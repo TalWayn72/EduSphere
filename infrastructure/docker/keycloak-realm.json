@@ -1,0 +1,220 @@
+{
+  "realm": "edusphere",
+  "enabled": true,
+  "displayName": "EduSphere",
+  "displayNameHtml": "<b>EduSphere</b> Knowledge Platform",
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": false,
+  "editUsernameAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "sslRequired": "external",
+  "accessTokenLifespan": 900,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespanEnabled": false,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "accessCodeLifespanLogin": 1800,
+  "actionTokenGeneratedByAdminLifespan": 43200,
+  "actionTokenGeneratedByUserLifespan": 300,
+  "oauth2DeviceCodeLifespan": 600,
+  "oauth2DevicePollingInterval": 5,
+  "clients": [
+    {
+      "clientId": "edusphere-backend",
+      "name": "EduSphere Backend Services",
+      "description": "GraphQL Gateway and Subgraphs",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "900"
+      },
+      "redirectUris": [],
+      "webOrigins": [],
+      "defaultClientScopes": [
+        "email",
+        "profile",
+        "roles"
+      ]
+    },
+    {
+      "clientId": "edusphere-web",
+      "name": "EduSphere Web Application",
+      "description": "React 19 + Vite Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "protocol": "openid-connect",
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:3000"
+      ],
+      "defaultClientScopes": [
+        "email",
+        "profile",
+        "roles"
+      ]
+    },
+    {
+      "clientId": "edusphere-mobile",
+      "name": "EduSphere Mobile App",
+      "description": "Expo SDK 54 React Native",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "protocol": "openid-connect",
+      "redirectUris": [
+        "edusphere://auth/callback",
+        "exp://localhost:19000"
+      ],
+      "webOrigins": [
+        "exp://localhost:19000"
+      ],
+      "defaultClientScopes": [
+        "email",
+        "profile",
+        "roles"
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "SUPER_ADMIN",
+        "description": "Platform administrator with full access across all tenants"
+      },
+      {
+        "name": "ORG_ADMIN",
+        "description": "Organization administrator for a specific tenant"
+      },
+      {
+        "name": "INSTRUCTOR",
+        "description": "Course instructor with content creation and management permissions"
+      },
+      {
+        "name": "STUDENT",
+        "description": "Student with access to enrolled courses and content"
+      },
+      {
+        "name": "RESEARCHER",
+        "description": "Researcher with read-only access to knowledge graph and analytics"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "super.admin@edusphere.dev",
+      "email": "super.admin@edusphere.dev",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Super",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "SuperAdmin123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["SUPER_ADMIN"],
+      "attributes": {
+        "tenant_id": ["00000000-0000-0000-0000-000000000000"]
+      }
+    },
+    {
+      "username": "org.admin@example.com",
+      "email": "org.admin@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Org",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "OrgAdmin123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ORG_ADMIN"],
+      "attributes": {
+        "tenant_id": ["11111111-1111-1111-1111-111111111111"]
+      }
+    },
+    {
+      "username": "instructor@example.com",
+      "email": "instructor@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "John",
+      "lastName": "Instructor",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Instructor123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["INSTRUCTOR"],
+      "attributes": {
+        "tenant_id": ["11111111-1111-1111-1111-111111111111"]
+      }
+    },
+    {
+      "username": "student@example.com",
+      "email": "student@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Jane",
+      "lastName": "Student",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Student123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["STUDENT"],
+      "attributes": {
+        "tenant_id": ["11111111-1111-1111-1111-111111111111"]
+      }
+    },
+    {
+      "username": "researcher@example.com",
+      "email": "researcher@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Bob",
+      "lastName": "Researcher",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Researcher123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["RESEARCHER"],
+      "attributes": {
+        "tenant_id": ["11111111-1111-1111-1111-111111111111"]
+      }
+    }
+  ]
+}

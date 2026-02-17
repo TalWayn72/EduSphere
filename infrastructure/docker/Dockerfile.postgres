@@ -1,0 +1,51 @@
+# Custom PostgreSQL 16 + Apache AGE 1.5.0 + pgvector 0.8.0
+FROM postgres:16-alpine
+
+LABEL maintainer="EduSphere Team"
+LABEL description="PostgreSQL 16 with Apache AGE graph database and pgvector for embeddings"
+
+# Install build dependencies
+RUN apk add --no-cache \
+    build-base \
+    clang \
+    llvm \
+    git \
+    curl \
+    flex \
+    bison
+
+# Install Apache AGE 1.5.0
+RUN cd /tmp && \
+    git clone --branch PG16/v1.5.0 --depth 1 https://github.com/apache/age.git && \
+    cd age && \
+    make USE_PGXS=1 && \
+    make USE_PGXS=1 install && \
+    cd / && \
+    rm -rf /tmp/age
+
+# Install pgvector 0.8.0
+RUN cd /tmp && \
+    git clone --branch v0.8.0 --depth 1 https://github.com/pgvector/pgvector.git && \
+    cd pgvector && \
+    make USE_PGXS=1 && \
+    make USE_PGXS=1 install && \
+    cd / && \
+    rm -rf /tmp/pgvector
+
+# Clean up build dependencies (keep runtime dependencies)
+RUN apk del build-base git curl && \
+    rm -rf /var/cache/apk/*
+
+# Copy initialization scripts
+COPY ./init.sql /docker-entrypoint-initdb.d/01-init.sql
+COPY ./age-setup.sql /docker-entrypoint-initdb.d/02-age-setup.sql
+
+# Set shared_preload_libraries in postgresql.conf
+RUN echo "shared_preload_libraries = 'age'" >> /usr/local/share/postgresql/postgresql.conf.sample
+
+# Expose PostgreSQL port
+EXPOSE 5432
+
+# Health check
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
+    CMD pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-edusphere} || exit 1
