@@ -20,6 +20,7 @@
 - **Communication:** Hebrew | **Code & Docs:** English
 - **Auto-approved:** File ops (Read, Write), Git (all operations including commit/push), pnpm, Bash, Docker, VS Code extensions
 - **No approval needed:** Execute directly without asking - Bash commands, Write operations, Git commits
+- **CRITICAL:** DO NOT ask "Can I do X?" or "Should I do Y?" - Just execute the task immediately. User will approve by default unless explicitly stated otherwise.
 
 ## Architecture & Patterns
 
