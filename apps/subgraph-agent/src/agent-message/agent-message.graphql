@@ -1,0 +1,39 @@
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+  TOOL
+}
+
+type AgentMessage @key(fields: "id") {
+  id: ID!
+  sessionId: ID!
+  session: AgentSession!
+  role: MessageRole!
+  content: String!
+  metadata: JSON
+  createdAt: String!
+}
+
+type AgentSession @key(fields: "id") {
+  id: ID!
+}
+
+scalar JSON
+
+extend type Query {
+  agentMessage(id: ID!): AgentMessage
+  agentMessagesBySession(sessionId: ID!): [AgentMessage!]!
+}
+
+extend type Mutation {
+  createAgentMessage(input: CreateAgentMessageInput!): AgentMessage!
+  deleteAgentMessage(id: ID!): Boolean!
+}
+
+input CreateAgentMessageInput {
+  sessionId: ID!
+  role: MessageRole!
+  content: String!
+  metadata: JSON
+}

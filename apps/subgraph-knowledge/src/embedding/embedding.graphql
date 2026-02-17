@@ -1,0 +1,41 @@
+type Embedding @key(fields: "id") {
+  id: ID!
+  contentItemId: ID!
+  contentItem: ContentItem!
+  chunkText: String!
+  embedding: [Float!]!
+  metadata: JSON
+  createdAt: String!
+}
+
+type ContentItem @key(fields: "id") {
+  id: ID!
+}
+
+type SimilarityResult {
+  embedding: Embedding!
+  similarity: Float!
+  distance: Float!
+}
+
+scalar JSON
+
+extend type Query {
+  embedding(id: ID!): Embedding
+  embeddingsByContentItem(contentItemId: ID!): [Embedding!]!
+  semanticSearch(query: [Float!]!, limit: Int = 10, minSimilarity: Float = 0.7): [SimilarityResult!]!
+  semanticSearchByContentItem(contentItemId: ID!, query: [Float!]!, limit: Int = 5): [SimilarityResult!]!
+}
+
+extend type Mutation {
+  createEmbedding(input: CreateEmbeddingInput!): Embedding!
+  deleteEmbedding(id: ID!): Boolean!
+  deleteEmbeddingsByContentItem(contentItemId: ID!): Int!
+}
+
+input CreateEmbeddingInput {
+  contentItemId: ID!
+  chunkText: String!
+  embedding: [Float!]!
+  metadata: JSON
+}
