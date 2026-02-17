@@ -1,0 +1,114 @@
+groups:
+  - name: edusphere_alerts
+    interval: 30s
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(edusphere_http_requests_total{status_code=~"5.."}[5m]))
+            /
+            sum(rate(edusphere_http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.service }}"
+
+      # Service down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} has been down for more than 1 minute"
+
+      # High response time
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(edusphere_http_request_duration_seconds_bucket[5m])) by (le, service)
+          ) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time for {{ $labels.service }}"
+          description: "95th percentile response time is {{ $value }}s"
+
+      # Database connection pool exhaustion
+      - alert: DatabasePoolExhaustion
+        expr: |
+          (
+            edusphere_db_pool_active_connections
+            /
+            edusphere_db_pool_max_connections
+          ) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "Connection pool is {{ $value | humanizePercentage }} full"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            process_resident_memory_bytes
+            /
+            (1024 * 1024 * 1024)
+          ) > 1.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage for {{ $labels.service }}"
+          description: "Memory usage is {{ $value }}GB"
+
+      # Disk space low
+      - alert: DiskSpaceLow
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/"}
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space running low"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"
+
+      # GraphQL query complexity too high
+      - alert: HighGraphQLComplexity
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(edusphere_graphql_query_complexity_bucket[5m])) by (le)
+          ) > 800
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High GraphQL query complexity detected"
+          description: "95th percentile complexity is {{ $value }}"
+
+      # Cache hit rate too low
+      - alert: LowCacheHitRate
+        expr: |
+          (
+            sum(rate(edusphere_cache_operations_total{result="hit"}[5m]))
+            /
+            sum(rate(edusphere_cache_operations_total[5m]))
+          ) < 0.5
+        for: 15m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }}"

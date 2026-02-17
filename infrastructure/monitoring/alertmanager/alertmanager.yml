@@ -1,0 +1,76 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@edusphere.com'
+  smtp_auth_username: 'alerts@edusphere.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree
+route:
+  group_by: ['alertname', 'severity', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'team-slack'
+
+  # Child routes
+  routes:
+    # Critical alerts go to PagerDuty
+    - match:
+        severity: critical
+      receiver: 'pagerduty'
+      continue: true
+
+    # All alerts go to Slack
+    - match_re:
+        severity: critical|warning|info
+      receiver: 'team-slack'
+
+receivers:
+  # Slack webhook
+  - name: 'team-slack'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#edusphere-alerts'
+        title: '{{ .GroupLabels.alertname }}'
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }}
+            *Description:* {{ .Annotations.description }}
+            *Severity:* {{ .Labels.severity }}
+            *Service:* {{ .Labels.service }}
+          {{ end }}
+        send_resolved: true
+
+  # PagerDuty for critical alerts
+  - name: 'pagerduty'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        description: '{{ .GroupLabels.alertname }}: {{ .CommonAnnotations.summary }}'
+
+  # Email for warnings
+  - name: 'team-email'
+    email_configs:
+      - to: 'team@edusphere.com'
+        headers:
+          Subject: '[{{ .Status }}] {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>{{ .GroupLabels.alertname }}</h2>
+          {{ range .Alerts }}
+          <p><b>Summary:</b> {{ .Annotations.summary }}</p>
+          <p><b>Description:</b> {{ .Annotations.description }}</p>
+          <p><b>Severity:</b> {{ .Labels.severity }}</p>
+          {{ end }}
+
+# Inhibition rules
+inhibit_rules:
+  # Don't alert on high response time if service is down
+  - source_match:
+      alertname: ServiceDown
+    target_match:
+      alertname: HighResponseTime
+    equal: ['service']
