@@ -8,7 +8,7 @@ import { UserModule } from './user/user.module';
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
       typePaths: ['./**/*.graphql'],
-      context: ({ req }) => ({ req }),
+      context: ({ req }: any) => ({ req }),
       playground: true,
       introspection: true,
     }),

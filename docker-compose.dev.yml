@@ -1,0 +1,258 @@
+# ═══════════════════════════════════════════════════════════════
+# EduSphere - Development Docker Compose
+# Local development with hot reload
+# ═══════════════════════════════════════════════════════════════
+
+version: '3.9'
+
+services:
+  # ═══════════════════════════════════════════════════════════════
+  # PostgreSQL 16 + pgvector + Apache AGE
+  # ═══════════════════════════════════════════════════════════════
+  postgres:
+    build:
+      context: ./infrastructure/docker
+      dockerfile: Dockerfile.postgres
+    container_name: edusphere-postgres
+    environment:
+      POSTGRES_USER: edusphere
+      POSTGRES_PASSWORD: edusphere_dev_password
+      POSTGRES_DB: edusphere
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./infrastructure/docker/age-setup.sql:/docker-entrypoint-initdb.d/02-age-setup.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edusphere"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Redis
+  # ═══════════════════════════════════════════════════════════════
+  redis:
+    image: redis:7-alpine
+    container_name: edusphere-redis
+    command: redis-server --requirepass edusphere_redis_password
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Core Subgraph (Port 4001)
+  # ═══════════════════════════════════════════════════════════════
+  subgraph-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: edusphere-subgraph-core
+    working_dir: /app/apps/subgraph-core
+    command: pnpm dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4001
+      - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+    ports:
+      - "4001:4001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/subgraph-core/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Content Subgraph (Port 4002)
+  # ═══════════════════════════════════════════════════════════════
+  subgraph-content:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: edusphere-subgraph-content
+    working_dir: /app/apps/subgraph-content
+    command: pnpm dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4002
+      - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+    ports:
+      - "4002:4002"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/subgraph-content/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Annotation Subgraph (Port 4003)
+  # ═══════════════════════════════════════════════════════════════
+  subgraph-annotation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: edusphere-subgraph-annotation
+    working_dir: /app/apps/subgraph-annotation
+    command: pnpm dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4003
+      - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+    ports:
+      - "4003:4003"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/subgraph-annotation/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Collaboration Subgraph (Port 4004)
+  # ═══════════════════════════════════════════════════════════════
+  subgraph-collaboration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: edusphere-subgraph-collaboration
+    working_dir: /app/apps/subgraph-collaboration
+    command: pnpm dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4004
+      - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+    ports:
+      - "4004:4004"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/subgraph-collaboration/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Agent Subgraph (Port 4005)
+  # ═══════════════════════════════════════════════════════════════
+  subgraph-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: edusphere-subgraph-agent
+    working_dir: /app/apps/subgraph-agent
+    command: pnpm dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4005
+      - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+    ports:
+      - "4005:4005"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/subgraph-agent/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Knowledge Subgraph (Port 4006) - pgvector
+  # ═══════════════════════════════════════════════════════════════
+  subgraph-knowledge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: edusphere-subgraph-knowledge
+    working_dir: /app/apps/subgraph-knowledge
+    command: pnpm dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4006
+      - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+    ports:
+      - "4006:4006"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/subgraph-knowledge/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # Gateway (Port 4000) - Hive Gateway v2.7
+  # ═══════════════════════════════════════════════════════════════
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: edusphere-gateway
+    working_dir: /app/apps/gateway
+    command: pnpm dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - SUBGRAPH_CORE_URL=http://subgraph-core:4001/graphql
+      - SUBGRAPH_CONTENT_URL=http://subgraph-content:4002/graphql
+      - SUBGRAPH_ANNOTATION_URL=http://subgraph-annotation:4003/graphql
+      - SUBGRAPH_COLLABORATION_URL=http://subgraph-collaboration:4004/graphql
+      - SUBGRAPH_AGENT_URL=http://subgraph-agent:4005/graphql
+      - SUBGRAPH_KNOWLEDGE_URL=http://subgraph-knowledge:4006/graphql
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/gateway/node_modules
+    depends_on:
+      - subgraph-core
+      - subgraph-content
+      - subgraph-annotation
+      - subgraph-collaboration
+      - subgraph-agent
+      - subgraph-knowledge
+    networks:
+      - edusphere
+
+networks:
+  edusphere:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

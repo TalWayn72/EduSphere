@@ -8,6 +8,9 @@
     "dev": "hive-gateway supergraph",
     "build": "echo 'Gateway is config-based, no build needed'",
     "compose": "hive-gateway compose",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "vitest run tests/integration",
     "lint": "echo 'No lint for config-based gateway'",
     "typecheck": "echo 'No typecheck for config-based gateway'"
   },
@@ -17,6 +20,10 @@
   },
   "devDependencies": {
     "@edusphere/tsconfig": "workspace:*",
-    "typescript": "^5.8.2"
+    "@types/node": "^22.10.5",
+    "@vitest/coverage-v8": "^2.1.8",
+    "graphql-request": "^7.1.2",
+    "typescript": "^5.8.2",
+    "vitest": "^2.1.8"
   }
 }
