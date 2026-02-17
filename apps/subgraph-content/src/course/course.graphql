@@ -1,0 +1,50 @@
+type Course @key(fields: "id") {
+  id: ID!
+  tenantId: ID!
+  title: String!
+  slug: String!
+  description: String
+  thumbnailUrl: String
+  instructorId: ID!
+  instructor: User @shareable
+  isPublished: Boolean!
+  estimatedHours: Int
+  modules: [Module!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+}
+
+extend type Query {
+  course(id: ID!): Course
+  courses(limit: Int = 20, offset: Int = 0): [Course!]!
+  coursesByInstructor(instructorId: ID!, limit: Int = 20): [Course!]!
+}
+
+extend type Mutation {
+  createCourse(input: CreateCourseInput!): Course!
+  updateCourse(id: ID!, input: UpdateCourseInput!): Course!
+  deleteCourse(id: ID!): Boolean!
+  publishCourse(id: ID!): Course!
+  unpublishCourse(id: ID!): Course!
+}
+
+input CreateCourseInput {
+  title: String!
+  slug: String!
+  description: String
+  instructorId: ID!
+  thumbnailUrl: String
+  estimatedHours: Int
+}
+
+input UpdateCourseInput {
+  title: String
+  slug: String
+  description: String
+  thumbnailUrl: String
+  estimatedHours: Int
+}

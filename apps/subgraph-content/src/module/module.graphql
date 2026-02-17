@@ -1,0 +1,39 @@
+type Module @key(fields: "id") {
+  id: ID!
+  courseId: ID!
+  course: Course!
+  title: String!
+  description: String
+  orderIndex: Int!
+  contentItems: [ContentItem!]!
+  createdAt: String!
+}
+
+type Course @key(fields: "id") {
+  id: ID!
+}
+
+extend type Query {
+  module(id: ID!): Module
+  modulesByCourse(courseId: ID!): [Module!]!
+}
+
+extend type Mutation {
+  createModule(input: CreateModuleInput!): Module!
+  updateModule(id: ID!, input: UpdateModuleInput!): Module!
+  deleteModule(id: ID!): Boolean!
+  reorderModules(courseId: ID!, moduleIds: [ID!]!): [Module!]!
+}
+
+input CreateModuleInput {
+  courseId: ID!
+  title: String!
+  description: String
+  orderIndex: Int!
+}
+
+input UpdateModuleInput {
+  title: String
+  description: String
+  orderIndex: Int
+}

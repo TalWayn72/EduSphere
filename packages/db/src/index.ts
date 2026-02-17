@@ -17,9 +17,13 @@ export function createDatabaseConnection(connectionString?: string) {
   return drizzle(pool, { schema });
 }
 
-// Export schema
+// Export schema and all tables/types
 export { schema };
+export * from './schema';
 export type Database = ReturnType<typeof createDatabaseConnection>;
+
+// Create default database connection
+export const db = createDatabaseConnection();
 
 // RLS Context Helper
 export async function withTenantContext<T>(
@@ -34,4 +38,4 @@ export async function withTenantContext<T>(
 }
 
 // Re-export from drizzle
-export { sql, eq, and, or, not } from 'drizzle-orm';
+export { sql, eq, and, or, not, desc, asc, inArray } from 'drizzle-orm';
