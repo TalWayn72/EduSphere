@@ -1,0 +1,93 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+scalar join__FieldSet
+
+enum join__Graph {
+  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  SECURITY
+  EXECUTION
+}
+
+scalar DateTime
+
+type User
+  @join__type(graph: CORE, key: "id")
+{
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  role: UserRole!
+  tenantId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum UserRole
+  @join__type(graph: CORE)
+{
+  SUPER_ADMIN @join__enumValue(graph: CORE)
+  ORG_ADMIN @join__enumValue(graph: CORE)
+  INSTRUCTOR @join__enumValue(graph: CORE)
+  STUDENT @join__enumValue(graph: CORE)
+  RESEARCHER @join__enumValue(graph: CORE)
+}
+
+type Query
+  @join__type(graph: CORE)
+{
+  _health: String!
+  user(id: ID!): User
+  users(limit: Int = 10, offset: Int = 0): [User!]!
+  me: User
+}
+
+type Mutation
+  @join__type(graph: CORE)
+{
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+}
+
+input CreateUserInput
+  @join__type(graph: CORE)
+{
+  email: String!
+  firstName: String!
+  lastName: String!
+  role: UserRole!
+  tenantId: ID!
+}
+
+input UpdateUserInput
+  @join__type(graph: CORE)
+{
+  firstName: String
+  lastName: String
+  role: UserRole
+}
