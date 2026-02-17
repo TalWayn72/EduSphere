@@ -52,6 +52,38 @@ services:
       - edusphere
 
   # ═══════════════════════════════════════════════════════════════
+  # Keycloak (Port 8080)
+  # ═══════════════════════════════════════════════════════════════
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: edusphere-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/edusphere
+      KC_DB_USERNAME: edusphere
+      KC_DB_PASSWORD: edusphere_dev_password
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+    command: start-dev --import-realm
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/docker/keycloak-realm.json:/opt/keycloak/data/import/edusphere-realm.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
   # Core Subgraph (Port 4001)
   # ═══════════════════════════════════════════════════════════════
   subgraph-core:
@@ -66,6 +98,7 @@ services:
       - NODE_ENV=development
       - PORT=4001
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - KEYCLOAK_URL=http://keycloak:8080
     ports:
       - "4001:4001"
     volumes:
@@ -74,6 +107,8 @@ services:
       - /app/apps/subgraph-core/node_modules
     depends_on:
       postgres:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     networks:
       - edusphere
@@ -93,6 +128,7 @@ services:
       - NODE_ENV=development
       - PORT=4002
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - KEYCLOAK_URL=http://keycloak:8080
     ports:
       - "4002:4002"
     volumes:
@@ -101,6 +137,8 @@ services:
       - /app/apps/subgraph-content/node_modules
     depends_on:
       postgres:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     networks:
       - edusphere

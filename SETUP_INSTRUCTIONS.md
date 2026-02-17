@@ -117,10 +117,74 @@ All services healthy!
 - Apache AGE graph ontology initialized
 - pgvector embeddings tables ready
 
-⏳ **Next:** Phase 2 - Core + Content Subgraphs
-- Keycloak authentication
-- GraphQL subgraph-core (Users, Tenants)
-- GraphQL subgraph-content (Courses, Media, Transcription)
+✅ **Phase 2: Authentication + Core/Content Subgraphs** - Infrastructure Ready
+- Keycloak realm configured (see [PHASE_2_SETUP.md](PHASE_2_SETUP.md))
+- Docker Compose updated with Keycloak service
+- 5 demo users with roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, STUDENT, RESEARCHER)
+- Code templates ready for packages/auth, subgraph-core, subgraph-content
+
+⏳ **Next:** Phase 3 - Gateway & Supergraph
+- Hive Gateway v2.7 configuration
+- Supergraph composition
+- GraphQL introspection
+- Frontend setup (React 19 + Vite)
+
+---
+
+## Phase 2: Keycloak Authentication Setup
+
+### Step 1: Start Keycloak
+
+```bash
+# Start Keycloak with PostgreSQL + Redis
+docker compose -f docker-compose.dev.yml up -d postgres redis keycloak
+
+# Wait for Keycloak to be ready (~60 seconds)
+docker logs -f edusphere-keycloak
+# Look for: "Running the server in development mode. DO NOT use this configuration in production."
+```
+
+### Step 2: Verify Keycloak Realm
+
+```bash
+# Open Keycloak Admin Console
+# URL: http://localhost:8080
+# Login: admin / admin123
+
+# Verify:
+# 1. Realm "edusphere" is imported
+# 2. 5 users exist (Users menu)
+# 3. 5 roles exist (Realm roles menu)
+# 4. 3 clients exist (Clients menu)
+```
+
+### Step 3: Test Authentication
+
+Test login with demo users:
+- **Super Admin**: super.admin@edusphere.dev / SuperAdmin123!
+- **Org Admin**: org.admin@example.com / OrgAdmin123!
+- **Instructor**: instructor@example.com / Instructor123!
+- **Student**: student@example.com / Student123!
+- **Researcher**: researcher@example.com / Researcher123!
+
+### Step 4: Build Auth Package & Subgraphs
+
+See [PHASE_2_SETUP.md](PHASE_2_SETUP.md) for complete code templates for:
+- `packages/auth` - JWT validation with Keycloak JWKS
+- `apps/subgraph-core` - Users & Tenants GraphQL API
+- `apps/subgraph-content` - Courses & Media GraphQL API
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build auth package
+pnpm --filter @edusphere/auth build
+
+# Start subgraphs (in separate terminals)
+pnpm --filter @edusphere/subgraph-core dev
+pnpm --filter @edusphere/subgraph-content dev
+```
 
 ---
 
