@@ -10,7 +10,11 @@
       "Bash(pnpm build:*)",
       "Bash(pnpm --filter @edusphere/auth build:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(pnpm --filter @edusphere/gateway build:*)",
+      "Bash(pnpm --filter @edusphere/subgraph-content build:*)",
+      "Bash(pnpm --filter @edusphere/web build:*)",
+      "Bash(find:*)"
     ]
   }
 }

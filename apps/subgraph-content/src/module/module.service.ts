@@ -23,8 +23,8 @@ export class ModuleService {
     return db
       .select()
       .from(modules)
-      .where(eq(modules.courseId, courseId))
-      .orderBy(asc(modules.orderIndex));
+      .where(eq(modules.course_id, courseId))
+      .orderBy(asc(modules.order_index));
   }
 
   async create(input: Partial<NewModule>) {
@@ -60,7 +60,7 @@ export class ModuleService {
     const updates = moduleIds.map((id, index) =>
       db
         .update(modules)
-        .set({ orderIndex: index })
+        .set({ order_index: index })
         .where(eq(modules.id, id)),
     );
 
@@ -71,6 +71,6 @@ export class ModuleService {
       .select()
       .from(modules)
       .where(inArray(modules.id, moduleIds))
-      .orderBy(asc(modules.orderIndex));
+      .orderBy(asc(modules.order_index));
   }
 }

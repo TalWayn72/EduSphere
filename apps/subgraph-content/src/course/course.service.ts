@@ -1,83 +1,51 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { db } from '@edusphere/db';
-import { courses, NewCourse } from '@edusphere/db';
-import { eq, desc } from 'drizzle-orm';
+import { Injectable } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, desc } from '@edusphere/db';
 
 @Injectable()
 export class CourseService {
+  private db = createDatabaseConnection();
+
   async findById(id: string) {
-    const [course] = await db
+    const [course] = await this.db
       .select()
-      .from(courses)
-      .where(eq(courses.id, id))
+      .from(schema.courses)
+      .where(eq(schema.courses.id, id))
       .limit(1);
-
-    if (!course) {
-      throw new NotFoundException(`Course with ID ${id} not found`);
-    }
-
-    return course;
+    return course || null;
   }
 
-  async findAll(limit: number = 20, offset: number = 0) {
-    return db
+  async findAll(limit: number, offset: number) {
+    return this.db
       .select()
-      .from(courses)
-      .orderBy(desc(courses.createdAt))
+      .from(schema.courses)
+      .orderBy(desc(schema.courses.created_at))
       .limit(limit)
       .offset(offset);
   }
 
-  async findByInstructor(instructorId: string, limit: number = 20) {
-    return db
-      .select()
-      .from(courses)
-      .where(eq(courses.instructorId, instructorId))
-      .orderBy(desc(courses.createdAt))
-      .limit(limit);
-  }
-
-  async create(input: Partial<NewCourse>) {
-    const tenantId = process.env.TENANT_ID || 'default-tenant-uuid';
-
-    const [course] = await db
-      .insert(courses)
+  async create(input: any) {
+    const [course] = await this.db
+      .insert(schema.courses)
       .values({
-        ...input,
-        tenantId,
-      } as NewCourse)
+        tenant_id: input.tenantId,
+        title: input.title,
+        description: input.description,
+        creator_id: input.creatorId,
+      })
       .returning();
-
     return course;
   }
 
-  async update(id: string, input: Partial<NewCourse>) {
-    const [updated] = await db
-      .update(courses)
+  async update(id: string, input: any) {
+    const [course] = await this.db
+      .update(schema.courses)
       .set({
-        ...input,
-        updatedAt: new Date(),
+        title: input.title,
+        description: input.description,
+        updated_at: new Date(),
       })
-      .where(eq(courses.id, id))
+      .where(eq(schema.courses.id, id))
       .returning();
-
-    if (!updated) {
-      throw new NotFoundException(`Course with ID ${id} not found`);
-    }
-
-    return updated;
-  }
-
-  async delete(id: string): Promise<boolean> {
-    const result = await db.delete(courses).where(eq(courses.id, id));
-    return (result.rowCount ?? 0) > 0;
-  }
-
-  async publish(id: string) {
-    return this.update(id, { isPublished: true });
-  }
-
-  async unpublish(id: string) {
-    return this.update(id, { isPublished: false });
+    return course;
   }
 }
