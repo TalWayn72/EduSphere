@@ -1,0 +1,55 @@
+type Discussion @key(fields: "id") {
+  id: ID!
+  contentItemId: ID
+  contentItem: ContentItem
+  authorId: ID!
+  author: User!
+  parentId: ID
+  parent: Discussion
+  replies: [Discussion!]!
+  title: String
+  content: String!
+  upvotes: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type ContentItem @key(fields: "id") {
+  id: ID!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+}
+
+extend type Query {
+  discussion(id: ID!): Discussion
+  discussionsByContentItem(contentItemId: ID!): [Discussion!]!
+  discussionsByAuthor(authorId: ID!): [Discussion!]!
+  discussionReplies(parentId: ID!): [Discussion!]!
+}
+
+extend type Mutation {
+  createDiscussion(input: CreateDiscussionInput!): Discussion!
+  updateDiscussion(id: ID!, input: UpdateDiscussionInput!): Discussion!
+  deleteDiscussion(id: ID!): Boolean!
+  upvoteDiscussion(id: ID!): Discussion!
+  replyToDiscussion(parentId: ID!, input: ReplyDiscussionInput!): Discussion!
+}
+
+input CreateDiscussionInput {
+  contentItemId: ID
+  authorId: ID!
+  title: String
+  content: String!
+}
+
+input UpdateDiscussionInput {
+  content: String
+  title: String
+}
+
+input ReplyDiscussionInput {
+  authorId: ID!
+  content: String!
+}

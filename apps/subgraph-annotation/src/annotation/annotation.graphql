@@ -1,0 +1,60 @@
+enum AnnotationType {
+  HIGHLIGHT
+  NOTE
+  QUESTION
+  BOOKMARK
+}
+
+type Annotation @key(fields: "id") {
+  id: ID!
+  contentItemId: ID!
+  contentItem: ContentItem!
+  userId: ID!
+  user: User!
+  type: AnnotationType!
+  text: String
+  highlightedText: String
+  startOffset: Int
+  endOffset: Int
+  color: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type ContentItem @key(fields: "id") {
+  id: ID!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+}
+
+extend type Query {
+  annotation(id: ID!): Annotation
+  annotationsByContentItem(contentItemId: ID!): [Annotation!]!
+  annotationsByUser(userId: ID!): [Annotation!]!
+  annotationsByType(contentItemId: ID!, type: AnnotationType!): [Annotation!]!
+}
+
+extend type Mutation {
+  createAnnotation(input: CreateAnnotationInput!): Annotation!
+  updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation!
+  deleteAnnotation(id: ID!): Boolean!
+}
+
+input CreateAnnotationInput {
+  contentItemId: ID!
+  userId: ID!
+  type: AnnotationType!
+  text: String
+  highlightedText: String
+  startOffset: Int
+  endOffset: Int
+  color: String
+}
+
+input UpdateAnnotationInput {
+  text: String
+  highlightedText: String
+  color: String
+}
