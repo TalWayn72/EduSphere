@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, split } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, split, ApolloLink } from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 import Navigation from './src/navigation';
 import { useLoadAssets } from './src/hooks/useLoadAssets';
+import { database } from './src/services/database';
+import { offlineLink } from './src/apollo/offlineLink';
 
 // GraphQL setup
 const GATEWAY_URL = __DEV__
@@ -44,15 +46,32 @@ const splitLink = split(
   httpLink,
 );
 
+// Chain offline support before the split link
+const link = ApolloLink.from([offlineLink, splitLink]);
+
 const client = new ApolloClient({
-  link: splitLink,
+  link,
   cache: new InMemoryCache(),
 });
 
 export default function App() {
   const isLoadingComplete = useLoadAssets();
+  const [dbReady, setDbReady] = useState(false);
 
-  if (!isLoadingComplete) {
+  useEffect(() => {
+    async function initDatabase() {
+      try {
+        await database.init();
+        setDbReady(true);
+      } catch (error) {
+        console.error('Failed to initialize database:', error);
+        setDbReady(true); // Continue anyway
+      }
+    }
+    initDatabase();
+  }, []);
+
+  if (!isLoadingComplete || !dbReady) {
     return null;
   }
 
