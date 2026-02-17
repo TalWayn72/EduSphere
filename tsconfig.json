@@ -1,0 +1,14 @@
+{
+  "extends": "@edusphere/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@edusphere/*": ["packages/*/src"]
+    }
+  },
+  "include": [],
+  "references": [
+    { "path": "./packages/tsconfig" },
+    { "path": "./packages/graphql-shared" }
+  ]
+}

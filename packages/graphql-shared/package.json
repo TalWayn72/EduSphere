@@ -1,0 +1,35 @@
+{
+  "name": "@edusphere/graphql-shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./scalars": {
+      "import": "./dist/scalars.js",
+      "types": "./dist/scalars.d.ts"
+    },
+    "./directives": {
+      "import": "./dist/directives.js",
+      "types": "./dist/directives.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "graphql": "^16.9.0",
+    "graphql-scalars": "^1.24.0"
+  },
+  "devDependencies": {
+    "@edusphere/tsconfig": "workspace:*",
+    "typescript": "^5.8.2"
+  }
+}
