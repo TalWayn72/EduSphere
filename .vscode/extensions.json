@@ -1,0 +1,23 @@
+{
+  "recommendations": [
+    "graphql.vscode-graphql",
+    "graphql.vscode-graphql-syntax",
+    "prisma.prisma",
+    "ckolkman.vscode-postgres",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml",
+    "eamodio.gitlens",
+    "rangav.vscode-thunder-client",
+    "humao.rest-client",
+    "usernamehw.errorlens",
+    "wix.vscode-import-cost",
+    "gruntfuggly.todo-tree",
+    "aaron-bond.better-comments",
+    "chakrounanas.turbo-console-log",
+    "christian-kohler.path-intellisense",
+    "yzhang.markdown-all-in-one"
+  ]
+}

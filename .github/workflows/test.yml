@@ -1,0 +1,338 @@
+name: Full Test Suite
+
+# Triggers on push or pull request to main branches
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+# Cancel outdated runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Integration tests with full infrastructure stack
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Service containers for testing
+    services:
+      # PostgreSQL 16 with AGE + pgvector extensions
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: edusphere_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: edusphere_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      # Redis for caching and session storage
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      # NATS JetStream for messaging
+      nats:
+        image: nats:latest
+        ports:
+          - 4222:4222
+          - 8222:8222
+        options: >-
+          --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:8222/healthz || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        # Start with JetStream enabled
+        args: ["-js"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      # Install PostgreSQL extensions (AGE + pgvector)
+      - name: Install PostgreSQL extensions
+        run: |
+          # Wait for PostgreSQL to be fully ready
+          sleep 5
+
+          # Note: In CI, we use a standard PostgreSQL image.
+          # For full AGE support, use a custom Docker image in production.
+          # Here we'll install pgvector which is available via apt
+
+          docker exec ${{ job.services.postgres.id }} sh -c "
+            apt-get update &&
+            apt-get install -y postgresql-16-pgvector || echo 'pgvector installation skipped in CI'
+          "
+
+          # Create extensions
+          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "SELECT * FROM pg_extension WHERE extname='vector';"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate database schema
+        run: pnpm --filter @edusphere/db generate
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+
+      - name: Run database migrations
+        run: pnpm --filter @edusphere/db migrate
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+
+      - name: Seed test data
+        run: pnpm --filter @edusphere/db seed
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+          NODE_ENV: test
+
+      - name: Run integration tests
+        run: pnpm turbo test:integration --concurrency=2
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+          REDIS_URL: redis://localhost:6379
+          NATS_URL: nats://localhost:4222
+          NODE_ENV: test
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+      - name: Upload integration test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-results
+          path: |
+            apps/*/test-results
+            packages/*/test-results
+          retention-days: 7
+
+  # Row-Level Security (RLS) policy tests
+  rls-tests:
+    name: RLS Policy Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: edusphere_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: edusphere_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install pgvector extension
+        run: |
+          sleep 5
+          docker exec ${{ job.services.postgres.id }} sh -c "
+            apt-get update &&
+            apt-get install -y postgresql-16-pgvector || echo 'pgvector installation skipped'
+          "
+          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run database migrations
+        run: pnpm --filter @edusphere/db migrate
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+
+      - name: Run RLS policy tests
+        run: pnpm --filter @edusphere/db test:rls
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+          NODE_ENV: test
+
+      - name: Upload RLS test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rls-test-results
+          path: packages/db/test-results
+          retention-days: 7
+
+  # GraphQL integration tests
+  graphql-tests:
+    name: GraphQL Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: edusphere_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: edusphere_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      nats:
+        image: nats:latest
+        ports:
+          - 4222:4222
+          - 8222:8222
+        options: >-
+          --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:8222/healthz || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        args: ["-js"]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test each subgraph in parallel
+        package:
+          - gateway
+          - subgraph-core
+          - subgraph-content
+          - subgraph-annotation
+          - subgraph-collaboration
+          - subgraph-agent
+          - subgraph-knowledge
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install pgvector extension
+        run: |
+          sleep 5
+          docker exec ${{ job.services.postgres.id }} sh -c "
+            apt-get update &&
+            apt-get install -y postgresql-16-pgvector || echo 'pgvector installation skipped'
+          "
+          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run database migrations
+        run: pnpm --filter @edusphere/db migrate
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+
+      - name: Seed test data
+        run: pnpm --filter @edusphere/db seed
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+          NODE_ENV: test
+
+      - name: Run GraphQL tests for ${{ matrix.package }}
+        run: pnpm --filter @edusphere/${{ matrix.package }} test:graphql
+        env:
+          DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
+          REDIS_URL: redis://localhost:6379
+          NATS_URL: nats://localhost:4222
+          NODE_ENV: test
+
+      - name: Upload GraphQL test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: graphql-test-results-${{ matrix.package }}
+          path: apps/${{ matrix.package }}/test-results
+          retention-days: 7
+
+  # Summary job - all tests must pass
+  test-complete:
+    name: Test Suite Complete
+    runs-on: ubuntu-latest
+    needs: [integration-tests, rls-tests, graphql-tests]
+    if: always()
+
+    steps:
+      - name: Check all test jobs succeeded
+        run: |
+          if [[ "${{ needs.integration-tests.result }}" != "success" || \
+                "${{ needs.rls-tests.result }}" != "success" || \
+                "${{ needs.graphql-tests.result }}" != "success" ]]; then
+            echo "One or more test jobs failed"
+            exit 1
+          fi
+          echo "All test suites passed successfully!"

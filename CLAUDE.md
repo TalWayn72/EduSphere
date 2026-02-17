@@ -529,6 +529,48 @@ pnpm audit --audit-level=high
 | `IMPLEMENTATION-ROADMAP.md` | Phase acceptance criteria change | Tasks, acceptance criteria, commands |
 | `API-CONTRACTS-GRAPHQL-FEDERATION.md` | GraphQL schema change | Types, queries, mutations, subscriptions |
 
+## VS Code Extensions
+
+**Recommended extensions** are defined in `.vscode/extensions.json` and will be suggested automatically when opening the project in VS Code.
+
+### Essential Extensions (Must Install)
+| Extension | Purpose | Why Critical |
+|-----------|---------|--------------|
+| **GraphQL: Language Feature Support** | GraphQL autocomplete, validation, schema viewing | Federation development requires GraphQL tooling |
+| **GraphQL: Syntax Highlighting** | Syntax highlighting for .graphql files | SDL schema files across 6 subgraphs |
+| **Prisma** | Database schema visualization (works with Drizzle) | Database schema exploration |
+| **PostgreSQL** (Chris Kolkman) | Database client for PostgreSQL queries | RLS policy testing, manual queries |
+| **ESLint** | Code quality and linting | Already configured in project |
+| **Prettier** | Auto-formatting | Matches project code conventions |
+| **Docker** | Manage containers directly from VS Code | Infrastructure management |
+
+### Highly Recommended
+| Extension | Purpose |
+|-----------|---------|
+| **GitLens** | Advanced Git features (blame, history, compare) |
+| **Thunder Client** | API testing for GraphQL endpoints |
+| **REST Client** | HTTP/GraphQL requests in .http files |
+| **Error Lens** | Inline error highlighting |
+| **Import Cost** | Shows bundle impact of imports |
+| **Todo Tree** | Highlights TODO/FIXME comments |
+| **Better Comments** | Color-coded comment categories |
+| **YAML** | Docker Compose and Kubernetes files |
+| **EditorConfig** | Consistent formatting across team |
+
+### Nice to Have
+| Extension | Purpose |
+|-----------|---------|
+| **Turbo Console Log** | Quick console.log insertion |
+| **Path Intellisense** | Autocomplete file paths |
+| **Markdown All in One** | Better markdown editing for docs |
+
+### Installation
+VS Code will prompt to install recommended extensions on first open. Alternatively:
+```bash
+# Install all at once via Extensions panel "Install All Recommended Extensions"
+# Or manually: Ctrl+Shift+X → Search extension name → Install
+```
+
 ## Troubleshooting
 
 | Problem | Solution |

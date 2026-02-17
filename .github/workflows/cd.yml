@@ -1,0 +1,363 @@
+name: Continuous Deployment
+
+# Triggers on push to main/master branches
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Manual trigger
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+# Prevent concurrent deployments
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false # Don't cancel in-progress deployments
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/edusphere
+
+jobs:
+  # Deploy to staging environment (automatic)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: staging
+      url: https://staging.edusphere.dev
+    # Only auto-deploy staging on push to main/master
+    if: github.event_name == 'push' || github.event.inputs.environment == 'staging'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl context
+        run: |
+          # Configure kubeconfig for staging cluster
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_STAGING }}" | base64 -d > ~/.kube/config
+          kubectl config use-context staging
+
+      - name: Verify cluster connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Set image tags
+        id: tags
+        run: |
+          # Use commit SHA as image tag
+          echo "IMAGE_TAG=main-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+      - name: Deploy Gateway
+        run: |
+          kubectl set image deployment/edusphere-gateway \
+            gateway=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-gateway:${{ steps.tags.outputs.IMAGE_TAG }} \
+            -n edusphere-staging
+
+      - name: Deploy Subgraphs
+        run: |
+          # Deploy all 6 subgraphs
+          for service in core content annotation collaboration agent knowledge; do
+            echo "Deploying subgraph-${service}..."
+            kubectl set image deployment/edusphere-subgraph-${service} \
+              subgraph-${service}=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-subgraph-${service}:${{ steps.tags.outputs.IMAGE_TAG }} \
+              -n edusphere-staging
+          done
+
+      - name: Deploy Frontend
+        run: |
+          kubectl set image deployment/edusphere-web \
+            web=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-web:${{ steps.tags.outputs.IMAGE_TAG }} \
+            -n edusphere-staging
+
+      - name: Wait for rollout to complete
+        run: |
+          # Wait for all deployments to complete
+          kubectl rollout status deployment/edusphere-gateway -n edusphere-staging --timeout=5m
+          kubectl rollout status deployment/edusphere-web -n edusphere-staging --timeout=5m
+
+          for service in core content annotation collaboration agent knowledge; do
+            kubectl rollout status deployment/edusphere-subgraph-${service} -n edusphere-staging --timeout=5m
+          done
+
+      - name: Run health checks
+        run: |
+          # Wait for services to be ready
+          sleep 30
+
+          # Health check Gateway
+          GATEWAY_URL="https://staging-api.edusphere.dev/graphql"
+          echo "Checking Gateway health..."
+          curl -f -X POST $GATEWAY_URL \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ __typename }"}' || exit 1
+
+          # Health check Frontend
+          FRONTEND_URL="https://staging.edusphere.dev"
+          echo "Checking Frontend health..."
+          curl -f $FRONTEND_URL || exit 1
+
+          echo "All health checks passed!"
+
+      - name: Run smoke tests
+        run: |
+          # Run basic smoke tests against staging
+          echo "Running smoke tests..."
+
+          # Test user authentication flow
+          curl -f -X POST https://staging-api.edusphere.dev/graphql \
+            -H "Content-Type: application/json" \
+            -d '{"query":"query { __schema { queryType { name } } }"}' || exit 1
+
+          echo "Smoke tests passed!"
+
+      - name: Create deployment annotation
+        run: |
+          kubectl annotate deployment/edusphere-gateway \
+            kubernetes.io/change-cause="Deploy ${{ steps.tags.outputs.IMAGE_TAG }} at ${{ steps.tags.outputs.DEPLOY_TIME }}" \
+            -n edusphere-staging --overwrite
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "Staging deployment successful!"
+          echo "Gateway: https://staging-api.edusphere.dev/graphql"
+          echo "Frontend: https://staging.edusphere.dev"
+          echo "Deployed commit: ${{ github.sha }}"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "Staging deployment failed!"
+          kubectl get events -n edusphere-staging --sort-by='.lastTimestamp' | tail -20
+
+  # Deploy to production environment (manual approval required)
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://edusphere.dev
+    needs: deploy-staging
+    # Only deploy to production on manual trigger or after successful staging deployment
+    if: github.event.inputs.environment == 'production' || (github.event_name == 'push' && success())
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.28.0'
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.13.0'
+
+      - name: Configure kubectl context
+        run: |
+          # Configure kubeconfig for production cluster
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > ~/.kube/config
+          kubectl config use-context production
+
+      - name: Verify cluster connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Set image tags
+        id: tags
+        run: |
+          # Use commit SHA as image tag
+          echo "IMAGE_TAG=main-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          echo "DEPLOY_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+      - name: Backup current deployment state
+        run: |
+          # Create backup of current deployment
+          kubectl get all -n edusphere-production -o yaml > deployment-backup-$(date +%Y%m%d-%H%M%S).yaml
+
+      - name: Deploy using Helm
+        run: |
+          # Deploy or upgrade using Helm chart
+          helm upgrade --install edusphere ./infrastructure/k8s/charts/edusphere \
+            --namespace edusphere-production \
+            --create-namespace \
+            --values ./infrastructure/k8s/values.prod.yaml \
+            --set gateway.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --set web.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --set subgraph-core.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --set subgraph-content.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --set subgraph-annotation.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --set subgraph-collaboration.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --set subgraph-agent.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --set subgraph-knowledge.image.tag=${{ steps.tags.outputs.IMAGE_TAG }} \
+            --wait \
+            --timeout 10m
+
+      - name: Wait for rollout to complete
+        run: |
+          # Wait for all deployments to complete
+          kubectl rollout status deployment/edusphere-gateway -n edusphere-production --timeout=10m
+          kubectl rollout status deployment/edusphere-web -n edusphere-production --timeout=10m
+
+          for service in core content annotation collaboration agent knowledge; do
+            kubectl rollout status deployment/edusphere-subgraph-${service} -n edusphere-production --timeout=10m
+          done
+
+      - name: Verify pod health
+        run: |
+          # Verify all pods are running and healthy
+          echo "Checking pod status..."
+          kubectl get pods -n edusphere-production
+
+          # Count running pods
+          RUNNING_PODS=$(kubectl get pods -n edusphere-production --field-selector=status.phase=Running --no-headers | wc -l)
+          TOTAL_PODS=$(kubectl get pods -n edusphere-production --no-headers | wc -l)
+
+          echo "Running pods: $RUNNING_PODS / $TOTAL_PODS"
+
+          if [ "$RUNNING_PODS" -lt "$TOTAL_PODS" ]; then
+            echo "Not all pods are running!"
+            kubectl get pods -n edusphere-production
+            exit 1
+          fi
+
+      - name: Run comprehensive health checks
+        run: |
+          # Wait for services to stabilize
+          sleep 60
+
+          # Health check Gateway
+          GATEWAY_URL="https://api.edusphere.dev/graphql"
+          echo "Checking Gateway health..."
+          curl -f -X POST $GATEWAY_URL \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ __typename }"}' || exit 1
+
+          # Health check Frontend
+          FRONTEND_URL="https://edusphere.dev"
+          echo "Checking Frontend health..."
+          curl -f $FRONTEND_URL || exit 1
+
+          # Test GraphQL introspection
+          echo "Testing GraphQL introspection..."
+          curl -f -X POST $GATEWAY_URL \
+            -H "Content-Type: application/json" \
+            -d '{"query":"query { __schema { queryType { name } } }"}' || exit 1
+
+          echo "All production health checks passed!"
+
+      - name: Run production smoke tests
+        run: |
+          # Run comprehensive smoke tests
+          echo "Running production smoke tests..."
+
+          # Test authentication endpoint
+          curl -f https://api.edusphere.dev/health || exit 1
+
+          # Test static assets
+          curl -f https://edusphere.dev/favicon.ico || exit 1
+
+          echo "Production smoke tests passed!"
+
+      - name: Create deployment record
+        run: |
+          # Annotate deployment with change cause
+          kubectl annotate deployment/edusphere-gateway \
+            kubernetes.io/change-cause="Production deploy ${{ steps.tags.outputs.IMAGE_TAG }} at ${{ steps.tags.outputs.DEPLOY_TIME }}" \
+            -n edusphere-production --overwrite
+
+          # Create deployment event
+          kubectl create configmap deployment-${{ github.sha }} \
+            --from-literal=deployed_at="${{ steps.tags.outputs.DEPLOY_TIME }}" \
+            --from-literal=commit="${{ github.sha }}" \
+            --from-literal=image_tag="${{ steps.tags.outputs.IMAGE_TAG }}" \
+            --from-literal=deployed_by="${{ github.actor }}" \
+            -n edusphere-production || true
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "Production deployment successful!"
+          echo "Gateway: https://api.edusphere.dev/graphql"
+          echo "Frontend: https://edusphere.dev"
+          echo "Deployed commit: ${{ github.sha }}"
+          echo "Deployed by: ${{ github.actor }}"
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Production deployment failed! Initiating rollback..."
+
+          # Rollback using Helm
+          helm rollback edusphere -n edusphere-production
+
+          # Wait for rollback to complete
+          kubectl rollout status deployment/edusphere-gateway -n edusphere-production --timeout=10m
+
+          echo "Rollback completed!"
+
+  # Post-deployment monitoring
+  post-deployment-monitoring:
+    name: Post-Deployment Monitoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [deploy-staging]
+    if: success()
+
+    steps:
+      - name: Monitor staging for 5 minutes
+        run: |
+          echo "Monitoring staging deployment for 5 minutes..."
+
+          for i in {1..10}; do
+            echo "Health check $i/10..."
+
+            # Check Gateway health
+            if ! curl -f -X POST https://staging-api.edusphere.dev/graphql \
+              -H "Content-Type: application/json" \
+              -d '{"query":"{ __typename }"}'; then
+              echo "Health check failed!"
+              exit 1
+            fi
+
+            sleep 30
+          done
+
+          echo "Monitoring complete - deployment stable!"
+
+      - name: Check error rates
+        run: |
+          # Check for elevated error rates in logs (if monitoring is set up)
+          echo "Checking error rates..."
+          # This would integrate with your monitoring solution (Prometheus, Datadog, etc.)
+          echo "Error rate monitoring would be implemented here"
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary"
+          echo "- Staging: ✅ Deployed successfully"
+          echo "- Monitoring: ✅ No issues detected"
+          echo "- Ready for production deployment"

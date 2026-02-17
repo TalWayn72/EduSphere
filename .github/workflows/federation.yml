@@ -1,0 +1,306 @@
+name: GraphQL Federation Validation
+
+# Triggers on push or pull request to main branches
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+# Cancel outdated runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Compose supergraph from all subgraph schemas
+  supergraph-composition:
+    name: Supergraph Composition (Hive Gateway)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all subgraphs
+        run: pnpm turbo build --filter='./apps/subgraph-*'
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+      - name: Generate subgraph schemas
+        run: |
+          # Generate SDL files for each subgraph
+          pnpm --filter @edusphere/subgraph-core exec ts-node scripts/generate-sdl.ts
+          pnpm --filter @edusphere/subgraph-content exec ts-node scripts/generate-sdl.ts
+          pnpm --filter @edusphere/subgraph-annotation exec ts-node scripts/generate-sdl.ts
+          pnpm --filter @edusphere/subgraph-collaboration exec ts-node scripts/generate-sdl.ts
+          pnpm --filter @edusphere/subgraph-agent exec ts-node scripts/generate-sdl.ts
+          pnpm --filter @edusphere/subgraph-knowledge exec ts-node scripts/generate-sdl.ts
+
+      - name: Compose supergraph
+        run: pnpm --filter @edusphere/gateway compose
+        env:
+          NODE_ENV: test
+
+      - name: Validate supergraph composition
+        run: |
+          # Check that supergraph.graphql was generated
+          if [ ! -f apps/gateway/supergraph.graphql ]; then
+            echo "ERROR: Supergraph composition failed - supergraph.graphql not found"
+            exit 1
+          fi
+
+          # Check file is not empty
+          if [ ! -s apps/gateway/supergraph.graphql ]; then
+            echo "ERROR: Supergraph composition produced empty file"
+            exit 1
+          fi
+
+          echo "Supergraph composition successful!"
+          wc -l apps/gateway/supergraph.graphql
+
+      - name: Upload supergraph schema
+        uses: actions/upload-artifact@v4
+        with:
+          name: supergraph-schema
+          path: apps/gateway/supergraph.graphql
+          retention-days: 30
+
+  # Validate schema quality and best practices
+  schema-validation:
+    name: Schema Validation & Linting
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: supergraph-composition
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download supergraph schema
+        uses: actions/download-artifact@v4
+        with:
+          name: supergraph-schema
+          path: apps/gateway
+
+      - name: Validate schema with GraphQL ESLint
+        run: |
+          # Run GraphQL schema linting
+          pnpm --filter @edusphere/gateway exec graphql-schema-linter apps/gateway/supergraph.graphql || true
+
+      - name: Check for GraphQL best practices
+        run: |
+          # Validate naming conventions, directives, field definitions
+          echo "Checking schema for best practices..."
+
+          # Check for deprecated fields usage
+          if grep -q "@deprecated" apps/gateway/supergraph.graphql; then
+            echo "Found deprecated fields (informational)"
+            grep "@deprecated" apps/gateway/supergraph.graphql
+          fi
+
+          # Validate Federation v2 directives
+          if ! grep -q "@shareable" apps/gateway/supergraph.graphql; then
+            echo "WARNING: No @shareable directives found - verify Federation v2 usage"
+          fi
+
+          echo "Schema validation completed"
+
+  # Breaking change detection using GraphQL Hive
+  breaking-changes:
+    name: Breaking Change Detection (Hive)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: supergraph-composition
+    # Only run on pull requests
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download supergraph schema
+        uses: actions/download-artifact@v4
+        with:
+          name: supergraph-schema
+          path: apps/gateway
+
+      - name: Install GraphQL Hive CLI
+        run: npm install -g @graphql-hive/cli
+
+      - name: Check for breaking changes
+        run: |
+          # Check schema against registry for breaking changes
+          pnpm --filter @edusphere/gateway exec hive schema:check \
+            --registry.accessToken ${{ secrets.HIVE_TOKEN }} \
+            apps/gateway/supergraph.graphql
+        continue-on-error: true # Don't fail PR, just warn
+
+      - name: Comment breaking changes on PR
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## ⚠️ Breaking Changes Detected\n\nThe schema check detected potential breaking changes. Please review the GraphQL Hive dashboard for details.\n\n[View Schema Check Results](https://app.graphql-hive.com)'
+            })
+
+  # Publish schema to Hive registry (only on main/master)
+  publish-schema:
+    name: Publish Schema to Hive Registry
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [supergraph-composition, schema-validation]
+    # Only run on push to main/master branches
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download supergraph schema
+        uses: actions/download-artifact@v4
+        with:
+          name: supergraph-schema
+          path: apps/gateway
+
+      - name: Install GraphQL Hive CLI
+        run: npm install -g @graphql-hive/cli
+
+      - name: Publish schema to Hive
+        run: |
+          # Publish each subgraph schema to Hive registry
+          echo "Publishing Core subgraph..."
+          pnpm --filter @edusphere/subgraph-core exec hive schema:publish \
+            --registry.accessToken ${{ secrets.HIVE_TOKEN }} \
+            --service core \
+            --url http://localhost:4001/graphql \
+            apps/subgraph-core/schema.graphql
+
+          echo "Publishing Content subgraph..."
+          pnpm --filter @edusphere/subgraph-content exec hive schema:publish \
+            --registry.accessToken ${{ secrets.HIVE_TOKEN }} \
+            --service content \
+            --url http://localhost:4002/graphql \
+            apps/subgraph-content/schema.graphql
+
+          echo "Publishing Annotation subgraph..."
+          pnpm --filter @edusphere/subgraph-annotation exec hive schema:publish \
+            --registry.accessToken ${{ secrets.HIVE_TOKEN }} \
+            --service annotation \
+            --url http://localhost:4003/graphql \
+            apps/subgraph-annotation/schema.graphql
+
+          echo "Publishing Collaboration subgraph..."
+          pnpm --filter @edusphere/subgraph-collaboration exec hive schema:publish \
+            --registry.accessToken ${{ secrets.HIVE_TOKEN }} \
+            --service collaboration \
+            --url http://localhost:4004/graphql \
+            apps/subgraph-collaboration/schema.graphql
+
+          echo "Publishing Agent subgraph..."
+          pnpm --filter @edusphere/subgraph-agent exec hive schema:publish \
+            --registry.accessToken ${{ secrets.HIVE_TOKEN }} \
+            --service agent \
+            --url http://localhost:4005/graphql \
+            apps/subgraph-agent/schema.graphql
+
+          echo "Publishing Knowledge subgraph..."
+          pnpm --filter @edusphere/subgraph-knowledge exec hive schema:publish \
+            --registry.accessToken ${{ secrets.HIVE_TOKEN }} \
+            --service knowledge \
+            --url http://localhost:4006/graphql \
+            apps/subgraph-knowledge/schema.graphql
+
+      - name: Create deployment annotation
+        run: |
+          echo "Schema published successfully to Hive registry"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+
+  # Summary job - all federation checks must pass
+  federation-complete:
+    name: Federation Validation Complete
+    runs-on: ubuntu-latest
+    needs: [supergraph-composition, schema-validation]
+    if: always()
+
+    steps:
+      - name: Check all federation jobs succeeded
+        run: |
+          if [[ "${{ needs.supergraph-composition.result }}" != "success" || \
+                "${{ needs.schema-validation.result }}" != "success" ]]; then
+            echo "One or more federation validation jobs failed"
+            exit 1
+          fi
+          echo "All federation checks passed successfully!"
