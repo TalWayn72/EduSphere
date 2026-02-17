@@ -2,28 +2,23 @@
   "name": "@edusphere/gateway",
   "version": "0.1.0",
   "private": true,
-  "description": "GraphQL Federation Gateway - Hive Gateway v2.7 (MIT-licensed)",
   "type": "module",
   "scripts": {
-    "dev": "hive-gateway supergraph",
-    "build": "echo 'Gateway is config-based, no build needed'",
-    "compose": "hive-gateway compose",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:integration": "vitest run tests/integration",
-    "lint": "echo 'No lint for config-based gateway'",
-    "typecheck": "echo 'No typecheck for config-based gateway'"
+    "dev": "tsx watch src/index.ts",
+    "start": "node --loader tsx src/index.ts",
+    "build": "echo 'Gateway is config-based, no build needed'"
   },
   "dependencies": {
     "@graphql-hive/gateway": "^1.10.0",
-    "graphql": "^16.9.0"
+    "graphql": "^16.9.0",
+    "graphql-yoga": "^5.10.7",
+    "jose": "^5.9.6",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0"
   },
   "devDependencies": {
-    "@edusphere/tsconfig": "workspace:*",
-    "@types/node": "^22.10.5",
-    "@vitest/coverage-v8": "^2.1.8",
-    "graphql-request": "^7.1.2",
-    "typescript": "^5.8.2",
-    "vitest": "^2.1.8"
+    "@types/node": "^22.10.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.2"
   }
 }
