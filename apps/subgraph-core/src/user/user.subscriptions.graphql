@@ -1,0 +1,16 @@
+type Subscription {
+  """User created event"""
+  userCreated(tenantId: ID!): User!
+
+  """User updated event"""
+  userUpdated(userId: ID!, tenantId: ID!): User!
+
+  """Real-time user status updates"""
+  userStatusChanged(userId: ID!): UserStatus!
+}
+
+type UserStatus {
+  userId: ID!
+  online: Boolean!
+  lastSeen: DateTime!
+}

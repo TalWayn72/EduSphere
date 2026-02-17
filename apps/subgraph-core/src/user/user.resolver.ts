@@ -1,9 +1,15 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Subscription, Args, Context } from '@nestjs/graphql';
 import { UserService } from './user.service';
+import { getPubSub, CHANNELS, EVENTS } from '@edusphere/redis-pubsub';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  private pubsub: PubSub;
+
+  constructor(private readonly userService: UserService) {
+    this.pubsub = new PubSub();
+  }
 
   @Query('_health')
   health(): string {
@@ -34,11 +40,46 @@ export class UserResolver {
 
   @Mutation('createUser')
   async createUser(@Args('input') input: any) {
-    return this.userService.create(input);
+    const user = await this.userService.create(input);
+
+    // Publish event for subscriptions
+    this.pubsub.publish(EVENTS.USER_CREATED, {
+      userCreated: user,
+      tenantId: input.tenantId,
+    });
+
+    return user;
   }
 
   @Mutation('updateUser')
   async updateUser(@Args('id') id: string, @Args('input') input: any) {
-    return this.userService.update(id, input);
+    const user = await this.userService.update(id, input);
+
+    // Publish event for subscriptions
+    this.pubsub.publish(EVENTS.USER_UPDATED, {
+      userUpdated: user,
+      userId: id,
+      tenantId: user.tenantId,
+    });
+
+    return user;
+  }
+
+  @Subscription('userCreated', {
+    filter: (payload, variables) => payload.tenantId === variables.tenantId,
+  })
+  userCreatedSubscription(@Args('tenantId') tenantId: string) {
+    return this.pubsub.asyncIterator(EVENTS.USER_CREATED);
+  }
+
+  @Subscription('userUpdated', {
+    filter: (payload, variables) =>
+      payload.userId === variables.userId && payload.tenantId === variables.tenantId,
+  })
+  userUpdatedSubscription(
+    @Args('userId') userId: string,
+    @Args('tenantId') tenantId: string,
+  ) {
+    return this.pubsub.asyncIterator(EVENTS.USER_UPDATED);
   }
 }

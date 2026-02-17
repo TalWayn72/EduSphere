@@ -1,0 +1,23 @@
+{
+  "name": "@edusphere/redis-pubsub",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Redis PubSub wrapper for real-time events",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ioredis": "^5.4.2"
+  },
+  "devDependencies": {
+    "@edusphere/tsconfig": "workspace:*",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.8.2"
+  }
+}
