@@ -1,0 +1,567 @@
+# EduSphere - AI Assistant Configuration
+
+## Project Context
+- **Type:** Knowledge Graph Educational Platform - Production Scale (100,000+ concurrent users)
+- **Architecture:** GraphQL Federation (6 subgraphs) + Apache AGE + pgvector + AI Agents
+- **Stack:** NestJS + GraphQL Yoga | React 19 + Vite 6 | Expo SDK 54 | Drizzle ORM + PostgreSQL 16 + Apache AGE + pgvector
+- **Monorepo:** pnpm workspaces + Turborepo - `apps/*`, `packages/*`, `infrastructure/`
+- **Repository:** [Internal/Private]
+- **Node:** >=20.0.0 | **pnpm:** >=9.0.0
+
+## Boundaries
+| Path | Reason |
+|------|--------|
+| `C:\Users\P0039217\.claude\projects\EduSphere` | **ACTIVE PROJECT - WORK HERE ONLY** |
+| All other paths | **DO NOT ACCESS** |
+
+**Active project only:** `C:\Users\P0039217\.claude\projects\EduSphere`
+
+## Language & Permissions
+- **Communication:** Hebrew | **Code & Docs:** English
+- **Auto-approved:** File ops (Read, Write), Git (all operations including commit/push), pnpm, Bash, Docker, VS Code extensions
+- **No approval needed:** Execute directly without asking - Bash commands, Write operations, Git commits
+
+## Architecture & Patterns
+
+### GraphQL Federation (Hive Gateway v2 + GraphQL Yoga)
+- **Gateway:** Hive Gateway v2 (port 4000) - MIT-licensed Federation v2.7 gateway
+- **6 Subgraphs:** Core (4001), Content (4002), Annotation (4003), Collaboration (4004), Agent (4005), Knowledge (4006)
+- **Pattern:** Schema-first SDL → Resolvers implement contract
+- **Entity ownership:** Each entity owned by exactly one subgraph, others extend with `@key` stubs
+- **Transport:** JWT with `tenant_id` → Gateway propagates `x-tenant-id` header → Subgraphs enforce RLS
+- **Schema Registry:** GraphQL Hive for breaking change detection
+
+### Backend (Subgraphs - NestJS + GraphQL Yoga)
+- **Pattern:** Controllers (thin) → Services (business logic) → Drizzle ORM → PostgreSQL
+- **GraphQL:** `@graphql-yoga/nestjs-federation` with `YogaFederationDriver` (schema-first)
+- **Validation:** Zod schemas on all mutations, input sanitization middleware globally
+- **Auth:** JWT via Keycloak (OIDC), `@authenticated` / `@requiresScopes` / `@requiresRole` directives
+- **Logging:** Pino logger (NOT console.log) - levels: trace/debug/info/warn/error/fatal
+- **Event-driven:** NATS JetStream for async messaging (content.created, annotation.added, agent.message)
+- **Middleware stack:** security → logging → auth → RLS context → rate-limit → resolver
+
+### Database (PostgreSQL 16 + Apache AGE + pgvector)
+- **PostgreSQL 16+** with extensions: uuid-ossp, pgcrypto, age (1.5.0), vector (0.8.0)
+- **Apache AGE:** Cypher graph queries for knowledge graph (Concept, Person, Term, Source, TopicCluster)
+- **pgvector:** HNSW indexes for semantic search (768-dim nomic-embed-text embeddings)
+- **Multi-tenancy:** Row-level security (RLS) with `SET LOCAL app.current_tenant = '<uuid>'`
+- **ORM:** Drizzle ORM v1 with native RLS support (`pgTable.withRLS()`)
+- **All DB queries via Drizzle only** - never raw SQL except for Apache AGE Cypher queries
+
+### Frontend (`apps/web` - React + Vite)
+- **State:** TanStack Query v5 for server state, Zustand v5 for client UI state
+- **Forms:** React Hook Form + Zod resolvers
+- **API Client:** GraphQL client with `graphql-request` or `urql` + service layer
+- **Routing:** React Router v6
+- **UI:** shadcn/ui (Radix UI primitives) + Tailwind CSS
+- **Path alias:** `@/*` maps to `src/*`
+
+### Mobile (`apps/mobile` - Expo SDK 54)
+- **Framework:** Expo SDK 54 (React Native 0.81)
+- **Offline-first:** expo-sqlite + TanStack Query for offline data patterns
+- **Code sharing:** ~70-80% shared with web app
+- **Commands:** `pnpm cap:sync`, `pnpm cap:build`
+
+### AI/ML Architecture (3 Layers)
+- **Layer 1:** Vercel AI SDK v6 - LLM abstraction (Ollama dev ↔ OpenAI/Anthropic prod)
+- **Layer 2:** LangGraph.js - State-machine agent workflows (assess → quiz → explain → debate)
+- **Layer 3:** LlamaIndex.TS - RAG pipeline, knowledge graph indexing
+- **Pattern:** HybridRAG (pgvector semantic + Apache AGE graph traversal fused before LLM)
+- **Sandboxing:** gVisor for multi-tenant agent execution safety
+
+### Shared Packages
+- `packages/db` - Drizzle schema, migrations, seed, RLS helpers, Apache AGE graph helpers
+- `packages/graphql-shared` - Shared SDL (scalars, enums, directives, pagination)
+- `packages/graphql-types` - Generated TypeScript types (codegen output)
+- `packages/auth` - JWT validation, context extraction, NestJS guards
+- `packages/nats-client` - NATS JetStream client wrapper
+- `packages/eslint-config` - Shared ESLint rules
+- `packages/tsconfig` - Shared TypeScript configs
+
+## Core Rules
+1. **Read before modify** - Always read a file before modifying it
+2. **Auto-fix errors** - Identify and resolve issues autonomously without asking
+3. **Don't ask questions - Execute directly** - When given a task, execute it immediately without asking for confirmation or clarification unless absolutely critical
+4. **Max 150 lines per file** - Keep files focused and modular. **Exceptions allowed** for: complex GraphQL resolvers with RLS+JWT+NATS, AI agent workflows (LangGraph.js), Apache AGE graph queries, integration tests, entry points. Create barrel files (`index.ts`) when splitting
+5. **TypeScript strict** - `strict: true`, no `any`, no `console.log` (use Pino logger)
+6. **All DB queries via Drizzle** - Never raw SQL (except Apache AGE Cypher queries via graph helpers)
+7. **Document every task** in `OPEN_ISSUES.md` with status tracking
+8. **Update docs at end of each task** - Keep CLAUDE.md, README.md, OPEN_ISSUES.md in sync
+9. **Never skip phases** - IMPLEMENTATION-ROADMAP.md defines strict phase order with acceptance criteria
+10. **Test everything** - No untested code enters repository
+11. **Security-first** - RLS validation, JWT scopes, input sanitization, no secrets in code
+12. **Parallel execution mandatory** - Split every task into sub-tasks whenever possible and run Agents/Workers in parallel for maximum efficiency
+
+## Environment Setup
+
+### Required Environment Variables
+
+#### Infrastructure (`.env` in project root)
+| Category | Key Variables |
+|----------|--------------|
+| **Database** | `DATABASE_URL` (PostgreSQL connection string with AGE/pgvector) |
+| **Redis** | `REDIS_URL` (optional for caching) |
+| **NATS** | `NATS_URL` (JetStream-enabled) |
+| **MinIO** | `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET` |
+| **Keycloak** | `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID`, `KEYCLOAK_CLIENT_SECRET` |
+| **Jaeger** | `JAEGER_ENDPOINT` (OpenTelemetry tracing) |
+
+#### Gateway (`apps/gateway/.env`)
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Gateway port (default: 4000) |
+| `SUBGRAPH_CORE_URL` | http://localhost:4001/graphql |
+| `SUBGRAPH_CONTENT_URL` | http://localhost:4002/graphql |
+| `SUBGRAPH_ANNOTATION_URL` | http://localhost:4003/graphql |
+| `SUBGRAPH_COLLABORATION_URL` | http://localhost:4004/graphql |
+| `SUBGRAPH_AGENT_URL` | http://localhost:4005/graphql |
+| `SUBGRAPH_KNOWLEDGE_URL` | http://localhost:4006/graphql |
+| `KEYCLOAK_JWKS_URL` | http://keycloak:8080/realms/edusphere/protocol/openid-connect/certs |
+
+#### Subgraphs (each `apps/subgraph-*/.env`)
+| Variable | Description |
+|----------|-------------|
+| `NODE_ENV` | development / production |
+| `PORT` | Subgraph port (4001-4006) |
+| `DATABASE_URL` | PostgreSQL connection |
+| `NATS_URL` | NATS JetStream URL |
+
+#### Frontend (`apps/web/.env`)
+| Variable | Description |
+|----------|-------------|
+| `VITE_GRAPHQL_URL` | http://localhost:4000/graphql |
+| `VITE_GRAPHQL_WS_URL` | ws://localhost:4000/graphql |
+| `VITE_KEYCLOAK_URL` | http://localhost:8080 |
+| `VITE_KEYCLOAK_REALM` | edusphere |
+| `VITE_KEYCLOAK_CLIENT_ID` | edusphere-app |
+
+#### AI/ML (`apps/subgraph-agent/.env`)
+| Variable | Description |
+|----------|-------------|
+| `OLLAMA_URL` | http://localhost:11434 (dev) |
+| `OPENAI_API_KEY` | (prod only) |
+| `ANTHROPIC_API_KEY` | (prod only) |
+| `EMBEDDING_MODEL` | nomic-embed-text (dev) / text-embedding-3-small (prod) |
+
+### Service Startup (required at session start)
+
+| Step | Command | Verify |
+|------|---------|--------|
+| 1. Infrastructure | `docker-compose up -d` | `docker ps` - postgres, keycloak, nats, minio, jaeger all healthy |
+| 2. Database | `pnpm --filter @edusphere/db migrate` | `./scripts/health-check.sh` passes |
+| 3. Seed | `pnpm --filter @edusphere/db seed` | Database has demo data |
+| 4. Gateway | `pnpm --filter @edusphere/gateway dev` | `curl http://localhost:4000/graphql` responds |
+| 5. Subgraphs | `pnpm turbo dev --filter='@edusphere/subgraph-*'` | All 6 subgraphs respond to health queries |
+| 6. Frontend | `pnpm --filter @edusphere/web dev` | http://localhost:5173 loads |
+
+**Health check script:** `./scripts/health-check.sh` verifies:
+- PostgreSQL accepts connections
+- Apache AGE extension loaded (`LOAD 'age'`)
+- pgvector extension loaded
+- `edusphere_graph` exists
+- Keycloak realm accessible
+- NATS healthy
+- MinIO reachable
+- Jaeger UI responds
+
+## Commands Reference
+
+### Development
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start all services (turbo dev) |
+| `pnpm --filter @edusphere/gateway dev` | Gateway only (port 4000) |
+| `pnpm --filter @edusphere/subgraph-core dev` | Core subgraph (port 4001) |
+| `pnpm --filter @edusphere/web dev` | Frontend (port 5173) |
+| `pnpm --filter @edusphere/mobile start` | Expo mobile dev server |
+| `pnpm turbo dev --filter='@edusphere/subgraph-*'` | All subgraphs in parallel |
+
+### Build & Lint
+| Command | Description |
+|---------|-------------|
+| `pnpm turbo build` | Build all workspaces |
+| `pnpm turbo build --filter='./apps/*'` | Build apps only |
+| `pnpm turbo lint` | Lint all workspaces (zero warnings in CI) |
+| `pnpm turbo lint -- --fix` | Auto-fix linting issues |
+| `pnpm turbo typecheck` | TypeScript strict compilation (zero errors) |
+
+### Database (Drizzle + Apache AGE)
+| Command | Description |
+|---------|-------------|
+| `pnpm --filter @edusphere/db generate` | Generate Drizzle migrations |
+| `pnpm --filter @edusphere/db migrate` | Apply migrations |
+| `pnpm --filter @edusphere/db seed` | Seed demo data (tenants, users, courses, knowledge graph) |
+| `pnpm --filter @edusphere/db studio` | Open Drizzle Studio (GUI) |
+| `pnpm --filter @edusphere/db graph:init` | Initialize Apache AGE graph ontology |
+
+### Testing
+| Command | Description |
+|---------|-------------|
+| `pnpm turbo test` | All tests (unit + integration) |
+| `pnpm turbo test -- --coverage` | With coverage reports |
+| `pnpm --filter @edusphere/subgraph-core test` | Core subgraph tests |
+| `pnpm --filter @edusphere/web test` | Frontend tests |
+| `pnpm --filter @edusphere/web test:e2e` | E2E tests (Playwright) |
+| `pnpm test:graphql` | GraphQL integration tests (all subgraphs) |
+| `pnpm test:rls` | RLS policy validation tests |
+| `pnpm test:federation` | Federation composition tests |
+
+### GraphQL & Schema
+| Command | Description |
+|---------|-------------|
+| `pnpm --filter @edusphere/gateway compose` | Compose supergraph SDL from subgraphs |
+| `pnpm codegen` | Generate TypeScript types from GraphQL schemas |
+| `pnpm --filter @edusphere/gateway schema:check` | Check for breaking changes (Hive) |
+| `pnpm --filter @edusphere/gateway schema:publish` | Publish schema to Hive registry |
+
+### Docker & Infrastructure
+| Command | Description |
+|---------|-------------|
+| `docker-compose up -d` | Start all infrastructure (postgres, keycloak, nats, minio, jaeger) |
+| `docker-compose down` | Stop all containers |
+| `docker-compose logs -f postgres` | View PostgreSQL logs |
+| `./scripts/health-check.sh` | Validate all services are healthy |
+| `./scripts/smoke-test.sh` | E2E smoke tests against running stack |
+
+### AI/ML & Agents
+| Command | Description |
+|---------|-------------|
+| `pnpm --filter @edusphere/subgraph-agent dev` | Agent subgraph with Ollama |
+| `pnpm --filter @edusphere/subgraph-knowledge embed` | Generate embeddings for all content |
+| `pnpm --filter @edusphere/transcription-worker start` | Start transcription worker (faster-whisper) |
+
+## Code Conventions
+
+### File Size Guidelines
+**Target:** Max 150 lines per file for maintainability and modularity.
+
+**Allowed Exceptions (use good judgment):**
+- GraphQL resolvers with complex business logic (RLS context + JWT validation + NATS events + error handling)
+- AI agent workflow definitions (LangGraph.js state machines with multiple nodes)
+- Apache AGE graph query helpers with multiple Cypher patterns
+- Integration test suites covering multiple scenarios
+- Entry points (`main.ts`, `app.module.ts`) that wire up many modules
+- Generated code (GraphQL types from codegen)
+- UI component libraries from `packages/ui` (Radix wrappers)
+
+**When to split:**
+- Duplicate code patterns → extract to shared utility
+- Multiple responsibilities → separate concerns into focused files
+- Overly long resolver → extract service layer
+- Large test file → split by feature/domain
+
+**How to split:**
+- Create barrel files (`index.ts`) to preserve import compatibility
+- Example: `user.resolver.ts` (150+ lines) → `user.resolver.ts` + `user.service.ts` + `user.validation.ts` + `index.ts`
+
+### Error Handling
+- **Backend (NestJS):** Use NestJS built-in exceptions (`BadRequestException`, `UnauthorizedException`, etc.) + global exception filter
+- **GraphQL:** Return structured errors with `extensions: { code, details }` per Error Handling Contract (API-CONTRACTS §6)
+- **Frontend:** React Error Boundaries for UI crashes, try/catch in GraphQL calls, toast notifications for user errors
+- **Always** return meaningful error messages - never expose internal details to client
+
+### Validation
+- **All mutations:** Zod schemas for input validation (define in `*.schemas.ts` files)
+- **RLS enforcement:** `withTenantContext()` wrapper for all database queries (sets `app.current_tenant` + `app.current_user_id`)
+- **JWT validation:** Gateway validates JWT via Keycloak JWKS, propagates `x-tenant-id` header
+- **Frontend:** React Hook Form + Zod for client-side validation before GraphQL calls
+
+### Logging
+- **Backend only:** Use Pino logger (`import { Logger } from '@nestjs/common'` + inject via DI)
+- **Never** use `console.log` in production code
+- **Log levels:** `error` for failures, `warn` for recoverable issues, `info` for key events, `debug` for development
+- **Structured logging:** Always include `tenantId`, `userId`, `requestId` in log context
+
+### GraphQL Conventions
+- **Schema-first:** SDL files are source of truth, resolvers implement contract
+- **Naming:** PascalCase for types, camelCase for fields, SCREAMING_SNAKE_CASE for enums
+- **Pagination:** Use Relay Cursor Connection spec (PageInfo, edges, nodes) for all lists
+- **Soft deletes:** Never expose `deleted_at`, filter in resolvers
+- **Federation:** Entity ownership - one subgraph owns, others extend with `@key` stubs
+- **Directives:** `@authenticated`, `@requiresScopes(scopes: ["org:manage"])`, `@requiresRole(roles: [ORG_ADMIN])`
+
+### Multi-tenancy & Security
+- **RLS pattern:** Always use `withTenantContext(tenantId, userId, role, () => { /* DB query */ })`
+- **JWT claims:** Gateway extracts `tenant_id`, `user_id`, `role`, `scopes` from JWT → GraphQL context
+- **Never trust client input:** Validate tenant_id from JWT, not from GraphQL arguments
+- **Cross-tenant access:** Only SUPER_ADMIN can query across tenants (explicit role check)
+
+## Testing Requirements
+
+| Change Type | Required Tests |
+|-------------|---------------|
+| New GraphQL type/field | Unit tests for resolvers + integration test for end-to-end query |
+| New mutation | Unit test + RLS validation test + E2E test |
+| Bug fix | Regression test + root cause documented in OPEN_ISSUES.md |
+| Database schema change | Migration test + RLS policy test |
+| New subgraph | Federation composition test + health check test |
+| AI agent template | Agent workflow test + sandboxing test + token streaming test |
+
+### Test File Locations
+| Type | Location |
+|------|----------|
+| Subgraph unit | `apps/subgraph-*/src/**/*.spec.ts` |
+| Subgraph integration | `apps/subgraph-*/src/test/integration/*.spec.ts` |
+| RLS validation | `packages/db/src/rls/*.test.ts` |
+| Frontend unit | `apps/web/src/**/*.test.{ts,tsx}` |
+| E2E | `apps/web/e2e/*.spec.ts` |
+| Federation | `apps/gateway/src/test/federation/*.spec.ts` |
+
+### Coverage Targets
+- **Backend:** >90% line coverage per subgraph
+- **Frontend:** >80% component coverage
+- **RLS policies:** 100% coverage (critical security)
+
+**No merge/deploy without:**
+- All tests passing (`pnpm turbo test`)
+- Supergraph composition succeeds (`pnpm --filter @edusphere/gateway compose`)
+- Health check passes (`./scripts/health-check.sh`)
+
+## Security
+
+### Pre-commit Gate (every code change)
+| Check | Rule |
+|-------|------|
+| XSS | No unsanitized user input in GraphQL responses |
+| SQL Injection | All queries via Drizzle ORM (except Cypher via graph helpers) |
+| NoSQL Injection | All Cypher queries use parameterized prepared statements |
+| RLS | All tenant-scoped tables have `USING (tenant_id = current_setting(...))` |
+| JWT | All mutations validate scopes (`@requiresScopes`) and roles (`@requiresRole`) |
+| Input Validation | All mutations have Zod schemas |
+| Secrets | No API keys, passwords, tokens in code (use env vars) |
+
+### RLS Validation Checklist
+- [ ] All 16 tables have RLS enabled (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY`)
+- [ ] All tenant-scoped tables have tenant isolation policy
+- [ ] All queries use `withTenantContext()` wrapper
+- [ ] Cross-tenant tests verify isolation (Tenant A cannot read Tenant B data)
+- [ ] Personal annotations only visible to owner or instructors
+
+### GraphQL Security
+- [ ] All mutations use `@authenticated` directive
+- [ ] Sensitive mutations use `@requiresScopes` (e.g., `course:write`, `agent:execute`)
+- [ ] Admin-only mutations use `@requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])`
+- [ ] Query depth limited to 10 (prevent DoS)
+- [ ] Query complexity limited to 1000 (prevent expensive queries)
+- [ ] Rate limiting at gateway level (per tenant, per IP)
+
+**Iron rule:** No commit may weaken existing security (RLS, JWT validation, scopes, directives).
+
+## CI/CD (GitHub Actions)
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `ci.yml` | Push/PR to main/develop | Lint + type check + unit tests + security scan |
+| `test.yml` | Push/PR to main/develop | Full test suite (unit + integration + E2E with Docker services) |
+| `federation.yml` | Push/PR to main/develop | Supergraph composition + breaking change detection |
+| `docker-build.yml` | PR to main + tags | Multi-stage Docker builds for all services + Trivy scan |
+| `cd.yml` | Push to main | Deployment pipeline (K8s + Helm) |
+
+### Pre-commit hooks (Husky)
+- ESLint auto-fix on staged files
+- TypeScript type check on affected files
+- No `console.log` in production code
+
+### Post-Push CI Verification
+After every `git push`, verify that GitHub Actions workflows are running:
+
+| Step | Command | Expected |
+|------|---------|----------|
+| 1. Check runs | `gh run list --limit 5` | Recent workflow runs visible |
+| 2. Watch run | `gh run watch` | Live status of current run |
+| 3. On failure | `gh run view <run-id> --log-failed` | View failure logs |
+
+**Iron rule:** Every push must trigger CI. If `gh run list` shows no new runs, investigate workflow triggers immediately.
+
+## Git Policy
+
+| Trigger | Action |
+|---------|--------|
+| Bug fix | Commit immediately |
+| Complete feature | Commit at completion |
+| Complete phase | Commit after acceptance criteria pass |
+| Refactoring | Commit after logical change |
+| End of day | Commit + Push for backup |
+
+**Flow:** Claude proposes commit → User approves → Claude executes.
+**Never auto-commit or auto-push without user approval.**
+
+### Commit Message Format
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`
+**Scopes:** `core`, `content`, `annotation`, `collab`, `agent`, `knowledge`, `gateway`, `web`, `mobile`, `db`, `infra`
+
+**Examples:**
+- `feat(agent): add Chavruta debate agent template`
+- `fix(db): RLS policy for annotations layer filtering`
+- `refactor(knowledge): optimize HybridRAG fusion algorithm`
+
+## Bug Fix Protocol
+
+1. **Read logs first** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console
+2. **If no logs exist** - Add logging as part of the fix (Pino logger)
+3. **Reproduce** - Write a failing test that reproduces the bug
+4. **Fix** - Implement the fix
+5. **Verify** - Run tests + health check + E2E smoke test
+6. **Document** in `OPEN_ISSUES.md`:
+   - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
+   - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
+   - Files, problem, root cause, solution, tests
+
+**Iron rule:** Never fix a bug without reading the logs first. No logs = part of the bug.
+
+## Parallel Execution (Agents)
+
+**MANDATORY RULE:** Split every task into sub-tasks and run Agents/Workers in parallel whenever possible.
+
+### Task Decomposition Protocol
+Before starting any task:
+1. **Analyze dependencies** - Identify which sub-tasks can run independently
+2. **Create execution plan** - Map out parallel vs sequential sub-tasks
+3. **Launch agents** - Spawn multiple agents using Task tool with clear responsibilities
+4. **Track progress** - Use Agent Tracking Table to monitor all parallel workers
+5. **Synchronize results** - Merge outputs only after all agents complete
+
+### Parallelization Opportunities
+- **Multiple subgraphs** - Each subgraph can be built/tested by separate agent
+- **Multiple tables** - Database schema creation can be split across agents
+- **Multiple test suites** - Backend, Frontend, E2E, RLS tests run in parallel
+- **Multiple files** - Code generation, linting, type checking across agents
+- **Multiple GraphQL types** - Resolver implementation split by domain
+
+### When Executing Phases
+- **Check for parallelization opportunities** - Phase 3 + Phase 4 can run in parallel
+- **Always prefer parallel over sequential** when no dependencies exist
+- **Use Agent Orchestration Protocol** - Report progress every 3 minutes
+- **Never run full test suite in parallel** - Use `pnpm turbo test --filter=<package>` per subgraph
+- **Launch agents with Task tool** - One agent per independent sub-task
+
+### Example: Phase 2 Parallelization
+```
+Task: Implement Core + Content Subgraphs
+├─ Agent-1: Core subgraph (Types + Resolvers + Tests) — parallel
+├─ Agent-2: Content subgraph (Types + Resolvers + Tests) — parallel
+├─ Agent-3: Auth infrastructure (JWT validation + Guards) — parallel
+└─ Agent-4: Documentation (API-CONTRACTS updates) — parallel
+```
+
+### Agent Tracking Table (required when running parallel)
+| Agent | Task | Status |
+|-------|------|--------|
+| Agent-1 (Architect) | Building docker-compose.yml | 🟡 Running |
+| Agent-2 (Schema) | Generating Drizzle migrations | ⏳ Waiting |
+| Agent-3 (Testing) | Writing health-check tests | ✅ Done |
+
+### OOM Protection
+| Event | Action |
+|-------|--------|
+| First OOM | Reduce agents by 20% |
+| Repeated OOM | Continue reducing until 1 agent |
+| Single agent + OOM | `NODE_OPTIONS=--max-old-space-size=8192` |
+
+## Phase Execution Protocol
+
+**CRITICAL:** This project follows IMPLEMENTATION-ROADMAP.md strictly.
+
+### Phase Rules
+1. **Never skip phases** - Each phase builds on the previous one
+2. **Run acceptance criteria before proceeding** - Green output = permission to advance
+3. **Reference API-CONTRACTS and DATABASE-SCHEMA** - Single source of truth
+4. **Report progress every 3 minutes** - Use Agent Orchestration Protocol format
+5. **No deviation from locked tech stack** - Update IMPLEMENTATION-ROADMAP.md if changes needed
+
+### Quality Gates (Enforced at every phase boundary)
+```bash
+# 1. TypeScript compilation (zero errors)
+pnpm turbo build --filter='./apps/*' --filter='./packages/*'
+
+# 2. Linting (zero warnings in CI mode)
+pnpm turbo lint
+
+# 3. Unit tests (100% pass, coverage thresholds met)
+pnpm turbo test -- --coverage
+
+# 4. Schema validation (supergraph composes without errors)
+pnpm --filter @edusphere/gateway compose
+
+# 5. Docker health (all containers healthy)
+./scripts/health-check.sh
+
+# 6. Security scan
+pnpm audit --audit-level=high
+```
+
+### Phase Progress Reporting Format
+```
+═══════════════════════════════════════════════════
+📊 PROGRESS REPORT — Phase X.Y — [timestamp]
+═══════════════════════════════════════════════════
+🔵 Active Agents:
+   Agent-1 [Schema]: Generating Drizzle migrations — 80% complete
+   Agent-2 [Testing]: Writing RLS validation tests — running
+
+✅ Completed this cycle:
+   - All 16 tables created with RLS enabled
+   - Apache AGE graph ontology initialized
+
+⏳ Next actions:
+   - Apply migrations to database
+   - Run health-check.sh
+
+📈 Phase progress: 65% → estimated 8 min remaining
+═══════════════════════════════════════════════════
+```
+
+## Documentation Sync
+
+| File | When to Update | What to Sync |
+|------|---------------|--------------|
+| `CLAUDE.md` | Work rules change, tech stack update | AI instructions, commands, patterns |
+| `README.md` | Stats/numbers change, new feature added | Test counts, phase status, architecture diagram |
+| `OPEN_ISSUES.md` | Every task/bug start or completion | Status, severity, files, problem, solution |
+| `IMPLEMENTATION-ROADMAP.md` | Phase acceptance criteria change | Tasks, acceptance criteria, commands |
+| `API-CONTRACTS-GRAPHQL-FEDERATION.md` | GraphQL schema change | Types, queries, mutations, subscriptions |
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Docker not running | `docker-compose up -d` |
+| PostgreSQL down (5432) | Check `docker ps`, restart postgres container |
+| Apache AGE not loaded | Run `LOAD 'age';` in psql, verify `shared_preload_libraries` in postgresql.conf |
+| Gateway down (4000) | `pnpm --filter @edusphere/gateway dev` |
+| Subgraph down (4001-4006) | `pnpm --filter @edusphere/subgraph-<name> dev` |
+| Frontend down (5173) | `pnpm --filter @edusphere/web dev` |
+| Empty DB | `pnpm --filter @edusphere/db seed` |
+| Drizzle schema out of sync | `pnpm --filter @edusphere/db generate && pnpm --filter @edusphere/db migrate` |
+| Supergraph composition fails | Check subgraph SDL files for Federation v2 compliance, run `pnpm --filter @edusphere/gateway compose` |
+| RLS policy fails | Verify `withTenantContext()` wrapper used, check `SET LOCAL` commands in logs |
+| JWT validation fails | Check Keycloak JWKS URL, verify `KEYCLOAK_JWKS_URL` in gateway .env |
+| NATS connection fails | Verify `NATS_URL` in .env, check `docker ps | grep nats` |
+| Embeddings not generated | Run `pnpm --filter @edusphere/subgraph-knowledge embed`, check Ollama running |
+| Transcription stuck | Check `apps/transcription-worker` logs, verify MinIO access, check faster-whisper GPU config |
+
+### Common Errors & Solutions
+
+**Error:** `ReferenceError: edusphere_graph does not exist`
+**Solution:** Run `pnpm --filter @edusphere/db graph:init` to initialize Apache AGE graph
+
+**Error:** `Error: Cannot query across tenants without SUPER_ADMIN role`
+**Solution:** Check JWT `role` claim, ensure `@requiresRole(roles: [SUPER_ADMIN])` directive on query
+
+**Error:** `Federation composition failed: Field "user" on Annotation cannot be resolved`
+**Solution:** Ensure User entity stub in Annotation subgraph with `@key(fields: "id") @external`
+
+**Error:** `OpenTelemetry trace context missing`
+**Solution:** Verify Jaeger running (`docker ps | grep jaeger`), check `JAEGER_ENDPOINT` in .env
+
+---
+
+**Last Updated:** February 2026 | **Version:** 1.0.0 | **Target Scale:** 100,000+ concurrent users
