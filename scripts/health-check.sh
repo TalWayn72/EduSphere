@@ -1,116 +1,73 @@
-#!/usr/bin/env bash
-# ═══════════════════════════════════════════════════════════════
-# EduSphere Infrastructure Health Check
-# Validates all services are running and healthy
-# ═══════════════════════════════════════════════════════════════
+#!/bin/bash
+
+# EduSphere Health Check Script
+# Verifies all infrastructure services are healthy
 
 set -e
 
-# Colors for output
+echo "🏥 EduSphere Health Check"
+echo "=========================="
+
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Counter for failures
-FAILURES=0
-
-echo "═══════════════════════════════════════════════════════════════"
-echo "🏥 EduSphere Infrastructure Health Check"
-echo "═══════════════════════════════════════════════════════════════"
-echo ""
-
-# Function to check service health
+# Check function
 check_service() {
-    local service_name=$1
-    local check_command=$2
-    local description=$3
+  SERVICE=$1
+  CHECK_CMD=$2
 
-    echo -n "Checking ${service_name}... "
+  echo -n "Checking $SERVICE... "
 
-    if eval "${check_command}" > /dev/null 2>&1; then
-        echo -e "${GREEN}✓ ${description}${NC}"
-    else
-        echo -e "${RED}✗ ${description} - FAILED${NC}"
-        ((FAILURES++))
-    fi
+  if eval "$CHECK_CMD" > /dev/null 2>&1; then
+    echo -e "${GREEN}✓${NC}"
+    return 0
+  else
+    echo -e "${RED}✗${NC}"
+    return 1
+  fi
 }
 
-# PostgreSQL
-check_service "PostgreSQL" \
-    "docker exec edusphere-postgres pg_isready -U edusphere -d edusphere" \
-    "PostgreSQL 16 accepting connections"
+FAILED=0
 
-check_service "Apache AGE" \
-    "docker exec edusphere-postgres psql -U edusphere -d edusphere -tAc \"SELECT extname FROM pg_extension WHERE extname='age'\" | grep -q age" \
-    "Apache AGE extension loaded"
+# 1. PostgreSQL
+if ! check_service "PostgreSQL" "docker exec edusphere-postgres pg_isready -U edusphere -d edusphere"; then
+  FAILED=$((FAILED + 1))
+fi
 
-check_service "pgvector" \
-    "docker exec edusphere-postgres psql -U edusphere -d edusphere -tAc \"SELECT extname FROM pg_extension WHERE extname='vector'\" | grep -q vector" \
-    "pgvector extension loaded"
+# 2. PostgreSQL Extensions
+echo -n "Checking PostgreSQL extensions... "
+EXTENSIONS=$(docker exec edusphere-postgres psql -U edusphere -d edusphere -t -c "SELECT COUNT(*) FROM pg_extension WHERE extname IN ('uuid-ossp', 'pgcrypto', 'age', 'vector')" 2>/dev/null || echo "0")
+if [ "$EXTENSIONS" -eq "4" ]; then
+  echo -e "${GREEN}✓${NC} (uuid-ossp, pgcrypto, age, vector)"
+else
+  echo -e "${RED}✗${NC} (expected 4, found $EXTENSIONS)"
+  FAILED=$((FAILED + 1))
+fi
 
-check_service "AGE Graph" \
-    "docker exec edusphere-postgres psql -U edusphere -d edusphere -tAc \"SELECT * FROM ag_catalog.ag_graph WHERE name='edusphere_graph'\" | grep -q edusphere_graph" \
-    "Apache AGE graph 'edusphere_graph' exists"
+# 3. Apache AGE Graph
+echo -n "Checking Apache AGE graph... "
+GRAPH_EXISTS=$(docker exec edusphere-postgres psql -U edusphere -d edusphere -t -c "SELECT COUNT(*) FROM ag_catalog.ag_graph WHERE name = 'edusphere_graph'" 2>/dev/null || echo "0")
+if [ "$GRAPH_EXISTS" -eq "1" ]; then
+  echo -e "${GREEN}✓${NC} (edusphere_graph)"
+else
+  echo -e "${RED}✗${NC} (graph not found)"
+  FAILED=$((FAILED + 1))
+fi
 
-# Keycloak
-check_service "Keycloak" \
-    "curl -sf http://localhost:8080/health/ready" \
-    "Keycloak OIDC server ready"
-
-check_service "Keycloak Realm" \
-    "curl -sf http://localhost:8080/realms/edusphere" \
-    "Keycloak 'edusphere' realm configured"
-
-# NATS JetStream
-check_service "NATS" \
-    "curl -sf http://localhost:8222/healthz" \
-    "NATS JetStream server healthy"
-
-# MinIO
-check_service "MinIO" \
-    "curl -sf http://localhost:9000/minio/health/live" \
-    "MinIO object storage ready"
-
-# Redis
-check_service "Redis" \
-    "docker exec edusphere-redis redis-cli -a edusphere_redis_password ping | grep -q PONG" \
-    "Redis cache responding"
-
-# Jaeger
-check_service "Jaeger" \
-    "curl -sf http://localhost:16686" \
-    "Jaeger tracing UI accessible"
-
-# Ollama
-check_service "Ollama" \
-    "curl -sf http://localhost:11434/api/tags" \
-    "Ollama LLM server responding"
+# 4. Redis
+if ! check_service "Redis" "docker exec edusphere-redis redis-cli ping"; then
+  FAILED=$((FAILED + 1))
+fi
 
 echo ""
-echo "═══════════════════════════════════════════════════════════════"
-
-# Summary
-if [ $FAILURES -eq 0 ]; then
-    echo -e "${GREEN}✅ All services are healthy!${NC}"
-    echo ""
-    echo "🌐 Service URLs:"
-    echo "   PostgreSQL:      localhost:5432"
-    echo "   Keycloak Admin:  http://localhost:8080 (admin/admin)"
-    echo "   NATS Monitor:    http://localhost:8222"
-    echo "   MinIO Console:   http://localhost:9001 (minioadmin/minioadmin)"
-    echo "   Redis:           localhost:6379"
-    echo "   Jaeger UI:       http://localhost:16686"
-    echo "   Ollama API:      http://localhost:11434"
-    echo ""
-    echo "✅ Ready to start Phase 0.3: First Subgraph"
-    exit 0
+echo "=========================="
+if [ $FAILED -eq 0 ]; then
+  echo -e "${GREEN}All services healthy!${NC}"
+  exit 0
 else
-    echo -e "${RED}❌ ${FAILURES} service(s) failed health check${NC}"
-    echo ""
-    echo "💡 Troubleshooting:"
-    echo "   1. Run: docker-compose up -d"
-    echo "   2. Check logs: docker-compose logs -f [service]"
-    echo "   3. Restart failed services: docker-compose restart [service]"
-    exit 1
+  echo -e "${RED}$FAILED service(s) failed health check${NC}"
+  exit 1
 fi

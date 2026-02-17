@@ -1,41 +1,49 @@
-import { pgTable, uuid, text, timestamp, jsonb, customType } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
-import { contentItems } from './contentItems';
+import { pgTable, uuid, timestamp, customType } from 'drizzle-orm/pg-core';
+import { pk } from './_shared';
+import { transcript_segments } from './content';
+import { annotations } from './annotation';
 
+// Custom vector type for pgvector
 const vector = customType<{ data: number[] }>({
   dataType() {
     return 'vector(768)';
   },
 });
 
-export const embeddings = pgTable('embeddings', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  contentItemId: uuid('content_item_id').notNull().references(() => contentItems.id, { onDelete: 'cascade' }),
-  chunkText: text('chunk_text').notNull(),
+// Content Embeddings (for transcript segments)
+export const content_embeddings = pgTable('content_embeddings', {
+  id: pk(),
+  segment_id: uuid('segment_id')
+    .notNull()
+    .references(() => transcript_segments.id, { onDelete: 'cascade' })
+    .unique(),
   embedding: vector('embedding').notNull(),
-  metadata: jsonb('metadata'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const embeddingsRLS = sql`
-CREATE POLICY embeddings_tenant_isolation ON embeddings
-  USING (
-    EXISTS (
-      SELECT 1 FROM content_items
-      JOIN modules ON modules.id = content_items.module_id
-      JOIN courses ON courses.id = modules.course_id
-      WHERE content_items.id = embeddings.content_item_id
-      AND courses.tenant_id::text = current_setting('app.current_tenant', TRUE)
-    )
-  );
+// Annotation Embeddings
+export const annotation_embeddings = pgTable('annotation_embeddings', {
+  id: pk(),
+  annotation_id: uuid('annotation_id')
+    .notNull()
+    .references(() => annotations.id, { onDelete: 'cascade' })
+    .unique(),
+  embedding: vector('embedding').notNull(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
-ALTER TABLE embeddings ENABLE ROW LEVEL SECURITY;
-`;
+// Concept Embeddings (for knowledge graph concepts)
+export const concept_embeddings = pgTable('concept_embeddings', {
+  id: pk(),
+  concept_id: uuid('concept_id').notNull().unique(),
+  // Note: No FK to AGE graph — conceptually references ag_catalog vertex
+  embedding: vector('embedding').notNull(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
-export const embeddingsIndexes = sql`
-CREATE INDEX idx_embeddings_content ON embeddings(content_item_id);
-CREATE INDEX idx_embeddings_vector ON embeddings USING hnsw (embedding vector_cosine_ops);
-`;
-
-export type Embedding = typeof embeddings.$inferSelect;
-export type NewEmbedding = typeof embeddings.$inferInsert;
+export type ContentEmbedding = typeof content_embeddings.$inferSelect;
+export type NewContentEmbedding = typeof content_embeddings.$inferInsert;
+export type AnnotationEmbedding = typeof annotation_embeddings.$inferSelect;
+export type NewAnnotationEmbedding = typeof annotation_embeddings.$inferInsert;
+export type ConceptEmbedding = typeof concept_embeddings.$inferSelect;
+export type NewConceptEmbedding = typeof concept_embeddings.$inferInsert;

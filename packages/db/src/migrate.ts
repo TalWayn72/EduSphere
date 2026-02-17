@@ -1,27 +1,24 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import pg from 'pg';
-
-const { Pool } = pg;
+import { Pool } from 'pg';
 
 async function runMigrations() {
-  console.log('🔄 Running database migrations...');
-
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL || 'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
   });
 
   const db = drizzle(pool);
 
-  try {
-    await migrate(db, { migrationsFolder: './drizzle' });
-    console.log('✅ Migrations completed successfully');
-  } catch (error) {
-    console.error('❌ Migration failed:', error);
-    process.exit(1);
-  } finally {
-    await pool.end();
-  }
+  console.log('Running migrations...');
+
+  await migrate(db, { migrationsFolder: './migrations' });
+
+  console.log('Migrations completed successfully');
+
+  await pool.end();
 }
 
-runMigrations();
+runMigrations().catch((error) => {
+  console.error('Migration failed:', error);
+  process.exit(1);
+});

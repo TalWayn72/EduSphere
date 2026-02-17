@@ -1,23 +1,21 @@
-// Core tables
-export * from './users';
-export * from './organizations';
+// Shared helpers
+export * from './_shared';
 
-// Course tables
-export * from './courses';
-export * from './modules';
-export * from './contentItems';
-export * from './userCourses';
-export * from './userProgress';
+// Core tables
+export * from './tenants';
+export * from './core';
+
+// Content tables
+export * from './content';
+
+// Annotation tables
+export * from './annotation';
 
 // Collaboration tables
-export * from './annotations';
-export * from './discussions';
-export * from './tags';
+export * from './collaboration';
 
-// File storage
-export * from './files';
+// Agent tables
+export * from './agent';
 
-// AI/ML tables
+// Embeddings tables
 export * from './embeddings';
-export * from './agentSessions';
-export * from './agentMessages';

@@ -1,41 +1,31 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { sql } from 'drizzle-orm';
-import pg from 'pg';
+import { Pool } from 'pg';
 import * as schema from './schema';
 
-const { Pool } = pg;
+// Database connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
 
-// Create PostgreSQL connection pool
-export function createDatabaseConnection(connectionString?: string) {
-  const pool = new Pool({
-    connectionString: connectionString || process.env.DATABASE_URL,
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-  });
+// Drizzle instance
+export const db = drizzle(pool, { schema });
 
-  return drizzle(pool, { schema });
-}
+// Export types
+export type DrizzleDB = typeof db;
 
-// Export schema and all tables/types
-export { schema };
+// Export schema
 export * from './schema';
-export type Database = ReturnType<typeof createDatabaseConnection>;
 
-// Create default database connection
-export const db = createDatabaseConnection();
+// Export graph utilities
+export * from './graph';
 
-// RLS Context Helper
-export async function withTenantContext<T>(
-  db: Database,
-  tenantId: string,
-  callback: () => Promise<T>
-): Promise<T> {
-  await db.execute(sql`SET LOCAL app.current_tenant = ${tenantId}`);
-  const result = await callback();
-  await db.execute(sql`RESET app.current_tenant`);
-  return result;
+// Export RLS utilities
+export * from './rls';
+
+// Cleanup
+export async function closeDatabase(): Promise<void> {
+  await pool.end();
 }
-
-// Re-export from drizzle
-export { sql, eq, and, or, not, desc, asc, inArray } from 'drizzle-orm';
