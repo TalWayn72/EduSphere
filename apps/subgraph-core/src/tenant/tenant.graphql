@@ -1,0 +1,23 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable"])
+
+type Tenant @key(fields: "id") {
+  id: ID!
+  name: String!
+  slug: String!
+  plan: TenantPlan!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum TenantPlan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+type Query {
+  tenant(id: ID!): Tenant
+  tenants(limit: Int = 10, offset: Int = 0): [Tenant!]!
+}

@@ -1,15 +1,15 @@
-import { Resolver, Query, Mutation, Subscription, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { getPubSub, CHANNELS, EVENTS } from '@edusphere/redis-pubsub';
-import { PubSub } from 'graphql-subscriptions';
+import type { AuthContext } from '@edusphere/auth';
+
+interface GraphQLContext {
+  req: any;
+  authContext?: AuthContext;
+}
 
 @Resolver('User')
 export class UserResolver {
-  private pubsub: PubSub;
-
-  constructor(private readonly userService: UserService) {
-    this.pubsub = new PubSub();
-  }
+  constructor(private readonly userService: UserService) {}
 
   @Query('_health')
   health(): string {
@@ -17,69 +17,44 @@ export class UserResolver {
   }
 
   @Query('user')
-  async getUser(@Args('id') id: string) {
-    return this.userService.findById(id);
+  async getUser(@Args('id') id: string, @Context() context: GraphQLContext) {
+    return this.userService.findById(id, context.authContext);
   }
 
   @Query('users')
   async getUsers(
     @Args('limit') limit: number,
-    @Args('offset') offset: number
+    @Args('offset') offset: number,
+    @Context() context: GraphQLContext
   ) {
-    return this.userService.findAll(limit, offset);
+    return this.userService.findAll(limit, offset, context.authContext);
   }
 
   @Query('me')
-  async getCurrentUser(@Context() context: any) {
-    const userId = context.req?.user?.id;
-    if (!userId) {
+  async getCurrentUser(@Context() context: GraphQLContext) {
+    if (!context.authContext) {
       throw new Error('Unauthenticated');
     }
-    return this.userService.findById(userId);
+    return this.userService.findById(context.authContext.userId, context.authContext);
   }
 
   @Mutation('createUser')
-  async createUser(@Args('input') input: any) {
-    const user = await this.userService.create(input);
-
-    // Publish event for subscriptions
-    this.pubsub.publish(EVENTS.USER_CREATED, {
-      userCreated: user,
-      tenantId: input.tenantId,
-    });
-
-    return user;
+  async createUser(@Args('input') input: any, @Context() context: GraphQLContext) {
+    if (!context.authContext) {
+      throw new Error('Unauthenticated');
+    }
+    return this.userService.create(input, context.authContext);
   }
 
   @Mutation('updateUser')
-  async updateUser(@Args('id') id: string, @Args('input') input: any) {
-    const user = await this.userService.update(id, input);
-
-    // Publish event for subscriptions
-    this.pubsub.publish(EVENTS.USER_UPDATED, {
-      userUpdated: user,
-      userId: id,
-      tenantId: user.tenantId,
-    });
-
-    return user;
-  }
-
-  @Subscription('userCreated', {
-    filter: (payload, variables) => payload.tenantId === variables.tenantId,
-  })
-  userCreatedSubscription(@Args('tenantId') tenantId: string) {
-    return this.pubsub.asyncIterator(EVENTS.USER_CREATED);
-  }
-
-  @Subscription('userUpdated', {
-    filter: (payload, variables) =>
-      payload.userId === variables.userId && payload.tenantId === variables.tenantId,
-  })
-  userUpdatedSubscription(
-    @Args('userId') userId: string,
-    @Args('tenantId') tenantId: string,
+  async updateUser(
+    @Args('id') id: string,
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
   ) {
-    return this.pubsub.asyncIterator(EVENTS.USER_UPDATED);
+    if (!context.authContext) {
+      throw new Error('Unauthenticated');
+    }
+    return this.userService.update(id, input, context.authContext);
   }
 }

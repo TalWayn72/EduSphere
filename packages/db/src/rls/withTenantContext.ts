@@ -13,7 +13,7 @@ export interface TenantContext {
 export async function withTenantContext<T>(
   db: DrizzleDB,
   context: TenantContext,
-  operation: (tx: DrizzleDB) => Promise<T>
+  operation: (db: DrizzleDB) => Promise<T>
 ): Promise<T> {
   return db.transaction(async (tx) => {
     // Set session variables for RLS policies
@@ -22,7 +22,7 @@ export async function withTenantContext<T>(
     await tx.execute(sql`SET LOCAL app.current_user_role = ${context.userRole}`);
 
     // Execute operation with RLS context
-    return operation(tx);
+    return operation(tx as any);
   });
 }
 
@@ -31,11 +31,11 @@ export async function withTenantContext<T>(
  */
 export async function withBypassRLS<T>(
   db: DrizzleDB,
-  operation: (tx: DrizzleDB) => Promise<T>
+  operation: (db: DrizzleDB) => Promise<T>
 ): Promise<T> {
   return db.transaction(async (tx) => {
     await tx.execute(sql`SET LOCAL row_security = OFF`);
-    const result = await operation(tx);
+    const result = await operation(tx as any);
     await tx.execute(sql`SET LOCAL row_security = ON`);
     return result;
   });

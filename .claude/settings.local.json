@@ -3,7 +3,14 @@
     "allow": [
       "Bash(pnpm install:*)",
       "Bash(pnpm --filter @edusphere/db generate:*)",
-      "Bash(pnpm --filter @edusphere/db build:*)"
+      "Bash(pnpm --filter @edusphere/db build:*)",
+      "Bash(git push:*)",
+      "Bash(pnpm --filter @edusphere/subgraph-core install:*)",
+      "Bash(pnpm --filter @edusphere/subgraph-core build:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm --filter @edusphere/auth build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
