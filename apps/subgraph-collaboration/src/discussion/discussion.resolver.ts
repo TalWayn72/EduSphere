@@ -1,9 +1,18 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent, ResolveReference } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Subscription, Args, ResolveField, Parent, ResolveReference } from '@nestjs/graphql';
 import { DiscussionService } from './discussion.service';
+import { PubSub } from 'graphql-subscriptions';
+
+const DISCUSSION_CREATED = 'discussionCreated';
+const DISCUSSION_UPDATED = 'discussionUpdated';
+const DISCUSSION_UPVOTED = 'discussionUpvoted';
 
 @Resolver('Discussion')
 export class DiscussionResolver {
-  constructor(private readonly discussionService: DiscussionService) {}
+  private pubsub: PubSub;
+
+  constructor(private readonly discussionService: DiscussionService) {
+    this.pubsub = new PubSub();
+  }
 
   @Query('discussion')
   async getDiscussion(@Args('id') id: string) {
@@ -27,12 +36,16 @@ export class DiscussionResolver {
 
   @Mutation('createDiscussion')
   async createDiscussion(@Args('input') input: any) {
-    return this.discussionService.create(input);
+    const discussion = await this.discussionService.create(input);
+    this.pubsub.publish(DISCUSSION_CREATED, { discussionCreated: discussion, courseId: input.courseId });
+    return discussion;
   }
 
   @Mutation('updateDiscussion')
   async updateDiscussion(@Args('id') id: string, @Args('input') input: any) {
-    return this.discussionService.update(id, input);
+    const discussion = await this.discussionService.update(id, input);
+    this.pubsub.publish(DISCUSSION_UPDATED, { discussionUpdated: discussion, discussionId: id });
+    return discussion;
   }
 
   @Mutation('deleteDiscussion')
@@ -42,7 +55,9 @@ export class DiscussionResolver {
 
   @Mutation('upvoteDiscussion')
   async upvoteDiscussion(@Args('id') id: string) {
-    return this.discussionService.upvote(id);
+    const discussion = await this.discussionService.upvote(id);
+    this.pubsub.publish(DISCUSSION_UPVOTED, { discussionUpvoted: discussion, discussionId: id });
+    return discussion;
   }
 
   @Mutation('replyToDiscussion')
@@ -58,5 +73,26 @@ export class DiscussionResolver {
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {
     return this.discussionService.findById(reference.id);
+  }
+
+  @Subscription('discussionCreated', {
+    filter: (payload, variables) => payload.courseId === variables.courseId,
+  })
+  discussionCreatedSubscription(@Args('courseId') courseId: string) {
+    return this.pubsub.asyncIterator(DISCUSSION_CREATED);
+  }
+
+  @Subscription('discussionUpdated', {
+    filter: (payload, variables) => payload.discussionId === variables.discussionId,
+  })
+  discussionUpdatedSubscription(@Args('discussionId') discussionId: string) {
+    return this.pubsub.asyncIterator(DISCUSSION_UPDATED);
+  }
+
+  @Subscription('discussionUpvoted', {
+    filter: (payload, variables) => payload.discussionId === variables.discussionId,
+  })
+  discussionUpvotedSubscription(@Args('discussionId') discussionId: string) {
+    return this.pubsub.asyncIterator(DISCUSSION_UPVOTED);
   }
 }
