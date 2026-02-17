@@ -1,0 +1,45 @@
+{
+  "name": "@edusphere/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "EduSphere Mobile App - iOS & Android (Expo SDK 54)",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build:android": "eas build --platform android",
+    "build:ios": "eas build --platform ios",
+    "submit:android": "eas submit --platform android",
+    "submit:ios": "eas submit --platform ios",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@apollo/client": "^3.11.11",
+    "@expo/vector-icons": "^14.0.4",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "@react-navigation/bottom-tabs": "^7.2.0",
+    "@react-navigation/native": "^7.0.15",
+    "@react-navigation/native-stack": "^7.2.0",
+    "expo": "~54.0.0",
+    "expo-constants": "~18.0.0",
+    "expo-secure-store": "~15.0.0",
+    "expo-splash-screen": "~0.30.0",
+    "expo-sqlite": "~16.0.0",
+    "expo-status-bar": "~2.1.0",
+    "graphql": "^16.9.0",
+    "graphql-ws": "^5.16.0",
+    "react": "18.3.1",
+    "react-native": "0.76.8",
+    "react-native-safe-area-context": "^4.16.0",
+    "react-native-screens": "~4.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@edusphere/tsconfig": "workspace:*",
+    "@types/react": "~18.3.18",
+    "typescript": "^5.8.2"
+  }
+}
