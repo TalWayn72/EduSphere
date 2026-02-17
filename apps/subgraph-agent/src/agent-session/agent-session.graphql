@@ -1,17 +1,30 @@
-enum SessionStatus {
+enum AgentSessionStatus {
   ACTIVE
   COMPLETED
   FAILED
   CANCELLED
 }
 
+enum TemplateType {
+  TUTOR
+  QUIZ_GENERATOR
+  DEBATE_FACILITATOR
+  EXPLANATION_GENERATOR
+  CHAVRUTA_DEBATE
+  SUMMARIZE
+  QUIZ_ASSESS
+  RESEARCH_SCOUT
+  EXPLAIN
+  CUSTOM
+}
+
 type AgentSession @key(fields: "id") {
   id: ID!
   userId: ID!
   user: User!
-  agentType: String!
-  status: SessionStatus!
-  metadata: JSON
+  templateType: TemplateType!
+  contextData: JSON
+  status: AgentSessionStatus!
   messages: [AgentMessage!]!
   createdAt: String!
   completedAt: String
@@ -21,28 +34,24 @@ type User @key(fields: "id") {
   id: ID!
 }
 
+type Course @key(fields: "id") {
+  id: ID!
+}
+
 scalar JSON
 
 extend type Query {
   agentSession(id: ID!): AgentSession
-  agentSessionsByUser(userId: ID!, limit: Int = 20): [AgentSession!]!
-  activeAgentSessions(userId: ID!): [AgentSession!]!
+  myAgentSessions: [AgentSession!]!
+  agentTemplates: [AgentTemplate!]!
 }
 
 extend type Mutation {
-  createAgentSession(input: CreateAgentSessionInput!): AgentSession!
-  updateAgentSession(id: ID!, input: UpdateAgentSessionInput!): AgentSession!
-  completeAgentSession(id: ID!): AgentSession!
-  cancelAgentSession(id: ID!): AgentSession!
+  startAgentSession(templateType: TemplateType!, context: JSON!): AgentSession!
+  sendMessage(sessionId: ID!, content: String!): AgentMessage!
+  endSession(sessionId: ID!): Boolean!
 }
 
-input CreateAgentSessionInput {
-  userId: ID!
-  agentType: String!
-  metadata: JSON
-}
-
-input UpdateAgentSessionInput {
-  status: SessionStatus
-  metadata: JSON
+extend type Subscription {
+  messageStream(sessionId: ID!): AgentMessage!
 }

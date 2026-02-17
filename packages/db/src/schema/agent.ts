@@ -3,6 +3,10 @@ import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 import { users } from './core';
 
+// Re-export agent sessions and messages
+export * from './agentSessions';
+export * from './agentMessages';
+
 // Agent Definitions
 export const agent_definitions = pgTable('agent_definitions', {
   id: pk(),

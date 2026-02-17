@@ -14,6 +14,9 @@ export * from './annotation';
 // Collaboration tables
 export * from './collaboration';
 
+// Discussion tables
+export * from './discussion';
+
 // Agent tables
 export * from './agent';
 

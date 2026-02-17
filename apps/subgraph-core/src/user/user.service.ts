@@ -62,14 +62,19 @@ export class UserService {
   async create(input: any, authContext: AuthContext) {
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
+      const values: any = {
+        tenant_id: input.tenantId || authContext.tenantId || '',
+        email: input.email,
+        display_name: `${input.firstName || ''} ${input.lastName || ''}`.trim(),
+      };
+
+      if (input.role) {
+        values.role = input.role;
+      }
+
       const [user] = await tx
         .insert(schema.users)
-        .values({
-          tenant_id: input.tenantId || authContext.tenantId || '',
-          email: input.email,
-          display_name: `${input.firstName || ''} ${input.lastName || ''}`.trim(),
-          role: input.role as any,
-        })
+        .values(values)
         .returning();
       return user;
     });
@@ -79,11 +84,11 @@ export class UserService {
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const updateData: any = {};
-      
+
       if (input.firstName || input.lastName) {
         updateData.display_name = `${input.firstName || ''} ${input.lastName || ''}`.trim();
       }
-      
+
       if (input.role) {
         updateData.role = input.role;
       }

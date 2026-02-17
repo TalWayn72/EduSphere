@@ -1,55 +1,116 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated"])
+
+"""Discussion types"""
+enum DiscussionType {
+  FORUM
+  CHAVRUTA
+  DEBATE
+}
+
+"""Message types"""
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+"""Discussion in a course"""
 type Discussion @key(fields: "id") {
   id: ID!
-  contentItemId: ID
-  contentItem: ContentItem
-  authorId: ID!
-  author: User!
-  parentId: ID
-  parent: Discussion
-  replies: [Discussion!]!
-  title: String
-  content: String!
-  upvotes: Int!
-  createdAt: String!
-  updatedAt: String!
+  courseId: ID!
+  course: Course!
+  title: String!
+  description: String
+  creatorId: ID!
+  creator: User!
+  discussionType: DiscussionType!
+  messages(limit: Int = 50, offset: Int = 0): [DiscussionMessage!]!
+  participants: [DiscussionParticipant!]!
+  participantCount: Int!
+  messageCount: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type ContentItem @key(fields: "id") {
+"""Message in a discussion"""
+type DiscussionMessage @key(fields: "id") {
+  id: ID!
+  discussionId: ID!
+  discussion: Discussion!
+  userId: ID!
+  user: User!
+  content: String!
+  messageType: MessageType!
+  parentMessageId: ID
+  parentMessage: DiscussionMessage
+  replies(limit: Int = 20, offset: Int = 0): [DiscussionMessage!]!
+  replyCount: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Participant in a discussion"""
+type DiscussionParticipant {
+  id: ID!
+  discussionId: ID!
+  discussion: Discussion!
+  userId: ID!
+  user: User!
+  joinedAt: DateTime!
+}
+
+"""External entity stubs"""
+type User @key(fields: "id") @external {
   id: ID!
 }
 
-type User @key(fields: "id") {
+type Course @key(fields: "id") @external {
   id: ID!
 }
 
 extend type Query {
-  discussion(id: ID!): Discussion
-  discussionsByContentItem(contentItemId: ID!): [Discussion!]!
-  discussionsByAuthor(authorId: ID!): [Discussion!]!
-  discussionReplies(parentId: ID!): [Discussion!]!
+  """Get a single discussion by ID"""
+  discussion(id: ID!): Discussion @authenticated
+
+  """Get all discussions for a course"""
+  discussions(courseId: ID!, limit: Int = 20, offset: Int = 0): [Discussion!]! @authenticated
+
+  """Get all messages in a discussion"""
+  discussionMessages(discussionId: ID!, limit: Int = 50, offset: Int = 0): [DiscussionMessage!]! @authenticated
 }
 
 extend type Mutation {
-  createDiscussion(input: CreateDiscussionInput!): Discussion!
-  updateDiscussion(id: ID!, input: UpdateDiscussionInput!): Discussion!
-  deleteDiscussion(id: ID!): Boolean!
-  upvoteDiscussion(id: ID!): Discussion!
-  replyToDiscussion(parentId: ID!, input: ReplyDiscussionInput!): Discussion!
+  """Create a new discussion"""
+  createDiscussion(input: CreateDiscussionInput!): Discussion! @authenticated
+
+  """Add a message to a discussion"""
+  addMessage(discussionId: ID!, input: AddMessageInput!): DiscussionMessage! @authenticated
+
+  """Join a discussion as a participant"""
+  joinDiscussion(discussionId: ID!): Boolean! @authenticated
+
+  """Leave a discussion"""
+  leaveDiscussion(discussionId: ID!): Boolean! @authenticated
+}
+
+type Subscription {
+  """Subscribe to new messages in a discussion"""
+  messageAdded(discussionId: ID!): DiscussionMessage!
 }
 
 input CreateDiscussionInput {
-  contentItemId: ID
-  authorId: ID!
-  title: String
-  content: String!
+  courseId: ID!
+  title: String!
+  description: String
+  discussionType: DiscussionType!
 }
 
-input UpdateDiscussionInput {
-  content: String
-  title: String
+input AddMessageInput {
+  content: String!
+  messageType: MessageType!
+  parentMessageId: ID
 }
 
-input ReplyDiscussionInput {
-  authorId: ID!
-  content: String!
-}
+scalar DateTime

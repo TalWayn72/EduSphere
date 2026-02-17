@@ -20,6 +20,7 @@ export * from './schema';
 
 // Export types
 export type Database = ReturnType<typeof createDatabaseConnection>;
+export type DrizzleDB = Database;
 
 // Default connection
 export const db = createDatabaseConnection();

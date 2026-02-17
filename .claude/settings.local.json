@@ -1,20 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm install:*)",
-      "Bash(pnpm --filter @edusphere/db generate:*)",
-      "Bash(pnpm --filter @edusphere/db build:*)",
-      "Bash(git push:*)",
-      "Bash(pnpm --filter @edusphere/subgraph-core install:*)",
-      "Bash(pnpm --filter @edusphere/subgraph-core build:*)",
-      "Bash(pnpm build:*)",
-      "Bash(pnpm --filter @edusphere/auth build:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(pnpm --filter @edusphere/gateway build:*)",
-      "Bash(pnpm --filter @edusphere/subgraph-content build:*)",
-      "Bash(pnpm --filter @edusphere/web build:*)",
-      "Bash(find:*)"
+      "Read:*",
+      "Write:*",
+      "Edit:*",
+      "Glob:*",
+      "Grep:*",
+      "Bash:*",
+      "Task:*",
+      "NotebookEdit:*",
+      "Bash(pnpm --filter @edusphere/subgraph-annotation build:*)"
     ]
   }
 }

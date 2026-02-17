@@ -1,0 +1,144 @@
+type Concept @key(fields: "id") {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  definition: String!
+  sourceIds: [ID!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Person @key(fields: "id") {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  bio: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Term @key(fields: "id") {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  definition: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Source @key(fields: "id") {
+  id: ID!
+  tenantId: ID!
+  title: String!
+  type: String!
+  url: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type TopicCluster @key(fields: "id") {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type ConceptRelationship {
+  fromConcept: Concept!
+  toConcept: Concept!
+  relationshipType: String!
+  strength: Float
+  inferred: Boolean
+  description: String
+}
+
+type RelatedConcept {
+  concept: Concept!
+  strength: Float!
+}
+
+type Course @key(fields: "id") {
+  id: ID!
+}
+
+type ContentItem @key(fields: "id") {
+  id: ID!
+}
+
+extend type Query {
+  concept(id: ID!): Concept
+  conceptByName(name: String!): Concept
+  concepts(limit: Int = 20): [Concept!]!
+  relatedConcepts(conceptId: ID!, depth: Int = 2, limit: Int = 10): [RelatedConcept!]!
+  
+  person(id: ID!): Person
+  personByName(name: String!): Person
+  
+  term(id: ID!): Term
+  termByName(name: String!): Term
+  
+  source(id: ID!): Source
+  
+  topicCluster(id: ID!): TopicCluster
+  topicClustersByCourse(courseId: ID!): [TopicCluster!]!
+  
+  searchSemantic(query: String!, limit: Int = 10): [SemanticResult!]!
+}
+
+extend type Mutation {
+  createConcept(input: CreateConceptInput!): Concept!
+  updateConcept(id: ID!, input: UpdateConceptInput!): Concept!
+  deleteConcept(id: ID!): Boolean!
+  
+  linkConcepts(fromId: ID!, toId: ID!, relationshipType: String!, strength: Float, description: String): ConceptRelationship!
+  
+  createPerson(input: CreatePersonInput!): Person!
+  createTerm(input: CreateTermInput!): Term!
+  createSource(input: CreateSourceInput!): Source!
+  createTopicCluster(input: CreateTopicClusterInput!): TopicCluster!
+  
+  generateEmbedding(text: String!, entityType: String!, entityId: ID!): Boolean!
+}
+
+input CreateConceptInput {
+  name: String!
+  definition: String!
+  sourceIds: [ID!]
+}
+
+input UpdateConceptInput {
+  name: String
+  definition: String
+  sourceIds: [ID!]
+}
+
+input CreatePersonInput {
+  name: String!
+  bio: String
+}
+
+input CreateTermInput {
+  name: String!
+  definition: String!
+}
+
+input CreateSourceInput {
+  title: String!
+  type: String!
+  url: String
+}
+
+input CreateTopicClusterInput {
+  name: String!
+  description: String
+}
+
+type SemanticResult {
+  id: ID!
+  text: String!
+  similarity: Float!
+  entityType: String!
+  entityId: ID!
+}

@@ -19,7 +19,7 @@ async function bootstrap() {
   await app.listen(port);
 
   logger.log(`🚀 Collaboration subgraph running on http://localhost:${port}/graphql`);
-  logger.log(`💬 Serving: Discussions/Forums`);
+  logger.log(`📊 GraphQL Playground available`);
 }
 
 bootstrap().catch((err) => {

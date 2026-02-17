@@ -2,7 +2,7 @@
   "name": "@edusphere/subgraph-agent",
   "version": "0.1.0",
   "private": true,
-  "description": "Agent subgraph - AI Sessions and Messages (NestJS + GraphQL Yoga Federation)",
+  "description": "Agent subgraph - AI Agents, Sessions, Messages (NestJS + GraphQL Yoga Federation + Vercel AI SDK)",
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
@@ -13,6 +13,8 @@
     "test:cov": "vitest --coverage"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.0.14",
+    "@edusphere/auth": "workspace:*",
     "@edusphere/db": "workspace:*",
     "@edusphere/graphql-shared": "workspace:*",
     "@graphql-yoga/nestjs-federation": "^3.19.0",
@@ -20,6 +22,7 @@
     "@nestjs/core": "^10.4.15",
     "@nestjs/graphql": "^12.2.2",
     "@nestjs/platform-express": "^10.4.15",
+    "ai": "^4.0.46",
     "drizzle-orm": "^0.39.3",
     "graphql": "^16.9.0",
     "graphql-subscriptions": "^3.0.0",

@@ -19,7 +19,9 @@ async function bootstrap() {
   await app.listen(port);
 
   logger.log(`🚀 Knowledge subgraph running on http://localhost:${port}/graphql`);
-  logger.log(`🔍 Serving: Embeddings, Semantic Search (pgvector HNSW)`);
+  logger.log(`📊 GraphQL Playground available`);
+  logger.log(`🔍 pgvector semantic search enabled`);
+  logger.log(`🕸️ Apache AGE graph queries enabled`);
 }
 
 bootstrap().catch((err) => {

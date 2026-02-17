@@ -1,0 +1,26 @@
+enum TemplateType {
+  TUTOR
+  QUIZ_GENERATOR
+  DEBATE_FACILITATOR
+  EXPLANATION_GENERATOR
+  CHAVRUTA_DEBATE
+  SUMMARIZE
+  QUIZ_ASSESS
+  RESEARCH_SCOUT
+  EXPLAIN
+  CUSTOM
+}
+
+type AgentTemplate @key(fields: "id") {
+  id: ID!
+  name: String!
+  templateType: TemplateType!
+  systemPrompt: String!
+  parameters: JSON!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+}
+
+scalar JSON

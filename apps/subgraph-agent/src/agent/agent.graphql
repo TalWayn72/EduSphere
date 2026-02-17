@@ -1,0 +1,54 @@
+enum AgentExecutionStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+type AgentExecution @key(fields: "id") {
+  id: ID!
+  agentId: ID!
+  agent: AgentTemplate!
+  userId: ID!
+  user: User!
+  input: JSON!
+  output: JSON
+  status: AgentExecutionStatus!
+  startedAt: String
+  completedAt: String
+  metadata: JSON!
+}
+
+type AgentTemplate @key(fields: "id") {
+  id: ID!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+}
+
+scalar JSON
+
+extend type Query {
+  agentExecution(id: ID!): AgentExecution
+  agentExecutionsByUser(userId: ID!, limit: Int = 20): [AgentExecution!]!
+  agentExecutionsByAgent(agentId: ID!, limit: Int = 20): [AgentExecution!]!
+  runningExecutions(userId: ID!): [AgentExecution!]!
+}
+
+extend type Mutation {
+  startAgentExecution(input: StartAgentExecutionInput!): AgentExecution!
+  cancelAgentExecution(id: ID!): AgentExecution!
+}
+
+extend type Subscription {
+  executionStatusChanged(executionId: ID!): AgentExecution!
+}
+
+input StartAgentExecutionInput {
+  agentId: ID!
+  userId: ID!
+  input: JSON!
+  metadata: JSON
+}

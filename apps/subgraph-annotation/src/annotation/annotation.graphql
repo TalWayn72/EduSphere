@@ -1,60 +1,81 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external"])
+
 enum AnnotationType {
-  HIGHLIGHT
-  NOTE
-  QUESTION
+  TEXT
+  SKETCH
+  LINK
   BOOKMARK
+  SPATIAL_COMMENT
+}
+
+enum AnnotationLayer {
+  PERSONAL
+  SHARED
+  INSTRUCTOR
+  AI_GENERATED
 }
 
 type Annotation @key(fields: "id") {
   id: ID!
-  contentItemId: ID!
-  contentItem: ContentItem!
+  tenantId: ID!
+  assetId: ID!
   userId: ID!
-  user: User!
-  type: AnnotationType!
-  text: String
-  highlightedText: String
-  startOffset: Int
-  endOffset: Int
-  color: String
-  createdAt: String!
-  updatedAt: String!
+  user: User
+  annotationType: AnnotationType!
+  layer: AnnotationLayer!
+  content: JSON!
+  spatialData: JSON
+  parentId: ID
+  parent: Annotation
+  isResolved: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type ContentItem @key(fields: "id") {
+type User @key(fields: "id") @external {
   id: ID!
 }
 
-type User @key(fields: "id") {
+type ContentItem @key(fields: "id") @external {
   id: ID!
 }
 
-extend type Query {
+type Query {
+  _health: String!
   annotation(id: ID!): Annotation
-  annotationsByContentItem(contentItemId: ID!): [Annotation!]!
-  annotationsByUser(userId: ID!): [Annotation!]!
-  annotationsByType(contentItemId: ID!, type: AnnotationType!): [Annotation!]!
+  annotations(
+    assetId: ID
+    userId: ID
+    layer: AnnotationLayer
+    limit: Int = 20
+    offset: Int = 0
+  ): [Annotation!]!
+  annotationsByAsset(assetId: ID!, layer: AnnotationLayer): [Annotation!]!
+  annotationsByUser(userId: ID!, limit: Int = 20, offset: Int = 0): [Annotation!]!
 }
 
-extend type Mutation {
+type Mutation {
   createAnnotation(input: CreateAnnotationInput!): Annotation!
   updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation!
   deleteAnnotation(id: ID!): Boolean!
+  resolveAnnotation(id: ID!): Annotation!
 }
 
 input CreateAnnotationInput {
-  contentItemId: ID!
-  userId: ID!
-  type: AnnotationType!
-  text: String
-  highlightedText: String
-  startOffset: Int
-  endOffset: Int
-  color: String
+  assetId: ID!
+  annotationType: AnnotationType!
+  layer: AnnotationLayer = PERSONAL
+  content: JSON!
+  spatialData: JSON
+  parentId: ID
 }
 
 input UpdateAnnotationInput {
-  text: String
-  highlightedText: String
-  color: String
+  content: JSON
+  spatialData: JSON
+  isResolved: Boolean
 }
+
+scalar DateTime
+scalar JSON
