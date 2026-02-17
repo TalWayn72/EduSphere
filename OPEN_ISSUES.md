@@ -34,9 +34,12 @@
 | **Security & RLS** | 0 | - | ⏳ To be validated |
 | **Testing** | 0 | - | ⏳ To be implemented |
 | **Performance** | 0 | - | ⏳ To be optimized |
-| **Documentation** | 3 | 🟢 Low | ✅ Completed |
+| **Documentation** | 5 | 🟢 Low | ✅ Completed |
+| **Development Tools** | 1 | 🟢 Low | ✅ Completed |
+| **CI/CD** | 1 | 🟢 Low | ✅ Completed |
+| **Git & GitHub** | 1 | 🟢 Low | ⏳ Pending user action |
 
-**סה"כ:** 3 פריטים → 3 הושלמו ✅ | 0 פתוחים 🔴
+**סה"כ:** 8 פריטים → 6 הושלמו ✅ | 1 ממתין למשתמש ⏳ | 0 פתוחים 🔴
 
 ---
 
@@ -161,6 +164,158 @@
 - ✅ Templates match Bellor quality level
 - ✅ Emoji usage consistent and readable
 - ✅ All 3 completed tasks documented
+
+---
+
+## ✅ TASK-004: VS Code Extensions Configuration (17 פברואר 2026)
+**סטטוס:** ✅ הושלם | **חומרה:** 🟢 Low | **תאריך:** 17 February 2026
+**קבצים:** `.vscode/extensions.json`, `CLAUDE.md`
+
+### בעיה
+הפרויקט זקוק להמלצות VS Code extensions מותאמות לסטאק הטכנולוגי (GraphQL Federation, PostgreSQL, Docker, TypeScript).
+
+### דרישות
+- קובץ `.vscode/extensions.json` עם המלצות אוטומטיות
+- חלוקה ל-3 רמות: Essential (חובה), Highly Recommended, Nice to Have
+- תיעוד ב-CLAUDE.md עם הסבר למה כל extension חשוב
+- התמקדות ב-GraphQL Federation development
+
+### פתרון
+1. **Created `.vscode/extensions.json`** עם 19 extensions:
+   - Essential: GraphQL, Prisma, PostgreSQL, ESLint, Prettier, Docker, EditorConfig
+   - Highly Recommended: GitLens, Thunder Client, REST Client, Error Lens, Import Cost, Todo Tree, Better Comments, YAML
+   - Nice to Have: Turbo Console Log, Path Intellisense, Markdown All in One
+2. **Updated `CLAUDE.md`** עם סעיף "VS Code Extensions" חדש:
+   - טבלאות מפורטות עם purpose ו-why critical
+   - הנחיות התקנה
+   - קישור ל-`.vscode/extensions.json`
+
+### בדיקות
+- ✅ extensions.json valid JSON
+- ✅ All extension IDs verified (format: publisher.extension-name)
+- ✅ Documentation added to CLAUDE.md
+- ✅ VS Code will auto-suggest extensions on project open
+
+---
+
+## ✅ TASK-005: CI/CD Workflows (17 פברואר 2026)
+**סטטוס:** ✅ הושלם | **חומרה:** 🟢 Low | **תאריך:** 17 February 2026
+**קבצים:** `.github/workflows/*.yml` (6 files, 1,983 lines)
+
+### בעיה
+הפרויקט זקוק ל-enterprise-grade CI/CD pipelines עם GitHub Actions לאוטומציה מלאה של build, test, security, deployment.
+
+### דרישות
+- CI pipeline: lint, typecheck, unit tests, security scan
+- Test pipeline: integration tests עם PostgreSQL/Redis/NATS services
+- Federation pipeline: supergraph composition validation, breaking change detection
+- Docker pipeline: multi-stage builds עם Trivy security scanning
+- CD pipeline: deployment לstagingproduction עם Kubernetes
+- PR gate: quality checks, coverage thresholds, sensitive file detection
+
+### פתרון
+נוצרו 6 workflows מקצועיים:
+
+1. **ci.yml (233 lines)** - Continuous Integration
+   - Parallel jobs: lint, typecheck, unit tests, security scan, build
+   - Turborepo caching with affected detection
+   - pnpm install with frozen lockfile
+   - Trivy filesystem scan for vulnerabilities
+
+2. **test.yml (338 lines)** - Full Test Suite
+   - PostgreSQL 16 + pgvector service
+   - Redis 7 + NATS JetStream services
+   - Matrix strategy for parallel execution
+   - Integration tests, RLS tests, GraphQL tests
+   - Coverage upload to Codecov
+
+3. **federation.yml (306 lines)** - GraphQL Federation Validation
+   - Supergraph composition check
+   - Breaking change detection with Hive
+   - Schema publishing to registry
+   - Federation v2 compliance validation
+
+4. **docker-build.yml (283 lines)** - Docker Build & Scan
+   - Multi-stage builds for Gateway + 6 subgraphs + Frontend
+   - Trivy security scanning (CRITICAL/HIGH vulnerabilities)
+   - GHCR push with semantic versioning
+   - Build matrix for parallel execution
+
+5. **cd.yml (363 lines)** - Continuous Deployment
+   - Deploy to staging (auto on main push)
+   - Deploy to production (manual approval required)
+   - Kubernetes deployment via kubectl/Helm
+   - Health checks and smoke tests
+   - Automatic rollback on failure
+
+6. **pr-gate.yml (395 lines)** - PR Quality Gate
+   - PR validation (title, description, branch naming)
+   - Wait for CI/test/federation completion
+   - Coverage thresholds enforcement
+   - Sensitive file detection (.env, credentials)
+   - Automated PR comments with results
+
+### בדיקות
+- ✅ All workflows valid YAML syntax
+- ✅ Proper concurrency controls (cancel-in-progress)
+- ✅ Secrets handling (no hardcoded values)
+- ✅ Turborepo integration with caching
+- ✅ pnpm caching for fast installs
+- ✅ Matrix strategies for parallelization
+
+---
+
+## ⏳ TASK-006: GitHub Repository Setup (17 פברואר 2026)
+**סטטוס:** ⏳ ממתין למשתמש | **חומרה:** 🟢 Low | **תאריך:** 17 February 2026
+**קבצים:** `GITHUB_SETUP.md`
+
+### בעיה
+הקוד נמצא ב-Git repository מקומי אבל צריך להעלות ל-GitHub לשיתוף פעולה ו-CI/CD automation.
+
+### דרישות
+- יצירת repository ב-GitHub (private או public)
+- הוספת remote origin
+- Push של כל הcommits (2 commits, 36 files)
+- הגדרת GitHub Actions permissions
+- הוספת repository secrets לCI/CD
+
+### מצב נוכחי
+- ✅ Git repository initialized locally
+- ✅ 2 commits created:
+  ```
+  5ccc6c6 Add VS Code extensions and CI/CD workflows
+  defa848 feat: Initial EduSphere project setup with comprehensive documentation
+  ```
+- ⏳ Remote repository - **ממתין ליצירה על ידי המשתמש**
+
+### פתרון
+נוצר `GITHUB_SETUP.md` עם 2 אפשרויות:
+
+**Option 1: Web UI (מומלץ)**
+1. ליצור repository ב-https://github.com/new
+2. להריץ:
+   ```bash
+   git remote add origin https://github.com/TalWayn72/EduSphere.git
+   git push -u origin master
+   ```
+
+**Option 2: GitHub CLI**
+1. להתקין `gh` CLI
+2. להריץ:
+   ```bash
+   gh auth login
+   gh repo create EduSphere --private --source=. --remote=origin --push
+   ```
+
+### צעדים הבאים (אחרי push)
+1. Enable GitHub Actions
+2. Add repository secrets (DOCKER_USERNAME, HIVE_TOKEN, etc.)
+3. Configure branch protection rules
+4. Start Phase 0.1: Monorepo Scaffolding
+
+### בדיקות
+- ⏳ Waiting for user to create GitHub repository
+- ⏳ Waiting for git push to remote
 
 ---
 
@@ -360,4 +515,4 @@ curl -sf http://localhost:4000/graphql -d '{"query":"{ _health }"}' | jq .data._
 
 ---
 
-**Last Updated:** 17 February 2026 | **Total Issues:** 3 completed | **Open Issues:** 0
+**Last Updated:** 17 February 2026 | **Total Tasks:** 8 (6 completed, 1 pending user action, 1 in progress)
