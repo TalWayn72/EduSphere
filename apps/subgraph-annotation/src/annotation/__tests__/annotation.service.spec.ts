@@ -31,6 +31,7 @@ describe('AnnotationService', () => {
       email: 'test@example.com',
       username: 'testuser',
       roles: ['STUDENT'],
+      scopes: [],
       tenantId: undefined, // Missing tenant
       isSuperAdmin: false,
     };

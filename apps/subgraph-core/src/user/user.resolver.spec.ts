@@ -12,9 +12,12 @@ const mockUserService = {
 
 const MOCK_AUTH: AuthContext = {
   userId: 'user-1',
+  email: 'student@example.com',
+  username: 'student',
   tenantId: 'tenant-1',
   roles: ['STUDENT'],
   scopes: ['read'],
+  isSuperAdmin: false,
 };
 
 const MOCK_USER = {

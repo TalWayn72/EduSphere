@@ -40,16 +40,22 @@ import { withTenantContext } from '@edusphere/db';
 
 const MOCK_AUTH: AuthContext = {
   userId: 'user-1',
+  email: 'student@example.com',
+  username: 'student',
   tenantId: 'tenant-1',
   roles: ['STUDENT'],
   scopes: ['read'],
+  isSuperAdmin: false,
 };
 
 const ADMIN_AUTH: AuthContext = {
   userId: 'admin-1',
+  email: 'admin@example.com',
+  username: 'admin',
   tenantId: 'tenant-1',
   roles: ['ORG_ADMIN'],
   scopes: ['read', 'write'],
+  isSuperAdmin: false,
 };
 
 const MOCK_USER = {
