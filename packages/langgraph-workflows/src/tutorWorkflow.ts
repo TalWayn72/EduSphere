@@ -6,12 +6,20 @@ import { z } from 'zod';
 const TutorStateSchema = z.object({
   question: z.string(),
   context: z.string().optional(),
-  studentLevel: z.enum(['beginner', 'intermediate', 'advanced']).default('intermediate'),
-  conversationHistory: z.array(z.object({
-    role: z.enum(['user', 'assistant']),
-    content: z.string(),
-  })).default([]),
-  currentStep: z.enum(['assess', 'explain', 'verify', 'followup', 'complete']).default('assess'),
+  studentLevel: z
+    .enum(['beginner', 'intermediate', 'advanced'])
+    .default('intermediate'),
+  conversationHistory: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string(),
+      })
+    )
+    .default([]),
+  currentStep: z
+    .enum(['assess', 'explain', 'verify', 'followup', 'complete'])
+    .default('assess'),
   explanation: z.string().optional(),
   comprehensionCheck: z.string().optional(),
   followupSuggestions: z.array(z.string()).default([]),
@@ -65,10 +73,15 @@ Question: "${state.question}"
 Respond with ONLY one word: beginner, intermediate, or advanced`,
     });
 
-    const level = text.trim().toLowerCase() as 'beginner' | 'intermediate' | 'advanced';
+    const level = text.trim().toLowerCase() as
+      | 'beginner'
+      | 'intermediate'
+      | 'advanced';
 
     return {
-      studentLevel: ['beginner', 'intermediate', 'advanced'].includes(level) ? level : 'intermediate',
+      studentLevel: ['beginner', 'intermediate', 'advanced'].includes(level)
+        ? level
+        : 'intermediate',
       currentStep: 'explain',
     };
   }
@@ -77,7 +90,8 @@ Respond with ONLY one word: beginner, intermediate, or advanced`,
     // Generate explanation adapted to student level
     const levelGuidance = {
       beginner: 'Use simple language, avoid jargon, provide concrete examples',
-      intermediate: 'Balance technical accuracy with clarity, use relevant examples',
+      intermediate:
+        'Balance technical accuracy with clarity, use relevant examples',
       advanced: 'Use precise technical language, dive deep into nuances',
     };
 
@@ -134,8 +148,8 @@ Suggest 3 related topics the student might want to explore next. Return as a num
 
     const suggestions = text
       .split('\n')
-      .filter(line => line.match(/^\d+\./))
-      .map(line => line.replace(/^\d+\.\s*/, '').trim());
+      .filter((line) => line.match(/^\d+\./))
+      .map((line) => line.replace(/^\d+\.\s*/, '').trim());
 
     return {
       followupSuggestions: suggestions,
@@ -152,7 +166,9 @@ Suggest 3 related topics the student might want to explore next. Return as a num
     return result as TutorState;
   }
 
-  async *stream(initialState: Partial<TutorState>): AsyncGenerator<TutorState, void, unknown> {
+  async *stream(
+    initialState: Partial<TutorState>
+  ): AsyncGenerator<TutorState, void, unknown> {
     const compiledGraph = this.graph.compile();
     const fullState = TutorStateSchema.parse(initialState);
 

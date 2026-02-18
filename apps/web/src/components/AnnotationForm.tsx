@@ -15,7 +15,11 @@ interface AnnotationFormProps {
   userRole: 'student' | 'instructor' | 'ai';
   contentTimestamp?: number;
   parentId?: string;
-  onSubmit: (content: string, layer: AnnotationLayer, timestamp?: number) => void;
+  onSubmit: (
+    content: string,
+    layer: AnnotationLayer,
+    timestamp?: number
+  ) => void;
   onCancel: () => void;
 }
 
@@ -28,9 +32,13 @@ export function AnnotationForm({
 }: AnnotationFormProps) {
   const [content, setContent] = useState('');
   const [selectedLayer, setSelectedLayer] = useState<AnnotationLayer>(
-    userRole === 'instructor' ? AnnotationLayer.INSTRUCTOR : AnnotationLayer.PERSONAL
+    userRole === 'instructor'
+      ? AnnotationLayer.INSTRUCTOR
+      : AnnotationLayer.PERSONAL
   );
-  const [timestamp, setTimestamp] = useState(contentTimestamp ? formatTimestamp(contentTimestamp) : '');
+  const [timestamp, setTimestamp] = useState(
+    contentTimestamp ? formatTimestamp(contentTimestamp) : ''
+  );
 
   // Get available layers based on user role
   const availableLayers = Object.values(AnnotationLayer).filter((layer) => {
@@ -42,14 +50,19 @@ export function AnnotationForm({
     e.preventDefault();
     if (!content.trim()) return;
 
-    const timestampSeconds = timestamp ? parseTimestamp(timestamp) : contentTimestamp;
+    const timestampSeconds = timestamp
+      ? parseTimestamp(timestamp)
+      : contentTimestamp;
     onSubmit(content, selectedLayer, timestampSeconds);
     setContent('');
     setTimestamp('');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-gray-50 rounded-lg border">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 p-4 bg-gray-50 rounded-lg border"
+    >
       <div>
         <Label htmlFor="content" className="text-sm font-medium">
           {parentId ? 'Add Reply' : 'Add Annotation'}
@@ -58,7 +71,9 @@ export function AnnotationForm({
           id="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={parentId ? 'Write your reply...' : 'Write your annotation...'}
+          placeholder={
+            parentId ? 'Write your reply...' : 'Write your annotation...'
+          }
           className="mt-1 min-h-[100px]"
           required
         />
@@ -70,7 +85,12 @@ export function AnnotationForm({
             <Label htmlFor="layer" className="text-sm font-medium">
               Layer
             </Label>
-            <Select value={selectedLayer} onValueChange={(value) => setSelectedLayer(value as AnnotationLayer)}>
+            <Select
+              value={selectedLayer}
+              onValueChange={(value) =>
+                setSelectedLayer(value as AnnotationLayer)
+              }
+            >
               <SelectTrigger id="layer" className="mt-1">
                 <SelectValue />
               </SelectTrigger>

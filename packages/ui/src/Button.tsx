@@ -47,9 +47,7 @@ export function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator
-          color={variant === 'primary' ? '#fff' : '#007AFF'}
-        />
+        <ActivityIndicator color={variant === 'primary' ? '#fff' : '#007AFF'} />
       ) : (
         <Text style={[styles.text, styles[`${variant}Text`], textStyle]}>
           {title}

@@ -37,7 +37,12 @@ export default function CourseList() {
           >
             <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>
               {course.title}
-              {!course.isPublished && <span style={{ color: '#999', fontSize: '14px' }}> (Draft)</span>}
+              {!course.isPublished && (
+                <span style={{ color: '#999', fontSize: '14px' }}>
+                  {' '}
+                  (Draft)
+                </span>
+              )}
             </h3>
             <p style={{ margin: '0', color: '#666' }}>{course.description}</p>
             <small style={{ color: '#999' }}>

@@ -20,7 +20,10 @@ export const CreateAnnotationInputSchema = z.object({
   annotationType: AnnotationType,
   layer: AnnotationLayer.default('PERSONAL'),
   content: z.record(z.unknown()).describe('JSON content of the annotation'),
-  spatialData: z.record(z.unknown()).optional().describe('Spatial positioning data'),
+  spatialData: z
+    .record(z.unknown())
+    .optional()
+    .describe('Spatial positioning data'),
   parentId: z.string().uuid('Parent ID must be a valid UUID').optional(),
 });
 

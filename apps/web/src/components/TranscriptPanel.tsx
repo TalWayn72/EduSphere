@@ -10,7 +10,11 @@ interface TranscriptPanelProps {
   onSeek: (timestamp: number) => void;
 }
 
-export function TranscriptPanel({ segments, currentTime, onSeek }: TranscriptPanelProps) {
+export function TranscriptPanel({
+  segments,
+  currentTime,
+  onSeek,
+}: TranscriptPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const formatTime = (seconds: number) => {
@@ -60,7 +64,9 @@ export function TranscriptPanel({ segments, currentTime, onSeek }: TranscriptPan
                 <span
                   className={cn(
                     'text-xs font-mono',
-                    isActive ? 'text-primary font-semibold' : 'text-muted-foreground'
+                    isActive
+                      ? 'text-primary font-semibold'
+                      : 'text-muted-foreground'
                   )}
                 >
                   {formatTime(segment.startTime)}
@@ -69,7 +75,9 @@ export function TranscriptPanel({ segments, currentTime, onSeek }: TranscriptPan
               <p
                 className={cn(
                   'text-sm leading-relaxed',
-                  isActive ? 'text-foreground font-medium' : 'text-muted-foreground'
+                  isActive
+                    ? 'text-foreground font-medium'
+                    : 'text-muted-foreground'
                 )}
               >
                 {segment.text}
@@ -80,7 +88,9 @@ export function TranscriptPanel({ segments, currentTime, onSeek }: TranscriptPan
 
         {filteredSegments.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-sm text-muted-foreground">No matching segments found</p>
+            <p className="text-sm text-muted-foreground">
+              No matching segments found
+            </p>
           </div>
         )}
       </div>

@@ -5,11 +5,15 @@ export const tenants = pgTable('tenants', {
   id: pk(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
-  plan: text('plan', { enum: ['FREE', 'STARTER', 'PROFESSIONAL', 'ENTERPRISE'] })
+  plan: text('plan', {
+    enum: ['FREE', 'STARTER', 'PROFESSIONAL', 'ENTERPRISE'],
+  })
     .notNull()
     .default('FREE'),
   settings: jsonb('settings').notNull().default({}),
-  subscription_expires_at: timestamp('subscription_expires_at', { withTimezone: true }),
+  subscription_expires_at: timestamp('subscription_expires_at', {
+    withTimezone: true,
+  }),
   ...timestamps,
 });
 

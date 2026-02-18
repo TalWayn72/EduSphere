@@ -3,46 +3,53 @@ import { database } from '../services/database';
 import NetInfo from '@react-native-community/netinfo';
 
 export const offlineLink = new ApolloLink((operation, forward) => {
-  return new Observable(observer => {
+  return new Observable((observer) => {
     let subscription: any;
 
-    NetInfo.fetch().then(state => {
+    NetInfo.fetch().then((state) => {
       const isOnline = state.isConnected ?? false;
 
       // For queries, try cache first if offline
-      if (!isOnline && operation.query.definitions[0].kind === 'OperationDefinition') {
+      if (
+        !isOnline &&
+        operation.query.definitions[0].kind === 'OperationDefinition'
+      ) {
         const def = operation.query.definitions[0];
         if (def.operation === 'query') {
-          database.getCachedQuery(
-            operation.query.loc?.source.body || '',
-            operation.variables
-          ).then(cachedData => {
-            if (cachedData) {
-              observer.next({ data: cachedData });
-              observer.complete();
-            } else {
-              observer.error(new Error('No cached data available offline'));
-            }
-          });
+          database
+            .getCachedQuery(
+              operation.query.loc?.source.body || '',
+              operation.variables
+            )
+            .then((cachedData) => {
+              if (cachedData) {
+                observer.next({ data: cachedData });
+                observer.complete();
+              } else {
+                observer.error(new Error('No cached data available offline'));
+              }
+            });
           return;
         }
 
         // For mutations, queue them for later
         if (def.operation === 'mutation') {
-          database.addOfflineMutation(
-            operation.query.loc?.source.body || '',
-            operation.variables
-          ).then(() => {
-            observer.next({ data: { __offline: true } });
-            observer.complete();
-          });
+          database
+            .addOfflineMutation(
+              operation.query.loc?.source.body || '',
+              operation.variables
+            )
+            .then(() => {
+              observer.next({ data: { __offline: true } });
+              observer.complete();
+            });
           return;
         }
       }
 
       // If online, proceed normally and cache the result
       subscription = forward(operation).subscribe({
-        next: result => {
+        next: (result) => {
           // Cache successful query results
           if (operation.query.definitions[0].kind === 'OperationDefinition') {
             const def = operation.query.definitions[0];

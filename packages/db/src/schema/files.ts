@@ -1,11 +1,20 @@
-import { pgTable, uuid, varchar, text, timestamp, bigint } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  bigint,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
 
 export const files = pgTable('files', {
   id: uuid('id').primaryKey().defaultRandom(),
   tenantId: uuid('tenant_id').notNull(),
-  uploadedBy: uuid('uploaded_by').notNull().references(() => users.id),
+  uploadedBy: uuid('uploaded_by')
+    .notNull()
+    .references(() => users.id),
   filename: varchar('filename', { length: 255 }).notNull(),
   originalName: varchar('original_name', { length: 255 }).notNull(),
   mimeType: varchar('mime_type', { length: 100 }).notNull(),

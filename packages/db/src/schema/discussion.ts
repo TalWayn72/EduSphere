@@ -5,8 +5,17 @@ import { tenants } from './tenants';
 import { users } from './core';
 
 // Enums
-export const discussionTypeEnum = pgEnum('discussion_type', ['FORUM', 'CHAVRUTA', 'DEBATE']);
-export const messageTypeEnum = pgEnum('message_type', ['TEXT', 'IMAGE', 'VIDEO', 'AUDIO']);
+export const discussionTypeEnum = pgEnum('discussion_type', [
+  'FORUM',
+  'CHAVRUTA',
+  'DEBATE',
+]);
+export const messageTypeEnum = pgEnum('message_type', [
+  'TEXT',
+  'IMAGE',
+  'VIDEO',
+  'AUDIO',
+]);
 
 // Discussions table
 export const discussions = pgTable('discussions', {
@@ -15,16 +24,24 @@ export const discussions = pgTable('discussions', {
   course_id: uuid('course_id').notNull(),
   title: text('title').notNull(),
   description: text('description'),
-  creator_id: uuid('creator_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  discussion_type: discussionTypeEnum('discussion_type').notNull().default('FORUM'),
+  creator_id: uuid('creator_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  discussion_type: discussionTypeEnum('discussion_type')
+    .notNull()
+    .default('FORUM'),
   ...timestamps,
 });
 
 // Discussion messages table
 export const discussion_messages = pgTable('discussion_messages', {
   id: pk(),
-  discussion_id: uuid('discussion_id').notNull().references(() => discussions.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  discussion_id: uuid('discussion_id')
+    .notNull()
+    .references(() => discussions.id, { onDelete: 'cascade' }),
+  user_id: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   content: text('content').notNull(),
   message_type: messageTypeEnum('message_type').notNull().default('TEXT'),
   parent_message_id: uuid('parent_message_id'),
@@ -34,9 +51,15 @@ export const discussion_messages = pgTable('discussion_messages', {
 // Discussion participants table
 export const discussion_participants = pgTable('discussion_participants', {
   id: pk(),
-  discussion_id: uuid('discussion_id').notNull().references(() => discussions.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  joined_at: timestamp('joined_at', { withTimezone: true }).notNull().defaultNow(),
+  discussion_id: uuid('discussion_id')
+    .notNull()
+    .references(() => discussions.id, { onDelete: 'cascade' }),
+  user_id: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  joined_at: timestamp('joined_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 // RLS policies
@@ -91,4 +114,5 @@ export type NewDiscussion = typeof discussions.$inferInsert;
 export type DiscussionMessage = typeof discussion_messages.$inferSelect;
 export type NewDiscussionMessage = typeof discussion_messages.$inferInsert;
 export type DiscussionParticipant = typeof discussion_participants.$inferSelect;
-export type NewDiscussionParticipant = typeof discussion_participants.$inferInsert;
+export type NewDiscussionParticipant =
+  typeof discussion_participants.$inferInsert;

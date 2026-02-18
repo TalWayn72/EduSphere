@@ -28,7 +28,9 @@ export function AnnotationPanel({
   currentUserRole = 'student',
   contentTimestamp,
 }: AnnotationPanelProps) {
-  const [annotations, setAnnotations] = useState<Annotation[]>(getThreadedAnnotations());
+  const [annotations, setAnnotations] = useState<Annotation[]>(
+    getThreadedAnnotations()
+  );
   const [enabledLayers, setEnabledLayers] = useState<AnnotationLayer[]>([
     AnnotationLayer.PERSONAL,
     AnnotationLayer.SHARED,
@@ -47,9 +49,14 @@ export function AnnotationPanel({
   const sortedAnnotations = useMemo(() => {
     const sorted = [...filteredAnnotations];
     if (sortBy === 'timestamp') {
-      sorted.sort((a, b) => (a.contentTimestamp || 0) - (b.contentTimestamp || 0));
+      sorted.sort(
+        (a, b) => (a.contentTimestamp || 0) - (b.contentTimestamp || 0)
+      );
     } else {
-      sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      sorted.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     }
     return sorted;
   }, [filteredAnnotations, sortBy]);
@@ -67,7 +74,11 @@ export function AnnotationPanel({
   };
 
   // Add new annotation
-  const handleAddAnnotation = (content: string, layer: AnnotationLayer, timestamp?: number) => {
+  const handleAddAnnotation = (
+    content: string,
+    layer: AnnotationLayer,
+    timestamp?: number
+  ) => {
     const newAnnotation: Annotation = {
       id: `ann-${Date.now()}`,
       content,
@@ -88,7 +99,11 @@ export function AnnotationPanel({
   };
 
   // Add reply
-  const handleReply = (parentId: string, content: string, layer: AnnotationLayer) => {
+  const handleReply = (
+    parentId: string,
+    content: string,
+    layer: AnnotationLayer
+  ) => {
     const reply: Annotation = {
       id: `ann-${Date.now()}`,
       content,
@@ -123,7 +138,11 @@ export function AnnotationPanel({
 
   // Delete annotation
   const handleDelete = (annotationId: string) => {
-    setAnnotations((prev) => prev.filter((ann) => ann.id !== annotationId && ann.parentId !== annotationId));
+    setAnnotations((prev) =>
+      prev.filter(
+        (ann) => ann.id !== annotationId && ann.parentId !== annotationId
+      )
+    );
   };
 
   return (
@@ -225,7 +244,8 @@ export function AnnotationPanel({
           {sortedAnnotations.length} of {annotations.length} annotations visible
         </span>
         <span>
-          {enabledLayers.length} of {Object.keys(AnnotationLayer).length} layers enabled
+          {enabledLayers.length} of {Object.keys(AnnotationLayer).length} layers
+          enabled
         </span>
       </div>
     </div>

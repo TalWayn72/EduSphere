@@ -1,4 +1,10 @@
-import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from 'prom-client';
+import {
+  Registry,
+  Counter,
+  Histogram,
+  Gauge,
+  collectDefaultMetrics,
+} from 'prom-client';
 import express, { Request, Response } from 'express';
 
 export class MetricsService {
@@ -65,8 +71,16 @@ export class MetricsService {
     });
   }
 
-  recordHttpRequest(method: string, route: string, statusCode: number, duration: number) {
-    this.httpRequestDuration.observe({ method, route, status_code: statusCode }, duration);
+  recordHttpRequest(
+    method: string,
+    route: string,
+    statusCode: number,
+    duration: number
+  ) {
+    this.httpRequestDuration.observe(
+      { method, route, status_code: statusCode },
+      duration
+    );
     this.httpRequestTotal.inc({ method, route, status_code: statusCode });
   }
 
@@ -74,8 +88,16 @@ export class MetricsService {
     this.dbQueryDuration.observe({ operation, table }, duration);
   }
 
-  recordGraphqlOperation(type: string, name: string, status: 'success' | 'error') {
-    this.graphqlOperations.inc({ operation_type: type, operation_name: name, status });
+  recordGraphqlOperation(
+    type: string,
+    name: string,
+    status: 'success' | 'error'
+  ) {
+    this.graphqlOperations.inc({
+      operation_type: type,
+      operation_name: name,
+      status,
+    });
   }
 
   recordCacheOperation(operation: 'get' | 'set', result: 'hit' | 'miss') {

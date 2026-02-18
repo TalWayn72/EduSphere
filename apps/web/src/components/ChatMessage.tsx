@@ -23,7 +23,12 @@ function renderMarkdown(text: string): React.ReactNode {
     { regex: /`([^`]+)`/g, type: 'code' },
   ];
 
-  const matches: Array<{ start: number; end: number; type: string; content: string }> = [];
+  const matches: Array<{
+    start: number;
+    end: number;
+    type: string;
+    content: string;
+  }> = [];
 
   patterns.forEach(({ regex, type }) => {
     let match;
@@ -58,7 +63,10 @@ function renderMarkdown(text: string): React.ReactNode {
       parts.push(<em key={key}>{match.content}</em>);
     } else if (match.type === 'code') {
       parts.push(
-        <code key={key} className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono">
+        <code
+          key={key}
+          className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono"
+        >
           {match.content}
         </code>
       );
@@ -75,7 +83,10 @@ function renderMarkdown(text: string): React.ReactNode {
   return parts.length > 0 ? parts : text;
 }
 
-export function ChatMessage({ message, agentName = 'AI Agent' }: ChatMessageProps) {
+export function ChatMessage({
+  message,
+  agentName = 'AI Agent',
+}: ChatMessageProps) {
   const isAgent = message.role === 'agent';
 
   // Split by paragraphs for better formatting

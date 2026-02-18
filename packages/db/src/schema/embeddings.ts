@@ -18,7 +18,9 @@ export const content_embeddings = pgTable('content_embeddings', {
     .references(() => transcript_segments.id, { onDelete: 'cascade' })
     .unique(),
   embedding: vector('embedding').notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 // Annotation Embeddings
@@ -29,7 +31,9 @@ export const annotation_embeddings = pgTable('annotation_embeddings', {
     .references(() => annotations.id, { onDelete: 'cascade' })
     .unique(),
   embedding: vector('embedding').notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 // Concept Embeddings (for knowledge graph concepts)
@@ -38,7 +42,9 @@ export const concept_embeddings = pgTable('concept_embeddings', {
   concept_id: uuid('concept_id').notNull().unique(),
   // Note: No FK to AGE graph — conceptually references ag_catalog vertex
   embedding: vector('embedding').notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type ContentEmbedding = typeof content_embeddings.$inferSelect;

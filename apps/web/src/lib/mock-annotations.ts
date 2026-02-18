@@ -4,7 +4,8 @@ export const mockAnnotations: Annotation[] = [
   // INSTRUCTOR annotations
   {
     id: 'ann-1',
-    content: 'Note the logical structure here: premise → inference → conclusion. This is a classic example of modus ponens reasoning.',
+    content:
+      'Note the logical structure here: premise → inference → conclusion. This is a classic example of modus ponens reasoning.',
     layer: AnnotationLayer.INSTRUCTOR,
     userId: 'instructor-1',
     userName: 'Dr. Cohen',
@@ -17,7 +18,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-2',
-    content: 'Critical thinking checkpoint: Can you identify any potential fallacies in this argument?',
+    content:
+      'Critical thinking checkpoint: Can you identify any potential fallacies in this argument?',
     layer: AnnotationLayer.INSTRUCTOR,
     userId: 'instructor-1',
     userName: 'Dr. Cohen',
@@ -30,7 +32,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-3',
-    content: 'Exam focus: This section will appear on the midterm. Pay special attention to the distinction between categorical and hypothetical syllogisms.',
+    content:
+      'Exam focus: This section will appear on the midterm. Pay special attention to the distinction between categorical and hypothetical syllogisms.',
     layer: AnnotationLayer.INSTRUCTOR,
     userId: 'instructor-1',
     userName: 'Dr. Cohen',
@@ -45,7 +48,8 @@ export const mockAnnotations: Annotation[] = [
   // SHARED annotations (students)
   {
     id: 'ann-4',
-    content: 'This reminds me of Aristotle\'s argument in Nicomachean Ethics about the golden mean. Similar logical framework!',
+    content:
+      "This reminds me of Aristotle's argument in Nicomachean Ethics about the golden mean. Similar logical framework!",
     layer: AnnotationLayer.SHARED,
     userId: 'student-2',
     userName: 'Sarah',
@@ -58,7 +62,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-5',
-    content: 'Great connection! I also see parallels with Kant\'s categorical imperative.',
+    content:
+      "Great connection! I also see parallels with Kant's categorical imperative.",
     layer: AnnotationLayer.SHARED,
     userId: 'student-3',
     userName: 'Michael',
@@ -72,7 +77,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-6',
-    content: 'Has anyone read the supplemental article Dr. Cohen recommended? It expands on this concept beautifully.',
+    content:
+      'Has anyone read the supplemental article Dr. Cohen recommended? It expands on this concept beautifully.',
     layer: AnnotationLayer.SHARED,
     userId: 'student-4',
     userName: 'Rachel',
@@ -99,7 +105,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-8',
-    content: 'Question: How does this differ from deductive vs inductive reasoning? Seems related.',
+    content:
+      'Question: How does this differ from deductive vs inductive reasoning? Seems related.',
     layer: AnnotationLayer.SHARED,
     userId: 'student-6',
     userName: 'Emma',
@@ -112,7 +119,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-9',
-    content: 'Study group meeting this Thursday at 3pm in the library to review this section. DM me if interested!',
+    content:
+      'Study group meeting this Thursday at 3pm in the library to review this section. DM me if interested!',
     layer: AnnotationLayer.SHARED,
     userId: 'student-2',
     userName: 'Sarah',
@@ -127,7 +135,8 @@ export const mockAnnotations: Annotation[] = [
   // AI_GENERATED annotations
   {
     id: 'ann-10',
-    content: 'Related concept: Free Will vs Determinism. This argument assumes agency in decision-making. Consider exploring the compatibilist position.',
+    content:
+      'Related concept: Free Will vs Determinism. This argument assumes agency in decision-making. Consider exploring the compatibilist position.',
     layer: AnnotationLayer.AI_GENERATED,
     userId: 'ai-agent-1',
     userName: 'AI Learning Assistant',
@@ -140,7 +149,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-11',
-    content: 'Knowledge Graph Connection: This concept links to "Epistemology → Justification Theory → Foundationalism". Explore the knowledge graph for deeper understanding.',
+    content:
+      'Knowledge Graph Connection: This concept links to "Epistemology → Justification Theory → Foundationalism". Explore the knowledge graph for deeper understanding.',
     layer: AnnotationLayer.AI_GENERATED,
     userId: 'ai-agent-1',
     userName: 'AI Learning Assistant',
@@ -153,7 +163,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-12',
-    content: 'Quiz suggestion: You might benefit from practicing syllogism identification. Try the interactive quiz in Module 3.',
+    content:
+      'Quiz suggestion: You might benefit from practicing syllogism identification. Try the interactive quiz in Module 3.',
     layer: AnnotationLayer.AI_GENERATED,
     userId: 'ai-agent-1',
     userName: 'AI Learning Assistant',
@@ -166,7 +177,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-13',
-    content: 'Historical context: This argument structure dates back to Aristotle\'s Prior Analytics (circa 350 BCE). The Organon established formal logic as we know it today.',
+    content:
+      "Historical context: This argument structure dates back to Aristotle's Prior Analytics (circa 350 BCE). The Organon established formal logic as we know it today.",
     layer: AnnotationLayer.AI_GENERATED,
     userId: 'ai-agent-1',
     userName: 'AI Learning Assistant',
@@ -181,7 +193,8 @@ export const mockAnnotations: Annotation[] = [
   // PERSONAL annotations (current user)
   {
     id: 'ann-14',
-    content: 'Review this section before the exam - especially the difference between soundness and validity.',
+    content:
+      'Review this section before the exam - especially the difference between soundness and validity.',
     layer: AnnotationLayer.PERSONAL,
     userId: 'current-user',
     userName: 'You',
@@ -207,7 +220,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-16',
-    content: 'Key insight: All deductive arguments are NOT necessarily sound - they must also have true premises!',
+    content:
+      'Key insight: All deductive arguments are NOT necessarily sound - they must also have true premises!',
     layer: AnnotationLayer.PERSONAL,
     userId: 'current-user',
     userName: 'You',
@@ -220,7 +234,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-17',
-    content: 'Practice problems: Complete exercises 5-8 in the textbook to solidify understanding.',
+    content:
+      'Practice problems: Complete exercises 5-8 in the textbook to solidify understanding.',
     layer: AnnotationLayer.PERSONAL,
     userId: 'current-user',
     userName: 'You',
@@ -233,7 +248,8 @@ export const mockAnnotations: Annotation[] = [
   },
   {
     id: 'ann-18',
-    content: 'Mind blown! This completely changed how I think about logical reasoning. Need to re-watch this section.',
+    content:
+      'Mind blown! This completely changed how I think about logical reasoning. Need to re-watch this section.',
     layer: AnnotationLayer.PERSONAL,
     userId: 'current-user',
     userName: 'You',
@@ -247,7 +263,9 @@ export const mockAnnotations: Annotation[] = [
 ];
 
 // Build threaded structure
-export const buildAnnotationThreads = (annotations: Annotation[]): Annotation[] => {
+export const buildAnnotationThreads = (
+  annotations: Annotation[]
+): Annotation[] => {
   const annotationMap = new Map<string, Annotation>();
   const rootAnnotations: Annotation[] = [];
 

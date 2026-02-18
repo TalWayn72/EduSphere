@@ -2,7 +2,9 @@
   "extends": "@edusphere/tsconfig/react.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

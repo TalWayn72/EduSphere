@@ -11,7 +11,10 @@ export const createDiscussionInputSchema = z.object({
 });
 
 export const addMessageInputSchema = z.object({
-  content: z.string().min(1, 'Message content is required').max(10000, 'Message too long'),
+  content: z
+    .string()
+    .min(1, 'Message content is required')
+    .max(10000, 'Message too long'),
   messageType: messageTypeSchema,
   parentMessageId: z.string().uuid('Invalid parent message ID').optional(),
 });

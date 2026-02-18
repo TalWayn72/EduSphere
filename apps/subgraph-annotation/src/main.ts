@@ -18,7 +18,9 @@ async function bootstrap() {
   const port = process.env.PORT || 4003;
   await app.listen(port);
 
-  logger.log(`🚀 Annotation subgraph running on http://localhost:${port}/graphql`);
+  logger.log(
+    `🚀 Annotation subgraph running on http://localhost:${port}/graphql`
+  );
   logger.log(`📝 Serving: PDF/Video Annotations`);
 }
 

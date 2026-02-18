@@ -74,7 +74,7 @@ export class CachedEmbeddings {
 
     // Embed uncached documents
     if (toEmbed.length > 0) {
-      const texts = toEmbed.map(item => item.text);
+      const texts = toEmbed.map((item) => item.text);
       const embeddings = await this.embeddings.embedDocuments(texts);
 
       for (let i = 0; i < toEmbed.length; i++) {
@@ -84,7 +84,11 @@ export class CachedEmbeddings {
 
         // Cache the result
         const cacheKey = this.getCacheKey(text);
-        await this.redis.setex(cacheKey, this.cacheTTL, JSON.stringify(embedding));
+        await this.redis.setex(
+          cacheKey,
+          this.cacheTTL,
+          JSON.stringify(embedding)
+        );
       }
     }
 
@@ -101,6 +105,9 @@ export class CachedEmbeddings {
   }
 }
 
-export function createEmbeddings(apiKey: string, options?: EmbeddingOptions): CachedEmbeddings {
+export function createEmbeddings(
+  apiKey: string,
+  options?: EmbeddingOptions
+): CachedEmbeddings {
   return new CachedEmbeddings(apiKey, options);
 }

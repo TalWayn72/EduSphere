@@ -15,7 +15,7 @@ export class DeepLinkingService {
   }
 
   parseURL(url: string): DeepLinkRoute | null {
-    const { hostname, path, queryParams } = Linking.parse(url);
+    const { path, queryParams } = Linking.parse(url);
 
     if (!path) {
       return null;
@@ -111,7 +111,7 @@ export function useDeepLinking() {
 
   useEffect(() => {
     // Handle initial URL
-    deepLinkingService.getInitialURL().then(url => {
+    deepLinkingService.getInitialURL().then((url) => {
       if (url) {
         handleDeepLink(url);
       }

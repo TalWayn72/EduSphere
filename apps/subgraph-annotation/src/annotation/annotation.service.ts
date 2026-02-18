@@ -1,5 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, and, desc, withTenantContext, sql } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  and,
+  desc,
+  withTenantContext,
+  sql,
+} from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -30,23 +38,28 @@ export class AnnotationService {
       const [annotation] = await tx
         .select()
         .from(schema.annotations)
-        .where(and(
-          eq(schema.annotations.id, id),
-          sql`${schema.annotations.deleted_at} IS NULL`
-        ))
+        .where(
+          and(
+            eq(schema.annotations.id, id),
+            sql`${schema.annotations.deleted_at} IS NULL`
+          )
+        )
         .limit(1);
 
       return annotation || null;
     });
   }
 
-  async findAll(filters: {
-    assetId?: string;
-    userId?: string;
-    layer?: string;
-    limit: number;
-    offset: number;
-  }, authContext?: AuthContext) {
+  async findAll(
+    filters: {
+      assetId?: string;
+      userId?: string;
+      layer?: string;
+      limit: number;
+      offset: number;
+    },
+    authContext?: AuthContext
+  ) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');
     }
@@ -65,7 +78,9 @@ export class AnnotationService {
 
       // Layer-based access control
       const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
+      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
+        userRole
+      );
 
       if (filters.layer) {
         conditions.push(eq(schema.annotations.layer, filters.layer as any));
@@ -98,7 +113,11 @@ export class AnnotationService {
     });
   }
 
-  async findByAsset(assetId: string, layer?: string, authContext?: AuthContext) {
+  async findByAsset(
+    assetId: string,
+    layer?: string,
+    authContext?: AuthContext
+  ) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');
     }
@@ -107,12 +126,14 @@ export class AnnotationService {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const conditions = [
         eq(schema.annotations.asset_id, assetId),
-        sql`${schema.annotations.deleted_at} IS NULL`
+        sql`${schema.annotations.deleted_at} IS NULL`,
       ];
 
       // Layer-based access control
       const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
+      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
+        userRole
+      );
 
       if (layer) {
         conditions.push(eq(schema.annotations.layer, layer as any));
@@ -143,7 +164,12 @@ export class AnnotationService {
     });
   }
 
-  async findByUser(userId: string, limit: number, offset: number, authContext?: AuthContext) {
+  async findByUser(
+    userId: string,
+    limit: number,
+    offset: number,
+    authContext?: AuthContext
+  ) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');
     }
@@ -153,10 +179,12 @@ export class AnnotationService {
       return tx
         .select()
         .from(schema.annotations)
-        .where(and(
-          eq(schema.annotations.user_id, userId),
-          sql`${schema.annotations.deleted_at} IS NULL`
-        ))
+        .where(
+          and(
+            eq(schema.annotations.user_id, userId),
+            sql`${schema.annotations.deleted_at} IS NULL`
+          )
+        )
         .orderBy(desc(schema.annotations.created_at))
         .limit(limit)
         .offset(offset);
@@ -189,7 +217,9 @@ export class AnnotationService {
         throw new Error('Failed to create annotation');
       }
 
-      this.logger.log(`Annotation created: ${annotation.id} by user ${authContext.userId}`);
+      this.logger.log(
+        `Annotation created: ${annotation.id} by user ${authContext.userId}`
+      );
       return annotation;
     });
   }
@@ -205,10 +235,12 @@ export class AnnotationService {
       const [existing] = await tx
         .select()
         .from(schema.annotations)
-        .where(and(
-          eq(schema.annotations.id, id),
-          sql`${schema.annotations.deleted_at} IS NULL`
-        ))
+        .where(
+          and(
+            eq(schema.annotations.id, id),
+            sql`${schema.annotations.deleted_at} IS NULL`
+          )
+        )
         .limit(1);
 
       if (!existing) {
@@ -217,11 +249,15 @@ export class AnnotationService {
 
       // Permission check: only owner or instructors can update
       const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
+      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
+        userRole
+      );
       const isOwner = existing.user_id === authContext.userId;
 
       if (!isOwner && !isInstructor) {
-        throw new Error('Unauthorized: You can only update your own annotations');
+        throw new Error(
+          'Unauthorized: You can only update your own annotations'
+        );
       }
 
       const updateData: any = {};
@@ -248,7 +284,9 @@ export class AnnotationService {
         throw new Error('Failed to update annotation');
       }
 
-      this.logger.log(`Annotation updated: ${annotation.id} by user ${authContext.userId}`);
+      this.logger.log(
+        `Annotation updated: ${annotation.id} by user ${authContext.userId}`
+      );
       return annotation;
     });
   }
@@ -268,10 +306,12 @@ export class AnnotationService {
       const [existing] = await tx
         .select()
         .from(schema.annotations)
-        .where(and(
-          eq(schema.annotations.id, id),
-          sql`${schema.annotations.deleted_at} IS NULL`
-        ))
+        .where(
+          and(
+            eq(schema.annotations.id, id),
+            sql`${schema.annotations.deleted_at} IS NULL`
+          )
+        )
         .limit(1);
 
       if (!existing) {
@@ -280,11 +320,15 @@ export class AnnotationService {
 
       // Permission check: only owner or instructors can delete
       const userRole = authContext.roles[0] || 'STUDENT';
-      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
+      const isInstructor = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
+        userRole
+      );
       const isOwner = existing.user_id === authContext.userId;
 
       if (!isOwner && !isInstructor) {
-        throw new Error('Unauthorized: You can only delete your own annotations');
+        throw new Error(
+          'Unauthorized: You can only delete your own annotations'
+        );
       }
 
       const [deleted] = await tx
@@ -294,7 +338,9 @@ export class AnnotationService {
         .returning();
 
       if (deleted) {
-        this.logger.log(`Annotation soft-deleted: ${id} by user ${authContext.userId}`);
+        this.logger.log(
+          `Annotation soft-deleted: ${id} by user ${authContext.userId}`
+        );
         return true;
       }
 

@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
 import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -12,7 +11,12 @@ interface VideoPlayerProps {
   seekTo?: number;
 }
 
-export function VideoPlayer({ src, bookmarks = [], onTimeUpdate, seekTo }: VideoPlayerProps) {
+export function VideoPlayer({
+  src,
+  bookmarks = [],
+  onTimeUpdate,
+  seekTo,
+}: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -143,7 +147,11 @@ export function VideoPlayer({ src, bookmarks = [], onTimeUpdate, seekTo }: Video
               onClick={togglePlayPause}
               className="text-white hover:bg-white/20"
             >
-              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+              {isPlaying ? (
+                <Pause className="h-5 w-5" />
+              ) : (
+                <Play className="h-5 w-5" />
+              )}
             </Button>
 
             <span className="text-sm font-mono">

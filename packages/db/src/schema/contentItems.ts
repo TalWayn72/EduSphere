@@ -1,4 +1,12 @@
-import { pgTable, uuid, varchar, text, timestamp, integer, pgEnum } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  integer,
+  pgEnum,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { modules } from './modules';
 
@@ -14,7 +22,9 @@ export const contentTypeEnum = pgEnum('content_type', [
 
 export const contentItems = pgTable('content_items', {
   id: uuid('id').primaryKey().defaultRandom(),
-  moduleId: uuid('module_id').notNull().references(() => modules.id, { onDelete: 'cascade' }),
+  moduleId: uuid('module_id')
+    .notNull()
+    .references(() => modules.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   type: contentTypeEnum('type').notNull(),
   content: text('content'),

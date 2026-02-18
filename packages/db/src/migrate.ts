@@ -4,7 +4,9 @@ import { Pool } from 'pg';
 
 async function runMigrations() {
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
+    connectionString:
+      process.env.DATABASE_URL ||
+      'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
   });
 
   const db = drizzle(pool);

@@ -19,7 +19,10 @@ export interface OfflineCourse {
 
 export class DownloadService {
   private downloads = new Map<string, FileSystem.DownloadResumable>();
-  private progressCallbacks = new Map<string, (progress: DownloadProgress) => void>();
+  private progressCallbacks = new Map<
+    string,
+    (progress: DownloadProgress) => void
+  >();
 
   async downloadCourse(
     courseId: string,
@@ -52,7 +55,10 @@ export class DownloadService {
           `${courseDir}${lesson.id}.mp4`,
           {},
           (downloadProgress) => {
-            const percentage = (downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite) * 100;
+            const percentage =
+              (downloadProgress.totalBytesWritten /
+                downloadProgress.totalBytesExpectedToWrite) *
+              100;
             onProgress?.({
               courseId,
               totalBytes: downloadProgress.totalBytesExpectedToWrite,
@@ -138,7 +144,7 @@ export class DownloadService {
       'SELECT * FROM offline_courses ORDER BY downloaded_at DESC'
     );
 
-    return (result || []).map(row => ({
+    return (result || []).map((row) => ({
       id: row.id,
       title: row.title,
       description: row.description,
@@ -179,15 +185,21 @@ export class DownloadService {
       `INSERT OR REPLACE INTO offline_courses
        (id, title, description, downloaded_at, size, lessons_count)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [course.id, course.title, course.description, course.downloadedAt, course.size, course.lessonsCount]
+      [
+        course.id,
+        course.title,
+        course.description,
+        course.downloadedAt,
+        course.size,
+        course.lessonsCount,
+      ]
     );
   }
 
   private async deleteOfflineCourse(courseId: string): Promise<void> {
-    await database.pool?.runAsync(
-      'DELETE FROM offline_courses WHERE id = ?',
-      [courseId]
-    );
+    await database.pool?.runAsync('DELETE FROM offline_courses WHERE id = ?', [
+      courseId,
+    ]);
   }
 }
 

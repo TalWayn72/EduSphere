@@ -1,6 +1,16 @@
-import { Resolver, Query, Mutation, Args, ResolveReference, Context } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveReference,
+  Context,
+} from '@nestjs/graphql';
 import { AnnotationService } from './annotation.service';
-import { CreateAnnotationInputSchema, UpdateAnnotationInputSchema } from './annotation.schemas';
+import {
+  CreateAnnotationInputSchema,
+  UpdateAnnotationInputSchema,
+} from './annotation.schemas';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
@@ -18,7 +28,10 @@ export class AnnotationResolver {
   }
 
   @Query('annotation')
-  async getAnnotation(@Args('id') id: string, @Context() context: GraphQLContext) {
+  async getAnnotation(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
     return this.annotationService.findById(id, context.authContext);
   }
 
@@ -43,7 +56,11 @@ export class AnnotationResolver {
     @Args('layer') layer: string | undefined,
     @Context() context: GraphQLContext
   ) {
-    return this.annotationService.findByAsset(assetId, layer, context.authContext);
+    return this.annotationService.findByAsset(
+      assetId,
+      layer,
+      context.authContext
+    );
   }
 
   @Query('annotationsByUser')
@@ -53,11 +70,19 @@ export class AnnotationResolver {
     @Args('offset') offset: number = 0,
     @Context() context: GraphQLContext
   ) {
-    return this.annotationService.findByUser(userId, limit, offset, context.authContext);
+    return this.annotationService.findByUser(
+      userId,
+      limit,
+      offset,
+      context.authContext
+    );
   }
 
   @Mutation('createAnnotation')
-  async createAnnotation(@Args('input') input: any, @Context() context: GraphQLContext) {
+  async createAnnotation(
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     if (!context.authContext) {
       throw new Error('Unauthenticated');
     }
@@ -81,7 +106,10 @@ export class AnnotationResolver {
   }
 
   @Mutation('deleteAnnotation')
-  async deleteAnnotation(@Args('id') id: string, @Context() context: GraphQLContext) {
+  async deleteAnnotation(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
     if (!context.authContext) {
       throw new Error('Unauthenticated');
     }
@@ -89,7 +117,10 @@ export class AnnotationResolver {
   }
 
   @Mutation('resolveAnnotation')
-  async resolveAnnotation(@Args('id') id: string, @Context() context: GraphQLContext) {
+  async resolveAnnotation(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
     if (!context.authContext) {
       throw new Error('Unauthenticated');
     }
@@ -97,7 +128,10 @@ export class AnnotationResolver {
   }
 
   @ResolveReference()
-  async resolveReference(reference: { __typename: string; id: string }, @Context() context: GraphQLContext) {
+  async resolveReference(
+    reference: { __typename: string; id: string },
+    @Context() context: GraphQLContext
+  ) {
     return this.annotationService.findById(reference.id, context.authContext);
   }
 }

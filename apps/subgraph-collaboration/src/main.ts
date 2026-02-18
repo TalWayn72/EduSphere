@@ -18,7 +18,9 @@ async function bootstrap() {
   const port = process.env.PORT || 4004;
   await app.listen(port);
 
-  logger.log(`🚀 Collaboration subgraph running on http://localhost:${port}/graphql`);
+  logger.log(
+    `🚀 Collaboration subgraph running on http://localhost:${port}/graphql`
+  );
   logger.log(`📊 GraphQL Playground available`);
 }
 

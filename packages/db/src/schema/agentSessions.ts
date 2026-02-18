@@ -1,4 +1,11 @@
-import { pgTable, uuid, varchar, timestamp, pgEnum, jsonb } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  pgEnum,
+  jsonb,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
 
@@ -11,7 +18,9 @@ export const sessionStatusEnum = pgEnum('session_status', [
 
 export const agentSessions = pgTable('agent_sessions', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   agentType: varchar('agent_type', { length: 100 }).notNull(),
   status: sessionStatusEnum('status').notNull().default('ACTIVE'),
   metadata: jsonb('metadata'),

@@ -14,7 +14,7 @@ export function useLoadAssets() {
         // await Font.loadAsync({...});
 
         // Simulate loading
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (e) {
         console.warn(e);
       } finally {

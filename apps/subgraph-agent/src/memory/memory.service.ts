@@ -25,7 +25,7 @@ export class MemoryService {
       .limit(limit);
 
     // Reverse to get chronological order
-    return messages.reverse().map(msg => ({
+    return messages.reverse().map((msg) => ({
       role: msg.role.toLowerCase() as any,
       content: msg.content,
       metadata: msg.metadata,
@@ -39,14 +39,12 @@ export class MemoryService {
     content: string,
     metadata?: any
   ): Promise<void> {
-    await this.db
-      .insert(schema.agentMessages)
-      .values({
-        sessionId: sessionId,
-        role: role.toUpperCase() as any,
-        content,
-        metadata: metadata || {},
-      });
+    await this.db.insert(schema.agentMessages).values({
+      sessionId: sessionId,
+      role: role.toUpperCase() as any,
+      content,
+      metadata: metadata || {},
+    });
 
     this.logger.debug(`Added ${role} message to session ${sessionId}`);
   }
@@ -60,14 +58,20 @@ export class MemoryService {
 
     // Simple summarization - in production, use LLM for better summaries
     const messageCount = messages.length;
-    const userMessages = messages.filter(m => m.role === 'user').length;
-    const assistantMessages = messages.filter(m => m.role === 'assistant').length;
+    const userMessages = messages.filter((m) => m.role === 'user').length;
+    const assistantMessages = messages.filter(
+      (m) => m.role === 'assistant'
+    ).length;
 
     const firstMessage = messages[0];
-    const startTime = firstMessage?.createdAt ? firstMessage.createdAt.toISOString() : 'unknown';
+    const startTime = firstMessage?.createdAt
+      ? firstMessage.createdAt.toISOString()
+      : 'unknown';
 
-    return `Session has ${messageCount} messages (${userMessages} user, ${assistantMessages} assistant). ` +
-           `Started at ${startTime}.`;
+    return (
+      `Session has ${messageCount} messages (${userMessages} user, ${assistantMessages} assistant). ` +
+      `Started at ${startTime}.`
+    );
   }
 
   async clearConversation(sessionId: string): Promise<void> {

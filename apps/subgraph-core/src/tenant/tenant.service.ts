@@ -20,10 +20,6 @@ export class TenantService {
   }
 
   async findAll(limit: number, offset: number) {
-    return this.db
-      .select()
-      .from(schema.tenants)
-      .limit(limit)
-      .offset(offset);
+    return this.db.select().from(schema.tenants).limit(limit).offset(offset);
   }
 }

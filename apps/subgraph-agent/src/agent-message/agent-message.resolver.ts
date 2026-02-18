@@ -7,7 +7,10 @@ export class AgentMessageResolver {
   constructor(private readonly agentMessageService: AgentMessageService) {}
 
   @ResolveReference()
-  async resolveReference(reference: { __typename: string; id: string }, @Context() context: any) {
+  async resolveReference(
+    reference: { __typename: string; id: string },
+    @Context() context: any
+  ) {
     const authContext = this.extractAuthContext(context);
     return this.agentMessageService.findById(reference.id, authContext);
   }

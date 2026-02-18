@@ -111,7 +111,12 @@ export class HealthService {
 
     return {
       name: 'memory',
-      status: percentage < 80 ? 'healthy' : percentage < 90 ? 'degraded' : 'unhealthy',
+      status:
+        percentage < 80
+          ? 'healthy'
+          : percentage < 90
+            ? 'degraded'
+            : 'unhealthy',
       message: `${heapUsedMB.toFixed(2)}MB / ${heapTotalMB.toFixed(2)}MB (${percentage.toFixed(1)}%)`,
       timestamp: new Date().toISOString(),
     };
@@ -130,9 +135,13 @@ export class HealthService {
     checks.push(dbCheck, redisCheck, memoryCheck);
 
     // Determine overall status
-    const hasUnhealthy = checks.some(c => c.status === 'unhealthy');
-    const hasDegraded = checks.some(c => c.status === 'degraded');
-    const status = hasUnhealthy ? 'unhealthy' : hasDegraded ? 'degraded' : 'healthy';
+    const hasUnhealthy = checks.some((c) => c.status === 'unhealthy');
+    const hasDegraded = checks.some((c) => c.status === 'degraded');
+    const status = hasUnhealthy
+      ? 'unhealthy'
+      : hasDegraded
+        ? 'degraded'
+        : 'healthy';
 
     return {
       status,
@@ -154,14 +163,24 @@ export class HealthService {
     // Readiness probe
     router.get('/health/ready', async (req: Request, res: Response) => {
       const report = await this.getHealthReport();
-      const statusCode = report.status === 'healthy' ? 200 : report.status === 'degraded' ? 200 : 503;
+      const statusCode =
+        report.status === 'healthy'
+          ? 200
+          : report.status === 'degraded'
+            ? 200
+            : 503;
       res.status(statusCode).json(report);
     });
 
     // Full health check
     router.get('/health', async (req: Request, res: Response) => {
       const report = await this.getHealthReport();
-      const statusCode = report.status === 'healthy' ? 200 : report.status === 'degraded' ? 200 : 503;
+      const statusCode =
+        report.status === 'healthy'
+          ? 200
+          : report.status === 'degraded'
+            ? 200
+            : 503;
       res.status(statusCode).json(report);
     });
 

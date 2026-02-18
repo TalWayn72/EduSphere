@@ -3,17 +3,59 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, BookOpen, Bot, Clock, Loader2, CheckCircle } from 'lucide-react';
+import {
+  Users,
+  BookOpen,
+  Bot,
+  Clock,
+  Loader2,
+  CheckCircle,
+} from 'lucide-react';
 
 const ACTIVE_SESSIONS = [
-  { id: 's1', partner: 'Sarah M.', content: 'Introduction to Talmud Study', duration: '14 min', topic: 'Kal vachomer', status: 'active' },
-  { id: 's2', partner: 'David K.', content: 'Maimonidean Philosophy', duration: '32 min', topic: 'Free will debate', status: 'active' },
+  {
+    id: 's1',
+    partner: 'Sarah M.',
+    content: 'Introduction to Talmud Study',
+    duration: '14 min',
+    topic: 'Kal vachomer',
+    status: 'active',
+  },
+  {
+    id: 's2',
+    partner: 'David K.',
+    content: 'Maimonidean Philosophy',
+    duration: '32 min',
+    topic: 'Free will debate',
+    status: 'active',
+  },
 ];
 
 const RECENT_SESSIONS = [
-  { id: 'r1', partner: 'Michael L.', content: 'Knowledge Graph Navigation', duration: '45 min', topic: 'Contradiction analysis', date: '2 hours ago' },
-  { id: 'r2', partner: 'Rachel T.', content: 'Ethics in Jewish Thought', duration: '28 min', topic: 'Moral imperatives', date: 'Yesterday' },
-  { id: 'r3', partner: 'AI Chavruta', content: 'Introduction to Talmud Study', duration: '20 min', topic: 'Pilpul method', date: '2 days ago' },
+  {
+    id: 'r1',
+    partner: 'Michael L.',
+    content: 'Knowledge Graph Navigation',
+    duration: '45 min',
+    topic: 'Contradiction analysis',
+    date: '2 hours ago',
+  },
+  {
+    id: 'r2',
+    partner: 'Rachel T.',
+    content: 'Ethics in Jewish Thought',
+    duration: '28 min',
+    topic: 'Moral imperatives',
+    date: 'Yesterday',
+  },
+  {
+    id: 'r3',
+    partner: 'AI Chavruta',
+    content: 'Introduction to Talmud Study',
+    duration: '20 min',
+    topic: 'Pilpul method',
+    date: '2 days ago',
+  },
 ];
 
 type MatchState = 'idle' | 'searching' | 'found';
@@ -58,14 +100,18 @@ export function CollaborationPage() {
                   <h3 className="font-semibold">Human Chavruta</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Get matched with another student studying the same content. Debate, question, and learn together in real-time.
+                  Get matched with another student studying the same content.
+                  Debate, question, and learn together in real-time.
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <div className="h-2 w-2 rounded-full bg-green-500" />
                   <span>12 students currently available</span>
                 </div>
                 {matchState === 'idle' || matchMode !== 'human' ? (
-                  <Button className="w-full" onClick={() => handleStartMatching('human')}>
+                  <Button
+                    className="w-full"
+                    onClick={() => handleStartMatching('human')}
+                  >
                     Find a Chavruta Partner
                   </Button>
                 ) : matchState === 'searching' ? (
@@ -88,14 +134,19 @@ export function CollaborationPage() {
                   <h3 className="font-semibold">AI Chavruta</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Practice with an AI partner available 24/7. The AI uses contradiction detection to challenge your thinking.
+                  Practice with an AI partner available 24/7. The AI uses
+                  contradiction detection to challenge your thinking.
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <div className="h-2 w-2 rounded-full bg-purple-500" />
                   <span>Always available · Instant match</span>
                 </div>
                 {matchState === 'idle' || matchMode !== 'ai' ? (
-                  <Button className="w-full" variant="outline" onClick={() => handleStartMatching('ai')}>
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => handleStartMatching('ai')}
+                  >
                     Start AI Chavruta
                   </Button>
                 ) : matchState === 'searching' ? (
@@ -122,13 +173,18 @@ export function CollaborationPage() {
             </h2>
             <div className="grid md:grid-cols-2 gap-3">
               {ACTIVE_SESSIONS.map((session) => (
-                <Card key={session.id} className="border-green-200 bg-green-50/50">
+                <Card
+                  key={session.id}
+                  className="border-green-200 bg-green-50/50"
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                          <span className="text-sm font-semibold">{session.partner}</span>
+                          <span className="text-sm font-semibold">
+                            {session.partner}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <BookOpen className="h-3 w-3" />
@@ -139,7 +195,10 @@ export function CollaborationPage() {
                           {session.duration} · {session.topic}
                         </div>
                       </div>
-                      <Button size="sm" className="h-8 text-xs bg-green-600 hover:bg-green-700">
+                      <Button
+                        size="sm"
+                        className="h-8 text-xs bg-green-600 hover:bg-green-700"
+                      >
                         Rejoin
                       </Button>
                     </div>
@@ -157,18 +216,29 @@ export function CollaborationPage() {
           </h2>
           <div className="space-y-2">
             {RECENT_SESSIONS.map((session) => (
-              <Card key={session.id} className="hover:bg-muted/30 transition-colors cursor-pointer">
+              <Card
+                key={session.id}
+                className="hover:bg-muted/30 transition-colors cursor-pointer"
+              >
                 <CardContent className="p-3 flex items-center gap-4">
                   <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm">
                     {session.partner === 'AI Chavruta' ? '🤖' : '👤'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{session.partner}</p>
-                    <p className="text-xs text-muted-foreground truncate">{session.content} · {session.topic}</p>
+                    <p className="text-sm font-medium truncate">
+                      {session.partner}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {session.content} · {session.topic}
+                    </p>
                   </div>
                   <div className="text-right flex-shrink-0 space-y-0.5">
-                    <p className="text-xs text-muted-foreground">{session.date}</p>
-                    <p className="text-xs text-muted-foreground">{session.duration}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {session.date}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {session.duration}
+                    </p>
                   </div>
                 </CardContent>
               </Card>

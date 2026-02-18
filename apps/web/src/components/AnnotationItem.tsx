@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { Annotation, AnnotationLayer, ANNOTATION_LAYER_CONFIGS } from '@/types/annotations';
+import {
+  Annotation,
+  AnnotationLayer,
+  ANNOTATION_LAYER_CONFIGS,
+} from '@/types/annotations';
 import { Button } from '@/components/ui/button';
 import { AnnotationForm } from './AnnotationForm';
 
@@ -129,13 +133,19 @@ export function AnnotationItem({
               <Button variant="outline" size="sm" onClick={handleEditCancel}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleEditSubmit} disabled={!editContent.trim()}>
+              <Button
+                size="sm"
+                onClick={handleEditSubmit}
+                disabled={!editContent.trim()}
+              >
                 Save
               </Button>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{annotation.content}</p>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+            {annotation.content}
+          </p>
         )}
 
         {/* Reply button */}
@@ -151,7 +161,8 @@ export function AnnotationItem({
             </Button>
             {annotation.replies && annotation.replies.length > 0 && (
               <span className="text-xs text-gray-500 self-center">
-                {annotation.replies.length} {annotation.replies.length === 1 ? 'reply' : 'replies'}
+                {annotation.replies.length}{' '}
+                {annotation.replies.length === 1 ? 'reply' : 'replies'}
               </span>
             )}
           </div>

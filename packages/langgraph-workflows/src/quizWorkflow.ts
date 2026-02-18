@@ -72,7 +72,7 @@ Requirements:
 
   private async validateNode(state: QuizState): Promise<Partial<QuizState>> {
     // Validate that all questions are unique
-    const uniqueQuestions = new Set(state.questions.map(q => q.question));
+    const uniqueQuestions = new Set(state.questions.map((q) => q.question));
     if (uniqueQuestions.size < state.questions.length) {
       throw new Error('Generated duplicate questions');
     }

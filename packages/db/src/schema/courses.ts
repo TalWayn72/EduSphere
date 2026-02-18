@@ -1,16 +1,28 @@
-import { pgTable, uuid, varchar, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  boolean,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { organizations } from './organizations';
 import { users } from './users';
 
 export const courses = pgTable('courses', {
   id: uuid('id').primaryKey().defaultRandom(),
-  tenantId: uuid('tenant_id').notNull().references(() => organizations.id, { onDelete: 'cascade' }),
+  tenantId: uuid('tenant_id')
+    .notNull()
+    .references(() => organizations.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 100 }).notNull(),
   description: text('description'),
   thumbnailUrl: varchar('thumbnail_url', { length: 500 }),
-  instructorId: uuid('instructor_id').notNull().references(() => users.id),
+  instructorId: uuid('instructor_id')
+    .notNull()
+    .references(() => users.id),
   isPublished: boolean('is_published').notNull().default(false),
   estimatedHours: integer('estimated_hours'),
   createdAt: timestamp('created_at').notNull().defaultNow(),

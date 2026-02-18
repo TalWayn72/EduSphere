@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { db, content_embeddings, annotation_embeddings, concept_embeddings } from '@edusphere/db';
-import type { NewContentEmbedding, NewAnnotationEmbedding, NewConceptEmbedding } from '@edusphere/db';
+import {
+  db,
+  content_embeddings,
+  annotation_embeddings,
+  concept_embeddings,
+} from '@edusphere/db';
 import { eq, sql } from 'drizzle-orm';
 
 @Injectable()
@@ -38,12 +42,18 @@ export class EmbeddingService {
     throw new NotFoundException(`Embedding with ID ${id} not found`);
   }
 
-  async findByContentItem(contentItemId: string) {
-    this.logger.warn('findByContentItem is deprecated - use content_embeddings directly');
+  async findByContentItem(_contentItemId: string) {
+    this.logger.warn(
+      'findByContentItem is deprecated - use content_embeddings directly'
+    );
     return [];
   }
 
-  async semanticSearch(queryVector: number[], limit: number = 10, minSimilarity: number = 0.7) {
+  async semanticSearch(
+    queryVector: number[],
+    limit: number = 10,
+    minSimilarity: number = 0.7
+  ) {
     const vectorString = `[${queryVector.join(',')}]`;
 
     const results = await db.execute(sql`
@@ -76,28 +86,44 @@ export class EmbeddingService {
     }));
   }
 
-  async semanticSearchByContentItem(contentItemId: string, queryVector: number[], limit: number = 5) {
-    this.logger.warn('semanticSearchByContentItem not implemented for new schema');
+  async semanticSearchByContentItem(
+    _contentItemId: string,
+    _queryVector: number[],
+    _limit: number = 5
+  ) {
+    this.logger.warn(
+      'semanticSearchByContentItem not implemented for new schema'
+    );
     return [];
   }
 
-  async create(input: any) {
-    this.logger.warn('Generic create not supported - use specific embedding type methods');
-    throw new Error('Use createContentEmbedding, createAnnotationEmbedding, or createConceptEmbedding');
+  async create(_input: any) {
+    this.logger.warn(
+      'Generic create not supported - use specific embedding type methods'
+    );
+    throw new Error(
+      'Use createContentEmbedding, createAnnotationEmbedding, or createConceptEmbedding'
+    );
   }
 
   async delete(id: string): Promise<boolean> {
-    const contentResult = await db.delete(content_embeddings).where(eq(content_embeddings.id, id));
+    const contentResult = await db
+      .delete(content_embeddings)
+      .where(eq(content_embeddings.id, id));
     if ((contentResult.rowCount ?? 0) > 0) return true;
 
-    const annotationResult = await db.delete(annotation_embeddings).where(eq(annotation_embeddings.id, id));
+    const annotationResult = await db
+      .delete(annotation_embeddings)
+      .where(eq(annotation_embeddings.id, id));
     if ((annotationResult.rowCount ?? 0) > 0) return true;
 
-    const conceptResult = await db.delete(concept_embeddings).where(eq(concept_embeddings.id, id));
+    const conceptResult = await db
+      .delete(concept_embeddings)
+      .where(eq(concept_embeddings.id, id));
     return (conceptResult.rowCount ?? 0) > 0;
   }
 
-  async deleteByContentItem(contentItemId: string): Promise<number> {
+  async deleteByContentItem(_contentItemId: string): Promise<number> {
     this.logger.warn('deleteByContentItem is deprecated');
     return 0;
   }

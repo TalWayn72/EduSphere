@@ -13,7 +13,7 @@
     "build:ios": "eas build --platform ios",
     "submit:android": "eas submit --platform android",
     "submit:ios": "eas submit --platform ios",
-    "typecheck": "tsc --noEmit",
+    "typecheck:expo": "tsc --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {

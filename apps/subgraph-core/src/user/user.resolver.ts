@@ -35,11 +35,17 @@ export class UserResolver {
     if (!context.authContext) {
       throw new Error('Unauthenticated');
     }
-    return this.userService.findById(context.authContext.userId, context.authContext);
+    return this.userService.findById(
+      context.authContext.userId,
+      context.authContext
+    );
   }
 
   @Mutation('createUser')
-  async createUser(@Args('input') input: any, @Context() context: GraphQLContext) {
+  async createUser(
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     if (!context.authContext) {
       throw new Error('Unauthenticated');
     }

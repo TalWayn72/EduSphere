@@ -60,7 +60,12 @@ export const CREATE_CONCEPT_MUTATION = gql`
 `;
 
 export const LINK_CONCEPTS_MUTATION = gql`
-  mutation LinkConcepts($fromId: ID!, $toId: ID!, $relationshipType: String!, $strength: Float) {
+  mutation LinkConcepts(
+    $fromId: ID!
+    $toId: ID!
+    $relationshipType: String!
+    $strength: Float
+  ) {
     linkConcepts(
       fromId: $fromId
       toId: $toId

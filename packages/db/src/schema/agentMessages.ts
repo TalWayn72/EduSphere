@@ -1,4 +1,11 @@
-import { pgTable, uuid, text, timestamp, pgEnum, jsonb } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  pgEnum,
+  jsonb,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { agentSessions } from './agentSessions';
 
@@ -11,7 +18,9 @@ export const messageRoleEnum = pgEnum('message_role', [
 
 export const agentMessages = pgTable('agent_messages', {
   id: uuid('id').primaryKey().defaultRandom(),
-  sessionId: uuid('session_id').notNull().references(() => agentSessions.id, { onDelete: 'cascade' }),
+  sessionId: uuid('session_id')
+    .notNull()
+    .references(() => agentSessions.id, { onDelete: 'cascade' }),
   role: messageRoleEnum('role').notNull(),
   content: text('content').notNull(),
   metadata: jsonb('metadata'),

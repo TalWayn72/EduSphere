@@ -4,7 +4,12 @@ import type { DrizzleDB } from '../index';
 export interface TenantContext {
   tenantId: string;
   userId: string;
-  userRole: 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER';
+  userRole:
+    | 'SUPER_ADMIN'
+    | 'ORG_ADMIN'
+    | 'INSTRUCTOR'
+    | 'STUDENT'
+    | 'RESEARCHER';
 }
 
 /**
@@ -19,7 +24,9 @@ export async function withTenantContext<T>(
     // Set session variables for RLS policies
     await tx.execute(sql`SET LOCAL app.current_tenant = ${context.tenantId}`);
     await tx.execute(sql`SET LOCAL app.current_user_id = ${context.userId}`);
-    await tx.execute(sql`SET LOCAL app.current_user_role = ${context.userRole}`);
+    await tx.execute(
+      sql`SET LOCAL app.current_user_role = ${context.userRole}`
+    );
 
     // Execute operation with RLS context
     return operation(tx as any);

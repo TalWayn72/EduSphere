@@ -29,7 +29,8 @@ export class NotificationService {
     }
 
     // Request permissions
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
     if (existingStatus !== 'granted') {
@@ -44,7 +45,9 @@ export class NotificationService {
 
     // Get push token
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
-    this.token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+    this.token = (
+      await Notifications.getExpoPushTokenAsync({ projectId })
+    ).data;
 
     // Configure notification channel for Android
     if (Platform.OS === 'android') {
@@ -66,8 +69,10 @@ export class NotificationService {
     onNotification: (notification: Notifications.Notification) => void,
     onResponse: (response: Notifications.NotificationResponse) => void
   ) {
-    this.notificationListener = Notifications.addNotificationReceivedListener(onNotification);
-    this.responseListener = Notifications.addNotificationResponseReceivedListener(onResponse);
+    this.notificationListener =
+      Notifications.addNotificationReceivedListener(onNotification);
+    this.responseListener =
+      Notifications.addNotificationResponseReceivedListener(onResponse);
   }
 
   removeListeners() {
@@ -79,7 +84,12 @@ export class NotificationService {
     }
   }
 
-  async scheduleLocal(title: string, body: string, data?: any, trigger?: number) {
+  async scheduleLocal(
+    title: string,
+    body: string,
+    data?: any,
+    trigger?: number
+  ) {
     await Notifications.scheduleNotificationAsync({
       content: {
         title,

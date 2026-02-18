@@ -58,10 +58,7 @@ export class ModuleService {
   async reorder(courseId: string, moduleIds: string[]) {
     // Update order_index for all modules
     const updates = moduleIds.map((id, index) =>
-      db
-        .update(modules)
-        .set({ order_index: index })
-        .where(eq(modules.id, id)),
+      db.update(modules).set({ order_index: index }).where(eq(modules.id, id))
     );
 
     await Promise.all(updates);

@@ -1,15 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useSubscription, useMutation, gql } from '@apollo/client';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($sessionId: ID!, $content: String!) {
-    createAgentMessage(input: {
-      sessionId: $sessionId
-      role: "USER"
-      content: $content
-      tenantId: "tenant-1"
-    }) {
+    createAgentMessage(
+      input: {
+        sessionId: $sessionId
+        role: "USER"
+        content: $content
+        tenantId: "tenant-1"
+      }
+    ) {
       id
     }
   }
@@ -39,7 +50,7 @@ export default function AITutorScreen() {
 
   useEffect(() => {
     if (data?.agentMessageCreated) {
-      setMessages(prev => [...prev, data.agentMessageCreated]);
+      setMessages((prev) => [...prev, data.agentMessageCreated]);
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
@@ -55,7 +66,7 @@ export default function AITutorScreen() {
       content: input,
       createdAt: new Date().toISOString(),
     };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
 
     await sendMessage({ variables: { sessionId, content: input } });
@@ -91,7 +102,9 @@ export default function AITutorScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🤖</Text>
-            <Text style={styles.emptyText}>Start a conversation with your AI tutor</Text>
+            <Text style={styles.emptyText}>
+              Start a conversation with your AI tutor
+            </Text>
           </View>
         }
       />
@@ -106,7 +119,10 @@ export default function AITutorScreen() {
           maxLength={500}
         />
         <TouchableOpacity
-          style={[styles.sendButton, !input.trim() && styles.sendButtonDisabled]}
+          style={[
+            styles.sendButton,
+            !input.trim() && styles.sendButtonDisabled,
+          ]}
           onPress={handleSend}
           disabled={!input.trim()}
         >

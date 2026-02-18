@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -8,10 +13,13 @@ import {
   withTenantContext,
   sql,
   type Database,
-  type TenantContext
+  type TenantContext,
 } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
-import type { CreateDiscussionInput, AddMessageInput } from './discussion.schemas';
+import type {
+  CreateDiscussionInput,
+  AddMessageInput,
+} from './discussion.schemas';
 
 @Injectable()
 export class DiscussionService {
@@ -48,7 +56,12 @@ export class DiscussionService {
     });
   }
 
-  async findDiscussionsByCourse(courseId: string, limit: number, offset: number, authContext: AuthContext) {
+  async findDiscussionsByCourse(
+    courseId: string,
+    limit: number,
+    offset: number,
+    authContext: AuthContext
+  ) {
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       return tx
@@ -61,7 +74,10 @@ export class DiscussionService {
     });
   }
 
-  async createDiscussion(input: CreateDiscussionInput, authContext: AuthContext) {
+  async createDiscussion(
+    input: CreateDiscussionInput,
+    authContext: AuthContext
+  ) {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -83,20 +99,25 @@ export class DiscussionService {
         .returning();
 
       // Auto-join creator as participant
-      await tx
-        .insert(schema.discussion_participants)
-        .values({
-          discussion_id: discussion.id,
-          user_id: authContext.userId,
-        });
+      await tx.insert(schema.discussion_participants).values({
+        discussion_id: discussion.id,
+        user_id: authContext.userId,
+      });
 
-      this.logger.log(`Discussion created: ${discussion.id} by user ${authContext.userId}`);
+      this.logger.log(
+        `Discussion created: ${discussion.id} by user ${authContext.userId}`
+      );
       return discussion;
     });
   }
 
   // Messages
-  async findMessagesByDiscussion(discussionId: string, limit: number, offset: number, authContext: AuthContext) {
+  async findMessagesByDiscussion(
+    discussionId: string,
+    limit: number,
+    offset: number,
+    authContext: AuthContext
+  ) {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -127,7 +148,12 @@ export class DiscussionService {
     });
   }
 
-  async findRepliesByParent(parentId: string, limit: number, offset: number, authContext: AuthContext) {
+  async findRepliesByParent(
+    parentId: string,
+    limit: number,
+    offset: number,
+    authContext: AuthContext
+  ) {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -154,7 +180,11 @@ export class DiscussionService {
     });
   }
 
-  async addMessage(discussionId: string, input: AddMessageInput, authContext: AuthContext) {
+  async addMessage(
+    discussionId: string,
+    input: AddMessageInput,
+    authContext: AuthContext
+  ) {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -163,9 +193,14 @@ export class DiscussionService {
 
       // Verify parent message exists if specified
       if (input.parentMessageId) {
-        const parent = await this.findMessageById(input.parentMessageId, authContext);
+        const parent = await this.findMessageById(
+          input.parentMessageId,
+          authContext
+        );
         if (!parent) {
-          throw new NotFoundException(`Parent message ${input.parentMessageId} not found`);
+          throw new NotFoundException(
+            `Parent message ${input.parentMessageId} not found`
+          );
         }
       }
 
@@ -185,13 +220,18 @@ export class DiscussionService {
         .values(messageValues)
         .returning();
 
-      this.logger.log(`Message added: ${message.id} in discussion ${discussionId}`);
+      this.logger.log(
+        `Message added: ${message.id} in discussion ${discussionId}`
+      );
       return message;
     });
   }
 
   // Participants
-  async findParticipantsByDiscussion(discussionId: string, authContext: AuthContext) {
+  async findParticipantsByDiscussion(
+    discussionId: string,
+    authContext: AuthContext
+  ) {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -254,14 +294,14 @@ export class DiscussionService {
         return true; // Already joined
       }
 
-      await tx
-        .insert(schema.discussion_participants)
-        .values({
-          discussion_id: discussionId,
-          user_id: authContext.userId,
-        });
+      await tx.insert(schema.discussion_participants).values({
+        discussion_id: discussionId,
+        user_id: authContext.userId,
+      });
 
-      this.logger.log(`User ${authContext.userId} joined discussion ${discussionId}`);
+      this.logger.log(
+        `User ${authContext.userId} joined discussion ${discussionId}`
+      );
       return true;
     });
   }
@@ -271,7 +311,10 @@ export class DiscussionService {
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       // Verify discussion exists
-      const discussion = await this.findDiscussionById(discussionId, authContext);
+      const discussion = await this.findDiscussionById(
+        discussionId,
+        authContext
+      );
 
       // Prevent creator from leaving
       if (discussion.creator_id === authContext.userId) {
@@ -287,7 +330,9 @@ export class DiscussionService {
           )
         );
 
-      this.logger.log(`User ${authContext.userId} left discussion ${discussionId}`);
+      this.logger.log(
+        `User ${authContext.userId} left discussion ${discussionId}`
+      );
       return true;
     });
   }

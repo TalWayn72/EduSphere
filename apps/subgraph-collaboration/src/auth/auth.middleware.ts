@@ -16,7 +16,9 @@ export class AuthMiddleware {
     const clientId = process.env.KEYCLOAK_CLIENT_ID || 'edusphere-backend';
 
     this.jwtValidator = new JWTValidator(keycloakUrl, realm, clientId);
-    this.logger.log(`JWT Validator initialized: ${keycloakUrl}/realms/${realm}`);
+    this.logger.log(
+      `JWT Validator initialized: ${keycloakUrl}/realms/${realm}`
+    );
   }
 
   async validateRequest(context: GraphQLContext): Promise<void> {

@@ -1,4 +1,11 @@
-import { pgTable, uuid, text, timestamp, integer, pgEnum } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  integer,
+  pgEnum,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { contentItems } from './contentItems';
 import { users } from './users';
@@ -12,8 +19,12 @@ export const annotationTypeEnum = pgEnum('annotation_type', [
 
 export const annotations = pgTable('annotations', {
   id: uuid('id').primaryKey().defaultRandom(),
-  contentItemId: uuid('content_item_id').notNull().references(() => contentItems.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  contentItemId: uuid('content_item_id')
+    .notNull()
+    .references(() => contentItems.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   type: annotationTypeEnum('type').notNull(),
   text: text('text'),
   highlightedText: text('highlighted_text'),

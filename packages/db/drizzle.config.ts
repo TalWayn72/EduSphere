@@ -5,7 +5,9 @@ export default defineConfig({
   out: './migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL || 'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
+    url:
+      process.env.DATABASE_URL ||
+      'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
   },
   verbose: true,
   strict: true,

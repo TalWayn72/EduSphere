@@ -1,12 +1,23 @@
-import { pgTable, uuid, varchar, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { contentItems } from './contentItems';
 import { users } from './users';
 
 export const discussions: any = pgTable('discussions', {
   id: uuid('id').primaryKey().defaultRandom(),
-  contentItemId: uuid('content_item_id').references(() => contentItems.id, { onDelete: 'cascade' }),
-  authorId: uuid('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  contentItemId: uuid('content_item_id').references(() => contentItems.id, {
+    onDelete: 'cascade',
+  }),
+  authorId: uuid('author_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   parentId: uuid('parent_id'),
   title: varchar('title', { length: 255 }),
   content: text('content').notNull(),

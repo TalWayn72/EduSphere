@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import {
   DiscussionResolver,
   DiscussionMessageResolver,
-  DiscussionParticipantResolver
+  DiscussionParticipantResolver,
 } from './discussion.resolver';
 import { DiscussionService } from './discussion.service';
 
@@ -11,7 +11,7 @@ import { DiscussionService } from './discussion.service';
     DiscussionResolver,
     DiscussionMessageResolver,
     DiscussionParticipantResolver,
-    DiscussionService
+    DiscussionService,
   ],
   exports: [DiscussionService],
 })

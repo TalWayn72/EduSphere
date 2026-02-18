@@ -10,8 +10,13 @@ export const tenantId = () => uuid('tenant_id').notNull();
 
 // Timestamps helper (created_at, updated_at)
 export const timestamps = {
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 };
 
 // Soft delete helper (deleted_at)

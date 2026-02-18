@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { useSubscription, gql } from '@apollo/client';
 
-const DISCUSSIONS_QUERY = gql`
+const _DISCUSSIONS_QUERY = gql`
   query Discussions($courseId: ID!) {
     discussions(courseId: $courseId, limit: 20) {
       id

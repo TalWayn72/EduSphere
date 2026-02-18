@@ -1,4 +1,10 @@
-import { Resolver, Query, Mutation, Args, ResolveReference } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveReference,
+} from '@nestjs/graphql';
 import { EmbeddingService } from './embedding.service';
 
 @Resolver('Embedding')
@@ -11,7 +17,9 @@ export class EmbeddingResolver {
   }
 
   @Query('embeddingsByContentItem')
-  async getEmbeddingsByContentItem(@Args('contentItemId') contentItemId: string) {
+  async getEmbeddingsByContentItem(
+    @Args('contentItemId') contentItemId: string
+  ) {
     return this.embeddingService.findByContentItem(contentItemId);
   }
 
@@ -19,7 +27,7 @@ export class EmbeddingResolver {
   async semanticSearch(
     @Args('query') query: number[],
     @Args('limit') limit: number = 10,
-    @Args('minSimilarity') minSimilarity: number = 0.7,
+    @Args('minSimilarity') minSimilarity: number = 0.7
   ) {
     return this.embeddingService.semanticSearch(query, limit, minSimilarity);
   }
@@ -28,9 +36,13 @@ export class EmbeddingResolver {
   async semanticSearchByContentItem(
     @Args('contentItemId') contentItemId: string,
     @Args('query') query: number[],
-    @Args('limit') limit: number = 5,
+    @Args('limit') limit: number = 5
   ) {
-    return this.embeddingService.semanticSearchByContentItem(contentItemId, query, limit);
+    return this.embeddingService.semanticSearchByContentItem(
+      contentItemId,
+      query,
+      limit
+    );
   }
 
   @Mutation('createEmbedding')
@@ -44,7 +56,9 @@ export class EmbeddingResolver {
   }
 
   @Mutation('deleteEmbeddingsByContentItem')
-  async deleteEmbeddingsByContentItem(@Args('contentItemId') contentItemId: string) {
+  async deleteEmbeddingsByContentItem(
+    @Args('contentItemId') contentItemId: string
+  ) {
     return this.embeddingService.deleteByContentItem(contentItemId);
   }
 

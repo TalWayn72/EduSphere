@@ -34,7 +34,8 @@ export const mockChatHistory: Message[] = [
   {
     id: 'msg-5',
     role: 'user',
-    content: "Hmm, I see the tension. But if everything is determined, how can we be held morally responsible?",
+    content:
+      'Hmm, I see the tension. But if everything is determined, how can we be held morally responsible?',
     timestamp: new Date(Date.now() - 1000 * 60 * 13),
   },
   {
@@ -47,7 +48,7 @@ export const mockChatHistory: Message[] = [
   {
     id: 'msg-7',
     role: 'user',
-    content: 'So God knows what we will do, but doesn\'t force us to do it?',
+    content: "So God knows what we will do, but doesn't force us to do it?",
     timestamp: new Date(Date.now() - 1000 * 60 * 12),
   },
   {
@@ -73,7 +74,8 @@ export const mockChatHistory: Message[] = [
   {
     id: 'msg-11',
     role: 'user',
-    content: 'Maybe we can only understand it through analogy or negative theology?',
+    content:
+      'Maybe we can only understand it through analogy or negative theology?',
     timestamp: new Date(Date.now() - 1000 * 60 * 10),
   },
   {
@@ -86,7 +88,8 @@ export const mockChatHistory: Message[] = [
   {
     id: 'msg-13',
     role: 'user',
-    content: "It's frustrating, but maybe that's the point - some things are beyond human reason?",
+    content:
+      "It's frustrating, but maybe that's the point - some things are beyond human reason?",
     timestamp: new Date(Date.now() - 1000 * 60 * 9),
   },
   {
@@ -99,7 +102,8 @@ export const mockChatHistory: Message[] = [
   {
     id: 'msg-15',
     role: 'user',
-    content: "I think we have to act as if we have free will, even if we can't prove it philosophically.",
+    content:
+      "I think we have to act as if we have free will, even if we can't prove it philosophically.",
     timestamp: new Date(Date.now() - 1000 * 60 * 8),
   },
   {

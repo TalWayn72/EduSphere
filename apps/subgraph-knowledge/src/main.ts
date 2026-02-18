@@ -18,7 +18,9 @@ async function bootstrap() {
   const port = process.env.PORT || 4006;
   await app.listen(port);
 
-  logger.log(`🚀 Knowledge subgraph running on http://localhost:${port}/graphql`);
+  logger.log(
+    `🚀 Knowledge subgraph running on http://localhost:${port}/graphql`
+  );
   logger.log(`📊 GraphQL Playground available`);
   logger.log(`🔍 pgvector semantic search enabled`);
   logger.log(`🕸️ Apache AGE graph queries enabled`);

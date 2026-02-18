@@ -29,6 +29,10 @@ export default [
         HTMLButtonElement: 'readonly',
         HTMLParagraphElement: 'readonly',
         HTMLHeadingElement: 'readonly',
+        HTMLVideoElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLTextAreaElement: 'readonly',
+        React: 'readonly',
         setInterval: 'readonly',
         setTimeout: 'readonly',
         clearInterval: 'readonly',
@@ -37,7 +41,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': typescript,
-      'react': reactPlugin,
+      react: reactPlugin,
       'react-hooks': reactHooksPlugin,
     },
     settings: {
@@ -53,7 +57,10 @@ export default [
       'react-hooks/exhaustive-deps': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
     },
   },
 ];

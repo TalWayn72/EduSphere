@@ -1,10 +1,19 @@
-import { pgTable, uuid, varchar, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  timestamp,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { courses } from './courses';
 
 export const modules = pgTable('modules', {
   id: uuid('id').primaryKey().defaultRandom(),
-  courseId: uuid('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  courseId: uuid('course_id')
+    .notNull()
+    .references(() => courses.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   orderIndex: integer('order_index').notNull().default(0),

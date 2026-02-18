@@ -1,12 +1,22 @@
-import { pgTable, uuid, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  timestamp,
+  integer,
+  boolean,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
 import { contentItems } from './contentItems';
 
 export const userProgress = pgTable('user_progress', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  contentItemId: uuid('content_item_id').notNull().references(() => contentItems.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  contentItemId: uuid('content_item_id')
+    .notNull()
+    .references(() => contentItems.id, { onDelete: 'cascade' }),
   isCompleted: boolean('is_completed').notNull().default(false),
   progress: integer('progress').notNull().default(0),
   timeSpent: integer('time_spent').notNull().default(0),

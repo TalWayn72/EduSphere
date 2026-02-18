@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { useQuery, gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -47,7 +53,9 @@ export default function CoursesScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.courseCard}
-            onPress={() => navigation.navigate('CourseDetail', { courseId: item.id })}
+            onPress={() =>
+              navigation.navigate('CourseDetail', { courseId: item.id })
+            }
           >
             <View style={styles.courseHeader}>
               <Text style={styles.courseTitle}>{item.title}</Text>

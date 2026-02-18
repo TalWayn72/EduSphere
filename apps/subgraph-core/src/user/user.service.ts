@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, withTenantContext } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  withTenantContext,
+} from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -44,19 +49,11 @@ export class UserService {
     if (authContext && authContext.tenantId) {
       const tenantCtx = this.toTenantContext(authContext);
       return withTenantContext(this.db, tenantCtx, async (tx) => {
-        return tx
-          .select()
-          .from(schema.users)
-          .limit(limit)
-          .offset(offset);
+        return tx.select().from(schema.users).limit(limit).offset(offset);
       });
     }
 
-    return this.db
-      .select()
-      .from(schema.users)
-      .limit(limit)
-      .offset(offset);
+    return this.db.select().from(schema.users).limit(limit).offset(offset);
   }
 
   async create(input: any, authContext: AuthContext) {
@@ -72,10 +69,7 @@ export class UserService {
         values.role = input.role;
       }
 
-      const [user] = await tx
-        .insert(schema.users)
-        .values(values)
-        .returning();
+      const [user] = await tx.insert(schema.users).values(values).returning();
       return user;
     });
   }
@@ -86,7 +80,8 @@ export class UserService {
       const updateData: any = {};
 
       if (input.firstName || input.lastName) {
-        updateData.display_name = `${input.firstName || ''} ${input.lastName || ''}`.trim();
+        updateData.display_name =
+          `${input.firstName || ''} ${input.lastName || ''}`.trim();
       }
 
       if (input.role) {

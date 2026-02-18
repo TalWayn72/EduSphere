@@ -91,13 +91,16 @@ class DatabaseService {
       ['pending']
     );
 
-    return results.map(row => ({
+    return results.map((row) => ({
       ...row,
       variables: JSON.parse(row.variables as any),
     }));
   }
 
-  async updateMutationStatus(id: string, status: 'synced' | 'failed'): Promise<void> {
+  async updateMutationStatus(
+    id: string,
+    status: 'synced' | 'failed'
+  ): Promise<void> {
     if (!this.db) return;
 
     await this.db.runAsync(
@@ -110,10 +113,9 @@ class DatabaseService {
     if (!this.db) return;
 
     const cutoff = Date.now() - maxAge;
-    await this.db.runAsync(
-      'DELETE FROM cached_queries WHERE timestamp < ?',
-      [cutoff]
-    );
+    await this.db.runAsync('DELETE FROM cached_queries WHERE timestamp < ?', [
+      cutoff,
+    ]);
   }
 
   private generateId(query: string, variables: any): string {

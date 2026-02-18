@@ -13,23 +13,27 @@ export class AgentMessageService {
       throw new NotFoundException('Tenant ID required');
     }
 
-    return withTenantContext(db, {
-      tenantId: authContext.tenantId,
-      userId: authContext.userId,
-      userRole: authContext.roles[0] as any,
-    }, async (txDb: Database) => {
-      const [message] = await txDb
-        .select()
-        .from(agentMessages)
-        .where(eq(agentMessages.id, id))
-        .limit(1);
+    return withTenantContext(
+      db,
+      {
+        tenantId: authContext.tenantId,
+        userId: authContext.userId,
+        userRole: authContext.roles[0] as any,
+      },
+      async (txDb: Database) => {
+        const [message] = await txDb
+          .select()
+          .from(agentMessages)
+          .where(eq(agentMessages.id, id))
+          .limit(1);
 
-      if (!message) {
-        throw new NotFoundException(`AgentMessage with ID ${id} not found`);
+        if (!message) {
+          throw new NotFoundException(`AgentMessage with ID ${id} not found`);
+        }
+
+        return message;
       }
-
-      return message;
-    });
+    );
   }
 
   async findBySession(sessionId: string, authContext: AuthContext) {
@@ -37,17 +41,21 @@ export class AgentMessageService {
       throw new NotFoundException('Tenant ID required');
     }
 
-    return withTenantContext(db, {
-      tenantId: authContext.tenantId,
-      userId: authContext.userId,
-      userRole: authContext.roles[0] as any,
-    }, async (txDb: Database) => {
-      return txDb
-        .select()
-        .from(agentMessages)
-        .where(eq(agentMessages.sessionId, sessionId))
-        .orderBy(asc(agentMessages.createdAt));
-    });
+    return withTenantContext(
+      db,
+      {
+        tenantId: authContext.tenantId,
+        userId: authContext.userId,
+        userRole: authContext.roles[0] as any,
+      },
+      async (txDb: Database) => {
+        return txDb
+          .select()
+          .from(agentMessages)
+          .where(eq(agentMessages.sessionId, sessionId))
+          .orderBy(asc(agentMessages.createdAt));
+      }
+    );
   }
 
   async create(input: Partial<NewAgentMessage>, authContext: AuthContext) {
@@ -55,23 +63,29 @@ export class AgentMessageService {
       throw new NotFoundException('Tenant ID required');
     }
 
-    return withTenantContext(db, {
-      tenantId: authContext.tenantId,
-      userId: authContext.userId,
-      userRole: authContext.roles[0] as any,
-    }, async (txDb: Database) => {
-      const [message] = await txDb
-        .insert(agentMessages)
-        .values(input as NewAgentMessage)
-        .returning();
+    return withTenantContext(
+      db,
+      {
+        tenantId: authContext.tenantId,
+        userId: authContext.userId,
+        userRole: authContext.roles[0] as any,
+      },
+      async (txDb: Database) => {
+        const [message] = await txDb
+          .insert(agentMessages)
+          .values(input as NewAgentMessage)
+          .returning();
 
-      if (!message) {
-        throw new NotFoundException('Failed to create message');
+        if (!message) {
+          throw new NotFoundException('Failed to create message');
+        }
+
+        this.logger.debug(
+          `Created message ${message.id} in session ${input.sessionId}`
+        );
+        return message;
       }
-
-      this.logger.debug(`Created message ${message.id} in session ${input.sessionId}`);
-      return message;
-    });
+    );
   }
 
   async delete(id: string, authContext: AuthContext): Promise<boolean> {
@@ -79,13 +93,19 @@ export class AgentMessageService {
       throw new NotFoundException('Tenant ID required');
     }
 
-    return withTenantContext(db, {
-      tenantId: authContext.tenantId,
-      userId: authContext.userId,
-      userRole: authContext.roles[0] as any,
-    }, async (txDb: Database) => {
-      const result = await txDb.delete(agentMessages).where(eq(agentMessages.id, id));
-      return (result.rowCount ?? 0) > 0;
-    });
+    return withTenantContext(
+      db,
+      {
+        tenantId: authContext.tenantId,
+        userId: authContext.userId,
+        userRole: authContext.roles[0] as any,
+      },
+      async (txDb: Database) => {
+        const result = await txDb
+          .delete(agentMessages)
+          .where(eq(agentMessages.id, id));
+        return (result.rowCount ?? 0) > 0;
+      }
+    );
   }
 }

@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent, ResolveReference } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+  ResolveReference,
+} from '@nestjs/graphql';
 import { ModuleService } from './module.service';
 
 @Resolver('Module')
@@ -33,13 +41,13 @@ export class ModuleResolver {
   @Mutation('reorderModules')
   async reorderModules(
     @Args('courseId') courseId: string,
-    @Args('moduleIds') moduleIds: string[],
+    @Args('moduleIds') moduleIds: string[]
   ) {
     return this.moduleService.reorder(courseId, moduleIds);
   }
 
   @ResolveField('contentItems')
-  async getContentItems(@Parent() module: any) {
+  async getContentItems(@Parent() _module: any) {
     // Will be resolved by ContentItem resolver
     return [];
   }

@@ -10,7 +10,10 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
   console.log('Initializing Apache AGE graph ontology...');
 
   // Create sample Concept vertex
-  await executeCypher(db, GRAPH_NAME, `
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
     CREATE (c:Concept {
       id: gen_random_uuid()::text,
       tenant_id: 'default',
@@ -21,10 +24,14 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
       updated_at: timestamp()
     })
     RETURN c
-  `);
+  `
+  );
 
   // Create sample Person vertex
-  await executeCypher(db, GRAPH_NAME, `
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
     CREATE (p:Person {
       id: gen_random_uuid()::text,
       tenant_id: 'default',
@@ -34,10 +41,14 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
       updated_at: timestamp()
     })
     RETURN p
-  `);
+  `
+  );
 
   // Create sample TopicCluster vertex
-  await executeCypher(db, GRAPH_NAME, `
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
     CREATE (tc:TopicCluster {
       id: gen_random_uuid()::text,
       tenant_id: 'default',
@@ -47,11 +58,14 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
       updated_at: timestamp()
     })
     RETURN tc
-  `);
+  `
+  );
 
   console.log('Graph ontology initialized successfully');
   console.log('Vertex labels: Concept, Person, Term, Source, TopicCluster');
-  console.log('Edge labels: RELATED_TO, CONTRADICTS, PREREQUISITE_OF, MENTIONS, CITES, AUTHORED_BY, INFERRED_RELATED, REFERS_TO, DERIVED_FROM, BELONGS_TO');
+  console.log(
+    'Edge labels: RELATED_TO, CONTRADICTS, PREREQUISITE_OF, MENTIONS, CITES, AUTHORED_BY, INFERRED_RELATED, REFERS_TO, DERIVED_FROM, BELONGS_TO'
+  );
 }
 
 /**
@@ -65,7 +79,10 @@ export interface ConceptProperties {
   source_ids?: string[];
 }
 
-export async function createConcept(db: DrizzleDB, props: ConceptProperties): Promise<string> {
+export async function createConcept(
+  db: DrizzleDB,
+  props: ConceptProperties
+): Promise<string> {
   const propsJson = JSON.stringify({
     ...props,
     id: props.id || 'gen_random_uuid()::text',
@@ -74,10 +91,14 @@ export async function createConcept(db: DrizzleDB, props: ConceptProperties): Pr
     updated_at: 'timestamp()',
   });
 
-  const result = await executeCypher<{ id: string }>(db, GRAPH_NAME, `
+  const result = await executeCypher<{ id: string }>(
+    db,
+    GRAPH_NAME,
+    `
     CREATE (c:Concept ${propsJson})
     RETURN c.id::text
-  `);
+  `
+  );
 
   return result[0]?.id || '';
 }
@@ -92,13 +113,17 @@ export async function findRelatedConcepts(
   maxDepth: number = 2,
   limit: number = 10
 ): Promise<any[]> {
-  return executeCypher(db, GRAPH_NAME, `
+  return executeCypher(
+    db,
+    GRAPH_NAME,
+    `
     MATCH (c:Concept {id: '${conceptId}'})-[r:RELATED_TO*1..${maxDepth}]-(related:Concept)
     WHERE related.tenant_id = '${tenantId}'
     RETURN related.name, related.definition, r[0].strength
     ORDER BY r[0].strength DESC
     LIMIT ${limit}
-  `);
+  `
+  );
 }
 
 /**
@@ -108,10 +133,14 @@ export async function findContradictions(
   db: DrizzleDB,
   conceptId: string
 ): Promise<any[]> {
-  return executeCypher(db, GRAPH_NAME, `
+  return executeCypher(
+    db,
+    GRAPH_NAME,
+    `
     MATCH (c:Concept {id: '${conceptId}'})-[r:CONTRADICTS]-(contra:Concept)
     RETURN contra.name, r.description, r.source_id
-  `);
+  `
+  );
 }
 
 /**
@@ -121,11 +150,15 @@ export async function findLearningPath(
   db: DrizzleDB,
   conceptId: string
 ): Promise<any[]> {
-  return executeCypher(db, GRAPH_NAME, `
+  return executeCypher(
+    db,
+    GRAPH_NAME,
+    `
     MATCH path = (start:Concept {id: '${conceptId}'})<-[:PREREQUISITE_OF*1..5]-(prereq:Concept)
     RETURN path
     ORDER BY length(path) ASC
-  `);
+  `
+  );
 }
 
 /**
@@ -149,10 +182,14 @@ export async function createRelationship(
     created_at: 'timestamp()',
   });
 
-  await executeCypher(db, GRAPH_NAME, `
+  await executeCypher(
+    db,
+    GRAPH_NAME,
+    `
     MATCH (a:Concept {id: '${fromConceptId}'})
     MATCH (b:Concept {id: '${toConceptId}'})
     CREATE (a)-[r:${relationshipType} ${propsJson}]->(b)
     RETURN r
-  `);
+  `
+  );
 }

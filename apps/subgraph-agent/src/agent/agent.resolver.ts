@@ -37,8 +37,8 @@ export class AgentResolver {
   @Mutation('startAgentExecution')
   async startAgentExecution(@Args('input') input: any) {
     const execution = await this.agentService.startExecution(input);
-    pubSub.publish('EXECUTION_STATUS_CHANGED', { 
-      executionStatusChanged: execution 
+    pubSub.publish('EXECUTION_STATUS_CHANGED', {
+      executionStatusChanged: execution,
     });
     return execution;
   }
@@ -46,8 +46,8 @@ export class AgentResolver {
   @Mutation('cancelAgentExecution')
   async cancelAgentExecution(@Args('id') id: string) {
     const execution = await this.agentService.cancelExecution(id);
-    pubSub.publish('EXECUTION_STATUS_CHANGED', { 
-      executionStatusChanged: execution 
+    pubSub.publish('EXECUTION_STATUS_CHANGED', {
+      executionStatusChanged: execution,
     });
     return execution;
   }

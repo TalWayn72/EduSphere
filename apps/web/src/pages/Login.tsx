@@ -2,7 +2,13 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, isAuthenticated } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/card';
 import { BookOpen } from 'lucide-react';
 
 export function Login() {
@@ -35,8 +41,8 @@ export function Login() {
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground text-center">
-              Sign in with your organizational account to access courses, collaborate with peers,
-              and interact with AI learning agents.
+              Sign in with your organizational account to access courses,
+              collaborate with peers, and interact with AI learning agents.
             </p>
             <Button className="w-full" size="lg" onClick={handleLogin}>
               Sign In with Keycloak

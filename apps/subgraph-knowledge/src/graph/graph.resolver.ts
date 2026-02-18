@@ -10,7 +10,11 @@ export class GraphResolver {
   constructor(private readonly graphService: GraphService) {}
 
   private getAuthContext(context: GraphQLContext) {
-    if (!context.authContext || !context.authContext.userId || !context.authContext.tenantId) {
+    if (
+      !context.authContext ||
+      !context.authContext.userId ||
+      !context.authContext.tenantId
+    ) {
       throw new UnauthorizedException('Authentication required');
     }
     return {
@@ -27,13 +31,19 @@ export class GraphResolver {
   }
 
   @Query()
-  async conceptByName(@Args('name') name: string, @Context() context: GraphQLContext) {
+  async conceptByName(
+    @Args('name') name: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.findConceptByName(name, tenantId, userId, role);
   }
 
   @Query()
-  async concepts(@Args('limit') limit: number = 20, @Context() context: GraphQLContext) {
+  async concepts(
+    @Args('limit') limit: number = 20,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.findAllConcepts(tenantId, userId, role, limit);
   }
@@ -46,7 +56,14 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
-    return this.graphService.findRelatedConcepts(conceptId, depth, limit, tenantId, userId, role);
+    return this.graphService.findRelatedConcepts(
+      conceptId,
+      depth,
+      limit,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Query()
@@ -56,7 +73,10 @@ export class GraphResolver {
   }
 
   @Query()
-  async personByName(@Args('name') name: string, @Context() context: GraphQLContext) {
+  async personByName(
+    @Args('name') name: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.findPersonByName(name, tenantId, userId, role);
   }
@@ -68,7 +88,10 @@ export class GraphResolver {
   }
 
   @Query()
-  async termByName(@Args('name') name: string, @Context() context: GraphQLContext) {
+  async termByName(
+    @Args('name') name: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.findTermByName(name, tenantId, userId, role);
   }
@@ -80,15 +103,26 @@ export class GraphResolver {
   }
 
   @Query()
-  async topicCluster(@Args('id') id: string, @Context() context: GraphQLContext) {
+  async topicCluster(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.findTopicClusterById(id, tenantId, userId, role);
   }
 
   @Query()
-  async topicClustersByCourse(@Args('courseId') courseId: string, @Context() context: GraphQLContext) {
+  async topicClustersByCourse(
+    @Args('courseId') courseId: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
-    return this.graphService.findTopicClustersByCourse(courseId, tenantId, userId, role);
+    return this.graphService.findTopicClustersByCourse(
+      courseId,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Query()
@@ -98,11 +132,20 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
-    return this.graphService.semanticSearch(query, limit, tenantId, userId, role);
+    return this.graphService.semanticSearch(
+      query,
+      limit,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Mutation()
-  async createConcept(@Args('input') input: any, @Context() context: GraphQLContext) {
+  async createConcept(
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.createConcept(
       input.name,
@@ -115,13 +158,20 @@ export class GraphResolver {
   }
 
   @Mutation()
-  async updateConcept(@Args('id') id: string, @Args('input') input: any, @Context() context: GraphQLContext) {
+  async updateConcept(
+    @Args('id') id: string,
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.updateConcept(id, input, tenantId, userId, role);
   }
 
   @Mutation()
-  async deleteConcept(@Args('id') id: string, @Context() context: GraphQLContext) {
+  async deleteConcept(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.deleteConcept(id, tenantId, userId, role);
   }
@@ -149,19 +199,40 @@ export class GraphResolver {
   }
 
   @Mutation()
-  async createPerson(@Args('input') input: any, @Context() context: GraphQLContext) {
+  async createPerson(
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
-    return this.graphService.createPerson(input.name, input.bio || null, tenantId, userId, role);
+    return this.graphService.createPerson(
+      input.name,
+      input.bio || null,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Mutation()
-  async createTerm(@Args('input') input: any, @Context() context: GraphQLContext) {
+  async createTerm(
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
-    return this.graphService.createTerm(input.name, input.definition, tenantId, userId, role);
+    return this.graphService.createTerm(
+      input.name,
+      input.definition,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   @Mutation()
-  async createSource(@Args('input') input: any, @Context() context: GraphQLContext) {
+  async createSource(
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.createSource(
       input.title,
@@ -174,7 +245,10 @@ export class GraphResolver {
   }
 
   @Mutation()
-  async createTopicCluster(@Args('input') input: any, @Context() context: GraphQLContext) {
+  async createTopicCluster(
+    @Args('input') input: any,
+    @Context() context: GraphQLContext
+  ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.graphService.createTopicCluster(
       input.name,
@@ -193,6 +267,13 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
-    return this.graphService.generateEmbedding(text, entityType, entityId, tenantId, userId, role);
+    return this.graphService.generateEmbedding(
+      text,
+      entityType,
+      entityId,
+      tenantId,
+      userId,
+      role
+    );
   }
 }

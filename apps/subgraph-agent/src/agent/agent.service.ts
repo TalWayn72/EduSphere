@@ -65,8 +65,9 @@ export class AgentService {
       this.logger.log(`Agent execution ${execution.id} started (QUEUED)`);
 
       // Process execution asynchronously
-      this.processExecution(execution.id).catch(err => {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      this.processExecution(execution.id).catch((err) => {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Unknown error';
         this.logger.error(`Execution ${execution.id} failed: ${errorMessage}`);
       });
     }
@@ -77,13 +78,13 @@ export class AgentService {
   async cancelExecution(id: string) {
     const [execution] = await this.db
       .update(schema.agent_executions)
-      .set({ 
+      .set({
         status: 'CANCELLED',
-        completed_at: new Date()
+        completed_at: new Date(),
       })
       .where(eq(schema.agent_executions.id, id))
       .returning();
-    
+
     this.logger.log(`Agent execution ${id} cancelled`);
     return execution;
   }
@@ -93,7 +94,7 @@ export class AgentService {
       .update(schema.agent_executions)
       .set({
         status: 'RUNNING',
-        started_at: new Date()
+        started_at: new Date(),
       })
       .where(eq(schema.agent_executions.id, executionId));
 
@@ -115,7 +116,10 @@ export class AgentService {
       }
 
       // Execute with AI service
-      const result = await this.aiService.execute(agent, execution!.input as any);
+      const result = await this.aiService.execute(
+        agent,
+        execution!.input as any
+      );
 
       // Update with result
       await this.db
@@ -123,23 +127,26 @@ export class AgentService {
         .set({
           status: 'COMPLETED',
           output: result as any,
-          completed_at: new Date()
+          completed_at: new Date(),
         })
         .where(eq(schema.agent_executions.id, executionId));
 
       this.logger.log(`Agent execution ${executionId} completed`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       await this.db
         .update(schema.agent_executions)
         .set({
           status: 'FAILED',
           output: { error: errorMessage } as any,
-          completed_at: new Date()
+          completed_at: new Date(),
         })
         .where(eq(schema.agent_executions.id, executionId));
 
-      this.logger.error(`Agent execution ${executionId} failed: ${errorMessage}`);
+      this.logger.error(
+        `Agent execution ${executionId} failed: ${errorMessage}`
+      );
     }
   }
 }

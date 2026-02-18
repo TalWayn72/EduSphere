@@ -25,7 +25,12 @@ export class RedisPubSub {
   /**
    * Publish event to channel
    */
-  async publish<T>(channel: string, event: string, data: T, tenantId?: string): Promise<void> {
+  async publish<T>(
+    channel: string,
+    event: string,
+    data: T,
+    tenantId?: string
+  ): Promise<void> {
     const message: PubSubMessage<T> = {
       event,
       data,
@@ -39,7 +44,10 @@ export class RedisPubSub {
   /**
    * Subscribe to channel
    */
-  async subscribe(channel: string, callback: (message: PubSubMessage) => void): Promise<void> {
+  async subscribe(
+    channel: string,
+    callback: (message: PubSubMessage) => void
+  ): Promise<void> {
     if (!this.listeners.has(channel)) {
       this.listeners.set(channel, new Set());
       await this.subscriber.subscribe(channel);
@@ -51,7 +59,10 @@ export class RedisPubSub {
   /**
    * Unsubscribe from channel
    */
-  async unsubscribe(channel: string, callback?: (message: PubSubMessage) => void): Promise<void> {
+  async unsubscribe(
+    channel: string,
+    callback?: (message: PubSubMessage) => void
+  ): Promise<void> {
     if (!this.listeners.has(channel)) return;
 
     if (callback) {
@@ -73,7 +84,7 @@ export class RedisPubSub {
 
     try {
       const parsed: PubSubMessage = JSON.parse(message);
-      listeners.forEach(callback => callback(parsed));
+      listeners.forEach((callback) => callback(parsed));
     } catch (error) {
       console.error('Failed to parse PubSub message:', error);
     }

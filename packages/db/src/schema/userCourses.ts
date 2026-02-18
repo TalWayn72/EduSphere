@@ -12,8 +12,12 @@ export const enrollmentStatusEnum = pgEnum('enrollment_status', [
 
 export const userCourses = pgTable('user_courses', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  courseId: uuid('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  courseId: uuid('course_id')
+    .notNull()
+    .references(() => courses.id, { onDelete: 'cascade' }),
   status: enrollmentStatusEnum('status').notNull().default('ACTIVE'),
   enrolledAt: timestamp('enrolled_at').notNull().defaultNow(),
   completedAt: timestamp('completed_at'),

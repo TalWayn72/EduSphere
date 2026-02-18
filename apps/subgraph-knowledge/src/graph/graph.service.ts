@@ -8,31 +8,64 @@ export class GraphService {
 
   constructor(private readonly cypherService: CypherService) {}
 
-  async findConceptById(id: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      const concept = await this.cypherService.findConceptById(id, tenantId);
-      if (!concept) {
-        throw new NotFoundException(`Concept with ID ${id} not found`);
+  async findConceptById(
+    id: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        const concept = await this.cypherService.findConceptById(id, tenantId);
+        if (!concept) {
+          throw new NotFoundException(`Concept with ID ${id} not found`);
+        }
+        return this.mapConceptFromGraph(concept);
       }
-      return this.mapConceptFromGraph(concept);
-    });
+    );
   }
 
-  async findConceptByName(name: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      const concept = await this.cypherService.findConceptByName(name, tenantId);
-      if (!concept) {
-        throw new NotFoundException(`Concept with name "${name}" not found`);
+  async findConceptByName(
+    name: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        const concept = await this.cypherService.findConceptByName(
+          name,
+          tenantId
+        );
+        if (!concept) {
+          throw new NotFoundException(`Concept with name "${name}" not found`);
+        }
+        return this.mapConceptFromGraph(concept);
       }
-      return this.mapConceptFromGraph(concept);
-    });
+    );
   }
 
-  async findAllConcepts(tenantId: string, userId: string, role: string, limit: number = 20) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      const concepts = await this.cypherService.findAllConcepts(tenantId, limit);
-      return concepts.map((c) => this.mapConceptFromGraph(c));
-    });
+  async findAllConcepts(
+    tenantId: string,
+    userId: string,
+    role: string,
+    limit: number = 20
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        const concepts = await this.cypherService.findAllConcepts(
+          tenantId,
+          limit
+        );
+        return concepts.map((c) => this.mapConceptFromGraph(c));
+      }
+    );
   }
 
   async createConcept(
@@ -43,19 +76,26 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      const conceptId = await this.cypherService.createConcept({
-        tenant_id: tenantId,
-        name,
-        definition,
-        source_ids: sourceIds,
-      });
-      const concept = await this.cypherService.findConceptById(conceptId, tenantId);
-      if (!concept) {
-        throw new NotFoundException(`Failed to create concept`);
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        const conceptId = await this.cypherService.createConcept({
+          tenant_id: tenantId,
+          name,
+          definition,
+          source_ids: sourceIds,
+        });
+        const concept = await this.cypherService.findConceptById(
+          conceptId,
+          tenantId
+        );
+        if (!concept) {
+          throw new NotFoundException(`Failed to create concept`);
+        }
+        return this.mapConceptFromGraph(concept);
       }
-      return this.mapConceptFromGraph(concept);
-    });
+    );
   }
 
   async updateConcept(
@@ -65,24 +105,42 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      const mappedUpdates: any = {};
-      if (updates.name) mappedUpdates.name = updates.name;
-      if (updates.definition) mappedUpdates.definition = updates.definition;
-      if (updates.sourceIds) mappedUpdates.source_ids = JSON.stringify(updates.sourceIds);
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        const mappedUpdates: any = {};
+        if (updates.name) mappedUpdates.name = updates.name;
+        if (updates.definition) mappedUpdates.definition = updates.definition;
+        if (updates.sourceIds)
+          mappedUpdates.source_ids = JSON.stringify(updates.sourceIds);
 
-      const concept = await this.cypherService.updateConcept(id, tenantId, mappedUpdates);
-      if (!concept) {
-        throw new NotFoundException(`Concept with ID ${id} not found`);
+        const concept = await this.cypherService.updateConcept(
+          id,
+          tenantId,
+          mappedUpdates
+        );
+        if (!concept) {
+          throw new NotFoundException(`Concept with ID ${id} not found`);
+        }
+        return this.mapConceptFromGraph(concept);
       }
-      return this.mapConceptFromGraph(concept);
-    });
+    );
   }
 
-  async deleteConcept(id: string, tenantId: string, userId: string, role: string): Promise<boolean> {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.deleteConcept(id, tenantId);
-    });
+  async deleteConcept(
+    id: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ): Promise<boolean> {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.deleteConcept(id, tenantId);
+      }
+    );
   }
 
   async findRelatedConcepts(
@@ -93,13 +151,22 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      const related = await this.cypherService.findRelatedConcepts(conceptId, tenantId, depth, limit);
-      return related.map((r: any) => ({
-        concept: this.mapConceptFromGraph(r),
-        strength: r.strength || 1.0,
-      }));
-    });
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        const related = await this.cypherService.findRelatedConcepts(
+          conceptId,
+          tenantId,
+          depth,
+          limit
+        );
+        return related.map((r: any) => ({
+          concept: this.mapConceptFromGraph(r),
+          strength: r.strength || 1.0,
+        }));
+      }
+    );
   }
 
   async linkConcepts(
@@ -112,31 +179,55 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      await this.cypherService.linkConcepts(fromId, toId, relationshipType, {
-        strength: strength ?? undefined,
-        description: description ?? undefined,
-      });
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        await this.cypherService.linkConcepts(fromId, toId, relationshipType, {
+          strength: strength ?? undefined,
+          description: description ?? undefined,
+        });
 
-      const fromConcept = await this.cypherService.findConceptById(fromId, tenantId);
-      const toConcept = await this.cypherService.findConceptById(toId, tenantId);
+        const fromConcept = await this.cypherService.findConceptById(
+          fromId,
+          tenantId
+        );
+        const toConcept = await this.cypherService.findConceptById(
+          toId,
+          tenantId
+        );
 
-      return {
-        fromConcept: fromConcept ? this.mapConceptFromGraph(fromConcept) : null,
-        toConcept: toConcept ? this.mapConceptFromGraph(toConcept) : null,
-        relationshipType,
-        strength,
-        inferred: false,
-        description,
-      };
-    });
+        return {
+          fromConcept: fromConcept
+            ? this.mapConceptFromGraph(fromConcept)
+            : null,
+          toConcept: toConcept ? this.mapConceptFromGraph(toConcept) : null,
+          relationshipType,
+          strength,
+          inferred: false,
+          description,
+        };
+      }
+    );
   }
 
-  async semanticSearch(query: string, limit: number, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      this.logger.warn('Semantic search not fully implemented - requires embedding generation');
-      return [];
-    });
+  async semanticSearch(
+    query: string,
+    limit: number,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        this.logger.warn(
+          'Semantic search not fully implemented - requires embedding generation'
+        );
+        return [];
+      }
+    );
   }
 
   async generateEmbedding(
@@ -147,10 +238,16 @@ export class GraphService {
     userId: string,
     role: string
   ): Promise<boolean> {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      this.logger.warn('Embedding generation not implemented - requires AI service integration');
-      return false;
-    });
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        this.logger.warn(
+          'Embedding generation not implemented - requires AI service integration'
+        );
+        return false;
+      }
+    );
   }
 
   private mapConceptFromGraph(graphNode: any): any {
@@ -165,46 +262,111 @@ export class GraphService {
     };
   }
 
-  async findPersonById(id: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.findPersonById(id, tenantId);
-    });
+  async findPersonById(
+    id: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.findPersonById(id, tenantId);
+      }
+    );
   }
 
-  async findPersonByName(name: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.findPersonByName(name, tenantId);
-    });
+  async findPersonByName(
+    name: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.findPersonByName(name, tenantId);
+      }
+    );
   }
 
-  async createPerson(name: string, bio: string | null, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.createPerson(name, bio, tenantId);
-    });
+  async createPerson(
+    name: string,
+    bio: string | null,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.createPerson(name, bio, tenantId);
+      }
+    );
   }
 
-  async findTermById(id: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.findTermById(id, tenantId);
-    });
+  async findTermById(
+    id: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.findTermById(id, tenantId);
+      }
+    );
   }
 
-  async findTermByName(name: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.findTermByName(name, tenantId);
-    });
+  async findTermByName(
+    name: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.findTermByName(name, tenantId);
+      }
+    );
   }
 
-  async createTerm(name: string, definition: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.createTerm(name, definition, tenantId);
-    });
+  async createTerm(
+    name: string,
+    definition: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.createTerm(name, definition, tenantId);
+      }
+    );
   }
 
-  async findSourceById(id: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.findSourceById(id, tenantId);
-    });
+  async findSourceById(
+    id: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.findSourceById(id, tenantId);
+      }
+    );
   }
 
   async createSource(
@@ -215,21 +377,43 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.createSource(title, type, url, tenantId);
-    });
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.createSource(title, type, url, tenantId);
+      }
+    );
   }
 
-  async findTopicClusterById(id: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.findTopicClusterById(id, tenantId);
-    });
+  async findTopicClusterById(
+    id: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.findTopicClusterById(id, tenantId);
+      }
+    );
   }
 
-  async findTopicClustersByCourse(courseId: string, tenantId: string, userId: string, role: string) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.findTopicClustersByCourse(courseId, tenantId);
-    });
+  async findTopicClustersByCourse(
+    courseId: string,
+    tenantId: string,
+    userId: string,
+    role: string
+  ) {
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.findTopicClustersByCourse(courseId, tenantId);
+      }
+    );
   }
 
   async createTopicCluster(
@@ -239,8 +423,16 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return withTenantContext(db, { tenantId, userId, userRole: role as any }, async () => {
-      return this.cypherService.createTopicCluster(name, description, tenantId);
-    });
+    return withTenantContext(
+      db,
+      { tenantId, userId, userRole: role as any },
+      async () => {
+        return this.cypherService.createTopicCluster(
+          name,
+          description,
+          tenantId
+        );
+      }
+    );
   }
 }

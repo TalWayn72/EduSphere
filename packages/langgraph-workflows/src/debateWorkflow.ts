@@ -8,12 +8,16 @@ const DebateStateSchema = z.object({
   position: z.enum(['for', 'against']),
   rounds: z.number().default(3),
   currentRound: z.number().default(1),
-  arguments: z.array(z.object({
-    round: z.number(),
-    position: z.string(),
-    argument: z.string(),
-    counterArgument: z.string().optional(),
-  })).default([]),
+  arguments: z
+    .array(
+      z.object({
+        round: z.number(),
+        position: z.string(),
+        argument: z.string(),
+        counterArgument: z.string().optional(),
+      })
+    )
+    .default([]),
   synthesis: z.string().optional(),
   isComplete: z.boolean().default(false),
 });
@@ -43,12 +47,20 @@ export class ChavrutaDebateWorkflow {
     graph.addNode('synthesize', this.synthesizeNode.bind(this));
 
     graph.setEntryPoint('argue');
-    graph.addConditionalEdges('argue', (state) => {
-      return state.currentRound <= state.rounds ? 'counter' : 'synthesize';
-    }, { counter: 'counter', synthesize: 'synthesize' });
-    graph.addConditionalEdges('counter', (state) => {
-      return state.currentRound < state.rounds ? 'argue' : 'synthesize';
-    }, { argue: 'argue', synthesize: 'synthesize' });
+    graph.addConditionalEdges(
+      'argue',
+      (state) => {
+        return state.currentRound <= state.rounds ? 'counter' : 'synthesize';
+      },
+      { counter: 'counter', synthesize: 'synthesize' }
+    );
+    graph.addConditionalEdges(
+      'counter',
+      (state) => {
+        return state.currentRound < state.rounds ? 'argue' : 'synthesize';
+      },
+      { argue: 'argue', synthesize: 'synthesize' }
+    );
     graph.addEdge('synthesize', END);
 
     return graph;
@@ -100,9 +112,14 @@ Provide a strong counter-argument that addresses their points while advancing yo
     };
   }
 
-  private async synthesizeNode(state: DebateState): Promise<Partial<DebateState>> {
+  private async synthesizeNode(
+    state: DebateState
+  ): Promise<Partial<DebateState>> {
     const debateHistory = state.arguments
-      .map(arg => `Round ${arg.round}:\nArgument: ${arg.argument}\nCounter: ${arg.counterArgument || 'N/A'}`)
+      .map(
+        (arg) =>
+          `Round ${arg.round}:\nArgument: ${arg.argument}\nCounter: ${arg.counterArgument || 'N/A'}`
+      )
       .join('\n\n');
 
     const { text } = await generateText({

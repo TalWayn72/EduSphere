@@ -3,12 +3,14 @@ import { useMutation, useQuery, gql } from '@apollo/client';
 
 const CREATE_SESSION = gql`
   mutation CreateSession($userId: ID!) {
-    createAgentSession(input: {
-      userId: $userId
-      agentType: "TUTOR"
-      context: "{}"
-      tenantId: "00000000-0000-0000-0000-000000000001"
-    }) {
+    createAgentSession(
+      input: {
+        userId: $userId
+        agentType: "TUTOR"
+        context: "{}"
+        tenantId: "00000000-0000-0000-0000-000000000001"
+      }
+    ) {
       id
       agentType
       status
@@ -18,12 +20,14 @@ const CREATE_SESSION = gql`
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($sessionId: ID!, $content: String!) {
-    createAgentMessage(input: {
-      sessionId: $sessionId
-      role: "USER"
-      content: $content
-      tenantId: "00000000-0000-0000-0000-000000000001"
-    }) {
+    createAgentMessage(
+      input: {
+        sessionId: $sessionId
+        role: "USER"
+        content: $content
+        tenantId: "00000000-0000-0000-0000-000000000001"
+      }
+    ) {
       id
       role
       content
@@ -137,7 +141,10 @@ export default function AITutor() {
             ))}
           </div>
 
-          <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px' }}>
+          <form
+            onSubmit={handleSendMessage}
+            style={{ display: 'flex', gap: '10px' }}
+          >
             <input
               type="text"
               value={message}

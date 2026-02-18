@@ -1,7 +1,10 @@
 {
   "extends": "@edusphere/tsconfig/react-native.json",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "rootDir": ".",
+    "outDir": "./dist",
+    "types": ["react-native"]
   },
   "include": [
     "**/*.ts",
@@ -10,6 +13,7 @@
     "expo-env.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

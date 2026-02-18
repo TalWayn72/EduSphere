@@ -53,11 +53,7 @@ export class JWTValidator {
   private issuer: string;
   private audience: string;
 
-  constructor(
-    keycloakUrl: string,
-    realm: string,
-    clientId: string,
-  ) {
+  constructor(keycloakUrl: string, realm: string, clientId: string) {
     const jwksUrl = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/certs`;
     this.jwks = createRemoteJWKSet(new URL(jwksUrl));
     this.issuer = `${keycloakUrl}/realms/${realm}`;
@@ -73,8 +69,9 @@ export class JWTValidator {
 
       const claims = JWTClaimsSchema.parse(payload);
 
-      const roles = claims.realm_access.roles
-        .filter((role): role is UserRole => UserRole.safeParse(role).success);
+      const roles = claims.realm_access.roles.filter(
+        (role): role is UserRole => UserRole.safeParse(role).success
+      );
 
       const authContext: AuthContext = {
         userId: claims.sub,
@@ -108,7 +105,10 @@ export class JWTValidator {
 // Authorization Helpers
 // ═══════════════════════════════════════════════════════════════
 
-export function requireRole(context: AuthContext | null, requiredRole: UserRole): void {
+export function requireRole(
+  context: AuthContext | null,
+  requiredRole: UserRole
+): void {
   if (!context) {
     throw new Error('Unauthorized: No authentication context');
   }
@@ -122,7 +122,10 @@ export function requireRole(context: AuthContext | null, requiredRole: UserRole)
   }
 }
 
-export function requireAnyRole(context: AuthContext | null, requiredRoles: UserRole[]): void {
+export function requireAnyRole(
+  context: AuthContext | null,
+  requiredRoles: UserRole[]
+): void {
   if (!context) {
     throw new Error('Unauthorized: No authentication context');
   }
@@ -133,11 +136,16 @@ export function requireAnyRole(context: AuthContext | null, requiredRoles: UserR
 
   const hasRole = requiredRoles.some((role) => context.roles.includes(role));
   if (!hasRole) {
-    throw new Error(`Forbidden: One of roles [${requiredRoles.join(', ')}] required`);
+    throw new Error(
+      `Forbidden: One of roles [${requiredRoles.join(', ')}] required`
+    );
   }
 }
 
-export function requireTenantAccess(context: AuthContext | null, tenantId: string): void {
+export function requireTenantAccess(
+  context: AuthContext | null,
+  tenantId: string
+): void {
   if (!context) {
     throw new Error('Unauthorized: No authentication context');
   }

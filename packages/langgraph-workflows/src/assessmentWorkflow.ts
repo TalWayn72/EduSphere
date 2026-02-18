@@ -11,17 +11,23 @@ const AssessmentResultSchema = z.object({
 });
 
 const AssessmentStateSchema = z.object({
-  submissions: z.array(z.object({
-    questionId: z.string(),
-    question: z.string(),
-    studentAnswer: z.string(),
-    rubric: z.string().optional(),
-  })),
-  evaluations: z.array(z.object({
-    questionId: z.string(),
-    score: z.number(),
-    feedback: z.string(),
-  })).default([]),
+  submissions: z.array(
+    z.object({
+      questionId: z.string(),
+      question: z.string(),
+      studentAnswer: z.string(),
+      rubric: z.string().optional(),
+    })
+  ),
+  evaluations: z
+    .array(
+      z.object({
+        questionId: z.string(),
+        score: z.number(),
+        feedback: z.string(),
+      })
+    )
+    .default([]),
   overallAssessment: AssessmentResultSchema.optional(),
   isComplete: z.boolean().default(false),
 });
@@ -52,7 +58,9 @@ export class AssessmentWorkflow {
     return graph;
   }
 
-  private async evaluateNode(state: AssessmentState): Promise<Partial<AssessmentState>> {
+  private async evaluateNode(
+    state: AssessmentState
+  ): Promise<Partial<AssessmentState>> {
     const evaluations = [];
 
     for (const submission of state.submissions) {
@@ -88,9 +96,11 @@ Feedback: [detailed feedback]`,
     return { evaluations };
   }
 
-  private async synthesizeNode(state: AssessmentState): Promise<Partial<AssessmentState>> {
+  private async synthesizeNode(
+    state: AssessmentState
+  ): Promise<Partial<AssessmentState>> {
     const allFeedback = state.evaluations
-      .map(e => `${e.questionId}: ${e.feedback}`)
+      .map((e) => `${e.questionId}: ${e.feedback}`)
       .join('\n\n');
 
     const { object } = await generateObject({

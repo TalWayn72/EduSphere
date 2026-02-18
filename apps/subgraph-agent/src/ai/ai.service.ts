@@ -11,7 +11,7 @@ export class AIService {
 
     try {
       // Choose model based on environment
-      const model = process.env.OPENAI_API_KEY 
+      const model = process.env.OPENAI_API_KEY
         ? openai('gpt-4-turbo')
         : openai('gpt-3.5-turbo');
 
@@ -34,7 +34,8 @@ export class AIService {
         finishReason: result.finishReason,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`AI execution failed: ${errorMessage}`);
       throw error;
     }
@@ -43,7 +44,7 @@ export class AIService {
   async executeStream(agent: any, input: any): Promise<any> {
     this.logger.debug(`Streaming agent: ${agent.template}`);
 
-    const model = process.env.OPENAI_API_KEY 
+    const model = process.env.OPENAI_API_KEY
       ? openai('gpt-4-turbo')
       : openai('gpt-3.5-turbo');
 
@@ -86,21 +87,33 @@ identify knowledge gaps, and guide inquiry-based learning.`,
   }
 
   private buildUserPrompt(_agent: any, input: any): string {
-    const context = input.context ? `Context: ${JSON.stringify(input.context)}\n\n` : '';
+    const context = input.context
+      ? `Context: ${JSON.stringify(input.context)}\n\n`
+      : '';
     const message = input.message || input.query || '';
 
     return `${context}${message}`;
   }
 
-  async getConversationMemory(sessionId: string, _limit: number = 10): Promise<any[]> {
+  async getConversationMemory(
+    sessionId: string,
+    _limit: number = 10
+  ): Promise<any[]> {
     // TODO: Implement conversation memory retrieval
     // This should fetch recent messages from agent_messages table
     // and format them for inclusion in the LLM context
-    this.logger.debug(`Retrieving conversation memory for session ${sessionId}`);
+    this.logger.debug(
+      `Retrieving conversation memory for session ${sessionId}`
+    );
     return [];
   }
 
-  async saveConversationMemory(sessionId: string, _role: string, _content: string, _metadata?: any): Promise<void> {
+  async saveConversationMemory(
+    sessionId: string,
+    _role: string,
+    _content: string,
+    _metadata?: any
+  ): Promise<void> {
     // TODO: Implement conversation memory storage
     // This should save messages to agent_messages table
     this.logger.debug(`Saving conversation memory for session ${sessionId}`);

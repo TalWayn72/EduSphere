@@ -1,6 +1,8 @@
 import Keycloak from 'keycloak-js';
 
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true' || !import.meta.env.VITE_KEYCLOAK_URL;
+const DEV_MODE =
+  import.meta.env.VITE_DEV_MODE === 'true' ||
+  !import.meta.env.VITE_KEYCLOAK_URL;
 
 const keycloakConfig = {
   url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',

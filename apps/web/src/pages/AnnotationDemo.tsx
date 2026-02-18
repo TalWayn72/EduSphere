@@ -9,7 +9,8 @@ export default function AnnotationDemo() {
             Annotation System Demo
           </h1>
           <p className="text-gray-600 mt-2">
-            4-layer annotation system with threading, filtering, and real-time collaboration
+            4-layer annotation system with threading, filtering, and real-time
+            collaboration
           </p>
         </div>
 

@@ -15,14 +15,7 @@ export function Card({
   style,
 }: CardProps) {
   return (
-    <View
-      style={[
-        styles.card,
-        styles[variant],
-        { padding },
-        style,
-      ]}
-    >
+    <View style={[styles.card, styles[variant], { padding }, style]}>
       {children}
     </View>
   );

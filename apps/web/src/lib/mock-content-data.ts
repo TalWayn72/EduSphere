@@ -38,10 +38,12 @@ export interface VideoContent {
 export const mockVideo: VideoContent = {
   id: 'video-1',
   title: 'Introduction to Talmudic Reasoning',
-  description: 'Learn the fundamentals of logical argumentation in Jewish texts',
+  description:
+    'Learn the fundamentals of logical argumentation in Jewish texts',
   duration: 300, // 5 minutes
   url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-  thumbnailUrl: 'https://peach.blender.org/wp-content/uploads/title_anouncement.jpg',
+  thumbnailUrl:
+    'https://peach.blender.org/wp-content/uploads/title_anouncement.jpg',
 };
 
 export const mockTranscript: TranscriptSegment[] = [
@@ -214,7 +216,8 @@ export const mockAnnotations: Annotation[] = [
     timestamp: 30,
     layer: 'INSTRUCTOR',
     author: 'Rabbi Cohen',
-    content: 'This principle is found in the 13 hermeneutical rules of Rabbi Ishmael',
+    content:
+      'This principle is found in the 13 hermeneutical rules of Rabbi Ishmael',
     createdAt: new Date(Date.now() - 7200000),
   },
   {
@@ -230,7 +233,8 @@ export const mockAnnotations: Annotation[] = [
     timestamp: 90,
     layer: 'AI_GENERATED',
     author: 'AI Assistant',
-    content: 'Related concept: Inductive reasoning in Aristotelian logic shares similarities with binyan av.',
+    content:
+      'Related concept: Inductive reasoning in Aristotelian logic shares similarities with binyan av.',
     createdAt: new Date(Date.now() - 1800000),
   },
   {
@@ -238,7 +242,8 @@ export const mockAnnotations: Annotation[] = [
     timestamp: 120,
     layer: 'PERSONAL',
     author: 'You',
-    content: 'Question for chavruta session: How does this apply to modern legal reasoning?',
+    content:
+      'Question for chavruta session: How does this apply to modern legal reasoning?',
     createdAt: new Date(Date.now() - 900000),
   },
   {
@@ -262,7 +267,8 @@ export const mockAnnotations: Annotation[] = [
     timestamp: 210,
     layer: 'AI_GENERATED',
     author: 'AI Assistant',
-    content: 'Knowledge graph connection: This concept links to "Debate Ethics" and "Pluralism in Jewish Thought"',
+    content:
+      'Knowledge graph connection: This concept links to "Debate Ethics" and "Pluralism in Jewish Thought"',
     createdAt: new Date(Date.now() - 600000),
   },
   {
@@ -270,7 +276,8 @@ export const mockAnnotations: Annotation[] = [
     timestamp: 240,
     layer: 'PERSONAL',
     author: 'You',
-    content: 'Svara - need to research this further. Seems related to natural law theory.',
+    content:
+      'Svara - need to research this further. Seems related to natural law theory.',
     createdAt: new Date(Date.now() - 300000),
   },
   {
@@ -278,7 +285,8 @@ export const mockAnnotations: Annotation[] = [
     timestamp: 270,
     layer: 'INSTRUCTOR',
     author: 'Rabbi Cohen',
-    content: 'Excellent summary. This captures the essence of what we aim to develop in students.',
+    content:
+      'Excellent summary. This captures the essence of what we aim to develop in students.',
     createdAt: new Date(Date.now() - 18000000),
   },
 ];

@@ -1,7 +1,6 @@
 import { generateText, streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { SemanticRetriever, RetrievalOptions } from './retriever';
-import { z } from 'zod';
 
 export interface RAGOptions {
   model?: string;
@@ -83,7 +82,7 @@ Please provide a helpful answer based on the context above. If the answer isn't 
 
     return {
       answer: text,
-      sources: results.map(r => ({
+      sources: results.map((r) => ({
         id: r.id,
         content: r.content,
         similarity: r.similarity,
@@ -148,7 +147,10 @@ Please provide a helpful answer based on the context above.`,
     // Format conversation history
     const conversationHistory = messages
       .slice(0, -1)
-      .map(msg => `${msg.role === 'user' ? 'Student' : 'Assistant'}: ${msg.content}`)
+      .map(
+        (msg) =>
+          `${msg.role === 'user' ? 'Student' : 'Assistant'}: ${msg.content}`
+      )
       .join('\n\n');
 
     const startGeneration = Date.now();
@@ -173,7 +175,7 @@ Continue the conversation with a helpful response.`,
 
     return {
       answer: text,
-      sources: results.map(r => ({
+      sources: results.map((r) => ({
         id: r.id,
         content: r.content,
         similarity: r.similarity,
@@ -188,6 +190,9 @@ Continue the conversation with a helpful response.`,
   }
 }
 
-export function createRAGPipeline(retriever: SemanticRetriever, model?: string): RAGPipeline {
+export function createRAGPipeline(
+  retriever: SemanticRetriever,
+  model?: string
+): RAGPipeline {
   return new RAGPipeline(retriever, model);
 }

@@ -106,7 +106,9 @@ export function AnnotationsPanel({
                 >
                   <Icon className={cn('h-4 w-4', config.color)} />
                   <span>{config.label}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">({count})</span>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    ({count})
+                  </span>
                 </label>
               </div>
             );

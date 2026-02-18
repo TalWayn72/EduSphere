@@ -20,7 +20,10 @@ export const ANNOTATIONS_QUERY = gql`
         id
         content
         userId
-        user { id displayName }
+        user {
+          id
+          displayName
+        }
         createdAt
       }
       isResolved
@@ -85,7 +88,10 @@ export const ANNOTATION_ADDED_SUBSCRIPTION = gql`
       type
       content
       userId
-      user { id displayName }
+      user {
+        id
+        displayName
+      }
       createdAt
     }
   }

@@ -126,7 +126,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
 
         {/* Agent Selector */}
         <div className="p-4 border-b bg-background">
-          <label className="text-sm font-medium mb-2 block">Select Agent:</label>
+          <label className="text-sm font-medium mb-2 block">
+            Select Agent:
+          </label>
           <Select
             value={selectedAgent}
             onValueChange={(value) => setSelectedAgent(value as AgentType)}

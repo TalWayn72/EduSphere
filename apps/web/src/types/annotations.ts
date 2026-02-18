@@ -37,7 +37,10 @@ export interface AnnotationLayerConfig {
   canDelete: (annotation: Annotation, currentUserId: string) => boolean;
 }
 
-export const ANNOTATION_LAYER_CONFIGS: Record<AnnotationLayer, AnnotationLayerConfig> = {
+export const ANNOTATION_LAYER_CONFIGS: Record<
+  AnnotationLayer,
+  AnnotationLayerConfig
+> = {
   [AnnotationLayer.PERSONAL]: {
     layer: AnnotationLayer.PERSONAL,
     label: 'Private',
@@ -46,7 +49,8 @@ export const ANNOTATION_LAYER_CONFIGS: Record<AnnotationLayer, AnnotationLayerCo
     color: 'text-blue-600',
     canCreate: () => true,
     canEdit: (annotation, currentUserId) => annotation.userId === currentUserId,
-    canDelete: (annotation, currentUserId) => annotation.userId === currentUserId,
+    canDelete: (annotation, currentUserId) =>
+      annotation.userId === currentUserId,
   },
   [AnnotationLayer.SHARED]: {
     layer: AnnotationLayer.SHARED,
@@ -56,7 +60,8 @@ export const ANNOTATION_LAYER_CONFIGS: Record<AnnotationLayer, AnnotationLayerCo
     color: 'text-green-600',
     canCreate: () => true,
     canEdit: (annotation, currentUserId) => annotation.userId === currentUserId,
-    canDelete: (annotation, currentUserId) => annotation.userId === currentUserId,
+    canDelete: (annotation, currentUserId) =>
+      annotation.userId === currentUserId,
   },
   [AnnotationLayer.INSTRUCTOR]: {
     layer: AnnotationLayer.INSTRUCTOR,
@@ -66,9 +71,11 @@ export const ANNOTATION_LAYER_CONFIGS: Record<AnnotationLayer, AnnotationLayerCo
     color: 'text-purple-600',
     canCreate: (userRole) => userRole === 'instructor',
     canEdit: (annotation, currentUserId) =>
-      annotation.userRole === 'instructor' && annotation.userId === currentUserId,
+      annotation.userRole === 'instructor' &&
+      annotation.userId === currentUserId,
     canDelete: (annotation, currentUserId) =>
-      annotation.userRole === 'instructor' && annotation.userId === currentUserId,
+      annotation.userRole === 'instructor' &&
+      annotation.userId === currentUserId,
   },
   [AnnotationLayer.AI_GENERATED]: {
     layer: AnnotationLayer.AI_GENERATED,

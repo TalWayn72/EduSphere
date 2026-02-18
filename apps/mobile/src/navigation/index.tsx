@@ -49,10 +49,26 @@ function MainTabs() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="Courses" component={CoursesScreen} options={{ title: 'Courses' }} />
-      <Tab.Screen name="Discussions" component={DiscussionsScreen} options={{ title: 'Forum' }} />
-      <Tab.Screen name="AITutor" component={AITutorScreen} options={{ title: 'AI Tutor' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
+      <Tab.Screen
+        name="Courses"
+        component={CoursesScreen}
+        options={{ title: 'Courses' }}
+      />
+      <Tab.Screen
+        name="Discussions"
+        component={DiscussionsScreen}
+        options={{ title: 'Forum' }}
+      />
+      <Tab.Screen
+        name="AITutor"
+        component={AITutorScreen}
+        options={{ title: 'AI Tutor' }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ title: 'Profile' }}
+      />
     </Tab.Navigator>
   );
 }

@@ -1,9 +1,22 @@
-import { Resolver, Query, Mutation, Subscription, Args, ResolveField, Parent, ResolveReference, Context } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Subscription,
+  Args,
+  ResolveField,
+  Parent,
+  ResolveReference,
+  Context,
+} from '@nestjs/graphql';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { AgentSessionService } from './agent-session.service';
 import { AgentMessageService } from '../agent-message/agent-message.service';
 import { PubSub } from 'graphql-subscriptions';
-import { StartAgentSessionSchema, SendMessageSchema } from './agent-session.schemas';
+import {
+  StartAgentSessionSchema,
+  SendMessageSchema,
+} from './agent-session.schemas';
 
 const pubSub = new PubSub();
 
@@ -11,7 +24,7 @@ const pubSub = new PubSub();
 export class AgentSessionResolver {
   constructor(
     private readonly agentSessionService: AgentSessionService,
-    private readonly agentMessageService: AgentMessageService,
+    private readonly agentMessageService: AgentMessageService
   ) {}
 
   @Query('agentSession')
@@ -65,7 +78,7 @@ export class AgentSessionResolver {
   async startAgentSession(
     @Args('templateType') templateType: string,
     @Args('context') contextData: any,
-    @Context() context: any,
+    @Context() context: any
   ) {
     const authContext = this.extractAuthContext(context);
 
@@ -79,18 +92,21 @@ export class AgentSessionResolver {
       throw new BadRequestException(validationResult.error.errors);
     }
 
-    return this.agentSessionService.create({
-      userId: authContext.userId,
-      agentType: templateType,
-      metadata: contextData,
-    }, authContext);
+    return this.agentSessionService.create(
+      {
+        userId: authContext.userId,
+        agentType: templateType,
+        metadata: contextData,
+      },
+      authContext
+    );
   }
 
   @Mutation('sendMessage')
   async sendMessage(
     @Args('sessionId') sessionId: string,
     @Args('content') content: string,
-    @Context() context: any,
+    @Context() context: any
   ) {
     const authContext = this.extractAuthContext(context);
 
@@ -105,11 +121,14 @@ export class AgentSessionResolver {
     }
 
     // Save user message
-    const userMessage = await this.agentMessageService.create({
-      sessionId,
-      role: 'USER',
-      content,
-    }, authContext);
+    const userMessage = await this.agentMessageService.create(
+      {
+        sessionId,
+        role: 'USER',
+        content,
+      },
+      authContext
+    );
 
     // Publish to subscription
     pubSub.publish('MESSAGE_STREAM', {
@@ -118,11 +137,14 @@ export class AgentSessionResolver {
 
     // TODO: Get session and use agent type to generate AI response
     // For now, create a simple assistant message
-    const assistantMessage = await this.agentMessageService.create({
-      sessionId,
-      role: 'ASSISTANT',
-      content: `Echo: ${content}`,
-    }, authContext);
+    const assistantMessage = await this.agentMessageService.create(
+      {
+        sessionId,
+        role: 'ASSISTANT',
+        content: `Echo: ${content}`,
+      },
+      authContext
+    );
 
     // Publish assistant message
     pubSub.publish('MESSAGE_STREAM', {
@@ -155,7 +177,10 @@ export class AgentSessionResolver {
   }
 
   @ResolveReference()
-  async resolveReference(reference: { __typename: string; id: string }, @Context() context: any) {
+  async resolveReference(
+    reference: { __typename: string; id: string },
+    @Context() context: any
+  ) {
     const authContext = this.extractAuthContext(context);
     return this.agentSessionService.findById(reference.id, authContext);
   }

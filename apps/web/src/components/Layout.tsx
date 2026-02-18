@@ -2,7 +2,15 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout, getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
-import { LogOut, BookOpen, Users, FileText, Bot, Network, LayoutDashboard, GitBranch } from 'lucide-react';
+import {
+  LogOut,
+  BookOpen,
+  Users,
+  FileText,
+  Bot,
+  Network,
+  GitBranch,
+} from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;

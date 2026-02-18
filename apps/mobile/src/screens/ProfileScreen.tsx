@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import { useQuery, gql } from '@apollo/client';
 
 const ME_QUERY = gql`
@@ -22,7 +28,8 @@ export default function ProfileScreen() {
       <View style={styles.header}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
-            {data?.me?.firstName?.[0]}{data?.me?.lastName?.[0]}
+            {data?.me?.firstName?.[0]}
+            {data?.me?.lastName?.[0]}
           </Text>
         </View>
         {loading ? (

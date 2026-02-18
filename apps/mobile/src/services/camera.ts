@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, CameraType } from 'expo-camera';
+import { Camera } from 'expo-camera';
 
 export interface CameraOptions {
   allowsEditing?: boolean;
@@ -18,15 +18,18 @@ export interface CameraResult {
 
 export class CameraService {
   async requestPermissions(): Promise<boolean> {
-    const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
-    const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status: cameraStatus } =
+      await Camera.requestCameraPermissionsAsync();
+    const { status: mediaStatus } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     return cameraStatus === 'granted' && mediaStatus === 'granted';
   }
 
   async hasPermissions(): Promise<boolean> {
     const { status: cameraStatus } = await Camera.getCameraPermissionsAsync();
-    const { status: mediaStatus } = await ImagePicker.getMediaLibraryPermissionsAsync();
+    const { status: mediaStatus } =
+      await ImagePicker.getMediaLibraryPermissionsAsync();
 
     return cameraStatus === 'granted' && mediaStatus === 'granted';
   }
@@ -41,11 +44,12 @@ export class CameraService {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: options.mediaTypes === 'all'
-        ? ImagePicker.MediaTypeOptions.All
-        : options.mediaTypes === 'videos'
-          ? ImagePicker.MediaTypeOptions.Videos
-          : ImagePicker.MediaTypeOptions.Images,
+      mediaTypes:
+        options.mediaTypes === 'all'
+          ? ImagePicker.MediaTypeOptions.All
+          : options.mediaTypes === 'videos'
+            ? ImagePicker.MediaTypeOptions.Videos
+            : ImagePicker.MediaTypeOptions.Images,
       allowsEditing: options.allowsEditing ?? true,
       aspect: options.aspect,
       quality: options.quality ?? 0.8,
@@ -65,7 +69,9 @@ export class CameraService {
     };
   }
 
-  async pickFromGallery(options: CameraOptions = {}): Promise<CameraResult | null> {
+  async pickFromGallery(
+    options: CameraOptions = {}
+  ): Promise<CameraResult | null> {
     const hasPermission = await this.hasPermissions();
     if (!hasPermission) {
       const granted = await this.requestPermissions();
@@ -75,11 +81,12 @@ export class CameraService {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: options.mediaTypes === 'all'
-        ? ImagePicker.MediaTypeOptions.All
-        : options.mediaTypes === 'videos'
-          ? ImagePicker.MediaTypeOptions.Videos
-          : ImagePicker.MediaTypeOptions.Images,
+      mediaTypes:
+        options.mediaTypes === 'all'
+          ? ImagePicker.MediaTypeOptions.All
+          : options.mediaTypes === 'videos'
+            ? ImagePicker.MediaTypeOptions.Videos
+            : ImagePicker.MediaTypeOptions.Images,
       allowsEditing: options.allowsEditing ?? true,
       aspect: options.aspect,
       quality: options.quality ?? 0.8,
@@ -109,11 +116,12 @@ export class CameraService {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: options.mediaTypes === 'all'
-        ? ImagePicker.MediaTypeOptions.All
-        : options.mediaTypes === 'videos'
-          ? ImagePicker.MediaTypeOptions.Videos
-          : ImagePicker.MediaTypeOptions.Images,
+      mediaTypes:
+        options.mediaTypes === 'all'
+          ? ImagePicker.MediaTypeOptions.All
+          : options.mediaTypes === 'videos'
+            ? ImagePicker.MediaTypeOptions.Videos
+            : ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       quality: options.quality ?? 0.8,
     });
@@ -122,7 +130,7 @@ export class CameraService {
       return [];
     }
 
-    return result.assets.map(asset => ({
+    return result.assets.map((asset) => ({
       uri: asset.uri,
       width: asset.width,
       height: asset.height,

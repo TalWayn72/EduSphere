@@ -13,20 +13,23 @@ export class BiometricService {
   async getCapabilities(): Promise<BiometricCapabilities> {
     const isAvailable = await LocalAuthentication.hasHardwareAsync();
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-    const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
+    const supportedTypes =
+      await LocalAuthentication.supportedAuthenticationTypesAsync();
 
-    const types: BiometricType[] = supportedTypes.map(type => {
-      switch (type) {
-        case LocalAuthentication.AuthenticationType.FINGERPRINT:
-          return 'fingerprint';
-        case LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION:
-          return 'facial';
-        case LocalAuthentication.AuthenticationType.IRIS:
-          return 'iris';
-        default:
-          return 'none';
-      }
-    }).filter(t => t !== 'none');
+    const types: BiometricType[] = supportedTypes
+      .map((type) => {
+        switch (type) {
+          case LocalAuthentication.AuthenticationType.FINGERPRINT:
+            return 'fingerprint';
+          case LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION:
+            return 'facial';
+          case LocalAuthentication.AuthenticationType.IRIS:
+            return 'iris';
+          default:
+            return 'none';
+        }
+      })
+      .filter((t) => t !== 'none');
 
     return { isAvailable, types, isEnrolled };
   }
@@ -54,7 +57,9 @@ export class BiometricService {
     const capabilities = await this.getCapabilities();
 
     if (capabilities.isAvailable && capabilities.isEnrolled) {
-      const authenticated = await this.authenticate('Authenticate to save credentials');
+      const authenticated = await this.authenticate(
+        'Authenticate to save credentials'
+      );
       if (authenticated) {
         await SecureStore.setItemAsync(key, value, {
           requireAuthentication: true,
@@ -68,11 +73,15 @@ export class BiometricService {
     }
   }
 
-  async getCredential(key: string, promptMessage?: string): Promise<string | null> {
+  async getCredential(
+    key: string,
+    promptMessage?: string
+  ): Promise<string | null> {
     try {
       const value = await SecureStore.getItemAsync(key, {
         requireAuthentication: true,
-        authenticationPrompt: promptMessage || 'Authenticate to access credentials',
+        authenticationPrompt:
+          promptMessage || 'Authenticate to access credentials',
       });
       return value;
     } catch (error) {

@@ -14,17 +14,14 @@ describe('AnnotationService', () => {
   });
 
   it('should require authentication for findById', async () => {
-    await expect(
-      service.findById('test-id', undefined)
-    ).rejects.toThrow('Authentication required');
+    await expect(service.findById('test-id', undefined)).rejects.toThrow(
+      'Authentication required'
+    );
   });
 
   it('should require authentication for findAll', async () => {
     await expect(
-      service.findAll(
-        { limit: 10, offset: 0 },
-        undefined
-      )
+      service.findAll({ limit: 10, offset: 0 }, undefined)
     ).rejects.toThrow('Authentication required');
   });
 

@@ -25,7 +25,7 @@ export default function AITutorLive({ sessionId }: Props) {
 
   useEffect(() => {
     if (data?.agentMessageCreated) {
-      setMessages(prev => [...prev, data.agentMessageCreated]);
+      setMessages((prev) => [...prev, data.agentMessageCreated]);
 
       // Auto-scroll to bottom
       const container = document.getElementById('messages-container');

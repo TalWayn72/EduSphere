@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, split, ApolloLink } from '@apollo/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  HttpLink,
+  split,
+  ApolloLink,
+} from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
@@ -31,7 +38,7 @@ const wsLink = new GraphQLWsLink(
         // authorization: token ? `Bearer ${token}` : '',
       };
     },
-  }),
+  })
 );
 
 const splitLink = split(
@@ -43,7 +50,7 @@ const splitLink = split(
     );
   },
   wsLink,
-  httpLink,
+  httpLink
 );
 
 // Chain offline support before the split link

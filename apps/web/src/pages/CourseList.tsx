@@ -1,7 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Clock, Users } from 'lucide-react';
 
@@ -10,7 +16,8 @@ const MOCK_COURSES = [
   {
     id: 'course-1',
     title: 'Introduction to Talmud Study',
-    description: 'Learn the fundamentals of Talmudic reasoning and argumentation',
+    description:
+      'Learn the fundamentals of Talmudic reasoning and argumentation',
     instructor: 'Rabbi David Cohen',
     duration: '8 weeks',
     students: 45,
@@ -20,7 +27,8 @@ const MOCK_COURSES = [
   {
     id: 'course-2',
     title: 'Advanced Chavruta Techniques',
-    description: 'Master the art of collaborative Talmud learning with AI assistance',
+    description:
+      'Master the art of collaborative Talmud learning with AI assistance',
     instructor: 'Dr. Sarah Levine',
     duration: '6 weeks',
     students: 32,
@@ -30,7 +38,8 @@ const MOCK_COURSES = [
   {
     id: 'course-3',
     title: 'Knowledge Graph Navigation',
-    description: 'Explore interconnected concepts in Jewish texts using graph-based learning',
+    description:
+      'Explore interconnected concepts in Jewish texts using graph-based learning',
     instructor: 'Prof. Michael Stein',
     duration: '4 weeks',
     students: 28,
@@ -50,7 +59,8 @@ const MOCK_COURSES = [
   {
     id: 'course-5',
     title: 'Ethics in Jewish Thought',
-    description: 'Explore ethical frameworks from classical to modern Jewish philosophy',
+    description:
+      'Explore ethical frameworks from classical to modern Jewish philosophy',
     instructor: 'Dr. Aaron Bernstein',
     duration: '6 weeks',
     students: 41,
@@ -60,7 +70,8 @@ const MOCK_COURSES = [
   {
     id: 'course-6',
     title: 'AI-Enhanced Torah Study',
-    description: 'Leverage AI agents for deeper understanding of traditional texts',
+    description:
+      'Leverage AI agents for deeper understanding of traditional texts',
     instructor: 'Rabbi Tech Innovation Team',
     duration: '5 weeks',
     students: 52,

@@ -80,7 +80,7 @@ export const mockGraphData: GraphData = {
       id: 'divine-providence',
       label: 'Divine Providence',
       type: 'CONCEPT',
-      description: 'God\'s involvement in the world',
+      description: "God's involvement in the world",
     },
     {
       id: 'prophecy',

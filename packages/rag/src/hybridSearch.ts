@@ -27,7 +27,11 @@ export class HybridSearchEngine {
   private embeddings: CachedEmbeddings;
   private tableName: string;
 
-  constructor(pool: Pool, embeddings: CachedEmbeddings, tableName: string = 'vector_documents') {
+  constructor(
+    pool: Pool,
+    embeddings: CachedEmbeddings,
+    tableName: string = 'vector_documents'
+  ) {
     this.pool = pool;
     this.embeddings = embeddings;
     this.tableName = tableName;
@@ -47,10 +51,18 @@ export class HybridSearchEngine {
 
     // 1. Semantic search with vector similarity
     const queryEmbedding = await this.embeddings.embedQuery(query);
-    const semanticResults = await this.semanticSearch(queryEmbedding, tenantId, rerankTopK);
+    const semanticResults = await this.semanticSearch(
+      queryEmbedding,
+      tenantId,
+      rerankTopK
+    );
 
     // 2. Keyword search with full-text search
-    const keywordResults = await this.keywordSearch(query, tenantId, rerankTopK);
+    const keywordResults = await this.keywordSearch(
+      query,
+      tenantId,
+      rerankTopK
+    );
 
     // 3. Combine and rerank results
     const combined = this.combineResults(
@@ -88,7 +100,7 @@ export class HybridSearchEngine {
       [JSON.stringify(embedding), tenantId, limit]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       id: row.id,
       content: row.content,
       metadata: row.metadata,
@@ -117,7 +129,7 @@ export class HybridSearchEngine {
       [query, tenantId, limit]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       id: row.id,
       content: row.content,
       metadata: row.metadata,
@@ -181,15 +193,18 @@ export class HybridSearchEngine {
 
     // Then, traverse knowledge graph to find related concepts
     // This would use Apache AGE Cypher queries
-    const relatedConcepts = await this.findRelatedConcepts(hybridResults, tenantId);
+    const relatedConcepts = await this.findRelatedConcepts(
+      hybridResults,
+      tenantId
+    );
 
     // Combine and rerank
     return this.mergeWithGraphResults(hybridResults, relatedConcepts);
   }
 
   private async findRelatedConcepts(
-    results: HybridSearchResult[],
-    tenantId: string
+    _results: HybridSearchResult[],
+    _tenantId: string
   ): Promise<HybridSearchResult[]> {
     // Placeholder for Apache AGE graph traversal
     // In actual implementation, this would:
@@ -212,7 +227,10 @@ export class HybridSearchEngine {
 
     for (const result of graphResults) {
       if (!resultsMap.has(result.id)) {
-        resultsMap.set(result.id, { ...result, combinedScore: result.combinedScore * 0.5 });
+        resultsMap.set(result.id, {
+          ...result,
+          combinedScore: result.combinedScore * 0.5,
+        });
       }
     }
 

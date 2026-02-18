@@ -20,7 +20,11 @@ export class PgVectorStore {
   private tableName: string;
   private dimensions: number;
 
-  constructor(connectionString: string, tableName: string = 'vector_documents', dimensions: number = 768) {
+  constructor(
+    connectionString: string,
+    tableName: string = 'vector_documents',
+    dimensions: number = 768
+  ) {
     this.pool = new Pool({ connectionString });
     this.tableName = tableName;
     this.dimensions = dimensions;
@@ -64,7 +68,13 @@ export class PgVectorStore {
          embedding = EXCLUDED.embedding,
          metadata = EXCLUDED.metadata,
          tenant_id = EXCLUDED.tenant_id`,
-      [doc.id, doc.content, JSON.stringify(doc.embedding), JSON.stringify(doc.metadata), doc.tenantId]
+      [
+        doc.id,
+        doc.content,
+        JSON.stringify(doc.embedding),
+        JSON.stringify(doc.metadata),
+        doc.tenantId,
+      ]
     );
   }
 
@@ -82,7 +92,13 @@ export class PgVectorStore {
              embedding = EXCLUDED.embedding,
              metadata = EXCLUDED.metadata,
              tenant_id = EXCLUDED.tenant_id`,
-          [doc.id, doc.content, JSON.stringify(doc.embedding), JSON.stringify(doc.metadata), doc.tenantId]
+          [
+            doc.id,
+            doc.content,
+            JSON.stringify(doc.embedding),
+            JSON.stringify(doc.metadata),
+            doc.tenantId,
+          ]
         );
       }
 
@@ -115,7 +131,7 @@ export class PgVectorStore {
       [JSON.stringify(embedding), tenantId, similarityThreshold, limit]
     );
 
-    return result.rows.map(row => ({
+    return result.rows.map((row) => ({
       id: row.id,
       content: row.content,
       metadata: row.metadata,
@@ -130,7 +146,10 @@ export class PgVectorStore {
     );
   }
 
-  async deleteByMetadata(metadata: Record<string, any>, tenantId: string): Promise<void> {
+  async deleteByMetadata(
+    metadata: Record<string, any>,
+    tenantId: string
+  ): Promise<void> {
     await this.pool.query(
       `DELETE FROM ${this.tableName} WHERE metadata @> $1::jsonb AND tenant_id = $2`,
       [JSON.stringify(metadata), tenantId]

@@ -11,7 +11,7 @@ export function useOfflineSync() {
 
   useEffect(() => {
     // Listen to network status
-    const unsubscribe = NetInfo.addEventListener(state => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
       const online = state.isConnected ?? false;
       setIsOnline(online);
 
@@ -49,7 +49,7 @@ export function useOfflineSync() {
 
           // Mark as synced
           await database.updateMutationStatus(item.id, 'synced');
-          setPendingCount(prev => Math.max(0, prev - 1));
+          setPendingCount((prev) => Math.max(0, prev - 1));
         } catch (error) {
           console.error('Failed to sync mutation:', error);
           await database.updateMutationStatus(item.id, 'failed');
