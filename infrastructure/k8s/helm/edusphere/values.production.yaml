@@ -1,0 +1,15 @@
+replicaCount:
+  gateway: 5
+  subgraph: 3
+  frontend: 3
+
+gateway:
+  autoscaling:
+    minReplicas: 5
+    maxReplicas: 50
+
+ingress:
+  host: app.edusphere.io
+  tls:
+    enabled: true
+    secretName: edusphere-prod-tls

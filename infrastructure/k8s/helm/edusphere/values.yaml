@@ -1,0 +1,116 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+  namespace: edusphere
+
+replicaCount:
+  gateway: 3
+  subgraph: 2
+  frontend: 2
+
+image:
+  registry: ghcr.io
+  repository: edusphere
+  pullPolicy: IfNotPresent
+  tag: ""  # Overridden by CI
+
+gateway:
+  enabled: true
+  name: gateway
+  port: 4000
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  podDisruptionBudget:
+    minAvailable: 2
+
+subgraphs:
+  core:
+    enabled: true
+    port: 4001
+    replicas: 2
+  content:
+    enabled: true
+    port: 4002
+    replicas: 2
+  annotation:
+    enabled: true
+    port: 4003
+    replicas: 2
+  collaboration:
+    enabled: true
+    port: 4004
+    replicas: 2
+  agent:
+    enabled: true
+    port: 4005
+    replicas: 2
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+  knowledge:
+    enabled: true
+    port: 4006
+    replicas: 2
+
+frontend:
+  enabled: true
+  name: frontend
+  port: 80
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: true
+  className: traefik
+  host: edusphere.example.com
+  tls:
+    enabled: true
+    secretName: edusphere-tls
+
+postgresql:
+  enabled: false  # Use external managed DB in production
+
+redis:
+  enabled: false  # Use external managed Redis
+
+serviceAccount:
+  create: true
+  name: ""
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL

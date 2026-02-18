@@ -1,0 +1,38 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "edusphere.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "edusphere.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # GraphQL API (HTTP + WebSocket)
+    - match: Host() && PathPrefix()
+      kind: Rule
+      middlewares:
+        - name: {{ include "edusphere.fullname" . }}-rate-limit
+        - name: {{ include "edusphere.fullname" . }}-cors
+        - name: {{ include "edusphere.fullname" . }}-security-headers
+      services:
+        - name: {{ include "edusphere.fullname" . }}-gateway
+          port: {{ .Values.gateway.port }}
+    # Frontend (SPA - catch all)
+    - match: Host()
+      kind: Rule
+      middlewares:
+        - name: {{ include "edusphere.fullname" . }}-security-headers
+        - name: {{ include "edusphere.fullname" . }}-compress
+      services:
+        - name: {{ include "edusphere.fullname" . }}-frontend
+          port: 80
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName }}
+    domains:
+      - main: {{ .Values.ingress.host }}
+  {{- end }}
+{{- end }}

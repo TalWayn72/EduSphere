@@ -1,0 +1,58 @@
+{{- if .Values.ingress.enabled }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "edusphere.fullname" . }}-rate-limit
+  namespace: {{ .Values.global.namespace }}
+spec:
+  rateLimit:
+    average: 1000
+    burst: 500
+    period: 1m
+    sourceCriterion:
+      requestHeaderName: X-Tenant-ID
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "edusphere.fullname" . }}-cors
+  namespace: {{ .Values.global.namespace }}
+spec:
+  headers:
+    accessControlAllowMethods:
+      - GET
+      - POST
+      - OPTIONS
+    accessControlAllowHeaders:
+      - Authorization
+      - Content-Type
+      - X-Tenant-ID
+    accessControlAllowOriginList:
+      - "https://{{ .Values.ingress.host }}"
+    accessControlMaxAge: 86400
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "edusphere.fullname" . }}-security-headers
+  namespace: {{ .Values.global.namespace }}
+spec:
+  headers:
+    frameDeny: true
+    browserXssFilter: true
+    contentTypeNosniff: true
+    forceSTSHeader: true
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    stsPreload: true
+    contentSecurityPolicy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' wss:; font-src 'self'"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "edusphere.fullname" . }}-compress
+  namespace: {{ .Values.global.namespace }}
+spec:
+  compress: {}
+{{- end }}

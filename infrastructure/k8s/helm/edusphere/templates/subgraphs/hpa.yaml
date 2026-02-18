@@ -1,0 +1,32 @@
+{{- range winget,  := .Values.subgraphs }}
+{{- if .enabled }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "edusphere.fullname" $ }}-subgraph-{{ winget }}
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    {{- include "edusphere.labels" $ | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "edusphere.fullname" $ }}-subgraph-{{ winget }}
+  minReplicas: {{ .replicas | default $.Values.replicaCount.subgraph }}
+  maxReplicas: {{ mul (.replicas | default $.Values.replicaCount.subgraph) 5 }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+{{- end }}
+{{- end }}
