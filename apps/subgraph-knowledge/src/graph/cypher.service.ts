@@ -1,3 +1,15 @@
+/**
+ * CypherService — Apache AGE graph query helpers.
+ *
+ * EXCEPTION NOTE (150-line rule): This service intentionally exceeds the 150-line
+ * limit per CLAUDE.md § "Apache AGE graph query helpers with multiple Cypher patterns".
+ * It covers 5 vertex domains (Concept, Person, Term, Source, TopicCluster) each
+ * requiring find/create Cypher patterns that cannot be easily shared due to differing
+ * vertex labels and property schemas.
+ *
+ * SECURITY NOTE: Cypher queries currently use string interpolation. Must be migrated
+ * to parameterised prepared statements before production (NoSQL injection risk).
+ */
 import { Injectable, Logger } from '@nestjs/common';
 import {
   db,

@@ -4,6 +4,49 @@
 **מצב פרויקט:** ✅ Phase 9 - Dashboard Analytics (Completed) | 🔴 Phases 10-17 — Frontend Core UX (In Progress)
 **סטטוס כללי:** Backend Complete (Phases 0-8) | Frontend UI Gaps Identified — Critical UX Missing
 
+---
+
+## 🔴 Security — CypherService Injection Vulnerability
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical |
+| **Status** | 🟡 Documented — Needs Fix Before Production |
+| **File** | `apps/subgraph-knowledge/src/graph/cypher.service.ts` |
+| **Issue** | All Cypher queries use string interpolation (e.g. `` `MATCH (c:Concept {id: '${id}'})` ``) — vulnerable to Cypher injection (NoSQL injection) |
+| **Rule violated** | CLAUDE.md § Security: "All Cypher queries use parameterized prepared statements" |
+| **Fix** | Replace string interpolation with parameterized queries via `executeCypher(db, graph, query, params)` pattern |
+| **Blocker for** | Any production deployment |
+
+---
+
+## ✅ Project Structure Audit — Feb 2026 (Completed)
+
+Audit performed 18 Feb 2026. Issues found and resolved:
+
+| Issue | Fix | Status |
+|-------|-----|--------|
+| Root dir had 15+ stray .md files | Moved to `docs/project/`, `docs/development/`, `docs/deployment/`, `docs/reports/` | ✅ Fixed |
+| 3 Bellor project files at root | Moved to `legacy/` | ✅ Fixed |
+| 4 PDFs at root (binary files in repo) | Moved to `docs/reference/` | ✅ Fixed |
+| `API-CONTRACTS-GRAPHQL-FEDERATION (1).md` — bad filename | Renamed to `API-CONTRACTS-GRAPHQL-FEDERATION.md` | ✅ Fixed |
+| `compass_artifact_wf-UUID.md` — unreadable filename | Renamed to `docs/reference/TECH-STACK-DECISIONS.md` | ✅ Fixed |
+| `VITE_DEV_MODE` missing from `vite-env.d.ts` types | Added `readonly VITE_DEV_MODE: string` | ✅ Fixed |
+| `mock-annotations.ts` (323 lines) — data mixed with logic | Extracted data to `mock-annotations.data.ts` (263 lines) | ✅ Fixed |
+| `ContentViewer.tsx` (844 lines) — no exception doc | Extracted utils to `content-viewer.utils.tsx`, added exception comment | ✅ Improved |
+| `vitest.config.ts` — empty (no globals/coverage) | Enhanced with globals, jsdom, coverage thresholds (80%) | ✅ Fixed |
+| `playwright.config.ts` — missing | Created with Chromium + webServer config | ✅ Fixed |
+| Vite `.mjs` timestamp files cluttering git status | Added `vite.config.ts.timestamp-*.mjs` to `.gitignore` | ✅ Fixed |
+
+### Outstanding (Lower Priority)
+- `ContentViewer.tsx` still ~795 lines (documented exception, needs extract to sub-components in future phase)
+- `apps/web` has 0 test files — vitest/playwright installed but no tests written yet
+- `zustand`, `@tanstack/react-query`, `zod` not installed in `apps/web` (promised in CLAUDE.md)
+- `@testing-library/react` not installed — needed before writing component tests
+- `seed.ts` uses `console.log` (violates "no console.log" rule) — acceptable for seed scripts
+
+---
+
 ## 🔴 ניתוח פערים קריטי — Frontend
 
 ניתוח מ-18 פברואר 2026 גילה שה-Backend מלא אבל ה-Frontend חסרות פיצ'רים קריטיים:

@@ -21,6 +21,7 @@ import {
   MOCK_TOTAL_STUDY_MINUTES,
   MOCK_CONCEPTS_MASTERED,
 } from '@/lib/mock-analytics';
+import { MOCK_ME, MOCK_COURSES } from '@/lib/mock-dashboard.data';
 import {
   BookOpen,
   Users,
@@ -32,66 +33,6 @@ import {
 } from 'lucide-react';
 
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
-
-const MOCK_ME = {
-  me: {
-    id: 'dev-user-1',
-    username: 'developer',
-    email: 'dev@edusphere.local',
-    firstName: 'Dev',
-    lastName: 'User',
-    role: 'SUPER_ADMIN',
-    tenantId: 'dev-tenant-1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-};
-
-const MOCK_COURSES = {
-  courses: {
-    edges: [
-      {
-        cursor: 'course-1',
-        node: {
-          id: 'course-1',
-          title: 'Introduction to Talmud Study',
-          description:
-            'Learn the fundamentals of Talmudic reasoning and argumentation',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      },
-      {
-        cursor: 'course-2',
-        node: {
-          id: 'course-2',
-          title: 'Advanced Chavruta Techniques',
-          description:
-            'Master the art of collaborative Talmud learning with AI assistance',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      },
-      {
-        cursor: 'course-3',
-        node: {
-          id: 'course-3',
-          title: 'Knowledge Graph Navigation',
-          description:
-            'Explore interconnected concepts in Jewish texts using graph-based learning',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      },
-    ],
-    pageInfo: {
-      hasNextPage: false,
-      hasPreviousPage: false,
-      startCursor: 'course-1',
-      endCursor: 'course-3',
-    },
-  },
-};
 
 export function Dashboard() {
   const [meResult] = useQuery({ query: ME_QUERY, pause: DEV_MODE });
@@ -146,42 +87,30 @@ export function Dashboard() {
           </Card>
         )}
 
-        {/* Stats Cards */}
+        {/* Primary Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Active Courses
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {coursesFetching
-                  ? '...'
-                  : (coursesData?.courses?.edges?.length ?? 0)}
+                {coursesFetching ? '...' : (coursesData?.courses?.edges?.length ?? 0)}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Enrolled and in progress
-              </p>
+              <p className="text-xs text-muted-foreground">Enrolled and in progress</p>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Learning Streak
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Learning Streak</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {MOCK_LEARNING_STREAK} days
-              </div>
+              <div className="text-2xl font-bold">{MOCK_LEARNING_STREAK} days</div>
               <p className="text-xs text-muted-foreground">Keep it up! 🔥</p>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Study Time</CardTitle>
@@ -192,19 +121,14 @@ export function Dashboard() {
               <p className="text-xs text-muted-foreground">Total this month</p>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Concepts Mastered
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Concepts Mastered</CardTitle>
               <Brain className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{MOCK_CONCEPTS_MASTERED}</div>
-              <p className="text-xs text-muted-foreground">
-                In knowledge graph
-              </p>
+              <p className="text-xs text-muted-foreground">In knowledge graph</p>
             </CardContent>
           </Card>
         </div>
@@ -213,19 +137,14 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Study Groups
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Study Groups</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">3</div>
-              <p className="text-xs text-muted-foreground">
-                Active collaborations
-              </p>
+              <p className="text-xs text-muted-foreground">Active collaborations</p>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Annotations</CardTitle>
@@ -233,12 +152,9 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">127</div>
-              <p className="text-xs text-muted-foreground">
-                Notes and highlights
-              </p>
+              <p className="text-xs text-muted-foreground">Notes and highlights</p>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">AI Sessions</CardTitle>
@@ -246,26 +162,19 @@ export function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">45</div>
-              <p className="text-xs text-muted-foreground">
-                Learning agent interactions
-              </p>
+              <p className="text-xs text-muted-foreground">Learning agent interactions</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Course Progress + Weekly Stats */}
-        <LearningStats
-          courses={MOCK_COURSE_PROGRESS}
-          weeklyStats={MOCK_WEEKLY_STATS}
-        />
+        <LearningStats courses={MOCK_COURSE_PROGRESS} weeklyStats={MOCK_WEEKLY_STATS} />
 
         {/* Activity Heatmap */}
         <Card>
           <CardHeader>
             <CardTitle>Study Activity</CardTitle>
-            <CardDescription>
-              Your learning activity over the past 12 weeks
-            </CardDescription>
+            <CardDescription>Your learning activity over the past 12 weeks</CardDescription>
           </CardHeader>
           <CardContent>
             <ActivityHeatmap data={MOCK_HEATMAP_DATA} />
@@ -287,9 +196,7 @@ export function Dashboard() {
           {meFetching ? (
             <Card>
               <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">
-                  Loading profile...
-                </p>
+                <p className="text-sm text-muted-foreground">Loading profile...</p>
               </CardContent>
             </Card>
           ) : meData?.me ? (
@@ -301,30 +208,20 @@ export function Dashboard() {
               <CardContent>
                 <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Username
-                    </dt>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Username</dt>
                     <dd className="text-sm mt-1">{meData.me.username}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Email
-                    </dt>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</dt>
                     <dd className="text-sm mt-1">{meData.me.email}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Role
-                    </dt>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Role</dt>
                     <dd className="text-sm mt-1">{meData.me.role}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Tenant
-                    </dt>
-                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">
-                      {meData.me.tenantId}
-                    </dd>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tenant</dt>
+                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{meData.me.tenantId}</dd>
                   </div>
                 </dl>
               </CardContent>

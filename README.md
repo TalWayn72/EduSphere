@@ -294,17 +294,19 @@ For detailed architecture diagrams: [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-R
 
 | Phase | Description | Duration | Status |
 |-------|-------------|----------|--------|
-| **Phase 0** | Foundation -- Monorepo, Docker stack, Hello World query | 1-2 days | 🔴 Not Started |
-| **Phase 1** | Data Layer -- 16 tables, RLS, AGE graph, pgvector, seed | 2-3 days | 🔴 Not Started |
-| **Phase 2** | Core + Content Subgraphs -- Auth, JWT, Tenants, Users, Courses, Media | 3-5 days | 🔴 Not Started |
-| **Phase 3** | Annotation + Collaboration -- Layers, CRDT, WebSocket, presence | 3-4 days | 🔴 Not Started |
-| **Phase 4** | Knowledge Subgraph -- Graph traversal, embeddings, HybridRAG | 4-5 days | 🔴 Not Started |
-| **Phase 5** | Agent Subgraph -- LangGraph workflows, templates, sandboxing | 4-5 days | 🔴 Not Started |
-| **Phase 6** | Frontend -- React SPA, TanStack Query, video player, AI chat | 5-7 days | 🔴 Not Started |
-| **Phase 7** | Production Hardening -- Performance, K8s, load tests, security | 5-7 days | 🔴 Not Started |
-| **Phase 8** | Mobile + Advanced -- Expo app, transcription worker, Chavruta | 5-7 days | 🔴 Not Started |
+| **Phase 0** | Foundation -- Monorepo, Docker stack, Hello World query | 1-2 days | ✅ Complete |
+| **Phase 1** | Data Layer -- 16 tables, RLS, AGE graph, pgvector, seed | 2-3 days | ✅ Complete |
+| **Phase 2** | Core + Content Subgraphs -- Auth, JWT, Tenants, Users, Courses, Media | 3-5 days | ✅ Complete |
+| **Phase 3** | Annotation + Collaboration -- Layers, CRDT, WebSocket, presence | 3-4 days | ✅ Complete |
+| **Phase 4** | Knowledge Subgraph -- Graph traversal, embeddings, HybridRAG | 4-5 days | ✅ Complete |
+| **Phase 5** | Agent Subgraph -- LangGraph workflows, templates, sandboxing | 4-5 days | ✅ Complete |
+| **Phase 6** | Frontend -- React SPA, TanStack Query, video player, AI chat | 5-7 days | ✅ Complete |
+| **Phase 7** | Production Hardening -- Performance, K8s, load tests, security | 5-7 days | ✅ Complete |
+| **Phase 8** | Mobile + Advanced -- Expo app, transcription worker, Chavruta | 5-7 days | ✅ Complete |
+| **Phase 9** | Dashboard Analytics -- Heatmap, progress bars, activity feed | 2-3 days | ✅ Complete |
+| **Phases 10-17** | Frontend Core UX -- Video player, semantic search, agent chat, collaboration | 15-25 days | 🔴 In Progress |
 
-**Total Estimated Duration:** 32-45 working days (with parallelization: ~25-35 days)
+**Current Status:** Backend complete (Phases 0-9) — see [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -317,9 +319,9 @@ See [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) for detailed phase br
 | **Project** | [CLAUDE.md](CLAUDE.md) -- AI assistant configuration and work rules |
 | | [OPEN_ISSUES.md](OPEN_ISSUES.md) -- Issue tracking and status |
 | **Architecture** | [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) -- Phased build plan |
-| | [API-CONTRACTS-GRAPHQL-FEDERATION.md](API-CONTRACTS-GRAPHQL-FEDERATION%20%281%29.md) -- GraphQL schema contracts |
-| | [EduSphere Claude.pdf](EduSphere%20Claude.pdf) -- Architecture guide and tech decisions |
-| | [EduSphere DB.pdf](EduSphere%20DB.pdf) -- Database design deep-dive |
+| | [API-CONTRACTS-GRAPHQL-FEDERATION.md](API-CONTRACTS-GRAPHQL-FEDERATION.md) -- GraphQL schema contracts |
+| | [EduSphere Claude.pdf](docs/reference/EduSphere%20Claude.pdf) -- Architecture guide and tech decisions |
+| | [EduSphere DB.pdf](docs/reference/EduSphere%20DB.pdf) -- Database design deep-dive |
 | **API** | GraphQL Playground: http://localhost:4000/graphql |
 | | Hive Schema Registry: [Configure URL] |
 

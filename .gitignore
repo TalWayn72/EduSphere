@@ -72,6 +72,9 @@ Thumbs.db
 *.swp
 *~
 
+# Vite build cache timestamps
+vite.config.ts.timestamp-*.mjs
+
 # Generated files
 graphql-types/
 .graphql/

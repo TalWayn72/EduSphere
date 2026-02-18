@@ -1,3 +1,9 @@
+/**
+ * Mock analytics data for Dashboard.
+ * EXCEPTION NOTE (150-line rule): Interfaces and their corresponding mock constants
+ * are tightly coupled (DailyActivity↔MOCK_HEATMAP_DATA, CourseProgress↔MOCK_COURSE_PROGRESS,
+ * etc.). Splitting them across files would hurt discoverability without meaningful benefit.
+ */
 export interface DailyActivity {
   date: string; // ISO date string
   count: number; // 0-10 study sessions

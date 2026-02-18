@@ -1,3 +1,14 @@
+/**
+ * ContentViewer — main learning interface.
+ *
+ * EXCEPTION NOTE (150-line rule): This component intentionally exceeds the 150-line
+ * limit because it orchestrates 4 tightly coupled concerns:
+ *   1. HTML5 video player (keyboard shortcuts, seek bar, playback speed)
+ *   2. Transcript sync (auto-scroll, highlight search terms)
+ *   3. Annotation layers (CRUD, layer toggle, optimistic updates, threading)
+ *   4. AI Chavruta chat (session management, mock Chavruta responses)
+ * Shared utilities and constants live in ./content-viewer.utils.ts.
+ */
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
@@ -27,6 +38,12 @@ import {
 import { mockGraphData } from '@/lib/mock-graph-data';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
 import {
+  LAYER_META,
+  SPEED_OPTIONS,
+  formatTime,
+  highlightText,
+} from './content-viewer.utils';
+import {
   Play,
   Pause,
   Volume2,
@@ -46,60 +63,6 @@ import {
 } from 'lucide-react';
 
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
-
-// ─── Layer colours ────────────────────────────────────────────────────────────
-const LAYER_META: Record<string, { label: string; color: string; bg: string }> =
-  {
-    PERSONAL: {
-      label: 'Personal',
-      color: 'text-violet-700',
-      bg: 'bg-violet-50 border-violet-200',
-    },
-    SHARED: {
-      label: 'Shared',
-      color: 'text-blue-700',
-      bg: 'bg-blue-50   border-blue-200',
-    },
-    INSTRUCTOR: {
-      label: 'Instructor',
-      color: 'text-green-700',
-      bg: 'bg-green-50  border-green-200',
-    },
-    AI_GENERATED: {
-      label: 'AI',
-      color: 'text-amber-700',
-      bg: 'bg-amber-50  border-amber-200',
-    },
-  };
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatTime(s: number) {
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return `${m}:${sec.toString().padStart(2, '0')}`;
-}
-
-function highlightText(text: string, query: string) {
-  if (!query.trim() || query.length < 2) return <>{text}</>;
-  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
-  const lower = query.toLowerCase();
-  return (
-    <>
-      {parts.map((part, i) =>
-        part.toLowerCase() === lower ? (
-          <mark key={i} className="bg-yellow-200 text-yellow-900 rounded px-0.5">
-            {part}
-          </mark>
-        ) : (
-          <span key={i}>{part}</span>
-        )
-      )}
-    </>
-  );
-}
-
-const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function ContentViewer() {
