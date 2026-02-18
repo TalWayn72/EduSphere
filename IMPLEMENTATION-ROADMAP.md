@@ -856,11 +856,24 @@ pnpm --filter @edusphere/web test:e2e  # all green
 
 ---
 
-## Phase 7: Production Hardening
+## Phase 7: Production Hardening (✅ PARTIALLY COMPLETED — 18 Feb 2026)
 
 **Goal**: The system is production-ready for 100,000+ concurrent users with monitoring, autoscaling, security hardening, and performance optimization.
 
 **Duration estimate**: 5–7 days
+
+**✅ Completed (18 Feb 2026):**
+- Phase 7.4: Kubernetes deployment — Helm chart (22 manifests), Traefik IngressRoute + 4 Middlewares, ExternalSecret CRD, Kustomize overlays (production/staging)
+- Phase 7.5: Load testing — k6 smoke/load/stress scenarios + Keycloak auth utils
+- GraphQL Subscriptions — `graphql-ws` + `subscriptionExchange` in urql-client, `MESSAGE_STREAM_SUBSCRIPTION` wired in AgentsPage
+- Security hardening: runAsNonRoot, readOnlyRootFilesystem, all Linux capabilities dropped in all containers
+- Traefik rate-limit (1000 req/min per tenant), CORS, HSTS, CSP, compression middlewares
+
+**⏳ Remaining Phase 7 tasks:**
+- Phase 7.1: PgBouncer, CDN, read replicas, persisted queries
+- Phase 7.2: OpenTelemetry spans, Prometheus metric endpoints, PagerDuty alerting
+- Phase 7.3: Query complexity analysis, persisted-only queries in production
+- CD pipeline: GitHub Actions `cd.yml` deploying Helm to staging → production
 
 ### Phase 7.1: Performance Optimization
 

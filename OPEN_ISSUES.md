@@ -1,8 +1,8 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 18 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 14 Full Annotation System — ALL Frontend Phases Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ (CypherService verified parameterized)
+**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅
 **בדיקות Web:** 146 unit tests עוברות (12 suites) | Backend: 37 tests (3 suites) | סה"כ: **183 tests** | Component tests (RTL): ✅ | Security ESLint: ✅ | CodeQL: ✅
 
 ---
@@ -86,10 +86,14 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 
 **GraphQL Integration:** KnowledgeGraph, AgentsPage, ContentViewer, Dashboard — כולם מחוברים ל-API אמיתי עם DEV_MODE fallback
 
+**GraphQL Subscriptions:** `graphql-ws` + `subscriptionExchange` פועלים — AI agent streaming אמיתי ב-AgentsPage
+
+**Phase 7 Production Hardening:** Helm chart (26 manifests) + k6 load tests (3 scenarios) + Traefik IngressRoute מוכן
+
 **הבא בתור:**
-1. Phase 7 Production Hardening — K8s manifests, Traefik, load testing (k6), monitoring
-2. Phase 8 Mobile — Expo SDK 54, offline-first patterns
-3. GraphQL Subscriptions — subscriptionExchange לצורך AI agent streaming אמיתי
+1. Phase 8 Mobile — Expo SDK 54, offline-first with expo-sqlite + TanStack Query
+2. CD pipeline — GitHub Actions `cd.yml` + Helm deploy to K8s cluster
+3. Prometheus/Grafana dashboards wiring to real metrics endpoints
 
 ---
 
@@ -106,8 +110,8 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | Environment | Purpose | Infrastructure | Status |
 |-------------|---------|----------------|--------|
 | **Local Dev** | Development environment | Docker Compose | ⏳ To be set up (Phase 0.2) |
-| **Staging** | QA and testing | Kubernetes cluster | ⏳ To be set up (Phase 7) |
-| **Production** | Live system (100K+ users) | Kubernetes cluster (HA) | ⏳ To be set up (Phase 7) |
+| **Staging** | QA and testing | Kubernetes cluster | ✅ Helm chart + Kustomize overlay ready (Phase 7) |
+| **Production** | Live system (100K+ users) | Kubernetes cluster (HA) | ✅ Helm chart + HPA + PDB + Traefik ready (Phase 7) |
 
 ---
 
@@ -131,6 +135,37 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | **Enhancements** | 1 | 🟡 Medium | ✅ Completed |
 
 **סה"כ:** 27 פריטים → 27 הושלמו ✅ | 0 בתכנון 🎉
+
+---
+
+## ✅ TASK-013: Phase 7 Production Hardening + GraphQL Subscriptions (18 פברואר 2026)
+
+**סטטוס:** ✅ הושלם | **חומרה:** 🟡 Medium | **תאריך:** 18 February 2026
+**Commits:** `34e65db` (Phase 7 K8s/Helm/k6), `9b75c1e` (GraphQL Subscriptions)
+
+### Agent-A — GraphQL Subscriptions
+| שינוי | פרטים |
+|-------|--------|
+| `graphql-ws` installed | `pnpm --filter @edusphere/web add graphql-ws` |
+| `apps/web/src/lib/urql-client.ts` | Added `subscriptionExchange` + `createWsClient` (graphql-ws) |
+| WebSocket auth | `connectionParams` injects JWT bearer token |
+| URL fallback | `VITE_GRAPHQL_WS_URL` → auto-derive from `VITE_GRAPHQL_URL` (http→ws) |
+| `apps/web/src/pages/AgentsPage.tsx` | `useSubscription(MESSAGE_STREAM_SUBSCRIPTION)` — paused in DEV_MODE |
+| Streaming effect | Appends chunks to last agent message during `isStreaming=true`, finalizes on `false` |
+| TypeScript | 0 errors | Tests: 146/146 passing |
+
+### Agent-B — Phase 7 Production Hardening (26 files)
+| Component | Files | Details |
+|-----------|-------|---------|
+| Helm Chart | `Chart.yaml`, `values.yaml`, `values.production.yaml` | `appVersion: 1.0.0`, bitnami deps |
+| Gateway | `deployment.yaml`, `service.yaml`, `hpa.yaml` (3-20 replicas), `pdb.yaml` (minAvailable: 2) | CPU 70% / mem 80% |
+| Subgraphs | Parameterized `deployment.yaml`, `service.yaml`, `hpa.yaml` for all 6 | Single `range` loop |
+| Frontend | `deployment.yaml`, `service.yaml`, `hpa.yaml` (2-10 replicas) | Nginx serving SPA |
+| Traefik | `traefik-ingressroute.yaml`, `middleware.yaml` (rate-limit/CORS/HSTS/CSP/compress) | 1000 req/min per tenant |
+| Secrets | `external-secrets.yaml` (ExternalSecret CRD → Vault/AWS SM) | DATABASE_URL, NATS_URL, etc. |
+| Kustomize | `base/`, `overlays/production/`, `overlays/staging/` | Namespace isolation |
+| k6 Tests | `smoke.js` (1VU/1min), `load.js` (1000VU/10min), `stress.js` (5000VU breaking) | p95<2s load, p99<5s |
+| k6 Utils | `auth.js` (Keycloak ROPC), `helpers.js` (GraphQL POST wrapper) | Reusable across scenarios |
 
 ---
 

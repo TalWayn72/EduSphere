@@ -342,24 +342,35 @@ pnpm dev
 pnpm turbo docker:build
 
 # Deploy to Kubernetes via Helm
-helm install edusphere ./infrastructure/k8s/charts/edusphere \
+helm install edusphere ./infrastructure/k8s/helm/edusphere \
   --namespace edusphere \
   --create-namespace \
-  --values ./infrastructure/k8s/values.prod.yaml
+  --values ./infrastructure/k8s/helm/edusphere/values.production.yaml
 
 # Verify deployment
 kubectl get pods -n edusphere
-kubectl get ingress -n edusphere
+kubectl get ingressroute -n edusphere  # Traefik CRD
+
+# Run k6 load tests
+k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
+  -e BASE_URL=https://app.edusphere.io \
+  -e TEST_USER=testuser@edusphere.io \
+  -e TEST_PASS=testpass
 ```
 
-**Helm Chart Features:**
-- HPA: 3-10 pods per subgraph, CPU 70% target
-- PDB: Minimum 2 pods available during updates
-- Rolling updates: MaxSurge 1, MaxUnavailable 0
-- Traefik Ingress with automatic TLS (Let's Encrypt)
-- StatefulSet for PostgreSQL with PVC
-- NATS JetStream cluster (3 nodes)
-- Keycloak HA mode (2+ replicas)
+**Helm Chart Features (Phase 7):**
+- Gateway: HPA 3-20 replicas (CPU 70% / mem 80%), PDB minAvailable 2
+- Subgraphs: Parameterized deployment for all 6 (single range loop), HPA auto-scale 5x
+- Frontend: HPA 2-10 replicas
+- Traefik IngressRoute: rate-limit (1000 req/min per tenant), CORS, HSTS/CSP security headers, gzip
+- ExternalSecret CRD: Vault/AWS Secrets Manager for DATABASE_URL, NATS_URL, Keycloak, MinIO creds
+- Kustomize overlays: production (edusphere-production ns) + staging (edusphere-staging ns)
+- Security hardening: runAsNonRoot, readOnlyRootFilesystem, all Linux capabilities dropped
+
+**k6 Load Tests:**
+- `smoke.js` — 1 VU / 1 min (verify system operational, p95 < 1000ms)
+- `load.js` — ramp to 1000 VU over 10 min (100K users @ 10% peak simultaneity), p95 < 2s
+- `stress.js` — ramp to 5000 VU (find breaking point), p99 < 10s
 
 ---
 
