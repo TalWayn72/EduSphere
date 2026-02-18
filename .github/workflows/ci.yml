@@ -112,11 +112,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage (thresholds enforced)
         run: pnpm turbo test -- --coverage --reporter=verbose
         env:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+      - name: Enforce frontend coverage thresholds
+        # vitest.config.ts already defines thresholds (80% lines/functions, 70% branches)
+        # If thresholds are not met, vitest exits with code 1 → CI fails
+        run: pnpm --filter @edusphere/web test -- --coverage --reporter=json
+        continue-on-error: false
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -164,12 +170,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run npm audit
+      - name: Run audit (all deps — report moderate, non-blocking)
         run: pnpm audit --audit-level=moderate
-        continue-on-error: true # Don't fail build on vulnerabilities (just report)
+        continue-on-error: true # Dev deps may have moderate; report only
 
-      - name: Run pnpm audit for production dependencies
+      - name: Run audit (prod deps — block on high)
         run: pnpm audit --prod --audit-level=high
+
+      - name: Run audit (prod deps — block on critical)
+        run: pnpm audit --prod --audit-level=critical
 
   # Build job - ensures all packages build successfully
   build:
@@ -212,11 +221,52 @@ jobs:
             packages/*/dist
           retention-days: 3
 
+  # E2E tests — Playwright, frontend-only (no backend required)
+  e2e-tests:
+    name: E2E Tests (Playwright — frontend only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @edusphere/web exec playwright install --with-deps chromium
+
+      - name: Run Playwright E2E tests
+        run: pnpm --filter @edusphere/web test:e2e
+        env:
+          # CI mode: no real backend, Playwright starts Vite dev server automatically
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 7
+
   # Summary job - all checks must pass
   ci-complete:
     name: CI Complete
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, unit-tests, security-scan, build]
+    needs: [lint, typecheck, unit-tests, security-scan, build, e2e-tests]
     if: always()
 
     steps:
@@ -226,7 +276,8 @@ jobs:
                 "${{ needs.typecheck.result }}" != "success" || \
                 "${{ needs.unit-tests.result }}" != "success" || \
                 "${{ needs.security-scan.result }}" != "success" || \
-                "${{ needs.build.result }}" != "success" ]]; then
+                "${{ needs.build.result }}" != "success" || \
+                "${{ needs.e2e-tests.result }}" != "success" ]]; then
             echo "One or more CI jobs failed"
             exit 1
           fi

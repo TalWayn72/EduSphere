@@ -390,18 +390,21 @@ kubectl get ingress -n edusphere
 
 | Category | Framework | Location | Status |
 |----------|-----------|----------|--------|
-| **Frontend Unit Tests** | Vitest + jsdom + RTL | `apps/web/src/**/*.test.{ts,tsx}` | ✅ **107 tests / 9 suites passing** |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL | `apps/web/src/**/*.test.{ts,tsx}` | ✅ **146 tests / 12 suites passing** |
+| **Backend Unit Tests** | Vitest | `apps/*/src/**/*.spec.ts` | ✅ **37 tests / 3 suites passing** (subgraph-core) |
 | **Frontend E2E** | Playwright | `apps/web/e2e/*.spec.ts` | ⏳ Specs ready — needs dev server |
-| **Backend Unit Tests** | Vitest | `apps/*/src/**/*.spec.ts` | ⏳ In progress (other session) |
 | **Integration Tests** | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts` | ⏳ Planned Phase 7 |
 | **RLS Validation** | Vitest | `packages/db/src/rls/*.test.ts` | ⏳ Planned Phase 7 |
 | **GraphQL Tests** | Vitest + SuperTest | `apps/*/src/test/graphql/*.spec.ts` | ⏳ Planned Phase 7 |
 | **Federation Tests** | Vitest | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7 |
 | **Load Tests** | k6 | `infrastructure/k6/*.js` | ⏳ Planned Phase 7 |
 
-**Frontend Unit Test Suites (107 tests, all green):**
-- `ActivityFeed.test.tsx` — component render, all 5 activity types, RTL queries (12 tests) 🆕
-- `ActivityHeatmap.test.tsx` — component render, legend, padding, tooltips, RTL (8 tests) 🆕
+**Frontend Unit Test Suites (146 tests, all green):**
+- `Layout.test.tsx` — nav items, logo, UserMenu, role-based links (11 tests) 🆕
+- `Dashboard.test.tsx` — stats cards, loading/error states, AIChatPanel (15 tests) 🆕
+- `AnnotationsPage.test.tsx` — heading, sort controls, tabs, layer filters (13 tests) 🆕
+- `ActivityFeed.test.tsx` — component render, all 5 activity types, RTL queries (12 tests)
+- `ActivityHeatmap.test.tsx` — component render, legend, padding, tooltips, RTL (8 tests)
 - `activity-feed.utils.test.ts` — `formatRelativeTime` with fake timers (8 tests)
 - `heatmap.utils.test.ts` — `getHeatmapColor`, `formatHeatmapDate`, `calcHeatmapStats` (16 tests)
 - `mock-analytics.test.ts` — heatmap data shape, course progress, weekly stats (14 tests)
@@ -410,9 +413,15 @@ kubectl get ingress -n edusphere
 - `content-viewer.utils.test.ts` — `formatTime`, `LAYER_META`, `SPEED_OPTIONS` (15 tests)
 - `AnnotationCard.test.ts` — `formatAnnotationTimestamp`, `ANNOTATION_LAYER_META` (12 tests)
 
+**Backend Unit Test Suites (37 tests, all green — subgraph-core):**
+- `user.service.spec.ts` — findById, findAll, create, update (15 tests) 🆕
+- `tenant.service.spec.ts` — findById, findAll with pagination (8 tests) 🆕
+- `user.resolver.spec.ts` — health, getUser, getUsers, me, createUser, updateUser (14 tests) 🆕
+
 **Testing Infrastructure:**
 - `src/test/setup.ts` — jest-dom matchers + MSW server lifecycle
-- `src/test/server.ts` + `src/test/handlers.ts` — MSW GraphQL mock server
+- `src/test/server.ts` + `src/test/handlers.ts` — MSW GraphQL mock server (18 real schema operations)
+- `packages/db/package.json` — ESM `"import"` condition added for Vitest compatibility
 
 **Coverage Targets:**
 - Backend: >90% line coverage per subgraph

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,12 @@ import {
   Send,
   RotateCcw,
 } from 'lucide-react';
+import {
+  START_AGENT_SESSION_MUTATION,
+  SEND_AGENT_MESSAGE_MUTATION,
+} from '@/lib/graphql/agent.queries';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 
 // ─── Agent modes ──────────────────────────────────────────────────────────────
 const AGENT_MODES = [
@@ -119,10 +126,25 @@ interface ChatMsg {
   content: string;
 }
 
+// Template type mapping (mode id → GraphQL enum value)
+const TEMPLATE_TYPE: Record<AgentModeId, string> = {
+  chavruta: 'CHAVRUTA',
+  quiz: 'QUIZ',
+  summarize: 'SUMMARIZE',
+  research: 'RESEARCH',
+  explain: 'EXPLAIN',
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export function AgentsPage() {
   const [activeMode, setActiveMode] = useState<AgentModeId>('chavruta');
   const [chatInput, setChatInput] = useState('');
+  // Session IDs per mode (real API only)
+  const [agentSessionIds, setAgentSessionIds] = useState<Partial<Record<AgentModeId, string>>>({});
+
+  const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
+  const [, sendMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
+
   const [sessions, setSessions] = useState<Record<AgentModeId, ChatMsg[]>>({
     chavruta: [
       {
@@ -178,7 +200,7 @@ export function AgentsPage() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingContent, isTyping]);
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     if (!chatInput.trim() || isTyping || streamingContent) return;
     const userMsg: ChatMsg = {
       id: Date.now().toString(),
@@ -186,12 +208,47 @@ export function AgentsPage() {
       content: chatInput,
     };
     const capturedMode = activeMode;
+    const capturedInput = chatInput;
     setChatInput('');
     setSessions((prev) => ({
       ...prev,
       [capturedMode]: [...prev[capturedMode], userMsg],
     }));
 
+    if (!DEV_MODE) {
+      // ── Real API path ──
+      setIsTyping(true);
+      try {
+        let sessionId = agentSessionIds[capturedMode];
+        if (!sessionId) {
+          const res = await startSession({
+            input: { templateType: TEMPLATE_TYPE[capturedMode] },
+          });
+          sessionId = res.data?.startAgentSession?.id ?? undefined;
+          if (sessionId) {
+            setAgentSessionIds((prev) => ({ ...prev, [capturedMode]: sessionId }));
+          }
+        }
+        if (sessionId) {
+          const res = await sendMessage({ sessionId, content: capturedInput });
+          const reply = res.data?.sendMessage;
+          if (reply) {
+            setSessions((prev) => ({
+              ...prev,
+              [capturedMode]: [
+                ...prev[capturedMode],
+                { id: reply.id as string, role: 'agent', content: reply.content as string },
+              ],
+            }));
+          }
+        }
+      } finally {
+        setIsTyping(false);
+      }
+      return;
+    }
+
+    // ── Mock / DEV_MODE path — streaming animation ──
     setIsTyping(true);
     setTimeout(() => {
       const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
@@ -222,7 +279,7 @@ export function AgentsPage() {
         }
       }, 18);
     }, 600);
-  }, [chatInput, activeMode, isTyping, streamingContent]);
+  }, [chatInput, activeMode, isTyping, streamingContent, agentSessionIds, startSession, sendMessage]);
 
   const handleReset = () => {
     setSessions((prev) => ({ ...prev, [activeMode]: [prev[activeMode][0]!] }));
@@ -235,6 +292,11 @@ export function AgentsPage() {
           <h1 className="text-2xl font-bold">AI Learning Agents</h1>
           <p className="text-sm text-muted-foreground">
             Choose an agent mode to enhance your learning
+            {DEV_MODE && (
+              <span className="ml-2 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 px-1.5 py-0.5 rounded">
+                Dev Mode — mock responses
+              </span>
+            )}
           </p>
         </div>
 

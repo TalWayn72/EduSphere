@@ -1,10 +1,14 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { mockGraphData, GraphNode } from '@/lib/mock-graph-data';
-import { Search, BookOpen, ChevronRight, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { mockGraphData, GraphNode, GraphEdge, NodeType, EdgeType } from '@/lib/mock-graph-data';
+import { CONCEPT_GRAPH_QUERY } from '@/lib/graphql/knowledge.queries';
+import { Search, BookOpen, ChevronRight, ZoomIn, ZoomOut, Maximize2, Loader2 } from 'lucide-react';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const SVG_W = 520,
@@ -46,6 +50,7 @@ function computePositions(nodes: GraphNode[]) {
 // ─── Component ────────────────────────────────────────────────────────────────
 export function KnowledgeGraph() {
   const navigate = useNavigate();
+  const { contentId = 'content-1' } = useParams<{ contentId: string }>();
   const [selectedId, setSelectedId] = useState<string>('free-will');
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
@@ -57,7 +62,40 @@ export function KnowledgeGraph() {
   const panStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const positions = useMemo(() => computePositions(mockGraphData.nodes), []);
+  // ── Real GraphQL data (paused in DEV_MODE) ──
+  const [graphResult] = useQuery({
+    query: CONCEPT_GRAPH_QUERY,
+    variables: { contentId },
+    pause: DEV_MODE,
+  });
+
+  // Normalise API response (from/to) → internal shape (source/target), fallback to mock
+  const graphData = useMemo((): { nodes: GraphNode[]; edges: GraphEdge[] } => {
+    if (DEV_MODE || graphResult.error || !graphResult.data?.conceptsForContent) {
+      return mockGraphData;
+    }
+    const { nodes: apiNodes, edges: apiEdges } =
+      graphResult.data.conceptsForContent as {
+        nodes: { id: string; label: string; type: string; description?: string }[];
+        edges: { from: string; to: string; type: string; strength?: number }[];
+      };
+    return {
+      nodes: apiNodes.map((n) => ({
+        id: n.id,
+        label: n.label,
+        type: n.type as NodeType,
+        description: n.description,
+      })),
+      edges: apiEdges.map((e, idx) => ({
+        id: `edge-${idx}`,
+        source: e.from,
+        target: e.to,
+        type: e.type as EdgeType,
+      })),
+    };
+  }, [graphResult.data, graphResult.error]);
+
+  const positions = useMemo(() => computePositions(graphData.nodes), [graphData.nodes]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -93,16 +131,16 @@ export function KnowledgeGraph() {
     setTranslate({ x: 0, y: 0 });
   };
 
-  const selectedNode = mockGraphData.nodes.find((n) => n.id === selectedId);
+  const selectedNode = graphData.nodes.find((n) => n.id === selectedId);
 
-  const connectedEdges = mockGraphData.edges.filter(
+  const connectedEdges = graphData.edges.filter(
     (e) => e.source === selectedId || e.target === selectedId
   );
   const connectedIds = new Set(
     connectedEdges.flatMap((e) => [e.source, e.target])
   );
 
-  const visibleNodes = mockGraphData.nodes.filter(
+  const visibleNodes = graphData.nodes.filter(
     (n) =>
       (!typeFilter || n.type === typeFilter) &&
       (!searchQuery ||
@@ -113,6 +151,12 @@ export function KnowledgeGraph() {
   return (
     <Layout>
       <div className="space-y-4">
+        {!DEV_MODE && graphResult.fetching && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Loading graph from server...
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -193,7 +237,7 @@ export function KnowledgeGraph() {
               >
               <g transform={`translate(${CX + translate.x},${CY + translate.y}) scale(${scale}) translate(${-CX},${-CY})`}>
                 {/* Edges */}
-                {mockGraphData.edges.map((e) => {
+                {graphData.edges.map((e) => {
                   const from = positions[e.source];
                   const to = positions[e.target];
                   if (!from || !to) return null;
@@ -221,7 +265,7 @@ export function KnowledgeGraph() {
                 })}
 
                 {/* Nodes */}
-                {mockGraphData.nodes.map((n) => {
+                {graphData.nodes.map((n) => {
                   const pos = positions[n.id];
                   if (!pos) return null;
                   const isSelected = n.id === selectedId;
@@ -345,7 +389,7 @@ export function KnowledgeGraph() {
                   {connectedEdges.map((e) => {
                     const otherId =
                       e.source === selectedId ? e.target : e.source;
-                    const other = mockGraphData.nodes.find(
+                    const other = graphData.nodes.find(
                       (n) => n.id === otherId
                     );
                     return (
@@ -388,13 +432,13 @@ export function KnowledgeGraph() {
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="text-center p-2 bg-muted/40 rounded">
                     <p className="text-lg font-bold">
-                      {mockGraphData.nodes.length}
+                      {graphData.nodes.length}
                     </p>
                     <p className="text-muted-foreground">Nodes</p>
                   </div>
                   <div className="text-center p-2 bg-muted/40 rounded">
                     <p className="text-lg font-bold">
-                      {mockGraphData.edges.length}
+                      {graphData.edges.length}
                     </p>
                     <p className="text-muted-foreground">Edges</p>
                   </div>
