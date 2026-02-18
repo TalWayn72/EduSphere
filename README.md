@@ -42,31 +42,31 @@ pnpm --filter @edusphere/db seed        # Seed demo data
 pnpm dev
 ```
 
-| Service | URL |
-|---------|-----|
-| **Gateway** | http://localhost:4000/graphql |
-| **Frontend** | http://localhost:5173 |
-| **Subgraph: Core** | http://localhost:4001/graphql |
-| **Subgraph: Content** | http://localhost:4002/graphql |
-| **Subgraph: Annotation** | http://localhost:4003/graphql |
+| Service                     | URL                           |
+| --------------------------- | ----------------------------- |
+| **Gateway**                 | http://localhost:4000/graphql |
+| **Frontend**                | http://localhost:5173         |
+| **Subgraph: Core**          | http://localhost:4001/graphql |
+| **Subgraph: Content**       | http://localhost:4002/graphql |
+| **Subgraph: Annotation**    | http://localhost:4003/graphql |
 | **Subgraph: Collaboration** | http://localhost:4004/graphql |
-| **Subgraph: Agent** | http://localhost:4005/graphql |
-| **Subgraph: Knowledge** | http://localhost:4006/graphql |
-| **Keycloak** | http://localhost:8080 |
-| **MinIO Console** | http://localhost:9001 |
-| **Jaeger UI** | http://localhost:16686 |
+| **Subgraph: Agent**         | http://localhost:4005/graphql |
+| **Subgraph: Knowledge**     | http://localhost:4006/graphql |
+| **Keycloak**                | http://localhost:8080         |
+| **MinIO Console**           | http://localhost:9001         |
+| **Jaeger UI**               | http://localhost:16686        |
 
 ### Demo User Accounts
 
 All demo users have password: **Demo123!**
 
-| Role | Email | Name |
-|------|-------|------|
-| Super Admin | admin@edusphere.dev | Admin User |
-| Org Admin | orgadmin@edusphere.dev | Org Admin |
-| Instructor | instructor@edusphere.dev | Instructor User |
-| Student | student@edusphere.dev | Student User |
-| Researcher | researcher@edusphere.dev | Researcher User |
+| Role        | Email                    | Name            |
+| ----------- | ------------------------ | --------------- |
+| Super Admin | admin@edusphere.dev      | Admin User      |
+| Org Admin   | orgadmin@edusphere.dev   | Org Admin       |
+| Instructor  | instructor@edusphere.dev | Instructor User |
+| Student     | student@edusphere.dev    | Student User    |
+| Researcher  | researcher@edusphere.dev | Researcher User |
 
 ### Service Health Check
 
@@ -76,16 +76,16 @@ Verify all services are running before starting work:
 ./scripts/health-check.sh
 ```
 
-| Service | Port | Check | Expected |
-|---------|------|-------|----------|
-| PostgreSQL 16 | 5432 | `docker ps \| grep postgres` | Container running |
-| Apache AGE | - | `docker exec postgres psql -c "LOAD 'age';"` | Extension loaded |
-| pgvector | - | `docker exec postgres psql -c "SELECT * FROM pg_extension WHERE extname='vector';"` | Extension exists |
-| Keycloak | 8080 | `curl -sf http://localhost:8080/realms/edusphere/.well-known/openid-configuration` | JSON response |
-| NATS JetStream | 4222 | `curl -sf http://localhost:8222/healthz` | OK |
-| MinIO | 9000 | `curl -sf http://localhost:9000/minio/health/live` | OK |
-| Jaeger | 16686 | `curl -sf http://localhost:16686` | HTML response |
-| Gateway | 4000 | `curl -sf http://localhost:4000/graphql -d '{"query":"{ __typename }"}'` | JSON response |
+| Service        | Port  | Check                                                                               | Expected          |
+| -------------- | ----- | ----------------------------------------------------------------------------------- | ----------------- |
+| PostgreSQL 16  | 5432  | `docker ps \| grep postgres`                                                        | Container running |
+| Apache AGE     | -     | `docker exec postgres psql -c "LOAD 'age';"`                                        | Extension loaded  |
+| pgvector       | -     | `docker exec postgres psql -c "SELECT * FROM pg_extension WHERE extname='vector';"` | Extension exists  |
+| Keycloak       | 8080  | `curl -sf http://localhost:8080/realms/edusphere/.well-known/openid-configuration`  | JSON response     |
+| NATS JetStream | 4222  | `curl -sf http://localhost:8222/healthz`                                            | OK                |
+| MinIO          | 9000  | `curl -sf http://localhost:9000/minio/health/live`                                  | OK                |
+| Jaeger         | 16686 | `curl -sf http://localhost:16686`                                                   | HTML response     |
+| Gateway        | 4000  | `curl -sf http://localhost:4000/graphql -d '{"query":"{ __typename }"}'`            | JSON response     |
 
 ---
 
@@ -172,54 +172,59 @@ For detailed architecture diagrams: [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-R
 ## Tech Stack
 
 ### Core Infrastructure
-| Layer | Technology | Version | License | Why |
-|-------|-----------|---------|---------|-----|
-| **Monorepo** | pnpm workspaces + Turborepo | pnpm 9.x + Turbo latest | MIT | 60-80% disk savings, 3-5x faster than npm, parallel builds |
-| **Gateway** | Hive Gateway v2 | v2.x | MIT | Federation v2.7, 2x faster than competitors, MIT-licensed (not ELv2) |
-| **Subgraph Runtime** | GraphQL Yoga + NestJS | Yoga 5.x + NestJS 11.x | MIT | `YogaFederationDriver`, enterprise DI, guards, interceptors |
-| **Database** | PostgreSQL 16+ | 16.x | PostgreSQL | RLS, extensions (AGE, pgvector), ACID, mature ecosystem |
-| **Graph DB** | Apache AGE | 1.5.0 | Apache 2.0 | openCypher in PostgreSQL, coexists with relational + vector |
-| **Vector Search** | pgvector + pgvectorscale | 0.8.0 | PostgreSQL | 471 QPS @ 99% recall (50M vectors), HNSW indexes, 768-dim |
-| **ORM** | Drizzle ORM | 1.x | Apache 2.0 | Native RLS, SQL-first, 14x lower latency vs N+1, 7.4 KB bundle |
-| **Auth** | Keycloak | v26.x | Apache 2.0 | OIDC/JWT, multi-tenant orgs, JWKS, SSO, RBAC |
-| **Messaging** | NATS JetStream | latest | Apache 2.0 | 20 MB binary, 128-256 MB RAM, subject wildcarding, KV store |
-| **Object Storage** | MinIO | latest | AGPLv3 | S3-compatible, presigned URLs, local dev + prod compatibility |
-| **Reverse Proxy** | Traefik | v3.6 | MIT | Auto-discovery, Let's Encrypt, K8s Ingress, dashboards |
-| **Telemetry** | OpenTelemetry → Jaeger | latest | Apache 2.0 | Distributed tracing, spans, metrics, Hive Gateway native integration |
+
+| Layer                | Technology                  | Version                 | License    | Why                                                                  |
+| -------------------- | --------------------------- | ----------------------- | ---------- | -------------------------------------------------------------------- |
+| **Monorepo**         | pnpm workspaces + Turborepo | pnpm 9.x + Turbo latest | MIT        | 60-80% disk savings, 3-5x faster than npm, parallel builds           |
+| **Gateway**          | Hive Gateway v2             | v2.x                    | MIT        | Federation v2.7, 2x faster than competitors, MIT-licensed (not ELv2) |
+| **Subgraph Runtime** | GraphQL Yoga + NestJS       | Yoga 5.x + NestJS 11.x  | MIT        | `YogaFederationDriver`, enterprise DI, guards, interceptors          |
+| **Database**         | PostgreSQL 16+              | 16.x                    | PostgreSQL | RLS, extensions (AGE, pgvector), ACID, mature ecosystem              |
+| **Graph DB**         | Apache AGE                  | 1.5.0                   | Apache 2.0 | openCypher in PostgreSQL, coexists with relational + vector          |
+| **Vector Search**    | pgvector + pgvectorscale    | 0.8.0                   | PostgreSQL | 471 QPS @ 99% recall (50M vectors), HNSW indexes, 768-dim            |
+| **ORM**              | Drizzle ORM                 | 1.x                     | Apache 2.0 | Native RLS, SQL-first, 14x lower latency vs N+1, 7.4 KB bundle       |
+| **Auth**             | Keycloak                    | v26.x                   | Apache 2.0 | OIDC/JWT, multi-tenant orgs, JWKS, SSO, RBAC                         |
+| **Messaging**        | NATS JetStream              | latest                  | Apache 2.0 | 20 MB binary, 128-256 MB RAM, subject wildcarding, KV store          |
+| **Object Storage**   | MinIO                       | latest                  | AGPLv3     | S3-compatible, presigned URLs, local dev + prod compatibility        |
+| **Reverse Proxy**    | Traefik                     | v3.6                    | MIT        | Auto-discovery, Let's Encrypt, K8s Ingress, dashboards               |
+| **Telemetry**        | OpenTelemetry → Jaeger      | latest                  | Apache 2.0 | Distributed tracing, spans, metrics, Hive Gateway native integration |
 
 ### Frontend
-| Layer | Technology | Version | License | Why |
-|-------|-----------|---------|---------|-----|
-| **Web Framework** | React + Vite | React 19 + Vite 6 | MIT | Near-instant HMR, smaller bundles, full architecture control |
-| **State Management** | TanStack Query + Zustand | v5 + v5 | MIT | Server state (TanStack) + client UI state (Zustand), TypeScript-native |
-| **UI Components** | shadcn/ui | latest | MIT | Radix primitives + Tailwind, copy-paste, full ownership, AI-friendly |
-| **Forms** | React Hook Form + Zod | latest | MIT | Type-safe validation, minimal re-renders, async validation |
-| **Routing** | React Router | v6 | MIT | Nested routes, loaders, actions, deferred data |
-| **Mobile** | Expo SDK 54 | 54.x | MIT | React Native 0.81, offline SQLite, 70-80% code sharing with web |
+
+| Layer                | Technology               | Version           | License | Why                                                                    |
+| -------------------- | ------------------------ | ----------------- | ------- | ---------------------------------------------------------------------- |
+| **Web Framework**    | React + Vite             | React 19 + Vite 6 | MIT     | Near-instant HMR, smaller bundles, full architecture control           |
+| **State Management** | TanStack Query + Zustand | v5 + v5           | MIT     | Server state (TanStack) + client UI state (Zustand), TypeScript-native |
+| **UI Components**    | shadcn/ui                | latest            | MIT     | Radix primitives + Tailwind, copy-paste, full ownership, AI-friendly   |
+| **Forms**            | React Hook Form + Zod    | latest            | MIT     | Type-safe validation, minimal re-renders, async validation             |
+| **Routing**          | React Router             | v6                | MIT     | Nested routes, loaders, actions, deferred data                         |
+| **Mobile**           | Expo SDK 54              | 54.x              | MIT     | React Native 0.81, offline SQLite, 70-80% code sharing with web        |
 
 ### Real-time & Collaboration
-| Layer | Technology | Version | License | Why |
-|-------|-----------|---------|---------|-----|
-| **CRDT** | Yjs | v13.6 | MIT | 3-4x adoption vs Automerge, 260K edits in 0.5s, 1.9M weekly npm |
-| **CRDT Server** | Hocuspocus | v2.x | MIT | JWT auth, lifecycle hooks, debounced persistence, Redis scaling |
-| **Video Player** | Video.js | v8.23 | Apache 2.0 | Plugin ecosystem (overlays, markers), HLS/DASH, accessibility |
-| **Annotation Canvas** | Konva.js (react-konva) | v10 | MIT | 2.5x faster than Fabric.js, React integration, layer system |
-| **Transcription** | faster-whisper | latest | MIT | 4x faster than Whisper, 50-70% less VRAM, CTranslate2 engine |
+
+| Layer                 | Technology             | Version | License    | Why                                                             |
+| --------------------- | ---------------------- | ------- | ---------- | --------------------------------------------------------------- |
+| **CRDT**              | Yjs                    | v13.6   | MIT        | 3-4x adoption vs Automerge, 260K edits in 0.5s, 1.9M weekly npm |
+| **CRDT Server**       | Hocuspocus             | v2.x    | MIT        | JWT auth, lifecycle hooks, debounced persistence, Redis scaling |
+| **Video Player**      | Video.js               | v8.23   | Apache 2.0 | Plugin ecosystem (overlays, markers), HLS/DASH, accessibility   |
+| **Annotation Canvas** | Konva.js (react-konva) | v10     | MIT        | 2.5x faster than Fabric.js, React integration, layer system     |
+| **Transcription**     | faster-whisper         | latest  | MIT        | 4x faster than Whisper, 50-70% less VRAM, CTranslate2 engine    |
 
 ### AI/ML Architecture (3 Layers)
-| Layer | Technology | Version | License | Why |
-|-------|-----------|---------|---------|-----|
-| **Layer 1: LLM Abstraction** | Vercel AI SDK | v6.x | Apache 2.0 | Unified API (Ollama dev ↔ OpenAI/Anthropic prod), 2.8M weekly npm |
-| **Layer 2: Agent Orchestration** | LangGraph.js | latest | MIT | State-machine workflows (assess → quiz → explain → debate) |
-| **Layer 3: RAG + Knowledge** | LlamaIndex.TS | latest | MIT | Data connectors, indexing, HybridRAG (vector + graph fusion) |
-| **Local LLMs** | Ollama | latest | MIT | 100+ models, Llama 3.1 8B, Phi-4 14B, nomic-embed-text (768-dim) |
-| **Sandboxing** | gVisor | latest | Apache 2.0 | User-space kernel, 10-20% overhead, Docker/K8s integration |
+
+| Layer                            | Technology    | Version | License    | Why                                                               |
+| -------------------------------- | ------------- | ------- | ---------- | ----------------------------------------------------------------- |
+| **Layer 1: LLM Abstraction**     | Vercel AI SDK | v6.x    | Apache 2.0 | Unified API (Ollama dev ↔ OpenAI/Anthropic prod), 2.8M weekly npm |
+| **Layer 2: Agent Orchestration** | LangGraph.js  | latest  | MIT        | State-machine workflows (assess → quiz → explain → debate)        |
+| **Layer 3: RAG + Knowledge**     | LlamaIndex.TS | latest  | MIT        | Data connectors, indexing, HybridRAG (vector + graph fusion)      |
+| **Local LLMs**                   | Ollama        | latest  | MIT        | 100+ models, Llama 3.1 8B, Phi-4 14B, nomic-embed-text (768-dim)  |
+| **Sandboxing**                   | gVisor        | latest  | Apache 2.0 | User-space kernel, 10-20% overhead, Docker/K8s integration        |
 
 ---
 
 ## Features
 
 ### Core Platform
+
 - **Multi-tenant Architecture** -- PostgreSQL RLS with single shared schema, Keycloak Organizations (v26+), tenant isolation at DB + API layers
 - **GraphQL Federation** -- 6 subgraphs (Core, Content, Annotation, Collaboration, Agent, Knowledge) composed via Hive Gateway v2
 - **Knowledge Graph** -- Apache AGE with openCypher queries, property graph model (Concept, Person, Term, Source, TopicCluster)
@@ -227,29 +232,34 @@ For detailed architecture diagrams: [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-R
 - **Real-time Collaboration** -- Yjs CRDT + Hocuspocus server, WebSocket sync, offline-first (y-indexeddb), compaction
 
 ### Content Management
+
 - **Course Hierarchy** -- Multi-level courses with modules, media assets, prerequisites, public/private visibility
 - **Video Processing** -- FFmpeg transcoding, HLS/DASH streaming, thumbnail generation, Video.js player with annotations
 - **Transcription Pipeline** -- faster-whisper (GPU-accelerated), NATS-driven worker, segment-level timestamps, auto-embedding generation
 - **Annotation Layers** -- PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED layers with RLS enforcement, sketches (Konva.js), spatial comments, threads
 
 ### AI Agents
+
 - **Pre-built Templates** -- Chavruta (dialectical debate), Summarizer, Quiz Master, Research Scout, Explainer (adaptive)
 - **User-buildable Agents** -- JSON configs (Zod schemas), personality/difficulty/scope dropdowns, MCP tool integrations
 - **Agent Execution** -- LangGraph.js state machines, token streaming via NATS subscriptions, status lifecycle (QUEUED → RUNNING → COMPLETED)
 - **Sandboxed Runtime** -- gVisor isolation, resource limits per tenant plan (FREE: 10/day, ENTERPRISE: unlimited), MCP proxy mediation
 
 ### Knowledge & Search
+
 - **Graph Traversal** -- Multi-hop queries (relatedConcepts, learningPath), contradiction detection (CONTRADICTS edges), prerequisite chains
 - **Topic Clustering** -- Automatic clustering via pgvector similarity + graph centrality, browsable topic hierarchies
 - **Hybrid Search** -- Parallel vector (semantic) + graph (structural) retrieval, fused ranking, graph context in results
 - **Embedding Pipeline** -- Auto-generate embeddings on content creation (transcripts, annotations, concepts), reindexing mutations
 
 ### Authentication & Authorization
+
 - **OIDC/JWT** -- Keycloak multi-tenant realms, JWT with `tenant_id` + `user_id` + `role` + `scopes`, JWKS validation at gateway
 - **GraphQL Directives** -- `@authenticated`, `@requiresScopes(scopes: ["org:manage"])`, `@requiresRole(roles: [ORG_ADMIN])`
 - **Row-Level Security** -- RLS policies on all 16 tables, `SET LOCAL app.current_tenant`, cross-tenant isolation tests
 
 ### Observability & Monitoring
+
 - **Distributed Tracing** -- OpenTelemetry spans across Gateway → Subgraphs → Database, Jaeger UI visualization
 - **Schema Registry** -- GraphQL Hive for breaking change detection, schema evolution tracking, composition validation
 - **Health Checks** -- Per-service health endpoints, `./scripts/health-check.sh` validation script, Docker healthchecks
@@ -258,54 +268,54 @@ For detailed architecture diagrams: [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-R
 
 ## Commands
 
-| Category | Command | Description |
-|----------|---------|-------------|
-| **Dev** | `pnpm dev` | Start all services (Gateway + 6 subgraphs + Frontend) |
-| | `pnpm --filter @edusphere/gateway dev` | Gateway only (port 4000) |
-| | `pnpm --filter @edusphere/subgraph-core dev` | Core subgraph (port 4001) |
-| | `pnpm --filter @edusphere/web dev` | Frontend (port 5173) |
-| | `pnpm --filter @edusphere/mobile start` | Expo mobile dev server |
-| **Build** | `pnpm turbo build` | Build all workspaces |
-| | `pnpm turbo lint` | Lint all (zero warnings in CI) |
-| | `pnpm turbo typecheck` | TypeScript strict (zero errors) |
-| **Test** | `pnpm turbo test` | All tests (unit + integration) |
-| | `pnpm turbo test -- --coverage` | With coverage reports |
-| | `pnpm --filter @edusphere/web test:e2e` | E2E tests (Playwright) |
-| | `pnpm test:graphql` | GraphQL integration tests |
-| | `pnpm test:rls` | RLS policy validation |
-| | `pnpm test:federation` | Federation composition tests |
-| **Database** | `pnpm --filter @edusphere/db generate` | Generate Drizzle migrations |
-| | `pnpm --filter @edusphere/db migrate` | Apply migrations |
-| | `pnpm --filter @edusphere/db seed` | Seed demo data |
-| | `pnpm --filter @edusphere/db graph:init` | Initialize Apache AGE graph |
-| | `pnpm --filter @edusphere/db studio` | Drizzle Studio (GUI) |
-| **GraphQL** | `pnpm --filter @edusphere/gateway compose` | Compose supergraph SDL |
-| | `pnpm codegen` | Generate TypeScript types |
-| | `pnpm --filter @edusphere/gateway schema:check` | Check breaking changes (Hive) |
-| | `pnpm --filter @edusphere/gateway schema:publish` | Publish to Hive registry |
-| **Docker** | `docker-compose up -d` | Start infrastructure |
-| | `docker-compose down` | Stop all containers |
-| | `./scripts/health-check.sh` | Validate all services healthy |
-| | `./scripts/smoke-test.sh` | E2E smoke tests |
+| Category     | Command                                           | Description                                           |
+| ------------ | ------------------------------------------------- | ----------------------------------------------------- |
+| **Dev**      | `pnpm dev`                                        | Start all services (Gateway + 6 subgraphs + Frontend) |
+|              | `pnpm --filter @edusphere/gateway dev`            | Gateway only (port 4000)                              |
+|              | `pnpm --filter @edusphere/subgraph-core dev`      | Core subgraph (port 4001)                             |
+|              | `pnpm --filter @edusphere/web dev`                | Frontend (port 5173)                                  |
+|              | `pnpm --filter @edusphere/mobile start`           | Expo mobile dev server                                |
+| **Build**    | `pnpm turbo build`                                | Build all workspaces                                  |
+|              | `pnpm turbo lint`                                 | Lint all (zero warnings in CI)                        |
+|              | `pnpm turbo typecheck`                            | TypeScript strict (zero errors)                       |
+| **Test**     | `pnpm turbo test`                                 | All tests (unit + integration)                        |
+|              | `pnpm turbo test -- --coverage`                   | With coverage reports                                 |
+|              | `pnpm --filter @edusphere/web test:e2e`           | E2E tests (Playwright)                                |
+|              | `pnpm test:graphql`                               | GraphQL integration tests                             |
+|              | `pnpm test:rls`                                   | RLS policy validation                                 |
+|              | `pnpm test:federation`                            | Federation composition tests                          |
+| **Database** | `pnpm --filter @edusphere/db generate`            | Generate Drizzle migrations                           |
+|              | `pnpm --filter @edusphere/db migrate`             | Apply migrations                                      |
+|              | `pnpm --filter @edusphere/db seed`                | Seed demo data                                        |
+|              | `pnpm --filter @edusphere/db graph:init`          | Initialize Apache AGE graph                           |
+|              | `pnpm --filter @edusphere/db studio`              | Drizzle Studio (GUI)                                  |
+| **GraphQL**  | `pnpm --filter @edusphere/gateway compose`        | Compose supergraph SDL                                |
+|              | `pnpm codegen`                                    | Generate TypeScript types                             |
+|              | `pnpm --filter @edusphere/gateway schema:check`   | Check breaking changes (Hive)                         |
+|              | `pnpm --filter @edusphere/gateway schema:publish` | Publish to Hive registry                              |
+| **Docker**   | `docker-compose up -d`                            | Start infrastructure                                  |
+|              | `docker-compose down`                             | Stop all containers                                   |
+|              | `./scripts/health-check.sh`                       | Validate all services healthy                         |
+|              | `./scripts/smoke-test.sh`                         | E2E smoke tests                                       |
 
 ---
 
 ## Development Phases
 
-| Phase | Description | Duration | Status |
-|-------|-------------|----------|--------|
-| **Phase 0** | Foundation -- Monorepo, Docker stack, Hello World query | 1-2 days | ✅ Complete |
-| **Phase 1** | Data Layer -- 16 tables, RLS, AGE graph, pgvector, seed | 2-3 days | ✅ Complete |
-| **Phase 2** | Core + Content Subgraphs -- Auth, JWT, Tenants, Users, Courses, Media | 3-5 days | ✅ Complete |
-| **Phase 3** | Annotation + Collaboration -- Layers, CRDT, WebSocket, presence | 3-4 days | ✅ Complete |
-| **Phase 4** | Knowledge Subgraph -- Graph traversal, embeddings, HybridRAG | 4-5 days | ✅ Complete |
-| **Phase 5** | Agent Subgraph -- LangGraph workflows, templates, sandboxing | 4-5 days | ✅ Complete |
-| **Phase 6** | Frontend -- React SPA, TanStack Query, video player, AI chat | 5-7 days | ✅ Complete |
-| **Phase 7** | Production Hardening -- Performance, K8s, load tests, security | 5-7 days | ✅ Complete |
-| **Phase 8** | Mobile + Advanced -- Expo app, transcription worker, Chavruta | 5-7 days | ✅ Complete |
-| **Phase 9** | Dashboard Analytics -- Heatmap, progress bars, activity feed | 2-3 days | ✅ Complete |
+| Phase            | Description                                                                            | Duration   | Status      |
+| ---------------- | -------------------------------------------------------------------------------------- | ---------- | ----------- |
+| **Phase 0**      | Foundation -- Monorepo, Docker stack, Hello World query                                | 1-2 days   | ✅ Complete |
+| **Phase 1**      | Data Layer -- 16 tables, RLS, AGE graph, pgvector, seed                                | 2-3 days   | ✅ Complete |
+| **Phase 2**      | Core + Content Subgraphs -- Auth, JWT, Tenants, Users, Courses, Media                  | 3-5 days   | ✅ Complete |
+| **Phase 3**      | Annotation + Collaboration -- Layers, CRDT, WebSocket, presence                        | 3-4 days   | ✅ Complete |
+| **Phase 4**      | Knowledge Subgraph -- Graph traversal, embeddings, HybridRAG                           | 4-5 days   | ✅ Complete |
+| **Phase 5**      | Agent Subgraph -- LangGraph workflows, templates, sandboxing                           | 4-5 days   | ✅ Complete |
+| **Phase 6**      | Frontend -- React SPA, TanStack Query, video player, AI chat                           | 5-7 days   | ✅ Complete |
+| **Phase 7**      | Production Hardening -- Performance, K8s, load tests, security                         | 5-7 days   | ✅ Complete |
+| **Phase 8**      | Mobile + Advanced -- Expo app, transcription worker, Chavruta                          | 5-7 days   | ✅ Complete |
+| **Phase 9**      | Dashboard Analytics -- Heatmap, progress bars, activity feed                           | 2-3 days   | ✅ Complete |
 | **Phases 10-14** | Frontend Core UX -- Video player, search, AI chat, knowledge graph, annotation overlay | 12-20 days | ✅ Complete |
-| **Phases 15-17** | Frontend UX polish -- User menu, course wizard, Tiptap collaboration editor | 5-8 days | ✅ Complete |
+| **Phases 15-17** | Frontend UX polish -- User menu, course wizard, Tiptap collaboration editor            | 5-8 days   | ✅ Complete |
 
 **Current Status:** ALL 17 phases complete ✅ — Backend + Frontend fully built. GraphQL integration active (KnowledgeGraph + AgentsPage + ContentViewer + Dashboard wired to real API with DEV_MODE fallback). Next: Phase 7 Production Hardening (K8s) + Phase 8 Mobile (Expo). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
@@ -315,28 +325,30 @@ See [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) for detailed phase br
 
 ## Documentation
 
-| Category | Document |
-|----------|----------|
-| **Project** | [CLAUDE.md](CLAUDE.md) -- AI assistant configuration and work rules |
-| | [OPEN_ISSUES.md](OPEN_ISSUES.md) -- Issue tracking and status |
-| **Architecture** | [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) -- Phased build plan |
-| | [API-CONTRACTS-GRAPHQL-FEDERATION.md](API-CONTRACTS-GRAPHQL-FEDERATION.md) -- GraphQL schema contracts |
-| | [EduSphere Claude.pdf](docs/reference/EduSphere%20Claude.pdf) -- Architecture guide and tech decisions |
-| | [EduSphere DB.pdf](docs/reference/EduSphere%20DB.pdf) -- Database design deep-dive |
-| **API** | GraphQL Playground: http://localhost:4000/graphql |
-| | Hive Schema Registry: [Configure URL] |
+| Category         | Document                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------ |
+| **Project**      | [CLAUDE.md](CLAUDE.md) -- AI assistant configuration and work rules                                    |
+|                  | [OPEN_ISSUES.md](OPEN_ISSUES.md) -- Issue tracking and status                                          |
+| **Architecture** | [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) -- Phased build plan                            |
+|                  | [API-CONTRACTS-GRAPHQL-FEDERATION.md](API-CONTRACTS-GRAPHQL-FEDERATION.md) -- GraphQL schema contracts |
+|                  | [EduSphere Claude.pdf](docs/reference/EduSphere%20Claude.pdf) -- Architecture guide and tech decisions |
+|                  | [EduSphere DB.pdf](docs/reference/EduSphere%20DB.pdf) -- Database design deep-dive                     |
+| **API**          | GraphQL Playground: http://localhost:4000/graphql                                                      |
+|                  | Hive Schema Registry: [Configure URL]                                                                  |
 
 ---
 
 ## Deployment
 
 ### Development
+
 ```bash
 docker-compose up -d
 pnpm dev
 ```
 
 ### Production -- Kubernetes (Helm)
+
 ```bash
 # Build Docker images for all services
 pnpm turbo docker:build
@@ -359,6 +371,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 ```
 
 **Helm Chart Features (Phase 7):**
+
 - Gateway: HPA 3-20 replicas (CPU 70% / mem 80%), PDB minAvailable 2
 - Subgraphs: Parameterized deployment for all 6 (single range loop), HPA auto-scale 5x
 - Frontend: HPA 2-10 replicas
@@ -368,6 +381,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 - Security hardening: runAsNonRoot, readOnlyRootFilesystem, all Linux capabilities dropped
 
 **k6 Load Tests:**
+
 - `smoke.js` — 1 VU / 1 min (verify system operational, p95 < 1000ms)
 - `load.js` — ramp to 1000 VU over 10 min (100K users @ 10% peak simultaneity), p95 < 2s
 - `stress.js` — ramp to 5000 VU (find breaking point), p99 < 10s
@@ -376,15 +390,16 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 ## Monitoring
 
-| Component | Tool | Access |
-|-----------|------|--------|
-| Metrics | Prometheus | http://localhost:9090 |
-| Dashboards | Grafana | http://localhost:3001 |
-| Distributed Tracing | Jaeger | http://localhost:16686 |
-| Schema Registry | GraphQL Hive | [Configure URL] |
-| Logs | Loki + Promtail | via Grafana |
+| Component           | Tool            | Access                 |
+| ------------------- | --------------- | ---------------------- |
+| Metrics             | Prometheus      | http://localhost:9090  |
+| Dashboards          | Grafana         | http://localhost:3001  |
+| Distributed Tracing | Jaeger          | http://localhost:16686 |
+| Schema Registry     | GraphQL Hive    | [Configure URL]        |
+| Logs                | Loki + Promtail | via Grafana            |
 
 **Tracked Metrics:**
+
 - API request rates (per subgraph, per tenant)
 - p50/p95/p99 latency (Gateway + Subgraphs)
 - Error rates (by error code)
@@ -400,18 +415,19 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 ## Testing
 
-| Category | Framework | Location | Status |
-|----------|-----------|----------|--------|
-| **Frontend Unit Tests** | Vitest + jsdom + RTL | `apps/web/src/**/*.test.{ts,tsx}` | ✅ **146 tests / 12 suites passing** |
-| **Backend Unit Tests** | Vitest | `apps/*/src/**/*.spec.ts` | ✅ **37 tests / 3 suites passing** (subgraph-core) |
-| **Frontend E2E** | Playwright | `apps/web/e2e/*.spec.ts` | ⏳ Specs ready — needs dev server |
-| **Integration Tests** | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts` | ⏳ Planned Phase 7 |
-| **RLS Validation** | Vitest | `packages/db/src/rls/*.test.ts` | ⏳ Planned Phase 7 |
-| **GraphQL Tests** | Vitest + SuperTest | `apps/*/src/test/graphql/*.spec.ts` | ⏳ Planned Phase 7 |
-| **Federation Tests** | Vitest | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7 |
-| **Load Tests** | k6 | `infrastructure/k6/*.js` | ⏳ Planned Phase 7 |
+| Category                | Framework               | Location                                     | Status                                             |
+| ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **146 tests / 12 suites passing**               |
+| **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ **37 tests / 3 suites passing** (subgraph-core) |
+| **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
+| **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |
+| **RLS Validation**      | Vitest                  | `packages/db/src/rls/*.test.ts`              | ⏳ Planned Phase 7                                 |
+| **GraphQL Tests**       | Vitest + SuperTest      | `apps/*/src/test/graphql/*.spec.ts`          | ⏳ Planned Phase 7                                 |
+| **Federation Tests**    | Vitest                  | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7                                 |
+| **Load Tests**          | k6                      | `infrastructure/k6/*.js`                     | ⏳ Planned Phase 7                                 |
 
 **Frontend Unit Test Suites (146 tests, all green):**
+
 - `Layout.test.tsx` — nav items, logo, UserMenu, role-based links (11 tests) 🆕
 - `Dashboard.test.tsx` — stats cards, loading/error states, AIChatPanel (15 tests) 🆕
 - `AnnotationsPage.test.tsx` — heading, sort controls, tabs, layer filters (13 tests) 🆕
@@ -426,27 +442,32 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 - `AnnotationCard.test.ts` — `formatAnnotationTimestamp`, `ANNOTATION_LAYER_META` (12 tests)
 
 **Backend Unit Test Suites (37 tests, all green — subgraph-core):**
+
 - `user.service.spec.ts` — findById, findAll, create, update (15 tests) 🆕
 - `tenant.service.spec.ts` — findById, findAll with pagination (8 tests) 🆕
 - `user.resolver.spec.ts` — health, getUser, getUsers, me, createUser, updateUser (14 tests) 🆕
 
 **Testing Infrastructure:**
+
 - `src/test/setup.ts` — jest-dom matchers + MSW server lifecycle
 - `src/test/server.ts` + `src/test/handlers.ts` — MSW GraphQL mock server (18 real schema operations)
 - `packages/db/package.json` — ESM `"import"` condition added for Vitest compatibility
 
 **Coverage Targets:**
+
 - Backend: >90% line coverage per subgraph
 - Frontend: >80% component coverage
 - RLS policies: 100% (security-critical)
 
 **Security Scanning:**
+
 - `eslint-plugin-security` — Node.js security patterns in all 6 subgraphs
 - `eslint-plugin-no-unsanitized` — XSS prevention in React frontend
 - GitHub CodeQL — SAST on every push/PR (`.github/workflows/codeql.yml`)
 - TruffleHog — secret scanning on every push/PR
 
 **CI/CD:**
+
 - All tests run on every PR
 - Supergraph composition validated
 - Breaking change detection (Hive)
@@ -458,26 +479,27 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 PostgreSQL 16 with Drizzle ORM. Key entities:
 
-| Table | Purpose |
-|-------|---------|
-| **tenants** | Multi-tenant organizations, subscription plans |
-| **users** | Profiles, roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, STUDENT, RESEARCHER) |
-| **courses** | Course hierarchy, prerequisites, public/private |
-| **modules** | Course modules, ordering |
-| **media_assets** | Videos, audio, PDFs, documents, images |
-| **transcripts** | Generated transcripts per media asset |
-| **transcript_segments** | Time-stamped segments with embeddings |
-| **annotations** | Markings, sketches, comments, threads, layers (PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED) |
-| **collab_documents** | CRDT documents (Yjs persistence) |
-| **crdt_updates** | Incremental CRDT updates, compaction |
-| **collab_sessions** | Real-time presence tracking |
-| **agent_definitions** | AI agent templates and custom configs |
-| **agent_executions** | Agent runs with status lifecycle |
-| **content_embeddings** | 768-dim vectors for semantic search (HNSW index) |
-| **annotation_embeddings** | Annotation embeddings |
-| **concept_embeddings** | Concept embeddings |
+| Table                     | Purpose                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------ |
+| **tenants**               | Multi-tenant organizations, subscription plans                                             |
+| **users**                 | Profiles, roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, STUDENT, RESEARCHER)                  |
+| **courses**               | Course hierarchy, prerequisites, public/private                                            |
+| **modules**               | Course modules, ordering                                                                   |
+| **media_assets**          | Videos, audio, PDFs, documents, images                                                     |
+| **transcripts**           | Generated transcripts per media asset                                                      |
+| **transcript_segments**   | Time-stamped segments with embeddings                                                      |
+| **annotations**           | Markings, sketches, comments, threads, layers (PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED) |
+| **collab_documents**      | CRDT documents (Yjs persistence)                                                           |
+| **crdt_updates**          | Incremental CRDT updates, compaction                                                       |
+| **collab_sessions**       | Real-time presence tracking                                                                |
+| **agent_definitions**     | AI agent templates and custom configs                                                      |
+| **agent_executions**      | Agent runs with status lifecycle                                                           |
+| **content_embeddings**    | 768-dim vectors for semantic search (HNSW index)                                           |
+| **annotation_embeddings** | Annotation embeddings                                                                      |
+| **concept_embeddings**    | Concept embeddings                                                                         |
 
 **Apache AGE Graph Ontology:**
+
 - **Vertex Labels:** Concept, Person, Term, Source, TopicCluster
 - **Edge Labels:** RELATED_TO, CONTRADICTS, PREREQUISITE_OF, MENTIONS, CITES, AUTHORED_BY, INFERRED_RELATED, REFERS_TO, DERIVED_FROM, BELONGS_TO
 
@@ -523,18 +545,18 @@ VITE_GRAPHQL_WS_URL=ws://localhost:4000/graphql
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Docker not running | `docker-compose up -d` |
-| PostgreSQL down | Check `docker ps \| grep postgres`, restart container |
-| Apache AGE not loaded | Run `LOAD 'age';` in psql, verify `shared_preload_libraries` |
-| Gateway down (4000) | `pnpm --filter @edusphere/gateway dev` |
-| Subgraph down | `pnpm --filter @edusphere/subgraph-<name> dev` |
-| Frontend down (5173) | `pnpm --filter @edusphere/web dev` |
-| Empty DB | `pnpm --filter @edusphere/db seed` |
+| Problem                      | Solution                                                        |
+| ---------------------------- | --------------------------------------------------------------- |
+| Docker not running           | `docker-compose up -d`                                          |
+| PostgreSQL down              | Check `docker ps \| grep postgres`, restart container           |
+| Apache AGE not loaded        | Run `LOAD 'age';` in psql, verify `shared_preload_libraries`    |
+| Gateway down (4000)          | `pnpm --filter @edusphere/gateway dev`                          |
+| Subgraph down                | `pnpm --filter @edusphere/subgraph-<name> dev`                  |
+| Frontend down (5173)         | `pnpm --filter @edusphere/web dev`                              |
+| Empty DB                     | `pnpm --filter @edusphere/db seed`                              |
 | Supergraph composition fails | Check SDL files, run `pnpm --filter @edusphere/gateway compose` |
-| RLS policy fails | Verify `withTenantContext()` wrapper, check logs |
-| JWT validation fails | Check Keycloak JWKS URL, verify gateway .env |
+| RLS policy fails             | Verify `withTenantContext()` wrapper, check logs                |
+| JWT validation fails         | Check Keycloak JWKS URL, verify gateway .env                    |
 
 ---
 

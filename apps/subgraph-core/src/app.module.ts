@@ -4,9 +4,11 @@ import { YogaFederationDriver } from '@graphql-yoga/nestjs-federation';
 import { UserModule } from './user/user.module';
 import { TenantModule } from './tenant/tenant.module';
 import { authMiddleware } from './auth/auth.middleware';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
+    MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
       typePaths: ['./**/*.graphql'],

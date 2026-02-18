@@ -8,7 +8,15 @@ export default defineConfig({
     passWithNoTests: true,
     coverage: {
       provider: 'v8',
-      thresholds: { lines: 80, functions: 80, branches: 70, statements: 80 },
+      reporter: ['text', 'lcov'],
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.spec.ts', 'src/main.ts', 'src/**/*.module.ts'],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 70,
+        statements: 80,
+      },
     },
   },
 });

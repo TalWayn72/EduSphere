@@ -9,11 +9,17 @@ replicaCount:
   subgraph: 2
   frontend: 2
 
+# Image settings — registry and repository match the GHCR namespace used by
+# docker-build.yml.  The CD pipeline overrides `image.tag` at deploy time via:
+#   --set image.tag=main-<short-sha>
 image:
   registry: ghcr.io
-  repository: edusphere
+  # Replaced at CI time with the actual GitHub org/user.
+  # Pattern: ghcr.io/<owner>/edusphere-<service>:<tag>
+  # e.g.    ghcr.io/edusphere-org/edusphere-gateway:main-a1b2c3d
+  repository: edusphere-org/edusphere
   pullPolicy: IfNotPresent
-  tag: ""  # Overridden by CI
+  tag: ""  # Overridden by CI: --set image.tag=main-<sha>
 
 gateway:
   enabled: true
@@ -88,7 +94,10 @@ frontend:
 ingress:
   enabled: true
   className: traefik
+  # UI hostname
   host: edusphere.example.com
+  # GraphQL gateway hostname (separate IngressRoute in Traefik)
+  apiHost: api.edusphere.example.com
   tls:
     enabled: true
     secretName: edusphere-tls
@@ -98,6 +107,27 @@ postgresql:
 
 redis:
   enabled: false  # Use external managed Redis
+
+pgbouncer:
+  enabled: true
+  replicaCount: 2
+  imageTag: "1.23.1"
+  postgresHost: "postgres"
+  postgresPort: 5432
+  database: edusphere
+  maxClientConn: 1000
+  maxDbConnections: 200
+  poolSizeDefault: 25
+  poolSizeAgent: 35
+  poolSizeKnowledge: 35
+  serverIdleTimeout: 600
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
 
 serviceAccount:
   create: true

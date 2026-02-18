@@ -1,0 +1,207 @@
+{{- if .Values.pgbouncer.enabled }}
+---
+# ────────────────────────────────────────────────────────────
+# ConfigMap — pgbouncer.ini
+# ────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "edusphere.fullname" . }}-pgbouncer-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "edusphere.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pgbouncer
+data:
+  pgbouncer.ini: |
+    [databases]
+    edusphere_core       = host={{ .Values.pgbouncer.postgresHost }} port={{ .Values.pgbouncer.postgresPort }} dbname={{ .Values.pgbouncer.database }} pool_size={{ .Values.pgbouncer.poolSizeDefault }}
+    edusphere_content    = host={{ .Values.pgbouncer.postgresHost }} port={{ .Values.pgbouncer.postgresPort }} dbname={{ .Values.pgbouncer.database }} pool_size={{ .Values.pgbouncer.poolSizeDefault }}
+    edusphere_annotation = host={{ .Values.pgbouncer.postgresHost }} port={{ .Values.pgbouncer.postgresPort }} dbname={{ .Values.pgbouncer.database }} pool_size={{ .Values.pgbouncer.poolSizeDefault }}
+    edusphere_collaboration = host={{ .Values.pgbouncer.postgresHost }} port={{ .Values.pgbouncer.postgresPort }} dbname={{ .Values.pgbouncer.database }} pool_size={{ .Values.pgbouncer.poolSizeDefault }}
+    edusphere_agent      = host={{ .Values.pgbouncer.postgresHost }} port={{ .Values.pgbouncer.postgresPort }} dbname={{ .Values.pgbouncer.database }} pool_size={{ .Values.pgbouncer.poolSizeAgent }}
+    edusphere_knowledge  = host={{ .Values.pgbouncer.postgresHost }} port={{ .Values.pgbouncer.postgresPort }} dbname={{ .Values.pgbouncer.database }} pool_size={{ .Values.pgbouncer.poolSizeKnowledge }}
+    edusphere            = host={{ .Values.pgbouncer.postgresHost }} port={{ .Values.pgbouncer.postgresPort }} dbname={{ .Values.pgbouncer.database }} pool_size=10
+
+    [pgbouncer]
+    listen_addr           = 0.0.0.0
+    listen_port           = 5432
+    pool_mode             = transaction
+    max_client_conn       = {{ .Values.pgbouncer.maxClientConn }}
+    default_pool_size     = {{ .Values.pgbouncer.poolSizeDefault }}
+    reserve_pool_size     = 5
+    reserve_pool_timeout  = 3
+    max_db_connections    = {{ .Values.pgbouncer.maxDbConnections }}
+    server_idle_timeout   = {{ .Values.pgbouncer.serverIdleTimeout }}
+    server_connect_timeout = 15
+    server_lifetime       = 3600
+    query_timeout         = 300
+    auth_type             = scram-sha-256
+    auth_file             = /etc/pgbouncer/userlist.txt
+    log_connections       = 1
+    log_disconnections    = 1
+    log_pooler_errors     = 1
+    stats_period          = 60
+    admin_users           = pgbouncer_admin
+    stats_users           = pgbouncer_stats
+    ignore_startup_parameters = extra_float_digits,options
+
+---
+# ────────────────────────────────────────────────────────────
+# Deployment — PgBouncer (2 replicas for HA)
+# ────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "edusphere.fullname" . }}-pgbouncer
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "edusphere.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pgbouncer
+spec:
+  replicas: {{ .Values.pgbouncer.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pgbouncer
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pgbouncer
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: pgbouncer
+      annotations:
+        # Restart pods when config changes
+        checksum/config: {{ include (print $.Template.BasePath "/pgbouncer.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9127"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        # ─── PgBouncer ───────────────────────────────────────
+        - name: pgbouncer
+          image: "bitnami/pgbouncer:{{ .Values.pgbouncer.imageTag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: PGBOUNCER_AUTH_TYPE
+              value: scram-sha-256
+          volumeMounts:
+            - name: pgbouncer-config
+              mountPath: /bitnami/pgbouncer/conf/pgbouncer.ini
+              subPath: pgbouncer.ini
+              readOnly: true
+            - name: pgbouncer-userlist
+              mountPath: /etc/pgbouncer/userlist.txt
+              subPath: userlist.txt
+              readOnly: true
+          resources:
+            {{- toYaml .Values.pgbouncer.resources | nindent 12 }}
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "pg_isready -h 127.0.0.1 -p 5432 -U edusphere -d edusphere"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+
+        # ─── Prometheus exporter sidecar ─────────────────────
+        - name: pgbouncer-exporter
+          image: "spreaker/prometheus-pgbouncer-exporter:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: metrics
+              containerPort: 9127
+              protocol: TCP
+          env:
+            - name: PGBOUNCER_EXPORTER_HOST
+              value: "127.0.0.1"
+            - name: PGBOUNCER_EXPORTER_PORT
+              value: "5432"
+            - name: PGBOUNCER_EXPORTER_USER
+              value: pgbouncer_stats
+            - name: PGBOUNCER_EXPORTER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "edusphere.fullname" . }}-pgbouncer-secret
+                  key: stats-password
+            - name: PGBOUNCER_EXPORTER_DATABASE
+              value: pgbouncer
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
+
+      volumes:
+        - name: pgbouncer-config
+          configMap:
+            name: {{ include "edusphere.fullname" . }}-pgbouncer-config
+        - name: pgbouncer-userlist
+          secret:
+            secretName: {{ include "edusphere.fullname" . }}-pgbouncer-secret
+            items:
+              - key: userlist.txt
+                path: userlist.txt
+
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: pgbouncer
+              app.kubernetes.io/instance: {{ .Release.Name }}
+
+---
+# ────────────────────────────────────────────────────────────
+# Service — PgBouncer
+# ────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "edusphere.fullname" . }}-pgbouncer
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "edusphere.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pgbouncer
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9127"
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+      protocol: TCP
+    - name: metrics
+      port: 9127
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: pgbouncer
+    app.kubernetes.io/instance: {{ .Release.Name }}
+
+{{- end }}

@@ -1,0 +1,28 @@
+apiVersion: 1
+
+# Grafana dashboard provisioning configuration
+# Place this file at /etc/grafana/provisioning/dashboards/dashboards.yaml
+# inside the Grafana container (or mount it via docker-compose volume).
+#
+# Dashboard JSON files must be placed in the path defined below.
+# For the docker-compose setup, mount the dashboards directory as:
+#   ./infrastructure/grafana/dashboards:/etc/grafana/dashboards
+
+providers:
+  # ─── EduSphere Core Dashboards ─────────────────────────────────────────────
+  - name: edusphere-core
+    orgId: 1
+    folder: EduSphere
+    folderUid: edusphere-folder
+    type: file
+    # Do not allow Grafana UI edits to overwrite provisioned files
+    disableDeletion: true
+    # Re-check for new/updated JSON files every 30 seconds
+    updateIntervalSeconds: 30
+    # Allow operators to edit provisioned dashboards in the UI
+    # (changes do not persist to disk — restart resets them)
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards
+      # Create sub-folders based on directory structure under path
+      foldersFromFilesStructure: false

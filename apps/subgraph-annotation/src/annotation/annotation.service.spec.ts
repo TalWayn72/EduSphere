@@ -306,5 +306,113 @@ describe('AnnotationService', () => {
         service.delete('ann-1', noTenantAuth)
       ).rejects.toThrow('Authentication required');
     });
+
+    it('throws Unauthorized when non-owner non-instructor tries to delete', async () => {
+      const otherAnnotation = { ...MOCK_ANNOTATION, user_id: 'other-user' };
+      mockLimit.mockResolvedValue([otherAnnotation]);
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      await expect(
+        service.delete('ann-1', MOCK_AUTH)
+      ).rejects.toThrow('Unauthorized');
+    });
+
+    it('allows instructor to delete any annotation (owner-check bypass)', async () => {
+      const otherAnnotation = { ...MOCK_ANNOTATION, user_id: 'other-user' };
+      mockLimit.mockResolvedValue([otherAnnotation]);
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      mockReturning.mockResolvedValue([{ ...otherAnnotation, deleted_at: new Date() }]);
+      const result = await service.delete('ann-1', INSTRUCTOR_AUTH);
+      expect(result).toBe(true);
+    });
+
+    it('allows annotation owner to delete their own annotation', async () => {
+      mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      mockReturning.mockResolvedValue([{ ...MOCK_ANNOTATION, deleted_at: new Date() }]);
+      const result = await service.delete('ann-1', MOCK_AUTH);
+      expect(result).toBe(true);
+    });
+  });
+
+  // ─── Layer-based filtering ─────────────────────────────────────────────
+  describe('Layer-based visibility rules', () => {
+    it('findAll() with PERSONAL layer filter only returns requesting user annotations', async () => {
+      mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
+      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+      await service.findAll({ layer: 'PERSONAL', limit: 10, offset: 0 }, MOCK_AUTH);
+      // withTenantContext is called — the layer filter is applied inside the tx callback
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ userId: 'user-1', tenantId: 'tenant-1' }),
+        expect.any(Function)
+      );
+    });
+
+    it('findAll() with SHARED layer filter returns results for student', async () => {
+      mockOffset.mockResolvedValue([{ ...MOCK_ANNOTATION, layer: 'SHARED' }]);
+      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+      const result = await service.findAll({ layer: 'SHARED', limit: 10, offset: 0 }, MOCK_AUTH);
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('findAll() called with INSTRUCTOR role uses instructor visibility rules', async () => {
+      mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
+      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+      await service.findAll({ limit: 10, offset: 0 }, INSTRUCTOR_AUTH);
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ tenantId: 'tenant-1', userId: 'instructor-1', userRole: 'INSTRUCTOR' }),
+        expect.any(Function)
+      );
+    });
+
+    it('findByAsset() with PERSONAL layer filter enforces owner-only visibility', async () => {
+      mockOrderBy.mockResolvedValue([MOCK_ANNOTATION]);
+      await service.findByAsset('asset-1', 'PERSONAL', MOCK_AUTH);
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ userId: 'user-1', tenantId: 'tenant-1' }),
+        expect.any(Function)
+      );
+    });
+
+    it('findByAsset() without layer filter applies instructor visibility for instructor role', async () => {
+      mockOrderBy.mockResolvedValue([MOCK_ANNOTATION]);
+      await service.findByAsset('asset-1', undefined, INSTRUCTOR_AUTH);
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ userId: 'instructor-1', userRole: 'INSTRUCTOR' }),
+        expect.any(Function)
+      );
+    });
+
+    it('findByAsset() without layer filter applies student visibility for student role', async () => {
+      mockOrderBy.mockResolvedValue([MOCK_ANNOTATION]);
+      await service.findByAsset('asset-1', undefined, MOCK_AUTH);
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ userId: 'user-1', userRole: 'STUDENT' }),
+        expect.any(Function)
+      );
+    });
+  });
+
+  // ─── resolve ──────────────────────────────────────────────────────────
+  describe('resolve()', () => {
+    it('delegates to update() with isResolved: true', async () => {
+      mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      mockReturning.mockResolvedValue([{ ...MOCK_ANNOTATION, is_resolved: true }]);
+      const result = await service.resolve('ann-1', MOCK_AUTH);
+      expect(result).toBeDefined();
+    });
+
+    it('throws Annotation not found when resolving non-existent annotation', async () => {
+      mockLimit.mockResolvedValue([]);
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      await expect(
+        service.resolve('nonexistent', MOCK_AUTH)
+      ).rejects.toThrow('Annotation not found');
+    });
   });
 });

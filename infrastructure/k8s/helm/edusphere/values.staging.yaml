@@ -1,0 +1,130 @@
+# =============================================================================
+# EduSphere — Staging Helm Values
+#
+# Overrides values.yaml for the staging environment.
+# Lower replica counts and resource limits than production to reduce cost,
+# while still exercising the full deployment topology.
+# =============================================================================
+
+global:
+  namespace: edusphere-staging
+
+# ── Replica counts (lean for staging) ────────────────────────────────────────
+replicaCount:
+  gateway: 2
+  subgraph: 1
+  frontend: 1
+
+# ── Image — tag is injected by the CD pipeline at deploy time ─────────────────
+image:
+  registry: ghcr.io
+  repository: ${{ github.repository_owner }}/edusphere
+  pullPolicy: Always   # Always pull in staging so the latest tag is guaranteed
+  tag: ""              # Set by CD: --set image.tag=main-<sha>
+
+# ── Gateway ───────────────────────────────────────────────────────────────────
+gateway:
+  enabled: true
+  autoscaling:
+    enabled: false     # No HPA in staging — predictable load
+    minReplicas: 2
+    maxReplicas: 5
+  podDisruptionBudget:
+    minAvailable: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── Subgraphs ─────────────────────────────────────────────────────────────────
+subgraphs:
+  core:
+    enabled: true
+    port: 4001
+    replicas: 1
+  content:
+    enabled: true
+    port: 4002
+    replicas: 1
+  annotation:
+    enabled: true
+    port: 4003
+    replicas: 1
+  collaboration:
+    enabled: true
+    port: 4004
+    replicas: 1
+  agent:
+    enabled: true
+    port: 4005
+    replicas: 1
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+  knowledge:
+    enabled: true
+    port: 4006
+    replicas: 1
+
+# ── Frontend ──────────────────────────────────────────────────────────────────
+frontend:
+  enabled: true
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+# ── Ingress ───────────────────────────────────────────────────────────────────
+ingress:
+  enabled: true
+  className: traefik
+  host: staging.edusphere.dev
+  apiHost: staging-api.edusphere.dev
+  tls:
+    enabled: true
+    secretName: edusphere-staging-tls
+
+# ── External services — secrets injected via External Secrets Operator ────────
+postgresql:
+  enabled: false   # Use shared staging PostgreSQL instance (external)
+
+redis:
+  enabled: false   # Use shared staging Redis instance (external)
+
+# ── Pod security (same as production) ────────────────────────────────────────
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# ── Service account ───────────────────────────────────────────────────────────
+serviceAccount:
+  create: true
+  name: "edusphere-staging"
+
+# ── Observability ─────────────────────────────────────────────────────────────
+monitoring:
+  # Prometheus scraping annotations are set in pod templates
+  enabled: true
+  namespace: monitoring

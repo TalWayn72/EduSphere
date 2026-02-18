@@ -1,0 +1,89 @@
+# ============================================================
+# PgBouncer docker-compose override for local development
+# ============================================================
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f infrastructure/docker-compose.pgbouncer.yml up -d
+#
+# After starting, update DATABASE_URL in subgraph .env files to point at PgBouncer:
+#   DATABASE_URL=postgresql://edusphere:<password>@pgbouncer:5432/edusphere_core
+#
+# For the agent subgraph:
+#   DATABASE_URL=postgresql://edusphere:<password>@pgbouncer:5432/edusphere_agent
+#
+# Verify PgBouncer is running:
+#   psql -h localhost -p 6432 -U pgbouncer_admin pgbouncer -c "SHOW STATS;"
+
+version: "3.9"
+
+services:
+  pgbouncer:
+    image: bitnami/pgbouncer:1.23.1
+    container_name: edusphere-pgbouncer
+    restart: unless-stopped
+    ports:
+      # Expose PgBouncer on host port 6432 (avoids conflict with direct postgres:5432)
+      - "6432:5432"
+    environment:
+      # bitnami/pgbouncer reads these env vars and writes pgbouncer.ini automatically.
+      # We override with our own config file instead via volume mount below.
+      PGBOUNCER_AUTH_TYPE: scram-sha-256
+      PGBOUNCER_DATABASE: edusphere
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: "1000"
+      PGBOUNCER_DEFAULT_POOL_SIZE: "20"
+      PGBOUNCER_SERVER_IDLE_TIMEOUT: "600"
+      POSTGRESQL_HOST: postgres
+      POSTGRESQL_PORT: "5432"
+      POSTGRESQL_USERNAME: edusphere
+      POSTGRESQL_PASSWORD: "${POSTGRES_PASSWORD:-edusphere_dev_password}"
+      POSTGRESQL_DATABASE: edusphere
+    volumes:
+      # Mount our hand-crafted config (overrides bitnami defaults)
+      - ./pgbouncer/pgbouncer.ini:/bitnami/pgbouncer/conf/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/bitnami/pgbouncer/conf/userlist.txt:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - edusphere-network
+    healthcheck:
+      # Connect to pgbouncer admin console and run SHOW STATS
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h 127.0.0.1 -p 5432 -U edusphere -d edusphere || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    labels:
+      com.edusphere.component: pgbouncer
+      com.edusphere.description: "PgBouncer connection pooler — transaction mode"
+
+  # ─── Prometheus exporter for PgBouncer ──────────────────────────────────────
+  pgbouncer-exporter:
+    image: spreaker/prometheus-pgbouncer-exporter:latest
+    container_name: edusphere-pgbouncer-exporter
+    restart: unless-stopped
+    ports:
+      - "9127:9127"
+    environment:
+      PGBOUNCER_EXPORTER_HOST: pgbouncer
+      PGBOUNCER_EXPORTER_PORT: "5432"
+      PGBOUNCER_EXPORTER_USER: pgbouncer_stats
+      PGBOUNCER_EXPORTER_PASSWORD: "${PGBOUNCER_STATS_PASSWORD:-pgbouncer_stats_dev}"
+      PGBOUNCER_EXPORTER_DATABASE: pgbouncer
+    depends_on:
+      pgbouncer:
+        condition: service_healthy
+    networks:
+      - edusphere-network
+    labels:
+      com.edusphere.component: pgbouncer-exporter
+
+networks:
+  edusphere-network:
+    external: true
+    name: edusphere-network

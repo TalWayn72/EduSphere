@@ -1,0 +1,74 @@
+apiVersion: 1
+
+# Grafana datasource auto-provisioning
+# Place this file at /etc/grafana/provisioning/datasources/datasources.yaml
+# inside the Grafana container (or mount it via docker-compose volume).
+
+datasources:
+  # ─── Prometheus (primary metrics source) ───────────────────────────────────
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    uid: prometheus-main
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+      # Align scrape interval with prometheus.yml global.scrape_interval
+      timeInterval: 15s
+      # Enable Prometheus query inspector in Grafana
+      queryTimeout: 60s
+      # Exemplars for trace correlation (requires Jaeger datasource)
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: jaeger-main
+          urlDisplayLabel: "Open in Jaeger"
+
+  # ─── Loki (log aggregation) ────────────────────────────────────────────────
+  - name: Loki
+    type: loki
+    access: proxy
+    uid: loki-main
+    url: http://loki:3100
+    isDefault: false
+    editable: false
+    jsonData:
+      maxLines: 5000
+      # Derived fields: parse trace IDs from structured Pino logs
+      derivedFields:
+        - datasourceUid: jaeger-main
+          matcherRegex: '"traceId":"(\w+)"'
+          name: TraceID
+          url: "$${__value.raw}"
+          urlDisplayLabel: "Open trace in Jaeger"
+
+  # ─── Jaeger (distributed tracing) ──────────────────────────────────────────
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    uid: jaeger-main
+    url: http://jaeger:16686
+    isDefault: false
+    editable: false
+
+  # ─── PostgreSQL (direct DB queries for RLS audit) ──────────────────────────
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    uid: postgres-main
+    url: postgres:5432
+    database: edusphere
+    user: edusphere
+    isDefault: false
+    editable: false
+    secureJsonData:
+      # Override via Grafana secret management (GF_SECURITY_ADMIN_PASSWORD env)
+      password: "${POSTGRES_PASSWORD}"
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+      maxOpenConns: 5
+      maxIdleConns: 2
+      connMaxLifetime: 14400

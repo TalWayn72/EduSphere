@@ -1,0 +1,29 @@
+; ============================================================
+; PgBouncer userlist.txt — authentication credentials
+; ============================================================
+;
+; FORMAT (one entry per line):
+;   "<username>" "<scram-sha-256-or-md5-hash>"
+;
+; Generating a scram-sha-256 hash (PostgreSQL 16):
+;   psql -c "SELECT rolpassword FROM pg_authid WHERE rolname = 'edusphere';"
+;
+; Or using pgbouncer's pg_shadow_show tool:
+;   python3 -c "import hashlib, base64, os; ..."
+;
+; IMPORTANT: Replace all placeholder values before deploying.
+; In production, inject these via Kubernetes ExternalSecrets (AWS Secrets Manager).
+; Never commit real credentials to version control.
+; ────────────────────────────────────────────────────────────
+
+; Application user — used by all 6 NestJS subgraphs
+; Replace with actual scram-sha-256 hash from PostgreSQL:
+"edusphere" "SCRAM-SHA-256$4096:REPLACE_WITH_REAL_SALT==$REPLACE_WITH_STORED_KEY==$REPLACE_WITH_SERVER_KEY=="
+
+; PgBouncer admin user — for SHOW STATS, RELOAD, PAUSE, etc.
+; Replace with actual hash:
+"pgbouncer_admin" "SCRAM-SHA-256$4096:REPLACE_WITH_REAL_SALT==$REPLACE_WITH_STORED_KEY==$REPLACE_WITH_SERVER_KEY=="
+
+; Read-only stats user — for Grafana PgBouncer stats integration
+; Replace with actual hash:
+"pgbouncer_stats" "SCRAM-SHA-256$4096:REPLACE_WITH_REAL_SALT==$REPLACE_WITH_STORED_KEY==$REPLACE_WITH_SERVER_KEY=="
