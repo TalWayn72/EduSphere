@@ -11,9 +11,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    // Use 'node' for pure unit tests (no DOM). Switch to 'jsdom' once
-    // @testing-library/react is installed for component rendering tests.
-    environment: 'node',
+    environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     passWithNoTests: true,
