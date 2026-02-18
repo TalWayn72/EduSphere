@@ -42,7 +42,7 @@ describe('LAYER_META', () => {
 
   it('each layer has label, color, and bg properties', () => {
     expectedLayers.forEach((layer) => {
-      const meta = LAYER_META[layer];
+      const meta = LAYER_META[layer]!;
       expect(meta).toHaveProperty('label');
       expect(meta).toHaveProperty('color');
       expect(meta).toHaveProperty('bg');
@@ -52,11 +52,11 @@ describe('LAYER_META', () => {
   });
 
   it('PERSONAL layer has correct label', () => {
-    expect(LAYER_META.PERSONAL.label).toBe('Personal');
+    expect(LAYER_META['PERSONAL']!.label).toBe('Personal');
   });
 
   it('AI_GENERATED layer has correct label', () => {
-    expect(LAYER_META.AI_GENERATED.label).toBe('AI');
+    expect(LAYER_META['AI_GENERATED']!.label).toBe('AI');
   });
 });
 

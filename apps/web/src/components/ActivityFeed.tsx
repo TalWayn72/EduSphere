@@ -1,5 +1,6 @@
 import { ActivityItem } from '@/lib/mock-analytics';
 import { BookOpen, Brain, FileText, MessageSquare, Zap } from 'lucide-react';
+import { formatRelativeTime } from '@/lib/activity-feed.utils';
 
 interface ActivityFeedProps {
   items: ActivityItem[];
@@ -23,15 +24,6 @@ const ACTIVITY_COLORS = {
   discussion:
     'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300',
 } as const;
-
-function formatRelativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours < 1) return 'Just now';
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
 
 export function ActivityFeed({ items }: ActivityFeedProps) {
   return (

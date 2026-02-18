@@ -30,8 +30,8 @@ describe('MOCK_HEATMAP_DATA', () => {
 
   it('dates are in ascending order', () => {
     for (let i = 1; i < MOCK_HEATMAP_DATA.length; i++) {
-      const prev = MOCK_HEATMAP_DATA[i - 1].date ?? '';
-      const curr = MOCK_HEATMAP_DATA[i].date ?? '';
+      const prev = MOCK_HEATMAP_DATA[i - 1]!.date ?? '';
+      const curr = MOCK_HEATMAP_DATA[i]!.date ?? '';
       expect(curr >= prev).toBe(true);
     }
   });

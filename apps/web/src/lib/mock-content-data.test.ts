@@ -58,8 +58,8 @@ describe('mockTranscript', () => {
 
   it('segments are in chronological order', () => {
     for (let i = 1; i < mockTranscript.length; i++) {
-      expect(mockTranscript[i].startTime).toBeGreaterThan(
-        mockTranscript[i - 1].startTime
+      expect(mockTranscript[i]!.startTime).toBeGreaterThan(
+        mockTranscript[i - 1]!.startTime
       );
     }
   });
