@@ -1,8 +1,25 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 17 פברואר 2026
-**מצב פרויקט:** ✅ Phase 10 - Frontend + Docs (Completed) + Enhanced Annotation Subgraph
-**סטטוס כללי:** Full-Stack Platform Complete → Production Ready! 🚀
+**תאריך עדכון:** 18 פברואר 2026
+**מצב פרויקט:** ✅ Phase 9 - Dashboard Analytics (Completed) | 🔴 Phases 10-17 — Frontend Core UX (In Progress)
+**סטטוס כללי:** Backend Complete (Phases 0-8) | Frontend UI Gaps Identified — Critical UX Missing
+
+## 🔴 ניתוח פערים קריטי — Frontend
+
+ניתוח מ-18 פברואר 2026 גילה שה-Backend מלא אבל ה-Frontend חסרות פיצ'רים קריטיים:
+
+| פיצ'ר | PRD דורש | מה קיים | דחיפות |
+|--------|---------|---------|--------|
+| **Video Player** | Video.js + HLS + transcript sync | ❌ אפס | 🔴 קריטי |
+| **Search UI** | Semantic search bar + results page | ❌ אפס | 🔴 קריטי |
+| **AI Agent Chat** | Chat panel + streaming tokens | ❌ אפס | 🔴 קריטי |
+| **Knowledge Graph** | Cytoscape/D3 visualization | ❌ אפס | 🟡 גבוה |
+| **Annotation על video** | Overlay + layers + threads | 20% | 🟡 גבוה |
+| **Logout / User Menu** | Dropdown עם logout | ❌ חסר | 🟡 גבוה |
+| **Course Creation UI** | Create/edit/publish flows | 20% | 🟡 גבוה |
+| **Collaboration Editor** | Yjs CRDT + presence | 0% | 🟢 בינוני |
+
+**תוכנית תיקון:** Phases 10-17 ב-IMPLEMENTATION-ROADMAP.md
 
 ---
 

@@ -1021,6 +1021,298 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
+## Phase 9: Dashboard Analytics (✅ Completed — Feb 2026)
+
+**Delivered:**
+- ActivityHeatmap: GitHub-style 12-week study activity grid
+- LearningStats: course progress bars + weekly sparkline chart
+- ActivityFeed: typed activity items with color-coded icons (study/quiz/annotation/ai/discussion)
+- Dashboard stats: Learning Streak, Study Time, Concepts Mastered cards
+
+---
+
+## Phase 10: Video Player + Transcript Sync (🔴 CRITICAL — User Cannot Consume Content)
+
+**Problem:** Users cannot watch any video content. The core learning loop is broken.
+
+### Phase 10.1: Video Player with HLS Streaming
+
+**Tasks:**
+1. Install Video.js + `@videojs/http-streaming` (HLS support)
+2. Build `VideoPlayerCore.tsx` component:
+   - HLS stream from MinIO presigned URLs
+   - Playback controls: play/pause, seek, speed (0.5x–2x), fullscreen
+   - Quality selector (360p / 720p / 1080p)
+   - Keyboard shortcuts: Space=play, ←/→=seek 5s, F=fullscreen
+3. Integrate into existing `ContentViewer.tsx` replacing placeholder
+
+### Phase 10.2: Transcript Panel with Sync
+
+**Tasks:**
+1. Build `TranscriptPanel.tsx`:
+   - Fetch segments from Knowledge subgraph (`transcriptSegments` query)
+   - Auto-scroll to active segment based on `currentTime`
+   - Click segment → seek video to that timestamp
+   - Highlight current word (word-level timestamps from Whisper)
+2. Two-column layout: Video (left 60%) | Transcript (right 40%)
+3. Toggle transcript panel visibility
+
+### Phase 10.3: Transcript Search → Video Jump
+
+**Tasks:**
+1. Search input in transcript panel header
+2. Filter segments by text match
+3. Click result → seek to timestamp
+4. "Found N results" indicator
+
+**Acceptance Criteria:**
+```bash
+# Video loads and plays HLS stream
+# Transcript scrolls automatically as video plays
+# Clicking a transcript line seeks video to that time
+# Search in transcript filters and jumps to result
+```
+
+---
+
+## Phase 11: Semantic Search UI (🔴 CRITICAL — Users Cannot Discover Content)
+
+**Problem:** No search bar exists anywhere in the UI. The Knowledge subgraph is fully built but inaccessible.
+
+### Phase 11.1: Global Search Bar
+
+**Tasks:**
+1. Add search input to Layout header (top navigation)
+2. Keyboard shortcut: `Cmd+K` / `Ctrl+K` opens search modal
+3. Debounced search (300ms) as user types
+4. Show recent searches from localStorage
+
+### Phase 11.2: Search Results Page (`/search?q=...`)
+
+**Tasks:**
+1. New `SearchPage.tsx` route at `/search`
+2. Call `hybridSearch` GraphQL query (Knowledge subgraph)
+3. Results display:
+   - Course title + module title + snippet with highlighted match
+   - Timestamp badge for video segments (e.g., "2:34")
+   - Similarity score badge
+   - Click → navigate to `/learn/:contentId?t=<seconds>`
+4. Filter sidebar: by course, content type (video/PDF), date range
+5. Toggle: Semantic / Keyword search mode
+
+### Phase 11.3: Search Results → Video Timestamp
+
+**Tasks:**
+1. Pass `t` query param to `ContentViewer.tsx`
+2. Auto-seek video to timestamp on load
+3. Highlight matching transcript segment
+
+**Acceptance Criteria:**
+```bash
+# Cmd+K opens search modal from any page
+# Typing returns results from Knowledge subgraph within 500ms
+# Clicking a video result opens ContentViewer at correct timestamp
+# Transcript segment is highlighted
+```
+
+---
+
+## Phase 12: AI Agent Chat Interface (🔴 CRITICAL — Core Value Prop Invisible)
+
+**Problem:** `AgentsPage.tsx` exists but there is zero chat UI. The entire AI layer (LangGraph, Vercel AI SDK) is backend-only.
+
+### Phase 12.1: Agent Chat Panel
+
+**Tasks:**
+1. Build `AgentChatPanel.tsx`:
+   - Message list with user/assistant bubbles
+   - Input textarea with `Enter` to send, `Shift+Enter` for newline
+   - Send button with loading spinner
+   - Streaming tokens display (SSE from Agent subgraph)
+   - Copy message button
+   - Markdown rendering in assistant messages (react-markdown)
+2. Connect to `executeAgent` mutation + `agentMessageStream` subscription
+3. Show agent name + avatar in header
+
+### Phase 12.2: Agent Template Selector
+
+**Tasks:**
+1. Sidebar or modal with 4 templates:
+   - 🎓 **Chavruta** (debate partner)
+   - 📝 **Summarizer** (content summary)
+   - ❓ **Quiz Master** (adaptive quiz)
+   - 🔍 **Research Scout** (sources + citations)
+2. Each template: name, description, icon, example prompt
+3. Select template → pre-fill system prompt → start session
+
+### Phase 12.3: Agent History
+
+**Tasks:**
+1. Session list sidebar: past conversations
+2. Click session → load message history
+3. "New Chat" button → clear and start fresh
+
+**Acceptance Criteria:**
+```bash
+# User selects Chavruta template → chat opens with greeting
+# User sends message → streaming response appears token by token
+# User can start a Quiz → receives quiz questions
+# Session is saved and retrievable from history
+```
+
+---
+
+## Phase 13: Knowledge Graph Visualization (🟡 HIGH — Empty Page)
+
+**Problem:** `KnowledgeGraph.tsx` renders an empty page. Backend graph data exists but no visualization.
+
+### Phase 13.1: Graph Canvas
+
+**Tasks:**
+1. Install `cytoscape` + `react-cytoscapejs` (or D3.js force-directed)
+2. Build `GraphCanvas.tsx`:
+   - Fetch concepts from `conceptsByTenant` + `getRelatedConcepts` queries
+   - Render nodes: Concept (blue), Term (green), Source (orange), Person (purple)
+   - Render edges: RELATES_TO, PART_OF, MENTIONED_IN
+   - Pan, zoom, fit-to-screen controls
+   - Node click → open detail panel
+
+### Phase 13.2: Concept Detail Panel
+
+**Tasks:**
+1. Slide-in right panel on node click:
+   - Concept name + type badge
+   - Description
+   - Related concepts list (clickable → navigate graph)
+   - Linked content items (click → open ContentViewer)
+2. "Explore from here" button → re-center graph on this concept
+
+### Phase 13.3: Learning Path Overlay
+
+**Tasks:**
+1. Highlight mastered concepts (based on user progress) in green
+2. Show "next recommended" concept in orange
+3. Progress percentage overlay on graph
+
+**Acceptance Criteria:**
+```bash
+# Graph renders within 2 seconds with 50+ nodes
+# Clicking a node shows detail panel
+# User's mastered concepts are visually distinct
+# Clicking linked content opens ContentViewer
+```
+
+---
+
+## Phase 14: Annotation System — Full Integration (🟡 HIGH)
+
+**Problem:** Annotation backend is complete (Phase 3) but frontend has only a demo page. No annotation during video playback.
+
+### Phase 14.1: Annotation Overlay on Video
+
+**Tasks:**
+1. Render annotation markers on video progress bar (colored dots at timestamps)
+2. Click marker → jump to that time + show annotation popup
+3. "Add annotation at current time" button during playback
+4. Annotation form: text input + type selector (NOTE/HIGHLIGHT/BOOKMARK/QUESTION)
+
+### Phase 14.2: Layer Filtering
+
+**Tasks:**
+1. Layer toggle buttons: PERSONAL / SHARED / INSTRUCTOR / AI_GENERATED
+2. Show count per layer
+3. Filter affects both progress bar markers and list view
+4. Persist filter preference in localStorage
+
+### Phase 14.3: Thread Replies
+
+**Tasks:**
+1. Click annotation → expand thread
+2. Reply input at bottom of thread
+3. Reply count badge on annotation marker
+
+**Acceptance Criteria:**
+```bash
+# Annotation markers visible on video progress bar
+# Can create annotation at current video timestamp
+# Layer toggles filter annotations correctly
+# Thread replies load and can be added
+```
+
+---
+
+## Phase 15: Authentication Completion + User Menu (🟡 MEDIUM)
+
+**Problem:** No logout button exists. Users cannot log out or view their profile.
+
+**Tasks:**
+1. Add user avatar + dropdown menu to Layout header:
+   - Display name + email
+   - "Profile" link → `/profile` page
+   - "Settings" link → `/settings` page
+   - "Logout" button → Keycloak logout + redirect to `/login`
+2. Build `ProfilePage.tsx`:
+   - Edit display name, avatar upload
+   - Notification preferences
+   - Learning statistics summary
+3. Route guards: redirect unauthenticated users to `/login`
+4. Role-based navigation: hide admin links from students
+
+**Acceptance Criteria:**
+```bash
+# Logout button visible and functional in all authenticated pages
+# Clicking logout clears Keycloak session and redirects to /login
+# Profile page loads and shows user data
+# Unauthenticated users redirected to /login from any protected route
+```
+
+---
+
+## Phase 16: Course Management UI (🟡 MEDIUM)
+
+**Problem:** Instructors have no UI to create or manage courses. Only students see (read-only) course list.
+
+**Tasks:**
+1. "New Course" button on CourseList page (visible to INSTRUCTOR+ roles only)
+2. Course creation wizard (3 steps): metadata → modules → publish
+3. Module management: drag-and-drop reorder, add/remove
+4. Course settings page: description, prerequisites, thumbnail upload
+5. Publish / Unpublish toggle with confirmation dialog
+6. Student enrollment: "Enroll" button on course card
+
+**Acceptance Criteria:**
+```bash
+# Instructor can create a course with title, description, thumbnail
+# Can add modules and reorder them
+# Can publish course and see it appear in student's course list
+# Student can enroll in a published course
+```
+
+---
+
+## Phase 17: Collaboration Real-Time Editor (🟢 LOWER)
+
+**Problem:** CollaborationPage.tsx is a stub. Yjs/Hocuspocus backend exists but no frontend editor.
+
+**Tasks:**
+1. Install `@tiptap/react` + Yjs extension for collaborative editing
+2. Build `CollaborativeEditor.tsx`:
+   - Rich text editing (bold/italic/lists/headings)
+   - Real-time cursor presence (colored per user)
+   - User avatar list (active participants)
+   - Document title editing
+3. Integrate with Collaboration subgraph WebSocket endpoint
+4. Offline queue: buffer changes locally, sync on reconnect
+
+**Acceptance Criteria:**
+```bash
+# Two browser tabs see each other's cursors in real-time
+# Text changes sync within 200ms
+# Disconnecting and reconnecting syncs buffered changes
+```
+
+---
+
 ## Cross-Cutting Concerns (Active in ALL Phases)
 
 ### Testing Strategy
