@@ -7,6 +7,10 @@ import { Login } from '@/pages/Login';
 import { Dashboard } from '@/pages/Dashboard';
 import { ContentViewer } from '@/pages/ContentViewer';
 import { CourseList } from '@/pages/CourseList';
+import { KnowledgeGraph } from '@/pages/KnowledgeGraph';
+import { AgentsPage } from '@/pages/AgentsPage';
+import { AnnotationsPage } from '@/pages/AnnotationsPage';
+import { CollaborationPage } from '@/pages/CollaborationPage';
 import AnnotationDemo from '@/pages/AnnotationDemo';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
@@ -61,6 +65,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/graph"
+            element={
+              <ProtectedRoute>
+                <KnowledgeGraph />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/agents"
+            element={
+              <ProtectedRoute>
+                <AgentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/annotations"
+            element={
+              <ProtectedRoute>
+                <AnnotationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/collaboration"
+            element={
+              <ProtectedRoute>
+                <CollaborationPage />
               </ProtectedRoute>
             }
           />

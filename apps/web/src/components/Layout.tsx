@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout, getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
-import { LogOut, BookOpen, Users, FileText, Bot, Network, LayoutDashboard } from 'lucide-react';
+import { LogOut, BookOpen, Users, FileText, Bot, Network, LayoutDashboard, GitBranch } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -38,15 +38,15 @@ export function Layout({ children }: LayoutProps) {
                   to="/courses"
                   className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
-                  <Network className="h-4 w-4" />
+                  <BookOpen className="h-4 w-4" />
                   <span>Courses</span>
                 </Link>
                 <Link
-                  to="/collaboration"
+                  to="/graph"
                   className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
-                  <Users className="h-4 w-4" />
-                  <span>Collaboration</span>
+                  <Network className="h-4 w-4" />
+                  <span>Graph</span>
                 </Link>
                 <Link
                   to="/annotations"
@@ -60,13 +60,20 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   <Bot className="h-4 w-4" />
-                  <span>AI Agents</span>
+                  <span>Agents</span>
+                </Link>
+                <Link
+                  to="/collaboration"
+                  className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <Users className="h-4 w-4" />
+                  <span>Chavruta</span>
                 </Link>
                 <Link
                   to="/dashboard"
                   className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
-                  <LayoutDashboard className="h-4 w-4" />
+                  <GitBranch className="h-4 w-4" />
                   <span>Dashboard</span>
                 </Link>
               </nav>
