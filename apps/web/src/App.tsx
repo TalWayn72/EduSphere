@@ -14,6 +14,9 @@ import { CollaborationPage } from '@/pages/CollaborationPage';
 import { SearchPage } from '@/pages/Search';
 import AnnotationDemo from '@/pages/AnnotationDemo';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { CourseCreatePage } from '@/pages/CourseCreatePage';
+import { CollaborationSessionPage } from '@/pages/CollaborationSessionPage';
 
 function App() {
   const [keycloakReady, setKeycloakReady] = useState(false);
@@ -64,6 +67,14 @@ function App() {
             }
           />
           <Route
+            path="/courses/new"
+            element={
+              <ProtectedRoute>
+                <CourseCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
@@ -104,10 +115,34 @@ function App() {
             }
           />
           <Route
+            path="/collaboration/session"
+            element={
+              <ProtectedRoute>
+                <CollaborationSessionPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/search"
             element={
               <ProtectedRoute>
                 <SearchPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />

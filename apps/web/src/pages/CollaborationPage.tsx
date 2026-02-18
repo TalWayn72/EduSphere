@@ -60,6 +60,12 @@ const RECENT_SESSIONS = [
 
 type MatchState = 'idle' | 'searching' | 'found';
 
+function toSessionUrl(partner: string, topic?: string): string {
+  const params = new URLSearchParams({ partner });
+  if (topic) params.set('topic', topic);
+  return `/collaboration/session?${params.toString()}`;
+}
+
 export function CollaborationPage() {
   const navigate = useNavigate();
   const [matchState, setMatchState] = useState<MatchState>('idle');
@@ -71,7 +77,7 @@ export function CollaborationPage() {
     if (mode === 'ai') {
       setTimeout(() => {
         setMatchState('found');
-        setTimeout(() => navigate('/learn/content-1'), 1500);
+        setTimeout(() => navigate(toSessionUrl('AI Chavruta', 'Dialectical study')), 1200);
       }, 1000);
     } else {
       setTimeout(() => setMatchState('found'), 3000);
@@ -120,7 +126,10 @@ export function CollaborationPage() {
                     Searching for partner...
                   </Button>
                 ) : (
-                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                  <Button
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={() => navigate(toSessionUrl('Study Partner', 'Collaborative notes'))}
+                  >
                     <CheckCircle className="h-4 w-4 mr-2" />
                     Partner found! Join session →
                   </Button>
@@ -198,6 +207,7 @@ export function CollaborationPage() {
                       <Button
                         size="sm"
                         className="h-8 text-xs bg-green-600 hover:bg-green-700"
+                        onClick={() => navigate(toSessionUrl(session.partner, session.topic))}
                       >
                         Rejoin
                       </Button>
