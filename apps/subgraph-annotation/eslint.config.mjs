@@ -1,11 +1,15 @@
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import securityPlugin from 'eslint-plugin-security';
 
 export default [
   { ignores: ['node_modules/**', 'dist/**', '.turbo/**', 'coverage/**'] },
+  securityPlugin.configs.recommended,
   {
     files: ['src/**/*.ts', 'test/**/*.ts'],
-    plugins: { '@typescript-eslint': tsPlugin },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
     languageOptions: {
       parser: tsParser,
       globals: {
@@ -30,6 +34,14 @@ export default [
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       'no-console': 'off',
+      'security/detect-object-injection': 'warn',
+      'security/detect-non-literal-regexp': 'error',
+      'security/detect-unsafe-regex': 'error',
+      'security/detect-eval-with-expression': 'error',
+      'security/detect-non-literal-fs-filename': 'warn',
+      'security/detect-non-literal-require': 'warn',
+      'security/detect-possible-timing-attacks': 'warn',
+      'security/detect-pseudorandom-number-generator': 'warn',
     },
   },
 ];

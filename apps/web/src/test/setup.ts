@@ -1,6 +1,13 @@
 // Vitest global test setup
-// Add @testing-library/jest-dom matchers when installed:
-// import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server } from './server';
 
-// Silence console errors during tests (optional — remove when debugging)
-// vi.spyOn(console, 'error').mockImplementation(() => {});
+// Start MSW server before all tests
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+
+// Reset handlers after each test (prevent test pollution)
+afterEach(() => server.resetHandlers());
+
+// Stop server after all tests
+afterAll(() => server.close());

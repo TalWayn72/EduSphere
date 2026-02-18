@@ -1,9 +1,9 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 18 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-15 Complete | 🟡 Phases 16-17 — Course Management + Collaboration (Next)
-**סטטוס כללי:** Backend Complete (Phases 0-8) | Frontend: User Menu ✅ Profile Page ✅ Logout ✅
-**בדיקות Web:** 87 unit tests עוברות (7 suites) | TypeScript strict: 0 errors
+**מצב פרויקט:** ✅ Phases 9-17 Complete — ALL Frontend Phases Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security: CypherService injection fix pending
+**בדיקות Web:** 107 unit tests עוברות (9 suites) | Component tests (RTL): ✅ | Security ESLint: ✅ | CodeQL: ✅
 
 ---
 
@@ -42,14 +42,21 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 ### Outstanding (Lower Priority)
 - `ContentViewer.tsx` still ~795 lines (documented exception, needs extract to sub-components in future phase)
 - `zustand`, `@tanstack/react-query`, `zod` not installed in `apps/web` (promised in CLAUDE.md)
-- `@testing-library/react` not installed — needed for component rendering tests (DOM-based)
 - `seed.ts` uses `console.log` (violates "no console.log" rule) — acceptable for seed scripts
 
 ### ✅ Completed Since Audit (18 Feb 2026)
-- `apps/web` test suite: **87 unit tests** across 7 suites — all passing (`vitest run`)
+- `apps/web` test suite: **107 unit tests** across 9 suites — all passing (`vitest run`)
+- Component tests with React Testing Library: `ActivityFeed.test.tsx` (12), `ActivityHeatmap.test.tsx` (8)
 - Pure utility functions extracted from components: `activity-feed.utils.ts`, `heatmap.utils.ts`, `content-viewer.utils.tsx`, `AnnotationCard.tsx`
 - E2E spec file created: `apps/web/e2e/smoke.spec.ts` (6 Playwright specs, runs with dev server)
 - `jsdom` installed as dev dependency — `environment: 'jsdom'` now active in vitest.config.ts
+- `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`, `msw` installed in `apps/web`
+- MSW server setup: `src/test/server.ts` + `src/test/handlers.ts` — GraphQL mocking infrastructure
+- `setup.ts` updated to import `@testing-library/jest-dom` and start MSW server
+- `eslint-plugin-security` v3 + `eslint-plugin-no-unsanitized` v4 installed at workspace root
+- `apps/web/eslint.config.js` — security rules + XSS prevention (`no-unsanitized/method`, `no-unsanitized/property`)
+- All 6 subgraph `eslint.config.mjs` — Node.js security rules (eval, regex, timing attacks, path traversal)
+- `.github/workflows/codeql.yml` — GitHub CodeQL SAST + TruffleHog secret scanning on every push/PR
 - TypeScript strict: `tsc --noEmit` — 0 errors across all test files
 
 ---
@@ -66,8 +73,8 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | **Knowledge Graph** | Cytoscape/D3 visualization | ❌ אפס | 🟡 גבוה |
 | **Annotation על video** | Overlay + layers + threads | 20% | 🟡 גבוה |
 | **Logout / User Menu** | Dropdown עם logout | ✅ הושלם | ✅ |
-| **Course Creation UI** | Create/edit/publish flows | 20% | 🟡 גבוה |
-| **Collaboration Editor** | Yjs CRDT + presence | 0% | 🟢 בינוני |
+| **Course Creation UI** | Create/edit/publish flows | ✅ הושלם | ✅ |
+| **Collaboration Editor** | Tiptap + mock presence + session | ✅ הושלם | ✅ |
 
 **תוכנית תיקון:** Phases 10-17 ב-IMPLEMENTATION-ROADMAP.md
 
@@ -160,6 +167,54 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 - `e2e/smoke.spec.ts`: 6 Playwright E2E specs (ממתינות לdev server)
 
 **תוצאה סופית:** tsc 0 שגיאות | vite build ✓ | 87/87 tests ✓
+
+---
+
+## ✅ TASK-011: Testing & Security Tooling Completion (18 פברואר 2026)
+
+**סטטוס:** ✅ הושלם | **חומרה:** 🟡 Medium | **תאריך:** 18 February 2026
+
+### בעיה
+ביקורת כלים גילתה 4 פערים קריטיים שנותרו לאחר TASK-010:
+1. `@testing-library/react` חסר — בדיקות component בלתי אפשריות
+2. `eslint-plugin-security` חסר — אין זיהוי פרצות ב-Node.js/React
+3. GitHub CodeQL חסר — אין SAST אוטומטי
+4. MSW חסר — אין mocking של GraphQL calls בבדיקות
+
+### שינויים
+
+#### Wave 1 — התקנות (מקביל)
+| חבילה | גרסה | מיקום |
+|--------|------|--------|
+| `@testing-library/react` | ^16 | `apps/web` devDependencies |
+| `@testing-library/user-event` | ^14 | `apps/web` devDependencies |
+| `@testing-library/jest-dom` | ^6` | `apps/web` devDependencies |
+| `msw` | ^2 | `apps/web` devDependencies |
+| `eslint-plugin-security` | ^3.0.1 | workspace root devDependencies |
+| `eslint-plugin-no-unsanitized` | ^4.1.4 | workspace root devDependencies |
+
+#### Wave 2 — קבצי תשתית
+| קובץ | שינוי |
+|------|-------|
+| `apps/web/src/test/setup.ts` | הוסף `import '@testing-library/jest-dom'` + MSW server lifecycle |
+| `apps/web/src/test/server.ts` | חדש — MSW node server עם `setupServer` |
+| `apps/web/src/test/handlers.ts` | חדש — GraphQL handlers ברירת מחדל |
+| `apps/web/eslint.config.js` | הוסף `eslint-plugin-security` + `eslint-plugin-no-unsanitized` |
+| `apps/subgraph-core/eslint.config.mjs` | הוסף security rules (Node.js) |
+| `apps/subgraph-content/eslint.config.mjs` | הוסף security rules |
+| `apps/subgraph-annotation/eslint.config.mjs` | הוסף security rules |
+| `apps/subgraph-collaboration/eslint.config.mjs` | הוסף security rules |
+| `apps/subgraph-agent/eslint.config.mjs` | הוסף security rules |
+| `apps/subgraph-knowledge/eslint.config.mjs` | הוסף security rules |
+| `.github/workflows/codeql.yml` | חדש — CodeQL SAST + TruffleHog secret scan |
+
+#### Wave 2 — בדיקות Component חדשות
+| Suite | Tests | Framework |
+|-------|-------|-----------|
+| `ActivityFeed.test.tsx` | 12 | React Testing Library |
+| `ActivityHeatmap.test.tsx` | 8 | React Testing Library |
+
+**תוצאה סופית:** 107/107 tests ✓ | 9 suites | Component rendering בדוק | Security ESLint פעיל | CodeQL מוגדר
 
 ---
 

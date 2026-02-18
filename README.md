@@ -390,7 +390,7 @@ kubectl get ingress -n edusphere
 
 | Category | Framework | Location | Status |
 |----------|-----------|----------|--------|
-| **Frontend Unit Tests** | Vitest + jsdom | `apps/web/src/**/*.test.ts` | ✅ **87 tests / 7 suites passing** |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL | `apps/web/src/**/*.test.{ts,tsx}` | ✅ **107 tests / 9 suites passing** |
 | **Frontend E2E** | Playwright | `apps/web/e2e/*.spec.ts` | ⏳ Specs ready — needs dev server |
 | **Backend Unit Tests** | Vitest | `apps/*/src/**/*.spec.ts` | ⏳ In progress (other session) |
 | **Integration Tests** | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts` | ⏳ Planned Phase 7 |
@@ -399,7 +399,9 @@ kubectl get ingress -n edusphere
 | **Federation Tests** | Vitest | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7 |
 | **Load Tests** | k6 | `infrastructure/k6/*.js` | ⏳ Planned Phase 7 |
 
-**Frontend Unit Test Suites (87 tests, all green):**
+**Frontend Unit Test Suites (107 tests, all green):**
+- `ActivityFeed.test.tsx` — component render, all 5 activity types, RTL queries (12 tests) 🆕
+- `ActivityHeatmap.test.tsx` — component render, legend, padding, tooltips, RTL (8 tests) 🆕
 - `activity-feed.utils.test.ts` — `formatRelativeTime` with fake timers (8 tests)
 - `heatmap.utils.test.ts` — `getHeatmapColor`, `formatHeatmapDate`, `calcHeatmapStats` (16 tests)
 - `mock-analytics.test.ts` — heatmap data shape, course progress, weekly stats (14 tests)
@@ -408,10 +410,20 @@ kubectl get ingress -n edusphere
 - `content-viewer.utils.test.ts` — `formatTime`, `LAYER_META`, `SPEED_OPTIONS` (15 tests)
 - `AnnotationCard.test.ts` — `formatAnnotationTimestamp`, `ANNOTATION_LAYER_META` (12 tests)
 
+**Testing Infrastructure:**
+- `src/test/setup.ts` — jest-dom matchers + MSW server lifecycle
+- `src/test/server.ts` + `src/test/handlers.ts` — MSW GraphQL mock server
+
 **Coverage Targets:**
 - Backend: >90% line coverage per subgraph
 - Frontend: >80% component coverage
 - RLS policies: 100% (security-critical)
+
+**Security Scanning:**
+- `eslint-plugin-security` — Node.js security patterns in all 6 subgraphs
+- `eslint-plugin-no-unsanitized` — XSS prevention in React frontend
+- GitHub CodeQL — SAST on every push/PR (`.github/workflows/codeql.yml`)
+- TruffleHog — secret scanning on every push/PR
 
 **CI/CD:**
 - All tests run on every PR
