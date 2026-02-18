@@ -1,19 +1,83 @@
-import React from 'react';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
 import { BookOpen, Users, FileText, Bot, TrendingUp, Clock } from 'lucide-react';
 
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
+// Mock data for dev mode
+const MOCK_ME = {
+  me: {
+    id: 'dev-user-1',
+    username: 'developer',
+    email: 'dev@edusphere.local',
+    firstName: 'Dev',
+    lastName: 'User',
+    role: 'SUPER_ADMIN',
+    tenantId: 'dev-tenant-1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+};
+
+const MOCK_COURSES = {
+  courses: {
+    edges: [
+      {
+        cursor: 'course-1',
+        node: {
+          id: 'course-1',
+          title: 'Introduction to Talmud Study',
+          description: 'Learn the fundamentals of Talmudic reasoning and argumentation',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+      {
+        cursor: 'course-2',
+        node: {
+          id: 'course-2',
+          title: 'Advanced Chavruta Techniques',
+          description: 'Master the art of collaborative Talmud learning with AI assistance',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+      {
+        cursor: 'course-3',
+        node: {
+          id: 'course-3',
+          title: 'Knowledge Graph Navigation',
+          description: 'Explore interconnected concepts in Jewish texts using graph-based learning',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    ],
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: 'course-1',
+      endCursor: 'course-3',
+    },
+  },
+};
+
 export function Dashboard() {
-  const [meResult] = useQuery({ query: ME_QUERY });
+  const [meResult] = useQuery({ query: ME_QUERY, pause: DEV_MODE });
   const [coursesResult] = useQuery({
     query: COURSES_QUERY,
     variables: { first: 5 },
+    pause: DEV_MODE,
   });
 
-  const { data: meData, fetching: meFetching, error: meError } = meResult;
-  const { data: coursesData, fetching: coursesFetching } = coursesResult;
+  // Use mock data in dev mode or fallback to mock data if queries fail
+  const meData = DEV_MODE || meResult.error ? MOCK_ME : meResult.data;
+  const coursesData = DEV_MODE || coursesResult.error ? MOCK_COURSES : coursesResult.data;
+  const meFetching = !DEV_MODE && meResult.fetching;
+  const coursesFetching = !DEV_MODE && coursesResult.fetching;
+  const meError = !DEV_MODE && meResult.error;
 
   return (
     <Layout>
@@ -25,7 +89,17 @@ export function Dashboard() {
           </p>
         </div>
 
-        {meError && (
+        {DEV_MODE && (
+          <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+            <CardContent className="pt-6">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                🔧 <strong>Development Mode:</strong> Using mock data. Start the Gateway to see real data.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {meError && !DEV_MODE && (
           <Card className="border-destructive">
             <CardContent className="pt-6">
               <p className="text-destructive">Error loading user data: {meError.message}</p>
