@@ -5,6 +5,9 @@ import { urqlClient } from '@/lib/urql-client';
 import { initKeycloak } from '@/lib/auth';
 import { Login } from '@/pages/Login';
 import { Dashboard } from '@/pages/Dashboard';
+import { ContentViewer } from '@/pages/ContentViewer';
+import { CourseList } from '@/pages/CourseList';
+import AnnotationDemo from '@/pages/AnnotationDemo';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 function App() {
@@ -38,6 +41,22 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
+            path="/learn/:contentId"
+            element={
+              <ProtectedRoute>
+                <ContentViewer />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <CourseList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
@@ -45,8 +64,16 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route
+            path="/annotations-demo"
+            element={
+              <ProtectedRoute>
+                <AnnotationDemo />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/learn/content-1" replace />} />
+          <Route path="*" element={<Navigate to="/learn/content-1" replace />} />
         </Routes>
       </BrowserRouter>
     </UrqlProvider>

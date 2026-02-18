@@ -1,6 +1,7 @@
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { AIChatPanel } from '@/components/AIChatPanel';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
 import { BookOpen, Users, FileText, Bot, TrendingUp, Clock } from 'lucide-react';
 
@@ -81,6 +82,7 @@ export function Dashboard() {
 
   return (
     <Layout>
+      <AIChatPanel />
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>

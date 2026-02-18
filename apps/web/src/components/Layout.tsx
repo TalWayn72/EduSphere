@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout, getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
-import { LogOut, BookOpen, Users, FileText, Bot, Network } from 'lucide-react';
+import { LogOut, BookOpen, Users, FileText, Bot, Network, LayoutDashboard } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,10 +28,17 @@ export function Layout({ children }: LayoutProps) {
               </Link>
               <nav className="hidden md:flex space-x-6">
                 <Link
-                  to="/courses"
+                  to="/learn/content-1"
                   className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   <BookOpen className="h-4 w-4" />
+                  <span>Learn</span>
+                </Link>
+                <Link
+                  to="/courses"
+                  className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <Network className="h-4 w-4" />
                   <span>Courses</span>
                 </Link>
                 <Link
@@ -56,11 +63,11 @@ export function Layout({ children }: LayoutProps) {
                   <span>AI Agents</span>
                 </Link>
                 <Link
-                  to="/knowledge-graph"
+                  to="/dashboard"
                   className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
-                  <Network className="h-4 w-4" />
-                  <span>Knowledge Graph</span>
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span>Dashboard</span>
                 </Link>
               </nav>
             </div>

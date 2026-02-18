@@ -9,7 +9,12 @@
       "Bash:*",
       "Task:*",
       "NotebookEdit:*",
-      "Bash(pnpm --filter @edusphere/subgraph-annotation build:*)"
+      "Bash(pnpm --filter @edusphere/subgraph-annotation build:*)",
+      "Bash(pnpm --filter @edusphere/web exec tsc:*)",
+      "Bash(test:*)",
+      "Bash(pnpm --filter @edusphere/web add:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(curl:*)"
     ]
   }
 }
