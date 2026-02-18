@@ -1,8 +1,9 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 18 פברואר 2026
-**מצב פרויקט:** ✅ Phase 9 - Dashboard Analytics (Completed) | 🔴 Phases 10-17 — Frontend Core UX (In Progress)
-**סטטוס כללי:** Backend Complete (Phases 0-8) | Frontend UI Gaps Identified — Critical UX Missing
+**מצב פרויקט:** ✅ Phases 9-15 Complete | 🟡 Phases 16-17 — Course Management + Collaboration (Next)
+**סטטוס כללי:** Backend Complete (Phases 0-8) | Frontend: User Menu ✅ Profile Page ✅ Logout ✅
+**בדיקות Web:** 87 unit tests עוברות (7 suites) | TypeScript strict: 0 errors
 
 ---
 
@@ -40,10 +41,16 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 
 ### Outstanding (Lower Priority)
 - `ContentViewer.tsx` still ~795 lines (documented exception, needs extract to sub-components in future phase)
-- `apps/web` has 0 test files — vitest/playwright installed but no tests written yet
 - `zustand`, `@tanstack/react-query`, `zod` not installed in `apps/web` (promised in CLAUDE.md)
-- `@testing-library/react` not installed — needed before writing component tests
+- `@testing-library/react` not installed — needed for component rendering tests (DOM-based)
 - `seed.ts` uses `console.log` (violates "no console.log" rule) — acceptable for seed scripts
+
+### ✅ Completed Since Audit (18 Feb 2026)
+- `apps/web` test suite: **87 unit tests** across 7 suites — all passing (`vitest run`)
+- Pure utility functions extracted from components: `activity-feed.utils.ts`, `heatmap.utils.ts`, `content-viewer.utils.tsx`, `AnnotationCard.tsx`
+- E2E spec file created: `apps/web/e2e/smoke.spec.ts` (6 Playwright specs, runs with dev server)
+- `jsdom` installed as dev dependency — `environment: 'jsdom'` now active in vitest.config.ts
+- TypeScript strict: `tsc --noEmit` — 0 errors across all test files
 
 ---
 
@@ -58,7 +65,7 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | **AI Agent Chat** | Chat panel + streaming tokens | ❌ אפס | 🔴 קריטי |
 | **Knowledge Graph** | Cytoscape/D3 visualization | ❌ אפס | 🟡 גבוה |
 | **Annotation על video** | Overlay + layers + threads | 20% | 🟡 גבוה |
-| **Logout / User Menu** | Dropdown עם logout | ❌ חסר | 🟡 גבוה |
+| **Logout / User Menu** | Dropdown עם logout | ✅ הושלם | ✅ |
 | **Course Creation UI** | Create/edit/publish flows | 20% | 🟡 גבוה |
 | **Collaboration Editor** | Yjs CRDT + presence | 0% | 🟢 בינוני |
 
@@ -93,7 +100,7 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | **GraphQL Federation** | 6 | 🟢 Low | ✅ Completed (Phases 2-6) |
 | **Gateway Integration** | 1 | 🟢 Low | ✅ Completed (Phase 7) |
 | **Docker Container** | 1 | 🟢 Low | ✅ Completed (Phase 8) |
-| **Testing & DevTools** | 1 | 🟢 Low | ✅ Completed (Phase 9) |
+| **Testing & DevTools** | 1 | 🟢 Low | ✅ Completed — 87 unit tests passing |
 | **Frontend Client** | 1 | 🟢 Low | ✅ Completed (Phase 10) |
 | **Documentation** | 5 | 🟢 Low | ✅ Completed |
 | **Security & RLS** | 0 | - | ✅ RLS on all 16 tables |
@@ -103,7 +110,56 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | **Permissions & Config** | 1 | 🔴 Critical | ✅ Completed |
 | **Enhancements** | 1 | 🟡 Medium | ✅ Completed |
 
-**סה"כ:** 24 פריטים → 24 הושלמו ✅ | 0 בתכנון 🎉
+**סה"כ:** 27 פריטים → 27 הושלמו ✅ | 0 בתכנון 🎉
+
+---
+
+## ✅ TASK-010: Project Structure Audit + Test Infrastructure (18 פברואר 2026)
+
+**סטטוס:** ✅ הושלם | **חומרה:** 🟡 Medium | **תאריך:** 18 February 2026
+
+### מה בוצע — Commits: `3d0b6d6`, `e448927`, `c5dc53e`, `a7d788a`
+
+#### Phase A — File Organization (`3d0b6d6`)
+| שינוי | פרטים |
+|-------|--------|
+| Root cleanup | הועברו 12 קבצי .md ל-`docs/{project,development,deployment,reports,reference}/` |
+| Legacy files | `Bellor_*.md` (90K שורות!) הועברו ל-`legacy/` |
+| PDFs | 4 קבצי PDF + Hebrew .docx הועברו ל-`docs/reference/` |
+| Bad filenames | `API-CONTRACTS-GRAPHQL-FEDERATION (1).md` → renamed, `compass_artifact_wf-UUID.md` → `TECH-STACK-DECISIONS.md` |
+
+#### Phase B — Code Splitting (150-line rule) (`3d0b6d6`)
+| קובץ | לפני | אחרי | קבצים חדשים |
+|------|------|------|-------------|
+| `mock-content-data.ts` | 293 שורות | 65 שורות | `mock-transcript.data.ts`, `mock-video-annotations.data.ts` |
+| `mock-annotations.ts` | 323 שורות | 53 שורות | `mock-annotations.data.ts` |
+| `Dashboard.tsx` | 337 שורות | 186 שורות | `mock-dashboard.data.ts` |
+| `AnnotationsPage.tsx` | 217 שורות | 119 שורות | `AnnotationCard.tsx` |
+| `ContentViewer.tsx` | 844 שורות | ~795 שורות | `content-viewer.utils.tsx` |
+
+#### Phase C — Test Infrastructure (`e448927`, `c5dc53e`)
+- `vitest.config.ts`: globals, jsdom, coverage thresholds (80% lines/functions, 70% branches)
+- `playwright.config.ts`: Chromium E2E config
+- `src/test/setup.ts`: test setup file
+- `jsdom` installed as dev dependency
+
+#### Phase D — Unit Tests 87 tests (`e448927`, `a7d788a`)
+| Suite | Tests | נבדק |
+|-------|-------|-------|
+| `content-viewer.utils.test.ts` | 15 | `formatTime`, `LAYER_META`, `SPEED_OPTIONS` |
+| `AnnotationCard.test.ts` | 12 | `formatAnnotationTimestamp`, `ANNOTATION_LAYER_META` |
+| `mock-content-data.test.ts` | 14 | video, bookmarks, transcript, annotations |
+| `mock-graph-data.test.ts` | 8 | nodes, edges, referential integrity |
+| `mock-analytics.test.ts` | 14 | heatmap, course progress, weekly stats, scalars |
+| `activity-feed.utils.test.ts` | 8 | `formatRelativeTime` עם fake timers |
+| `heatmap.utils.test.ts` | 16 | `getHeatmapColor` (כל thresholds), `formatHeatmapDate`, `calcHeatmapStats` |
+
+#### Phase E — Utils Extraction (`a7d788a`)
+- `activity-feed.utils.ts`: `formatRelativeTime` חולצה מ-`ActivityFeed.tsx`
+- `heatmap.utils.ts`: `getHeatmapColor`, `formatHeatmapDate`, `calcHeatmapStats` חולצו מ-`ActivityHeatmap.tsx`
+- `e2e/smoke.spec.ts`: 6 Playwright E2E specs (ממתינות לdev server)
+
+**תוצאה סופית:** tsc 0 שגיאות | vite build ✓ | 87/87 tests ✓
 
 ---
 

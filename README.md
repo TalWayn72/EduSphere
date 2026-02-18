@@ -388,15 +388,25 @@ kubectl get ingress -n edusphere
 
 ## Testing
 
-| Category | Framework | Location | Target |
+| Category | Framework | Location | Status |
 |----------|-----------|----------|--------|
-| **Unit Tests** | Vitest | `apps/*/src/**/*.spec.ts` | >90% coverage |
-| **Integration Tests** | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts` | All DB + NATS ops |
-| **RLS Validation** | Vitest | `packages/db/src/rls/*.test.ts` | 100% (critical) |
-| **GraphQL Tests** | Vitest + SuperTest | `apps/*/src/test/graphql/*.spec.ts` | All queries/mutations |
-| **Federation Tests** | Vitest | `apps/gateway/src/test/federation/*.spec.ts` | Composition + @key resolution |
-| **E2E Tests** | Playwright | `apps/web/e2e/*.spec.ts` | Core user flows |
-| **Load Tests** | k6 | `infrastructure/k6/*.js` | 100K concurrent users |
+| **Frontend Unit Tests** | Vitest + jsdom | `apps/web/src/**/*.test.ts` | ✅ **87 tests / 7 suites passing** |
+| **Frontend E2E** | Playwright | `apps/web/e2e/*.spec.ts` | ⏳ Specs ready — needs dev server |
+| **Backend Unit Tests** | Vitest | `apps/*/src/**/*.spec.ts` | ⏳ In progress (other session) |
+| **Integration Tests** | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts` | ⏳ Planned Phase 7 |
+| **RLS Validation** | Vitest | `packages/db/src/rls/*.test.ts` | ⏳ Planned Phase 7 |
+| **GraphQL Tests** | Vitest + SuperTest | `apps/*/src/test/graphql/*.spec.ts` | ⏳ Planned Phase 7 |
+| **Federation Tests** | Vitest | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7 |
+| **Load Tests** | k6 | `infrastructure/k6/*.js` | ⏳ Planned Phase 7 |
+
+**Frontend Unit Test Suites (87 tests, all green):**
+- `activity-feed.utils.test.ts` — `formatRelativeTime` with fake timers (8 tests)
+- `heatmap.utils.test.ts` — `getHeatmapColor`, `formatHeatmapDate`, `calcHeatmapStats` (16 tests)
+- `mock-analytics.test.ts` — heatmap data shape, course progress, weekly stats (14 tests)
+- `mock-content-data.test.ts` — video, bookmarks, transcript ordering, annotations (14 tests)
+- `mock-graph-data.test.ts` — graph nodes, edges, referential integrity (8 tests)
+- `content-viewer.utils.test.ts` — `formatTime`, `LAYER_META`, `SPEED_OPTIONS` (15 tests)
+- `AnnotationCard.test.ts` — `formatAnnotationTimestamp`, `ANNOTATION_LAYER_META` (12 tests)
 
 **Coverage Targets:**
 - Backend: >90% line coverage per subgraph
