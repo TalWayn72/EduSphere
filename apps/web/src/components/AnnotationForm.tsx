@@ -141,10 +141,10 @@ function parseTimestamp(timestamp: string): number | undefined {
   if (parts.some(isNaN)) return undefined;
 
   if (parts.length === 2) {
-    const [minutes, seconds] = parts;
+    const [minutes = 0, seconds = 0] = parts;
     return minutes * 60 + seconds;
   } else if (parts.length === 3) {
-    const [hours, minutes, seconds] = parts;
+    const [hours = 0, minutes = 0, seconds = 0] = parts;
     return hours * 3600 + minutes * 60 + seconds;
   }
   return undefined;

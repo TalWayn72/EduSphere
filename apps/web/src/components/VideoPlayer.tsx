@@ -54,13 +54,13 @@ export function VideoPlayer({ src, bookmarks = [], onTimeUpdate, seekTo }: Video
 
   const handleSeek = (value: number[]) => {
     if (videoRef.current) {
-      videoRef.current.currentTime = value[0];
-      setCurrentTime(value[0]);
+      videoRef.current.currentTime = value[0] ?? 0;
+      setCurrentTime(value[0] ?? 0);
     }
   };
 
   const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0];
+    const newVolume = value[0] ?? 1;
     setVolume(newVolume);
     if (videoRef.current) {
       videoRef.current.volume = newVolume;
