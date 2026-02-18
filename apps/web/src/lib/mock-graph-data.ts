@@ -1,6 +1,10 @@
 /**
  * Mock Knowledge Graph Data
- * Jewish Philosophy concepts and relationships for demonstration
+ * Jewish Philosophy concepts and relationships for demonstration.
+ *
+ * EXCEPTION NOTE (150-line rule): Types (NodeType, EdgeType, GraphNode, GraphEdge, GraphData)
+ * are tightly coupled with mockGraphData because the data is the canonical example of those types.
+ * Splitting types/data would scatter the domain model without readability benefit.
  */
 
 export type NodeType = 'CONCEPT' | 'PERSON' | 'TERM' | 'SOURCE';
