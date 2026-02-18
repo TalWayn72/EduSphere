@@ -7,9 +7,7 @@ const GRAPH_NAME = 'edusphere_graph';
  * Initialize Apache AGE graph ontology
  */
 export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
-  console.log('Initializing Apache AGE graph ontology...');
-
-  // Create sample Concept vertex
+  // Static seed data — no user input involved, no parameterization needed.
   await executeCypher(
     db,
     GRAPH_NAME,
@@ -27,7 +25,6 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
   `
   );
 
-  // Create sample Person vertex
   await executeCypher(
     db,
     GRAPH_NAME,
@@ -44,7 +41,6 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
   `
   );
 
-  // Create sample TopicCluster vertex
   await executeCypher(
     db,
     GRAPH_NAME,
@@ -59,12 +55,6 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
     })
     RETURN tc
   `
-  );
-
-  console.log('Graph ontology initialized successfully');
-  console.log('Vertex labels: Concept, Person, Term, Source, TopicCluster');
-  console.log(
-    'Edge labels: RELATED_TO, CONTRADICTS, PREREQUISITE_OF, MENTIONS, CITES, AUTHORED_BY, INFERRED_RELATED, REFERS_TO, DERIVED_FROM, BELONGS_TO'
   );
 }
 
@@ -104,7 +94,7 @@ export async function createConcept(
 }
 
 /**
- * Find related concepts (2-hop traversal)
+ * Find related concepts (2-hop traversal) — all user-supplied values parameterized.
  */
 export async function findRelatedConcepts(
   db: DrizzleDB,
@@ -113,21 +103,25 @@ export async function findRelatedConcepts(
   maxDepth: number = 2,
   limit: number = 10
 ): Promise<any[]> {
+  // maxDepth and limit are internal integers, not user-facing strings — clamped for safety.
+  const safeDepth = Math.max(1, Math.min(10, Math.trunc(maxDepth)));
+  const safeLimit = Math.max(1, Math.min(100, Math.trunc(limit)));
   return executeCypher(
     db,
     GRAPH_NAME,
     `
-    MATCH (c:Concept {id: '${conceptId}'})-[r:RELATED_TO*1..${maxDepth}]-(related:Concept)
-    WHERE related.tenant_id = '${tenantId}'
+    MATCH (c:Concept {id: $conceptId})-[r:RELATED_TO*1..${safeDepth}]-(related:Concept)
+    WHERE related.tenant_id = $tenantId
     RETURN related.name, related.definition, r[0].strength
     ORDER BY r[0].strength DESC
-    LIMIT ${limit}
-  `
+    LIMIT ${safeLimit}
+  `,
+    { conceptId, tenantId }
   );
 }
 
 /**
- * Find contradictions
+ * Find contradictions for a concept — conceptId parameterized.
  */
 export async function findContradictions(
   db: DrizzleDB,
@@ -137,14 +131,15 @@ export async function findContradictions(
     db,
     GRAPH_NAME,
     `
-    MATCH (c:Concept {id: '${conceptId}'})-[r:CONTRADICTS]-(contra:Concept)
+    MATCH (c:Concept {id: $conceptId})-[r:CONTRADICTS]-(contra:Concept)
     RETURN contra.name, r.description, r.source_id
-  `
+  `,
+    { conceptId }
   );
 }
 
 /**
- * Find learning path (prerequisite chain)
+ * Find learning path (prerequisite chain) — conceptId parameterized.
  */
 export async function findLearningPath(
   db: DrizzleDB,
@@ -154,15 +149,17 @@ export async function findLearningPath(
     db,
     GRAPH_NAME,
     `
-    MATCH path = (start:Concept {id: '${conceptId}'})<-[:PREREQUISITE_OF*1..5]-(prereq:Concept)
+    MATCH path = (start:Concept {id: $conceptId})<-[:PREREQUISITE_OF*1..5]-(prereq:Concept)
     RETURN path
     ORDER BY length(path) ASC
-  `
+  `,
+    { conceptId }
   );
 }
 
 /**
- * Create relationship between concepts
+ * Create relationship between concepts — all IDs parameterized.
+ * relationshipType is an internal enum value, not user input.
  */
 export interface RelationshipProperties {
   strength?: number;
@@ -186,10 +183,11 @@ export async function createRelationship(
     db,
     GRAPH_NAME,
     `
-    MATCH (a:Concept {id: '${fromConceptId}'})
-    MATCH (b:Concept {id: '${toConceptId}'})
+    MATCH (a:Concept {id: $fromConceptId})
+    MATCH (b:Concept {id: $toConceptId})
     CREATE (a)-[r:${relationshipType} ${propsJson}]->(b)
     RETURN r
-  `
+  `,
+    { fromConceptId, toConceptId }
   );
 }

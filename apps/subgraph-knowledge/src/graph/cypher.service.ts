@@ -7,8 +7,9 @@
  * requiring find/create Cypher patterns that cannot be easily shared due to differing
  * vertex labels and property schemas.
  *
- * SECURITY NOTE: Cypher queries currently use string interpolation. Must be migrated
- * to parameterised prepared statements before production (NoSQL injection risk).
+ * SECURITY: All user-supplied values are passed via parameterized queries using the
+ * Apache AGE cypher() third-argument params mechanism. No string interpolation of
+ * user-controlled data is present in this file.
  */
 import { Injectable, Logger } from '@nestjs/common';
 import {
@@ -26,14 +27,19 @@ const GRAPH_NAME = 'edusphere_graph';
 export class CypherService {
   private readonly logger = new Logger(CypherService.name);
 
+  // ---------------------------------------------------------------------------
+  // Concept
+  // ---------------------------------------------------------------------------
+
   async findConceptById(id: string, tenantId: string): Promise<any> {
     const result = await executeCypher(
       db,
       GRAPH_NAME,
       `
-      MATCH (c:Concept {id: '${id}', tenant_id: '${tenantId}'})
+      MATCH (c:Concept {id: $id, tenant_id: $tenantId})
       RETURN c
-    `
+      `,
+      { id, tenantId }
     );
     return result[0] || null;
   }
@@ -43,22 +49,26 @@ export class CypherService {
       db,
       GRAPH_NAME,
       `
-      MATCH (c:Concept {name: '${name}', tenant_id: '${tenantId}'})
+      MATCH (c:Concept {name: $name, tenant_id: $tenantId})
       RETURN c
-    `
+      `,
+      { name, tenantId }
     );
     return result[0] || null;
   }
 
   async findAllConcepts(tenantId: string, limit: number): Promise<any[]> {
+    // limit is an internal integer from the resolver, not raw user text — clamped for safety.
+    const safeLimit = Math.max(1, Math.min(200, Math.trunc(limit)));
     return executeCypher(
       db,
       GRAPH_NAME,
       `
-      MATCH (c:Concept {tenant_id: '${tenantId}'})
+      MATCH (c:Concept {tenant_id: $tenantId})
       RETURN c
-      LIMIT ${limit}
-    `
+      LIMIT ${safeLimit}
+      `,
+      { tenantId }
     );
   }
 
@@ -71,18 +81,27 @@ export class CypherService {
     tenantId: string,
     updates: Partial<ConceptProperties>
   ): Promise<any> {
-    const setParts = Object.entries(updates)
-      .map(([key, value]) => `c.${key} = '${value}'`)
+    // Build SET clause using param references ($key) for each update value.
+    // Keys come from the ConceptProperties type — they are not user-controlled
+    // strings but still validated here against the allowed property allowlist.
+    const allowedKeys = new Set<string>(['name', 'definition', 'source_ids']);
+    const safeUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([key]) => allowedKeys.has(key))
+    );
+
+    const setParts = Object.keys(safeUpdates)
+      .map((key) => `c.${key} = $${key}`)
       .join(', ');
 
     const result = await executeCypher(
       db,
       GRAPH_NAME,
       `
-      MATCH (c:Concept {id: '${id}', tenant_id: '${tenantId}'})
+      MATCH (c:Concept {id: $id, tenant_id: $tenantId})
       SET ${setParts}, c.updated_at = timestamp()
       RETURN c
-    `
+      `,
+      { id, tenantId, ...safeUpdates }
     );
     return result[0] || null;
   }
@@ -93,13 +112,14 @@ export class CypherService {
         db,
         GRAPH_NAME,
         `
-        MATCH (c:Concept {id: '${id}', tenant_id: '${tenantId}'})
+        MATCH (c:Concept {id: $id, tenant_id: $tenantId})
         DETACH DELETE c
-      `
+        `,
+        { id, tenantId }
       );
       return true;
     } catch (error) {
-      this.logger.error(`Failed to delete concept ${id}:`, error);
+      this.logger.error({ err: error, conceptId: id }, 'Failed to delete concept');
       return false;
     }
   }
@@ -122,14 +142,19 @@ export class CypherService {
     return createRelationship(db, fromId, toId, relationshipType, properties);
   }
 
+  // ---------------------------------------------------------------------------
+  // Person
+  // ---------------------------------------------------------------------------
+
   async findPersonById(id: string, tenantId: string): Promise<any> {
     const result = await executeCypher(
       db,
       GRAPH_NAME,
       `
-      MATCH (p:Person {id: '${id}', tenant_id: '${tenantId}'})
+      MATCH (p:Person {id: $id, tenant_id: $tenantId})
       RETURN p
-    `
+      `,
+      { id, tenantId }
     );
     return result[0] || null;
   }
@@ -139,9 +164,10 @@ export class CypherService {
       db,
       GRAPH_NAME,
       `
-      MATCH (p:Person {name: '${name}', tenant_id: '${tenantId}'})
+      MATCH (p:Person {name: $name, tenant_id: $tenantId})
       RETURN p
-    `
+      `,
+      { name, tenantId }
     );
     return result[0] || null;
   }
@@ -157,26 +183,32 @@ export class CypherService {
       `
       CREATE (p:Person {
         id: gen_random_uuid()::text,
-        tenant_id: '${tenantId}',
-        name: '${name}',
-        bio: ${bio ? `'${bio}'` : 'null'},
+        tenant_id: $tenantId,
+        name: $name,
+        bio: $bio,
         created_at: timestamp(),
         updated_at: timestamp()
       })
       RETURN p
-    `
+      `,
+      { tenantId, name, bio: bio ?? null }
     );
     return result[0];
   }
+
+  // ---------------------------------------------------------------------------
+  // Term
+  // ---------------------------------------------------------------------------
 
   async findTermById(id: string, tenantId: string): Promise<any> {
     const result = await executeCypher(
       db,
       GRAPH_NAME,
       `
-      MATCH (t:Term {id: '${id}', tenant_id: '${tenantId}'})
+      MATCH (t:Term {id: $id, tenant_id: $tenantId})
       RETURN t
-    `
+      `,
+      { id, tenantId }
     );
     return result[0] || null;
   }
@@ -186,9 +218,10 @@ export class CypherService {
       db,
       GRAPH_NAME,
       `
-      MATCH (t:Term {name: '${name}', tenant_id: '${tenantId}'})
+      MATCH (t:Term {name: $name, tenant_id: $tenantId})
       RETURN t
-    `
+      `,
+      { name, tenantId }
     );
     return result[0] || null;
   }
@@ -204,26 +237,32 @@ export class CypherService {
       `
       CREATE (t:Term {
         id: gen_random_uuid()::text,
-        tenant_id: '${tenantId}',
-        name: '${name}',
-        definition: '${definition}',
+        tenant_id: $tenantId,
+        name: $name,
+        definition: $definition,
         created_at: timestamp(),
         updated_at: timestamp()
       })
       RETURN t
-    `
+      `,
+      { tenantId, name, definition }
     );
     return result[0];
   }
+
+  // ---------------------------------------------------------------------------
+  // Source
+  // ---------------------------------------------------------------------------
 
   async findSourceById(id: string, tenantId: string): Promise<any> {
     const result = await executeCypher(
       db,
       GRAPH_NAME,
       `
-      MATCH (s:Source {id: '${id}', tenant_id: '${tenantId}'})
+      MATCH (s:Source {id: $id, tenant_id: $tenantId})
       RETURN s
-    `
+      `,
+      { id, tenantId }
     );
     return result[0] || null;
   }
@@ -240,27 +279,33 @@ export class CypherService {
       `
       CREATE (s:Source {
         id: gen_random_uuid()::text,
-        tenant_id: '${tenantId}',
-        title: '${title}',
-        type: '${type}',
-        url: ${url ? `'${url}'` : 'null'},
+        tenant_id: $tenantId,
+        title: $title,
+        type: $type,
+        url: $url,
         created_at: timestamp(),
         updated_at: timestamp()
       })
       RETURN s
-    `
+      `,
+      { tenantId, title, type, url: url ?? null }
     );
     return result[0];
   }
+
+  // ---------------------------------------------------------------------------
+  // TopicCluster
+  // ---------------------------------------------------------------------------
 
   async findTopicClusterById(id: string, tenantId: string): Promise<any> {
     const result = await executeCypher(
       db,
       GRAPH_NAME,
       `
-      MATCH (tc:TopicCluster {id: '${id}', tenant_id: '${tenantId}'})
+      MATCH (tc:TopicCluster {id: $id, tenant_id: $tenantId})
       RETURN tc
-    `
+      `,
+      { id, tenantId }
     );
     return result[0] || null;
   }
@@ -273,9 +318,10 @@ export class CypherService {
       db,
       GRAPH_NAME,
       `
-      MATCH (tc:TopicCluster {tenant_id: '${tenantId}'})-[:BELONGS_TO]->(course {id: '${courseId}'})
+      MATCH (tc:TopicCluster {tenant_id: $tenantId})-[:BELONGS_TO]->(course {id: $courseId})
       RETURN tc
-    `
+      `,
+      { tenantId, courseId }
     );
   }
 
@@ -290,14 +336,15 @@ export class CypherService {
       `
       CREATE (tc:TopicCluster {
         id: gen_random_uuid()::text,
-        tenant_id: '${tenantId}',
-        name: '${name}',
-        description: ${description ? `'${description}'` : 'null'},
+        tenant_id: $tenantId,
+        name: $name,
+        description: $description,
         created_at: timestamp(),
         updated_at: timestamp()
       })
       RETURN tc
-    `
+      `,
+      { tenantId, name, description: description ?? null }
     );
     return result[0];
   }

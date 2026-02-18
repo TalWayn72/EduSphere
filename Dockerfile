@@ -16,33 +16,18 @@ ENV TZ=UTC
 # STAGE 1: Install System Dependencies
 # ═══════════════════════════════════════════════════════════════
 
+# Install base tools + add PostgreSQL 16 official PGDG repo
 RUN apt-get update && apt-get install -y \
-    # Build tools
-    build-essential \
-    curl \
-    wget \
-    git \
-    ca-certificates \
-    gnupg \
-    lsb-release \
-    # PostgreSQL 16
-    postgresql-16 \
-    postgresql-contrib-16 \
-    postgresql-server-dev-16 \
-    # Redis
-    redis-server \
-    # Supervisor for process management
-    supervisor \
-    # Java for Keycloak
-    openjdk-21-jre-headless \
-    # Python for various tools
-    python3 \
-    python3-pip \
-    # Network tools
-    netcat-openbsd \
-    # Cleanup
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    build-essential curl wget git ca-certificates gnupg lsb-release \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+       | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+       > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update && apt-get install -y \
+    postgresql-16 postgresql-contrib-16 postgresql-server-dev-16 \
+    redis-server supervisor openjdk-21-jre-headless \
+    python3 python3-pip netcat-openbsd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 2: Install Node.js 20 + pnpm
@@ -162,21 +147,10 @@ COPY infrastructure/docker/supervisord.conf /etc/supervisor/conf.d/edusphere.con
 # STAGE 8: Expose Ports
 # ═══════════════════════════════════════════════════════════════
 
-EXPOSE 4000    # Gateway
-EXPOSE 4001    # Core Subgraph
-EXPOSE 4002    # Content Subgraph
-EXPOSE 4003    # Annotation Subgraph
-EXPOSE 4004    # Collaboration Subgraph
-EXPOSE 4005    # Agent Subgraph
-EXPOSE 4006    # Knowledge Subgraph
-EXPOSE 5432    # PostgreSQL
-EXPOSE 6379    # Redis
-EXPOSE 8080    # Keycloak
-EXPOSE 4222    # NATS Client
-EXPOSE 8222    # NATS Monitoring
-EXPOSE 9000    # MinIO API
-EXPOSE 9001    # MinIO Console
-EXPOSE 11434   # Ollama
+# Gateway + Subgraphs
+EXPOSE 4000 4001 4002 4003 4004 4005 4006
+# Infrastructure
+EXPOSE 5432 6379 8080 4222 8222 9000 9001 11434
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 9: Startup

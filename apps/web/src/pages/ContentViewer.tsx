@@ -55,12 +55,13 @@ import {
   BookOpen,
   Bot,
   ChevronRight,
-  Clock,
   Plus,
   Send,
-  Eye,
-  EyeOff,
 } from 'lucide-react';
+import { VideoProgressMarkers } from '@/components/VideoProgressMarkers';
+import { AddAnnotationOverlay } from '@/components/AddAnnotationOverlay';
+import { LayerToggleBar } from '@/components/LayerToggleBar';
+import { AnnotationThread } from '@/components/AnnotationThread';
 
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 
@@ -257,6 +258,56 @@ export function ContentViewer() {
     setShowAnnotationForm(false);
   };
 
+  // ── Add annotation from video overlay (Phase 14.2) ──
+  const handleOverlayAnnotation = (
+    content: string,
+    layer: AnnotationLayer,
+    timestamp: number
+  ) => {
+    setLocalAnnotations((prev) => [
+      {
+        id: `local-${Date.now()}`,
+        content,
+        layer,
+        userId: 'current-user',
+        userName: 'You',
+        userRole: 'student',
+        timestamp: formatTime(timestamp),
+        contentId,
+        contentTimestamp: timestamp,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        replies: [],
+      },
+      ...prev,
+    ]);
+  };
+
+  // ── Reply to an annotation (Phase 14.4) ──
+  const handleReply = (
+    parentId: string,
+    replyContent: string,
+    replyLayer: AnnotationLayer
+  ) => {
+    setLocalAnnotations((prev) => [
+      ...prev,
+      {
+        id: `local-reply-${Date.now()}`,
+        content: replyContent,
+        layer: replyLayer,
+        userId: 'current-user',
+        userName: 'You',
+        userRole: 'student',
+        timestamp: formatTime(currentTime),
+        contentId,
+        parentId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        replies: [],
+      },
+    ]);
+  };
+
   // ── AI Chat ──
   const handleSendChat = async () => {
     if (!chatInput.trim()) return;
@@ -352,6 +403,12 @@ export function ContentViewer() {
                       onClick={() => seekTo(bm.timestamp)}
                     />
                   ))}
+
+                {/* Phase 14.2: Add annotation overlay button */}
+                <AddAnnotationOverlay
+                  currentTime={currentTime}
+                  onSave={handleOverlayAnnotation}
+                />
               </div>
 
               {/* Controls */}
@@ -385,7 +442,7 @@ export function ContentViewer() {
                     <Volume2 className="h-4 w-4" />
                   )}
                 </Button>
-                {/* Seek bar */}
+                {/* Seek bar — Phase 14.1: annotation markers sit inside */}
                 <div
                   className="flex-1 relative h-2 bg-muted rounded-full cursor-pointer"
                   onClick={(e) => {
@@ -398,6 +455,12 @@ export function ContentViewer() {
                     style={{
                       width: `${duration ? (currentTime / duration) * 100 : 0}%`,
                     }}
+                  />
+                  {/* Annotation markers on progress bar */}
+                  <VideoProgressMarkers
+                    annotations={annotations}
+                    duration={duration}
+                    onSeek={seekTo}
                   />
                 </div>
                 <span className="text-xs text-muted-foreground tabular-nums">
@@ -477,25 +540,11 @@ export function ContentViewer() {
                   <Plus className="h-3 w-3 mr-1" /> Add
                 </Button>
               </div>
-              {/* Layer toggles */}
-              <div className="flex flex-wrap gap-1">
-                {(Object.keys(LAYER_META) as AnnotationLayer[]).map((layer) => (
-                  <button
-                    key={layer}
-                    onClick={() => toggleLayer(layer)}
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border transition-opacity
-                      ${LAYER_META[layer]?.bg ?? ''} ${LAYER_META[layer]?.color ?? ''}
-                      ${activeLayers.includes(layer) ? 'opacity-100' : 'opacity-30'}`}
-                  >
-                    {activeLayers.includes(layer) ? (
-                      <Eye className="h-3 w-3" />
-                    ) : (
-                      <EyeOff className="h-3 w-3" />
-                    )}
-                    {LAYER_META[layer]?.label}
-                  </button>
-                ))}
-              </div>
+              {/* Phase 14.3: Layer toggle chips with counts */}
+              <LayerToggleBar
+                activeLayers={activeLayers}
+                onToggle={toggleLayer}
+              />
             </div>
 
             {/* Add annotation form */}
@@ -547,45 +596,14 @@ export function ContentViewer() {
                   No annotations visible. Enable layers above.
                 </p>
               )}
+              {/* Phase 14.4: AnnotationThread cards with expand + inline reply */}
               {annotations.map((ann) => (
-                <div
+                <AnnotationThread
                   key={ann.id}
-                  className={`p-3 rounded-md border text-sm space-y-1 cursor-pointer hover:shadow-sm transition-shadow
-                    ${LAYER_META[ann.layer]?.bg ?? ''}`}
-                  onClick={() =>
-                    ann.contentTimestamp !== undefined &&
-                    seekTo(ann.contentTimestamp)
-                  }
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs font-semibold ${LAYER_META[ann.layer]?.color ?? ''}`}
-                    >
-                      {ann.userName ?? 'Unknown'}
-                    </span>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {ann.timestamp ?? formatTime(ann.contentTimestamp ?? 0)}
-                    </span>
-                  </div>
-                  <p className="leading-snug">{ann.content}</p>
-                  {/* Replies */}
-                  {ann.replies && ann.replies.length > 0 && (
-                    <div className="ml-3 pt-2 space-y-2 border-l-2 border-current/20 pl-3">
-                      {ann.replies.map((reply: typeof ann) => (
-                        <div
-                          key={reply.id}
-                          className="text-xs text-muted-foreground"
-                        >
-                          <span className="font-medium">
-                            {reply.userName}:{' '}
-                          </span>
-                          {reply.content}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                  annotation={ann}
+                  onSeek={seekTo}
+                  onReply={handleReply}
+                />
               ))}
             </div>
           </Card>
