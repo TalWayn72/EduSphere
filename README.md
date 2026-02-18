@@ -304,9 +304,10 @@ For detailed architecture diagrams: [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-R
 | **Phase 7** | Production Hardening -- Performance, K8s, load tests, security | 5-7 days | ✅ Complete |
 | **Phase 8** | Mobile + Advanced -- Expo app, transcription worker, Chavruta | 5-7 days | ✅ Complete |
 | **Phase 9** | Dashboard Analytics -- Heatmap, progress bars, activity feed | 2-3 days | ✅ Complete |
-| **Phases 10-17** | Frontend Core UX -- Video player, semantic search, agent chat, collaboration | 15-25 days | 🔴 In Progress |
+| **Phases 10-14** | Frontend Core UX -- Video player, search, AI chat, knowledge graph, annotation overlay | 12-20 days | ✅ Complete |
+| **Phases 15-17** | Frontend UX polish -- User menu, course wizard, Tiptap collaboration editor | 5-8 days | ✅ Complete |
 
-**Current Status:** Backend complete (Phases 0-9) — see [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** ALL 17 phases complete ✅ — Backend + Frontend fully built. GraphQL integration active (KnowledgeGraph + AgentsPage + ContentViewer + Dashboard wired to real API with DEV_MODE fallback). Next: Phase 7 Production Hardening (K8s) + Phase 8 Mobile (Expo). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 

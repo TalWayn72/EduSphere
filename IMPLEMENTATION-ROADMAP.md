@@ -1204,7 +1204,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 14: Annotation System — Full Integration (🟡 HIGH)
+## Phase 14: Annotation System — Full Integration (✅ COMPLETED — Feb 2026)
 
 **Problem:** Annotation backend is complete (Phase 3) but frontend has only a demo page. No annotation during video playback.
 
@@ -1241,7 +1241,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 15: Authentication Completion + User Menu (🟡 MEDIUM)
+## Phase 15: Authentication Completion + User Menu (✅ COMPLETED — Feb 2026)
 
 **Problem:** No logout button exists. Users cannot log out or view their profile.
 
@@ -1268,7 +1268,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 16: Course Management UI (🟡 MEDIUM)
+## Phase 16: Course Management UI (✅ COMPLETED — Feb 2026)
 
 **Problem:** Instructors have no UI to create or manage courses. Only students see (read-only) course list.
 
@@ -1290,7 +1290,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 17: Collaboration Real-Time Editor (🟢 LOWER)
+## Phase 17: Collaboration Real-Time Editor (✅ COMPLETED — Feb 2026)
 
 **Problem:** CollaborationPage.tsx is a stub. Yjs/Hocuspocus backend exists but no frontend editor.
 
