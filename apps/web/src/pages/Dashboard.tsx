@@ -8,19 +8,31 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { AIChatPanel } from '@/components/AIChatPanel';
+import { ActivityHeatmap } from '@/components/ActivityHeatmap';
+import { LearningStats } from '@/components/LearningStats';
+import { ActivityFeed } from '@/components/ActivityFeed';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
+import {
+  MOCK_HEATMAP_DATA,
+  MOCK_COURSE_PROGRESS,
+  MOCK_WEEKLY_STATS,
+  MOCK_ACTIVITY_FEED,
+  MOCK_LEARNING_STREAK,
+  MOCK_TOTAL_STUDY_MINUTES,
+  MOCK_CONCEPTS_MASTERED,
+} from '@/lib/mock-analytics';
 import {
   BookOpen,
   Users,
   FileText,
   Bot,
-  TrendingUp,
+  Flame,
   Clock,
+  Brain,
 } from 'lucide-react';
 
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 
-// Mock data for dev mode
 const MOCK_ME = {
   me: {
     id: 'dev-user-1',
@@ -89,7 +101,6 @@ export function Dashboard() {
     pause: DEV_MODE,
   });
 
-  // Use mock data in dev mode or fallback to mock data if queries fail
   const meData = DEV_MODE || meResult.error ? MOCK_ME : meResult.data;
   const coursesData =
     DEV_MODE || coursesResult.error ? MOCK_COURSES : coursesResult.data;
@@ -97,10 +108,16 @@ export function Dashboard() {
   const coursesFetching = !DEV_MODE && coursesResult.fetching;
   const meError = !DEV_MODE && meResult.error;
 
+  const totalMinutesDisplay =
+    MOCK_TOTAL_STUDY_MINUTES >= 60
+      ? `${Math.floor(MOCK_TOTAL_STUDY_MINUTES / 60)}h ${MOCK_TOTAL_STUDY_MINUTES % 60}m`
+      : `${MOCK_TOTAL_STUDY_MINUTES}m`;
+
   return (
     <Layout>
       <AIChatPanel />
       <div className="space-y-8">
+        {/* Header */}
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
@@ -119,7 +136,7 @@ export function Dashboard() {
           </Card>
         )}
 
-        {meError && !DEV_MODE && (
+        {meError && (
           <Card className="border-destructive">
             <CardContent className="pt-6">
               <p className="text-destructive">
@@ -129,6 +146,7 @@ export function Dashboard() {
           </Card>
         )}
 
+        {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -149,6 +167,50 @@ export function Dashboard() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Learning Streak
+              </CardTitle>
+              <Flame className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {MOCK_LEARNING_STREAK} days
+              </div>
+              <p className="text-xs text-muted-foreground">Keep it up! 🔥</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Study Time</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalMinutesDisplay}</div>
+              <p className="text-xs text-muted-foreground">Total this month</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Concepts Mastered
+              </CardTitle>
+              <Brain className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{MOCK_CONCEPTS_MASTERED}</div>
+              <p className="text-xs text-muted-foreground">
+                In knowledge graph
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Secondary Stats */}
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -191,129 +253,84 @@ export function Dashboard() {
           </Card>
         </div>
 
+        {/* Course Progress + Weekly Stats */}
+        <LearningStats
+          courses={MOCK_COURSE_PROGRESS}
+          weeklyStats={MOCK_WEEKLY_STATS}
+        />
+
+        {/* Activity Heatmap */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Study Activity</CardTitle>
+            <CardDescription>
+              Your learning activity over the past 12 weeks
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ActivityHeatmap data={MOCK_HEATMAP_DATA} />
+          </CardContent>
+        </Card>
+
+        {/* Activity Feed + Profile */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Courses</CardTitle>
-              <CardDescription>Your active learning paths</CardDescription>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>Your latest learning events</CardDescription>
             </CardHeader>
             <CardContent>
-              {coursesFetching ? (
-                <p className="text-sm text-muted-foreground">
-                  Loading courses...
-                </p>
-              ) : coursesData?.courses?.edges?.length > 0 ? (
-                <div className="space-y-4">
-                  {coursesData.courses.edges.map(
-                    (edge: {
-                      node: { id: string; title: string; description: string };
-                    }) => (
-                      <div
-                        key={edge.node.id}
-                        className="flex items-start space-x-4"
-                      >
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex-1 space-y-1">
-                          <p className="text-sm font-medium leading-none">
-                            {edge.node.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground line-clamp-1">
-                            {edge.node.description}
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No courses found
-                </p>
-              )}
+              <ActivityFeed items={MOCK_ACTIVITY_FEED} />
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Learning Activity</CardTitle>
-              <CardDescription>Your recent study sessions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-4">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Clock className="h-5 w-5 text-primary" />
+          {meFetching ? (
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">
+                  Loading profile...
+                </p>
+              </CardContent>
+            </Card>
+          ) : meData?.me ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile</CardTitle>
+                <CardDescription>Your account information</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Username
+                    </dt>
+                    <dd className="text-sm mt-1">{meData.me.username}</dd>
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      Study Session
-                    </p>
-                    <p className="text-sm text-muted-foreground">2 hours ago</p>
+                  <div>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Email
+                    </dt>
+                    <dd className="text-sm mt-1">{meData.me.email}</dd>
                   </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-primary" />
+                  <div>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Role
+                    </dt>
+                    <dd className="text-sm mt-1">{meData.me.role}</dd>
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      Quiz Completed
-                    </p>
-                    <p className="text-sm text-muted-foreground">5 hours ago</p>
+                  <div>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Tenant
+                    </dt>
+                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">
+                      {meData.me.tenantId}
+                    </dd>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </dl>
+              </CardContent>
+            </Card>
+          ) : null}
         </div>
-
-        {meFetching ? (
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">
-                Loading user profile...
-              </p>
-            </CardContent>
-          </Card>
-        ) : meData?.me ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">
-                    Username
-                  </dt>
-                  <dd className="text-sm">{meData.me.username}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">
-                    Email
-                  </dt>
-                  <dd className="text-sm">{meData.me.email}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">
-                    Role
-                  </dt>
-                  <dd className="text-sm">{meData.me.role}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">
-                    Tenant ID
-                  </dt>
-                  <dd className="text-sm font-mono text-xs">
-                    {meData.me.tenantId}
-                  </dd>
-                </div>
-              </dl>
-            </CardContent>
-          </Card>
-        ) : null}
       </div>
     </Layout>
   );
