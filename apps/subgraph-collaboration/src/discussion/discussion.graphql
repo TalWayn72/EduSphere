@@ -62,11 +62,11 @@ type DiscussionParticipant {
 }
 
 """External entity stubs"""
-type User @key(fields: "id") @external {
+type User @key(fields: "id") {
   id: ID!
 }
 
-type Course @key(fields: "id") @external {
+type Course @key(fields: "id") {
   id: ID!
 }
 

@@ -24,3 +24,29 @@ type User @key(fields: "id") {
 }
 
 scalar JSON
+
+extend type Query {
+  agentTemplate(id: ID!): AgentTemplate
+  agentTemplatesByType(template: String!): [AgentTemplate!]!
+}
+
+extend type Mutation {
+  createAgentTemplate(input: CreateAgentTemplateInput!): AgentTemplate!
+  updateAgentTemplate(id: ID!, input: UpdateAgentTemplateInput!): AgentTemplate!
+  deleteAgentTemplate(id: ID!): Boolean!
+  activateAgentTemplate(id: ID!): AgentTemplate!
+  deactivateAgentTemplate(id: ID!): AgentTemplate!
+}
+
+input CreateAgentTemplateInput {
+  name: String!
+  templateType: TemplateType!
+  systemPrompt: String!
+  parameters: JSON
+}
+
+input UpdateAgentTemplateInput {
+  name: String
+  systemPrompt: String
+  parameters: JSON
+}

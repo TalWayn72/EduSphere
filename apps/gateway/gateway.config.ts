@@ -1,8 +1,9 @@
 import { defineConfig } from '@graphql-hive/gateway';
 
 export const gatewayConfig = defineConfig({
-  supergraph: 'file://./supergraph.graphql',
+  supergraph: './supergraph.graphql',
   pollingInterval: 10000,
+  host: '0.0.0.0',
   port: Number(process.env.PORT) || 4000,
   cors: {
     origin: process.env.CORS_ORIGIN?.split(',') || '*',
@@ -12,9 +13,7 @@ export const gatewayConfig = defineConfig({
     enabled: process.env.NODE_ENV !== 'production',
   },
   healthCheckEndpoint: '/health',
-  logging: {
-    level: process.env.LOG_LEVEL || 'info',
-  },
+  logging: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
 });
 
 export default gatewayConfig;

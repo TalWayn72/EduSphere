@@ -1,3 +1,6 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external"])
+
 type Course @key(fields: "id") {
   id: ID!
   tenantId: ID!
@@ -19,6 +22,7 @@ type User @key(fields: "id") {
 }
 
 extend type Query {
+  _health: String! @shareable
   course(id: ID!): Course
   courses(limit: Int = 20, offset: Int = 0): [Course!]!
   coursesByInstructor(instructorId: ID!, limit: Int = 20): [Course!]!

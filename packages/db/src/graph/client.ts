@@ -1,16 +1,13 @@
-import { sql } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import type { Pool } from 'pg';
 
 export type DrizzleDB = NodePgDatabase<any>;
 
 /**
  * Execute Apache AGE Cypher query with optional parameterized params.
  *
- * Apache AGE passes parameters via the third argument to cypher() as an agtype
- * object. Within the Cypher query, reference them as $paramName.
- *
- * Example:
- *   executeCypher(db, graph, 'MATCH (n {id: $id}) RETURN n', { id: myId })
+ * Uses raw pg client (simple query protocol) because LOAD 'age' and
+ * SET search_path cannot be combined with SELECT in a prepared statement.
  */
 export async function executeCypher<T = any>(
   db: DrizzleDB,
@@ -18,25 +15,27 @@ export async function executeCypher<T = any>(
   query: string,
   params?: Record<string, unknown>
 ): Promise<T[]> {
-  let result;
-  if (params && Object.keys(params).length > 0) {
-    // Serialize params as an agtype-compatible JSON literal.
-    // We pass the JSON string through sql.raw inside a cast so AGE receives it
-    // as agtype, which is the type accepted by cypher()'s third argument.
-    const paramsJson = JSON.stringify(params);
-    result = await db.execute(sql`
-      LOAD 'age';
-      SET search_path = ag_catalog, "$user", public;
-      SELECT * FROM cypher(${graphName}, $$${sql.raw(query)}$$, ${sql.raw(`'${paramsJson.replace(/'/g, "''")}'`)}) AS (result agtype);
-    `);
-  } else {
-    result = await db.execute(sql`
-      LOAD 'age';
-      SET search_path = ag_catalog, "$user", public;
-      SELECT * FROM cypher(${graphName}, $$${sql.raw(query)}$$) AS (result agtype);
-    `);
+  const pool = (db as any).$client as Pool;
+  const client = await pool.connect();
+  try {
+    await client.query("LOAD 'age'");
+    await client.query('SET search_path = ag_catalog, "$user", public');
+
+    let result;
+    if (params && Object.keys(params).length > 0) {
+      const paramsJson = JSON.stringify(params).replace(/'/g, "''");
+      result = await client.query(
+        `SELECT * FROM cypher('${graphName}', $$${query}$$, '${paramsJson}') AS (result agtype)`
+      );
+    } else {
+      result = await client.query(
+        `SELECT * FROM cypher('${graphName}', $$${query}$$) AS (result agtype)`
+      );
+    }
+    return result.rows as T[];
+  } finally {
+    client.release();
   }
-  return result.rows as T[];
 }
 
 /**

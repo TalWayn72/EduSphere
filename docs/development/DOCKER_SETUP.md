@@ -2,22 +2,116 @@
 
 > **Purpose**: Comprehensive guide for setting up and managing the EduSphere Docker development environment
 > **Target**: Local development on Windows, macOS, and Linux
-> **Last Updated**: February 17, 2026
+> **Last Updated**: February 18, 2026
 
 ---
 
 ## Table of Contents
 
 1. [Prerequisites](#1-prerequisites)
-2. [Custom Images](#2-custom-images)
-3. [docker-compose.yml](#3-docker-composeyml)
-4. [Network Configuration](#4-network-configuration)
-5. [Volume Management](#5-volume-management)
-6. [Service Health Checks](#6-service-health-checks)
-7. [Environment Variables](#7-environment-variables)
-8. [Startup/Shutdown Commands](#8-startupshutdown-commands)
-9. [Logs & Debugging](#9-logs--debugging)
-10. [Windows-Specific Issues](#10-windows-specific-issues)
+2. [All-in-One Container (Recommended for demos/staging)](#2-all-in-one-container)
+3. [Custom Images](#3-custom-images)
+4. [docker-compose.yml](#4-docker-composeyml)
+5. [Network Configuration](#5-network-configuration)
+6. [Volume Management](#6-volume-management)
+7. [Service Health Checks](#7-service-health-checks)
+8. [Environment Variables](#8-environment-variables)
+9. [Startup/Shutdown Commands](#9-startupshutdown-commands)
+10. [Logs & Debugging](#10-logs--debugging)
+11. [Windows-Specific Issues](#11-windows-specific-issues)
+
+---
+
+## 2. All-in-One Container
+
+> **Use case**: Demo environments, staging servers, CI/CD pipelines, quick local setup.
+> **Image**: `edusphere-all-in-one:build10`
+> **Managed by**: supervisord (all services in a single container)
+
+### Architecture
+
+```
+edusphere-all-in-one
+├── PostgreSQL 17 + Apache AGE + pgvector   (port 5432)
+├── Redis                                    (port 6379)
+├── NATS JetStream                           (port 4222, 8222)
+├── MinIO                                    (port 9000, 9001)
+├── Keycloak 26.5.3                          (port 8080)
+├── Ollama (disabled by default)             (port 11434)
+├── subgraph-core                            (port 4001)
+├── subgraph-content                         (port 4002)
+├── subgraph-annotation                      (port 4003)
+├── subgraph-collaboration                   (port 4004)
+├── subgraph-agent                           (port 4005)
+├── subgraph-knowledge                       (port 4006)
+└── Hive Gateway v2 (supergraph)             (port 4000)
+```
+
+### Startup Sequence
+
+1. `startup.sh` starts PostgreSQL, creates DB + extensions (AGE, pgvector, uuid-ossp)
+2. Runs `tsx src/migrate.ts` — applies Drizzle migrations (idempotent, IF NOT EXISTS)
+3. Seeds demo data if DB is empty (5 users, 1 course, Apache AGE graph ontology)
+4. Stops temporary PostgreSQL, hands off to supervisord
+5. supervisord starts ALL services in priority order
+6. After 35s, `compose-supergraph` runs `node compose.js` — fetches SDL from 6 subgraphs, writes `supergraph.graphql`
+7. Gateway hot-reloads and serves the composed supergraph
+
+### Build
+
+```bash
+docker build -t edusphere-all-in-one:build10 .
+```
+
+### Run
+
+```bash
+docker run -d --name edusphere \
+  -p 4000:4000 -p 4001:4001 -p 4002:4002 -p 4003:4003 \
+  -p 4004:4004 -p 4005:4005 -p 4006:4006 \
+  -p 5432:5432 -p 6379:6379 -p 8080:8080 \
+  -p 4222:4222 -p 8222:8222 -p 9000:9000 -p 9001:9001 \
+  edusphere-all-in-one:build10
+```
+
+### Verify
+
+```bash
+# Gateway health
+curl http://localhost:4000/health
+
+# GraphQL users query
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ users(limit:3){ id email firstName lastName role } }"}'
+
+# GraphQL courses query
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ courses { id title slug instructorId isPublished } }"}'
+```
+
+### Logs
+
+```bash
+docker exec <container> bash -c "cat //var/log/edusphere/compose-supergraph.log"
+docker exec <container> bash -c "cat //var/log/edusphere/gateway.log"
+docker exec <container> bash -c "cat //var/log/edusphere/subgraph-core.log"
+docker exec <container> bash -c "cat //var/log/postgresql/init.log"
+```
+
+### Key Technical Decisions
+
+| Decision | Reason |
+|----------|--------|
+| supervisord over systemd | Works in Docker without PID 1 issues |
+| startup.sh for DB init | PostgreSQL needs to be up before migrate/seed, then handed to supervisord |
+| `compose-supergraph` as one-shot program | Waits for all subgraphs (35s), then fetches SDL and composes |
+| `node compose.js` (not tsx) | Gateway dir has compiled JS in node_modules |
+| `IF NOT EXISTS` in migrations | Idempotent — safe to run on already-initialized DB |
+| Raw pg Pool in `executeCypher` | Apache AGE requires multi-statement: LOAD + SET + SELECT — cannot use Drizzle prepared statements |
+
+---
 11. [Performance Tuning](#11-performance-tuning)
 12. [Troubleshooting](#12-troubleshooting)
 

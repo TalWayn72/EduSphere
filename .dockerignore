@@ -2,12 +2,14 @@
 node_modules/
 **/node_modules/
 
-# Build outputs
+# Build outputs (built inside Docker, not needed in build context)
 dist/
 build/
 .next/
 out/
+# TypeScript incremental build info — causes nest build to skip compilation in Docker
 *.tsbuildinfo
+**/*.tsbuildinfo
 
 # Logs
 logs/

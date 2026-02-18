@@ -24,6 +24,18 @@ export class UserService {
     };
   }
 
+  private mapUser(user: any) {
+    if (!user) return null;
+    const displayName = user.display_name || '';
+    const parts = displayName.split(' ');
+    return {
+      ...user,
+      firstName: user.first_name || parts[0] || '',
+      lastName: user.last_name || parts.slice(1).join(' ') || '',
+      tenantId: user.tenant_id || '',
+    };
+  }
+
   async findById(id: string, authContext?: AuthContext) {
     if (authContext && authContext.tenantId) {
       const tenantCtx = this.toTenantContext(authContext);
@@ -33,7 +45,7 @@ export class UserService {
           .from(schema.users)
           .where(eq(schema.users.id, id))
           .limit(1);
-        return user || null;
+        return this.mapUser(user) || null;
       });
     }
 
@@ -42,27 +54,32 @@ export class UserService {
       .from(schema.users)
       .where(eq(schema.users.id, id))
       .limit(1);
-    return user || null;
+    return this.mapUser(user) || null;
   }
 
   async findAll(limit: number, offset: number, authContext?: AuthContext) {
     if (authContext && authContext.tenantId) {
       const tenantCtx = this.toTenantContext(authContext);
       return withTenantContext(this.db, tenantCtx, async (tx) => {
-        return tx.select().from(schema.users).limit(limit).offset(offset);
+        const rows = await tx.select().from(schema.users).limit(limit).offset(offset);
+        return rows.map((u) => this.mapUser(u));
       });
     }
 
-    return this.db.select().from(schema.users).limit(limit).offset(offset);
+    const rows = await this.db.select().from(schema.users).limit(limit).offset(offset);
+    return rows.map((u) => this.mapUser(u));
   }
 
   async create(input: any, authContext: AuthContext) {
     const tenantCtx = this.toTenantContext(authContext);
     return withTenantContext(this.db, tenantCtx, async (tx) => {
+      const displayName = `${input.firstName || ''} ${input.lastName || ''}`.trim();
       const values: any = {
         tenant_id: input.tenantId || authContext.tenantId || '',
         email: input.email,
-        display_name: `${input.firstName || ''} ${input.lastName || ''}`.trim(),
+        first_name: input.firstName || '',
+        last_name: input.lastName || '',
+        display_name: displayName,
       };
 
       if (input.role) {
@@ -70,7 +87,7 @@ export class UserService {
       }
 
       const [user] = await tx.insert(schema.users).values(values).returning();
-      return user;
+      return this.mapUser(user);
     });
   }
 
@@ -79,6 +96,12 @@ export class UserService {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const updateData: any = {};
 
+      if (input.firstName !== undefined) {
+        updateData.first_name = input.firstName;
+      }
+      if (input.lastName !== undefined) {
+        updateData.last_name = input.lastName;
+      }
       if (input.firstName || input.lastName) {
         updateData.display_name =
           `${input.firstName || ''} ${input.lastName || ''}`.trim();
@@ -98,7 +121,7 @@ export class UserService {
         throw new Error('User not found');
       }
 
-      return user;
+      return this.mapUser(user);
     });
   }
 }

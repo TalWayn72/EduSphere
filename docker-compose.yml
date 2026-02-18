@@ -31,7 +31,7 @@ services:
       - "11434:11434" # Ollama
     volumes:
       # Persist data outside container
-      - postgres_data:/var/lib/postgresql/16/main
+      - postgres_data:/var/lib/postgresql/17/main
       - keycloak_data:/opt/keycloak/data
       - minio_data:/data/minio
       - ollama_data:/root/.ollama

@@ -44,6 +44,7 @@ export interface AuthContext {
   firstName?: string;
   lastName?: string;
   roles: UserRole[];
+  scopes: string[];
   tenantId?: string;
   isSuperAdmin: boolean;
 }
@@ -80,6 +81,7 @@ export class JWTValidator {
         firstName: claims.given_name,
         lastName: claims.family_name,
         roles,
+        scopes: [],
         tenantId: claims.tenant_id,
         isSuperAdmin: roles.includes('SUPER_ADMIN'),
       };

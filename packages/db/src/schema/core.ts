@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, jsonb, unique } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, varchar, jsonb, unique } from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 
@@ -9,7 +9,9 @@ export const users = pgTable(
     id: pk(),
     tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
     email: text('email').notNull(),
-    display_name: text('display_name').notNull(),
+    first_name: varchar('first_name', { length: 100 }).notNull().default(''),
+    last_name: varchar('last_name', { length: 100 }).notNull().default(''),
+    display_name: text('display_name').notNull().default(''),
     role: text('role', {
       enum: ['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER'],
     })

@@ -133,6 +133,9 @@ Please provide a helpful answer based on the context above.`,
     options: RAGOptions = {}
   ): Promise<RAGResult> {
     const lastMessage = messages[messages.length - 1];
+    if (!lastMessage) {
+      throw new Error('Messages array is empty');
+    }
     if (lastMessage.role !== 'user') {
       throw new Error('Last message must be from user');
     }

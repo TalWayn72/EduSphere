@@ -33,16 +33,16 @@ type Annotation @key(fields: "id") {
   updatedAt: DateTime!
 }
 
-type User @key(fields: "id") @external {
+type User @key(fields: "id") {
   id: ID!
 }
 
-type ContentItem @key(fields: "id") @external {
+type ContentItem @key(fields: "id") {
   id: ID!
 }
 
 type Query {
-  _health: String!
+  _health: String! @shareable
   annotation(id: ID!): Annotation
   annotations(
     assetId: ID

@@ -62,13 +62,14 @@ export class CachedEmbeddings {
 
     // Check cache for each document
     for (let i = 0; i < documents.length; i++) {
-      const cacheKey = this.getCacheKey(documents[i]);
+      const doc = documents[i]!;
+      const cacheKey = this.getCacheKey(doc);
       const cached = await this.redis.get(cacheKey);
 
       if (cached) {
         results[i] = JSON.parse(cached);
       } else {
-        toEmbed.push({ index: i, text: documents[i] });
+        toEmbed.push({ index: i, text: doc });
       }
     }
 
@@ -78,8 +79,8 @@ export class CachedEmbeddings {
       const embeddings = await this.embeddings.embedDocuments(texts);
 
       for (let i = 0; i < toEmbed.length; i++) {
-        const { index, text } = toEmbed[i];
-        const embedding = embeddings[i];
+        const { index, text } = toEmbed[i]!;
+        const embedding = embeddings[i]!;
         results[index] = embedding;
 
         // Cache the result

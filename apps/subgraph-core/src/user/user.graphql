@@ -21,7 +21,7 @@ enum UserRole {
 }
 
 type Query {
-  _health: String!
+  _health: String! @shareable
   user(id: ID!): User
   users(limit: Int = 10, offset: Int = 0): [User!]!
   me: User

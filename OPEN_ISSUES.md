@@ -1,9 +1,70 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 18 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions + Phase 8 Mobile — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅ | Mobile (Expo) ✅
+**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions + Phase 8 Mobile + Docker All-in-One — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅ | Mobile (Expo) ✅ | Docker All-in-One ✅
 **בדיקות Web:** 146 unit tests עוברות (12 suites) | Backend: 37 tests (3 suites) | Mobile: 7 tests (2 suites) | סה"כ: **190 tests** | Component tests (RTL): ✅ | Security ESLint: ✅ | CodeQL: ✅
+
+---
+
+## ✅ INFRA-002: Docker All-in-One Container — הושלם (18 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🟡 Medium → ✅ Done |
+| **Status** | ✅ Build 10 - Production Ready |
+| **Image** | `edusphere-all-in-one:build10` |
+| **Size** | ~8GB (Ubuntu 22.04 + PG17 + AGE + pgvector + Node 22 + Keycloak + NATS + MinIO + Ollama) |
+
+### מה נכלל
+- **PostgreSQL 17** + Apache AGE 1.5 + pgvector 0.8 — managed by supervisord
+- **6 NestJS Subgraphs** (core 4001, content 4002, annotation 4003, collaboration 4004, agent 4005, knowledge 4006)
+- **Hive Gateway v2** (port 4000) — Federation v2.7 supergraph
+- **Redis** + **NATS JetStream** + **MinIO** + **Keycloak** + **Ollama** (disabled by default)
+- **Auto-compose**: `compose-supergraph` program runs `node compose.js` after 35s — builds supergraph automatically on startup
+- **Auto-migrate**: `tsx src/migrate.ts` runs migrations 0000 + 0001 on every startup (idempotent)
+- **Auto-seed**: inserts demo data if DB is empty
+
+### קבצים שעודכנו
+| קובץ | שינוי |
+|------|-------|
+| `Dockerfile` | Ubuntu 22.04 + PG17 + AGE/pgvector + Node 22 + all services |
+| `infrastructure/docker/startup.sh` | PG init → migrate → seed → supervisord |
+| `infrastructure/docker/supervisord.conf` | כל 6 subgraphs + gateway + compose-supergraph |
+| `apps/gateway/compose.js` | חדש — מרכיב supergraph מ-6 subgraphs |
+| `apps/gateway/gateway.config.ts` | תוקן — host 0.0.0.0, supergraph path, logging |
+| `packages/db/src/graph/client.ts` | תוקן — Apache AGE executeCypher עם raw pg Pool (multi-statement fix) |
+| `packages/db/src/schema/core.ts` | עודכן — הוספת first_name, last_name לטבלת users |
+| `packages/db/src/schema/content.ts` | עודכן — הוספת slug, instructor_id, is_published, thumbnail_url, estimated_hours לcourses |
+| `packages/db/migrations/0001_add_missing_columns.sql` | חדש — מיגרציה לעמודות החסרות |
+| `apps/subgraph-core/src/user/user.service.ts` | הוספת `mapUser()` — ממפה DB fields ל-GraphQL fields |
+| `apps/subgraph-content/src/course/course.service.ts` | הוספת `mapCourse()` — ממפה DB fields ל-GraphQL fields |
+| GraphQL schemas (6 subgraphs) | תוקן Federation v2 — הסרת `@external` מ-entity stubs, הוספת `@shareable` ל-`_health` |
+
+### הפעלה
+```bash
+docker run -d --name edusphere \
+  -p 4000:4000 -p 4001:4001 -p 4002:4002 -p 4003:4003 \
+  -p 4004:4004 -p 4005:4005 -p 4006:4006 \
+  -p 5432:5432 -p 6379:6379 -p 8080:8080 \
+  -p 4222:4222 -p 9000:9000 -p 9001:9001 \
+  edusphere-all-in-one:build10
+
+# בדיקה:
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ users(limit:3){ id email firstName lastName role } }"}'
+```
+
+### בעיות שנפתרו
+| בעיה | פתרון |
+|------|--------|
+| Apache AGE multi-statement in prepared statement | Raw pg Pool client עם 3 `client.query()` נפרדים |
+| Federation: `@external` on entity stubs | הסרת `@external` — Federation v2 לא דורש זאת |
+| `Non-shareable field "_health"` | הוספת `@shareable` לכל הגדרות `_health` |
+| `Cannot return null for User.firstName` | `mapUser()` מפצל `display_name` + מיגרציה 0001 מוסיפה `first_name`/`last_name` |
+| `Cannot return null for Course.slug` | `mapCourse()` + מיגרציה 0001 מוסיפה `slug`, `instructor_id`, `is_published` |
+| supervisord absolute paths | תוקן paths מוחלטים `/app/apps/gateway/node_modules/.bin/hive-gateway` |
 
 ---
 
