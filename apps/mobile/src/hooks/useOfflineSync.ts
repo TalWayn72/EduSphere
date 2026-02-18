@@ -44,7 +44,9 @@ export function useOfflineSync() {
           // Execute the mutation
           await client.mutate({
             mutation: item.mutation as any,
-            variables: item.variables,
+            variables: typeof item.variables === 'string'
+              ? JSON.parse(item.variables)
+              : item.variables,
           });
 
           // Mark as synced

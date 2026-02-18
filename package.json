@@ -38,7 +38,8 @@
   "pnpm": {
     "overrides": {
       "tar": ">=7.5.8",
-      "fast-xml-parser": ">=5.3.6"
+      "fast-xml-parser": ">=5.3.6",
+      "@types/react": "~18.3.18"
     }
   },
   "lint-staged": {

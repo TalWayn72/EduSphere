@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { useQuery, gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
+import { database } from '../services/database';
 
 const COURSES_QUERY = gql`
   query Courses {
@@ -23,13 +24,55 @@ const COURSES_QUERY = gql`
   }
 `;
 
+const COURSES_QUERY_STR = `query Courses {
+  courses(limit: 20) {
+    id title description isPublished createdAt
+  }
+}`;
+
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  isPublished: boolean;
+  createdAt: string;
+}
 
 export default function CoursesScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const [cachedCourses, setCachedCourses] = useState<Course[]>([]);
+  const [isShowingCache, setIsShowingCache] = useState(false);
+
   const { data, loading, error } = useQuery(COURSES_QUERY);
 
-  if (loading) {
+  // Cache successful results to SQLite
+  useEffect(() => {
+    if (data?.courses) {
+      database.cacheQuery(COURSES_QUERY_STR, {}, data).catch(() => {});
+      setIsShowingCache(false);
+    }
+  }, [data]);
+
+  // Load from cache when there's an error
+  useEffect(() => {
+    if (error) {
+      database
+        .getCachedQuery(COURSES_QUERY_STR, {})
+        .then((cached: { courses?: Course[] } | null) => {
+          if (cached?.courses) {
+            setCachedCourses(cached.courses);
+            setIsShowingCache(true);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [error]);
+
+  const courses: Course[] = data?.courses ?? cachedCourses;
+
+  if (loading && courses.length === 0) {
     return (
       <View style={styles.center}>
         <Text>Loading courses...</Text>
@@ -37,18 +80,26 @@ export default function CoursesScreen() {
     );
   }
 
-  if (error) {
+  if (error && courses.length === 0) {
     return (
       <View style={styles.center}>
         <Text style={styles.error}>Error: {error.message}</Text>
+        <Text style={styles.hint}>Check your connection and try again</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
+      {isShowingCache && (
+        <View style={styles.offlineBanner}>
+          <Text style={styles.offlineBannerText}>
+            Showing cached content — you are offline
+          </Text>
+        </View>
+      )}
       <FlatList
-        data={data?.courses || []}
+        data={courses}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -72,6 +123,11 @@ export default function CoursesScreen() {
           </TouchableOpacity>
         )}
         contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.center}>
+            <Text style={styles.hint}>No courses available</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -86,6 +142,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
+  },
+  offlineBanner: {
+    backgroundColor: '#FF9500',
+    padding: 10,
+    alignItems: 'center',
+  },
+  offlineBannerText: {
+    color: 'white',
+    fontSize: 13,
+    fontWeight: '500',
   },
   listContent: {
     padding: 16,
@@ -128,5 +195,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
+    marginBottom: 8,
+  },
+  hint: {
+    color: '#999',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

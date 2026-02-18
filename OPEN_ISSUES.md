@@ -1,9 +1,9 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 18 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅
-**בדיקות Web:** 146 unit tests עוברות (12 suites) | Backend: 37 tests (3 suites) | סה"כ: **183 tests** | Component tests (RTL): ✅ | Security ESLint: ✅ | CodeQL: ✅
+**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions + Phase 8 Mobile — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅ | Mobile (Expo) ✅
+**בדיקות Web:** 146 unit tests עוברות (12 suites) | Backend: 37 tests (3 suites) | Mobile: 7 tests (2 suites) | סה"כ: **190 tests** | Component tests (RTL): ✅ | Security ESLint: ✅ | CodeQL: ✅
 
 ---
 
@@ -90,10 +90,23 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 
 **Phase 7 Production Hardening:** Helm chart (26 manifests) + k6 load tests (3 scenarios) + Traefik IngressRoute מוכן
 
+**Phase 8 Mobile — הושלם (18 פברואר 2026):**
+- HomeScreen: dashboard עם stats, progress bars, recent courses
+- CoursesScreen: offline-first SQLite cache + orange offline banner
+- DiscussionsScreen: useQuery + DEV_MODE mock data + TextInput for posting
+- KnowledgeGraphScreen: node list + search + type filter chips + modal detail
+- navigation/index.tsx: 6 tabs (Home, Courses, Forum, AI Tutor, Graph, Profile)
+- auth.ts: SecureStore JWT storage + expiry detection
+- database.ts: pool getter + getAllAsync/runAsync helpers + offline_courses table
+- TypeScript fixes: camera.ts, backgroundSync.ts, deepLinking.ts, notifications.ts, offlineLink.ts
+- global.d.ts: refs patch for TypeScript 5.8+ + React Navigation v7 compat
+- Tests: 7 unit tests (2 suites) — all passing
+- 0 TypeScript errors
+
 **הבא בתור:**
-1. Phase 8 Mobile — Expo SDK 54, offline-first with expo-sqlite + TanStack Query
-2. CD pipeline — GitHub Actions `cd.yml` + Helm deploy to K8s cluster
-3. Prometheus/Grafana dashboards wiring to real metrics endpoints
+1. CD pipeline — GitHub Actions `cd.yml` + Helm deploy to K8s cluster
+2. Prometheus/Grafana dashboards wiring to real metrics endpoints
+3. Phase 8.2 Transcription Worker Pipeline
 
 ---
 

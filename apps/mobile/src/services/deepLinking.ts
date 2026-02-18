@@ -38,31 +38,31 @@ export class DeepLinkingService {
       case 'course':
         return {
           screen: 'CourseDetail',
-          params: { courseId: id, ...queryParams },
+          params: { courseId: id, ...(queryParams ?? {}) },
         };
 
       case 'lesson':
         return {
           screen: 'LessonDetail',
-          params: { lessonId: id, ...queryParams },
+          params: { lessonId: id, ...(queryParams ?? {}) },
         };
 
       case 'discussion':
         return {
           screen: 'DiscussionDetail',
-          params: { discussionId: id, ...queryParams },
+          params: { discussionId: id, ...(queryParams ?? {}) },
         };
 
       case 'profile':
         return {
           screen: 'Profile',
-          params: queryParams,
+          params: queryParams ?? undefined,
         };
 
       case 'ai-tutor':
         return {
           screen: 'AITutor',
-          params: { sessionId: id, ...queryParams },
+          params: { sessionId: id, ...(queryParams ?? {}) },
         };
 
       default:

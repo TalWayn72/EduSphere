@@ -1,4 +1,5 @@
 import { ApolloLink, Observable } from '@apollo/client';
+import { OperationDefinitionNode } from 'graphql';
 import { database } from '../services/database';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -10,11 +11,12 @@ export const offlineLink = new ApolloLink((operation, forward) => {
       const isOnline = state.isConnected ?? false;
 
       // For queries, try cache first if offline
+      const firstDef = operation.query.definitions[0];
       if (
         !isOnline &&
-        operation.query.definitions[0].kind === 'OperationDefinition'
+        firstDef?.kind === 'OperationDefinition'
       ) {
-        const def = operation.query.definitions[0];
+        const def = firstDef as OperationDefinitionNode;
         if (def.operation === 'query') {
           database
             .getCachedQuery(
@@ -33,7 +35,7 @@ export const offlineLink = new ApolloLink((operation, forward) => {
         }
 
         // For mutations, queue them for later
-        if (def.operation === 'mutation') {
+        if ((def as OperationDefinitionNode).operation === 'mutation') {
           database
             .addOfflineMutation(
               operation.query.loc?.source.body || '',
@@ -51,8 +53,9 @@ export const offlineLink = new ApolloLink((operation, forward) => {
       subscription = forward(operation).subscribe({
         next: (result) => {
           // Cache successful query results
-          if (operation.query.definitions[0].kind === 'OperationDefinition') {
-            const def = operation.query.definitions[0];
+          const onlineDef = operation.query.definitions[0];
+          if (onlineDef?.kind === 'OperationDefinition') {
+            const def = onlineDef as OperationDefinitionNode;
             if (def.operation === 'query' && result.data) {
               database.cacheQuery(
                 operation.query.loc?.source.body || '',

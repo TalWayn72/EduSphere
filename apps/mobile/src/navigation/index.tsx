@@ -5,10 +5,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 // Screens
+import HomeScreen from '../screens/HomeScreen';
 import CoursesScreen from '../screens/CoursesScreen';
 import CourseDetailScreen from '../screens/CourseDetailScreen';
 import DiscussionsScreen from '../screens/DiscussionsScreen';
 import AITutorScreen from '../screens/AITutorScreen';
+import KnowledgeGraphScreen from '../screens/KnowledgeGraphScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 export type RootStackParamList = {
@@ -17,9 +19,11 @@ export type RootStackParamList = {
 };
 
 export type MainTabParamList = {
+  Home: undefined;
   Courses: undefined;
   Discussions: undefined;
   AITutor: undefined;
+  KnowledgeGraph: undefined;
   Profile: undefined;
 };
 
@@ -33,12 +37,16 @@ function MainTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
 
-          if (route.name === 'Courses') {
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Courses') {
             iconName = focused ? 'book' : 'book-outline';
           } else if (route.name === 'Discussions') {
             iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
           } else if (route.name === 'AITutor') {
-            iconName = focused ? 'logo-android' : 'logo-android';
+            iconName = focused ? 'bulb' : 'bulb-outline';
+          } else if (route.name === 'KnowledgeGraph') {
+            iconName = focused ? 'git-network' : 'git-network-outline';
           } else {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -49,6 +57,11 @@ function MainTabs() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ title: 'Home' }}
+      />
       <Tab.Screen
         name="Courses"
         component={CoursesScreen}
@@ -63,6 +76,11 @@ function MainTabs() {
         name="AITutor"
         component={AITutorScreen}
         options={{ title: 'AI Tutor' }}
+      />
+      <Tab.Screen
+        name="KnowledgeGraph"
+        component={KnowledgeGraphScreen}
+        options={{ title: 'Graph' }}
       />
       <Tab.Screen
         name="Profile"

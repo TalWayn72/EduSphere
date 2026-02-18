@@ -60,12 +60,13 @@ export class CameraService {
     }
 
     const asset = result.assets[0];
+    if (!asset) return null;
     return {
       uri: asset.uri,
       width: asset.width,
       height: asset.height,
       type: asset.type === 'video' ? 'video' : 'image',
-      duration: asset.duration,
+      duration: asset.duration ?? undefined,
     };
   }
 
@@ -97,12 +98,13 @@ export class CameraService {
     }
 
     const asset = result.assets[0];
+    if (!asset) return null;
     return {
       uri: asset.uri,
       width: asset.width,
       height: asset.height,
       type: asset.type === 'video' ? 'video' : 'image',
-      duration: asset.duration,
+      duration: asset.duration ?? undefined,
     };
   }
 
@@ -135,7 +137,7 @@ export class CameraService {
       width: asset.width,
       height: asset.height,
       type: asset.type === 'video' ? 'video' : 'image',
-      duration: asset.duration,
+      duration: asset.duration ?? undefined,
     }));
   }
 }

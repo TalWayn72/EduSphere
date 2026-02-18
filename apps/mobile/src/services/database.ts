@@ -19,6 +19,20 @@ export interface OfflineMutation {
 class DatabaseService {
   private db: SQLite.SQLiteDatabase | null = null;
 
+  get pool(): SQLite.SQLiteDatabase | null {
+    return this.db;
+  }
+
+  async runAsync(sql: string, args?: (string | number | null)[]): Promise<void> {
+    if (!this.db) return;
+    await this.db.runAsync(sql, args ?? []);
+  }
+
+  async getAllAsync<T>(sql: string, args?: (string | number | null)[]): Promise<T[]> {
+    if (!this.db) return [];
+    return this.db.getAllAsync<T>(sql, args ?? []);
+  }
+
   async init() {
     this.db = await SQLite.openDatabaseAsync('edusphere.db');
     await this.createTables();
@@ -42,6 +56,15 @@ class DatabaseService {
         variables TEXT NOT NULL,
         timestamp INTEGER NOT NULL,
         status TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS offline_courses (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        downloaded_at INTEGER NOT NULL,
+        size INTEGER NOT NULL,
+        lessons_count INTEGER NOT NULL
       );
 
       CREATE INDEX IF NOT EXISTS idx_timestamp ON cached_queries(timestamp);

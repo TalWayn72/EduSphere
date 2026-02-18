@@ -61,7 +61,7 @@ export class BackgroundSyncService {
         // Execute mutation
         await this.apolloClient.mutate({
           mutation: mutation.mutation as any,
-          variables: mutation.variables,
+          variables: mutation.variables as any,
         });
 
         // Mark as synced
@@ -77,7 +77,7 @@ export class BackgroundSyncService {
     await database.clearOldCache(7 * 24 * 60 * 60 * 1000); // 7 days
   }
 
-  async getStatus(): Promise<BackgroundFetch.BackgroundFetchStatus> {
+  async getStatus(): Promise<BackgroundFetch.BackgroundFetchStatus | null> {
     return await BackgroundFetch.getStatusAsync();
   }
 
