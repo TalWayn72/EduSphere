@@ -1,5 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
 
 type User @key(fields: "id") {
   id: ID!
@@ -28,8 +28,8 @@ type Query {
 }
 
 type Mutation {
-  createUser(input: CreateUserInput!): User!
-  updateUser(id: ID!, input: UpdateUserInput!): User!
+  createUser(input: CreateUserInput!): User! @authenticated
+  updateUser(id: ID!, input: UpdateUserInput!): User! @authenticated
 }
 
 input CreateUserInput {

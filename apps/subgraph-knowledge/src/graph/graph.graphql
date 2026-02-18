@@ -1,3 +1,6 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+
 type Concept @key(fields: "id") {
   id: ID!
   tenantId: ID!
@@ -72,34 +75,34 @@ extend type Query {
   conceptByName(name: String!): Concept
   concepts(limit: Int = 20): [Concept!]!
   relatedConcepts(conceptId: ID!, depth: Int = 2, limit: Int = 10): [RelatedConcept!]!
-  
+
   person(id: ID!): Person
   personByName(name: String!): Person
-  
+
   term(id: ID!): Term
   termByName(name: String!): Term
-  
+
   source(id: ID!): Source
-  
+
   topicCluster(id: ID!): TopicCluster
   topicClustersByCourse(courseId: ID!): [TopicCluster!]!
-  
+
   searchSemantic(query: String!, limit: Int = 10): [SemanticResult!]!
 }
 
 extend type Mutation {
-  createConcept(input: CreateConceptInput!): Concept!
-  updateConcept(id: ID!, input: UpdateConceptInput!): Concept!
-  deleteConcept(id: ID!): Boolean!
-  
-  linkConcepts(fromId: ID!, toId: ID!, relationshipType: String!, strength: Float, description: String): ConceptRelationship!
-  
-  createPerson(input: CreatePersonInput!): Person!
-  createTerm(input: CreateTermInput!): Term!
-  createSource(input: CreateSourceInput!): Source!
-  createTopicCluster(input: CreateTopicClusterInput!): TopicCluster!
-  
-  generateEmbedding(text: String!, entityType: String!, entityId: ID!): Boolean!
+  createConcept(input: CreateConceptInput!): Concept! @authenticated
+  updateConcept(id: ID!, input: UpdateConceptInput!): Concept! @authenticated
+  deleteConcept(id: ID!): Boolean! @authenticated
+
+  linkConcepts(fromId: ID!, toId: ID!, relationshipType: String!, strength: Float, description: String): ConceptRelationship! @authenticated
+
+  createPerson(input: CreatePersonInput!): Person! @authenticated
+  createTerm(input: CreateTermInput!): Term! @authenticated
+  createSource(input: CreateSourceInput!): Source! @authenticated
+  createTopicCluster(input: CreateTopicClusterInput!): TopicCluster! @authenticated
+
+  generateEmbedding(text: String!, entityType: String!, entityId: ID!): Boolean! @authenticated
 }
 
 input CreateConceptInput {

@@ -1,3 +1,6 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+
 type Embedding @key(fields: "id") {
   id: ID!
   contentItemId: ID!
@@ -28,9 +31,9 @@ extend type Query {
 }
 
 extend type Mutation {
-  createEmbedding(input: CreateEmbeddingInput!): Embedding!
-  deleteEmbedding(id: ID!): Boolean!
-  deleteEmbeddingsByContentItem(contentItemId: ID!): Int!
+  createEmbedding(input: CreateEmbeddingInput!): Embedding! @authenticated
+  deleteEmbedding(id: ID!): Boolean! @authenticated
+  deleteEmbeddingsByContentItem(contentItemId: ID!): Int! @authenticated
 }
 
 input CreateEmbeddingInput {

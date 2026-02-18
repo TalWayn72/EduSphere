@@ -1,5 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated"])
 
 type Course @key(fields: "id") {
   id: ID!
@@ -29,11 +29,11 @@ extend type Query {
 }
 
 extend type Mutation {
-  createCourse(input: CreateCourseInput!): Course!
-  updateCourse(id: ID!, input: UpdateCourseInput!): Course!
-  deleteCourse(id: ID!): Boolean!
-  publishCourse(id: ID!): Course!
-  unpublishCourse(id: ID!): Course!
+  createCourse(input: CreateCourseInput!): Course! @authenticated
+  updateCourse(id: ID!, input: UpdateCourseInput!): Course! @authenticated
+  deleteCourse(id: ID!): Boolean! @authenticated
+  publishCourse(id: ID!): Course! @authenticated
+  unpublishCourse(id: ID!): Course! @authenticated
 }
 
 input CreateCourseInput {

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node --loader tsx src/index.ts",
-    "build": "echo 'Gateway is config-based, no build needed'"
+    "build": "echo 'Gateway is config-based, no build needed'",
+    "compose": "node compose.js"
   },
   "dependencies": {
     "@graphql-hive/gateway": "^1.10.0",

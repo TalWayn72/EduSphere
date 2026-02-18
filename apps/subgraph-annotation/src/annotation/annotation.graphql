@@ -1,5 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated"])
 
 enum AnnotationType {
   TEXT
@@ -56,10 +56,10 @@ type Query {
 }
 
 type Mutation {
-  createAnnotation(input: CreateAnnotationInput!): Annotation!
-  updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation!
-  deleteAnnotation(id: ID!): Boolean!
-  resolveAnnotation(id: ID!): Annotation!
+  createAnnotation(input: CreateAnnotationInput!): Annotation! @authenticated
+  updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation! @authenticated
+  deleteAnnotation(id: ID!): Boolean! @authenticated
+  resolveAnnotation(id: ID!): Annotation! @authenticated
 }
 
 input CreateAnnotationInput {

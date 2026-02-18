@@ -23,10 +23,10 @@ extend type Query {
 }
 
 extend type Mutation {
-  createModule(input: CreateModuleInput!): Module!
-  updateModule(id: ID!, input: UpdateModuleInput!): Module!
-  deleteModule(id: ID!): Boolean!
-  reorderModules(courseId: ID!, moduleIds: [ID!]!): [Module!]!
+  createModule(input: CreateModuleInput!): Module! @authenticated
+  updateModule(id: ID!, input: UpdateModuleInput!): Module! @authenticated
+  deleteModule(id: ID!): Boolean! @authenticated
+  reorderModules(courseId: ID!, moduleIds: [ID!]!): [Module!]! @authenticated
 }
 
 input CreateModuleInput {

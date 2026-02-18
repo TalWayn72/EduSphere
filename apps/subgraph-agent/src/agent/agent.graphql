@@ -1,3 +1,6 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+
 enum AgentExecutionStatus {
   QUEUED
   RUNNING
@@ -38,8 +41,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  startAgentExecution(input: StartAgentExecutionInput!): AgentExecution!
-  cancelAgentExecution(id: ID!): AgentExecution!
+  startAgentExecution(input: StartAgentExecutionInput!): AgentExecution! @authenticated
+  cancelAgentExecution(id: ID!): AgentExecution! @authenticated
 }
 
 extend type Subscription {

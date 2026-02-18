@@ -31,11 +31,11 @@ extend type Query {
 }
 
 extend type Mutation {
-  createAgentTemplate(input: CreateAgentTemplateInput!): AgentTemplate!
-  updateAgentTemplate(id: ID!, input: UpdateAgentTemplateInput!): AgentTemplate!
-  deleteAgentTemplate(id: ID!): Boolean!
-  activateAgentTemplate(id: ID!): AgentTemplate!
-  deactivateAgentTemplate(id: ID!): AgentTemplate!
+  createAgentTemplate(input: CreateAgentTemplateInput!): AgentTemplate! @authenticated
+  updateAgentTemplate(id: ID!, input: UpdateAgentTemplateInput!): AgentTemplate! @authenticated
+  deleteAgentTemplate(id: ID!): Boolean! @authenticated
+  activateAgentTemplate(id: ID!): AgentTemplate! @authenticated
+  deactivateAgentTemplate(id: ID!): AgentTemplate! @authenticated
 }
 
 input CreateAgentTemplateInput {
