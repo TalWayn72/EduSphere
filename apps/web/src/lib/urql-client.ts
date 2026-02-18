@@ -1,6 +1,15 @@
-import { createClient, fetchExchange } from 'urql';
+import { createClient, fetchExchange, subscriptionExchange } from 'urql';
 import { cacheExchange } from '@urql/exchange-graphcache';
+import { createClient as createWsClient } from 'graphql-ws';
 import { getToken } from './auth';
+
+const wsClient = createWsClient({
+  url: import.meta.env.VITE_GRAPHQL_WS_URL ?? import.meta.env.VITE_GRAPHQL_URL.replace(/^http/, 'ws'),
+  connectionParams: () => {
+    const token = getToken();
+    return token ? { authorization: `Bearer ${token}` } : {};
+  },
+});
 
 export const urqlClient = createClient({
   url: import.meta.env.VITE_GRAPHQL_URL,
@@ -8,6 +17,17 @@ export const urqlClient = createClient({
     cacheExchange({
       keys: {
         PageInfo: () => null,
+      },
+    }),
+    subscriptionExchange({
+      forwardSubscription(request) {
+        const input = { ...request, query: request.query ?? '' };
+        return {
+          subscribe(sink) {
+            const unsubscribe = wsClient.subscribe(input, sink);
+            return { unsubscribe };
+          },
+        };
       },
     }),
     fetchExchange,

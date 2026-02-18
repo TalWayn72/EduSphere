@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useMutation } from 'urql';
+import { useMutation, useSubscription } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
 import {
   START_AGENT_SESSION_MUTATION,
   SEND_AGENT_MESSAGE_MUTATION,
+  MESSAGE_STREAM_SUBSCRIPTION,
 } from '@/lib/graphql/agent.queries';
 
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
@@ -194,6 +195,41 @@ export function AgentsPage() {
   const [streamingContent, setStreamingContent] = useState('');
   const mode = AGENT_MODES.find((m) => m.id === activeMode)!;
   const messages = sessions[activeMode];
+
+  // ─── Subscription: real AI streaming (non-DEV_MODE only) ───────────────────
+  const currentSessionId = agentSessionIds[activeMode] ?? null;
+
+  const [streamResult] = useSubscription(
+    {
+      query: MESSAGE_STREAM_SUBSCRIPTION,
+      variables: { sessionId: currentSessionId ?? '' },
+      pause: DEV_MODE || !currentSessionId,
+    },
+  );
+
+  // Effect: handle streaming messages from subscription
+  useEffect(() => {
+    const msg = streamResult.data?.messageStream;
+    if (!msg) return;
+    setSessions((prev) => {
+      const current = prev[activeMode] ?? [];
+      if (msg.isStreaming) {
+        // Append to last agent message or create new one
+        const last = current[current.length - 1];
+        if (last && last.role === 'agent' && last.id === msg.id) {
+          return { ...prev, [activeMode]: [...current.slice(0, -1), { ...last, content: msg.content }] };
+        }
+        return { ...prev, [activeMode]: [...current, { id: msg.id as string, role: 'agent' as const, content: msg.content as string }] };
+      }
+      // Final message — replace or append
+      const last = current[current.length - 1];
+      if (last && last.role === 'agent' && last.id === msg.id) {
+        return { ...prev, [activeMode]: [...current.slice(0, -1), { ...last, content: msg.content }] };
+      }
+      return { ...prev, [activeMode]: [...current, { id: msg.id as string, role: 'agent' as const, content: msg.content as string }] };
+    });
+    if (!msg.isStreaming) setIsTyping(false);
+  }, [streamResult.data, activeMode]);
 
   // Auto-scroll during streaming
   useEffect(() => {
