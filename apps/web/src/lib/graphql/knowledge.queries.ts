@@ -76,3 +76,4 @@ export const LINK_CONCEPTS_MUTATION = gql`
     }
   }
 `;
+

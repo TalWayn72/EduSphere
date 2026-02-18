@@ -11,6 +11,7 @@ import { KnowledgeGraph } from '@/pages/KnowledgeGraph';
 import { AgentsPage } from '@/pages/AgentsPage';
 import { AnnotationsPage } from '@/pages/AnnotationsPage';
 import { CollaborationPage } from '@/pages/CollaborationPage';
+import { SearchPage } from '@/pages/Search';
 import AnnotationDemo from '@/pages/AnnotationDemo';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
@@ -99,6 +100,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CollaborationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <ProtectedRoute>
+                <SearchPage />
               </ProtectedRoute>
             }
           />

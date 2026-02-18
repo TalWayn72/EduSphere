@@ -44,7 +44,7 @@ function generateHeatmapData(): DailyActivity[] {
         ? Math.floor(Math.random() * baseActivity + (isWeekend ? 0 : 1))
         : 0;
     days.push({
-      date: date.toISOString().split('T')[0],
+      date: date.toISOString().split('T')[0] ?? '',
       count: randomActivity,
     });
   }

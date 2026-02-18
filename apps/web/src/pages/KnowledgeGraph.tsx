@@ -1,10 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { mockGraphData, GraphNode } from '@/lib/mock-graph-data';
-import { Search, BookOpen, ChevronRight } from 'lucide-react';
+import { Search, BookOpen, ChevronRight, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const SVG_W = 520,
@@ -50,7 +50,48 @@ export function KnowledgeGraph() {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
 
+  // Zoom/pan state
+  const [scale, setScale] = useState(1);
+  const [translate, setTranslate] = useState({ x: 0, y: 0 });
+  const isPanning = useRef(false);
+  const panStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const svgRef = useRef<SVGSVGElement>(null);
+
   const positions = useMemo(() => computePositions(mockGraphData.nodes), []);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setScale((s) => Math.min(3, Math.max(0.3, s * delta)));
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if ((e.target as SVGElement).closest('g[data-node]')) return;
+    isPanning.current = true;
+    panStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      tx: translate.x,
+      ty: translate.y,
+    };
+  }, [translate]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isPanning.current) return;
+    setTranslate({
+      x: panStart.current.tx + (e.clientX - panStart.current.x),
+      y: panStart.current.ty + (e.clientY - panStart.current.y),
+    });
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    isPanning.current = false;
+  }, []);
+
+  const resetView = () => {
+    setScale(1);
+    setTranslate({ x: 0, y: 0 });
+  };
 
   const selectedNode = mockGraphData.nodes.find((n) => n.id === selectedId);
 
@@ -110,12 +151,47 @@ export function KnowledgeGraph() {
         <div className="grid grid-cols-12 gap-4">
           {/* SVG Graph */}
           <Card className="col-span-12 lg:col-span-8">
-            <CardContent className="p-2">
+            <CardContent className="p-2 relative">
+              {/* Zoom controls */}
+              <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setScale((s) => Math.min(3, s * 1.2))}
+                >
+                  <ZoomIn className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setScale((s) => Math.max(0.3, s / 1.2))}
+                >
+                  <ZoomOut className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={resetView}
+                  title="Reset view"
+                >
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
               <svg
+                ref={svgRef}
                 viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-                className="w-full"
+                className="w-full cursor-grab active:cursor-grabbing select-none"
                 style={{ maxHeight: '420px' }}
+                onWheel={handleWheel}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
               >
+              <g transform={`translate(${CX + translate.x},${CY + translate.y}) scale(${scale}) translate(${-CX},${-CY})`}>
                 {/* Edges */}
                 {mockGraphData.edges.map((e) => {
                   const from = positions[e.source];
@@ -155,6 +231,7 @@ export function KnowledgeGraph() {
                   return (
                     <g
                       key={n.id}
+                      data-node={n.id}
                       onClick={() => setSelectedId(n.id)}
                       style={{ cursor: 'pointer' }}
                     >
@@ -199,6 +276,7 @@ export function KnowledgeGraph() {
                     </g>
                   );
                 })}
+              </g>
               </svg>
 
               {/* Edge legend */}

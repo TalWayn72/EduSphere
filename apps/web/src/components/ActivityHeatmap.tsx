@@ -25,7 +25,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
   let currentWeek: DailyActivity[] = [];
 
   // Pad start to align to Sunday
-  const firstDate = new Date(data[0].date);
+  const firstDate = new Date(data[0]?.date ?? '');
   const startDayOfWeek = firstDate.getDay();
   for (let i = 0; i < startDayOfWeek; i++) {
     currentWeek.push({ date: '', count: -1 });

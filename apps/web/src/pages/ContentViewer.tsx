@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -79,6 +79,28 @@ function formatTime(s: number) {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
+function highlightText(text: string, query: string) {
+  if (!query.trim() || query.length < 2) return <>{text}</>;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+  const lower = query.toLowerCase();
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === lower ? (
+          <mark key={i} className="bg-yellow-200 text-yellow-900 rounded px-0.5">
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
+const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function ContentViewer() {
   const { contentId = 'content-1' } = useParams<{ contentId: string }>();
@@ -118,6 +140,10 @@ export function ContentViewer() {
   ]);
   const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const transcriptContainerRef = useRef<HTMLDivElement>(null);
+  const activeSegmentRef = useRef<HTMLDivElement>(null);
+  const [searchParams] = useSearchParams();
 
   // ── GraphQL ──
   const [contentResult] = useQuery({
@@ -182,6 +208,49 @@ export function ContentViewer() {
       videoRef.current.currentTime = time;
       setCurrentTime(time);
     }
+  }, []);
+
+  // Keyboard shortcuts: Space=play/pause, ←/→=seek 5s
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      )
+        return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (!videoRef.current) return;
+        if (videoRef.current.paused) void videoRef.current.play();
+        else videoRef.current.pause();
+      } else if (e.code === 'ArrowLeft') {
+        seekTo(Math.max(0, currentTime - 5));
+      } else if (e.code === 'ArrowRight') {
+        seekTo(Math.min(duration, currentTime + 5));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentTime, duration, seekTo]);
+
+  // Auto-scroll transcript to active segment
+  useEffect(() => {
+    activeSegmentRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+    });
+  }, [activeSegment]);
+
+  // Sync playback speed with video element
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.playbackRate = playbackSpeed;
+  }, [playbackSpeed]);
+
+  // Jump to ?t= URL param on mount
+  useEffect(() => {
+    const t = searchParams.get('t');
+    if (t) seekTo(parseFloat(t));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleLayer = (layer: AnnotationLayer) => {
@@ -379,6 +448,20 @@ export function ContentViewer() {
                 >
                   <Maximize className="h-4 w-4" />
                 </Button>
+                <button
+                  onClick={() => {
+                    const idx = SPEED_OPTIONS.indexOf(
+                      playbackSpeed as (typeof SPEED_OPTIONS)[number]
+                    );
+                    setPlaybackSpeed(
+                      SPEED_OPTIONS[(idx + 1) % SPEED_OPTIONS.length] ?? 1
+                    );
+                  }}
+                  className="text-xs font-mono px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80 transition-colors min-w-[2.5rem] text-center"
+                  title="Playback speed (click to cycle)"
+                >
+                  {playbackSpeed}×
+                </button>
               </div>
             </CardContent>
           </Card>
@@ -393,10 +476,11 @@ export function ContentViewer() {
                 {videoTitle}
               </span>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+            <div ref={transcriptContainerRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
               {transcript.map((seg, idx) => (
                 <div
                   key={seg.id}
+                  ref={idx === activeSegment ? activeSegmentRef : null}
                   onClick={() => seekTo(seg.startTime)}
                   className={`flex gap-3 p-2 rounded-md cursor-pointer transition-colors text-sm
                     ${idx === activeSegment ? 'bg-primary/10 border border-primary/30' : 'hover:bg-muted/60'}`}
@@ -405,7 +489,7 @@ export function ContentViewer() {
                     {formatTime(seg.startTime)}
                   </span>
                   <span className={idx === activeSegment ? 'font-medium' : ''}>
-                    {seg.text}
+                    {highlightText(seg.text, searchQuery)}
                   </span>
                 </div>
               ))}

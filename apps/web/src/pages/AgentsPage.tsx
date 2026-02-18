@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -167,40 +167,62 @@ export function AgentsPage() {
   });
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const streamRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const [isTyping, setIsTyping] = useState(false);
+  const [streamingContent, setStreamingContent] = useState('');
   const mode = AGENT_MODES.find((m) => m.id === activeMode)!;
   const messages = sessions[activeMode];
 
-  const handleSend = () => {
-    if (!chatInput.trim()) return;
+  // Auto-scroll during streaming
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streamingContent, isTyping]);
+
+  const handleSend = useCallback(() => {
+    if (!chatInput.trim() || isTyping || streamingContent) return;
     const userMsg: ChatMsg = {
       id: Date.now().toString(),
       role: 'user',
       content: chatInput,
     };
+    const capturedMode = activeMode;
     setChatInput('');
     setSessions((prev) => ({
       ...prev,
-      [activeMode]: [...prev[activeMode], userMsg],
+      [capturedMode]: [...prev[capturedMode], userMsg],
     }));
 
+    setIsTyping(true);
     setTimeout(() => {
-      const modeData = AGENT_MODES.find((m) => m.id === activeMode)!;
-      const pick =
+      const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
+      const fullText =
         modeData.responses[
           Math.floor(Math.random() * modeData.responses.length)
         ] ?? modeData.responses[0];
-      const reply: ChatMsg = {
-        id: (Date.now() + 1).toString(),
-        role: 'agent',
-        content: pick,
-      };
-      setSessions((prev) => ({
-        ...prev,
-        [activeMode]: [...prev[activeMode], reply],
-      }));
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 700);
-  };
+      setIsTyping(false);
+
+      // Stream characters
+      let charIdx = 0;
+      setStreamingContent('');
+      streamRef.current = setInterval(() => {
+        charIdx += 3; // reveal 3 chars per tick for speed
+        setStreamingContent(fullText.slice(0, charIdx));
+        if (charIdx >= fullText.length) {
+          clearInterval(streamRef.current);
+          setStreamingContent('');
+          const reply: ChatMsg = {
+            id: (Date.now() + 1).toString(),
+            role: 'agent',
+            content: fullText,
+          };
+          setSessions((prev) => ({
+            ...prev,
+            [capturedMode]: [...prev[capturedMode], reply],
+          }));
+        }
+      }, 18);
+    }, 600);
+  }, [chatInput, activeMode, isTyping, streamingContent]);
 
   const handleReset = () => {
     setSessions((prev) => ({ ...prev, [activeMode]: [prev[activeMode][0]!] }));
@@ -282,6 +304,29 @@ export function AgentsPage() {
                 </div>
               </div>
             ))}
+            {/* Typing indicator */}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-muted rounded-lg rounded-bl-none px-4 py-3 flex gap-1 items-center">
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce"
+                      style={{ animationDelay: `${i * 120}ms` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Streaming message */}
+            {streamingContent && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] bg-muted px-3 py-2 rounded-lg rounded-bl-none text-sm leading-relaxed whitespace-pre-wrap">
+                  {streamingContent}
+                  <span className="inline-block w-0.5 h-4 ml-0.5 bg-foreground/70 animate-pulse align-text-bottom" />
+                </div>
+              </div>
+            )}
             <div ref={chatEndRef} />
           </div>
 
@@ -306,10 +351,20 @@ export function AgentsPage() {
               onKeyDown={(e) =>
                 e.key === 'Enter' && !e.shiftKey && handleSend()
               }
-              placeholder={`Ask the ${mode.label}...`}
-              className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+              placeholder={
+                isTyping || streamingContent
+                  ? 'Agent is responding...'
+                  : `Ask the ${mode.label}...`
+              }
+              disabled={isTyping || !!streamingContent}
+              className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60 disabled:cursor-not-allowed"
             />
-            <Button size="sm" className="h-9 w-9 p-0" onClick={handleSend}>
+            <Button
+              size="sm"
+              className="h-9 w-9 p-0"
+              onClick={handleSend}
+              disabled={isTyping || !!streamingContent}
+            >
               <Send className="h-4 w-4" />
             </Button>
           </div>

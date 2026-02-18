@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout, getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import {
   Bot,
   Network,
   GitBranch,
+  Search,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -24,6 +25,18 @@ export function Layout({ children }: LayoutProps) {
     logout();
     navigate('/login');
   };
+
+  // Global keyboard shortcut: Ctrl+K / Cmd+K → open search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        navigate('/search');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -86,9 +99,19 @@ export function Layout({ children }: LayoutProps) {
                 </Link>
               </nav>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:flex items-center gap-2 text-muted-foreground text-sm w-48 justify-start"
+                onClick={() => navigate('/search')}
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>Search...</span>
+                <kbd className="ml-auto text-xs bg-muted px-1.5 py-0.5 rounded border">⌘K</kbd>
+              </Button>
               {user && (
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground hidden lg:block">
                   {user.firstName} {user.lastName}
                 </div>
               )}
