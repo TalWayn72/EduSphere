@@ -1,9 +1,115 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 18 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions + Phase 8 Mobile + Docker All-in-One — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅ | Mobile (Expo) ✅ | Docker All-in-One ✅
+**תאריך עדכון:** 19 פברואר 2026
+**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions + Phase 8 Mobile + Docker All-in-One + **UPGRADE-001 Stack Upgrade** — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅ | Mobile (Expo) ✅ | Docker All-in-One ✅ | Stack Upgrades ✅
 **בדיקות Web:** 146 unit tests עוברות (12 suites) | Backend: 37 tests (3 suites) | Mobile: 7 tests (2 suites) | סה"כ: **190 tests** | Component tests (RTL): ✅ | Security ESLint: ✅ | CodeQL: ✅
+
+---
+
+## ✅ UPGRADE-001: Full Stack Upgrade — הושלם (19 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical (Security) + 🟡 Important (Performance/Features) |
+| **Status** | ✅ Completed |
+| **Scope** | כל ה-Stack הטכנולוגי |
+
+### שלב 0 — אבטחה קריטית (יום 1)
+
+| Package | לפני | אחרי | סיבה |
+|---------|------|------|------|
+| `@langchain/community` | 0.3.22 | 1.1.16 | 🔴 SSRF vulnerability fix |
+| `Apache AGE` | 1.5.0 | 1.7.0 | 🔴 RLS support + PG18 compat |
+| `pgvector` | 0.8.0 | 0.8.1 | iterative HNSW scan accuracy |
+| `redis` (Docker) | 7-alpine | 8.6.0-alpine | performance + security |
+| `Keycloak` (dev) | 26.0 | 26.5.3 | align with all-in-one |
+
+### שלב 1 — Build Tools
+
+| Package | לפני | אחרי |
+|---------|------|------|
+| `turbo` | 2.3.3 | 2.7.2 |
+| `typescript` | 5.7-5.8 | 6.0.3 (כל packages) |
+| `prettier` | 3.4.2 | 3.8.1 |
+| `eslint` | 9.18.0 | 10.0.0 |
+| `vite` | 6.0.11 | 7.1.2 (Rust Rolldown) |
+| `vitest` | 2.1-3.2 | 4.0.18 (כל packages) |
+| `@tailwindcss/vite` | — | 4.0.12 (new) |
+| Tailwind CSS | 3.4.17 | 4.0.12 (Oxide engine) |
+| Node.js requirement | >=20.0.0 | >=20.19.0 |
+
+### שלב 2 — Database
+
+| Package | לפני | אחרי |
+|---------|------|------|
+| `drizzle-orm` | 0.39.3 | 0.45.1 (native pgvector) |
+| `drizzle-kit` | 0.30.2 | 0.45.1 |
+| `zod` | 3.24.1 | 4.3.6 (כל packages) |
+
+**קוד שעודכן:**
+- `packages/db/src/schema/embeddings.ts` — migrated `customType` → native `vector()` from `drizzle-orm/pg-core`
+
+### שלב 3 — NestJS + GraphQL + Infrastructure
+
+| Package | לפני | אחרי |
+|---------|------|------|
+| `@nestjs/common/core` | 10.4.15 | 11.1.14 (כל subgraphs) |
+| `@nestjs/testing` | 10.4.15 | 11.1.14 |
+| `@graphql-hive/gateway` | 1.10.0 | 2.2.1 |
+| `graphql-yoga` | 5.10.7 | 5.18.0 |
+| `graphql` | 16.9-10 | 16.12.0 |
+| `pino` | 9.6.0 | 10.3.1 |
+| `pino-pretty` | 13.0.0 | 13.1.3 |
+| `nats` | 2.28.x | 2.29.3 |
+| `jose` | 5.9.6 | 6.1.3 |
+
+**קוד שעודכן:**
+- `apps/gateway/gateway.config.ts` — fixed Hive Gateway v2 `plugins` API (removed `ctx.plugins` spreading)
+
+### שלב 4+5 — AI/ML + Frontend
+
+| Package | לפני | אחרי |
+|---------|------|------|
+| `@langchain/openai` | 0.3.16 | 1.2.8 |
+| `langchain` | 0.3.10 | 1.2.24 |
+| `ai` (Vercel AI SDK) | 4.0.46 | 5.0.0 |
+| `@ai-sdk/openai` | 1.0-1.1 | 3.0.30 |
+| `ollama-ai-provider` | 1.2.0 (deprecated) | 3.3.0 |
+| `react` + `react-dom` | 19.0.0 | 19.2.4 |
+| `react-router-dom` | 6.28.0 | 7.12.1 |
+| `@playwright/test` | 1.49.1 | 1.58.2 |
+| `keycloak-js` | 26.0.0 | 26.5.3 |
+
+**חדש שנוסף:**
+- `@tanstack/react-query` v5 — server state management
+- `@tanstack/react-query-devtools` v5 — dev tools
+- `zustand` v5 — client UI state
+- `apps/web/src/lib/query-client.ts` — QueryClient singleton
+- `apps/web/src/lib/store.ts` — Zustand UIStore
+
+**קוד שעודכן:**
+- `apps/web/src/App.tsx` — added `QueryClientProvider`
+- `apps/web/vite.config.ts` — added `@tailwindcss/vite` plugin
+- `apps/web/src/styles/globals.css` — migrated to Tailwind v4 CSS-first syntax
+- `apps/web/postcss.config.js` — removed tailwindcss (now in Vite plugin)
+
+### ⏳ משימות עתידיות (Phase נוסף)
+
+| משימה | עדיפות | הערה |
+|-------|--------|------|
+| `@langchain/langgraph` 0.2.28 → 1.0.x | 🔴 High | requires StateGraph API migration in 5 workflow files |
+| PostgreSQL 16 → 18.2 | 🟡 Medium | requires `pg_upgrade` + maintenance window |
+| AGE RLS on label tables | 🟡 Medium | AGE 1.7.0 ready, needs per-tenant Cypher policy |
+| Hive Gateway v2 NATS Subscriptions | 🟡 Medium | enable distributed subscriptions |
+| LangGraph durable execution | 🟡 Medium | requires v1.0 upgrade first |
+| Vercel AI SDK v6 | 🟢 Low | wait for GA (currently beta) |
+
+### קבצים שעודכנו (שינויי package.json)
+
+כל `apps/subgraph-*/package.json` (×6) + `apps/gateway/package.json` + `apps/web/package.json` + `apps/transcription-worker/package.json` + `apps/mobile/package.json` + `packages/*/package.json` (×12) + `package.json` (root)
+
+---
 
 ---
 

@@ -1,8 +1,8 @@
-# Custom PostgreSQL 16 + Apache AGE 1.5.0 + pgvector 0.8.0
+# Custom PostgreSQL 16 + Apache AGE 1.7.0 + pgvector 0.8.1
 FROM postgres:16-alpine
 
 LABEL maintainer="EduSphere Team"
-LABEL description="PostgreSQL 16 with Apache AGE graph database and pgvector for embeddings"
+LABEL description="PostgreSQL 16 with Apache AGE 1.7.0 graph database (with RLS) and pgvector 0.8.1 for embeddings"
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -14,18 +14,18 @@ RUN apk add --no-cache \
     flex \
     bison
 
-# Install Apache AGE 1.5.0
+# Install Apache AGE 1.7.0 (adds RLS support + index on ID columns for multi-tenancy)
 RUN cd /tmp && \
-    git clone --branch PG16/v1.5.0 --depth 1 https://github.com/apache/age.git && \
+    git clone --branch PG16/v1.7.0 --depth 1 https://github.com/apache/age.git && \
     cd age && \
     make USE_PGXS=1 && \
     make USE_PGXS=1 install && \
     cd / && \
     rm -rf /tmp/age
 
-# Install pgvector 0.8.0
+# Install pgvector 0.8.1 (iterative index scans for improved HNSW accuracy)
 RUN cd /tmp && \
-    git clone --branch v0.8.0 --depth 1 https://github.com/pgvector/pgvector.git && \
+    git clone --branch v0.8.1 --depth 1 https://github.com/pgvector/pgvector.git && \
     cd pgvector && \
     make USE_PGXS=1 && \
     make USE_PGXS=1 install && \

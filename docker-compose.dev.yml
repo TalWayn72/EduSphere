@@ -36,7 +36,7 @@ services:
   # Redis
   # ═══════════════════════════════════════════════════════════════
   redis:
-    image: redis:7-alpine
+    image: redis:8.6.0-alpine
     container_name: edusphere-redis
     command: redis-server --requirepass edusphere_redis_password
     ports:
@@ -52,10 +52,28 @@ services:
       - edusphere
 
   # ═══════════════════════════════════════════════════════════════
+  # NATS JetStream
+  # ═══════════════════════════════════════════════════════════════
+  nats:
+    image: nats:2-alpine
+    container_name: edusphere-nats
+    command: ["-js", "-m", "8222"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4222 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
   # Keycloak (Port 8080)
   # ═══════════════════════════════════════════════════════════════
   keycloak:
-    image: quay.io/keycloak/keycloak:26.0
+    image: quay.io/keycloak/keycloak:26.5.3
     container_name: edusphere-keycloak
     environment:
       KEYCLOAK_ADMIN: admin
@@ -84,6 +102,29 @@ services:
       - edusphere
 
   # ═══════════════════════════════════════════════════════════════
+  # Jaeger - Distributed Tracing (OTLP HTTP on 4318, UI on 16686)
+  # Accepts OTLP HTTP traces/metrics from all subgraphs via port 4318.
+  # ═══════════════════════════════════════════════════════════════
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    container_name: edusphere-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4317:4317"     # OTLP gRPC (optional)
+      - "4318:4318"     # OTLP HTTP (used by @edusphere/telemetry)
+      - "14268:14268"   # Jaeger HTTP collector (legacy)
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:16686/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - edusphere
+    restart: unless-stopped
+
+  # ═══════════════════════════════════════════════════════════════
   # Core Subgraph (Port 4001)
   # ═══════════════════════════════════════════════════════════════
   subgraph-core:
@@ -99,16 +140,30 @@ services:
       - PORT=4001
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+      - OTEL_SERVICE_NAME=subgraph-core
     ports:
       - "4001:4001"
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/subgraph-core/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4001 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
     depends_on:
       postgres:
         condition: service_healthy
+      nats:
+        condition: service_healthy
       keycloak:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -129,16 +184,30 @@ services:
       - PORT=4002
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
       - KEYCLOAK_URL=http://keycloak:8080
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+      - OTEL_SERVICE_NAME=subgraph-content
     ports:
       - "4002:4002"
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/subgraph-content/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4002 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
     depends_on:
       postgres:
         condition: service_healthy
+      nats:
+        condition: service_healthy
       keycloak:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -158,14 +227,28 @@ services:
       - NODE_ENV=development
       - PORT=4003
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+      - OTEL_SERVICE_NAME=subgraph-annotation
     ports:
       - "4003:4003"
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/subgraph-annotation/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4003 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
     depends_on:
       postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -185,14 +268,28 @@ services:
       - NODE_ENV=development
       - PORT=4004
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+      - OTEL_SERVICE_NAME=subgraph-collaboration
     ports:
       - "4004:4004"
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/subgraph-collaboration/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4004 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
     depends_on:
       postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -212,14 +309,28 @@ services:
       - NODE_ENV=development
       - PORT=4005
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+      - OTEL_SERVICE_NAME=subgraph-agent
     ports:
       - "4005:4005"
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/subgraph-agent/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4005 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
     depends_on:
       postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -239,14 +350,28 @@ services:
       - NODE_ENV=development
       - PORT=4006
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@postgres:5432/edusphere
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+      - OTEL_SERVICE_NAME=subgraph-knowledge
     ports:
       - "4006:4006"
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/subgraph-knowledge/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4006 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
     depends_on:
       postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     networks:
       - edusphere
@@ -271,19 +396,37 @@ services:
       - SUBGRAPH_COLLABORATION_URL=http://subgraph-collaboration:4004/graphql
       - SUBGRAPH_AGENT_URL=http://subgraph-agent:4005/graphql
       - SUBGRAPH_KNOWLEDGE_URL=http://subgraph-knowledge:4006/graphql
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+      - OTEL_SERVICE_NAME=gateway
     ports:
       - "4000:4000"
     volumes:
       - .:/app
       - /app/node_modules
       - /app/apps/gateway/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
     depends_on:
-      - subgraph-core
-      - subgraph-content
-      - subgraph-annotation
-      - subgraph-collaboration
-      - subgraph-agent
-      - subgraph-knowledge
+      subgraph-core:
+        condition: service_healthy
+      subgraph-content:
+        condition: service_healthy
+      subgraph-annotation:
+        condition: service_healthy
+      subgraph-collaboration:
+        condition: service_healthy
+      subgraph-agent:
+        condition: service_healthy
+      subgraph-knowledge:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy
     networks:
       - edusphere
 

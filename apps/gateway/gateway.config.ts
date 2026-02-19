@@ -1,4 +1,5 @@
 import { defineConfig } from '@graphql-hive/gateway';
+import { useResponseCache } from '@graphql-yoga/plugin-response-cache';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
@@ -32,6 +33,29 @@ export const gatewayConfig = defineConfig({
   healthCheckEndpoint: '/health',
 
   logging: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
+
+  // ─── Response Cache ──────────────────────────────────────────────────────
+  // Caches GET and application/graphql requests for 60 seconds.
+  // Cache keys are namespaced per tenant to enforce multi-tenant isolation.
+  // Mutations and error responses are never cached.
+  // Hive Gateway v2: plugins as factory function (ctx no longer carries plugins array)
+  plugins: () => [
+    useResponseCache({
+      // Cache for 60 seconds by default
+      ttl: 60_000,
+      // Only cache safe read-only requests (GET or explicit GraphQL content-type)
+      enabled: (request) =>
+        request.method === 'GET' ||
+        (request.headers.get('content-type')?.includes('application/graphql') ?? false),
+      // Tenant-scoped cache key prevents cross-tenant data leakage
+      buildResponseCacheKey: async ({ documentString, variableValues, request }) => {
+        const tenantId = request.headers.get('x-tenant-id') ?? 'anonymous';
+        return `${tenantId}:${documentString}:${JSON.stringify(variableValues ?? {})}`;
+      },
+      // Do not cache responses that contain errors
+      shouldCacheResult: ({ result }) => !result.errors?.length,
+    }),
+  ],
 
   // ─── Persisted Queries ──────────────────────────────────────────────────
   // When manifest is present:

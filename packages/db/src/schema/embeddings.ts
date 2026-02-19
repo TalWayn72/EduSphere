@@ -1,14 +1,10 @@
-import { pgTable, uuid, timestamp, customType } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, timestamp, vector } from 'drizzle-orm/pg-core';
 import { pk } from './_shared';
 import { transcript_segments } from './content';
 import { annotations } from './annotation';
 
-// Custom vector type for pgvector
-const vector = customType<{ data: number[] }>({
-  dataType() {
-    return 'vector(768)';
-  },
-});
+// Drizzle ORM v0.45 native pgvector support — replaces customType pattern
+// Dimensions: 768 (nomic-embed-text dev / text-embedding-3-small prod)
 
 // Content Embeddings (for transcript segments)
 export const content_embeddings = pgTable('content_embeddings', {
@@ -17,7 +13,7 @@ export const content_embeddings = pgTable('content_embeddings', {
     .notNull()
     .references(() => transcript_segments.id, { onDelete: 'cascade' })
     .unique(),
-  embedding: vector('embedding').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
   created_at: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -30,7 +26,7 @@ export const annotation_embeddings = pgTable('annotation_embeddings', {
     .notNull()
     .references(() => annotations.id, { onDelete: 'cascade' })
     .unique(),
-  embedding: vector('embedding').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
   created_at: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -41,7 +37,7 @@ export const concept_embeddings = pgTable('concept_embeddings', {
   id: pk(),
   concept_id: uuid('concept_id').notNull().unique(),
   // Note: No FK to AGE graph — conceptually references ag_catalog vertex
-  embedding: vector('embedding').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
   created_at: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
