@@ -24,9 +24,9 @@ export const JWTClaimsSchema = z.object({
   realm_access: z.object({
     roles: z.array(z.string()),
   }),
-  tenant_id: z.string().uuid().optional(),
+  tenant_id: z.string().optional(),
   iss: z.string(),
-  aud: z.union([z.string(), z.array(z.string())]),
+  aud: z.union([z.string(), z.array(z.string())]).optional(),
   exp: z.number(),
   iat: z.number(),
 });
@@ -52,9 +52,12 @@ export interface AuthContext {
 export class JWTValidator {
   private jwks: ReturnType<typeof createRemoteJWKSet>;
   private issuer: string;
-  private audience: string;
+  private audience: string | undefined;
 
-  constructor(keycloakUrl: string, realm: string, clientId: string) {
+  // clientId is optional: when omitted the audience claim is not validated.
+  // Subgraphs behind the gateway can skip audience checks since the gateway
+  // already validates the token before forwarding the Authorization header.
+  constructor(keycloakUrl: string, realm: string, clientId?: string) {
     const jwksUrl = `${keycloakUrl}/realms/${realm}/protocol/openid-connect/certs`;
     this.jwks = createRemoteJWKSet(new URL(jwksUrl));
     this.issuer = `${keycloakUrl}/realms/${realm}`;
@@ -65,7 +68,7 @@ export class JWTValidator {
     try {
       const { payload } = await jwtVerify(token, this.jwks, {
         issuer: this.issuer,
-        audience: this.audience,
+        ...(this.audience ? { audience: this.audience } : {}),
       });
 
       const claims = JWTClaimsSchema.parse(payload);

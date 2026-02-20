@@ -21,12 +21,12 @@ export async function withTenantContext<T>(
   operation: (db: DrizzleDB) => Promise<T>
 ): Promise<T> {
   return db.transaction(async (tx) => {
-    // Set session variables for RLS policies
-    await tx.execute(sql`SET LOCAL app.current_tenant = ${context.tenantId}`);
-    await tx.execute(sql`SET LOCAL app.current_user_id = ${context.userId}`);
-    await tx.execute(
-      sql`SET LOCAL app.current_user_role = ${context.userRole}`
-    );
+    // Set session variables for RLS policies.
+    // SET LOCAL does not accept parameterized placeholders ($1) — use sql.raw() for literal values.
+    const esc = (v: string) => v.replace(/'/g, "''");
+    await tx.execute(sql.raw(`SET LOCAL app.current_tenant = '${esc(context.tenantId)}'`));
+    await tx.execute(sql.raw(`SET LOCAL app.current_user_id = '${esc(context.userId)}'`));
+    await tx.execute(sql.raw(`SET LOCAL app.current_user_role = '${esc(context.userRole)}'`));
 
     // Execute operation with RLS context
     return operation(tx as any);
