@@ -1,8 +1,8 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 20 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2 Transcription Worker** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1 ✅ | AGE RLS ✅ | NATS Gateway ✅
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅
 **בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | סה"כ: **>1,400 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅
 
 ---
@@ -104,6 +104,21 @@
 | Phase 8.2 Transcription Worker | 🔴 Critical | ✅ Full pipeline — Whisper + HLS + embedding + concepts |
 | Prometheus/Grafana Observability | 🟡 Medium | ✅ 3 dashboards + alerting + provisioning |
 | LangGraph durable execution | 🟡 Medium | ✅ MemorySaver + NATS persistence via nats-client |
+
+### ✅ ניצול יכולות חדשות — הושלם (20 פברואר 2026)
+
+| משימה | עדיפות | סטטוס | פרטים |
+|-------|--------|-------|--------|
+| NestJS v11 Pino structured logging | 🔴 High | ✅ Done | nestjs-pino@4.6.0, JSON prod / pino-pretty dev, tenantId+requestId per log |
+| LangGraph v1 PostgreSQL checkpointing | 🔴 High | ✅ Done | PostgresSaver@1.0.1, graceful MemorySaver fallback, .setup() auto-creates tables |
+| React Router v7 `createBrowserRouter` | 🟡 Medium | ✅ Done | 17 routes, guarded() helper, App.tsx 237→50 lines |
+| Tailwind CSS v4 CSS-first `@theme` | 🟢 Low | ✅ Done | 19 color tokens + 4 radii in @theme, tailwind.config.js cleaned |
+
+**באגים שנמצאו ותוקנו (חסמו pnpm install):**
+- `drizzle-kit@^0.45.1` (לא קיים) → `^0.30.2` — subgraph-core, subgraph-collaboration, packages/db
+- `keycloak-js@^26.5.3` (לא קיים) → `^26.2.3` — apps/web
+- `ollama-ai-provider@^3.3.0` (לא קיים) → `^1.2.0` — subgraph-agent
+- `typescript@^6.0.3` (לא קיים) → `^5.9.3` — root package.json + pnpm.overrides
 
 ### ⏳ משימות עתידיות
 
