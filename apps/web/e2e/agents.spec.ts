@@ -66,11 +66,12 @@ test.describe('Agents — page load and template selector', () => {
     await page.waitForLoadState('networkidle');
 
     // AGENT_MODES: chavruta, quiz, summarize, research, explain
-    await expect(page.getByText('Chavruta Debate')).toBeVisible();
-    await expect(page.getByText('Quiz Master')).toBeVisible();
-    await expect(page.getByText('Summarizer')).toBeVisible();
-    await expect(page.getByText('Research Scout')).toBeVisible();
-    await expect(page.getByText('Explainer')).toBeVisible();
+    // Use locator().filter() to avoid strict-mode collision with nav sidebar links
+    await expect(page.locator('button').filter({ hasText: 'Chavruta Debate' }).first()).toBeVisible();
+    await expect(page.locator('button').filter({ hasText: 'Quiz Master' }).first()).toBeVisible();
+    await expect(page.locator('button').filter({ hasText: 'Summarizer' }).first()).toBeVisible();
+    await expect(page.locator('button').filter({ hasText: 'Research Scout' }).first()).toBeVisible();
+    await expect(page.locator('button').filter({ hasText: 'Explainer' }).first()).toBeVisible();
   });
 
   test('Chavruta is active by default and shows its greeting message', async ({
@@ -125,9 +126,11 @@ test.describe('Agents — page load and template selector', () => {
     await page.waitForLoadState('networkidle');
 
     // Chavruta prompts: 'Debate free will', 'Argue against Rambam', 'Challenge my thesis'
-    await expect(page.getByText('Debate free will')).toBeVisible();
-    await expect(page.getByText('Argue against Rambam')).toBeVisible();
-    await expect(page.getByText('Challenge my thesis')).toBeVisible();
+    // Scope to chips container (overflow-x-auto strip) to avoid collision with chat bubbles
+    const chipsBar = page.locator('div.overflow-x-auto');
+    await expect(chipsBar.locator('button', { hasText: 'Debate free will' })).toBeVisible();
+    await expect(chipsBar.locator('button', { hasText: 'Argue against Rambam' })).toBeVisible();
+    await expect(chipsBar.locator('button', { hasText: 'Challenge my thesis' })).toBeVisible();
   });
 });
 
@@ -168,10 +171,10 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
       .filter({ has: page.locator('.lucide-send') });
     await sendBtn.click();
 
-    // User bubble appears
-    await expect(page.getByText('Debate free will')).toBeVisible({
-      timeout: 3_000,
-    });
+    // User bubble appears — scope to primary-colored chat bubbles to avoid chip collision
+    await expect(
+      page.locator('[class*="bg-primary"]').filter({ hasText: 'Debate free will' })
+    ).toBeVisible({ timeout: 3_000 });
 
     // Wait for streaming to complete and AI message to settle
     // DEV_MODE: 600ms delay + streaming ~1–2s
@@ -186,7 +189,8 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     await page.goto('/agents');
     await page.waitForLoadState('networkidle');
 
-    const chip = page.getByText('Debate free will');
+    // Scope to chips bar to avoid strict-mode collision with chat bubble text
+    const chip = page.locator('div.overflow-x-auto button').filter({ hasText: 'Debate free will' });
     await chip.click();
 
     const chatInput = page.locator('input[placeholder*="Ask the"]');
