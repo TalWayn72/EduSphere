@@ -2,16 +2,21 @@
  * LangGraph workflow adapters.
  *
  * Each adapter wraps a LangGraph workflow class from @edusphere/langgraph-workflows,
- * compiles the graph with a MemorySaver checkpointer, invokes it with a
+ * compiles the graph with a durable checkpointer, invokes it with a
  * thread_id derived from the agent session ID, and returns an AIResult.
  *
- * The MemorySaver is module-level so state persists across HTTP requests
- * within the same Node.js process (development / single-replica).
- * For multi-replica production deployments replace with a Redis-backed
- * checkpointer.
+ * Checkpointer strategy:
+ *  - When DATABASE_URL is set: PostgresSaver (durable, multi-replica safe).
+ *  - Otherwise: MemorySaver (development / single-replica fallback).
+ *
+ * The checkpointer instance is module-level so it is created only once per
+ * process. PostgresSaver.setup() is idempotent and creates the checkpoint
+ * tables if they do not yet exist.
  */
 
 import { MemorySaver } from '@langchain/langgraph';
+import { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
+import pg from 'pg';
 import {
   createDebateWorkflow,
   createQuizWorkflow,
@@ -20,8 +25,37 @@ import {
 } from '@edusphere/langgraph-workflows';
 import type { AIResult } from './ai.service';
 
-// One shared checkpointer instance per process.
-export const checkpointer = new MemorySaver();
+// ── Checkpointer factory ──────────────────────────────────────────────────────
+
+let _checkpointer: MemorySaver | PostgresSaver | null = null;
+
+export async function getCheckpointer(): Promise<MemorySaver | PostgresSaver> {
+  if (_checkpointer) return _checkpointer;
+
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl) {
+    try {
+      const pool = new pg.Pool({ connectionString: dbUrl, max: 5 });
+      const saver = new PostgresSaver(pool);
+      // Creates checkpoint tables if they do not exist (idempotent).
+      await saver.setup();
+      _checkpointer = saver;
+      console.log('[LangGraph] Using PostgresSaver for durable checkpointing');
+    } catch (err) {
+      console.warn(
+        '[LangGraph] PostgresSaver init failed, falling back to MemorySaver:',
+        err
+      );
+      _checkpointer = new MemorySaver();
+    }
+  } else {
+    _checkpointer = new MemorySaver();
+    console.log(
+      '[LangGraph] DATABASE_URL not set — using MemorySaver (dev mode)'
+    );
+  }
+  return _checkpointer;
+}
 
 // ── Thread config helper ───────────────────────────────────────────────────
 
@@ -36,6 +70,7 @@ export async function runLangGraphDebate(
   message: string,
   context: Record<string, unknown>
 ): Promise<AIResult> {
+  const checkpointer = await getCheckpointer();
   const workflow = createDebateWorkflow();
   const compiled = workflow.compile({ checkpointer });
 
@@ -65,6 +100,7 @@ export async function runLangGraphQuiz(
   message: string,
   context: Record<string, unknown>
 ): Promise<AIResult> {
+  const checkpointer = await getCheckpointer();
   const workflow = createQuizWorkflow();
   const compiled = workflow.compile({ checkpointer });
 
@@ -96,6 +132,7 @@ export async function runLangGraphTutor(
   message: string,
   context: Record<string, unknown>
 ): Promise<AIResult> {
+  const checkpointer = await getCheckpointer();
   const workflow = createTutorWorkflow();
   const compiled = workflow.compile({ checkpointer });
 
@@ -131,6 +168,7 @@ export async function runLangGraphAssessment(
   message: string,
   context: Record<string, unknown>
 ): Promise<AIResult> {
+  const checkpointer = await getCheckpointer();
   const workflow = createAssessmentWorkflow();
   const compiled = workflow.compile({ checkpointer });
 

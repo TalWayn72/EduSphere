@@ -3,15 +3,12 @@ import { initTelemetry } from '@edusphere/telemetry';
 initTelemetry('subgraph-content');
 
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 
-const logger = new Logger('Bootstrap');
-
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-  });
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
 
   // CORS for development
   app.enableCors({
@@ -22,11 +19,12 @@ async function bootstrap() {
   const port = process.env.PORT || 4002;
   await app.listen(port);
 
-  logger.log(`🚀 Content subgraph running on http://localhost:${port}/graphql`);
-  logger.log(`📚 Serving: Courses, Modules, ContentItems`);
+  const logger = app.get(Logger);
+  logger.log('Content subgraph running on http://localhost:' + port + '/graphql', 'Bootstrap');
+  logger.log('Serving: Courses, Modules, ContentItems', 'Bootstrap');
 }
 
 bootstrap().catch((err) => {
-  logger.error('Failed to start application', err);
+  process.stderr.write('Failed to start application: ' + String(err) + '\n');
   process.exit(1);
 });

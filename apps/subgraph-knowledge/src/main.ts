@@ -3,15 +3,12 @@ import { initTelemetry } from '@edusphere/telemetry';
 initTelemetry('subgraph-knowledge');
 
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 
-const logger = new Logger('Bootstrap');
-
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-  });
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
 
   // CORS for development
   app.enableCors({
@@ -22,15 +19,14 @@ async function bootstrap() {
   const port = process.env.PORT || 4006;
   await app.listen(port);
 
-  logger.log(
-    `🚀 Knowledge subgraph running on http://localhost:${port}/graphql`
-  );
-  logger.log(`📊 GraphQL Playground available`);
-  logger.log(`🔍 pgvector semantic search enabled`);
-  logger.log(`🕸️ Apache AGE graph queries enabled`);
+  const logger = app.get(Logger);
+  logger.log('Knowledge subgraph running on http://localhost:' + port + '/graphql', 'Bootstrap');
+  logger.log('GraphQL Playground available', 'Bootstrap');
+  logger.log('pgvector semantic search enabled', 'Bootstrap');
+  logger.log('Apache AGE graph queries enabled', 'Bootstrap');
 }
 
 bootstrap().catch((err) => {
-  logger.error('Failed to start application', err);
+  process.stderr.write('Failed to start application: ' + String(err) + '\n');
   process.exit(1);
 });

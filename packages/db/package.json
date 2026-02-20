@@ -38,7 +38,7 @@
     "@types/node": "^22.10.7",
     "@types/pg": "^8.11.11",
     "@vitest/coverage-v8": "^4.0.18",
-    "drizzle-kit": "^0.45.1",
+    "drizzle-kit": "^0.30.2",
     "tsx": "^4.19.2",
     "typescript": "^6.0.3",
     "vitest": "^4.0.18"
