@@ -37,7 +37,7 @@ export async function runLangGraphDebate(
   context: Record<string, unknown>
 ): Promise<AIResult> {
   const workflow = createDebateWorkflow();
-  const compiled = workflow['graph'].compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer });
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -66,7 +66,7 @@ export async function runLangGraphQuiz(
   context: Record<string, unknown>
 ): Promise<AIResult> {
   const workflow = createQuizWorkflow();
-  const compiled = workflow['graph'].compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer });
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -97,7 +97,7 @@ export async function runLangGraphTutor(
   context: Record<string, unknown>
 ): Promise<AIResult> {
   const workflow = createTutorWorkflow();
-  const compiled = workflow['graph'].compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer });
 
   const state = {
     question: message,
@@ -132,7 +132,7 @@ export async function runLangGraphAssessment(
   context: Record<string, unknown>
 ): Promise<AIResult> {
   const workflow = createAssessmentWorkflow();
-  const compiled = workflow['graph'].compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer });
 
   const submission = {
     questionId: 'q1',

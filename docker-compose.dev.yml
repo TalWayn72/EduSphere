@@ -430,6 +430,54 @@ services:
     networks:
       - edusphere
 
+  # ═══════════════════════════════════════════════════════════════
+  # Prometheus - Metrics collection
+  # Start with: docker-compose -f docker-compose.dev.yml --profile monitoring up -d
+  # ═══════════════════════════════════════════════════════════════
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: edusphere-prometheus-dev
+    volumes:
+      - ./infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infrastructure/monitoring/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - edusphere
+    profiles:
+      - monitoring
+
+  # ═══════════════════════════════════════════════════════════════
+  # Grafana - Dashboard visualization
+  # UI available at http://localhost:3001  (admin / edusphere)
+  # ═══════════════════════════════════════════════════════════════
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: edusphere-grafana-dev
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=edusphere
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - ./infrastructure/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infrastructure/monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - edusphere
+    profiles:
+      - monitoring
+
 networks:
   edusphere:
     driver: bridge
@@ -437,3 +485,5 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  prometheus_data:
+  grafana_data:

@@ -1,4 +1,4 @@
-import { StateGraph, END } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -24,43 +24,43 @@ const DebateStateSchema = z.object({
 
 export type DebateState = z.infer<typeof DebateStateSchema>;
 
+const DebateStateAnnotation = Annotation.Root({
+  topic: Annotation<string>(),
+  position: Annotation<'for' | 'against'>({ default: () => 'for' }),
+  rounds: Annotation<number>({ default: () => 3 }),
+  currentRound: Annotation<number>({ default: () => 1 }),
+  arguments: Annotation<DebateState['arguments']>({ default: () => [] }),
+  synthesis: Annotation<string | undefined>({ default: () => undefined }),
+  isComplete: Annotation<boolean>({ default: () => false }),
+});
+
 /**
  * Chavruta Debate Workflow
  * Simulates Talmudic-style dialectical learning
  */
 export class ChavrutaDebateWorkflow {
   private model: string;
-  private graph: StateGraph<DebateState>;
+  private graph: StateGraph<typeof DebateStateAnnotation.State>;
 
   constructor(model: string = 'gpt-4-turbo') {
     this.model = model;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<DebateState> {
-    const graph = new StateGraph<DebateState>({
-      channels: DebateStateSchema.shape,
-    });
+  private buildGraph(): StateGraph<typeof DebateStateAnnotation.State> {
+    const graph = new StateGraph(DebateStateAnnotation);
 
     graph.addNode('argue', this.argueNode.bind(this));
     graph.addNode('counter', this.counterNode.bind(this));
     graph.addNode('synthesize', this.synthesizeNode.bind(this));
 
-    graph.setEntryPoint('argue');
-    graph.addConditionalEdges(
-      'argue',
-      (state) => {
-        return state.currentRound <= state.rounds ? 'counter' : 'synthesize';
-      },
-      { counter: 'counter', synthesize: 'synthesize' }
-    );
-    graph.addConditionalEdges(
-      'counter',
-      (state) => {
-        return state.currentRound < state.rounds ? 'argue' : 'synthesize';
-      },
-      { argue: 'argue', synthesize: 'synthesize' }
-    );
+    graph.addEdge(START, 'argue');
+    graph.addConditionalEdges('argue', (state) => {
+      return state.currentRound <= state.rounds ? 'counter' : 'synthesize';
+    });
+    graph.addConditionalEdges('counter', (state) => {
+      return state.currentRound < state.rounds ? 'argue' : 'synthesize';
+    });
     graph.addEdge('synthesize', END);
 
     return graph;
@@ -143,11 +143,13 @@ Provide:
     };
   }
 
-  async run(initialState: Partial<DebateState>): Promise<DebateState> {
-    const compiledGraph = this.graph.compile();
-    const fullState = DebateStateSchema.parse(initialState);
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+  }
 
-    const result = await compiledGraph.invoke(fullState);
+  async run(initialState: Partial<DebateState>): Promise<DebateState> {
+    const fullState = DebateStateSchema.parse(initialState);
+    const result = await this.graph.compile().invoke(fullState);
     return result as DebateState;
   }
 }

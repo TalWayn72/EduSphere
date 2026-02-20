@@ -8,18 +8,32 @@ export type DrizzleDB = NodePgDatabase<any>;
  *
  * Uses raw pg client (simple query protocol) because LOAD 'age' and
  * SET search_path cannot be combined with SELECT in a prepared statement.
+ *
+ * When tenantId is provided, issues SET LOCAL app.current_tenant before
+ * the Cypher query so that AGE 1.7.0 RLS policies on label tables
+ * enforce tenant isolation at the database layer in addition to the
+ * tenant_id property filter inside the Cypher WHERE clause.
  */
 export async function executeCypher<T = any>(
   db: DrizzleDB,
   graphName: string,
   query: string,
-  params?: Record<string, unknown>
+  params?: Record<string, unknown>,
+  tenantId?: string,
 ): Promise<T[]> {
   const pool = (db as any).$client as Pool;
   const client = await pool.connect();
   try {
     await client.query("LOAD 'age'");
     await client.query('SET search_path = ag_catalog, "$user", public');
+
+    if (tenantId) {
+      // SET LOCAL is transaction-scoped; use parameterized query to avoid injection.
+      await client.query('SELECT set_config($1, $2, TRUE)', [
+        'app.current_tenant',
+        tenantId,
+      ]);
+    }
 
     let result;
     if (params && Object.keys(params).length > 0) {

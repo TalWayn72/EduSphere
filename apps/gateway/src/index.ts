@@ -7,6 +7,7 @@ import { createYoga } from 'graphql-yoga';
 import { createServer } from 'http';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import pino from 'pino';
+import { createNatsPubSub, shutdownNatsPubSub } from './nats-subscriptions.js';
 
 const logger = pino({
   transport: { target: 'pino-pretty' },
@@ -19,6 +20,11 @@ const JWKS_URL =
 const KEYCLOAK_ISSUER = `${process.env.KEYCLOAK_URL || 'http://localhost:8080'}/realms/${process.env.KEYCLOAK_REALM || 'edusphere'}`;
 
 const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
+
+// ── NATS pub/sub (distributed subscriptions across replicas) ─────────────────
+// Initialised before the gateway so it is ready for the first subscription.
+// Falls back to in-process EventEmitter when NATS_URL is not configured.
+const pubSub = await createNatsPubSub(logger);
 
 const gateway = createGateway({
   supergraph: {
@@ -69,6 +75,8 @@ const yoga = createYoga({
       userId,
       tenantId,
       role,
+      // Pub/sub engine available to subscription resolvers via context
+      pubSub,
       headers: {
         authorization: authHeader,
         'x-tenant-id': tenantId,
@@ -86,3 +94,21 @@ server.listen(port, () => {
   logger.info(`Gateway running on http://localhost:${port}/graphql`);
   logger.info('GraphQL Playground available');
 });
+
+// ── Graceful shutdown ─────────────────────────────────────────────────────────
+
+async function shutdown(signal: string): Promise<void> {
+  logger.info({ signal }, 'Received shutdown signal — draining connections');
+
+  server.close(() => {
+    logger.info('HTTP server closed');
+  });
+
+  await shutdownNatsPubSub();
+  logger.info('NATS pub/sub drained');
+
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => void shutdown('SIGTERM'));
+process.on('SIGINT', () => void shutdown('SIGINT'));

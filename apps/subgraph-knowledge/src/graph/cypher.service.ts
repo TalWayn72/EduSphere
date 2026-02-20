@@ -54,7 +54,8 @@ export class CypherService {
       MATCH (c:Concept {id: $id, tenant_id: $tenantId})
       RETURN c
       `,
-      { id, tenantId }
+      { id, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -67,7 +68,8 @@ export class CypherService {
       MATCH (c:Concept {name: $name, tenant_id: $tenantId})
       RETURN c
       `,
-      { name, tenantId }
+      { name, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -90,7 +92,8 @@ export class CypherService {
       RETURN c
       LIMIT 1
       `,
-      { name, tenantId }
+      { name, tenantId },
+      tenantId,
     );
     return result[0] ?? null;
   }
@@ -117,7 +120,8 @@ export class CypherService {
       MERGE (a)-[r:RELATED_TO]->(b)
       ON CREATE SET r.strength = $strength, r.created_at = timestamp()
       `,
-      { fromName, toName, tenantId, strength }
+      { fromName, toName, tenantId, strength },
+      tenantId,
     );
   }
 
@@ -132,7 +136,8 @@ export class CypherService {
       RETURN c
       LIMIT ${safeLimit}
       `,
-      { tenantId }
+      { tenantId },
+      tenantId,
     );
   }
 
@@ -165,7 +170,8 @@ export class CypherService {
       SET ${setParts}, c.updated_at = timestamp()
       RETURN c
       `,
-      { id, tenantId, ...safeUpdates }
+      { id, tenantId, ...safeUpdates },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -179,7 +185,8 @@ export class CypherService {
         MATCH (c:Concept {id: $id, tenant_id: $tenantId})
         DETACH DELETE c
         `,
-        { id, tenantId }
+        { id, tenantId },
+        tenantId,
       );
       return true;
     } catch (error) {
@@ -218,7 +225,8 @@ export class CypherService {
       MATCH (p:Person {id: $id, tenant_id: $tenantId})
       RETURN p
       `,
-      { id, tenantId }
+      { id, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -231,7 +239,8 @@ export class CypherService {
       MATCH (p:Person {name: $name, tenant_id: $tenantId})
       RETURN p
       `,
-      { name, tenantId }
+      { name, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -255,7 +264,8 @@ export class CypherService {
       })
       RETURN p
       `,
-      { tenantId, name, bio: bio ?? null }
+      { tenantId, name, bio: bio ?? null },
+      tenantId,
     );
     return result[0];
   }
@@ -272,7 +282,8 @@ export class CypherService {
       MATCH (t:Term {id: $id, tenant_id: $tenantId})
       RETURN t
       `,
-      { id, tenantId }
+      { id, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -285,7 +296,8 @@ export class CypherService {
       MATCH (t:Term {name: $name, tenant_id: $tenantId})
       RETURN t
       `,
-      { name, tenantId }
+      { name, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -309,7 +321,8 @@ export class CypherService {
       })
       RETURN t
       `,
-      { tenantId, name, definition }
+      { tenantId, name, definition },
+      tenantId,
     );
     return result[0];
   }
@@ -326,7 +339,8 @@ export class CypherService {
       MATCH (s:Source {id: $id, tenant_id: $tenantId})
       RETURN s
       `,
-      { id, tenantId }
+      { id, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -352,7 +366,8 @@ export class CypherService {
       })
       RETURN s
       `,
-      { tenantId, title, type, url: url ?? null }
+      { tenantId, title, type, url: url ?? null },
+      tenantId,
     );
     return result[0];
   }
@@ -369,7 +384,8 @@ export class CypherService {
       MATCH (tc:TopicCluster {id: $id, tenant_id: $tenantId})
       RETURN tc
       `,
-      { id, tenantId }
+      { id, tenantId },
+      tenantId,
     );
     return result[0] || null;
   }
@@ -385,7 +401,8 @@ export class CypherService {
       MATCH (tc:TopicCluster {tenant_id: $tenantId})-[:BELONGS_TO]->(course {id: $courseId})
       RETURN tc
       `,
-      { tenantId, courseId }
+      { tenantId, courseId },
+      tenantId,
     );
   }
 
@@ -408,7 +425,8 @@ export class CypherService {
       })
       RETURN tc
       `,
-      { tenantId, name, description: description ?? null }
+      { tenantId, name, description: description ?? null },
+      tenantId,
     );
     return result[0];
   }
@@ -438,6 +456,7 @@ export class CypherService {
     try {
       await client.query("LOAD 'age'");
       await client.query('SET search_path = ag_catalog, "$user", public');
+      await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
       const paramsJson = JSON.stringify({ fromName, toName, tenantId }).replace(/'/g, "''");
       const sql = `
@@ -494,6 +513,7 @@ export class CypherService {
     try {
       await client.query("LOAD 'age'");
       await client.query('SET search_path = ag_catalog, "$user", public');
+      await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
       const paramsJson = JSON.stringify({ conceptName, tenantId }).replace(/'/g, "''");
       const sql = `
@@ -539,6 +559,7 @@ export class CypherService {
     try {
       await client.query("LOAD 'age'");
       await client.query('SET search_path = ag_catalog, "$user", public');
+      await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
       const paramsJson = JSON.stringify({ conceptName, tenantId }).replace(/'/g, "''");
       const sql = `

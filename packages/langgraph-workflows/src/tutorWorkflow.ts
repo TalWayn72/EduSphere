@@ -1,4 +1,4 @@
-import { StateGraph, END } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -28,6 +28,18 @@ const TutorStateSchema = z.object({
 
 export type TutorState = z.infer<typeof TutorStateSchema>;
 
+const TutorStateAnnotation = Annotation.Root({
+  question: Annotation<string>(),
+  context: Annotation<string | undefined>({ default: () => undefined }),
+  studentLevel: Annotation<TutorState['studentLevel']>({ default: () => 'intermediate' }),
+  conversationHistory: Annotation<TutorState['conversationHistory']>({ default: () => [] }),
+  currentStep: Annotation<TutorState['currentStep']>({ default: () => 'assess' }),
+  explanation: Annotation<string | undefined>({ default: () => undefined }),
+  comprehensionCheck: Annotation<string | undefined>({ default: () => undefined }),
+  followupSuggestions: Annotation<string[]>({ default: () => [] }),
+  isComplete: Annotation<boolean>({ default: () => false }),
+});
+
 /**
  * Adaptive Tutor Workflow
  *
@@ -35,17 +47,15 @@ export type TutorState = z.infer<typeof TutorStateSchema>;
  */
 export class AdaptiveTutorWorkflow {
   private model: string;
-  private graph: StateGraph<TutorState>;
+  private graph: StateGraph<typeof TutorStateAnnotation.State>;
 
   constructor(model: string = 'gpt-4-turbo') {
     this.model = model;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<TutorState> {
-    const graph = new StateGraph<TutorState>({
-      channels: TutorStateSchema.shape,
-    });
+  private buildGraph(): StateGraph<typeof TutorStateAnnotation.State> {
+    const graph = new StateGraph(TutorStateAnnotation);
 
     // Define nodes
     graph.addNode('assess', this.assessNode.bind(this));
@@ -54,7 +64,7 @@ export class AdaptiveTutorWorkflow {
     graph.addNode('followup', this.followupNode.bind(this));
 
     // Define edges
-    graph.setEntryPoint('assess');
+    graph.addEdge(START, 'assess');
     graph.addEdge('assess', 'explain');
     graph.addEdge('explain', 'verify');
     graph.addEdge('verify', 'followup');
@@ -158,11 +168,13 @@ Suggest 3 related topics the student might want to explore next. Return as a num
     };
   }
 
-  async run(initialState: Partial<TutorState>): Promise<TutorState> {
-    const compiledGraph = this.graph.compile();
-    const fullState = TutorStateSchema.parse(initialState);
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+  }
 
-    const result = await compiledGraph.invoke(fullState);
+  async run(initialState: Partial<TutorState>): Promise<TutorState> {
+    const fullState = TutorStateSchema.parse(initialState);
+    const result = await this.graph.compile().invoke(fullState);
     return result as TutorState;
   }
 

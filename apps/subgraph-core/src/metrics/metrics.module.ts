@@ -61,6 +61,37 @@ export const NATS_MESSAGES_CONSUMED = new Counter({
   registers: [registry],
 });
 
+// ── New metrics required by Grafana dashboards ────────────────────────────────
+
+export const ACTIVE_CONNECTIONS = new Gauge({
+  name: 'edusphere_active_connections',
+  help: 'Number of active WebSocket / GraphQL subscription connections',
+  labelNames: ['service'],
+  registers: [registry],
+});
+
+export const DB_POOL_ACTIVE_CONNECTIONS = new Gauge({
+  name: 'edusphere_db_pool_active_connections',
+  help: 'Number of active connections in the database connection pool',
+  labelNames: ['service'],
+  registers: [registry],
+});
+
+export const GRAPHQL_QUERY_COMPLEXITY = new Histogram({
+  name: 'edusphere_graphql_query_complexity',
+  help: 'Complexity score of incoming GraphQL queries',
+  labelNames: ['operation_type', 'operation_name'],
+  buckets: [1, 5, 10, 25, 50, 100, 250, 500, 1000],
+  registers: [registry],
+});
+
+export const CACHE_HIT_RATE = new Gauge({
+  name: 'edusphere_cache_hit_rate',
+  help: 'Cache hit rate (hits / total requests) as a ratio between 0 and 1',
+  labelNames: ['cache_type'],
+  registers: [registry],
+});
+
 export const METRICS_REGISTRY = registry;
 
 @Global()

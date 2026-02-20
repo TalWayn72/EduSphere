@@ -1,9 +1,9 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 19 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 Complete + Phase 7 Production Hardening + GraphQL Subscriptions + Phase 8 Mobile + Docker All-in-One + **UPGRADE-001 Stack Upgrade** — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | WebSocket Subscriptions ✅ | Mobile (Expo) ✅ | Docker All-in-One ✅ | Stack Upgrades ✅
-**בדיקות Web:** 146 unit tests עוברות (12 suites) | Backend: 37 tests (3 suites) | Mobile: 7 tests (2 suites) | סה"כ: **190 tests** | Component tests (RTL): ✅ | Security ESLint: ✅ | CodeQL: ✅
+**תאריך עדכון:** 20 פברואר 2026
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2 Transcription Worker** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1 ✅ | AGE RLS ✅ | NATS Gateway ✅
+**בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | סה"כ: **>1,400 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅
 
 ---
 
@@ -94,16 +94,24 @@
 - `apps/web/src/styles/globals.css` — migrated to Tailwind v4 CSS-first syntax
 - `apps/web/postcss.config.js` — removed tailwindcss (now in Vite plugin)
 
-### ⏳ משימות עתידיות (Phase נוסף)
+### ✅ משימות שהושלמו (Phase נוסף — 20 פברואר 2026)
+
+| משימה | עדיפות | סטטוס |
+|-------|--------|-------|
+| `@langchain/langgraph` 0.2.28 → 1.0.0 | 🔴 High | ✅ Migrated — Annotation.Root + START constant |
+| AGE RLS on label tables | 🟡 Medium | ✅ Implemented — vertex + edge label RLS policies |
+| Hive Gateway v2 NATS Subscriptions | 🟡 Medium | ✅ NATS pub/sub bridge + InProcess fallback |
+| Phase 8.2 Transcription Worker | 🔴 Critical | ✅ Full pipeline — Whisper + HLS + embedding + concepts |
+| Prometheus/Grafana Observability | 🟡 Medium | ✅ 3 dashboards + alerting + provisioning |
+| LangGraph durable execution | 🟡 Medium | ✅ MemorySaver + NATS persistence via nats-client |
+
+### ⏳ משימות עתידיות
 
 | משימה | עדיפות | הערה |
 |-------|--------|------|
-| `@langchain/langgraph` 0.2.28 → 1.0.x | 🔴 High | requires StateGraph API migration in 5 workflow files |
 | PostgreSQL 16 → 18.2 | 🟡 Medium | requires `pg_upgrade` + maintenance window |
-| AGE RLS on label tables | 🟡 Medium | AGE 1.7.0 ready, needs per-tenant Cypher policy |
-| Hive Gateway v2 NATS Subscriptions | 🟡 Medium | enable distributed subscriptions |
-| LangGraph durable execution | 🟡 Medium | requires v1.0 upgrade first |
 | Vercel AI SDK v6 | 🟢 Low | wait for GA (currently beta) |
+| AGE ontology.ts tenantId propagation | 🟢 Low | findRelatedConcepts + createRelationship in ontology.ts |
 
 ### קבצים שעודכנו (שינויי package.json)
 

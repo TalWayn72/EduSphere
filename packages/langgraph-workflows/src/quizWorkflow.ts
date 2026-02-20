@@ -1,4 +1,4 @@
-import { StateGraph, END } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -24,24 +24,33 @@ const QuizStateSchema = z.object({
 export type QuizState = z.infer<typeof QuizStateSchema>;
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 
+const QuizStateAnnotation = Annotation.Root({
+  topic: Annotation<string>(),
+  numQuestions: Annotation<number>({ default: () => 5 }),
+  difficulty: Annotation<QuizState['difficulty']>({ default: () => 'medium' }),
+  questions: Annotation<QuizQuestion[]>({ default: () => [] }),
+  currentQuestionIndex: Annotation<number>({ default: () => 0 }),
+  userAnswers: Annotation<number[]>({ default: () => [] }),
+  score: Annotation<number>({ default: () => 0 }),
+  isComplete: Annotation<boolean>({ default: () => false }),
+});
+
 export class QuizGeneratorWorkflow {
   private model: string;
-  private graph: StateGraph<QuizState>;
+  private graph: StateGraph<typeof QuizStateAnnotation.State>;
 
   constructor(model: string = 'gpt-4-turbo') {
     this.model = model;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<QuizState> {
-    const graph = new StateGraph<QuizState>({
-      channels: QuizStateSchema.shape,
-    });
+  private buildGraph(): StateGraph<typeof QuizStateAnnotation.State> {
+    const graph = new StateGraph(QuizStateAnnotation);
 
     graph.addNode('generate', this.generateNode.bind(this));
     graph.addNode('validate', this.validateNode.bind(this));
 
-    graph.setEntryPoint('generate');
+    graph.addEdge(START, 'generate');
     graph.addEdge('generate', 'validate');
     graph.addEdge('validate', END);
 
@@ -80,11 +89,13 @@ Requirements:
     return { isComplete: true };
   }
 
-  async run(initialState: Partial<QuizState>): Promise<QuizState> {
-    const compiledGraph = this.graph.compile();
-    const fullState = QuizStateSchema.parse(initialState);
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+  }
 
-    const result = await compiledGraph.invoke(fullState);
+  async run(initialState: Partial<QuizState>): Promise<QuizState> {
+    const fullState = QuizStateSchema.parse(initialState);
+    const result = await this.graph.compile().invoke(fullState);
     return result as QuizState;
   }
 }

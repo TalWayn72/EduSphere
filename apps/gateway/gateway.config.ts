@@ -72,6 +72,32 @@ export const gatewayConfig = defineConfig({
         },
       }
     : {}),
+
+  // ─── NATS Distributed Subscriptions ─────────────────────────────────────
+  // Multi-replica subscription support is implemented in src/nats-subscriptions.ts.
+  //
+  // The NatsPubSub bridge is wired into the GraphQL context in src/index.ts
+  // so that subscription resolvers can call ctx.pubSub.publish() / .subscribe().
+  //
+  // Runtime behaviour:
+  //   NATS_URL set   → NatsPubSub (multi-replica, events fan-out via gw.sub.* subjects)
+  //   NATS_URL unset → InProcessPubSub (single-replica, in-memory EventEmitter)
+  //
+  // NATS subject convention: gw.sub.<topic>
+  //
+  // To add a new subscription topic in a subgraph resolver:
+  //   async *myField(_root, _args, ctx) {
+  //     const unsubscribe = await ctx.pubSub.subscribe('my-topic', (payload) => {
+  //       // push payload to the AsyncGenerator
+  //     });
+  //     try { yield* asyncGenerator; } finally { unsubscribe(); }
+  //   }
+  //
+  // To emit events from a mutation resolver:
+  //   await ctx.pubSub.publish('my-topic', { data: ... });
+  //
+  // Environment variables:
+  //   NATS_URL=nats://nats:4222   (required for multi-replica mode)
 });
 
 export default gatewayConfig;

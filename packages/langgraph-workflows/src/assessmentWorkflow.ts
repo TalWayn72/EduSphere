@@ -1,4 +1,4 @@
-import { StateGraph, END } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateText, generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -33,25 +33,31 @@ const AssessmentStateSchema = z.object({
 });
 
 export type AssessmentState = z.infer<typeof AssessmentStateSchema>;
+export type AssessmentResult = z.infer<typeof AssessmentResultSchema>;
+
+const AssessmentStateAnnotation = Annotation.Root({
+  submissions: Annotation<AssessmentState['submissions']>({ default: () => [] }),
+  evaluations: Annotation<AssessmentState['evaluations']>({ default: () => [] }),
+  overallAssessment: Annotation<AssessmentResult | undefined>({ default: () => undefined }),
+  isComplete: Annotation<boolean>({ default: () => false }),
+});
 
 export class AssessmentWorkflow {
   private model: string;
-  private graph: StateGraph<AssessmentState>;
+  private graph: StateGraph<typeof AssessmentStateAnnotation.State>;
 
   constructor(model: string = 'gpt-4-turbo') {
     this.model = model;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<AssessmentState> {
-    const graph = new StateGraph<AssessmentState>({
-      channels: AssessmentStateSchema.shape,
-    });
+  private buildGraph(): StateGraph<typeof AssessmentStateAnnotation.State> {
+    const graph = new StateGraph(AssessmentStateAnnotation);
 
     graph.addNode('evaluate', this.evaluateNode.bind(this));
     graph.addNode('synthesize', this.synthesizeNode.bind(this));
 
-    graph.setEntryPoint('evaluate');
+    graph.addEdge(START, 'evaluate');
     graph.addEdge('evaluate', 'synthesize');
     graph.addEdge('synthesize', END);
 
@@ -123,11 +129,13 @@ Synthesize an overall assessment with:
     };
   }
 
-  async run(initialState: Partial<AssessmentState>): Promise<AssessmentState> {
-    const compiledGraph = this.graph.compile();
-    const fullState = AssessmentStateSchema.parse(initialState);
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+  }
 
-    const result = await compiledGraph.invoke(fullState);
+  async run(initialState: Partial<AssessmentState>): Promise<AssessmentState> {
+    const fullState = AssessmentStateSchema.parse(initialState);
+    const result = await this.graph.compile().invoke(fullState);
     return result as AssessmentState;
   }
 }
