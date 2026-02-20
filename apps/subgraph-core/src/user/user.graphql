@@ -20,11 +20,25 @@ enum UserRole {
   RESEARCHER
 }
 
+type UserStats {
+  coursesEnrolled: Int!
+  annotationsCreated: Int!
+  conceptsMastered: Int!
+  totalLearningMinutes: Int!
+  weeklyActivity: [DayActivity!]!
+}
+
+type DayActivity {
+  date: String!
+  count: Int!
+}
+
 type Query {
   _health: String! @shareable
   user(id: ID!): User
   users(limit: Int = 10, offset: Int = 0): [User!]!
   me: User
+  myStats: UserStats! @authenticated
 }
 
 type Mutation {

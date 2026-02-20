@@ -64,6 +64,9 @@ const MOCK_USER = {
   email: 'test@example.com',
   display_name: 'Test User',
   role: 'STUDENT',
+  firstName: 'Test',
+  lastName: 'User',
+  tenantId: 'tenant-1',
 };
 
 describe('UserService', () => {
@@ -215,7 +218,7 @@ describe('UserService', () => {
 
   describe('update()', () => {
     it('returns updated user', async () => {
-      const updated = { ...MOCK_USER, display_name: 'New Name' };
+      const updated = { ...MOCK_USER, display_name: 'New Name', firstName: 'New', lastName: 'Name' };
       mockReturning.mockResolvedValue([updated]);
       mockWhere.mockReturnValue({ returning: mockReturning });
       mockSet.mockReturnValue({ where: mockWhere });

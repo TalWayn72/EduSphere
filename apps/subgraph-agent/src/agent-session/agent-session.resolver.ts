@@ -9,39 +9,55 @@ import {
   ResolveReference,
   Context,
 } from '@nestjs/graphql';
-import { UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Logger, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { trace, SpanStatusCode } from '@opentelemetry/api';
+import { createPubSub } from 'graphql-yoga';
 import { AgentSessionService } from './agent-session.service';
 import { AgentMessageService } from '../agent-message/agent-message.service';
-import { PubSub } from 'graphql-subscriptions';
+import { AIService } from '../ai/ai.service';
 import {
   StartAgentSessionSchema,
   SendMessageSchema,
 } from './agent-session.schemas';
 
-const pubSub = new PubSub();
+interface AgentMessagePayload {
+  id: string;
+  sessionId: string;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+const pubSub = createPubSub<{
+  [key: `messageStream_${string}`]: [{ messageStream: AgentMessagePayload }];
+}>();
+
+const tracer = trace.getTracer('subgraph-agent');
 
 @Resolver('AgentSession')
 export class AgentSessionResolver {
+  private readonly logger = new Logger(AgentSessionResolver.name);
+
   constructor(
     private readonly agentSessionService: AgentSessionService,
-    private readonly agentMessageService: AgentMessageService
+    private readonly agentMessageService: AgentMessageService,
+    private readonly aiService: AIService
   ) {}
 
   @Query('agentSession')
-  async getAgentSession(@Args('id') id: string, @Context() context: any) {
+  async getAgentSession(@Args('id') id: string, @Context() context: unknown) {
     const authContext = this.extractAuthContext(context);
     return this.agentSessionService.findById(id, authContext);
   }
 
   @Query('myAgentSessions')
-  async getMyAgentSessions(@Context() context: any) {
+  async getMyAgentSessions(@Context() context: unknown) {
     const authContext = this.extractAuthContext(context);
     return this.agentSessionService.findByUser(authContext.userId, authContext);
   }
 
   @Query('agentTemplates')
   async getAgentTemplates() {
-    // Return hardcoded templates for now
     return [
       {
         id: '1',
@@ -77,12 +93,11 @@ export class AgentSessionResolver {
   @Mutation('startAgentSession')
   async startAgentSession(
     @Args('templateType') templateType: string,
-    @Args('context') contextData: any,
-    @Context() context: any
+    @Args('context') contextData: unknown,
+    @Context() context: unknown
   ) {
     const authContext = this.extractAuthContext(context);
 
-    // Validate input
     const validationResult = StartAgentSessionSchema.safeParse({
       templateType,
       context: contextData,
@@ -106,72 +121,108 @@ export class AgentSessionResolver {
   async sendMessage(
     @Args('sessionId') sessionId: string,
     @Args('content') content: string,
-    @Context() context: any
+    @Context() context: unknown
   ) {
     const authContext = this.extractAuthContext(context);
 
-    // Validate input
-    const validationResult = SendMessageSchema.safeParse({
-      sessionId,
-      content,
-    });
-
+    const validationResult = SendMessageSchema.safeParse({ sessionId, content });
     if (!validationResult.success) {
       throw new BadRequestException(validationResult.error.errors);
     }
 
-    // Save user message
-    const userMessage = await this.agentMessageService.create(
-      {
-        sessionId,
-        role: 'USER',
-        content,
+    const span = tracer.startSpan('agent.sendMessage', {
+      attributes: {
+        'session.id': sessionId,
+        'user.id': authContext.userId,
+        'message.length': content.length,
       },
-      authContext
-    );
-
-    // Publish to subscription
-    pubSub.publish('MESSAGE_STREAM', {
-      messageStream: userMessage,
     });
 
-    // TODO: Get session and use agent type to generate AI response
-    // For now, create a simple assistant message
-    const assistantMessage = await this.agentMessageService.create(
-      {
-        sessionId,
-        role: 'ASSISTANT',
-        content: `Echo: ${content}`,
-      },
-      authContext
-    );
+    try {
+      // Persist user message
+      const userMessage = await this.agentMessageService.create(
+        { sessionId, role: 'USER', content },
+        authContext
+      );
 
-    // Publish assistant message
-    pubSub.publish('MESSAGE_STREAM', {
-      messageStream: assistantMessage,
-    });
+      pubSub.publish(`messageStream_${sessionId}`, {
+        messageStream: userMessage as AgentMessagePayload,
+      });
 
-    return assistantMessage;
+      // Resolve agent type from session, then invoke LangGraph via AIService.
+      let agentReply = `Echo: ${content}`;
+      let templateType = 'EXPLAIN';
+      try {
+        const session = await this.agentSessionService.findById(sessionId, authContext);
+        templateType =
+          (session as Record<string, unknown>)['agentType'] as string ?? 'EXPLAIN';
+        const sessionContext =
+          (session as Record<string, unknown>)['metadata'] as Record<string, unknown> ?? {};
+
+        span.setAttribute('template.type', templateType);
+
+        const aiResult = await this.aiService.continueSession(
+          sessionId,
+          content,
+          templateType,
+          sessionContext
+        );
+        agentReply = aiResult.text;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'AI error';
+        this.logger.error(`sendMessage AI error: ${msg}`);
+        // Fall back to echo so the mutation always succeeds.
+      }
+
+      const assistantMessage = await this.agentMessageService.create(
+        { sessionId, role: 'ASSISTANT', content: agentReply },
+        authContext
+      );
+
+      pubSub.publish(`messageStream_${sessionId}`, {
+        messageStream: assistantMessage as AgentMessagePayload,
+      });
+
+      this.logger.debug(
+        `sendMessage: session=${sessionId} user=${authContext.userId}`
+      );
+
+      span.setStatus({ code: SpanStatusCode.OK });
+      return assistantMessage;
+    } catch (err) {
+      span.recordException(err instanceof Error ? err : new Error(String(err)));
+      span.setStatus({ code: SpanStatusCode.ERROR });
+      throw err;
+    } finally {
+      span.end();
+    }
   }
 
   @Mutation('endSession')
-  async endSession(@Args('sessionId') id: string, @Context() context: any) {
+  async endSession(
+    @Args('sessionId') id: string,
+    @Context() context: unknown
+  ) {
     const authContext = this.extractAuthContext(context);
     await this.agentSessionService.complete(id, authContext);
     return true;
   }
 
   @Subscription('messageStream', {
-    filter: (payload, variables) => {
-      return payload.messageStream.sessionId === variables.sessionId;
-    },
+    filter: (
+      payload: { messageStream: AgentMessagePayload },
+      variables: { sessionId: string }
+    ) => payload.messageStream.sessionId === variables.sessionId,
   })
-  messageStream() {
-    return pubSub.asyncIterableIterator('MESSAGE_STREAM');
+  subscribeToMessageStream(@Args('sessionId') sessionId: string) {
+    return pubSub.subscribe(`messageStream_${sessionId}`);
   }
 
   @ResolveField('messages')
-  async getMessages(@Parent() session: any, @Context() context: any) {
+  async getMessages(
+    @Parent() session: { id: string },
+    @Context() context: unknown
+  ) {
     const authContext = this.extractAuthContext(context);
     return this.agentMessageService.findBySession(session.id, authContext);
   }
@@ -179,16 +230,17 @@ export class AgentSessionResolver {
   @ResolveReference()
   async resolveReference(
     reference: { __typename: string; id: string },
-    @Context() context: any
+    @Context() context: unknown
   ) {
     const authContext = this.extractAuthContext(context);
     return this.agentSessionService.findById(reference.id, authContext);
   }
 
-  private extractAuthContext(context: any) {
-    if (!context.authContext) {
+  private extractAuthContext(context: unknown) {
+    const ctx = context as { authContext?: { userId: string } };
+    if (!ctx.authContext) {
       throw new UnauthorizedException('Authentication required');
     }
-    return context.authContext;
+    return ctx.authContext;
   }
 }

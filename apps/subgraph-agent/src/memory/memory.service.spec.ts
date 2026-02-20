@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryService } from './memory.service';
+import type { ConversationContext } from './memory.service';
 
 // ── DB mock helpers ──────────────────────────────────────────────────────────
+
 const mockWhere = vi.fn();
 const mockLimit = vi.fn();
 const mockOrderBy = vi.fn();
@@ -33,13 +35,29 @@ vi.mock('@edusphere/db', () => ({
   desc: vi.fn((col) => ({ col, dir: 'desc' })),
 }));
 
+// ── NATS KV mock ──────────────────────────────────────────────────────────────
+
+const mockKvSet = vi.fn();
+const mockKvGet = vi.fn();
+const mockKvDelete = vi.fn();
+
+vi.mock('@edusphere/nats-client', () => ({
+  NatsKVClient: vi.fn().mockImplementation(() => ({
+    set: mockKvSet,
+    get: mockKvGet,
+    delete: mockKvDelete,
+    close: vi.fn(),
+  })),
+}));
+
 // ── Fixtures ──────────────────────────────────────────────────────────────────
+
 const makeMessage = (role: string, content: string, createdAt: Date) => ({
   id: `msg-${role}-${Date.now()}`,
   sessionId: 'session-1',
   role: role.toUpperCase(),
   content,
-  metadata: {},
+  metadata: null,
   createdAt,
 });
 
@@ -68,6 +86,10 @@ describe('MemoryService', () => {
     // Delete chain
     mockWhere.mockReturnValue({ orderBy: mockOrderBy, rowCount: 1 });
     mockDelete.mockReturnValue({ where: vi.fn().mockResolvedValue({ rowCount: 1 }) });
+
+    // NATS KV defaults
+    mockKvSet.mockResolvedValue(undefined);
+    mockKvGet.mockResolvedValue(null);
 
     service = new MemoryService();
   });
@@ -143,20 +165,20 @@ describe('MemoryService', () => {
     });
 
     it('uppercases role when inserting into DB', async () => {
-      let capturedValues: any;
-      mockValues.mockImplementation((v) => {
+      let capturedValues: Record<string, unknown> | undefined;
+      mockValues.mockImplementation((v: Record<string, unknown>) => {
         capturedValues = v;
         return Promise.resolve({ rowCount: 1 });
       });
       mockInsert.mockReturnValue({ values: mockValues });
 
       await service.addMessage('session-1', 'user', 'Test');
-      expect(capturedValues.role).toBe('USER');
+      expect(capturedValues?.['role']).toBe('USER');
     });
 
     it('stores provided metadata in message', async () => {
-      let capturedValues: any;
-      mockValues.mockImplementation((v) => {
+      let capturedValues: Record<string, unknown> | undefined;
+      mockValues.mockImplementation((v: Record<string, unknown>) => {
         capturedValues = v;
         return Promise.resolve({ rowCount: 1 });
       });
@@ -164,19 +186,19 @@ describe('MemoryService', () => {
 
       const meta = { tokenCount: 42 };
       await service.addMessage('session-1', 'user', 'Hello', meta);
-      expect(capturedValues.metadata).toEqual(meta);
+      expect(capturedValues?.['metadata']).toEqual(meta);
     });
 
     it('defaults metadata to empty object when not provided', async () => {
-      let capturedValues: any;
-      mockValues.mockImplementation((v) => {
+      let capturedValues: Record<string, unknown> | undefined;
+      mockValues.mockImplementation((v: Record<string, unknown>) => {
         capturedValues = v;
         return Promise.resolve({ rowCount: 1 });
       });
       mockInsert.mockReturnValue({ values: mockValues });
 
       await service.addMessage('session-1', 'user', 'Hello');
-      expect(capturedValues.metadata).toEqual({});
+      expect(capturedValues?.['metadata']).toEqual({});
     });
   });
 
@@ -234,6 +256,89 @@ describe('MemoryService', () => {
       mockSelect.mockReturnValue({ from: mockFrom });
       const result = await service.getMessageCount('session-1');
       expect(result).toBe(0);
+    });
+  });
+
+  // ── saveContext ───────────────────────────────────────────────────────────
+
+  describe('saveContext()', () => {
+    it('writes context to NATS KV under the correct bucket', async () => {
+      await service.saveContext('session-42', { messages: [] });
+      expect(mockKvSet).toHaveBeenCalledOnce();
+      const [bucket, key] = mockKvSet.mock.calls[0] as [string, string, unknown];
+      expect(bucket).toBe('agent-memory');
+      expect(key).toBe('session-42');
+    });
+
+    it('stamps updatedAt on the saved payload', async () => {
+      await service.saveContext('session-99', { messages: [] });
+      const [, , payload] = mockKvSet.mock.calls[0] as [string, string, ConversationContext];
+      expect(typeof payload.updatedAt).toBe('string');
+      expect(new Date(payload.updatedAt).getTime()).toBeLessThanOrEqual(Date.now());
+    });
+
+    it('embeds sessionId in the saved payload', async () => {
+      await service.saveContext('session-abc', { messages: [] });
+      const [, , payload] = mockKvSet.mock.calls[0] as [string, string, ConversationContext];
+      expect(payload.sessionId).toBe('session-abc');
+    });
+
+    it('resolves without throwing when KV write succeeds', async () => {
+      await expect(service.saveContext('s1', { messages: [] })).resolves.toBeUndefined();
+    });
+  });
+
+  // ── loadContext ───────────────────────────────────────────────────────────
+
+  describe('loadContext()', () => {
+    it('returns the cached context from NATS KV when available (fast path)', async () => {
+      const cached: ConversationContext = {
+        sessionId: 'session-1',
+        messages: [{ role: 'user', content: 'hello', createdAt: new Date() }],
+        updatedAt: new Date().toISOString(),
+      };
+      mockKvGet.mockResolvedValue(cached);
+
+      const result = await service.loadContext('session-1');
+      expect(result).toEqual(cached);
+      // DB should not be hit
+      expect(mockSelect).not.toHaveBeenCalled();
+    });
+
+    it('falls back to database when KV returns null', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockLimit.mockResolvedValue([makeMessage('USER', 'DB fallback msg', new Date())]);
+
+      const result = await service.loadContext('session-1');
+      expect(result.sessionId).toBe('session-1');
+      expect(result.messages.length).toBe(1);
+      // After DB fallback, repopulates KV
+      expect(mockKvSet).toHaveBeenCalledOnce();
+    });
+
+    it('falls back to database when KV throws an error', async () => {
+      mockKvGet.mockRejectedValue(new Error('NATS unavailable'));
+      mockLimit.mockResolvedValue([]);
+
+      const result = await service.loadContext('session-fallback');
+      expect(result.sessionId).toBe('session-fallback');
+      expect(result.messages).toEqual([]);
+    });
+
+    it('does not throw when repopulating KV after DB fallback fails', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockLimit.mockResolvedValue([]);
+      mockKvSet.mockRejectedValue(new Error('KV write failed'));
+
+      await expect(service.loadContext('session-1')).resolves.toBeDefined();
+    });
+
+    it('returns context with correct sessionId from DB fallback', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockLimit.mockResolvedValue([]);
+
+      const result = await service.loadContext('my-session');
+      expect(result.sessionId).toBe('my-session');
     });
   });
 });

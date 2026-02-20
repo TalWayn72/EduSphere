@@ -1,126 +1,84 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Clock, Users, Plus, Globe, EyeOff, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Clock, Users, Plus, Globe, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
-import type { CourseFormData } from './course-create.types';
+import { COURSES_QUERY } from '@/lib/queries';
+import {
+  MY_ENROLLMENTS_QUERY,
+  ENROLL_COURSE_MUTATION,
+  UNENROLL_COURSE_MUTATION,
+} from '@/lib/graphql/content.queries';
 
 const INSTRUCTOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
-interface Course {
+interface CourseItem {
   id: string;
   title: string;
-  description: string;
-  instructor: string;
-  duration: string;
-  students: number;
-  defaultContentId: string;
-  thumbnail: string;
-  published: boolean;
+  description: string | null;
+  slug: string;
+  thumbnailUrl: string | null;
+  instructorId: string;
+  isPublished: boolean;
+  estimatedHours: number | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-const BASE_COURSES: Course[] = [
-  {
-    id: 'course-1',
-    title: 'Introduction to Talmud Study',
-    description: 'Learn the fundamentals of Talmudic reasoning and argumentation',
-    instructor: 'Rabbi David Cohen',
-    duration: '8 weeks',
-    students: 45,
-    defaultContentId: 'content-1',
-    thumbnail: '📚',
-    published: true,
-  },
-  {
-    id: 'course-2',
-    title: 'Advanced Chavruta Techniques',
-    description: 'Master the art of collaborative Talmud learning with AI assistance',
-    instructor: 'Dr. Sarah Levine',
-    duration: '6 weeks',
-    students: 32,
-    defaultContentId: 'content-3',
-    thumbnail: '🤝',
-    published: true,
-  },
-  {
-    id: 'course-3',
-    title: 'Knowledge Graph Navigation',
-    description: 'Explore interconnected concepts in Jewish texts using graph-based learning',
-    instructor: 'Prof. Michael Stein',
-    duration: '4 weeks',
-    students: 28,
-    defaultContentId: 'content-2',
-    thumbnail: '🕸️',
-    published: true,
-  },
-  {
-    id: 'course-4',
-    title: 'Maimonidean Philosophy',
-    description: 'Deep dive into the Guide for the Perplexed and other works',
-    instructor: 'Rabbi Rachel Goldberg',
-    duration: '10 weeks',
-    students: 38,
-    defaultContentId: 'content-1',
-    thumbnail: '🔍',
-    published: true,
-  },
-  {
-    id: 'course-5',
-    title: 'Ethics in Jewish Thought',
-    description: 'Explore ethical frameworks from classical to modern Jewish philosophy',
-    instructor: 'Dr. Aaron Bernstein',
-    duration: '6 weeks',
-    students: 41,
-    defaultContentId: 'content-2',
-    thumbnail: '⚖️',
-    published: true,
-  },
-  {
-    id: 'course-6',
-    title: 'AI-Enhanced Torah Study',
-    description: 'Leverage AI agents for deeper understanding of traditional texts',
-    instructor: 'Rabbi Tech Innovation Team',
-    duration: '5 weeks',
-    students: 52,
-    defaultContentId: 'content-1',
-    thumbnail: '🤖',
-    published: true,
-  },
-];
+interface UserEnrollment {
+  id: string;
+  courseId: string;
+  userId: string;
+  status: string;
+  enrolledAt: string;
+  completedAt: string | null;
+}
 
-function courseFromFormData(data: CourseFormData): Course {
-  return {
-    id: `course-new-${Date.now()}`,
-    title: data.title,
-    description: data.description,
-    instructor: 'You',
-    duration: data.duration || '—',
-    students: 0,
-    defaultContentId: 'content-1',
-    thumbnail: data.thumbnail,
-    published: data.published,
-  };
+interface CoursesQueryResult {
+  courses: CourseItem[];
+}
+
+interface MyEnrollmentsResult {
+  myEnrollments: UserEnrollment[];
 }
 
 export function CourseList() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = getCurrentUser();
-  const [courses, setCourses] = useState<Course[]>(BASE_COURSES);
-  const [enrolled, setEnrolled] = useState<Set<string>>(new Set());
-  const [toast, setToast] = useState<string | null>(null);
-
   const isInstructor = user ? INSTRUCTOR_ROLES.has(user.role) : false;
 
-  // Receive newly created course from CourseCreatePage
+  const [{ data, fetching, error }] = useQuery<CoursesQueryResult>({
+    query: COURSES_QUERY,
+    variables: { limit: 50, offset: 0 },
+  });
+
+  const [{ data: enrollmentsData }, reexecuteEnrollments] = useQuery<MyEnrollmentsResult>({
+    query: MY_ENROLLMENTS_QUERY,
+    pause: isInstructor,
+  });
+
+  const [, executeEnroll] = useMutation<
+    { enrollCourse: UserEnrollment },
+    { courseId: string }
+  >(ENROLL_COURSE_MUTATION);
+
+  const [, executeUnenroll] = useMutation<
+    { unenrollCourse: boolean },
+    { courseId: string }
+  >(UNENROLL_COURSE_MUTATION);
+
+  const [localPublishState, setLocalPublishState] = useState<Map<string, boolean>>(new Map());
+  const [toast, setToast] = useState<string | null>(null);
+
+  // Show success message from CourseCreatePage navigation state
   useEffect(() => {
-    const state = location.state as { newCourse?: CourseFormData; message?: string } | null;
-    if (state?.newCourse) {
-      setCourses((prev) => [courseFromFormData(state.newCourse!), ...prev]);
-      if (state.message) showToast(state.message);
-      // Clear state so refresh doesn't re-add
+    const state = location.state as { message?: string } | null;
+    if (state?.message) {
+      showToast(state.message);
       window.history.replaceState({}, '');
     }
   }, [location.state]);
@@ -130,31 +88,64 @@ export function CourseList() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const handleEnroll = (e: React.MouseEvent, courseId: string, title: string) => {
+  const enrolledCourseIds = new Set(
+    (enrollmentsData?.myEnrollments ?? [])
+      .filter((e) => e.status === 'ACTIVE')
+      .map((e) => e.courseId)
+  );
+
+  const handleEnroll = async (e: React.MouseEvent, courseId: string, title: string) => {
     e.stopPropagation();
-    setEnrolled((prev) => {
-      const next = new Set(prev);
-      if (next.has(courseId)) {
-        next.delete(courseId);
-        showToast(`Unenrolled from "${title}"`);
+    const alreadyEnrolled = enrolledCourseIds.has(courseId);
+
+    if (alreadyEnrolled) {
+      const { error } = await executeUnenroll({ courseId });
+      if (error) {
+        showToast(`Failed to unenroll: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
       } else {
-        next.add(courseId);
-        showToast(`Enrolled in "${title}"!`);
+        showToast(`Unenrolled from "${title}"`);
+        reexecuteEnrollments({ requestPolicy: 'network-only' });
       }
-      return next;
-    });
+    } else {
+      const { error } = await executeEnroll({ courseId });
+      if (error) {
+        showToast(`Failed to enroll: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+      } else {
+        showToast(`Enrolled in "${title}"!`);
+        reexecuteEnrollments({ requestPolicy: 'network-only' });
+      }
+    }
   };
 
-  const togglePublish = (e: React.MouseEvent, courseId: string) => {
+  const togglePublish = (e: React.MouseEvent, courseId: string, current: boolean) => {
     e.stopPropagation();
-    setCourses((prev) =>
-      prev.map((c) => (c.id === courseId ? { ...c, published: !c.published } : c))
-    );
+    setLocalPublishState((prev) => new Map(prev).set(courseId, !current));
   };
+
+  const isPublished = (course: CourseItem): boolean =>
+    localPublishState.has(course.id)
+      ? (localPublishState.get(course.id) as boolean)
+      : course.isPublished;
+
+  const allCourses = data?.courses ?? [];
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold tracking-tight">Courses</h1>
+          <Card className="border-destructive">
+            <CardContent className="pt-6">
+              <p className="text-destructive">Error loading courses: {error.message}</p>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      {/* Toast */}
       {toast && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 rounded-lg shadow-lg text-sm animate-in slide-in-from-bottom-2">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
@@ -178,103 +169,119 @@ export function CourseList() {
           )}
         </div>
 
+        {fetching && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">Loading courses...</span>
+          </div>
+        )}
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <Card
-              key={course.id}
-              className="hover:shadow-lg transition-shadow cursor-pointer group relative"
-              onClick={() => navigate(`/learn/${course.defaultContentId}`)}
-            >
-              {/* Draft badge for instructors */}
-              {isInstructor && !course.published && (
-                <div className="absolute top-3 right-3 bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full">
-                  Draft
-                </div>
-              )}
-
-              <CardHeader>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="text-4xl">{course.thumbnail}</div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/learn/${course.defaultContentId}`);
-                    }}
-                  >
-                    Open
-                  </Button>
-                </div>
-                <CardTitle className="text-xl leading-snug">{course.title}</CardTitle>
-                <CardDescription className="line-clamp-2">{course.description}</CardDescription>
-              </CardHeader>
-
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <BookOpen className="h-4 w-4 shrink-0" />
-                    <span className="truncate">{course.instructor}</span>
+          {allCourses.map((course) => {
+            const published = isPublished(course);
+            const isEnrolled = enrolledCourseIds.has(course.id);
+            return (
+              <Card
+                key={course.id}
+                className="hover:shadow-lg transition-shadow cursor-pointer group relative"
+                onClick={() => navigate(`/courses/${course.id}`)}
+              >
+                {isInstructor && !published && (
+                  <div className="absolute top-3 right-3 bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full">
+                    Draft
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {course.duration !== '—' && (
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-4 w-4" />
-                        <span>{course.duration}</span>
+                )}
+                {!isInstructor && isEnrolled && (
+                  <div className="absolute top-3 right-3 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full font-medium">
+                    Enrolled
+                  </div>
+                )}
+
+                <CardHeader>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="text-4xl">{course.thumbnailUrl ?? '📚'}</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/courses/${course.id}`);
+                      }}
+                    >
+                      Open
+                    </Button>
+                  </div>
+                  <CardTitle className="text-xl leading-snug">{course.title}</CardTitle>
+                  <CardDescription className="line-clamp-2">{course.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                  <div className="space-y-3">
+                    {course.estimatedHours != null && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4 shrink-0" />
+                        <span>{course.estimatedHours}h estimated</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5">
-                      <Users className="h-4 w-4" />
-                      <span>{course.students} students</span>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BookOpen className="h-4 w-4 shrink-0" />
+                      <span className="truncate font-mono text-xs">{course.instructorId}</span>
                     </div>
+
+                    {!isInstructor && (
+                      <Button
+                        variant={isEnrolled ? 'secondary' : 'default'}
+                        size="sm"
+                        className="w-full mt-1 gap-1.5"
+                        onClick={(e) => handleEnroll(e, course.id, course.title)}
+                      >
+                        {isEnrolled ? (
+                          <>
+                            <CheckCircle2 className="h-4 w-4" />
+                            Enrolled
+                          </>
+                        ) : (
+                          'Enroll'
+                        )}
+                      </Button>
+                    )}
+
+                    {isInstructor && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-1 gap-1.5"
+                        onClick={(e) => togglePublish(e, course.id, published)}
+                      >
+                        {published ? (
+                          <>
+                            <EyeOff className="h-3.5 w-3.5" />
+                            Unpublish
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="h-3.5 w-3.5" />
+                            Publish
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
-
-                  {/* Enroll button — students only */}
-                  {!isInstructor && (
-                    <Button
-                      variant={enrolled.has(course.id) ? 'secondary' : 'default'}
-                      size="sm"
-                      className="w-full mt-1 gap-1.5"
-                      onClick={(e) => handleEnroll(e, course.id, course.title)}
-                    >
-                      {enrolled.has(course.id) ? (
-                        <>
-                          <CheckCircle2 className="h-4 w-4" />
-                          Enrolled
-                        </>
-                      ) : (
-                        'Enroll'
-                      )}
-                    </Button>
-                  )}
-
-                  {/* Publish toggle — instructors only */}
-                  {isInstructor && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-1 gap-1.5"
-                      onClick={(e) => togglePublish(e, course.id)}
-                    >
-                      {course.published ? (
-                        <>
-                          <EyeOff className="h-3.5 w-3.5" />
-                          Unpublish
-                        </>
-                      ) : (
-                        <>
-                          <Globe className="h-3.5 w-3.5" />
-                          Publish
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
+
+        {!fetching && allCourses.length === 0 && (
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">No courses available yet.</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </Layout>
   );

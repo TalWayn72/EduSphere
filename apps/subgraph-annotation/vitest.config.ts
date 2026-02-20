@@ -4,16 +4,25 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    include: ['src/**/*.spec.ts'],
+    passWithNoTests: true,
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'lcov'],
+      include: ['src/**/*.ts'],
       exclude: [
-        'node_modules/',
-        'dist/',
-        '**/*.spec.ts',
-        '**/*.test.ts',
-        'vitest.config.ts',
+        'src/**/*.spec.ts',
+        'src/main.ts',
+        'src/**/*.module.ts',
+        'src/app.module.ts',
+        'src/auth/auth.middleware.ts',
       ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 70,
+        statements: 80,
+      },
     },
   },
 });

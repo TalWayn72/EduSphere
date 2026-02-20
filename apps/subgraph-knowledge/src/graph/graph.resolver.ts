@@ -1,7 +1,10 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException, Logger } from '@nestjs/common';
+import { trace, SpanStatusCode } from '@opentelemetry/api';
 import { GraphService } from './graph.service';
 import type { GraphQLContext } from '../auth/auth.middleware';
+
+const tracer = trace.getTracer('subgraph-knowledge');
 
 @Resolver()
 export class GraphResolver {
@@ -132,13 +135,37 @@ export class GraphResolver {
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
-    return this.graphService.semanticSearch(
-      query,
-      limit,
-      tenantId,
-      userId,
-      role
-    );
+
+    const span = tracer.startSpan('knowledge.semanticSearch', {
+      attributes: {
+        'search.query.length': query.length,
+        'search.limit': limit,
+        'tenant.id': tenantId,
+        'user.id': userId,
+      },
+    });
+
+    try {
+      const results = await this.graphService.semanticSearch(
+        query,
+        limit,
+        tenantId,
+        userId,
+        role
+      );
+      span.setAttribute(
+        'search.results.count',
+        Array.isArray(results) ? results.length : 0
+      );
+      span.setStatus({ code: SpanStatusCode.OK });
+      return results;
+    } catch (err) {
+      span.recordException(err instanceof Error ? err : new Error(String(err)));
+      span.setStatus({ code: SpanStatusCode.ERROR });
+      throw err;
+    } finally {
+      span.end();
+    }
   }
 
   @Mutation()
@@ -271,6 +298,51 @@ export class GraphResolver {
       text,
       entityType,
       entityId,
+      tenantId,
+      userId,
+      role
+    );
+  }
+
+  // ─── Learning Path queries ────────────────────────────────────────────────
+
+  @Query()
+  async learningPath(
+    @Args('from') from: string,
+    @Args('to') to: string,
+    @Context() context: GraphQLContext
+  ) {
+    const { tenantId, userId, role } = this.getAuthContext(context);
+    this.logger.debug({ from, to }, 'learningPath query');
+    return this.graphService.getLearningPath(from, to, tenantId, userId, role);
+  }
+
+  @Query()
+  async relatedConceptsByName(
+    @Args('conceptName') conceptName: string,
+    @Args('depth') depth: number = 2,
+    @Context() context: GraphQLContext
+  ) {
+    const { tenantId, userId, role } = this.getAuthContext(context);
+    this.logger.debug({ conceptName, depth }, 'relatedConceptsByName query');
+    return this.graphService.getRelatedConceptsByName(
+      conceptName,
+      depth,
+      tenantId,
+      userId,
+      role
+    );
+  }
+
+  @Query()
+  async prerequisiteChain(
+    @Args('conceptName') conceptName: string,
+    @Context() context: GraphQLContext
+  ) {
+    const { tenantId, userId, role } = this.getAuthContext(context);
+    this.logger.debug({ conceptName }, 'prerequisiteChain query');
+    return this.graphService.getPrerequisiteChain(
+      conceptName,
       tenantId,
       userId,
       role

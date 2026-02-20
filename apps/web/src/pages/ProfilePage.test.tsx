@@ -22,6 +22,15 @@ vi.mock('@/components/Layout', () => ({
   ),
 }));
 
+// Mock urql — ProfilePage now uses useQuery for ME_QUERY and COURSES_QUERY
+vi.mock('urql', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('urql')>();
+  return {
+    ...actual,
+    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  };
+});
+
 import { getCurrentUser } from '@/lib/auth';
 import { ProfilePage } from './ProfilePage';
 
@@ -125,10 +134,10 @@ describe('ProfilePage', () => {
     expect(screen.queryByText('Permissions', { selector: 'h3' })).not.toBeInTheDocument();
   });
 
-  it('renders Learning Overview section with mock stats', () => {
+  it('renders Learning Overview section with real stats labels', () => {
     renderPage();
     expect(screen.getByText('Learning Overview')).toBeInTheDocument();
-    expect(screen.getByText('Courses Enrolled')).toBeInTheDocument();
+    expect(screen.getByText('Courses Available')).toBeInTheDocument();
     expect(screen.getByText('Concepts Mastered')).toBeInTheDocument();
     expect(screen.getByText('Annotations Created')).toBeInTheDocument();
   });

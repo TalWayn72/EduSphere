@@ -6,6 +6,16 @@ export interface CourseModule {
   description: string;
 }
 
+export interface UploadedMedia {
+  id: string;
+  courseId: string;
+  fileKey: string;
+  title: string;
+  contentType: string;
+  status: 'UPLOADING' | 'PROCESSING' | 'READY' | 'ERROR';
+  downloadUrl: string | null;
+}
+
 export interface CourseFormData {
   title: string;
   description: string;
@@ -13,6 +23,7 @@ export interface CourseFormData {
   duration: string;
   thumbnail: string;
   modules: CourseModule[];
+  mediaList: UploadedMedia[];
   published: boolean;
 }
 
@@ -31,5 +42,6 @@ export const DEFAULT_FORM: CourseFormData = {
   duration: '',
   thumbnail: '📚',
   modules: [],
+  mediaList: [],
   published: false,
 };

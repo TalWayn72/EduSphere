@@ -14,13 +14,18 @@ const mockUpdate = vi.fn();
 const mockSet = vi.fn();
 
 const mockDb = { select: mockSelect, insert: mockInsert, update: mockUpdate };
+
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   schema: {
     courses: {
-      id: 'id', tenant_id: 'tenant_id', title: 'title',
-      description: 'description', creator_id: 'creator_id',
-      created_at: 'created_at', updated_at: 'updated_at',
+      id: 'id',
+      tenantId: 'tenant_id',
+      title: 'title',
+      description: 'description',
+      instructorId: 'instructor_id',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
     },
   },
   eq: vi.fn((col, val) => ({ col, val })),
@@ -28,14 +33,27 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 const MOCK_COURSE = {
-  id: 'course-1', tenant_id: 'tenant-1', title: 'Test Course',
-  description: 'A test course', creator_id: 'user-1',
-  created_at: new Date('2026-01-01'), updated_at: new Date('2026-01-01'),
+  id: 'course-1',
+  tenantId: 'tenant-1',
+  title: 'Test Course',
+  description: 'A test course',
+  instructorId: 'user-1',
+  createdAt: new Date('2026-01-01'),
+  updatedAt: new Date('2026-01-01'),
+  isPublished: false,
+  slug: '',
+  thumbnailUrl: null,
+  estimatedHours: null,
 };
 
 describe('CourseService', () => {
   let service: CourseService;
-  beforeEach(() => { vi.clearAllMocks(); service = new CourseService(); });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    service = new CourseService();
+  });
+
   describe('findById()', () => {
     beforeEach(() => {
       mockLimit.mockResolvedValue([MOCK_COURSE]);
@@ -73,6 +91,7 @@ describe('CourseService', () => {
       expect(mockFrom).toHaveBeenCalled();
     });
   });
+
   describe('findAll()', () => {
     beforeEach(() => {
       mockOffset.mockResolvedValue([MOCK_COURSE]);
@@ -111,6 +130,7 @@ describe('CourseService', () => {
       expect(result).toHaveLength(2);
     });
   });
+
   describe('create()', () => {
     beforeEach(() => {
       mockReturning.mockResolvedValue([MOCK_COURSE]);
@@ -119,44 +139,45 @@ describe('CourseService', () => {
     });
 
     it('inserts and returns the new course', async () => {
-      const input = { tenantId: 'tenant-1', title: 'New Course', description: 'Desc', creatorId: 'user-1' };
+      const input = { tenantId: 'tenant-1', title: 'New Course', description: 'Desc', instructorId: 'user-1' };
       const result = await service.create(input);
       expect(result).toEqual(MOCK_COURSE);
     });
 
-    it('maps tenantId to tenant_id', async () => {
-      let cap: any;
-      mockValues.mockImplementation((v: any) => { cap = v; return { returning: mockReturning }; });
-      await service.create({ tenantId: 'tenant-99', title: 'T', description: 'D', creatorId: 'u' });
-      expect(cap.tenant_id).toBe('tenant-99');
+    it('maps tenantId correctly', async () => {
+      let cap: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => { cap = v; return { returning: mockReturning }; });
+      await service.create({ tenantId: 'tenant-99', title: 'T', description: 'D', instructorId: 'u' });
+      expect(cap['tenantId']).toBe('tenant-99');
     });
 
     it('maps title correctly', async () => {
-      let cap: any;
-      mockValues.mockImplementation((v: any) => { cap = v; return { returning: mockReturning }; });
-      await service.create({ tenantId: 'tenant-1', title: 'My Course', description: 'D', creatorId: 'u' });
-      expect(cap.title).toBe('My Course');
+      let cap: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => { cap = v; return { returning: mockReturning }; });
+      await service.create({ tenantId: 'tenant-1', title: 'My Course', description: 'D', instructorId: 'u' });
+      expect(cap['title']).toBe('My Course');
     });
 
     it('maps description correctly', async () => {
-      let cap: any;
-      mockValues.mockImplementation((v: any) => { cap = v; return { returning: mockReturning }; });
-      await service.create({ tenantId: 't', title: 'T', description: 'My Desc', creatorId: 'u' });
-      expect(cap.description).toBe('My Desc');
+      let cap: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => { cap = v; return { returning: mockReturning }; });
+      await service.create({ tenantId: 't', title: 'T', description: 'My Desc', instructorId: 'u' });
+      expect(cap['description']).toBe('My Desc');
     });
 
-    it('maps creatorId to creator_id', async () => {
-      let cap: any;
-      mockValues.mockImplementation((v: any) => { cap = v; return { returning: mockReturning }; });
-      await service.create({ tenantId: 't', title: 'T', description: 'D', creatorId: 'user-42' });
-      expect(cap.creator_id).toBe('user-42');
+    it('maps instructorId correctly', async () => {
+      let cap: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => { cap = v; return { returning: mockReturning }; });
+      await service.create({ tenantId: 't', title: 'T', description: 'D', instructorId: 'user-42' });
+      expect(cap['instructorId']).toBe('user-42');
     });
 
     it('calls .returning()', async () => {
-      await service.create({ tenantId: 't', title: 'T', description: 'D', creatorId: 'u' });
+      await service.create({ tenantId: 't', title: 'T', description: 'D', instructorId: 'u' });
       expect(mockReturning).toHaveBeenCalled();
     });
   });
+
   describe('update()', () => {
     beforeEach(() => {
       mockReturning.mockResolvedValue([MOCK_COURSE]);
@@ -173,24 +194,24 @@ describe('CourseService', () => {
     });
 
     it('updates the title field', async () => {
-      let cap: any;
-      mockSet.mockImplementation((v: any) => { cap = v; return { where: mockWhere }; });
+      let cap: Record<string, unknown> = {};
+      mockSet.mockImplementation((v: Record<string, unknown>) => { cap = v; return { where: mockWhere }; });
       await service.update('course-1', { title: 'New Title', description: 'D' });
-      expect(cap.title).toBe('New Title');
+      expect(cap['title']).toBe('New Title');
     });
 
     it('updates the description field', async () => {
-      let cap: any;
-      mockSet.mockImplementation((v: any) => { cap = v; return { where: mockWhere }; });
+      let cap: Record<string, unknown> = {};
+      mockSet.mockImplementation((v: Record<string, unknown>) => { cap = v; return { where: mockWhere }; });
       await service.update('course-1', { title: 'T', description: 'New Desc' });
-      expect(cap.description).toBe('New Desc');
+      expect(cap['description']).toBe('New Desc');
     });
 
-    it('sets updated_at to a Date object', async () => {
-      let cap: any;
-      mockSet.mockImplementation((v: any) => { cap = v; return { where: mockWhere }; });
+    it('sets updatedAt to a Date object', async () => {
+      let cap: Record<string, unknown> = {};
+      mockSet.mockImplementation((v: Record<string, unknown>) => { cap = v; return { where: mockWhere }; });
       await service.update('course-1', { title: 'T', description: 'D' });
-      expect(cap.updated_at).toBeInstanceOf(Date);
+      expect(cap['updatedAt']).toBeInstanceOf(Date);
     });
 
     it('uses eq() with the provided id', async () => {

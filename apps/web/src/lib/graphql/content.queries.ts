@@ -66,6 +66,32 @@ export const COURSE_CONTENTS_QUERY = gql`
   }
 `;
 
+export const COURSE_DETAIL_QUERY = gql`
+  query CourseDetail($id: ID!) {
+    course(id: $id) {
+      id
+      title
+      description
+      thumbnailUrl
+      estimatedHours
+      isPublished
+      instructorId
+      modules {
+        id
+        title
+        orderIndex
+        contentItems {
+          id
+          title
+          contentType
+          duration
+          orderIndex
+        }
+      }
+    }
+  }
+`;
+
 export const SEARCH_TRANSCRIPTS_QUERY = gql`
   query SearchTranscripts($query: String!, $courseId: ID, $first: Int) {
     searchTranscripts(query: $query, courseId: $courseId, first: $first) {
@@ -102,5 +128,92 @@ export const SEMANTIC_SEARCH_QUERY = gql`
       entityId
       metadata
     }
+  }
+`;
+
+export const PRESIGNED_UPLOAD_QUERY = gql`
+  query GetPresignedUploadUrl($fileName: String!, $contentType: String!, $courseId: ID!) {
+    getPresignedUploadUrl(fileName: $fileName, contentType: $contentType, courseId: $courseId) {
+      uploadUrl
+      fileKey
+      expiresAt
+    }
+  }
+`;
+
+export const CONFIRM_MEDIA_UPLOAD_MUTATION = gql`
+  mutation ConfirmMediaUpload($fileKey: String!, $courseId: ID!, $title: String!) {
+    confirmMediaUpload(fileKey: $fileKey, courseId: $courseId, title: $title) {
+      id
+      courseId
+      fileKey
+      title
+      contentType
+      status
+      downloadUrl
+      hlsManifestUrl
+    }
+  }
+`;
+
+export const CREATE_COURSE_MUTATION = gql`
+  mutation CreateCourse($input: CreateCourseInput!) {
+    createCourse(input: $input) {
+      id
+      title
+      slug
+      description
+      isPublished
+      estimatedHours
+      createdAt
+    }
+  }
+`;
+
+export const ENROLL_COURSE_MUTATION = gql`
+  mutation EnrollCourse($courseId: ID!) {
+    enrollCourse(courseId: $courseId) {
+      id
+      courseId
+      userId
+      status
+      enrolledAt
+    }
+  }
+`;
+
+export const UNENROLL_COURSE_MUTATION = gql`
+  mutation UnenrollCourse($courseId: ID!) {
+    unenrollCourse(courseId: $courseId)
+  }
+`;
+
+export const MY_ENROLLMENTS_QUERY = gql`
+  query MyEnrollments {
+    myEnrollments {
+      id
+      courseId
+      userId
+      status
+      enrolledAt
+      completedAt
+    }
+  }
+`;
+
+export const MY_COURSE_PROGRESS_QUERY = gql`
+  query MyCourseProgress($courseId: ID!) {
+    myCourseProgress(courseId: $courseId) {
+      courseId
+      totalItems
+      completedItems
+      percentComplete
+    }
+  }
+`;
+
+export const MARK_CONTENT_VIEWED_MUTATION = gql`
+  mutation MarkContentViewed($contentItemId: ID!) {
+    markContentViewed(contentItemId: $contentItemId)
   }
 `;

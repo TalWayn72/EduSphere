@@ -31,6 +31,15 @@ const mockCypherService = {
   findTopicClusterById: vi.fn(),
   findTopicClustersByCourse: vi.fn(),
   createTopicCluster: vi.fn(),
+  // Learning Path methods
+  findShortestLearningPath: vi.fn(),
+  collectRelatedConcepts: vi.fn(),
+  findPrerequisiteChain: vi.fn(),
+};
+
+const mockEmbeddingService = {
+  callEmbeddingProvider: vi.fn(),
+  generateEmbedding: vi.fn(),
 };
 
 const RAW_CONCEPT = {
@@ -58,7 +67,10 @@ describe('GraphService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new GraphService(mockCypherService as any);
+    service = new GraphService(
+      mockCypherService as any,
+      mockEmbeddingService as any
+    );
   });
 
   // ─── findConceptById ───────────────────────────────────────────────────────
@@ -180,9 +192,256 @@ describe('GraphService', () => {
   // ─── semanticSearch ────────────────────────────────────────────────────────
 
   describe('semanticSearch()', () => {
-    it('returns empty array (not yet implemented)', async () => {
+    it('returns vector results when embedding provider succeeds', async () => {
+      // db.execute is used for the pgvector query inside withTenantContext
+      const mockDbModule = await import('@edusphere/db');
+      vi.mocked(mockEmbeddingService.callEmbeddingProvider).mockResolvedValue([0.1, 0.2]);
+      // db.execute is called for pgvector; db.select for ILIKE fallback
+      // withTenantContext is already mocked to just call callback
+      // We need to mock db.execute to return rows
+      (mockDbModule.db as any).execute = vi.fn().mockResolvedValue([
+        {
+          id: 'e1',
+          segment_id: 'seg-1',
+          transcript_id: 'tr-1',
+          text: 'test text',
+          similarity: '0.9',
+        },
+      ]);
+      (mockDbModule.db as any).select = vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }),
+        }),
+      });
+      mockCypherService.findAllConcepts.mockResolvedValue([]);
+
       const result = await service.semanticSearch('test', 10, 'tenant-1', 'user-1', 'STUDENT');
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0].entityType).toBe('transcript_segment');
+    });
+
+    it('falls back to ILIKE when embedding provider throws', async () => {
+      const mockDbModule = await import('@edusphere/db');
+      vi.mocked(mockEmbeddingService.callEmbeddingProvider).mockRejectedValue(
+        new Error('no provider')
+      );
+      (mockDbModule.db as any).select = vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([
+              { id: 'seg-1', text: 'test text', transcript_id: 'tr-1' },
+            ]),
+          }),
+        }),
+      });
+      mockCypherService.findAllConcepts.mockResolvedValue([]);
+
+      const result = await service.semanticSearch('test', 10, 'tenant-1', 'user-1', 'STUDENT');
+      expect(result.length).toBeGreaterThan(0);
+    });
+  });
+  describe('updateConcept', () => {
+    it('updates concept', async () => {
+      mockCypherService.updateConcept.mockResolvedValue({ ...RAW_CONCEPT, name: 'Updated' });
+      const result = await service.updateConcept('concept-1', { name: 'Updated' }, 'tenant-1', 'user-1', 'INSTRUCTOR');
+      expect(result).toMatchObject({ name: 'Updated' });
+    });
+    it('throws NotFoundException when null returned', async () => {
+      mockCypherService.updateConcept.mockResolvedValue(null);
+      await expect(service.updateConcept('x', {}, 'tenant-1', 'user-1', 'INSTRUCTOR')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('generateEmbedding', () => {
+    it('returns true when embedding succeeds for transcript_segment', async () => {
+      vi.mocked(mockEmbeddingService.generateEmbedding).mockResolvedValue({
+        id: 'e1',
+        type: 'content',
+        refId: 'seg-1',
+        embedding: [0.1],
+        createdAt: new Date().toISOString(),
+      });
+      const result = await service.generateEmbedding(
+        'text',
+        'transcript_segment',
+        'seg-1',
+        'tenant-1',
+        'user-1',
+        'INSTRUCTOR'
+      );
+      expect(result).toBe(true);
+    });
+
+    it('returns false for unsupported entityType', async () => {
+      const result = await service.generateEmbedding(
+        'text',
+        'Concept',
+        'c-1',
+        'tenant-1',
+        'user-1',
+        'INSTRUCTOR'
+      );
+      expect(result).toBe(false);
+    });
+
+    it('returns false when embeddingService.generateEmbedding throws', async () => {
+      vi.mocked(mockEmbeddingService.generateEmbedding).mockRejectedValue(
+        new Error('provider error')
+      );
+      const result = await service.generateEmbedding(
+        'text',
+        'transcript_segment',
+        'seg-x',
+        'tenant-1',
+        'user-1',
+        'INSTRUCTOR'
+      );
+      expect(result).toBe(false);
+    });
+  });
+
+  // ─── getLearningPath ────────────────────────────────────────────────────────
+
+  describe('getLearningPath()', () => {
+    const MOCK_PATH = {
+      concepts: [
+        { id: 'c-1', name: 'Algebra', type: 'CONCEPT' },
+        { id: 'c-2', name: 'Calculus', type: 'CONCEPT' },
+      ],
+      steps: 1,
+    };
+
+    it('returns learning path when cypherService finds a path', async () => {
+      mockCypherService.findShortestLearningPath.mockResolvedValue(MOCK_PATH);
+      const result = await service.getLearningPath(
+        'Algebra', 'Calculus', 'tenant-1', 'user-1', 'STUDENT'
+      );
+      expect(result).toEqual(MOCK_PATH);
+    });
+
+    it('returns null when no path exists', async () => {
+      mockCypherService.findShortestLearningPath.mockResolvedValue(null);
+      const result = await service.getLearningPath(
+        'A', 'B', 'tenant-1', 'user-1', 'STUDENT'
+      );
+      expect(result).toBeNull();
+    });
+
+    it('delegates to cypherService.findShortestLearningPath with correct args', async () => {
+      mockCypherService.findShortestLearningPath.mockResolvedValue(null);
+      await service.getLearningPath('Algebra', 'Calculus', 'tenant-1', 'user-1', 'STUDENT');
+      expect(mockCypherService.findShortestLearningPath).toHaveBeenCalledWith(
+        'Algebra', 'Calculus', 'tenant-1'
+      );
+    });
+
+    it('wraps call in withTenantContext', async () => {
+      mockCypherService.findShortestLearningPath.mockResolvedValue(MOCK_PATH);
+      const { withTenantContext } = await import('@edusphere/db');
+      await service.getLearningPath('A', 'B', 'tenant-1', 'user-1', 'STUDENT');
+      expect(withTenantContext).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' }),
+        expect.any(Function)
+      );
+    });
+  });
+
+  // ─── getRelatedConceptsByName ───────────────────────────────────────────────
+
+  describe('getRelatedConceptsByName()', () => {
+    const MOCK_RELATED = [
+      { id: 'c-2', name: 'Kinematics', type: 'CONCEPT' },
+      { id: 'c-3', name: 'Dynamics', type: 'CONCEPT' },
+    ];
+
+    it('returns related concepts array', async () => {
+      mockCypherService.collectRelatedConcepts.mockResolvedValue(MOCK_RELATED);
+      const result = await service.getRelatedConceptsByName(
+        'Physics', 2, 'tenant-1', 'user-1', 'STUDENT'
+      );
+      expect(result).toEqual(MOCK_RELATED);
+    });
+
+    it('returns empty array when no related concepts found', async () => {
+      mockCypherService.collectRelatedConcepts.mockResolvedValue([]);
+      const result = await service.getRelatedConceptsByName(
+        'Obscure', 2, 'tenant-1', 'user-1', 'STUDENT'
+      );
       expect(result).toEqual([]);
+    });
+
+    it('delegates to cypherService.collectRelatedConcepts with correct args', async () => {
+      mockCypherService.collectRelatedConcepts.mockResolvedValue([]);
+      await service.getRelatedConceptsByName('Physics', 3, 'tenant-1', 'user-1', 'STUDENT');
+      expect(mockCypherService.collectRelatedConcepts).toHaveBeenCalledWith(
+        'Physics', 3, 'tenant-1'
+      );
+    });
+
+    it('wraps call in withTenantContext', async () => {
+      mockCypherService.collectRelatedConcepts.mockResolvedValue([]);
+      const { withTenantContext } = await import('@edusphere/db');
+      await service.getRelatedConceptsByName('Physics', 2, 'tenant-1', 'user-1', 'STUDENT');
+      expect(withTenantContext).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ tenantId: 'tenant-1' }),
+        expect.any(Function)
+      );
+    });
+  });
+
+  // ─── getPrerequisiteChain ───────────────────────────────────────────────────
+
+  describe('getPrerequisiteChain()', () => {
+    const MOCK_CHAIN = [
+      { id: 'c-1', name: 'Arithmetic' },
+      { id: 'c-2', name: 'Algebra' },
+      { id: 'c-3', name: 'Calculus' },
+    ];
+
+    it('returns prerequisite chain array', async () => {
+      mockCypherService.findPrerequisiteChain.mockResolvedValue(MOCK_CHAIN);
+      const result = await service.getPrerequisiteChain(
+        'Calculus', 'tenant-1', 'user-1', 'STUDENT'
+      );
+      expect(result).toEqual(MOCK_CHAIN);
+    });
+
+    it('returns empty array when no prerequisites found', async () => {
+      mockCypherService.findPrerequisiteChain.mockResolvedValue([]);
+      const result = await service.getPrerequisiteChain(
+        'Intro', 'tenant-1', 'user-1', 'STUDENT'
+      );
+      expect(result).toEqual([]);
+    });
+
+    it('delegates to cypherService.findPrerequisiteChain with correct args', async () => {
+      mockCypherService.findPrerequisiteChain.mockResolvedValue([]);
+      await service.getPrerequisiteChain('Calculus', 'tenant-1', 'user-1', 'STUDENT');
+      expect(mockCypherService.findPrerequisiteChain).toHaveBeenCalledWith(
+        'Calculus', 'tenant-1'
+      );
+    });
+
+    it('wraps call in withTenantContext', async () => {
+      mockCypherService.findPrerequisiteChain.mockResolvedValue([]);
+      const { withTenantContext } = await import('@edusphere/db');
+      await service.getPrerequisiteChain('Calculus', 'tenant-1', 'user-1', 'STUDENT');
+      expect(withTenantContext).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' }),
+        expect.any(Function)
+      );
+    });
+
+    it('includes root and target in the returned chain', async () => {
+      mockCypherService.findPrerequisiteChain.mockResolvedValue(MOCK_CHAIN);
+      const result = await service.getPrerequisiteChain(
+        'Calculus', 'tenant-1', 'user-1', 'STUDENT'
+      ) as Array<{ id: string; name: string }>;
+      expect(result[0].name).toBe('Arithmetic');
+      expect(result[result.length - 1].name).toBe('Calculus');
     });
   });
 });

@@ -1,73 +1,118 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { db } from '@edusphere/db';
-import { modules, NewModule } from '@edusphere/db';
-import { eq, asc, inArray } from 'drizzle-orm';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, asc, inArray } from '@edusphere/db';
+
+type DbModule = typeof schema.modules.$inferSelect;
+
+interface ModuleInput {
+  courseId?: string;
+  title?: string;
+  description?: string;
+  orderIndex?: number;
+}
 
 @Injectable()
 export class ModuleService {
+  private readonly logger = new Logger(ModuleService.name);
+  private readonly db = createDatabaseConnection();
+
+  private mapModule(row: DbModule) {
+    return {
+      ...row,
+      courseId: row.course_id,
+      orderIndex: row.order_index,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
   async findById(id: string) {
-    const [module] = await db
+    const [row] = await this.db
       .select()
-      .from(modules)
-      .where(eq(modules.id, id))
+      .from(schema.modules)
+      .where(eq(schema.modules.id, id))
       .limit(1);
 
-    if (!module) {
+    if (!row) {
+      this.logger.warn(`Module not found: ${id}`);
       throw new NotFoundException(`Module with ID ${id} not found`);
     }
 
-    return module;
+    return this.mapModule(row);
   }
 
   async findByCourse(courseId: string) {
-    return db
+    this.logger.debug(`Fetching modules for course: ${courseId}`);
+    const rows = await this.db
       .select()
-      .from(modules)
-      .where(eq(modules.course_id, courseId))
-      .orderBy(asc(modules.order_index));
+      .from(schema.modules)
+      .where(eq(schema.modules.course_id, courseId))
+      .orderBy(asc(schema.modules.order_index));
+    return rows.map((r) => this.mapModule(r));
   }
 
-  async create(input: Partial<NewModule>) {
-    const [module] = await db
-      .insert(modules)
-      .values(input as NewModule)
+  async create(input: ModuleInput) {
+    this.logger.debug(`Creating module for course: ${input.courseId}`);
+    const [row] = await this.db
+      .insert(schema.modules)
+      .values({
+        course_id: input.courseId ?? '',
+        title: input.title ?? '',
+        description: input.description,
+        order_index: input.orderIndex ?? 0,
+      })
       .returning();
 
-    return module;
+    if (!row) {
+      throw new Error('Failed to create module');
+    }
+
+    return this.mapModule(row);
   }
 
-  async update(id: string, input: Partial<NewModule>) {
-    const [updated] = await db
-      .update(modules)
-      .set(input)
-      .where(eq(modules.id, id))
+  async update(id: string, input: ModuleInput) {
+    const updateData: Record<string, unknown> = { updated_at: new Date() };
+    if (input.title !== undefined) updateData['title'] = input.title;
+    if (input.description !== undefined) updateData['description'] = input.description;
+    if (input.orderIndex !== undefined) updateData['order_index'] = input.orderIndex;
+
+    const [row] = await this.db
+      .update(schema.modules)
+      .set(updateData)
+      .where(eq(schema.modules.id, id))
       .returning();
 
-    if (!updated) {
+    if (!row) {
+      this.logger.warn(`Module not found for update: ${id}`);
       throw new NotFoundException(`Module with ID ${id} not found`);
     }
 
-    return updated;
+    return this.mapModule(row);
   }
 
   async delete(id: string): Promise<boolean> {
-    const result = await db.delete(modules).where(eq(modules.id, id));
+    const result = await this.db
+      .delete(schema.modules)
+      .where(eq(schema.modules.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 
   async reorder(courseId: string, moduleIds: string[]) {
-    // Update order_index for all modules
+    this.logger.debug(`Reordering ${moduleIds.length} modules in course: ${courseId}`);
     const updates = moduleIds.map((id, index) =>
-      db.update(modules).set({ order_index: index }).where(eq(modules.id, id))
+      this.db
+        .update(schema.modules)
+        .set({ order_index: index })
+        .where(eq(schema.modules.id, id))
     );
 
     await Promise.all(updates);
 
-    // Return reordered modules
-    return db
+    const rows = await this.db
       .select()
-      .from(modules)
-      .where(inArray(modules.id, moduleIds))
-      .orderBy(asc(modules.order_index));
+      .from(schema.modules)
+      .where(inArray(schema.modules.id, moduleIds))
+      .orderBy(asc(schema.modules.order_index));
+
+    return rows.map((r) => this.mapModule(r));
   }
 }

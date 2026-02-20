@@ -1,18 +1,22 @@
-import { DailyActivity } from '@/lib/mock-analytics';
 import {
   getHeatmapColor,
   formatHeatmapDate,
   calcHeatmapStats,
 } from '@/lib/heatmap.utils';
 
+export interface HeatmapDay {
+  date: string;
+  count: number;
+}
+
 interface ActivityHeatmapProps {
-  data: DailyActivity[];
+  data: HeatmapDay[];
 }
 
 export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
   // Group into weeks (columns)
-  const weeks: DailyActivity[][] = [];
-  let currentWeek: DailyActivity[] = [];
+  const weeks: HeatmapDay[][] = [];
+  let currentWeek: HeatmapDay[] = [];
 
   // Pad start to align to Sunday
   const firstDate = new Date(data[0]?.date ?? '');

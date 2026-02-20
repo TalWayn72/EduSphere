@@ -14,7 +14,7 @@ import {
   ChevronRight,
   Loader2,
 } from 'lucide-react';
-import { SEMANTIC_SEARCH_QUERY } from '@/lib/graphql/content.queries';
+import { SEARCH_SEMANTIC_QUERY } from '@/lib/graphql/knowledge.queries';
 import { mockTranscript } from '@/lib/mock-content-data';
 import { getThreadedAnnotations } from '@/lib/mock-annotations';
 import { mockGraphData } from '@/lib/mock-graph-data';
@@ -187,7 +187,7 @@ export function SearchPage() {
 
   // GraphQL semantic search (real mode)
   const [searchResult] = useQuery({
-    query: SEMANTIC_SEARCH_QUERY,
+    query: SEARCH_SEMANTIC_QUERY,
     variables: { query, limit: 20 },
     pause: DEV_MODE || query.length < 2,
   });
@@ -215,10 +215,30 @@ export function SearchPage() {
     inputRef.current?.focus();
   }, []);
 
+  // Map SemanticResult → SearchResult
+  const realResults: SearchResult[] = (
+    (searchResult.data?.searchSemantic ?? []) as Array<{
+      id: string;
+      text: string;
+      similarity: number;
+      entityType: string;
+      entityId: string;
+    }>
+  ).map((r) => {
+    const isConceptType = r.entityType === 'concept';
+    const type: ResultType = isConceptType ? 'concept' : 'transcript';
+    return {
+      id: r.id,
+      type,
+      title: isConceptType ? r.text.split('\n')[0]?.slice(0, 80) ?? r.entityType : query,
+      snippet: r.text,
+      meta: `${Math.round(r.similarity * 100)}% match`,
+      href: isConceptType ? '/graph' : `/learn/${r.entityId}`,
+    };
+  });
+
   // Build results
-  const results: SearchResult[] = DEV_MODE
-    ? mockSearch(query)
-    : ((searchResult.data?.semanticSearch ?? []) as SearchResult[]);
+  const results: SearchResult[] = DEV_MODE ? mockSearch(query) : realResults;
 
   const loading =
     (!DEV_MODE && searchResult.fetching) || isSearching;
@@ -255,8 +275,28 @@ export function SearchPage() {
           )}
         </div>
 
+        {/* Error state */}
+        {!DEV_MODE && searchResult.error && query.length >= 2 && (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+            Search unavailable — please try again later.
+          </div>
+        )}
+
+        {/* Loading skeleton */}
+        {loading && query.length >= 2 && (
+          <div className="space-y-3" aria-busy="true" aria-label="Loading results">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="rounded-xl border bg-muted/30 p-4 animate-pulse">
+                <div className="h-4 w-1/3 rounded bg-muted mb-2" />
+                <div className="h-3 w-full rounded bg-muted mb-1" />
+                <div className="h-3 w-2/3 rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Result count */}
-        {query.length >= 2 && !loading && (
+        {query.length >= 2 && !loading && !searchResult.error && (
           <p className="text-sm text-muted-foreground px-1">
             {results.length === 0
               ? 'No results found'
@@ -286,7 +326,7 @@ export function SearchPage() {
         )}
 
         {/* Results grouped by type */}
-        {typeOrder.map((type) => {
+        {!loading && typeOrder.map((type) => {
           const items = grouped[type];
           if (!items || items.length === 0) return null;
           const config = TYPE_CONFIG[type];
@@ -339,7 +379,7 @@ export function SearchPage() {
 
         {DEV_MODE && query.length >= 2 && (
           <p className="text-xs text-center text-muted-foreground pb-4">
-            🔧 Dev Mode — mock search results. Connect Gateway for semantic search.
+            Dev Mode — mock search results. Set VITE_DEV_MODE=false for live semantic search.
           </p>
         )}
       </div>

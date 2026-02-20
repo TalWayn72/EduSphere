@@ -21,11 +21,29 @@ type User @key(fields: "id") {
   id: ID!
 }
 
+type UserCourse {
+  id: ID!
+  courseId: ID!
+  userId: ID!
+  status: String!
+  enrolledAt: String!
+  completedAt: String
+}
+
+type CourseProgress {
+  courseId: ID!
+  totalItems: Int!
+  completedItems: Int!
+  percentComplete: Float!
+}
+
 extend type Query {
   _health: String! @shareable
   course(id: ID!): Course
   courses(limit: Int = 20, offset: Int = 0): [Course!]!
   coursesByInstructor(instructorId: ID!, limit: Int = 20): [Course!]!
+  myEnrollments: [UserCourse!]! @authenticated
+  myCourseProgress(courseId: ID!): CourseProgress! @authenticated
 }
 
 extend type Mutation {
@@ -34,6 +52,9 @@ extend type Mutation {
   deleteCourse(id: ID!): Boolean! @authenticated
   publishCourse(id: ID!): Course! @authenticated
   unpublishCourse(id: ID!): Course! @authenticated
+  enrollCourse(courseId: ID!): UserCourse! @authenticated
+  unenrollCourse(courseId: ID!): Boolean! @authenticated
+  markContentViewed(contentItemId: ID!): Boolean! @authenticated
 }
 
 input CreateCourseInput {
@@ -43,6 +64,7 @@ input CreateCourseInput {
   instructorId: ID!
   thumbnailUrl: String
   estimatedHours: Int
+  isPublished: Boolean
 }
 
 input UpdateCourseInput {

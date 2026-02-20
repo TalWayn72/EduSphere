@@ -1,4 +1,5 @@
 import { useQuery } from 'urql';
+import { useDeferredValue } from 'react';
 import { Layout } from '@/components/Layout';
 import {
   Card,
@@ -11,48 +12,85 @@ import { AIChatPanel } from '@/components/AIChatPanel';
 import { ActivityHeatmap } from '@/components/ActivityHeatmap';
 import { LearningStats } from '@/components/LearningStats';
 import { ActivityFeed } from '@/components/ActivityFeed';
-import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
+import { ME_QUERY, COURSES_QUERY, MY_STATS_QUERY } from '@/lib/queries';
 import {
-  MOCK_HEATMAP_DATA,
   MOCK_COURSE_PROGRESS,
   MOCK_WEEKLY_STATS,
   MOCK_ACTIVITY_FEED,
-  MOCK_LEARNING_STREAK,
-  MOCK_TOTAL_STUDY_MINUTES,
-  MOCK_CONCEPTS_MASTERED,
 } from '@/lib/mock-analytics';
-import { MOCK_ME, MOCK_COURSES } from '@/lib/mock-dashboard.data';
 import {
   BookOpen,
   Users,
   FileText,
   Bot,
-  Flame,
   Clock,
   Brain,
 } from 'lucide-react';
 
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+interface MeQueryResult {
+  me: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    tenantId: string;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+}
+
+interface CourseNode {
+  id: string;
+  title: string;
+  description: string | null;
+  slug: string;
+  isPublished: boolean;
+  estimatedHours: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CoursesQueryResult {
+  courses: CourseNode[];
+}
+
+interface MyStatsResult {
+  myStats: {
+    coursesEnrolled: number;
+    annotationsCreated: number;
+    conceptsMastered: number;
+    totalLearningMinutes: number;
+    weeklyActivity: { date: string; count: number }[];
+  };
+}
+
+function StatSkeleton() {
+  return (
+    <div className="h-8 w-16 bg-muted animate-pulse rounded" />
+  );
+}
 
 export function Dashboard() {
-  const [meResult] = useQuery({ query: ME_QUERY, pause: DEV_MODE });
-  const [coursesResult] = useQuery({
+  const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY });
+  const [coursesResult] = useQuery<CoursesQueryResult>({
     query: COURSES_QUERY,
-    variables: { first: 5 },
-    pause: DEV_MODE,
+    variables: { limit: 5, offset: 0 },
   });
+  const [statsResult] = useQuery<MyStatsResult>({ query: MY_STATS_QUERY });
 
-  const meData = DEV_MODE || meResult.error ? MOCK_ME : meResult.data;
-  const coursesData =
-    DEV_MODE || coursesResult.error ? MOCK_COURSES : coursesResult.data;
-  const meFetching = !DEV_MODE && meResult.fetching;
-  const coursesFetching = !DEV_MODE && coursesResult.fetching;
-  const meError = !DEV_MODE && meResult.error;
+  const stats = statsResult.data?.myStats;
 
-  const totalMinutesDisplay =
-    MOCK_TOTAL_STUDY_MINUTES >= 60
-      ? `${Math.floor(MOCK_TOTAL_STUDY_MINUTES / 60)}h ${MOCK_TOTAL_STUDY_MINUTES % 60}m`
-      : `${MOCK_TOTAL_STUDY_MINUTES}m`;
+  // useDeferredValue defers rendering of the data-intensive ActivityHeatmap.
+  // React will render the heatmap with the previous (stale) data first while
+  // computing the updated layout, keeping the rest of the page responsive.
+  const weeklyActivity = stats?.weeklyActivity ?? [];
+  const deferredActivity = useDeferredValue(weeklyActivity);
+
+  const totalMinutesDisplay = (() => {
+    const m = stats?.totalLearningMinutes ?? 0;
+    return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
+  })();
 
   return (
     <Layout>
@@ -62,53 +100,46 @@ export function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back{meData?.me && `, ${meData.me.firstName}`}!
+            Welcome back{meResult.data?.me && `, ${meResult.data.me.firstName}`}!
           </p>
         </div>
 
-        {DEV_MODE && (
-          <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+        {meResult.error && (
+          <Card className="border-destructive">
             <CardContent className="pt-6">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                🔧 <strong>Development Mode:</strong> Using mock data. Start the
-                Gateway to see real data.
+              <p className="text-destructive">
+                Error loading user data: {meResult.error.message}
               </p>
             </CardContent>
           </Card>
         )}
 
-        {meError && (
+        {statsResult.error && (
           <Card className="border-destructive">
             <CardContent className="pt-6">
               <p className="text-destructive">
-                Error loading user data: {meError.message}
+                Error loading stats: {statsResult.error.message}
               </p>
             </CardContent>
           </Card>
         )}
 
         {/* Primary Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
+              <CardTitle className="text-sm font-medium">Courses Enrolled</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {coursesFetching ? '...' : (coursesData?.courses?.edges?.length ?? 0)}
+                {statsResult.fetching ? (
+                  <StatSkeleton />
+                ) : (
+                  stats?.coursesEnrolled ?? 0
+                )}
               </div>
-              <p className="text-xs text-muted-foreground">Enrolled and in progress</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Learning Streak</CardTitle>
-              <Flame className="h-4 w-4 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{MOCK_LEARNING_STREAK} days</div>
-              <p className="text-xs text-muted-foreground">Keep it up! 🔥</p>
+              <p className="text-xs text-muted-foreground">Active enrollments</p>
             </CardContent>
           </Card>
           <Card>
@@ -117,8 +148,10 @@ export function Dashboard() {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalMinutesDisplay}</div>
-              <p className="text-xs text-muted-foreground">Total this month</p>
+              <div className="text-2xl font-bold">
+                {statsResult.fetching ? <StatSkeleton /> : totalMinutesDisplay}
+              </div>
+              <p className="text-xs text-muted-foreground">Total recorded</p>
             </CardContent>
           </Card>
           <Card>
@@ -127,8 +160,14 @@ export function Dashboard() {
               <Brain className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{MOCK_CONCEPTS_MASTERED}</div>
-              <p className="text-xs text-muted-foreground">In knowledge graph</p>
+              <div className="text-2xl font-bold">
+                {statsResult.fetching ? (
+                  <StatSkeleton />
+                ) : (
+                  stats?.conceptsMastered ?? 0
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">Completed content items</p>
             </CardContent>
           </Card>
         </div>
@@ -137,12 +176,16 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Study Groups</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
+              <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">3</div>
-              <p className="text-xs text-muted-foreground">Active collaborations</p>
+              <div className="text-2xl font-bold">
+                {coursesResult.fetching
+                  ? '...'
+                  : (coursesResult.data?.courses?.length ?? 0)}
+              </div>
+              <p className="text-xs text-muted-foreground">Available in catalog</p>
             </CardContent>
           </Card>
           <Card>
@@ -151,18 +194,27 @@ export function Dashboard() {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">127</div>
+              <div className="text-2xl font-bold">
+                {statsResult.fetching ? (
+                  <StatSkeleton />
+                ) : (
+                  stats?.annotationsCreated ?? 0
+                )}
+              </div>
               <p className="text-xs text-muted-foreground">Notes and highlights</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">AI Sessions</CardTitle>
-              <Bot className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Study Groups</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">45</div>
-              <p className="text-xs text-muted-foreground">Learning agent interactions</p>
+              <div className="text-2xl font-bold">
+                <Bot className="h-4 w-4 inline mr-1 text-muted-foreground" />
+                —
+              </div>
+              <p className="text-xs text-muted-foreground">Active collaborations</p>
             </CardContent>
           </Card>
         </div>
@@ -174,10 +226,16 @@ export function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Study Activity</CardTitle>
-            <CardDescription>Your learning activity over the past 12 weeks</CardDescription>
+            <CardDescription>
+              Your annotation activity over the past 30 days
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ActivityHeatmap data={MOCK_HEATMAP_DATA} />
+            {statsResult.fetching ? (
+              <div className="h-16 bg-muted animate-pulse rounded" />
+            ) : (
+              <ActivityHeatmap data={deferredActivity} />
+            )}
           </CardContent>
         </Card>
 
@@ -193,13 +251,13 @@ export function Dashboard() {
             </CardContent>
           </Card>
 
-          {meFetching ? (
+          {meResult.fetching ? (
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">Loading profile...</p>
               </CardContent>
             </Card>
-          ) : meData?.me ? (
+          ) : meResult.data?.me ? (
             <Card>
               <CardHeader>
                 <CardTitle>Profile</CardTitle>
@@ -208,20 +266,20 @@ export function Dashboard() {
               <CardContent>
                 <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Username</dt>
-                    <dd className="text-sm mt-1">{meData.me.username}</dd>
+                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</dt>
+                    <dd className="text-sm mt-1">{meResult.data.me.firstName} {meResult.data.me.lastName}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</dt>
-                    <dd className="text-sm mt-1">{meData.me.email}</dd>
+                    <dd className="text-sm mt-1">{meResult.data.me.email}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Role</dt>
-                    <dd className="text-sm mt-1">{meData.me.role}</dd>
+                    <dd className="text-sm mt-1">{meResult.data.me.role}</dd>
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tenant</dt>
-                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{meData.me.tenantId}</dd>
+                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{meResult.data.me.tenantId}</dd>
                   </div>
                 </dl>
               </CardContent>

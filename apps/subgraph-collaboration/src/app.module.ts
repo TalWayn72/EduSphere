@@ -2,10 +2,13 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { YogaFederationDriver } from '@graphql-yoga/nestjs-federation';
 import { DiscussionModule } from './discussion/discussion.module';
+import { CrdtModule } from './crdt/crdt.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
   imports: [
+    MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
       typePaths: ['./**/*.graphql'],
@@ -18,6 +21,7 @@ import { authMiddleware } from './auth/auth.middleware';
       introspection: true,
     }),
     DiscussionModule,
+    CrdtModule,
   ],
 })
 export class AppModule {}

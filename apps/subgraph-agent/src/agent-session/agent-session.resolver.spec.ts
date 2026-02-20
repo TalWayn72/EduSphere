@@ -278,7 +278,7 @@ describe('AgentSessionResolver', () => {
 
   describe('messageStream()', () => {
     it('returns an async iterable from pubSub', () => {
-      const iterator = resolver.messageStream();
+      const iterator = resolver.subscribeToMessageStream('session-1');
       expect(iterator).toBeDefined();
       expect(typeof iterator[Symbol.asyncIterator]).toBe('function');
     });

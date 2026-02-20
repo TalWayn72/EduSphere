@@ -88,6 +88,25 @@ extend type Query {
   topicClustersByCourse(courseId: ID!): [TopicCluster!]!
 
   searchSemantic(query: String!, limit: Int = 10): [SemanticResult!]!
+
+  """
+  Find the shortest learning path between two concepts identified by name.
+  Returns null when no path exists between the two concepts.
+  Uses Apache AGE shortestPath() traversing RELATED_TO and PREREQUISITE_OF edges.
+  """
+  learningPath(from: String!, to: String!): LearningPath @authenticated
+
+  """
+  Collect all distinct concepts reachable from a named concept within `depth` hops
+  (default depth 2, max 5) via RELATED_TO edges using COLLECT(DISTINCT ...) aggregation.
+  """
+  relatedConceptsByName(conceptName: String!, depth: Int = 2): [ConceptNode!]! @authenticated
+
+  """
+  Find the deepest prerequisite chain leading into a named concept.
+  Returns nodes ordered from root prerequisite to the target concept.
+  """
+  prerequisiteChain(conceptName: String!): [ConceptNode!]! @authenticated
 }
 
 extend type Mutation {
@@ -144,4 +163,24 @@ type SemanticResult {
   similarity: Float!
   entityType: String!
   entityId: ID!
+}
+
+"""
+A lightweight concept node used in learning path and prerequisite chain results.
+Distinct from the full Concept entity — carries only the fields needed for path display.
+"""
+type ConceptNode {
+  id: ID!
+  name: String!
+  type: String
+}
+
+"""
+Result of a shortestPath query between two concepts.
+concepts: ordered list of ConceptNodes along the path (start inclusive, end inclusive).
+steps: number of edges in the path (= length of path).
+"""
+type LearningPath {
+  concepts: [ConceptNode!]!
+  steps: Int!
 }

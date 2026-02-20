@@ -1,8 +1,17 @@
 import { Resolver, Query, Mutation, Subscription, Args } from '@nestjs/graphql';
+import { createPubSub } from 'graphql-yoga';
 import { AgentService } from './agent.service';
-import { PubSub } from 'graphql-subscriptions';
 
-const pubSub = new PubSub();
+interface ExecutionPayload {
+  id: string;
+  [key: string]: unknown;
+}
+
+const pubSub = createPubSub<{
+  [key: `executionStatus_${string}`]: [
+    { executionStatusChanged: ExecutionPayload },
+  ];
+}>();
 
 @Resolver('AgentExecution')
 export class AgentResolver {
@@ -35,10 +44,10 @@ export class AgentResolver {
   }
 
   @Mutation('startAgentExecution')
-  async startAgentExecution(@Args('input') input: any) {
+  async startAgentExecution(@Args('input') input: unknown) {
     const execution = await this.agentService.startExecution(input);
-    pubSub.publish('EXECUTION_STATUS_CHANGED', {
-      executionStatusChanged: execution,
+    pubSub.publish(`executionStatus_${(execution as ExecutionPayload).id}`, {
+      executionStatusChanged: execution as ExecutionPayload,
     });
     return execution;
   }
@@ -46,18 +55,19 @@ export class AgentResolver {
   @Mutation('cancelAgentExecution')
   async cancelAgentExecution(@Args('id') id: string) {
     const execution = await this.agentService.cancelExecution(id);
-    pubSub.publish('EXECUTION_STATUS_CHANGED', {
-      executionStatusChanged: execution,
+    pubSub.publish(`executionStatus_${(execution as ExecutionPayload).id}`, {
+      executionStatusChanged: execution as ExecutionPayload,
     });
     return execution;
   }
 
   @Subscription('executionStatusChanged', {
-    filter: (payload, variables) => {
-      return payload.executionStatusChanged.id === variables.executionId;
-    },
+    filter: (
+      payload: { executionStatusChanged: ExecutionPayload },
+      variables: { executionId: string }
+    ) => payload.executionStatusChanged.id === variables.executionId,
   })
-  executionStatusChanged() {
-    return pubSub.asyncIterableIterator('EXECUTION_STATUS_CHANGED');
+  executionStatusChanged(@Args('executionId') executionId: string) {
+    return pubSub.subscribe(`executionStatus_${executionId}`);
   }
 }

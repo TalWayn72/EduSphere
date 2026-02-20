@@ -86,3 +86,16 @@ dist/
 *.key
 *.crt
 secrets/
+
+# Test output artifacts
+coverage_result*.txt
+*_result.txt
+*_result2.txt
+
+# Windows NUL device artifacts
+nul
+apps/web/nul
+
+# Windows temp path artifacts (created by Windows path confusion)
+"apps/web/C:*"
+apps/web/C:*

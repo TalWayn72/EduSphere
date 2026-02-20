@@ -1,5 +1,6 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UserService } from './user.service';
+import { UserStatsService } from './user-stats.service';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
@@ -9,7 +10,10 @@ interface GraphQLContext {
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly userStatsService: UserStatsService
+  ) {}
 
   @Query('_health')
   health(): string {
@@ -38,6 +42,17 @@ export class UserResolver {
     return this.userService.findById(
       context.authContext.userId,
       context.authContext
+    );
+  }
+
+  @Query('myStats')
+  async getMyStats(@Context() context: GraphQLContext) {
+    if (!context.authContext) {
+      throw new Error('Unauthenticated');
+    }
+    return this.userStatsService.getMyStats(
+      context.authContext.userId,
+      context.authContext.tenantId || ''
     );
   }
 

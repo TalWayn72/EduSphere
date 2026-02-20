@@ -5,7 +5,7 @@ import {
   Args,
   ResolveReference,
 } from '@nestjs/graphql';
-import { EmbeddingService } from './embedding.service';
+import { EmbeddingService, type SegmentInput } from './embedding.service';
 
 @Resolver('Embedding')
 export class EmbeddingResolver {
@@ -23,13 +23,31 @@ export class EmbeddingResolver {
     return this.embeddingService.findByContentItem(contentItemId);
   }
 
+  @Query('embeddingsBySegment')
+  async getEmbeddingsBySegment(@Args('segmentId') segmentId: string) {
+    return this.embeddingService.findBySegment(segmentId);
+  }
+
   @Query('semanticSearch')
   async semanticSearch(
     @Args('query') query: number[],
     @Args('limit') limit: number = 10,
     @Args('minSimilarity') minSimilarity: number = 0.7
   ) {
-    return this.embeddingService.semanticSearch(query, limit, minSimilarity);
+    return this.embeddingService.semanticSearchByVector(
+      query,
+      limit,
+      minSimilarity
+    );
+  }
+
+  @Query('semanticSearchByText')
+  async semanticSearchByText(
+    @Args('query') query: string,
+    @Args('tenantId') tenantId: string,
+    @Args('limit') limit: number = 10
+  ) {
+    return this.embeddingService.semanticSearch(query, tenantId, limit);
   }
 
   @Query('semanticSearchByContentItem')
@@ -38,16 +56,30 @@ export class EmbeddingResolver {
     @Args('query') query: number[],
     @Args('limit') limit: number = 5
   ) {
-    return this.embeddingService.semanticSearchByContentItem(
-      contentItemId,
-      query,
-      limit
-    );
+    // Legacy — delegates to vector search ignoring contentItemId filter
+    return this.embeddingService.semanticSearchByVector(query, limit, 0.7);
+  }
+
+  @Mutation('generateEmbedding')
+  async generateEmbedding(
+    @Args('text') text: string,
+    @Args('segmentId') segmentId: string
+  ) {
+    return this.embeddingService.generateEmbedding(text, segmentId);
+  }
+
+  @Mutation('generateBatchEmbeddings')
+  async generateBatchEmbeddings(
+    @Args('segments') segments: SegmentInput[]
+  ): Promise<number> {
+    return this.embeddingService.generateBatchEmbeddings(segments);
   }
 
   @Mutation('createEmbedding')
-  async createEmbedding(@Args('input') input: any) {
-    return this.embeddingService.create(input);
+  async createEmbedding(@Args('input') _input: unknown) {
+    throw new Error(
+      'Use generateEmbedding or generateBatchEmbeddings instead'
+    );
   }
 
   @Mutation('deleteEmbedding')

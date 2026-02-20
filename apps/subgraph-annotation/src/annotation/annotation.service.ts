@@ -295,6 +295,33 @@ export class AnnotationService {
     return this.update(id, { isResolved: true }, authContext);
   }
 
+  async replyTo(
+    parentId: string,
+    content: string,
+    authContext: AuthContext
+  ) {
+    if (!authContext || !authContext.tenantId) {
+      throw new Error('Authentication required');
+    }
+
+    // Load parent to inherit layer and assetId
+    const parent = await this.findById(parentId, authContext);
+    if (!parent) {
+      throw new Error('Parent annotation not found');
+    }
+
+    return this.create(
+      {
+        assetId: parent.asset_id,
+        annotationType: parent.annotation_type,
+        layer: parent.layer,
+        content: { text: content },
+        parentId,
+      },
+      authContext
+    );
+  }
+
   async delete(id: string, authContext: AuthContext): Promise<boolean> {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');

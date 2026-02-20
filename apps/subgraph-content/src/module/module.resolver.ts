@@ -8,10 +8,25 @@ import {
   ResolveReference,
 } from '@nestjs/graphql';
 import { ModuleService } from './module.service';
+import { ContentItemService } from '../content-item/content-item.service';
+
+interface ModuleParent {
+  id: string;
+}
+
+interface ModuleInput {
+  courseId?: string;
+  title?: string;
+  description?: string;
+  orderIndex?: number;
+}
 
 @Resolver('Module')
 export class ModuleResolver {
-  constructor(private readonly moduleService: ModuleService) {}
+  constructor(
+    private readonly moduleService: ModuleService,
+    private readonly contentItemService: ContentItemService,
+  ) {}
 
   @Query('module')
   async getModule(@Args('id') id: string) {
@@ -24,12 +39,12 @@ export class ModuleResolver {
   }
 
   @Mutation('createModule')
-  async createModule(@Args('input') input: any) {
+  async createModule(@Args('input') input: ModuleInput) {
     return this.moduleService.create(input);
   }
 
   @Mutation('updateModule')
-  async updateModule(@Args('id') id: string, @Args('input') input: any) {
+  async updateModule(@Args('id') id: string, @Args('input') input: ModuleInput) {
     return this.moduleService.update(id, input);
   }
 
@@ -47,9 +62,8 @@ export class ModuleResolver {
   }
 
   @ResolveField('contentItems')
-  async getContentItems(@Parent() _module: any) {
-    // Will be resolved by ContentItem resolver
-    return [];
+  async getContentItems(@Parent() mod: ModuleParent) {
+    return this.contentItemService.findByModule(mod.id);
   }
 
   @ResolveReference()

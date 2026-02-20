@@ -58,6 +58,20 @@ export class DiscussionResolver {
     );
   }
 
+  @Query('myDiscussions')
+  async getMyDiscussions(
+    @Args('limit') limit: number = 20,
+    @Args('offset') offset: number = 0,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext) throw new Error('Unauthenticated');
+    return this.discussionService.findDiscussionsByUser(
+      limit,
+      offset,
+      context.authContext
+    );
+  }
+
   @Query('discussionMessages')
   async getDiscussionMessages(
     @Args('discussionId') discussionId: string,

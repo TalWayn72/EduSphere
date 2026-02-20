@@ -1,0 +1,44 @@
+type PresignedUploadUrl {
+  uploadUrl: String!
+  fileKey: String!
+  expiresAt: String!
+}
+
+type MediaAsset {
+  id: ID!
+  courseId: ID!
+  fileKey: String!
+  title: String!
+  contentType: String!
+  status: MediaStatus!
+  downloadUrl: String
+  """
+  Presigned URL for the HLS master manifest (.m3u8).
+  Null until HLS transcoding completes (non-blocking background step).
+  Valid for 1 hour after generation.
+  """
+  hlsManifestUrl: String
+}
+
+enum MediaStatus {
+  UPLOADING
+  PROCESSING
+  READY
+  ERROR
+}
+
+extend type Query {
+  getPresignedUploadUrl(
+    fileName: String!
+    contentType: String!
+    courseId: ID!
+  ): PresignedUploadUrl! @authenticated
+}
+
+extend type Mutation {
+  confirmMediaUpload(
+    fileKey: String!
+    courseId: ID!
+    title: String!
+  ): MediaAsset! @authenticated
+}

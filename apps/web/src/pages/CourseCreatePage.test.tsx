@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser } from '@/lib/auth';
 
@@ -35,6 +35,27 @@ vi.mock('@/components/ui/select', () => ({
   ),
 }));
 
+// Stub Media step — requires Hocuspocus/Yjs which can't run in jsdom
+vi.mock('./CourseWizardMediaStep', () => ({
+  CourseWizardMediaStep: () => <div data-testid="media-step">Media Upload</div>,
+}));
+
+// Stub sonner toast — prevents real toast system from mounting
+vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+
+// Mock urql so useMutation doesn't throw "No client" in tests.
+// We spread the real module so `gql` and other named exports remain available.
+const mockExecuteMutation = vi.fn().mockResolvedValue({ data: null, error: null });
+vi.mock('urql', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('urql')>();
+  return {
+    ...actual,
+    useMutation: () => [{ fetching: false, data: null, error: null }, mockExecuteMutation],
+    useQuery: () => [{ fetching: false, data: null, error: null }, vi.fn()],
+    Provider: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
+
 import { getCurrentUser } from '@/lib/auth';
 import { CourseCreatePage } from './CourseCreatePage';
 
@@ -59,17 +80,28 @@ const renderPage = () =>
   );
 
 /** Navigate the wizard to Step 2 by filling in the title and clicking Next */
-function advanceToStep2(title = 'Test Course') {
+async function advanceToStep2(title = 'Test Course That Is Long Enough') {
   fireEvent.change(screen.getByLabelText(/course title/i), {
     target: { value: title },
   });
-  fireEvent.click(screen.getByRole('button', { name: /next/i }));
+  // RHF validates on blur/touch — trigger validation before clicking Next
+  fireEvent.blur(screen.getByLabelText(/course title/i));
+  await act(async () => {
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+  });
 }
 
-/** Navigate the wizard to Step 3 */
-function advanceToStep3(title = 'Test Course') {
-  advanceToStep2(title);
-  fireEvent.click(screen.getByRole('button', { name: /next/i }));
+/** Navigate the wizard to Step 3 (Publish/Review) */
+async function advanceToStep3(title = 'Test Course That Is Long Enough') {
+  await advanceToStep2(title);
+  // Step 2 (Modules) → Step 3 (Media)
+  await act(async () => {
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+  });
+  // Step 3 (Media) → Step 4 (Publish)
+  await act(async () => {
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+  });
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -78,6 +110,7 @@ describe('CourseCreatePage', () => {
   beforeEach(() => {
     vi.mocked(getCurrentUser).mockReturnValue(INSTRUCTOR_USER);
     mockNavigate.mockClear();
+    mockExecuteMutation.mockResolvedValue({ data: null, error: null });
   });
 
   afterEach(() => {
@@ -93,14 +126,8 @@ describe('CourseCreatePage', () => {
 
   it('renders Step 1 (Course Info) card heading initially', () => {
     renderPage();
-    // The card h2 heading for the current step
     expect(screen.getByRole('heading', { name: /course info/i, level: 2 })).toBeInTheDocument();
     expect(screen.getByLabelText(/course title/i)).toBeInTheDocument();
-  });
-
-  it('shows "Title is required" validation message when title is empty', () => {
-    renderPage();
-    expect(screen.getByText('Title is required')).toBeInTheDocument();
   });
 
   it('shows Description textarea in Step 1', () => {
@@ -124,12 +151,20 @@ describe('CourseCreatePage', () => {
     expect(nextBtn).toBeDisabled();
   });
 
-  it('Next button is enabled after entering a title', () => {
+  it('Next button is enabled after entering a title of 3+ chars', () => {
     renderPage();
     const titleInput = screen.getByLabelText(/course title/i);
-    fireEvent.change(titleInput, { target: { value: 'My Test Course' } });
+    fireEvent.change(titleInput, { target: { value: 'ABC' } });
     const nextBtn = screen.getByRole('button', { name: /next/i });
     expect(nextBtn).not.toBeDisabled();
+  });
+
+  it('Next button remains disabled for a title shorter than 3 chars', () => {
+    renderPage();
+    const titleInput = screen.getByLabelText(/course title/i);
+    fireEvent.change(titleInput, { target: { value: 'AB' } });
+    const nextBtn = screen.getByRole('button', { name: /next/i });
+    expect(nextBtn).toBeDisabled();
   });
 
   it('Back button is disabled on Step 1', () => {
@@ -138,34 +173,43 @@ describe('CourseCreatePage', () => {
     expect(backBtn).toBeDisabled();
   });
 
+  it('shows title validation error after blurring with a too-short title', async () => {
+    renderPage();
+    const titleInput = screen.getByLabelText(/course title/i);
+    fireEvent.change(titleInput, { target: { value: 'AB' } });
+    fireEvent.blur(titleInput);
+    await waitFor(() => {
+      expect(screen.getByText(/title must be at least 3 characters/i)).toBeInTheDocument();
+    });
+  });
+
   // ── Step 1 → Step 2 navigation ──────────────────────────────────────────
 
-  it('entering a title and clicking Next advances to Step 2 (Modules card heading)', () => {
+  it('entering a title and clicking Next advances to Step 2 (Modules card heading)', async () => {
     renderPage();
-    advanceToStep2('Introduction to Talmud');
-    // The active step card renders an h2 "Modules"
+    await advanceToStep2('Introduction to Talmud Study');
     expect(screen.getByRole('heading', { name: /^modules$/i, level: 2 })).toBeInTheDocument();
     expect(screen.getByLabelText(/module title/i)).toBeInTheDocument();
   });
 
   // ── Step 2 module management ────────────────────────────────────────────
 
-  it('Step 2 shows empty state when no modules exist', () => {
+  it('Step 2 shows empty state when no modules exist', async () => {
     renderPage();
-    advanceToStep2();
+    await advanceToStep2();
     expect(screen.getByText(/no modules yet/i)).toBeInTheDocument();
   });
 
-  it('Add Module button is disabled when module title is empty', () => {
+  it('Add Module button is disabled when module title is empty', async () => {
     renderPage();
-    advanceToStep2();
+    await advanceToStep2();
     const addBtn = screen.getByRole('button', { name: /add module/i });
     expect(addBtn).toBeDisabled();
   });
 
-  it('adding a module title and clicking Add Module shows it in the list', () => {
+  it('adding a module title and clicking Add Module shows it in the list', async () => {
     renderPage();
-    advanceToStep2();
+    await advanceToStep2();
 
     fireEvent.change(screen.getByLabelText(/module title/i), {
       target: { value: 'Intro to Gemara' },
@@ -176,9 +220,9 @@ describe('CourseCreatePage', () => {
     expect(screen.getByText('Module 1')).toBeInTheDocument();
   });
 
-  it('pressing Enter in module title input adds the module', () => {
+  it('pressing Enter in module title input adds the module', async () => {
     renderPage();
-    advanceToStep2();
+    await advanceToStep2();
 
     const moduleTitleInput = screen.getByLabelText(/module title/i);
     fireEvent.change(moduleTitleInput, { target: { value: 'Tractate Berakhot' } });
@@ -187,9 +231,9 @@ describe('CourseCreatePage', () => {
     expect(screen.getByText('Tractate Berakhot')).toBeInTheDocument();
   });
 
-  it('removing a module removes it from the list', () => {
+  it('removing a module removes it from the list', async () => {
     renderPage();
-    advanceToStep2();
+    await advanceToStep2();
 
     fireEvent.change(screen.getByLabelText(/module title/i), {
       target: { value: 'Module to Remove' },
@@ -201,42 +245,45 @@ describe('CourseCreatePage', () => {
     expect(screen.queryByText('Module to Remove')).not.toBeInTheDocument();
   });
 
-  it('Back button on Step 2 returns to Step 1 (Course Title input visible)', () => {
+  it('Back button on Step 2 returns to Step 1 (Course Title input visible)', async () => {
     renderPage();
-    advanceToStep2();
-    // Now on step 2 — click Back
+    await advanceToStep2();
     fireEvent.click(screen.getByRole('button', { name: /^back$/i }));
-    // Back on step 1 — title input should be visible again
     expect(screen.getByLabelText(/course title/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/module title/i)).not.toBeInTheDocument();
   });
 
   // ── Step 2 → Step 3 navigation ──────────────────────────────────────────
 
-  it('Step 3 shows review card with course title', () => {
+  it('Step 3 shows review card with course title', async () => {
     renderPage();
-    advanceToStep3('GraphQL Mastery');
-    expect(screen.getByText('GraphQL Mastery')).toBeInTheDocument();
+    await advanceToStep3('GraphQL Mastery Course');
+    expect(screen.getByText('GraphQL Mastery Course')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /publish course/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save as draft/i })).toBeInTheDocument();
   });
 
-  it('"Back to Modules" button on Step 3 returns to Step 2', () => {
+  it('"Back to Media" button on Step 3 returns to Media step', async () => {
     renderPage();
-    advanceToStep3();
-    fireEvent.click(screen.getByRole('button', { name: /back to modules/i }));
-    expect(screen.getByLabelText(/module title/i)).toBeInTheDocument();
+    await advanceToStep3();
+    fireEvent.click(screen.getByRole('button', { name: /back to media/i }));
+    expect(screen.getByTestId('media-step')).toBeInTheDocument();
   });
 
-  it('Step 3 shows module count in review card', () => {
+  it('Step 3 shows module count in review card', async () => {
     renderPage();
-    advanceToStep2();
+    await advanceToStep2();
 
     fireEvent.change(screen.getByLabelText(/module title/i), {
       target: { value: 'Module A' },
     });
     fireEvent.click(screen.getByRole('button', { name: /add module/i }));
-    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    });
 
     expect(screen.getByText('1 module')).toBeInTheDocument();
     expect(screen.getByText('Module A')).toBeInTheDocument();
@@ -244,50 +291,46 @@ describe('CourseCreatePage', () => {
 
   // ── Step 3 publish actions ──────────────────────────────────────────────
 
-  it('clicking "Publish Course" triggers navigation with published=true', async () => {
-    vi.useFakeTimers();
+  it('clicking "Publish Course" calls executeMutation with isPublished=true', async () => {
+    mockExecuteMutation.mockResolvedValue({
+      data: { createCourse: { id: 'course-1', title: 'GraphQL Mastery Course' } },
+      error: null,
+    });
     renderPage();
-    advanceToStep3('My Published Course');
+    await advanceToStep3('GraphQL Mastery Course');
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /publish course/i }));
-      vi.runAllTimers();
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      '/courses',
+    expect(mockExecuteMutation).toHaveBeenCalledWith(
       expect.objectContaining({
-        state: expect.objectContaining({
-          newCourse: expect.objectContaining({ published: true }),
-        }),
+        input: expect.objectContaining({ isPublished: true }),
       })
     );
   });
 
-  it('clicking "Save as Draft" triggers navigation with published=false', async () => {
-    vi.useFakeTimers();
+  it('clicking "Save as Draft" calls executeMutation with isPublished=false', async () => {
+    mockExecuteMutation.mockResolvedValue({
+      data: { createCourse: { id: 'course-2', title: 'Draft Course Enough Chars' } },
+      error: null,
+    });
     renderPage();
-    advanceToStep3('Draft Course');
+    await advanceToStep3('Draft Course Enough Chars');
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /save as draft/i }));
-      vi.runAllTimers();
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      '/courses',
+    expect(mockExecuteMutation).toHaveBeenCalledWith(
       expect.objectContaining({
-        state: expect.objectContaining({
-          newCourse: expect.objectContaining({ published: false }),
-        }),
+        input: expect.objectContaining({ isPublished: false }),
       })
     );
   });
 
-  it('step indicator renders all three step labels', () => {
+  it('step indicator renders all four step labels', () => {
     renderPage();
-    // Step labels appear multiple times (indicator + card heading)
-    // Use getAllByText to avoid multiple-match errors
     expect(screen.getAllByText('Course Info').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Modules').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Publish').length).toBeGreaterThanOrEqual(1);
@@ -295,21 +338,19 @@ describe('CourseCreatePage', () => {
 
   it('"Courses" back nav button navigates to /courses', () => {
     renderPage();
-    // The "Courses" button in the header (not a nav link — it's a ghost Button)
     const coursesBtn = screen.getByRole('button', { name: /courses/i });
     fireEvent.click(coursesBtn);
     expect(mockNavigate).toHaveBeenCalledWith('/courses');
   });
 
-  it('Step 3 review shows "Review and publish" description', () => {
+  it('Step 3 review shows "Review and publish" description', async () => {
     renderPage();
-    advanceToStep3();
+    await advanceToStep3();
     expect(screen.getByText(/review your course before publishing/i)).toBeInTheDocument();
   });
 
   it('difficulty options are displayed in Step 1', () => {
     renderPage();
-    // SelectValue stub shows "Beginner"; SelectItem also renders difficulty labels
     expect(screen.getAllByText('Beginner').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Intermediate').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Advanced').length).toBeGreaterThanOrEqual(1);

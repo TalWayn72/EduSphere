@@ -77,6 +77,9 @@ extend type Query {
   """Get all discussions for a course"""
   discussions(courseId: ID!, limit: Int = 20, offset: Int = 0): [Discussion!]! @authenticated
 
+  """Get all discussions the current user has participated in"""
+  myDiscussions(limit: Int = 20, offset: Int = 0): [Discussion!]! @authenticated
+
   """Get all messages in a discussion"""
   discussionMessages(discussionId: ID!, limit: Int = 50, offset: Int = 0): [DiscussionMessage!]! @authenticated
 }

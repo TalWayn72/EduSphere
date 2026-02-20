@@ -7,6 +7,7 @@ export * from './core';
 
 // Content tables
 export * from './content';
+export * from './contentItems';
 
 // Annotation tables
 export * from './annotation';

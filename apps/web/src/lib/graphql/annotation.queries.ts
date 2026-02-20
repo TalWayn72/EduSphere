@@ -34,6 +34,25 @@ export const ANNOTATIONS_QUERY = gql`
   }
 `;
 
+/** Fetch all annotations belonging to the current user (by userId). */
+export const MY_ANNOTATIONS_QUERY = gql`
+  query MyAnnotations($userId: ID!, $limit: Int, $offset: Int) {
+    annotationsByUser(userId: $userId, limit: $limit, offset: $offset) {
+      id
+      assetId
+      userId
+      layer
+      annotationType
+      content
+      spatialData
+      parentId
+      isResolved
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const CREATE_ANNOTATION_MUTATION = gql`
   mutation CreateAnnotation($input: CreateAnnotationInput!) {
     createAnnotation(input: $input) {

@@ -1,12 +1,15 @@
 import { gql } from 'urql';
 
+/**
+ * Start a new agent session.
+ * Schema: startAgentSession(templateType: TemplateType!, context: JSON!): AgentSession!
+ */
 export const START_AGENT_SESSION_MUTATION = gql`
-  mutation StartAgentSession($input: StartAgentSessionInput!) {
-    startAgentSession(input: $input) {
+  mutation StartAgentSession($templateType: TemplateType!, $context: JSON!) {
+    startAgentSession(templateType: $templateType, context: $context) {
       id
       templateType
       status
-      contextContentId
       createdAt
     }
   }
@@ -20,6 +23,12 @@ export const SEND_AGENT_MESSAGE_MUTATION = gql`
       content
       createdAt
     }
+  }
+`;
+
+export const END_SESSION_MUTATION = gql`
+  mutation EndAgentSession($sessionId: ID!) {
+    endSession(sessionId: $sessionId)
   }
 `;
 
@@ -41,21 +50,32 @@ export const AGENT_SESSION_QUERY = gql`
 `;
 
 export const MY_SESSIONS_QUERY = gql`
-  query MyAgentSessions($first: Int) {
-    myAgentSessions(first: $first) {
-      edges {
-        node {
-          id
-          templateType
-          status
-          createdAt
-          messages(last: 1) {
-            id
-            content
-            role
-          }
-        }
+  query MyAgentSessions {
+    myAgentSessions {
+      id
+      templateType
+      status
+      createdAt
+      messages {
+        id
+        content
+        role
       }
+    }
+  }
+`;
+
+/**
+ * Fetch all available agent templates.
+ * Schema: agentTemplates: [AgentTemplate!]!
+ */
+export const AGENT_TEMPLATES_QUERY = gql`
+  query AgentTemplates {
+    agentTemplates {
+      id
+      name
+      templateType
+      systemPrompt
     }
   }
 `;
@@ -66,17 +86,7 @@ export const MESSAGE_STREAM_SUBSCRIPTION = gql`
       id
       role
       content
-      isStreaming
       createdAt
-    }
-  }
-`;
-
-export const END_SESSION_MUTATION = gql`
-  mutation EndAgentSession($sessionId: ID!) {
-    endSession(sessionId: $sessionId) {
-      id
-      status
     }
   }
 `;

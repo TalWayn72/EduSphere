@@ -5,10 +5,12 @@ import { AgentSessionModule } from './agent-session/agent-session.module';
 import { AgentMessageModule } from './agent-message/agent-message.module';
 import { TemplateModule } from './template/template.module';
 import { AgentModule } from './agent/agent.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
   imports: [
+    MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
       typePaths: ['./**/*.graphql'],

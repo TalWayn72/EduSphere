@@ -1,0 +1,30 @@
+{
+  "name": "@edusphere/nats-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:cov": "vitest run --coverage"
+  },
+  "dependencies": {
+    "nats": "^2.29.3"
+  },
+  "devDependencies": {
+    "@edusphere/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^4.0.18",
+    "typescript": "^6.0.3",
+    "vitest": "^4.0.18"
+  }
+}

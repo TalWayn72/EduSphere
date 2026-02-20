@@ -60,6 +60,12 @@ type Mutation {
   updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation! @authenticated
   deleteAnnotation(id: ID!): Boolean! @authenticated
   resolveAnnotation(id: ID!): Annotation! @authenticated
+  replyToAnnotation(annotationId: ID!, content: String!): Annotation! @authenticated
+}
+
+type Subscription {
+  """Subscribe to new annotations on a specific asset in real-time"""
+  annotationAdded(assetId: ID!): Annotation!
 }
 
 input CreateAnnotationInput {

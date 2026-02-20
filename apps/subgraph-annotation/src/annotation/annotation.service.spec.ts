@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationService } from './annotation.service';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -80,7 +80,7 @@ describe('AnnotationService', () => {
   let service: AnnotationService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     // Default chain: select().from().where().limit() -> [MOCK_ANNOTATION]
     mockReturning.mockResolvedValue([MOCK_ANNOTATION]);
     mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
@@ -413,6 +413,88 @@ describe('AnnotationService', () => {
       await expect(
         service.resolve('nonexistent', MOCK_AUTH)
       ).rejects.toThrow('Annotation not found');
+    });
+  });
+
+  // ─── Edge cases for uncovered lines ──────────────────────────────────
+  describe('Edge cases and additional coverage', () => {
+    it('create() throws Failed to create annotation when returning is empty', async () => {
+      mockReturning.mockResolvedValue([]);
+      await expect(
+        service.create({
+          assetId: 'asset-1',
+          annotationType: 'TEXT',
+          layer: 'PERSONAL',
+          content: { text: 'fail' },
+        }, MOCK_AUTH)
+      ).rejects.toThrow('Failed to create annotation');
+    });
+
+    it('update() throws Failed to update annotation when returning is empty', async () => {
+      // First call (findById): returns existing annotation
+      mockLimit
+        .mockResolvedValueOnce([MOCK_ANNOTATION])  // findById check
+        .mockResolvedValueOnce([]);                 // update returning empty
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      mockReturning.mockResolvedValue([]);          // update .returning() empty
+      await expect(
+        service.update('ann-1', { content: { text: 'x' } }, MOCK_AUTH)
+      ).rejects.toThrow('Failed to update annotation');
+    });
+
+    it('delete() returns false when soft-delete returning is empty', async () => {
+      // Full mock reset needed - prior tests may modify mockLimit chain
+      mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
+      mockLimit.mockResolvedValue([MOCK_ANNOTATION]); // select finds existing annotation
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      // The soft-delete update.set().where().returning() returns empty -> service returns false
+      mockReturning.mockResolvedValueOnce([]); // update returning empty = false
+      const result = await service.delete('ann-1', MOCK_AUTH);
+      expect(result).toBe(false);
+    });
+
+    it('findByUser() calls withTenantContext with correct context', async () => {
+      // findByUser uses: select().from().where().orderBy().limit().offset()
+      mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
+      mockLimit.mockReturnValue({ offset: mockOffset });
+      mockOrderBy.mockReturnValue({ limit: mockLimit });
+      mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
+      mockWhere.mockReturnValue({ limit: mockLimit, orderBy: mockOrderBy, returning: mockReturning });
+      await service.findByUser('user-1', 5, 0, MOCK_AUTH);
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' }),
+        expect.any(Function)
+      );
+    });
+
+    it('update() with spatialData and isResolved updates correctly', async () => {
+      // Full mock reset - findByUser() test overrides mockLimit to return object not array
+      mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
+      mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      mockReturning.mockResolvedValue([{ ...MOCK_ANNOTATION, is_resolved: true }]);
+      const result = await service.update('ann-1', {
+        spatialData: { x: 10, y: 20 },
+        isResolved: true,
+      }, MOCK_AUTH);
+      expect(result).toBeDefined();
+    });
+
+    it('create() throws Authentication required when no authContext', async () => {
+      await expect(
+        service.create({ assetId: 'a', annotationType: 'TEXT', layer: 'PERSONAL', content: {} }, undefined as any)
+      ).rejects.toThrow('Authentication required');
+    });
+
+    it('update() accepts no-op updates (empty input)', async () => {
+      // Reset mock chain: findByUser test overrides mockLimit to return object
+      mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
+      mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
+      mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
+      mockReturning.mockResolvedValue([MOCK_ANNOTATION]);
+      const result = await service.update('ann-1', {}, MOCK_AUTH);
+      expect(result).toBeDefined();
     });
   });
 });

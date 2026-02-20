@@ -1,7 +1,3 @@
-type ContentItem @key(fields: "id") {
-  id: ID!
-}
-
 type Module @key(fields: "id") {
   id: ID!
   courseId: ID!

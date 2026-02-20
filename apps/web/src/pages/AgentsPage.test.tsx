@@ -14,6 +14,7 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
+    useQuery: vi.fn(() => [{ data: { agentTemplates: [] }, fetching: false, error: undefined }, vi.fn()]),
     useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
     useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
   };

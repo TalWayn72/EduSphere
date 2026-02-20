@@ -6,35 +6,20 @@
  *   1. HTML5 video player (keyboard shortcuts, seek bar, playback speed)
  *   2. Transcript sync (auto-scroll, highlight search terms)
  *   3. Annotation layers (CRUD, layer toggle, optimistic updates, threading)
- *   4. AI Chavruta chat (session management, mock Chavruta responses)
- * Shared utilities and constants live in ./content-viewer.utils.ts.
+ *   4. AI Chavruta chat (session management, Chavruta responses)
+ * Data fetching and AI chat logic live in dedicated hooks (hooks/use*.ts).
  */
 import { useState, useRef, useCallback, useEffect } from 'react';
+import Hls from 'hls.js';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
-import {
-  ANNOTATIONS_QUERY,
-  CREATE_ANNOTATION_MUTATION,
-} from '@/lib/graphql/annotation.queries';
-import {
-  START_AGENT_SESSION_MUTATION,
-  SEND_AGENT_MESSAGE_MUTATION,
-} from '@/lib/graphql/agent.queries';
-import {
-  mockVideo,
-  mockTranscript,
-  mockBookmarks,
-  TranscriptSegment,
-} from '@/lib/mock-content-data';
-import {
-  getThreadedAnnotations,
-  filterAnnotationsByLayers,
-} from '@/lib/mock-annotations';
+import { useContentData } from '@/hooks/useContentData';
+import { useAnnotations } from '@/hooks/useAnnotations';
+import { useAgentChat } from '@/hooks/useAgentChat';
+import { mockBookmarks } from '@/lib/mock-content-data';
 import { mockGraphData } from '@/lib/mock-graph-data';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
 import {
@@ -57,26 +42,54 @@ import {
   ChevronRight,
   Plus,
   Send,
+  AlertCircle,
 } from 'lucide-react';
 import { VideoProgressMarkers } from '@/components/VideoProgressMarkers';
 import { AddAnnotationOverlay } from '@/components/AddAnnotationOverlay';
 import { LayerToggleBar } from '@/components/LayerToggleBar';
 import { AnnotationThread } from '@/components/AnnotationThread';
+import { ContentViewerBreadcrumb } from '@/components/ContentViewerBreadcrumb';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+// ─── Skeleton helpers ──────────────────────────────────────────────────────────
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+function SkeletonLine({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`bg-muted animate-pulse rounded ${className}`}
+      aria-hidden="true"
+    />
+  );
+}
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-red-800 bg-red-50 border border-red-200 rounded-md">
+      <AlertCircle className="h-3 w-3 flex-shrink-0" />
+      {message} — showing cached data.
+    </div>
+  );
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────────
 export function ContentViewer() {
   const { contentId = 'content-1' } = useParams<{ contentId: string }>();
 
   // ── Video state ──
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
-  // ── Annotations state ──
+  // ── Layer / annotation form state ──
   const [activeLayers, setActiveLayers] = useState<AnnotationLayer[]>([
     AnnotationLayer.PERSONAL,
     AnnotationLayer.SHARED,
@@ -84,74 +97,75 @@ export function ContentViewer() {
     AnnotationLayer.AI_GENERATED,
   ]);
   const [newAnnotation, setNewAnnotation] = useState('');
-  const [newLayer, setNewLayer] = useState<AnnotationLayer>(
-    AnnotationLayer.PERSONAL
-  );
+  const [newLayer, setNewLayer] = useState<AnnotationLayer>(AnnotationLayer.PERSONAL);
   const [showAnnotationForm, setShowAnnotationForm] = useState(false);
-  const [localAnnotations, setLocalAnnotations] = useState<Annotation[]>([]);
 
   // ── Search state ──
   const [searchQuery, setSearchQuery] = useState('');
 
-  // ── AI Chat state ──
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: '1',
-      role: 'agent',
-      content: `שלום! I'm your Chavruta learning partner. I can help you debate, understand, and explore the concepts in this lesson. Ask me anything!`,
-    },
-  ]);
-  const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  // ── Refs for scroll sync ──
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
   const activeSegmentRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
 
-  // ── GraphQL ──
-  const [contentResult] = useQuery({
-    query: CONTENT_ITEM_QUERY,
-    variables: { id: contentId },
-    pause: DEV_MODE,
-  });
+  // ── Data hooks ──
+  const {
+    videoUrl,
+    hlsManifestUrl,
+    videoTitle,
+    transcript,
+    fetching: contentFetching,
+    error: contentError,
+  } = useContentData(contentId);
 
-  const [annotationsResult] = useQuery({
-    query: ANNOTATIONS_QUERY,
-    variables: { assetId: contentId, layers: activeLayers },
-    pause: DEV_MODE,
-  });
+  const {
+    annotations,
+    fetching: annotFetching,
+    error: annotError,
+    addAnnotation,
+    addReply,
+  } = useAnnotations(contentId, activeLayers);
 
-  const [, createAnnotation] = useMutation(CREATE_ANNOTATION_MUTATION);
-  const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
-  const [, sendMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
+  const { messages: chatMessages, chatInput, setChatInput, sendMessage: sendChatMessage, chatEndRef, isStreaming } =
+    useAgentChat(contentId);
 
-  // ── Derived data (real or mock) ──
-  const baseAnnotations: Annotation[] =
-    DEV_MODE || annotationsResult.error
-      ? filterAnnotationsByLayers(getThreadedAnnotations(), activeLayers)
-      : (annotationsResult.data?.annotations ?? []);
-
-  // Merge optimistically-added local annotations (DEV_MODE only)
-  const annotations: Annotation[] = DEV_MODE
-    ? [
-        ...filterAnnotationsByLayers(localAnnotations, activeLayers),
-        ...baseAnnotations,
-      ]
-    : baseAnnotations;
-
-  const transcript: TranscriptSegment[] = DEV_MODE
-    ? mockTranscript
-    : (contentResult.data?.contentItem?.transcript?.segments ?? mockTranscript);
   const bookmarks = mockBookmarks;
-  const videoUrl = DEV_MODE
-    ? mockVideo.url
-    : (contentResult.data?.contentItem?.mediaAsset?.url ?? mockVideo.url);
-  const videoTitle = DEV_MODE
-    ? mockVideo.title
-    : (contentResult.data?.contentItem?.title ?? mockVideo.title);
 
-  // Active transcript segment
+  // ── HLS adaptive streaming ──
+  // Initialise (or re-initialise) HLS.js whenever the source URLs change.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || contentFetching) return;
+
+    // Tear down any previous HLS instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    const effectiveUrl = hlsManifestUrl ?? videoUrl;
+    const isHls = effectiveUrl.includes('.m3u8');
+
+    if (isHls && Hls.isSupported()) {
+      const hls = new Hls({ startLevel: -1 });
+      hls.loadSource(effectiveUrl);
+      hls.attachMedia(video);
+      hlsRef.current = hls;
+    } else if (isHls && video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native HLS
+      video.src = effectiveUrl;
+    } else {
+      video.src = videoUrl;
+    }
+
+    return () => {
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoUrl, hlsManifestUrl, contentFetching]);
+
+  // ── Active transcript segment ──
   const activeSegment = transcript.findIndex(
     (s) => currentTime >= s.startTime && currentTime < s.endTime
   );
@@ -159,11 +173,8 @@ export function ContentViewer() {
   // ── Video controls ──
   const togglePlay = () => {
     if (!videoRef.current) return;
-    if (playing) {
-      videoRef.current.pause();
-    } else {
-      videoRef.current.play();
-    }
+    if (playing) videoRef.current.pause();
+    else void videoRef.current.play();
     setPlaying(!playing);
   };
 
@@ -177,11 +188,7 @@ export function ContentViewer() {
   // Keyboard shortcuts: Space=play/pause, ←/→=seek 5s
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
-      )
-        return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.code === 'Space') {
         e.preventDefault();
         if (!videoRef.current) return;
@@ -199,10 +206,7 @@ export function ContentViewer() {
 
   // Auto-scroll transcript to active segment
   useEffect(() => {
-    activeSegmentRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-    });
+    activeSegmentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [activeSegment]);
 
   // Sync playback speed with video element
@@ -224,171 +228,61 @@ export function ContentViewer() {
   };
 
   // ── Add annotation ──
-  const handleAddAnnotation = async () => {
+  const handleAddAnnotation = () => {
     if (!newAnnotation.trim()) return;
-    if (DEV_MODE) {
-      // Optimistic local add
-      setLocalAnnotations((prev) => [
-        {
-          id: `local-${Date.now()}`,
-          content: newAnnotation,
-          layer: newLayer,
-          userId: 'current-user',
-          userName: 'You',
-          userRole: 'student',
-          timestamp: formatTime(currentTime),
-          contentId,
-          contentTimestamp: currentTime,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        ...prev,
-      ]);
-    } else {
-      await createAnnotation({
-        input: {
-          assetId: contentId,
-          content: newAnnotation,
-          layer: newLayer,
-          timestampStart: currentTime,
-        },
-      });
-    }
+    addAnnotation(newAnnotation, newLayer, currentTime);
     setNewAnnotation('');
     setShowAnnotationForm(false);
   };
 
-  // ── Add annotation from video overlay (Phase 14.2) ──
+  // ── Add annotation from video overlay ──
   const handleOverlayAnnotation = (
     content: string,
     layer: AnnotationLayer,
     timestamp: number
   ) => {
-    setLocalAnnotations((prev) => [
-      {
-        id: `local-${Date.now()}`,
-        content,
-        layer,
-        userId: 'current-user',
-        userName: 'You',
-        userRole: 'student',
-        timestamp: formatTime(timestamp),
-        contentId,
-        contentTimestamp: timestamp,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        replies: [],
-      },
-      ...prev,
-    ]);
+    void addAnnotation(content, layer, timestamp);
   };
 
-  // ── Reply to an annotation (Phase 14.4) ──
-  const handleReply = (
-    parentId: string,
-    replyContent: string,
-    replyLayer: AnnotationLayer
-  ) => {
-    setLocalAnnotations((prev) => [
-      ...prev,
-      {
-        id: `local-reply-${Date.now()}`,
-        content: replyContent,
-        layer: replyLayer,
-        userId: 'current-user',
-        userName: 'You',
-        userRole: 'student',
-        timestamp: formatTime(currentTime),
-        contentId,
-        parentId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        replies: [],
-      },
-    ]);
+  // ── Reply to an annotation ──
+  const handleReply = (parentId: string, replyContent: string, replyLayer: AnnotationLayer) => {
+    void addReply(parentId, replyContent, replyLayer, currentTime);
   };
 
-  // ── AI Chat ──
-  const handleSendChat = async () => {
-    if (!chatInput.trim()) return;
-    const userMsg = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: chatInput,
-    };
-    setChatMessages((prev) => [...prev, userMsg]);
-    setChatInput('');
-
-    if (!DEV_MODE) {
-      let sid = agentSessionId;
-      if (!sid) {
-        const res = await startSession({
-          input: { templateType: 'CHAVRUTA', contextContentId: contentId },
-        });
-        sid = res.data?.startAgentSession?.id ?? null;
-        setAgentSessionId(sid);
-      }
-      if (sid) {
-        const res = await sendMessage({ sessionId: sid, content: chatInput });
-        const reply = res.data?.sendMessage;
-        if (reply)
-          setChatMessages((prev) => [
-            ...prev,
-            { id: reply.id, role: 'agent', content: reply.content },
-          ]);
-      }
-    } else {
-      // Mock Chavruta response
-      setTimeout(() => {
-        const responses = [
-          `That's an interesting point. Let me challenge you: if free will truly exists, how do you explain the deterministic nature of neural processes?`,
-          `A strong argument! But consider the opposite view: Rambam himself in the Mishneh Torah writes that man has absolute free choice. How do you reconcile this?`,
-          `Excellent! Can you find a source in the Talmud that supports or contradicts this position?`,
-          `Let's explore this deeper. What would the implications be if you are correct? How would that affect the concept of reward and punishment?`,
-        ];
-        const reply =
-          responses[Math.floor(Math.random() * responses.length)] ?? '';
-        setChatMessages((prev) => [
-          ...prev,
-          { id: Date.now().toString(), role: 'agent', content: reply },
-        ]);
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 800);
-    }
+  // ── AI Chat send handler ──
+  const handleSendChat = () => {
+    void sendChatMessage();
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ─── Render ─────────────────────────────────────────────────────────────────
   return (
     <Layout>
-      {DEV_MODE && (
-        <div className="mb-3 px-3 py-1.5 text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-md">
-          🔧 Dev Mode — mock content. Start the Gateway for real data.
-        </div>
-      )}
+      {/* Breadcrumb + prev/next navigation */}
+      <ContentViewerBreadcrumb contentId={contentId} contentTitle={videoTitle} />
 
-      <div className="grid grid-cols-12 gap-4 h-[calc(100vh-9rem)]">
+      {/* Error banners (non-blocking) */}
+      {contentError && <ErrorBanner message={contentError} />}
+      {annotError && <ErrorBanner message={annotError} />}
+
+      <div className="grid grid-cols-12 gap-4 h-[calc(100vh-11rem)]">
         {/* ── LEFT: Video + Transcript ── */}
         <div className="col-span-12 lg:col-span-6 flex flex-col gap-3 overflow-hidden">
           {/* Video player */}
           <Card className="flex-shrink-0">
             <CardContent className="p-0">
-              <div
-                className="relative bg-black rounded-t-lg"
-                style={{ aspectRatio: '16/9' }}
-              >
-                <video
-                  ref={videoRef}
-                  src={videoUrl}
-                  className="w-full h-full rounded-t-lg"
-                  onTimeUpdate={(e) =>
-                    setCurrentTime(e.currentTarget.currentTime)
-                  }
-                  onLoadedMetadata={(e) =>
-                    setDuration(e.currentTarget.duration)
-                  }
-                  onPlay={() => setPlaying(true)}
-                  onPause={() => setPlaying(false)}
-                />
+              <div className="relative bg-black rounded-t-lg" style={{ aspectRatio: '16/9' }}>
+                {contentFetching ? (
+                  <SkeletonLine className="w-full h-full rounded-t-lg" />
+                ) : (
+                  <video
+                    ref={videoRef}
+                    className="w-full h-full rounded-t-lg"
+                    onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                    onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+                    onPlay={() => setPlaying(true)}
+                    onPause={() => setPlaying(false)}
+                  />
+                )}
                 {/* Bookmark markers */}
                 {duration > 0 &&
                   bookmarks.map((bm) => (
@@ -404,45 +298,39 @@ export function ContentViewer() {
                     />
                   ))}
 
-                {/* Phase 14.2: Add annotation overlay button */}
-                <AddAnnotationOverlay
-                  currentTime={currentTime}
-                  onSave={handleOverlayAnnotation}
-                />
+                <AddAnnotationOverlay currentTime={currentTime} onSave={handleOverlayAnnotation} />
               </div>
 
               {/* Controls */}
               <div className="px-3 py-2 flex items-center gap-3 bg-muted/40 rounded-b-lg">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={togglePlay}
-                >
-                  {playing ? (
-                    <Pause className="h-4 w-4" />
-                  ) : (
-                    <Play className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => {
-                    if (videoRef.current) {
-                      videoRef.current.muted = !muted;
-                      setMuted(!muted);
-                    }
-                  }}
-                >
-                  {muted ? (
-                    <VolumeX className="h-4 w-4" />
-                  ) : (
-                    <Volume2 className="h-4 w-4" />
-                  )}
-                </Button>
-                {/* Seek bar — Phase 14.1: annotation markers sit inside */}
+                <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={togglePlay}>
+                      {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{playing ? 'Pause (Space)' : 'Play (Space)'}</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => {
+                        if (videoRef.current) {
+                          videoRef.current.muted = !muted;
+                          setMuted(!muted);
+                        }
+                      }}
+                    >
+                      {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{muted ? 'Unmute' : 'Mute'}</TooltipContent>
+                </Tooltip>
+                {/* Seek bar with annotation markers */}
                 <div
                   className="flex-1 relative h-2 bg-muted rounded-full cursor-pointer"
                   onClick={(e) => {
@@ -452,42 +340,41 @@ export function ContentViewer() {
                 >
                   <div
                     className="h-2 bg-primary rounded-full"
-                    style={{
-                      width: `${duration ? (currentTime / duration) * 100 : 0}%`,
-                    }}
+                    style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
                   />
-                  {/* Annotation markers on progress bar */}
-                  <VideoProgressMarkers
-                    annotations={annotations}
-                    duration={duration}
-                    onSeek={seekTo}
-                  />
+                  <VideoProgressMarkers annotations={annotations} duration={duration} onSeek={seekTo} />
                 </div>
                 <span className="text-xs text-muted-foreground tabular-nums">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => videoRef.current?.requestFullscreen()}
-                >
-                  <Maximize className="h-4 w-4" />
-                </Button>
-                <button
-                  onClick={() => {
-                    const idx = SPEED_OPTIONS.indexOf(
-                      playbackSpeed as (typeof SPEED_OPTIONS)[number]
-                    );
-                    setPlaybackSpeed(
-                      SPEED_OPTIONS[(idx + 1) % SPEED_OPTIONS.length] ?? 1
-                    );
-                  }}
-                  className="text-xs font-mono px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80 transition-colors min-w-[2.5rem] text-center"
-                  title="Playback speed (click to cycle)"
-                >
-                  {playbackSpeed}×
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => videoRef.current?.requestFullscreen()}
+                    >
+                      <Maximize className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Fullscreen</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => {
+                        const idx = SPEED_OPTIONS.indexOf(playbackSpeed as (typeof SPEED_OPTIONS)[number]);
+                        setPlaybackSpeed(SPEED_OPTIONS[(idx + 1) % SPEED_OPTIONS.length] ?? 1);
+                      }}
+                      className="text-xs font-mono px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80 transition-colors min-w-[2.5rem] text-center"
+                    >
+                      {playbackSpeed}×
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Playback speed (click to cycle)</TooltipContent>
+                </Tooltip>
+                </TooltipProvider>
               </div>
             </CardContent>
           </Card>
@@ -498,27 +385,39 @@ export function ContentViewer() {
               <span className="text-sm font-semibold flex items-center gap-2">
                 <BookOpen className="h-4 w-4" /> Transcript
               </span>
-              <span className="text-xs text-muted-foreground">
-                {videoTitle}
-              </span>
+              {contentFetching ? (
+                <SkeletonLine className="h-3 w-32" />
+              ) : (
+                <span className="text-xs text-muted-foreground">{videoTitle}</span>
+              )}
             </div>
-            <div ref={transcriptContainerRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
-              {transcript.map((seg, idx) => (
-                <div
-                  key={seg.id}
-                  ref={idx === activeSegment ? activeSegmentRef : null}
-                  onClick={() => seekTo(seg.startTime)}
-                  className={`flex gap-3 p-2 rounded-md cursor-pointer transition-colors text-sm
-                    ${idx === activeSegment ? 'bg-primary/10 border border-primary/30' : 'hover:bg-muted/60'}`}
-                >
-                  <span className="text-xs text-muted-foreground tabular-nums pt-0.5 flex-shrink-0 w-10">
-                    {formatTime(seg.startTime)}
-                  </span>
-                  <span className={idx === activeSegment ? 'font-medium' : ''}>
-                    {highlightText(seg.text, searchQuery)}
-                  </span>
-                </div>
-              ))}
+            <div
+              ref={transcriptContainerRef}
+              className="flex-1 overflow-y-auto px-4 py-2 space-y-1"
+            >
+              {contentFetching
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="flex gap-3 p-2">
+                      <SkeletonLine className="h-3 w-10 flex-shrink-0" />
+                      <SkeletonLine className="h-3 flex-1" />
+                    </div>
+                  ))
+                : transcript.map((seg, idx) => (
+                    <div
+                      key={seg.id}
+                      ref={idx === activeSegment ? activeSegmentRef : null}
+                      onClick={() => seekTo(seg.startTime)}
+                      className={`flex gap-3 p-2 rounded-md cursor-pointer transition-colors text-sm
+                        ${idx === activeSegment ? 'bg-primary/10 border border-primary/30' : 'hover:bg-muted/60'}`}
+                    >
+                      <span className="text-xs text-muted-foreground tabular-nums pt-0.5 flex-shrink-0 w-10">
+                        {formatTime(seg.startTime)}
+                      </span>
+                      <span className={idx === activeSegment ? 'font-medium' : ''}>
+                        {highlightText(seg.text, searchQuery)}
+                      </span>
+                    </div>
+                  ))}
             </div>
           </Card>
         </div>
@@ -540,11 +439,7 @@ export function ContentViewer() {
                   <Plus className="h-3 w-3 mr-1" /> Add
                 </Button>
               </div>
-              {/* Phase 14.3: Layer toggle chips with counts */}
-              <LayerToggleBar
-                activeLayers={activeLayers}
-                onToggle={toggleLayer}
-              />
+              <LayerToggleBar activeLayers={activeLayers} onToggle={toggleLayer} />
             </div>
 
             {/* Add annotation form */}
@@ -578,11 +473,7 @@ export function ContentViewer() {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={handleAddAnnotation}
-                  >
+                  <Button size="sm" className="h-7 text-xs" onClick={handleAddAnnotation}>
                     Save @ {formatTime(currentTime)}
                   </Button>
                 </div>
@@ -591,13 +482,21 @@ export function ContentViewer() {
 
             {/* Annotations list */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-              {annotations.length === 0 && (
+              {annotFetching && annotations.length === 0
+                ? Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="space-y-1.5 p-3 border rounded-lg">
+                      <SkeletonLine className="h-3 w-24" />
+                      <SkeletonLine className="h-3 w-full" />
+                      <SkeletonLine className="h-3 w-3/4" />
+                    </div>
+                  ))
+                : null}
+              {!annotFetching && annotations.length === 0 && (
                 <p className="text-xs text-muted-foreground text-center py-6">
                   No annotations visible. Enable layers above.
                 </p>
               )}
-              {/* Phase 14.4: AnnotationThread cards with expand + inline reply */}
-              {annotations.map((ann) => (
+              {annotations.map((ann: Annotation) => (
                 <AnnotationThread
                   key={ann.id}
                   annotation={ann}
@@ -643,11 +542,7 @@ export function ContentViewer() {
                     </div>
                   ))}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full mt-2 text-xs h-7"
-                >
+                <Button variant="ghost" size="sm" className="w-full mt-2 text-xs h-7">
                   Explore full graph <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
               </TabsContent>
@@ -659,11 +554,7 @@ export function ContentViewer() {
                     placeholder="Search transcript, annotations..."
                     className="flex-1 text-xs px-3 py-1.5 border rounded-md bg-background"
                   />
-                  <Button
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    onClick={() => setSearchQuery('')}
-                  >
+                  <Button size="sm" className="h-8 w-8 p-0" onClick={() => setSearchQuery('')}>
                     <Search className="h-3 w-3" />
                   </Button>
                 </div>
@@ -671,41 +562,14 @@ export function ContentViewer() {
                   <div className="space-y-1 max-h-32 overflow-y-auto">
                     {[
                       ...transcript
-                        .filter((s) =>
-                          s.text
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
-                        )
-                        .map((s) => ({
-                          type: 'transcript',
-                          id: s.id,
-                          text: s.text,
-                          ts: s.startTime,
-                        })),
+                        .filter((s) => s.text.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map((s) => ({ type: 'transcript', id: s.id, text: s.text, ts: s.startTime })),
                       ...annotations
-                        .filter((a) =>
-                          a.content
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
-                        )
-                        .map((a) => ({
-                          type: 'annotation',
-                          id: a.id,
-                          text: a.content,
-                          ts: a.contentTimestamp,
-                        })),
+                        .filter((a) => a.content.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map((a) => ({ type: 'annotation', id: a.id, text: a.content, ts: a.contentTimestamp })),
                       ...mockGraphData.nodes
-                        .filter((n) =>
-                          n.label
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
-                        )
-                        .map((n) => ({
-                          type: 'concept',
-                          id: n.id,
-                          text: n.label,
-                          ts: undefined,
-                        })),
+                        .filter((n) => n.label.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map((n) => ({ type: 'concept', id: n.id, text: n.label, ts: undefined })),
                     ].map((r) => (
                       <div
                         key={r.id}
@@ -713,11 +577,7 @@ export function ContentViewer() {
                         className="text-xs p-1.5 rounded border bg-muted/30 cursor-pointer hover:bg-muted/60 truncate"
                       >
                         <span className="font-medium text-muted-foreground mr-1">
-                          {r.type === 'transcript'
-                            ? '📝'
-                            : r.type === 'annotation'
-                              ? '💬'
-                              : '🔵'}
+                          {r.type === 'transcript' ? '📝' : r.type === 'annotation' ? '💬' : '🔵'}
                         </span>
                         {r.text}
                       </div>
@@ -740,9 +600,7 @@ export function ContentViewer() {
               <Bot className="h-4 w-4 text-primary" />
               <div>
                 <p className="text-sm font-semibold">Chavruta AI</p>
-                <p className="text-xs text-muted-foreground">
-                  Dialectical learning partner
-                </p>
+                <p className="text-xs text-muted-foreground">Dialectical learning partner</p>
               </div>
               <div className="ml-auto flex gap-1">
                 {['CHAVRUTA', 'QUIZ', 'EXPLAIN'].map((mode) => (
@@ -775,22 +633,28 @@ export function ContentViewer() {
                   </div>
                 </div>
               ))}
+              {isStreaming && (
+                <div className="flex justify-start">
+                  <div className="bg-muted rounded-lg rounded-bl-none px-4 py-3 flex gap-1 items-center">
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce"
+                        style={{ animationDelay: `${i * 120}ms` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
               <div ref={chatEndRef} />
             </div>
 
             {/* Quick prompts */}
             <div className="px-4 py-2 border-t border-b flex gap-2 overflow-x-auto flex-shrink-0">
-              {[
-                'Debate free will',
-                'Quiz me',
-                'Summarize',
-                'Explain Rambam',
-              ].map((prompt) => (
+              {['Debate free will', 'Quiz me', 'Summarize', 'Explain Rambam'].map((prompt) => (
                 <button
                   key={prompt}
-                  onClick={() => {
-                    setChatInput(prompt);
-                  }}
+                  onClick={() => setChatInput(prompt)}
                   className="text-xs px-2 py-1 rounded-full border bg-muted/40 hover:bg-primary/10 hover:border-primary/30 whitespace-nowrap transition-colors"
                 >
                   {prompt}
@@ -803,16 +667,16 @@ export function ContentViewer() {
               <input
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) =>
-                  e.key === 'Enter' && !e.shiftKey && handleSendChat()
-                }
-                placeholder="Ask or debate..."
-                className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !isStreaming && handleSendChat()}
+                placeholder={isStreaming ? 'Agent is responding...' : 'Ask or debate...'}
+                disabled={isStreaming}
+                className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60 disabled:cursor-not-allowed"
               />
               <Button
                 size="sm"
                 className="h-9 w-9 p-0 flex-shrink-0"
                 onClick={handleSendChat}
+                disabled={isStreaming}
               >
                 <Send className="h-4 w-4" />
               </Button>

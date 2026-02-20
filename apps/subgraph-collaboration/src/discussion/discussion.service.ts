@@ -10,6 +10,7 @@ import {
   eq,
   and,
   desc,
+  inArray,
   withTenantContext,
   sql,
   type Database,
@@ -255,6 +256,34 @@ export class DiscussionService {
         .where(eq(schema.discussion_participants.discussion_id, discussionId));
 
       return result[0]?.count || 0;
+    });
+  }
+
+  async findDiscussionsByUser(
+    limit: number,
+    offset: number,
+    authContext: AuthContext
+  ) {
+    const tenantCtx = this.toTenantContext(authContext);
+
+    return withTenantContext(this.db, tenantCtx, async (tx) => {
+      // Find discussion IDs where user is a participant
+      const participations = await tx
+        .select({ discussion_id: schema.discussion_participants.discussion_id })
+        .from(schema.discussion_participants)
+        .where(eq(schema.discussion_participants.user_id, authContext.userId));
+
+      if (participations.length === 0) return [];
+
+      const ids = participations.map((p) => p.discussion_id);
+
+      return tx
+        .select()
+        .from(schema.discussions)
+        .where(inArray(schema.discussions.id, ids))
+        .orderBy(desc(schema.discussions.created_at))
+        .limit(limit)
+        .offset(offset);
     });
   }
 

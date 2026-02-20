@@ -4,7 +4,6 @@ export const ME_QUERY = gql`
   query Me {
     me {
       id
-      username
       email
       firstName
       lastName
@@ -30,23 +29,32 @@ export const TENANT_QUERY = gql`
 `;
 
 export const COURSES_QUERY = gql`
-  query Courses($first: Int, $after: String) {
-    courses(first: $first, after: $after) {
-      edges {
-        cursor
-        node {
-          id
-          title
-          description
-          createdAt
-          updatedAt
-        }
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
+  query Courses($limit: Int, $offset: Int) {
+    courses(limit: $limit, offset: $offset) {
+      id
+      title
+      description
+      slug
+      thumbnailUrl
+      instructorId
+      isPublished
+      estimatedHours
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const MY_STATS_QUERY = gql`
+  query MyStats {
+    myStats {
+      coursesEnrolled
+      annotationsCreated
+      conceptsMastered
+      totalLearningMinutes
+      weeklyActivity {
+        date
+        count
       }
     }
   }

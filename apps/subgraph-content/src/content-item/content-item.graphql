@@ -1,0 +1,17 @@
+type ContentItem @key(fields: "id") {
+  id: ID!
+  moduleId: ID!
+  title: String!
+  contentType: String!
+  content: String
+  fileId: ID
+  duration: Int
+  orderIndex: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+extend type Query {
+  contentItem(id: ID!): ContentItem
+  contentItemsByModule(moduleId: ID!): [ContentItem!]!
+}

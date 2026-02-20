@@ -1,3 +1,7 @@
+// MUST be the first import — patches Node.js http before the gateway loads.
+import { initTelemetry } from '@edusphere/telemetry';
+initTelemetry('gateway');
+
 import { createGateway } from '@graphql-hive/gateway';
 import { createYoga } from 'graphql-yoga';
 import { createServer } from 'http';

@@ -1,48 +1,160 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from 'urql';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from 'sonner';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Form } from '@/components/ui/form';
 import { CourseWizardStep1 } from './CourseWizardStep1';
 import { CourseWizardStep2 } from './CourseWizardStep2';
+import { CourseWizardMediaStep } from './CourseWizardMediaStep';
 import { CourseWizardStep3 } from './CourseWizardStep3';
-import { DEFAULT_FORM, type CourseFormData } from './course-create.types';
+import {
+  DEFAULT_FORM,
+  type CourseFormData,
+  type Difficulty,
+} from './course-create.types';
+import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
+import { getCurrentUser } from '@/lib/auth';
+
+// ── Zod schema for Step 1 fields ─────────────────────────────────────────────
+export const courseSchema = z.object({
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters').or(z.literal('')),
+  difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
+  duration: z.string().optional(),
+  thumbnail: z.string().min(1, 'Thumbnail required'),
+});
+
+export type CourseSchemaValues = z.infer<typeof courseSchema>;
+
+// ── GraphQL types ─────────────────────────────────────────────────────────────
+interface CreateCourseResult {
+  createCourse: {
+    id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    isPublished: boolean;
+    estimatedHours: number | null;
+    createdAt: string;
+  };
+}
+
+interface CreateCourseVariables {
+  input: {
+    title: string;
+    slug: string;
+    description?: string;
+    instructorId: string;
+    isPublished: boolean;
+    estimatedHours?: number;
+  };
+}
 
 const STEPS = [
   { label: 'Course Info', description: 'Title, description, difficulty' },
   { label: 'Modules', description: 'Add and order course modules' },
+  { label: 'Media', description: 'Upload videos, audio, documents' },
   { label: 'Publish', description: 'Review and publish' },
 ];
 
+const DRAFT_COURSE_ID = 'draft';
+
 export function CourseCreatePage() {
   const navigate = useNavigate();
+  const user = getCurrentUser();
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState<CourseFormData>(DEFAULT_FORM);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
 
-  const update = (updates: Partial<CourseFormData>) => {
-    setForm((prev) => ({ ...prev, ...updates }));
+  const form = useForm<CourseSchemaValues>({
+    resolver: zodResolver(courseSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      difficulty: 'BEGINNER',
+      duration: '',
+      thumbnail: '📚',
+    },
+    mode: 'onTouched',
+  });
+
+  const [createResult, executeMutation] = useMutation<CreateCourseResult, CreateCourseVariables>(
+    CREATE_COURSE_MUTATION
+  );
+
+  const isSubmitting = createResult.fetching;
+
+  // Sync RHF values into wizard state for non-RHF steps to read
+  const syncWizardData = () => {
+    const vals = form.getValues();
+    setWizardData((prev) => ({
+      ...prev,
+      title: vals.title,
+      description: vals.description ?? '',
+      difficulty: vals.difficulty as Difficulty,
+      duration: vals.duration ?? '',
+      thumbnail: vals.thumbnail,
+    }));
   };
 
-  const handlePublish = (publish: boolean) => {
-    setIsSubmitting(true);
-    // In production: call createCourse GraphQL mutation
-    // For now: simulate async and navigate back
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate('/courses', {
-        state: {
-          newCourse: { ...form, published: publish },
-          message: publish
-            ? `"${form.title}" has been published!`
-            : `"${form.title}" saved as draft.`,
-        },
-      });
-    }, 800);
+  const handleNextFromStep1 = async () => {
+    const valid = await form.trigger(['title', 'description', 'difficulty']);
+    if (!valid) return;
+    syncWizardData();
+    setStep(1);
   };
 
-  const canAdvance = step === 0 ? !!form.title.trim() : true;
+  const handlePublish = async (publish: boolean) => {
+    const vals = form.getValues();
+    const slug = vals.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const instructorId = user?.id ?? 'unknown';
+
+    const { data, error } = await executeMutation({
+      input: {
+        title: vals.title,
+        slug,
+        description: vals.description || undefined,
+        instructorId,
+        isPublished: publish,
+      },
+    });
+
+    if (error) {
+      const msg = error.graphQLErrors?.[0]?.message ?? error.message ?? 'Failed to create course';
+      toast.error(msg);
+      return;
+    }
+
+    if (data?.createCourse) {
+      const label = publish
+        ? `"${data.createCourse.title}" has been published!`
+        : `"${data.createCourse.title}" saved as draft.`;
+      toast.success(label);
+      navigate(`/courses/${data.createCourse.id}`);
+    }
+  };
+
+  // Merged view of form data for steps 2–4 that display wizard state
+  const currentData: CourseFormData = {
+    ...wizardData,
+    title: form.watch('title') || wizardData.title,
+    description: form.watch('description') || wizardData.description,
+    difficulty: (form.watch('difficulty') as Difficulty) || wizardData.difficulty,
+    thumbnail: form.watch('thumbnail') || wizardData.thumbnail,
+  };
+
+  const updateWizard = (updates: Partial<CourseFormData>) => {
+    setWizardData((prev) => ({ ...prev, ...updates }));
+  };
+
+  const canAdvanceStep1 = form.watch('title')?.trim().length >= 3;
+  const lastContentStep = STEPS.length - 2;
 
   return (
     <Layout>
@@ -96,15 +208,24 @@ export function CourseCreatePage() {
             <p className="text-sm text-muted-foreground">{STEPS[step]?.description}</p>
           </div>
 
-          {step === 0 && <CourseWizardStep1 data={form} onChange={update} />}
-          {step === 1 && <CourseWizardStep2 modules={form.modules} onChange={update} />}
+          <Form {...form}>
+            {step === 0 && <CourseWizardStep1 control={form.control} />}
+          </Form>
+          {step === 1 && <CourseWizardStep2 modules={wizardData.modules} onChange={updateWizard} />}
           {step === 2 && (
-            <CourseWizardStep3 data={form} onPublish={handlePublish} isSubmitting={isSubmitting} />
+            <CourseWizardMediaStep
+              courseId={DRAFT_COURSE_ID}
+              mediaList={wizardData.mediaList}
+              onChange={updateWizard}
+            />
+          )}
+          {step === 3 && (
+            <CourseWizardStep3 data={currentData} onPublish={handlePublish} isSubmitting={isSubmitting} />
           )}
         </Card>
 
-        {/* Navigation buttons (steps 0 and 1 only) */}
-        {step < 2 && (
+        {/* Navigation */}
+        {step < STEPS.length - 1 && (
           <div className="flex justify-between">
             <Button
               variant="outline"
@@ -114,17 +235,20 @@ export function CourseCreatePage() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
-            <Button onClick={() => setStep((s) => s + 1)} disabled={!canAdvance}>
+            <Button
+              onClick={step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)}
+              disabled={step === 0 && !canAdvanceStep1}
+            >
               Next
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
         )}
-        {step === 2 && (
+        {step === STEPS.length - 1 && (
           <div className="flex justify-start">
-            <Button variant="outline" onClick={() => setStep(1)}>
+            <Button variant="outline" onClick={() => setStep(lastContentStep)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Modules
+              Back to Media
             </Button>
           </div>
         )}

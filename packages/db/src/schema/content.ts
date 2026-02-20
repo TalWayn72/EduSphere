@@ -65,6 +65,8 @@ export const media_assets = pgTable('media_assets', {
     enum: ['VIDEO', 'AUDIO', 'DOCUMENT'],
   }).notNull(),
   file_url: text('file_url').notNull(),
+  /** MinIO object key for the HLS master manifest (.m3u8). Null until HLS transcode completes. */
+  hls_manifest_key: text('hls_manifest_key'),
   duration: integer('duration'),
   transcription_status: text('transcription_status', {
     enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'],

@@ -1,11 +1,20 @@
 import React, { useRef, useState, useEffect } from 'react';
+import Hls from 'hls.js';
 import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Bookmark } from '@/lib/mock-content-data';
 
 interface VideoPlayerProps {
+  /** Direct URL for the original video file (fallback when HLS is unavailable). */
   src: string;
+  /**
+   * Optional HLS master manifest URL (.m3u8).
+   * When provided, HLS adaptive streaming is used in preference to `src`.
+   * Falls back to `src` on browsers/devices that do not support HLS.js and
+   * lack native HLS support.
+   */
+  hlsSrc?: string | null;
   bookmarks?: Bookmark[];
   onTimeUpdate?: (currentTime: number) => void;
   seekTo?: number;
@@ -13,41 +22,77 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({
   src,
+  hlsSrc,
   bookmarks = [],
   onTimeUpdate,
   seekTo,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
 
-  // Handle seek from transcript
+  // ── HLS initialisation ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Tear down any existing HLS instance before re-initialising
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    const effectiveUrl = hlsSrc ?? src;
+    const isHlsUrl = effectiveUrl.includes('.m3u8');
+
+    if (isHlsUrl && Hls.isSupported()) {
+      // HLS.js path (Chrome, Firefox, Edge, etc.)
+      const hls = new Hls({ startLevel: -1 }); // -1 = auto quality selection
+      hls.loadSource(effectiveUrl);
+      hls.attachMedia(video);
+      hlsRef.current = hls;
+    } else if (isHlsUrl && video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native HLS path (Safari, iOS)
+      video.src = effectiveUrl;
+    } else {
+      // Non-HLS fallback (direct video URL)
+      video.src = src;
+    }
+
+    return () => {
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
+  }, [src, hlsSrc]);
+
+  // ── Seek from external caller (e.g. transcript click) ──────────────────────
   useEffect(() => {
     if (seekTo !== undefined && videoRef.current) {
       videoRef.current.currentTime = seekTo;
     }
   }, [seekTo]);
 
+  // ── Playback controls ───────────────────────────────────────────────────────
   const togglePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      void videoRef.current.play();
     }
+    setIsPlaying(!isPlaying);
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      const time = videoRef.current.currentTime;
-      setCurrentTime(time);
-      onTimeUpdate?.(time);
-    }
+    if (!videoRef.current) return;
+    const time = videoRef.current.currentTime;
+    setCurrentTime(time);
+    onTimeUpdate?.(time);
   };
 
   const handleLoadedMetadata = () => {
@@ -73,25 +118,23 @@ export function VideoPlayer({
   };
 
   const toggleMute = () => {
-    if (videoRef.current) {
-      const newMuted = !isMuted;
-      setIsMuted(newMuted);
-      videoRef.current.muted = newMuted;
-      if (newMuted) {
-        setVolume(0);
-      } else {
-        setVolume(videoRef.current.volume || 1);
-      }
+    if (!videoRef.current) return;
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    videoRef.current.muted = newMuted;
+    if (newMuted) {
+      setVolume(0);
+    } else {
+      setVolume(videoRef.current.volume || 1);
     }
   };
 
   const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        videoRef.current.requestFullscreen();
-      }
+    if (!videoRef.current) return;
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+    } else {
+      void videoRef.current.requestFullscreen();
     }
   };
 
@@ -101,15 +144,13 @@ export function VideoPlayer({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getBookmarkPosition = (timestamp: number) => {
-    return (timestamp / duration) * 100;
-  };
+  const getBookmarkPosition = (timestamp: number) => (timestamp / duration) * 100;
 
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="relative bg-black rounded-lg overflow-hidden group">
       <video
         ref={videoRef}
-        src={src}
         className="w-full aspect-video"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
