@@ -30,25 +30,29 @@ async function loginViaKeycloak(page: Page): Promise<void> {
   await page.goto('/login');
   await page.waitForLoadState('domcontentloaded');
 
+  // Increase timeouts to handle slow Keycloak responses under parallel test load
   const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
-  await signInBtn.waitFor({ timeout: 10_000 });
+  await signInBtn.waitFor({ timeout: 25_000 });
   await signInBtn.click();
 
   // Keycloak OIDC login form
-  await page.waitForURL(/localhost:8080\/realms\/edusphere/, { timeout: 15_000 });
-  await expect(page.locator('#username')).toBeVisible({ timeout: 10_000 });
+  await page.waitForURL(/localhost:8080\/realms\/edusphere/, { timeout: 25_000 });
+  await expect(page.locator('#username')).toBeVisible({ timeout: 15_000 });
   await page.fill('#username', STUDENT.email);
   await page.fill('#password', STUDENT.password);
   await page.click('#kc-login');
 
   // Wait for Keycloak to redirect back to the app and for the router to settle
-  await page.waitForURL(new RegExp(APP_HOST.replace('.', '\\.')), { timeout: 20_000 });
+  await page.waitForURL(new RegExp(APP_HOST.replace('.', '\\.')), { timeout: 35_000 });
   await page.waitForURL(/\/(learn|courses|dashboard|agents|search|login)/, {
     timeout: 25_000,
   });
 }
 
 test.describe('Agents — page load and template selector', () => {
+  // Serial mode: prevents all 5 tests from logging into Keycloak simultaneously,
+  // which can cause timeouts when other test suites are running in parallel.
+  test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => {
     await loginViaKeycloak(page);
   });
@@ -138,6 +142,8 @@ test.describe('Agents — page load and template selector', () => {
 });
 
 test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
+  // Serial mode: same reason as the first describe block — reduce parallel Keycloak logins.
+  test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => {
     await loginViaKeycloak(page);
   });

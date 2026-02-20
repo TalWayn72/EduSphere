@@ -14,7 +14,9 @@ import { test, expect, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+// Default to 5173 — consistent with playwright.config.ts webServer and baseURL.
+// Override with E2E_BASE_URL env var when running against a different port.
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5173';
 const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 
 const USERS = {
