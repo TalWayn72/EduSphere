@@ -20,7 +20,7 @@ const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 const USERS = {
   student: { email: 'student@example.com', password: 'Student123!', role: 'Student' },
   instructor: { email: 'instructor@example.com', password: 'Instructor123!', role: 'Instructor' },
-  admin: { email: 'super.admin@edusphere.dev', password: 'SuperAdmin123!', role: 'Super Admin' },
+  admin: { email: 'super.admin@edusphere.dev', password: 'Admin1234', role: 'Super Admin' },
 };
 
 interface PageEntry {
@@ -159,6 +159,19 @@ async function doLogin(page: Page, email: string, password: string): Promise<voi
   // Wait for redirect back to app
   await page.waitForURL(/localhost:5175/, { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(2000);
+
+  // If still on login page, try once more (session may have been stale)
+  if (page.url().includes('/login')) {
+    const retryBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+    const retryVisible = await retryBtn.isVisible().catch(() => false);
+    if (retryVisible) {
+      await retryBtn.click();
+      await page.waitForTimeout(2000);
+      await keycloakLogin(page, email, password);
+      await page.waitForURL(/localhost:5175/, { timeout: 20000 }).catch(() => {});
+      await page.waitForTimeout(2000);
+    }
+  }
 }
 
 async function doLogout(page: Page): Promise<void> {

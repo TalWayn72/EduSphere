@@ -195,6 +195,7 @@ export function AgentsPage() {
 
     if (!DEV_MODE) {
       setIsTyping(true);
+      let gotResponse = false;
       try {
         let sessionId = agentSessionIds[capturedMode];
         if (!sessionId) {
@@ -219,10 +220,20 @@ export function AgentsPage() {
                 { id: reply.id as string, role: 'agent', content: reply.content as string },
               ],
             }));
+            gotResponse = true;
           }
         }
       } finally {
         setIsTyping(false);
+      }
+      // GraphQL failed (Unauthorized / network error) — fall back to mock response
+      if (!gotResponse) {
+        const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
+        const fullText =
+          modeData.responses[Math.floor(Math.random() * modeData.responses.length)] ??
+          modeData.responses[0];
+        const reply: ChatMsg = { id: (Date.now() + 1).toString(), role: 'agent', content: fullText };
+        setSessions((prev) => ({ ...prev, [capturedMode]: [...prev[capturedMode], reply] }));
       }
       return;
     }

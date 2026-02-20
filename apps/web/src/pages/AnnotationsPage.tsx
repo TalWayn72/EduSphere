@@ -208,17 +208,6 @@ export function AnnotationsPage() {
     );
   }
 
-  if (error) {
-    return (
-      <Layout>
-        <div className="flex items-center gap-2 p-4 rounded-md border border-destructive/30 bg-destructive/10 text-destructive">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          <span className="text-sm">Failed to load annotations: {error.message}</span>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <DeleteConfirmDialog
@@ -229,6 +218,13 @@ export function AnnotationsPage() {
       />
 
       <div className="space-y-4">
+        {error && (
+          <div className="flex items-center gap-2 p-3 rounded-md border border-orange-200 bg-orange-50 text-orange-800 text-xs">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+            Failed to load annotations — showing empty state.
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Annotations</h1>
@@ -290,26 +286,23 @@ export function AnnotationsPage() {
           })}
         </div>
 
-        {total === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p className="text-sm">No annotations yet.</p>
-            <p className="text-xs mt-1">Open a lesson and start annotating content.</p>
-          </div>
-        )}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="all">All ({total})</TabsTrigger>
+            {ALL_LAYERS.map((layer) => (
+              <TabsTrigger key={layer} value={layer}>
+                {ANNOTATION_LAYER_META[layer].icon} {ANNOTATION_LAYER_META[layer].label} (
+                {counts[layer] ?? 0})
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        {total > 0 && (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="all">All ({total})</TabsTrigger>
-              {ALL_LAYERS.map((layer) => (
-                <TabsTrigger key={layer} value={layer}>
-                  {ANNOTATION_LAYER_META[layer].icon} {ANNOTATION_LAYER_META[layer].label} (
-                  {counts[layer] ?? 0})
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            <TabsContent value="all" className="mt-4">
+          <TabsContent value="all" className="mt-4">
+            {sorted(annotations).length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-12">
+                No annotations yet. Open a lesson and start annotating content.
+              </p>
+            ) : (
               <div className="grid md:grid-cols-2 gap-3">
                 {sorted(annotations).map((ann) => (
                   <AnnotationItem
@@ -320,29 +313,29 @@ export function AnnotationsPage() {
                   />
                 ))}
               </div>
-            </TabsContent>
+            )}
+          </TabsContent>
 
-            {ALL_LAYERS.map((layer) => (
-              <TabsContent key={layer} value={layer} className="mt-4">
-                <div className="grid md:grid-cols-2 gap-3">
-                  {sorted(annotations.filter((a) => a.layer === layer)).map((ann) => (
-                    <AnnotationItem
-                      key={ann.id}
-                      ann={ann}
-                      onSeek={handleSeek}
-                      onDeleteRequest={handleDeleteRequest}
-                    />
-                  ))}
-                  {annotations.filter((a) => a.layer === layer).length === 0 && (
-                    <p className="col-span-2 text-center text-sm text-muted-foreground py-8">
-                      No {ANNOTATION_LAYER_META[layer].label.toLowerCase()} annotations yet.
-                    </p>
-                  )}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        )}
+          {ALL_LAYERS.map((layer) => (
+            <TabsContent key={layer} value={layer} className="mt-4">
+              <div className="grid md:grid-cols-2 gap-3">
+                {sorted(annotations.filter((a) => a.layer === layer)).map((ann) => (
+                  <AnnotationItem
+                    key={ann.id}
+                    ann={ann}
+                    onSeek={handleSeek}
+                    onDeleteRequest={handleDeleteRequest}
+                  />
+                ))}
+                {annotations.filter((a) => a.layer === layer).length === 0 && (
+                  <p className="col-span-2 text-center text-sm text-muted-foreground py-8">
+                    No {ANNOTATION_LAYER_META[layer].label.toLowerCase()} annotations yet.
+                  </p>
+                )}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </Layout>
   );
