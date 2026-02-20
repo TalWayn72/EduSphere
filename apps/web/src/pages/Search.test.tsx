@@ -280,4 +280,179 @@ describe('SearchPage', () => {
       { timeout: 2000 }
     );
   });
+
+  // ── Offline / GraphQL error fallback ──────────────────────────────────────
+  // These tests exercise the non-DEV_MODE path where urql returns an error.
+  // In test env VITE_DEV_MODE=true by default, so we stub the env to "false"
+  // and reset the module so DEV_MODE is re-evaluated before each test.
+
+  describe('offline fallback (GraphQL error path)', () => {
+    beforeEach(() => {
+      // Stub VITE_DEV_MODE to "false" so the component uses the real-API path
+      vi.stubEnv('VITE_DEV_MODE', 'false');
+      // Reset the module registry so Search.tsx re-evaluates DEV_MODE
+      vi.resetModules();
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    });
+
+    it('shows the "Offline mode" banner when urql returns an error', async () => {
+      // Override useQuery to return an error before dynamic import
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: undefined,
+          fetching: false,
+          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      // Dynamically import SearchPage after module reset so DEV_MODE=false
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'Talmud');
+
+      await waitFor(
+        () =>
+          expect(
+            screen.getByText(/offline mode — showing cached results/i)
+          ).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('returns mock results for "Talmud" when GraphQL fails', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: undefined,
+          fetching: false,
+          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'Talmud');
+
+      // Should show result count, not "No results found"
+      await waitFor(
+        () => expect(screen.getByText(/results? for "Talmud"/i)).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('returns mock results for "Rambam" when GraphQL fails', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: undefined,
+          fetching: false,
+          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'Rambam');
+
+      await waitFor(
+        () => expect(screen.getByText(/results? for "Rambam"/i)).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('returns mock results for "chavruta" when GraphQL fails', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: undefined,
+          fetching: false,
+          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'chavruta');
+
+      await waitFor(
+        () => expect(screen.getByText(/results? for "chavruta"/i)).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('does NOT show the offline banner when urql succeeds', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        { data: { searchSemantic: [] }, fetching: false, error: undefined },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'Talmud');
+
+      // Banner must NOT appear when there is no error
+      await waitFor(
+        () =>
+          expect(
+            screen.queryByText(/offline mode — showing cached results/i)
+          ).not.toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+  });
 });

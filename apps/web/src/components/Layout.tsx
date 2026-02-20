@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/UserMenu';
@@ -11,6 +11,8 @@ import {
   Network,
   GitBranch,
   Search,
+  Menu,
+  X,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -48,6 +50,7 @@ export function Layout({ children }: LayoutProps) {
   }, [navigate]);
 
   const isAdmin = user ? ADMIN_ROLES.has(user.role) : false;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -61,29 +64,55 @@ export function Layout({ children }: LayoutProps) {
               </Link>
               <nav className="hidden md:flex space-x-1">
                 {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
-                  <Link
+                  <NavLink
                     key={to}
                     to={to}
-                    className="flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    aria-current={({ isActive }) => (isActive ? 'page' : undefined)}
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-accent text-accent-foreground'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+                      ].join(' ')
+                    }
                   >
-                    <Icon className="h-4 w-4" />
-                    <span>{label}</span>
-                  </Link>
+                    {({ isActive }) => (
+                      <>
+                        <Icon className="h-4 w-4" />
+                        <span>{label}</span>
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
                 ))}
                 {/* Admin-only: show course creation entry point */}
                 {isAdmin && (
-                  <Link
+                  <NavLink
                     to="/courses/new"
-                    className="flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                    aria-current={({ isActive }) => (isActive ? 'page' : undefined)}
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-primary hover:bg-primary/10',
+                      ].join(' ')
+                    }
                   >
-                    <BookOpen className="h-4 w-4" />
-                    <span>New Course</span>
-                  </Link>
+                    {({ isActive }) => (
+                      <>
+                        <BookOpen className="h-4 w-4" />
+                        <span>New Course</span>
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
                 )}
               </nav>
             </div>
 
-            {/* Right side: Search + User */}
+            {/* Right side: Search + User + Mobile hamburger */}
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -103,8 +132,58 @@ export function Layout({ children }: LayoutProps) {
                   Sign in
                 </Button>
               )}
+
+              {/* Hamburger button — visible on mobile only */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden p-2"
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
             </div>
           </div>
+
+          {/* Mobile dropdown nav panel — visible below md breakpoint only */}
+          {mobileMenuOpen && (
+            <nav className="md:hidden border-t pt-2 pb-3 flex flex-col space-y-1">
+              {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{label}</span>
+                </Link>
+              ))}
+              {isAdmin && (
+                <Link
+                  to="/courses/new"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span>New Course</span>
+                </Link>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="mx-3 mt-1 flex items-center gap-2 text-muted-foreground text-sm justify-start"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate('/search');
+                }}
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>Search...</span>
+              </Button>
+            </nav>
+          )}
         </div>
       </header>
       <main className="container mx-auto px-4 py-8">{children}</main>

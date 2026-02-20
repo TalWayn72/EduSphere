@@ -15,6 +15,17 @@ import { Search, BookOpen, ChevronRight, ZoomIn, ZoomOut, Maximize2, Loader2, Re
 
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 
+// ─── Mock learning path used when DEV_MODE is true ───────────────────────────
+const MOCK_LEARNING_PATH: ApiLearningPath = {
+  steps: 4,
+  concepts: [
+    { id: 'mock-path-1', name: 'Introduction to Jewish Philosophy', type: 'CONCEPT' },
+    { id: 'mock-path-2', name: 'Free Will in Medieval Philosophy', type: 'CONCEPT' },
+    { id: 'mock-path-3', name: 'Maimonides on Providence', type: 'CONCEPT' },
+    { id: 'mock-path-4', name: 'Contemporary Applications', type: 'CONCEPT' },
+  ],
+};
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 const SVG_W = 520, SVG_H = 380, CX = 260, CY = 195, R = 155;
 
@@ -93,6 +104,9 @@ export function KnowledgeGraph() {
   const [pathTo, setPathTo] = useState('');
   const [pathSearchTrigger, setPathSearchTrigger] = useState<{ from: string; to: string } | null>(null);
   const [pathError, setPathError] = useState<string | null>(null);
+  // DEV_MODE mock path state — replaces the paused real query in development
+  const [mockPathResult, setMockPathResult] = useState<ApiLearningPath | null>(null);
+  const [mockPathLoading, setMockPathLoading] = useState(false);
 
   // Dismiss toast after 4 s
   useEffect(() => {
@@ -116,7 +130,8 @@ export function KnowledgeGraph() {
     pause: DEV_MODE || !selectedId,
   });
 
-  // ── Learning Path query — fires only when user clicks "Find Path" ──
+  // ── Learning Path query — fires only when user clicks "Find Path" (prod only) ──
+  // In DEV_MODE the query stays paused; mock data is returned via mockPathResult instead.
   const [learningPathResult] = useQuery({
     query: LEARNING_PATH_QUERY,
     variables: {
@@ -207,12 +222,25 @@ export function KnowledgeGraph() {
     }
     setPathError(null);
     setPathSearchTrigger({ from, to });
+
+    if (DEV_MODE) {
+      // Reset previous result and show a brief loading flash before returning mock data.
+      setMockPathResult(null);
+      setMockPathLoading(true);
+      const timer = setTimeout(() => {
+        setMockPathLoading(false);
+        setMockPathResult(MOCK_LEARNING_PATH);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
   }, [pathFrom, pathTo]);
 
-  const learningPath: ApiLearningPath | null =
-    learningPathResult.data?.learningPath ?? null;
+  // In DEV_MODE use the mock result; in production use the real query response.
+  const learningPath: ApiLearningPath | null = DEV_MODE
+    ? mockPathResult
+    : ((learningPathResult.data as { learningPath?: ApiLearningPath } | undefined)?.learningPath ?? null);
   const relatedByName: ApiConceptNode[] =
-    relatedByNameResult.data?.relatedConceptsByName ?? [];
+    (relatedByNameResult.data as { relatedConceptsByName?: ApiConceptNode[] } | undefined)?.relatedConceptsByName ?? [];
 
   // IDs that are on the active learning path — used to highlight nodes
   const pathNodeIds = useMemo(
@@ -519,9 +547,9 @@ export function KnowledgeGraph() {
                   variant="outline"
                   className="w-full h-7 text-xs"
                   onClick={handleFindPath}
-                  disabled={!DEV_MODE && learningPathResult.fetching}
+                  disabled={DEV_MODE ? mockPathLoading : learningPathResult.fetching}
                 >
-                  {!DEV_MODE && learningPathResult.fetching ? (
+                  {(DEV_MODE ? mockPathLoading : learningPathResult.fetching) ? (
                     <><Loader2 className="h-3 w-3 mr-1 animate-spin" />Finding...</>
                   ) : (
                     'Find Path'
@@ -538,7 +566,7 @@ export function KnowledgeGraph() {
                   </p>
                 )}
 
-                {pathSearchTrigger && !learningPathResult.fetching && !learningPathResult.error && (
+                {pathSearchTrigger && !mockPathLoading && !learningPathResult.fetching && !learningPathResult.error && (
                   learningPath ? (
                     <div className="space-y-1">
                       <p className="text-xs text-muted-foreground">

@@ -129,6 +129,10 @@ export function ContentViewer() {
   const { messages: chatMessages, chatInput, setChatInput, sendMessage: sendChatMessage, chatEndRef, isStreaming } =
     useAgentChat(contentId);
 
+  // useContentData does not expose bookmark data — the bookmarks field is not
+  // part of the ContentItem schema in the current supergraph (tracked in
+  // OPEN_ISSUES.md). Fall back to mockBookmarks until the backend exposes a
+  // real bookmarks query/field.
   const bookmarks = mockBookmarks;
 
   // ── HLS adaptive streaming ──
@@ -173,9 +177,12 @@ export function ContentViewer() {
   // ── Video controls ──
   const togglePlay = () => {
     if (!videoRef.current) return;
-    if (playing) videoRef.current.pause();
-    else void videoRef.current.play();
-    setPlaying(!playing);
+    if (videoRef.current.paused) {
+      videoRef.current.play().catch((err) => console.warn('play failed:', err));
+    } else {
+      videoRef.current.pause();
+    }
+    // Do NOT call setPlaying() here — onPlay/onPause events are the source of truth.
   };
 
   const seekTo = useCallback((time: number) => {
@@ -191,9 +198,7 @@ export function ContentViewer() {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.code === 'Space') {
         e.preventDefault();
-        if (!videoRef.current) return;
-        if (videoRef.current.paused) void videoRef.current.play();
-        else videoRef.current.pause();
+        togglePlay();
       } else if (e.code === 'ArrowLeft') {
         seekTo(Math.max(0, currentTime - 5));
       } else if (e.code === 'ArrowRight') {

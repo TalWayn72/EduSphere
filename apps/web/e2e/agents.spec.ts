@@ -1,9 +1,13 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * Agents E2E tests — AgentsPage (/agents).
  *
- * DEV_MODE assumptions (VITE_DEV_MODE=true):
+ * Auth: Each test performs a full Keycloak OIDC login as student@example.com
+ * before navigating to /agents. The server runs with VITE_DEV_MODE=false so
+ * ProtectedRoute enforces authentication via real Keycloak tokens.
+ *
+ * DEV_MODE mock-data assumptions (still active for agent UI behaviour):
  *   - AGENT_MODES array defines 5 templates: chavruta, quiz, summarize, research, explain
  *   - Each mode has 3 quick-prompt chips and a pre-seeded greeting message
  *   - Sending a message triggers a 600ms delay, then streams mock response characters
@@ -14,7 +18,38 @@ import { test, expect } from '@playwright/test';
  * Tests that check for the final AI message use a 10s timeout to be safe.
  */
 
+const STUDENT = { email: 'student@example.com', password: 'Student123!' };
+
+/**
+ * Perform a full Keycloak OIDC login as the given user and wait until the app
+ * has redirected back to an authenticated route.
+ */
+async function loginViaKeycloak(page: Page): Promise<void> {
+  await page.goto('/login');
+  await page.waitForLoadState('domcontentloaded');
+
+  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  await signInBtn.waitFor({ timeout: 10_000 });
+  await signInBtn.click();
+
+  // Keycloak OIDC login form
+  await page.waitForURL(/localhost:8080\/realms\/edusphere/, { timeout: 15_000 });
+  await expect(page.locator('#username')).toBeVisible({ timeout: 10_000 });
+  await page.fill('#username', STUDENT.email);
+  await page.fill('#password', STUDENT.password);
+  await page.click('#kc-login');
+
+  // Wait for Keycloak to redirect back to the app and for the router to settle
+  await page.waitForURL(/localhost:5175/, { timeout: 20_000 });
+  await page.waitForURL(/\/(learn|courses|dashboard|agents|search|login)/, {
+    timeout: 25_000,
+  });
+}
+
 test.describe('Agents — page load and template selector', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginViaKeycloak(page);
+  });
   test('agents page loads with the heading "AI Learning Agents"', async ({
     page,
   }) => {
@@ -97,6 +132,10 @@ test.describe('Agents — page load and template selector', () => {
 });
 
 test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginViaKeycloak(page);
+  });
+
   test('sending a message shows it in the chat as a user bubble', async ({
     page,
   }) => {

@@ -146,6 +146,8 @@ export function AnnotationsPage() {
   const [sortBy, setSortBy] = useState<'time' | 'layer'>('time');
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  // BUG-06 fix: controlled tab state so layer summary cards can drive the Tabs
+  const [activeTab, setActiveTab] = useState<string>('all');
 
   const [{ data, fetching, error }] = useQuery({
     query: MY_ANNOTATIONS_QUERY,
@@ -259,8 +261,25 @@ export function AnnotationsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {ALL_LAYERS.map((layer) => {
             const meta = ANNOTATION_LAYER_META[layer];
+            const isSelected = activeTab === layer;
             return (
-              <Card key={layer} className={`border ${meta.bg}`}>
+              <Card
+                key={layer}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSelected}
+                onClick={() => setActiveTab(layer)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') setActiveTab(layer);
+                }}
+                className={[
+                  'border cursor-pointer transition-all select-none',
+                  meta.bg,
+                  isSelected
+                    ? 'ring-2 ring-offset-2 ring-primary shadow-md'
+                    : 'hover:shadow-sm hover:brightness-95',
+                ].join(' ')}
+              >
                 <CardContent className="p-3 text-center">
                   <p className="text-2xl">{meta.icon}</p>
                   <p className={`text-lg font-bold ${meta.color}`}>{counts[layer] ?? 0}</p>
@@ -279,7 +298,7 @@ export function AnnotationsPage() {
         )}
 
         {total > 0 && (
-          <Tabs defaultValue="all">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
               <TabsTrigger value="all">All ({total})</TabsTrigger>
               {ALL_LAYERS.map((layer) => (

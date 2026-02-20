@@ -1,10 +1,14 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { SearchPage } from './pages/SearchPage';
 
 /**
  * Search E2E tests — /search route and Ctrl+K / Cmd+K keyboard shortcut.
  *
- * DEV_MODE assumptions (VITE_DEV_MODE=true):
+ * Auth: Each test performs a full Keycloak OIDC login as student@example.com
+ * before navigating to /search. The server runs with VITE_DEV_MODE=false so
+ * ProtectedRoute enforces authentication via real Keycloak tokens.
+ *
+ * DEV_MODE mock-data assumptions (still active for search UI behaviour):
  *   - Search uses mockSearch() which queries in-memory mock fixtures
  *   - Results appear within ~300ms (debounce) with no network round-trip
  *   - Suggested chips: 'Talmud', 'chavruta', 'kal vachomer', 'Rambam', 'pilpul'
@@ -12,7 +16,38 @@ import { SearchPage } from './pages/SearchPage';
  *   - Mock graph nodes include 'Free Will', 'Maimonides', etc.
  */
 
+const STUDENT = { email: 'student@example.com', password: 'Student123!' };
+
+/**
+ * Perform a full Keycloak OIDC login as the given user and wait until the app
+ * has redirected back to an authenticated route.
+ */
+async function loginViaKeycloak(page: Page): Promise<void> {
+  await page.goto('/login');
+  await page.waitForLoadState('domcontentloaded');
+
+  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  await signInBtn.waitFor({ timeout: 10_000 });
+  await signInBtn.click();
+
+  // Keycloak OIDC login form
+  await page.waitForURL(/localhost:8080\/realms\/edusphere/, { timeout: 15_000 });
+  await expect(page.locator('#username')).toBeVisible({ timeout: 10_000 });
+  await page.fill('#username', STUDENT.email);
+  await page.fill('#password', STUDENT.password);
+  await page.click('#kc-login');
+
+  // Wait for Keycloak to redirect back to the app and for the router to settle
+  await page.waitForURL(/localhost:5175/, { timeout: 20_000 });
+  await page.waitForURL(/\/(learn|courses|dashboard|agents|search|login)/, {
+    timeout: 25_000,
+  });
+}
+
 test.describe('Search — page load and empty state', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginViaKeycloak(page);
+  });
   test('search page loads with empty state when no query is provided', async ({
     page,
   }) => {
@@ -46,6 +81,10 @@ test.describe('Search — page load and empty state', () => {
 });
 
 test.describe('Search — keyboard shortcut', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginViaKeycloak(page);
+  });
+
   test('Ctrl+K (or Cmd+K) from /dashboard opens the search page', async ({
     page,
   }) => {
@@ -88,6 +127,10 @@ test.describe('Search — keyboard shortcut', () => {
 });
 
 test.describe('Search — results behaviour', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginViaKeycloak(page);
+  });
+
   test('typing a query returns results within 1 second', async ({ page }) => {
     const searchPage = new SearchPage(page);
     await searchPage.goto();

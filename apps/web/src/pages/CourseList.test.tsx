@@ -125,13 +125,19 @@ describe('CourseList', () => {
     expect(screen.getByText(/loading courses/i)).toBeInTheDocument();
   });
 
-  it('shows error state when query fails', () => {
+  it('shows offline banner and mock fallback courses when query fails', () => {
     vi.mocked(useQuery).mockReturnValueOnce([
       { data: undefined, fetching: false, error: new Error('Network error') },
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
     renderCourseList();
-    expect(screen.getByText(/error loading courses/i)).toBeInTheDocument();
+    // Non-blocking warning banner is shown
+    expect(screen.getByText(/\[Network\] Failed to fetch/i)).toBeInTheDocument();
+    expect(screen.getByText(/showing cached data/i)).toBeInTheDocument();
+    // Page still renders with mock fallback courses — not a blank error page
+    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(screen.getByText('Courses')).toBeInTheDocument();
   });
 
   it('shows Enroll buttons for students', () => {

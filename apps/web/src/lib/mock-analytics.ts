@@ -160,3 +160,14 @@ export const MOCK_ACTIVITY_FEED: ActivityItem[] = [
 export const MOCK_LEARNING_STREAK = 7; // days
 export const MOCK_TOTAL_STUDY_MINUTES = 870;
 export const MOCK_CONCEPTS_MASTERED = 34;
+
+// Aggregate stats object used by Dashboard until myStats resolver is implemented.
+export const MOCK_STATS = {
+  coursesEnrolled: 3,
+  activeCourses: 3,
+  completedCourses: 1,
+  annotationsCreated: 43,
+  conceptsMastered: MOCK_CONCEPTS_MASTERED,
+  totalLearningMinutes: MOCK_TOTAL_STUDY_MINUTES,
+  weeklyActivity: MOCK_HEATMAP_DATA,
+};

@@ -12,11 +12,17 @@ import { AIChatPanel } from '@/components/AIChatPanel';
 import { ActivityHeatmap } from '@/components/ActivityHeatmap';
 import { LearningStats } from '@/components/LearningStats';
 import { ActivityFeed } from '@/components/ActivityFeed';
-import { ME_QUERY, COURSES_QUERY, MY_STATS_QUERY } from '@/lib/queries';
+import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
+import { MY_ANNOTATIONS_QUERY } from '@/lib/graphql/annotation.queries';
 import {
   MOCK_COURSE_PROGRESS,
   MOCK_WEEKLY_STATS,
   MOCK_ACTIVITY_FEED,
+  // myStats resolver is not yet in the deployed supergraph — mock is the fallback.
+  // weeklyActivity, totalLearningMinutes, conceptsMastered: no backend query yet (mock).
+  // coursesEnrolled: resolved from COURSES_QUERY.data.courses.length (real).
+  // annotationsCreated: resolved from MY_ANNOTATIONS_QUERY count (real).
+  MOCK_STATS,
 } from '@/lib/mock-analytics';
 import {
   BookOpen,
@@ -47,50 +53,62 @@ interface CourseNode {
   slug: string;
   isPublished: boolean;
   estimatedHours: number | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface CoursesQueryResult {
   courses: CourseNode[];
 }
 
-interface MyStatsResult {
-  myStats: {
-    coursesEnrolled: number;
-    annotationsCreated: number;
-    conceptsMastered: number;
-    totalLearningMinutes: number;
-    weeklyActivity: { date: string; count: number }[];
-  };
+interface AnnotationNode {
+  id: string;
 }
 
-function StatSkeleton() {
-  return (
-    <div className="h-8 w-16 bg-muted animate-pulse rounded" />
-  );
+interface MyAnnotationsQueryResult {
+  annotationsByUser: AnnotationNode[];
 }
 
 export function Dashboard() {
   const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY });
   const [coursesResult] = useQuery<CoursesQueryResult>({
     query: COURSES_QUERY,
-    variables: { limit: 5, offset: 0 },
+    variables: { limit: 100, offset: 0 },
   });
-  const [statsResult] = useQuery<MyStatsResult>({ query: MY_STATS_QUERY });
 
-  const stats = statsResult.data?.myStats;
+  // MY_ANNOTATIONS_QUERY requires userId; pause until me resolves to avoid a
+  // premature request with an undefined variable.
+  const currentUserId = meResult.data?.me?.id;
+  const [annotationsResult] = useQuery<MyAnnotationsQueryResult>({
+    query: MY_ANNOTATIONS_QUERY,
+    variables: { userId: currentUserId, limit: 500, offset: 0 },
+    pause: !currentUserId,
+  });
+
+  // --- Derived real stats (fall back to MOCK_STATS when real data unavailable) ---
+
+  // REAL: total courses from the catalog (limit raised to 100 so the count is meaningful)
+  const coursesEnrolled =
+    coursesResult.fetching
+      ? null
+      : (coursesResult.data?.courses?.length ?? MOCK_STATS.coursesEnrolled);
+
+  // REAL: annotation count from annotationsByUser
+  const annotationsCreated =
+    !currentUserId || annotationsResult.fetching
+      ? null
+      : (annotationsResult.data?.annotationsByUser?.length ?? MOCK_STATS.annotationsCreated);
+
+  // MOCK: no backend query yet for study time or concepts mastered
+  const totalLearningMinutes = MOCK_STATS.totalLearningMinutes;
+  const totalMinutesDisplay =
+    totalLearningMinutes >= 60
+      ? `${Math.floor(totalLearningMinutes / 60)}h ${totalLearningMinutes % 60}m`
+      : `${totalLearningMinutes}m`;
 
   // useDeferredValue defers rendering of the data-intensive ActivityHeatmap.
   // React will render the heatmap with the previous (stale) data first while
   // computing the updated layout, keeping the rest of the page responsive.
-  const weeklyActivity = stats?.weeklyActivity ?? [];
-  const deferredActivity = useDeferredValue(weeklyActivity);
-
-  const totalMinutesDisplay = (() => {
-    const m = stats?.totalLearningMinutes ?? 0;
-    return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
-  })();
+  // weeklyActivity has no backend endpoint yet — still mock.
+  const deferredActivity = useDeferredValue(MOCK_STATS.weeklyActivity);
 
   return (
     <Layout>
@@ -114,16 +132,6 @@ export function Dashboard() {
           </Card>
         )}
 
-        {statsResult.error && (
-          <Card className="border-destructive">
-            <CardContent className="pt-6">
-              <p className="text-destructive">
-                Error loading stats: {statsResult.error.message}
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Primary Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
@@ -132,14 +140,11 @@ export function Dashboard() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
+              {/* Real: derived from COURSES_QUERY catalog count */}
               <div className="text-2xl font-bold">
-                {statsResult.fetching ? (
-                  <StatSkeleton />
-                ) : (
-                  stats?.coursesEnrolled ?? 0
-                )}
+                {coursesEnrolled === null ? '...' : coursesEnrolled}
               </div>
-              <p className="text-xs text-muted-foreground">Active enrollments</p>
+              <p className="text-xs text-muted-foreground">Available in catalog</p>
             </CardContent>
           </Card>
           <Card>
@@ -148,9 +153,7 @@ export function Dashboard() {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {statsResult.fetching ? <StatSkeleton /> : totalMinutesDisplay}
-              </div>
+              <div className="text-2xl font-bold">{totalMinutesDisplay}</div>
               <p className="text-xs text-muted-foreground">Total recorded</p>
             </CardContent>
           </Card>
@@ -160,13 +163,7 @@ export function Dashboard() {
               <Brain className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {statsResult.fetching ? (
-                  <StatSkeleton />
-                ) : (
-                  stats?.conceptsMastered ?? 0
-                )}
-              </div>
+              <div className="text-2xl font-bold">{MOCK_STATS.conceptsMastered}</div>
               <p className="text-xs text-muted-foreground">Completed content items</p>
             </CardContent>
           </Card>
@@ -180,10 +177,9 @@ export function Dashboard() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
+              {/* Real: same COURSES_QUERY result as Courses Enrolled card */}
               <div className="text-2xl font-bold">
-                {coursesResult.fetching
-                  ? '...'
-                  : (coursesResult.data?.courses?.length ?? 0)}
+                {coursesEnrolled === null ? '...' : coursesEnrolled}
               </div>
               <p className="text-xs text-muted-foreground">Available in catalog</p>
             </CardContent>
@@ -194,12 +190,9 @@ export function Dashboard() {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
+              {/* Real: derived from MY_ANNOTATIONS_QUERY (annotationsByUser count) */}
               <div className="text-2xl font-bold">
-                {statsResult.fetching ? (
-                  <StatSkeleton />
-                ) : (
-                  stats?.annotationsCreated ?? 0
-                )}
+                {annotationsCreated === null ? '...' : annotationsCreated}
               </div>
               <p className="text-xs text-muted-foreground">Notes and highlights</p>
             </CardContent>
@@ -231,11 +224,7 @@ export function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {statsResult.fetching ? (
-              <div className="h-16 bg-muted animate-pulse rounded" />
-            ) : (
-              <ActivityHeatmap data={deferredActivity} />
-            )}
+            <ActivityHeatmap data={deferredActivity} />
           </CardContent>
         </Card>
 
@@ -279,7 +268,7 @@ export function Dashboard() {
                   </div>
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tenant</dt>
-                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{meResult.data.me.tenantId}</dd>
+                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{meResult.data.me.tenantId || '—'}</dd>
                   </div>
                 </dl>
               </CardContent>

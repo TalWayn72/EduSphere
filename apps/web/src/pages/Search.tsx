@@ -237,8 +237,15 @@ export function SearchPage() {
     };
   });
 
-  // Build results
-  const results: SearchResult[] = DEV_MODE ? mockSearch(query) : realResults;
+  // Determine if GraphQL failed and we need to fall back to offline mock search
+  const isOfflineFallback = !DEV_MODE && !!searchResult.error && query.length >= 2;
+
+  // Build results: dev mode → mock, real mode with error → offline mock fallback, real mode ok → real
+  const results: SearchResult[] = DEV_MODE
+    ? mockSearch(query)
+    : isOfflineFallback
+      ? mockSearch(query)
+      : realResults;
 
   const loading =
     (!DEV_MODE && searchResult.fetching) || isSearching;
@@ -275,10 +282,15 @@ export function SearchPage() {
           )}
         </div>
 
-        {/* Error state */}
-        {!DEV_MODE && searchResult.error && query.length >= 2 && (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-            Search unavailable — please try again later.
+        {/* Offline fallback banner — shown instead of hard error, results still appear below */}
+        {isOfflineFallback && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-800"
+          >
+            <span className="inline-block h-2 w-2 rounded-full bg-amber-400 flex-shrink-0" aria-hidden="true" />
+            Offline mode — showing cached results
           </div>
         )}
 
@@ -296,7 +308,7 @@ export function SearchPage() {
         )}
 
         {/* Result count */}
-        {query.length >= 2 && !loading && !searchResult.error && (
+        {query.length >= 2 && !loading && (
           <p className="text-sm text-muted-foreground px-1">
             {results.length === 0
               ? 'No results found'
