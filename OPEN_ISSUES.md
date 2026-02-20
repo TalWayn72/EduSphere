@@ -2,8 +2,103 @@
 
 **תאריך עדכון:** 20 פברואר 2026
 **מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅ | **BUG-DOCKER-001 ✅ Fixed** | **BUG-04 ✅ Fixed** | **BUG-03 ✅ Fixed** | **E2E Audit BUG-01/02/05/12/13/14/15/17/18 ✅ Fixed** | **Visual QA Round 2 BUG-19/20/21/22 ✅ Fixed** | **Visual QA Round 3 BUG-25/26/27 ✅ Fixed** | **ANTHROPIC_API_KEY ✅ Permanent**
-**בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | סה"כ: **>1,400 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **6-Agent Visual QA: 41/44 PASS (93%)** | **Round 3 fixes: BUG-25/26/27 ✅**
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅ | **BUG-DOCKER-001 ✅ Fixed** | **BUG-04 ✅ Fixed** | **BUG-03 ✅ Fixed** | **E2E Audit BUG-01/02/05/12/13/14/15/17/18 ✅ Fixed** | **Visual QA Round 2 BUG-19/20/21/22 ✅ Fixed** | **Visual QA Round 3 BUG-25/26/27 ✅ Fixed** | **Visual QA Round 4 BUG-28/29/30 ✅ Fixed** | **Visual QA Round 5 BUG-31/32 ✅ Fixed** | **ANTHROPIC_API_KEY ✅ Permanent**
+**בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | סה"כ: **>1,400 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **6-Agent Visual QA: Round 5 — 49/57 unique tests PASS** | **Round 4+5 fixes: BUG-28/29/30/31/32 ✅**
+
+---
+
+## ✅ BUG-32: search.spec.ts / SearchPage.ts — `[class*="CardContent"]` Never Matches DOM (Visual QA Round 5 — 20 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🟡 Medium |
+| **Status** | ✅ Fixed |
+| **Files** | `apps/web/e2e/pages/SearchPage.ts`, `apps/web/e2e/search.spec.ts` |
+
+### בעיית שורש
+
+`SearchPage.ts` `resultCards` locator was `page.locator('[class*="CardContent"]')`. In Tailwind-v4/shadcn, `CardContent` is a React component name — it never appears as a CSS class in the DOM. The actual rendered `<div>` gets classes like `p-4 rounded-lg` etc. (Tailwind utilities). So `[class*="CardContent"]` matched 0 elements, causing `assertResultsVisible()` and all card-click tests to fail. Tests 6, 8, and 12 of `search.spec.ts` all failed with element-not-found.
+
+### תיקון
+
+Changed locator from `[class*="CardContent"]` → `[class*="rounded-lg"][class*="cursor-pointer"]` (filtered by `has: '[class*="font-semibold"]'`). The shadcn `Card` component adds `rounded-lg` as a base class; search result cards are also `cursor-pointer`. Applied the same fix in `search.spec.ts` tests 8 and 9.
+
+---
+
+## ✅ BUG-31: agents.spec.ts Tests 4 & 7 — Playwright Strict Mode Violations (Visual QA Round 5 — 20 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🟡 Medium |
+| **Status** | ✅ Fixed |
+| **Files** | `apps/web/e2e/agents.spec.ts` |
+
+### בעיית שורש
+
+**Test 4** (`selecting Quiz Master mode`): locator `getByText(/test your knowledge/i).or(getByText(/Quiz me/i)).or(getByText(/random/i))` matched 3 simultaneous elements (1 greeting bubble + 2 quick-prompt chips). Playwright strict mode requires exactly 1 element for `.toBeVisible()`.
+
+**Test 7** (`AI response streams`): locator `locator('[class*="bg-primary"]').filter({ hasText: 'Debate free will' })` matched 2 elements — the user chat bubble (bg-primary) and the quick-prompt chip button with identical text. Strict mode rejected it.
+
+### תיקון
+
+Added `.first()` at the end of each ambiguous locator chain. Both tests now resolve to the first matching element, satisfying strict mode while still asserting the expected content is visible.
+
+---
+
+## ✅ BUG-30: visual-qa-student Tests 06 & 07 — Add Annotation Button + Tab Enum Names (Visual QA Round 4 — 20 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🟡 Medium |
+| **Status** | ✅ Fixed |
+| **Files** | `apps/web/e2e/visual-qa-student.spec.ts` |
+
+### בעיית שורש
+
+**Test 06** (Create Annotation): `Add` button locator not finding element within 3s. The Vite HMR chunk invalidation (hash mismatch after previous tests) caused some modules to fail to load, making the annotation panel temporarily invisible. Also selector was too narrow.
+
+**Test 07** (Annotation tabs): Used raw enum values `['All', 'PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED']` but `TabsTrigger` renders display labels from `ANNOTATION_LAYER_META`: `Personal`, `Shared`, `Instructor`, `AI`.
+
+### תיקון
+
+1. Test 06: Increased wait to 5000ms, added `.or()` fallback selector for button detection.
+2. Test 07: Changed tab names to match display labels `['All', 'Personal', 'Shared', 'Instructor', 'AI']` with case-insensitive regex matching.
+
+---
+
+## ✅ BUG-29: search.spec.ts All 12 Tests Fail — Hardcoded Port 5175 in loginViaKeycloak() (Visual QA Round 4 — 20 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical |
+| **Status** | ✅ Fixed |
+| **Files** | `apps/web/e2e/search.spec.ts` |
+
+### בעיית שורש
+
+`loginViaKeycloak()` called `page.waitForURL(/localhost:5175/)` after Keycloak OIDC redirect. But `playwright.config.ts` sets `baseURL: 'http://localhost:5173'` — the app always returns to port 5173. All 12 tests timed out waiting for a URL that never came.
+
+### תיקון
+
+Dynamic `APP_HOST` constant: `const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5173').replace(/^https?:\/\//, '')`. `waitForURL` now uses `new RegExp(APP_HOST.replace('.', '\\.'))`.
+
+---
+
+## ✅ BUG-28: agents.spec.ts All 11 Tests Fail — Hardcoded Port 5175 in loginViaKeycloak() (Visual QA Round 4 — 20 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical |
+| **Status** | ✅ Fixed |
+| **Files** | `apps/web/e2e/agents.spec.ts` |
+
+### בעיית שורש
+
+`loginViaKeycloak()` waited for `waitForURL(/localhost:5175/)` after Keycloak OIDC redirect. Playwright `baseURL` is `localhost:5173`, so after successful Keycloak login, the redirect returns to port 5173. `waitForURL` never matched and all 11 agent tests timed out after 20s.
+
+### תיקון
+
+Same as BUG-29: dynamic `APP_HOST` from `process.env.E2E_BASE_URL ?? 'http://localhost:5173'`.
 
 ---
 

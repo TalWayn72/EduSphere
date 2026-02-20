@@ -164,8 +164,9 @@ test.describe('Search — results behaviour', () => {
     await searchPage.searchFor('Talmud');
 
     // Course results navigate to /courses (href from mockSearch)
+    // Use rounded-lg + cursor-pointer to match the shadcn Card outer div
     const courseCard = page
-      .locator('[class*="CardContent"]')
+      .locator('[class*="rounded-lg"][class*="cursor-pointer"]')
       .filter({ hasText: 'Introduction to Talmud Study' })
       .first();
 
@@ -188,9 +189,9 @@ test.describe('Search — results behaviour', () => {
     // Wait for results
     await page.waitForTimeout(600);
 
-    // Look for a transcript result card
+    // Look for a transcript result card (green color for transcript type)
     const transcriptResult = page
-      .locator('[class*="CardContent"]')
+      .locator('[class*="rounded-lg"][class*="cursor-pointer"]')
       .filter({
         has: page.locator('[class*="text-green"]'),
       })

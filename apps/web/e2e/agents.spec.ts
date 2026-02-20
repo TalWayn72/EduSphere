@@ -113,11 +113,12 @@ test.describe('Agents — page load and template selector', () => {
       .filter({ hasText: 'Quiz Master' });
     await expect(chatHeader.first()).toBeVisible({ timeout: 3_000 });
 
-    // Quiz greeting should appear
+    // Quiz greeting should appear — .first() avoids strict-mode violation when
+    // the same text appears in both a chat bubble and a quick-prompt chip
     await expect(
       page.getByText(/test your knowledge/i).or(page.getByText(/Quiz me/i)).or(
         page.getByText(/random/i)
-      )
+      ).first()
     ).toBeVisible({ timeout: 3_000 });
   });
 
@@ -173,9 +174,10 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
       .filter({ has: page.locator('.lucide-send') });
     await sendBtn.click();
 
-    // User bubble appears — scope to primary-colored chat bubbles to avoid chip collision
+    // User bubble appears — .first() avoids strict-mode violation when the quick-prompt
+    // chip with the same text is also visible alongside the chat bubble
     await expect(
-      page.locator('[class*="bg-primary"]').filter({ hasText: 'Debate free will' })
+      page.locator('[class*="bg-primary"]').filter({ hasText: 'Debate free will' }).first()
     ).toBeVisible({ timeout: 3_000 });
 
     // Wait for streaming to complete and AI message to settle
