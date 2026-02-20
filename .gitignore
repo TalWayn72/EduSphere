@@ -99,3 +99,5 @@ apps/web/nul
 # Windows temp path artifacts (created by Windows path confusion)
 "apps/web/C:*"
 apps/web/C:*
+apps/web/C*Users*AppData*
+"apps/web/C*"
