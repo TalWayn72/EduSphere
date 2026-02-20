@@ -441,14 +441,17 @@ test('06 — Content Viewer — create an annotation', async ({ page }) => {
 
   await loginViaKeycloak(page);
   await page.goto(`${BASE}/learn/content-1`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(5000); // extra wait for Vite HMR to settle
 
-  // Try to add an annotation
-  const addBtn = page.getByRole('button', { name: /Add/i }).first();
+  // Try to add an annotation — button has text "Add" with Plus icon
+  const addBtn = page
+    .getByRole('button', { name: /Add/i })
+    .or(page.locator('button:has(svg)').filter({ hasText: /Add/i }))
+    .first();
   const addBtnVisible = await addBtn.isVisible().catch(() => false);
 
   if (!addBtnVisible) {
-    entry.notes.push('MISSING: Add annotation button not visible');
+    entry.notes.push('MISSING: Add annotation button not visible (possible Vite HMR cache miss)');
     entry.url = page.url();
     entry.screenshot = await snap(page, '06-annotation-no-button');
     entry.loadedSuccessfully = false;
@@ -524,10 +527,10 @@ test('07 — Annotations Page — layer tabs and list', async ({ page }) => {
   const headingVisible = await heading.isVisible().catch(() => false);
   if (!headingVisible) entry.notes.push('MISSING: Annotations heading not visible');
 
-  // Check layer tabs
-  const tabs = ['All', 'PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED'];
+  // Check layer tabs — use display labels (from ANNOTATION_LAYER_META), not enum values
+  const tabs = ['All', 'Personal', 'Shared', 'Instructor', 'AI'];
   for (const tab of tabs) {
-    const tabEl = page.getByRole('tab', { name: tab });
+    const tabEl = page.getByRole('tab', { name: new RegExp(tab, 'i') });
     const tabVisible = await tabEl.isVisible().catch(() => false);
     if (!tabVisible) entry.notes.push(`MISSING tab: "${tab}"`);
   }

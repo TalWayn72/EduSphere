@@ -17,6 +17,8 @@ import { SearchPage } from './pages/SearchPage';
  */
 
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
+// Matches whichever port the app is running on (5173 default, 5175 when E2E_BASE_URL overrides)
+const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5173').replace(/^https?:\/\//, '');
 
 /**
  * Perform a full Keycloak OIDC login as the given user and wait until the app
@@ -38,7 +40,7 @@ async function loginViaKeycloak(page: Page): Promise<void> {
   await page.click('#kc-login');
 
   // Wait for Keycloak to redirect back to the app and for the router to settle
-  await page.waitForURL(/localhost:5175/, { timeout: 20_000 });
+  await page.waitForURL(new RegExp(APP_HOST.replace('.', '\\.')), { timeout: 20_000 });
   await page.waitForURL(/\/(learn|courses|dashboard|agents|search|login)/, {
     timeout: 25_000,
   });
