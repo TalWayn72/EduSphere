@@ -1,5 +1,7 @@
 import { useQuery } from 'urql';
 import { useDeferredValue } from 'react';
+import { Link } from 'react-router-dom';
+import { getCurrentUser } from '@/lib/auth';
 import { Layout } from '@/components/Layout';
 import {
   Card,
@@ -31,6 +33,8 @@ import {
   Bot,
   Clock,
   Brain,
+  PlusCircle,
+  Settings,
 } from 'lucide-react';
 
 interface MeQueryResult {
@@ -68,6 +72,7 @@ interface MyAnnotationsQueryResult {
 }
 
 export function Dashboard() {
+  const localUser = getCurrentUser();
   const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY });
   const [coursesResult] = useQuery<CoursesQueryResult>({
     query: COURSES_QUERY,
@@ -118,9 +123,40 @@ export function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back{meResult.data?.me && `, ${meResult.data.me.firstName}`}!
+            Welcome back{(meResult.data?.me?.firstName ?? localUser?.firstName) && `, ${meResult.data?.me?.firstName ?? localUser?.firstName}`}!
           </p>
         </div>
+
+        {/* Instructor / Admin quick actions */}
+        {localUser && ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(localUser.role) && (
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Settings className="h-4 w-4 text-primary" />
+                Instructor Tools
+                <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  {localUser.role.replace('_', ' ')}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex gap-3">
+              <Link
+                to="/courses/new"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                <PlusCircle className="h-4 w-4" />
+                Create Course
+              </Link>
+              <Link
+                to="/courses"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent transition-colors"
+              >
+                <BookOpen className="h-4 w-4" />
+                Manage Courses
+              </Link>
+            </CardContent>
+          </Card>
+        )}
 
         {meResult.error && (
           <Card className="border-destructive">
@@ -240,40 +276,55 @@ export function Dashboard() {
             </CardContent>
           </Card>
 
-          {meResult.fetching ? (
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">Loading profile...</p>
-              </CardContent>
-            </Card>
-          ) : meResult.data?.me ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile</CardTitle>
-                <CardDescription>Your account information</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</dt>
-                    <dd className="text-sm mt-1">{meResult.data.me.firstName} {meResult.data.me.lastName}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</dt>
-                    <dd className="text-sm mt-1">{meResult.data.me.email}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Role</dt>
-                    <dd className="text-sm mt-1">{meResult.data.me.role}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tenant</dt>
-                    <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{meResult.data.me.tenantId || '—'}</dd>
-                  </div>
-                </dl>
-              </CardContent>
-            </Card>
-          ) : null}
+          {(() => {
+            // Use real GraphQL data when available, fall back to JWT-parsed user
+            const profile = meResult.data?.me ?? (localUser ? {
+              firstName: localUser.firstName,
+              lastName: localUser.lastName,
+              email: localUser.email,
+              role: localUser.role,
+              tenantId: localUser.tenantId,
+            } : null);
+
+            if (meResult.fetching && !localUser) {
+              return (
+                <Card>
+                  <CardContent className="pt-6">
+                    <p className="text-sm text-muted-foreground">Loading profile...</p>
+                  </CardContent>
+                </Card>
+              );
+            }
+            if (!profile) return null;
+            return (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile</CardTitle>
+                  <CardDescription>Your account information</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</dt>
+                      <dd className="text-sm mt-1">{profile.firstName} {profile.lastName}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</dt>
+                      <dd className="text-sm mt-1">{profile.email}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Role</dt>
+                      <dd className="text-sm mt-1">{profile.role}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tenant</dt>
+                      <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{profile.tenantId || '—'}</dd>
+                    </div>
+                  </dl>
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
       </div>
     </Layout>

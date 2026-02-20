@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { ArrowLeft, User, Mail, Shield, Key, BookOpen, Brain, MessageSquare } from 'lucide-react';
 import { Layout } from '@/components/Layout';
@@ -59,8 +59,7 @@ export function ProfilePage() {
   });
 
   if (!localUser) {
-    navigate('/login');
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   // Use real ME_QUERY data when available, fall back to JWT-parsed user

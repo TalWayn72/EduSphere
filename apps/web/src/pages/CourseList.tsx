@@ -4,7 +4,7 @@ import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Clock, Users, Plus, Globe, EyeOff, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
+import { BookOpen, Clock, Users, Plus, Globe, EyeOff, CheckCircle2, Loader2, AlertTriangle, Pencil } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { COURSES_QUERY } from '@/lib/queries';
 import {
@@ -291,24 +291,38 @@ export function CourseList() {
                     )}
 
                     {isInstructor && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full mt-1 gap-1.5"
-                        onClick={(e) => togglePublish(e, course.id, published)}
-                      >
-                        {published ? (
-                          <>
-                            <EyeOff className="h-3.5 w-3.5" />
-                            Unpublish
-                          </>
-                        ) : (
-                          <>
-                            <Globe className="h-3.5 w-3.5" />
-                            Publish
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex gap-2 mt-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 gap-1.5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/courses/${course.id}`);
+                          }}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-1 gap-1.5"
+                          onClick={(e) => togglePublish(e, course.id, published)}
+                        >
+                          {published ? (
+                            <>
+                              <EyeOff className="h-3.5 w-3.5" />
+                              Unpublish
+                            </>
+                          ) : (
+                            <>
+                              <Globe className="h-3.5 w-3.5" />
+                              Publish
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </CardContent>
