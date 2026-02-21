@@ -1,9 +1,51 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 20 פברואר 2026
+**תאריך עדכון:** 21 פברואר 2026
 **מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅ | **BUG-DOCKER-001 ✅ Fixed** | **BUG-04 ✅ Fixed** | **BUG-03 ✅ Fixed** | **E2E Audit BUG-01/02/05/12/13/14/15/17/18 ✅ Fixed** | **Visual QA Round 2 BUG-19/20/21/22 ✅ Fixed** | **Visual QA Round 3 BUG-25/26/27 ✅ Fixed** | **Visual QA Round 4 BUG-28/29/30 ✅ Fixed** | **Visual QA Round 5 BUG-31/32 ✅ Fixed** | **Visual QA Round 6 BUG-33/34/35 ✅ Fixed** | **ANTHROPIC_API_KEY ✅ Permanent**
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅ | **BUG-DOCKER-001 ✅ Fixed** | **BUG-04 ✅ Fixed** | **BUG-03 ✅ Fixed** | **E2E Audit BUG-01/02/05/12/13/14/15/17/18 ✅ Fixed** | **Visual QA Round 2 BUG-19/20/21/22 ✅ Fixed** | **Visual QA Round 3 BUG-25/26/27 ✅ Fixed** | **Visual QA Round 4 BUG-28/29/30 ✅ Fixed** | **Visual QA Round 5 BUG-31/32 ✅ Fixed** | **Visual QA Round 6 BUG-33/34/35 ✅ Fixed** | **BUG-23 ✅ Fixed (Keycloak 26 JWT + RLS)** | **ANTHROPIC_API_KEY ✅ Permanent**
 **בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | סה"כ: **>1,400 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Visual QA Round 7: agents 10/10+1skip ✅, search 12/12 ✅, full-visual-qa 15/15 ✅, visual-qa-student 15/15 ✅** | **ALL E2E PASS — 0 failures**
+
+---
+
+## ✅ BUG-23: GraphQL Unauthorized — Keycloak 26 JWT + RLS Issues (21 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical (all authenticated queries fail) |
+| **Status** | ✅ Fixed |
+| **Files** | `packages/auth/src/jwt.ts`, `packages/db/src/rls/withTenantContext.ts`, Keycloak realm (runtime) |
+
+### בעיות שורש (3 בעיות נפרדות)
+
+**1. `sub` claim חסר מה-JWT (Keycloak 26 breaking change)**
+Keycloak 26 אינו מוסיף `sub` לaccess token אוטומטית — נדרש `oidc-usermodel-property-mapper` מפורש.
+
+**2. `aud` claim חסר + Zod v4 UUID validation מחמירה**
+- `aud` חסר ב-public clients → `JWTClaimsSchema` נכשל (`aud` was non-optional)
+- `tenant_id: 11111111-1111-1111-1111-111111111111` נכשל ב-Zod v4 strict UUID check (variant bits)
+
+**3. `SET LOCAL` לא תומך ב-parameterized queries**
+`sql\`SET LOCAL app.current_tenant = ${tenantId}\`` → Drizzle מייצר `$1` → PostgreSQL: `syntax error at or near "$1"`
+
+### תיקונים
+
+**packages/auth/src/jwt.ts:**
+- `tenant_id: z.string().uuid().optional()` → `z.string().optional()`
+- `aud: z.union(...)` → `.optional()` (jose מאמת aud בנפרד)
+
+**packages/db/src/rls/withTenantContext.ts:**
+- `sql\`SET LOCAL ... = ${val}\`` → `sql.raw(\`SET LOCAL ... = '${esc(val)}'\`)`
+
+**Keycloak realm (runtime + volume):**
+- הוסף `oidc-usermodel-property-mapper` (sub)
+- הוסף `oidc-audience-mapper` (aud = edusphere-web)
+- הוסף `oidc-usermodel-attribute-mapper` (tenant_id)
+- הגדיר `tenant_id` ב-User Profile (Keycloak 26 declarative profile)
+- עדכן UUIDs ב-DB להתאים ל-Keycloak sub claims
+- הגדיר firstName/lastName לכל users (required profile fields)
+
+### תוצאה
+`me { id email role tenantId }` מחזיר נתונים מלאים לכל 5 המשתמשים.
 
 ---
 
