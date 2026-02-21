@@ -1,0 +1,33 @@
+{
+  "title": "Configurações",
+  "language": {
+    "title": "Idioma",
+    "description": "Selecione seu idioma preferido para a interface e respostas da IA",
+    "saved": "Preferência de idioma salva",
+    "error": "Falha ao salvar a preferência de idioma. Por favor, tente novamente.",
+    "saving": "Salvando..."
+  },
+  "appearance": {
+    "title": "Aparência",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "email": "Notificações por e-mail",
+    "push": "Notificações push",
+    "emailDescription": "Receba atualizações e comunicados de cursos por e-mail",
+    "pushDescription": "Receba notificações em tempo real no seu dispositivo"
+  },
+  "account": {
+    "title": "Conta",
+    "editProfile": "Editar perfil",
+    "privacy": "Privacidade",
+    "myLearning": "Meu aprendizado",
+    "progress": "Progresso",
+    "achievements": "Conquistas",
+    "version": "Versão {{version}}"
+  }
+}

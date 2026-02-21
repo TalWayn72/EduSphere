@@ -1,6 +1,7 @@
 import { useQuery } from 'urql';
 import { useDeferredValue } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getCurrentUser } from '@/lib/auth';
 import { Layout } from '@/components/Layout';
 import {
@@ -47,6 +48,12 @@ interface MeQueryResult {
     tenantId: string;
     createdAt: string;
     updatedAt: string;
+    preferences: {
+      locale: string;
+      theme: string;
+      emailNotifications: boolean;
+      pushNotifications: boolean;
+    } | null;
   } | null;
 }
 
@@ -72,6 +79,7 @@ interface MyAnnotationsQueryResult {
 }
 
 export function Dashboard() {
+  const { t } = useTranslation(['dashboard', 'common']);
   const localUser = getCurrentUser();
   const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY });
   const [coursesResult] = useQuery<CoursesQueryResult>({
@@ -115,15 +123,17 @@ export function Dashboard() {
   // weeklyActivity has no backend endpoint yet — still mock.
   const deferredActivity = useDeferredValue(MOCK_STATS.weeklyActivity);
 
+  const firstName = meResult.data?.me?.firstName ?? localUser?.firstName;
+
   return (
     <Layout>
       <AIChatPanel />
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Welcome back{(meResult.data?.me?.firstName ?? localUser?.firstName) && `, ${meResult.data?.me?.firstName ?? localUser?.firstName}`}!
+            {firstName ? t('welcomeBack', { name: firstName }) : t('welcomeBack', { name: '' }).trimEnd()}
           </p>
         </div>
 
@@ -133,7 +143,7 @@ export function Dashboard() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Settings className="h-4 w-4 text-primary" />
-                Instructor Tools
+                {t('instructorTools')}
                 <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                   {localUser.role.replace('_', ' ')}
                 </span>
@@ -145,14 +155,14 @@ export function Dashboard() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
               >
                 <PlusCircle className="h-4 w-4" />
-                Create Course
+                {t('createCourse')}
               </Link>
               <Link
                 to="/courses"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent transition-colors"
               >
                 <BookOpen className="h-4 w-4" />
-                Manage Courses
+                {t('manageCourses')}
               </Link>
             </CardContent>
           </Card>
@@ -162,7 +172,7 @@ export function Dashboard() {
           <Card className="border-destructive">
             <CardContent className="pt-6">
               <p className="text-destructive">
-                Error loading user data: {meResult.error.message}
+                {t('errorLoadingUser')}: {meResult.error.message}
               </p>
             </CardContent>
           </Card>
@@ -172,7 +182,7 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Courses Enrolled</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('stats.coursesEnrolled')}</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -185,7 +195,7 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Study Time</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('stats.studyTime')}</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -195,7 +205,7 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Concepts Mastered</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('stats.conceptsMastered')}</CardTitle>
               <Brain className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -209,7 +219,7 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('stats.activeCourses')}</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -222,7 +232,7 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Annotations</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('stats.annotationsCreated')}</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -254,9 +264,9 @@ export function Dashboard() {
         {/* Activity Heatmap */}
         <Card>
           <CardHeader>
-            <CardTitle>Study Activity</CardTitle>
+            <CardTitle>{t('studyActivity')}</CardTitle>
             <CardDescription>
-              Your annotation activity over the past 30 days
+              {t('activityDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -268,8 +278,8 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your latest learning events</CardDescription>
+              <CardTitle>{t('recentActivity')}</CardTitle>
+              <CardDescription>{t('latestEvents')}</CardDescription>
             </CardHeader>
             <CardContent>
               <ActivityFeed items={MOCK_ACTIVITY_FEED} />
@@ -290,7 +300,7 @@ export function Dashboard() {
               return (
                 <Card>
                   <CardContent className="pt-6">
-                    <p className="text-sm text-muted-foreground">Loading profile...</p>
+                    <p className="text-sm text-muted-foreground">{t('common:loading')}</p>
                   </CardContent>
                 </Card>
               );
@@ -299,8 +309,8 @@ export function Dashboard() {
             return (
               <Card>
                 <CardHeader>
-                  <CardTitle>Profile</CardTitle>
-                  <CardDescription>Your account information</CardDescription>
+                  <CardTitle>{t('common:profile')}</CardTitle>
+                  <CardDescription>{t('common:accountInformation')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">

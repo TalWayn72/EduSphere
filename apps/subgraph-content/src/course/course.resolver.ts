@@ -71,7 +71,7 @@ export class CourseResolver {
   @Mutation('createCourse')
   async createCourse(@Args('input') input: Record<string, unknown>, @Context() ctx: GqlContext) {
     requireAuth(ctx);
-    return this.courseService.create(input as Parameters<CourseService['create']>[0]);
+    return this.courseService.create(input as unknown as Parameters<CourseService['create']>[0]);
   }
 
   @Mutation('updateCourse')
@@ -80,7 +80,7 @@ export class CourseResolver {
     @Args('input') input: Record<string, unknown>,
     @Context() _ctx: GqlContext
   ) {
-    return this.courseService.update(id, input as Parameters<CourseService['update']>[1]);
+    return this.courseService.update(id, input as unknown as Parameters<CourseService['update']>[1]);
   }
 
   // ── Enrollment ───────────────────────────────────────────────

@@ -107,7 +107,6 @@ describe('ActivityFeed', () => {
       makeItem({ id: '2', title: 'Second' }),
     ];
     render(<ActivityFeed items={items} />);
-    const titles = screen.getAllByRole('paragraph', { hidden: true });
     // Both titles exist in document order
     const allText = screen.getByText('First');
     const allText2 = screen.getByText('Second');

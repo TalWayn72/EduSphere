@@ -31,45 +31,38 @@ const mockEditor = {
   can: vi.fn(() => ({ undo: () => true, redo: () => false })),
 };
 
-vi.mock('@tiptap/react', () => ({
-  useEditor: vi.fn(() => mockEditor),
+// ── Tiptap / HocuspocusProvider extension mocks ──────────────────────────────
+// vitest.config.ts aliases ALL of the following to the same tiptapStub path:
+//   @tiptap/react, @tiptap/starter-kit, @tiptap/extension-*, @hocuspocus/provider, lowlight
+// Because they resolve to the same file, only ONE vi.mock() is registered
+// (the last one wins). We therefore use a SINGLE mock that covers all needed
+// exports from every aliased package.
+
+vi.mock('@hocuspocus/provider', () => ({
+  // ── @tiptap/react exports (used by CollaborativeEditor and the test itself) ──
+  // useEditor return value is set in beforeEach via vi.mocked(TiptapReact.useEditor)
+  useEditor: vi.fn(),
   EditorContent: ({ editor: _editor }: { editor: unknown }) => (
     <div data-testid="editor-content" aria-label="editor content" />
   ),
+
+  // ── @hocuspocus/provider exports ──
+  HocuspocusProvider: vi.fn(() => ({
+    awareness: { setLocalStateField: vi.fn(), on: vi.fn(), off: vi.fn(), getStates: vi.fn(() => new Map()) },
+    destroy: vi.fn(),
+  })),
+
+  // ── Extension default exports (configure pattern) ──
+  default: { configure: vi.fn(() => ({})) },
+  Table: { configure: vi.fn(() => ({})) },
+  lowlight: {},
+  createLowlight: vi.fn(() => ({})),
+  __mockUndoManager: undefined,
 }));
 
-// ── Extension mocks ──────────────────────────────────────────────────────────
-vi.mock('@tiptap/starter-kit', () => ({ default: { configure: vi.fn(() => ({})) } }));
-vi.mock('@tiptap/extension-placeholder', () => ({
-  default: { configure: vi.fn(() => ({})) },
-}));
-vi.mock('@tiptap/extension-collaboration', () => ({
-  default: { configure: vi.fn(() => ({})) },
-}));
-vi.mock('@tiptap/extension-collaboration-cursor', () => ({
-  default: { configure: vi.fn(() => ({})) },
-}));
-vi.mock('@tiptap/extension-code-block-lowlight', () => ({
-  default: { configure: vi.fn(() => ({})) },
-}));
-vi.mock('@tiptap/extension-task-list', () => ({ default: {} }));
-vi.mock('@tiptap/extension-task-item', () => ({
-  default: { configure: vi.fn(() => ({})) },
-}));
-vi.mock('@tiptap/extension-table', () => ({
-  default: { configure: vi.fn(() => ({})) },
-}));
-vi.mock('@tiptap/extension-table-row', () => ({ default: {} }));
-vi.mock('@tiptap/extension-table-cell', () => ({ default: {} }));
-vi.mock('@tiptap/extension-table-header', () => ({ default: {} }));
-vi.mock('@tiptap/extension-mention', () => ({
-  default: { configure: vi.fn(() => ({})) },
-}));
-vi.mock('@tiptap/extension-mathematics', () => ({ default: {} }));
-vi.mock('lowlight', () => ({ lowlight: {} }));
-vi.mock('katex/dist/katex.min.css', () => ({}));
-
-// ── Y.js / HocuspocusProvider mocks ─────────────────────────────────────────
+// ── Y.js mock (has its own non-stub path) ─────────────────────────────────────
+// Use class syntax so `new Y.Doc()` and `new Y.UndoManager()` work correctly.
+// Arrow functions cannot be used as constructors; vi.fn(arrowFn) inherits that limitation.
 vi.mock('yjs', () => {
   const mockUndoManager = {
     canUndo: vi.fn(() => false),
@@ -79,21 +72,26 @@ vi.mock('yjs', () => {
     on: vi.fn(),
     off: vi.fn(),
   };
+
+  class MockDoc {
+    getXmlFragment() { return {}; }
+  }
+
+  class MockUndoManager {
+    canUndo() { return mockUndoManager.canUndo(); }
+    canRedo() { return mockUndoManager.canRedo(); }
+    undo() { return mockUndoManager.undo(); }
+    redo() { return mockUndoManager.redo(); }
+    on(...args: Parameters<typeof mockUndoManager.on>) { return mockUndoManager.on(...args); }
+    off(...args: Parameters<typeof mockUndoManager.off>) { return mockUndoManager.off(...args); }
+  }
+
   return {
-    Doc: vi.fn(() => ({
-      getXmlFragment: vi.fn(() => ({})),
-    })),
-    UndoManager: vi.fn(() => mockUndoManager),
+    Doc: MockDoc,
+    UndoManager: MockUndoManager,
     __mockUndoManager: mockUndoManager,
   };
 });
-
-vi.mock('@hocuspocus/provider', () => ({
-  HocuspocusProvider: vi.fn(() => ({
-    awareness: { setLocalStateField: vi.fn(), on: vi.fn(), off: vi.fn(), getStates: vi.fn(() => new Map()) },
-    destroy: vi.fn(),
-  })),
-}));
 
 vi.mock('@/lib/auth', () => ({
   getToken: vi.fn(() => null),
@@ -101,7 +99,7 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 import { CollaborativeEditor } from './CollaborativeEditor';
-import { useEditor } from '@tiptap/react';
+import * as TiptapReact from '@tiptap/react';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -117,7 +115,7 @@ const renderEditor = (props: Partial<Parameters<typeof CollaborativeEditor>[0]> 
 
 describe('CollaborativeEditor', () => {
   beforeEach(() => {
-    vi.mocked(useEditor).mockReturnValue(mockEditor as unknown as ReturnType<typeof useEditor>);
+    vi.mocked(TiptapReact.useEditor).mockReturnValue(mockEditor as unknown as ReturnType<typeof TiptapReact.useEditor>);
     mockChain.focus.mockReturnThis();
     Object.values(mockChain).forEach((fn) => {
       if (typeof fn === 'function' && 'mockClear' in fn) fn.mockClear();
@@ -135,7 +133,7 @@ describe('CollaborativeEditor', () => {
   });
 
   it('returns null when editor is not yet initialised', () => {
-    vi.mocked(useEditor).mockReturnValue(null as unknown as ReturnType<typeof useEditor>);
+    vi.mocked(TiptapReact.useEditor).mockReturnValue(null as unknown as ReturnType<typeof TiptapReact.useEditor>);
     const { container } = renderEditor();
     expect(container.firstChild).toBeNull();
   });

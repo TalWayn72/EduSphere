@@ -1,0 +1,15 @@
+{
+  "generic": "Terjadi kesalahan. Silakan coba lagi.",
+  "network": "Kesalahan jaringan. Silakan periksa koneksi Anda.",
+  "notFound": "Sumber daya yang diminta tidak ditemukan.",
+  "unauthorized": "Anda tidak diizinkan untuk melakukan tindakan ini.",
+  "forbidden": "Akses ditolak.",
+  "validation": "Silakan periksa masukan Anda dan coba lagi.",
+  "timeout": "Permintaan habis waktu. Silakan coba lagi.",
+  "serverError": "Terjadi kesalahan server. Silakan coba lagi nanti.",
+  "graphql": {
+    "fetchFailed": "Gagal memuat data",
+    "mutationFailed": "Gagal menyimpan perubahan",
+    "retryHint": "Silakan muat ulang halaman atau coba lagi."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "title": "Agentes de aprendizaje IA",
+  "subtitle": "Elige un modo de agente para mejorar tu aprendizaje",
+  "devMode": "Modo desarrollo — respuestas simuladas",
+  "selectAgent": "Seleccionar agente:",
+  "reset": "Restablecer",
+  "sendMessage": "Enviar mensaje",
+  "askAgent": "Pregunta al {{agentLabel}}...",
+  "responding": "El agente está respondiendo...",
+  "startConversation": "Iniciar conversación",
+  "conversationHistory": "Historial de conversación",
+  "clearHistory": "Limpiar historial",
+  "modes": {
+    "chavruta": {
+      "label": "Debate Chavruta",
+      "description": "Compañero dialéctico — desafía tus argumentos usando razonamiento talmúdico"
+    },
+    "quiz": {
+      "label": "Maestro de preguntas",
+      "description": "Cuestionarios adaptativos basados en tu historial de aprendizaje y brechas de conocimiento"
+    },
+    "summarize": {
+      "label": "Resumidor",
+      "description": "Resúmenes progresivos de tu contenido estudiado con extracción de conceptos clave"
+    },
+    "research": {
+      "label": "Explorador de investigación",
+      "description": "Buscador de referencias cruzadas — descubre conexiones entre textos y períodos de tiempo"
+    },
+    "explain": {
+      "label": "Explicador",
+      "description": "Explicaciones adaptativas que se ajustan a tu nivel de comprensión"
+    }
+  },
+  "chatPanel": {
+    "title": "Asistente de aprendizaje IA",
+    "openPanel": "Abrir panel IA",
+    "closePanel": "Cerrar panel IA"
+  }
+}

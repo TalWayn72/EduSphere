@@ -42,6 +42,7 @@ export function initTelemetry(serviceName: string): NodeSDK {
       url: `${otlpEndpoint}/v1/traces`,
     }),
 
+    // @ts-expect-error version skew between @opentelemetry/sdk-metrics and @opentelemetry/sdk-node
     metricReader: new PeriodicExportingMetricReader({
       exporter: new OTLPMetricExporter({
         url: `${otlpEndpoint}/v1/metrics`,

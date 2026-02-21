@@ -12,6 +12,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Hls from 'hls.js';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -78,7 +79,12 @@ function ErrorBanner({ message }: { message: string }) {
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export function ContentViewer() {
+  const { t } = useTranslation(['content', 'common']);
   const { contentId = 'content-1' } = useParams<{ contentId: string }>();
+
+  // Phase B: When locale !== 'en', display translation status badge
+  // const locale = i18n.language;
+  // const showTranslationBadge = locale !== 'en';
 
   // ── Video state ──
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -166,7 +172,6 @@ export function ContentViewer() {
       hlsRef.current?.destroy();
       hlsRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoUrl, hlsManifestUrl, contentFetching]);
 
   // ── Active transcript segment ──
@@ -178,7 +183,10 @@ export function ContentViewer() {
   const togglePlay = () => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
-      videoRef.current.play().catch((err) => console.warn('play failed:', err));
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => console.warn('play failed:', err));
+      }
     } else {
       videoRef.current.pause();
     }
@@ -315,7 +323,7 @@ export function ContentViewer() {
                       {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>{playing ? 'Pause (Space)' : 'Play (Space)'}</TooltipContent>
+                  <TooltipContent>{playing ? t('content:pause') : t('content:play')}</TooltipContent>
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -333,7 +341,7 @@ export function ContentViewer() {
                       {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>{muted ? 'Unmute' : 'Mute'}</TooltipContent>
+                  <TooltipContent>{muted ? t('content:unmute') : t('content:mute')}</TooltipContent>
                 </Tooltip>
                 {/* Seek bar with annotation markers */}
                 <div
@@ -363,7 +371,7 @@ export function ContentViewer() {
                       <Maximize className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Fullscreen</TooltipContent>
+                  <TooltipContent>{t('content:fullscreen')}</TooltipContent>
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -377,7 +385,7 @@ export function ContentViewer() {
                       {playbackSpeed}×
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent>Playback speed (click to cycle)</TooltipContent>
+                  <TooltipContent>{t('content:playbackSpeed')}</TooltipContent>
                 </Tooltip>
                 </TooltipProvider>
               </div>
@@ -388,7 +396,7 @@ export function ContentViewer() {
           <Card className="flex-1 overflow-hidden flex flex-col">
             <div className="px-4 py-2 border-b flex items-center justify-between">
               <span className="text-sm font-semibold flex items-center gap-2">
-                <BookOpen className="h-4 w-4" /> Transcript
+                <BookOpen className="h-4 w-4" /> {t('content:transcript')}
               </span>
               {contentFetching ? (
                 <SkeletonLine className="h-3 w-32" />
@@ -433,7 +441,7 @@ export function ContentViewer() {
             <div className="px-4 py-2 border-b">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold flex items-center gap-2">
-                  <FileText className="h-4 w-4" /> Annotations
+                  <FileText className="h-4 w-4" /> {t('common:annotations')}
                 </span>
                 <Button
                   variant="ghost"
@@ -441,7 +449,7 @@ export function ContentViewer() {
                   className="h-7 text-xs"
                   onClick={() => setShowAnnotationForm(!showAnnotationForm)}
                 >
-                  <Plus className="h-3 w-3 mr-1" /> Add
+                  <Plus className="h-3 w-3 mr-1" /> {t('common:add')}
                 </Button>
               </div>
               <LayerToggleBar activeLayers={activeLayers} onToggle={toggleLayer} />
@@ -465,7 +473,7 @@ export function ContentViewer() {
                 <textarea
                   value={newAnnotation}
                   onChange={(e) => setNewAnnotation(e.target.value)}
-                  placeholder="Add annotation at current timestamp..."
+                  placeholder={t('content:annotationPlaceholder')}
                   className="w-full text-sm px-3 py-2 border rounded-md bg-background resize-none"
                   rows={3}
                 />
@@ -476,10 +484,10 @@ export function ContentViewer() {
                     className="h-7 text-xs"
                     onClick={() => setShowAnnotationForm(false)}
                   >
-                    Cancel
+                    {t('common:cancel')}
                   </Button>
                   <Button size="sm" className="h-7 text-xs" onClick={handleAddAnnotation}>
-                    Save @ {formatTime(currentTime)}
+                    {t('content:saveAt', { time: formatTime(currentTime) })}
                   </Button>
                 </div>
               </div>
@@ -498,7 +506,7 @@ export function ContentViewer() {
                 : null}
               {!annotFetching && annotations.length === 0 && (
                 <p className="text-xs text-muted-foreground text-center py-6">
-                  No annotations visible. Enable layers above.
+                  {t('content:noAnnotationsVisible')}
                 </p>
               )}
               {annotations.map((ann: Annotation) => (
@@ -518,11 +526,11 @@ export function ContentViewer() {
               <TabsList className="w-full rounded-none border-b bg-transparent px-2 h-9">
                 <TabsTrigger value="graph" className="text-xs flex-1">
                   <Network className="h-3 w-3 mr-1" />
-                  Graph
+                  {t('common:graph')}
                 </TabsTrigger>
                 <TabsTrigger value="search" className="text-xs flex-1">
                   <Search className="h-3 w-3 mr-1" />
-                  Search
+                  {t('common:search')}
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="graph" className="m-0 px-4 py-3">
@@ -548,7 +556,7 @@ export function ContentViewer() {
                   ))}
                 </div>
                 <Button variant="ghost" size="sm" className="w-full mt-2 text-xs h-7">
-                  Explore full graph <ChevronRight className="h-3 w-3 ml-1" />
+                  {t('content:exploreFullGraph')} <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
               </TabsContent>
               <TabsContent value="search" className="m-0 px-4 py-3 space-y-2">
@@ -556,7 +564,7 @@ export function ContentViewer() {
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search transcript, annotations..."
+                    placeholder={t('content:searchTranscript')}
                     className="flex-1 text-xs px-3 py-1.5 border rounded-md bg-background"
                   />
                   <Button size="sm" className="h-8 w-8 p-0" onClick={() => setSearchQuery('')}>
@@ -590,7 +598,7 @@ export function ContentViewer() {
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    Search transcripts, annotations &amp; concepts
+                    {t('content:searchTranscriptHint')}
                   </p>
                 )}
               </TabsContent>
@@ -604,8 +612,8 @@ export function ContentViewer() {
             <div className="px-4 py-2 border-b flex items-center gap-2 flex-shrink-0">
               <Bot className="h-4 w-4 text-primary" />
               <div>
-                <p className="text-sm font-semibold">Chavruta AI</p>
-                <p className="text-xs text-muted-foreground">Dialectical learning partner</p>
+                <p className="text-sm font-semibold">{t('content:chavrutaAi')}</p>
+                <p className="text-xs text-muted-foreground">{t('content:dialecticalPartner')}</p>
               </div>
               <div className="ml-auto flex gap-1">
                 {['CHAVRUTA', 'QUIZ', 'EXPLAIN'].map((mode) => (
@@ -673,7 +681,7 @@ export function ContentViewer() {
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !isStreaming && handleSendChat()}
-                placeholder={isStreaming ? 'Agent is responding...' : 'Ask or debate...'}
+                placeholder={isStreaming ? t('content:agentResponding') : t('content:askOrDebate')}
                 disabled={isStreaming}
                 className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60 disabled:cursor-not-allowed"
               />

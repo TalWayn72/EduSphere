@@ -1,0 +1,50 @@
+{
+  "title": "Tableau de bord",
+  "welcomeBack": "Bon retour, {{name}} !",
+  "instructorTools": "Outils de l'instructeur",
+  "createCourse": "Créer un cours",
+  "manageCourses": "Gérer les cours",
+  "continueLearning": "Continuer à apprendre",
+  "yourProgress": "Votre progression",
+  "studyActivity": "Activité d'étude",
+  "activityDescription": "Votre activité d'annotation au cours des 30 derniers jours",
+  "recentActivity": "Activité récente",
+  "latestEvents": "Vos derniers événements d'apprentissage",
+  "noActivity": "Aucune activité récente",
+  "errorLoadingUser": "Erreur lors du chargement des données utilisateur",
+  "stats": {
+    "activeCourses": "Cours actifs",
+    "learningStreak": "Série d'apprentissage",
+    "studyTime": "Temps d'étude",
+    "concepts": "Concepts",
+    "coursesEnrolled": "Cours inscrits",
+    "conceptsMastered": "Concepts maîtrisés",
+    "annotationsCreated": "Annotations créées",
+    "weeklyGoal": "Objectif hebdomadaire",
+    "days": "jours",
+    "hours": "heures",
+    "minutes": "minutes"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} jours d'étude",
+    "totalSessions": "{{count}} sessions d'étude au total",
+    "less": "Moins",
+    "more": "Plus"
+  },
+  "profile": {
+    "accountDetails": "Détails du compte",
+    "permissions": "Autorisations",
+    "learningOverview": "Aperçu de l'apprentissage",
+    "fields": {
+      "username": "Nom d'utilisateur",
+      "email": "E-mail",
+      "role": "Rôle",
+      "tenantId": "ID de locataire"
+    },
+    "stats": {
+      "coursesAvailable": "Cours disponibles",
+      "conceptsMastered": "Concepts maîtrisés",
+      "annotationsCreated": "Annotations créées"
+    }
+  }
+}

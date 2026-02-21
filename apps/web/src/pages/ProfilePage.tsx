@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, User, Mail, Shield, Key, BookOpen, Brain, MessageSquare } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,12 @@ interface MeQueryResult {
     tenantId: string;
     createdAt: string;
     updatedAt: string;
+    preferences: {
+      locale: string;
+      theme: string;
+      emailNotifications: boolean;
+      pushNotifications: boolean;
+    } | null;
   } | null;
 }
 
@@ -49,6 +56,7 @@ function getInitials(firstName: string, lastName: string, fallback: string): str
 }
 
 export function ProfilePage() {
+  const { t } = useTranslation(['common', 'dashboard']);
   const navigate = useNavigate();
   const localUser = getCurrentUser();
 
@@ -75,9 +83,9 @@ export function ProfilePage() {
   const coursesCount = coursesResult.data?.courses?.length ?? '—';
 
   const stats = [
-    { icon: BookOpen, label: 'Courses Available', value: coursesResult.fetching ? '...' : String(coursesCount) },
-    { icon: Brain, label: 'Concepts Mastered', value: '—' },
-    { icon: MessageSquare, label: 'Annotations Created', value: '—' },
+    { icon: BookOpen, label: t('profile.stats.coursesAvailable'), value: coursesResult.fetching ? '...' : String(coursesCount) },
+    { icon: Brain, label: t('profile.stats.conceptsMastered'), value: '—' },
+    { icon: MessageSquare, label: t('profile.stats.annotationsCreated'), value: '—' },
   ];
 
   return (
@@ -87,9 +95,9 @@ export function ProfilePage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            {t('common:back')}
           </Button>
-          <h1 className="text-2xl font-bold">Profile</h1>
+          <h1 className="text-2xl font-bold">{t('common:profile')}</h1>
         </div>
 
         {/* Identity card */}
@@ -115,27 +123,27 @@ export function ProfilePage() {
         {/* Account details */}
         <Card className="p-6 space-y-4">
           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-            Account Details
+            {t('profile.accountDetails')}
           </h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
               <User className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">Username</span>
+              <span className="text-muted-foreground w-24">{t('profile.fields.username')}</span>
               <span className="font-medium">{localUser.username}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">Email</span>
+              <span className="text-muted-foreground w-24">{t('profile.fields.email')}</span>
               <span className="font-medium">{email}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Shield className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">Role</span>
+              <span className="text-muted-foreground w-24">{t('profile.fields.role')}</span>
               <span className="font-medium">{roleLabel}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Key className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">Tenant ID</span>
+              <span className="text-muted-foreground w-24">{t('profile.fields.tenantId')}</span>
               <span className="font-mono text-xs text-muted-foreground truncate">{tenantId}</span>
             </div>
           </div>
@@ -145,7 +153,7 @@ export function ProfilePage() {
         {localUser.scopes.length > 0 && (
           <Card className="p-6 space-y-4">
             <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Permissions
+              {t('profile.permissions')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {localUser.scopes.map((scope) => (
@@ -163,7 +171,7 @@ export function ProfilePage() {
         {/* Learning stats */}
         <Card className="p-6 space-y-4">
           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-            Learning Overview
+            {t('profile.learningOverview')}
           </h3>
           <div className="grid grid-cols-3 gap-4">
             {stats.map(({ icon: Icon, label, value }) => (

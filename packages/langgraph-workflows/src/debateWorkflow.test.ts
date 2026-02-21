@@ -20,8 +20,15 @@ vi.mock('@ai-sdk/openai', () => ({
 vi.mock('@langchain/langgraph', () => {
   type NodeFn = (state: Record<string, unknown>) => Promise<Record<string, unknown>>;
 
+  // Annotation must be callable as a function AND have a .Root static method
+  const AnnotationFn = (config?: unknown) => config ?? {};
+  AnnotationFn.Root = (fields: Record<string, unknown>) => fields;
+
   return {
-    StateGraph: vi.fn().mockImplementation(() => {
+    Annotation: AnnotationFn,
+    START: '__start__',
+    END: '__end__',
+    StateGraph: vi.fn().mockImplementation(function () {
       const nodes: Record<string, NodeFn> = {};
       let entryPoint = '';
       const conditionalEdges: Array<{
@@ -30,27 +37,29 @@ vi.mock('@langchain/langgraph', () => {
       }> = [];
       const staticEdges: Array<[string, string]> = [];
 
-      return {
-        addNode: vi.fn((name: string, fn: NodeFn) => {
-          nodes[name] = fn;
-        }),
-        setEntryPoint: vi.fn((name: string) => {
-          entryPoint = name;
-        }),
-        addEdge: vi.fn((from: string, to: string) => {
+      this.addNode = vi.fn(function (name: string, fn: NodeFn) {
+        nodes[name] = fn;
+      });
+      this.setEntryPoint = vi.fn(function (name: string) {
+        entryPoint = name;
+      });
+      this.addEdge = vi.fn(function (from: string, to: string) {
+        if (from === '__start__') {
+          entryPoint = to;
+        } else {
           staticEdges.push([from, to]);
-        }),
-        addConditionalEdges: vi.fn(
-          (
-            from: string,
-            condition: (state: Record<string, unknown>) => string,
-            _mapping: Record<string, string>
-          ) => {
-            conditionalEdges.push({ from, condition });
-          }
-        ),
-        compile: vi.fn(() => ({
-          invoke: vi.fn(async (initialState: unknown) => {
+        }
+      });
+      this.addConditionalEdges = vi.fn(function (
+        from: string,
+        condition: (state: Record<string, unknown>) => string,
+        _mapping: Record<string, string>
+      ) {
+        conditionalEdges.push({ from, condition });
+      });
+      this.compile = vi.fn(function () {
+        return {
+          invoke: vi.fn(async function (initialState: unknown) {
             let state = { ...(initialState as Record<string, unknown>) };
             let currentNode = entryPoint;
             const maxIterations = 50; // safety guard
@@ -60,7 +69,7 @@ vi.mock('@langchain/langgraph', () => {
               iter++;
               if (!nodes[currentNode]) break;
 
-              const partial = await nodes[currentNode](state);
+              const partial = await nodes[currentNode]!(state);
               state = { ...state, ...partial };
 
               // Find next node via conditional or static edge
@@ -70,16 +79,15 @@ vi.mock('@langchain/langgraph', () => {
                 currentNode = nextNode;
               } else {
                 const staticEdge = staticEdges.find(([from]) => from === currentNode);
-                currentNode = staticEdge ? staticEdge[1] : '__end__';
+                currentNode = staticEdge ? staticEdge[1]! : '__end__';
               }
             }
 
             return state;
           }),
-        })),
-      };
+        };
+      });
     }),
-    END: '__end__',
   };
 });
 

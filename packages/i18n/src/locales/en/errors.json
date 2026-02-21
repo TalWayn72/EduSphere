@@ -1,0 +1,15 @@
+{
+  "generic": "Something went wrong. Please try again.",
+  "network": "Network error. Please check your connection.",
+  "notFound": "The requested resource was not found.",
+  "unauthorized": "You are not authorized to perform this action.",
+  "forbidden": "Access denied.",
+  "validation": "Please check your input and try again.",
+  "timeout": "The request timed out. Please try again.",
+  "serverError": "A server error occurred. Please try again later.",
+  "graphql": {
+    "fetchFailed": "Failed to load data",
+    "mutationFailed": "Failed to save changes",
+    "retryHint": "Please refresh the page or try again."
+  }
+}

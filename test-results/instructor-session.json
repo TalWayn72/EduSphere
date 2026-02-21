@@ -1,0 +1,45 @@
+{
+  "cookies": [
+    {
+      "name": "AUTH_SESSION_ID",
+      "value": "UHlHdTRheFptRFM3aHJzcEowRFVoVHpNLlhScTNFRTN2MVRqY2hadzNJOThYVzhtM3FnaDRDZ1FtVlVJYW9CNUJEY2NReVJnbWFkNXgtSFBiYWJxV2NLSnlnNm9DcUlkYmFMSmlicXlUOFhTM05R",
+      "domain": "localhost",
+      "path": "/realms/edusphere/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "KC_AUTH_SESSION_HASH",
+      "value": "sNCEUh3IMd2dkvXBH0p6inNQuEaep61pMIyN2EonWfE",
+      "domain": "localhost",
+      "path": "/realms/edusphere/",
+      "expires": 1771590393.928687,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "KEYCLOAK_IDENTITY",
+      "value": "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwZmRjOWJlOC00NzJiLTRlZmQtOTIzNi1lMDNiYTk4YTlkYjgifQ.eyJleHAiOjE3NzE2MjYzMzUsImlhdCI6MTc3MTU5MDMzNSwianRpIjoiNjkxNWI3MWQtNzc2ZC0zMTQzLTVmNzMtODMzMDgwYzA5Njk1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9lZHVzcGhlcmUiLCJzdWIiOiJkYWEwMGU4ZC0wYjkwLTQ5OTAtYWIzNi1lOWRjY2JmODU1YTUiLCJ0eXAiOiJTZXJpYWxpemVkLUlEIiwic2lkIjoiUHlHdTRheFptRFM3aHJzcEowRFVoVHpNIiwic3RhdGVfY2hlY2tlciI6IjcwN2d6WC1sTXcxTEJfcE9JTU40aDRNNXNiUUlKR0JhMUhwRnNBd3IwaTAifQ.vF8DS6vH9Fbz7oewBoqC0NhxbMo27gNRAXBZXs1hZTzodtmWXVexqnFCxNTBKygxGpFB6aiECJUKD4Xij_k2VA",
+      "domain": "localhost",
+      "path": "/realms/edusphere/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "KEYCLOAK_SESSION",
+      "value": "sNCEUh3IMd2dkvXBH0p6inNQuEaep61pMIyN2EonWfE",
+      "domain": "localhost",
+      "path": "/realms/edusphere/",
+      "expires": 1771626335.656864,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": []
+}

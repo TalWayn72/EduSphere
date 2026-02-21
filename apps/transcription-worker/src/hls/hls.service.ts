@@ -136,7 +136,6 @@ export class HlsService {
     }
     const { pipeline } = await import('stream/promises');
     const { createWriteStream } = await import('fs');
-    const { Readable } = await import('stream');
     await pipeline(Body as NodeJS.ReadableStream, createWriteStream(destPath));
   }
 

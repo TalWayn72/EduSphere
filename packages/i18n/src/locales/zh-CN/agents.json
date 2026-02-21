@@ -1,0 +1,40 @@
+{
+  "title": "AI学习助手",
+  "subtitle": "选择助手模式以增强您的学习",
+  "devMode": "开发模式 — 模拟响应",
+  "selectAgent": "选择助手：",
+  "reset": "重置",
+  "sendMessage": "发送消息",
+  "askAgent": "向{{agentLabel}}提问...",
+  "responding": "助手正在响应...",
+  "startConversation": "开始对话",
+  "conversationHistory": "对话历史",
+  "clearHistory": "清除历史",
+  "modes": {
+    "chavruta": {
+      "label": "学习辩论",
+      "description": "辩证学习伙伴 — 使用逻辑推理挑战您的论点"
+    },
+    "quiz": {
+      "label": "测验大师",
+      "description": "基于您的学习历史和知识空缺的自适应测验"
+    },
+    "summarize": {
+      "label": "摘要器",
+      "description": "已学内容的渐进式摘要，包含关键概念提取"
+    },
+    "research": {
+      "label": "研究侦察",
+      "description": "交叉引用查找器 — 发现文本和时期之间的联系"
+    },
+    "explain": {
+      "label": "讲解器",
+      "description": "根据您的理解水平调整的自适应解释"
+    }
+  },
+  "chatPanel": {
+    "title": "AI学习助手",
+    "openPanel": "打开AI面板",
+    "closePanel": "关闭AI面板"
+  }
+}

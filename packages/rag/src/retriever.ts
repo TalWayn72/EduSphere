@@ -4,7 +4,7 @@ import { PgVectorStore, SearchResult } from './vectorStore';
 export interface RetrievalOptions {
   topK?: number;
   similarityThreshold?: number;
-  filter?: Record<string, any>;
+  filter?: Record<string, unknown>;
 }
 
 export interface RetrievalResult extends SearchResult {
@@ -55,7 +55,7 @@ export class SemanticRetriever {
     // Concatenate results into context
     const context = results
       .map((result, index) => {
-        return `[${index + 1}] ${result.content}\nSource: ${result.metadata.source || 'Unknown'}\n`;
+        return `[${index + 1}] ${result.content}\nSource: ${result.metadata['source'] ?? 'Unknown'}\n`;
       })
       .join('\n');
 

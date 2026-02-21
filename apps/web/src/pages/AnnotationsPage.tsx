@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -89,19 +90,20 @@ interface DeleteDialogProps {
 }
 
 function DeleteConfirmDialog({ open, onOpenChange, onConfirm, isDeleting }: DeleteDialogProps) {
+  const { t } = useTranslation('annotations');
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Delete annotation</DialogTitle>
+          <DialogTitle>{t('deleteTitle')}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this annotation? This action cannot be undone.
+            {t('deleteConfirm')}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
           <DialogClose asChild>
             <Button variant="outline" disabled={isDeleting}>
-              Cancel
+              {t('cancel')}
             </Button>
           </DialogClose>
           <Button
@@ -109,7 +111,7 @@ function DeleteConfirmDialog({ open, onOpenChange, onConfirm, isDeleting }: Dele
             onClick={onConfirm}
             disabled={isDeleting}
           >
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? t('deleting') : t('delete')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -125,13 +127,14 @@ interface AnnotationItemProps {
 }
 
 function AnnotationItem({ ann, onSeek, onDeleteRequest }: AnnotationItemProps) {
+  const { t } = useTranslation('annotations');
   return (
     <div className="relative group">
       <AnnotationCard ann={ann} onSeek={onSeek} />
       <button
         onClick={() => onDeleteRequest(ann.id)}
         className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-        aria-label="Delete annotation"
+        aria-label={t('deleteAriaLabel')}
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
@@ -141,6 +144,7 @@ function AnnotationItem({ ann, onSeek, onDeleteRequest }: AnnotationItemProps) {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 export function AnnotationsPage() {
+  const { t } = useTranslation('annotations');
   const navigate = useNavigate();
   const user = getCurrentUser();
   const [sortBy, setSortBy] = useState<'time' | 'layer'>('time');
@@ -194,7 +198,7 @@ export function AnnotationsPage() {
     await executeDelete({ id: pendingDeleteId });
     setIsDeleting(false);
     setPendingDeleteId(null);
-    toast.success('Annotation deleted');
+    toast.success(t('annotationDeleted'));
   };
 
   if (fetching) {
@@ -202,7 +206,7 @@ export function AnnotationsPage() {
       <Layout>
         <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span>Loading annotations...</span>
+          <span>{t('loading')}</span>
         </div>
       </Layout>
     );
@@ -221,27 +225,27 @@ export function AnnotationsPage() {
         {error && (
           <div className="flex items-center gap-2 p-3 rounded-md border border-orange-200 bg-orange-50 text-orange-800 text-xs">
             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-            Failed to load annotations — showing empty state.
+            {t('loadError')}
           </div>
         )}
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Annotations</h1>
+            <h1 className="text-2xl font-bold">{t('title')}</h1>
             <p className="text-sm text-muted-foreground">
-              All your annotations across {total} notes
+              {t('subtitle', { count: total })}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Sort:</span>
+            <span className="text-xs text-muted-foreground">{t('sort')}:</span>
             <Button
               variant={sortBy === 'time' ? 'default' : 'ghost'}
               size="sm"
               className="h-7 text-xs"
               onClick={() => setSortBy('time')}
             >
-              By time
+              {t('sortByTime')}
             </Button>
             <Button
               variant={sortBy === 'layer' ? 'default' : 'ghost'}
@@ -249,7 +253,7 @@ export function AnnotationsPage() {
               className="h-7 text-xs"
               onClick={() => setSortBy('layer')}
             >
-              By layer
+              {t('sortByLayer')}
             </Button>
           </div>
         </div>
@@ -288,7 +292,7 @@ export function AnnotationsPage() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="all">All ({total})</TabsTrigger>
+            <TabsTrigger value="all">{t('all')} ({total})</TabsTrigger>
             {ALL_LAYERS.map((layer) => (
               <TabsTrigger key={layer} value={layer}>
                 {ANNOTATION_LAYER_META[layer].icon} {ANNOTATION_LAYER_META[layer].label} (
@@ -300,7 +304,7 @@ export function AnnotationsPage() {
           <TabsContent value="all" className="mt-4">
             {sorted(annotations).length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-12">
-                No annotations yet. Open a lesson and start annotating content.
+                {t('noAnnotations')}
               </p>
             ) : (
               <div className="grid md:grid-cols-2 gap-3">
@@ -329,7 +333,7 @@ export function AnnotationsPage() {
                 ))}
                 {annotations.filter((a) => a.layer === layer).length === 0 && (
                   <p className="col-span-2 text-center text-sm text-muted-foreground py-8">
-                    No {ANNOTATION_LAYER_META[layer].label.toLowerCase()} annotations yet.
+                    {t('noLayerAnnotations', { layer: ANNOTATION_LAYER_META[layer].label.toLowerCase() })}
                   </p>
                 )}
               </div>

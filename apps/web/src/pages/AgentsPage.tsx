@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useMutation, useQuery, useSubscription } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -125,6 +126,16 @@ function buildInitialSessions(): Record<AgentModeId, ChatMsg[]> {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function AgentsPage() {
+  const { t, i18n } = useTranslation('agents');
+
+  // Merge translated labels/descriptions into the mode data at render time.
+  // AGENT_MODES itself is kept as const for AgentModeId type inference.
+  const translatedModes = AGENT_MODES.map((m) => ({
+    ...m,
+    label: t(`modes.${m.id}.label`),
+    description: t(`modes.${m.id}.description`),
+  }));
+
   const [activeMode, setActiveMode] = useState<AgentModeId>('chavruta');
   const [chatInput, setChatInput] = useState('');
   const [agentSessionIds, setAgentSessionIds] = useState<Partial<Record<AgentModeId, string>>>({});
@@ -201,7 +212,7 @@ export function AgentsPage() {
         if (!sessionId) {
           const res = await startSession({
             templateType: TEMPLATE_TYPE[capturedMode],
-            context: {},
+            context: { locale: i18n.language },
           });
           const newId = res.data?.startAgentSession?.id as string | undefined;
           if (newId) {
@@ -266,7 +277,7 @@ export function AgentsPage() {
         }
       }, 18);
     }, 600);
-  }, [chatInput, activeMode, isTyping, streamingContent, agentSessionIds, startSession, sendMessage]);
+  }, [chatInput, activeMode, isTyping, streamingContent, agentSessionIds, startSession, sendMessage, i18n.language]);
 
   const handleReset = () => {
     setSessions((prev) => ({ ...prev, [activeMode]: [prev[activeMode][0]!] }));
@@ -274,6 +285,7 @@ export function AgentsPage() {
   };
 
   const mode = AGENT_MODES.find((m) => m.id === activeMode)!;
+  const translatedMode = translatedModes.find((m) => m.id === activeMode)!;
   const messages = sessions[activeMode];
   const hasTemplatesError = !DEV_MODE && templatesResult.error;
 
@@ -281,12 +293,12 @@ export function AgentsPage() {
     <Layout>
       <div className="space-y-4">
         <div>
-          <h1 className="text-2xl font-bold">AI Learning Agents</h1>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Choose an agent mode to enhance your learning
+            {t('subtitle')}
             {DEV_MODE && (
               <span className="ml-2 text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 px-1.5 py-0.5 rounded">
-                Dev Mode — mock responses
+                {t('devMode')}
               </span>
             )}
           </p>
@@ -299,7 +311,7 @@ export function AgentsPage() {
 
         {/* Mode cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {AGENT_MODES.map((m) => (
+          {translatedModes.map((m) => (
             <button
               key={m.id}
               onClick={() => setActiveMode(m.id as AgentModeId)}
@@ -323,11 +335,11 @@ export function AgentsPage() {
           <div className={`flex items-center gap-3 px-4 py-3 border-b rounded-t-lg ${mode.bg}`}>
             <div className={mode.color}>{mode.icon}</div>
             <div className="flex-1">
-              <p className="font-semibold text-sm">{mode.label}</p>
-              <p className="text-xs text-muted-foreground">{mode.description}</p>
+              <p className="font-semibold text-sm">{translatedMode.label}</p>
+              <p className="text-xs text-muted-foreground">{translatedMode.description}</p>
             </div>
             <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={handleReset}>
-              <RotateCcw className="h-3 w-3 mr-1" /> Reset
+              <RotateCcw className="h-3 w-3 mr-1" /> {t('reset')}
             </Button>
           </div>
 
@@ -377,7 +389,7 @@ export function AgentsPage() {
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-              placeholder={isTyping || streamingContent ? 'Agent is responding...' : `Ask the ${mode.label}...`}
+              placeholder={isTyping || streamingContent ? t('responding') : t('askAgent', { agentLabel: translatedMode.label })}
               disabled={isTyping || !!streamingContent}
               className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60 disabled:cursor-not-allowed"
             />

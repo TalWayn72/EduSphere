@@ -6,6 +6,12 @@
  * - Uses useTransition to keep the UI responsive during mutations
  * - Wires ANNOTATION_ADDED_SUBSCRIPTION for real-time incoming annotations
  * - Falls back to mock data when the query errors
+ *
+ * Schema notes:
+ *   content: JSON scalar — may be a plain string or { text: string }.
+ *   spatialData: JSON — holds { timestampStart?: number, ... }.
+ *   Replies are modelled as sibling annotations with parentId set.
+ *   Multi-layer filtering is applied client-side (API supports single layer).
  */
 import { useOptimistic, useTransition, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useSubscription } from 'urql';
@@ -24,27 +30,17 @@ import { formatTime } from '@/pages/content-viewer.utils';
 
 // ── GraphQL response types ──────────────────────────────────────────────────
 
-interface GqlAnnotationUser {
-  id: string;
-  displayName: string;
-}
-
-interface GqlAnnotationReply {
-  id: string;
-  content: string;
-  userId: string;
-  user?: GqlAnnotationUser | null;
-  createdAt: string;
-}
-
 interface GqlAnnotation {
   id: string;
   layer: AnnotationLayer;
-  content: string;
-  timestampStart?: number | null;
+  annotationType: string;
+  /** JSON scalar — plain string or { text: string } object */
+  content: unknown;
+  /** JSON scalar — { timestampStart?: number, ... } */
+  spatialData?: unknown;
+  parentId?: string | null;
   userId: string;
-  user?: GqlAnnotationUser | null;
-  replies?: GqlAnnotationReply[] | null;
+  isResolved: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,38 +59,53 @@ type OptimisticAction =
   | { type: 'add'; annotation: Annotation }
   | { type: 'reply'; annotation: Annotation };
 
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Extract plain text from a JSON content scalar. */
+function extractContentText(raw: unknown): string {
+  if (typeof raw === 'string') return raw;
+  if (raw && typeof raw === 'object') {
+    const obj = raw as Record<string, unknown>;
+    if (typeof obj['text'] === 'string') return obj['text'];
+  }
+  return String(raw ?? '');
+}
+
+/** Extract timestampStart (seconds) from a JSON spatialData scalar. */
+function extractTimestamp(raw: unknown): number {
+  if (!raw || typeof raw !== 'object') return 0;
+  const obj = raw as Record<string, unknown>;
+  return typeof obj['timestampStart'] === 'number' ? obj['timestampStart'] : 0;
+}
+
 // ── Normaliser ──────────────────────────────────────────────────────────────
 
 function normaliseAnnotation(
   gql: GqlAnnotation,
   contentId: string
 ): Annotation {
+  const text = extractContentText(gql.content);
+  const timestampStart = extractTimestamp(gql.spatialData);
+
   return {
     id: gql.id,
-    content: gql.content,
+    content: text,
     layer: gql.layer,
     userId: gql.userId,
-    userName: gql.user?.displayName ?? 'Unknown',
-    userRole: gql.layer === AnnotationLayer.AI_GENERATED ? 'ai'
-      : gql.layer === AnnotationLayer.INSTRUCTOR ? 'instructor'
-      : 'student',
-    timestamp: formatTime(gql.timestampStart ?? 0),
+    userName: 'User', // user displayName resolved via core subgraph (not fetched here)
+    userRole:
+      gql.layer === AnnotationLayer.AI_GENERATED
+        ? 'ai'
+        : gql.layer === AnnotationLayer.INSTRUCTOR
+        ? 'instructor'
+        : 'student',
+    timestamp: formatTime(timestampStart),
     contentId,
-    contentTimestamp: gql.timestampStart ?? undefined,
+    contentTimestamp: timestampStart || undefined,
+    parentId: gql.parentId ?? undefined,
     createdAt: gql.createdAt,
     updatedAt: gql.updatedAt,
-    replies: (gql.replies ?? []).map((r) => ({
-      id: r.id,
-      content: r.content,
-      layer: gql.layer,
-      userId: r.userId,
-      userName: r.user?.displayName ?? 'Unknown',
-      userRole: 'student' as const,
-      timestamp: formatTime(0),
-      contentId,
-      createdAt: r.createdAt,
-      updatedAt: r.createdAt,
-    })),
+    replies: [], // siblings with matching parentId are threaded client-side
   };
 }
 
@@ -107,6 +118,14 @@ function buildOptimisticList(
   }
   // reply: append to end (subscription will deduplicate on next query)
   return [...state, action.annotation];
+}
+
+// ── UUID validation ─────────────────────────────────────────────────────────
+
+/** Returns true only for canonical UUID v4 strings (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isUUID(value: string): boolean {
+  return UUID_RE.test(value);
 }
 
 // ── Hook ────────────────────────────────────────────────────────────────────
@@ -124,15 +143,21 @@ export function useAnnotations(
   contentId: string,
   activeLayers: AnnotationLayer[]
 ): UseAnnotationsReturn {
+  // Only query when contentId is a valid UUID — slugs (e.g. "content-1") would
+  // cause a PostgreSQL type-mismatch error on the uuid asset_id column.
+  const validAssetId = !!contentId && isUUID(contentId);
+
+  // Fetch all annotations for this asset; multi-layer filtering is client-side.
   const [result] = useQuery<AnnotationsQueryResult>({
     query: ANNOTATIONS_QUERY,
-    variables: { assetId: contentId, layers: activeLayers },
+    variables: { assetId: contentId },
+    pause: !validAssetId,
   });
 
   const [subscriptionResult] = useSubscription<AnnotationAddedSubscriptionResult>({
     query: ANNOTATION_ADDED_SUBSCRIPTION,
     variables: { assetId: contentId },
-    pause: !contentId,
+    pause: !validAssetId,
   });
 
   const [, createAnnotation] = useMutation(CREATE_ANNOTATION_MUTATION);
@@ -147,7 +172,6 @@ export function useAnnotations(
       );
 
   // useOptimistic: base state is server list; reducer applies add/reply actions.
-  // React automatically reverts optimistic state if the transition throws.
   const [optimisticAnnotations, dispatchOptimistic] = useOptimistic<
     Annotation[],
     OptimisticAction
@@ -155,10 +179,6 @@ export function useAnnotations(
 
   const [isPending, startTransition] = useTransition();
 
-  // When the subscription delivers a new annotation, merge it into the server
-  // list indirectly by letting the urql cache update trigger a re-render.
-  // We still need to handle the case where the subscription fires before the
-  // next polling round — so we use dispatchOptimistic with 'add' action here.
   useEffect(() => {
     const incoming = subscriptionResult.data?.annotationAdded;
     if (!incoming) return;
@@ -173,15 +193,12 @@ export function useAnnotations(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subscriptionResult.data, contentId]);
 
-  // Deduplicate: optimistic list may temporarily include items already
-  // returned by the server (subscription -> server query race).
+  // Deduplicate optimistic list vs server list
   const serverIds = new Set(serverAnnotations.map((a) => a.id));
   const visibleAnnotations = filterAnnotationsByLayers(
     optimisticAnnotations.filter((a, idx, arr) => {
-      // Keep server items always; keep local-* items only if not yet in server
       if (!a.id.startsWith('local-')) return true;
       const isSuperseded = serverIds.has(a.id);
-      // Deduplicate optimistic entries by id within the optimistic list itself
       return !isSuperseded && arr.findIndex((x) => x.id === a.id) === idx;
     }),
     activeLayers
@@ -209,9 +226,10 @@ export function useAnnotations(
         await createAnnotation({
           input: {
             assetId: contentId,
+            annotationType: 'TEXT',
             content,
             layer,
-            timestampStart: timestamp,
+            spatialData: timestamp > 0 ? { timestampStart: timestamp } : null,
           },
         });
       });

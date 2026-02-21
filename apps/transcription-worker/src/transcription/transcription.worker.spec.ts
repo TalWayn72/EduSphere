@@ -1,14 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Test } from '@nestjs/testing';
+
 import { TranscriptionWorker } from './transcription.worker';
-import { TranscriptionService } from './transcription.service';
-import { NatsService } from '../nats/nats.service';
 
 describe('TranscriptionWorker', () => {
-  let worker: TranscriptionWorker;
-  let transcriptionService: TranscriptionService;
-  let natsService: NatsService;
-
   const mockTranscriptionService = {
     transcribeFile: vi.fn().mockResolvedValue(undefined),
   };
@@ -16,7 +10,6 @@ describe('TranscriptionWorker', () => {
   // Minimal async-iterable subscription mock
   const makeSubscription = (messages: string[]) => {
     let index = 0;
-    const sc = { decode: (d: Uint8Array) => Buffer.from(d).toString() };
     return {
       [Symbol.asyncIterator]() {
         return {
@@ -41,20 +34,19 @@ describe('TranscriptionWorker', () => {
     }),
   };
 
-  beforeEach(async () => {
+  let worker: TranscriptionWorker;
+
+  beforeEach(() => {
     vi.clearAllMocks();
-
-    const module = await Test.createTestingModule({
-      providers: [
-        TranscriptionWorker,
-        { provide: TranscriptionService, useValue: mockTranscriptionService },
-        { provide: NatsService, useValue: mockNatsService },
-      ],
-    }).compile();
-
-    worker = module.get(TranscriptionWorker);
-    transcriptionService = module.get(TranscriptionService);
-    natsService = module.get(NatsService);
+    // Skip the 500ms startup delay in every test
+    vi.spyOn(global, 'setTimeout').mockImplementation((fn) => {
+      (fn as () => void)();
+      return 0 as unknown as ReturnType<typeof setTimeout>;
+    });
+    worker = new TranscriptionWorker(
+      mockTranscriptionService as any,
+      mockNatsService as any,
+    );
   });
 
   describe('onModuleInit', () => {
@@ -98,7 +90,7 @@ describe('TranscriptionWorker', () => {
       // Allow async message loop to run
       await new Promise((r) => setTimeout(r, 50));
 
-      expect(transcriptionService.transcribeFile).toHaveBeenCalledWith(event);
+      expect(mockTranscriptionService.transcribeFile).toHaveBeenCalledWith(event);
     });
 
     it('does not crash on malformed JSON messages', async () => {
@@ -109,7 +101,7 @@ describe('TranscriptionWorker', () => {
       await worker.onModuleInit();
       await new Promise((r) => setTimeout(r, 50));
 
-      expect(transcriptionService.transcribeFile).not.toHaveBeenCalled();
+      expect(mockTranscriptionService.transcribeFile).not.toHaveBeenCalled();
     });
   });
 });

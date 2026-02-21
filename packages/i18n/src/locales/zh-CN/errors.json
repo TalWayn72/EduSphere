@@ -1,0 +1,15 @@
+{
+  "generic": "出现错误，请重试。",
+  "network": "网络错误，请检查您的连接。",
+  "notFound": "未找到请求的资源。",
+  "unauthorized": "您无权执行此操作。",
+  "forbidden": "访问被拒绝。",
+  "validation": "请检查您的输入后重试。",
+  "timeout": "请求超时，请重试。",
+  "serverError": "服务器错误，请稍后重试。",
+  "graphql": {
+    "fetchFailed": "数据加载失败",
+    "mutationFailed": "保存更改失败",
+    "retryHint": "请刷新页面或重试。"
+  }
+}

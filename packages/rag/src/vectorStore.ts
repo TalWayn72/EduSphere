@@ -4,14 +4,14 @@ export interface VectorDocument {
   id: string;
   content: string;
   embedding: number[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   tenantId: string;
 }
 
 export interface SearchResult {
   id: string;
   content: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   similarity: number;
 }
 
@@ -131,11 +131,11 @@ export class PgVectorStore {
       [JSON.stringify(embedding), tenantId, similarityThreshold, limit]
     );
 
-    return result.rows.map((row) => ({
-      id: row.id,
-      content: row.content,
-      metadata: row.metadata,
-      similarity: parseFloat(row.similarity),
+    return result.rows.map((row: Record<string, unknown>) => ({
+      id: row['id'] as string,
+      content: row['content'] as string,
+      metadata: row['metadata'] as Record<string, unknown>,
+      similarity: parseFloat(row['similarity'] as string),
     }));
   }
 
@@ -147,7 +147,7 @@ export class PgVectorStore {
   }
 
   async deleteByMetadata(
-    metadata: Record<string, any>,
+    metadata: Record<string, unknown>,
     tenantId: string
   ): Promise<void> {
     await this.pool.query(

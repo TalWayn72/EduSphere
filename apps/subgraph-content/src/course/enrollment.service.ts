@@ -39,6 +39,7 @@ export class EnrollmentService {
         .values({ userId: ctx.userId, courseId, status: 'ACTIVE' })
         .returning();
       this.logger.log(`User ${ctx.userId} enrolled in course ${courseId}`);
+      if (!enrollment) throw new Error('Enrollment failed');
       return this.mapEnrollment(enrollment);
     });
   }
@@ -105,7 +106,7 @@ export class EnrollmentService {
         .select({ id: schema.contentItems.id })
         .from(schema.contentItems)
         .innerJoin(schema.modules, eq(schema.contentItems.moduleId, schema.modules.id))
-        .where(eq(schema.modules.courseId, courseId));
+        .where(eq(schema.modules.course_id, courseId));
 
       const totalItems = allItems.length;
       if (totalItems === 0) {

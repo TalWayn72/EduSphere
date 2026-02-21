@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationResolver } from './annotation.resolver';
-import { AnnotationService } from './annotation.service';
 import type { AuthContext } from '@edusphere/auth';
 
 const mockAnnotationService = {
@@ -139,7 +138,7 @@ describe('AnnotationResolver', () => {
 
   describe('createAnnotation()', () => {
     const validInput = {
-      assetId: '00000000-0000-0000-0000-000000000001',
+      assetId: '11111111-1111-4111-a111-111111111111',
       annotationType: 'TEXT',
       layer: 'PERSONAL',
       content: { text: 'New annotation' },

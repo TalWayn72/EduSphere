@@ -75,7 +75,7 @@ describe('GraphResolver', () => {
     });
 
     it('does not call service when unauthenticated', async () => {
-      try { await resolver.concept('x', NO_AUTH_CTX as any); } catch (_) { /* expected */ }
+      try { await resolver.concept('x', NO_AUTH_CTX as any); } catch { /* expected */ }
       expect(mockGraphService.findConceptById).not.toHaveBeenCalled();
     });
   });
@@ -275,7 +275,7 @@ describe('GraphResolver', () => {
     });
 
     it('does not call service when unauthenticated', async () => {
-      try { await resolver.learningPath('A', 'B', NO_AUTH_CTX as any); } catch (_) { /* expected */ }
+      try { await resolver.learningPath('A', 'B', NO_AUTH_CTX as any); } catch { /* expected */ }
       expect(mockGraphService.getLearningPath).not.toHaveBeenCalled();
     });
   });
@@ -348,7 +348,7 @@ describe('GraphResolver', () => {
     });
 
     it('does not call service when unauthenticated', async () => {
-      try { await resolver.prerequisiteChain('X', NO_AUTH_CTX as any); } catch (_) { /* expected */ }
+      try { await resolver.prerequisiteChain('X', NO_AUTH_CTX as any); } catch { /* expected */ }
       expect(mockGraphService.getPrerequisiteChain).not.toHaveBeenCalled();
     });
   });

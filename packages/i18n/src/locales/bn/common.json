@@ -1,0 +1,50 @@
+{
+  "loading": "লোড হচ্ছে...",
+  "error": "একটি ত্রুটি ঘটেছে",
+  "retry": "পুনরায় চেষ্টা করুন",
+  "cancel": "বাতিল করুন",
+  "save": "সংরক্ষণ করুন",
+  "back": "পিছনে",
+  "search": "অনুসন্ধান করুন...",
+  "searchPlaceholder": "অনুসন্ধান করুন...",
+  "searchHint": "সমস্ত কোর্স, ট্রান্সক্রিপ্ট, অ্যানোটেশন এবং ধারণায় অনুসন্ধান করুন",
+  "searchFullPlaceholder": "কোর্স, ট্রান্সক্রিপ্ট, অ্যানোটেশন, ধারণা অনুসন্ধান করুন...",
+  "signIn": "সাইন ইন করুন",
+  "logOut": "লগ আউট",
+  "profile": "প্রোফাইল",
+  "settings": "সেটিংস",
+  "yes": "হ্যাঁ",
+  "no": "না",
+  "close": "বন্ধ করুন",
+  "confirm": "নিশ্চিত করুন",
+  "delete": "মুছুন",
+  "edit": "সম্পাদনা করুন",
+  "create": "তৈরি করুন",
+  "submit": "জমা দিন",
+  "noResults": "কোনো ফলাফল পাওয়া যায়নি",
+  "viewAll": "সব দেখুন",
+  "learnMore": "আরো জানুন",
+  "optional": "ঐচ্ছিক",
+  "required": "প্রয়োজনীয়",
+  "add": "যোগ করুন",
+  "annotations": "অ্যানোটেশন",
+  "graph": "গ্রাফ",
+  "accountInformation": "অ্যাকাউন্ট তথ্য",
+  "errorLoadingUser": "ব্যবহারকারীর ডেটা লোড করতে ত্রুটি",
+  "profilePage": {
+    "accountDetails": "অ্যাকাউন্টের বিবরণ",
+    "permissions": "অনুমতি",
+    "learningOverview": "শেখার সারসংক্ষেপ",
+    "fields": {
+      "username": "ব্যবহারকারীর নাম",
+      "email": "ইমেইল",
+      "role": "ভূমিকা",
+      "tenantId": "টেন্যান্ট আইডি"
+    },
+    "stats": {
+      "coursesAvailable": "উপলব্ধ কোর্স",
+      "conceptsMastered": "আয়ত্ত করা ধারণা",
+      "annotationsCreated": "তৈরি করা অ্যানোটেশন"
+    }
+  }
+}

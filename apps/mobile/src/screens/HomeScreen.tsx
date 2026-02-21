@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 import { DEV_MODE, MOCK_USER, MOCK_STATS, MOCK_RECENT_COURSES } from '../lib/mock-mobile-data';
@@ -33,6 +34,7 @@ type CourseItem = { id: string; title: string; progress: number; lastAccessed?: 
 
 export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { t } = useTranslation(['dashboard', 'common']);
   const { data, loading } = useQuery(HOME_QUERY, { skip: DEV_MODE });
   const user = DEV_MODE ? MOCK_USER : (data?.me as typeof MOCK_USER | undefined);
   const stats = MOCK_STATS;
@@ -43,7 +45,7 @@ export default function HomeScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Welcome back,</Text>
+          <Text style={styles.greeting}>{t('dashboard:welcomeBack', { name: user?.firstName ?? 'Student' })}</Text>
           {loading && !DEV_MODE ? (
             <ActivityIndicator size="small" color="#007AFF" />
           ) : (
@@ -52,14 +54,14 @@ export default function HomeScreen() {
         </View>
         {DEV_MODE && (<View style={styles.devBadge}><Text style={styles.devBadgeText}>DEV</Text></View>)}
       </View>
-      <Text style={styles.sectionTitle}>Your Progress</Text>
+      <Text style={styles.sectionTitle}>{t('dashboard:yourProgress')}</Text>
       <View style={styles.statsGrid}>
-        <StatCard label="Active Courses" value={stats.activeCourses} color="#007AFF" />
-        <StatCard label="Learning Streak" value={stats.learningStreak} unit="days" color="#FF9500" />
-        <StatCard label="Study Time" value={Math.round(stats.studyTimeMinutes / 60)} unit="hrs" color="#34C759" />
-        <StatCard label="Concepts" value={stats.conceptsMastered} color="#AF52DE" />
+        <StatCard label={t('dashboard:stats.activeCourses')} value={stats.activeCourses} color="#007AFF" />
+        <StatCard label={t('dashboard:stats.learningStreak')} value={stats.learningStreak} unit={t('dashboard:stats.days')} color="#FF9500" />
+        <StatCard label={t('dashboard:stats.studyTime')} value={Math.round(stats.studyTimeMinutes / 60)} unit="hrs" color="#34C759" />
+        <StatCard label={t('dashboard:stats.concepts')} value={stats.conceptsMastered} color="#AF52DE" />
       </View>
-      <Text style={styles.sectionTitle}>Continue Learning</Text>
+      <Text style={styles.sectionTitle}>{t('dashboard:continueLearning')}</Text>
       {recentCourses.map((course) => (
         <TouchableOpacity key={course.id} style={styles.courseCard} onPress={() => navigation.navigate('CourseDetail', { courseId: course.id })}>
           <View style={styles.courseInfo}>

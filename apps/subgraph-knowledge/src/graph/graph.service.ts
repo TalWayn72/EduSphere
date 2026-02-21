@@ -242,20 +242,15 @@ export class GraphService {
           const vector = await this.embeddingService.callEmbeddingProvider(query);
           const vectorString = `[${vector.join(',')}]`;
 
-          const rows = await db.execute<{
-            id: string;
-            segment_id: string;
-            transcript_id: string;
-            text: string;
-            similarity: string;
-          }>(sql`
+          type GraphVectorRow = { id: string; segment_id: string; transcript_id: string; text: string; similarity: string };
+          const rows = (await db.execute<GraphVectorRow>(sql`
             SELECT ce.id, ce.segment_id, ts.transcript_id, ts.text,
               1 - (ce.embedding <=> ${vectorString}::vector) AS similarity
             FROM content_embeddings ce
             JOIN transcript_segments ts ON ts.id = ce.segment_id
             ORDER BY ce.embedding <=> ${vectorString}::vector ASC
             LIMIT ${limit}
-          `);
+          `)) as unknown as GraphVectorRow[];
 
           vectorResults = rows.map((r) => ({
             id: r.segment_id,

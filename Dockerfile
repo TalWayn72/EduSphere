@@ -146,8 +146,9 @@ COPY packages ./packages
 COPY apps ./apps
 
 # Install + build (cached unless packages/apps change)
+# Build only backend services — web/mobile frontends are not served from this container
 RUN pnpm install --no-frozen-lockfile
-RUN pnpm turbo build
+RUN pnpm turbo build --filter='./packages/*' --filter='./apps/subgraph-*' --filter='./apps/gateway' --filter='./apps/transcription-worker'
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 9: Runtime config (after build — changes here don't bust build cache)

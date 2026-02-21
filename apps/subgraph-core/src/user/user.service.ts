@@ -7,6 +7,7 @@ import {
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
+import { parsePreferences } from './user-preferences.service';
 
 @Injectable()
 export class UserService {
@@ -24,15 +25,16 @@ export class UserService {
     };
   }
 
-  private mapUser(user: any) {
+  private mapUser(user: Record<string, unknown> | null | undefined) {
     if (!user) return null;
-    const displayName = user.display_name || '';
+    const displayName = (user['display_name'] as string) || '';
     const parts = displayName.split(' ');
     return {
       ...user,
-      firstName: user.first_name || parts[0] || '',
-      lastName: user.last_name || parts.slice(1).join(' ') || '',
-      tenantId: user.tenant_id || '',
+      firstName:   (user['first_name'] as string) || parts[0] || '',
+      lastName:    (user['last_name']  as string) || parts.slice(1).join(' ') || '',
+      tenantId:    (user['tenant_id']  as string) || '',
+      preferences: parsePreferences(user['preferences']),
     };
   }
 

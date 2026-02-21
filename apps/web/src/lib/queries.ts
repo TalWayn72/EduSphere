@@ -11,6 +11,26 @@ export const ME_QUERY = gql`
       tenantId
       createdAt
       updatedAt
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
+    }
+  }
+`;
+
+export const UPDATE_USER_PREFERENCES_MUTATION = gql`
+  mutation UpdateUserPreferences($input: UpdateUserPreferencesInput!) {
+    updateUserPreferences(input: $input) {
+      id
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
     }
   }
 `;
@@ -39,8 +59,6 @@ export const COURSES_QUERY = gql`
       instructorId
       isPublished
       estimatedHours
-      createdAt
-      updatedAt
     }
   }
 `;

@@ -1,0 +1,50 @@
+{
+  "loading": "Cargando...",
+  "error": "Ocurrió un error",
+  "retry": "Reintentar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "back": "Volver",
+  "search": "Buscar...",
+  "searchPlaceholder": "Buscar...",
+  "searchHint": "Buscar en todos los cursos, transcripciones, anotaciones y conceptos",
+  "searchFullPlaceholder": "Buscar cursos, transcripciones, anotaciones, conceptos...",
+  "signIn": "Iniciar sesión",
+  "logOut": "Cerrar sesión",
+  "profile": "Perfil",
+  "settings": "Configuración",
+  "yes": "Sí",
+  "no": "No",
+  "close": "Cerrar",
+  "confirm": "Confirmar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "create": "Crear",
+  "submit": "Enviar",
+  "noResults": "No se encontraron resultados",
+  "viewAll": "Ver todo",
+  "learnMore": "Más información",
+  "optional": "Opcional",
+  "required": "Obligatorio",
+  "add": "Agregar",
+  "annotations": "Anotaciones",
+  "graph": "Gráfico",
+  "accountInformation": "Información de cuenta",
+  "errorLoadingUser": "Error al cargar datos del usuario",
+  "profilePage": {
+    "accountDetails": "Detalles de cuenta",
+    "permissions": "Permisos",
+    "learningOverview": "Resumen de aprendizaje",
+    "fields": {
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "role": "Rol",
+      "tenantId": "ID de inquilino"
+    },
+    "stats": {
+      "coursesAvailable": "Cursos disponibles",
+      "conceptsMastered": "Conceptos dominados",
+      "annotationsCreated": "Anotaciones creadas"
+    }
+  }
+}

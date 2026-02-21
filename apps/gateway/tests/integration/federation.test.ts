@@ -44,8 +44,9 @@ describe('GraphQL Federation Integration', () => {
         mutation {
           createCourse(input: {
             title: "Test Course"
+            slug: "test-course"
             description: "Integration test course"
-            tenantId: "00000000-0000-0000-0000-000000000001"
+            instructorId: "00000000-0000-0000-0000-000000000001"
           }) {
             id
             title
@@ -66,22 +67,20 @@ describe('GraphQL Federation Integration', () => {
       const mutation = `
         mutation {
           createAnnotation(input: {
-            type: NOTE
-            content: "Test note"
-            targetType: "COURSE"
-            targetId: "test-course-123"
-            userId: "00000000-0000-0000-0000-000000000001"
-            tenantId: "00000000-0000-0000-0000-000000000001"
+            assetId: "00000000-0000-0000-0000-000000000002"
+            annotationType: TEXT
+            content: {text: "Test note"}
+            layer: PERSONAL
           }) {
             id
-            type
+            annotationType
             content
           }
         }
       `;
       const data: any = await client.request(mutation);
       expect(data.createAnnotation).toBeDefined();
-      expect(data.createAnnotation.type).toBe('NOTE');
+      expect(data.createAnnotation.annotationType).toBe('TEXT');
     });
   });
 
@@ -91,21 +90,18 @@ describe('GraphQL Federation Integration', () => {
         mutation {
           createDiscussion(input: {
             title: "Test Discussion"
-            content: "Integration test discussion"
-            courseId: "test-course-123"
-            userId: "00000000-0000-0000-0000-000000000001"
-            tenantId: "00000000-0000-0000-0000-000000000001"
+            description: "Integration test discussion"
+            courseId: "00000000-0000-0000-0000-000000000003"
+            discussionType: FORUM
           }) {
             id
             title
-            content
-            upvotes
           }
         }
       `;
       const data: any = await client.request(mutation);
       expect(data.createDiscussion).toBeDefined();
-      expect(data.createDiscussion.upvotes).toBe(0);
+      expect(data.createDiscussion.title).toBe('Test Discussion');
     });
   });
 
@@ -113,36 +109,35 @@ describe('GraphQL Federation Integration', () => {
     it('should create AI session', async () => {
       const mutation = `
         mutation {
-          createAgentSession(input: {
-            userId: "00000000-0000-0000-0000-000000000001"
-            agentType: "TUTOR"
+          startAgentSession(
+            templateType: TUTOR
             context: "{}"
-            tenantId: "00000000-0000-0000-0000-000000000001"
-          }) {
+          ) {
             id
-            agentType
+            templateType
             status
           }
         }
       `;
       const data: any = await client.request(mutation);
-      expect(data.createAgentSession).toBeDefined();
-      expect(data.createAgentSession.status).toBe('ACTIVE');
+      expect(data.startAgentSession).toBeDefined();
+      expect(data.startAgentSession.status).toBe('ACTIVE');
     });
   });
 
   describe('Knowledge Subgraph (Port 4006)', () => {
     it('should perform semantic search', async () => {
+      const queryVec = Array(768).fill(0.1).join(', ');
       const query = `
         query {
           semanticSearch(
-            queryVector: [${Array(768).fill(0.1).join(', ')}]
+            query: [${queryVec}]
             limit: 5
             minSimilarity: 0.5
           ) {
             embedding {
               id
-              content
+              chunkText
             }
             similarity
             distance
@@ -163,21 +158,6 @@ describe('GraphQL Federation Integration', () => {
             id
             email
             firstName
-            # This extends from Content Subgraph via @key(fields: "id")
-            courses {
-              id
-              title
-              modules {
-                id
-                title
-              }
-            }
-            # This extends from Annotation Subgraph
-            annotations {
-              id
-              type
-              content
-            }
           }
         }
       `;
@@ -188,7 +168,7 @@ describe('GraphQL Federation Integration', () => {
   });
 });
 
-// ─── Schema Composition Tests (no live server required) ───────────────────────
+// --- Schema Composition Tests (no live server required) ---
 describe('Gateway Federation - Schema Composition', () => {
   let gateway: ReturnType<typeof createGateway>;
 
@@ -263,10 +243,6 @@ describe('Gateway Federation - Schema Composition', () => {
         user(id: "test-user-id") {
           id
           email
-          enrolledCourses {
-            id
-            title
-          }
         }
       }
     `);

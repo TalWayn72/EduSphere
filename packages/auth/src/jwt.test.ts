@@ -209,6 +209,17 @@ describe('JWTValidator', () => {
       });
     });
 
+    it('omits audience from jwtVerify when clientId is not provided', async () => {
+      const noAudValidator = new JWTValidator(KEYCLOAK_URL, REALM);
+      mockJwtVerify.mockResolvedValueOnce({ payload: makePayload() } as never);
+
+      await noAudValidator.validate('some.token');
+
+      expect(mockJwtVerify).toHaveBeenCalledWith('some.token', fakeJwks, {
+        issuer: `${KEYCLOAK_URL}/realms/${REALM}`,
+      });
+    });
+
     it('passes the JWKS function object as the key material to jwtVerify', async () => {
       mockJwtVerify.mockResolvedValueOnce({ payload: makePayload() } as never);
 

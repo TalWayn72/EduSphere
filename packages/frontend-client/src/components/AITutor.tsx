@@ -47,6 +47,13 @@ const GET_MESSAGES = gql`
   }
 `;
 
+interface AgentMessage {
+  id: string;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
 export default function AITutor() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
@@ -120,7 +127,7 @@ export default function AITutor() {
               backgroundColor: '#f9f9f9',
             }}
           >
-            {messagesData?.agentMessages?.map((msg: any) => (
+            {messagesData?.agentMessages?.map((msg: AgentMessage) => (
               <div
                 key={msg.id}
                 style={{

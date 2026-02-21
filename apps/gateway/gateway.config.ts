@@ -1,3 +1,8 @@
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 import { defineConfig } from '@graphql-hive/gateway';
 import { useResponseCache } from '@graphql-yoga/plugin-response-cache';
 import { readFileSync, existsSync } from 'fs';
@@ -21,7 +26,11 @@ export const gatewayConfig = defineConfig({
   port: Number(process.env.PORT) || 4000,
 
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || '*',
+    origin: (() => {
+      const devPorts = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'];
+      const configured = process.env.CORS_ORIGIN?.split(',').filter(Boolean) ?? [];
+      return isProduction ? configured : [...new Set([...configured, ...devPorts])];
+    })(),
     credentials: true,
   },
 
@@ -43,6 +52,9 @@ export const gatewayConfig = defineConfig({
     useResponseCache({
       // Cache for 60 seconds by default
       ttl: 60_000,
+      // session must be provided — return null to treat all as anonymous
+      // (we use buildResponseCacheKey for tenant isolation instead)
+      session: () => null,
       // Only cache safe read-only requests (GET or explicit GraphQL content-type)
       enabled: (request) =>
         request.method === 'GET' ||
@@ -55,6 +67,20 @@ export const gatewayConfig = defineConfig({
       // Do not cache responses that contain errors
       shouldCacheResult: ({ result }) => !result.errors?.length,
     }),
+
+    // ─── Authorization Header Propagation ──────────────────────────────────
+    // hive-gateway CLI does not forward the Authorization header to upstream
+    // subgraphs by default. Each subgraph independently validates the JWT, so
+    // it must receive the original Bearer token from the client request.
+    {
+      onFetch({ options, setOptions, context }) {
+        const gqlCtx = context as { request?: Request } | null | undefined;
+        const auth = gqlCtx?.request?.headers?.get('authorization');
+        if (!auth) return;
+        const prev = options.headers as Record<string, string> | undefined;
+        setOptions({ ...options, headers: { ...(prev ?? {}), authorization: auth } });
+      },
+    },
   ],
 
   // ─── Persisted Queries ──────────────────────────────────────────────────

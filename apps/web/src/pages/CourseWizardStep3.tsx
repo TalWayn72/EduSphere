@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, Clock, Layers, Globe, EyeOff } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,17 +11,18 @@ interface Props {
   isSubmitting: boolean;
 }
 
-const DIFFICULTY_LABELS: Record<string, string> = {
-  BEGINNER: 'Beginner',
-  INTERMEDIATE: 'Intermediate',
-  ADVANCED: 'Advanced',
-};
-
 export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
+  const { t } = useTranslation('courses');
+
+  const DIFFICULTY_LABELS: Record<string, string> = {
+    BEGINNER: t('difficulty.BEGINNER'),
+    INTERMEDIATE: t('difficulty.INTERMEDIATE'),
+    ADVANCED: t('difficulty.ADVANCED'),
+  };
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Review your course before publishing. You can always edit it later.
+        {t('wizard.reviewText')}
       </p>
 
       {/* Course preview card */}
@@ -28,7 +30,7 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
         <div className="flex items-start gap-4">
           <span className="text-5xl">{data.thumbnail}</span>
           <div className="flex-1 space-y-1">
-            <h3 className="text-xl font-semibold">{data.title || '(No title)'}</h3>
+            <h3 className="text-xl font-semibold">{data.title || t('wizard.noTitle')}</h3>
             {data.description && (
               <p className="text-sm text-muted-foreground">{data.description}</p>
             )}
@@ -48,7 +50,7 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
           )}
           <div className="flex items-center gap-2 text-muted-foreground">
             <Layers className="h-4 w-4 shrink-0" />
-            <span>{data.modules.length} module{data.modules.length !== 1 ? 's' : ''}</span>
+            <span>{t('wizard.moduleCount', { count: data.modules.length })}</span>
           </div>
         </div>
       </Card>
@@ -56,7 +58,7 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
       {/* Modules list */}
       {data.modules.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium">Modules ({data.modules.length})</p>
+          <p className="text-sm font-medium">{t('modules')} ({data.modules.length})</p>
           <div className="space-y-1">
             {data.modules.map((mod, i) => (
               <div key={mod.id} className="flex items-center gap-2 text-sm py-1.5 border-b last:border-0">
@@ -83,7 +85,7 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
           disabled={!data.title || isSubmitting}
         >
           <Globe className="h-4 w-4" />
-          Publish Course
+          {t('wizard.publishCourse')}
         </Button>
         <Button
           variant="outline"
@@ -92,13 +94,13 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
           disabled={!data.title || isSubmitting}
         >
           <EyeOff className="h-4 w-4" />
-          Save as Draft
+          {t('wizard.saveAsDraft')}
         </Button>
       </div>
 
       {!data.title && (
         <p className="text-xs text-destructive text-center">
-          Please go back and add a course title before publishing.
+          {t('wizard.pleaseAddTitle')}
         </p>
       )}
     </div>

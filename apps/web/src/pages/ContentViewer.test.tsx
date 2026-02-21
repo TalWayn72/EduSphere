@@ -51,6 +51,12 @@ vi.mock('@/components/Layout', () => ({
   ),
 }));
 
+// ContentViewerBreadcrumb calls useCourseNavigation → useQuery (urql).
+// Mock it to avoid needing a urql Provider in tests.
+vi.mock('@/components/ContentViewerBreadcrumb', () => ({
+  ContentViewerBreadcrumb: () => null,
+}));
+
 vi.mock('@/components/VideoProgressMarkers', () => ({
   VideoProgressMarkers: () => <div data-testid="video-progress-markers" />,
 }));
@@ -331,7 +337,7 @@ describe('ContentViewer', () => {
     expect(chatInput).toBeDefined();
     // All buttons rendered — click the send button (last Button mock in chat area)
     const allButtons = screen.getAllByRole('button');
-    const sendBtn = allButtons[allButtons.length - 1];
+    const sendBtn = allButtons[allButtons.length - 1]!;
     fireEvent.click(sendBtn);
     // Component does not crash
     expect(screen.getByTestId('layout')).toBeDefined();
@@ -362,7 +368,7 @@ describe('ContentViewer', () => {
     // Find the play/pause button (first icon button in controls)
     expect(allButtons.length).toBeGreaterThan(0);
     // Click the first button (play/pause toggle)
-    fireEvent.click(allButtons[0]);
+    fireEvent.click(allButtons[0]!);
     // Component does not crash after toggling play
     expect(screen.getByTestId('layout')).toBeDefined();
   });

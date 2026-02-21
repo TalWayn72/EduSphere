@@ -3,6 +3,7 @@
  */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -72,6 +73,7 @@ interface ModuleCardProps {
 }
 
 function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const [open, setOpen] = useState(defaultOpen);
 
@@ -102,7 +104,7 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
       {open && (
         <CardContent className="pt-0 pb-2">
           {mod.contentItems.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-2 px-2">No content items yet.</p>
+            <p className="text-xs text-muted-foreground py-2 px-2">{t('noContentItems')}</p>
           ) : (
             <ul className="space-y-1">
               {mod.contentItems.map((item) => (
@@ -131,11 +133,13 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
 }
 
 export function CourseModuleList({ modules, courseId }: Props) {
+  const { t } = useTranslation('courses');
+
   if (modules.length === 0) {
     return (
       <Card>
         <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          No modules have been added to this course yet.
+          {t('noModulesAdded')}
         </CardContent>
       </Card>
     );
@@ -145,7 +149,7 @@ export function CourseModuleList({ modules, courseId }: Props) {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-semibold">Course Content</h2>
+      <h2 className="text-lg font-semibold">{t('courseContent')}</h2>
       {sorted.map((mod, idx) => (
         <ModuleCard key={mod.id} mod={mod} defaultOpen={idx === 0} courseId={courseId} />
       ))}

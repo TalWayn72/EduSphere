@@ -8,6 +8,7 @@ import { MediaModule } from './media/media.module';
 import { ContentItemModule } from './content-item/content-item.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
+import { TranslationModule } from './translation/translation.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { authMiddleware } from './auth/auth.middleware';
     ModuleModule,
     MediaModule,
     ContentItemModule,
+    TranslationModule,
   ],
 })
 export class AppModule {}

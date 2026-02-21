@@ -48,6 +48,9 @@ const CourseDetailPage = lazy(() =>
     default: m.CourseDetailPage,
   }))
 );
+const SettingsPage = lazy(() =>
+  import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage }))
+);
 const AnnotationDemo = lazy(() => import('@/pages/AnnotationDemo'));
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
@@ -128,7 +131,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/settings',
-    element: guarded(<ProfilePage />),
+    element: guarded(<SettingsPage />),
   },
   {
     path: '/annotations-demo',

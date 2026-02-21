@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 // Mock @aws-sdk/client-s3 before importing the module
 vi.mock('@aws-sdk/client-s3', () => ({
-  S3Client: vi.fn().mockImplementation(() => ({
-    send: vi.fn(),
-  })),
-  GetObjectCommand: vi.fn().mockImplementation((args) => args),
+  S3Client: vi.fn().mockImplementation(function (this: unknown) {
+    (this as Record<string, unknown>)['send'] = vi.fn();
+    return this;
+  }),
+  GetObjectCommand: vi.fn().mockImplementation(function(args) { return args; }),
 }));
 
 // Mock stream/promises pipeline
@@ -71,7 +72,10 @@ describe('MinioClient', () => {
 
       const mockBody = Readable.from(['audio data']);
       const mockSend = vi.fn().mockResolvedValue({ Body: mockBody });
-      (S3Client as any).mockImplementation(() => ({ send: mockSend }));
+      (S3Client as ReturnType<typeof vi.fn>).mockImplementation(function (this: unknown) {
+        (this as Record<string, unknown>)['send'] = mockSend;
+        return this;
+      });
 
       const { MinioClient } = await import('./minio.client');
       const client = new MinioClient();
@@ -88,7 +92,10 @@ describe('MinioClient', () => {
     it('throws InternalServerErrorException when Body is null', async () => {
       const { S3Client } = await import('@aws-sdk/client-s3');
       const mockSend = vi.fn().mockResolvedValue({ Body: null });
-      (S3Client as any).mockImplementation(() => ({ send: mockSend }));
+      (S3Client as ReturnType<typeof vi.fn>).mockImplementation(function (this: unknown) {
+        (this as Record<string, unknown>)['send'] = mockSend;
+        return this;
+      });
 
       const { MinioClient } = await import('./minio.client');
       const client = new MinioClient();

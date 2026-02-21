@@ -1,0 +1,50 @@
+{
+  "title": "ড্যাশবোর্ড",
+  "welcomeBack": "{{name}}, আবার স্বাগতম!",
+  "instructorTools": "প্রশিক্ষক সরঞ্জাম",
+  "createCourse": "কোর্স তৈরি করুন",
+  "manageCourses": "কোর্স পরিচালনা করুন",
+  "continueLearning": "শেখা অব্যাহত রাখুন",
+  "yourProgress": "আপনার অগ্রগতি",
+  "studyActivity": "অধ্যয়ন কার্যক্রম",
+  "activityDescription": "গত ৩০ দিনে আপনার টীকা কার্যক্রম",
+  "recentActivity": "সাম্প্রতিক কার্যক্রম",
+  "latestEvents": "আপনার সর্বশেষ শেখার ঘটনা",
+  "noActivity": "সাম্প্রতিক কোনো কার্যক্রম নেই",
+  "errorLoadingUser": "ব্যবহারকারীর ডেটা লোড করতে ত্রুটি",
+  "stats": {
+    "activeCourses": "সক্রিয় কোর্স",
+    "learningStreak": "শেখার ধারা",
+    "studyTime": "অধ্যয়নের সময়",
+    "concepts": "ধারণা",
+    "coursesEnrolled": "নথিভুক্ত কোর্স",
+    "conceptsMastered": "আয়ত্ত ধারণা",
+    "annotationsCreated": "তৈরি টীকা",
+    "weeklyGoal": "সাপ্তাহিক লক্ষ্য",
+    "days": "দিন",
+    "hours": "ঘন্টা",
+    "minutes": "মিনিট"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} অধ্যয়ন দিন",
+    "totalSessions": "মোট {{count}} অধ্যয়ন সেশন",
+    "less": "কম",
+    "more": "বেশি"
+  },
+  "profile": {
+    "accountDetails": "অ্যাকাউন্টের বিবরণ",
+    "permissions": "অনুমতি",
+    "learningOverview": "শেখার সারসংক্ষেপ",
+    "fields": {
+      "username": "ব্যবহারকারীর নাম",
+      "email": "ইমেইল",
+      "role": "ভূমিকা",
+      "tenantId": "টেন্যান্ট আইডি"
+    },
+    "stats": {
+      "coursesAvailable": "উপলব্ধ কোর্স",
+      "conceptsMastered": "আয়ত্ত করা ধারণা",
+      "annotationsCreated": "তৈরি করা অ্যানোটেশন"
+    }
+  }
+}

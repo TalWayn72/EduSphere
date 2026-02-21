@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, Modal, ScrollView } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
 import { DEV_MODE, MOCK_GRAPH_NODES } from '../lib/mock-mobile-data';
 
 const KNOWLEDGE_GRAPH_QUERY = gql`
@@ -20,6 +21,7 @@ type NodeType = 'CONCEPT' | 'PERSON' | 'SOURCE' | 'TERM';
 interface GraphNode { id: string; label: string; type: NodeType; description?: string; connections?: number; }
 
 export default function KnowledgeGraphScreen() {
+  const { t } = useTranslation('knowledge');
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<NodeType | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
@@ -40,7 +42,7 @@ export default function KnowledgeGraphScreen() {
           style={styles.searchInput}
           value={searchQuery}
           onChangeText={setSearchQuery}
-          placeholder="🔍 Search concepts..."
+          placeholder={`🔍 ${t('searchConcepts')}`}
           clearButtonMode="while-editing"
         />
       </View>
@@ -54,7 +56,7 @@ export default function KnowledgeGraphScreen() {
         ))}
       </ScrollView>
       <View style={styles.statsBar}>
-        <Text style={styles.statsText}>{filteredNodes.length} of {nodes.length} concepts{DEV_MODE && ' (mock)'}</Text>
+        <Text style={styles.statsText}>{filteredNodes.length} of {nodes.length} {t('concepts')}{DEV_MODE && ' (mock)'}</Text>
       </View>
       <FlatList
         data={filteredNodes}
@@ -74,7 +76,7 @@ export default function KnowledgeGraphScreen() {
           </TouchableOpacity>
         )}
         contentContainerStyle={styles.listContent}
-        ListEmptyComponent={<View style={styles.empty}><Text style={styles.emptyText}>No concepts match your search</Text></View>}
+        ListEmptyComponent={<View style={styles.empty}><Text style={styles.emptyText}>{t('noConcepts')}</Text></View>}
       />
       <Modal visible={selectedNode !== null} transparent animationType="slide" onRequestClose={() => setSelectedNode(null)}>
         <View style={styles.modalOverlay}>
@@ -95,7 +97,7 @@ export default function KnowledgeGraphScreen() {
                   <Text style={styles.modalDescription}>{selectedNode.description}</Text>
                 )}
                 {selectedNode.connections !== undefined && (
-                  <Text style={styles.modalConnections}>🔗 {selectedNode.connections} connections in the knowledge graph</Text>
+                  <Text style={styles.modalConnections}>🔗 {selectedNode.connections} {t('relationships')}</Text>
                 )}
               </>
             )}

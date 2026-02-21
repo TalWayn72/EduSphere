@@ -1,0 +1,50 @@
+{
+  "title": "Panel de control",
+  "welcomeBack": "¡Bienvenido de nuevo, {{name}}!",
+  "instructorTools": "Herramientas del instructor",
+  "createCourse": "Crear curso",
+  "manageCourses": "Gestionar cursos",
+  "continueLearning": "Continuar aprendiendo",
+  "yourProgress": "Tu progreso",
+  "studyActivity": "Actividad de estudio",
+  "activityDescription": "Tu actividad de anotaciones en los últimos 30 días",
+  "recentActivity": "Actividad reciente",
+  "latestEvents": "Tus últimos eventos de aprendizaje",
+  "noActivity": "Sin actividad reciente",
+  "errorLoadingUser": "Error al cargar datos del usuario",
+  "stats": {
+    "activeCourses": "Cursos activos",
+    "learningStreak": "Racha de aprendizaje",
+    "studyTime": "Tiempo de estudio",
+    "concepts": "Conceptos",
+    "coursesEnrolled": "Cursos matriculados",
+    "conceptsMastered": "Conceptos dominados",
+    "annotationsCreated": "Anotaciones creadas",
+    "weeklyGoal": "Objetivo semanal",
+    "days": "días",
+    "hours": "horas",
+    "minutes": "minutos"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} días de estudio",
+    "totalSessions": "{{count}} sesiones de estudio en total",
+    "less": "Menos",
+    "more": "Más"
+  },
+  "profile": {
+    "accountDetails": "Detalles de cuenta",
+    "permissions": "Permisos",
+    "learningOverview": "Resumen de aprendizaje",
+    "fields": {
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "role": "Rol",
+      "tenantId": "ID de inquilino"
+    },
+    "stats": {
+      "coursesAvailable": "Cursos disponibles",
+      "conceptsMastered": "Conceptos dominados",
+      "annotationsCreated": "Anotaciones creadas"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "title": "设置",
+  "language": {
+    "title": "语言",
+    "description": "选择您界面和AI回复的首选语言",
+    "saved": "语言偏好已保存",
+    "error": "保存语言偏好失败，请重试",
+    "saving": "保存中..."
+  },
+  "appearance": {
+    "title": "外观",
+    "theme": "主题",
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "notifications": {
+    "title": "通知",
+    "email": "邮件通知",
+    "push": "推送通知",
+    "emailDescription": "通过邮件接收课程更新和公告",
+    "pushDescription": "在您的设备上接收实时通知"
+  },
+  "account": {
+    "title": "账户",
+    "editProfile": "编辑个人资料",
+    "privacy": "隐私",
+    "myLearning": "我的学习",
+    "progress": "进度",
+    "achievements": "成就",
+    "version": "版本 {{version}}"
+  }
+}

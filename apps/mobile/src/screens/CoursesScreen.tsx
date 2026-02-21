@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 import { database } from '../services/database';
@@ -42,6 +43,7 @@ interface Course {
 
 export default function CoursesScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { t } = useTranslation('courses');
   const [cachedCourses, setCachedCourses] = useState<Course[]>([]);
   const [isShowingCache, setIsShowingCache] = useState(false);
 
@@ -75,7 +77,7 @@ export default function CoursesScreen() {
   if (loading && courses.length === 0) {
     return (
       <View style={styles.center}>
-        <Text>Loading courses...</Text>
+        <Text>{t('loadingCourses')}</Text>
       </View>
     );
   }
@@ -83,8 +85,8 @@ export default function CoursesScreen() {
   if (error && courses.length === 0) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>Error: {error.message}</Text>
-        <Text style={styles.hint}>Check your connection and try again</Text>
+        <Text style={styles.error}>{t('failedToLoad', { message: error.message })}</Text>
+        <Text style={styles.hint}>{t('common:retry')}</Text>
       </View>
     );
   }
@@ -94,7 +96,7 @@ export default function CoursesScreen() {
       {isShowingCache && (
         <View style={styles.offlineBanner}>
           <Text style={styles.offlineBannerText}>
-            Showing cached content — you are offline
+            {t('showingCachedData')}
           </Text>
         </View>
       )}
@@ -111,7 +113,7 @@ export default function CoursesScreen() {
             <View style={styles.courseHeader}>
               <Text style={styles.courseTitle}>{item.title}</Text>
               {!item.isPublished && (
-                <Text style={styles.draftBadge}>Draft</Text>
+                <Text style={styles.draftBadge}>{t('draft')}</Text>
               )}
             </View>
             <Text style={styles.courseDescription} numberOfLines={2}>
@@ -125,7 +127,7 @@ export default function CoursesScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text style={styles.hint}>No courses available</Text>
+            <Text style={styles.hint}>{t('noCourses')}</Text>
           </View>
         }
       />

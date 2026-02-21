@@ -222,6 +222,8 @@ describe('EmbeddingService', () => {
 
   describe('semanticSearch()', () => {
     it('uses pgvector when provider is available', async () => {
+      // Set OLLAMA_URL so the service doesn't short-circuit to ilikeFallback
+      process.env.OLLAMA_URL = 'http://localhost:11434';
       vi.spyOn(service, 'callEmbeddingProvider').mockResolvedValue([0.1, 0.2]);
       mockExecute.mockResolvedValue([
         { id: 'e1', segment_id: 's1', similarity: '0.92' },
@@ -230,6 +232,7 @@ describe('EmbeddingService', () => {
       const results = await service.semanticSearch('query', 'tenant-1', 5);
       expect(results).toHaveLength(1);
       expect(results[0].similarity).toBe(0.92);
+      delete process.env.OLLAMA_URL;
     });
 
     it('falls back to ILIKE when provider throws', async () => {

@@ -2,32 +2,31 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NatsKVClient } from './kv.client.js';
 
 // ── NATS mock infrastructure ──────────────────────────────────────────────────
+// vi.hoisted() ensures all variables are initialized before vi.mock() hoisting.
 
-const mockStorePut = vi.fn();
-const mockStoreGet = vi.fn();
-const mockStoreDelete = vi.fn();
-
-const mockKvStore = {
-  put: mockStorePut,
-  get: mockStoreGet,
-  delete: mockStoreDelete,
-};
-
-const mockStreamsAdd = vi.fn();
-const mockJsm = { streams: { add: mockStreamsAdd } };
-
-const mockKvView = vi.fn();
-const mockJs = { views: { kv: mockKvView } };
-
-const mockDrain = vi.fn().mockResolvedValue(undefined);
-const mockJetstreamManager = vi.fn().mockResolvedValue(mockJsm);
-const mockJetstream = vi.fn().mockReturnValue(mockJs);
-
-const mockNc = {
-  jetstream: mockJetstream,
-  jetstreamManager: mockJetstreamManager,
-  drain: mockDrain,
-};
+const {
+  mockStorePut, mockStoreGet, mockStoreDelete, mockKvStore,
+  mockStreamsAdd, mockJsm, mockKvView, mockJs,
+  mockDrain, mockJetstreamManager, mockJetstream, mockNc,
+} = vi.hoisted(() => {
+  const mockStorePut = vi.fn();
+  const mockStoreGet = vi.fn();
+  const mockStoreDelete = vi.fn();
+  const mockKvStore = { put: mockStorePut, get: mockStoreGet, delete: mockStoreDelete };
+  const mockStreamsAdd = vi.fn();
+  const mockJsm = { streams: { add: mockStreamsAdd } };
+  const mockKvView = vi.fn();
+  const mockJs = { views: { kv: mockKvView } };
+  const mockDrain = vi.fn().mockResolvedValue(undefined);
+  const mockJetstreamManager = vi.fn().mockResolvedValue(mockJsm);
+  const mockJetstream = vi.fn().mockReturnValue(mockJs);
+  const mockNc = { jetstream: mockJetstream, jetstreamManager: mockJetstreamManager, drain: mockDrain };
+  return {
+    mockStorePut, mockStoreGet, mockStoreDelete, mockKvStore,
+    mockStreamsAdd, mockJsm, mockKvView, mockJs,
+    mockDrain, mockJetstreamManager, mockJetstream, mockNc,
+  };
+});
 
 vi.mock('nats', () => ({
   connect: vi.fn().mockResolvedValue(mockNc),

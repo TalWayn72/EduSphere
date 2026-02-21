@@ -7,6 +7,7 @@ const mockStreamText = vi.fn();
 vi.mock('ai', () => ({
   generateText: (...args: unknown[]) => mockGenerateText(...args),
   streamText: (...args: unknown[]) => mockStreamText(...args),
+  stepCountIs: (n: number) => (_: unknown) => n,
 }));
 
 vi.mock('@ai-sdk/openai', () => ({
@@ -142,7 +143,7 @@ describe('AIService', () => {
       const agent = { ...MOCK_AGENT_EXPLAIN, config: { temperature: 0.7, maxTokens: 500 } };
       await service.execute(agent, MOCK_INPUT);
       expect(mockGenerateText).toHaveBeenCalledWith(
-        expect.objectContaining({ maxTokens: 500 })
+        expect.objectContaining({ maxOutputTokens: 500 })
       );
     });
 
@@ -160,7 +161,7 @@ describe('AIService', () => {
       const agentNoConfig = { ...MOCK_AGENT_EXPLAIN, config: undefined };
       await service.execute(agentNoConfig, MOCK_INPUT);
       expect(mockGenerateText).toHaveBeenCalledWith(
-        expect.objectContaining({ maxTokens: 2000 })
+        expect.objectContaining({ maxOutputTokens: 2000 })
       );
     });
 
@@ -291,7 +292,7 @@ describe('AIService', () => {
       const result = await service.continueSession(
         SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX
       );
-      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX);
+      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
@@ -300,7 +301,8 @@ describe('AIService', () => {
       expect(mockRunLangGraphDebate).toHaveBeenCalledWith(
         SESSION_ID,
         expect.any(String),
-        expect.any(Object)
+        expect.any(Object),
+        expect.any(String)
       );
     });
 
@@ -308,26 +310,26 @@ describe('AIService', () => {
       const result = await service.continueSession(
         SESSION_ID, MESSAGE, 'QUIZ_GENERATOR', CTX
       );
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX);
+      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
     it('routes QUIZ_ASSESS to runLangGraphQuiz', async () => {
       await service.continueSession(SESSION_ID, MESSAGE, 'QUIZ_ASSESS', CTX);
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX);
+      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
     });
 
     it('routes TUTOR to runLangGraphTutor', async () => {
       const result = await service.continueSession(
         SESSION_ID, MESSAGE, 'TUTOR', CTX
       );
-      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX);
+      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
     it('routes EXPLANATION_GENERATOR to runLangGraphTutor', async () => {
       await service.continueSession(SESSION_ID, MESSAGE, 'EXPLANATION_GENERATOR', CTX);
-      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX);
+      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
     });
 
     it('routes SUMMARIZE to legacy summarizer (not LangGraph adapters)', async () => {
@@ -367,7 +369,7 @@ describe('AIService', () => {
 
     it('uses empty context object when none provided', async () => {
       await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE');
-      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, {});
+      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, {}, 'en');
     });
   });
 
@@ -477,11 +479,11 @@ describe('AIService', () => {
       );
     });
 
-    it('passes maxSteps: 5 to generateText for EXPLAIN template', async () => {
+    it('passes stopWhen to generateText for EXPLAIN template', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
       await service.execute(MOCK_AGENT_EXPLAIN, MOCK_INPUT);
       expect(mockGenerateText).toHaveBeenCalledWith(
-        expect.objectContaining({ maxSteps: 5 })
+        expect.objectContaining({ stopWhen: expect.any(Function) })
       );
     });
 
@@ -540,11 +542,11 @@ describe('AIService', () => {
       );
     });
 
-    it('passes maxSteps: 5 to streamText for EXPLAIN template', async () => {
+    it('passes stopWhen to streamText for EXPLAIN template', async () => {
       mockStreamText.mockReturnValue({});
       await service.executeStream(MOCK_AGENT_EXPLAIN, MOCK_INPUT);
       expect(mockStreamText).toHaveBeenCalledWith(
-        expect.objectContaining({ maxSteps: 5 })
+        expect.objectContaining({ stopWhen: expect.any(Function) })
       );
     });
 
@@ -573,7 +575,7 @@ describe('AIService', () => {
       const inputWithTenant = { ...MOCK_INPUT, tenantId: 'tenant-xyz' };
       await service.executeStream(MOCK_AGENT_EXPLAIN, inputWithTenant);
       expect(mockStreamText).toHaveBeenCalledWith(
-        expect.objectContaining({ tools: expect.any(Object), maxSteps: 5 })
+        expect.objectContaining({ tools: expect.any(Object), stopWhen: expect.any(Function) })
       );
     });
 
@@ -582,7 +584,7 @@ describe('AIService', () => {
       await service.executeStream(MOCK_AGENT_CHAVRUTA, MOCK_INPUT_WITH_CONTENT);
       const calls = mockStreamText.mock.calls as Array<[Record<string, unknown>]>;
       const serviceToolsCall = calls.some(
-        ([arg]) => 'tools' in arg && 'maxSteps' in arg && arg['maxSteps'] === 5
+        ([arg]) => 'tools' in arg && 'stopWhen' in arg
       );
       // Chavruta workflow calls streamText internally but without service-injected tools
       expect(serviceToolsCall).toBe(false);

@@ -1,0 +1,50 @@
+{
+  "loading": "Loading...",
+  "error": "An error occurred",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "save": "Save",
+  "back": "Back",
+  "search": "Search",
+  "searchPlaceholder": "Search...",
+  "searchHint": "Search across all courses, transcripts, annotations and concepts",
+  "searchFullPlaceholder": "Search courses, transcripts, annotations, concepts...",
+  "signIn": "Sign In",
+  "logOut": "Log out",
+  "profile": "Profile",
+  "settings": "Settings",
+  "yes": "Yes",
+  "no": "No",
+  "close": "Close",
+  "confirm": "Confirm",
+  "delete": "Delete",
+  "edit": "Edit",
+  "create": "Create",
+  "submit": "Submit",
+  "noResults": "No results found",
+  "viewAll": "View all",
+  "learnMore": "Learn more",
+  "optional": "Optional",
+  "required": "Required",
+  "add": "Add",
+  "annotations": "Annotations",
+  "graph": "Graph",
+  "accountInformation": "Account Information",
+  "errorLoadingUser": "Error loading user data",
+  "profilePage": {
+    "accountDetails": "Account Details",
+    "permissions": "Permissions",
+    "learningOverview": "Learning Overview",
+    "fields": {
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "tenantId": "Tenant ID"
+    },
+    "stats": {
+      "coursesAvailable": "Courses Available",
+      "conceptsMastered": "Concepts Mastered",
+      "annotationsCreated": "Annotations Created"
+    }
+  }
+}

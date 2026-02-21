@@ -1,15 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Test } from '@nestjs/testing';
-import { TranscriptionService } from './transcription.service';
-import { WhisperClient } from './whisper.client';
-import { MinioClient } from './minio.client';
-import { NatsService } from '../nats/nats.service';
-import { ConceptExtractor } from '../knowledge/concept-extractor';
-import { GraphBuilder } from '../knowledge/graph-builder';
-import { HlsService } from '../hls/hls.service';
-import type { MediaUploadedEvent } from './transcription.types';
 
-// Mock @edusphere/db so tests don't need a real DB
+// Mock @edusphere/db so tests do not need a real DB
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn().mockReturnValue({
     insert: vi.fn().mockReturnThis(),
@@ -32,6 +23,9 @@ vi.mock('fs/promises', () => ({
   unlink: vi.fn().mockResolvedValue(undefined),
 }));
 
+import { TranscriptionService } from './transcription.service';
+import type { MediaUploadedEvent } from './transcription.types';
+
 const makeEvent = (overrides: Partial<MediaUploadedEvent> = {}): MediaUploadedEvent => ({
   fileKey: 'media/test.mp3',
   assetId: 'asset-uuid',
@@ -44,9 +38,6 @@ const makeEvent = (overrides: Partial<MediaUploadedEvent> = {}): MediaUploadedEv
 
 describe('TranscriptionService', () => {
   let service: TranscriptionService;
-  let whisper: WhisperClient;
-  let minio: MinioClient;
-  let nats: NatsService;
 
   const mockWhisper = {
     transcribe: vi.fn().mockResolvedValue({
@@ -73,38 +64,29 @@ describe('TranscriptionService', () => {
   };
 
   const mockHls = {
-    transcodeToHls: vi.fn().mockResolvedValue(null), // null = non-video, silently skipped
+    transcodeToHls: vi.fn().mockResolvedValue(null),
     getManifestPresignedUrl: vi.fn().mockResolvedValue('https://minio/hls/master.m3u8'),
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
-
-    const module = await Test.createTestingModule({
-      providers: [
-        TranscriptionService,
-        { provide: WhisperClient, useValue: mockWhisper },
-        { provide: MinioClient, useValue: mockMinio },
-        { provide: NatsService, useValue: mockNats },
-        { provide: ConceptExtractor, useValue: mockConceptExtractor },
-        { provide: GraphBuilder, useValue: mockGraphBuilder },
-        { provide: HlsService, useValue: mockHls },
-      ],
-    }).compile();
-
-    service = module.get(TranscriptionService);
-    whisper = module.get(WhisperClient);
-    minio = module.get(MinioClient);
-    nats = module.get(NatsService);
+    service = new TranscriptionService(
+      mockWhisper as any,
+      mockMinio as any,
+      mockNats as any,
+      mockConceptExtractor as any,
+      mockGraphBuilder as any,
+      mockHls as any,
+    );
   });
 
   describe('transcribeFile', () => {
     it('orchestrates full happy path and publishes completed event', async () => {
       await service.transcribeFile(makeEvent());
 
-      expect(minio.downloadToTemp).toHaveBeenCalledWith('media/test.mp3');
-      expect(whisper.transcribe).toHaveBeenCalledWith('/tmp/test.mp3');
-      expect(nats.publish).toHaveBeenCalledWith(
+      expect(mockMinio.downloadToTemp).toHaveBeenCalledWith('media/test.mp3');
+      expect(mockWhisper.transcribe).toHaveBeenCalledWith('/tmp/test.mp3');
+      expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.completed',
         expect.objectContaining({
           assetId: 'asset-uuid',
@@ -118,7 +100,7 @@ describe('TranscriptionService', () => {
       mockWhisper.transcribe.mockRejectedValueOnce(new Error('Whisper timeout'));
 
       await expect(service.transcribeFile(makeEvent())).resolves.toBeUndefined();
-      expect(nats.publish).toHaveBeenCalledWith(
+      expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.failed',
         expect.objectContaining({
           assetId: 'asset-uuid',
@@ -131,7 +113,7 @@ describe('TranscriptionService', () => {
       mockMinio.downloadToTemp.mockRejectedValueOnce(new Error('MinIO unreachable'));
 
       await service.transcribeFile(makeEvent());
-      expect(nats.publish).toHaveBeenCalledWith(
+      expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.failed',
         expect.objectContaining({ error: 'MinIO unreachable' })
       );
@@ -153,7 +135,7 @@ describe('TranscriptionService', () => {
       });
 
       await service.transcribeFile(makeEvent());
-      expect(nats.publish).toHaveBeenCalledWith(
+      expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.completed',
         expect.objectContaining({ segmentCount: 0 })
       );
@@ -168,13 +150,11 @@ describe('TranscriptionService', () => {
 
       await service.transcribeFile(videoEvent);
 
-      // transcription.completed must be published before HLS resolves
-      expect(nats.publish).toHaveBeenCalledWith(
+      expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.completed',
         expect.objectContaining({ assetId: 'asset-uuid' }),
       );
 
-      // Give the fire-and-forget HLS task time to settle
       await new Promise((r) => setTimeout(r, 20));
 
       expect(mockHls.transcodeToHls).toHaveBeenCalledWith(
@@ -193,12 +173,11 @@ describe('TranscriptionService', () => {
 
       await expect(service.transcribeFile(videoEvent)).resolves.toBeUndefined();
 
-      expect(nats.publish).toHaveBeenCalledWith(
+      expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.completed',
         expect.objectContaining({ assetId: 'asset-uuid' }),
       );
 
-      // Let the rejected promise settle
       await new Promise((r) => setTimeout(r, 20));
     });
   });

@@ -58,14 +58,14 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
         }
       },
 
-      onConnect(data: onConnectPayload) {
+      async onConnect(data: onConnectPayload) {
         const ctx = data.context as ConnectionContext;
         self.logger.log(
           `User connected: ${ctx.authContext?.userId ?? 'unknown'} to doc "${data.documentName}"`
         );
       },
 
-      onDisconnect(data: onDisconnectPayload) {
+      async onDisconnect(data: onDisconnectPayload) {
         const ctx = data.context as ConnectionContext;
         self.logger.log(
           `User disconnected: ${ctx.authContext?.userId ?? 'unknown'} from doc "${data.documentName}"`

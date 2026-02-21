@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +18,7 @@ function generateId(): string {
 }
 
 export function CourseWizardStep2({ modules, onChange }: Props) {
+  const { t } = useTranslation('courses');
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
 
@@ -48,7 +50,7 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
       {/* Existing modules */}
       {modules.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-          <p className="text-sm">No modules yet. Add your first module below.</p>
+          <p className="text-sm">{t('wizard.noModulesYet')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -81,7 +83,7 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-muted-foreground">
-                      Module {i + 1}
+                      {t('wizard.moduleNumber', { n: i + 1 })}
                     </span>
                   </div>
                   <p className="font-medium text-sm">{mod.title}</p>
@@ -109,22 +111,22 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
 
       {/* Add new module form */}
       <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
-        <p className="text-sm font-medium">Add Module</p>
+        <p className="text-sm font-medium">{t('wizard.addModule')}</p>
         <div className="space-y-2">
-          <Label htmlFor="module-title">Module Title *</Label>
+          <Label htmlFor="module-title">{t('wizard.addModuleTitle')}</Label>
           <Input
             id="module-title"
-            placeholder="e.g. Introduction to Gemara"
+            placeholder={t('wizard.addModuleTitlePlaceholder')}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addModule(); } }}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="module-desc">Description (optional)</Label>
+          <Label htmlFor="module-desc">{t('wizard.addModuleDescriptionLabel')}</Label>
           <Textarea
             id="module-desc"
-            placeholder="What will this module cover?"
+            placeholder={t('wizard.addModuleDescriptionPlaceholder')}
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
             rows={2}
@@ -139,7 +141,7 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
           className="gap-1.5"
         >
           <Plus className="h-4 w-4" />
-          Add Module
+          {t('wizard.addModule')}
         </Button>
       </div>
     </div>

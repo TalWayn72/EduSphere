@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 
@@ -31,6 +32,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'CourseDetail'>;
 
 export default function CourseDetailScreen({ route }: Props) {
   const { courseId } = route.params;
+  const { t } = useTranslation('courses');
   const { data, loading, error } = useQuery(COURSE_DETAIL_QUERY, {
     variables: { id: courseId },
   });
@@ -38,7 +40,7 @@ export default function CourseDetailScreen({ route }: Props) {
   if (loading) {
     return (
       <View style={styles.center}>
-        <Text>Loading course...</Text>
+        <Text>{t('loadingCourse')}</Text>
       </View>
     );
   }
@@ -46,7 +48,7 @@ export default function CourseDetailScreen({ route }: Props) {
   if (error) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>Error: {error.message}</Text>
+        <Text style={styles.error}>{t('failedToLoad', { message: error.message })}</Text>
       </View>
     );
   }
@@ -61,7 +63,7 @@ export default function CourseDetailScreen({ route }: Props) {
       </View>
 
       <View style={styles.modulesSection}>
-        <Text style={styles.sectionTitle}>📖 Modules</Text>
+        <Text style={styles.sectionTitle}>📖 {t('modules')}</Text>
         {course.modules?.map((module: any) => (
           <View key={module.id} style={styles.moduleCard}>
             <Text style={styles.moduleTitle}>{module.title}</Text>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useSubscription } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Save, Users } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CollaborativeEditor } from '@/components/CollaborativeEditor';
-import { getCurrentUser } from '@/lib/auth';
 import {
   DISCUSSION_QUERY,
   JOIN_DISCUSSION_MUTATION,
@@ -31,6 +31,7 @@ interface BackendDiscussion {
 }
 
 export function CollaborationSessionPage() {
+  const { t } = useTranslation('collaboration');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -38,9 +39,8 @@ export function CollaborationSessionPage() {
   const topic = searchParams.get('topic') ?? '';
   const discussionId = searchParams.get('discussionId') ?? '';
 
-  const user = getCurrentUser();
   const [docTitle, setDocTitle] = useState(
-    topic ? `Chavruta: ${topic}` : 'Shared Study Notes'
+    topic ? `${t('chavruta')}: ${topic}` : t('sharedStudyNotes')
   );
   const [saved, setSaved] = useState(false);
 
@@ -77,9 +77,9 @@ export function CollaborationSessionPage() {
 
   // Show latest arriving message as a hint in the session info bar
   const infoNote = latestMessage
-    ? `New message from ${latestMessage.userId.slice(0, 8)}...`
+    ? t('newMessage', { userId: latestMessage.userId.slice(0, 8) })
     : partnerName !== 'Partner'
-      ? `Studying with ${partnerName}`
+      ? t('studyingWith', { partner: partnerName })
       : null;
 
   const handleSave = () => {
@@ -88,9 +88,9 @@ export function CollaborationSessionPage() {
   };
 
   const SAMPLE_CONTENT = `<h1>${docTitle}</h1>
-<p>Welcome to your collaborative study session. Write your notes, questions, and insights here.</p>
-<h2>Key Topics</h2>
-<ul><li>Add your first topic...</li></ul>`;
+<p>${t('sampleWelcome')}</p>
+<h2>${t('sampleKeyTopics')}</h2>
+<ul><li>${t('sampleFirstTopic')}</li></ul>`;
 
   return (
     <Layout>
@@ -99,21 +99,21 @@ export function CollaborationSessionPage() {
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => navigate('/collaboration')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Sessions
+            {t('sessions')}
           </Button>
 
           <div className="flex-1" />
 
           <Button variant="outline" size="sm" onClick={handleSave} className="gap-1.5">
             <Save className="h-3.5 w-3.5" />
-            {saved ? 'Saved!' : 'Save'}
+            {saved ? t('saved') : t('save')}
           </Button>
         </div>
 
         {/* Session info bar */}
         <div className="flex items-center gap-3 py-2 px-3 bg-muted/50 rounded-lg text-sm">
           <Users className="h-4 w-4 text-muted-foreground shrink-0" />
-          <span className="text-muted-foreground">Chavruta with</span>
+          <span className="text-muted-foreground">{t('chavrutaWith')}</span>
           <span className="font-semibold">
             {discussion?.title ?? partnerName}
           </span>
@@ -133,7 +133,7 @@ export function CollaborationSessionPage() {
           <div className="flex items-center gap-1">
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-xs text-muted-foreground">
-              {participantCount} participants
+              {t('participants', { count: participantCount })}
             </span>
           </div>
         </div>
@@ -143,21 +143,21 @@ export function CollaborationSessionPage() {
           value={docTitle}
           onChange={(e) => setDocTitle(e.target.value)}
           className="text-xl font-bold border-0 border-b rounded-none px-0 h-auto py-1 focus-visible:ring-0 focus-visible:border-primary"
-          placeholder="Document title..."
+          placeholder={t('documentTitlePlaceholder')}
         />
 
         {/* Collaborative editor — documentId wires Yjs/Hocuspocus CRDT */}
         <CollaborativeEditor
           documentId={discussionId || undefined}
           initialContent={discussionId ? undefined : SAMPLE_CONTENT}
-          placeholder="Start writing your study notes, questions, or insights..."
+          placeholder={t('editorPlaceholder')}
         />
 
         {/* Footer note */}
         <p className="text-xs text-muted-foreground text-center">
           {discussionId
-            ? `CRDT document sync via Hocuspocus — key: discussion:${discussionId.slice(0, 8)}...`
-            : 'Start a session from the Collaboration page to enable real-time CRDT sync.'}
+            ? t('crdtSyncActive', { key: discussionId.slice(0, 8) })
+            : t('crdtSyncInactive')}
         </p>
       </div>
     </Layout>

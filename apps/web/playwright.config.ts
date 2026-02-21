@@ -61,9 +61,10 @@ export default defineConfig({
     screenshot: 'only-on-failure',
 
     /**
-     * Video recording: retain only on failure to keep artifact sizes small.
+     * Video recording: disabled when ffmpeg is unavailable (corporate proxy).
+     * Enable in CI where playwright install runs fully.
      */
-    video: 'retain-on-failure',
+    video: process.env.CI ? 'retain-on-failure' : 'off',
 
     /**
      * Global timeout per action (click, fill, expect, etc.).
@@ -93,7 +94,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use installed system Chrome when Playwright's own Chromium binary
+        // is unavailable (e.g. corporate proxy blocks playwright.dev downloads).
+        channel: 'chrome',
+      },
     },
     /* Uncomment to test additional browsers in CI:
     {

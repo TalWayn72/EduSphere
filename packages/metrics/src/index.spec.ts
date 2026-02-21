@@ -26,14 +26,12 @@ const {
   const mockContentType = 'text/plain; version=0.0.4; charset=utf-8';
   const mockCollectDefaultMetrics = vi.fn();
 
-  const MockHistogram = vi.fn().mockImplementation(() => ({ observe: mockObserve }));
-  const MockCounter = vi.fn().mockImplementation(() => ({ inc: mockInc }));
-  const MockGauge = vi.fn().mockImplementation(() => ({ inc: mockInc, dec: mockDec }));
-  const MockRegistry = vi.fn().mockImplementation(() => ({
-    setDefaultLabels: mockSetDefaultLabels,
-    metrics: mockMetrics,
-    contentType: mockContentType,
-  }));
+  const MockHistogram = vi.fn(function() { return { observe: mockObserve }; });
+  const MockCounter = vi.fn(function() { return { inc: mockInc }; });
+  const MockGauge = vi.fn(function() { return { inc: mockInc, dec: mockDec }; });
+  const MockRegistry = vi.fn(function() {
+    return { setDefaultLabels: mockSetDefaultLabels, metrics: mockMetrics, contentType: mockContentType };
+  });
 
   return {
     mockObserve,
@@ -81,14 +79,12 @@ describe('MetricsService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    MockRegistry.mockImplementation(() => ({
-      setDefaultLabels: mockSetDefaultLabels,
-      metrics: mockMetrics,
-      contentType: mockContentType,
-    }));
-    MockHistogram.mockImplementation(() => ({ observe: mockObserve }));
-    MockCounter.mockImplementation(() => ({ inc: mockInc }));
-    MockGauge.mockImplementation(() => ({ inc: mockInc, dec: mockDec }));
+    MockRegistry.mockImplementation(function() {
+      return { setDefaultLabels: mockSetDefaultLabels, metrics: mockMetrics, contentType: mockContentType };
+    });
+    MockHistogram.mockImplementation(function() { return { observe: mockObserve }; });
+    MockCounter.mockImplementation(function() { return { inc: mockInc }; });
+    MockGauge.mockImplementation(function() { return { inc: mockInc, dec: mockDec }; });
 
     service = new MetricsService('test-service');
   });
@@ -288,14 +284,12 @@ describe('MetricsService', () => {
 describe('createMetricsMiddleware()', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    MockRegistry.mockImplementation(() => ({
-      setDefaultLabels: vi.fn(),
-      metrics: vi.fn().mockResolvedValue(''),
-      contentType: '',
-    }));
-    MockHistogram.mockImplementation(() => ({ observe: mockObserve }));
-    MockCounter.mockImplementation(() => ({ inc: mockInc }));
-    MockGauge.mockImplementation(() => ({ inc: mockInc, dec: mockDec }));
+    MockRegistry.mockImplementation(function() {
+      return { setDefaultLabels: vi.fn(), metrics: vi.fn().mockResolvedValue(''), contentType: '' };
+    });
+    MockHistogram.mockImplementation(function() { return { observe: mockObserve }; });
+    MockCounter.mockImplementation(function() { return { inc: mockInc }; });
+    MockGauge.mockImplementation(function() { return { inc: mockInc, dec: mockDec }; });
   });
 
   it('calls incrementActiveConnections when a request arrives and decrements on finish', () => {

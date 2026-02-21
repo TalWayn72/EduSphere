@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -36,6 +37,7 @@ function getInitials(user: AuthUser): string {
 
 export function UserMenu({ user }: UserMenuProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   const handleLogout = () => {
     logout();
@@ -67,7 +69,7 @@ export function UserMenu({ user }: UserMenuProps) {
             </p>
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
             <p className={`text-xs font-medium ${getRoleBadgeColor(user.role)}`}>
-              {user.role.replace('_', ' ')}
+              {(user.role ?? '').replace('_', ' ')}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -76,11 +78,11 @@ export function UserMenu({ user }: UserMenuProps) {
 
         <DropdownMenuItem onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
-          Profile
+          {t('profile')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
-          Settings
+          {t('settings')}
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
@@ -90,7 +92,7 @@ export function UserMenu({ user }: UserMenuProps) {
           className="text-destructive focus:text-destructive"
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Log out
+          {t('logOut')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

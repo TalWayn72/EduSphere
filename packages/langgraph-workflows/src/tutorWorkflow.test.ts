@@ -15,36 +15,47 @@ vi.mock('@ai-sdk/openai', () => ({
 
 // Mock LangGraph — per-instance state so each new StateGraph() starts fresh
 vi.mock('@langchain/langgraph', () => {
+  // Annotation must be callable as a function AND have a .Root static method
+  const AnnotationFn = (config?: unknown) => config ?? {};
+  AnnotationFn.Root = (fields: Record<string, unknown>) => fields;
+
   return {
-    StateGraph: vi.fn().mockImplementation(() => {
+    Annotation: AnnotationFn,
+    START: '__start__',
+    END: '__end__',
+    StateGraph: vi.fn().mockImplementation(function () {
       const nodes: Record<string, (state: unknown) => Promise<unknown>> = {};
       let entryPoint = '';
       const edges: Array<[string, string]> = [];
 
-      return {
-        addNode: vi.fn((name: string, fn: (state: unknown) => Promise<unknown>) => {
-          nodes[name] = fn;
-        }),
-        setEntryPoint: vi.fn((name: string) => {
-          entryPoint = name;
-        }),
-        addEdge: vi.fn((from: string, to: string) => {
+      this.addNode = vi.fn(function (name: string, fn: (state: unknown) => Promise<unknown>) {
+        nodes[name] = fn;
+      });
+      this.setEntryPoint = vi.fn(function (name: string) {
+        entryPoint = name;
+      });
+      this.addEdge = vi.fn(function (from: string, to: string) {
+        if (from === '__start__') {
+          entryPoint = to;
+        } else {
           edges.push([from, to]);
-        }),
-        addConditionalEdges: vi.fn(),
-        compile: vi.fn(() => ({
-          invoke: vi.fn(async (initialState: unknown) => {
+        }
+      });
+      this.addConditionalEdges = vi.fn();
+      this.compile = vi.fn(function () {
+        return {
+          invoke: vi.fn(async function (initialState: unknown) {
             // Run nodes in topological order: assess → explain → verify → followup
             let state = { ...(initialState as Record<string, unknown>) };
             const order = [
               entryPoint,
-              ...edges.map(([, to]) => to).filter((n) => n !== '__end__'),
+              ...edges.map(([, to]: [string, string]) => to).filter((n: string) => n !== '__end__'),
             ];
             const seen = new Set<string>();
             for (const nodeName of order) {
               if (seen.has(nodeName) || !nodes[nodeName]) continue;
               seen.add(nodeName);
-              const partial = await nodes[nodeName](state);
+              const partial = await nodes[nodeName]!(state);
               state = { ...state, ...(partial as Record<string, unknown>) };
             }
             return state;
@@ -52,10 +63,9 @@ vi.mock('@langchain/langgraph', () => {
           stream: vi.fn(async function* (initialState: unknown) {
             yield initialState;
           }),
-        })),
-      };
+        };
+      });
     }),
-    END: '__end__',
   };
 });
 

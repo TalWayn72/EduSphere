@@ -101,7 +101,7 @@ describe('DiscussionResolver', () => {
 
     it('does not call service when unauthenticated', async () => {
       const ctx = { req: {} };
-      try { await resolver.getDiscussion('disc-1', ctx); } catch (_) { /* expected */ }
+      try { await resolver.getDiscussion('disc-1', ctx); } catch { /* expected */ }
       expect(mockDiscussionService.findDiscussionById).not.toHaveBeenCalled();
     });
   });
@@ -226,7 +226,7 @@ describe('DiscussionResolver', () => {
       const ctx = { req: {} };
       try {
         await resolver.addMessage('disc-1', validMessageInput, ctx);
-      } catch (_) { /* expected */ }
+      } catch { /* expected */ }
       expect(mockPublish).not.toHaveBeenCalled();
     });
 

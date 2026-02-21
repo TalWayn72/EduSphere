@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/UserMenu';
@@ -19,23 +20,23 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Nav items visible to all authenticated users
-const NAV_ITEMS = [
-  { to: '/learn/content-1', icon: BookOpen, label: 'Learn' },
-  { to: '/courses', icon: BookOpen, label: 'Courses' },
-  { to: '/graph', icon: Network, label: 'Graph' },
-  { to: '/annotations', icon: FileText, label: 'Annotations' },
-  { to: '/agents', icon: Bot, label: 'Agents' },
-  { to: '/collaboration', icon: Users, label: 'Chavruta' },
-  { to: '/dashboard', icon: GitBranch, label: 'Dashboard' },
-] as const;
-
 // Admin-only nav items (hidden from STUDENT role)
 const ADMIN_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
 export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const user = getCurrentUser();
+  const { t } = useTranslation('nav');
+
+  const navItems = useMemo(() => [
+    { to: '/learn/content-1', icon: BookOpen, label: t('learn') },
+    { to: '/courses',          icon: BookOpen, label: t('courses') },
+    { to: '/graph',            icon: Network,  label: t('graph') },
+    { to: '/annotations',      icon: FileText, label: t('annotations') },
+    { to: '/agents',           icon: Bot,      label: t('agents') },
+    { to: '/collaboration',    icon: Users,    label: t('chavruta') },
+    { to: '/dashboard',        icon: GitBranch, label: t('dashboard') },
+  ], [t]);
 
   // Global keyboard shortcut: Ctrl+K / Cmd+K → open search
   useEffect(() => {
@@ -63,11 +64,10 @@ export function Layout({ children }: LayoutProps) {
                 EduSphere
               </Link>
               <nav className="hidden md:flex space-x-1">
-                {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
+                {navItems.map(({ to, icon: Icon, label }) => (
                   <NavLink
                     key={to}
                     to={to}
-                    aria-current={({ isActive }) => (isActive ? 'page' : undefined)}
                     className={({ isActive }) =>
                       [
                         'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
@@ -90,7 +90,6 @@ export function Layout({ children }: LayoutProps) {
                 {isAdmin && (
                   <NavLink
                     to="/courses/new"
-                    aria-current={({ isActive }) => (isActive ? 'page' : undefined)}
                     className={({ isActive }) =>
                       [
                         'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
@@ -103,7 +102,7 @@ export function Layout({ children }: LayoutProps) {
                     {({ isActive }) => (
                       <>
                         <BookOpen className="h-4 w-4" />
-                        <span>New Course</span>
+                        <span>{t('newCourse')}</span>
                         <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
                       </>
                     )}
@@ -121,7 +120,7 @@ export function Layout({ children }: LayoutProps) {
                 onClick={() => navigate('/search')}
               >
                 <Search className="h-3.5 w-3.5" />
-                <span>Search...</span>
+                <span>{t('search')}</span>
                 <kbd className="ml-auto text-xs bg-muted px-1.5 py-0.5 rounded border">⌘K</kbd>
               </Button>
 
@@ -149,7 +148,7 @@ export function Layout({ children }: LayoutProps) {
           {/* Mobile dropdown nav panel — visible below md breakpoint only */}
           {mobileMenuOpen && (
             <nav className="md:hidden border-t pt-2 pb-3 flex flex-col space-y-1">
-              {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
+              {navItems.map(({ to, icon: Icon, label }) => (
                 <Link
                   key={to}
                   to={to}
@@ -167,7 +166,7 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                 >
                   <BookOpen className="h-4 w-4" />
-                  <span>New Course</span>
+                  <span>{t('newCourse')}</span>
                 </Link>
               )}
               <Button
@@ -180,7 +179,7 @@ export function Layout({ children }: LayoutProps) {
                 }}
               >
                 <Search className="h-3.5 w-3.5" />
-                <span>Search...</span>
+                <span>{t('search')}</span>
               </Button>
             </nav>
           )}

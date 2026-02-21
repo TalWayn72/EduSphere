@@ -2,6 +2,7 @@ import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
+import { injectLocale } from './locale-prompt';
 
 const TutorStateSchema = z.object({
   question: z.string(),
@@ -30,14 +31,14 @@ export type TutorState = z.infer<typeof TutorStateSchema>;
 
 const TutorStateAnnotation = Annotation.Root({
   question: Annotation<string>(),
-  context: Annotation<string | undefined>({ default: () => undefined }),
-  studentLevel: Annotation<TutorState['studentLevel']>({ default: () => 'intermediate' }),
-  conversationHistory: Annotation<TutorState['conversationHistory']>({ default: () => [] }),
-  currentStep: Annotation<TutorState['currentStep']>({ default: () => 'assess' }),
-  explanation: Annotation<string | undefined>({ default: () => undefined }),
-  comprehensionCheck: Annotation<string | undefined>({ default: () => undefined }),
-  followupSuggestions: Annotation<string[]>({ default: () => [] }),
-  isComplete: Annotation<boolean>({ default: () => false }),
+  context: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  studentLevel: Annotation<TutorState['studentLevel']>({ value: (_, u) => u, default: () => 'intermediate' }),
+  conversationHistory: Annotation<TutorState['conversationHistory']>({ value: (_, u) => u, default: () => [] }),
+  currentStep: Annotation<TutorState['currentStep']>({ value: (_, u) => u, default: () => 'assess' }),
+  explanation: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  comprehensionCheck: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  followupSuggestions: Annotation<string[]>({ value: (_, u) => u, default: () => [] }),
+  isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
 /**
@@ -47,15 +48,20 @@ const TutorStateAnnotation = Annotation.Root({
  */
 export class AdaptiveTutorWorkflow {
   private model: string;
-  private graph: StateGraph<typeof TutorStateAnnotation.State>;
+  private locale: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private graph: any;
 
-  constructor(model: string = 'gpt-4-turbo') {
+  constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
+    this.locale = locale;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<typeof TutorStateAnnotation.State> {
-    const graph = new StateGraph(TutorStateAnnotation);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private buildGraph(): any {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const graph = new StateGraph(TutorStateAnnotation) as any;
 
     // Define nodes
     graph.addNode('assess', this.assessNode.bind(this));
@@ -76,7 +82,8 @@ export class AdaptiveTutorWorkflow {
   private async assessNode(state: TutorState): Promise<Partial<TutorState>> {
     // Assess the complexity of the question
     const { text } = await generateText({
-      model: openai(this.model),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
       prompt: `Analyze this student question and determine their likely understanding level:
 Question: "${state.question}"
 
@@ -105,13 +112,15 @@ Respond with ONLY one word: beginner, intermediate, or advanced`,
       advanced: 'Use precise technical language, dive deep into nuances',
     };
 
-    const systemPrompt = `You are an expert tutor. ${levelGuidance[state.studentLevel]}.
+    const basePrompt = `You are an expert tutor. ${levelGuidance[state.studentLevel]}.
 ${state.context ? `Use this context: ${state.context}` : ''}
 
 Provide a clear, educational explanation.`;
+    const systemPrompt = injectLocale(basePrompt, this.locale);
 
     const { text } = await generateText({
-      model: openai(this.model),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
       system: systemPrompt,
       prompt: `Question: ${state.question}
 
@@ -132,7 +141,8 @@ Provide a comprehensive yet accessible explanation.`,
   private async verifyNode(state: TutorState): Promise<Partial<TutorState>> {
     // Generate comprehension check question
     const { text } = await generateText({
-      model: openai(this.model),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
       prompt: `Based on this explanation:
 "${state.explanation}"
 
@@ -148,7 +158,8 @@ Generate ONE thoughtful comprehension check question that tests understanding wi
   private async followupNode(state: TutorState): Promise<Partial<TutorState>> {
     // Generate follow-up suggestions
     const { text } = await generateText({
-      model: openai(this.model),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
       prompt: `Given this question and explanation:
 Question: "${state.question}"
 Explanation: "${state.explanation}"
@@ -169,7 +180,7 @@ Suggest 3 related topics the student might want to explore next. Return as a num
   }
 
   compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+    return this.graph.compile(opts);
   }
 
   async run(initialState: Partial<TutorState>): Promise<TutorState> {
@@ -185,11 +196,11 @@ Suggest 3 related topics the student might want to explore next. Return as a num
     const fullState = TutorStateSchema.parse(initialState);
 
     for await (const state of await compiledGraph.stream(fullState)) {
-      yield state as TutorState;
+      yield state as unknown as TutorState;
     }
   }
 }
 
-export function createTutorWorkflow(model?: string): AdaptiveTutorWorkflow {
-  return new AdaptiveTutorWorkflow(model);
+export function createTutorWorkflow(model?: string, locale: string = 'en'): AdaptiveTutorWorkflow {
+  return new AdaptiveTutorWorkflow(model, locale);
 }

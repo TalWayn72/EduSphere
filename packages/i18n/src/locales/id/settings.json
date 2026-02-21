@@ -1,0 +1,33 @@
+{
+  "title": "Pengaturan",
+  "language": {
+    "title": "Bahasa",
+    "description": "Pilih bahasa pilihan Anda untuk antarmuka dan respons AI",
+    "saved": "Preferensi bahasa disimpan",
+    "error": "Gagal menyimpan preferensi bahasa. Silakan coba lagi.",
+    "saving": "Menyimpan..."
+  },
+  "appearance": {
+    "title": "Tampilan",
+    "theme": "Tema",
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem"
+  },
+  "notifications": {
+    "title": "Notifikasi",
+    "email": "Notifikasi email",
+    "push": "Notifikasi push",
+    "emailDescription": "Terima pembaruan kursus dan pengumuman melalui email",
+    "pushDescription": "Terima notifikasi real-time di perangkat Anda"
+  },
+  "account": {
+    "title": "Akun",
+    "editProfile": "Edit profil",
+    "privacy": "Privasi",
+    "myLearning": "Pembelajaran saya",
+    "progress": "Kemajuan",
+    "achievements": "Pencapaian",
+    "version": "Versi {{version}}"
+  }
+}

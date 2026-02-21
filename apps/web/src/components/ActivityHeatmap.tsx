@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   getHeatmapColor,
   formatHeatmapDate,
@@ -14,6 +15,8 @@ interface ActivityHeatmapProps {
 }
 
 export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
+  const { t } = useTranslation('dashboard');
+
   // Group into weeks (columns)
   const weeks: HeatmapDay[][] = [];
   let currentWeek: HeatmapDay[] = [];
@@ -57,17 +60,17 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
         ))}
       </div>
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>{totalStudyDays} study days in the last 12 weeks</span>
+        <span>{t('heatmap.studyDays', { count: totalStudyDays })}</span>
         <div className="flex items-center gap-1">
-          <span>Less</span>
+          <span>{t('heatmap.less')}</span>
           {[0, 2, 4, 6, 8].map((c) => (
             <div key={c} className={`w-3 h-3 rounded-sm ${getHeatmapColor(c)}`} />
           ))}
-          <span>More</span>
+          <span>{t('heatmap.more')}</span>
         </div>
       </div>
       <p className="text-xs text-muted-foreground">
-        {totalSessions} total study sessions
+        {t('heatmap.totalSessions', { count: totalSessions })}
       </p>
     </div>
   );

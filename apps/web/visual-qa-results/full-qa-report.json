@@ -1,0 +1,297 @@
+[
+  {
+    "label": "S1.01 — Login Page",
+    "url": "http://localhost:5173/login",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_01-login-page.png",
+    "headings": [
+      "Welcome to EduSphere"
+    ],
+    "bodySnippet": "Welcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nSign in with your organizational account to access courses, collaborate with peers, and interact with AI learning agents.\n\nSign In with Keycloak",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "SUCCESS: Login page fully rendered with heading + button"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.02 — Student Keycloak Login",
+    "url": "http://localhost:5173/learn/content-1",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_02-student-after-login.png",
+    "headings": [],
+    "bodySnippet": "EduSphere\nLearn\n(current page)\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nSearch...\n⌘K\nJS\nJane\n[GraphQL] Unauthorized — showing cached data.\nAdd Note @ 0:00\n0:00 / 9:56\n1×\nTranscript\nIntroduction to Talmudic Reasoning\n0:00\nWelcome to this introduction to Talmudic reasoning. Today, we will e",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "On Keycloak page: http://localhost:5173/learn/content-1"
+    ],
+    "loadedOk": false
+  },
+  {
+    "label": "S1.03 — Student Dashboard",
+    "url": "http://localhost:5173/dashboard",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_03-student-dashboard.png",
+    "headings": [
+      "AI Learning Assistant",
+      "Dashboard",
+      "Courses Enrolled",
+      "Study Time",
+      "Concepts Mastered"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nSearch...\n⌘K\nJS\nJane\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n02:50 PM\n\nWhat's the relationship between free will and divine provid",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Stat card \"Study Time\": VISIBLE",
+      "Stat card \"Concepts Mastered\": VISIBLE",
+      "Stat card \"Active Courses\": VISIBLE",
+      "Stat card \"Annotations\": VISIBLE",
+      "Navigation sidebar: VISIBLE",
+      "ERROR CARD: Error loading user data: [GraphQL] Unauthorized"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.04 — Student Courses",
+    "url": "http://localhost:5173/courses",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_04-student-courses.png",
+    "headings": [
+      "Courses",
+      "Introduction to Talmud Study",
+      "Advanced Chavruta Techniques",
+      "Knowledge Graph Navigation",
+      "Jewish Philosophy: Rambam & Ramban"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\n(current page)\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nSearch...\n⌘K\nJS\nJane\n[Network] Failed to fetch — [GraphQL] Unauthorized — showing cached data.\nCourses\n\nExplore our collection of courses and start your learning journey\n\n📚\nOpen\nIntroduction to Talmud Study\n\nLearn th",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Course cards visible: 4",
+      "Enroll button visible: true"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.05 — Content Viewer",
+    "url": "http://localhost:5173/learn/content-1",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_05-content-viewer.png",
+    "headings": [],
+    "bodySnippet": "EduSphere\nLearn\n(current page)\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nSearch...\n⌘K\nJS\nJane\n[GraphQL] Unauthorized — showing cached data.\nAdd Note @ 0:00\n0:00 / 9:56\n1×\nTranscript\nIntroduction to Talmudic Reasoning\n0:00\nWelcome to this introduction to Talmudic reasoning. Today, we will e",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Video player: VISIBLE",
+      "Transcript panel: VISIBLE",
+      "Annotations panel: VISIBLE"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.06 — AI Agents",
+    "url": "http://localhost:5173/agents",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_06-agents.png",
+    "headings": [
+      "AI Learning Agents"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\n(current page)\nChavruta\nDashboard\nSearch...\n⌘K\nJS\nJane\nAI Learning Agents\n\nChoose an agent mode to enhance your learning\n\nCould not load agent templates: [GraphQL] Unauthorized\n\nChavruta Debate\n\nDialectical partner — challenges your arguments using Ta",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Agent mode \"Chavruta Debate\": VISIBLE",
+      "Agent mode \"Quiz Master\": VISIBLE",
+      "Agent mode \"Summarizer\": VISIBLE",
+      "Agent mode \"Research Scout\": VISIBLE",
+      "Agent mode \"Explainer\": VISIBLE",
+      "Chat input: VISIBLE"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.07 — Knowledge Graph",
+    "url": "http://localhost:5173/graph",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_07-knowledge-graph.png",
+    "headings": [
+      "Knowledge Graph"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\n(current page)\nAnnotations\nAgents\nChavruta\nDashboard\nSearch...\n⌘K\nJS\nJane\nFailed to load knowledge graph: [GraphQL] Unauthorized\nKnowledge Graph\n\nExplore concepts, people, and sources from your learning materials\n\n💡 CONCEPT\n👤 PERSON\n📚 SOURCE\nRefresh\nRambam\nAristotle\n",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Canvas element: MISSING",
+      "SVG element: VISIBLE",
+      "Final URL: http://localhost:5173/graph"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.08 — Collaboration",
+    "url": "http://localhost:5173/collaboration",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_08-collaboration.png",
+    "headings": [
+      "Collaboration",
+      "Human Chavruta",
+      "AI Chavruta",
+      "RECENT DISCUSSIONS"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\n(current page)\nDashboard\nSearch...\n⌘K\nJS\nJane\nCollaboration\n\nStudy with partners in real-time Chavruta sessions\n\nHuman Chavruta\n\nGet matched with another student studying the same content. Debate, question, and learn together in real-time.\n\nF",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Header/nav visible: true"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.09 — Search (Talmud)",
+    "url": "http://localhost:5173/search?q=Talmud",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_09b-search-talmud-results.png",
+    "headings": [
+      "COURSES",
+      "TRANSCRIPTS",
+      "CONCEPTS"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nSearch...\n⌘K\nJS\nJane\nOffline mode — showing cached results\n\n7 results for \"Talmud\"\n\nCOURSES\n(2)\n\nIntroduction to Talmud Study\n\nFundamentals of Talmudic reasoning and argumentation\n\nAdvanced Chavruta Techniques\n\nCollaborative Talmud ",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Search results for \"Talmud\": 7 cards"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.10 — Student Profile",
+    "url": "http://localhost:5173/profile",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_10-student-profile.png",
+    "headings": [
+      "Profile",
+      "Jane Student",
+      "ACCOUNT DETAILS",
+      "PERMISSIONS",
+      "LEARNING OVERVIEW"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nSearch...\n⌘K\nJS\nJane\nBack\nProfile\nJS\nJane Student\n\n@student@example.com\n\nStudent\nACCOUNT DETAILS\nUsername\nstudent@example.com\nEmail\nstudent@example.com\nRole\nStudent\nTenant ID\nPERMISSIONS\nopenid\nprofile\nemail\nLEARNING OVERVIEW\n\n—\n\nCo",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Header/nav: VISIBLE",
+      "Profile heading: VISIBLE",
+      "Student email visible: NO"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S1.11 — UserMenu & Logout",
+    "url": "http://localhost:5173/login",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_11b-after-logout.png",
+    "headings": [
+      "Welcome to EduSphere"
+    ],
+    "bodySnippet": "Welcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nSign in with your organizational account to access courses, collaborate with peers, and interact with AI learning agents.\n\nSign In with Keycloak",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Dropdown menu: VISIBLE",
+      "Menu items: Profile, Settings, Log out",
+      "After logout URL: http://localhost:5173/login",
+      "Redirected to login: true"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S2.01 — Instructor Dashboard",
+    "url": "http://localhost:5173/dashboard",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S2_01-instructor-dashboard.png",
+    "headings": [
+      "AI Learning Assistant",
+      "Dashboard",
+      "Instructor Tools\nINSTRUCTOR",
+      "Courses Enrolled",
+      "Study Time"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nJI\nJohn\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n02:55 PM\n\nWhat's the relationship between free will and di",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Dashboard heading: VISIBLE",
+      "Create Course button (instructor feature): NOT VISIBLE",
+      "Manage button: NOT VISIBLE",
+      "Instructor role shown: true"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S2.02 — Instructor Courses",
+    "url": "http://localhost:5173/courses",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S2_02-instructor-courses.png",
+    "headings": [
+      "Courses",
+      "Introduction to Talmud Study",
+      "Advanced Chavruta Techniques",
+      "Knowledge Graph Navigation",
+      "Jewish Philosophy: Rambam & Ramban"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\n(current page)\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nJI\nJohn\n[Network] Failed to fetch — [GraphQL] Unauthorized — showing cached data.\nCourses\n\nExplore our collection of courses and start your learning journey\n\nNew Course\n📚\nOpen\nIntroduction to ",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Courses heading: VISIBLE",
+      "Create/New Course button: VISIBLE (instructor feature)",
+      "Edit button on course: VISIBLE (instructor feature)"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S3.01 — Super Admin Dashboard",
+    "url": "http://localhost:5173/dashboard",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S3_01-admin-dashboard.png",
+    "headings": [
+      "AI Learning Assistant",
+      "Dashboard",
+      "Instructor Tools\nSUPER ADMIN",
+      "Courses Enrolled",
+      "Study Time"
+    ],
+    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nSA\nSuper\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n02:57 PM\n\nWhat's the relationship between free will and d",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Dashboard heading: VISIBLE",
+      "Admin-specific content: VISIBLE",
+      "Nav items: Learn, Courses, Graph, Annotations, Agents, Chavruta, Dashboard\n(current page), New Course",
+      "Admin nav link: NOT VISIBLE"
+    ],
+    "loadedOk": true
+  },
+  {
+    "label": "S3.02 — Super Admin Route Check",
+    "url": "http://localhost:5173/annotations",
+    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S3_02-admin-routes.png",
+    "headings": [
+      "Unexpected Application Error!",
+      "Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510"
+    ],
+    "bodySnippet": "Unexpected Application Error!\nFailed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510\nTypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510\n\n💿 Hey developer 👋\n\nYou can pro",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)",
+      "Error handled by React Router default ErrorBoundary: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510",
+      "Error handled by React Router default ErrorBoundary: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510",
+      "Error handled by React Router default ErrorBoundary: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510",
+      "Error handled by React Router default ErrorBoundary: TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510",
+      "%o\n\n%s\n\n%s\n TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510 The above error occurred in one of your React components. React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary.",
+      "React Router caught the following error during render TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/pages/AnnotationsPage.tsx?t=1771589907510"
+    ],
+    "networkErrors": [
+      "HTTP 504 http://localhost:5173/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=31029275",
+      "FAILED: http://localhost:5173/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=31029275 (net::ERR_ABORTED)"
+    ],
+    "notes": [
+      "/dashboard: finalURL=http://localhost:5173/dashboard crashed=false",
+      "/courses: finalURL=http://localhost:5173/courses crashed=false",
+      "/agents: finalURL=http://localhost:5173/agents crashed=false",
+      "/search: finalURL=http://localhost:5173/search crashed=false",
+      "/profile: finalURL=http://localhost:5173/profile crashed=false",
+      "/annotations: finalURL=http://localhost:5173/annotations crashed=false"
+    ],
+    "loadedOk": true
+  }
+]

@@ -1,13 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-var mockValidate = vi.fn();
-var mockExtractToken = vi.fn();
+// vi.hoisted() runs before vi.mock factories and before ESM imports —
+// guaranteeing that mockValidate/mockExtractToken are vi.fn() instances
+// when the JWTValidator constructor mock is first invoked at module load time.
+const { mockValidate, mockExtractToken } = vi.hoisted(() => ({
+  mockValidate: vi.fn(),
+  mockExtractToken: vi.fn(),
+}));
 
 vi.mock('@edusphere/auth', () => ({
-  JWTValidator: vi.fn().mockImplementation(() => ({
-    validate: mockValidate,
-    extractToken: mockExtractToken,
-  })),
+  JWTValidator: vi.fn().mockImplementation(function () {
+    this.validate = mockValidate;
+    this.extractToken = mockExtractToken;
+  }),
 }));
 
 import { AuthMiddleware } from './auth.middleware';

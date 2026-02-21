@@ -154,7 +154,9 @@ describe('ProfilePage', () => {
   it('redirects to /login when no user is authenticated', () => {
     vi.mocked(getCurrentUser).mockReturnValue(null);
     renderPage();
-    expect(mockNavigate).toHaveBeenCalledWith('/login');
+    // ProfilePage uses <Navigate to="/login" replace /> (declarative redirect),
+    // so the profile heading is not rendered rather than calling navigate() imperatively.
+    expect(screen.queryByRole('heading', { name: /^profile$/i })).not.toBeInTheDocument();
   });
 
   it('renders Back button for navigation', () => {

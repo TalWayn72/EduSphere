@@ -2,6 +2,7 @@ import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateText, generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
+import { injectLocale } from './locale-prompt';
 
 const AssessmentResultSchema = z.object({
   strengths: z.array(z.string()),
@@ -36,23 +37,28 @@ export type AssessmentState = z.infer<typeof AssessmentStateSchema>;
 export type AssessmentResult = z.infer<typeof AssessmentResultSchema>;
 
 const AssessmentStateAnnotation = Annotation.Root({
-  submissions: Annotation<AssessmentState['submissions']>({ default: () => [] }),
-  evaluations: Annotation<AssessmentState['evaluations']>({ default: () => [] }),
-  overallAssessment: Annotation<AssessmentResult | undefined>({ default: () => undefined }),
-  isComplete: Annotation<boolean>({ default: () => false }),
+  submissions: Annotation<AssessmentState['submissions']>({ value: (_, u) => u, default: () => [] }),
+  evaluations: Annotation<AssessmentState['evaluations']>({ value: (_, u) => u, default: () => [] }),
+  overallAssessment: Annotation<AssessmentResult | undefined>({ value: (_, u) => u, default: () => undefined }),
+  isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
 export class AssessmentWorkflow {
   private model: string;
-  private graph: StateGraph<typeof AssessmentStateAnnotation.State>;
+  private locale: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private graph: any;
 
-  constructor(model: string = 'gpt-4-turbo') {
+  constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
+    this.locale = locale;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<typeof AssessmentStateAnnotation.State> {
-    const graph = new StateGraph(AssessmentStateAnnotation);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private buildGraph(): any {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const graph = new StateGraph(AssessmentStateAnnotation) as any;
 
     graph.addNode('evaluate', this.evaluateNode.bind(this));
     graph.addNode('synthesize', this.synthesizeNode.bind(this));
@@ -71,7 +77,9 @@ export class AssessmentWorkflow {
 
     for (const submission of state.submissions) {
       const { text } = await generateText({
-        model: openai(this.model),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        model: openai(this.model) as any,
+        system: injectLocale('You are an expert educational assessor providing fair and constructive feedback.', this.locale),
         prompt: `Evaluate this student answer:
 
 Question: "${submission.question}"
@@ -89,7 +97,7 @@ Feedback: [detailed feedback]`,
       });
 
       const scoreMatch = text.match(/Score:\s*(\d+)/);
-      const score = scoreMatch ? parseInt(scoreMatch[1]) : 50;
+      const score = scoreMatch ? parseInt(scoreMatch[1] ?? '50') : 50;
       const feedback = text.replace(/Score:\s*\d+\s*\n?/, '').trim();
 
       evaluations.push({
@@ -110,7 +118,9 @@ Feedback: [detailed feedback]`,
       .join('\n\n');
 
     const { object } = await generateObject({
-      model: openai(this.model),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
+      system: injectLocale('You are an expert educational assessor providing fair and constructive feedback.', this.locale),
       schema: AssessmentResultSchema,
       prompt: `Based on these evaluations:
 
@@ -130,7 +140,7 @@ Synthesize an overall assessment with:
   }
 
   compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+    return this.graph.compile(opts);
   }
 
   async run(initialState: Partial<AssessmentState>): Promise<AssessmentState> {
@@ -140,6 +150,6 @@ Synthesize an overall assessment with:
   }
 }
 
-export function createAssessmentWorkflow(model?: string): AssessmentWorkflow {
-  return new AssessmentWorkflow(model);
+export function createAssessmentWorkflow(model?: string, locale: string = 'en'): AssessmentWorkflow {
+  return new AssessmentWorkflow(model, locale);
 }

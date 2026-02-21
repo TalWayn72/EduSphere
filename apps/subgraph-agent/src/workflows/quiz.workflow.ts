@@ -8,7 +8,8 @@
  * with explanation, tracks score and adapts difficulty.
  */
 
-import { generateText, streamText, type LanguageModelV1 } from 'ai';
+import { generateText, streamText, type LanguageModel } from 'ai';
+import { injectLocale } from '../ai/locale-prompt';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -146,7 +147,10 @@ function parseQuestions(raw: string): QuizQuestion[] {
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
-export function createQuizWorkflow(model: LanguageModelV1) {
+export function createQuizWorkflow(model: LanguageModel, locale: string = 'en') {
+  const BASE_SYSTEM = 'You are an educational quiz assistant.';
+  const system = injectLocale(BASE_SYSTEM, locale);
+
   async function step(
     ctx: QuizContext,
     userAnswer?: number
@@ -163,9 +167,9 @@ export function createQuizWorkflow(model: LanguageModelV1) {
       case 'GENERATE_QUESTIONS': {
         const { text } = await generateText({
           model,
+          system,
           prompt: GENERATE_QUESTIONS_PROMPT(ctx.courseContent),
           temperature: 0.4,
-          maxTokens: 1200,
         });
         const questions = parseQuestions(text);
         return {
@@ -188,9 +192,9 @@ export function createQuizWorkflow(model: LanguageModelV1) {
         }
         const { text } = await generateText({
           model,
+          system,
           prompt: ASK_QUESTION_PROMPT(q, ctx.currentQuestionIndex + 1),
           temperature: 0.5,
-          maxTokens: 300,
         });
         return {
           text,
@@ -206,9 +210,9 @@ export function createQuizWorkflow(model: LanguageModelV1) {
         const isCorrect = answerIdx === q?.correctIndex;
         const { text } = await generateText({
           model,
+          system,
           prompt: EVALUATE_PROMPT(q!, answerIdx, isCorrect),
           temperature: 0.6,
-          maxTokens: 250,
         });
         const newScore = ctx.score + (isCorrect ? 1 : 0);
         const newAnswers = [...ctx.answers, answerIdx];
@@ -235,9 +239,9 @@ export function createQuizWorkflow(model: LanguageModelV1) {
       case 'SCORE': {
         const { text } = await generateText({
           model,
+          system,
           prompt: SCORE_PROMPT(ctx.score, ctx.questions.length),
           temperature: 0.7,
-          maxTokens: 400,
         });
         return {
           text,
@@ -258,7 +262,12 @@ export function createQuizWorkflow(model: LanguageModelV1) {
           ? EVALUATE_PROMPT(q, userAnswer ?? 0, (userAnswer ?? 0) === q.correctIndex)
           : SCORE_PROMPT(ctx.score, ctx.questions.length);
 
-    return streamText({ model, prompt, temperature: 0.6, maxTokens: 400 });
+    return streamText({
+      model,
+      system,
+      prompt,
+      temperature: 0.7,
+    });
   }
 
   return { step, stream };

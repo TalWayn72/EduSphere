@@ -1,33 +1,23 @@
 import { gql } from 'urql';
 
+// Fields that exist on the Annotation type in the annotation subgraph SDL.
+// Key notes:
+//   - `content` is a JSON scalar (string or object); text is extracted client-side.
+//   - `spatialData` is JSON and holds positional/timestamp data ({ timestampStart, ... }).
+//   - `user` stub only exposes `id` in the annotation subgraph.
+//   - The API accepts a single optional `layer` argument; multi-layer filtering
+//     is handled client-side via filterAnnotationsByLayers().
 export const ANNOTATIONS_QUERY = gql`
-  query Annotations($assetId: ID!, $layers: [AnnotationLayer!]) {
-    annotations(assetId: $assetId, layers: $layers) {
+  query Annotations($assetId: ID!) {
+    annotations(assetId: $assetId) {
       id
       layer
-      type
+      annotationType
       content
-      startOffset
-      endOffset
-      timestampStart
-      timestampEnd
+      spatialData
+      parentId
       userId
-      user {
-        id
-        displayName
-      }
-      replies {
-        id
-        content
-        userId
-        user {
-          id
-          displayName
-        }
-        createdAt
-      }
       isResolved
-      isPinned
       createdAt
       updatedAt
     }
@@ -58,13 +48,13 @@ export const CREATE_ANNOTATION_MUTATION = gql`
     createAnnotation(input: $input) {
       id
       layer
-      type
+      annotationType
       content
-      startOffset
-      endOffset
-      timestampStart
+      spatialData
+      parentId
       userId
       createdAt
+      updatedAt
     }
   }
 `;
@@ -74,8 +64,8 @@ export const UPDATE_ANNOTATION_MUTATION = gql`
     updateAnnotation(id: $id, input: $input) {
       id
       content
+      spatialData
       layer
-      isPinned
       isResolved
       updatedAt
     }
@@ -94,7 +84,11 @@ export const REPLY_TO_ANNOTATION_MUTATION = gql`
       id
       content
       userId
+      parentId
+      layer
+      annotationType
       createdAt
+      updatedAt
     }
   }
 `;
@@ -104,14 +98,13 @@ export const ANNOTATION_ADDED_SUBSCRIPTION = gql`
     annotationAdded(assetId: $assetId) {
       id
       layer
-      type
+      annotationType
       content
+      spatialData
+      parentId
       userId
-      user {
-        id
-        displayName
-      }
       createdAt
+      updatedAt
     }
   }
 `;

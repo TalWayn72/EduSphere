@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,17 +51,24 @@ function formatRelativeTime(iso: string): string {
 }
 
 export function CollaborationPage() {
+  const { t } = useTranslation('collaboration');
   const navigate = useNavigate();
   const [matchState, setMatchState] = useState<MatchState>('idle');
   const [matchMode, setMatchMode] = useState<'human' | 'ai'>('human');
 
+  // MY_DISCUSSIONS_QUERY is not in the running gateway supergraph (Docker image predates
+  // the feature). Pause until the image is rebuilt. Tracked in OPEN_ISSUES.md (BUG-DOCKER-001).
   const [{ data, fetching, error }, reexecute] = useQuery({
     query: MY_DISCUSSIONS_QUERY,
     variables: { limit: 20, offset: 0 },
+    pause: true,
   });
 
   const [createResult, executeCreate] = useMutation(CREATE_DISCUSSION_MUTATION);
 
+  // "Cannot query field" means the running subgraph build predates myDiscussions
+  // being added to the schema. Treat as empty list until Docker image is rebuilt.
+  const isSchemaValidationError = error?.message?.includes('Cannot query field');
   const discussions: BackendDiscussion[] =
     (data as { myDiscussions?: BackendDiscussion[] } | undefined)?.myDiscussions ?? [];
 
@@ -102,9 +110,9 @@ export function CollaborationPage() {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Collaboration</h1>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Study with partners in real-time Chavruta sessions
+            {t('subtitle')}
           </p>
         </div>
 
@@ -116,20 +124,19 @@ export function CollaborationPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-semibold">Human Chavruta</h3>
+                  <h3 className="font-semibold">{t('humanChavruta')}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Get matched with another student studying the same content.
-                  Debate, question, and learn together in real-time.
+                  {t('humanChavrutaDescription')}
                 </p>
                 {matchState === 'idle' || matchMode !== 'human' ? (
                   <Button className="w-full" onClick={() => handleStartMatching('human')}>
-                    Find a Chavruta Partner
+                    {t('findPartner')}
                   </Button>
                 ) : matchState === 'searching' ? (
                   <Button className="w-full" variant="outline" disabled>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Searching for partner...
+                    {t('searchingPartner')}
                   </Button>
                 ) : (
                   <Button
@@ -138,7 +145,7 @@ export function CollaborationPage() {
                     disabled={createResult.fetching}
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    {createResult.fetching ? 'Creating session...' : 'Partner found! Join session →'}
+                    {createResult.fetching ? t('creatingSession') : t('partnerFound')}
                   </Button>
                 )}
               </div>
@@ -147,15 +154,14 @@ export function CollaborationPage() {
               <div className="space-y-3 border-l pl-6">
                 <div className="flex items-center gap-2">
                   <Bot className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-semibold">AI Chavruta</h3>
+                  <h3 className="font-semibold">{t('aiChavruta')}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Practice with an AI partner available 24/7. The AI uses
-                  contradiction detection to challenge your thinking.
+                  {t('aiChavrutaDescription')}
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <div className="h-2 w-2 rounded-full bg-purple-500" />
-                  <span>Always available · Instant match</span>
+                  <span>{t('alwaysAvailable')}</span>
                 </div>
                 {matchState === 'idle' || matchMode !== 'ai' ? (
                   <Button
@@ -163,17 +169,17 @@ export function CollaborationPage() {
                     variant="outline"
                     onClick={() => handleStartMatching('ai')}
                   >
-                    Start AI Chavruta
+                    {t('startAiChavruta')}
                   </Button>
                 ) : matchState === 'searching' ? (
                   <Button className="w-full" variant="outline" disabled>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Connecting to AI agent...
+                    {t('connectingAi')}
                   </Button>
                 ) : (
                   <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Opening session...
+                    {t('openingSession')}
                   </Button>
                 )}
               </div>
@@ -181,11 +187,11 @@ export function CollaborationPage() {
           </CardContent>
         </Card>
 
-        {/* Error state */}
-        {error && (
+        {/* Error state — hide schema-validation errors (field not yet in deployed subgraph) */}
+        {error && !isSchemaValidationError && (
           <div className="flex items-center gap-2 p-3 rounded-md border border-destructive/30 bg-destructive/10 text-destructive text-sm">
             <AlertCircle className="h-4 w-4 shrink-0" />
-            Failed to load sessions: {error.message}
+            {t('loadError')}: {error.message}
           </div>
         )}
 
@@ -193,14 +199,14 @@ export function CollaborationPage() {
         {fetching ? (
           <div className="flex items-center gap-2 text-muted-foreground text-sm py-4">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Loading sessions...
+            {t('loadingSessions')}
           </div>
         ) : (
           <>
             {activeSessions.length > 0 && (
               <div className="space-y-3">
                 <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                  Active Chavruta Sessions
+                  {t('activeSessions')}
                 </h2>
                 <div className="grid md:grid-cols-2 gap-3">
                   {activeSessions.map((session) => (
@@ -228,7 +234,7 @@ export function CollaborationPage() {
                             className="h-8 text-xs bg-green-600 hover:bg-green-700"
                             onClick={() => navigate(toSessionUrl(session.title, session.id))}
                           >
-                            Rejoin
+                            {t('rejoin')}
                           </Button>
                         </div>
                       </CardContent>
@@ -242,7 +248,7 @@ export function CollaborationPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                  Recent Discussions
+                  {t('recentDiscussions')}
                 </h2>
                 <Button
                   variant="ghost"
@@ -252,14 +258,14 @@ export function CollaborationPage() {
                   disabled={createResult.fetching}
                 >
                   <Plus className="h-3.5 w-3.5" />
-                  New Session
+                  {t('newSession')}
                 </Button>
               </div>
 
               {recentSessions.length === 0 && !fetching && (
                 <div className="text-center py-8 text-muted-foreground">
-                  <p className="text-sm">No discussions yet.</p>
-                  <p className="text-xs mt-1">Find a partner or start an AI Chavruta session above.</p>
+                  <p className="text-sm">{t('noSessions')}</p>
+                  <p className="text-xs mt-1">{t('noSessionsHint')}</p>
                 </div>
               )}
 

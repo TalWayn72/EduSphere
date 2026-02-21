@@ -1,6 +1,13 @@
 extend schema
   @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
 
+type UserPreferences {
+  locale: String!
+  theme: String!
+  emailNotifications: Boolean!
+  pushNotifications: Boolean!
+}
+
 type User @key(fields: "id") {
   id: ID!
   email: String!
@@ -8,6 +15,7 @@ type User @key(fields: "id") {
   lastName: String!
   role: UserRole!
   tenantId: ID!
+  preferences: UserPreferences!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -44,6 +52,7 @@ type Query {
 type Mutation {
   createUser(input: CreateUserInput!): User! @authenticated
   updateUser(id: ID!, input: UpdateUserInput!): User! @authenticated
+  updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
 }
 
 input CreateUserInput {
@@ -58,6 +67,13 @@ input UpdateUserInput {
   firstName: String
   lastName: String
   role: UserRole
+}
+
+input UpdateUserPreferencesInput {
+  locale: String
+  theme: String
+  emailNotifications: Boolean
+  pushNotifications: Boolean
 }
 
 scalar DateTime

@@ -37,9 +37,12 @@ export async function executeCypher<T = any>(
 
     let result;
     if (params && Object.keys(params).length > 0) {
-      const paramsJson = JSON.stringify(params).replace(/'/g, "''");
+      // Apache AGE requires the third argument to be a SQL parameter ($1),
+      // not a string literal — otherwise it throws "third argument of cypher
+      // function must be a parameter".
       result = await client.query(
-        `SELECT * FROM cypher('${graphName}', $$${query}$$, '${paramsJson}') AS (result agtype)`
+        `SELECT * FROM cypher('${graphName}', $$${query}$$, $1) AS (result agtype)`,
+        [JSON.stringify(params)]
       );
     } else {
       result = await client.query(

@@ -1,82 +1,792 @@
-schema
-  @link(url: "https://specs.apollo.dev/link/v1.0")
-  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
-{
-  query: Query
-  mutation: Mutation
-}
 
-directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
 
-directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+    schema
+    @link(url: "https://specs.apollo.dev/link/v1.0")
+    @link(url: "https://specs.apollo.dev/join/v0.4", for: EXECUTION)
+    
+    
+    
+    
+    
+    @link(url: "https://specs.apollo.dev/authenticated/v0.1", for: SECURITY)
+    
+  {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+  }
 
-directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+  
+    directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
 
-directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+    directive @join__graph(name: String!, url: String!) on ENUM_VALUE
 
-directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+    
+      directive @join__field(
+        graph: join__Graph
+        requires: join__FieldSet
+        provides: join__FieldSet
+        type: String
+        external: Boolean
+        override: String
+        usedOverridden: Boolean
+        overrideLabel: String
+        
+      ) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+    
+    
 
-directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+    directive @join__implements(
+      graph: join__Graph!
+      interface: String!
+    ) repeatable on OBJECT | INTERFACE
 
-directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+    directive @join__type(
+      graph: join__Graph!
+      key: join__FieldSet
+      extension: Boolean! = false
+      resolvable: Boolean! = true
+      isInterfaceObject: Boolean! = false
+    ) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
 
-scalar join__FieldSet
+    directive @join__unionMember(
+      graph: join__Graph!
+      member: String!
+    ) repeatable on UNION
 
+    scalar join__FieldSet
+    
+  
+  
+  directive @link(
+    url: String
+    as: String
+    for: link__Purpose
+    import: [link__Import]
+  ) repeatable on SCHEMA
+
+  scalar link__Import
+
+  enum link__Purpose {
+    """
+    `SECURITY` features provide metadata necessary to securely resolve fields.
+    """
+    SECURITY
+
+    """
+    `EXECUTION` features provide metadata necessary for operation execution.
+    """
+    EXECUTION
+  }
+
+  
+  
+  
+  
+  
+  
+  directive @authenticated on FIELD_DEFINITION | OBJECT | INTERFACE | SCALAR | ENUM
+
+  
 enum join__Graph {
-  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql")
+  AGENT @join__graph(name: "agent", url: "http://localhost:4005/graphql") 
+  ANNOTATION @join__graph(name: "annotation", url: "http://localhost:4003/graphql") 
+  COLLABORATION @join__graph(name: "collaboration", url: "http://localhost:4004/graphql") 
+  CONTENT @join__graph(name: "content", url: "http://localhost:4002/graphql") 
+  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql") 
+  KNOWLEDGE @join__graph(name: "knowledge", url: "http://localhost:4006/graphql") 
 }
 
-scalar link__Import
+scalar JSON @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: KNOWLEDGE) 
 
-enum link__Purpose {
-  SECURITY
-  EXECUTION
-}
+scalar DateTime @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE) 
 
-scalar DateTime
-
-type User
-  @join__type(graph: CORE, key: "id")
-{
+type AgentMessage @join__type(graph: AGENT, key: "id")  {
   id: ID!
-  email: String!
-  firstName: String!
-  lastName: String!
-  role: UserRole!
+  sessionId: ID!
+  session: AgentSession!
+  role: MessageRole!
+  content: String!
+  createdAt: String!
+}
+
+type AgentSession @join__type(graph: AGENT, key: "id")  {
+  id: ID!
+  userId: ID!
+  user: User!
+  templateType: TemplateType!
+  contextData: JSON
+  status: AgentSessionStatus!
+  messages: [AgentMessage!]!
+  createdAt: String!
+  completedAt: String
+}
+
+"""
+External entity stubs
+"""
+type User @join__type(graph: AGENT, key: "id")  @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: CORE, key: "id")  {
+  id: ID!
+  email: String! @join__field(graph: CORE) 
+  firstName: String! @join__field(graph: CORE) 
+  lastName: String! @join__field(graph: CORE) 
+  role: UserRole! @join__field(graph: CORE) 
+  tenantId: ID! @join__field(graph: CORE) 
+  createdAt: DateTime! @join__field(graph: CORE) 
+  updatedAt: DateTime! @join__field(graph: CORE) 
+}
+
+type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  tenantId: ID! @join__field(graph: CONTENT) 
+  title: String! @join__field(graph: CONTENT) 
+  slug: String! @join__field(graph: CONTENT) 
+  description: String @join__field(graph: CONTENT) 
+  thumbnailUrl: String @join__field(graph: CONTENT) 
+  instructorId: ID! @join__field(graph: CONTENT) 
+  instructor: User @join__field(graph: CONTENT) 
+  isPublished: Boolean! @join__field(graph: CONTENT) 
+  estimatedHours: Int @join__field(graph: CONTENT) 
+  modules: [Module!]! @join__field(graph: CONTENT) 
+  createdAt: String! @join__field(graph: CONTENT) 
+  updatedAt: String! @join__field(graph: CONTENT) 
+}
+
+type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
+  agentSession(id: ID!) : AgentSession @join__field(graph: AGENT) 
+  myAgentSessions: [AgentSession!]! @join__field(graph: AGENT) 
+  agentTemplates: [AgentTemplate!]! @join__field(graph: AGENT) 
+  agentExecution(id: ID!) : AgentExecution @join__field(graph: AGENT) 
+  agentExecutionsByUser(userId: ID!, limit: Int = 20) : [AgentExecution!]! @join__field(graph: AGENT) 
+  agentExecutionsByAgent(agentId: ID!, limit: Int = 20) : [AgentExecution!]! @join__field(graph: AGENT) 
+  runningExecutions(userId: ID!) : [AgentExecution!]! @join__field(graph: AGENT) 
+  agentTemplate(id: ID!) : AgentTemplate @join__field(graph: AGENT) 
+  agentTemplatesByType(template: String!) : [AgentTemplate!]! @join__field(graph: AGENT) 
+  _health: String! @join__field(graph: ANNOTATION)  @join__field(graph: CONTENT)  @join__field(graph: CORE) 
+  annotation(id: ID!) : Annotation @join__field(graph: ANNOTATION) 
+  annotations(
+    assetId: ID
+    userId: ID
+    layer: AnnotationLayer
+    limit: Int = 20
+    offset: Int = 0
+  ): [Annotation!]! @join__field(graph: ANNOTATION) 
+  annotationsByAsset(assetId: ID!, layer: AnnotationLayer) : [Annotation!]! @join__field(graph: ANNOTATION) 
+  annotationsByUser(userId: ID!, limit: Int = 20, offset: Int = 0) : [Annotation!]! @join__field(graph: ANNOTATION) 
+  """
+  Get a single discussion by ID
+  """
+  discussion(id: ID!) : Discussion @join__field(graph: COLLABORATION)  @authenticated
+  """
+  Get all discussions for a course
+  """
+  discussions(courseId: ID!, limit: Int = 20, offset: Int = 0) : [Discussion!]! @join__field(graph: COLLABORATION)  @authenticated
+  """
+  Get all discussions the current user has participated in
+  """
+  myDiscussions(limit: Int = 20, offset: Int = 0) : [Discussion!]! @join__field(graph: COLLABORATION)  @authenticated
+  """
+  Get all messages in a discussion
+  """
+  discussionMessages(discussionId: ID!, limit: Int = 50, offset: Int = 0) : [DiscussionMessage!]! @join__field(graph: COLLABORATION)  @authenticated
+  contentItem(id: ID!) : ContentItem @join__field(graph: CONTENT) 
+  contentItemsByModule(moduleId: ID!) : [ContentItem!]! @join__field(graph: CONTENT) 
+  course(id: ID!) : Course @join__field(graph: CONTENT) 
+  courses(limit: Int = 20, offset: Int = 0) : [Course!]! @join__field(graph: CONTENT) 
+  coursesByInstructor(instructorId: ID!, limit: Int = 20) : [Course!]! @join__field(graph: CONTENT) 
+  myEnrollments: [UserCourse!]! @join__field(graph: CONTENT)  @authenticated
+  myCourseProgress(courseId: ID!) : CourseProgress! @join__field(graph: CONTENT)  @authenticated
+  getPresignedUploadUrl(fileName: String!, contentType: String!, courseId: ID!) : PresignedUploadUrl! @join__field(graph: CONTENT)  @authenticated
+  module(id: ID!) : Module @join__field(graph: CONTENT) 
+  modulesByCourse(courseId: ID!) : [Module!]! @join__field(graph: CONTENT) 
+  tenant(id: ID!) : Tenant @join__field(graph: CORE) 
+  tenants(limit: Int = 10, offset: Int = 0) : [Tenant!]! @join__field(graph: CORE) 
+  user(id: ID!) : User @join__field(graph: CORE) 
+  users(limit: Int = 10, offset: Int = 0) : [User!]! @join__field(graph: CORE) 
+  me: User @join__field(graph: CORE) 
+  myStats: UserStats! @join__field(graph: CORE)  @authenticated
+  embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE) 
+  embeddingsByContentItem(contentItemId: ID!) : [Embedding!]! @join__field(graph: KNOWLEDGE) 
+  semanticSearch(query: [Float!]!, limit: Int = 10, minSimilarity: Float = 0.7) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
+  semanticSearchByContentItem(contentItemId: ID!, query: [Float!]!, limit: Int = 5) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
+  concept(id: ID!) : Concept @join__field(graph: KNOWLEDGE) 
+  conceptByName(name: String!) : Concept @join__field(graph: KNOWLEDGE) 
+  concepts(limit: Int = 20) : [Concept!]! @join__field(graph: KNOWLEDGE) 
+  relatedConcepts(conceptId: ID!, depth: Int = 2, limit: Int = 10) : [RelatedConcept!]! @join__field(graph: KNOWLEDGE) 
+  person(id: ID!) : Person @join__field(graph: KNOWLEDGE) 
+  personByName(name: String!) : Person @join__field(graph: KNOWLEDGE) 
+  term(id: ID!) : Term @join__field(graph: KNOWLEDGE) 
+  termByName(name: String!) : Term @join__field(graph: KNOWLEDGE) 
+  source(id: ID!) : Source @join__field(graph: KNOWLEDGE) 
+  topicCluster(id: ID!) : TopicCluster @join__field(graph: KNOWLEDGE) 
+  topicClustersByCourse(courseId: ID!) : [TopicCluster!]! @join__field(graph: KNOWLEDGE) 
+  searchSemantic(query: String!, limit: Int = 10) : [SemanticResult!]! @join__field(graph: KNOWLEDGE) 
+  """
+  Find the shortest learning path between two concepts identified by name.
+  Returns null when no path exists between the two concepts.
+  Uses Apache AGE shortestPath() traversing RELATED_TO and PREREQUISITE_OF edges.
+  """
+  learningPath(from: String!, to: String!) : LearningPath @join__field(graph: KNOWLEDGE)  @authenticated
+  """
+  Collect all distinct concepts reachable from a named concept within `depth` hops
+  (default depth 2, max 5) via RELATED_TO edges using COLLECT(DISTINCT ...) aggregation.
+  """
+  relatedConceptsByName(conceptName: String!, depth: Int = 2) : [ConceptNode!]! @join__field(graph: KNOWLEDGE)  @authenticated
+  """
+  Find the deepest prerequisite chain leading into a named concept.
+  Returns nodes ordered from root prerequisite to the target concept.
+  """
+  prerequisiteChain(conceptName: String!) : [ConceptNode!]! @join__field(graph: KNOWLEDGE)  @authenticated
+}
+
+type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
+  startAgentSession(templateType: TemplateType!, context: JSON!) : AgentSession! @join__field(graph: AGENT)  @authenticated
+  sendMessage(sessionId: ID!, content: String!) : AgentMessage! @join__field(graph: AGENT)  @authenticated
+  endSession(sessionId: ID!) : Boolean! @join__field(graph: AGENT)  @authenticated
+  startAgentExecution(input: StartAgentExecutionInput!) : AgentExecution! @join__field(graph: AGENT)  @authenticated
+  cancelAgentExecution(id: ID!) : AgentExecution! @join__field(graph: AGENT)  @authenticated
+  createAgentTemplate(input: CreateAgentTemplateInput!) : AgentTemplate! @join__field(graph: AGENT)  @authenticated
+  updateAgentTemplate(id: ID!, input: UpdateAgentTemplateInput!) : AgentTemplate! @join__field(graph: AGENT)  @authenticated
+  deleteAgentTemplate(id: ID!) : Boolean! @join__field(graph: AGENT)  @authenticated
+  activateAgentTemplate(id: ID!) : AgentTemplate! @join__field(graph: AGENT)  @authenticated
+  deactivateAgentTemplate(id: ID!) : AgentTemplate! @join__field(graph: AGENT)  @authenticated
+  createAnnotation(input: CreateAnnotationInput!) : Annotation! @join__field(graph: ANNOTATION)  @authenticated
+  updateAnnotation(id: ID!, input: UpdateAnnotationInput!) : Annotation! @join__field(graph: ANNOTATION)  @authenticated
+  deleteAnnotation(id: ID!) : Boolean! @join__field(graph: ANNOTATION)  @authenticated
+  resolveAnnotation(id: ID!) : Annotation! @join__field(graph: ANNOTATION)  @authenticated
+  replyToAnnotation(annotationId: ID!, content: String!) : Annotation! @join__field(graph: ANNOTATION)  @authenticated
+  """
+  Create a new discussion
+  """
+  createDiscussion(input: CreateDiscussionInput!) : Discussion! @join__field(graph: COLLABORATION)  @authenticated
+  """
+  Add a message to a discussion
+  """
+  addMessage(discussionId: ID!, input: AddMessageInput!) : DiscussionMessage! @join__field(graph: COLLABORATION)  @authenticated
+  """
+  Join a discussion as a participant
+  """
+  joinDiscussion(discussionId: ID!) : Boolean! @join__field(graph: COLLABORATION)  @authenticated
+  """
+  Leave a discussion
+  """
+  leaveDiscussion(discussionId: ID!) : Boolean! @join__field(graph: COLLABORATION)  @authenticated
+  createCourse(input: CreateCourseInput!) : Course! @join__field(graph: CONTENT)  @authenticated
+  updateCourse(id: ID!, input: UpdateCourseInput!) : Course! @join__field(graph: CONTENT)  @authenticated
+  deleteCourse(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  publishCourse(id: ID!) : Course! @join__field(graph: CONTENT)  @authenticated
+  unpublishCourse(id: ID!) : Course! @join__field(graph: CONTENT)  @authenticated
+  enrollCourse(courseId: ID!) : UserCourse! @join__field(graph: CONTENT)  @authenticated
+  unenrollCourse(courseId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  markContentViewed(contentItemId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  confirmMediaUpload(fileKey: String!, courseId: ID!, title: String!) : MediaAsset! @join__field(graph: CONTENT)  @authenticated
+  createModule(input: CreateModuleInput!) : Module! @join__field(graph: CONTENT)  @authenticated
+  updateModule(id: ID!, input: UpdateModuleInput!) : Module! @join__field(graph: CONTENT)  @authenticated
+  deleteModule(id: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  reorderModules(courseId: ID!, moduleIds: [ID!]!) : [Module!]! @join__field(graph: CONTENT)  @authenticated
+  createUser(input: CreateUserInput!) : User! @join__field(graph: CORE)  @authenticated
+  updateUser(id: ID!, input: UpdateUserInput!) : User! @join__field(graph: CORE)  @authenticated
+  createEmbedding(input: CreateEmbeddingInput!) : Embedding! @join__field(graph: KNOWLEDGE)  @authenticated
+  deleteEmbedding(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
+  deleteEmbeddingsByContentItem(contentItemId: ID!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated
+  createConcept(input: CreateConceptInput!) : Concept! @join__field(graph: KNOWLEDGE)  @authenticated
+  updateConcept(id: ID!, input: UpdateConceptInput!) : Concept! @join__field(graph: KNOWLEDGE)  @authenticated
+  deleteConcept(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
+  linkConcepts(
+    fromId: ID!
+    toId: ID!
+    relationshipType: String!
+    strength: Float
+    description: String
+  ): ConceptRelationship! @join__field(graph: KNOWLEDGE)  @authenticated
+  createPerson(input: CreatePersonInput!) : Person! @join__field(graph: KNOWLEDGE)  @authenticated
+  createTerm(input: CreateTermInput!) : Term! @join__field(graph: KNOWLEDGE)  @authenticated
+  createSource(input: CreateSourceInput!) : Source! @join__field(graph: KNOWLEDGE)  @authenticated
+  createTopicCluster(input: CreateTopicClusterInput!) : TopicCluster! @join__field(graph: KNOWLEDGE)  @authenticated
+  generateEmbedding(text: String!, entityType: String!, entityId: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
+}
+
+type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE)  {
+  messageStream(sessionId: ID!) : AgentMessage! @join__field(graph: AGENT) 
+  executionStatusChanged(executionId: ID!) : AgentExecution! @join__field(graph: AGENT) 
+  """
+  Subscribe to new annotations on a specific asset in real-time
+  """
+  annotationAdded(assetId: ID!) : Annotation! @join__field(graph: ANNOTATION) 
+  """
+  Subscribe to new messages in a discussion
+  """
+  messageAdded(discussionId: ID!) : DiscussionMessage! @join__field(graph: COLLABORATION) 
+  """
+  User created event
+  """
+  userCreated(tenantId: ID!) : User! @join__field(graph: CORE) 
+  """
+  User updated event
+  """
+  userUpdated(userId: ID!, tenantId: ID!) : User! @join__field(graph: CORE) 
+  """
+  Real-time user status updates
+  """
+  userStatusChanged(userId: ID!) : UserStatus! @join__field(graph: CORE) 
+}
+
+type AgentExecution @join__type(graph: AGENT, key: "id")  {
+  id: ID!
+  agentId: ID!
+  agent: AgentTemplate!
+  userId: ID!
+  user: User!
+  input: JSON!
+  output: JSON
+  status: AgentExecutionStatus!
+  startedAt: String
+  completedAt: String
+  metadata: JSON!
+}
+
+type AgentTemplate @join__type(graph: AGENT, key: "id")  {
+  id: ID!
+  name: String!
+  templateType: TemplateType!
+  systemPrompt: String!
+  parameters: JSON!
+}
+
+type Annotation @join__type(graph: ANNOTATION, key: "id")  {
+  id: ID!
   tenantId: ID!
+  assetId: ID!
+  userId: ID!
+  user: User
+  annotationType: AnnotationType!
+  layer: AnnotationLayer!
+  content: JSON!
+  spatialData: JSON
+  parentId: ID
+  parent: Annotation
+  isResolved: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
-enum UserRole
-  @join__type(graph: CORE)
-{
-  SUPER_ADMIN @join__enumValue(graph: CORE)
-  ORG_ADMIN @join__enumValue(graph: CORE)
-  INSTRUCTOR @join__enumValue(graph: CORE)
-  STUDENT @join__enumValue(graph: CORE)
-  RESEARCHER @join__enumValue(graph: CORE)
+type ContentItem @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  moduleId: ID! @join__field(graph: CONTENT) 
+  title: String! @join__field(graph: CONTENT) 
+  contentType: String! @join__field(graph: CONTENT) 
+  content: String @join__field(graph: CONTENT) 
+  fileId: ID @join__field(graph: CONTENT) 
+  duration: Int @join__field(graph: CONTENT) 
+  orderIndex: Int! @join__field(graph: CONTENT) 
+  createdAt: String! @join__field(graph: CONTENT) 
+  updatedAt: String! @join__field(graph: CONTENT) 
 }
 
-type Query
-  @join__type(graph: CORE)
-{
-  _health: String!
-  user(id: ID!): User
-  users(limit: Int = 10, offset: Int = 0): [User!]!
-  me: User
+"""
+Discussion in a course
+"""
+type Discussion @join__type(graph: COLLABORATION, key: "id")  {
+  id: ID!
+  courseId: ID!
+  course: Course!
+  title: String!
+  description: String
+  creatorId: ID!
+  creator: User!
+  discussionType: DiscussionType!
+  messages(limit: Int = 50, offset: Int = 0) : [DiscussionMessage!]!
+  participants: [DiscussionParticipant!]!
+  participantCount: Int!
+  messageCount: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type Mutation
-  @join__type(graph: CORE)
-{
-  createUser(input: CreateUserInput!): User!
-  updateUser(id: ID!, input: UpdateUserInput!): User!
+"""
+Message in a discussion
+"""
+type DiscussionMessage @join__type(graph: COLLABORATION, key: "id")  {
+  id: ID!
+  discussionId: ID!
+  discussion: Discussion!
+  userId: ID!
+  user: User!
+  content: String!
+  messageType: MessageType!
+  parentMessageId: ID
+  parentMessage: DiscussionMessage
+  replies(limit: Int = 20, offset: Int = 0) : [DiscussionMessage!]!
+  replyCount: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-input CreateUserInput
-  @join__type(graph: CORE)
-{
+"""
+Participant in a discussion
+"""
+type DiscussionParticipant @join__type(graph: COLLABORATION)  {
+  id: ID!
+  discussionId: ID!
+  discussion: Discussion!
+  userId: ID!
+  user: User!
+  joinedAt: DateTime!
+}
+
+type UserCourse @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  userId: ID!
+  status: String!
+  enrolledAt: String!
+  completedAt: String
+}
+
+type CourseProgress @join__type(graph: CONTENT)  {
+  courseId: ID!
+  totalItems: Int!
+  completedItems: Int!
+  percentComplete: Float!
+}
+
+type PresignedUploadUrl @join__type(graph: CONTENT)  {
+  uploadUrl: String!
+  fileKey: String!
+  expiresAt: String!
+}
+
+type MediaAsset @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  fileKey: String!
+  title: String!
+  contentType: String!
+  status: MediaStatus!
+  downloadUrl: String
+  """
+  Presigned URL for the HLS master manifest (.m3u8).
+  Null until HLS transcoding completes (non-blocking background step).
+  Valid for 1 hour after generation.
+  """
+  hlsManifestUrl: String
+}
+
+type Module @join__type(graph: CONTENT, key: "id")  {
+  id: ID!
+  courseId: ID!
+  course: Course!
+  title: String!
+  description: String
+  orderIndex: Int!
+  contentItems: [ContentItem!]!
+  createdAt: String!
+}
+
+type Tenant @join__type(graph: CORE, key: "id")  {
+  id: ID!
+  name: String!
+  slug: String!
+  plan: TenantPlan!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UserStats @join__type(graph: CORE)  {
+  coursesEnrolled: Int!
+  annotationsCreated: Int!
+  conceptsMastered: Int!
+  totalLearningMinutes: Int!
+  weeklyActivity: [DayActivity!]!
+}
+
+type DayActivity @join__type(graph: CORE)  {
+  date: String!
+  count: Int!
+}
+
+type UserStatus @join__type(graph: CORE)  {
+  userId: ID!
+  online: Boolean!
+  lastSeen: DateTime!
+}
+
+type Embedding @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  contentItemId: ID!
+  contentItem: ContentItem!
+  chunkText: String!
+  embedding: [Float!]!
+  metadata: JSON
+  createdAt: String!
+}
+
+type SimilarityResult @join__type(graph: KNOWLEDGE)  {
+  embedding: Embedding!
+  similarity: Float!
+  distance: Float!
+}
+
+type Concept @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  definition: String!
+  sourceIds: [ID!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Person @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  bio: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Term @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  definition: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Source @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  tenantId: ID!
+  title: String!
+  type: String!
+  url: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type TopicCluster @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type ConceptRelationship @join__type(graph: KNOWLEDGE)  {
+  fromConcept: Concept!
+  toConcept: Concept!
+  relationshipType: String!
+  strength: Float
+  inferred: Boolean
+  description: String
+}
+
+type RelatedConcept @join__type(graph: KNOWLEDGE)  {
+  concept: Concept!
+  strength: Float!
+}
+
+type SemanticResult @join__type(graph: KNOWLEDGE)  {
+  id: ID!
+  text: String!
+  similarity: Float!
+  entityType: String!
+  entityId: ID!
+}
+
+"""
+A lightweight concept node used in learning path and prerequisite chain results.
+Distinct from the full Concept entity — carries only the fields needed for path display.
+"""
+type ConceptNode @join__type(graph: KNOWLEDGE)  {
+  id: ID!
+  name: String!
+  type: String
+}
+
+"""
+Result of a shortestPath query between two concepts.
+concepts: ordered list of ConceptNodes along the path (start inclusive, end inclusive).
+steps: number of edges in the path (= length of path).
+"""
+type LearningPath @join__type(graph: KNOWLEDGE)  {
+  concepts: [ConceptNode!]!
+  steps: Int!
+}
+
+enum MessageRole @join__type(graph: AGENT)  {
+  USER @join__enumValue(graph: AGENT) 
+  ASSISTANT @join__enumValue(graph: AGENT) 
+  SYSTEM @join__enumValue(graph: AGENT) 
+  TOOL @join__enumValue(graph: AGENT) 
+}
+
+enum TemplateType @join__type(graph: AGENT)  {
+  TUTOR @join__enumValue(graph: AGENT) 
+  QUIZ_GENERATOR @join__enumValue(graph: AGENT) 
+  DEBATE_FACILITATOR @join__enumValue(graph: AGENT) 
+  EXPLANATION_GENERATOR @join__enumValue(graph: AGENT) 
+  CHAVRUTA_DEBATE @join__enumValue(graph: AGENT) 
+  SUMMARIZE @join__enumValue(graph: AGENT) 
+  QUIZ_ASSESS @join__enumValue(graph: AGENT) 
+  RESEARCH_SCOUT @join__enumValue(graph: AGENT) 
+  EXPLAIN @join__enumValue(graph: AGENT) 
+  CUSTOM @join__enumValue(graph: AGENT) 
+}
+
+enum AgentSessionStatus @join__type(graph: AGENT)  {
+  ACTIVE @join__enumValue(graph: AGENT) 
+  COMPLETED @join__enumValue(graph: AGENT) 
+  FAILED @join__enumValue(graph: AGENT) 
+  CANCELLED @join__enumValue(graph: AGENT) 
+}
+
+enum AgentExecutionStatus @join__type(graph: AGENT)  {
+  QUEUED @join__enumValue(graph: AGENT) 
+  RUNNING @join__enumValue(graph: AGENT) 
+  COMPLETED @join__enumValue(graph: AGENT) 
+  FAILED @join__enumValue(graph: AGENT) 
+  CANCELLED @join__enumValue(graph: AGENT) 
+}
+
+enum AnnotationType @join__type(graph: ANNOTATION)  {
+  TEXT @join__enumValue(graph: ANNOTATION) 
+  SKETCH @join__enumValue(graph: ANNOTATION) 
+  LINK @join__enumValue(graph: ANNOTATION) 
+  BOOKMARK @join__enumValue(graph: ANNOTATION) 
+  SPATIAL_COMMENT @join__enumValue(graph: ANNOTATION) 
+}
+
+enum AnnotationLayer @join__type(graph: ANNOTATION)  {
+  PERSONAL @join__enumValue(graph: ANNOTATION) 
+  SHARED @join__enumValue(graph: ANNOTATION) 
+  INSTRUCTOR @join__enumValue(graph: ANNOTATION) 
+  AI_GENERATED @join__enumValue(graph: ANNOTATION) 
+}
+
+"""
+Discussion types
+"""
+enum DiscussionType @join__type(graph: COLLABORATION)  {
+  FORUM @join__enumValue(graph: COLLABORATION) 
+  CHAVRUTA @join__enumValue(graph: COLLABORATION) 
+  DEBATE @join__enumValue(graph: COLLABORATION) 
+}
+
+"""
+Message types
+"""
+enum MessageType @join__type(graph: COLLABORATION)  {
+  TEXT @join__enumValue(graph: COLLABORATION) 
+  IMAGE @join__enumValue(graph: COLLABORATION) 
+  VIDEO @join__enumValue(graph: COLLABORATION) 
+  AUDIO @join__enumValue(graph: COLLABORATION) 
+}
+
+enum MediaStatus @join__type(graph: CONTENT)  {
+  UPLOADING @join__enumValue(graph: CONTENT) 
+  PROCESSING @join__enumValue(graph: CONTENT) 
+  READY @join__enumValue(graph: CONTENT) 
+  ERROR @join__enumValue(graph: CONTENT) 
+}
+
+enum TenantPlan @join__type(graph: CORE)  {
+  FREE @join__enumValue(graph: CORE) 
+  STARTER @join__enumValue(graph: CORE) 
+  PROFESSIONAL @join__enumValue(graph: CORE) 
+  ENTERPRISE @join__enumValue(graph: CORE) 
+}
+
+enum UserRole @join__type(graph: CORE)  {
+  SUPER_ADMIN @join__enumValue(graph: CORE) 
+  ORG_ADMIN @join__enumValue(graph: CORE) 
+  INSTRUCTOR @join__enumValue(graph: CORE) 
+  STUDENT @join__enumValue(graph: CORE) 
+  RESEARCHER @join__enumValue(graph: CORE) 
+}
+
+input StartAgentExecutionInput @join__type(graph: AGENT)  {
+  agentId: ID!
+  userId: ID!
+  input: JSON!
+  metadata: JSON
+}
+
+input CreateAgentTemplateInput @join__type(graph: AGENT)  {
+  name: String!
+  templateType: TemplateType!
+  systemPrompt: String!
+  parameters: JSON
+}
+
+input UpdateAgentTemplateInput @join__type(graph: AGENT)  {
+  name: String
+  systemPrompt: String
+  parameters: JSON
+}
+
+input CreateAnnotationInput @join__type(graph: ANNOTATION)  {
+  assetId: ID!
+  annotationType: AnnotationType!
+  layer: AnnotationLayer = PERSONAL
+  content: JSON!
+  spatialData: JSON
+  parentId: ID
+}
+
+input UpdateAnnotationInput @join__type(graph: ANNOTATION)  {
+  content: JSON
+  spatialData: JSON
+  isResolved: Boolean
+}
+
+input CreateDiscussionInput @join__type(graph: COLLABORATION)  {
+  courseId: ID!
+  title: String!
+  description: String
+  discussionType: DiscussionType!
+}
+
+input AddMessageInput @join__type(graph: COLLABORATION)  {
+  content: String!
+  messageType: MessageType!
+  parentMessageId: ID
+}
+
+input CreateCourseInput @join__type(graph: CONTENT)  {
+  title: String!
+  slug: String!
+  description: String
+  instructorId: ID!
+  thumbnailUrl: String
+  estimatedHours: Int
+  isPublished: Boolean
+}
+
+input UpdateCourseInput @join__type(graph: CONTENT)  {
+  title: String
+  slug: String
+  description: String
+  thumbnailUrl: String
+  estimatedHours: Int
+}
+
+input CreateModuleInput @join__type(graph: CONTENT)  {
+  courseId: ID!
+  title: String!
+  description: String
+  orderIndex: Int!
+}
+
+input UpdateModuleInput @join__type(graph: CONTENT)  {
+  title: String
+  description: String
+  orderIndex: Int
+}
+
+input CreateUserInput @join__type(graph: CORE)  {
   email: String!
   firstName: String!
   lastName: String!
@@ -84,10 +794,49 @@ input CreateUserInput
   tenantId: ID!
 }
 
-input UpdateUserInput
-  @join__type(graph: CORE)
-{
+input UpdateUserInput @join__type(graph: CORE)  {
   firstName: String
   lastName: String
   role: UserRole
 }
+
+input CreateEmbeddingInput @join__type(graph: KNOWLEDGE)  {
+  contentItemId: ID!
+  chunkText: String!
+  embedding: [Float!]!
+  metadata: JSON
+}
+
+input CreateConceptInput @join__type(graph: KNOWLEDGE)  {
+  name: String!
+  definition: String!
+  sourceIds: [ID!]
+}
+
+input UpdateConceptInput @join__type(graph: KNOWLEDGE)  {
+  name: String
+  definition: String
+  sourceIds: [ID!]
+}
+
+input CreatePersonInput @join__type(graph: KNOWLEDGE)  {
+  name: String!
+  bio: String
+}
+
+input CreateTermInput @join__type(graph: KNOWLEDGE)  {
+  name: String!
+  definition: String!
+}
+
+input CreateSourceInput @join__type(graph: KNOWLEDGE)  {
+  title: String!
+  type: String!
+  url: String
+}
+
+input CreateTopicClusterInput @join__type(graph: KNOWLEDGE)  {
+  name: String!
+  description: String
+}
+    

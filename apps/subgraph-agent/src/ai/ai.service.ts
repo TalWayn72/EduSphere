@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { openai } from '@ai-sdk/openai';
-import { generateText, streamText, type LanguageModelV1 } from 'ai';
+import { generateText, streamText, stepCountIs, type LanguageModel } from 'ai';
 import {
   createChavrutaWorkflow,
   type ChavrutaContext,
@@ -26,6 +26,8 @@ import {
   searchKnowledgeGraph,
   fetchContentItem,
 } from './ai.service.db';
+import { injectLocale } from './locale-prompt';
+import { createOllama } from 'ollama-ai-provider';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -97,21 +99,19 @@ export class AIService {
 
   // ── Model factory ──────────────────────────────────────────────────────────
 
-  private getModel(): LanguageModelV1 {
+  private getModel(): LanguageModel {
     if (process.env.OLLAMA_URL) {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const ollamaModule = require('ollama-ai-provider') as {
-        createOllama: (opts: { baseURL: string }) => (id: string) => LanguageModelV1;
-      };
-      const ollama = ollamaModule.createOllama({
+      const ollama = createOllama({
         baseURL: `${process.env.OLLAMA_URL}/api`,
       });
       const modelId = process.env.OLLAMA_MODEL ?? 'llama3.2';
-      return ollama(modelId);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return ollama(modelId) as any;
     }
-    return process.env.OPENAI_API_KEY
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (process.env.OPENAI_API_KEY
       ? openai('gpt-4-turbo')
-      : openai('gpt-3.5-turbo');
+      : openai('gpt-3.5-turbo')) as any;
   }
 
   // ── Tool builder ──────────────────────────────────────────────────────────
@@ -138,26 +138,27 @@ export class AIService {
     sessionId: string,
     message: string,
     templateType: string,
-    context: Record<string, unknown> = {}
+    context: Record<string, unknown> = {},
+    locale: string = 'en'
   ): Promise<AIResult> {
     this.logger.debug(
-      `continueSession: session=${sessionId} template=${templateType}`
+      `continueSession: session=${sessionId} template=${templateType} locale=${locale}`
     );
 
     try {
       if (templateType === 'CHAVRUTA_DEBATE') {
-        return runLangGraphDebate(sessionId, message, context);
+        return runLangGraphDebate(sessionId, message, context, locale);
       }
       if (templateType === 'QUIZ_GENERATOR' || templateType === 'QUIZ_ASSESS') {
-        return runLangGraphQuiz(sessionId, message, context);
+        return runLangGraphQuiz(sessionId, message, context, locale);
       }
       if (templateType === 'TUTOR' || templateType === 'EXPLANATION_GENERATOR') {
-        return runLangGraphTutor(sessionId, message, context);
+        return runLangGraphTutor(sessionId, message, context, locale);
       }
       if (templateType === 'SUMMARIZE') {
         const model = this.getModel();
         const ctx = this.buildSummarizerCtx({ message, context, sessionId });
-        const workflow = createSummarizerWorkflow(model);
+        const workflow = createSummarizerWorkflow(model, locale);
         const result = await workflow.step(ctx);
         return {
           text: result.text,
@@ -172,7 +173,8 @@ export class AIService {
       return this.runGeneric(
         this.getModel(),
         { template: templateType },
-        { message, context, sessionId }
+        { message, context, sessionId },
+        locale
       );
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Unknown error';
@@ -207,24 +209,24 @@ export class AIService {
 
   // ── executeStream ──────────────────────────────────────────────────────────
 
-  async executeStream(agent: AgentDefinition, input: ExecutionInput) {
+  async executeStream(agent: AgentDefinition, input: ExecutionInput, locale: string = 'en') {
     this.logger.debug(`Streaming agent: ${agent.template}`);
     const model = this.getModel();
 
     if (agent.template === 'CHAVRUTA_DEBATE') {
       const ctx = this.buildChavrutaCtx(input);
-      return createChavrutaWorkflow(model).stream(ctx);
+      return createChavrutaWorkflow(model, locale).stream(ctx);
     }
     if (agent.template === 'QUIZ_ASSESS') {
       const ctx = this.buildQuizCtx(input);
-      return createLegacyQuizWorkflow(model).stream(ctx, input.userAnswer);
+      return createLegacyQuizWorkflow(model, locale).stream(ctx, input.userAnswer);
     }
     if (agent.template === 'SUMMARIZE') {
       const ctx = this.buildSummarizerCtx(input);
-      return createSummarizerWorkflow(model).stream(ctx);
+      return createSummarizerWorkflow(model, locale).stream(ctx);
     }
 
-    const system = this.resolveSystemPrompt(agent);
+    const system = injectLocale(this.resolveSystemPrompt(agent), locale);
     const prompt = this.buildUserPrompt(input);
     const cfg = getAgentConfig(agent);
     const tenantId = input.tenantId ?? '';
@@ -233,9 +235,9 @@ export class AIService {
       system,
       prompt,
       temperature: cfg.temperature ?? 0.7,
-      maxTokens: cfg.maxTokens ?? 2000,
+      maxOutputTokens: cfg.maxTokens ?? 2000,
+      stopWhen: stepCountIs(MAX_TOOL_STEPS),
       tools: this.buildTools(tenantId),
-      maxSteps: MAX_TOOL_STEPS,
     });
   }
 
@@ -269,11 +271,12 @@ export class AIService {
   // ── Private helpers ────────────────────────────────────────────────────────
 
   private async runGeneric(
-    model: LanguageModelV1,
+    model: LanguageModel,
     agent: { template: string },
-    input: ExecutionInput
+    input: ExecutionInput,
+    locale: string = 'en'
   ): Promise<AIResult> {
-    const system = this.resolveSystemPrompt(agent);
+    const system = injectLocale(this.resolveSystemPrompt(agent), locale);
     const prompt = this.buildUserPrompt(input);
     const cfg = getAgentConfig(agent as AgentDefinition);
     const tenantId = input.tenantId ?? '';
@@ -282,9 +285,9 @@ export class AIService {
       system,
       prompt,
       temperature: cfg.temperature ?? 0.7,
-      maxTokens: cfg.maxTokens ?? 2000,
+      maxOutputTokens: cfg.maxTokens ?? 2000,
+      stopWhen: stepCountIs(MAX_TOOL_STEPS),
       tools: this.buildTools(tenantId),
-      maxSteps: MAX_TOOL_STEPS,
     });
     return {
       text: result.text,
@@ -294,11 +297,12 @@ export class AIService {
   }
 
   private async runChavruta(
-    model: LanguageModelV1,
-    input: ExecutionInput
+    model: LanguageModel,
+    input: ExecutionInput,
+    locale: string = 'en'
   ): Promise<AIResult> {
     const ctx = this.buildChavrutaCtx(input);
-    const workflow = createChavrutaWorkflow(model);
+    const workflow = createChavrutaWorkflow(model, locale);
     const result = await workflow.step(ctx);
     return {
       text: result.text,
@@ -311,11 +315,12 @@ export class AIService {
   }
 
   private async runQuiz(
-    model: LanguageModelV1,
-    input: ExecutionInput
+    model: LanguageModel,
+    input: ExecutionInput,
+    locale: string = 'en'
   ): Promise<AIResult> {
     const ctx = this.buildQuizCtx(input);
-    const workflow = createLegacyQuizWorkflow(model);
+    const workflow = createLegacyQuizWorkflow(model, locale);
     const result = await workflow.step(ctx, input.userAnswer);
     return {
       text: result.text,
@@ -328,11 +333,12 @@ export class AIService {
   }
 
   private async runSummarizer(
-    model: LanguageModelV1,
-    input: ExecutionInput
+    model: LanguageModel,
+    input: ExecutionInput,
+    locale: string = 'en'
   ): Promise<AIResult> {
     const ctx = this.buildSummarizerCtx(input);
-    const workflow = createSummarizerWorkflow(model);
+    const workflow = createSummarizerWorkflow(model, locale);
     const result = await workflow.step(ctx);
     return {
       text: result.text,

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { X, Send, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation('agents');
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -112,7 +114,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
         <div className="flex items-center justify-between p-4 border-b bg-muted/30">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">AI Learning Assistant</h2>
+            <h2 className="text-lg font-semibold">{t('chatPanel.title')}</h2>
           </div>
           <Button
             variant="ghost"
@@ -127,7 +129,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
         {/* Agent Selector */}
         <div className="p-4 border-b bg-background">
           <label className="text-sm font-medium mb-2 block">
-            Select Agent:
+            {t('selectAgent')}
           </label>
           <Select
             value={selectedAgent}
@@ -159,7 +161,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
               <Sparkles className="h-12 w-12 mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">Start a conversation</p>
+              <p className="text-lg font-medium mb-2">{t('chatPanel.startConversation')}</p>
               <p className="text-sm max-w-xs">
                 Ask me anything about {currentAgent.name.toLowerCase()} topics!
               </p>
@@ -200,7 +202,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Press Enter to send, Shift+Enter for new line
+            {t('chatPanel.inputHint')}
           </p>
         </div>
       </div>

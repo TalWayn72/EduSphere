@@ -1,0 +1,50 @@
+{
+  "title": "डैशबोर्ड",
+  "welcomeBack": "{{name}}, वापस स्वागत है!",
+  "instructorTools": "प्रशिक्षक उपकरण",
+  "createCourse": "पाठ्यक्रम बनाएं",
+  "manageCourses": "पाठ्यक्रम प्रबंधित करें",
+  "continueLearning": "सीखना जारी रखें",
+  "yourProgress": "आपकी प्रगति",
+  "studyActivity": "अध्ययन गतिविधि",
+  "activityDescription": "पिछले 30 दिनों में आपकी टिप्पणी गतिविधि",
+  "recentActivity": "हाल की गतिविधि",
+  "latestEvents": "आपकी नवीनतम सीखने की घटनाएं",
+  "noActivity": "हाल ही में कोई गतिविधि नहीं",
+  "errorLoadingUser": "उपयोगकर्ता डेटा लोड करने में त्रुटि",
+  "stats": {
+    "activeCourses": "सक्रिय पाठ्यक्रम",
+    "learningStreak": "सीखने की श्रृंखला",
+    "studyTime": "अध्ययन समय",
+    "concepts": "अवधारणाएं",
+    "coursesEnrolled": "नामांकित पाठ्यक्रम",
+    "conceptsMastered": "महारत हासिल अवधारणाएं",
+    "annotationsCreated": "बनाई गई टिप्पणियाँ",
+    "weeklyGoal": "साप्ताहिक लक्ष्य",
+    "days": "दिन",
+    "hours": "घंटे",
+    "minutes": "मिनट"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} अध्ययन दिन",
+    "totalSessions": "कुल {{count}} अध्ययन सत्र",
+    "less": "कम",
+    "more": "अधिक"
+  },
+  "profile": {
+    "accountDetails": "खाता विवरण",
+    "permissions": "अनुमतियां",
+    "learningOverview": "सीखने का अवलोकन",
+    "fields": {
+      "username": "उपयोगकर्ता नाम",
+      "email": "ईमेल",
+      "role": "भूमिका",
+      "tenantId": "टेनेंट आईडी"
+    },
+    "stats": {
+      "coursesAvailable": "उपलब्ध पाठ्यक्रम",
+      "conceptsMastered": "महारत हासिल अवधारणाएं",
+      "annotationsCreated": "बनाए गए एनोटेशन"
+    }
+  }
+}

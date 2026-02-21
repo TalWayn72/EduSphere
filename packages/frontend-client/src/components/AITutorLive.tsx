@@ -16,8 +16,15 @@ interface Props {
   sessionId: string;
 }
 
+interface AgentMessage {
+  id: string;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
 export default function AITutorLive({ sessionId }: Props) {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<AgentMessage[]>([]);
 
   const { data } = useSubscription(AGENT_MESSAGE_SUB, {
     variables: { sessionId },

@@ -101,15 +101,21 @@ describe('executeCypher()', () => {
     expect(cypherCall).toContain("cypher('my_graph'");
   });
 
-  it('includes params JSON in the query string when params provided', async () => {
+  it('passes params as a PostgreSQL $1 parameter (not embedded in SQL string)', async () => {
     const db = buildMockDb();
     const params = { id: 'concept-1', tenantId: 'tenant-1' };
     await executeCypher(db, GRAPH, 'MATCH (n {id: $id}) RETURN n', params);
 
-    const queryCalls = mockQuery.mock.calls.map((c) => c[0] as string);
-    const cypherCall = queryCalls.find((q) => q.includes('cypher'));
-    expect(cypherCall).toContain('"id":"concept-1"');
-    expect(cypherCall).toContain('"tenantId":"tenant-1"');
+    // The SQL must contain $1 placeholder (AGE requirement)
+    const cypherCallArgs = mockQuery.mock.calls.find(
+      (c) => typeof c[0] === 'string' && (c[0] as string).includes('cypher')
+    );
+    expect(cypherCallArgs?.[0]).toContain('$1');
+    // The params JSON is in the pg values array, not the SQL string
+    const pgValues = cypherCallArgs?.[1] as string[] | undefined;
+    expect(pgValues).toBeDefined();
+    const parsed = JSON.parse(pgValues![0]);
+    expect(parsed).toMatchObject({ id: 'concept-1', tenantId: 'tenant-1' });
   });
 
   it('does NOT include params placeholder when params is empty object', async () => {
@@ -133,21 +139,21 @@ describe('executeCypher()', () => {
     expect(cypherCall).not.toMatch(/"[{]/); // no JSON params appended
   });
 
-  it('escapes single-quote characters in params JSON so they are doubled', async () => {
+  it('safely passes values with single quotes via pg parameter (no escaping needed)', async () => {
     const db = buildMockDb();
-    // A value that contains a single quote — must be escaped to '' by the implementation
+    // A value with a single quote — parameterized queries handle it safely without escaping.
     const params = { id: "O'Brien" };
     await executeCypher(db, GRAPH, 'MATCH (n {id: $id}) RETURN n', params);
 
-    const queryCalls = mockQuery.mock.calls.map((c) => c[0] as string);
-    const cypherCall = queryCalls.find((q) => q.includes('cypher'));
-
-    expect(cypherCall).toBeDefined();
-    // The implementation calls .replace(/'/g, "''") — the single quote must be doubled
-    expect(cypherCall).toContain("O''Brien");
-    // The raw (un-escaped) form must NOT appear in the params portion of the query
-    // We verify this by checking that "O'B" (one quote between letters) is absent
-    expect(cypherCall).not.toContain("\"O'Brien\"");
+    const cypherCallArgs = mockQuery.mock.calls.find(
+      (c) => typeof c[0] === 'string' && (c[0] as string).includes('cypher')
+    );
+    // SQL string must use $1 placeholder (no inline JSON with single-quote escaping)
+    expect(cypherCallArgs?.[0]).toContain('$1');
+    expect(cypherCallArgs?.[0]).not.toContain("O'Brien");
+    // Value is safely in the pg values array
+    const pgValues = cypherCallArgs?.[1] as string[] | undefined;
+    expect(JSON.parse(pgValues![0])).toMatchObject({ id: "O'Brien" });
   });
 
   it('returns empty array when rows is empty', async () => {
@@ -242,19 +248,21 @@ describe('addEdge()', () => {
     expect(cypherCall).toContain('CREATE');
   });
 
-  it('uses $fromId and $toId parameters (not raw string interpolation)', async () => {
+  it('uses $fromId and $toId Cypher params; IDs are in pg values array not SQL', async () => {
     const db = buildMockDb();
     await addEdge(db, GRAPH, 'from-uuid', 'to-uuid', 'RELATED_TO');
 
-    const queryCalls = mockQuery.mock.calls.map((c) => c[0] as string);
-    const cypherCall = queryCalls.find((q) => q.includes('cypher'));
-
-    // The actual IDs must appear as param values, not raw in the query body
-    expect(cypherCall).toContain('$fromId');
-    expect(cypherCall).toContain('$toId');
-    // Verify the IDs are passed via the params JSON, not interpolated
-    expect(cypherCall).toContain('"from-uuid"');
-    expect(cypherCall).toContain('"to-uuid"');
+    const cypherCallArgs = mockQuery.mock.calls.find(
+      (c) => typeof c[0] === 'string' && (c[0] as string).includes('cypher')
+    );
+    // Cypher body references $fromId / $toId
+    expect(cypherCallArgs?.[0]).toContain('$fromId');
+    expect(cypherCallArgs?.[0]).toContain('$toId');
+    // IDs live in the pg values array (via $1 placeholder), not in the SQL string
+    const pgValues = cypherCallArgs?.[1] as string[] | undefined;
+    expect(pgValues).toBeDefined();
+    const parsed = JSON.parse(pgValues![0]);
+    expect(parsed).toMatchObject({ fromId: 'from-uuid', toId: 'to-uuid' });
   });
 
   it('includes the edge label in the CREATE clause', async () => {
@@ -311,18 +319,21 @@ describe('queryNodes()', () => {
     expect(cypherCall).toContain('Person');
   });
 
-  it('generates parameterised filter references for each filter key', async () => {
+  it('generates Cypher $key refs in SQL body; values in pg values array', async () => {
     const db = buildMockDb();
     await queryNodes(db, GRAPH, 'Concept', { tenant_id: 't1', name: 'Algebra' });
 
-    const queryCalls = mockQuery.mock.calls.map((c) => c[0] as string);
-    const cypherCall = queryCalls.find((q) => q.includes('cypher'));
-    // Each filter key must appear as $key reference
-    expect(cypherCall).toContain('$tenant_id');
-    expect(cypherCall).toContain('$name');
-    // Values passed via params JSON
-    expect(cypherCall).toContain('"t1"');
-    expect(cypherCall).toContain('"Algebra"');
+    const cypherCallArgs = mockQuery.mock.calls.find(
+      (c) => typeof c[0] === 'string' && (c[0] as string).includes('cypher')
+    );
+    // Cypher body uses $key references
+    expect(cypherCallArgs?.[0]).toContain('$tenant_id');
+    expect(cypherCallArgs?.[0]).toContain('$name');
+    // Values are in the pg values array (via $1), not embedded in SQL
+    const pgValues = cypherCallArgs?.[1] as string[] | undefined;
+    expect(pgValues).toBeDefined();
+    const parsed = JSON.parse(pgValues![0]);
+    expect(parsed).toMatchObject({ tenant_id: 't1', name: 'Algebra' });
   });
 
   it('returns the rows from the cypher call', async () => {
@@ -362,14 +373,21 @@ describe('traverse()', () => {
     expect(cypherCall).toContain('RELATED_TO');
   });
 
-  it('uses $startNodeId param (not raw string interpolation)', async () => {
+  it('uses $startNodeId Cypher ref; value is in pg values array not SQL', async () => {
     const db = buildMockDb();
     await traverse(db, GRAPH, 'dangerous-id', 'RELATED_TO');
 
-    const queryCalls = mockQuery.mock.calls.map((c) => c[0] as string);
-    const cypherCall = queryCalls.find((q) => q.includes('cypher'));
-    expect(cypherCall).toContain('$startNodeId');
-    expect(cypherCall).toContain('"dangerous-id"');
+    const cypherCallArgs = mockQuery.mock.calls.find(
+      (c) => typeof c[0] === 'string' && (c[0] as string).includes('cypher')
+    );
+    expect(cypherCallArgs?.[0]).toContain('$startNodeId');
+    // Must NOT be interpolated into the SQL string
+    expect(cypherCallArgs?.[0]).not.toContain('dangerous-id');
+    // Lives in pg values array
+    const pgValues = cypherCallArgs?.[1] as string[] | undefined;
+    expect(pgValues).toBeDefined();
+    const parsed = JSON.parse(pgValues![0]);
+    expect(parsed).toMatchObject({ startNodeId: 'dangerous-id' });
   });
 
   it('clamps maxDepth of 0 to minimum of 1', async () => {

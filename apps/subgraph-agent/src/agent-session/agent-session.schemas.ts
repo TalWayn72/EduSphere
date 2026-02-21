@@ -15,12 +15,14 @@ export const TemplateTypeEnum = z.enum([
 
 export const StartAgentSessionSchema = z.object({
   templateType: TemplateTypeEnum,
-  context: z.record(z.any()).optional(),
+  context: z.record(z.string(), z.unknown()).optional(),
+  locale: z.string().min(2).max(10).optional().default('en'),
 });
 
 export const SendMessageSchema = z.object({
   sessionId: z.string().uuid(),
   content: z.string().min(1).max(10000),
+  locale: z.string().min(2).max(10).optional().default('en'),
 });
 
 export const EndSessionSchema = z.object({

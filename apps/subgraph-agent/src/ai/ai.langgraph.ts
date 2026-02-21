@@ -68,10 +68,11 @@ function threadConfig(threadId: string) {
 export async function runLangGraphDebate(
   threadId: string,
   message: string,
-  context: Record<string, unknown>
+  context: Record<string, unknown>,
+  locale: string = 'en'
 ): Promise<AIResult> {
   const checkpointer = await getCheckpointer();
-  const workflow = createDebateWorkflow();
+  const workflow = createDebateWorkflow(undefined, locale);
   const compiled = workflow.compile({ checkpointer });
 
   const state = {
@@ -98,10 +99,11 @@ export async function runLangGraphDebate(
 export async function runLangGraphQuiz(
   threadId: string,
   message: string,
-  context: Record<string, unknown>
+  context: Record<string, unknown>,
+  locale: string = 'en'
 ): Promise<AIResult> {
   const checkpointer = await getCheckpointer();
-  const workflow = createQuizWorkflow();
+  const workflow = createQuizWorkflow(undefined, locale);
   const compiled = workflow.compile({ checkpointer });
 
   const state = {
@@ -130,10 +132,11 @@ export async function runLangGraphQuiz(
 export async function runLangGraphTutor(
   threadId: string,
   message: string,
-  context: Record<string, unknown>
+  context: Record<string, unknown>,
+  locale: string = 'en'
 ): Promise<AIResult> {
   const checkpointer = await getCheckpointer();
-  const workflow = createTutorWorkflow();
+  const workflow = createTutorWorkflow(undefined, locale);
   const compiled = workflow.compile({ checkpointer });
 
   const state = {
@@ -166,10 +169,11 @@ export async function runLangGraphTutor(
 export async function runLangGraphAssessment(
   threadId: string,
   message: string,
-  context: Record<string, unknown>
+  context: Record<string, unknown>,
+  locale: string = 'en'
 ): Promise<AIResult> {
   const checkpointer = await getCheckpointer();
-  const workflow = createAssessmentWorkflow();
+  const workflow = createAssessmentWorkflow(undefined, locale);
   const compiled = workflow.compile({ checkpointer });
 
   const submission = {

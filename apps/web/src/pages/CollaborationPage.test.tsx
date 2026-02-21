@@ -3,13 +3,17 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
-// Mock urql before component import — use vi.fn() so we can override per-test
-const mockUseQuery = vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]);
-const mockUseMutation = vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]);
+// vi.hoisted() ensures these are initialized before vi.mock() hoisting runs.
+const { mockUseQuery, mockUseMutation } = vi.hoisted(() => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mockUseQuery: vi.fn<any>(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mockUseMutation: vi.fn<any>(() => [{ fetching: false, error: undefined }, vi.fn()]),
+}));
 
 vi.mock("urql", () => ({
-  useQuery: (...args: unknown[]) => mockUseQuery(...args),
-  useMutation: (...args: unknown[]) => mockUseMutation(...args),
+  useQuery: mockUseQuery,
+  useMutation: mockUseMutation,
 }));
 
 // Mock react-router-dom navigate
@@ -183,7 +187,7 @@ describe("CollaborationPage", () => {
       vi.fn(),
     ]);
     renderPage();
-    fireEvent.click(screen.getByTitle ? screen.getByText('New Session') : screen.getByText('New Session'));
+    fireEvent.click(screen.getByText('New Session'));
     expect(executeCreate).toHaveBeenCalled();
   });
 

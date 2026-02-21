@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, FileVideo, FileAudio, FileText, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -34,6 +35,7 @@ function fileIcon(mime: string) {
 const ACCEPTED_TYPES = 'video/mp4,video/webm,audio/mpeg,audio/wav,application/pdf,image/jpeg,image/png';
 
 export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) {
+  const { t } = useTranslation('courses');
   const inputRef = useRef<HTMLInputElement>(null);
   const [entries, setEntries] = useState<FileUploadEntry[]>([]);
 
@@ -68,7 +70,7 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
     }).toPromise();
 
     if (presignResult.error || !presignResult.data?.getPresignedUploadUrl) {
-      updateEntry(index, { state: 'error', error: 'Failed to get upload URL' });
+      updateEntry(index, { state: 'error', error: t('wizard.failedUploadUrl') });
       return;
     }
 
@@ -93,7 +95,7 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
         return;
       }
     } catch {
-      updateEntry(index, { state: 'error', error: 'Network error during upload' });
+      updateEntry(index, { state: 'error', error: t('wizard.networkError') });
       return;
     }
 
@@ -107,7 +109,7 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
     }).toPromise();
 
     if (confirmResult.error || !confirmResult.data?.confirmMediaUpload) {
-      updateEntry(index, { state: 'error', error: 'Failed to confirm upload' });
+      updateEntry(index, { state: 'error', error: t('wizard.failedConfirm') });
       return;
     }
 
@@ -130,7 +132,7 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
       {/* Existing confirmed media */}
       {mediaList.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium">Uploaded Files ({mediaList.length})</p>
+          <p className="text-sm font-medium">{t('wizard.uploadedFiles', { count: mediaList.length })}</p>
           {mediaList.map((m) => (
             <Card key={m.id} className="p-3 flex items-center gap-3 text-sm">
               <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
@@ -160,7 +162,7 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor={`title-${i}`} className="text-xs">Display Title</Label>
+                <Label htmlFor={`title-${i}`} className="text-xs">{t('wizard.displayTitle')}</Label>
                 <Input
                   id={`title-${i}`}
                   value={entry.title}
@@ -180,10 +182,10 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {entry.state === 'presigning' && 'Preparing upload...'}
-                    {entry.state === 'uploading' && 'Uploading file...'}
-                    {entry.state === 'confirming' && 'Confirming...'}
-                    {entry.state === 'done' && 'Upload complete'}
+                    {entry.state === 'presigning' && t('wizard.preparingUpload')}
+                    {entry.state === 'uploading' && t('wizard.uploadingFile')}
+                    {entry.state === 'confirming' && t('wizard.confirming')}
+                    {entry.state === 'done' && t('wizard.uploadComplete')}
                   </p>
                 </div>
               )}
@@ -204,7 +206,7 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
                   className="w-full gap-1.5"
                 >
                   <Upload className="h-4 w-4" />
-                  Upload
+                  {t('wizard.upload')}
                 </Button>
               )}
             </Card>
@@ -218,9 +220,9 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
         onClick={() => inputRef.current?.click()}
       >
         <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-        <p className="text-sm font-medium">Click to select files</p>
+        <p className="text-sm font-medium">{t('wizard.clickToSelect')}</p>
         <p className="text-xs text-muted-foreground mt-1">
-          Supports video, audio, PDF, images
+          {t('wizard.supportedFormats')}
         </p>
         <input
           ref={inputRef}

@@ -64,7 +64,7 @@ export interface UseAgentChatReturn {
   chatInput: string;
   setChatInput: (value: string) => void;
   sendMessage: () => void;
-  chatEndRef: RefObject<HTMLDivElement>;
+  chatEndRef: RefObject<HTMLDivElement | null>;
   isStreaming: boolean;
   isSending: boolean;
 }
@@ -81,12 +81,12 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
   const [, sendAgentMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
 
-  // useOptimistic: base state is confirmedMessages from server/subscription.
-  // React reverts to confirmedMessages automatically if transition throws.
-  const [messages, addOptimisticMessage] = useOptimistic<
-    ChatMessage[],
-    ChatMessage
-  >(confirmedMessages, optimisticReducer);
+  // useOptimistic exposes the live message list; the reducer merges streaming
+  // updates on top of confirmedMessages without extra state.
+  const [messages] = useOptimistic<ChatMessage[], ChatMessage>(
+    confirmedMessages,
+    optimisticReducer
+  );
 
   const [isSending, startTransition] = useTransition();
 
@@ -154,34 +154,29 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       content: trimmed,
     };
 
-    // Clear input immediately for responsive feel
+    // Clear input and add user message to confirmed list immediately —
+    // avoids the useOptimistic duplicate-key bug that occurs when both
+    // addOptimisticMessage() and setConfirmedMessages() add the same id.
     setChatInput('');
     setIsStreaming(true);
+    setConfirmedMessages((prev) => [...prev, userMsg]);
 
     startTransition(async () => {
-      // Show user message instantly in the UI (optimistic)
-      addOptimisticMessage(userMsg);
-
       // Ensure we have an active session
       let sid = sessionId;
       if (!sid) {
         const res = await startSession({
-          input: { templateType: 'CHAVRUTA', contextContentId: contentId },
+          templateType: 'CHAVRUTA',
+          context: { contentId },
         });
         sid = res.data?.startAgentSession?.id ?? null;
         if (sid) setSessionId(sid);
       }
 
       if (sid) {
-        // Promote optimistic message to confirmed state
-        setConfirmedMessages((prev) => {
-          const alreadyPresent = prev.some((m) => m.id === userMsg.id);
-          return alreadyPresent ? prev : [...prev, userMsg];
-        });
-
         const res = await sendAgentMessage({ sessionId: sid, content: trimmed });
         const reply = res.data?.sendMessage;
-        if (reply && !sessionId) {
+        if (reply) {
           setConfirmedMessages((prev) => {
             const alreadyPresent = prev.some((m) => m.id === (reply.id as string));
             if (alreadyPresent) return prev;
@@ -189,7 +184,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
               ...prev,
               {
                 id: reply.id as string,
-                role: 'agent',
+                role: 'agent' as const,
                 content: reply.content as string,
               },
             ];
@@ -197,15 +192,12 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           setIsStreaming(false);
           return;
         }
+        // Streaming response will arrive via subscription
         setTimeout(() => setIsStreaming(false), 30_000);
         return;
       }
 
-      // Backend unavailable — confirm optimistic message then mock
-      setConfirmedMessages((prev) => {
-        const alreadyPresent = prev.some((m) => m.id === userMsg.id);
-        return alreadyPresent ? prev : [...prev, userMsg];
-      });
+      // Backend unavailable — fall back to mock response
       appendMockResponse();
     });
   }, [
@@ -215,7 +207,6 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     startSession,
     sendAgentMessage,
     appendMockResponse,
-    addOptimisticMessage,
   ]);
 
   return {

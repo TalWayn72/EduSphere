@@ -1,10 +1,13 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { UnauthorizedException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserStatsService } from './user-stats.service';
+import { UserPreferencesService } from './user-preferences.service';
+import { UpdateUserPreferencesSchema } from './user.schemas';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
-  req: any;
+  req: unknown;
   authContext?: AuthContext;
 }
 
@@ -12,7 +15,8 @@ interface GraphQLContext {
 export class UserResolver {
   constructor(
     private readonly userService: UserService,
-    private readonly userStatsService: UserStatsService
+    private readonly userStatsService: UserStatsService,
+    private readonly userPreferencesService: UserPreferencesService,
   ) {}
 
   @Query('_health')
@@ -70,12 +74,28 @@ export class UserResolver {
   @Mutation('updateUser')
   async updateUser(
     @Args('id') id: string,
-    @Args('input') input: any,
+    @Args('input') input: unknown,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) {
       throw new Error('Unauthenticated');
     }
     return this.userService.update(id, input, context.authContext);
+  }
+
+  @Mutation('updateUserPreferences')
+  async updateUserPreferences(
+    @Args('input') input: unknown,
+    @Context() context: GraphQLContext,
+  ) {
+    if (!context.authContext) {
+      throw new UnauthorizedException('Unauthenticated');
+    }
+    const validated = UpdateUserPreferencesSchema.parse(input);
+    return this.userPreferencesService.updatePreferences(
+      context.authContext.userId,
+      validated,
+      context.authContext,
+    );
   }
 }

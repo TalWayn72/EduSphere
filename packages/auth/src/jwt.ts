@@ -24,7 +24,7 @@ export const JWTClaimsSchema = z.object({
   realm_access: z.object({
     roles: z.array(z.string()),
   }),
-  tenant_id: z.string().optional(),
+  tenant_id: z.string().uuid().optional(),
   iss: z.string(),
   aud: z.union([z.string(), z.array(z.string())]).optional(),
   exp: z.number(),

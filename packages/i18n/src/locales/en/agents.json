@@ -1,0 +1,40 @@
+{
+  "title": "AI Learning Agents",
+  "subtitle": "Choose an agent mode to enhance your learning",
+  "devMode": "Dev Mode — mock responses",
+  "selectAgent": "Select Agent:",
+  "reset": "Reset",
+  "sendMessage": "Send message",
+  "askAgent": "Ask the {{agentLabel}}...",
+  "responding": "Agent is responding...",
+  "startConversation": "Start a conversation",
+  "conversationHistory": "Conversation history",
+  "clearHistory": "Clear history",
+  "modes": {
+    "chavruta": {
+      "label": "Chavruta Debate",
+      "description": "Dialectical partner — challenges your arguments using Talmudic reasoning"
+    },
+    "quiz": {
+      "label": "Quiz Master",
+      "description": "Adaptive quizzes based on your learning history and prerequisite gaps"
+    },
+    "summarize": {
+      "label": "Summarizer",
+      "description": "Progressive summaries of your studied content with key concept extraction"
+    },
+    "research": {
+      "label": "Research Scout",
+      "description": "Cross-reference finder — discovers connections across texts and time periods"
+    },
+    "explain": {
+      "label": "Explainer",
+      "description": "Adaptive explanations that adjust to your understanding level"
+    }
+  },
+  "chatPanel": {
+    "title": "AI Learning Assistant",
+    "openPanel": "Open AI panel",
+    "closePanel": "Close AI panel"
+  }
+}

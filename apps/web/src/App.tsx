@@ -5,6 +5,7 @@ import { Provider as UrqlProvider } from 'urql';
 import { urqlClient } from '@/lib/urql-client';
 import { queryClient } from '@/lib/query-client';
 import { initKeycloak } from '@/lib/auth';
+import { initI18n } from '@/lib/i18n';
 import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -14,14 +15,18 @@ function App() {
   const [keycloakReady, setKeycloakReady] = useState(false);
 
   useEffect(() => {
-    initKeycloak()
-      .then(() => {
-        setKeycloakReady(true);
-      })
-      .catch((error) => {
-        console.error('Keycloak initialization error:', error);
-        setKeycloakReady(true);
-      });
+    async function bootstrap() {
+      try {
+        await initKeycloak();
+      } catch {
+        // Keycloak init failure is non-fatal — app continues in unauthenticated state
+      }
+      // Initialize i18n with cached locale from localStorage (before DB fetch)
+      const cachedLocale = localStorage.getItem('edusphere_locale') ?? undefined;
+      await initI18n(cachedLocale);
+      setKeycloakReady(true);
+    }
+    void bootstrap();
   }, []);
 
   if (!keycloakReady) {

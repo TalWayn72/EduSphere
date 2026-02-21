@@ -3,7 +3,6 @@ import {
   createDatabaseConnection,
   schema,
   eq,
-  inArray,
   sql,
 } from '@edusphere/db';
 
@@ -79,18 +78,14 @@ export class EmbeddingService {
     const vector = await this.callEmbeddingProvider(text);
     const vectorString = `[${vector.join(',')}]`;
 
-    const [row] = await this.db.execute<{
-      id: string;
-      segment_id: string;
-      embedding: number[];
-      created_at: Date;
-    }>(sql`
+    type InsertRow = { id: string; segment_id: string; embedding: number[]; created_at: Date };
+    const [row] = (await this.db.execute<InsertRow>(sql`
       INSERT INTO content_embeddings (segment_id, embedding)
       VALUES (${segmentId}, ${vectorString}::vector)
       ON CONFLICT (segment_id)
       DO UPDATE SET embedding = EXCLUDED.embedding
       RETURNING id, segment_id, embedding, created_at
-    `);
+    `)) as unknown as InsertRow[];
 
     if (!row) throw new Error('Failed to upsert content embedding');
 
@@ -164,18 +159,15 @@ export class EmbeddingService {
 
     const vectorString = `[${vector.join(',')}]`;
 
-    const rows = await this.db.execute<{
-      id: string;
-      segment_id: string;
-      similarity: string;
-    }>(sql`
+    type SimilarityRow = { id: string; segment_id: string; similarity: string };
+    const rows = (await this.db.execute<SimilarityRow>(sql`
       SELECT ce.id, ce.segment_id,
         1 - (ce.embedding <=> ${vectorString}::vector) AS similarity
       FROM content_embeddings ce
       JOIN transcript_segments ts ON ts.id = ce.segment_id
       ORDER BY ce.embedding <=> ${vectorString}::vector ASC
       LIMIT ${limit}
-    `);
+    `)) as unknown as SimilarityRow[];
 
     return rows.map((r) => ({
       id: r.id,
@@ -333,19 +325,15 @@ export class EmbeddingService {
     minSimilarity: number = 0.7
   ): Promise<SearchResult[]> {
     const vectorString = `[${queryVector.join(',')}]`;
-    const rows = await this.db.execute<{
-      id: string;
-      segment_id: string;
-      type: string;
-      similarity: string;
-    }>(sql`
+    type VectorRow = { id: string; segment_id: string; type: string; similarity: string };
+    const rows = (await this.db.execute<VectorRow>(sql`
       SELECT 'content' AS type, ce.id, ce.segment_id,
         1 - (ce.embedding <=> ${vectorString}::vector) AS similarity
       FROM content_embeddings ce
       WHERE 1 - (ce.embedding <=> ${vectorString}::vector) >= ${minSimilarity}
       ORDER BY ce.embedding <=> ${vectorString}::vector ASC
       LIMIT ${limit}
-    `);
+    `)) as unknown as VectorRow[];
 
     return rows.map((r) => ({
       id: r.id,

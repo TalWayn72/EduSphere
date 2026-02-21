@@ -203,7 +203,6 @@ describe('RAGPipeline', () => {
       const pipeline = new RAGPipeline(mockRetriever);
       await pipeline.generate('question', 'tenant-abc', { model: 'gpt-3.5-turbo' });
 
-      const callArg = mockGenerateText.mock.calls[0]![0] as Record<string, unknown>;
       // openai() is called with the model string
       const { openai } = await import('@ai-sdk/openai');
       expect(vi.mocked(openai)).toHaveBeenCalledWith('gpt-3.5-turbo');

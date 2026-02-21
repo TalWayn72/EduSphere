@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { mockPgQuery, MockPool, mockPing, MockRedis, routeHandlers, mockRouterGet, MockExpressRouter } = vi.hoisted(() => {
   const mockPgQuery = vi.fn();
-  const MockPool = vi.fn().mockImplementation(() => ({ query: mockPgQuery }));
+  const MockPool = vi.fn(function() { return { query: mockPgQuery }; });
   const mockPing = vi.fn();
-  const MockRedis = vi.fn().mockImplementation(() => ({ ping: mockPing }));
+  const MockRedis = vi.fn(function() { return { ping: mockPing }; });
   const routeHandlers: Record<string, (...args: unknown[]) => unknown> = {};
   const MockExpressRouter = vi.fn();
   const mockRouterGet = vi.fn().mockImplementation((path: string, handler: (...args: unknown[]) => unknown) => {
@@ -31,8 +31,8 @@ describe('HealthService', () => {
       routeHandlers[path] = handler;
     });
     MockExpressRouter.mockReturnValue({ get: mockRouterGet });
-    MockPool.mockImplementation(() => ({ query: mockPgQuery }));
-    MockRedis.mockImplementation(() => ({ ping: mockPing }));
+    MockPool.mockImplementation(function() { return { query: mockPgQuery }; });
+    MockRedis.mockImplementation(function() { return { ping: mockPing }; });
     service = new HealthService('2.0.0');
   });
 

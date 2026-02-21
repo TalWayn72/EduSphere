@@ -10,6 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { useSubscription, useMutation, gql } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($sessionId: ID!, $content: String!) {
@@ -38,6 +39,7 @@ const MESSAGE_SUB = gql`
 `;
 
 export default function AITutorScreen() {
+  const { t } = useTranslation('agents');
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const flatListRef = useRef<FlatList>(null);
@@ -90,7 +92,7 @@ export default function AITutorScreen() {
             ]}
           >
             <Text style={styles.messageRole}>
-              {item.role === 'USER' ? '👤 You' : '🤖 AI Tutor'}
+              {item.role === 'USER' ? `👤 ${t('common:profile')}` : `🤖 ${t('chatPanel.title')}`}
             </Text>
             <Text style={styles.messageContent}>{item.content}</Text>
             <Text style={styles.messageTime}>
@@ -103,7 +105,7 @@ export default function AITutorScreen() {
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🤖</Text>
             <Text style={styles.emptyText}>
-              Start a conversation with your AI tutor
+              {t('startConversation')}
             </Text>
           </View>
         }
@@ -114,7 +116,7 @@ export default function AITutorScreen() {
           style={styles.input}
           value={input}
           onChangeText={setInput}
-          placeholder="Ask a question..."
+          placeholder={t('askAgent', { agentLabel: t('chatPanel.title') })}
           multiline
           maxLength={500}
         />
@@ -126,7 +128,7 @@ export default function AITutorScreen() {
           onPress={handleSend}
           disabled={!input.trim()}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Text style={styles.sendButtonText}>{t('sendMessage')}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

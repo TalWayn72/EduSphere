@@ -16,6 +16,7 @@ import Navigation from './src/navigation';
 import { useLoadAssets } from './src/hooks/useLoadAssets';
 import { database } from './src/services/database';
 import { offlineLink } from './src/apollo/offlineLink';
+import { initMobileI18n } from './src/lib/i18n';
 
 // GraphQL setup
 const GATEWAY_URL = __DEV__
@@ -64,6 +65,7 @@ const client = new ApolloClient({
 export default function App() {
   const isLoadingComplete = useLoadAssets();
   const [dbReady, setDbReady] = useState(false);
+  const [i18nReady, setI18nReady] = useState(false);
 
   useEffect(() => {
     async function initDatabase() {
@@ -78,7 +80,13 @@ export default function App() {
     initDatabase();
   }, []);
 
-  if (!isLoadingComplete || !dbReady) {
+  useEffect(() => {
+    initMobileI18n()
+      .then(() => { setI18nReady(true); })
+      .catch(() => { setI18nReady(true); }); // Continue even if i18n fails
+  }, []);
+
+  if (!isLoadingComplete || !dbReady || !i18nReady) {
     return null;
   }
 

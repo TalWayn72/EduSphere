@@ -49,14 +49,17 @@ import * as urql from 'urql';
 
 // ── Helper to configure urql mock state ──────────────────────────────────────
 
+// SERVER_ANNOTATION matches the actual Annotation type from annotation.graphql.
+// content is a JSON scalar (string here); spatialData holds timestamp info.
 const SERVER_ANNOTATION = {
   id: 'ann-server-1',
   layer: AnnotationLayer.PERSONAL,
+  annotationType: 'TEXT',
   content: 'Server annotation',
-  timestampStart: 10,
+  spatialData: { timestampStart: 10 },
+  parentId: null,
   userId: 'user-server',
-  user: { id: 'user-server', displayName: 'Server User' },
-  replies: [],
+  isResolved: false,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
 };
@@ -93,6 +96,9 @@ function setupUrqlMocks(options: UrqlMockOptions = {}) {
   ] as ReturnType<typeof urql.useSubscription>);
 }
 
+// Valid UUID to use in tests that exercise the real query path.
+const VALID_UUID = '909e98a3-d6c4-407c-a4ab-59a978820f07';
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('useAnnotations', () => {
@@ -100,24 +106,42 @@ describe('useAnnotations', () => {
     vi.clearAllMocks();
   });
 
-  it('returns normalised server annotations', () => {
+  it('returns normalised server annotations when contentId is a valid UUID', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
-      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
     expect(result.current.annotations).toHaveLength(1);
     expect(result.current.annotations[0]?.id).toBe('ann-server-1');
-    expect(result.current.annotations[0]?.userName).toBe('Server User');
+    // userName is 'User' — displayName is not fetched (User stub only has id in annotation subgraph)
+    expect(result.current.annotations[0]?.userName).toBe('User');
+    // timestamp extracted from spatialData.timestampStart via extractTimestamp()
     expect(result.current.annotations[0]?.timestamp).toBe('10s');
     expect(result.current.fetching).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('pauses the query and returns no error when contentId is not a UUID (e.g. slug)', () => {
+    // When the query is paused, urql returns no data and no error.
+    setupUrqlMocks({ queryData: null, queryError: null });
+
+    const { result } = renderHook(() =>
+      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+    );
+
+    // useQuery should be called with pause:true — verify via mock call args.
+    const queryCall = vi.mocked(urql.useQuery).mock.calls[0];
+    expect(queryCall?.[0]).toMatchObject({ pause: true });
+
+    // No error banner should be shown.
     expect(result.current.error).toBeNull();
   });
 
   it('adds an optimistic annotation immediately when addAnnotation is called', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
-      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
     act(() => {
@@ -133,7 +157,7 @@ describe('useAnnotations', () => {
   it('optimistic annotation has the correct content and layer', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
-      useAnnotations('content-1', [AnnotationLayer.SHARED])
+      useAnnotations(VALID_UUID, [AnnotationLayer.SHARED])
     );
 
     act(() => {
@@ -152,7 +176,7 @@ describe('useAnnotations', () => {
   it('adds an optimistic reply when addReply is called', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
-      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
     act(() => {
@@ -166,7 +190,7 @@ describe('useAnnotations', () => {
   it('sets parentId on optimistic reply', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
-      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
     act(() => {
@@ -187,7 +211,7 @@ describe('useAnnotations', () => {
     });
 
     const { result } = renderHook(() =>
-      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
     // filterAnnotationsByLayers returns input unchanged (mocked above)
@@ -199,7 +223,7 @@ describe('useAnnotations', () => {
   it('exposes isPending from useTransition', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
-      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
     // Before any transition: isPending is false

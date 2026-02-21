@@ -3,7 +3,7 @@ import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import { connect, StringCodec } from 'nats';
-import { createDatabaseConnection, schema, eq } from '@edusphere/db';
+import { createDatabaseConnection, schema } from '@edusphere/db';
 
 const PRESIGNED_URL_EXPIRY_SECONDS = 900; // 15 minutes
 

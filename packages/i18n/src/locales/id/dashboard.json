@@ -1,0 +1,50 @@
+{
+  "title": "Dasbor",
+  "welcomeBack": "Selamat datang kembali, {{name}}!",
+  "instructorTools": "Alat instruktur",
+  "createCourse": "Buat kursus",
+  "manageCourses": "Kelola kursus",
+  "continueLearning": "Lanjutkan belajar",
+  "yourProgress": "Kemajuan Anda",
+  "studyActivity": "Aktivitas belajar",
+  "activityDescription": "Aktivitas anotasi Anda selama 30 hari terakhir",
+  "recentActivity": "Aktivitas terbaru",
+  "latestEvents": "Acara belajar terbaru Anda",
+  "noActivity": "Tidak ada aktivitas terbaru",
+  "errorLoadingUser": "Gagal memuat data pengguna",
+  "stats": {
+    "activeCourses": "Kursus aktif",
+    "learningStreak": "Rentang belajar",
+    "studyTime": "Waktu belajar",
+    "concepts": "Konsep",
+    "coursesEnrolled": "Kursus terdaftar",
+    "conceptsMastered": "Konsep yang dikuasai",
+    "annotationsCreated": "Anotasi dibuat",
+    "weeklyGoal": "Target mingguan",
+    "days": "hari",
+    "hours": "jam",
+    "minutes": "menit"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} hari belajar",
+    "totalSessions": "Total {{count}} sesi belajar",
+    "less": "Sedikit",
+    "more": "Banyak"
+  },
+  "profile": {
+    "accountDetails": "Detail akun",
+    "permissions": "Izin",
+    "learningOverview": "Ikhtisar pembelajaran",
+    "fields": {
+      "username": "Nama pengguna",
+      "email": "Email",
+      "role": "Peran",
+      "tenantId": "ID penyewa"
+    },
+    "stats": {
+      "coursesAvailable": "Kursus tersedia",
+      "conceptsMastered": "Konsep yang dikuasai",
+      "annotationsCreated": "Anotasi dibuat"
+    }
+  }
+}

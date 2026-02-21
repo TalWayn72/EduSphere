@@ -13,7 +13,7 @@ export class AuthMiddleware {
   constructor() {
     const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080';
     const realm = process.env.KEYCLOAK_REALM || 'edusphere';
-    const clientId = process.env.KEYCLOAK_CLIENT_ID || 'edusphere-backend';
+    const clientId = process.env.KEYCLOAK_CLIENT_ID;
 
     this.jwtValidator = new JWTValidator(keycloakUrl, realm, clientId);
     this.logger.log(

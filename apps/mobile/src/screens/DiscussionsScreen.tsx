@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useQuery, useSubscription, gql } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
 import { DEV_MODE, MOCK_DISCUSSIONS } from '../lib/mock-mobile-data';
 
 const DISCUSSIONS_QUERY = gql`
@@ -42,6 +43,7 @@ interface Discussion {
 }
 
 export default function DiscussionsScreen() {
+  const { t } = useTranslation('collaboration');
   const courseId = 'demo-course';
   const [newTitle, setNewTitle] = useState('');
 
@@ -85,7 +87,7 @@ export default function DiscussionsScreen() {
               {item.content}
             </Text>
             <View style={styles.discussionMeta}>
-              <Text style={styles.upvotes}>{item.upvotes} upvotes</Text>
+              <Text style={styles.upvotes}>{item.upvotes} {t('reply')}</Text>
               {item.createdAt && (
                 <Text style={styles.createdAt}>
                   {new Date(item.createdAt).toLocaleDateString()}
@@ -96,7 +98,7 @@ export default function DiscussionsScreen() {
         )}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyText}>No discussions yet</Text>
+            <Text style={styles.emptyText}>{t('noSessions')}</Text>
           </View>
         }
         contentContainerStyle={styles.listContent}
@@ -108,7 +110,7 @@ export default function DiscussionsScreen() {
           style={styles.input}
           value={newTitle}
           onChangeText={setNewTitle}
-          placeholder="Start a discussion..."
+          placeholder={t('newPost')}
           maxLength={200}
         />
         <TouchableOpacity
@@ -116,7 +118,7 @@ export default function DiscussionsScreen() {
           disabled={!newTitle.trim()}
           onPress={() => setNewTitle('')}
         >
-          <Text style={styles.postButtonText}>Post</Text>
+          <Text style={styles.postButtonText}>{t('newPost')}</Text>
         </TouchableOpacity>
       </View>
     </View>

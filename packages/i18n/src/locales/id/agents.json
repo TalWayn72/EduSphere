@@ -1,0 +1,40 @@
+{
+  "title": "Agen Pembelajaran AI",
+  "subtitle": "Pilih mode agen untuk meningkatkan pembelajaran Anda",
+  "devMode": "Mode dev — respons tiruan",
+  "selectAgent": "Pilih Agen:",
+  "reset": "Atur ulang",
+  "sendMessage": "Kirim pesan",
+  "askAgent": "Tanya {{agentLabel}}...",
+  "responding": "Agen sedang merespons...",
+  "startConversation": "Mulai percakapan",
+  "conversationHistory": "Riwayat percakapan",
+  "clearHistory": "Hapus riwayat",
+  "modes": {
+    "chavruta": {
+      "label": "Debat Chavruta",
+      "description": "Mitra dialektis — menantang argumen Anda menggunakan penalaran Talmud"
+    },
+    "quiz": {
+      "label": "Master Kuis",
+      "description": "Kuis adaptif berdasarkan riwayat belajar dan kesenjangan pengetahuan Anda"
+    },
+    "summarize": {
+      "label": "Perangkum",
+      "description": "Ringkasan progresif konten yang Anda pelajari dengan ekstraksi konsep kunci"
+    },
+    "research": {
+      "label": "Penjelajah Riset",
+      "description": "Pencari referensi silang — menemukan koneksi antar teks dan periode waktu"
+    },
+    "explain": {
+      "label": "Penjelas",
+      "description": "Penjelasan adaptif yang menyesuaikan dengan tingkat pemahaman Anda"
+    }
+  },
+  "chatPanel": {
+    "title": "Asisten Pembelajaran AI",
+    "openPanel": "Buka panel AI",
+    "closePanel": "Tutup panel AI"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "title": "Панель управления",
+  "welcomeBack": "С возвращением, {{name}}!",
+  "instructorTools": "Инструменты преподавателя",
+  "createCourse": "Создать курс",
+  "manageCourses": "Управление курсами",
+  "continueLearning": "Продолжить обучение",
+  "yourProgress": "Ваш прогресс",
+  "studyActivity": "Учебная активность",
+  "activityDescription": "Ваша активность аннотирования за последние 30 дней",
+  "recentActivity": "Недавняя активность",
+  "latestEvents": "Ваши последние учебные события",
+  "noActivity": "Нет недавней активности",
+  "errorLoadingUser": "Ошибка загрузки данных пользователя",
+  "stats": {
+    "activeCourses": "Активные курсы",
+    "learningStreak": "Серия обучения",
+    "studyTime": "Время учёбы",
+    "concepts": "Концепции",
+    "coursesEnrolled": "Записанные курсы",
+    "conceptsMastered": "Освоенные концепции",
+    "annotationsCreated": "Созданные аннотации",
+    "weeklyGoal": "Еженедельная цель",
+    "days": "дней",
+    "hours": "часов",
+    "minutes": "минут"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} дней учёбы",
+    "totalSessions": "{{count}} учебных сессий всего",
+    "less": "Меньше",
+    "more": "Больше"
+  },
+  "profile": {
+    "accountDetails": "Детали аккаунта",
+    "permissions": "Разрешения",
+    "learningOverview": "Обзор обучения",
+    "fields": {
+      "username": "Имя пользователя",
+      "email": "Электронная почта",
+      "role": "Роль",
+      "tenantId": "ID клиента"
+    },
+    "stats": {
+      "coursesAvailable": "Доступные курсы",
+      "conceptsMastered": "Освоенные концепции",
+      "annotationsCreated": "Созданные аннотации"
+    }
+  }
+}

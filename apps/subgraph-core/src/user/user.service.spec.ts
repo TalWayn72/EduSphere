@@ -7,7 +7,7 @@ const mockSelect = vi.fn();
 const mockFrom = vi.fn();
 const mockWhere = vi.fn();
 const mockLimit = vi.fn();
-const mockOffset = vi.fn();
+const _mockOffset = vi.fn();
 const mockInsert = vi.fn();
 const mockValues = vi.fn();
 const mockReturning = vi.fn();
@@ -59,6 +59,12 @@ const ADMIN_AUTH: AuthContext = {
 };
 
 const MOCK_USER = {
+  preferences: {
+    locale: 'en',
+    theme: 'system',
+    emailNotifications: true,
+    pushNotifications: true,
+  },
   id: 'user-1',
   tenant_id: 'tenant-1',
   email: 'test@example.com',

@@ -1,0 +1,24 @@
+{
+  "name": "@edusphere/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./locales/*": "./src/locales/*"
+  },
+  "dependencies": {
+    "i18next": "^23.16.0",
+    "react-i18next": "^15.0.0"
+  },
+  "devDependencies": {
+    "@edusphere/tsconfig": "workspace:*",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}

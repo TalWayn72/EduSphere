@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { login, isAuthenticated } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +13,7 @@ import {
 import { BookOpen } from 'lucide-react';
 
 export function Login() {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,19 +35,18 @@ export function Login() {
               <BookOpen className="h-12 w-12 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-3xl">Welcome to EduSphere</CardTitle>
+          <CardTitle className="text-3xl">{t('welcome')}</CardTitle>
           <CardDescription>
-            Knowledge Graph Educational Platform
+            {t('subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground text-center">
-              Sign in with your organizational account to access courses,
-              collaborate with peers, and interact with AI learning agents.
+              {t('organizationalAccount')}
             </p>
             <Button className="w-full" size="lg" onClick={handleLogin}>
-              Sign In with Keycloak
+              {t('signInWith', { provider: 'Keycloak' })}
             </Button>
           </div>
         </CardContent>

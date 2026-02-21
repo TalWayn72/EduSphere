@@ -1,0 +1,50 @@
+{
+  "title": "Dashboard",
+  "welcomeBack": "Welcome back, {{name}}!",
+  "instructorTools": "Instructor Tools",
+  "createCourse": "Create Course",
+  "manageCourses": "Manage Courses",
+  "continueLearning": "Continue Learning",
+  "yourProgress": "Your Progress",
+  "studyActivity": "Study Activity",
+  "activityDescription": "Your annotation activity over the past 30 days",
+  "recentActivity": "Recent Activity",
+  "latestEvents": "Your latest learning events",
+  "noActivity": "No recent activity",
+  "errorLoadingUser": "Error loading user data",
+  "stats": {
+    "activeCourses": "Active Courses",
+    "learningStreak": "Learning Streak",
+    "studyTime": "Study Time",
+    "concepts": "Concepts",
+    "coursesEnrolled": "Courses Enrolled",
+    "conceptsMastered": "Concepts Mastered",
+    "annotationsCreated": "Annotations",
+    "weeklyGoal": "Weekly Goal",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} study days",
+    "totalSessions": "{{count}} total study sessions",
+    "less": "Less",
+    "more": "More"
+  },
+  "profile": {
+    "accountDetails": "Account Details",
+    "permissions": "Permissions",
+    "learningOverview": "Learning Overview",
+    "fields": {
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "tenantId": "Tenant ID"
+    },
+    "stats": {
+      "coursesAvailable": "Courses Available",
+      "conceptsMastered": "Concepts Mastered",
+      "annotationsCreated": "Annotations Created"
+    }
+  }
+}

@@ -148,7 +148,7 @@ describe('CourseService', () => {
       let cap: Record<string, unknown> = {};
       mockValues.mockImplementation((v: Record<string, unknown>) => { cap = v; return { returning: mockReturning }; });
       await service.create({ tenantId: 'tenant-99', title: 'T', description: 'D', instructorId: 'u' });
-      expect(cap['tenantId']).toBe('tenant-99');
+      expect(cap['tenant_id']).toBe('tenant-99');
     });
 
     it('maps title correctly', async () => {
@@ -169,7 +169,7 @@ describe('CourseService', () => {
       let cap: Record<string, unknown> = {};
       mockValues.mockImplementation((v: Record<string, unknown>) => { cap = v; return { returning: mockReturning }; });
       await service.create({ tenantId: 't', title: 'T', description: 'D', instructorId: 'user-42' });
-      expect(cap['instructorId']).toBe('user-42');
+      expect(cap['instructor_id']).toBe('user-42');
     });
 
     it('calls .returning()', async () => {

@@ -1,0 +1,50 @@
+{
+  "loading": "Chargement...",
+  "error": "Une erreur s'est produite",
+  "retry": "Réessayer",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "back": "Retour",
+  "search": "Rechercher...",
+  "searchPlaceholder": "Rechercher...",
+  "searchHint": "Rechercher dans tous les cours, transcriptions, annotations et concepts",
+  "searchFullPlaceholder": "Rechercher des cours, transcriptions, annotations, concepts...",
+  "signIn": "Se connecter",
+  "logOut": "Se déconnecter",
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "yes": "Oui",
+  "no": "Non",
+  "close": "Fermer",
+  "confirm": "Confirmer",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "create": "Créer",
+  "submit": "Soumettre",
+  "noResults": "Aucun résultat trouvé",
+  "viewAll": "Voir tout",
+  "learnMore": "En savoir plus",
+  "optional": "Optionnel",
+  "required": "Obligatoire",
+  "add": "Ajouter",
+  "annotations": "Annotations",
+  "graph": "Graphique",
+  "accountInformation": "Informations du compte",
+  "errorLoadingUser": "Erreur lors du chargement des données utilisateur",
+  "profilePage": {
+    "accountDetails": "Détails du compte",
+    "permissions": "Autorisations",
+    "learningOverview": "Aperçu de l'apprentissage",
+    "fields": {
+      "username": "Nom d'utilisateur",
+      "email": "E-mail",
+      "role": "Rôle",
+      "tenantId": "ID de locataire"
+    },
+    "stats": {
+      "coursesAvailable": "Cours disponibles",
+      "conceptsMastered": "Concepts maîtrisés",
+      "annotationsCreated": "Annotations créées"
+    }
+  }
+}

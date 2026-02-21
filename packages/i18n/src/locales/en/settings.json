@@ -1,0 +1,33 @@
+{
+  "title": "Settings",
+  "language": {
+    "title": "Language",
+    "description": "Select your preferred language for the interface and AI responses",
+    "saved": "Language preference saved",
+    "error": "Failed to save language preference. Please try again.",
+    "saving": "Saving..."
+  },
+  "appearance": {
+    "title": "Appearance",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "email": "Email notifications",
+    "push": "Push notifications",
+    "emailDescription": "Receive course updates and announcements by email",
+    "pushDescription": "Receive real-time notifications on your device"
+  },
+  "account": {
+    "title": "Account",
+    "editProfile": "Edit Profile",
+    "privacy": "Privacy",
+    "myLearning": "My Learning",
+    "progress": "Progress",
+    "achievements": "Achievements",
+    "version": "Version {{version}}"
+  }
+}

@@ -1,0 +1,31 @@
+type ContentTranslation {
+  id: ID!
+  contentItemId: ID!
+  locale: String!
+  translatedTitle: String
+  translatedDescription: String
+  translatedSummary: String
+  translatedTranscript: String
+  qualityScore: Float
+  modelUsed: String!
+  translationStatus: TranslationStatus!
+  createdAt: String!
+}
+
+enum TranslationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+extend type Query {
+  contentTranslation(contentItemId: ID!, locale: String!): ContentTranslation @authenticated
+}
+
+extend type Mutation {
+  requestContentTranslation(
+    contentItemId: ID!
+    targetLocale: String!
+  ): ContentTranslation! @authenticated
+}

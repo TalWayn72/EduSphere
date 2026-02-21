@@ -17,7 +17,7 @@ import type { AuthContext } from '@edusphere/auth';
 let _mockResolveValue: unknown[] = [];
 
 const chain: Record<string, (...args: unknown[]) => unknown> = {};
-const makeChain = (): typeof chain => {
+const _makeChain = (): typeof chain => {
   // Each method returns the same chain object, except terminal methods
   // that resolve based on _mockResolveValue.
   // We keep a "callCount" per chain so sequential calls can have different results.
@@ -28,15 +28,15 @@ const makeChain = (): typeof chain => {
 const terminalOffset = vi.fn(async () => _mockResolveValue);
 const terminalLimit  = vi.fn(async () => _mockResolveValue);
 // .where() for count queries resolves directly
-const terminalWhere  = vi.fn(async () => _mockResolveValue);
+const _terminalWhere  = vi.fn(async () => _mockResolveValue);
 
 // Non-terminal mocks
 const mockOffset  = vi.fn(() => terminalOffset());
 const mockLimit   = vi.fn(() => ({ offset: mockOffset, then: terminalLimit.bind(terminalLimit) }));
-const mockOrderBy = vi.fn(() => ({ limit: mockLimit }));
+const _mockOrderBy = vi.fn(() => ({ limit: mockLimit }));
 const mockSelect  = vi.fn();
 const mockFrom    = vi.fn();
-const mockWhere   = vi.fn();
+const _mockWhere   = vi.fn();
 const mockInsert  = vi.fn();
 const mockValues  = vi.fn();
 const mockReturning = vi.fn();

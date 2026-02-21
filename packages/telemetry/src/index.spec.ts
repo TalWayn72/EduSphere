@@ -39,6 +39,8 @@ vi.mock('@opentelemetry/semantic-conventions', () => ({
 // ─── Import under test after mocks are set up ────────────────────────────────
 import { initTelemetry } from './index';
 import { NodeSDK } from '@opentelemetry/sdk-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { Resource } from '@opentelemetry/resources';
 
 describe('initTelemetry', () => {
   const originalEnv = process.env;
@@ -72,7 +74,6 @@ describe('initTelemetry', () => {
 
   it('should use OTEL_EXPORTER_OTLP_ENDPOINT env var when set', () => {
     process.env['OTEL_EXPORTER_OTLP_ENDPOINT'] = 'http://custom-jaeger:4318';
-    const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
     initTelemetry('test-service');
     expect(OTLPTraceExporter).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -83,7 +84,6 @@ describe('initTelemetry', () => {
 
   it('should fall back to localhost:4318 when OTEL env var is not set', () => {
     delete process.env['OTEL_EXPORTER_OTLP_ENDPOINT'];
-    const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
     initTelemetry('test-service');
     expect(OTLPTraceExporter).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -134,7 +134,6 @@ describe('initTelemetry', () => {
   });
 
   it('should pass the provided service name to Resource', () => {
-    const { Resource } = require('@opentelemetry/resources');
     initTelemetry('subgraph-agent');
     expect(Resource).toHaveBeenCalledWith(
       expect.objectContaining({

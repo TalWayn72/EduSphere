@@ -1,0 +1,50 @@
+{
+  "title": "Painel",
+  "welcomeBack": "Bem-vindo de volta, {{name}}!",
+  "instructorTools": "Ferramentas do instrutor",
+  "createCourse": "Criar curso",
+  "manageCourses": "Gerenciar cursos",
+  "continueLearning": "Continuar aprendendo",
+  "yourProgress": "Seu progresso",
+  "studyActivity": "Atividade de estudo",
+  "activityDescription": "Sua atividade de anotações nos últimos 30 dias",
+  "recentActivity": "Atividade recente",
+  "latestEvents": "Seus últimos eventos de aprendizado",
+  "noActivity": "Sem atividade recente",
+  "errorLoadingUser": "Erro ao carregar dados do usuário",
+  "stats": {
+    "activeCourses": "Cursos ativos",
+    "learningStreak": "Sequência de aprendizado",
+    "studyTime": "Tempo de estudo",
+    "concepts": "Conceitos",
+    "coursesEnrolled": "Cursos matriculados",
+    "conceptsMastered": "Conceitos dominados",
+    "annotationsCreated": "Anotações criadas",
+    "weeklyGoal": "Meta semanal",
+    "days": "dias",
+    "hours": "horas",
+    "minutes": "minutos"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} dias de estudo",
+    "totalSessions": "{{count}} sessões de estudo no total",
+    "less": "Menos",
+    "more": "Mais"
+  },
+  "profile": {
+    "accountDetails": "Detalhes da conta",
+    "permissions": "Permissões",
+    "learningOverview": "Visão geral de aprendizagem",
+    "fields": {
+      "username": "Nome de usuário",
+      "email": "E-mail",
+      "role": "Função",
+      "tenantId": "ID do inquilino"
+    },
+    "stats": {
+      "coursesAvailable": "Cursos disponíveis",
+      "conceptsMastered": "Conceitos dominados",
+      "annotationsCreated": "Anotações criadas"
+    }
+  }
+}

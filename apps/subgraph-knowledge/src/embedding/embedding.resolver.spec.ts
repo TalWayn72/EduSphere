@@ -7,6 +7,7 @@ const mockEmbeddingService = {
   findById: vi.fn(),
   findByContentItem: vi.fn(),
   semanticSearch: vi.fn(),
+  semanticSearchByVector: vi.fn(),
   semanticSearchByContentItem: vi.fn(),
   create: vi.fn(),
   delete: vi.fn(),
@@ -52,45 +53,44 @@ describe('EmbeddingResolver', () => {
   });
 
   describe('semanticSearch()', () => {
-    it('calls embeddingService.semanticSearch with correct args', async () => {
-      mockEmbeddingService.semanticSearch.mockResolvedValue([MOCK_EMBED]);
+    it('calls embeddingService.semanticSearchByVector with correct args', async () => {
+      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([MOCK_EMBED]);
       const query = [0.1, 0.2, 0.3];
       const result = await resolver.semanticSearch(query, 5, 0.8);
-      expect(mockEmbeddingService.semanticSearch).toHaveBeenCalledWith(query, 5, 0.8);
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(query, 5, 0.8);
       expect(result).toHaveLength(1);
     });
 
     it('uses default limit=10 and minSimilarity=0.7 when not provided', async () => {
-      mockEmbeddingService.semanticSearch.mockResolvedValue([]);
+      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
       await resolver.semanticSearch([0.1, 0.2]);
-      expect(mockEmbeddingService.semanticSearch).toHaveBeenCalledWith([0.1, 0.2], 10, 0.7);
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith([0.1, 0.2], 10, 0.7);
     });
   });
 
   describe('semanticSearchByContentItem()', () => {
-    it('calls embeddingService.semanticSearchByContentItem with correct args', async () => {
-      mockEmbeddingService.semanticSearchByContentItem.mockResolvedValue([]);
+    it('delegates to embeddingService.semanticSearchByVector (legacy shim)', async () => {
+      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
       const result = await resolver.semanticSearchByContentItem('content-1', [0.1, 0.2], 3);
-      expect(mockEmbeddingService.semanticSearchByContentItem).toHaveBeenCalledWith(
-        'content-1', [0.1, 0.2], 3
-      );
+      // Resolver ignores contentItemId and delegates entirely to semanticSearchByVector
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith([0.1, 0.2], 3, 0.7);
       expect(result).toEqual([]);
     });
 
     it('uses default limit=5 when not provided', async () => {
-      mockEmbeddingService.semanticSearchByContentItem.mockResolvedValue([]);
+      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
       await resolver.semanticSearchByContentItem('content-1', [0.1]);
-      expect(mockEmbeddingService.semanticSearchByContentItem).toHaveBeenCalledWith(
-        'content-1', [0.1], 5
-      );
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith([0.1], 5, 0.7);
     });
   });
 
   describe('createEmbedding()', () => {
-    it('calls embeddingService.create with provided input', async () => {
-      mockEmbeddingService.create.mockRejectedValue(new Error('Use specific method'));
-      await expect(resolver.createEmbedding({ type: 'content' })).rejects.toThrow(Error);
-      expect(mockEmbeddingService.create).toHaveBeenCalledWith({ type: 'content' });
+    it('throws immediately without calling embeddingService.create', async () => {
+      // Resolver throws before delegating — create is intentionally disabled
+      await expect(resolver.createEmbedding({ type: 'content' })).rejects.toThrow(
+        'Use generateEmbedding'
+      );
+      expect(mockEmbeddingService.create).not.toHaveBeenCalled();
     });
   });
 

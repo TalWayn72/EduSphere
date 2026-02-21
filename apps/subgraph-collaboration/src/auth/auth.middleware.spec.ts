@@ -10,10 +10,9 @@ const { mockExtractToken, mockValidate } = vi.hoisted(() => {
 });
 
 vi.mock('@edusphere/auth', () => ({
-  JWTValidator: vi.fn().mockImplementation(() => ({
-    extractToken: mockExtractToken,
-    validate: mockValidate,
-  })),
+  JWTValidator: vi.fn(function() {
+    return { extractToken: mockExtractToken, validate: mockValidate };
+  }),
 }));
 
 import { AuthMiddleware } from './auth.middleware';
@@ -203,7 +202,7 @@ describe('AuthMiddleware', () => {
 
       try {
         await middleware.validateRequest(ctx);
-      } catch (_) { /* expected */ }
+      } catch { /* expected */ }
 
       expect(ctx.authContext).toBeUndefined();
     });

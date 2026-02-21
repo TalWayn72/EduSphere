@@ -1,0 +1,50 @@
+{
+  "loading": "Загрузка...",
+  "error": "Произошла ошибка",
+  "retry": "Повторить",
+  "cancel": "Отмена",
+  "save": "Сохранить",
+  "back": "Назад",
+  "search": "Поиск...",
+  "searchPlaceholder": "Поиск...",
+  "searchHint": "Поиск по всем курсам, транскриптам, аннотациям и концепциям",
+  "searchFullPlaceholder": "Поиск курсов, транскриптов, аннотаций, концепций...",
+  "signIn": "Войти",
+  "logOut": "Выйти",
+  "profile": "Профиль",
+  "settings": "Настройки",
+  "yes": "Да",
+  "no": "Нет",
+  "close": "Закрыть",
+  "confirm": "Подтвердить",
+  "delete": "Удалить",
+  "edit": "Редактировать",
+  "create": "Создать",
+  "submit": "Отправить",
+  "noResults": "Результаты не найдены",
+  "viewAll": "Смотреть всё",
+  "learnMore": "Узнать больше",
+  "optional": "Необязательно",
+  "required": "Обязательно",
+  "add": "Добавить",
+  "annotations": "Аннотации",
+  "graph": "Граф",
+  "accountInformation": "Информация об аккаунте",
+  "errorLoadingUser": "Ошибка загрузки данных пользователя",
+  "profilePage": {
+    "accountDetails": "Детали аккаунта",
+    "permissions": "Разрешения",
+    "learningOverview": "Обзор обучения",
+    "fields": {
+      "username": "Имя пользователя",
+      "email": "Электронная почта",
+      "role": "Роль",
+      "tenantId": "ID клиента"
+    },
+    "stats": {
+      "coursesAvailable": "Доступные курсы",
+      "conceptsMastered": "Освоенные концепции",
+      "annotationsCreated": "Созданные аннотации"
+    }
+  }
+}

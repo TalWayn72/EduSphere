@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -57,23 +58,25 @@ interface CreateCourseVariables {
   };
 }
 
-const STEPS = [
-  { label: 'Course Info', description: 'Title, description, difficulty' },
-  { label: 'Modules', description: 'Add and order course modules' },
-  { label: 'Media', description: 'Upload videos, audio, documents' },
-  { label: 'Publish', description: 'Review and publish' },
-];
-
 const DRAFT_COURSE_ID = 'draft';
 
 export function CourseCreatePage() {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const user = getCurrentUser();
+
+  const STEPS = [
+    { label: t('wizard.step1Label'), description: t('wizard.step1Description') },
+    { label: t('wizard.step2Label'), description: t('wizard.step2Description') },
+    { label: t('wizard.mediaLabel'), description: t('wizard.mediaDescription') },
+    { label: t('wizard.publishLabel'), description: t('wizard.publishDescription') },
+  ];
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
 
   const form = useForm<CourseSchemaValues>({
-    resolver: zodResolver(courseSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(courseSchema as any),
     defaultValues: {
       title: '',
       description: '',
@@ -163,9 +166,9 @@ export function CourseCreatePage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Courses
+            {t('title')}
           </Button>
-          <h1 className="text-2xl font-bold">Create New Course</h1>
+          <h1 className="text-2xl font-bold">{t('createCourse')}</h1>
         </div>
 
         {/* Step indicator */}
@@ -233,13 +236,13 @@ export function CourseCreatePage() {
               disabled={step === 0}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              {t('wizard.back')}
             </Button>
             <Button
               onClick={step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)}
               disabled={step === 0 && !canAdvanceStep1}
             >
-              Next
+              {t('wizard.next')}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
@@ -248,7 +251,7 @@ export function CourseCreatePage() {
           <div className="flex justify-start">
             <Button variant="outline" onClick={() => setStep(lastContentStep)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Media
+              {t('wizard.backToMedia')}
             </Button>
           </div>
         )}

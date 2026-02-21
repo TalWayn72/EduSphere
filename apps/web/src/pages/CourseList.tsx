@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,11 +71,11 @@ const MOCK_COURSES_FALLBACK: CourseItem[] = [
   },
 ];
 
-function OfflineBanner({ message }: { message: string }) {
+function OfflineBanner({ message, cachedLabel }: { message: string; cachedLabel: string }) {
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md">
       <AlertTriangle className="h-3 w-3 flex-shrink-0" />
-      {message} — showing cached data.
+      {message} — {cachedLabel}
     </div>
   );
 }
@@ -97,6 +98,7 @@ interface MyEnrollmentsResult {
 }
 
 export function CourseList() {
+  const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const location = useLocation();
   const user = getCurrentUser();
@@ -194,20 +196,20 @@ export function CourseList() {
 
       <div className="space-y-6">
         {error && (
-          <OfflineBanner message={`[Network] Failed to fetch — ${error.message}`} />
+          <OfflineBanner message={`[Network] Failed to fetch — ${error.message}`} cachedLabel={t('showingCachedData')} />
         )}
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Courses</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
             <p className="text-muted-foreground">
-              Explore our collection of courses and start your learning journey
+              {t('exploreCollection')}
             </p>
           </div>
           {isInstructor && (
             <Button onClick={() => navigate('/courses/new')} className="gap-2 shrink-0">
               <Plus className="h-4 w-4" />
-              New Course
+              {t('newCourse')}
             </Button>
           )}
         </div>
@@ -215,7 +217,7 @@ export function CourseList() {
         {fetching && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="text-sm">Loading courses...</span>
+            <span className="text-sm">{t('loadingCourses')}</span>
           </div>
         )}
 
@@ -231,12 +233,12 @@ export function CourseList() {
               >
                 {isInstructor && !published && (
                   <div className="absolute top-3 right-3 bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full">
-                    Draft
+                    {t('draft')}
                   </div>
                 )}
                 {!isInstructor && isEnrolled && (
                   <div className="absolute top-3 right-3 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full font-medium">
-                    Enrolled
+                    {t('enrolled')}
                   </div>
                 )}
 
@@ -252,7 +254,7 @@ export function CourseList() {
                         navigate(`/courses/${course.id}`);
                       }}
                     >
-                      Open
+                      {t('open')}
                     </Button>
                   </div>
                   <CardTitle className="text-xl leading-snug">{course.title}</CardTitle>
@@ -264,7 +266,7 @@ export function CourseList() {
                     {course.estimatedHours != null && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="h-4 w-4 shrink-0" />
-                        <span>{course.estimatedHours}h estimated</span>
+                        <span>{t('hoursEstimated', { hours: course.estimatedHours })}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -282,10 +284,10 @@ export function CourseList() {
                         {isEnrolled ? (
                           <>
                             <CheckCircle2 className="h-4 w-4" />
-                            Enrolled
+                            {t('enrolled')}
                           </>
                         ) : (
-                          'Enroll'
+                          t('enroll')
                         )}
                       </Button>
                     )}
@@ -302,7 +304,7 @@ export function CourseList() {
                           }}
                         >
                           <Pencil className="h-3.5 w-3.5" />
-                          Edit
+                          {t('edit')}
                         </Button>
                         <Button
                           variant="ghost"
@@ -313,12 +315,12 @@ export function CourseList() {
                           {published ? (
                             <>
                               <EyeOff className="h-3.5 w-3.5" />
-                              Unpublish
+                              {t('unpublishCourse')}
                             </>
                           ) : (
                             <>
                               <Globe className="h-3.5 w-3.5" />
-                              Publish
+                              {t('publishCourse')}
                             </>
                           )}
                         </Button>
@@ -335,7 +337,7 @@ export function CourseList() {
           <Card>
             <CardContent className="pt-6 text-center">
               <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">No courses available yet.</p>
+              <p className="text-sm text-muted-foreground">{t('noCoursesYet')}</p>
             </CardContent>
           </Card>
         )}

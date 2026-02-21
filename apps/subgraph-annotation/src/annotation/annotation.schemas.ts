@@ -16,20 +16,20 @@ export const AnnotationLayer = z.enum([
 ]);
 
 export const CreateAnnotationInputSchema = z.object({
-  assetId: z.string().uuid('Asset ID must be a valid UUID'),
+  assetId: z.string().uuid(),
   annotationType: AnnotationType,
   layer: AnnotationLayer.default('PERSONAL'),
-  content: z.record(z.unknown()).describe('JSON content of the annotation'),
+  content: z.record(z.string(), z.unknown()).describe('JSON content of the annotation'),
   spatialData: z
-    .record(z.unknown())
+    .record(z.string(), z.unknown())
     .optional()
     .describe('Spatial positioning data'),
-  parentId: z.string().uuid('Parent ID must be a valid UUID').optional(),
+  parentId: z.string().uuid().optional(),
 });
 
 export const UpdateAnnotationInputSchema = z.object({
-  content: z.record(z.unknown()).optional(),
-  spatialData: z.record(z.unknown()).optional(),
+  content: z.record(z.string(), z.unknown()).optional(),
+  spatialData: z.record(z.string(), z.unknown()).optional(),
   isResolved: z.boolean().optional(),
 });
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { type Control } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function CourseWizardStep1({ control }: Props) {
+  const { t } = useTranslation('courses');
   return (
     <div className="space-y-6">
       <FormField
@@ -31,9 +33,9 @@ export function CourseWizardStep1({ control }: Props) {
         name="title"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Course Title *</FormLabel>
+            <FormLabel>{t('wizard.courseTitleLabel')}</FormLabel>
             <FormControl>
-              <Input placeholder="e.g. Introduction to Talmud Study" {...field} />
+              <Input placeholder={t('wizard.courseTitlePlaceholder')} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -45,10 +47,10 @@ export function CourseWizardStep1({ control }: Props) {
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>{t('wizard.descriptionLabel')}</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="What will students learn in this course?"
+                placeholder={t('wizard.courseDescriptionPlaceholder')}
                 rows={4}
                 {...field}
               />
@@ -64,7 +66,7 @@ export function CourseWizardStep1({ control }: Props) {
           name="difficulty"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Difficulty Level</FormLabel>
+              <FormLabel>{t('wizard.difficultyLabel')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -89,9 +91,9 @@ export function CourseWizardStep1({ control }: Props) {
           name="duration"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Duration</FormLabel>
+              <FormLabel>{t('wizard.durationLabel')}</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. 6 weeks" {...field} />
+                <Input placeholder={t('wizard.durationPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,7 +106,7 @@ export function CourseWizardStep1({ control }: Props) {
         name="thumbnail"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Thumbnail Icon</FormLabel>
+            <FormLabel>{t('wizard.thumbnailLabel')}</FormLabel>
             <FormControl>
               <div className="flex flex-wrap gap-2">
                 {THUMBNAIL_OPTIONS.map((emoji) => (

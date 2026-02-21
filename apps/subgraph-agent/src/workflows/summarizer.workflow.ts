@@ -7,7 +7,8 @@
  * with key concepts, main points, and learning objectives.
  */
 
-import { generateText, streamText, type LanguageModelV1 } from 'ai';
+import { generateText, streamText, type LanguageModel } from 'ai';
+import { injectLocale } from '../ai/locale-prompt';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -152,15 +153,18 @@ function parseSummaryOutput(raw: string): SummaryOutput | null {
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
-export function createSummarizerWorkflow(model: LanguageModelV1) {
+export function createSummarizerWorkflow(model: LanguageModel, locale: string = 'en') {
+  const BASE_SYSTEM = 'You are an expert educational content summarizer.';
+  const system = injectLocale(BASE_SYSTEM, locale);
+
   async function step(ctx: SummarizerContext): Promise<SummarizerResult> {
     switch (ctx.currentState) {
       case 'EXTRACT': {
         const { text } = await generateText({
           model,
+          system,
           prompt: EXTRACT_PROMPT(ctx.content),
           temperature: 0.2,
-          maxTokens: 800,
         });
         return {
           text: 'Content extracted. Building outline...',
@@ -173,9 +177,9 @@ export function createSummarizerWorkflow(model: LanguageModelV1) {
       case 'OUTLINE': {
         const { text } = await generateText({
           model,
+          system,
           prompt: OUTLINE_PROMPT(ctx.rawExtraction),
           temperature: 0.3,
-          maxTokens: 600,
         });
         return {
           text: 'Outline created. Drafting summary...',
@@ -188,9 +192,9 @@ export function createSummarizerWorkflow(model: LanguageModelV1) {
       case 'DRAFT': {
         const { text } = await generateText({
           model,
+          system,
           prompt: DRAFT_PROMPT(ctx.content, ctx.outline),
           temperature: 0.5,
-          maxTokens: 700,
         });
         return {
           text: 'Draft complete. Refining...',
@@ -203,9 +207,9 @@ export function createSummarizerWorkflow(model: LanguageModelV1) {
       case 'REFINE': {
         const { text } = await generateText({
           model,
+          system,
           prompt: REFINE_PROMPT(ctx.draft, ctx.content),
           temperature: 0.3,
-          maxTokens: 900,
         });
         const summary = parseSummaryOutput(text);
         return {
@@ -240,7 +244,12 @@ export function createSummarizerWorkflow(model: LanguageModelV1) {
             ? DRAFT_PROMPT(ctx.content, ctx.outline)
             : REFINE_PROMPT(ctx.draft, ctx.content);
 
-    return streamText({ model, prompt, temperature: 0.3, maxTokens: 900 });
+    return streamText({
+      model,
+      system,
+      prompt,
+      temperature: 0.5,
+    });
   }
 
   return { step, stream };

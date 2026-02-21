@@ -2,6 +2,7 @@ import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
+import { injectLocale } from './locale-prompt';
 
 const DebateStateSchema = z.object({
   topic: z.string(),
@@ -26,12 +27,12 @@ export type DebateState = z.infer<typeof DebateStateSchema>;
 
 const DebateStateAnnotation = Annotation.Root({
   topic: Annotation<string>(),
-  position: Annotation<'for' | 'against'>({ default: () => 'for' }),
-  rounds: Annotation<number>({ default: () => 3 }),
-  currentRound: Annotation<number>({ default: () => 1 }),
-  arguments: Annotation<DebateState['arguments']>({ default: () => [] }),
-  synthesis: Annotation<string | undefined>({ default: () => undefined }),
-  isComplete: Annotation<boolean>({ default: () => false }),
+  position: Annotation<'for' | 'against'>({ value: (_, u) => u, default: () => 'for' }),
+  rounds: Annotation<number>({ value: (_, u) => u, default: () => 3 }),
+  currentRound: Annotation<number>({ value: (_, u) => u, default: () => 1 }),
+  arguments: Annotation<DebateState['arguments']>({ value: (_, u) => u, default: () => [] }),
+  synthesis: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
 /**
@@ -40,25 +41,30 @@ const DebateStateAnnotation = Annotation.Root({
  */
 export class ChavrutaDebateWorkflow {
   private model: string;
-  private graph: StateGraph<typeof DebateStateAnnotation.State>;
+  private locale: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private graph: any;
 
-  constructor(model: string = 'gpt-4-turbo') {
+  constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
+    this.locale = locale;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<typeof DebateStateAnnotation.State> {
-    const graph = new StateGraph(DebateStateAnnotation);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private buildGraph(): any {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const graph = new StateGraph(DebateStateAnnotation) as any;
 
     graph.addNode('argue', this.argueNode.bind(this));
     graph.addNode('counter', this.counterNode.bind(this));
     graph.addNode('synthesize', this.synthesizeNode.bind(this));
 
     graph.addEdge(START, 'argue');
-    graph.addConditionalEdges('argue', (state) => {
+    graph.addConditionalEdges('argue', (state: DebateState) => {
       return state.currentRound <= state.rounds ? 'counter' : 'synthesize';
     });
-    graph.addConditionalEdges('counter', (state) => {
+    graph.addConditionalEdges('counter', (state: DebateState) => {
       return state.currentRound < state.rounds ? 'argue' : 'synthesize';
     });
     graph.addEdge('synthesize', END);
@@ -68,7 +74,9 @@ export class ChavrutaDebateWorkflow {
 
   private async argueNode(state: DebateState): Promise<Partial<DebateState>> {
     const { text } = await generateText({
-      model: openai(this.model),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
+      system: injectLocale('You are a skilled debate participant.', this.locale),
       prompt: `You are arguing ${state.position === 'for' ? 'FOR' : 'AGAINST'} the following topic:
 "${state.topic}"
 
@@ -91,9 +99,12 @@ Provide a strong, logical argument for your position. Use evidence and reasoning
 
   private async counterNode(state: DebateState): Promise<Partial<DebateState>> {
     const lastArgument = state.arguments[state.arguments.length - 1];
+    if (!lastArgument) return {};
 
     const { text } = await generateText({
-      model: openai(this.model),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
+      system: injectLocale('You are a skilled debate participant.', this.locale),
       prompt: `You are arguing ${state.position === 'for' ? 'AGAINST' : 'FOR'} the following topic:
 "${state.topic}"
 
@@ -104,7 +115,8 @@ Provide a strong counter-argument that addresses their points while advancing yo
     });
 
     const updatedArguments = [...state.arguments];
-    updatedArguments[updatedArguments.length - 1].counterArgument = text;
+    const last = updatedArguments[updatedArguments.length - 1];
+    if (last) last.counterArgument = text;
 
     return {
       arguments: updatedArguments,
@@ -123,8 +135,10 @@ Provide a strong counter-argument that addresses their points while advancing yo
       .join('\n\n');
 
     const { text } = await generateText({
-      model: openai(this.model),
-      prompt: `You are a philosophical teacher. Synthesize the following debate:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      model: openai(this.model) as any,
+      system: injectLocale('You are a philosophical teacher.', this.locale),
+      prompt: `Synthesize the following debate:
 
 Topic: "${state.topic}"
 
@@ -144,7 +158,7 @@ Provide:
   }
 
   compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+    return this.graph.compile(opts);
   }
 
   async run(initialState: Partial<DebateState>): Promise<DebateState> {
@@ -154,6 +168,6 @@ Provide:
   }
 }
 
-export function createDebateWorkflow(model?: string): ChavrutaDebateWorkflow {
-  return new ChavrutaDebateWorkflow(model);
+export function createDebateWorkflow(model?: string, locale: string = 'en'): ChavrutaDebateWorkflow {
+  return new ChavrutaDebateWorkflow(model, locale);
 }

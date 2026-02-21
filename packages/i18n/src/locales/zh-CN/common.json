@@ -1,0 +1,50 @@
+{
+  "loading": "加载中...",
+  "error": "发生错误",
+  "retry": "重试",
+  "cancel": "取消",
+  "save": "保存",
+  "back": "返回",
+  "search": "搜索...",
+  "searchPlaceholder": "搜索...",
+  "searchHint": "搜索所有课程、字幕、注释和概念",
+  "searchFullPlaceholder": "搜索课程、字幕、注释、概念...",
+  "signIn": "登录",
+  "logOut": "退出登录",
+  "profile": "个人资料",
+  "settings": "设置",
+  "yes": "是",
+  "no": "否",
+  "close": "关闭",
+  "confirm": "确认",
+  "delete": "删除",
+  "edit": "编辑",
+  "create": "创建",
+  "submit": "提交",
+  "noResults": "未找到结果",
+  "viewAll": "查看全部",
+  "learnMore": "了解更多",
+  "optional": "可选",
+  "required": "必填",
+  "add": "添加",
+  "annotations": "注释",
+  "graph": "图谱",
+  "accountInformation": "账户信息",
+  "errorLoadingUser": "加载用户数据时出错",
+  "profilePage": {
+    "accountDetails": "账户详情",
+    "permissions": "权限",
+    "learningOverview": "学习概览",
+    "fields": {
+      "username": "用户名",
+      "email": "邮箱",
+      "role": "角色",
+      "tenantId": "租户ID"
+    },
+    "stats": {
+      "coursesAvailable": "可用课程",
+      "conceptsMastered": "已掌握概念",
+      "annotationsCreated": "已创建注释"
+    }
+  }
+}

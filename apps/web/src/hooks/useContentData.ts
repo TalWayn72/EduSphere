@@ -48,9 +48,13 @@ export interface ContentData {
 }
 
 export function useContentData(contentId: string): ContentData {
+  // contentItem(id: ID!) is not yet exposed in the supergraph schema.
+  // The query is paused to avoid HTTP 400 validation errors in the console.
+  // The hook falls back to mock data below. Tracked in OPEN_ISSUES.md.
   const [result] = useQuery<ContentQueryResult>({
     query: CONTENT_ITEM_QUERY,
     variables: { id: contentId },
+    pause: true,
   });
 
   const item = result.data?.contentItem;

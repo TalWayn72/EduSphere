@@ -1,0 +1,50 @@
+{
+  "loading": "Memuat...",
+  "error": "Terjadi kesalahan",
+  "retry": "Coba lagi",
+  "cancel": "Batal",
+  "save": "Simpan",
+  "back": "Kembali",
+  "search": "Cari...",
+  "searchPlaceholder": "Cari...",
+  "searchHint": "Cari di semua kursus, transkrip, anotasi dan konsep",
+  "searchFullPlaceholder": "Cari kursus, transkrip, anotasi, konsep...",
+  "signIn": "Masuk",
+  "logOut": "Keluar",
+  "profile": "Profil",
+  "settings": "Pengaturan",
+  "yes": "Ya",
+  "no": "Tidak",
+  "close": "Tutup",
+  "confirm": "Konfirmasi",
+  "delete": "Hapus",
+  "edit": "Edit",
+  "create": "Buat",
+  "submit": "Kirim",
+  "noResults": "Tidak ada hasil yang ditemukan",
+  "viewAll": "Lihat semua",
+  "learnMore": "Pelajari lebih lanjut",
+  "optional": "Opsional",
+  "required": "Wajib",
+  "add": "Tambah",
+  "annotations": "Anotasi",
+  "graph": "Grafik",
+  "accountInformation": "Informasi akun",
+  "errorLoadingUser": "Gagal memuat data pengguna",
+  "profilePage": {
+    "accountDetails": "Detail akun",
+    "permissions": "Izin",
+    "learningOverview": "Ikhtisar pembelajaran",
+    "fields": {
+      "username": "Nama pengguna",
+      "email": "Email",
+      "role": "Peran",
+      "tenantId": "ID penyewa"
+    },
+    "stats": {
+      "coursesAvailable": "Kursus tersedia",
+      "conceptsMastered": "Konsep yang dikuasai",
+      "annotationsCreated": "Anotasi dibuat"
+    }
+  }
+}

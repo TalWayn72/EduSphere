@@ -458,7 +458,7 @@ export class CypherService {
       await client.query('SET search_path = ag_catalog, "$user", public');
       await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
-      const paramsJson = JSON.stringify({ fromName, toName, tenantId }).replace(/'/g, "''");
+      // AGE requires the params to be a SQL parameter ($1), not a string literal.
       const sql = `
         SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$
           MATCH (start:Concept {tenant_id: $tenantId}), (end:Concept {tenant_id: $tenantId})
@@ -466,10 +466,10 @@ export class CypherService {
           MATCH path = shortestPath((start)-[:RELATED_TO|PREREQUISITE_OF*1..10]-(end))
           RETURN [node IN nodes(path) | {id: node.id, name: node.name, type: node.type}] AS concepts,
                  length(path) AS steps
-        $$, '${paramsJson}') AS (concepts ag_catalog.agtype, steps ag_catalog.agtype)
+        $$, $1) AS (concepts ag_catalog.agtype, steps ag_catalog.agtype)
       `;
 
-      const result = await client.query(sql);
+      const result = await client.query(sql, [JSON.stringify({ fromName, toName, tenantId })]);
       if (!result.rows || result.rows.length === 0) {
         return null;
       }
@@ -515,17 +515,17 @@ export class CypherService {
       await client.query('SET search_path = ag_catalog, "$user", public');
       await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
-      const paramsJson = JSON.stringify({ conceptName, tenantId }).replace(/'/g, "''");
+      // AGE requires the params to be a SQL parameter ($1), not a string literal.
       const sql = `
         SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$
           MATCH (c:Concept {tenant_id: $tenantId})
           WHERE toLower(c.name) = toLower($conceptName)
           MATCH (c)-[:RELATED_TO*1..${safeDepth}]-(related:Concept {tenant_id: $tenantId})
           RETURN COLLECT(DISTINCT {id: related.id, name: related.name, type: related.type}) AS related
-        $$, '${paramsJson}') AS (related ag_catalog.agtype)
+        $$, $1) AS (related ag_catalog.agtype)
       `;
 
-      const result = await client.query(sql);
+      const result = await client.query(sql, [JSON.stringify({ conceptName, tenantId })]);
       if (!result.rows || result.rows.length === 0) {
         return [];
       }
@@ -561,7 +561,7 @@ export class CypherService {
       await client.query('SET search_path = ag_catalog, "$user", public');
       await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
-      const paramsJson = JSON.stringify({ conceptName, tenantId }).replace(/'/g, "''");
+      // AGE requires the params to be a SQL parameter ($1), not a string literal.
       const sql = `
         SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$
           MATCH (c:Concept {tenant_id: $tenantId})
@@ -570,10 +570,10 @@ export class CypherService {
           RETURN [node IN nodes(path) | {id: node.id, name: node.name}] AS chain
           ORDER BY length(path) DESC
           LIMIT 1
-        $$, '${paramsJson}') AS (chain ag_catalog.agtype)
+        $$, $1) AS (chain ag_catalog.agtype)
       `;
 
-      const result = await client.query(sql);
+      const result = await client.query(sql, [JSON.stringify({ conceptName, tenantId })]);
       if (!result.rows || result.rows.length === 0) {
         return [];
       }

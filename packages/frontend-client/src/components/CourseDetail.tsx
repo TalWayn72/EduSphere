@@ -24,6 +24,21 @@ const COURSE_DETAIL_QUERY = gql`
   }
 `;
 
+interface ContentItem {
+  id: string;
+  title: string;
+  type: string;
+  orderIndex: number;
+}
+
+interface CourseModule {
+  id: string;
+  title: string;
+  description?: string;
+  orderIndex: number;
+  contentItems?: ContentItem[];
+}
+
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const { data, loading, error } = useQuery(COURSE_DETAIL_QUERY, {
@@ -42,7 +57,7 @@ export default function CourseDetail() {
 
       <div style={{ marginTop: '30px' }}>
         <h3>📖 Modules</h3>
-        {course.modules?.map((module: any) => (
+        {course.modules?.map((module: CourseModule) => (
           <div
             key={module.id}
             style={{
@@ -55,11 +70,11 @@ export default function CourseDetail() {
             <h4>{module.title}</h4>
             <p style={{ color: '#666' }}>{module.description}</p>
 
-            {module.contentItems?.length > 0 && (
+            {(module.contentItems?.length ?? 0) > 0 && (
               <div style={{ marginTop: '15px' }}>
                 <strong>Content:</strong>
                 <ul>
-                  {module.contentItems.map((item: any) => (
+                  {module.contentItems?.map((item: ContentItem) => (
                     <li key={item.id}>
                       {item.type === 'VIDEO' && '🎥 '}
                       {item.type === 'READING' && '📄 '}

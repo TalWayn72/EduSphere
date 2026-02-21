@@ -59,7 +59,8 @@ describe('CypherService', function() {
     it('passes params to executeCypher', async function() {
       (executeCypher as any).mockResolvedValue([RAW]);
       await service.findConceptById('c-1', 't-1');
-      expect(executeCypher).toHaveBeenCalledWith(expect.anything(), 'edusphere_graph', expect.any(String), { id: 'c-1', tenantId: 't-1' });
+      // executeCypher is called with 5 args: db, graphName, query, params, tenantId
+      expect(executeCypher).toHaveBeenCalledWith(expect.anything(), 'edusphere_graph', expect.any(String), { id: 'c-1', tenantId: 't-1' }, 't-1');
     });
   });
 
@@ -95,11 +96,13 @@ describe('CypherService', function() {
     it('calls executeCypher with MERGE RELATED_TO query', async function() {
       (executeCypher as any).mockResolvedValue([]);
       await service.linkConceptsByName('Metaphysics', 'Ontology', 't-1', 0.7);
+      // 5th arg is tenantId passed for RLS set_config inside executeCypher
       expect(executeCypher).toHaveBeenCalledWith(
         expect.anything(),
         'edusphere_graph',
         expect.stringContaining('MERGE'),
-        expect.objectContaining({ fromName: 'Metaphysics', toName: 'Ontology', tenantId: 't-1', strength: 0.7 })
+        expect.objectContaining({ fromName: 'Metaphysics', toName: 'Ontology', tenantId: 't-1', strength: 0.7 }),
+        't-1'
       );
     });
     it('uses default strength of 0.7 when not specified', async function() {
@@ -239,7 +242,8 @@ describe('CypherService', function() {
       mockClientQuery
         .mockResolvedValueOnce({}) // LOAD 'age'
         .mockResolvedValueOnce({}) // SET search_path
-        .mockResolvedValueOnce({ rows: [{ concepts: conceptsJson, steps: '1' }] });
+        .mockResolvedValueOnce({}) // SELECT set_config (set_config call for RLS)
+        .mockResolvedValueOnce({ rows: [{ concepts: conceptsJson, steps: '1' }] }); // cypher
       const result = await service.findShortestLearningPath('Algebra', 'Calculus', 't-1');
       expect(result).not.toBeNull();
       expect(result!.steps).toBe(1);
@@ -266,19 +270,20 @@ describe('CypherService', function() {
       expect(mockRelease).toHaveBeenCalled();
     });
 
-    it('includes fromName, toName, tenantId in the cypher SQL', async function() {
+    it('includes fromName, toName, tenantId in the cypher SQL / pg params', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({ rows: [] });
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
+        .mockResolvedValueOnce({ rows: [] }); // cypher — index 3
       await service.findShortestLearningPath('Algebra', 'Calculus', 'tenant-42');
       const calls = mockClientQuery.mock.calls;
-      // Third call is the actual cypher SELECT
-      const cypherCall = calls[2][0] as string;
-      expect(cypherCall).toContain('shortestPath');
-      expect(cypherCall).toContain('Algebra');
-      expect(cypherCall).toContain('Calculus');
-      expect(cypherCall).toContain('tenant-42');
+      // 4th call (index 3) is the actual cypher SELECT
+      const cypherSql = calls[3]![0] as string;
+      const pgParams = JSON.parse((calls[3]![1] as string[])[0]);
+      expect(cypherSql).toContain('shortestPath');
+      // Values are now in the pg params JSON, not the SQL string
+      expect(pgParams).toMatchObject({ fromName: 'Algebra', toName: 'Calculus', tenantId: 'tenant-42' });
     });
   });
 
@@ -298,9 +303,10 @@ describe('CypherService', function() {
         { id: 'c-3', name: 'Dynamics', type: 'CONCEPT' },
       ]);
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({ rows: [{ related: relatedJson }] });
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
+        .mockResolvedValueOnce({ rows: [{ related: relatedJson }] }); // cypher
       const result = await service.collectRelatedConcepts('Physics', 2, 't-1');
       expect(result).toHaveLength(2);
       expect(result[0].name).toBe('Kinematics');
@@ -308,21 +314,23 @@ describe('CypherService', function() {
 
     it('clamps depth to minimum 1', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({ rows: [] });
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
+        .mockResolvedValueOnce({ rows: [] }); // cypher — index 3
       await service.collectRelatedConcepts('Physics', -5, 't-1');
-      const cypherSql = mockClientQuery.mock.calls[2][0] as string;
+      const cypherSql = mockClientQuery.mock.calls[3]![0] as string;
       expect(cypherSql).toContain('*1..1');
     });
 
     it('clamps depth to maximum 5', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({ rows: [] });
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
+        .mockResolvedValueOnce({ rows: [] }); // cypher — index 3
       await service.collectRelatedConcepts('Physics', 99, 't-1');
-      const cypherSql = mockClientQuery.mock.calls[2][0] as string;
+      const cypherSql = mockClientQuery.mock.calls[3]![0] as string;
       expect(cypherSql).toContain('*1..5');
     });
 
@@ -338,11 +346,12 @@ describe('CypherService', function() {
 
     it('includes COLLECT and DISTINCT in cypher query', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({ rows: [] });
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
+        .mockResolvedValueOnce({ rows: [] }); // cypher — index 3
       await service.collectRelatedConcepts('Physics', 2, 't-1');
-      const cypherSql = mockClientQuery.mock.calls[2][0] as string;
+      const cypherSql = mockClientQuery.mock.calls[3]![0] as string;
       expect(cypherSql).toContain('COLLECT');
       expect(cypherSql).toContain('DISTINCT');
     });
@@ -365,9 +374,10 @@ describe('CypherService', function() {
         { id: 'c-3', name: 'Calculus' },
       ]);
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({ rows: [{ chain: chainJson }] });
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
+        .mockResolvedValueOnce({ rows: [{ chain: chainJson }] }); // cypher
       const result = await service.findPrerequisiteChain('Calculus', 't-1');
       expect(result).toHaveLength(3);
       expect(result[0].name).toBe('Arithmetic');
@@ -376,11 +386,12 @@ describe('CypherService', function() {
 
     it('includes PREREQUISITE_OF and ORDER BY length in cypher query', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({ rows: [] });
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
+        .mockResolvedValueOnce({ rows: [] }); // cypher — index 3
       await service.findPrerequisiteChain('Calculus', 't-1');
-      const cypherSql = mockClientQuery.mock.calls[2][0] as string;
+      const cypherSql = mockClientQuery.mock.calls[3]![0] as string;
       expect(cypherSql).toContain('PREREQUISITE_OF');
       expect(cypherSql).toContain('ORDER BY');
       expect(cypherSql).toContain('LIMIT 1');

@@ -10,15 +10,14 @@ const mocks = vi.hoisted(() => {
     mockExtractToken: vi.fn(),
     mockValidate: vi.fn(),
     loggerInstance,
-    MockLogger: vi.fn().mockImplementation(() => loggerInstance),
+    MockLogger: vi.fn().mockImplementation(function() { return loggerInstance; }),
   };
 });
 
 vi.mock('@edusphere/auth', () => ({
-  JWTValidator: vi.fn().mockImplementation(() => ({
-    extractToken: mocks.mockExtractToken,
-    validate: mocks.mockValidate,
-  })),
+  JWTValidator: vi.fn().mockImplementation(function() {
+    return { extractToken: mocks.mockExtractToken, validate: mocks.mockValidate };
+  }),
 }));
 
 vi.mock('@nestjs/common', () => ({

@@ -8,6 +8,7 @@
 import { useTransition, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,6 +73,7 @@ interface ProgressData {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function CourseDetailPage() {
+  const { t } = useTranslation('courses');
   const { courseId = '' } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
 
@@ -112,10 +114,10 @@ export function CourseDetailPage() {
     startEnrollTransition(async () => {
       if (isEnrolled) {
         await unenrollMutation({ courseId });
-        showToast('Unenrolled from course');
+        showToast(t('unenroll'));
       } else {
         await enrollMutation({ courseId });
-        showToast('Enrolled successfully!');
+        showToast(t('enrolled'));
       }
     });
   };
@@ -125,7 +127,7 @@ export function CourseDetailPage() {
       <Layout>
         <div className="flex items-center gap-2 p-6 text-destructive">
           <AlertCircle className="h-5 w-5" />
-          <span>Failed to load course: {error.message}</span>
+          <span>{t('failedToLoad', { message: error.message })}</span>
         </div>
       </Layout>
     );
@@ -136,7 +138,7 @@ export function CourseDetailPage() {
       <Layout>
         <div className="flex items-center gap-2 text-muted-foreground p-6">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Loading course…</span>
+          <span>{t('loadingCourse')}</span>
         </div>
       </Layout>
     );
@@ -157,7 +159,7 @@ export function CourseDetailPage() {
         {/* Back navigation */}
         <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate('/courses')}>
           <ArrowLeft className="h-4 w-4" />
-          All Courses
+          {t('backToCourses')}
         </Button>
 
         {/* Course header card */}
@@ -179,12 +181,12 @@ export function CourseDetailPage() {
                   )}
                   <span className="flex items-center gap-1.5">
                     <BookOpen className="h-4 w-4" />
-                    {totalItems} items in {course.modules.length} modules
+                    {t('itemsInModules', { items: totalItems, modules: course.modules.length })}
                   </span>
                   {isEnrolled && progress && (
                     <span className="flex items-center gap-1.5 text-primary">
                       <Users className="h-4 w-4" />
-                      {progress.percentComplete}% complete
+                      {t('percentComplete', { percent: progress.percentComplete })}
                     </span>
                   )}
                 </div>
@@ -196,7 +198,7 @@ export function CourseDetailPage() {
                 disabled={isEnrolling}
               >
                 {isEnrolling && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isEnrolling ? (isEnrolled ? 'Unenrolling...' : 'Enrolling...') : (isEnrolled ? 'Unenroll' : 'Enroll')}
+                {isEnrolling ? (isEnrolled ? t('unenrolling') : t('enrolling')) : (isEnrolled ? t('unenroll') : t('enroll'))}
               </Button>
             </div>
           </CardHeader>
@@ -206,7 +208,7 @@ export function CourseDetailPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{progress.completedItems} of {progress.totalItems} completed</span>
+                  <span>{t('completedOfTotal', { completed: progress.completedItems, total: progress.totalItems })}</span>
                   <span>{progress.percentComplete}%</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">

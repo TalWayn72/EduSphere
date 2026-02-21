@@ -7,6 +7,6 @@ import { EmbeddingModule } from '../embedding/embedding.module';
 @Module({
   imports: [EmbeddingModule],
   providers: [GraphResolver, GraphService, CypherService],
-  exports: [GraphService],
+  exports: [GraphService, CypherService],
 })
 export class GraphModule {}

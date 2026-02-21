@@ -1,0 +1,50 @@
+{
+  "loading": "लोड हो रहा है...",
+  "error": "एक त्रुटि हुई",
+  "retry": "पुनः प्रयास करें",
+  "cancel": "रद्द करें",
+  "save": "सहेजें",
+  "back": "वापस",
+  "search": "खोजें...",
+  "searchPlaceholder": "खोजें...",
+  "searchHint": "सभी पाठ्यक्रमों, प्रतिलेखों, एनोटेशन और अवधारणाओं में खोजें",
+  "searchFullPlaceholder": "पाठ्यक्रम, प्रतिलेख, एनोटेशन, अवधारणाएं खोजें...",
+  "signIn": "साइन इन करें",
+  "logOut": "लॉग आउट",
+  "profile": "प्रोफ़ाइल",
+  "settings": "सेटिंग्स",
+  "yes": "हाँ",
+  "no": "नहीं",
+  "close": "बंद करें",
+  "confirm": "पुष्टि करें",
+  "delete": "हटाएं",
+  "edit": "संपादित करें",
+  "create": "बनाएं",
+  "submit": "जमा करें",
+  "noResults": "कोई परिणाम नहीं मिला",
+  "viewAll": "सभी देखें",
+  "learnMore": "और जानें",
+  "optional": "वैकल्पिक",
+  "required": "आवश्यक",
+  "add": "जोड़ें",
+  "annotations": "एनोटेशन",
+  "graph": "ग्राफ",
+  "accountInformation": "खाता जानकारी",
+  "errorLoadingUser": "उपयोगकर्ता डेटा लोड करने में त्रुटि",
+  "profilePage": {
+    "accountDetails": "खाता विवरण",
+    "permissions": "अनुमतियां",
+    "learningOverview": "सीखने का अवलोकन",
+    "fields": {
+      "username": "उपयोगकर्ता नाम",
+      "email": "ईमेल",
+      "role": "भूमिका",
+      "tenantId": "टेनेंट आईडी"
+    },
+    "stats": {
+      "coursesAvailable": "उपलब्ध पाठ्यक्रम",
+      "conceptsMastered": "महारत हासिल अवधारणाएं",
+      "annotationsCreated": "बनाए गए एनोटेशन"
+    }
+  }
+}

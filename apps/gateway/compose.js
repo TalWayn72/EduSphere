@@ -8,9 +8,8 @@ const require = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const path = require('path');
 
-const COMPOSE_PATH = '/app/node_modules/.pnpm/@theguild+federation-composition@0.21.3_graphql@16.12.0/node_modules/@theguild/federation-composition/cjs/index.js';
-const { composeServices } = require(COMPOSE_PATH);
-const { parse } = require('/app/node_modules/.pnpm/graphql@16.12.0/node_modules/graphql/index.js');
+const { composeServices } = require('@theguild/federation-composition');
+const { parse } = require('graphql');
 
 const SUBGRAPHS = [
   { name: 'core',          url: 'http://localhost:4001/graphql' },

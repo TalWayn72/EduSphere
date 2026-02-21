@@ -8,7 +8,8 @@
  * replacing it with @langchain/langgraph later is a drop-in swap.
  */
 
-import { generateText, streamText, type LanguageModelV1 } from 'ai';
+import { generateText, streamText, type LanguageModel } from 'ai';
+import { injectLocale } from '../ai/locale-prompt';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -103,9 +104,9 @@ function buildMessages(
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
-export function createChavrutaWorkflow(model: LanguageModelV1) {
+export function createChavrutaWorkflow(model: LanguageModel, locale: string = 'en') {
   async function step(ctx: ChavrutaContext): Promise<ChavrutaResult> {
-    const system = SYSTEM_PROMPTS[ctx.currentState];
+    const system = injectLocale(SYSTEM_PROMPTS[ctx.currentState], locale);
     const messages = buildMessages(ctx);
 
     const { text } = await generateText({
@@ -113,7 +114,6 @@ export function createChavrutaWorkflow(model: LanguageModelV1) {
       system,
       messages,
       temperature: 0.8,
-      maxTokens: 400,
     });
 
     const score =
@@ -132,7 +132,7 @@ export function createChavrutaWorkflow(model: LanguageModelV1) {
   }
 
   async function stream(ctx: ChavrutaContext) {
-    const system = SYSTEM_PROMPTS[ctx.currentState];
+    const system = injectLocale(SYSTEM_PROMPTS[ctx.currentState], locale);
     const messages = buildMessages(ctx);
 
     return streamText({
@@ -140,7 +140,6 @@ export function createChavrutaWorkflow(model: LanguageModelV1) {
       system,
       messages,
       temperature: 0.8,
-      maxTokens: 400,
     });
   }
 

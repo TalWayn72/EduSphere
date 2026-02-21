@@ -1,0 +1,15 @@
+{
+  "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+  "network": "Error de red. Por favor, comprueba tu conexión.",
+  "notFound": "No se encontró el recurso solicitado.",
+  "unauthorized": "No estás autorizado para realizar esta acción.",
+  "forbidden": "Acceso denegado.",
+  "validation": "Por favor, comprueba tu entrada e inténtalo de nuevo.",
+  "timeout": "La solicitud expiró. Por favor, inténtalo de nuevo.",
+  "serverError": "Ocurrió un error en el servidor. Por favor, inténtalo más tarde.",
+  "graphql": {
+    "fetchFailed": "Error al cargar datos",
+    "mutationFailed": "Error al guardar cambios",
+    "retryHint": "Por favor, recarga la página o inténtalo de nuevo."
+  }
+}

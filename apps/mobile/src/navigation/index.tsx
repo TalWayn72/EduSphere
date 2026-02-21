@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -12,10 +13,12 @@ import DiscussionsScreen from '../screens/DiscussionsScreen';
 import AITutorScreen from '../screens/AITutorScreen';
 import KnowledgeGraphScreen from '../screens/KnowledgeGraphScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 export type RootStackParamList = {
   Main: undefined;
   CourseDetail: { courseId: string };
+  Settings: undefined;
 };
 
 export type MainTabParamList = {
@@ -31,6 +34,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 function MainTabs() {
+  const { t } = useTranslation('nav');
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -60,38 +64,39 @@ function MainTabs() {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        options={{ title: 'Home' }}
+        options={{ title: t('home') }}
       />
       <Tab.Screen
         name="Courses"
         component={CoursesScreen}
-        options={{ title: 'Courses' }}
+        options={{ title: t('courses') }}
       />
       <Tab.Screen
         name="Discussions"
         component={DiscussionsScreen}
-        options={{ title: 'Forum' }}
+        options={{ title: t('discussions') }}
       />
       <Tab.Screen
         name="AITutor"
         component={AITutorScreen}
-        options={{ title: 'AI Tutor' }}
+        options={{ title: t('aiTutor') }}
       />
       <Tab.Screen
         name="KnowledgeGraph"
         component={KnowledgeGraphScreen}
-        options={{ title: 'Graph' }}
+        options={{ title: t('graph') }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={{ title: 'Profile' }}
+        options={{ title: t('profile') }}
       />
     </Tab.Navigator>
   );
 }
 
 export default function Navigation() {
+  const { t } = useTranslation('courses');
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -103,7 +108,12 @@ export default function Navigation() {
         <Stack.Screen
           name="CourseDetail"
           component={CourseDetailScreen}
-          options={{ title: 'Course Details' }}
+          options={{ title: t('courseDetails') }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ title: t('common:settings', { defaultValue: 'Settings' }) }}
         />
       </Stack.Navigator>
     </NavigationContainer>

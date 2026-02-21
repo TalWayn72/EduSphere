@@ -9,6 +9,15 @@ vi.mock('@edusphere/db', () => ({
   withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, callback: () => unknown) =>
     callback()
   ),
+  // Drizzle table reference used in semanticSearch select/where clauses.
+  // Column values are irrelevant — only their existence matters for mocked db.select().
+  transcript_segments: {
+    id: 'id',
+    text: 'text',
+    transcript_id: 'transcript_id',
+  },
+  // sql tagged-template helper used in the ILIKE fallback where clause.
+  sql: vi.fn((...args: unknown[]) => args),
 }));
 
 const mockCypherService = {

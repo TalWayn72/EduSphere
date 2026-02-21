@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Search, Clock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -16,6 +17,7 @@ export function TranscriptPanel({
   onSeek,
 }: TranscriptPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useTranslation('content');
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -37,7 +39,7 @@ export function TranscriptPanel({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search transcript..."
+            placeholder={t('transcript.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -89,7 +91,7 @@ export function TranscriptPanel({
         {filteredSegments.length === 0 && (
           <div className="text-center py-8">
             <p className="text-sm text-muted-foreground">
-              No matching segments found
+              {t('transcript.noResults')}
             </p>
           </div>
         )}

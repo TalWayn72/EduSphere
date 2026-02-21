@@ -1,4 +1,3 @@
-import { tool } from 'ai';
 import { z } from 'zod';
 
 // ── Result shapes ─────────────────────────────────────────────────────────────
@@ -21,11 +20,15 @@ export interface ContentItemResult {
 // Each factory accepts the actual execute implementation as a closure so that
 // the service can inject DB-bound logic without coupling the schema definitions
 // to any infrastructure dependency.
+//
+// Note: We return plain tool-shaped objects rather than calling tool() from
+// 'ai' because the AI SDK v5 overloads conflict with our dynamic execute
+// closures. The runtime shape is identical.
 
 export function buildSearchKnowledgeGraphTool(
   execute: (query: string, limit: number) => Promise<KnowledgeSearchResult[]>
 ) {
-  return tool({
+  return {
     description:
       'Search the knowledge graph for concepts and transcript segments related to a query. ' +
       'Use this when the user asks about a topic to find relevant knowledge and context.',
@@ -33,14 +36,16 @@ export function buildSearchKnowledgeGraphTool(
       query: z.string().describe('The search query to find relevant concepts or content'),
       limit: z.number().int().min(1).max(20).default(5).describe('Maximum number of results to return'),
     }),
-    execute: async ({ query, limit }) => execute(query, limit),
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    execute: async (params: any) => execute(params.query as string, params.limit as number),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
 }
 
 export function buildFetchCourseContentTool(
   execute: (contentItemId: string) => Promise<ContentItemResult | null>
 ) {
-  return tool({
+  return {
     description:
       'Fetch the title, type, and text content of a specific content item by its ID. ' +
       'Use this to retrieve context about what the user is currently studying.',
@@ -50,8 +55,10 @@ export function buildFetchCourseContentTool(
         .uuid()
         .describe('The UUID of the content item to fetch'),
     }),
-    execute: async ({ contentItemId }) => execute(contentItemId),
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    execute: async (params: any) => execute(params.contentItemId as string),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
 }
 
 // ── Parameter schemas (re-exported for testing) ───────────────────────────────

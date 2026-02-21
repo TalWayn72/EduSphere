@@ -72,7 +72,9 @@ describe('Dashboard', () => {
     void MOCK_LEARNING_STREAK;
     renderDashboard();
     expect(screen.getByText('Courses Enrolled')).toBeInTheDocument();
-    expect(screen.getByText('Active enrollments')).toBeInTheDocument();
+    // Both the "Courses Enrolled" and "Active Courses" cards share the same
+    // subtitle; verify at least one is present without failing on duplicates.
+    expect(screen.getAllByText('Available in catalog').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders Study Time stat card', () => {
@@ -149,7 +151,8 @@ describe('Dashboard', () => {
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
     renderDashboard();
-    expect(screen.getByText('...')).toBeInTheDocument();
+    // Multiple stat cards show '...' while loading (Courses Enrolled, Annotations, etc.)
+    expect(screen.getAllByText('...').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows personalised greeting with firstName when ME_QUERY succeeds', () => {

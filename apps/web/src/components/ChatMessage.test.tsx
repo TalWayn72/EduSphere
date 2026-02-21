@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import type { Message } from "@/types/chat";
 
 // ChatMessage is a pure render component with no external dependencies

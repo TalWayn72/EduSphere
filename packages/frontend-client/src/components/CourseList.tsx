@@ -13,6 +13,14 @@ const COURSES_QUERY = gql`
   }
 `;
 
+interface Course {
+  id: string;
+  title: string;
+  description?: string;
+  isPublished: boolean;
+  createdAt: string;
+}
+
 export default function CourseList() {
   const { data, loading, error } = useQuery(COURSES_QUERY);
 
@@ -23,7 +31,7 @@ export default function CourseList() {
     <div>
       <h2>📚 Available Courses</h2>
       <div style={{ display: 'grid', gap: '20px', marginTop: '20px' }}>
-        {data?.courses?.map((course: any) => (
+        {data?.courses?.map((course: Course) => (
           <Link
             key={course.id}
             to={`/course/${course.id}`}

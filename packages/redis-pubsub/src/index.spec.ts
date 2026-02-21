@@ -18,7 +18,7 @@ interface MockRedisInstance {
 const { createdInstances, MockRedis } = vi.hoisted(() => {
   const createdInstances: MockRedisInstance[] = [];
 
-  const MockRedis = vi.fn().mockImplementation(() => {
+  const MockRedis = vi.fn(function() {
     const instance: MockRedisInstance = {
       publish: vi.fn().mockResolvedValue(1),
       subscribe: vi.fn().mockResolvedValue(undefined),
@@ -79,7 +79,7 @@ describe('RedisPubSub', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     createdInstances.length = 0;
-    MockRedis.mockImplementation(() => {
+    MockRedis.mockImplementation(function() {
       const instance: MockRedisInstance = {
         publish: vi.fn().mockResolvedValue(1),
         subscribe: vi.fn().mockResolvedValue(undefined),

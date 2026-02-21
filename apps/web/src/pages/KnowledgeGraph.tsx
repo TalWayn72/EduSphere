@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -82,6 +83,7 @@ function computePositions(nodes: GraphNode[]) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function KnowledgeGraph() {
+  const { t } = useTranslation('knowledge');
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,7 +118,7 @@ export function KnowledgeGraph() {
   }, [toast]);
 
   // ── Real: fetch all concepts ──
-  const [conceptsResult] = useQuery({
+  const [conceptsResult] = useQuery<{ concepts: ApiConcept[] }>({
     query: GET_CONCEPTS_QUERY,
     variables: { limit: 50, _refresh: refreshKey },
     pause: DEV_MODE,
@@ -147,8 +149,7 @@ export function KnowledgeGraph() {
   // We resolve the label from the raw API data to avoid dependency on graphData (defined below).
   const selectedNodeName = DEV_MODE
     ? (mockGraphData.nodes.find((n) => n.id === selectedId)?.label ?? '')
-    : ((conceptsResult.data?.concepts as ApiConcept[] | undefined)
-        ?.find((c) => c.id === selectedId)?.name ?? '');
+    : (conceptsResult.data?.concepts?.find((c) => c.id === selectedId)?.name ?? '');
   const [relatedByNameResult] = useQuery({
     query: RELATED_CONCEPTS_BY_NAME_QUERY,
     variables: { conceptName: selectedNodeName, depth: 2 },
@@ -161,7 +162,7 @@ export function KnowledgeGraph() {
       return mockGraphData;
     }
 
-    const apiConcepts = conceptsResult.data.concepts as ApiConcept[];
+    const apiConcepts = conceptsResult.data.concepts;
     const nodes: GraphNode[] = apiConcepts.map((c) => ({
       id: c.id,
       label: c.name,
@@ -196,7 +197,7 @@ export function KnowledgeGraph() {
   // Show toast when concept count increases after a manual refresh
   useEffect(() => {
     if (DEV_MODE || conceptsResult.fetching || !conceptsResult.data?.concepts) return;
-    const current = (conceptsResult.data.concepts as ApiConcept[]).length;
+    const current = conceptsResult.data.concepts.length;
     if (prevConceptCount.current !== null && current > prevConceptCount.current) {
       const added = current - prevConceptCount.current;
       setToast(`Graph updated with ${added} new concept${added === 1 ? '' : 's'}`);
@@ -292,12 +293,12 @@ export function KnowledgeGraph() {
         {isLoading && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Loader2 className="h-3 w-3 animate-spin" />
-            Loading graph from server...
+            {t('loadingGraph')}
           </div>
         )}
         {!DEV_MODE && conceptsResult.error && (
           <div className="text-xs text-destructive">
-            Failed to load knowledge graph: {conceptsResult.error.message}
+            {t('loadError')}: {conceptsResult.error.message}
           </div>
         )}
         {toast && (
@@ -310,9 +311,9 @@ export function KnowledgeGraph() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Knowledge Graph</h1>
+            <h1 className="text-2xl font-bold">{t('title')}</h1>
             <p className="text-sm text-muted-foreground">
-              Explore concepts, people, and sources from your learning materials
+              {t('subtitle')}
             </p>
           </div>
           <div className="flex gap-2 items-center">
@@ -334,10 +335,10 @@ export function KnowledgeGraph() {
                 className="h-7 text-xs gap-1"
                 onClick={handleRefresh}
                 disabled={isLoading}
-                title="Refresh graph from server"
+                title={t('refreshGraph')}
               >
                 <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh
+                {t('refresh')}
               </Button>
             )}
           </div>
@@ -349,7 +350,7 @@ export function KnowledgeGraph() {
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search concepts..."
+            placeholder={t('searchConcepts')}
             className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background"
           />
         </div>
@@ -480,7 +481,7 @@ export function KnowledgeGraph() {
                     className="w-full text-xs h-7 justify-start"
                     onClick={() => navigate('/learn/content-1')}>
                     <BookOpen className="h-3 w-3 mr-1" />
-                    See in content <ChevronRight className="h-3 w-3 ml-auto" />
+                    {t('seeInContent')} <ChevronRight className="h-3 w-3 ml-auto" />
                   </Button>
                 </CardContent>
               </Card>
@@ -489,7 +490,7 @@ export function KnowledgeGraph() {
             <Card>
               <CardContent className="p-4">
                 <p className="text-xs font-semibold text-muted-foreground mb-2">
-                  CONNECTIONS ({connectedEdges.length})
+                  {t('connections')} ({connectedEdges.length})
                   {!DEV_MODE && relatedResult.fetching && (
                     <Loader2 className="inline h-3 w-3 ml-1 animate-spin" />
                   )}
@@ -523,13 +524,13 @@ export function KnowledgeGraph() {
               <CardContent className="p-4 space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
                   <GitBranch className="h-3 w-3" />
-                  LEARNING PATH
+                  {t('learningPath')}
                 </p>
                 <div className="flex gap-1">
                   <input
                     value={pathFrom}
                     onChange={(e) => setPathFrom(e.target.value)}
-                    placeholder="From concept..."
+                    placeholder={t('fromConcept')}
                     className="flex-1 min-w-0 px-2 py-1 text-xs border rounded-md bg-background"
                     onKeyDown={(e) => e.key === 'Enter' && handleFindPath()}
                   />
@@ -537,7 +538,7 @@ export function KnowledgeGraph() {
                   <input
                     value={pathTo}
                     onChange={(e) => setPathTo(e.target.value)}
-                    placeholder="To concept..."
+                    placeholder={t('toConcept')}
                     className="flex-1 min-w-0 px-2 py-1 text-xs border rounded-md bg-background"
                     onKeyDown={(e) => e.key === 'Enter' && handleFindPath()}
                   />
@@ -550,9 +551,9 @@ export function KnowledgeGraph() {
                   disabled={DEV_MODE ? mockPathLoading : learningPathResult.fetching}
                 >
                   {(DEV_MODE ? mockPathLoading : learningPathResult.fetching) ? (
-                    <><Loader2 className="h-3 w-3 mr-1 animate-spin" />Finding...</>
+                    <><Loader2 className="h-3 w-3 mr-1 animate-spin" />{t('finding')}</>
                   ) : (
-                    'Find Path'
+                    t('findPath')
                   )}
                 </Button>
 
@@ -590,7 +591,7 @@ export function KnowledgeGraph() {
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground italic">
-                      No path found between these concepts.
+                      {t('noPath')}
                     </p>
                   )
                 )}
@@ -632,15 +633,15 @@ export function KnowledgeGraph() {
 
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs font-semibold text-muted-foreground mb-2">GRAPH STATS</p>
+                <p className="text-xs font-semibold text-muted-foreground mb-2">{t('graphStats')}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="text-center p-2 bg-muted/40 rounded">
                     <p className="text-lg font-bold">{graphData.nodes.length}</p>
-                    <p className="text-muted-foreground">Nodes</p>
+                    <p className="text-muted-foreground">{t('nodes')}</p>
                   </div>
                   <div className="text-center p-2 bg-muted/40 rounded">
                     <p className="text-lg font-bold">{graphData.edges.length}</p>
-                    <p className="text-muted-foreground">Edges</p>
+                    <p className="text-muted-foreground">{t('edges')}</p>
                   </div>
                 </div>
               </CardContent>

@@ -73,7 +73,7 @@ export class MemoryService {
   ): Promise<void> {
     await this.db.insert(schema.agentMessages).values({
       sessionId,
-      role: role.toUpperCase(),
+      role: role.toUpperCase() as 'USER' | 'ASSISTANT' | 'SYSTEM' | 'TOOL',
       content,
       metadata: metadata ?? {},
     });

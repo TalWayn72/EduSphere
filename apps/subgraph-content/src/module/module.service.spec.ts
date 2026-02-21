@@ -51,7 +51,7 @@ const DB_MODULE = {
   deleted_at: null,
 };
 
-const MAPPED_MODULE = {
+const _MAPPED_MODULE = {
   ...DB_MODULE,
   courseId: 'course-1',
   orderIndex: 0,

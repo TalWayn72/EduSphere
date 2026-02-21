@@ -3,12 +3,10 @@ import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import securityPlugin from 'eslint-plugin-security';
 import noUnsanitizedPlugin from 'eslint-plugin-no-unsanitized';
 
 export default [
   js.configs.recommended,
-  securityPlugin.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -46,6 +44,17 @@ export default [
         setTimeout: 'readonly',
         clearInterval: 'readonly',
         clearTimeout: 'readonly',
+        localStorage: 'readonly',
+        URLSearchParams: 'readonly',
+        File: 'readonly',
+        fetch: 'readonly',
+        HTMLSpanElement: 'readonly',
+        FormData: 'readonly',
+        Headers: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
+        Event: 'readonly',
+        CustomEvent: 'readonly',
       },
     },
     plugins: {

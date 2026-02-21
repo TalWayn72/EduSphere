@@ -4,20 +4,54 @@ import type { ConversationContext } from './memory.service';
 
 // ── DB mock helpers ──────────────────────────────────────────────────────────
 
-const mockWhere = vi.fn();
-const mockLimit = vi.fn();
-const mockOrderBy = vi.fn();
-const mockValues = vi.fn();
-const mockFrom = vi.fn();
-const mockSelect = vi.fn();
-const mockInsert = vi.fn();
-const mockDelete = vi.fn();
+const {
+  mockWhere,
+  mockLimit,
+  mockOrderBy,
+  mockValues,
+  mockFrom,
+  mockSelect,
+  mockInsert,
+  mockDelete,
+  mockDb,
+  mockKvSet,
+  mockKvGet,
+  mockKvDelete,
+} = vi.hoisted(() => {
+  const mockWhere = vi.fn();
+  const mockLimit = vi.fn();
+  const mockOrderBy = vi.fn();
+  const mockValues = vi.fn();
+  const mockFrom = vi.fn();
+  const mockSelect = vi.fn();
+  const mockInsert = vi.fn();
+  const mockDelete = vi.fn();
 
-const mockDb = {
-  select: mockSelect,
-  insert: mockInsert,
-  delete: mockDelete,
-};
+  const mockDb = {
+    select: mockSelect,
+    insert: mockInsert,
+    delete: mockDelete,
+  };
+
+  const mockKvSet = vi.fn();
+  const mockKvGet = vi.fn();
+  const mockKvDelete = vi.fn();
+
+  return {
+    mockWhere,
+    mockLimit,
+    mockOrderBy,
+    mockValues,
+    mockFrom,
+    mockSelect,
+    mockInsert,
+    mockDelete,
+    mockDb,
+    mockKvSet,
+    mockKvGet,
+    mockKvDelete,
+  };
+});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
@@ -31,23 +65,19 @@ vi.mock('@edusphere/db', () => ({
       createdAt: 'createdAt',
     },
   },
-  eq: vi.fn((col, val) => ({ col, val })),
-  desc: vi.fn((col) => ({ col, dir: 'desc' })),
+  eq: vi.fn((col: unknown, val: unknown) => ({ col, val })),
+  desc: vi.fn((col: unknown) => ({ col, dir: 'desc' })),
 }));
 
 // ── NATS KV mock ──────────────────────────────────────────────────────────────
 
-const mockKvSet = vi.fn();
-const mockKvGet = vi.fn();
-const mockKvDelete = vi.fn();
-
 vi.mock('@edusphere/nats-client', () => ({
-  NatsKVClient: vi.fn().mockImplementation(() => ({
-    set: mockKvSet,
-    get: mockKvGet,
-    delete: mockKvDelete,
-    close: vi.fn(),
-  })),
+  NatsKVClient: vi.fn().mockImplementation(function () {
+    this.set = mockKvSet;
+    this.get = mockKvGet;
+    this.delete = mockKvDelete;
+    this.close = vi.fn();
+  }),
 }));
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────

@@ -40,6 +40,9 @@ export class CourseService {
       estimatedHours: course['estimated_hours'] !== undefined
         ? course['estimated_hours']
         : (course['estimatedHours'] || null),
+      // content.ts schema uses snake_case timestamps via the ...timestamps helper
+      createdAt: course['created_at'] || course['createdAt'] || null,
+      updatedAt: course['updated_at'] || course['updatedAt'] || null,
     };
   }
 
@@ -56,7 +59,7 @@ export class CourseService {
     const rows = await this.db
       .select()
       .from(schema.courses)
-      .orderBy(desc(schema.courses.createdAt))
+      .orderBy(desc(schema.courses.created_at))
       .limit(limit)
       .offset(offset);
     return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
@@ -68,14 +71,14 @@ export class CourseService {
     const [course] = await this.db
       .insert(schema.courses)
       .values({
-        tenantId: input.tenantId ?? '',
+        tenant_id: input.tenantId ?? '',
         title: input.title,
         slug,
         description: input.description,
-        instructorId,
-        isPublished: input.isPublished || false,
-        thumbnailUrl: input.thumbnailUrl,
-        estimatedHours: input.estimatedHours,
+        instructor_id: instructorId,
+        is_published: input.isPublished || false,
+        thumbnail_url: input.thumbnailUrl,
+        estimated_hours: input.estimatedHours,
       })
       .returning();
     this.logger.log(`Course created: ${course?.id} - "${input.title}"`);

@@ -2,6 +2,7 @@ import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
+import { injectLocale } from './locale-prompt';
 
 const QuizQuestionSchema = z.object({
   question: z.string(),
@@ -26,26 +27,31 @@ export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 
 const QuizStateAnnotation = Annotation.Root({
   topic: Annotation<string>(),
-  numQuestions: Annotation<number>({ default: () => 5 }),
-  difficulty: Annotation<QuizState['difficulty']>({ default: () => 'medium' }),
-  questions: Annotation<QuizQuestion[]>({ default: () => [] }),
-  currentQuestionIndex: Annotation<number>({ default: () => 0 }),
-  userAnswers: Annotation<number[]>({ default: () => [] }),
-  score: Annotation<number>({ default: () => 0 }),
-  isComplete: Annotation<boolean>({ default: () => false }),
+  numQuestions: Annotation<number>({ value: (_, u) => u, default: () => 5 }),
+  difficulty: Annotation<QuizState['difficulty']>({ value: (_, u) => u, default: () => 'medium' }),
+  questions: Annotation<QuizQuestion[]>({ value: (_, u) => u, default: () => [] }),
+  currentQuestionIndex: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
+  userAnswers: Annotation<number[]>({ value: (_, u) => u, default: () => [] }),
+  score: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
+  isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
 export class QuizGeneratorWorkflow {
   private model: string;
-  private graph: StateGraph<typeof QuizStateAnnotation.State>;
+  private locale: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private graph: any;
 
-  constructor(model: string = 'gpt-4-turbo') {
+  constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
+    this.locale = locale;
     this.graph = this.buildGraph();
   }
 
-  private buildGraph(): StateGraph<typeof QuizStateAnnotation.State> {
-    const graph = new StateGraph(QuizStateAnnotation);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private buildGraph(): any {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const graph = new StateGraph(QuizStateAnnotation) as any;
 
     graph.addNode('generate', this.generateNode.bind(this));
     graph.addNode('validate', this.validateNode.bind(this));
@@ -62,7 +68,9 @@ export class QuizGeneratorWorkflow {
 
     for (let i = 0; i < state.numQuestions; i++) {
       const { object } = await generateObject({
-        model: openai(this.model),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        model: openai(this.model) as any,
+        system: injectLocale('You are an expert educational quiz generator.', this.locale),
         schema: QuizQuestionSchema,
         prompt: `Generate a ${state.difficulty} difficulty multiple-choice question about: ${state.topic}
 
@@ -90,7 +98,7 @@ Requirements:
   }
 
   compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts as Parameters<typeof this.graph.compile>[0]);
+    return this.graph.compile(opts);
   }
 
   async run(initialState: Partial<QuizState>): Promise<QuizState> {
@@ -100,6 +108,6 @@ Requirements:
   }
 }
 
-export function createQuizWorkflow(model?: string): QuizGeneratorWorkflow {
-  return new QuizGeneratorWorkflow(model);
+export function createQuizWorkflow(model?: string, locale: string = 'en'): QuizGeneratorWorkflow {
+  return new QuizGeneratorWorkflow(model, locale);
 }

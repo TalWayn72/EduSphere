@@ -10,6 +10,16 @@ const mockUserService = {
   update: vi.fn(),
 };
 
+// Mock UserStatsService
+const mockUserStatsService = {
+  getMyStats: vi.fn(),
+};
+
+// Mock UserPreferencesService
+const mockUserPreferencesService = {
+  updatePreferences: vi.fn(),
+};
+
 const MOCK_AUTH: AuthContext = {
   userId: 'user-1',
   email: 'student@example.com',
@@ -33,7 +43,11 @@ describe('UserResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new UserResolver(mockUserService as any);
+    resolver = new UserResolver(
+      mockUserService as any,
+      mockUserStatsService as any,
+      mockUserPreferencesService as any,
+    );
   });
 
   // ─── health ──────────────────────────────────────────────────────────────
@@ -129,7 +143,7 @@ describe('UserResolver', () => {
       const ctx = { req: {} };
       try {
         await resolver.createUser({}, ctx);
-      } catch (_) { /* expected */ }
+      } catch { /* expected */ }
       expect(mockUserService.create).not.toHaveBeenCalled();
     });
   });
@@ -157,8 +171,55 @@ describe('UserResolver', () => {
       const ctx = { req: {} };
       try {
         await resolver.updateUser('user-1', {}, ctx);
-      } catch (_) { /* expected */ }
+      } catch { /* expected */ }
       expect(mockUserService.update).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── updateUserPreferences ───────────────────────────────────────────────
+
+  describe('updateUserPreferences()', () => {
+    it('updates preferences and returns user', async () => {
+      const updated = { ...MOCK_USER };
+      mockUserPreferencesService.updatePreferences.mockResolvedValue(updated);
+      const ctx = { req: {}, authContext: MOCK_AUTH };
+      const input = { locale: 'fr', theme: 'dark' };
+      const result = await resolver.updateUserPreferences(input, ctx);
+      expect(mockUserPreferencesService.updatePreferences).toHaveBeenCalledWith(
+        'user-1',
+        expect.objectContaining({ locale: 'fr', theme: 'dark' }),
+        MOCK_AUTH,
+      );
+      expect(result).toEqual(updated);
+    });
+
+    it('throws UnauthorizedException when no authContext', async () => {
+      const ctx = { req: {} };
+      await expect(
+        resolver.updateUserPreferences({ locale: 'en' }, ctx)
+      ).rejects.toThrow('Unauthenticated');
+    });
+
+    it('does not call service when unauthenticated', async () => {
+      const ctx = { req: {} };
+      try {
+        await resolver.updateUserPreferences({}, ctx);
+      } catch { /* expected */ }
+      expect(mockUserPreferencesService.updatePreferences).not.toHaveBeenCalled();
+    });
+
+    it('rejects invalid locale', async () => {
+      const ctx = { req: {}, authContext: MOCK_AUTH };
+      await expect(
+        resolver.updateUserPreferences({ locale: 'xx-INVALID' }, ctx)
+      ).rejects.toThrow();
+    });
+
+    it('rejects invalid theme', async () => {
+      const ctx = { req: {}, authContext: MOCK_AUTH };
+      await expect(
+        resolver.updateUserPreferences({ theme: 'neon' }, ctx)
+      ).rejects.toThrow();
     });
   });
 });

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from 'urql';
+import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -176,6 +177,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function SearchPage() {
+  const { t } = useTranslation('common');
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialQuery = searchParams.get('q') ?? '';
@@ -274,7 +276,7 @@ export function SearchPage() {
             onKeyDown={(e) => {
               if (e.key === 'Escape') navigate(-1);
             }}
-            placeholder="Search courses, transcripts, annotations, concepts..."
+            placeholder={t('searchFullPlaceholder')}
             className="w-full pl-12 pr-4 py-3 text-lg border-2 border-primary/30 rounded-xl bg-background focus:outline-none focus:border-primary transition-colors shadow-sm"
           />
           {loading && (
@@ -311,7 +313,7 @@ export function SearchPage() {
         {query.length >= 2 && !loading && (
           <p className="text-sm text-muted-foreground px-1">
             {results.length === 0
-              ? 'No results found'
+              ? t('noResults')
               : `${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"`}
           </p>
         )}
@@ -321,7 +323,7 @@ export function SearchPage() {
           <div className="text-center py-16 space-y-3">
             <SearchIcon className="h-12 w-12 text-muted-foreground/30 mx-auto" />
             <p className="text-muted-foreground">
-              Search across all courses, transcripts, annotations, and knowledge graph concepts
+              {t('searchHint')}
             </p>
             <div className="flex flex-wrap gap-2 justify-center mt-4">
               {['Talmud', 'chavruta', 'kal vachomer', 'Rambam', 'pilpul'].map((s) => (

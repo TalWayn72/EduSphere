@@ -104,13 +104,13 @@ describe('AgentSessionResolver', () => {
 
   describe('getAgentTemplates()', () => {
     it('returns a list of templates without calling any service', async () => {
-      const ctx = buildContext();
+      const _ctx = buildContext();
       const result = await resolver.getAgentTemplates();
       expect(Array.isArray(result)).toBe(true);
     });
 
     it('returns at least one template', async () => {
-      const ctx = buildContext();
+      const _ctx = buildContext();
       const result = await resolver.getAgentTemplates();
       expect(result.length).toBeGreaterThan(0);
     });
@@ -156,20 +156,20 @@ describe('AgentSessionResolver', () => {
     it('creates a new session and returns it', async () => {
       mockAgentSessionService.create.mockResolvedValue(MOCK_SESSION);
       const ctx = buildContext();
-      const result = await resolver.startAgentSession('TUTOR', {}, ctx);
+      const result = await resolver.startAgentSession('TUTOR', {}, 'en', ctx);
       expect(result).toEqual(MOCK_SESSION);
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
       const ctx = buildContext(false);
-      await expect(resolver.startAgentSession('TUTOR', {}, ctx)).rejects.toThrow(
+      await expect(resolver.startAgentSession('TUTOR', {}, 'en', ctx)).rejects.toThrow(
         UnauthorizedException
       );
     });
 
     it('throws BadRequestException for invalid templateType', async () => {
       const ctx = buildContext();
-      await expect(resolver.startAgentSession('INVALID_TYPE', {}, ctx)).rejects.toThrow(
+      await expect(resolver.startAgentSession('INVALID_TYPE', {}, 'en', ctx)).rejects.toThrow(
         BadRequestException
       );
     });
@@ -177,7 +177,7 @@ describe('AgentSessionResolver', () => {
     it('passes userId from authContext to session create', async () => {
       mockAgentSessionService.create.mockResolvedValue(MOCK_SESSION);
       const ctx = buildContext();
-      await resolver.startAgentSession('TUTOR', {}, ctx);
+      await resolver.startAgentSession('TUTOR', {}, 'en', ctx);
       expect(mockAgentSessionService.create).toHaveBeenCalledWith(
         expect.objectContaining({ userId: 'user-1' }),
         MOCK_AUTH
@@ -188,7 +188,7 @@ describe('AgentSessionResolver', () => {
       mockAgentSessionService.create.mockResolvedValue(MOCK_SESSION);
       const ctx = buildContext();
       await expect(
-        resolver.startAgentSession('CHAVRUTA_DEBATE', {}, ctx)
+        resolver.startAgentSession('CHAVRUTA_DEBATE', {}, 'en', ctx)
       ).resolves.toBeDefined();
     });
 
@@ -196,7 +196,7 @@ describe('AgentSessionResolver', () => {
       mockAgentSessionService.create.mockResolvedValue(MOCK_SESSION);
       const ctx = buildContext();
       await expect(
-        resolver.startAgentSession('QUIZ_ASSESS', {}, ctx)
+        resolver.startAgentSession('QUIZ_ASSESS', {}, 'en', ctx)
       ).resolves.toBeDefined();
     });
 
@@ -204,7 +204,7 @@ describe('AgentSessionResolver', () => {
       mockAgentSessionService.create.mockResolvedValue(MOCK_SESSION);
       const ctx = buildContext();
       await expect(
-        resolver.startAgentSession('SUMMARIZE', {}, ctx)
+        resolver.startAgentSession('SUMMARIZE', {}, 'en', ctx)
       ).resolves.toBeDefined();
     });
   });

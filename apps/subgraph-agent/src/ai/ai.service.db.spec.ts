@@ -18,7 +18,7 @@ let withTenantContextImpl: (
 ) => Promise<unknown>;
 
 let dbExecuteImpl: Mock;
-let txSelectImpl: Mock;
+let _txSelectImpl: Mock;
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({
@@ -81,7 +81,7 @@ describe('searchKnowledgeGraph', () => {
     vi.clearAllMocks();
     global.fetch = vi.fn();
     dbExecuteImpl = vi.fn();
-    txSelectImpl = vi.fn();
+    _txSelectImpl = vi.fn();
   });
 
   it('returns vector results when Ollama responds', async () => {

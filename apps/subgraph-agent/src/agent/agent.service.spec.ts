@@ -11,17 +11,17 @@ import { AgentService } from './agent.service';
 //   cancelExecution: update().set().where().returning()
 //   processExecution: update().set().where()  +  select chain twice
 
-const mockReturning = vi.fn();
-const mockLimit = vi.fn();
-const mockOrderBy = vi.fn();
-const mockSet = vi.fn();
-const mockValues = vi.fn();
+const _mockReturning = vi.fn();
+const _mockLimit = vi.fn();
+const _mockOrderBy = vi.fn();
+const _mockSet = vi.fn();
+const _mockValues = vi.fn();
 const mockInsert = vi.fn();
 const mockUpdate = vi.fn();
 const mockSelect = vi.fn();
 
 // Where mock: must support both .limit() and .orderBy() and .returning()
-const mockWhere = vi.fn();
+const _mockWhere = vi.fn();
 
 const mockDb = {
   select: mockSelect,

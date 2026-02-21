@@ -7,13 +7,14 @@ import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
-import Table from '@tiptap/extension-table';
+import { Table } from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Mention from '@tiptap/extension-mention';
 import Mathematics from '@tiptap/extension-mathematics';
-import { lowlight } from 'lowlight';
+import { createLowlight } from 'lowlight';
+const lowlight = createLowlight();
 import * as Y from 'yjs';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import { getToken, getCurrentUser } from '@/lib/auth';
@@ -178,7 +179,7 @@ export function CollaborativeEditor({
       const currentUser = getCurrentUser();
       return [
         ...base,
-        StarterKit.configure({ history: false }),
+        StarterKit.configure({ history: false } as object),
         Collaboration.configure({ document: ydocRef.current }),
         CollaborationCursor.configure({
           provider: providerRef.current,

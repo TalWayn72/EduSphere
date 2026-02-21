@@ -1,0 +1,50 @@
+{
+  "title": "控制台",
+  "welcomeBack": "欢迎回来，{{name}}！",
+  "instructorTools": "讲师工具",
+  "createCourse": "创建课程",
+  "manageCourses": "管理课程",
+  "continueLearning": "继续学习",
+  "yourProgress": "您的进度",
+  "studyActivity": "学习活动",
+  "activityDescription": "您过去30天的注释活动",
+  "recentActivity": "最近活动",
+  "latestEvents": "您的最新学习事件",
+  "noActivity": "最近没有活动",
+  "errorLoadingUser": "加载用户数据时出错",
+  "stats": {
+    "activeCourses": "活跃课程",
+    "learningStreak": "连续学习",
+    "studyTime": "学习时间",
+    "concepts": "概念",
+    "coursesEnrolled": "已注册课程",
+    "conceptsMastered": "已掌握概念",
+    "annotationsCreated": "已创建注释",
+    "weeklyGoal": "每周目标",
+    "days": "天",
+    "hours": "小时",
+    "minutes": "分钟"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} 个学习日",
+    "totalSessions": "共 {{count}} 次学习",
+    "less": "少",
+    "more": "多"
+  },
+  "profile": {
+    "accountDetails": "账户详情",
+    "permissions": "权限",
+    "learningOverview": "学习概览",
+    "fields": {
+      "username": "用户名",
+      "email": "邮箱",
+      "role": "角色",
+      "tenantId": "租户ID"
+    },
+    "stats": {
+      "coursesAvailable": "可用课程",
+      "conceptsMastered": "已掌握概念",
+      "annotationsCreated": "已创建注释"
+    }
+  }
+}

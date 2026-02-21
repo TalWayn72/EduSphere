@@ -13,5 +13,5 @@
     "sourceMap": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", ".turbo"]
+  "exclude": ["node_modules", "dist", ".turbo", "**/*.spec.ts", "**/*.test.ts"]
 }

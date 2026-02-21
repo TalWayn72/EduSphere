@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -19,36 +20,35 @@ vi.mock('@/lib/auth', () => ({
 // Mock Radix DropdownMenu — jsdom doesn't support the Floating-UI portal
 // The mock renders a simple open/close toggle with all menu items visible.
 vi.mock('@/components/ui/dropdown-menu', () => {
-  const React = require('react');
   function DropdownMenu({ children }: { children: React.ReactNode }) {
     const [open, setOpen] = React.useState(false);
     // Inject open state via context so children can read it
     return (
       <div data-testid="dropdown-root" data-open={String(open)} onClick={() => setOpen((o: boolean) => !o)}>
-        {React.Children.map(children, (child: React.ReactElement) =>
-          React.cloneElement(child, { __open: open, __setOpen: setOpen })
+        {React.Children.map(children, (child) =>
+          React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { __open: open, __setOpen: setOpen })
         )}
       </div>
     );
   }
-  function DropdownMenuTrigger({ children, asChild, __open, __setOpen, ...rest }: {
-    children: React.ReactNode; asChild?: boolean;
+  function DropdownMenuTrigger({ children, _asChild, __open, __setOpen, ..._rest }: {
+    children: React.ReactNode; _asChild?: boolean;
     __open?: boolean; __setOpen?: (v: boolean) => void;
   }) {
-    const child = React.Children.only(children) as React.ReactElement;
+    const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>;
     return React.cloneElement(child, {
       onClick: (e: React.MouseEvent) => { e.stopPropagation(); __setOpen?.(!__open); },
       'aria-expanded': __open,
       'aria-haspopup': 'menu',
     });
   }
-  function DropdownMenuContent({ children, align, className, __open }: {
-    children: React.ReactNode; align?: string; className?: string; __open?: boolean;
+  function DropdownMenuContent({ children, _align, _className, __open }: {
+    children: React.ReactNode; _align?: string; _className?: string; __open?: boolean;
   }) {
     if (!__open) return null;
     return <div role="menu" data-testid="dropdown-content">{children}</div>;
   }
-  function DropdownMenuLabel({ children, className }: { children: React.ReactNode; className?: string }) {
+  function DropdownMenuLabel({ children, _className }: { children: React.ReactNode; _className?: string }) {
     return <div data-testid="dropdown-label">{children}</div>;
   }
   function DropdownMenuSeparator() {

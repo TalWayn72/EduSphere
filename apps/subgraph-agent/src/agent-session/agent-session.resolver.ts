@@ -12,6 +12,7 @@ import {
 import { Logger, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
 import { createPubSub } from 'graphql-yoga';
+import type { AuthContext } from '@edusphere/auth';
 import { AgentSessionService } from './agent-session.service';
 import { AgentMessageService } from '../agent-message/agent-message.service';
 import { AIService } from '../ai/ai.service';
@@ -94,6 +95,7 @@ export class AgentSessionResolver {
   async startAgentSession(
     @Args('templateType') templateType: string,
     @Args('context') contextData: unknown,
+    @Args('locale') locale: unknown,
     @Context() context: unknown
   ) {
     const authContext = this.extractAuthContext(context);
@@ -101,17 +103,24 @@ export class AgentSessionResolver {
     const validationResult = StartAgentSessionSchema.safeParse({
       templateType,
       context: contextData,
+      locale: locale ?? 'en',
     });
 
     if (!validationResult.success) {
-      throw new BadRequestException(validationResult.error.errors);
+      throw new BadRequestException(validationResult.error.issues);
     }
+
+    const resolvedLocale = validationResult.data.locale ?? 'en';
+    const existingMeta =
+      contextData !== null && typeof contextData === 'object'
+        ? (contextData as Record<string, unknown>)
+        : {};
 
     return this.agentSessionService.create(
       {
         userId: authContext.userId,
         agentType: templateType,
-        metadata: contextData,
+        metadata: { ...existingMeta, locale: resolvedLocale },
       },
       authContext
     );
@@ -127,7 +136,7 @@ export class AgentSessionResolver {
 
     const validationResult = SendMessageSchema.safeParse({ sessionId, content });
     if (!validationResult.success) {
-      throw new BadRequestException(validationResult.error.errors);
+      throw new BadRequestException(validationResult.error.issues);
     }
 
     const span = tracer.startSpan('agent.sendMessage', {
@@ -146,26 +155,30 @@ export class AgentSessionResolver {
       );
 
       pubSub.publish(`messageStream_${sessionId}`, {
-        messageStream: userMessage as AgentMessagePayload,
+        messageStream: userMessage as unknown as AgentMessagePayload,
       });
 
-      // Resolve agent type from session, then invoke LangGraph via AIService.
+      // Resolve agent type and locale from session, then invoke AIService.
       let agentReply = `Echo: ${content}`;
       let templateType = 'EXPLAIN';
       try {
         const session = await this.agentSessionService.findById(sessionId, authContext);
         templateType =
           (session as Record<string, unknown>)['agentType'] as string ?? 'EXPLAIN';
-        const sessionContext =
+        const sessionMeta =
           (session as Record<string, unknown>)['metadata'] as Record<string, unknown> ?? {};
+        const sessionLocale =
+          typeof sessionMeta['locale'] === 'string' ? sessionMeta['locale'] : 'en';
 
         span.setAttribute('template.type', templateType);
+        span.setAttribute('session.locale', sessionLocale);
 
         const aiResult = await this.aiService.continueSession(
           sessionId,
           content,
           templateType,
-          sessionContext
+          sessionMeta,
+          sessionLocale
         );
         agentReply = aiResult.text;
       } catch (err) {
@@ -180,7 +193,7 @@ export class AgentSessionResolver {
       );
 
       pubSub.publish(`messageStream_${sessionId}`, {
-        messageStream: assistantMessage as AgentMessagePayload,
+        messageStream: assistantMessage as unknown as AgentMessagePayload,
       });
 
       this.logger.debug(
@@ -236,8 +249,8 @@ export class AgentSessionResolver {
     return this.agentSessionService.findById(reference.id, authContext);
   }
 
-  private extractAuthContext(context: unknown) {
-    const ctx = context as { authContext?: { userId: string } };
+  private extractAuthContext(context: unknown): AuthContext {
+    const ctx = context as { authContext?: AuthContext };
     if (!ctx.authContext) {
       throw new UnauthorizedException('Authentication required');
     }
