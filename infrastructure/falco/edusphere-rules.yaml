@@ -1,0 +1,92 @@
+# EduSphere — Falco Runtime Security Rules
+# Standards: SOC 2 CC7.2, GDPR Art.32
+# Deploy as Kubernetes DaemonSet with eBPF driver
+
+- macro: edusphere_subgraph
+  condition: >
+    container.label.app in (subgraph-core, subgraph-content, subgraph-annotation,
+                             subgraph-collaboration, subgraph-agent, subgraph-knowledge)
+
+- macro: edusphere_gateway
+  condition: container.label.app = "edusphere-gateway"
+
+- macro: allowed_llm_endpoints
+  condition: >
+    fd.sip.name in (api.openai.com, api.anthropic.com) or
+    fd.sip in (127.0.0.1, ::1)
+
+# Rule 1: Direct database access bypassing application layer
+# Subgraph containers should never spawn psql directly
+- rule: EduSphere direct psql access
+  desc: Detects psql spawned inside a subgraph container (bypasses Drizzle ORM + RLS)
+  condition: >
+    spawned_process and
+    proc.name = psql and
+    edusphere_subgraph and
+    not proc.pname in (sh, bash, entrypoint.sh)
+  output: >
+    Direct psql in subgraph (user=%user.name cmd=%proc.cmdline
+    container=%container.name pod=%k8s.pod.name)
+  priority: WARNING
+  tags: [database, rls_bypass, gdpr, soc2]
+
+# Rule 2: Unexpected outbound connection from agent subgraph
+# Agent may only connect to: Ollama (local), OpenAI, Anthropic, NATS, Postgres
+- rule: EduSphere agent unexpected outbound
+  desc: Agent subgraph connecting to non-whitelisted external endpoint
+  condition: >
+    outbound and
+    container.label.app = subgraph-agent and
+    not fd.sip in (127.0.0.1, ::1) and
+    not allowed_llm_endpoints and
+    not fd.sport in (4222, 5432, 8080, 8443)
+  output: >
+    Unexpected outbound from agent subgraph (dest=%fd.sip.name:%fd.sport
+    pod=%k8s.pod.name ns=%k8s.ns.name)
+  priority: CRITICAL
+  tags: [network, ai_compliance, eu_ai_act, gdpr]
+
+# Rule 3: Secrets file access in containers
+# No subgraph should read /etc/passwd, /proc/keys, or mounted secrets directly
+- rule: EduSphere sensitive file read in container
+  desc: Detects reads of sensitive system files inside EduSphere containers
+  condition: >
+    open_read and
+    edusphere_subgraph and
+    fd.name in (/etc/shadow, /proc/keys, /proc/1/environ, /run/secrets/kubernetes.io/serviceaccount/token)
+  output: >
+    Sensitive file read in subgraph container (file=%fd.name
+    user=%user.name container=%container.name)
+  priority: ERROR
+  tags: [secrets, privilege_escalation, soc2]
+
+# Rule 4: Container spawning unexpected shell
+# Application containers should not spawn interactive shells in production
+- rule: EduSphere shell in production container
+  desc: Shell spawned inside EduSphere container in production namespace
+  condition: >
+    spawned_process and
+    (edusphere_subgraph or edusphere_gateway) and
+    proc.name in (sh, bash, zsh, ash) and
+    k8s.ns.name in (edusphere, edusphere-prod) and
+    not proc.pname in (entrypoint.sh, node, tini, dumb-init)
+  output: >
+    Shell spawned in production container (shell=%proc.name
+    parent=%proc.pname container=%container.name pod=%k8s.pod.name)
+  priority: WARNING
+  tags: [container_security, soc2]
+
+# Rule 5: File write to read-only container filesystem
+# All EduSphere containers should have readOnlyRootFilesystem=true
+- rule: EduSphere write to read-only filesystem
+  desc: File written to container root filesystem (should be read-only)
+  condition: >
+    open_write and
+    edusphere_subgraph and
+    not fd.name startswith /tmp and
+    not fd.name startswith /app/logs
+  output: >
+    Write to read-only container filesystem (file=%fd.name
+    container=%container.name pod=%k8s.pod.name)
+  priority: WARNING
+  tags: [container_security, soc2]

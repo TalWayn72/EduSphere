@@ -37,3 +37,9 @@ export * from './consent';
 
 // Retention policies (GDPR Art.5(e))
 export * from './retentionPolicies';
+
+// Tenant branding table (white-label support — G-19)
+export * from './tenantBranding';
+
+// Tenant domains table (white-label custom domains + Keycloak realm routing — G-20, G-21)
+export * from './tenantDomains';

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  EduSphere — Wazuh Custom Detection Rules
+  Standards: GDPR Art.33, SOC 2 CC7.2, CC7.3
+  Review: Quarterly or after each incident
+-->
+<group name="edusphere,gdpr,soc2">
+
+  <!-- Rule 100001: Cross-tenant RLS violation attempt
+       Triggers when application logs a cross-tenant access error.
+       This is CRITICAL — any occurrence warrants immediate investigation. -->
+  <rule id="100001" level="15">
+    <decoded_as>json</decoded_as>
+    <field name="message" type="pcre2">cross.tenant|RLS.violation|current_tenant.mismatch</field>
+    <description>CRITICAL: Cross-tenant RLS violation detected (GDPR Art.32, SOC2 CC6.1)</description>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+    <group>gdpr_violation,soc2_cc6</group>
+  </rule>
+
+  <!-- Rule 100002: Mass data export (potential exfiltration)
+       Fires when exportUserData query returns >100 records.
+       Normal usage exports 1 user record at a time. -->
+  <rule id="100002" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="action" type="pcre2">exportUserData|DATA_EXPORT|BULK_EXPORT</field>
+    <field name="count" type="pcre2">^[1-9]\d{2,}</field>
+    <description>HIGH: Mass data export detected — possible exfiltration (GDPR Art.32)</description>
+    <mitre>
+      <id>T1530</id>
+    </mitre>
+    <group>gdpr_violation,data_exfiltration</group>
+  </rule>
+
+  <!-- Rule 100003: Authentication brute force (10 failures in 60 seconds)
+       Complements Keycloak's built-in brute force protection.
+       Alerts BEFORE Keycloak lockout for faster response. -->
+  <rule id="100003" level="10" frequency="10" timeframe="60">
+    <decoded_as>json</decoded_as>
+    <field name="status" type="pcre2">FAILED</field>
+    <field name="action" type="pcre2">LOGIN|AUTHENTICATE</field>
+    <description>HIGH: Authentication brute force detected (SOC2 CC6.7)</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+    <group>authentication,brute_force,soc2_cc6</group>
+  </rule>
+
+  <!-- Rule 100004: Service account doing unexpected operations
+       Service accounts should only perform specific actions.
+       Any admin action from a service account context is suspicious. -->
+  <rule id="100004" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="userRole" type="pcre2">SERVICE_ACCOUNT</field>
+    <field name="action" type="pcre2">DELETE_USER|EXPORT_ALL|CHANGE_TENANT|GRANT_ADMIN</field>
+    <description>HIGH: Service account performing privileged operation (SOC2 CC6.3)</description>
+    <group>privilege_escalation,soc2_cc6</group>
+  </rule>
+
+  <!-- Rule 100005: Data erasure operation
+       RIGHT-TO-ERASURE operations should be logged and monitored.
+       Multiple erasures in short window may indicate abuse. -->
+  <rule id="100005" level="6">
+    <decoded_as>json</decoded_as>
+    <field name="action" type="pcre2">DATA_ERASURE</field>
+    <description>INFO: GDPR right-to-erasure operation executed (GDPR Art.17)</description>
+    <group>gdpr_art17,audit</group>
+  </rule>
+
+  <!-- Rule 100006: PII field accessed outside business hours
+       PII access at unusual hours (e.g., 2-5 AM local) may indicate compromise.
+       Requires time-based correlation in Wazuh. -->
+  <rule id="100006" level="8" timeframe="3600" frequency="50">
+    <decoded_as>json</decoded_as>
+    <field name="resourceType" type="pcre2">USER|ANNOTATION|AGENT_SESSION</field>
+    <field name="action" type="pcre2">READ</field>
+    <description>MEDIUM: High-volume PII read — possible scraping (GDPR Art.32)</description>
+    <group>data_scraping,gdpr_violation</group>
+  </rule>
+
+  <!-- Rule 100007: Admin account created outside provisioning workflow
+       New SUPER_ADMIN creation should only happen via IaC provisioning.
+       Direct creation is a red flag. -->
+  <rule id="100007" level="13">
+    <decoded_as>json</decoded_as>
+    <field name="action" type="pcre2">CREATE_USER|USER_CREATED</field>
+    <field name="metadata.role" type="pcre2">SUPER_ADMIN</field>
+    <description>CRITICAL: SUPER_ADMIN user created — verify this is authorized (SOC2 CC6.2)</description>
+    <group>privilege_escalation,soc2_cc6</group>
+  </rule>
+
+  <!-- Rule 100008: Consent withdrawn + AI processing still occurring
+       If user withdraws THIRD_PARTY_LLM consent, no LLM calls should follow.
+       This rule detects a consent-processing mismatch. -->
+  <rule id="100008" level="14">
+    <decoded_as>json</decoded_as>
+    <field name="action" type="pcre2">CONSENT_WITHDRAWN</field>
+    <same_field>userId</same_field>
+    <description>CRITICAL: LLM call after consent withdrawal — GDPR Art.7 violation risk</description>
+    <options>no_full_log</options>
+    <group>gdpr_art7,consent_violation</group>
+  </rule>
+
+</group>
