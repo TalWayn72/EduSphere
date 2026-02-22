@@ -1,0 +1,77 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--headed"]
+    },
+
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere"
+      ]
+    },
+
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+
+    "typescript-diagnostics": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "ts-diagnostics-mcp@latest",
+        "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere"
+      ]
+    },
+
+    "eslint": {
+      "command": "npx",
+      "args": ["-y", "@eslint/mcp@latest"]
+    },
+
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "REPLACE_WITH_YOUR_GITHUB_PAT"
+      }
+    },
+
+    "graphql": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-graphql",
+        "--endpoint",
+        "http://localhost:4000/graphql"
+      ]
+    },
+
+    "nats": {
+      "command": "npx",
+      "args": ["-y", "mcp-nats"],
+      "env": {
+        "NATS_URL": "nats://localhost:4222",
+        "NATS_USER": "edusphere",
+        "NATS_PASSWORD": "edusphere_nats_password"
+      }
+    },
+
+    "tavily": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp@latest"],
+      "env": {
+        "TAVILY_API_KEY": "REPLACE_WITH_YOUR_TAVILY_API_KEY"
+      }
+    },
+
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    }
+  }
+}

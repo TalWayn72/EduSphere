@@ -1,9 +1,44 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 22 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** ✅ — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** ✅ — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅**
 **בדיקות:** Security: **738 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 67 | Mobile offline: 17 unit + 34 static | Web: 1,400+ | Backend: 1,200+ | i18n: ~250+ | סה"כ: **>3,800 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **ALL E2E PASS — 0 failures** | **738/738 security tests ✅**
+
+---
+
+## ✅ MCP-001: Claude Code MCP Capability Upgrade — 10 MCP Servers (22 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🟢 Enhancement (developer productivity) |
+| **Status** | ✅ Complete |
+| **Files** | `.mcp.json`, `docs/plans/MCP_TOOLS_SETUP.md` |
+
+### מה בוצע
+
+הגדרת 10 MCP servers ב-`.mcp.json` שמרחיבים את יכולות Claude Code לכתיבת קוד ובדיקות:
+
+| # | Server | Package | תועלת |
+|---|--------|---------|--------|
+| 1 | `postgres` | `@modelcontextprotocol/server-postgres` | שאילתות SQL ישירות, אימות RLS policies |
+| 2 | `memory` | `@modelcontextprotocol/server-memory` | זיכרון בין שיחות, שמירת context ארכיטקטוני |
+| 3 | `typescript-diagnostics` | `ts-diagnostics-mcp` | שגיאות TypeScript מובנות לפי קובץ |
+| 4 | `eslint` | `@eslint/mcp` | lint מובנה per-file, כולל security rules |
+| 5 | `playwright` | `@playwright/mcp` | E2E testing (היה קיים, נשמר) |
+| 6 | `github` | `@modelcontextprotocol/server-github` | GitHub API — CI/CD, PRs, workflow monitoring |
+| 7 | `graphql` | `mcp-graphql` | introspection של Federation supergraph חי |
+| 8 | `nats` | `mcp-nats` | debug JetStream events בזמן אמת |
+| 9 | `tavily` | `tavily-mcp` | חיפוש documentation טכני מדויק |
+| 10 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | חשיבה מובנית לבעיות מורכבות |
+
+### פעולות נדרשות מהמשתמש
+
+שני API keys דורשים הגדרה ידנית ב-`.mcp.json`:
+- `REPLACE_WITH_YOUR_GITHUB_PAT` → [GitHub Personal Access Token](https://github.com/settings/tokens) (scopes: `repo`, `workflow`, `read:org`)
+- `REPLACE_WITH_YOUR_TAVILY_API_KEY` → [Tavily API Key](https://tavily.com) (free tier: 1000 searches/month)
+
+ראה תיעוד מלא: [`docs/plans/MCP_TOOLS_SETUP.md`](docs/plans/MCP_TOOLS_SETUP.md)
 
 ---
 

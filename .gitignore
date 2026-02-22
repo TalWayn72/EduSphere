@@ -88,6 +88,10 @@ dist/
 *.crt
 secrets/
 
+# MCP server config — contains personal API keys (GitHub PAT, Tavily key)
+# Use .mcp.json.example as template and fill in your own keys locally
+.mcp.json
+
 # Test output artifacts
 coverage_result*.txt
 *_result.txt
