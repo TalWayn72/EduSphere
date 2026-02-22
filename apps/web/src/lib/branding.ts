@@ -74,7 +74,7 @@ export function detectTenantSlug(): string | null {
   const hostname = window.location.hostname;
   const parts = hostname.split('.');
   if (parts.length >= 3 && parts[0] !== 'www' && parts[0] !== 'app') {
-    return parts[0];
+    return parts[0] ?? null;
   }
   return null;
 }

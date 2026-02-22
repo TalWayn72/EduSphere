@@ -72,7 +72,7 @@ export class UserErasureService {
         // Step 3: Delete annotations
         const annotations = await tx
           .delete(schema.annotations)
-          .where(eq(schema.annotations.userId, userId))
+          .where(eq(schema.annotations.user_id, userId))
           .returning();
         report.deletedEntities.push({ type: 'ANNOTATIONS', count: annotations.length });
 

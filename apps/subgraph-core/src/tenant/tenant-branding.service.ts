@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { db } from '@edusphere/db';
-import { tenantBranding } from '@edusphere/db/schema';
+import { db, tenantBranding } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 
 export interface TenantBrandingData {

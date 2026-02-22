@@ -37,7 +37,7 @@ export class UserExportService {
       const [profile, annotations, agentSessions, progress, enrollments] =
         await Promise.all([
           tx.select().from(schema.users).where(eq(schema.users.id, userId)),
-          tx.select().from(schema.annotations).where(eq(schema.annotations.userId, userId)),
+          tx.select().from(schema.annotations).where(eq(schema.annotations.user_id, userId)),
           tx.select().from(schema.agentSessions).where(eq(schema.agentSessions.userId, userId)),
           tx.select().from(schema.userProgress).where(eq(schema.userProgress.userId, userId)),
           tx.select().from(schema.userCourses).where(eq(schema.userCourses.userId, userId)),

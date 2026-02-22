@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { lt } from 'drizzle-orm';
-import { db } from '@edusphere/db';
-import { RETENTION_DEFAULTS } from '@edusphere/db/schema';
+import { db, RETENTION_DEFAULTS, agentMessages, agentSessions, userProgress, annotations } from '@edusphere/db';
 
 /**
  * Retention Cleanup Service — GDPR Art.5(e) storage limitation.
@@ -69,25 +68,26 @@ export class RetentionCleanupService {
     cutoff: Date,
     mode: 'HARD_DELETE' | 'ANONYMIZE',
   ): Promise<{ deletedCount: number; mode: string }> {
-    const schema = await import('@edusphere/db/schema');
-
-    // Map entity type keys to the actual Drizzle table objects
-    const tableMap: Record<string, { createdAt: ReturnType<typeof lt>[0] } | undefined> = {
-      AGENT_MESSAGES: schema.agentMessages as unknown as { createdAt: ReturnType<typeof lt>[0] },
-      AGENT_SESSIONS: schema.agentSessions as unknown as { createdAt: ReturnType<typeof lt>[0] },
-      USER_PROGRESS: schema.userProgress as unknown as { createdAt: ReturnType<typeof lt>[0] },
-      ANNOTATIONS: schema.annotations as unknown as { createdAt: ReturnType<typeof lt>[0] },
+    // Map entity type keys to the actual Drizzle table objects (typed as any to avoid
+    // complex Drizzle generic constraints that vary between table definitions)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tableMap: Record<string, any> = {
+      AGENT_MESSAGES: agentMessages,
+      AGENT_SESSIONS: agentSessions,
+      USER_PROGRESS: userProgress,
+      ANNOTATIONS: annotations,
     };
 
-    const table = tableMap[entityType];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const table: any = tableMap[entityType];
     if (!table) {
       this.logger.warn({ entityType }, 'No table mapped for entity type — skipping');
       return { deletedCount: 0, mode: 'SKIPPED' };
     }
 
     if (mode === 'HARD_DELETE') {
-      const deleted = await (db.delete as (t: unknown) => unknown)(table);
-      const deletedRows = await (deleted as { where: (c: unknown) => { returning: () => Promise<unknown[]> } })
+      const deletedRows = await db
+        .delete(table)
         .where(lt(table.createdAt, cutoff))
         .returning();
       return { deletedCount: (deletedRows as unknown[]).length, mode };

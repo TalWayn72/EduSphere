@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GraphQLError } from 'graphql';
 import { and, eq } from 'drizzle-orm';
-import { db } from '@edusphere/db';
+import { db, userConsents } from '@edusphere/db';
 
 /**
  * SI-10: LLM Consent Guard — GDPR Art.6+7 + EU AI Act transparency.
@@ -20,8 +20,6 @@ export class LlmConsentGuard {
     userId: string,
     isExternalLLM: boolean,
   ): Promise<void> {
-    const { userConsents } = await import('@edusphere/db/schema');
-
     const requiredType = isExternalLLM ? 'THIRD_PARTY_LLM' : 'AI_PROCESSING';
 
     const rows = await db
