@@ -40,9 +40,12 @@ function mockSelectChain(result: unknown[]) {
   });
 }
 
-function mockDeleteChain(rowCount: number) {
+function mockDeleteChain(found: boolean) {
+  const row = found ? { id: 'some-id' } : undefined;
   mockDelete.mockReturnValueOnce({
-    where: vi.fn().mockResolvedValue({ rowCount }),
+    where: vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue(row ? [row] : []),
+    }),
   });
 }
 
@@ -294,35 +297,28 @@ describe('EmbeddingService', () => {
 
   describe('delete()', () => {
     it('returns true when deleted from content_embeddings', async () => {
-      mockDeleteChain(1);
+      mockDeleteChain(true);
       expect(await service.delete('emb-1')).toBe(true);
     });
 
     it('returns true when found in annotation_embeddings', async () => {
-      mockDeleteChain(0);
-      mockDeleteChain(1);
+      mockDeleteChain(false);
+      mockDeleteChain(true);
       expect(await service.delete('emb-2')).toBe(true);
     });
 
     it('returns true when found in concept_embeddings', async () => {
-      mockDeleteChain(0);
-      mockDeleteChain(0);
-      mockDeleteChain(1);
+      mockDeleteChain(false);
+      mockDeleteChain(false);
+      mockDeleteChain(true);
       expect(await service.delete('emb-3')).toBe(true);
     });
 
     it('returns false when not in any table', async () => {
-      mockDeleteChain(0);
-      mockDeleteChain(0);
-      mockDeleteChain(0);
+      mockDeleteChain(false);
+      mockDeleteChain(false);
+      mockDeleteChain(false);
       expect(await service.delete('missing')).toBe(false);
-    });
-
-    it('handles null rowCount gracefully', async () => {
-      mockDelete.mockReturnValue({
-        where: vi.fn().mockResolvedValue({ rowCount: null }),
-      });
-      expect(await service.delete('x')).toBe(false);
     });
   });
 

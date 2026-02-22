@@ -10,7 +10,8 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
 COPY packages/ packages/
-COPY apps/subgraph-content/ apps/subgraph-content/
+# Copy all apps so pnpm workspace resolution succeeds with --frozen-lockfile
+COPY apps/ apps/
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS builder

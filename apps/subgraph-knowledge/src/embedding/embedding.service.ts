@@ -185,20 +185,23 @@ export class EmbeddingService implements OnModuleDestroy {
   // ── Delete ────────────────────────────────────────────────────────────────
 
   async delete(id: string): Promise<boolean> {
-    const c = await this.db
+    const [c] = await this.db
       .delete(schema.content_embeddings)
-      .where(eq(schema.content_embeddings.id, id));
-    if ((c.rowCount ?? 0) > 0) return true;
+      .where(eq(schema.content_embeddings.id, id))
+      .returning({ id: schema.content_embeddings.id });
+    if (c) return true;
 
-    const a = await this.db
+    const [a] = await this.db
       .delete(schema.annotation_embeddings)
-      .where(eq(schema.annotation_embeddings.id, id));
-    if ((a.rowCount ?? 0) > 0) return true;
+      .where(eq(schema.annotation_embeddings.id, id))
+      .returning({ id: schema.annotation_embeddings.id });
+    if (a) return true;
 
-    const conc = await this.db
+    const [conc] = await this.db
       .delete(schema.concept_embeddings)
-      .where(eq(schema.concept_embeddings.id, id));
-    return (conc.rowCount ?? 0) > 0;
+      .where(eq(schema.concept_embeddings.id, id))
+      .returning({ id: schema.concept_embeddings.id });
+    return !!conc;
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────

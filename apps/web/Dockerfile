@@ -8,7 +8,8 @@ RUN npm install -g pnpm@${PNPM_VERSION} --no-fund --no-audit
 WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY packages/ packages/
-COPY apps/web/ apps/web/
+# Copy all apps so pnpm workspace resolution succeeds with --frozen-lockfile
+COPY apps/ apps/
 RUN pnpm install --frozen-lockfile
 
 ARG VITE_GRAPHQL_URL
