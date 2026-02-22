@@ -27,9 +27,9 @@ jobs:
 
     # Service containers for testing
     services:
-      # PostgreSQL 16 with AGE + pgvector extensions
+      # PostgreSQL 16 with pgvector pre-installed
       postgres:
-        image: postgres:16-alpine
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -84,24 +84,12 @@ jobs:
           done
           echo "NATS JetStream started"
 
-      # Install PostgreSQL extensions (AGE + pgvector)
-      - name: Install PostgreSQL extensions
+      # Enable pgvector extension (pre-installed in pgvector/pgvector:pg16 image)
+      - name: Enable PostgreSQL extensions
         run: |
-          # Wait for PostgreSQL to be fully ready
-          sleep 5
-
-          # Note: In CI, we use a standard PostgreSQL image.
-          # For full AGE support, use a custom Docker image in production.
-          # Here we'll install pgvector which is available via apt
-
-          docker exec ${{ job.services.postgres.id }} sh -c "
-            apt-get update &&
-            apt-get install -y postgresql-16-pgvector || echo 'pgvector installation skipped in CI'
-          "
-
-          # Create extensions
-          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
-          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "SELECT * FROM pg_extension WHERE extname='vector';"
+          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
+            -c "CREATE EXTENSION IF NOT EXISTS vector;" \
+            -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -150,7 +138,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16-alpine
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -179,14 +167,10 @@ jobs:
           node-version: 20.x
           cache: pnpm
 
-      - name: Install pgvector extension
+      - name: Enable pgvector extension
         run: |
-          sleep 5
-          docker exec ${{ job.services.postgres.id }} sh -c "
-            apt-get update &&
-            apt-get install -y postgresql-16-pgvector || echo 'pgvector installation skipped'
-          "
-          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
+            -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -218,7 +202,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16-alpine
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -283,14 +267,10 @@ jobs:
           done
           echo "NATS JetStream started"
 
-      - name: Install pgvector extension
+      - name: Enable pgvector extension
         run: |
-          sleep 5
-          docker exec ${{ job.services.postgres.id }} sh -c "
-            apt-get update &&
-            apt-get install -y postgresql-16-pgvector || echo 'pgvector installation skipped'
-          "
-          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+          PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
+            -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
