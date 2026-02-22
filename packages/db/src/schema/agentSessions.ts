@@ -30,7 +30,8 @@ export const agentSessions = pgTable('agent_sessions', {
 
 export const agentSessionsRLS = sql`
 CREATE POLICY agent_sessions_user_isolation ON agent_sessions
-  USING (user_id::text = current_setting('app.current_user', TRUE));
+  USING (user_id::text = current_setting('app.current_user_id', TRUE))
+  WITH CHECK (user_id::text = current_setting('app.current_user_id', TRUE));
 
 ALTER TABLE agent_sessions ENABLE ROW LEVEL SECURITY;
 `;

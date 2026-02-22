@@ -1,9 +1,265 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 22 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** ✅ — ALL Done!
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-06 CORS Fix** + **G-01 RLS Variable Fix** + **G-12 Brute Force Protection** + **G-05 SSL Bypass Fix** ✅ — ALL Done!
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅ | **i18n Phase A+B ✅** | **BUG-DOCKER-001 ✅ Fixed** | **BUG-04 ✅ Fixed** | **BUG-03 ✅ Fixed** | **E2E Audit BUG-01/02/05/12/13/14/15/17/18 ✅ Fixed** | **Visual QA Round 2 BUG-19/20/21/22 ✅ Fixed** | **Visual QA Round 3 BUG-25/26/27 ✅ Fixed** | **Visual QA Round 4 BUG-28/29/30 ✅ Fixed** | **Visual QA Round 5 BUG-31/32 ✅ Fixed** | **Visual QA Round 6 BUG-33/34/35 ✅ Fixed** | **BUG-23 ✅ Fixed (Keycloak 26 JWT + RLS)** | **ANTHROPIC_API_KEY ✅ Permanent**
-**בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | i18n: ~250+ tests | סה"כ: **>1,650 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Visual QA Round 7: agents 10/10+1skip ✅, search 12/12 ✅, full-visual-qa 15/15 ✅, visual-qa-student 15/15 ✅** | **ALL E2E PASS — 0 failures**
+**בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | i18n: ~250+ tests | Security: 82 tests | סה"כ: **>1,735 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Visual QA Round 7: agents 10/10+1skip ✅, search 12/12 ✅, full-visual-qa 15/15 ✅, visual-qa-student 15/15 ✅** | **ALL E2E PASS — 0 failures**
+
+---
+
+## ✅ SEC-TEST-001: Security Test Suite — tests/security/ (22 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🟢 Enhancement (CI gate improvement) |
+| **Status** | ✅ Complete |
+| **Files** | `tests/security/vitest.config.ts`, `tests/security/keycloak-config.spec.ts`, `tests/security/dockerfile-security.spec.ts`, `tests/security/cors-config.spec.ts`, `tests/security/rls-variables.spec.ts`, `tests/security/cross-tenant-isolation.spec.ts`, `tests/security/gdpr-rights.spec.ts`, `package.json` |
+
+### מה בוצע
+
+Created a comprehensive static-analysis security test suite under `tests/security/` that runs as part of CI without a live database or running services. 82 tests across 6 spec files — all passing.
+
+| File | Security Controls | Tests |
+|------|------------------|-------|
+| `keycloak-config.spec.ts` | G-12: Brute-force protection, SSL required, token lifetime | 7 |
+| `dockerfile-security.spec.ts` | G-05, SI-5: No insecure curl/wget/APT SSL bypass flags | 9 |
+| `cors-config.spec.ts` | SI-2, G-06: No wildcard origin, fail-closed empty-array fallback | 6 |
+| `rls-variables.spec.ts` | SI-1, G-01: Correct `app.current_user_id` variable in all 13 RLS files | 42 |
+| `cross-tenant-isolation.spec.ts` | GDPR Art.32, SOC2 CC6.1: SET LOCAL contract + mock execution order | 10 |
+| `gdpr-rights.spec.ts` | Art.17 Right to Erasure, Art.20 Portability: schema field contracts | 8 |
+
+New root scripts added: `pnpm test:security` and `pnpm test:rls`.
+
+---
+
+## ✅ G-01: RLS Variable Mismatch — `app.current_user` vs `app.current_user_id` (22 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical (security — RLS silently disabled, cross-user data leak) |
+| **Status** | ✅ Fixed |
+| **Files** | `packages/db/src/schema/annotations.ts`, `packages/db/src/schema/agentSessions.ts`, `packages/db/src/schema/agentMessages.ts`, `packages/db/src/schema/userCourses.ts`, `packages/db/src/schema/userProgress.ts`, `packages/db/src/rls/annotation-rls.test.ts` (new) |
+
+### בעיית שורש
+
+Five RLS policy SQL expressions used `current_setting('app.current_user', TRUE)` while `withTenantContext()` (in `packages/db/src/rls/withTenantContext.ts`) sets `SET LOCAL app.current_user_id`. Because `current_setting()` returns an empty string (not an error) when the variable is unset, the comparison `user_id::text = ''` always evaluated to `false` — meaning the USING clause rejected every row and the WITH CHECK clause rejected every write, effectively disabling RLS or silently blocking all access rather than enforcing per-user isolation.
+
+The mismatch affected:
+- `annotations` table (cross-user annotation read/write)
+- `agent_sessions` table (cross-user agent session access)
+- `agent_messages` table (via session join)
+- `user_courses` table (enrollment isolation)
+- `user_progress` table (progress isolation)
+
+### תיקון שבוצע
+
+In all five schema files, replaced every occurrence of:
+```sql
+current_setting('app.current_user', TRUE)
+```
+with:
+```sql
+current_setting('app.current_user_id', TRUE)
+```
+
+Additionally:
+- `agentSessions` policy was missing its `WITH CHECK` clause — added.
+- Regression test suite created at `packages/db/src/rls/annotation-rls.test.ts` with 14 tests covering:
+  - All 5 tables: SQL expressions contain `app.current_user_id`, not `app.current_user`
+  - `withTenantContext` sets `current_user_id` (not bare `current_user`)
+  - Cross-user isolation: user-A and user-B transactions never bleed IDs
+  - Parallel context isolation
+
+---
+
+## ✅ G-06: Gateway CORS Wildcard — Credentialed Requests Blocked by Browser (22 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical (security violation + browser blocks all credentialed GraphQL requests) |
+| **Status** | ✅ Fixed |
+| **Files** | `apps/gateway/src/index.ts`, `apps/gateway/.env.example`, `apps/gateway/tests/cors.test.ts` |
+
+### בעיית שורש
+
+Gateway had `cors: { origin: process.env.CORS_ORIGIN?.split(',') || '*', credentials: true }`.
+The fallback `'*'` violates the CORS spec: browsers block credentialed requests (those that send cookies or Authorization headers) when `Access-Control-Allow-Origin: *` is returned. This caused authentication to silently fail for any deployment without `CORS_ORIGIN` set, and constituted a security misconfiguration.
+
+### תיקון שבוצע
+
+```typescript
+// Before — wildcard fallback, spec violation:
+cors: {
+  origin: process.env.CORS_ORIGIN?.split(',') || '*',
+  credentials: true,
+},
+
+// After — fail-closed, no wildcard possible:
+cors: {
+  origin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+    : [], // NEVER wildcard in production — fail closed
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+},
+```
+
+- When `CORS_ORIGIN` is unset the allowed-origin list is `[]` (deny all) — fail closed.
+- When `CORS_ORIGIN` is set, each value is trimmed to tolerate accidental spaces.
+- `methods` restricted to only what the gateway needs.
+- `.env.example` updated with production example and dev defaults.
+- 6 unit tests added in `apps/gateway/tests/cors.test.ts` covering: two-origin parsing, whitespace trimming, empty-array when unset, wildcard never present, single-origin, always-array return type.
+
+---
+
+## ✅ G-12: Keycloak Brute Force Protection Disabled (22 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical (security — unlimited login attempts, account takeover risk) |
+| **Status** | ✅ Fixed |
+| **Files** | `infrastructure/docker/keycloak-realm.json`, `tests/security/keycloak-config.spec.ts` (new) |
+
+### בעיית שורש
+
+`keycloak-realm.json` had `"bruteForceProtected": false`, which allows an attacker unlimited password-guessing attempts against any account. Additionally, `failureFactor` was set to `30` (far too permissive), meaning 30 failures were required before any lockout would trigger even if protection were re-enabled.
+
+### תיקון שבוצע
+
+**`infrastructure/docker/keycloak-realm.json`:**
+
+```diff
+- "bruteForceProtected": false,
++ "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxTemporaryLockouts": 0,
+  "bruteForceStrategy": "MULTIPLE",
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+- "failureFactor": 30,
++ "failureFactor": 5,
+```
+
+Effective lockout policy after fix:
+- After **5 failed attempts** the account is temporarily locked
+- Lockout wait increments by 60 s per failure, capped at **15 min** (`maxFailureWaitSeconds: 900`)
+- Lockout counter resets after **12 hours** (`maxDeltaTimeSeconds: 43200`)
+- No permanent lockout (`permanentLockout: false`) — prevents self-DoS
+- `sslRequired: "external"` was already correct (not changed)
+- `accessTokenLifespan: 900` was already correct (not changed)
+
+**`tests/security/keycloak-config.spec.ts`** (new — 7 static config assertions):
+- `bruteForceProtected === true`
+- `failureFactor <= 5`
+- `permanentLockout === false`
+- `sslRequired` is `"external"` or `"all"` (not `"none"`)
+- `accessTokenLifespan <= 900`
+- `maxFailureWaitSeconds <= 900`
+- `maxDeltaTimeSeconds <= 43200`
+
+All 7 tests pass (`pnpm test` in `tests/security/` — 7/7 green).
+
+---
+
+## ✅ G-05: SSL Verification Bypass in Dockerfile — MITM Vulnerability (22 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🔴 Critical (security — MITM attack surface during Docker image build) |
+| **Status** | ✅ Fixed |
+| **Files** | `Dockerfile`, `tests/security/dockerfile-security.spec.ts` (new) |
+
+### בעיית שורש
+
+The root `Dockerfile` contained multiple SSL verification bypass patterns that allowed any network attacker or compromised DNS to silently substitute malicious binaries during the image build:
+
+1. **`ENV GIT_SSL_NO_VERIFY=true`** — Disabled TLS verification for all `git` operations at the OS level inside the container.
+2. **`ENV NODE_TLS_REJECT_UNAUTHORIZED=0`** — Disabled TLS certificate validation for all Node.js HTTPS connections.
+3. **APT insecure config file written in STAGE 0:**
+   ```
+   Acquire::https::Verify-Peer "false"
+   Acquire::https::Verify-Host "false"
+   Acquire::AllowInsecureRepositories "true"
+   ```
+   Created as `/etc/apt/apt.conf.d/99insecure` — affects every subsequent `apt-get` call.
+4. **`curl -fsSL --insecure https://www.postgresql.org/...`** (line 42) — PostgreSQL GPG key fetched without certificate verification.
+5. **`wget --no-check-certificate`** used in four stages:
+   - Node.js binary download (lines 62, 64)
+   - NATS server download (line 76)
+   - MinIO binary download (line 87)
+   - Keycloak archive download (line 98)
+6. **`curl -fsSL --insecure https://ollama.com/install.sh`** (line 108) — Ollama install script piped to `sh` without TLS validation.
+
+The comment "corporate proxy environments" was the original rationale, but the correct solution for corporate HTTPS inspection proxies is to add the corporate CA bundle to the image — not to disable all certificate verification globally.
+
+### תיקון שבוצע
+
+**`Dockerfile`** — 14 lines removed / changed:
+
+```diff
+-ENV GIT_SSL_NO_VERIFY=true
+-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+
+-# STAGE 0: Disable apt SSL verification (corporate proxy support)
+-RUN echo 'Acquire::https::Verify-Peer "false";' > /etc/apt/apt.conf.d/99insecure && \
+-    echo 'Acquire::https::Verify-Host "false";' >> /etc/apt/apt.conf.d/99insecure && \
+-    echo 'Acquire::AllowInsecureRepositories "true";' >> /etc/apt/apt.conf.d/99insecure
+
++# STAGE 0: Ensure CA certificates are up to date
++# Required before any HTTPS apt/curl/wget operations
++RUN apt-get update && \
++    apt-get install -y --no-install-recommends ca-certificates && \
++    rm -rf /var/lib/apt/lists/* && \
++    update-ca-certificates
+
+-    && curl -fsSL --insecure https://www.postgresql.org/media/keys/ACCC4CF8.asc \
++    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+
+-    NODEFILE=$(wget --no-check-certificate -qO- https://nodejs.org/dist/latest-v22.x/ \
++    NODEFILE=$(curl -fsSL https://nodejs.org/dist/latest-v22.x/ \
+-    wget --no-check-certificate -q "https://nodejs.org/dist/latest-v22.x/$NODEFILE" && \
++    curl -fsSL "https://nodejs.org/dist/latest-v22.x/$NODEFILE" -o "$NODEFILE" && \
+
+-    wget --no-check-certificate -q \
+-      https://github.com/nats-io/nats-server/releases/.../nats-server-v2.12.4-linux-amd64.tar.gz && \
++    curl -fsSL \
++      https://github.com/nats-io/nats-server/releases/.../nats-server-v2.12.4-linux-amd64.tar.gz \
++      -o nats-server-v2.12.4-linux-amd64.tar.gz && \
+
+-RUN wget --no-check-certificate -q \
+-      -O /usr/local/bin/minio \
+-      https://dl.min.io/server/minio/release/linux-amd64/minio && \
++RUN curl -fsSL \
++      https://dl.min.io/server/minio/release/linux-amd64/minio \
++      -o /usr/local/bin/minio && \
+
+-    wget --no-check-certificate -q \
+-      https://github.com/keycloak/keycloak/releases/.../keycloak-26.5.3.tar.gz && \
++    curl -fsSL \
++      https://github.com/keycloak/keycloak/releases/.../keycloak-26.5.3.tar.gz \
++      -o keycloak-26.5.3.tar.gz && \
+
+-RUN curl -fsSL --insecure https://ollama.com/install.sh | sh
++RUN curl -fsSL https://ollama.com/install.sh | sh
+```
+
+All `wget --no-check-certificate` calls replaced with `curl -fsSL` (validates TLS by default using the system CA bundle refreshed in STAGE 0). All ENV-level TLS bypass variables removed.
+
+**`tests/security/dockerfile-security.spec.ts`** (new — 9 static content assertions):
+- `--insecure` flag absent
+- `-k ` (curl shorthand) absent
+- `Verify-Peer "false"` absent
+- `Verify-Host "false"` absent
+- `AllowInsecureRepositories` absent
+- `99insecure` (insecure apt config filename) absent
+- `--no-check-certificate` absent
+- `GIT_SSL_NO_VERIFY` ENV absent
+- `NODE_TLS_REJECT_UNAUTHORIZED` ENV absent
+
+All 9 tests pass (`pnpm test` in `tests/security/` — 9/9 green).
 
 ---
 

@@ -46,8 +46,11 @@ const gateway = createGateway({
 const yoga = createYoga({
   gateway,
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || '*',
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+      : [], // NEVER wildcard in production — fail closed
     credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
   },
   logging: logger,
   context: async ({ request }) => {

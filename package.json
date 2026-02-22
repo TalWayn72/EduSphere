@@ -15,6 +15,8 @@
     "typecheck": "turbo typecheck",
     "test": "turbo test",
     "test:coverage": "turbo test -- --coverage",
+    "test:security": "pnpm --filter @edusphere/security-tests test",
+    "test:rls": "pnpm --filter @edusphere/db test -- --reporter=verbose",
     "clean": "turbo clean && rm -rf node_modules .turbo",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "db:generate": "pnpm --filter @edusphere/db generate",

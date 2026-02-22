@@ -383,6 +383,28 @@
 - Supergraph composition succeeds (`pnpm --filter @edusphere/gateway compose`)
 - Health check passes (`./scripts/health-check.sh`)
 
+## Security Invariants — ENFORCED (Iron Rules — never violate)
+
+These are non-negotiable. Any code violating these invariants must be rejected immediately.
+
+| # | Invariant | WRONG | RIGHT |
+|---|-----------|-------|-------|
+| **SI-1** | RLS session variable name | `current_setting('app.current_user', TRUE)` | `current_setting('app.current_user_id', TRUE)` |
+| **SI-2** | CORS origin in production | `origin: '*'` | `origin: process.env.CORS_ORIGIN?.split(',') ?? []` |
+| **SI-3** | PII fields in DB | Store plaintext email/name/annotation text | `encryptField(value, tenantKey)` before every write |
+| **SI-4** | Keycloak brute-force | `"bruteForceProtected": false` | `"bruteForceProtected": true, "failureFactor": 5` |
+| **SI-5** | SSL verification in Docker | `curl --insecure` / `Acquire::https::Verify-Peer "false"` | `apt-get install -y ca-certificates && update-ca-certificates` |
+| **SI-6** | Inter-service HTTP | Plain `http://` subgraph URLs in production | mTLS via Linkerd or `https://` with certs |
+| **SI-7** | NATS without auth/TLS | `connect({ servers: url })` bare | `connect({ servers, tls, authenticator })` |
+| **SI-8** | DB direct access | `new Pool()` / raw `pg` client | `getOrCreatePool()` from `@edusphere/db` only |
+| **SI-9** | Cross-tenant query | Query without `withTenantContext()` | Always wrap: `withTenantContext(tenantId, userId, role, fn)` |
+| **SI-10** | LLM call without consent | Forward user message to OpenAI/Anthropic directly | Check `THIRD_PARTY_LLM` consent first — throw `CONSENT_REQUIRED` if missing |
+
+**Enforcement:** Pre-commit hook and CI gate must run `pnpm test:rls` + `pnpm audit --audit-level=high`.
+**Iron rule:** No commit may weaken any of SI-1 through SI-10. A failing invariant = a blocked PR.
+
+---
+
 ## Security
 
 ### Pre-commit Gate (every code change)

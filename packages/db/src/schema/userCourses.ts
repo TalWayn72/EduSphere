@@ -26,7 +26,7 @@ export const userCourses = pgTable('user_courses', {
 export const userCoursesRLS = sql`
 CREATE POLICY user_courses_isolation ON user_courses
   USING (
-    user_id::text = current_setting('app.current_user', TRUE)
+    user_id::text = current_setting('app.current_user_id', TRUE)
     OR EXISTS (
       SELECT 1 FROM courses
       WHERE courses.id = user_courses.course_id

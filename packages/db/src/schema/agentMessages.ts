@@ -33,7 +33,7 @@ CREATE POLICY agent_messages_session_isolation ON agent_messages
     EXISTS (
       SELECT 1 FROM agent_sessions
       WHERE agent_sessions.id = agent_messages.session_id
-      AND agent_sessions.user_id::text = current_setting('app.current_user', TRUE)
+      AND agent_sessions.user_id::text = current_setting('app.current_user_id', TRUE)
     )
   );
 

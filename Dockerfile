@@ -18,18 +18,17 @@ LABEL node.version="22-lts"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
-# Disable SSL verification for corporate proxy environments
-ENV GIT_SSL_NO_VERIFY=true
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 ENV PATH="/opt/nodejs/bin:$PATH"
 
 # ═══════════════════════════════════════════════════════════════
-# STAGE 0: Disable apt SSL verification (corporate proxy support)
+# STAGE 0: Ensure CA certificates are up to date
+# Required before any HTTPS apt/curl/wget operations
 # ═══════════════════════════════════════════════════════════════
 
-RUN echo 'Acquire::https::Verify-Peer "false";' > /etc/apt/apt.conf.d/99insecure && \
-    echo 'Acquire::https::Verify-Host "false";' >> /etc/apt/apt.conf.d/99insecure && \
-    echo 'Acquire::AllowInsecureRepositories "true";' >> /etc/apt/apt.conf.d/99insecure
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 1: System base + PGDG repo + PostgreSQL 17 + AGE + pgvector
@@ -37,9 +36,9 @@ RUN echo 'Acquire::https::Verify-Peer "false";' > /etc/apt/apt.conf.d/99insecure
 # ═══════════════════════════════════════════════════════════════
 
 RUN apt-get update && apt-get install -y \
-    build-essential curl wget git ca-certificates gnupg lsb-release \
+    build-essential curl wget git gnupg lsb-release \
     netcat-openbsd supervisor python3 python3-pip \
-    && curl -fsSL --insecure https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
        | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
        > /etc/apt/sources.list.d/pgdg.list \
@@ -54,14 +53,13 @@ RUN apt-get update && apt-get install -y \
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 2: Node.js 22 LTS + pnpm
-# Direct binary from nodejs.org — bypasses corporate SSL proxy issues
-# (NodeSource setup script's internal curl fails with SSL inspection)
+# Direct binary from nodejs.org — pinned to official signed release
 # ═══════════════════════════════════════════════════════════════
 
 RUN cd /tmp && \
-    NODEFILE=$(wget --no-check-certificate -qO- https://nodejs.org/dist/latest-v22.x/ \
+    NODEFILE=$(curl -fsSL https://nodejs.org/dist/latest-v22.x/ \
       | grep -oP 'node-v[0-9]+\.[0-9]+\.[0-9]+-linux-x64\.tar\.xz' | sort -V | tail -1) && \
-    wget --no-check-certificate -q "https://nodejs.org/dist/latest-v22.x/$NODEFILE" && \
+    curl -fsSL "https://nodejs.org/dist/latest-v22.x/$NODEFILE" -o "$NODEFILE" && \
     tar -xJf "$NODEFILE" && \
     mv "${NODEFILE%.tar.xz}" /opt/nodejs && \
     rm -f "$NODEFILE" && \
@@ -73,8 +71,9 @@ RUN cd /tmp && \
 # ═══════════════════════════════════════════════════════════════
 
 RUN cd /tmp && \
-    wget --no-check-certificate -q \
-      https://github.com/nats-io/nats-server/releases/download/v2.12.4/nats-server-v2.12.4-linux-amd64.tar.gz && \
+    curl -fsSL \
+      https://github.com/nats-io/nats-server/releases/download/v2.12.4/nats-server-v2.12.4-linux-amd64.tar.gz \
+      -o nats-server-v2.12.4-linux-amd64.tar.gz && \
     tar -xzf nats-server-v2.12.4-linux-amd64.tar.gz && \
     mv nats-server-v2.12.4-linux-amd64/nats-server /usr/local/bin/nats-server && \
     chmod +x /usr/local/bin/nats-server && \
@@ -84,9 +83,9 @@ RUN cd /tmp && \
 # STAGE 4: MinIO (latest)
 # ═══════════════════════════════════════════════════════════════
 
-RUN wget --no-check-certificate -q \
-      -O /usr/local/bin/minio \
-      https://dl.min.io/server/minio/release/linux-amd64/minio && \
+RUN curl -fsSL \
+      https://dl.min.io/server/minio/release/linux-amd64/minio \
+      -o /usr/local/bin/minio && \
     chmod +x /usr/local/bin/minio && \
     mkdir -p /data/minio
 
@@ -95,8 +94,9 @@ RUN wget --no-check-certificate -q \
 # ═══════════════════════════════════════════════════════════════
 
 RUN cd /opt && \
-    wget --no-check-certificate -q \
-      https://github.com/keycloak/keycloak/releases/download/26.5.3/keycloak-26.5.3.tar.gz && \
+    curl -fsSL \
+      https://github.com/keycloak/keycloak/releases/download/26.5.3/keycloak-26.5.3.tar.gz \
+      -o keycloak-26.5.3.tar.gz && \
     tar -xzf keycloak-26.5.3.tar.gz && \
     mv keycloak-26.5.3 keycloak && \
     rm keycloak-26.5.3.tar.gz
@@ -105,7 +105,7 @@ RUN cd /opt && \
 # STAGE 6: Ollama
 # ═══════════════════════════════════════════════════════════════
 
-RUN curl -fsSL --insecure https://ollama.com/install.sh | sh
+RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 7: Configure PostgreSQL 17 — AGE + pgvector + edusphere DB

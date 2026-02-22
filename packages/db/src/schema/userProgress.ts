@@ -26,8 +26,8 @@ export const userProgress = pgTable('user_progress', {
 
 export const userProgressRLS = sql`
 CREATE POLICY user_progress_isolation ON user_progress
-  USING (user_id::text = current_setting('app.current_user', TRUE))
-  WITH CHECK (user_id::text = current_setting('app.current_user', TRUE));
+  USING (user_id::text = current_setting('app.current_user_id', TRUE))
+  WITH CHECK (user_id::text = current_setting('app.current_user_id', TRUE));
 
 ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 `;

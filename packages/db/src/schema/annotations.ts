@@ -37,8 +37,8 @@ export const annotations = pgTable('annotations', {
 
 export const annotationsRLS = sql`
 CREATE POLICY annotations_user_isolation ON annotations
-  USING (user_id::text = current_setting('app.current_user', TRUE))
-  WITH CHECK (user_id::text = current_setting('app.current_user', TRUE));
+  USING (user_id::text = current_setting('app.current_user_id', TRUE))
+  WITH CHECK (user_id::text = current_setting('app.current_user_id', TRUE));
 
 ALTER TABLE annotations ENABLE ROW LEVEL SECURITY;
 `;
