@@ -539,8 +539,11 @@ jobs:
     name: Deployment Notification
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      statuses: write
     # Always run; depends on all deploy + smoke jobs to know final status
     needs:
+      - check-prerequisites
       - deploy-staging
       - smoke-test-staging
       - deploy-production
