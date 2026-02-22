@@ -43,10 +43,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v2
         with:
           version: 9
-          standalone: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

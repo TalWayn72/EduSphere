@@ -74,10 +74,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v2
         with:
-          version: 9
-          standalone: true
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -169,10 +168,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v2
         with:
-          version: 9
-          standalone: true
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -272,10 +270,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v2
         with:
-          version: 9
-          standalone: true
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -334,10 +331,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v2
         with:
-          version: 9
-          standalone: true
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
