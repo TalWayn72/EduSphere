@@ -158,11 +158,11 @@ describe('PgBouncer Cryptography (infrastructure/pgbouncer/pgbouncer.ini)', () =
   const content = readFile('infrastructure/pgbouncer/pgbouncer.ini');
 
   it('pgbouncer.ini uses scram-sha-256 auth_type', () => {
-    expect(content).toMatch(/auth_types*=s*scram-sha-256/);
+    expect(content).toMatch(/auth_type\s*=\s*scram-sha-256/);
   });
 
   it('does not use md5 auth_type (deprecated in PostgreSQL 16)', () => {
-    expect(content).not.toMatch(/auth_types*=s*md5/);
+    expect(content).not.toMatch(/auth_type\s*=\s*md5/);
   });
 });
 
