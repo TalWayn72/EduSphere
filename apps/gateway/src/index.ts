@@ -7,6 +7,8 @@ import { createYoga } from 'graphql-yoga';
 import { createServer } from 'http';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import pino from 'pino';
+import { checkRateLimit } from './middleware/rate-limit.js';
+import { depthLimitRule, complexityLimitRule } from './middleware/query-complexity.js';
 import { createNatsPubSub, shutdownNatsPubSub } from './nats-subscriptions.js';
 
 const logger = pino({
@@ -22,8 +24,6 @@ const KEYCLOAK_ISSUER = `${process.env.KEYCLOAK_URL || 'http://localhost:8080'}/
 const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
 
 // ── NATS pub/sub (distributed subscriptions across replicas) ─────────────────
-// Initialised before the gateway so it is ready for the first subscription.
-// Falls back to in-process EventEmitter when NATS_URL is not configured.
 const pubSub = await createNatsPubSub(logger);
 
 const gateway = createGateway({
@@ -43,8 +43,36 @@ const gateway = createGateway({
   additionalResolvers: [],
 });
 
+// ── G-09: Rate limiting helper ────────────────────────────────────────────────
+
+function rateLimitedResponse(resetAt: number): Response {
+  const retryAfterSec = Math.ceil((resetAt - Date.now()) / 1000);
+  return new Response(
+    JSON.stringify({
+      errors: [
+        {
+          message: 'Rate limit exceeded. Please retry later.',
+          extensions: { code: 'RATE_LIMIT_EXCEEDED', retryAfter: resetAt },
+        },
+      ],
+    }),
+    {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': String(retryAfterSec),
+      },
+    },
+  );
+}
+
+// ── G-10: Collect validation rules ───────────────────────────────────────────
+const validationRules = [depthLimitRule(), complexityLimitRule()];
+
 const yoga = createYoga({
   gateway,
+  // G-10: reject deeply-nested / high-complexity queries before execution
+  validationRules,
   cors: {
     origin: process.env.CORS_ORIGIN
       ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
@@ -53,9 +81,25 @@ const yoga = createYoga({
     methods: ['GET', 'POST', 'OPTIONS'],
   },
   logging: logger,
+  // G-09: Rate limiting applied in context (runs before resolvers)
   context: async ({ request }) => {
+    // Prefer tenant-scoped key; fall back to IP for unauthenticated requests
+    const tenantId =
+      (request.headers.get('x-tenant-id') as string | null) ??
+      (request.headers.get('x-forwarded-for') as string | null) ??
+      'unknown';
+
+    const rateCheck = checkRateLimit(tenantId);
+    if (!rateCheck.allowed) {
+      logger.warn({ tenantId, resetAt: rateCheck.resetAt }, 'G-09: rate limit exceeded');
+      // Yoga supports returning a Response from context to short-circuit
+      throw Object.assign(new Error('Rate limit exceeded'), {
+        _rateLimitResponse: rateLimitedResponse(rateCheck.resetAt),
+      });
+    }
+
     const authHeader = request.headers.get('authorization');
-    let tenantId: string | null = null;
+    let resolvedTenantId: string | null = null;
     let userId: string | null = null;
     let role: string | null = null;
     let isAuthenticated = false;
@@ -64,7 +108,7 @@ const yoga = createYoga({
       const token = authHeader.slice(7);
       try {
         const { payload } = await jwtVerify(token, JWKS, { issuer: KEYCLOAK_ISSUER });
-        tenantId = (payload['tenant_id'] as string) ?? null;
+        resolvedTenantId = (payload['tenant_id'] as string) ?? null;
         userId = payload.sub ?? null;
         role = (payload['role'] as string) ?? null;
         isAuthenticated = true;
@@ -76,13 +120,12 @@ const yoga = createYoga({
     return {
       isAuthenticated,
       userId,
-      tenantId,
+      tenantId: resolvedTenantId,
       role,
-      // Pub/sub engine available to subscription resolvers via context
       pubSub,
       headers: {
         authorization: authHeader,
-        'x-tenant-id': tenantId,
+        'x-tenant-id': resolvedTenantId,
         'x-user-id': userId,
         'x-user-role': role,
       },
@@ -90,12 +133,53 @@ const yoga = createYoga({
   },
 });
 
+// ── HTTP server with G-09 pre-flight rate-limit enforcement ──────────────────
+// We wrap the raw HTTP listener so that the 429 can be returned before Yoga
+// even parses the GraphQL document (cheaper than post-parse rejection).
+
 const port = parseInt(process.env.PORT || '4000');
-const server = createServer(yoga);
+
+const server = createServer(async (req, res) => {
+  // Extract rate-limit key from raw HTTP headers (before Yoga parsing)
+  const tenantHeader =
+    req.headers['x-tenant-id'] ??
+    req.headers['x-forwarded-for'] ??
+    req.socket.remoteAddress ??
+    'unknown';
+  const key = Array.isArray(tenantHeader) ? tenantHeader[0] : tenantHeader;
+
+  const rateCheck = checkRateLimit(key ?? 'unknown');
+  if (!rateCheck.allowed) {
+    const retryAfterSec = Math.ceil((rateCheck.resetAt - Date.now()) / 1000);
+    logger.warn({ key, resetAt: rateCheck.resetAt }, 'G-09: rate limit exceeded (HTTP layer)');
+    res.writeHead(429, {
+      'Content-Type': 'application/json',
+      'Retry-After': String(retryAfterSec),
+    });
+    res.end(
+      JSON.stringify({
+        errors: [
+          {
+            message: 'Rate limit exceeded. Please retry later.',
+            extensions: { code: 'RATE_LIMIT_EXCEEDED', retryAfter: rateCheck.resetAt },
+          },
+        ],
+      }),
+    );
+    return;
+  }
+
+  // Forward to Yoga handler
+  yoga.handle(req as unknown as Request, res as unknown as Response);
+});
 
 server.listen(port, () => {
   logger.info(`Gateway running on http://localhost:${port}/graphql`);
   logger.info('GraphQL Playground available');
+  logger.info(
+    { maxDepth: process.env['GRAPHQL_MAX_DEPTH'] ?? 10, maxComplexity: process.env['GRAPHQL_MAX_COMPLEXITY'] ?? 1000, rateLimitMax: process.env['RATE_LIMIT_MAX'] ?? 100 },
+    'G-09/G-10: rate limiting + query guards active',
+  );
 });
 
 // ── Graceful shutdown ─────────────────────────────────────────────────────────

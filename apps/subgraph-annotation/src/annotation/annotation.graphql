@@ -1,5 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@external", "@authenticated", "@requiresScopes"])
 
 enum AnnotationType {
   TEXT
@@ -56,11 +56,21 @@ type Query {
 }
 
 type Mutation {
-  createAnnotation(input: CreateAnnotationInput!): Annotation! @authenticated
-  updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation! @authenticated
-  deleteAnnotation(id: ID!): Boolean! @authenticated
-  resolveAnnotation(id: ID!): Annotation! @authenticated
-  replyToAnnotation(annotationId: ID!, content: String!): Annotation! @authenticated
+  createAnnotation(input: CreateAnnotationInput!): Annotation!
+    @authenticated
+    @requiresScopes(scopes: ["write:annotations"])
+  updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation!
+    @authenticated
+    @requiresScopes(scopes: ["write:annotations"])
+  deleteAnnotation(id: ID!): Boolean!
+    @authenticated
+    @requiresScopes(scopes: ["write:annotations"])
+  resolveAnnotation(id: ID!): Annotation!
+    @authenticated
+    @requiresScopes(scopes: ["write:annotations"])
+  replyToAnnotation(annotationId: ID!, content: String!): Annotation!
+    @authenticated
+    @requiresScopes(scopes: ["write:annotations"])
 }
 
 type Subscription {

@@ -1,5 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole", "@requiresScopes"])
 
 type UserPreferences {
   locale: String!
@@ -53,8 +53,17 @@ type Query {
 }
 
 type Mutation {
-  createUser(input: CreateUserInput!): User! @authenticated
-  updateUser(id: ID!, input: UpdateUserInput!): User! @authenticated
+  # Admin-only: creating a user with an arbitrary role requires ORG_ADMIN or SUPER_ADMIN
+  createUser(input: CreateUserInput!): User!
+    @authenticated
+    @requiresScopes(scopes: ["write:users"])
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+  # Role changes require admin privileges; first/last name updates are also guarded
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+    @authenticated
+    @requiresScopes(scopes: ["write:users"])
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+  # Self-service: any authenticated user may update their own preferences
   updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
 }
 
