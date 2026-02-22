@@ -1,4 +1,5 @@
 import { connect, StringCodec, type KV, type NatsConnection } from 'nats';
+import { buildNatsOptions } from './connection.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -24,6 +25,9 @@ export interface KVClientOptions {
  *
  * Provides typed get/set/delete operations with automatic bucket creation
  * and per-bucket TTL. Connections are lazily established and shared.
+ *
+ * SI-7: TLS and NKey authentication are automatically applied when the
+ * corresponding environment variables are set (see buildNatsOptions).
  */
 export class NatsKVClient {
   private readonly sc = StringCodec();
@@ -43,7 +47,12 @@ export class NatsKVClient {
   /** Returns the active NATS connection, establishing it if necessary. */
   private async connection(): Promise<NatsConnection> {
     if (!this.nc) {
-      this.nc = await connect({ servers: this.url });
+      // SI-7: Use buildNatsOptions to pick up TLS + NKey config from env.
+      // When a custom URL is provided via constructor options, override the
+      // servers field so that test overrides still work.
+      const opts = buildNatsOptions();
+      opts.servers = this.url;
+      this.nc = await connect(opts);
     }
     return this.nc;
   }

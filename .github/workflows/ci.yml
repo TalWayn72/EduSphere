@@ -180,6 +180,38 @@ jobs:
       - name: Run audit (prod deps — block on critical)
         run: pnpm audit --prod --audit-level=critical
 
+
+  # Security policy tests + RLS policy tests (static analysis -- no DB required)
+  security-policy-tests:
+    name: Security & RLS Policy Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: unit-tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Security tests (static analysis -- no DB required)
+        run: pnpm test:security
+
+      - name: RLS policy tests
+        run: pnpm test:rls
+
   # Build job - ensures all packages build successfully
   build:
     name: Build All Packages
@@ -306,7 +338,7 @@ jobs:
   ci-complete:
     name: CI Complete
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, unit-tests, security-scan, build, e2e-tests, codegen-validation]
+    needs: [lint, typecheck, unit-tests, security-scan, security-policy-tests, build, e2e-tests, codegen-validation]
     if: always()
 
     steps:
@@ -316,6 +348,7 @@ jobs:
                 "${{ needs.typecheck.result }}" != "success" || \
                 "${{ needs.unit-tests.result }}" != "success" || \
                 "${{ needs.security-scan.result }}" != "success" || \
+                "${{ needs.security-policy-tests.result }}" != "success" || \
                 "${{ needs.build.result }}" != "success" || \
                 "${{ needs.e2e-tests.result }}" != "success" || \
                 "${{ needs.codegen-validation.result }}" != "success" ]]; then

@@ -28,3 +28,6 @@ export * from './embeddings';
 
 // Translation tables
 export * from './contentTranslations';
+
+// Audit log table (GDPR Art.32 + SOC2 CC7.2)
+export * from './auditLog';
