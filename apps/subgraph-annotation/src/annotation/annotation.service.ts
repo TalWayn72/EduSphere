@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -7,17 +7,22 @@ import {
   desc,
   withTenantContext,
   sql,
+  closeAllPools,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
 @Injectable()
-export class AnnotationService {
+export class AnnotationService implements OnModuleDestroy {
   private readonly logger = new Logger(AnnotationService.name);
   private db: Database;
 
   constructor() {
     this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
   }
 
   private toTenantContext(authContext: AuthContext): TenantContext {

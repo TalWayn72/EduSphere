@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -55,6 +55,16 @@ export function CollaborationPage() {
   const navigate = useNavigate();
   const [matchState, setMatchState] = useState<MatchState>('idle');
   const [matchMode, setMatchMode] = useState<'human' | 'ai'>('human');
+  const matchTimeoutRef1 = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const matchTimeoutRef2 = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Cleanup match timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (matchTimeoutRef1.current) clearTimeout(matchTimeoutRef1.current);
+      if (matchTimeoutRef2.current) clearTimeout(matchTimeoutRef2.current);
+    };
+  }, []);
 
   // MY_DISCUSSIONS_QUERY is not in the running gateway supergraph (Docker image predates
   // the feature). Pause until the image is rebuilt. Tracked in OPEN_ISSUES.md (BUG-DOCKER-001).
@@ -79,15 +89,15 @@ export function CollaborationPage() {
     setMatchMode(mode);
     setMatchState('searching');
     if (mode === 'ai') {
-      setTimeout(() => {
+      matchTimeoutRef1.current = setTimeout(() => {
         setMatchState('found');
-        setTimeout(
+        matchTimeoutRef2.current = setTimeout(
           () => navigate(`/collaboration/session?partner=AI+Chavruta&topic=Dialectical+study`),
           1200
         );
       }, 1000);
     } else {
-      setTimeout(() => setMatchState('found'), 3000);
+      matchTimeoutRef1.current = setTimeout(() => setMatchState('found'), 3000);
     }
   };
 

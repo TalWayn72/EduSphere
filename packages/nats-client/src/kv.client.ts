@@ -5,6 +5,9 @@ import { connect, StringCodec, type KV, type NatsConnection } from 'nats';
 /** 24-hour TTL expressed in nanoseconds (NATS JetStream unit). */
 const DEFAULT_TTL_NS = 24 * 60 * 60 * 1_000_000_000;
 
+/** Maximum number of KV store handles to cache before evicting the oldest. */
+const MAX_STORE_CACHE_SIZE = 1000;
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface KVClientOptions {
@@ -50,6 +53,9 @@ export class NatsKVClient {
   /**
    * Returns the KV store for `bucketName`, creating the stream if it does not
    * exist yet. Results are cached to avoid redundant lookups.
+   *
+   * Applies insertion-order LRU eviction when the cache exceeds
+   * MAX_STORE_CACHE_SIZE entries.
    */
   async getStore(bucketName: string): Promise<KV> {
     const cached = this.stores.get(bucketName);
@@ -73,6 +79,15 @@ export class NatsKVClient {
     }
 
     this.stores.set(bucketName, kv);
+
+    // Evict oldest entry if over limit (insertion-order LRU).
+    if (this.stores.size > MAX_STORE_CACHE_SIZE) {
+      const oldestKey = this.stores.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.stores.delete(oldestKey);
+      }
+    }
+
     return kv;
   }
 

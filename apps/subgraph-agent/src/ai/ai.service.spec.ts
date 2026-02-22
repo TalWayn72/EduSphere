@@ -95,13 +95,15 @@ const MOCK_LANGGRAPH_RESULT = {
   text: 'LangGraph response',
   workflowResult: { isComplete: true },
 };
+const MOCK_CHECKPOINTER = { type: 'mock-checkpointer' };
+const mockLangGraphService = { getCheckpointer: () => MOCK_CHECKPOINTER };
 
 describe('AIService', () => {
   let service: AIService;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new AIService();
+    service = new AIService(mockLangGraphService as any);
 
     mockRunLangGraphDebate.mockResolvedValue(MOCK_LANGGRAPH_RESULT);
     mockRunLangGraphQuiz.mockResolvedValue(MOCK_LANGGRAPH_RESULT);
@@ -292,7 +294,7 @@ describe('AIService', () => {
       const result = await service.continueSession(
         SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX
       );
-      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
+      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
@@ -302,7 +304,8 @@ describe('AIService', () => {
         SESSION_ID,
         expect.any(String),
         expect.any(Object),
-        expect.any(String)
+        expect.any(String),
+        expect.any(Object)
       );
     });
 
@@ -310,26 +313,26 @@ describe('AIService', () => {
       const result = await service.continueSession(
         SESSION_ID, MESSAGE, 'QUIZ_GENERATOR', CTX
       );
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
+      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
     it('routes QUIZ_ASSESS to runLangGraphQuiz', async () => {
       await service.continueSession(SESSION_ID, MESSAGE, 'QUIZ_ASSESS', CTX);
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
+      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
     });
 
     it('routes TUTOR to runLangGraphTutor', async () => {
       const result = await service.continueSession(
         SESSION_ID, MESSAGE, 'TUTOR', CTX
       );
-      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
+      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
     it('routes EXPLANATION_GENERATOR to runLangGraphTutor', async () => {
       await service.continueSession(SESSION_ID, MESSAGE, 'EXPLANATION_GENERATOR', CTX);
-      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en');
+      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
     });
 
     it('routes SUMMARIZE to legacy summarizer (not LangGraph adapters)', async () => {
@@ -369,7 +372,7 @@ describe('AIService', () => {
 
     it('uses empty context object when none provided', async () => {
       await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE');
-      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, {}, 'en');
+      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, {}, 'en', MOCK_CHECKPOINTER);
     });
   });
 

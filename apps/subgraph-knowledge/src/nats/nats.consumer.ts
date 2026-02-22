@@ -61,6 +61,8 @@ export class NatsConsumer implements OnModuleInit, OnModuleDestroy {
         await jsm.streams.add({
           name: STREAM_NAME,
           subjects: ['knowledge.*'],
+          max_age: 24 * 60 * 60 * 1_000_000_000, // 24 hours in nanoseconds
+          max_bytes: 100 * 1024 * 1024,            // 100 MB max
         });
         this.logger.log(`Created NATS stream: ${STREAM_NAME}`);
       }

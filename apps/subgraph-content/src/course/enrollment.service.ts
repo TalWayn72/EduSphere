@@ -1,11 +1,15 @@
-import { Injectable, Logger, ConflictException, NotFoundException } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, and, withTenantContext } from '@edusphere/db';
+import { Injectable, Logger, ConflictException, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, and, withTenantContext, closeAllPools } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 
 @Injectable()
-export class EnrollmentService {
+export class EnrollmentService implements OnModuleDestroy {
   private readonly logger = new Logger(EnrollmentService.name);
   private db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async enrollCourse(courseId: string, ctx: TenantContext) {
     return withTenantContext(this.db, ctx, async (tx) => {

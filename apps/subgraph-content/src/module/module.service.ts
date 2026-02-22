@@ -1,5 +1,5 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, asc, inArray } from '@edusphere/db';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, asc, inArray, closeAllPools } from '@edusphere/db';
 
 type DbModule = typeof schema.modules.$inferSelect;
 
@@ -11,9 +11,13 @@ interface ModuleInput {
 }
 
 @Injectable()
-export class ModuleService {
+export class ModuleService implements OnModuleDestroy {
   private readonly logger = new Logger(ModuleService.name);
   private readonly db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   private mapModule(row: DbModule) {
     return {

@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq } from '@edusphere/db';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, closeAllPools } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
 
 @Injectable()
-export class TenantService {
+export class TenantService implements OnModuleDestroy {
   private db: Database;
 
   constructor() {
     this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
   }
 
   async findById(id: string) {

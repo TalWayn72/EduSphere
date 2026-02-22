@@ -46,6 +46,10 @@ const DEV_USER: AuthUser = {
 let devAuthenticated = false;
 let devToken = 'dev-token-mock-jwt';
 
+// Module-level handle so the token-refresh interval can be cleared on logout
+// or if setupTokenRefresh() is called more than once (e.g. hot-reload).
+let _tokenRefreshInterval: ReturnType<typeof setInterval> | null = null;
+
 export function initKeycloak(): Promise<boolean> {
   // Development mode - skip Keycloak
   if (DEV_MODE) {
@@ -115,10 +119,12 @@ export function login(): void {
 export function logout(): void {
   if (DEV_MODE) {
     devAuthenticated = false;
+    clearTokenRefresh();
     window.location.href = '/login';
     return;
   }
 
+  clearTokenRefresh();
   keycloak!.logout({
     redirectUri: window.location.origin,
   });
@@ -175,10 +181,20 @@ export function getCurrentUser(): AuthUser | null {
   };
 }
 
+export function clearTokenRefresh(): void {
+  if (_tokenRefreshInterval !== null) {
+    clearInterval(_tokenRefreshInterval);
+    _tokenRefreshInterval = null;
+  }
+}
+
 function setupTokenRefresh(): void {
   if (DEV_MODE || !keycloak) return;
 
-  setInterval(() => {
+  if (_tokenRefreshInterval !== null) {
+    clearInterval(_tokenRefreshInterval);
+  }
+  _tokenRefreshInterval = setInterval(() => {
     keycloak
       .updateToken(70)
       .then((refreshed) => {

@@ -41,6 +41,8 @@ services:
     environment:
       # Node
       - NODE_ENV=development
+      # Memory safety: cap Node.js heap to 6 GiB inside the 8 GiB container limit
+      - NODE_OPTIONS=--max-old-space-size=6144
       # Database
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere
       # CORS
@@ -48,6 +50,13 @@ services:
       # Logging
       - LOG_LEVEL=debug
       - LOG_PRETTY=true
+    # ── Memory Safety (Wave 4-B) ──────────────────────────────────
+    # Hard limit: Docker OOM-killer fires at 8 GiB.
+    # Soft reservation: scheduler keeps 4 GiB guaranteed for this
+    # container; NODE_OPTIONS above caps the JS heap at 6 GiB so
+    # the process can be killed cleanly before the hard limit.
+    mem_limit: 8g
+    mem_reservation: 4g
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
       interval: 30s

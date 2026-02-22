@@ -1,9 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
   eq,
   withTenantContext,
+  closeAllPools,
 } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
@@ -27,12 +28,16 @@ export function parsePreferences(raw: unknown): UserPreferences {
 }
 
 @Injectable()
-export class UserPreferencesService {
+export class UserPreferencesService implements OnModuleDestroy {
   private readonly logger = new Logger(UserPreferencesService.name);
   private db: Database;
 
   constructor() {
     this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
   }
 
   private toTenantContext(authContext: AuthContext) {

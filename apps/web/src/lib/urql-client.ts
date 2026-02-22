@@ -41,3 +41,12 @@ export const urqlClient = createClient({
     };
   },
 });
+export function disposeWsClient(): void {
+  wsClient.dispose();
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    wsClient.dispose();
+  });
+}

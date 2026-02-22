@@ -4,6 +4,8 @@ import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { injectLocale } from './locale-prompt';
 
+const MAX_DEBATE_ARGUMENTS = 20;
+
 const DebateStateSchema = z.object({
   topic: z.string(),
   position: z.enum(['for', 'against']),
@@ -30,7 +32,15 @@ const DebateStateAnnotation = Annotation.Root({
   position: Annotation<'for' | 'against'>({ value: (_, u) => u, default: () => 'for' }),
   rounds: Annotation<number>({ value: (_, u) => u, default: () => 3 }),
   currentRound: Annotation<number>({ value: (_, u) => u, default: () => 1 }),
-  arguments: Annotation<DebateState['arguments']>({ value: (_, u) => u, default: () => [] }),
+  arguments: Annotation<DebateState['arguments']>({
+    reducer: (existing, incoming) => {
+      const merged = [...existing, ...incoming];
+      return merged.length > MAX_DEBATE_ARGUMENTS
+        ? merged.slice(merged.length - MAX_DEBATE_ARGUMENTS)
+        : merged;
+    },
+    default: () => [],
+  }),
   synthesis: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
@@ -87,7 +97,6 @@ Provide a strong, logical argument for your position. Use evidence and reasoning
 
     return {
       arguments: [
-        ...state.arguments,
         {
           round: state.currentRound,
           position: state.position,

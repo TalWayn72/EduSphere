@@ -20,6 +20,7 @@ export class NatsService implements OnModuleDestroy {
   private readonly logger = new Logger(NatsService.name);
   private readonly sc = StringCodec();
   private connection: NatsConnection | null = null;
+  private readonly subscriptions: Array<() => void> = [];
 
   // ── Connection ─────────────────────────────────────────────────────────────
 
@@ -91,12 +92,16 @@ export class NatsService implements OnModuleDestroy {
     void processMessages();
     this.logger.debug(`Subscribed to NATS subject: ${subject}`);
 
-    return () => sub.unsubscribe();
+    const cleanup = () => sub.unsubscribe();
+    this.subscriptions.push(cleanup);
+    return cleanup;
   }
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   async onModuleDestroy(): Promise<void> {
+    this.subscriptions.forEach((cleanup) => cleanup());
+    this.subscriptions.length = 0;
     if (this.connection) {
       await this.connection.drain();
       this.connection = null;

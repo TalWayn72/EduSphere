@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc } from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, desc, closeAllPools } from '@edusphere/db';
 
 interface CreateCourseInput {
   tenantId?: string;
@@ -22,9 +22,13 @@ interface UpdateCourseInput {
 }
 
 @Injectable()
-export class CourseService {
+export class CourseService implements OnModuleDestroy {
   private readonly logger = new Logger(CourseService.name);
   private db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   private mapCourse(course: Record<string, unknown> | null | undefined) {
     if (!course) return null;

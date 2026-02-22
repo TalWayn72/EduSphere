@@ -5,18 +5,17 @@
  * compiles the graph with a durable checkpointer, invokes it with a
  * thread_id derived from the agent session ID, and returns an AIResult.
  *
- * Checkpointer strategy:
+ * Checkpointer strategy (injected via LangGraphService):
  *  - When DATABASE_URL is set: PostgresSaver (durable, multi-replica safe).
  *  - Otherwise: MemorySaver (development / single-replica fallback).
  *
- * The checkpointer instance is module-level so it is created only once per
- * process. PostgresSaver.setup() is idempotent and creates the checkpoint
- * tables if they do not yet exist.
+ * Each adapter accepts an optional `checkpointer` parameter.  When provided
+ * (the normal NestJS injection path) it is used directly.  When omitted a
+ * fresh MemorySaver is created as a backward-compatible fallback for tests.
  */
 
 import { MemorySaver } from '@langchain/langgraph';
 import { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
-import pg from 'pg';
 import {
   createDebateWorkflow,
   createQuizWorkflow,
@@ -25,37 +24,7 @@ import {
 } from '@edusphere/langgraph-workflows';
 import type { AIResult } from './ai.service';
 
-// ── Checkpointer factory ──────────────────────────────────────────────────────
-
-let _checkpointer: MemorySaver | PostgresSaver | null = null;
-
-export async function getCheckpointer(): Promise<MemorySaver | PostgresSaver> {
-  if (_checkpointer) return _checkpointer;
-
-  const dbUrl = process.env.DATABASE_URL;
-  if (dbUrl) {
-    try {
-      const pool = new pg.Pool({ connectionString: dbUrl, max: 5 });
-      const saver = new PostgresSaver(pool);
-      // Creates checkpoint tables if they do not exist (idempotent).
-      await saver.setup();
-      _checkpointer = saver;
-      console.log('[LangGraph] Using PostgresSaver for durable checkpointing');
-    } catch (err) {
-      console.warn(
-        '[LangGraph] PostgresSaver init failed, falling back to MemorySaver:',
-        err
-      );
-      _checkpointer = new MemorySaver();
-    }
-  } else {
-    _checkpointer = new MemorySaver();
-    console.log(
-      '[LangGraph] DATABASE_URL not set — using MemorySaver (dev mode)'
-    );
-  }
-  return _checkpointer;
-}
+type Checkpointer = MemorySaver | PostgresSaver;
 
 // ── Thread config helper ───────────────────────────────────────────────────
 
@@ -69,11 +38,12 @@ export async function runLangGraphDebate(
   threadId: string,
   message: string,
   context: Record<string, unknown>,
-  locale: string = 'en'
+  locale: string = 'en',
+  checkpointer?: Checkpointer
 ): Promise<AIResult> {
-  const checkpointer = await getCheckpointer();
+  const cp = checkpointer ?? new MemorySaver();
   const workflow = createDebateWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer: cp });
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -100,11 +70,12 @@ export async function runLangGraphQuiz(
   threadId: string,
   message: string,
   context: Record<string, unknown>,
-  locale: string = 'en'
+  locale: string = 'en',
+  checkpointer?: Checkpointer
 ): Promise<AIResult> {
-  const checkpointer = await getCheckpointer();
+  const cp = checkpointer ?? new MemorySaver();
   const workflow = createQuizWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer: cp });
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -133,11 +104,12 @@ export async function runLangGraphTutor(
   threadId: string,
   message: string,
   context: Record<string, unknown>,
-  locale: string = 'en'
+  locale: string = 'en',
+  checkpointer?: Checkpointer
 ): Promise<AIResult> {
-  const checkpointer = await getCheckpointer();
+  const cp = checkpointer ?? new MemorySaver();
   const workflow = createTutorWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer: cp });
 
   const state = {
     question: message,
@@ -170,11 +142,12 @@ export async function runLangGraphAssessment(
   threadId: string,
   message: string,
   context: Record<string, unknown>,
-  locale: string = 'en'
+  locale: string = 'en',
+  checkpointer?: Checkpointer
 ): Promise<AIResult> {
-  const checkpointer = await getCheckpointer();
+  const cp = checkpointer ?? new MemorySaver();
   const workflow = createAssessmentWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer });
+  const compiled = workflow.compile({ checkpointer: cp });
 
   const submission = {
     questionId: 'q1',

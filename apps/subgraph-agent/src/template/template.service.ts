@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc } from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, desc, closeAllPools } from '@edusphere/db';
 
 // ── Default template definitions ──────────────────────────────────────────────
 
@@ -59,9 +59,13 @@ demonstrated understanding. Always check for comprehension before moving on.`,
 };
 
 @Injectable()
-export class TemplateService {
+export class TemplateService implements OnModuleDestroy {
   private readonly logger = new Logger(TemplateService.name);
   private db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async findById(id: string) {
     const [template] = await this.db
@@ -187,6 +191,8 @@ export class TemplateService {
 
   /** Return the config for a built-in template type (for direct AI service use). */
   getDefaultConfig(templateKey: string): DefaultTemplateConfig | null {
+    if (!Object.hasOwn(DEFAULT_TEMPLATES, templateKey)) return null;
+    // eslint-disable-next-line security/detect-object-injection
     return DEFAULT_TEMPLATES[templateKey] ?? null;
   }
 }

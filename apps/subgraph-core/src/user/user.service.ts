@@ -1,20 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
   eq,
   withTenantContext,
+  closeAllPools,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 import { parsePreferences } from './user-preferences.service';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnModuleDestroy {
   private db: Database;
 
   constructor() {
     this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
   }
 
   private toTenantContext(authContext: AuthContext): TenantContext {

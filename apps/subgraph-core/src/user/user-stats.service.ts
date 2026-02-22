@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -6,6 +6,7 @@ import {
   eq,
   and,
   withTenantContext,
+  closeAllPools,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 
@@ -23,12 +24,16 @@ export interface UserStats {
 }
 
 @Injectable()
-export class UserStatsService {
+export class UserStatsService implements OnModuleDestroy {
   private readonly logger = new Logger(UserStatsService.name);
   private db: Database;
 
   constructor() {
     this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
   }
 
   async getMyStats(userId: string, tenantId: string): Promise<UserStats> {

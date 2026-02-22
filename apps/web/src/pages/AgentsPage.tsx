@@ -145,6 +145,7 @@ export function AgentsPage() {
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
   const [, sendMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
@@ -195,6 +196,21 @@ export function AgentsPage() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [sessions, streamingContent, isTyping]);
+
+  // Cleanup on unmount — cancel any in-flight interval or timeout to prevent
+  // state updates on an unmounted component (timer leak fix).
+  useEffect(() => {
+    return () => {
+      if (streamRef.current !== undefined) {
+        clearInterval(streamRef.current);
+        streamRef.current = undefined;
+      }
+      if (streamTimeoutRef.current !== undefined) {
+        clearTimeout(streamTimeoutRef.current);
+        streamTimeoutRef.current = undefined;
+      }
+    };
+  }, []);
 
   const handleSend = useCallback(async () => {
     if (!chatInput.trim() || isTyping || streamingContent) return;
@@ -251,7 +267,7 @@ export function AgentsPage() {
 
     // ── Mock / DEV_MODE path — streaming animation ──
     setIsTyping(true);
-    setTimeout(() => {
+    streamTimeoutRef.current = setTimeout(() => {
       const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
       const fullText =
         modeData.responses[Math.floor(Math.random() * modeData.responses.length)] ??

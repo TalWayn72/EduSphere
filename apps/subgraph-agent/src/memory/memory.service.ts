@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc } from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, desc, closeAllPools } from '@edusphere/db';
 import { NatsKVClient } from '@edusphere/nats-client';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ interface AgentMessageRow {
 // ── MemoryService ─────────────────────────────────────────────────────────────
 
 @Injectable()
-export class MemoryService {
+export class MemoryService implements OnModuleDestroy {
   private readonly logger = new Logger(MemoryService.name);
   private readonly db = createDatabaseConnection();
   private readonly kv = new NatsKVClient();
@@ -186,5 +186,10 @@ export class MemoryService {
     }
 
     return context;
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.kv.close();
+    await closeAllPools();
   }
 }

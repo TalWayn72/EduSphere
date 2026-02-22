@@ -93,6 +93,57 @@
 11. **Security-first** - RLS validation, JWT scopes, input sanitization, no secrets in code
 12. **Parallel execution mandatory** - Split every task into sub-tasks whenever possible and run Agents/Workers in parallel for maximum efficiency
 
+
+## Memory Safety (Mandatory)
+
+**Iron rule:** No commit may introduce a memory leak. Every resource opened must have a corresponding close/cleanup path.
+
+### Backend Rules
+| Rule | Pattern |
+|------|---------|
+| Every `@Injectable()` service with `createDatabaseConnection()` MUST implement `OnModuleDestroy` calling `closeAllPools()` | `implements OnModuleDestroy` |
+| Every `@Injectable()` service with `new NatsKVClient()` MUST call `this.kv.close()` in `OnModuleDestroy` | Lifecycle hook |
+| Every `setInterval`/`setTimeout` in a NestJS service MUST store the handle and clear it in `OnModuleDestroy` | Handle in class field |
+| All async `for await` subscription loops MUST be stoppable via the subscription's `unsubscribe()` — track in service array | Subscription tracking array |
+| Fire-and-forget async MUST use `Promise.race(task, timeoutPromise)` with DB failure update on timeout | 5-min default timeout |
+| Unbounded `Map`/`Array` MUST have max-size eviction (insertion-order LRU for Map, `slice(-N)` for arrays) | Size guard |
+| Database pools MUST use `getOrCreatePool()` from `@edusphere/db` — never `new Pool()` directly | Import `getOrCreatePool` |
+
+### Frontend Rules
+| Rule | Pattern |
+|------|---------|
+| Every `setInterval` in component/hook MUST have `clearInterval` in `useEffect` cleanup return | `const ref = useRef(); useEffect(() => () => clearInterval(ref.current), [])` |
+| Every `setTimeout` inside a component MUST be stored in `useRef` and cleared in `useEffect` cleanup | Same pattern |
+| NEVER `return () => cleanup()` inside `useCallback` — the return value is **discarded** by React | Use `useEffect` for cleanup instead |
+| GraphQL subscriptions (`useSubscription`) MUST use `pause: true` flag tied to component mount state | `const [paused, setPaused] = useState(false); useEffect(() => () => setPaused(true), [])` |
+| Module-level WebSocket clients MUST be disposed on `window.beforeunload` | `window.addEventListener('beforeunload', () => client.dispose())` |
+
+### Infrastructure Rules
+| Rule | Pattern |
+|------|---------|
+| ALL Docker services MUST have `mem_limit` AND `mem_reservation` in docker-compose files | Validated in CI |
+| All Node.js services MUST set `NODE_OPTIONS=--max-old-space-size` ≤ 75% of container `mem_limit` | Environment block |
+| ALL NATS JetStream streams MUST declare `max_age` AND `max_bytes` at creation | Use stream factory helper |
+| LangGraph checkpointers MUST be wrapped in NestJS `@Injectable()` with `OnModuleInit`/`OnModuleDestroy` | `LangGraphService` pattern |
+
+### Memory Testing Rules (required for every new service/hook)
+| Change Type | Required Test |
+|-------------|---------------|
+| New NestJS service with DB/NATS connections | `*.memory.spec.ts` verifying `onModuleDestroy` calls cleanup |
+| New React hook with timers or subscriptions | `*.memory.test.ts` verifying `unmount` triggers `clearTimeout`/`clearInterval` |
+| New unbounded Map or growing array | Test verifying eviction fires at configured max size |
+| New async subscription loop | Test verifying loop exits cleanly on `unsubscribe()` |
+| New `setInterval` anywhere | Test verifying `clearInterval` called on service destroy or component unmount |
+
+### OOM Response Protocol
+| Event | Action |
+|-------|--------|
+| Container OOM-killed | Check `docker stats` → identify service → increase `mem_limit` OR fix the leak |
+| Node.js heap OOM | Run with `--expose-gc` + `--heap-prof` → analyze `.heapprofile` in Chrome DevTools |
+| NATS memory pressure | Check stream sizes: `nats stream ls` + `nats stream info <name>` → enforce retention |
+| PostgreSQL connection exhaustion | Check `pg_stat_activity` → verify `closeAllPools()` is called on service destroy |
+| First OOM in CI | Reduce parallel agents by 20% (see Parallel Execution section) |
+
 ## Environment Setup
 
 ### Required Environment Variables

@@ -28,7 +28,17 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const outerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const innerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const { t } = useTranslation('agents');
+
+  // Cleanup both timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
+      if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+    };
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -57,7 +67,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
     setIsStreaming(true);
 
     // Simulate AI response with streaming
-    setTimeout(() => {
+    outerTimeoutRef.current = setTimeout(() => {
       const agentMessage: Message = {
         id: `msg-${Date.now()}-agent`,
         role: 'agent',
@@ -69,7 +79,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
       setMessages((prev) => [...prev, agentMessage]);
 
       // End streaming after 1 second
-      setTimeout(() => {
+      innerTimeoutRef.current = setTimeout(() => {
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === agentMessage.id ? { ...msg, isStreaming: false } : msg

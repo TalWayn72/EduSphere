@@ -27,6 +27,7 @@ import {
   fetchContentItem,
 } from './ai.service.db';
 import { injectLocale } from './locale-prompt';
+import { LangGraphService } from './langgraph.service';
 import { createOllama } from 'ollama-ai-provider';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -97,6 +98,8 @@ identify knowledge gaps, and guide inquiry-based learning.`,
 export class AIService {
   private readonly logger = new Logger(AIService.name);
 
+  constructor(private readonly langGraphService: LangGraphService) {}
+
   // ── Model factory ──────────────────────────────────────────────────────────
 
   private getModel(): LanguageModel {
@@ -131,8 +134,8 @@ export class AIService {
 
   // ── continueSession — primary entry point from resolver ───────────────────
   //
-  // Uses the session.id as the LangGraph thread_id so the MemorySaver
-  // checkpointer maintains conversation state across successive calls.
+  // Uses the session.id as the LangGraph thread_id so the checkpointer
+  // maintains conversation state across successive calls.
 
   async continueSession(
     sessionId: string,
@@ -146,14 +149,16 @@ export class AIService {
     );
 
     try {
+      const checkpointer = this.langGraphService.getCheckpointer();
+
       if (templateType === 'CHAVRUTA_DEBATE') {
-        return runLangGraphDebate(sessionId, message, context, locale);
+        return runLangGraphDebate(sessionId, message, context, locale, checkpointer);
       }
       if (templateType === 'QUIZ_GENERATOR' || templateType === 'QUIZ_ASSESS') {
-        return runLangGraphQuiz(sessionId, message, context, locale);
+        return runLangGraphQuiz(sessionId, message, context, locale, checkpointer);
       }
       if (templateType === 'TUTOR' || templateType === 'EXPLANATION_GENERATOR') {
-        return runLangGraphTutor(sessionId, message, context, locale);
+        return runLangGraphTutor(sessionId, message, context, locale, checkpointer);
       }
       if (templateType === 'SUMMARIZE') {
         const model = this.getModel();
@@ -209,7 +214,12 @@ export class AIService {
 
   // ── executeStream ──────────────────────────────────────────────────────────
 
-  async executeStream(agent: AgentDefinition, input: ExecutionInput, locale: string = 'en') {
+  async executeStream(
+    agent: AgentDefinition,
+    input: ExecutionInput,
+    locale: string = 'en',
+    abortSignal?: AbortSignal,
+  ) {
     this.logger.debug(`Streaming agent: ${agent.template}`);
     const model = this.getModel();
 
@@ -238,6 +248,7 @@ export class AIService {
       maxOutputTokens: cfg.maxTokens ?? 2000,
       stopWhen: stepCountIs(MAX_TOOL_STEPS),
       tools: this.buildTools(tenantId),
+      abortSignal,
     });
   }
 
@@ -401,6 +412,6 @@ export class AIService {
     const ctx = input.context
       ? `Context: ${JSON.stringify(input.context)}\n\n`
       : '';
-    return `${ctx}${input.message ?? input.query ?? ''}`;
+    return `${ctx}${input.message ?? input.query ?? ""}`;
   }
 }

@@ -109,6 +109,14 @@ export function KnowledgeGraph() {
   // DEV_MODE mock path state — replaces the paused real query in development
   const [mockPathResult, setMockPathResult] = useState<ApiLearningPath | null>(null);
   const [mockPathLoading, setMockPathLoading] = useState(false);
+  const mockPathTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Cleanup mock path timer on unmount
+  useEffect(() => {
+    return () => {
+      if (mockPathTimerRef.current) clearTimeout(mockPathTimerRef.current);
+    };
+  }, []);
 
   // Dismiss toast after 4 s
   useEffect(() => {
@@ -228,11 +236,12 @@ export function KnowledgeGraph() {
       // Reset previous result and show a brief loading flash before returning mock data.
       setMockPathResult(null);
       setMockPathLoading(true);
-      const timer = setTimeout(() => {
+      if (mockPathTimerRef.current) clearTimeout(mockPathTimerRef.current);
+      mockPathTimerRef.current = setTimeout(() => {
         setMockPathLoading(false);
         setMockPathResult(MOCK_LEARNING_PATH);
       }, 600);
-      return () => clearTimeout(timer);
+      return;
     }
   }, [pathFrom, pathTo]);
 

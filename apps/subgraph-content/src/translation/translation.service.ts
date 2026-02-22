@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { connect, StringCodec } from 'nats';
 import {
   createDatabaseConnection,
@@ -6,15 +6,20 @@ import {
   eq,
   and,
   withTenantContext,
+  closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext, ContentTranslation } from '@edusphere/db';
 
 const sc = StringCodec();
 
 @Injectable()
-export class TranslationService {
+export class TranslationService implements OnModuleDestroy {
   private readonly logger = new Logger(TranslationService.name);
   private readonly db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async findTranslation(
     contentItemId: string,

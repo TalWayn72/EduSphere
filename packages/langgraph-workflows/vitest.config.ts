@@ -6,6 +6,10 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
     passWithNoTests: true,
+    pool: 'forks',
+    forks: {
+      execArgv: ['--max-old-space-size=512'],
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

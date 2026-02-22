@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
   eq,
   sql,
+  closeAllPools,
 } from '@edusphere/db';
 
 export interface EmbeddingRecord {
@@ -30,9 +31,13 @@ export interface SegmentInput {
 const BATCH_SIZE = 20;
 
 @Injectable()
-export class EmbeddingService {
+export class EmbeddingService implements OnModuleDestroy {
   private readonly logger = new Logger(EmbeddingService.name);
   private readonly db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   // ── Lookup ────────────────────────────────────────────────────────────────
 

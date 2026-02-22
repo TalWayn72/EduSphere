@@ -1,13 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc, and } from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { createDatabaseConnection, schema, eq, desc, and, closeAllPools } from '@edusphere/db';
 import { AIService } from '../ai/ai.service';
 
 @Injectable()
-export class AgentService {
+export class AgentService implements OnModuleDestroy {
   private readonly logger = new Logger(AgentService.name);
   private db = createDatabaseConnection();
 
   constructor(private readonly aiService: AIService) {}
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+  }
 
   async findById(id: string) {
     const [execution] = await this.db

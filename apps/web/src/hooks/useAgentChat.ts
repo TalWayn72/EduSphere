@@ -77,6 +77,16 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const mockTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const streamingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (mockTimeoutRef.current) clearTimeout(mockTimeoutRef.current);
+      if (streamingTimeoutRef.current) clearTimeout(streamingTimeoutRef.current);
+    };
+  }, []);
 
   const [, startSession] = useMutation<
     StartAgentSessionMutation,
@@ -141,7 +151,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
 
   const appendMockResponse = useCallback(() => {
     setIsStreaming(true);
-    setTimeout(() => {
+    mockTimeoutRef.current = setTimeout(() => {
       const reply =
         MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)] ?? '';
       setConfirmedMessages((prev) => [
@@ -203,7 +213,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           return;
         }
         // Streaming response will arrive via subscription
-        setTimeout(() => setIsStreaming(false), 30_000);
+        streamingTimeoutRef.current = setTimeout(() => setIsStreaming(false), 30_000);
         return;
       }
 

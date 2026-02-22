@@ -1,9 +1,9 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException, OnModuleDestroy } from '@nestjs/common';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import { connect, StringCodec } from 'nats';
-import { createDatabaseConnection, schema } from '@edusphere/db';
+import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 
 const PRESIGNED_URL_EXPIRY_SECONDS = 900; // 15 minutes
 
@@ -25,7 +25,7 @@ interface MediaAssetResult {
 }
 
 @Injectable()
-export class MediaService {
+export class MediaService implements OnModuleDestroy {
   private readonly logger = new Logger(MediaService.name);
   private readonly s3: S3Client;
   private readonly bucket: string;
@@ -47,6 +47,10 @@ export class MediaService {
     });
 
     this.logger.log(`MediaService initialized: bucket=${this.bucket} endpoint=${endpoint}`);
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
   }
 
   async getPresignedUploadUrl(

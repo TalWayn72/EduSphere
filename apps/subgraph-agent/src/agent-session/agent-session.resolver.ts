@@ -29,15 +29,12 @@ interface AgentMessagePayload {
   createdAt: string;
 }
 
-const pubSub = createPubSub<{
-  [key: `messageStream_${string}`]: [{ messageStream: AgentMessagePayload }];
-}>();
-
 const tracer = trace.getTracer('subgraph-agent');
 
 @Resolver('AgentSession')
 export class AgentSessionResolver {
   private readonly logger = new Logger(AgentSessionResolver.name);
+  private readonly pubSub = createPubSub<Record<string, [{ messageStream: AgentMessagePayload }]>>();
 
   constructor(
     private readonly agentSessionService: AgentSessionService,
@@ -154,7 +151,7 @@ export class AgentSessionResolver {
         authContext
       );
 
-      pubSub.publish(`messageStream_${sessionId}`, {
+      this.pubSub.publish(`messageStream_${sessionId}`, {
         messageStream: userMessage as unknown as AgentMessagePayload,
       });
 
@@ -192,7 +189,7 @@ export class AgentSessionResolver {
         authContext
       );
 
-      pubSub.publish(`messageStream_${sessionId}`, {
+      this.pubSub.publish(`messageStream_${sessionId}`, {
         messageStream: assistantMessage as unknown as AgentMessagePayload,
       });
 
@@ -218,6 +215,16 @@ export class AgentSessionResolver {
   ) {
     const authContext = this.extractAuthContext(context);
     await this.agentSessionService.complete(id, authContext);
+    // Signal subscribers that the stream is done
+    this.pubSub.publish('messageStream_' + id, {
+      messageStream: {
+        id: '__end__',
+        sessionId: id,
+        role: 'SYSTEM' as const,
+        content: '',
+        createdAt: new Date().toISOString(),
+      },
+    });
     return true;
   }
 
@@ -228,7 +235,7 @@ export class AgentSessionResolver {
     ) => payload.messageStream.sessionId === variables.sessionId,
   })
   subscribeToMessageStream(@Args('sessionId') sessionId: string) {
-    return pubSub.subscribe(`messageStream_${sessionId}`);
+    return this.pubSub.subscribe(`messageStream_${sessionId}`);
   }
 
   @ResolveField('messages')

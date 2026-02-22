@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   ForbiddenException,
+  OnModuleDestroy,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -13,6 +14,7 @@ import {
   inArray,
   withTenantContext,
   sql,
+  closeAllPools,
   type Database,
   type TenantContext,
 } from '@edusphere/db';
@@ -23,12 +25,16 @@ import type {
 } from './discussion.schemas';
 
 @Injectable()
-export class DiscussionService {
+export class DiscussionService implements OnModuleDestroy {
   private readonly logger = new Logger(DiscussionService.name);
   private db: Database;
 
   constructor() {
     this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
   }
 
   private toTenantContext(authContext: AuthContext): TenantContext {

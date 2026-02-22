@@ -5,7 +5,7 @@
  * Uses React 19 useTransition for the enroll/unenroll action so the UI
  * stays responsive while the mutation is in flight.
  */
-import { useTransition, useState } from 'react';
+import { useTransition, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -100,6 +100,14 @@ export function CourseDetailPage() {
   // enroll/unenroll mutation.  isEnrolling replaces the old useState flag.
   const [isEnrolling, startEnrollTransition] = useTransition();
   const [toast, setToast] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Cleanup toast timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   const course = data?.course;
   const isEnrolled = enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ?? false;
@@ -107,7 +115,8 @@ export function CourseDetailPage() {
 
   const showToast = (msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setToast(null), 3000);
   };
 
   const handleEnroll = () => {

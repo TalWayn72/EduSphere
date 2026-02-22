@@ -4,6 +4,8 @@ import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { injectLocale } from './locale-prompt';
 
+const MAX_HISTORY_MESSAGES = 20;
+
 const TutorStateSchema = z.object({
   question: z.string(),
   context: z.string().optional(),
@@ -33,7 +35,15 @@ const TutorStateAnnotation = Annotation.Root({
   question: Annotation<string>(),
   context: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
   studentLevel: Annotation<TutorState['studentLevel']>({ value: (_, u) => u, default: () => 'intermediate' }),
-  conversationHistory: Annotation<TutorState['conversationHistory']>({ value: (_, u) => u, default: () => [] }),
+  conversationHistory: Annotation<TutorState['conversationHistory']>({
+    reducer: (existing, incoming) => {
+      const merged = [...existing, ...incoming];
+      return merged.length > MAX_HISTORY_MESSAGES
+        ? merged.slice(merged.length - MAX_HISTORY_MESSAGES)
+        : merged;
+    },
+    default: () => [],
+  }),
   currentStep: Annotation<TutorState['currentStep']>({ value: (_, u) => u, default: () => 'assess' }),
   explanation: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
   comprehensionCheck: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
@@ -131,7 +141,6 @@ Provide a comprehensive yet accessible explanation.`,
       explanation: text,
       currentStep: 'verify',
       conversationHistory: [
-        ...state.conversationHistory,
         { role: 'user' as const, content: state.question },
         { role: 'assistant' as const, content: text },
       ],
