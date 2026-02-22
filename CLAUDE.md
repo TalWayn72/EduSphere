@@ -16,6 +16,20 @@
 
 **Active project only:** `C:\Users\P0039217\.claude\projects\EduSphere`
 
+## Document Storage Rule — MANDATORY
+> **ALL project documents MUST be saved inside the project folder or its sub-folders only.**
+> **NEVER** save plans, docs, specs, or any project artifact to `C:\Users\P0039217\.claude\plans\` or any path outside the project directory.
+>
+> **Correct locations within the project:**
+> - Plans & implementation specs → `docs/plans/`
+> - Security & compliance docs → `docs/security/`
+> - Architecture decisions → `docs/architecture/`
+> - ISMS & ISO documents → `docs/isms/`
+> - API contracts → `API-CONTRACTS-GRAPHQL-FEDERATION.md` (root)
+> - All others → `docs/<relevant-subfolder>/`
+>
+> **Enforcement:** When plan mode writes a plan file, immediately move it to the project before any other work. Check with `ls docs/plans/` that the file is in the correct location.
+
 ## Language & Permissions
 - **Communication:** Hebrew | **Code & Docs:** English
 - **Auto-approved:** File ops (Read, Write), Git (all operations including commit/push), pnpm, Bash, Docker, VS Code extensions
