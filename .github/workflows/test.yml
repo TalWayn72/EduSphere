@@ -367,7 +367,8 @@ jobs:
         run: |
           if [[ "${{ needs.integration-tests.result }}" != "success" || \
                 "${{ needs.rls-tests.result }}" != "success" || \
-                "${{ needs.graphql-tests.result }}" != "success" || \n                "${{ needs.contract-tests.result }}" != "success" ]]; then
+                "${{ needs.graphql-tests.result }}" != "success" || \
+                "${{ needs.contract-tests.result }}" != "success" ]]; then
             echo "One or more test jobs failed"
             exit 1
           fi
