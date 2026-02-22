@@ -269,7 +269,8 @@
 | `pnpm --filter @edusphere/web test` | Frontend tests |
 | `pnpm --filter @edusphere/web test:e2e` | E2E tests (Playwright) |
 | `pnpm test:graphql` | GraphQL integration tests (all subgraphs) |
-| `pnpm test:rls` | RLS policy validation tests |
+| `pnpm test:rls` | RLS policy validation tests with verbose output |
+| `pnpm test:security` | Static security tests (no DB required) — 249+ tests |
 | `pnpm test:federation` | Federation composition tests |
 
 ### GraphQL & Schema
@@ -434,6 +435,25 @@ These are non-negotiable. Any code violating these invariants must be rejected i
 - [ ] Rate limiting at gateway level (per tenant, per IP)
 
 **Iron rule:** No commit may weaken existing security (RLS, JWT validation, scopes, directives).
+
+### Security Test Files
+| Test File | Coverage |
+|-----------|---------|
+| `tests/security/rls-variables.spec.ts` | SI-1: RLS session variable names |
+| `tests/security/cors-config.spec.ts` | SI-2: CORS fail-closed |
+| `tests/security/pii-encryption.spec.ts` | SI-3: AES-256-GCM encryption |
+| `tests/security/keycloak-config.spec.ts` | G-12: Brute force protection |
+| `tests/security/dockerfile-security.spec.ts` | G-05: SSL bypass patterns |
+| `tests/security/nats-security.spec.ts` | SI-7: NATS TLS |
+| `tests/security/audit-log.spec.ts` | G-08: Audit trail |
+| `tests/security/minio-config.spec.ts` | G-17: MinIO encryption |
+| `tests/security/consent-management.spec.ts` | G-04: Consent |
+| `tests/security/data-retention.spec.ts` | G-13: Retention TTLs |
+| `tests/security/gdpr-erasure.spec.ts` | G-03+G-11: Erasure+Portability |
+| `tests/security/api-security.spec.ts` | G-09+G-10: Rate limit + complexity |
+| `tests/security/graphql-authorization.spec.ts` | G-15: @requiresScopes |
+| `tests/security/ai-compliance.spec.ts` | SI-10: LLM consent |
+| `tests/security/eu-ai-act.spec.ts` | EU AI Act: transparency |
 
 ## CI/CD (GitHub Actions)
 
