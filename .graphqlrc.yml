@@ -1,0 +1,17 @@
+# EduSphere GraphQL Configuration
+# Used by: VS Code GraphQL extensions, graphql-inspector, codegen
+# Schema source: Composed supergraph SDL (run `pnpm --filter @edusphere/gateway compose` first)
+
+schema: apps/gateway/supergraph.graphql
+
+documents:
+  - apps/web/src/lib/graphql/**/*.ts
+  - apps/mobile/src/**/*.ts
+
+extensions:
+  endpoints:
+    gateway:
+      url: http://localhost:4000/graphql
+      headers:
+        Authorization: "Bearer ${GRAPHQL_TEST_TOKEN}"
+        Content-Type: application/json

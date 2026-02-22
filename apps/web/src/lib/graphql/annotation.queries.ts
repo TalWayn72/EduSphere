@@ -7,6 +7,8 @@ import { gql } from 'urql';
 //   - `user` stub only exposes `id` in the annotation subgraph.
 //   - The API accepts a single optional `layer` argument; multi-layer filtering
 //     is handled client-side via filterAnnotationsByLayers().
+//
+// Mutations and subscriptions have been moved to annotation.mutations.ts.
 export const ANNOTATIONS_QUERY = gql`
   query Annotations($assetId: ID!) {
     annotations(assetId: $assetId) {
@@ -43,41 +45,6 @@ export const MY_ANNOTATIONS_QUERY = gql`
   }
 `;
 
-export const CREATE_ANNOTATION_MUTATION = gql`
-  mutation CreateAnnotation($input: CreateAnnotationInput!) {
-    createAnnotation(input: $input) {
-      id
-      layer
-      annotationType
-      content
-      spatialData
-      parentId
-      userId
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-export const UPDATE_ANNOTATION_MUTATION = gql`
-  mutation UpdateAnnotation($id: ID!, $input: UpdateAnnotationInput!) {
-    updateAnnotation(id: $id, input: $input) {
-      id
-      content
-      spatialData
-      layer
-      isResolved
-      updatedAt
-    }
-  }
-`;
-
-export const DELETE_ANNOTATION_MUTATION = gql`
-  mutation DeleteAnnotation($id: ID!) {
-    deleteAnnotation(id: $id)
-  }
-`;
-
 export const REPLY_TO_ANNOTATION_MUTATION = gql`
   mutation ReplyToAnnotation($annotationId: ID!, $content: String!) {
     replyToAnnotation(annotationId: $annotationId, content: $content) {
@@ -87,22 +54,6 @@ export const REPLY_TO_ANNOTATION_MUTATION = gql`
       parentId
       layer
       annotationType
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-export const ANNOTATION_ADDED_SUBSCRIPTION = gql`
-  subscription AnnotationAdded($assetId: ID!) {
-    annotationAdded(assetId: $assetId) {
-      id
-      layer
-      annotationType
-      content
-      spatialData
-      parentId
-      userId
       createdAt
       updatedAt
     }

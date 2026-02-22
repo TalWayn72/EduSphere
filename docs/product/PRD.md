@@ -1,7 +1,7 @@
 # EduSphere Product Requirements Document (PRD)
 
 **Version:** 1.0
-**Last Updated:** February 17, 2026
+**Last Updated:** February 22, 2026
 **Document Owner:** Product Management
 **Status:** Active
 
@@ -459,9 +459,45 @@ Annotations are not flat comments but structured, layered contributions:
 
 ---
 
-### 4.6 Search & Discovery
+### 4.6 Multi-Language Support (i18n)
 
-#### 4.6.1 Semantic Search
+**Status:** ✅ Implemented — February 2026
+
+EduSphere is fully internationalized with support for 9 languages across all user interfaces.
+
+**Supported Languages:**
+
+| Code | Language | Native Name |
+|------|----------|-------------|
+| en | English | English |
+| zh-CN | Simplified Chinese | 中文 |
+| hi | Hindi | हिन्दी |
+| es | Spanish | Español |
+| fr | French | Français |
+| bn | Bengali | বাংলা |
+| pt | Portuguese (BR) | Português |
+| ru | Russian | Русский |
+| id | Indonesian | Bahasa Indonesia |
+
+**Implementation Architecture:**
+
+| Layer | Technology | Details |
+|-------|-----------|---------|
+| **Shared Translation Package** | `@edusphere/i18n` | 9 locales × 12 namespaces = 108 JSON files, TypeScript strict `t()` autocomplete |
+| **Web (React 19)** | i18next + react-i18next | Vite dynamic import backend; all 14 pages and all components translated |
+| **Mobile (Expo SDK 54)** | i18next | Metro-compatible `require()` backend; all 7 screens translated |
+| **Language Settings** | `/settings` page + `useUserPreferences` hook | Locale persisted to DB (`users.preferences` JSONB) + localStorage |
+| **AI Agent Responses** | `injectLocale()` system prompt injection | All workflows (Chavruta, Quiz, Summarizer, Tutor, Debate, Assessment) respond in user's language |
+| **Content Translation** | `content_translations` table + NATS pipeline | On-demand async translation with DB cache; GraphQL query/mutation for requesting and fetching |
+
+**Namespaces (12):**
+`common`, `nav`, `auth`, `dashboard`, `courses`, `content`, `annotations`, `agents`, `collaboration`, `knowledge`, `settings`, `errors`
+
+---
+
+### 4.7 Search & Discovery
+
+#### 4.7.1 Semantic Search
 
 | Feature | Description | Technology | Priority |
 |---------|-------------|-----------|----------|
@@ -471,7 +507,7 @@ Annotations are not flat comments but structured, layered contributions:
 | **Cross-Content Search** | Search across transcript segments, annotations, concepts | Unified embedding table | P0 |
 | **Result Highlighting** | Return matched text snippets with context | Full-text search | P1 |
 
-#### 4.6.2 Hybrid Search (HybridRAG)
+#### 4.7.2 Hybrid Search (HybridRAG)
 
 | Feature | Description | Fusion Strategy | Priority |
 |---------|-------------|----------------|----------|
@@ -480,7 +516,7 @@ Annotations are not flat comments but structured, layered contributions:
 | **Configurable Depth** | User-specified graph traversal depth (1-5 hops) | Query parameter | P1 |
 | **Citation Paths** | Trace intellectual lineage from search results | DERIVED_FROM chains | P2 |
 
-#### 4.6.3 Search Features
+#### 4.7.3 Search Features
 
 | Feature | Description | User Roles | Priority |
 |---------|-------------|-----------|----------|
@@ -588,7 +624,19 @@ Annotations are not flat comments but structured, layered contributions:
 
 ---
 
-### 5.7 Administration (5 stories)
+### 5.7 Multi-Language Support (4 stories)
+
+**I18N-01**: As a **Student**, I want to **select my preferred language in the Settings page** so that **the entire platform UI is displayed in my native language**.
+
+**I18N-02**: As a **Student**, I want to **have my language preference remembered across sessions** so that **I don't have to re-select my language every time I log in**.
+
+**I18N-03**: As a **Student**, I want to **ask an AI agent questions and receive answers in my selected language** so that **I can engage with educational content without a language barrier**.
+
+**I18N-04**: As an **Instructor**, I want to **request an on-demand translation of course content** so that **students who speak different languages can access the same material**.
+
+---
+
+### 5.8 Administration (5 stories)
 
 **AD-01**: As an **Org Admin**, I want to **configure SSO with our existing Keycloak realm** so that **users don't need separate credentials**.
 
@@ -796,6 +844,7 @@ EduSphere's 8-phase implementation roadmap (detailed in IMPLEMENTATION-ROADMAP.m
 | **Phase 6: Frontend** | 5-7 days | React SPA (course UI, video player, annotations, search, AI chat) | All user-facing features |
 | **Phase 7: Production** | 5-7 days | Performance optimization, observability (Jaeger, Grafana), security hardening, K8s deployment, load testing (100K users) | Performance §6.1, Security §6.3, Compliance §6.4 |
 | **Phase 8: Mobile + Advanced** | 5-7 days | Expo mobile app (offline-first), transcription worker (faster-whisper), Chavruta partner learning | Content Management §4.1.2 (transcription), Collaboration §4.3 (Chavruta sessions) |
+| **Phase i18n: Internationalization** | 3-4 days | 9 languages UI (packages/i18n, web, mobile, settings), AI locale injection, content_translations pipeline | Multi-Language Support §4.6, User Stories I18N-01 to I18N-04 |
 
 **Total Duration:** 32-45 working days (25-35 days with parallelization)
 

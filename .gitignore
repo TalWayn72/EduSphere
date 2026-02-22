@@ -76,7 +76,8 @@ Thumbs.db
 vite.config.ts.timestamp-*.mjs
 
 # Generated files
-graphql-types/
+# Note: packages/graphql-types/ is a source package — DO NOT ignore it
+# The generated output inside it IS committed (for CI drift detection via codegen-validation job)
 .graphql/
 dist/
 *.tsbuildinfo

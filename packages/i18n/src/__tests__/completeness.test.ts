@@ -14,6 +14,21 @@ function getAllKeys(obj: Record<string, unknown>, prefix = ''): string[] {
 
 const localesDir = path.join(__dirname, '..', 'locales');
 
+describe('i18n — locale file structure', () => {
+  it('has a locales directory', () => {
+    expect(fs.existsSync(localesDir)).toBe(true);
+  });
+
+  for (const locale of SUPPORTED_LOCALES) {
+    for (const ns of NAMESPACES) {
+      it(`${locale}/${ns}.json exists`, () => {
+        const file = path.join(localesDir, locale, `${ns}.json`);
+        expect(fs.existsSync(file), `Missing: ${locale}/${ns}.json`).toBe(true);
+      });
+    }
+  }
+});
+
 describe('Translation completeness — no missing keys vs English', () => {
   for (const ns of NAMESPACES) {
     const enPath = path.join(localesDir, 'en', `${ns}.json`);

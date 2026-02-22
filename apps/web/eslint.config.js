@@ -49,6 +49,7 @@ export default [
         File: 'readonly',
         fetch: 'readonly',
         HTMLSpanElement: 'readonly',
+        HTMLSelectElement: 'readonly',
         FormData: 'readonly',
         Headers: 'readonly',
         Request: 'readonly',

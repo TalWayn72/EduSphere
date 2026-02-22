@@ -142,6 +142,33 @@ describe('UserService', () => {
       await service.findById('user-1', noTenantAuth);
       expect(withTenantContext).not.toHaveBeenCalled();
     });
+
+    it('returned user includes a preferences field', async () => {
+      mockLimit.mockResolvedValue([MOCK_USER]);
+      const result = await service.findById('user-1');
+      expect(result).not.toBeNull();
+      expect(result).toHaveProperty('preferences');
+    });
+
+    it('preferences field has the expected shape (locale and theme)', async () => {
+      mockLimit.mockResolvedValue([MOCK_USER]);
+      const result = await service.findById('user-1');
+      expect(result).not.toBeNull();
+      const prefs = (result as Record<string, unknown>)['preferences'] as Record<string, unknown>;
+      expect(typeof prefs['locale']).toBe('string');
+      expect(typeof prefs['theme']).toBe('string');
+    });
+
+    it('preferences falls back to defaults when stored preferences is null', async () => {
+      mockLimit.mockResolvedValue([{ ...MOCK_USER, preferences: null }]);
+      const result = await service.findById('user-1');
+      expect(result).not.toBeNull();
+      const prefs = (result as Record<string, unknown>)['preferences'] as Record<string, unknown>;
+      expect(prefs['locale']).toBe('en');
+      expect(prefs['theme']).toBe('system');
+      expect(prefs['emailNotifications']).toBe(true);
+      expect(prefs['pushNotifications']).toBe(true);
+    });
   });
 
   // ─── findAll ────────────────────────────────────────────────────────────────

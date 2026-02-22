@@ -122,7 +122,7 @@ export class AgentSessionService {
           userId: authContext.userId,
           tenantId: authContext.tenantId,
           data: { agentType: session.agentType },
-          timestamp: new Date(),
+          timestamp: new Date().toISOString(),
         });
 
         return session;
@@ -183,7 +183,7 @@ export class AgentSessionService {
       userId: authContext.userId,
       tenantId: authContext.tenantId,
       data: { status: 'COMPLETED' },
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     });
 
     return session;

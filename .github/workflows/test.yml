@@ -319,11 +319,47 @@ jobs:
           path: apps/${{ matrix.package }}/test-results
           retention-days: 7
 
+
+  # Consumer contract tests - validate frontend GraphQL ops against supergraph
+  contract-tests:
+    name: Contract Tests (Schema + Entity References)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run contract tests
+        run: pnpm --filter @edusphere/contract-tests run test
+
+      - name: Upload contract test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contract-test-results
+          path: tests/contract/test-results
+          retention-days: 7
+
   # Summary job - all tests must pass
   test-complete:
     name: Test Suite Complete
     runs-on: ubuntu-latest
-    needs: [integration-tests, rls-tests, graphql-tests]
+    needs: [integration-tests, rls-tests, graphql-tests, contract-tests]
     if: always()
 
     steps:
@@ -331,7 +367,7 @@ jobs:
         run: |
           if [[ "${{ needs.integration-tests.result }}" != "success" || \
                 "${{ needs.rls-tests.result }}" != "success" || \
-                "${{ needs.graphql-tests.result }}" != "success" ]]; then
+                "${{ needs.graphql-tests.result }}" != "success" || \n                "${{ needs.contract-tests.result }}" != "success" ]]; then
             echo "One or more test jobs failed"
             exit 1
           fi

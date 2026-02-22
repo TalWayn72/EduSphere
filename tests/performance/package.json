@@ -1,0 +1,13 @@
+{
+  "name": "@edusphere/performance-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --config __tests__/vitest.config.ts",
+    "test:watch": "vitest --config __tests__/vitest.config.ts"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.18"
+  }
+}

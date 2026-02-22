@@ -44,28 +44,9 @@ export const GET_RELATED_CONCEPTS_QUERY = gql`
   }
 `;
 
-/**
- * @deprecated conceptsForContent does not exist in the real schema.
- * Kept for reference only.
- */
-export const CONCEPT_GRAPH_QUERY = gql`
-  query ConceptGraph($contentId: ID!) {
-    conceptsForContent(contentId: $contentId) {
-      nodes {
-        id
-        label
-        type
-        description
-      }
-      edges {
-        from
-        to
-        type
-        strength
-      }
-    }
-  }
-`;
+// CONCEPT_GRAPH_QUERY referencing conceptsForContent has been removed.
+// That field does not exist in the composed supergraph.  Use
+// GET_RELATED_CONCEPTS_QUERY + relatedConceptsByName instead.
 
 export const CREATE_CONCEPT_MUTATION = gql`
   mutation CreateConcept($input: CreateConceptInput!) {

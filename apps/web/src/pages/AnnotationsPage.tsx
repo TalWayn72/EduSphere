@@ -18,7 +18,8 @@ import {
 } from '@/components/ui/dialog';
 import { Filter, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
-import { MY_ANNOTATIONS_QUERY, DELETE_ANNOTATION_MUTATION } from '@/lib/graphql/annotation.queries';
+import { MY_ANNOTATIONS_QUERY } from '@/lib/graphql/annotation.queries';
+import { DELETE_ANNOTATION_MUTATION } from '@/lib/graphql/annotation.mutations';
 import { AnnotationCard, ANNOTATION_LAYER_META } from './AnnotationCard';
 import { AnnotationLayer, type Annotation } from '@/types/annotations';
 

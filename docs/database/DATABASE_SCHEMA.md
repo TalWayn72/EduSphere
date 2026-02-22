@@ -4,7 +4,7 @@
 **PostgreSQL**: 16+
 **Extensions**: uuid-ossp, pgcrypto, age (1.5.0), vector (0.8.0)
 **ORM**: Drizzle ORM 1.x with native RLS support
-**Last Updated**: 2026-02-17
+**Last Updated**: 2026-02-22
 
 ---
 
@@ -883,6 +883,71 @@ export const concept_embeddings = pgTable('concept_embeddings', {
   created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 ```
+
+---
+
+#### Table 17: `content_translations`
+
+**Purpose**: On-demand AI translation cache for content items. Translations are generated asynchronously via NATS JetStream and cached here for subsequent reads (cache-first lookup).
+
+```sql
+CREATE TABLE content_translations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  content_item_id UUID NOT NULL REFERENCES content_items.id ON DELETE CASCADE,
+    -- Source content item being translated
+  locale TEXT NOT NULL,
+    -- BCP 47 target locale code (e.g., 'es', 'zh-CN', 'hi')
+  translated_title TEXT,
+    -- Translated title (NULL while PENDING or PROCESSING)
+  translated_description TEXT,
+    -- Translated description (NULL while PENDING or PROCESSING)
+  translated_summary TEXT,
+    -- AI-generated translated summary (NULL while PENDING or PROCESSING)
+  translated_transcript TEXT,
+    -- Translated transcript text (NULL while PENDING or PROCESSING)
+  quality_score NUMERIC(3,2),
+    -- Translation quality score 0.00–1.00 (NULL until COMPLETED)
+  model_used TEXT NOT NULL DEFAULT 'ollama/llama3.2',
+    -- AI model used for translation
+  translation_status TEXT NOT NULL DEFAULT 'PENDING',
+    -- Enum: 'PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+
+  CONSTRAINT ct_item_locale_uq UNIQUE (content_item_id, locale)
+);
+
+-- Indexes
+CREATE INDEX ct_locale_idx ON content_translations(locale);
+CREATE INDEX ct_status_idx ON content_translations(translation_status);
+```
+
+**Drizzle Schema** (`packages/db/src/schema/contentTranslations.ts`):
+```typescript
+export const content_translations = pgTable('content_translations', {
+  id: pk(),
+  content_item_id: uuid('content_item_id').notNull(),
+    // FK to content_items.id (application-level; no cross-schema FK constraint)
+  locale: text('locale').notNull(),
+  translated_title: text('translated_title'),
+  translated_description: text('translated_description'),
+  translated_summary: text('translated_summary'),
+  translated_transcript: text('translated_transcript'),
+  quality_score: numeric('quality_score', { precision: 3, scale: 2 }),
+  model_used: text('model_used').notNull().default('ollama/llama3.2'),
+  translation_status: text('translation_status', {
+    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED']
+  }).notNull().default('PENDING'),
+  ...timestamps(),
+}, (table) => ({
+  ct_item_locale_uq: unique('ct_item_locale_uq').on(table.content_item_id, table.locale),
+}));
+```
+
+**Notes:**
+- **Idempotent upsert**: concurrent `requestContentTranslation` calls for the same `(content_item_id, locale)` are safe — the unique constraint prevents duplicate rows.
+- **RLS**: Inherits tenant isolation via the `content_items` join. Translations are accessible only to users who have access to the source content item.
+- **Cache-first**: TranslationService checks for an existing COMPLETED record before publishing to NATS. Only PENDING/FAILED records trigger a new NATS event.
 
 ---
 

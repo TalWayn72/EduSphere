@@ -1,9 +1,36 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 21 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** — ALL Done!
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅ | **BUG-DOCKER-001 ✅ Fixed** | **BUG-04 ✅ Fixed** | **BUG-03 ✅ Fixed** | **E2E Audit BUG-01/02/05/12/13/14/15/17/18 ✅ Fixed** | **Visual QA Round 2 BUG-19/20/21/22 ✅ Fixed** | **Visual QA Round 3 BUG-25/26/27 ✅ Fixed** | **Visual QA Round 4 BUG-28/29/30 ✅ Fixed** | **Visual QA Round 5 BUG-31/32 ✅ Fixed** | **Visual QA Round 6 BUG-33/34/35 ✅ Fixed** | **BUG-23 ✅ Fixed (Keycloak 26 JWT + RLS)** | **ANTHROPIC_API_KEY ✅ Permanent**
-**בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | סה"כ: **>1,400 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Visual QA Round 7: agents 10/10+1skip ✅, search 12/12 ✅, full-visual-qa 15/15 ✅, visual-qa-student 15/15 ✅** | **ALL E2E PASS — 0 failures**
+**תאריך עדכון:** 22 פברואר 2026
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** ✅ — ALL Done!
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | Metrics/Grafana ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | Pino JSON Logs ✅ | Router v7 ✅ | Tailwind v4 CSS-first ✅ | **i18n Phase A+B ✅** | **BUG-DOCKER-001 ✅ Fixed** | **BUG-04 ✅ Fixed** | **BUG-03 ✅ Fixed** | **E2E Audit BUG-01/02/05/12/13/14/15/17/18 ✅ Fixed** | **Visual QA Round 2 BUG-19/20/21/22 ✅ Fixed** | **Visual QA Round 3 BUG-25/26/27 ✅ Fixed** | **Visual QA Round 4 BUG-28/29/30 ✅ Fixed** | **Visual QA Round 5 BUG-31/32 ✅ Fixed** | **Visual QA Round 6 BUG-33/34/35 ✅ Fixed** | **BUG-23 ✅ Fixed (Keycloak 26 JWT + RLS)** | **ANTHROPIC_API_KEY ✅ Permanent**
+**בדיקות:** Web: 1,400+ tests | Backend: 1,200+ tests | Mobile: 7 tests | i18n: ~250+ tests | סה"כ: **>1,650 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Visual QA Round 7: agents 10/10+1skip ✅, search 12/12 ✅, full-visual-qa 15/15 ✅, visual-qa-student 15/15 ✅** | **ALL E2E PASS — 0 failures**
+
+---
+
+## ✅ i18n: Full Platform Internationalization — Phase A + B (22 פברואר 2026)
+
+| | |
+|---|---|
+| **Severity** | 🟢 Enhancement |
+| **Status** | ✅ Complete |
+| **Files** | packages/i18n (108 files), subgraph-core (UserPreferences), subgraph-content (translation module), subgraph-agent (locale injection), apps/web (14 pages + SettingsPage + LanguageSelector + useUserPreferences), apps/mobile (7 screens + SettingsScreen) |
+
+### מה בוצע
+
+**Phase A — UI i18n:**
+- packages/i18n: 9 locales × 12 namespaces = 108 JSON files (en, zh-CN, hi, es, fr, bn, pt, ru, id)
+- subgraph-core: UserPreferences GraphQL type + updateUserPreferences mutation
+- Web: כל 14 עמודים + כל רכיבים מוגרים, SettingsPage, LanguageSelector, useUserPreferences hook
+- Mobile: כל 7 מסכים, SettingsScreen, Metro require() backend
+
+**Phase B — AI Content Localization:**
+- content_translations DB table (Drizzle schema) עם idempotent upsert + NATS publish
+- subgraph-content: translation module (GraphQL + service + resolver)
+- AI locale injection: injectLocale() utility + כל workflows (chavruta, quiz, summarizer, tutor, debate, assessment)
+- agent-session: locale stored in metadata JSONB, passed to continueSession()
+
+### תוצאה
+EduSphere תומך ב-9 שפות. המשתמש בוחר שפה ב-Settings — מתעדכן ב-DB + localStorage + i18next. AI agents מגיבים בשפה הנבחרת.
 
 ---
 

@@ -11,6 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { AnnotationLayer } from '@/types/annotations';
+import type { AnnotationsQuery } from '@edusphere/graphql-types';
 
 // ── urql mock ────────────────────────────────────────────────────────────────
 // We fully mock urql so no real network calls are made.
@@ -27,9 +28,16 @@ vi.mock('urql', () => ({
 // ── graphql query mocks ───────────────────────────────────────────────────────
 vi.mock('@/lib/graphql/annotation.queries', () => ({
   ANNOTATIONS_QUERY: 'ANNOTATIONS_QUERY',
-  CREATE_ANNOTATION_MUTATION: 'CREATE_ANNOTATION_MUTATION',
   REPLY_TO_ANNOTATION_MUTATION: 'REPLY_TO_ANNOTATION_MUTATION',
+}));
+
+// CREATE_ANNOTATION_MUTATION and ANNOTATION_ADDED_SUBSCRIPTION moved to mutations file.
+vi.mock('@/lib/graphql/annotation.mutations', () => ({
+  CREATE_ANNOTATION_MUTATION: 'CREATE_ANNOTATION_MUTATION',
   ANNOTATION_ADDED_SUBSCRIPTION: 'ANNOTATION_ADDED_SUBSCRIPTION',
+  UPDATE_ANNOTATION_MUTATION: 'UPDATE_ANNOTATION_MUTATION',
+  DELETE_ANNOTATION_MUTATION: 'DELETE_ANNOTATION_MUTATION',
+  ANNOTATIONS_BY_ASSET_QUERY: 'ANNOTATIONS_BY_ASSET_QUERY',
 }));
 
 // ── content-viewer utils mock ─────────────────────────────────────────────────
@@ -65,7 +73,7 @@ const SERVER_ANNOTATION = {
 };
 
 type UrqlMockOptions = {
-  queryData?: { annotations: typeof SERVER_ANNOTATION[] } | null;
+  queryData?: AnnotationsQuery | null;
   queryFetching?: boolean;
   queryError?: unknown;
 };

@@ -1,0 +1,597 @@
+asyncapi: '3.0.0'
+
+info:
+  title: EduSphere NATS Event Bus
+  version: '1.0.0'
+  description: |
+    JetStream event contracts for all EduSphere microservices.
+    This specification is the source of truth for all async message schemas.
+
+    All events use JSON encoding. Publishers MUST validate against these schemas
+    before publishing. Subscribers MUST validate incoming messages using the
+    runtime validators in src/events-validator.ts.
+
+defaultContentType: application/json
+
+servers:
+  production:
+    host: nats-server:4222
+    protocol: nats
+    description: NATS JetStream broker (production)
+  development:
+    host: localhost:4222
+    protocol: nats
+    description: NATS JetStream broker (development)
+
+channels:
+  agentSession:
+    address: 'agent.session.{tenantId}'
+    description: Agent session lifecycle events (created, completed, failed, cancelled)
+    parameters:
+      tenantId:
+        description: Tenant UUID
+    messages:
+      AgentSessionEvent:
+        $ref: '#/components/messages/AgentSessionEvent'
+
+  agentMessage:
+    address: 'agent.message.{tenantId}.{sessionId}'
+    description: Individual agent messages and streaming chunks
+    parameters:
+      tenantId:
+        description: Tenant UUID
+      sessionId:
+        description: Agent session UUID
+    messages:
+      AgentMessageEvent:
+        $ref: '#/components/messages/AgentMessageEvent'
+
+  annotation:
+    address: 'annotation.{tenantId}.{assetId}'
+    description: Annotation CRUD events for a specific content asset
+    parameters:
+      tenantId:
+        description: Tenant UUID
+      assetId:
+        description: Content asset UUID
+    messages:
+      AnnotationEvent:
+        $ref: '#/components/messages/AnnotationEvent'
+
+  content:
+    address: 'content.{tenantId}'
+    description: Content item lifecycle events
+    parameters:
+      tenantId:
+        description: Tenant UUID
+    messages:
+      ContentEvent:
+        $ref: '#/components/messages/ContentEvent'
+
+  media:
+    address: 'media.{eventType}'
+    description: |
+      Media upload and processing events published by the Content subgraph.
+      Examples: media.uploaded
+    parameters:
+      eventType:
+        description: Media event type suffix
+    messages:
+      MediaEvent:
+        $ref: '#/components/messages/MediaEvent'
+
+  transcription:
+    address: 'transcription.{eventType}'
+    description: |
+      Transcription lifecycle events published by the Transcription Worker.
+      Examples: transcription.completed, transcription.failed
+    parameters:
+      eventType:
+        description: Transcription event type suffix
+    messages:
+      TranscriptionEvent:
+        $ref: '#/components/messages/TranscriptionEvent'
+
+  knowledgeConcepts:
+    address: 'knowledge.concepts.{eventType}'
+    description: |
+      Knowledge graph concept extraction events.
+      Published by: Transcription Worker (knowledge.concepts.extracted)
+      Consumed by: Knowledge subgraph NatsConsumer
+      Published by Knowledge subgraph (knowledge.concepts.persisted)
+    parameters:
+      eventType:
+        description: Concept event type suffix (extracted | persisted)
+    messages:
+      KnowledgeConceptEvent:
+        $ref: '#/components/messages/KnowledgeConceptEvent'
+
+  contentTranslation:
+    address: 'content.translate.requested'
+    description: Content translation request events published by the Content subgraph
+    messages:
+      ContentTranslationEvent:
+        $ref: '#/components/messages/ContentTranslationEvent'
+
+  gatewayPubSub:
+    address: 'gw.sub.{topic}'
+    description: |
+      Gateway pub/sub bridge for GraphQL subscriptions.
+      Used internally by the Hive Gateway to fan-out subscription events
+      across multiple gateway replicas.
+      Subject convention: gw.sub.<topic>
+    parameters:
+      topic:
+        description: GraphQL subscription topic name
+    messages:
+      GatewayPubSubEvent:
+        $ref: '#/components/messages/GatewayPubSubEvent'
+
+operations:
+  publishAgentSession:
+    action: send
+    channel:
+      $ref: '#/channels/agentSession'
+    description: Published by Agent subgraph when session state changes
+
+  receiveAgentSession:
+    action: receive
+    channel:
+      $ref: '#/channels/agentSession'
+    description: Consumed by Agent subgraph and Gateway for subscription fanout
+
+  publishAgentMessage:
+    action: send
+    channel:
+      $ref: '#/channels/agentMessage'
+    description: Published by Agent subgraph on message creation and stream chunks
+
+  receiveAgentMessage:
+    action: receive
+    channel:
+      $ref: '#/channels/agentMessage'
+    description: Consumed by Agent subgraph for streaming GraphQL subscriptions
+
+  publishAnnotation:
+    action: send
+    channel:
+      $ref: '#/channels/annotation'
+    description: Published by Annotation subgraph on CRUD operations
+
+  receiveAnnotation:
+    action: receive
+    channel:
+      $ref: '#/channels/annotation'
+    description: Consumed by Gateway for GraphQL subscription fanout
+
+  publishContent:
+    action: send
+    channel:
+      $ref: '#/channels/content'
+    description: Published by Content subgraph on content lifecycle events
+
+  receiveContent:
+    action: receive
+    channel:
+      $ref: '#/channels/content'
+    description: Consumed by other subgraphs and workers that react to content changes
+
+  publishMedia:
+    action: send
+    channel:
+      $ref: '#/channels/media'
+    description: Published by Content subgraph when media is uploaded
+
+  publishTranscription:
+    action: send
+    channel:
+      $ref: '#/channels/transcription'
+    description: Published by Transcription Worker on job completion or failure
+
+  receiveTranscription:
+    action: receive
+    channel:
+      $ref: '#/channels/transcription'
+    description: Consumed by Knowledge subgraph and Content subgraph to process transcripts
+
+  publishKnowledgeConcepts:
+    action: send
+    channel:
+      $ref: '#/channels/knowledgeConcepts'
+    description: |
+      Published by Transcription Worker (knowledge.concepts.extracted) and
+      Knowledge subgraph (knowledge.concepts.persisted)
+
+  receiveKnowledgeConcepts:
+    action: receive
+    channel:
+      $ref: '#/channels/knowledgeConcepts'
+    description: Consumed by Knowledge subgraph NatsConsumer (QUEUE_GROUP knowledge-workers)
+
+  publishContentTranslation:
+    action: send
+    channel:
+      $ref: '#/channels/contentTranslation'
+    description: Published by Content subgraph when translation is requested
+
+  publishGatewayPubSub:
+    action: send
+    channel:
+      $ref: '#/channels/gatewayPubSub'
+    description: Published by Gateway when a mutation triggers a subscription update
+
+  receiveGatewayPubSub:
+    action: receive
+    channel:
+      $ref: '#/channels/gatewayPubSub'
+    description: Consumed by all Gateway replicas for subscription fanout
+
+components:
+  messages:
+    AgentSessionEvent:
+      name: AgentSessionEvent
+      title: Agent Session Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AgentSessionPayload'
+
+    AgentMessageEvent:
+      name: AgentMessageEvent
+      title: Agent Message Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AgentMessagePayload'
+
+    AnnotationEvent:
+      name: AnnotationEvent
+      title: Annotation Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AnnotationPayload'
+
+    ContentEvent:
+      name: ContentEvent
+      title: Content Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ContentPayload'
+
+    MediaEvent:
+      name: MediaEvent
+      title: Media Upload Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/MediaPayload'
+
+    TranscriptionEvent:
+      name: TranscriptionEvent
+      title: Transcription Worker Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/TranscriptionPayload'
+
+    KnowledgeConceptEvent:
+      name: KnowledgeConceptEvent
+      title: Knowledge Concept Extraction Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/KnowledgeConceptPayload'
+
+    ContentTranslationEvent:
+      name: ContentTranslationEvent
+      title: Content Translation Request Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ContentTranslationPayload'
+
+    GatewayPubSubEvent:
+      name: GatewayPubSubEvent
+      title: Gateway Pub/Sub Event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/GatewayPubSubPayload'
+
+  schemas:
+    # ─── Agent Session Events ──────────────────────────────────────────────────
+
+    AgentEventType:
+      type: string
+      enum:
+        - session.created
+        - session.completed
+        - session.failed
+        - session.cancelled
+      description: Agent session lifecycle event types
+
+    AgentMessageEventType:
+      type: string
+      enum:
+        - message.created
+        - stream.chunk
+        - stream.end
+        - stream.error
+      description: Agent message event types (including streaming chunks)
+
+    AgentSessionPayload:
+      type: object
+      required:
+        - type
+        - sessionId
+        - userId
+        - timestamp
+      properties:
+        type:
+          $ref: '#/components/schemas/AgentEventType'
+        sessionId:
+          type: string
+          format: uuid
+          description: The agent session UUID
+        userId:
+          type: string
+          format: uuid
+          description: The user who owns the session
+        tenantId:
+          type: string
+          format: uuid
+          description: Tenant UUID (optional for SUPER_ADMIN cross-tenant sessions)
+        data:
+          type: object
+          additionalProperties: true
+          description: Event-specific payload data (varies by type — e.g. agentType, status)
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when event occurred
+
+    AgentMessagePayload:
+      type: object
+      required:
+        - type
+        - sessionId
+        - userId
+        - timestamp
+      properties:
+        type:
+          $ref: '#/components/schemas/AgentMessageEventType'
+        sessionId:
+          type: string
+          format: uuid
+        messageId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        content:
+          type: string
+          description: Message content or stream chunk text
+        tokenCount:
+          type: integer
+          description: Token count (populated for message.created events)
+        timestamp:
+          type: string
+          format: date-time
+
+    # ─── Annotation Events ─────────────────────────────────────────────────────
+
+    AnnotationEventType:
+      type: string
+      enum:
+        - annotation.created
+        - annotation.updated
+        - annotation.deleted
+        - annotation.resolved
+      description: Annotation CRUD event types
+
+    AnnotationLayer:
+      type: string
+      enum:
+        - PERSONAL
+        - SHARED
+        - INSTRUCTOR
+        - AI_GENERATED
+      description: Annotation visibility layer (mirrors GraphQL AnnotationLayer enum)
+
+    AnnotationPayload:
+      type: object
+      required:
+        - type
+        - annotationId
+        - assetId
+        - userId
+        - tenantId
+        - timestamp
+      properties:
+        type:
+          $ref: '#/components/schemas/AnnotationEventType'
+        annotationId:
+          type: string
+          format: uuid
+        assetId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        layer:
+          $ref: '#/components/schemas/AnnotationLayer'
+        timestamp:
+          type: string
+          format: date-time
+
+    # ─── Content Events ────────────────────────────────────────────────────────
+
+    ContentEventType:
+      type: string
+      enum:
+        - content.created
+        - content.updated
+        - content.deleted
+        - content.published
+        - content.transcription.completed
+      description: Content lifecycle event types
+
+    ContentPayload:
+      type: object
+      required:
+        - type
+        - contentItemId
+        - tenantId
+        - timestamp
+      properties:
+        type:
+          $ref: '#/components/schemas/ContentEventType'
+        contentItemId:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+
+    # ─── Media Events ──────────────────────────────────────────────────────────
+
+    MediaPayload:
+      type: object
+      required:
+        - assetId
+        - contentItemId
+        - tenantId
+        - storageKey
+      properties:
+        assetId:
+          type: string
+          format: uuid
+        contentItemId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        storageKey:
+          type: string
+          description: MinIO object key for the uploaded media file
+        mimeType:
+          type: string
+          description: MIME type of the uploaded file (e.g. video/mp4, audio/mpeg)
+        sizeBytes:
+          type: integer
+          description: File size in bytes
+
+    # ─── Transcription Events ──────────────────────────────────────────────────
+
+    TranscriptionEventType:
+      type: string
+      enum:
+        - transcription.completed
+        - transcription.failed
+      description: Transcription worker event types
+
+    TranscriptionPayload:
+      type: object
+      required:
+        - type
+        - assetId
+      properties:
+        type:
+          $ref: '#/components/schemas/TranscriptionEventType'
+        assetId:
+          type: string
+          format: uuid
+          description: The media asset UUID that was transcribed
+        segmentCount:
+          type: integer
+          description: Number of transcript segments produced (transcription.completed only)
+        language:
+          type: string
+          description: Detected language code (e.g. en, he)
+        errorMessage:
+          type: string
+          description: Error detail (transcription.failed only)
+
+    # ─── Knowledge Graph Events ────────────────────────────────────────────────
+
+    KnowledgeConceptEventType:
+      type: string
+      enum:
+        - knowledge.concepts.extracted
+        - knowledge.concepts.persisted
+      description: Knowledge concept lifecycle event types
+
+    KnowledgeConceptPayload:
+      type: object
+      required:
+        - type
+        - assetId
+        - concepts
+      properties:
+        type:
+          $ref: '#/components/schemas/KnowledgeConceptEventType'
+        assetId:
+          type: string
+          format: uuid
+          description: The source asset UUID concepts were extracted from
+        concepts:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                description: Concept name (case-insensitive match for idempotency)
+              description:
+                type: string
+              relationships:
+                type: array
+                items:
+                  type: string
+                description: Related concept names
+
+    # ─── Content Translation Events ────────────────────────────────────────────
+
+    ContentTranslationPayload:
+      type: object
+      required:
+        - contentItemId
+        - targetLanguage
+        - tenantId
+      properties:
+        contentItemId:
+          type: string
+          format: uuid
+        targetLanguage:
+          type: string
+          description: BCP 47 language tag (e.g. he, fr, es)
+        tenantId:
+          type: string
+          format: uuid
+        requestedBy:
+          type: string
+          format: uuid
+          description: User UUID who requested the translation
+
+    # ─── Gateway Pub/Sub Events ────────────────────────────────────────────────
+
+    GatewayPubSubPayload:
+      type: object
+      required:
+        - topic
+        - data
+      properties:
+        topic:
+          type: string
+          description: The GraphQL subscription topic name (e.g. annotationAdded_<assetId>)
+        data:
+          type: object
+          additionalProperties: true
+          description: The subscription event data to broadcast to all connected clients

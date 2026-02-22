@@ -1,0 +1,10 @@
+{
+  "extends": "@edusphere/tsconfig/base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "declarationDir": "dist",
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts"]
+}

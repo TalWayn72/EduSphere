@@ -22,20 +22,20 @@ import {
   SEND_AGENT_MESSAGE_MUTATION,
   MESSAGE_STREAM_SUBSCRIPTION,
 } from '@/lib/graphql/agent.queries';
+import type {
+  StartAgentSessionMutation,
+  StartAgentSessionMutationVariables,
+  SendAgentMessageMutation,
+  SendAgentMessageMutationVariables,
+  MessageStreamSubscription,
+  MessageStreamSubscriptionVariables,
+} from '@edusphere/graphql-types';
+import { MessageRole } from '@edusphere/graphql-types';
 
 export interface ChatMessage {
   id: string;
   role: 'user' | 'agent';
   content: string;
-}
-
-interface StreamMessagePayload {
-  messageStream?: {
-    id: string;
-    role: string;
-    content: string;
-    createdAt: string;
-  } | null;
 }
 
 const INITIAL_MESSAGE: ChatMessage = {
@@ -78,8 +78,14 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const [isStreaming, setIsStreaming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
-  const [, sendAgentMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
+  const [, startSession] = useMutation<
+    StartAgentSessionMutation,
+    StartAgentSessionMutationVariables
+  >(START_AGENT_SESSION_MUTATION);
+  const [, sendAgentMessage] = useMutation<
+    SendAgentMessageMutation,
+    SendAgentMessageMutationVariables
+  >(SEND_AGENT_MESSAGE_MUTATION);
 
   // useOptimistic exposes the live message list; the reducer merges streaming
   // updates on top of confirmedMessages without extra state.
@@ -90,8 +96,10 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
 
   const [isSending, startTransition] = useTransition();
 
-  // Subscribe to streaming agent responses when a session is active
-  const [streamResult] = useSubscription<StreamMessagePayload>({
+  // Subscribe to streaming agent responses when a session is active.
+  // useSubscription<Data, Result, Variables>: Variables is the 3rd param.
+  // Pass only Data here; use `satisfies` on variables for compile-time safety.
+  const [streamResult] = useSubscription<MessageStreamSubscription, MessageStreamSubscription, MessageStreamSubscriptionVariables>({
     query: MESSAGE_STREAM_SUBSCRIPTION,
     variables: { sessionId: sessionId ?? '' },
     pause: !sessionId,
@@ -103,7 +111,7 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     if (!msg) return;
 
     const incomingRole: ChatMessage['role'] =
-      msg.role === 'USER' ? 'user' : 'agent';
+      msg.role === MessageRole.User ? 'user' : 'agent';
 
     setConfirmedMessages((prev) => {
       const existingIdx = prev.findIndex((m) => m.id === msg.id);
@@ -165,8 +173,10 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       // Ensure we have an active session
       let sid = sessionId;
       if (!sid) {
+        // TODO: TemplateType.Chavruta does not exist in the schema — use
+        // TemplateType.ChavrutaDebate when the agent subgraph is updated.
         const res = await startSession({
-          templateType: 'CHAVRUTA',
+          templateType: 'CHAVRUTA' as import('@edusphere/graphql-types').TemplateType,
           context: { contentId },
         });
         sid = res.data?.startAgentSession?.id ?? null;
@@ -178,14 +188,14 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
         const reply = res.data?.sendMessage;
         if (reply) {
           setConfirmedMessages((prev) => {
-            const alreadyPresent = prev.some((m) => m.id === (reply.id as string));
+            const alreadyPresent = prev.some((m) => m.id === reply.id);
             if (alreadyPresent) return prev;
             return [
               ...prev,
               {
-                id: reply.id as string,
+                id: reply.id,
                 role: 'agent' as const,
-                content: reply.content as string,
+                content: reply.content,
               },
             ];
           });

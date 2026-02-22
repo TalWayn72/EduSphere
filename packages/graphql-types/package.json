@@ -1,0 +1,23 @@
+{
+  "name": "@edusphere/graphql-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "echo 'graphql-types is source-only, no build step required'",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@edusphere/tsconfig": "workspace:*",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}

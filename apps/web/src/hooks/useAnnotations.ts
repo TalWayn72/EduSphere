@@ -16,42 +16,33 @@
 import { useOptimistic, useTransition, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useSubscription } from 'urql';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
+import { ANNOTATIONS_QUERY, REPLY_TO_ANNOTATION_MUTATION } from '@/lib/graphql/annotation.queries';
 import {
-  ANNOTATIONS_QUERY,
   CREATE_ANNOTATION_MUTATION,
-  REPLY_TO_ANNOTATION_MUTATION,
   ANNOTATION_ADDED_SUBSCRIPTION,
-} from '@/lib/graphql/annotation.queries';
+} from '@/lib/graphql/annotation.mutations';
 import {
   getThreadedAnnotations,
   filterAnnotationsByLayers,
 } from '@/lib/mock-annotations';
 import { formatTime } from '@/pages/content-viewer.utils';
+import type {
+  AnnotationsQuery,
+  AnnotationsQueryVariables,
+  AnnotationAddedSubscription,
+  AnnotationAddedSubscriptionVariables,
+} from '@edusphere/graphql-types';
 
-// ── GraphQL response types ──────────────────────────────────────────────────
+// ── GraphQL response types (derived from generated types) ───────────────────
 
-interface GqlAnnotation {
-  id: string;
-  layer: AnnotationLayer;
-  annotationType: string;
-  /** JSON scalar — plain string or { text: string } object */
-  content: unknown;
-  /** JSON scalar — { timestampStart?: number, ... } */
-  spatialData?: unknown;
-  parentId?: string | null;
-  userId: string;
-  isResolved: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+/** Shape of a single annotation returned by the Annotations query. */
+type GqlAnnotation = AnnotationsQuery['annotations'][number];
 
-interface AnnotationsQueryResult {
-  annotations?: GqlAnnotation[] | null;
-}
-
-interface AnnotationAddedSubscriptionResult {
-  annotationAdded?: GqlAnnotation | null;
-}
+/**
+ * Minimum fields required by normaliseAnnotation — covers both query items
+ * (which have parentId) and subscription events (which do not).
+ */
+type GqlAnnotationInput = GqlAnnotation | AnnotationAddedSubscription['annotationAdded'];
 
 // ── Optimistic action types ─────────────────────────────────────────────────
 
@@ -81,28 +72,32 @@ function extractTimestamp(raw: unknown): number {
 // ── Normaliser ──────────────────────────────────────────────────────────────
 
 function normaliseAnnotation(
-  gql: GqlAnnotation,
+  gql: GqlAnnotationInput,
   contentId: string
 ): Annotation {
   const text = extractContentText(gql.content);
   const timestampStart = extractTimestamp(gql.spatialData);
 
+  // Cast the generated AnnotationLayer to the local enum: both are string enums
+  // with identical runtime values ('PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED').
+  const localLayer = gql.layer as unknown as AnnotationLayer;
+
   return {
     id: gql.id,
     content: text,
-    layer: gql.layer,
+    layer: localLayer,
     userId: gql.userId,
     userName: 'User', // user displayName resolved via core subgraph (not fetched here)
     userRole:
-      gql.layer === AnnotationLayer.AI_GENERATED
+      localLayer === AnnotationLayer.AI_GENERATED
         ? 'ai'
-        : gql.layer === AnnotationLayer.INSTRUCTOR
+        : localLayer === AnnotationLayer.INSTRUCTOR
         ? 'instructor'
         : 'student',
     timestamp: formatTime(timestampStart),
     contentId,
     contentTimestamp: timestampStart || undefined,
-    parentId: gql.parentId ?? undefined,
+    parentId: ('parentId' in gql ? gql.parentId : undefined) ?? undefined,
     createdAt: gql.createdAt,
     updatedAt: gql.updatedAt,
     replies: [], // siblings with matching parentId are threaded client-side
@@ -148,13 +143,14 @@ export function useAnnotations(
   const validAssetId = !!contentId && isUUID(contentId);
 
   // Fetch all annotations for this asset; multi-layer filtering is client-side.
-  const [result] = useQuery<AnnotationsQueryResult>({
+  const [result] = useQuery<AnnotationsQuery, AnnotationsQueryVariables>({
     query: ANNOTATIONS_QUERY,
     variables: { assetId: contentId },
     pause: !validAssetId,
   });
 
-  const [subscriptionResult] = useSubscription<AnnotationAddedSubscriptionResult>({
+  // useSubscription<Data, Result, Variables>: Variables is the 3rd param.
+  const [subscriptionResult] = useSubscription<AnnotationAddedSubscription, AnnotationAddedSubscription, AnnotationAddedSubscriptionVariables>({
     query: ANNOTATION_ADDED_SUBSCRIPTION,
     variables: { assetId: contentId },
     pause: !validAssetId,

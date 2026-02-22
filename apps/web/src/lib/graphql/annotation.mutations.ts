@@ -9,10 +9,9 @@ export const CREATE_ANNOTATION_MUTATION = gql`
       layer
       annotationType
       content
-      startTime
-      endTime
-      position
+      spatialData
       parentId
+      isResolved
       createdAt
       updatedAt
     }
@@ -24,6 +23,9 @@ export const UPDATE_ANNOTATION_MUTATION = gql`
     updateAnnotation(id: $id, input: $input) {
       id
       content
+      spatialData
+      layer
+      isResolved
       updatedAt
     }
   }
@@ -41,27 +43,12 @@ export const ANNOTATIONS_BY_ASSET_QUERY = gql`
       id
       assetId
       userId
-      user {
-        id
-        displayName
-      }
       layer
       annotationType
       content
-      startTime
-      endTime
-      position
+      spatialData
       parentId
-      replies {
-        id
-        userId
-        user {
-          id
-          displayName
-        }
-        content
-        createdAt
-      }
+      isResolved
       createdAt
       updatedAt
     }
@@ -74,16 +61,12 @@ export const ANNOTATION_ADDED_SUBSCRIPTION = gql`
       id
       assetId
       userId
-      user {
-        id
-        displayName
-      }
       layer
       annotationType
       content
-      startTime
-      endTime
+      spatialData
       createdAt
+      updatedAt
     }
   }
 `;
