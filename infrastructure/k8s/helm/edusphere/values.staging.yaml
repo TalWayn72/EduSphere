@@ -11,24 +11,26 @@ global:
 
 # ── Replica counts (lean for staging) ────────────────────────────────────────
 replicaCount:
-  gateway: 2
+  gateway: 1
   subgraph: 1
   frontend: 1
 
 # ── Image — tag is injected by the CD pipeline at deploy time ─────────────────
+# pullPolicy: Always in staging ensures the latest tag is guaranteed to be pulled
+# even when the tag name (e.g. 'main-abc1234') was previously cached on a node.
 image:
   registry: ghcr.io
-  repository: ${{ github.repository_owner }}/edusphere
-  pullPolicy: Always   # Always pull in staging so the latest tag is guaranteed
-  tag: ""              # Set by CD: --set image.tag=main-<sha>
+  repository: edusphere-org/edusphere
+  pullPolicy: Always
+  tag: ""   # Set by CD: --set image.tag=main-<sha>
 
 # ── Gateway ───────────────────────────────────────────────────────────────────
 gateway:
   enabled: true
   autoscaling:
-    enabled: false     # No HPA in staging — predictable load
-    minReplicas: 2
-    maxReplicas: 5
+    enabled: false   # No HPA in staging — predictable load
+    minReplicas: 1
+    maxReplicas: 3
   podDisruptionBudget:
     minAvailable: 1
   resources:
@@ -38,6 +40,9 @@ gateway:
     limits:
       cpu: 500m
       memory: 512Mi
+  env:
+    NODE_ENV: staging
+    LOG_LEVEL: debug
 
 # ── Subgraphs ─────────────────────────────────────────────────────────────────
 subgraphs:
@@ -45,18 +50,30 @@ subgraphs:
     enabled: true
     port: 4001
     replicas: 1
+    env:
+      NODE_ENV: staging
+      LOG_LEVEL: debug
   content:
     enabled: true
     port: 4002
     replicas: 1
+    env:
+      NODE_ENV: staging
+      LOG_LEVEL: debug
   annotation:
     enabled: true
     port: 4003
     replicas: 1
+    env:
+      NODE_ENV: staging
+      LOG_LEVEL: debug
   collaboration:
     enabled: true
     port: 4004
     replicas: 1
+    env:
+      NODE_ENV: staging
+      LOG_LEVEL: debug
   agent:
     enabled: true
     port: 4005
@@ -68,10 +85,16 @@ subgraphs:
       limits:
         cpu: 1000m
         memory: 2Gi
+    env:
+      NODE_ENV: staging
+      LOG_LEVEL: debug
   knowledge:
     enabled: true
     port: 4006
     replicas: 1
+    env:
+      NODE_ENV: staging
+      LOG_LEVEL: debug
 
 # ── Frontend ──────────────────────────────────────────────────────────────────
 frontend:
@@ -79,7 +102,7 @@ frontend:
   autoscaling:
     enabled: false
     minReplicas: 1
-    maxReplicas: 3
+    maxReplicas: 2
   resources:
     requests:
       cpu: 50m
@@ -87,6 +110,8 @@ frontend:
     limits:
       cpu: 250m
       memory: 256Mi
+  env:
+    NODE_ENV: staging
 
 # ── Ingress ───────────────────────────────────────────────────────────────────
 ingress:
@@ -97,8 +122,14 @@ ingress:
   tls:
     enabled: true
     secretName: edusphere-staging-tls
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    traefik.ingress.kubernetes.io/router.tls: "true"
 
-# ── External services — secrets injected via External Secrets Operator ────────
+# ── External services — shared staging cluster ────────────────────────────────
+# Staging uses a shared PostgreSQL and Redis instance (not bundled via Helm).
+# Connection strings are pulled from the 'edusphere-staging-secrets' Secret
+# managed by External Secrets Operator.
 postgresql:
   enabled: false   # Use shared staging PostgreSQL instance (external)
 

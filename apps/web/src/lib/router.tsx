@@ -52,6 +52,9 @@ const SettingsPage = lazy(() =>
   import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage }))
 );
 const AnnotationDemo = lazy(() => import('@/pages/AnnotationDemo'));
+const ChavrutaPage = lazy(() =>
+  import('@/pages/chavruta/ChavrutaPage').then((m) => ({ default: m.ChavrutaPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -136,6 +139,14 @@ export const router = createBrowserRouter([
   {
     path: '/annotations-demo',
     element: guarded(<AnnotationDemo />),
+  },
+  {
+    path: '/chavruta',
+    element: guarded(<ChavrutaPage />),
+  },
+  {
+    path: '/chavruta/:topicId',
+    element: guarded(<ChavrutaPage />),
   },
   {
     path: '/',

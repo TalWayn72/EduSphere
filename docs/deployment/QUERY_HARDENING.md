@@ -85,20 +85,29 @@ No wildcard (`*`) CORS is possible -- fail-closed empty array prevents
 all cross-origin requests if `CORS_ORIGIN` is not configured.
 
 ---
-## 5. Persisted Queries (Phase 7.3 -- Planned)
+## 5. Persisted Queries (APQ)
 
 **Goal:** Allow only pre-registered query hashes in production, rejecting
-arbitrary GraphQL from untrusted clients.
+arbitrary GraphQL from untrusted clients. (OWASP API4)
 
-**Approach:** Hive Gateway APQ (Automatic Persisted Queries):
-1. Client sends persistedQuery extension with sha256Hash
-2. Gateway looks up hash in registry
-3. Unknown hashes return 404 (first request), client sends full query
-4. Full query registered in hash store for future use
+**Implementation:**
+- `apps/gateway/src/persisted-queries/registry.ts` — bounded hash→query Map (max 10,000 entries, LRU eviction)
+- `apps/gateway/src/persisted-queries/middleware.ts` — APQ enforcement middleware
 
-**Status:** Planned; currently all authenticated queries allowed.
+**APQ protocol (Automatic Persisted Queries):**
+1. Client sends `extensions.persistedQuery.sha256Hash` with the request
+2. If hash + full query both present: gateway registers the mapping and proceeds
+3. If hash only and registered: gateway substitutes stored query document
+4. If hash only and NOT registered: gateway returns 400 `PERSISTED_QUERY_NOT_FOUND`
+5. If no hash and `PERSISTED_QUERIES_ONLY=true`: gateway returns 400 `PERSISTED_QUERIES_REQUIRED`
 
-**Future implementation:** `apps/gateway/src/persisted-queries/registry.ts`
+**Status:** Implemented. Enabled via `PERSISTED_QUERIES_ONLY=true` environment variable.
+
+**Configuration:**
+```bash
+# apps/gateway/.env (production)
+PERSISTED_QUERIES_ONLY=true
+```
 
 ---
 
@@ -120,6 +129,7 @@ arbitrary GraphQL from untrusted clients.
 | `GRAPHQL_MAX_COMPLEXITY` | `1000` | Maximum query complexity score |
 | `CORS_ORIGIN` | (fail-closed) | Comma-separated allowed origins |
 | `RATE_LIMIT_MAX` | `1000` | Requests per window per tenant |
+| `PERSISTED_QUERIES_ONLY` | `true` (prod) | Reject arbitrary GraphQL; require APQ hashes |
 
 ---
 

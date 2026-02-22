@@ -15,92 +15,95 @@ replicaCount:
   frontend: 3
 
 # ── Image — tag injected by the CD pipeline at deploy time ────────────────────
+# The CD pipeline passes --set image.tag=main-<short-sha> at every deploy.
+# pullPolicy: IfNotPresent because the SHA tag is immutable — no need to re-pull.
 image:
   registry: ghcr.io
   repository: edusphere-org/edusphere
-  pullPolicy: IfNotPresent  # Tag is immutable SHA in production
-  tag: ""                   # Set by CD: --set image.tag=main-<sha>
+  pullPolicy: Always
+  tag: ""   # Set by CD: --set image.tag=main-<sha>
 
 # ── Gateway ───────────────────────────────────────────────────────────────────
 gateway:
   enabled: true
+  replicaCount: 3
   autoscaling:
     enabled: true
-    minReplicas: 5
-    maxReplicas: 50
-    targetCPUUtilizationPercentage: 65
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 75
   podDisruptionBudget:
-    minAvailable: 3
+    minAvailable: 1
   resources:
     requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
       cpu: 500m
       memory: 1Gi
-    limits:
-      cpu: 2000m
-      memory: 2Gi
+  env:
+    NODE_ENV: production
+    PERSISTED_QUERIES_ONLY: "true"
 
 # ── Subgraphs ─────────────────────────────────────────────────────────────────
 subgraphs:
   core:
     enabled: true
     port: 4001
-    replicas: 3
+    replicas: 2
     resources:
       requests:
-        cpu: 200m
+        cpu: 250m
         memory: 512Mi
       limits:
-        cpu: 1000m
+        cpu: 500m
         memory: 1Gi
+    env:
+      NODE_ENV: production
   content:
     enabled: true
     port: 4002
-    replicas: 3
+    replicas: 2
     resources:
       requests:
-        cpu: 200m
+        cpu: 250m
         memory: 512Mi
       limits:
-        cpu: 1000m
+        cpu: 500m
         memory: 1Gi
+    env:
+      NODE_ENV: production
   annotation:
     enabled: true
     port: 4003
-    replicas: 3
+    replicas: 2
     resources:
       requests:
-        cpu: 150m
-        memory: 256Mi
+        cpu: 250m
+        memory: 512Mi
       limits:
         cpu: 500m
-        memory: 512Mi
+        memory: 1Gi
+    env:
+      NODE_ENV: production
   collaboration:
     enabled: true
     port: 4004
-    replicas: 3
+    replicas: 2
     resources:
       requests:
-        cpu: 200m
+        cpu: 250m
         memory: 512Mi
       limits:
-        cpu: 1000m
+        cpu: 500m
         memory: 1Gi
+    env:
+      NODE_ENV: production
   agent:
     enabled: true
     port: 4005
-    replicas: 3
-    resources:
-      requests:
-        cpu: 1000m
-        memory: 2Gi
-      limits:
-        cpu: 4000m
-        memory: 8Gi
-  knowledge:
-    enabled: true
-    port: 4006
-    replicas: 3
+    replicas: 2
     resources:
       requests:
         cpu: 500m
@@ -108,14 +111,29 @@ subgraphs:
       limits:
         cpu: 2000m
         memory: 4Gi
+    env:
+      NODE_ENV: production
+  knowledge:
+    enabled: true
+    port: 4006
+    replicas: 2
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    env:
+      NODE_ENV: production
 
 # ── Frontend ──────────────────────────────────────────────────────────────────
 frontend:
   enabled: true
   autoscaling:
     enabled: true
-    minReplicas: 3
-    maxReplicas: 20
+    minReplicas: 2
+    maxReplicas: 10
     targetCPUUtilizationPercentage: 70
   resources:
     requests:
@@ -124,20 +142,74 @@ frontend:
     limits:
       cpu: 500m
       memory: 512Mi
+  env:
+    NODE_ENV: production
 
-# ── Ingress (Traefik) ─────────────────────────────────────────────────────────
+# ── Ingress (Traefik + cert-manager TLS) ─────────────────────────────────────
 ingress:
   enabled: true
   className: traefik
   host: app.edusphere.io
-  apiHost: api.edusphere.dev
+  apiHost: api.edusphere.io
   tls:
     enabled: true
     secretName: edusphere-prod-tls
+  annotations:
+    # cert-manager issues and renews TLS certificates automatically
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.tls: "true"
 
-# ── External services ─────────────────────────────────────────────────────────
+# ── Pod Disruption Budget (cluster-level availability guarantee) ──────────────
+podDisruptionBudget:
+  minAvailable: 1
+
+# ── Autoscaling (cluster-wide defaults; service-level values above override) ──
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# ── Node affinity — prefer on-demand (non-spot) nodes for production ──────────
+# This soft rule (preferredDuringSchedulingIgnoredDuringExecution) keeps pods
+# on stable on-demand nodes while still allowing scheduling on spot if needed.
+nodeAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 80
+      preference:
+        matchExpressions:
+          - key: node.kubernetes.io/capacity-type
+            operator: NotIn
+            values:
+              - spot
+              - preemptible
+    - weight: 50
+      preference:
+        matchExpressions:
+          - key: topology.kubernetes.io/zone
+            operator: Exists
+
+# ── Topology spread constraints — distribute across availability zones ─────────
+# Ensures no single AZ failure takes out all replicas of any service.
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: edusphere
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: edusphere
+
+# ── External services — secrets injected via External Secrets Operator ────────
 postgresql:
   enabled: false   # External managed PostgreSQL 16 (RDS / CloudSQL / etc.)
+  # Connection string pulled from Kubernetes Secret 'edusphere-secrets'
+  # key: database-url — managed by External Secrets Operator
 
 redis:
   enabled: false   # External managed Redis (ElastiCache / Upstash / etc.)

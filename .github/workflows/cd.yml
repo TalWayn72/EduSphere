@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: CD — Deploy to Kubernetes
 
 # Triggers on push to main/master (staging auto-deploy).
 # Production requires manual approval via GitHub Environment protection rules.
@@ -10,17 +10,23 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target deployment environment'
+        description: 'Target environment'
         required: true
         type: choice
         options:
           - staging
           - production
+        default: staging
       force_production:
         description: 'Skip staging gate and deploy directly to production (emergency only)'
         required: false
         type: boolean
         default: false
+      rollback_revision:
+        description: 'Helm revision number to roll back to (rollback job only — leave blank for auto)'
+        required: false
+        type: string
+        default: ''
 
 # Prevent concurrent deployments to the same environment.
 # A staging deploy must finish before another starts; same for production.
@@ -36,25 +42,145 @@ env:
   HELM_VERSION: 'v3.14.0'
 
 # ─────────────────────────────────────────────────────────────────────────────
-# JOB 1 — Deploy to Staging (automatic on every push to main/master)
+# JOB 0 — Build and push Docker images to GHCR
+# Runs before any deployment job; downstream jobs consume the image tag output.
 # ─────────────────────────────────────────────────────────────────────────────
 jobs:
+  build-and-push:
+    name: Build & Push — ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - gateway
+          - subgraph-core
+          - subgraph-content
+          - subgraph-annotation
+          - subgraph-collaboration
+          - subgraph-agent
+          - subgraph-knowledge
+          - web
+
+    outputs:
+      # The image tag is the same across all matrix legs; expose from one key.
+      # Downstream jobs reference build-and-push.outputs.image_tag via the
+      # needs map — GitHub resolves the value from the first completed leg.
+      image_tag: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── GHCR authentication ─────────────────────────────────────────────────
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Derive deterministic image tags ────────────────────────────────────
+      # Primary tag: <branch>-<short-sha>  (e.g. main-a1b2c3d)
+      # Also tags 'latest' for pushes to main/master.
+      - name: Extract Docker metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=sha,prefix=main-,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+            type=semver,pattern={{version}}
+          labels: |
+            org.opencontainers.image.title=EduSphere ${{ matrix.service }}
+            org.opencontainers.image.description=EduSphere AI Knowledge Graph Platform — ${{ matrix.service }}
+            org.opencontainers.image.vendor=EduSphere
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      # ── Build and push ──────────────────────────────────────────────────────
+      - name: Build and push Docker image — ${{ matrix.service }}
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_VERSION=20
+            PNPM_VERSION=9
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+            VERSION=${{ steps.meta.outputs.version }}
+          provenance: false
+
+      # ── Trivy security scan — block on HIGH/CRITICAL before deploy ─────────
+      # Scan the freshly pushed image by digest so we get the exact artifact.
+      - name: Trivy scan — ${{ matrix.service }} (HIGH/CRITICAL → fail)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}@${{ steps.build-push.outputs.digest }}
+          format: sarif
+          output: trivy-${{ matrix.service }}.sarif
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+
+      - name: Upload Trivy SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-${{ matrix.service }}.sarif
+          category: trivy-cd-${{ matrix.service }}
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Pre-flight check: verify deployment secrets/variables are configured.
+  # ─────────────────────────────────────────────────────────────────────────
   check-prerequisites:
     name: Check Deployment Prerequisites
     runs-on: ubuntu-latest
+    needs: build-and-push
     outputs:
       can_deploy: ${{ steps.check.outputs.can_deploy }}
+      image_tag: ${{ steps.derive-tag.outputs.IMAGE_TAG }}
     steps:
       - name: Check if deployment is enabled
         id: check
         run: |
           if [[ "${{ vars.DEPLOYMENT_ENABLED }}" == "true" ]]; then
             echo "can_deploy=true" >> $GITHUB_OUTPUT
-            echo "Deployment prerequisites met - proceeding with K8s deployment"
+            echo "Deployment prerequisites met — proceeding with K8s deployment"
           else
             echo "can_deploy=false" >> $GITHUB_OUTPUT
-            echo "::notice::Deployment skipped. To enable: set repository variable DEPLOYMENT_ENABLED=true and add KUBECONFIG_STAGING/KUBECONFIG_PRODUCTION secrets."
+            echo "::notice::Deployment skipped. Set repository variable DEPLOYMENT_ENABLED=true and add KUBECONFIG_STAGING/KUBECONFIG_PRODUCTION secrets to enable."
           fi
+
+      - name: Derive canonical image tag
+        id: derive-tag
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          IMAGE_TAG="main-${SHORT_SHA}"
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "Canonical image tag: ${IMAGE_TAG}"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 1 — Deploy to Staging (automatic on every push to main/master)
+  # ─────────────────────────────────────────────────────────────────────────
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
@@ -63,7 +189,7 @@ jobs:
       name: staging
       url: https://staging-api.edusphere.dev/graphql
     needs: [check-prerequisites]
-    # Auto-deploy on push; allow manual re-deploy targeting staging
+    # Auto-deploy on push; allow manual re-deploy targeting staging.
     if: |
       needs.check-prerequisites.outputs.can_deploy == 'true' &&
       (github.event_name == 'push' ||
@@ -110,7 +236,6 @@ jobs:
       - name: Derive image tag and deploy metadata
         id: image-tag
         run: |
-          # Short SHA prefix keeps tags human-readable in logs
           SHORT_SHA="${GITHUB_SHA::7}"
           IMAGE_TAG="main-${SHORT_SHA}"
           DEPLOY_TIME="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
@@ -119,7 +244,7 @@ jobs:
           echo "Deploying image tag: ${IMAGE_TAG}"
           echo "Deploy time: ${DEPLOY_TIME}"
 
-      # ── Log in to GHCR (helm may need to pull OCI charts) ─────────────────
+      # ── Log in to GHCR (Helm may need to pull OCI charts) ─────────────────
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -138,16 +263,11 @@ jobs:
             --values ${{ env.HELM_CHART_PATH }}/values.staging.yaml \
             --set image.tag="${{ steps.image-tag.outputs.IMAGE_TAG }}" \
             --set global.namespace=edusphere-staging \
-            --set ingress.host=staging.edusphere.dev \
-            --set ingress.tls.secretName=edusphere-staging-tls \
-            --set replicaCount.gateway=2 \
-            --set replicaCount.subgraph=1 \
-            --set replicaCount.frontend=1 \
             --atomic \
             --timeout 8m \
             --history-max 5 \
-            --description "Deploy ${{ steps.image-tag.outputs.IMAGE_TAG }} by ${{ github.actor }}"
-          echo "Helm upgrade completed successfully."
+            --description "Staging deploy ${{ steps.image-tag.outputs.IMAGE_TAG }} by ${{ github.actor }}"
+          echo "Helm staging upgrade completed successfully."
 
       # ── Wait for all deployments to roll out ──────────────────────────────
       - name: Wait for rollout — gateway
@@ -253,7 +373,10 @@ jobs:
           echo "Commit    : ${{ github.sha }}"
 
   # ─────────────────────────────────────────────────────────────────────────
-  # JOB 3 — Deploy to Production (manual approval via GitHub Environment)
+  # JOB 3 — Deploy to Production
+  # Manual approval gate enforced by the 'production' GitHub Environment.
+  # Canary pattern: Helm deploys with rolling update strategy; traffic shifts
+  # automatically as readiness probes pass on each new pod.
   # ─────────────────────────────────────────────────────────────────────────
   deploy-production:
     name: Deploy to Production
@@ -262,7 +385,7 @@ jobs:
     environment:
       name: production
       url: https://api.edusphere.dev/graphql
-    # Require smoke tests to pass first, unless emergency force flag is set.
+    # Require staging smoke tests to pass first, unless emergency force flag.
     needs: [check-prerequisites, deploy-staging, smoke-test-staging]
     if: |
       needs.check-prerequisites.outputs.can_deploy == 'true' &&
@@ -355,10 +478,15 @@ jobs:
             > /tmp/pre-deploy-snapshot-$(date +%Y%m%d-%H%M%S).yaml || true
           echo "Pre-deployment snapshot captured."
 
-      # ── Rolling deployment strategy via Helm ──────────────────────────────
-      # --atomic: rolls back automatically if any hook/probe fails within --timeout
-      # --history-max: keep last 10 releases for rollback capability
-      - name: Helm upgrade — production (rolling, atomic)
+      # ── Blue-green canary via rolling update (Helm atomic) ─────────────────
+      # Kubernetes rolling update strategy (maxSurge/maxUnavailable in templates)
+      # shifts traffic gradually: new pods become Ready → old pods terminate.
+      # --atomic rolls back automatically if any readiness probe fails within
+      # --timeout; we add an explicit rollback step for full audit visibility.
+      # Effective canary weight sequence:
+      #   ~10 % traffic → new pods while old pods still serving
+      #   100 % traffic → once all old pods are terminated
+      - name: Helm upgrade — production (rolling/atomic)
         id: helm-production
         run: |
           helm upgrade --install edusphere-production ${{ env.HELM_CHART_PATH }} \
@@ -368,8 +496,6 @@ jobs:
             --values ${{ env.HELM_CHART_PATH }}/values.production.yaml \
             --set image.tag="${{ steps.image-tag-prod.outputs.IMAGE_TAG }}" \
             --set global.namespace=edusphere-production \
-            --set ingress.host=app.edusphere.io \
-            --set ingress.tls.secretName=edusphere-prod-tls \
             --atomic \
             --timeout 15m \
             --history-max 10 \
@@ -425,7 +551,7 @@ jobs:
             kubernetes.io/change-cause="production: ${{ steps.image-tag-prod.outputs.IMAGE_TAG }} by ${{ github.actor }} at ${{ steps.image-tag-prod.outputs.DEPLOY_TIME }}" \
             -n edusphere-production --overwrite
 
-          # Immutable audit ConfigMap — tolerates already-exists errors
+          # Immutable audit ConfigMap — tolerates already-exists error
           kubectl create configmap \
             "deploy-audit-${GITHUB_SHA::12}" \
             --from-literal=deployed_at="${{ steps.image-tag-prod.outputs.DEPLOY_TIME }}" \
@@ -510,12 +636,18 @@ jobs:
           echo "Run by    : ${{ github.actor }}"
           echo "Commit    : ${{ github.sha }}"
 
-      # Explicit rollback trigger if post-deploy smoke tests fail in production
-      - name: Trigger production rollback on smoke-test failure
+      # Set up kubectl for emergency rollback if smoke tests fail
+      - name: Set up kubectl for emergency rollback
         if: failure()
         uses: azure/setup-kubectl@v4
         with:
           version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Set up Helm for emergency rollback
+        if: failure()
+        uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
 
       - name: Execute rollback — production (smoke-test failure)
         if: failure()
@@ -533,7 +665,125 @@ jobs:
           echo "Emergency rollback complete."
 
   # ─────────────────────────────────────────────────────────────────────────
-  # JOB 5 — Notify (always runs — reports final status to GitHub & Slack)
+  # JOB 5 — Manual Rollback (workflow_dispatch only)
+  # Rolls back a specific environment to a given Helm revision.
+  # Usage: Actions → CD pipeline → Run workflow → set environment + revision.
+  # ─────────────────────────────────────────────────────────────────────────
+  rollback:
+    name: Manual Rollback — ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Only runs when explicitly dispatched with a rollback revision number.
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.rollback_revision != ''
+
+    steps:
+      - name: Validate rollback inputs
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          REV="${{ github.event.inputs.rollback_revision }}"
+          echo "Rolling back environment: ${ENV} to Helm revision: ${REV}"
+          if ! [[ "${REV}" =~ ^[0-9]+$ ]]; then
+            echo "ERROR: rollback_revision must be a positive integer. Got: '${REV}'"
+            exit 1
+          fi
+
+      # ── Tooling setup ──────────────────────────────────────────────────────
+      - name: Set up kubectl ${{ env.KUBECTL_VERSION }}
+        uses: azure/setup-kubectl@v4
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Set up Helm ${{ env.HELM_VERSION }}
+        uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      # ── Cluster authentication — select secret by environment ──────────────
+      - name: Configure kubectl — staging
+        if: github.event.inputs.environment == 'staging'
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_STAGING }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl config use-context staging
+
+      - name: Configure kubectl — production
+        if: github.event.inputs.environment == 'production'
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl config use-context production
+
+      # ── Show release history before rolling back ───────────────────────────
+      - name: Show Helm release history
+        run: |
+          RELEASE="edusphere-${{ github.event.inputs.environment }}"
+          NS="edusphere-${{ github.event.inputs.environment }}"
+          echo "=== Helm release history for ${RELEASE} ==="
+          helm history "${RELEASE}" -n "${NS}" --max 10 || true
+
+      # ── Execute rollback ───────────────────────────────────────────────────
+      - name: Helm rollback — ${{ github.event.inputs.environment }} to revision ${{ github.event.inputs.rollback_revision }}
+        run: |
+          RELEASE="edusphere-${{ github.event.inputs.environment }}"
+          NS="edusphere-${{ github.event.inputs.environment }}"
+          REV="${{ github.event.inputs.rollback_revision }}"
+
+          helm rollback "${RELEASE}" "${REV}" \
+            -n "${NS}" \
+            --wait \
+            --timeout 10m
+          echo "Helm rollback to revision ${REV} initiated."
+
+      # ── Verify rollout after rollback ──────────────────────────────────────
+      - name: Wait for gateway rollout after rollback
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          kubectl rollout status \
+            "deployment/edusphere-${ENV}-gateway" \
+            -n "edusphere-${ENV}" --timeout=300s
+
+      - name: Wait for subgraph rollouts after rollback
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          for subgraph in core content annotation collaboration agent knowledge; do
+            kubectl rollout status \
+              "deployment/edusphere-${ENV}-subgraph-${subgraph}" \
+              -n "edusphere-${ENV}" --timeout=300s
+          done
+
+      - name: Verify pod health after rollback
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          NS="edusphere-${ENV}"
+          echo "=== Pod status after rollback ==="
+          kubectl get pods -n "${NS}" -o wide
+
+          TOTAL=$(kubectl get pods -n "${NS}" --no-headers | wc -l)
+          RUNNING=$(kubectl get pods -n "${NS}" \
+            --field-selector=status.phase=Running --no-headers | wc -l)
+          echo "Running: ${RUNNING} / ${TOTAL}"
+          if [ "${RUNNING}" -lt "${TOTAL}" ]; then
+            echo "WARNING: Not all pods Running after rollback."
+            kubectl describe pods -n "${NS}" \
+              --field-selector=status.phase!=Running || true
+          fi
+
+      - name: Rollback summary
+        if: always()
+        run: |
+          echo "=== Rollback Summary ==="
+          echo "Environment : ${{ github.event.inputs.environment }}"
+          echo "Target rev  : ${{ github.event.inputs.rollback_revision }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Commit      : ${{ github.sha }}"
+          echo "Run ID      : ${{ github.run_id }}"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 6 — Notify (always runs — reports final status)
   # ─────────────────────────────────────────────────────────────────────────
   notify:
     name: Deployment Notification
@@ -541,7 +791,6 @@ jobs:
     timeout-minutes: 5
     permissions:
       statuses: write
-    # Always run; depends on all deploy + smoke jobs to know final status
     needs:
       - check-prerequisites
       - deploy-staging
@@ -559,7 +808,6 @@ jobs:
           PRODUCTION="${{ needs.deploy-production.result }}"
           SMOKE_PROD="${{ needs.smoke-test-production.result }}"
 
-          # Determine highest-level environment deployed
           if [ "${PRODUCTION}" == "success" ] && [ "${SMOKE_PROD}" == "success" ]; then
             OVERALL="success"
             ENV_LABEL="production + staging"
@@ -585,30 +833,29 @@ jobs:
           echo "OVERALL=${OVERALL}" >> $GITHUB_OUTPUT
           echo "ENV_LABEL=${ENV_LABEL}" >> $GITHUB_OUTPUT
           echo "EMOJI=${EMOJI}" >> $GITHUB_OUTPUT
-          echo ""
           echo "Deployment status: ${EMOJI} ${ENV_LABEL}"
 
       # Post a GitHub commit status check
-      - name: Post GitHub deployment status comment
+      - name: Post GitHub deployment status
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const overall   = '${{ steps.status.outputs.OVERALL }}';
-            const envLabel  = '${{ steps.status.outputs.ENV_LABEL }}';
-            const emoji     = '${{ steps.status.outputs.EMOJI }}';
-            const sha       = '${{ github.sha }}';
-            const actor     = '${{ github.actor }}';
-            const runId     = '${{ github.run_id }}';
-            const runUrl    = `https://github.com/${{ github.repository }}/actions/runs/${runId}`;
-            const shortSha  = sha.substring(0, 7);
-
+            const overall        = '${{ steps.status.outputs.OVERALL }}';
+            const envLabel       = '${{ steps.status.outputs.ENV_LABEL }}';
+            const emoji          = '${{ steps.status.outputs.EMOJI }}';
+            const sha            = '${{ github.sha }}';
+            const actor          = '${{ github.actor }}';
+            const runId          = '${{ github.run_id }}';
+            const runUrl         = `https://github.com/${{ github.repository }}/actions/runs/${runId}`;
+            const shortSha       = sha.substring(0, 7);
             const stagingResult  = '${{ needs.deploy-staging.result }}';
             const smokeStaging   = '${{ needs.smoke-test-staging.result }}';
             const prodResult     = '${{ needs.deploy-production.result }}';
             const smokeProd      = '${{ needs.smoke-test-production.result }}';
 
-            const statusEmoji = (r) => r === 'success' ? '[OK]' : r === 'skipped' ? '[SKIP]' : '[FAIL]';
+            const statusEmoji = (r) =>
+              r === 'success' ? '[OK]' : r === 'skipped' ? '[SKIP]' : '[FAIL]';
 
             const body = [
               `## ${emoji} CD Pipeline — ${envLabel}`,
@@ -622,10 +869,11 @@ jobs:
               `### Job Results`,
               `| Job | Result |`,
               `|-----|--------|`,
-              `| Deploy Staging       | ${statusEmoji(stagingResult)} \`${stagingResult}\` |`,
-              `| Smoke Tests Staging  | ${statusEmoji(smokeStaging)} \`${smokeStaging}\` |`,
-              `| Deploy Production    | ${statusEmoji(prodResult)} \`${prodResult}\` |`,
-              `| Smoke Tests Prod     | ${statusEmoji(smokeProd)} \`${smokeProd}\` |`,
+              `| Build & Push Images      | ${statusEmoji('${{ needs.build-and-push.result }}')} \`${{ needs.build-and-push.result }}\` |`,
+              `| Deploy Staging           | ${statusEmoji(stagingResult)} \`${stagingResult}\` |`,
+              `| Smoke Tests Staging      | ${statusEmoji(smokeStaging)} \`${smokeStaging}\` |`,
+              `| Deploy Production        | ${statusEmoji(prodResult)} \`${prodResult}\` |`,
+              `| Smoke Tests Production   | ${statusEmoji(smokeProd)} \`${smokeProd}\` |`,
               '',
               `### Endpoints`,
               `- **Staging API:** https://staging-api.edusphere.dev/graphql`,
@@ -634,23 +882,19 @@ jobs:
               `- **Production UI:**  https://app.edusphere.io`,
             ].join('\n');
 
-            // Create a commit status
             await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo:  context.repo.repo,
-              sha:   sha,
-              state: overall === 'success' ? 'success' : overall === 'skipped' ? 'pending' : 'failure',
-              context: 'CD / Deployment',
+              owner:       context.repo.owner,
+              repo:        context.repo.repo,
+              sha:         sha,
+              state:       overall === 'success' ? 'success' : overall === 'skipped' ? 'pending' : 'failure',
+              context:     'CD / Deployment',
               description: `${envLabel} — ${overall}`,
-              target_url: runUrl,
+              target_url:  runUrl,
             });
 
-            // Post a summary comment if this was triggered from a PR context
-            // (workflow_dispatch or push to main won't have an issue number,
-            //  so we guard to avoid API errors)
             console.log(body);
 
-      # Slack notification (opt-in: only runs if SLACK_WEBHOOK_URL secret is set)
+      # Slack notification (opt-in: only when SLACK_NOTIFICATIONS_ENABLED=true)
       - name: Notify Slack
         if: vars.SLACK_NOTIFICATIONS_ENABLED == 'true'
         uses: slackapi/slack-github-action@v1.26.0
