@@ -230,6 +230,74 @@
 - MinIO reachable
 - Jaeger UI responds
 
+## MCP Tools — When to Use (Mandatory)
+
+**CRITICAL RULE:** Prefer MCP tools over Bash commands whenever available.
+MCP tools return **structured, typed data** — Bash commands return unstructured text that must be parsed.
+
+### Decision Matrix
+
+| Task | Use This MCP Tool | Do NOT Use |
+|------|-------------------|------------|
+| PostgreSQL query (RLS, schema, pg_policies) | `mcp__postgres__query` | `psql -c "..."` or Bash |
+| Search technical docs / APIs / patterns | `mcp__tavily__tavily_search` | WebSearch built-in |
+| Lint a file after writing it | `mcp__eslint__lint-files` | `pnpm turbo lint` |
+| Store architectural decision across sessions | `mcp__memory__create_entities` | Editing CLAUDE.md |
+| Recall previous decisions / bug root causes | `mcp__memory__search_nodes` | Asking user to repeat |
+| GitHub CI status / PR reviews / commit history | `mcp__github__*` | `gh run list` |
+| GraphQL schema inspection / query testing | `mcp__graphql__introspect-schema` / `mcp__graphql__query-graphql` | `pnpm compose` |
+| Complex multi-step reasoning / planning | `mcp__sequential-thinking__sequentialthinking` | Inline reasoning only |
+| E2E browser test after UI change | playwright MCP | `pnpm test:e2e` |
+| NATS event monitoring / stream inspection | nats MCP | `nats sub EDUSPHERE.>` |
+| Per-file TypeScript errors (faster than full build) | typescript-diagnostics MCP | `pnpm turbo typecheck` |
+
+### postgres — Use For
+- Validate RLS policies: `SELECT tablename, policyname, cmd, qual FROM pg_policies WHERE schemaname='public'`
+- Check tenant isolation: query with `SET LOCAL app.current_tenant = '<uuid>'`
+- Inspect Apache AGE graph: `SELECT * FROM cypher('edusphere_graph', ...) AS (n agtype)`
+- Debug connection pool: `SELECT pid, state, query FROM pg_stat_activity WHERE datname='edusphere'`
+- Verify migration state: `SELECT * FROM drizzle.__drizzle_migrations`
+
+### memory — ALWAYS Use
+- **Start of every complex task:** `mcp__memory__create_entities` to record the task context
+- **After every bug fix:** Record root cause and solution as entity
+- **After every architectural decision:** Store the decision and rationale
+- **Before starting related tasks:** `mcp__memory__search_nodes` to recall past decisions
+
+### tavily — Use For
+- Apache AGE Cypher query syntax and examples
+- LangGraph.js agent patterns and state machine docs
+- pgvector HNSW index configuration
+- NestJS Federation v2 patterns and resolver examples
+- Drizzle ORM v1 migration and RLS helpers
+- `mcp__tavily__tavily_research` for comprehensive multi-source research
+
+### eslint — Use After Every File Write
+```
+mcp__eslint__lint-files({ filePaths: ["/absolute/path/to/file.ts"] })
+```
+Fix any errors before moving to next file. Do not batch lint at the end.
+
+### github — Use After Every Push
+- `mcp__github__list_commits` to verify commit landed
+- `mcp__github__get_pull_request_status` to check CI gates
+- View failed workflow logs via `mcp__github__search_issues`
+
+### sequential-thinking — Use For
+- RLS policy design (multi-tenant edge cases, cross-schema access)
+- LangGraph state machine architecture decisions
+- Federation entity resolution debugging
+- Complex Drizzle migration sequences with rollback strategy
+
+### Infrastructure Status (3 servers need services running)
+| Server | Prerequisite | Verify |
+|--------|-------------|--------|
+| `postgres` | `docker-compose up -d postgres` | `mcp__postgres__query` returns result |
+| `graphql` | `pnpm --filter @edusphere/gateway dev` | `mcp__graphql__introspect-schema` returns types |
+| `nats` | `docker-compose up -d nats` | nats MCP returns stream list |
+
+---
+
 ## Commands Reference
 
 ### Development

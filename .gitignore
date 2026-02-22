@@ -82,11 +82,15 @@ vite.config.ts.timestamp-*.mjs
 dist/
 *.tsbuildinfo
 
-# Secrets
-*.pem
+# Secrets — private keys and certificates with embedded secrets
 *.key
-*.crt
 secrets/
+# *.pem and *.crt excluded by default — except public CA certificates below
+*.pem
+*.crt
+# Allow public corporate CA certificates (no private keys — safe to commit)
+!infrastructure/certs/ca-bundle.pem
+!infrastructure/certs/corporate-root-ca.pem
 
 # MCP server config — contains personal API keys (GitHub PAT, Tavily key)
 # Use .mcp.json.example as template and fill in your own keys locally

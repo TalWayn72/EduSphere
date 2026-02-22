@@ -2,7 +2,10 @@
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest", "--headed"]
+      "args": ["-y", "@playwright/mcp@latest", "--headed"],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+      }
     },
 
     "postgres": {
@@ -11,12 +14,18 @@
         "-y",
         "@modelcontextprotocol/server-postgres",
         "postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere"
-      ]
+      ],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+      }
     },
 
     "memory": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+      }
     },
 
     "typescript-diagnostics": {
@@ -25,19 +34,26 @@
         "-y",
         "ts-diagnostics-mcp@latest",
         "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere"
-      ]
+      ],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+      }
     },
 
     "eslint": {
       "command": "npx",
-      "args": ["-y", "@eslint/mcp@latest"]
+      "args": ["-y", "@eslint/mcp@latest"],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+      }
     },
 
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "REPLACE_WITH_YOUR_GITHUB_PAT"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "REPLACE_WITH_YOUR_GITHUB_PAT",
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
       }
     },
 
@@ -48,7 +64,10 @@
         "mcp-graphql",
         "--endpoint",
         "http://localhost:4000/graphql"
-      ]
+      ],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+      }
     },
 
     "nats": {
@@ -57,7 +76,8 @@
       "env": {
         "NATS_URL": "nats://localhost:4222",
         "NATS_USER": "edusphere",
-        "NATS_PASSWORD": "edusphere_nats_password"
+        "NATS_PASSWORD": "edusphere_nats_password",
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
       }
     },
 
@@ -65,13 +85,17 @@
       "command": "npx",
       "args": ["-y", "tavily-mcp@latest"],
       "env": {
-        "TAVILY_API_KEY": "REPLACE_WITH_YOUR_TAVILY_API_KEY"
+        "TAVILY_API_KEY": "REPLACE_WITH_YOUR_TAVILY_API_KEY",
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
       }
     },
 
     "sequential-thinking": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YOUR_USERNAME\\.claude\\projects\\EduSphere\\infrastructure\\certs\\ca-bundle.pem"
+      }
     }
   }
 }

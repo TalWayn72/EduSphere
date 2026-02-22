@@ -12,31 +12,47 @@
 | | |
 |---|---|
 | **Severity** | 🟢 Enhancement (developer productivity) |
-| **Status** | ✅ Complete |
-| **Files** | `.mcp.json`, `docs/plans/MCP_TOOLS_SETUP.md` |
+| **Status** | ✅ Complete + Verified + SSL Fixed |
+| **Files** | `.mcp.json` (gitignored), `.mcp.json.example`, `docs/plans/MCP_TOOLS_SETUP.md`, `infrastructure/certs/ca-bundle.pem`, `CLAUDE.md` |
 
 ### מה בוצע
 
-הגדרת 10 MCP servers ב-`.mcp.json` שמרחיבים את יכולות Claude Code לכתיבת קוד ובדיקות:
+הגדרת 10 MCP servers ב-`.mcp.json` שמרחיבים את יכולות Claude Code:
 
-| # | Server | Package | תועלת |
-|---|--------|---------|--------|
-| 1 | `postgres` | `@modelcontextprotocol/server-postgres` | שאילתות SQL ישירות, אימות RLS policies |
-| 2 | `memory` | `@modelcontextprotocol/server-memory` | זיכרון בין שיחות, שמירת context ארכיטקטוני |
-| 3 | `typescript-diagnostics` | `ts-diagnostics-mcp` | שגיאות TypeScript מובנות לפי קובץ |
-| 4 | `eslint` | `@eslint/mcp` | lint מובנה per-file, כולל security rules |
-| 5 | `playwright` | `@playwright/mcp` | E2E testing (היה קיים, נשמר) |
-| 6 | `github` | `@modelcontextprotocol/server-github` | GitHub API — CI/CD, PRs, workflow monitoring |
-| 7 | `graphql` | `mcp-graphql` | introspection של Federation supergraph חי |
-| 8 | `nats` | `mcp-nats` | debug JetStream events בזמן אמת |
-| 9 | `tavily` | `tavily-mcp` | חיפוש documentation טכני מדויק |
-| 10 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | חשיבה מובנית לבעיות מורכבות |
+| # | Server | Package | סטטוס אימות |
+|---|--------|---------|------------|
+| 1 | `postgres` | `@modelcontextprotocol/server-postgres` | ✅ רץ (DB צריך Docker) |
+| 2 | `memory` | `@modelcontextprotocol/server-memory` | ✅ מאומת — עובד |
+| 3 | `typescript-diagnostics` | `ts-diagnostics-mcp` | ✅ package קיים (v0.1.7) |
+| 4 | `eslint` | `@eslint/mcp` | ✅ רץ |
+| 5 | `playwright` | `@playwright/mcp` | ✅ רץ (צריך web dev) |
+| 6 | `github` | `@modelcontextprotocol/server-github` | ✅ מאומת — HTTP 200 |
+| 7 | `graphql` | `mcp-graphql` | ✅ רץ (צריך gateway) |
+| 8 | `nats` | `mcp-nats` | ✅ package קיים (v0.1.0) |
+| 9 | `tavily` | `tavily-mcp` | ✅ מאומת — HTTP 200 |
+| 10 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | ✅ מאומת — עובד |
 
-### פעולות נדרשות מהמשתמש
+### תיקון SSL — Corporate Proxy (Blue Coat)
 
-שני API keys דורשים הגדרה ידנית ב-`.mcp.json`:
-- `REPLACE_WITH_YOUR_GITHUB_PAT` → [GitHub Personal Access Token](https://github.com/settings/tokens) (scopes: `repo`, `workflow`, `read:org`)
-- `REPLACE_WITH_YOUR_TAVILY_API_KEY` → [Tavily API Key](https://tavily.com) (free tier: 1000 searches/month)
+**בעיה שנמצאה:** סביבה ארגונית עם Blue Coat SSL inspection proxy ("Cloud Services CA - G2").
+Node.js לא מכיר את ה-CA ולכן HTTPS requests נכשלים עם `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`.
+
+**פתרון שיושם:**
+- יוצאו שני CA certificates מ-Windows cert store: Root CA + Intermediate CA
+- נשמרו ב-`infrastructure/certs/ca-bundle.pem` (מחויב ל-git — cert ציבורי)
+- הוסף `NODE_EXTRA_CA_CERTS` ל-env של כל 10 servers ב-`.mcp.json`
+- **אימות:** GitHub API 200, Tavily API 200 ✅
+
+### .mcp.json — Security
+- הקובץ ב-`.gitignore` (מכיל PAT/API keys אישיים)
+- `.mcp.json.example` עם placeholders מחויב ל-git
+- יש לשנות `YOUR_USERNAME` ב-`.mcp.json.example` בעת Setup
+
+### הוראות שימוש ב-CLAUDE.md
+נוספה סעיף **"MCP Tools — When to Use (Mandatory)"** ב-CLAUDE.md עם:
+- Decision Matrix: איזה MCP tool לכל משימה
+- הוראות לכל 10 servers — מתי ואיך להשתמש
+- Infrastructure prerequisites לservers שדורשים Docker
 
 ראה תיעוד מלא: [`docs/plans/MCP_TOOLS_SETUP.md`](docs/plans/MCP_TOOLS_SETUP.md)
 
