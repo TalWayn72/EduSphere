@@ -260,6 +260,250 @@ All `wget --no-check-certificate` calls replaced with `curl -fsSL` (validates TL
 - `NODE_TLS_REJECT_UNAUTHORIZED` ENV absent
 
 All 9 tests pass (`pnpm test` in `tests/security/` — 9/9 green).
+---
+
+## ✅ G-02: No PII Encryption at Rest (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🔴 Critical |
+| **Status** | ✅ Fixed (commit 5081d06) |
+| **Files** | packages/db/src/helpers/encryption.ts, tests/security/pii-encryption.spec.ts |
+
+### בעיית שורש
+
+PII fields (email, name, annotation text) were stored as plaintext in the database. A database breach would expose all user data directly.
+
+### תיקון שבוצע
+
+AES-256-GCM encryption helpers implemented. All PII fields now encrypted via encryptField(value, tenantKey) before every write and decrypted on read. Per-tenant encryption keys derived from master secret using HKDF.
+
+**Tests:** 17 unit tests + 13 static security tests (30 total). All passing.
+
+---
+
+## ✅ G-03: Right to Erasure Broken (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🔴 Critical |
+| **Status** | ✅ Fixed (commit f4b6f82) |
+| **Files** | apps/subgraph-core/src/user/user-erasure.service.ts, tests/security/gdpr-erasure.spec.ts |
+
+### בעיית שורש
+
+GDPR Article 17 (Right to Erasure) was not implemented. User deletion only set deleted_at (soft delete) leaving all PII intact in the database.
+
+### תיקון שבוצע
+
+UserErasureService implemented with cascading hard-deletes across all 16 tables. Audit log entry created for each erasure request. GraphQL mutation deleteMyAccount added.
+
+**Tests:** 7 unit tests + 17 security tests (24 total). All passing.
+
+---
+
+## ✅ G-04: No Consent Management (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🔴 Critical |
+| **Status** | ✅ Fixed (commit f4b6f82) |
+| **Files** | packages/db/src/schema/userConsents.ts, apps/subgraph-core/src/consent/consent.service.ts, tests/security/consent-management.spec.ts |
+
+### בעיית שורש
+
+No consent management existed. User data was forwarded to third-party LLMs without explicit user consent, violating GDPR Article 6 and Article 7.
+
+### תיקון שבוצע
+
+user_consents table added. ConsentService implemented with THIRD_PARTY_LLM consent type. SI-10 invariant enforced: every LLM call checks consent first and throws CONSENT_REQUIRED error if missing.
+
+**Tests:** 5 unit tests + 16 security tests (21 total). All passing.
+
+---
+
+## ✅ G-08: No Audit Trail (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🔴 Critical |
+| **Status** | ✅ Fixed (commit 5081d06) |
+| **Files** | packages/db/src/schema/auditLog.ts, apps/gateway/src/interceptors/audit.interceptor.ts, apps/subgraph-core/src/audit/audit.service.ts, tests/security/audit-log.spec.ts |
+
+### בעיית שורש
+
+No audit trail existed for sensitive operations. SOC 2 Type II and GDPR Article 30 require records of processing activities.
+
+### תיקון שבוצע
+
+audit_log table added. AuditService injected into all resolvers. AuditInterceptor applied globally at gateway level for automatic logging of all mutations.
+
+**Tests:** 3 unit tests + 13 security tests (16 total). All passing.
+
+---
+
+## ✅ G-09: No Rate Limiting (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ✅ Fixed (commit f4b6f82) |
+| **Files** | apps/gateway/src/middleware/rate-limit.middleware.ts, tests/security/api-security.spec.ts |
+
+### בעיית שורש
+
+Gateway had no rate limiting. Any client could send unlimited GraphQL requests, enabling DoS attacks and credential stuffing.
+
+### תיקון שבוצע
+
+Sliding-window rate limiter: 100 requests per 15 minutes per tenant. Returns HTTP 429 with Retry-After header. Redis-backed counter for distributed rate limiting.
+
+**Tests:** 7 unit tests + 8 security tests (15 total). All passing.
+
+---
+
+## ✅ G-10: No Query Depth/Complexity Limits (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ✅ Fixed (commit f4b6f82) |
+| **Files** | apps/gateway/src/plugins/query-complexity.plugin.ts, tests/security/api-security.spec.ts |
+
+### בעיית שורש
+
+GraphQL queries had no depth or complexity limits. A deeply nested query could exhaust server memory and CPU.
+
+### תיקון שבוצע
+
+depthLimitRule (max depth: 10) and complexityLimitRule (max complexity: 1000) added as GraphQL validation rules. Queries exceeding limits rejected before execution.
+
+**Tests:** 7 unit tests + 9 security tests (16 total). All passing.
+
+---
+
+## ✅ G-11: No Data Portability (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ✅ Fixed (commit f4b6f82) |
+| **Files** | apps/subgraph-core/src/user/user-export.service.ts, tests/security/gdpr-erasure.spec.ts |
+
+### בעיית שורש
+
+GDPR Article 20 (Right to Data Portability) was not implemented. Users could not export their personal data.
+
+### תיקון שבוצע
+
+UserExportService implemented with parallel fetch of all entity types. Returns JSON archive. GraphQL query exportMyData added.
+
+**Tests:** 10 security tests. All passing.
+
+---
+
+## ✅ G-13: No Data Retention Policy (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ✅ Fixed (commit f4b6f82) |
+| **Files** | packages/db/src/schema/dataRetentionPolicies.ts, apps/subgraph-core/src/retention/retention-cleanup.service.ts, tests/security/data-retention.spec.ts |
+
+### בעיית שורש
+
+No data retention policy existed. Data was kept indefinitely, violating GDPR Article 5(1)(e) and increasing breach exposure surface.
+
+### תיקון שבוצע
+
+data_retention_policies table added. RetentionCleanupService runs daily at 02:00 UTC. Default TTLs: user data 3 years, audit logs 7 years, agent messages 1 year.
+
+**Tests:** 4 unit tests + 13 security tests (17 total). All passing.
+
+---
+
+## ✅ G-15: Missing @requiresScopes Directives on Admin Mutations (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ✅ Fixed (commit f4b6f82) |
+| **Files** | All 6 subgraph SDL files, tests/security/graphql-authorization.spec.ts |
+
+### בעיית שורש
+
+Several admin and sensitive mutations were missing @requiresRole and @requiresScopes directives. Any authenticated user could invoke admin-only mutations.
+
+### תיקון שבוצע
+
+Added @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN]) to all admin mutations and @requiresScopes to all sensitive mutations (course:write, agent:execute, content:publish, etc.).
+
+**Tests:** 26 security tests. All passing.
+
+---
+
+## ✅ G-16: NATS JetStream Unencrypted (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ✅ Fixed (commit 5081d06) |
+| **Files** | packages/nats-client/src/index.ts, infrastructure/nats/nats-server.conf, tests/security/nats-security.spec.ts |
+
+### בעיית שורש
+
+NATS connections used bare connect without TLS or authentication. All inter-service messages transmitted in plaintext.
+
+### תיקון שבוצע
+
+buildNatsOptions() helper implemented with TLS configuration and NKey-based authentication. nats-server.conf updated to require TLS and NKey auth. SI-7 invariant enforced.
+
+**Tests:** 11 security tests. All passing.
+
+---
+
+## ✅ G-17: MinIO Files Unencrypted at Rest (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ✅ Fixed (commit 5081d06) |
+| **Files** | infrastructure/docker/minio/config.env, infrastructure/docker/docker-compose.yml, tests/security/minio-config.spec.ts |
+
+### בעיית שורש
+
+MinIO buckets had no server-side encryption. Course video files and user uploads stored as plaintext.
+
+### תיקון שבוצע
+
+MINIO_KMS_SECRET_KEY environment variable added for SSE-S3 AES-256 server-side encryption. All new objects encrypted by default. docker-compose.yml updated.
+
+**Tests:** 16 security tests. All passing.
+
+---
+
+## 🟡 G-14: LLM Data Transfers Without DPA — IN PROGRESS (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | 🟡 Phase 5 in progress |
+| **Files** | apps/subgraph-agent/src/ai/llm-consent-gate.ts |
+
+### בעיית שורש
+
+User messages forwarded to OpenAI/Anthropic without DPA verification or PII scrubbing. Violates GDPR Article 28 and Article 46.
+
+### תיקון חלקי
+
+LLM consent gate (SI-10) implemented. PII scrubber strips emails and names before sending to external LLMs. DPA documentation pending (Phase 11).
+
+---
+
+## ⏳ G-18: No Incident Response Procedure — PENDING (22 פברואר 2026)
+| | |
+|---|---|
+| **Severity** | 🟡 High |
+| **Status** | ⏳ Planned Phase 11 |
+| **Files** | TBD |
+
+### בעיית שורש
+
+No incident response procedure documented. GDPR Article 33 requires 72-hour notification. No runbook exists for security incidents.
+
+### תיקון מתוכנן
+
+Phase 11 will deliver: incident response runbook, automated breach detection alerts (Grafana), PagerDuty integration, 72-hour GDPR notification workflow.
+
+
 
 ---
 
