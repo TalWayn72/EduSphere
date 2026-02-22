@@ -1,99 +1,150 @@
-# Legitimate Interest Assessment — Anonymized Usage Analytics
+# Legitimate Interest Assessment (LIA) - Anonymized Platform Analytics
 
-**Document ID:** LIA-002
 **Version:** 1.0
-**Owner:** DPO / Product
-**Created:** 2026-02-22
-**Next Review:** 2027-02-22
-**GDPR Reference:** Article 6(1)(f) — Legitimate Interests
-**Note:** This LIA applies **only** to anonymized/aggregated analytics. Individual-level behavioral profiling requires separate consent (Article 6(1)(a)).
+**Date:** 2026-02-22
+**Legal Basis:** GDPR Article 6(1)(f) - Legitimate Interests
+**Data Controller:** EduSphere Technologies Ltd.
+**Author:** Data Protection Officer
+**Review Cycle:** Annual
 
 ---
 
-## Scope
+## 1. Overview
 
-This assessment covers EduSphere's collection of **anonymized** usage data for platform improvement:
-- Aggregate page view counts (no user_id linkage after aggregation)
-- Aggregate feature adoption rates (% of tenants using a feature)
-- System error rates and performance metrics (response times, failure modes)
-- Aggregate learning outcome statistics (course completion rates per cohort)
+This Legitimate Interest Assessment evaluates whether EduSphere can rely on legitimate interests (GDPR Art.6(1)(f)) as the legal basis for processing anonymized usage analytics data for the purpose of platform improvement.
 
-**Out of scope** (requires separate consent, NOT covered by this LIA):
-- Individual learning behavior profiling
-- AI personalization based on individual browsing history
-- Marketing analytics or advertising attribution
+**Processing activity:** Collection and analysis of anonymized, aggregated platform usage data
+**Data processed:** Page views, feature usage counts, session counts, error rates - all aggregated and anonymized
+**Key distinction:** This processing does NOT involve personal data after anonymization. However, the pre-anonymization collection stage requires a legal basis.
 
 ---
 
-## Part 1 — Purpose Test
+## 2. Purpose Test
 
-### Legitimate Interest Identified
+### 2.1 Identified Legitimate Interests
 
-1. **Platform improvement** — Understanding which features are used, where users encounter errors, and where the product can be improved benefits all users directly.
-2. **Capacity planning** — Aggregate traffic data allows infrastructure scaling before performance degrades, protecting service availability for all users.
-3. **Security monitoring** — Aggregate error patterns can indicate attack attempts (e.g., spike in 401 errors indicating credential stuffing).
-4. **Legal and contractual obligations** — Enterprise clients require SLA reporting on uptime and error rates. This requires aggregate performance data.
+| Interest | Description | Stakeholders |
+|----------|-------------|-------------|
+| Platform improvement | Understand which features are used, where users encounter friction, and how to prioritise product development | EduSphere, clients, data subjects |
+| Performance optimization | Identify slow pages, high-error-rate flows, and infrastructure bottlenecks | EduSphere, clients |
+| Business intelligence | Understand platform adoption and engagement to make informed investment decisions | EduSphere |
+| Benchmark reporting | Provide clients with anonymized usage benchmarks for their platform instances | Clients |
 
-**Conclusion Part 1: ✅ PASS**
+### 2.2 Are the Interests Legitimate?
 
----
-
-## Part 2 — Necessity Test
-
-### Data Minimization Applied
-
-| Analytics Type | Personal Data | Anonymization Method |
-|---------------|--------------|---------------------|
-| Page views | None — count only | Aggregate before storage |
-| Feature usage | None — rate only | k-anonymity: minimum group size 50 |
-| Error rates | IP address (technical) | Truncated to /24 subnet, discarded after 24h |
-| Performance metrics | None | Timing only, no user linkage |
-| Learning outcomes | None — cohort rates | k-anonymity: minimum cohort size 10 |
-
-Where individual-level data is temporarily required for calculation, it is:
-1. Processed in-memory only
-2. Never written to persistent storage
-3. Aggregated within 24 hours
-4. Discarded after aggregation is complete
-
-**Conclusion Part 2: ✅ PASS — Anonymization means minimal personal data processing**
+Yes. Product improvement and service quality analytics are widely recognized as legitimate interests when data is genuinely anonymized. EDPB Opinion 5/2019 on the interplay between the e-Privacy Directive and GDPR supports analytics as a legitimate interest where privacy impact is minimal.
 
 ---
 
-## Part 3 — Balancing Test
+## 3. Necessity Test
 
-### Safeguards
+### 3.1 Is Processing Necessary?
+
+Analytics data collection is necessary because:
+
+1. Qualitative feedback alone is insufficient to identify systemic UX issues affecting all users
+2. Without usage data, product decisions are based on incomplete information, leading to poor resource allocation
+3. Error rate monitoring requires automated data collection; manual testing cannot replicate real-world usage patterns
+
+### 3.2 Alternatives Considered
+
+| Alternative | Assessment |
+|-------------|------------|
+| No analytics | Not viable - product improvement without data leads to poor decisions; unable to identify errors affecting users |
+| Consent-based analytics only | Would create systematic bias (only engaged users consent); unrepresentative data |
+| Fully synthetic data | Synthetic data does not reflect real usage patterns; cannot substitute for actual telemetry |
+| Current approach (anonymized aggregates) | This IS the privacy-minimising approach - no individual tracking |
+
+**Conclusion:** Anonymized aggregate analytics is the minimum necessary approach for platform improvement.
+
+---
+
+## 4. Balancing Test
+
+### 4.1 Nature of Data Processed
+
+| Data Element | Identifiability | Assessment |
+|-------------|-----------------|------------|
+| Page view counts | Non-identifiable aggregate | Zero privacy impact |
+| Feature usage counts | Non-identifiable aggregate | Zero privacy impact |
+| Session counts (per tenant) | Organizational-level, not individual | Minimal privacy impact |
+| Error rates | Non-identifiable aggregate | Zero privacy impact |
+| Funnel drop-off rates | Non-identifiable aggregate | Zero privacy impact |
+
+**Key safeguard:** Analytics data is aggregated to a minimum group size of k=5 (k-anonymity) before any reporting or storage. Individual user events are never stored or exported.
+
+### 4.2 Anonymization Standard
+
+The analytics processing uses the following anonymization pipeline:
+
+1. **Collection:** Raw events include a pseudonymous session token (no user ID, no email)
+2. **Aggregation:** Events are aggregated by page, feature, tenant, and time period (hourly/daily)
+3. **k-anonymity enforcement:** Any aggregate bucket with fewer than 5 contributing sessions is suppressed
+4. **Storage:** Only the aggregated counts are persisted; raw events are discarded within 24 hours
+5. **Export:** Reports contain only aggregated counts; no session tokens in any output
+
+**Re-identification risk:** Negligible. The ICO anonymization code of practice and EDPB Opinion 05/2014 on Anonymisation Techniques support this approach as effective anonymization.
+
+### 4.3 Impact on Data Subjects
+
+| Impact Type | Assessment |
+|-------------|------------|
+| Tracking risk | None - no persistent user identifier in analytics pipeline |
+| Re-identification | Negligible - k-anonymity k>=5 applied; raw events discarded within 24 hours |
+| Behavioral profiling | None - no individual-level data retained or analyzed |
+| Cross-context linkage | None - analytics pseudonymous token cannot be linked to user account |
+
+### 4.4 Safeguards Applied
 
 | Safeguard | Implementation |
-|-----------|---------------|
-| Genuine anonymization | k-anonymity enforced; no singling-out possible |
-| No re-identification | Tenant-separated aggregates to prevent cross-tenant re-identification |
-| No secondary use | Analytics used only for platform improvement and capacity planning |
-| User transparency | Privacy Policy discloses aggregate analytics collection |
-| Opt-out available | Tenants can disable analytics collection via `ANALYTICS_ENABLED=false` flag |
-| Data retention | Aggregate statistics retained 2 years; no individual-level data retained |
-
-### Reasonable Expectation
-
-Users of digital services expect service providers to use aggregate statistics to improve the service. Provided the data is genuinely anonymized and used only for platform improvement, this expectation is met. The EDPB and ICO guidance confirms that genuinely anonymized data falls outside the scope of GDPR (Recital 26), making the residual privacy risk minimal.
-
-**Conclusion Part 3: ✅ PASS**
+|----------|---------------|
+| k-anonymity | k >= 5 enforced; low-count buckets suppressed |
+| No user IDs | Session tokens are ephemeral and not linked to user accounts |
+| No PII | Names, emails, content not included in analytics events |
+| Raw event TTL | Raw events deleted within 24 hours; only aggregates retained |
+| Opt-out | Data subjects can opt out of analytics in platform privacy settings |
+| No third-party sharing | Analytics data not shared with third parties or used for advertising |
 
 ---
 
-## Overall Conclusion
+## 5. Conclusion
 
-| Test | Result |
-|------|--------|
-| Purpose Test | ✅ PASS |
-| Necessity Test | ✅ PASS |
-| Balancing Test | ✅ PASS |
+**Result: Legitimate Interest applies.**
 
-**Processing legal basis: GDPR Article 6(1)(f) — Legitimate Interests ✅**
+The balancing test demonstrates that:
 
-**Note:** If EduSphere in future implements individual-level analytics (e.g., "user X visited page Y"), this LIA must be updated and explicit consent obtained under Article 6(1)(a).
+1. EduSphere has a genuine legitimate interest in understanding platform usage for improvement
+2. Anonymized aggregate analytics is the minimum necessary and privacy-preserving approach
+3. The privacy impact on data subjects is negligible given k-anonymity, lack of user IDs, and 24-hour raw event deletion
+4. Data subjects have a reasonable expectation of basic usage telemetry on software platforms
+5. An opt-out mechanism is available, consistent with Art.21 rights
+
+**Legal basis: GDPR Article 6(1)(f) - Legitimate Interests of EduSphere Technologies Ltd.**
+
+**Note:** Once data is genuinely anonymized (post-aggregation), GDPR no longer applies. This LIA covers the collection and pre-anonymization processing stage only.
 
 ---
 
-*Reviewed and approved by: DPO | Product Lead | Legal Counsel*
-*Approval date: 2026-02-22*
+## 6. Data Specification
+
+| Field | Retention (raw) | Retention (aggregate) | Notes |
+|-------|-----------------|----------------------|-------|
+| Page identifier | 24 hours | 13 months | URL path only, no query params |
+| Feature interaction type | 24 hours | 13 months | E.g., QUIZ_START, VIDEO_PLAY |
+| Session token | 24 hours | Not retained | Ephemeral, not linked to user |
+| Tenant ID | 24 hours | 13 months | For per-tenant reporting |
+| Error type | 24 hours | 13 months | Error category, not stack trace |
+| Timestamp (hour) | 24 hours | 13 months | Rounded to hour, not second |
+
+**Prohibited:** Full URLs with query params, user IDs, session content, device fingerprints, precise timestamps.
+
+---
+
+## 7. Review and Approval
+
+| Role | Name | Date |
+|------|------|------|
+| Data Protection Officer | [DPO_NAME] | 2026-02-22 |
+| Next review | - | 2027-02-22 |
+
+*EduSphere LIA - Analytics v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev*

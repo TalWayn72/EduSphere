@@ -1,132 +1,136 @@
-# DPA Execution Instructions for White-Label Clients
+# DPA Customization and Execution Instructions
 
-**Document ID:** LEGAL-DPA-002
 **Version:** 1.0
-**Owner:** Legal / DPO
-**Created:** 2026-02-22
-**Reference:** `docs/legal/DPA_TEMPLATE.md` (LEGAL-DPA-001)
+**Date:** 2026-02-22
+**Contact:** dpo@edusphere.dev
 
 ---
 
-## Who Needs to Sign a DPA?
+## Overview
 
-Under GDPR Article 28, a Data Processing Agreement is required whenever:
+This document provides step-by-step instructions for customizing and executing the EduSphere Data Processing Agreement (DPA) template (`docs/legal/DPA_TEMPLATE.md`) with white-label clients.
 
-1. **Your organization is a GDPR controller** — i.e., you determine the purposes and means of processing your users' personal data
-2. **EduSphere processes that data on your behalf** — as your data processor
-
-**In practice:** Every EduSphere white-label client or enterprise tenant that deploys EduSphere to process the personal data of EU/EEA residents must sign a DPA.
-
-**Exemption:** If your organization is based entirely outside the EU/EEA and processes no EU/EEA residents' data, a DPA is not legally required — but we recommend executing one as a contractual best practice.
+The DPA is required under GDPR Article 28 whenever EduSphere processes personal data on behalf of a client organization (Controller).
 
 ---
 
-## How to Execute the DPA
+## Step-by-Step Process
 
-### Step 1: Obtain the Template
+### Step 1: Identify the Parties
 
-The standard EduSphere DPA Template is available at:
-- `docs/legal/DPA_TEMPLATE.md` (this repository)
-- Your EduSphere account portal: Settings → Legal → Data Processing Agreement
+Collect the following information from the client before filling the template:
 
-### Step 2: Fill in Client Information
+| Field | Required? | Source |
+|-------|-----------|--------|
+| CLIENT_LEGAL_NAME | Yes | Client legal registration documents |
+| CLIENT_ADDRESS | Yes | Registered office address |
+| CLIENT_REGISTRATION_NUMBER | Yes | Company registration / VAT number |
+| CLIENT_CONTACT_NAME | Yes | Designated contact for DPA matters |
+| CLIENT_CONTACT_EMAIL | Yes | Email for DPA notifications (sub-processor changes) |
+| CLIENT_DPO_EMAIL | If appointed | Required if client has >250 employees or high-risk processing |
+| MEMBER_STATE | Yes (EU/EEA) | Member State whose law governs the agreement |
+| JURISDICTION | Yes (EU/EEA) | Courts with jurisdiction for disputes |
 
-Replace all placeholder text in double angle brackets `<<LIKE THIS>>` with your organization's details:
+### Step 2: Review the Technical and Organisational Measures (TOMs)
 
-| Placeholder | What to Enter |
-|-------------|--------------|
-| `<<CONTROLLER_NAME>>` | Your organization's full legal name |
-| `<<CONTROLLER_ADDRESS>>` | Registered office address |
-| `<<CONTROLLER_COUNTRY>>` | Country of incorporation |
-| `<<CONTROLLER_REG_NO>>` | Company registration number |
-| `<<CONTROLLER_DPO_EMAIL>>` | Your DPO email (if appointed) |
-| `<<CONTRACT_DATE>>` | Date you want the DPA to take effect |
-| `<<DATA_RESIDENCY_REGION>>` | EU (eu-central-1) / US / Custom |
-| `<<RETENTION_PERIOD>>` | Your required data retention period (default: per EduSphere policy) |
-| `<<SUPERVISORY_AUTHORITY>>` | Your lead supervisory authority (e.g., BfDI for Germany, CNIL for France) |
+Section 8 of the DPA describes EduSphere technical controls. Before sending to a client:
 
-### Step 3: Review Annexes
+1. Verify that AES-256-GCM encryption is active for the client tenant (check infra team)
+2. Confirm TLS 1.3 is enforced on the client sub-domain / vanity domain
+3. Confirm audit logging is enabled for the client tenant (SUPER_ADMIN setting)
+4. If client requires on-premises deployment, update Section 8.7 (Physical Security) to reflect client data centre details
+5. If client is a healthcare organization, review whether special category data addendum is required
 
-The DPA template includes three annexes that may need customization:
+### Step 3: Fill in the Template
 
-- **Annex I — Subject-Matter and Duration:** Pre-filled with EduSphere standard processing activities. Review and add any custom processing activities specific to your deployment.
-- **Annex II — Technical and Organisational Measures:** Pre-filled with EduSphere's security controls. If you operate an on-premises deployment, add your own infrastructure controls.
-- **Annex III — Sub-Processors:** Lists all sub-processors EduSphere uses. Review and add any additional sub-processors you authorize.
+1. Create a copy of `docs/legal/DPA_TEMPLATE.md` named `DPA_[CLIENT_NAME]_[YYYY-MM-DD].md`
+2. Replace all bracketed placeholders [LIKE_THIS] with actual values
+3. Verify no placeholders remain using: `grep -n "[" DPA_*.md`
+4. Set the document date to the execution date
 
-### Step 4: Negotiate (Optional)
+**Fields to customize:**
 
-The template is designed to be accepted as-is for standard SaaS deployments. If you require modifications:
+| Placeholder | Section | Notes |
+|-------------|---------|-------|
+| [CLIENT_LEGAL_NAME] | 1 | Full legal entity name as registered |
+| [CLIENT_ADDRESS] | 1 | Registered office, not trading address |
+| [CLIENT_REGISTRATION_NUMBER] | 1 | Company number / VAT registration |
+| [CLIENT_CONTACT_NAME] | 1 | Primary contact for DPA matters |
+| [CLIENT_CONTACT_EMAIL] | 1 | Receives sub-processor change notifications |
+| [CLIENT_DPO_EMAIL] | 1 | Leave blank if no DPO appointed |
+| [EDUSPHERE_REGISTERED_ADDRESS] | 1 | Fill from EduSphere legal entity details |
+| [EDUSPHERE_REGISTRATION_NUMBER] | 1 | EduSphere company registration number |
+| [MEMBER_STATE] | 10 | E.g., Ireland, Germany, Netherlands |
+| [JURISDICTION] | 10 | E.g., Dublin, Munich, Amsterdam courts |
 
-- **Email:** legal@edusphere.io
-- **Response SLA:** 10 business days for standard change requests
-- **Enterprise modifications:** Available for Enterprise plan customers — contact your account manager
+### Step 4: Legal Review
 
-Common negotiated items:
-- Data residency restrictions (EU-only, specific country)
-- Sub-processor approval rights (prior written approval vs. notification)
-- Audit rights (remote questionnaire vs. on-site inspection)
-- Custom retention periods
+1. Send the completed DPA to EduSphere legal counsel for review
+2. If the client requests material changes to Section 6 (Obligations) or Section 8 (TOMs), escalate to DPO
+3. Clients may NOT weaken the TOMs in Section 8 (security controls are non-negotiable)
+4. Clients may add stricter obligations or shorter timelines
 
-### Step 5: Sign and Return
+### Step 5: Sign Both Parties
 
-**Electronic signature (preferred):**
-1. Sign using DocuSign, HelloSign, or Adobe Sign
-2. Send completed signed copy to: legal@edusphere.io
-3. EduSphere will countersign and return an executed copy within 5 business days
-
-**Paper signature:**
-1. Print two copies, sign both
-2. Mail to: EduSphere Legal, [registered address]
-3. We will countersign and return one copy
-
-### Step 6: Store the Executed DPA
-
-Store the executed DPA:
-- In your legal document management system
-- As evidence for your own GDPR compliance records (Article 30 Records of Processing)
-- Share with your DPO
-
-EduSphere retains a copy and can provide it to you or your supervisory authority upon request.
+1. Generate a PDF from the completed markdown (use pandoc or legal document tool)
+2. Send to client for wet or electronic signature (DocuSign / Adobe Sign acceptable)
+3. EduSphere DPO countersigns on behalf of EduSphere Technologies Ltd.
+4. Retain executed copy in: `docs/legal/executed/DPA_[CLIENT_NAME]_[YYYY-MM-DD]_SIGNED.pdf`
+5. Register the DPA in the client onboarding tracker (Notion / CRM)
 
 ---
 
-## What Happens if EduSphere Updates the DPA?
+## When to Re-Execute the DPA
 
-EduSphere may update the DPA to reflect:
-- Changes to sub-processors
-- Regulatory changes (new EDPB guidelines, SCCs updates)
-- Material changes to processing activities
+A new DPA must be executed or the existing DPA must be amended in the following circumstances:
 
-**Notification:** You will receive 30 days' advance notice by email.
+### Sub-processor Changes
 
-**If you object:** You may terminate your EduSphere subscription under the termination provisions of your Master Services Agreement.
+| Trigger | Action | Timeline |
+|---------|--------|----------|
+| New sub-processor added to docs/security/SUBPROCESSORS.md | Send change notification to all clients at CLIENT_CONTACT_EMAIL | 30 days before activation |
+| Sub-processor removed | Update SUBPROCESSORS.md; notify clients | Within 14 days |
+| Sub-processor changes data transfer mechanism | Update SUBPROCESSORS.md and DPA Annex if applicable | Before change |
 
-**If you do not respond:** Continued use of EduSphere after the 30-day notice period constitutes acceptance of the updated DPA.
+### Scope Changes
 
----
+| Trigger | Action |
+|---------|--------|
+| Client adds new types of personal data not listed in Section 4 | Amend DPA Annex A or re-execute |
+| Client deploys platform for new categories of data subjects (e.g., minors <16) | Re-execute with appropriate addendum |
+| Client changes governing law jurisdiction | Re-execute Section 10 |
+| EduSphere changes data centre region (EU to non-EU) | Re-execute with updated TOMs and transfer mechanism |
+| New GDPR obligation requires TOM update | Notify all clients; amend via DPA amendment letter |
 
-## Standard Contractual Clauses (SCCs) for International Transfers
+### Annual Review
 
-If EduSphere transfers your users' personal data outside the EU/EEA (e.g., to OpenAI or Anthropic APIs):
-
-- The EU SCCs (2021/914) are automatically incorporated by reference into the DPA
-- The Standard Essential Module 2 (Controller→Processor) or Module 3 (Processor→Processor) applies
-- A copy of the applicable SCCs is available at: legal@edusphere.io
-
-For AI providers (OpenAI, Anthropic):
-- EduSphere maintains Data Processing Agreements with these providers
-- Copies available upon request with signed NDA
-
----
-
-## Questions?
-
-| Contact | For |
-|---------|-----|
-| legal@edusphere.io | DPA execution, legal questions |
-| privacy@edusphere.io | GDPR rights, DPO contact |
-| security@edusphere.io | Security questions, breach notification |
+- Review all executed DPAs annually (typically January)
+- Check sub-processor list for changes
+- Verify TOMs still accurate against current security posture
+- Update template version if material changes needed
 
 ---
 
-*This document is for informational purposes. It does not constitute legal advice. Clients should consult their own legal counsel before executing a DPA.*
+## Contact and Escalation
+
+| Matter | Contact | Response SLA |
+|--------|---------|-------------|
+| DPA questions from clients | dpo@edusphere.dev | 2 business days |
+| Client objects to sub-processor change | dpo@edusphere.dev + legal@edusphere.dev | Within 7 days |
+| Client requests on-site audit | dpo@edusphere.dev | 30-day scheduling |
+| DPA amendment requests | dpo@edusphere.dev | 5 business days |
+| Data subject rights requests forwarded by client | privacy@edusphere.dev | 48-hour acknowledgment |
+
+**DPO Contact:** dpo@edusphere.dev
+
+---
+
+## DPA Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-02-22 | Initial release |
+
+---
+
+*EduSphere DPA Instructions v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev*

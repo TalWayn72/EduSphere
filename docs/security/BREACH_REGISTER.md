@@ -1,144 +1,140 @@
 # Personal Data Breach Register
 
-**Document ID:** SEC-BREACH-001
 **Version:** 1.0
-**Owner:** DPO
-**Created:** 2026-02-22
-**GDPR Reference:** Article 33(5) — Controller must document all personal data breaches
-**SOC2 Reference:** CC7.3, CC7.4
+**Date:** 2026-02-22
+**Reference:** GDPR Article 33(5)
+**Owner:** Data Protection Officer (dpo@edusphere.dev)
+**Review Cycle:** Annual (and after each breach)
 
 ---
 
 ## Purpose
 
-GDPR Article 33(5) requires controllers to document all personal data breaches, regardless of whether notification to the supervisory authority was required. This register serves as EduSphere's official breach record and provides evidence of compliance with the 72-hour notification obligation.
+This register documents all personal data breaches in accordance with GDPR Article 33(5), which requires controllers to document any personal data breaches, including the facts relating to the breach, its effects, and the remedial action taken. This documentation enables supervisory authorities to verify compliance with notification obligations.
 
-**Retention:** This register must be retained for a minimum of 3 years from the date of each entry.
-
----
-
-## Register Format
-
-Each entry must capture:
-
-| Field | Description |
-|-------|-------------|
-| **Incident ID** | Unique identifier (format: BREACH-YYYY-NNN) |
-| **Date Discovered** | Date/time EduSphere first became aware |
-| **Date of Breach** | Estimated date breach began (if known) |
-| **Duration** | How long the breach lasted before containment |
-| **Discovery Source** | How it was discovered (Wazuh alert / user report / third party / internal audit) |
-| **Nature** | Type: confidentiality / integrity / availability breach |
-| **Categories of Data** | Types of personal data involved (names, emails, annotations, AI conversations, etc.) |
-| **Approximate No. of Records** | Number of records involved (estimate acceptable) |
-| **Categories of Data Subjects** | Students / Instructors / ORG_ADMINs / All users |
-| **Tenants Affected** | Which tenant(s) impacted |
-| **Cause** | Root cause (e.g., misconfiguration / software vulnerability / insider threat / supply chain) |
-| **Consequences** | Likely consequences for data subjects |
-| **Measures Taken** | Remediation steps taken |
-| **DPA Notified** | Yes / No / Not required (low risk) |
-| **DPA Notification Date** | Date notification sent to supervisory authority |
-| **Users Notified** | Yes / No / Not required |
-| **User Notification Date** | Date notification sent to affected users |
-| **Outcome / Status** | Closed / Under investigation / Pending notification |
-| **RCA Document** | Link to root cause analysis document |
+**Scope:** All personal data breaches affecting data processed by EduSphere Technologies Ltd. (as Controller) or notified by clients/sub-processors where EduSphere acts as Processor.
 
 ---
 
-## Active Incidents
+## Severity Levels
 
-*As of 2026-02-22, no breaches have been recorded.*
-
----
-
-## Closed Incidents
-
-*None — EduSphere launched in 2026. Register will be populated as incidents occur.*
-
----
-
-## Breach Classification Guide
-
-### Severity Classification
-
-| Severity | Criteria | DPA Notification | User Notification |
-|----------|----------|-----------------|-------------------|
-| **Critical** | Large-scale breach (>1,000 subjects), sensitive categories (health, financial), or identity theft risk | Required within 72h | Required without undue delay |
-| **High** | Limited-scale breach (10-999 subjects), moderate risk (email + name exposed) | Required within 72h | Consider on case-by-case |
-| **Medium** | Very limited-scale (<10 subjects), low risk | Not required; document only | Not required |
-| **Low** | Availability-only breach (no data exposed), or breach of encrypted data with secure key | Not required; document only | Not required |
-
-### Breach Type Definitions
-
-| Type | Definition | Example |
-|------|-----------|---------|
-| **Confidentiality breach** | Unauthorized disclosure or access to personal data | Misconfigured RLS policy allows cross-tenant read |
-| **Integrity breach** | Unauthorized modification of personal data | SQL injection corrupting annotation records |
-| **Availability breach** | Personal data made unavailable | DDoS causing temporary loss of access to learning records |
+| Level | Definition | Examples |
+|-------|------------|----------|
+| **Critical** | Breach involving special category data, financial data, or large-scale exposure (>1,000 individuals); likely to result in high risk to individuals | Mass credential compromise; database with special category data exposed publicly |
+| **High** | Breach involving significant personal data exposure; risk to individuals likely but not certain; DPA notification threshold crossed | Tenant data exposed to another tenant; user PII accessible without authentication |
+| **Medium** | Limited personal data exposure; risk to individuals possible but low; DPA notification threshold may apply | Single user account compromised; small number of records inadvertently shared |
+| **Low** | Minimal personal data involved; risk to individuals unlikely; no DPA notification required | Accidental internal access log review; temporary misconfiguration with no data accessed |
 
 ---
 
-## 72-Hour Clock Protocol
+## Notification Thresholds
 
-When a potential breach is identified:
+### Supervisory Authority (DPA) Notification - GDPR Art.33
+
+Notify the competent supervisory authority **within 72 hours** of becoming aware of a breach if the breach is likely to result in a risk to the rights and freedoms of natural persons.
+
+**Exceptions (no DPA notification required):**
+- The breach is unlikely to result in a risk to individuals (e.g., data was encrypted with AES-256-GCM and keys are not compromised)
+- Low severity breaches where affected data is pseudonymous and there is no realistic risk of harm
+
+**If notification is late (>72 hours):** Include explanation of the reasons for the delay in the notification.
+
+### Data Subject Notification - GDPR Art.34
+
+Notify affected data subjects **without undue delay** if the breach is likely to result in **high risk** to the rights and freedoms of natural persons.
+
+**Exceptions (no data subject notification required):**
+- Affected data was encrypted and the decryption key has not been compromised
+- Subsequent measures eliminate the high risk to data subjects
+- Notification would require disproportionate effort (use public communication instead)
+
+---
+
+## Breach Register
+
+| Ref # | Date Discovered | Date Reported to DPO | Description | Data Subjects Affected | Categories of Data | Severity | Notified DPA? | DPA Notification Date | Users Notified? | Root Cause | Remediation | Status |
+|--------|-----------------|----------------------|-------------|----------------------|-------------------|----------|----------------|----------------------|----------------|-----------|-------------|--------|
+| BR-2026-001 | 2026-02-22 | 2026-02-22 | [TEMPLATE ENTRY] Hypothetical example: Misconfigured API endpoint temporarily exposed user profile data for Tenant A to authenticated users of Tenant B. No evidence of data exfiltration. Affected window: 2026-02-20 14:00 to 2026-02-22 09:00 UTC. | Up to 47 students (Tenant A) | Email addresses, course enrollment records | High | Pending | - | Pending | RLS policy gap: missing tenant_id check on /api/v1/users/search endpoint | (1) Endpoint patched with tenant_id filter; (2) Full RLS audit of all API endpoints initiated; (3) Affected users to be notified per Art.34 | Open |
+
+---
+
+## Breach Entry Template
+
+Use the following template when recording a new breach:
 
 ```
-T+0:00  Detection — assign Incident Commander, open #incident channel
-T+0:04  Initial assessment — does it involve personal data? If YES, GDPR clock starts
-T+4:00  Internal severity classification — Critical / High / Medium / Low
-T+24:00 Draft DPA notification ready (even if incomplete — Art. 33(4) allows phase 1 notification)
-T+48:00 Scope confirmed — number of data subjects, categories of data, tenants affected
-T+72:00 ⚠️ DPA notification DEADLINE — must be sent by this point
-
-Note: The 72-hour clock runs from when EduSphere BECAME AWARE, not when the breach occurred.
+Ref #: BR-[YYYY]-[NNN]
+Date Discovered: [YYYY-MM-DD HH:MM UTC]
+Date Reported to DPO: [YYYY-MM-DD HH:MM UTC]
+Description: [Brief description of the breach]
+Data Subjects Affected: [Number or range if unknown]
+Categories of Data: [List data types involved]
+Severity: [Critical / High / Medium / Low]
+Notified DPA: [Yes / No / N/A - not required]
+DPA Notification Date: [YYYY-MM-DD or N/A]
+Users Notified: [Yes / No / N/A - not required]
+Root Cause: [Technical or procedural cause]
+Remediation: [Steps taken or planned]
+Status: [Open / Closed - Date Closed]
 ```
 
-**DPA Contact (EU/EEA):**
-- Germany: Bundesbeauftragter für den Datenschutz (BfDI) — www.bfdi.bund.de
-- France: CNIL — www.cnil.fr — notifications@cnil.fr
-- Netherlands: Autoriteit Persoonsgegevens — meldloket@autoriteitpersoonsgegevens.nl
-- UK (post-Brexit): ICO — https://ico.org.uk/report-a-breach/
+---
+
+## Breach Response Procedure
+
+### Immediate Actions (0-4 hours)
+
+1. **Contain:** Stop the breach - revoke compromised credentials, patch vulnerability, isolate affected system
+2. **Preserve evidence:** Capture logs, screenshots, and system state before making changes
+3. **Notify DPO:** Email dpo@edusphere.dev with subject line: [BREACH ALERT] Brief Description
+4. **Assess severity:** DPO makes initial severity determination within 1 hour
+
+### Assessment Phase (4-24 hours)
+
+1. Determine scope: which tenants, how many users, which data categories affected
+2. Determine whether DPA notification is required (72-hour clock starts from awareness)
+3. Determine whether data subject notification is required
+4. Document in this register
+
+### Notification Phase (24-72 hours)
+
+1. If DPA notification required: Submit to competent supervisory authority using their online form
+2. If user notification required: Draft notification with: what happened, what data, what risk, what to do
+3. Notify affected Controller(s) under DPA obligations (Art.28(3)(f))
+
+### Remediation and Review
+
+1. Complete technical remediation
+2. Root cause analysis (within 5 business days)
+3. Update security controls to prevent recurrence
+4. Post-incident review with engineering and DPO
+5. Update this register with status: Closed
 
 ---
 
-## DPA Notification Template
-
-When notification is required, the following information must be included (Article 33(3)):
-
-1. **Nature of the breach** including categories and approximate number of data subjects and records
-2. **Contact details of DPO:** privacy@edusphere.io
-3. **Likely consequences** of the breach for data subjects
-4. **Measures taken or proposed** to address the breach and mitigate adverse effects
-
-A phase 1 notification can be submitted within 72 hours if full information is not yet available, with a phase 2 follow-up once the investigation is complete.
-
----
-
-## Tenant Breach Notification Obligations
-
-Where a breach affects a specific tenant (EduSphere acts as data processor under GDPR Art.28):
-
-1. **EduSphere must notify the affected tenant (controller) without undue delay** — typically within 24 hours of becoming aware
-2. The tenant (controller) is then responsible for notifying their DPA and data subjects
-3. EduSphere will provide the tenant with all available information to support their notification
-4. EduSphere will cooperate with the tenant's incident response investigation
-
-Notification contacts per tenant are stored in `tenants.settings.incidentContact`.
-
----
-
-## Annual Review Requirement
+## Annual Review
 
 This register must be reviewed annually by the DPO to:
-1. Verify all incidents are documented
-2. Verify notifications were made within required timeframes
-3. Identify systemic causes of breaches
-4. Update classification guide if regulatory guidance changes
-5. Confirm retention schedules are being followed
+
+- Verify all entries are complete and accurate
+- Identify patterns or recurring root causes requiring systemic remediation
+- Confirm supervisory authority notifications were made correctly
+- Archive closed entries older than 3 years to secure storage
+- Update breach response procedures if gaps were identified
 
 **Next scheduled review:** 2027-02-22
 
 ---
 
-*This document is confidential — for internal use, regulatory disclosure, and legal proceedings only.*
-*Do not share externally without DPO approval.*
+## Supervisory Authority Contact Details
+
+| Jurisdiction | Authority | Contact |
+|-------------|-----------|--------|
+| Ireland (lead SA for EU operations) | Data Protection Commission (DPC) | www.dataprotection.ie / +353 57 868 4800 |
+| UK | Information Commissioner Office (ICO) | ico.org.uk / 0303 123 1113 |
+| Germany | Relevant Landesbehoerde (per state) | bfdi.bund.de |
+| France | CNIL | cnil.fr |
+
+---
+
+*EduSphere Breach Register v1.0 - 2026-02-22 - Owner: dpo@edusphere.dev - Review: Annual*
