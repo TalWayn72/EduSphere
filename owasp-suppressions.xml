@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  OWASP Dependency-Check Suppressions — EduSphere
+  ================================================
+  False positive suppressions must include:
+    1. Jira/GitHub issue reference (notes field)
+    2. Expiry date (until attribute) — maximum 12 months
+    3. Reviewer's identity in notes
+
+  Process: PR description → Security Review → approval → merge
+  Review cycle: quarterly audit of all suppressions
+
+  Last reviewed: 2026-02-22
+  Reviewer: EduSphere Security Team
+-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+
+  <!--
+    Add suppressions here as needed with full justification.
+
+    Example format:
+    <suppress until="2026-12-31Z">
+      <notes><![CDATA[
+        CVE-XXXX-YYYY: False positive — affects only the CLI module which is
+        a devDependency not shipped in production. Confirmed by GitHub Advisory.
+        GitHub issue: https://github.com/example/example/issues/1234
+        Reviewer: security-team@edusphere.dev — 2026-01-15
+      ]]></notes>
+      <packageUrl regex="true">^pkg:npm/example@.*$</packageUrl>
+      <cve>CVE-XXXX-YYYY</cve>
+    </suppress>
+  -->
+
+</suppressions>

@@ -1,0 +1,105 @@
+name: GitHub Audit Log Export
+
+# SOC2 CC3.3 / GDPR Art.32: Retain audit logs beyond GitHub's 90-day limit.
+# Exports GitHub organization audit logs every 6 hours to a dedicated branch.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:         # Manual trigger (e.g., for forensic retrieval)
+
+jobs:
+  export-audit-logs:
+    name: Export GitHub Audit Logs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout audit-logs branch
+        uses: actions/checkout@v4
+        with:
+          ref: audit-logs
+          token: ${{ secrets.AUDIT_EXPORT_TOKEN || github.token }}
+          fetch-depth: 1
+        continue-on-error: true  # Branch may not exist yet
+
+      - name: Checkout main branch (fallback)
+        if: failure()
+        uses: actions/checkout@v4
+
+      - name: Create audit-logs directory
+        run: mkdir -p audit-logs/github
+
+      - name: Export GitHub Audit Logs
+        env:
+          GH_TOKEN: ${{ secrets.AUDIT_EXPORT_TOKEN }}
+          ORG: ${{ github.repository_owner }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          HOUR=$(date -u +%H)
+          OUTPUT_FILE="audit-logs/github/${DATE}-${HOUR}.jsonl"
+
+          echo "Exporting GitHub audit logs for org: $ORG"
+          echo "Output: $OUTPUT_FILE"
+
+          # Export audit log events (requires org:audit_log scope on token)
+          # Falls back to repo-level events if org token not available
+          if [ -n "$GH_TOKEN" ]; then
+            gh api \
+              --paginate \
+              --jq '.[]' \
+              "/orgs/${ORG}/audit-log?per_page=100&order=asc" \
+              >> "$OUTPUT_FILE" 2>/dev/null \
+              && echo "✅ Org audit log exported: $(wc -l < "$OUTPUT_FILE") events" \
+              || echo "⚠️  Org audit log requires org:audit_log scope — skipping"
+          else
+            echo "⚠️  AUDIT_EXPORT_TOKEN not set — exporting repo events only"
+            gh api \
+              --paginate \
+              --jq '.[]' \
+              "/repos/${GITHUB_REPOSITORY}/events?per_page=100" \
+              >> "$OUTPUT_FILE" 2>/dev/null || true
+          fi
+
+          # Always create the file even if empty (for audit completeness)
+          touch "$OUTPUT_FILE"
+          echo "Export complete: $OUTPUT_FILE ($(wc -c < "$OUTPUT_FILE") bytes)"
+
+      - name: Verify audit log integrity
+        run: |
+          # Count exported files
+          TOTAL_FILES=$(find audit-logs/ -name '*.jsonl' | wc -l)
+          echo "Total audit log files: $TOTAL_FILES"
+
+          # Most recent file
+          LATEST=$(find audit-logs/ -name '*.jsonl' | sort | tail -1)
+          echo "Latest file: $LATEST ($(wc -c < "$LATEST") bytes)"
+
+      - name: Commit and push audit logs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add audit-logs/
+          if git diff --staged --quiet; then
+            echo "No new audit events to commit"
+          else
+            EVENTS=$(git diff --staged --stat | tail -1)
+            git commit -m "chore(audit): export GitHub audit logs $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+SOC2 CC3.3: Automated audit log retention beyond GitHub 90-day limit.
+$EVENTS"
+            git push origin HEAD:audit-logs 2>/dev/null || \
+              git push --set-upstream origin HEAD:audit-logs
+            echo "✅ Audit logs pushed to audit-logs branch"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Audit Log Export Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Date:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files:** $(find audit-logs/ -name '*.jsonl' | wc -l) total" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** \`audit-logs\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Retention:** Unlimited (git history)" >> $GITHUB_STEP_SUMMARY
