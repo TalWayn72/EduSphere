@@ -39,6 +39,22 @@ env:
 # JOB 1 — Deploy to Staging (automatic on every push to main/master)
 # ─────────────────────────────────────────────────────────────────────────────
 jobs:
+  check-prerequisites:
+    name: Check Deployment Prerequisites
+    runs-on: ubuntu-latest
+    outputs:
+      can_deploy: ${{ steps.check.outputs.can_deploy }}
+    steps:
+      - name: Check if deployment is enabled
+        id: check
+        run: |
+          if [[ "${{ vars.DEPLOYMENT_ENABLED }}" == "true" ]]; then
+            echo "can_deploy=true" >> $GITHUB_OUTPUT
+            echo "Deployment prerequisites met - proceeding with K8s deployment"
+          else
+            echo "can_deploy=false" >> $GITHUB_OUTPUT
+            echo "::notice::Deployment skipped. To enable: set repository variable DEPLOYMENT_ENABLED=true and add KUBECONFIG_STAGING/KUBECONFIG_PRODUCTION secrets."
+          fi
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
@@ -46,10 +62,12 @@ jobs:
     environment:
       name: staging
       url: https://staging-api.edusphere.dev/graphql
+    needs: [check-prerequisites]
     # Auto-deploy on push; allow manual re-deploy targeting staging
     if: |
-      github.event_name == 'push' ||
-      github.event.inputs.environment == 'staging'
+      needs.check-prerequisites.outputs.can_deploy == 'true' &&
+      (github.event_name == 'push' ||
+       github.event.inputs.environment == 'staging')
 
     outputs:
       image_tag: ${{ steps.image-tag.outputs.IMAGE_TAG }}
@@ -245,18 +263,21 @@ jobs:
       name: production
       url: https://api.edusphere.dev/graphql
     # Require smoke tests to pass first, unless emergency force flag is set.
-    needs: [deploy-staging, smoke-test-staging]
+    needs: [check-prerequisites, deploy-staging, smoke-test-staging]
     if: |
+      needs.check-prerequisites.outputs.can_deploy == 'true' &&
       (
-        needs.smoke-test-staging.result == 'success' &&
         (
-          github.event.inputs.environment == 'production' ||
-          (github.event_name == 'push' && needs.deploy-staging.result == 'success')
+          needs.smoke-test-staging.result == 'success' &&
+          (
+            github.event.inputs.environment == 'production' ||
+            (github.event_name == 'push' && needs.deploy-staging.result == 'success')
+          )
+        ) ||
+        (
+          github.event.inputs.force_production == 'true' &&
+          github.event.inputs.environment == 'production'
         )
-      ) ||
-      (
-        github.event.inputs.force_production == 'true' &&
-        github.event.inputs.environment == 'production'
       )
 
     outputs:
