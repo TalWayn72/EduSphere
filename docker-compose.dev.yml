@@ -7,7 +7,8 @@ version: '3.9'
 
 services:
   # ═══════════════════════════════════════════════════════════════
-  # PostgreSQL 16 + pgvector + Apache AGE
+  # PostgreSQL 18 + pgvector + Apache AGE (upgraded Feb 2026)
+  # Fresh volumes switch automatically. Existing data: run pg_upgrade.
   # ═══════════════════════════════════════════════════════════════
   postgres:
     build:
@@ -116,15 +117,15 @@ services:
   # Accepts OTLP HTTP traces/metrics from all subgraphs via port 4318.
   # ═══════════════════════════════════════════════════════════════
   jaeger:
-    image: jaegertracing/all-in-one:1.58
+    image: jaegertracing/jaeger:2.15.1
     container_name: edusphere-jaeger
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
+    # Jaeger v2: image renamed jaegertracing/all-in-one → jaegertracing/jaeger
+    # OTLP enabled by default — COLLECTOR_OTLP_ENABLED removed
+    # Port 14268 (Jaeger Thrift HTTP) removed in v2; use OTLP on 4318 instead
     ports:
       - "16686:16686"   # Jaeger UI
-      - "4317:4317"     # OTLP gRPC (optional)
+      - "4317:4317"     # OTLP gRPC
       - "4318:4318"     # OTLP HTTP (used by @edusphere/telemetry)
-      - "14268:14268"   # Jaeger HTTP collector (legacy)
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:16686/ || exit 1"]
       interval: 10s
@@ -485,7 +486,7 @@ services:
   # UI available at http://localhost:3001  (admin / edusphere)
   # ═══════════════════════════════════════════════════════════════
   grafana:
-    image: grafana/grafana:11.6.0
+    image: grafana/grafana:12.3.2
     container_name: edusphere-grafana-dev
     environment:
       - GF_SECURITY_ADMIN_USER=admin

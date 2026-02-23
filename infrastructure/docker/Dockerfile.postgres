@@ -1,8 +1,16 @@
-# Custom PostgreSQL 16 + Apache AGE 1.7.0 + pgvector 0.8.1
-FROM postgres:16-alpine
+# Custom PostgreSQL 18 + Apache AGE 1.7.0 + pgvector 0.8.1
+# Upgraded: PG16 → PG18 (released Feb 12, 2026)
+# NOTE: Existing data volumes require pg_upgrade before switching from PG16.
+#       Fresh development environments can switch immediately.
+FROM postgres:18-alpine
 
 LABEL maintainer="EduSphere Team"
-LABEL description="PostgreSQL 16 with Apache AGE 1.7.0 graph database (with RLS) and pgvector 0.8.1 for embeddings"
+LABEL description="PostgreSQL 18 with Apache AGE 1.7.0 graph database (with RLS) and pgvector 0.8.1 for embeddings"
+
+# Install corporate CA cert BEFORE apk add (fixes SSL interception on corporate proxy)
+# SI-5 compliant: cert injected, no --insecure flags used
+COPY ./corporate-root-ca.pem /usr/local/share/ca-certificates/corporate-root-ca.crt
+RUN cat /usr/local/share/ca-certificates/corporate-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -14,9 +22,10 @@ RUN apk add --no-cache \
     flex \
     bison
 
-# Install Apache AGE 1.7.0 (adds RLS support + index on ID columns for multi-tenancy)
+# Install Apache AGE 1.7.0 (supports PG18 — RLS + multi-tenancy index)
+# Branch: release/PG18/1.7.0 (stable); tag PG18/v1.7.0-rc0 is RC only
 RUN cd /tmp && \
-    git clone --branch PG16/v1.7.0 --depth 1 https://github.com/apache/age.git && \
+    git clone --branch release/PG18/1.7.0 --depth 1 https://github.com/apache/age.git && \
     cd age && \
     make USE_PGXS=1 && \
     make USE_PGXS=1 install && \

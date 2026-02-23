@@ -7,7 +7,7 @@ services:
 
   # Prometheus - Metrics collection
   prometheus:
-    image: prom/prometheus:v2.52.0
+    image: prom/prometheus:v3.2.1
     container_name: edusphere-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -28,7 +28,7 @@ services:
 
   # Grafana - Visualization
   grafana:
-    image: grafana/grafana:11.0.0
+    image: grafana/grafana:12.3.2
     container_name: edusphere-grafana
     volumes:
       - grafana_data:/var/lib/grafana
@@ -37,9 +37,9 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_INSTALL_PLUGINS=grafana-piechart-panel
       - GF_SERVER_ROOT_URL=http://localhost:3001
       - GF_AUTH_ANONYMOUS_ENABLED=false
+      # grafana-piechart-panel is built into Grafana 12.x — no install needed
     ports:
       - "3001:3000"
     networks:
@@ -51,7 +51,7 @@ services:
 
   # Loki - Log aggregation
   loki:
-    image: grafana/loki:3.0.0
+    image: grafana/loki:3.6.5
     container_name: edusphere-loki
     command: -config.file=/etc/loki/local-config.yml
     volumes:
@@ -63,15 +63,19 @@ services:
       - monitoring
     restart: unless-stopped
 
-  # Promtail - Log shipper
-  promtail:
-    image: grafana/promtail:3.0.0
-    container_name: edusphere-promtail
-    command: -config.file=/etc/promtail/config.yml
+  # Grafana Alloy - Log shipper (replaces Promtail — EOL March 2, 2026)
+  alloy:
+    image: grafana/alloy:v1.8.2
+    container_name: edusphere-alloy
+    command: run /etc/alloy/config.alloy
     volumes:
-      - ./infrastructure/monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml
-      - /var/log:/var/log
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./infrastructure/monitoring/alloy/alloy-config.alloy:/etc/alloy/config.alloy:ro
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "12345:12345"   # Alloy UI (optional)
+    mem_limit: 256m
+    mem_reservation: 64m
     networks:
       - monitoring
     restart: unless-stopped
@@ -108,7 +112,7 @@ services:
 
   # Redis Exporter
   redis-exporter:
-    image: oliver006/redis_exporter:v1.58.0
+    image: oliver006/redis_exporter:v1.68.0
     container_name: edusphere-redis-exporter
     environment:
       - REDIS_ADDR=host.docker.internal:6379
@@ -119,13 +123,11 @@ services:
     restart: unless-stopped
 
   # Node Exporter - System metrics
+  # NOTE: rootfs host mount removed — not supported on Windows Docker Desktop.
+  # On Linux hosts, restore: command: ['--path.rootfs=/host'] and volume '/:/host:ro,rslave'
   node-exporter:
-    image: prom/node-exporter:v1.8.0
+    image: prom/node-exporter:v1.8.1
     container_name: edusphere-node-exporter
-    command:
-      - '--path.rootfs=/host'
-    volumes:
-      - '/:/host:ro,rslave'
     ports:
       - "9100:9100"
     networks:
@@ -134,7 +136,7 @@ services:
 
   # cAdvisor - Container metrics
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: ghcr.io/google/cadvisor:0.56.2
     container_name: edusphere-cadvisor
     volumes:
       - /:/rootfs:ro
