@@ -3,10 +3,10 @@
 ## Project Context
 - **Type:** Knowledge Graph Educational Platform - Production Scale (100,000+ concurrent users)
 - **Architecture:** GraphQL Federation (6 subgraphs) + Apache AGE + pgvector + AI Agents
-- **Stack:** NestJS + GraphQL Yoga | React 19 + Vite 6 | Expo SDK 54 | Drizzle ORM + PostgreSQL 16 + Apache AGE + pgvector
+- **Stack:** NestJS + GraphQL Yoga | React 19 + Vite 6 | Expo SDK 54 | Drizzle ORM + PostgreSQL 18 + Apache AGE + pgvector
 - **Monorepo:** pnpm workspaces + Turborepo - `apps/*`, `packages/*`, `infrastructure/`
 - **Repository:** [Internal/Private]
-- **Node:** >=20.0.0 | **pnpm:** >=9.0.0
+- **Node:** >=20.0.0 | **pnpm:** >=10.0.0
 
 ## Boundaries
 | Path | Reason |
@@ -32,9 +32,11 @@
 
 ## Language & Permissions
 - **Communication:** Hebrew | **Code & Docs:** English
-- **Auto-approved:** File ops (Read, Write), Git (all operations including commit/push), pnpm, Bash, Docker, VS Code extensions
-- **No approval needed:** Execute directly without asking - Bash commands, Write operations, Git commits
-- **CRITICAL:** DO NOT ask "Can I do X?" or "Should I do Y?" - Just execute the task immediately. User will approve by default unless explicitly stated otherwise.
+- **Auto-approved:** File ops (Read, Write), Git (all operations including commit/push), pnpm, Bash, Docker, VS Code extensions, MCP tool calls
+- **No approval needed:** Execute directly without asking - Bash commands, Write operations, Git commits, MCP server tests, Docker operations, file edits
+- **CRITICAL — IRON RULE — NEVER VIOLATE:** DO NOT ask "Can I do X?" or "Should I do Y?" or "האם לבצע?" or "האם להפעיל?" — Just execute immediately. No exceptions. This applies to ALL operations: MCP tests, Docker, git, file writes, Bash commands, running servers, making API calls. If in doubt — execute, don't ask.
+- **VIOLATION EXAMPLE (FORBIDDEN):** "האם לבצע Reload Window?" / "Should I run the tests?" / "רוצה שאפעיל?"
+- **CORRECT BEHAVIOR:** Detect what needs to be done → execute it → report results.
 
 ## Architecture & Patterns
 

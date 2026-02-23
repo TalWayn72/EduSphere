@@ -15,7 +15,17 @@
       "Skill(*)",
       "AskUserQuestion(*)",
       "ExitPlanMode(*)",
-      "EnterPlanMode(*)"
+      "EnterPlanMode(*)",
+      "mcp__memory__*",
+      "mcp__sequential-thinking__*",
+      "mcp__eslint__*",
+      "mcp__github__*",
+      "mcp__tavily__*",
+      "mcp__postgres__*",
+      "mcp__graphql__*",
+      "mcp__nats__*",
+      "mcp__typescript-diagnostics__*",
+      "mcp__playwright__*"
     ]
   }
 }
