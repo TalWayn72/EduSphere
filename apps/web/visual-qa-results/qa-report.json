@@ -1,72 +1,72 @@
 [
   {
     "label": "01 — Login Page",
-    "url": "http://localhost:5175/login",
+    "url": "http://localhost:5174/dashboard",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\01-login-page.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
+    ],
     "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": []
+    "loadedSuccessfully": false,
+    "notes": [
+      "MISSING: \"Welcome to EduSphere\" heading not visible",
+      "MISSING: \"Sign In with Keycloak\" button not visible",
+      "MISSING: Description text not visible"
+    ]
   },
   {
     "label": "02 — Keycloak Auth Flow",
-    "url": "http://localhost:5175/learn/content-1",
+    "url": "http://localhost:5174/learn/content-1",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\02-post-keycloak-login.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
+    ],
     "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": []
   },
   {
     "label": "03 — Dashboard",
-    "url": "http://localhost:5175/dashboard",
+    "url": "http://localhost:5174/dashboard",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\03-dashboard.png",
-    "consoleErrors": [],
-    "consoleWarnings": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
+    ],
     "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/pages/content-viewer.utils.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/types/annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)"
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
     "loadedSuccessfully": true,
     "notes": [
-      "ERROR CARD VISIBLE: Error loading user data: [GraphQL] Unauthorized"
+      "ERROR CARD VISIBLE: Error loading user data: [Network] Failed to fetch"
     ]
   },
   {
     "label": "04 — Course List",
-    "url": "http://localhost:5175/courses",
+    "url": "http://localhost:5174/courses",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\04-courses-list.png",
-    "consoleErrors": [],
-    "consoleWarnings": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
+    ],
     "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)"
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
     "loadedSuccessfully": true,
     "notes": [
@@ -75,98 +75,67 @@
   },
   {
     "label": "05 — Content Viewer",
-    "url": "http://localhost:5175/learn/content-1",
+    "url": "http://localhost:5174/learn/content-1",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\05-content-viewer.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": []
   },
   {
     "label": "06 — Create Annotation",
-    "url": "http://localhost:5175/learn/content-1",
+    "url": "http://localhost:5174/learn/content-1",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\06-annotation-result.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": [
-      "WARNING: Annotation text not visible after save — may not have saved, or GraphQL mutation failed"
+      "SUCCESS: Annotation created and visible in list"
     ]
   },
   {
     "label": "07 — Annotations Page",
-    "url": "http://localhost:5175/annotations",
+    "url": "http://localhost:5174/annotations",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\07-annotations-page.png",
-    "consoleErrors": [],
-    "consoleWarnings": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
+    ],
     "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/types/annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/pages/content-viewer.utils.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-graph-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-content-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useAgentChat.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)"
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
     "loadedSuccessfully": true,
     "notes": []
   },
   {
     "label": "08 — Knowledge Graph",
-    "url": "http://localhost:5175/graph",
+    "url": "http://localhost:5174/graph",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\08-knowledge-graph.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/vite.svg (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/vite.svg (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useCourseNavigation.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=acbfbb38 (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": [
       "INFO: No canvas/svg graph element visible — may be text-based fallback or loading"
@@ -174,29 +143,16 @@
   },
   {
     "label": "09 — Search Page",
-    "url": "http://localhost:5175/search",
+    "url": "http://localhost:5174/search",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\09-search-results.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-graph-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useAnnotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/vite.svg (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useAgentChat.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-content-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/pages/content-viewer.utils.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/types/annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": [
       "Found 7 search result cards after querying \"Talmud\""
@@ -204,30 +160,16 @@
   },
   {
     "label": "10 — AI Agents (Chavruta)",
-    "url": "http://localhost:5175/agents",
+    "url": "http://localhost:5174/agents",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\10-agents-ai-response.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/types/annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/pages/content-viewer.utils.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-content-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-graph-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/vite.svg (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": [
       "AI response bubbles visible: 2"
@@ -235,28 +177,16 @@
   },
   {
     "label": "11 — Collaboration Page",
-    "url": "http://localhost:5175/collaboration",
+    "url": "http://localhost:5174/collaboration",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\11-collaboration.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/Layout.tsx?t=1771586032798 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tabs.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-graph-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useAnnotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/types/annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/pages/content-viewer.utils.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useAgentChat.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useContentData.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-content-data.ts (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": [
       "Page heading: \"Collaboration\""
@@ -264,27 +194,21 @@
   },
   {
     "label": "12 — Profile Page",
-    "url": "http://localhost:5175/profile",
+    "url": "http://localhost:5174/profile",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\12-profile.png",
-    "consoleErrors": [],
-    "consoleWarnings": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
+    ],
     "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useAgentChat.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/types/annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useContentData.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/hooks/useAnnotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/pages/content-viewer.utils.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-graph-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-content-data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)"
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
     "loadedSuccessfully": true,
     "notes": [
@@ -293,58 +217,42 @@
   },
   {
     "label": "13 — UserMenu / Logout",
-    "url": "http://localhost:5175/login",
+    "url": "http://localhost:5174/dashboard",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\13-after-logout.png",
-    "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)"
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
     ],
-    "loadedSuccessfully": true,
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
+    ],
+    "networkErrors": [
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
+    ],
+    "loadedSuccessfully": false,
     "notes": [
-      "After logout URL: http://localhost:5175/login",
-      "SUCCESS: Logout redirected correctly to login/Keycloak"
+      "After logout URL: http://localhost:5174/dashboard",
+      "BUG: After logout, user is still on http://localhost:5174/dashboard instead of /login or Keycloak"
     ]
   },
   {
     "label": "14 — Navigation Sidebar",
-    "url": "http://localhost:5175/dashboard",
+    "url": "http://localhost:5174/dashboard",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\14-sidebar-navigation.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/types/annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/pages/content-viewer.utils.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": [
       "FOUND nav link: \"Dashboard\"",
@@ -356,30 +264,19 @@
   },
   {
     "label": "15 — Unknown Route / 404",
-    "url": "http://localhost:5175/learn/content-1",
+    "url": "http://localhost:5174/learn/content-1",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\15-unknown-route.png",
     "consoleErrors": [],
-    "consoleWarnings": [],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:5175/src/components/UserMenu.tsx?t=1771583578577 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/annotation.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/content.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/VideoProgressMarkers.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d0e9c6e3 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AnnotationThread.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/node_modules/.vite/deps/hls__js.js?v=e27b7756 (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/AddAnnotationOverlay.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-annotations.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-transcript.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ui/tooltip.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/mock-video-annotations.data.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/lib/graphql/agent.queries.ts (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/ContentViewerBreadcrumb.tsx (net::ERR_ABORTED)",
-      "FAILED REQUEST — http://localhost:5175/src/components/LayerToggleBar.tsx (net::ERR_ABORTED)"
+    "consoleWarnings": [
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication",
+      "🔧 DEV MODE: Running without Keycloak authentication"
     ],
+    "networkErrors": [],
     "loadedSuccessfully": true,
     "notes": [
-      "INFO: Unknown route redirected to http://localhost:5175/learn/content-1 — fallback route working"
+      "INFO: Unknown route redirected to http://localhost:5174/learn/content-1 — fallback route working"
     ]
   }
 ]
