@@ -4,15 +4,66 @@ import type { Pool } from 'pg';
 export type DrizzleDB = NodePgDatabase<any>;
 
 /**
+ * Convert a JS value to a safe Cypher literal string.
+ *
+ * - Strings are double-quoted and internal double-quotes / backslashes are escaped.
+ * - Numbers and booleans are stringified as-is.
+ * - null / undefined become the Cypher `null` keyword.
+ *
+ * This is used by substituteParams() when the AGE third-argument parameterisation
+ * fails (AGE 1.7.0 + PostgreSQL 17 incompatibility — see executeCypher).
+ */
+export function toCypherLiteral(value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  const escaped = String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+  return `"${escaped}"`;
+}
+
+/**
+ * Replace Cypher `$paramName` references with safe literal values.
+ *
+ * Only replaces `$word` tokens that exist as keys in `params`.
+ * Unknown `$token` references are left untouched so any remaining ones
+ * surface as an AGE "undefined parameter" error rather than silently
+ * producing wrong results.
+ */
+export function substituteParams(
+  query: string,
+  params: Record<string, unknown>,
+): string {
+  return query.replace(/\$([A-Za-z_]\w*)/g, (match, key) => {
+    if (!(key in params)) return match;
+    return toCypherLiteral(params[key]);
+  });
+}
+
+/**
  * Execute Apache AGE Cypher query with optional parameterized params.
  *
  * Uses raw pg client (simple query protocol) because LOAD 'age' and
  * SET search_path cannot be combined with SELECT in a prepared statement.
  *
- * When tenantId is provided, issues SET LOCAL app.current_tenant before
- * the Cypher query so that AGE 1.7.0 RLS policies on label tables
- * enforce tenant isolation at the database layer in addition to the
- * tenant_id property filter inside the Cypher WHERE clause.
+ * When tenantId is provided, issues set_config() before the Cypher query
+ * so that AGE 1.7.0 RLS policies on label tables enforce tenant isolation
+ * at the database layer in addition to the tenant_id property filter inside
+ * the Cypher WHERE clause.
+ *
+ * AGE 1.7.0 + PostgreSQL 17 compatibility note
+ * ─────────────────────────────────────────────
+ * AGE's cypher() planner hook requires the third argument to be a raw Param
+ * node (i.e. `$1` in SQL).  On PostgreSQL 17 this check fails even when the
+ * caller correctly passes `$1` via the extended query protocol — a known
+ * AGE 1.7.0 / PG-17 incompatibility.  We therefore:
+ *   1. Try the standard `$1` parameterised form first.
+ *   2. On the specific AGE error, retry by substituting values directly into
+ *      the Cypher query string as safely-escaped literals (substituteParams).
+ * Once the stack is upgraded to AGE ≥1.9 (which supports PG 17) the fallback
+ * branch will never be reached and can be removed.
  */
 export async function executeCypher<T = any>(
   db: DrizzleDB,
@@ -28,27 +79,40 @@ export async function executeCypher<T = any>(
     await client.query('SET search_path = ag_catalog, "$user", public');
 
     if (tenantId) {
-      // SET LOCAL is transaction-scoped; use parameterized query to avoid injection.
+      // Use parameterized set_config to avoid injection.
       await client.query('SELECT set_config($1, $2, TRUE)', [
         'app.current_tenant',
         tenantId,
       ]);
     }
 
-    let result;
     if (params && Object.keys(params).length > 0) {
-      // Apache AGE requires the third argument to be a SQL parameter ($1),
-      // not a string literal — otherwise it throws "third argument of cypher
-      // function must be a parameter".
-      result = await client.query(
-        `SELECT * FROM cypher('${graphName}', $$${query}$$, $1) AS (result agtype)`,
-        [JSON.stringify(params)]
-      );
-    } else {
-      result = await client.query(
-        `SELECT * FROM cypher('${graphName}', $$${query}$$) AS (result agtype)`
-      );
+      try {
+        // Primary path: AGE third-argument parameterisation ($1 = JSON params).
+        // Requires AGE ≥1.9 on PostgreSQL 17; works on AGE 1.7 + PG 16.
+        const result = await client.query(
+          `SELECT * FROM cypher('${graphName}', $$${query}$$, $1) AS (result agtype)`,
+          [JSON.stringify(params)],
+        );
+        return result.rows as T[];
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!msg.includes('third argument of cypher function must be a parameter')) {
+          throw err;
+        }
+        // Fallback: AGE 1.7.0 + PostgreSQL 17 cannot use the $1 form.
+        // Substitute values as safe Cypher literals and use the 2-argument form.
+        const substituted = substituteParams(query, params);
+        const result = await client.query(
+          `SELECT * FROM cypher('${graphName}', $$${substituted}$$) AS (result agtype)`,
+        );
+        return result.rows as T[];
+      }
     }
+
+    const result = await client.query(
+      `SELECT * FROM cypher('${graphName}', $$${query}$$) AS (result agtype)`,
+    );
     return result.rows as T[];
   } finally {
     client.release();

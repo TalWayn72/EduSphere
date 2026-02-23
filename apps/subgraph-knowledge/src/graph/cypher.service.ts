@@ -16,6 +16,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   db,
   executeCypher,
+  substituteParams,
   createConcept,
   findRelatedConcepts,
   createRelationship,
@@ -458,23 +459,36 @@ export class CypherService {
       await client.query('SET search_path = ag_catalog, "$user", public');
       await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
-      // AGE requires the params to be a SQL parameter ($1), not a string literal.
-      const sql = `
-        SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$
-          MATCH (start:Concept {tenant_id: $tenantId}), (end:Concept {tenant_id: $tenantId})
-          WHERE toLower(start.name) = toLower($fromName) AND toLower(end.name) = toLower($toName)
-          MATCH path = shortestPath((start)-[:RELATED_TO|PREREQUISITE_OF*1..10]-(end))
-          RETURN [node IN nodes(path) | {id: node.id, name: node.name, type: node.type}] AS concepts,
-                 length(path) AS steps
-        $$, $1) AS (concepts ag_catalog.agtype, steps ag_catalog.agtype)
+      const cypherQuery = `
+        MATCH (start:Concept {tenant_id: $tenantId}), (end:Concept {tenant_id: $tenantId})
+        WHERE toLower(start.name) = toLower($fromName) AND toLower(end.name) = toLower($toName)
+        MATCH path = shortestPath((start)-[:RELATED_TO|PREREQUISITE_OF*1..10]-(end))
+        RETURN [node IN nodes(path) | {id: node.id, name: node.name, type: node.type}] AS concepts,
+               length(path) AS steps
       `;
+      const cypherParams = { fromName, toName, tenantId };
+      const AS_CLAUSE = `AS (concepts ag_catalog.agtype, steps ag_catalog.agtype)`;
 
-      const result = await client.query(sql, [JSON.stringify({ fromName, toName, tenantId })]);
-      if (!result.rows || result.rows.length === 0) {
-        return null;
+      let rows: Array<{ concepts: string; steps: string }>;
+      try {
+        // Primary: $1 parameterized form (AGE ≥1.9 + PG 17, or AGE 1.7 + PG 16)
+        const queryWithParam = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${cypherQuery}$$, $1) ${AS_CLAUSE}`;
+        const result = await client.query(queryWithParam, [JSON.stringify(cypherParams)]);
+        rows = result.rows as Array<{ concepts: string; steps: string }>;
+      } catch (ageErr) {
+        const msg = ageErr instanceof Error ? ageErr.message : String(ageErr);
+        if (!msg.includes('third argument of cypher function must be a parameter')) throw ageErr;
+        // Fallback: AGE 1.7.0 + PostgreSQL 17 — substitute as safe Cypher literals
+        const substituted = substituteParams(cypherQuery, cypherParams);
+        const queryDirect = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${substituted}$$) ${AS_CLAUSE}`;
+        const result = await client.query(queryDirect);
+        rows = result.rows as Array<{ concepts: string; steps: string }>;
       }
 
-      const row = result.rows[0] as { concepts: string; steps: string };
+      if (!rows || rows.length === 0) return null;
+
+      const row = rows[0];
+      if (!row) return null;
       const concepts = this.parseAgtypeArray(row.concepts) as ConceptNode[];
       const steps = this.parseAgtypeScalar(row.steps) as number;
 
@@ -515,22 +529,35 @@ export class CypherService {
       await client.query('SET search_path = ag_catalog, "$user", public');
       await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
-      // AGE requires the params to be a SQL parameter ($1), not a string literal.
-      const sql = `
-        SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$
-          MATCH (c:Concept {tenant_id: $tenantId})
-          WHERE toLower(c.name) = toLower($conceptName)
-          MATCH (c)-[:RELATED_TO*1..${safeDepth}]-(related:Concept {tenant_id: $tenantId})
-          RETURN COLLECT(DISTINCT {id: related.id, name: related.name, type: related.type}) AS related
-        $$, $1) AS (related ag_catalog.agtype)
+      const cypherQuery = `
+        MATCH (c:Concept {tenant_id: $tenantId})
+        WHERE toLower(c.name) = toLower($conceptName)
+        MATCH (c)-[:RELATED_TO*1..${safeDepth}]-(related:Concept {tenant_id: $tenantId})
+        RETURN COLLECT(DISTINCT {id: related.id, name: related.name, type: related.type}) AS related
       `;
+      const cypherParams = { conceptName, tenantId };
+      const AS_CLAUSE = `AS (related ag_catalog.agtype)`;
 
-      const result = await client.query(sql, [JSON.stringify({ conceptName, tenantId })]);
-      if (!result.rows || result.rows.length === 0) {
-        return [];
+      let rows: Array<{ related: string }>;
+      try {
+        // Primary: $1 parameterized form
+        const queryWithParam = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${cypherQuery}$$, $1) ${AS_CLAUSE}`;
+        const result = await client.query(queryWithParam, [JSON.stringify(cypherParams)]);
+        rows = result.rows as Array<{ related: string }>;
+      } catch (ageErr) {
+        const msg = ageErr instanceof Error ? ageErr.message : String(ageErr);
+        if (!msg.includes('third argument of cypher function must be a parameter')) throw ageErr;
+        // Fallback: AGE 1.7.0 + PostgreSQL 17 — substitute as safe Cypher literals
+        const substituted = substituteParams(cypherQuery, cypherParams);
+        const queryDirect = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${substituted}$$) ${AS_CLAUSE}`;
+        const result = await client.query(queryDirect);
+        rows = result.rows as Array<{ related: string }>;
       }
 
-      const row = result.rows[0] as { related: string };
+      if (!rows || rows.length === 0) return [];
+
+      const row = rows[0];
+      if (!row) return [];
       return this.parseAgtypeArray(row.related) as ConceptNode[];
     } catch (err) {
       this.logger.error(
@@ -561,24 +588,37 @@ export class CypherService {
       await client.query('SET search_path = ag_catalog, "$user", public');
       await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
 
-      // AGE requires the params to be a SQL parameter ($1), not a string literal.
-      const sql = `
-        SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$
-          MATCH (c:Concept {tenant_id: $tenantId})
-          WHERE toLower(c.name) = toLower($conceptName)
-          MATCH path = (prereq:Concept)-[:PREREQUISITE_OF*1..5]->(c)
-          RETURN [node IN nodes(path) | {id: node.id, name: node.name}] AS chain
-          ORDER BY length(path) DESC
-          LIMIT 1
-        $$, $1) AS (chain ag_catalog.agtype)
+      const cypherQuery = `
+        MATCH (c:Concept {tenant_id: $tenantId})
+        WHERE toLower(c.name) = toLower($conceptName)
+        MATCH path = (prereq:Concept)-[:PREREQUISITE_OF*1..5]->(c)
+        RETURN [node IN nodes(path) | {id: node.id, name: node.name}] AS chain
+        ORDER BY length(path) DESC
+        LIMIT 1
       `;
+      const cypherParams = { conceptName, tenantId };
+      const AS_CLAUSE = `AS (chain ag_catalog.agtype)`;
 
-      const result = await client.query(sql, [JSON.stringify({ conceptName, tenantId })]);
-      if (!result.rows || result.rows.length === 0) {
-        return [];
+      let rows: Array<{ chain: string }>;
+      try {
+        // Primary: $1 parameterized form
+        const queryWithParam = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${cypherQuery}$$, $1) ${AS_CLAUSE}`;
+        const result = await client.query(queryWithParam, [JSON.stringify(cypherParams)]);
+        rows = result.rows as Array<{ chain: string }>;
+      } catch (ageErr) {
+        const msg = ageErr instanceof Error ? ageErr.message : String(ageErr);
+        if (!msg.includes('third argument of cypher function must be a parameter')) throw ageErr;
+        // Fallback: AGE 1.7.0 + PostgreSQL 17 — substitute as safe Cypher literals
+        const substituted = substituteParams(cypherQuery, cypherParams);
+        const queryDirect = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${substituted}$$) ${AS_CLAUSE}`;
+        const result = await client.query(queryDirect);
+        rows = result.rows as Array<{ chain: string }>;
       }
 
-      const row = result.rows[0] as { chain: string };
+      if (!rows || rows.length === 0) return [];
+
+      const row = rows[0];
+      if (!row) return [];
       return this.parseAgtypeArray(row.chain) as ConceptNode[];
     } catch (err) {
       this.logger.error(

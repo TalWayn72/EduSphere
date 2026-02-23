@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   executeCypher,
+  toCypherLiteral,
+  substituteParams,
   addVertex,
   addEdge,
   queryNodes,
@@ -30,6 +32,98 @@ function buildMockDb(): DrizzleDB {
 }
 
 const GRAPH = 'edusphere_graph';
+
+// ---------------------------------------------------------------------------
+// toCypherLiteral
+// ---------------------------------------------------------------------------
+
+describe('toCypherLiteral()', () => {
+  it('returns null for null', () => {
+    expect(toCypherLiteral(null)).toBe('null');
+  });
+
+  it('returns null for undefined', () => {
+    expect(toCypherLiteral(undefined)).toBe('null');
+  });
+
+  it('returns number as string', () => {
+    expect(toCypherLiteral(42)).toBe('42');
+    expect(toCypherLiteral(3.14)).toBe('3.14');
+  });
+
+  it('returns boolean as string', () => {
+    expect(toCypherLiteral(true)).toBe('true');
+    expect(toCypherLiteral(false)).toBe('false');
+  });
+
+  it('wraps string in double quotes', () => {
+    expect(toCypherLiteral('hello')).toBe('"hello"');
+  });
+
+  it('escapes double quotes inside string', () => {
+    expect(toCypherLiteral('say "hi"')).toBe('"say \\"hi\\""');
+  });
+
+  it('escapes backslashes', () => {
+    expect(toCypherLiteral('back\\slash')).toBe('"back\\\\slash"');
+  });
+
+  it('escapes newlines', () => {
+    expect(toCypherLiteral('line1\nline2')).toBe('"line1\\nline2"');
+  });
+
+  it('handles UUIDs without modification (safe chars only)', () => {
+    const uuid = '550e8400-e29b-41d4-a716-446655440000';
+    expect(toCypherLiteral(uuid)).toBe(`"${uuid}"`);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// substituteParams
+// ---------------------------------------------------------------------------
+
+describe('substituteParams()', () => {
+  it('replaces $key with the literal value', () => {
+    const result = substituteParams(
+      'MATCH (c {tenant_id: $tenantId}) RETURN c',
+      { tenantId: 'tenant-abc' },
+    );
+    expect(result).toBe('MATCH (c {tenant_id: "tenant-abc"}) RETURN c');
+  });
+
+  it('replaces multiple params', () => {
+    const result = substituteParams(
+      'MATCH (c {id: $id, tenant_id: $tenantId}) RETURN c',
+      { id: 'concept-1', tenantId: 'tenant-1' },
+    );
+    expect(result).toContain('"concept-1"');
+    expect(result).toContain('"tenant-1"');
+  });
+
+  it('replaces numeric param with unquoted number', () => {
+    const result = substituteParams('SET r.strength = $strength', { strength: 0.7 });
+    expect(result).toBe('SET r.strength = 0.7');
+  });
+
+  it('replaces null param with null keyword', () => {
+    const result = substituteParams('SET n.bio = $bio', { bio: null });
+    expect(result).toBe('SET n.bio = null');
+  });
+
+  it('leaves unknown $tokens untouched', () => {
+    const result = substituteParams('MATCH (n {id: $unknown}) RETURN n', { tenantId: 't1' });
+    expect(result).toBe('MATCH (n {id: $unknown}) RETURN n');
+  });
+
+  it('escapes double quotes in string values to prevent Cypher injection', () => {
+    const result = substituteParams(
+      'MATCH (n {name: $name}) RETURN n',
+      { name: 'evil"injection' },
+    );
+    expect(result).toContain('\\"injection');
+    expect(result).not.toContain('evil"injection');
+  });
+});
 
 // ---------------------------------------------------------------------------
 // executeCypher
@@ -116,6 +210,48 @@ describe('executeCypher()', () => {
     expect(pgValues).toBeDefined();
     const parsed = JSON.parse(pgValues![0]);
     expect(parsed).toMatchObject({ id: 'concept-1', tenantId: 'tenant-1' });
+  });
+
+  it('falls back to substituteParams when AGE throws third-argument error (PG17 compat)', async () => {
+    const ageError = new Error('third argument of cypher function must be a parameter');
+    mockQuery
+      .mockResolvedValueOnce(undefined) // LOAD 'age'
+      .mockResolvedValueOnce(undefined) // SET search_path
+      .mockRejectedValueOnce(ageError)  // first cypher attempt ($1 form) — AGE PG17 error
+      .mockResolvedValueOnce({ rows: [{ result: 'ok' }] }); // retry with substituted literals
+
+    const db = buildMockDb();
+    const result = await executeCypher(
+      db,
+      GRAPH,
+      'MATCH (n {id: $id}) RETURN n',
+      { id: 'concept-1' },
+    );
+
+    // Fallback succeeded
+    expect(result).toEqual([{ result: 'ok' }]);
+
+    // The retry call must NOT include $1 in the pg values array
+    const calls = mockQuery.mock.calls;
+    const retrySql = calls[3]![0] as string;
+    expect(retrySql).toContain('cypher(');
+    // Values were inlined — no pg params array
+    expect(calls[3]![1]).toBeUndefined();
+    // Substituted literal appears in the query body
+    expect(retrySql).toContain('"concept-1"');
+  });
+
+  it('re-throws non-AGE errors without retrying', async () => {
+    const dbError = new Error('connection reset by peer');
+    mockQuery
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(dbError);
+
+    const db = buildMockDb();
+    await expect(
+      executeCypher(db, GRAPH, 'MATCH (n) RETURN n', { tenantId: 't1' }),
+    ).rejects.toThrow('connection reset by peer');
   });
 
   it('does NOT include params placeholder when params is empty object', async () => {

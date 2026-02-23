@@ -32,13 +32,21 @@ export class UserService implements OnModuleDestroy {
 
   private mapUser(user: Record<string, unknown> | null | undefined) {
     if (!user) return null;
+    // Drizzle returns camelCase keys; some paths may return snake_case — handle both.
     const displayName = (user['display_name'] as string) || '';
     const parts = displayName.split(' ');
+    const toIso = (v: unknown): string => {
+      if (!v) return new Date().toISOString();
+      if (v instanceof Date) return v.toISOString();
+      return String(v);
+    };
     return {
       ...user,
-      firstName:   (user['first_name'] as string) || parts[0] || '',
-      lastName:    (user['last_name']  as string) || parts.slice(1).join(' ') || '',
-      tenantId:    (user['tenant_id']  as string) || '',
+      firstName:   (user['first_name'] as string) || (user['firstName'] as string) || parts[0] || '',
+      lastName:    (user['last_name']  as string) || (user['lastName']  as string) || parts.slice(1).join(' ') || '',
+      tenantId:    (user['tenant_id']  as string) || (user['tenantId']  as string) || '',
+      createdAt:   toIso(user['created_at'] ?? user['createdAt']),
+      updatedAt:   toIso(user['updated_at'] ?? user['updatedAt']),
       preferences: parsePreferences(user['preferences']),
     };
   }
