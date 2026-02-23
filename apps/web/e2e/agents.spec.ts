@@ -19,8 +19,8 @@ import { test, expect, type Page } from '@playwright/test';
  */
 
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
-// Matches whichever port the app is running on (5173 default, 5175 when E2E_BASE_URL overrides)
-const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5173').replace(/^https?:\/\//, '');
+// Host extracted from BASE_URL — used in waitForURL pattern after Keycloak redirect
+const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5174').replace(/^https?:\/\//, '');
 
 /**
  * Perform a full Keycloak OIDC login as the given user and wait until the app
@@ -54,7 +54,13 @@ test.describe('Agents — page load and template selector', () => {
   // which can cause timeouts when other test suites are running in parallel.
   test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => {
-    await loginViaKeycloak(page);
+    if (process.env.VITE_DEV_MODE !== 'false') {
+      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+    } else {
+      await loginViaKeycloak(page);
+    }
   });
   test('agents page loads with the heading "AI Learning Agents"', async ({
     page,
@@ -145,7 +151,13 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
   // Serial mode: same reason as the first describe block — reduce parallel Keycloak logins.
   test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => {
-    await loginViaKeycloak(page);
+    if (process.env.VITE_DEV_MODE !== 'false') {
+      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+    } else {
+      await loginViaKeycloak(page);
+    }
   });
 
   test('sending a message shows it in the chat as a user bubble', async ({

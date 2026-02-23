@@ -27,3 +27,13 @@ dist-ssr
 .env
 .env.local
 .env.production
+
+# E2E secrets — use *.example files as templates (those ARE committed)
+.env.e2e.local
+.env.e2e.staging
+.env.e2e.production
+
+# E2E test output
+test-results/
+playwright-report/
+visual-qa-results/

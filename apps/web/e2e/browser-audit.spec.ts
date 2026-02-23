@@ -19,7 +19,7 @@ async function waitForAppReady(page: any, timeout = 15000) {
 }
 
 test('01 - Homepage loads and redirects correctly', async ({ page }) => {
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5174/');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/01-homepage.png`, fullPage: false });
   console.log('URL after navigation:', page.url());
@@ -29,7 +29,7 @@ test('01 - Homepage loads and redirects correctly', async ({ page }) => {
 });
 
 test('02 - Login page', async ({ page }) => {
-  await page.goto('http://localhost:5175/login');
+  await page.goto('http://localhost:5174/login');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/02-login.png`, fullPage: false });
   console.log('Login URL:', page.url());
@@ -38,7 +38,7 @@ test('02 - Login page', async ({ page }) => {
 });
 
 test('03 - Dashboard page', async ({ page }) => {
-  await page.goto('http://localhost:5175/dashboard');
+  await page.goto('http://localhost:5174/dashboard');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/03-dashboard.png`, fullPage: true });
   console.log('Dashboard URL:', page.url());
@@ -47,7 +47,7 @@ test('03 - Dashboard page', async ({ page }) => {
 });
 
 test('04 - Courses page', async ({ page }) => {
-  await page.goto('http://localhost:5175/courses');
+  await page.goto('http://localhost:5174/courses');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/04-courses.png`, fullPage: true });
   console.log('Courses URL:', page.url());
@@ -56,7 +56,7 @@ test('04 - Courses page', async ({ page }) => {
 });
 
 test('05 - Content Viewer page', async ({ page }) => {
-  await page.goto('http://localhost:5175/learn/content-1');
+  await page.goto('http://localhost:5174/learn/content-1');
   await waitForAppReady(page, 20000);
   await page.screenshot({ path: `${SCREENSHOTS}/05-content-viewer.png`, fullPage: true });
   console.log('ContentViewer URL:', page.url());
@@ -65,7 +65,7 @@ test('05 - Content Viewer page', async ({ page }) => {
 });
 
 test('06 - Knowledge Graph page', async ({ page }) => {
-  await page.goto('http://localhost:5175/graph');
+  await page.goto('http://localhost:5174/graph');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/06-knowledge-graph.png`, fullPage: true });
   console.log('Graph URL:', page.url());
@@ -74,7 +74,7 @@ test('06 - Knowledge Graph page', async ({ page }) => {
 });
 
 test('07 - Agents page', async ({ page }) => {
-  await page.goto('http://localhost:5175/agents');
+  await page.goto('http://localhost:5174/agents');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/07-agents.png`, fullPage: true });
   console.log('Agents URL:', page.url());
@@ -83,7 +83,7 @@ test('07 - Agents page', async ({ page }) => {
 });
 
 test('08 - Annotations page', async ({ page }) => {
-  await page.goto('http://localhost:5175/annotations');
+  await page.goto('http://localhost:5174/annotations');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/08-annotations.png`, fullPage: true });
   console.log('Annotations URL:', page.url());
@@ -92,7 +92,7 @@ test('08 - Annotations page', async ({ page }) => {
 });
 
 test('09 - Collaboration page', async ({ page }) => {
-  await page.goto('http://localhost:5175/collaboration');
+  await page.goto('http://localhost:5174/collaboration');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/09-collaboration.png`, fullPage: true });
   console.log('Collaboration URL:', page.url());
@@ -101,7 +101,7 @@ test('09 - Collaboration page', async ({ page }) => {
 });
 
 test('10 - Search page', async ({ page }) => {
-  await page.goto('http://localhost:5175/search');
+  await page.goto('http://localhost:5174/search');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/10-search.png`, fullPage: true });
   console.log('Search URL:', page.url());
@@ -110,7 +110,7 @@ test('10 - Search page', async ({ page }) => {
 });
 
 test('11 - Profile page', async ({ page }) => {
-  await page.goto('http://localhost:5175/profile');
+  await page.goto('http://localhost:5174/profile');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/11-profile.png`, fullPage: true });
   console.log('Profile URL:', page.url());
@@ -119,7 +119,7 @@ test('11 - Profile page', async ({ page }) => {
 });
 
 test('12 - Courses New page', async ({ page }) => {
-  await page.goto('http://localhost:5175/courses/new');
+  await page.goto('http://localhost:5174/courses/new');
   await waitForAppReady(page);
   await page.screenshot({ path: `${SCREENSHOTS}/12-course-create.png`, fullPage: true });
   console.log('CourseCreate URL:', page.url());
@@ -128,7 +128,7 @@ test('12 - Courses New page', async ({ page }) => {
 });
 
 test('13 - Keycloak login flow as super admin', async ({ page }) => {
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5174/');
   await waitForAppReady(page, 8000);
 
   const currentUrl = page.url();

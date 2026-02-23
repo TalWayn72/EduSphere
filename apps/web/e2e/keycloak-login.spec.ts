@@ -23,6 +23,9 @@
 
 import { test, expect, type Page } from '@playwright/test';
 
+// Set to true only when VITE_DEV_MODE=false (real Keycloak available)
+const LIVE_BACKEND = process.env.VITE_DEV_MODE === 'false';
+
 // ---------------------------------------------------------------------------
 // Credentials (demo users from keycloak-realm.json)
 // ---------------------------------------------------------------------------
@@ -103,6 +106,7 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
   test('no "Falling back to DEV MODE" warning when VITE_DEV_MODE=false', async ({
     page,
   }) => {
+    test.skip(!LIVE_BACKEND, 'DEV_MODE intentionally emits "Falling back to DEV MODE" warning — requires VITE_DEV_MODE=false');
     const warnings: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'warning' || msg.type() === 'warn')
@@ -128,6 +132,10 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Keycloak — login page', () => {
+  test.beforeEach(() => {
+    test.skip(!LIVE_BACKEND, 'Login page UI requires VITE_DEV_MODE=false (DEV_MODE redirects to /dashboard)');
+  });
+
   test('shows EduSphere branding and Sign In button', async ({ page }) => {
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
@@ -158,6 +166,10 @@ test.describe('Keycloak — login page', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Keycloak — full login flow', () => {
+  test.beforeEach(() => {
+    test.skip(!LIVE_BACKEND, 'Full Keycloak login flow requires VITE_DEV_MODE=false and running Keycloak');
+  });
+
   test('student can log in and reach the dashboard', async ({ page }) => {
     await page.goto('/login');
     await page.waitForLoadState('domcontentloaded');
@@ -232,6 +244,10 @@ test.describe('Keycloak — full login flow', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Keycloak — protected routes', () => {
+  test.beforeEach(() => {
+    test.skip(!LIVE_BACKEND, 'Protected route redirect requires VITE_DEV_MODE=false (DEV_MODE is always authenticated)');
+  });
+
   test('unauthenticated user visiting /dashboard is redirected to /login', async ({
     page,
   }) => {

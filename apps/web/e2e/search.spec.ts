@@ -48,7 +48,13 @@ async function loginViaKeycloak(page: Page): Promise<void> {
 
 test.describe('Search — page load and empty state', () => {
   test.beforeEach(async ({ page }) => {
-    await loginViaKeycloak(page);
+    if (process.env.VITE_DEV_MODE !== 'false') {
+      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+    } else {
+      await loginViaKeycloak(page);
+    }
   });
   test('search page loads with empty state when no query is provided', async ({
     page,
@@ -84,7 +90,13 @@ test.describe('Search — page load and empty state', () => {
 
 test.describe('Search — keyboard shortcut', () => {
   test.beforeEach(async ({ page }) => {
-    await loginViaKeycloak(page);
+    if (process.env.VITE_DEV_MODE !== 'false') {
+      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+    } else {
+      await loginViaKeycloak(page);
+    }
   });
 
   test('Ctrl+K (or Cmd+K) from /dashboard opens the search page', async ({
@@ -130,7 +142,13 @@ test.describe('Search — keyboard shortcut', () => {
 
 test.describe('Search — results behaviour', () => {
   test.beforeEach(async ({ page }) => {
-    await loginViaKeycloak(page);
+    if (process.env.VITE_DEV_MODE !== 'false') {
+      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+    } else {
+      await loginViaKeycloak(page);
+    }
   });
 
   test('typing a query returns results within 1 second', async ({ page }) => {
@@ -219,7 +237,8 @@ test.describe('Search — results behaviour', () => {
   test('result count label shows correct number', async ({ page }) => {
     const searchPage = new SearchPage(page);
     await searchPage.goto();
-    await searchPage.searchFor('Rambam');
+    // Use 'Talmud' — guaranteed match in MOCK_COURSES (Introduction to Talmud Study)
+    await searchPage.searchFor('Talmud');
 
     // Result count label appears when query.length >= 2 and results > 0
     const countText = await searchPage.getResultCountText();

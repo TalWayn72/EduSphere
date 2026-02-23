@@ -18,7 +18,7 @@ import path from 'path';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 
@@ -105,7 +105,7 @@ function attachErrorListeners(page: Page, entry: PageReport): void {
   page.on('response', (res) => {
     if (res.status() >= 400) {
       const url = res.url();
-      if (url.includes('localhost') || url.includes('5175') || url.includes('4000') || url.includes('8080')) {
+      if (url.includes('localhost') || url.includes('4000') || url.includes('8080') || url.startsWith(BASE)) {
         // Skip Keycloak redirect/silent-sso responses that are expected non-200
         if (!url.includes('silent-check-sso') && !url.includes('login-status-iframe')) {
           entry.networkErrors.push(`HTTP ${res.status()} — ${url}`);
@@ -130,6 +130,13 @@ async function snap(page: Page, label: string): Promise<string> {
 }
 
 async function loginViaKeycloak(page: Page): Promise<void> {
+  if (process.env.VITE_DEV_MODE !== 'false') {
+    // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
+    await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    return;
+  }
+
   await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
 
   // The app shows "Initializing authentication..." while Keycloak.init() runs.
@@ -154,7 +161,7 @@ async function loginViaKeycloak(page: Page): Promise<void> {
   await page.click('#kc-login');
 
   // Wait for redirect back to app
-  await page.waitForURL(/localhost:5175/, { timeout: 30_000 });
+  await page.waitForURL(/localhost/, { timeout: 30_000 });
   // Wait for React router to settle on a real route
   await page.waitForURL(/\/(dashboard|courses|learn|agents|annotations|graph|profile|search)/, {
     timeout: 20_000,

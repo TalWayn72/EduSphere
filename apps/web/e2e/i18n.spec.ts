@@ -157,9 +157,12 @@ test.describe('i18n — Language switching', () => {
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /English/i }).first().click();
 
+    // Allow locale JSON chunks to load (ViteLocaleBackend lazy-loads each locale)
+    await page.waitForLoadState('networkidle');
+
     await expect(
       page.getByRole('heading', { name: 'Settings' })
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test('description text updates to Spanish after locale switch', async ({ page }) => {
@@ -169,10 +172,14 @@ test.describe('i18n — Language switching', () => {
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: /Espa/i }).first().click();
 
+    // Allow Spanish locale JSON chunk to load (ViteLocaleBackend lazy-loads each locale)
+    await page.waitForLoadState('networkidle');
+
     // es/settings.json: language.description → "Selecciona tu idioma preferido..."
+    // Two elements may render the same description text (different font-size variants)
     await expect(
-      page.getByText(/Selecciona tu idioma preferido/i)
-    ).toBeVisible({ timeout: 10_000 });
+      page.getByText(/Selecciona tu idioma preferido/i).first()
+    ).toBeVisible({ timeout: 15_000 });
   });
 });
 

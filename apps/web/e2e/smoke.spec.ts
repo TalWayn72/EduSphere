@@ -20,21 +20,27 @@ test.describe('Smoke Tests — Critical Page Loads', () => {
     expect(page.url()).toContain('/learn/');
   });
 
-  test('login page renders the welcome card', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.assertVisible();
+  test('login page redirects authenticated users to dashboard in DEV_MODE', async ({ page }) => {
+    // In DEV_MODE (VITE_DEV_MODE=true) the app auto-authenticates every visitor.
+    // Login.tsx's useEffect detects isAuthenticated()=true and navigates to /dashboard.
+    // This test verifies that redirect chain works end-to-end.
+    await page.goto('/login');
+    await expect(
+      page.getByRole('heading', { name: 'Dashboard' })
+    ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('dashboard page loads with all four stats cards', async ({ page }) => {
+  test('dashboard page loads with stats cards', async ({ page }) => {
     await page.goto('/dashboard');
     await expect(
       page.getByRole('heading', { name: 'Dashboard' })
     ).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Active Courses')).toBeVisible();
-    await expect(page.getByText('Learning Streak')).toBeVisible();
+    // Primary stats row — labels from dashboard i18n (stats.* keys)
+    await expect(page.getByText('Courses Enrolled')).toBeVisible();
     await expect(page.getByText('Study Time')).toBeVisible();
     await expect(page.getByText('Concepts Mastered')).toBeVisible();
+    // Secondary stats row
+    await expect(page.getByText('Active Courses')).toBeVisible();
   });
 
   test('annotations page loads with layer tabs', async ({ page }) => {

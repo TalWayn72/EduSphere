@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 
-const BASE = 'http://localhost:5175';
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const SHOTS = 'test-results/mobile-screenshots';
 
@@ -10,6 +10,12 @@ test.use({ viewport: { width: 390, height: 844 } }); // iPhone 14 Pro
 test.beforeAll(() => { fs.mkdirSync(SHOTS, { recursive: true }); });
 
 async function login(page: any) {
+  if (process.env.VITE_DEV_MODE !== 'false') {
+    // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
+    await page.goto(`${BASE}/`);
+    await page.waitForLoadState('networkidle');
+    return;
+  }
   await page.goto(`${BASE}/login`);
   await page.waitForFunction(() => !document.body.innerText.includes('Initializing'), { timeout: 15000 }).catch(() => {});
   const btn = page.locator('button', { hasText: /sign in/i }).first();
@@ -19,7 +25,7 @@ async function login(page: any) {
   await page.fill('#username', STUDENT.email);
   await page.fill('#password', STUDENT.password);
   await page.click('#kc-login');
-  await page.waitForURL(/localhost:5175/, { timeout: 20000 });
+  await page.waitForURL(new RegExp(BASE.replace(/^https?:\/\//, '').replace('.', '\\.')), { timeout: 20000 });
 }
 
 test('M-01 mobile hamburger menu visible', async ({ page }) => {

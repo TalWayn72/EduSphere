@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
-const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
 const INSTRUCTOR = {
   email: 'instructor@example.com',
   password: 'Instructor123!',
@@ -53,51 +53,58 @@ async function shot(page: Page, name: string): Promise<void> {
 }
 
 async function doLogin(browser: Browser): Promise<void> {
-  console.log('[login] Starting Keycloak login flow...');
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
 
-  await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3500);
-
-  const url = page.url();
-  console.log(`[login] Post-check-sso URL: ${url}`);
-
-  if (url.includes('localhost:5175') && !url.includes('/login')) {
-    console.log('[login] SSO session reused — already authenticated');
+  if (process.env.VITE_DEV_MODE !== 'false') {
+    // DEV_MODE: auto-authenticated — navigate to app and save (empty) storageState
+    console.log('[login] DEV_MODE: auto-authenticated, skipping Keycloak login');
+    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1000);
   } else {
-    await shot(page, '00-login-page-raw');
-    const bodyHTML = await page.evaluate(() => document.body.innerHTML);
-    console.log(`[login] Body HTML snippet: ${bodyHTML.slice(0, 300)}`);
+    console.log('[login] Starting Keycloak login flow...');
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(3500);
 
-    // Find the sign-in button
-    const btn = page.locator('button').filter({ hasText: /sign in/i }).first();
-    const vis = await btn.isVisible({ timeout: 8000 }).catch(() => false);
-    if (!vis) {
-      // List all buttons
-      const all = await page.locator('button').all();
-      for (const b of all) {
-        const t = await b.textContent().catch(() => '');
-        console.log(`  button: "${t?.trim()}"`);
+    const url = page.url();
+    console.log(`[login] Post-check-sso URL: ${url}`);
+
+    if (!url.includes('/login') && !url.includes('8080/realms')) {
+      console.log('[login] SSO session reused — already authenticated');
+    } else {
+      await shot(page, '00-login-page-raw');
+      const bodyHTML = await page.evaluate(() => document.body.innerHTML);
+      console.log(`[login] Body HTML snippet: ${bodyHTML.slice(0, 300)}`);
+
+      // Find the sign-in button
+      const btn = page.locator('button').filter({ hasText: /sign in/i }).first();
+      const vis = await btn.isVisible({ timeout: 8000 }).catch(() => false);
+      if (!vis) {
+        // List all buttons for debugging
+        const all = await page.locator('button').all();
+        for (const b of all) {
+          const t = await b.textContent().catch(() => '');
+          console.log(`  button: "${t?.trim()}"`);
+        }
+        console.warn('[login] Sign In button not found — may already be authenticated');
+      } else {
+        console.log('[login] Clicking Sign In with Keycloak...');
+        await btn.click();
+        await page.waitForURL(/localhost:8080/, { timeout: 20_000 });
+        console.log(`[login] Keycloak: ${page.url()}`);
+
+        await page.locator('#username').waitFor({ state: 'visible', timeout: 10_000 });
+        await shot(page, '01-keycloak-form');
+        await page.fill('#username', INSTRUCTOR.email);
+        await page.fill('#password', INSTRUCTOR.password);
+        await page.click('#kc-login');
+
+        await page.waitForURL(/localhost/, { timeout: 25_000 });
+        await page.waitForTimeout(2500);
+        console.log(`[login] Back on app: ${page.url()}`);
+        await shot(page, '02-post-login-app');
       }
-      throw new Error('Sign In button not found on /login page');
     }
-
-    console.log('[login] Clicking Sign In with Keycloak...');
-    await btn.click();
-    await page.waitForURL(/localhost:8080/, { timeout: 20_000 });
-    console.log(`[login] Keycloak: ${page.url()}`);
-
-    await page.locator('#username').waitFor({ state: 'visible', timeout: 10_000 });
-    await shot(page, '01-keycloak-form');
-    await page.fill('#username', INSTRUCTOR.email);
-    await page.fill('#password', INSTRUCTOR.password);
-    await page.click('#kc-login');
-
-    await page.waitForURL(/localhost:5175/, { timeout: 25_000 });
-    await page.waitForTimeout(2500);
-    console.log(`[login] Back on app: ${page.url()}`);
-    await shot(page, '02-post-login-app');
   }
 
   ensureDir(path.dirname(SESSION_FILE));
