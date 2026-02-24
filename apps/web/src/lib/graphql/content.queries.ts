@@ -104,6 +104,8 @@ export const CONFIRM_MEDIA_UPLOAD_MUTATION = gql`
   }
 `;
 
+export const UPDATE_MEDIA_ALT_TEXT_MUTATION = gql;
+
 export const CREATE_COURSE_MUTATION = gql`
   mutation CreateCourse($input: CreateCourseInput!) {
     createCourse(input: $input) {
@@ -163,5 +165,31 @@ export const MY_COURSE_PROGRESS_QUERY = gql`
 export const MARK_CONTENT_VIEWED_MUTATION = gql`
   mutation MarkContentViewed($contentItemId: ID!) {
     markContentViewed(contentItemId: $contentItemId)
+  }
+`;
+
+export const COURSE_ANALYTICS_QUERY = gql`
+  query CourseAnalytics($courseId: ID!) {
+    courseAnalytics(courseId: $courseId) {
+      courseId
+      enrollmentCount
+      activeLearnersLast7Days
+      completionRate
+      avgQuizScore
+      contentItemMetrics {
+        contentItemId
+        title
+        viewCount
+        avgTimeSpentSeconds
+        completionRate
+      }
+      dropOffFunnel {
+        moduleId
+        moduleName
+        learnersStarted
+        learnersCompleted
+        dropOffRate
+      }
+    }
   }
 `;

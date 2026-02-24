@@ -1977,9 +1977,9 @@ const user = await withTenantContext(tenantId, userId, role, async () => {
 ## Related Documents
 
 - [CLAUDE.md](../../CLAUDE.md) — AI assistant configuration and work rules
-- [IMPLEMENTATION-ROADMAP.md](../../IMPLEMENTATION-ROADMAP.md) — Phased build plan
-- [API-CONTRACTS-GRAPHQL-FEDERATION.md](../api/API-CONTRACTS-GRAPHQL-FEDERATION.md) — GraphQL schema definitions
-- [DATABASE-SCHEMA.md](../database/DATABASE-SCHEMA.md) — Database design and RLS policies
+- [IMPLEMENTATION_ROADMAP.md](../../IMPLEMENTATION_ROADMAP.md) — Phased build plan
+- [API_CONTRACTS_GRAPHQL_FEDERATION.md](../api/API_CONTRACTS_GRAPHQL_FEDERATION.md) — GraphQL schema definitions
+- [docs/database/DATABASE_SCHEMA.md](../database/DATABASE_SCHEMA.md) — Database design and RLS policies
 - [OPEN_ISSUES.md](../../OPEN_ISSUES.md) — Issue tracking
 
 ---

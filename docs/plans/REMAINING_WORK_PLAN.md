@@ -77,7 +77,7 @@ Files updated:
 **Being created by:** Agent a6b52e7
 
 - [ ] `docs/security/LIA_SECURITY_MONITORING.md`
-- [ ] `docs/security/LIA_ANALYTICS.md`
+- [ ] `docs/security/LIA_PLATFORM_ANALYTICS.md`
 
 ### B3. Breach Register 🟡 IN PROGRESS
 **Being created by:** Agent a6b52e7
@@ -174,14 +174,14 @@ Files created:
 |---------|--------|
 | `docs/legal/DPA_TEMPLATE.md` | 🟡 In progress (Agent a6b52e7) |
 | `docs/security/LIA_SECURITY_MONITORING.md` | 🟡 In progress |
-| `docs/security/LIA_ANALYTICS.md` | 🟡 In progress |
+| `docs/security/LIA_PLATFORM_ANALYTICS.md` | 🟡 In progress |
 | `docs/security/BREACH_REGISTER.md` | 🟡 In progress |
 | `docs/deployment/DR_TEST_RESULTS.md` | 🟡 In progress |
 | `docs/deployment/READ_REPLICAS.md` | ✅ Created |
-| `docs/security/SUBPROCESSORS.md` | ✅ Created |
+| `docs/security/SUBPROCESSOR_REGISTER.md` | ✅ Created |
 | `docs/security/VENDOR_REGISTER.md` | ✅ Created |
 | `docs/security/DPIA_TEMPLATE.md` | ✅ Created |
-| `docs/security/PROCESSING_ACTIVITIES.md` | ✅ Created |
+| `docs/security/GDPR_PROCESSING_ACTIVITIES.md` | ✅ Created |
 | `docs/security/CRYPTO_INVENTORY.md` | ✅ Created |
 | `docs/ai/MODEL_CARDS.md` | ✅ Created |
 | `docs/security/INCIDENT_RESPONSE.md` | ✅ Created |

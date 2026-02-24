@@ -1,0 +1,13 @@
+type Certificate {
+  id: ID!
+  courseId: ID!
+  courseName: String!
+  issuedAt: String!
+  verificationCode: String!
+  pdfUrl: String
+}
+
+extend type Query {
+  myCertificates: [Certificate!]! @authenticated
+  verifyCertificate(code: String!): Certificate
+}

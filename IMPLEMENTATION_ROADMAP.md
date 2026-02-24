@@ -11,8 +11,8 @@
 > horizontal scaling, connection pooling, caching, and fault isolation from Phase 0.
 
 > **Reference Documents** (must be loaded before any phase begins):
-> - `DATABASE-SCHEMA.md` — single source of truth for all tables, RLS, graph, embeddings
-> - `API-CONTRACTS-GRAPHQL-FEDERATION.md` — single source of truth for all GraphQL types, queries, mutations, subscriptions
+> - `docs/database/DATABASE_SCHEMA.md` — single source of truth for all tables, RLS, graph, embeddings
+> - `API_CONTRACTS_GRAPHQL_FEDERATION.md` — single source of truth for all GraphQL types, queries, mutations, subscriptions
 > - `EduSphere_Claude.pdf` — architecture guide and technology decisions
 > - `EduSphere_DB.pdf` — database design deep-dive
 
@@ -219,7 +219,7 @@ pnpm --filter @edusphere/graphql-shared build  # exits 0
    # MinIO reachable, Jaeger UI responds
    ```
 5. Create SQL init script (`infrastructure/docker/postgres-age/init.sql`):
-   - Per DATABASE-SCHEMA.md §2: Create extensions (uuid-ossp, pgcrypto, age, vector)
+   - Per docs/database/DATABASE_SCHEMA.md §2: Create extensions (uuid-ossp, pgcrypto, age, vector)
    - Create `edusphere_graph` via `SELECT create_graph('edusphere_graph')`
    - Create `edusphere_app` role
    - Grant AGE permissions
@@ -296,7 +296,7 @@ curl -sf http://localhost:4000/graphql \
 
 **Tasks**:
 1. Create `packages/db/` with Drizzle ORM configuration
-2. Implement **every table** from DATABASE-SCHEMA.md §4–§8:
+2. Implement **every table** from docs/database/DATABASE_SCHEMA.md §4–§8:
    - `packages/db/src/schema/_shared.ts` — pk(), tenantId(), timestamps(), softDelete(), enums
    - `packages/db/src/schema/core.ts` — tenants, users
    - `packages/db/src/schema/content.ts` — courses, modules, media_assets, transcripts, transcript_segments
@@ -305,13 +305,13 @@ curl -sf http://localhost:4000/graphql \
    - `packages/db/src/schema/agent.ts` — agent_definitions, agent_executions
    - `packages/db/src/schema/embeddings.ts` — content_embeddings, annotation_embeddings, concept_embeddings
 3. Enable RLS on all user-facing tables using `pgTable.withRLS()`
-4. Define all indexes per DATABASE-SCHEMA.md:
+4. Define all indexes per docs/database/DATABASE_SCHEMA.md:
    - B-tree indexes on `tenant_id` + commonly filtered columns
    - GIN indexes on `tags` (jsonb), `metadata` (jsonb)
    - HNSW indexes on embedding vectors (cosine distance, m=16, ef_construction=64)
    - Partial index on `deleted_at IS NULL` for all soft-delete tables
 
-**Reference**: DATABASE-SCHEMA.md §3–§8 (exact column names, types, constraints)
+**Reference**: docs/database/DATABASE_SCHEMA.md §3–§8 (exact column names, types, constraints)
 
 **Acceptance Criteria**:
 ```bash
@@ -334,7 +334,7 @@ docker exec edusphere-postgres psql -U postgres -d edusphere -c "
 ### Phase 1.2: Row-Level Security Policies
 
 **Tasks**:
-1. Implement RLS policies per DATABASE-SCHEMA.md §9:
+1. Implement RLS policies per docs/database/DATABASE_SCHEMA.md §9:
    - Every tenant-isolated table: `USING (tenant_id = current_setting('app.current_tenant')::uuid)`
    - Users table additional policy: super_admin sees all tenants
    - Annotations: owner-only for PERSONAL layer, shared for SHARED/INSTRUCTOR/AI_GENERATED
@@ -370,13 +370,13 @@ pnpm --filter @edusphere/db test -- --testPathPattern=tenant-isolation  # all gr
 ### Phase 1.3: Apache AGE Graph Ontology
 
 **Tasks**:
-1. Create `packages/db/src/graph/` with helpers from DATABASE-SCHEMA.md §15:
+1. Create `packages/db/src/graph/` with helpers from docs/database/DATABASE_SCHEMA.md §15:
    - `client.ts` — `executeCypher()`, `addVertex()`, `addEdge()`
    - `ontology.ts` — graph creation, vertex label setup
 2. Initialize vertex labels: Concept, Person, Term, Source, TopicCluster
 3. Initialize edge labels: RELATED_TO, CONTRADICTS, PREREQUISITE_OF, MENTIONS, CITES, AUTHORED_BY, INFERRED_RELATED, REFERS_TO, DERIVED_FROM, BELONGS_TO
 4. All vertices carry: `id` (UUID), `tenant_id`, `created_at`, `updated_at`
-5. Edge-specific properties per DATABASE-SCHEMA.md §10
+5. Edge-specific properties per docs/database/DATABASE_SCHEMA.md §10
 
 **Acceptance Criteria**:
 ```bash
@@ -396,7 +396,7 @@ pnpm --filter @edusphere/db test -- --testPathPattern=graph  # all green
 ### Phase 1.4: Seed Data
 
 **Tasks**:
-1. Implement seed script per DATABASE-SCHEMA.md §14:
+1. Implement seed script per docs/database/DATABASE_SCHEMA.md §14:
    - Default tenant with known UUID
    - Admin user + student user
    - Sample course with modules
@@ -1365,7 +1365,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 - [ ] README.md updated for new packages/apps
 - [ ] API-CONTRACTS.md updated for schema changes
-- [ ] DATABASE-SCHEMA.md updated for table changes
+- [ ] docs/database/DATABASE_SCHEMA.md updated for table changes
 - [ ] OpenAPI/GraphQL introspection endpoint accessible
 - [ ] Architecture Decision Records (ADRs) for significant decisions
 
@@ -1417,7 +1417,7 @@ When starting a new session, Claude Code should run:
 
 ```bash
 # 1. Load all reference documents
-cat DATABASE-SCHEMA.md API-CONTRACTS-GRAPHQL-FEDERATION.md
+cat docs/database/DATABASE_SCHEMA.md API_CONTRACTS_GRAPHQL_FEDERATION.md
 
 # 2. Check current progress
 git log --oneline -20
@@ -1455,6 +1455,6 @@ pnpm turbo test 2>/dev/null
 > - **Never skip phases.** Each phase builds on the previous one.
 > - **Run acceptance criteria before proceeding.** Green output = permission to advance.
 > - **Report progress every 3 minutes** using the format above.
-> - **Reference API-CONTRACTS and DATABASE-SCHEMA** for every type, field, and resolver.
+> - **Reference API-CONTRACTS and DATABASE_SCHEMA** for every type, field, and resolver.
 > - **No deviation** from the locked technology stack without updating this document.
 > - **Test everything.** No untested code enters the repository.

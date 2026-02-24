@@ -123,7 +123,7 @@ The Processor shall implement and maintain appropriate technical and organisatio
 
 ### 6.4 Sub-processor Obligations (Art.28(3)(d))
 
-The Processor shall not engage another processor (sub-processor) without prior written authorisation of the Controller. The Controller hereby grants general written authorisation for the sub-processors listed in docs/security/SUBPROCESSORS.md.
+The Processor shall not engage another processor (sub-processor) without prior written authorisation of the Controller. The Controller hereby grants general written authorisation for the sub-processors listed in docs/security/SUBPROCESSOR_REGISTER.md.
 
 ### 6.5 Data Subject Rights Assistance (Art.28(3)(e))
 
@@ -170,7 +170,7 @@ The Processor shall make available to the Controller all information necessary t
 
 ### 7.1 Authorised Sub-processors
 
-The Controller provides general authorisation for the Processor to engage the sub-processors listed in docs/security/SUBPROCESSORS.md.
+The Controller provides general authorisation for the Processor to engage the sub-processors listed in docs/security/SUBPROCESSOR_REGISTER.md.
 
 ### 7.2 Change Notification
 
@@ -269,7 +269,7 @@ Where processing involves a transfer of personal data to a third country (outsid
 - Adequacy decisions (where applicable)
 - Binding Corporate Rules (where applicable)
 
-Details are specified in the Sub-processor register (docs/security/SUBPROCESSORS.md).
+Details are specified in the Sub-processor register (docs/security/SUBPROCESSOR_REGISTER.md).
 
 ---
 

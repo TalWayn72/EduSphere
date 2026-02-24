@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Clock, Users, Plus, Globe, EyeOff, CheckCircle2, Loader2, AlertTriangle, Pencil } from 'lucide-react';
+import { BookOpen, Clock, Users, Plus, Globe, EyeOff, CheckCircle2, Loader2, AlertTriangle, Pencil, Sparkles } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { COURSES_QUERY } from '@/lib/queries';
 import {
@@ -13,6 +13,7 @@ import {
   ENROLL_COURSE_MUTATION,
   UNENROLL_COURSE_MUTATION,
 } from '@/lib/graphql/content.queries';
+import { AiCourseCreatorModal } from '@/components/AiCourseCreatorModal';
 
 const INSTRUCTOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
@@ -128,6 +129,7 @@ export function CourseList() {
 
   const [localPublishState, setLocalPublishState] = useState<Map<string, boolean>>(new Map());
   const [toast, setToast] = useState<string | null>(null);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Cleanup toast timeout on unmount
@@ -216,10 +218,16 @@ export function CourseList() {
             </p>
           </div>
           {isInstructor && (
-            <Button onClick={() => navigate('/courses/new')} className="gap-2 shrink-0">
-              <Plus className="h-4 w-4" />
-              {t('newCourse')}
-            </Button>
+            <div className="flex gap-2 shrink-0">
+              <Button variant="outline" onClick={() => setAiModalOpen(true)} className="gap-2">
+                <Sparkles className="h-4 w-4" />
+                AI Create Course
+              </Button>
+              <Button onClick={() => navigate('/courses/new')} className="gap-2">
+                <Plus className="h-4 w-4" />
+                {t('newCourse')}
+              </Button>
+            </div>
           )}
         </div>
 
@@ -351,6 +359,7 @@ export function CourseList() {
           </Card>
         )}
       </div>
+      <AiCourseCreatorModal open={aiModalOpen} onClose={() => setAiModalOpen(false)} />
     </Layout>
   );
 }

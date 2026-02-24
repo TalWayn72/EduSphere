@@ -219,7 +219,7 @@
 - [x] **CLAUDE.md** - AI assistant onboarding and project overview
 - [x] **README.md** - Project introduction and setup guide
 - [x] **OPEN_ISSUES.md** - Known issues and technical debt tracking
-- [x] **PRD.md** - Product Requirements Document
+- [x] **PRODUCT_REQUIREMENTS.md** - Product Requirements Document
 - [x] **ARCHITECTURE.md** - System architecture and design patterns
 - [x] **DATABASE_SCHEMA.md** - Complete database schema with relationships
 - [x] **SECURITY_CHECKLIST.md** - Security best practices and compliance
@@ -609,7 +609,7 @@
 
 ### Key Documents Reference
 - **Technical Overview:** `docs/CLAUDE.md`
-- **Product Requirements:** `docs/PRD.md`
+- **Product Requirements:** `docs/PRODUCT_REQUIREMENTS.md`
 - **System Architecture:** `docs/ARCHITECTURE.md`
 - **Database Design:** `docs/DATABASE_SCHEMA.md`
 - **Security Standards:** `docs/SECURITY_CHECKLIST.md`

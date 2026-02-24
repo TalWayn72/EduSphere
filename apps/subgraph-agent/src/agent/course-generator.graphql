@@ -1,0 +1,25 @@
+input GenerateCourseInput {
+  prompt: String!
+  targetAudienceLevel: String
+  estimatedHours: Int
+  language: String
+}
+
+type GeneratedModule {
+  title: String!
+  description: String!
+  contentItemTitles: [String!]!
+}
+
+type CourseGenerationResult {
+  executionId: ID!
+  status: String!
+  courseTitle: String
+  courseDescription: String
+  modules: [GeneratedModule!]!
+  draftCourseId: ID
+}
+
+extend type Mutation {
+  generateCourseFromPrompt(input: GenerateCourseInput!): CourseGenerationResult! @authenticated
+}

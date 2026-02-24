@@ -32,7 +32,7 @@
 **מטרה:** מסד נתונים מלא עם RLS + Apache AGE + pgvector
 
 **משימות:**
-1. ✅ **Create 16 PostgreSQL tables** (DATABASE-SCHEMA.md)
+1. ✅ **Create 16 PostgreSQL tables** (docs/database/DATABASE_SCHEMA.md)
    - Users, Tenants, Courses, Modules, Lessons
    - MediaAssets, Transcripts, TranscriptSegments
    - Annotations, AnnotationThreads
@@ -609,7 +609,7 @@
 ## 🎬 Next Steps
 
 ### Immediate Actions (התחל מחר!)
-1. **Day 1 Morning:** Create all 16 database tables (DATABASE-SCHEMA.md)
+1. **Day 1 Morning:** Create all 16 database tables (docs/database/DATABASE_SCHEMA.md)
 2. **Day 1 Afternoon:** Initialize Apache AGE graph + pgvector
 3. **Day 2 Morning:** Seed demo data (2 tenants, 10 users, 5 courses)
 4. **Day 2 Afternoon:** Setup Keycloak realm + test JWT

@@ -1,8 +1,9 @@
-import { Injectable, Logger, InternalServerErrorException, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException, OnModuleDestroy, NotFoundException } from '@nestjs/common';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import { connect, StringCodec } from 'nats';
+import { eq } from 'drizzle-orm';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 
 const PRESIGNED_URL_EXPIRY_SECONDS = 900; // 15 minutes
@@ -161,6 +162,38 @@ export class MediaService implements OnModuleDestroy {
    * Generates a short-lived presigned URL for the HLS master manifest stored
    * at `hlsManifestKey` in MinIO.  Returns null if the key is absent.
    */
+
+  async updateAltText(mediaId: string, altText: string, tenantId: string): Promise<MediaAssetResult> {
+    const [updated] = await this.db
+      .update(schema.media_assets)
+      .set({ alt_text: altText })
+      .where(eq(schema.media_assets.id, mediaId))
+      .returning();
+    if (!updated) {
+      throw new NotFoundException('Media asset ' + mediaId + ' not found');
+    }
+    this.logger.log('Alt-text updated: mediaId=' + mediaId + ' tenant=' + tenantId);
+    let downloadUrl: string | null = null;
+    try {
+      downloadUrl = await this.getPresignedDownloadUrl(updated.file_url);
+    } catch {
+      this.logger.warn('Could not generate download URL for asset ' + mediaId);
+    }
+    const contentType = this.extractContentTypeFromKey(updated.file_url);
+    return {
+      id: updated.id,
+      courseId: updated.course_id ?? '',
+      fileKey: updated.file_url,
+      title: updated.title,
+      contentType,
+      status: 'READY',
+      downloadUrl,
+      hlsManifestUrl: null,
+      captionsUrl: null,
+      altText: updated.alt_text ?? null,
+    };
+  }
+
   async getHlsManifestUrl(hlsManifestKey: string | null): Promise<string | null> {
     if (!hlsManifestKey) return null;
     try {
@@ -183,12 +216,12 @@ export class MediaService implements OnModuleDestroy {
     let nc;
     try {
       nc = await connect({ servers: natsUrl });
-      nc.publish('media.uploaded', this.sc.encode(JSON.stringify(payload)));
+      nc.publish('EDUSPHERE.media.uploaded', this.sc.encode(JSON.stringify(payload)));
       await nc.flush();
-      this.logger.debug(`Published media.uploaded: assetId=${payload.assetId}`);
+      this.logger.debug(`Published EDUSPHERE.media.uploaded: assetId=${payload.assetId}`);
     } catch (err) {
       // Non-fatal: transcription failure does not block upload confirmation
-      this.logger.error('Failed to publish media.uploaded to NATS', err);
+      this.logger.error('Failed to publish EDUSPHERE.media.uploaded to NATS', err);
     } finally {
       if (nc) await nc.close().catch(() => undefined);
     }

@@ -1,0 +1,34 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@authenticated"])
+
+"""
+An SM-2 spaced-repetition review card tracking when a concept is next due.
+"""
+type SRSCard {
+  id: ID!
+  conceptName: String!
+  dueDate: DateTime!
+  intervalDays: Int!
+  easeFactor: Float!
+  repetitions: Int!
+  lastReviewedAt: DateTime
+}
+
+extend type Query {
+  """Return cards that are due for review now (dueDate <= current time)."""
+  dueReviews(limit: Int): [SRSCard!]! @authenticated
+
+  """Count of cards currently due — used by the Dashboard badge."""
+  srsQueueCount: Int! @authenticated
+}
+
+extend type Mutation {
+  """
+  Record a review result using the SM-2 quality scale (0–5) and return
+  the updated card with its new due date and interval.
+  """
+  submitReview(cardId: ID!, quality: Int!): SRSCard! @authenticated
+
+  """Create a new spaced-repetition card for the authenticated user."""
+  createReviewCard(conceptName: String!): SRSCard! @authenticated
+}

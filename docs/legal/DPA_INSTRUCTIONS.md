@@ -88,9 +88,9 @@ A new DPA must be executed or the existing DPA must be amended in the following 
 
 | Trigger | Action | Timeline |
 |---------|--------|----------|
-| New sub-processor added to docs/security/SUBPROCESSORS.md | Send change notification to all clients at CLIENT_CONTACT_EMAIL | 30 days before activation |
-| Sub-processor removed | Update SUBPROCESSORS.md; notify clients | Within 14 days |
-| Sub-processor changes data transfer mechanism | Update SUBPROCESSORS.md and DPA Annex if applicable | Before change |
+| New sub-processor added to docs/security/SUBPROCESSOR_REGISTER.md | Send change notification to all clients at CLIENT_CONTACT_EMAIL | 30 days before activation |
+| Sub-processor removed | Update SUBPROCESSOR_REGISTER.md; notify clients | Within 14 days |
+| Sub-processor changes data transfer mechanism | Update SUBPROCESSOR_REGISTER.md and DPA Annex if applicable | Before change |
 
 ### Scope Changes
 

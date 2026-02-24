@@ -9,6 +9,9 @@ import { ContentItemModule } from './content-item/content-item.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
 import { TranslationModule } from './translation/translation.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { LiveSessionModule } from './live-session/live-session.module';
+import { QuizModule } from './quiz/quiz.module';
 
 @Module({
   imports: [
@@ -42,6 +45,9 @@ import { TranslationModule } from './translation/translation.module';
     MediaModule,
     ContentItemModule,
     TranslationModule,
+    AnalyticsModule,
+    LiveSessionModule,
+    QuizModule,
   ],
 })
 export class AppModule {}

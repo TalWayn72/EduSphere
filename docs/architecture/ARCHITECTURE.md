@@ -2401,9 +2401,9 @@ spec:
 
 ### 12.1 Internal Documentation
 
-- **IMPLEMENTATION-ROADMAP.md**: Phased build plan with acceptance criteria
-- **API-CONTRACTS-GRAPHQL-FEDERATION.md**: Complete GraphQL schema definitions
-- **DATABASE-SCHEMA.md**: PostgreSQL tables, RLS policies, Apache AGE ontology
+- **IMPLEMENTATION_ROADMAP.md**: Phased build plan with acceptance criteria
+- **API_CONTRACTS_GRAPHQL_FEDERATION.md**: Complete GraphQL schema definitions
+- **docs/database/DATABASE_SCHEMA.md**: PostgreSQL tables, RLS policies, Apache AGE ontology
 - **CLAUDE.md**: AI assistant configuration and development protocols
 
 ---
@@ -2472,11 +2472,11 @@ EduSphere's architecture balances **simplicity** (PostgreSQL maximalism, schema-
 
 ---
 
-**For Implementation Details**: See [IMPLEMENTATION-ROADMAP.md](../plans/IMPLEMENTATION-ROADMAP.md) for phased build plan with acceptance criteria.
+**For Implementation Details**: See [IMPLEMENTATION_ROADMAP.md](../plans/IMPLEMENTATION_ROADMAP.md) for phased build plan with acceptance criteria.
 
-**For API Contracts**: See [API-CONTRACTS-GRAPHQL-FEDERATION.md](../api/API-CONTRACTS-GRAPHQL-FEDERATION.md) for complete GraphQL schema definitions.
+**For API Contracts**: See [API_CONTRACTS_GRAPHQL_FEDERATION.md](../api/API_CONTRACTS_GRAPHQL_FEDERATION.md) for complete GraphQL schema definitions.
 
-**For Database Schema**: See DATABASE-SCHEMA.md for PostgreSQL tables, RLS policies, and Apache AGE ontology (to be created in Phase 1).
+**For Database Schema**: See docs/database/DATABASE_SCHEMA.md for PostgreSQL tables, RLS policies, and Apache AGE ontology (to be created in Phase 1).
 
 ---
 

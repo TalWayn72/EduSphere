@@ -6,8 +6,8 @@ This document defines the **comprehensive testing strategy** for EduSphere, a pr
 
 **Reference Documents:**
 - `CLAUDE.md` — Testing section (§Testing Requirements)
-- `IMPLEMENTATION-ROADMAP.md` — Phase-by-phase testing acceptance criteria
-- `API-CONTRACTS-GRAPHQL-FEDERATION.md` — GraphQL schema contract
+- `IMPLEMENTATION_ROADMAP.md` — Phase-by-phase testing acceptance criteria
+- `API_CONTRACTS_GRAPHQL_FEDERATION.md` — GraphQL schema contract
 
 ---
 
@@ -2931,5 +2931,5 @@ it('should delete course', async () => { /* ... */ });
 
 For questions or clarifications, refer to:
 - `CLAUDE.md` — AI assistant configuration
-- `IMPLEMENTATION-ROADMAP.md` — Phase-by-phase testing acceptance criteria
-- `API-CONTRACTS-GRAPHQL-FEDERATION.md` — GraphQL schema contracts
+- `IMPLEMENTATION_ROADMAP.md` — Phase-by-phase testing acceptance criteria
+- `API_CONTRACTS_GRAPHQL_FEDERATION.md` — GraphQL schema contracts

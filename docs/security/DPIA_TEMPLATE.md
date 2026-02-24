@@ -162,5 +162,5 @@ _What data could be removed without affecting the purpose?_
 - [ ] Risk treatments documented (Section 3.2)
 - [ ] Security measures verified (Section 4)
 - [ ] DPO review completed (Section 5)
-- [ ] Records of Processing updated (PROCESSING_ACTIVITIES.md)
+- [ ] Records of Processing updated (GDPR_PROCESSING_ACTIVITIES.md)
 - [ ] Project team informed of approved conditions

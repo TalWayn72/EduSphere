@@ -128,4 +128,4 @@ All changes are recorded in:
 - [INCIDENT_RESPONSE_POLICY.md](./INCIDENT_RESPONSE_POLICY.md)
 - [docs/security/INCIDENT_RESPONSE.md](../security/INCIDENT_RESPONSE.md)
 - `.github/workflows/ci.yml`
-- `IMPLEMENTATION-ROADMAP.md`
+- `IMPLEMENTATION_ROADMAP.md`

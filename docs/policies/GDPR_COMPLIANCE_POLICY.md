@@ -118,7 +118,7 @@ Notification must include:
 
 ## 9. Records of Processing Activities (Art.30)
 
-Maintained in `docs/security/PROCESSING_ACTIVITIES.md`:
+Maintained in `docs/security/GDPR_PROCESSING_ACTIVITIES.md`:
 - Purpose, legal basis, data categories for each processing activity
 - Recipients and transfers
 - Retention periods

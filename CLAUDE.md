@@ -25,7 +25,7 @@
 > - Security & compliance docs → `docs/security/`
 > - Architecture decisions → `docs/architecture/`
 > - ISMS & ISO documents → `docs/isms/`
-> - API contracts → `API-CONTRACTS-GRAPHQL-FEDERATION.md` (root)
+> - API contracts → `API_CONTRACTS_GRAPHQL_FEDERATION.md` (root)
 > - All others → `docs/<relevant-subfolder>/`
 >
 > **Enforcement:** When plan mode writes a plan file, immediately move it to the project before any other work. Check with `ls docs/plans/` that the file is in the correct location.
@@ -104,7 +104,7 @@
 6. **All DB queries via Drizzle** - Never raw SQL (except Apache AGE Cypher queries via graph helpers)
 7. **Document every task** in `OPEN_ISSUES.md` with status tracking
 8. **Update docs at end of each task** - Keep CLAUDE.md, README.md, OPEN_ISSUES.md in sync
-9. **Never skip phases** - IMPLEMENTATION-ROADMAP.md defines strict phase order with acceptance criteria
+9. **Never skip phases** - IMPLEMENTATION_ROADMAP.md defines strict phase order with acceptance criteria
 10. **Test everything** - No untested code enters repository
 11. **Security-first** - RLS validation, JWT scopes, input sanitization, no secrets in code
 12. **Parallel execution mandatory** - Split every task into sub-tasks whenever possible and run Agents/Workers in parallel for maximum efficiency
@@ -646,14 +646,14 @@ Task: Implement Core + Content Subgraphs
 
 ## Phase Execution Protocol
 
-**CRITICAL:** This project follows IMPLEMENTATION-ROADMAP.md strictly.
+**CRITICAL:** This project follows IMPLEMENTATION_ROADMAP.md strictly.
 
 ### Phase Rules
 1. **Never skip phases** - Each phase builds on the previous one
 2. **Run acceptance criteria before proceeding** - Green output = permission to advance
-3. **Reference API-CONTRACTS and DATABASE-SCHEMA** - Single source of truth
+3. **Reference API-CONTRACTS and DATABASE_SCHEMA** - Single source of truth
 4. **Report progress every 3 minutes** - Use Agent Orchestration Protocol format
-5. **No deviation from locked tech stack** - Update IMPLEMENTATION-ROADMAP.md if changes needed
+5. **No deviation from locked tech stack** - Update IMPLEMENTATION_ROADMAP.md if changes needed
 
 ### Quality Gates (Enforced at every phase boundary)
 ```bash
@@ -704,8 +704,8 @@ pnpm audit --audit-level=high
 | `CLAUDE.md` | Work rules change, tech stack update | AI instructions, commands, patterns |
 | `README.md` | Stats/numbers change, new feature added | Test counts, phase status, architecture diagram |
 | `OPEN_ISSUES.md` | Every task/bug start or completion | Status, severity, files, problem, solution |
-| `IMPLEMENTATION-ROADMAP.md` | Phase acceptance criteria change | Tasks, acceptance criteria, commands |
-| `API-CONTRACTS-GRAPHQL-FEDERATION.md` | GraphQL schema change | Types, queries, mutations, subscriptions |
+| `IMPLEMENTATION_ROADMAP.md` | Phase acceptance criteria change | Tasks, acceptance criteria, commands |
+| `API_CONTRACTS_GRAPHQL_FEDERATION.md` | GraphQL schema change | Types, queries, mutations, subscriptions |
 
 ## VS Code Extensions
 

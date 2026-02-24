@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { urqlClient } from '@/lib/urql-client';
 import { PRESIGNED_UPLOAD_QUERY, CONFIRM_MEDIA_UPLOAD_MUTATION } from '@/lib/graphql/content.queries';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
+import { AltTextModal } from '@/components/AltTextModal';
 
 interface Props {
   courseId: string;
@@ -38,6 +39,7 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
   const { t } = useTranslation('courses');
   const inputRef = useRef<HTMLInputElement>(null);
   const [entries, setEntries] = useState<FileUploadEntry[]>([]);
+  const [altTextTarget, setAltTextTarget] = useState<{ mediaId: string; altText: string | null } | null>(null);
 
   const updateEntry = (index: number, patch: Partial<FileUploadEntry>) => {
     setEntries((prev) => prev.map((e, i) => (i === index ? { ...e, ...patch } : e)));
@@ -234,6 +236,24 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
           aria-label="Select files to upload"
         />
       </div>
-    </div>
+    
+      {/* Alt-text review modal for image uploads (F-023) */}
+      {altTextTarget && (
+        <AltTextModal
+          mediaId={altTextTarget.mediaId}
+          initialAltText={altTextTarget.altText}
+          open={true}
+          onClose={() => setAltTextTarget(null)}
+          onSaved={(text) => {
+            onChange({
+              mediaList: mediaList.map((m) =>
+                m.id === altTextTarget.mediaId ? { ...m, altText: text } : m
+              ),
+            });
+            setAltTextTarget(null);
+          }}
+        />
+      )}
+</div>
   );
 }

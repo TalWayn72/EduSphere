@@ -48,6 +48,11 @@ const CourseDetailPage = lazy(() =>
     default: m.CourseDetailPage,
   }))
 );
+const CourseAnalyticsPage = lazy(() =>
+  import('@/pages/CourseAnalyticsPage').then((m) => ({
+    default: m.CourseAnalyticsPage,
+  }))
+);
 const SettingsPage = lazy(() =>
   import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage }))
 );
@@ -95,6 +100,10 @@ export const router = createBrowserRouter([
   {
     path: '/courses/new',
     element: guarded(<CourseCreatePage />),
+  },
+  {
+    path: '/courses/:courseId/analytics',
+    element: guarded(<CourseAnalyticsPage />),
   },
   {
     path: '/courses/:courseId',

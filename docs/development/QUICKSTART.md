@@ -300,7 +300,7 @@ query {
 ## 📚 Documentation
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System design & decisions
-- **[OPEN_ISSUES_PHASES.md](./OPEN_ISSUES_PHASES.md)** - Implementation phases
+- **[PHASE_IMPLEMENTATION_LOG.md](./PHASE_IMPLEMENTATION_LOG.md)** - Implementation phases
 - **[packages/db/README.md](./packages/db/README.md)** - Database schema
 - **[infrastructure/README.md](./infrastructure/README.md)** - Docker setup
 

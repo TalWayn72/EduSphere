@@ -4,6 +4,7 @@ import { YogaFederationDriver } from '@graphql-yoga/nestjs-federation';
 import { LoggerModule } from 'nestjs-pino';
 import { UserModule } from './user/user.module';
 import { TenantModule } from './tenant/tenant.module';
+import { SrsModule } from './srs/srs.module';
 import { authMiddleware } from './auth/auth.middleware';
 import { MetricsModule } from './metrics/metrics.module';
 
@@ -16,19 +17,22 @@ import { MetricsModule } from './metrics/metrics.module';
           ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
           : undefined,
         redact: ['req.headers.authorization', 'req.headers.cookie'],
-        customProps: (req: any) => ({
-          tenantId: req.headers['x-tenant-id'],
-          requestId: req.headers['x-request-id'],
-        }),
+        customProps: (req: unknown) => {
+          const r = req as { headers?: Record<string, string> };
+          return {
+            tenantId: r.headers?.['x-tenant-id'],
+            requestId: r.headers?.['x-request-id'],
+          };
+        },
       },
     }),
     MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
       typePaths: ['./**/*.graphql'],
-      context: async ({ req }: any) => {
+      context: async ({ req }: { req: unknown }) => {
         const ctx = { req };
-        await authMiddleware.validateRequest(ctx);
+        await authMiddleware.validateRequest(ctx as Parameters<typeof authMiddleware.validateRequest>[0]);
         return ctx;
       },
       playground: true,
@@ -36,6 +40,7 @@ import { MetricsModule } from './metrics/metrics.module';
     }),
     UserModule,
     TenantModule,
+    SrsModule,
   ],
 })
 export class AppModule {}

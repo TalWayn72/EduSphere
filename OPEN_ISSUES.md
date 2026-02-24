@@ -2079,7 +2079,7 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | Root dir had 15+ stray .md files                          | Moved to `docs/project/`, `docs/development/`, `docs/deployment/`, `docs/reports/` | ✅ Fixed    |
 | 3 unrelated legacy .md files at root                      | Deleted                                                                            | ✅ Fixed    |
 | 4 PDFs at root (binary files in repo)                     | Moved to `docs/reference/`                                                         | ✅ Fixed    |
-| `API-CONTRACTS-GRAPHQL-FEDERATION (1).md` — bad filename  | Renamed to `API-CONTRACTS-GRAPHQL-FEDERATION.md`                                   | ✅ Fixed    |
+| `API-CONTRACTS-GRAPHQL-FEDERATION (1).md` — bad filename  | Renamed to `API_CONTRACTS_GRAPHQL_FEDERATION.md`                                   | ✅ Fixed    |
 | `compass_artifact_wf-UUID.md` — unreadable filename       | Renamed to `docs/reference/TECH-STACK-DECISIONS.md`                                | ✅ Fixed    |
 | `VITE_DEV_MODE` missing from `vite-env.d.ts` types        | Added `readonly VITE_DEV_MODE: string`                                             | ✅ Fixed    |
 | `mock-annotations.ts` (323 lines) — data mixed with logic | Extracted data to `mock-annotations.data.ts` (263 lines)                           | ✅ Fixed    |
@@ -2568,7 +2568,7 @@ if (!isOwner && !isInstructor) {
 - ✅ Document structure complete
 - ✅ All sections filled with relevant content
 - ✅ Examples provided for complex patterns
-- ✅ Commands verified against IMPLEMENTATION-ROADMAP.md
+- ✅ Commands verified against IMPLEMENTATION_ROADMAP.md
 - ✅ Environment variables aligned with architecture
 
 ---
@@ -2623,7 +2623,7 @@ if (!isOwner && !isInstructor) {
 - ✅ All links functional (internal docs)
 - ✅ ASCII diagrams render correctly
 - ✅ Commands verified against package.json structure
-- ✅ Tech stack aligned with IMPLEMENTATION-ROADMAP.md
+- ✅ Tech stack aligned with IMPLEMENTATION_ROADMAP.md
 
 ---
 
@@ -2652,7 +2652,7 @@ if (!isOwner && !isInstructor) {
 2. **סיכום תקלות** - טבלה עם 7 קטגוריות (Infrastructure, Database, GraphQL, Security, Testing, Performance, Documentation)
 3. **3 דוגמאות מתועדות** - TASK-001 (CLAUDE.md), TASK-002 (README.md), TASK-003 (OPEN_ISSUES.md)
 4. **תבנית מובנית** - כל task עם: סטטוס, חומרה, תאריך, קבצים, בעיה, דרישות, פתרון, בדיקות
-5. **Phase tracking template** - תבנית לכל phase ב-IMPLEMENTATION-ROADMAP.md
+5. **Phase tracking template** - תבנית לכל phase ב-IMPLEMENTATION_ROADMAP.md
 6. **Common issue templates** - תבניות לבאגים, features, refactoring, security issues
 
 ### בדיקות
@@ -3286,6 +3286,38 @@ curl -sf http://localhost:4000/graphql -d '{"query":"{ _health }"}' | jq .data._
 
 ---
 
+## F-023 - AI Alt-Text Generation for Uploaded Images
+
+**Status:** ✅ Complete | **Severity:** U0001F7E2 Low | **Date:** 2026-02-24
+
+### תיאור
+הוספת יכולת יצירת alt-text אוטומטית לתמונות באמצעות בינה מלאכותית.
+
+### קבצים
+-  - הוספת עמודת  ל-
+-  - שירות NestJS חדש
+-  - הוספת , תיקון subject NATS
+-  - הוספת  mutation
+- { is a shell keyword - SDL עדכון
+-  - רישום 
+-  - קומפוננט דיאלוג לעריכת alt-text
+-  - אינטגרציה עם ה-modal
+-  - הוספת 
+
+### פתרון
+- NATS subject  → 
+- Vercel AI SDK  עם vision input (Ollama LLaVA ב-dev, OpenAI GPT-4o ב-prod)
+- SI-10: בדיקת  ליקבעת ספק (מקומי/חיצוני)
+- Memory safety: OnModuleDestroy מבטל מנוי NATS
+- 15 tests (10 יחידה + 5 memory)
+
+### בדיקות
+- [x]  - 10 tests
+- [x]  - 5 tests
+
+
+---
+
 ## Notes
 
 - **Iron rule:** Every bug must be documented in OPEN_ISSUES.md before being fixed
@@ -3297,4 +3329,4 @@ curl -sf http://localhost:4000/graphql -d '{"query":"{ _health }"}' | jq .data._
 
 ---
 
-**Last Updated:** 20 February 2026 | **Total Tasks:** 10 (10 completed)
+**Last Updated:** 24 February 2026 | **Total Tasks:** 11 (11 completed)

@@ -76,5 +76,5 @@ When a vendor relationship ends:
 1. Revoke all API keys and credentials
 2. Request data deletion confirmation (within 30 days)
 3. Update this register (set Status = ❌ Terminated)
-4. Update SUBPROCESSORS.md and notify customers (30-day notice)
+4. Update SUBPROCESSOR_REGISTER.md and notify customers (30-day notice)
 5. Archive DPA in legal document management system

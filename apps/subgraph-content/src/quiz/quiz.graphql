@@ -1,0 +1,28 @@
+scalar JSON
+scalar DateTime
+
+type QuizItemResult {
+  itemIndex: Int!
+  correct: Boolean!
+  explanation: String
+  partialScore: Float
+}
+
+type QuizResult {
+  id: ID!
+  score: Float!
+  passed: Boolean!
+  itemResults: [QuizItemResult!]!
+  submittedAt: DateTime!
+}
+
+extend type Mutation {
+  gradeQuizSubmission(
+    contentItemId: ID!
+    answers: JSON!
+  ): QuizResult! @authenticated
+}
+
+extend type Query {
+  myQuizResults(contentItemId: ID!): [QuizResult!]! @authenticated
+}

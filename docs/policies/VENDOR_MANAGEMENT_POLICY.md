@@ -58,7 +58,7 @@ All LLM providers (OpenAI, Anthropic) are Tier 1 vendors with additional control
 
 ## 5. Subprocessor List
 
-EduSphere's current subprocessor list is maintained at `docs/security/SUBPROCESSORS.md` and updated within 30 days of any change. Customers receive 30-day advance notice of new subprocessors (GDPR Art.28(2)).
+EduSphere's current subprocessor list is maintained at `docs/security/SUBPROCESSOR_REGISTER.md` and updated within 30 days of any change. Customers receive 30-day advance notice of new subprocessors (GDPR Art.28(2)).
 
 Key subprocessors:
 | Subprocessor | Purpose | Data | Region | DPA |

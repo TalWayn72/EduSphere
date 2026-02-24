@@ -68,6 +68,9 @@
     --ring: 221.2 83.2% 53.3%;
 
     --radius: 0.5rem;
+
+    /* WCAG 2.2 SC 2.4.12 scroll-padding-top variable */
+    --header-height: 60px;
   }
 
   .dark {
@@ -107,6 +110,52 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* WCAG 2.2 SC 2.4.12 — Focus Not Obscured (Minimum)
+     scroll-padding-top reserves space for the non-sticky header so that
+     keyboard-focused elements are never fully hidden behind it.           */
+  html {
+    scroll-padding-top: var(--header-height);
+  }
+
+  /* WCAG 2.2 SC 2.4.11 — Focus Appearance
+     3 px solid #2563eb (blue-600) gives 4.5:1 contrast on white and
+     >= 3:1 on the light-grey background. outline-offset: 2px positions
+     the ring outside the element boundary.                                */
+  *:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Suppress the UA outline for mouse/touch users; keyboard users still
+     see the :focus-visible outline above (progressive enhancement).        */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* WCAG 2.2 SC 2.5.8 — Target Size (Minimum)
+     All interactive controls must have an activation area >= 24x24 CSS px.
+     Inline anchors inside body text are exempt (Exception 2).              */
+  button,
+  [role="button"],
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 24px;
+    min-width: 24px;
+  }
+
+  /* Inline anchors that are part of body text are exempt from the 24 px
+     floor (SC 2.5.8 Exception 2 — Inline). Reset to avoid overriding
+     surrounding text layout.                                               */
+  p a,
+  li a,
+  td a {
+    min-height: unset;
+    min-width: unset;
   }
 }
 

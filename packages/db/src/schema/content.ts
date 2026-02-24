@@ -67,6 +67,12 @@ export const media_assets = pgTable('media_assets', {
   file_url: text('file_url').notNull(),
   /** MinIO object key for the HLS master manifest (.m3u8). Null until HLS transcode completes. */
   hls_manifest_key: text('hls_manifest_key'),
+  /**
+   * AI-generated alt-text description for image assets (F-023).
+   * Populated asynchronously after upload via NATS + AltTextGeneratorService.
+   * Instructors can review and edit via updateMediaAltText mutation.
+   */
+  alt_text: text('alt_text'),
   duration: integer('duration'),
   transcription_status: text('transcription_status', {
     enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'],

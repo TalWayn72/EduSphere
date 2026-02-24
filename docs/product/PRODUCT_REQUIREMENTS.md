@@ -735,7 +735,7 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 #### 6.6.1 Apache AGE (Graph Database)
 
-- **Schema Validation**: All vertex and edge types follow DATABASE-SCHEMA.md ontology
+- **Schema Validation**: All vertex and edge types follow docs/database/DATABASE_SCHEMA.md ontology
 - **Tenant Isolation**: All graph queries filtered by `tenant_id` property on vertices
 - **Query Optimization**: Indexes on `tenant_id`, `created_at`, `updated_at` properties
 - **Traversal Limits**: Max depth = 5 hops to prevent graph traversal DoS
@@ -831,7 +831,7 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 ### 8.1 Phase Mapping
 
-EduSphere's 8-phase implementation roadmap (detailed in IMPLEMENTATION-ROADMAP.md) delivers features incrementally:
+EduSphere's 8-phase implementation roadmap (detailed in IMPLEMENTATION_ROADMAP.md) delivers features incrementally:
 
 | Phase | Duration | Key Features Delivered | PRD Section Alignment |
 |-------|----------|------------------------|----------------------|
@@ -1003,9 +1003,9 @@ The following features are **explicitly out of scope** for the initial release:
 
 ## Appendix B: References
 
-1. **IMPLEMENTATION-ROADMAP.md** — 8-phase build plan with acceptance criteria
-2. **API-CONTRACTS-GRAPHQL-FEDERATION.md** — Complete GraphQL schema definitions
-3. **DATABASE-SCHEMA.md** — PostgreSQL tables, RLS policies, Apache AGE ontology
+1. **IMPLEMENTATION_ROADMAP.md** — 8-phase build plan with acceptance criteria
+2. **API_CONTRACTS_GRAPHQL_FEDERATION.md** — Complete GraphQL schema definitions
+3. **docs/database/DATABASE_SCHEMA.md** — PostgreSQL tables, RLS policies, Apache AGE ontology
 4. **EduSphere_Claude.pdf** — Architecture guide and technology decisions
 5. **EduSphere_DB.pdf** — Database design deep-dive
 

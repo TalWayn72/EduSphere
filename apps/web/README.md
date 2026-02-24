@@ -166,6 +166,6 @@ import { urqlClient } from '@/lib/urql-client';
 
 ## Related Documentation
 
-- [API Contracts](../../API-CONTRACTS-GRAPHQL-FEDERATION.md)
-- [Implementation Roadmap](../../IMPLEMENTATION-ROADMAP.md)
+- [API Contracts](../../API_CONTRACTS_GRAPHQL_FEDERATION.md)
+- [Implementation Roadmap](../../IMPLEMENTATION_ROADMAP.md)
 - [Claude Instructions](../../CLAUDE.md)

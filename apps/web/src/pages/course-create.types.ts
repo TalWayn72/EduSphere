@@ -14,6 +14,7 @@ export interface UploadedMedia {
   contentType: string;
   status: 'UPLOADING' | 'PROCESSING' | 'READY' | 'ERROR';
   downloadUrl: string | null;
+  altText: string | null;
 }
 
 export interface CourseFormData {

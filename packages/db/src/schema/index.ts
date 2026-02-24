@@ -43,3 +43,15 @@ export * from './tenantBranding';
 
 // Tenant domains table (white-label custom domains + Keycloak realm routing — G-20, G-21)
 export * from './tenantDomains';
+
+// Competency goals (F-002 Auto-Pathing)
+export * from './competency';
+
+// Spaced Repetition System cards (F-001 SRS)
+export * from './srs';
+
+// Quiz results table (F-008: Advanced Quiz Item Types)
+export * from './quiz-results';
+
+// Live sessions (F-012 Virtual Classroom — BigBlueButton)
+export * from './live-sessions';

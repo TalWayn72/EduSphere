@@ -64,6 +64,21 @@ export class MediaResolver {
     return this.mediaService.confirmUpload(fileKey, courseId, title, tenantId, userId);
   }
 
+
+  @Mutation('updateMediaAltText')
+  async updateMediaAltText(
+    @Args('mediaId') mediaId: string,
+    @Args('altText') altText: string,
+    @Context() ctx: GraphQLContext,
+  ) {
+    const auth = ctx.authContext;
+    if (!auth) throw new UnauthorizedException('Authentication required');
+    const tenantId = auth.tenantId;
+    if (!tenantId) throw new UnauthorizedException('Tenant context missing');
+    this.logger.log('updateMediaAltText: mediaId=' + mediaId + ' tenant=' + tenantId);
+    return this.mediaService.updateAltText(mediaId, altText, tenantId);
+  }
+
   /**
    * Field resolver: generates a presigned URL for the HLS master manifest.
    * The parent object must expose a `hlsManifestKey` (internal DB key).

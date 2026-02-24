@@ -18,6 +18,7 @@ export const contentTypeEnum = pgEnum('content_type', [
   'ASSIGNMENT',
   'LINK',
   'AUDIO',
+  'LIVE_SESSION',
 ]);
 
 export const contentItems = pgTable('content_items', {
