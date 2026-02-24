@@ -5,8 +5,8 @@ import { gql } from 'urql';
  * Schema: startAgentSession(templateType: TemplateType!, context: JSON!): AgentSession!
  */
 export const START_AGENT_SESSION_MUTATION = gql`
-  mutation StartAgentSession($templateType: TemplateType!, $context: JSON!) {
-    startAgentSession(templateType: $templateType, context: $context) {
+  mutation StartAgentSession($templateType: TemplateType!, $context: JSON!, $locale: String) {
+    startAgentSession(templateType: $templateType, context: $context, locale: $locale) {
       id
       templateType
       status

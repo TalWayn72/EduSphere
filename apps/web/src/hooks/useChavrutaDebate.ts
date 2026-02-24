@@ -5,6 +5,7 @@
  */
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useMutation, useSubscription } from 'urql';
+import { i18n } from '@/lib/i18n';
 import {
   START_AGENT_SESSION_MUTATION,
   SEND_AGENT_MESSAGE_MUTATION,
@@ -100,7 +101,7 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
     try {
       let sid = sessionId;
       if (!sid) {
-        const res = await startSession({ templateType: 'CHAVRUTA_DEBATE', context: { topicId: topicId ?? topic } });
+        const res = await startSession({ templateType: 'CHAVRUTA_DEBATE', context: { topicId: topicId ?? topic }, locale: i18n.language });
         sid = (res.data?.startAgentSession?.id as string | null) ?? null;
         if (sid) { setSessionId(sid); setSubPaused(false); }
       }

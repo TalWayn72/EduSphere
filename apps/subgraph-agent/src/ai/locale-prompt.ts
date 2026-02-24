@@ -4,6 +4,7 @@
  */
 
 const LANGUAGE_INSTRUCTIONS: Readonly<Record<string, string>> = {
+  'he':    'Always respond in Hebrew (עברית). Do not switch to English. Write right-to-left.',
   'zh-CN': 'Always respond in Simplified Chinese (中文). Do not switch to English.',
   'hi':    'Always respond in Hindi (हिन्दी). Do not switch to English.',
   'es':    'Always respond in Spanish (Español). Do not switch to English.',
