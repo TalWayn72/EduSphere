@@ -1,0 +1,50 @@
+{
+  "loading": "טוען...",
+  "error": "אירעה שגיאה",
+  "retry": "נסה שוב",
+  "cancel": "ביטול",
+  "save": "שמור",
+  "back": "חזור",
+  "search": "חיפוש",
+  "searchPlaceholder": "חפש...",
+  "searchHint": "חיפוש בכל הקורסים, תמלולים, הערות ומושגים",
+  "searchFullPlaceholder": "חיפוש קורסים, תמלולים, הערות, מושגים...",
+  "signIn": "כניסה",
+  "logOut": "יציאה",
+  "profile": "פרופיל",
+  "settings": "הגדרות",
+  "yes": "כן",
+  "no": "לא",
+  "close": "סגור",
+  "confirm": "אישור",
+  "delete": "מחק",
+  "edit": "ערוך",
+  "create": "צור",
+  "submit": "שלח",
+  "noResults": "לא נמצאו תוצאות",
+  "viewAll": "הצג הכל",
+  "learnMore": "למד עוד",
+  "optional": "אופציונלי",
+  "required": "חובה",
+  "add": "הוסף",
+  "annotations": "הערות",
+  "graph": "גרף",
+  "accountInformation": "פרטי חשבון",
+  "errorLoadingUser": "שגיאה בטעינת נתוני המשתמש",
+  "profilePage": {
+    "accountDetails": "פרטי חשבון",
+    "permissions": "הרשאות",
+    "learningOverview": "סקירת למידה",
+    "fields": {
+      "username": "שם משתמש",
+      "email": "אימייל",
+      "role": "תפקיד",
+      "tenantId": "מזהה ארגון"
+    },
+    "stats": {
+      "coursesAvailable": "קורסים זמינים",
+      "conceptsMastered": "מושגים שנרכשו",
+      "annotationsCreated": "הערות שנוצרו"
+    }
+  }
+}

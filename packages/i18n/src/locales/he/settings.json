@@ -1,0 +1,33 @@
+{
+  "title": "הגדרות",
+  "language": {
+    "title": "שפה",
+    "description": "בחר את השפה המועדפת לממשק ולתגובות AI",
+    "saved": "העדפת השפה נשמרה",
+    "error": "שמירת העדפת השפה נכשלה. נסה שוב.",
+    "saving": "שומר..."
+  },
+  "appearance": {
+    "title": "מראה",
+    "theme": "ערכת נושא",
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת"
+  },
+  "notifications": {
+    "title": "התראות",
+    "email": "התראות אימייל",
+    "push": "התראות דחיפה",
+    "emailDescription": "קבל עדכוני קורס והודעות באימייל",
+    "pushDescription": "קבל התראות בזמן אמת במכשיר שלך"
+  },
+  "account": {
+    "title": "חשבון",
+    "editProfile": "ערוך פרופיל",
+    "privacy": "פרטיות",
+    "myLearning": "הלמידה שלי",
+    "progress": "התקדמות",
+    "achievements": "הישגים",
+    "version": "גרסה {{version}}"
+  }
+}

@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  *   - SettingsPage.tsx: renders <h1>{t('title')}</h1> and <LanguageSelector />
  *   - LanguageSelector.tsx: Radix Select (role="combobox"), lists LOCALE_LABELS
  *   - useUserPreferences.ts: setLocale() → localStorage.setItem('edusphere_locale', locale)
- *   - packages/i18n/src/index.ts: SUPPORTED_LOCALES (9 locales), LOCALE_LABELS
+ *   - packages/i18n/src/index.ts: SUPPORTED_LOCALES (10 locales), LOCALE_LABELS, RTL_LOCALES
  *   - en/settings.json: title="Settings", language.title="Language"
  *   - es/settings.json: title="Configuración", language.description="Selecciona..."
  *
@@ -64,7 +64,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
     await expect(page.getByRole('combobox').first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('dropdown contains all 9 locales from SUPPORTED_LOCALES', async ({ page }) => {
+  test('dropdown contains all 10 locales from SUPPORTED_LOCALES', async ({ page }) => {
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
 
@@ -74,7 +74,7 @@ test.describe('i18n — LanguageSelector presence and content', () => {
     const options = page.getByRole('option');
     await expect(options.first()).toBeVisible({ timeout: 5_000 });
     const count = await options.count();
-    expect(count).toBeGreaterThanOrEqual(9);
+    expect(count).toBeGreaterThanOrEqual(10);
   });
 
   test('dropdown shows English native name', async ({ page }) => {
@@ -251,5 +251,78 @@ test.describe('i18n — Locale persistence in localStorage', () => {
 
     stored = await page.evaluate(() => localStorage.getItem('edusphere_locale'));
     expect(stored).toBe('en');
+  });
+});
+
+// ── Group 5: Hebrew (RTL) locale ──────────────────────────────────────────────
+
+test.describe('i18n — Hebrew RTL locale', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  test('dropdown shows עברית native name (he)', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('combobox').first().click();
+
+    // LOCALE_LABELS['he'].native === 'עברית'
+    await expect(
+      page.getByRole('option', { name: /עברית/ }).first()
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('selecting Hebrew switches the page heading to הגדרות', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: /עברית/ }).first().click();
+
+    // he/settings.json: title → "הגדרות"
+    await page.waitForLoadState('networkidle');
+    await expect(
+      page.getByRole('heading', { name: /הגדרות/ })
+    ).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('selecting Hebrew sets document dir to rtl', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: /עברית/ }).first().click();
+
+    // applyDocumentDirection('he') → document.documentElement.dir = 'rtl'
+    const dir = await page.evaluate(() => document.documentElement.dir);
+    expect(dir).toBe('rtl');
+  });
+
+  test('selecting Hebrew writes he to localStorage', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: /עברית/ }).first().click();
+
+    const stored = await page.evaluate(() => localStorage.getItem('edusphere_locale'));
+    expect(stored).toBe('he');
+  });
+
+  test('switching from Hebrew back to English restores ltr direction', async ({ page }) => {
+    await page.goto('/settings');
+    await page.waitForLoadState('networkidle');
+
+    // Switch to Hebrew first
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: /עברית/ }).first().click();
+    let dir = await page.evaluate(() => document.documentElement.dir);
+    expect(dir).toBe('rtl');
+
+    // Switch back to English
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: /English/i }).first().click();
+    await page.waitForLoadState('networkidle');
+
+    dir = await page.evaluate(() => document.documentElement.dir);
+    expect(dir).toBe('ltr');
   });
 });

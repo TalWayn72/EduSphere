@@ -1,0 +1,40 @@
+{
+  "title": "סוכני למידה AI",
+  "subtitle": "בחר מצב סוכן לשיפור הלמידה שלך",
+  "devMode": "מצב פיתוח — תגובות מדומות",
+  "selectAgent": "בחר סוכן:",
+  "reset": "אפס",
+  "sendMessage": "שלח הודעה",
+  "askAgent": "שאל את {{agentLabel}}...",
+  "responding": "הסוכן מגיב...",
+  "startConversation": "התחל שיחה",
+  "conversationHistory": "היסטוריית שיחה",
+  "clearHistory": "נקה היסטוריה",
+  "modes": {
+    "chavruta": {
+      "label": "דיון חברותא",
+      "description": "שותף דיאלקטי — מאתגר את טיעוניך בשיטת הנמקה תלמודית"
+    },
+    "quiz": {
+      "label": "מאסטר חידונים",
+      "description": "חידונים אדפטיביים המבוססים על היסטוריית הלמידה והפערים שלך"
+    },
+    "summarize": {
+      "label": "מסכם",
+      "description": "סיכומים מדורגים של התוכן שנלמד עם חילוץ מושגי מפתח"
+    },
+    "research": {
+      "label": "סייר מחקר",
+      "description": "מוצא הפניות צולבות — מגלה קשרים בין טקסטים ותקופות"
+    },
+    "explain": {
+      "label": "מסביר",
+      "description": "הסברים אדפטיביים המותאמים לרמת ההבנה שלך"
+    }
+  },
+  "chatPanel": {
+    "title": "עוזר למידה AI",
+    "openPanel": "פתח לוח AI",
+    "closePanel": "סגור לוח AI"
+  }
+}

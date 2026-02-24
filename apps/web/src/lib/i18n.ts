@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE, NAMESPACES } from '@edusphere/i18n';
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE, NAMESPACES, RTL_LOCALES } from '@edusphere/i18n';
 
 // Custom backend: lazy-loads namespace JSONs via Vite's dynamic import()
 // Vite resolves these at build time via the workspace package
@@ -36,6 +36,13 @@ const ViteLocaleBackend = {
     }
   },
 };
+
+/** Sets document.dir and document.lang based on the active locale */
+export function applyDocumentDirection(locale: string): void {
+  const dir = RTL_LOCALES.has(locale as 'he') ? 'rtl' : 'ltr';
+  document.documentElement.dir = dir;
+  document.documentElement.lang = locale;
+}
 
 export async function initI18n(initialLocale?: string): Promise<void> {
   if (i18n.isInitialized) return; // Guard against double-init in React strict mode

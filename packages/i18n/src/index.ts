@@ -1,8 +1,11 @@
 export const SUPPORTED_LOCALES = [
-  'en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id'
+  'en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id', 'he'
 ] as const;
 export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
 export const DEFAULT_LOCALE: SupportedLocale = 'en';
+
+/** Locales that require right-to-left text direction */
+export const RTL_LOCALES = new Set<SupportedLocale>(['he']);
 
 export const LOCALE_LABELS: Record<SupportedLocale, {
   native: string;
@@ -18,6 +21,7 @@ export const LOCALE_LABELS: Record<SupportedLocale, {
   'pt':    { native: 'Português',        english: 'Portuguese', flag: '🇧🇷' },
   'ru':    { native: 'Русский',          english: 'Russian',    flag: '🇷🇺' },
   'id':    { native: 'Bahasa Indonesia', english: 'Indonesian', flag: '🇮🇩' },
+  'he':    { native: 'עברית',            english: 'Hebrew',     flag: '🇮🇱' },
 };
 
 export const NAMESPACES = [

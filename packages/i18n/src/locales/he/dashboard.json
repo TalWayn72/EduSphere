@@ -1,0 +1,50 @@
+{
+  "title": "לוח בקרה",
+  "welcomeBack": "ברוך שובך, {{name}}!",
+  "instructorTools": "כלי מרצה",
+  "createCourse": "צור קורס",
+  "manageCourses": "נהל קורסים",
+  "continueLearning": "המשך ללמוד",
+  "yourProgress": "ההתקדמות שלך",
+  "studyActivity": "פעילות לימוד",
+  "activityDescription": "פעילות ההערות שלך ב-30 הימים האחרונים",
+  "recentActivity": "פעילות אחרונה",
+  "latestEvents": "אירועי הלמידה האחרונים שלך",
+  "noActivity": "אין פעילות אחרונה",
+  "errorLoadingUser": "שגיאה בטעינת נתוני משתמש",
+  "stats": {
+    "activeCourses": "קורסים פעילים",
+    "learningStreak": "רצף לימוד",
+    "studyTime": "זמן לימוד",
+    "concepts": "מושגים",
+    "coursesEnrolled": "קורסים שנרשמת אליהם",
+    "conceptsMastered": "מושגים שנרכשו",
+    "annotationsCreated": "הערות",
+    "weeklyGoal": "יעד שבועי",
+    "days": "ימים",
+    "hours": "שעות",
+    "minutes": "דקות"
+  },
+  "heatmap": {
+    "studyDays": "{{count}} ימי לימוד",
+    "totalSessions": "{{count}} סשנים סה\"כ",
+    "less": "פחות",
+    "more": "יותר"
+  },
+  "profile": {
+    "accountDetails": "פרטי חשבון",
+    "permissions": "הרשאות",
+    "learningOverview": "סקירת למידה",
+    "fields": {
+      "username": "שם משתמש",
+      "email": "אימייל",
+      "role": "תפקיד",
+      "tenantId": "מזהה ארגון"
+    },
+    "stats": {
+      "coursesAvailable": "קורסים זמינים",
+      "conceptsMastered": "מושגים שנרכשו",
+      "annotationsCreated": "הערות שנוצרו"
+    }
+  }
+}

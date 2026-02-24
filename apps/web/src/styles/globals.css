@@ -110,6 +110,23 @@
   }
 }
 
+/* ── RTL Support — applied when dir="rtl" is set on <html> ──────────────── */
+
+/* Flip space-x-* margin direction for RTL layouts */
+[dir="rtl"] [class*="space-x-"] > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* Flip ml-auto / mr-auto for RTL */
+[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
+
+/* Ensure text inputs and textareas flow RTL */
+[dir="rtl"] input,
+[dir="rtl"] textarea {
+  text-align: right;
+}
+
 /* ── CollaborativeEditor — mention chip ─────────────────────────────────── */
 .mention {
   background-color: hsl(var(--primary) / 0.1);

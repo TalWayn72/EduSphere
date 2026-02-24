@@ -5,7 +5,7 @@ import { Provider as UrqlProvider } from 'urql';
 import { urqlClient } from '@/lib/urql-client';
 import { queryClient } from '@/lib/query-client';
 import { initKeycloak } from '@/lib/auth';
-import { initI18n } from '@/lib/i18n';
+import { initI18n, applyDocumentDirection } from '@/lib/i18n';
 import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -24,6 +24,8 @@ function App() {
       // Initialize i18n with cached locale from localStorage (before DB fetch)
       const cachedLocale = localStorage.getItem('edusphere_locale') ?? undefined;
       await initI18n(cachedLocale);
+      // Apply RTL direction immediately from cached locale (before DB fetch)
+      if (cachedLocale) applyDocumentDirection(cachedLocale);
       setKeycloakReady(true);
     }
     void bootstrap();
