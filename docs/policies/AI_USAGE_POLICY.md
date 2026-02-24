@@ -74,7 +74,7 @@ Every AI-generated response includes:
 - Implemented in: `apps/subgraph-agent/src/ai/ai-transparency.ts`
 
 ### Art.53 — Model Cards
-All AI models publish model cards at `docs/security/MODEL_CARDS.md`:
+All AI models publish model cards at `docs/ai/MODEL_CARDS.md`:
 - Model ID, provider, version
 - Intended use cases
 - Known limitations
@@ -138,7 +138,7 @@ All staff using AI coding assistants (GitHub Copilot, Claude, etc.) must:
 
 - [VENDOR_MANAGEMENT_POLICY.md](./VENDOR_MANAGEMENT_POLICY.md)
 - [GDPR_COMPLIANCE_POLICY.md](./GDPR_COMPLIANCE_POLICY.md)
-- [docs/security/MODEL_CARDS.md](../security/MODEL_CARDS.md)
+- [docs/ai/MODEL_CARDS.md](../ai/MODEL_CARDS.md)
 - [apps/subgraph-agent/src/ai/llm-consent.guard.ts](../../apps/subgraph-agent/src/ai/llm-consent.guard.ts)
 - [apps/subgraph-agent/src/ai/pii-scrubber.ts](../../apps/subgraph-agent/src/ai/pii-scrubber.ts)
 - [apps/subgraph-agent/src/ai/ai-transparency.ts](../../apps/subgraph-agent/src/ai/ai-transparency.ts)

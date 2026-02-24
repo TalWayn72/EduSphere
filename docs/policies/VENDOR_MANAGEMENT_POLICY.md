@@ -51,7 +51,7 @@ All LLM providers (OpenAI, Anthropic) are Tier 1 vendors with additional control
 
 - **User consent gate**: `THIRD_PARTY_LLM` consent required before any data sent to external LLM
 - **PII scrubbing**: PII scrubber middleware strips names, emails, IDs before LLM calls
-- **Model cards**: Published for each model in use (`docs/security/MODEL_CARDS.md`)
+- **Model cards**: Published for each model in use (`docs/ai/MODEL_CARDS.md`)
 - **EU AI Act Art.50**: Transparency disclosure when AI generates educational content
 - **Data retention**: EduSphere configures zero-retention API options where available
 - **Fallback**: Ollama (local LLM) available for customers requiring data sovereignty
@@ -87,4 +87,4 @@ If a vendor reports a security incident affecting EduSphere data:
 - [INFORMATION_SECURITY_POLICY.md](./INFORMATION_SECURITY_POLICY.md)
 - [GDPR_COMPLIANCE_POLICY.md](./GDPR_COMPLIANCE_POLICY.md)
 - [AI_USAGE_POLICY.md](./AI_USAGE_POLICY.md)
-- [docs/security/MODEL_CARDS.md](../security/MODEL_CARDS.md)
+- [docs/ai/MODEL_CARDS.md](../security/MODEL_CARDS.md)
