@@ -2077,7 +2077,7 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | Issue                                                     | Fix                                                                                | Status      |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------- |
 | Root dir had 15+ stray .md files                          | Moved to `docs/project/`, `docs/development/`, `docs/deployment/`, `docs/reports/` | ✅ Fixed    |
-| 3 Bellor project files at root                            | Moved to `legacy/`                                                                 | ✅ Fixed    |
+| 3 unrelated legacy .md files at root                      | Deleted                                                                            | ✅ Fixed    |
 | 4 PDFs at root (binary files in repo)                     | Moved to `docs/reference/`                                                         | ✅ Fixed    |
 | `API-CONTRACTS-GRAPHQL-FEDERATION (1).md` — bad filename  | Renamed to `API-CONTRACTS-GRAPHQL-FEDERATION.md`                                   | ✅ Fixed    |
 | `compass_artifact_wf-UUID.md` — unreadable filename       | Renamed to `docs/reference/TECH-STACK-DECISIONS.md`                                | ✅ Fixed    |
@@ -2248,7 +2248,7 @@ Audit performed 18 Feb 2026. Issues found and resolved:
 | שינוי         | פרטים                                                                                                          |
 | ------------- | -------------------------------------------------------------------------------------------------------------- |
 | Root cleanup  | הועברו 12 קבצי .md ל-`docs/{project,development,deployment,reports,reference}/`                                |
-| Legacy files  | `Bellor_*.md` (90K שורות!) הועברו ל-`legacy/`                                                                  |
+| Legacy files  | 3 קבצי .md לא רלוונטיים נמחקו מהפרויקט                                                                         |
 | PDFs          | 4 קבצי PDF + Hebrew .docx הועברו ל-`docs/reference/`                                                           |
 | Bad filenames | `API-CONTRACTS-GRAPHQL-FEDERATION (1).md` → renamed, `compass_artifact_wf-UUID.md` → `TECH-STACK-DECISIONS.md` |
 
@@ -2658,7 +2658,7 @@ if (!isOwner && !isInstructor) {
 ### בדיקות
 
 - ✅ Document structure ready for phase execution
-- ✅ Templates match Bellor quality level
+- ✅ Document templates meet project quality standards
 - ✅ Emoji usage consistent and readable
 - ✅ All 3 completed tasks documented
 
