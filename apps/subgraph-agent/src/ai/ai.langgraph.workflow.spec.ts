@@ -94,21 +94,25 @@ describe('ai.langgraph.ts: file exists and defines the four adapters', () => {
 
   it('exports runLangGraphDebate', () => {
     const src = readSrc('ai.langgraph.ts');
+    // eslint-disable-next-line security/detect-unsafe-regex
     expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphDebate/);
   });
 
   it('exports runLangGraphQuiz', () => {
     const src = readSrc('ai.langgraph.ts');
+    // eslint-disable-next-line security/detect-unsafe-regex
     expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphQuiz/);
   });
 
   it('exports runLangGraphTutor', () => {
     const src = readSrc('ai.langgraph.ts');
+    // eslint-disable-next-line security/detect-unsafe-regex
     expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphTutor/);
   });
 
   it('exports runLangGraphAssessment', () => {
     const src = readSrc('ai.langgraph.ts');
+    // eslint-disable-next-line security/detect-unsafe-regex
     expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphAssessment/);
   });
 });

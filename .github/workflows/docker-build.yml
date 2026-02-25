@@ -92,7 +92,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NODE_VERSION=20
-            PNPM_VERSION=9
+            PNPM_VERSION=10
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VCS_REF=${{ github.sha }}
             VERSION=${{ steps.meta.outputs.version }}
@@ -108,7 +108,7 @@ jobs:
           cache-from: type=gha
           build-args: |
             NODE_VERSION=20
-            PNPM_VERSION=9
+            PNPM_VERSION=10
 
       - name: Run Trivy security scan
         if: github.event_name == 'pull_request'
@@ -244,7 +244,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NODE_VERSION=20
-            PNPM_VERSION=9
+            PNPM_VERSION=10
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VCS_REF=${{ github.sha }}
             VERSION=${{ steps.version.outputs.VERSION }}

@@ -126,7 +126,7 @@ function conceptLinkingNode(
 // ── Node: finalize ────────────────────────────────────────────────────────────
 
 function finalizeNode(
-  state: CourseGenStateType,
+  _state: CourseGenStateType,
 ): Partial<CourseGenStateType> {
   // No additional transformation — just pass state through
   return {};
