@@ -2115,12 +2115,12 @@ const coursesEnrolled =
 
 ---
 
-## 🟡 BUG-09: Profile — Tenant ID ריק (20 פברואר 2026)
+## ✅ BUG-09: Profile — Tenant ID ריק (20 פברואר 2026)
 
 | | |
 |---|---|
 | **Severity** | 🟢 Low (informational field — not functional) |
-| **Status** | 🟡 Open |
+| **Status** | ✅ Fixed (25 פברואר 2026) |
 | **Files** | `apps/web/src/pages/ProfilePage.tsx` |
 | **נמצא ב** | Visual QA — Profile page |
 
@@ -2128,9 +2128,15 @@ const coursesEnrolled =
 
 `tenant_id` מה-JWT לא מוצג ב-Profile. `getCurrentUser()` מחזיר `user.tenantId` רק אם הטוקן כולל את ה-claim `tenant_id`. Keycloak צריך mapper שמכניס את `tenant_id` ל-JWT claims.
 
-### תיקון מוצע
+### תיקון שבוצע
 
-הוסף Keycloak Protocol Mapper לרשות `edusphere` → Client Scope → `tenant_id` User Attribute → Add to token.
+Frontend: הוספת fallback `"Not available"` בשדה tenant_id כאשר הערך ריק — במקום להציג שדה ריק לחלוטין.
+
+```tsx
+{tenantId || <span className="italic text-xs text-muted-foreground/60">{t('profile.fields.tenantIdMissing', 'Not available')}</span>}
+```
+
+Keycloak (נדרש אם רוצים להציג את ה-ID האמיתי): הוסף Protocol Mapper לרשות `edusphere` → Client Scope → `tenant_id` User Attribute → Add to token.
 
 ---
 

@@ -149,7 +149,9 @@ export function ProfilePage() {
             <div className="flex items-center gap-3 text-sm">
               <Key className="h-4 w-4 text-muted-foreground shrink-0" />
               <span className="text-muted-foreground w-24">{t('profile.fields.tenantId')}</span>
-              <span className="font-mono text-xs text-muted-foreground truncate">{tenantId}</span>
+              <span className="font-mono text-xs text-muted-foreground truncate">
+                {tenantId || <span className="italic text-xs text-muted-foreground/60">{t('profile.fields.tenantIdMissing', 'Not available')}</span>}
+              </span>
             </div>
           </div>
         </Card>
