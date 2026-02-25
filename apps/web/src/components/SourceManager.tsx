@@ -12,11 +12,13 @@
 import { useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { gqlClient as graphqlClient } from '@/lib/graphql';
+import { getToken } from '@/lib/auth';
 import {
   COURSE_KNOWLEDGE_SOURCES,
   KNOWLEDGE_SOURCE_DETAIL,
   ADD_URL_SOURCE,
   ADD_TEXT_SOURCE,
+  ADD_YOUTUBE_SOURCE,
   DELETE_KNOWLEDGE_SOURCE,
 } from '@/lib/graphql/sources.queries';
 
@@ -65,7 +67,7 @@ const STATUS_LABELS: Record<SourceStatus, string> = {
 
 // ─── Add-source Modal ─────────────────────────────────────────────────────────
 
-type AddTab = 'url' | 'text' | 'file';
+type AddTab = 'url' | 'text' | 'file' | 'youtube';
 
 function AddSourceModal({
   courseId,
@@ -82,6 +84,8 @@ function AddSourceModal({
   const [text, setText] = useState('');
   const [textTitle, setTextTitle] = useState('');
   const [fileTitle, setFileTitle] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [youtubeTitle, setYoutubeTitle] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -100,6 +104,13 @@ function AddSourceModal({
     onError: (e) => setError(String(e)),
   });
 
+  const addYoutube = useMutation({
+    mutationFn: (input: { courseId: string; title: string; url: string }) =>
+      graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }),
+    onSuccess: () => { onAdded(); onClose(); },
+    onError: (e) => setError(String(e)),
+  });
+
   const handleSubmit = async () => {
     setError('');
     setBusy(true);
@@ -112,16 +123,21 @@ function AddSourceModal({
         if (!text.trim()) return setError('נא להזין טקסט');
         const title = textTitle || text.slice(0, 50) + '...';
         await addText.mutateAsync({ courseId, title, text });
+      } else if (tab === 'youtube') {
+        if (!youtubeUrl.trim()) return setError('נא להזין קישור YouTube');
+        const title = youtubeTitle || youtubeUrl;
+        await addYoutube.mutateAsync({ courseId, title, url: youtubeUrl });
       } else if (tab === 'file') {
         const file = fileRef.current?.files?.[0];
         if (!file) return setError('נא לבחור קובץ');
-        // File upload: POST to REST endpoint which wraps the GraphQL mutation
         const fd = new FormData();
         fd.append('file', file);
         fd.append('courseId', courseId);
         fd.append('title', fileTitle || file.name);
+        const token = getToken();
         const res = await fetch('/api/knowledge-sources/upload', {
           method: 'POST',
+          headers: token ? { authorization: `Bearer ${token}` } : {},
           body: fd,
         });
         if (!res.ok) throw new Error(await res.text());
@@ -146,14 +162,14 @@ function AddSourceModal({
 
         {/* Tabs */}
         <div className="flex border-b px-6">
-          {(['url', 'text', 'file'] as AddTab[]).map((t) => (
+          {(['url', 'text', 'youtube', 'file'] as AddTab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors
                 ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             >
-              {t === 'url' ? '🌐 קישור' : t === 'text' ? '✏️ טקסט' : '📄 קובץ'}
+              {t === 'url' ? '🌐 קישור' : t === 'text' ? '✏️ טקסט' : t === 'youtube' ? '▶️ YouTube' : '📄 קובץ'}
             </button>
           ))}
         </div>
@@ -195,6 +211,27 @@ function AddSourceModal({
                 value={text}
                 onChange={e => setText(e.target.value)}
               />
+            </>
+          )}
+
+          {tab === 'youtube' && (
+            <>
+              <input
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="https://youtube.com/watch?v=..."
+                value={youtubeUrl}
+                onChange={e => setYoutubeUrl(e.target.value)}
+                dir="ltr"
+              />
+              <input
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="כותרת (אופציונלי)"
+                value={youtubeTitle}
+                onChange={e => setYoutubeTitle(e.target.value)}
+              />
+              <p className="text-xs text-gray-500">
+                המערכת תוריד את תמלול הווידאו ותיצור ממנו embeddings לחיפוש סמנטי.
+              </p>
             </>
           )}
 

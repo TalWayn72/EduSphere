@@ -16,6 +16,7 @@ import { COURSE_DETAIL_QUERY } from '@/lib/graphql/content.queries';
 import { ENROLL_COURSE_MUTATION, UNENROLL_COURSE_MUTATION } from '@/lib/graphql/content.queries';
 import { MY_ENROLLMENTS_QUERY, MY_COURSE_PROGRESS_QUERY } from '@/lib/graphql/content.queries';
 import { CourseModuleList } from './CourseDetailPage.modules';
+import { SourceManager } from '@/components/SourceManager';
 import {
   ArrowLeft,
   Clock,
@@ -24,6 +25,7 @@ import {
   Loader2,
   AlertCircle,
   Users,
+  BookMarked,
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -100,6 +102,7 @@ export function CourseDetailPage() {
   // enroll/unenroll mutation.  isEnrolling replaces the old useState flag.
   const [isEnrolling, startEnrollTransition] = useTransition();
   const [toast, setToast] = useState<string | null>(null);
+  const [showSources, setShowSources] = useState(false);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Cleanup toast timeout on unmount
@@ -233,6 +236,27 @@ export function CourseDetailPage() {
 
         {/* Module list */}
         <CourseModuleList modules={course.modules} courseId={courseId} />
+
+        {/* Knowledge Sources — collapsible panel */}
+        <div className="border rounded-xl overflow-hidden">
+          <button
+            className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 transition-colors text-sm font-medium"
+            onClick={() => setShowSources((v) => !v)}
+            aria-expanded={showSources}
+            data-testid="toggle-sources"
+          >
+            <span className="flex items-center gap-2">
+              <BookMarked className="h-4 w-4 text-blue-600" />
+              מקורות מידע
+            </span>
+            <span className="text-gray-400">{showSources ? '▲' : '▼'}</span>
+          </button>
+          {showSources && (
+            <div className="h-96" data-testid="sources-panel">
+              <SourceManager courseId={courseId} />
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );

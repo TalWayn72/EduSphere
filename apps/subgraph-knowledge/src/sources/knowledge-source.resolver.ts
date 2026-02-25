@@ -62,6 +62,21 @@ export class KnowledgeSourceResolver {
   }
 
   @Mutation()
+  async addYoutubeSource(
+    @Args('input') input: { courseId: string; title: string; url: string },
+    @Context() ctx: GraphQLContext,
+  ) {
+    const { tenantId } = this.auth(ctx);
+    return this.service.createAndProcess({
+      tenantId,
+      courseId: input.courseId,
+      title: input.title,
+      sourceType: 'YOUTUBE',
+      origin: input.url,
+    });
+  }
+
+  @Mutation()
   async deleteKnowledgeSource(
     @Args('id') id: string,
     @Context() ctx: GraphQLContext,

@@ -55,6 +55,18 @@ export const ADD_TEXT_SOURCE = gql`
   }
 `;
 
+export const ADD_YOUTUBE_SOURCE = gql`
+  mutation AddYoutubeSource($input: AddYoutubeSourceInput!) {
+    addYoutubeSource(input: $input) {
+      id
+      title
+      sourceType
+      status
+      origin
+    }
+  }
+`;
+
 export const DELETE_KNOWLEDGE_SOURCE = gql`
   mutation DeleteKnowledgeSource($id: ID!) {
     deleteKnowledgeSource(id: $id)

@@ -32,10 +32,12 @@ export type CreateSourceInput = {
   courseId: string;
   title: string;
   sourceType: SourceType;
-  /** Local file path (FILE_* types) or URL string */
+  /** Local file path (FILE_* types), URL string, or YouTube URL */
   origin: string;
   /** Raw text for TEXT type */
   rawText?: string;
+  /** In-memory file buffer for REST upload (FILE_DOCX, FILE_PDF, FILE_TXT) */
+  fileBuffer?: Buffer;
 };
 
 @Injectable()
@@ -125,9 +127,17 @@ export class KnowledgeSourceService implements OnModuleDestroy {
       let parsed: { text: string; wordCount: number; metadata: Record<string, unknown> };
 
       if (input.sourceType === 'FILE_DOCX') {
-        parsed = await this.parser.parseDocx(input.origin);
+        parsed = await this.parser.parseDocx(input.fileBuffer ?? input.origin);
+      } else if (input.sourceType === 'FILE_PDF') {
+        if (!input.fileBuffer) throw new Error('FILE_PDF requires a file buffer');
+        parsed = await this.parser.parsePdf(input.fileBuffer);
+      } else if (input.sourceType === 'FILE_TXT') {
+        const text = input.fileBuffer?.toString('utf-8') ?? '';
+        parsed = this.parser.parseText(text);
       } else if (input.sourceType === 'URL') {
         parsed = await this.parser.parseUrl(input.origin);
+      } else if (input.sourceType === 'YOUTUBE') {
+        parsed = await this.parser.parseYoutube(input.origin);
       } else if (input.sourceType === 'TEXT') {
         parsed = this.parser.parseText(input.rawText ?? '');
       } else {

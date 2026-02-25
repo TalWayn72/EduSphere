@@ -1,11 +1,12 @@
 /**
- * DocumentParserService — converts local files and URLs into plaintext.
+ * DocumentParserService — converts local files, buffers and URLs into plaintext.
  *
  * Supported sources:
- *  • DOCX  — uses mammoth (Word → HTML → strip tags)
- *  • PDF   — page-by-page text extraction (placeholder; add pdf-parse if needed)
+ *  • DOCX  — uses mammoth (Word → HTML → strip tags); accepts string path or Buffer
+ *  • PDF   — uses pdf-parse (Buffer → text)
  *  • URL   — fetch HTML + strip tags
  *  • TEXT  — passthrough
+ *  • YOUTUBE — fetches auto-generated transcript via youtube-transcript
  */
 
 import { Injectable, Logger } from '@nestjs/common';
@@ -22,22 +23,36 @@ export type ParseResult = {
 export class DocumentParserService {
   private readonly logger = new Logger(DocumentParserService.name);
 
-  /** Parse a local DOCX file path → plaintext */
-  async parseDocx(filePath: string): Promise<ParseResult> {
+  /** Parse a local DOCX file path or an in-memory Buffer → plaintext */
+  async parseDocx(source: string | Buffer): Promise<ParseResult> {
     const { default: mammoth } = await import('mammoth');
-    const absPath = resolve(filePath);
-    const buffer = readFileSync(absPath);
+    const buffer =
+      typeof source === 'string' ? readFileSync(resolve(source)) : source;
     const result = await mammoth.extractRawText({ buffer });
 
     if (result.messages.length > 0) {
-      this.logger.warn(`mammoth warnings for ${filePath}`, result.messages);
+      const src = typeof source === 'string' ? source : '<buffer>';
+      this.logger.warn(`mammoth warnings for ${src}`, result.messages);
     }
 
     const text = result.value.trim();
     return {
       text,
       wordCount: text.split(/\s+/).filter(Boolean).length,
-      metadata: { source_type: 'FILE_DOCX', original_path: filePath },
+      metadata: { source_type: 'FILE_DOCX' },
+    };
+  }
+
+  /** Parse a PDF buffer → plaintext (uses pdf-parse) */
+  async parsePdf(buffer: Buffer): Promise<ParseResult> {
+    // Dynamic import avoids pdf-parse's test-runner auto-execution at require time
+    const { default: pdfParse } = await import('pdf-parse');
+    const data = await pdfParse(buffer);
+    const text = data.text.replace(/\r\n/g, '\n').replace(/\s{3,}/g, '\n').trim();
+    return {
+      text,
+      wordCount: text.split(/\s+/).filter(Boolean).length,
+      metadata: { source_type: 'FILE_PDF', pages: data.numpages },
     };
   }
 
@@ -88,6 +103,43 @@ export class DocumentParserService {
       wordCount: text.split(/\s+/).filter(Boolean).length,
       metadata: { source_type: 'TEXT' },
     };
+  }
+
+  /** Fetch a YouTube video transcript via youtube-transcript package */
+  async parseYoutube(videoUrl: string): Promise<ParseResult> {
+    const videoId = this.extractYoutubeId(videoUrl);
+    if (!videoId) throw new Error(`Cannot extract video ID from URL: ${videoUrl}`);
+
+    this.logger.log(`Fetching YouTube transcript for video ${videoId}`);
+
+    // Dynamic import — youtube-transcript uses CJS-compatible syntax
+    const { YoutubeTranscript } = await import('youtube-transcript');
+    const segments = await YoutubeTranscript.fetchTranscript(videoId);
+
+    const text = segments
+      .map((s: { text: string }) => s.text)
+      .join(' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+
+    return {
+      text,
+      wordCount: text.split(/\s+/).filter(Boolean).length,
+      metadata: { source_type: 'YOUTUBE', video_id: videoId, url: videoUrl },
+    };
+  }
+
+  private extractYoutubeId(url: string): string | null {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) return m[1];
+    }
+    return null;
   }
 
   /**
