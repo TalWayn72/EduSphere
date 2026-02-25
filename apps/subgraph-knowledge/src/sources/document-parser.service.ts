@@ -45,8 +45,12 @@ export class DocumentParserService {
 
   /** Parse a PDF buffer → plaintext (uses pdf-parse) */
   async parsePdf(buffer: Buffer): Promise<ParseResult> {
-    // Dynamic import avoids pdf-parse's test-runner auto-execution at require time
-    const { default: pdfParse } = await import('pdf-parse');
+    // Dynamic import avoids pdf-parse's test-runner auto-execution at require time.
+    // Cast to callable: pdf-parse@2.4.5 changed its CJS export shape and TypeScript
+    // infers the module object rather than the callable default export.
+    type PdfParseFn = (buf: Buffer) => Promise<{ text: string; numpages: number }>;
+    const pdfParseModule = await import('pdf-parse');
+    const pdfParse = (pdfParseModule.default ?? pdfParseModule) as unknown as PdfParseFn;
     const data = await pdfParse(buffer);
     const text = data.text.replace(/\r\n/g, '\n').replace(/\s{3,}/g, '\n').trim();
     return {
@@ -137,7 +141,7 @@ export class DocumentParserService {
     ];
     for (const p of patterns) {
       const m = url.match(p);
-      if (m) return m[1];
+      if (m) return m[1] ?? null;
     }
     return null;
   }
