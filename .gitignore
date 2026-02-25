@@ -68,6 +68,8 @@ Thumbs.db
 # Temporary files
 *.tmp
 .tmp-*.js
+.tmp-*.mjs
+test_output.txt
 *.temp
 *.bak
 *.swp
