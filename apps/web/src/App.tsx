@@ -8,6 +8,7 @@ import { initKeycloak } from '@/lib/auth';
 import { initI18n, applyDocumentDirection } from '@/lib/i18n';
 import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
+import { StorageWarningBanner } from '@/components/StorageWarningBanner';
 
 // ── App ──────────────────────────────────────────────────────────────────────
 
@@ -47,6 +48,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UrqlProvider value={urqlClient}>
+        <StorageWarningBanner />
         <Toaster />
         <RouterProvider router={router} />
       </UrqlProvider>
