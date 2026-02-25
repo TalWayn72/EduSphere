@@ -1,0 +1,8 @@
+{
+  "conflicts": {
+    "title": "{{count}} opérations de synchronisation échouées",
+    "subtitle": "Ces modifications n'ont pas pu être enregistrées. Ignorez pour effacer.",
+    "dismissAll": "Tout ignorer",
+    "dismiss": "Ignorer"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "conflicts": {
+    "title": "{{count}} 个同步操作失败",
+    "subtitle": "这些更改无法保存。关闭以清除。",
+    "dismissAll": "全部关闭",
+    "dismiss": "关闭"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "conflicts": {
+    "title": "{{count}} operaciones de sincronización fallidas",
+    "subtitle": "Estos cambios no pudieron guardarse. Descarta para limpiar.",
+    "dismissAll": "Descartar todo",
+    "dismiss": "Descartar"
+  }
+}
