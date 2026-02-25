@@ -4,10 +4,8 @@ import { Zap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MicrolessonCard, type MicrolessonData } from '@/components/MicrolessonCard';
-import {
-  DAILY_MICROLESSON_QUERY,
-  MARK_CONTENT_VIEWED_MUTATION,
-} from '@/lib/graphql/content.queries';
+import { DAILY_MICROLESSON_QUERY } from '@/lib/graphql/content-tier3.queries';
+import { MARK_CONTENT_VIEWED_MUTATION } from '@/lib/graphql/content.queries';
 
 interface DailyMicrolessonQueryResult {
   dailyMicrolesson: {

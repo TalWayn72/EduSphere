@@ -5,8 +5,8 @@ import { gql } from 'urql';
  * Schema: startAgentSession(templateType: TemplateType!, context: JSON!): AgentSession!
  */
 export const START_AGENT_SESSION_MUTATION = gql`
-  mutation StartAgentSession($templateType: TemplateType!, $context: JSON!, $locale: String) {
-    startAgentSession(templateType: $templateType, context: $context, locale: $locale) {
+  mutation StartAgentSession($templateType: TemplateType!, $context: JSON!) {
+    startAgentSession(templateType: $templateType, context: $context) {
       id
       templateType
       status
@@ -91,22 +91,6 @@ export const MESSAGE_STREAM_SUBSCRIPTION = gql`
   }
 `;
 
-export const GENERATE_COURSE_FROM_PROMPT_MUTATION = gql`
-  mutation GenerateCourseFromPrompt($prompt: String!, $tenantId: ID!) {
-    generateCourseFromPrompt(prompt: $prompt, tenantId: $tenantId) {
-      executionId
-      status
-    }
-  }
-`;
-
-export const EXECUTION_STATUS_SUBSCRIPTION = gql`
-  subscription ExecutionStatus($executionId: ID!) {
-    executionStatus(executionId: $executionId) {
-      executionId
-      status
-      result
-      error
-    }
-  }
-`;
+// NOTE: generateCourseFromPrompt and executionStatus subscriptions have been
+// moved to agent-course-gen.queries.ts, which is excluded from codegen until
+// the supergraph is recomposed with the full subgraph-agent SDL.

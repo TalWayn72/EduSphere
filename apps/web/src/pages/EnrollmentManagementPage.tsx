@@ -40,7 +40,7 @@ import {
   ADMIN_ENROLL_USER_MUTATION,
   ADMIN_UNENROLL_USER_MUTATION,
   ADMIN_BULK_ENROLL_MUTATION,
-} from '@/lib/graphql/content.queries';
+} from '@/lib/graphql/content-tier3.queries';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 

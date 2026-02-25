@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RichEditor } from './RichEditor';
-import { CREATE_CONTENT_ITEM_MUTATION } from '@/lib/graphql/content.queries';
+import { CREATE_CONTENT_ITEM_MUTATION } from '@/lib/graphql/content-tier3.queries';
 import { PRESIGNED_UPLOAD_QUERY } from '@/lib/graphql/content.queries';
 import { urqlClient } from '@/lib/urql-client';
 

@@ -10,7 +10,7 @@ import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { COURSE_ANALYTICS_QUERY, AT_RISK_LEARNERS_QUERY, RESOLVE_AT_RISK_FLAG_MUTATION } from '@/lib/graphql/content.queries';
+import { COURSE_ANALYTICS_QUERY, AT_RISK_LEARNERS_QUERY, RESOLVE_AT_RISK_FLAG_MUTATION } from '@/lib/graphql/content-tier3.queries';
 import { ArrowLeft, Users, Activity, TrendingUp, Star, Loader2, AlertCircle, AlertTriangle } from 'lucide-react';
 import { AnalyticsCharts } from './CourseAnalyticsPage.charts';
 import { useAuthRole } from '@/hooks/useAuthRole';

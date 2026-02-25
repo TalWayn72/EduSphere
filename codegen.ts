@@ -36,6 +36,13 @@ const config: CodegenConfig = {
     // supergraph composition. They use manually-typed interfaces so they do NOT
     // need generated types. Exclude until compose.js is re-run with live services.
     //
+    // Agent tier-3 (course generator — not yet in supergraph):
+    '!apps/web/src/lib/graphql/agent-course-gen.queries.ts',
+    // Content tier-3 (analytics, microlearning, at-risk, scenarios, admin enrollment):
+    '!apps/web/src/lib/graphql/content-tier3.queries.ts',
+    // Knowledge tier-3 (skill gap, social feed):
+    '!apps/web/src/lib/graphql/knowledge-tier3.queries.ts',
+    //
     // Admin (Phase-2):
     '!apps/web/src/lib/graphql/admin-gamification.queries.ts',
     '!apps/web/src/lib/graphql/admin-language.queries.ts',
