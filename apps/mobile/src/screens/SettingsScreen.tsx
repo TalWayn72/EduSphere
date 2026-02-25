@@ -4,6 +4,7 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  Switch,
   StyleSheet,
   SafeAreaView,
   ScrollView,
@@ -14,6 +15,9 @@ import { useTranslation } from 'react-i18next';
 import { SUPPORTED_LOCALES, LOCALE_LABELS, type SupportedLocale } from '@edusphere/i18n';
 import { saveMobileLocale } from '../lib/i18n';
 import { useStorageManager } from '../hooks/useStorageManager';
+import { useWifiOnlySetting } from '../hooks/useWifiOnlySetting';
+import { useDownloadedCourses } from '../hooks/useDownloadedCourses';
+import type { OfflineCourse } from '../services/downloads';
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -131,6 +135,85 @@ function StorageSection() {
   );
 }
 
+function WifiOnlySection() {
+  const { t } = useTranslation('settings');
+  const { wifiOnly, isLoading, toggle } = useWifiOnlySetting();
+
+  return (
+    <View style={styles.wifiSection}>
+      <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>{t('downloads.wifiOnlyTitle')}</Text>
+      <Text style={styles.sectionDescription}>{t('downloads.wifiOnlyDescription')}</Text>
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>{t('downloads.wifiOnlyLabel')}</Text>
+        <Switch
+          value={wifiOnly}
+          onValueChange={() => void toggle()}
+          disabled={isLoading}
+          accessibilityLabel={t('downloads.wifiOnlyLabel')}
+          accessibilityRole="switch"
+          accessibilityState={{ checked: wifiOnly }}
+        />
+      </View>
+    </View>
+  );
+}
+
+function DownloadedCoursesSection() {
+  const { t } = useTranslation('settings');
+  const { courses, isLoading, deleteCourse } = useDownloadedCourses();
+
+  const handleDelete = (course: OfflineCourse) => {
+    Alert.alert(
+      t('downloads.deleteTitle'),
+      t('downloads.deleteConfirm', { title: course.title }),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: () => void deleteCourse(course.id),
+        },
+      ]
+    );
+  };
+
+  return (
+    <View>
+      <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>{t('downloads.coursesTitle')}</Text>
+      <Text style={styles.sectionDescription}>{t('downloads.coursesDescription')}</Text>
+      {isLoading ? (
+        <View style={styles.loadingRow}><ActivityIndicator size="small" color="#2563EB" /></View>
+      ) : courses.length === 0 ? (
+        <Text style={styles.emptyText}>{t('downloads.noCourses')}</Text>
+      ) : (
+        <FlatList
+          data={courses}
+          keyExtractor={(item) => item.id}
+          scrollEnabled={false}
+          renderItem={({ item }) => (
+            <View style={styles.courseRow}>
+              <View style={styles.courseInfo}>
+                <Text style={styles.courseTitle} numberOfLines={1}>{item.title}</Text>
+                <Text style={styles.courseMeta}>
+                  {formatBytes(item.size)} · {new Date(item.downloadedAt).toLocaleDateString()}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.deleteBtn}
+                onPress={() => handleDelete(item)}
+                accessibilityLabel={t('downloads.deleteLabel', { title: item.title })}
+                accessibilityRole="button"
+              >
+                <Text style={styles.deleteBtnText}>{t('common.delete')}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      )}
+    </View>
+  );
+}
+
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation('settings');
   const currentLocale = i18n.language as SupportedLocale;
@@ -178,6 +261,12 @@ export default function SettingsScreen() {
         <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>{t('storage.title')}</Text>
         <Text style={styles.sectionDescription}>{t('storage.description')}</Text>
         <StorageSection />
+
+        {/* WiFi-only download section */}
+        <WifiOnlySection />
+
+        {/* Downloaded courses section */}
+        <DownloadedCoursesSection />
       </ScrollView>
     </SafeAreaView>
   );
@@ -211,4 +300,14 @@ const styles = StyleSheet.create({
   actionButtonDanger: { borderColor: '#FCA5A5' },
   actionButtonText: { fontSize: 14, color: '#374151', fontWeight: '500' },
   actionButtonTextDanger: { color: '#DC2626' },
+  wifiSection: { paddingBottom: 8 },
+  switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  switchLabel: { fontSize: 15, color: '#111827', flex: 1 },
+  emptyText: { fontSize: 14, color: '#9CA3AF', paddingHorizontal: 16, paddingVertical: 12 },
+  courseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  courseInfo: { flex: 1, marginRight: 12 },
+  courseTitle: { fontSize: 15, color: '#111827', fontWeight: '500' },
+  courseMeta: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  deleteBtn: { borderWidth: 1, borderColor: '#FCA5A5', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 6 },
+  deleteBtnText: { fontSize: 13, color: '#DC2626', fontWeight: '500' },
 });

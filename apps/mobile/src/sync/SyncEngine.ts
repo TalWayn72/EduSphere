@@ -5,7 +5,7 @@
  * Max 3 retries per mutation; permanently failed items are dequeued with error log.
  */
 import * as Network from 'expo-network';
-import { enqueue, dequeue, peek, incrementRetry, queueSize, QueuedMutation } from './OfflineQueue';
+import { enqueue, dequeue, peek, incrementRetry, queueSize, addConflict, QueuedMutation } from './OfflineQueue';
 
 export type SyncStatus = 'idle' | 'syncing' | 'error';
 type StatusListener = (status: SyncStatus, pending: number) => void;
@@ -80,9 +80,10 @@ export class SyncEngine {
       } else {
         incrementRetry(mutation.id);
         if (mutation.retryCount + 1 >= MAX_RETRIES) {
-          // Give up — remove from queue to prevent permanent blockage
+          // Give up — remove from queue, persist to conflicts table for user review
           dequeue(mutation.id);
-          console.warn('[SyncEngine] Permanently failed mutation dropped', mutation.operationName);
+          addConflict(mutation, 'max_retries_exceeded');
+          this._emit('error', queueSize());
         }
         hadError = true;
       }

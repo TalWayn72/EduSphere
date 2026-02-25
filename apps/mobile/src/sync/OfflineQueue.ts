@@ -37,6 +37,13 @@ function getDb(): SQLite.SQLiteDatabase {
         retry_count INTEGER NOT NULL DEFAULT 0
       );
       CREATE INDEX IF NOT EXISTS idx_offline_queue_created ON offline_queue(created_at ASC);
+      CREATE TABLE IF NOT EXISTS offline_conflicts (
+        id TEXT PRIMARY KEY,
+        operation_name TEXT NOT NULL,
+        failed_at INTEGER NOT NULL,
+        retry_count INTEGER NOT NULL,
+        error_reason TEXT NOT NULL
+      );
     `);
   }
   return _db;
@@ -81,6 +88,42 @@ export function queueSize(): number {
 
 export function clearAll(): void {
   getDb().runSync('DELETE FROM offline_queue');
+}
+
+export interface ConflictedMutation {
+  id: string;
+  operationName: string;
+  failedAt: number;
+  retryCount: number;
+  errorReason: string;
+}
+
+export function addConflict(mutation: QueuedMutation, errorReason: string): void {
+  getDb().runSync(
+    'INSERT OR REPLACE INTO offline_conflicts (id, operation_name, failed_at, retry_count, error_reason) VALUES (?, ?, ?, ?, ?)',
+    [mutation.id, mutation.operationName, Date.now(), mutation.retryCount, errorReason],
+  );
+}
+
+export function getConflicts(): ConflictedMutation[] {
+  const rows = getDb().getAllSync<{
+    id: string; operation_name: string; failed_at: number; retry_count: number; error_reason: string;
+  }>('SELECT * FROM offline_conflicts ORDER BY failed_at DESC');
+  return rows.map((r) => ({
+    id: r.id,
+    operationName: r.operation_name,
+    failedAt: r.failed_at,
+    retryCount: r.retry_count,
+    errorReason: r.error_reason,
+  }));
+}
+
+export function resolveConflict(id: string): void {
+  getDb().runSync('DELETE FROM offline_conflicts WHERE id = ?', [id]);
+}
+
+export function conflictCount(): number {
+  return (getDb().getFirstSync<{ c: number }>('SELECT COUNT(*) as c FROM offline_conflicts'))?.c ?? 0;
 }
 
 /** Call on app teardown to close the SQLite connection. */

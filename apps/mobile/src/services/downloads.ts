@@ -1,6 +1,8 @@
 import * as FileSystem from 'expo-file-system';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { database } from './database';
 import { storageManager } from './StorageManager';
+import { isWifiConnected } from './networkUtils';
 
 export interface DownloadProgress {
   courseId: string;
@@ -47,6 +49,15 @@ export class DownloadService {
         throw new Error(
           `STORAGE_QUOTA_EXCEEDED:${stats.eduSphereUsedBytes}:${stats.eduSphereQuotaBytes}`
         );
+      }
+    }
+
+    // WiFi-only guard
+    const wifiOnlyRaw = await AsyncStorage.getItem('edusphere_wifi_only_download').catch(() => null);
+    if (wifiOnlyRaw === 'true') {
+      const onWifi = await isWifiConnected();
+      if (!onWifi) {
+        throw new Error('WIFI_REQUIRED');
       }
     }
 
