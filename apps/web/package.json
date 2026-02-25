@@ -65,6 +65,7 @@
     "react-hook-form": "^7.71.1",
     "react-i18next": "^15.0.0",
     "react-router-dom": "^7.12.1",
+    "recharts": "^3.7.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "urql": "^4.1.0",
