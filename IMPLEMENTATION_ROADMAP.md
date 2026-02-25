@@ -1044,9 +1044,9 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 10: Video Player + Transcript Sync (🔴 CRITICAL — User Cannot Consume Content)
+## Phase 10: Video Player + Transcript Sync ✅ COMPLETE (Feb 18, 2026)
 
-**Problem:** Users cannot watch any video content. The core learning loop is broken.
+**Status:** Shipped in commit `32deb1c`. HLS player via `hls.js` in `ContentViewer.tsx` with transcript sync, search, and `?t=` deep links.
 
 ### Phase 10.1: Video Player with HLS Streaming
 
@@ -1088,9 +1088,9 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 11: Semantic Search UI (🔴 CRITICAL — Users Cannot Discover Content)
+## Phase 11: Semantic Search UI ✅ COMPLETE (Feb 18, 2026)
 
-**Problem:** No search bar exists anywhere in the UI. The Knowledge subgraph is fully built but inaccessible.
+**Status:** Shipped in commit `32deb1c`. Global search bar in Layout header (Cmd+K), `/search` page with hybrid results, timestamp deep-link into ContentViewer.
 
 ### Phase 11.1: Global Search Bar
 
@@ -1130,9 +1130,9 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 12: AI Agent Chat Interface (🔴 CRITICAL — Core Value Prop Invisible)
+## Phase 12: AI Agent Chat Interface ✅ COMPLETE (Feb 18, 2026)
 
-**Problem:** `AgentsPage.tsx` exists but there is zero chat UI. The entire AI layer (LangGraph, Vercel AI SDK) is backend-only.
+**Status:** Shipped in commit `32deb1c`. Full chat UI in `AgentsPage.tsx` with 5 agent templates, token streaming, session management, and memory-safe cleanup.
 
 ### Phase 12.1: Agent Chat Panel
 
@@ -1175,9 +1175,9 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 13: Knowledge Graph Visualization (🟡 HIGH — Empty Page)
+## Phase 13: Knowledge Graph Visualization ✅ COMPLETE (Feb 18, 2026)
 
-**Problem:** `KnowledgeGraph.tsx` renders an empty page. Backend graph data exists but no visualization.
+**Status:** Shipped in commit `32deb1c`. SVG-based graph in `KnowledgeGraph.tsx` with 4 node types, edge rendering, pan/zoom/reset controls, and concept detail panel.
 
 ### Phase 13.1: Graph Canvas
 
