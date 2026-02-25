@@ -29,5 +29,22 @@
     "progress": "Kemajuan",
     "achievements": "Pencapaian",
     "version": "Versi {{version}}"
+  },
+  "storage": {
+    "title": "Penyimpanan Offline",
+    "description": "Kelola penyimpanan lokal untuk pembelajaran offline. EduSphere dibatasi hingga 50% disk perangkat Anda.",
+    "overLimitWarning": "Penyimpanan offline penuh — mode offline dinonaktifkan. Bebaskan ruang untuk melanjutkan belajar offline.",
+    "approachingLimitWarning": "Penyimpanan offline hampir penuh. Bebaskan ruang untuk terus bekerja offline.",
+    "clearCache": "Hapus Cache Kueri",
+    "clearDownloads": "Hapus Kursus yang Diunduh",
+    "clearCacheTitle": "Hapus Cache Kueri?",
+    "clearCacheConfirm": "Ini menghapus data pelajaran yang di-cache. Anda dapat mengunduhnya kembali saat online.",
+    "clearDownloadsTitle": "Hapus Kursus yang Diunduh?",
+    "clearDownloadsConfirm": "Semua kursus yang diunduh akan dihapus dari perangkat ini. Anda dapat mengunduhnya kembali saat online.",
+    "cleared": "Penyimpanan Dibersihkan",
+    "freedBytes": "{{bytes}} dibebaskan",
+    "deviceFree": "{{free}} tersedia di perangkat",
+    "used": "digunakan",
+    "limitOf": "batas"
   }
 }

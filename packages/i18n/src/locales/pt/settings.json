@@ -29,5 +29,22 @@
     "progress": "Progresso",
     "achievements": "Conquistas",
     "version": "Versão {{version}}"
+  },
+  "storage": {
+    "title": "Armazenamento offline",
+    "description": "Gerencie o armazenamento local para aprendizado offline. O EduSphere é limitado a 50% do disco do seu dispositivo.",
+    "overLimitWarning": "O armazenamento offline está cheio — o modo offline está desativado. Libere espaço para continuar aprendendo offline.",
+    "approachingLimitWarning": "O armazenamento offline está quase cheio. Libere espaço para continuar trabalhando offline.",
+    "clearCache": "Limpar cache de consultas",
+    "clearDownloads": "Excluir cursos baixados",
+    "clearCacheTitle": "Limpar cache de consultas?",
+    "clearCacheConfirm": "Isso remove os dados de lições em cache. Você pode baixá-los novamente quando estiver online.",
+    "clearDownloadsTitle": "Excluir cursos baixados?",
+    "clearDownloadsConfirm": "Todos os cursos baixados serão removidos deste dispositivo. Você pode baixá-los novamente quando estiver online.",
+    "cleared": "Armazenamento limpo",
+    "freedBytes": "{{bytes}} liberados",
+    "deviceFree": "{{free}} disponíveis no dispositivo",
+    "used": "usado",
+    "limitOf": "limite"
   }
 }

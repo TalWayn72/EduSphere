@@ -29,5 +29,22 @@
     "progress": "Progression",
     "achievements": "Réalisations",
     "version": "Version {{version}}"
+  },
+  "storage": {
+    "title": "Stockage hors ligne",
+    "description": "Gérez le stockage local pour l'apprentissage hors ligne. EduSphere est limité à 50% du disque de votre appareil.",
+    "overLimitWarning": "Le stockage hors ligne est plein — le mode hors ligne est désactivé. Libérez de l'espace pour continuer à apprendre hors ligne.",
+    "approachingLimitWarning": "Le stockage hors ligne est presque plein. Libérez de l'espace pour continuer à travailler hors ligne.",
+    "clearCache": "Vider le cache des requêtes",
+    "clearDownloads": "Supprimer les cours téléchargés",
+    "clearCacheTitle": "Vider le cache des requêtes ?",
+    "clearCacheConfirm": "Cela supprime les données de leçons mises en cache. Vous pouvez les retélécharger lorsque vous êtes en ligne.",
+    "clearDownloadsTitle": "Supprimer les cours téléchargés ?",
+    "clearDownloadsConfirm": "Tous les cours téléchargés seront supprimés de cet appareil. Vous pouvez les retélécharger lorsque vous êtes en ligne.",
+    "cleared": "Stockage effacé",
+    "freedBytes": "{{bytes}} libérés",
+    "deviceFree": "{{free}} disponibles sur l'appareil",
+    "used": "utilisé",
+    "limitOf": "limite"
   }
 }

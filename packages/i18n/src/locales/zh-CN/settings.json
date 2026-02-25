@@ -29,5 +29,22 @@
     "progress": "进度",
     "achievements": "成就",
     "version": "版本 {{version}}"
+  },
+  "storage": {
+    "title": "离线存储",
+    "description": "管理离线学习的本地存储。EduSphere 限制使用设备磁盘的 50%。",
+    "overLimitWarning": "离线存储已满 — 离线模式已禁用。请清理空间以继续离线学习。",
+    "approachingLimitWarning": "离线存储即将满。请清理空间以继续离线工作。",
+    "clearCache": "清除查询缓存",
+    "clearDownloads": "删除已下载的课程",
+    "clearCacheTitle": "清除查询缓存？",
+    "clearCacheConfirm": "这将删除缓存的课程数据。联网后可重新下载。",
+    "clearDownloadsTitle": "删除已下载的课程？",
+    "clearDownloadsConfirm": "所有已下载的课程将从此设备中删除。联网后可重新下载。",
+    "cleared": "存储已清理",
+    "freedBytes": "已释放 {{bytes}}",
+    "deviceFree": "设备可用空间 {{free}}",
+    "used": "已使用",
+    "limitOf": "限制"
   }
 }
