@@ -108,7 +108,7 @@ export function VideoAnnotationLayer({
             variant="outline"
             className="h-7 text-xs"
             onClick={() => setShowForm(true)}
-            aria-label="Add annotation at current time"
+            aria-label="Add note at current time"
           >
             + Add Note
           </Button>

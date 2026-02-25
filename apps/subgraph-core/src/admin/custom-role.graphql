@@ -1,0 +1,69 @@
+type Role {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String!
+  permissions: [String!]!
+  isSystem: Boolean!
+  userCount: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type RoleDelegation {
+  id: ID!
+  userId: ID!
+  roleId: ID!
+  delegatedBy: ID!
+  validUntil: String
+  isActive: Boolean!
+  createdAt: String!
+}
+
+input CreateRoleInput {
+  name: String!
+  description: String
+  permissions: [String!]!
+}
+
+input UpdateRoleInput {
+  name: String
+  description: String
+  permissions: [String!]
+}
+
+extend type Query {
+  roles: [Role!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  role(id: ID!): Role
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  userDelegations(userId: ID!): [RoleDelegation!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  createRole(input: CreateRoleInput!): Role!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  updateRole(id: ID!, input: UpdateRoleInput!): Role!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  deleteRole(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  delegateRole(userId: ID!, roleId: ID!, validUntil: String): RoleDelegation!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  revokeDelegation(delegationId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

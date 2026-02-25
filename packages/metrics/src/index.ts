@@ -71,6 +71,11 @@ export class MetricsService {
     });
   }
 
+  /** Returns the underlying Prometheus Registry for this service. */
+  getRegistry(): Registry {
+    return this.registry;
+  }
+
   recordHttpRequest(
     method: string,
     route: string,
@@ -146,5 +151,10 @@ export function createMetricsMiddleware(metricsService: MetricsService) {
     next();
   };
 }
+
+// NestJS-specific exports (module factory, controller, interceptor)
+export { createMetricsModule } from './nestjs.module-factory.js';
+export { MetricsController } from './nestjs.controller.js';
+export { MetricsInterceptor } from './nestjs.interceptor.js';
 
 export { Registry, Counter, Histogram, Gauge };

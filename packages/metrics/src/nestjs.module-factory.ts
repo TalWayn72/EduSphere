@@ -17,7 +17,7 @@ export function createMetricsModule(serviceName: string): DynamicModule {
       },
       {
         provide: 'METRICS_REGISTRY',
-        useValue: metricsService.registry,
+        useValue: metricsService.getRegistry(),
       },
       {
         provide: APP_INTERCEPTOR,

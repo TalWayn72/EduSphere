@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { connect, StringCodec } from 'nats';
 import { eq } from 'drizzle-orm';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
+import { minioConfig } from '@edusphere/config';
 
 const PRESIGNED_URL_EXPIRY_SECONDS = 900; // 15 minutes
 
@@ -23,6 +24,8 @@ interface MediaAssetResult {
   status: string;
   downloadUrl: string | null;
   hlsManifestUrl: string | null;
+  captionsUrl: string | null;
+  altText: string | null;
 }
 
 @Injectable()
@@ -34,20 +37,19 @@ export class MediaService implements OnModuleDestroy {
   private readonly sc = StringCodec();
 
   constructor() {
-    const endpoint = process.env.MINIO_ENDPOINT ?? 'http://localhost:9000';
-    this.bucket = process.env.MINIO_BUCKET ?? 'edusphere-media';
+    this.bucket = minioConfig.bucket;
 
     this.s3 = new S3Client({
-      endpoint,
-      region: process.env.MINIO_REGION ?? 'us-east-1',
+      endpoint: minioConfig.endpoint,
+      region: minioConfig.region,
       credentials: {
-        accessKeyId: process.env.MINIO_ACCESS_KEY ?? 'minioadmin',
-        secretAccessKey: process.env.MINIO_SECRET_KEY ?? 'minioadmin',
+        accessKeyId: minioConfig.accessKey,
+        secretAccessKey: minioConfig.secretKey,
       },
       forcePathStyle: true, // Required for MinIO
     });
 
-    this.logger.log(`MediaService initialized: bucket=${this.bucket} endpoint=${endpoint}`);
+    this.logger.log(`MediaService initialized: bucket=${this.bucket} endpoint=${minioConfig.endpoint}`);
   }
 
   async onModuleDestroy(): Promise<void> {
@@ -155,6 +157,8 @@ export class MediaService implements OnModuleDestroy {
       downloadUrl,
       // HLS manifest key is null at upload time; set later by the transcoding worker
       hlsManifestUrl: null,
+      captionsUrl: null,
+      altText: null,
     };
   }
 

@@ -1,0 +1,35 @@
+"""
+xAPI / LRS integration — F-028 xAPI 1.0.3 Self-Hosted LRS
+Provides token management and statement query access for ORG_ADMINs.
+"""
+
+type XapiToken {
+  id: ID!
+  description: String!
+  lrsEndpoint: String
+  isActive: Boolean!
+  createdAt: String!
+}
+
+type XapiStatementResult {
+  id: ID!
+  verb: String!
+  objectId: String!
+  storedAt: String!
+}
+
+extend type Query {
+  """List all xAPI tokens for this tenant. ORG_ADMIN only."""
+  xapiTokens: [XapiToken!]! @authenticated @requiresRole(roles: [ORG_ADMIN])
+
+  """Query recent xAPI statements stored in the self-hosted LRS."""
+  xapiStatements(limit: Int, since: String): [XapiStatementResult!]! @authenticated @requiresRole(roles: [ORG_ADMIN])
+}
+
+extend type Mutation {
+  """Generate a new xAPI LRS bearer token. Returns the raw token (shown once)."""
+  generateXapiToken(description: String!, lrsEndpoint: String): String! @authenticated @requiresRole(roles: [ORG_ADMIN])
+
+  """Revoke an existing xAPI token."""
+  revokeXapiToken(tokenId: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+}

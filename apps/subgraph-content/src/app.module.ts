@@ -12,6 +12,20 @@ import { TranslationModule } from './translation/translation.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { LiveSessionModule } from './live-session/live-session.module';
 import { QuizModule } from './quiz/quiz.module';
+import { ComplianceModule } from './compliance/compliance.module';
+import { MicrolearningModule } from './microlearning/microlearning.module';
+import { PlagiarismModule } from './plagiarism/plagiarism.module';
+import { AtRiskModule } from './at-risk/at-risk.module';
+import { ScenarioModule } from './scenario/scenario.module';
+import { LtiModule } from './lti/lti.module';
+import { BiExportModule } from './bi-export/bi-export.module';
+import { CpdModule } from './cpd/cpd.module';
+import { XapiModule } from './xapi/xapi.module';
+import { ProgramModule } from './programs/program.module';
+import { AssessmentModule } from './assessment/assessment.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { OpenBadgeModule } from './open-badges/open-badge.module';
+import { LibraryModule } from './course-library/library.module';
 
 @Module({
   imports: [
@@ -48,6 +62,20 @@ import { QuizModule } from './quiz/quiz.module';
     AnalyticsModule,
     LiveSessionModule,
     QuizModule,
+    ComplianceModule,
+    MicrolearningModule,
+    PlagiarismModule,
+    AtRiskModule,
+    ScenarioModule,
+    LtiModule,
+    BiExportModule,
+    CpdModule,
+    XapiModule,
+    ProgramModule,
+    AssessmentModule,
+    MarketplaceModule,
+    OpenBadgeModule,
+    LibraryModule,
   ],
 })
 export class AppModule {}

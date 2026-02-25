@@ -15,6 +15,10 @@ import { AIChatPanel } from '@/components/AIChatPanel';
 import { ActivityHeatmap } from '@/components/ActivityHeatmap';
 import { LearningStats } from '@/components/LearningStats';
 import { ActivityFeed } from '@/components/ActivityFeed';
+import { SRSWidget } from '@/components/SRSWidget';
+import { LeaderboardWidget } from '@/components/LeaderboardWidget';
+import { SkillGapWidget } from '@/components/SkillGapWidget';
+import { DailyLearningWidget } from '@/components/DailyLearningWidget';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
 import { MY_ANNOTATIONS_QUERY } from '@/lib/graphql/annotation.queries';
 import {
@@ -257,6 +261,18 @@ export function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Daily Learning Widget (F-021 Microlearning) */}
+        <DailyLearningWidget />
+
+        {/* SRS Review Queue Widget (F-001) */}
+        <SRSWidget />
+
+        {/* Leaderboard Widget (F-011) */}
+        <LeaderboardWidget />
+
+        {/* Skill Gap Analysis Widget (F-006) */}
+        <SkillGapWidget />
 
         {/* Course Progress + Weekly Stats */}
         <LearningStats courses={MOCK_COURSE_PROGRESS} weeklyStats={MOCK_WEEKLY_STATS} />

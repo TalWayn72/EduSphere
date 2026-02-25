@@ -3,6 +3,11 @@
  * SOC2 CC6: Prevent request flooding per tenant/IP.
  * For production with Redis: replace the Map store with ioredis.
  */
+import {
+  RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_MAX_REQUESTS,
+  RATE_LIMIT_CLEANUP_INTERVAL_MS,
+} from '../constants.js';
 
 interface RateLimitEntry {
   timestamps: number[];
@@ -10,23 +15,33 @@ interface RateLimitEntry {
 
 const store = new Map<string, RateLimitEntry>();
 
-const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-export const MAX_REQUESTS = parseInt(process.env['RATE_LIMIT_MAX'] ?? '100', 10);
+export const MAX_REQUESTS = parseInt(
+  process.env['RATE_LIMIT_MAX'] ?? String(RATE_LIMIT_MAX_REQUESTS),
+  10,
+);
 
-// Clean up stale entries every 5 minutes to prevent memory leaks
-const cleanupInterval = setInterval(
+// Clean up stale entries to prevent memory leaks
+let cleanupIntervalHandle: ReturnType<typeof setInterval> | undefined = setInterval(
   () => {
-    const cutoff = Date.now() - WINDOW_MS;
+    const cutoff = Date.now() - RATE_LIMIT_WINDOW_MS;
     for (const [key, entry] of store.entries()) {
       entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
       if (entry.timestamps.length === 0) store.delete(key);
     }
   },
-  5 * 60 * 1000,
+  RATE_LIMIT_CLEANUP_INTERVAL_MS,
 );
 
 // Allow test teardown without keeping Node.js alive
-if (cleanupInterval.unref) cleanupInterval.unref();
+if (cleanupIntervalHandle.unref) cleanupIntervalHandle.unref();
+
+/** Stop the cleanup timer — call from process shutdown handler to allow clean exit. */
+export function stopRateLimitCleanup(): void {
+  if (cleanupIntervalHandle !== undefined) {
+    clearInterval(cleanupIntervalHandle);
+    cleanupIntervalHandle = undefined;
+  }
+}
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -40,7 +55,7 @@ export interface RateLimitResult {
  */
 export function checkRateLimit(key: string): RateLimitResult {
   const now = Date.now();
-  const windowStart = now - WINDOW_MS;
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
 
   const entry = store.get(key) ?? { timestamps: [] };
   // Remove timestamps outside the current window
@@ -57,7 +72,7 @@ export function checkRateLimit(key: string): RateLimitResult {
   return {
     allowed,
     remaining: Math.max(0, MAX_REQUESTS - entry.timestamps.length),
-    resetAt: oldest + WINDOW_MS,
+    resetAt: oldest + RATE_LIMIT_WINDOW_MS,
   };
 }
 

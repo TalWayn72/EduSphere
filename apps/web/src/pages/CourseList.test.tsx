@@ -18,6 +18,8 @@ vi.mock('urql', async (importOriginal) => {
     // The execute function resolves with { error: null } so that enrollment handlers
     // can destructure without throwing.
     useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
+    // useSubscription must be mocked for AiCourseCreatorModal (rendered inside CourseList).
+    useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
   };
 });
 

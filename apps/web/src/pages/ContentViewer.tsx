@@ -57,6 +57,11 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+import { useQuery } from 'urql';
+import { LiveSessionCard } from '@/components/LiveSessionCard';
+import { LIVE_SESSION_QUERY } from '@/lib/graphql/live-session.queries';
+import { ScenarioPlayer } from '@/components/ScenarioPlayer';
+import { useScenarioNode } from '@/hooks/useScenarioNode';
 // ─── Skeleton helpers ──────────────────────────────────────────────────────────
 
 function SkeletonLine({ className = '' }: { className?: string }) {
@@ -141,6 +146,14 @@ export function ContentViewer() {
   // real bookmarks query/field.
   const bookmarks = mockBookmarks;
 
+  // ── Live session (LIVE_SESSION content type) ──
+  const [liveSessionResult] = useQuery({
+    query: LIVE_SESSION_QUERY,
+    variables: { contentItemId: contentId },
+  });
+  const liveSession = liveSessionResult.data?.liveSession ?? null;
+  // ── Scenario node (SCENARIO content type) ──
+  const { scenarioNode } = useScenarioNode(contentId, true);
   // ── HLS adaptive streaming ──
   // Initialise (or re-initialise) HLS.js whenever the source URLs change.
   useEffect(() => {
@@ -277,6 +290,21 @@ export function ContentViewer() {
       {contentError && <ErrorBanner message={contentError} />}
       {annotError && <ErrorBanner message={annotError} />}
 
+      {/* Live Session card — shown for LIVE_SESSION content type */}
+      {liveSession && (
+        <div className="mb-4">
+          <LiveSessionCard liveSession={liveSession} />
+        </div>
+      )}
+      {/* Scenario player — shown for SCENARIO content type */}
+      {scenarioNode && (
+        <div className="mb-4">
+          <ScenarioPlayer
+            rootContentItemId={contentId}
+            initialNode={scenarioNode}
+          />
+        </div>
+      )}
       <div className="grid grid-cols-12 gap-4 h-[calc(100vh-11rem)]">
         {/* ── LEFT: Video + Transcript ── */}
         <div className="col-span-12 lg:col-span-6 flex flex-col gap-3 overflow-hidden">

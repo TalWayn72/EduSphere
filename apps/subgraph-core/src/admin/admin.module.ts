@@ -7,6 +7,8 @@ import { AnnouncementsResolver } from './announcements.resolver';
 import { AnnouncementsService } from './announcements.service';
 import { SecurityResolver } from './security.resolver';
 import { SecurityService } from './security.service';
+import { CustomRoleResolver } from './custom-role.resolver';
+import { CustomRoleService } from './custom-role.service';
 
 @Module({
   providers: [
@@ -18,6 +20,8 @@ import { SecurityService } from './security.service';
     AnnouncementsService,
     SecurityResolver,
     SecurityService,
+    CustomRoleResolver,
+    CustomRoleService,
   ],
   exports: [AdminOverviewService],
 })

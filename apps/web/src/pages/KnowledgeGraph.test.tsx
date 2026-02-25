@@ -242,4 +242,18 @@ describe('KnowledgeGraph', () => {
     renderKG();
     expect(screen.getByText('Knowledge Graph')).toBeDefined();
   });
+
+  // ─── Regression: graph must not vanish when API returns empty array ───────────
+  // Bug: `!data?.concepts` evaluated to false for `[]` (truthy), causing the
+  // component to build an empty graph instead of falling back to mock data.
+  // Fix: changed to `!data?.concepts?.length` so empty arrays also trigger fallback.
+  it('regression: shows mock graph nodes when API returns empty concepts array', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      { data: { concepts: [] }, fetching: false, error: undefined },
+    ]);
+    renderKG();
+    // Mock graph has nodes — at least the default selected "Free Will" label must appear
+    expect(screen.getAllByText('Free Will').length).toBeGreaterThan(0);
+  });
 });

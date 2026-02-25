@@ -15,7 +15,7 @@ import type { SupportedLocale } from '@edusphere/i18n';
 
 export function SettingsPage() {
   const { t } = useTranslation('settings');
-  const { locale, setLocale, isSaving } = useUserPreferences();
+  const { locale, setLocale, isSaving, availableLocales } = useUserPreferences();
 
   const handleLocaleChange = async (newLocale: SupportedLocale): Promise<void> => {
     try {
@@ -43,6 +43,7 @@ export function SettingsPage() {
               value={locale}
               onChange={(l) => void handleLocaleChange(l)}
               disabled={isSaving}
+              availableLocales={availableLocales}
             />
             {isSaving && (
               <p className="text-xs text-muted-foreground mt-2">{t('language.saving')}</p>

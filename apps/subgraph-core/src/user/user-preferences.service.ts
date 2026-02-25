@@ -15,6 +15,7 @@ export interface UserPreferences {
   theme: string;
   emailNotifications: boolean;
   pushNotifications: boolean;
+  isPublicProfile: boolean;
 }
 
 export function parsePreferences(raw: unknown): UserPreferences {
@@ -24,6 +25,7 @@ export function parsePreferences(raw: unknown): UserPreferences {
     theme:              (r['theme']              as string)  ?? 'system',
     emailNotifications: (r['emailNotifications'] as boolean) ?? true,
     pushNotifications:  (r['pushNotifications']  as boolean) ?? true,
+    isPublicProfile:    (r['isPublicProfile']    as boolean) ?? false,
   };
 }
 
@@ -44,7 +46,7 @@ export class UserPreferencesService implements OnModuleDestroy {
     return {
       tenantId: authContext.tenantId || '',
       userId:   authContext.userId,
-      userRole: authContext.roles[0] || 'STUDENT',
+      userRole: (authContext.roles[0] || 'STUDENT') as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER',
     };
   }
 
@@ -56,7 +58,6 @@ export class UserPreferencesService implements OnModuleDestroy {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // Fetch current preferences
       const [existing] = await tx
         .select({ preferences: schema.users.preferences })
         .from(schema.users)
@@ -69,12 +70,12 @@ export class UserPreferencesService implements OnModuleDestroy {
 
       const current = parsePreferences(existing.preferences);
 
-      // PATCH semantics: only overwrite defined fields
       const merged: UserPreferences = {
         locale:             input.locale             ?? current.locale,
         theme:              input.theme              ?? current.theme,
         emailNotifications: input.emailNotifications ?? current.emailNotifications,
         pushNotifications:  input.pushNotifications  ?? current.pushNotifications,
+        isPublicProfile:    current.isPublicProfile,
       };
 
       const [updated] = await tx
@@ -88,11 +89,51 @@ export class UserPreferencesService implements OnModuleDestroy {
       }
 
       this.logger.debug(
-        { userId: id, tenantId: authContext.tenantId, merged },
+        { userId: id, tenantId: authContext.tenantId },
         'updatePreferences committed',
       );
 
       return updated;
+    });
+  }
+
+  async updateProfileVisibility(
+    id: string,
+    isPublic: boolean,
+    authContext: AuthContext,
+  ): Promise<UserPreferences> {
+    const tenantCtx = this.toTenantContext(authContext);
+
+    return withTenantContext(this.db, tenantCtx, async (tx) => {
+      const [existing] = await tx
+        .select({ preferences: schema.users.preferences })
+        .from(schema.users)
+        .where(eq(schema.users.id, id))
+        .limit(1);
+
+      if (!existing) {
+        throw new NotFoundException(`User ${id} not found`);
+      }
+
+      const current = parsePreferences(existing.preferences);
+      const merged: UserPreferences = { ...current, isPublicProfile: isPublic };
+
+      const [updated] = await tx
+        .update(schema.users)
+        .set({ preferences: merged })
+        .where(eq(schema.users.id, id))
+        .returning();
+
+      if (!updated) {
+        throw new NotFoundException(`User ${id} not found`);
+      }
+
+      this.logger.log(
+        { userId: id, isPublic },
+        'updateProfileVisibility committed',
+      );
+
+      return parsePreferences(updated.preferences);
     });
   }
 }

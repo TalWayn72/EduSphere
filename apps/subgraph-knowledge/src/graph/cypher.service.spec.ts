@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CypherService } from './cypher.service';
+import { CypherConceptService } from './cypher-concept.service';
+import { CypherPersonService } from './cypher-person.service';
+import { CypherTermService } from './cypher-term.service';
+import { CypherSourceService } from './cypher-source.service';
+import { CypherTopicClusterService } from './cypher-topic-cluster.service';
+import { CypherLearningPathService } from './cypher-learning-path.service';
 
 // ─── Pool mock for direct pool.query calls (Learning Path methods) ────────────
 //
@@ -43,7 +49,14 @@ describe('CypherService', function() {
     // Restore default implementations after clearAllMocks() wipes them
     mockClientQuery.mockResolvedValue({ rows: [] });
     mockPoolConnect.mockResolvedValue({ query: mockClientQuery, release: mockRelease });
-    service = new CypherService();
+    service = new CypherService(
+      new CypherConceptService(),
+      new CypherPersonService(),
+      new CypherTermService(),
+      new CypherSourceService(),
+      new CypherTopicClusterService(),
+      new CypherLearningPathService(),
+    );
   });
 
   describe('findConceptById', function() {
@@ -262,8 +275,9 @@ describe('CypherService', function() {
 
     it('returns null and releases client on error', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
         .mockRejectedValueOnce(new Error('AGE query failed'));
       const result = await service.findShortestLearningPath('A', 'B', 't-1');
       expect(result).toBeNull();
@@ -336,8 +350,9 @@ describe('CypherService', function() {
 
     it('returns empty array and releases client on error', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
         .mockRejectedValueOnce(new Error('connection reset'));
       const result = await service.collectRelatedConcepts('Physics', 2, 't-1');
       expect(result).toEqual([]);
@@ -399,8 +414,9 @@ describe('CypherService', function() {
 
     it('returns empty array and releases client on error', async function() {
       mockClientQuery
-        .mockResolvedValueOnce({})
-        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce({}) // LOAD 'age'
+        .mockResolvedValueOnce({}) // SET search_path
+        .mockResolvedValueOnce({}) // set_config (RLS)
         .mockRejectedValueOnce(new Error('query failed'));
       const result = await service.findPrerequisiteChain('Calculus', 't-1');
       expect(result).toEqual([]);

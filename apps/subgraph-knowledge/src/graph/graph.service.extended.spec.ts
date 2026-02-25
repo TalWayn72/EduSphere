@@ -1,23 +1,38 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GraphService } from './graph.service';
+import { GraphConceptService } from './graph-concept.service';
+import { GraphSearchService } from './graph-search.service';
+import { GraphPersonTermService } from './graph-person-term.service';
 
 vi.mock('@edusphere/db', () => ({ db: {}, withTenantContext: vi.fn(async (_db, _ctx, cb) => cb()) }));
 
 var mc = {
-  findConceptById: vi.fn(), findConceptByName: vi.fn(), findAllConcepts: vi.fn(),
+  findConceptById: vi.fn(), findConceptByName: vi.fn(), findConceptByNameCaseInsensitive: vi.fn(),
+  findAllConcepts: vi.fn(),
   createConcept: vi.fn(), updateConcept: vi.fn(), deleteConcept: vi.fn(),
   findRelatedConcepts: vi.fn(), linkConcepts: vi.fn(),
+  linkConceptsAndFetch: vi.fn().mockResolvedValue({ from: null, to: null }),
+  callEmbeddingProvider: vi.fn(), generateEmbedding: vi.fn(),
   findPersonById: vi.fn(), findPersonByName: vi.fn(), createPerson: vi.fn(),
   findTermById: vi.fn(), findTermByName: vi.fn(), createTerm: vi.fn(),
   findSourceById: vi.fn(), createSource: vi.fn(),
   findTopicClusterById: vi.fn(), findTopicClustersByCourse: vi.fn(), createTopicCluster: vi.fn(),
+  findShortestLearningPath: vi.fn(), collectRelatedConcepts: vi.fn(), findPrerequisiteChain: vi.fn(),
 };
 
 var RAW = { id: 'c-1', tenant_id: 't-1', name: 'X', definition: 'D', source_ids: '[]', created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' };
 
 describe('GraphService extended', () => {
   var svc;
-  beforeEach(() => { vi.clearAllMocks(); svc = new GraphService(mc); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mc.linkConceptsAndFetch.mockResolvedValue({ from: null, to: null });
+    svc = new GraphService(
+      new GraphConceptService(mc as any),
+      new GraphSearchService(mc as any, mc as any),
+      new GraphPersonTermService(mc as any, mc as any, mc as any, mc as any, mc as any),
+    );
+  });
   it('findRelatedConcepts maps strength', async () => {
     mc.findRelatedConcepts.mockResolvedValue([{ ...RAW, strength: 0.9 }]);
     var r = await svc.findRelatedConcepts('c-1',2,10,'t-1','u-1','STUDENT');

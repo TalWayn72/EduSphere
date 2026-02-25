@@ -1,0 +1,66 @@
+enum AssessmentStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+enum RaterRole {
+  SELF
+  PEER
+  MANAGER
+  DIRECT_REPORT
+}
+
+type AssessmentCampaign {
+  id: ID!
+  title: String!
+  targetUserId: ID!
+  status: AssessmentStatus!
+  dueDate: String
+  criteriaCount: Int!
+}
+
+type CriteriaAggregation {
+  criteriaId: ID!
+  label: String!
+  selfScore: Float
+  peerAvg: Float
+  managerScore: Float
+  overallAvg: Float!
+}
+
+type AssessmentResult {
+  campaignId: ID!
+  aggregatedScores: [CriteriaAggregation!]!
+  summary: String!
+  generatedAt: String!
+}
+
+extend type Query {
+  myCampaigns: [AssessmentCampaign!]! @authenticated
+  campaignsToRespond: [AssessmentCampaign!]! @authenticated
+  assessmentResult(campaignId: ID!): AssessmentResult @authenticated
+}
+
+extend type Mutation {
+  createAssessmentCampaign(
+    title: String!
+    targetUserId: ID!
+    dueDate: String
+  ): AssessmentCampaign! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  activateAssessmentCampaign(
+    campaignId: ID!
+  ): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  submitAssessmentResponse(
+    campaignId: ID!
+    raterRole: RaterRole!
+    criteriaScores: String!
+    narrative: String
+  ): Boolean! @authenticated
+
+  completeAssessmentCampaign(
+    campaignId: ID!
+  ): AssessmentResult! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+}

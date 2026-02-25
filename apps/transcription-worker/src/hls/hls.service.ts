@@ -12,6 +12,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { lookup as mimeLookup } from 'mime-types';
 import { randomUUID } from 'crypto';
+import { minioConfig } from '@edusphere/config';
 
 export interface HlsResult {
   /** MinIO key for the .m3u8 master manifest */
@@ -34,15 +35,15 @@ export class HlsService {
 
   constructor() {
     this.s3 = new S3Client({
-      endpoint: process.env.MINIO_ENDPOINT ?? 'http://localhost:9000',
-      region: process.env.MINIO_REGION ?? 'us-east-1',
+      endpoint: minioConfig.endpoint,
+      region: minioConfig.region,
       credentials: {
-        accessKeyId: process.env.MINIO_ACCESS_KEY ?? 'minioadmin',
-        secretAccessKey: process.env.MINIO_SECRET_KEY ?? 'minioadmin',
+        accessKeyId: minioConfig.accessKey,
+        secretAccessKey: minioConfig.secretKey,
       },
       forcePathStyle: true,
     });
-    this.bucket = process.env.MINIO_BUCKET ?? 'edusphere-media';
+    this.bucket = minioConfig.bucket;
     this.logger.log(
       `HlsService initialized: bucket=${this.bucket}`,
     );

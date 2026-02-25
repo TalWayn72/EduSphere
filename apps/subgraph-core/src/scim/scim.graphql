@@ -1,0 +1,37 @@
+extend type Query {
+  scimTokens: [ScimToken!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  scimSyncLog(limit: Int): [ScimSyncEntry!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  generateScimToken(input: GenerateScimTokenInput!): GenerateScimTokenResult! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  revokeScimToken(id: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+type ScimToken {
+  id: ID!
+  description: String!
+  lastUsedAt: DateTime
+  expiresAt: DateTime
+  isActive: Boolean!
+  createdAt: DateTime!
+}
+
+input GenerateScimTokenInput {
+  description: String!
+  expiresInDays: Int
+}
+
+type GenerateScimTokenResult {
+  token: ScimToken!
+  rawToken: String!
+}
+
+type ScimSyncEntry {
+  id: ID!
+  operation: String!
+  externalId: String
+  status: String!
+  errorMessage: String
+  createdAt: DateTime!
+}

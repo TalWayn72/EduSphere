@@ -4,15 +4,18 @@
  * Route: /courses/:courseId/analytics
  * Access: INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN only
  */
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from 'urql';
+import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { COURSE_ANALYTICS_QUERY } from '@/lib/graphql/content.queries';
-import { ArrowLeft, Users, Activity, TrendingUp, Star, Loader2, AlertCircle } from 'lucide-react';
+import { COURSE_ANALYTICS_QUERY, AT_RISK_LEARNERS_QUERY, RESOLVE_AT_RISK_FLAG_MUTATION } from '@/lib/graphql/content.queries';
+import { ArrowLeft, Users, Activity, TrendingUp, Star, Loader2, AlertCircle, AlertTriangle } from 'lucide-react';
 import { AnalyticsCharts } from './CourseAnalyticsPage.charts';
 import { useAuthRole } from '@/hooks/useAuthRole';
+import { AtRiskLearnersTable } from '@/components/AtRiskLearnersTable';
+import type { AtRiskLearnerRow } from '@/components/AtRiskLearnersTable';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -44,6 +47,10 @@ interface CourseAnalyticsData {
 
 interface CourseAnalyticsResult {
   courseAnalytics: CourseAnalyticsData;
+}
+
+interface AtRiskResult {
+  atRiskLearners: AtRiskLearnerRow[];
 }
 
 // ── Stat Card ─────────────────────────────────────────────────────────────────
@@ -78,12 +85,30 @@ export function CourseAnalyticsPage() {
   const { courseId = '' } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const role = useAuthRole();
+  const [resolving, setResolving] = useState<string | null>(null);
+
+  const paused = !courseId || !ALLOWED_ROLES.has(role ?? '');
 
   const [{ data, fetching, error }] = useQuery<CourseAnalyticsResult>({
     query: COURSE_ANALYTICS_QUERY,
     variables: { courseId },
-    pause: !courseId || !ALLOWED_ROLES.has(role ?? ''),
+    pause: paused,
   });
+
+  const [{ data: riskData }] = useQuery<AtRiskResult>({
+    query: AT_RISK_LEARNERS_QUERY,
+    variables: { courseId },
+    pause: paused,
+  });
+
+  const [, resolveFlag] = useMutation(RESOLVE_AT_RISK_FLAG_MUTATION);
+
+  const handleResolve = async (learnerId: string, _courseId: string) => {
+    const key = learnerId + _courseId;
+    setResolving(key);
+    await resolveFlag({ flagId: learnerId });
+    setResolving(null);
+  };
 
   if (!ALLOWED_ROLES.has(role ?? '')) {
     return (
@@ -119,6 +144,7 @@ export function CourseAnalyticsPage() {
   }
 
   const a = data.courseAnalytics;
+  const atRisk = riskData?.atRiskLearners ?? [];
 
   return (
     <Layout>
@@ -152,6 +178,28 @@ export function CourseAnalyticsPage() {
           contentItemMetrics={a.contentItemMetrics}
           dropOffFunnel={a.dropOffFunnel}
         />
+
+        {/* At-Risk Learners */}
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-base">
+              At-Risk Learners
+              {atRisk.length > 0 && (
+                <span className="ml-2 px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 text-xs font-semibold">
+                  {atRisk.length} at risk
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AtRiskLearnersTable
+              learners={atRisk}
+              onResolve={handleResolve}
+              resolving={resolving}
+            />
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

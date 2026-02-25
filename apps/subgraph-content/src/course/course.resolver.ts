@@ -5,6 +5,7 @@ import type { AuthContext } from '@edusphere/auth';
 import type { TenantContext } from '@edusphere/db';
 import { CourseService } from './course.service';
 import { EnrollmentService } from './enrollment.service';
+import { AdminEnrollmentService } from './admin-enrollment.service';
 import { ModuleService } from '../module/module.service';
 
 const tracer = trace.getTracer('subgraph-content');
@@ -34,6 +35,7 @@ export class CourseResolver {
   constructor(
     private readonly courseService: CourseService,
     private readonly enrollmentService: EnrollmentService,
+    private readonly adminEnrollmentService: AdminEnrollmentService,
     private readonly moduleService: ModuleService,
   ) {}
 
@@ -118,6 +120,47 @@ export class CourseResolver {
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.enrollmentService.markContentViewed(contentItemId, tenantCtx);
+  }
+
+  // ── Admin Enrollment (F-108) ─────────────────────────────────
+
+  @Query('adminCourseEnrollments')
+  async adminCourseEnrollments(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext,
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.adminEnrollmentService.getEnrollments(courseId, tenantCtx);
+  }
+
+  @Mutation('adminEnrollUser')
+  async adminEnrollUser(
+    @Args('courseId') courseId: string,
+    @Args('userId') userId: string,
+    @Context() ctx: GqlContext,
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.adminEnrollmentService.enrollUser(courseId, userId, tenantCtx);
+  }
+
+  @Mutation('adminUnenrollUser')
+  async adminUnenrollUser(
+    @Args('courseId') courseId: string,
+    @Args('userId') userId: string,
+    @Context() ctx: GqlContext,
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.adminEnrollmentService.unenrollUser(courseId, userId, tenantCtx);
+  }
+
+  @Mutation('adminBulkEnroll')
+  async adminBulkEnroll(
+    @Args('courseId') courseId: string,
+    @Args('userIds') userIds: string[],
+    @Context() ctx: GqlContext,
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.adminEnrollmentService.bulkEnroll(courseId, userIds, tenantCtx);
   }
 
   // ── Field Resolvers ──────────────────────────────────────────

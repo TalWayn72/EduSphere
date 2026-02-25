@@ -27,8 +27,8 @@ describe('ModuleResolver', () => {
     reorder: ReturnType<typeof vi.fn>;
   };
 
-  const contentItemService = {
-    findByModule: vi.fn().mockResolvedValue([]),
+  const contentItemLoader = {
+    byModuleId: { load: vi.fn().mockResolvedValue([]) },
   };
 
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe('ModuleResolver', () => {
       delete: vi.fn(),
       reorder: vi.fn(),
     };
-    resolver = new ModuleResolver(moduleService as never, contentItemService as never);
+    resolver = new ModuleResolver(moduleService as never, contentItemLoader as never);
   });
 
   describe('getModule()', () => {
@@ -128,10 +128,10 @@ describe('ModuleResolver', () => {
   });
 
   describe('getContentItems() (ResolveField)', () => {
-    it('delegates to contentItemService.findByModule', async () => {
-      contentItemService.findByModule.mockResolvedValue([]);
-      const result = await resolver.getContentItems(MOCK_MODULE as never);
-      expect(contentItemService.findByModule).toHaveBeenCalledWith('mod-1');
+    it('delegates to contentItemLoader.byModuleId.load', async () => {
+      contentItemLoader.byModuleId.load.mockResolvedValue([]);
+      const result = await resolver.getContentItems(MOCK_MODULE as never, {} as never);
+      expect(contentItemLoader.byModuleId.load).toHaveBeenCalledWith('mod-1');
       expect(result).toEqual([]);
     });
   });

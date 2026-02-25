@@ -6,6 +6,7 @@ import { AgentSessionModule } from './agent-session/agent-session.module';
 import { AgentMessageModule } from './agent-message/agent-message.module';
 import { TemplateModule } from './template/template.module';
 import { AgentModule } from './agent/agent.module';
+import { RoleplayModule } from './roleplay/roleplay.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
 
@@ -40,6 +41,7 @@ import { authMiddleware } from './auth/auth.middleware';
     AgentMessageModule,
     TemplateModule,
     AgentModule,
+    RoleplayModule,
   ],
 })
 export class AppModule {}

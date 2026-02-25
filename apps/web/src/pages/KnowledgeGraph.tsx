@@ -166,7 +166,7 @@ export function KnowledgeGraph() {
 
   // ── Build graph from real API data or fall back to mock ──
   const graphData = useMemo((): { nodes: GraphNode[]; edges: GraphEdge[] } => {
-    if (DEV_MODE || conceptsResult.error || !conceptsResult.data?.concepts) {
+    if (DEV_MODE || conceptsResult.error || !conceptsResult.data?.concepts?.length) {
       return mockGraphData;
     }
 

@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
-export { sql, eq, and, or, not, desc, asc, inArray } from 'drizzle-orm';
+export { sql, eq, and, or, not, desc, asc, inArray, lte, gte, lt, gt, ne, isNotNull, isNull } from 'drizzle-orm';
 
 // ---------------------------------------------------------------------------
 // Singleton pool registry — one Pool per unique connection string

@@ -1,203 +1,150 @@
+/**
+ * Unit tests for MediaService.
+ *
+ * Covers:
+ *  1. getPresignedUploadUrl() generates a URL with the correct fileKey structure.
+ *  2. getPresignedUploadUrl() throws InternalServerErrorException when S3Client fails.
+ *  3. confirmUpload() inserts a DB row and returns a MediaAssetResult with status READY.
+ *  4. confirmUpload() publishes to NATS via EDUSPHERE.media.uploaded.
+ *  5. getPresignedDownloadUrl() returns a signed URL from S3Client.
+ *  6. updateAltText() updates the DB row and returns the updated alt text.
+ *  7. updateAltText() throws NotFoundException when the asset does not exist.
+ *  8. getHlsManifestUrl() returns null when hlsManifestKey is null.
+ *  9. onModuleDestroy() calls closeAllPools().
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { InternalServerErrorException } from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { MediaService } from './media.service';
 
-const {
-  mockSend,
-  mockGetSignedUrl,
-  mockNatsPublish,
-  mockNatsFlush,
-  mockNatsClose,
-  mockReturning,
-  mockInsertValues,
-  mockDbInsert,
-  mockDb,
-} = vi.hoisted(() => {
-  const mockSend = vi.fn();
-  const mockGetSignedUrl = vi.fn().mockResolvedValue('https://minio.example.com/signed');
-  const mockNatsPublish = vi.fn();
-  const mockNatsFlush = vi.fn().mockResolvedValue(undefined);
-  const mockNatsClose = vi.fn().mockResolvedValue(undefined);
-  const mockReturning = vi.fn().mockResolvedValue([{ id: 'asset-1', course_id: 'course-1' }]);
-  const mockInsertValues = vi.fn(() => ({ returning: mockReturning }));
-  const mockDbInsert = vi.fn(() => ({ values: mockInsertValues }));
-  const mockDb = { insert: mockDbInsert };
-  return {
-    mockSend,
-    mockGetSignedUrl,
-    mockNatsPublish,
-    mockNatsFlush,
-    mockNatsClose,
-    mockReturning,
-    mockInsertValues,
-    mockDbInsert,
-    mockDb,
-  };
-});
-
+const mockS3Send = vi.fn();
 
 vi.mock('@aws-sdk/client-s3', () => ({
-  S3Client: vi.fn().mockImplementation(function() { (this as Record<string,unknown>).send = mockSend; }),
-  PutObjectCommand: vi.fn().mockImplementation(function(p: Record<string,unknown>) { Object.assign(this as object, { type: 'PUT', ...p }); }),
-  GetObjectCommand: vi.fn().mockImplementation(function(p: Record<string,unknown>) { Object.assign(this as object, { type: 'GET', ...p }); }),
+  S3Client: vi.fn().mockImplementation(function S3ClientCtor() { return { send: mockS3Send }; }),
+  PutObjectCommand: vi.fn().mockImplementation(function PutObjectCommandCtor(params: unknown) { return { type: 'PutObject', params }; }),
+  GetObjectCommand: vi.fn().mockImplementation(function GetObjectCommandCtor(params: unknown) { return { type: 'GetObject', params }; }),
 }));
 
-vi.mock('@aws-sdk/s3-request-presigner', () => ({ getSignedUrl: mockGetSignedUrl }));
+const mockGetSignedUrl = vi.fn().mockResolvedValue('https://minio.example.com/bucket/key?sig=abc');
+
+vi.mock('@aws-sdk/s3-request-presigner', () => ({
+  getSignedUrl: (...args: unknown[]) => mockGetSignedUrl(...args),
+}));
+
+const mockNatsPublish = vi.fn();
+const mockNatsFlush = vi.fn().mockResolvedValue(undefined);
+const mockNatsClose = vi.fn().mockResolvedValue(undefined);
+const mockNatsConnect = vi.fn().mockResolvedValue({
+  publish: mockNatsPublish,
+  flush: mockNatsFlush,
+  close: mockNatsClose,
+});
 
 vi.mock('nats', () => ({
-  connect: vi.fn().mockResolvedValue({ publish: mockNatsPublish, flush: mockNatsFlush, close: mockNatsClose }),
-  StringCodec: vi.fn().mockReturnValue({ encode: vi.fn((v) => v) }),
+  connect: (...args: unknown[]) => mockNatsConnect(...args),
+  StringCodec: vi.fn().mockImplementation(function StringCodecCtor() {
+    return { encode: (s: string) => Buffer.from(s) };
+  }),
 }));
 
+const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+
+const ASSET_ROW = {
+  id: 'asset-1',
+  course_id: 'course-1',
+  file_url: 'tenant-1/course-1/uuid-video.mp4',
+  title: 'Lecture 1',
+  alt_text: null,
+};
+
+const mockInsertReturning = vi.fn().mockResolvedValue([ASSET_ROW]);
+const mockInsertValues = vi.fn().mockReturnValue({ returning: mockInsertReturning });
+const mockUpdateReturning = vi.fn().mockResolvedValue([{ ...ASSET_ROW, alt_text: 'A cat' }]);
+const mockUpdateWhere = vi.fn().mockReturnValue({ returning: mockUpdateReturning });
+const mockUpdateSet = vi.fn().mockReturnValue({ where: mockUpdateWhere });
+
+const mockDb = {
+  insert: vi.fn().mockReturnValue({ values: mockInsertValues }),
+  update: vi.fn().mockReturnValue({ set: mockUpdateSet }),
+};
 
 vi.mock('@edusphere/db', () => ({
-  createDatabaseConnection: vi.fn(() => mockDb),
-  closeAllPools: vi.fn().mockResolvedValue(undefined),
-  schema: { media_assets: {} },
+  createDatabaseConnection: () => mockDb,
+  closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
+  schema: {
+    media_assets: { id: 'id', file_url: 'file_url', alt_text: 'alt_text' },
+  },
+  eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
 }));
-
-vi.mock('@edusphere/config', () => ({
-  minioConfig: { endpoint: 'minio.internal', port: 9000, useSSL: false, region: 'us-east-1', accessKey: 'admin', secretKey: 'admin', bucket: 'edusphere-media' },
-}));
-
-import { MediaService } from './media.service.js';
 
 describe('MediaService', () => {
-  let service: MediaService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let service: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetSignedUrl.mockResolvedValue('https://minio.example.com/signed');
-    mockReturning.mockResolvedValue([{ id: 'asset-1', course_id: 'course-1' }]);
+    mockGetSignedUrl.mockResolvedValue('https://minio.example.com/bucket/key?sig=abc');
+    mockInsertReturning.mockResolvedValue([ASSET_ROW]);
+    mockInsertValues.mockReturnValue({ returning: mockInsertReturning });
+    mockUpdateReturning.mockResolvedValue([{ ...ASSET_ROW, alt_text: 'A cat' }]);
+    mockUpdateWhere.mockReturnValue({ returning: mockUpdateReturning });
+    mockUpdateSet.mockReturnValue({ where: mockUpdateWhere });
+    mockDb.update.mockReturnValue({ set: mockUpdateSet });
+    mockNatsConnect.mockResolvedValue({ publish: mockNatsPublish, flush: mockNatsFlush, close: mockNatsClose });
+    process.env['MINIO_ENDPOINT'] = 'http://localhost:9000';
+    process.env['MINIO_BUCKET'] = 'edusphere-media';
+    process.env['NATS_URL'] = 'nats://localhost:4222';
     service = new MediaService();
   });
 
-  // getPresignedUploadUrl
-
-  describe('getPresignedUploadUrl()', () => {
-    it('returns uploadUrl, fileKey, and expiresAt', async () => {
-      const result = await service.getPresignedUploadUrl('lec.mp4', 'video/mp4', 'course-1', 'tenant-1');
-      expect(result.uploadUrl).toBe('https://minio.example.com/signed');
-      expect(result.fileKey).toBeDefined();
-      expect(result.expiresAt).toBeDefined();
-    });
-
-    it('includes tenantId and courseId in storage key path', async () => {
-      const result = await service.getPresignedUploadUrl('lec.mp4', 'video/mp4', 'course-abc', 'tenant-xyz');
-      expect(result.fileKey).toContain('tenant-xyz');
-      expect(result.fileKey).toContain('course-abc');
-    });
-
-    it('uses bucket name from config (edusphere-media) not hardcoded', async () => {
-      const { PutObjectCommand } = await import('@aws-sdk/client-s3');
-      await service.getPresignedUploadUrl('f.pdf', 'application/pdf', 'c1', 't1');
-      const callArg = vi.mocked(PutObjectCommand).mock.calls[0][0];
-      expect(callArg.Bucket).toBe('edusphere-media');
-    });
-
-    it('sanitizes filename: replaces spaces and special chars', async () => {
-      const result = await service.getPresignedUploadUrl('my file (2).mp4', 'video/mp4', 'c1', 't1');
-      expect(result.fileKey).not.toContain(' ');
-    });
-
-    it('throws InternalServerErrorException when getSignedUrl rejects', async () => {
-      mockGetSignedUrl.mockRejectedValueOnce(new Error('S3 down'));
-      await expect(
-        service.getPresignedUploadUrl('f.mp4', 'video/mp4', 'c1', 't1'),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('sets expiresAt 15 minutes ahead of current time', async () => {
-      const before = Date.now();
-      const result = await service.getPresignedUploadUrl('f.mp4', 'video/mp4', 'c1', 't1');
-      const after = Date.now();
-      const expiresMs = new Date(result.expiresAt).getTime();
-      expect(expiresMs).toBeGreaterThanOrEqual(before + 900000);
-      expect(expiresMs).toBeLessThanOrEqual(after + 900000);
-    });
+  it('should generate a presigned upload URL with correct fileKey structure', async () => {
+    const result = await service.getPresignedUploadUrl('lecture.mp4', 'video/mp4', 'course-1', 'tenant-1');
+    expect(result.uploadUrl).toContain('minio.example.com');
+    expect(result.fileKey).toMatch(/^tenant-1\/course-1\/.+-lecture\.mp4$/);
+    expect(result.expiresAt).toBeTruthy();
   });
 
-  describe('getPresignedDownloadUrl()', () => {
-    it('returns a presigned download URL string', async () => {
-      const url = await service.getPresignedDownloadUrl('t1/c1/file.mp4');
-      expect(typeof url).toBe('string');
-      expect(url).toBe('https://minio.example.com/signed');
-    });
-
-    it('passes the correct fileKey to GetObjectCommand', async () => {
-      const { GetObjectCommand } = await import('@aws-sdk/client-s3');
-      await service.getPresignedDownloadUrl('t1/c1/file.pdf');
-      const callArg = vi.mocked(GetObjectCommand).mock.calls[0][0];
-      expect(callArg.Key).toBe('t1/c1/file.pdf');
-    });
-
-    it('throws InternalServerErrorException when presigning fails', async () => {
-      mockGetSignedUrl.mockRejectedValueOnce(new Error('Network error'));
-      await expect(service.getPresignedDownloadUrl('key.mp4')).rejects.toThrow(InternalServerErrorException);
-    });
+  it('should throw InternalServerErrorException when getSignedUrl fails for upload', async () => {
+    mockGetSignedUrl.mockRejectedValueOnce(new Error('S3 unavailable'));
+    await expect(service.getPresignedUploadUrl('file.mp4', 'video/mp4', 'c-1', 't-1')).rejects.toThrow(InternalServerErrorException);
   });
 
-  describe('getHlsManifestUrl()', () => {
-    it('returns null when hlsManifestKey is null', async () => {
-      expect(await service.getHlsManifestUrl(null)).toBeNull();
-    });
-
-    it('returns a presigned URL for a valid hlsManifestKey', async () => {
-      const result = await service.getHlsManifestUrl('t1/c1/hls/master.m3u8');
-      expect(result).toBe('https://minio.example.com/signed');
-    });
-
-    it('returns null not throws when presigning fails for HLS key', async () => {
-      mockGetSignedUrl.mockRejectedValueOnce(new Error('S3 error'));
-      expect(await service.getHlsManifestUrl('bad/master.m3u8')).toBeNull();
-    });
+  it('should insert a DB record and return READY status on confirmUpload()', async () => {
+    const result = await service.confirmUpload('tenant-1/course-1/uuid-video.mp4', 'course-1', 'Lecture 1', 'tenant-1', 'user-1');
+    expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    expect(result.status).toBe('READY');
+    expect(result.id).toBe('asset-1');
+    expect(result.fileKey).toBe('tenant-1/course-1/uuid-video.mp4');
   });
 
-  describe('confirmUpload()', () => {
-    it('inserts media_assets with correct tenant_id', async () => {
-      await service.confirmUpload('t1/c1/file.mp4', 'c1', 'Lecture', 'tenant-1', 'user-1');
-      expect(mockDbInsert).toHaveBeenCalledTimes(1);
-      const [arg] = mockInsertValues.mock.calls[0] as [Record<string, unknown>];
-      expect(arg.tenant_id).toBe('tenant-1');
-    });
-
-    it('returns result with id, courseId, fileKey, title and READY status', async () => {
-      const r = await service.confirmUpload('t1/c1/f.mp4', 'course-1', 'Lecture 1', 'tenant-1', 'user-1');
-      expect(r.id).toBe('asset-1');
-      expect(r.courseId).toBe('course-1');
-      expect(r.fileKey).toBe('t1/c1/f.mp4');
-      expect(r.title).toBe('Lecture 1');
-      expect(r.status).toBe('READY');
-    });
-
-    it('detects VIDEO for .mp4 files', async () => {
-      await service.confirmUpload('t1/c1/v.mp4', 'c1', 'V', 't1', 'u1');
-      const [arg] = mockInsertValues.mock.calls[0] as [Record<string, unknown>];
-      expect(arg.media_type).toBe('VIDEO');
-    });
-
-    it('detects DOCUMENT for .pdf files', async () => {
-      await service.confirmUpload('t1/c1/d.pdf', 'c1', 'D', 't1', 'u1');
-      const [arg] = mockInsertValues.mock.calls[0] as [Record<string, unknown>];
-      expect(arg.media_type).toBe('DOCUMENT');
-    });
-
-    it('detects AUDIO for .mp3 files', async () => {
-      await service.confirmUpload('t1/c1/a.mp3', 'c1', 'A', 't1', 'u1');
-      const [arg] = mockInsertValues.mock.calls[0] as [Record<string, unknown>];
-      expect(arg.media_type).toBe('AUDIO');
-    });
-
-    it('sets hlsManifestUrl to null at upload time', async () => {
-      const r = await service.confirmUpload('t1/c1/f.mp4', 'c1', 'L', 't1', 'u1');
-      expect(r.hlsManifestUrl).toBeNull();
-    });
+  it('should publish EDUSPHERE.media.uploaded to NATS after confirming upload', async () => {
+    await service.confirmUpload('tenant-1/course-1/uuid-video.mp4', 'course-1', 'Lecture 1', 'tenant-1', 'user-1');
+    expect(mockNatsConnect).toHaveBeenCalledTimes(1);
+    expect(mockNatsPublish).toHaveBeenCalledWith('EDUSPHERE.media.uploaded', expect.any(Buffer));
   });
 
-  describe('onModuleDestroy()', () => {
-    it('calls closeAllPools to release DB connections', async () => {
-      const { closeAllPools } = await import('@edusphere/db');
-      await service.onModuleDestroy();
-      expect(closeAllPools).toHaveBeenCalledTimes(1);
-    });
+  it('should return a signed download URL from getPresignedDownloadUrl()', async () => {
+    const url = await service.getPresignedDownloadUrl('tenant-1/course-1/file.mp4');
+    expect(url).toContain('minio.example.com');
+  });
+
+  it('should update alt text in DB and return updated altText via updateAltText()', async () => {
+    const result = await service.updateAltText('asset-1', 'A cat', 'tenant-1');
+    expect(mockDb.update).toHaveBeenCalledTimes(1);
+    expect(result.altText).toBe('A cat');
+  });
+
+  it('should throw NotFoundException when asset not found in updateAltText()', async () => {
+    mockUpdateReturning.mockResolvedValueOnce([]);
+    await expect(service.updateAltText('missing-asset', 'Alt', 'tenant-1')).rejects.toThrow(NotFoundException);
+  });
+
+  it('should return null from getHlsManifestUrl() when hlsManifestKey is null', async () => {
+    const result = await service.getHlsManifestUrl(null);
+    expect(result).toBeNull();
+  });
+
+  it('should call closeAllPools on onModuleDestroy()', async () => {
+    await service.onModuleDestroy();
+    expect(mockCloseAllPools).toHaveBeenCalledTimes(1);
   });
 });

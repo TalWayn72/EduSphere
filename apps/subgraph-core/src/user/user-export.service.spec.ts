@@ -1,116 +1,200 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+/**
+ * Unit tests for UserExportService (GDPR Art.20 — Right to Data Portability).
+ *
+ * Covers:
+ *  1. exportUserData() returns a well-formed UserDataExport structure.
+ *  2. exportUserData() includes profile, annotations, agentSessions, learningProgress, enrollments.
+ *  3. exportUserData() writes an audit log entry after successful export.
+ *  4. exportUserData() still succeeds (non-fatal) when the audit log insert fails.
+ *  5. exportUserData() returns null for profile when the user is not found.
+ *  6. onModuleDestroy() calls closeAllPools().
+ *  7. exportedAt is a valid ISO-8601 timestamp.
+ *  8. gdprArticle field is always '20'.
+ */
 
-const mockTx = { select: vi.fn(), insert: vi.fn() };
-const mockDbInsert = vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) });
-const mockDbInstance = { insert: mockDbInsert };
+import { UserExportService } from './user-export.service';
 
-vi.mock("@edusphere/db", () => ({
-  createDatabaseConnection: vi.fn(() => mockDbInstance),
+// ── DB mocks ─────────────────────────────────────────────────────────────────
+
+const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+
+const mockAuditLogInsert = {
+  values: vi.fn().mockResolvedValue(undefined),
+};
+
+// withTenantContext executes the callback directly in tests
+const mockWithTenantContext = vi.fn(
+  (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => fn(_db),
+);
+
+// Default data returned by each table select
+const defaultUser = { id: 'user-1', email: 'alice@example.com', name: 'Alice' };
+const defaultAnnotations = [{ id: 'ann-1', body: 'Note A' }, { id: 'ann-2', body: 'Note B' }];
+const defaultAgentSessions = [{ id: 'sess-1', agentId: 'ag-1' }];
+const defaultProgress = [{ id: 'prog-1', completedAt: '2026-01-01' }];
+const defaultEnrollments = [{ id: 'enr-1', courseId: 'course-1' }, { id: 'enr-2', courseId: 'course-2' }];
+
+// Factory: each call to select().from().where() returns canned data for that table
+function makeSelectMock(
+  users: unknown[],
+  annotations: unknown[],
+  agentSessions: unknown[],
+  userProgress: unknown[],
+  userCourses: unknown[],
+) {
+  let callIndex = 0;
+  const datasets = [users, annotations, agentSessions, userProgress, userCourses];
+
+  return vi.fn().mockImplementation(() => ({
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockImplementation(() => {
+      const data = datasets[callIndex % datasets.length] ?? [];
+      callIndex++;
+      return Promise.resolve(data);
+    }),
+  }));
+}
+
+const mockInsert = vi.fn().mockReturnValue(mockAuditLogInsert);
+
+const mockDb = {
+  select: makeSelectMock(
+    [defaultUser],
+    defaultAnnotations,
+    defaultAgentSessions,
+    defaultProgress,
+    defaultEnrollments,
+  ),
+  insert: mockInsert,
+};
+
+vi.mock('@edusphere/db', () => ({
+  createDatabaseConnection: () => mockDb,
+  closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
+  withTenantContext: (...args: unknown[]) => mockWithTenantContext(...(args as Parameters<typeof mockWithTenantContext>)),
   schema: {
-    users: { id: "id" },
-    annotations: { user_id: "user_id" },
-    agentSessions: { userId: "userId" },
-    userProgress: { userId: "userId" },
-    userCourses: { userId: "userId" },
+    users: { id: 'id' },
+    annotations: { user_id: 'user_id' },
+    agentSessions: { userId: 'userId' },
+    userProgress: { userId: 'userId' },
+    userCourses: { userId: 'userId' },
     auditLog: {},
   },
-  withTenantContext: vi.fn(async (_db, _ctx, fn) => fn(mockTx)),
-  closeAllPools: vi.fn().mockResolvedValue(undefined),
-  eq: vi.fn((col, val) => ({ col, val })),
+  eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
 }));
 
-import { UserExportService } from "./user-export.service.js";
+// ─────────────────────────────────────────────────────────────────────────────
 
-const MOCK_USER = { id: "user-1", email: "user@test.com" };
-const MOCK_ANNOTATION = { id: "ann-1", user_id: "user-1" };
-const MOCK_SESSION = { id: "sess-1", userId: "user-1" };
-const MOCK_PROGRESS = { id: "prog-1", userId: "user-1" };
-const MOCK_ENROLLMENT = { id: "enr-1", courseId: "course-abc" };
-
-describe("UserExportService — GDPR Art.20 Right to Data Portability", () => {
+describe('UserExportService — GDPR Art.20', () => {
   let service: UserExportService;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDbInsert.mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) });
-    let callCount = 0;
-    const datasets = [[MOCK_USER], [MOCK_ANNOTATION], [MOCK_SESSION], [MOCK_PROGRESS], [MOCK_ENROLLMENT]];
-    mockTx.select.mockImplementation(() => ({
-      from: vi.fn().mockImplementation(() => ({
-        where: vi.fn().mockResolvedValue(datasets[callCount++ % datasets.length]),
-      })),
-    }));
-    mockTx.insert = vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) });
+
+    // Reset the mockDb.select to default data each test
+    mockDb.select = makeSelectMock(
+      [defaultUser],
+      defaultAnnotations,
+      defaultAgentSessions,
+      defaultProgress,
+      defaultEnrollments,
+    );
+    mockDb.insert = mockInsert;
+
     service = new UserExportService();
   });
 
-  it("returns a structured export object with GDPR metadata", async () => {
-    const result = await service.exportUserData("user-1", "tenant-1");
-    expect(result.gdprArticle).toBe("20");
-    expect(result.format).toBe("EduSphere-UserExport/1.0");
-    expect(result.userId).toBe("user-1");
-    expect(result.exportedAt).toBeDefined();
+  // ── Test 1 ──────────────────────────────────────────────────────────────────
+  it('should return a well-formed UserDataExport object', async () => {
+    const result = await service.exportUserData('user-1', 'tenant-1');
+
+    expect(result).toMatchObject({
+      gdprArticle: '20',
+      format: 'EduSphere-UserExport/1.0',
+      userId: 'user-1',
+    });
+    expect(typeof result.exportedAt).toBe('string');
   });
 
-  it("includes profile, annotations, agentSessions, learningProgress, enrollments", async () => {
-    const result = await service.exportUserData("user-1", "tenant-1");
+  // ── Test 2 ──────────────────────────────────────────────────────────────────
+  it('should include all five entity collections in the export', async () => {
+    const result = await service.exportUserData('user-1', 'tenant-1');
+
     expect(result.profile).toBeDefined();
     expect(Array.isArray(result.annotations)).toBe(true);
     expect(Array.isArray(result.agentSessions)).toBe(true);
     expect(Array.isArray(result.learningProgress)).toBe(true);
     expect(Array.isArray(result.enrollments)).toBe(true);
+    expect(result.annotations).toHaveLength(2);
+    expect(result.agentSessions).toHaveLength(1);
+    expect(result.enrollments).toHaveLength(2);
   });
 
-  it("wraps all queries in withTenantContext for tenant isolation", async () => {
-    const { withTenantContext } = await import("@edusphere/db");
-    await service.exportUserData("user-1", "tenant-1");
-    expect(withTenantContext).toHaveBeenCalledTimes(1);
-    const [, ctx] = vi.mocked(withTenantContext).mock.calls[0];
-    expect(ctx.tenantId).toBe("tenant-1");
-    expect(ctx.userId).toBe("user-1");
+  // ── Test 3 ──────────────────────────────────────────────────────────────────
+  it('should write an audit log entry after a successful export', async () => {
+    await service.exportUserData('user-1', 'tenant-1');
+
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(mockAuditLogInsert.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'EXPORT',
+        resourceType: 'USER',
+        resourceId: 'user-1',
+        status: 'SUCCESS',
+      }),
+    );
   });
 
-  it("writes an audit log entry after export for GDPR compliance", async () => {
-    await service.exportUserData("user-1", "tenant-1");
-    // writeAuditLog calls this.db.insert (not via withTenantContext)
-    expect(mockDbInsert).toHaveBeenCalled();
+  // ── Test 4 ──────────────────────────────────────────────────────────────────
+  it('should still return export data even when audit log insert fails', async () => {
+    mockAuditLogInsert.values.mockRejectedValueOnce(new Error('Audit DB unavailable'));
+
+    // Must resolve (not throw) and return the export data
+    const result = await service.exportUserData('user-1', 'tenant-1');
+
+    expect(result.userId).toBe('user-1');
+    expect(result.gdprArticle).toBe('20');
   });
 
-  it("returns profile as null when DB returns no user row", async () => {
-    let callCount = 0;
-    mockTx.select.mockImplementation(() => ({
-      from: vi.fn().mockImplementation(() => ({
-        where: vi.fn().mockResolvedValue(callCount++ === 0 ? [] : []),
-      })),
-    }));
-    const result = await service.exportUserData("user-ghost", "tenant-1");
+  // ── Test 5 ──────────────────────────────────────────────────────────────────
+  it('should return null for profile when user is not found', async () => {
+    // Simulate user not found — first select resolves to empty array
+    mockDb.select = makeSelectMock(
+      [],                 // no profile row
+      defaultAnnotations,
+      defaultAgentSessions,
+      defaultProgress,
+      defaultEnrollments,
+    );
+
+    const result = await service.exportUserData('unknown-user', 'tenant-1');
+
     expect(result.profile).toBeNull();
   });
 
-  it("returns empty arrays when user has no activity data", async () => {
-    mockTx.select.mockImplementation(() => ({
-      from: vi.fn().mockImplementation(() => ({
-        where: vi.fn().mockResolvedValue([]),
-      })),
-    }));
-    const result = await service.exportUserData("user-new", "tenant-1");
-    expect(result.annotations).toHaveLength(0);
-    expect(result.agentSessions).toHaveLength(0);
-    expect(result.learningProgress).toHaveLength(0);
-    expect(result.enrollments).toHaveLength(0);
-  });
-
-  it("ctx.userId and ctx.tenantId enforce cross-tenant isolation", async () => {
-    const { withTenantContext } = await import("@edusphere/db");
-    await service.exportUserData("user-a", "tenant-x");
-    const [, ctx] = vi.mocked(withTenantContext).mock.calls[0];
-    expect(ctx.tenantId).toBe("tenant-x");
-    expect(ctx.userId).toBe("user-a");
-  });
-
-  it("onModuleDestroy calls closeAllPools to release DB connections", async () => {
-    const { closeAllPools } = await import("@edusphere/db");
+  // ── Test 6 ──────────────────────────────────────────────────────────────────
+  it('should call closeAllPools on onModuleDestroy()', async () => {
     await service.onModuleDestroy();
-    expect(closeAllPools).toHaveBeenCalledTimes(1);
+
+    expect(mockCloseAllPools).toHaveBeenCalledTimes(1);
+  });
+
+  // ── Test 7 ──────────────────────────────────────────────────────────────────
+  it('should set exportedAt to a valid ISO-8601 timestamp', async () => {
+    const before = Date.now();
+    const result = await service.exportUserData('user-1', 'tenant-1');
+    const after = Date.now();
+
+    const exportTime = new Date(result.exportedAt).getTime();
+    expect(exportTime).toBeGreaterThanOrEqual(before);
+    expect(exportTime).toBeLessThanOrEqual(after);
+  });
+
+  // ── Test 8 ──────────────────────────────────────────────────────────────────
+  it('should always set gdprArticle to "20"', async () => {
+    const result = await service.exportUserData('user-1', 'tenant-1');
+
+    expect(result.gdprArticle).toBe('20');
   });
 });

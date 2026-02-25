@@ -185,29 +185,31 @@ describe('ai.service.ts: orchestration layer structure', () => {
     expect(src).toContain('runLangGraphDebate');
   });
 
-  it('ai.service.ts imports runLangGraphQuiz from ai.langgraph', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts imports runLangGraphQuiz from ai.langgraph', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('runLangGraphQuiz');
   });
 
-  it('ai.service.ts imports runLangGraphTutor from ai.langgraph', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts imports runLangGraphTutor from ai.langgraph', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('runLangGraphTutor');
   });
 
-  it('ai.service.ts uses LangGraphService to get checkpointer', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts uses LangGraphService to get checkpointer', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('langGraphService.getCheckpointer()');
   });
 
-  it('ai.service.ts passes sessionId as LangGraph thread_id', () => {
-    // continueSession passes sessionId as the first arg (used as thread_id)
+  it('ai.service.ts passes sessionId to the chavruta workflow for CHAVRUTA_DEBATE', () => {
+    // CHAVRUTA_DEBATE now routes to the conversational chavruta.workflow.ts,
+    // using sessionId as ChavrutaContext.sessionId (not runLangGraphDebate).
     const src = readSrc('ai.service.ts');
-    expect(src).toContain('runLangGraphDebate(sessionId');
+    expect(src).toContain("sessionId,");
+    expect(src).toContain('createChavrutaWorkflow');
   });
 
-  it('ai.service.ts defines LANGGRAPH_TEMPLATES set', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts defines LANGGRAPH_TEMPLATES set', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('LANGGRAPH_TEMPLATES');
     expect(src).toContain('CHAVRUTA_DEBATE');
     expect(src).toContain('TUTOR');
@@ -566,7 +568,7 @@ describe('langgraph.service.ts: structural requirements', () => {
   });
 
   it('defines MAX_MEMORY_SAVER_SESSIONS constant', () => {
-    expect(src).toContain('MAX_MEMORY_SAVER_SESSIONS');
+    expect(src).toContain('LANGGRAPH_MAX_MEMORY_SESSIONS');
   });
 
   it('defines CLEANUP_INTERVAL_MS constant', () => {

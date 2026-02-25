@@ -130,3 +130,9 @@ export * from './announcements';
 
 // Security settings per tenant (MFA, session, password policy, IP allowlist)
 export * from './security-settings';
+
+// Custom roles + sub-admin delegation (F-113)
+export * from './custom-roles';
+
+// Knowledge Sources — NotebookLM-style source management
+export * from './knowledge-sources';

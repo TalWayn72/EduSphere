@@ -1,0 +1,37 @@
+scalar DateTime
+
+type SimilarSubmission {
+  submissionId: ID!
+  userId: ID!
+  similarity: Float!
+  submittedAt: DateTime!
+}
+
+type PlagiarismReport {
+  submissionId: ID!
+  isFlagged: Boolean!
+  highestSimilarity: Float!
+  similarSubmissions: [SimilarSubmission!]!
+  checkedAt: DateTime!
+}
+
+type TextSubmission {
+  id: ID!
+  contentItemId: ID!
+  submittedAt: DateTime!
+  wordCount: Int!
+  plagiarismReport: PlagiarismReport
+}
+
+extend type Mutation {
+  submitTextAssignment(
+    contentItemId: ID!
+    textContent: String!
+    courseId: ID!
+  ): TextSubmission! @authenticated
+}
+
+extend type Query {
+  mySubmissions(contentItemId: ID!): [TextSubmission!]! @authenticated
+  submissionPlagiarismReport(submissionId: ID!): PlagiarismReport @authenticated
+}

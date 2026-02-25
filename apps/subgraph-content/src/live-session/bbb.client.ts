@@ -30,7 +30,7 @@ export class BigBlueButtonClient {
 
   private extractXmlField(xml: string, field: string): string | null {
     const match = xml.match(new RegExp(`<${field}>(.*?)<\/${field}>`));
-    return match ? match[1] : null;
+    return match?.[1] ?? null;
   }
 
   async createMeeting(
@@ -87,7 +87,35 @@ export class BigBlueButtonClient {
     if (!text.includes('<returncode>SUCCESS</returncode>')) return null;
 
     const match = text.match(/<url>(.*?)<\/url>/);
-    return match ? match[1] : null;
+    return match?.[1] ?? null;
+  }
+
+  /**
+   * Create breakout rooms inside an active BBB meeting.
+   * Calls the BBB breakoutRooms API for each room definition.
+   */
+  async sendBreakoutRooms(
+    meetingId: string,
+    rooms: Array<{ name: string; sequence: number; durationMinutes: number }>,
+  ): Promise<void> {
+    for (const room of rooms) {
+      const url = this.buildUrl('create', {
+        meetingID: `${meetingId}-breakout-${room.sequence}`,
+        name: room.name,
+        parentMeetingID: meetingId,
+        sequence: String(room.sequence),
+        freeJoin: 'false',
+        record: 'false',
+        duration: String(room.durationMinutes),
+        isBreakout: 'true',
+      });
+      const response = await fetch(url);
+      const text = await response.text();
+      if (!text.includes('<returncode>SUCCESS</returncode>')) {
+        const message = this.extractXmlField(text, 'message') ?? text.slice(0, 200);
+        throw new Error(`BBB breakout room create failed: ${message}`);
+      }
+    }
   }
 }
 

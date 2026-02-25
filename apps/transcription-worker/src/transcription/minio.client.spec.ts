@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock @aws-sdk/client-s3 before importing the module
 vi.mock('@aws-sdk/client-s3', () => ({
@@ -22,6 +22,10 @@ vi.mock('fs', async () => ({
 describe('MinioClient', () => {
   const originalEnv = { ...process.env };
 
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
   afterEach(() => {
     process.env = { ...originalEnv };
     vi.clearAllMocks();
@@ -32,7 +36,8 @@ describe('MinioClient', () => {
       process.env.MINIO_ENDPOINT = 'http://minio:9000';
       process.env.MINIO_ACCESS_KEY = 'access';
       process.env.MINIO_SECRET_KEY = 'secret';
-      process.env.MINIO_BUCKET = 'test-bucket';
+      // minioConfig reads MINIO_BUCKET_NAME (not MINIO_BUCKET)
+      process.env.MINIO_BUCKET_NAME = 'test-bucket';
 
       const { S3Client } = await import('@aws-sdk/client-s3');
       const { MinioClient } = await import('./minio.client');
@@ -51,15 +56,17 @@ describe('MinioClient', () => {
       delete process.env.MINIO_ENDPOINT;
       delete process.env.MINIO_ACCESS_KEY;
       delete process.env.MINIO_SECRET_KEY;
-      delete process.env.MINIO_BUCKET;
+      delete process.env.MINIO_BUCKET_NAME;
 
       const { S3Client } = await import('@aws-sdk/client-s3');
       const { MinioClient } = await import('./minio.client');
       const client = new MinioClient();
 
       expect(client).toBeDefined();
+      // minioConfig.endpoint default is the bare hostname 'localhost'
+      // (callers that need a full URL should set MINIO_ENDPOINT explicitly)
       expect(S3Client).toHaveBeenCalledWith(
-        expect.objectContaining({ endpoint: 'http://localhost:9000' })
+        expect.objectContaining({ endpoint: 'localhost' })
       );
     });
   });

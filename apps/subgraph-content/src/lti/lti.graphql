@@ -1,0 +1,40 @@
+"""LTI 1.3 registered platform (Canvas, Moodle, Blackboard, etc.)"""
+type LtiPlatform {
+  id: ID!
+  platformName: String!
+  platformUrl: String!
+  clientId: String!
+  authLoginUrl: String!
+  authTokenUrl: String!
+  keySetUrl: String!
+  deploymentId: String!
+  isActive: Boolean!
+}
+
+"""Input for registering a new LTI 1.3 platform"""
+input RegisterLtiPlatformInput {
+  platformName: String!
+  platformUrl: String!
+  clientId: String!
+  authLoginUrl: String!
+  authTokenUrl: String!
+  keySetUrl: String!
+  deploymentId: String!
+}
+
+extend type Query {
+  """List all LTI platforms for the current tenant. ORG_ADMIN only."""
+  ltiPlatforms: [LtiPlatform!]! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  """Register a new LTI 1.3 platform for the current tenant."""
+  registerLtiPlatform(input: RegisterLtiPlatformInput!): LtiPlatform!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  """Enable or disable an LTI platform."""
+  toggleLtiPlatform(id: ID!, isActive: Boolean!): LtiPlatform!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

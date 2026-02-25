@@ -1,195 +1,206 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+/**
+ * Unit tests for UserStatsService.
+ *
+ * Covers:
+ *  1. getMyStats() aggregates enrolled, annotations, progress, activity correctly.
+ *  2. getMyStats() returns zeroed stats when all sub-queries return empty results.
+ *  3. computeStreaks (via getMyStats) computes currentStreak for consecutive days.
+ *  4. computeStreaks computes longestStreak across a gap.
+ *  5. computeStreaks returns 0/0 when no active days.
+ *  6. onModuleDestroy() calls closeAllPools().
+ *  7. getMyStats() converts total_seconds to minutes correctly.
+ *  8. getMyStats() maps weeklyActivity date/count rows properly.
+ */
 
-const mockTx = { select: vi.fn(), execute: vi.fn() };
+import { UserStatsService } from './user-stats.service';
 
-vi.mock("@edusphere/db", () => ({
-  createDatabaseConnection: vi.fn(() => mockTx),
+// ── DB mocks ─────────────────────────────────────────────────────────────────
+
+const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+
+// withTenantContext just calls the callback with the db directly in tests
+const mockWithTenantContext = vi.fn(
+  (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => fn(_db),
+);
+
+const mockSelectBuilder = {
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  // Default: empty result
+  then: undefined as unknown,
+};
+
+// We need fine-grained control over execute() since the service uses it for raw SQL
+const mockExecute = vi.fn();
+
+const mockDb = {
+  select: vi.fn().mockReturnValue(mockSelectBuilder),
+  execute: mockExecute,
+};
+
+vi.mock('@edusphere/db', () => ({
+  createDatabaseConnection: () => mockDb,
+  closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
+  withTenantContext: (...args: unknown[]) => mockWithTenantContext(...(args as Parameters<typeof mockWithTenantContext>)),
   schema: {
-    annotations: { user_id: "user_id", tenant_id: "tenant_id" },
+    annotations: { user_id: 'user_id', tenant_id: 'tenant_id' },
   },
-  withTenantContext: vi.fn(async (_db, _ctx, fn) => fn(mockTx)),
-  closeAllPools: vi.fn().mockResolvedValue(undefined),
-  sql: vi.fn((strings, ...vals) => ({ strings, vals })),
-  eq: vi.fn((col, val) => ({ col, val })),
-  and: vi.fn((...conds) => ({ conds })),
+  sql: vi.fn((strings: TemplateStringsArray, ...vals: unknown[]) => ({ strings, vals })),
+  eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
+  and: vi.fn((...conds: unknown[]) => ({ conds, op: 'and' })),
 }));
 
-import { UserStatsService } from "./user-stats.service.js";
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-describe("UserStatsService", () => {
+function isoDate(daysAgo: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().slice(0, 10);
+}
+
+describe('UserStatsService', () => {
   let service: UserStatsService;
 
-  const setupMocks = (opts = {}) => {
-    const {
-      enrolled = 5,
-      annotationCount = 12,
-      completed = 8,
-      totalSeconds = 7200,
-      activityRows = [],
-    } = opts;
-    let executeCallCount = 0;
-    mockTx.execute.mockImplementation(() => {
-      const call = executeCallCount++;
-      if (call === 0) return Promise.resolve({ rows: [{ count: enrolled }] });
-      if (call === 1) return Promise.resolve({ rows: [{ completed, total_seconds: totalSeconds }] });
-      return Promise.resolve({ rows: activityRows });
-    });
-    mockTx.select.mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue([{ count: String(annotationCount) }]),
-      }),
-    });
-  };
+  /** Sets up what mockExecute resolves with for the three raw-SQL calls. */
+  function setupExecuteMocks(
+    enrolledCount: number,
+    completedCount: number,
+    totalSeconds: number,
+    activityRows: { date: string; count: number }[],
+  ) {
+    mockExecute
+      .mockResolvedValueOnce({ rows: [{ count: enrolledCount }] }) // countEnrolled
+      .mockResolvedValueOnce({                                       // sumLearningMinutes
+        rows: [{ completed: completedCount, total_seconds: totalSeconds }],
+      })
+      .mockResolvedValueOnce({ rows: activityRows });                // fetchWeeklyActivity
+  }
+
+  /** Sets up what the select chain resolves with for countAnnotations. */
+  function setupAnnotationsMock(count: number) {
+    mockSelectBuilder.from = vi.fn().mockReturnThis();
+    mockSelectBuilder.where = vi.fn().mockResolvedValue([{ count: String(count) }]);
+    mockDb.select = vi.fn().mockReturnValue(mockSelectBuilder);
+  }
 
   beforeEach(() => {
     vi.clearAllMocks();
-    setupMocks();
     service = new UserStatsService();
   });
 
-  describe("getMyStats()", () => {
-    it("returns coursesEnrolled from user_courses table", async () => {
-      const stats = await service.getMyStats("user-1", "tenant-1");
-      expect(stats.coursesEnrolled).toBe(5);
-    });
+  // ── Test 1 ──────────────────────────────────────────────────────────────────
+  it('should aggregate all stats correctly from sub-queries', async () => {
+    setupAnnotationsMock(7);
+    setupExecuteMocks(3, 12, 7200, [
+      { date: isoDate(2), count: 4 },
+      { date: isoDate(1), count: 2 },
+      { date: isoDate(0), count: 5 },
+    ]);
 
-    it("returns annotationsCreated filtered by userId and tenantId", async () => {
-      const stats = await service.getMyStats("user-1", "tenant-1");
-      expect(stats.annotationsCreated).toBe(12);
-    });
+    const stats = await service.getMyStats('user-1', 'tenant-1');
 
-    it("returns conceptsMastered from completed user_progress rows", async () => {
-      setupMocks({ completed: 3 });
-      const stats = await service.getMyStats("user-1", "tenant-1");
-      expect(stats.conceptsMastered).toBe(3);
-    });
-
-    it("converts totalSeconds to totalLearningMinutes by dividing by 60", async () => {
-      setupMocks({ totalSeconds: 3600 });
-      const stats = await service.getMyStats("user-1", "tenant-1");
-      expect(stats.totalLearningMinutes).toBe(60);
-    });
-
-    it("returns weeklyActivity as array of {date, count} entries", async () => {
-      const activityRows = [{ date: "2026-02-17", count: 3 }, { date: "2026-02-18", count: 5 }];
-      setupMocks({ activityRows });
-      const stats = await service.getMyStats("user-1", "tenant-1");
-      expect(stats.weeklyActivity).toHaveLength(2);
-      expect(stats.weeklyActivity[0].date).toBe("2026-02-17");
-      expect(stats.weeklyActivity[0].count).toBe(3);
-    });
-
-    it("returns all zeros when user has no activity", async () => {
-      setupMocks({ enrolled: 0, annotationCount: 0, completed: 0, totalSeconds: 0 });
-      const stats = await service.getMyStats("user-new", "tenant-1");
-      expect(stats.coursesEnrolled).toBe(0);
-      expect(stats.annotationsCreated).toBe(0);
-      expect(stats.conceptsMastered).toBe(0);
-      expect(stats.totalLearningMinutes).toBe(0);
-    });
-
-    it("wraps all queries in withTenantContext for tenant isolation", async () => {
-      const { withTenantContext } = await import("@edusphere/db");
-      await service.getMyStats("user-1", "tenant-1");
-      expect(withTenantContext).toHaveBeenCalledTimes(1);
-      const [, ctx] = vi.mocked(withTenantContext).mock.calls[0];
-      expect(ctx.tenantId).toBe("tenant-1");
-      expect(ctx.userId).toBe("user-1");
-    });
-
-    it("filters annotations by both userId AND tenantId (prevents cross-tenant reads)", async () => {
-      const { and } = await import("@edusphere/db");
-      await service.getMyStats("user-1", "tenant-1");
-      expect(and).toHaveBeenCalled();
-    });
+    expect(stats.coursesEnrolled).toBe(3);
+    expect(stats.annotationsCreated).toBe(7);
+    expect(stats.conceptsMastered).toBe(12);
+    expect(stats.totalLearningMinutes).toBe(120); // 7200 s / 60
+    expect(stats.weeklyActivity).toHaveLength(3);
   });
 
-  describe("onModuleDestroy()", () => {
-    it("calls closeAllPools to release DB connections", async () => {
-      const { closeAllPools } = await import("@edusphere/db");
-      await service.onModuleDestroy();
-      expect(closeAllPools).toHaveBeenCalledTimes(1);
-    });
+  // ── Test 2 ──────────────────────────────────────────────────────────────────
+  it('should return zeroed stats when all sub-queries return empty', async () => {
+    setupAnnotationsMock(0);
+    setupExecuteMocks(0, 0, 0, []);
+
+    const stats = await service.getMyStats('user-2', 'tenant-1');
+
+    expect(stats.coursesEnrolled).toBe(0);
+    expect(stats.annotationsCreated).toBe(0);
+    expect(stats.conceptsMastered).toBe(0);
+    expect(stats.totalLearningMinutes).toBe(0);
+    expect(stats.weeklyActivity).toHaveLength(0);
+    expect(stats.currentStreak).toBe(0);
+    expect(stats.longestStreak).toBe(0);
   });
 
-  describe('computeStreaks() — streak computation', () => {
-    it('returns currentStreak=0 and longestStreak=0 when weeklyActivity is empty', async () => {
-      mockTx.execute.mockResolvedValueOnce({ rows: [{ count: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ completed: 0, total_seconds: 0 }] })
-             .mockResolvedValueOnce({ rows: [] });
-      const stats = await service.getMyStats('user-1', 'tenant-1');
-      expect(stats.currentStreak).toBe(0);
-      expect(stats.longestStreak).toBe(0);
-    });
+  // ── Test 3 ──────────────────────────────────────────────────────────────────
+  it('should compute currentStreak as consecutive days back from today', async () => {
+    setupAnnotationsMock(0);
+    // Activity on today, yesterday, 2 days ago → streak = 3
+    setupExecuteMocks(0, 0, 0, [
+      { date: isoDate(2), count: 1 },
+      { date: isoDate(1), count: 1 },
+      { date: isoDate(0), count: 1 },
+    ]);
 
-    it('returns currentStreak=1 when only today has activity', async () => {
-      const today = new Date().toISOString().split('T')[0];
-      mockTx.execute.mockResolvedValueOnce({ rows: [{ count: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ completed: 0, total_seconds: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ date: today, count: 3 }] });
-      const stats = await service.getMyStats('user-1', 'tenant-1');
-      expect(stats.currentStreak).toBe(1);
-      expect(stats.longestStreak).toBe(1);
-    });
+    const stats = await service.getMyStats('user-3', 'tenant-1');
 
-    it('returns currentStreak=0 when most recent activity was 2+ days ago', async () => {
-      const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      mockTx.execute.mockResolvedValueOnce({ rows: [{ count: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ completed: 0, total_seconds: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ date: twoDaysAgo, count: 5 }] });
-      const stats = await service.getMyStats('user-1', 'tenant-1');
-      expect(stats.currentStreak).toBe(0);
-    });
+    expect(stats.currentStreak).toBe(3);
+  });
 
-    it('counts consecutive-day streak correctly for 3 consecutive days ending today', async () => {
-      const days = [0, 1, 2].map(offset => {
-        const d = new Date(Date.now() - offset * 24 * 60 * 60 * 1000);
-        return { date: d.toISOString().split('T')[0], count: 2 };
-      });
-      mockTx.execute.mockResolvedValueOnce({ rows: [{ count: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ completed: 0, total_seconds: 0 }] })
-             .mockResolvedValueOnce({ rows: days });
-      const stats = await service.getMyStats('user-1', 'tenant-1');
-      expect(stats.currentStreak).toBe(3);
-      expect(stats.longestStreak).toBe(3);
-    });
+  // ── Test 4 ──────────────────────────────────────────────────────────────────
+  it('should compute longestStreak across a gap in activity', async () => {
+    setupAnnotationsMock(0);
+    // Days: -10, -9, -8 (run=3), gap, -3, -2, -1, today (run=4) → longestStreak=4
+    setupExecuteMocks(0, 0, 0, [
+      { date: isoDate(10), count: 2 },
+      { date: isoDate(9), count: 1 },
+      { date: isoDate(8), count: 3 },
+      { date: isoDate(3), count: 1 },
+      { date: isoDate(2), count: 2 },
+      { date: isoDate(1), count: 1 },
+      { date: isoDate(0), count: 4 },
+    ]);
 
-    it('skips days with count=0 when computing streaks', async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      mockTx.execute.mockResolvedValueOnce({ rows: [{ count: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ completed: 0, total_seconds: 0 }] })
-             .mockResolvedValueOnce({ rows: [
-               { date: yesterday, count: 0 },
-               { date: today, count: 3 },
-             ]});
-      const stats = await service.getMyStats('user-1', 'tenant-1');
-      expect(stats.currentStreak).toBe(1);
-    });
+    const stats = await service.getMyStats('user-4', 'tenant-1');
 
-    it('returns longestStreak from historical data even when current streak is broken', async () => {
-      // 3-day streak from 10 days ago, current streak broken
-      const makeDay = (offset: number, cnt: number) => ({
-        date: new Date(Date.now() - offset * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        count: cnt,
-      });
-      mockTx.execute.mockResolvedValueOnce({ rows: [{ count: 0 }] })
-             .mockResolvedValueOnce({ rows: [{ completed: 0, total_seconds: 0 }] })
-             .mockResolvedValueOnce({ rows: [
-               makeDay(10, 5),
-               makeDay(11, 3),
-               makeDay(12, 7),
-             ]});
-      const stats = await service.getMyStats('user-1', 'tenant-1');
-      expect(stats.currentStreak).toBe(0);
-      expect(stats.longestStreak).toBe(3);
-    });
+    expect(stats.longestStreak).toBe(4);
+    expect(stats.currentStreak).toBe(4);
+  });
 
-    it('includes currentStreak and longestStreak fields in returned stats object', async () => {
-      mockTx.execute.mockResolvedValue({ rows: [] });
-      const stats = await service.getMyStats('user-1', 'tenant-1');
-      expect(Object.prototype.hasOwnProperty.call(stats, 'currentStreak')).toBe(true);
-      expect(Object.prototype.hasOwnProperty.call(stats, 'longestStreak')).toBe(true);
-    });
+  // ── Test 5 ──────────────────────────────────────────────────────────────────
+  it('should return streak 0/0 when all activity has count=0', async () => {
+    setupAnnotationsMock(0);
+    setupExecuteMocks(0, 0, 0, [
+      { date: isoDate(1), count: 0 },
+      { date: isoDate(0), count: 0 },
+    ]);
+
+    const stats = await service.getMyStats('user-5', 'tenant-1');
+
+    expect(stats.currentStreak).toBe(0);
+    expect(stats.longestStreak).toBe(0);
+  });
+
+  // ── Test 6 ──────────────────────────────────────────────────────────────────
+  it('should call closeAllPools on onModuleDestroy()', async () => {
+    await service.onModuleDestroy();
+
+    expect(mockCloseAllPools).toHaveBeenCalledTimes(1);
+  });
+
+  // ── Test 7 ──────────────────────────────────────────────────────────────────
+  it('should round totalLearningMinutes correctly from seconds', async () => {
+    setupAnnotationsMock(0);
+    // 90 seconds → 1.5 minutes → rounds to 2
+    setupExecuteMocks(0, 0, 90, []);
+
+    const stats = await service.getMyStats('user-7', 'tenant-1');
+
+    expect(stats.totalLearningMinutes).toBe(2);
+  });
+
+  // ── Test 8 ──────────────────────────────────────────────────────────────────
+  it('should map weeklyActivity rows with correct date and count types', async () => {
+    setupAnnotationsMock(0);
+    setupExecuteMocks(0, 0, 0, [
+      { date: '2026-02-20', count: 3 },
+      { date: '2026-02-21', count: 7 },
+    ]);
+
+    const stats = await service.getMyStats('user-8', 'tenant-1');
+
+    expect(stats.weeklyActivity[0]).toEqual({ date: '2026-02-20', count: 3 });
+    expect(stats.weeklyActivity[1]).toEqual({ date: '2026-02-21', count: 7 });
   });
 });

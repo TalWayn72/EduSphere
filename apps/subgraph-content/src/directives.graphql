@@ -1,0 +1,12 @@
+"""Custom application-level directives (non-federation)."""
+enum UserRole {
+  ORG_ADMIN
+  SUPER_ADMIN
+  INSTRUCTOR
+  STUDENT
+  RESEARCHER
+}
+
+directive @requiresRole(roles: [UserRole!]!) on FIELD_DEFINITION
+directive @requiresScopes(scopes: [String!]!) on FIELD_DEFINITION
+directive @rateLimit(limit: Int!, window: Int!) on FIELD_DEFINITION

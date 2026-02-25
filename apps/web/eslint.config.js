@@ -56,6 +56,10 @@ export default [
         Response: 'readonly',
         Event: 'readonly',
         CustomEvent: 'readonly',
+        navigator: 'readonly',
+        alert: 'readonly',
+        crypto: 'readonly',
+        location: 'readonly',
       },
     },
     plugins: {

@@ -98,21 +98,32 @@ export class GraphConceptService {
     });
   }
 
+  /**
+   * linkConcepts — creates a typed relationship between two Concept nodes.
+   *
+   * N+1 fix: previously called cypher.linkConcepts (MERGE) then two separate
+   * cypher.findConceptById (MATCH) queries — 3 round-trips in total.
+   * Now calls cypher.linkConceptsAndFetch which performs the MERGE and
+   * returns both nodes in a single Cypher query — 1 round-trip.
+   */
   async linkConcepts(
     fromId: string, toId: string, relationshipType: string,
     strength: number | null, description: string | null,
     tenantId: string, userId: string, role: string
   ) {
     return withTenantContext(db, { tenantId, userId, userRole: toUserRole(role) }, async () => {
-      await this.cypher.linkConcepts(fromId, toId, relationshipType, {
-        strength: strength ?? undefined,
-        description: description ?? undefined,
-      });
-      const fromConcept = await this.cypher.findConceptById(fromId, tenantId);
-      const toConcept = await this.cypher.findConceptById(toId, tenantId);
+      const { from, to } = await this.cypher.linkConceptsAndFetch(
+        fromId, toId, relationshipType,
+        { strength: strength ?? undefined, description: description ?? undefined },
+        tenantId,
+      );
+      this.logger.debug(
+        { fromId, toId, relationshipType, tenantId },
+        'linkConcepts: relationship created/updated in single round-trip',
+      );
       return {
-        fromConcept: fromConcept ? this.mapConcept(fromConcept as GraphConceptNode) : null,
-        toConcept: toConcept ? this.mapConcept(toConcept as GraphConceptNode) : null,
+        fromConcept: from ? this.mapConcept(from as GraphConceptNode) : null,
+        toConcept:   to   ? this.mapConcept(to   as GraphConceptNode) : null,
         relationshipType,
         strength,
         inferred: false,

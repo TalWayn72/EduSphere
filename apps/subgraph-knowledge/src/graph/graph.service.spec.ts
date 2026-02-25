@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { GraphService } from './graph.service';
+import { GraphConceptService } from './graph-concept.service';
+import { GraphSearchService } from './graph-search.service';
+import { GraphPersonTermService } from './graph-person-term.service';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -23,12 +26,14 @@ vi.mock('@edusphere/db', () => ({
 const mockCypherService = {
   findConceptById: vi.fn(),
   findConceptByName: vi.fn(),
+  findConceptByNameCaseInsensitive: vi.fn(),
   findAllConcepts: vi.fn(),
   createConcept: vi.fn(),
   updateConcept: vi.fn(),
   deleteConcept: vi.fn(),
   findRelatedConcepts: vi.fn(),
   linkConcepts: vi.fn(),
+  linkConceptsAndFetch: vi.fn().mockResolvedValue({ from: null, to: null }),
   findPersonById: vi.fn(),
   findPersonByName: vi.fn(),
   createPerson: vi.fn(),
@@ -76,9 +81,17 @@ describe('GraphService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCypherService.linkConceptsAndFetch.mockResolvedValue({ from: null, to: null });
     service = new GraphService(
-      mockCypherService as any,
-      mockEmbeddingService as any
+      new GraphConceptService(mockCypherService as any),
+      new GraphSearchService(mockCypherService as any, mockEmbeddingService as any),
+      new GraphPersonTermService(
+        mockCypherService as any,
+        mockCypherService as any,
+        mockCypherService as any,
+        mockCypherService as any,
+        mockCypherService as any,
+      ),
     );
   });
 

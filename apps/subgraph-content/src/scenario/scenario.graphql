@@ -1,0 +1,63 @@
+"""
+A single choice option within a scenario node.
+"""
+type ScenarioChoice {
+  id: ID!
+  text: String!
+  """
+  ID of the next ContentItem to navigate to when this choice is selected.
+  null means this choice leads to the end of the branch.
+  """
+  nextContentItemId: ID
+}
+
+"""
+A scenario node parsed from a SCENARIO-type ContentItem.
+"""
+type ScenarioNode {
+  id: ID!
+  title: String!
+  description: String!
+  choices: [ScenarioChoice!]!
+  isEndNode: Boolean!
+  """
+  Only present on terminal nodes (isEndNode = true).
+  One of: SUCCESS | FAILURE | NEUTRAL
+  """
+  endingType: String
+}
+
+"""
+A single step in a learner's path through a branching scenario.
+"""
+type ScenarioProgressEntry {
+  fromContentItemId: ID!
+  choiceId: String!
+  choiceText: String!
+  chosenAt: String!
+}
+
+extend type Query {
+  """
+  Returns the scenario node data for a given SCENARIO-type ContentItem.
+  """
+  scenarioNode(contentItemId: ID!): ScenarioNode @authenticated
+
+  """
+  Returns the ordered list of choices the authenticated user has made
+  for the given scenario tree (identified by its root content item ID).
+  """
+  myScenarioProgress(scenarioRootId: ID!): [ScenarioProgressEntry!]! @authenticated
+}
+
+extend type Mutation {
+  """
+  Records the authenticated learner's choice within a scenario and returns
+  the next scenario node. Returns null when the chosen branch has ended.
+  """
+  recordScenarioChoice(
+    fromContentItemId: ID!
+    choiceId: String!
+    scenarioRootId: ID!
+  ): ScenarioNode @authenticated
+}

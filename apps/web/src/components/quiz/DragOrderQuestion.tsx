@@ -27,6 +27,7 @@ export function DragOrderQuestion({ item, value, onChange, disabled }: Props) {
     if (from === idx) return;
     const next = [...orderedItems];
     const [moved] = next.splice(from, 1);
+    if (!moved) return;
     next.splice(idx, 0, moved);
     dragIndex.current = null;
     onChange(next.map((it) => it.id));

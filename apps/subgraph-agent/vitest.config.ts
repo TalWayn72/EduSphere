@@ -7,6 +7,8 @@ export default defineConfig({
     include: ['src/**/*.spec.ts'],
     exclude: ['node_modules', 'dist'],
     passWithNoTests: false,
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

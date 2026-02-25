@@ -1,5 +1,5 @@
 {
-  "extends": "@edusphere/tsconfig/base.json",
+  "extends": "@edusphere/tsconfig/nestjs.json",
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",

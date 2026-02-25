@@ -8,10 +8,11 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
+import { minioConfig } from '@edusphere/config';
 
 /**
  * Downloads objects from MinIO (S3-compatible) to a local temp file.
- * Env vars: MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_BUCKET, MINIO_REGION
+ * Configuration via minioConfig from @edusphere/config (reads MINIO_* env vars).
  */
 @Injectable()
 export class MinioClient {
@@ -20,14 +21,14 @@ export class MinioClient {
   private readonly bucket: string;
 
   constructor() {
-    const endpoint = process.env.MINIO_ENDPOINT ?? 'http://localhost:9000';
-    const accessKeyId = process.env.MINIO_ACCESS_KEY ?? 'minioadmin';
-    const secretAccessKey = process.env.MINIO_SECRET_KEY ?? 'minioadmin';
-    this.bucket = process.env.MINIO_BUCKET ?? 'edusphere-media';
+    const endpoint = minioConfig.endpoint;
+    const accessKeyId = minioConfig.accessKey;
+    const secretAccessKey = minioConfig.secretKey;
+    this.bucket = minioConfig.bucket;
 
     this.s3 = new S3Client({
       endpoint,
-      region: process.env.MINIO_REGION ?? 'us-east-1',
+      region: minioConfig.region,
       credentials: { accessKeyId, secretAccessKey },
       forcePathStyle: true,
     });

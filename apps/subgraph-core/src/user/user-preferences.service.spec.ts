@@ -25,13 +25,13 @@ const MOCK_AUTH: AuthContext = {
   userId: 'user-1', email: 'student@example.com', username: 'student',
   tenantId: 'tenant-1', roles: ['STUDENT'], scopes: ['read'], isSuperAdmin: false,
 };
-const STORED_PREFS = { locale: 'fr', theme: 'dark', emailNotifications: false, pushNotifications: true };
+const STORED_PREFS = { locale: 'fr', theme: 'dark', emailNotifications: false, pushNotifications: true, isPublicProfile: false };
 const MOCK_USER = { id: 'user-1', tenant_id: 'tenant-1', email: 'test@example.com', preferences: STORED_PREFS };
 
 // ─── parsePreferences ────────────────────────────────────────────────────────
 
 describe('parsePreferences()', () => {
-  const DEFAULTS = { locale: 'en', theme: 'system', emailNotifications: true, pushNotifications: true };
+  const DEFAULTS = { locale: 'en', theme: 'system', emailNotifications: true, pushNotifications: true, isPublicProfile: false };
 
   it('returns defaults for null', () => expect(parsePreferences(null)).toEqual(DEFAULTS));
   it('returns defaults for undefined', () => expect(parsePreferences(undefined)).toEqual(DEFAULTS));
@@ -47,7 +47,7 @@ describe('parsePreferences()', () => {
 
   it('falls back to defaults for missing fields (partial input)', () => {
     const result = parsePreferences({ locale: 'hi' });
-    expect(result).toEqual({ locale: 'hi', theme: 'system', emailNotifications: true, pushNotifications: true });
+    expect(result).toEqual({ locale: 'hi', theme: 'system', emailNotifications: true, pushNotifications: true, isPublicProfile: false });
   });
 
   it('correctly parses explicit emailNotifications and pushNotifications false', () => {
@@ -57,6 +57,7 @@ describe('parsePreferences()', () => {
       theme: 'system',
       emailNotifications: false,
       pushNotifications: false,
+      isPublicProfile: false,
     });
   });
 
@@ -67,6 +68,7 @@ describe('parsePreferences()', () => {
       theme: 'dark',
       emailNotifications: true,
       pushNotifications: true,
+      isPublicProfile: false,
     });
   });
 
@@ -135,7 +137,7 @@ describe('UserPreferencesService', () => {
       await service.updatePreferences('user-1', { locale: 'es' }, MOCK_AUTH);
 
       expect(capturedSet).toEqual({
-        preferences: { locale: 'es', theme: 'dark', emailNotifications: false, pushNotifications: true },
+        preferences: { locale: 'es', theme: 'dark', emailNotifications: false, pushNotifications: true, isPublicProfile: false },
       });
     });
 
@@ -178,13 +180,19 @@ describe('UserPreferencesService', () => {
       // STORED_PREFS = { locale: 'fr', theme: 'dark', emailNotifications: false, pushNotifications: true }
       // All fields overridden by input
       expect(capturedSet).toEqual({
-        preferences: { locale: 'zh-CN', theme: 'light', emailNotifications: true, pushNotifications: false },
+        preferences: { locale: 'zh-CN', theme: 'light', emailNotifications: true, pushNotifications: false, isPublicProfile: false },
       });
     });
 
     it('calls withTenantContext exactly once per invocation', async () => {
       await service.updatePreferences('user-1', { locale: 'pt' }, MOCK_AUTH);
       expect(withTenantContext).toHaveBeenCalledOnce();
+    });
+
+    it('accepts Hebrew locale (he) without throwing', async () => {
+      await expect(
+        service.updatePreferences('user-1', { locale: 'he' }, MOCK_AUTH),
+      ).resolves.toBeDefined();
     });
   });
 });

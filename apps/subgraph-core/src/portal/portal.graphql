@@ -1,0 +1,27 @@
+type PortalBlock {
+  id: ID!
+  type: String!
+  order: Int!
+  config: String!
+}
+
+type PortalPage {
+  id: ID!
+  title: String!
+  published: Boolean!
+  blocks: [PortalBlock!]!
+  updatedAt: String!
+}
+
+extend type Query {
+  myPortal: PortalPage @authenticated @requiresRole(roles: [ORG_ADMIN])
+  publicPortal: PortalPage
+}
+
+extend type Mutation {
+  savePortalLayout(title: String!, blocksJson: String!): PortalPage!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
+  publishPortal: Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+  unpublishPortal: Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+}

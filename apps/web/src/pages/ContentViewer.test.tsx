@@ -6,6 +6,17 @@ import { mockTranscript } from '@/lib/mock-content-data';
 import { getThreadedAnnotations } from '@/lib/mock-annotations';
 import { AnnotationLayer } from '@/types/annotations';
 
+// ─── Mock urql — ContentViewer calls useQuery for live session data ────────────
+vi.mock('urql', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('urql')>();
+  return {
+    ...actual,
+    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
+    useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  };
+});
+
 // ─── Mock hooks ────────────────────────────────────────────────────────────────
 
 vi.mock('@/hooks/useContentData', () => ({

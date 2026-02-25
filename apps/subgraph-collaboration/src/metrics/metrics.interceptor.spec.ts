@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { of, throwError } from 'rxjs';
 import type { ExecutionContext } from '@nestjs/common';
-import { MetricsInterceptor } from './metrics.interceptor';
+import { MetricsInterceptor } from '@edusphere/metrics';
 import type { MetricsService } from '@edusphere/metrics';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

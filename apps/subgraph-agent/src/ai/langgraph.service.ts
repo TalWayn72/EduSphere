@@ -2,11 +2,9 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import { MemorySaver } from '@langchain/langgraph';
 import { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
 import pg from 'pg';
+import { LANGGRAPH_MAX_MEMORY_SESSIONS, LANGGRAPH_CLEANUP_INTERVAL_MS } from '../constants';
 
 type Checkpointer = MemorySaver | PostgresSaver;
-
-const MAX_MEMORY_SAVER_SESSIONS = 1000;
-const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 @Injectable()
 export class LangGraphService implements OnModuleInit, OnModuleDestroy {
@@ -42,15 +40,15 @@ export class LangGraphService implements OnModuleInit, OnModuleDestroy {
       if (!(saver instanceof MemorySaver)) return;
       // Access internal storage — MemorySaver stores checkpoints in a Map
       const storage = (saver as unknown as { storage?: Map<string, unknown> }).storage;
-      if (storage && storage.size > MAX_MEMORY_SAVER_SESSIONS) {
-        const toDelete = storage.size - MAX_MEMORY_SAVER_SESSIONS;
+      if (storage && storage.size > LANGGRAPH_MAX_MEMORY_SESSIONS) {
+        const toDelete = storage.size - LANGGRAPH_MAX_MEMORY_SESSIONS;
         const keys = [...storage.keys()].slice(0, toDelete);
         keys.forEach((k) => storage.delete(k));
         this.logger.warn(
           `LangGraph MemorySaver: trimmed ${toDelete} old sessions (size was ${storage.size + toDelete})`,
         );
       }
-    }, CLEANUP_INTERVAL_MS);
+    }, LANGGRAPH_CLEANUP_INTERVAL_MS);
   }
 
   async onModuleDestroy(): Promise<void> {

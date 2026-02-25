@@ -37,6 +37,15 @@ type CourseProgress {
   percentComplete: Float!
 }
 
+type AdminEnrollmentRecord {
+  id: ID!
+  courseId: ID!
+  userId: ID!
+  status: String!
+  enrolledAt: String!
+  completedAt: String
+}
+
 extend type Query {
   _health: String! @shareable
   course(id: ID!): Course
@@ -44,6 +53,9 @@ extend type Query {
   coursesByInstructor(instructorId: ID!, limit: Int = 20): [Course!]!
   myEnrollments: [UserCourse!]! @authenticated
   myCourseProgress(courseId: ID!): CourseProgress! @authenticated
+  adminCourseEnrollments(courseId: ID!): [AdminEnrollmentRecord!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 extend type Mutation {
@@ -55,6 +67,15 @@ extend type Mutation {
   enrollCourse(courseId: ID!): UserCourse! @authenticated
   unenrollCourse(courseId: ID!): Boolean! @authenticated
   markContentViewed(contentItemId: ID!): Boolean! @authenticated
+  adminEnrollUser(courseId: ID!, userId: ID!): AdminEnrollmentRecord!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  adminUnenrollUser(courseId: ID!, userId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  adminBulkEnroll(courseId: ID!, userIds: [ID!]!): Int!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 input CreateCourseInput {

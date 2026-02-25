@@ -10,8 +10,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 describe('packages/i18n exports', () => {
-  it('exports exactly 9 supported locales', () => {
-    expect(SUPPORTED_LOCALES).toHaveLength(9);
+  it('exports exactly 10 supported locales', () => {
+    expect(SUPPORTED_LOCALES).toHaveLength(10);
     expect(SUPPORTED_LOCALES).toContain('en');
     expect(SUPPORTED_LOCALES).toContain('zh-CN');
     expect(SUPPORTED_LOCALES).toContain('hi');
@@ -21,6 +21,7 @@ describe('packages/i18n exports', () => {
     expect(SUPPORTED_LOCALES).toContain('pt');
     expect(SUPPORTED_LOCALES).toContain('ru');
     expect(SUPPORTED_LOCALES).toContain('id');
+    expect(SUPPORTED_LOCALES).toContain('he');
   });
 
   it('default locale is English', () => {
@@ -54,8 +55,8 @@ describe('packages/i18n exports', () => {
 });
 
 describe('SUPPORTED_LOCALES', () => {
-  it('contains exactly 9 locales', () => {
-    expect(SUPPORTED_LOCALES).toHaveLength(9);
+  it('contains exactly 10 locales', () => {
+    expect(SUPPORTED_LOCALES).toHaveLength(10);
   });
 
   it('includes English as first locale', () => {

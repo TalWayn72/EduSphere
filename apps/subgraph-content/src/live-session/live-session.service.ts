@@ -15,9 +15,10 @@ import {
   and,
 } from '@edusphere/db';
 import { createBbbClient, BBB_DEMO_JOIN_URL } from './bbb.client';
-import type { LiveSession } from '@edusphere/db';
 
 const NATS_SUBJECT = 'EDUSPHERE.live.session.ended';
+
+const MODERATOR_ROLES = ['INSTRUCTOR', 'ADMIN', 'ORG_ADMIN', 'SUPER_ADMIN'];
 
 export interface LiveSessionResult {
   id: string;
@@ -26,6 +27,22 @@ export interface LiveSessionResult {
   scheduledAt: string;
   status: string;
   recordingUrl: string | null;
+}
+
+interface DbLiveSession {
+  id: string;
+  contentItemId: string;
+  tenantId: string;
+  bbbMeetingId: string;
+  meetingName: string;
+  scheduledAt: Date;
+  startedAt?: Date | null;
+  endedAt?: Date | null;
+  recordingUrl?: string | null;
+  attendeePassword: string;
+  moderatorPassword: string;
+  status: string;
+  createdAt: Date;
 }
 
 @Injectable()
@@ -49,7 +66,7 @@ export class LiveSessionService implements OnModuleDestroy {
     await closeAllPools();
   }
 
-  private map(row: LiveSession): LiveSessionResult {
+  private map(row: DbLiveSession): LiveSessionResult {
     return {
       id: row.id,
       contentItemId: row.contentItemId,
@@ -102,7 +119,7 @@ export class LiveSessionService implements OnModuleDestroy {
       this.logger.debug('BBB not configured — using demo mode');
     }
 
-    return this.map(session);
+    return this.map(session as DbLiveSession);
   }
 
   async getByContentItem(contentItemId: string, tenantId: string): Promise<LiveSessionResult | null> {
@@ -117,7 +134,7 @@ export class LiveSessionService implements OnModuleDestroy {
       )
       .limit(1);
 
-    return row ? this.map(row) : null;
+    return row ? this.map(row as DbLiveSession) : null;
   }
 
   async getJoinUrl(
@@ -138,10 +155,16 @@ export class LiveSessionService implements OnModuleDestroy {
       .limit(1);
 
     if (!session) throw new NotFoundException(`LiveSession ${sessionId} not found`);
-    if (session.status === 'ENDED') throw new ForbiddenException('Session has ended');
 
-    const isModerator = ['INSTRUCTOR', 'ADMIN', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
-    const password = isModerator ? session.moderatorPassword : session.attendeePassword;
+    const typedSession = session as DbLiveSession;
+    if (typedSession.status === 'ENDED') {
+      throw new ForbiddenException('Session has ended');
+    }
+
+    const isModerator = MODERATOR_ROLES.includes(userRole);
+    const password = isModerator
+      ? typedSession.moderatorPassword
+      : typedSession.attendeePassword;
 
     const bbb = createBbbClient();
     if (!bbb) {
@@ -149,7 +172,7 @@ export class LiveSessionService implements OnModuleDestroy {
       return BBB_DEMO_JOIN_URL;
     }
 
-    return bbb.buildJoinUrl(session.bbbMeetingId, userName, password);
+    return bbb.buildJoinUrl(typedSession.bbbMeetingId, userName, password);
   }
 
   async endSession(sessionId: string, tenantId: string): Promise<LiveSessionResult> {
@@ -166,7 +189,7 @@ export class LiveSessionService implements OnModuleDestroy {
 
     if (!updated) throw new NotFoundException(`LiveSession ${sessionId} not found`);
     this.logger.log(`Session ended: ${sessionId}`);
-    return this.map(updated);
+    return this.map(updated as DbLiveSession);
   }
 
   async processRecording(sessionId: string, tenantId: string): Promise<void> {
@@ -183,6 +206,8 @@ export class LiveSessionService implements OnModuleDestroy {
 
     if (!session) return;
 
+    const typedSession = session as DbLiveSession;
+
     await this.db
       .update(schema.liveSessions)
       .set({ status: 'RECORDING' })
@@ -191,7 +216,7 @@ export class LiveSessionService implements OnModuleDestroy {
     const bbb = createBbbClient();
     if (!bbb) return;
 
-    const recordingUrl = await bbb.getRecordingUrl(session.bbbMeetingId);
+    const recordingUrl = await bbb.getRecordingUrl(typedSession.bbbMeetingId);
     if (recordingUrl) {
       await this.db
         .update(schema.liveSessions)

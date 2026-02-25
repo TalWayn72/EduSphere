@@ -9,6 +9,8 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getCurrentUser } from '@/lib/auth';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
+import { BadgesGrid } from '@/components/BadgesGrid';
+import { ProfileVisibilityCard } from './ProfileVisibilityCard';
 
 const ROLE_LABELS: Record<string, string> = {
   SUPER_ADMIN: 'Super Admin',
@@ -41,6 +43,7 @@ interface MeQueryResult {
       theme: string;
       emailNotifications: boolean;
       pushNotifications: boolean;
+      isPublicProfile?: boolean;
     } | null;
   } | null;
 }
@@ -76,6 +79,8 @@ export function ProfilePage() {
   const email = meResult.data?.me?.email ?? localUser.email;
   const role = meResult.data?.me?.role ?? localUser.role;
   const tenantId = meResult.data?.me?.tenantId ?? localUser.tenantId;
+  const userId = meResult.data?.me?.id ?? '';
+  const preferences = meResult.data?.me?.preferences ?? null;
 
   const initials = getInitials(firstName, lastName, localUser.username);
   const roleLabel = ROLE_LABELS[role] ?? role;
@@ -185,6 +190,18 @@ export function ProfilePage() {
             ))}
           </div>
         </Card>
+
+        {/* Badges section (F-011) */}
+        <Card className="p-6 space-y-4">
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            Badges Earned
+          </h3>
+          <BadgesGrid />
+        </Card>
+        {/* Public Profile visibility toggle (F-022) */}
+        {userId && (
+          <ProfileVisibilityCard userId={userId} preferences={preferences} />
+        )}
       </div>
     </Layout>
   );

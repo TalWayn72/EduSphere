@@ -7,6 +7,7 @@ import {
   integer,
   numeric,
   unique,
+  timestamp,
 } from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
@@ -27,6 +28,9 @@ export const courses = pgTable('courses', {
   estimated_hours: integer('estimated_hours'),
   prerequisites: jsonb('prerequisites').notNull().default([]),
   tags: jsonb('tags').notNull().default([]),
+  // F-016: Compliance Training Report Export
+  is_compliance: boolean('is_compliance').notNull().default(false),
+  compliance_due_date: timestamp('compliance_due_date', { withTimezone: true }),
   ...timestamps,
   ...softDelete,
 });

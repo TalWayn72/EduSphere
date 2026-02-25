@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Test } from '@nestjs/testing';
-import { MetricsController } from './metrics.controller';
+import { MetricsController } from '@edusphere/metrics';
 
 describe('MetricsController', () => {
   let controller: MetricsController;

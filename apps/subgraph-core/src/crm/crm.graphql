@@ -1,0 +1,25 @@
+type CrmConnection {
+  id: ID!
+  provider: String!
+  instanceUrl: String!
+  isActive: Boolean!
+  createdAt: String!
+}
+
+type CrmSyncLogEntry {
+  id: ID!
+  operation: String!
+  externalId: String
+  status: String!
+  errorMessage: String
+  createdAt: String!
+}
+
+extend type Query {
+  crmConnection: CrmConnection @authenticated @requiresRole(roles: [ORG_ADMIN])
+  crmSyncLog(limit: Int): [CrmSyncLogEntry!]! @authenticated @requiresRole(roles: [ORG_ADMIN])
+}
+
+extend type Mutation {
+  disconnectCrm: Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+}

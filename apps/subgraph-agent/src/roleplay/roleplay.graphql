@@ -1,0 +1,53 @@
+scalar DateTime
+
+type ScenarioTemplate {
+  id: ID!
+  title: String!
+  domain: String!
+  difficultyLevel: String!
+  sceneDescription: String!
+  maxTurns: Int!
+  isBuiltin: Boolean!
+}
+
+type EvaluationCriterionScore {
+  name: String!
+  score: Float!
+  feedback: String!
+}
+
+type ScenarioEvaluation {
+  overallScore: Float!
+  criteriaScores: [EvaluationCriterionScore!]!
+  strengths: [String!]!
+  areasForImprovement: [String!]!
+  summary: String!
+}
+
+type ScenarioSession {
+  id: ID!
+  scenarioId: ID!
+  status: String!
+  turnCount: Int!
+  evaluation: ScenarioEvaluation
+  startedAt: DateTime!
+  completedAt: DateTime
+}
+
+extend type Query {
+  scenarioTemplates: [ScenarioTemplate!]! @authenticated
+  myScenarioSession(sessionId: ID!): ScenarioSession @authenticated
+}
+
+extend type Mutation {
+  startRoleplaySession(scenarioId: ID!): ScenarioSession! @authenticated
+  sendRoleplayMessage(sessionId: ID!, message: String!): Boolean! @authenticated
+  createScenarioTemplate(
+    title: String!
+    domain: String!
+    difficultyLevel: String!
+    characterPersona: String!
+    sceneDescription: String!
+    maxTurns: Int
+  ): ScenarioTemplate! @authenticated
+}

@@ -41,6 +41,21 @@
       ],
       "cache": false
     },
+    "test:memory": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "cache": false
+    },
+    "test:rls": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "cache": false
+    },
+    "test:security": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true

@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-// Mock urql — keep gql/other exports, only override useQuery
+// Mock urql — keep gql/other exports, override useQuery, useMutation, useSubscription
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
     useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
+    useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
   };
 });
 

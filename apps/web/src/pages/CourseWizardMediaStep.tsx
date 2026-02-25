@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload, FileVideo, FileAudio, FileText, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, FileVideo, FileAudio, FileText, X, CheckCircle2, AlertCircle, PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,9 @@ import { urqlClient } from '@/lib/urql-client';
 import { PRESIGNED_UPLOAD_QUERY, CONFIRM_MEDIA_UPLOAD_MUTATION } from '@/lib/graphql/content.queries';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
 import { AltTextModal } from '@/components/AltTextModal';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { RichEditor } from '@/components/editor/RichEditor';
 interface Props {
   courseId: string;
   mediaList: UploadedMedia[];
@@ -40,6 +42,9 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
   const inputRef = useRef<HTMLInputElement>(null);
   const [entries, setEntries] = useState<FileUploadEntry[]>([]);
   const [altTextTarget, setAltTextTarget] = useState<{ mediaId: string; altText: string | null } | null>(null);
+  const [richDocTitle, setRichDocTitle] = useState('');
+  const [richDocContent, setRichDocContent] = useState('');
+  const [richDocSaved, setRichDocSaved] = useState(false);
 
   const updateEntry = (index: number, patch: Partial<FileUploadEntry>) => {
     setEntries((prev) => prev.map((e, i) => (i === index ? { ...e, ...patch } : e)));
@@ -129,6 +134,10 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
     setEntries((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleSaveRichDoc = () => { if (!richDocTitle.trim()) return;
+    const richEntry = { id: `rich-${Date.now()}`, courseId, fileKey: '', title: richDocTitle.trim(), contentType: 'RICH_DOCUMENT', status: 'READY' as const, downloadUrl: null, altText: null } as UploadedMedia;
+    onChange({ mediaList: [...mediaList, richEntry] }); setRichDocSaved(true); setRichDocTitle(''); setRichDocContent(''); setTimeout(() => setRichDocSaved(false), 3000);
+  };
   return (
     <div className="space-y-6">
       {/* Existing confirmed media */}
@@ -237,6 +246,16 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
         />
       </div>
     
+      {/* Rich Document section */}
+      <div className="mt-6 border-t pt-4 space-y-3">
+        <p className="text-sm font-medium flex items-center gap-2"><PenLine className="h-4 w-4" /> Create Rich Document</p>
+        <input className="w-full text-sm px-3 py-2 border rounded-md bg-background" placeholder="Document title..." value={richDocTitle} onChange={(e) => setRichDocTitle(e.target.value)} />
+        <RichEditor content={richDocContent} onChange={setRichDocContent} />
+        <div className="flex items-center gap-2 justify-end">
+          {richDocSaved && <span className="text-sm text-green-600 flex items-center gap-1"><CheckCircle2 className="h-4 w-4" /> Added</span>}
+          <button type="button" onClick={handleSaveRichDoc} disabled={!richDocTitle.trim()} className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground disabled:opacity-50">Add Rich Document</button>
+        </div>
+      </div>
       {/* Alt-text review modal for image uploads (F-023) */}
       {altTextTarget && (
         <AltTextModal

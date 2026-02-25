@@ -6,9 +6,10 @@ import {
   ResolveField,
   Parent,
   ResolveReference,
+  Context,
 } from '@nestjs/graphql';
 import { ModuleService } from './module.service';
-import { ContentItemService } from '../content-item/content-item.service';
+import { ContentItemLoader } from '../content-item/content-item.loader';
 
 interface ModuleParent {
   id: string;
@@ -21,11 +22,17 @@ interface ModuleInput {
   orderIndex?: number;
 }
 
+interface GraphQLContext {
+  loaders?: {
+    contentItems?: ContentItemLoader;
+  };
+}
+
 @Resolver('Module')
 export class ModuleResolver {
   constructor(
     private readonly moduleService: ModuleService,
-    private readonly contentItemService: ContentItemService,
+    private readonly contentItemLoader: ContentItemLoader,
   ) {}
 
   @Query('module')
@@ -61,9 +68,21 @@ export class ModuleResolver {
     return this.moduleService.reorder(courseId, moduleIds);
   }
 
+  /**
+   * ResolveField uses ContentItemLoader (DataLoader) to batch all
+   * contentItems requests for a list of modules into one DB query,
+   * eliminating the N+1 problem.
+   *
+   * Falls back to the injected loader instance if the GraphQL context
+   * does not carry a per-request loader (e.g. in unit tests).
+   */
   @ResolveField('contentItems')
-  async getContentItems(@Parent() mod: ModuleParent) {
-    return this.contentItemService.findByModule(mod.id);
+  async getContentItems(
+    @Parent() mod: ModuleParent,
+    @Context() ctx: GraphQLContext,
+  ) {
+    const loader = ctx.loaders?.contentItems ?? this.contentItemLoader;
+    return loader.byModuleId.load(mod.id);
   }
 
   @ResolveReference()

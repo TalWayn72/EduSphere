@@ -90,3 +90,23 @@ export const MESSAGE_STREAM_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const GENERATE_COURSE_FROM_PROMPT_MUTATION = gql`
+  mutation GenerateCourseFromPrompt($prompt: String!, $tenantId: ID!) {
+    generateCourseFromPrompt(prompt: $prompt, tenantId: $tenantId) {
+      executionId
+      status
+    }
+  }
+`;
+
+export const EXECUTION_STATUS_SUBSCRIPTION = gql`
+  subscription ExecutionStatus($executionId: ID!) {
+    executionStatus(executionId: $executionId) {
+      executionId
+      status
+      result
+      error
+    }
+  }
+`;

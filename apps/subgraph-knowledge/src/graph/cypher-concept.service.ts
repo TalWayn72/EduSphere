@@ -120,4 +120,39 @@ export class CypherConceptService {
   ): Promise<void> {
     return createRelationship(db, fromId, toId, relationshipType, properties);
   }
+
+  /**
+   * linkConceptsAndFetch — creates the relationship AND returns both endpoint
+   * nodes in a single Cypher round-trip, eliminating the N+1 pattern in
+   * GraphConceptService.linkConcepts (was: MERGE + 2x MATCH).
+   */
+  async linkConceptsAndFetch(
+    fromId: string, toId: string,
+    relationshipType: string,
+    properties: RelationshipProperties,
+    tenantId: string,
+  ): Promise<{ from: unknown; to: unknown }> {
+    const safeStrength = properties.strength ?? 1.0;
+    const safeDescription = properties.description ?? '';
+    // Single Cypher query: create the relationship, return both nodes.
+    const rows = await executeCypher(
+      db, GRAPH_NAME,
+      `MATCH (a:Concept {id: $fromId, tenant_id: $tenantId})
+       MATCH (b:Concept {id: $toId, tenant_id: $tenantId})
+       MERGE (a)-[r:\`${relationshipType}\`]->(b)
+       ON CREATE SET r.strength = $strength,
+                     r.description = $description,
+                     r.created_at = timestamp()
+       ON MATCH  SET r.strength = $strength,
+                     r.description = $description,
+                     r.updated_at = timestamp()
+       RETURN a, b`,
+      { fromId, toId, tenantId, strength: safeStrength, description: safeDescription },
+      tenantId,
+    );
+    return {
+      from: (rows[0] as Record<string, unknown>)?.a ?? null,
+      to:   (rows[0] as Record<string, unknown>)?.b ?? null,
+    };
+  }
 }

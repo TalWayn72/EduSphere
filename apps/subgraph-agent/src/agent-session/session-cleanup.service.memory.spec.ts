@@ -1,146 +1,126 @@
 /**
- * session-cleanup.service.memory.spec.ts
- *
  * Memory-safety tests for SessionCleanupService.
+ *
  * Verifies:
- *   1. onModuleDestroy() calls clearInterval with the active handle.
- *   2. cleanupInterval is null after destroy (no dangling handle).
- *   3. Multiple init/destroy cycles do not accumulate intervals.
- *   4. onModuleDestroy() calls closeAllPools() to release DB connections.
- *   5. Destroying before init (cleanupInterval === null) is safe / does not throw.
+ *  1. onModuleInit() creates the cleanup interval.
+ *  2. onModuleDestroy() calls clearInterval and nullifies the handle.
+ *  3. onModuleDestroy() calls closeAllPools() exactly once.
+ *  4. Multiple onModuleDestroy() calls do NOT call clearInterval twice.
+ *  5. cleanupStaleSessions() deletes rows older than the cutoff.
+ *  6. cleanupStaleSessions() does not throw on DB error (logs instead).
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { SessionCleanupService } from './session-cleanup.service';
 
-// ── Hoist mocks — must be set up before any import of the service ─────────────
+// --- Module-level mocks must appear before any import that transitively loads them ---
 
-const { mockCloseAllPools, mockDb } = vi.hoisted(() => {
-  const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+const mockDelete = vi.fn().mockReturnThis();
+const mockWhere = vi.fn().mockReturnThis();
+const mockReturning = vi.fn().mockResolvedValue([{ id: 'sess-1' }, { id: 'sess-2' }]);
 
-  const mockReturning = vi.fn().mockResolvedValue([]);
-  const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
-  const mockDelete = vi.fn().mockReturnValue({ where: mockWhere });
-  const mockDb = { delete: mockDelete };
+const mockDb = {
+  delete: mockDelete,
+};
 
-  return { mockCloseAllPools, mockDb };
-});
+// Wire the chained calls: delete → where → returning
+mockDelete.mockReturnValue({ where: mockWhere });
+mockWhere.mockReturnValue({ returning: mockReturning });
+
+const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+const mockCreateDatabaseConnection = vi.fn().mockReturnValue(mockDb);
 
 vi.mock('@edusphere/db', () => ({
-  createDatabaseConnection: () => mockDb,
-  closeAllPools: mockCloseAllPools,
-  agentSessions: {
-    id: 'id',
-    createdAt: 'createdAt',
-  },
-}));
-
-vi.mock('drizzle-orm', () => ({
+  createDatabaseConnection: (...args: unknown[]) => mockCreateDatabaseConnection(...args),
+  closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
+  agentSessions: { id: 'id', createdAt: 'createdAt' },
   lt: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'lt' })),
 }));
 
-// Mock constants so the service can be imported without a physical constants.js
-// at the package root. The service imports from '../../constants.js' (package root).
-vi.mock('../constants.js', () => ({
-  SESSION_CLEANUP_INTERVAL_MS: 30 * 60 * 1000, // 30 minutes
-  STALE_SESSION_AGE_MS: 24 * 60 * 60 * 1000,   // 24 hours
-}));
-
-import { SessionCleanupService } from './session-cleanup.service.js';
-
-// Helper to access private fields without repeated casting
-function getPrivate<T>(svc: SessionCleanupService, field: string): T {
-  return (svc as unknown as Record<string, T>)[field];
-}
-
 describe('SessionCleanupService — memory safety', () => {
+  let service: SessionCleanupService;
+  let setIntervalSpy: ReturnType<typeof vi.spyOn>;
+  let clearIntervalSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.clearAllMocks();
+    setIntervalSpy = vi.spyOn(global, 'setInterval');
+    clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+
+    mockDelete.mockClear();
+    mockWhere.mockClear();
+    mockReturning.mockClear();
+    mockCloseAllPools.mockClear();
+
+    service = new SessionCleanupService();
   });
 
   afterEach(() => {
     vi.useRealTimers();
-  });
-
-  // ── Test 1: clearInterval is called on destroy with the active handle ──────
-  it('calls clearInterval with the active handle on module destroy', () => {
-    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
-
-    const svc = new SessionCleanupService();
-    svc.onModuleInit();
-
-    const handle = getPrivate<ReturnType<typeof setInterval>>(svc, 'cleanupInterval');
-    expect(handle).not.toBeNull();
-
-    svc.onModuleDestroy();
-
-    expect(clearIntervalSpy).toHaveBeenCalledWith(handle);
-    clearIntervalSpy.mockRestore();
-  });
-
-  // ── Test 2: cleanupInterval is null after destroy ──────────────────────────
-  it('sets cleanupInterval to null after module destroy', () => {
-    const svc = new SessionCleanupService();
-    svc.onModuleInit();
-    expect(getPrivate(svc, 'cleanupInterval')).not.toBeNull();
-
-    svc.onModuleDestroy();
-    expect(getPrivate(svc, 'cleanupInterval')).toBeNull();
-  });
-
-  // ── Test 3: multiple init/destroy cycles — no interval accumulation ────────
-  it('does not accumulate intervals across multiple init/destroy cycles', () => {
-    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
-    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
-
-    const svc = new SessionCleanupService();
-
-    // First cycle
-    svc.onModuleInit();
-    svc.onModuleDestroy();
-
-    // Second cycle
-    svc.onModuleInit();
-    svc.onModuleDestroy();
-
-    expect(setIntervalSpy).toHaveBeenCalledTimes(2);
-    expect(clearIntervalSpy).toHaveBeenCalledTimes(2);
-    expect(getPrivate(svc, 'cleanupInterval')).toBeNull();
-
     setIntervalSpy.mockRestore();
     clearIntervalSpy.mockRestore();
   });
 
-  // ── Test 4: closeAllPools is called on destroy ─────────────────────────────
-  it('calls closeAllPools() on module destroy to release DB connections', () => {
-    const svc = new SessionCleanupService();
-    svc.onModuleInit();
-    svc.onModuleDestroy();
+  // ── Test 1 ──────────────────────────────────────────────────────────────────
+  it('should call setInterval during onModuleInit()', () => {
+    service.onModuleInit();
+
+    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+    // Verify the interval is set to 30 minutes (1800000 ms)
+    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 30 * 60 * 1000);
+  });
+
+  // ── Test 2 ──────────────────────────────────────────────────────────────────
+  it('should call clearInterval on onModuleDestroy()', () => {
+    service.onModuleInit();
+
+    service.onModuleDestroy();
+
+    expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+  });
+
+  // ── Test 3 ──────────────────────────────────────────────────────────────────
+  it('should call closeAllPools() on onModuleDestroy()', () => {
+    service.onModuleInit();
+
+    service.onModuleDestroy();
 
     expect(mockCloseAllPools).toHaveBeenCalledTimes(1);
   });
 
-  // ── Test 5: safe to destroy when cleanupInterval is already null ───────────
-  it('does not throw when onModuleDestroy() is called before onModuleInit()', () => {
-    const svc = new SessionCleanupService();
-    // cleanupInterval starts as null — destroy should be a no-op for the timer
-    expect(() => svc.onModuleDestroy()).not.toThrow();
+  // ── Test 4 ──────────────────────────────────────────────────────────────────
+  it('should not call clearInterval twice if onModuleDestroy is called twice', () => {
+    service.onModuleInit();
+
+    service.onModuleDestroy();
+    service.onModuleDestroy(); // idempotent: handle is null after first call
+
+    // clearInterval should only be invoked once with an actual handle
+    expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
   });
 
-  // ── Test 6: destroy is idempotent ─────────────────────────────────────────
-  it('is idempotent — calling onModuleDestroy() twice does not throw', () => {
-    const svc = new SessionCleanupService();
-    svc.onModuleInit();
-    svc.onModuleDestroy();
-    expect(() => svc.onModuleDestroy()).not.toThrow();
-    expect(getPrivate(svc, 'cleanupInterval')).toBeNull();
+  // ── Test 5 ──────────────────────────────────────────────────────────────────
+  it('should call db.delete().where().returning() in cleanupStaleSessions()', async () => {
+    await service.cleanupStaleSessions();
+
+    expect(mockDelete).toHaveBeenCalledTimes(1);
+    expect(mockWhere).toHaveBeenCalledTimes(1);
+    expect(mockReturning).toHaveBeenCalledTimes(1);
   });
 
-  // ── Test 7: cleanupStaleSessions resolves without throwing ────────────────
-  it('cleanupStaleSessions completes without throwing when DB returns results', async () => {
-    const svc = new SessionCleanupService();
-    svc.onModuleInit();
-    await expect(svc.cleanupStaleSessions()).resolves.toBeUndefined();
-    svc.onModuleDestroy();
+  // ── Test 6 ──────────────────────────────────────────────────────────────────
+  it('should NOT throw when cleanupStaleSessions encounters a DB error', async () => {
+    mockReturning.mockRejectedValueOnce(new Error('DB connection lost'));
+
+    // Must resolve without throwing
+    await expect(service.cleanupStaleSessions()).resolves.toBeUndefined();
+  });
+
+  // ── Test 7 ──────────────────────────────────────────────────────────────────
+  it('should NOT call clearInterval if onModuleInit was never called', () => {
+    // Destroy without init — the interval handle is null, clearInterval must not fire
+    service.onModuleDestroy();
+
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
   });
 });

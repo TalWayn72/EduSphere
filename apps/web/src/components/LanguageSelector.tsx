@@ -13,10 +13,12 @@ interface LanguageSelectorProps {
   value: SupportedLocale;
   onChange: (locale: SupportedLocale) => void;
   disabled?: boolean;
+  availableLocales?: readonly SupportedLocale[];
 }
 
-export function LanguageSelector({ value, onChange, disabled }: LanguageSelectorProps) {
+export function LanguageSelector({ value, onChange, disabled, availableLocales }: LanguageSelectorProps) {
   const { t } = useTranslation('settings');
+  const locales = availableLocales ?? SUPPORTED_LOCALES;
 
   return (
     <div className="space-y-2">
@@ -35,7 +37,7 @@ export function LanguageSelector({ value, onChange, disabled }: LanguageSelector
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {SUPPORTED_LOCALES.map((locale) => {
+          {locales.map((locale) => {
             const info = LOCALE_LABELS[locale];
             return (
               <SelectItem key={locale} value={locale}>

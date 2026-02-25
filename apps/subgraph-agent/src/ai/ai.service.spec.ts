@@ -62,6 +62,8 @@ vi.mock('./tools/agent-tools', () => ({
 
 // Import AFTER mocks are declared
 import { AIService } from './ai.service';
+import { AiLanggraphRunnerService } from './ai-langgraph-runner.service';
+import { AiLegacyRunnerService } from './ai-legacy-runner.service';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -103,7 +105,11 @@ describe('AIService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new AIService(mockLangGraphService as any);
+    service = new AIService(
+      mockLangGraphService as any,
+      new AiLanggraphRunnerService(mockLangGraphService as any),
+      new AiLegacyRunnerService(),
+    );
 
     mockRunLangGraphDebate.mockResolvedValue(MOCK_LANGGRAPH_RESULT);
     mockRunLangGraphQuiz.mockResolvedValue(MOCK_LANGGRAPH_RESULT);
@@ -283,30 +289,102 @@ describe('AIService', () => {
     });
   });
 
-  // ── continueSession — LangGraph routing ───────────────────────────────────
+  // ── continueSession — routing ─────────────────────────────────────────────
 
-  describe('continueSession() — LangGraph routing', () => {
+  describe('continueSession() — routing', () => {
     const SESSION_ID = 'session-abc-123';
     const MESSAGE = 'Tell me about the French Revolution';
     const CTX = { topic: 'French Revolution' };
 
-    it('routes CHAVRUTA_DEBATE to runLangGraphDebate', async () => {
-      const result = await service.continueSession(
-        SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX
-      );
-      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
-      expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
-    });
+    // CHAVRUTA_DEBATE now routes to the conversational chavruta.workflow.ts,
+    // NOT runLangGraphDebate (which ran a one-shot argue→counter→synthesize loop
+    // and ignored the user's actual message).
+    describe('CHAVRUTA_DEBATE — conversational chavruta workflow', () => {
+      it('does NOT call runLangGraphDebate', async () => {
+        mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
+        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        expect(mockRunLangGraphDebate).not.toHaveBeenCalled();
+      });
 
-    it('passes thread_id (sessionId) as first arg to runLangGraphDebate', async () => {
-      await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
-      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(
-        SESSION_ID,
-        expect.any(String),
-        expect.any(Object),
-        expect.any(String),
-        expect.any(Object)
-      );
+      it('calls generateText (via chavruta workflow) with Chavruta system prompt', async () => {
+        let capturedCall: Record<string, unknown> = {};
+        mockGenerateText.mockImplementation((args: unknown) => {
+          capturedCall = args as Record<string, unknown>;
+          return Promise.resolve(MOCK_GENERATE_RESULT);
+        });
+        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        expect(mockGenerateText).toHaveBeenCalled();
+        expect(String(capturedCall['system'] ?? '')).toContain('Chavruta');
+      });
+
+      it('includes the user message in conversation history sent to LLM', async () => {
+        let capturedCall: Record<string, unknown> = {};
+        mockGenerateText.mockImplementation((args: unknown) => {
+          capturedCall = args as Record<string, unknown>;
+          return Promise.resolve(MOCK_GENERATE_RESULT);
+        });
+        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        const msgs = capturedCall['messages'] as Array<{ role: string; content: string }>;
+        expect(msgs).toBeDefined();
+        expect(msgs.some((m) => m.content === MESSAGE)).toBe(true);
+      });
+
+      it('uses context.topic as the debate content', async () => {
+        let capturedCall: Record<string, unknown> = {};
+        mockGenerateText.mockImplementation((args: unknown) => {
+          capturedCall = args as Record<string, unknown>;
+          return Promise.resolve(MOCK_GENERATE_RESULT);
+        });
+        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', { topic: 'Free will' });
+        // system prompt is built from ASSESS state; content doesn't appear in system but workflow receives it
+        expect(capturedCall['system']).toBeDefined();
+      });
+
+      it('falls back to context.topicId when context.topic is absent', async () => {
+        mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
+        // Should not throw when topic is missing
+        await expect(
+          service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', { topicId: 'topic-uuid' })
+        ).resolves.toBeDefined();
+      });
+
+      it('returns text from generateText', async () => {
+        mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
+        const result = await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        expect(result.text).toBe(MOCK_GENERATE_RESULT.text);
+      });
+
+      it('returns workflowResult with nextState', async () => {
+        mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
+        const result = await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        expect(result.workflowResult).toBeDefined();
+        expect((result.workflowResult as Record<string, unknown>)['nextState']).toBeDefined();
+      });
+
+      it('injects Hebrew locale instruction into system prompt when locale is he', async () => {
+        let capturedCall: Record<string, unknown> = {};
+        mockGenerateText.mockImplementation((args: unknown) => {
+          capturedCall = args as Record<string, unknown>;
+          return Promise.resolve(MOCK_GENERATE_RESULT);
+        });
+        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX, 'he');
+        expect(String(capturedCall['system'] ?? '')).toContain('Hebrew');
+      });
+
+      it('propagates error from generateText', async () => {
+        mockGenerateText.mockRejectedValueOnce(new Error('LLM timeout'));
+        await expect(
+          service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX)
+        ).rejects.toThrow('LLM timeout');
+      });
+
+      it('works with empty context object', async () => {
+        mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
+        await expect(
+          service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE')
+        ).resolves.toBeDefined();
+        expect(mockRunLangGraphDebate).not.toHaveBeenCalled();
+      });
     });
 
     it('routes QUIZ_GENERATOR to runLangGraphQuiz', async () => {
@@ -354,25 +432,6 @@ describe('AIService', () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
       const result = await service.continueSession(SESSION_ID, MESSAGE, 'RESEARCH_SCOUT', {});
       expect(result.text).toBe(MOCK_GENERATE_RESULT.text);
-    });
-
-    it('includes workflowResult from LangGraph adapter', async () => {
-      const result = await service.continueSession(
-        SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX
-      );
-      expect(result.workflowResult).toEqual(MOCK_LANGGRAPH_RESULT.workflowResult);
-    });
-
-    it('propagates error from LangGraph adapter', async () => {
-      mockRunLangGraphDebate.mockRejectedValueOnce(new Error('LangGraph timeout'));
-      await expect(
-        service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX)
-      ).rejects.toThrow('LangGraph timeout');
-    });
-
-    it('uses empty context object when none provided', async () => {
-      await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE');
-      expect(mockRunLangGraphDebate).toHaveBeenCalledWith(SESSION_ID, MESSAGE, {}, 'en', MOCK_CHECKPOINTER);
     });
   });
 

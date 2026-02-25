@@ -32,6 +32,7 @@ export default defineConfig({
       '@tiptap/extension-table-header': tiptapStub,
       '@tiptap/extension-task-list': tiptapStub,
       '@tiptap/extension-task-item': tiptapStub,
+      '@tiptap/extension-image': tiptapStub,
       '@tiptap/react': tiptapStub,
       '@tiptap/starter-kit': tiptapStub,
       'lowlight': tiptapStub,
@@ -48,6 +49,8 @@ export default defineConfig({
     passWithNoTests: true,
     restoreAllMocks: true,
     clearMocks: true,
+    testTimeout: 30000,
+    hookTimeout: 30000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

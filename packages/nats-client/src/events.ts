@@ -152,7 +152,9 @@ export type NatsEvent =
   | TranscriptionPayload
   | KnowledgeConceptPayload
   | ContentTranslationPayload
-  | GatewayPubSubPayload;
+  | GatewayPubSubPayload
+  | UserFollowedPayload
+  | PollVotePayload;
 
 // ─── Type Guards ─────────────────────────────────────────────────────────────
 
@@ -236,5 +238,157 @@ export function isKnowledgeConceptEvent(
     Array.isArray(obj['concepts']) &&
     (obj['type'] === 'knowledge.concepts.extracted' ||
       obj['type'] === 'knowledge.concepts.persisted')
+  );
+}
+
+// ─── Social Follow Events (F-035 Social Following System) ────────────────────
+
+export interface UserFollowedPayload {
+  readonly followerId: string;
+  readonly followingId: string;
+  readonly tenantId: string;
+  readonly timestamp: string; // ISO 8601
+}
+
+export function isUserFollowedEvent(e: unknown): e is UserFollowedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['followerId'] === 'string' &&
+    typeof obj['followingId'] === 'string' &&
+    typeof obj['tenantId'] === 'string'
+  );
+}
+
+// ─── Submission Events (F-005 Plagiarism Detection) ──────────────────────────
+
+export interface SubmissionCreatedPayload {
+  readonly submissionId: string;
+  readonly tenantId: string;
+  readonly courseId: string;
+  readonly userId: string;
+  readonly timestamp: string; // ISO 8601
+}
+
+export function isSubmissionCreatedEvent(e: unknown): e is SubmissionCreatedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['submissionId'] === 'string' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['courseId'] === 'string'
+  );
+}
+
+// ─── Live Session Poll Events (F-034 BBB Breakout Rooms + Polls) ─────────────
+
+export interface PollVotePayload {
+  readonly pollId: string;
+  readonly sessionId: string;
+  readonly tenantId: string;
+  readonly optionIndex: number;
+  readonly totalVotes: number;
+  readonly results: Array<{ optionIndex: number; count: number }>;
+}
+
+export function isPollVoteEvent(e: unknown): e is PollVotePayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['pollId'] === 'string' &&
+    typeof obj['sessionId'] === 'string' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['totalVotes'] === 'number'
+  );
+}
+
+export const NatsSubjects = {
+  POLL_VOTED: 'EDUSPHERE.poll.voted',
+  COURSE_ENROLLED: 'EDUSPHERE.course.enrolled',
+  BADGE_ISSUED: 'EDUSPHERE.badge.issued',
+  BADGE_REVOKED: 'EDUSPHERE.badge.revoked',
+} as const;
+
+// ─── Course Enrolled Events (F-031 Instructor Marketplace) ───────────────────
+
+export interface CourseEnrolledPayload {
+  readonly courseId: string;
+  readonly userId: string;
+  readonly tenantId: string;
+  readonly purchaseId: string;
+  readonly timestamp: string; // ISO 8601
+}
+
+export function isCourseEnrolledEvent(e: unknown): e is CourseEnrolledPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['courseId'] === 'string' &&
+    typeof obj['userId'] === 'string' &&
+    typeof obj['purchaseId'] === 'string'
+  );
+}
+
+// ─── Course Completion Events (F-027 CPD/CE Credit Tracking) ─────────────────
+
+export interface CourseCompletedPayload {
+  readonly courseId: string;
+  readonly userId: string;
+  readonly tenantId: string;
+  readonly completionDate: string; // ISO 8601
+  readonly certificateId?: string;
+  readonly courseTitle?: string;
+  readonly courseCategory?: string;
+  readonly estimatedHours?: number;
+}
+
+export function isCourseCompletedEvent(e: unknown): e is CourseCompletedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['courseId'] === 'string' &&
+    typeof obj['userId'] === 'string' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['completionDate'] === 'string'
+  );
+}
+
+// ─── OpenBadge 3.0 Events (F-025 Micro-Credentials) ──────────────────────────
+
+export interface BadgeIssuedPayload {
+  readonly assertionId: string;
+  readonly badgeDefinitionId: string;
+  readonly recipientId: string;
+  readonly tenantId: string;
+  readonly badgeName: string;
+  readonly verifyUrl: string;
+  readonly timestamp: string; // ISO 8601
+}
+
+export interface BadgeRevokedPayload {
+  readonly assertionId: string;
+  readonly tenantId: string;
+  readonly reason: string;
+  readonly timestamp: string; // ISO 8601
+}
+
+export function isBadgeIssuedEvent(e: unknown): e is BadgeIssuedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['assertionId'] === 'string' &&
+    typeof obj['recipientId'] === 'string' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['badgeName'] === 'string'
+  );
+}
+
+export function isBadgeRevokedEvent(e: unknown): e is BadgeRevokedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['assertionId'] === 'string' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['reason'] === 'string'
   );
 }

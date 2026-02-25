@@ -1,0 +1,25 @@
+type ScormSession {
+  id: ID!
+  lessonStatus: String!
+  scoreRaw: Float
+  suspendData: String
+  completedAt: String
+  updatedAt: String!
+}
+
+type ScormImportResult {
+  courseId: ID!
+  itemCount: Int!
+}
+
+extend type Query {
+  myScormSession(contentItemId: ID!): ScormSession @authenticated
+}
+
+extend type Mutation {
+  initScormSession(contentItemId: ID!): ScormSession! @authenticated
+  updateScormSession(sessionId: ID!, data: String!): Boolean! @authenticated
+  finishScormSession(sessionId: ID!, data: String!): Boolean! @authenticated
+  importScormPackage(fileKey: String!): ScormImportResult! @authenticated
+  exportCourseAsScorm(courseId: ID!): String! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+}

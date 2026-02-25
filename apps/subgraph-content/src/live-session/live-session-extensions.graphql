@@ -1,0 +1,64 @@
+type BreakoutRoom {
+  id: ID!
+  sessionId: ID!
+  roomName: String!
+  capacity: Int!
+  assignedUserIds: [ID!]!
+}
+
+type SessionPoll {
+  id: ID!
+  sessionId: ID!
+  question: String!
+  options: [String!]!
+  isActive: Boolean!
+}
+
+type PollOptionResult {
+  text: String!
+  count: Int!
+  percentage: Float!
+}
+
+type PollResults {
+  pollId: ID!
+  question: String!
+  options: [PollOptionResult!]!
+  totalVotes: Int!
+}
+
+input CreateBreakoutRoomInput {
+  roomName: String!
+  capacity: Int!
+  assignedUserIds: [ID!]
+}
+
+extend type Query {
+  sessionPolls(sessionId: ID!): [SessionPoll!]! @authenticated
+  pollResults(pollId: ID!): PollResults! @authenticated
+  breakoutRooms(sessionId: ID!): [BreakoutRoom!]! @authenticated
+}
+
+extend type Mutation {
+  createBreakoutRooms(sessionId: ID!, rooms: [CreateBreakoutRoomInput!]!): [BreakoutRoom!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  createPoll(sessionId: ID!, question: String!, options: [String!]!): SessionPoll!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  activatePoll(pollId: ID!): SessionPoll!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  closePoll(pollId: ID!): PollResults!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  votePoll(pollId: ID!, optionIndex: Int!): Boolean! @authenticated
+}
+
+extend type Subscription {
+  pollUpdated(pollId: ID!): PollResults! @authenticated
+}

@@ -1,0 +1,48 @@
+enum LibraryTopic {
+  GDPR
+  SOC2
+  HIPAA
+  AML
+  DEI
+  CYBERSECURITY
+  HARASSMENT_PREVENTION
+}
+
+enum LibraryLicense {
+  FREE
+  PAID
+}
+
+type LibraryCourse {
+  id: ID!
+  title: String!
+  description: String!
+  topic: LibraryTopic!
+  licenseType: LibraryLicense!
+  priceCents: Int!
+  durationMinutes: Int!
+  """True if the current tenant has already activated this course"""
+  isActivated: Boolean!
+}
+
+type LibraryActivation {
+  id: ID!
+  libraryCourseId: ID!
+  """The course ID created in the tenant's catalog, populated after activation"""
+  courseId: ID
+  activatedAt: String!
+}
+
+extend type Query {
+  libraryCourses(topic: LibraryTopic): [LibraryCourse!]! @authenticated
+  myLibraryActivations: [LibraryActivation!]! @authenticated @requiresRole(roles: [ORG_ADMIN])
+}
+
+extend type Mutation {
+  activateLibraryCourse(libraryCourseId: ID!): LibraryActivation!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
+  deactivateLibraryCourse(libraryCourseId: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN])
+}

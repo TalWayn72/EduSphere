@@ -10,11 +10,9 @@ vi.mock('@edusphere/db', () => ({
       }),
     }),
   },
-}));
-
-vi.mock('@edusphere/db/schema', () => ({
   userConsents: { userId: 'userId', consentType: 'consentType', given: 'given' },
 }));
+
 
 describe('LlmConsentGuard', () => {
   let guard: LlmConsentGuard;

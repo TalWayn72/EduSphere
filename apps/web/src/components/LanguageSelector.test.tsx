@@ -76,12 +76,12 @@ describe('LanguageSelector', () => {
     expect(screen.getByTestId('select-native')).toBeInTheDocument();
   });
 
-  it('renders all 9 supported locales as options', () => {
+  it('renders all 10 supported locales as options', () => {
     renderSelector('en', onChange);
     SUPPORTED_LOCALES.forEach((locale) => {
       expect(screen.getByTestId(`option-${locale}`)).toBeInTheDocument();
     });
-    expect(SUPPORTED_LOCALES).toHaveLength(9);
+    expect(SUPPORTED_LOCALES).toHaveLength(10);
   });
 
   it('renders the native language name for each locale', () => {

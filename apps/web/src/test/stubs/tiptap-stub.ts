@@ -17,3 +17,11 @@ export default stub;
 // Named exports that some extensions expose
 export const lowlight = {};
 export const HocuspocusProvider = class {};
+// lowlight package exports
+export const createLowlight = () => ({});
+// Mathematics extension
+export const Mathematics = stub;
+// Table extension
+export const Table = stub;
+// Image extension
+export const Image = stub;

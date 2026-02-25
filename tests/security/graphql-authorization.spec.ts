@@ -86,7 +86,10 @@ describe('G-15: user.graphql -- admin mutations have fine-grained auth', () => {
   });
   it('updateUserPreferences is self-service: @authenticated but NOT @requiresRole', () => {
     const i = schema.indexOf('updateUserPreferences');
-    const b = schema.slice(i, i + 800);
+    // Slice only to the next mutation definition (updateProfileVisibility) so
+    // later admin-only mutations with @requiresRole don't pollute the window.
+    const nextDef = schema.indexOf('updateProfileVisibility', i);
+    const b = schema.slice(i, nextDef > i ? nextDef : i + 200);
     expect(b).toContain('@authenticated'); expect(b).not.toContain('@requiresRole');
   });
   it('all mutations retain @authenticated as baseline guard', () => {

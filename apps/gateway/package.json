@@ -8,9 +8,11 @@
     "start": "node --loader tsx src/index.ts",
     "build": "echo 'Gateway is config-based, no build needed'",
     "compose": "node compose.js",
-    "test": "vitest run --config tests/vitest.config.ts"
+    "test": "vitest run --config tests/vitest.config.ts",
+    "test:memory": "vitest run --reporter=verbose **/*.memory.spec.ts"
   },
   "dependencies": {
+    "@edusphere/config": "workspace:*",
     "@edusphere/telemetry": "workspace:*",
     "@graphql-hive/gateway": "^2.2.1",
     "@graphql-yoga/plugin-response-cache": "^3.0.0",

@@ -60,7 +60,8 @@ function ContentItemChart({ metrics }: { metrics: ContentItemMetric[] }) {
             <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-30} textAnchor="end" />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip
-              formatter={(value: number, name: string) =>
+              // @ts-expect-error Recharts Formatter types are overly strict
+              formatter={(value: number | undefined, name: string) =>
                 name === 'viewCount' ? [`${value} views`, 'Views'] : [`${value}%`, 'Completion']
               }
             />
@@ -107,7 +108,8 @@ function DropOffFunnelChart({ funnel }: { funnel: FunnelStep[] }) {
             <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-30} textAnchor="end" />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip
-              formatter={(value: number, name: string) =>
+              // @ts-expect-error Recharts Formatter types are overly strict
+              formatter={(value: number | undefined, name: string) =>
                 name === 'started'
                   ? [`${value}`, 'Started']
                   : name === 'completed'

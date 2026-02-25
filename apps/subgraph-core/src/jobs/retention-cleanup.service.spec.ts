@@ -9,9 +9,6 @@ vi.mock('@edusphere/db', () => ({
       }),
     }),
   },
-}));
-
-vi.mock('@edusphere/db/schema', () => ({
   RETENTION_DEFAULTS: {
     AGENT_MESSAGES: { days: 90, mode: 'HARD_DELETE' },
   },

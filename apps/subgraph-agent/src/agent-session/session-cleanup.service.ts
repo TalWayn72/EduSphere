@@ -1,9 +1,8 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { createDatabaseConnection, closeAllPools, agentSessions } from '@edusphere/db';
 import { lt } from 'drizzle-orm';
+import { SESSION_CLEANUP_INTERVAL_MS, STALE_SESSION_AGE_MS } from '../constants';
 
-const CLEANUP_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
-const STALE_SESSION_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 @Injectable()
 export class SessionCleanupService implements OnModuleInit, OnModuleDestroy {
@@ -14,7 +13,7 @@ export class SessionCleanupService implements OnModuleInit, OnModuleDestroy {
   onModuleInit(): void {
     this.cleanupInterval = setInterval(() => {
       void this.cleanupStaleSessions();
-    }, CLEANUP_INTERVAL_MS);
+    }, SESSION_CLEANUP_INTERVAL_MS);
     this.logger.log(
       'SessionCleanupService: stale session cleanup scheduled every 30 minutes',
     );

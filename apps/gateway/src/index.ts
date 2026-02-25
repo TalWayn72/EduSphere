@@ -7,7 +7,7 @@ import { createYoga } from 'graphql-yoga';
 import { createServer } from 'http';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import pino from 'pino';
-import { checkRateLimit } from './middleware/rate-limit.js';
+import { checkRateLimit, stopRateLimitCleanup } from './middleware/rate-limit.js';
 import { depthLimitRule, complexityLimitRule } from './middleware/query-complexity.js';
 import { createNatsPubSub, shutdownNatsPubSub } from './nats-subscriptions.js';
 
@@ -190,6 +190,9 @@ async function shutdown(signal: string): Promise<void> {
   server.close(() => {
     logger.info('HTTP server closed');
   });
+
+  stopRateLimitCleanup();
+  logger.info('Rate-limit cleanup stopped');
 
   await shutdownNatsPubSub();
   logger.info('NATS pub/sub drained');
