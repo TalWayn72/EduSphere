@@ -7,7 +7,7 @@ import {
 import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
-import { generateText, type LanguageModelV1 } from 'ai';
+import { generateText, type LanguageModel } from 'ai';
 import { createOllama } from 'ollama-ai-provider';
 import { createOpenAI } from '@ai-sdk/openai';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
@@ -115,7 +115,7 @@ export class AltTextGeneratorService implements OnModuleInit, OnModuleDestroy {
     const isExternal = !process.env.OLLAMA_URL;
     const model = (isExternal
       ? createOpenAI({ apiKey: process.env.OPENAI_API_KEY })('gpt-4o')
-      : createOllama({ baseURL: `${process.env.OLLAMA_URL}/api` })('llava')) as unknown as LanguageModelV1;
+      : createOllama({ baseURL: `${process.env.OLLAMA_URL}/api` })('llava')) as unknown as LanguageModel;
 
     this.logger.debug(`Using ${isExternal ? 'OpenAI gpt-4o' : 'Ollama llava'} for asset=${assetId}`);
 

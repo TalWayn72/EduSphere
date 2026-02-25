@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { GripVertical } from 'lucide-react';
 import type { DragOrder } from '@/types/quiz';
 
