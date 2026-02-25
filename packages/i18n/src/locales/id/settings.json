@@ -46,5 +46,16 @@
     "deviceFree": "{{free}} tersedia di perangkat",
     "used": "digunakan",
     "limitOf": "batas"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "Unduhan Hanya WiFi",
+    "wifiOnlyDescription": "Unduh kursus hanya saat terhubung ke WiFi untuk menghemat data seluler",
+    "wifiOnlyLabel": "Hanya WiFi",
+    "deleteTitle": "Hapus Kursus",
+    "deleteConfirm": "Hapus '{{title}}' dari perangkat ini?",
+    "coursesTitle": "Kursus yang Diunduh",
+    "coursesDescription": "Kursus yang disimpan di perangkat Anda untuk ditonton secara offline",
+    "noCourses": "Tidak ada kursus yang diunduh",
+    "deleteLabel": "Hapus {{title}}"
   }
 }

@@ -46,5 +46,16 @@
     "deviceFree": "{{free}} доступно на устройстве",
     "used": "использовано",
     "limitOf": "лимит"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "Загрузка только по WiFi",
+    "wifiOnlyDescription": "Загружайте курсы только при подключении к WiFi для экономии мобильных данных",
+    "wifiOnlyLabel": "Только WiFi",
+    "deleteTitle": "Удалить курс",
+    "deleteConfirm": "Удалить '{{title}}' с этого устройства?",
+    "coursesTitle": "Загруженные курсы",
+    "coursesDescription": "Курсы, сохранённые на устройстве для просмотра офлайн",
+    "noCourses": "Нет загруженных курсов",
+    "deleteLabel": "Удалить {{title}}"
   }
 }

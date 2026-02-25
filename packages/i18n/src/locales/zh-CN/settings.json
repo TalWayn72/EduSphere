@@ -46,5 +46,16 @@
     "deviceFree": "设备可用空间 {{free}}",
     "used": "已使用",
     "limitOf": "限制"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "仅 WiFi 下载",
+    "wifiOnlyDescription": "仅在连接 WiFi 时下载课程，以节省移动数据",
+    "wifiOnlyLabel": "仅 WiFi",
+    "deleteTitle": "删除课程",
+    "deleteConfirm": "从此设备删除"{{title}}"?",
+    "coursesTitle": "已下载的课程",
+    "coursesDescription": "保存在您设备上供离线查看的课程",
+    "noCourses": "没有已下载的课程",
+    "deleteLabel": "删除 {{title}}"
   }
 }

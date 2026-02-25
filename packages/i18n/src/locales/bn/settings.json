@@ -46,5 +46,16 @@
     "deviceFree": "ডিভাইসে {{free}} উপলব্ধ",
     "used": "ব্যবহৃত",
     "limitOf": "সীমা"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "শুধুমাত্র WiFi ডাউনলোড",
+    "wifiOnlyDescription": "মোবাইল ডেটা বাঁচাতে শুধুমাত্র WiFi সংযুক্ত থাকলে কোর্স ডাউনলোড করুন",
+    "wifiOnlyLabel": "শুধু WiFi",
+    "deleteTitle": "কোর্স মুছুন",
+    "deleteConfirm": "এই ডিভাইস থেকে '{{title}}' সরাবেন?",
+    "coursesTitle": "ডাউনলোড করা কোর্স",
+    "coursesDescription": "অফলাইন দেখার জন্য আপনার ডিভাইসে সংরক্ষিত কোর্স",
+    "noCourses": "কোনো ডাউনলোড করা কোর্স নেই",
+    "deleteLabel": "{{title}} মুছুন"
   }
 }
