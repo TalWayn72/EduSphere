@@ -46,5 +46,16 @@
     "deviceFree": "डिवाइस पर {{free}} उपलब्ध",
     "used": "उपयोग में",
     "limitOf": "सीमा"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "केवल WiFi डाउनलोड",
+    "wifiOnlyDescription": "मोबाइल डेटा बचाने के लिए केवल WiFi से कनेक्ट होने पर कोर्स डाउनलोड करें",
+    "wifiOnlyLabel": "केवल WiFi",
+    "deleteTitle": "कोर्स हटाएं",
+    "deleteConfirm": "इस डिवाइस से '{{title}}' हटाएं?",
+    "coursesTitle": "डाउनलोड किए गए कोर्स",
+    "coursesDescription": "ऑफलाइन देखने के लिए आपके डिवाइस पर सहेजे गए कोर्स",
+    "noCourses": "कोई डाउनलोड किया गया कोर्स नहीं",
+    "deleteLabel": "{{title}} हटाएं"
   }
 }

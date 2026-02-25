@@ -46,5 +46,16 @@
     "deviceFree": "{{free}} disponibles sur l'appareil",
     "used": "utilisé",
     "limitOf": "limite"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "Téléchargements WiFi uniquement",
+    "wifiOnlyDescription": "Téléchargez les cours uniquement en WiFi pour économiser les données mobiles",
+    "wifiOnlyLabel": "WiFi uniquement",
+    "deleteTitle": "Supprimer le cours",
+    "deleteConfirm": "Supprimer '{{title}}' de cet appareil ?",
+    "coursesTitle": "Cours téléchargés",
+    "coursesDescription": "Cours enregistrés sur votre appareil pour une consultation hors ligne",
+    "noCourses": "Aucun cours téléchargé",
+    "deleteLabel": "Supprimer {{title}}"
   }
 }
