@@ -9,8 +9,6 @@ import { urqlClient } from '@/lib/urql-client';
 import { PRESIGNED_UPLOAD_QUERY, CONFIRM_MEDIA_UPLOAD_MUTATION } from '@/lib/graphql/content.queries';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
 import { AltTextModal } from '@/components/AltTextModal';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
 import { RichEditor } from '@/components/editor/RichEditor';
 interface Props {
   courseId: string;
