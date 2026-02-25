@@ -4,7 +4,7 @@
  * Returns null when the content item is not a SCENARIO type or is still loading.
  */
 import { useQuery } from 'urql';
-import { SCENARIO_NODE_QUERY } from '@/lib/graphql/content.queries';
+import { SCENARIO_NODE_QUERY } from '@/lib/graphql/content-tier3.queries';
 
 interface ScenarioChoiceItem {
   id: string;

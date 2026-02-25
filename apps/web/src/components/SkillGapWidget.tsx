@@ -22,7 +22,7 @@ import {
   SKILL_GAP_ANALYSIS_QUERY,
   SKILL_PROFILES_QUERY,
   CREATE_SKILL_PROFILE_MUTATION,
-} from '@/lib/graphql/knowledge.queries';
+} from '@/lib/graphql/knowledge-tier3.queries';
 
 interface SkillProfile { id: string; roleName: string; description: string | null; requiredConceptsCount: number; }
 interface SkillGapItem { conceptName: string; isMastered: boolean; recommendedContentTitles: string[]; }

@@ -12,7 +12,7 @@ import { useMutation } from 'urql';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, CheckCircle, XCircle, MinusCircle } from 'lucide-react';
-import { RECORD_SCENARIO_CHOICE_MUTATION } from '@/lib/graphql/content.queries';
+import { RECORD_SCENARIO_CHOICE_MUTATION } from '@/lib/graphql/content-tier3.queries';
 
 interface ScenarioChoiceItem {
   id: string;

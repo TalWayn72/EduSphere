@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { urqlClient } from '@/lib/urql-client';
-import { UPDATE_MEDIA_ALT_TEXT_MUTATION } from '@/lib/graphql/content.queries';
+import { UPDATE_MEDIA_ALT_TEXT_MUTATION } from '@/lib/graphql/content-tier3.queries';
 
 interface Props {
   mediaId: string;

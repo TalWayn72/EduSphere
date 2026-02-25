@@ -10,7 +10,7 @@ import {
   CardTitle,
   CardContent,
 } from '@/components/ui/card';
-import { SOCIAL_FEED_QUERY } from '@/lib/graphql/knowledge.queries';
+import { SOCIAL_FEED_QUERY } from '@/lib/graphql/knowledge-tier3.queries';
 
 interface SocialFeedItem {
   userId: string;

@@ -5,7 +5,7 @@ import { Loader2, Sparkles, X, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { GENERATE_COURSE_FROM_PROMPT_MUTATION, EXECUTION_STATUS_SUBSCRIPTION } from '@/lib/graphql/agent.queries';
+import { GENERATE_COURSE_FROM_PROMPT_MUTATION, EXECUTION_STATUS_SUBSCRIPTION } from '@/lib/graphql/agent-course-gen.queries';
 import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
 
 interface GeneratedModule { title: string; description: string; contentItemTitles: string[]; }
