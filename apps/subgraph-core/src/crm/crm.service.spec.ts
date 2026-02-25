@@ -38,13 +38,13 @@ const mockEnc = {
 
 // Lazy import after mocks
 let CrmService: typeof import('./crm.service.js').CrmService;
-let closeAllPools: () => Promise<void>;
+let _closeAllPools: () => Promise<void>;
 let withTenantContext: ReturnType<typeof vi.fn>;
 
 beforeEach(async () => {
   vi.clearAllMocks();
   const dbMod = await import('@edusphere/db');
-  closeAllPools = dbMod.closeAllPools as () => Promise<void>;
+  _closeAllPools = dbMod.closeAllPools as () => Promise<void>;
   withTenantContext = dbMod.withTenantContext as ReturnType<typeof vi.fn>;
   const mod = await import('./crm.service.js');
   CrmService = mod.CrmService;

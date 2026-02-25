@@ -16,24 +16,26 @@ export interface ScrubResult {
 const PII_PATTERNS: Array<{ name: string; pattern: RegExp; replacement: string }> = [
   {
     name: 'EMAIL',
-    pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+    // eslint-disable-next-line security/detect-unsafe-regex
+    pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
     replacement: '[EMAIL]',
   },
   // IP addresses must come before phone patterns to avoid partial digit matches.
   {
     name: 'IP_ADDRESS',
+    // eslint-disable-next-line security/detect-unsafe-regex
     pattern: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g,
     replacement: '[IP_ADDRESS]',
   },
   {
     name: 'PHONE_IL',
-    pattern: /\b(?:\+972|0)(?:-?[0-9]){9,10}\b/g,
+    pattern: /\b(?:\+972|0)(?:-?\d){9,10}\b/g,
     replacement: '[PHONE]',
   },
   // International phone: +country-code with optional hyphens/spaces, 7-15 digits total.
   {
     name: 'PHONE_INTL',
-    pattern: /\+[1-9][\d\s\-]{6,14}\d/g,
+    pattern: /\+[1-9][\d\s-]{6,14}\d/g,
     replacement: '[PHONE]',
   },
   {
@@ -43,6 +45,7 @@ const PII_PATTERNS: Array<{ name: string; pattern: RegExp; replacement: string }
   },
   {
     name: 'CREDIT_CARD',
+    // eslint-disable-next-line security/detect-unsafe-regex
     pattern: /\b(?:\d[ -]?){13,16}\b/g,
     replacement: '[CARD_NUMBER]',
   },

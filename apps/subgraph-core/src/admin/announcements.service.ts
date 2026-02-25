@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { db, announcements } from '@edusphere/db';
 import { count, eq, and, lte, gte, desc, isNull, or } from 'drizzle-orm';
-import { sql } from 'drizzle-orm';
 
 export interface AnnouncementData {
   id: string;
