@@ -1,10 +1,11 @@
 # EduSphere — Agent Memory
 
 ## Project Status (Feb 2026)
-- Branch: `docs/normalize-file-naming`
-- Phase: Production-ready; building example content + new features
+- Branch: `fix/bug-16-23-g18` → PR #2 open against `master` (https://github.com/TalWayn72/EduSphere/pull/2)
+- Phase: Production-ready; all features complete (Tier 1+2+3, 15/15)
 - DB package: CommonJS module (`"module": "CommonJS"`) — cannot use `import.meta.url`
 - `@edusphere/db` must be rebuilt (`pnpm --filter @edusphere/db build`) after schema changes before other packages can see new types
+- GitHub API: use `NODE_TLS_REJECT_UNAUTHORIZED=0 node` + HTTPS module (no `gh` CLI, no curl on git-bash)
 
 ## Key Architecture Decisions
 - Auth in subgraph resolvers: use `@Context() ctx: GraphQLContext` from `../auth/auth.middleware.js` and call `ctx.authContext.tenantId` (no UseGuards)
@@ -20,23 +21,23 @@
   - `packages/db/src/seed/assets/nahar-shalom.docx` — source Word file (248KB)
 - HebrewBooks.org free text: https://hebrewbooks.org/21991 (Siddur Nahar Shalom Part 1)
 
-## NotebookLM Feature (Knowledge Sources)
-Added full NotebookLM-style source management:
+## NotebookLM Feature (Knowledge Sources) — COMPLETE
+Full NotebookLM-style source management:
 - **Schema**: `packages/db/src/schema/knowledge-sources.ts` → `knowledgeSources` table
 - **Backend**: `apps/subgraph-knowledge/src/sources/`
-  - `document-parser.service.ts` — parses DOCX (mammoth), URL (fetch), text
-  - `knowledge-source.service.ts` — CRUD + chunking + embedding
-  - `knowledge-source.resolver.ts` — GraphQL queries/mutations
-  - `knowledge-source.graphql` — SDL schema
-  - `knowledge-source.module.ts` — NestJS module
+  - `document-parser.service.ts` — parses DOCX (mammoth), PDF (pdf-parse), URL (fetch), YouTube (youtube-transcript), text
+  - `knowledge-source.service.ts` — CRUD + chunking + embedding; handles FILE_PDF/TXT/YOUTUBE
+  - `knowledge-source.controller.ts` — REST `POST /api/knowledge-sources/upload` (Multer memory, JWT, 50MB)
+  - `knowledge-source.resolver.ts` — GraphQL queries/mutations incl. addYoutubeSource
+  - `knowledge-source.graphql` — SDL schema with AddYoutubeSourceInput
+  - `knowledge-source.module.ts` — NestJS module (controller registered)
 - **Frontend**: `apps/web/src/components/SourceManager.tsx`
-  - NotebookLM-style left panel
-  - Add source modal: URL tab, Text tab, File tab (DOCX/PDF)
-  - Source list with status indicators (PENDING/PROCESSING/READY/FAILED)
-  - Source detail drawer with full text preview
-  - Auto-polling every 3s when sources are processing
-- **GraphQL queries**: `apps/web/src/lib/graphql/sources.queries.ts`
-- **mammoth** installed in `@edusphere/subgraph-knowledge` for DOCX parsing
+  - Add source modal: URL tab, Text tab, File tab (DOCX/PDF), YouTube tab
+  - JWT Authorization header on file upload fetch
+- **CourseDetailPage**: collapsible "מקורות מידע" panel (data-testid="toggle-sources")
+- **Vite proxy**: `/api` → `http://localhost:4006`
+- **GraphQL queries**: `apps/web/src/lib/graphql/sources.queries.ts` (incl. ADD_YOUTUBE_SOURCE)
+- **Tests**: 52 unit tests pass; E2E: `apps/web/e2e/knowledge-sources.spec.ts`
 
 ## DOCX Processing Pattern
 ```typescript
