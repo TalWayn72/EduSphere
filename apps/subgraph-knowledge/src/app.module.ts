@@ -6,6 +6,7 @@ import type { IncomingMessage } from 'http';
 import type { Request } from 'express';
 import { EmbeddingModule } from './embedding/embedding.module';
 import { GraphModule } from './graph/graph.module';
+import { KnowledgeSourceModule } from './sources/knowledge-source.module';
 import { NatsConsumerModule } from './nats/nats.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
@@ -39,6 +40,7 @@ import { authMiddleware } from './auth/auth.middleware';
     }),
     EmbeddingModule,
     GraphModule,
+    KnowledgeSourceModule,
     NatsConsumerModule,
   ],
 })

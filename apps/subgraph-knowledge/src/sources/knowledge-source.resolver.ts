@@ -1,43 +1,43 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/auth.guard.js';
+import { UnauthorizedException } from '@nestjs/common';
+import type { GraphQLContext } from '../auth/auth.middleware.js';
 import { KnowledgeSourceService } from './knowledge-source.service.js';
-
-interface GqlContext {
-  tenantId: string;
-  userId: string;
-}
 
 @Resolver('KnowledgeSource')
 export class KnowledgeSourceResolver {
   constructor(private readonly service: KnowledgeSourceService) {}
 
-  @Query()
-  @UseGuards(AuthGuard)
-  async courseKnowledgeSources(
-    @Args('courseId') courseId: string,
-    @Context() ctx: GqlContext,
-  ) {
-    return this.service.listByCourseSources(ctx.tenantId, courseId);
+  private auth(ctx: GraphQLContext) {
+    if (!ctx.authContext?.tenantId) throw new UnauthorizedException('Auth required');
+    return { tenantId: ctx.authContext.tenantId };
   }
 
   @Query()
-  @UseGuards(AuthGuard)
+  async courseKnowledgeSources(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GraphQLContext,
+  ) {
+    const { tenantId } = this.auth(ctx);
+    return this.service.listByCourseSources(tenantId, courseId);
+  }
+
+  @Query()
   async knowledgeSource(
     @Args('id') id: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GraphQLContext,
   ) {
-    return this.service.findById(id, ctx.tenantId);
+    const { tenantId } = this.auth(ctx);
+    return this.service.findById(id, tenantId);
   }
 
   @Mutation()
-  @UseGuards(AuthGuard)
   async addUrlSource(
     @Args('input') input: { courseId: string; title: string; url: string },
-    @Context() ctx: GqlContext,
+    @Context() ctx: GraphQLContext,
   ) {
+    const { tenantId } = this.auth(ctx);
     return this.service.createAndProcess({
-      tenantId: ctx.tenantId,
+      tenantId,
       courseId: input.courseId,
       title: input.title,
       sourceType: 'URL',
@@ -46,13 +46,13 @@ export class KnowledgeSourceResolver {
   }
 
   @Mutation()
-  @UseGuards(AuthGuard)
   async addTextSource(
     @Args('input') input: { courseId: string; title: string; text: string },
-    @Context() ctx: GqlContext,
+    @Context() ctx: GraphQLContext,
   ) {
+    const { tenantId } = this.auth(ctx);
     return this.service.createAndProcess({
-      tenantId: ctx.tenantId,
+      tenantId,
       courseId: input.courseId,
       title: input.title,
       sourceType: 'TEXT',
@@ -62,18 +62,12 @@ export class KnowledgeSourceResolver {
   }
 
   @Mutation()
-  @UseGuards(AuthGuard)
   async deleteKnowledgeSource(
     @Args('id') id: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GraphQLContext,
   ) {
-    await this.service.deleteSource(id, ctx.tenantId);
+    const { tenantId } = this.auth(ctx);
+    await this.service.deleteSource(id, tenantId);
     return true;
-  }
-
-  // Virtual field resolvers
-  preview(parent: { raw_content?: string | null }) {
-    if (!parent.raw_content) return null;
-    return parent.raw_content.slice(0, 500);
   }
 }
