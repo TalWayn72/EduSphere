@@ -46,5 +46,16 @@
     "deviceFree": "{{free}} פנויים במכשיר",
     "used": "בשימוש",
     "limitOf": "מגבלה"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "הורדות דרך WiFi בלבד",
+    "wifiOnlyDescription": "הורד קורסים רק כאשר מחובר ל-WiFi כדי לחסוך בנתונים סלולריים",
+    "wifiOnlyLabel": "WiFi בלבד",
+    "deleteTitle": "מחק קורס",
+    "deleteConfirm": "להסיר את '{{title}}' ממכשיר זה?",
+    "coursesTitle": "קורסים שהורדו",
+    "coursesDescription": "קורסים שנשמרו במכשיר שלך לצפייה ללא חיבור",
+    "noCourses": "אין קורסים שהורדו",
+    "deleteLabel": "מחק {{title}}"
   }
 }
