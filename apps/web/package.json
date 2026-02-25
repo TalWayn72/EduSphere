@@ -79,6 +79,7 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
     "@edusphere/eslint-config": "workspace:*",
     "@edusphere/tsconfig": "workspace:*",
     "@eslint/js": "^10.0.1",

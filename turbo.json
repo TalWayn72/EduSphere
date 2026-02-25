@@ -71,6 +71,18 @@
         "src/generated/**",
         "graphql-types/**"
       ]
+    },
+    "schema:check": {
+      "dependsOn": ["compose"],
+      "outputs": [],
+      "cache": false,
+      "env": ["HIVE_TOKEN"]
+    },
+    "schema:publish": {
+      "dependsOn": ["compose"],
+      "outputs": [],
+      "cache": false,
+      "env": ["HIVE_TOKEN"]
     }
   }
 }
