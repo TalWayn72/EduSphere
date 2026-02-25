@@ -106,14 +106,24 @@ const yoga = createYoga({
 
     if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.slice(7);
-      try {
-        const { payload } = await jwtVerify(token, JWKS, { issuer: KEYCLOAK_ISSUER });
-        resolvedTenantId = (payload['tenant_id'] as string) ?? null;
-        userId = payload.sub ?? null;
-        role = (payload['role'] as string) ?? null;
+
+      // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
+      // non-production environments. NEVER active when NODE_ENV=production.
+      if (process.env.NODE_ENV !== 'production' && token === 'dev-token-mock-jwt') {
+        resolvedTenantId = 'dev-tenant-1';
+        userId = 'dev-user-1';
+        role = 'SUPER_ADMIN';
         isAuthenticated = true;
-      } catch (error) {
-        logger.warn({ err: error }, 'JWT verification failed — request proceeds unauthenticated');
+      } else {
+        try {
+          const { payload } = await jwtVerify(token, JWKS, { issuer: KEYCLOAK_ISSUER });
+          resolvedTenantId = (payload['tenant_id'] as string) ?? null;
+          userId = payload.sub ?? null;
+          role = (payload['role'] as string) ?? null;
+          isAuthenticated = true;
+        } catch (error) {
+          logger.warn({ err: error }, 'JWT verification failed — request proceeds unauthenticated');
+        }
       }
     }
 

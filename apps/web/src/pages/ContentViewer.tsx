@@ -20,7 +20,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useContentData } from '@/hooks/useContentData';
 import { useAnnotations } from '@/hooks/useAnnotations';
 import { useAgentChat } from '@/hooks/useAgentChat';
-import { mockBookmarks } from '@/lib/mock-content-data';
 import { mockGraphData } from '@/lib/mock-graph-data';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
 import {
@@ -140,11 +139,16 @@ export function ContentViewer() {
   const { messages: chatMessages, chatInput, setChatInput, sendMessage: sendChatMessage, chatEndRef, isStreaming } =
     useAgentChat(contentId);
 
-  // useContentData does not expose bookmark data — the bookmarks field is not
-  // part of the ContentItem schema in the current supergraph (tracked in
-  // OPEN_ISSUES.md). Fall back to mockBookmarks until the backend exposes a
-  // real bookmarks query/field.
-  const bookmarks = mockBookmarks;
+  // Derive bookmarks from PERSONAL annotations that have a video timestamp.
+  // This replaces the hardcoded mockBookmarks (BUG-16) with persisted data.
+  const bookmarks = annotations
+    .filter((a) => a.layer === AnnotationLayer.PERSONAL && a.contentTimestamp !== undefined)
+    .map((a) => ({
+      id: a.id,
+      timestamp: a.contentTimestamp!,
+      label: a.content.length > 60 ? a.content.slice(0, 57) + '…' : a.content,
+      color: '#3b82f6',
+    }));
 
   // ── Live session (LIVE_SESSION content type) ──
   const [liveSessionResult] = useQuery({
