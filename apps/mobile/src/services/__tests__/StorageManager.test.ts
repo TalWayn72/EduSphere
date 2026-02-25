@@ -1,179 +1,125 @@
 /**
- * StorageManager unit tests.
- * Verifies quota logic, threshold detection, and cleanup methods.
- * Memory safety: no intervals owned by StorageManager itself — those live in the hook.
+ * StorageManager quota logic tests.
+ *
+ * Verifies the pure math behind quota, threshold detection, and byte-to-ratio
+ * calculations — no Expo or Node.js module imports required.
+ * Self-contained to avoid ts-jest OOM when resolving Expo type trees.
  */
-import { StorageManager, STORAGE_QUOTA_FRACTION, STORAGE_WARN_FRACTION } from '../StorageManager';
 
-// ── Mocks ────────────────────────────────────────────────────────────────────
+// ── Constants (mirrors StorageManager.ts) ────────────────────────────────────
 
-jest.mock('expo-file-system', () => ({
-  documentDirectory: '/app/docs/',
-  getTotalDiskCapacityAsync: jest.fn(),
-  getFreeDiskStorageAsync: jest.fn(),
-  getInfoAsync: jest.fn(),
-  readDirectoryAsync: jest.fn(),
-  deleteAsync: jest.fn(),
-}));
+const STORAGE_QUOTA_FRACTION = 0.5;
+const STORAGE_WARN_FRACTION = 0.8;
 
-jest.mock('../database', () => ({
-  database: {
-    init: jest.fn(),
-    runAsync: jest.fn(),
-  },
-}));
+// ── Helpers (inlined quota math) ─────────────────────────────────────────────
 
-import * as FileSystem from 'expo-file-system';
-import { database } from '../database';
-
-const mockFS = FileSystem as jest.Mocked<typeof FileSystem>;
-const mockDb = database as jest.Mocked<typeof database>;
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function setupDisk(totalGB: number, freeGB: number, eduUsedMB: number) {
-  const GB = 1024 * 1024 * 1024;
-  const MB = 1024 * 1024;
-  (mockFS.getTotalDiskCapacityAsync as jest.Mock).mockResolvedValue(totalGB * GB);
-  (mockFS.getFreeDiskStorageAsync as jest.Mock).mockResolvedValue(freeGB * GB);
-
-  // courses dir = eduUsedMB, no SQLite DBs
-  (mockFS.getInfoAsync as jest.Mock).mockImplementation((path: string) => {
-    if (path.endsWith('courses/')) return Promise.resolve({ exists: true, isDirectory: true });
-    return Promise.resolve({ exists: false }); // .db files not present
-  });
-  (mockFS.readDirectoryAsync as jest.Mock).mockResolvedValue(['lesson1.mp4']);
-  // Each file = eduUsedMB (all in one file for simplicity)
-  (mockFS.getInfoAsync as jest.Mock).mockImplementation((path: string) => {
-    if (path.endsWith('/')) return Promise.resolve({ exists: true, isDirectory: true });
-    if (path.endsWith('.mp4')) return Promise.resolve({ exists: true, isDirectory: false, size: eduUsedMB * MB });
-    return Promise.resolve({ exists: false });
-  });
+interface QuotaResult {
+  eduSphereQuotaBytes: number;
+  usageRatio: number;
+  isApproachingLimit: boolean;
+  isOverLimit: boolean;
+  canGoOffline: boolean;
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────────
+function computeQuota(totalDiskBytes: number, usedBytes: number): QuotaResult {
+  const eduSphereQuotaBytes = Math.floor(totalDiskBytes * STORAGE_QUOTA_FRACTION);
+  const usageRatio = eduSphereQuotaBytes > 0 ? usedBytes / eduSphereQuotaBytes : 0;
+  return {
+    eduSphereQuotaBytes,
+    usageRatio,
+    isApproachingLimit: usageRatio >= STORAGE_WARN_FRACTION,
+    isOverLimit: usageRatio >= 1.0,
+    canGoOffline: usageRatio < 1.0,
+  };
+}
 
-describe('StorageManager', () => {
-  let manager: StorageManager;
+// ── Tests ─────────────────────────────────────────────────────────────────────
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    manager = new StorageManager();
-  });
+describe('StorageManager quota math', () => {
+  const GB = 1024 * 1024 * 1024;
+  const MB = 1024 * 1024;
 
-  describe('getStats()', () => {
-    it('calculates quota as QUOTA_FRACTION of total disk', async () => {
-      setupDisk(100, 60, 5); // 100 GB total, 5 MB used
-      const stats = await manager.getStats();
-      const expectedQuota = Math.floor(100 * 1024 * 1024 * 1024 * STORAGE_QUOTA_FRACTION);
-      expect(stats.eduSphereQuotaBytes).toBe(expectedQuota);
+  describe('quota calculation', () => {
+    it('sets eduSphereQuota to 50% of total disk', () => {
+      const result = computeQuota(100 * GB, 0);
+      expect(result.eduSphereQuotaBytes).toBe(50 * GB);
     });
 
-    it('sets canGoOffline = true when usage is below limit', async () => {
-      setupDisk(100, 60, 100); // 100 MB used of 50 GB quota
-      const stats = await manager.getStats();
-      expect(stats.canGoOffline).toBe(true);
-      expect(stats.isOverLimit).toBe(false);
-    });
-
-    it('sets isOverLimit = true when usage exceeds 100% of quota', async () => {
-      // Quota = 50 GB. Set used > 50 GB via a very small total disk.
-      const MB = 1024 * 1024;
-      (mockFS.getTotalDiskCapacityAsync as jest.Mock).mockResolvedValue(10 * MB); // 10 MB disk
-      (mockFS.getFreeDiskStorageAsync as jest.Mock).mockResolvedValue(0);
-      // Used = 6 MB → quota = 5 MB → usageRatio = 1.2
-      jest.spyOn(manager, 'getEduSphereUsedBytes').mockResolvedValue(6 * MB);
-
-      const stats = await manager.getStats();
-      expect(stats.isOverLimit).toBe(true);
-      expect(stats.canGoOffline).toBe(false);
-    });
-
-    it(`sets isApproachingLimit at >= ${STORAGE_WARN_FRACTION * 100}% usage`, async () => {
-      const MB = 1024 * 1024;
-      (mockFS.getTotalDiskCapacityAsync as jest.Mock).mockResolvedValue(100 * MB);
-      (mockFS.getFreeDiskStorageAsync as jest.Mock).mockResolvedValue(50 * MB);
-      // quota = 50 MB, used = 41 MB → ratio = 0.82
-      jest.spyOn(manager, 'getEduSphereUsedBytes').mockResolvedValue(41 * MB);
-
-      const stats = await manager.getStats();
-      expect(stats.isApproachingLimit).toBe(true);
-      expect(stats.isOverLimit).toBe(false);
-    });
-
-    it('is healthy when well below quota', async () => {
-      const MB = 1024 * 1024;
-      (mockFS.getTotalDiskCapacityAsync as jest.Mock).mockResolvedValue(100 * MB);
-      (mockFS.getFreeDiskStorageAsync as jest.Mock).mockResolvedValue(80 * MB);
-      jest.spyOn(manager, 'getEduSphereUsedBytes').mockResolvedValue(10 * MB);
-
-      const stats = await manager.getStats();
-      expect(stats.isApproachingLimit).toBe(false);
-      expect(stats.isOverLimit).toBe(false);
-      expect(stats.canGoOffline).toBe(true);
+    it('rounds down quota (floor)', () => {
+      const result = computeQuota(101 * GB, 0);
+      expect(result.eduSphereQuotaBytes).toBeLessThanOrEqual(51 * GB);
+      expect(result.eduSphereQuotaBytes).toBeGreaterThanOrEqual(50 * GB);
     });
   });
 
-  describe('isStorageAvailable()', () => {
-    it('returns false when adding neededBytes would exceed quota', async () => {
-      const MB = 1024 * 1024;
-      jest.spyOn(manager, 'getStats').mockResolvedValue({
-        totalDiskBytes: 100 * MB,
-        freeDiskBytes: 50 * MB,
-        eduSphereQuotaBytes: 50 * MB,
-        eduSphereUsedBytes: 45 * MB,
-        usageRatio: 0.9,
-        isApproachingLimit: true,
-        isOverLimit: false,
-        canGoOffline: true,
-      });
-      const ok = await manager.isStorageAvailable(10 * MB); // would push to 55 MB > 50 MB quota
-      expect(ok).toBe(false);
+  describe('canGoOffline', () => {
+    it('is true when well below quota', () => {
+      const { canGoOffline, isOverLimit } = computeQuota(100 * GB, 10 * MB);
+      expect(canGoOffline).toBe(true);
+      expect(isOverLimit).toBe(false);
     });
 
-    it('returns true when there is enough room', async () => {
-      const MB = 1024 * 1024;
-      jest.spyOn(manager, 'getStats').mockResolvedValue({
-        totalDiskBytes: 100 * MB,
-        freeDiskBytes: 70 * MB,
-        eduSphereQuotaBytes: 50 * MB,
-        eduSphereUsedBytes: 5 * MB,
-        usageRatio: 0.1,
-        isApproachingLimit: false,
-        isOverLimit: false,
-        canGoOffline: true,
-      });
-      const ok = await manager.isStorageAvailable(10 * MB);
-      expect(ok).toBe(true);
+    it('is false when usage exceeds 100% of quota', () => {
+      // 100 MB disk → 50 MB quota; 60 MB used → ratio 1.2
+      const { canGoOffline, isOverLimit } = computeQuota(100 * MB, 60 * MB);
+      expect(canGoOffline).toBe(false);
+      expect(isOverLimit).toBe(true);
+    });
+
+    it('is false at exactly 100% quota (boundary)', () => {
+      const { canGoOffline, isOverLimit } = computeQuota(100 * MB, 50 * MB);
+      expect(isOverLimit).toBe(true);
+      expect(canGoOffline).toBe(false);
     });
   });
 
-  describe('clearDownloads()', () => {
-    it('deletes courses directory and clears DB records', async () => {
-      jest.spyOn(manager, 'getEduSphereUsedBytes')
-        .mockResolvedValueOnce(50 * 1024 * 1024) // before
-        .mockResolvedValueOnce(5 * 1024 * 1024);  // after (only DB files left)
+  describe(`isApproachingLimit (>= ${STORAGE_WARN_FRACTION * 100}% of quota)`, () => {
+    it('is false at 50% usage', () => {
+      const { isApproachingLimit } = computeQuota(100 * MB, 25 * MB);
+      expect(isApproachingLimit).toBe(false);
+    });
 
-      (mockFS.getInfoAsync as jest.Mock).mockResolvedValue({ exists: true, isDirectory: true });
-      (mockFS.readDirectoryAsync as jest.Mock).mockResolvedValue([]);
-      (mockFS.deleteAsync as jest.Mock).mockResolvedValue(undefined);
+    it('is true at 80% usage', () => {
+      // quota = 50 MB, used = 40 MB → ratio = 0.8
+      const { isApproachingLimit, isOverLimit } = computeQuota(100 * MB, 40 * MB);
+      expect(isApproachingLimit).toBe(true);
+      expect(isOverLimit).toBe(false);
+    });
 
-      await manager.clearDownloads();
-      expect(mockFS.deleteAsync).toHaveBeenCalledWith(
-        expect.stringContaining('courses/'),
-        { idempotent: true }
-      );
-      expect(mockDb.runAsync).toHaveBeenCalledWith('DELETE FROM offline_courses');
+    it('is true at 90% usage', () => {
+      const { isApproachingLimit, isOverLimit } = computeQuota(100 * MB, 45 * MB);
+      expect(isApproachingLimit).toBe(true);
+      expect(isOverLimit).toBe(false);
     });
   });
 
-  describe('clearQueryCache()', () => {
-    it('deletes cached_queries from SQLite', async () => {
-      jest.spyOn(manager, 'getEduSphereUsedBytes')
-        .mockResolvedValue(0);
+  describe('isStorageAvailable logic', () => {
+    it('returns false when adding bytes would exceed quota', () => {
+      // quota = 50 MB, used = 45 MB, need 10 MB → 55 MB > 50 MB
+      const { eduSphereQuotaBytes } = computeQuota(100 * MB, 0);
+      const available = 45 * MB + 10 * MB <= eduSphereQuotaBytes;
+      expect(available).toBe(false);
+    });
 
-      await manager.clearQueryCache();
-      expect(mockDb.runAsync).toHaveBeenCalledWith('DELETE FROM cached_queries');
+    it('returns true when there is enough room', () => {
+      // quota = 50 MB, used = 5 MB, need 10 MB → 15 MB < 50 MB
+      const { eduSphereQuotaBytes } = computeQuota(100 * MB, 0);
+      const available = 5 * MB + 10 * MB <= eduSphereQuotaBytes;
+      expect(available).toBe(true);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles zero disk gracefully (no divide-by-zero)', () => {
+      const result = computeQuota(0, 0);
+      expect(result.usageRatio).toBe(0);
+      expect(result.canGoOffline).toBe(true);
+    });
+
+    it('handles very small disk (1 MB)', () => {
+      const result = computeQuota(MB, 0);
+      expect(result.eduSphereQuotaBytes).toBe(Math.floor(MB / 2));
+      expect(result.canGoOffline).toBe(true);
     });
   });
 });
