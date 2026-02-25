@@ -3,17 +3,23 @@ import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Provider as UrqlProvider } from 'urql';
 import { urqlClient } from '@/lib/urql-client';
-import { queryClient } from '@/lib/query-client';
+import { queryClient } from '@/lib/persisted-query-client';
 import { initKeycloak } from '@/lib/auth';
 import { initI18n, applyDocumentDirection } from '@/lib/i18n';
 import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
 import { StorageWarningBanner } from '@/components/StorageWarningBanner';
+import { registerServiceWorker } from '@/pwa';
 
 // ── App ──────────────────────────────────────────────────────────────────────
 
 function App() {
   const [keycloakReady, setKeycloakReady] = useState(false);
+
+  // Register the PWA service worker once on mount (production only)
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
 
   useEffect(() => {
     async function bootstrap() {
