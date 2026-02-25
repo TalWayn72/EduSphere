@@ -56,7 +56,6 @@ function PollResults({ pollId, tenantId: _tenantId }: { pollId: string; tenantId
 export function PollWidget({ sessionId, isModerator }: PollWidgetProps) {
   const [question, setQuestion] = useState('');
   const [optionInputs, setOptionInputs] = useState(['', '']);
-  const [activePollId, setActivePollId] = useState<string | null>(null);
   const [votedPollIds, setVotedPollIds] = useState<Set<string>>(new Set());
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
@@ -131,13 +130,13 @@ export function PollWidget({ sessionId, isModerator }: PollWidgetProps) {
               <div className="flex gap-2">
                 {!poll.isActive && (
                   <Button size="sm" variant="outline"
-                    onClick={async () => { await activatePoll({ pollId: poll.id }); setActivePollId(poll.id); refetchPolls({ requestPolicy: 'network-only' }); }}>
+                    onClick={async () => { await activatePoll({ pollId: poll.id }); refetchPolls({ requestPolicy: 'network-only' }); }}>
                     Activate
                   </Button>
                 )}
                 {poll.isActive && (
                   <Button size="sm" variant="destructive"
-                    onClick={async () => { await closePoll({ pollId: poll.id }); setActivePollId(null); refetchPolls({ requestPolicy: 'network-only' }); }}>
+                    onClick={async () => { await closePoll({ pollId: poll.id }); refetchPolls({ requestPolicy: 'network-only' }); }}>
                     Close Poll
                   </Button>
                 )}
