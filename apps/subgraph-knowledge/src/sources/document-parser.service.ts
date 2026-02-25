@@ -114,9 +114,9 @@ export class DocumentParserService {
       const chunk = text.slice(start, end).trim();
       if (chunk.length > 0) chunks.push({ index, text: chunk });
 
+      if (end >= text.length) break;
       start = end - overlap;
       index++;
-      if (start >= text.length) break;
     }
 
     return chunks;

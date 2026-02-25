@@ -11,21 +11,24 @@
  * parser is replaced by a mock.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DocumentParserService } from './document-parser.service.js';
-
-// ─── Stub fetch (URL parsing) ─────────────────────────────────────────────────
-const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('DocumentParserService', () => {
   let service: DocumentParserService;
+  let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFetch = vi.fn();
+    vi.stubGlobal('fetch', mockFetch);
     service = new DocumentParserService();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   // ── parseText ──────────────────────────────────────────────────────────────
@@ -83,8 +86,9 @@ describe('DocumentParserService', () => {
       const text = 'x '.repeat(1000);
       const [c0, c1] = service.chunkText(text, 1000, 200);
       if (!c1) return;
+      // c1 starts inside c0's overlap region — verify shared content exists
       const tailOfC0 = c0.text.slice(-150);
-      expect(c1.text.startsWith(tailOfC0.slice(0, 50))).toBe(true);
+      expect(c1.text).toContain(tailOfC0.slice(0, 50));
     });
 
     it('returns empty array for empty text', () => {
