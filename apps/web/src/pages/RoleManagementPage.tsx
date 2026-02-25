@@ -47,16 +47,12 @@ export function RoleManagementPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Partial<RoleRecord> | undefined>();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [rolesResult, reexecuteRoles] = useQuery<{ roles: BackendRole[] }>({
     query: LIST_ROLES_QUERY,
   });
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [, createRole] = useMutation(CREATE_ROLE_MUTATION);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [, updateRole] = useMutation(UPDATE_ROLE_MUTATION);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [, deleteRole] = useMutation(DELETE_ROLE_MUTATION);
 
   if (!authRole || !ADMIN_ROLES.has(authRole)) {
