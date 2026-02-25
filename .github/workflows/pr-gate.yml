@@ -295,8 +295,8 @@ jobs:
         run: |
           echo "Checking for large files (>5MB)..."
 
-          # Find files larger than 5MB
-          LARGE_FILES=$(find . -type f -size +5M -not -path "*/node_modules/*" -not -path "*/.git/*")
+          # Find files larger than 5MB (reference PDFs in docs/reference are tracked intentionally)
+          LARGE_FILES=$(find . -type f -size +5M -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/docs/reference/*")
 
           if [ -n "$LARGE_FILES" ]; then
             echo "❌ Large files detected:"
