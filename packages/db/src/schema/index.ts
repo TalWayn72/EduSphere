@@ -55,3 +55,78 @@ export * from './quiz-results';
 
 // Live sessions (F-012 Virtual Classroom — BigBlueButton)
 export * from './live-sessions';
+
+// Gamification tables (F-011 Badges, Points, Leaderboards)
+export * from './gamification';
+
+// SCORM tables (F-017)
+export * from './scorm';
+
+// Skill profiles (F-006 Skill Gap Analysis)
+export * from './skill-profiles';
+
+// Microlearning paths (F-021 Microlearning Content Type)
+export * from './microlearning';
+
+// Text submissions + plagiarism embeddings (F-005)
+export * from './submissions';
+
+// At-risk flags (F-003 Performance Risk Detection)
+export * from './at-risk';
+
+// Roleplay scenario tables (F-007 AI Role-Play Scenarios)
+export * from './scenarios';
+
+// Branching scenario progress choices (F-009)
+export * from './scenario-progress';
+
+// LTI 1.3 Provider tables (F-018)
+export * from './lti';
+
+// SCIM 2.0 tables (F-019 HRIS Auto-Enrollment)
+export * from './scim';
+
+// Certificates (F-016 Course Completion Certificates)
+export * from './certificates';
+
+// BI API tokens (F-029 BI Tool Export — Power BI / Tableau)
+export * from './bi-tokens';
+
+// Social following (F-035 Social Following System)
+export * from './social';
+
+// CPD/CE Credit Tracking (F-027)
+export * from './cpd';
+
+// xAPI / LRS Integration (F-028)
+export * from './xapi';
+
+// Stackable Credentials / Nanodegrees (F-026)
+export * from './programs';
+
+// BBB Breakout Rooms + Polls (F-034)
+export * from './live-session-extensions';
+
+// 360° Multi-Rater Assessments (F-030)
+export * from './assessments';
+
+// CRM Integration / Salesforce (F-033)
+export * from './crm';
+
+// OpenBadges 3.0 — W3C Verifiable Credentials (F-025)
+export * from './open-badges';
+
+// Instructor Marketplace + Revenue Sharing (F-031)
+export * from './marketplace';
+
+// Pre-Built Compliance Course Library (F-038)
+export * from './course-library';
+
+// No-Code Custom Portal Builder (F-037)
+export * from './portal';
+
+// Announcements (platform-wide admin messages)
+export * from './announcements';
+
+// Security settings per tenant (MFA, session, password policy, IP allowlist)
+export * from './security-settings';

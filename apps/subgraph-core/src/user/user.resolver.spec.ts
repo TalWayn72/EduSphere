@@ -18,6 +18,12 @@ const mockUserStatsService = {
 // Mock UserPreferencesService
 const mockUserPreferencesService = {
   updatePreferences: vi.fn(),
+  updateProfileVisibility: vi.fn(),
+};
+
+// Mock PublicProfileService
+const mockPublicProfileService = {
+  getPublicProfile: vi.fn(),
 };
 
 const MOCK_AUTH: AuthContext = {
@@ -47,6 +53,7 @@ describe('UserResolver', () => {
       mockUserService as any,
       mockUserStatsService as any,
       mockUserPreferencesService as any,
+      mockPublicProfileService as any,
     );
   });
 

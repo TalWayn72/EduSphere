@@ -1,0 +1,34 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole"])
+
+type AuditLogEntry {
+  id: ID!
+  tenantId: ID!
+  userId: ID
+  action: String!
+  resourceType: String
+  resourceId: ID
+  status: String!
+  ipAddress: String
+  requestId: String
+  createdAt: String!
+  metadata: String
+}
+
+type AuditLogResult {
+  entries: [AuditLogEntry!]!
+  total: Int!
+}
+
+extend type Query {
+  adminAuditLog(
+    limit: Int = 50
+    offset: Int = 0
+    action: String
+    userId: ID
+    since: String
+    until: String
+  ): AuditLogResult!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

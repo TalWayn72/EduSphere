@@ -1,0 +1,71 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole"])
+
+type Badge {
+  id: ID!
+  name: String!
+  description: String!
+  iconEmoji: String!
+  category: String!
+  pointsReward: Int!
+  conditionType: String!
+  conditionValue: Int!
+}
+
+type UserBadge {
+  id: ID!
+  badge: Badge!
+  earnedAt: DateTime!
+}
+
+type LeaderboardEntry {
+  rank: Int!
+  userId: ID!
+  displayName: String!
+  totalPoints: Int!
+  badgeCount: Int!
+}
+
+input CreateBadgeInput {
+  name: String!
+  description: String!
+  iconEmoji: String!
+  category: String!
+  pointsReward: Int!
+  conditionType: String!
+  conditionValue: Int!
+}
+
+input UpdateBadgeInput {
+  name: String
+  description: String
+  iconEmoji: String
+  category: String
+  pointsReward: Int
+  conditionType: String
+  conditionValue: Int
+}
+
+extend type Query {
+  myBadges: [UserBadge!]! @authenticated
+  leaderboard(limit: Int): [LeaderboardEntry!]! @authenticated
+  myRank: Int! @authenticated
+  myTotalPoints: Int! @authenticated
+  adminBadges: [Badge!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  createBadge(input: CreateBadgeInput!): Badge!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  updateBadge(id: ID!, input: UpdateBadgeInput!): Badge!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  deleteBadge(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

@@ -1,0 +1,19 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole", "@requiresScopes"])
+
+type AdminOverview {
+  totalUsers: Int!
+  activeUsersThisMonth: Int!
+  totalCourses: Int!
+  completionsThisMonth: Int!
+  atRiskCount: Int!
+  lastScimSync: String
+  lastComplianceReport: String
+  storageUsedMb: Float!
+}
+
+type Query {
+  adminOverview: AdminOverview!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

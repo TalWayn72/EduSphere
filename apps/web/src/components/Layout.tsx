@@ -14,6 +14,9 @@ import {
   Search,
   Menu,
   X,
+  ShieldCheck,
+  Link2,
+  LayoutDashboard,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -22,6 +25,8 @@ interface LayoutProps {
 
 // Admin-only nav items (hidden from STUDENT role)
 const ADMIN_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
+// Compliance nav: only ORG_ADMIN and SUPER_ADMIN (F-016)
+const COMPLIANCE_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN']);
 
 export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
@@ -51,6 +56,7 @@ export function Layout({ children }: LayoutProps) {
   }, [navigate]);
 
   const isAdmin = user ? ADMIN_ROLES.has(user.role) : false;
+  const isComplianceAdmin = user ? COMPLIANCE_ROLES.has(user.role) : false;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -103,6 +109,88 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <BookOpen className="h-4 w-4" />
                         <span>{t('newCourse')}</span>
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
+                )}
+                {/* Admin Panel: ORG_ADMIN / SUPER_ADMIN - appears before LTI */}
+                {isComplianceAdmin && (
+                  <NavLink
+                    to="/admin"
+                    end
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive ? 'bg-primary/10 text-primary' : 'text-primary hover:bg-primary/10',
+                      ].join(' ')
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span>Admin Panel</span>
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
+                )}
+                {/* LTI 1.3: ORG_ADMIN / SUPER_ADMIN only (F-018) */}
+                {isComplianceAdmin && (
+                  <NavLink
+                    to="/admin/lti"
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive ? 'bg-primary/10 text-primary' : 'text-primary hover:bg-primary/10',
+                      ].join(' ')
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <Link2 className="h-4 w-4" />
+                        <span>LTI 1.3</span>
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
+                )}
+                {/* Compliance: ORG_ADMIN / SUPER_ADMIN only (F-016) */}
+                {isComplianceAdmin && (
+                  <NavLink
+                    to="/admin/compliance"
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-primary hover:bg-primary/10',
+                      ].join(' ')
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <ShieldCheck className="h-4 w-4" />
+                        <span>Compliance</span>
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
+                )}
+                {isComplianceAdmin && (
+                  <NavLink
+                    to="/admin/scim"
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive ? 'bg-primary/10 text-primary' : 'text-primary hover:bg-primary/10',
+                      ].join(' ')
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <ShieldCheck className="h-4 w-4" />
+                        <span>SCIM / HRIS</span>
                         <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
                       </>
                     )}
@@ -167,6 +255,47 @@ export function Layout({ children }: LayoutProps) {
                 >
                   <BookOpen className="h-4 w-4" />
                   <span>{t('newCourse')}</span>
+                </Link>
+              )}
+              {/* Admin Panel - mobile */}
+              {isComplianceAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span>Admin Panel</span>
+                </Link>
+              )}
+              {isComplianceAdmin && (
+                <Link
+                  to="/admin/lti"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <Link2 className="h-4 w-4" />
+                  <span>LTI 1.3</span>
+                </Link>
+              )}
+              {isComplianceAdmin && (
+                <Link
+                  to="/admin/compliance"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Compliance</span>
+                </Link>
+              )}
+              {isComplianceAdmin && (
+                <Link
+                  to="/admin/scim"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>SCIM / HRIS</span>
                 </Link>
               )}
               <Button
