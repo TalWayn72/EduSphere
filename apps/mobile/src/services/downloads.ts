@@ -1,5 +1,6 @@
 import * as FileSystem from 'expo-file-system';
 import { database } from './database';
+import { storageManager } from './StorageManager';
 
 export interface DownloadProgress {
   courseId: string;
@@ -31,6 +32,22 @@ export class DownloadService {
   ): Promise<void> {
     if (this.downloads.has(courseId)) {
       throw new Error('Course is already being downloaded');
+    }
+
+    // Quota guard — estimate total size before committing (sum of lesson video sizes if known)
+    const estimatedBytes: number = (courseData.lessons ?? []).reduce(
+      (sum: number, l: { estimatedSizeBytes?: number }) =>
+        sum + (l.estimatedSizeBytes ?? 0),
+      0
+    );
+    if (estimatedBytes > 0) {
+      const ok = await storageManager.isStorageAvailable(estimatedBytes);
+      if (!ok) {
+        const stats = await storageManager.getStats();
+        throw new Error(
+          `STORAGE_QUOTA_EXCEEDED:${stats.eduSphereUsedBytes}:${stats.eduSphereQuotaBytes}`
+        );
+      }
     }
 
     if (onProgress) {

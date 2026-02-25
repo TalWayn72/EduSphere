@@ -10,11 +10,12 @@ const { tenants, users, courses, modules, media_assets } = schema;
 async function seed() {
   console.log('🌱 Seeding database...');
 
-  const pool = new Pool({
-    connectionString:
-      process.env.DATABASE_URL ||
-      'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
-  });
+  // Ensure DATABASE_URL is set so helper modules (createDatabaseConnection) pick it up
+  process.env.DATABASE_URL =
+    process.env.DATABASE_URL ||
+    'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere';
+
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   const db = drizzle(pool, { schema });
 

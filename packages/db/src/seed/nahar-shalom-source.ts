@@ -63,23 +63,10 @@ export async function seedNaharShalomSource(): Promise<void> {
     return;
   }
 
-  console.log('📖 Extracting text from nahar-shalom.docx...');
-  let rawContent: string;
-  let chunkCount = 0;
-
-  try {
-    rawContent = await extractDocxText(DOCX_PATH);
-    const chunks = chunkText(rawContent);
-    chunkCount = chunks.length;
-
-    console.log(
-      `   Extracted ${rawContent.length.toLocaleString()} chars → ${chunkCount} chunks`,
-    );
-  } catch (err) {
-    console.warn(`⚠️  Could not parse DOCX (${err}) — storing placeholder`);
-    rawContent = '(DOCX parsing failed — install mammoth and re-seed)';
-  }
-
+  // Insert as PENDING — the running subgraph-knowledge service will
+  // pick this up and process the DOCX text + embeddings on demand.
+  // (Full mammoth extraction at seed-time causes OOM in tsx due to
+  //  large schema imports already consuming most of the heap.)
   await db.insert(schema.knowledgeSources).values({
     id: SOURCE_ID,
     tenant_id: DEMO_TENANT,
@@ -88,20 +75,18 @@ export async function seedNaharShalomSource(): Promise<void> {
     source_type: 'FILE_DOCX',
     origin: 'nahar-shalom.docx',
     file_key: 'seed/nahar-shalom.docx',
-    raw_content: rawContent,
-    status: 'READY',
-    chunk_count: chunkCount,
+    raw_content: '',
+    status: 'PENDING',
+    chunk_count: 0,
     metadata: {
-      extracted_chars: rawContent.length,
-      chunk_size: 1000,
-      overlap: 200,
       language: 'he',
       author: 'רבי שלום שרעבי (הרש"ש)',
       year_composed: '~1760',
       hebrewbooks_url: 'https://hebrewbooks.org/21991',
       seeded_at: new Date().toISOString(),
+      note: 'Process via POST /knowledge/sources/:id/process when service is running',
     },
   });
 
-  console.log(`✅ Nahar Shalom source seeded: ${chunkCount} chunks ready for embedding`);
+  console.log(`✅ Nahar Shalom source registered (PENDING) — process via the running service`);
 }

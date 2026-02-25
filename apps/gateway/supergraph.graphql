@@ -134,7 +134,6 @@ type User @join__type(graph: AGENT, key: "id")  @join__type(graph: ANNOTATION, k
   tenantId: ID! @join__field(graph: CORE) 
   createdAt: DateTime! @join__field(graph: CORE) 
   updatedAt: DateTime! @join__field(graph: CORE) 
-  preferences: UserPreferences @join__field(graph: CORE) 
 }
 
 type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
@@ -287,7 +286,6 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   reorderModules(courseId: ID!, moduleIds: [ID!]!) : [Module!]! @join__field(graph: CONTENT)  @authenticated
   createUser(input: CreateUserInput!) : User! @join__field(graph: CORE)  @authenticated
   updateUser(id: ID!, input: UpdateUserInput!) : User! @join__field(graph: CORE)  @authenticated
-  updateUserPreferences(input: UpdateUserPreferencesInput!) : User! @join__field(graph: CORE)  @authenticated
   createEmbedding(input: CreateEmbeddingInput!) : Embedding! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbedding(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbeddingsByContentItem(contentItemId: ID!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated
@@ -511,13 +509,6 @@ type UserStatus @join__type(graph: CORE)  {
   userId: ID!
   online: Boolean!
   lastSeen: DateTime!
-}
-
-type UserPreferences @join__type(graph: CORE)  {
-  locale: String!
-  theme: String!
-  emailNotifications: Boolean!
-  pushNotifications: Boolean!
 }
 
 type Embedding @join__type(graph: KNOWLEDGE, key: "id")  {
@@ -807,13 +798,6 @@ input UpdateUserInput @join__type(graph: CORE)  {
   firstName: String
   lastName: String
   role: UserRole
-}
-
-input UpdateUserPreferencesInput @join__type(graph: CORE)  {
-  locale: String
-  theme: String
-  emailNotifications: Boolean
-  pushNotifications: Boolean
 }
 
 input CreateEmbeddingInput @join__type(graph: KNOWLEDGE)  {

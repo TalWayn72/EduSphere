@@ -1,5 +1,5 @@
 import { pgTable, uuid, varchar, boolean, timestamp } from 'drizzle-orm/pg-core';
-import { tenants } from './tenants.js';
+import { tenants } from './tenants';
 
 /**
  * Custom domain management for white-label tenants (G-20, G-21).
