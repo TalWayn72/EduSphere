@@ -10,6 +10,7 @@ import type enCollaboration from './locales/en/collaboration.json';
 import type enKnowledge from './locales/en/knowledge.json';
 import type enSettings from './locales/en/settings.json';
 import type enErrors from './locales/en/errors.json';
+import type enOffline from './locales/en/offline.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -27,6 +28,7 @@ declare module 'i18next' {
       knowledge: typeof enKnowledge;
       settings: typeof enSettings;
       errors: typeof enErrors;
+      offline: typeof enOffline;
     };
   }
 }

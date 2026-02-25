@@ -26,6 +26,6 @@ export const LOCALE_LABELS: Record<SupportedLocale, {
 
 export const NAMESPACES = [
   'common', 'nav', 'auth', 'dashboard', 'courses', 'content',
-  'annotations', 'agents', 'collaboration', 'knowledge', 'settings', 'errors',
+  'annotations', 'agents', 'collaboration', 'knowledge', 'settings', 'errors', 'offline',
 ] as const;
 export type I18nNamespace = typeof NAMESPACES[number];
