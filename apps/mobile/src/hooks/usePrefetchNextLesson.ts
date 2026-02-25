@@ -50,13 +50,11 @@ export function usePrefetchNextLesson() {
     const onWifi = await safeIsWifi();
     if (!onWifi) return; // prefetch on WiFi only
 
-    // Check storage quota
+    // Check storage quota — require space for the lesson plus MIN_FREE_BYTES buffer
     const nextLesson = courseData.lessons[nextLessonIndex];
     const needed = nextLesson.estimatedSizeBytes ?? 0;
-    if (needed > 0) {
-      const ok = await storageManager.isStorageAvailable(needed);
-      if (!ok) return; // not enough quota
-    }
+    const ok = await storageManager.isStorageAvailable(needed + MIN_FREE_BYTES);
+    if (!ok) return; // not enough quota
 
     // Check if already downloaded
     const existing = await downloadService.getOfflineCourses();
