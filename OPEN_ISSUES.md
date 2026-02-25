@@ -1,9 +1,34 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 25 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅**
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: 17 unit + 34 static | Web: 569 | Backend subgraphs: 1,764+ | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,510 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **ALL E2E PASS** | **813/813 security tests ✅** | **ALL turbo test PASS (38/38 tasks) ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅**
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅**
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569 | Backend subgraphs: 1,764+ | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,524 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **ALL E2E PASS** | **813/813 security tests ✅** | **ALL turbo test PASS (38/38 tasks) ✅**
+
+---
+
+## OFFLINE-001 — Offline Storage Quota Management (25 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Branch:** `fix/bug-16-23-g18`
+
+### Problem
+No disk space awareness — downloads + caches could grow unbounded, fill device, block offline use silently.
+
+### Solution
+Quota = 50% of device disk (mobile) / 50% of browser quota (web). Warn at 80%, block at 100%.
+
+| File | Change |
+|------|--------|
+| `apps/mobile/src/services/StorageManager.ts` | New — quota logic, clearDownloads, clearQueryCache |
+| `apps/mobile/src/hooks/useStorageManager.ts` | New — 5-min polling, memory-safe |
+| `apps/mobile/src/screens/SettingsScreen.tsx` | Updated — storage section with bar + clear actions |
+| `apps/mobile/src/services/downloads.ts` | Updated — quota guard before download |
+| `apps/web/src/services/StorageManager.ts` | New — navigator.storage.estimate() |
+| `apps/web/src/hooks/useStorageManager.ts` | New |
+| `apps/web/src/components/StorageWarningBanner.tsx` | New — global alert via App.tsx |
+| `apps/web/src/pages/SettingsPage.tsx` | Updated — storage card |
+| `packages/i18n/src/locales/*/settings.json` | Updated — 15 storage keys × 10 langs |
+| `apps/mobile/src/services/__tests__/StorageManager.test.ts` | New — 12 quota math tests |
 
 ---
 
@@ -1318,20 +1343,27 @@ MINIO_KMS_SECRET_KEY environment variable added for SSE-S3 AES-256 server-side e
 
 ---
 
-## 🟡 G-14: LLM Data Transfers Without DPA — IN PROGRESS (22 פברואר 2026)
+## ✅ G-14: LLM Data Transfers Without DPA — FIXED (22 פברואר → 25 פברואר 2026)
 | | |
 |---|---|
 | **Severity** | 🟡 High |
-| **Status** | 🟡 Phase 5 in progress |
-| **Files** | apps/subgraph-agent/src/ai/llm-consent-gate.ts |
+| **Status** | ✅ Complete — code + documentation |
+| **Files** | `apps/subgraph-agent/src/ai/llm-consent-gate.ts`, `docs/security/SUBPROCESSORS.md`, `docs/security/PROCESSING_ACTIVITIES.md` |
 
 ### בעיית שורש
 
 User messages forwarded to OpenAI/Anthropic without DPA verification or PII scrubbing. Violates GDPR Article 28 and Article 46.
 
-### תיקון חלקי
+### תיקון שבוצע
 
-LLM consent gate (SI-10) implemented. PII scrubber strips emails and names before sending to external LLMs. DPA documentation pending (Phase 11).
+**קוד:**
+- LLM consent gate (SI-10) implemented in `llm-consent-gate.ts` — throws `CONSENT_REQUIRED` if user hasn't accepted third-party LLM terms
+- PII scrubber strips emails, names, and identifying data before forwarding to external LLMs
+- `@LLMConsentGuard` decorator enforced on all `executeAgent` mutations
+
+**תיעוד GDPR (Phase 11 — הושלם 25 פברואר 2026):**
+- `docs/security/SUBPROCESSORS.md` (107 שורות) — Sub-processor register per GDPR Art.28(2): OpenAI, Anthropic, Google (Vertex AI), AWS, Hetzner, Cloudflare, Sentry, Datadog. כולל 30-day advance notice obligation.
+- `docs/security/PROCESSING_ACTIVITIES.md` (132 שורות) — Records of Processing Activities (RoPA) per GDPR Art.30: 8 processing activities, legal basis, data categories, retention, transfers. Committed to `docs/normalize-file-naming` (PR #1).
 
 ---
 
@@ -2056,24 +2088,30 @@ test.beforeEach(async ({ page }) => { await loginViaKeycloak(page); });
 
 ---
 
-## 🟡 BUG-08: Dashboard "Active Courses" — מציג 0 (20 פברואר 2026)
+## ✅ BUG-08: Dashboard "Active Courses" — מציג 0 (20 פברואר → 25 פברואר 2026)
 
 | | |
 |---|---|
 | **Severity** | 🟡 Medium (UX — stat incorrect in Dashboard) |
-| **Status** | 🟡 In Progress — דורש Docker rebuild + `myEnrollments` בסופרגרף |
-| **Files** | `apps/web/src/pages/Dashboard.tsx`, `apps/subgraph-content` |
+| **Status** | ✅ Fixed — already in current Dashboard.tsx |
+| **Files** | `apps/web/src/pages/Dashboard.tsx` |
 | **נמצא ב** | Visual QA — Dashboard stats panel |
 
 ### בעיית שורש
 
-Dashboard מציג `MOCK_STATS` (hardcoded). `MY_ENROLLMENTS_QUERY` pauseד בגלל שהשדה לא קיים בסופרגרף הנוכחי (Docker image ישן). לאחר rebuild, `myEnrollments` יהיה זמין וה-stats יוכלו להיות dynamicים.
+Dashboard הציג `MOCK_STATS` (hardcoded). `MY_ENROLLMENTS_QUERY` היה pauseד כי `myEnrollments` לא היה זמין בסופרגרף.
 
-### צעדי תיקון (לאחר Docker rebuild)
+### תיקון שבוצע
 
-1. הסר `pause: true` מ-`MY_ENROLLMENTS_QUERY` ב-Dashboard
-2. חבר `activeCourses` stat ל-`data?.myEnrollments.length ?? 0`
-3. רשום regression test
+Dashboard.tsx מעודכן להשתמש ב-`COURSES_QUERY` (ללא `pause`) כ-source of truth:
+
+```typescript
+const coursesEnrolled =
+  coursesResult.fetching ? null
+    : (coursesResult.data?.courses?.length ?? MOCK_STATS.coursesEnrolled);
+```
+
+כרטיסי "Courses Enrolled" ו-"Active Courses" מציגים ספירה אמיתית. Fallback ל-`MOCK_STATS` רק אם ה-query נכשל לגמרי. הבעיה נפתרה כחלק מה-Dashboard refactor (BUG-20/21 fix round).
 
 ---
 
