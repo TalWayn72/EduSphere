@@ -37,7 +37,7 @@ const FOLLOWED_B = 'followed-uuid-b';
 
 const CONTENT_1 = { content_item_id: 'content-1', content_title: 'GraphQL Fundamentals', user_id: FOLLOWED_A, last_accessed_at: new Date(), is_completed: false };
 const CONTENT_2 = { content_item_id: 'content-2', content_title: 'Docker for Devs', user_id: FOLLOWED_B, last_accessed_at: new Date(), is_completed: false };
-const CONTENT_3 = { content_item_id: 'content-3', content_title: 'Already Done', user_id: FOLLOWED_A, last_accessed_at: new Date(), is_completed: false };
+const _CONTENT_3 = { content_item_id: 'content-3', content_title: 'Already Done', user_id: FOLLOWED_A, last_accessed_at: new Date(), is_completed: false };
 
 function makeService() {
   return new SocialRecommendationsService();

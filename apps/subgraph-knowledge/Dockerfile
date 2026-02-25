@@ -8,13 +8,14 @@ RUN npm install -g pnpm@${PNPM_VERSION} --no-fund --no-audit
 WORKDIR /app
 
 FROM base AS deps
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.json tsconfig.base.json ./
 COPY packages/ packages/
 # Copy all apps so pnpm workspace resolution succeeds with --frozen-lockfile
 COPY apps/ apps/
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS builder
+RUN pnpm turbo build --filter='./packages/*'
 RUN pnpm --filter @edusphere/subgraph-knowledge build
 
 FROM base AS runner

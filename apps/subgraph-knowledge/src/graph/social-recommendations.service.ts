@@ -12,7 +12,6 @@ import {
   closeAllPools,
   eq,
   and,
-  inArray,
 } from '@edusphere/db';
 import { toUserRole } from './graph-types';
 

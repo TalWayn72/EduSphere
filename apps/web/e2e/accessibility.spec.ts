@@ -50,14 +50,10 @@ function formatViolations(violations: Result[]): string {
   return violations
     .map(
       (v) =>
-        `
-[${v.impact ?? 'unknown'}] ${v.id}: ${v.description}` +
-        `
-  Affected: ${v.nodes.map((n) => n.target.join(', ')).join('
-  ')}`,
+        `\n[${v.impact ?? 'unknown'}] ${v.id}: ${v.description}` +
+        `\n  Affected: ${v.nodes.map((n) => n.target.join(', ')).join('\n  ')}`,
     )
-    .join('
-');
+    .join('\n');
 }
 
 // -------------------------------------------------------------------------
@@ -171,13 +167,11 @@ test.describe('WCAG 2.2 SC 2.5.8 - Target Size @a11y', () => {
 
       const summary = violations
         .map((v) => `  "${v.text}" [${v.selector}] -> ${v.width}x${v.height}px`)
-        .join('
-');
+        .join('\n');
 
       expect(
         violations,
-        `Target size violations on ${url}:
-${summary}`,
+        `Target size violations on ${url}:\n${summary}`,
       ).toHaveLength(0);
     });
   }
@@ -255,9 +249,7 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
 
     expect(
       noOutlineElements,
-      `Elements missing focus outline:
-${noOutlineElements.join('
-')}`,
+      `Elements missing focus outline:\n${noOutlineElements.join('\n')}`,
     ).toHaveLength(0);
   });
 });
@@ -313,9 +305,7 @@ test.describe('WCAG 2.2 SC 2.4.12 - Focus Not Obscured @a11y', () => {
 
     expect(
       obscuredElements,
-      `Focused elements fully hidden from viewport:
-${obscuredElements.join('
-')}`,
+      `Focused elements fully hidden from viewport:\n${obscuredElements.join('\n')}`,
     ).toHaveLength(0);
   });
 });
