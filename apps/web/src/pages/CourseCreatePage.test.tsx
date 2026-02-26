@@ -62,7 +62,9 @@ vi.mock('./CourseWizardStep2', () => ({
     onChange,
   }: {
     modules: Array<{ title: string; order: number }>;
-    onChange: (updates: { modules: Array<{ title: string; order: number }> }) => void;
+    onChange: (updates: {
+      modules: Array<{ title: string; order: number }>;
+    }) => void;
   }) => {
     const [moduleTitle, setModuleTitle] = useState('');
     return (
@@ -78,7 +80,9 @@ vi.mock('./CourseWizardStep2', () => ({
                 <button
                   type="button"
                   aria-label="Remove module"
-                  onClick={() => onChange({ modules: modules.filter((_, idx) => idx !== i) })}
+                  onClick={() =>
+                    onChange({ modules: modules.filter((_, idx) => idx !== i) })
+                  }
                 >
                   Remove
                 </button>
@@ -93,7 +97,12 @@ vi.mock('./CourseWizardStep2', () => ({
           onChange={(e) => setModuleTitle(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && moduleTitle.trim()) {
-              onChange({ modules: [...modules, { title: moduleTitle.trim(), order: modules.length + 1 }] });
+              onChange({
+                modules: [
+                  ...modules,
+                  { title: moduleTitle.trim(), order: modules.length + 1 },
+                ],
+              });
               setModuleTitle('');
             }
           }}
@@ -102,7 +111,12 @@ vi.mock('./CourseWizardStep2', () => ({
           type="button"
           disabled={!moduleTitle.trim()}
           onClick={() => {
-            onChange({ modules: [...modules, { title: moduleTitle.trim(), order: modules.length + 1 }] });
+            onChange({
+              modules: [
+                ...modules,
+                { title: moduleTitle.trim(), order: modules.length + 1 },
+              ],
+            });
             setModuleTitle('');
           }}
         >
@@ -129,14 +143,26 @@ vi.mock('./CourseWizardStep3', () => ({
       <p>{data.title}</p>
       {data.modules.length > 0 && (
         <>
-          <p>{data.modules.length} module{data.modules.length !== 1 ? 's' : ''}</p>
-          {data.modules.map((m, i) => <p key={i}>{m.title}</p>)}
+          <p>
+            {data.modules.length} module{data.modules.length !== 1 ? 's' : ''}
+          </p>
+          {data.modules.map((m, i) => (
+            <p key={i}>{m.title}</p>
+          ))}
         </>
       )}
-      <button type="button" disabled={isSubmitting} onClick={() => onPublish(true)}>
+      <button
+        type="button"
+        disabled={isSubmitting}
+        onClick={() => onPublish(true)}
+      >
         Publish Course
       </button>
-      <button type="button" disabled={isSubmitting} onClick={() => onPublish(false)}>
+      <button
+        type="button"
+        disabled={isSubmitting}
+        onClick={() => onPublish(false)}
+      >
         Save as Draft
       </button>
     </div>

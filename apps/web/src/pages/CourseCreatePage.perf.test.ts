@@ -41,21 +41,27 @@ describe('CourseCreatePage — lazy import guards', () => {
       /^import\s+\{[^}]*CourseWizardMediaStep[^}]*\}\s+from/m
     );
     // Must use lazy(() => import(...))
-    expect(source).toMatch(/lazy\(\s*\(\)\s*=>\s*import\(['"]\.\/CourseWizardMediaStep/);
+    expect(source).toMatch(
+      /lazy\(\s*\(\)\s*=>\s*import\(['"]\.\/CourseWizardMediaStep/
+    );
   });
 
   it('CourseWizardStep2 is referenced via lazy(), not a static import', () => {
     expect(source).not.toMatch(
       /^import\s+\{[^}]*CourseWizardStep2[^}]*\}\s+from/m
     );
-    expect(source).toMatch(/lazy\(\s*\(\)\s*=>\s*import\(['"]\.\/CourseWizardStep2/);
+    expect(source).toMatch(
+      /lazy\(\s*\(\)\s*=>\s*import\(['"]\.\/CourseWizardStep2/
+    );
   });
 
   it('CourseWizardStep3 is referenced via lazy(), not a static import', () => {
     expect(source).not.toMatch(
       /^import\s+\{[^}]*CourseWizardStep3[^}]*\}\s+from/m
     );
-    expect(source).toMatch(/lazy\(\s*\(\)\s*=>\s*import\(['"]\.\/CourseWizardStep3/);
+    expect(source).toMatch(
+      /lazy\(\s*\(\)\s*=>\s*import\(['"]\.\/CourseWizardStep3/
+    );
   });
 
   it('CourseWizardStep1 is still a static import (renders on step 0)', () => {

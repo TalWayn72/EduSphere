@@ -160,9 +160,7 @@ test.describe('AI Chat Panel', () => {
 
     // The backdrop is the semi-transparent overlay (bg-black/50 md:hidden)
     // It covers the left side of the screen on mobile
-    const backdrop = page.locator(
-      'div.fixed.inset-0[class*="bg-black"]'
-    );
+    const backdrop = page.locator('div.fixed.inset-0[class*="bg-black"]');
     await expect(backdrop).toBeVisible({ timeout: 5_000 });
 
     await backdrop.click({ position: { x: 50, y: 400 } });

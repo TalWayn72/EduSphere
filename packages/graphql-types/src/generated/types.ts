@@ -563,6 +563,17 @@ export enum MessageType {
   Video = 'VIDEO'
 }
 
+/** An ordered collection of MICROLESSON content items forming a learning path. */
+export type MicrolearningPath = {
+  __typename?: 'MicrolearningPath';
+  contentItemIds: Array<Scalars['ID']['output']>;
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  itemCount: Scalars['Int']['output'];
+  title: Scalars['String']['output'];
+  topicClusterId?: Maybe<Scalars['ID']['output']>;
+};
+
 export type Module = {
   __typename?: 'Module';
   contentItems: Array<ContentItem>;
@@ -1212,6 +1223,8 @@ export type Query = {
   coursesByInstructor: Array<Course>;
   crmConnection?: Maybe<CrmConnection>;
   crmSyncLog: Array<CrmSyncLogEntry>;
+  /** Returns the next unviewed MICROLESSON for the authenticated user today. */
+  dailyMicrolesson?: Maybe<ContentItem>;
   /** Get a single discussion by ID */
   discussion?: Maybe<Discussion>;
   /** Get all messages in a discussion */
@@ -1230,6 +1243,8 @@ export type Query = {
    */
   learningPath?: Maybe<LearningPath>;
   me?: Maybe<User>;
+  /** Lists all microlearning paths for the authenticated user's tenant. */
+  microlearningPaths: Array<MicrolearningPath>;
   module?: Maybe<Module>;
   modulesByCourse: Array<Module>;
   myAgentSessions: Array<AgentSession>;
@@ -1977,6 +1992,7 @@ export type User = {
   firstName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   lastName: Scalars['String']['output'];
+  preferences: UserPreferences;
   role: UserRole;
   tenantId: Scalars['ID']['output'];
   updatedAt: Scalars['DateTime']['output'];

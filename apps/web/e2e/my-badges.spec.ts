@@ -43,11 +43,14 @@ function singleBadgeResponse() {
           revokedAt: null,
           revokedReason: null,
           evidenceUrl: null,
-          vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
+          vcDocument: JSON.stringify({
+            '@context': 'https://w3id.org/openbadges/v3',
+          }),
           definition: {
             id: 'def-001',
             name: 'Course Completion Hero',
-            description: 'Awarded for completing the full EduSphere onboarding.',
+            description:
+              'Awarded for completing the full EduSphere onboarding.',
             imageUrl: null,
             criteriaUrl: null,
             tags: ['onboarding'],
@@ -73,7 +76,9 @@ function revokedBadgeResponse() {
           revokedAt: '2025-08-15T12:00:00.000Z',
           revokedReason: 'Policy violation',
           evidenceUrl: null,
-          vcDocument: JSON.stringify({ '@context': 'https://w3id.org/openbadges/v3' }),
+          vcDocument: JSON.stringify({
+            '@context': 'https://w3id.org/openbadges/v3',
+          }),
           definition: {
             id: 'def-002',
             name: 'Advanced Scholar',
@@ -135,9 +140,9 @@ test.describe('My Open Badges', () => {
     await gotoMyBadges(page, emptyBadgesResponse());
 
     // "You haven't earned any Open Badges yet"
-    await expect(
-      page.getByText(/haven.t earned any Open Badges/i)
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/haven.t earned any Open Badges/i)).toBeVisible(
+      { timeout: 10_000 }
+    );
   });
 
   // 3. Badge name appears when API returns one badge
@@ -146,9 +151,9 @@ test.describe('My Open Badges', () => {
   }) => {
     await gotoMyBadges(page, singleBadgeResponse());
 
-    await expect(
-      page.getByText('Course Completion Hero')
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Course Completion Hero')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   // 4. Revoked badge shows "Revoked" status label

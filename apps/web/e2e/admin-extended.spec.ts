@@ -87,8 +87,7 @@ test.describe('Admin Branding — /admin/branding', () => {
 
     // BrandingSettingsPage renders color pickers, a logo upload, and a preview
     const hasBrandingUI =
-      /Primary Color|Logo|Brand|Theme|Color/i.test(body) ||
-      spinnerCount > 0;
+      /Primary Color|Logo|Brand|Theme|Color/i.test(body) || spinnerCount > 0;
 
     expect(hasBrandingUI).toBe(true);
   });

@@ -236,7 +236,9 @@ test.describe('Admin User Management — /admin/users', () => {
     await gotoAdminRoute(page, '/admin/users');
 
     // UserManagementPage renders a text search input and a role <Select>
-    const searchInput = page.locator('input[type="text"], input[type="search"]');
+    const searchInput = page.locator(
+      'input[type="text"], input[type="search"]'
+    );
     const count = await searchInput.count();
     // At least one search-like input should exist once the page renders
     // (spinner may still be active — that is acceptable)

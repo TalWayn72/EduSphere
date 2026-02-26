@@ -37,7 +37,8 @@ function exportSuccessResponse() {
   return {
     data: {
       exportAuditLog: {
-        presignedUrl: 'https://storage.edusphere.test/audit-export.csv?token=abc123',
+        presignedUrl:
+          'https://storage.edusphere.test/audit-export.csv?token=abc123',
         expiresAt: new Date(Date.now() + 3600_000).toISOString(),
         recordCount: 142,
       },
@@ -66,9 +67,9 @@ test.describe('Audit Log Export', () => {
   test('page renders at /admin/audit-log with "Audit Log" heading', async ({
     page,
   }) => {
-    await expect(
-      page.getByRole('heading', { name: /Audit Log/i })
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: /Audit Log/i })).toBeVisible(
+      { timeout: 10_000 }
+    );
   });
 
   // 2. Two date inputs present
@@ -194,7 +195,10 @@ test.describe('Audit Log Export', () => {
       await page.evaluate(() => {
         const original = window.open.bind(window);
         window.open = (url?: string | URL, ...rest: string[]) => {
-          if (url) (window as unknown as { captureWindowOpen: (u: string) => void }).captureWindowOpen(String(url));
+          if (url)
+            (
+              window as unknown as { captureWindowOpen: (u: string) => void }
+            ).captureWindowOpen(String(url));
           return original(url, ...rest);
         };
       });
@@ -216,13 +220,16 @@ test.describe('Audit Log Export', () => {
       });
 
       // Verify window.open was called with the presigned URL
-      await page.waitForFunction(
-        () =>
-          (window as unknown as { captureWindowOpen?: unknown }).captureWindowOpen !== undefined,
-        { timeout: 10_000 }
-      ).catch(() => {
-        // captureWindowOpen may have been called before waitForFunction
-      });
+      await page
+        .waitForFunction(
+          () =>
+            (window as unknown as { captureWindowOpen?: unknown })
+              .captureWindowOpen !== undefined,
+          { timeout: 10_000 }
+        )
+        .catch(() => {
+          // captureWindowOpen may have been called before waitForFunction
+        });
 
       // The presignedUrl from the mock should have been opened
       const body = (await page.locator('body').textContent()) ?? '';

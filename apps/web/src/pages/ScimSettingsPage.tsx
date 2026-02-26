@@ -259,14 +259,12 @@ export function ScimSettingsPage() {
       {showModal && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => {
-            if (!generatedToken) setShowModal(false);
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !generatedToken)
+              setShowModal(false);
           }}
         >
-          <div
-            className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4">
             <h2 className="text-lg font-semibold">Generate SCIM Token</h2>
             {generatedToken ? (
               <div className="space-y-3">

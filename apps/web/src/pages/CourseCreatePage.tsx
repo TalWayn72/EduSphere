@@ -175,8 +175,12 @@ export function CourseCreatePage() {
   };
 
   // Single subscription for all watched fields — avoids 5 separate re-render cycles per keystroke.
-  const [watchedTitle, watchedDescription, watchedDifficulty, watchedThumbnail] =
-    form.watch(['title', 'description', 'difficulty', 'thumbnail']);
+  const [
+    watchedTitle,
+    watchedDescription,
+    watchedDifficulty,
+    watchedThumbnail,
+  ] = form.watch(['title', 'description', 'difficulty', 'thumbnail']);
 
   // Merged view of form data for steps 2–4 that display wizard state
   const currentData: CourseFormData = {
