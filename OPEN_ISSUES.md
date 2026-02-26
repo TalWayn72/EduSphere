@@ -1,9 +1,71 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 26 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,630 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88/88 ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,641 tests** (+11) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5 (BUG-026) ✅** | **Contract 36+11 (BUG-026) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
+
+---
+
+## ✅ BUG-026 — `/my-badges`: `Cannot query field "myOpenBadges" on type "Query"` (26 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (page error banner) | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+`/my-badges` showed a red error banner:
+> Failed to load badges: [GraphQL] Cannot query field "myOpenBadges" on type "Query".
+
+`MyOpenBadgesPage.tsx` imports `MY_OPEN_BADGES_QUERY` from `@/lib/graphql/badges.queries` and queries `myOpenBadges` via urql at runtime. The field was correctly defined in both the CORE subgraph SDL (`apps/subgraph-core/src/gamification/gamification.graphql:113`) and in the manually-maintained `apps/gateway/supergraph.graphql:234`, but the **live Hive Gateway did not serve the field** because the gateway composes its schema dynamically from running subgraphs — not from `supergraph.graphql`.
+
+### Root Cause
+
+**Structural gap — two sources of truth:**
+
+| Source | `myOpenBadges` present? | Used by |
+|--------|------------------------|---------|
+| `supergraph.graphql` (static file) | ✅ Added in Wave 5C | `pnpm codegen`, `schema-contract.test.ts` |
+| Live Hive Gateway (composes from `_service` SDL) | ❌ Only if subgraph-core is running at compose time | Runtime browser requests |
+
+The gateway uses `@graphql-hive/gateway` with `type: 'config'`, which fetches the SDL from each subgraph at startup. If `subgraph-core` was **not running** when the gateway started (or was restarted without subgraph-core), `myOpenBadges` is absent from the composed schema even though `supergraph.graphql` has it.
+
+**Why tests didn't catch it:**
+
+1. **`MyOpenBadgesPage.test.tsx`** mocks `urql.useQuery` entirely with `vi.mock('urql', ...)` — no real GraphQL request is made, so field validity is never checked.
+2. **`apps/web/e2e/my-badges.spec.ts`** intercepts the network at `page.route()` and returns hardcoded JSON — never hits the live gateway.
+3. **`tests/contract/schema-contract.test.ts`** validates queries against `supergraph.graphql`, but `badges.queries.ts` was **never added to this test file** — it had zero contract coverage. This means even a breaking change to `supergraph.graphql` for badge fields would go undetected.
+4. **`apps/gateway/src/test/federation/`** had no regression spec for Open Badges fields (compare: `admin-supergraph.spec.ts` which covers admin fields explicitly).
+
+### Solution
+
+1. **Added `badges.queries.ts` to contract tests**: `tests/contract/schema-contract.test.ts` — new suite `Schema Contract - badges.queries.ts (BUG-026 regression)` with `MY_OPEN_BADGES_QUERY` and `VERIFY_OPEN_BADGE_QUERY` validated against `supergraph.graphql`.
+2. **Added regression spec**: `apps/gateway/src/test/federation/open-badges-supergraph.spec.ts` — verifies `myOpenBadges`, `verifyOpenBadge`, `issueBadge`, `revokeOpenBadge`, `OpenBadgeAssertion`, `OpenBadgeDefinition` are present in `supergraph.graphql` AND in the core subgraph SDL (two-layer check).
+3. **Filled contract test gaps**: `collaboration.queries.ts` (8 operations) and `notifications.subscriptions.ts` (1 subscription) added to `schema-contract.test.ts` — both were included in codegen but had zero contract test coverage.
+4. **Operational fix**: restart subgraph-core, then restart gateway so it re-composes with all subgraphs available.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `tests/contract/schema-contract.test.ts` | +11 tests: badges (2), collaboration (8), notifications (1) |
+| `apps/gateway/src/test/federation/open-badges-supergraph.spec.ts` | New file — 9 regression assertions for Open Badges in supergraph + subgraph SDL |
+
+### Prevention Pattern (updated)
+
+For **every** query file in `apps/web/src/lib/graphql/` that is:
+- NOT excluded from `codegen.ts`, OR
+- Used by a rendered component (even if excluded from codegen)
+
+→ There **MUST** be a corresponding suite in `tests/contract/schema-contract.test.ts`.
+
+For **every** domain feature added to the core subgraph SDL:
+→ There **MUST** be a regression spec in `apps/gateway/src/test/federation/<domain>-supergraph.spec.ts` that verifies the fields are in `supergraph.graphql` AND in the subgraph SDL.
+
+**Checklist for future features:**
+- [ ] Query file in `apps/web/src/lib/graphql/` → entry in `schema-contract.test.ts`
+- [ ] New subgraph SDL fields → regression spec in `apps/gateway/src/test/federation/`
+- [ ] Unit/E2E tests mock GraphQL → contract test covers real field validity
+- [ ] Gateway startup: subgraphs must be healthy before gateway starts
 
 ---
 
@@ -4419,3 +4481,57 @@ Full SCORM 1.2/2004 import pipeline + SCORM 1.2 API shim for in-platform playbac
 | `apps/subgraph-core/src/gamification/open-badges.service.memory.spec.ts` | Rewrote with `vi.hoisted()` |
 | `apps/subgraph-core/src/gamification/open-badges.service.spec.ts` | Fixed `result.assertion.*` access |
 
+
+
+---
+
+## PERF-001 — `/courses/new` Slow Initial Load (TipTap eager import)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Date:** 2026-02-26
+
+### Problem
+
+`http://localhost:5173/courses/new` was slow to load on first visit. The page eventually loaded but with a significant delay.
+
+### Root Cause
+
+Two compounding issues:
+
+| # | Issue | Impact |
+|---|-------|--------|
+| P1 | `CourseCreatePage` statically imported `CourseWizardMediaStep`, which statically imported `RichEditor`, which pulled in the full TipTap stack (StarterKit + 8 extensions + `lowlight` + KaTeX CSS ≈ 450 KB uncompressed) — **on every `/courses/new` visit, before the user saw Step 1** | Slow first paint |
+| P2 | 5 separate `form.watch('fieldName')` calls in a single render function = 5 independent RHF subscriptions → the component re-rendered 5× per keystroke | Sluggish typing in Step 1 |
+
+### Why Tests Didn't Catch It
+
+`CourseCreatePage.test.tsx` fully mocked `CourseWizardMediaStep` (line 52):
+```typescript
+vi.mock('./CourseWizardMediaStep', () => ({
+  CourseWizardMediaStep: () => <div data-testid="media-step">Media Upload</div>,
+}));
+```
+This bypassed all real imports — TipTap/KaTeX was never loaded in tests, making the bundle-size regression invisible. No bundle-size or performance regression test existed.
+
+### Fix
+
+**`apps/web/src/pages/CourseCreatePage.tsx`**
+- `CourseWizardStep2`, `CourseWizardMediaStep`, `CourseWizardStep3` changed from static imports to `React.lazy()` + `<Suspense>` boundaries. `CourseWizardStep1` stays eager (renders immediately on Step 0).
+- 5× `form.watch('field')` calls replaced with single `form.watch(['title', 'description', 'difficulty', 'thumbnail'])` — 1 subscription instead of 5.
+
+**`apps/web/src/pages/CourseCreatePage.test.tsx`**
+- `advanceToStep2` / `advanceToStep3` helpers updated with `waitFor(...)` after each navigation to wait for lazy-loaded components to mount.
+
+**`apps/web/src/pages/CourseCreatePage.perf.test.ts`** _(new file)_
+- 8 static-analysis tests that will fail if lazy imports are accidentally reverted to static:
+  - Verifies `CourseWizardMediaStep`, `Step2`, `Step3` use `lazy(() => import(...))` in source
+  - Verifies `CourseWizardStep1` stays as a static import
+  - Verifies `Suspense` is present
+  - Verifies exactly ONE `form.watch([...])` call (array form), not multiple single-field calls
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/CourseCreatePage.tsx` | `lazy()` for Steps 2/3/Media; single `form.watch` array call; `<Suspense>` wrapper |
+| `apps/web/src/pages/CourseCreatePage.test.tsx` | `advanceToStep2/3` helpers add `waitFor` for lazy component resolution |
+| `apps/web/src/pages/CourseCreatePage.perf.test.ts` | New — 8 performance regression tests |

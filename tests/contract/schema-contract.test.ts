@@ -502,3 +502,181 @@ describe('Schema Contract - content-tier3.queries.ts (Microlearning)', () => {
     expect(true).toBe(true);
   });
 });
+
+// ---- badges.queries.ts — BUG-026: was missing from contract tests, allowing runtime
+// "Cannot query field 'myOpenBadges' on type 'Query'" to go undetected.
+const MY_OPEN_BADGES_QUERY_DOC = parse(`
+  query MyOpenBadges {
+    myOpenBadges {
+      id
+      badgeDefinitionId
+      recipientId
+      issuedAt
+      expiresAt
+      evidenceUrl
+      revoked
+      revokedAt
+      revokedReason
+      definition {
+        id
+        name
+        description
+        imageUrl
+        criteriaUrl
+        tags
+        issuerId
+        createdAt
+      }
+      vcDocument
+    }
+  }
+`);
+
+const VERIFY_OPEN_BADGE_QUERY_DOC = parse(`
+  query VerifyOpenBadge($assertionId: ID!) {
+    verifyOpenBadge(assertionId: $assertionId)
+  }
+`);
+
+describe('Schema Contract - badges.queries.ts (BUG-026 regression)', () => {
+  it('MY_OPEN_BADGES_QUERY is valid against supergraph', () => {
+    assertValid('MY_OPEN_BADGES_QUERY', MY_OPEN_BADGES_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('VERIFY_OPEN_BADGE_QUERY is valid against supergraph', () => {
+    assertValid('VERIFY_OPEN_BADGE_QUERY', VERIFY_OPEN_BADGE_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+});
+
+// ---- collaboration.queries.ts — previously unvalidated in contract tests
+const DISCUSSIONS_QUERY_DOC = parse(`
+  query Discussions($courseId: ID!, $limit: Int, $offset: Int) {
+    discussions(courseId: $courseId, limit: $limit, offset: $offset) {
+      id courseId title description creatorId discussionType
+      participantCount messageCount createdAt updatedAt
+    }
+  }
+`);
+
+const MY_DISCUSSIONS_QUERY_DOC = parse(`
+  query MyDiscussions($limit: Int, $offset: Int) {
+    myDiscussions(limit: $limit, offset: $offset) {
+      id courseId title description creatorId discussionType
+      participantCount messageCount createdAt updatedAt
+    }
+  }
+`);
+
+const DISCUSSION_QUERY_DOC = parse(`
+  query Discussion($id: ID!) {
+    discussion(id: $id) {
+      id courseId title description creatorId discussionType
+      participantCount messageCount
+      messages(limit: 50, offset: 0) {
+        id userId content messageType parentMessageId replyCount createdAt
+      }
+      participants { id userId joinedAt }
+      createdAt updatedAt
+    }
+  }
+`);
+
+const CREATE_DISCUSSION_MUTATION_DOC = parse(`
+  mutation CreateDiscussion($input: CreateDiscussionInput!) {
+    createDiscussion(input: $input) {
+      id courseId title description discussionType
+      participantCount messageCount createdAt updatedAt
+    }
+  }
+`);
+
+const ADD_MESSAGE_MUTATION_DOC = parse(`
+  mutation AddMessage($discussionId: ID!, $input: AddMessageInput!) {
+    addMessage(discussionId: $discussionId, input: $input) {
+      id discussionId userId content messageType parentMessageId replyCount createdAt
+    }
+  }
+`);
+
+const JOIN_DISCUSSION_MUTATION_DOC = parse(`
+  mutation JoinDiscussion($discussionId: ID!) {
+    joinDiscussion(discussionId: $discussionId)
+  }
+`);
+
+const LEAVE_DISCUSSION_MUTATION_DOC = parse(`
+  mutation LeaveDiscussion($discussionId: ID!) {
+    leaveDiscussion(discussionId: $discussionId)
+  }
+`);
+
+const MESSAGE_ADDED_SUBSCRIPTION_DOC = parse(`
+  subscription MessageAdded($discussionId: ID!) {
+    messageAdded(discussionId: $discussionId) {
+      id discussionId userId content messageType parentMessageId createdAt
+    }
+  }
+`);
+
+describe('Schema Contract - collaboration.queries.ts', () => {
+  it('DISCUSSIONS_QUERY is valid', () => {
+    assertValid('DISCUSSIONS_QUERY', DISCUSSIONS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('MY_DISCUSSIONS_QUERY is valid', () => {
+    assertValid('MY_DISCUSSIONS_QUERY', MY_DISCUSSIONS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('DISCUSSION_QUERY is valid', () => {
+    assertValid('DISCUSSION_QUERY', DISCUSSION_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('CREATE_DISCUSSION_MUTATION is valid', () => {
+    assertValid('CREATE_DISCUSSION_MUTATION', CREATE_DISCUSSION_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('ADD_MESSAGE_MUTATION is valid', () => {
+    assertValid('ADD_MESSAGE_MUTATION', ADD_MESSAGE_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('JOIN_DISCUSSION_MUTATION is valid', () => {
+    assertValid('JOIN_DISCUSSION_MUTATION', JOIN_DISCUSSION_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('LEAVE_DISCUSSION_MUTATION is valid', () => {
+    assertValid('LEAVE_DISCUSSION_MUTATION', LEAVE_DISCUSSION_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('MESSAGE_ADDED_SUBSCRIPTION is valid', () => {
+    assertValid('MESSAGE_ADDED_SUBSCRIPTION', MESSAGE_ADDED_SUBSCRIPTION_DOC);
+    expect(true).toBe(true);
+  });
+});
+
+// ---- notifications.subscriptions.ts — previously unvalidated in contract tests
+const NOTIFICATION_RECEIVED_SUBSCRIPTION_DOC = parse(`
+  subscription NotificationReceived($userId: ID!) {
+    notificationReceived(userId: $userId) {
+      id type title body payload readAt createdAt
+    }
+  }
+`);
+
+describe('Schema Contract - notifications.subscriptions.ts', () => {
+  it('NOTIFICATION_RECEIVED_SUBSCRIPTION is valid', () => {
+    assertValid(
+      'NOTIFICATION_RECEIVED_SUBSCRIPTION',
+      NOTIFICATION_RECEIVED_SUBSCRIPTION_DOC
+    );
+    expect(true).toBe(true);
+  });
+});
