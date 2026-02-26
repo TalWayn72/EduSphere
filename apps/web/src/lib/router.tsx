@@ -230,6 +230,9 @@ const CpdSettingsPage = lazy(() =>
 const LtiLaunchPage = lazy(() =>
   import('@/pages/LtiLaunchPage').then((m) => ({ default: m.LtiLaunchPage }))
 );
+const MyOpenBadgesPage = lazy(() =>
+  import('@/pages/MyOpenBadgesPage').then((m) => ({ default: m.MyOpenBadgesPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -381,6 +384,10 @@ export const router = createBrowserRouter([
   {
     path: '/agents',
     element: guarded(<AgentsPage />),
+  },
+  {
+    path: '/my-badges',
+    element: guarded(<MyOpenBadgesPage />),
   },
   {
     path: '/annotations',

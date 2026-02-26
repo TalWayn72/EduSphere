@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   Link2,
   LayoutDashboard,
+  Award,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -40,6 +41,7 @@ export function Layout({ children }: LayoutProps) {
       { to: '/graph', icon: Network, label: t('graph') },
       { to: '/annotations', icon: FileText, label: t('annotations') },
       { to: '/agents', icon: Bot, label: t('agents') },
+      { to: '/my-badges', icon: Award, label: t('myBadges') },
       { to: '/collaboration', icon: Users, label: t('chavruta') },
       { to: '/dashboard', icon: GitBranch, label: t('dashboard') },
     ],
