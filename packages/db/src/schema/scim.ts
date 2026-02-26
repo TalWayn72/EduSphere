@@ -2,16 +2,19 @@
  * SCIM 2.0 schema — F-019 HRIS Auto-Enrollment
  * scim_tokens: API tokens for HRIS systems (Workday, BambooHR, ADP)
  * scim_sync_log: audit trail of SCIM provisioning operations
+ * scim_groups: SCIM 2.0 group provisioning (RFC 7643)
  */
 import {
   pgTable,
   uuid,
   text,
+  varchar,
   timestamp,
   boolean,
   jsonb,
   pgEnum,
 } from 'drizzle-orm/pg-core';
+// uuid is used by scimTokens.createdByUserId and pk() internally
 import { sql } from 'drizzle-orm';
 import { pk, tenantId } from './_shared';
 
@@ -59,6 +62,39 @@ export const scimSyncLog = pgTable('scim_sync_log', {
     .notNull()
     .defaultNow(),
 });
+
+/**
+ * scim_groups — SCIM 2.0 group objects (RFC 7643 §4.2).
+ * Groups map to cohorts/classes; memberIds contain EduSphere user UUIDs.
+ * courseIds (EduSphere extension) trigger auto-enrollment on member add.
+ */
+export const scimGroups = pgTable('scim_groups', {
+  id: pk(),
+  tenantId: tenantId(),
+  externalId: varchar('external_id', { length: 255 }),
+  displayName: varchar('display_name', { length: 255 }).notNull(),
+  memberIds: jsonb('member_ids').$type<string[]>().default([]),
+  courseIds: jsonb('course_ids').$type<string[]>().default([]),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}).enableRLS();
+
+export const scimGroupsRLS = sql`
+ALTER TABLE scim_groups ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY scim_groups_tenant_isolation ON scim_groups
+  FOR ALL
+  USING (tenant_id::text = current_setting('app.current_tenant', TRUE))
+  WITH CHECK (tenant_id::text = current_setting('app.current_tenant', TRUE));
+`;
+
+export const scimGroupsIndexes = sql`
+CREATE INDEX IF NOT EXISTS idx_scim_groups_tenant ON scim_groups(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_scim_groups_display_name ON scim_groups(tenant_id, display_name);
+`;
+
+export type ScimGroup = typeof scimGroups.$inferSelect;
+export type NewScimGroup = typeof scimGroups.$inferInsert;
 
 export const scimTokensRLS = sql`
 ALTER TABLE scim_tokens ENABLE ROW LEVEL SECURITY;

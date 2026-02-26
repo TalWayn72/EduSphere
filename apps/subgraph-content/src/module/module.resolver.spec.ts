@@ -31,6 +31,10 @@ describe('ModuleResolver', () => {
     byModuleId: { load: vi.fn().mockResolvedValue([]) },
   };
 
+  const moduleLoader = {
+    byId: { load: vi.fn() },
+  };
+
   beforeEach(() => {
     moduleService = {
       findById: vi.fn(),
@@ -40,9 +44,11 @@ describe('ModuleResolver', () => {
       delete: vi.fn(),
       reorder: vi.fn(),
     };
+    moduleLoader.byId.load.mockReset();
     resolver = new ModuleResolver(
       moduleService as never,
-      contentItemLoader as never
+      contentItemLoader as never,
+      moduleLoader as never
     );
   });
 
@@ -157,14 +163,14 @@ describe('ModuleResolver', () => {
   });
 
   describe('resolveReference()', () => {
-    it('resolves module by id from federation reference', async () => {
-      moduleService.findById.mockResolvedValue(MOCK_MODULE);
+    it('resolves module by id via moduleLoader.byId.load (batched federation lookup)', async () => {
+      moduleLoader.byId.load.mockResolvedValue(MOCK_MODULE);
       const result = await resolver.resolveReference({
         __typename: 'Module',
         id: 'mod-1',
       });
       expect(result).toEqual(MOCK_MODULE);
-      expect(moduleService.findById).toHaveBeenCalledWith('mod-1');
+      expect(moduleLoader.byId.load).toHaveBeenCalledWith('mod-1');
     });
   });
 });

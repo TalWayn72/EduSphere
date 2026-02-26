@@ -14,7 +14,7 @@ import type { TenantContext } from '@edusphere/db';
 import { CourseService } from './course.service';
 import { EnrollmentService } from './enrollment.service';
 import { AdminEnrollmentService } from './admin-enrollment.service';
-import { ModuleService } from '../module/module.service';
+import { ModuleLoader } from '../module/module.loader';
 
 const tracer = trace.getTracer('subgraph-content');
 
@@ -44,7 +44,7 @@ export class CourseResolver {
     private readonly courseService: CourseService,
     private readonly enrollmentService: EnrollmentService,
     private readonly adminEnrollmentService: AdminEnrollmentService,
-    private readonly moduleService: ModuleService
+    private readonly moduleLoader: ModuleLoader
   ) {}
 
   @Query('_health')
@@ -194,8 +194,13 @@ export class CourseResolver {
 
   // ── Field Resolvers ──────────────────────────────────────────
 
+  /**
+   * ResolveField uses ModuleLoader (DataLoader) to batch all
+   * modules requests for a list of courses into one DB query,
+   * eliminating the N+1 problem.
+   */
   @ResolveField('modules')
   async getModules(@Parent() course: CourseParent) {
-    return this.moduleService.findByCourse(course.id);
+    return this.moduleLoader.byCourseId.load(course.id);
   }
 }

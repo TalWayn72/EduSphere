@@ -10,6 +10,7 @@ import {
 } from '@nestjs/graphql';
 import { ModuleService } from './module.service';
 import { ContentItemLoader } from '../content-item/content-item.loader';
+import { ModuleLoader } from './module.loader';
 
 interface ModuleParent {
   id: string;
@@ -32,7 +33,8 @@ interface GraphQLContext {
 export class ModuleResolver {
   constructor(
     private readonly moduleService: ModuleService,
-    private readonly contentItemLoader: ContentItemLoader
+    private readonly contentItemLoader: ContentItemLoader,
+    private readonly moduleLoader: ModuleLoader
   ) {}
 
   @Query('module')
@@ -88,8 +90,13 @@ export class ModuleResolver {
     return loader.byModuleId.load(mod.id);
   }
 
+  /**
+   * ResolveReference uses ModuleLoader byId (DataLoader) to batch
+   * federation entity resolution calls into one DB query per request tick,
+   * eliminating the N+1 problem for @ResolveReference.
+   */
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {
-    return this.moduleService.findById(reference.id);
+    return this.moduleLoader.byId.load(reference.id);
   }
 }

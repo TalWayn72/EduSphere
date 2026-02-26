@@ -14,8 +14,10 @@ import {
 import type { Request, Response } from 'express';
 import { ScimTokenService } from './scim-token.service.js';
 import { ScimUserService } from './scim-user.service.js';
+import { ScimGroupService } from './scim-group.service.js';
 import type {
   ScimUser,
+  ScimGroup,
   ScimError,
   ScimPatchRequest,
   ServiceProviderConfig,
@@ -31,7 +33,8 @@ const SCIM_CT = 'application/scim+json';
 export class ScimController {
   constructor(
     private readonly tokenService: ScimTokenService,
-    private readonly userService: ScimUserService
+    private readonly userService: ScimUserService,
+    private readonly groupService: ScimGroupService
   ) {}
 
   private scimError(res: Response, status: number, detail: string): void {
@@ -77,6 +80,8 @@ export class ScimController {
     };
     res.status(200).type(SCIM_CT).json(config);
   }
+
+  // ─── Users ────────────────────────────────────────────────────────────────
 
   @Get('Users')
   async listUsers(@Req() req: Request, @Res() res: Response): Promise<void> {
@@ -183,45 +188,120 @@ export class ScimController {
     res.status(204).send();
   }
 
+  // ─── Groups ───────────────────────────────────────────────────────────────
+
   @Get('Groups')
   async listGroups(@Req() req: Request, @Res() res: Response): Promise<void> {
     const auth = await this.authorize(req, res);
     if (!auth) return;
+    const startIndex = Number(req.query['startIndex'] ?? 1);
+    const count = Math.min(Number(req.query['count'] ?? 100), 200);
+    const filter = req.query['filter'] as string | undefined;
+    const { groups, total } = await this.groupService.listGroups(
+      auth.tenantId,
+      startIndex,
+      count,
+      filter
+    );
     res
       .status(200)
       .type(SCIM_CT)
       .json({
         schemas: [SCIM_LIST_SCHEMA],
-        totalResults: 0,
-        startIndex: 1,
-        itemsPerPage: 0,
-        Resources: [],
+        totalResults: total,
+        startIndex,
+        itemsPerPage: count,
+        Resources: groups,
       });
   }
 
   @Post('Groups')
   async createGroup(
     @Req() req: Request,
-    @Body() body: Record<string, unknown>,
+    @Body() body: ScimGroup,
     @Res() res: Response
   ): Promise<void> {
     const auth = await this.authorize(req, res);
     if (!auth) return;
-    const ext = body['urn:edusphere:scim:extension'] as
-      | { courseIds?: string[] }
-      | undefined;
-    const members =
-      (body['members'] as Array<{ value: string }> | undefined) ?? [];
-    if (ext?.courseIds?.length && members.length > 0) {
-      for (const member of members) {
-        await this.userService.patchUser(auth.tenantId, member.value, []);
-      }
+    if (!body.displayName) {
+      this.scimError(res, 400, 'displayName is required');
+      return;
     }
-    const group = {
-      schemas: [SCIM_GROUP_SCHEMA],
-      id: crypto.randomUUID(),
-      displayName: body['displayName'] ?? '',
-    };
+    const group = await this.groupService.createGroup(auth.tenantId, body);
     res.status(201).type(SCIM_CT).json(group);
+  }
+
+  @Get('Groups/:id')
+  async getGroup(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Res() res: Response
+  ): Promise<void> {
+    const auth = await this.authorize(req, res);
+    if (!auth) return;
+    try {
+      const group = await this.groupService.getGroup(auth.tenantId, id);
+      res.status(200).type(SCIM_CT).json(group);
+    } catch {
+      this.scimError(res, 404, 'Group not found');
+    }
+  }
+
+  @Put('Groups/:id')
+  async replaceGroup(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() body: ScimGroup,
+    @Res() res: Response
+  ): Promise<void> {
+    const auth = await this.authorize(req, res);
+    if (!auth) return;
+    try {
+      const group = await this.groupService.replaceGroup(
+        auth.tenantId,
+        id,
+        body
+      );
+      res.status(200).type(SCIM_CT).json(group);
+    } catch {
+      this.scimError(res, 404, 'Group not found');
+    }
+  }
+
+  @Patch('Groups/:id')
+  async patchGroup(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() body: ScimPatchRequest,
+    @Res() res: Response
+  ): Promise<void> {
+    const auth = await this.authorize(req, res);
+    if (!auth) return;
+    try {
+      const group = await this.groupService.patchGroup(
+        auth.tenantId,
+        id,
+        body.Operations ?? []
+      );
+      res.status(200).type(SCIM_CT).json(group);
+    } catch {
+      this.scimError(res, 404, 'Group not found');
+    }
+  }
+
+  @Delete('Groups/:id')
+  async deleteGroup(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Res() res: Response
+  ): Promise<void> {
+    const auth = await this.authorize(req, res);
+    if (!auth) return;
+    try {
+      await this.groupService.deleteGroup(auth.tenantId, id);
+      res.status(204).send();
+    } catch {
+      this.scimError(res, 404, 'Group not found');
+    }
   }
 }
