@@ -103,17 +103,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run unit tests with coverage (thresholds enforced)
-        run: pnpm turbo test -- --coverage --reporter=verbose
+      - name: Run frontend unit tests with coverage (thresholds enforced)
+        # Only run frontend tests here; backend subgraph tests require a live DB
+        # and run in the Full Test Suite workflow (test.yml) with proper services.
+        # vitest.config.ts defines thresholds: lines/statements 79%, functions 70%, branches 65%
+        run: pnpm --filter @edusphere/web test -- --run --coverage --reporter=verbose
+        continue-on-error: false
+
+      - name: Run shared-package unit tests (no DB required)
+        run: pnpm turbo test --filter='./packages/*' -- --run --reporter=verbose
+        continue-on-error: false
         env:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-
-      - name: Enforce frontend coverage thresholds
-        # vitest.config.ts already defines thresholds (80% lines/functions, 70% branches)
-        # If thresholds are not met, vitest exits with code 1 → CI fails
-        run: pnpm --filter @edusphere/web test -- --coverage --reporter=json
-        continue-on-error: false
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
