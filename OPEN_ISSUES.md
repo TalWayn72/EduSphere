@@ -7,6 +7,42 @@
 
 ---
 
+## HIVE-001 — GraphQL Hive Schema Registry Integration (26 Feb 2026)
+
+**Status:** 🟡 Pending Token Setup | **Severity:** 🟢 Low | **Branch:** `fix/bug-16-23-g18`
+
+### What Was Done
+- Added `@graphql-hive/cli@^0.47.0` to `apps/gateway/devDependencies`
+- Added `schema:check` and `schema:publish` scripts to `apps/gateway/package.json`
+- `turbo.json` already had `schema:check` and `schema:publish` tasks (no change needed)
+- `apps/gateway/.env.example` already documented `HIVE_TOKEN` (no change needed)
+- Schema composition validated: 6 subgraphs composed to 27,847-char supergraph
+
+### Pending: HIVE_TOKEN Setup
+`HIVE_TOKEN` is NOT set in the current environment. To activate schema registry:
+
+1. Go to https://app.graphql-hive.com/ → Project Settings → Tokens
+2. Create a token with **Schema Check** and **Schema Publish** scopes
+3. Add to `apps/gateway/.env`:
+   ```
+   HIVE_TOKEN=<your-token>
+   ```
+4. Run publish:
+   ```bash
+   pnpm --filter @edusphere/gateway schema:publish
+   ```
+5. Run check (before every deployment to detect breaking changes):
+   ```bash
+   pnpm --filter @edusphere/gateway schema:check
+   ```
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `apps/gateway/package.json` | Added `@graphql-hive/cli` devDep + `schema:check` + `schema:publish` scripts |
+
+---
+
 ## OFFLINE-001 — Offline Storage Quota Management (25 Feb 2026)
 
 **Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Branch:** `fix/bug-16-23-g18`

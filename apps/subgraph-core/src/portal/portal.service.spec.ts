@@ -23,12 +23,12 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 let PortalService: typeof import('./portal.service.js').PortalService;
-let closeAllPools: () => Promise<void>;
+let _closeAllPools: () => Promise<void>;
 
 beforeEach(async () => {
   vi.clearAllMocks();
   const dbMod = await import('@edusphere/db');
-  closeAllPools = dbMod.closeAllPools as () => Promise<void>;
+  _closeAllPools = dbMod.closeAllPools as () => Promise<void>;
   const mod = await import('./portal.service.js');
   PortalService = mod.PortalService;
 });

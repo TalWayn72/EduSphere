@@ -7,9 +7,12 @@
  *   • Local file upload (DOCX / PDF) — dispatched via backend mutation
  *
  * Design: left sidebar panel with a source list + "Add source" button.
+ *
+ * DEV_MODE: when VITE_DEV_MODE=true, mock data is returned without hitting
+ * the GraphQL backend. This keeps E2E and Storybook tests self-contained.
  */
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { gqlClient as graphqlClient } from '@/lib/graphql';
 import { getToken } from '@/lib/auth';
@@ -21,6 +24,11 @@ import {
   ADD_YOUTUBE_SOURCE,
   DELETE_KNOWLEDGE_SOURCE,
 } from '@/lib/graphql/sources.queries';
+
+// ─── DEV_MODE flag ────────────────────────────────────────────────────────────
+
+const IS_DEV_MODE =
+  import.meta.env.VITE_DEV_MODE === 'true' || !import.meta.env.VITE_KEYCLOAK_URL;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -65,6 +73,42 @@ const STATUS_LABELS: Record<SourceStatus, string> = {
   FAILED:     'שגיאה',
 };
 
+// ─── DEV_MODE mock data ───────────────────────────────────────────────────────
+
+/** Seed sources returned when VITE_DEV_MODE=true (no backend required). */
+const DEV_SOURCES: KnowledgeSource[] = [
+  {
+    id: 'dev-src-1',
+    title: 'מבוא לתלמוד',
+    sourceType: 'URL',
+    origin: 'https://example.com/intro-talmud',
+    preview: 'מסכת בבא קמא — פרק ראשון: מניין הנזיקין.',
+    status: 'READY',
+    chunkCount: 12,
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: 'dev-src-2',
+    title: 'הרמב"ם - משנה תורה',
+    sourceType: 'TEXT',
+    preview: 'הלכות תשובה — פרק א.',
+    status: 'READY',
+    chunkCount: 7,
+    createdAt: new Date(Date.now() - 43200000).toISOString(),
+  },
+];
+
+/** Mock query function for DEV_MODE — resolves immediately with seed data. */
+function devQueryFn(): Promise<KnowledgeSource[]> {
+  return Promise.resolve(DEV_SOURCES);
+}
+
+/** Mock mutation for DEV_MODE — no-op that resolves immediately. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function devMutationFn(_: unknown): Promise<void> {
+  return Promise.resolve();
+}
+
 // ─── Add-source Modal ─────────────────────────────────────────────────────────
 
 type AddTab = 'url' | 'text' | 'file' | 'youtube';
@@ -90,23 +134,36 @@ function AddSourceModal({
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
+  // Close modal on Escape key
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
   const addUrl = useMutation({
-    mutationFn: (input: { courseId: string; title: string; url: string }) =>
-      graphqlClient.request(ADD_URL_SOURCE, { input }),
+    mutationFn: IS_DEV_MODE
+      ? devMutationFn
+      : (input: { courseId: string; title: string; url: string }) =>
+          graphqlClient.request(ADD_URL_SOURCE, { input }),
     onSuccess: () => { onAdded(); onClose(); },
     onError: (e) => setError(String(e)),
   });
 
   const addText = useMutation({
-    mutationFn: (input: { courseId: string; title: string; text: string }) =>
-      graphqlClient.request(ADD_TEXT_SOURCE, { input }),
+    mutationFn: IS_DEV_MODE
+      ? devMutationFn
+      : (input: { courseId: string; title: string; text: string }) =>
+          graphqlClient.request(ADD_TEXT_SOURCE, { input }),
     onSuccess: () => { onAdded(); onClose(); },
     onError: (e) => setError(String(e)),
   });
 
   const addYoutube = useMutation({
-    mutationFn: (input: { courseId: string; title: string; url: string }) =>
-      graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }),
+    mutationFn: IS_DEV_MODE
+      ? devMutationFn
+      : (input: { courseId: string; title: string; url: string }) =>
+          graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }),
     onSuccess: () => { onAdded(); onClose(); },
     onError: (e) => setError(String(e)),
   });
@@ -178,6 +235,7 @@ function AddSourceModal({
         <div className="p-6 flex flex-col gap-4">
           {tab === 'url' && (
             <>
+              <label className="text-xs font-medium text-gray-700">כתובת URL</label>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="https://..."
@@ -295,10 +353,12 @@ function SourceDetailDrawer({
 }) {
   const { data, isLoading } = useQuery({
     queryKey: ['knowledge-source', sourceId],
-    queryFn: () =>
-      graphqlClient
-        .request(KNOWLEDGE_SOURCE_DETAIL, { id: sourceId })
-        .then((r: { knowledgeSource: KnowledgeSource }) => r.knowledgeSource),
+    queryFn: IS_DEV_MODE
+      ? () => Promise.resolve(DEV_SOURCES.find((s) => s.id === sourceId) ?? DEV_SOURCES[0])
+      : () =>
+          graphqlClient
+            .request(KNOWLEDGE_SOURCE_DETAIL, { id: sourceId })
+            .then((r: { knowledgeSource: KnowledgeSource }) => r.knowledgeSource),
   });
 
   return (
@@ -325,22 +385,27 @@ export function SourceManager({ courseId }: { courseId: string }) {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['course-sources', courseId],
-    queryFn: () =>
-      graphqlClient
-        .request(COURSE_KNOWLEDGE_SOURCES, { courseId })
-        .then((r: { courseKnowledgeSources: KnowledgeSource[] }) => r.courseKnowledgeSources),
-    refetchInterval: (query) => {
-      const sources = query.state.data as KnowledgeSource[] | undefined;
-      const hasProcessing = sources?.some(
-        (s) => s.status === 'PENDING' || s.status === 'PROCESSING',
-      );
-      return hasProcessing ? 3000 : false;
-    },
+    queryFn: IS_DEV_MODE
+      ? devQueryFn
+      : () =>
+          graphqlClient
+            .request(COURSE_KNOWLEDGE_SOURCES, { courseId })
+            .then((r: { courseKnowledgeSources: KnowledgeSource[] }) => r.courseKnowledgeSources),
+    refetchInterval: IS_DEV_MODE
+      ? false
+      : (query) => {
+          const sources = query.state.data as KnowledgeSource[] | undefined;
+          const hasProcessing = sources?.some(
+            (s) => s.status === 'PENDING' || s.status === 'PROCESSING',
+          );
+          return hasProcessing ? 3000 : false;
+        },
   });
 
   const deleteSource = useMutation({
-    mutationFn: (id: string) =>
-      graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }),
+    mutationFn: IS_DEV_MODE
+      ? devMutationFn
+      : (id: string) => graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }),
     onSuccess: () => refetch(),
   });
 

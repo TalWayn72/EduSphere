@@ -48,7 +48,7 @@ export function UserMenu({ user }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex items-center gap-2 rounded-full p-1 hover:bg-accent transition-colors outline-none"
+          className="flex items-center gap-2 rounded-full p-1 hover:bg-accent transition-colors"
           aria-label="User menu"
         >
           <Avatar className="h-8 w-8">

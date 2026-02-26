@@ -122,10 +122,13 @@
   /* WCAG 2.2 SC 2.4.11 — Focus Appearance
      3 px solid #2563eb (blue-600) gives 4.5:1 contrast on white and
      >= 3:1 on the light-grey background. outline-offset: 2px positions
-     the ring outside the element boundary.                                */
+     the ring outside the element boundary.
+     !important is required to prevent Tailwind utility classes such as
+     focus-visible:outline-none and bare outline-none from overriding the
+     accessible outline on keyboard-focused elements.                       */
   *:focus-visible {
-    outline: 3px solid #2563eb;
-    outline-offset: 2px;
+    outline: 3px solid #2563eb !important;
+    outline-offset: 2px !important;
     border-radius: 2px;
   }
 

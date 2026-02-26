@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => {
   return { mockLimit, mockWhere, mockFrom, mockSelect, mockOnConflictDoUpdate, mockValues, mockInsert, mockDb };
 });
 
-const { mockLimit, mockWhere, mockFrom, mockSelect, mockOnConflictDoUpdate, mockValues, mockInsert, mockDb } = mocks;
+const { mockLimit, _mockWhere, _mockFrom, mockSelect, mockOnConflictDoUpdate, mockValues, mockInsert, _mockDb } = mocks;
 
 vi.mock('@edusphere/db', () => ({
   db: mocks.mockDb,
