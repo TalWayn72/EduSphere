@@ -99,8 +99,11 @@ export default defineConfig({
         'src/components/ui/**',
         // Video/media components require HTMLVideoElement not available in jsdom
         'src/components/VideoPlayer.tsx',
+        'src/components/VideoPlayerCore.tsx',
         'src/components/VideoProgressMarkers.tsx',
         'src/components/TranscriptPanel.tsx',
+        // Storybook story files — not production logic
+        'src/components/VideoPlayer.stories.tsx',
         // Annotation sub-components (old) rendered inside ContentViewer via Radix portals
         'src/components/AddAnnotationOverlay.tsx',
         'src/components/AnnotationForm.tsx',
@@ -117,11 +120,15 @@ export default defineConfig({
         'src/components/editor/AnnotatedRichDocumentViewer.tsx',
         'src/components/editor/RichContentViewer.tsx',
         'src/components/editor/RichDocumentEditor.tsx',
+        'src/components/editor/RichEditor.tsx',
         'src/components/editor/index.ts',
         // Quiz, SCORM and portal-builder components — Tier-2/3 features, tested via E2E
         'src/components/quiz/**',
         'src/components/scorm/**',
         'src/components/portal-builder/**',
+        // Tier-3 knowledge/skill/learning widgets — complex chart + graph deps, tested via E2E
+        'src/components/SkillGapWidget.tsx',
+        'src/components/DailyLearningWidget.tsx',
         // Tier-2/3 components that require DOM/media APIs or have no unit tests (E2E covered)
         'src/components/AiCourseCreatorModal.tsx',
         'src/components/AltTextModal.tsx',
@@ -162,6 +169,8 @@ export default defineConfig({
         'src/pages/AnnotationDemo.tsx',
         // Media-upload wizard step — requires FileReader / video APIs not available in jsdom
         'src/pages/CourseWizardMediaStep.tsx',
+        // KnowledgeGraph — D3 force-simulation + canvas APIs not available in jsdom
+        'src/pages/KnowledgeGraph.tsx',
         // Admin pages — tested via E2E
         'src/pages/AdminDashboardPage.tsx',
         'src/pages/AnnouncementsPage.tsx',
@@ -258,10 +267,10 @@ export default defineConfig({
         'src/services/**',
       ],
       thresholds: {
-        lines: 79,
-        functions: 70,
-        branches: 65,
-        statements: 79,
+        lines: 85,
+        functions: 85,
+        branches: 75,
+        statements: 85,
       },
     },
   },

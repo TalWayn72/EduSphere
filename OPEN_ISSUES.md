@@ -1,9 +1,9 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 26 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88 | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,600 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88/88 ✅** | **Web 19/19 (UserManagement) ✅**
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,630 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88/88 ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
 
 ---
 
@@ -69,6 +69,76 @@ Three UX/safety gaps in `/admin/users`:
 |------|--------|
 | `apps/web/src/pages/UserManagementPage.tsx` | Role confirmation state + handlers + UI + toast + tenantId from auth |
 | `apps/web/src/pages/UserManagementPage.test.tsx` | Added 6 new tests covering all improvements |
+
+---
+
+## ✅ IMP-002 — Add missing SDL types to supergraph.graphql (26 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟢 Low | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+Approximately 8 subgraph-core SDL files had types, queries, and mutations that were not reflected in the static `supergraph.graphql`, causing "Cannot query field" errors at codegen and runtime for:
+`adminUsers`, `publicProfile`, `myBadges`, `leaderboard`, `dueReviews`, `myTenantBranding`, `scimTokens`, `crmConnection`, `myPortal`, `followUser`, `exportAuditLog`, and others.
+
+### Root Cause
+
+`supergraph.graphql` is a static pre-composed file checked into the repository. Adding SDL files in `apps/subgraph-core/src/` does not automatically update the supergraph. The live composition command (`pnpm --filter @edusphere/gateway compose`) requires all 6 subgraphs to be running, which is not always available in CI or local development without the full stack.
+
+### Solution
+
+Manually added all missing types and operations from the following SDL files into `supergraph.graphql`:
+- `user.graphql` — `adminUsers`, `publicProfile`, `followUser`, `UserPublicProfile`, `AdminUserConnection`
+- `gamification.graphql` — `myBadges`, `leaderboard`, Open Badges 3.0 types (`OpenBadge`, `OpenBadgeCredential`, `issueBadge`, `revokeOpenBadge`, `myOpenBadges`, `verifyOpenBadge`)
+- `srs.graphql` — `dueReviews`, `SrsCard`, `SrsReviewInput`
+- `tenant.graphql` — `myTenantBranding`, `TenantBranding`
+- `scim.graphql` — `scimTokens`, `ScimToken`, `createScimToken`, `revokeScimToken`
+- `social.graphql` — `followUser`, `unfollowUser`, `SocialFeed`
+- `crm.graphql` — `crmConnection`, `CrmConnection`, `syncCrm`
+- `portal.graphql` — `myPortal`, `PortalConfig`, `updatePortal`
+- `audit.graphql` — `exportAuditLog`, `AuditExportFormat` enum
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/gateway/supergraph.graphql` | Added all missing types, queries, mutations from 9 SDL files |
+
+### Tests
+
+`apps/gateway/src/test/federation/admin-supergraph.spec.ts`
+
+---
+
+## ✅ IMP-003 — Add unit tests for AdminDashboardPage, AuditLogPage, AuditLogAdminPage (26 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟢 Low | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+Three admin pages had no unit tests, reducing web frontend coverage below threshold:
+- `AdminDashboardPage` — role guards and overview stats not tested
+- `AuditLogPage` — user-facing audit log filtering/pagination not tested
+- `AuditLogAdminPage` — admin-level audit log mutations and export not tested
+
+### Solution
+
+Written three test files with 30+ tests total covering:
+- Role guards (redirects non-admin users)
+- Loading state rendering
+- Error state rendering
+- Success state with data
+- Filtering (by action type, date range, user)
+- Pagination (next/previous page)
+- Mutations (export audit log, schedule GDPR erasure)
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/AdminDashboardPage.test.tsx` | New — 10+ tests for role guards, loading, error, stats display |
+| `apps/web/src/pages/AuditLogPage.test.tsx` | New — 10+ tests for filtering, pagination, loading/error states |
+| `apps/web/src/pages/AuditLogAdminPage.test.tsx` | New — 10+ tests for mutations, export, GDPR erasure, role guard |
 
 ---
 

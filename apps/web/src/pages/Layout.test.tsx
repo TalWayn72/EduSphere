@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import type { AuthUser } from '@/lib/auth';
@@ -116,5 +116,126 @@ describe('Layout', () => {
   it('renders keyboard shortcut hint ⌘K in Search button', () => {
     renderLayout();
     expect(screen.getByText('⌘K')).toBeInTheDocument();
+  });
+
+  // ── My Badges nav item ──────────────────────────────────────────────────
+
+  it('renders My Badges nav link for all users', () => {
+    renderLayout();
+    expect(screen.getByText('My Badges')).toBeInTheDocument();
+  });
+
+  // ── Admin-only compliance nav items ────────────────────────────────────
+
+  it('shows "Admin Panel" nav link for ORG_ADMIN', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    renderLayout();
+    expect(screen.getByText('Admin Panel')).toBeInTheDocument();
+  });
+
+  it('shows "LTI 1.3" nav link for ORG_ADMIN', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    renderLayout();
+    expect(screen.getByText('LTI 1.3')).toBeInTheDocument();
+  });
+
+  it('shows "Compliance" nav link for ORG_ADMIN', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    renderLayout();
+    expect(screen.getByText('Compliance')).toBeInTheDocument();
+  });
+
+  it('shows "SCIM / HRIS" nav link for ORG_ADMIN', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    renderLayout();
+    expect(screen.getByText('SCIM / HRIS')).toBeInTheDocument();
+  });
+
+  it('shows compliance nav items for SUPER_ADMIN', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'SUPER_ADMIN' });
+    renderLayout();
+    expect(screen.getByText('Admin Panel')).toBeInTheDocument();
+    expect(screen.getByText('LTI 1.3')).toBeInTheDocument();
+    expect(screen.getByText('Compliance')).toBeInTheDocument();
+  });
+
+  it('does NOT show admin compliance nav items for STUDENT', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
+    renderLayout();
+    expect(screen.queryByText('Admin Panel')).not.toBeInTheDocument();
+    expect(screen.queryByText('LTI 1.3')).not.toBeInTheDocument();
+    expect(screen.queryByText('Compliance')).not.toBeInTheDocument();
+  });
+
+  it('does NOT show admin compliance nav items for INSTRUCTOR', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(ADMIN_USER);
+    renderLayout();
+    expect(screen.queryByText('Admin Panel')).not.toBeInTheDocument();
+    expect(screen.queryByText('LTI 1.3')).not.toBeInTheDocument();
+  });
+
+  // ── Mobile hamburger menu ───────────────────────────────────────────────
+
+  it('renders mobile menu button with "Open menu" label when closed', () => {
+    renderLayout();
+    expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument();
+  });
+
+  it('opens mobile nav panel when hamburger button is clicked', () => {
+    renderLayout();
+    const hamburger = screen.getByRole('button', { name: 'Open menu' });
+    fireEvent.click(hamburger);
+    // After click, aria-label toggles to "Close menu"
+    expect(screen.getByRole('button', { name: 'Close menu' })).toBeInTheDocument();
+  });
+
+  it('shows nav links in mobile menu after opening', () => {
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    // Mobile nav shows duplicated nav links — at least 2 "Courses" links now
+    const coursesLinks = screen.getAllByText('Courses');
+    expect(coursesLinks.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows "New Course" in mobile menu for INSTRUCTOR', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(ADMIN_USER);
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    const newCourseLinks = screen.getAllByText('New Course');
+    expect(newCourseLinks.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows admin panel links in mobile menu for ORG_ADMIN', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    // Admin Panel appears twice (desktop + mobile)
+    const adminPanelLinks = screen.getAllByText('Admin Panel');
+    expect(adminPanelLinks.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows Search button in mobile menu after opening', () => {
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    // Mobile menu has its own Search button
+    const searchButtons = screen.getAllByText('Search...');
+    expect(searchButtons.length).toBeGreaterThanOrEqual(1);
+  });
+
+  // ── Keyboard shortcut ───────────────────────────────────────────────────
+
+  it('registers Ctrl+K keyboard event listener on mount', () => {
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    renderLayout();
+    expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    vi.restoreAllMocks();
+  });
+
+  it('removes keydown listener on unmount', () => {
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+    const { unmount } = renderLayout();
+    unmount();
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    vi.restoreAllMocks();
   });
 });
