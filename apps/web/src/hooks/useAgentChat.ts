@@ -12,6 +12,7 @@ import {
   useRef,
   useCallback,
   useEffect,
+  useMemo,
   useOptimistic,
   useTransition,
   type RefObject,
@@ -64,6 +65,7 @@ export interface UseAgentChatReturn {
   chatInput: string;
   setChatInput: (value: string) => void;
   sendMessage: () => void;
+  stopGeneration: () => void;
   chatEndRef: RefObject<HTMLDivElement | null>;
   isStreaming: boolean;
   isSending: boolean;
@@ -248,11 +250,25 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
     appendMockResponse,
   ]);
 
+  const stopGeneration = useCallback(() => {
+    setIsStreaming(false);
+  }, []);
+
+  // Derived display messages: append blinking cursor to the last agent message
+  // while a response is being streamed in.
+  const displayMessages = useMemo(() => {
+    if (!isStreaming || messages.length === 0) return messages;
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== 'agent') return messages;
+    return [...messages.slice(0, -1), { ...last, content: last.content + '▌' }];
+  }, [messages, isStreaming]);
+
   return {
-    messages,
+    messages: displayMessages,
     chatInput,
     setChatInput,
     sendMessage,
+    stopGeneration,
     chatEndRef,
     isStreaming,
     isSending,

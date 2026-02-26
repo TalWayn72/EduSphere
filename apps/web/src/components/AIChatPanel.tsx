@@ -42,6 +42,10 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+
+  const stopGeneration = () => {
+    setIsStreaming(false);
+  };
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mockTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -279,15 +283,27 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
               disabled={isStreaming}
               className="flex-1"
             />
-            <Button
-              onClick={() => void handleSendMessage()}
-              disabled={!inputValue.trim() || isStreaming}
-              size="icon"
-              className="shrink-0"
-              aria-label="Send message"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+            {isStreaming ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={stopGeneration}
+                className="shrink-0"
+                aria-label="Stop generation"
+              >
+                &#9632; Stop
+              </Button>
+            ) : (
+              <Button
+                onClick={() => void handleSendMessage()}
+                disabled={!inputValue.trim()}
+                size="icon"
+                className="shrink-0"
+                aria-label="Send message"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            )}
           </div>
           <p className="text-xs text-muted-foreground mt-2">
             {t('chatPanel.inputHint')}
