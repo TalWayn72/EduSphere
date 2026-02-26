@@ -227,6 +227,9 @@ const CpdSettingsPage = lazy(() =>
     default: m.CPDSettingsPage,
   }))
 );
+const LtiLaunchPage = lazy(() =>
+  import('@/pages/LtiLaunchPage').then((m) => ({ default: m.LtiLaunchPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -253,6 +256,15 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <Login />
+      </Suspense>
+    ),
+  },
+  // LTI 1.3 deep-link handler — intentionally public (not wrapped in ProtectedRoute)
+  {
+    path: '/lti/launch',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <LtiLaunchPage />
       </Suspense>
     ),
   },
