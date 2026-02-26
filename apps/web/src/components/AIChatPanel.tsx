@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMutation, useSubscription } from 'urql';
 import { cn } from '@/lib/utils';
 import { X, Send, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,9 +13,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ChatMessage } from '@/components/ChatMessage';
-import { mockChatHistory } from '@/lib/mock-chat';
 import type { AgentType, Message } from '@/types/chat';
 import { AGENT_TYPES } from '@/types/chat';
+import {
+  START_AGENT_SESSION_MUTATION,
+  SEND_AGENT_MESSAGE_MUTATION,
+  MESSAGE_STREAM_SUBSCRIPTION,
+} from '@/lib/graphql/agent.queries';
+
+const DEV_MODE = import.meta.env.DEV;
+
+const AGENT_TO_TEMPLATE: Record<AgentType, string> = {
+  chavruta: 'CHAVRUTA_DEBATE',
+  'quiz-master': 'QUIZ_ASSESS',
+  'research-scout': 'RESEARCH_SCOUT',
+  summarizer: 'SUMMARIZE',
+  explainer: 'EXPLAIN',
+};
 
 interface AIChatPanelProps {
   className?: string;
@@ -23,81 +38,129 @@ interface AIChatPanelProps {
 export function AIChatPanel({ className }: AIChatPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<AgentType>('chavruta');
-  const [messages, setMessages] = useState<Message[]>(mockChatHistory);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const outerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  );
-  const innerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  );
+  const mockTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mockStreamRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const { t } = useTranslation('agents');
 
-  // Cleanup both timeouts on unmount
+  const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
+  const [, sendMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
+  const [streamResult] = useSubscription({
+    query: MESSAGE_STREAM_SUBSCRIPTION,
+    variables: { sessionId: sessionId ?? '' },
+    pause: !sessionId || DEV_MODE,
+  });
+
+  // Cleanup mock timers on unmount
   useEffect(() => {
     return () => {
-      if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
-      if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+      if (mockTimerRef.current) clearTimeout(mockTimerRef.current);
+      if (mockStreamRef.current) clearTimeout(mockStreamRef.current);
     };
   }, []);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Handle streaming subscription results
+  useEffect(() => {
+    const msg = streamResult.data?.messageStream;
+    if (!msg) return;
+    setMessages((prev) => {
+      const exists = prev.some((m) => m.id === (msg as { id: string }).id);
+      if (exists) {
+        return prev.map((m) =>
+          m.id === (msg as { id: string }).id
+            ? { ...m, content: (msg as { content: string }).content, isStreaming: false }
+            : m
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: (msg as { id: string }).id,
+          role: 'agent' as const,
+          content: (msg as { content: string }).content,
+          timestamp: new Date((msg as { createdAt: string }).createdAt),
+          isStreaming: false,
+        },
+      ];
+    });
+    setIsStreaming(false);
+  }, [streamResult.data]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when panel opens
   useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus();
-    }
+    if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
 
-  const handleSendMessage = () => {
+  // Reset session when agent type changes
+  useEffect(() => {
+    setSessionId(null);
+    setMessages([]);
+  }, [selectedAgent]);
+
+  const handleSendMessage = async () => {
     if (!inputValue.trim() || isStreaming) return;
 
-    const userMessage: Message = {
+    const userMsg: Message = {
       id: `msg-${Date.now()}`,
       role: 'user',
       content: inputValue.trim(),
       timestamp: new Date(),
     };
-
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMsg]);
+    const text = inputValue.trim();
     setInputValue('');
     setIsStreaming(true);
 
-    // Simulate AI response with streaming
-    outerTimeoutRef.current = setTimeout(() => {
-      const agentMessage: Message = {
-        id: `msg-${Date.now()}-agent`,
-        role: 'agent',
-        content: generateMockResponse(inputValue, selectedAgent),
-        timestamp: new Date(),
-        isStreaming: true,
-      };
+    if (DEV_MODE) {
+      mockTimerRef.current = setTimeout(() => {
+        const agentMsg: Message = {
+          id: `msg-${Date.now()}-agent`,
+          role: 'agent',
+          content: generateMockResponse(text, selectedAgent),
+          timestamp: new Date(),
+          isStreaming: true,
+        };
+        setMessages((prev) => [...prev, agentMsg]);
+        mockStreamRef.current = setTimeout(() => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === agentMsg.id ? { ...m, isStreaming: false } : m))
+          );
+          setIsStreaming(false);
+        }, 1000);
+      }, 800);
+      return;
+    }
 
-      setMessages((prev) => [...prev, agentMessage]);
-
-      // End streaming after 1 second
-      innerTimeoutRef.current = setTimeout(() => {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === agentMessage.id ? { ...msg, isStreaming: false } : msg
-          )
-        );
-        setIsStreaming(false);
-      }, 1000);
-    }, 800);
+    try {
+      let sid = sessionId;
+      if (!sid) {
+        const res = await startSession({
+          templateType: AGENT_TO_TEMPLATE[selectedAgent],
+          context: {},
+        });
+        sid = (res.data?.startAgentSession as { id?: string } | undefined)?.id ?? null;
+        if (sid) setSessionId(sid);
+      }
+      if (sid) {
+        await sendMessage({ sessionId: sid, content: text });
+      }
+    } catch {
+      setIsStreaming(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      void handleSendMessage();
     }
   };
 
@@ -105,7 +168,6 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
 
   return (
     <>
-      {/* Toggle Button - Fixed position */}
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
@@ -116,7 +178,6 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
         </Button>
       )}
 
-      {/* Sliding Panel */}
       <div
         className={cn(
           'fixed top-0 right-0 h-full w-full md:w-[480px] bg-background border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col',
@@ -124,31 +185,19 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           className
         )}
       >
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-muted/30">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">{t('chatPanel.title')}</h2>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsOpen(false)}
-            className="h-8 w-8"
-          >
+          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8">
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Agent Selector */}
         <div className="p-4 border-b bg-background">
-          <label className="text-sm font-medium mb-2 block">
-            {t('selectAgent')}
-          </label>
-          <Select
-            value={selectedAgent}
-            onValueChange={(value) => setSelectedAgent(value as AgentType)}
-          >
+          <label className="text-sm font-medium mb-2 block">{t('selectAgent')}</label>
+          <Select value={selectedAgent} onValueChange={(v) => setSelectedAgent(v as AgentType)}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -170,14 +219,11 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           </Select>
         </div>
 
-        {/* Messages Container */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/10">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
               <Sparkles className="h-12 w-12 mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">
-                {t('chatPanel.startConversation')}
-              </p>
+              <p className="text-lg font-medium mb-2">{t('chatPanel.startConversation')}</p>
               <p className="text-sm max-w-xs">
                 Ask me anything about {currentAgent.name.toLowerCase()} topics!
               </p>
@@ -185,18 +231,13 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           ) : (
             <>
               {messages.map((message) => (
-                <ChatMessage
-                  key={message.id}
-                  message={message}
-                  agentName={currentAgent.name}
-                />
+                <ChatMessage key={message.id} message={message} agentName={currentAgent.name} />
               ))}
               <div ref={messagesEndRef} />
             </>
           )}
         </div>
 
-        {/* Input Area */}
         <div className="p-4 border-t bg-background">
           <div className="flex gap-2">
             <Input
@@ -209,7 +250,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
               className="flex-1"
             />
             <Button
-              onClick={handleSendMessage}
+              onClick={() => void handleSendMessage()}
               disabled={!inputValue.trim() || isStreaming}
               size="icon"
               className="shrink-0"
@@ -217,13 +258,10 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            {t('chatPanel.inputHint')}
-          </p>
+          <p className="text-xs text-muted-foreground mt-2">{t('chatPanel.inputHint')}</p>
         </div>
       </div>
 
-      {/* Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
@@ -234,17 +272,14 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
   );
 }
 
-/**
- * Generate mock AI responses based on agent type
- */
 function generateMockResponse(userInput: string, agentType: AgentType): string {
+  const preview = userInput.slice(0, 30);
   const responses: Record<AgentType, string> = {
-    chavruta: `That's an interesting point! Let me challenge your thinking: Consider the **counter-argument** from Rambam's perspective.\n\nHe would say that your assumption requires us to first define what we mean by "${userInput.slice(0, 30)}..."\n\nWhat evidence supports your position?`,
-    'quiz-master': `Great question! Let me test your understanding:\n\n**Question 1:** Based on your statement about "${userInput.slice(0, 30)}...", which philosophical concept does this most closely relate to?\n\nA) Epistemology\nB) Metaphysics\nC) Ethics\nD) Logic`,
-    'research-scout': `I found **3 relevant sources** related to "${userInput.slice(0, 30)}...":\n\n1. **Guide for the Perplexed** (Part II, Ch. 25) - Discusses similar themes\n2. **Talmud Bavli, Berachot 33b** - Related principle\n3. **Sefer HaIkkarim** - Contemporary analysis\n\nWould you like me to explain the connections?`,
-    summarizer: `Let me summarize the key points from "${userInput.slice(0, 30)}...":\n\n**Main Idea:** [Core concept]\n\n**Supporting Arguments:**\n- Point 1\n- Point 2\n- Point 3\n\n**Conclusion:** [Summary]`,
-    explainer: `Great question! Let me break down "${userInput.slice(0, 30)}..." step by step:\n\n**Step 1:** First, understand the basic definition\n**Step 2:** Consider the historical context\n**Step 3:** Examine the logical implications\n\nDoes this help clarify the concept?`,
+    chavruta: `That's an interesting point! Consider the **counter-argument** from Rambam's perspective.\n\nHe would say that your assumption about "${preview}..." requires a deeper definition first.\n\nWhat evidence supports your position?`,
+    'quiz-master': `Let me test your understanding:\n\n**Question:** Based on "${preview}...", which concept does this most closely relate to?\n\nA) Epistemology\nB) Metaphysics\nC) Ethics\nD) Logic`,
+    'research-scout': `Found **3 relevant sources** for "${preview}...":\n\n1. **Guide for the Perplexed** (Part II, Ch. 25)\n2. **Talmud Bavli, Berachot 33b**\n3. **Sefer HaIkkarim**\n\nWould you like me to explain the connections?`,
+    summarizer: `Key points from "${preview}...":\n\n**Main Idea:** Core concept\n\n**Supporting Arguments:**\n- Point 1\n- Point 2\n\n**Conclusion:** Summary`,
+    explainer: `Let me break down "${preview}..." step by step:\n\n**Step 1:** Basic definition\n**Step 2:** Historical context\n**Step 3:** Logical implications\n\nDoes this help clarify?`,
   };
-
   return responses[agentType];
 }

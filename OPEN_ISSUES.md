@@ -46,6 +46,32 @@ State initializers `roleFilter` and `appliedRole` were also `''`, and the query 
 
 ---
 
+## ✅ IMP-001 — UserManagementPage: Role Confirmation + Toast Feedback + tenantId Safety (26 Feb 2026)
+
+**Status:** ✅ Done | **Severity:** 🟡 Medium | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+Three UX/safety gaps in `/admin/users`:
+1. Role changes applied immediately to API with no confirmation — accidental clicks changed user roles
+2. No feedback (toast) on any action (reset password, deactivate, role change)
+3. `tenantId` for InviteUserModal taken from `users[0]?.tenantId` — empty string when list was empty/loading
+
+### Solution
+
+1. **Role confirmation step:** `handleRoleChange` now sets `confirmRoleChange` state. Row shows "→ NEW_ROLE? [Confirm] [Cancel]" inline. `handleConfirmRoleChange` does the actual API call and rolls back `editingRole` on error.
+2. **Toast feedback:** `import { toast } from 'sonner'` — `toast.success()` / `toast.error()` on all three mutations (deactivate, resetPassword, updateUser).
+3. **tenantId from auth:** `getCurrentUser()?.tenantId ?? ''` replaces `users[0]?.tenantId ?? ''` — always correct regardless of list state.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/UserManagementPage.tsx` | Role confirmation state + handlers + UI + toast + tenantId from auth |
+| `apps/web/src/pages/UserManagementPage.test.tsx` | Added 6 new tests covering all improvements |
+
+---
+
 ## ✅ BUG-007: Admin Panel — `Cannot query field "adminOverview" on type "Query"` (26 Feb 2026)
 
 Severity: 🔴 Critical (Admin Panel blank) | Status: ✅ Fixed | Scope: apps/gateway
