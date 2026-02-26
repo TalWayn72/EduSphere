@@ -21,3 +21,4 @@ export * from './profile.queries';
 export * from './roleplay.queries';
 export * from './crm.queries';
 export * from './library.queries';
+export * from './notifications.subscriptions';
