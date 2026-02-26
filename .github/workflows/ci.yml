@@ -244,7 +244,7 @@ jobs:
   e2e-tests:
     name: E2E Tests (Playwright — frontend only)
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60  # 37 spec files run serially; observed runtime ~44-46min
 
     steps:
       - name: Checkout repository
