@@ -10,8 +10,8 @@
     "compose": "node compose.js",
     "test": "vitest run --config tests/vitest.config.ts",
     "test:memory": "vitest run --reporter=verbose **/*.memory.spec.ts",
-    "schema:check": "hive schema:check --service gateway --url http://localhost:4000/graphql --sdl apps/gateway/supergraph.graphql",
-    "schema:publish": "hive schema:publish --service gateway --url http://localhost:4000/graphql --sdl apps/gateway/supergraph.graphql"
+    "schema:check": "hive schema:check --registry.accessToken $HIVE_TOKEN supergraph.graphql",
+    "schema:publish": "hive schema:publish --registry.accessToken $HIVE_TOKEN --commit $npm_package_version supergraph.graphql"
   },
   "dependencies": {
     "@edusphere/config": "workspace:*",
