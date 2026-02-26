@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import DataLoader from 'dataloader';
 import { ModuleService } from './module.service.js';
 
-type ModuleMapped = Awaited<
-  ReturnType<ModuleService['findByCourseIdBatch']>
-> extends Map<string, Array<infer V>>
-  ? V
-  : never;
+type ModuleMapped =
+  Awaited<ReturnType<ModuleService['findByCourseIdBatch']>> extends Map<
+    string,
+    Array<infer V>
+  >
+    ? V
+    : never;
 
 /**
  * ModuleLoader — NestJS-injectable DataLoader that batches multiple

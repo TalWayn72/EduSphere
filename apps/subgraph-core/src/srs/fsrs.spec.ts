@@ -2,11 +2,7 @@
  * Unit tests for FSRS-4.5 spaced repetition algorithm.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  computeNextReviewFSRS,
-  retrievability,
-  newFSRSCard,
-} from './fsrs';
+import { computeNextReviewFSRS, retrievability, newFSRSCard } from './fsrs';
 import type { FSRSCard } from './fsrs';
 
 describe('retrievability', () => {

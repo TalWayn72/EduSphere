@@ -1,4 +1,9 @@
-import { Injectable, Logger, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import * as crypto from 'crypto';
 import type {
@@ -54,7 +59,11 @@ export class LtiService {
    * Persist state + nonce for CSRF protection during the login flow.
    * Evicts the oldest entry when the store is full (LRU by insertion order).
    */
-  async storeState(state: string, nonce: string, loginHint: string): Promise<void> {
+  async storeState(
+    state: string,
+    nonce: string,
+    loginHint: string
+  ): Promise<void> {
     this.evictExpiredStates();
     if (this.stateStore.size >= this.MAX_STATES) {
       const oldestKey = this.stateStore.keys().next().value;
@@ -98,11 +107,7 @@ export class LtiService {
 
   // ── OIDC authentication URL builder ──────────────────────────────────────────
 
-  buildAuthUrl(
-    body: LtiLoginRequest,
-    state: string,
-    nonce: string,
-  ): string {
+  buildAuthUrl(body: LtiLoginRequest, state: string, nonce: string): string {
     const platform = this.getPlatformConfig(body.iss);
     const toolBaseUrl = process.env['TOOL_BASE_URL'] ?? 'http://localhost:4002';
     const redirectUri = `${toolBaseUrl}/lti/launch`;
@@ -138,7 +143,9 @@ export class LtiService {
     // Retrieve and consume the stored state (deletes it — one-time use)
     const storedState = await this.consumeState(state);
     if (!storedState) {
-      throw new UnauthorizedException('LTI state missing, expired, or already used');
+      throw new UnauthorizedException(
+        'LTI state missing, expired, or already used'
+      );
     }
 
     const platform = this.getPlatformConfig();
@@ -156,7 +163,9 @@ export class LtiService {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.logger.warn({ err: msg }, 'LTI id_token verification failed');
-      throw new UnauthorizedException(`LTI id_token verification failed: ${msg}`);
+      throw new UnauthorizedException(
+        `LTI id_token verification failed: ${msg}`
+      );
     }
 
     // Verify nonce (one-time use — prevents replay attacks)
@@ -165,12 +174,16 @@ export class LtiService {
     }
 
     // Verify LTI version
-    const ltiVersion = claims['https://purl.imsglobal.org/spec/lti/claim/version'];
+    const ltiVersion =
+      claims['https://purl.imsglobal.org/spec/lti/claim/version'];
     if (ltiVersion !== '1.3.0') {
       throw new BadRequestException(`Unsupported LTI version: ${ltiVersion}`);
     }
 
-    this.logger.log({ sub: claims.sub, iss: claims.iss }, 'LTI launch validated');
+    this.logger.log(
+      { sub: claims.sub, iss: claims.iss },
+      'LTI launch validated'
+    );
     return claims;
   }
 
@@ -189,9 +202,11 @@ export class LtiService {
    */
   resolveTargetUrl(claims: LtiClaims): string {
     const custom = claims['https://purl.imsglobal.org/spec/lti/claim/custom'];
-    const resourceLink = claims['https://purl.imsglobal.org/spec/lti/claim/resource_link'];
+    const resourceLink =
+      claims['https://purl.imsglobal.org/spec/lti/claim/resource_link'];
     const context = claims['https://purl.imsglobal.org/spec/lti/claim/context'];
-    const targetLinkUri = claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'];
+    const targetLinkUri =
+      claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'];
 
     if (custom?.['edusphere_content_id']) {
       return `/learn/${custom['edusphere_content_id']}`;
@@ -239,13 +254,18 @@ export class LtiService {
   getToolJwks(): Record<string, unknown> {
     const privateKeyPem = process.env['LTI_TOOL_PRIVATE_KEY'];
     if (!privateKeyPem) {
-      this.logger.warn('LTI_TOOL_PRIVATE_KEY not configured — returning empty JWKS');
+      this.logger.warn(
+        'LTI_TOOL_PRIVATE_KEY not configured — returning empty JWKS'
+      );
       return { keys: [] };
     }
     try {
       const keyObject = crypto.createPrivateKey(privateKeyPem);
       const publicKey = crypto.createPublicKey(keyObject);
-      const jwk = publicKey.export({ format: 'jwk' }) as Record<string, unknown>;
+      const jwk = publicKey.export({ format: 'jwk' }) as Record<
+        string,
+        unknown
+      >;
       // Add key metadata required by LTI spec
       jwk['use'] = 'sig';
       jwk['alg'] = 'RS256';
@@ -274,24 +294,26 @@ export class LtiService {
   async getPlatforms(tenantId: string): Promise<LtiPlatformDto[]> {
     const cfg = this.getPlatformConfig();
     if (!cfg.issuer) return [];
-    return [{
-      id: `env-${tenantId}`,
-      tenantId,
-      platformName: 'LMS Platform',
-      platformUrl: cfg.issuer,
-      clientId: cfg.clientId,
-      authLoginUrl: cfg.authEndpoint,
-      authTokenUrl: cfg.authEndpoint,
-      keySetUrl: cfg.jwksUri,
-      deploymentId: process.env['LTI_DEPLOYMENT_ID'] ?? '',
-      isActive: true,
-    }];
+    return [
+      {
+        id: `env-${tenantId}`,
+        tenantId,
+        platformName: 'LMS Platform',
+        platformUrl: cfg.issuer,
+        clientId: cfg.clientId,
+        authLoginUrl: cfg.authEndpoint,
+        authTokenUrl: cfg.authEndpoint,
+        keySetUrl: cfg.jwksUri,
+        deploymentId: process.env['LTI_DEPLOYMENT_ID'] ?? '',
+        isActive: true,
+      },
+    ];
   }
 
   /** Registers an LTI platform (stored in env for single-tenant; use DB for multi-tenant). */
   async registerPlatform(
     tenantId: string,
-    input: RegisterLtiPlatformInput,
+    input: RegisterLtiPlatformInput
   ): Promise<LtiPlatformDto> {
     return {
       id: `env-${tenantId}-${Date.now()}`,
@@ -305,7 +327,7 @@ export class LtiService {
   async togglePlatform(
     id: string,
     tenantId: string,
-    isActive: boolean,
+    isActive: boolean
   ): Promise<LtiPlatformDto> {
     const platforms = await this.getPlatforms(tenantId);
     const platform = platforms[0];

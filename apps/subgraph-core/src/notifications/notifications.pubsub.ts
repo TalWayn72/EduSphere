@@ -9,12 +9,16 @@ import type { Notification } from './nats-notification.bridge';
  */
 export type NotificationPubSub = ReturnType<
   typeof createPubSub<{
-    [key: `notificationReceived.${string}`]: [{ notificationReceived: Notification }];
+    [key: `notificationReceived.${string}`]: [
+      { notificationReceived: Notification },
+    ];
   }>
 >;
 
 export const notificationPubSub: NotificationPubSub = createPubSub<{
-  [key: `notificationReceived.${string}`]: [{ notificationReceived: Notification }];
+  [key: `notificationReceived.${string}`]: [
+    { notificationReceived: Notification },
+  ];
 }>();
 
 export const NOTIFICATION_PUB_SUB = Symbol('NOTIFICATION_PUB_SUB');

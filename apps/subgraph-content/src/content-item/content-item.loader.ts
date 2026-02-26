@@ -43,8 +43,7 @@ export class ContentItemLoader {
         // DataLoader requires results in the SAME ORDER as the input keys
         return ids.map(
           (id) =>
-            batchMap.get(id) ??
-            new Error(`ContentItem with ID ${id} not found`)
+            batchMap.get(id) ?? new Error(`ContentItem with ID ${id} not found`)
         );
       },
       { cache: false } // Disable per-request caching — NestJS DI handles scope

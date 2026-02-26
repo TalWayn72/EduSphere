@@ -92,10 +92,7 @@ export class ModuleService implements OnModuleDestroy {
   ): Promise<Map<string, ReturnType<typeof this.mapModule>>> {
     if (ids.length === 0) return new Map();
     const rows = await withReadReplica((db) =>
-      db
-        .select()
-        .from(schema.modules)
-        .where(inArray(schema.modules.id, ids))
+      db.select().from(schema.modules).where(inArray(schema.modules.id, ids))
     );
     const result = new Map<string, ReturnType<typeof this.mapModule>>();
     for (const row of rows) {

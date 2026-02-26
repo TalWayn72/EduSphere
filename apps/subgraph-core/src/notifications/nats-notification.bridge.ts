@@ -35,27 +35,35 @@ export interface Notification {
 /** Map NATS subjects to notification types and human-readable titles. */
 const SUBJECT_MAP: Record<
   string,
-  { type: NotificationType; title: (raw: Record<string, unknown>) => string; body: (raw: Record<string, unknown>) => string }
+  {
+    type: NotificationType;
+    title: (raw: Record<string, unknown>) => string;
+    body: (raw: Record<string, unknown>) => string;
+  }
 > = {
   'badge.issued': {
     type: 'BADGE_ISSUED',
     title: () => 'New Badge Earned!',
-    body: (raw) => `You earned a new badge: ${String(raw['badgeName'] ?? 'Achievement')}.`,
+    body: (raw) =>
+      `You earned a new badge: ${String(raw['badgeName'] ?? 'Achievement')}.`,
   },
   'course.enrolled': {
     type: 'COURSE_ENROLLED',
     title: () => 'Course Enrollment',
-    body: (raw) => `You have been enrolled in ${String(raw['courseName'] ?? 'a new course')}.`,
+    body: (raw) =>
+      `You have been enrolled in ${String(raw['courseName'] ?? 'a new course')}.`,
   },
   'user.followed': {
     type: 'USER_FOLLOWED',
     title: () => 'New Follower',
-    body: (raw) => `${String(raw['followerName'] ?? 'Someone')} started following you.`,
+    body: (raw) =>
+      `${String(raw['followerName'] ?? 'Someone')} started following you.`,
   },
   'srs.review.due': {
     type: 'SRS_REVIEW_DUE',
     title: () => 'Review Due',
-    body: (raw) => `You have ${String(raw['cardCount'] ?? 'some')} cards ready for review.`,
+    body: (raw) =>
+      `You have ${String(raw['cardCount'] ?? 'some')} cards ready for review.`,
   },
 };
 
@@ -88,7 +96,10 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
       this.logger.log('NatsNotificationBridge connected to NATS');
       await this.registerSubscriptions();
     } catch (err) {
-      this.logger.error('Failed to connect NatsNotificationBridge to NATS', err);
+      this.logger.error(
+        'Failed to connect NatsNotificationBridge to NATS',
+        err
+      );
     }
   }
 
@@ -123,18 +134,23 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
 
   private async processMessages(
     subject: string,
-    sub: Subscription,
+    sub: Subscription
   ): Promise<void> {
     const mapping = SUBJECT_MAP[subject];
     if (!mapping) return;
 
     for await (const msg of sub) {
       try {
-        const raw = JSON.parse(this.sc.decode(msg.data)) as Record<string, unknown>;
+        const raw = JSON.parse(this.sc.decode(msg.data)) as Record<
+          string,
+          unknown
+        >;
         const userId = String(raw['userId'] ?? '');
 
         if (!userId) {
-          this.logger.warn(`Received ${subject} event without userId — skipping`);
+          this.logger.warn(
+            `Received ${subject} event without userId — skipping`
+          );
           continue;
         }
 
@@ -154,7 +170,7 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
         });
 
         this.logger.debug(
-          `Published notification ${notification.type} for user ${userId}`,
+          `Published notification ${notification.type} for user ${userId}`
         );
       } catch (err) {
         this.logger.error(`Error processing NATS message on ${subject}`, err);

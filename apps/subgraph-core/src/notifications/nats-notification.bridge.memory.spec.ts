@@ -127,7 +127,7 @@ describe('NatsNotificationBridge — memory leak / subscription tracking', () =>
       // Each registered NATS sub's unsubscribe should be called exactly once.
       const totalCalls = mockUnsubscribeFns.reduce(
         (acc, fn) => acc + fn.mock.calls.length,
-        0,
+        0
       );
       expect(totalCalls).toBe(WATCHED_SUBJECT_COUNT);
     });
@@ -184,7 +184,7 @@ describe('NatsNotificationBridge — memory leak / subscription tracking', () =>
 
       const totalCalls = mockUnsubscribeFns.reduce(
         (acc, fn) => acc + fn.mock.calls.length,
-        0,
+        0
       );
       expect(totalCalls).toBe(0);
     });

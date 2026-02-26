@@ -23,23 +23,25 @@ export class NotificationsResolver {
    * notification stream.
    */
   @Subscription('notificationReceived', {
-    filter: (
-      payload: NotificationPayload,
-      variables: { userId: string },
-    ) => payload.notificationReceived.userId === variables.userId,
+    filter: (payload: NotificationPayload, variables: { userId: string }) =>
+      payload.notificationReceived.userId === variables.userId,
   })
   notificationReceived(
     @Args('userId') userId: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const authUserId = context.authContext?.userId;
 
     if (!authUserId) {
-      throw new UnauthorizedException('Authentication required for notifications subscription');
+      throw new UnauthorizedException(
+        'Authentication required for notifications subscription'
+      );
     }
 
     if (authUserId !== userId) {
-      throw new UnauthorizedException('Cannot subscribe to another user\'s notifications');
+      throw new UnauthorizedException(
+        "Cannot subscribe to another user's notifications"
+      );
     }
 
     return notificationPubSub.subscribe(`notificationReceived.${userId}`);

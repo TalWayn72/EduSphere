@@ -75,12 +75,18 @@ describe('LtiService memory safety', () => {
     const service = new LtiService();
 
     const stateStore = (
-      service as unknown as { stateStore: Map<string, { payload: unknown; expiresAt: number }> }
+      service as unknown as {
+        stateStore: Map<string, { payload: unknown; expiresAt: number }>;
+      }
     ).stateStore;
 
     // Manually insert an already-expired entry.
     stateStore.set('expired-state', {
-      payload: { nonce: 'n', loginHint: 'h', createdAt: new Date().toISOString() },
+      payload: {
+        nonce: 'n',
+        loginHint: 'h',
+        createdAt: new Date().toISOString(),
+      },
       expiresAt: Date.now() - 1,
     });
 
@@ -100,7 +106,7 @@ describe('LtiService memory safety', () => {
     const service = new LtiService();
 
     expect(
-      typeof (service as unknown as Record<string, unknown>)['onModuleDestroy'],
+      typeof (service as unknown as Record<string, unknown>)['onModuleDestroy']
     ).toBe('undefined');
   });
 

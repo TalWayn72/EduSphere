@@ -130,7 +130,10 @@ export class GamificationResolver {
       issuedAt: assertion.issuedAt.toISOString(),
       expiresAt: assertion.expiresAt?.toISOString() ?? null,
       revokedAt: assertion.revokedAt?.toISOString() ?? null,
-      definition: { ...definition, createdAt: definition.createdAt.toISOString() },
+      definition: {
+        ...definition,
+        createdAt: definition.createdAt.toISOString(),
+      },
       vcDocument: JSON.stringify({ ...assertion, proof: assertion.proof }),
     };
   }
@@ -142,6 +145,10 @@ export class GamificationResolver {
     @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.requireAuth(ctx);
-    return this.openBadgesService.revokeOpenBadge(assertionId, tenantId, reason);
+    return this.openBadgesService.revokeOpenBadge(
+      assertionId,
+      tenantId,
+      reason
+    );
   }
 }

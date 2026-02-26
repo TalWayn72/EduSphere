@@ -12,7 +12,7 @@ let supergraph: string;
 beforeAll(() => {
   supergraph = readFileSync(
     join(__dirname, '../../../supergraph.graphql'),
-    'utf8',
+    'utf8'
   );
 });
 
@@ -41,7 +41,7 @@ describe('supergraph — admin types present (BUG-007 regression)', () => {
     'mySecuritySettings',
   ])('Query.%s is routed to CORE subgraph', (field) => {
     expect(supergraph).toMatch(
-      new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`),
+      new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`)
     );
   });
 
@@ -58,7 +58,7 @@ describe('supergraph — admin types present (BUG-007 regression)', () => {
     'updateSecuritySettings',
   ])('Mutation.%s is routed to CORE subgraph', (field) => {
     expect(supergraph).toMatch(
-      new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`),
+      new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`)
     );
   });
 

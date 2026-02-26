@@ -59,7 +59,10 @@ const makeDbGroup = (overrides: Record<string, unknown> = {}) => ({
 
 describe('ScimGroupService', () => {
   let service: ScimGroupService;
-  let mockNats: { drain: ReturnType<typeof vi.fn>; publish: ReturnType<typeof vi.fn> };
+  let mockNats: {
+    drain: ReturnType<typeof vi.fn>;
+    publish: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -69,7 +72,9 @@ describe('ScimGroupService', () => {
       publish: vi.fn(),
     };
     vi.mocked(connect).mockResolvedValue(
-      mockNats as Parameters<typeof connect>[0] extends infer _T ? unknown : never
+      mockNats as Parameters<typeof connect>[0] extends infer _T
+        ? unknown
+        : never
     );
 
     service = new ScimGroupService();
@@ -142,10 +147,14 @@ describe('ScimGroupService', () => {
         'urn:edusphere:scim:extension': { courseIds: ['course-a'] },
       });
 
-      expect(result.schemas).toEqual(['urn:ietf:params:scim:schemas:core:2.0:Group']);
+      expect(result.schemas).toEqual([
+        'urn:ietf:params:scim:schemas:core:2.0:Group',
+      ]);
       expect(result.displayName).toBe('Engineering');
       expect(result.members).toHaveLength(2);
-      expect(result['urn:edusphere:scim:extension']?.courseIds).toEqual(['course-a']);
+      expect(result['urn:edusphere:scim:extension']?.courseIds).toEqual([
+        'course-a',
+      ]);
     });
 
     it('emits NATS enrollment event when courseIds + members present', async () => {
@@ -383,7 +392,9 @@ describe('ScimGroupService', () => {
 
     it('sets nats to null after drain preventing double-drain', async () => {
       await service.onModuleDestroy();
-      const privateNats = (service as unknown as Record<string, unknown>)['nats'];
+      const privateNats = (service as unknown as Record<string, unknown>)[
+        'nats'
+      ];
       expect(privateNats).toBeNull();
     });
   });

@@ -34,9 +34,7 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
-  withReadReplica: vi.fn(
-    (fn: (db: typeof mockDb) => unknown) => fn(mockDb)
-  ),
+  withReadReplica: vi.fn((fn: (db: typeof mockDb) => unknown) => fn(mockDb)),
   schema: {
     contentItems: {
       id: 'id',

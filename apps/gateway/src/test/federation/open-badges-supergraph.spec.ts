@@ -21,7 +21,7 @@ let supergraph: string;
 beforeAll(() => {
   supergraph = readFileSync(
     join(__dirname, '../../../supergraph.graphql'),
-    'utf8',
+    'utf8'
   );
 });
 
@@ -30,25 +30,25 @@ describe('supergraph — Open Badges 3.0 types present (BUG-026 regression)', ()
     'object type %s is defined with @join__type(graph: CORE)',
     (typeName) => {
       expect(supergraph).toContain(`type ${typeName} @join__type(graph: CORE)`);
-    },
+    }
   );
 
   it.each(['myOpenBadges', 'verifyOpenBadge'])(
     'Query.%s is routed to CORE subgraph',
     (field) => {
       expect(supergraph).toMatch(
-        new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`),
+        new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`)
       );
-    },
+    }
   );
 
   it.each(['issueBadge', 'revokeOpenBadge'])(
     'Mutation.%s is routed to CORE subgraph',
     (field) => {
       expect(supergraph).toMatch(
-        new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`),
+        new RegExp(`${field}[^}]*@join__field\\(graph: CORE\\)`)
       );
-    },
+    }
   );
 
   it('OpenBadgeAssertion has required fields', () => {
@@ -72,7 +72,13 @@ describe('supergraph — Open Badges 3.0 types present (BUG-026 regression)', ()
     const idx = supergraph.indexOf('type OpenBadgeDefinition');
     expect(idx).toBeGreaterThan(0);
     const block = supergraph.slice(idx, supergraph.indexOf('}', idx) + 1);
-    for (const field of ['id', 'name', 'description', 'issuerId', 'createdAt']) {
+    for (const field of [
+      'id',
+      'name',
+      'description',
+      'issuerId',
+      'createdAt',
+    ]) {
       expect(block).toContain(field);
     }
   });
@@ -85,9 +91,9 @@ describe('supergraph — Open Badges backed by core subgraph SDL', () => {
     coreGamificationSDL = readFileSync(
       join(
         __dirname,
-        '../../../../subgraph-core/src/gamification/gamification.graphql',
+        '../../../../subgraph-core/src/gamification/gamification.graphql'
       ),
-      'utf8',
+      'utf8'
     );
   });
 

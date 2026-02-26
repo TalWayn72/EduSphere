@@ -40,7 +40,7 @@ export class LtiController {
   @HttpCode(HttpStatus.FOUND)
   async initiateLogin(
     @Body() body: LtiLoginRequest,
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     this.logger.log({ iss: body.iss }, 'LTI login initiation received');
 
@@ -72,18 +72,25 @@ export class LtiController {
   @HttpCode(HttpStatus.FOUND)
   async handleLaunch(
     @Body() body: LtiLaunchRequest,
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     this.logger.log('LTI launch received');
 
-    const claims = await this.ltiService.validateLaunch(body.id_token, body.state);
+    const claims = await this.ltiService.validateLaunch(
+      body.id_token,
+      body.state
+    );
     const sessionToken = this.ltiService.createSession(claims);
     const targetPath = this.ltiService.resolveTargetUrl(claims);
 
-    const frontendBase = process.env['TOOL_BASE_URL'] ?? 'http://localhost:5173';
+    const frontendBase =
+      process.env['TOOL_BASE_URL'] ?? 'http://localhost:5173';
     const redirectUrl = `${frontendBase}/lti/launch?lti_token=${sessionToken}&target=${encodeURIComponent(targetPath)}`;
 
-    this.logger.log({ sub: claims.sub, targetPath }, 'LTI launch successful — redirecting');
+    this.logger.log(
+      { sub: claims.sub, targetPath },
+      'LTI launch successful — redirecting'
+    );
     res.redirect(redirectUrl);
   }
 

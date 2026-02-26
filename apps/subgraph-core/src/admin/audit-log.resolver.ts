@@ -55,7 +55,10 @@ export class AuditLogResolver {
     @Context() ctx: GraphQLContext
   ): Promise<boolean> {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
-    await this.auditLogService.scheduleGdprErasure(userId, ctx.authContext.tenantId ?? '');
+    await this.auditLogService.scheduleGdprErasure(
+      userId,
+      ctx.authContext.tenantId ?? ''
+    );
     return true;
   }
 }

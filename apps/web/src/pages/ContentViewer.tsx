@@ -143,10 +143,11 @@ export function ContentViewer() {
   const [liveSessionResult] = useQuery({
     query: LIVE_SESSION_QUERY,
     variables: { contentItemId: contentId },
+    pause: true, // liveSession not yet in supergraph — BUG-027
   });
   const liveSession = liveSessionResult.data?.liveSession ?? null;
   // ── Scenario node (SCENARIO content type) ──
-  const { scenarioNode } = useScenarioNode(contentId, true);
+  const { scenarioNode } = useScenarioNode(contentId, false); // scenarioNode not yet in supergraph — BUG-027
 
   // ── Seek callback (from transcript click / ?t= param) ──
   const seekTo = useCallback((time: number) => {

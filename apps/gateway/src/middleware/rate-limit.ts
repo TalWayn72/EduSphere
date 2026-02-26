@@ -30,7 +30,8 @@ export const MAX_REQUESTS = parseInt(
 );
 
 export const PREMIUM_MAX_REQUESTS = parseInt(
-  process.env['RATE_LIMIT_PREMIUM_MAX'] ?? String(RATE_LIMIT_PREMIUM_MAX_REQUESTS),
+  process.env['RATE_LIMIT_PREMIUM_MAX'] ??
+    String(RATE_LIMIT_PREMIUM_MAX_REQUESTS),
   10
 );
 

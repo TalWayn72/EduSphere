@@ -7,7 +7,12 @@ import { ScimResolver } from './scim.resolver.js';
 
 @Module({
   controllers: [ScimController],
-  providers: [ScimTokenService, ScimUserService, ScimGroupService, ScimResolver],
+  providers: [
+    ScimTokenService,
+    ScimUserService,
+    ScimGroupService,
+    ScimResolver,
+  ],
   exports: [ScimTokenService],
 })
 export class ScimModule {}

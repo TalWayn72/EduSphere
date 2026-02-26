@@ -37,7 +37,11 @@ const MOCK_COURSE = {
   title: 'Introduction to GraphQL',
   description: 'Learn GraphQL from scratch.',
   modules: [
-    { id: 'm1', title: 'Getting Started', contentItems: [{ id: 'ci1', title: 'Basics', type: 'READING' }] },
+    {
+      id: 'm1',
+      title: 'Getting Started',
+      contentItems: [{ id: 'ci1', title: 'Basics', type: 'READING' }],
+    },
     { id: 'm2', title: 'Advanced Topics', contentItems: [] },
   ],
 };
@@ -49,7 +53,11 @@ beforeEach(() => {
 
 describe('CourseViewerScreen', () => {
   it('renders course title when data is loaded', () => {
-    mockUseQuery.mockReturnValue({ data: { course: MOCK_COURSE }, loading: false, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: { course: MOCK_COURSE },
+      loading: false,
+      error: undefined,
+    });
 
     const { getByTestId } = render(
       <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
@@ -60,7 +68,11 @@ describe('CourseViewerScreen', () => {
   });
 
   it('renders module list', () => {
-    mockUseQuery.mockReturnValue({ data: { course: MOCK_COURSE }, loading: false, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: { course: MOCK_COURSE },
+      loading: false,
+      error: undefined,
+    });
 
     const { getByTestId } = render(
       <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
@@ -72,7 +84,11 @@ describe('CourseViewerScreen', () => {
   });
 
   it('shows loading state', () => {
-    mockUseQuery.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
 
     const { getByType } = render(
       <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
@@ -84,7 +100,11 @@ describe('CourseViewerScreen', () => {
 
   it('shows offline indicator when offline', () => {
     mockUseNetInfo.mockReturnValue({ isConnected: false });
-    mockUseQuery.mockReturnValue({ data: { course: MOCK_COURSE }, loading: false, error: undefined });
+    mockUseQuery.mockReturnValue({
+      data: { course: MOCK_COURSE },
+      loading: false,
+      error: undefined,
+    });
 
     const { getByTestId } = render(
       <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />

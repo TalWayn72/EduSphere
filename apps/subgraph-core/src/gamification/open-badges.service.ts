@@ -119,7 +119,10 @@ export class OpenBadgesService {
     }>
   > {
     const rows = await db
-      .select({ assertion: openBadgeAssertions, definition: openBadgeDefinitions })
+      .select({
+        assertion: openBadgeAssertions,
+        definition: openBadgeDefinitions,
+      })
       .from(openBadgeAssertions)
       .innerJoin(
         openBadgeDefinitions,

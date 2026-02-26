@@ -23,8 +23,8 @@ const mocks = vi.hoisted(() => {
   const mockWriteDb = { insert: mockInsert, update: mockUpdate };
 
   // withReadReplica — default impl returns empty array; tests override per-call
-  const withReadReplicaMock = vi.fn(
-    (_fn: (db: unknown) => unknown) => Promise.resolve([])
+  const withReadReplicaMock = vi.fn((_fn: (db: unknown) => unknown) =>
+    Promise.resolve([])
   );
 
   return {

@@ -56,7 +56,9 @@ export default function AIChatScreen({ route }: Props) {
     setIsTyping(true);
 
     try {
-      const result = await sendMessage({ variables: { sessionId, content: text } });
+      const result = await sendMessage({
+        variables: { sessionId, content: text },
+      });
       const aiMsg = result.data?.sendMessage as ChatMessage | undefined;
       if (aiMsg) {
         setMessages((prev) => [...prev, aiMsg]);
@@ -82,7 +84,9 @@ export default function AIChatScreen({ route }: Props) {
           renderItem={({ item }) => <MessageBubble message={item} />}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={<EmptyChat />}
-          onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
+          onContentSizeChange={() =>
+            listRef.current?.scrollToEnd({ animated: false })
+          }
         />
 
         {isTyping && (
@@ -104,7 +108,10 @@ export default function AIChatScreen({ route }: Props) {
             editable={!isTyping}
           />
           <TouchableOpacity
-            style={[styles.sendBtn, (!input.trim() || isTyping) && styles.sendBtnDisabled]}
+            style={[
+              styles.sendBtn,
+              (!input.trim() || isTyping) && styles.sendBtnDisabled,
+            ]}
             onPress={handleSend}
             disabled={!input.trim() || isTyping}
             accessibilityRole="button"
@@ -121,13 +128,23 @@ export default function AIChatScreen({ route }: Props) {
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'USER';
   return (
-    <View style={[styles.bubbleWrapper, isUser ? styles.wrapperRight : styles.wrapperLeft]}>
-      <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAI]}>
+    <View
+      style={[
+        styles.bubbleWrapper,
+        isUser ? styles.wrapperRight : styles.wrapperLeft,
+      ]}
+    >
+      <View
+        style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAI]}
+      >
         <Text style={[styles.bubbleText, isUser && styles.bubbleTextUser]}>
           {message.content}
         </Text>
         <Text style={[styles.bubbleTime, isUser && styles.bubbleTimeUser]}>
-          {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(message.createdAt).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
         </Text>
       </View>
     </View>
@@ -139,7 +156,9 @@ function EmptyChat() {
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyIcon}>🤖</Text>
       <Text style={styles.emptyTitle}>AI Assistant</Text>
-      <Text style={styles.emptySubtitle}>Start a conversation to get help with your studies.</Text>
+      <Text style={styles.emptySubtitle}>
+        Start a conversation to get help with your studies.
+      </Text>
     </View>
   );
 }
@@ -153,7 +172,14 @@ const styles = StyleSheet.create({
   bubbleWrapper: { maxWidth: '78%' },
   bubble: { borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10 },
   bubbleUser: { backgroundColor: '#2563EB', borderBottomRightRadius: 4 },
-  bubbleAI: { backgroundColor: '#fff', borderBottomLeftRadius: 4, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  bubbleAI: {
+    backgroundColor: '#fff',
+    borderBottomLeftRadius: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
   bubbleText: { fontSize: 15, color: '#111827', lineHeight: 21 },
   bubbleTextUser: { color: '#fff' },
   bubbleTime: { fontSize: 11, color: '#9CA3AF', marginTop: 4 },
@@ -195,8 +221,23 @@ const styles = StyleSheet.create({
   },
   sendBtnDisabled: { backgroundColor: '#93C5FD' },
   sendBtnText: { color: '#fff', fontWeight: '600', fontSize: 15 },
-  emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 80,
+  },
   emptyIcon: { fontSize: 56, marginBottom: 16 },
-  emptyTitle: { fontSize: 20, fontWeight: '700', color: '#111827', marginBottom: 8 },
-  emptySubtitle: { fontSize: 14, color: '#6B7280', textAlign: 'center', paddingHorizontal: 32 },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
 });

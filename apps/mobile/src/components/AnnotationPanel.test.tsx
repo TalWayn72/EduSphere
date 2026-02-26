@@ -23,8 +23,18 @@ vi.mock('@react-native-community/netinfo', () => ({
 import AnnotationPanel from './AnnotationPanel';
 
 const ANNOTATIONS = [
-  { id: 'a1', text: 'Great point here', createdAt: '2025-01-01T00:00:00Z', author: { displayName: 'Alice' } },
-  { id: 'a2', text: 'Need to revisit', createdAt: '2025-01-02T00:00:00Z', author: { displayName: 'Bob' } },
+  {
+    id: 'a1',
+    text: 'Great point here',
+    createdAt: '2025-01-01T00:00:00Z',
+    author: { displayName: 'Alice' },
+  },
+  {
+    id: 'a2',
+    text: 'Need to revisit',
+    createdAt: '2025-01-02T00:00:00Z',
+    author: { displayName: 'Bob' },
+  },
 ];
 
 const mockMutateFn = vi.fn().mockResolvedValue({ data: {} });
@@ -32,7 +42,10 @@ const mockMutateFn = vi.fn().mockResolvedValue({ data: {} });
 beforeEach(() => {
   vi.clearAllMocks();
   mockUseNetInfo.mockReturnValue({ isConnected: true });
-  mockUseQuery.mockReturnValue({ data: { annotations: ANNOTATIONS }, loading: false });
+  mockUseQuery.mockReturnValue({
+    data: { annotations: ANNOTATIONS },
+    loading: false,
+  });
   mockUseMutation.mockReturnValue([mockMutateFn, { loading: false }]);
 });
 

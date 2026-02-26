@@ -52,6 +52,7 @@ export function useCourseNavigation(contentId: string): CourseNavContext {
     query: COURSE_DETAIL_QUERY,
     variables: { id: courseIdHint },
     pause: !courseIdHint,
+    requestPolicy: 'network-only', // avoid synchronous cache read that triggers setState-during-render
   });
 
   const course = courseResult.data?.course;

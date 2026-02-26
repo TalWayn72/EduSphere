@@ -35,7 +35,9 @@ let mockMutateFn: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockMutateFn = vi.fn().mockResolvedValue({ data: { sendMessage: AI_RESPONSE } });
+  mockMutateFn = vi
+    .fn()
+    .mockResolvedValue({ data: { sendMessage: AI_RESPONSE } });
   mockUseMutation.mockReturnValue([mockMutateFn, { loading: false }]);
 });
 
@@ -83,7 +85,9 @@ describe('AIChatScreen', () => {
   it('typing indicator shows during loading', async () => {
     // Mutation that doesn't resolve immediately
     let resolveMutation: (v: unknown) => void;
-    const pendingPromise = new Promise((resolve) => { resolveMutation = resolve; });
+    const pendingPromise = new Promise((resolve) => {
+      resolveMutation = resolve;
+    });
     mockMutateFn = vi.fn().mockReturnValue(pendingPromise);
     mockUseMutation.mockReturnValue([mockMutateFn, { loading: false }]);
 

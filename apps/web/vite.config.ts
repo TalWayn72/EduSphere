@@ -109,8 +109,7 @@ export default defineConfig({
           )
             return 'vendor-graphql';
           // TanStack (Query + Table + Virtual) — used on Admin + Analytics pages
-          if (id.includes('node_modules/@tanstack/'))
-            return 'vendor-tanstack';
+          if (id.includes('node_modules/@tanstack/')) return 'vendor-tanstack';
           // Zod + react-hook-form — form validation across many pages
           if (
             id.includes('node_modules/zod') ||

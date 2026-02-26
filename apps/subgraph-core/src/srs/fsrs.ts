@@ -49,10 +49,7 @@ const FACTOR = Math.pow(RETRIEVABILITY_TARGET, 1 / DECAY) - 1; // ≈ 0.1111
  * Formula: R(t, S) = (1 + t / (9 * S)) ^ -1
  * Equivalent to the power-law forgetting curve from the FSRS spec.
  */
-export function retrievability(
-  elapsedDays: number,
-  stability: number
-): number {
+export function retrievability(elapsedDays: number, stability: number): number {
   if (stability <= 0) return 0;
   return Math.pow(1 + elapsedDays / (9 * stability), -1);
 }
@@ -64,7 +61,8 @@ export function retrievability(
  * Formula: I(S) = S / FACTOR * (R_target^(1/DECAY) - 1)
  */
 function nextInterval(stability: number): number {
-  const interval = (stability / FACTOR) * (Math.pow(RETRIEVABILITY_TARGET, 1 / DECAY) - 1);
+  const interval =
+    (stability / FACTOR) * (Math.pow(RETRIEVABILITY_TARGET, 1 / DECAY) - 1);
   return Math.max(1, Math.round(interval));
 }
 

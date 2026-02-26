@@ -23,10 +23,14 @@ function makeClaims(overrides: Partial<LtiClaims> = {}): LtiClaims {
     iat: Math.floor(Date.now() / 1000),
     nonce: 'test-nonce',
     'https://purl.imsglobal.org/spec/lti/claim/version': '1.3.0',
-    'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',
+    'https://purl.imsglobal.org/spec/lti/claim/message_type':
+      'LtiResourceLinkRequest',
     'https://purl.imsglobal.org/spec/lti/claim/deployment_id': 'deploy-1',
-    'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://tool.example.com/launch',
-    'https://purl.imsglobal.org/spec/lti/claim/resource_link': { id: 'resource-99' },
+    'https://purl.imsglobal.org/spec/lti/claim/target_link_uri':
+      'https://tool.example.com/launch',
+    'https://purl.imsglobal.org/spec/lti/claim/resource_link': {
+      id: 'resource-99',
+    },
     'https://purl.imsglobal.org/spec/lti/claim/roles': [
       'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
     ],
@@ -44,8 +48,10 @@ describe('LtiService', () => {
     // Reset env vars before each test
     process.env['LTI_PLATFORM_ISSUER'] = 'https://canvas.instructure.com';
     process.env['LTI_PLATFORM_CLIENT_ID'] = 'client-abc';
-    process.env['LTI_PLATFORM_AUTH_ENDPOINT'] = 'https://canvas.instructure.com/api/lti/authorize_redirect';
-    process.env['LTI_PLATFORM_JWKS_URL'] = 'https://canvas.instructure.com/api/lti/security/jwks';
+    process.env['LTI_PLATFORM_AUTH_ENDPOINT'] =
+      'https://canvas.instructure.com/api/lti/authorize_redirect';
+    process.env['LTI_PLATFORM_JWKS_URL'] =
+      'https://canvas.instructure.com/api/lti/security/jwks';
     process.env['TOOL_BASE_URL'] = 'http://localhost:4002';
   });
 
@@ -96,7 +102,9 @@ describe('LtiService', () => {
 
     it('builds URL pointing to the platform auth endpoint', () => {
       const url = service.buildAuthUrl(loginBody, 'state-x', 'nonce-x');
-      expect(url).toContain('https://canvas.instructure.com/api/lti/authorize_redirect');
+      expect(url).toContain(
+        'https://canvas.instructure.com/api/lti/authorize_redirect'
+      );
     });
 
     it('includes required OIDC params: scope=openid', () => {
@@ -123,7 +131,7 @@ describe('LtiService', () => {
       const url = service.buildAuthUrl(
         { ...loginBody, client_id: 'override-id' },
         'state-x',
-        'nonce-x',
+        'nonce-x'
       );
       expect(url).toContain('client_id=override-id');
     });
@@ -136,14 +144,16 @@ describe('LtiService', () => {
 
     it('includes redirect_uri pointing to /lti/launch', () => {
       const url = service.buildAuthUrl(loginBody, 'state-x', 'nonce-x');
-      expect(url).toContain(encodeURIComponent('http://localhost:4002/lti/launch'));
+      expect(url).toContain(
+        encodeURIComponent('http://localhost:4002/lti/launch')
+      );
     });
 
     it('appends lti_message_hint when provided', () => {
       const url = service.buildAuthUrl(
         { ...loginBody, lti_message_hint: 'msg-hint' },
         'state-x',
-        'nonce-x',
+        'nonce-x'
       );
       expect(url).toContain('lti_message_hint=msg-hint');
     });
@@ -153,8 +163,8 @@ describe('LtiService', () => {
         service.buildAuthUrl(
           { ...loginBody, iss: 'https://unknown.lms.example.com' },
           'state-x',
-          'nonce-x',
-        ),
+          'nonce-x'
+        )
       ).toThrow(UnauthorizedException);
     });
   });
@@ -180,22 +190,24 @@ describe('LtiService', () => {
       await service.validateLaunch('token', 'state-jwks');
 
       expect(createRemoteJWKSet).toHaveBeenCalledWith(
-        new URL('https://canvas.instructure.com/api/lti/security/jwks'),
+        new URL('https://canvas.instructure.com/api/lti/security/jwks')
       );
     });
 
     it('throws UnauthorizedException when state is missing', async () => {
       await expect(
-        service.validateLaunch('token', 'nonexistent-state'),
+        service.validateLaunch('token', 'nonexistent-state')
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when JWT verification fails', async () => {
-      vi.mocked(jwtVerify).mockRejectedValueOnce(new Error('signature invalid'));
+      vi.mocked(jwtVerify).mockRejectedValueOnce(
+        new Error('signature invalid')
+      );
 
       await service.storeState('state-bad-jwt', 'nonce-bad', 'hint');
       await expect(
-        service.validateLaunch('bad-token', 'state-bad-jwt'),
+        service.validateLaunch('bad-token', 'state-bad-jwt')
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -203,9 +215,13 @@ describe('LtiService', () => {
       const claims = makeClaims({ nonce: 'wrong-nonce' });
       vi.mocked(jwtVerify).mockResolvedValueOnce({ payload: claims } as never);
 
-      await service.storeState('state-nonce-mismatch', 'expected-nonce', 'hint');
+      await service.storeState(
+        'state-nonce-mismatch',
+        'expected-nonce',
+        'hint'
+      );
       await expect(
-        service.validateLaunch('token', 'state-nonce-mismatch'),
+        service.validateLaunch('token', 'state-nonce-mismatch')
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -218,7 +234,7 @@ describe('LtiService', () => {
 
       await service.storeState('state-version', 'nonce-version', 'hint');
       await expect(
-        service.validateLaunch('token', 'state-version'),
+        service.validateLaunch('token', 'state-version')
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -230,9 +246,9 @@ describe('LtiService', () => {
       await service.validateLaunch('token', 'once-state');
 
       // Second attempt must fail — state was deleted
-      await expect(service.validateLaunch('token', 'once-state')).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(
+        service.validateLaunch('token', 'once-state')
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -241,7 +257,9 @@ describe('LtiService', () => {
   describe('resolveTargetUrl', () => {
     it('maps resource_link.id to /courses/:id', () => {
       const claims = makeClaims({
-        'https://purl.imsglobal.org/spec/lti/claim/resource_link': { id: 'course-42' },
+        'https://purl.imsglobal.org/spec/lti/claim/resource_link': {
+          id: 'course-42',
+        },
       });
       expect(service.resolveTargetUrl(claims)).toBe('/courses/course-42');
     });
@@ -283,7 +301,8 @@ describe('LtiService', () => {
       const claims = makeClaims({
         'https://purl.imsglobal.org/spec/lti/claim/resource_link': { id: '' },
         'https://purl.imsglobal.org/spec/lti/claim/context': undefined,
-        'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': '/courses/path-course',
+        'https://purl.imsglobal.org/spec/lti/claim/target_link_uri':
+          '/courses/path-course',
       });
       expect(service.resolveTargetUrl(claims)).toBe('/courses/path-course');
     });
@@ -292,7 +311,8 @@ describe('LtiService', () => {
       const claims = makeClaims({
         'https://purl.imsglobal.org/spec/lti/claim/resource_link': { id: '' },
         'https://purl.imsglobal.org/spec/lti/claim/context': undefined,
-        'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://evil.example.com',
+        'https://purl.imsglobal.org/spec/lti/claim/target_link_uri':
+          'https://evil.example.com',
       });
       expect(service.resolveTargetUrl(claims)).toBe('/dashboard');
     });
@@ -312,7 +332,9 @@ describe('LtiService', () => {
     });
 
     it('generates unique values on each call', () => {
-      const states = new Set(Array.from({ length: 10 }, () => service.generateState()));
+      const states = new Set(
+        Array.from({ length: 10 }, () => service.generateState())
+      );
       expect(states.size).toBe(10);
     });
   });
@@ -328,7 +350,9 @@ describe('LtiService', () => {
 
     it('returns a unique token on each call', () => {
       const claims = makeClaims();
-      const tokens = new Set(Array.from({ length: 5 }, () => service.createSession(claims)));
+      const tokens = new Set(
+        Array.from({ length: 5 }, () => service.createSession(claims))
+      );
       expect(tokens.size).toBe(5);
     });
   });

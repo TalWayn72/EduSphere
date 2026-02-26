@@ -173,8 +173,7 @@ describe('ModuleLoader', () => {
       // The critical assertion: service called ONCE, not three times
       expect(serviceMock.findByIdBatch).toHaveBeenCalledTimes(1);
 
-      const calledWith: string[] =
-        serviceMock.findByIdBatch.mock.calls[0]![0];
+      const calledWith: string[] = serviceMock.findByIdBatch.mock.calls[0]![0];
       expect(calledWith).toHaveLength(3);
       expect(calledWith).toContain('mod-a1');
       expect(calledWith).toContain('mod-a2');

@@ -105,9 +105,7 @@ export class ContentItemService implements OnModuleDestroy {
     return this.map(row);
   }
 
-  async findByIdBatch(
-    ids: string[]
-  ): Promise<Map<string, ContentItemMapped>> {
+  async findByIdBatch(ids: string[]): Promise<Map<string, ContentItemMapped>> {
     if (ids.length === 0) return new Map();
     const rows = await withReadReplica((db) =>
       db

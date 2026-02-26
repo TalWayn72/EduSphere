@@ -283,9 +283,7 @@ export class ScimGroupService implements OnModuleInit, OnModuleDestroy {
     this.logger.log({ tenantId, groupId }, 'SCIM: group deleted');
   }
 
-  private toScimGroup(
-    row: typeof schema.scimGroups.$inferSelect
-  ): ScimGroup {
+  private toScimGroup(row: typeof schema.scimGroups.$inferSelect): ScimGroup {
     const memberIds = (row.memberIds as string[] | null) ?? [];
     const courseIds = (row.courseIds as string[] | null) ?? [];
     return {

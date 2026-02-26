@@ -32,7 +32,10 @@ export interface AnnotationPanelProps {
   onClose: () => void;
 }
 
-export default function AnnotationPanel({ contentId, onClose }: AnnotationPanelProps) {
+export default function AnnotationPanel({
+  contentId,
+  onClose,
+}: AnnotationPanelProps) {
   const netInfo = useNetInfo();
   const isOffline = netInfo.isConnected === false;
   const [newText, setNewText] = useState('');
@@ -42,9 +45,12 @@ export default function AnnotationPanel({ contentId, onClose }: AnnotationPanelP
     fetchPolicy: isOffline ? 'cache-only' : 'cache-and-network',
   });
 
-  const [createAnnotation, { loading: submitting }] = useMutation(CREATE_ANNOTATION, {
-    refetchQueries: [{ query: GET_ANNOTATIONS, variables: { contentId } }],
-  });
+  const [createAnnotation, { loading: submitting }] = useMutation(
+    CREATE_ANNOTATION,
+    {
+      refetchQueries: [{ query: GET_ANNOTATIONS, variables: { contentId } }],
+    }
+  );
 
   const handleSubmit = async () => {
     const trimmed = newText.trim();
@@ -99,7 +105,10 @@ export default function AnnotationPanel({ contentId, onClose }: AnnotationPanelP
                   editable={!submitting}
                 />
                 <TouchableOpacity
-                  style={[styles.submitBtn, (!newText.trim() || submitting) && styles.submitBtnDisabled]}
+                  style={[
+                    styles.submitBtn,
+                    (!newText.trim() || submitting) && styles.submitBtnDisabled,
+                  ]}
                   onPress={handleSubmit}
                   disabled={!newText.trim() || submitting}
                   testID="annotation-submit"
@@ -125,11 +134,23 @@ export default function AnnotationPanel({ contentId, onClose }: AnnotationPanelP
   );
 }
 
-function PanelHeader({ onClose, isOffline }: { onClose: () => void; isOffline: boolean }) {
+function PanelHeader({
+  onClose,
+  isOffline,
+}: {
+  onClose: () => void;
+  isOffline: boolean;
+}) {
   return (
     <View style={styles.header}>
-      <Text style={styles.headerTitle}>Annotations{isOffline ? ' (Offline)' : ''}</Text>
-      <TouchableOpacity onPress={onClose} accessibilityRole="button" accessibilityLabel="Close">
+      <Text style={styles.headerTitle}>
+        Annotations{isOffline ? ' (Offline)' : ''}
+      </Text>
+      <TouchableOpacity
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Close"
+      >
         <Text style={styles.closeBtn}>Done</Text>
       </TouchableOpacity>
     </View>
@@ -140,7 +161,9 @@ function AnnotationItem({ annotation }: { annotation: Annotation }) {
   return (
     <View style={styles.annotationItem}>
       <View style={styles.annotationMeta}>
-        <Text style={styles.annotationAuthor}>{annotation.author?.displayName ?? 'Unknown'}</Text>
+        <Text style={styles.annotationAuthor}>
+          {annotation.author?.displayName ?? 'Unknown'}
+        </Text>
         <Text style={styles.annotationDate}>
           {new Date(annotation.createdAt).toLocaleDateString()}
         </Text>
@@ -151,8 +174,17 @@ function AnnotationItem({ annotation }: { annotation: Annotation }) {
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
-  panel: { backgroundColor: '#fff', borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '80%' },
+  overlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  panel: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: '80%',
+  },
   keyboardView: { flex: 1 },
   header: {
     flexDirection: 'row',
@@ -166,13 +198,22 @@ const styles = StyleSheet.create({
   closeBtn: { fontSize: 16, color: '#2563EB', fontWeight: '500' },
   loadingRow: { padding: 24, alignItems: 'center' },
   list: { flexGrow: 0, maxHeight: 300 },
-  emptyText: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', padding: 24 },
+  emptyText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    padding: 24,
+  },
   annotationItem: {
     padding: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
   },
-  annotationMeta: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  annotationMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   annotationAuthor: { fontSize: 12, fontWeight: '600', color: '#374151' },
   annotationDate: { fontSize: 11, color: '#9CA3AF' },
   annotationText: { fontSize: 14, color: '#111827', lineHeight: 20 },

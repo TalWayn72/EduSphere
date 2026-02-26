@@ -22,18 +22,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 //    const declarations) ────────────────────────────────────────────────────
 
 const { mockDb, mockSelectFrom, mockInsertReturning } = vi.hoisted(() => {
-  const mockInsertReturning = vi.fn().mockResolvedValue([{
-    id: 'assertion-1',
-    badgeDefinitionId: 'badge-class-1',
-    recipientId: 'user-1',
-    tenantId: 'tenant-1',
-    issuedAt: new Date('2026-01-01T00:00:00.000Z'),
-    evidenceUrl: null,
-    revoked: false,
-    revokedAt: null,
-    revokedReason: null,
-    proof: {},
-  }]);
+  const mockInsertReturning = vi.fn().mockResolvedValue([
+    {
+      id: 'assertion-1',
+      badgeDefinitionId: 'badge-class-1',
+      recipientId: 'user-1',
+      tenantId: 'tenant-1',
+      issuedAt: new Date('2026-01-01T00:00:00.000Z'),
+      evidenceUrl: null,
+      revoked: false,
+      revokedAt: null,
+      revokedReason: null,
+      proof: {},
+    },
+  ]);
 
   const mockSelectFrom = {
     from: vi.fn(),
@@ -99,18 +101,20 @@ describe('OpenBadgesService — memory safety', () => {
     vi.clearAllMocks();
 
     // Re-apply defaults after clearAllMocks
-    mockInsertReturning.mockResolvedValue([{
-      id: 'assertion-1',
-      badgeDefinitionId: 'badge-class-1',
-      recipientId: 'user-1',
-      tenantId: 'tenant-1',
-      issuedAt: new Date('2026-01-01T00:00:00.000Z'),
-      evidenceUrl: null,
-      revoked: false,
-      revokedAt: null,
-      revokedReason: null,
-      proof: {},
-    }]);
+    mockInsertReturning.mockResolvedValue([
+      {
+        id: 'assertion-1',
+        badgeDefinitionId: 'badge-class-1',
+        recipientId: 'user-1',
+        tenantId: 'tenant-1',
+        issuedAt: new Date('2026-01-01T00:00:00.000Z'),
+        evidenceUrl: null,
+        revoked: false,
+        revokedAt: null,
+        revokedReason: null,
+        proof: {},
+      },
+    ]);
 
     mockDb.select.mockReturnValue(mockSelectFrom);
   });
@@ -162,7 +166,9 @@ describe('OpenBadgesService — memory safety', () => {
     it('does NOT have an onModuleDestroy method', () => {
       const service = new OpenBadgesService();
       expect(
-        typeof (service as unknown as Record<string, unknown>)['onModuleDestroy'],
+        typeof (service as unknown as Record<string, unknown>)[
+          'onModuleDestroy'
+        ]
       ).toBe('undefined');
     });
 
@@ -177,15 +183,17 @@ describe('OpenBadgesService — memory safety', () => {
   describe('no timer leaks during issueBadge()', () => {
     it('does not call setInterval during issueBadge()', async () => {
       // Arrange: mock db.select chain to return a valid badge definition
-      const mockWhere = vi.fn().mockResolvedValue([{
-        id: 'badge-class-1',
-        tenantId: 'tenant-1',
-        name: 'Test Badge',
-        description: 'A test badge',
-        issuerId: 'urn:issuer:1',
-        criteriaUrl: null,
-        imageUrl: null,
-      }]);
+      const mockWhere = vi.fn().mockResolvedValue([
+        {
+          id: 'badge-class-1',
+          tenantId: 'tenant-1',
+          name: 'Test Badge',
+          description: 'A test badge',
+          issuerId: 'urn:issuer:1',
+          criteriaUrl: null,
+          imageUrl: null,
+        },
+      ]);
       mockSelectFrom.from.mockReturnValue({ where: mockWhere });
       mockDb.select.mockReturnValue(mockSelectFrom);
 
@@ -200,7 +208,10 @@ describe('OpenBadgesService — memory safety', () => {
   describe('no timer leaks during myOpenBadges()', () => {
     it('does not call setInterval during myOpenBadges()', async () => {
       const mockWhere = vi.fn().mockResolvedValue([]);
-      mockSelectFrom.from.mockReturnValue({ where: mockWhere, innerJoin: vi.fn().mockReturnValue({ where: mockWhere }) });
+      mockSelectFrom.from.mockReturnValue({
+        where: mockWhere,
+        innerJoin: vi.fn().mockReturnValue({ where: mockWhere }),
+      });
       mockDb.select.mockReturnValue(mockSelectFrom);
 
       const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');

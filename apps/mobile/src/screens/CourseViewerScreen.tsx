@@ -120,7 +120,9 @@ function ModuleRow({ module, expanded, onPress }: ModuleRowProps) {
     >
       <View style={styles.moduleInfo}>
         <Text style={styles.moduleTitle}>{module.title}</Text>
-        <Text style={styles.moduleMeta}>{count} item{count !== 1 ? 's' : ''}</Text>
+        <Text style={styles.moduleMeta}>
+          {count} item{count !== 1 ? 's' : ''}
+        </Text>
       </View>
       <Text style={styles.chevron}>{expanded ? '\u25B2' : '\u25BC'}</Text>
       {expanded && count > 0 && (
@@ -128,7 +130,11 @@ function ModuleRow({ module, expanded, onPress }: ModuleRowProps) {
           {module.contentItems.map((item) => (
             <View key={item.id} style={styles.contentItem}>
               <Text style={styles.contentIcon}>
-                {item.type === 'VIDEO' ? '\uD83C\uDFA5' : item.type === 'QUIZ' ? '\u2705' : '\uD83D\uDCCB'}
+                {item.type === 'VIDEO'
+                  ? '\uD83C\uDFA5'
+                  : item.type === 'QUIZ'
+                    ? '\u2705'
+                    : '\uD83D\uDCCB'}
               </Text>
               <Text style={styles.contentTitle}>{item.title}</Text>
             </View>
@@ -141,7 +147,12 @@ function ModuleRow({ module, expanded, onPress }: ModuleRowProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
   loadingText: { marginTop: 12, fontSize: 14, color: '#6B7280' },
   errorText: { fontSize: 16, color: '#DC2626', fontWeight: '600' },
   errorDetail: { fontSize: 13, color: '#9CA3AF', marginTop: 4 },
@@ -153,23 +164,40 @@ const styles = StyleSheet.create({
     borderBottomColor: '#D97706',
   },
   offlineText: { fontSize: 13, color: '#92400E', textAlign: 'center' },
-  header: { padding: 20, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
+  header: {
+    padding: 20,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
+  },
   title: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 6 },
   description: { fontSize: 14, color: '#6B7280', lineHeight: 20 },
   listContent: { paddingBottom: 24 },
-  emptyText: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', marginTop: 32 },
+  emptyText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 32,
+  },
   moduleRow: {
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
   },
-  moduleInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  moduleInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   moduleTitle: { fontSize: 16, fontWeight: '600', color: '#111827', flex: 1 },
   moduleMeta: { fontSize: 13, color: '#6B7280', marginLeft: 8 },
   chevron: { fontSize: 12, color: '#9CA3AF', marginTop: 4 },
   contentList: { marginTop: 10, paddingLeft: 8 },
-  contentItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 5 },
+  contentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
   contentIcon: { fontSize: 14, marginRight: 8 },
   contentTitle: { fontSize: 14, color: '#374151', flex: 1 },
 });

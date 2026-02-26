@@ -71,7 +71,10 @@ export class HlsService {
 
     try {
       await mkdir(workDir, { recursive: true });
-      sourcePath = join(workDir, `source-${randomBytes(8).toString('hex')}.mp4`);
+      sourcePath = join(
+        workDir,
+        `source-${randomBytes(8).toString('hex')}.mp4`
+      );
 
       // Step 1 – Download source from MinIO
       this.logger.log(`HLS: downloading source key=${sourceKey}`);

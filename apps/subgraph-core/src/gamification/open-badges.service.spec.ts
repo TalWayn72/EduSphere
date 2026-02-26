@@ -17,8 +17,32 @@ vi.mock('@edusphere/db', () => {
   };
   return {
     db: mockDb,
-    openBadgeDefinitions: { id: 'id', tenantId: 'tenantId', name: 'name', description: 'description', issuerId: 'issuerId', criteriaUrl: 'criteriaUrl', imageUrl: 'imageUrl', createdAt: 'createdAt', tags: 'tags', version: 'version', badgeDefinitionId: 'badgeDefinitionId' },
-    openBadgeAssertions: { id: 'id', badgeDefinitionId: 'badgeDefinitionId', recipientId: 'recipientId', tenantId: 'tenantId', issuedAt: 'issuedAt', expiresAt: 'expiresAt', evidenceUrl: 'evidenceUrl', proof: 'proof', revoked: 'revoked', revokedAt: 'revokedAt', revokedReason: 'revokedReason' },
+    openBadgeDefinitions: {
+      id: 'id',
+      tenantId: 'tenantId',
+      name: 'name',
+      description: 'description',
+      issuerId: 'issuerId',
+      criteriaUrl: 'criteriaUrl',
+      imageUrl: 'imageUrl',
+      createdAt: 'createdAt',
+      tags: 'tags',
+      version: 'version',
+      badgeDefinitionId: 'badgeDefinitionId',
+    },
+    openBadgeAssertions: {
+      id: 'id',
+      badgeDefinitionId: 'badgeDefinitionId',
+      recipientId: 'recipientId',
+      tenantId: 'tenantId',
+      issuedAt: 'issuedAt',
+      expiresAt: 'expiresAt',
+      evidenceUrl: 'evidenceUrl',
+      proof: 'proof',
+      revoked: 'revoked',
+      revokedAt: 'revokedAt',
+      revokedReason: 'revokedReason',
+    },
     eq: vi.fn((a, b) => ({ field: a, value: b })),
     and: vi.fn((...args) => args),
   };
@@ -45,7 +69,14 @@ const mockAssertion = {
   issuedAt: new Date('2024-06-01'),
   expiresAt: null,
   evidenceUrl: null,
-  proof: { type: 'DataIntegrityProof', proofValue: 'abc123', cryptosuite: 'hmac-sha256', created: '2024-06-01T00:00:00.000Z', verificationMethod: 'urn:edusphere:hmac-key-1', proofPurpose: 'assertionMethod' },
+  proof: {
+    type: 'DataIntegrityProof',
+    proofValue: 'abc123',
+    cryptosuite: 'hmac-sha256',
+    created: '2024-06-01T00:00:00.000Z',
+    verificationMethod: 'urn:edusphere:hmac-key-1',
+    proofPurpose: 'assertionMethod',
+  },
   revoked: false,
   revokedAt: null,
   revokedReason: null,
@@ -108,7 +139,11 @@ describe('OpenBadgesService', () => {
         }),
       });
 
-      const result = await service.revokeOpenBadge('assert-1', 'tenant-1', 'User request');
+      const result = await service.revokeOpenBadge(
+        'assert-1',
+        'tenant-1',
+        'User request'
+      );
       expect(result).toBe(true);
     });
   });
@@ -118,7 +153,9 @@ describe('OpenBadgesService', () => {
       const mockDb = db as ReturnType<typeof vi.fn> & typeof db;
       (mockDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue([{ ...mockAssertion, revoked: true }]),
+          where: vi
+            .fn()
+            .mockResolvedValue([{ ...mockAssertion, revoked: true }]),
         }),
       });
 

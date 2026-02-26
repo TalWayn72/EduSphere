@@ -76,7 +76,11 @@ function BadgeCard({ badge }: BadgeCardProps): React.ReactElement {
           </View>
         )}
         <View style={styles.cardInfo}>
-          <Text style={styles.badgeName} numberOfLines={2} testID={`badge-name-${badge.id}`}>
+          <Text
+            style={styles.badgeName}
+            numberOfLines={2}
+            testID={`badge-name-${badge.id}`}
+          >
             {badge.definition.name}
           </Text>
           <Text
@@ -92,9 +96,7 @@ function BadgeCard({ badge }: BadgeCardProps): React.ReactElement {
         {badge.definition.description}
       </Text>
 
-      <Text style={styles.issuedAt}>
-        Issued: {formatDate(badge.issuedAt)}
-      </Text>
+      <Text style={styles.issuedAt}>Issued: {formatDate(badge.issuedAt)}</Text>
 
       {badge.revoked && badge.revokedReason ? (
         <View style={styles.revokedBox} testID={`revoked-reason-${badge.id}`}>
