@@ -17,6 +17,7 @@ const mockDb = { select: mockSelect, insert: mockInsert, update: mockUpdate };
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
+  withReadReplica: vi.fn((fn: (db: typeof mockDb) => unknown) => fn(mockDb)),
   schema: {
     courses: {
       id: 'id',

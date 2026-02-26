@@ -39,6 +39,10 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mocks.mockDb),
+  withReadReplica: vi.fn((fn: (db: typeof mocks.mockDb) => unknown) =>
+    fn(mocks.mockDb)
+  ),
+  closeAllPools: vi.fn(),
   schema: {
     modules: { id: 'id', course_id: 'course_id', order_index: 'order_index' },
   },

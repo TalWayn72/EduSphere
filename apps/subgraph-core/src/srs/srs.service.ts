@@ -226,6 +226,71 @@ export class SrsService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('SrsService: daily digest scheduled (every 24h)');
   }
 
+  // ---------------------------------------------------------------------------
+  // API alias methods — thin delegation, no duplicated business logic.
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Alias for getDueReviews.
+   * getDueCards(tenantId, userId, limit?) → delegates to getDueReviews
+   */
+  async getDueCards(
+    tenantId: string,
+    userId: string,
+    limit?: number
+  ): Promise<SRSCard[]> {
+    return this.getDueReviews(userId, tenantId, limit ?? 20);
+  }
+
+  /**
+   * Alias for createCard with optional initialDueDate override.
+   * scheduleReview(tenantId, userId, conceptName, initialDueDate?, algorithm?)
+   * → delegates to createCard, then patches dueDate if initialDueDate provided.
+   * The `algorithm` parameter is stored for future use; scheduling itself
+   * always uses SM-2 via the existing createCard path (FSRS integration
+   * requires schema column additions tracked separately).
+   */
+  async scheduleReview(
+    tenantId: string,
+    userId: string,
+    conceptName: string,
+    initialDueDate?: Date | string,
+    _algorithm?: string
+  ): Promise<SRSCard> {
+    const card = await this.createCard(userId, tenantId, conceptName);
+    if (!initialDueDate) return card;
+    return withTenantContext(
+      this.db,
+      this.ctx(userId, tenantId),
+      async (tx) => {
+        const parsedDate =
+          initialDueDate instanceof Date
+            ? initialDueDate
+            : new Date(initialDueDate);
+        const [updated] = await tx
+          .update(schema.spacedRepetitionCards)
+          .set({ dueDate: parsedDate })
+          .where(eq(schema.spacedRepetitionCards.id, card.id))
+          .returning();
+        if (!updated) throw new Error('Failed to update SRS card due date');
+        return this.mapCard(updated);
+      }
+    );
+  }
+
+  /**
+   * Alias for submitReview.
+   * recordReview(tenantId, userId, cardId, quality) → delegates to submitReview
+   */
+  async recordReview(
+    tenantId: string,
+    userId: string,
+    cardId: string,
+    quality: number
+  ): Promise<SRSCard> {
+    return this.submitReview(cardId, userId, tenantId, quality);
+  }
+
   private async publishDailyDigest(): Promise<void> {
     if (!this.nats) return;
     try {

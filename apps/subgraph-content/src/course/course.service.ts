@@ -5,6 +5,7 @@ import {
   eq,
   desc,
   closeAllPools,
+  withReadReplica,
 } from '@edusphere/db';
 
 interface CreateCourseInput {
@@ -63,21 +64,21 @@ export class CourseService implements OnModuleDestroy {
   }
 
   async findById(id: string) {
-    const [course] = await this.db
-      .select()
-      .from(schema.courses)
-      .where(eq(schema.courses.id, id))
-      .limit(1);
+    const [course] = await withReadReplica((db) =>
+      db.select().from(schema.courses).where(eq(schema.courses.id, id)).limit(1)
+    );
     return this.mapCourse(course as Record<string, unknown>) || null;
   }
 
   async findAll(limit: number, offset: number) {
-    const rows = await this.db
-      .select()
-      .from(schema.courses)
-      .orderBy(desc(schema.courses.created_at))
-      .limit(limit)
-      .offset(offset);
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.courses)
+        .orderBy(desc(schema.courses.created_at))
+        .limit(limit)
+        .offset(offset)
+    );
     return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
   }
 

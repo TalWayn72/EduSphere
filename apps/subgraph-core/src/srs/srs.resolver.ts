@@ -63,4 +63,48 @@ export class SrsResolver {
     }
     return this.srsService.createCard(userId, tenantId, conceptName.trim());
   }
+
+  @Query('getDueCards')
+  async getDueCards(
+    @Args('limit') limit: number | undefined,
+    @Context() context: GraphQLContext
+  ) {
+    const { userId, tenantId } = this.requireAuth(context);
+    return this.srsService.getDueCards(tenantId, userId, limit);
+  }
+
+  @Mutation('scheduleReview')
+  async scheduleReview(
+    @Args('conceptName') conceptName: string,
+    @Args('initialDueDate') initialDueDate: string | undefined,
+    @Args('algorithm') algorithm: string | undefined,
+    @Context() context: GraphQLContext
+  ) {
+    const { userId, tenantId } = this.requireAuth(context);
+    if (!conceptName || conceptName.trim().length === 0) {
+      throw new BadRequestException('conceptName must not be empty');
+    }
+    return this.srsService.scheduleReview(
+      tenantId,
+      userId,
+      conceptName.trim(),
+      initialDueDate,
+      algorithm
+    );
+  }
+
+  @Mutation('recordReview')
+  async recordReview(
+    @Args('cardId') cardId: string,
+    @Args('quality') quality: number,
+    @Context() context: GraphQLContext
+  ) {
+    const { userId, tenantId } = this.requireAuth(context);
+    if (!Number.isInteger(quality) || quality < 0 || quality > 5) {
+      throw new BadRequestException(
+        'quality must be an integer between 0 and 5'
+      );
+    }
+    return this.srsService.recordReview(tenantId, userId, cardId, quality);
+  }
 }

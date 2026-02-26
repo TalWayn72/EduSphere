@@ -11,6 +11,7 @@ import {
   asc,
   inArray,
   closeAllPools,
+  withReadReplica,
 } from '@edusphere/db';
 import {
   microlessonContentSchema,
@@ -88,11 +89,13 @@ export class ContentItemService implements OnModuleDestroy {
   }
 
   async findById(id: string): Promise<ContentItemMapped> {
-    const [row] = await this.db
-      .select()
-      .from(schema.contentItems)
-      .where(eq(schema.contentItems.id, id))
-      .limit(1);
+    const [row] = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.contentItems)
+        .where(eq(schema.contentItems.id, id))
+        .limit(1)
+    );
 
     if (!row) {
       this.logger.warn(`ContentItem not found: ${id}`);
@@ -102,15 +105,34 @@ export class ContentItemService implements OnModuleDestroy {
     return this.map(row);
   }
 
+  async findByIdBatch(
+    ids: string[]
+  ): Promise<Map<string, ContentItemMapped>> {
+    if (ids.length === 0) return new Map();
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.contentItems)
+        .where(inArray(schema.contentItems.id, ids))
+    );
+    const result = new Map<string, ContentItemMapped>();
+    for (const row of rows) {
+      result.set(row.id, this.map(row));
+    }
+    return result;
+  }
+
   async findByModuleIdBatch(
     moduleIds: string[]
   ): Promise<Map<string, ContentItemMapped[]>> {
     if (moduleIds.length === 0) return new Map();
-    const rows = await this.db
-      .select()
-      .from(schema.contentItems)
-      .where(inArray(schema.contentItems.moduleId, moduleIds))
-      .orderBy(asc(schema.contentItems.orderIndex));
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.contentItems)
+        .where(inArray(schema.contentItems.moduleId, moduleIds))
+        .orderBy(asc(schema.contentItems.orderIndex))
+    );
     const result = new Map<string, ContentItemMapped[]>();
     for (const row of rows) {
       const key = row.moduleId;
@@ -122,11 +144,13 @@ export class ContentItemService implements OnModuleDestroy {
 
   async findByModule(moduleId: string): Promise<ContentItemMapped[]> {
     this.logger.debug(`Fetching content items for module: ${moduleId}`);
-    const rows = await this.db
-      .select()
-      .from(schema.contentItems)
-      .where(eq(schema.contentItems.moduleId, moduleId))
-      .orderBy(asc(schema.contentItems.orderIndex));
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.contentItems)
+        .where(eq(schema.contentItems.moduleId, moduleId))
+        .orderBy(asc(schema.contentItems.orderIndex))
+    );
 
     return rows.map((r) => this.map(r));
   }

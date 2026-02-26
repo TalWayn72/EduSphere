@@ -14,12 +14,25 @@ type SRSCard {
   lastReviewedAt: DateTime
 }
 
+"""
+Spaced-repetition scheduling algorithm to use when creating or reviewing a card.
+SM2 uses the classic SuperMemo-2 algorithm (quality 0-5).
+FSRS uses the FSRS-4.5 algorithm (quality 1-4).
+"""
+enum AlgorithmType {
+  SM2
+  FSRS
+}
+
 extend type Query {
   """Return cards that are due for review now (dueDate <= current time)."""
   dueReviews(limit: Int): [SRSCard!]! @authenticated
 
   """Count of cards currently due — used by the Dashboard badge."""
   srsQueueCount: Int! @authenticated
+
+  """Alias for dueReviews — returns cards due for review up to the given limit."""
+  getDueCards(limit: Int): [SRSCard!]! @authenticated
 }
 
 extend type Mutation {
@@ -31,4 +44,21 @@ extend type Mutation {
 
   """Create a new spaced-repetition card for the authenticated user."""
   createReviewCard(conceptName: String!): SRSCard! @authenticated
+
+  """
+  Schedule a concept for spaced-repetition review. Creates a card and
+  optionally sets an explicit initial due date. Defaults to SM2 algorithm.
+  Alias surface for createReviewCard with extended options.
+  """
+  scheduleReview(
+    conceptName: String!
+    initialDueDate: DateTime
+    algorithm: AlgorithmType
+  ): SRSCard! @authenticated
+
+  """
+  Record a review for a card identified by ID using the given quality rating.
+  Alias for submitReview with positional card-id argument.
+  """
+  recordReview(cardId: ID!, quality: Int!): SRSCard! @authenticated
 }

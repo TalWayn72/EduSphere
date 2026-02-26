@@ -185,4 +185,122 @@ describe('SrsService', () => {
       ).rejects.toThrow(RangeError);
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // API alias delegation methods
+  // ---------------------------------------------------------------------------
+
+  describe('getDueCards', () => {
+    it('delegates to getDueReviews and returns due cards', async () => {
+      const dueCard = makeCard({ dueDate: yesterday });
+      const chain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([dueCard]),
+      };
+      mockSelect.mockReturnValue(chain);
+
+      const results = await service.getDueCards('tenant-1', 'user-1', 10);
+      expect(results).toHaveLength(1);
+      expect(results[0]?.id).toBe('card-1');
+    });
+
+    it('uses default limit of 20 when not provided', async () => {
+      const chain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([]),
+      };
+      mockSelect.mockReturnValue(chain);
+
+      const results = await service.getDueCards('tenant-1', 'user-1');
+      expect(results).toHaveLength(0);
+      // limit(20) was called via delegation
+      expect(chain.limit).toHaveBeenCalledWith(20);
+    });
+  });
+
+  describe('scheduleReview', () => {
+    it('creates a card and returns it when no initialDueDate provided', async () => {
+      const newCard = makeCard({ dueDate: now });
+      const insertChain = {
+        values: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockResolvedValue([newCard]),
+      };
+      mockInsert.mockReturnValue(insertChain);
+
+      const result = await service.scheduleReview(
+        'tenant-1',
+        'user-1',
+        'Mitosis'
+      );
+      expect(result.conceptName).toBe('Photosynthesis'); // mocked card conceptName
+      expect(result.id).toBe('card-1');
+    });
+
+    it('creates a card and patches dueDate when initialDueDate provided', async () => {
+      const newCard = makeCard({ dueDate: now });
+      const insertChain = {
+        values: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockResolvedValue([newCard]),
+      };
+      mockInsert.mockReturnValue(insertChain);
+
+      const futureDate = new Date('2026-03-15T00:00:00.000Z');
+      const updatedCard = makeCard({ dueDate: futureDate });
+      const updateChain = {
+        set: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockResolvedValue([updatedCard]),
+      };
+      mockUpdate.mockReturnValue(updateChain);
+
+      const result = await service.scheduleReview(
+        'tenant-1',
+        'user-1',
+        'Mitosis',
+        futureDate
+      );
+      expect(mockUpdate).toHaveBeenCalled();
+      expect(result.id).toBe('card-1');
+    });
+  });
+
+  describe('recordReview', () => {
+    it('delegates to submitReview and returns updated card', async () => {
+      const existingCard = makeCard({ repetitions: 1, intervalDays: 1 });
+      const selectChain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([existingCard]),
+      };
+      mockSelect.mockReturnValue(selectChain);
+
+      const updatedCard = makeCard({
+        repetitions: 2,
+        intervalDays: 6,
+        dueDate: tomorrow,
+      });
+      const updateChain = {
+        set: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockResolvedValue([updatedCard]),
+      };
+      mockUpdate.mockReturnValue(updateChain);
+
+      const result = await service.recordReview(
+        'tenant-1',
+        'user-1',
+        'card-1',
+        4
+      );
+      expect(result.repetitions).toBe(2);
+      expect(result.intervalDays).toBe(6);
+    });
+
+    it('throws RangeError for invalid quality via recordReview', async () => {
+      await expect(
+        service.recordReview('tenant-1', 'user-1', 'card-1', 9)
+      ).rejects.toThrow(RangeError);
+    });
+  });
 });

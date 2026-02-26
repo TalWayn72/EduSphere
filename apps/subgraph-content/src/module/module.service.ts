@@ -11,6 +11,7 @@ import {
   asc,
   inArray,
   closeAllPools,
+  withReadReplica,
 } from '@edusphere/db';
 
 type DbModule = typeof schema.modules.$inferSelect;
@@ -42,11 +43,9 @@ export class ModuleService implements OnModuleDestroy {
   }
 
   async findById(id: string) {
-    const [row] = await this.db
-      .select()
-      .from(schema.modules)
-      .where(eq(schema.modules.id, id))
-      .limit(1);
+    const [row] = await withReadReplica((db) =>
+      db.select().from(schema.modules).where(eq(schema.modules.id, id)).limit(1)
+    );
 
     if (!row) {
       this.logger.warn(`Module not found: ${id}`);
@@ -58,12 +57,51 @@ export class ModuleService implements OnModuleDestroy {
 
   async findByCourse(courseId: string) {
     this.logger.debug(`Fetching modules for course: ${courseId}`);
-    const rows = await this.db
-      .select()
-      .from(schema.modules)
-      .where(eq(schema.modules.course_id, courseId))
-      .orderBy(asc(schema.modules.order_index));
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.modules)
+        .where(eq(schema.modules.course_id, courseId))
+        .orderBy(asc(schema.modules.order_index))
+    );
     return rows.map((r) => this.mapModule(r));
+  }
+
+  async findByCourseIdBatch(
+    courseIds: string[]
+  ): Promise<Map<string, ReturnType<typeof this.mapModule>[]>> {
+    if (courseIds.length === 0) return new Map();
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.modules)
+        .where(inArray(schema.modules.course_id, courseIds))
+        .orderBy(asc(schema.modules.order_index))
+    );
+    const result = new Map<string, ReturnType<typeof this.mapModule>[]>();
+    for (const row of rows) {
+      const key = row.course_id;
+      if (!result.has(key)) result.set(key, []);
+      result.get(key)!.push(this.mapModule(row));
+    }
+    return result;
+  }
+
+  async findByIdBatch(
+    ids: string[]
+  ): Promise<Map<string, ReturnType<typeof this.mapModule>>> {
+    if (ids.length === 0) return new Map();
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.modules)
+        .where(inArray(schema.modules.id, ids))
+    );
+    const result = new Map<string, ReturnType<typeof this.mapModule>>();
+    for (const row of rows) {
+      result.set(row.id, this.mapModule(row));
+    }
+    return result;
   }
 
   async create(input: ModuleInput) {

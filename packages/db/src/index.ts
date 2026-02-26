@@ -91,3 +91,6 @@ export * from './graph';
 
 // Export RLS utilities
 export * from './rls';
+
+// Export read/write replica helpers
+export { withReadReplica, createReadConnection, createWriteConnection } from './helpers/readReplica.js';
