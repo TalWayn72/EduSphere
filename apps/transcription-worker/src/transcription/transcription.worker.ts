@@ -19,7 +19,7 @@ export class TranscriptionWorker implements OnModuleInit {
 
   constructor(
     private readonly transcriptionService: TranscriptionService,
-    private readonly natsService: NatsService,
+    private readonly natsService: NatsService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -31,7 +31,9 @@ export class TranscriptionWorker implements OnModuleInit {
   private async startListening(): Promise<void> {
     const conn = this.natsService.getConnection();
     if (!conn) {
-      this.logger.warn('NATS not connected — TranscriptionWorker will not receive events');
+      this.logger.warn(
+        'NATS not connected — TranscriptionWorker will not receive events'
+      );
       return;
     }
 

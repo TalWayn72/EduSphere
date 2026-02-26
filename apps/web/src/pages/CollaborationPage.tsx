@@ -55,8 +55,12 @@ export function CollaborationPage() {
   const navigate = useNavigate();
   const [matchState, setMatchState] = useState<MatchState>('idle');
   const [matchMode, setMatchMode] = useState<'human' | 'ai'>('human');
-  const matchTimeoutRef1 = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const matchTimeoutRef2 = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const matchTimeoutRef1 = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const matchTimeoutRef2 = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Cleanup match timeouts on unmount
   useEffect(() => {
@@ -78,12 +82,18 @@ export function CollaborationPage() {
 
   // "Cannot query field" means the running subgraph build predates myDiscussions
   // being added to the schema. Treat as empty list until Docker image is rebuilt.
-  const isSchemaValidationError = error?.message?.includes('Cannot query field');
+  const isSchemaValidationError =
+    error?.message?.includes('Cannot query field');
   const discussions: BackendDiscussion[] =
-    (data as { myDiscussions?: BackendDiscussion[] } | undefined)?.myDiscussions ?? [];
+    (data as { myDiscussions?: BackendDiscussion[] } | undefined)
+      ?.myDiscussions ?? [];
 
-  const activeSessions = discussions.filter((d) => d.discussionType === 'CHAVRUTA');
-  const recentSessions = discussions.filter((d) => d.discussionType !== 'CHAVRUTA');
+  const activeSessions = discussions.filter(
+    (d) => d.discussionType === 'CHAVRUTA'
+  );
+  const recentSessions = discussions.filter(
+    (d) => d.discussionType !== 'CHAVRUTA'
+  );
 
   const handleStartMatching = (mode: 'human' | 'ai') => {
     setMatchMode(mode);
@@ -92,7 +102,10 @@ export function CollaborationPage() {
       matchTimeoutRef1.current = setTimeout(() => {
         setMatchState('found');
         matchTimeoutRef2.current = setTimeout(
-          () => navigate(`/collaboration/session?partner=AI+Chavruta&topic=Dialectical+study`),
+          () =>
+            navigate(
+              `/collaboration/session?partner=AI+Chavruta&topic=Dialectical+study`
+            ),
           1200
         );
       }, 1000);
@@ -110,7 +123,8 @@ export function CollaborationPage() {
       },
     });
     if (!result.error && result.data) {
-      const disc = (result.data as { createDiscussion: BackendDiscussion }).createDiscussion;
+      const disc = (result.data as { createDiscussion: BackendDiscussion })
+        .createDiscussion;
       reexecute({ requestPolicy: 'network-only' });
       navigate(toSessionUrl(disc.title, disc.id));
     }
@@ -121,9 +135,7 @@ export function CollaborationPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">{t('title')}</h1>
-          <p className="text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
 
         {/* Match panel */}
@@ -140,7 +152,10 @@ export function CollaborationPage() {
                   {t('humanChavrutaDescription')}
                 </p>
                 {matchState === 'idle' || matchMode !== 'human' ? (
-                  <Button className="w-full" onClick={() => handleStartMatching('human')}>
+                  <Button
+                    className="w-full"
+                    onClick={() => handleStartMatching('human')}
+                  >
                     {t('findPartner')}
                   </Button>
                 ) : matchState === 'searching' ? (
@@ -155,7 +170,9 @@ export function CollaborationPage() {
                     disabled={createResult.fetching}
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    {createResult.fetching ? t('creatingSession') : t('partnerFound')}
+                    {createResult.fetching
+                      ? t('creatingSession')
+                      : t('partnerFound')}
                   </Button>
                 )}
               </div>
@@ -220,7 +237,10 @@ export function CollaborationPage() {
                 </h2>
                 <div className="grid md:grid-cols-2 gap-3">
                   {activeSessions.map((session) => (
-                    <Card key={session.id} className="border-green-200 bg-green-50/50">
+                    <Card
+                      key={session.id}
+                      className="border-green-200 bg-green-50/50"
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1">
@@ -242,7 +262,9 @@ export function CollaborationPage() {
                           <Button
                             size="sm"
                             className="h-8 text-xs bg-green-600 hover:bg-green-700"
-                            onClick={() => navigate(toSessionUrl(session.title, session.id))}
+                            onClick={() =>
+                              navigate(toSessionUrl(session.title, session.id))
+                            }
                           >
                             {t('rejoin')}
                           </Button>
@@ -284,16 +306,21 @@ export function CollaborationPage() {
                   <Card
                     key={session.id}
                     className="hover:bg-muted/30 transition-colors cursor-pointer"
-                    onClick={() => navigate(toSessionUrl(session.title, session.id))}
+                    onClick={() =>
+                      navigate(toSessionUrl(session.title, session.id))
+                    }
                   >
                     <CardContent className="p-3 flex items-center gap-4">
                       <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm shrink-0">
                         <BookOpen className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{session.title}</p>
+                        <p className="text-sm font-medium truncate">
+                          {session.title}
+                        </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {session.discussionType} · {session.messageCount} messages
+                          {session.discussionType} · {session.messageCount}{' '}
+                          messages
                         </p>
                       </div>
                       <div className="text-right shrink-0 space-y-0.5">

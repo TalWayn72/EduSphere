@@ -12,25 +12,34 @@ const GRAPH_NAME = graphConfig.graphName;
 export class CypherTermService {
   async findTermById(id: string, tenantId: string): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `MATCH (t:Term {id: $id, tenant_id: $tenantId}) RETURN t`,
-      { id, tenantId }, tenantId,
+      { id, tenantId },
+      tenantId
     );
     return result[0] || null;
   }
 
   async findTermByName(name: string, tenantId: string): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `MATCH (t:Term {name: $name, tenant_id: $tenantId}) RETURN t`,
-      { name, tenantId }, tenantId,
+      { name, tenantId },
+      tenantId
     );
     return result[0] || null;
   }
 
-  async createTerm(name: string, definition: string, tenantId: string): Promise<unknown> {
+  async createTerm(
+    name: string,
+    definition: string,
+    tenantId: string
+  ): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `CREATE (t:Term {
         id: gen_random_uuid()::text,
         tenant_id: $tenantId,
@@ -39,7 +48,8 @@ export class CypherTermService {
         created_at: timestamp(),
         updated_at: timestamp()
       }) RETURN t`,
-      { tenantId, name, definition }, tenantId,
+      { tenantId, name, definition },
+      tenantId
     );
     return result[0];
   }

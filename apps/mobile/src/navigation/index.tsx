@@ -113,7 +113,9 @@ export default function Navigation() {
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}
-          options={{ title: t('common:settings', { defaultValue: 'Settings' }) }}
+          options={{
+            title: t('common:settings', { defaultValue: 'Settings' }),
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -8,17 +8,37 @@
  *  4. Forward to external LRS if token has lrs_endpoint configured
  */
 import {
-  Injectable, Logger, OnModuleInit, OnModuleDestroy,
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import {
-  createDatabaseConnection, closeAllPools, schema, withTenantContext, eq, and, gte, lte,
+  createDatabaseConnection,
+  closeAllPools,
+  schema,
+  withTenantContext,
+  eq,
+  and,
+  gte,
+  lte,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import type {
-  XapiStatement, XapiQueryParams, XapiActor, XapiVerb, XapiObject, MappableNatsPayload,
+  XapiStatement,
+  XapiQueryParams,
+  XapiActor,
+  XapiVerb,
+  XapiObject,
+  MappableNatsPayload,
 } from './xapi.types.js';
 import { SUBJECT_TO_VERB } from './xapi.types.js';
 
@@ -26,7 +46,11 @@ const NATS_WILDCARD = 'EDUSPHERE.*';
 const LRS_FORWARD_TIMEOUT_MS = 5_000;
 
 function makeActor(userId: string): XapiActor {
-  return { objectType: 'Agent', name: userId, mbox: `mailto:${userId}@edusphere.local` };
+  return {
+    objectType: 'Agent',
+    name: userId,
+    mbox: `mailto:${userId}@edusphere.local`,
+  };
 }
 
 function makeVerb(verbId: string): XapiVerb {
@@ -77,12 +101,18 @@ export class XapiStatementService implements OnModuleInit, OnModuleDestroy {
       try {
         const raw = JSON.parse(this.sc.decode(msg.data)) as unknown;
         const statement = this.mapNatsToXapi(msg.subject, raw);
-        if (statement && typeof (raw as MappableNatsPayload).tenantId === 'string') {
+        if (
+          statement &&
+          typeof (raw as MappableNatsPayload).tenantId === 'string'
+        ) {
           const tenantId = (raw as MappableNatsPayload).tenantId;
           await this.storeStatement(tenantId, statement);
         }
       } catch (err) {
-        this.logger.warn({ err }, 'XapiStatementService: failed to process message');
+        this.logger.warn(
+          { err },
+          'XapiStatementService: failed to process message'
+        );
       }
     }
   }
@@ -94,7 +124,12 @@ export class XapiStatementService implements OnModuleInit, OnModuleDestroy {
     const p = payload as MappableNatsPayload;
     if (!p.userId || !p.tenantId) return null;
 
-    const resourceId = p.courseId ?? p.contentItemId ?? p.annotationId ?? p.followingId ?? p.userId;
+    const resourceId =
+      p.courseId ??
+      p.contentItemId ??
+      p.annotationId ??
+      p.followingId ??
+      p.userId;
     const name = p.courseTitle ?? resourceId;
 
     return {
@@ -106,8 +141,15 @@ export class XapiStatementService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  async storeStatement(tenantId: string, statement: XapiStatement): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+  async storeStatement(
+    tenantId: string,
+    statement: XapiStatement
+  ): Promise<void> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
       tx.insert(schema.xapiStatements).values({
         tenantId,
@@ -117,19 +159,33 @@ export class XapiStatementService implements OnModuleInit, OnModuleDestroy {
         object: statement.object,
         result: statement.result ?? null,
         context: statement.context ?? null,
-      }),
+      })
     );
   }
 
-  async queryStatements(tenantId: string, params: XapiQueryParams): Promise<XapiStatement[]> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+  async queryStatements(
+    tenantId: string,
+    params: XapiQueryParams
+  ): Promise<XapiStatement[]> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
     const limit = Math.min(params.limit ?? 20, 200);
 
     const rows = await withTenantContext(this.db, ctx, async (tx) => {
       const conditions = [eq(schema.xapiStatements.tenantId, tenantId)];
-      if (params.since) conditions.push(gte(schema.xapiStatements.storedAt, new Date(params.since)));
-      if (params.until) conditions.push(lte(schema.xapiStatements.storedAt, new Date(params.until)));
-      return tx.select()
+      if (params.since)
+        conditions.push(
+          gte(schema.xapiStatements.storedAt, new Date(params.since))
+        );
+      if (params.until)
+        conditions.push(
+          lte(schema.xapiStatements.storedAt, new Date(params.until))
+        );
+      return tx
+        .select()
         .from(schema.xapiStatements)
         .where(and(...conditions))
         .limit(limit)
@@ -147,15 +203,22 @@ export class XapiStatementService implements OnModuleInit, OnModuleDestroy {
     }));
   }
 
-  async forwardToExternalLrs(lrsEndpoint: string, rawToken: string, statement: XapiStatement): Promise<void> {
+  async forwardToExternalLrs(
+    lrsEndpoint: string,
+    rawToken: string,
+    statement: XapiStatement
+  ): Promise<void> {
     const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('LRS forward timeout')), LRS_FORWARD_TIMEOUT_MS),
+      setTimeout(
+        () => reject(new Error('LRS forward timeout')),
+        LRS_FORWARD_TIMEOUT_MS
+      )
     );
     const forward = fetch(`${lrsEndpoint}/statements`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${rawToken}`,
+        Authorization: `Bearer ${rawToken}`,
         'X-Experience-API-Version': '1.0.3',
       },
       body: JSON.stringify(statement),

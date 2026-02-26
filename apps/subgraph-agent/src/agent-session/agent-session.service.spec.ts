@@ -88,7 +88,9 @@ describe('AgentSessionService', () => {
     mockInsert.mockReturnValue({ values: mockValues });
 
     // Default update chain
-    mockSet.mockReturnValue({ where: vi.fn().mockReturnValue({ returning: mockReturning }) });
+    mockSet.mockReturnValue({
+      where: vi.fn().mockReturnValue({ returning: mockReturning }),
+    });
     mockUpdate.mockReturnValue({ set: mockSet });
 
     service = new AgentSessionService(mockNatsService as any);
@@ -105,12 +107,16 @@ describe('AgentSessionService', () => {
 
     it('throws NotFoundException when session does not exist', async () => {
       mockLimit.mockResolvedValue([]);
-      await expect(service.findById('nonexistent', MOCK_AUTH)).rejects.toThrow(NotFoundException);
+      await expect(service.findById('nonexistent', MOCK_AUTH)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('throws NotFoundException when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
-      await expect(service.findById('session-1', noTenantAuth)).rejects.toThrow(NotFoundException);
+      await expect(service.findById('session-1', noTenantAuth)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('calls withTenantContext with correct tenant info', async () => {
@@ -148,7 +154,9 @@ describe('AgentSessionService', () => {
 
     it('throws NotFoundException when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
-      await expect(service.findByUser('user-1', noTenantAuth)).rejects.toThrow(NotFoundException);
+      await expect(service.findByUser('user-1', noTenantAuth)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('calls withTenantContext on every query', async () => {
@@ -173,7 +181,9 @@ describe('AgentSessionService', () => {
 
     it('throws NotFoundException when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
-      await expect(service.findActiveByUser('user-1', noTenantAuth)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.findActiveByUser('user-1', noTenantAuth)
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -198,7 +208,10 @@ describe('AgentSessionService', () => {
       mockReturning.mockResolvedValue([MOCK_SESSION]);
       await service.create({ userId: 'user-1', agentType: 'TUTOR' }, MOCK_AUTH);
       expect(mockNatsService.publish).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'session.created', sessionId: 'session-1' })
+        expect.objectContaining({
+          type: 'session.created',
+          sessionId: 'session-1',
+        })
       );
     });
 

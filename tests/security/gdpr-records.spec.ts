@@ -22,7 +22,9 @@ describe('PROCESSING_ACTIVITIES.md — GDPR Art.30 RoPA', () => {
   const content = readFile('docs/security/PROCESSING_ACTIVITIES.md');
 
   it('docs/security/PROCESSING_ACTIVITIES.md exists', () => {
-    expect(existsSync(resolve(ROOT, 'docs/security/PROCESSING_ACTIVITIES.md'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'docs/security/PROCESSING_ACTIVITIES.md'))
+    ).toBe(true);
   });
 
   it('covers user account management activity (RPA-001)', () => {
@@ -54,7 +56,9 @@ describe('PROCESSING_ACTIVITIES.md — GDPR Art.30 RoPA', () => {
   });
 
   it('notes US transfer with SCCs for AI providers', () => {
-    expect(content).toMatch(/SCC|Standard Contractual|US.*consent|consent.*US/i);
+    expect(content).toMatch(
+      /SCC|Standard Contractual|US.*consent|consent.*US/i
+    );
   });
 
   it('distinguishes EduSphere as controller vs processor roles', () => {
@@ -74,7 +78,9 @@ describe('DPIA_TEMPLATE.md — GDPR Art.35 Data Protection Impact Assessment', (
   const content = readFile('docs/security/DPIA_TEMPLATE.md');
 
   it('docs/security/DPIA_TEMPLATE.md exists', () => {
-    expect(existsSync(resolve(ROOT, 'docs/security/DPIA_TEMPLATE.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/security/DPIA_TEMPLATE.md'))).toBe(
+      true
+    );
   });
 
   it('references GDPR Art.35', () => {

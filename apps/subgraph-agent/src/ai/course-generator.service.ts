@@ -6,7 +6,12 @@
  */
 
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, closeAllPools, eq } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  closeAllPools,
+  eq,
+} from '@edusphere/db';
 import { LlmConsentGuard } from './llm-consent.guard.js';
 import { createCourseGeneratorWorkflow } from './course-generator.workflow.js';
 
@@ -49,10 +54,12 @@ export class CourseGeneratorService implements OnModuleDestroy {
   async generateCourse(
     options: GenerateCourseOptions,
     userId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<CourseGenerationRecord> {
     // SI-10: Require THIRD_PARTY_LLM consent when using external LLM
-    const isExternal = Boolean(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY);
+    const isExternal = Boolean(
+      process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY
+    );
     await this.consentGuard.assertConsent(userId, isExternal);
 
     const [execution] = await this.db
@@ -81,7 +88,10 @@ export class CourseGeneratorService implements OnModuleDestroy {
     // Fire-and-forget: run workflow asynchronously
     this.runWorkflowAsync(executionId, options).catch((err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error({ executionId, err: msg }, 'Course generation workflow failed');
+      this.logger.error(
+        { executionId, err: msg },
+        'Course generation workflow failed'
+      );
     });
 
     return { executionId, status: 'RUNNING', modules: [] };
@@ -89,7 +99,7 @@ export class CourseGeneratorService implements OnModuleDestroy {
 
   private async runWorkflowAsync(
     executionId: string,
-    options: GenerateCourseOptions,
+    options: GenerateCourseOptions
   ): Promise<void> {
     try {
       const workflow = createCourseGeneratorWorkflow();

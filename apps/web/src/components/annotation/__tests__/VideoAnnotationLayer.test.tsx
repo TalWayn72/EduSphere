@@ -30,9 +30,16 @@ vi.mock('../AnnotationTimeline', () => ({
 
 vi.mock('@/components/ui/tooltip', () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  TooltipTrigger: ({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) =>
-    asChild ? <>{children}</> : <div>{children}</div>,
-  TooltipContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  TooltipTrigger: ({
+    children,
+    asChild,
+  }: {
+    children: React.ReactNode;
+    asChild?: boolean;
+  }) => (asChild ? <>{children}</> : <div>{children}</div>),
+  TooltipContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // ── Import component after mocks ──────────────────────────────────────────────
@@ -108,7 +115,12 @@ describe('VideoAnnotationLayer', () => {
 
   it('calls onAnnotationClick with the correct annotation when marker is clicked', () => {
     const onAnnotationClick = vi.fn();
-    render(<VideoAnnotationLayer {...DEFAULT_PROPS} onAnnotationClick={onAnnotationClick} />);
+    render(
+      <VideoAnnotationLayer
+        {...DEFAULT_PROPS}
+        onAnnotationClick={onAnnotationClick}
+      />
+    );
 
     const markers = screen.getAllByRole('listitem');
     fireEvent.click(markers[0]!);

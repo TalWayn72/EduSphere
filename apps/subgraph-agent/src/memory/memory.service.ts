@@ -1,5 +1,11 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc, closeAllPools } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  desc,
+  closeAllPools,
+} from '@edusphere/db';
 import { NatsKVClient } from '@edusphere/nats-client';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -117,7 +123,9 @@ export class MemoryService implements OnModuleDestroy {
     const messages = (await this.db
       .select()
       .from(schema.agentMessages)
-      .where(eq(schema.agentMessages.sessionId, sessionId))) as AgentMessageRow[];
+      .where(
+        eq(schema.agentMessages.sessionId, sessionId)
+      )) as AgentMessageRow[];
 
     return messages.length;
   }
@@ -156,7 +164,10 @@ export class MemoryService implements OnModuleDestroy {
   async loadContext(sessionId: string): Promise<ConversationContext> {
     // ── Fast path: NATS KV ────────────────────────────────────────────────
     try {
-      const cached = await this.kv.get<ConversationContext>(KV_BUCKET, sessionId);
+      const cached = await this.kv.get<ConversationContext>(
+        KV_BUCKET,
+        sessionId
+      );
       if (cached) {
         this.logger.debug(`Cache hit for session ${sessionId} (NATS KV)`);
         return cached;
@@ -182,7 +193,10 @@ export class MemoryService implements OnModuleDestroy {
     try {
       await this.kv.set(KV_BUCKET, sessionId, context);
     } catch (err) {
-      this.logger.warn({ err, sessionId }, 'Failed to repopulate NATS KV after DB fallback');
+      this.logger.warn(
+        { err, sessionId },
+        'Failed to repopulate NATS KV after DB fallback'
+      );
     }
 
     return context;

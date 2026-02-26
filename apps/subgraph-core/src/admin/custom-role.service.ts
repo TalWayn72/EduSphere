@@ -70,8 +70,8 @@ export class CustomRoleService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.customRoles.id, id),
-            eq(schema.customRoles.tenantId, tenantCtx.tenantId),
-          ),
+            eq(schema.customRoles.tenantId, tenantCtx.tenantId)
+          )
         )
         .limit(1);
       if (!row) throw new NotFoundException(`Role ${id} not found`);
@@ -81,7 +81,7 @@ export class CustomRoleService implements OnModuleDestroy {
 
   async createRole(
     input: { name: string; description?: string; permissions: string[] },
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<RoleData> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [created] = await tx
@@ -96,7 +96,9 @@ export class CustomRoleService implements OnModuleDestroy {
         })
         .returning();
       if (!created) throw new Error('Role insert failed');
-      this.logger.log(`Created custom role "${input.name}" in tenant ${tenantCtx.tenantId}`);
+      this.logger.log(
+        `Created custom role "${input.name}" in tenant ${tenantCtx.tenantId}`
+      );
       return this.mapRole(created, 0);
     });
   }
@@ -104,7 +106,7 @@ export class CustomRoleService implements OnModuleDestroy {
   async updateRole(
     id: string,
     input: { name?: string; description?: string; permissions?: string[] },
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<RoleData> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [existing] = await tx
@@ -113,19 +115,24 @@ export class CustomRoleService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.customRoles.id, id),
-            eq(schema.customRoles.tenantId, tenantCtx.tenantId),
-          ),
+            eq(schema.customRoles.tenantId, tenantCtx.tenantId)
+          )
         )
         .limit(1);
       if (!existing) throw new NotFoundException(`Role ${id} not found`);
-      if (existing.isSystem) throw new BadRequestException('System roles cannot be modified');
+      if (existing.isSystem)
+        throw new BadRequestException('System roles cannot be modified');
 
       const [updated] = await tx
         .update(schema.customRoles)
         .set({
           ...(input.name !== undefined && { name: input.name }),
-          ...(input.description !== undefined && { description: input.description }),
-          ...(input.permissions !== undefined && { permissions: input.permissions }),
+          ...(input.description !== undefined && {
+            description: input.description,
+          }),
+          ...(input.permissions !== undefined && {
+            permissions: input.permissions,
+          }),
           updatedAt: new Date(),
         })
         .where(eq(schema.customRoles.id, id))
@@ -144,12 +151,13 @@ export class CustomRoleService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.customRoles.id, id),
-            eq(schema.customRoles.tenantId, tenantCtx.tenantId),
-          ),
+            eq(schema.customRoles.tenantId, tenantCtx.tenantId)
+          )
         )
         .limit(1);
       if (!existing) throw new NotFoundException(`Role ${id} not found`);
-      if (existing.isSystem) throw new BadRequestException('System roles cannot be deleted');
+      if (existing.isSystem)
+        throw new BadRequestException('System roles cannot be deleted');
 
       // Revoke all active delegations first
       await tx
@@ -167,7 +175,7 @@ export class CustomRoleService implements OnModuleDestroy {
     userId: string,
     roleId: string,
     validUntil: string | null,
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<DelegationData> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [role] = await tx
@@ -176,8 +184,8 @@ export class CustomRoleService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.customRoles.id, roleId),
-            eq(schema.customRoles.tenantId, tenantCtx.tenantId),
-          ),
+            eq(schema.customRoles.tenantId, tenantCtx.tenantId)
+          )
         )
         .limit(1);
       if (!role) throw new NotFoundException(`Role ${roleId} not found`);
@@ -199,7 +207,10 @@ export class CustomRoleService implements OnModuleDestroy {
     });
   }
 
-  async revokeDelegation(delegationId: string, tenantCtx: TenantContext): Promise<boolean> {
+  async revokeDelegation(
+    delegationId: string,
+    tenantCtx: TenantContext
+  ): Promise<boolean> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [updated] = await tx
         .update(schema.userRoleDelegations)
@@ -207,17 +218,21 @@ export class CustomRoleService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.userRoleDelegations.id, delegationId),
-            eq(schema.userRoleDelegations.tenantId, tenantCtx.tenantId),
-          ),
+            eq(schema.userRoleDelegations.tenantId, tenantCtx.tenantId)
+          )
         )
         .returning();
-      if (!updated) throw new NotFoundException(`Delegation ${delegationId} not found`);
+      if (!updated)
+        throw new NotFoundException(`Delegation ${delegationId} not found`);
       this.logger.log(`Revoked delegation ${delegationId}`);
       return true;
     });
   }
 
-  async getUserDelegations(userId: string, tenantCtx: TenantContext): Promise<DelegationData[]> {
+  async getUserDelegations(
+    userId: string,
+    tenantCtx: TenantContext
+  ): Promise<DelegationData[]> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const rows = await tx
         .select()
@@ -226,8 +241,8 @@ export class CustomRoleService implements OnModuleDestroy {
           and(
             eq(schema.userRoleDelegations.userId, userId),
             eq(schema.userRoleDelegations.tenantId, tenantCtx.tenantId),
-            eq(schema.userRoleDelegations.isActive, true),
-          ),
+            eq(schema.userRoleDelegations.isActive, true)
+          )
         );
       return rows.map((r) => this.mapDelegation(r));
     });
@@ -235,11 +250,17 @@ export class CustomRoleService implements OnModuleDestroy {
 
   private mapRole(
     row: {
-      id: string; tenantId: string; name: string; description: string;
-      permissions: string[] | null; isSystem: boolean; createdBy: string;
-      createdAt: Date; updatedAt: Date;
+      id: string;
+      tenantId: string;
+      name: string;
+      description: string;
+      permissions: string[] | null;
+      isSystem: boolean;
+      createdBy: string;
+      createdAt: Date;
+      updatedAt: Date;
     },
-    userCount: number,
+    userCount: number
   ): RoleData {
     return {
       id: row.id,
@@ -256,8 +277,13 @@ export class CustomRoleService implements OnModuleDestroy {
   }
 
   private mapDelegation(row: {
-    id: string; userId: string; roleId: string; delegatedBy: string;
-    validUntil: Date | null; isActive: boolean; createdAt: Date;
+    id: string;
+    userId: string;
+    roleId: string;
+    delegatedBy: string;
+    validUntil: Date | null;
+    isActive: boolean;
+    createdAt: Date;
   }): DelegationData {
     return {
       id: row.id,

@@ -63,7 +63,10 @@ export class PublicProfileService implements OnModuleDestroy {
 
       const prefs = parsePreferences(user.preferences);
       if (!prefs.isPublicProfile) {
-        this.logger.debug({ userId }, 'publicProfile requested but profile is private');
+        this.logger.debug(
+          { userId },
+          'publicProfile requested but profile is private'
+        );
         return null;
       }
 
@@ -97,7 +100,11 @@ export class PublicProfileService implements OnModuleDestroy {
       `);
 
       const courseList = (
-        completedRows.rows as { course_id: string; title: string; completed_at: string }[]
+        completedRows.rows as {
+          course_id: string;
+          title: string;
+          completed_at: string;
+        }[]
       ).map((r) => ({
         id: r.course_id,
         title: r.title,
@@ -107,18 +114,22 @@ export class PublicProfileService implements OnModuleDestroy {
       }));
 
       const badgeCount = Number(
-        (badgeRows.rows[0] as { count: number } | undefined)?.count ?? 0,
+        (badgeRows.rows[0] as { count: number } | undefined)?.count ?? 0
       );
 
       const progressRow = progressRows.rows[0] as
         | { completed: number; total_seconds: number }
         | undefined;
 
-      const joinedAt = user.created_at instanceof Date
-        ? user.created_at.toISOString()
-        : String(user.created_at);
+      const joinedAt =
+        user.created_at instanceof Date
+          ? user.created_at.toISOString()
+          : String(user.created_at);
 
-      this.logger.debug({ userId, badgeCount, courses: courseList.length }, 'publicProfile fetched');
+      this.logger.debug(
+        { userId, badgeCount, courses: courseList.length },
+        'publicProfile fetched'
+      );
 
       return {
         userId: user.id,
@@ -132,7 +143,9 @@ export class PublicProfileService implements OnModuleDestroy {
         completedCourses: courseList,
         badgesCount: badgeCount,
         conceptsMastered: Number(progressRow?.completed ?? 0),
-        totalLearningMinutes: Math.round(Number(progressRow?.total_seconds ?? 0) / 60),
+        totalLearningMinutes: Math.round(
+          Number(progressRow?.total_seconds ?? 0) / 60
+        ),
       };
     });
   }

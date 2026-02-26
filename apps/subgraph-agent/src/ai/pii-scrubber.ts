@@ -13,7 +13,11 @@ export interface ScrubResult {
 }
 
 // PII patterns to detect and redact — ORDER MATTERS: more specific patterns first.
-const PII_PATTERNS: Array<{ name: string; pattern: RegExp; replacement: string }> = [
+const PII_PATTERNS: Array<{
+  name: string;
+  pattern: RegExp;
+  replacement: string;
+}> = [
   {
     name: 'EMAIL',
     pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,

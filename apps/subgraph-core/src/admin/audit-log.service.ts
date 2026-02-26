@@ -35,7 +35,7 @@ export class AuditLogService implements OnModuleDestroy {
 
   async getAuditLog(
     tenantId: string,
-    opts: AuditLogOpts,
+    opts: AuditLogOpts
   ): Promise<{ entries: AuditLogEntryData[]; total: number }> {
     const filters: SQL[] = [eq(auditLog.tenantId, tenantId)];
 
@@ -77,13 +77,17 @@ export class AuditLogService implements OnModuleDestroy {
       status: row.status,
       ipAddress: row.ipAddress ?? null,
       requestId: row.requestId ?? null,
-      createdAt: row.createdAt instanceof Date
-        ? row.createdAt.toISOString()
-        : String(row.createdAt),
+      createdAt:
+        row.createdAt instanceof Date
+          ? row.createdAt.toISOString()
+          : String(row.createdAt),
       metadata: row.metadata != null ? JSON.stringify(row.metadata) : null,
     }));
 
-    this.logger.debug({ tenantId, total, returned: entries.length }, 'Audit log fetched');
+    this.logger.debug(
+      { tenantId, total, returned: entries.length },
+      'Audit log fetched'
+    );
     return { entries, total };
   }
 }

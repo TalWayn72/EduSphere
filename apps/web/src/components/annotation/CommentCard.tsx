@@ -77,7 +77,7 @@ export function CommentCard({
         depth === 0 ? 'mb-2' : 'mb-1 ml-4 mt-1 bg-muted/50',
         isFocused
           ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/30'
-          : 'border-border bg-card hover:bg-accent/40',
+          : 'border-border bg-card hover:bg-accent/40'
       )}
       onClick={() => onFocus(annotation.id)}
     >
@@ -98,7 +98,7 @@ export function CommentCard({
       <span
         className={cn(
           'inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold mb-1.5',
-          LAYER_BADGE_CLASS[annotation.layer],
+          LAYER_BADGE_CLASS[annotation.layer]
         )}
       >
         {layerConfig.icon} {layerConfig.label}

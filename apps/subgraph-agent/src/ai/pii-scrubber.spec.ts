@@ -27,7 +27,9 @@ describe('scrubPII', () => {
   });
 
   it('returns redactedCount > 0 when PII found', () => {
-    const { redactedCount } = scrubPII('Email: test@test.com, also test2@test.com');
+    const { redactedCount } = scrubPII(
+      'Email: test@test.com, also test2@test.com'
+    );
     expect(redactedCount).toBeGreaterThan(0);
   });
 
@@ -38,7 +40,9 @@ describe('scrubPII', () => {
   });
 
   it('preserves non-PII content', () => {
-    const { text } = scrubPII('Hello, I want to learn about TypeScript email@test.com');
+    const { text } = scrubPII(
+      'Hello, I want to learn about TypeScript email@test.com'
+    );
     expect(text).toContain('Hello, I want to learn about TypeScript');
     expect(text).toContain('[EMAIL]');
   });

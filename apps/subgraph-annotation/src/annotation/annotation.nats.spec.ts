@@ -25,27 +25,45 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   schema: {
     annotations: {
-      id: 'id', asset_id: 'asset_id', user_id: 'user_id',
-      layer: 'layer', deleted_at: 'deleted_at',
-      tenant_id: 'tenant_id', created_at: 'created_at',
+      id: 'id',
+      asset_id: 'asset_id',
+      user_id: 'user_id',
+      layer: 'layer',
+      deleted_at: 'deleted_at',
+      tenant_id: 'tenant_id',
+      created_at: 'created_at',
     },
   },
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args) => args),
   desc: vi.fn((col) => ({ desc: col })),
-  sql: Object.assign(vi.fn((str) => str), { placeholder: vi.fn() }),
+  sql: Object.assign(
+    vi.fn((str) => str),
+    { placeholder: vi.fn() }
+  ),
   withTenantContext: vi.fn(async (_db, _ctx, callback) => callback(mockTx)),
   closeAllPools: vi.fn(),
 }));
 
 const MOCK_AUTH: AuthContext = {
-  userId: 'user-nats', email: 'n@e.com', username: 'natsUser',
-  tenantId: 'tenant-nats', roles: ['STUDENT'], scopes: [], isSuperAdmin: false,
+  userId: 'user-nats',
+  email: 'n@e.com',
+  username: 'natsUser',
+  tenantId: 'tenant-nats',
+  roles: ['STUDENT'],
+  scopes: [],
+  isSuperAdmin: false,
 };
 const MOCK_ANNOTATION = {
-  id: 'ann-nats', asset_id: 'asset-nats', user_id: 'user-nats',
-  tenant_id: 'tenant-nats', layer: 'PERSONAL', content: { text: 'nats test' },
-  is_resolved: false, deleted_at: null, created_at: new Date(),
+  id: 'ann-nats',
+  asset_id: 'asset-nats',
+  user_id: 'user-nats',
+  tenant_id: 'tenant-nats',
+  layer: 'PERSONAL',
+  content: { text: 'nats test' },
+  is_resolved: false,
+  deleted_at: null,
+  created_at: new Date(),
 };
 
 /**
@@ -79,15 +97,28 @@ describe('AnnotationService — NATS event publishing', () => {
   describe('create() — annotation.added event', () => {
     it('create() successfully returns annotation (pre-condition for event publish)', async () => {
       const result = await service.create(
-        { assetId: 'asset-nats', annotationType: 'TEXT', layer: 'PERSONAL', content: { text: 'hello' } },
+        {
+          assetId: 'asset-nats',
+          annotationType: 'TEXT',
+          layer: 'PERSONAL',
+          content: { text: 'hello' },
+        },
         MOCK_AUTH
       );
-      expect(result).toMatchObject({ id: 'ann-nats', tenant_id: 'tenant-nats' });
+      expect(result).toMatchObject({
+        id: 'ann-nats',
+        tenant_id: 'tenant-nats',
+      });
     });
 
     it('event payload would contain annotationId, assetId, tenantId, userId, layer', async () => {
       const result = await service.create(
-        { assetId: 'asset-nats', annotationType: 'TEXT', layer: 'PERSONAL', content: {} },
+        {
+          assetId: 'asset-nats',
+          annotationType: 'TEXT',
+          layer: 'PERSONAL',
+          content: {},
+        },
         MOCK_AUTH
       );
       // Verify the data needed for annotation.added event is present on created annotation
@@ -102,7 +133,12 @@ describe('AnnotationService — NATS event publishing', () => {
       mockNatsPublish.mockRejectedValue(new Error('NATS unavailable'));
       // Even if NATS were wired up and threw, the annotation insert already completed
       const result = await service.create(
-        { assetId: 'asset-nats', annotationType: 'TEXT', layer: 'PERSONAL', content: {} },
+        {
+          assetId: 'asset-nats',
+          annotationType: 'TEXT',
+          layer: 'PERSONAL',
+          content: {},
+        },
         MOCK_AUTH
       );
       // create() still returns the annotation — NATS failure is fire-and-forget
@@ -113,9 +149,15 @@ describe('AnnotationService — NATS event publishing', () => {
 
   describe('update() — no event publishing', () => {
     it('update() completes without calling NATS publish mock (update is silent)', async () => {
-      mockReturning.mockResolvedValueOnce([MOCK_ANNOTATION]);  // findById check
-      mockReturning.mockResolvedValueOnce([{ ...MOCK_ANNOTATION, content: { text: 'updated' } }]);
-      await service.update('ann-nats', { content: { text: 'updated' } }, MOCK_AUTH);
+      mockReturning.mockResolvedValueOnce([MOCK_ANNOTATION]); // findById check
+      mockReturning.mockResolvedValueOnce([
+        { ...MOCK_ANNOTATION, content: { text: 'updated' } },
+      ]);
+      await service.update(
+        'ann-nats',
+        { content: { text: 'updated' } },
+        MOCK_AUTH
+      );
       // mockNatsClient.publish is NOT injected into current service —
       // verifying it was never called confirms update is a quiet operation
       expect(mockNatsPublish).not.toHaveBeenCalled();
@@ -124,8 +166,14 @@ describe('AnnotationService — NATS event publishing', () => {
     it('update() returns updated annotation without side-effects', async () => {
       mockReturning
         .mockResolvedValueOnce([MOCK_ANNOTATION])
-        .mockResolvedValueOnce([{ ...MOCK_ANNOTATION, content: { text: 'new' } }]);
-      const result = await service.update('ann-nats', { content: { text: 'new' } }, MOCK_AUTH);
+        .mockResolvedValueOnce([
+          { ...MOCK_ANNOTATION, content: { text: 'new' } },
+        ]);
+      const result = await service.update(
+        'ann-nats',
+        { content: { text: 'new' } },
+        MOCK_AUTH
+      );
       expect(result).toBeDefined();
       expect(mockNatsPublish).not.toHaveBeenCalled();
     });

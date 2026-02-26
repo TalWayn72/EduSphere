@@ -18,12 +18,18 @@ export const microlessonContentSchema = z.object({
   objective: z.string().min(1).max(500),
   conceptName: z.string().min(1).max(200),
   body: z.string().min(1).max(5000),
-  durationSeconds: z.number().int().min(1).max(MICROLESSON_MAX_DURATION_SECONDS),
+  durationSeconds: z
+    .number()
+    .int()
+    .min(1)
+    .max(MICROLESSON_MAX_DURATION_SECONDS),
   quizQuestion: microlessonQuizQuestionSchema.optional(),
 });
 
 export type MicrolessonContent = z.infer<typeof microlessonContentSchema>;
-export type MicrolessonQuizQuestion = z.infer<typeof microlessonQuizQuestionSchema>;
+export type MicrolessonQuizQuestion = z.infer<
+  typeof microlessonQuizQuestionSchema
+>;
 export type MicrolessonQuizOption = z.infer<typeof microlessonQuizOptionSchema>;
 
 export const createMicrolearningPathInputSchema = z.object({

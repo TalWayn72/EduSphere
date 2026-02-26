@@ -1,10 +1,4 @@
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  Context,
-} from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { LiveSessionService } from './live-session.service';
 
 interface GraphQLContext {
@@ -26,7 +20,7 @@ export class LiveSessionResolver {
   @Query('liveSession')
   async getLiveSession(
     @Args('contentItemId') contentItemId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tenantId = ctx.req.user?.tenant_id ?? '';
     return this.liveSessionService.getByContentItem(contentItemId, tenantId);
@@ -37,41 +31,39 @@ export class LiveSessionResolver {
     @Args('contentItemId') contentItemId: string,
     @Args('scheduledAt') scheduledAt: string,
     @Args('meetingName') meetingName: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tenantId = ctx.req.user?.tenant_id ?? '';
     return this.liveSessionService.createLiveSession(
       contentItemId,
       tenantId,
       new Date(scheduledAt),
-      meetingName,
+      meetingName
     );
   }
 
   @Mutation('joinLiveSession')
   async joinLiveSession(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<string> {
     const tenantId = ctx.req.user?.tenant_id ?? '';
     const userName =
-      ctx.req.user?.name ??
-      ctx.req.user?.preferred_username ??
-      'Learner';
+      ctx.req.user?.name ?? ctx.req.user?.preferred_username ?? 'Learner';
     const userRole = ctx.req.user?.role ?? 'LEARNER';
 
     return this.liveSessionService.getJoinUrl(
       sessionId,
       tenantId,
       userName,
-      userRole,
+      userRole
     );
   }
 
   @Mutation('endLiveSession')
   async endLiveSession(
     @Args('sessionId') sessionId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tenantId = ctx.req.user?.tenant_id ?? '';
     return this.liveSessionService.endSession(sessionId, tenantId);

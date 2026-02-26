@@ -37,7 +37,9 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn(),
   and: vi.fn(),
-  withTenantContext: vi.fn(async (_, __, fn: (db: unknown) => unknown) => fn({})),
+  withTenantContext: vi.fn(async (_, __, fn: (db: unknown) => unknown) =>
+    fn({})
+  ),
 }));
 
 vi.mock('@edusphere/nats-client', () => ({
@@ -62,9 +64,13 @@ vi.mock('nats', () => ({
 }));
 
 vi.mock('../certificate/certificate.service.js', () => ({
-  CertificateService: vi.fn().mockImplementation(function CertificateServiceCtor() {
-    return { generateCertificate: vi.fn().mockResolvedValue({ id: 'cert-1' }) };
-  }),
+  CertificateService: vi
+    .fn()
+    .mockImplementation(function CertificateServiceCtor() {
+      return {
+        generateCertificate: vi.fn().mockResolvedValue({ id: 'cert-1' }),
+      };
+    }),
 }));
 
 // ─── Import after mocks ────────────────────────────────────────────────────────
@@ -114,26 +120,74 @@ describe('ProgramService — memory safety', () => {
   // ─── 3. Concurrent course completions resolve correctly ───────────────────
 
   it('concurrent course completions resolve without collision', async () => {
-    const getProgramProgressSpy = vi.spyOn(service, 'getProgramProgress').mockResolvedValue({
-      totalCourses: 3,
-      completedCourses: 2,
-      completedCourseIds: ['c1', 'c2'],
-      percentComplete: 67,
-    });
+    const getProgramProgressSpy = vi
+      .spyOn(service, 'getProgramProgress')
+      .mockResolvedValue({
+        totalCourses: 3,
+        completedCourses: 2,
+        completedCourseIds: ['c1', 'c2'],
+        percentComplete: 67,
+      });
 
-    const enrollment = { id: 'enroll-1', userId: 'user-1', programId: 'prog-1', tenantId: 'tenant-1', completedAt: null };
-    const program = { id: 'prog-1', tenantId: 'tenant-1', requiredCourseIds: ['c1', 'c2', 'c3'] };
+    const enrollment = {
+      id: 'enroll-1',
+      userId: 'user-1',
+      programId: 'prog-1',
+      tenantId: 'tenant-1',
+      completedAt: null,
+    };
+    const program = {
+      id: 'prog-1',
+      tenantId: 'tenant-1',
+      requiredCourseIds: ['c1', 'c2', 'c3'],
+    };
 
     const { withTenantContext } = await import('@edusphere/db');
     vi.mocked(withTenantContext)
       // h1: getUserEnrollments
-      .mockImplementationOnce(async (_, __, fn) => fn({ select: vi.fn().mockReturnValue({ from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([enrollment]) }) }) } as never))
+      .mockImplementationOnce(async (_, __, fn) =>
+        fn({
+          select: vi.fn().mockReturnValue({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([enrollment]),
+            }),
+          }),
+        } as never)
+      )
       // h2: getUserEnrollments
-      .mockImplementationOnce(async (_, __, fn) => fn({ select: vi.fn().mockReturnValue({ from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([enrollment]) }) }) } as never))
+      .mockImplementationOnce(async (_, __, fn) =>
+        fn({
+          select: vi.fn().mockReturnValue({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([enrollment]),
+            }),
+          }),
+        } as never)
+      )
       // h1: checkProgramCompletion → program fetch
-      .mockImplementationOnce(async (_, __, fn) => fn({ select: vi.fn().mockReturnValue({ from: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([program]) }) }) }) } as never))
+      .mockImplementationOnce(async (_, __, fn) =>
+        fn({
+          select: vi.fn().mockReturnValue({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([program]),
+              }),
+            }),
+          }),
+        } as never)
+      )
       // h2: checkProgramCompletion → program fetch
-      .mockImplementationOnce(async (_, __, fn) => fn({ select: vi.fn().mockReturnValue({ from: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([program]) }) }) }) } as never));
+      .mockImplementationOnce(async (_, __, fn) =>
+        fn({
+          select: vi.fn().mockReturnValue({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([program]),
+              }),
+            }),
+          }),
+        } as never)
+      );
 
     // Fire two completions concurrently for the same program
     const payload = {
@@ -143,8 +197,11 @@ describe('ProgramService — memory safety', () => {
       completionDate: new Date().toISOString(),
     };
 
-    const handler = (service as unknown as { handleCourseCompleted: (p: unknown) => Promise<void> })
-      .handleCourseCompleted.bind(service);
+    const handler = (
+      service as unknown as {
+        handleCourseCompleted: (p: unknown) => Promise<void>;
+      }
+    ).handleCourseCompleted.bind(service);
 
     await Promise.all([handler(payload), handler(payload)]);
 

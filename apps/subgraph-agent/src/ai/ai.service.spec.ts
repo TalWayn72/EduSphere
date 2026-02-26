@@ -36,7 +36,8 @@ const mockSearchKnowledgeGraph = vi.fn();
 const mockFetchContentItem = vi.fn();
 
 vi.mock('./ai.service.db', () => ({
-  searchKnowledgeGraph: (...args: unknown[]) => mockSearchKnowledgeGraph(...args),
+  searchKnowledgeGraph: (...args: unknown[]) =>
+    mockSearchKnowledgeGraph(...args),
   fetchContentItem: (...args: unknown[]) => mockFetchContentItem(...args),
 }));
 
@@ -44,18 +45,20 @@ vi.mock('./ai.service.db', () => ({
 // Mimic the Vercel AI tool() wrapper: the internal execute destructures the
 // object args (as Vercel would) and calls the user-provided closure positionally.
 vi.mock('./tools/agent-tools', () => ({
-  buildSearchKnowledgeGraphTool: (exec: (q: string, l: number) => Promise<unknown>) =>
-    ({
-      description: 'search-knowledge-graph',
-      parameters: {},
-      execute: ({ query, limit }: { query: string; limit: number }) => exec(query, limit),
-    }),
-  buildFetchCourseContentTool: (exec: (id: string) => Promise<unknown>) =>
-    ({
-      description: 'fetch-course-content',
-      parameters: {},
-      execute: ({ contentItemId }: { contentItemId: string }) => exec(contentItemId),
-    }),
+  buildSearchKnowledgeGraphTool: (
+    exec: (q: string, l: number) => Promise<unknown>
+  ) => ({
+    description: 'search-knowledge-graph',
+    parameters: {},
+    execute: ({ query, limit }: { query: string; limit: number }) =>
+      exec(query, limit),
+  }),
+  buildFetchCourseContentTool: (exec: (id: string) => Promise<unknown>) => ({
+    description: 'fetch-course-content',
+    parameters: {},
+    execute: ({ contentItemId }: { contentItemId: string }) =>
+      exec(contentItemId),
+  }),
   searchKnowledgeGraphSchema: {},
   fetchCourseContentSchema: {},
 }));
@@ -108,7 +111,7 @@ describe('AIService', () => {
     service = new AIService(
       mockLangGraphService as any,
       new AiLanggraphRunnerService(mockLangGraphService as any),
-      new AiLegacyRunnerService(),
+      new AiLegacyRunnerService()
     );
 
     mockRunLangGraphDebate.mockResolvedValue(MOCK_LANGGRAPH_RESULT);
@@ -139,7 +142,10 @@ describe('AIService', () => {
 
     it('uses temperature from agent config', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const agent = { ...MOCK_AGENT_EXPLAIN, config: { temperature: 0.3, maxTokens: 500 } };
+      const agent = {
+        ...MOCK_AGENT_EXPLAIN,
+        config: { temperature: 0.3, maxTokens: 500 },
+      };
       await service.execute(agent, MOCK_INPUT);
       expect(mockGenerateText).toHaveBeenCalledWith(
         expect.objectContaining({ temperature: 0.3 })
@@ -148,7 +154,10 @@ describe('AIService', () => {
 
     it('uses maxTokens from agent config', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const agent = { ...MOCK_AGENT_EXPLAIN, config: { temperature: 0.7, maxTokens: 500 } };
+      const agent = {
+        ...MOCK_AGENT_EXPLAIN,
+        config: { temperature: 0.7, maxTokens: 500 },
+      };
       await service.execute(agent, MOCK_INPUT);
       expect(mockGenerateText).toHaveBeenCalledWith(
         expect.objectContaining({ maxOutputTokens: 500 })
@@ -175,9 +184,9 @@ describe('AIService', () => {
 
     it('propagates error when generateText throws', async () => {
       mockGenerateText.mockRejectedValue(new Error('API rate limit exceeded'));
-      await expect(service.execute(MOCK_AGENT_EXPLAIN, MOCK_INPUT)).rejects.toThrow(
-        'API rate limit exceeded'
-      );
+      await expect(
+        service.execute(MOCK_AGENT_EXPLAIN, MOCK_INPUT)
+      ).rejects.toThrow('API rate limit exceeded');
     });
 
     it('includes context in user prompt when provided', async () => {
@@ -210,7 +219,9 @@ describe('AIService', () => {
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
       await service.execute(MOCK_AGENT_RESEARCH, MOCK_INPUT);
-      expect(String(capturedCall['system']).toLowerCase()).toContain('research');
+      expect(String(capturedCall['system']).toLowerCase()).toContain(
+        'research'
+      );
     });
 
     it('falls back to default prompt for unknown template', async () => {
@@ -219,7 +230,10 @@ describe('AIService', () => {
         capturedCall = args as Record<string, unknown>;
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
-      await service.execute({ ...MOCK_AGENT_EXPLAIN, template: 'UNKNOWN' }, MOCK_INPUT);
+      await service.execute(
+        { ...MOCK_AGENT_EXPLAIN, template: 'UNKNOWN' },
+        MOCK_INPUT
+      );
       expect(typeof capturedCall['system']).toBe('string');
     });
   });
@@ -229,15 +243,23 @@ describe('AIService', () => {
   describe('execute() — CHAVRUTA_DEBATE (legacy manual workflow)', () => {
     it('routes CHAVRUTA_DEBATE to chavruta workflow and returns text', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const result = await service.execute(MOCK_AGENT_CHAVRUTA, MOCK_INPUT_WITH_CONTENT);
+      const result = await service.execute(
+        MOCK_AGENT_CHAVRUTA,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(result.text).toBe(MOCK_GENERATE_RESULT.text);
     });
 
     it('returns workflowResult with nextState', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const result = await service.execute(MOCK_AGENT_CHAVRUTA, MOCK_INPUT_WITH_CONTENT);
+      const result = await service.execute(
+        MOCK_AGENT_CHAVRUTA,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(result.workflowResult).toBeDefined();
-      expect((result.workflowResult as Record<string, unknown>)['nextState']).toBeDefined();
+      expect(
+        (result.workflowResult as Record<string, unknown>)['nextState']
+      ).toBeDefined();
     });
 
     it('calls generateText via chavruta workflow', async () => {
@@ -261,14 +283,28 @@ describe('AIService', () => {
 
   describe('execute() — QUIZ_ASSESS (legacy manual workflow)', () => {
     it('routes QUIZ_ASSESS and returns text', async () => {
-      mockGenerateText.mockResolvedValue({ text: 'Quiz result', usage: {}, finishReason: 'stop' });
-      const result = await service.execute(MOCK_AGENT_QUIZ, MOCK_INPUT_WITH_CONTENT);
+      mockGenerateText.mockResolvedValue({
+        text: 'Quiz result',
+        usage: {},
+        finishReason: 'stop',
+      });
+      const result = await service.execute(
+        MOCK_AGENT_QUIZ,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(result.text).toBeDefined();
     });
 
     it('returns workflowResult for QUIZ_ASSESS', async () => {
-      mockGenerateText.mockResolvedValue({ text: 'Quiz result', usage: {}, finishReason: 'stop' });
-      const result = await service.execute(MOCK_AGENT_QUIZ, MOCK_INPUT_WITH_CONTENT);
+      mockGenerateText.mockResolvedValue({
+        text: 'Quiz result',
+        usage: {},
+        finishReason: 'stop',
+      });
+      const result = await service.execute(
+        MOCK_AGENT_QUIZ,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(result.workflowResult).toBeDefined();
     });
   });
@@ -278,13 +314,19 @@ describe('AIService', () => {
   describe('execute() — SUMMARIZE (legacy manual workflow)', () => {
     it('routes SUMMARIZE and returns text', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const result = await service.execute(MOCK_AGENT_SUMMARIZE, MOCK_INPUT_WITH_CONTENT);
+      const result = await service.execute(
+        MOCK_AGENT_SUMMARIZE,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(result.text).toBeDefined();
     });
 
     it('returns workflowResult for SUMMARIZE', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const result = await service.execute(MOCK_AGENT_SUMMARIZE, MOCK_INPUT_WITH_CONTENT);
+      const result = await service.execute(
+        MOCK_AGENT_SUMMARIZE,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(result.workflowResult).toBeDefined();
     });
   });
@@ -302,7 +344,12 @@ describe('AIService', () => {
     describe('CHAVRUTA_DEBATE — conversational chavruta workflow', () => {
       it('does NOT call runLangGraphDebate', async () => {
         mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        await service.continueSession(
+          SESSION_ID,
+          MESSAGE,
+          'CHAVRUTA_DEBATE',
+          CTX
+        );
         expect(mockRunLangGraphDebate).not.toHaveBeenCalled();
       });
 
@@ -312,7 +359,12 @@ describe('AIService', () => {
           capturedCall = args as Record<string, unknown>;
           return Promise.resolve(MOCK_GENERATE_RESULT);
         });
-        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        await service.continueSession(
+          SESSION_ID,
+          MESSAGE,
+          'CHAVRUTA_DEBATE',
+          CTX
+        );
         expect(mockGenerateText).toHaveBeenCalled();
         expect(String(capturedCall['system'] ?? '')).toContain('Chavruta');
       });
@@ -323,8 +375,16 @@ describe('AIService', () => {
           capturedCall = args as Record<string, unknown>;
           return Promise.resolve(MOCK_GENERATE_RESULT);
         });
-        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
-        const msgs = capturedCall['messages'] as Array<{ role: string; content: string }>;
+        await service.continueSession(
+          SESSION_ID,
+          MESSAGE,
+          'CHAVRUTA_DEBATE',
+          CTX
+        );
+        const msgs = capturedCall['messages'] as Array<{
+          role: string;
+          content: string;
+        }>;
         expect(msgs).toBeDefined();
         expect(msgs.some((m) => m.content === MESSAGE)).toBe(true);
       });
@@ -335,7 +395,9 @@ describe('AIService', () => {
           capturedCall = args as Record<string, unknown>;
           return Promise.resolve(MOCK_GENERATE_RESULT);
         });
-        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', { topic: 'Free will' });
+        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', {
+          topic: 'Free will',
+        });
         // system prompt is built from ASSESS state; content doesn't appear in system but workflow receives it
         expect(capturedCall['system']).toBeDefined();
       });
@@ -344,21 +406,35 @@ describe('AIService', () => {
         mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
         // Should not throw when topic is missing
         await expect(
-          service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', { topicId: 'topic-uuid' })
+          service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', {
+            topicId: 'topic-uuid',
+          })
         ).resolves.toBeDefined();
       });
 
       it('returns text from generateText', async () => {
         mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-        const result = await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        const result = await service.continueSession(
+          SESSION_ID,
+          MESSAGE,
+          'CHAVRUTA_DEBATE',
+          CTX
+        );
         expect(result.text).toBe(MOCK_GENERATE_RESULT.text);
       });
 
       it('returns workflowResult with nextState', async () => {
         mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-        const result = await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX);
+        const result = await service.continueSession(
+          SESSION_ID,
+          MESSAGE,
+          'CHAVRUTA_DEBATE',
+          CTX
+        );
         expect(result.workflowResult).toBeDefined();
-        expect((result.workflowResult as Record<string, unknown>)['nextState']).toBeDefined();
+        expect(
+          (result.workflowResult as Record<string, unknown>)['nextState']
+        ).toBeDefined();
       });
 
       it('injects Hebrew locale instruction into system prompt when locale is he', async () => {
@@ -367,7 +443,13 @@ describe('AIService', () => {
           capturedCall = args as Record<string, unknown>;
           return Promise.resolve(MOCK_GENERATE_RESULT);
         });
-        await service.continueSession(SESSION_ID, MESSAGE, 'CHAVRUTA_DEBATE', CTX, 'he');
+        await service.continueSession(
+          SESSION_ID,
+          MESSAGE,
+          'CHAVRUTA_DEBATE',
+          CTX,
+          'he'
+        );
         expect(String(capturedCall['system'] ?? '')).toContain('Hebrew');
       });
 
@@ -389,28 +471,63 @@ describe('AIService', () => {
 
     it('routes QUIZ_GENERATOR to runLangGraphQuiz', async () => {
       const result = await service.continueSession(
-        SESSION_ID, MESSAGE, 'QUIZ_GENERATOR', CTX
+        SESSION_ID,
+        MESSAGE,
+        'QUIZ_GENERATOR',
+        CTX
       );
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
+      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(
+        SESSION_ID,
+        MESSAGE,
+        CTX,
+        'en',
+        MOCK_CHECKPOINTER
+      );
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
     it('routes QUIZ_ASSESS to runLangGraphQuiz', async () => {
       await service.continueSession(SESSION_ID, MESSAGE, 'QUIZ_ASSESS', CTX);
-      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
+      expect(mockRunLangGraphQuiz).toHaveBeenCalledWith(
+        SESSION_ID,
+        MESSAGE,
+        CTX,
+        'en',
+        MOCK_CHECKPOINTER
+      );
     });
 
     it('routes TUTOR to runLangGraphTutor', async () => {
       const result = await service.continueSession(
-        SESSION_ID, MESSAGE, 'TUTOR', CTX
+        SESSION_ID,
+        MESSAGE,
+        'TUTOR',
+        CTX
       );
-      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
+      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(
+        SESSION_ID,
+        MESSAGE,
+        CTX,
+        'en',
+        MOCK_CHECKPOINTER
+      );
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
 
     it('routes EXPLANATION_GENERATOR to runLangGraphTutor', async () => {
-      await service.continueSession(SESSION_ID, MESSAGE, 'EXPLANATION_GENERATOR', CTX);
-      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(SESSION_ID, MESSAGE, CTX, 'en', MOCK_CHECKPOINTER);
+      await service.continueSession(
+        SESSION_ID,
+        MESSAGE,
+        'EXPLANATION_GENERATOR',
+        CTX
+      );
+      expect(mockRunLangGraphTutor).toHaveBeenCalledWith(
+        SESSION_ID,
+        MESSAGE,
+        CTX,
+        'en',
+        MOCK_CHECKPOINTER
+      );
     });
 
     it('routes SUMMARIZE to legacy summarizer (not LangGraph adapters)', async () => {
@@ -423,14 +540,24 @@ describe('AIService', () => {
 
     it('routes EXPLAIN to generic fallback (not LangGraph adapters)', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const result = await service.continueSession(SESSION_ID, MESSAGE, 'EXPLAIN', {});
+      const result = await service.continueSession(
+        SESSION_ID,
+        MESSAGE,
+        'EXPLAIN',
+        {}
+      );
       expect(mockRunLangGraphDebate).not.toHaveBeenCalled();
       expect(result.text).toBe(MOCK_GENERATE_RESULT.text);
     });
 
     it('routes RESEARCH_SCOUT to generic fallback', async () => {
       mockGenerateText.mockResolvedValue(MOCK_GENERATE_RESULT);
-      const result = await service.continueSession(SESSION_ID, MESSAGE, 'RESEARCH_SCOUT', {});
+      const result = await service.continueSession(
+        SESSION_ID,
+        MESSAGE,
+        'RESEARCH_SCOUT',
+        {}
+      );
       expect(result.text).toBe(MOCK_GENERATE_RESULT.text);
     });
   });
@@ -481,7 +608,10 @@ describe('AIService', () => {
     it('calls streamText for EXPLAIN and returns the stream result', async () => {
       const mockStream = { stream: 'mock-stream' };
       mockStreamText.mockReturnValue(mockStream);
-      const result = await service.executeStream(MOCK_AGENT_EXPLAIN, MOCK_INPUT);
+      const result = await service.executeStream(
+        MOCK_AGENT_EXPLAIN,
+        MOCK_INPUT
+      );
       expect(result).toEqual(mockStream);
     });
 
@@ -503,7 +633,10 @@ describe('AIService', () => {
 
     it('uses temperature from agent config in stream mode', async () => {
       mockStreamText.mockReturnValue({});
-      const agent = { ...MOCK_AGENT_EXPLAIN, config: { temperature: 0.2, maxTokens: 300 } };
+      const agent = {
+        ...MOCK_AGENT_EXPLAIN,
+        config: { temperature: 0.2, maxTokens: 300 },
+      };
       await service.executeStream(agent, MOCK_INPUT);
       expect(mockStreamText).toHaveBeenCalledWith(
         expect.objectContaining({ temperature: 0.2 })
@@ -512,7 +645,10 @@ describe('AIService', () => {
 
     it('routes CHAVRUTA_DEBATE stream through chavruta workflow', async () => {
       mockStreamText.mockReturnValue({ stream: 'chavruta-stream' });
-      const result = await service.executeStream(MOCK_AGENT_CHAVRUTA, MOCK_INPUT_WITH_CONTENT);
+      const result = await service.executeStream(
+        MOCK_AGENT_CHAVRUTA,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(mockStreamText).toHaveBeenCalled();
       expect(result).toBeDefined();
     });
@@ -525,7 +661,10 @@ describe('AIService', () => {
 
     it('routes SUMMARIZE stream through summarizer workflow', async () => {
       mockStreamText.mockReturnValue({ stream: 'summarize-stream' });
-      await service.executeStream(MOCK_AGENT_SUMMARIZE, MOCK_INPUT_WITH_CONTENT);
+      await service.executeStream(
+        MOCK_AGENT_SUMMARIZE,
+        MOCK_INPUT_WITH_CONTENT
+      );
       expect(mockStreamText).toHaveBeenCalled();
     });
   });
@@ -560,7 +699,10 @@ describe('AIService', () => {
     it('tools object contains searchKnowledgeGraph key', async () => {
       let capturedTools: Record<string, unknown> = {};
       mockGenerateText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, unknown>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          unknown
+        >;
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
       await service.execute(MOCK_AGENT_EXPLAIN, MOCK_INPUT);
@@ -570,7 +712,10 @@ describe('AIService', () => {
     it('tools object contains fetchCourseContent key', async () => {
       let capturedTools: Record<string, unknown> = {};
       mockGenerateText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, unknown>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          unknown
+        >;
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
       await service.execute(MOCK_AGENT_EXPLAIN, MOCK_INPUT);
@@ -615,7 +760,10 @@ describe('AIService', () => {
     it('tools object contains searchKnowledgeGraph for stream', async () => {
       let capturedTools: Record<string, unknown> = {};
       mockStreamText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, unknown>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          unknown
+        >;
         return {};
       });
       await service.executeStream(MOCK_AGENT_EXPLAIN, MOCK_INPUT);
@@ -625,7 +773,10 @@ describe('AIService', () => {
     it('tools object contains fetchCourseContent for stream', async () => {
       let capturedTools: Record<string, unknown> = {};
       mockStreamText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, unknown>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          unknown
+        >;
         return {};
       });
       await service.executeStream(MOCK_AGENT_EXPLAIN, MOCK_INPUT);
@@ -637,14 +788,19 @@ describe('AIService', () => {
       const inputWithTenant = { ...MOCK_INPUT, tenantId: 'tenant-xyz' };
       await service.executeStream(MOCK_AGENT_EXPLAIN, inputWithTenant);
       expect(mockStreamText).toHaveBeenCalledWith(
-        expect.objectContaining({ tools: expect.any(Object), stopWhen: expect.any(Function) })
+        expect.objectContaining({
+          tools: expect.any(Object),
+          stopWhen: expect.any(Function),
+        })
       );
     });
 
     it('workflow-routed templates (CHAVRUTA) do NOT call streamText with tools+maxSteps from service', async () => {
       mockStreamText.mockReturnValue({ stream: 'chavruta' });
       await service.executeStream(MOCK_AGENT_CHAVRUTA, MOCK_INPUT_WITH_CONTENT);
-      const calls = mockStreamText.mock.calls as Array<[Record<string, unknown>]>;
+      const calls = mockStreamText.mock.calls as Array<
+        [Record<string, unknown>]
+      >;
       const serviceToolsCall = calls.some(
         ([arg]) => 'tools' in arg && 'stopWhen' in arg
       );
@@ -657,37 +813,61 @@ describe('AIService', () => {
 
   describe('searchKnowledgeGraph tool execute closure', () => {
     it('delegates to DB helper with correct tenantId and query', async () => {
-      const mockResults = [{ id: 'r1', text: 'chloroplast', type: 'ts', similarity: 0.9 }];
+      const mockResults = [
+        { id: 'r1', text: 'chloroplast', type: 'ts', similarity: 0.9 },
+      ];
       mockSearchKnowledgeGraph.mockResolvedValue(mockResults);
 
-      type ToolDef = { execute: (args: { query: string; limit: number }) => Promise<unknown> };
+      type ToolDef = {
+        execute: (args: { query: string; limit: number }) => Promise<unknown>;
+      };
       let capturedTools: Record<string, ToolDef> = {};
       mockGenerateText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, ToolDef>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          ToolDef
+        >;
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
 
-      await service.execute(MOCK_AGENT_EXPLAIN, { ...MOCK_INPUT, tenantId: 'tenant-123' });
+      await service.execute(MOCK_AGENT_EXPLAIN, {
+        ...MOCK_INPUT,
+        tenantId: 'tenant-123',
+      });
 
       const toolExec = capturedTools['searchKnowledgeGraph']?.execute;
       if (toolExec) {
         await toolExec({ query: 'biology', limit: 3 });
-        expect(mockSearchKnowledgeGraph).toHaveBeenCalledWith('biology', 'tenant-123', 3);
+        expect(mockSearchKnowledgeGraph).toHaveBeenCalledWith(
+          'biology',
+          'tenant-123',
+          3
+        );
       }
     });
 
     it('returns results from DB helper', async () => {
-      const mockResults = [{ id: 'r1', text: 'mitosis', type: 'ts', similarity: 0.85 }];
+      const mockResults = [
+        { id: 'r1', text: 'mitosis', type: 'ts', similarity: 0.85 },
+      ];
       mockSearchKnowledgeGraph.mockResolvedValue(mockResults);
 
-      type ToolDef = { execute: (args: { query: string; limit: number }) => Promise<unknown> };
+      type ToolDef = {
+        execute: (args: { query: string; limit: number }) => Promise<unknown>;
+      };
       let capturedTools: Record<string, ToolDef> = {};
       mockGenerateText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, ToolDef>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          ToolDef
+        >;
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
 
-      await service.execute(MOCK_AGENT_EXPLAIN, { ...MOCK_INPUT, tenantId: 'tenant-456' });
+      await service.execute(MOCK_AGENT_EXPLAIN, {
+        ...MOCK_INPUT,
+        tenantId: 'tenant-456',
+      });
 
       const toolExec = capturedTools['searchKnowledgeGraph']?.execute;
       if (toolExec) {
@@ -701,17 +881,30 @@ describe('AIService', () => {
 
   describe('fetchCourseContent tool execute closure', () => {
     it('delegates to DB helper with contentItemId and tenantId', async () => {
-      const mockItem = { id: 'item-1', title: 'Math 101', type: 'course', content: null };
+      const mockItem = {
+        id: 'item-1',
+        title: 'Math 101',
+        type: 'course',
+        content: null,
+      };
       mockFetchContentItem.mockResolvedValue(mockItem);
 
-      type ToolDef = { execute: (args: { contentItemId: string }) => Promise<unknown> };
+      type ToolDef = {
+        execute: (args: { contentItemId: string }) => Promise<unknown>;
+      };
       let capturedTools: Record<string, ToolDef> = {};
       mockGenerateText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, ToolDef>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          ToolDef
+        >;
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
 
-      await service.execute(MOCK_AGENT_EXPLAIN, { ...MOCK_INPUT, tenantId: 'tenant-789' });
+      await service.execute(MOCK_AGENT_EXPLAIN, {
+        ...MOCK_INPUT,
+        tenantId: 'tenant-789',
+      });
 
       const uuid = '123e4567-e89b-12d3-a456-426614174000';
       const toolExec = capturedTools['fetchCourseContent']?.execute;
@@ -724,14 +917,22 @@ describe('AIService', () => {
     it('returns null when item not found', async () => {
       mockFetchContentItem.mockResolvedValue(null);
 
-      type ToolDef = { execute: (args: { contentItemId: string }) => Promise<unknown> };
+      type ToolDef = {
+        execute: (args: { contentItemId: string }) => Promise<unknown>;
+      };
       let capturedTools: Record<string, ToolDef> = {};
       mockGenerateText.mockImplementation((args: unknown) => {
-        capturedTools = (args as Record<string, unknown>)['tools'] as Record<string, ToolDef>;
+        capturedTools = (args as Record<string, unknown>)['tools'] as Record<
+          string,
+          ToolDef
+        >;
         return Promise.resolve(MOCK_GENERATE_RESULT);
       });
 
-      await service.execute(MOCK_AGENT_EXPLAIN, { ...MOCK_INPUT, tenantId: 'tenant-000' });
+      await service.execute(MOCK_AGENT_EXPLAIN, {
+        ...MOCK_INPUT,
+        tenantId: 'tenant-000',
+      });
 
       const uuid = '123e4567-e89b-12d3-a456-426614174001';
       const toolExec = capturedTools['fetchCourseContent']?.execute;
@@ -751,7 +952,9 @@ describe('AIService', () => {
     });
 
     it('accepts sessionId and optional limit without throwing', async () => {
-      await expect(service.getConversationMemory('session-1', 5)).resolves.toBeDefined();
+      await expect(
+        service.getConversationMemory('session-1', 5)
+      ).resolves.toBeDefined();
     });
   });
 

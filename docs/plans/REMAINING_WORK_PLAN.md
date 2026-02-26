@@ -9,36 +9,38 @@
 
 ## Current State
 
-| Layer | Status | Tests |
-|-------|--------|-------|
-| Security compliance (G-01→G-22) | ✅ Complete | 476/476 |
-| SOC2 policy library (10 docs) | ✅ Complete | POL-001→POL-010 |
-| CI security pipeline | ✅ Complete | Trivy+OWASP+SBOM |
-| Compliance docs (GDPR Art.30/35) | ✅ Complete | SUBPROCESSORS, DPIA, RoPA |
-| PgBouncer config | ✅ Complete | Tests passing |
-| OpenTelemetry + Prometheus | ✅ Complete | Tests passing |
-| Query hardening | ✅ Complete | Tests passing |
-| Read Replicas + CDN | ✅ Complete | 14 tests |
-| Persisted Queries (APQ) | ✅ Complete | 21 tests |
-| CD Pipeline (Helm K8s) | ✅ Complete | cd.yml + values |
-| k6 Load Tests (100k users) | ✅ Complete | 3 scenarios |
-| pgvector HNSW tuning | ✅ Complete | optimize-hnsw.sql |
-| Video Annotation UI (web) | ✅ Complete | 5 components+tests |
-| Chavruta Debate UI (web) | ✅ Complete | 4 components+tests |
-| AGE Graph Tests | ✅ Complete | 52 tests |
-| NATS Event Schema Tests | ✅ Complete | 56 tests |
-| LangGraph Workflow Tests | ✅ Complete | 67 tests |
-| Mobile Offline Sync (SyncEngine) | ✅ Complete | In progress |
-| DPA Template + LIA + Breach Register | 🟡 In Progress | Agent running |
+| Layer                                | Status         | Tests                     |
+| ------------------------------------ | -------------- | ------------------------- |
+| Security compliance (G-01→G-22)      | ✅ Complete    | 476/476                   |
+| SOC2 policy library (10 docs)        | ✅ Complete    | POL-001→POL-010           |
+| CI security pipeline                 | ✅ Complete    | Trivy+OWASP+SBOM          |
+| Compliance docs (GDPR Art.30/35)     | ✅ Complete    | SUBPROCESSORS, DPIA, RoPA |
+| PgBouncer config                     | ✅ Complete    | Tests passing             |
+| OpenTelemetry + Prometheus           | ✅ Complete    | Tests passing             |
+| Query hardening                      | ✅ Complete    | Tests passing             |
+| Read Replicas + CDN                  | ✅ Complete    | 14 tests                  |
+| Persisted Queries (APQ)              | ✅ Complete    | 21 tests                  |
+| CD Pipeline (Helm K8s)               | ✅ Complete    | cd.yml + values           |
+| k6 Load Tests (100k users)           | ✅ Complete    | 3 scenarios               |
+| pgvector HNSW tuning                 | ✅ Complete    | optimize-hnsw.sql         |
+| Video Annotation UI (web)            | ✅ Complete    | 5 components+tests        |
+| Chavruta Debate UI (web)             | ✅ Complete    | 4 components+tests        |
+| AGE Graph Tests                      | ✅ Complete    | 52 tests                  |
+| NATS Event Schema Tests              | ✅ Complete    | 56 tests                  |
+| LangGraph Workflow Tests             | ✅ Complete    | 67 tests                  |
+| Mobile Offline Sync (SyncEngine)     | ✅ Complete    | In progress               |
+| DPA Template + LIA + Breach Register | 🟡 In Progress | Agent running             |
 
 ---
 
 ## A. Production Scale — Phase 7 Remaining
 
 ### A1. Read Replicas + CDN (Phase 7.1) ✅ COMPLETE
+
 **Completed by:** Agent aa36f3d
 
 Files created:
+
 - [x] `infrastructure/postgres/postgresql-replica.conf`
 - [x] `infrastructure/postgres/pg_hba.conf`
 - [x] `docs/deployment/READ_REPLICAS.md`
@@ -47,18 +49,22 @@ Files created:
 - [x] `tests/security/read-replica.spec.ts` — 14 tests
 
 ### A2. Persisted Queries — Production Mode (Phase 7.3) ✅ COMPLETE
+
 **Completed by:** Agent a60a283
 
 Files created:
+
 - [x] `apps/gateway/src/persisted-queries/registry.ts` — LRU-capped APQ registry
 - [x] `apps/gateway/src/persisted-queries/middleware.ts` — reject unknown hashes in prod
 - [x] `apps/gateway/.env.example` — `PERSISTED_QUERIES_ONLY=true`
 - [x] `tests/security/persisted-queries.spec.ts` — 21 tests
 
 ### A3. CD Pipeline — Helm to Kubernetes (Phase 7) ✅ COMPLETE
+
 **Completed by:** Agent a5cb989
 
 Files updated:
+
 - [x] `.github/workflows/cd.yml` — build matrix, staging→production, rollback job
 - [x] `infrastructure/k8s/helm/edusphere/values.production.yaml` — autoscaling, PDB, nodeAffinity
 - [x] `infrastructure/k8s/helm/edusphere/values.staging.yaml` — debug logging, cert-manager staging
@@ -68,18 +74,21 @@ Files updated:
 ## B. Compliance Documents Remaining
 
 ### B1. DPA Template for Clients 🟡 IN PROGRESS
+
 **Being created by:** Agent a6b52e7
 
 - [ ] `docs/legal/DPA_TEMPLATE.md`
 - [ ] `docs/legal/DPA_INSTRUCTIONS.md`
 
 ### B2. Legitimate Interest Assessment (LIA) 🟡 IN PROGRESS
+
 **Being created by:** Agent a6b52e7
 
 - [ ] `docs/security/LIA_SECURITY_MONITORING.md`
 - [ ] `docs/security/LIA_PLATFORM_ANALYTICS.md`
 
 ### B3. Breach Register 🟡 IN PROGRESS
+
 **Being created by:** Agent a6b52e7
 
 - [ ] `docs/security/BREACH_REGISTER.md`
@@ -89,9 +98,11 @@ Files updated:
 ## C. Frontend Features — Phase 8 (Mobile + Advanced)
 
 ### C1. Video Annotation Layer (Phase 8 — Frontend) ✅ COMPLETE
+
 **Completed by:** Agent a033b11
 
 Files created:
+
 - [x] `apps/web/src/components/annotation/VideoAnnotationLayer.tsx`
 - [x] `apps/web/src/hooks/useVideoAnnotations.ts`
 - [x] `apps/web/src/components/annotation/AnnotationTimeline.tsx`
@@ -109,9 +120,11 @@ Files created:
 - [x] `tests/security/mobile-offline.spec.ts`
 
 ### C3. Chavruta (Debate) UI ✅ COMPLETE
+
 **Completed by:** Agent a41debd
 
 Files created:
+
 - [x] `apps/web/src/pages/chavruta/ChavrutaPage.tsx`
 - [x] `apps/web/src/components/chavruta/DebateInterface.tsx`
 - [x] `apps/web/src/hooks/useChavrutaDebate.ts`
@@ -123,6 +136,7 @@ Files created:
 ## D. Performance & Scale Testing ✅ COMPLETE
 
 ### D1. k6 Load Tests — Phase 7.5 ✅
+
 **Completed by:** Agent a0b136d
 
 - [x] `infrastructure/load-testing/scenarios/100k-users.js` — staged ramp-up to 100k VUs
@@ -130,6 +144,7 @@ Files created:
 - [x] `infrastructure/load-testing/scenarios/soak-test.js` — 24h at 500 VUs
 
 ### D2. pgvector HNSW Index Tuning ✅
+
 **Completed by:** Agent a0b136d
 
 - [x] `packages/db/src/migrations/optimize-hnsw.sql` — benchmarked m=16/ef=64 params
@@ -139,6 +154,7 @@ Files created:
 ## E. Missing Test Coverage ✅ COMPLETE
 
 ### E1. Apache AGE Graph Tests ✅
+
 **Completed by:** Agent a968eb2
 
 - [x] `packages/db/src/graph/age-queries.test.ts` — 52 tests
@@ -148,6 +164,7 @@ Files created:
   - Depth clamping guards
 
 ### E2. NATS Event Schema Tests ✅
+
 **Completed by:** Agent a968eb2
 
 - [x] `packages/nats-client/src/events.schema.test.ts` — 56 tests
@@ -157,6 +174,7 @@ Files created:
   - All enum values validated
 
 ### E3. LangGraph Workflow Tests ✅
+
 **Completed by:** Agent a968eb2
 
 - [x] `apps/subgraph-agent/src/ai/ai.langgraph.workflow.spec.ts` — 67 tests
@@ -169,40 +187,40 @@ Files created:
 
 ## F. Documentation Gaps
 
-| Document | Status |
-|---------|--------|
-| `docs/legal/DPA_TEMPLATE.md` | ✅ Created |
-| `docs/legal/DPA_INSTRUCTIONS.md` | ✅ Created |
-| `docs/security/LIA_SECURITY_MONITORING.md` | ✅ Created |
-| `docs/security/LIA_PLATFORM_ANALYTICS.md` | ✅ Created |
-| `docs/security/BREACH_REGISTER.md` | ✅ Created |
-| `docs/deployment/DR_TEST_RESULTS.md` | ✅ Created |
-| `docs/deployment/READ_REPLICAS.md` | ✅ Created |
-| `docs/security/SUBPROCESSOR_REGISTER.md` | ✅ Created |
-| `docs/security/VENDOR_REGISTER.md` | ✅ Created |
-| `docs/security/DPIA_TEMPLATE.md` | ✅ Created |
+| Document                                      | Status     |
+| --------------------------------------------- | ---------- |
+| `docs/legal/DPA_TEMPLATE.md`                  | ✅ Created |
+| `docs/legal/DPA_INSTRUCTIONS.md`              | ✅ Created |
+| `docs/security/LIA_SECURITY_MONITORING.md`    | ✅ Created |
+| `docs/security/LIA_PLATFORM_ANALYTICS.md`     | ✅ Created |
+| `docs/security/BREACH_REGISTER.md`            | ✅ Created |
+| `docs/deployment/DR_TEST_RESULTS.md`          | ✅ Created |
+| `docs/deployment/READ_REPLICAS.md`            | ✅ Created |
+| `docs/security/SUBPROCESSOR_REGISTER.md`      | ✅ Created |
+| `docs/security/VENDOR_REGISTER.md`            | ✅ Created |
+| `docs/security/DPIA_TEMPLATE.md`              | ✅ Created |
 | `docs/security/GDPR_PROCESSING_ACTIVITIES.md` | ✅ Created |
-| `docs/security/CRYPTO_INVENTORY.md` | ✅ Created |
-| `docs/ai/MODEL_CARDS.md` | ✅ Created |
-| `docs/security/INCIDENT_RESPONSE.md` | ✅ Created |
-| `docs/deployment/SECURITY_HARDENING.md` | ✅ Created |
-| `docs/deployment/AIR_GAPPED_INSTALL.md` | ✅ Created |
+| `docs/security/CRYPTO_INVENTORY.md`           | ✅ Created |
+| `docs/ai/MODEL_CARDS.md`                      | ✅ Created |
+| `docs/security/INCIDENT_RESPONSE.md`          | ✅ Created |
+| `docs/deployment/SECURITY_HARDENING.md`       | ✅ Created |
+| `docs/deployment/AIR_GAPPED_INSTALL.md`       | ✅ Created |
 
 ---
 
 ## Test Count Summary (All waves complete)
 
-| Suite | Count |
-|-------|-------|
-| Security static tests (`tests/security/`) | ~652 |
-| AGE Graph tests | +52 |
-| NATS schema tests | +56 |
-| LangGraph workflow tests | +67 |
-| Gateway tests (cors, rate-limit, complexity, schema-lint) | existing |
-| Mobile offline tests | +4 files ✅ |
-| Knowledge Sources unit tests | +52 ✅ |
-| **Total estimated** | **~880+** |
+| Suite                                                     | Count       |
+| --------------------------------------------------------- | ----------- |
+| Security static tests (`tests/security/`)                 | ~652        |
+| AGE Graph tests                                           | +52         |
+| NATS schema tests                                         | +56         |
+| LangGraph workflow tests                                  | +67         |
+| Gateway tests (cors, rate-limit, complexity, schema-lint) | existing    |
+| Mobile offline tests                                      | +4 files ✅ |
+| Knowledge Sources unit tests                              | +52 ✅      |
+| **Total estimated**                                       | **~880+**   |
 
 ---
 
-*Last updated: 2026-02-25 | All items complete ✅*
+_Last updated: 2026-02-25 | All items complete ✅_

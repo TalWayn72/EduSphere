@@ -16,11 +16,13 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 // ---------------------------------------------------------------------------
 
 const makeKeycloakMock = (initResult: boolean | Error) => ({
-  init: vi.fn().mockImplementation(() =>
-    initResult instanceof Error
-      ? Promise.reject(initResult)
-      : Promise.resolve(initResult),
-  ),
+  init: vi
+    .fn()
+    .mockImplementation(() =>
+      initResult instanceof Error
+        ? Promise.reject(initResult)
+        : Promise.resolve(initResult)
+    ),
   authenticated: initResult === true,
   token: initResult === true ? 'mock-token' : undefined,
   tokenParsed: initResult === true ? { sub: 'user-1' } : null,
@@ -99,7 +101,9 @@ describe('auth — double-init guard (React StrictMode)', () => {
     stubKeycloakEnv('false');
 
     const keycloakMock = makeKeycloakMock(false);
-    vi.doMock('keycloak-js', () => ({ default: makeConstructor(keycloakMock) }));
+    vi.doMock('keycloak-js', () => ({
+      default: makeConstructor(keycloakMock),
+    }));
 
     const { initKeycloak } = await import('@/lib/auth');
 
@@ -119,10 +123,15 @@ describe('auth — double-init guard (React StrictMode)', () => {
     // Slow init to simulate a real async operation so both concurrent
     // calls are in-flight simultaneously (the key StrictMode scenario)
     const keycloakMock = makeKeycloakMock(false);
-    keycloakMock.init = vi.fn().mockImplementation(
-      () => new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 10)),
-    );
-    vi.doMock('keycloak-js', () => ({ default: makeConstructor(keycloakMock) }));
+    keycloakMock.init = vi
+      .fn()
+      .mockImplementation(
+        () =>
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 10))
+      );
+    vi.doMock('keycloak-js', () => ({
+      default: makeConstructor(keycloakMock),
+    }));
 
     const { initKeycloak } = await import('@/lib/auth');
 
@@ -139,7 +148,9 @@ describe('auth — double-init guard (React StrictMode)', () => {
     stubKeycloakEnv('false');
 
     const keycloakMock = makeKeycloakMock(true);
-    vi.doMock('keycloak-js', () => ({ default: makeConstructor(keycloakMock) }));
+    vi.doMock('keycloak-js', () => ({
+      default: makeConstructor(keycloakMock),
+    }));
 
     const { initKeycloak } = await import('@/lib/auth');
 
@@ -163,11 +174,15 @@ describe('auth — genuine Keycloak errors are re-thrown', () => {
 
     const networkError = new Error('Network error: Keycloak unreachable');
     const keycloakMock = makeKeycloakMock(networkError);
-    vi.doMock('keycloak-js', () => ({ default: makeConstructor(keycloakMock) }));
+    vi.doMock('keycloak-js', () => ({
+      default: makeConstructor(keycloakMock),
+    }));
 
     const { initKeycloak } = await import('@/lib/auth');
 
-    await expect(initKeycloak()).rejects.toThrow('Network error: Keycloak unreachable');
+    await expect(initKeycloak()).rejects.toThrow(
+      'Network error: Keycloak unreachable'
+    );
   });
 
   it('initPromise resets to null after a genuine error (allows retry)', async () => {
@@ -182,7 +197,9 @@ describe('auth — genuine Keycloak errors are re-thrown', () => {
         : Promise.resolve(false);
     });
 
-    vi.doMock('keycloak-js', () => ({ default: makeConstructor(keycloakMock) }));
+    vi.doMock('keycloak-js', () => ({
+      default: makeConstructor(keycloakMock),
+    }));
 
     const { initKeycloak } = await import('@/lib/auth');
 

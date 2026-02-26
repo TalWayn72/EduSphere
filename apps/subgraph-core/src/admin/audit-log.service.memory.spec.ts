@@ -20,7 +20,9 @@ vi.mock('@edusphere/db', () => ({
 import { AuditLogService } from './audit-log.service.js';
 
 describe('AuditLogService — memory safety', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('constructs without errors', () => {
     expect(() => new AuditLogService()).not.toThrow();

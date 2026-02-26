@@ -25,7 +25,7 @@ export class SrsResolver {
   @Query('dueReviews')
   async getDueReviews(
     @Args('limit') limit: number | undefined,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { userId, tenantId } = this.requireAuth(context);
     return this.srsService.getDueReviews(userId, tenantId, limit ?? 20);
@@ -41,11 +41,13 @@ export class SrsResolver {
   async submitReview(
     @Args('cardId') cardId: string,
     @Args('quality') quality: number,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { userId, tenantId } = this.requireAuth(context);
     if (!Number.isInteger(quality) || quality < 0 || quality > 5) {
-      throw new BadRequestException('quality must be an integer between 0 and 5');
+      throw new BadRequestException(
+        'quality must be an integer between 0 and 5'
+      );
     }
     return this.srsService.submitReview(cardId, userId, tenantId, quality);
   }
@@ -53,7 +55,7 @@ export class SrsResolver {
   @Mutation('createReviewCard')
   async createReviewCard(
     @Args('conceptName') conceptName: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { userId, tenantId } = this.requireAuth(context);
     if (!conceptName || conceptName.trim().length === 0) {

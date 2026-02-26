@@ -45,35 +45,47 @@ describe('TranslationResolver', () => {
   // ── getContentTranslation ──────────────────────────────────────────────
   describe('getContentTranslation()', () => {
     it('delegates to service.findTranslation and returns result', async () => {
-      mockTranslationService.findTranslation.mockResolvedValue(MOCK_TRANSLATION);
-      const result = await resolver.getContentTranslation(VALID_UUID, 'he', AUTH_CTX);
+      mockTranslationService.findTranslation.mockResolvedValue(
+        MOCK_TRANSLATION
+      );
+      const result = await resolver.getContentTranslation(
+        VALID_UUID,
+        'he',
+        AUTH_CTX
+      );
       expect(mockTranslationService.findTranslation).toHaveBeenCalledWith(
         VALID_UUID,
         'he',
-        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' }),
+        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' })
       );
       expect(result).toEqual(MOCK_TRANSLATION);
     });
 
     it('returns null when translation not found', async () => {
       mockTranslationService.findTranslation.mockResolvedValue(null);
-      const result = await resolver.getContentTranslation(VALID_UUID, 'fr', AUTH_CTX);
+      const result = await resolver.getContentTranslation(
+        VALID_UUID,
+        'fr',
+        AUTH_CTX
+      );
       expect(result).toBeNull();
     });
 
     it('throws UnauthorizedException when authContext is missing', async () => {
       await expect(
-        resolver.getContentTranslation(VALID_UUID, 'he', NO_AUTH_CTX),
+        resolver.getContentTranslation(VALID_UUID, 'he', NO_AUTH_CTX)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('derives userRole from first roles entry', async () => {
-      mockTranslationService.findTranslation.mockResolvedValue(MOCK_TRANSLATION);
+      mockTranslationService.findTranslation.mockResolvedValue(
+        MOCK_TRANSLATION
+      );
       await resolver.getContentTranslation(VALID_UUID, 'he', AUTH_CTX);
       expect(mockTranslationService.findTranslation).toHaveBeenCalledWith(
         VALID_UUID,
         'he',
-        expect.objectContaining({ userRole: 'STUDENT' }),
+        expect.objectContaining({ userRole: 'STUDENT' })
       );
     });
   });
@@ -81,43 +93,53 @@ describe('TranslationResolver', () => {
   // ── requestContentTranslation ──────────────────────────────────────────
   describe('requestContentTranslation()', () => {
     it('delegates to service.requestTranslation for a valid UUID', async () => {
-      mockTranslationService.requestTranslation.mockResolvedValue(MOCK_TRANSLATION);
-      const result = await resolver.requestContentTranslation(VALID_UUID, 'he', AUTH_CTX);
+      mockTranslationService.requestTranslation.mockResolvedValue(
+        MOCK_TRANSLATION
+      );
+      const result = await resolver.requestContentTranslation(
+        VALID_UUID,
+        'he',
+        AUTH_CTX
+      );
       expect(mockTranslationService.requestTranslation).toHaveBeenCalledWith(
         VALID_UUID,
         'he',
-        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' }),
+        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' })
       );
       expect(result).toEqual(MOCK_TRANSLATION);
     });
 
     it('throws BadRequestException when contentItemId is not a valid UUID', async () => {
       await expect(
-        resolver.requestContentTranslation('not-a-uuid', 'he', AUTH_CTX),
+        resolver.requestContentTranslation('not-a-uuid', 'he', AUTH_CTX)
       ).rejects.toThrow(BadRequestException);
     });
 
     it('throws BadRequestException when targetLocale is too short', async () => {
       await expect(
-        resolver.requestContentTranslation(VALID_UUID, 'x', AUTH_CTX),
+        resolver.requestContentTranslation(VALID_UUID, 'x', AUTH_CTX)
       ).rejects.toThrow(BadRequestException);
     });
 
     it('throws BadRequestException when targetLocale is longer than 10 chars', async () => {
       await expect(
-        resolver.requestContentTranslation(VALID_UUID, 'en-US-extended', AUTH_CTX),
+        resolver.requestContentTranslation(
+          VALID_UUID,
+          'en-US-extended',
+          AUTH_CTX
+        )
       ).rejects.toThrow(BadRequestException);
     });
 
     it('throws UnauthorizedException when authContext is missing', async () => {
       await expect(
-        resolver.requestContentTranslation(VALID_UUID, 'he', NO_AUTH_CTX),
+        resolver.requestContentTranslation(VALID_UUID, 'he', NO_AUTH_CTX)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('does not call service when UUID is invalid', async () => {
       await expect(
-        resolver.requestContentTranslation('bad-id', 'he', AUTH_CTX),
+        resolver.requestContentTranslation('bad-id', 'he', AUTH_CTX)
       ).rejects.toThrow(BadRequestException);
       expect(mockTranslationService.requestTranslation).not.toHaveBeenCalled();
     });

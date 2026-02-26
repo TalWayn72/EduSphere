@@ -1,7 +1,7 @@
 global:
-  imageRegistry: ""
+  imageRegistry: ''
   imagePullSecrets: []
-  storageClass: ""
+  storageClass: ''
   namespace: edusphere
 
 replicaCount:
@@ -19,7 +19,7 @@ image:
   # e.g.    ghcr.io/edusphere-org/edusphere-gateway:main-a1b2c3d
   repository: edusphere-org/edusphere
   pullPolicy: IfNotPresent
-  tag: ""  # Overridden by CI: --set image.tag=main-<sha>
+  tag: '' # Overridden by CI: --set image.tag=main-<sha>
 
 gateway:
   enabled: true
@@ -103,16 +103,16 @@ ingress:
     secretName: edusphere-tls
 
 postgresql:
-  enabled: false  # Use external managed DB in production
+  enabled: false # Use external managed DB in production
 
 redis:
-  enabled: false  # Use external managed Redis
+  enabled: false # Use external managed Redis
 
 pgbouncer:
   enabled: true
   replicaCount: 2
-  imageTag: "1.23.1"
-  postgresHost: "postgres"
+  imageTag: '1.23.1'
+  postgresHost: 'postgres'
   postgresPort: 5432
   database: edusphere
   maxClientConn: 1000
@@ -131,7 +131,7 @@ pgbouncer:
 
 serviceAccount:
   create: true
-  name: ""
+  name: ''
 
 podSecurityContext:
   runAsNonRoot: true

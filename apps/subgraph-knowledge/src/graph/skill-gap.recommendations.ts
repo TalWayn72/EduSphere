@@ -15,7 +15,10 @@ export class SkillGapRecommendations {
 
   constructor(private readonly embeddingService: EmbeddingService) {}
 
-  async buildGapItems(gapConcepts: string[], tenantId: string): Promise<SkillGapItem[]> {
+  async buildGapItems(
+    gapConcepts: string[],
+    tenantId: string
+  ): Promise<SkillGapItem[]> {
     return Promise.all(
       gapConcepts.map(async (conceptName) => {
         let recommendedContentItems: string[] = [];
@@ -26,17 +29,17 @@ export class SkillGapRecommendations {
           const results = await this.embeddingService.semanticSearch(
             conceptName,
             tenantId,
-            RECS_PER_CONCEPT,
+            RECS_PER_CONCEPT
           );
           recommendedContentItems = results.map((r) => r.refId);
           relevanceScore = results[0]?.similarity ?? 0;
           recommendedContentTitles = await this.resolveContentTitles(
-            results.map((r) => r.refId),
+            results.map((r) => r.refId)
           );
         } catch (err) {
           this.logger.warn(
             { conceptName, err: String(err) },
-            'Recommendation lookup failed',
+            'Recommendation lookup failed'
           );
         }
 
@@ -47,7 +50,7 @@ export class SkillGapRecommendations {
           recommendedContentTitles,
           relevanceScore,
         };
-      }),
+      })
     );
   }
 

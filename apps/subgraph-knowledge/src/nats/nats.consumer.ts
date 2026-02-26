@@ -4,12 +4,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import {
-  connect,
-  NatsConnection,
-  StringCodec,
-  JetStreamManager,
-} from 'nats';
+import { connect, NatsConnection, StringCodec, JetStreamManager } from 'nats';
 import { CypherService } from '../graph/cypher.service';
 import type { ExtractedConcept } from './nats.types';
 
@@ -40,7 +35,10 @@ export class NatsConsumer implements OnModuleInit, OnModuleDestroy {
       await this.ensureStream();
       await this.startConsuming();
     } catch (err) {
-      this.logger.error({ err }, 'Failed to connect to NATS — knowledge consumer inactive');
+      this.logger.error(
+        { err },
+        'Failed to connect to NATS — knowledge consumer inactive'
+      );
     }
   }
 
@@ -62,7 +60,7 @@ export class NatsConsumer implements OnModuleInit, OnModuleDestroy {
           name: STREAM_NAME,
           subjects: ['knowledge.*'],
           max_age: 24 * 60 * 60 * 1_000_000_000, // 24 hours in nanoseconds
-          max_bytes: 100 * 1024 * 1024,            // 100 MB max
+          max_bytes: 100 * 1024 * 1024, // 100 MB max
         });
         this.logger.log(`Created NATS stream: ${STREAM_NAME}`);
       }
@@ -88,7 +86,10 @@ export class NatsConsumer implements OnModuleInit, OnModuleDestroy {
           };
           await this.processConcepts(payload);
         } catch (err) {
-          this.logger.error({ err }, 'Failed to handle knowledge.concepts.extracted message');
+          this.logger.error(
+            { err },
+            'Failed to handle knowledge.concepts.extracted message'
+          );
         }
       }
     })().catch((err) => {

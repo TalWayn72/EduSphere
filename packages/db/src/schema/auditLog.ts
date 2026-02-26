@@ -33,11 +33,17 @@ export const auditLog = pgTable(
     requestId: varchar('request_id', { length: 36 }),
     status: varchar('status', { length: 20 }).notNull().default('SUCCESS'),
     metadata: jsonb('metadata'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     index('audit_log_tenant_created_idx').on(table.tenantId, table.createdAt),
-    index('audit_log_user_action_idx').on(table.userId, table.action, table.createdAt),
+    index('audit_log_user_action_idx').on(
+      table.userId,
+      table.action,
+      table.createdAt
+    ),
     index('audit_log_resource_idx').on(table.resourceType, table.resourceId),
     pgPolicy('audit_log_rls', {
       using: sql`
@@ -45,7 +51,7 @@ export const auditLog = pgTable(
         OR tenant_id::text = current_setting('app.current_tenant', TRUE)
       `,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type AuditLog = typeof auditLog.$inferSelect;

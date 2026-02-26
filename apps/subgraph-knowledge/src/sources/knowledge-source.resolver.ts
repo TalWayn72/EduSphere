@@ -8,14 +8,15 @@ export class KnowledgeSourceResolver {
   constructor(private readonly service: KnowledgeSourceService) {}
 
   private auth(ctx: GraphQLContext) {
-    if (!ctx.authContext?.tenantId) throw new UnauthorizedException('Auth required');
+    if (!ctx.authContext?.tenantId)
+      throw new UnauthorizedException('Auth required');
     return { tenantId: ctx.authContext.tenantId };
   }
 
   @Query()
   async courseKnowledgeSources(
     @Args('courseId') courseId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.auth(ctx);
     return this.service.listByCourseSources(tenantId, courseId);
@@ -24,7 +25,7 @@ export class KnowledgeSourceResolver {
   @Query()
   async knowledgeSource(
     @Args('id') id: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.auth(ctx);
     return this.service.findById(id, tenantId);
@@ -33,7 +34,7 @@ export class KnowledgeSourceResolver {
   @Mutation()
   async addUrlSource(
     @Args('input') input: { courseId: string; title: string; url: string },
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.auth(ctx);
     return this.service.createAndProcess({
@@ -48,7 +49,7 @@ export class KnowledgeSourceResolver {
   @Mutation()
   async addTextSource(
     @Args('input') input: { courseId: string; title: string; text: string },
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.auth(ctx);
     return this.service.createAndProcess({
@@ -64,7 +65,7 @@ export class KnowledgeSourceResolver {
   @Mutation()
   async addYoutubeSource(
     @Args('input') input: { courseId: string; title: string; url: string },
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.auth(ctx);
     return this.service.createAndProcess({
@@ -79,7 +80,7 @@ export class KnowledgeSourceResolver {
   @Mutation()
   async deleteKnowledgeSource(
     @Args('id') id: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const { tenantId } = this.auth(ctx);
     await this.service.deleteSource(id, tenantId);

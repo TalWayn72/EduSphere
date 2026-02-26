@@ -4,8 +4,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mocks = vi.hoisted(() => {
   const mockDestroy = vi.fn().mockResolvedValue(undefined);
-  const mockListen  = vi.fn().mockResolvedValue(undefined);
-  const mockConfigure = vi.fn(() => ({ listen: mockListen, destroy: mockDestroy }));
+  const mockListen = vi.fn().mockResolvedValue(undefined);
+  const mockConfigure = vi.fn(() => ({
+    listen: mockListen,
+    destroy: mockDestroy,
+  }));
   const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
   return { mockDestroy, mockListen, mockConfigure, mockCloseAllPools };
 });
@@ -16,7 +19,9 @@ vi.mock('@hocuspocus/server', () => ({
 
 vi.mock('@edusphere/auth', () => ({
   // Regular function (not arrow) so it's callable with `new`
-  JWTValidator: vi.fn().mockImplementation(function() { return { validate: vi.fn() }; }),
+  JWTValidator: vi.fn().mockImplementation(function () {
+    return { validate: vi.fn() };
+  }),
 }));
 
 vi.mock('@edusphere/config', () => ({
@@ -25,9 +30,15 @@ vi.mock('@edusphere/config', () => ({
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({
-    select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn(() => ({ limit: vi.fn().mockResolvedValue([]) })) })) })),
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({ limit: vi.fn().mockResolvedValue([]) })),
+      })),
+    })),
     insert: vi.fn(() => ({ values: vi.fn().mockResolvedValue([]) })),
-    update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })) })),
+    update: vi.fn(() => ({
+      set: vi.fn(() => ({ where: vi.fn().mockResolvedValue([]) })),
+    })),
   })),
   schema: { collab_documents: {} },
   eq: vi.fn(),

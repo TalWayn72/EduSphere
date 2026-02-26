@@ -86,7 +86,7 @@ describe('substituteParams()', () => {
   it('replaces $key with the literal value', () => {
     const result = substituteParams(
       'MATCH (c {tenant_id: $tenantId}) RETURN c',
-      { tenantId: 'tenant-abc' },
+      { tenantId: 'tenant-abc' }
     );
     expect(result).toBe('MATCH (c {tenant_id: "tenant-abc"}) RETURN c');
   });
@@ -94,14 +94,16 @@ describe('substituteParams()', () => {
   it('replaces multiple params', () => {
     const result = substituteParams(
       'MATCH (c {id: $id, tenant_id: $tenantId}) RETURN c',
-      { id: 'concept-1', tenantId: 'tenant-1' },
+      { id: 'concept-1', tenantId: 'tenant-1' }
     );
     expect(result).toContain('"concept-1"');
     expect(result).toContain('"tenant-1"');
   });
 
   it('replaces numeric param with unquoted number', () => {
-    const result = substituteParams('SET r.strength = $strength', { strength: 0.7 });
+    const result = substituteParams('SET r.strength = $strength', {
+      strength: 0.7,
+    });
     expect(result).toBe('SET r.strength = 0.7');
   });
 
@@ -111,15 +113,16 @@ describe('substituteParams()', () => {
   });
 
   it('leaves unknown $tokens untouched', () => {
-    const result = substituteParams('MATCH (n {id: $unknown}) RETURN n', { tenantId: 't1' });
+    const result = substituteParams('MATCH (n {id: $unknown}) RETURN n', {
+      tenantId: 't1',
+    });
     expect(result).toBe('MATCH (n {id: $unknown}) RETURN n');
   });
 
   it('escapes double quotes in string values to prevent Cypher injection', () => {
-    const result = substituteParams(
-      'MATCH (n {name: $name}) RETURN n',
-      { name: 'evil"injection' },
-    );
+    const result = substituteParams('MATCH (n {name: $name}) RETURN n', {
+      name: 'evil"injection',
+    });
     expect(result).toContain('\\"injection');
     expect(result).not.toContain('evil"injection');
   });
@@ -213,11 +216,13 @@ describe('executeCypher()', () => {
   });
 
   it('falls back to substituteParams when AGE throws third-argument error (PG17 compat)', async () => {
-    const ageError = new Error('third argument of cypher function must be a parameter');
+    const ageError = new Error(
+      'third argument of cypher function must be a parameter'
+    );
     mockQuery
       .mockResolvedValueOnce(undefined) // LOAD 'age'
       .mockResolvedValueOnce(undefined) // SET search_path
-      .mockRejectedValueOnce(ageError)  // first cypher attempt ($1 form) — AGE PG17 error
+      .mockRejectedValueOnce(ageError) // first cypher attempt ($1 form) — AGE PG17 error
       .mockResolvedValueOnce({ rows: [{ result: 'ok' }] }); // retry with substituted literals
 
     const db = buildMockDb();
@@ -225,7 +230,7 @@ describe('executeCypher()', () => {
       db,
       GRAPH,
       'MATCH (n {id: $id}) RETURN n',
-      { id: 'concept-1' },
+      { id: 'concept-1' }
     );
 
     // Fallback succeeded
@@ -250,7 +255,7 @@ describe('executeCypher()', () => {
 
     const db = buildMockDb();
     await expect(
-      executeCypher(db, GRAPH, 'MATCH (n) RETURN n', { tenantId: 't1' }),
+      executeCypher(db, GRAPH, 'MATCH (n) RETURN n', { tenantId: 't1' })
     ).rejects.toThrow('connection reset by peer');
   });
 
@@ -457,7 +462,10 @@ describe('queryNodes()', () => {
 
   it('generates Cypher $key refs in SQL body; values in pg values array', async () => {
     const db = buildMockDb();
-    await queryNodes(db, GRAPH, 'Concept', { tenant_id: 't1', name: 'Algebra' });
+    await queryNodes(db, GRAPH, 'Concept', {
+      tenant_id: 't1',
+      name: 'Algebra',
+    });
 
     const cypherCallArgs = mockQuery.mock.calls.find(
       (c) => typeof c[0] === 'string' && (c[0] as string).includes('cypher')

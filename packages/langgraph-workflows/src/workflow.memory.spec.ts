@@ -157,9 +157,10 @@ describe('Workflow state pruning', () => {
     });
 
     it('handles empty existing array without error', () => {
-      const result = reduce([], [
-        { round: 1, position: 'for', argument: 'opening' },
-      ]);
+      const result = reduce(
+        [],
+        [{ round: 1, position: 'for', argument: 'opening' }]
+      );
       expect(result.length).toBe(1);
       expect(result[0].argument).toBe('opening');
     });

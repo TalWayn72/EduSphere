@@ -14,10 +14,11 @@ const isProduction = process.env.NODE_ENV === 'production';
 // In development the manifest is optional — arbitrary queries are allowed.
 // In production, only queries in the manifest are accepted.
 const manifestPath = join(__dirname, 'persisted-queries', 'manifest.json');
-const persistedQueryManifest: Record<string, string> | undefined =
-  existsSync(manifestPath)
-    ? (JSON.parse(readFileSync(manifestPath, 'utf-8')) as Record<string, string>)
-    : undefined;
+const persistedQueryManifest: Record<string, string> | undefined = existsSync(
+  manifestPath
+)
+  ? (JSON.parse(readFileSync(manifestPath, 'utf-8')) as Record<string, string>)
+  : undefined;
 
 export const gatewayConfig = defineConfig({
   supergraph: './supergraph.graphql',
@@ -27,9 +28,17 @@ export const gatewayConfig = defineConfig({
 
   cors: {
     origin: (() => {
-      const devPorts = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'];
-      const configured = process.env.CORS_ORIGIN?.split(',').filter(Boolean) ?? [];
-      return isProduction ? configured : [...new Set([...configured, ...devPorts])];
+      const devPorts = [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://localhost:5176',
+      ];
+      const configured =
+        process.env.CORS_ORIGIN?.split(',').filter(Boolean) ?? [];
+      return isProduction
+        ? configured
+        : [...new Set([...configured, ...devPorts])];
     })(),
     credentials: true,
   },
@@ -41,7 +50,8 @@ export const gatewayConfig = defineConfig({
 
   healthCheckEndpoint: '/health',
 
-  logging: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
+  logging:
+    (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
 
   // ─── Response Cache ──────────────────────────────────────────────────────
   // Caches GET and application/graphql requests for 60 seconds.
@@ -58,9 +68,14 @@ export const gatewayConfig = defineConfig({
       // Only cache safe read-only requests (GET or explicit GraphQL content-type)
       enabled: (request) =>
         request.method === 'GET' ||
-        (request.headers.get('content-type')?.includes('application/graphql') ?? false),
+        (request.headers.get('content-type')?.includes('application/graphql') ??
+          false),
       // Tenant-scoped cache key prevents cross-tenant data leakage
-      buildResponseCacheKey: async ({ documentString, variableValues, request }) => {
+      buildResponseCacheKey: async ({
+        documentString,
+        variableValues,
+        request,
+      }) => {
         const tenantId = request.headers.get('x-tenant-id') ?? 'anonymous';
         return `${tenantId}:${documentString}:${JSON.stringify(variableValues ?? {})}`;
       },
@@ -78,7 +93,10 @@ export const gatewayConfig = defineConfig({
         const auth = gqlCtx?.request?.headers?.get('authorization');
         if (!auth) return;
         const prev = options.headers as Record<string, string> | undefined;
-        setOptions({ ...options, headers: { ...(prev ?? {}), authorization: auth } });
+        setOptions({
+          ...options,
+          headers: { ...(prev ?? {}), authorization: auth },
+        });
       },
     },
   ],

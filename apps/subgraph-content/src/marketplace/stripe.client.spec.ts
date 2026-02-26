@@ -54,7 +54,9 @@ describe('StripeClient', () => {
   it('1. throws when calling method without STRIPE_SECRET_KEY configured', async () => {
     delete process.env['STRIPE_SECRET_KEY'];
     const client = await getClient();
-    await expect(client.createPaymentIntent(100, 'USD')).rejects.toThrow('STRIPE_SECRET_KEY not configured');
+    await expect(client.createPaymentIntent(100, 'USD')).rejects.toThrow(
+      'STRIPE_SECRET_KEY not configured'
+    );
   });
 
   it('2. createPaymentIntent calls stripe.paymentIntents.create with correct params', async () => {
@@ -65,19 +67,30 @@ describe('StripeClient', () => {
     const result = await client.createPaymentIntent(2999, 'USD', 'cus_test');
 
     expect(mockPaymentIntentsCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ amount: 2999, currency: 'usd', customer: 'cus_test' }),
+      expect.objectContaining({
+        amount: 2999,
+        currency: 'usd',
+        customer: 'cus_test',
+      })
     );
     expect(result).toBe(fakeIntent);
   });
 
   it('3. createCustomer calls stripe.customers.create with email and name', async () => {
-    const fakeCustomer = { id: 'cus_123', email: 'test@example.com', name: 'Test User' };
+    const fakeCustomer = {
+      id: 'cus_123',
+      email: 'test@example.com',
+      name: 'Test User',
+    };
     mockCustomersCreate.mockResolvedValue(fakeCustomer);
 
     const client = await getClient();
     const result = await client.createCustomer('test@example.com', 'Test User');
 
-    expect(mockCustomersCreate).toHaveBeenCalledWith({ email: 'test@example.com', name: 'Test User' });
+    expect(mockCustomersCreate).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      name: 'Test User',
+    });
     expect(result).toBe(fakeCustomer);
   });
 
@@ -86,21 +99,37 @@ describe('StripeClient', () => {
     mockWebhooksConstructEvent.mockResolvedValue(fakeEvent);
 
     const client = await getClient();
-    const result = await client.constructWebhookEvent('raw-body', 'sig_header', 'whsec_test');
+    const result = await client.constructWebhookEvent(
+      'raw-body',
+      'sig_header',
+      'whsec_test'
+    );
 
-    expect(mockWebhooksConstructEvent).toHaveBeenCalledWith('raw-body', 'sig_header', 'whsec_test');
+    expect(mockWebhooksConstructEvent).toHaveBeenCalledWith(
+      'raw-body',
+      'sig_header',
+      'whsec_test'
+    );
     expect(result).toBe(fakeEvent);
   });
 
   it('5. createTransfer calls stripe.transfers.create with correct destination', async () => {
-    const fakeTransfer = { id: 'tr_123', amount: 5000, destination: 'acct_test' };
+    const fakeTransfer = {
+      id: 'tr_123',
+      amount: 5000,
+      destination: 'acct_test',
+    };
     mockTransfersCreate.mockResolvedValue(fakeTransfer);
 
     const client = await getClient();
-    const result = await client.createTransfer(5000, 'acct_test', 'Payout for instructor');
+    const result = await client.createTransfer(
+      5000,
+      'acct_test',
+      'Payout for instructor'
+    );
 
     expect(mockTransfersCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ amount: 5000, destination: 'acct_test' }),
+      expect.objectContaining({ amount: 5000, destination: 'acct_test' })
     );
     expect(result).toBe(fakeTransfer);
   });

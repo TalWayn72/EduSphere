@@ -31,7 +31,12 @@ export class UserErasureService {
     userId: string,
     tenantId: string,
     requestedBy: string,
-    userRole: 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER' = 'STUDENT',
+    userRole:
+      | 'SUPER_ADMIN'
+      | 'ORG_ADMIN'
+      | 'INSTRUCTOR'
+      | 'STUDENT'
+      | 'RESEARCHER' = 'STUDENT'
   ): Promise<ErasureReport> {
     const report: ErasureReport = {
       userId,
@@ -57,7 +62,10 @@ export class UserErasureService {
             .delete(schema.agentMessages)
             .where(inArray(schema.agentMessages.sessionId, ids))
             .returning();
-          report.deletedEntities.push({ type: 'AGENT_MESSAGES', count: msgs.length });
+          report.deletedEntities.push({
+            type: 'AGENT_MESSAGES',
+            count: msgs.length,
+          });
         } else {
           report.deletedEntities.push({ type: 'AGENT_MESSAGES', count: 0 });
         }
@@ -67,28 +75,40 @@ export class UserErasureService {
           .delete(schema.agentSessions)
           .where(eq(schema.agentSessions.userId, userId))
           .returning();
-        report.deletedEntities.push({ type: 'AGENT_SESSIONS', count: sessions.length });
+        report.deletedEntities.push({
+          type: 'AGENT_SESSIONS',
+          count: sessions.length,
+        });
 
         // Step 3: Delete annotations
         const annotations = await tx
           .delete(schema.annotations)
           .where(eq(schema.annotations.user_id, userId))
           .returning();
-        report.deletedEntities.push({ type: 'ANNOTATIONS', count: annotations.length });
+        report.deletedEntities.push({
+          type: 'ANNOTATIONS',
+          count: annotations.length,
+        });
 
         // Step 4: Delete user progress
         const progress = await tx
           .delete(schema.userProgress)
           .where(eq(schema.userProgress.userId, userId))
           .returning();
-        report.deletedEntities.push({ type: 'USER_PROGRESS', count: progress.length });
+        report.deletedEntities.push({
+          type: 'USER_PROGRESS',
+          count: progress.length,
+        });
 
         // Step 5: Delete user enrollments
         const enrollments = await tx
           .delete(schema.userCourses)
           .where(eq(schema.userCourses.userId, userId))
           .returning();
-        report.deletedEntities.push({ type: 'ENROLLMENTS', count: enrollments.length });
+        report.deletedEntities.push({
+          type: 'ENROLLMENTS',
+          count: enrollments.length,
+        });
 
         // Step 6: Hard-delete user record (not soft-delete — Art.17 mandates removal)
         await tx.delete(schema.users).where(eq(schema.users.id, userId));
@@ -99,11 +119,17 @@ export class UserErasureService {
       report.completedAt = new Date();
 
       // Write audit log (append-only — outside erasure transaction so it survives)
-      await this.writeAuditLog(tenantId, requestedBy, userId, 'SUCCESS', report);
+      await this.writeAuditLog(
+        tenantId,
+        requestedBy,
+        userId,
+        'SUCCESS',
+        report
+      );
 
       this.logger.log(
         { userId, tenantId, report },
-        'GDPR Art.17 erasure completed',
+        'GDPR Art.17 erasure completed'
       );
     } catch (error) {
       report.status = 'FAILED';
@@ -111,7 +137,7 @@ export class UserErasureService {
 
       this.logger.error(
         { userId, tenantId, error },
-        'GDPR Art.17 erasure failed',
+        'GDPR Art.17 erasure failed'
       );
 
       await this.writeAuditLog(tenantId, requestedBy, userId, 'FAILED', report);
@@ -125,7 +151,7 @@ export class UserErasureService {
     requestedBy: string,
     targetUserId: string,
     status: string,
-    report: ErasureReport,
+    report: ErasureReport
   ): Promise<void> {
     try {
       await this.db.insert(schema.auditLog).values({
@@ -144,7 +170,7 @@ export class UserErasureService {
     } catch (auditError) {
       this.logger.error(
         { tenantId, requestedBy, auditError },
-        'Failed to write GDPR erasure audit log',
+        'Failed to write GDPR erasure audit log'
       );
     }
   }

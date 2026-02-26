@@ -14,7 +14,11 @@ import {
   withTenantContext,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import { QuizGraderService, QuizAnswers, GradeResult } from './quiz-grader.service';
+import {
+  QuizGraderService,
+  QuizAnswers,
+  GradeResult,
+} from './quiz-grader.service';
 import { QuizContentSchema, QuizContent } from './quiz-schemas';
 
 export interface QuizResultMapped {
@@ -40,7 +44,7 @@ export class QuizService implements OnModuleDestroy {
     contentItemId: string,
     userId: string,
     ctx: TenantContext,
-    answers: QuizAnswers,
+    answers: QuizAnswers
   ): Promise<QuizResultMapped> {
     const quizContent = await this.loadQuizContent(contentItemId, ctx);
 
@@ -56,7 +60,10 @@ export class QuizService implements OnModuleDestroy {
           score: gradeResult.score,
           passed: gradeResult.passed,
           answers: answers as Record<string, unknown>,
-          itemResults: gradeResult.itemResults as unknown as Record<string, unknown>[],
+          itemResults: gradeResult.itemResults as unknown as Record<
+            string,
+            unknown
+          >[],
         })
         .returning();
       return row;
@@ -67,7 +74,7 @@ export class QuizService implements OnModuleDestroy {
     }
 
     this.logger.log(
-      `Quiz submitted: user=${userId} content=${contentItemId} score=${gradeResult.score}`,
+      `Quiz submitted: user=${userId} content=${contentItemId} score=${gradeResult.score}`
     );
 
     return this.mapResult(saved);
@@ -76,13 +83,13 @@ export class QuizService implements OnModuleDestroy {
   async getMyResults(
     userId: string,
     ctx: TenantContext,
-    contentItemId?: string,
+    contentItemId?: string
   ): Promise<QuizResultMapped[]> {
     const rows = await withTenantContext(this.db, ctx, async (tx) => {
       const conditions = contentItemId
         ? and(
             eq(schema.quizResults.userId, userId),
-            eq(schema.quizResults.contentItemId, contentItemId),
+            eq(schema.quizResults.contentItemId, contentItemId)
           )
         : eq(schema.quizResults.userId, userId);
 
@@ -98,14 +105,14 @@ export class QuizService implements OnModuleDestroy {
 
   private async loadQuizContent(
     contentItemId: string,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<QuizContent> {
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
       tx
         .select()
         .from(schema.contentItems)
         .where(eq(schema.contentItems.id, contentItemId))
-        .limit(1),
+        .limit(1)
     );
 
     const item = rows[0];
@@ -113,10 +120,14 @@ export class QuizService implements OnModuleDestroy {
       throw new NotFoundException(`ContentItem ${contentItemId} not found`);
     }
     if (item.type !== 'QUIZ') {
-      throw new BadRequestException(`ContentItem ${contentItemId} is not a QUIZ`);
+      throw new BadRequestException(
+        `ContentItem ${contentItemId} is not a QUIZ`
+      );
     }
     if (!item.content) {
-      throw new BadRequestException(`ContentItem ${contentItemId} has no quiz content`);
+      throw new BadRequestException(
+        `ContentItem ${contentItemId} has no quiz content`
+      );
     }
 
     let raw: unknown;
@@ -128,14 +139,18 @@ export class QuizService implements OnModuleDestroy {
 
     const parsed = QuizContentSchema.safeParse(raw);
     if (!parsed.success) {
-      this.logger.error(`Invalid quiz content for ${contentItemId}: ${parsed.error.message}`);
+      this.logger.error(
+        `Invalid quiz content for ${contentItemId}: ${parsed.error.message}`
+      );
       throw new BadRequestException('Quiz content failed schema validation');
     }
 
     return parsed.data;
   }
 
-  private mapResult(row: typeof schema.quizResults.$inferSelect): QuizResultMapped {
+  private mapResult(
+    row: typeof schema.quizResults.$inferSelect
+  ): QuizResultMapped {
     return {
       id: row.id,
       score: row.score,

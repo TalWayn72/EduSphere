@@ -41,30 +41,49 @@ const acceptedOrAuth = (body, field) =>
   body.errors?.some((e) => authCodes.includes(e.extensions?.code));
 
 export default function () {
-  if (!JWT_TOKEN) { sleep(1); return; }
+  if (!JWT_TOKEN) {
+    sleep(1);
+    return;
+  }
 
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${JWT_TOKEN}`,
   };
-  const templateId = TEMPLATE_IDS[Math.floor(Math.random() * TEMPLATE_IDS.length)];
+  const templateId =
+    TEMPLATE_IDS[Math.floor(Math.random() * TEMPLATE_IDS.length)];
 
   // Step 1: create agent session
-  const sessionRes = http.post(GATEWAY_URL, startSession(templateId), { headers });
+  const sessionRes = http.post(GATEWAY_URL, startSession(templateId), {
+    headers,
+  });
   const sessionOk = check(sessionRes, {
     'session creation status 200': (r) => r.status === 200,
     'session created or auth error': (r) => {
-      try { return acceptedOrAuth(JSON.parse(r.body), 'startAgentSession'); }
-      catch { return false; }
+      try {
+        return acceptedOrAuth(JSON.parse(r.body), 'startAgentSession');
+      } catch {
+        return false;
+      }
     },
   });
 
-  if (!sessionOk) { sleep(2); return; }
+  if (!sessionOk) {
+    sleep(2);
+    return;
+  }
 
   let sessionId;
-  try { sessionId = JSON.parse(sessionRes.body).data?.startAgentSession?.id; }
-  catch { sleep(2); return; }
-  if (!sessionId) { sleep(2); return; }
+  try {
+    sessionId = JSON.parse(sessionRes.body).data?.startAgentSession?.id;
+  } catch {
+    sleep(2);
+    return;
+  }
+  if (!sessionId) {
+    sleep(2);
+    return;
+  }
 
   sleep(0.5);
 
@@ -73,8 +92,11 @@ export default function () {
   check(msgRes, {
     'message send status 200': (r) => r.status === 200,
     'agent responded or accepted': (r) => {
-      try { return acceptedOrAuth(JSON.parse(r.body), 'sendAgentMessage'); }
-      catch { return false; }
+      try {
+        return acceptedOrAuth(JSON.parse(r.body), 'sendAgentMessage');
+      } catch {
+        return false;
+      }
     },
   });
 

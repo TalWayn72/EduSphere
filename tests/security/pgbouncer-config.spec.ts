@@ -21,7 +21,9 @@ describe('PgBouncer: pgbouncer.ini — Security Configuration', () => {
   const content = readFile('infrastructure/pgbouncer/pgbouncer.ini');
 
   it('infrastructure/pgbouncer/pgbouncer.ini exists', () => {
-    expect(existsSync(resolve(ROOT, 'infrastructure/pgbouncer/pgbouncer.ini'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'infrastructure/pgbouncer/pgbouncer.ini'))
+    ).toBe(true);
   });
 
   it('uses transaction pooling mode (required for RLS SET LOCAL)', () => {
@@ -88,7 +90,9 @@ describe('PgBouncer: userlist.txt — Credential Security', () => {
   const content = readFile('infrastructure/pgbouncer/userlist.txt');
 
   it('infrastructure/pgbouncer/userlist.txt exists', () => {
-    expect(existsSync(resolve(ROOT, 'infrastructure/pgbouncer/userlist.txt'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'infrastructure/pgbouncer/userlist.txt'))
+    ).toBe(true);
   });
 
   it('uses SCRAM-SHA-256 hash format (not MD5 or plaintext)', () => {
@@ -117,7 +121,9 @@ describe('PgBouncer: docker-compose.pgbouncer.yml — Container Security', () =>
   const content = readFile('infrastructure/docker-compose.pgbouncer.yml');
 
   it('infrastructure/docker-compose.pgbouncer.yml exists', () => {
-    expect(existsSync(resolve(ROOT, 'infrastructure/docker-compose.pgbouncer.yml'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'infrastructure/docker-compose.pgbouncer.yml'))
+    ).toBe(true);
   });
 
   it('does not expose PgBouncer directly on port 5432 (conflict with postgres)', () => {
@@ -135,9 +141,11 @@ describe('PgBouncer: docker-compose.pgbouncer.yml — Container Security', () =>
 });
 
 describe('PgBouncer: Transaction Pooling + RLS Compatibility', () => {
-  it("CLAUDE.md documents SET LOCAL for RLS tenant context", () => {
+  it('CLAUDE.md documents SET LOCAL for RLS tenant context', () => {
     const content = readFile('CLAUDE.md');
-    expect(content).toMatch(/SET LOCAL.*current_tenant|current_tenant.*SET LOCAL/);
+    expect(content).toMatch(
+      /SET LOCAL.*current_tenant|current_tenant.*SET LOCAL/
+    );
   });
 
   it('withTenantContext uses BEGIN/SET LOCAL/COMMIT for RLS compatibility', () => {

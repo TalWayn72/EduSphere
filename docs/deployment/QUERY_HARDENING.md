@@ -9,11 +9,13 @@
 ## Overview
 
 EduSphere GraphQL gateway implements multiple layers of query hardening to prevent:
+
 - **DoS attacks** via deeply nested or computationally expensive queries
 - **Data exfiltration** via overly broad queries
 - **Abuse** via excessive API usage
 
 ---
+
 ## 1. Query Depth Limiting (G-10)
 
 **Implementation:** `apps/gateway/src/middleware/query-complexity.ts` -- `depthLimitRule()`
@@ -22,7 +24,29 @@ EduSphere GraphQL gateway implements multiple layers of query hardening to preve
 
 ```graphql
 # Rejected query (depth = 12, exceeds limit of 10):
-{ user { courses { lessons { annotations { author { courses { lessons { annotations { author { courses { id } } } } } } } } } } }
+{
+  user {
+    courses {
+      lessons {
+        annotations {
+          author {
+            courses {
+              lessons {
+                annotations {
+                  author {
+                    courses {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 ```
 
 Error response: `Query depth 12 exceeds maximum allowed depth of 10`
@@ -36,6 +60,7 @@ Error response: `Query depth 12 exceeds maximum allowed depth of 10`
 **Default limit:** `MAX_COMPLEXITY = 1000` (configurable via `GRAPHQL_MAX_COMPLEXITY` env var)
 
 **Complexity scoring:**
+
 - Each field: 1 complexity unit
 - List fields (name ends with "s"): subtree cost x10 multiplier
 - Prevents worst-case cardinality attacks
@@ -46,6 +71,7 @@ Error response: `Query depth 12 exceeds maximum allowed depth of 10`
 ```
 
 ---
+
 ## 3. Rate Limiting (G-09)
 
 **Implementation:** `apps/gateway/src/middleware/rate-limit.ts`
@@ -76,6 +102,7 @@ cors: {
 ```
 
 **Production configuration:**
+
 ```bash
 # apps/gateway/.env (production)
 CORS_ORIGIN=https://app.edusphere.dev,https://tenant1.edusphere.dev
@@ -85,16 +112,19 @@ No wildcard (`*`) CORS is possible -- fail-closed empty array prevents
 all cross-origin requests if `CORS_ORIGIN` is not configured.
 
 ---
+
 ## 5. Persisted Queries (APQ)
 
 **Goal:** Allow only pre-registered query hashes in production, rejecting
 arbitrary GraphQL from untrusted clients. (OWASP API4)
 
 **Implementation:**
+
 - `apps/gateway/src/persisted-queries/registry.ts` — bounded hash→query Map (max 10,000 entries, LRU eviction)
 - `apps/gateway/src/persisted-queries/middleware.ts` — APQ enforcement middleware
 
 **APQ protocol (Automatic Persisted Queries):**
+
 1. Client sends `extensions.persistedQuery.sha256Hash` with the request
 2. If hash + full query both present: gateway registers the mapping and proceeds
 3. If hash only and registered: gateway substitutes stored query document
@@ -104,6 +134,7 @@ arbitrary GraphQL from untrusted clients. (OWASP API4)
 **Status:** Implemented. Enabled via `PERSISTED_QUERIES_ONLY=true` environment variable.
 
 **Configuration:**
+
 ```bash
 # apps/gateway/.env (production)
 PERSISTED_QUERIES_ONLY=true
@@ -114,6 +145,7 @@ PERSISTED_QUERIES_ONLY=true
 ## 6. Schema Validation (schema-lint)
 
 `apps/gateway/tests/schema-lint.test.ts` validates:
+
 - All mutations use `@authenticated` directive
 - Sensitive mutations use `@requiresScopes`
 - Admin mutations use `@requiresRole`
@@ -123,12 +155,12 @@ PERSISTED_QUERIES_ONLY=true
 
 ## 7. Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GRAPHQL_MAX_DEPTH` | `10` | Maximum query nesting depth |
-| `GRAPHQL_MAX_COMPLEXITY` | `1000` | Maximum query complexity score |
-| `CORS_ORIGIN` | (fail-closed) | Comma-separated allowed origins |
-| `RATE_LIMIT_MAX` | `1000` | Requests per window per tenant |
+| Variable                 | Default       | Description                                  |
+| ------------------------ | ------------- | -------------------------------------------- |
+| `GRAPHQL_MAX_DEPTH`      | `10`          | Maximum query nesting depth                  |
+| `GRAPHQL_MAX_COMPLEXITY` | `1000`        | Maximum query complexity score               |
+| `CORS_ORIGIN`            | (fail-closed) | Comma-separated allowed origins              |
+| `RATE_LIMIT_MAX`         | `1000`        | Requests per window per tenant               |
 | `PERSISTED_QUERIES_ONLY` | `true` (prod) | Reject arbitrary GraphQL; require APQ hashes |
 
 ---

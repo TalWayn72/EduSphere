@@ -149,7 +149,7 @@ describe('AgentsPage interval/timeout cleanup (memory safety)', () => {
     const { container, unmount } = renderAgents();
 
     act(() => {
-      sendMessage(container, 'Explain like I\'m 5');
+      sendMessage(container, "Explain like I'm 5");
     });
 
     unmount();
@@ -205,13 +205,17 @@ describe('AgentsPage interval/timeout cleanup (memory safety)', () => {
     act(() => {
       sendMessage(container, 'First message');
     });
-    act(() => { vi.runAllTimers(); });
+    act(() => {
+      vi.runAllTimers();
+    });
 
     // Second message — unmount mid-stream
     act(() => {
       sendMessage(container, 'Second message');
     });
-    act(() => { vi.advanceTimersByTime(700); });
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
 
     unmount();
 

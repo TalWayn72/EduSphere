@@ -44,7 +44,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
   });
 
   test('course detail page loads without crash', async ({ page }) => {
-    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
     await expect(page.locator('body')).toBeVisible();
   });
 
@@ -60,33 +62,49 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
 
   test('clicking toggle expands the sources panel', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-panel')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
   });
 
-  test('clicking toggle again collapses the sources panel', async ({ page }) => {
+  test('clicking toggle again collapses the sources panel', async ({
+    page,
+  }) => {
     const toggle = page.getByTestId('toggle-sources');
     await toggle.click();
-    await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-panel')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
     await toggle.click();
-    await expect(page.getByTestId('sources-panel')).not.toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-panel')).not.toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
   });
 
-  test('sources panel shows "הוסף מקור" button when expanded', async ({ page }) => {
+  test('sources panel shows "הוסף מקור" button when expanded', async ({
+    page,
+  }) => {
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByRole('button', { name: /הוסף מקור/i })).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByRole('button', { name: /הוסף מקור/i })).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
   });
 
   test('"הוסף מקור" button opens the Add Source modal', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
     // Modal should appear with tab selector
-    await expect(page.getByText(/כתובת URL|URL/i).first()).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText(/כתובת URL|URL/i).first()).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
   });
 
   test('Add Source modal has URL tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
-    await expect(page.getByRole('button', { name: /URL|קישור/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole('button', { name: /URL|קישור/i }).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -94,7 +112,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
   test('Add Source modal has Text tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
-    await expect(page.getByRole('button', { name: /טקסט|text/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole('button', { name: /טקסט|text/i }).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -102,7 +122,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
   test('Add Source modal has File tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
-    await expect(page.getByRole('button', { name: /קובץ|file/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole('button', { name: /קובץ|file/i }).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -110,7 +132,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
   test('Add Source modal has YouTube tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
-    await expect(page.getByRole('button', { name: /YouTube|יוטיוב/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole('button', { name: /YouTube|יוטיוב/i }).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -119,14 +143,20 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
     await page.getByTestId('toggle-sources').click();
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
     // Wait for modal to appear
-    await expect(page.getByText(/כתובת URL|URL/i).first()).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText(/כתובת URL|URL/i).first()).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
     await page.keyboard.press('Escape');
-    await expect(page.getByText(/כתובת URL/i)).not.toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText(/כתובת URL/i)).not.toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
   });
 
   test('no crash overlay visible after opening the panel', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
   });
 });
 
@@ -134,56 +164,92 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
 
 test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   test.skip(IS_DEV_MODE, 'Set VITE_DEV_MODE=false to run live-backend tests');
-  test.skip(!RUN_WRITE_TESTS, 'Write tests disabled by E2E_RUN_WRITE_TESTS=false');
+  test.skip(
+    !RUN_WRITE_TESTS,
+    'Write tests disabled by E2E_RUN_WRITE_TESTS=false'
+  );
 
   test.beforeEach(async ({ page }) => {
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
     // Open the sources panel
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByTestId('sources-panel')).toBeVisible({ timeout: UI_TIMEOUT });
+    await expect(page.getByTestId('sources-panel')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
   });
 
   test('can add a URL source and it appears in the list', async ({ page }) => {
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
     // URL tab is default — fill in the form
-    await page.getByPlaceholder(/https?:\/\//i).fill('https://example.com/test-source');
-    await page.getByRole('button', { name: /הוסף|שמור|submit/i }).last().click();
+    await page
+      .getByPlaceholder(/https?:\/\//i)
+      .fill('https://example.com/test-source');
+    await page
+      .getByRole('button', { name: /הוסף|שמור|submit/i })
+      .last()
+      .click();
 
     // Modal closes
-    await expect(page.getByText(/https:\/\/example.com\/test-source/i)).toBeVisible({
+    await expect(
+      page.getByText(/https:\/\/example.com\/test-source/i)
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
 
-  test('new URL source starts in PENDING or PROCESSING status', async ({ page }) => {
+  test('new URL source starts in PENDING or PROCESSING status', async ({
+    page,
+  }) => {
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
-    await page.getByPlaceholder(/https?:\/\//i).fill('https://example.com/e2e-test');
-    await page.getByRole('button', { name: /הוסף|שמור|submit/i }).last().click();
+    await page
+      .getByPlaceholder(/https?:\/\//i)
+      .fill('https://example.com/e2e-test');
+    await page
+      .getByRole('button', { name: /הוסף|שמור|submit/i })
+      .last()
+      .click();
 
     // Status should be PENDING or PROCESSING initially
     const statusEl = page.getByText(/ממתין|מעבד|pending|processing/i).first();
     await expect(statusEl).toBeVisible({ timeout: UI_TIMEOUT });
   });
 
-  test('URL source eventually reaches READY or FAILED status', async ({ page }) => {
+  test('URL source eventually reaches READY or FAILED status', async ({
+    page,
+  }) => {
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
-    await page.getByPlaceholder(/https?:\/\//i).fill('https://example.com/e2e-ready');
-    await page.getByRole('button', { name: /הוסף|שמור|submit/i }).last().click();
+    await page
+      .getByPlaceholder(/https?:\/\//i)
+      .fill('https://example.com/e2e-ready');
+    await page
+      .getByRole('button', { name: /הוסף|שמור|submit/i })
+      .last()
+      .click();
 
     // Wait for READY or FAILED (panel auto-polls every 3s)
-    await expect(
-      page.getByText(/מוכן|נכשל|ready|failed/i).first(),
-    ).toBeVisible({ timeout: PROCESSING_TIMEOUT });
+    await expect(page.getByText(/מוכן|נכשל|ready|failed/i).first()).toBeVisible(
+      { timeout: PROCESSING_TIMEOUT }
+    );
   });
 
   test('can add raw text source', async ({ page }) => {
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
     // Click Text tab
-    await page.getByRole('button', { name: /טקסט|text/i }).first().click();
-    await page.getByPlaceholder(/הדבק טקסט|paste text/i).fill('Test raw text content for E2E');
-    await page.getByRole('button', { name: /הוסף|שמור|submit/i }).last().click();
+    await page
+      .getByRole('button', { name: /טקסט|text/i })
+      .first()
+      .click();
+    await page
+      .getByPlaceholder(/הדבק טקסט|paste text/i)
+      .fill('Test raw text content for E2E');
+    await page
+      .getByRole('button', { name: /הוסף|שמור|submit/i })
+      .last()
+      .click();
 
-    await expect(page.getByText(/ממתין|מוכן|pending|ready/i).first()).toBeVisible({
+    await expect(
+      page.getByText(/ממתין|מוכן|pending|ready/i).first()
+    ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
@@ -191,11 +257,17 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   test('can add a YouTube source', async ({ page }) => {
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
     // Click YouTube tab
-    await page.getByRole('button', { name: /YouTube|יוטיוב/i }).first().click();
+    await page
+      .getByRole('button', { name: /YouTube|יוטיוב/i })
+      .first()
+      .click();
     await page
       .getByPlaceholder(/youtube.com\/watch|youtu.be/i)
       .fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-    await page.getByRole('button', { name: /הוסף|שמור|submit/i }).last().click();
+    await page
+      .getByRole('button', { name: /הוסף|שמור|submit/i })
+      .last()
+      .click();
 
     // Source should appear with YouTube icon or title
     await expect(page.getByText(/dQw4w9WgXcQ|youtube/i).first()).toBeVisible({
@@ -206,20 +278,30 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   test('can delete a source', async ({ page }) => {
     // Add a source first
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
-    await page.getByPlaceholder(/https?:\/\//i).fill('https://example.com/to-delete');
-    await page.getByRole('button', { name: /הוסף|שמור|submit/i }).last().click();
+    await page
+      .getByPlaceholder(/https?:\/\//i)
+      .fill('https://example.com/to-delete');
+    await page
+      .getByRole('button', { name: /הוסף|שמור|submit/i })
+      .last()
+      .click();
     await expect(page.getByText('https://example.com/to-delete')).toBeVisible({
       timeout: UI_TIMEOUT,
     });
 
     // Hover to reveal delete button (✕), then click with confirm dialog
-    const sourceItem = page.locator('[class*="group"]').filter({ hasText: 'to-delete' }).first();
+    const sourceItem = page
+      .locator('[class*="group"]')
+      .filter({ hasText: 'to-delete' })
+      .first();
     await sourceItem.hover();
     page.on('dialog', (dialog) => dialog.accept());
     await sourceItem.getByTitle(/הסר מקור/i).click();
 
     // Source should disappear
-    await expect(page.getByText('https://example.com/to-delete')).not.toBeVisible({
+    await expect(
+      page.getByText('https://example.com/to-delete')
+    ).not.toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });

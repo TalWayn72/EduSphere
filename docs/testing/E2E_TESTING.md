@@ -114,7 +114,7 @@ export class BasePage {
   }
 
   async getNotificationText(): Promise<string> {
-    return await this.notificationBanner.textContent() || '';
+    return (await this.notificationBanner.textContent()) || '';
   }
 
   async clickNavigation(menuItem: string) {
@@ -141,12 +141,16 @@ export class CoursePage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.createCourseButton = page.getByRole('button', { name: 'Create Course' });
+    this.createCourseButton = page.getByRole('button', {
+      name: 'Create Course',
+    });
     this.courseTitle = page.getByLabel('Course Title');
     this.courseDescription = page.getByLabel('Course Description');
     this.courseThumbnail = page.locator('input[type="file"][name="thumbnail"]');
     this.publishButton = page.getByRole('button', { name: 'Publish' });
-    this.saveAsDraftButton = page.getByRole('button', { name: 'Save as Draft' });
+    this.saveAsDraftButton = page.getByRole('button', {
+      name: 'Save as Draft',
+    });
     this.courseList = page.locator('[data-testid="course-list"]');
   }
 
@@ -172,6 +176,7 @@ export class CoursePage extends BasePage {
 ### Authentication Flows
 
 #### 1. User Login
+
 ```typescript
 test('user can log in with valid credentials', async ({ page }) => {
   const loginPage = new LoginPage(page);
@@ -182,6 +187,7 @@ test('user can log in with valid credentials', async ({ page }) => {
 ```
 
 #### 2. User Registration
+
 ```typescript
 test('new user can register', async ({ page }) => {
   const registrationPage = new RegistrationPage(page);
@@ -191,13 +197,14 @@ test('new user can register', async ({ page }) => {
     password: 'SecurePass123!',
     firstName: 'John',
     lastName: 'Doe',
-    role: 'student'
+    role: 'student',
   });
   await expect(page).toHaveURL('/onboarding');
 });
 ```
 
 #### 3. Password Reset
+
 ```typescript
 test('user can reset forgotten password', async ({ page }) => {
   const resetPage = new PasswordResetPage(page);
@@ -208,6 +215,7 @@ test('user can reset forgotten password', async ({ page }) => {
 ```
 
 #### 4. SSO Login
+
 ```typescript
 test('user can authenticate via SSO', async ({ page }) => {
   const loginPage = new LoginPage(page);
@@ -219,20 +227,24 @@ test('user can authenticate via SSO', async ({ page }) => {
 ```
 
 #### 5. Session Timeout
+
 ```typescript
 test('session expires after inactivity', async ({ page, context }) => {
   // Set short session timeout for testing
-  await context.addCookies([{
-    name: 'session_timeout',
-    value: '60',
-    domain: 'localhost',
-    path: '/'
-  }]);
+  await context.addCookies([
+    {
+      name: 'session_timeout',
+      value: '60',
+      domain: 'localhost',
+      path: '/',
+    },
+  ]);
   // Wait and verify redirect
 });
 ```
 
 #### 6. Multi-Factor Authentication
+
 ```typescript
 test('user can enable and use 2FA', async ({ page }) => {
   const mfaPage = new MFAPage(page);
@@ -245,17 +257,24 @@ test('user can enable and use 2FA', async ({ page }) => {
 ### Course Management Flows
 
 #### 7. Create Course
+
 ```typescript
-test('instructor can create new course', async ({ page, authenticatedUser }) => {
+test('instructor can create new course', async ({
+  page,
+  authenticatedUser,
+}) => {
   const coursePage = new CoursePage(page);
   await coursePage.navigate('/courses/new');
   await coursePage.createCourse('Introduction to AI', 'Learn AI fundamentals');
   await coursePage.publishCourse();
-  await expect(coursePage.successNotification).toContainText('Course published');
+  await expect(coursePage.successNotification).toContainText(
+    'Course published'
+  );
 });
 ```
 
 #### 8. Edit Course
+
 ```typescript
 test('instructor can edit existing course', async ({ page }) => {
   const coursePage = new CoursePage(page);
@@ -266,6 +285,7 @@ test('instructor can edit existing course', async ({ page }) => {
 ```
 
 #### 9. Delete Course
+
 ```typescript
 test('instructor can delete course with confirmation', async ({ page }) => {
   const coursePage = new CoursePage(page);
@@ -277,6 +297,7 @@ test('instructor can delete course with confirmation', async ({ page }) => {
 ```
 
 #### 10. Course Enrollment
+
 ```typescript
 test('student can enroll in course', async ({ page }) => {
   const coursePage = new CoursePage(page);
@@ -287,6 +308,7 @@ test('student can enroll in course', async ({ page }) => {
 ```
 
 #### 11. Course Unenrollment
+
 ```typescript
 test('student can unenroll from course', async ({ page }) => {
   const coursePage = new CoursePage(page);
@@ -297,6 +319,7 @@ test('student can unenroll from course', async ({ page }) => {
 ```
 
 #### 12. Course Search and Filter
+
 ```typescript
 test('user can search and filter courses', async ({ page }) => {
   const searchPage = new SearchPage(page);
@@ -311,6 +334,7 @@ test('user can search and filter courses', async ({ page }) => {
 ### Video Player Flows
 
 #### 13. Video Playback
+
 ```typescript
 test('student can play course video', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -321,6 +345,7 @@ test('student can play course video', async ({ page }) => {
 ```
 
 #### 14. Video Quality Selection
+
 ```typescript
 test('user can change video quality', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -332,6 +357,7 @@ test('user can change video quality', async ({ page }) => {
 ```
 
 #### 15. Video Playback Speed
+
 ```typescript
 test('user can adjust playback speed', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -342,6 +368,7 @@ test('user can adjust playback speed', async ({ page }) => {
 ```
 
 #### 16. Video Bookmarking
+
 ```typescript
 test('user can bookmark video timestamp', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -353,6 +380,7 @@ test('user can bookmark video timestamp', async ({ page }) => {
 ```
 
 #### 17. Video Transcript Display
+
 ```typescript
 test('user can view synchronized transcript', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -367,6 +395,7 @@ test('user can view synchronized transcript', async ({ page }) => {
 ### Annotation Flows
 
 #### 18. Create Text Annotation
+
 ```typescript
 test('user can create text annotation on video', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -378,6 +407,7 @@ test('user can create text annotation on video', async ({ page }) => {
 ```
 
 #### 19. Reply to Annotation
+
 ```typescript
 test('user can reply to existing annotation', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -389,6 +419,7 @@ test('user can reply to existing annotation', async ({ page }) => {
 ```
 
 #### 20. Edit Annotation
+
 ```typescript
 test('user can edit their annotation', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -400,6 +431,7 @@ test('user can edit their annotation', async ({ page }) => {
 ```
 
 #### 21. Delete Annotation
+
 ```typescript
 test('user can delete their annotation', async ({ page }) => {
   const videoPage = new VideoPlayerPage(page);
@@ -414,6 +446,7 @@ test('user can delete their annotation', async ({ page }) => {
 ### AI Chat Flows
 
 #### 22. AI Chat Query
+
 ```typescript
 test('student can ask AI assistant question', async ({ page }) => {
   const aiPage = new AIAssistantPage(page);
@@ -424,6 +457,7 @@ test('student can ask AI assistant question', async ({ page }) => {
 ```
 
 #### 23. AI Context Awareness
+
 ```typescript
 test('AI provides context-aware responses', async ({ page }) => {
   const aiPage = new AIAssistantPage(page);
@@ -434,6 +468,7 @@ test('AI provides context-aware responses', async ({ page }) => {
 ```
 
 #### 24. AI Recommendations
+
 ```typescript
 test('AI suggests relevant learning materials', async ({ page }) => {
   const aiPage = new AIAssistantPage(page);
@@ -444,6 +479,7 @@ test('AI suggests relevant learning materials', async ({ page }) => {
 ```
 
 #### 25. AI Content Generation
+
 ```typescript
 test('instructor can generate quiz with AI', async ({ page }) => {
   const aiPage = new AIAssistantPage(page);
@@ -456,6 +492,7 @@ test('instructor can generate quiz with AI', async ({ page }) => {
 ### Search Flows
 
 #### 26. Global Search
+
 ```typescript
 test('user can search across platform', async ({ page }) => {
   const searchPage = new SearchPage(page);
@@ -467,6 +504,7 @@ test('user can search across platform', async ({ page }) => {
 ```
 
 #### 27. Advanced Search Filters
+
 ```typescript
 test('user can apply multiple search filters', async ({ page }) => {
   const searchPage = new SearchPage(page);
@@ -476,13 +514,14 @@ test('user can apply multiple search filters', async ({ page }) => {
     category: 'Computer Science',
     difficulty: 'Beginner',
     duration: 'Under 10 hours',
-    rating: '4+ stars'
+    rating: '4+ stars',
   });
   await expect(searchPage.filteredResults).toBeVisible();
 });
 ```
 
 #### 28. Search Autocomplete
+
 ```typescript
 test('search provides autocomplete suggestions', async ({ page }) => {
   const searchPage = new SearchPage(page);
@@ -496,16 +535,21 @@ test('search provides autocomplete suggestions', async ({ page }) => {
 ### Collaboration Flows
 
 #### 29. Discussion Forum Post
+
 ```typescript
 test('student can create discussion post', async ({ page }) => {
   const discussionPage = new DiscussionPage(page);
   await discussionPage.navigate('/courses/123/discussions');
-  await discussionPage.createPost('Help with assignment 3', 'I need clarification...');
+  await discussionPage.createPost(
+    'Help with assignment 3',
+    'I need clarification...'
+  );
   await expect(discussionPage.posts).toContainText('Help with assignment 3');
 });
 ```
 
 #### 30. Group Work Collaboration
+
 ```typescript
 test('students can collaborate in groups', async ({ page }) => {
   const groupPage = new GroupPage(page);
@@ -517,6 +561,7 @@ test('students can collaborate in groups', async ({ page }) => {
 ```
 
 #### 31. Peer Review Submission
+
 ```typescript
 test('student can submit peer review', async ({ page }) => {
   const reviewPage = new PeerReviewPage(page);
@@ -524,7 +569,7 @@ test('student can submit peer review', async ({ page }) => {
   await reviewPage.provideFeedback({
     criteria1: 4,
     criteria2: 5,
-    comments: 'Excellent work on the implementation'
+    comments: 'Excellent work on the implementation',
   });
   await reviewPage.submit();
   await expect(reviewPage.successMessage).toBeVisible();
@@ -534,6 +579,7 @@ test('student can submit peer review', async ({ page }) => {
 ### Additional Critical Flows
 
 #### 32. Assignment Submission
+
 ```typescript
 test('student can submit assignment', async ({ page }) => {
   const assignmentPage = new AssignmentPage(page);
@@ -546,6 +592,7 @@ test('student can submit assignment', async ({ page }) => {
 ```
 
 #### 33. Quiz Taking
+
 ```typescript
 test('student can take and submit quiz', async ({ page }) => {
   const quizPage = new QuizPage(page);
@@ -559,6 +606,7 @@ test('student can take and submit quiz', async ({ page }) => {
 ```
 
 #### 34. Progress Tracking
+
 ```typescript
 test('student can view learning progress', async ({ page }) => {
   const progressPage = new ProgressPage(page);
@@ -569,6 +617,7 @@ test('student can view learning progress', async ({ page }) => {
 ```
 
 #### 35. Notifications Management
+
 ```typescript
 test('user can manage notification preferences', async ({ page }) => {
   const settingsPage = new SettingsPage(page);
@@ -634,7 +683,7 @@ export const test = base.extend<AuthFixtures>({
       process.env.STUDENT_PASSWORD!
     );
     await use(page);
-  }
+  },
 });
 
 export { expect } from '@playwright/test';
@@ -658,7 +707,7 @@ export const test = base.extend<CourseFixtures>({
     const course = await createCourse({
       title: 'Test Course',
       description: 'Course for testing',
-      status: 'draft'
+      status: 'draft',
     });
 
     await use(course);
@@ -671,12 +720,12 @@ export const test = base.extend<CourseFixtures>({
     const course = await createCourse({
       title: 'Published Test Course',
       description: 'Published course for testing',
-      status: 'published'
+      status: 'published',
     });
 
     await use(course);
     await deleteCourse(course.id);
-  }
+  },
 });
 ```
 
@@ -698,8 +747,8 @@ export async function seedTestData() {
       password: studentPassword,
       firstName: 'Test',
       lastName: 'Student',
-      role: 'STUDENT'
-    }
+      role: 'STUDENT',
+    },
   });
 
   const instructorPassword = await hash('InstructorPass123!', 10);
@@ -709,8 +758,8 @@ export async function seedTestData() {
       password: instructorPassword,
       firstName: 'Test',
       lastName: 'Instructor',
-      role: 'INSTRUCTOR'
-    }
+      role: 'INSTRUCTOR',
+    },
   });
 
   // Create test courses
@@ -726,17 +775,17 @@ export async function seedTestData() {
             title: 'What is Machine Learning?',
             content: 'Introduction to ML concepts',
             order: 1,
-            videoUrl: 'https://example.com/video1.mp4'
+            videoUrl: 'https://example.com/video1.mp4',
           },
           {
             title: 'Supervised Learning',
             content: 'Understanding supervised algorithms',
             order: 2,
-            videoUrl: 'https://example.com/video2.mp4'
-          }
-        ]
-      }
-    }
+            videoUrl: 'https://example.com/video2.mp4',
+          },
+        ],
+      },
+    },
   });
 
   return { student, instructor, course };
@@ -747,7 +796,7 @@ export async function cleanupTestData() {
   await prisma.lesson.deleteMany({});
   await prisma.course.deleteMany({});
   await prisma.user.deleteMany({
-    where: { email: { contains: '@test.com' } }
+    where: { email: { contains: '@test.com' } },
   });
 }
 ```
@@ -765,8 +814,8 @@ export const UserFactory = {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     role: 'STUDENT',
-    ...overrides
-  })
+    ...overrides,
+  }),
 };
 
 export const CourseFactory = {
@@ -776,8 +825,8 @@ export const CourseFactory = {
     category: faker.helpers.arrayElement(['CS', 'Math', 'Science']),
     level: faker.helpers.arrayElement(['Beginner', 'Intermediate', 'Advanced']),
     duration: faker.number.int({ min: 5, max: 100 }),
-    ...overrides
-  })
+    ...overrides,
+  }),
 };
 
 export const LessonFactory = {
@@ -786,8 +835,8 @@ export const LessonFactory = {
     content: faker.lorem.paragraphs(3),
     videoUrl: faker.internet.url(),
     duration: faker.number.int({ min: 5, max: 60 }),
-    ...overrides
-  })
+    ...overrides,
+  }),
 };
 
 export const AnnotationFactory = {
@@ -795,8 +844,8 @@ export const AnnotationFactory = {
     timestamp: faker.number.int({ min: 0, max: 3600 }),
     content: faker.lorem.sentence(),
     type: faker.helpers.arrayElement(['note', 'question', 'highlight']),
-    ...overrides
-  })
+    ...overrides,
+  }),
 };
 ```
 
@@ -810,7 +859,7 @@ test('course page matches visual snapshot', async ({ page }) => {
   await page.goto('/courses/123');
   await expect(page).toHaveScreenshot('course-page.png', {
     maxDiffPixels: 100,
-    threshold: 0.2
+    threshold: 0.2,
   });
 });
 
@@ -848,7 +897,7 @@ test('course page is accessible', async ({ page }) => {
   await injectAxe(page);
   await checkA11y(page, null, {
     detailedReport: true,
-    detailedReportOptions: { html: true }
+    detailedReportOptions: { html: true },
   });
 });
 
@@ -883,8 +932,8 @@ test('color contrast meets WCAG AA', async ({ page }) => {
   await injectAxe(page);
   await checkA11y(page, null, {
     rules: {
-      'color-contrast': { enabled: true }
-    }
+      'color-contrast': { enabled: true },
+    },
   });
 });
 ```
@@ -896,11 +945,13 @@ test('course listing loads within performance budget', async ({ page }) => {
   await page.goto('/courses');
 
   const performanceMetrics = await page.evaluate(() => {
-    const timing = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const timing = performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming;
     return {
       fcp: performance.getEntriesByName('first-contentful-paint')[0]?.startTime,
       lcp: timing.loadEventEnd - timing.fetchStart,
-      ttfb: timing.responseStart - timing.requestStart
+      ttfb: timing.responseStart - timing.requestStart,
     };
   });
 
@@ -926,11 +977,15 @@ test('search results render incrementally', async ({ page }) => {
   await page.goto('/search?q=machine+learning');
 
   // First results should appear quickly
-  await expect(page.locator('[data-testid="search-result"]').first()).toBeVisible({ timeout: 1000 });
+  await expect(
+    page.locator('[data-testid="search-result"]').first()
+  ).toBeVisible({ timeout: 1000 });
 
   // All results loaded
   await page.waitForLoadState('networkidle');
-  const resultCount = await page.locator('[data-testid="search-result"]').count();
+  const resultCount = await page
+    .locator('[data-testid="search-result"]')
+    .count();
   expect(resultCount).toBeGreaterThan(0);
 });
 ```
@@ -1062,7 +1117,7 @@ export default defineConfig({
     ['html'],
     ['junit', { outputFile: 'test-results/junit.xml' }],
     ['json', { outputFile: 'test-results/results.json' }],
-    ['github']
+    ['github'],
   ],
 
   use: {
@@ -1119,6 +1174,7 @@ npx playwright show-trace test-results/example-test/trace.zip
 ```
 
 The trace viewer provides:
+
 - **Timeline**: Visual timeline of all actions
 - **Screenshots**: Automatic screenshots at each step
 - **Network Activity**: All network requests and responses
@@ -1188,12 +1244,12 @@ npx playwright test --ui
 ```typescript
 test('debug example', async ({ page }) => {
   // Listen to console messages
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     console.log(`Browser console: ${msg.type()}: ${msg.text()}`);
   });
 
   // Listen to page errors
-  page.on('pageerror', error => {
+  page.on('pageerror', (error) => {
     console.error(`Page error: ${error.message}`);
   });
 
@@ -1213,7 +1269,9 @@ test('debug example', async ({ page }) => {
 
 ```typescript
 // Good: Independent, descriptive test
-test('instructor can publish draft course from course list', async ({ page }) => {
+test('instructor can publish draft course from course list', async ({
+  page,
+}) => {
   // Clear test setup, execution, and assertions
 });
 
@@ -1271,7 +1329,7 @@ await page.waitForTimeout(5000);
 ```typescript
 test('handle network errors gracefully', async ({ page }) => {
   // Simulate network failure
-  await page.route('**/api/courses', route => route.abort());
+  await page.route('**/api/courses', (route) => route.abort());
 
   await page.goto('/courses');
   await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
@@ -1306,7 +1364,7 @@ test.afterEach(async ({ page }, testInfo) => {
 test.beforeEach(async ({ request }) => {
   // Fast API-based setup
   await request.post('/api/courses', {
-    data: { title: 'Test Course', status: 'published' }
+    data: { title: 'Test Course', status: 'published' },
   });
 });
 
@@ -1347,7 +1405,7 @@ await page.locator('[data-testid="modal"]').waitFor({ state: 'attached' });
 
 // Solution 2: Retry failed tests
 // In playwright.config.ts
-retries: 2
+retries: 2;
 
 // Solution 3: Use strict mode to catch multiple elements
 await page.getByRole('button', { name: 'Submit' }).click(); // Fails if multiple matches
@@ -1374,7 +1432,7 @@ await page.locator('[data-testid="footer-link"]').scrollIntoViewIfNeeded();
 // Issue: Session not persisting between tests
 // Solution: Use storageState
 test.use({
-  storageState: 'auth.json'
+  storageState: 'auth.json',
 });
 
 // Generate auth state
@@ -1462,11 +1520,11 @@ test('debug logging example', async ({ page }, testInfo) => {
   console.log(`Test: ${testInfo.title}`);
   console.log(`Project: ${testInfo.project.name}`);
 
-  page.on('request', request => {
+  page.on('request', (request) => {
     console.log(`Request: ${request.method()} ${request.url()}`);
   });
 
-  page.on('response', response => {
+  page.on('response', (response) => {
     console.log(`Response: ${response.status()} ${response.url()}`);
   });
 

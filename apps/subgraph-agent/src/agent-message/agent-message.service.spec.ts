@@ -78,8 +78,14 @@ describe('AgentMessageService', () => {
     mockInsert.mockReturnValue({ values: mockValues });
 
     // Default delete chain
-    mockWhere.mockReturnValue({ limit: mockLimit, orderBy: mockOrderBy, returning: mockReturning });
-    mockDelete.mockReturnValue({ where: vi.fn().mockResolvedValue({ rowCount: 1 }) });
+    mockWhere.mockReturnValue({
+      limit: mockLimit,
+      orderBy: mockOrderBy,
+      returning: mockReturning,
+    });
+    mockDelete.mockReturnValue({
+      where: vi.fn().mockResolvedValue({ rowCount: 1 }),
+    });
 
     service = new AgentMessageService();
   });
@@ -95,12 +101,16 @@ describe('AgentMessageService', () => {
 
     it('throws NotFoundException when message does not exist', async () => {
       mockLimit.mockResolvedValue([]);
-      await expect(service.findById('nonexistent', MOCK_AUTH)).rejects.toThrow(NotFoundException);
+      await expect(service.findById('nonexistent', MOCK_AUTH)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('throws NotFoundException when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
-      await expect(service.findById('msg-1', noTenantAuth)).rejects.toThrow(NotFoundException);
+      await expect(service.findById('msg-1', noTenantAuth)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('calls withTenantContext with correct tenant info', async () => {
@@ -136,9 +146,9 @@ describe('AgentMessageService', () => {
 
     it('throws NotFoundException when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
-      await expect(service.findBySession('session-1', noTenantAuth)).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(
+        service.findBySession('session-1', noTenantAuth)
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('calls withTenantContext on every query', async () => {
@@ -161,7 +171,11 @@ describe('AgentMessageService', () => {
   describe('create()', () => {
     it('creates a message and returns it', async () => {
       mockReturning.mockResolvedValue([MOCK_MESSAGE]);
-      const input = { sessionId: 'session-1', role: 'USER' as const, content: 'Hello' };
+      const input = {
+        sessionId: 'session-1',
+        role: 'USER' as const,
+        content: 'Hello',
+      };
       const result = await service.create(input, MOCK_AUTH);
       expect(result).toEqual(MOCK_MESSAGE);
     });
@@ -169,14 +183,20 @@ describe('AgentMessageService', () => {
     it('throws NotFoundException when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
       await expect(
-        service.create({ sessionId: 'session-1', role: 'USER' as const, content: 'Hi' }, noTenantAuth)
+        service.create(
+          { sessionId: 'session-1', role: 'USER' as const, content: 'Hi' },
+          noTenantAuth
+        )
       ).rejects.toThrow(NotFoundException);
     });
 
     it('throws NotFoundException when insert returns empty', async () => {
       mockReturning.mockResolvedValue([]);
       await expect(
-        service.create({ sessionId: 'session-1', role: 'USER' as const, content: 'Hi' }, MOCK_AUTH)
+        service.create(
+          { sessionId: 'session-1', role: 'USER' as const, content: 'Hi' },
+          MOCK_AUTH
+        )
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -197,7 +217,11 @@ describe('AgentMessageService', () => {
       const assistantMsg = { ...MOCK_MESSAGE, role: 'ASSISTANT' };
       mockReturning.mockResolvedValue([assistantMsg]);
       const result = await service.create(
-        { sessionId: 'session-1', role: 'ASSISTANT' as const, content: 'Hi there!' },
+        {
+          sessionId: 'session-1',
+          role: 'ASSISTANT' as const,
+          content: 'Hi there!',
+        },
         MOCK_AUTH
       );
       expect(result.role).toBe('ASSISTANT');
@@ -208,24 +232,32 @@ describe('AgentMessageService', () => {
 
   describe('delete()', () => {
     it('returns true when message is successfully deleted', async () => {
-      mockDelete.mockReturnValue({ where: vi.fn().mockResolvedValue({ rowCount: 1 }) });
+      mockDelete.mockReturnValue({
+        where: vi.fn().mockResolvedValue({ rowCount: 1 }),
+      });
       const result = await service.delete('msg-1', MOCK_AUTH);
       expect(result).toBe(true);
     });
 
     it('returns false when message does not exist (rowCount 0)', async () => {
-      mockDelete.mockReturnValue({ where: vi.fn().mockResolvedValue({ rowCount: 0 }) });
+      mockDelete.mockReturnValue({
+        where: vi.fn().mockResolvedValue({ rowCount: 0 }),
+      });
       const result = await service.delete('nonexistent', MOCK_AUTH);
       expect(result).toBe(false);
     });
 
     it('throws NotFoundException when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: '' };
-      await expect(service.delete('msg-1', noTenantAuth)).rejects.toThrow(NotFoundException);
+      await expect(service.delete('msg-1', noTenantAuth)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('calls withTenantContext for RLS enforcement on delete', async () => {
-      mockDelete.mockReturnValue({ where: vi.fn().mockResolvedValue({ rowCount: 1 }) });
+      mockDelete.mockReturnValue({
+        where: vi.fn().mockResolvedValue({ rowCount: 1 }),
+      });
       await service.delete('msg-1', MOCK_AUTH);
       expect(withTenantContext).toHaveBeenCalledWith(
         expect.anything(),

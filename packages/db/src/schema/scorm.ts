@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  uuid,
-  text,
-  real,
-  timestamp,
-} from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, real, timestamp } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps } from './_shared';
 

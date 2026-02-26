@@ -16,10 +16,23 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   closeAllPools: vi.fn(),
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: (db: unknown) => unknown) => fn(mockDb)),
+  withTenantContext: vi.fn(
+    (_db: unknown, _ctx: unknown, fn: (db: unknown) => unknown) => fn(mockDb)
+  ),
   schema: {
-    libraryCourses: { id: 'id', isActive: 'is_active', topic: 'topic', licenseType: 'license_type', scormPackageUrl: 'scorm_package_url' },
-    tenantLibraryActivations: { id: 'id', tenantId: 'tenant_id', libraryCourseId: 'library_course_id', courseId: 'course_id' },
+    libraryCourses: {
+      id: 'id',
+      isActive: 'is_active',
+      topic: 'topic',
+      licenseType: 'license_type',
+      scormPackageUrl: 'scorm_package_url',
+    },
+    tenantLibraryActivations: {
+      id: 'id',
+      tenantId: 'tenant_id',
+      libraryCourseId: 'library_course_id',
+      courseId: 'course_id',
+    },
     courses: {},
   },
 }));
@@ -31,7 +44,9 @@ vi.mock('drizzle-orm', () => ({
 
 // ── Mock S3 ───────────────────────────────────────────────────────────────────
 vi.mock('@aws-sdk/client-s3', () => ({
-  S3Client: vi.fn().mockImplementation(function S3ClientCtor() { return { send: vi.fn() }; }),
+  S3Client: vi.fn().mockImplementation(function S3ClientCtor() {
+    return { send: vi.fn() };
+  }),
   CopyObjectCommand: vi.fn(),
 }));
 
@@ -41,8 +56,30 @@ const COURSE_LIB_ID = 'lib-course-1';
 const USER_ID = 'user-1';
 
 const mockActiveCourses = [
-  { id: COURSE_LIB_ID, title: 'GDPR Essentials', topic: 'GDPR', isActive: true, licenseType: 'FREE', priceCents: 0, durationMinutes: 45, description: '', scormPackageUrl: 'library/GDPR/course.zip', lastUpdated: new Date() },
-  { id: 'lib-course-2', title: 'HIPAA Privacy', topic: 'HIPAA', isActive: true, licenseType: 'FREE', priceCents: 0, durationMinutes: 90, description: '', scormPackageUrl: 'library/HIPAA/course.zip', lastUpdated: new Date() },
+  {
+    id: COURSE_LIB_ID,
+    title: 'GDPR Essentials',
+    topic: 'GDPR',
+    isActive: true,
+    licenseType: 'FREE',
+    priceCents: 0,
+    durationMinutes: 45,
+    description: '',
+    scormPackageUrl: 'library/GDPR/course.zip',
+    lastUpdated: new Date(),
+  },
+  {
+    id: 'lib-course-2',
+    title: 'HIPAA Privacy',
+    topic: 'HIPAA',
+    isActive: true,
+    licenseType: 'FREE',
+    priceCents: 0,
+    durationMinutes: 90,
+    description: '',
+    scormPackageUrl: 'library/HIPAA/course.zip',
+    lastUpdated: new Date(),
+  },
 ];
 
 describe('LibraryService', () => {
@@ -103,7 +140,11 @@ describe('LibraryService', () => {
     vi.mocked(withTenantContext).mockResolvedValueOnce(undefined); // courses insert
     vi.mocked(withTenantContext).mockResolvedValueOnce([mockActivation]); // activation insert
 
-    const result = await service.activateCourse(TENANT_A, COURSE_LIB_ID, USER_ID);
+    const result = await service.activateCourse(
+      TENANT_A,
+      COURSE_LIB_ID,
+      USER_ID
+    );
 
     expect(result.tenantId).toBe(TENANT_A);
     expect(result.libraryCourseId).toBe(COURSE_LIB_ID);
@@ -125,7 +166,11 @@ describe('LibraryService', () => {
     // withTenantContext returns existing activation (already activated)
     vi.mocked(withTenantContext).mockResolvedValueOnce([existingActivation]);
 
-    const result = await service.activateCourse(TENANT_A, COURSE_LIB_ID, USER_ID);
+    const result = await service.activateCourse(
+      TENANT_A,
+      COURSE_LIB_ID,
+      USER_ID
+    );
 
     expect(result.id).toBe('activation-existing');
     // Should NOT have called insert
@@ -135,7 +180,14 @@ describe('LibraryService', () => {
   // ── Test 5: getTenantActivations returns only tenant's activations ─────────
   it('getTenantActivations returns only the calling tenant activations', async () => {
     const { withTenantContext } = await import('@edusphere/db');
-    const tenantAActivation = { id: 'act-a', tenantId: TENANT_A, libraryCourseId: COURSE_LIB_ID, activatedBy: USER_ID, courseId: null, activatedAt: new Date() };
+    const tenantAActivation = {
+      id: 'act-a',
+      tenantId: TENANT_A,
+      libraryCourseId: COURSE_LIB_ID,
+      activatedBy: USER_ID,
+      courseId: null,
+      activatedAt: new Date(),
+    };
 
     vi.mocked(withTenantContext).mockResolvedValueOnce([tenantAActivation]);
 
@@ -156,7 +208,7 @@ describe('LibraryService', () => {
     expect(withTenantContext).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ tenantId: TENANT_A, userRole: 'ORG_ADMIN' }),
-      expect.any(Function),
+      expect.any(Function)
     );
     expect(mockDb.delete).toHaveBeenCalled();
   });

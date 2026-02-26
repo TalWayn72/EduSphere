@@ -48,11 +48,17 @@ export class DocumentParserService {
     // Dynamic import avoids pdf-parse's test-runner auto-execution at require time.
     // Cast to callable: pdf-parse@2.4.5 changed its CJS export shape and TypeScript
     // infers the module object rather than the callable default export.
-    type PdfParseFn = (buf: Buffer) => Promise<{ text: string; numpages: number }>;
+    type PdfParseFn = (
+      buf: Buffer
+    ) => Promise<{ text: string; numpages: number }>;
     const pdfParseModule = await import('pdf-parse');
-    const pdfParse = (pdfParseModule.default ?? pdfParseModule) as unknown as PdfParseFn;
+    const pdfParse = (pdfParseModule.default ??
+      pdfParseModule) as unknown as PdfParseFn;
     const data = await pdfParse(buffer);
-    const text = data.text.replace(/\r\n/g, '\n').replace(/\s{3,}/g, '\n').trim();
+    const text = data.text
+      .replace(/\r\n/g, '\n')
+      .replace(/\s{3,}/g, '\n')
+      .trim();
     return {
       text,
       wordCount: text.split(/\s+/).filter(Boolean).length,
@@ -112,7 +118,8 @@ export class DocumentParserService {
   /** Fetch a YouTube video transcript via youtube-transcript package */
   async parseYoutube(videoUrl: string): Promise<ParseResult> {
     const videoId = this.extractYoutubeId(videoUrl);
-    if (!videoId) throw new Error(`Cannot extract video ID from URL: ${videoUrl}`);
+    if (!videoId)
+      throw new Error(`Cannot extract video ID from URL: ${videoUrl}`);
 
     this.logger.log(`Fetching YouTube transcript for video ${videoId}`);
 
@@ -153,7 +160,7 @@ export class DocumentParserService {
   chunkText(
     text: string,
     chunkSize = 1000,
-    overlap = 200,
+    overlap = 200
   ): Array<{ index: number; text: string }> {
     const chunks: Array<{ index: number; text: string }> = [];
     let start = 0;

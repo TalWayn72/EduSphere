@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -36,7 +41,7 @@ export class BreakoutService implements OnModuleDestroy {
     sessionId: string,
     rooms: CreateBreakoutRoomInput[],
     tenantId: string,
-    instructorUserId: string,
+    instructorUserId: string
   ): Promise<BreakoutRoomResult[]> {
     const inserted = await withTenantContext(
       this.db,
@@ -50,14 +55,13 @@ export class BreakoutService implements OnModuleDestroy {
           assignedUserIds: r.assignedUserIds ?? [],
           bbbBreakoutId: `${sessionId}-br-${i + 1}`,
         }));
-        return tx
-          .insert(schema.breakoutRooms)
-          .values(values)
-          .returning();
-      },
+        return tx.insert(schema.breakoutRooms).values(values).returning();
+      }
     );
 
-    this.logger.log(`Created ${inserted.length} breakout rooms for session=${sessionId}`);
+    this.logger.log(
+      `Created ${inserted.length} breakout rooms for session=${sessionId}`
+    );
 
     // Attempt BBB API call (non-fatal if BBB not configured)
     const [session] = await this.db
@@ -66,8 +70,8 @@ export class BreakoutService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.liveSessions.id, sessionId),
-          eq(schema.liveSessions.tenantId, tenantId),
-        ),
+          eq(schema.liveSessions.tenantId, tenantId)
+        )
       )
       .limit(1);
 
@@ -81,7 +85,7 @@ export class BreakoutService implements OnModuleDestroy {
               name: r.roomName,
               sequence: i + 1,
               durationMinutes: 30,
-            })),
+            }))
           );
         } catch (err) {
           this.logger.warn(`BBB sendBreakoutRooms failed (non-fatal): ${err}`);
@@ -104,7 +108,7 @@ export class BreakoutService implements OnModuleDestroy {
     roomId: string,
     userIds: string[],
     tenantId: string,
-    callerUserId: string,
+    callerUserId: string
   ): Promise<void> {
     await withTenantContext(
       this.db,
@@ -116,10 +120,10 @@ export class BreakoutService implements OnModuleDestroy {
           .where(
             and(
               eq(schema.breakoutRooms.id, roomId),
-              eq(schema.breakoutRooms.tenantId, tenantId),
-            ),
+              eq(schema.breakoutRooms.tenantId, tenantId)
+            )
           );
-      },
+      }
     );
     this.logger.log(`Assigned ${userIds.length} users to room=${roomId}`);
   }
@@ -127,7 +131,7 @@ export class BreakoutService implements OnModuleDestroy {
   async listRooms(
     sessionId: string,
     tenantId: string,
-    callerUserId: string,
+    callerUserId: string
   ): Promise<BreakoutRoomResult[]> {
     const rows = await withTenantContext(
       this.db,
@@ -139,9 +143,9 @@ export class BreakoutService implements OnModuleDestroy {
           .where(
             and(
               eq(schema.breakoutRooms.sessionId, sessionId),
-              eq(schema.breakoutRooms.tenantId, tenantId),
-            ),
-          ),
+              eq(schema.breakoutRooms.tenantId, tenantId)
+            )
+          )
     );
 
     return rows.map((r) => ({

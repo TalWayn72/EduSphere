@@ -4,7 +4,9 @@ import { AnnotationLayer } from '@/types/annotations';
 import type { Annotation } from '@/types/annotations';
 
 // ── Mock urql useMutation ────────────────────────────────────────────────────
-const mockCreateAnnotation = vi.fn().mockResolvedValue({ data: null, error: null });
+const mockCreateAnnotation = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: null });
 
 vi.mock('urql', () => ({
   useMutation: vi.fn(() => [{}, mockCreateAnnotation]),
@@ -43,7 +45,10 @@ import { useUIStore } from '@/lib/store';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
-const BASE_ANNOTATION: Omit<Annotation, 'id' | 'layer' | 'textRange' | 'contentTimestamp'> = {
+const BASE_ANNOTATION: Omit<
+  Annotation,
+  'id' | 'layer' | 'textRange' | 'contentTimestamp'
+> = {
   content: 'Test annotation',
   userId: 'user-1',
   userName: 'Alice',
@@ -113,12 +118,16 @@ describe('useDocumentAnnotations', () => {
   it('filters out annotations without textRange', () => {
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
     expect(result.current.textAnnotations).toHaveLength(2);
-    expect(result.current.textAnnotations.map((a) => a.id)).not.toContain('ann-2');
+    expect(result.current.textAnnotations.map((a) => a.id)).not.toContain(
+      'ann-2'
+    );
   });
 
   it('sorts textAnnotations ascending by from position', () => {
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
-    const positions = result.current.textAnnotations.map((a) => a.textRange.from);
+    const positions = result.current.textAnnotations.map(
+      (a) => a.textRange.from
+    );
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
     // ann-3 (from:5) comes before ann-1 (from:10)
     expect(result.current.textAnnotations[0].id).toBe('ann-3');
@@ -150,7 +159,9 @@ describe('useDocumentAnnotations', () => {
   });
 
   it('exposes focusedAnnotationId from UIStore', () => {
-    vi.mocked(useUIStore).mockReturnValue(makeUIStore({ focusedAnnotationId: 'ann-1' }));
+    vi.mocked(useUIStore).mockReturnValue(
+      makeUIStore({ focusedAnnotationId: 'ann-1' })
+    );
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
     expect(result.current.focusedAnnotationId).toBe('ann-1');
   });
@@ -246,17 +257,23 @@ describe('useDocumentAnnotations', () => {
 
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
     expect(result.current.textAnnotations).toHaveLength(1);
-    expect(result.current.textAnnotations[0].textRange).toEqual({ from: 20, to: 40 });
+    expect(result.current.textAnnotations[0].textRange).toEqual({
+      from: 20,
+      to: 40,
+    });
   });
 
   it('delegates to useAnnotations — no second subscription created', () => {
     renderHook(() => useDocumentAnnotations('doc-1'));
     expect(vi.mocked(useAnnotations)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(useAnnotations)).toHaveBeenCalledWith('doc-1', expect.arrayContaining([
-      AnnotationLayer.PERSONAL,
-      AnnotationLayer.SHARED,
-      AnnotationLayer.INSTRUCTOR,
-      AnnotationLayer.AI_GENERATED,
-    ]));
+    expect(vi.mocked(useAnnotations)).toHaveBeenCalledWith(
+      'doc-1',
+      expect.arrayContaining([
+        AnnotationLayer.PERSONAL,
+        AnnotationLayer.SHARED,
+        AnnotationLayer.INSTRUCTOR,
+        AnnotationLayer.AI_GENERATED,
+      ])
+    );
   });
 });

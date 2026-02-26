@@ -20,7 +20,8 @@ const SEARCH_QUERIES = [
 ];
 
 export default function () {
-  const query = SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)];
+  const query =
+    SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)];
 
   const SEARCH_QUERY = JSON.stringify({
     query: `query SemanticSearch($query: String!, $limit: Int) {
@@ -46,7 +47,9 @@ export default function () {
     'no server errors': (r) => {
       try {
         const body = JSON.parse(r.body);
-        return !body.errors?.some((e) => e.extensions?.code === 'INTERNAL_ERROR');
+        return !body.errors?.some(
+          (e) => e.extensions?.code === 'INTERNAL_ERROR'
+        );
       } catch {
         return false;
       }

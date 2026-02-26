@@ -53,7 +53,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('Alice Smith')).toBeInTheDocument();
   });
@@ -64,7 +64,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('AS')).toBeInTheDocument();
   });
@@ -75,7 +75,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText(/Private/)).toBeInTheDocument();
   });
@@ -86,7 +86,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('This is a test comment')).toBeInTheDocument();
   });
@@ -98,7 +98,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={onFocus}
-      />,
+      />
     );
     fireEvent.click(screen.getByRole('article'));
     expect(onFocus).toHaveBeenCalledWith('ann-1');
@@ -110,7 +110,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={true}
         onFocus={vi.fn()}
-      />,
+      />
     );
     const card = container.querySelector('[role="article"]');
     expect(card?.className).toContain('ring-1');
@@ -122,7 +122,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     const card = container.querySelector('[role="article"]');
     expect(card?.className).not.toContain('ring-1');
@@ -138,7 +138,7 @@ describe('CommentCard', () => {
         annotation={longAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('show more')).toBeInTheDocument();
   });
@@ -153,7 +153,7 @@ describe('CommentCard', () => {
         annotation={longAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     fireEvent.click(screen.getByText('show more'));
     expect(screen.getByText('show less')).toBeInTheDocument();
@@ -165,7 +165,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.queryByText('show more')).not.toBeInTheDocument();
   });
@@ -178,7 +178,7 @@ describe('CommentCard', () => {
         isFocused={false}
         onFocus={vi.fn()}
         onReply={onReply}
-      />,
+      />
     );
     fireEvent.click(screen.getByText(/Reply/));
     expect(onReply).toHaveBeenCalledWith('ann-1');
@@ -192,7 +192,7 @@ describe('CommentCard', () => {
         isFocused={false}
         onFocus={onFocus}
         onReply={vi.fn()}
-      />,
+      />
     );
     fireEvent.click(screen.getByText(/Reply/));
     expect(onFocus).not.toHaveBeenCalled();
@@ -206,7 +206,7 @@ describe('CommentCard', () => {
         isFocused={false}
         onFocus={vi.fn()}
         onResolve={onResolve}
-      />,
+      />
     );
     fireEvent.click(screen.getByText(/Resolve/));
     expect(onResolve).toHaveBeenCalledWith('ann-1');
@@ -218,7 +218,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.queryByText(/Reply/)).not.toBeInTheDocument();
   });
@@ -229,7 +229,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.queryByText(/Resolve/)).not.toBeInTheDocument();
   });
@@ -251,7 +251,7 @@ describe('CommentCard', () => {
         annotation={withReplies}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText('1')).toBeInTheDocument();
   });
@@ -262,7 +262,7 @@ describe('CommentCard', () => {
         annotation={baseAnnotation}
         isFocused={false}
         onFocus={vi.fn()}
-      />,
+      />
     );
     expect(screen.getByText(/ago/)).toBeInTheDocument();
   });
@@ -274,7 +274,7 @@ describe('CommentCard', () => {
         isFocused={false}
         onFocus={vi.fn()}
         depth={1}
-      />,
+      />
     );
     const card = container.querySelector('[role="article"]');
     expect(card?.className).toContain('ml-4');
@@ -288,7 +288,7 @@ describe('CommentCard', () => {
         onFocus={vi.fn()}
         onReply={vi.fn()}
         depth={1}
-      />,
+      />
     );
     expect(screen.queryByText(/Reply/)).not.toBeInTheDocument();
   });

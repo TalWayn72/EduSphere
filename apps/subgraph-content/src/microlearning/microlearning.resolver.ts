@@ -11,7 +11,7 @@ export class MicrolearningResolver {
 
   constructor(
     private readonly microlearningService: MicrolearningService,
-    private readonly contentItemService: ContentItemService,
+    private readonly contentItemService: ContentItemService
   ) {}
 
   @Query('dailyMicrolesson')
@@ -19,7 +19,9 @@ export class MicrolearningResolver {
     const tenantCtx = this.requireAuth(ctx);
     const itemId = await this.microlearningService.getDailyLesson(tenantCtx);
     if (!itemId) return null;
-    this.logger.debug(`dailyMicrolesson: itemId=${itemId} userId=${tenantCtx.userId}`);
+    this.logger.debug(
+      `dailyMicrolesson: itemId=${itemId} userId=${tenantCtx.userId}`
+    );
     return this.contentItemService.findById(itemId);
   }
 
@@ -33,13 +35,15 @@ export class MicrolearningResolver {
     @Args('title') title: string,
     @Args('contentItemIds') contentItemIds: string[],
     @Args('topicClusterId') topicClusterId: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tenantCtx = this.requireAuth(ctx);
-    this.logger.log(`createMicrolearningPath: title="${title}" userId=${tenantCtx.userId}`);
+    this.logger.log(
+      `createMicrolearningPath: title="${title}" userId=${tenantCtx.userId}`
+    );
     return this.microlearningService.createPath(
       { title, contentItemIds, topicClusterId },
-      tenantCtx,
+      tenantCtx
     );
   }
 

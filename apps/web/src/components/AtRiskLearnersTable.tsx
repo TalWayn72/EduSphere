@@ -26,8 +26,10 @@ interface Props {
 }
 
 function riskBadgeClass(score: number): string {
-  if (score > 0.7) return 'px-2 py-0.5 rounded border text-xs font-semibold bg-red-100 text-red-800 border-red-200';
-  if (score >= 0.5) return 'px-2 py-0.5 rounded border text-xs font-semibold bg-orange-100 text-orange-800 border-orange-200';
+  if (score > 0.7)
+    return 'px-2 py-0.5 rounded border text-xs font-semibold bg-red-100 text-red-800 border-red-200';
+  if (score >= 0.5)
+    return 'px-2 py-0.5 rounded border text-xs font-semibold bg-orange-100 text-orange-800 border-orange-200';
   return 'px-2 py-0.5 rounded border text-xs font-semibold bg-yellow-100 text-yellow-800 border-yellow-200';
 }
 
@@ -55,8 +57,13 @@ export function AtRiskLearnersTable({ learners, onResolve, resolving }: Props) {
         </thead>
         <tbody>
           {learners.map((l) => (
-            <tr key={l.learnerId + l.courseId} className="border-b hover:bg-muted/50">
-              <td className="py-2 pr-4 font-mono text-xs">{l.learnerId.slice(0, 8)}...</td>
+            <tr
+              key={l.learnerId + l.courseId}
+              className="border-b hover:bg-muted/50"
+            >
+              <td className="py-2 pr-4 font-mono text-xs">
+                {l.learnerId.slice(0, 8)}...
+              </td>
               <td className="py-2 pr-4">
                 <span className={riskBadgeClass(l.riskScore)}>
                   {(l.riskScore * 100).toFixed(0)}%

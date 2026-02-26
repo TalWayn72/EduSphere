@@ -43,7 +43,9 @@ function toAnnotation(a: BackendAnnotation, userName: string): Annotation {
   const textContent =
     typeof rawContent === 'string'
       ? rawContent
-      : typeof rawContent === 'object' && rawContent !== null && 'text' in rawContent
+      : typeof rawContent === 'object' &&
+          rawContent !== null &&
+          'text' in rawContent
         ? String((rawContent as Record<string, unknown>)['text'])
         : JSON.stringify(rawContent);
 
@@ -90,16 +92,19 @@ interface DeleteDialogProps {
   isDeleting: boolean;
 }
 
-function DeleteConfirmDialog({ open, onOpenChange, onConfirm, isDeleting }: DeleteDialogProps) {
+function DeleteConfirmDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  isDeleting,
+}: DeleteDialogProps) {
   const { t } = useTranslation('annotations');
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{t('deleteTitle')}</DialogTitle>
-          <DialogDescription>
-            {t('deleteConfirm')}
-          </DialogDescription>
+          <DialogDescription>{t('deleteConfirm')}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
           <DialogClose asChild>
@@ -163,7 +168,8 @@ export function AnnotationsPage() {
   const [, executeDelete] = useMutation(DELETE_ANNOTATION_MUTATION);
 
   const backendAnnotations: BackendAnnotation[] =
-    (data as { annotationsByUser?: BackendAnnotation[] } | undefined)?.annotationsByUser ?? [];
+    (data as { annotationsByUser?: BackendAnnotation[] } | undefined)
+      ?.annotationsByUser ?? [];
 
   const displayName = user
     ? `${user.firstName} ${user.lastName}`.trim() || user.username
@@ -179,7 +185,8 @@ export function AnnotationsPage() {
   const sorted = (list: Annotation[]): Annotation[] => {
     if (sortBy === 'time') {
       return [...list].sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
     }
     return [...list].sort((a, b) => a.layer.localeCompare(b.layer));
@@ -217,7 +224,9 @@ export function AnnotationsPage() {
     <Layout>
       <DeleteConfirmDialog
         open={pendingDeleteId !== null}
-        onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteId(null);
+        }}
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting}
       />
@@ -283,7 +292,9 @@ export function AnnotationsPage() {
               >
                 <CardContent className="p-3 text-center">
                   <p className="text-2xl">{meta.icon}</p>
-                  <p className={`text-lg font-bold ${meta.color}`}>{counts[layer] ?? 0}</p>
+                  <p className={`text-lg font-bold ${meta.color}`}>
+                    {counts[layer] ?? 0}
+                  </p>
                   <p className="text-xs text-muted-foreground">{meta.label}</p>
                 </CardContent>
               </Card>
@@ -293,11 +304,13 @@ export function AnnotationsPage() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="all">{t('all')} ({total})</TabsTrigger>
+            <TabsTrigger value="all">
+              {t('all')} ({total})
+            </TabsTrigger>
             {ALL_LAYERS.map((layer) => (
               <TabsTrigger key={layer} value={layer}>
-                {ANNOTATION_LAYER_META[layer].icon} {ANNOTATION_LAYER_META[layer].label} (
-                {counts[layer] ?? 0})
+                {ANNOTATION_LAYER_META[layer].icon}{' '}
+                {ANNOTATION_LAYER_META[layer].label} ({counts[layer] ?? 0})
               </TabsTrigger>
             ))}
           </TabsList>
@@ -324,17 +337,21 @@ export function AnnotationsPage() {
           {ALL_LAYERS.map((layer) => (
             <TabsContent key={layer} value={layer} className="mt-4">
               <div className="grid md:grid-cols-2 gap-3">
-                {sorted(annotations.filter((a) => a.layer === layer)).map((ann) => (
-                  <AnnotationItem
-                    key={ann.id}
-                    ann={ann}
-                    onSeek={handleSeek}
-                    onDeleteRequest={handleDeleteRequest}
-                  />
-                ))}
+                {sorted(annotations.filter((a) => a.layer === layer)).map(
+                  (ann) => (
+                    <AnnotationItem
+                      key={ann.id}
+                      ann={ann}
+                      onSeek={handleSeek}
+                      onDeleteRequest={handleDeleteRequest}
+                    />
+                  )
+                )}
                 {annotations.filter((a) => a.layer === layer).length === 0 && (
                   <p className="col-span-2 text-center text-sm text-muted-foreground py-8">
-                    {t('noLayerAnnotations', { layer: ANNOTATION_LAYER_META[layer].label.toLowerCase() })}
+                    {t('noLayerAnnotations', {
+                      layer: ANNOTATION_LAYER_META[layer].label.toLowerCase(),
+                    })}
                   </p>
                 )}
               </div>

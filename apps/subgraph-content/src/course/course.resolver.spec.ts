@@ -62,7 +62,7 @@ describe('CourseResolver', () => {
     resolver = new CourseResolver(
       mockCourseService as any,
       mockEnrollmentService as any,
-      mockModuleService as any,
+      mockModuleService as any
     );
   });
 
@@ -141,7 +141,9 @@ describe('CourseResolver', () => {
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.enrollCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(UnauthorizedException);
+      await expect(
+        resolver.enrollCourse('course-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -157,13 +159,17 @@ describe('CourseResolver', () => {
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.unenrollCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(UnauthorizedException);
+      await expect(
+        resolver.unenrollCourse('course-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
   describe('getMyEnrollments()', () => {
     it('delegates to enrollmentService.getMyEnrollments', async () => {
-      mockEnrollmentService.getMyEnrollments.mockResolvedValue([MOCK_ENROLLMENT]);
+      mockEnrollmentService.getMyEnrollments.mockResolvedValue([
+        MOCK_ENROLLMENT,
+      ]);
       const result = await resolver.getMyEnrollments(AUTH_CTX);
       expect(mockEnrollmentService.getMyEnrollments).toHaveBeenCalledWith(
         expect.objectContaining({ userId: 'user-1' })
@@ -172,7 +178,9 @@ describe('CourseResolver', () => {
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.getMyEnrollments(NO_AUTH_CTX)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getMyEnrollments(NO_AUTH_CTX)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('returns empty array when no enrollments', async () => {
@@ -202,7 +210,9 @@ describe('CourseResolver', () => {
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.getMyCourseProgress('course-1', NO_AUTH_CTX)).rejects.toThrow(UnauthorizedException);
+      await expect(
+        resolver.getMyCourseProgress('course-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -218,7 +228,9 @@ describe('CourseResolver', () => {
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.markContentViewed('item-1', NO_AUTH_CTX)).rejects.toThrow(UnauthorizedException);
+      await expect(
+        resolver.markContentViewed('item-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });

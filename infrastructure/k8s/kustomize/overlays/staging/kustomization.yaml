@@ -11,6 +11,6 @@ commonAnnotations:
 
 images:
   - name: ghcr.io/edusphere/gateway
-    newTag: "latest"
+    newTag: 'latest'
   - name: ghcr.io/edusphere/web
-    newTag: "latest"
+    newTag: 'latest'

@@ -31,9 +31,21 @@ const LIVE_BACKEND = process.env.VITE_DEV_MODE === 'false';
 // ---------------------------------------------------------------------------
 
 const USERS = {
-  student:    { email: 'student@example.com',         password: 'Student123!',     role: 'STUDENT' },
-  instructor: { email: 'instructor@example.com',      password: 'Instructor123!',  role: 'INSTRUCTOR' },
-  superAdmin: { email: 'super.admin@edusphere.dev',   password: 'SuperAdmin123!',  role: 'SUPER_ADMIN' },
+  student: {
+    email: 'student@example.com',
+    password: 'Student123!',
+    role: 'STUDENT',
+  },
+  instructor: {
+    email: 'instructor@example.com',
+    password: 'Instructor123!',
+    role: 'INSTRUCTOR',
+  },
+  superAdmin: {
+    email: 'super.admin@edusphere.dev',
+    password: 'SuperAdmin123!',
+    role: 'SUPER_ADMIN',
+  },
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -44,10 +56,12 @@ const USERS = {
 async function loginViaKeycloak(
   page: Page,
   email: string,
-  password: string,
+  password: string
 ): Promise<void> {
   // Wait for Keycloak login page
-  await page.waitForURL(/localhost:8080\/realms\/edusphere/, { timeout: 15_000 });
+  await page.waitForURL(/localhost:8080\/realms\/edusphere/, {
+    timeout: 15_000,
+  });
   await expect(page.locator('#username')).toBeVisible({ timeout: 10_000 });
 
   await page.fill('#username', email);
@@ -67,11 +81,11 @@ async function assertNoKeycloakInitError(page: Page): Promise<void> {
   await page.waitForTimeout(500);
 
   const doubleInitError = errors.find((e) =>
-    e.includes('can only be initialized once'),
+    e.includes('can only be initialized once')
   );
   expect(
     doubleInitError,
-    'Expected no "can only be initialized once" error — double-init guard must prevent this',
+    'Expected no "can only be initialized once" error — double-init guard must prevent this'
   ).toBeUndefined();
 }
 
@@ -95,18 +109,21 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
     await page.waitForTimeout(1_000);
 
     const doubleInitError = errors.find((e) =>
-      e.includes('can only be initialized once'),
+      e.includes('can only be initialized once')
     );
     expect(
       doubleInitError,
-      `Console error found: "${doubleInitError}" — SEC-KC-001 regression`,
+      `Console error found: "${doubleInitError}" — SEC-KC-001 regression`
     ).toBeUndefined();
   });
 
   test('no "Falling back to DEV MODE" warning when VITE_DEV_MODE=false', async ({
     page,
   }) => {
-    test.skip(!LIVE_BACKEND, 'DEV_MODE intentionally emits "Falling back to DEV MODE" warning — requires VITE_DEV_MODE=false');
+    test.skip(
+      !LIVE_BACKEND,
+      'DEV_MODE intentionally emits "Falling back to DEV MODE" warning — requires VITE_DEV_MODE=false'
+    );
     const warnings: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'warning' || msg.type() === 'warn')
@@ -118,11 +135,11 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
     await page.waitForTimeout(1_000);
 
     const devModeFallback = warnings.find((w) =>
-      w.includes('Falling back to DEV MODE'),
+      w.includes('Falling back to DEV MODE')
     );
     expect(
       devModeFallback,
-      'Expected no DEV MODE fallback — Keycloak init should succeed cleanly',
+      'Expected no DEV MODE fallback — Keycloak init should succeed cleanly'
     ).toBeUndefined();
   });
 });
@@ -133,7 +150,10 @@ test.describe('Keycloak — init guard (SEC-KC-001 regression)', () => {
 
 test.describe('Keycloak — login page', () => {
   test.beforeEach(() => {
-    test.skip(!LIVE_BACKEND, 'Login page UI requires VITE_DEV_MODE=false (DEV_MODE redirects to /dashboard)');
+    test.skip(
+      !LIVE_BACKEND,
+      'Login page UI requires VITE_DEV_MODE=false (DEV_MODE redirects to /dashboard)'
+    );
   });
 
   test('shows EduSphere branding and Sign In button', async ({ page }) => {
@@ -141,10 +161,10 @@ test.describe('Keycloak — login page', () => {
     await page.waitForLoadState('networkidle');
 
     await expect(
-      page.getByRole('heading', { name: 'Welcome to EduSphere' }),
+      page.getByRole('heading', { name: 'Welcome to EduSphere' })
     ).toBeVisible();
     await expect(
-      page.getByRole('button', { name: /Sign In with Keycloak/i }),
+      page.getByRole('button', { name: /Sign In with Keycloak/i })
     ).toBeVisible();
   });
 
@@ -167,7 +187,10 @@ test.describe('Keycloak — login page', () => {
 
 test.describe('Keycloak — full login flow', () => {
   test.beforeEach(() => {
-    test.skip(!LIVE_BACKEND, 'Full Keycloak login flow requires VITE_DEV_MODE=false and running Keycloak');
+    test.skip(
+      !LIVE_BACKEND,
+      'Full Keycloak login flow requires VITE_DEV_MODE=false and running Keycloak'
+    );
   });
 
   test('student can log in and reach the dashboard', async ({ page }) => {
@@ -183,7 +206,9 @@ test.describe('Keycloak — full login flow', () => {
     // WebSocket subscription that never settles.
     await page.waitForURL(/localhost/, { timeout: 20_000 });
     // Wait for the router to render (URL changes from /#code=... to /learn/... or /login)
-    await page.waitForURL(/\/(learn|courses|dashboard|login)/, { timeout: 25_000 });
+    await page.waitForURL(/\/(learn|courses|dashboard|login)/, {
+      timeout: 25_000,
+    });
 
     // Confirm we are NOT back on /login — user is authenticated.
     expect(page.url()).not.toMatch(/\/login/);
@@ -193,9 +218,9 @@ test.describe('Keycloak — full login flow', () => {
     // user remains authenticated without being redirected to /login.
     await page.goto('/dashboard');
     // Wait for the Dashboard heading — signals the page rendered (authenticated).
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' }),
-    ).toBeVisible({ timeout: 25_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 25_000,
+    });
 
     await assertNoKeycloakInitError(page);
   });
@@ -205,15 +230,17 @@ test.describe('Keycloak — full login flow', () => {
     await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /Sign In with Keycloak/i }).click();
-    await page.waitForURL(/localhost:8080\/realms\/edusphere/, { timeout: 15_000 });
+    await page.waitForURL(/localhost:8080\/realms\/edusphere/, {
+      timeout: 15_000,
+    });
 
     await page.fill('#username', 'student@example.com');
     await page.fill('#password', 'WrongPassword999!');
     await page.click('#kc-login');
 
-    await expect(
-      page.getByText(/invalid username or password/i),
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText(/invalid username or password/i)).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('instructor can log in and reach the dashboard', async ({ page }) => {
@@ -224,18 +251,20 @@ test.describe('Keycloak — full login flow', () => {
     await loginViaKeycloak(
       page,
       USERS.instructor.email,
-      USERS.instructor.password,
+      USERS.instructor.password
     );
 
     await page.waitForURL(/localhost/, { timeout: 20_000 });
-    await page.waitForURL(/\/(learn|courses|dashboard|login)/, { timeout: 25_000 });
+    await page.waitForURL(/\/(learn|courses|dashboard|login)/, {
+      timeout: 25_000,
+    });
     expect(page.url()).not.toMatch(/\/login/);
 
     // Navigate to /dashboard via full page load; silent SSO restores the session.
     await page.goto('/dashboard');
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' }),
-    ).toBeVisible({ timeout: 25_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 25_000,
+    });
   });
 });
 
@@ -245,7 +274,10 @@ test.describe('Keycloak — full login flow', () => {
 
 test.describe('Keycloak — protected routes', () => {
   test.beforeEach(() => {
-    test.skip(!LIVE_BACKEND, 'Protected route redirect requires VITE_DEV_MODE=false (DEV_MODE is always authenticated)');
+    test.skip(
+      !LIVE_BACKEND,
+      'Protected route redirect requires VITE_DEV_MODE=false (DEV_MODE is always authenticated)'
+    );
   });
 
   test('unauthenticated user visiting /dashboard is redirected to /login', async ({
@@ -258,7 +290,8 @@ test.describe('Keycloak — protected routes', () => {
     await page.waitForURL(/\/(login|realms)/, { timeout: 15_000 });
 
     const url = page.url();
-    const isLoginPage = url.includes('/login') || url.includes('/realms/edusphere');
+    const isLoginPage =
+      url.includes('/login') || url.includes('/realms/edusphere');
     expect(isLoginPage).toBe(true);
   });
 });

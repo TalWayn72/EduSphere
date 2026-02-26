@@ -20,7 +20,10 @@ async function bootstrap() {
   await app.listen(port);
 
   const logger = app.get(Logger);
-  logger.log('Agent subgraph running on http://localhost:' + port + '/graphql', 'Bootstrap');
+  logger.log(
+    'Agent subgraph running on http://localhost:' + port + '/graphql',
+    'Bootstrap'
+  );
   logger.log('Serving: AI Sessions, Messages', 'Bootstrap');
 }
 

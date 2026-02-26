@@ -30,13 +30,13 @@ export const annotationPluginKey = new PluginKey<DecorationSet>('annotations');
 function buildDecorationSet(
   doc: Node,
   annotations: TextRangeAnnotation[],
-  focusedId: string | null,
+  focusedId: string | null
 ): DecorationSet {
   const decorations: Decoration[] = [];
 
   // Sort by priority so higher-priority layers render last (win click events)
   const sorted = [...annotations].sort(
-    (a, b) => LAYER_PRIORITY.indexOf(a.layer) - LAYER_PRIORITY.indexOf(b.layer),
+    (a, b) => LAYER_PRIORITY.indexOf(a.layer) - LAYER_PRIORITY.indexOf(b.layer)
   );
 
   for (const ann of sorted) {
@@ -58,7 +58,7 @@ function buildDecorationSet(
       Decoration.inline(clampedFrom, clampedTo, {
         class: classes,
         'data-annotation-id': ann.id,
-      }),
+      })
     );
   }
 
@@ -67,7 +67,7 @@ function buildDecorationSet(
 
 export function createAnnotationDecorationsPlugin(
   getAnnotations: () => TextRangeAnnotation[],
-  getFocusedId: () => string | null,
+  getFocusedId: () => string | null
 ) {
   return new Plugin<DecorationSet>({
     key: annotationPluginKey,
@@ -77,7 +77,11 @@ export function createAnnotationDecorationsPlugin(
       },
       apply(tr, old, _, newState) {
         if (tr.getMeta(annotationPluginKey)) {
-          return buildDecorationSet(newState.doc, getAnnotations(), getFocusedId());
+          return buildDecorationSet(
+            newState.doc,
+            getAnnotations(),
+            getFocusedId()
+          );
         }
         return old.map(tr.mapping, newState.doc);
       },
@@ -92,7 +96,7 @@ export function createAnnotationDecorationsPlugin(
 
 export function createAnnotationExtension(
   getAnnotations: () => TextRangeAnnotation[],
-  getFocusedId: () => string | null,
+  getFocusedId: () => string | null
 ) {
   return Extension.create({
     name: 'annotationDecorations',

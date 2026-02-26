@@ -1,4 +1,11 @@
-import { pgTable, text, uuid, jsonb, timestamp, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  uuid,
+  jsonb,
+  timestamp,
+  index,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps } from './_shared';
 import { tenants } from './tenants';
@@ -16,17 +23,27 @@ export const certificates = pgTable(
     course_id: uuid('course_id')
       .notNull()
       .references(() => courses.id, { onDelete: 'cascade' }),
-    issued_at: timestamp('issued_at', { withTimezone: true }).notNull().defaultNow(),
-    verification_code: uuid('verification_code').notNull().unique().defaultRandom(),
+    issued_at: timestamp('issued_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    verification_code: uuid('verification_code')
+      .notNull()
+      .unique()
+      .defaultRandom(),
     pdf_url: text('pdf_url'),
     metadata: jsonb('metadata').notNull().default({}),
     ...timestamps,
   },
   (table) => ({
     tenantIdx: index('idx_certificates_tenant').on(table.tenant_id),
-    tenantUserIdx: index('idx_certificates_tenant_user').on(table.tenant_id, table.user_id),
-    verificationCodeIdx: index('idx_certificates_verification_code').on(table.verification_code),
-  }),
+    tenantUserIdx: index('idx_certificates_tenant_user').on(
+      table.tenant_id,
+      table.user_id
+    ),
+    verificationCodeIdx: index('idx_certificates_verification_code').on(
+      table.verification_code
+    ),
+  })
 );
 
 export const certificatesRLS = sql`

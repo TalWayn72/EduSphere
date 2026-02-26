@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -14,9 +20,15 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: { agentTemplates: [] }, fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { data: { agentTemplates: [] }, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
     useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
-    useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useSubscription: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
   };
 });
 
@@ -50,10 +62,13 @@ function renderAgents() {
  * executeFn is the mock function you can inspect for call assertions.
  */
 function makeMutationMock(responseData: Record<string, unknown> = {}) {
-  const executeFn = vi.fn().mockResolvedValue({ data: responseData, error: undefined });
-  return [{ fetching: false, error: undefined }, executeFn] as unknown as ReturnType<
-    typeof useMutation
-  >;
+  const executeFn = vi
+    .fn()
+    .mockResolvedValue({ data: responseData, error: undefined });
+  return [
+    { fetching: false, error: undefined },
+    executeFn,
+  ] as unknown as ReturnType<typeof useMutation>;
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -62,7 +77,13 @@ describe('AgentsPage', () => {
   beforeEach(() => {
     vi.mocked(useMutation).mockReturnValue(
       makeMutationMock({
-        startAgentSession: { id: 'session-1', templateType: 'CHAVRUTA', status: 'ACTIVE', contextContentId: null, createdAt: new Date().toISOString() },
+        startAgentSession: {
+          id: 'session-1',
+          templateType: 'CHAVRUTA',
+          status: 'ACTIVE',
+          contextContentId: null,
+          createdAt: new Date().toISOString(),
+        },
       })
     );
     vi.mocked(useSubscription).mockReturnValue([
@@ -92,11 +113,21 @@ describe('AgentsPage', () => {
 
   it('renders all five agent mode selector cards', () => {
     renderAgents();
-    expect(screen.getByRole('button', { name: /chavruta debate/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /quiz master/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /summarizer/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /research scout/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /explainer/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /chavruta debate/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /quiz master/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /summarizer/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /research scout/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /explainer/i })
+    ).toBeInTheDocument();
   });
 
   it('shows Chavruta as the default active mode', () => {
@@ -137,40 +168,36 @@ describe('AgentsPage', () => {
     renderAgents();
     await userEvent.click(screen.getByRole('button', { name: /quiz master/i }));
     // After switching, the chat header and initial message should update
-    expect(
-      screen.getByText(/test your knowledge/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/test your knowledge/i)).toBeInTheDocument();
   });
 
   it('switches active mode to Summarizer when that card is clicked', async () => {
     renderAgents();
     await userEvent.click(screen.getByRole('button', { name: /summarizer/i }));
-    expect(
-      screen.getByText(/summarize any lesson/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/summarize any lesson/i)).toBeInTheDocument();
   });
 
   it('switches active mode to Research Scout when that card is clicked', async () => {
     renderAgents();
-    await userEvent.click(screen.getByRole('button', { name: /research scout/i }));
-    expect(
-      screen.getByText(/Research mode active/i)
-    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: /research scout/i })
+    );
+    expect(screen.getByText(/Research mode active/i)).toBeInTheDocument();
   });
 
   it('switches active mode to Explainer when that card is clicked', async () => {
     renderAgents();
     await userEvent.click(screen.getByRole('button', { name: /explainer/i }));
-    expect(
-      screen.getByText(/Explain mode ready/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Explain mode ready/i)).toBeInTheDocument();
   });
 
   // ── Input interaction ──────────────────────────────────────────────────────
 
   it('updates chat input value as user types', async () => {
     renderAgents();
-    const input = screen.getByPlaceholderText(/Ask the Chavruta Debate/i) as HTMLInputElement;
+    const input = screen.getByPlaceholderText(
+      /Ask the Chavruta Debate/i
+    ) as HTMLInputElement;
     await userEvent.type(input, 'Debate free will');
     expect(input.value).toBe('Debate free will');
   });
@@ -178,8 +205,12 @@ describe('AgentsPage', () => {
   it('populates input when a quick-prompt chip is clicked', async () => {
     renderAgents();
     // Chavruta mode has prompts: 'Debate free will', 'Argue against Rambam', 'Challenge my thesis'
-    await userEvent.click(screen.getByRole('button', { name: 'Debate free will' }));
-    const input = screen.getByPlaceholderText(/Ask the Chavruta Debate/i) as HTMLInputElement;
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Debate free will' })
+    );
+    const input = screen.getByPlaceholderText(
+      /Ask the Chavruta Debate/i
+    ) as HTMLInputElement;
     expect(input.value).toBe('Debate free will');
   });
 
@@ -201,7 +232,9 @@ describe('AgentsPage', () => {
     vi.useFakeTimers();
     renderAgents();
 
-    const input = screen.getByPlaceholderText(/Ask the Chavruta Debate/i) as HTMLInputElement;
+    const input = screen.getByPlaceholderText(
+      /Ask the Chavruta Debate/i
+    ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'What is pilpul?' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
@@ -214,7 +247,9 @@ describe('AgentsPage', () => {
     vi.useFakeTimers();
     renderAgents();
 
-    const input = screen.getByPlaceholderText(/Ask the Chavruta Debate/i) as HTMLInputElement;
+    const input = screen.getByPlaceholderText(
+      /Ask the Chavruta Debate/i
+    ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Debate free will' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
@@ -246,10 +281,14 @@ describe('AgentsPage', () => {
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
     // Advance past the 600ms typing delay
-    act(() => { vi.advanceTimersByTime(700); });
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
 
     // After typing delay, streaming begins (setInterval at 18ms)
-    act(() => { vi.advanceTimersByTime(50); });
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
 
     // The blinking cursor span appears during streaming
     const cursor = document.querySelector('.animate-pulse');
@@ -262,7 +301,9 @@ describe('AgentsPage', () => {
     vi.useFakeTimers();
     renderAgents();
 
-    const input = screen.getByPlaceholderText(/Ask the Chavruta Debate/i) as HTMLInputElement;
+    const input = screen.getByPlaceholderText(
+      /Ask the Chavruta Debate/i
+    ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Debate free will' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
@@ -284,14 +325,20 @@ describe('AgentsPage', () => {
     });
 
     // Advance past typing delay (600ms)
-    act(() => { vi.advanceTimersByTime(700); });
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
 
     // Advance through full streaming (responses are ~250 chars, 3/tick at 18ms = ~1600ms)
     // Run all remaining timers to completion
-    act(() => { vi.runAllTimers(); });
+    act(() => {
+      vi.runAllTimers();
+    });
 
     // At least one response from Chavruta agent must now be visible
-    const agentResponse = screen.queryByText(/counter-argument|Ramban|steelman/i);
+    const agentResponse = screen.queryByText(
+      /counter-argument|Ramban|steelman/i
+    );
     expect(agentResponse).not.toBeNull();
 
     vi.useRealTimers();
@@ -312,8 +359,12 @@ describe('AgentsPage', () => {
     });
 
     // Advance time to complete the streaming
-    act(() => { vi.advanceTimersByTime(700); });
-    act(() => { vi.runAllTimers(); });
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
+    act(() => {
+      vi.runAllTimers();
+    });
 
     // User message in the chat bubble should be visible after streaming
     // (Note: the quick-prompt chip "Debate free will" also matches, so use getAllByText)
@@ -337,15 +388,23 @@ describe('AgentsPage', () => {
   it('renders Quiz Master quick prompts when Quiz Master mode is active', async () => {
     renderAgents();
     await userEvent.click(screen.getByRole('button', { name: /quiz master/i }));
-    expect(screen.getByRole('button', { name: 'Quiz me on free will' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Test my Rambam knowledge' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Quiz me on free will' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Test my Rambam knowledge' })
+    ).toBeInTheDocument();
   });
 
   it('renders Summarizer quick prompts when Summarizer mode is active', async () => {
     renderAgents();
     await userEvent.click(screen.getByRole('button', { name: /summarizer/i }));
-    expect(screen.getByRole('button', { name: 'Summarize lesson 1' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Key concepts only' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Summarize lesson 1' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Key concepts only' })
+    ).toBeInTheDocument();
   });
 
   // ── Subscription (real API path) ───────────────────────────────────────────
@@ -370,7 +429,9 @@ describe('AgentsPage', () => {
     renderAgents();
 
     await waitFor(() => {
-      expect(screen.getByText('Streamed AI token content here.')).toBeInTheDocument();
+      expect(
+        screen.getByText('Streamed AI token content here.')
+      ).toBeInTheDocument();
     });
   });
 });

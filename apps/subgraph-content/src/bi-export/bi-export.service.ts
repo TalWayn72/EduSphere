@@ -5,7 +5,13 @@
  */
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
-  createDatabaseConnection, closeAllPools, schema, withTenantContext, eq, isNotNull, desc,
+  createDatabaseConnection,
+  closeAllPools,
+  schema,
+  withTenantContext,
+  eq,
+  isNotNull,
+  desc,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 
@@ -47,23 +53,27 @@ export class BiExportService implements OnModuleDestroy {
     return { tenantId, userId: 'bi-export', userRole: 'ORG_ADMIN' };
   }
 
-  async getEnrollments(tenantId: string, params: ODataParams): Promise<ODataResponse<Record<string, unknown>>> {
+  async getEnrollments(
+    tenantId: string,
+    params: ODataParams
+  ): Promise<ODataResponse<Record<string, unknown>>> {
     const top = this.resolveTop(params);
     const skip = params.skip ?? 0;
     const ctx = this.buildCtx(tenantId);
 
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select({
-        id: schema.userCourses.id,
-        userId: schema.userCourses.userId,
-        courseId: schema.userCourses.courseId,
-        status: schema.userCourses.status,
-        enrolledAt: schema.userCourses.enrolledAt,
-        completedAt: schema.userCourses.completedAt,
-      })
+      tx
+        .select({
+          id: schema.userCourses.id,
+          userId: schema.userCourses.userId,
+          courseId: schema.userCourses.courseId,
+          status: schema.userCourses.status,
+          enrolledAt: schema.userCourses.enrolledAt,
+          completedAt: schema.userCourses.completedAt,
+        })
         .from(schema.userCourses)
         .limit(top)
-        .offset(skip),
+        .offset(skip)
     );
 
     this.logger.debug({ tenantId, count: rows.length }, 'getEnrollments');
@@ -74,24 +84,28 @@ export class BiExportService implements OnModuleDestroy {
     };
   }
 
-  async getCompletions(tenantId: string, params: ODataParams): Promise<ODataResponse<Record<string, unknown>>> {
+  async getCompletions(
+    tenantId: string,
+    params: ODataParams
+  ): Promise<ODataResponse<Record<string, unknown>>> {
     const top = this.resolveTop(params);
     const skip = params.skip ?? 0;
     const ctx = this.buildCtx(tenantId);
 
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select({
-        id: schema.userProgress.id,
-        userId: schema.userProgress.userId,
-        contentItemId: schema.userProgress.contentItemId,
-        completedAt: schema.userProgress.completedAt,
-        timeSpent: schema.userProgress.timeSpent,
-        progress: schema.userProgress.progress,
-      })
+      tx
+        .select({
+          id: schema.userProgress.id,
+          userId: schema.userProgress.userId,
+          contentItemId: schema.userProgress.contentItemId,
+          completedAt: schema.userProgress.completedAt,
+          timeSpent: schema.userProgress.timeSpent,
+          progress: schema.userProgress.progress,
+        })
         .from(schema.userProgress)
         .where(isNotNull(schema.userProgress.completedAt))
         .limit(top)
-        .offset(skip),
+        .offset(skip)
     );
 
     this.logger.debug({ tenantId, count: rows.length }, 'getCompletions');
@@ -102,25 +116,29 @@ export class BiExportService implements OnModuleDestroy {
     };
   }
 
-  async getQuizResults(tenantId: string, params: ODataParams): Promise<ODataResponse<Record<string, unknown>>> {
+  async getQuizResults(
+    tenantId: string,
+    params: ODataParams
+  ): Promise<ODataResponse<Record<string, unknown>>> {
     const top = this.resolveTop(params);
     const skip = params.skip ?? 0;
     const ctx = this.buildCtx(tenantId);
 
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select({
-        id: schema.quizResults.id,
-        userId: schema.quizResults.userId,
-        contentItemId: schema.quizResults.contentItemId,
-        score: schema.quizResults.score,
-        passed: schema.quizResults.passed,
-        submittedAt: schema.quizResults.submittedAt,
-      })
+      tx
+        .select({
+          id: schema.quizResults.id,
+          userId: schema.quizResults.userId,
+          contentItemId: schema.quizResults.contentItemId,
+          score: schema.quizResults.score,
+          passed: schema.quizResults.passed,
+          submittedAt: schema.quizResults.submittedAt,
+        })
         .from(schema.quizResults)
         .where(eq(schema.quizResults.tenantId, tenantId))
         .orderBy(desc(schema.quizResults.submittedAt))
         .limit(top)
-        .offset(skip),
+        .offset(skip)
     );
 
     this.logger.debug({ tenantId, count: rows.length }, 'getQuizResults');
@@ -131,25 +149,29 @@ export class BiExportService implements OnModuleDestroy {
     };
   }
 
-  async getActivityLog(tenantId: string, params: ODataParams): Promise<ODataResponse<Record<string, unknown>>> {
+  async getActivityLog(
+    tenantId: string,
+    params: ODataParams
+  ): Promise<ODataResponse<Record<string, unknown>>> {
     const top = this.resolveTop(params);
     const skip = params.skip ?? 0;
     const ctx = this.buildCtx(tenantId);
 
     // Use userProgress lastAccessedAt as daily activity proxy
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select({
-        id: schema.userProgress.id,
-        userId: schema.userProgress.userId,
-        contentItemId: schema.userProgress.contentItemId,
-        lastAccessedAt: schema.userProgress.lastAccessedAt,
-        timeSpent: schema.userProgress.timeSpent,
-        progress: schema.userProgress.progress,
-      })
+      tx
+        .select({
+          id: schema.userProgress.id,
+          userId: schema.userProgress.userId,
+          contentItemId: schema.userProgress.contentItemId,
+          lastAccessedAt: schema.userProgress.lastAccessedAt,
+          timeSpent: schema.userProgress.timeSpent,
+          progress: schema.userProgress.progress,
+        })
         .from(schema.userProgress)
         .orderBy(desc(schema.userProgress.lastAccessedAt))
         .limit(top)
-        .offset(skip),
+        .offset(skip)
     );
 
     this.logger.debug({ tenantId, count: rows.length }, 'getActivityLog');

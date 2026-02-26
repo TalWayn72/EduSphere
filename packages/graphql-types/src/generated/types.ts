@@ -1,21 +1,34 @@
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  DateTime: { input: string; output: string; }
-  JSON: { input: unknown; output: unknown; }
-  join__FieldSet: { input: string; output: string; }
-  link__Import: { input: string; output: string; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  DateTime: { input: string; output: string };
+  JSON: { input: unknown; output: unknown };
+  join__FieldSet: { input: string; output: string };
+  link__Import: { input: string; output: string };
 };
 
 export type AddMessageInput = {
@@ -44,7 +57,7 @@ export enum AgentExecutionStatus {
   Completed = 'COMPLETED',
   Failed = 'FAILED',
   Queued = 'QUEUED',
-  Running = 'RUNNING'
+  Running = 'RUNNING',
 }
 
 export type AgentMessage = {
@@ -74,7 +87,7 @@ export enum AgentSessionStatus {
   Active = 'ACTIVE',
   Cancelled = 'CANCELLED',
   Completed = 'COMPLETED',
-  Failed = 'FAILED'
+  Failed = 'FAILED',
 }
 
 export type AgentTemplate = {
@@ -108,7 +121,7 @@ export enum AnnotationLayer {
   AiGenerated = 'AI_GENERATED',
   Instructor = 'INSTRUCTOR',
   Personal = 'PERSONAL',
-  Shared = 'SHARED'
+  Shared = 'SHARED',
 }
 
 export enum AnnotationType {
@@ -116,7 +129,7 @@ export enum AnnotationType {
   Link = 'LINK',
   Sketch = 'SKETCH',
   SpatialComment = 'SPATIAL_COMMENT',
-  Text = 'TEXT'
+  Text = 'TEXT',
 }
 
 export type Concept = {
@@ -297,7 +310,6 @@ export type Discussion = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
-
 /** Discussion in a course */
 export type DiscussionMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -322,7 +334,6 @@ export type DiscussionMessage = {
   userId: Scalars['ID']['output'];
 };
 
-
 /** Message in a discussion */
 export type DiscussionMessageRepliesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -344,7 +355,7 @@ export type DiscussionParticipant = {
 export enum DiscussionType {
   Chavruta = 'CHAVRUTA',
   Debate = 'DEBATE',
-  Forum = 'FORUM'
+  Forum = 'FORUM',
 }
 
 export type Embedding = {
@@ -390,14 +401,14 @@ export enum MediaStatus {
   Error = 'ERROR',
   Processing = 'PROCESSING',
   Ready = 'READY',
-  Uploading = 'UPLOADING'
+  Uploading = 'UPLOADING',
 }
 
 export enum MessageRole {
   Assistant = 'ASSISTANT',
   System = 'SYSTEM',
   Tool = 'TOOL',
-  User = 'USER'
+  User = 'USER',
 }
 
 /** Message types */
@@ -405,7 +416,7 @@ export enum MessageType {
   Audio = 'AUDIO',
   Image = 'IMAGE',
   Text = 'TEXT',
-  Video = 'VIDEO'
+  Video = 'VIDEO',
 }
 
 export type Module = {
@@ -474,22 +485,18 @@ export type Mutation = {
   updateUser: User;
 };
 
-
 export type MutationActivateAgentTemplateArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationAddMessageArgs = {
   discussionId: Scalars['ID']['input'];
   input: AddMessageInput;
 };
 
-
 export type MutationCancelAgentExecutionArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationConfirmMediaUploadArgs = {
   courseId: Scalars['ID']['input'];
@@ -497,116 +504,93 @@ export type MutationConfirmMediaUploadArgs = {
   title: Scalars['String']['input'];
 };
 
-
 export type MutationCreateAgentTemplateArgs = {
   input: CreateAgentTemplateInput;
 };
-
 
 export type MutationCreateAnnotationArgs = {
   input: CreateAnnotationInput;
 };
 
-
 export type MutationCreateConceptArgs = {
   input: CreateConceptInput;
 };
-
 
 export type MutationCreateCourseArgs = {
   input: CreateCourseInput;
 };
 
-
 export type MutationCreateDiscussionArgs = {
   input: CreateDiscussionInput;
 };
-
 
 export type MutationCreateEmbeddingArgs = {
   input: CreateEmbeddingInput;
 };
 
-
 export type MutationCreateModuleArgs = {
   input: CreateModuleInput;
 };
-
 
 export type MutationCreatePersonArgs = {
   input: CreatePersonInput;
 };
 
-
 export type MutationCreateSourceArgs = {
   input: CreateSourceInput;
 };
-
 
 export type MutationCreateTermArgs = {
   input: CreateTermInput;
 };
 
-
 export type MutationCreateTopicClusterArgs = {
   input: CreateTopicClusterInput;
 };
-
 
 export type MutationCreateUserArgs = {
   input: CreateUserInput;
 };
 
-
 export type MutationDeactivateAgentTemplateArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationDeleteAgentTemplateArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationDeleteAnnotationArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationDeleteConceptArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationDeleteCourseArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationDeleteEmbeddingArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationDeleteEmbeddingsByContentItemArgs = {
   contentItemId: Scalars['ID']['input'];
 };
-
 
 export type MutationDeleteModuleArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationEndSessionArgs = {
   sessionId: Scalars['ID']['input'];
 };
 
-
 export type MutationEnrollCourseArgs = {
   courseId: Scalars['ID']['input'];
 };
-
 
 export type MutationGenerateEmbeddingArgs = {
   entityId: Scalars['ID']['input'];
@@ -614,16 +598,13 @@ export type MutationGenerateEmbeddingArgs = {
   text: Scalars['String']['input'];
 };
 
-
 export type MutationJoinDiscussionArgs = {
   discussionId: Scalars['ID']['input'];
 };
 
-
 export type MutationLeaveDiscussionArgs = {
   discussionId: Scalars['ID']['input'];
 };
-
 
 export type MutationLinkConceptsArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
@@ -633,90 +614,74 @@ export type MutationLinkConceptsArgs = {
   toId: Scalars['ID']['input'];
 };
 
-
 export type MutationMarkContentViewedArgs = {
   contentItemId: Scalars['ID']['input'];
 };
 
-
 export type MutationPublishCourseArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationReorderModulesArgs = {
   courseId: Scalars['ID']['input'];
   moduleIds: Array<Scalars['ID']['input']>;
 };
 
-
 export type MutationReplyToAnnotationArgs = {
   annotationId: Scalars['ID']['input'];
   content: Scalars['String']['input'];
 };
 
-
 export type MutationResolveAnnotationArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationSendMessageArgs = {
   content: Scalars['String']['input'];
   sessionId: Scalars['ID']['input'];
 };
 
-
 export type MutationStartAgentExecutionArgs = {
   input: StartAgentExecutionInput;
 };
-
 
 export type MutationStartAgentSessionArgs = {
   context: Scalars['JSON']['input'];
   templateType: TemplateType;
 };
 
-
 export type MutationUnenrollCourseArgs = {
   courseId: Scalars['ID']['input'];
 };
 
-
 export type MutationUnpublishCourseArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationUpdateAgentTemplateArgs = {
   id: Scalars['ID']['input'];
   input: UpdateAgentTemplateInput;
 };
 
-
 export type MutationUpdateAnnotationArgs = {
   id: Scalars['ID']['input'];
   input: UpdateAnnotationInput;
 };
-
 
 export type MutationUpdateConceptArgs = {
   id: Scalars['ID']['input'];
   input: UpdateConceptInput;
 };
 
-
 export type MutationUpdateCourseArgs = {
   id: Scalars['ID']['input'];
   input: UpdateCourseInput;
 };
 
-
 export type MutationUpdateModuleArgs = {
   id: Scalars['ID']['input'];
   input: UpdateModuleInput;
 };
-
 
 export type MutationUpdateUserArgs = {
   id: Scalars['ID']['input'];
@@ -814,43 +779,35 @@ export type Query = {
   users: Array<User>;
 };
 
-
 export type QueryAgentExecutionArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryAgentExecutionsByAgentArgs = {
   agentId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryAgentExecutionsByUserArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   userId: Scalars['ID']['input'];
 };
 
-
 export type QueryAgentSessionArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryAgentTemplateArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QueryAgentTemplatesByTypeArgs = {
   template: Scalars['String']['input'];
 };
 
-
 export type QueryAnnotationArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryAnnotationsArgs = {
   assetId?: InputMaybe<Scalars['ID']['input']>;
@@ -860,12 +817,10 @@ export type QueryAnnotationsArgs = {
   userId?: InputMaybe<Scalars['ID']['input']>;
 };
 
-
 export type QueryAnnotationsByAssetArgs = {
   assetId: Scalars['ID']['input'];
   layer?: InputMaybe<AnnotationLayer>;
 };
-
 
 export type QueryAnnotationsByUserArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -873,53 +828,43 @@ export type QueryAnnotationsByUserArgs = {
   userId: Scalars['ID']['input'];
 };
 
-
 export type QueryConceptArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryConceptByNameArgs = {
   name: Scalars['String']['input'];
 };
 
-
 export type QueryConceptsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
-
 
 export type QueryContentItemArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QueryContentItemsByModuleArgs = {
   moduleId: Scalars['ID']['input'];
 };
 
-
 export type QueryCourseArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryCoursesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryCoursesByInstructorArgs = {
   instructorId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryDiscussionArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryDiscussionMessagesArgs = {
   discussionId: Scalars['ID']['input'];
@@ -927,23 +872,19 @@ export type QueryDiscussionMessagesArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryDiscussionsArgs = {
   courseId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryEmbeddingArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QueryEmbeddingsByContentItemArgs = {
   contentItemId: Scalars['ID']['input'];
 };
-
 
 export type QueryGetPresignedUploadUrlArgs = {
   contentType: Scalars['String']['input'];
@@ -951,48 +892,39 @@ export type QueryGetPresignedUploadUrlArgs = {
   fileName: Scalars['String']['input'];
 };
 
-
 export type QueryLearningPathArgs = {
   from: Scalars['String']['input'];
   to: Scalars['String']['input'];
 };
 
-
 export type QueryModuleArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryModulesByCourseArgs = {
   courseId: Scalars['ID']['input'];
 };
 
-
 export type QueryMyCourseProgressArgs = {
   courseId: Scalars['ID']['input'];
 };
-
 
 export type QueryMyDiscussionsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryPersonArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryPersonByNameArgs = {
   name: Scalars['String']['input'];
 };
 
-
 export type QueryPrerequisiteChainArgs = {
   conceptName: Scalars['String']['input'];
 };
-
 
 export type QueryRelatedConceptsArgs = {
   conceptId: Scalars['ID']['input'];
@@ -1000,23 +932,19 @@ export type QueryRelatedConceptsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryRelatedConceptsByNameArgs = {
   conceptName: Scalars['String']['input'];
   depth?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryRunningExecutionsArgs = {
   userId: Scalars['ID']['input'];
 };
-
 
 export type QuerySearchSemanticArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
 };
-
 
 export type QuerySemanticSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -1024,54 +952,44 @@ export type QuerySemanticSearchArgs = {
   query: Array<Scalars['Float']['input']>;
 };
 
-
 export type QuerySemanticSearchByContentItemArgs = {
   contentItemId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Array<Scalars['Float']['input']>;
 };
 
-
 export type QuerySourceArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QueryTenantArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryTenantsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 export type QueryTermArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryTermByNameArgs = {
   name: Scalars['String']['input'];
 };
 
-
 export type QueryTopicClusterArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryTopicClustersByCourseArgs = {
   courseId: Scalars['ID']['input'];
 };
 
-
 export type QueryUserArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryUsersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -1134,36 +1052,29 @@ export type Subscription = {
   userUpdated: User;
 };
 
-
 export type SubscriptionAnnotationAddedArgs = {
   assetId: Scalars['ID']['input'];
 };
-
 
 export type SubscriptionExecutionStatusChangedArgs = {
   executionId: Scalars['ID']['input'];
 };
 
-
 export type SubscriptionMessageAddedArgs = {
   discussionId: Scalars['ID']['input'];
 };
-
 
 export type SubscriptionMessageStreamArgs = {
   sessionId: Scalars['ID']['input'];
 };
 
-
 export type SubscriptionUserCreatedArgs = {
   tenantId: Scalars['ID']['input'];
 };
 
-
 export type SubscriptionUserStatusChangedArgs = {
   userId: Scalars['ID']['input'];
 };
-
 
 export type SubscriptionUserUpdatedArgs = {
   tenantId: Scalars['ID']['input'];
@@ -1180,7 +1091,7 @@ export enum TemplateType {
   QuizGenerator = 'QUIZ_GENERATOR',
   ResearchScout = 'RESEARCH_SCOUT',
   Summarize = 'SUMMARIZE',
-  Tutor = 'TUTOR'
+  Tutor = 'TUTOR',
 }
 
 export type Tenant = {
@@ -1197,7 +1108,7 @@ export enum TenantPlan {
   Enterprise = 'ENTERPRISE',
   Free = 'FREE',
   Professional = 'PROFESSIONAL',
-  Starter = 'STARTER'
+  Starter = 'STARTER',
 }
 
 export type Term = {
@@ -1286,7 +1197,7 @@ export enum UserRole {
   OrgAdmin = 'ORG_ADMIN',
   Researcher = 'RESEARCHER',
   Student = 'STUDENT',
-  SuperAdmin = 'SUPER_ADMIN'
+  SuperAdmin = 'SUPER_ADMIN',
 }
 
 export type UserStats = {
@@ -1311,12 +1222,12 @@ export enum Join__Graph {
   Collaboration = 'COLLABORATION',
   Content = 'CONTENT',
   Core = 'CORE',
-  Knowledge = 'KNOWLEDGE'
+  Knowledge = 'KNOWLEDGE',
 }
 
 export enum Link__Purpose {
   /** `EXECUTION` features provide metadata necessary for operation execution. */
   Execution = 'EXECUTION',
   /** `SECURITY` features provide metadata necessary to securely resolve fields. */
-  Security = 'SECURITY'
+  Security = 'SECURITY',
 }

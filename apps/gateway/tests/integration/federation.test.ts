@@ -9,7 +9,8 @@ const SKIP = process.env.RUN_INTEGRATION_TESTS !== 'true';
 
 describe.skipIf(SKIP)('GraphQL Federation Integration', () => {
   let client: GraphQLClient;
-  const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:4000/graphql';
+  const GATEWAY_URL =
+    process.env.GATEWAY_URL || 'http://localhost:4000/graphql';
 
   beforeAll(() => {
     client = new GraphQLClient(GATEWAY_URL);
@@ -182,12 +183,42 @@ describe.skipIf(SKIP)('Gateway Federation - Schema Composition', () => {
         type: 'config',
         config: {
           subgraphs: [
-            { name: 'core', url: process.env.SUBGRAPH_CORE_URL || 'http://localhost:4001/graphql' },
-            { name: 'content', url: process.env.SUBGRAPH_CONTENT_URL || 'http://localhost:4002/graphql' },
-            { name: 'annotation', url: process.env.SUBGRAPH_ANNOTATION_URL || 'http://localhost:4003/graphql' },
-            { name: 'collaboration', url: process.env.SUBGRAPH_COLLABORATION_URL || 'http://localhost:4004/graphql' },
-            { name: 'agent', url: process.env.SUBGRAPH_AGENT_URL || 'http://localhost:4005/graphql' },
-            { name: 'knowledge', url: process.env.SUBGRAPH_KNOWLEDGE_URL || 'http://localhost:4006/graphql' },
+            {
+              name: 'core',
+              url:
+                process.env.SUBGRAPH_CORE_URL ||
+                'http://localhost:4001/graphql',
+            },
+            {
+              name: 'content',
+              url:
+                process.env.SUBGRAPH_CONTENT_URL ||
+                'http://localhost:4002/graphql',
+            },
+            {
+              name: 'annotation',
+              url:
+                process.env.SUBGRAPH_ANNOTATION_URL ||
+                'http://localhost:4003/graphql',
+            },
+            {
+              name: 'collaboration',
+              url:
+                process.env.SUBGRAPH_COLLABORATION_URL ||
+                'http://localhost:4004/graphql',
+            },
+            {
+              name: 'agent',
+              url:
+                process.env.SUBGRAPH_AGENT_URL ||
+                'http://localhost:4005/graphql',
+            },
+            {
+              name: 'knowledge',
+              url:
+                process.env.SUBGRAPH_KNOWLEDGE_URL ||
+                'http://localhost:4006/graphql',
+            },
           ],
         },
       },

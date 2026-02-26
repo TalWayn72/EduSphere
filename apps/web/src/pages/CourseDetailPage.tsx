@@ -13,8 +13,14 @@ import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { COURSE_DETAIL_QUERY } from '@/lib/graphql/content.queries';
-import { ENROLL_COURSE_MUTATION, UNENROLL_COURSE_MUTATION } from '@/lib/graphql/content.queries';
-import { MY_ENROLLMENTS_QUERY, MY_COURSE_PROGRESS_QUERY } from '@/lib/graphql/content.queries';
+import {
+  ENROLL_COURSE_MUTATION,
+  UNENROLL_COURSE_MUTATION,
+} from '@/lib/graphql/content.queries';
+import {
+  MY_ENROLLMENTS_QUERY,
+  MY_COURSE_PROGRESS_QUERY,
+} from '@/lib/graphql/content.queries';
 import { CourseModuleList } from './CourseDetailPage.modules';
 import { SourceManager } from '@/components/SourceManager';
 import {
@@ -76,7 +82,8 @@ interface ProgressData {
 const MOCK_COURSE_FALLBACK: CourseDetailData = {
   id: 'cc000000-0000-0000-0000-000000000002',
   title: 'Introduction to Talmud Study',
-  description: 'Learn the fundamentals of Talmudic reasoning and argumentation using AI-powered tools.',
+  description:
+    'Learn the fundamentals of Talmudic reasoning and argumentation using AI-powered tools.',
   thumbnailUrl: '📚',
   estimatedHours: 8,
   isPublished: true,
@@ -87,8 +94,20 @@ const MOCK_COURSE_FALLBACK: CourseDetailData = {
       title: 'Unit 1: Foundations',
       orderIndex: 0,
       contentItems: [
-        { id: 'ci-demo-1', title: 'Introduction Video', contentType: 'VIDEO', duration: 600, orderIndex: 0 },
-        { id: 'ci-demo-2', title: 'Reading: Mishnah Overview', contentType: 'PDF', duration: null, orderIndex: 1 },
+        {
+          id: 'ci-demo-1',
+          title: 'Introduction Video',
+          contentType: 'VIDEO',
+          duration: 600,
+          orderIndex: 0,
+        },
+        {
+          id: 'ci-demo-2',
+          title: 'Reading: Mishnah Overview',
+          contentType: 'PDF',
+          duration: null,
+          orderIndex: 1,
+        },
       ],
     },
   ],
@@ -125,7 +144,9 @@ export function CourseDetailPage() {
   const [isEnrolling, startEnrollTransition] = useTransition();
   const [toast, setToast] = useState<string | null>(null);
   const [showSources, setShowSources] = useState(false);
-  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Cleanup toast timeout on unmount
   useEffect(() => {
@@ -136,7 +157,8 @@ export function CourseDetailPage() {
 
   // Fall back to mock data when GraphQL is unavailable (DEV_MODE / no backend)
   const course = data?.course ?? (error ? MOCK_COURSE_FALLBACK : null);
-  const isEnrolled = enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ?? false;
+  const isEnrolled =
+    enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ?? false;
   const progress = progressData?.myCourseProgress;
 
   const showToast = (msg: string) => {
@@ -168,7 +190,10 @@ export function CourseDetailPage() {
     );
   }
 
-  const totalItems = course.modules.reduce((n, m) => n + m.contentItems.length, 0);
+  const totalItems = course.modules.reduce(
+    (n, m) => n + m.contentItems.length,
+    0
+  );
 
   return (
     <Layout>
@@ -181,7 +206,12 @@ export function CourseDetailPage() {
 
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Back navigation */}
-        <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate('/courses')}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+          onClick={() => navigate('/courses')}
+        >
           <ArrowLeft className="h-4 w-4" />
           {t('backToCourses')}
         </Button>
@@ -192,9 +222,13 @@ export function CourseDetailPage() {
             <div className="flex items-start gap-4">
               <span className="text-5xl">{course.thumbnailUrl ?? '📚'}</span>
               <div className="flex-1 min-w-0">
-                <CardTitle className="text-2xl leading-snug mb-2">{course.title}</CardTitle>
+                <CardTitle className="text-2xl leading-snug mb-2">
+                  {course.title}
+                </CardTitle>
                 {course.description && (
-                  <p className="text-muted-foreground text-sm">{course.description}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {course.description}
+                  </p>
                 )}
                 <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
                   {course.estimatedHours != null && (
@@ -205,12 +239,17 @@ export function CourseDetailPage() {
                   )}
                   <span className="flex items-center gap-1.5">
                     <BookOpen className="h-4 w-4" />
-                    {t('itemsInModules', { items: totalItems, modules: course.modules.length })}
+                    {t('itemsInModules', {
+                      items: totalItems,
+                      modules: course.modules.length,
+                    })}
                   </span>
                   {isEnrolled && progress && (
                     <span className="flex items-center gap-1.5 text-primary">
                       <Users className="h-4 w-4" />
-                      {t('percentComplete', { percent: progress.percentComplete })}
+                      {t('percentComplete', {
+                        percent: progress.percentComplete,
+                      })}
                     </span>
                   )}
                 </div>
@@ -222,7 +261,13 @@ export function CourseDetailPage() {
                 disabled={isEnrolling}
               >
                 {isEnrolling && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isEnrolling ? (isEnrolled ? t('unenrolling') : t('enrolling')) : (isEnrolled ? t('unenroll') : t('enroll'))}
+                {isEnrolling
+                  ? isEnrolled
+                    ? t('unenrolling')
+                    : t('enrolling')
+                  : isEnrolled
+                    ? t('unenroll')
+                    : t('enroll')}
               </Button>
             </div>
           </CardHeader>
@@ -232,7 +277,12 @@ export function CourseDetailPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{t('completedOfTotal', { completed: progress.completedItems, total: progress.totalItems })}</span>
+                  <span>
+                    {t('completedOfTotal', {
+                      completed: progress.completedItems,
+                      total: progress.totalItems,
+                    })}
+                  </span>
                   <span>{progress.percentComplete}%</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">

@@ -30,7 +30,11 @@ interface CreateContentItemVariables {
   };
 }
 
-export function RichDocumentEditor({ moduleId, courseId, onSaved }: RichDocumentEditorProps) {
+export function RichDocumentEditor({
+  moduleId,
+  courseId,
+  onSaved,
+}: RichDocumentEditorProps) {
   const [title, setTitle] = useState('');
   const [editorContent, setEditorContent] = useState('');
 
@@ -53,7 +57,8 @@ export function RichDocumentEditor({ moduleId, courseId, onSaved }: RichDocument
         throw new Error('Failed to get upload URL');
       }
 
-      const { uploadUrl, fileKey } = presignResult.data.getPresignedUploadUrl as {
+      const { uploadUrl, fileKey } = presignResult.data
+        .getPresignedUploadUrl as {
         uploadUrl: string;
         fileKey: string;
       };
@@ -71,7 +76,7 @@ export function RichDocumentEditor({ moduleId, courseId, onSaved }: RichDocument
       // Return a public URL using the fileKey (MinIO path)
       return `/media/${fileKey}`;
     },
-    [courseId],
+    [courseId]
   );
 
   const handleSave = useCallback(async () => {
@@ -91,7 +96,10 @@ export function RichDocumentEditor({ moduleId, courseId, onSaved }: RichDocument
     });
 
     if (error) {
-      const msg = error.graphQLErrors?.[0]?.message ?? error.message ?? 'Failed to save document';
+      const msg =
+        error.graphQLErrors?.[0]?.message ??
+        error.message ??
+        'Failed to save document';
       toast.error(msg);
       return;
     }
@@ -123,7 +131,9 @@ export function RichDocumentEditor({ moduleId, courseId, onSaved }: RichDocument
 
       <div className="flex justify-end">
         <Button
-          onClick={() => { void handleSave(); }}
+          onClick={() => {
+            void handleSave();
+          }}
           disabled={createResult.fetching || !title.trim()}
           className="gap-2"
         >

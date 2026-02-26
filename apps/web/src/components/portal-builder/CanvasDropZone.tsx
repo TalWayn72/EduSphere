@@ -89,7 +89,10 @@ export function CanvasDropZone({ blocks, onDrop, onRemove, onReorder }: Props) {
           aria-label={`${block.type} block`}
         >
           <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-            <GripVertical className="h-4 w-4 text-muted-foreground" aria-hidden />
+            <GripVertical
+              className="h-4 w-4 text-muted-foreground"
+              aria-hidden
+            />
           </div>
           <button
             onClick={() => onRemove(block.id)}

@@ -24,7 +24,13 @@ interface Props {
 
 const MAX_ALT_TEXT_LENGTH = 125;
 
-export function AltTextModal({ mediaId, initialAltText, open, onClose, onSaved }: Props) {
+export function AltTextModal({
+  mediaId,
+  initialAltText,
+  open,
+  onClose,
+  onSaved,
+}: Props) {
   const { t } = useTranslation('media');
   const [value, setValue] = useState(initialAltText ?? '');
   const [saving, setSaving] = useState(false);
@@ -65,7 +71,12 @@ export function AltTextModal({ mediaId, initialAltText, open, onClose, onSaved }
   const remaining = MAX_ALT_TEXT_LENGTH - value.length;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -76,7 +87,10 @@ export function AltTextModal({ mediaId, initialAltText, open, onClose, onSaved }
 
         <div className="space-y-3 py-2">
           <p className="text-sm text-muted-foreground">
-            {t('altText.description', 'AI has generated a description for this image. Review and edit it to ensure accuracy and accessibility.')}
+            {t(
+              'altText.description',
+              'AI has generated a description for this image. Review and edit it to ensure accuracy and accessibility.'
+            )}
           </p>
           <div className="space-y-1.5">
             <Label htmlFor="alt-text-input">
@@ -85,7 +99,9 @@ export function AltTextModal({ mediaId, initialAltText, open, onClose, onSaved }
             <Textarea
               id="alt-text-input"
               value={value}
-              onChange={(e) => setValue(e.target.value.slice(0, MAX_ALT_TEXT_LENGTH))}
+              onChange={(e) =>
+                setValue(e.target.value.slice(0, MAX_ALT_TEXT_LENGTH))
+              }
               placeholder={t('altText.placeholder', 'Describe the image...')}
               rows={3}
               disabled={saving}
@@ -94,13 +110,18 @@ export function AltTextModal({ mediaId, initialAltText, open, onClose, onSaved }
             />
             <p
               id="alt-text-counter"
-              className={'text-xs text-right ' + (remaining < 10 ? 'text-destructive' : 'text-muted-foreground')}
+              className={
+                'text-xs text-right ' +
+                (remaining < 10 ? 'text-destructive' : 'text-muted-foreground')
+              }
             >
               {remaining} {t('altText.remaining', 'characters remaining')}
             </p>
           </div>
           {error && (
-            <p role="alert" className="text-xs text-destructive">{error}</p>
+            <p role="alert" className="text-xs text-destructive">
+              {error}
+            </p>
           )}
         </div>
 

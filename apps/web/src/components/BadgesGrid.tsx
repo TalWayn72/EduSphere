@@ -22,7 +22,11 @@ interface MyBadgesResult {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 interface BadgesGridProps {
@@ -36,9 +40,15 @@ function BadgeCard({ userBadge }: { userBadge: UserBadgeData }) {
         {userBadge.badge.iconEmoji}
       </span>
       <p className="font-semibold text-sm">{userBadge.badge.name}</p>
-      <p className="text-xs text-muted-foreground line-clamp-2">{userBadge.badge.description}</p>
-      <span className="mt-auto text-xs text-primary font-medium">+{userBadge.badge.pointsReward} pts</span>
-      <time className="text-xs text-muted-foreground">{formatDate(userBadge.earnedAt)}</time>
+      <p className="text-xs text-muted-foreground line-clamp-2">
+        {userBadge.badge.description}
+      </p>
+      <span className="mt-auto text-xs text-primary font-medium">
+        +{userBadge.badge.pointsReward} pts
+      </span>
+      <time className="text-xs text-muted-foreground">
+        {formatDate(userBadge.earnedAt)}
+      </time>
     </Card>
   );
 }
@@ -73,7 +83,9 @@ export function BadgesGrid({ badges: propBadges }: BadgesGridProps) {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {badges.map((ub) => <BadgeCard key={ub.id} userBadge={ub} />)}
+      {badges.map((ub) => (
+        <BadgeCard key={ub.id} userBadge={ub} />
+      ))}
     </div>
   );
 }

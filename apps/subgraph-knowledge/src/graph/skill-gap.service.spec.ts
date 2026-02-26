@@ -18,8 +18,9 @@ const mockTx = {
 
 vi.mock('@edusphere/db', () => ({
   db: { execute: vi.fn() },
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => unknown) =>
-    cb(mockTx)
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => unknown) =>
+      cb(mockTx)
   ),
   skillProfiles: {
     id: 'id',
@@ -83,7 +84,12 @@ describe('SkillGapService', () => {
       });
       mockRecommendations.buildGapItems.mockResolvedValue([]);
 
-      const report = await service.analyzeSkillGap(USER, TENANT, ROLE, 'profile-1');
+      const report = await service.analyzeSkillGap(
+        USER,
+        TENANT,
+        ROLE,
+        'profile-1'
+      );
 
       expect(report.gapCount).toBe(0);
       expect(report.completionPercentage).toBe(100);
@@ -95,12 +101,35 @@ describe('SkillGapService', () => {
       setupProfileQuery(PROFILE);
       mockExecute.mockResolvedValueOnce({ rows: [] });
       mockRecommendations.buildGapItems.mockResolvedValue([
-        { conceptName: 'GraphQL', isMastered: false, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0 },
-        { conceptName: 'Docker', isMastered: false, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0 },
-        { conceptName: 'PostgreSQL', isMastered: false, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0 },
+        {
+          conceptName: 'GraphQL',
+          isMastered: false,
+          recommendedContentItems: [],
+          recommendedContentTitles: [],
+          relevanceScore: 0,
+        },
+        {
+          conceptName: 'Docker',
+          isMastered: false,
+          recommendedContentItems: [],
+          recommendedContentTitles: [],
+          relevanceScore: 0,
+        },
+        {
+          conceptName: 'PostgreSQL',
+          isMastered: false,
+          recommendedContentItems: [],
+          recommendedContentTitles: [],
+          relevanceScore: 0,
+        },
       ]);
 
-      const report = await service.analyzeSkillGap(USER, TENANT, ROLE, 'profile-1');
+      const report = await service.analyzeSkillGap(
+        USER,
+        TENANT,
+        ROLE,
+        'profile-1'
+      );
 
       expect(report.gapCount).toBe(3);
       expect(report.mastered).toBe(0);
@@ -109,13 +138,32 @@ describe('SkillGapService', () => {
 
     it('computes correct percentages for partial mastery (1 of 3)', async () => {
       setupProfileQuery(PROFILE);
-      mockExecute.mockResolvedValueOnce({ rows: [{ concept_name: 'graphql' }] });
+      mockExecute.mockResolvedValueOnce({
+        rows: [{ concept_name: 'graphql' }],
+      });
       mockRecommendations.buildGapItems.mockResolvedValue([
-        { conceptName: 'Docker', isMastered: false, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0 },
-        { conceptName: 'PostgreSQL', isMastered: false, recommendedContentItems: [], recommendedContentTitles: [], relevanceScore: 0 },
+        {
+          conceptName: 'Docker',
+          isMastered: false,
+          recommendedContentItems: [],
+          recommendedContentTitles: [],
+          relevanceScore: 0,
+        },
+        {
+          conceptName: 'PostgreSQL',
+          isMastered: false,
+          recommendedContentItems: [],
+          recommendedContentTitles: [],
+          relevanceScore: 0,
+        },
       ]);
 
-      const report = await service.analyzeSkillGap(USER, TENANT, ROLE, 'profile-1');
+      const report = await service.analyzeSkillGap(
+        USER,
+        TENANT,
+        ROLE,
+        'profile-1'
+      );
 
       expect(report.mastered).toBe(1);
       expect(report.gapCount).toBe(2);
@@ -126,7 +174,7 @@ describe('SkillGapService', () => {
       setupProfileQuery(null);
 
       await expect(
-        service.analyzeSkillGap(USER, TENANT, ROLE, 'non-existent'),
+        service.analyzeSkillGap(USER, TENANT, ROLE, 'non-existent')
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -143,10 +191,17 @@ describe('SkillGapService', () => {
         },
       ]);
 
-      const report = await service.analyzeSkillGap(USER, TENANT, ROLE, 'profile-1');
+      const report = await service.analyzeSkillGap(
+        USER,
+        TENANT,
+        ROLE,
+        'profile-1'
+      );
 
       expect(report.gaps[0]?.recommendedContentItems).toContain('seg-1');
-      expect(report.gaps[0]?.recommendedContentTitles).toContain('GraphQL Course');
+      expect(report.gaps[0]?.recommendedContentTitles).toContain(
+        'GraphQL Course'
+      );
     });
 
     it('returns 100% when profile has zero required concepts', async () => {
@@ -155,7 +210,12 @@ describe('SkillGapService', () => {
       mockExecute.mockResolvedValueOnce({ rows: [] });
       mockRecommendations.buildGapItems.mockResolvedValue([]);
 
-      const report = await service.analyzeSkillGap(USER, TENANT, ROLE, 'profile-1');
+      const report = await service.analyzeSkillGap(
+        USER,
+        TENANT,
+        ROLE,
+        'profile-1'
+      );
 
       expect(report.completionPercentage).toBe(100);
       expect(report.totalRequired).toBe(0);
@@ -171,7 +231,12 @@ describe('SkillGapService', () => {
       });
 
       const dto = await service.createSkillProfile(
-        TENANT, USER, 'INSTRUCTOR', 'Backend Engineer', null, ['GraphQL'],
+        TENANT,
+        USER,
+        'INSTRUCTOR',
+        'Backend Engineer',
+        null,
+        ['GraphQL']
       );
 
       expect(dto.roleName).toBe('Backend Engineer');

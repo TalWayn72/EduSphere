@@ -78,7 +78,12 @@ export function WordCommentPanel({
       : annotations.filter((a) => a.layer === activeFilter);
 
   // CommentCard.onFocus is (id: string); bridge to panel's (id: string | null) API.
-  const handleFocus = useCallback((id: string) => { onFocusAnnotation(id); }, [onFocusAnnotation]);
+  const handleFocus = useCallback(
+    (id: string) => {
+      onFocusAnnotation(id);
+    },
+    [onFocusAnnotation]
+  );
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
@@ -117,7 +122,7 @@ export function WordCommentPanel({
               'shrink-0 rounded px-2 py-0.5 text-[10px] font-medium transition-colors',
               activeFilter === value
                 ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-accent',
+                : 'text-muted-foreground hover:bg-accent'
             )}
           >
             {label}

@@ -37,6 +37,7 @@ docker exec edusphere-postgres psql -U edusphere -d edusphere -c "\dt"
 ```
 
 Expected output: **16 tables**
+
 - tenants, users, courses, modules, media_assets
 - transcripts, transcript_segments
 - annotations
@@ -60,6 +61,7 @@ docker exec edusphere-postgres psql -U edusphere -d edusphere -c "
 ```
 
 Expected output:
+
 - 2 tenants (Demo, University A)
 - 5 users (1 super admin, 1 org admin, 1 instructor, 2 students)
 - 1 course with 2 modules
@@ -90,6 +92,7 @@ docker exec edusphere-postgres psql -U edusphere -d edusphere -c "
 ```
 
 Expected output:
+
 ```
 🏥 EduSphere Health Check
 ==========================
@@ -107,23 +110,27 @@ All services healthy!
 ## Current Status
 
 ✅ **Phase 0: Foundation** - Complete
+
 - Docker infrastructure configured
 - PostgreSQL 16 + Apache AGE 1.5.0 + pgvector 0.8.0
 - Health check script created
 
 ✅ **Phase 1: Data Layer** - Complete
+
 - 16 PostgreSQL tables created
 - Row-Level Security (RLS) ready
 - Apache AGE graph ontology initialized
 - pgvector embeddings tables ready
 
 ✅ **Phase 2: Authentication + Core/Content Subgraphs** - Infrastructure Ready
+
 - Keycloak realm configured (see [PHASE_2_SETUP.md](PHASE_2_SETUP.md))
 - Docker Compose updated with Keycloak service
 - 5 demo users with roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, STUDENT, RESEARCHER)
 - Code templates ready for packages/auth, subgraph-core, subgraph-content
 
 ⏳ **Next:** Phase 3 - Gateway & Supergraph
+
 - Hive Gateway v2.7 configuration
 - Supergraph composition
 - GraphQL introspection
@@ -161,6 +168,7 @@ docker logs -f edusphere-keycloak
 ### Step 3: Test Authentication
 
 Test login with demo users:
+
 - **Super Admin**: super.admin@edusphere.dev / SuperAdmin123!
 - **Org Admin**: org.admin@example.com / OrgAdmin123!
 - **Instructor**: instructor@example.com / Instructor123!
@@ -170,6 +178,7 @@ Test login with demo users:
 ### Step 4: Build Auth Package & Subgraphs
 
 See [PHASE_2_SETUP.md](PHASE_2_SETUP.md) for complete code templates for:
+
 - `packages/auth` - JWT validation with Keycloak JWKS
 - `apps/subgraph-core` - Users & Tenants GraphQL API
 - `apps/subgraph-content` - Courses & Media GraphQL API
@@ -191,12 +200,14 @@ pnpm --filter @edusphere/subgraph-content dev
 ## Troubleshooting
 
 ### Docker not found
+
 ```bash
 # On Windows, ensure Docker Desktop is running
 # Check PATH includes: C:\Program Files\Docker\Docker\resources\bin\
 ```
 
 ### PostgreSQL connection refused
+
 ```bash
 # Check container is running
 docker ps | grep postgres
@@ -206,6 +217,7 @@ docker logs edusphere-postgres
 ```
 
 ### Apache AGE extension not loaded
+
 ```bash
 # Restart PostgreSQL container
 docker restart edusphere-postgres
@@ -215,6 +227,7 @@ docker exec edusphere-postgres psql -U postgres -c "SHOW shared_preload_librarie
 ```
 
 ### Migrations fail
+
 ```bash
 # Reset database (CAUTION: deletes all data)
 docker exec edusphere-postgres psql -U postgres -c "DROP DATABASE edusphere"

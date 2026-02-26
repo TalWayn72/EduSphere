@@ -12,10 +12,22 @@ const tiptapStub = path.resolve(__dirname, './src/test/stubs/tiptap-stub.ts');
 // Vitest uses the resolved file path as the module-cache key, so if multiple
 // packages alias to the same file, vi.mock() calls overwrite each other
 // (last writer wins).  Separate files = separate cache slots = safe isolation.
-const tiptapCoreStub = path.resolve(__dirname, './src/test/stubs/tiptap-core-stub.ts');
-const tiptapPmStateStub = path.resolve(__dirname, './src/test/stubs/tiptap-pm-state-stub.ts');
-const tiptapPmViewStub = path.resolve(__dirname, './src/test/stubs/tiptap-pm-view-stub.ts');
-const tiptapPmModelStub = path.resolve(__dirname, './src/test/stubs/tiptap-pm-model-stub.ts');
+const tiptapCoreStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-core-stub.ts'
+);
+const tiptapPmStateStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-pm-state-stub.ts'
+);
+const tiptapPmViewStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-pm-view-stub.ts'
+);
+const tiptapPmModelStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-pm-model-stub.ts'
+);
 
 export default defineConfig({
   plugins: [react()],
@@ -43,7 +55,7 @@ export default defineConfig({
       '@tiptap/extension-image': tiptapStub,
       '@tiptap/react': tiptapStub,
       '@tiptap/starter-kit': tiptapStub,
-      'lowlight': tiptapStub,
+      lowlight: tiptapStub,
       '@hocuspocus/provider': tiptapStub,
       // CSS imports from katex — not needed in jsdom tests
       'katex/dist/katex.min.css': tiptapStub,

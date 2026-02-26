@@ -1,9 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TenantLanguageService, LANG_CACHE_MAX_SIZE } from './tenant-language.service';
+import {
+  TenantLanguageService,
+  LANG_CACHE_MAX_SIZE,
+} from './tenant-language.service';
 
 const mockWhere = vi.fn();
 const mockLimit = vi.fn();
-const mockFrom  = vi.fn();
+const mockFrom = vi.fn();
 
 vi.mock('@edusphere/db', () => ({
   db: { select: () => ({ from: mockFrom }) },
@@ -16,7 +19,9 @@ describe('TenantLanguageService — memory safety', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLimit.mockResolvedValue([{ settings: { supportedLanguages: ['en'], defaultLanguage: 'en' } }]);
+    mockLimit.mockResolvedValue([
+      { settings: { supportedLanguages: ['en'], defaultLanguage: 'en' } },
+    ]);
     mockWhere.mockReturnValue({ limit: mockLimit });
     mockFrom.mockReturnValue({ where: mockWhere });
     service = new TenantLanguageService();

@@ -18,7 +18,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mockFindByModuleIdBatch = vi.fn();
 
 vi.mock('./content-item.service.js', () => ({
-  ContentItemService: vi.fn().mockImplementation(function() {
+  ContentItemService: vi.fn().mockImplementation(function () {
     return { findByModuleIdBatch: mockFindByModuleIdBatch };
   }),
 }));
@@ -43,7 +43,9 @@ describe('ContentItemLoader — memory safety', () => {
     // Access the internal DataLoader options via the known property name.
     // DataLoader exposes _cacheMap only when caching is enabled.
     // With cache:false the map is never populated even after loads.
-    const dl = loader.byModuleId as unknown as { _cacheMap: Map<unknown, unknown> | undefined };
+    const dl = loader.byModuleId as unknown as {
+      _cacheMap: Map<unknown, unknown> | undefined;
+    };
     // cache:false means _cacheMap is undefined or null
     expect(dl._cacheMap == null).toBe(true);
   });
@@ -57,7 +59,10 @@ describe('ContentItemLoader — memory safety', () => {
 
   // ── Test 3: batch function passes keys to the service ────────────────────
   it('batch function delegates to ContentItemService.findByModuleIdBatch', async () => {
-    const batchMap = new Map([['mod-1', [{ id: 'ci-1' }]], ['mod-2', []]]);
+    const batchMap = new Map([
+      ['mod-1', [{ id: 'ci-1' }]],
+      ['mod-2', []],
+    ]);
     mockFindByModuleIdBatch.mockResolvedValue(batchMap);
 
     const loader = makeLoader();

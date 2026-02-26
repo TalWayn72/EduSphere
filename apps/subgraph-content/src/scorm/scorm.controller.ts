@@ -83,7 +83,7 @@ export class ScormController {
   @Get('launch/:sessionId')
   async launchScorm(
     @Param('sessionId') sessionId: string,
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     // Load session to get content item
     const session = await this.sessionService.findSessionById(sessionId);
@@ -96,7 +96,9 @@ export class ScormController {
       .limit(1);
 
     if (!pkg) {
-      throw new NotFoundException(`SCORM package not found for session ${sessionId}`);
+      throw new NotFoundException(
+        `SCORM package not found for session ${sessionId}`
+      );
     }
 
     // Fetch entry point HTML from MinIO
@@ -104,7 +106,7 @@ export class ScormController {
     let htmlContent: string;
     try {
       const response = await this.s3.send(
-        new GetObjectCommand({ Bucket: this.bucket, Key: minioKey }),
+        new GetObjectCommand({ Bucket: this.bucket, Key: minioKey })
       );
       const chunks: Uint8Array[] = [];
       for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
@@ -112,17 +114,19 @@ export class ScormController {
       }
       htmlContent = Buffer.concat(chunks).toString('utf-8');
     } catch (e) {
-      this.logger.error(`Failed to fetch SCORM entry point: key=${minioKey} err=${String(e)}`);
+      this.logger.error(
+        `Failed to fetch SCORM entry point: key=${minioKey} err=${String(e)}`
+      );
       throw new InternalServerErrorException('Failed to load SCORM content');
     }
 
     // Inject API shim before </head>
     const shimWithSession = SCORM_SHIM_SCRIPT.replace(
       "data-session''",
-      `data-session='${sessionId}'`,
+      `data-session='${sessionId}'`
     ).replace(
       "getAttribute('data-session')",
-      `getAttribute('data-session') || '${sessionId}'`,
+      `getAttribute('data-session') || '${sessionId}'`
     );
 
     const injected = htmlContent.includes('</head>')

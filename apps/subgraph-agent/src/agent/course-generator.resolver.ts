@@ -23,7 +23,7 @@ export class CourseGeneratorResolver {
   @Mutation('generateCourseFromPrompt')
   async generateCourseFromPrompt(
     @Args('input') input: GenerateCourseInputArgs,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId) {
@@ -41,7 +41,7 @@ export class CourseGeneratorResolver {
         language: input.language,
       },
       auth.userId,
-      tenantId,
+      tenantId
     );
 
     return {

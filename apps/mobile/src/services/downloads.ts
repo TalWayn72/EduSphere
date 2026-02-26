@@ -53,7 +53,9 @@ export class DownloadService {
     }
 
     // WiFi-only guard
-    const wifiOnlyRaw = await AsyncStorage.getItem('edusphere_wifi_only_download').catch(() => null);
+    const wifiOnlyRaw = await AsyncStorage.getItem(
+      'edusphere_wifi_only_download'
+    ).catch(() => null);
     if (wifiOnlyRaw === 'true') {
       const onWifi = await isWifiConnected();
       if (!onWifi) {

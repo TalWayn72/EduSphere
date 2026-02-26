@@ -32,7 +32,11 @@ vi.mock('@edusphere/db', () => ({
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: {
-    liveSessions: { id: 'id', contentItemId: 'contentItemId', tenantId: 'tenantId' },
+    liveSessions: {
+      id: 'id',
+      contentItemId: 'contentItemId',
+      tenantId: 'tenantId',
+    },
   },
   eq: vi.fn((a, b) => ({ field: a, value: b })),
   and: vi.fn((...args) => args),
@@ -42,7 +46,9 @@ vi.mock('nats', () => ({
   connect: vi.fn().mockResolvedValue({
     subscribe: vi.fn().mockReturnValue({
       unsubscribe: vi.fn(),
-      [Symbol.asyncIterator]: vi.fn().mockReturnValue({ next: vi.fn().mockResolvedValue({ done: true }) }),
+      [Symbol.asyncIterator]: vi
+        .fn()
+        .mockReturnValue({ next: vi.fn().mockResolvedValue({ done: true }) }),
     }),
     drain: vi.fn().mockResolvedValue(undefined),
     close: vi.fn().mockResolvedValue(undefined),
@@ -81,7 +87,7 @@ describe('LiveSessionService', () => {
         'content-1',
         'tenant-1',
         new Date('2026-03-01T10:00:00Z'),
-        'Hebrew Philosophy 101',
+        'Hebrew Philosophy 101'
       );
 
       expect(result.id).toBe('session-uuid-1');
@@ -94,7 +100,10 @@ describe('LiveSessionService', () => {
     it('works in demo mode (BBB not configured)', async () => {
       vi.mocked(createBbbClient).mockReturnValue(null);
       const result = await service.createLiveSession(
-        'content-1', 'tenant-1', new Date(), 'Test',
+        'content-1',
+        'tenant-1',
+        new Date(),
+        'Test'
       );
       expect(result.id).toBeTruthy();
     });
@@ -106,64 +115,92 @@ describe('LiveSessionService', () => {
 
       // Mock DB to return a live session
       const db = (service as any).db;
-      db.limit = vi.fn().mockResolvedValue([{
-        id: 'session-1',
-        contentItemId: 'content-1',
-        tenantId: 'tenant-1',
-        bbbMeetingId: 'bbb-1',
-        meetingName: 'Test',
-        scheduledAt: new Date(),
-        status: 'LIVE',
-        attendeePassword: 'att-pw',
-        moderatorPassword: 'mod-pw',
-        recordingUrl: null,
-      }]);
+      db.limit = vi.fn().mockResolvedValue([
+        {
+          id: 'session-1',
+          contentItemId: 'content-1',
+          tenantId: 'tenant-1',
+          bbbMeetingId: 'bbb-1',
+          meetingName: 'Test',
+          scheduledAt: new Date(),
+          status: 'LIVE',
+          attendeePassword: 'att-pw',
+          moderatorPassword: 'mod-pw',
+          recordingUrl: null,
+        },
+      ]);
 
-      const url = await service.getJoinUrl('session-1', 'tenant-1', 'Alice', 'LEARNER');
+      const url = await service.getJoinUrl(
+        'session-1',
+        'tenant-1',
+        'Alice',
+        'LEARNER'
+      );
       expect(url).toBe('https://demo.bigbluebutton.org/gl/meeting-demo');
     });
 
     it('returns moderator join URL for INSTRUCTOR role when BBB is configured', async () => {
-      const mockBuildJoinUrl = vi.fn().mockReturnValue('https://bbb.example.com/join?pw=mod-pw');
+      const mockBuildJoinUrl = vi
+        .fn()
+        .mockReturnValue('https://bbb.example.com/join?pw=mod-pw');
       vi.mocked(createBbbClient).mockReturnValue({
         buildJoinUrl: mockBuildJoinUrl,
       } as any);
 
       const db = (service as any).db;
-      db.limit = vi.fn().mockResolvedValue([{
-        id: 'session-1',
-        contentItemId: 'content-1',
-        tenantId: 'tenant-1',
-        bbbMeetingId: 'bbb-1',
-        meetingName: 'Test',
-        scheduledAt: new Date(),
-        status: 'LIVE',
-        attendeePassword: 'att-pw',
-        moderatorPassword: 'mod-pw',
-        recordingUrl: null,
-      }]);
+      db.limit = vi.fn().mockResolvedValue([
+        {
+          id: 'session-1',
+          contentItemId: 'content-1',
+          tenantId: 'tenant-1',
+          bbbMeetingId: 'bbb-1',
+          meetingName: 'Test',
+          scheduledAt: new Date(),
+          status: 'LIVE',
+          attendeePassword: 'att-pw',
+          moderatorPassword: 'mod-pw',
+          recordingUrl: null,
+        },
+      ]);
 
-      await service.getJoinUrl('session-1', 'tenant-1', 'Prof. Cohen', 'INSTRUCTOR');
-      expect(mockBuildJoinUrl).toHaveBeenCalledWith('bbb-1', 'Prof. Cohen', 'mod-pw');
+      await service.getJoinUrl(
+        'session-1',
+        'tenant-1',
+        'Prof. Cohen',
+        'INSTRUCTOR'
+      );
+      expect(mockBuildJoinUrl).toHaveBeenCalledWith(
+        'bbb-1',
+        'Prof. Cohen',
+        'mod-pw'
+      );
     });
 
     it('returns attendee join URL for LEARNER role', async () => {
-      const mockBuildJoinUrl = vi.fn().mockReturnValue('https://bbb.example.com/join?pw=att-pw');
+      const mockBuildJoinUrl = vi
+        .fn()
+        .mockReturnValue('https://bbb.example.com/join?pw=att-pw');
       vi.mocked(createBbbClient).mockReturnValue({
         buildJoinUrl: mockBuildJoinUrl,
       } as any);
 
       const db = (service as any).db;
-      db.limit = vi.fn().mockResolvedValue([{
-        id: 'session-1',
-        bbbMeetingId: 'bbb-1',
-        status: 'LIVE',
-        attendeePassword: 'att-pw',
-        moderatorPassword: 'mod-pw',
-      }]);
+      db.limit = vi.fn().mockResolvedValue([
+        {
+          id: 'session-1',
+          bbbMeetingId: 'bbb-1',
+          status: 'LIVE',
+          attendeePassword: 'att-pw',
+          moderatorPassword: 'mod-pw',
+        },
+      ]);
 
       await service.getJoinUrl('session-1', 'tenant-1', 'Student', 'LEARNER');
-      expect(mockBuildJoinUrl).toHaveBeenCalledWith('bbb-1', 'Student', 'att-pw');
+      expect(mockBuildJoinUrl).toHaveBeenCalledWith(
+        'bbb-1',
+        'Student',
+        'att-pw'
+      );
     });
 
     it('throws NotFoundException for non-existent session', async () => {
@@ -171,21 +208,23 @@ describe('LiveSessionService', () => {
       db.limit = vi.fn().mockResolvedValue([]);
 
       await expect(
-        service.getJoinUrl('missing', 'tenant-1', 'Alice', 'LEARNER'),
+        service.getJoinUrl('missing', 'tenant-1', 'Alice', 'LEARNER')
       ).rejects.toBeInstanceOf(NotFoundException);
     });
 
     it('throws ForbiddenException for ended sessions', async () => {
       const db = (service as any).db;
-      db.limit = vi.fn().mockResolvedValue([{
-        id: 'session-1',
-        status: 'ENDED',
-        attendeePassword: 'att',
-        moderatorPassword: 'mod',
-      }]);
+      db.limit = vi.fn().mockResolvedValue([
+        {
+          id: 'session-1',
+          status: 'ENDED',
+          attendeePassword: 'att',
+          moderatorPassword: 'mod',
+        },
+      ]);
 
       await expect(
-        service.getJoinUrl('session-1', 'tenant-1', 'Alice', 'LEARNER'),
+        service.getJoinUrl('session-1', 'tenant-1', 'Alice', 'LEARNER')
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
   });

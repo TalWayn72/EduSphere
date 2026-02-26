@@ -87,7 +87,9 @@ export default function DiscussionsScreen() {
               {item.content}
             </Text>
             <View style={styles.discussionMeta}>
-              <Text style={styles.upvotes}>{item.upvotes} {t('reply')}</Text>
+              <Text style={styles.upvotes}>
+                {item.upvotes} {t('reply')}
+              </Text>
               {item.createdAt && (
                 <Text style={styles.createdAt}>
                   {new Date(item.createdAt).toLocaleDateString()}
@@ -114,7 +116,10 @@ export default function DiscussionsScreen() {
           maxLength={200}
         />
         <TouchableOpacity
-          style={[styles.postButton, !newTitle.trim() && styles.postButtonDisabled]}
+          style={[
+            styles.postButton,
+            !newTitle.trim() && styles.postButtonDisabled,
+          ]}
           disabled={!newTitle.trim()}
           onPress={() => setNewTitle('')}
         >

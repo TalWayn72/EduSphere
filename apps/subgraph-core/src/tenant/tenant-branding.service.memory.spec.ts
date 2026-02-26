@@ -37,7 +37,7 @@ import { TenantBrandingService } from './tenant-branding.service.js';
 const BRANDING_CACHE_MAX_SIZE = 500;
 
 function getCache(
-  svc: TenantBrandingService,
+  svc: TenantBrandingService
 ): Map<string, { data: unknown; expiresAt: number }> {
   return (svc as unknown as Record<string, unknown>)['cache'] as Map<
     string,

@@ -42,7 +42,7 @@ export class LtiController {
   @HttpCode(HttpStatus.FOUND)
   async initiateLogin(
     @Body() body: LtiLoginBody,
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     if (!body.iss || !body.login_hint || !body.target_link_uri) {
       res.status(400).json({ error: 'Missing required LTI login params' });
@@ -67,20 +67,27 @@ export class LtiController {
   @HttpCode(HttpStatus.OK)
   async handleCallback(
     @Body() body: LtiCallbackBody,
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     if (!body.id_token || !body.state) {
       res.status(400).json({ error: 'Missing id_token or state' });
       return;
     }
 
-    const result = await this.ltiService.handleCallback(body.id_token, body.state);
+    const result = await this.ltiService.handleCallback(
+      body.id_token,
+      body.state
+    );
     this.logger.log('LTI callback success userId=' + result.userId);
 
     // Redirect to frontend with session token
     const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173';
     const target = result.courseId
-      ? frontendUrl + '/courses/' + result.courseId + '?lti_token=' + result.sessionToken
+      ? frontendUrl +
+        '/courses/' +
+        result.courseId +
+        '?lti_token=' +
+        result.sessionToken
       : frontendUrl + '/dashboard?lti_token=' + result.sessionToken;
 
     res.redirect(target);

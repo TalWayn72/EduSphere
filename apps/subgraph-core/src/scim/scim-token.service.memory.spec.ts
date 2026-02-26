@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // vi.mock hoisted - use inline vi.fn(), no outer variable refs
-vi.mock("@edusphere/db", () => ({
+vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: { scimTokens: {} },
@@ -10,10 +10,10 @@ vi.mock("@edusphere/db", () => ({
   and: vi.fn(),
 }));
 
-import { ScimTokenService } from "./scim-token.service.js";
-import { closeAllPools } from "@edusphere/db";
+import { ScimTokenService } from './scim-token.service.js';
+import { closeAllPools } from '@edusphere/db';
 
-describe("ScimTokenService memory safety", () => {
+describe('ScimTokenService memory safety', () => {
   let service: ScimTokenService;
 
   beforeEach(() => {
@@ -21,17 +21,19 @@ describe("ScimTokenService memory safety", () => {
     service = new ScimTokenService();
   });
 
-  it("onModuleDestroy calls closeAllPools to release DB connections", async () => {
+  it('onModuleDestroy calls closeAllPools to release DB connections', async () => {
     await service.onModuleDestroy();
     expect(closeAllPools).toHaveBeenCalledTimes(1);
   });
 
-  it("no NATS subscriptions: ScimTokenService has no NATS connections (token-only service)", () => {
+  it('no NATS subscriptions: ScimTokenService has no NATS connections (token-only service)', () => {
     // ScimTokenService intentionally has no NATS connections.
-    expect((service as unknown as Record<string, unknown>)["nats"]).toBeUndefined();
+    expect(
+      (service as unknown as Record<string, unknown>)['nats']
+    ).toBeUndefined();
   });
 
-  it("validateToken cache evicts at max size - many calls do not throw", async () => {
+  it('validateToken cache evicts at max size - many calls do not throw', async () => {
     const selectMock = vi.fn().mockReturnValue({
       from: vi.fn().mockReturnValue({
         where: vi.fn().mockReturnValue({
@@ -39,9 +41,13 @@ describe("ScimTokenService memory safety", () => {
         }),
       }),
     });
-    const updateMock = vi.fn().mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn() }) });
+    const updateMock = vi
+      .fn()
+      .mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn() }) });
     Object.assign(service, { db: { select: selectMock, update: updateMock } });
-    const calls = Array.from({ length: 10 }, (_v, i) => service.validateToken("token-padded-to-minimum-length-" + String(i)));
+    const calls = Array.from({ length: 10 }, (_v, i) =>
+      service.validateToken('token-padded-to-minimum-length-' + String(i))
+    );
     const results = await Promise.all(calls);
     expect(results.every((r) => r === null)).toBe(true);
   });

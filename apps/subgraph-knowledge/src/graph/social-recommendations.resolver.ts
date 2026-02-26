@@ -27,13 +27,13 @@ export class SocialRecommendationsResolver {
   @Query('socialRecommendations')
   async socialRecommendations(
     @Args('limit') limit: number | undefined,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { userId, tenantId } = this.getAuthContext(context);
     const recs = await this.socialService.getRecommendations(
       userId,
       tenantId,
-      limit ?? DEFAULT_RECS_LIMIT,
+      limit ?? DEFAULT_RECS_LIMIT
     );
     return recs.map((r) => ({
       ...r,
@@ -44,13 +44,13 @@ export class SocialRecommendationsResolver {
   @Query('socialFeed')
   async socialFeed(
     @Args('limit') limit: number | undefined,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { userId, tenantId } = this.getAuthContext(context);
     const items = await this.socialService.getSocialFeed(
       userId,
       tenantId,
-      limit ?? DEFAULT_FEED_LIMIT,
+      limit ?? DEFAULT_FEED_LIMIT
     );
     return items.map((item) => ({
       ...item,

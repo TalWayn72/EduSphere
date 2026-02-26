@@ -40,7 +40,7 @@ function renderCourseList(mocks: MockedResponse[] = []) {
       <MemoryRouter>
         <CourseList />
       </MemoryRouter>
-    </MockedProvider>,
+    </MockedProvider>
   );
 }
 

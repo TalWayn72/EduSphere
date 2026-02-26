@@ -19,7 +19,14 @@ vi.mock('@edusphere/db', () => ({
   },
   withTenantContext: mockWithTenantContext,
   eq: vi.fn((a: unknown, b: unknown) => ({ a, b, _eq: true })),
-  ALLOWED_BLOCK_TYPES: ['HeroBanner', 'FeaturedCourses', 'StatWidget', 'TextBlock', 'ImageBlock', 'CTAButton'],
+  ALLOWED_BLOCK_TYPES: [
+    'HeroBanner',
+    'FeaturedCourses',
+    'StatWidget',
+    'TextBlock',
+    'ImageBlock',
+    'CTAButton',
+  ],
 }));
 
 let PortalService: typeof import('./portal.service.js').PortalService;
@@ -38,17 +45,19 @@ function makeService() {
 }
 
 // Helper: build a fake PortalPage row
-function fakePortalPage(overrides: Partial<{
-  id: string;
-  tenantId: string;
-  title: string;
-  layout: unknown[];
-  published: boolean;
-  slug: string;
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-}> = {}) {
+function fakePortalPage(
+  overrides: Partial<{
+    id: string;
+    tenantId: string;
+    title: string;
+    layout: unknown[];
+    published: boolean;
+    slug: string;
+    createdBy: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }> = {}
+) {
   return {
     id: 'page-1',
     tenantId: 'tenant-1',
@@ -80,12 +89,19 @@ describe('PortalService', () => {
       (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
         fn({
           insert: () => ({ values: () => ({ returning: () => [newPage] }) }),
-        }),
+        })
     );
 
     const svc = makeService();
-    const blocks = [{ id: 'b1', type: 'HeroBanner' as const, order: 0, config: {} }];
-    const result = await svc.createOrUpdatePortal('tenant-1', blocks, 'My Portal', 'user-1');
+    const blocks = [
+      { id: 'b1', type: 'HeroBanner' as const, order: 0, config: {} },
+    ];
+    const result = await svc.createOrUpdatePortal(
+      'tenant-1',
+      blocks,
+      'My Portal',
+      'user-1'
+    );
 
     expect(result.title).toBe('My Portal');
   });
@@ -101,11 +117,16 @@ describe('PortalService', () => {
           update: () => ({
             set: () => ({ where: () => ({ returning: () => [updated] }) }),
           }),
-        }),
+        })
     );
 
     const svc = makeService();
-    const result = await svc.createOrUpdatePortal('tenant-1', [], 'Updated Portal', 'user-1');
+    const result = await svc.createOrUpdatePortal(
+      'tenant-1',
+      [],
+      'Updated Portal',
+      'user-1'
+    );
     expect(result.title).toBe('Updated Portal');
   });
 
@@ -113,7 +134,7 @@ describe('PortalService', () => {
     const updateWhere = vi.fn().mockResolvedValue([]);
     mockWithTenantContext.mockImplementation(
       (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-        fn({ update: () => ({ set: () => ({ where: updateWhere }) }) }),
+        fn({ update: () => ({ set: () => ({ where: updateWhere }) }) })
     );
 
     const svc = makeService();
@@ -125,7 +146,7 @@ describe('PortalService', () => {
     const updateWhere = vi.fn().mockResolvedValue([]);
     mockWithTenantContext.mockImplementation(
       (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-        fn({ update: () => ({ set: () => ({ where: updateWhere }) }) }),
+        fn({ update: () => ({ set: () => ({ where: updateWhere }) }) })
     );
 
     const svc = makeService();
@@ -134,7 +155,12 @@ describe('PortalService', () => {
   });
 
   it('addBlock appends new block to existing layout', async () => {
-    const existingBlock = { id: 'b0', type: 'TextBlock' as const, order: 0, config: {} };
+    const existingBlock = {
+      id: 'b0',
+      type: 'TextBlock' as const,
+      order: 0,
+      config: {},
+    };
     const existingPage = fakePortalPage({ layout: [existingBlock] });
 
     // getPortalPage (inside addBlock) → existing page
@@ -142,14 +168,28 @@ describe('PortalService', () => {
     // getPortalPage (inside createOrUpdatePortal) → existing page again
     mockWithTenantContext.mockResolvedValueOnce([existingPage]);
     // update call
-    const updatedPage = fakePortalPage({ layout: [existingBlock, { id: 'b1', type: 'CTAButton', order: 1, config: {} }] });
+    const updatedPage = fakePortalPage({
+      layout: [
+        existingBlock,
+        { id: 'b1', type: 'CTAButton', order: 1, config: {} },
+      ],
+    });
     mockWithTenantContext.mockImplementationOnce(
       (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-        fn({ update: () => ({ set: () => ({ where: () => ({ returning: () => [updatedPage] }) }) }) }),
+        fn({
+          update: () => ({
+            set: () => ({ where: () => ({ returning: () => [updatedPage] }) }),
+          }),
+        })
     );
 
     const svc = makeService();
-    const newBlock = { id: 'b1', type: 'CTAButton' as const, order: 99, config: {} };
+    const newBlock = {
+      id: 'b1',
+      type: 'CTAButton' as const,
+      order: 99,
+      config: {},
+    };
     const result = await svc.addBlock('tenant-1', newBlock, 'user-1');
     const layout = result.layout as Array<{ type: string }>;
     expect(layout.some((b) => b.type === 'CTAButton')).toBe(true);
@@ -167,10 +207,16 @@ describe('PortalService', () => {
     // getPortalPage (inside createOrUpdatePortal)
     mockWithTenantContext.mockResolvedValueOnce([existingPage]);
     // update
-    const updatedPage = fakePortalPage({ layout: [{ id: 'b2', type: 'TextBlock', order: 0, config: {} }] });
+    const updatedPage = fakePortalPage({
+      layout: [{ id: 'b2', type: 'TextBlock', order: 0, config: {} }],
+    });
     mockWithTenantContext.mockImplementationOnce(
       (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
-        fn({ update: () => ({ set: () => ({ where: () => ({ returning: () => [updatedPage] }) }) }) }),
+        fn({
+          update: () => ({
+            set: () => ({ where: () => ({ returning: () => [updatedPage] }) }),
+          }),
+        })
     );
 
     const svc = makeService();
@@ -181,9 +227,16 @@ describe('PortalService', () => {
 
   it('validateBlock throws BadRequestException on unknown block type', () => {
     const svc = makeService();
-    const badBlock = { id: 'x', type: 'MaliciousBlock' as never, order: 0, config: {} };
+    const badBlock = {
+      id: 'x',
+      type: 'MaliciousBlock' as never,
+      order: 0,
+      config: {},
+    };
     expect(() => {
-      (svc as unknown as { validateBlock: (b: unknown) => void }).validateBlock(badBlock);
+      (svc as unknown as { validateBlock: (b: unknown) => void }).validateBlock(
+        badBlock
+      );
     }).toThrow(BadRequestException);
   });
 });

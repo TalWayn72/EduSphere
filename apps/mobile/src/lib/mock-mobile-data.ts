@@ -38,16 +38,46 @@ export const MOCK_RECENT_COURSES = [
 ];
 
 export const MOCK_GRAPH_NODES = [
-  { id: 'free-will', label: 'Free Will', type: 'CONCEPT' as const, connections: 4 },
-  { id: 'determinism', label: 'Determinism', type: 'CONCEPT' as const, connections: 3 },
-  { id: 'causality', label: 'Causality', type: 'CONCEPT' as const, connections: 5 },
-  { id: 'consciousness', label: 'Consciousness', type: 'CONCEPT' as const, connections: 6 },
+  {
+    id: 'free-will',
+    label: 'Free Will',
+    type: 'CONCEPT' as const,
+    connections: 4,
+  },
+  {
+    id: 'determinism',
+    label: 'Determinism',
+    type: 'CONCEPT' as const,
+    connections: 3,
+  },
+  {
+    id: 'causality',
+    label: 'Causality',
+    type: 'CONCEPT' as const,
+    connections: 5,
+  },
+  {
+    id: 'consciousness',
+    label: 'Consciousness',
+    type: 'CONCEPT' as const,
+    connections: 6,
+  },
   { id: 'kant', label: 'Kant', type: 'PERSON' as const, connections: 4 },
-  { id: 'aristotle', label: 'Aristotle', type: 'PERSON' as const, connections: 7 },
+  {
+    id: 'aristotle',
+    label: 'Aristotle',
+    type: 'PERSON' as const,
+    connections: 7,
+  },
   { id: 'hume', label: 'Hume', type: 'PERSON' as const, connections: 3 },
   { id: 'ethics', label: 'Ethics', type: 'CONCEPT' as const, connections: 8 },
   { id: 'virtue', label: 'Virtue', type: 'TERM' as const, connections: 2 },
-  { id: 'critique', label: 'Critique of Pure Reason', type: 'SOURCE' as const, connections: 3 },
+  {
+    id: 'critique',
+    label: 'Critique of Pure Reason',
+    type: 'SOURCE' as const,
+    connections: 3,
+  },
 ];
 
 export const MOCK_DISCUSSIONS = [

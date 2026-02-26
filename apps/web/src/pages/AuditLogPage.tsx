@@ -61,33 +61,55 @@ export function AuditLogPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <AdminLayout title="Audit Log" description="Track all administrative actions and platform events">
+    <AdminLayout
+      title="Audit Log"
+      description="Track all administrative actions and platform events"
+    >
       <div className="space-y-4">
         <Card>
-          <CardHeader><CardTitle className="text-base">Filters</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-base">Filters</CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
               <Input
                 placeholder="Filter by action..."
                 value={actionFilter}
-                onChange={(e) => { setActionFilter(e.target.value); setPage(0); }}
+                onChange={(e) => {
+                  setActionFilter(e.target.value);
+                  setPage(0);
+                }}
                 className="w-56"
               />
               <Input
                 type="date"
                 value={since}
-                onChange={(e) => { setSince(e.target.value); setPage(0); }}
+                onChange={(e) => {
+                  setSince(e.target.value);
+                  setPage(0);
+                }}
                 className="w-44"
                 aria-label="Since date"
               />
               <Input
                 type="date"
                 value={until}
-                onChange={(e) => { setUntil(e.target.value); setPage(0); }}
+                onChange={(e) => {
+                  setUntil(e.target.value);
+                  setPage(0);
+                }}
                 className="w-44"
                 aria-label="Until date"
               />
-              <Button variant="outline" onClick={() => { setActionFilter(''); setSince(''); setUntil(''); setPage(0); }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setActionFilter('');
+                  setSince('');
+                  setUntil('');
+                  setPage(0);
+                }}
+              >
                 Clear
               </Button>
             </div>
@@ -100,10 +122,14 @@ export function AuditLogPage() {
               <p className="p-6 text-sm text-muted-foreground">Loading...</p>
             )}
             {result.error && (
-              <p className="p-6 text-sm text-destructive">Failed to load audit log.</p>
+              <p className="p-6 text-sm text-destructive">
+                Failed to load audit log.
+              </p>
             )}
             {!result.fetching && entries.length === 0 && (
-              <p className="p-6 text-sm text-muted-foreground text-center">No audit entries found.</p>
+              <p className="p-6 text-sm text-muted-foreground text-center">
+                No audit entries found.
+              </p>
             )}
             {entries.length > 0 && (
               <div className="overflow-x-auto">
@@ -111,11 +137,21 @@ export function AuditLogPage() {
                   <thead>
                     <tr className="border-b bg-muted/50">
                       <th className="px-4 py-3 text-left font-medium">Time</th>
-                      <th className="px-4 py-3 text-left font-medium">Action</th>
-                      <th className="px-4 py-3 text-left font-medium">User ID</th>
-                      <th className="px-4 py-3 text-left font-medium">Resource</th>
-                      <th className="px-4 py-3 text-left font-medium">Status</th>
-                      <th className="px-4 py-3 text-left font-medium">IP Address</th>
+                      <th className="px-4 py-3 text-left font-medium">
+                        Action
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium">
+                        User ID
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium">
+                        Resource
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium">
+                        IP Address
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -124,15 +160,26 @@ export function AuditLogPage() {
                         <td className="px-4 py-2 whitespace-nowrap text-muted-foreground">
                           {new Date(entry.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-4 py-2 font-mono text-xs">{entry.action}</td>
+                        <td className="px-4 py-2 font-mono text-xs">
+                          {entry.action}
+                        </td>
                         <td className="px-4 py-2 font-mono text-xs text-muted-foreground">
                           {entry.userId ?? '—'}
                         </td>
                         <td className="px-4 py-2 text-xs text-muted-foreground">
-                          {entry.resourceType ? `${entry.resourceType}${entry.resourceId ? ` #${entry.resourceId}` : ''}` : '—'}
+                          {entry.resourceType
+                            ? `${entry.resourceType}${entry.resourceId ? ` #${entry.resourceId}` : ''}`
+                            : '—'}
                         </td>
                         <td className="px-4 py-2">
-                          <Badge variant={entry.status === 'SUCCESS' ? 'default' : 'destructive'} className="text-xs">
+                          <Badge
+                            variant={
+                              entry.status === 'SUCCESS'
+                                ? 'default'
+                                : 'destructive'
+                            }
+                            className="text-xs"
+                          >
                             {entry.status}
                           </Badge>
                         </td>
@@ -154,10 +201,20 @@ export function AuditLogPage() {
               {total} total entries — page {page + 1} of {totalPages}
             </p>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 0}
+                onClick={() => setPage((p) => p - 1)}
+              >
                 Previous
               </Button>
-              <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage((p) => p + 1)}
+              >
                 Next
               </Button>
             </div>

@@ -23,7 +23,7 @@ function renderQuestion(
   idx: number,
   answers: AnswerMap,
   setAnswer: (idx: number, v: unknown) => void,
-  submitted: boolean,
+  submitted: boolean
 ) {
   const val = answers[idx];
   const disabled = submitted;
@@ -139,7 +139,8 @@ export function QuizPlayer({ quizContent, contentItemId }: Props) {
           />
         </div>
 
-        {item && renderQuestion(item, currentIdx, answers, setAnswer, submitted)}
+        {item &&
+          renderQuestion(item, currentIdx, answers, setAnswer, submitted)}
 
         <div className="flex justify-between pt-2">
           <Button

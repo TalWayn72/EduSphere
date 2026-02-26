@@ -2,7 +2,10 @@
 import React from 'react';
 
 // Layer display metadata (label, colours)
-export const LAYER_META: Record<string, { label: string; color: string; bg: string }> = {
+export const LAYER_META: Record<
+  string,
+  { label: string; color: string; bg: string }
+> = {
   PERSONAL: {
     label: 'Personal',
     color: 'text-violet-700',
@@ -44,7 +47,10 @@ export function highlightText(text: string, query: string): React.ReactNode {
     <>
       {parts.map((part, i) =>
         part.toLowerCase() === lower ? (
-          <mark key={i} className="bg-yellow-200 text-yellow-900 rounded px-0.5">
+          <mark
+            key={i}
+            className="bg-yellow-200 text-yellow-900 rounded px-0.5"
+          >
             {part}
           </mark>
         ) : (

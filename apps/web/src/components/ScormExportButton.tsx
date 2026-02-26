@@ -18,9 +18,14 @@ interface ExportMutationData {
   exportCourseAsScorm: string;
 }
 
-export function ScormExportButton({ courseId, courseTitle }: ScormExportButtonProps) {
+export function ScormExportButton({
+  courseId,
+  courseTitle,
+}: ScormExportButtonProps) {
   const [error, setError] = useState<string | null>(null);
-  const [, exportScorm] = useMutation<ExportMutationData>(EXPORT_COURSE_AS_SCORM_MUTATION);
+  const [, exportScorm] = useMutation<ExportMutationData>(
+    EXPORT_COURSE_AS_SCORM_MUTATION
+  );
 
   const handleExport = async () => {
     setError(null);

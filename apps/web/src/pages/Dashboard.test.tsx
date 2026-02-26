@@ -7,9 +7,18 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
-    useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
-    useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
+    useMutation: vi.fn(() => [
+      { fetching: false },
+      vi.fn().mockResolvedValue({ error: null }),
+    ]),
+    useSubscription: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
   };
 });
 
@@ -55,7 +64,9 @@ describe('Dashboard', () => {
 
   it('renders Dashboard heading', () => {
     renderDashboard();
-    expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /dashboard/i })
+    ).toBeInTheDocument();
   });
 
   it('renders "Welcome back" greeting', () => {
@@ -76,7 +87,9 @@ describe('Dashboard', () => {
     expect(screen.getByText('Courses Enrolled')).toBeInTheDocument();
     // Both the "Courses Enrolled" and "Active Courses" cards share the same
     // subtitle; verify at least one is present without failing on duplicates.
-    expect(screen.getAllByText('Available in catalog').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('Available in catalog').length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('renders Study Time stat card', () => {
@@ -104,7 +117,9 @@ describe('Dashboard', () => {
     ] as unknown as ReturnType<typeof useQuery>);
     renderDashboard();
     expect(screen.getByText('Concepts Mastered')).toBeInTheDocument();
-    expect(screen.getByText(String(MOCK_CONCEPTS_MASTERED))).toBeInTheDocument();
+    expect(
+      screen.getByText(String(MOCK_CONCEPTS_MASTERED))
+    ).toBeInTheDocument();
   });
 
   it('renders Study Groups secondary card', () => {
@@ -189,7 +204,11 @@ describe('Dashboard', () => {
   it('shows error card when ME_QUERY fails', () => {
     vi.mocked(useQuery)
       .mockReturnValueOnce([
-        { data: undefined, fetching: false, error: new Error('Network error') as never },
+        {
+          data: undefined,
+          fetching: false,
+          error: new Error('Network error') as never,
+        },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>)
       .mockReturnValueOnce([
@@ -206,8 +225,30 @@ describe('Dashboard', () => {
       {
         data: {
           courses: [
-            { id: 'c-1', title: 'Course A', description: null, slug: 'course-a', isPublished: true, thumbnailUrl: null, instructorId: 'u-1', estimatedHours: null, createdAt: '', updatedAt: '' },
-            { id: 'c-2', title: 'Course B', description: null, slug: 'course-b', isPublished: true, thumbnailUrl: null, instructorId: 'u-1', estimatedHours: null, createdAt: '', updatedAt: '' },
+            {
+              id: 'c-1',
+              title: 'Course A',
+              description: null,
+              slug: 'course-a',
+              isPublished: true,
+              thumbnailUrl: null,
+              instructorId: 'u-1',
+              estimatedHours: null,
+              createdAt: '',
+              updatedAt: '',
+            },
+            {
+              id: 'c-2',
+              title: 'Course B',
+              description: null,
+              slug: 'course-b',
+              isPublished: true,
+              thumbnailUrl: null,
+              instructorId: 'u-1',
+              estimatedHours: null,
+              createdAt: '',
+              updatedAt: '',
+            },
           ],
         },
         fetching: false,

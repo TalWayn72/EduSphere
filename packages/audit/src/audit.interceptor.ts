@@ -74,11 +74,12 @@ export class AuditInterceptor implements NestInterceptor {
           status: 'FAILED',
           metadata: {
             operationType: 'GRAPHQL_MUTATION',
-            errorMessage: error instanceof Error ? error.message : 'Unknown error',
+            errorMessage:
+              error instanceof Error ? error.message : 'Unknown error',
           },
         });
         return throwError(() => error);
-      }),
+      })
     );
   }
 

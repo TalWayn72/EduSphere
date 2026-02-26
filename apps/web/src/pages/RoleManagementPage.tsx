@@ -16,7 +16,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { ShieldCheck, Plus, Lock } from 'lucide-react';
 import { useAuthRole } from '@/hooks/useAuthRole';
-import { SYSTEM_ROLES, RoleRecord } from '@/lib/graphql/admin-roles.permissions';
+import {
+  SYSTEM_ROLES,
+  RoleRecord,
+} from '@/lib/graphql/admin-roles.permissions';
 import {
   LIST_ROLES_QUERY,
   CREATE_ROLE_MUTATION,
@@ -45,7 +48,9 @@ export function RoleManagementPage() {
   const authRole = useAuthRole();
   const [selectedId, setSelectedId] = useState<string>(SYSTEM_ROLES[0]!.id);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<Partial<RoleRecord> | undefined>();
+  const [editingRole, setEditingRole] = useState<
+    Partial<RoleRecord> | undefined
+  >();
 
   const [rolesResult, reexecuteRoles] = useQuery<{ roles: BackendRole[] }>({
     query: LIST_ROLES_QUERY,
@@ -75,7 +80,10 @@ export function RoleManagementPage() {
   const roles: RoleRecord[] = [...SYSTEM_ROLES, ...backendCustomRoles];
   const selectedRole = roles.find((r) => r.id === selectedId) ?? roles[0]!;
 
-  function openCreateModal() { setEditingRole(undefined); setModalOpen(true); }
+  function openCreateModal() {
+    setEditingRole(undefined);
+    setModalOpen(true);
+  }
 
   function handleDuplicate(role: RoleRecord) {
     setEditingRole({
@@ -86,7 +94,10 @@ export function RoleManagementPage() {
     setModalOpen(true);
   }
 
-  function handleEdit(role: RoleRecord) { setEditingRole(role); setModalOpen(true); }
+  function handleEdit(role: RoleRecord) {
+    setEditingRole(role);
+    setModalOpen(true);
+  }
 
   async function handleDelete(role: RoleRecord) {
     const result = await deleteRole({ id: role.id });
@@ -103,7 +114,11 @@ export function RoleManagementPage() {
     if (editingRole?.id) {
       const result = await updateRole({
         id: editingRole.id,
-        input: { name: values.name, description: values.description, permissions: values.permissions },
+        input: {
+          name: values.name,
+          description: values.description,
+          permissions: values.permissions,
+        },
       });
       if (result.error) {
         toast.error(`Failed to update role: ${result.error.message}`);
@@ -113,13 +128,18 @@ export function RoleManagementPage() {
       toast.success(`Role "${values.name}" updated.`);
     } else {
       const result = await createRole({
-        input: { name: values.name, description: values.description, permissions: values.permissions },
+        input: {
+          name: values.name,
+          description: values.description,
+          permissions: values.permissions,
+        },
       });
       if (result.error) {
         toast.error(`Failed to create role: ${result.error.message}`);
         return;
       }
-      const newId = (result.data as { createRole?: { id: string } })?.createRole?.id;
+      const newId = (result.data as { createRole?: { id: string } })?.createRole
+        ?.id;
       reexecuteRoles({ requestPolicy: 'network-only' });
       if (newId) setSelectedId(newId);
       toast.success(`Role "${values.name}" created.`);
@@ -150,9 +170,11 @@ export function RoleManagementPage() {
                   ${selectedId === role.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
               >
                 <span className="flex items-center gap-1.5 font-medium truncate">
-                  {role.isSystem
-                    ? <Lock className="h-3.5 w-3.5 flex-none opacity-60" />
-                    : <ShieldCheck className="h-3.5 w-3.5 flex-none opacity-60" />}
+                  {role.isSystem ? (
+                    <Lock className="h-3.5 w-3.5 flex-none opacity-60" />
+                  ) : (
+                    <ShieldCheck className="h-3.5 w-3.5 flex-none opacity-60" />
+                  )}
                   {role.name}
                 </span>
                 <Badge
@@ -164,7 +186,9 @@ export function RoleManagementPage() {
               </button>
             ))}
             {rolesResult.fetching && (
-              <p className="px-3 py-2 text-xs text-muted-foreground">Loading…</p>
+              <p className="px-3 py-2 text-xs text-muted-foreground">
+                Loading…
+              </p>
             )}
           </ScrollArea>
           <Separator />

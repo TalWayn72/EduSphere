@@ -7,6 +7,7 @@ The Annotation subgraph has been fully implemented with all required features, R
 ## What Was Built
 
 ### 1. Core Infrastructure ✅
+
 - **Port**: 4003
 - **Framework**: NestJS + GraphQL Yoga Federation
 - **Database**: PostgreSQL with RLS
@@ -16,6 +17,7 @@ The Annotation subgraph has been fully implemented with all required features, R
 ### 2. Files Created/Updated (16 files)
 
 #### Configuration
+
 - `package.json` - Dependencies with @edusphere/auth
 - `tsconfig.json` - TypeScript configuration
 - `nest-cli.json` - NestJS CLI settings
@@ -23,6 +25,7 @@ The Annotation subgraph has been fully implemented with all required features, R
 - `.env` - Environment variables
 
 #### Source Code (8 files)
+
 ```
 src/
 ├── auth/
@@ -40,6 +43,7 @@ src/
 ```
 
 #### Documentation
+
 - `README.md` - User documentation
 - `IMPLEMENTATION.md` - Technical implementation details
 - `SUMMARY.md` - This file
@@ -47,13 +51,21 @@ src/
 ### 3. GraphQL Schema
 
 #### Types
+
 ```graphql
 enum AnnotationType {
-  TEXT, SKETCH, LINK, BOOKMARK, SPATIAL_COMMENT
+  TEXT
+  SKETCH
+  LINK
+  BOOKMARK
+  SPATIAL_COMMENT
 }
 
 enum AnnotationLayer {
-  PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED
+  PERSONAL
+  SHARED
+  INSTRUCTOR
+  AI_GENERATED
 }
 
 type Annotation @key(fields: "id") {
@@ -75,6 +87,7 @@ type Annotation @key(fields: "id") {
 ```
 
 #### Queries (5)
+
 - `_health` - Health check
 - `annotation(id: ID!)` - Single annotation
 - `annotations(...)` - Filtered list with pagination
@@ -82,12 +95,14 @@ type Annotation @key(fields: "id") {
 - `annotationsByUser(userId: ID!, ...)` - All user annotations
 
 #### Mutations (4)
+
 - `createAnnotation(input: CreateAnnotationInput!)` - Create new annotation
 - `updateAnnotation(id: ID!, input: UpdateAnnotationInput!)` - Update existing
 - `deleteAnnotation(id: ID!)` - Soft delete annotation
 - `resolveAnnotation(id: ID!)` - Mark as resolved
 
 #### Federation
+
 - Entity stubs: `User @external`, `ContentItem @external`
 - Federation v2.7 directives: `@key`, `@external`, `@shareable`
 - Cross-subgraph resolution via `@ResolveReference`
@@ -95,23 +110,27 @@ type Annotation @key(fields: "id") {
 ### 4. Security Features ✅
 
 #### Row-Level Security (RLS)
+
 - All queries use `withTenantContext(db, { tenantId, userId, userRole }, ...)`
 - PostgreSQL RLS policies automatically enforce tenant isolation
 - No cross-tenant data leakage possible
 
 #### JWT Authentication
+
 - Keycloak JWKS validation
 - Bearer token extraction from Authorization header
 - Auth context propagation to all resolvers
 - All mutations require authentication
 
 #### Input Validation
+
 - Zod schemas for all mutation inputs
 - UUID validation for IDs
 - Enum validation for types and layers
 - JSON structure validation for content
 
 #### Soft Deletes
+
 - All queries filter `deleted_at IS NULL`
 - Delete mutations set timestamp instead of removing data
 - Audit trail preservation
@@ -120,40 +139,44 @@ type Annotation @key(fields: "id") {
 
 Maps to `packages/db/src/schema/annotation.ts`:
 
-| Database Column | GraphQL Field | Type | Description |
-|----------------|---------------|------|-------------|
-| id | id | UUID | Primary key |
-| tenant_id | tenantId | UUID | Multi-tenancy isolation |
-| asset_id | assetId | UUID | Media asset reference |
-| user_id | userId | UUID | Annotation creator |
-| annotation_type | annotationType | Enum | TEXT/SKETCH/LINK/etc |
-| layer | layer | Enum | PERSONAL/SHARED/etc |
-| content | content | JSON | Annotation content |
-| spatial_data | spatialData | JSON | Position/coordinates |
-| parent_id | parentId | UUID | Thread parent |
-| is_resolved | isResolved | Boolean | Resolution status |
-| created_at | createdAt | DateTime | Creation timestamp |
-| updated_at | updatedAt | DateTime | Last update |
-| deleted_at | - | DateTime | Soft delete (filtered) |
+| Database Column | GraphQL Field  | Type     | Description             |
+| --------------- | -------------- | -------- | ----------------------- |
+| id              | id             | UUID     | Primary key             |
+| tenant_id       | tenantId       | UUID     | Multi-tenancy isolation |
+| asset_id        | assetId        | UUID     | Media asset reference   |
+| user_id         | userId         | UUID     | Annotation creator      |
+| annotation_type | annotationType | Enum     | TEXT/SKETCH/LINK/etc    |
+| layer           | layer          | Enum     | PERSONAL/SHARED/etc     |
+| content         | content        | JSON     | Annotation content      |
+| spatial_data    | spatialData    | JSON     | Position/coordinates    |
+| parent_id       | parentId       | UUID     | Thread parent           |
+| is_resolved     | isResolved     | Boolean  | Resolution status       |
+| created_at      | createdAt      | DateTime | Creation timestamp      |
+| updated_at      | updatedAt      | DateTime | Last update             |
+| deleted_at      | -              | DateTime | Soft delete (filtered)  |
 
 ### 6. Key Technical Decisions
 
 #### Why withTenantContext()?
+
 Ensures PostgreSQL RLS policies are automatically applied to all queries, preventing accidental tenant data leakage.
 
 #### Why Soft Deletes?
+
 - Preserve audit trails
 - Allow data recovery
 - Support GDPR compliance with retention policies
 - Avoid cascading delete issues
 
 #### Why Zod Validation?
+
 - Type-safe validation
 - Clear error messages
 - Reusable schemas
 - Runtime type checking
 
 #### Why Pino Logger?
+
 - Structured JSON logging
 - High performance (async)
 - Standard in NestJS ecosystem
@@ -162,11 +185,13 @@ Ensures PostgreSQL RLS policies are automatically applied to all queries, preven
 ### 7. Testing
 
 #### Unit Tests
+
 - Service authentication checks
 - Input validation
 - Error handling
 
 #### Integration Tests (Future)
+
 - End-to-end GraphQL queries
 - RLS policy verification
 - Federation composition
@@ -190,6 +215,7 @@ pnpm --filter @edusphere/subgraph-annotation test
 ### 9. Dependencies
 
 #### Runtime
+
 - `@nestjs/common`, `@nestjs/core` - NestJS framework
 - `@nestjs/graphql` - GraphQL integration
 - `@graphql-yoga/nestjs-federation` - Federation support
@@ -202,6 +228,7 @@ pnpm --filter @edusphere/subgraph-annotation test
 - `pg` - PostgreSQL client
 
 #### Dev Dependencies
+
 - `@nestjs/cli`, `@nestjs/testing` - Development tools
 - `vitest` - Testing framework
 - `typescript` - Language compiler
@@ -247,6 +274,7 @@ Request Flow:
 ### 13. Integration Checklist
 
 For Gateway integration:
+
 - [x] GraphQL schema composed successfully
 - [x] Federation v2.7 directives correct
 - [x] Entity stubs properly marked @external
@@ -261,6 +289,7 @@ For Gateway integration:
 ### 14. Production Readiness
 
 #### Ready ✅
+
 - RLS enforcement
 - JWT authentication
 - Input validation
@@ -270,6 +299,7 @@ For Gateway integration:
 - Type safety
 
 #### Needs Before Production
+
 - [ ] ESLint configuration
 - [ ] Integration tests
 - [ ] Performance testing
@@ -294,6 +324,7 @@ For Gateway integration:
 The Annotation subgraph is **fully functional** and ready for integration with the Gateway. All core features are implemented with proper security (RLS + JWT), validation (Zod), logging (Pino), and federation support (v2.7).
 
 **Next Steps**:
+
 1. Add to Gateway configuration
 2. Test federated queries
 3. Add integration tests

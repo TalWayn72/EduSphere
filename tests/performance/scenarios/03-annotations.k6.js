@@ -35,7 +35,9 @@ export default function () {
     'no auth errors': (r) => {
       try {
         const body = JSON.parse(r.body);
-        return !body.errors?.some((e) => e.extensions?.code === 'UNAUTHENTICATED');
+        return !body.errors?.some(
+          (e) => e.extensions?.code === 'UNAUTHENTICATED'
+        );
       } catch {
         return false;
       }

@@ -82,7 +82,9 @@ describe('RLS policy expression contract (SI-1, G-01)', () => {
     expect(policyExpression).toContain('app.current_user_id');
     expect(policyExpression).toContain('current_setting');
     // Must NOT use the wrong variable name (BUG-23 root cause)
-    expect(policyExpression).not.toMatch(/current_setting\('app\.current_user'\)/);
+    expect(policyExpression).not.toMatch(
+      /current_setting\('app\.current_user'\)/
+    );
   });
 
   it('TRUE second arg makes missing variable return NULL not raise exception', () => {
@@ -117,10 +119,10 @@ describe('withTenantContext execution order (mock)', () => {
 
     // SET LOCAL calls must precede the business query.
     expect(executionOrder.indexOf('BUSINESS_QUERY')).toBeGreaterThan(
-      executionOrder.findIndex((e) => e.includes('current_tenant')),
+      executionOrder.findIndex((e) => e.includes('current_tenant'))
     );
     expect(executionOrder.indexOf('BUSINESS_QUERY')).toBeGreaterThan(
-      executionOrder.findIndex((e) => e.includes('current_user_id')),
+      executionOrder.findIndex((e) => e.includes('current_user_id'))
     );
     expect(result).toHaveLength(1);
     expect(mockSetLocal).toHaveBeenCalledTimes(2);

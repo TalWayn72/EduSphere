@@ -1,8 +1,9 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
 import {
-  S3Client,
-  GetObjectCommand,
-} from '@aws-sdk/client-s3';
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { createWriteStream } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -42,9 +43,14 @@ export class MinioClient {
    */
   async downloadToTemp(fileKey: string): Promise<string> {
     const ext = fileKey.split('.').pop() ?? 'bin';
-    const tempPath = join(tmpdir(), `transcription-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`);
+    const tempPath = join(
+      tmpdir(),
+      `transcription-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    );
 
-    this.logger.debug(`Downloading s3://${this.bucket}/${fileKey} → ${tempPath}`);
+    this.logger.debug(
+      `Downloading s3://${this.bucket}/${fileKey} → ${tempPath}`
+    );
 
     try {
       const cmd = new GetObjectCommand({ Bucket: this.bucket, Key: fileKey });
@@ -59,7 +65,9 @@ export class MinioClient {
       return tempPath;
     } catch (err) {
       this.logger.error(`Failed to download ${fileKey} from MinIO`, err);
-      throw new InternalServerErrorException(`MinIO download failed for key: ${fileKey}`);
+      throw new InternalServerErrorException(
+        `MinIO download failed for key: ${fileKey}`
+      );
     }
   }
 }

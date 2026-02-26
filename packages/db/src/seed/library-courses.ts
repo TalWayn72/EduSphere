@@ -84,7 +84,9 @@ export async function seedLibraryCourses(): Promise<void> {
       .where(eq(schema.libraryCourses.scormPackageUrl, seed.scormPackageUrl));
 
     if (existing.length === 0) {
-      await db.insert(schema.libraryCourses).values({ ...seed, isActive: true });
+      await db
+        .insert(schema.libraryCourses)
+        .values({ ...seed, isActive: true });
     }
   }
 }

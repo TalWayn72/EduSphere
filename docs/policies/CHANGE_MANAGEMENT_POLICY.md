@@ -17,6 +17,7 @@ Ensure that all changes to EduSphere production systems are authorized, tested, 
 ## 2. Scope
 
 All changes to:
+
 - Production application code (all 6 subgraphs + gateway + frontend + mobile)
 - Infrastructure configuration (Docker, Kubernetes, Helm charts)
 - Database schema (Drizzle migrations)
@@ -26,12 +27,12 @@ All changes to:
 
 ## 3. Change Classification
 
-| Class | Definition | Approval | Deployment |
-|-------|-----------|---------|-----------|
-| **Emergency** | Production outage or security breach | CISO or CTO verbal + post-hoc ticket | Immediate; rollback plan required |
-| **Standard** | Pre-approved recurring change (e.g., dependency patch) | Pre-approved category | Automated via CI/CD |
-| **Normal** | All other changes | 1 peer review + QA sign-off | Scheduled deployment window |
-| **Major** | Architecture change, new subgraph, breaking schema | Engineering Lead + CISO | Planned with 2-week notice |
+| Class         | Definition                                             | Approval                             | Deployment                        |
+| ------------- | ------------------------------------------------------ | ------------------------------------ | --------------------------------- |
+| **Emergency** | Production outage or security breach                   | CISO or CTO verbal + post-hoc ticket | Immediate; rollback plan required |
+| **Standard**  | Pre-approved recurring change (e.g., dependency patch) | Pre-approved category                | Automated via CI/CD               |
+| **Normal**    | All other changes                                      | 1 peer review + QA sign-off          | Scheduled deployment window       |
+| **Major**     | Architecture change, new subgraph, breaking schema     | Engineering Lead + CISO              | Planned with 2-week notice        |
 
 ## 4. Change Process
 
@@ -71,6 +72,7 @@ Post-deploy smoke tests
 ### 4.3 Security Configuration Changes
 
 Changes to the following require CISO approval:
+
 - Keycloak realm configuration (keycloak-realm.json)
 - CORS policy (gateway CORS origin allowlist)
 - JWT token lifetimes
@@ -80,12 +82,12 @@ Changes to the following require CISO approval:
 
 ### 4.4 Dependency Updates
 
-| Type | Process |
-|------|---------|
-| Security patch (CVSS ≥7.0) | Emergency process — deploy within 48 hours |
-| Minor/patch version | Standard process — deploy in next release |
-| Major version | Normal process — assessment + testing + planned deployment |
-| New dependency | PR review includes security justification + license check |
+| Type                       | Process                                                    |
+| -------------------------- | ---------------------------------------------------------- |
+| Security patch (CVSS ≥7.0) | Emergency process — deploy within 48 hours                 |
+| Minor/patch version        | Standard process — deploy in next release                  |
+| Major version              | Normal process — assessment + testing + planned deployment |
+| New dependency             | PR review includes security justification + license check  |
 
 ## 5. CI/CD Pipeline (Enforcement)
 
@@ -101,6 +103,7 @@ No merge to `main`/`master` is possible without all required status checks passi
 ## 6. Rollback Policy
 
 Every deployment must have a documented rollback procedure:
+
 - **Application:** Helm rollback (`helm rollback edusphere <revision>`)
 - **Database:** Forward-only migration + data migration script for rollback
 - **Configuration:** Previous version in git; Helm values rollback
@@ -110,6 +113,7 @@ Rollback must be tested in staging before production deployment for Major change
 ## 7. Change Records
 
 All changes are recorded in:
+
 - Git history (immutable, cryptographically signed commits preferred)
 - GitHub Actions workflow run logs (retained 90 days; exported to `audit-logs` branch)
 - Deployment log in Kubernetes (Helm release history)

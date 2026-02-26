@@ -3,12 +3,20 @@ import { useQuery, useMutation } from 'urql';
 import { Link } from 'react-router-dom';
 import { Brain, PlusCircle, Trash2, Target } from 'lucide-react';
 import {
-  Card, CardHeader, CardTitle, CardDescription, CardContent,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   MY_COMPETENCY_GOALS_QUERY,
@@ -29,7 +37,9 @@ export function CompetencyGoalWidget() {
   const [conceptName, setConceptName] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const [{ data, fetching }] = useQuery<{ myCompetencyGoals: CompetencyGoal[] }>({
+  const [{ data, fetching }] = useQuery<{
+    myCompetencyGoals: CompetencyGoal[];
+  }>({
     query: MY_COMPETENCY_GOALS_QUERY,
   });
 
@@ -69,7 +79,9 @@ export function CompetencyGoalWidget() {
           </Button>
         </CardHeader>
         <CardContent>
-          {fetching && <p className="text-sm text-muted-foreground">Loading goals...</p>}
+          {fetching && (
+            <p className="text-sm text-muted-foreground">Loading goals...</p>
+          )}
           {!fetching && goals.length === 0 && (
             <p className="text-sm text-muted-foreground">
               No goals yet. Add a concept to get your learning path.
@@ -80,7 +92,9 @@ export function CompetencyGoalWidget() {
               <li
                 key={goal.id}
                 className="border rounded-md p-3 cursor-pointer hover:bg-accent/50 transition-colors"
-                onClick={() => setExpanded(expanded === goal.id ? null : goal.id)}
+                onClick={() =>
+                  setExpanded(expanded === goal.id ? null : goal.id)
+                }
               >
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 font-medium text-sm">
@@ -100,7 +114,10 @@ export function CompetencyGoalWidget() {
             ))}
           </ul>
           {goals.length > 0 && (
-            <Link to="/knowledge" className="mt-3 inline-flex text-xs text-primary hover:underline">
+            <Link
+              to="/knowledge"
+              className="mt-3 inline-flex text-xs text-primary hover:underline"
+            >
               Explore full Knowledge Graph →
             </Link>
           )}
@@ -122,8 +139,12 @@ export function CompetencyGoalWidget() {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={handleAdd} disabled={!conceptName.trim()}>Add Goal</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAdd} disabled={!conceptName.trim()}>
+              Add Goal
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

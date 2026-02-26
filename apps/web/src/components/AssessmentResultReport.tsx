@@ -71,7 +71,9 @@ export function AssessmentResultReport({ campaignId }: Props) {
       <Card>
         <CardContent className="pt-6 flex items-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm text-muted-foreground">Loading results...</span>
+          <span className="text-sm text-muted-foreground">
+            Loading results...
+          </span>
         </CardContent>
       </Card>
     );
@@ -93,7 +95,9 @@ export function AssessmentResultReport({ campaignId }: Props) {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground">No results available yet. Complete the campaign to generate results.</p>
+          <p className="text-sm text-muted-foreground">
+            No results available yet. Complete the campaign to generate results.
+          </p>
         </CardContent>
       </Card>
     );
@@ -109,7 +113,9 @@ export function AssessmentResultReport({ campaignId }: Props) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="p-3 bg-muted/40 rounded-lg">
-          <p className="text-sm font-medium text-foreground">{result.summary}</p>
+          <p className="text-sm font-medium text-foreground">
+            {result.summary}
+          </p>
         </div>
         <div className="space-y-3">
           {result.aggregatedScores.map((c) => (

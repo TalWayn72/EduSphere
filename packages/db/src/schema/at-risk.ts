@@ -20,23 +20,20 @@ export const atRiskStatusEnum = pgEnum('at_risk_status', [
   'dismissed',
 ]);
 
-export const atRiskFlags = pgTable(
-  'at_risk_flags',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    learnerId: uuid('learner_id').notNull(),
-    courseId: uuid('course_id').notNull(),
-    tenantId: uuid('tenant_id').notNull(),
-    /** Computed risk score 0.0 – 1.0 */
-    riskScore: real('risk_score').notNull(),
-    /** JSONB bag of boolean risk factors */
-    riskFactors: jsonb('risk_factors').notNull(),
-    status: atRiskStatusEnum('status').notNull().default('active'),
-    flaggedAt: timestamp('flagged_at').notNull().defaultNow(),
-    resolvedAt: timestamp('resolved_at'),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-  },
-);
+export const atRiskFlags = pgTable('at_risk_flags', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  learnerId: uuid('learner_id').notNull(),
+  courseId: uuid('course_id').notNull(),
+  tenantId: uuid('tenant_id').notNull(),
+  /** Computed risk score 0.0 – 1.0 */
+  riskScore: real('risk_score').notNull(),
+  /** JSONB bag of boolean risk factors */
+  riskFactors: jsonb('risk_factors').notNull(),
+  status: atRiskStatusEnum('status').notNull().default('active'),
+  flaggedAt: timestamp('flagged_at').notNull().defaultNow(),
+  resolvedAt: timestamp('resolved_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
 
 /** Unique constraint: only one active flag per (learner, course) pair */
 export const atRiskFlagsUniqueActive = sql`

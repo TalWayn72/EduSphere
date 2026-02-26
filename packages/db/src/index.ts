@@ -1,7 +1,23 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
-export { sql, eq, and, or, not, desc, asc, inArray, lte, gte, lt, gt, ne, isNotNull, isNull } from 'drizzle-orm';
+export {
+  sql,
+  eq,
+  and,
+  or,
+  not,
+  desc,
+  asc,
+  inArray,
+  lte,
+  gte,
+  lt,
+  gt,
+  ne,
+  isNotNull,
+  isNull,
+} from 'drizzle-orm';
 
 // ---------------------------------------------------------------------------
 // Singleton pool registry — one Pool per unique connection string
@@ -25,14 +41,14 @@ export function getOrCreatePool(connectionString?: string): Pool {
 
 export async function closeAllPools(): Promise<void> {
   const results = await Promise.allSettled(
-    Array.from(_pools.values()).map((pool) => pool.end()),
+    Array.from(_pools.values()).map((pool) => pool.end())
   );
   _pools.clear();
   for (const result of results) {
     if (result.status === 'rejected') {
       // Log but do not rethrow — we want all pools drained regardless
       process.stderr.write(
-        `[db] pool.end() error during shutdown: ${String(result.reason)}\n`,
+        `[db] pool.end() error during shutdown: ${String(result.reason)}\n`
       );
     }
   }

@@ -17,7 +17,9 @@ const baseRow: ComplianceReportRow = {
 describe('generateCsvReport', () => {
   it('includes correct headers', () => {
     const csv = generateCsvReport([baseRow], 'Test Report');
-    expect(csv).toContain('Name,Email,Department,Course,Enrolled,Completed,Score,Status,Due Date');
+    expect(csv).toContain(
+      'Name,Email,Department,Course,Enrolled,Completed,Score,Status,Due Date'
+    );
   });
 
   it('populates a fully-filled row correctly', () => {
@@ -31,7 +33,11 @@ describe('generateCsvReport', () => {
   });
 
   it('outputs empty string for null completedAt', () => {
-    const row: ComplianceReportRow = { ...baseRow, completedAt: null, status: 'in_progress' };
+    const row: ComplianceReportRow = {
+      ...baseRow,
+      completedAt: null,
+      status: 'in_progress',
+    };
     const csv = generateCsvReport([row], 'Test Report');
     const lines = csv.split('\n');
     // data row is after title, generated, blank line, headers

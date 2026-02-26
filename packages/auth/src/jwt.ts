@@ -68,7 +68,10 @@ export class JWTValidator {
     // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
     // non-production environments so Playwright tests work without a live Keycloak.
     // NEVER active in production (NODE_ENV === 'production').
-    if (process.env.NODE_ENV !== 'production' && token === 'dev-token-mock-jwt') {
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      token === 'dev-token-mock-jwt'
+    ) {
       return {
         userId: 'dev-user-1',
         email: 'dev@edusphere.local',

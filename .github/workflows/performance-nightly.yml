@@ -2,13 +2,13 @@ name: Nightly Performance Tests
 
 on:
   schedule:
-    - cron: '0 2 * * *' # 2am UTC daily
+    - cron: "0 2 * * *" # 2am UTC daily
   workflow_dispatch:
     inputs:
       profile:
-        description: 'Load profile to run'
+        description: "Load profile to run"
         required: false
-        default: 'load'
+        default: "load"
         type: choice
         options:
           - smoke

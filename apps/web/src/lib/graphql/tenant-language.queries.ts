@@ -10,7 +10,9 @@ export const MY_TENANT_LANGUAGE_SETTINGS_QUERY = gql`
 `;
 
 export const UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION = gql`
-  mutation UpdateTenantLanguageSettings($input: UpdateTenantLanguageSettingsInput!) {
+  mutation UpdateTenantLanguageSettings(
+    $input: UpdateTenantLanguageSettingsInput!
+  ) {
     updateTenantLanguageSettings(input: $input) {
       supportedLanguages
       defaultLanguage

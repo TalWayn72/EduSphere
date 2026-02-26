@@ -5,8 +5,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockRows = [
-  { id: 'r1', userId: 'u1', courseId: 'c1', status: 'ACTIVE', enrolledAt: new Date('2025-01-01'), completedAt: null },
-  { id: 'r2', userId: 'u2', courseId: 'c1', status: 'COMPLETED', enrolledAt: new Date('2025-01-02'), completedAt: new Date('2025-02-01') },
+  {
+    id: 'r1',
+    userId: 'u1',
+    courseId: 'c1',
+    status: 'ACTIVE',
+    enrolledAt: new Date('2025-01-01'),
+    completedAt: null,
+  },
+  {
+    id: 'r2',
+    userId: 'u2',
+    courseId: 'c1',
+    status: 'COMPLETED',
+    enrolledAt: new Date('2025-01-02'),
+    completedAt: new Date('2025-02-01'),
+  },
 ];
 
 const buildDbChain = (resolveWith: unknown[]) => {
@@ -21,10 +35,21 @@ const buildDbChain = (resolveWith: unknown[]) => {
     values: vi.fn().mockReturnThis(),
     returning: vi.fn().mockResolvedValue([]),
     // Make chain thenable: `await chain.select(...).from(...).limit(...).offset(...)` resolves to resolveWith
-    then: vi.fn((resolve: (v: unknown) => void) => Promise.resolve(resolveWith).then(resolve)),
+    then: vi.fn((resolve: (v: unknown) => void) =>
+      Promise.resolve(resolveWith).then(resolve)
+    ),
   };
   // All methods return `chain` so await on chain calls chain.then()
-  for (const key of ['select', 'from', 'where', 'limit', 'offset', 'orderBy', 'insert', 'values']) {
+  for (const key of [
+    'select',
+    'from',
+    'where',
+    'limit',
+    'offset',
+    'orderBy',
+    'insert',
+    'values',
+  ]) {
     (chain[key] as ReturnType<typeof vi.fn>).mockReturnValue(chain);
   }
   return chain;
@@ -33,13 +58,37 @@ const buildDbChain = (resolveWith: unknown[]) => {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => buildDbChain(mockRows)),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
-    fn(buildDbChain(mockRows)),
+  withTenantContext: vi.fn(
+    (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      fn(buildDbChain(mockRows))
   ),
   schema: {
-    userCourses: { id: 'id', userId: 'userId', courseId: 'courseId', status: 'status', enrolledAt: 'enrolledAt', completedAt: 'completedAt' },
-    userProgress: { id: 'id', userId: 'userId', contentItemId: 'contentItemId', completedAt: 'completedAt', timeSpent: 'timeSpent', progress: 'progress', lastAccessedAt: 'lastAccessedAt' },
-    quizResults: { id: 'id', userId: 'userId', contentItemId: 'contentItemId', tenantId: 'tenantId', score: 'score', passed: 'passed', submittedAt: 'submittedAt' },
+    userCourses: {
+      id: 'id',
+      userId: 'userId',
+      courseId: 'courseId',
+      status: 'status',
+      enrolledAt: 'enrolledAt',
+      completedAt: 'completedAt',
+    },
+    userProgress: {
+      id: 'id',
+      userId: 'userId',
+      contentItemId: 'contentItemId',
+      completedAt: 'completedAt',
+      timeSpent: 'timeSpent',
+      progress: 'progress',
+      lastAccessedAt: 'lastAccessedAt',
+    },
+    quizResults: {
+      id: 'id',
+      userId: 'userId',
+      contentItemId: 'contentItemId',
+      tenantId: 'tenantId',
+      score: 'score',
+      passed: 'passed',
+      submittedAt: 'submittedAt',
+    },
   },
   eq: vi.fn((a: unknown, b: unknown) => ({ field: a, value: b })),
   and: vi.fn((...args: unknown[]) => args),
@@ -101,12 +150,21 @@ describe('BiExportService', () => {
     expect(withTenantContext).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ tenantId: TENANT_ID }),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
   it('getQuizResults returns score data with OData format', async () => {
-    const quizRows = [{ id: 'q1', userId: 'u1', contentItemId: 'ci1', score: 85.5, passed: true, submittedAt: new Date() }];
+    const quizRows = [
+      {
+        id: 'q1',
+        userId: 'u1',
+        contentItemId: 'ci1',
+        score: 85.5,
+        passed: true,
+        submittedAt: new Date(),
+      },
+    ];
     const { withTenantContext } = await import('@edusphere/db');
     vi.mocked(withTenantContext).mockResolvedValueOnce(quizRows);
 

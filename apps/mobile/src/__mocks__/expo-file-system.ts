@@ -2,8 +2,12 @@
 
 export const documentDirectory = '/mock/docs/';
 
-export const getTotalDiskCapacityAsync = jest.fn().mockResolvedValue(100 * 1024 * 1024 * 1024);
-export const getFreeDiskStorageAsync = jest.fn().mockResolvedValue(60 * 1024 * 1024 * 1024);
+export const getTotalDiskCapacityAsync = jest
+  .fn()
+  .mockResolvedValue(100 * 1024 * 1024 * 1024);
+export const getFreeDiskStorageAsync = jest
+  .fn()
+  .mockResolvedValue(60 * 1024 * 1024 * 1024);
 export const getInfoAsync = jest.fn().mockResolvedValue({ exists: false });
 export const readDirectoryAsync = jest.fn().mockResolvedValue([]);
 export const makeDirectoryAsync = jest.fn().mockResolvedValue(undefined);

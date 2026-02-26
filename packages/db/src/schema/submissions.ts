@@ -50,7 +50,7 @@ export const textSubmissions = pgTable(
         AND tenant_id::text = current_setting('app.current_tenant', TRUE)
       `,
     }),
-  ],
+  ]
 ).enableRLS();
 
 // ── submission_embeddings ─────────────────────────────────────────────────────
@@ -80,7 +80,7 @@ export const submissionEmbeddings = pgTable(
         tenant_id::text = current_setting('app.current_tenant', TRUE)
       `,
     }),
-  ],
+  ]
 ).enableRLS();
 
 // SQL for HNSW index (applied via migration)

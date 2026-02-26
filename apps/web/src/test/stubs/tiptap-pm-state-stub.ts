@@ -5,7 +5,9 @@
 export const Plugin = class {};
 export const PluginKey = class {
   constructor(public name: string) {}
-  getState(_state: unknown) { return undefined; }
+  getState(_state: unknown) {
+    return undefined;
+  }
 };
 export const Transaction = class {};
 export const EditorState = class {};

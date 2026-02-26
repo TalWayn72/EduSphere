@@ -33,7 +33,7 @@ export interface UseScenarioNodeResult {
 
 export function useScenarioNode(
   contentItemId: string,
-  enabled = true,
+  enabled = true
 ): UseScenarioNodeResult {
   const [result] = useQuery<ScenarioNodeResult>({
     query: SCENARIO_NODE_QUERY,

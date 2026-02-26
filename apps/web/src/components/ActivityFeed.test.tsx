@@ -61,7 +61,9 @@ describe('ActivityFeed', () => {
   });
 
   it('renders relative time for each item', () => {
-    const items = [makeItem({ timestamp: new Date('2024-02-15T11:30:00Z').toISOString() })];
+    const items = [
+      makeItem({ timestamp: new Date('2024-02-15T11:30:00Z').toISOString() }),
+    ];
     render(<ActivityFeed items={items} />);
     expect(screen.getByText('Just now')).toBeInTheDocument();
   });

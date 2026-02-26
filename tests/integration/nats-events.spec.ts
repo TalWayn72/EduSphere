@@ -117,11 +117,16 @@ describe('NATS Event Delivery', () => {
     it('is NOT published when annotation is updated (only on creation)', () => {
       const publish = makePublish();
       const created: AnnotationPayload = annotationCreatedPayload();
-      const updated: AnnotationPayload = { ...created, type: 'annotation.updated' };
+      const updated: AnnotationPayload = {
+        ...created,
+        type: 'annotation.updated',
+      };
 
       // Simulate service logic: only publish on created, skip on updated
-      if (created.type === 'annotation.created') publish('annotation.created', encodePayload(created));
-      if (updated.type === 'annotation.created') publish('annotation.created', encodePayload(updated));
+      if (created.type === 'annotation.created')
+        publish('annotation.created', encodePayload(created));
+      if (updated.type === 'annotation.created')
+        publish('annotation.created', encodePayload(updated));
 
       expect(publish).toHaveBeenCalledTimes(1);
       const [, data] = publish.mock.calls[0]!;
@@ -147,9 +152,21 @@ describe('NATS Event Delivery', () => {
     });
 
     it('validateAgentMessageEvent accepts message.created and stream.chunk types', () => {
-      const base = { sessionId: 'sess-1', userId: 'user-1', timestamp: ISO_NOW };
-      expect(() => validateAgentMessageEvent({ ...base, type: 'message.created' })).not.toThrow();
-      expect(() => validateAgentMessageEvent({ ...base, type: 'stream.chunk', content: 'chunk' })).not.toThrow();
+      const base = {
+        sessionId: 'sess-1',
+        userId: 'user-1',
+        timestamp: ISO_NOW,
+      };
+      expect(() =>
+        validateAgentMessageEvent({ ...base, type: 'message.created' })
+      ).not.toThrow();
+      expect(() =>
+        validateAgentMessageEvent({
+          ...base,
+          type: 'stream.chunk',
+          content: 'chunk',
+        })
+      ).not.toThrow();
     });
   });
 
@@ -181,15 +198,14 @@ describe('NATS Event Delivery', () => {
   describe('dead letter queue', () => {
     it('malformed event payload is rejected by validator without crashing', () => {
       const malformed = { unexpected: true, garbage: 42 };
-      expect(() => validateContentEvent(malformed)).toThrow(EventValidationError);
+      expect(() => validateContentEvent(malformed)).toThrow(
+        EventValidationError
+      );
     });
 
     it('service continues processing after a bad event', () => {
       const results: string[] = [];
-      const events: unknown[] = [
-        { garbage: true },
-        contentCreatedPayload(),
-      ];
+      const events: unknown[] = [{ garbage: true }, contentCreatedPayload()];
 
       for (const evt of events) {
         try {
@@ -211,14 +227,18 @@ describe('NATS Event Delivery', () => {
       const connectMock = vi.fn().mockImplementation(async () => {
         callCount++;
         if (callCount === 1) throw new Error('Connection refused');
-        return { publish: vi.fn(), drain: vi.fn().mockResolvedValue(undefined) };
+        return {
+          publish: vi.fn(),
+          drain: vi.fn().mockResolvedValue(undefined),
+        };
       });
 
       let nc: Awaited<ReturnType<typeof connectMock>> | null = null;
       const publishWithRetry = async (subject: string, data: unknown) => {
         for (let attempt = 0; attempt < 2; attempt++) {
           try {
-            if (!nc) nc = await connectMock({ servers: 'nats://localhost:4222' });
+            if (!nc)
+              nc = await connectMock({ servers: 'nats://localhost:4222' });
             nc.publish(subject, data);
             return;
           } catch {
@@ -227,23 +247,33 @@ describe('NATS Event Delivery', () => {
         }
       };
 
-      await publishWithRetry('content.created', encodePayload(contentCreatedPayload()));
+      await publishWithRetry(
+        'content.created',
+        encodePayload(contentCreatedPayload())
+      );
       expect(connectMock).toHaveBeenCalledTimes(2);
     });
 
     it('queued events can be published after reconnect', async () => {
       const publishMock = vi.fn();
-      const connectMock = vi.fn().mockResolvedValue({ publish: publishMock, drain: vi.fn() });
+      const connectMock = vi
+        .fn()
+        .mockResolvedValue({ publish: publishMock, drain: vi.fn() });
 
       const nc = await connectMock({ servers: 'nats://localhost:4222' });
-      const queue: ContentPayload[] = [contentCreatedPayload(), { ...contentCreatedPayload(), contentItemId: 'ci-uuid-002' }];
+      const queue: ContentPayload[] = [
+        contentCreatedPayload(),
+        { ...contentCreatedPayload(), contentItemId: 'ci-uuid-002' },
+      ];
 
       for (const evt of queue) {
         nc.publish('content.created', encodePayload(evt));
       }
 
       expect(publishMock).toHaveBeenCalledTimes(2);
-      const firstDecoded = decodePayload((publishMock.mock.calls[0]![1]) as Uint8Array) as ContentPayload;
+      const firstDecoded = decodePayload(
+        publishMock.mock.calls[0]![1] as Uint8Array
+      ) as ContentPayload;
       expect(firstDecoded.contentItemId).toBe('ci-uuid-001');
     });
   });

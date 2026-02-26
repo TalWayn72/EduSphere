@@ -25,15 +25,22 @@ const mockAuditLogInsert = {
 
 // withTenantContext executes the callback directly in tests
 const mockWithTenantContext = vi.fn(
-  (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => fn(_db),
+  (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
+    fn(_db)
 );
 
 // Default data returned by each table select
 const defaultUser = { id: 'user-1', email: 'alice@example.com', name: 'Alice' };
-const defaultAnnotations = [{ id: 'ann-1', body: 'Note A' }, { id: 'ann-2', body: 'Note B' }];
+const defaultAnnotations = [
+  { id: 'ann-1', body: 'Note A' },
+  { id: 'ann-2', body: 'Note B' },
+];
 const defaultAgentSessions = [{ id: 'sess-1', agentId: 'ag-1' }];
 const defaultProgress = [{ id: 'prog-1', completedAt: '2026-01-01' }];
-const defaultEnrollments = [{ id: 'enr-1', courseId: 'course-1' }, { id: 'enr-2', courseId: 'course-2' }];
+const defaultEnrollments = [
+  { id: 'enr-1', courseId: 'course-1' },
+  { id: 'enr-2', courseId: 'course-2' },
+];
 
 // Factory: each call to select().from().where() returns canned data for that table
 function makeSelectMock(
@@ -41,10 +48,16 @@ function makeSelectMock(
   annotations: unknown[],
   agentSessions: unknown[],
   userProgress: unknown[],
-  userCourses: unknown[],
+  userCourses: unknown[]
 ) {
   let callIndex = 0;
-  const datasets = [users, annotations, agentSessions, userProgress, userCourses];
+  const datasets = [
+    users,
+    annotations,
+    agentSessions,
+    userProgress,
+    userCourses,
+  ];
 
   return vi.fn().mockImplementation(() => ({
     from: vi.fn().mockReturnThis(),
@@ -64,7 +77,7 @@ const mockDb = {
     defaultAnnotations,
     defaultAgentSessions,
     defaultProgress,
-    defaultEnrollments,
+    defaultEnrollments
   ),
   insert: mockInsert,
 };
@@ -72,7 +85,10 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
-  withTenantContext: (...args: unknown[]) => mockWithTenantContext(...(args as Parameters<typeof mockWithTenantContext>)),
+  withTenantContext: (...args: unknown[]) =>
+    mockWithTenantContext(
+      ...(args as Parameters<typeof mockWithTenantContext>)
+    ),
   schema: {
     users: { id: 'id' },
     annotations: { user_id: 'user_id' },
@@ -98,7 +114,7 @@ describe('UserExportService — GDPR Art.20', () => {
       defaultAnnotations,
       defaultAgentSessions,
       defaultProgress,
-      defaultEnrollments,
+      defaultEnrollments
     );
     mockDb.insert = mockInsert;
 
@@ -142,13 +158,15 @@ describe('UserExportService — GDPR Art.20', () => {
         resourceType: 'USER',
         resourceId: 'user-1',
         status: 'SUCCESS',
-      }),
+      })
     );
   });
 
   // ── Test 4 ──────────────────────────────────────────────────────────────────
   it('should still return export data even when audit log insert fails', async () => {
-    mockAuditLogInsert.values.mockRejectedValueOnce(new Error('Audit DB unavailable'));
+    mockAuditLogInsert.values.mockRejectedValueOnce(
+      new Error('Audit DB unavailable')
+    );
 
     // Must resolve (not throw) and return the export data
     const result = await service.exportUserData('user-1', 'tenant-1');
@@ -161,11 +179,11 @@ describe('UserExportService — GDPR Art.20', () => {
   it('should return null for profile when user is not found', async () => {
     // Simulate user not found — first select resolves to empty array
     mockDb.select = makeSelectMock(
-      [],                 // no profile row
+      [], // no profile row
       defaultAnnotations,
       defaultAgentSessions,
       defaultProgress,
-      defaultEnrollments,
+      defaultEnrollments
     );
 
     const result = await service.exportUserData('unknown-user', 'tenant-1');

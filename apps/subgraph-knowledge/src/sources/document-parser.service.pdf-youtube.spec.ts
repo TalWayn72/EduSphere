@@ -16,10 +16,12 @@ vi.mock('pdf-parse', () => ({
 
 vi.mock('youtube-transcript', () => ({
   YoutubeTranscript: {
-    fetchTranscript: vi.fn().mockResolvedValue([
-      { text: 'Hello from the video' },
-      { text: 'This is a test transcript' },
-    ]),
+    fetchTranscript: vi
+      .fn()
+      .mockResolvedValue([
+        { text: 'Hello from the video' },
+        { text: 'This is a test transcript' },
+      ]),
   },
 }));
 
@@ -35,7 +37,10 @@ vi.mock('mammoth', () => ({
 // Mock fs so parseDocx(string) does not hit the real filesystem
 vi.mock('fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs')>();
-  return { ...actual, readFileSync: vi.fn().mockReturnValue(Buffer.from('fake docx bytes')) };
+  return {
+    ...actual,
+    readFileSync: vi.fn().mockReturnValue(Buffer.from('fake docx bytes')),
+  };
 });
 
 import { DocumentParserService } from './document-parser.service.js';
@@ -54,7 +59,10 @@ describe('DocumentParserService — PDF + YouTube + DOCX buffer', () => {
     it('returns extracted text from pdf-parse', async () => {
       const result = await service.parsePdf(Buffer.from('%PDF mock'));
       expect(result.text).toContain('Extracted PDF content');
-      expect(result.metadata).toMatchObject({ source_type: 'FILE_PDF', pages: 2 });
+      expect(result.metadata).toMatchObject({
+        source_type: 'FILE_PDF',
+        pages: 2,
+      });
     });
 
     it('returns wordCount > 0 for non-empty PDF', async () => {
@@ -67,9 +75,16 @@ describe('DocumentParserService — PDF + YouTube + DOCX buffer', () => {
 
   describe('parseYoutube()', () => {
     it('joins transcript segments into single text', async () => {
-      const result = await service.parseYoutube('https://youtube.com/watch?v=dQw4w9WgXcQ');
-      expect(result.text).toBe('Hello from the video This is a test transcript');
-      expect(result.metadata).toMatchObject({ source_type: 'YOUTUBE', video_id: 'dQw4w9WgXcQ' });
+      const result = await service.parseYoutube(
+        'https://youtube.com/watch?v=dQw4w9WgXcQ'
+      );
+      expect(result.text).toBe(
+        'Hello from the video This is a test transcript'
+      );
+      expect(result.metadata).toMatchObject({
+        source_type: 'YOUTUBE',
+        video_id: 'dQw4w9WgXcQ',
+      });
     });
 
     it('handles youtu.be short URLs', async () => {
@@ -78,12 +93,16 @@ describe('DocumentParserService — PDF + YouTube + DOCX buffer', () => {
     });
 
     it('handles /shorts/ URLs', async () => {
-      const result = await service.parseYoutube('https://youtube.com/shorts/dQw4w9WgXcQ');
+      const result = await service.parseYoutube(
+        'https://youtube.com/shorts/dQw4w9WgXcQ'
+      );
       expect(result.metadata).toMatchObject({ video_id: 'dQw4w9WgXcQ' });
     });
 
     it('throws for an invalid YouTube URL', async () => {
-      await expect(service.parseYoutube('https://vimeo.com/123456')).rejects.toThrow(/Cannot extract video ID/);
+      await expect(
+        service.parseYoutube('https://vimeo.com/123456')
+      ).rejects.toThrow(/Cannot extract video ID/);
     });
 
     it('returns wordCount matching transcript words', async () => {

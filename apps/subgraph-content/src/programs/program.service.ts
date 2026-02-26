@@ -24,8 +24,16 @@ import {
   withTenantContext,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
-import { buildNatsOptions, isCourseCompletedEvent } from '@edusphere/nats-client';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
+import {
+  buildNatsOptions,
+  isCourseCompletedEvent,
+} from '@edusphere/nats-client';
 import type { CourseCompletedPayload } from '@edusphere/nats-client';
 import { CertificateService } from '../certificate/certificate.service.js';
 
@@ -107,7 +115,9 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
     try {
       this.nc = await connect(buildNatsOptions());
       this.sub = this.nc.subscribe(COURSE_COMPLETED_SUBJECT);
-      this.logger.log(`ProgramService: subscribed to ${COURSE_COMPLETED_SUBJECT}`);
+      this.logger.log(
+        `ProgramService: subscribed to ${COURSE_COMPLETED_SUBJECT}`
+      );
       void this.processMessages();
     } catch (err) {
       this.logger.error(`ProgramService: NATS connect failed: ${String(err)}`);
@@ -123,27 +133,37 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
           await this.handleCourseCompleted(raw);
         }
       } catch (err) {
-        this.logger.warn({ err }, 'ProgramService: failed to process course.completed message');
+        this.logger.warn(
+          { err },
+          'ProgramService: failed to process course.completed message'
+        );
       }
     }
   }
 
-  private async handleCourseCompleted(payload: CourseCompletedPayload): Promise<void> {
+  private async handleCourseCompleted(
+    payload: CourseCompletedPayload
+  ): Promise<void> {
     const { userId, tenantId } = payload;
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const enrollments = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.programEnrollments)
-        .where(and(
-          eq(schema.programEnrollments.userId, userId),
-          eq(schema.programEnrollments.tenantId, tenantId),
-        )),
+        .where(
+          and(
+            eq(schema.programEnrollments.userId, userId),
+            eq(schema.programEnrollments.tenantId, tenantId)
+          )
+        )
     );
 
     const incomplete = enrollments.filter((e) => !e.completedAt);
     await Promise.all(
-      incomplete.map((e) => this.checkProgramCompletion(userId, e.programId, tenantId)),
+      incomplete.map((e) =>
+        this.checkProgramCompletion(userId, e.programId, tenantId)
+      )
     );
   }
 
@@ -152,15 +172,16 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
   private async checkProgramCompletion(
     userId: string,
     programId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<void> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const [program] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.credentialPrograms)
         .where(eq(schema.credentialPrograms.id, programId))
-        .limit(1),
+        .limit(1)
     );
 
     if (!program) return;
@@ -169,13 +190,16 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
     if (progress.percentComplete < 100) return;
 
     const [enrollment] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.programEnrollments)
+      tx
+        .update(schema.programEnrollments)
         .set({ completedAt: new Date() })
-        .where(and(
-          eq(schema.programEnrollments.userId, userId),
-          eq(schema.programEnrollments.programId, programId),
-        ))
-        .returning(),
+        .where(
+          and(
+            eq(schema.programEnrollments.userId, userId),
+            eq(schema.programEnrollments.programId, programId)
+          )
+        )
+        .returning()
     );
 
     if (!enrollment) return;
@@ -190,64 +214,91 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
       });
 
       await withTenantContext(this.db, ctx, async (tx) =>
-        tx.update(schema.programEnrollments)
+        tx
+          .update(schema.programEnrollments)
           .set({ certificateId: cert.id })
-          .where(eq(schema.programEnrollments.id, enrollment.id)),
+          .where(eq(schema.programEnrollments.id, enrollment.id))
       );
 
       this.logger.log(
         { userId, programId, tenantId, certId: cert.id },
-        'ProgramService: nanodegree certificate issued',
+        'ProgramService: nanodegree certificate issued'
       );
     } catch (err) {
-      this.logger.error({ err, userId, programId }, 'ProgramService: cert generation failed');
+      this.logger.error(
+        { err, userId, programId },
+        'ProgramService: cert generation failed'
+      );
     }
   }
 
   // ─── Public API ───────────────────────────────────────────────────────────
 
-  async listPrograms(tenantId: string, userId: string): Promise<ProgramResult[]> {
+  async listPrograms(
+    tenantId: string,
+    userId: string
+  ): Promise<ProgramResult[]> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const programs = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.credentialPrograms)
-        .where(and(
-          eq(schema.credentialPrograms.tenantId, tenantId),
-          eq(schema.credentialPrograms.published, true),
-        )),
+      tx
+        .select()
+        .from(schema.credentialPrograms)
+        .where(
+          and(
+            eq(schema.credentialPrograms.tenantId, tenantId),
+            eq(schema.credentialPrograms.published, true)
+          )
+        )
     );
 
-    const counts = await this.getEnrollmentCounts(programs.map((p) => p.id), tenantId, userId);
+    const counts = await this.getEnrollmentCounts(
+      programs.map((p) => p.id),
+      tenantId,
+      userId
+    );
     return programs.map((p) => this.mapProgram(p, counts.get(p.id) ?? 0));
   }
 
-  async getProgram(programId: string, tenantId: string, userId: string): Promise<ProgramResult> {
+  async getProgram(
+    programId: string,
+    tenantId: string,
+    userId: string
+  ): Promise<ProgramResult> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const [program] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.credentialPrograms)
-        .where(and(
-          eq(schema.credentialPrograms.id, programId),
-          eq(schema.credentialPrograms.tenantId, tenantId),
-        ))
-        .limit(1),
+        .where(
+          and(
+            eq(schema.credentialPrograms.id, programId),
+            eq(schema.credentialPrograms.tenantId, tenantId)
+          )
+        )
+        .limit(1)
     );
 
     if (!program) throw new NotFoundException(`Program ${programId} not found`);
-    const counts = await this.getEnrollmentCounts([programId], tenantId, userId);
+    const counts = await this.getEnrollmentCounts(
+      [programId],
+      tenantId,
+      userId
+    );
     return this.mapProgram(program, counts.get(programId) ?? 0);
   }
 
   async createProgram(
     input: CreateProgramInput,
     tenantId: string,
-    userId: string,
+    userId: string
   ): Promise<ProgramResult> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'ORG_ADMIN' };
 
     const [program] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.credentialPrograms)
+      tx
+        .insert(schema.credentialPrograms)
         .values({
           tenantId,
           title: input.title,
@@ -256,10 +307,13 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
           badgeEmoji: input.badgeEmoji ?? '🎓',
           totalHours: input.totalHours ?? 0,
         })
-        .returning(),
+        .returning()
     );
 
-    this.logger.log({ programId: program!.id, tenantId }, 'ProgramService: program created');
+    this.logger.log(
+      { programId: program!.id, tenantId },
+      'ProgramService: program created'
+    );
     return this.mapProgram(program!, 0);
   }
 
@@ -267,78 +321,103 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
     programId: string,
     input: UpdateProgramInput,
     tenantId: string,
-    userId: string,
+    userId: string
   ): Promise<ProgramResult> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'ORG_ADMIN' };
 
     const [updated] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.credentialPrograms)
+      tx
+        .update(schema.credentialPrograms)
         .set({ ...input, updatedAt: new Date() })
-        .where(and(
-          eq(schema.credentialPrograms.id, programId),
-          eq(schema.credentialPrograms.tenantId, tenantId),
-        ))
-        .returning(),
+        .where(
+          and(
+            eq(schema.credentialPrograms.id, programId),
+            eq(schema.credentialPrograms.tenantId, tenantId)
+          )
+        )
+        .returning()
     );
 
     if (!updated) throw new NotFoundException(`Program ${programId} not found`);
-    const counts = await this.getEnrollmentCounts([programId], tenantId, userId);
+    const counts = await this.getEnrollmentCounts(
+      [programId],
+      tenantId,
+      userId
+    );
     return this.mapProgram(updated, counts.get(programId) ?? 0);
   }
 
   async enrollInProgram(
     programId: string,
     userId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<EnrollmentResult> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const existing = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.programEnrollments)
-        .where(and(
-          eq(schema.programEnrollments.userId, userId),
-          eq(schema.programEnrollments.programId, programId),
-        ))
-        .limit(1),
+        .where(
+          and(
+            eq(schema.programEnrollments.userId, userId),
+            eq(schema.programEnrollments.programId, programId)
+          )
+        )
+        .limit(1)
     );
 
     if (existing.length > 0) {
       const record = existing[0]!;
-      this.logger.log({ userId, programId }, 'ProgramService: enrollment already exists (idempotent)');
+      this.logger.log(
+        { userId, programId },
+        'ProgramService: enrollment already exists (idempotent)'
+      );
       return this.mapEnrollment(record);
     }
 
     const [program] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.credentialPrograms)
         .where(eq(schema.credentialPrograms.id, programId))
-        .limit(1),
+        .limit(1)
     );
 
     if (!program) throw new NotFoundException(`Program ${programId} not found`);
-    if (!program.published) throw new ConflictException('Program is not yet published');
+    if (!program.published)
+      throw new ConflictException('Program is not yet published');
 
     const [enrollment] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.programEnrollments)
+      tx
+        .insert(schema.programEnrollments)
         .values({ userId, programId, tenantId })
-        .returning(),
+        .returning()
     );
 
-    this.logger.log({ userId, programId, tenantId }, 'ProgramService: user enrolled in program');
+    this.logger.log(
+      { userId, programId, tenantId },
+      'ProgramService: user enrolled in program'
+    );
     return this.mapEnrollment(enrollment!);
   }
 
-  async getUserEnrollments(userId: string, tenantId: string): Promise<EnrollmentResult[]> {
+  async getUserEnrollments(
+    userId: string,
+    tenantId: string
+  ): Promise<EnrollmentResult[]> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.programEnrollments)
-        .where(and(
-          eq(schema.programEnrollments.userId, userId),
-          eq(schema.programEnrollments.tenantId, tenantId),
-        )),
+        .where(
+          and(
+            eq(schema.programEnrollments.userId, userId),
+            eq(schema.programEnrollments.tenantId, tenantId)
+          )
+        )
     );
 
     return rows.map((r) => this.mapEnrollment(r));
@@ -347,37 +426,51 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
   async getProgramProgress(
     programId: string,
     userId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<ProgramProgress> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const [program] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.credentialPrograms)
         .where(eq(schema.credentialPrograms.id, programId))
-        .limit(1),
+        .limit(1)
     );
 
     if (!program) throw new NotFoundException(`Program ${programId} not found`);
 
     const requiredIds = program.requiredCourseIds as string[];
     if (requiredIds.length === 0) {
-      return { totalCourses: 0, completedCourses: 0, completedCourseIds: [], percentComplete: 100 };
+      return {
+        totalCourses: 0,
+        completedCourses: 0,
+        completedCourseIds: [],
+        percentComplete: 100,
+      };
     }
 
     const completions = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select({ courseId: schema.userCourses.courseId })
+      tx
+        .select({ courseId: schema.userCourses.courseId })
         .from(schema.userCourses)
-        .where(eq(schema.userCourses.userId, userId)),
+        .where(eq(schema.userCourses.userId, userId))
     );
 
-    const doneSet = new Set(completions.filter((c) => c.courseId !== null).map((c) => c.courseId!));
+    const doneSet = new Set(
+      completions.filter((c) => c.courseId !== null).map((c) => c.courseId!)
+    );
     const completedCourseIds = requiredIds.filter((id) => doneSet.has(id));
     const completedCourses = completedCourseIds.length;
     const totalCourses = requiredIds.length;
     const percentComplete = Math.round((completedCourses / totalCourses) * 100);
 
-    return { totalCourses, completedCourses, completedCourseIds, percentComplete };
+    return {
+      totalCourses,
+      completedCourses,
+      completedCourseIds,
+      percentComplete,
+    };
   }
 
   // ─── Private helpers ──────────────────────────────────────────────────────
@@ -385,17 +478,18 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
   private async getEnrollmentCounts(
     programIds: string[],
     tenantId: string,
-    userId: string,
+    userId: string
   ): Promise<Map<string, number>> {
     if (programIds.length === 0) return new Map();
     const ctx: TenantContext = { tenantId, userId, userRole: 'ORG_ADMIN' };
 
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select({
-        programId: schema.programEnrollments.programId,
-      })
+      tx
+        .select({
+          programId: schema.programEnrollments.programId,
+        })
         .from(schema.programEnrollments)
-        .where(eq(schema.programEnrollments.tenantId, tenantId)),
+        .where(eq(schema.programEnrollments.tenantId, tenantId))
     );
 
     const counts = new Map<string, number>();
@@ -408,7 +502,7 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
 
   private mapProgram(
     p: typeof schema.credentialPrograms.$inferSelect,
-    enrollmentCount: number,
+    enrollmentCount: number
   ): ProgramResult {
     return {
       id: p.id,
@@ -422,7 +516,9 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private mapEnrollment(e: typeof schema.programEnrollments.$inferSelect): EnrollmentResult {
+  private mapEnrollment(
+    e: typeof schema.programEnrollments.$inferSelect
+  ): EnrollmentResult {
     return {
       id: e.id,
       programId: e.programId,

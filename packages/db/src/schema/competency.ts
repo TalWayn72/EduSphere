@@ -14,7 +14,9 @@ export const userCompetencyGoals = pgTable(
     targetConceptName: text('target_concept_name').notNull(),
     currentLevel: text('current_level'),
     targetLevel: text('target_level'),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     pgPolicy('competency_goals_rls', {
@@ -26,7 +28,7 @@ export const userCompetencyGoals = pgTable(
         user_id::text = current_setting('app.current_user_id', TRUE)
       `,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type UserCompetencyGoal = typeof userCompetencyGoals.$inferSelect;

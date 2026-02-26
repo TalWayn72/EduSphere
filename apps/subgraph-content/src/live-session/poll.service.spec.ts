@@ -42,7 +42,8 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn(() => ({})),
   and: vi.fn(() => ({})),
   withTenantContext: vi.fn(
-    (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) => fn(_mockDb),
+    (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      fn(_mockDb)
   ),
 }));
 
@@ -51,7 +52,7 @@ vi.mock('nats', () => ({
     Promise.resolve({
       publish: (...args: unknown[]) => _mockPublish(...args),
       drain: vi.fn().mockResolvedValue(undefined),
-    }),
+    })
   ),
   StringCodec: vi.fn(() => ({
     encode: vi.fn((s: string) => Buffer.from(s)),
@@ -103,7 +104,13 @@ describe('PollService', () => {
 
   // 1. createPoll stores question and options
   it('createPoll stores question and options', async () => {
-    const result = await service.createPoll(SESSION_ID, 'Which is best?', ['A', 'B', 'C'], TENANT, USER);
+    const result = await service.createPoll(
+      SESSION_ID,
+      'Which is best?',
+      ['A', 'B', 'C'],
+      TENANT,
+      USER
+    );
     expect(result.question).toBe('Which is best?');
     expect(result.options).toEqual(['Option A', 'Option B', 'Option C']);
     expect(_mockDb['insert']).toHaveBeenCalled();
@@ -111,7 +118,9 @@ describe('PollService', () => {
 
   // 2. activatePoll sets isActive=true
   it('activatePoll sets isActive=true', async () => {
-    _mockDb['returning'] = vi.fn().mockResolvedValue([makePoll({ isActive: true })]);
+    _mockDb['returning'] = vi
+      .fn()
+      .mockResolvedValue([makePoll({ isActive: true })]);
     const result = await service.activatePoll(POLL_ID, TENANT, USER);
     expect(result.isActive).toBe(true);
     expect(_mockDb['update']).toHaveBeenCalled();
@@ -122,7 +131,9 @@ describe('PollService', () => {
     // closePoll: update→set→where→returning needs to work
     // then getPollResults: select→from→where→limit (poll) + select→from→where (votes)
     const freshDb = makeMockDb();
-    freshDb['returning'] = vi.fn().mockResolvedValue([makePoll({ isActive: false })]);
+    freshDb['returning'] = vi
+      .fn()
+      .mockResolvedValue([makePoll({ isActive: false })]);
     freshDb['limit'] = vi.fn().mockResolvedValue([makePoll()]);
     // where: when chained for update (returning after), also when chained for select (votes)
     // Must support BOTH .returning() after and direct await
@@ -148,9 +159,10 @@ describe('PollService', () => {
     // vote() calls select().from().where().limit(1) for existing vote check → returns []
     const innerDb = makeMockDb();
     innerDb['limit'] = vi.fn().mockResolvedValue([]); // no existing vote
-    innerDb['where'] = vi.fn()
-      .mockReturnValueOnce(innerDb)  // chain for select-limit
-      .mockResolvedValue([]);        // votes for publish event
+    innerDb['where'] = vi
+      .fn()
+      .mockReturnValueOnce(innerDb) // chain for select-limit
+      .mockResolvedValue([]); // votes for publish event
     innerDb['returning'] = vi.fn().mockResolvedValue([]);
     _mockDb = innerDb;
     // Recreate service with fresh db
@@ -163,11 +175,18 @@ describe('PollService', () => {
 
   // 5. vote is idempotent: second vote from same user updates existing record
   it('vote is idempotent: second vote from same user updates existing record', async () => {
-    const existingVote = { id: 'vote-1', pollId: POLL_ID, userId: USER, optionIndex: 0, votedAt: new Date() };
+    const existingVote = {
+      id: 'vote-1',
+      pollId: POLL_ID,
+      userId: USER,
+      optionIndex: 0,
+      votedAt: new Date(),
+    };
     const innerDb = makeMockDb();
     innerDb['limit'] = vi.fn().mockResolvedValue([existingVote]); // found existing
-    innerDb['where'] = vi.fn()
-      .mockReturnValueOnce(innerDb)  // chain for select
+    innerDb['where'] = vi
+      .fn()
+      .mockReturnValueOnce(innerDb) // chain for select
       .mockResolvedValue([existingVote]); // votes for publish
     innerDb['returning'] = vi.fn().mockResolvedValue([]);
     _mockDb = innerDb;
@@ -187,7 +206,8 @@ describe('PollService', () => {
     const result = options.map((text, i) => ({
       text,
       count: counts[i] ?? 0,
-      percentage: totalVotes > 0 ? Math.round(((counts[i] ?? 0) / totalVotes) * 100) : 0,
+      percentage:
+        totalVotes > 0 ? Math.round(((counts[i] ?? 0) / totalVotes) * 100) : 0,
     }));
     expect(result[0].percentage).toBe(75);
     expect(result[1].percentage).toBe(25);
@@ -210,7 +230,10 @@ describe('PollService', () => {
     // - When awaited directly: resolves to [] (for votes query and poll query in publishVoteEvent)
     // - When .limit() is called on it: resolves to [] (for existing vote check)
     // - When .returning() is called on it: resolves to [] (for insert)
-    const makeWhereable = (limitResult: unknown[] = [], directResult: unknown[] = []) => ({
+    const makeWhereable = (
+      limitResult: unknown[] = [],
+      directResult: unknown[] = []
+    ) => ({
       limit: vi.fn().mockResolvedValue(limitResult),
       returning: vi.fn().mockResolvedValue([]),
       then: (resolve: (v: unknown[]) => void, _reject?: (e: unknown) => void) =>

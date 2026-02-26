@@ -53,11 +53,13 @@ const SQL_PATTERNS = [
  * Assert that none of the SQL error patterns appear as visible text on the page.
  * Called at the end of every nav-tab test.
  */
-async function assertNoSqlOnPage(page: import('@playwright/test').Page): Promise<void> {
+async function assertNoSqlOnPage(
+  page: import('@playwright/test').Page
+): Promise<void> {
   for (const pattern of SQL_PATTERNS) {
-    await expect(
-      page.getByText(pattern, { exact: false })
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(pattern, { exact: false })).not.toBeVisible({
+      timeout: 2_000,
+    });
   }
 }
 
@@ -65,10 +67,12 @@ async function assertNoSqlOnPage(page: import('@playwright/test').Page): Promise
  * Assert the crash overlay is absent.
  * React Error Boundary renders "Something went wrong" on unhandled render errors.
  */
-async function assertNoCrash(page: import('@playwright/test').Page): Promise<void> {
-  await expect(
-    page.getByText(/something went wrong/i)
-  ).not.toBeVisible({ timeout: 3_000 });
+async function assertNoCrash(
+  page: import('@playwright/test').Page
+): Promise<void> {
+  await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+    timeout: 3_000,
+  });
 }
 
 // ─── Suite 1: Nav tab routing ─────────────────────────────────────────────────
@@ -91,8 +95,12 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
 
   // ── Learn (/learn/content-1) ────────────────────────────────────────────────
 
-  test('Learn tab navigates to /learn/content-1 and renders video player', async ({ page }) => {
-    const learnLink = page.locator('nav').getByRole('link', { name: /^Learn$/i });
+  test('Learn tab navigates to /learn/content-1 and renders video player', async ({
+    page,
+  }) => {
+    const learnLink = page
+      .locator('nav')
+      .getByRole('link', { name: /^Learn$/i });
     await expect(learnLink).toBeVisible({ timeout: 8_000 });
     await learnLink.click();
 
@@ -108,8 +116,12 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
 
   // ── Courses (/courses) ──────────────────────────────────────────────────────
 
-  test('Courses tab navigates to /courses and renders course list', async ({ page }) => {
-    const coursesLink = page.locator('nav').getByRole('link', { name: /^Courses$/i });
+  test('Courses tab navigates to /courses and renders course list', async ({
+    page,
+  }) => {
+    const coursesLink = page
+      .locator('nav')
+      .getByRole('link', { name: /^Courses$/i });
     await expect(coursesLink).toBeVisible({ timeout: 8_000 });
     await coursesLink.click();
 
@@ -131,8 +143,12 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
 
   // ── Graph (/graph) ──────────────────────────────────────────────────────────
 
-  test('Graph tab navigates to /graph and renders the knowledge graph page', async ({ page }) => {
-    const graphLink = page.locator('nav').getByRole('link', { name: /^Graph$/i });
+  test('Graph tab navigates to /graph and renders the knowledge graph page', async ({
+    page,
+  }) => {
+    const graphLink = page
+      .locator('nav')
+      .getByRole('link', { name: /^Graph$/i });
     await expect(graphLink).toBeVisible({ timeout: 8_000 });
     await graphLink.click();
 
@@ -150,8 +166,12 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
 
   // ── Annotations (/annotations) ──────────────────────────────────────────────
 
-  test('Annotations tab navigates to /annotations and renders tabs', async ({ page }) => {
-    const annotationsLink = page.locator('nav').getByRole('link', { name: /^Annotations$/i });
+  test('Annotations tab navigates to /annotations and renders tabs', async ({
+    page,
+  }) => {
+    const annotationsLink = page
+      .locator('nav')
+      .getByRole('link', { name: /^Annotations$/i });
     await expect(annotationsLink).toBeVisible({ timeout: 8_000 });
     await annotationsLink.click();
 
@@ -172,8 +192,12 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
 
   // ── Agents (/agents) ────────────────────────────────────────────────────────
 
-  test('Agents tab navigates to /agents and renders "AI Learning Agents" heading', async ({ page }) => {
-    const agentsLink = page.locator('nav').getByRole('link', { name: /^Agents$/i });
+  test('Agents tab navigates to /agents and renders "AI Learning Agents" heading', async ({
+    page,
+  }) => {
+    const agentsLink = page
+      .locator('nav')
+      .getByRole('link', { name: /^Agents$/i });
     await expect(agentsLink).toBeVisible({ timeout: 8_000 });
     await agentsLink.click();
 
@@ -190,8 +214,12 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
 
   // ── Chavruta (/collaboration) ───────────────────────────────────────────────
 
-  test('Chavruta tab navigates to /collaboration and renders collaboration page', async ({ page }) => {
-    const chavrutaLink = page.locator('nav').getByRole('link', { name: /^Chavruta$/i });
+  test('Chavruta tab navigates to /collaboration and renders collaboration page', async ({
+    page,
+  }) => {
+    const chavrutaLink = page
+      .locator('nav')
+      .getByRole('link', { name: /^Chavruta$/i });
     await expect(chavrutaLink).toBeVisible({ timeout: 8_000 });
     await chavrutaLink.click();
 
@@ -208,24 +236,30 @@ test.describe('Nav Audit — top navigation tabs route correctly', () => {
 
   // ── Dashboard (/dashboard) ──────────────────────────────────────────────────
 
-  test('Dashboard tab navigates to /dashboard and renders stats cards', async ({ page }) => {
+  test('Dashboard tab navigates to /dashboard and renders stats cards', async ({
+    page,
+  }) => {
     // Start from a different page so the navigation action is meaningful
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
 
-    const dashboardLink = page.locator('nav').getByRole('link', { name: /^Dashboard$/i });
+    const dashboardLink = page
+      .locator('nav')
+      .getByRole('link', { name: /^Dashboard$/i });
     await expect(dashboardLink).toBeVisible({ timeout: 8_000 });
     await dashboardLink.click();
 
     await page.waitForURL('**/dashboard', { timeout: 10_000 });
     expect(page.url()).toContain('/dashboard');
 
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 8_000,
+    });
 
     // Primary stats row
-    await expect(page.getByText('Courses Enrolled')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText('Courses Enrolled')).toBeVisible({
+      timeout: 8_000,
+    });
 
     await assertNoCrash(page);
     await assertNoSqlOnPage(page);
@@ -304,9 +338,9 @@ test.describe('Nav Audit — all nav destinations are error-free', () => {
       await expect(page.locator('header')).toBeVisible({ timeout: 10_000 });
 
       // Expected text should appear somewhere on the page
-      await expect(
-        page.getByText(expectedText).first()
-      ).toBeVisible({ timeout: 10_000 });
+      await expect(page.getByText(expectedText).first()).toBeVisible({
+        timeout: 10_000,
+      });
 
       await assertNoCrash(page);
       await assertNoSqlOnPage(page);
@@ -341,9 +375,9 @@ test.describe('Nav Audit — user menu', () => {
     await userMenuTrigger.click();
 
     // common.json: profile → "Profile"
-    await expect(
-      page.getByRole('menuitem', { name: /Profile/i })
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('menuitem', { name: /Profile/i })).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('user dropdown contains a Settings item', async ({ page }) => {
@@ -351,9 +385,9 @@ test.describe('Nav Audit — user menu', () => {
     await userMenuTrigger.click();
 
     // common.json: settings → "Settings"
-    await expect(
-      page.getByRole('menuitem', { name: /Settings/i })
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('menuitem', { name: /Settings/i })).toBeVisible(
+      { timeout: 5_000 }
+    );
   });
 
   test('user dropdown contains a Log out item', async ({ page }) => {
@@ -361,12 +395,14 @@ test.describe('Nav Audit — user menu', () => {
     await userMenuTrigger.click();
 
     // common.json: logOut → "Log out"
-    await expect(
-      page.getByRole('menuitem', { name: /Log out/i })
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('menuitem', { name: /Log out/i })).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
-  test('clicking Profile item in the dropdown navigates to /profile', async ({ page }) => {
+  test('clicking Profile item in the dropdown navigates to /profile', async ({
+    page,
+  }) => {
     const userMenuTrigger = page.getByRole('button', { name: /User menu/i });
     await userMenuTrigger.click();
 
@@ -376,7 +412,9 @@ test.describe('Nav Audit — user menu', () => {
     expect(page.url()).toContain('/profile');
   });
 
-  test('clicking Settings item in the dropdown navigates to /settings', async ({ page }) => {
+  test('clicking Settings item in the dropdown navigates to /settings', async ({
+    page,
+  }) => {
     const userMenuTrigger = page.getByRole('button', { name: /User menu/i });
     await userMenuTrigger.click();
 
@@ -386,7 +424,9 @@ test.describe('Nav Audit — user menu', () => {
     expect(page.url()).toContain('/settings');
   });
 
-  test('user dropdown shows the current user name or email', async ({ page }) => {
+  test('user dropdown shows the current user name or email', async ({
+    page,
+  }) => {
     const userMenuTrigger = page.getByRole('button', { name: /User menu/i });
     await userMenuTrigger.click();
 
@@ -394,7 +434,7 @@ test.describe('Nav Audit — user menu', () => {
     // In DEV_MODE the user is "Super Admin" with email "super.admin@edusphere.dev"
     const menu = page.locator('[role="menu"]');
     await expect(menu).toBeVisible({ timeout: 5_000 });
-    const menuText = await menu.textContent() ?? '';
+    const menuText = (await menu.textContent()) ?? '';
     // At minimum the menu renders some non-empty text (name, email, or role)
     expect(menuText.trim().length).toBeGreaterThan(0);
   });
@@ -435,26 +475,33 @@ test.describe('Nav Audit — search button', () => {
     expect(page.url()).toContain('/search');
   });
 
-  test('search page renders a search input after navigation', async ({ page }) => {
+  test('search page renders a search input after navigation', async ({
+    page,
+  }) => {
     await page.goto('/search');
     await page.waitForLoadState('networkidle');
 
     // Search page renders an input for the query (no explicit type attribute)
-    await expect(page.locator('input[placeholder*="earch"]').first())
-      .toBeVisible({ timeout: 8_000 });
+    await expect(
+      page.locator('input[placeholder*="earch"]').first()
+    ).toBeVisible({ timeout: 8_000 });
   });
 });
 
 // ─── Suite 5: New Course button (admin-only) ──────────────────────────────────
 
 test.describe('Nav Audit — New Course button (admin-only, visible in DEV_MODE)', () => {
-  test('New Course nav link is visible for SUPER_ADMIN in DEV_MODE', async ({ page }) => {
+  test('New Course nav link is visible for SUPER_ADMIN in DEV_MODE', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
 
     // In DEV_MODE the mock user is SUPER_ADMIN — isAdmin=true — so "New Course" renders
     // nav.json: newCourse → "New Course"
-    const newCourseLink = page.locator('nav').getByRole('link', { name: /New Course/i });
+    const newCourseLink = page
+      .locator('nav')
+      .getByRole('link', { name: /New Course/i });
     await expect(newCourseLink).toBeVisible({ timeout: 8_000 });
   });
 
@@ -462,7 +509,9 @@ test.describe('Nav Audit — New Course button (admin-only, visible in DEV_MODE)
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
 
-    const newCourseLink = page.locator('nav').getByRole('link', { name: /New Course/i });
+    const newCourseLink = page
+      .locator('nav')
+      .getByRole('link', { name: /New Course/i });
     await newCourseLink.click();
 
     await page.waitForURL('**/courses/new', { timeout: 10_000 });
@@ -482,12 +531,14 @@ test.describe('Nav Audit — EduSphere logo', () => {
     await page.waitForLoadState('networkidle');
 
     // Layout renders: <Link to="/" className="...">EduSphere</Link>
-    await expect(
-      page.getByRole('link', { name: /EduSphere/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('link', { name: /EduSphere/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
-  test('clicking EduSphere logo navigates to "/" which redirects to the learn page', async ({ page }) => {
+  test('clicking EduSphere logo navigates to "/" which redirects to the learn page', async ({
+    page,
+  }) => {
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
 
@@ -508,10 +559,14 @@ test.describe('Nav Audit — language selector (Settings page)', () => {
     await page.waitForLoadState('networkidle');
 
     // LanguageSelector uses shadcn/ui <Select> — renders role="combobox"
-    await expect(page.getByRole('combobox').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('combobox').first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('opening the language selector shows multiple language options', async ({ page }) => {
+  test('opening the language selector shows multiple language options', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
 

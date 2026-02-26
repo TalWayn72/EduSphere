@@ -4,7 +4,9 @@ import { createClient as createWsClient } from 'graphql-ws';
 import { getToken } from './auth';
 
 const wsClient = createWsClient({
-  url: import.meta.env.VITE_GRAPHQL_WS_URL ?? import.meta.env.VITE_GRAPHQL_URL.replace(/^http/, 'ws'),
+  url:
+    import.meta.env.VITE_GRAPHQL_WS_URL ??
+    import.meta.env.VITE_GRAPHQL_URL.replace(/^http/, 'ws'),
   connectionParams: () => {
     const token = getToken();
     return token ? { authorization: `Bearer ${token}` } : {};

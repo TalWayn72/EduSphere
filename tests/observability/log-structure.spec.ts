@@ -15,10 +15,21 @@ import { fileURLToPath } from 'url';
 
 const REPO_ROOT = join(fileURLToPath(import.meta.url), '..', '..', '..');
 const APPS_DIR = join(REPO_ROOT, 'apps');
-const ALERTS_YML = join(REPO_ROOT, 'infrastructure', 'monitoring', 'rules', 'alerts.yml');
+const ALERTS_YML = join(
+  REPO_ROOT,
+  'infrastructure',
+  'monitoring',
+  'rules',
+  'alerts.yml'
+);
 
 const PINO_LEVELS: Record<string, number> = {
-  trace: 10, debug: 20, info: 30, warn: 40, error: 50, fatal: 60,
+  trace: 10,
+  debug: 20,
+  info: 30,
+  warn: 40,
+  error: 50,
+  fatal: 60,
 };
 
 /** Recursively collect .ts files, excluding test/spec files and node_modules */
@@ -54,7 +65,9 @@ function parseAlertsYaml(content: string): Array<Record<string, string>> {
       continue;
     }
     if (current) {
-      const kv = /^\s+(expr|for|summary|description|severity):\s*(.+)$/.exec(line);
+      const kv = /^\s+(expr|for|summary|description|severity):\s*(.+)$/.exec(
+        line
+      );
       if (kv) current[kv[1] ?? ''] = (kv[2] ?? '').trim();
     }
   }
@@ -142,7 +155,9 @@ describe('Pino Log Structure', () => {
     });
 
     it('error logs include err.message and err.stack', () => {
-      const log = makeLog({ err: { message: 'Something failed', stack: 'Error: ...' } });
+      const log = makeLog({
+        err: { message: 'Something failed', stack: 'Error: ...' },
+      });
       expect(log.err?.message).toBeDefined();
       expect(log.err?.stack).toBeDefined();
     });
@@ -150,8 +165,16 @@ describe('Pino Log Structure', () => {
 
   describe('No console.log in production source', () => {
     // Only scan backend (NestJS) apps that use Pino — frontend/mobile use console legitimately
-    const BACKEND_APPS = ['subgraph-core', 'subgraph-content', 'subgraph-annotation',
-      'subgraph-collaboration', 'subgraph-agent', 'subgraph-knowledge', 'gateway', 'transcription-worker'];
+    const BACKEND_APPS = [
+      'subgraph-core',
+      'subgraph-content',
+      'subgraph-annotation',
+      'subgraph-collaboration',
+      'subgraph-agent',
+      'subgraph-knowledge',
+      'gateway',
+      'transcription-worker',
+    ];
     const sourceFiles = (() => {
       const files: string[] = [];
       if (existsSync(APPS_DIR)) {
@@ -170,7 +193,10 @@ describe('Pino Log Structure', () => {
           offenders.push(file.replace(REPO_ROOT, ''));
         }
       }
-      expect(offenders, `console.log found in:\n${offenders.join('\n')}`).toHaveLength(0);
+      expect(
+        offenders,
+        `console.log found in:\n${offenders.join('\n')}`
+      ).toHaveLength(0);
     });
 
     it('no console.error calls in backend apps/*/src/**/*.ts (excludes test files)', () => {
@@ -181,7 +207,10 @@ describe('Pino Log Structure', () => {
           offenders.push(file.replace(REPO_ROOT, ''));
         }
       }
-      expect(offenders, `console.error found in:\n${offenders.join('\n')}`).toHaveLength(0);
+      expect(
+        offenders,
+        `console.error found in:\n${offenders.join('\n')}`
+      ).toHaveLength(0);
     });
 
     it('no console.warn calls in backend apps/*/src/**/*.ts (excludes test files)', () => {
@@ -192,12 +221,17 @@ describe('Pino Log Structure', () => {
           offenders.push(file.replace(REPO_ROOT, ''));
         }
       }
-      expect(offenders, `console.warn found in:\n${offenders.join('\n')}`).toHaveLength(0);
+      expect(
+        offenders,
+        `console.warn found in:\n${offenders.join('\n')}`
+      ).toHaveLength(0);
     });
   });
 
   describe('Prometheus alert rules syntax', () => {
-    const rawYaml = existsSync(ALERTS_YML) ? readFileSync(ALERTS_YML, 'utf-8') : '';
+    const rawYaml = existsSync(ALERTS_YML)
+      ? readFileSync(ALERTS_YML, 'utf-8')
+      : '';
     const rules = parseAlertsYaml(rawYaml);
     const VALID_SEVERITIES = new Set(['critical', 'warning', 'info']);
 
@@ -222,7 +256,7 @@ describe('Pino Log Structure', () => {
       for (const sev of severities) {
         expect(
           VALID_SEVERITIES.has(sev),
-          `Invalid severity "${sev}" — must be critical, warning, or info`,
+          `Invalid severity "${sev}" — must be critical, warning, or info`
         ).toBe(true);
       }
     });

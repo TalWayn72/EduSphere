@@ -16,26 +16,37 @@ import { LangGraphService } from './langgraph.service';
 
 // ── Mocks (via vi.hoisted so factories can reference them before const init) ──
 
-const { mockPoolEnd, MockPool, mockSaverSetup, MockPostgresSaver, MockMemorySaver } =
-  vi.hoisted(() => {
-    const mockPoolEnd = vi.fn().mockResolvedValue(undefined);
-    const mockSaverSetup = vi.fn().mockResolvedValue(undefined);
-    // Regular function implementations (NOT arrow functions) so `new MockPool()` /
-    // `new MockPostgresSaver()` works — Vitest calls `new impl()` internally, and
-    // arrow functions are not constructors.
-    const MockPool = vi.fn().mockImplementation(function PoolCtor() {
-      return { end: mockPoolEnd };
-    });
-    const MockPostgresSaver = vi.fn().mockImplementation(function PostgresSaverCtor(
-      _pool: unknown,
-    ) {
+const {
+  mockPoolEnd,
+  MockPool,
+  mockSaverSetup,
+  MockPostgresSaver,
+  MockMemorySaver,
+} = vi.hoisted(() => {
+  const mockPoolEnd = vi.fn().mockResolvedValue(undefined);
+  const mockSaverSetup = vi.fn().mockResolvedValue(undefined);
+  // Regular function implementations (NOT arrow functions) so `new MockPool()` /
+  // `new MockPostgresSaver()` works — Vitest calls `new impl()` internally, and
+  // arrow functions are not constructors.
+  const MockPool = vi.fn().mockImplementation(function PoolCtor() {
+    return { end: mockPoolEnd };
+  });
+  const MockPostgresSaver = vi
+    .fn()
+    .mockImplementation(function PostgresSaverCtor(_pool: unknown) {
       return { setup: mockSaverSetup };
     });
-    class MockMemorySaver {
-      storage = new Map<string, unknown>();
-    }
-    return { mockPoolEnd, MockPool, mockSaverSetup, MockPostgresSaver, MockMemorySaver };
-  });
+  class MockMemorySaver {
+    storage = new Map<string, unknown>();
+  }
+  return {
+    mockPoolEnd,
+    MockPool,
+    mockSaverSetup,
+    MockPostgresSaver,
+    MockMemorySaver,
+  };
+});
 
 vi.mock('pg', () => ({ default: { Pool: MockPool } }));
 vi.mock('@langchain/langgraph', () => ({ MemorySaver: MockMemorySaver }));
@@ -84,7 +95,8 @@ describe('LangGraphService — memory safety', () => {
 
   // ── Test 2 ──────────────────────────────────────────────────────────────────
   it('should call pool.end() on destroy when PostgresSaver is active', async () => {
-    process.env.DATABASE_URL = 'postgresql://user:pass@localhost:5432/edusphere';
+    process.env.DATABASE_URL =
+      'postgresql://user:pass@localhost:5432/edusphere';
 
     await service.onModuleInit();
     await service.onModuleDestroy();
@@ -105,7 +117,8 @@ describe('LangGraphService — memory safety', () => {
 
   // ── Test 4 ──────────────────────────────────────────────────────────────────
   it('should NOT call pool.end() twice on double destroy', async () => {
-    process.env.DATABASE_URL = 'postgresql://user:pass@localhost:5432/edusphere';
+    process.env.DATABASE_URL =
+      'postgresql://user:pass@localhost:5432/edusphere';
 
     await service.onModuleInit();
     await service.onModuleDestroy();
@@ -119,7 +132,9 @@ describe('LangGraphService — memory safety', () => {
     delete process.env.DATABASE_URL;
     await service.onModuleInit();
 
-    const checkpointer = service.getCheckpointer() as unknown as { storage: Map<string, unknown> };
+    const checkpointer = service.getCheckpointer() as unknown as {
+      storage: Map<string, unknown>;
+    };
     // Populate 1050 sessions (50 over the limit)
     for (let i = 0; i < 1050; i++) {
       checkpointer.storage.set(`session-${i}`, { data: i });
@@ -135,7 +150,9 @@ describe('LangGraphService — memory safety', () => {
 
   // ── Test 6 ──────────────────────────────────────────────────────────────────
   it('should throw from getCheckpointer() before onModuleInit()', () => {
-    expect(() => service.getCheckpointer()).toThrow('LangGraphService not initialized');
+    expect(() => service.getCheckpointer()).toThrow(
+      'LangGraphService not initialized'
+    );
   });
 
   // ── Test 7 ──────────────────────────────────────────────────────────────────

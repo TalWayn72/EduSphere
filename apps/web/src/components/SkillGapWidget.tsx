@@ -3,7 +3,11 @@ import { useQuery, useMutation } from 'urql';
 import { Link } from 'react-router-dom';
 import { BarChart3, ChevronDown, BookOpen, PlusCircle } from 'lucide-react';
 import {
-  Card, CardHeader, CardTitle, CardDescription, CardContent,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -15,7 +19,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
@@ -24,11 +32,25 @@ import {
   CREATE_SKILL_PROFILE_MUTATION,
 } from '@/lib/graphql/knowledge-tier3.queries';
 
-interface SkillProfile { id: string; roleName: string; description: string | null; requiredConceptsCount: number; }
-interface SkillGapItem { conceptName: string; isMastered: boolean; recommendedContentTitles: string[]; }
+interface SkillProfile {
+  id: string;
+  roleName: string;
+  description: string | null;
+  requiredConceptsCount: number;
+}
+interface SkillGapItem {
+  conceptName: string;
+  isMastered: boolean;
+  recommendedContentTitles: string[];
+}
 interface SkillGapReport {
-  roleId: string; roleName: string; totalRequired: number; mastered: number;
-  gapCount: number; completionPercentage: number; gaps: SkillGapItem[];
+  roleId: string;
+  roleName: string;
+  totalRequired: number;
+  mastered: number;
+  gapCount: number;
+  completionPercentage: number;
+  gaps: SkillGapItem[];
 }
 
 const MAX_VISIBLE_GAPS = 5;
@@ -58,8 +80,15 @@ export function SkillGapWidget() {
 
   const handleCreate = async () => {
     if (!newRole.trim() || !newConcepts.trim()) return;
-    const concepts = newConcepts.split(',').map((c) => c.trim()).filter(Boolean);
-    await createProfile({ roleName: newRole.trim(), description: null, requiredConcepts: concepts });
+    const concepts = newConcepts
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean);
+    await createProfile({
+      roleName: newRole.trim(),
+      description: null,
+      requiredConcepts: concepts,
+    });
     setNewRole('');
     setNewConcepts('');
     setCreateOpen(false);
@@ -78,7 +107,11 @@ export function SkillGapWidget() {
               Compare your knowledge against a role profile
             </CardDescription>
           </div>
-          <Button size="sm" variant="outline" onClick={() => setCreateOpen(true)}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCreateOpen(true)}
+          >
             <PlusCircle className="h-4 w-4 mr-1" />
             New Profile
           </Button>
@@ -129,14 +162,18 @@ export function SkillGapWidget() {
                 </div>
                 <Progress value={report.completionPercentage} className="h-2" />
                 <p className="text-xs text-muted-foreground mt-1">
-                  {report.completionPercentage}% complete · {report.gapCount} gaps remaining
+                  {report.completionPercentage}% complete · {report.gapCount}{' '}
+                  gaps remaining
                 </p>
               </div>
 
               {report.gaps.length > 0 && (
                 <ul className="space-y-2">
                   {report.gaps.slice(0, MAX_VISIBLE_GAPS).map((gap) => (
-                    <li key={gap.conceptName} className="border rounded-md p-2.5">
+                    <li
+                      key={gap.conceptName}
+                      className="border rounded-md p-2.5"
+                    >
                       <p className="text-sm font-medium flex items-center gap-1.5">
                         <BookOpen className="h-3.5 w-3.5 text-amber-500" />
                         {gap.conceptName}
@@ -191,7 +228,9 @@ export function SkillGapWidget() {
             </p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>
+              Cancel
+            </Button>
             <Button
               onClick={handleCreate}
               disabled={!newRole.trim() || !newConcepts.trim()}

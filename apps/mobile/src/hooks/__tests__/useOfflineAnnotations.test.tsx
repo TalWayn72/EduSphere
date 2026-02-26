@@ -54,12 +54,22 @@ describe('useOfflineAnnotations', () => {
   it('addAnnotation enqueues a mutation', () => {
     const { result } = renderHook(() => useOfflineAnnotations(opts));
     act(() => {
-      result.current.addAnnotation('asset-1', 12.5, 'Test annotation', 'PERSONAL');
+      result.current.addAnnotation(
+        'asset-1',
+        12.5,
+        'Test annotation',
+        'PERSONAL'
+      );
     });
-    expect(mockEnqueue).toHaveBeenCalledWith(expect.objectContaining({
-      operationName: 'AddAnnotation',
-      variables: expect.objectContaining({ assetId: 'asset-1', text: 'Test annotation' }),
-    }));
+    expect(mockEnqueue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operationName: 'AddAnnotation',
+        variables: expect.objectContaining({
+          assetId: 'asset-1',
+          text: 'Test annotation',
+        }),
+      })
+    );
   });
 
   it('returns pending annotation in localPending', () => {

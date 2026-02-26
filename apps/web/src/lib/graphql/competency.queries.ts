@@ -28,8 +28,14 @@ export const MY_LEARNING_PATH_QUERY = gql`
 `;
 
 export const ADD_COMPETENCY_GOAL_MUTATION = gql`
-  mutation AddCompetencyGoal($targetConceptName: String!, $targetLevel: String) {
-    addCompetencyGoal(targetConceptName: $targetConceptName, targetLevel: $targetLevel) {
+  mutation AddCompetencyGoal(
+    $targetConceptName: String!
+    $targetLevel: String
+  ) {
+    addCompetencyGoal(
+      targetConceptName: $targetConceptName
+      targetLevel: $targetLevel
+    ) {
       id
       targetConceptName
       currentLevel

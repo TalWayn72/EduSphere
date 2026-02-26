@@ -45,7 +45,7 @@ export class CertificatePdfService {
         Key: fileKey,
         Body: pdfBuffer,
         ContentType: 'application/pdf',
-      }),
+      })
     );
 
     this.logger.log(`Certificate PDF uploaded: key=${fileKey}`);
@@ -62,17 +62,32 @@ export class CertificatePdfService {
       doc.on('error', reject);
 
       // Title
-      doc.fontSize(32).font('Helvetica-Bold').text('Certificate of Completion', { align: 'center' });
+      doc
+        .fontSize(32)
+        .font('Helvetica-Bold')
+        .text('Certificate of Completion', { align: 'center' });
       doc.moveDown(1.5);
 
       // Body
-      doc.fontSize(16).font('Helvetica').text('This certifies that', { align: 'center' });
+      doc
+        .fontSize(16)
+        .font('Helvetica')
+        .text('This certifies that', { align: 'center' });
       doc.moveDown(0.5);
-      doc.fontSize(26).font('Helvetica-Bold').text(input.learnerName, { align: 'center' });
+      doc
+        .fontSize(26)
+        .font('Helvetica-Bold')
+        .text(input.learnerName, { align: 'center' });
       doc.moveDown(0.5);
-      doc.fontSize(16).font('Helvetica').text('has successfully completed the course', { align: 'center' });
+      doc
+        .fontSize(16)
+        .font('Helvetica')
+        .text('has successfully completed the course', { align: 'center' });
       doc.moveDown(0.5);
-      doc.fontSize(22).font('Helvetica-Bold').text(input.courseName, { align: 'center' });
+      doc
+        .fontSize(22)
+        .font('Helvetica-Bold')
+        .text(input.courseName, { align: 'center' });
       doc.moveDown(1.5);
 
       // Date
@@ -81,12 +96,19 @@ export class CertificatePdfService {
         month: 'long',
         day: 'numeric',
       });
-      doc.fontSize(14).font('Helvetica').text(`Issued on: ${dateStr}`, { align: 'center' });
+      doc
+        .fontSize(14)
+        .font('Helvetica')
+        .text(`Issued on: ${dateStr}`, { align: 'center' });
       doc.moveDown(0.5);
 
       // Verification code
-      doc.fontSize(11).fillColor('#888888')
-        .text(`Verification Code: ${input.verificationCode}`, { align: 'center' });
+      doc
+        .fontSize(11)
+        .fillColor('#888888')
+        .text(`Verification Code: ${input.verificationCode}`, {
+          align: 'center',
+        });
 
       doc.end();
     });

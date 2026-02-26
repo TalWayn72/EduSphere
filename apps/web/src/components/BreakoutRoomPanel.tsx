@@ -63,13 +63,18 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
   const [, createRooms] = useMutation(CREATE_BREAKOUT_ROOMS_MUTATION);
 
   const existingRooms: BreakoutRoomData[] =
-    (roomsData as { breakoutRooms?: BreakoutRoomData[] } | undefined)?.breakoutRooms ?? [];
+    (roomsData as { breakoutRooms?: BreakoutRoomData[] } | undefined)
+      ?.breakoutRooms ?? [];
 
   const addRoom = () => {
     setRooms([...rooms, { roomName: '', capacity: 10, assignedUserIds: [] }]);
   };
 
-  const updateRoom = (idx: number, field: keyof RoomFormEntry, value: string | number) => {
+  const updateRoom = (
+    idx: number,
+    field: keyof RoomFormEntry,
+    value: string | number
+  ) => {
     const next = [...rooms];
     next[idx] = { ...next[idx], [field]: value } as RoomFormEntry;
     setRooms(next);
@@ -77,7 +82,10 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
 
   const handleCreate = async () => {
     const valid = rooms.filter((r) => r.roomName.trim().length > 0);
-    if (valid.length === 0) { setError('Enter at least one room name.'); return; }
+    if (valid.length === 0) {
+      setError('Enter at least one room name.');
+      return;
+    }
     setError(null);
     setCreating(true);
     try {
@@ -89,7 +97,10 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
           assignedUserIds: r.assignedUserIds,
         })),
       });
-      if (result.error) { setError(result.error.message); return; }
+      if (result.error) {
+        setError(result.error.message);
+        return;
+      }
       setRooms([{ roomName: '', capacity: 10, assignedUserIds: [] }]);
       refetchRooms({ requestPolicy: 'network-only' });
     } finally {
@@ -122,7 +133,9 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
                 min={2}
                 max={50}
                 value={room.capacity}
-                onChange={(e) => updateRoom(i, 'capacity', Number(e.target.value))}
+                onChange={(e) =>
+                  updateRoom(i, 'capacity', Number(e.target.value))
+                }
                 className="text-sm w-20"
                 aria-label="Capacity"
               />
@@ -130,10 +143,19 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
           ))}
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={addRoom} className="gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addRoom}
+              className="gap-1"
+            >
               <Plus className="h-3 w-3" /> Add Room
             </Button>
-            <Button size="sm" onClick={() => void handleCreate()} disabled={creating}>
+            <Button
+              size="sm"
+              onClick={() => void handleCreate()}
+              disabled={creating}
+            >
               {creating ? 'Creating...' : 'Create Rooms'}
             </Button>
           </div>
@@ -142,7 +164,9 @@ export function BreakoutRoomPanel({ sessionId }: BreakoutRoomPanelProps) {
         {/* Existing Rooms */}
         {existingRooms.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground">Active Rooms</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Active Rooms
+            </p>
             {existingRooms.map((room) => (
               <RoomRow key={room.id} room={room} />
             ))}

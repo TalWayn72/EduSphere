@@ -33,15 +33,18 @@ export function Layout({ children }: LayoutProps) {
   const user = getCurrentUser();
   const { t } = useTranslation('nav');
 
-  const navItems = useMemo(() => [
-    { to: '/learn/content-1', icon: BookOpen, label: t('learn') },
-    { to: '/courses',          icon: BookOpen, label: t('courses') },
-    { to: '/graph',            icon: Network,  label: t('graph') },
-    { to: '/annotations',      icon: FileText, label: t('annotations') },
-    { to: '/agents',           icon: Bot,      label: t('agents') },
-    { to: '/collaboration',    icon: Users,    label: t('chavruta') },
-    { to: '/dashboard',        icon: GitBranch, label: t('dashboard') },
-  ], [t]);
+  const navItems = useMemo(
+    () => [
+      { to: '/learn/content-1', icon: BookOpen, label: t('learn') },
+      { to: '/courses', icon: BookOpen, label: t('courses') },
+      { to: '/graph', icon: Network, label: t('graph') },
+      { to: '/annotations', icon: FileText, label: t('annotations') },
+      { to: '/agents', icon: Bot, label: t('agents') },
+      { to: '/collaboration', icon: Users, label: t('chavruta') },
+      { to: '/dashboard', icon: GitBranch, label: t('dashboard') },
+    ],
+    [t]
+  );
 
   // Global keyboard shortcut: Ctrl+K / Cmd+K → open search
   useEffect(() => {
@@ -87,7 +90,9 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <Icon className="h-4 w-4" />
                         <span>{label}</span>
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>
@@ -109,7 +114,9 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <BookOpen className="h-4 w-4" />
                         <span>{t('newCourse')}</span>
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>
@@ -122,7 +129,9 @@ export function Layout({ children }: LayoutProps) {
                     className={({ isActive }) =>
                       [
                         'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                        isActive ? 'bg-primary/10 text-primary' : 'text-primary hover:bg-primary/10',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-primary hover:bg-primary/10',
                       ].join(' ')
                     }
                   >
@@ -130,7 +139,9 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <LayoutDashboard className="h-4 w-4" />
                         <span>Admin Panel</span>
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>
@@ -142,7 +153,9 @@ export function Layout({ children }: LayoutProps) {
                     className={({ isActive }) =>
                       [
                         'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                        isActive ? 'bg-primary/10 text-primary' : 'text-primary hover:bg-primary/10',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-primary hover:bg-primary/10',
                       ].join(' ')
                     }
                   >
@@ -150,7 +163,9 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <Link2 className="h-4 w-4" />
                         <span>LTI 1.3</span>
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>
@@ -172,7 +187,9 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <ShieldCheck className="h-4 w-4" />
                         <span>Compliance</span>
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>
@@ -183,7 +200,9 @@ export function Layout({ children }: LayoutProps) {
                     className={({ isActive }) =>
                       [
                         'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                        isActive ? 'bg-primary/10 text-primary' : 'text-primary hover:bg-primary/10',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-primary hover:bg-primary/10',
                       ].join(' ')
                     }
                   >
@@ -191,7 +210,9 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <ShieldCheck className="h-4 w-4" />
                         <span>SCIM / HRIS</span>
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>
@@ -209,7 +230,9 @@ export function Layout({ children }: LayoutProps) {
               >
                 <Search className="h-3.5 w-3.5" />
                 <span>{t('search')}</span>
-                <kbd className="ml-auto text-xs bg-muted px-1.5 py-0.5 rounded border">⌘K</kbd>
+                <kbd className="ml-auto text-xs bg-muted px-1.5 py-0.5 rounded border">
+                  ⌘K
+                </kbd>
               </Button>
 
               {user ? (
@@ -228,7 +251,11 @@ export function Layout({ children }: LayoutProps) {
                 aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
                 onClick={() => setMobileMenuOpen((prev) => !prev)}
               >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </Button>
             </div>
           </div>

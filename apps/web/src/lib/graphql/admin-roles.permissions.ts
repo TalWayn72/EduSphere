@@ -102,44 +102,64 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ];
 
-export const ALL_PERMISSIONS = PERMISSION_GROUPS.flatMap(g =>
-  g.permissions.map(p => p.key),
+export const ALL_PERMISSIONS = PERMISSION_GROUPS.flatMap((g) =>
+  g.permissions.map((p) => p.key)
 );
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
   SUPER_ADMIN: ALL_PERMISSIONS,
-  ORG_ADMIN: ALL_PERMISSIONS.filter(p => p !== 'security:configure'),
+  ORG_ADMIN: ALL_PERMISSIONS.filter((p) => p !== 'security:configure'),
   INSTRUCTOR: [
-    'courses:view', 'courses:create', 'courses:edit', 'courses:publish',
-    'enrollments:view', 'analytics:view',
-    'assessments:view', 'assessments:create', 'assessments:grade',
+    'courses:view',
+    'courses:create',
+    'courses:edit',
+    'courses:publish',
+    'enrollments:view',
+    'analytics:view',
+    'assessments:view',
+    'assessments:create',
+    'assessments:grade',
   ],
-  STUDENT: ['courses:view', 'enrollments:view', 'knowledge:view', 'social:view'],
+  STUDENT: [
+    'courses:view',
+    'enrollments:view',
+    'knowledge:view',
+    'social:view',
+  ],
 };
 
 export const SYSTEM_ROLES: RoleRecord[] = [
   {
-    id: 'system-super-admin', name: 'SUPER_ADMIN',
+    id: 'system-super-admin',
+    name: 'SUPER_ADMIN',
     description: 'Full platform access — all permissions, all tenants.',
-    isSystem: true, userCount: 2,
+    isSystem: true,
+    userCount: 2,
     permissions: DEFAULT_ROLE_PERMISSIONS['SUPER_ADMIN'] ?? [],
   },
   {
-    id: 'system-org-admin', name: 'ORG_ADMIN',
-    description: 'Organisation administrator with full tenant management access.',
-    isSystem: true, userCount: 14,
+    id: 'system-org-admin',
+    name: 'ORG_ADMIN',
+    description:
+      'Organisation administrator with full tenant management access.',
+    isSystem: true,
+    userCount: 14,
     permissions: DEFAULT_ROLE_PERMISSIONS['ORG_ADMIN'] ?? [],
   },
   {
-    id: 'system-instructor', name: 'INSTRUCTOR',
+    id: 'system-instructor',
+    name: 'INSTRUCTOR',
     description: 'Content creator and course facilitator.',
-    isSystem: true, userCount: 87,
+    isSystem: true,
+    userCount: 87,
     permissions: DEFAULT_ROLE_PERMISSIONS['INSTRUCTOR'] ?? [],
   },
   {
-    id: 'system-student', name: 'STUDENT',
+    id: 'system-student',
+    name: 'STUDENT',
     description: 'Learner with access to enrolled content.',
-    isSystem: true, userCount: 4312,
+    isSystem: true,
+    userCount: 4312,
     permissions: DEFAULT_ROLE_PERMISSIONS['STUDENT'] ?? [],
   },
 ];

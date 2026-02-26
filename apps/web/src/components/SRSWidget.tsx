@@ -43,11 +43,15 @@ export function SRSWidget() {
     pause: mode !== 'reviewing',
   });
 
-  const [, createCard] = useMutation<CreateCardResult>(CREATE_REVIEW_CARD_MUTATION);
+  const [, createCard] = useMutation<CreateCardResult>(
+    CREATE_REVIEW_CARD_MUTATION
+  );
 
   // Pause subscription on unmount to avoid dangling requests
   useEffect(() => {
-    return () => { pauseRef.current = true; };
+    return () => {
+      pauseRef.current = true;
+    };
   }, []);
 
   const queueCount = countResult.data?.srsQueueCount ?? 0;
@@ -76,10 +80,7 @@ export function SRSWidget() {
       </CardHeader>
       <CardContent>
         {mode === 'reviewing' ? (
-          <SRSReviewSession
-            cards={cards}
-            onComplete={handleReviewComplete}
-          />
+          <SRSReviewSession cards={cards} onComplete={handleReviewComplete} />
         ) : (
           <div className="space-y-3">
             <div>
@@ -87,7 +88,9 @@ export function SRSWidget() {
                 {loading ? '...' : queueCount}
               </div>
               <p className="text-xs text-muted-foreground">
-                {queueCount === 1 ? 'card due for review' : 'cards due for review'}
+                {queueCount === 1
+                  ? 'card due for review'
+                  : 'cards due for review'}
               </p>
             </div>
 

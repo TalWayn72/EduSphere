@@ -62,7 +62,9 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     page,
   }) => {
     // Fill only 2 characters — below the 3-char minimum
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('AB');
     await page.waitForTimeout(200);
 
@@ -73,7 +75,9 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
   test('title field: 3 chars — Next button becomes enabled', async ({
     page,
   }) => {
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('ABC');
     await page.waitForTimeout(200);
 
@@ -84,15 +88,19 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
   test('title field: valid title enables Next and does not show error message', async ({
     page,
   }) => {
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('Introduction to Talmud');
     await page.waitForTimeout(200);
 
     // No error message should appear while value is valid
     const errorMsg = page.getByText(/at least 3 characters/i);
-    await expect(errorMsg).not.toBeVisible({ timeout: 2_000 }).catch(() => {
-      // Error may have briefly appeared during typing — ignore timing edge case
-    });
+    await expect(errorMsg)
+      .not.toBeVisible({ timeout: 2_000 })
+      .catch(() => {
+        // Error may have briefly appeared during typing — ignore timing edge case
+      });
 
     const nextBtn = page.getByRole('button', { name: /next/i });
     await expect(nextBtn).toBeEnabled();
@@ -102,7 +110,9 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     page,
   }) => {
     // mode: 'onTouched' — error fires on blur after a touch
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('A');
     // Tab away to trigger blur
     await titleInput.press('Tab');
@@ -137,9 +147,9 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     await page.waitForTimeout(300);
 
     // Zod message: "Description must be at least 10 characters"
-    await expect(
-      page.getByText(/at least 10 characters/i)
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/at least 10 characters/i)).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('description field: empty string is accepted (allowed by schema)', async ({
@@ -152,9 +162,9 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     await page.waitForTimeout(300);
 
     // No error for empty description (z.string().min(10).or(z.literal('')))
-    await expect(
-      page.getByText(/at least 10 characters/i)
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(/at least 10 characters/i)).not.toBeVisible({
+      timeout: 2_000,
+    });
   });
 
   // ── Difficulty selector ─────────────────────────────────────────────────────
@@ -175,15 +185,15 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     await trigger.click();
 
     // Radix SelectContent renders options with role="option"
-    await expect(
-      page.getByRole('option', { name: /Beginner/i })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('option', { name: /Beginner/i })).toBeVisible({
+      timeout: 3_000,
+    });
     await expect(
       page.getByRole('option', { name: /Intermediate/i })
     ).toBeVisible({ timeout: 3_000 });
-    await expect(
-      page.getByRole('option', { name: /Advanced/i })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('option', { name: /Advanced/i })).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('difficulty selector: selecting INTERMEDIATE updates displayed value', async ({
@@ -192,7 +202,9 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     const trigger = page.getByRole('combobox').first();
     await trigger.click();
 
-    const intermediateOption = page.getByRole('option', { name: /Intermediate/i });
+    const intermediateOption = page.getByRole('option', {
+      name: /Intermediate/i,
+    });
     await intermediateOption.click();
 
     // After selection the trigger should display the selected label
@@ -262,12 +274,17 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     page,
   }) => {
     // Click the graduation cap emoji
-    const graduationBtn = page.locator('button[type="button"]').filter({ hasText: '🎓' }).first();
+    const graduationBtn = page
+      .locator('button[type="button"]')
+      .filter({ hasText: '🎓' })
+      .first();
     await expect(graduationBtn).toBeVisible({ timeout: 5_000 });
     await graduationBtn.click();
 
     // After selection the button gets ring-2 ring-primary class (active state)
-    await expect(graduationBtn).toHaveClass(/border-primary/, { timeout: 2_000 });
+    await expect(graduationBtn).toHaveClass(/border-primary/, {
+      timeout: 2_000,
+    });
   });
 
   // ── Next button flow ─────────────────────────────────────────────────────────
@@ -275,7 +292,9 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
   test('filling a valid title and clicking Next advances to Step 2', async ({
     page,
   }) => {
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('Valid Course Title');
     await page.waitForTimeout(200);
 
@@ -286,7 +305,10 @@ test.describe('Course Creation Wizard — Step 1 (Course Info)', () => {
     // Step 2: modules — heading changes or module-related content appears
     // The step indicator advances; step number 2 should now be active
     await expect(
-      page.getByText(/module/i).or(page.getByText(/Add Module/i)).first()
+      page
+        .getByText(/module/i)
+        .or(page.getByText(/Add Module/i))
+        .first()
     ).toBeVisible({ timeout: 5_000 });
   });
 });
@@ -302,7 +324,9 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
     await page.waitForLoadState('networkidle');
 
     // Fill step 1 and advance to step 2
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('Valid Course Title');
     await page.waitForTimeout(200);
     const nextBtn = page.getByRole('button', { name: /next/i });
@@ -310,11 +334,13 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
     await page.waitForTimeout(300);
   });
 
-  test('step 2 shows empty-modules placeholder by default', async ({ page }) => {
+  test('step 2 shows empty-modules placeholder by default', async ({
+    page,
+  }) => {
     // CourseWizardStep2: "No modules yet" message inside the dashed border
-    await expect(
-      page.getByText(/no modules yet/i)
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/no modules yet/i)).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('Add Module button is disabled when title input is empty', async ({
@@ -329,9 +355,10 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
   test('typing a module title enables the Add Module button', async ({
     page,
   }) => {
-    const moduleTitleInput = page.locator('input#module-title').or(
-      page.locator('input[placeholder*="module title"]')
-    ).first();
+    const moduleTitleInput = page
+      .locator('input#module-title')
+      .or(page.locator('input[placeholder*="module title"]'))
+      .first();
 
     await moduleTitleInput.fill('Module 1: Introduction');
     await page.waitForTimeout(200);
@@ -343,9 +370,10 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
   test('clicking Add Module creates a new module card in the list', async ({
     page,
   }) => {
-    const moduleTitleInput = page.locator('input#module-title').or(
-      page.locator('input[placeholder*="module title"]')
-    ).first();
+    const moduleTitleInput = page
+      .locator('input#module-title')
+      .or(page.locator('input[placeholder*="module title"]'))
+      .first();
 
     await moduleTitleInput.fill('Module One');
     const addBtn = page.getByRole('button', { name: /add module/i }).first();
@@ -358,59 +386,73 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
   test('adding a module hides the empty-modules placeholder', async ({
     page,
   }) => {
-    const moduleTitleInput = page.locator('input#module-title').or(
-      page.locator('input[placeholder*="module title"]')
-    ).first();
+    const moduleTitleInput = page
+      .locator('input#module-title')
+      .or(page.locator('input[placeholder*="module title"]'))
+      .first();
 
     await moduleTitleInput.fill('First Module');
-    await page.getByRole('button', { name: /add module/i }).first().click();
+    await page
+      .getByRole('button', { name: /add module/i })
+      .first()
+      .click();
 
-    await expect(
-      page.getByText(/no modules yet/i)
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/no modules yet/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('pressing Enter in the module title input also adds the module', async ({
     page,
   }) => {
-    const moduleTitleInput = page.locator('input#module-title').or(
-      page.locator('input[placeholder*="module title"]')
-    ).first();
+    const moduleTitleInput = page
+      .locator('input#module-title')
+      .or(page.locator('input[placeholder*="module title"]'))
+      .first();
 
     await moduleTitleInput.fill('Enter-added Module');
     await moduleTitleInput.press('Enter');
 
-    await expect(
-      page.getByText('Enter-added Module')
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Enter-added Module')).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('Remove module button deletes the module from the list', async ({
     page,
   }) => {
-    const moduleTitleInput = page.locator('input#module-title').or(
-      page.locator('input[placeholder*="module title"]')
-    ).first();
+    const moduleTitleInput = page
+      .locator('input#module-title')
+      .or(page.locator('input[placeholder*="module title"]'))
+      .first();
 
     await moduleTitleInput.fill('Temporary Module');
-    await page.getByRole('button', { name: /add module/i }).first().click();
-    await expect(page.getByText('Temporary Module')).toBeVisible({ timeout: 3_000 });
+    await page
+      .getByRole('button', { name: /add module/i })
+      .first()
+      .click();
+    await expect(page.getByText('Temporary Module')).toBeVisible({
+      timeout: 3_000,
+    });
 
     // Remove button has aria-label="Remove module"
-    const removeBtn = page.getByRole('button', { name: /remove module/i }).first();
+    const removeBtn = page
+      .getByRole('button', { name: /remove module/i })
+      .first();
     await removeBtn.click();
 
-    await expect(
-      page.getByText('Temporary Module')
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Temporary Module')).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('module description textarea is optional and accepts text', async ({
     page,
   }) => {
-    const moduleTitleInput = page.locator('input#module-title').or(
-      page.locator('input[placeholder*="module title"]')
-    ).first();
+    const moduleTitleInput = page
+      .locator('input#module-title')
+      .or(page.locator('input[placeholder*="module title"]'))
+      .first();
     const moduleDescInput = page
       .locator('textarea#module-desc')
       .or(page.locator('textarea[placeholder*="description"]'))
@@ -418,17 +460,23 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
 
     await moduleTitleInput.fill('Module With Desc');
     await moduleDescInput.fill('A detailed description of this module.');
-    await page.getByRole('button', { name: /add module/i }).first().click();
+    await page
+      .getByRole('button', { name: /add module/i })
+      .first()
+      .click();
 
-    await expect(page.getByText('Module With Desc')).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Module With Desc')).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('adding multiple modules shows them all in the list', async ({
     page,
   }) => {
-    const moduleTitleInput = page.locator('input#module-title').or(
-      page.locator('input[placeholder*="module title"]')
-    ).first();
+    const moduleTitleInput = page
+      .locator('input#module-title')
+      .or(page.locator('input[placeholder*="module title"]'))
+      .first();
     const addBtn = page.getByRole('button', { name: /add module/i }).first();
 
     for (const title of ['Module Alpha', 'Module Beta', 'Module Gamma']) {
@@ -437,9 +485,13 @@ test.describe('Course Creation Wizard — Step 2 (Modules)', () => {
       await page.waitForTimeout(100);
     }
 
-    await expect(page.getByText('Module Alpha')).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Module Alpha')).toBeVisible({
+      timeout: 3_000,
+    });
     await expect(page.getByText('Module Beta')).toBeVisible({ timeout: 3_000 });
-    await expect(page.getByText('Module Gamma')).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Module Gamma')).toBeVisible({
+      timeout: 3_000,
+    });
   });
 });
 
@@ -454,7 +506,9 @@ test.describe('Course Creation Wizard — Step 4 (Publish / Review)', () => {
     await page.waitForLoadState('networkidle');
 
     // Navigate through steps 1 → 2 → 3 → 4
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('A Valid Course Title');
     await page.waitForTimeout(200);
     await page.getByRole('button', { name: /next/i }).click();
@@ -481,9 +535,9 @@ test.describe('Course Creation Wizard — Step 4 (Publish / Review)', () => {
     page,
   }) => {
     // CourseWizardStep3 renders a Card with the title — h3 text
-    await expect(
-      page.getByText('A Valid Course Title')
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('A Valid Course Title')).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('Back to Media button on step 4 navigates back to step 3', async ({
@@ -512,11 +566,10 @@ test.describe('Search form — input behaviour and validation', () => {
   });
 
   test('search input is auto-focused on page load', async ({ page }) => {
-    const input = page.locator(
-      'input[placeholder*="Search courses"]',
-    ).or(
-      page.locator('input[placeholder*="earch"]')
-    ).first();
+    const input = page
+      .locator('input[placeholder*="Search courses"]')
+      .or(page.locator('input[placeholder*="earch"]'))
+      .first();
 
     await expect(input).toBeVisible({ timeout: 5_000 });
     const focused = await input.evaluate((el) => document.activeElement === el);
@@ -538,17 +591,18 @@ test.describe('Search form — input behaviour and validation', () => {
   test('typing less than 2 chars does not trigger search — empty state persists', async ({
     page,
   }) => {
-    const input = page.locator('input').filter({
-      hasText: '',
-    }).first();
+    const input = page
+      .locator('input')
+      .filter({
+        hasText: '',
+      })
+      .first();
 
     await input.fill('T');
     await page.waitForTimeout(500);
 
     // Result count label only renders when query.length >= 2
-    await expect(
-      page.getByText(/result/i)
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(/result/i)).not.toBeVisible({ timeout: 2_000 });
   });
 
   test('typing 2 chars triggers debounced search and shows results', async ({
@@ -580,16 +634,21 @@ test.describe('Search form — input behaviour and validation', () => {
     await page.waitForTimeout(500);
 
     // Empty state should return
-    await expect(
-      page.getByRole('button', { name: 'Talmud' })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('button', { name: 'Talmud' })).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('special characters in search do not crash the page', async ({
     page,
   }) => {
     const input = page.locator('input[placeholder*="earch"]').first();
-    const specialChars = ['<script>alert(1)</script>', '"; DROP TABLE', "foo'bar", '{{injection}}'];
+    const specialChars = [
+      '<script>alert(1)</script>',
+      '"; DROP TABLE',
+      "foo'bar",
+      '{{injection}}',
+    ];
 
     for (const chars of specialChars) {
       await input.fill(chars);
@@ -661,9 +720,10 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     await addBtn.click();
 
     // Textarea with annotation placeholder should appear
-    const textarea = page.locator('textarea[placeholder*="annotation"]').or(
-      page.locator('textarea[placeholder*="note"]')
-    ).first();
+    const textarea = page
+      .locator('textarea[placeholder*="annotation"]')
+      .or(page.locator('textarea[placeholder*="note"]'))
+      .first();
     await expect(textarea).toBeVisible({ timeout: 3_000 });
   });
 
@@ -686,9 +746,10 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     const addBtn = page.getByRole('button', { name: /^Add$/i });
     await addBtn.click();
 
-    const textarea = page.locator('textarea[placeholder*="annotation"]').or(
-      page.locator('textarea[placeholder*="note"]')
-    ).first();
+    const textarea = page
+      .locator('textarea[placeholder*="annotation"]')
+      .or(page.locator('textarea[placeholder*="note"]'))
+      .first();
     await textarea.fill('My test annotation');
 
     const saveBtn = page.getByRole('button', { name: /Save @/i });
@@ -701,9 +762,10 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     const addBtn = page.getByRole('button', { name: /^Add$/i });
     await addBtn.click();
 
-    const textarea = page.locator('textarea[placeholder*="annotation"]').or(
-      page.locator('textarea[placeholder*="note"]')
-    ).first();
+    const textarea = page
+      .locator('textarea[placeholder*="annotation"]')
+      .or(page.locator('textarea[placeholder*="note"]'))
+      .first();
     await textarea.fill('X');
 
     const saveBtn = page.getByRole('button', { name: /Save @/i });
@@ -716,9 +778,10 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     const addBtn = page.getByRole('button', { name: /^Add$/i });
     await addBtn.click();
 
-    const textarea = page.locator('textarea[placeholder*="annotation"]').or(
-      page.locator('textarea[placeholder*="note"]')
-    ).first();
+    const textarea = page
+      .locator('textarea[placeholder*="annotation"]')
+      .or(page.locator('textarea[placeholder*="note"]'))
+      .first();
     await textarea.fill('Will be cancelled');
 
     const cancelBtn = page.getByRole('button', { name: /cancel/i }).last();
@@ -727,9 +790,9 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     // Form should collapse
     await expect(textarea).not.toBeVisible({ timeout: 3_000 });
     // The annotation text should NOT appear in the list
-    await expect(
-      page.getByText('Will be cancelled')
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText('Will be cancelled')).not.toBeVisible({
+      timeout: 2_000,
+    });
   });
 
   test('annotation form: submitting valid text adds annotation to the list', async ({
@@ -738,9 +801,10 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     const addBtn = page.getByRole('button', { name: /^Add$/i });
     await addBtn.click();
 
-    const textarea = page.locator('textarea[placeholder*="annotation"]').or(
-      page.locator('textarea[placeholder*="note"]')
-    ).first();
+    const textarea = page
+      .locator('textarea[placeholder*="annotation"]')
+      .or(page.locator('textarea[placeholder*="note"]'))
+      .first();
     const uniqueText = `E2E annotation ${Date.now()}`;
     await textarea.fill(uniqueText);
 
@@ -751,9 +815,7 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     await expect(textarea).not.toBeVisible({ timeout: 3_000 });
 
     // Annotation text appears in the list
-    await expect(
-      page.getByText(uniqueText)
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(uniqueText)).toBeVisible({ timeout: 5_000 });
   });
 
   test('annotation layer selector: PERSONAL, SHARED, INSTRUCTOR, AI layer buttons visible', async ({
@@ -764,13 +826,17 @@ test.describe('Annotation creation form — /learn/content-1', () => {
 
     // Layer buttons rendered inside the inline form — label text comes from LAYER_META
     // Use .first() to avoid strict-mode violation: the LayerToggleBar also shows these labels
-    await expect(page.getByText('Personal').first()).toBeVisible({ timeout: 3_000 });
-    await expect(page.getByText('Shared').first()).toBeVisible({ timeout: 3_000 });
-    await expect(page.getByText('Instructor').first()).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Personal').first()).toBeVisible({
+      timeout: 3_000,
+    });
+    await expect(page.getByText('Shared').first()).toBeVisible({
+      timeout: 3_000,
+    });
+    await expect(page.getByText('Instructor').first()).toBeVisible({
+      timeout: 3_000,
+    });
     // AI layer label is 'AI' in LAYER_META
-    await expect(
-      page.getByText('AI').first()
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('AI').first()).toBeVisible({ timeout: 3_000 });
   });
 
   test('annotation layer selector: clicking Shared selects it (ring visible)', async ({
@@ -781,7 +847,10 @@ test.describe('Annotation creation form — /learn/content-1', () => {
 
     // Each layer is rendered as a <button> in the inline form — use .last() to select
     // the inline form button (LayerToggleBar buttons appear first in the DOM)
-    const sharedBtn = page.locator('button').filter({ hasText: /^Shared$/ }).last();
+    const sharedBtn = page
+      .locator('button')
+      .filter({ hasText: /^Shared$/ })
+      .last();
     await expect(sharedBtn).toBeVisible({ timeout: 3_000 });
     await sharedBtn.click();
 
@@ -802,9 +871,9 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     await expect(
       page.getByRole('button', { name: /Instructor annotations/i }).first()
     ).toBeVisible({ timeout: 5_000 });
-    await expect(
-      page.getByRole('button', { name: /AI/i }).first()
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('button', { name: /AI/i }).first()).toBeVisible(
+      { timeout: 5_000 }
+    );
   });
 
   test('layer toggle: deactivating a layer and re-activating does not crash', async ({
@@ -840,16 +909,16 @@ test.describe('Settings page — Language selector form', () => {
 
   test('settings page loads with the page heading', async ({ page }) => {
     // SettingsPage renders <h1> with t('title') — "Settings" in English
-    await expect(
-      page.getByRole('heading', { level: 1 })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('language selector card is visible', async ({ page }) => {
     // Card contains a CardTitle for the language section
-    await expect(
-      page.getByText(/language/i).first()
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/language/i).first()).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('language selector trigger (combobox) is present and enabled', async ({
@@ -869,9 +938,9 @@ test.describe('Settings page — Language selector form', () => {
 
     // SUPPORTED_LOCALES includes at least English (en) — rendered as SelectItem
     // Each item has native label: "English", "עברית", "Français", etc.
-    await expect(
-      page.getByRole('option', { name: /English/i })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('option', { name: /English/i })).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('selecting a different locale does not crash the page', async ({
@@ -897,9 +966,11 @@ test.describe('Settings page — Language selector form', () => {
   }) => {
     // The LanguageSelector component on the settings page has aria-label from t('language.title')
     // It is inside a Card — use the Card's containing element
-    const card = page.locator('[data-slot="card"]').or(
-      page.locator('.rounded-xl').or(page.locator('.rounded-lg'))
-    ).filter({ hasText: /language/i }).first();
+    const card = page
+      .locator('[data-slot="card"]')
+      .or(page.locator('.rounded-xl').or(page.locator('.rounded-lg')))
+      .filter({ hasText: /language/i })
+      .first();
 
     await expect(card).toBeVisible({ timeout: 5_000 });
 

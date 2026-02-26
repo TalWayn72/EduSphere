@@ -44,39 +44,56 @@ export class SocialRecommendationsService implements OnModuleDestroy {
   async getRecommendations(
     userId: string,
     tenantId: string,
-    limit = 10,
+    limit = 10
   ): Promise<SocialRecommendation[]> {
     const ctx = { tenantId, userId, userRole: toUserRole('STUDENT') };
 
     const followedIds = await this.getFollowedUserIds(userId, tenantId, ctx);
     if (followedIds.length === 0) return [];
 
-    const mutualIds = await this.getMutualFollowerIds(userId, tenantId, followedIds, ctx);
+    const mutualIds = await this.getMutualFollowerIds(
+      userId,
+      tenantId,
+      followedIds,
+      ctx
+    );
     const mutualSet = new Set(mutualIds);
 
-    const completedIds = await this.getCompletedContentIds(userId, tenantId, ctx);
+    const completedIds = await this.getCompletedContentIds(
+      userId,
+      tenantId,
+      ctx
+    );
 
     const cutoff = new Date(Date.now() - THIRTY_DAYS_MS);
-    const activityRows = await this.getFollowedActivity(followedIds, tenantId, cutoff, ctx);
+    const activityRows = await this.getFollowedActivity(
+      followedIds,
+      tenantId,
+      cutoff,
+      ctx
+    );
 
     const aggregated = this.aggregateActivity(
       activityRows,
       completedIds,
-      mutualSet,
+      mutualSet
     );
 
     const ranked = aggregated
       .sort((a, b) => b.weight - a.weight)
       .slice(0, limit);
 
-    this.logger.debug({ userId, followedCount: followedIds.length, ranked: ranked.length }, 'socialRecommendations computed');
+    this.logger.debug(
+      { userId, followedCount: followedIds.length, ranked: ranked.length },
+      'socialRecommendations computed'
+    );
     return ranked;
   }
 
   async getSocialFeed(
     userId: string,
     tenantId: string,
-    limit = 20,
+    limit = 20
   ): Promise<SocialFeedItem[]> {
     const ctx = { tenantId, userId, userRole: toUserRole('STUDENT') };
     const followedIds = await this.getFollowedUserIds(userId, tenantId, ctx);
@@ -117,7 +134,11 @@ export class SocialRecommendationsService implements OnModuleDestroy {
     return rows.map((r) => ({
       userId: r.user_id,
       userDisplayName: r.display_name,
-      action: r.is_completed ? 'completed' : r.progress > 0 ? 'progressed' : 'started',
+      action: r.is_completed
+        ? 'completed'
+        : r.progress > 0
+          ? 'progressed'
+          : 'started',
       contentItemId: r.content_item_id,
       contentTitle: r.content_title,
       timestamp: new Date(r.last_accessed_at),
@@ -126,40 +147,90 @@ export class SocialRecommendationsService implements OnModuleDestroy {
 
   onModuleDestroy(): void {
     closeAllPools().catch((err) =>
-      this.logger.error({ err }, 'closeAllPools error on destroy'),
+      this.logger.error({ err }, 'closeAllPools error on destroy')
     );
   }
 
-  private async getFollowedUserIds(userId: string, tenantId: string, ctx: Parameters<typeof withTenantContext>[1]): Promise<string[]> {
+  private async getFollowedUserIds(
+    userId: string,
+    tenantId: string,
+    ctx: Parameters<typeof withTenantContext>[1]
+  ): Promise<string[]> {
     const follows = await withTenantContext(db, ctx, async (tx) =>
-      tx.select({ followingId: userFollows.followingId })
+      tx
+        .select({ followingId: userFollows.followingId })
         .from(userFollows)
-        .where(and(eq(userFollows.followerId, userId), eq(userFollows.tenantId, tenantId))),
+        .where(
+          and(
+            eq(userFollows.followerId, userId),
+            eq(userFollows.tenantId, tenantId)
+          )
+        )
     );
     return follows.map((f) => f.followingId);
   }
 
-  private async getMutualFollowerIds(userId: string, tenantId: string, followedIds: string[], ctx: Parameters<typeof withTenantContext>[1]): Promise<string[]> {
+  private async getMutualFollowerIds(
+    userId: string,
+    tenantId: string,
+    followedIds: string[],
+    ctx: Parameters<typeof withTenantContext>[1]
+  ): Promise<string[]> {
     const myFollowers = await withTenantContext(db, ctx, async (tx) =>
-      tx.select({ followerId: userFollows.followerId })
+      tx
+        .select({ followerId: userFollows.followerId })
         .from(userFollows)
-        .where(and(eq(userFollows.followingId, userId), eq(userFollows.tenantId, tenantId))),
+        .where(
+          and(
+            eq(userFollows.followingId, userId),
+            eq(userFollows.tenantId, tenantId)
+          )
+        )
     );
     const followerSet = new Set(myFollowers.map((f) => f.followerId));
     return followedIds.filter((id) => followerSet.has(id));
   }
 
-  private async getCompletedContentIds(userId: string, tenantId: string, ctx: Parameters<typeof withTenantContext>[1]): Promise<Set<string>> {
+  private async getCompletedContentIds(
+    userId: string,
+    tenantId: string,
+    ctx: Parameters<typeof withTenantContext>[1]
+  ): Promise<Set<string>> {
     const rows = await withTenantContext(db, ctx, async (tx) =>
-      tx.select({ contentItemId: userProgress.contentItemId })
+      tx
+        .select({ contentItemId: userProgress.contentItemId })
         .from(userProgress)
-        .where(and(eq(userProgress.userId, userId), eq(userProgress.isCompleted, true))),
+        .where(
+          and(
+            eq(userProgress.userId, userId),
+            eq(userProgress.isCompleted, true)
+          )
+        )
     );
     return new Set(rows.map((r) => r.contentItemId));
   }
 
-  private async getFollowedActivity(followedIds: string[], _tenantId: string, cutoff: Date, ctx: Parameters<typeof withTenantContext>[1]): Promise<{ contentItemId: string; contentTitle: string; userId: string; lastAccessedAt: Date; isCompleted: boolean }[]> {
-    type ActivityRow = { content_item_id: string; content_title: string; user_id: string; last_accessed_at: Date; is_completed: boolean };
+  private async getFollowedActivity(
+    followedIds: string[],
+    _tenantId: string,
+    cutoff: Date,
+    ctx: Parameters<typeof withTenantContext>[1]
+  ): Promise<
+    {
+      contentItemId: string;
+      contentTitle: string;
+      userId: string;
+      lastAccessedAt: Date;
+      isCompleted: boolean;
+    }[]
+  > {
+    type ActivityRow = {
+      content_item_id: string;
+      content_title: string;
+      user_id: string;
+      last_accessed_at: Date;
+      is_completed: boolean;
+    };
     const rows = await withTenantContext(db, ctx, async (tx) => {
       const result = await tx.execute(sql`
         SELECT up.content_item_id, ci.title AS content_title, up.user_id, up.last_accessed_at, up.is_completed
@@ -181,9 +252,14 @@ export class SocialRecommendationsService implements OnModuleDestroy {
   }
 
   private aggregateActivity(
-    rows: { contentItemId: string; contentTitle: string; userId: string; lastAccessedAt: Date }[],
+    rows: {
+      contentItemId: string;
+      contentTitle: string;
+      userId: string;
+      lastAccessedAt: Date;
+    }[],
     completedIds: Set<string>,
-    mutualSet: Set<string>,
+    mutualSet: Set<string>
   ): SocialRecommendation[] {
     const map = new Map<string, SocialRecommendation>();
     for (const row of rows) {
@@ -203,7 +279,8 @@ export class SocialRecommendationsService implements OnModuleDestroy {
         existing.followersCount += 1;
         existing.weight += isMutual ? MUTUAL_WEIGHT_MULTIPLIER : 1;
         if (isMutual) existing.isMutualFollower = true;
-        if (row.lastAccessedAt > existing.lastActivity) existing.lastActivity = row.lastAccessedAt;
+        if (row.lastAccessedAt > existing.lastActivity)
+          existing.lastActivity = row.lastAccessedAt;
       }
     }
     return Array.from(map.values());

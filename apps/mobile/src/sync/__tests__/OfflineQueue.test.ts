@@ -12,12 +12,33 @@ const mockDb = {
   execSync: vi.fn(),
   runSync: vi.fn((sql: string, params?: unknown[]) => {
     if (sql.startsWith('INSERT') && sql.includes('offline_queue')) {
-      const [id, opName, query, variables, tenantId, userId, createdAt] = params as string[];
-      queueRows.push({ id, operation_name: opName, query, variables, tenant_id: tenantId, user_id: userId, created_at: Number(createdAt), retry_count: 0 });
+      const [id, opName, query, variables, tenantId, userId, createdAt] =
+        params as string[];
+      queueRows.push({
+        id,
+        operation_name: opName,
+        query,
+        variables,
+        tenant_id: tenantId,
+        user_id: userId,
+        created_at: Number(createdAt),
+        retry_count: 0,
+      });
     } else if (sql.startsWith('INSERT') && sql.includes('offline_conflicts')) {
-      const [id, opName, failedAt, retryCount, errorReason] = params as unknown[];
-      conflictRows.push({ id, operation_name: opName, failed_at: failedAt, retry_count: retryCount, error_reason: errorReason });
-    } else if (sql.startsWith('DELETE') && sql.includes('offline_queue') && params?.length) {
+      const [id, opName, failedAt, retryCount, errorReason] =
+        params as unknown[];
+      conflictRows.push({
+        id,
+        operation_name: opName,
+        failed_at: failedAt,
+        retry_count: retryCount,
+        error_reason: errorReason,
+      });
+    } else if (
+      sql.startsWith('DELETE') &&
+      sql.includes('offline_queue') &&
+      params?.length
+    ) {
       // dequeue — DELETE with id param
       const id = (params as string[])[0];
       const idx = queueRows.findIndex((r) => (r as { id: string }).id === id);
@@ -25,13 +46,21 @@ const mockDb = {
     } else if (sql.startsWith('DELETE') && sql.includes('offline_queue')) {
       // clearAll — no params
       queueRows.length = 0;
-    } else if (sql.startsWith('DELETE') && sql.includes('offline_conflicts') && params?.length) {
+    } else if (
+      sql.startsWith('DELETE') &&
+      sql.includes('offline_conflicts') &&
+      params?.length
+    ) {
       const id = (params as string[])[0];
-      const idx = conflictRows.findIndex((r) => (r as { id: string }).id === id);
+      const idx = conflictRows.findIndex(
+        (r) => (r as { id: string }).id === id
+      );
       if (idx !== -1) conflictRows.splice(idx, 1);
     } else if (sql.startsWith('UPDATE')) {
       const id = (params as string[])[0];
-      const row = queueRows.find((r) => (r as { id: string }).id === id) as { retry_count: number } | undefined;
+      const row = queueRows.find((r) => (r as { id: string }).id === id) as
+        | { retry_count: number }
+        | undefined;
       if (row) row.retry_count += 1;
     }
   }),
@@ -42,12 +71,18 @@ const mockDb = {
   getAllSync: vi.fn((sql: string, params?: unknown[]) => {
     if (sql.includes('offline_conflicts')) {
       return [...conflictRows].sort(
-        (a, b) => (b as { failed_at: number }).failed_at - (a as { failed_at: number }).failed_at,
+        (a, b) =>
+          (b as { failed_at: number }).failed_at -
+          (a as { failed_at: number }).failed_at
       );
     }
     const limit = (params as number[])?.[0] ?? 10;
     return [...queueRows]
-      .sort((a, b) => (a as { created_at: number }).created_at - (b as { created_at: number }).created_at)
+      .sort(
+        (a, b) =>
+          (a as { created_at: number }).created_at -
+          (b as { created_at: number }).created_at
+      )
       .slice(0, limit);
   }),
   closeSync: vi.fn(),
@@ -58,8 +93,16 @@ vi.mock('expo-sqlite', () => ({
 }));
 
 import {
-  enqueue, dequeue, peek, incrementRetry, queueSize, clearAll,
-  addConflict, getConflicts, resolveConflict, conflictCount,
+  enqueue,
+  dequeue,
+  peek,
+  incrementRetry,
+  queueSize,
+  clearAll,
+  addConflict,
+  getConflicts,
+  resolveConflict,
+  conflictCount,
   type QueuedMutation,
 } from '../OfflineQueue';
 

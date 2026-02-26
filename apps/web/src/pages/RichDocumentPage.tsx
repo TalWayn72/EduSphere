@@ -2,7 +2,11 @@ import { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from '@/components/ui/resizable';
 import { AnnotatedDocumentViewer } from '@/components/annotation/AnnotatedDocumentViewer';
 import { WordCommentPanel } from '@/components/annotation/WordCommentPanel';
 import { SelectionCommentButton } from '@/components/annotation/SelectionCommentButton';
@@ -31,7 +35,12 @@ interface SelectionPosition {
 }
 
 function SkeletonBlock() {
-  return <div className="bg-muted animate-pulse rounded h-4 w-full" aria-hidden="true" />;
+  return (
+    <div
+      className="bg-muted animate-pulse rounded h-4 w-full"
+      aria-hidden="true"
+    />
+  );
 }
 
 export function RichDocumentPage() {
@@ -53,11 +62,20 @@ export function RichDocumentPage() {
     error: annotationsError,
   } = useDocumentAnnotations(contentId);
 
-  const { annotationPanelWidth, documentZoom, setDocumentZoom } = useDocumentUIStore();
+  const {
+    annotationPanelWidth,
+    documentZoom,
+    setDocumentZoom,
+    defaultAnnotationLayer,
+    setDefaultAnnotationLayer,
+  } = useDocumentUIStore();
 
   // Text-selection state
-  const [selectionPosition, setSelectionPosition] = useState<SelectionPosition | null>(null);
-  const [pendingForm, setPendingForm] = useState<SelectionPosition | null>(null);
+  const [selectionPosition, setSelectionPosition] =
+    useState<SelectionPosition | null>(null);
+  const [pendingForm, setPendingForm] = useState<SelectionPosition | null>(
+    null
+  );
 
   const handleSelectionChange = useCallback((pos: SelectionPosition | null) => {
     setSelectionPosition(pos);
@@ -71,11 +89,16 @@ export function RichDocumentPage() {
   const handleSubmitComment = useCallback(
     async (text: string, layer: AnnotationLayer) => {
       if (!pendingForm) return;
-      await addTextAnnotation({ text, layer, from: pendingForm.from, to: pendingForm.to });
+      await addTextAnnotation({
+        text,
+        layer,
+        from: pendingForm.from,
+        to: pendingForm.to,
+      });
       setPendingForm(null);
       setSelectionPosition(null);
     },
-    [pendingForm, addTextAnnotation],
+    [pendingForm, addTextAnnotation]
   );
 
   const handleCancelComment = useCallback(() => {
@@ -99,6 +122,8 @@ export function RichDocumentPage() {
           title={fetching ? '' : (item?.title ?? '')}
           documentZoom={documentZoom}
           onZoomChange={setDocumentZoom}
+          defaultAnnotationLayer={defaultAnnotationLayer}
+          onDefaultLayerChange={setDefaultAnnotationLayer}
         />
 
         {hasError && (
@@ -110,17 +135,31 @@ export function RichDocumentPage() {
 
         {fetching && !item && (
           <div className="mx-6 mt-4 space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => <SkeletonBlock key={i} />)}
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonBlock key={i} />
+            ))}
           </div>
         )}
 
         {item && (
-          <ResizablePanelGroup orientation="horizontal" className="flex-1 min-h-0">
+          <ResizablePanelGroup
+            orientation="horizontal"
+            className="flex-1 min-h-0"
+          >
             {/* Document panel */}
-            <ResizablePanel defaultSize={100 - annotationPanelWidth} minSize={40}>
+            <ResizablePanel
+              defaultSize={100 - annotationPanelWidth}
+              minSize={40}
+            >
               <div className="h-full overflow-y-auto px-6 py-4">
                 {item.contentType === 'RICH_DOCUMENT' && item.content ? (
-                  <div style={{ transform: `scale(${documentZoom})`, transformOrigin: 'top left', width: `${Math.round((1 / documentZoom) * 100)}%` }}>
+                  <div
+                    style={{
+                      transform: `scale(${documentZoom})`,
+                      transformOrigin: 'top left',
+                      width: `${Math.round((1 / documentZoom) * 100)}%`,
+                    }}
+                  >
                     <AnnotatedDocumentViewer
                       content={item.content}
                       annotations={textAnnotations}
@@ -130,7 +169,9 @@ export function RichDocumentPage() {
                     />
                   </div>
                 ) : (
-                  <p className="text-muted-foreground text-sm">No content available.</p>
+                  <p className="text-muted-foreground text-sm">
+                    No content available.
+                  </p>
                 )}
               </div>
             </ResizablePanel>
@@ -138,7 +179,11 @@ export function RichDocumentPage() {
             <ResizableHandle withHandle />
 
             {/* Comment panel */}
-            <ResizablePanel defaultSize={annotationPanelWidth} minSize={20} maxSize={50}>
+            <ResizablePanel
+              defaultSize={annotationPanelWidth}
+              minSize={20}
+              maxSize={50}
+            >
               <WordCommentPanel
                 annotations={allAnnotations}
                 focusedAnnotationId={focusedAnnotationId}

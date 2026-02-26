@@ -51,13 +51,15 @@ export const tenantLibraryActivations = pgTable(
   (t) => ({
     tenantCourseUnique: uniqueIndex('tenant_library_activations_unique').on(
       t.tenantId,
-      t.libraryCourseId,
+      t.libraryCourseId
     ),
     tenantIdx: index('tenant_library_activations_tenant_idx').on(t.tenantId),
-  }),
+  })
 );
 
 export type LibraryCourse = typeof libraryCourses.$inferSelect;
 export type NewLibraryCourse = typeof libraryCourses.$inferInsert;
-export type TenantLibraryActivation = typeof tenantLibraryActivations.$inferSelect;
-export type NewTenantLibraryActivation = typeof tenantLibraryActivations.$inferInsert;
+export type TenantLibraryActivation =
+  typeof tenantLibraryActivations.$inferSelect;
+export type NewTenantLibraryActivation =
+  typeof tenantLibraryActivations.$inferInsert;

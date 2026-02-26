@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { HybridSearchEngine, createHybridSearch, HybridSearchResult } from './hybridSearch';
+import {
+  HybridSearchEngine,
+  createHybridSearch,
+  HybridSearchResult,
+} from './hybridSearch';
 import type { CachedEmbeddings } from './embeddings';
 import type { Pool } from 'pg';
 
@@ -34,7 +38,8 @@ function makeMockPool(
   semanticRows: Record<string, unknown>[] = [],
   keywordRows: Record<string, unknown>[] = []
 ): Pool & { query: ReturnType<typeof vi.fn> } {
-  const query = vi.fn()
+  const query = vi
+    .fn()
     .mockResolvedValueOnce({ rows: semanticRows })
     .mockResolvedValueOnce({ rows: keywordRows });
   return { query } as unknown as Pool & { query: ReturnType<typeof vi.fn> };
@@ -42,7 +47,9 @@ function makeMockPool(
 
 function makeMockEmbeddings(): CachedEmbeddings {
   return {
-    embedQuery: vi.fn<[string], Promise<number[]>>().mockResolvedValue(makeFakeEmbedding()),
+    embedQuery: vi
+      .fn<[string], Promise<number[]>>()
+      .mockResolvedValue(makeFakeEmbedding()),
     embedDocuments: vi.fn(),
     configureCache: vi.fn(),
     clearCache: vi.fn(),
@@ -86,7 +93,9 @@ describe('HybridSearchEngine', () => {
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
       await engine.search('machine learning', 'tenant-abc');
 
-      expect(mockEmbeddings.embedQuery).toHaveBeenCalledWith('machine learning');
+      expect(mockEmbeddings.embedQuery).toHaveBeenCalledWith(
+        'machine learning'
+      );
     });
 
     it('runs exactly 2 DB queries (semantic + keyword)', async () => {
@@ -155,11 +164,16 @@ describe('HybridSearchEngine', () => {
       const allParams = (pool.query as ReturnType<typeof vi.fn>).mock.calls.map(
         (call: unknown[]) => call[1] as unknown[]
       );
-      expect(allParams.every((params) => params.includes('tenant-42'))).toBe(true);
+      expect(allParams.every((params) => params.includes('tenant-42'))).toBe(
+        true
+      );
     });
 
     it('uses default semanticWeight=0.7 for semantic-only result', async () => {
-      const pool = makeMockPool([makeSemanticRow({ id: 'sem-only', semantic_score: '1.0' })], []);
+      const pool = makeMockPool(
+        [makeSemanticRow({ id: 'sem-only', semantic_score: '1.0' })],
+        []
+      );
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
       const results = await engine.search('test', 'tenant-abc');
 
@@ -219,7 +233,9 @@ describe('HybridSearchEngine', () => {
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
       await engine.search('test', 'tenant-abc');
 
-      const semanticQuery = String((pool.query as ReturnType<typeof vi.fn>).mock.calls[0]![0]);
+      const semanticQuery = String(
+        (pool.query as ReturnType<typeof vi.fn>).mock.calls[0]![0]
+      );
       expect(semanticQuery).toContain('<=>');
     });
 
@@ -230,7 +246,8 @@ describe('HybridSearchEngine', () => {
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
       await engine.search('test', 'tenant-abc');
 
-      const params = (pool.query as ReturnType<typeof vi.fn>).mock.calls[0]![1] as unknown[];
+      const params = (pool.query as ReturnType<typeof vi.fn>).mock
+        .calls[0]![1] as unknown[];
       expect(params[0]).toBe(JSON.stringify(fakeEmb));
     });
   });
@@ -241,7 +258,9 @@ describe('HybridSearchEngine', () => {
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
       await engine.search('test query', 'tenant-abc');
 
-      const keywordQuery = String((pool.query as ReturnType<typeof vi.fn>).mock.calls[1]![0]);
+      const keywordQuery = String(
+        (pool.query as ReturnType<typeof vi.fn>).mock.calls[1]![0]
+      );
       expect(keywordQuery).toContain('ts_rank');
     });
 
@@ -250,7 +269,8 @@ describe('HybridSearchEngine', () => {
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
       await engine.search('machine learning', 'tenant-abc');
 
-      const params = (pool.query as ReturnType<typeof vi.fn>).mock.calls[1]![1] as unknown[];
+      const params = (pool.query as ReturnType<typeof vi.fn>).mock
+        .calls[1]![1] as unknown[];
       expect(params[0]).toBe('machine learning');
     });
   });
@@ -259,7 +279,10 @@ describe('HybridSearchEngine', () => {
     it('returns HybridSearchResult array', async () => {
       const pool = makeMockPool([makeSemanticRow()], []);
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
-      const results = await engine.searchWithGraphTraversal('quantum computing', 'tenant-abc');
+      const results = await engine.searchWithGraphTraversal(
+        'quantum computing',
+        'tenant-abc'
+      );
 
       expect(Array.isArray(results)).toBe(true);
     });
@@ -267,7 +290,10 @@ describe('HybridSearchEngine', () => {
     it('graph traversal preserves results from hybrid search', async () => {
       const pool = makeMockPool([makeSemanticRow({ id: 'base-result' })], []);
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
-      const results = await engine.searchWithGraphTraversal('test', 'tenant-abc');
+      const results = await engine.searchWithGraphTraversal(
+        'test',
+        'tenant-abc'
+      );
 
       expect(results.some((r) => r.id === 'base-result')).toBe(true);
     });
@@ -281,7 +307,10 @@ describe('HybridSearchEngine', () => {
         []
       );
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
-      const results = await engine.searchWithGraphTraversal('test', 'tenant-abc');
+      const results = await engine.searchWithGraphTraversal(
+        'test',
+        'tenant-abc'
+      );
 
       const minRank = Math.min(...results.map((r) => r.rank));
       expect(minRank).toBe(1);
@@ -290,7 +319,10 @@ describe('HybridSearchEngine', () => {
     it('returns empty array when no hybrid results found', async () => {
       const pool = makeMockPool([], []);
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
-      const results = await engine.searchWithGraphTraversal('obscure', 'tenant-abc');
+      const results = await engine.searchWithGraphTraversal(
+        'obscure',
+        'tenant-abc'
+      );
 
       expect(results).toHaveLength(0);
     });
@@ -304,7 +336,9 @@ describe('HybridSearchEngine', () => {
       const pool = { query: vi.fn() } as unknown as Pool;
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
 
-      await expect(engine.search('test', 'tenant-abc')).rejects.toThrow('OpenAI embedding failed');
+      await expect(engine.search('test', 'tenant-abc')).rejects.toThrow(
+        'OpenAI embedding failed'
+      );
     });
 
     it('propagates DB error from semantic search', async () => {
@@ -313,7 +347,9 @@ describe('HybridSearchEngine', () => {
       } as unknown as Pool;
       const engine = new HybridSearchEngine(pool, mockEmbeddings);
 
-      await expect(engine.search('test', 'tenant-abc')).rejects.toThrow('PG connection refused');
+      await expect(engine.search('test', 'tenant-abc')).rejects.toThrow(
+        'PG connection refused'
+      );
     });
   });
 

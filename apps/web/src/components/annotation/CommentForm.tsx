@@ -60,7 +60,9 @@ export function CommentForm({
       className="w-72 rounded-lg border border-border bg-card shadow-xl p-3 flex flex-col gap-2"
     >
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-semibold text-foreground">New Comment</span>
+        <span className="text-xs font-semibold text-foreground">
+          New Comment
+        </span>
         <button
           aria-label="Close"
           className="rounded p-0.5 hover:bg-accent text-muted-foreground"
@@ -86,16 +88,27 @@ export function CommentForm({
       >
         {Object.values(AnnotationLayer).map((l) => (
           <option key={l} value={l}>
-            {ANNOTATION_LAYER_CONFIGS[l].icon} {ANNOTATION_LAYER_CONFIGS[l].label}
+            {ANNOTATION_LAYER_CONFIGS[l].icon}{' '}
+            {ANNOTATION_LAYER_CONFIGS[l].label}
           </option>
         ))}
       </select>
 
       <div className="flex justify-end gap-1.5 mt-1">
-        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={onCancel}>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 text-xs"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
-        <Button size="sm" className="h-7 text-xs" onClick={handleSubmit} disabled={!text.trim()}>
+        <Button
+          size="sm"
+          className="h-7 text-xs"
+          onClick={handleSubmit}
+          disabled={!text.trim()}
+        >
           Save
         </Button>
       </div>

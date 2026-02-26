@@ -16,9 +16,17 @@
       "duration": "15s",
       "status": "PASSED",
       "thresholds": {
-        "http_req_duration_p95": { "sla": 500, "actual": 16.76, "passed": true },
-        "http_req_duration_p99": { "sla": 1000, "actual": 50.62, "passed": true },
-        "http_req_failed_rate": { "sla": 0.01, "actual": 0.00, "passed": true },
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 16.76,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 50.62,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
         "http_req_waiting_p95": { "sla": 400, "actual": 16.66, "passed": true }
       },
       "metrics": {
@@ -31,7 +39,7 @@
         "avg_ms": 5.62,
         "min_ms": 1.48,
         "max_ms": 51.53,
-        "errorRate": 0.00,
+        "errorRate": 0.0,
         "checksSucceeded": "100.00%",
         "checksFailed": "0.00%",
         "dataReceived_kb": 56,
@@ -50,9 +58,17 @@
       "duration": "30s",
       "status": "PASSED",
       "thresholds": {
-        "http_req_duration_p95": { "sla": 500, "actual": 148.65, "passed": true },
-        "http_req_duration_p99": { "sla": 1000, "actual": 801.77, "passed": true },
-        "http_req_failed_rate": { "sla": 0.01, "actual": 0.00, "passed": true },
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 148.65,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 801.77,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
         "http_req_waiting_p95": { "sla": 400, "actual": 148.57, "passed": true }
       },
       "metrics": {
@@ -62,10 +78,10 @@
         "p90_ms": 117.81,
         "p95_ms": 148.65,
         "p99_ms": 801.77,
-        "avg_ms": 70.10,
+        "avg_ms": 70.1,
         "min_ms": 9.34,
         "max_ms": 821.69,
-        "errorRate": 0.00,
+        "errorRate": 0.0,
         "checksSucceeded": "100.00%",
         "checksFailed": "0.00%",
         "dataReceived_kb": 637,
@@ -85,9 +101,17 @@
       "duration": "30s",
       "status": "PASSED",
       "thresholds": {
-        "http_req_duration_p95": { "sla": 500, "actual": 334.66, "passed": true },
-        "http_req_duration_p99": { "sla": 1000, "actual": 489.62, "passed": true },
-        "http_req_failed_rate": { "sla": 0.01, "actual": 0.00, "passed": true },
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 334.66,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 489.62,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
         "http_req_waiting_p95": { "sla": 400, "actual": 334.53, "passed": true }
       },
       "metrics": {
@@ -100,7 +124,7 @@
         "avg_ms": 108.29,
         "min_ms": 10.77,
         "max_ms": 626.11,
-        "errorRate": 0.00,
+        "errorRate": 0.0,
         "checksSucceeded": "100.00%",
         "checksFailed": "0.00%",
         "dataReceived_kb": 191,
@@ -120,9 +144,17 @@
       "duration": "30s",
       "status": "PASSED",
       "thresholds": {
-        "http_req_duration_p95": { "sla": 500, "actual": 164.79, "passed": true },
-        "http_req_duration_p99": { "sla": 1000, "actual": 207.74, "passed": true },
-        "http_req_failed_rate": { "sla": 0.01, "actual": 0.00, "passed": true },
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 164.79,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 207.74,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
         "http_req_waiting_p95": { "sla": 400, "actual": 164.66, "passed": true }
       },
       "metrics": {
@@ -135,7 +167,7 @@
         "avg_ms": 49.61,
         "min_ms": 4.97,
         "max_ms": 274.38,
-        "errorRate": 0.00,
+        "errorRate": 0.0,
         "checksSucceeded": "66.66%",
         "checksFailed": "33.33%",
         "dataReceived_kb": 216,
@@ -157,14 +189,14 @@
       "thresholds": {
         "http_req_duration_p95": { "sla": 3000, "actual": 0, "passed": true },
         "http_req_duration_p99": { "sla": 5000, "actual": 0, "passed": true },
-        "http_req_failed_rate": { "sla": 0.02, "actual": 0.00, "passed": true }
+        "http_req_failed_rate": { "sla": 0.02, "actual": 0.0, "passed": true }
       },
       "metrics": {
         "totalRequests": 0,
         "requestsPerSecond": 0,
         "p95_ms": 0,
         "p99_ms": 0,
-        "errorRate": 0.00,
+        "errorRate": 0.0,
         "iterations": 150,
         "notes": "No HTTP requests — scenario correctly skipped all iterations (JWT_TOKEN not set). Agent mutations require authentication."
       },
@@ -178,9 +210,17 @@
       "duration": "30s",
       "status": "PASSED",
       "thresholds": {
-        "http_req_duration_p95": { "sla": 800, "actual": 233.05, "passed": true },
-        "http_req_duration_p99": { "sla": 1500, "actual": 485.09, "passed": true },
-        "http_req_failed_rate": { "sla": 0.01, "actual": 0.00, "passed": true }
+        "http_req_duration_p95": {
+          "sla": 800,
+          "actual": 233.05,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1500,
+          "actual": 485.09,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true }
       },
       "metrics": {
         "totalRequests": 380,
@@ -191,8 +231,8 @@
         "p99_ms": 485.09,
         "avg_ms": 46.48,
         "min_ms": 3.12,
-        "max_ms": 526.70,
-        "errorRate": 0.00,
+        "max_ms": 526.7,
+        "errorRate": 0.0,
         "checksSucceeded": "80.00%",
         "checksFailed": "20.00%",
         "dataReceived_kb": 332,
@@ -229,14 +269,14 @@
       "thresholds": {
         "http_req_duration_p95": { "sla": 5000, "actual": 0, "passed": true },
         "http_req_duration_p99": { "sla": 10000, "actual": 0, "passed": true },
-        "http_req_failed_rate": { "sla": 0.05, "actual": 0.00, "passed": true }
+        "http_req_failed_rate": { "sla": 0.05, "actual": 0.0, "passed": true }
       },
       "metrics": {
         "totalRequests": 0,
         "requestsPerSecond": 0,
         "p95_ms": 0,
         "p99_ms": 0,
-        "errorRate": 0.00,
+        "errorRate": 0.0,
         "iterations": 450
       },
       "checks": {},

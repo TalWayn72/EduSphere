@@ -2,8 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { of, throwError } from 'rxjs';
 import { MetricsInterceptor, MetricsService } from '@edusphere/metrics';
 
-function buildHttpContext(override: Partial<{ method: string; path: string; route?: { path: string }; statusCode: number }> = {}) {
-  const req = { method: override.method ?? 'GET', path: override.path ?? '/test', route: override.route };
+function buildHttpContext(
+  override: Partial<{
+    method: string;
+    path: string;
+    route?: { path: string };
+    statusCode: number;
+  }> = {}
+) {
+  const req = {
+    method: override.method ?? 'GET',
+    path: override.path ?? '/test',
+    route: override.route,
+  };
   const res = { statusCode: override.statusCode ?? 200 };
   return {
     getType: vi.fn().mockReturnValue('http'),
@@ -15,8 +26,13 @@ function buildHttpContext(override: Partial<{ method: string; path: string; rout
   } as any;
 }
 
-function buildGraphqlContext(override: Partial<{ operationType: string; fieldName: string }> = {}) {
-  const info = { operation: { operation: override.operationType ?? 'query' }, fieldName: override.fieldName ?? 'getUser' };
+function buildGraphqlContext(
+  override: Partial<{ operationType: string; fieldName: string }> = {}
+) {
+  const info = {
+    operation: { operation: override.operationType ?? 'query' },
+    fieldName: override.fieldName ?? 'getUser',
+  };
   return {
     getType: vi.fn().mockReturnValue('graphql'),
     switchToHttp: vi.fn(),
@@ -42,7 +58,11 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
   describe('intercept() — HTTP success', () => {
     it('records HTTP request on success', () =>
       new Promise<void>((resolve) => {
-        const ctx = buildHttpContext({ method: 'POST', path: '/api/test', statusCode: 201 });
+        const ctx = buildHttpContext({
+          method: 'POST',
+          path: '/api/test',
+          statusCode: 201,
+        });
         const next = { handle: vi.fn().mockReturnValue(of({ data: 'ok' })) };
         interceptor.intercept(ctx, next).subscribe({
           complete: () => {
@@ -54,11 +74,15 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
 
     it('uses route.path when available', () =>
       new Promise<void>((resolve) => {
-        const ctx = buildHttpContext({ route: { path: '/users/:id' }, path: '/users/1' });
+        const ctx = buildHttpContext({
+          route: { path: '/users/:id' },
+          path: '/users/1',
+        });
         const next = { handle: vi.fn().mockReturnValue(of({})) };
         interceptor.intercept(ctx, next).subscribe({
           complete: () => {
-            const [, route] = (mockService.recordHttpRequest as any).mock.calls[0];
+            const [, route] = (mockService.recordHttpRequest as any).mock
+              .calls[0];
             expect(route).toBe('/users/:id');
             resolve();
           },
@@ -72,11 +96,16 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
     it('records HTTP request with status 500 on error', () =>
       new Promise<void>((resolve) => {
         const ctx = buildHttpContext({ method: 'GET', path: '/fail' });
-        const next = { handle: vi.fn().mockReturnValue(throwError(() => new Error('boom'))) };
+        const next = {
+          handle: vi.fn().mockReturnValue(throwError(() => new Error('boom'))),
+        };
         interceptor.intercept(ctx, next).subscribe({
           error: () => {
             expect(mockService.recordHttpRequest).toHaveBeenCalledWith(
-              'GET', '/fail', 500, expect.any(Number),
+              'GET',
+              '/fail',
+              500,
+              expect.any(Number)
             );
             resolve();
           },
@@ -86,7 +115,11 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
     it('re-throws the error to the subscriber', () =>
       new Promise<void>((resolve) => {
         const ctx = buildHttpContext();
-        const next = { handle: vi.fn().mockReturnValue(throwError(() => new Error('upstream error'))) };
+        const next = {
+          handle: vi
+            .fn()
+            .mockReturnValue(throwError(() => new Error('upstream error'))),
+        };
         interceptor.intercept(ctx, next).subscribe({
           error: (err: Error) => {
             expect(err.message).toBe('upstream error');
@@ -101,12 +134,17 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
   describe('intercept() — GraphQL success', () => {
     it('records GraphQL operation on success', () =>
       new Promise<void>((resolve) => {
-        const ctx = buildGraphqlContext({ operationType: 'query', fieldName: 'getCourse' });
+        const ctx = buildGraphqlContext({
+          operationType: 'query',
+          fieldName: 'getCourse',
+        });
         const next = { handle: vi.fn().mockReturnValue(of({ course: {} })) };
         interceptor.intercept(ctx, next).subscribe({
           complete: () => {
             expect(mockService.recordGraphqlOperation).toHaveBeenCalledWith(
-              'query', 'getCourse', 'success',
+              'query',
+              'getCourse',
+              'success'
             );
             resolve();
           },
@@ -122,7 +160,8 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
         const next = { handle: vi.fn().mockReturnValue(of({})) };
         interceptor.intercept(ctx, next).subscribe({
           complete: () => {
-            const [, opName] = (mockService.recordGraphqlOperation as any).mock.calls[0];
+            const [, opName] = (mockService.recordGraphqlOperation as any).mock
+              .calls[0];
             expect(opName).toBe('unknown');
             resolve();
           },
@@ -135,12 +174,21 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
   describe('intercept() — GraphQL error', () => {
     it('records GraphQL operation with status error', () =>
       new Promise<void>((resolve) => {
-        const ctx = buildGraphqlContext({ operationType: 'mutation', fieldName: 'createUser' });
-        const next = { handle: vi.fn().mockReturnValue(throwError(() => new Error('gql error'))) };
+        const ctx = buildGraphqlContext({
+          operationType: 'mutation',
+          fieldName: 'createUser',
+        });
+        const next = {
+          handle: vi
+            .fn()
+            .mockReturnValue(throwError(() => new Error('gql error'))),
+        };
         interceptor.intercept(ctx, next).subscribe({
           error: () => {
             expect(mockService.recordGraphqlOperation).toHaveBeenCalledWith(
-              'mutation', 'createUser', 'error',
+              'mutation',
+              'createUser',
+              'error'
             );
             resolve();
           },

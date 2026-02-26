@@ -17,7 +17,9 @@ function requireInstructor(ctx: GqlContext): TenantContext {
   }
   const role = auth.roles[0] ?? 'STUDENT';
   if (!ALLOWED_ROLES.has(role)) {
-    throw new UnauthorizedException('Instructor, OrgAdmin, or SuperAdmin role required');
+    throw new UnauthorizedException(
+      'Instructor, OrgAdmin, or SuperAdmin role required'
+    );
   }
   return {
     tenantId: auth.tenantId,
@@ -33,7 +35,7 @@ export class AnalyticsResolver {
   @Query('courseAnalytics')
   async getCourseAnalytics(
     @Args('courseId') courseId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireInstructor(ctx);
     return this.analyticsService.getCourseAnalytics(courseId, tenantCtx);

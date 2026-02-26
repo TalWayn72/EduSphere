@@ -4,15 +4,15 @@ Complete Docker-based infrastructure stack for local development and testing.
 
 ## Services
 
-| Service | Port(s) | Version | Purpose |
-|---------|---------|---------|---------|
-| **PostgreSQL** | 5432 | 16 + AGE 1.5.0 + pgvector 0.8.0 | Main database with graph + embeddings |
-| **Keycloak** | 8080 | 26.1.0 | OIDC authentication & JWT tokens |
-| **NATS** | 4222, 8222 | 2.10 | JetStream event messaging |
-| **MinIO** | 9000, 9001 | Latest | S3-compatible object storage |
-| **Redis** | 6379 | 7-alpine | Caching & sessions |
-| **Jaeger** | 16686, 4317, 4318 | 1.64 | OpenTelemetry tracing |
-| **Ollama** | 11434 | Latest | Local LLM for AI agents |
+| Service        | Port(s)           | Version                         | Purpose                               |
+| -------------- | ----------------- | ------------------------------- | ------------------------------------- |
+| **PostgreSQL** | 5432              | 16 + AGE 1.5.0 + pgvector 0.8.0 | Main database with graph + embeddings |
+| **Keycloak**   | 8080              | 26.1.0                          | OIDC authentication & JWT tokens      |
+| **NATS**       | 4222, 8222        | 2.10                            | JetStream event messaging             |
+| **MinIO**      | 9000, 9001        | Latest                          | S3-compatible object storage          |
+| **Redis**      | 6379              | 7-alpine                        | Caching & sessions                    |
+| **Jaeger**     | 16686, 4317, 4318 | 1.64                            | OpenTelemetry tracing                 |
+| **Ollama**     | 11434             | Latest                          | Local LLM for AI agents               |
 
 ## Quick Start
 
@@ -29,22 +29,27 @@ docker-compose up -d
 ### 2. Access Services
 
 **Keycloak Admin Console**
+
 - URL: http://localhost:8080
 - Username: `admin`
 - Password: `admin`
 
 **MinIO Console**
+
 - URL: http://localhost:9001
 - Access Key: `minioadmin`
 - Secret Key: `minioadmin`
 
 **Jaeger UI**
+
 - URL: http://localhost:16686
 
 **NATS Monitor**
+
 - URL: http://localhost:8222
 
 **PostgreSQL**
+
 ```bash
 psql postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere
 ```
@@ -56,23 +61,25 @@ psql postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere
 ```
 
 Expected output:
+
 ```
 ✅ All services are healthy!
 ```
 
 ## Demo Users
 
-| Email | Password | Role | tenant_id |
-|-------|----------|------|-----------|
+| Email                     | Password       | Role        | tenant_id                            |
+| ------------------------- | -------------- | ----------- | ------------------------------------ |
 | super.admin@edusphere.dev | SuperAdmin123! | SUPER_ADMIN | 00000000-0000-0000-0000-000000000000 |
-| org.admin@example.com | OrgAdmin123! | ORG_ADMIN | 11111111-1111-1111-1111-111111111111 |
-| instructor@example.com | Instructor123! | INSTRUCTOR | 11111111-1111-1111-1111-111111111111 |
-| student@example.com | Student123! | STUDENT | 11111111-1111-1111-1111-111111111111 |
-| researcher@example.com | Researcher123! | RESEARCHER | 11111111-1111-1111-1111-111111111111 |
+| org.admin@example.com     | OrgAdmin123!   | ORG_ADMIN   | 11111111-1111-1111-1111-111111111111 |
+| instructor@example.com    | Instructor123! | INSTRUCTOR  | 11111111-1111-1111-1111-111111111111 |
+| student@example.com       | Student123!    | STUDENT     | 11111111-1111-1111-1111-111111111111 |
+| researcher@example.com    | Researcher123! | RESEARCHER  | 11111111-1111-1111-1111-111111111111 |
 
 ## Custom PostgreSQL Image
 
 Built from `infrastructure/docker/Dockerfile.postgres`:
+
 - **Base:** postgres:16-alpine
 - **Extensions:**
   - Apache AGE 1.5.0 (graph database)
@@ -194,5 +201,6 @@ docker-compose restart nats
 ## Next Steps
 
 After infrastructure is healthy:
+
 1. ✅ Run `./scripts/health-check.sh`
 2. → Start Phase 0.3: Scaffold first subgraph (Core)

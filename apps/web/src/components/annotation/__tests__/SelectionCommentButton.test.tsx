@@ -26,14 +26,17 @@ vi.mock('@/components/ui/button', () => ({
 describe('SelectionCommentButton', () => {
   it('renders nothing when position is null', () => {
     const { container } = render(
-      <SelectionCommentButton position={null} onAddComment={vi.fn()} />,
+      <SelectionCommentButton position={null} onAddComment={vi.fn()} />
     );
     expect(container.firstChild).toBeNull();
   });
 
   it('renders button when position is provided', () => {
     render(
-      <SelectionCommentButton position={{ x: 100, y: 200 }} onAddComment={vi.fn()} />,
+      <SelectionCommentButton
+        position={{ x: 100, y: 200 }}
+        onAddComment={vi.fn()}
+      />
     );
     expect(screen.getByText(/Add Comment/)).toBeInTheDocument();
   });
@@ -41,7 +44,9 @@ describe('SelectionCommentButton', () => {
   it('calls onAddComment with position when clicked', () => {
     const onAddComment = vi.fn();
     const pos = { x: 100, y: 200 };
-    render(<SelectionCommentButton position={pos} onAddComment={onAddComment} />);
+    render(
+      <SelectionCommentButton position={pos} onAddComment={onAddComment} />
+    );
     fireEvent.click(screen.getByText(/Add Comment/));
     expect(onAddComment).toHaveBeenCalledWith(pos);
   });

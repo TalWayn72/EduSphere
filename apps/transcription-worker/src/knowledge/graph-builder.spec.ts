@@ -8,7 +8,11 @@ const mockNatsService = {
 } as unknown as NatsService;
 
 const CONCEPTS: ExtractedConcept[] = [
-  { name: 'Metaphysics', definition: 'Study of being', relatedTerms: ['Ontology'] },
+  {
+    name: 'Metaphysics',
+    definition: 'Study of being',
+    relatedTerms: ['Ontology'],
+  },
   { name: 'Ontology', definition: 'Study of existence', relatedTerms: [] },
 ];
 
@@ -42,7 +46,9 @@ describe('GraphBuilder', () => {
   });
 
   it('does not throw when NATS publish fails', async () => {
-    vi.mocked(mockNatsService.publish).mockRejectedValueOnce(new Error('NATS down'));
+    vi.mocked(mockNatsService.publish).mockRejectedValueOnce(
+      new Error('NATS down')
+    );
 
     await expect(
       graphBuilder.publishConcepts(CONCEPTS, 'course-1', 'tenant-1')
@@ -54,7 +60,10 @@ describe('GraphBuilder', () => {
 
     await graphBuilder.publishConcepts(CONCEPTS, 'course-2', 'tenant-2');
 
-    const [, payload] = vi.mocked(mockNatsService.publish).mock.calls[0] as [string, any];
+    const [, payload] = vi.mocked(mockNatsService.publish).mock.calls[0] as [
+      string,
+      any,
+    ];
     expect(payload.concepts).toHaveLength(2);
     expect(payload.concepts[0].relatedTerms).toContain('Ontology');
     expect(payload.courseId).toBe('course-2');

@@ -11,6 +11,7 @@
 > horizontal scaling, connection pooling, caching, and fault isolation from Phase 0.
 
 > **Reference Documents** (must be loaded before any phase begins):
+>
 > - `docs/database/DATABASE_SCHEMA.md` — single source of truth for all tables, RLS, graph, embeddings
 > - `API_CONTRACTS_GRAPHQL_FEDERATION.md` — single source of truth for all GraphQL types, queries, mutations, subscriptions
 > - `EduSphere_Claude.pdf` — architecture guide and technology decisions
@@ -23,30 +24,30 @@
 Before any code is written, Claude Code must acknowledge these **locked** technology choices.
 These have been validated for production viability, MIT/Apache licensing, and ecosystem maturity.
 
-| Layer | Technology | Version | License | Validation Status |
-|-------|-----------|---------|---------|------------------|
-| **Gateway** | Hive Gateway v2 | latest (v2.x) | MIT | ✅ 100% Federation v2.7 compliance (189/189 tests). Event-driven distributed subscriptions. Runtime log-level switching. |
-| **Gateway (Prod Option)** | Hive Router (Rust) | latest | MIT | ✅ ~1830 RPS, p95 ~48ms. Consider for production upgrade path. |
-| **Subgraph Runtime** | GraphQL Yoga + NestJS | Yoga 5.x + `@graphql-yoga/nestjs-federation` 3.x | MIT | ✅ `YogaFederationDriver` actively maintained (last publish: weeks ago). |
-| **Framework** | NestJS | 11.x | MIT | ✅ Enterprise-grade DI, module system, guards, interceptors. |
-| **ORM** | Drizzle ORM | 1.x (beta → stable) | Apache 2.0 | ✅ Native RLS support via `pgTable.withRLS()`. `defineRelations()` API. Native pgvector support. |
-| **Database** | PostgreSQL 16+ | 16.x | PostgreSQL | ✅ With Apache AGE 1.5+ and pgvector 0.8+ |
-| **Graph DB** | Apache AGE | 1.5.0 (PG16) | Apache 2.0 | ✅ Cypher queries within PostgreSQL |
-| **Vector Search** | pgvector | 0.8.0 | PostgreSQL | ✅ HNSW indexes, 768-dim nomic-embed-text |
-| **Auth** | Keycloak | v26.x | Apache 2.0 | ✅ OIDC/JWT, multi-tenant realms, JWKS |
-| **Messaging** | NATS JetStream | latest | Apache 2.0 | ✅ Event-driven subscriptions, at-least-once delivery |
-| **Object Storage** | MinIO | latest | AGPLv3 | ✅ S3-compatible presigned URLs |
-| **CRDT/Collab** | Yjs + Hocuspocus | latest | MIT | ✅ Real-time collaborative editing |
-| **AI Layer 1** | Vercel AI SDK | v6.x | Apache 2.0 | ✅ Unified LLM abstraction (Ollama ↔ OpenAI/Anthropic) |
-| **AI Layer 2** | LangGraph.js | latest | MIT | ✅ State-machine agent workflows |
-| **AI Layer 3** | LlamaIndex.TS | latest | MIT | ✅ RAG pipeline, knowledge graph indexing |
-| **Transcription** | faster-whisper | latest | MIT | ✅ GPU-accelerated speech-to-text |
-| **Frontend** | React + Vite | React 19 + Vite 6 | MIT | ✅ TanStack Query v5 for data layer |
-| **Mobile** | Expo SDK 54 | 54.x | MIT | ✅ Offline-first patterns |
-| **Reverse Proxy** | Traefik | v3.6 | MIT | ✅ Auto-discovery, Let's Encrypt, rate limiting |
-| **Schema Registry** | GraphQL Hive | latest | MIT | ✅ Breaking change detection, composition |
-| **Telemetry** | OpenTelemetry → Jaeger | latest | Apache 2.0 | ✅ Distributed tracing, Hive Gateway v2 native integration |
-| **Monorepo** | pnpm workspaces + Turborepo | latest | MIT | ✅ Efficient dependency hoisting, parallel builds |
+| Layer                     | Technology                  | Version                                          | License    | Validation Status                                                                                                        |
+| ------------------------- | --------------------------- | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Gateway**               | Hive Gateway v2             | latest (v2.x)                                    | MIT        | ✅ 100% Federation v2.7 compliance (189/189 tests). Event-driven distributed subscriptions. Runtime log-level switching. |
+| **Gateway (Prod Option)** | Hive Router (Rust)          | latest                                           | MIT        | ✅ ~1830 RPS, p95 ~48ms. Consider for production upgrade path.                                                           |
+| **Subgraph Runtime**      | GraphQL Yoga + NestJS       | Yoga 5.x + `@graphql-yoga/nestjs-federation` 3.x | MIT        | ✅ `YogaFederationDriver` actively maintained (last publish: weeks ago).                                                 |
+| **Framework**             | NestJS                      | 11.x                                             | MIT        | ✅ Enterprise-grade DI, module system, guards, interceptors.                                                             |
+| **ORM**                   | Drizzle ORM                 | 1.x (beta → stable)                              | Apache 2.0 | ✅ Native RLS support via `pgTable.withRLS()`. `defineRelations()` API. Native pgvector support.                         |
+| **Database**              | PostgreSQL 16+              | 16.x                                             | PostgreSQL | ✅ With Apache AGE 1.5+ and pgvector 0.8+                                                                                |
+| **Graph DB**              | Apache AGE                  | 1.5.0 (PG16)                                     | Apache 2.0 | ✅ Cypher queries within PostgreSQL                                                                                      |
+| **Vector Search**         | pgvector                    | 0.8.0                                            | PostgreSQL | ✅ HNSW indexes, 768-dim nomic-embed-text                                                                                |
+| **Auth**                  | Keycloak                    | v26.x                                            | Apache 2.0 | ✅ OIDC/JWT, multi-tenant realms, JWKS                                                                                   |
+| **Messaging**             | NATS JetStream              | latest                                           | Apache 2.0 | ✅ Event-driven subscriptions, at-least-once delivery                                                                    |
+| **Object Storage**        | MinIO                       | latest                                           | AGPLv3     | ✅ S3-compatible presigned URLs                                                                                          |
+| **CRDT/Collab**           | Yjs + Hocuspocus            | latest                                           | MIT        | ✅ Real-time collaborative editing                                                                                       |
+| **AI Layer 1**            | Vercel AI SDK               | v6.x                                             | Apache 2.0 | ✅ Unified LLM abstraction (Ollama ↔ OpenAI/Anthropic)                                                                   |
+| **AI Layer 2**            | LangGraph.js                | latest                                           | MIT        | ✅ State-machine agent workflows                                                                                         |
+| **AI Layer 3**            | LlamaIndex.TS               | latest                                           | MIT        | ✅ RAG pipeline, knowledge graph indexing                                                                                |
+| **Transcription**         | faster-whisper              | latest                                           | MIT        | ✅ GPU-accelerated speech-to-text                                                                                        |
+| **Frontend**              | React + Vite                | React 19 + Vite 6                                | MIT        | ✅ TanStack Query v5 for data layer                                                                                      |
+| **Mobile**                | Expo SDK 54                 | 54.x                                             | MIT        | ✅ Offline-first patterns                                                                                                |
+| **Reverse Proxy**         | Traefik                     | v3.6                                             | MIT        | ✅ Auto-discovery, Let's Encrypt, rate limiting                                                                          |
+| **Schema Registry**       | GraphQL Hive                | latest                                           | MIT        | ✅ Breaking change detection, composition                                                                                |
+| **Telemetry**             | OpenTelemetry → Jaeger      | latest                                           | Apache 2.0 | ✅ Distributed tracing, Hive Gateway v2 native integration                                                               |
+| **Monorepo**              | pnpm workspaces + Turborepo | latest                                           | MIT        | ✅ Efficient dependency hoisting, parallel builds                                                                        |
 
 ---
 
@@ -97,6 +98,7 @@ edusphere/
 Claude Code should operate with the following multi-agent patterns when executing phases:
 
 ### Progress Reporting (Every 3 minutes)
+
 ```
 ═══════════════════════════════════════════════════
 📊 PROGRESS REPORT — Phase X.Y — [timestamp]
@@ -119,18 +121,20 @@ Claude Code should operate with the following multi-agent patterns when executin
 ```
 
 ### Agent Roles
-| Agent Role | Responsibility | Active Phases |
-|-----------|---------------|---------------|
-| **Architect** | File structure, configs, docker-compose, monorepo setup | 0–1 |
-| **Schema** | Drizzle schemas, migrations, RLS policies, graph setup | 1–2 |
-| **API** | GraphQL SDL, resolvers, guards, context | 2–4 |
-| **Test** | Unit tests, integration tests, E2E, load tests | ALL |
-| **Security** | RLS validation, JWT flow, scope enforcement, penetration | ALL |
-| **Frontend** | React components, hooks, routing, state management | 4–6 |
-| **AI/ML** | Embeddings, RAG pipeline, agent workflows | 5–6 |
-| **DevOps** | CI/CD, monitoring, scaling, K8s manifests | 6–7 |
+
+| Agent Role    | Responsibility                                           | Active Phases |
+| ------------- | -------------------------------------------------------- | ------------- |
+| **Architect** | File structure, configs, docker-compose, monorepo setup  | 0–1           |
+| **Schema**    | Drizzle schemas, migrations, RLS policies, graph setup   | 1–2           |
+| **API**       | GraphQL SDL, resolvers, guards, context                  | 2–4           |
+| **Test**      | Unit tests, integration tests, E2E, load tests           | ALL           |
+| **Security**  | RLS validation, JWT flow, scope enforcement, penetration | ALL           |
+| **Frontend**  | React components, hooks, routing, state management       | 4–6           |
+| **AI/ML**     | Embeddings, RAG pipeline, agent workflows                | 5–6           |
+| **DevOps**    | CI/CD, monitoring, scaling, K8s manifests                | 6–7           |
 
 ### Quality Gates (Enforced at every phase boundary)
+
 ```bash
 # 1. TypeScript compilation (zero errors)
 pnpm turbo build --filter='./apps/*' --filter='./packages/*'
@@ -162,6 +166,7 @@ pnpm audit --audit-level=high
 ### Phase 0.1: Monorepo Scaffolding
 
 **Tasks**:
+
 1. Initialize pnpm workspace with `pnpm-workspace.yaml`
 2. Create `turbo.json` with build/lint/test/dev pipelines
 3. Set up shared TypeScript config (`packages/tsconfig/`)
@@ -177,6 +182,7 @@ pnpm audit --audit-level=high
    - `src/pagination.graphql` — PageInfo, ConnectionArgs
 
 **Acceptance Criteria**:
+
 ```bash
 # All workspace packages resolve
 pnpm install --frozen-lockfile  # exits 0
@@ -191,6 +197,7 @@ pnpm --filter @edusphere/graphql-shared build  # exits 0
 ### Phase 0.2: Infrastructure Docker Stack
 
 **Tasks**:
+
 1. Build custom PostgreSQL image (`infrastructure/docker/postgres-age/Dockerfile`):
    ```dockerfile
    FROM postgres:16-bookworm
@@ -225,6 +232,7 @@ pnpm --filter @edusphere/graphql-shared build  # exits 0
    - Grant AGE permissions
 
 **Acceptance Criteria**:
+
 ```bash
 # Full stack starts
 docker-compose up -d  # all containers reach "healthy" state within 60s
@@ -259,6 +267,7 @@ curl -sf http://localhost:9000/minio/health/live  # exits 0
 ### Phase 0.3: First Subgraph — Core "Hello World"
 
 **Tasks**:
+
 1. Scaffold `apps/subgraph-core/` as NestJS application:
    - Install: `@nestjs/graphql`, `graphql-yoga`, `@graphql-yoga/nestjs-federation`, `graphql`
    - Configure `YogaFederationDriver` with schema-first approach
@@ -270,6 +279,7 @@ curl -sf http://localhost:9000/minio/health/live  # exits 0
 4. Verify the full path: Client → Gateway (port 4000) → Core subgraph (port 4001)
 
 **Acceptance Criteria**:
+
 ```bash
 # Gateway responds to health query
 curl -sf http://localhost:4000/graphql \
@@ -295,6 +305,7 @@ curl -sf http://localhost:4000/graphql \
 ### Phase 1.1: Drizzle Schema Package
 
 **Tasks**:
+
 1. Create `packages/db/` with Drizzle ORM configuration
 2. Implement **every table** from docs/database/DATABASE_SCHEMA.md §4–§8:
    - `packages/db/src/schema/_shared.ts` — pk(), tenantId(), timestamps(), softDelete(), enums
@@ -314,6 +325,7 @@ curl -sf http://localhost:4000/graphql \
 **Reference**: docs/database/DATABASE_SCHEMA.md §3–§8 (exact column names, types, constraints)
 
 **Acceptance Criteria**:
+
 ```bash
 # Schema compiles without errors
 pnpm --filter @edusphere/db build  # exits 0
@@ -334,6 +346,7 @@ docker exec edusphere-postgres psql -U postgres -d edusphere -c "
 ### Phase 1.2: Row-Level Security Policies
 
 **Tasks**:
+
 1. Implement RLS policies per docs/database/DATABASE_SCHEMA.md §9:
    - Every tenant-isolated table: `USING (tenant_id = current_setting('app.current_tenant')::uuid)`
    - Users table additional policy: super_admin sees all tenants
@@ -351,6 +364,7 @@ docker exec edusphere-postgres psql -U postgres -d edusphere -c "
    - Soft-deleted records are invisible
 
 **Acceptance Criteria**:
+
 ```bash
 # RLS enabled on all 16 tables
 docker exec edusphere-postgres psql -U postgres -d edusphere -c "
@@ -370,6 +384,7 @@ pnpm --filter @edusphere/db test -- --testPathPattern=tenant-isolation  # all gr
 ### Phase 1.3: Apache AGE Graph Ontology
 
 **Tasks**:
+
 1. Create `packages/db/src/graph/` with helpers from docs/database/DATABASE_SCHEMA.md §15:
    - `client.ts` — `executeCypher()`, `addVertex()`, `addEdge()`
    - `ontology.ts` — graph creation, vertex label setup
@@ -379,6 +394,7 @@ pnpm --filter @edusphere/db test -- --testPathPattern=tenant-isolation  # all gr
 5. Edge-specific properties per docs/database/DATABASE_SCHEMA.md §10
 
 **Acceptance Criteria**:
+
 ```bash
 # Graph ontology loads without errors
 pnpm --filter @edusphere/db exec tsx src/graph/ontology.ts  # exits 0
@@ -396,6 +412,7 @@ pnpm --filter @edusphere/db test -- --testPathPattern=graph  # all green
 ### Phase 1.4: Seed Data
 
 **Tasks**:
+
 1. Implement seed script per docs/database/DATABASE_SCHEMA.md §14:
    - Default tenant with known UUID
    - Admin user + student user
@@ -405,6 +422,7 @@ pnpm --filter @edusphere/db test -- --testPathPattern=graph  # all green
 2. Make seed idempotent (uses `onConflictDoNothing`)
 
 **Acceptance Criteria**:
+
 ```bash
 # Seed runs without errors
 pnpm --filter @edusphere/db exec tsx src/seed.ts  # exits 0
@@ -429,6 +447,7 @@ docker exec edusphere-postgres psql -U postgres -d edusphere -c "
 ### Phase 2.1: Auth Infrastructure
 
 **Tasks**:
+
 1. Create `packages/auth/`:
    - `jwt-validator.ts` — JWKS fetching from Keycloak, JWT verification
    - `context-extractor.ts` — Extract `tenantId`, `userId`, `role`, `scopes` from JWT claims
@@ -454,6 +473,7 @@ docker exec edusphere-postgres psql -U postgres -d edusphere -c "
    ```
 
 **Acceptance Criteria**:
+
 ```bash
 # Token generation works
 TOKEN=$(./scripts/get-dev-token.sh admin@edusphere.dev)
@@ -476,6 +496,7 @@ curl -sf http://localhost:4000/graphql \
 ### Phase 2.2: Core Subgraph — Full Implementation
 
 **Tasks**:
+
 1. Implement ALL Core subgraph types per API-CONTRACTS §7:
    - `Tenant` entity with `@key(fields: "id")`
    - `User` entity with `@key(fields: "id")`
@@ -487,6 +508,7 @@ curl -sf http://localhost:4000/graphql \
 5. Unit test every resolver
 
 **Acceptance Criteria**:
+
 ```bash
 # All Core queries respond correctly
 pnpm --filter @edusphere/subgraph-core test -- --coverage  # >90% line coverage
@@ -507,6 +529,7 @@ curl -sf http://localhost:4000/graphql \
 ### Phase 2.3: Content Subgraph — Full Implementation
 
 **Tasks**:
+
 1. Implement ALL Content subgraph types per API-CONTRACTS §8:
    - `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment` entities
    - Entity extensions: `User.createdCourses`, `Tenant.courses`
@@ -521,6 +544,7 @@ curl -sf http://localhost:4000/graphql \
    - Publish `edusphere.{tenant}.transcription.status` on status change
 
 **Acceptance Criteria**:
+
 ```bash
 # All Content queries respond correctly
 pnpm --filter @edusphere/subgraph-content test -- --coverage  # >90%
@@ -556,6 +580,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 3.1: Annotation Subgraph
 
 **Tasks**:
+
 1. Implement ALL Annotation types per API-CONTRACTS §9:
    - `Annotation` entity with all types: text, sketch, link, bookmark, spatial_comment
    - `AnnotationLayer` filtering (PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED)
@@ -567,6 +592,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 6. Owner-only enforcement for PERSONAL layer mutations
 
 **Acceptance Criteria**:
+
 ```bash
 # Annotation CRUD with layer filtering works
 pnpm --filter @edusphere/subgraph-annotation test -- --coverage  # >90%
@@ -582,6 +608,7 @@ pnpm --filter @edusphere/subgraph-annotation test -- --coverage  # >90%
 ### Phase 3.2: Collaboration Subgraph
 
 **Tasks**:
+
 1. Implement ALL Collaboration types per API-CONTRACTS §10:
    - `CollabDocument` entity
    - `CollabSession` entity (presence tracking)
@@ -596,6 +623,7 @@ pnpm --filter @edusphere/subgraph-annotation test -- --coverage  # >90%
 6. CRDT compaction logic for `compactCollabDocument`
 
 **Acceptance Criteria**:
+
 ```bash
 # Collaboration CRUD works
 pnpm --filter @edusphere/subgraph-collaboration test -- --coverage  # >90%
@@ -620,6 +648,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 4.1: Knowledge Graph Resolvers
 
 **Tasks**:
+
 1. Implement ALL Knowledge subgraph types per API-CONTRACTS §12:
    - `Concept`, `Person`, `Term`, `Source`, `TopicCluster` entities
    - `KnowledgeRelation`, `ConceptMention`, `Contradiction`, `PrerequisiteLink`
@@ -633,6 +662,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 6. `reviewInferredRelation` — accept/reject AI-inferred relations
 
 **Acceptance Criteria**:
+
 ```bash
 # Graph queries return correct results
 pnpm --filter @edusphere/subgraph-knowledge test -- --testPathPattern=graph  # all green
@@ -645,6 +675,7 @@ pnpm --filter @edusphere/subgraph-knowledge test -- --testPathPattern=graph  # a
 ### Phase 4.2: Embedding Pipeline + Semantic Search
 
 **Tasks**:
+
 1. Implement embedding generation service:
    - Uses Vercel AI SDK → `embed()` function
    - Dev: nomic-embed-text via Ollama (768 dimensions)
@@ -665,6 +696,7 @@ pnpm --filter @edusphere/subgraph-knowledge test -- --testPathPattern=graph  # a
 6. Subscription: `conceptsExtracted(assetId)` via NATS
 
 **Acceptance Criteria**:
+
 ```bash
 # Embedding generation works
 pnpm --filter @edusphere/subgraph-knowledge test -- --testPathPattern=embedding  # all green
@@ -692,6 +724,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 5.1: Agent CRUD + Execution Engine
 
 **Tasks**:
+
 1. Implement ALL Agent subgraph types per API-CONTRACTS §11:
    - `AgentDefinition` entity with `AgentConfig` (systemPrompt, toolsEnabled, modelOverride)
    - `AgentExecution` entity with status lifecycle: QUEUED → RUNNING → COMPLETED/FAILED/CANCELLED
@@ -706,6 +739,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
    - `agentResponseStream(executionId)` — real-time token stream
 
 **Acceptance Criteria**:
+
 ```bash
 # Agent CRUD works
 pnpm --filter @edusphere/subgraph-agent test -- --coverage  # >90%
@@ -720,6 +754,7 @@ pnpm --filter @edusphere/subgraph-agent test -- --coverage  # >90%
 ### Phase 5.2: LangGraph.js Agent Workflows
 
 **Tasks**:
+
 1. Implement pre-built LangGraph.js state machines per API-CONTRACTS §19:
    - `chavruta-debate-graph` — Dialectical debate using CONTRADICTS edges
    - `summarize-graph` — Progressive summarization of transcript segments
@@ -739,6 +774,7 @@ pnpm --filter @edusphere/subgraph-agent test -- --coverage  # >90%
    - `calculator` / `citation_formatter`
 
 **Acceptance Criteria**:
+
 ```bash
 # Each agent template produces valid output
 pnpm --filter @edusphere/subgraph-agent test -- --testPathPattern=workflows  # all green
@@ -754,6 +790,7 @@ pnpm --filter @edusphere/subgraph-agent test -- --testPathPattern=workflows  # a
 ### Phase 5.3: Agent Sandboxing
 
 **Tasks**:
+
 1. Implement resource limits per tenant plan:
    - FREE: 10 executions/day, 30s timeout, 256MB memory
    - STARTER: 100 executions/day, 60s timeout, 512MB
@@ -763,6 +800,7 @@ pnpm --filter @edusphere/subgraph-agent test -- --testPathPattern=workflows  # a
 3. Rate limiting at gateway level per `@rateLimit` directive
 
 **Acceptance Criteria**:
+
 ```bash
 # Resource limits enforced
 # Free tier user gets blocked after 10 executions
@@ -773,7 +811,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 
 # Full API contract coverage:
 # 44 queries implemented ✓
-# 44 mutations implemented ✓  
+# 44 mutations implemented ✓
 # 7 subscriptions implemented ✓
 ```
 
@@ -788,6 +826,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 6.1: React Application Shell
 
 **Tasks**:
+
 1. Scaffold `apps/web/` with Vite + React 19 + TypeScript
 2. Set up TanStack Query v5 with GraphQL client
 3. Run GraphQL Code Generator (per API-CONTRACTS §18):
@@ -802,6 +841,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 6.2: Course & Content Management
 
 **Tasks**:
+
 1. Course list with cursor pagination
 2. Course detail view with modules
 3. Media upload flow (presigned URL → direct MinIO upload → completeMediaUpload)
@@ -813,6 +853,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 6.3: Annotation Layer
 
 **Tasks**:
+
 1. Annotation sidebar with layer filtering
 2. Sketch canvas overlay (Konva.js v10) on video player
 3. Text annotation creation/editing
@@ -823,6 +864,7 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 6.4: Knowledge & Search
 
 **Tasks**:
+
 1. Semantic search interface with hybrid search support
 2. Knowledge graph visualization (D3.js or Cytoscape.js)
 3. Concept detail view with relations, contradictions, prerequisites
@@ -831,12 +873,14 @@ pnpm --filter @edusphere/gateway compose  # exits 0
 ### Phase 6.5: AI Agent Interface
 
 **Tasks**:
+
 1. Agent chat panel with real-time token streaming
 2. Agent template selector (Chavruta, Summarizer, Quiz Master, etc.)
 3. Agent execution history
 4. Side-panel / overlay rendering based on `outputFormat`
 
 **Phase 6 Acceptance Criteria**:
+
 ```bash
 # Frontend builds
 pnpm --filter @edusphere/web build  # exits 0
@@ -850,7 +894,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 # Best Practices: >90
 
 # Core user flows work:
-# Login → Browse courses → Open course → Play video → 
+# Login → Browse courses → Open course → Play video →
 # Create annotation → Search content → Chat with AI agent → Logout
 ```
 
@@ -863,6 +907,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 **Duration estimate**: 5–7 days
 
 **✅ Completed (18 Feb 2026):**
+
 - Phase 7.4: Kubernetes deployment — Helm chart (22 manifests), Traefik IngressRoute + 4 Middlewares, ExternalSecret CRD, Kustomize overlays (production/staging)
 - Phase 7.5: Load testing — k6 smoke/load/stress scenarios + Keycloak auth utils
 - GraphQL Subscriptions — `graphql-ws` + `subscriptionExchange` in urql-client, `MESSAGE_STREAM_SUBSCRIPTION` wired in AgentsPage
@@ -870,6 +915,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 - Traefik rate-limit (1000 req/min per tenant), CORS, HSTS, CSP, compression middlewares
 
 **⏳ Remaining Phase 7 tasks:**
+
 - Phase 7.1: PgBouncer, CDN, read replicas, persisted queries
 - Phase 7.2: OpenTelemetry spans, Prometheus metric endpoints, PagerDuty alerting
 - Phase 7.3: Query complexity analysis, persisted-only queries in production
@@ -878,6 +924,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 ### Phase 7.1: Performance Optimization
 
 **Tasks**:
+
 1. **Gateway caching**: Persisted queries, response caching at gateway level
 2. **Database optimization**:
    - Connection pooling (PgBouncer or built-in pool sizing)
@@ -894,6 +941,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 ### Phase 7.2: Observability & Monitoring
 
 **Tasks**:
+
 1. **OpenTelemetry instrumentation**:
    - Gateway → all subgraphs → database spans
    - Custom spans for embedding generation, graph queries
@@ -912,6 +960,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 ### Phase 7.3: Security Hardening
 
 **Tasks**:
+
 1. **Rate limiting**: Per-tenant, per-IP, per-operation limits at gateway
 2. **Query complexity analysis**: Block expensive queries (depth > 10, breadth > 100)
 3. **Persisted queries only** in production (block arbitrary queries)
@@ -924,6 +973,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 ### Phase 7.4: Kubernetes Deployment
 
 **Tasks**:
+
 1. Kubernetes manifests (`infrastructure/k8s/`):
    - Deployments for each subgraph (min 2 replicas)
    - HPA: CPU 70% → scale up, min 2, max 20 replicas per subgraph
@@ -942,6 +992,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 ### Phase 7.5: Load Testing
 
 **Tasks**:
+
 1. k6 or Artillery load test scripts:
    - 10K concurrent users: login → browse → search → chat
    - 50K concurrent users: sustained read queries
@@ -950,6 +1001,7 @@ pnpm --filter @edusphere/web test:e2e  # all green
 3. Database failover testing
 
 **Phase 7 Acceptance Criteria**:
+
 ```bash
 # Load test: 100K concurrent users
 k6 run scripts/load-test-100k.js
@@ -984,6 +1036,7 @@ pnpm turbo test:e2e  # all green in staging environment
 ### Phase 8.1: Expo Mobile Application
 
 **Tasks**:
+
 1. Scaffold `apps/mobile/` with Expo SDK 54
 2. Offline-first architecture:
    - SQLite local cache for viewed courses/annotations
@@ -995,6 +1048,7 @@ pnpm turbo test:e2e  # all green in staging environment
 ### Phase 8.2: Transcription Worker Pipeline
 
 **Tasks**:
+
 1. Implement `apps/transcription-worker/`:
    - NATS consumer listening to `edusphere.*.media.uploaded`
    - Downloads media from MinIO
@@ -1008,6 +1062,7 @@ pnpm turbo test:e2e  # all green in staging environment
 ### Phase 8.3: Chavruta (Partner Learning) Features
 
 **Tasks**:
+
 1. Real-time paired study session:
    - Match two users on the same content
    - Shared annotation canvas via Yjs CRDT
@@ -1017,6 +1072,7 @@ pnpm turbo test:e2e  # all green in staging environment
 3. Progress tracking and learning analytics
 
 **Phase 8 Acceptance Criteria**:
+
 ```bash
 # Mobile app builds for iOS and Android
 pnpm --filter @edusphere/mobile expo build  # exits 0
@@ -1037,6 +1093,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ## Phase 9: Dashboard Analytics (✅ Completed — Feb 2026)
 
 **Delivered:**
+
 - ActivityHeatmap: GitHub-style 12-week study activity grid
 - LearningStats: course progress bars + weekly sparkline chart
 - ActivityFeed: typed activity items with color-coded icons (study/quiz/annotation/ai/discussion)
@@ -1051,6 +1108,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 10.1: Video Player with HLS Streaming
 
 **Tasks:**
+
 1. Install Video.js + `@videojs/http-streaming` (HLS support)
 2. Build `VideoPlayerCore.tsx` component:
    - HLS stream from MinIO presigned URLs
@@ -1062,6 +1120,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 10.2: Transcript Panel with Sync
 
 **Tasks:**
+
 1. Build `TranscriptPanel.tsx`:
    - Fetch segments from Knowledge subgraph (`transcriptSegments` query)
    - Auto-scroll to active segment based on `currentTime`
@@ -1073,12 +1132,14 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 10.3: Transcript Search → Video Jump
 
 **Tasks:**
+
 1. Search input in transcript panel header
 2. Filter segments by text match
 3. Click result → seek to timestamp
 4. "Found N results" indicator
 
 **Acceptance Criteria:**
+
 ```bash
 # Video loads and plays HLS stream
 # Transcript scrolls automatically as video plays
@@ -1095,6 +1156,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 11.1: Global Search Bar
 
 **Tasks:**
+
 1. Add search input to Layout header (top navigation)
 2. Keyboard shortcut: `Cmd+K` / `Ctrl+K` opens search modal
 3. Debounced search (300ms) as user types
@@ -1103,6 +1165,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 11.2: Search Results Page (`/search?q=...`)
 
 **Tasks:**
+
 1. New `SearchPage.tsx` route at `/search`
 2. Call `hybridSearch` GraphQL query (Knowledge subgraph)
 3. Results display:
@@ -1116,11 +1179,13 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 11.3: Search Results → Video Timestamp
 
 **Tasks:**
+
 1. Pass `t` query param to `ContentViewer.tsx`
 2. Auto-seek video to timestamp on load
 3. Highlight matching transcript segment
 
 **Acceptance Criteria:**
+
 ```bash
 # Cmd+K opens search modal from any page
 # Typing returns results from Knowledge subgraph within 500ms
@@ -1137,6 +1202,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 12.1: Agent Chat Panel
 
 **Tasks:**
+
 1. Build `AgentChatPanel.tsx`:
    - Message list with user/assistant bubbles
    - Input textarea with `Enter` to send, `Shift+Enter` for newline
@@ -1150,6 +1216,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 12.2: Agent Template Selector
 
 **Tasks:**
+
 1. Sidebar or modal with 4 templates:
    - 🎓 **Chavruta** (debate partner)
    - 📝 **Summarizer** (content summary)
@@ -1161,11 +1228,13 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 12.3: Agent History
 
 **Tasks:**
+
 1. Session list sidebar: past conversations
 2. Click session → load message history
 3. "New Chat" button → clear and start fresh
 
 **Acceptance Criteria:**
+
 ```bash
 # User selects Chavruta template → chat opens with greeting
 # User sends message → streaming response appears token by token
@@ -1182,6 +1251,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 13.1: Graph Canvas
 
 **Tasks:**
+
 1. Install `cytoscape` + `react-cytoscapejs` (or D3.js force-directed)
 2. Build `GraphCanvas.tsx`:
    - Fetch concepts from `conceptsByTenant` + `getRelatedConcepts` queries
@@ -1193,6 +1263,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 13.2: Concept Detail Panel
 
 **Tasks:**
+
 1. Slide-in right panel on node click:
    - Concept name + type badge
    - Description
@@ -1203,11 +1274,13 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 13.3: Learning Path Overlay
 
 **Tasks:**
+
 1. Highlight mastered concepts (based on user progress) in green
 2. Show "next recommended" concept in orange
 3. Progress percentage overlay on graph
 
 **Acceptance Criteria:**
+
 ```bash
 # Graph renders within 2 seconds with 50+ nodes
 # Clicking a node shows detail panel
@@ -1224,6 +1297,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 14.1: Annotation Overlay on Video
 
 **Tasks:**
+
 1. Render annotation markers on video progress bar (colored dots at timestamps)
 2. Click marker → jump to that time + show annotation popup
 3. "Add annotation at current time" button during playback
@@ -1232,6 +1306,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 14.2: Layer Filtering
 
 **Tasks:**
+
 1. Layer toggle buttons: PERSONAL / SHARED / INSTRUCTOR / AI_GENERATED
 2. Show count per layer
 3. Filter affects both progress bar markers and list view
@@ -1240,11 +1315,13 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 ### Phase 14.3: Thread Replies
 
 **Tasks:**
+
 1. Click annotation → expand thread
 2. Reply input at bottom of thread
 3. Reply count badge on annotation marker
 
 **Acceptance Criteria:**
+
 ```bash
 # Annotation markers visible on video progress bar
 # Can create annotation at current video timestamp
@@ -1259,6 +1336,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 **Problem:** No logout button exists. Users cannot log out or view their profile.
 
 **Tasks:**
+
 1. Add user avatar + dropdown menu to Layout header:
    - Display name + email
    - "Profile" link → `/profile` page
@@ -1272,6 +1350,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 4. Role-based navigation: hide admin links from students
 
 **Acceptance Criteria:**
+
 ```bash
 # Logout button visible and functional in all authenticated pages
 # Clicking logout clears Keycloak session and redirects to /login
@@ -1286,6 +1365,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 **Problem:** Instructors have no UI to create or manage courses. Only students see (read-only) course list.
 
 **Tasks:**
+
 1. "New Course" button on CourseList page (visible to INSTRUCTOR+ roles only)
 2. Course creation wizard (3 steps): metadata → modules → publish
 3. Module management: drag-and-drop reorder, add/remove
@@ -1294,6 +1374,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 6. Student enrollment: "Enroll" button on course card
 
 **Acceptance Criteria:**
+
 ```bash
 # Instructor can create a course with title, description, thumbnail
 # Can add modules and reorder them
@@ -1308,6 +1389,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 **Problem:** CollaborationPage.tsx is a stub. Yjs/Hocuspocus backend exists but no frontend editor.
 
 **Tasks:**
+
 1. Install `@tiptap/react` + Yjs extension for collaborative editing
 2. Build `CollaborativeEditor.tsx`:
    - Rich text editing (bold/italic/lists/headings)
@@ -1318,6 +1400,7 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 4. Offline queue: buffer changes locally, sync on reconnect
 
 **Acceptance Criteria:**
+
 ```bash
 # Two browser tabs see each other's cursors in real-time
 # Text changes sync within 200ms
@@ -1330,15 +1413,15 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ### Testing Strategy
 
-| Test Type | Tool | Coverage Target | When Run |
-|-----------|------|----------------|----------|
-| **Unit Tests** | Vitest | >90% line coverage per package | Every commit |
-| **Integration Tests** | Vitest + Testcontainers | All DB operations, RLS, graph queries | Every PR |
-| **API Tests** | SuperTest + GraphQL | All 44 queries, 44 mutations, 7 subscriptions | Every PR |
-| **E2E Tests** | Playwright | Core user flows (10+ scenarios) | Pre-merge, nightly |
-| **Load Tests** | k6 | 100K concurrent users | Weekly, pre-release |
-| **Security Tests** | OWASP ZAP + custom | No critical/high vulnerabilities | Weekly |
-| **Schema Tests** | Hive CLI | No breaking changes | Every schema change |
+| Test Type             | Tool                    | Coverage Target                               | When Run            |
+| --------------------- | ----------------------- | --------------------------------------------- | ------------------- |
+| **Unit Tests**        | Vitest                  | >90% line coverage per package                | Every commit        |
+| **Integration Tests** | Vitest + Testcontainers | All DB operations, RLS, graph queries         | Every PR            |
+| **API Tests**         | SuperTest + GraphQL     | All 44 queries, 44 mutations, 7 subscriptions | Every PR            |
+| **E2E Tests**         | Playwright              | Core user flows (10+ scenarios)               | Pre-merge, nightly  |
+| **Load Tests**        | k6                      | 100K concurrent users                         | Weekly, pre-release |
+| **Security Tests**    | OWASP ZAP + custom      | No critical/high vulnerabilities              | Weekly              |
+| **Schema Tests**      | Hive CLI                | No breaking changes                           | Every schema change |
 
 ### Code Quality Standards
 
@@ -1435,23 +1518,24 @@ pnpm turbo test 2>/dev/null
 
 ## Estimated Total Duration
 
-| Phase | Duration | Cumulative |
-|-------|----------|-----------|
-| Phase 0: Foundation | 1–2 days | 1–2 days |
-| Phase 1: Data Layer | 2–3 days | 3–5 days |
-| Phase 2: Core + Content | 3–5 days | 6–10 days |
-| Phase 3: Annotation + Collab | 3–4 days | 9–14 days |
-| Phase 4: Knowledge | 4–5 days | 13–19 days |
-| Phase 5: Agents | 4–5 days | 17–24 days |
-| Phase 6: Frontend | 5–7 days | 22–31 days |
-| Phase 7: Production | 5–7 days | 27–38 days |
-| Phase 8: Mobile + Advanced | 5–7 days | 32–45 days |
+| Phase                        | Duration | Cumulative |
+| ---------------------------- | -------- | ---------- |
+| Phase 0: Foundation          | 1–2 days | 1–2 days   |
+| Phase 1: Data Layer          | 2–3 days | 3–5 days   |
+| Phase 2: Core + Content      | 3–5 days | 6–10 days  |
+| Phase 3: Annotation + Collab | 3–4 days | 9–14 days  |
+| Phase 4: Knowledge           | 4–5 days | 13–19 days |
+| Phase 5: Agents              | 4–5 days | 17–24 days |
+| Phase 6: Frontend            | 5–7 days | 22–31 days |
+| Phase 7: Production          | 5–7 days | 27–38 days |
+| Phase 8: Mobile + Advanced   | 5–7 days | 32–45 days |
 
 **Total: 32–45 working days** (with parallelization: ~25–35 days)
 
 ---
 
 > **CRITICAL REMINDER FOR CLAUDE CODE**:
+>
 > - **Never skip phases.** Each phase builds on the previous one.
 > - **Run acceptance criteria before proceeding.** Green output = permission to advance.
 > - **Report progress every 3 minutes** using the format above.

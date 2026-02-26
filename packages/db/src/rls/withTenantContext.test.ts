@@ -44,7 +44,7 @@ describe('withTenantContext()', () => {
     const db = buildMockDb();
     const result = await withTenantContext(db, BASE_CONTEXT, async () => 42);
     expect(result).toBe(42);
-    expect((db.transaction as ReturnType<typeof vi.fn>)).toHaveBeenCalledOnce();
+    expect(db.transaction as ReturnType<typeof vi.fn>).toHaveBeenCalledOnce();
   });
 
   it('executes SET LOCAL for current_tenant with correct tenant ID', async () => {
@@ -102,7 +102,11 @@ describe('withTenantContext()', () => {
   it('propagates the operation return value (object)', async () => {
     const db = buildMockDb();
     const payload = { rows: [{ id: '1' }] };
-    const result = await withTenantContext(db, BASE_CONTEXT, async () => payload);
+    const result = await withTenantContext(
+      db,
+      BASE_CONTEXT,
+      async () => payload
+    );
     expect(result).toEqual(payload);
   });
 
@@ -167,8 +171,16 @@ describe('withTenantContext()', () => {
     const dbA = buildMockDb({ execute: executeA });
     const dbB = buildMockDb({ execute: executeB });
 
-    const ctxA: TenantContext = { tenantId: 'tenant-A', userId: 'user-A', userRole: 'STUDENT' };
-    const ctxB: TenantContext = { tenantId: 'tenant-B', userId: 'user-B', userRole: 'ORG_ADMIN' };
+    const ctxA: TenantContext = {
+      tenantId: 'tenant-A',
+      userId: 'user-A',
+      userRole: 'STUDENT',
+    };
+    const ctxB: TenantContext = {
+      tenantId: 'tenant-B',
+      userId: 'user-B',
+      userRole: 'ORG_ADMIN',
+    };
 
     await withTenantContext(dbA, ctxA, async () => 'a');
     await withTenantContext(dbB, ctxB, async () => 'b');
@@ -214,7 +226,7 @@ describe('withBypassRLS()', () => {
     const db = buildMockDb();
     const result = await withBypassRLS(db, async () => 'bypassed');
     expect(result).toBe('bypassed');
-    expect((db.transaction as ReturnType<typeof vi.fn>)).toHaveBeenCalledOnce();
+    expect(db.transaction as ReturnType<typeof vi.fn>).toHaveBeenCalledOnce();
   });
 
   it('executes SET LOCAL row_security = OFF before the operation', async () => {

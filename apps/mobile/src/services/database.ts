@@ -23,12 +23,18 @@ class DatabaseService {
     return this.db;
   }
 
-  async runAsync(sql: string, args?: (string | number | null)[]): Promise<void> {
+  async runAsync(
+    sql: string,
+    args?: (string | number | null)[]
+  ): Promise<void> {
     if (!this.db) return;
     await this.db.runAsync(sql, args ?? []);
   }
 
-  async getAllAsync<T>(sql: string, args?: (string | number | null)[]): Promise<T[]> {
+  async getAllAsync<T>(
+    sql: string,
+    args?: (string | number | null)[]
+  ): Promise<T[]> {
     if (!this.db) return [];
     return this.db.getAllAsync<T>(sql, args ?? []);
   }

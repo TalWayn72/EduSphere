@@ -17,7 +17,11 @@ function formatTime(s: number): string {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-export function AddAnnotationForm({ currentTime, onSave, onCancel }: AddAnnotationFormProps) {
+export function AddAnnotationForm({
+  currentTime,
+  onSave,
+  onCancel,
+}: AddAnnotationFormProps) {
   const [text, setText] = useState('');
   // Capture timestamp at form-open moment (currentTime may advance while form is open)
   const capturedTime = currentTime;
@@ -45,10 +49,20 @@ export function AddAnnotationForm({ currentTime, onSave, onCancel }: AddAnnotati
         aria-label="Annotation text input"
       />
       <div className="flex gap-2 justify-end">
-        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={onCancel}>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 text-xs"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
-        <Button size="sm" className="h-7 text-xs" onClick={handleSave} disabled={!text.trim()}>
+        <Button
+          size="sm"
+          className="h-7 text-xs"
+          onClick={handleSave}
+          disabled={!text.trim()}
+        >
           Save
         </Button>
       </div>

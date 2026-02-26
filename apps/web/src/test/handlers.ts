@@ -67,9 +67,7 @@ const FIXTURE_CONTENT_ITEM = {
 
 export const handlers = [
   // ── User queries ──
-  graphql.query('Me', () =>
-    HttpResponse.json({ data: { me: FIXTURE_USER } })
-  ),
+  graphql.query('Me', () => HttpResponse.json({ data: { me: FIXTURE_USER } })),
 
   graphql.query('Tenant', () =>
     HttpResponse.json({
@@ -310,7 +308,8 @@ export const handlers = [
           },
           {
             id: 'sem-2',
-            content: 'The Talmudic concept of pilpul refers to dialectical analysis',
+            content:
+              'The Talmudic concept of pilpul refers to dialectical analysis',
             similarity: 0.87,
             entityType: 'CONCEPT',
             entityId: 'concept-1',

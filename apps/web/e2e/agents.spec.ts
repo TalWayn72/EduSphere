@@ -20,7 +20,10 @@ import { test, expect, type Page } from '@playwright/test';
 
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 // Host extracted from BASE_URL — used in waitForURL pattern after Keycloak redirect
-const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5174').replace(/^https?:\/\//, '');
+const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5174').replace(
+  /^https?:\/\//,
+  ''
+);
 
 /**
  * Perform a full Keycloak OIDC login as the given user and wait until the app
@@ -31,19 +34,25 @@ async function loginViaKeycloak(page: Page): Promise<void> {
   await page.waitForLoadState('domcontentloaded');
 
   // Increase timeouts to handle slow Keycloak responses under parallel test load
-  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  const signInBtn = page.getByRole('button', {
+    name: /sign in with keycloak/i,
+  });
   await signInBtn.waitFor({ timeout: 25_000 });
   await signInBtn.click();
 
   // Keycloak OIDC login form
-  await page.waitForURL(/localhost:8080\/realms\/edusphere/, { timeout: 25_000 });
+  await page.waitForURL(/localhost:8080\/realms\/edusphere/, {
+    timeout: 25_000,
+  });
   await expect(page.locator('#username')).toBeVisible({ timeout: 15_000 });
   await page.fill('#username', STUDENT.email);
   await page.fill('#password', STUDENT.password);
   await page.click('#kc-login');
 
   // Wait for Keycloak to redirect back to the app and for the router to settle
-  await page.waitForURL(new RegExp(APP_HOST.replace('.', '\\.')), { timeout: 35_000 });
+  await page.waitForURL(new RegExp(APP_HOST.replace('.', '\\.')), {
+    timeout: 35_000,
+  });
   await page.waitForURL(/\/(learn|courses|dashboard|agents|search|login)/, {
     timeout: 25_000,
   });
@@ -79,11 +88,21 @@ test.describe('Agents — page load and template selector', () => {
 
     // AGENT_MODES: chavruta, quiz, summarize, research, explain
     // Use locator().filter() to avoid strict-mode collision with nav sidebar links
-    await expect(page.locator('button').filter({ hasText: 'Chavruta Debate' }).first()).toBeVisible();
-    await expect(page.locator('button').filter({ hasText: 'Quiz Master' }).first()).toBeVisible();
-    await expect(page.locator('button').filter({ hasText: 'Summarizer' }).first()).toBeVisible();
-    await expect(page.locator('button').filter({ hasText: 'Research Scout' }).first()).toBeVisible();
-    await expect(page.locator('button').filter({ hasText: 'Explainer' }).first()).toBeVisible();
+    await expect(
+      page.locator('button').filter({ hasText: 'Chavruta Debate' }).first()
+    ).toBeVisible();
+    await expect(
+      page.locator('button').filter({ hasText: 'Quiz Master' }).first()
+    ).toBeVisible();
+    await expect(
+      page.locator('button').filter({ hasText: 'Summarizer' }).first()
+    ).toBeVisible();
+    await expect(
+      page.locator('button').filter({ hasText: 'Research Scout' }).first()
+    ).toBeVisible();
+    await expect(
+      page.locator('button').filter({ hasText: 'Explainer' }).first()
+    ).toBeVisible();
   });
 
   test('Chavruta is active by default and shows its greeting message', async ({
@@ -112,9 +131,7 @@ test.describe('Agents — page load and template selector', () => {
     await page.waitForLoadState('networkidle');
 
     // Click the Quiz Master card
-    const quizCard = page
-      .locator('button')
-      .filter({ hasText: 'Quiz Master' });
+    const quizCard = page.locator('button').filter({ hasText: 'Quiz Master' });
     await quizCard.click();
 
     // Chat header should switch to "Quiz Master"
@@ -126,9 +143,11 @@ test.describe('Agents — page load and template selector', () => {
     // Quiz greeting should appear — .first() avoids strict-mode violation when
     // the same text appears in both a chat bubble and a quick-prompt chip
     await expect(
-      page.getByText(/test your knowledge/i).or(page.getByText(/Quiz me/i)).or(
-        page.getByText(/random/i)
-      ).first()
+      page
+        .getByText(/test your knowledge/i)
+        .or(page.getByText(/Quiz me/i))
+        .or(page.getByText(/random/i))
+        .first()
     ).toBeVisible({ timeout: 3_000 });
   });
 
@@ -141,9 +160,15 @@ test.describe('Agents — page load and template selector', () => {
     // Chavruta prompts: 'Debate free will', 'Argue against Rambam', 'Challenge my thesis'
     // Scope to chips container (overflow-x-auto strip) to avoid collision with chat bubbles
     const chipsBar = page.locator('div.overflow-x-auto');
-    await expect(chipsBar.locator('button', { hasText: 'Debate free will' })).toBeVisible();
-    await expect(chipsBar.locator('button', { hasText: 'Argue against Rambam' })).toBeVisible();
-    await expect(chipsBar.locator('button', { hasText: 'Challenge my thesis' })).toBeVisible();
+    await expect(
+      chipsBar.locator('button', { hasText: 'Debate free will' })
+    ).toBeVisible();
+    await expect(
+      chipsBar.locator('button', { hasText: 'Argue against Rambam' })
+    ).toBeVisible();
+    await expect(
+      chipsBar.locator('button', { hasText: 'Challenge my thesis' })
+    ).toBeVisible();
   });
 });
 
@@ -173,9 +198,9 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     await page.keyboard.press('Enter');
 
     // User message should appear immediately
-    await expect(
-      page.getByText('What is free will?')
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('What is free will?')).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('after sending, AI response streams and eventually appears as a message', async ({
@@ -195,7 +220,10 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     // User bubble appears — .first() avoids strict-mode violation when the quick-prompt
     // chip with the same text is also visible alongside the chat bubble
     await expect(
-      page.locator('[class*="bg-primary"]').filter({ hasText: 'Debate free will' }).first()
+      page
+        .locator('[class*="bg-primary"]')
+        .filter({ hasText: 'Debate free will' })
+        .first()
     ).toBeVisible({ timeout: 3_000 });
 
     // Wait for streaming to complete and AI message to settle
@@ -212,7 +240,9 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     await page.waitForLoadState('networkidle');
 
     // Scope to chips bar to avoid strict-mode collision with chat bubble text
-    const chip = page.locator('div.overflow-x-auto button').filter({ hasText: 'Debate free will' });
+    const chip = page
+      .locator('div.overflow-x-auto button')
+      .filter({ hasText: 'Debate free will' });
     await chip.click();
 
     const chatInput = page.locator('input[placeholder*="Ask the"]');
@@ -240,9 +270,9 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     await resetBtn.click();
 
     // User message should be gone — only the initial greeting remains
-    await expect(
-      page.getByText('Test message for reset')
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Test message for reset')).not.toBeVisible({
+      timeout: 3_000,
+    });
 
     // Initial greeting still present
     await expect(
@@ -277,7 +307,7 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     expect(isDisabled).toBe(true);
   });
 
-  test('switching modes preserves each mode\'s chat history independently', async ({
+  test("switching modes preserves each mode's chat history independently", async ({
     page,
   }) => {
     await page.goto('/agents');
@@ -287,29 +317,23 @@ test.describe('Agents — chat interaction (DEV_MODE mock responses)', () => {
     const chatInput = page.locator('input[placeholder*="Ask the"]');
     await chatInput.fill('Chavruta specific message');
     await page.keyboard.press('Enter');
-    await expect(
-      page.getByText('Chavruta specific message')
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Chavruta specific message')).toBeVisible({
+      timeout: 3_000,
+    });
 
     // Switch to Quiz Master
-    await page
-      .locator('button')
-      .filter({ hasText: 'Quiz Master' })
-      .click();
+    await page.locator('button').filter({ hasText: 'Quiz Master' }).click();
 
     // The Chavruta message should not be visible in Quiz mode
-    await expect(
-      page.getByText('Chavruta specific message')
-    ).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText('Chavruta specific message')).not.toBeVisible({
+      timeout: 2_000,
+    });
 
     // Switch back to Chavruta — message should return
-    await page
-      .locator('button')
-      .filter({ hasText: 'Chavruta Debate' })
-      .click();
+    await page.locator('button').filter({ hasText: 'Chavruta Debate' }).click();
 
-    await expect(
-      page.getByText('Chavruta specific message')
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText('Chavruta specific message')).toBeVisible({
+      timeout: 3_000,
+    });
   });
 });

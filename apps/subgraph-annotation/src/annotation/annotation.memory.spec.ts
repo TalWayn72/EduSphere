@@ -13,9 +13,13 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: mocks.mockCreateConnection,
   schema: {
     annotations: {
-      id: 'id', asset_id: 'asset_id', user_id: 'user_id',
-      layer: 'layer', deleted_at: 'deleted_at',
-      tenant_id: 'tenant_id', created_at: 'created_at',
+      id: 'id',
+      asset_id: 'asset_id',
+      user_id: 'user_id',
+      layer: 'layer',
+      deleted_at: 'deleted_at',
+      tenant_id: 'tenant_id',
+      created_at: 'created_at',
     },
   },
   eq: vi.fn(),
@@ -93,7 +97,9 @@ describe('AnnotationService — memory leak prevention', () => {
 
   describe('closeAllPools() — error resilience', () => {
     it('onModuleDestroy does not rethrow if closeAllPools rejects', async () => {
-      mocks.mockCloseAllPools.mockRejectedValue(new Error('pool already closed'));
+      mocks.mockCloseAllPools.mockRejectedValue(
+        new Error('pool already closed')
+      );
       const moduleRef = await Test.createTestingModule({
         providers: [AnnotationService],
       }).compile();
@@ -101,7 +107,9 @@ describe('AnnotationService — memory leak prevention', () => {
       const service = moduleRef.get(AnnotationService);
       // Service calls closeAllPools — if it throws, the promise propagates
       // (This verifies the current implementation behavior)
-      await expect(service.onModuleDestroy()).rejects.toThrow('pool already closed');
+      await expect(service.onModuleDestroy()).rejects.toThrow(
+        'pool already closed'
+      );
     });
   });
 });

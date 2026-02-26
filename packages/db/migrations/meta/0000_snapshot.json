@@ -69,9 +69,7 @@
         "tenants_slug_unique": {
           "name": "tenants_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -154,12 +152,8 @@
           "name": "users_tenant_id_tenants_id_fk",
           "tableFrom": "users",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -169,10 +163,7 @@
         "users_email_tenant_id_unique": {
           "name": "users_email_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email",
-            "tenant_id"
-          ]
+          "columns": ["email", "tenant_id"]
         }
       },
       "policies": {},
@@ -262,12 +253,8 @@
           "name": "courses_tenant_id_tenants_id_fk",
           "tableFrom": "courses",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -275,12 +262,8 @@
           "name": "courses_creator_id_users_id_fk",
           "tableFrom": "courses",
           "tableTo": "users",
-          "columnsFrom": [
-            "creator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["creator_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -385,12 +368,8 @@
           "name": "media_assets_tenant_id_tenants_id_fk",
           "tableFrom": "media_assets",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -398,12 +377,8 @@
           "name": "media_assets_course_id_courses_id_fk",
           "tableFrom": "media_assets",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -411,12 +386,8 @@
           "name": "media_assets_module_id_modules_id_fk",
           "tableFrom": "media_assets",
           "tableTo": "modules",
-          "columnsFrom": [
-            "module_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["module_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -490,12 +461,8 @@
           "name": "modules_course_id_courses_id_fk",
           "tableFrom": "modules",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -505,10 +472,7 @@
         "modules_course_id_order_index_unique": {
           "name": "modules_course_id_order_index_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "course_id",
-            "order_index"
-          ]
+          "columns": ["course_id", "order_index"]
         }
       },
       "policies": {},
@@ -577,12 +541,8 @@
           "name": "transcript_segments_transcript_id_transcripts_id_fk",
           "tableFrom": "transcript_segments",
           "tableTo": "transcripts",
-          "columnsFrom": [
-            "transcript_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["transcript_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -644,12 +604,8 @@
           "name": "transcripts_asset_id_media_assets_id_fk",
           "tableFrom": "transcripts",
           "tableTo": "media_assets",
-          "columnsFrom": [
-            "asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -659,10 +615,7 @@
         "transcripts_asset_id_language_unique": {
           "name": "transcripts_asset_id_language_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "asset_id",
-            "language"
-          ]
+          "columns": ["asset_id", "language"]
         }
       },
       "policies": {},
@@ -763,12 +716,8 @@
           "name": "annotations_tenant_id_tenants_id_fk",
           "tableFrom": "annotations",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -776,12 +725,8 @@
           "name": "annotations_asset_id_media_assets_id_fk",
           "tableFrom": "annotations",
           "tableTo": "media_assets",
-          "columnsFrom": [
-            "asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -789,12 +734,8 @@
           "name": "annotations_user_id_users_id_fk",
           "tableFrom": "annotations",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -802,12 +743,8 @@
           "name": "annotations_parent_id_annotations_id_fk",
           "tableFrom": "annotations",
           "tableTo": "annotations",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -880,12 +817,8 @@
           "name": "collab_documents_tenant_id_tenants_id_fk",
           "tableFrom": "collab_documents",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -895,10 +828,7 @@
         "collab_documents_entity_type_entity_id_unique": {
           "name": "collab_documents_entity_type_entity_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "entity_type",
-            "entity_id"
-          ]
+          "columns": ["entity_type", "entity_id"]
         }
       },
       "policies": {},
@@ -955,12 +885,8 @@
           "name": "collab_sessions_document_id_collab_documents_id_fk",
           "tableFrom": "collab_sessions",
           "tableTo": "collab_documents",
-          "columnsFrom": [
-            "document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -968,12 +894,8 @@
           "name": "collab_sessions_user_id_users_id_fk",
           "tableFrom": "collab_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -983,9 +905,7 @@
         "collab_sessions_connection_id_unique": {
           "name": "collab_sessions_connection_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "connection_id"
-          ]
+          "columns": ["connection_id"]
         }
       },
       "policies": {},
@@ -1029,12 +949,8 @@
           "name": "crdt_updates_document_id_collab_documents_id_fk",
           "tableFrom": "crdt_updates",
           "tableTo": "collab_documents",
-          "columnsFrom": [
-            "document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1121,12 +1037,8 @@
           "name": "agent_definitions_tenant_id_tenants_id_fk",
           "tableFrom": "agent_definitions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1134,12 +1046,8 @@
           "name": "agent_definitions_creator_id_users_id_fk",
           "tableFrom": "agent_definitions",
           "tableTo": "users",
-          "columnsFrom": [
-            "creator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["creator_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1218,12 +1126,8 @@
           "name": "agent_executions_agent_id_agent_definitions_id_fk",
           "tableFrom": "agent_executions",
           "tableTo": "agent_definitions",
-          "columnsFrom": [
-            "agent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["agent_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1231,12 +1135,8 @@
           "name": "agent_executions_user_id_users_id_fk",
           "tableFrom": "agent_executions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1284,12 +1184,8 @@
           "name": "annotation_embeddings_annotation_id_annotations_id_fk",
           "tableFrom": "annotation_embeddings",
           "tableTo": "annotations",
-          "columnsFrom": [
-            "annotation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["annotation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1299,9 +1195,7 @@
         "annotation_embeddings_annotation_id_unique": {
           "name": "annotation_embeddings_annotation_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "annotation_id"
-          ]
+          "columns": ["annotation_id"]
         }
       },
       "policies": {},
@@ -1346,9 +1240,7 @@
         "concept_embeddings_concept_id_unique": {
           "name": "concept_embeddings_concept_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "concept_id"
-          ]
+          "columns": ["concept_id"]
         }
       },
       "policies": {},
@@ -1392,12 +1284,8 @@
           "name": "content_embeddings_segment_id_transcript_segments_id_fk",
           "tableFrom": "content_embeddings",
           "tableTo": "transcript_segments",
-          "columnsFrom": [
-            "segment_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["segment_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1407,9 +1295,7 @@
         "content_embeddings_segment_id_unique": {
           "name": "content_embeddings_segment_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "segment_id"
-          ]
+          "columns": ["segment_id"]
         }
       },
       "policies": {},

@@ -12,27 +12,37 @@ const GRAPH_NAME = graphConfig.graphName;
 export class CypherTopicClusterService {
   async findTopicClusterById(id: string, tenantId: string): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `MATCH (tc:TopicCluster {id: $id, tenant_id: $tenantId}) RETURN tc`,
-      { id, tenantId }, tenantId,
+      { id, tenantId },
+      tenantId
     );
     return result[0] || null;
   }
 
-  async findTopicClustersByCourse(courseId: string, tenantId: string): Promise<unknown[]> {
+  async findTopicClustersByCourse(
+    courseId: string,
+    tenantId: string
+  ): Promise<unknown[]> {
     return executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `MATCH (tc:TopicCluster {tenant_id: $tenantId})-[:BELONGS_TO]->(course {id: $courseId})
        RETURN tc`,
-      { tenantId, courseId }, tenantId,
+      { tenantId, courseId },
+      tenantId
     );
   }
 
   async createTopicCluster(
-    name: string, description: string | null, tenantId: string
+    name: string,
+    description: string | null,
+    tenantId: string
   ): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `CREATE (tc:TopicCluster {
         id: gen_random_uuid()::text,
         tenant_id: $tenantId,
@@ -41,7 +51,8 @@ export class CypherTopicClusterService {
         created_at: timestamp(),
         updated_at: timestamp()
       }) RETURN tc`,
-      { tenantId, name, description: description ?? null }, tenantId,
+      { tenantId, name, description: description ?? null },
+      tenantId
     );
     return result[0];
   }

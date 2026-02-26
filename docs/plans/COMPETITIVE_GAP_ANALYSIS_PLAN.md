@@ -49,11 +49,11 @@ This analysis identifies **47 feature gaps** across 12 categories. Rather than a
 
 ### 1.4 Summary Metrics
 
-| Priority Tier | Feature Count | Total Effort Range |
-|---|---|---|
-| Tier 1 (Now — 0-3 months) | 14 features | ~25-38 weeks total capacity |
-| Tier 2 (Next — 3-6 months) | 18 features | ~40-60 weeks total capacity |
-| Tier 3 (Future — 6-18 months) | 15 features | ~60-100+ weeks total capacity |
+| Priority Tier                 | Feature Count | Total Effort Range            |
+| ----------------------------- | ------------- | ----------------------------- |
+| Tier 1 (Now — 0-3 months)     | 14 features   | ~25-38 weeks total capacity   |
+| Tier 2 (Next — 3-6 months)    | 18 features   | ~40-60 weeks total capacity   |
+| Tier 3 (Future — 6-18 months) | 15 features   | ~60-100+ weeks total capacity |
 
 ---
 
@@ -65,14 +65,14 @@ The following capabilities are confirmed present in the codebase as of February 
 
 **GraphQL Federation (6 Subgraphs)**
 
-| Subgraph | Port | Verified Entities/Resolvers |
-|---|---|---|
-| `subgraph-core` | 4001 | User (5 roles), Tenant (4 plans), UserStats, UserPreferences, GDPR erasure/export, retention cleanup |
-| `subgraph-content` | 4002 | Course (publish/draft/fork), Module, ContentItem (7 types), Media (S3/MinIO presigned), Translations, CourseProgress |
-| `subgraph-annotation` | 4003 | Annotation (5 types, 4 layers), real-time subscription, thread replies, layer-RLS |
-| `subgraph-collaboration` | 4004 | Discussion (FORUM/CHAVRUTA/DEBATE), DiscussionMessage (threaded), Hocuspocus/Yjs CRDT server |
-| `subgraph-agent` | 4005 | AgentTemplate (10 types), AgentExecution, AgentSession, LangGraph.js workflows, LLM consent guard |
-| `subgraph-knowledge` | 4006 | Concept, Person, Term, Source, TopicCluster, ConceptRelationship, LearningPath (shortestPath), EmbeddingService |
+| Subgraph                 | Port | Verified Entities/Resolvers                                                                                          |
+| ------------------------ | ---- | -------------------------------------------------------------------------------------------------------------------- |
+| `subgraph-core`          | 4001 | User (5 roles), Tenant (4 plans), UserStats, UserPreferences, GDPR erasure/export, retention cleanup                 |
+| `subgraph-content`       | 4002 | Course (publish/draft/fork), Module, ContentItem (7 types), Media (S3/MinIO presigned), Translations, CourseProgress |
+| `subgraph-annotation`    | 4003 | Annotation (5 types, 4 layers), real-time subscription, thread replies, layer-RLS                                    |
+| `subgraph-collaboration` | 4004 | Discussion (FORUM/CHAVRUTA/DEBATE), DiscussionMessage (threaded), Hocuspocus/Yjs CRDT server                         |
+| `subgraph-agent`         | 4005 | AgentTemplate (10 types), AgentExecution, AgentSession, LangGraph.js workflows, LLM consent guard                    |
+| `subgraph-knowledge`     | 4006 | Concept, Person, Term, Source, TopicCluster, ConceptRelationship, LearningPath (shortestPath), EmbeddingService      |
 
 **Database (PostgreSQL 18 + Apache AGE + pgvector)**
 
@@ -967,23 +967,23 @@ The following scoring criteria are applied:
 
 The following features are architecturally sound but require significant prerequisites or represent longer-term market investments:
 
-| ID | Feature | Priority | Effort | Dependency |
-|---|---|---|---|---|
-| F-025 | Blockchain-verified micro-credentials (BCdiploma/OpenBadges 3.0) | Tier 3 | XL | F-014 (certificates) must exist first |
-| F-026 | Stackable credentials / nanodegree programs | Tier 3 | L | F-014 + F-011 (badges) |
-| F-027 | CPD/CE credit tracking with regulatory body export | Tier 3 | L | F-016 (compliance reports) |
-| F-028 | xAPI / Tin Can API statement emission + LRS | Tier 3 | L | Architecture decision on LRS vendor |
-| F-029 | Power BI / Tableau connector via REST API | Tier 3 | M | F-015 (analytics) must be built first |
-| F-030 | 360-degree multi-rater assessments | Tier 3 | L | New domain requiring product design |
-| F-031 | Instructor marketplace + revenue sharing | Tier 3 | XL | Stripe integration, legal/tax framework |
-| F-032 | SCORM 2004 export from EduSphere courses | Tier 3 | L | F-017 SCORM import first |
-| F-033 | CRM integration (Salesforce) | Tier 3 | M | F-019 HRIS integration pattern first |
-| F-034 | Live session breakout rooms + polls | Tier 3 | L | F-012 (virtual classroom) must exist |
-| F-035 | Social following system | Tier 3 | M | F-022 (public profiles) must exist |
-| F-036 | Social content recommendations | Tier 3 | L | F-035 + significant analytics data |
-| F-037 | No-code custom portal builder | Tier 3 | XL | Separate product investment |
-| F-038 | Pre-built compliance course library | Tier 3 | XL | Content/partnership investment |
-| F-039 | VPAT and HECVAT documentation | Tier 3 | S | F-024 (WCAG 2.2) must be verified first |
+| ID    | Feature                                                          | Priority | Effort | Dependency                              |
+| ----- | ---------------------------------------------------------------- | -------- | ------ | --------------------------------------- |
+| F-025 | Blockchain-verified micro-credentials (BCdiploma/OpenBadges 3.0) | Tier 3   | XL     | F-014 (certificates) must exist first   |
+| F-026 | Stackable credentials / nanodegree programs                      | Tier 3   | L      | F-014 + F-011 (badges)                  |
+| F-027 | CPD/CE credit tracking with regulatory body export               | Tier 3   | L      | F-016 (compliance reports)              |
+| F-028 | xAPI / Tin Can API statement emission + LRS                      | Tier 3   | L      | Architecture decision on LRS vendor     |
+| F-029 | Power BI / Tableau connector via REST API                        | Tier 3   | M      | F-015 (analytics) must be built first   |
+| F-030 | 360-degree multi-rater assessments                               | Tier 3   | L      | New domain requiring product design     |
+| F-031 | Instructor marketplace + revenue sharing                         | Tier 3   | XL     | Stripe integration, legal/tax framework |
+| F-032 | SCORM 2004 export from EduSphere courses                         | Tier 3   | L      | F-017 SCORM import first                |
+| F-033 | CRM integration (Salesforce)                                     | Tier 3   | M      | F-019 HRIS integration pattern first    |
+| F-034 | Live session breakout rooms + polls                              | Tier 3   | L      | F-012 (virtual classroom) must exist    |
+| F-035 | Social following system                                          | Tier 3   | M      | F-022 (public profiles) must exist      |
+| F-036 | Social content recommendations                                   | Tier 3   | L      | F-035 + significant analytics data      |
+| F-037 | No-code custom portal builder                                    | Tier 3   | XL     | Separate product investment             |
+| F-038 | Pre-built compliance course library                              | Tier 3   | XL     | Content/partnership investment          |
+| F-039 | VPAT and HECVAT documentation                                    | Tier 3   | S      | F-024 (WCAG 2.2) must be verified first |
 
 ---
 
@@ -1077,47 +1077,47 @@ With competency goals set (F-002), the skill gap is a graph query: find concepts
 
 All features sorted by Priority Tier, then by Business Value within tier.
 
-| ID | Feature | Category | Tier | Business Value | Effort | Platforms That Have It |
-|---|---|---|---|---|---|---|
-| F-010 | Streak Tracking | Gamification | 1 | HIGH | S (1w) | Khan Academy, Duolingo |
-| F-013 | WebVTT Auto-Captioning | Accessibility / Video | 1 | HIGH | S (1-2w) | Most modern LMS |
-| F-014 | Digital Certificate Auto-Generation | Credentials | 1 | HIGH | M (3-4w) | Every major LMS |
-| F-023 | AI Alt-Text Generation | Accessibility | 1 | HIGH | M (3-4w) | Multiple platforms |
-| F-015 | Instructor Analytics Dashboard | Analytics | 1 | HIGH | M (4-5w) | Every major LMS |
-| F-001 | Spaced Repetition System | Adaptive Learning | 1 | HIGH | M (3-4w) | SC Training, FLOWSPARKS |
-| F-002 | Competency Mapping + Auto-Pathing | Adaptive Learning | 1 | HIGH | M (4-5w) | Docebo, D2L |
-| F-004 | AI Course Creation from Prompt | AI Features | 1 | HIGH | M (4-6w) | Docebo, Mindsmith |
-| F-008 | Advanced Quiz Item Types | Assessment | 1 | HIGH | L (8-10w) | Articulate, most LMS |
-| F-012 | Virtual Classroom (BigBlueButton) | Live Learning | 1 | HIGH | L (8-10w) | Canvas, Moodle |
-| F-017 | SCORM 1.2/2004 Import | Integrations | 1 | HIGH | XL (14-18w) | Every major LMS |
-| F-024 | WCAG 2.2 AA Upgrade | Accessibility | 1 | HIGH | M (4-5w) | Absorb, Open LMS |
-| F-011 | Badges, Points, Leaderboards | Gamification | 2 | HIGH | M (4-5w) | TalentLMS, Absorb, Brightspace |
-| F-005 | Plagiarism Detection | AI Features | 2 | HIGH | M (4-5w) | Blackboard, Canvas |
-| F-006 | Skill Gap Analysis | AI Features | 2 | HIGH | M (3-4w) | Pluralsight, Docebo |
-| F-016 | Compliance Report Export | Analytics | 2 | HIGH | M (3-4w) | Cornerstone, TalentLMS |
-| F-018 | LTI 1.3 Provider | Integrations | 2 | HIGH | L (8-10w) | Canvas, Moodle, Blackboard |
-| F-019 | HRIS Auto-Enrollment (SCIM) | Integrations | 2 | HIGH | L (8-10w) | Cornerstone, Docebo |
-| F-003 | At-Risk Learner Flagging | Adaptive Learning | 2 | HIGH | L (8-10w) | D2L Brightspace |
-| F-020 | Rich Block Content Editor | Content Creation | 2 | HIGH | M (5-6w) | Canvas, Moodle, Teachable |
-| F-007 | AI Role-Play Scenarios | AI Features | 2 | HIGH | L (8-10w) | Adobe LM, Mursion |
-| F-009 | Branching Scenario Learning | Assessment | 2 | MED-HIGH | L (9-12w) | Articulate, Adobe Captivate |
-| F-022 | Public Learner Portfolio | Social | 2 | MED | M (3-4w) | LinkedIn Learning, Coursera |
-| F-021 | Microlearning Content Type | Microlearning | 2 | MED | M (4-5w) | SC Training, EdApp |
-| F-025 | Blockchain Micro-Credentials | Credentials | 3 | MED | XL (14+w) | BCdiploma, Credly |
-| F-026 | Stackable Credentials / Nanodegrees | Credentials | 3 | MED | L (8-10w) | Coursera, edX, Udacity |
-| F-027 | CPD/CE Credit Tracking | Compliance | 3 | MED | L (8-10w) | Multiple platforms |
-| F-028 | xAPI / LRS Integration | Integrations | 3 | MED | L (8-10w) | Most enterprise LMS |
-| F-029 | BI Tool Export (Power BI, Tableau) | Analytics | 3 | MED | M (3-4w) | Cornerstone, Docebo |
-| F-030 | 360-Degree Multi-Rater Assessment | Assessment | 3 | MED | L (8-10w) | Cornerstone, Docebo |
-| F-031 | Instructor Marketplace + Revenue Share | Marketplace | 3 | MED | XL (20+w) | Udemy, Teachable, Skillshare |
-| F-032 | SCORM Export | Integrations | 3 | MED | L (8-10w) | Most LMS |
-| F-033 | CRM Integration (Salesforce) | Integrations | 3 | LOW | M (4-5w) | Absorb LMS |
-| F-034 | Live Breakout Rooms + Polls | Live Learning | 3 | MED | L (8-10w) | Multiple platforms |
-| F-035 | Social Following System | Social | 3 | LOW | M (3-4w) | Multiple platforms |
-| F-036 | Social Content Recommendations | Social | 3 | LOW | L (7-9w) | LinkedIn Learning |
-| F-037 | No-Code Portal Builder | Content Creation | 3 | LOW | XL (20+w) | Adobe LM |
-| F-038 | Pre-Built Compliance Library | Marketplace | 3 | MED | XL (partner) | Cornerstone, LinkedIn |
-| F-039 | VPAT / HECVAT Documentation | Accessibility | 3 | HIGH | S (2-3w) | Absorb, Open LMS |
+| ID    | Feature                                | Category              | Tier | Business Value | Effort       | Platforms That Have It         |
+| ----- | -------------------------------------- | --------------------- | ---- | -------------- | ------------ | ------------------------------ |
+| F-010 | Streak Tracking                        | Gamification          | 1    | HIGH           | S (1w)       | Khan Academy, Duolingo         |
+| F-013 | WebVTT Auto-Captioning                 | Accessibility / Video | 1    | HIGH           | S (1-2w)     | Most modern LMS                |
+| F-014 | Digital Certificate Auto-Generation    | Credentials           | 1    | HIGH           | M (3-4w)     | Every major LMS                |
+| F-023 | AI Alt-Text Generation                 | Accessibility         | 1    | HIGH           | M (3-4w)     | Multiple platforms             |
+| F-015 | Instructor Analytics Dashboard         | Analytics             | 1    | HIGH           | M (4-5w)     | Every major LMS                |
+| F-001 | Spaced Repetition System               | Adaptive Learning     | 1    | HIGH           | M (3-4w)     | SC Training, FLOWSPARKS        |
+| F-002 | Competency Mapping + Auto-Pathing      | Adaptive Learning     | 1    | HIGH           | M (4-5w)     | Docebo, D2L                    |
+| F-004 | AI Course Creation from Prompt         | AI Features           | 1    | HIGH           | M (4-6w)     | Docebo, Mindsmith              |
+| F-008 | Advanced Quiz Item Types               | Assessment            | 1    | HIGH           | L (8-10w)    | Articulate, most LMS           |
+| F-012 | Virtual Classroom (BigBlueButton)      | Live Learning         | 1    | HIGH           | L (8-10w)    | Canvas, Moodle                 |
+| F-017 | SCORM 1.2/2004 Import                  | Integrations          | 1    | HIGH           | XL (14-18w)  | Every major LMS                |
+| F-024 | WCAG 2.2 AA Upgrade                    | Accessibility         | 1    | HIGH           | M (4-5w)     | Absorb, Open LMS               |
+| F-011 | Badges, Points, Leaderboards           | Gamification          | 2    | HIGH           | M (4-5w)     | TalentLMS, Absorb, Brightspace |
+| F-005 | Plagiarism Detection                   | AI Features           | 2    | HIGH           | M (4-5w)     | Blackboard, Canvas             |
+| F-006 | Skill Gap Analysis                     | AI Features           | 2    | HIGH           | M (3-4w)     | Pluralsight, Docebo            |
+| F-016 | Compliance Report Export               | Analytics             | 2    | HIGH           | M (3-4w)     | Cornerstone, TalentLMS         |
+| F-018 | LTI 1.3 Provider                       | Integrations          | 2    | HIGH           | L (8-10w)    | Canvas, Moodle, Blackboard     |
+| F-019 | HRIS Auto-Enrollment (SCIM)            | Integrations          | 2    | HIGH           | L (8-10w)    | Cornerstone, Docebo            |
+| F-003 | At-Risk Learner Flagging               | Adaptive Learning     | 2    | HIGH           | L (8-10w)    | D2L Brightspace                |
+| F-020 | Rich Block Content Editor              | Content Creation      | 2    | HIGH           | M (5-6w)     | Canvas, Moodle, Teachable      |
+| F-007 | AI Role-Play Scenarios                 | AI Features           | 2    | HIGH           | L (8-10w)    | Adobe LM, Mursion              |
+| F-009 | Branching Scenario Learning            | Assessment            | 2    | MED-HIGH       | L (9-12w)    | Articulate, Adobe Captivate    |
+| F-022 | Public Learner Portfolio               | Social                | 2    | MED            | M (3-4w)     | LinkedIn Learning, Coursera    |
+| F-021 | Microlearning Content Type             | Microlearning         | 2    | MED            | M (4-5w)     | SC Training, EdApp             |
+| F-025 | Blockchain Micro-Credentials           | Credentials           | 3    | MED            | XL (14+w)    | BCdiploma, Credly              |
+| F-026 | Stackable Credentials / Nanodegrees    | Credentials           | 3    | MED            | L (8-10w)    | Coursera, edX, Udacity         |
+| F-027 | CPD/CE Credit Tracking                 | Compliance            | 3    | MED            | L (8-10w)    | Multiple platforms             |
+| F-028 | xAPI / LRS Integration                 | Integrations          | 3    | MED            | L (8-10w)    | Most enterprise LMS            |
+| F-029 | BI Tool Export (Power BI, Tableau)     | Analytics             | 3    | MED            | M (3-4w)     | Cornerstone, Docebo            |
+| F-030 | 360-Degree Multi-Rater Assessment      | Assessment            | 3    | MED            | L (8-10w)    | Cornerstone, Docebo            |
+| F-031 | Instructor Marketplace + Revenue Share | Marketplace           | 3    | MED            | XL (20+w)    | Udemy, Teachable, Skillshare   |
+| F-032 | SCORM Export                           | Integrations          | 3    | MED            | L (8-10w)    | Most LMS                       |
+| F-033 | CRM Integration (Salesforce)           | Integrations          | 3    | LOW            | M (4-5w)     | Absorb LMS                     |
+| F-034 | Live Breakout Rooms + Polls            | Live Learning         | 3    | MED            | L (8-10w)    | Multiple platforms             |
+| F-035 | Social Following System                | Social                | 3    | LOW            | M (3-4w)     | Multiple platforms             |
+| F-036 | Social Content Recommendations         | Social                | 3    | LOW            | L (7-9w)     | LinkedIn Learning              |
+| F-037 | No-Code Portal Builder                 | Content Creation      | 3    | LOW            | XL (20+w)    | Adobe LM                       |
+| F-038 | Pre-Built Compliance Library           | Marketplace           | 3    | MED            | XL (partner) | Cornerstone, LinkedIn          |
+| F-039 | VPAT / HECVAT Documentation            | Accessibility         | 3    | HIGH           | S (2-3w)     | Absorb, Open LMS               |
 
 ---
 
@@ -1125,20 +1125,20 @@ All features sorted by Priority Tier, then by Business Value within tier.
 
 Before any Tier 1 feature development begins, the following are confirmed as already in place:
 
-| Prerequisite | Status | Location |
-|---|---|---|
-| Apache AGE graph with shortestPath | DONE | `subgraph-knowledge/src/graph/` |
-| pgvector 768-dim HNSW embeddings | DONE | `packages/db/src/schema/embeddings.ts` |
-| Vercel AI SDK `generateObject` | DONE | `transcription-worker/src/knowledge/concept-extractor.ts` |
-| LangGraph.js state machine workflows | DONE | `subgraph-agent/src/ai/` |
-| NATS JetStream event bus | DONE | All subgraphs via `packages/nats-client` |
-| MinIO S3 object storage (presigned URLs) | DONE | `subgraph-content/src/media/media.service.ts` |
-| Pino structured logging everywhere | DONE | All services |
-| faster-whisper timestamped transcription | DONE | `transcription-worker/src/` |
-| `@nestjs/schedule` cron capability | AVAILABLE | Can be added to any subgraph |
-| RLS + `withTenantContext` wrapper | DONE | All DB queries |
-| GDPR consent guard (`THIRD_PARTY_LLM`) | DONE | `subgraph-agent/src/ai/llm-consent.guard.ts` |
-| WCAG 2.1 AA tests (CI blocking) | DONE | `apps/web/e2e/accessibility.spec.ts` |
+| Prerequisite                             | Status    | Location                                                  |
+| ---------------------------------------- | --------- | --------------------------------------------------------- |
+| Apache AGE graph with shortestPath       | DONE      | `subgraph-knowledge/src/graph/`                           |
+| pgvector 768-dim HNSW embeddings         | DONE      | `packages/db/src/schema/embeddings.ts`                    |
+| Vercel AI SDK `generateObject`           | DONE      | `transcription-worker/src/knowledge/concept-extractor.ts` |
+| LangGraph.js state machine workflows     | DONE      | `subgraph-agent/src/ai/`                                  |
+| NATS JetStream event bus                 | DONE      | All subgraphs via `packages/nats-client`                  |
+| MinIO S3 object storage (presigned URLs) | DONE      | `subgraph-content/src/media/media.service.ts`             |
+| Pino structured logging everywhere       | DONE      | All services                                              |
+| faster-whisper timestamped transcription | DONE      | `transcription-worker/src/`                               |
+| `@nestjs/schedule` cron capability       | AVAILABLE | Can be added to any subgraph                              |
+| RLS + `withTenantContext` wrapper        | DONE      | All DB queries                                            |
+| GDPR consent guard (`THIRD_PARTY_LLM`)   | DONE      | `subgraph-agent/src/ai/llm-consent.guard.ts`              |
+| WCAG 2.1 AA tests (CI blocking)          | DONE      | `apps/web/e2e/accessibility.spec.ts`                      |
 
 ---
 

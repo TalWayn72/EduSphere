@@ -23,11 +23,22 @@ import {
   withTenantContext,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { EmbeddingClient } from './embedding.client.js';
-import type { SimilarSubmission, SubmissionCreatedPayload } from './plagiarism.types.js';
-import { DEFAULT_SIMILARITY_THRESHOLD, DEFAULT_TOP_K } from './plagiarism.types.js';
+import type {
+  SimilarSubmission,
+  SubmissionCreatedPayload,
+} from './plagiarism.types.js';
+import {
+  DEFAULT_SIMILARITY_THRESHOLD,
+  DEFAULT_TOP_K,
+} from './plagiarism.types.js';
 
 type SimRow = {
   submission_id: string;
@@ -68,10 +79,14 @@ export class PlagiarismService implements OnModuleInit, OnModuleDestroy {
     try {
       this.nc = await connect(buildNatsOptions());
       this.sub = this.nc.subscribe('EDUSPHERE.submission.created');
-      this.logger.log('PlagiarismService: subscribed to EDUSPHERE.submission.created');
+      this.logger.log(
+        'PlagiarismService: subscribed to EDUSPHERE.submission.created'
+      );
       void this.processMessages();
     } catch (err) {
-      this.logger.error(`PlagiarismService: NATS connect failed: ${String(err)}`);
+      this.logger.error(
+        `PlagiarismService: NATS connect failed: ${String(err)}`
+      );
     }
   }
 
@@ -79,10 +94,18 @@ export class PlagiarismService implements OnModuleInit, OnModuleDestroy {
     if (!this.sub) return;
     for await (const msg of this.sub) {
       try {
-        const payload = JSON.parse(this.sc.decode(msg.data)) as SubmissionCreatedPayload;
-        await this.processSubmission(payload.submissionId, payload.tenantId, payload.courseId);
+        const payload = JSON.parse(
+          this.sc.decode(msg.data)
+        ) as SubmissionCreatedPayload;
+        await this.processSubmission(
+          payload.submissionId,
+          payload.tenantId,
+          payload.courseId
+        );
       } catch (err) {
-        this.logger.error(`PlagiarismService: message processing error: ${String(err)}`);
+        this.logger.error(
+          `PlagiarismService: message processing error: ${String(err)}`
+        );
       }
     }
   }
@@ -92,7 +115,7 @@ export class PlagiarismService implements OnModuleInit, OnModuleDestroy {
   async processSubmission(
     submissionId: string,
     tenantId: string,
-    courseId: string,
+    courseId: string
   ): Promise<void> {
     const adminCtx: TenantContext = {
       tenantId,
@@ -100,17 +123,23 @@ export class PlagiarismService implements OnModuleInit, OnModuleDestroy {
       userRole: 'SUPER_ADMIN',
     };
 
-    const submission = await withTenantContext(this.db, adminCtx, async (tx) => {
-      const [row] = await tx
-        .select()
-        .from(schema.textSubmissions)
-        .where(eq(schema.textSubmissions.id, submissionId))
-        .limit(1);
-      return row ?? null;
-    });
+    const submission = await withTenantContext(
+      this.db,
+      adminCtx,
+      async (tx) => {
+        const [row] = await tx
+          .select()
+          .from(schema.textSubmissions)
+          .where(eq(schema.textSubmissions.id, submissionId))
+          .limit(1);
+        return row ?? null;
+      }
+    );
 
     if (!submission) {
-      this.logger.warn(`PlagiarismService: submission ${submissionId} not found`);
+      this.logger.warn(
+        `PlagiarismService: submission ${submissionId} not found`
+      );
       return;
     }
 
@@ -118,11 +147,19 @@ export class PlagiarismService implements OnModuleInit, OnModuleDestroy {
     try {
       vector = await this.embeddingClient.embed(submission.textContent);
     } catch (err) {
-      this.logger.error(`PlagiarismService: embedding failed for ${submissionId}: ${String(err)}`);
+      this.logger.error(
+        `PlagiarismService: embedding failed for ${submissionId}: ${String(err)}`
+      );
       return;
     }
 
-    const similar = await this.runSimilarityQuery(submissionId, tenantId, courseId, vector, adminCtx);
+    const similar = await this.runSimilarityQuery(
+      submissionId,
+      tenantId,
+      courseId,
+      vector,
+      adminCtx
+    );
     const threshold = await this.getThreshold(tenantId);
     const highest = similar[0]?.similarity ?? 0;
     const isFlagged = highest >= threshold;
@@ -151,14 +188,14 @@ export class PlagiarismService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.logger.log(
-      `PlagiarismService: checked ${submissionId} — highest=${highest.toFixed(3)} flagged=${isFlagged}`,
+      `PlagiarismService: checked ${submissionId} — highest=${highest.toFixed(3)} flagged=${isFlagged}`
     );
   }
 
   async getSimilarSubmissions(
     submissionId: string,
     tenantId: string,
-    topK: number = DEFAULT_TOP_K,
+    topK: number = DEFAULT_TOP_K
   ): Promise<SimilarSubmission[]> {
     const rows = (await this.db.execute<SimRow>(sql`
       SELECT
@@ -192,7 +229,7 @@ export class PlagiarismService implements OnModuleInit, OnModuleDestroy {
     tenantId: string,
     courseId: string,
     vector: number[],
-    adminCtx: TenantContext,
+    adminCtx: TenantContext
   ): Promise<SimilarSubmission[]> {
     const vecStr = `[${vector.join(',')}]`;
 

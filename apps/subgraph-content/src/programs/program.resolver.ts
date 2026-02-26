@@ -42,14 +42,20 @@ export class ProgramResolver {
   @Query('programProgress')
   async programProgress(
     @Args('programId') programId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-    this.logger.log(`programProgress: programId=${programId} userId=${auth.userId}`);
-    return this.programService.getProgramProgress(programId, auth.userId, auth.tenantId);
+    this.logger.log(
+      `programProgress: programId=${programId} userId=${auth.userId}`
+    );
+    return this.programService.getProgramProgress(
+      programId,
+      auth.userId,
+      auth.tenantId
+    );
   }
 
   @Mutation('createProgram')
@@ -59,17 +65,19 @@ export class ProgramResolver {
     @Args('requiredCourseIds') requiredCourseIds: string[],
     @Args('badgeEmoji') badgeEmoji: string | undefined,
     @Args('totalHours') totalHours: number | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-    this.logger.log(`createProgram: title="${title}" tenantId=${auth.tenantId}`);
+    this.logger.log(
+      `createProgram: title="${title}" tenantId=${auth.tenantId}`
+    );
     return this.programService.createProgram(
       { title, description, requiredCourseIds, badgeEmoji, totalHours },
       auth.tenantId,
-      auth.userId,
+      auth.userId
     );
   }
 
@@ -79,26 +87,37 @@ export class ProgramResolver {
     @Args('title') title: string | undefined,
     @Args('description') description: string | undefined,
     @Args('published') published: boolean | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
     this.logger.log(`updateProgram: id=${id} tenantId=${auth.tenantId}`);
-    return this.programService.updateProgram(id, { title, description, published }, auth.tenantId, auth.userId);
+    return this.programService.updateProgram(
+      id,
+      { title, description, published },
+      auth.tenantId,
+      auth.userId
+    );
   }
 
   @Mutation('enrollInProgram')
   async enrollInProgram(
     @Args('programId') programId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-    this.logger.log(`enrollInProgram: programId=${programId} userId=${auth.userId}`);
-    return this.programService.enrollInProgram(programId, auth.userId, auth.tenantId);
+    this.logger.log(
+      `enrollInProgram: programId=${programId} userId=${auth.userId}`
+    );
+    return this.programService.enrollInProgram(
+      programId,
+      auth.userId,
+      auth.tenantId
+    );
   }
 }

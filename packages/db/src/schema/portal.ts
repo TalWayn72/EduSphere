@@ -52,7 +52,7 @@ export const portalPages = pgTable(
         AND published = TRUE
       `,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type PortalPage = typeof portalPages.$inferSelect;

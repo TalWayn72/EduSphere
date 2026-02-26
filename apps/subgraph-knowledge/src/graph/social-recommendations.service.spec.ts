@@ -16,17 +16,29 @@ const mockTx = {
 
 vi.mock('@edusphere/db', () => ({
   db: {},
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => unknown) =>
-    cb(mockTx),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => unknown) =>
+      cb(mockTx)
   ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  userFollows: { followerId: 'follower_id', followingId: 'following_id', tenantId: 'tenant_id' },
-  userProgress: { userId: 'user_id', contentItemId: 'content_item_id', isCompleted: 'is_completed' },
+  userFollows: {
+    followerId: 'follower_id',
+    followingId: 'following_id',
+    tenantId: 'tenant_id',
+  },
+  userProgress: {
+    userId: 'user_id',
+    contentItemId: 'content_item_id',
+    isCompleted: 'is_completed',
+  },
   contentItems: { id: 'id', title: 'title' },
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val })),
   and: vi.fn((...args: unknown[]) => args),
   inArray: vi.fn((col: unknown, vals: unknown) => ({ col, vals })),
-  sql: Object.assign(vi.fn((...args: unknown[]) => args), { raw: vi.fn() }),
+  sql: Object.assign(
+    vi.fn((...args: unknown[]) => args),
+    { raw: vi.fn() }
+  ),
 }));
 
 // ─── Shared fixtures ───────────────────────────────────────────────────────────
@@ -35,9 +47,27 @@ const USER = 'user-uuid';
 const FOLLOWED_A = 'followed-uuid-a';
 const FOLLOWED_B = 'followed-uuid-b';
 
-const CONTENT_1 = { content_item_id: 'content-1', content_title: 'GraphQL Fundamentals', user_id: FOLLOWED_A, last_accessed_at: new Date(), is_completed: false };
-const CONTENT_2 = { content_item_id: 'content-2', content_title: 'Docker for Devs', user_id: FOLLOWED_B, last_accessed_at: new Date(), is_completed: false };
-const _CONTENT_3 = { content_item_id: 'content-3', content_title: 'Already Done', user_id: FOLLOWED_A, last_accessed_at: new Date(), is_completed: false };
+const CONTENT_1 = {
+  content_item_id: 'content-1',
+  content_title: 'GraphQL Fundamentals',
+  user_id: FOLLOWED_A,
+  last_accessed_at: new Date(),
+  is_completed: false,
+};
+const CONTENT_2 = {
+  content_item_id: 'content-2',
+  content_title: 'Docker for Devs',
+  user_id: FOLLOWED_B,
+  last_accessed_at: new Date(),
+  is_completed: false,
+};
+const _CONTENT_3 = {
+  content_item_id: 'content-3',
+  content_title: 'Already Done',
+  user_id: FOLLOWED_A,
+  last_accessed_at: new Date(),
+  is_completed: false,
+};
 
 function makeService() {
   return new SocialRecommendationsService();
@@ -94,7 +124,10 @@ describe('SocialRecommendationsService', () => {
   // ── Test 3 ───────────────────────────────────────────────────────────────────
   it('getRecommendations ranks by follower count descending', async () => {
     // Step 1: getFollowedUserIds — two followed users
-    setupSelectChain([{ followingId: FOLLOWED_A }, { followingId: FOLLOWED_B }]);
+    setupSelectChain([
+      { followingId: FOLLOWED_A },
+      { followingId: FOLLOWED_B },
+    ]);
     // Step 2: getMutualFollowerIds — no mutual followers
     setupSelectChain([]);
     // Step 3: getCompletedContentIds — USER has completed nothing
@@ -116,7 +149,10 @@ describe('SocialRecommendationsService', () => {
   // ── Test 4 ───────────────────────────────────────────────────────────────────
   it('getRecommendations gives mutual followers 2x weight boost', async () => {
     // Step 1: followed users: A and B
-    setupSelectChain([{ followingId: FOLLOWED_A }, { followingId: FOLLOWED_B }]);
+    setupSelectChain([
+      { followingId: FOLLOWED_A },
+      { followingId: FOLLOWED_B },
+    ]);
     // Step 2: getMutualFollowerIds — A follows USER back → A is mutual
     setupSelectChain([{ followerId: FOLLOWED_A }]);
     // Step 3: getCompletedContentIds — nothing completed

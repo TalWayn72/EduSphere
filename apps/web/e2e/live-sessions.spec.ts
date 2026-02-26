@@ -26,7 +26,7 @@ import { IS_DEV_MODE, RUN_WRITE_TESTS } from './env';
  */
 async function gotoContentViewer(
   page: Parameters<typeof login>[0],
-  contentId = 'content-1',
+  contentId = 'content-1'
 ) {
   await login(page);
   await page.goto(`/learn/${contentId}`);
@@ -41,9 +41,11 @@ test.describe('Live Sessions', () => {
   test.describe('LiveSessionCard', () => {
     // ── SCHEDULED status ──────────────────────────────────────────────────
 
-    test('SCHEDULED status badge renders with blue styling', async ({ page }) => {
+    test('SCHEDULED status badge renders with blue styling', async ({
+      page,
+    }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
       const hasScheduled = /SCHEDULED/i.test(body);
 
       if (hasScheduled) {
@@ -56,9 +58,11 @@ test.describe('Live Sessions', () => {
       }
     });
 
-    test('SCHEDULED or LIVE session renders a join/start button', async ({ page }) => {
+    test('SCHEDULED or LIVE session renders a join/start button', async ({
+      page,
+    }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
       const canJoin = /SCHEDULED|LIVE/i.test(body);
       if (canJoin) {
@@ -72,9 +76,11 @@ test.describe('Live Sessions', () => {
 
     // ── LIVE status ───────────────────────────────────────────────────────
 
-    test('LIVE status badge is rendered when session is live', async ({ page }) => {
+    test('LIVE status badge is rendered when session is live', async ({
+      page,
+    }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
       if (/\bLIVE\b/.test(body)) {
         const liveBadge = page.locator('text=LIVE');
@@ -82,14 +88,18 @@ test.describe('Live Sessions', () => {
       }
     });
 
-    test('LIVE badge may contain a pulsing Radio icon (SVG present)', async ({ page }) => {
+    test('LIVE badge may contain a pulsing Radio icon (SVG present)', async ({
+      page,
+    }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
       if (/\bLIVE\b/.test(body)) {
         // The component renders a <Radio className="animate-pulse"> inside the badge
         const svgInsideBadge = page
-          .locator('span:has-text("LIVE") svg, [class*="badge" i]:has-text("LIVE") svg')
+          .locator(
+            'span:has-text("LIVE") svg, [class*="badge" i]:has-text("LIVE") svg'
+          )
           .first();
         const count = await svgInsideBadge.count();
         // SVG presence is informational — component renders without crashing
@@ -99,23 +109,29 @@ test.describe('Live Sessions', () => {
 
     // ── ENDED status ──────────────────────────────────────────────────────
 
-    test('ENDED status badge renders when session has ended', async ({ page }) => {
+    test('ENDED status badge renders when session has ended', async ({
+      page,
+    }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
       if (/\bENDED\b/.test(body)) {
         await expect(page.locator('text=ENDED').first()).toBeVisible();
       }
     });
 
-    test('ENDED session with recording shows a <video> element', async ({ page }) => {
+    test('ENDED session with recording shows a <video> element', async ({
+      page,
+    }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
       if (/ENDED/i.test(body)) {
         // Recording is optional — check if a video element is present
         const videoCount = await page.locator('video').count();
-        const hasRecordingLabel = /Recording Available|recordingUrl/i.test(body);
+        const hasRecordingLabel = /Recording Available|recordingUrl/i.test(
+          body
+        );
         // If recording label is shown, video element should exist
         if (hasRecordingLabel) {
           expect(videoCount).toBeGreaterThan(0);
@@ -123,11 +139,16 @@ test.describe('Live Sessions', () => {
       }
     });
 
-    test('ENDED session without recording does not show join button', async ({ page }) => {
+    test('ENDED session without recording does not show join button', async ({
+      page,
+    }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
-      if (/ENDED/i.test(body) && !/recordingUrl|Recording Available/i.test(body)) {
+      if (
+        /ENDED/i.test(body) &&
+        !/recordingUrl|Recording Available/i.test(body)
+      ) {
         // canJoin is false for ENDED — no join button should be visible
         const joinBtn = page.getByRole('button', { name: /join session/i });
         expect(await joinBtn.count()).toBe(0);
@@ -138,7 +159,7 @@ test.describe('Live Sessions', () => {
 
     test('RECORDING status shows processing message', async ({ page }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
       if (/\bRECORDING\b/.test(body)) {
         // The card shows a "processing recording" message
@@ -159,12 +180,11 @@ test.describe('Live Sessions', () => {
 
     test('LiveSessionCard renders a scheduled date/time', async ({ page }) => {
       await gotoContentViewer(page);
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
 
       // Date/time from scheduledDate.toLocaleDateString() and toLocaleTimeString()
       // will render some date-like string if a live session card is present
-      const hasSessionCard =
-        /SCHEDULED|LIVE|ENDED|RECORDING/i.test(body);
+      const hasSessionCard = /SCHEDULED|LIVE|ENDED|RECORDING/i.test(body);
       if (hasSessionCard) {
         // A date string must exist alongside the status badge
         expect(body.length).toBeGreaterThan(50);
@@ -197,16 +217,23 @@ test.describe('Live Sessions', () => {
       expect(count).toBeGreaterThanOrEqual(0);
     });
 
-    test('ScheduleLiveSessionModal renders dialog with correct title', async ({ page }) => {
+    test('ScheduleLiveSessionModal renders dialog with correct title', async ({
+      page,
+    }) => {
       test.skip(!IS_DEV_MODE, 'This test relies on DEV_MODE mock data');
 
       await gotoContentViewer(page);
       const scheduleBtn = page.getByRole('button', {
         name: /schedule session|schedule live/i,
       });
-      const hasTrigger = await scheduleBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+      const hasTrigger = await scheduleBtn
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
 
-      test.skip(!hasTrigger, 'Schedule Session button not found on this content item');
+      test.skip(
+        !hasTrigger,
+        'Schedule Session button not found on this content item'
+      );
 
       await scheduleBtn.click();
       // The Dialog title is translated via i18n; match the key content
@@ -221,25 +248,35 @@ test.describe('Live Sessions', () => {
       const scheduleBtn = page.getByRole('button', {
         name: /schedule session|schedule live/i,
       });
-      const hasTrigger = await scheduleBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+      const hasTrigger = await scheduleBtn
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
       test.skip(!hasTrigger, 'Schedule trigger not found');
 
       await scheduleBtn.click();
-      await expect(page.locator('#meeting-name')).toBeVisible({ timeout: 5_000 });
+      await expect(page.locator('#meeting-name')).toBeVisible({
+        timeout: 5_000,
+      });
     });
 
-    test('modal has datetime-local input for scheduled time', async ({ page }) => {
+    test('modal has datetime-local input for scheduled time', async ({
+      page,
+    }) => {
       test.skip(!IS_DEV_MODE, 'Requires DEV_MODE mock data');
 
       await gotoContentViewer(page);
       const scheduleBtn = page.getByRole('button', {
         name: /schedule session|schedule live/i,
       });
-      const hasTrigger = await scheduleBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+      const hasTrigger = await scheduleBtn
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
       test.skip(!hasTrigger, 'Schedule trigger not found');
 
       await scheduleBtn.click();
-      await expect(page.locator('#scheduled-at')).toBeVisible({ timeout: 5_000 });
+      await expect(page.locator('#scheduled-at')).toBeVisible({
+        timeout: 5_000,
+      });
     });
 
     test('modal submit button is present', async ({ page }) => {
@@ -249,7 +286,9 @@ test.describe('Live Sessions', () => {
       const scheduleBtn = page.getByRole('button', {
         name: /schedule session|schedule live/i,
       });
-      const hasTrigger = await scheduleBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+      const hasTrigger = await scheduleBtn
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
       test.skip(!hasTrigger, 'Schedule trigger not found');
 
       await scheduleBtn.click();
@@ -268,7 +307,9 @@ test.describe('Live Sessions', () => {
       const scheduleBtn = page.getByRole('button', {
         name: /schedule session|schedule live/i,
       });
-      const hasTrigger = await scheduleBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+      const hasTrigger = await scheduleBtn
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
       test.skip(!hasTrigger, 'Schedule trigger not found');
 
       await scheduleBtn.click();
@@ -285,14 +326,18 @@ test.describe('Live Sessions', () => {
     test.describe('Create session (write)', () => {
       test.skip(!RUN_WRITE_TESTS, 'Skipped: RUN_WRITE_TESTS=false');
 
-      test('submitting the form with valid data closes the modal', async ({ page }) => {
+      test('submitting the form with valid data closes the modal', async ({
+        page,
+      }) => {
         test.skip(!IS_DEV_MODE, 'Requires DEV_MODE mock data');
 
         await gotoContentViewer(page);
         const scheduleBtn = page.getByRole('button', {
           name: /schedule session|schedule live/i,
         });
-        const hasTrigger = await scheduleBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+        const hasTrigger = await scheduleBtn
+          .isVisible({ timeout: 3_000 })
+          .catch(() => false);
         test.skip(!hasTrigger, 'Schedule trigger not found');
 
         await scheduleBtn.click();
@@ -305,14 +350,16 @@ test.describe('Live Sessions', () => {
         // Fill in a future datetime
         const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const localIso = new Date(
-          futureDate.getTime() - futureDate.getTimezoneOffset() * 60_000,
+          futureDate.getTime() - futureDate.getTimezoneOffset() * 60_000
         )
           .toISOString()
           .slice(0, 16);
         await dialog.locator('#scheduled-at').fill(localIso);
 
         // Submit
-        const submitBtn = dialog.getByRole('button', { name: /schedule|save|create/i });
+        const submitBtn = dialog.getByRole('button', {
+          name: /schedule|save|create/i,
+        });
         await submitBtn.click();
 
         // Modal should close on success
@@ -323,18 +370,23 @@ test.describe('Live Sessions', () => {
 
   // ── Visual regression ─────────────────────────────────────────────────────
 
-  test('visual: LiveSessionCard area in content viewer @visual', async ({ page }) => {
+  test('visual: LiveSessionCard area in content viewer @visual', async ({
+    page,
+  }) => {
     await gotoContentViewer(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     const hasSession = /SCHEDULED|LIVE|ENDED|RECORDING/i.test(body);
 
     if (hasSession) {
       // Screenshot just the card rather than the full page to reduce flakiness
-      const card = page.locator('[class*="card" i]').filter({
-        hasText: /SCHEDULED|LIVE|ENDED|RECORDING/i,
-      }).first();
+      const card = page
+        .locator('[class*="card" i]')
+        .filter({
+          hasText: /SCHEDULED|LIVE|ENDED|RECORDING/i,
+        })
+        .first();
       await expect(card).toHaveScreenshot('live-session-card.png', {
         maxDiffPixels: 200,
         animations: 'disabled',
@@ -355,15 +407,20 @@ test.describe('Live Sessions', () => {
     const scheduleBtn = page.getByRole('button', {
       name: /schedule session|schedule live/i,
     });
-    const hasTrigger = await scheduleBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+    const hasTrigger = await scheduleBtn
+      .isVisible({ timeout: 3_000 })
+      .catch(() => false);
 
     if (!hasTrigger) {
       // No modal trigger available — capture page as fallback baseline
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await expect(page).toHaveScreenshot('live-session-modal-unavailable.png', {
-        maxDiffPixels: 200,
-        animations: 'disabled',
-      });
+      await expect(page).toHaveScreenshot(
+        'live-session-modal-unavailable.png',
+        {
+          maxDiffPixels: 200,
+          animations: 'disabled',
+        }
+      );
       return;
     }
 

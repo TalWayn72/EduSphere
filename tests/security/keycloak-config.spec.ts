@@ -11,7 +11,7 @@ import { resolve, join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
 const REALM_PATH = resolve(
-  join(import.meta.dirname, '../../infrastructure/docker/keycloak-realm.json'),
+  join(import.meta.dirname, '../../infrastructure/docker/keycloak-realm.json')
 );
 
 interface KeycloakRealm {

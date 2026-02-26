@@ -40,10 +40,20 @@ const MOCK_COURSE = {
       description: 'Overview of GraphQL',
       orderIndex: 1,
       contentItems: [
-        { id: 'ci-1', title: 'What is GraphQL?', type: 'READING', orderIndex: 1 },
+        {
+          id: 'ci-1',
+          title: 'What is GraphQL?',
+          type: 'READING',
+          orderIndex: 1,
+        },
         { id: 'ci-2', title: 'Demo video', type: 'VIDEO', orderIndex: 2 },
         { id: 'ci-3', title: 'Quiz 1', type: 'QUIZ', orderIndex: 3 },
-        { id: 'ci-4', title: 'Practice exercise', type: 'EXERCISE', orderIndex: 4 },
+        {
+          id: 'ci-4',
+          title: 'Practice exercise',
+          type: 'EXERCISE',
+          orderIndex: 4,
+        },
       ],
     },
     {
@@ -64,7 +74,7 @@ function renderCourseDetail(courseId: string, mocks: MockedResponse[] = []) {
           <Route path="/course/:id" element={<CourseDetail />} />
         </Routes>
       </MemoryRouter>
-    </MockedProvider>,
+    </MockedProvider>
   );
 }
 

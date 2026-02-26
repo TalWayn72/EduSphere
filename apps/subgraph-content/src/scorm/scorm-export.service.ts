@@ -1,5 +1,14 @@
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import AdmZip from 'adm-zip';
 import {
@@ -48,52 +57,60 @@ export class ScormExportService implements OnModuleDestroy {
     await closeAllPools();
   }
 
-  async exportCourse(courseId: string, tenantCtx: TenantContext): Promise<string> {
+  async exportCourse(
+    courseId: string,
+    tenantCtx: TenantContext
+  ): Promise<string> {
     // 1. Fetch course and content items under RLS
-    const { course, items } = await withTenantContext(this.db, tenantCtx, async (tx) => {
-      const [courseRow] = await tx
-        .select()
-        .from(schema.courses)
-        .where(
-          and(
-            eq(schema.courses.id, courseId),
-            eq(schema.courses.tenant_id, tenantCtx.tenantId),
-            sql`${schema.courses.deleted_at} IS NULL`,
-          ),
-        )
-        .limit(1);
+    const { course, items } = await withTenantContext(
+      this.db,
+      tenantCtx,
+      async (tx) => {
+        const [courseRow] = await tx
+          .select()
+          .from(schema.courses)
+          .where(
+            and(
+              eq(schema.courses.id, courseId),
+              eq(schema.courses.tenant_id, tenantCtx.tenantId),
+              sql`${schema.courses.deleted_at} IS NULL`
+            )
+          )
+          .limit(1);
 
-      if (!courseRow) throw new NotFoundException(`Course ${courseId} not found`);
+        if (!courseRow)
+          throw new NotFoundException(`Course ${courseId} not found`);
 
-      const moduleRows = await tx
-        .select()
-        .from(schema.modules)
-        .where(
-          and(
-            eq(schema.modules.course_id, courseId),
-            sql`${schema.modules.deleted_at} IS NULL`,
-          ),
-        );
+        const moduleRows = await tx
+          .select()
+          .from(schema.modules)
+          .where(
+            and(
+              eq(schema.modules.course_id, courseId),
+              sql`${schema.modules.deleted_at} IS NULL`
+            )
+          );
 
-      const moduleIds = moduleRows.map((m) => m.id);
-      const contentRows: ContentItem[] =
-        moduleIds.length > 0
-          ? await tx
-              .select()
-              .from(schema.contentItems)
-              .where(sql`${schema.contentItems.moduleId} = ANY(${moduleIds})`)
-              .orderBy(schema.contentItems.orderIndex)
-          : [];
+        const moduleIds = moduleRows.map((m) => m.id);
+        const contentRows: ContentItem[] =
+          moduleIds.length > 0
+            ? await tx
+                .select()
+                .from(schema.contentItems)
+                .where(sql`${schema.contentItems.moduleId} = ANY(${moduleIds})`)
+                .orderBy(schema.contentItems.orderIndex)
+            : [];
 
-      return {
-        course: {
-          id: courseRow.id,
-          title: courseRow.title,
-          description: courseRow.description ?? null,
-        } satisfies CourseData,
-        items: contentRows,
-      };
-    });
+        return {
+          course: {
+            id: courseRow.id,
+            title: courseRow.title,
+            description: courseRow.description ?? null,
+          } satisfies CourseData,
+          items: contentRows,
+        };
+      }
+    );
 
     // 2. Build ZIP
     const zip = new AdmZip();
@@ -121,17 +138,24 @@ export class ScormExportService implements OnModuleDestroy {
         Key: key,
         Body: zipBuffer,
         ContentType: 'application/zip',
-      }),
+      })
     );
 
-    this.logger.log(`SCORM export uploaded: key=${key} size=${zipBuffer.length} bytes`);
+    this.logger.log(
+      `SCORM export uploaded: key=${key} size=${zipBuffer.length} bytes`
+    );
 
     // 7. Return presigned download URL (24h)
     const command = new GetObjectCommand({ Bucket: this.bucket, Key: key });
-    return getSignedUrl(this.s3, command, { expiresIn: EXPORT_URL_EXPIRY_SECONDS });
+    return getSignedUrl(this.s3, command, {
+      expiresIn: EXPORT_URL_EXPIRY_SECONDS,
+    });
   }
 
-  private async addContentItemToZip(zip: AdmZip, item: ContentItem): Promise<void> {
+  private async addContentItemToZip(
+    zip: AdmZip,
+    item: ContentItem
+  ): Promise<void> {
     const dir = `content/${item.id}`;
 
     if (item.type === 'VIDEO') {
@@ -162,7 +186,10 @@ export class ScormExportService implements OnModuleDestroy {
     if (item.type === 'MARKDOWN' && item.content) {
       const parsed = JSON.parse(item.content ?? '{}') as { text?: string };
       const mdHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${item.title}</title></head><body><pre>${parsed.text ?? ''}</pre></body></html>`;
-      zip.addFile(`${dir}/document.html`, Buffer.from(injectScormApiShim(mdHtml), 'utf-8'));
+      zip.addFile(
+        `${dir}/document.html`,
+        Buffer.from(injectScormApiShim(mdHtml), 'utf-8')
+      );
       return;
     }
 
@@ -170,13 +197,15 @@ export class ScormExportService implements OnModuleDestroy {
 
     // Fallback placeholder
     const placeholder = injectScormApiShim(
-      `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${item.title}</title></head><body><p>Content: ${item.title}</p></body></html>`,
+      `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${item.title}</title></head><body><p>Content: ${item.title}</p></body></html>`
     );
     zip.addFile(`${dir}/index.html`, Buffer.from(placeholder, 'utf-8'));
   }
 
   private async downloadFromMinio(key: string): Promise<Buffer> {
-    const response = await this.s3.send(new GetObjectCommand({ Bucket: this.bucket, Key: key }));
+    const response = await this.s3.send(
+      new GetObjectCommand({ Bucket: this.bucket, Key: key })
+    );
     const chunks: Uint8Array[] = [];
     for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
       chunks.push(chunk);

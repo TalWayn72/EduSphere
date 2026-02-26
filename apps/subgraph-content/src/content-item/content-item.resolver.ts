@@ -1,9 +1,4 @@
-import {
-  Resolver,
-  Query,
-  Args,
-  ResolveReference,
-} from '@nestjs/graphql';
+import { Resolver, Query, Args, ResolveReference } from '@nestjs/graphql';
 import { ContentItemService } from './content-item.service';
 
 @Resolver('ContentItem')

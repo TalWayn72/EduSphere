@@ -69,9 +69,7 @@
         "tenants_slug_unique": {
           "name": "tenants_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -169,12 +167,8 @@
           "name": "users_tenant_id_tenants_id_fk",
           "tableFrom": "users",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -184,10 +178,7 @@
         "users_email_tenant_id_unique": {
           "name": "users_email_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email",
-            "tenant_id"
-          ]
+          "columns": ["email", "tenant_id"]
         }
       },
       "policies": {},
@@ -322,12 +313,8 @@
           "name": "courses_tenant_id_tenants_id_fk",
           "tableFrom": "courses",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -335,12 +322,8 @@
           "name": "courses_creator_id_users_id_fk",
           "tableFrom": "courses",
           "tableTo": "users",
-          "columnsFrom": [
-            "creator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["creator_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -348,12 +331,8 @@
           "name": "courses_instructor_id_users_id_fk",
           "tableFrom": "courses",
           "tableTo": "users",
-          "columnsFrom": [
-            "instructor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["instructor_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -470,12 +449,8 @@
           "name": "media_assets_tenant_id_tenants_id_fk",
           "tableFrom": "media_assets",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -483,12 +458,8 @@
           "name": "media_assets_course_id_courses_id_fk",
           "tableFrom": "media_assets",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -496,12 +467,8 @@
           "name": "media_assets_module_id_modules_id_fk",
           "tableFrom": "media_assets",
           "tableTo": "modules",
-          "columnsFrom": [
-            "module_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["module_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -575,12 +542,8 @@
           "name": "modules_course_id_courses_id_fk",
           "tableFrom": "modules",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -590,10 +553,7 @@
         "modules_course_id_order_index_unique": {
           "name": "modules_course_id_order_index_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "course_id",
-            "order_index"
-          ]
+          "columns": ["course_id", "order_index"]
         }
       },
       "policies": {},
@@ -662,12 +622,8 @@
           "name": "transcript_segments_transcript_id_transcripts_id_fk",
           "tableFrom": "transcript_segments",
           "tableTo": "transcripts",
-          "columnsFrom": [
-            "transcript_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["transcript_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -729,12 +685,8 @@
           "name": "transcripts_asset_id_media_assets_id_fk",
           "tableFrom": "transcripts",
           "tableTo": "media_assets",
-          "columnsFrom": [
-            "asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -744,10 +696,7 @@
         "transcripts_asset_id_language_unique": {
           "name": "transcripts_asset_id_language_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "asset_id",
-            "language"
-          ]
+          "columns": ["asset_id", "language"]
         }
       },
       "policies": {},
@@ -830,12 +779,8 @@
           "name": "content_items_module_id_modules_id_fk",
           "tableFrom": "content_items",
           "tableTo": "modules",
-          "columnsFrom": [
-            "module_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["module_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -897,12 +842,8 @@
           "name": "user_courses_user_id_users_id_fk",
           "tableFrom": "user_courses",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -910,12 +851,8 @@
           "name": "user_courses_course_id_courses_id_fk",
           "tableFrom": "user_courses",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -990,12 +927,8 @@
           "name": "user_progress_user_id_users_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1003,12 +936,8 @@
           "name": "user_progress_content_item_id_content_items_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1171,12 +1100,8 @@
           "name": "annotations_tenant_id_tenants_id_fk",
           "tableFrom": "annotations",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1184,12 +1109,8 @@
           "name": "annotations_asset_id_media_assets_id_fk",
           "tableFrom": "annotations",
           "tableTo": "media_assets",
-          "columnsFrom": [
-            "asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1197,12 +1118,8 @@
           "name": "annotations_user_id_users_id_fk",
           "tableFrom": "annotations",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1210,12 +1127,8 @@
           "name": "annotations_parent_id_annotations_id_fk",
           "tableFrom": "annotations",
           "tableTo": "annotations",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1288,12 +1201,8 @@
           "name": "collab_documents_tenant_id_tenants_id_fk",
           "tableFrom": "collab_documents",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1303,10 +1212,7 @@
         "collab_documents_entity_type_entity_id_unique": {
           "name": "collab_documents_entity_type_entity_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "entity_type",
-            "entity_id"
-          ]
+          "columns": ["entity_type", "entity_id"]
         }
       },
       "policies": {},
@@ -1363,12 +1269,8 @@
           "name": "collab_sessions_document_id_collab_documents_id_fk",
           "tableFrom": "collab_sessions",
           "tableTo": "collab_documents",
-          "columnsFrom": [
-            "document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1376,12 +1278,8 @@
           "name": "collab_sessions_user_id_users_id_fk",
           "tableFrom": "collab_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1391,9 +1289,7 @@
         "collab_sessions_connection_id_unique": {
           "name": "collab_sessions_connection_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "connection_id"
-          ]
+          "columns": ["connection_id"]
         }
       },
       "policies": {},
@@ -1437,12 +1333,8 @@
           "name": "crdt_updates_document_id_collab_documents_id_fk",
           "tableFrom": "crdt_updates",
           "tableTo": "collab_documents",
-          "columnsFrom": [
-            "document_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["document_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1517,12 +1409,8 @@
           "name": "discussion_messages_discussion_id_discussions_id_fk",
           "tableFrom": "discussion_messages",
           "tableTo": "discussions",
-          "columnsFrom": [
-            "discussion_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["discussion_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1530,12 +1418,8 @@
           "name": "discussion_messages_user_id_users_id_fk",
           "tableFrom": "discussion_messages",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1583,12 +1467,8 @@
           "name": "discussion_participants_discussion_id_discussions_id_fk",
           "tableFrom": "discussion_participants",
           "tableTo": "discussions",
-          "columnsFrom": [
-            "discussion_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["discussion_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1596,12 +1476,8 @@
           "name": "discussion_participants_user_id_users_id_fk",
           "tableFrom": "discussion_participants",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1682,12 +1558,8 @@
           "name": "discussions_tenant_id_tenants_id_fk",
           "tableFrom": "discussions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1695,12 +1567,8 @@
           "name": "discussions_creator_id_users_id_fk",
           "tableFrom": "discussions",
           "tableTo": "users",
-          "columnsFrom": [
-            "creator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["creator_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1787,12 +1655,8 @@
           "name": "agent_definitions_tenant_id_tenants_id_fk",
           "tableFrom": "agent_definitions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1800,12 +1664,8 @@
           "name": "agent_definitions_creator_id_users_id_fk",
           "tableFrom": "agent_definitions",
           "tableTo": "users",
-          "columnsFrom": [
-            "creator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["creator_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1884,12 +1744,8 @@
           "name": "agent_executions_agent_id_agent_definitions_id_fk",
           "tableFrom": "agent_executions",
           "tableTo": "agent_definitions",
-          "columnsFrom": [
-            "agent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["agent_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1897,12 +1753,8 @@
           "name": "agent_executions_user_id_users_id_fk",
           "tableFrom": "agent_executions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1970,12 +1822,8 @@
           "name": "agent_sessions_user_id_users_id_fk",
           "tableFrom": "agent_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2056,12 +1904,8 @@
           "name": "agent_messages_session_id_agent_sessions_id_fk",
           "tableFrom": "agent_messages",
           "tableTo": "agent_sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2109,12 +1953,8 @@
           "name": "annotation_embeddings_annotation_id_annotations_id_fk",
           "tableFrom": "annotation_embeddings",
           "tableTo": "annotations",
-          "columnsFrom": [
-            "annotation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["annotation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2124,9 +1964,7 @@
         "annotation_embeddings_annotation_id_unique": {
           "name": "annotation_embeddings_annotation_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "annotation_id"
-          ]
+          "columns": ["annotation_id"]
         }
       },
       "policies": {},
@@ -2171,9 +2009,7 @@
         "concept_embeddings_concept_id_unique": {
           "name": "concept_embeddings_concept_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "concept_id"
-          ]
+          "columns": ["concept_id"]
         }
       },
       "policies": {},
@@ -2217,12 +2053,8 @@
           "name": "content_embeddings_segment_id_transcript_segments_id_fk",
           "tableFrom": "content_embeddings",
           "tableTo": "transcript_segments",
-          "columnsFrom": [
-            "segment_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["segment_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2232,9 +2064,7 @@
         "content_embeddings_segment_id_unique": {
           "name": "content_embeddings_segment_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "segment_id"
-          ]
+          "columns": ["segment_id"]
         }
       },
       "policies": {},
@@ -2360,12 +2190,8 @@
           "name": "content_translations_content_item_id_content_items_id_fk",
           "tableFrom": "content_translations",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2375,10 +2201,7 @@
         "ct_item_locale_uq": {
           "name": "ct_item_locale_uq",
           "nullsNotDistinct": false,
-          "columns": [
-            "content_item_id",
-            "locale"
-          ]
+          "columns": ["content_item_id", "locale"]
         }
       },
       "policies": {},
@@ -2556,9 +2379,7 @@
           "name": "audit_log_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        current_setting('app.current_user_role', TRUE) = 'SUPER_ADMIN'\n        OR tenant_id::text = current_setting('app.current_tenant', TRUE)\n      "
         }
       },
@@ -2659,10 +2480,7 @@
         "user_consents_user_type_unique": {
           "name": "user_consents_user_type_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "consent_type"
-          ]
+          "columns": ["user_id", "consent_type"]
         }
       },
       "policies": {
@@ -2670,9 +2488,7 @@
           "name": "user_consents_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n      "
         }
       },
@@ -2746,9 +2562,7 @@
           "name": "retention_policies_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id IS NULL\n        OR tenant_id::text = current_setting('app.current_tenant', TRUE)\n        OR current_setting('app.current_user_role', TRUE) = 'SUPER_ADMIN'\n      "
         }
       },
@@ -2891,12 +2705,8 @@
           "name": "tenant_branding_tenant_id_tenants_id_fk",
           "tableFrom": "tenant_branding",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2906,9 +2716,7 @@
         "tenant_branding_tenant_id_unique": {
           "name": "tenant_branding_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -2992,12 +2800,8 @@
           "name": "tenant_domains_tenant_id_tenants_id_fk",
           "tableFrom": "tenant_domains",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3007,9 +2811,7 @@
         "tenant_domains_domain_unique": {
           "name": "tenant_domains_domain_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "domain"
-          ]
+          "columns": ["domain"]
         }
       },
       "policies": {},
@@ -3074,9 +2876,7 @@
           "name": "competency_goals_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n      ",
           "withCheck": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n      "
         }
@@ -3164,9 +2964,7 @@
           "name": "srs_cards_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n      ",
           "withCheck": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n      "
         }
@@ -3241,12 +3039,8 @@
           "name": "quiz_results_user_id_users_id_fk",
           "tableFrom": "quiz_results",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3254,12 +3048,8 @@
           "name": "quiz_results_content_item_id_content_items_id_fk",
           "tableFrom": "quiz_results",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3363,12 +3153,8 @@
           "name": "live_sessions_content_item_id_content_items_id_fk",
           "tableFrom": "live_sessions",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3378,9 +3164,7 @@
         "live_sessions_bbb_meeting_id_unique": {
           "name": "live_sessions_bbb_meeting_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "bbb_meeting_id"
-          ]
+          "columns": ["bbb_meeting_id"]
         }
       },
       "policies": {},
@@ -3462,9 +3246,7 @@
         "badges_name_unique": {
           "name": "badges_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -3529,9 +3311,7 @@
           "name": "point_events_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -3588,12 +3368,8 @@
           "name": "user_badges_badge_id_badges_id_fk",
           "tableFrom": "user_badges",
           "tableTo": "badges",
-          "columnsFrom": [
-            "badge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["badge_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3605,9 +3381,7 @@
           "name": "user_badges_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -3660,9 +3434,7 @@
         "user_points_user_id_unique": {
           "name": "user_points_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {
@@ -3670,9 +3442,7 @@
           "name": "user_points_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "tenant_id::text = current_setting('app.current_tenant', TRUE)",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -3917,9 +3687,7 @@
           "name": "skill_profiles_tenant_isolation",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n      ",
           "withCheck": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND (\n          current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n        )\n      "
         }
@@ -3990,12 +3758,8 @@
           "name": "microlearning_paths_tenant_id_tenants_id_fk",
           "tableFrom": "microlearning_paths",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4003,12 +3767,8 @@
           "name": "microlearning_paths_created_by_users_id_fk",
           "tableFrom": "microlearning_paths",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -4083,9 +3843,7 @@
         "submission_embeddings_submission_id_unique": {
           "name": "submission_embeddings_submission_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "submission_id"
-          ]
+          "columns": ["submission_id"]
         }
       },
       "policies": {
@@ -4093,9 +3851,7 @@
           "name": "submission_embeddings_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n      ",
           "withCheck": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n      "
         }
@@ -4175,9 +3931,7 @@
           "name": "text_submissions_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        (user_id::text = current_setting('app.current_user_id', TRUE)\n          AND tenant_id::text = current_setting('app.current_tenant', TRUE))\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n      ",
           "withCheck": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        AND tenant_id::text = current_setting('app.current_tenant', TRUE)\n      "
         }
@@ -4338,12 +4092,8 @@
           "name": "scenario_sessions_user_id_users_id_fk",
           "tableFrom": "scenario_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4351,12 +4101,8 @@
           "name": "scenario_sessions_scenario_id_scenario_templates_id_fk",
           "tableFrom": "scenario_sessions",
           "tableTo": "scenario_templates",
-          "columnsFrom": [
-            "scenario_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scenario_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4364,12 +4110,8 @@
           "name": "scenario_sessions_tenant_id_tenants_id_fk",
           "tableFrom": "scenario_sessions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -4483,12 +4225,8 @@
           "name": "scenario_templates_tenant_id_tenants_id_fk",
           "tableFrom": "scenario_templates",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -4496,12 +4234,8 @@
           "name": "scenario_templates_created_by_users_id_fk",
           "tableFrom": "scenario_templates",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -4573,12 +4307,8 @@
           "name": "scenario_choices_user_id_users_id_fk",
           "tableFrom": "scenario_choices",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -4650,12 +4380,8 @@
           "name": "lti_launches_platform_id_lti_platforms_id_fk",
           "tableFrom": "lti_launches",
           "tableTo": "lti_platforms",
-          "columnsFrom": [
-            "platform_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["platform_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -4665,9 +4391,7 @@
         "lti_launches_nonce_unique": {
           "name": "lti_launches_nonce_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "launch_nonce"
-          ]
+          "columns": ["launch_nonce"]
         }
       },
       "policies": {},
@@ -4903,9 +4627,7 @@
         "scim_tokens_token_hash_unique": {
           "name": "scim_tokens_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
+          "columns": ["token_hash"]
         }
       },
       "policies": {},
@@ -5041,12 +4763,8 @@
           "name": "certificates_tenant_id_tenants_id_fk",
           "tableFrom": "certificates",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -5054,12 +4772,8 @@
           "name": "certificates_user_id_users_id_fk",
           "tableFrom": "certificates",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -5067,12 +4781,8 @@
           "name": "certificates_course_id_courses_id_fk",
           "tableFrom": "certificates",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -5082,9 +4792,7 @@
         "certificates_verification_code_unique": {
           "name": "certificates_verification_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "verification_code"
-          ]
+          "columns": ["verification_code"]
         }
       },
       "policies": {},
@@ -5164,9 +4872,7 @@
         "bi_api_tokens_token_hash_unique": {
           "name": "bi_api_tokens_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
+          "columns": ["token_hash"]
         }
       },
       "policies": {},
@@ -5271,9 +4977,7 @@
           "name": "user_follows_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND (\n          follower_id::text = current_setting('app.current_user_id', TRUE)\n          OR following_id::text = current_setting('app.current_user_id', TRUE)\n          OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n        )\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -5685,9 +5389,7 @@
         "xapi_tokens_token_hash_unique": {
           "name": "xapi_tokens_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
+          "columns": ["token_hash"]
         }
       },
       "policies": {},
@@ -6356,9 +6058,7 @@
           "name": "assessment_campaigns_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "tenant_id = current_setting('app.current_tenant', TRUE)::uuid\n        AND (\n          target_user_id = current_setting('app.current_user_id', TRUE)::uuid\n          OR current_setting('app.current_role', TRUE) IN ('ORG_ADMIN', 'SUPER_ADMIN', 'INSTRUCTOR')\n        )"
         }
       },
@@ -6473,9 +6173,7 @@
           "name": "assessment_responses_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "tenant_id = current_setting('app.current_tenant', TRUE)::uuid\n        AND (\n          responder_id = current_setting('app.current_user_id', TRUE)::uuid\n          OR current_setting('app.current_role', TRUE) IN ('ORG_ADMIN', 'SUPER_ADMIN', 'INSTRUCTOR')\n        )"
         }
       },
@@ -6538,9 +6236,7 @@
         "assessment_results_campaign_id_unique": {
           "name": "assessment_results_campaign_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "campaign_id"
-          ]
+          "columns": ["campaign_id"]
         }
       },
       "policies": {},
@@ -6646,9 +6342,7 @@
         "crm_connections_tenant_id_unique": {
           "name": "crm_connections_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -6839,12 +6533,8 @@
           "name": "open_badge_assertions_badge_definition_id_open_badge_definitions_id_fk",
           "tableFrom": "open_badge_assertions",
           "tableTo": "open_badge_definitions",
-          "columnsFrom": [
-            "badge_definition_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["badge_definition_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -6856,9 +6546,7 @@
           "name": "open_badge_assertions_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND (\n          recipient_id::text = current_setting('app.current_user_id', TRUE)\n          OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n        )\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -6960,9 +6648,7 @@
           "name": "open_badge_definitions_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND (\n          current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n          OR current_setting('app.current_user_role', TRUE) = 'STUDENT'\n        )\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -7066,9 +6752,7 @@
           "name": "course_listings_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "tenant_id::text = current_setting('app.current_tenant', TRUE)",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -7164,9 +6848,7 @@
           "name": "instructor_payouts_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        instructor_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -7269,9 +6951,7 @@
         "purchases_stripe_payment_intent_id_unique": {
           "name": "purchases_stripe_payment_intent_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "stripe_payment_intent_id"
-          ]
+          "columns": ["stripe_payment_intent_id"]
         }
       },
       "policies": {
@@ -7279,9 +6959,7 @@
           "name": "purchases_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR')\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -7349,9 +7027,7 @@
         "stripe_customers_stripe_customer_id_unique": {
           "name": "stripe_customers_stripe_customer_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "stripe_customer_id"
-          ]
+          "columns": ["stripe_customer_id"]
         }
       },
       "policies": {
@@ -7359,9 +7035,7 @@
           "name": "stripe_customers_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        user_id::text = current_setting('app.current_user_id', TRUE)\n        OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n      ",
           "withCheck": "tenant_id::text = current_setting('app.current_tenant', TRUE)"
         }
@@ -7627,9 +7301,7 @@
         "portal_pages_tenant_id_unique": {
           "name": "portal_pages_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {
@@ -7637,9 +7309,7 @@
           "name": "portal_pages_admin_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n      ",
           "withCheck": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n      "
         },
@@ -7647,9 +7317,7 @@
           "name": "portal_pages_read_published_rls",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND published = TRUE\n      "
         }
       },
@@ -7754,9 +7422,7 @@
           "name": "announcements_rls",
           "as": "PERMISSIVE",
           "for": "ALL",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "tenant_id::text = current_setting('app.current_tenant', TRUE)",
           "withCheck": "\n        tenant_id::text = current_setting('app.current_tenant', TRUE)\n        AND current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')\n      "
         }
@@ -7864,9 +7530,7 @@
         "security_settings_tenant_id_unique": {
           "name": "security_settings_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -8111,12 +7775,8 @@
           "name": "knowledge_sources_tenant_id_tenants_id_fk",
           "tableFrom": "knowledge_sources",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -8124,12 +7784,8 @@
           "name": "knowledge_sources_course_id_courses_id_fk",
           "tableFrom": "knowledge_sources",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -8163,51 +7819,27 @@
     "public.enrollment_status": {
       "name": "enrollment_status",
       "schema": "public",
-      "values": [
-        "ACTIVE",
-        "COMPLETED",
-        "DROPPED",
-        "SUSPENDED"
-      ]
+      "values": ["ACTIVE", "COMPLETED", "DROPPED", "SUSPENDED"]
     },
     "public.discussion_type": {
       "name": "discussion_type",
       "schema": "public",
-      "values": [
-        "FORUM",
-        "CHAVRUTA",
-        "DEBATE"
-      ]
+      "values": ["FORUM", "CHAVRUTA", "DEBATE"]
     },
     "public.message_type": {
       "name": "message_type",
       "schema": "public",
-      "values": [
-        "TEXT",
-        "IMAGE",
-        "VIDEO",
-        "AUDIO"
-      ]
+      "values": ["TEXT", "IMAGE", "VIDEO", "AUDIO"]
     },
     "public.session_status": {
       "name": "session_status",
       "schema": "public",
-      "values": [
-        "ACTIVE",
-        "COMPLETED",
-        "FAILED",
-        "CANCELLED"
-      ]
+      "values": ["ACTIVE", "COMPLETED", "FAILED", "CANCELLED"]
     },
     "public.message_role": {
       "name": "message_role",
       "schema": "public",
-      "values": [
-        "USER",
-        "ASSISTANT",
-        "SYSTEM",
-        "TOOL"
-      ]
+      "values": ["USER", "ASSISTANT", "SYSTEM", "TOOL"]
     },
     "public.consent_type": {
       "name": "consent_type",
@@ -8224,94 +7856,52 @@
     "public.live_session_status": {
       "name": "live_session_status",
       "schema": "public",
-      "values": [
-        "SCHEDULED",
-        "LIVE",
-        "ENDED",
-        "RECORDING"
-      ]
+      "values": ["SCHEDULED", "LIVE", "ENDED", "RECORDING"]
     },
     "public.at_risk_status": {
       "name": "at_risk_status",
       "schema": "public",
-      "values": [
-        "active",
-        "resolved",
-        "dismissed"
-      ]
+      "values": ["active", "resolved", "dismissed"]
     },
     "public.scim_operation": {
       "name": "scim_operation",
       "schema": "public",
-      "values": [
-        "CREATE_USER",
-        "UPDATE_USER",
-        "DELETE_USER",
-        "SYNC_GROUP"
-      ]
+      "values": ["CREATE_USER", "UPDATE_USER", "DELETE_USER", "SYNC_GROUP"]
     },
     "public.scim_status": {
       "name": "scim_status",
       "schema": "public",
-      "values": [
-        "SUCCESS",
-        "FAILED"
-      ]
+      "values": ["SUCCESS", "FAILED"]
     },
     "public.assessment_status": {
       "name": "assessment_status",
       "schema": "public",
-      "values": [
-        "DRAFT",
-        "ACTIVE",
-        "COMPLETED"
-      ]
+      "values": ["DRAFT", "ACTIVE", "COMPLETED"]
     },
     "public.rater_role": {
       "name": "rater_role",
       "schema": "public",
-      "values": [
-        "SELF",
-        "PEER",
-        "MANAGER",
-        "DIRECT_REPORT"
-      ]
+      "values": ["SELF", "PEER", "MANAGER", "DIRECT_REPORT"]
     },
     "public.marketplace_currency": {
       "name": "marketplace_currency",
       "schema": "public",
-      "values": [
-        "USD",
-        "EUR",
-        "ILS"
-      ]
+      "values": ["USD", "EUR", "ILS"]
     },
     "public.payout_status": {
       "name": "payout_status",
       "schema": "public",
-      "values": [
-        "PENDING",
-        "PAID",
-        "FAILED"
-      ]
+      "values": ["PENDING", "PAID", "FAILED"]
     },
     "public.purchase_status": {
       "name": "purchase_status",
       "schema": "public",
-      "values": [
-        "PENDING",
-        "COMPLETE",
-        "REFUNDED",
-        "FAILED"
-      ]
+      "values": ["PENDING", "COMPLETE", "REFUNDED", "FAILED"]
     },
     "public.library_license": {
       "name": "library_license",
       "schema": "public",
-      "values": [
-        "FREE",
-        "PAID"
-      ]
+      "values": ["FREE", "PAID"]
     },
     "public.library_topic": {
       "name": "library_topic",

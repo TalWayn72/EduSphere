@@ -35,26 +35,50 @@ export class CoursePage {
 
     // Course list
     this.courseListHeading = page.getByRole('heading', { name: 'Courses' });
-    this.courseCards = page.locator('[data-testid="course-card"], .hover\\:shadow-lg').filter({
-      has: page.locator('h3, [class*="CardTitle"]'),
-    });
+    this.courseCards = page
+      .locator('[data-testid="course-card"], .hover\\:shadow-lg')
+      .filter({
+        has: page.locator('h3, [class*="CardTitle"]'),
+      });
     this.enrollButtons = page.getByRole('button', { name: /Enroll/i });
 
     // Content viewer
     this.videoElement = page.locator('video');
-    this.playButton = page.getByRole('button').filter({ has: page.locator('.lucide-play, .lucide-pause') }).first();
-    this.muteButton = page.getByRole('button').filter({ has: page.locator('.lucide-volume2, .lucide-volume-x') }).first();
-    this.seekBar = page.locator('.flex-1.relative.h-2.bg-muted.rounded-full.cursor-pointer').first();
+    this.playButton = page
+      .getByRole('button')
+      .filter({ has: page.locator('.lucide-play, .lucide-pause') })
+      .first();
+    this.muteButton = page
+      .getByRole('button')
+      .filter({ has: page.locator('.lucide-volume2, .lucide-volume-x') })
+      .first();
+    this.seekBar = page
+      .locator('.flex-1.relative.h-2.bg-muted.rounded-full.cursor-pointer')
+      .first();
     this.currentTimeDisplay = page.locator('.tabular-nums').first();
-    this.transcriptPanel = page.locator('text=Transcript').locator('..').locator('..');
-    this.transcriptSegments = page.locator('.flex.gap-3.p-2.rounded-md.cursor-pointer');
-    this.annotationsPanel = page.locator('text=Annotations').first().locator('..').locator('..');
+    this.transcriptPanel = page
+      .locator('text=Transcript')
+      .locator('..')
+      .locator('..');
+    this.transcriptSegments = page.locator(
+      '.flex.gap-3.p-2.rounded-md.cursor-pointer'
+    );
+    this.annotationsPanel = page
+      .locator('text=Annotations')
+      .first()
+      .locator('..')
+      .locator('..');
     this.addAnnotationButton = page.getByRole('button', { name: /Add/i });
-    this.annotationTextarea = page.locator('textarea[placeholder*="annotation"]');
+    this.annotationTextarea = page.locator(
+      'textarea[placeholder*="annotation"]'
+    );
     this.saveAnnotationButton = page.getByRole('button', { name: /Save @/i });
-    this.layerToggleBar = page.locator('[data-testid="layer-toggle-bar"]').or(
-      page.locator('.flex.gap-1\\.5').filter({ has: page.locator('button') })
-    ).first();
+    this.layerToggleBar = page
+      .locator('[data-testid="layer-toggle-bar"]')
+      .or(
+        page.locator('.flex.gap-1\\.5').filter({ has: page.locator('button') })
+      )
+      .first();
     this.progressBar = page.locator('.h-2.bg-primary.rounded-full').first();
   }
 
@@ -88,7 +112,9 @@ export class CoursePage {
     const searchTab = this.page.getByRole('tab', { name: /Search/i });
     await searchTab.click();
 
-    const searchInput = this.page.locator('input[placeholder*="Search transcript"]');
+    const searchInput = this.page.locator(
+      'input[placeholder*="Search transcript"]'
+    );
     await searchInput.fill(query);
     // Debounce is 300ms in the real component; allow 500ms here
     await this.page.waitForTimeout(500);
@@ -135,6 +161,8 @@ export class CoursePage {
     const transcriptLabel = this.page.getByText('Transcript');
     await expect(transcriptLabel).toBeVisible();
     // At least one segment should be present (mock data has many)
-    await expect(this.transcriptSegments.first()).toBeVisible({ timeout: 5_000 });
+    await expect(this.transcriptSegments.first()).toBeVisible({
+      timeout: 5_000,
+    });
   }
 }

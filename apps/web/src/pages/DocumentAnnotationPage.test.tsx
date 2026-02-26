@@ -65,7 +65,7 @@ function renderPage() {
   return render(
     <MemoryRouter initialEntries={['/document/doc-1']}>
       <DocumentAnnotationPage />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -154,7 +154,14 @@ describe('DocumentAnnotationPage', () => {
     vi.mocked(useQuery).mockReturnValue([
       {
         fetching: false,
-        data: { contentItem: { id: 'doc-1', title: 'Test Doc', content: '{}', contentType: 'RICH_DOCUMENT' } },
+        data: {
+          contentItem: {
+            id: 'doc-1',
+            title: 'Test Doc',
+            content: '{}',
+            contentType: 'RICH_DOCUMENT',
+          },
+        },
         error: undefined,
       },
       vi.fn(),
@@ -171,7 +178,14 @@ describe('DocumentAnnotationPage', () => {
     vi.mocked(useQuery).mockReturnValue([
       {
         fetching: false,
-        data: { contentItem: { id: 'doc-1', title: 'My Document', content: '{}', contentType: 'RICH_DOCUMENT' } },
+        data: {
+          contentItem: {
+            id: 'doc-1',
+            title: 'My Document',
+            content: '{}',
+            contentType: 'RICH_DOCUMENT',
+          },
+        },
         error: undefined,
       },
       vi.fn(),
@@ -184,7 +198,14 @@ describe('DocumentAnnotationPage', () => {
     vi.mocked(useQuery).mockReturnValue([
       {
         fetching: false,
-        data: { contentItem: { id: 'doc-1', title: 'Doc', content: '{}', contentType: 'RICH_DOCUMENT' } },
+        data: {
+          contentItem: {
+            id: 'doc-1',
+            title: 'Doc',
+            content: '{}',
+            contentType: 'RICH_DOCUMENT',
+          },
+        },
         error: undefined,
       },
       vi.fn(),
@@ -198,13 +219,26 @@ describe('DocumentAnnotationPage', () => {
     vi.mocked(useQuery).mockReturnValue([
       {
         fetching: false,
-        data: { contentItem: { id: 'doc-1', title: 'Doc', content: 'hello', contentType: 'RICH_DOCUMENT' } },
+        data: {
+          contentItem: {
+            id: 'doc-1',
+            title: 'Doc',
+            content: 'hello',
+            contentType: 'RICH_DOCUMENT',
+          },
+        },
         error: undefined,
       },
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
     vi.mocked(useDocumentAnnotations).mockReturnValue({
-      textAnnotations: [{ id: 'ann-1', layer: AnnotationLayer.PERSONAL, textRange: { from: 10, to: 50 } }],
+      textAnnotations: [
+        {
+          id: 'ann-1',
+          layer: AnnotationLayer.PERSONAL,
+          textRange: { from: 10, to: 50 },
+        },
+      ],
       allAnnotations: mockAnnotations,
       focusedAnnotationId: null,
       setFocusedAnnotationId: vi.fn(),

@@ -88,7 +88,7 @@ export function RichEditor({
         e.target.value = '';
       }
     },
-    [editor, onImageUpload],
+    [editor, onImageUpload]
   );
 
   if (!editor) return null;
@@ -109,7 +109,9 @@ export function RichEditor({
           type="file"
           accept="image/jpeg,image/png,image/gif,image/webp"
           className="hidden"
-          onChange={(e) => { void handleFileChange(e); }}
+          onChange={(e) => {
+            void handleFileChange(e);
+          }}
           aria-hidden="true"
         />
       )}

@@ -38,23 +38,41 @@ export class AiLanggraphRunnerService {
     message: string,
     templateType: string,
     context: Record<string, unknown>,
-    locale: string,
+    locale: string
   ): Promise<AIResult | null> {
     const checkpointer = this.langGraphService.getCheckpointer();
 
     if (templateType === 'CHAVRUTA_DEBATE') {
       this.logger.debug(`LangGraph: debate session=${sessionId}`);
-      return runLangGraphDebate(sessionId, message, context, locale, checkpointer);
+      return runLangGraphDebate(
+        sessionId,
+        message,
+        context,
+        locale,
+        checkpointer
+      );
     }
 
     if (templateType === 'QUIZ_GENERATOR' || templateType === 'QUIZ_ASSESS') {
       this.logger.debug(`LangGraph: quiz session=${sessionId}`);
-      return runLangGraphQuiz(sessionId, message, context, locale, checkpointer);
+      return runLangGraphQuiz(
+        sessionId,
+        message,
+        context,
+        locale,
+        checkpointer
+      );
     }
 
     if (templateType === 'TUTOR' || templateType === 'EXPLANATION_GENERATOR') {
       this.logger.debug(`LangGraph: tutor session=${sessionId}`);
-      return runLangGraphTutor(sessionId, message, context, locale, checkpointer);
+      return runLangGraphTutor(
+        sessionId,
+        message,
+        context,
+        locale,
+        checkpointer
+      );
     }
 
     // Not a LangGraph template — signal caller to use legacy runner

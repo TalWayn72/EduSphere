@@ -61,8 +61,16 @@ const MOCK_OUTLINE = {
     title: 'Intro to AI',
     description: 'Learn the fundamentals of AI',
     modules: [
-      { title: 'Module 1', description: 'Basics', contentItemTitles: ['Lesson 1'] },
-      { title: 'Module 2', description: 'Advanced', contentItemTitles: ['Lesson 2'] },
+      {
+        title: 'Module 1',
+        description: 'Basics',
+        contentItemTitles: ['Lesson 1'],
+      },
+      {
+        title: 'Module 2',
+        description: 'Advanced',
+        contentItemTitles: ['Lesson 2'],
+      },
     ],
   },
   conceptNames: ['Intro to AI', 'Module 1'],
@@ -99,20 +107,23 @@ describe('CourseGeneratorService', () => {
     await service.generateCourse(
       { prompt: 'Test course' },
       'user-1',
-      'tenant-1',
+      'tenant-1'
     );
     expect(mockAssertConsent).toHaveBeenCalledOnce();
-    expect(mockAssertConsent).toHaveBeenCalledWith('user-1', expect.any(Boolean));
+    expect(mockAssertConsent).toHaveBeenCalledWith(
+      'user-1',
+      expect.any(Boolean)
+    );
   });
 
   it('throws CONSENT_REQUIRED when consent is missing', async () => {
     mockAssertConsent.mockRejectedValueOnce(
       new GraphQLError('Consent required', {
         extensions: { code: 'CONSENT_REQUIRED' },
-      }),
+      })
     );
     await expect(
-      service.generateCourse({ prompt: 'Test' }, 'user-1', 'tenant-1'),
+      service.generateCourse({ prompt: 'Test' }, 'user-1', 'tenant-1')
     ).rejects.toMatchObject({
       extensions: { code: 'CONSENT_REQUIRED' },
     });
@@ -122,7 +133,7 @@ describe('CourseGeneratorService', () => {
     const result = await service.generateCourse(
       { prompt: 'Intro to Machine Learning' },
       'user-1',
-      'tenant-1',
+      'tenant-1'
     );
     expect(result.executionId).toBe('exec-course-1');
     expect(result.status).toBe('RUNNING');
@@ -131,9 +142,13 @@ describe('CourseGeneratorService', () => {
 
   it('passes prompt, level, and hours to the insert values', async () => {
     await service.generateCourse(
-      { prompt: 'React course', targetAudienceLevel: 'beginner', estimatedHours: 5 },
+      {
+        prompt: 'React course',
+        targetAudienceLevel: 'beginner',
+        estimatedHours: 5,
+      },
       'user-1',
-      'tenant-1',
+      'tenant-1'
     );
     expect(mockValues).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -142,7 +157,7 @@ describe('CourseGeneratorService', () => {
           targetAudienceLevel: 'beginner',
           estimatedHours: 5,
         }),
-      }),
+      })
     );
   });
 

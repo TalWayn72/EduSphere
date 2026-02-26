@@ -56,7 +56,7 @@ function formatViolations(violations: Awaited<ReturnType<typeof auditPage>>) {
     .map(
       (v) =>
         `\n[${v.impact ?? 'unknown'}] ${v.id}: ${v.description}` +
-        `\n  Affected: ${v.nodes.map((n) => n.target.join(', ')).join('\n  ')}`,
+        `\n  Affected: ${v.nodes.map((n) => n.target.join(', ')).join('\n  ')}`
     )
     .join('\n');
 }
@@ -66,7 +66,12 @@ function formatViolations(violations: Awaited<ReturnType<typeof auditPage>>) {
  * minimum target size of 24x24 CSS pixels.
  */
 async function checkTargetSizes(page: Page): Promise<string[]> {
-  type ViolationEntry = { selector: string; width: number; height: number; text: string };
+  type ViolationEntry = {
+    selector: string;
+    width: number;
+    height: number;
+    text: string;
+  };
   const violations = await page.evaluate((): ViolationEntry[] => {
     const selectors = [
       'button:not([hidden]):not([disabled])',
@@ -86,7 +91,11 @@ async function checkTargetSizes(page: Page): Promise<string[]> {
             selector: sel,
             width: Math.round(box.width),
             height: Math.round(box.height),
-            text: (el.textContent ?? el.getAttribute('aria-label') ?? el.tagName)
+            text: (
+              el.textContent ??
+              el.getAttribute('aria-label') ??
+              el.tagName
+            )
               .trim()
               .slice(0, 60),
           });
@@ -95,7 +104,9 @@ async function checkTargetSizes(page: Page): Promise<string[]> {
     }
     return results;
   });
-  return violations.map((v) => `"${v.text}" [${v.selector}] -> ${v.width}x${v.height}px`);
+  return violations.map(
+    (v) => `"${v.text}" [${v.selector}] -> ${v.width}x${v.height}px`
+  );
 }
 
 /**
@@ -103,7 +114,12 @@ async function checkTargetSizes(page: Page): Promise<string[]> {
  * elements of a page.
  */
 async function checkFocusVisible(page: Page, maxTabs = 10): Promise<string[]> {
-  type FocusInfo = { tag: string; text: string; outlineWidth: string; outlineStyle: string } | null;
+  type FocusInfo = {
+    tag: string;
+    text: string;
+    outlineWidth: string;
+    outlineStyle: string;
+  } | null;
   const noOutline: string[] = [];
   for (let i = 0; i < maxTabs; i++) {
     await page.keyboard.press('Tab');
@@ -113,7 +129,9 @@ async function checkFocusVisible(page: Page, maxTabs = 10): Promise<string[]> {
       const cs = window.getComputedStyle(el);
       return {
         tag: el.tagName,
-        text: (el.textContent ?? el.getAttribute('aria-label') ?? '').trim().slice(0, 40),
+        text: (el.textContent ?? el.getAttribute('aria-label') ?? '')
+          .trim()
+          .slice(0, 40),
         outlineWidth: cs.outlineWidth,
         outlineStyle: cs.outlineStyle,
       };
@@ -136,27 +154,33 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('quiz page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('quiz page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/quiz/quiz-mc-1');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /quiz/quiz-mc-1:\n${violations.join('\n')}`,
+      `Target size violations on /quiz/quiz-mc-1:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('quiz page — focusable elements have visible outline', async ({ page }) => {
+  test('quiz page — focusable elements have visible outline', async ({
+    page,
+  }) => {
     await page.goto('/quiz/quiz-mc-1');
     await page.waitForLoadState('networkidle');
     const noOutline = await checkFocusVisible(page, 8);
     expect(
       noOutline,
-      `Elements missing focus outline on /quiz/quiz-mc-1:\n${noOutline.join('\n')}`,
+      `Elements missing focus outline on /quiz/quiz-mc-1:\n${noOutline.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('quiz page — answer options are keyboard navigable (Tab + Space/Enter)', async ({ page }) => {
+  test('quiz page — answer options are keyboard navigable (Tab + Space/Enter)', async ({
+    page,
+  }) => {
     await page.goto('/quiz/quiz-mc-1');
     await page.waitForLoadState('networkidle');
     // Tab into the question area
@@ -165,33 +189,46 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     // The focused element should be within the quiz card
     const focused = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;
-      return el ? { tag: el.tagName, role: el.getAttribute('role') ?? '' } : null;
+      return el
+        ? { tag: el.tagName, role: el.getAttribute('role') ?? '' }
+        : null;
     });
     // Verify focus reached an interactive element (not body)
     expect(focused).not.toBeNull();
     expect(focused?.tag).not.toBe('BODY');
   });
 
-  test('quiz page — Previous/Next buttons have accessible names', async ({ page }) => {
+  test('quiz page — Previous/Next buttons have accessible names', async ({
+    page,
+  }) => {
     await page.goto('/quiz/quiz-mc-1');
     await page.waitForLoadState('networkidle');
     const prevBtn = page.locator('button', { hasText: /previous/i });
     const nextBtn = page.locator('button', { hasText: /next|submit/i });
     const prevVisible = await prevBtn.isVisible().catch(() => false);
-    const nextVisible = await nextBtn.first().isVisible().catch(() => false);
+    const nextVisible = await nextBtn
+      .first()
+      .isVisible()
+      .catch(() => false);
     if (prevVisible) {
-      const prevLabel = await prevBtn.getAttribute('aria-label').catch(() => null)
-        ?? await prevBtn.textContent();
+      const prevLabel =
+        (await prevBtn.getAttribute('aria-label').catch(() => null)) ??
+        (await prevBtn.textContent());
       expect(prevLabel?.trim().length).toBeGreaterThan(0);
     }
     if (nextVisible) {
-      const nextLabel = await nextBtn.first().getAttribute('aria-label').catch(() => null)
-        ?? await nextBtn.first().textContent();
+      const nextLabel =
+        (await nextBtn
+          .first()
+          .getAttribute('aria-label')
+          .catch(() => null)) ?? (await nextBtn.first().textContent());
       expect(nextLabel?.trim().length).toBeGreaterThan(0);
     }
   });
 
-  test('quiz result page has no WCAG violations after submission', async ({ page }) => {
+  test('quiz result page has no WCAG violations after submission', async ({
+    page,
+  }) => {
     await page.goto('/quiz/quiz-mc-1');
     await page.waitForLoadState('networkidle');
     // Attempt to reach the result view
@@ -205,7 +242,10 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
   });
 });
 
@@ -219,39 +259,48 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('scenarios page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('scenarios page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/scenarios');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /scenarios:\n${violations.join('\n')}`,
+      `Target size violations on /scenarios:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('scenarios page — focusable elements have visible outline', async ({ page }) => {
+  test('scenarios page — focusable elements have visible outline', async ({
+    page,
+  }) => {
     await page.goto('/scenarios');
     await page.waitForLoadState('networkidle');
     const noOutline = await checkFocusVisible(page, 8);
     expect(
       noOutline,
-      `Elements missing focus outline on /scenarios:\n${noOutline.join('\n')}`,
+      `Elements missing focus outline on /scenarios:\n${noOutline.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('scenarios page — "Create Scenario" button has accessible name', async ({ page }) => {
+  test('scenarios page — "Create Scenario" button has accessible name', async ({
+    page,
+  }) => {
     await page.goto('/scenarios');
     await page.waitForLoadState('networkidle');
     const btn = page.locator('button', { hasText: /create scenario/i });
     const btnVisible = await btn.isVisible().catch(() => false);
     if (btnVisible) {
-      const label = await btn.getAttribute('aria-label').catch(() => null)
-        ?? await btn.textContent();
+      const label =
+        (await btn.getAttribute('aria-label').catch(() => null)) ??
+        (await btn.textContent());
       expect(label?.trim().length).toBeGreaterThan(0);
     }
   });
 
-  test('scenarios page — scenario cards are keyboard accessible', async ({ page }) => {
+  test('scenarios page — scenario cards are keyboard accessible', async ({
+    page,
+  }) => {
     await page.goto('/scenarios');
     await page.waitForLoadState('networkidle');
     // Tab into scenario grid
@@ -270,7 +319,10 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     }
     // At least one scenario card should be reachable by keyboard
     // This is a soft check — report but don't hard fail if no scenarios loaded
-    const scenarioCount = await page.locator('[class*="cursor-pointer"]').count().catch(() => 0);
+    const scenarioCount = await page
+      .locator('[class*="cursor-pointer"]')
+      .count()
+      .catch(() => 0);
     if (scenarioCount > 0) {
       expect(focusedCard).toBe(true);
     }
@@ -290,7 +342,10 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
   });
 });
 
@@ -304,17 +359,21 @@ test.describe('Accessibility — Rich Document Viewer @a11y-new', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('rich document page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('rich document page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/document/doc-1');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /document/doc-1:\n${violations.join('\n')}`,
+      `Target size violations on /document/doc-1:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('rich document page — document heading has correct heading hierarchy', async ({ page }) => {
+  test('rich document page — document heading has correct heading hierarchy', async ({
+    page,
+  }) => {
     await page.goto('/document/doc-1');
     await page.waitForLoadState('networkidle');
     // Page should have exactly one h1
@@ -326,7 +385,9 @@ test.describe('Accessibility — Rich Document Viewer @a11y-new', () => {
     }
   });
 
-  test('rich document page — error state is announced to screen readers', async ({ page }) => {
+  test('rich document page — error state is announced to screen readers', async ({
+    page,
+  }) => {
     await page.goto('/document/does-not-exist');
     await page.waitForLoadState('networkidle');
     // Error messages should have role="alert" or aria-live for SR announcement
@@ -337,10 +398,15 @@ test.describe('Accessibility — Rich Document Viewer @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
     // Soft assertion — document but do not block CI
     if (!alertVisible) {
-      console.warn('[a11y] /document/does-not-exist: error state lacks role="alert"');
+      console.warn(
+        '[a11y] /document/does-not-exist: error state lacks role="alert"'
+      );
     }
   });
 });
@@ -355,21 +421,27 @@ test.describe('Accessibility — LTI Settings Page @a11y-new', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('LTI settings page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('LTI settings page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/admin/lti');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /admin/lti:\n${violations.join('\n')}`,
+      `Target size violations on /admin/lti:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('LTI settings page — registration form labels are associated with inputs', async ({ page }) => {
+  test('LTI settings page — registration form labels are associated with inputs', async ({
+    page,
+  }) => {
     await page.goto('/admin/lti');
     await page.waitForLoadState('networkidle');
     // Open registration form
-    const registerBtn = page.locator('button', { hasText: /register platform/i });
+    const registerBtn = page.locator('button', {
+      hasText: /register platform/i,
+    });
     const btnVisible = await registerBtn.isVisible().catch(() => false);
     if (btnVisible) {
       await registerBtn.click();
@@ -380,16 +452,21 @@ test.describe('Accessibility — LTI Settings Page @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
   });
 
-  test('LTI settings page — focusable elements have visible outline', async ({ page }) => {
+  test('LTI settings page — focusable elements have visible outline', async ({
+    page,
+  }) => {
     await page.goto('/admin/lti');
     await page.waitForLoadState('networkidle');
     const noOutline = await checkFocusVisible(page, 8);
     expect(
       noOutline,
-      `Elements missing focus outline on /admin/lti:\n${noOutline.join('\n')}`,
+      `Elements missing focus outline on /admin/lti:\n${noOutline.join('\n')}`
     ).toHaveLength(0);
   });
 });
@@ -400,7 +477,9 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('SCIM settings page — generate token modal has no violations', async ({ page }) => {
+  test('SCIM settings page — generate token modal has no violations', async ({
+    page,
+  }) => {
     await page.goto('/admin/scim');
     await page.waitForLoadState('networkidle');
     const btn = page.locator('button', { hasText: /generate token/i });
@@ -413,10 +492,15 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
   });
 
-  test('SCIM settings page — modal can be dismissed with Escape key', async ({ page }) => {
+  test('SCIM settings page — modal can be dismissed with Escape key', async ({
+    page,
+  }) => {
     await page.goto('/admin/scim');
     await page.waitForLoadState('networkidle');
     const btn = page.locator('button', { hasText: /generate token/i });
@@ -438,19 +522,23 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     }
   });
 
-  test('SCIM settings page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('SCIM settings page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/admin/scim');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /admin/scim:\n${violations.join('\n')}`,
+      `Target size violations on /admin/scim:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 });
 
 test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
-  test('compliance reports page has no WCAG 2.2 AA violations', async ({ page }) => {
+  test('compliance reports page has no WCAG 2.2 AA violations', async ({
+    page,
+  }) => {
     const violations = await auditPage(page, '/admin/compliance');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
@@ -462,10 +550,15 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
   });
 
-  test('compliance reports page — date input has visible label', async ({ page }) => {
+  test('compliance reports page — date input has visible label', async ({
+    page,
+  }) => {
     await page.goto('/admin/compliance');
     await page.waitForLoadState('networkidle');
     const dateInput = page.locator('input[type="date"]');
@@ -473,7 +566,9 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
     if (dateVisible) {
       // Check that the date input has an associated label
       const labelText = await page.evaluate(() => {
-        const input = document.querySelector('input[type="date"]') as HTMLElement | null;
+        const input = document.querySelector(
+          'input[type="date"]'
+        ) as HTMLElement | null;
         if (!input) return null;
         const id = input.getAttribute('id');
         if (id) {
@@ -482,20 +577,24 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
         }
         const parent = input.closest('div');
         const label = parent?.querySelector('label');
-        return label ? (label as HTMLElement).textContent?.trim() ?? null : null;
+        return label
+          ? ((label as HTMLElement).textContent?.trim() ?? null)
+          : null;
       });
       // Label should be non-empty
       expect(labelText?.length).toBeGreaterThan(0);
     }
   });
 
-  test('compliance reports page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('compliance reports page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/admin/compliance');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /admin/compliance:\n${violations.join('\n')}`,
+      `Target size violations on /admin/compliance:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 });
@@ -505,34 +604,43 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Accessibility — Public Profile Page @a11y-new', () => {
-  test('public profile page has no WCAG 2.2 AA violations', async ({ page }) => {
+  test('public profile page has no WCAG 2.2 AA violations', async ({
+    page,
+  }) => {
     const violations = await auditPage(page, '/u/user-1');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('public profile page — private/not found state has no violations', async ({ page }) => {
+  test('public profile page — private/not found state has no violations', async ({
+    page,
+  }) => {
     const violations = await auditPage(page, '/u/non-existent-user-xyz');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('public profile page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('public profile page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/u/user-1');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /u/user-1:\n${violations.join('\n')}`,
+      `Target size violations on /u/user-1:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('public profile page — "Share" button has accessible name', async ({ page }) => {
+  test('public profile page — "Share" button has accessible name', async ({
+    page,
+  }) => {
     await page.goto('/u/user-1');
     await page.waitForLoadState('networkidle');
     const shareBtn = page.locator('button', { hasText: /share|copy/i });
     const btnVisible = await shareBtn.isVisible().catch(() => false);
     if (btnVisible) {
-      const label = await shareBtn.getAttribute('aria-label').catch(() => null)
-        ?? await shareBtn.textContent();
+      const label =
+        (await shareBtn.getAttribute('aria-label').catch(() => null)) ??
+        (await shareBtn.textContent());
       expect(label?.trim().length).toBeGreaterThan(0);
     }
   });
@@ -571,11 +679,16 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
         .withTags([...WCAG_TAGS])
         .disableRules(['color-contrast'])
         .analyze();
-      expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+      expect(
+        violations.violations,
+        formatViolations(violations.violations)
+      ).toHaveLength(0);
     }
   });
 
-  test('dashboard — DailyLearningWidget has no violations', async ({ page }) => {
+  test('dashboard — DailyLearningWidget has no violations', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     const widget = page.locator('.card', { hasText: 'Daily Learning' }).first();
@@ -586,7 +699,10 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
         .withTags([...WCAG_TAGS])
         .disableRules(['color-contrast'])
         .analyze();
-      expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+      expect(
+        violations.violations,
+        formatViolations(violations.violations)
+      ).toHaveLength(0);
     }
   });
 
@@ -597,10 +713,15 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
   });
 
-  test('dashboard — SkillGapWidget create-profile dialog has no violations', async ({ page }) => {
+  test('dashboard — SkillGapWidget create-profile dialog has no violations', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     const btn = page.locator('button', { hasText: /new profile/i });
@@ -616,28 +737,35 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
           .withTags([...WCAG_TAGS])
           .disableRules(['color-contrast'])
           .analyze();
-        expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+        expect(
+          violations.violations,
+          formatViolations(violations.violations)
+        ).toHaveLength(0);
       }
     }
   });
 
-  test('dashboard — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('dashboard — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /dashboard:\n${violations.join('\n')}`,
+      `Target size violations on /dashboard:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 
-  test('dashboard — focusable elements have visible focus outline', async ({ page }) => {
+  test('dashboard — focusable elements have visible focus outline', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     const noOutline = await checkFocusVisible(page, 10);
     expect(
       noOutline,
-      `Elements missing focus outline on /dashboard:\n${noOutline.join('\n')}`,
+      `Elements missing focus outline on /dashboard:\n${noOutline.join('\n')}`
     ).toHaveLength(0);
   });
 });
@@ -647,12 +775,16 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Accessibility — Course Analytics Page @a11y-new', () => {
-  test('course analytics page has no WCAG 2.2 AA violations', async ({ page }) => {
+  test('course analytics page has no WCAG 2.2 AA violations', async ({
+    page,
+  }) => {
     const violations = await auditPage(page, '/courses/course-1/analytics');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('course analytics page — at-risk table has accessible column headers', async ({ page }) => {
+  test('course analytics page — at-risk table has accessible column headers', async ({
+    page,
+  }) => {
     await page.goto('/courses/course-1/analytics');
     await page.waitForLoadState('networkidle');
     // Check that any table elements use proper th elements with scope
@@ -678,16 +810,21 @@ test.describe('Accessibility — Course Analytics Page @a11y-new', () => {
       .withTags([...WCAG_TAGS])
       .disableRules(['color-contrast'])
       .analyze();
-    expect(violations.violations, formatViolations(violations.violations)).toHaveLength(0);
+    expect(
+      violations.violations,
+      formatViolations(violations.violations)
+    ).toHaveLength(0);
   });
 
-  test('course analytics page — all interactive elements meet 24x24px target size', async ({ page }) => {
+  test('course analytics page — all interactive elements meet 24x24px target size', async ({
+    page,
+  }) => {
     await page.goto('/courses/course-1/analytics');
     await page.waitForLoadState('networkidle');
     const violations = await checkTargetSizes(page);
     expect(
       violations,
-      `Target size violations on /courses/course-1/analytics:\n${violations.join('\n')}`,
+      `Target size violations on /courses/course-1/analytics:\n${violations.join('\n')}`
     ).toHaveLength(0);
   });
 });
@@ -705,12 +842,16 @@ test.describe('Accessibility — RTL Layout (Hebrew) @a11y-new', () => {
     return auditPage(page, url);
   }
 
-  test('dashboard page is accessible in RTL mode (Hebrew)', async ({ page }) => {
+  test('dashboard page is accessible in RTL mode (Hebrew)', async ({
+    page,
+  }) => {
     const violations = await auditPageRTL(page, '/dashboard?lang=he');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('scenarios page is accessible in RTL mode (Hebrew)', async ({ page }) => {
+  test('scenarios page is accessible in RTL mode (Hebrew)', async ({
+    page,
+  }) => {
     const violations = await auditPageRTL(page, '/scenarios?lang=he');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
@@ -720,12 +861,16 @@ test.describe('Accessibility — RTL Layout (Hebrew) @a11y-new', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('public profile page is accessible in RTL mode (Hebrew)', async ({ page }) => {
+  test('public profile page is accessible in RTL mode (Hebrew)', async ({
+    page,
+  }) => {
     const violations = await auditPageRTL(page, '/u/user-1?lang=he');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('admin LTI page is accessible in RTL mode (Hebrew)', async ({ page }) => {
+  test('admin LTI page is accessible in RTL mode (Hebrew)', async ({
+    page,
+  }) => {
     const violations = await auditPageRTL(page, '/admin/lti?lang=he');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
@@ -763,7 +908,9 @@ test.describe('Accessibility — Mobile Viewport @a11y-new', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('admin compliance page on mobile has no WCAG violations', async ({ page }) => {
+  test('admin compliance page on mobile has no WCAG violations', async ({
+    page,
+  }) => {
     const violations = await auditPage(page, '/admin/compliance');
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
@@ -786,13 +933,15 @@ test.describe('WCAG 2.2 SC 2.5.8 — Target Size (new pages) @a11y-new', () => {
   ];
 
   for (const url of NEW_PAGES) {
-    test(`interactive elements on ${url} meet 24x24px target size`, async ({ page }) => {
+    test(`interactive elements on ${url} meet 24x24px target size`, async ({
+      page,
+    }) => {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
       const violations = await checkTargetSizes(page);
       expect(
         violations,
-        `Target size violations on ${url}:\n${violations.join('\n')}`,
+        `Target size violations on ${url}:\n${violations.join('\n')}`
       ).toHaveLength(0);
     });
   }
@@ -812,13 +961,15 @@ test.describe('WCAG 2.2 SC 2.4.11 — Focus Appearance (new pages) @a11y-new', (
   ];
 
   for (const url of FOCUS_PAGES) {
-    test(`focusable elements on ${url} have visible focus outline`, async ({ page }) => {
+    test(`focusable elements on ${url} have visible focus outline`, async ({
+      page,
+    }) => {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
       const noOutline = await checkFocusVisible(page, 8);
       expect(
         noOutline,
-        `Elements missing focus outline on ${url}:\n${noOutline.join('\n')}`,
+        `Elements missing focus outline on ${url}:\n${noOutline.join('\n')}`
       ).toHaveLength(0);
     });
   }

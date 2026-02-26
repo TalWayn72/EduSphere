@@ -64,15 +64,18 @@ async function auditPage(
 
   await page.waitForTimeout(1500); // let hydration settle
 
-  const screenshotPath = path.join(SCREENSHOT_DIR, `${label.replace(/\s+/g, '-').toLowerCase()}.png`);
+  const screenshotPath = path.join(
+    SCREENSHOT_DIR,
+    `${label.replace(/\s+/g, '-').toLowerCase()}.png`
+  );
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
   const status =
     consoleErrors.length > 0 || networkErrors.some((e) => e.startsWith('4'))
       ? 'error'
       : consoleWarnings.length > 2
-      ? 'warning'
-      : 'ok';
+        ? 'warning'
+        : 'ok';
 
   return {
     page: label,
@@ -97,7 +100,9 @@ async function loginViaKeycloak(page: Page) {
   await page.fill('input[name="password"]', STUDENT.password);
   await page.click('input[type="submit"]');
   await page.waitForURL(/localhost:5173/, { timeout: 20000 });
-  await page.waitForURL(/\/(learn|courses|dashboard|login)/, { timeout: 25000 });
+  await page.waitForURL(/\/(learn|courses|dashboard|login)/, {
+    timeout: 25000,
+  });
 }
 
 async function main() {
@@ -122,7 +127,9 @@ async function main() {
 
   // ── 1. Login page ──────────────────────────────────────────────
   console.log('📸 [1/7] Login page...');
-  results.push(await auditPage(page, '01-login', `${BASE_URL}/login`, 'button'));
+  results.push(
+    await auditPage(page, '01-login', `${BASE_URL}/login`, 'button')
+  );
 
   // ── 2. Login flow ──────────────────────────────────────────────
   console.log('🔐 [2/7] Authenticating via Keycloak...');
@@ -137,23 +144,48 @@ async function main() {
   console.log('📸 [3/7] Dashboard...');
   await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(2000);
-  results.push(await auditPage(page, '03-dashboard', `${BASE_URL}/dashboard`, 'h1'));
+  results.push(
+    await auditPage(page, '03-dashboard', `${BASE_URL}/dashboard`, 'h1')
+  );
 
   // ── 4. Courses ─────────────────────────────────────────────────
   console.log('📸 [4/7] Courses page...');
-  results.push(await auditPage(page, '04-courses', `${BASE_URL}/courses`, '[data-testid], h1, h2'));
+  results.push(
+    await auditPage(
+      page,
+      '04-courses',
+      `${BASE_URL}/courses`,
+      '[data-testid], h1, h2'
+    )
+  );
 
   // ── 5. Content viewer ──────────────────────────────────────────
   console.log('📸 [5/7] Content viewer (/learn/content-1)...');
-  results.push(await auditPage(page, '05-content-viewer', `${BASE_URL}/learn/content-1`, undefined));
+  results.push(
+    await auditPage(
+      page,
+      '05-content-viewer',
+      `${BASE_URL}/learn/content-1`,
+      undefined
+    )
+  );
 
   // ── 6. Knowledge Graph ─────────────────────────────────────────
   console.log('📸 [6/7] Knowledge Graph...');
-  results.push(await auditPage(page, '06-knowledge-graph', `${BASE_URL}/knowledge-graph`, undefined));
+  results.push(
+    await auditPage(
+      page,
+      '06-knowledge-graph',
+      `${BASE_URL}/knowledge-graph`,
+      undefined
+    )
+  );
 
   // ── 7. Profile / Settings ──────────────────────────────────────
   console.log('📸 [7/7] Profile page...');
-  results.push(await auditPage(page, '07-profile', `${BASE_URL}/profile`, undefined));
+  results.push(
+    await auditPage(page, '07-profile', `${BASE_URL}/profile`, undefined)
+  );
 
   await browser.close();
 
@@ -163,7 +195,8 @@ async function main() {
   console.log('═══════════════════════════════════════════════════');
 
   for (const r of results) {
-    const icon = r.status === 'ok' ? '✅' : r.status === 'warning' ? '⚠️' : '❌';
+    const icon =
+      r.status === 'ok' ? '✅' : r.status === 'warning' ? '⚠️' : '❌';
     console.log(`\n${icon} ${r.page}`);
     console.log(`   URL: ${r.url}`);
     console.log(`   Screenshot: ${r.screenshot}`);

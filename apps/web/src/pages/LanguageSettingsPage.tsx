@@ -9,7 +9,11 @@ import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import {
-  Card, CardContent, CardHeader, CardTitle, CardDescription,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
 } from '@/components/ui/card';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { Languages, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -31,13 +35,23 @@ const AVAILABLE_LOCALES: Locale[] = [
   { code: 'en', name: 'English', nativeName: 'English', rtl: false },
   { code: 'he', name: 'Hebrew', nativeName: 'עברית', rtl: true },
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', rtl: true },
-  { code: 'zh-CN', name: 'Chinese (Simplified)', nativeName: '中文（简体）', rtl: false },
+  {
+    code: 'zh-CN',
+    name: 'Chinese (Simplified)',
+    nativeName: '中文（简体）',
+    rtl: false,
+  },
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', rtl: false },
   { code: 'es', name: 'Spanish', nativeName: 'Español', rtl: false },
   { code: 'fr', name: 'French', nativeName: 'Français', rtl: false },
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', rtl: false },
   { code: 'ru', name: 'Russian', nativeName: 'Русский', rtl: false },
-  { code: 'id', name: 'Indonesian', nativeName: 'Bahasa Indonesia', rtl: false },
+  {
+    code: 'id',
+    name: 'Indonesian',
+    nativeName: 'Bahasa Indonesia',
+    rtl: false,
+  },
 ];
 
 interface LanguageSettings {
@@ -45,11 +59,15 @@ interface LanguageSettings {
   defaultLanguage: string;
 }
 
-interface QueryResult { myTenantLanguageSettings: LanguageSettings | null }
+interface QueryResult {
+  myTenantLanguageSettings: LanguageSettings | null;
+}
 
 function RtlBadge() {
   return (
-    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono">RTL</span>
+    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono">
+      RTL
+    </span>
   );
 }
 
@@ -61,8 +79,12 @@ export function LanguageSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const [queryResult] = useQuery<QueryResult>({ query: TENANT_LANGUAGE_SETTINGS_QUERY });
-  const [mutResult, updateSettings] = useMutation(UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION);
+  const [queryResult] = useQuery<QueryResult>({
+    query: TENANT_LANGUAGE_SETTINGS_QUERY,
+  });
+  const [mutResult, updateSettings] = useMutation(
+    UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION
+  );
 
   useEffect(() => {
     const s = queryResult.data?.myTenantLanguageSettings;
@@ -72,13 +94,20 @@ export function LanguageSettingsPage() {
     }
   }, [queryResult.data]);
 
-  if (!role || !ADMIN_ROLES.has(role)) { navigate('/dashboard'); return null; }
+  if (!role || !ADMIN_ROLES.has(role)) {
+    navigate('/dashboard');
+    return null;
+  }
 
   const handleToggleSupported = (code: string) => {
     if (code === defaultLanguage) return;
     setSupported((prev) => {
       const next = new Set(prev);
-      if (next.has(code)) { next.delete(code); } else { next.add(code); }
+      if (next.has(code)) {
+        next.delete(code);
+      } else {
+        next.add(code);
+      }
       return next;
     });
     setSaved(false);
@@ -105,7 +134,9 @@ export function LanguageSettingsPage() {
     }
   };
 
-  const defaultLocale = AVAILABLE_LOCALES.find((l) => l.code === defaultLanguage);
+  const defaultLocale = AVAILABLE_LOCALES.find(
+    (l) => l.code === defaultLanguage
+  );
 
   return (
     <Layout>
@@ -122,14 +153,17 @@ export function LanguageSettingsPage() {
 
         {queryResult.fetching ? (
           <div className="flex items-center gap-2 text-muted-foreground py-8">
-            <Loader2 className="h-5 w-5 animate-spin" /> Loading language settings...
+            <Loader2 className="h-5 w-5 animate-spin" /> Loading language
+            settings...
           </div>
         ) : (
           <>
             <Card>
               <CardHeader>
                 <CardTitle>Default Language</CardTitle>
-                <CardDescription>New users will see this language by default</CardDescription>
+                <CardDescription>
+                  New users will see this language by default
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <select
@@ -139,7 +173,8 @@ export function LanguageSettingsPage() {
                 >
                   {AVAILABLE_LOCALES.map((l) => (
                     <option key={l.code} value={l.code}>
-                      {l.name} - {l.nativeName}{l.rtl ? ' (RTL)' : ''}
+                      {l.name} - {l.nativeName}
+                      {l.rtl ? ' (RTL)' : ''}
                     </option>
                   ))}
                 </select>
@@ -149,7 +184,9 @@ export function LanguageSettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Enabled Languages</CardTitle>
-                <CardDescription>Choose which languages users can select</CardDescription>
+                <CardDescription>
+                  Choose which languages users can select
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 {supported.size === 0 && (
@@ -164,7 +201,10 @@ export function LanguageSettingsPage() {
                   return (
                     <label
                       key={l.code}
-                      className={'flex items-center gap-3 p-2 rounded-md hover:bg-muted cursor-pointer' + (isDefault ? ' opacity-70' : '')}
+                      className={
+                        'flex items-center gap-3 p-2 rounded-md hover:bg-muted cursor-pointer' +
+                        (isDefault ? ' opacity-70' : '')
+                      }
                     >
                       <input
                         type="checkbox"
@@ -173,11 +213,17 @@ export function LanguageSettingsPage() {
                         onChange={() => handleToggleSupported(l.code)}
                         className="h-4 w-4 rounded border"
                       />
-                      <span className="text-sm font-medium flex-1">{l.name}</span>
-                      <span className="text-sm text-muted-foreground">{l.nativeName}</span>
+                      <span className="text-sm font-medium flex-1">
+                        {l.name}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {l.nativeName}
+                      </span>
                       {l.rtl && <RtlBadge />}
                       {isDefault && (
-                        <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">default</span>
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                          default
+                        </span>
                       )}
                     </label>
                   );
@@ -188,28 +234,35 @@ export function LanguageSettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Preview</CardTitle>
-                <CardDescription>Enabled languages in your organization</CardDescription>
+                <CardDescription>
+                  Enabled languages in your organization
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-3 text-sm">
-                  {AVAILABLE_LOCALES.filter((l) => supported.has(l.code)).map((l) => (
-                    <span
-                      key={l.code}
-                      dir={l.rtl ? 'rtl' : 'ltr'}
-                      className={'px-3 py-1.5 rounded-full border text-sm' + (
-                        l.code === defaultLanguage
-                          ? ' bg-primary text-primary-foreground border-primary font-medium'
-                          : ' bg-muted border-transparent'
-                      )}
-                    >
-                      {l.nativeName}
-                    </span>
-                  ))}
+                  {AVAILABLE_LOCALES.filter((l) => supported.has(l.code)).map(
+                    (l) => (
+                      <span
+                        key={l.code}
+                        dir={l.rtl ? 'rtl' : 'ltr'}
+                        className={
+                          'px-3 py-1.5 rounded-full border text-sm' +
+                          (l.code === defaultLanguage
+                            ? ' bg-primary text-primary-foreground border-primary font-medium'
+                            : ' bg-muted border-transparent')
+                        }
+                      >
+                        {l.nativeName}
+                      </span>
+                    )
+                  )}
                 </div>
                 {defaultLocale && (
                   <p className="mt-3 text-xs text-muted-foreground">
                     Default: <strong>{defaultLocale.name}</strong>
-                    {defaultLocale.rtl ? ' - Right-to-left layout will be applied' : ''}
+                    {defaultLocale.rtl
+                      ? ' - Right-to-left layout will be applied'
+                      : ''}
                   </p>
                 )}
               </CardContent>
@@ -220,7 +273,9 @@ export function LanguageSettingsPage() {
                 onClick={() => void handleSave()}
                 disabled={mutResult.fetching || supported.size === 0}
               >
-                {mutResult.fetching && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {mutResult.fetching && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
                 Save Changes
               </Button>
               {saved && (

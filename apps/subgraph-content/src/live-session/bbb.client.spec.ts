@@ -1,11 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createHash } from 'crypto';
-import { BigBlueButtonClient, createBbbClient, BBB_DEMO_JOIN_URL } from './bbb.client';
+import {
+  BigBlueButtonClient,
+  createBbbClient,
+  BBB_DEMO_JOIN_URL,
+} from './bbb.client';
 
 const TEST_URL = 'https://bbb.example.com/bigbluebutton/api';
 const TEST_SECRET = 'test-secret-abc123';
 
-function expectedChecksum(apiCall: string, params: Record<string, string>): string {
+function expectedChecksum(
+  apiCall: string,
+  params: Record<string, string>
+): string {
   const queryString = new URLSearchParams(params).toString();
   return createHash('sha256')
     .update(apiCall + queryString + TEST_SECRET)
@@ -21,7 +28,12 @@ describe('BigBlueButtonClient', () => {
 
   describe('buildJoinUrl', () => {
     it('includes correct checksum in join URL', () => {
-      const params = { meetingID: 'meeting-1', fullName: 'Alice', password: 'pw123', redirect: 'true' };
+      const params = {
+        meetingID: 'meeting-1',
+        fullName: 'Alice',
+        password: 'pw123',
+        redirect: 'true',
+      };
       const checksum = expectedChecksum('join', params);
       const url = client.buildJoinUrl('meeting-1', 'Alice', 'pw123');
 
@@ -47,22 +59,29 @@ describe('BigBlueButtonClient', () => {
     });
 
     it('resolves when BBB returns SUCCESS', async () => {
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
-        text: async () => '<returncode>SUCCESS</returncode>',
-      }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValueOnce({
+          text: async () => '<returncode>SUCCESS</returncode>',
+        })
+      );
 
       await expect(
-        client.createMeeting('mid', 'Meeting', 'apw', 'mpw'),
+        client.createMeeting('mid', 'Meeting', 'apw', 'mpw')
       ).resolves.toBeUndefined();
     });
 
     it('throws when BBB returns FAILED', async () => {
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
-        text: async () => '<returncode>FAILED</returncode><message>Bad meeting</message>',
-      }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValueOnce({
+          text: async () =>
+            '<returncode>FAILED</returncode><message>Bad meeting</message>',
+        })
+      );
 
       await expect(
-        client.createMeeting('mid', 'Meeting', 'apw', 'mpw'),
+        client.createMeeting('mid', 'Meeting', 'apw', 'mpw')
       ).rejects.toThrow('BBB create meeting failed');
     });
   });
@@ -73,19 +92,25 @@ describe('BigBlueButtonClient', () => {
     });
 
     it('extracts the recording URL from XML', async () => {
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
-        text: async () =>
-          '<returncode>SUCCESS</returncode><url>https://bbb.example.com/rec/meeting-1</url>',
-      }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValueOnce({
+          text: async () =>
+            '<returncode>SUCCESS</returncode><url>https://bbb.example.com/rec/meeting-1</url>',
+        })
+      );
 
       const url = await client.getRecordingUrl('meeting-1');
       expect(url).toBe('https://bbb.example.com/rec/meeting-1');
     });
 
     it('returns null when no recording is available', async () => {
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
-        text: async () => '<returncode>SUCCESS</returncode><recordings/>',
-      }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValueOnce({
+          text: async () => '<returncode>SUCCESS</returncode><recordings/>',
+        })
+      );
 
       const url = await client.getRecordingUrl('meeting-1');
       expect(url).toBeNull();

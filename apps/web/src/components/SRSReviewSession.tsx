@@ -21,17 +21,23 @@ interface SubmitReviewResult {
   submitReview: { id: string };
 }
 
-const QUALITY_BUTTONS: { label: string; quality: number; variant: 'destructive' | 'outline' | 'secondary' | 'default' }[] = [
+const QUALITY_BUTTONS: {
+  label: string;
+  quality: number;
+  variant: 'destructive' | 'outline' | 'secondary' | 'default';
+}[] = [
   { label: 'Again', quality: 1, variant: 'destructive' },
-  { label: 'Hard',  quality: 3, variant: 'outline' },
-  { label: 'Good',  quality: 4, variant: 'secondary' },
-  { label: 'Easy',  quality: 5, variant: 'default' },
+  { label: 'Hard', quality: 3, variant: 'outline' },
+  { label: 'Good', quality: 4, variant: 'secondary' },
+  { label: 'Easy', quality: 5, variant: 'default' },
 ];
 
 export function SRSReviewSession({ cards, onComplete }: Props) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const [, submitReview] = useMutation<SubmitReviewResult>(SUBMIT_REVIEW_MUTATION);
+  const [, submitReview] = useMutation<SubmitReviewResult>(
+    SUBMIT_REVIEW_MUTATION
+  );
 
   const card = cards[index];
 
@@ -39,8 +45,12 @@ export function SRSReviewSession({ cards, onComplete }: Props) {
     return (
       <div className="text-center py-6 space-y-2">
         <p className="text-2xl">All caught up!</p>
-        <p className="text-muted-foreground text-sm">Great work — come back tomorrow.</p>
-        <Button onClick={onComplete} variant="outline" size="sm">Close</Button>
+        <p className="text-muted-foreground text-sm">
+          Great work — come back tomorrow.
+        </p>
+        <Button onClick={onComplete} variant="outline" size="sm">
+          Close
+        </Button>
       </div>
     );
   }

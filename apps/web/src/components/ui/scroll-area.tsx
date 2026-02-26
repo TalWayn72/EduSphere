@@ -1,19 +1,19 @@
-import * as React from "react";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
 interface ScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
-  orientation?: "vertical" | "horizontal" | "both";
+  orientation?: 'vertical' | 'horizontal' | 'both';
 }
 
 const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
-  ({ className, children, orientation = "vertical", ...props }, ref) => (
+  ({ className, children, orientation = 'vertical', ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "relative overflow-hidden",
-        orientation === "vertical" && "overflow-y-auto",
-        orientation === "horizontal" && "overflow-x-auto",
-        orientation === "both" && "overflow-auto",
+        'relative overflow-hidden',
+        orientation === 'vertical' && 'overflow-y-auto',
+        orientation === 'horizontal' && 'overflow-x-auto',
+        orientation === 'both' && 'overflow-auto',
         className
       )}
       {...props}
@@ -22,13 +22,18 @@ const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
     </div>
   )
 );
-ScrollArea.displayName = "ScrollArea";
+ScrollArea.displayName = 'ScrollArea';
 
-const ScrollBar = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex touch-none select-none", className)} {...props} />
-  )
-);
-ScrollBar.displayName = "ScrollBar";
+const ScrollBar = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn('flex touch-none select-none', className)}
+    {...props}
+  />
+));
+ScrollBar.displayName = 'ScrollBar';
 
 export { ScrollArea, ScrollBar };

@@ -23,12 +23,12 @@ This Legitimate Interest Assessment evaluates whether EduSphere can rely on legi
 
 ### 2.1 Identified Legitimate Interests
 
-| Interest | Description | Stakeholders |
-|----------|-------------|-------------|
-| Platform improvement | Understand which features are used, where users encounter friction, and how to prioritise product development | EduSphere, clients, data subjects |
-| Performance optimization | Identify slow pages, high-error-rate flows, and infrastructure bottlenecks | EduSphere, clients |
-| Business intelligence | Understand platform adoption and engagement to make informed investment decisions | EduSphere |
-| Benchmark reporting | Provide clients with anonymized usage benchmarks for their platform instances | Clients |
+| Interest                 | Description                                                                                                   | Stakeholders                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| Platform improvement     | Understand which features are used, where users encounter friction, and how to prioritise product development | EduSphere, clients, data subjects |
+| Performance optimization | Identify slow pages, high-error-rate flows, and infrastructure bottlenecks                                    | EduSphere, clients                |
+| Business intelligence    | Understand platform adoption and engagement to make informed investment decisions                             | EduSphere                         |
+| Benchmark reporting      | Provide clients with anonymized usage benchmarks for their platform instances                                 | Clients                           |
 
 ### 2.2 Are the Interests Legitimate?
 
@@ -48,12 +48,12 @@ Analytics data collection is necessary because:
 
 ### 3.2 Alternatives Considered
 
-| Alternative | Assessment |
-|-------------|------------|
-| No analytics | Not viable - product improvement without data leads to poor decisions; unable to identify errors affecting users |
-| Consent-based analytics only | Would create systematic bias (only engaged users consent); unrepresentative data |
-| Fully synthetic data | Synthetic data does not reflect real usage patterns; cannot substitute for actual telemetry |
-| Current approach (anonymized aggregates) | This IS the privacy-minimising approach - no individual tracking |
+| Alternative                              | Assessment                                                                                                       |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| No analytics                             | Not viable - product improvement without data leads to poor decisions; unable to identify errors affecting users |
+| Consent-based analytics only             | Would create systematic bias (only engaged users consent); unrepresentative data                                 |
+| Fully synthetic data                     | Synthetic data does not reflect real usage patterns; cannot substitute for actual telemetry                      |
+| Current approach (anonymized aggregates) | This IS the privacy-minimising approach - no individual tracking                                                 |
 
 **Conclusion:** Anonymized aggregate analytics is the minimum necessary approach for platform improvement.
 
@@ -63,13 +63,13 @@ Analytics data collection is necessary because:
 
 ### 4.1 Nature of Data Processed
 
-| Data Element | Identifiability | Assessment |
-|-------------|-----------------|------------|
-| Page view counts | Non-identifiable aggregate | Zero privacy impact |
-| Feature usage counts | Non-identifiable aggregate | Zero privacy impact |
+| Data Element                | Identifiability                      | Assessment             |
+| --------------------------- | ------------------------------------ | ---------------------- |
+| Page view counts            | Non-identifiable aggregate           | Zero privacy impact    |
+| Feature usage counts        | Non-identifiable aggregate           | Zero privacy impact    |
 | Session counts (per tenant) | Organizational-level, not individual | Minimal privacy impact |
-| Error rates | Non-identifiable aggregate | Zero privacy impact |
-| Funnel drop-off rates | Non-identifiable aggregate | Zero privacy impact |
+| Error rates                 | Non-identifiable aggregate           | Zero privacy impact    |
+| Funnel drop-off rates       | Non-identifiable aggregate           | Zero privacy impact    |
 
 **Key safeguard:** Analytics data is aggregated to a minimum group size of k=5 (k-anonymity) before any reporting or storage. Individual user events are never stored or exported.
 
@@ -87,22 +87,22 @@ The analytics processing uses the following anonymization pipeline:
 
 ### 4.3 Impact on Data Subjects
 
-| Impact Type | Assessment |
-|-------------|------------|
-| Tracking risk | None - no persistent user identifier in analytics pipeline |
-| Re-identification | Negligible - k-anonymity k>=5 applied; raw events discarded within 24 hours |
-| Behavioral profiling | None - no individual-level data retained or analyzed |
-| Cross-context linkage | None - analytics pseudonymous token cannot be linked to user account |
+| Impact Type           | Assessment                                                                  |
+| --------------------- | --------------------------------------------------------------------------- |
+| Tracking risk         | None - no persistent user identifier in analytics pipeline                  |
+| Re-identification     | Negligible - k-anonymity k>=5 applied; raw events discarded within 24 hours |
+| Behavioral profiling  | None - no individual-level data retained or analyzed                        |
+| Cross-context linkage | None - analytics pseudonymous token cannot be linked to user account        |
 
 ### 4.4 Safeguards Applied
 
-| Safeguard | Implementation |
-|----------|---------------|
-| k-anonymity | k >= 5 enforced; low-count buckets suppressed |
-| No user IDs | Session tokens are ephemeral and not linked to user accounts |
-| No PII | Names, emails, content not included in analytics events |
-| Raw event TTL | Raw events deleted within 24 hours; only aggregates retained |
-| Opt-out | Data subjects can opt out of analytics in platform privacy settings |
+| Safeguard              | Implementation                                                       |
+| ---------------------- | -------------------------------------------------------------------- |
+| k-anonymity            | k >= 5 enforced; low-count buckets suppressed                        |
+| No user IDs            | Session tokens are ephemeral and not linked to user accounts         |
+| No PII                 | Names, emails, content not included in analytics events              |
+| Raw event TTL          | Raw events deleted within 24 hours; only aggregates retained         |
+| Opt-out                | Data subjects can opt out of analytics in platform privacy settings  |
 | No third-party sharing | Analytics data not shared with third parties or used for advertising |
 
 ---
@@ -127,14 +127,14 @@ The balancing test demonstrates that:
 
 ## 6. Data Specification
 
-| Field | Retention (raw) | Retention (aggregate) | Notes |
-|-------|-----------------|----------------------|-------|
-| Page identifier | 24 hours | 13 months | URL path only, no query params |
-| Feature interaction type | 24 hours | 13 months | E.g., QUIZ_START, VIDEO_PLAY |
-| Session token | 24 hours | Not retained | Ephemeral, not linked to user |
-| Tenant ID | 24 hours | 13 months | For per-tenant reporting |
-| Error type | 24 hours | 13 months | Error category, not stack trace |
-| Timestamp (hour) | 24 hours | 13 months | Rounded to hour, not second |
+| Field                    | Retention (raw) | Retention (aggregate) | Notes                           |
+| ------------------------ | --------------- | --------------------- | ------------------------------- |
+| Page identifier          | 24 hours        | 13 months             | URL path only, no query params  |
+| Feature interaction type | 24 hours        | 13 months             | E.g., QUIZ_START, VIDEO_PLAY    |
+| Session token            | 24 hours        | Not retained          | Ephemeral, not linked to user   |
+| Tenant ID                | 24 hours        | 13 months             | For per-tenant reporting        |
+| Error type               | 24 hours        | 13 months             | Error category, not stack trace |
+| Timestamp (hour)         | 24 hours        | 13 months             | Rounded to hour, not second     |
 
 **Prohibited:** Full URLs with query params, user IDs, session content, device fingerprints, precise timestamps.
 
@@ -142,9 +142,9 @@ The balancing test demonstrates that:
 
 ## 7. Review and Approval
 
-| Role | Name | Date |
-|------|------|------|
+| Role                    | Name       | Date       |
+| ----------------------- | ---------- | ---------- |
 | Data Protection Officer | [DPO_NAME] | 2026-02-22 |
-| Next review | - | 2027-02-22 |
+| Next review             | -          | 2027-02-22 |
 
-*EduSphere LIA - Analytics v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev*
+_EduSphere LIA - Analytics v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev_

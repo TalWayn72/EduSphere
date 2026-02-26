@@ -35,13 +35,13 @@ test.describe('SCIM 2.0 Admin Settings', () => {
   test('page renders at /admin/scim with heading', async ({ page }) => {
     await gotoScim(page);
     await expect(
-      page.getByRole('heading', { name: /SCIM \/ HRIS Integration/i }),
+      page.getByRole('heading', { name: /SCIM \/ HRIS Integration/i })
     ).toBeVisible();
   });
 
   test('subtitle describes supported HRIS systems', async ({ page }) => {
     await gotoScim(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     expect(/Workday|BambooHR|ADP/i.test(body)).toBe(true);
   });
 
@@ -50,11 +50,11 @@ test.describe('SCIM 2.0 Admin Settings', () => {
   test('SCIM Endpoint section renders with endpoint URL', async ({ page }) => {
     await gotoScim(page);
     await expect(
-      page.getByRole('heading', { name: /SCIM Endpoint/i }),
+      page.getByRole('heading', { name: /SCIM Endpoint/i })
     ).toBeVisible();
 
     // The endpoint URL contains /scim/v2
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     expect(/\/scim\/v2/i.test(body)).toBe(true);
   });
 
@@ -76,9 +76,7 @@ test.describe('SCIM 2.0 Admin Settings', () => {
     const copyBtn = page.getByRole('button', { name: /copy/i }).first();
     await copyBtn.click();
 
-    await expect(
-      page.getByText(/Copied!/i),
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Copied!/i)).toBeVisible({ timeout: 3_000 });
   });
 
   // ── API Tokens section ────────────────────────────────────────────────────
@@ -86,20 +84,24 @@ test.describe('SCIM 2.0 Admin Settings', () => {
   test('API Tokens section renders', async ({ page }) => {
     await gotoScim(page);
     await expect(
-      page.getByRole('heading', { name: /API Tokens/i }),
+      page.getByRole('heading', { name: /API Tokens/i })
     ).toBeVisible();
   });
 
-  test('Generate Token button is visible in the API Tokens section', async ({ page }) => {
+  test('Generate Token button is visible in the API Tokens section', async ({
+    page,
+  }) => {
     await gotoScim(page);
     await expect(
-      page.getByRole('button', { name: /generate token/i }),
+      page.getByRole('button', { name: /generate token/i })
     ).toBeVisible();
   });
 
-  test('no tokens present renders the empty-state message', async ({ page }) => {
+  test('no tokens present renders the empty-state message', async ({
+    page,
+  }) => {
     await gotoScim(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     // Either the empty state text or existing tokens — both are valid renders
     const renderedTokenState =
       /No tokens yet/i.test(body) ||
@@ -115,7 +117,7 @@ test.describe('SCIM 2.0 Admin Settings', () => {
     await page.getByRole('button', { name: /generate token/i }).click();
 
     await expect(
-      page.getByRole('heading', { name: /Generate SCIM Token/i }),
+      page.getByRole('heading', { name: /Generate SCIM Token/i })
     ).toBeVisible();
   });
 
@@ -124,7 +126,9 @@ test.describe('SCIM 2.0 Admin Settings', () => {
     await page.getByRole('button', { name: /generate token/i }).click();
 
     await expect(
-      page.locator('input[placeholder*="Workday" i], input[placeholder*="description" i]'),
+      page.locator(
+        'input[placeholder*="Workday" i], input[placeholder*="description" i]'
+      )
     ).toBeVisible();
   });
 
@@ -136,7 +140,9 @@ test.describe('SCIM 2.0 Admin Settings', () => {
     await expect(page.locator('input[type="number"]')).toBeVisible();
   });
 
-  test('modal Generate button is disabled without a description', async ({ page }) => {
+  test('modal Generate button is disabled without a description', async ({
+    page,
+  }) => {
     await gotoScim(page);
     await page.getByRole('button', { name: /generate token/i }).click();
 
@@ -147,12 +153,14 @@ test.describe('SCIM 2.0 Admin Settings', () => {
     await expect(generateBtn).toBeDisabled();
   });
 
-  test('modal Generate button becomes enabled after entering a description', async ({ page }) => {
+  test('modal Generate button becomes enabled after entering a description', async ({
+    page,
+  }) => {
     await gotoScim(page);
     await page.getByRole('button', { name: /generate token/i }).click();
 
     const descInput = page.locator(
-      'input[placeholder*="Workday" i], input[placeholder*="description" i]',
+      'input[placeholder*="Workday" i], input[placeholder*="description" i]'
     );
     await descInput.fill('Workday Production');
 
@@ -166,12 +174,15 @@ test.describe('SCIM 2.0 Admin Settings', () => {
     await gotoScim(page);
     await page.getByRole('button', { name: /generate token/i }).click();
     await expect(
-      page.getByRole('heading', { name: /Generate SCIM Token/i }),
+      page.getByRole('heading', { name: /Generate SCIM Token/i })
     ).toBeVisible();
 
-    await page.locator('.fixed').getByRole('button', { name: /cancel/i }).click();
+    await page
+      .locator('.fixed')
+      .getByRole('button', { name: /cancel/i })
+      .click();
     await expect(
-      page.getByRole('heading', { name: /Generate SCIM Token/i }),
+      page.getByRole('heading', { name: /Generate SCIM Token/i })
     ).not.toBeVisible();
   });
 
@@ -180,13 +191,13 @@ test.describe('SCIM 2.0 Admin Settings', () => {
   test('Sync Log section renders', async ({ page }) => {
     await gotoScim(page);
     await expect(
-      page.getByRole('heading', { name: /Sync Log/i }),
+      page.getByRole('heading', { name: /Sync Log/i })
     ).toBeVisible();
   });
 
   test('Sync Log shows empty state or log entries', async ({ page }) => {
     await gotoScim(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     // Either empty state text or entries with SUCCESS/FAILED status
     const hasLogState =
       /No sync operations yet/i.test(body) ||
@@ -199,17 +210,21 @@ test.describe('SCIM 2.0 Admin Settings', () => {
   test.describe('Write tests', () => {
     test.skip(!RUN_WRITE_TESTS, 'Skipped: RUN_WRITE_TESTS=false');
 
-    test('token rows with Active status have a revoke (trash) button', async ({ page }) => {
+    test('token rows with Active status have a revoke (trash) button', async ({
+      page,
+    }) => {
       await gotoScim(page);
       // Active tokens render a trash icon button for revocation
-      const revokeBtn = page.locator('[aria-label*="revoke" i], button svg[data-lucide="trash2"]').first();
+      const revokeBtn = page
+        .locator('[aria-label*="revoke" i], button svg[data-lucide="trash2"]')
+        .first();
       const count = await revokeBtn.count();
 
       if (count > 0) {
         await expect(revokeBtn).toBeVisible();
       } else {
         // No active tokens — that is a valid state; skip silently
-        const body = await page.locator('body').textContent() ?? '';
+        const body = (await page.locator('body').textContent()) ?? '';
         expect(/No tokens yet|Active|Revoked/i.test(body)).toBe(true);
       }
     });
@@ -234,7 +249,7 @@ test.describe('SCIM 2.0 Admin Settings', () => {
     await gotoScim(page);
     await page.getByRole('button', { name: /generate token/i }).click();
     await expect(
-      page.getByRole('heading', { name: /Generate SCIM Token/i }),
+      page.getByRole('heading', { name: /Generate SCIM Token/i })
     ).toBeVisible();
 
     await page.emulateMedia({ reducedMotion: 'reduce' });

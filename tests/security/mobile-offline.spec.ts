@@ -23,7 +23,9 @@ describe('OfflineQueue (apps/mobile/src/sync/OfflineQueue.ts)', () => {
   const content = readFile('apps/mobile/src/sync/OfflineQueue.ts');
 
   it('file exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/mobile/src/sync/OfflineQueue.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/mobile/src/sync/OfflineQueue.ts'))
+    ).toBe(true);
   });
 
   it('exports enqueue function', () => {
@@ -65,7 +67,9 @@ describe('SyncEngine (apps/mobile/src/sync/SyncEngine.ts)', () => {
   const content = readFile('apps/mobile/src/sync/SyncEngine.ts');
 
   it('file exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/mobile/src/sync/SyncEngine.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/mobile/src/sync/SyncEngine.ts'))
+    ).toBe(true);
   });
 
   it('exports SyncEngine class', () => {
@@ -112,7 +116,11 @@ describe('useOfflineAnnotations (apps/mobile/src/hooks/useOfflineAnnotations.ts)
   const content = readFile('apps/mobile/src/hooks/useOfflineAnnotations.ts');
 
   it('file exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/mobile/src/hooks/useOfflineAnnotations.ts'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(ROOT, 'apps/mobile/src/hooks/useOfflineAnnotations.ts')
+      )
+    ).toBe(true);
   });
 
   it('exports useOfflineAnnotations hook', () => {
@@ -144,14 +152,29 @@ describe('useOfflineAnnotations (apps/mobile/src/hooks/useOfflineAnnotations.ts)
 
 describe('Mobile offline sync test coverage', () => {
   it('OfflineQueue unit tests exist', () => {
-    expect(existsSync(resolve(ROOT, 'apps/mobile/src/sync/__tests__/OfflineQueue.test.ts'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(ROOT, 'apps/mobile/src/sync/__tests__/OfflineQueue.test.ts')
+      )
+    ).toBe(true);
   });
 
   it('SyncEngine unit tests exist', () => {
-    expect(existsSync(resolve(ROOT, 'apps/mobile/src/sync/__tests__/SyncEngine.test.ts'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(ROOT, 'apps/mobile/src/sync/__tests__/SyncEngine.test.ts')
+      )
+    ).toBe(true);
   });
 
   it('useOfflineAnnotations hook tests exist', () => {
-    expect(existsSync(resolve(ROOT, 'apps/mobile/src/hooks/__tests__/useOfflineAnnotations.test.tsx'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(
+          ROOT,
+          'apps/mobile/src/hooks/__tests__/useOfflineAnnotations.test.tsx'
+        )
+      )
+    ).toBe(true);
   });
 });

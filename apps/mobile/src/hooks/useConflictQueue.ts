@@ -4,7 +4,12 @@
  * Memory-safe: no intervals, loads on mount only.
  */
 import { useState, useEffect, useCallback } from 'react';
-import { getConflicts, resolveConflict, conflictCount, type ConflictedMutation } from '../sync/OfflineQueue';
+import {
+  getConflicts,
+  resolveConflict,
+  conflictCount,
+  type ConflictedMutation,
+} from '../sync/OfflineQueue';
 
 interface UseConflictQueueReturn {
   conflicts: ConflictedMutation[];
@@ -24,10 +29,13 @@ export function useConflictQueue(): UseConflictQueueReturn {
     reload();
   }, [reload]);
 
-  const dismiss = useCallback((id: string) => {
-    resolveConflict(id);
-    reload();
-  }, [reload]);
+  const dismiss = useCallback(
+    (id: string) => {
+      resolveConflict(id);
+      reload();
+    },
+    [reload]
+  );
 
   const dismissAll = useCallback(() => {
     conflicts.forEach((c) => resolveConflict(c.id));

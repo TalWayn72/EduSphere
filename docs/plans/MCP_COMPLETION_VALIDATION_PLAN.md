@@ -7,6 +7,7 @@
 בנוסף: חלק מה-servers לא נוצלו בפועל כי אין הוראות מפורשות ב-CLAUDE.md מתי להשתמש בהם.
 
 **מטרת התוכנית:**
+
 1. Commit לשינויים הפתוחים
 2. אימות כל server על-ידי הפעלה ישירה
 3. עדכון CLAUDE.md עם הוראות שימוש מפורשות לכל tool
@@ -16,14 +17,14 @@
 
 ## קבצים קריטיים
 
-| קובץ | פעולה |
-|------|--------|
-| `.mcp.json` | Already staged — ייכנס ל-commit |
-| `OPEN_ISSUES.md` | Stage + commit |
-| `docs/plans/MCP_TOOLS_SETUP.md` | Stage + commit |
+| קובץ                                           | פעולה                               |
+| ---------------------------------------------- | ----------------------------------- |
+| `.mcp.json`                                    | Already staged — ייכנס ל-commit     |
+| `OPEN_ISSUES.md`                               | Stage + commit                      |
+| `docs/plans/MCP_TOOLS_SETUP.md`                | Stage + commit                      |
 | `packages/graphql-shared/tsconfig.tsbuildinfo` | **לא לכלול** — auto-generated cache |
-| `scripts/setup-mcp-keys.sh` | Stage + commit |
-| `CLAUDE.md` | עדכון — הוספת סעיף MCP Tools Usage |
+| `scripts/setup-mcp-keys.sh`                    | Stage + commit                      |
+| `CLAUDE.md`                                    | עדכון — הוספת סעיף MCP Tools Usage  |
 
 ---
 
@@ -41,22 +42,24 @@ git commit -m "feat(infra): configure 10 MCP servers for Claude Code capabilitie
 ## שלב 2: אימות MCP Servers (parallel)
 
 ### Servers שכבר פעילים בסשן (verify by invoking):
-| Server | כלי לבדיקה | שאילתת אימות |
-|--------|------------|---------------|
-| `postgres` | `mcp__postgres__query` | `SELECT version()` |
-| `memory` | `mcp__memory__search_nodes` | `query: "EduSphere"` |
-| `github` | `mcp__github__search_repositories` | `query: "EduSphere"` |
-| `graphql` | `mcp__graphql__introspect-schema` | introspect supergraph |
-| `tavily` | `mcp__tavily__tavily_search` | search "pgvector HNSW" |
-| `sequential-thinking` | `mcp__sequential-thinking__sequentialthinking` | test thought |
-| `eslint` | `mcp__eslint__lint-files` | lint a project file |
+
+| Server                | כלי לבדיקה                                     | שאילתת אימות           |
+| --------------------- | ---------------------------------------------- | ---------------------- |
+| `postgres`            | `mcp__postgres__query`                         | `SELECT version()`     |
+| `memory`              | `mcp__memory__search_nodes`                    | `query: "EduSphere"`   |
+| `github`              | `mcp__github__search_repositories`             | `query: "EduSphere"`   |
+| `graphql`             | `mcp__graphql__introspect-schema`              | introspect supergraph  |
+| `tavily`              | `mcp__tavily__tavily_search`                   | search "pgvector HNSW" |
+| `sequential-thinking` | `mcp__sequential-thinking__sequentialthinking` | test thought           |
+| `eslint`              | `mcp__eslint__lint-files`                      | lint a project file    |
 
 ### Servers לבדיקת זמינות (might fail — investigate):
-| Server | Package | בדיקה |
-|--------|---------|--------|
-| `nats` | `mcp-nats` | בדיקה אם הtools קיימים בסשן |
-| `typescript-diagnostics` | `ts-diagnostics-mcp@latest` | בדיקה אם הtools קיימים |
-| `playwright` | `@playwright/mcp@latest` | בדיקה אם הtools קיימים |
+
+| Server                   | Package                     | בדיקה                       |
+| ------------------------ | --------------------------- | --------------------------- |
+| `nats`                   | `mcp-nats`                  | בדיקה אם הtools קיימים בסשן |
+| `typescript-diagnostics` | `ts-diagnostics-mcp@latest` | בדיקה אם הtools קיימים      |
+| `playwright`             | `@playwright/mcp@latest`    | בדיקה אם הtools קיימים      |
 
 ---
 
@@ -74,32 +77,35 @@ MCP tools return structured data — Bash commands return unstructured text.
 
 ### Decision Matrix: MCP Tool vs Bash
 
-| Task | Use MCP Tool | NOT Bash |
-|------|-------------|----------|
-| PostgreSQL query (RLS, schema, policies) | `mcp__postgres__query` | `psql -c "..."` |
-| Search technical documentation | `mcp__tavily__tavily_search` | WebSearch |
-| Lint a file after writing | `mcp__eslint__lint-files` | `pnpm turbo lint` |
-| Store architectural decision | `mcp__memory__create_entities` | CLAUDE.md edit |
-| GitHub CI/CD status after push | `mcp__github__*` | `gh run list` |
-| GraphQL schema inspection | `mcp__graphql__introspect-schema` | `pnpm compose` |
-| Complex multi-step reasoning | `mcp__sequential-thinking__*` | — |
-| E2E browser testing | playwright MCP | `pnpm test:e2e` |
-| NATS event monitoring | nats MCP | `nats sub EDUSPHERE.>` |
-| Per-file TypeScript errors | typescript-diagnostics MCP | `pnpm turbo typecheck` |
+| Task                                     | Use MCP Tool                      | NOT Bash               |
+| ---------------------------------------- | --------------------------------- | ---------------------- |
+| PostgreSQL query (RLS, schema, policies) | `mcp__postgres__query`            | `psql -c "..."`        |
+| Search technical documentation           | `mcp__tavily__tavily_search`      | WebSearch              |
+| Lint a file after writing                | `mcp__eslint__lint-files`         | `pnpm turbo lint`      |
+| Store architectural decision             | `mcp__memory__create_entities`    | CLAUDE.md edit         |
+| GitHub CI/CD status after push           | `mcp__github__*`                  | `gh run list`          |
+| GraphQL schema inspection                | `mcp__graphql__introspect-schema` | `pnpm compose`         |
+| Complex multi-step reasoning             | `mcp__sequential-thinking__*`     | —                      |
+| E2E browser testing                      | playwright MCP                    | `pnpm test:e2e`        |
+| NATS event monitoring                    | nats MCP                          | `nats sub EDUSPHERE.>` |
+| Per-file TypeScript errors               | typescript-diagnostics MCP        | `pnpm turbo typecheck` |
 
 ### postgres — Use For:
+
 - Validate RLS policies: `SELECT * FROM pg_policies WHERE schemaname='public'`
 - Check tenant isolation: query with different `app.current_tenant` settings
 - Inspect Apache AGE graph structure
 - Debug connection pool: `SELECT * FROM pg_stat_activity`
 
 ### memory — Use For:
+
 - Store every architectural decision made during a session
 - Remember bug root causes across sessions
 - Track which patterns are specific to this codebase
 - **Create entity at start of every complex task**
 
 ### tavily — Use For:
+
 - Apache AGE Cypher documentation
 - LangGraph.js state machine patterns
 - pgvector HNSW configuration
@@ -107,16 +113,19 @@ MCP tools return structured data — Bash commands return unstructured text.
 - Drizzle ORM v1 migration patterns
 
 ### eslint — Use For:
+
 - Lint every new/modified file immediately after writing
 - Validate security rules before commit
 - Check for `no-unsanitized`, `security/*` violations
 
 ### github — Use For:
+
 - After every `git push`: check `mcp__github__list_commits`
 - Monitor CI/CD: `mcp__github__get_pull_request_status`
 - View failed workflow logs
 
 ### sequential-thinking — Use For:
+
 - RLS policy design (multi-tenant edge cases)
 - LangGraph state machine architecture
 - Federation entity resolution planning
@@ -128,6 +137,7 @@ MCP tools return structured data — Bash commands return unstructured text.
 ## שלב 4: תיעוד תוצאות ב-OPEN_ISSUES.md
 
 עדכון MCP-001 עם:
+
 - תוצאות אימות כל server (✅ / ⚠️ / ❌)
 - הוספת הוראות ל-CLAUDE.md (✅)
 - commit hash

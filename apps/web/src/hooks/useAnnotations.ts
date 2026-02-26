@@ -16,7 +16,10 @@
 import { useOptimistic, useTransition, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useSubscription } from 'urql';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
-import { ANNOTATIONS_QUERY, REPLY_TO_ANNOTATION_MUTATION } from '@/lib/graphql/annotation.queries';
+import {
+  ANNOTATIONS_QUERY,
+  REPLY_TO_ANNOTATION_MUTATION,
+} from '@/lib/graphql/annotation.queries';
 import {
   CREATE_ANNOTATION_MUTATION,
   ANNOTATION_ADDED_SUBSCRIPTION,
@@ -42,7 +45,9 @@ type GqlAnnotation = AnnotationsQuery['annotations'][number];
  * Minimum fields required by normaliseAnnotation — covers both query items
  * (which have parentId) and subscription events (which do not).
  */
-type GqlAnnotationInput = GqlAnnotation | AnnotationAddedSubscription['annotationAdded'];
+type GqlAnnotationInput =
+  | GqlAnnotation
+  | AnnotationAddedSubscription['annotationAdded'];
 
 // ── Optimistic action types ─────────────────────────────────────────────────
 
@@ -92,8 +97,8 @@ function normaliseAnnotation(
       localLayer === AnnotationLayer.AI_GENERATED
         ? 'ai'
         : localLayer === AnnotationLayer.INSTRUCTOR
-        ? 'instructor'
-        : 'student',
+          ? 'instructor'
+          : 'student',
     timestamp: formatTime(timestampStart),
     contentId,
     contentTimestamp: timestampStart || undefined,
@@ -118,7 +123,8 @@ function buildOptimisticList(
 // ── UUID validation ─────────────────────────────────────────────────────────
 
 /** Returns true only for canonical UUID v4 strings (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). */
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function isUUID(value: string): boolean {
   return UUID_RE.test(value);
 }
@@ -130,8 +136,17 @@ export interface UseAnnotationsReturn {
   fetching: boolean;
   isPending: boolean;
   error: string | null;
-  addAnnotation: (content: string, layer: AnnotationLayer, timestamp: number) => void;
-  addReply: (parentId: string, content: string, layer: AnnotationLayer, timestamp: number) => void;
+  addAnnotation: (
+    content: string,
+    layer: AnnotationLayer,
+    timestamp: number
+  ) => void;
+  addReply: (
+    parentId: string,
+    content: string,
+    layer: AnnotationLayer,
+    timestamp: number
+  ) => void;
 }
 
 export function useAnnotations(
@@ -150,7 +165,11 @@ export function useAnnotations(
   });
 
   // useSubscription<Data, Result, Variables>: Variables is the 3rd param.
-  const [subscriptionResult] = useSubscription<AnnotationAddedSubscription, AnnotationAddedSubscription, AnnotationAddedSubscriptionVariables>({
+  const [subscriptionResult] = useSubscription<
+    AnnotationAddedSubscription,
+    AnnotationAddedSubscription,
+    AnnotationAddedSubscriptionVariables
+  >({
     query: ANNOTATION_ADDED_SUBSCRIPTION,
     variables: { assetId: contentId },
     pause: !validAssetId,
@@ -267,7 +286,9 @@ export function useAnnotations(
     annotations: visibleAnnotations,
     fetching: result.fetching,
     isPending,
-    error: hasError ? (result.error?.message ?? 'Failed to load annotations') : null,
+    error: hasError
+      ? (result.error?.message ?? 'Failed to load annotations')
+      : null,
     addAnnotation,
     addReply,
   };

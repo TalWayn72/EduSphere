@@ -5,7 +5,12 @@ import { TenantLanguageService } from './tenant-language.service';
 import { TenantBrandingService } from './tenant-branding.service';
 
 @Module({
-  providers: [TenantResolver, TenantService, TenantLanguageService, TenantBrandingService],
+  providers: [
+    TenantResolver,
+    TenantService,
+    TenantLanguageService,
+    TenantBrandingService,
+  ],
   exports: [TenantService, TenantLanguageService, TenantBrandingService],
 })
 export class TenantModule {}

@@ -43,7 +43,8 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn(() => ({})),
   and: vi.fn(() => ({})),
   withTenantContext: vi.fn(
-    (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) => fn(_mockDb),
+    (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      fn(_mockDb)
   ),
 }));
 
@@ -77,7 +78,11 @@ function makeRoom(i = 1) {
   };
 }
 
-const mockLiveSession = { id: SESSION, tenantId: TENANT, bbbMeetingId: 'bbb-meeting-1' };
+const mockLiveSession = {
+  id: SESSION,
+  tenantId: TENANT,
+  bbbMeetingId: 'bbb-meeting-1',
+};
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -88,7 +93,9 @@ describe('BreakoutService', () => {
     _mockSendBreakoutRooms = vi.fn().mockResolvedValue(undefined);
     _mockDb = makeMockDb();
     // Default: insert+values+returning stores rooms; limit returns live session
-    _mockDb['returning'] = vi.fn().mockResolvedValue([makeRoom(1), makeRoom(2)]);
+    _mockDb['returning'] = vi
+      .fn()
+      .mockResolvedValue([makeRoom(1), makeRoom(2)]);
     _mockDb['limit'] = vi.fn().mockResolvedValue([mockLiveSession]);
     service = new BreakoutService();
   });
@@ -101,9 +108,12 @@ describe('BreakoutService', () => {
   it('stores breakout rooms in the database', async () => {
     const rooms = await service.createBreakoutRooms(
       SESSION,
-      [{ roomName: 'Group 1', capacity: 10 }, { roomName: 'Group 2', capacity: 8 }],
+      [
+        { roomName: 'Group 1', capacity: 10 },
+        { roomName: 'Group 2', capacity: 8 },
+      ],
       TENANT,
-      USER,
+      USER
     );
     expect(rooms).toHaveLength(2);
     expect(rooms[0].roomName).toBe('Group 1');
@@ -116,20 +126,27 @@ describe('BreakoutService', () => {
       SESSION,
       [{ roomName: 'Group 1', capacity: 10 }],
       TENANT,
-      USER,
+      USER
     );
     expect(_mockSendBreakoutRooms).toHaveBeenCalledWith(
       mockLiveSession.bbbMeetingId,
-      expect.arrayContaining([expect.objectContaining({ name: 'Group 1' })]),
+      expect.arrayContaining([expect.objectContaining({ name: 'Group 1' })])
     );
   });
 
   // 3. assignUsersToRoom updates assigned_user_ids
   it('assignUsersToRoom updates the assigned_user_ids array', async () => {
     _mockDb['returning'] = vi.fn().mockResolvedValue([]);
-    await service.assignUsersToRoom('room-1', ['user-a', 'user-b'], TENANT, USER);
+    await service.assignUsersToRoom(
+      'room-1',
+      ['user-a', 'user-b'],
+      TENANT,
+      USER
+    );
     expect(_mockDb['update']).toHaveBeenCalled();
-    expect(_mockDb['set']).toHaveBeenCalledWith({ assignedUserIds: ['user-a', 'user-b'] });
+    expect(_mockDb['set']).toHaveBeenCalledWith({
+      assignedUserIds: ['user-a', 'user-b'],
+    });
   });
 
   // 4. listRooms returns rooms for session
@@ -148,7 +165,12 @@ describe('BreakoutService', () => {
     _mockDb['limit'] = vi.fn().mockResolvedValue([]); // session not found
 
     await expect(
-      service.createBreakoutRooms(SESSION, [{ roomName: 'Room', capacity: 5 }], TENANT, USER),
+      service.createBreakoutRooms(
+        SESSION,
+        [{ roomName: 'Room', capacity: 5 }],
+        TENANT,
+        USER
+      )
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 

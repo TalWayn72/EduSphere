@@ -29,29 +29,38 @@ export class TranslationResolver {
   async getContentTranslation(
     @Args('contentItemId') contentItemId: string,
     @Args('locale') locale: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
-    return this.translationService.findTranslation(contentItemId, locale, tenantCtx);
+    return this.translationService.findTranslation(
+      contentItemId,
+      locale,
+      tenantCtx
+    );
   }
 
   @Mutation('requestContentTranslation')
   async requestContentTranslation(
     @Args('contentItemId') contentItemId: string,
     @Args('targetLocale') targetLocale: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
 
-    const parsed = RequestContentTranslationSchema.safeParse({ contentItemId, targetLocale });
+    const parsed = RequestContentTranslationSchema.safeParse({
+      contentItemId,
+      targetLocale,
+    });
     if (!parsed.success) {
-      throw new BadRequestException(parsed.error.issues.map((i) => i.message).join('; '));
+      throw new BadRequestException(
+        parsed.error.issues.map((i) => i.message).join('; ')
+      );
     }
 
     return this.translationService.requestTranslation(
       parsed.data.contentItemId,
       parsed.data.targetLocale,
-      tenantCtx,
+      tenantCtx
     );
   }
 }

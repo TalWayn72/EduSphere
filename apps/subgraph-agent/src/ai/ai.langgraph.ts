@@ -55,7 +55,9 @@ export async function runLangGraphDebate(
   };
 
   const result = await compiled.invoke(state, threadConfig(threadId));
-  const synthesis = (result as Record<string, unknown>)['synthesis'] as string | undefined;
+  const synthesis = (result as Record<string, unknown>)['synthesis'] as
+    | string
+    | undefined;
   const args = (result as Record<string, unknown>)['arguments'];
 
   return {
@@ -80,7 +82,8 @@ export async function runLangGraphQuiz(
   const state = {
     topic: (context['topic'] as string) ?? message,
     numQuestions: (context['numQuestions'] as number) ?? 5,
-    difficulty: (context['difficulty'] as 'easy' | 'medium' | 'hard') ?? 'medium',
+    difficulty:
+      (context['difficulty'] as 'easy' | 'medium' | 'hard') ?? 'medium',
     questions: [],
     currentQuestionIndex: 0,
     userAnswers: [],
@@ -94,7 +97,11 @@ export async function runLangGraphQuiz(
 
   return {
     text: `Quiz generated: ${Array.isArray(questions) ? questions.length : 0} questions on "${state.topic}"`,
-    workflowResult: { questions, score: typedResult['score'], isComplete: true },
+    workflowResult: {
+      questions,
+      score: typedResult['score'],
+      isComplete: true,
+    },
   };
 }
 
@@ -164,7 +171,9 @@ export async function runLangGraphAssessment(
 
   const result = await compiled.invoke(state, threadConfig(threadId));
   const typedResult = result as Record<string, unknown>;
-  const overall = typedResult['overallAssessment'] as Record<string, unknown> | undefined;
+  const overall = typedResult['overallAssessment'] as
+    | Record<string, unknown>
+    | undefined;
 
   return {
     text: (overall?.['summary'] as string) ?? 'Assessment complete',

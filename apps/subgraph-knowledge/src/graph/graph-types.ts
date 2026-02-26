@@ -16,7 +16,9 @@ const VALID_ROLES = new Set<string>([
  * Coerce an unknown role string to TenantContext['userRole'].
  * Falls back to 'STUDENT' when the value is absent or unrecognised.
  */
-export function toUserRole(role: string | null | undefined): TenantContext['userRole'] {
+export function toUserRole(
+  role: string | null | undefined
+): TenantContext['userRole'] {
   if (role && VALID_ROLES.has(role)) return role as TenantContext['userRole'];
   return 'STUDENT';
 }

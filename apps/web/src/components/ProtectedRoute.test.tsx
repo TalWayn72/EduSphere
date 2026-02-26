@@ -23,7 +23,10 @@ function renderWithRouter(authenticated: boolean) {
             </ProtectedRoute>
           }
         />
-        <Route path="/login" element={<div data-testid="login-page">Login</div>} />
+        <Route
+          path="/login"
+          element={<div data-testid="login-page">Login</div>}
+        />
       </Routes>
     </MemoryRouter>
   );

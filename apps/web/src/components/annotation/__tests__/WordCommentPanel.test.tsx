@@ -52,7 +52,7 @@ vi.mock('@/lib/utils', () => ({
 
 const makeAnnotation = (
   id: string,
-  layer = AnnotationLayer.PERSONAL,
+  layer = AnnotationLayer.PERSONAL
 ): Annotation => ({
   id,
   content: `Comment ${id}`,
@@ -84,7 +84,8 @@ describe('WordCommentPanel', () => {
 
   afterEach(() => {
     // Restore prototype after each test
-    delete (window.HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
+    delete (window.HTMLElement.prototype as Partial<HTMLElement>)
+      .scrollIntoView;
   });
 
   it('renders "Comments" heading', () => {
@@ -118,7 +119,7 @@ describe('WordCommentPanel', () => {
         {...defaultProps}
         selectionActive={true}
         onAddComment={onAddComment}
-      />,
+      />
     );
     fireEvent.click(screen.getByText('Add'));
     expect(onAddComment).toHaveBeenCalled();
@@ -168,23 +169,23 @@ describe('WordCommentPanel', () => {
         {...defaultProps}
         annotations={annotations}
         focusedAnnotationId="a1"
-      />,
+      />
     );
     expect(screen.getByTestId('comment-card-a1')).toHaveAttribute(
       'data-focused',
-      'true',
+      'true'
     );
   });
 
   it('shows empty state message when no annotations and no selection', () => {
     render(<WordCommentPanel {...defaultProps} />);
-    expect(
-      screen.getByText(/Select text in the document/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Select text in the document/)).toBeInTheDocument();
   });
 
   it('shows different empty state when selection is active', () => {
     render(<WordCommentPanel {...defaultProps} selectionActive={true} />);
-    expect(screen.getByText(/Click \u201cAdd\u201d to comment/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Click \u201cAdd\u201d to comment/)
+    ).toBeInTheDocument();
   });
 });

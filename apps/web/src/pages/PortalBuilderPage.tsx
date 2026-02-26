@@ -21,12 +21,20 @@ function createBlock(type: BlockType, order: number): PortalBlock {
   return { id: crypto.randomUUID(), type, order, config: {} };
 }
 
-function parseServerBlocks(raw: Array<{ id: string; type: string; order: number; config: string }>): PortalBlock[] {
+function parseServerBlocks(
+  raw: Array<{ id: string; type: string; order: number; config: string }>
+): PortalBlock[] {
   return raw.map((b) => ({
     id: b.id,
     type: b.type as BlockType,
     order: b.order,
-    config: (() => { try { return JSON.parse(b.config) as Record<string, unknown>; } catch { return {}; } })(),
+    config: (() => {
+      try {
+        return JSON.parse(b.config) as Record<string, unknown>;
+      } catch {
+        return {};
+      }
+    })(),
   }));
 }
 
@@ -36,15 +44,24 @@ export function PortalBuilderPage() {
   const [, publishMutation] = useMutation(PUBLISH_PORTAL_MUTATION);
   const [, unpublishMutation] = useMutation(UNPUBLISH_PORTAL_MUTATION);
 
-  const serverPortal = data?.myPortal as {
-    title: string;
-    published: boolean;
-    blocks: Array<{ id: string; type: string; order: number; config: string }>;
-  } | undefined;
+  const serverPortal = data?.myPortal as
+    | {
+        title: string;
+        published: boolean;
+        blocks: Array<{
+          id: string;
+          type: string;
+          order: number;
+          config: string;
+        }>;
+      }
+    | undefined;
 
-  const [title, setTitle] = useState<string>(serverPortal?.title ?? 'Learning Portal');
+  const [title, setTitle] = useState<string>(
+    serverPortal?.title ?? 'Learning Portal'
+  );
   const [blocks, setBlocks] = useState<PortalBlock[]>(() =>
-    serverPortal?.blocks ? parseServerBlocks(serverPortal.blocks) : [],
+    serverPortal?.blocks ? parseServerBlocks(serverPortal.blocks) : []
   );
   const [saving, setSaving] = useState(false);
 
@@ -53,7 +70,9 @@ export function PortalBuilderPage() {
   }, []);
 
   const handleRemove = useCallback((blockId: string) => {
-    setBlocks((prev) => prev.filter((b) => b.id !== blockId).map((b, i) => ({ ...b, order: i })));
+    setBlocks((prev) =>
+      prev.filter((b) => b.id !== blockId).map((b, i) => ({ ...b, order: i }))
+    );
   }, []);
 
   const handleReorder = useCallback((fromIdx: number, toIdx: number) => {
@@ -68,21 +87,33 @@ export function PortalBuilderPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    const result = await saveMutation({ title, blocksJson: JSON.stringify(blocks) });
+    const result = await saveMutation({
+      title,
+      blocksJson: JSON.stringify(blocks),
+    });
     setSaving(false);
-    if (result.error) { toast.error('Failed to save portal'); return; }
+    if (result.error) {
+      toast.error('Failed to save portal');
+      return;
+    }
     toast.success('Portal draft saved');
   };
 
   const handlePublish = async () => {
     const result = await publishMutation({});
-    if (result.error) { toast.error('Failed to publish portal'); return; }
+    if (result.error) {
+      toast.error('Failed to publish portal');
+      return;
+    }
     toast.success('Portal published');
   };
 
   const handleUnpublish = async () => {
     const result = await unpublishMutation({});
-    if (result.error) { toast.error('Failed to unpublish portal'); return; }
+    if (result.error) {
+      toast.error('Failed to unpublish portal');
+      return;
+    }
     toast.success('Portal unpublished');
   };
 

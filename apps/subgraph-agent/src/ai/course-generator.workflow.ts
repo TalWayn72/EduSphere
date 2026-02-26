@@ -29,7 +29,7 @@ export const CourseSchema = z.object({
         title: z.string().max(200),
         description: z.string().max(500),
         contentItemTitles: z.array(z.string().max(200)).max(6),
-      }),
+      })
     )
     .min(2)
     .max(8),
@@ -60,13 +60,15 @@ function buildModel(): LanguageModel {
   const ollama = createOllama({
     baseURL: `${process.env.OLLAMA_URL ?? 'http://localhost:11434'}/api`,
   });
-  return ollama(process.env.OLLAMA_MODEL ?? 'llama3.2') as unknown as LanguageModel;
+  return ollama(
+    process.env.OLLAMA_MODEL ?? 'llama3.2'
+  ) as unknown as LanguageModel;
 }
 
 // ── Node: outline_generation ──────────────────────────────────────────────────
 
 async function outlineGenerationNode(
-  state: CourseGenStateType,
+  state: CourseGenStateType
 ): Promise<Partial<CourseGenStateType>> {
   const levelHint = state.targetAudienceLevel
     ? `Target audience level: ${state.targetAudienceLevel}.`
@@ -74,9 +76,10 @@ async function outlineGenerationNode(
   const hoursHint = state.estimatedHours
     ? `Target duration: approximately ${state.estimatedHours} hours.`
     : '';
-  const langHint = state.language && state.language !== 'en'
-    ? `Generate content in language: ${state.language}.`
-    : '';
+  const langHint =
+    state.language && state.language !== 'en'
+      ? `Generate content in language: ${state.language}.`
+      : '';
 
   const prompt = [
     `Create a comprehensive course outline for: "${state.prompt}".`,
@@ -108,7 +111,7 @@ async function outlineGenerationNode(
 // ── Node: concept_linking ─────────────────────────────────────────────────────
 
 function conceptLinkingNode(
-  state: CourseGenStateType,
+  state: CourseGenStateType
 ): Partial<CourseGenStateType> {
   if (!state.courseOutline) {
     return { conceptNames: [] };
@@ -125,9 +128,7 @@ function conceptLinkingNode(
 
 // ── Node: finalize ────────────────────────────────────────────────────────────
 
-function finalizeNode(
-  _state: CourseGenStateType,
-): Partial<CourseGenStateType> {
+function finalizeNode(_state: CourseGenStateType): Partial<CourseGenStateType> {
   // No additional transformation — just pass state through
   return {};
 }

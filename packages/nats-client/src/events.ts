@@ -229,7 +229,7 @@ export function isTranscriptionEvent(e: unknown): e is TranscriptionPayload {
 }
 
 export function isKnowledgeConceptEvent(
-  e: unknown,
+  e: unknown
 ): e is KnowledgeConceptPayload {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
@@ -270,7 +270,9 @@ export interface SubmissionCreatedPayload {
   readonly timestamp: string; // ISO 8601
 }
 
-export function isSubmissionCreatedEvent(e: unknown): e is SubmissionCreatedPayload {
+export function isSubmissionCreatedEvent(
+  e: unknown
+): e is SubmissionCreatedPayload {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
   return (
@@ -342,7 +344,9 @@ export interface CourseCompletedPayload {
   readonly estimatedHours?: number;
 }
 
-export function isCourseCompletedEvent(e: unknown): e is CourseCompletedPayload {
+export function isCourseCompletedEvent(
+  e: unknown
+): e is CourseCompletedPayload {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
   return (

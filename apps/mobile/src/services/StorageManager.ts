@@ -40,7 +40,9 @@ async function measureDirBytes(path: string): Promise<number> {
   if (!info.isDirectory) {
     return (info as FileSystem.FileInfo & { size?: number }).size ?? 0;
   }
-  const entries = await FileSystem.readDirectoryAsync(path).catch(() => [] as string[]);
+  const entries = await FileSystem.readDirectoryAsync(path).catch(
+    () => [] as string[]
+  );
   let total = 0;
   for (const entry of entries) {
     total += await measureDirBytes(`${path}${entry}/`);
@@ -68,16 +70,18 @@ export class StorageManager {
   }
 
   async getStats(): Promise<StorageStats> {
-    const [totalDiskBytes, freeDiskBytes, eduSphereUsedBytes] = await Promise.all([
-      FileSystem.getTotalDiskCapacityAsync(),
-      FileSystem.getFreeDiskStorageAsync(),
-      this.getEduSphereUsedBytes(),
-    ]);
+    const [totalDiskBytes, freeDiskBytes, eduSphereUsedBytes] =
+      await Promise.all([
+        FileSystem.getTotalDiskCapacityAsync(),
+        FileSystem.getFreeDiskStorageAsync(),
+        this.getEduSphereUsedBytes(),
+      ]);
 
-    const eduSphereQuotaBytes = Math.floor(totalDiskBytes * STORAGE_QUOTA_FRACTION);
-    const usageRatio = eduSphereQuotaBytes > 0
-      ? eduSphereUsedBytes / eduSphereQuotaBytes
-      : 0;
+    const eduSphereQuotaBytes = Math.floor(
+      totalDiskBytes * STORAGE_QUOTA_FRACTION
+    );
+    const usageRatio =
+      eduSphereQuotaBytes > 0 ? eduSphereUsedBytes / eduSphereQuotaBytes : 0;
 
     return {
       totalDiskBytes,

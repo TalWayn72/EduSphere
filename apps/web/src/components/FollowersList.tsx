@@ -1,9 +1,15 @@
 import React from 'react';
 import { useQuery } from 'urql';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
-import { MY_FOLLOWERS_QUERY, MY_FOLLOWING_QUERY } from '@/lib/graphql/profile.queries';
+import {
+  MY_FOLLOWERS_QUERY,
+  MY_FOLLOWING_QUERY,
+} from '@/lib/graphql/profile.queries';
 import { FollowButton } from '@/components/FollowButton';
 
 interface FollowersListProps {
@@ -13,8 +19,12 @@ interface FollowersListProps {
   onClose: () => void;
 }
 
-interface FollowersData { myFollowers: string[] }
-interface FollowingData { myFollowing: string[] }
+interface FollowersData {
+  myFollowers: string[];
+}
+interface FollowingData {
+  myFollowing: string[];
+}
 
 function UserIdRow({ userId }: { userId: string }) {
   return (
@@ -25,14 +35,25 @@ function UserIdRow({ userId }: { userId: string }) {
         </span>
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-mono text-muted-foreground truncate">{userId}</p>
+        <p className="text-sm font-mono text-muted-foreground truncate">
+          {userId}
+        </p>
       </div>
-      <FollowButton userId={userId} initialIsFollowing={false} followersCount={0} />
+      <FollowButton
+        userId={userId}
+        initialIsFollowing={false}
+        followersCount={0}
+      />
     </li>
   );
 }
 
-export function FollowersList({ userId: _userId, type, isOpen, onClose }: FollowersListProps) {
+export function FollowersList({
+  userId: _userId,
+  type,
+  isOpen,
+  onClose,
+}: FollowersListProps) {
   const title = type === 'followers' ? 'Followers' : 'Following';
 
   const [followersResult] = useQuery<FollowersData>({
@@ -56,7 +77,12 @@ export function FollowersList({ userId: _userId, type, isOpen, onClose }: Follow
       : (followingResult.data?.myFollowing ?? []);
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -67,7 +93,9 @@ export function FollowersList({ userId: _userId, type, isOpen, onClose }: Follow
           </div>
         ) : ids.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            {type === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
+            {type === 'followers'
+              ? 'No followers yet.'
+              : 'Not following anyone yet.'}
           </p>
         ) : (
           <div className="max-h-96 overflow-y-auto">

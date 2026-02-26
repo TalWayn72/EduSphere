@@ -11,14 +11,21 @@ import { NotFoundException } from '@nestjs/common';
 
 // ─── Hoist mocks ──────────────────────────────────────────────────────────────
 
-const { mockCloseAllPools, mockInsert, mockSelect, mockUpdate, mockDelete } = vi.hoisted(() => {
-  const mockInsert = vi.fn();
-  const mockSelect = vi.fn();
-  const mockUpdate = vi.fn();
-  const mockDelete = vi.fn();
-  const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
-  return { mockCloseAllPools, mockInsert, mockSelect, mockUpdate, mockDelete };
-});
+const { mockCloseAllPools, mockInsert, mockSelect, mockUpdate, mockDelete } =
+  vi.hoisted(() => {
+    const mockInsert = vi.fn();
+    const mockSelect = vi.fn();
+    const mockUpdate = vi.fn();
+    const mockDelete = vi.fn();
+    const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+    return {
+      mockCloseAllPools,
+      mockInsert,
+      mockSelect,
+      mockUpdate,
+      mockDelete,
+    };
+  });
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => ({
@@ -68,7 +75,11 @@ const MOCK_SOURCE = {
   updated_at: new Date().toISOString(),
 };
 
-const PENDING_SOURCE = { ...MOCK_SOURCE, id: 'ks-new', status: 'PENDING' as const };
+const PENDING_SOURCE = {
+  ...MOCK_SOURCE,
+  id: 'ks-new',
+  status: 'PENDING' as const,
+};
 
 // ─── Helpers to build mock Drizzle query chains ───────────────────────────────
 
@@ -110,9 +121,15 @@ function buildDelete() {
 // ─── Mock dependencies ────────────────────────────────────────────────────────
 
 const mockParser = {
-  parseText: vi.fn().mockReturnValue({ text: 'parsed text', wordCount: 2, metadata: {} }),
-  parseUrl: vi.fn().mockResolvedValue({ text: 'url text', wordCount: 2, metadata: {} }),
-  parseDocx: vi.fn().mockResolvedValue({ text: 'docx text', wordCount: 2, metadata: {} }),
+  parseText: vi
+    .fn()
+    .mockReturnValue({ text: 'parsed text', wordCount: 2, metadata: {} }),
+  parseUrl: vi
+    .fn()
+    .mockResolvedValue({ text: 'url text', wordCount: 2, metadata: {} }),
+  parseDocx: vi
+    .fn()
+    .mockResolvedValue({ text: 'docx text', wordCount: 2, metadata: {} }),
   chunkText: vi.fn().mockReturnValue([{ index: 0, text: 'chunk 1' }]),
 };
 
@@ -127,7 +144,10 @@ describe('KnowledgeSourceService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new KnowledgeSourceService(mockParser as any, mockEmbeddings as any);
+    service = new KnowledgeSourceService(
+      mockParser as any,
+      mockEmbeddings as any
+    );
   });
 
   // ── listByCourseSources ────────────────────────────────────────────────────
@@ -157,12 +177,16 @@ describe('KnowledgeSourceService', () => {
 
     it('throws NotFoundException when source does not exist', async () => {
       mockSelect.mockImplementation(buildSelect([]));
-      await expect(service.findById('missing', TENANT)).rejects.toThrow(NotFoundException);
+      await expect(service.findById('missing', TENANT)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('includes id in NotFoundException message', async () => {
       mockSelect.mockImplementation(buildSelect([]));
-      await expect(service.findById('bad-id', TENANT)).rejects.toThrow('bad-id');
+      await expect(service.findById('bad-id', TENANT)).rejects.toThrow(
+        'bad-id'
+      );
     });
   });
 
@@ -170,7 +194,11 @@ describe('KnowledgeSourceService', () => {
 
   describe('createAndProcess() — TEXT source', () => {
     it('inserts source as PENDING, then sets to READY', async () => {
-      const readySource = { ...PENDING_SOURCE, status: 'READY' as const, chunk_count: 1 };
+      const readySource = {
+        ...PENDING_SOURCE,
+        status: 'READY' as const,
+        chunk_count: 1,
+      };
       mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
       mockUpdate.mockImplementation(buildUpdate(readySource));
 
@@ -187,13 +215,17 @@ describe('KnowledgeSourceService', () => {
       expect(mockParser.chunkText).toHaveBeenCalled();
       expect(mockEmbeddings.generateEmbedding).toHaveBeenCalledWith(
         'chunk 1',
-        expect.stringContaining('ks:'),
+        expect.stringContaining('ks:')
       );
       expect(result.status).toBe('READY');
     });
 
     it('marks source as FAILED when parser throws', async () => {
-      const failedSource = { ...PENDING_SOURCE, status: 'FAILED' as const, error_message: 'parse error' };
+      const failedSource = {
+        ...PENDING_SOURCE,
+        status: 'FAILED' as const,
+        error_message: 'parse error',
+      };
       mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
 
       // First update (PROCESSING) succeeds; second (FAILED) returns failed source
@@ -207,7 +239,9 @@ describe('KnowledgeSourceService', () => {
         return { set };
       });
 
-      mockParser.parseText.mockImplementationOnce(() => { throw new Error('parse error'); });
+      mockParser.parseText.mockImplementationOnce(() => {
+        throw new Error('parse error');
+      });
 
       const result = await service.createAndProcess({
         tenantId: TENANT,
@@ -238,7 +272,9 @@ describe('KnowledgeSourceService', () => {
         origin: 'https://example.com/article',
       });
 
-      expect(mockParser.parseUrl).toHaveBeenCalledWith('https://example.com/article');
+      expect(mockParser.parseUrl).toHaveBeenCalledWith(
+        'https://example.com/article'
+      );
     });
   });
 
@@ -274,7 +310,11 @@ describe('KnowledgeSourceService', () => {
         .mockResolvedValueOnce({ id: 'emb-0' })
         .mockRejectedValueOnce(new Error('provider down'));
 
-      const readySource = { ...PENDING_SOURCE, status: 'READY' as const, chunk_count: 1 };
+      const readySource = {
+        ...PENDING_SOURCE,
+        status: 'READY' as const,
+        chunk_count: 1,
+      };
       mockInsert.mockImplementation(buildInsert(PENDING_SOURCE));
       mockUpdate.mockImplementation(buildUpdate(readySource));
 
@@ -299,13 +339,17 @@ describe('KnowledgeSourceService', () => {
       mockSelect.mockImplementation(buildSelect([MOCK_SOURCE]));
       mockDelete.mockImplementation(buildDelete());
 
-      await expect(service.deleteSource('ks-1', TENANT)).resolves.toBeUndefined();
+      await expect(
+        service.deleteSource('ks-1', TENANT)
+      ).resolves.toBeUndefined();
       expect(mockDelete).toHaveBeenCalled();
     });
 
     it('throws NotFoundException if source does not exist', async () => {
       mockSelect.mockImplementation(buildSelect([]));
-      await expect(service.deleteSource('ghost', TENANT)).rejects.toThrow(NotFoundException);
+      await expect(service.deleteSource('ghost', TENANT)).rejects.toThrow(
+        NotFoundException
+      );
       expect(mockDelete).not.toHaveBeenCalled();
     });
   });

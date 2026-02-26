@@ -70,7 +70,13 @@ describe('MOCK_WEEKLY_STATS', () => {
 });
 
 describe('MOCK_ACTIVITY_FEED', () => {
-  const validTypes = ['study', 'quiz', 'annotation', 'ai_session', 'discussion'];
+  const validTypes = [
+    'study',
+    'quiz',
+    'annotation',
+    'ai_session',
+    'discussion',
+  ];
 
   it('has at least one activity item', () => {
     expect(MOCK_ACTIVITY_FEED.length).toBeGreaterThan(0);

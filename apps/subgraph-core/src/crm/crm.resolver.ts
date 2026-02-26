@@ -32,7 +32,7 @@ export class CrmResolver {
   @Query('crmSyncLog')
   async crmSyncLog(
     @Context() ctx: GqlContext,
-    @Args('limit', { type: () => Int, nullable: true }) limit?: number,
+    @Args('limit', { type: () => Int, nullable: true }) limit?: number
   ): Promise<object[]> {
     const tenantId = ctx.req.headers['x-tenant-id'];
     if (!tenantId) return [];

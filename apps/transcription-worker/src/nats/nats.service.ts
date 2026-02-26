@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   connect,
   NatsConnection,
@@ -41,7 +46,10 @@ export class NatsService implements OnModuleInit, OnModuleDestroy {
   /**
    * Publish a JSON payload to the given NATS subject.
    */
-  async publish(subject: string, payload: Record<string, unknown>): Promise<void> {
+  async publish(
+    subject: string,
+    payload: Record<string, unknown>
+  ): Promise<void> {
     if (!this.js) {
       this.logger.warn(`NATS not connected — dropping event on ${subject}`);
       return;
@@ -81,12 +89,18 @@ export class NatsService implements OnModuleInit, OnModuleDestroy {
         try {
           await jsm.streams.info(stream.name);
         } catch {
-          await jsm.streams.add({ name: stream.name, subjects: stream.subjects });
+          await jsm.streams.add({
+            name: stream.name,
+            subjects: stream.subjects,
+          });
           this.logger.log(`Created NATS stream: ${stream.name}`);
         }
       }
     } catch (err) {
-      this.logger.warn('Could not ensure NATS streams (JetStream may not be enabled)', err);
+      this.logger.warn(
+        'Could not ensure NATS streams (JetStream may not be enabled)',
+        err
+      );
     }
   }
 }

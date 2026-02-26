@@ -24,7 +24,7 @@ export class TranslationService implements OnModuleDestroy {
   async findTranslation(
     contentItemId: string,
     locale: string,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<ContentTranslation | null> {
     return withTenantContext(this.db, ctx, async (tx) => {
       const [row] = await tx
@@ -33,8 +33,8 @@ export class TranslationService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.contentTranslations.content_item_id, contentItemId),
-            eq(schema.contentTranslations.locale, locale),
-          ),
+            eq(schema.contentTranslations.locale, locale)
+          )
         )
         .limit(1);
       return row ?? null;
@@ -44,7 +44,7 @@ export class TranslationService implements OnModuleDestroy {
   async requestTranslation(
     contentItemId: string,
     targetLocale: string,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<ContentTranslation> {
     return withTenantContext(this.db, ctx, async (tx) => {
       // Return existing COMPLETED or PROCESSING row without re-queuing
@@ -54,8 +54,8 @@ export class TranslationService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.contentTranslations.content_item_id, contentItemId),
-            eq(schema.contentTranslations.locale, targetLocale),
-          ),
+            eq(schema.contentTranslations.locale, targetLocale)
+          )
         )
         .limit(1);
 
@@ -65,7 +65,7 @@ export class TranslationService implements OnModuleDestroy {
           existing.translation_status === 'PROCESSING')
       ) {
         this.logger.debug(
-          `Translation already ${existing.translation_status}: item=${contentItemId} locale=${targetLocale}`,
+          `Translation already ${existing.translation_status}: item=${contentItemId} locale=${targetLocale}`
         );
         return existing;
       }
@@ -91,10 +91,14 @@ export class TranslationService implements OnModuleDestroy {
       if (!row) throw new Error('Failed to upsert translation record');
 
       this.logger.log(
-        `Translation requested: item=${contentItemId} locale=${targetLocale} id=${row.id}`,
+        `Translation requested: item=${contentItemId} locale=${targetLocale} id=${row.id}`
       );
 
-      await this.publishTranslationRequested({ contentItemId, targetLocale, translationId: row.id });
+      await this.publishTranslationRequested({
+        contentItemId,
+        targetLocale,
+        translationId: row.id,
+      });
 
       return row;
     });
@@ -109,11 +113,19 @@ export class TranslationService implements OnModuleDestroy {
     let nc;
     try {
       nc = await connect({ servers: natsUrl });
-      nc.publish('content.translate.requested', sc.encode(JSON.stringify(payload)));
+      nc.publish(
+        'content.translate.requested',
+        sc.encode(JSON.stringify(payload))
+      );
       await nc.flush();
-      this.logger.debug(`Published content.translate.requested: id=${payload.translationId}`);
+      this.logger.debug(
+        `Published content.translate.requested: id=${payload.translationId}`
+      );
     } catch (err) {
-      this.logger.warn('Failed to publish content.translate.requested — NATS unavailable', err);
+      this.logger.warn(
+        'Failed to publish content.translate.requested — NATS unavailable',
+        err
+      );
     } finally {
       if (nc) await nc.close().catch(() => undefined);
     }

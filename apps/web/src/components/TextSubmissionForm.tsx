@@ -37,10 +37,14 @@ export function TextSubmissionForm({
     };
   }, []);
 
-  const { submit, loading, error } = useSubmitAssignment(contentItemId, courseId);
+  const { submit, loading, error } = useSubmitAssignment(
+    contentItemId,
+    courseId
+  );
 
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
-  const canSubmit = wordCount >= MIN_WORDS && text.length <= MAX_CHARS && !loading;
+  const canSubmit =
+    wordCount >= MIN_WORDS && text.length <= MAX_CHARS && !loading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,10 +83,13 @@ export function TextSubmissionForm({
           maxLength={MAX_CHARS}
           disabled={loading}
         />
-        <p className={`mt-1 text-xs ${wordCount < MIN_WORDS ? 'text-red-500' : 'text-gray-500'}`}>
+        <p
+          className={`mt-1 text-xs ${wordCount < MIN_WORDS ? 'text-red-500' : 'text-gray-500'}`}
+        >
           {wordCount} word{wordCount !== 1 ? 's' : ''}
-          {wordCount < MIN_WORDS ? ` (minimum ${MIN_WORDS} required)` : ''}
-          {' '}· {MAX_CHARS - text.length} characters remaining
+          {wordCount < MIN_WORDS
+            ? ` (minimum ${MIN_WORDS} required)`
+            : ''} · {MAX_CHARS - text.length} characters remaining
         </p>
       </div>
 

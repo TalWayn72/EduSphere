@@ -33,7 +33,9 @@ interface ScormImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (courseId: string) => void;
-  presignedUploadUrl: (fileName: string) => Promise<{ uploadUrl: string; fileKey: string }>;
+  presignedUploadUrl: (
+    fileName: string
+  ) => Promise<{ uploadUrl: string; fileKey: string }>;
 }
 
 type ImportState = 'idle' | 'uploading' | 'importing' | 'done' | 'error';
@@ -76,9 +78,13 @@ export function ScormImportDialog({
         xhr.open('PUT', uploadUrl);
         xhr.setRequestHeader('Content-Type', 'application/zip');
         xhr.upload.onprogress = (ev) => {
-          if (ev.lengthComputable) setProgress(Math.round((ev.loaded / ev.total) * 90));
+          if (ev.lengthComputable)
+            setProgress(Math.round((ev.loaded / ev.total) * 90));
         };
-        xhr.onload = () => (xhr.status < 300 ? resolve() : reject(new Error(`Upload failed: ${xhr.status}`)));
+        xhr.onload = () =>
+          xhr.status < 300
+            ? resolve()
+            : reject(new Error(`Upload failed: ${xhr.status}`));
         xhr.onerror = () => reject(new Error('Upload network error'));
         xhr.send(file);
       });
@@ -125,8 +131,16 @@ export function ScormImportDialog({
               onClick={() => fileRef.current?.click()}
             >
               <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Click to select a .zip SCORM package</p>
-              <input ref={fileRef} type="file" accept=".zip" className="hidden" onChange={handleFileChange} />
+              <p className="text-sm text-muted-foreground">
+                Click to select a .zip SCORM package
+              </p>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".zip"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
           )}
 
@@ -135,7 +149,9 @@ export function ScormImportDialog({
               <div className="flex items-center gap-3">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 <span className="text-sm">
-                  {state === 'uploading' ? `Uploading... ${progress}%` : 'Importing SCORM package...'}
+                  {state === 'uploading'
+                    ? `Uploading... ${progress}%`
+                    : 'Importing SCORM package...'}
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -150,7 +166,9 @@ export function ScormImportDialog({
           {state === 'done' && (
             <div className="flex items-center gap-3 text-green-600">
               <CheckCircle className="h-5 w-5" />
-              <span className="text-sm font-medium">Import successful! Redirecting...</span>
+              <span className="text-sm font-medium">
+                Import successful! Redirecting...
+              </span>
             </div>
           )}
 
@@ -160,7 +178,14 @@ export function ScormImportDialog({
                 <AlertCircle className="h-5 w-5" />
                 <span className="text-sm">{errorMsg}</span>
               </div>
-              <Button variant="outline" size="sm" onClick={() => { setState('idle'); fileRef.current?.click(); }}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setState('idle');
+                  fileRef.current?.click();
+                }}
+              >
                 Try again
               </Button>
             </div>
@@ -168,7 +193,11 @@ export function ScormImportDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={handleClose} disabled={state === 'uploading' || state === 'importing'}>
+          <Button
+            variant="ghost"
+            onClick={handleClose}
+            disabled={state === 'uploading' || state === 'importing'}
+          >
             Cancel
           </Button>
         </DialogFooter>

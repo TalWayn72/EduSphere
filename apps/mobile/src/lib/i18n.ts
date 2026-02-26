@@ -13,18 +13,22 @@ const MetroLocaleBackend = {
   read(
     language: string,
     namespace: string,
-    callback: (err: unknown, data: unknown) => void,
+    callback: (err: unknown, data: unknown) => void
   ) {
     try {
       // Metro resolves this glob pattern at bundle time across all locale/namespace combos
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const data: unknown = require(`@edusphere/i18n/src/locales/${language}/${namespace}.json`);
+      const data: unknown = require(
+        `@edusphere/i18n/src/locales/${language}/${namespace}.json`
+      );
       callback(null, data);
     } catch {
       try {
         // Fallback to English
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const fallback: unknown = require(`@edusphere/i18n/src/locales/en/${namespace}.json`);
+        const fallback: unknown = require(
+          `@edusphere/i18n/src/locales/en/${namespace}.json`
+        );
         callback(null, fallback);
       } catch (err) {
         callback(err, null);

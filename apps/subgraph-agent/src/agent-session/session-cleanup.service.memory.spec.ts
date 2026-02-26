@@ -17,7 +17,9 @@ import { SessionCleanupService } from './session-cleanup.service';
 
 const mockDelete = vi.fn().mockReturnThis();
 const mockWhere = vi.fn().mockReturnThis();
-const mockReturning = vi.fn().mockResolvedValue([{ id: 'sess-1' }, { id: 'sess-2' }]);
+const mockReturning = vi
+  .fn()
+  .mockResolvedValue([{ id: 'sess-1' }, { id: 'sess-2' }]);
 
 const mockDb = {
   delete: mockDelete,
@@ -31,7 +33,8 @@ const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 const mockCreateDatabaseConnection = vi.fn().mockReturnValue(mockDb);
 
 vi.mock('@edusphere/db', () => ({
-  createDatabaseConnection: (...args: unknown[]) => mockCreateDatabaseConnection(...args),
+  createDatabaseConnection: (...args: unknown[]) =>
+    mockCreateDatabaseConnection(...args),
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
   agentSessions: { id: 'id', createdAt: 'createdAt' },
   lt: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'lt' })),
@@ -67,7 +70,10 @@ describe('SessionCleanupService — memory safety', () => {
 
     expect(setIntervalSpy).toHaveBeenCalledTimes(1);
     // Verify the interval is set to 30 minutes (1800000 ms)
-    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 30 * 60 * 1000);
+    expect(setIntervalSpy).toHaveBeenCalledWith(
+      expect.any(Function),
+      30 * 60 * 1000
+    );
   });
 
   // ── Test 2 ──────────────────────────────────────────────────────────────────

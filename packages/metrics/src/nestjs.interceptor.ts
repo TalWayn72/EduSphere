@@ -25,7 +25,7 @@ export class MetricsInterceptor implements NestInterceptor {
   private handleHttp(
     context: ExecutionContext,
     next: CallHandler,
-    start: bigint,
+    start: bigint
   ): Observable<unknown> {
     const req = context.switchToHttp().getRequest<{
       method: string;
@@ -39,20 +39,25 @@ export class MetricsInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         const duration = Number(process.hrtime.bigint() - start) / 1e9;
-        this.metricsService.recordHttpRequest(method, route, res.statusCode, duration);
+        this.metricsService.recordHttpRequest(
+          method,
+          route,
+          res.statusCode,
+          duration
+        );
       }),
       catchError((err: unknown) => {
         const duration = Number(process.hrtime.bigint() - start) / 1e9;
         this.metricsService.recordHttpRequest(method, route, 500, duration);
         return throwError(() => err);
-      }),
+      })
     );
   }
 
   private handleGraphql(
     context: ExecutionContext,
     next: CallHandler,
-    _start: bigint,
+    _start: bigint
   ): Observable<unknown> {
     const info = context.getArgByIndex<{
       operation?: { operation?: string };
@@ -63,12 +68,20 @@ export class MetricsInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(() => {
-        this.metricsService.recordGraphqlOperation(operationType, operationName, 'success');
+        this.metricsService.recordGraphqlOperation(
+          operationType,
+          operationName,
+          'success'
+        );
       }),
       catchError((err: unknown) => {
-        this.metricsService.recordGraphqlOperation(operationType, operationName, 'error');
+        this.metricsService.recordGraphqlOperation(
+          operationType,
+          operationName,
+          'error'
+        );
         return throwError(() => err);
-      }),
+      })
     );
   }
 }

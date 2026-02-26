@@ -4,13 +4,22 @@
  * scim_sync_log: audit trail of SCIM provisioning operations
  */
 import {
-  pgTable, uuid, text, timestamp, boolean, jsonb, pgEnum,
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  boolean,
+  jsonb,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk, tenantId } from './_shared';
 
 export const scimOperationEnum = pgEnum('scim_operation', [
-  'CREATE_USER', 'UPDATE_USER', 'DELETE_USER', 'SYNC_GROUP',
+  'CREATE_USER',
+  'UPDATE_USER',
+  'DELETE_USER',
+  'SYNC_GROUP',
 ]);
 
 export const scimStatusEnum = pgEnum('scim_status', ['SUCCESS', 'FAILED']);
@@ -28,7 +37,9 @@ export const scimTokens = pgTable('scim_tokens', {
   lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
   expiresAt: timestamp('expires_at', { withTimezone: true }),
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 /**
@@ -44,7 +55,9 @@ export const scimSyncLog = pgTable('scim_sync_log', {
   errorMessage: text('error_message'),
   affectedUserId: uuid('affected_user_id'),
   syncData: jsonb('sync_data'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const scimTokensRLS = sql`

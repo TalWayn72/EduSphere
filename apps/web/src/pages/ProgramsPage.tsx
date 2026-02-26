@@ -1,7 +1,13 @@
 import React from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -31,8 +37,12 @@ interface ProgramEnrollment {
 
 export function ProgramsPage(): React.ReactElement {
   const navigate = useNavigate();
-  const [programsResult] = useQuery<{ programs: CredentialProgram[] }>({ query: PROGRAMS_QUERY });
-  const [enrollmentsResult] = useQuery<{ myProgramEnrollments: ProgramEnrollment[] }>({
+  const [programsResult] = useQuery<{ programs: CredentialProgram[] }>({
+    query: PROGRAMS_QUERY,
+  });
+  const [enrollmentsResult] = useQuery<{
+    myProgramEnrollments: ProgramEnrollment[];
+  }>({
     query: MY_PROGRAM_ENROLLMENTS_QUERY,
   });
   const [, enrollMutation] = useMutation(ENROLL_IN_PROGRAM_MUTATION);
@@ -83,18 +93,27 @@ export function ProgramsPage(): React.ReactElement {
             const isCompleted = Boolean(enrollment?.completedAt);
 
             return (
-              <Card key={program.id} className="flex flex-col hover:shadow-lg transition-shadow">
+              <Card
+                key={program.id}
+                className="flex flex-col hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-4xl">{program.badgeEmoji}</span>
                     {isCompleted ? (
-                      <Badge variant="default" className="bg-green-500">Completed</Badge>
+                      <Badge variant="default" className="bg-green-500">
+                        Completed
+                      </Badge>
                     ) : isEnrolled ? (
                       <Badge variant="secondary">Enrolled</Badge>
                     ) : null}
                   </div>
-                  <CardTitle className="text-lg mt-2">{program.title}</CardTitle>
-                  <CardDescription className="line-clamp-2">{program.description}</CardDescription>
+                  <CardTitle className="text-lg mt-2">
+                    {program.title}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {program.description}
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-4 mt-auto">
@@ -105,7 +124,11 @@ export function ProgramsPage(): React.ReactElement {
                   </div>
 
                   {isEnrolled && !isCompleted && (
-                    <Progress value={0} className="h-2" aria-label="Program progress" />
+                    <Progress
+                      value={0}
+                      className="h-2"
+                      aria-label="Program progress"
+                    />
                   )}
 
                   <div className="flex gap-2">

@@ -28,8 +28,12 @@ function makeSearchResult(overrides: Partial<SearchResult> = {}): SearchResult {
 
 function makeMockEmbeddings() {
   return {
-    embedQuery: vi.fn<[string], Promise<number[]>>().mockResolvedValue(makeFakeEmbedding()),
-    embedDocuments: vi.fn<[string[]], Promise<number[][]>>().mockResolvedValue([makeFakeEmbedding()]),
+    embedQuery: vi
+      .fn<[string], Promise<number[]>>()
+      .mockResolvedValue(makeFakeEmbedding()),
+    embedDocuments: vi
+      .fn<[string[]], Promise<number[][]>>()
+      .mockResolvedValue([makeFakeEmbedding()]),
     configureCache: vi.fn(),
     clearCache: vi.fn(),
   } as unknown as CachedEmbeddings;
@@ -37,7 +41,8 @@ function makeMockEmbeddings() {
 
 function makeMockVectorStore(results: SearchResult[] = [makeSearchResult()]) {
   return {
-    similaritySearch: vi.fn<[number[], string, number, number], Promise<SearchResult[]>>()
+    similaritySearch: vi
+      .fn<[number[], string, number, number], Promise<SearchResult[]>>()
       .mockResolvedValue(results),
     addDocument: vi.fn(),
     addDocuments: vi.fn(),
@@ -149,13 +154,16 @@ describe('SemanticRetriever', () => {
     it('adds rank information to each result (1-indexed)', async () => {
       const results = [
         makeSearchResult({ id: 'r1', similarity: 0.95 }),
-        makeSearchResult({ id: 'r2', similarity: 0.80 }),
+        makeSearchResult({ id: 'r2', similarity: 0.8 }),
         makeSearchResult({ id: 'r3', similarity: 0.65 }),
       ];
       mockVectorStore = makeMockVectorStore(results);
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      const retrieved: RetrievalResult[] = await retriever.retrieve('query', 'tenant-abc');
+      const retrieved: RetrievalResult[] = await retriever.retrieve(
+        'query',
+        'tenant-abc'
+      );
 
       expect(retrieved[0]!.rank).toBe(1);
       expect(retrieved[1]!.rank).toBe(2);
@@ -190,10 +198,14 @@ describe('SemanticRetriever', () => {
     });
 
     it('propagates embedding error', async () => {
-      vi.mocked(mockEmbeddings.embedQuery).mockRejectedValue(new Error('Embedding API down'));
+      vi.mocked(mockEmbeddings.embedQuery).mockRejectedValue(
+        new Error('Embedding API down')
+      );
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      await expect(retriever.retrieve('query', 'tenant-abc')).rejects.toThrow('Embedding API down');
+      await expect(retriever.retrieve('query', 'tenant-abc')).rejects.toThrow(
+        'Embedding API down'
+      );
     });
 
     it('propagates vector store error', async () => {
@@ -202,13 +214,18 @@ describe('SemanticRetriever', () => {
       );
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      await expect(retriever.retrieve('query', 'tenant-abc')).rejects.toThrow('PG connection lost');
+      await expect(retriever.retrieve('query', 'tenant-abc')).rejects.toThrow(
+        'PG connection lost'
+      );
     });
   });
 
   describe('retrieveWithContext()', () => {
     it('returns both results and formatted context string', async () => {
-      const result1 = makeSearchResult({ id: 'ctx-1', content: 'First content block' });
+      const result1 = makeSearchResult({
+        id: 'ctx-1',
+        content: 'First content block',
+      });
       const result2 = makeSearchResult({
         id: 'ctx-2',
         content: 'Second content block',
@@ -217,7 +234,10 @@ describe('SemanticRetriever', () => {
       mockVectorStore = makeMockVectorStore([result1, result2]);
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      const { results, context } = await retriever.retrieveWithContext('query', 'tenant-abc');
+      const { results, context } = await retriever.retrieveWithContext(
+        'query',
+        'tenant-abc'
+      );
 
       expect(results).toHaveLength(2);
       expect(typeof context).toBe('string');
@@ -232,7 +252,10 @@ describe('SemanticRetriever', () => {
       mockVectorStore = makeMockVectorStore(results);
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      const { context } = await retriever.retrieveWithContext('query', 'tenant-abc');
+      const { context } = await retriever.retrieveWithContext(
+        'query',
+        'tenant-abc'
+      );
 
       expect(context).toContain('[1]');
       expect(context).toContain('[2]');
@@ -245,7 +268,10 @@ describe('SemanticRetriever', () => {
       mockVectorStore = makeMockVectorStore(results);
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      const { context } = await retriever.retrieveWithContext('query', 'tenant-abc');
+      const { context } = await retriever.retrieveWithContext(
+        'query',
+        'tenant-abc'
+      );
 
       expect(context).toContain('important-paper.pdf');
     });
@@ -255,7 +281,10 @@ describe('SemanticRetriever', () => {
       mockVectorStore = makeMockVectorStore(results);
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      const { context } = await retriever.retrieveWithContext('query', 'tenant-abc');
+      const { context } = await retriever.retrieveWithContext(
+        'query',
+        'tenant-abc'
+      );
 
       expect(context).toContain('Unknown');
     });
@@ -264,7 +293,10 @@ describe('SemanticRetriever', () => {
       mockVectorStore = makeMockVectorStore([makeSearchResult()]);
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      const { results } = await retriever.retrieveWithContext('query', 'tenant-abc');
+      const { results } = await retriever.retrieveWithContext(
+        'query',
+        'tenant-abc'
+      );
 
       expect(results[0]!.rank).toBe(1);
     });
@@ -273,7 +305,10 @@ describe('SemanticRetriever', () => {
       mockVectorStore = makeMockVectorStore([]);
       const retriever = new SemanticRetriever(mockEmbeddings, mockVectorStore);
 
-      const { results, context } = await retriever.retrieveWithContext('query', 'tenant-abc');
+      const { results, context } = await retriever.retrieveWithContext(
+        'query',
+        'tenant-abc'
+      );
 
       expect(results).toHaveLength(0);
       expect(context).toBe('');

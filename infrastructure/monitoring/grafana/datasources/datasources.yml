@@ -24,6 +24,6 @@ datasources:
     secureJsonData:
       password: edusphere_dev_password
     jsonData:
-      sslmode: 'disable'
+      sslmode: "disable"
       postgresVersion: 1600
       timescaledb: false

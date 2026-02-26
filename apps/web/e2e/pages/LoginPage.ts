@@ -24,9 +24,15 @@ export class LoginPage {
     this.page = page;
     this.heading = page.getByRole('heading', { name: 'Welcome to EduSphere' });
     this.subheading = page.getByText('Knowledge Graph Educational Platform');
-    this.signInButton = page.getByRole('button', { name: /Sign In with Keycloak/i });
-    this.logoIcon = page.locator('[data-testid="logo-icon"], .lucide-book-open').first();
-    this.descriptionText = page.getByText(/Sign in with your organizational account/i);
+    this.signInButton = page.getByRole('button', {
+      name: /Sign In with Keycloak/i,
+    });
+    this.logoIcon = page
+      .locator('[data-testid="logo-icon"], .lucide-book-open')
+      .first();
+    this.descriptionText = page.getByText(
+      /Sign in with your organizational account/i
+    );
   }
 
   /** Navigate to the login page. */
@@ -62,7 +68,9 @@ export class LoginPage {
    */
   async logout(): Promise<void> {
     // Open the user menu (avatar button in header)
-    const userMenuTrigger = this.page.getByRole('button', { name: /user menu/i });
+    const userMenuTrigger = this.page.getByRole('button', {
+      name: /user menu/i,
+    });
     await userMenuTrigger.click();
 
     // Click Log out

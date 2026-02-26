@@ -8,11 +8,14 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const ROOT = resolve(__dirname, '../..');
-const read = (p: string) => existsSync(resolve(ROOT, p)) ? readFileSync(resolve(ROOT, p), 'utf-8') : '';
+const read = (p: string) =>
+  existsSync(resolve(ROOT, p)) ? readFileSync(resolve(ROOT, p), 'utf-8') : '';
 
 describe('EU AI Act Art.50: AI Transparency', () => {
   it('ai-transparency.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/subgraph-agent/src/ai/ai-transparency.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/subgraph-agent/src/ai/ai-transparency.ts'))
+    ).toBe(true);
   });
 
   it('AITransparencyMetadata interface has isAIGenerated field', () => {

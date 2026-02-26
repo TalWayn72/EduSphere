@@ -24,9 +24,15 @@ export async function withTenantContext<T>(
     // Set session variables for RLS policies.
     // SET LOCAL does not accept parameterized placeholders ($1) — use sql.raw() for literal values.
     const esc = (v: string) => v.replace(/'/g, "''");
-    await tx.execute(sql.raw(`SET LOCAL app.current_tenant = '${esc(context.tenantId)}'`));
-    await tx.execute(sql.raw(`SET LOCAL app.current_user_id = '${esc(context.userId)}'`));
-    await tx.execute(sql.raw(`SET LOCAL app.current_user_role = '${esc(context.userRole)}'`));
+    await tx.execute(
+      sql.raw(`SET LOCAL app.current_tenant = '${esc(context.tenantId)}'`)
+    );
+    await tx.execute(
+      sql.raw(`SET LOCAL app.current_user_id = '${esc(context.userId)}'`)
+    );
+    await tx.execute(
+      sql.raw(`SET LOCAL app.current_user_role = '${esc(context.userRole)}'`)
+    );
 
     // Execute operation with RLS context
     return operation(tx as any);

@@ -32,7 +32,7 @@ interface GraphQLContext {
 export class ModuleResolver {
   constructor(
     private readonly moduleService: ModuleService,
-    private readonly contentItemLoader: ContentItemLoader,
+    private readonly contentItemLoader: ContentItemLoader
   ) {}
 
   @Query('module')
@@ -51,7 +51,10 @@ export class ModuleResolver {
   }
 
   @Mutation('updateModule')
-  async updateModule(@Args('id') id: string, @Args('input') input: ModuleInput) {
+  async updateModule(
+    @Args('id') id: string,
+    @Args('input') input: ModuleInput
+  ) {
     return this.moduleService.update(id, input);
   }
 
@@ -79,7 +82,7 @@ export class ModuleResolver {
   @ResolveField('contentItems')
   async getContentItems(
     @Parent() mod: ModuleParent,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const loader = ctx.loaders?.contentItems ?? this.contentItemLoader;
     return loader.byModuleId.load(mod.id);

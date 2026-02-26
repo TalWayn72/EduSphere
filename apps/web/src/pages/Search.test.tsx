@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
@@ -89,7 +95,9 @@ describe('SearchPage', () => {
   it('renders suggested search chips in the empty state', () => {
     renderSearch();
     expect(screen.getByRole('button', { name: 'Talmud' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'chavruta' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'chavruta' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Rambam' })).toBeInTheDocument();
   });
 
@@ -172,7 +180,8 @@ describe('SearchPage', () => {
     await userEvent.type(input, 'talmud');
 
     await waitFor(
-      () => expect(screen.getByText(/results? for "talmud"/i)).toBeInTheDocument(),
+      () =>
+        expect(screen.getByText(/results? for "talmud"/i)).toBeInTheDocument(),
       { timeout: 2000 }
     );
   });
@@ -180,7 +189,10 @@ describe('SearchPage', () => {
   it('renders grouped section heading "Courses" when course results exist', async () => {
     renderSearch();
 
-    await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'talmud');
+    await userEvent.type(
+      screen.getByPlaceholderText(/search courses/i),
+      'talmud'
+    );
 
     await waitFor(
       () => expect(screen.getByText('Courses')).toBeInTheDocument(),
@@ -191,12 +203,17 @@ describe('SearchPage', () => {
   it('renders grouped section heading for at least one result type', async () => {
     renderSearch();
 
-    await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'talmud');
+    await userEvent.type(
+      screen.getByPlaceholderText(/search courses/i),
+      'talmud'
+    );
 
     await waitFor(
       () => {
         // At least one of the known section headings must appear
-        const heading = screen.queryByText(/Courses|Transcripts|Annotations|Concepts/i);
+        const heading = screen.queryByText(
+          /Courses|Transcripts|Annotations|Concepts/i
+        );
         expect(heading).not.toBeNull();
       },
       { timeout: 2000 }
@@ -241,7 +258,10 @@ describe('SearchPage', () => {
 
     // After debounce completes (300ms real time), results + count appear
     await waitFor(
-      () => expect(screen.getByText(/results? for "reasoning"/i)).toBeInTheDocument(),
+      () =>
+        expect(
+          screen.getByText(/results? for "reasoning"/i)
+        ).toBeInTheDocument(),
       { timeout: 2000 }
     );
   });
@@ -270,7 +290,10 @@ describe('SearchPage', () => {
   it('renders highlighted <mark> elements for matching query text in results', async () => {
     renderSearch();
 
-    await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'talmud');
+    await userEvent.type(
+      screen.getByPlaceholderText(/search courses/i),
+      'talmud'
+    );
 
     await waitFor(
       () => {
@@ -306,7 +329,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -340,7 +365,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -360,7 +387,10 @@ describe('SearchPage', () => {
 
       // Should show result count, not "No results found"
       await waitFor(
-        () => expect(screen.getByText(/results? for "Talmud"/i)).toBeInTheDocument(),
+        () =>
+          expect(
+            screen.getByText(/results? for "Talmud"/i)
+          ).toBeInTheDocument(),
         { timeout: 2000 }
       );
     });
@@ -371,7 +401,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -390,7 +422,10 @@ describe('SearchPage', () => {
       await userEvent.type(input, 'Rambam');
 
       await waitFor(
-        () => expect(screen.getByText(/results? for "Rambam"/i)).toBeInTheDocument(),
+        () =>
+          expect(
+            screen.getByText(/results? for "Rambam"/i)
+          ).toBeInTheDocument(),
         { timeout: 2000 }
       );
     });
@@ -401,7 +436,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -420,7 +457,10 @@ describe('SearchPage', () => {
       await userEvent.type(input, 'chavruta');
 
       await waitFor(
-        () => expect(screen.getByText(/results? for "chavruta"/i)).toBeInTheDocument(),
+        () =>
+          expect(
+            screen.getByText(/results? for "chavruta"/i)
+          ).toBeInTheDocument(),
         { timeout: 2000 }
       );
     });

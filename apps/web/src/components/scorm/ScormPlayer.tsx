@@ -39,7 +39,11 @@ interface ScormMessage {
 const SUBGRAPH_CONTENT_URL =
   import.meta.env.VITE_CONTENT_SERVICE_URL ?? 'http://localhost:4002';
 
-export function ScormPlayer({ sessionId, contentItemId: _contentItemId, className }: ScormPlayerProps) {
+export function ScormPlayer({
+  sessionId,
+  contentItemId: _contentItemId,
+  className,
+}: ScormPlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [, updateSession] = useMutation(UPDATE_SCORM_SESSION);
   const [, finishSession] = useMutation(FINISH_SCORM_SESSION);
@@ -47,7 +51,10 @@ export function ScormPlayer({ sessionId, contentItemId: _contentItemId, classNam
   const handleMessage = useCallback(
     (event: MessageEvent) => {
       // Only handle messages from our iframe origin
-      if (event.origin !== SUBGRAPH_CONTENT_URL && event.origin !== window.location.origin) {
+      if (
+        event.origin !== SUBGRAPH_CONTENT_URL &&
+        event.origin !== window.location.origin
+      ) {
         return;
       }
 
@@ -66,7 +73,7 @@ export function ScormPlayer({ sessionId, contentItemId: _contentItemId, classNam
         });
       }
     },
-    [sessionId, updateSession, finishSession],
+    [sessionId, updateSession, finishSession]
   );
 
   useEffect(() => {

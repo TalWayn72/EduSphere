@@ -22,8 +22,11 @@ interface QuotaResult {
 }
 
 function computeQuota(totalDiskBytes: number, usedBytes: number): QuotaResult {
-  const eduSphereQuotaBytes = Math.floor(totalDiskBytes * STORAGE_QUOTA_FRACTION);
-  const usageRatio = eduSphereQuotaBytes > 0 ? usedBytes / eduSphereQuotaBytes : 0;
+  const eduSphereQuotaBytes = Math.floor(
+    totalDiskBytes * STORAGE_QUOTA_FRACTION
+  );
+  const usageRatio =
+    eduSphereQuotaBytes > 0 ? usedBytes / eduSphereQuotaBytes : 0;
   return {
     eduSphereQuotaBytes,
     usageRatio,
@@ -81,13 +84,19 @@ describe('StorageManager quota math', () => {
 
     it('is true at 80% usage', () => {
       // quota = 50 MB, used = 40 MB → ratio = 0.8
-      const { isApproachingLimit, isOverLimit } = computeQuota(100 * MB, 40 * MB);
+      const { isApproachingLimit, isOverLimit } = computeQuota(
+        100 * MB,
+        40 * MB
+      );
       expect(isApproachingLimit).toBe(true);
       expect(isOverLimit).toBe(false);
     });
 
     it('is true at 90% usage', () => {
-      const { isApproachingLimit, isOverLimit } = computeQuota(100 * MB, 45 * MB);
+      const { isApproachingLimit, isOverLimit } = computeQuota(
+        100 * MB,
+        45 * MB
+      );
       expect(isApproachingLimit).toBe(true);
       expect(isOverLimit).toBe(false);
     });

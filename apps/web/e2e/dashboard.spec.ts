@@ -42,7 +42,8 @@ const SCREENSHOTS_DIR = path.join(process.cwd(), 'visual-qa-results');
  * Cause:         Old user.graphql in Docker container — missing UserPreferences type
  * Fix:           docker cp user.graphql → node compose.js → restart gateway
  */
-const PREFERENCES_SCHEMA_ERROR = 'Cannot query field "preferences" on type "User"';
+const PREFERENCES_SCHEMA_ERROR =
+  'Cannot query field "preferences" on type "User"';
 
 /**
  * Resolver null error: mapUser() returned an object where createdAt was null
@@ -52,7 +53,8 @@ const PREFERENCES_SCHEMA_ERROR = 'Cannot query field "preferences" on type "User
  *         and didn't handle camelCase (Drizzle) vs snake_case (raw SQL) column names
  * Fix:    Fix mapUser() with toIso() helper + fallback for both naming conventions
  */
-const NULL_CREATED_AT_ERROR = 'Cannot return null for non-nullable field User.createdAt';
+const NULL_CREATED_AT_ERROR =
+  'Cannot return null for non-nullable field User.createdAt';
 
 /**
  * Generic user data error prefix shown on the Dashboard page.
@@ -71,15 +73,17 @@ test.beforeAll(() => {
 test.describe('Dashboard — DEV_MODE (mock data)', () => {
   test('page loads with "Dashboard" heading', async ({ page }) => {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('stats cards are visible', async ({ page }) => {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
     // Primary stats row: Courses Enrolled, Study Time, Concepts Mastered
-    await expect(page.getByText('Courses Enrolled')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText('Courses Enrolled')).toBeVisible({
+      timeout: 8_000,
+    });
     await expect(page.getByText('Study Time')).toBeVisible();
     await expect(page.getByText('Concepts Mastered')).toBeVisible();
     // Secondary stats row: Active Courses, Annotations, Study Groups
@@ -88,7 +92,9 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
 
   test('Instructor Tools section is visible', async ({ page }) => {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Instructor Tools')).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText('Instructor Tools')).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   /**
@@ -102,20 +108,22 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
    * What IS a regression is either of the specific schema/resolver errors below.
    * This test guards only against those two, not the generic Unauthorized message.
    */
-  test('no "preferences" schema error visible — regression guard', async ({ page }) => {
+  test('no "preferences" schema error visible — regression guard', async ({
+    page,
+  }) => {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2_000); // let React + GraphQL settle
 
     // Specific schema mismatch: preferences field missing from gateway supergraph
     // Regression: old user.graphql in Docker container — UserPreferences type absent
     await expect(
-      page.getByText(PREFERENCES_SCHEMA_ERROR, { exact: false }),
+      page.getByText(PREFERENCES_SCHEMA_ERROR, { exact: false })
     ).not.toBeVisible({ timeout: 3_000 });
 
     // Resolver null bug: mapUser() didn't convert Date → ISO string for createdAt
     // Regression: old container code accessed snake_case keys; Drizzle returns camelCase
     await expect(
-      page.getByText(NULL_CREATED_AT_ERROR, { exact: false }),
+      page.getByText(NULL_CREATED_AT_ERROR, { exact: false })
     ).not.toBeVisible({ timeout: 3_000 });
 
     // Note: "Error loading user data: [GraphQL] Unauthorized" CAN appear in DEV_MODE
@@ -123,9 +131,13 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
     // and is checked (absent) only in the live-backend suite below.
   });
 
-  test('no crash overlay ("Something went wrong") visible', async ({ page }) => {
+  test('no crash overlay ("Something went wrong") visible', async ({
+    page,
+  }) => {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('visual snapshot — dashboard DEV_MODE render', async ({ page }) => {
@@ -143,7 +155,10 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
 const LIVE_BACKEND = process.env.VITE_DEV_MODE === 'false';
 
 test.describe('Dashboard — Live backend (schema regression guard)', () => {
-  test.skip(!LIVE_BACKEND, 'Set VITE_DEV_MODE=false to run live-backend regression tests');
+  test.skip(
+    !LIVE_BACKEND,
+    'Set VITE_DEV_MODE=false to run live-backend regression tests'
+  );
 
   /**
    * PRIMARY REGRESSION TEST.
@@ -160,28 +175,33 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
    *   docker exec edusphere-all-in-one sh -c "cd /app/apps/gateway && node compose.js"
    *   supervisorctl restart gateway
    */
-  test('preferences schema error does NOT appear after /dashboard load', async ({ page }) => {
+  test('preferences schema error does NOT appear after /dashboard load', async ({
+    page,
+  }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
 
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await page.goto(`${BASE}/dashboard`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
     await page.waitForTimeout(5_000); // allow ME_QUERY to resolve
 
     // CRITICAL: schema mismatch error must be absent
     await expect(
-      page.getByText(PREFERENCES_SCHEMA_ERROR, { exact: false }),
+      page.getByText(PREFERENCES_SCHEMA_ERROR, { exact: false })
     ).not.toBeVisible({ timeout: 2_000 });
 
     // CRITICAL: resolver null bug for createdAt must be absent
     await expect(
-      page.getByText(NULL_CREATED_AT_ERROR, { exact: false }),
+      page.getByText(NULL_CREATED_AT_ERROR, { exact: false })
     ).not.toBeVisible({ timeout: 2_000 });
 
     // Generic error banner must also be absent
     await expect(
-      page.getByText(USER_DATA_ERROR_PREFIX, { exact: false }),
+      page.getByText(USER_DATA_ERROR_PREFIX, { exact: false })
     ).not.toBeVisible({ timeout: 2_000 });
 
     if (consoleErrors.length > 0) {
@@ -189,29 +209,44 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
     }
   });
 
-  test('user display name is shown in header from real API', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+  test('user display name is shown in header from real API', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE}/dashboard`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
     await page.waitForTimeout(5_000);
 
     // The header shows the user's name — must not be empty
     const header = page.locator('header');
     await expect(header).toBeVisible({ timeout: 5_000 });
     // Name should appear somewhere — at minimum the header renders
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Dashboard' })
+    ).toBeVisible();
   });
 
   test('stats cards show numeric values from real API', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await page.goto(`${BASE}/dashboard`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
     await page.waitForTimeout(5_000);
 
-    await expect(page.getByText('Active Courses')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Active Courses')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText('Learning Streak')).toBeVisible();
     await expect(page.getByText('Study Time')).toBeVisible();
     await expect(page.getByText('Concepts Mastered')).toBeVisible();
   });
 
   test('visual snapshot — dashboard live backend render', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await page.goto(`${BASE}/dashboard`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
     await page.waitForTimeout(5_000);
 
     const file = path.join(SCREENSHOTS_DIR, 'dashboard-live-backend.png');

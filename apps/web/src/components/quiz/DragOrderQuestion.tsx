@@ -40,7 +40,9 @@ export function DragOrderQuestion({ item, value, onChange, disabled }: Props) {
   return (
     <div className="space-y-3">
       <p className="font-medium text-sm">{item.question}</p>
-      <p className="text-xs text-muted-foreground">Drag items into the correct order</p>
+      <p className="text-xs text-muted-foreground">
+        Drag items into the correct order
+      </p>
       <ul className="space-y-2" role="list" aria-label="Orderable items">
         {orderedItems.map((it, idx) => (
           <li
@@ -52,7 +54,10 @@ export function DragOrderQuestion({ item, value, onChange, disabled }: Props) {
             className={`flex items-center gap-3 px-4 py-3 rounded-lg border bg-card text-sm
               ${disabled ? 'cursor-default opacity-70' : 'cursor-grab active:cursor-grabbing hover:border-primary/50'}`}
           >
-            <GripVertical className="h-4 w-4 text-muted-foreground flex-shrink-0" aria-hidden />
+            <GripVertical
+              className="h-4 w-4 text-muted-foreground flex-shrink-0"
+              aria-hidden
+            />
             <span className="flex-shrink-0 text-xs text-muted-foreground w-5 text-center">
               {idx + 1}
             </span>

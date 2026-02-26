@@ -64,7 +64,7 @@ import { NatsService } from './nats.service';
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const buildEvent = (
-  overrides: Partial<AgentSessionPayload> = {},
+  overrides: Partial<AgentSessionPayload> = {}
 ): AgentSessionPayload => ({
   type: 'session.created',
   sessionId: 'session-1',
@@ -172,7 +172,7 @@ describe('NatsService', () => {
       const handler = vi.fn();
       const unsubscribe = await service.subscribe(
         'edusphere.agent.session.created',
-        handler,
+        handler
       );
       expect(typeof unsubscribe).toBe('function');
     });
@@ -227,7 +227,7 @@ describe('NatsService', () => {
         expect.objectContaining({
           type: 'session.completed',
           sessionId: validPayload.sessionId,
-        }),
+        })
       );
     });
 
@@ -308,7 +308,7 @@ describe('NatsService', () => {
       // Only the valid message triggers the handler.
       expect(handler).toHaveBeenCalledTimes(1);
       expect(handler).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'session.failed' }),
+        expect.objectContaining({ type: 'session.failed' })
       );
     });
 

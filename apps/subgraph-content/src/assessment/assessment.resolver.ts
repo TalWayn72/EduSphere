@@ -46,7 +46,10 @@ export class AssessmentResolver {
   async myCampaigns(@Context() ctx: GraphQLContext) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
-    const list = await this.svc.listCampaignsForTarget(auth.userId, auth.tenantId);
+    const list = await this.svc.listCampaignsForTarget(
+      auth.userId,
+      auth.tenantId
+    );
     return list.map(mapCampaign);
   }
 
@@ -54,14 +57,17 @@ export class AssessmentResolver {
   async campaignsToRespond(@Context() ctx: GraphQLContext) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
-    const list = await this.svc.listCampaignsForResponder(auth.userId, auth.tenantId);
+    const list = await this.svc.listCampaignsForResponder(
+      auth.userId,
+      auth.tenantId
+    );
     return list.map(mapCampaign);
   }
 
   @Query('assessmentResult')
   async assessmentResult(
     @Args('campaignId') campaignId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.tenantId) throw new UnauthorizedException();
@@ -80,15 +86,23 @@ export class AssessmentResolver {
     @Args('title') title: string,
     @Args('targetUserId') targetUserId: string,
     @Args('dueDate') dueDate: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
-    this.logger.log({ title, targetUserId, tenant: auth.tenantId }, 'createAssessmentCampaign');
+    this.logger.log(
+      { title, targetUserId, tenant: auth.tenantId },
+      'createAssessmentCampaign'
+    );
     const campaign = await this.svc.createCampaign(
-      { title, targetUserId, rubric: defaultRubric(), dueDate: dueDate ? new Date(dueDate) : undefined },
+      {
+        title,
+        targetUserId,
+        rubric: defaultRubric(),
+        dueDate: dueDate ? new Date(dueDate) : undefined,
+      },
       auth.tenantId,
-      auth.userId,
+      auth.userId
     );
     return mapCampaign(campaign);
   }
@@ -96,7 +110,7 @@ export class AssessmentResolver {
   @Mutation('activateAssessmentCampaign')
   async activateAssessmentCampaign(
     @Args('campaignId') campaignId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<boolean> {
     const auth = ctx.authContext;
     if (!auth?.tenantId) throw new UnauthorizedException();
@@ -110,19 +124,26 @@ export class AssessmentResolver {
     @Args('raterRole') raterRole: RaterRole,
     @Args('criteriaScores') criteriaScores: string,
     @Args('narrative') narrative: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<boolean> {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) throw new UnauthorizedException();
     const parsed = JSON.parse(criteriaScores) as Record<string, number>;
-    await this.svc.submitResponse(campaignId, auth.userId, raterRole, parsed, narrative ?? null, auth.tenantId);
+    await this.svc.submitResponse(
+      campaignId,
+      auth.userId,
+      raterRole,
+      parsed,
+      narrative ?? null,
+      auth.tenantId
+    );
     return true;
   }
 
   @Mutation('completeAssessmentCampaign')
   async completeAssessmentCampaign(
     @Args('campaignId') campaignId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.tenantId) throw new UnauthorizedException();

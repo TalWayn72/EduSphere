@@ -11,18 +11,29 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect } = vi.hoisted(() => {
-  const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
-  const mockUnsubscribe = vi.fn();
-  const mockDrain = vi.fn().mockResolvedValue(undefined);
-  const asyncIter = { next: vi.fn().mockResolvedValue({ done: true }) };
-  const mockSub = { unsubscribe: mockUnsubscribe, [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter) };
-  const mockNatsConnect = vi.fn().mockResolvedValue({ subscribe: vi.fn().mockReturnValue(mockSub), drain: mockDrain });
-  return { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect };
-});
+const { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect } =
+  vi.hoisted(() => {
+    const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+    const mockUnsubscribe = vi.fn();
+    const mockDrain = vi.fn().mockResolvedValue(undefined);
+    const asyncIter = { next: vi.fn().mockResolvedValue({ done: true }) };
+    const mockSub = {
+      unsubscribe: mockUnsubscribe,
+      [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter),
+    };
+    const mockNatsConnect = vi.fn().mockResolvedValue({
+      subscribe: vi.fn().mockReturnValue(mockSub),
+      drain: mockDrain,
+    });
+    return { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect };
+  });
 
 vi.mock('@edusphere/db', () => ({
-  createDatabaseConnection: () => ({ execute: vi.fn().mockResolvedValue([]), select: vi.fn(), update: vi.fn() }),
+  createDatabaseConnection: () => ({
+    execute: vi.fn().mockResolvedValue([]),
+    select: vi.fn(),
+    update: vi.fn(),
+  }),
   closeAllPools: mockCloseAllPools,
   schema: { textSubmissions: {}, submissionEmbeddings: {}, tenants: {} },
   eq: vi.fn(),
@@ -33,10 +44,17 @@ vi.mock('@edusphere/db', () => ({
 
 vi.mock('nats', () => ({
   connect: mockNatsConnect,
-  StringCodec: vi.fn().mockReturnValue({ decode: vi.fn().mockReturnValue('{}'), encode: vi.fn() }),
+  StringCodec: vi.fn().mockReturnValue({
+    decode: vi.fn().mockReturnValue('{}'),
+    encode: vi.fn(),
+  }),
 }));
 
-vi.mock('@edusphere/nats-client', () => ({ buildNatsOptions: vi.fn().mockReturnValue({ servers: 'nats://localhost:4222' }) }));
+vi.mock('@edusphere/nats-client', () => ({
+  buildNatsOptions: vi
+    .fn()
+    .mockReturnValue({ servers: 'nats://localhost:4222' }),
+}));
 
 import { PlagiarismService } from './plagiarism.service.js';
 import { EmbeddingClient } from './embedding.client.js';
@@ -52,8 +70,14 @@ describe('PlagiarismService - memory safety', () => {
     vi.clearAllMocks();
     mockDrain.mockResolvedValue(undefined);
     const asyncIter = { next: vi.fn().mockResolvedValue({ done: true }) };
-    const mockSub = { unsubscribe: mockUnsubscribe, [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter) };
-    mockNatsConnect.mockResolvedValue({ subscribe: vi.fn().mockReturnValue(mockSub), drain: mockDrain });
+    const mockSub = {
+      unsubscribe: mockUnsubscribe,
+      [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter),
+    };
+    mockNatsConnect.mockResolvedValue({
+      subscribe: vi.fn().mockReturnValue(mockSub),
+      drain: mockDrain,
+    });
   });
 
   it('unsubscribes NATS subscription on destroy', async () => {

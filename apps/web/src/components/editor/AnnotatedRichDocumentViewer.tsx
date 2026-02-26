@@ -63,7 +63,7 @@ export function AnnotatedRichDocumentViewer({
       Mathematics,
       createAnnotationExtension(
         () => annotationsRef.current,
-        () => focusedIdRef.current,
+        () => focusedIdRef.current
       ),
     ],
     content: parsedContent,
@@ -92,7 +92,7 @@ export function AnnotatedRichDocumentViewer({
         onAnnotationClick?.(annotationId);
       }
     },
-    [onAnnotationClick],
+    [onAnnotationClick]
   );
 
   if (!editor) return null;

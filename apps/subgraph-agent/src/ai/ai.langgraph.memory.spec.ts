@@ -12,9 +12,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const { mockPgPoolEnd, MockPgPool } = vi.hoisted(() => {
   const mockPgPoolEnd = vi.fn().mockResolvedValue(undefined);
-  const MockPgPool = vi.fn().mockImplementation(function (
-    this: { end: typeof mockPgPoolEnd },
-  ) {
+  const MockPgPool = vi.fn().mockImplementation(function (this: {
+    end: typeof mockPgPoolEnd;
+  }) {
     this.end = mockPgPoolEnd;
   });
   return { mockPgPoolEnd, MockPgPool };
@@ -29,7 +29,7 @@ const { _mockPostgresSaverSetup, MockPostgresSaver } = vi.hoisted(() => {
   const _mockPostgresSaverSetup = vi.fn().mockResolvedValue(undefined);
   const MockPostgresSaver = vi.fn().mockImplementation(function (
     this: { setup: typeof _mockPostgresSaverSetup },
-    _pool: unknown,
+    _pool: unknown
   ) {
     this.setup = _mockPostgresSaverSetup;
   });
@@ -138,7 +138,9 @@ describe('LangGraphService - memory leak / teardown', () => {
       const checkpointer = svc.getCheckpointer();
       expect(checkpointer).toBeInstanceOf(MemorySaver);
 
-      const storage = (checkpointer as unknown as { storage: Map<string, unknown> }).storage;
+      const storage = (
+        checkpointer as unknown as { storage: Map<string, unknown> }
+      ).storage;
       for (let i = 0; i < 1200; i++) {
         storage.set('session-' + String(i), { data: 'payload-' + String(i) });
       }
@@ -155,7 +157,9 @@ describe('LangGraphService - memory leak / teardown', () => {
       await svc.onModuleInit();
 
       const checkpointer = svc.getCheckpointer();
-      const storage = (checkpointer as unknown as { storage: Map<string, unknown> }).storage;
+      const storage = (
+        checkpointer as unknown as { storage: Map<string, unknown> }
+      ).storage;
       for (let i = 0; i < 500; i++) {
         storage.set('session-' + String(i), {});
       }
@@ -171,7 +175,9 @@ describe('LangGraphService - memory leak / teardown', () => {
       await svc.onModuleInit();
 
       const checkpointer = svc.getCheckpointer();
-      const storage = (checkpointer as unknown as { storage: Map<string, unknown> }).storage;
+      const storage = (
+        checkpointer as unknown as { storage: Map<string, unknown> }
+      ).storage;
       for (let i = 0; i < 1050; i++) {
         storage.set('session-' + String(i), {});
       }
@@ -188,13 +194,15 @@ describe('LangGraphService - memory leak / teardown', () => {
   describe('getCheckpointer() - pre-init guard', () => {
     it('throws when called before onModuleInit()', () => {
       const svc = new LangGraphService();
-      expect(() => svc.getCheckpointer()).toThrow('LangGraphService not initialized');
+      expect(() => svc.getCheckpointer()).toThrow(
+        'LangGraphService not initialized'
+      );
     });
 
     it('throw message mentions onModuleInit()', () => {
       const svc = new LangGraphService();
       expect(() => svc.getCheckpointer()).toThrowError(
-        /onModuleInit\(\) has not been called/,
+        /onModuleInit\(\) has not been called/
       );
     });
 
@@ -209,7 +217,9 @@ describe('LangGraphService - memory leak / teardown', () => {
       const svc = new LangGraphService();
       await svc.onModuleInit();
       await svc.onModuleDestroy();
-      expect(() => svc.getCheckpointer()).toThrow('LangGraphService not initialized');
+      expect(() => svc.getCheckpointer()).toThrow(
+        'LangGraphService not initialized'
+      );
     });
   });
 });

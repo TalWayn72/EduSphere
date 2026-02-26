@@ -15,7 +15,10 @@ vi.mock('@edusphere/db', () => ({
     },
   },
   sql: Object.assign(
-    (strings: TemplateStringsArray, ...values: unknown[]) => ({ strings, values }),
+    (strings: TemplateStringsArray, ...values: unknown[]) => ({
+      strings,
+      values,
+    }),
     { raw: vi.fn() }
   ),
   eq: vi.fn(),
@@ -31,29 +34,44 @@ const USER_PRIVATE = {
   id: 'user-1',
   display_name: 'Alice',
   avatar_url: null,
-  preferences: { isPublicProfile: false, locale: 'en', theme: 'system', emailNotifications: true, pushNotifications: true },
+  preferences: {
+    isPublicProfile: false,
+    locale: 'en',
+    theme: 'system',
+    emailNotifications: true,
+    pushNotifications: true,
+  },
   created_at: new Date('2024-01-01T00:00:00Z'),
 };
 
 const USER_PUBLIC = {
   ...USER_PRIVATE,
-  preferences: { isPublicProfile: true, locale: 'en', theme: 'system', emailNotifications: true, pushNotifications: true },
+  preferences: {
+    isPublicProfile: true,
+    locale: 'en',
+    theme: 'system',
+    emailNotifications: true,
+    pushNotifications: true,
+  },
 };
 
-function makeBypassImpl(user: typeof USER_PRIVATE | null, courses = [], badges = 0, progress = { completed: 5, total_seconds: 3600 }) {
-  return (
-    _db: unknown,
-    operation: (tx: unknown) => Promise<unknown>,
-  ) => {
+function makeBypassImpl(
+  user: typeof USER_PRIVATE | null,
+  courses = [],
+  badges = 0,
+  progress = { completed: 5, total_seconds: 3600 }
+) {
+  return (_db: unknown, operation: (tx: unknown) => Promise<unknown>) => {
     const tx = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       limit: vi.fn().mockResolvedValue(user ? [user] : []),
-      execute: vi.fn()
-        .mockResolvedValueOnce({ rows: courses })              // completed courses
+      execute: vi
+        .fn()
+        .mockResolvedValueOnce({ rows: courses }) // completed courses
         .mockResolvedValueOnce({ rows: [{ count: badges }] }) // badge count
-        .mockResolvedValueOnce({ rows: [progress] }),         // progress
+        .mockResolvedValueOnce({ rows: [progress] }), // progress
     };
     return operation(tx);
   };
@@ -68,23 +86,34 @@ describe('PublicProfileService', () => {
   });
 
   it('returns null when user does not exist', async () => {
-    mockWithBypassRLS.mockImplementation(makeBypassImpl(null) as typeof withBypassRLS);
+    mockWithBypassRLS.mockImplementation(
+      makeBypassImpl(null) as typeof withBypassRLS
+    );
     const result = await service.getPublicProfile('missing-user');
     expect(result).toBeNull();
   });
 
   it('returns null when isPublicProfile is false (private profile)', async () => {
-    mockWithBypassRLS.mockImplementation(makeBypassImpl(USER_PRIVATE) as typeof withBypassRLS);
+    mockWithBypassRLS.mockImplementation(
+      makeBypassImpl(USER_PRIVATE) as typeof withBypassRLS
+    );
     const result = await service.getPublicProfile('user-1');
     expect(result).toBeNull();
   });
 
   it('returns PublicProfile when isPublicProfile is true', async () => {
     const courses = [
-      { course_id: 'c-1', title: 'Intro to Math', completed_at: '2025-01-15T00:00:00Z' },
+      {
+        course_id: 'c-1',
+        title: 'Intro to Math',
+        completed_at: '2025-01-15T00:00:00Z',
+      },
     ];
     mockWithBypassRLS.mockImplementation(
-      makeBypassImpl(USER_PUBLIC, courses, 3, { completed: 10, total_seconds: 7200 }) as typeof withBypassRLS,
+      makeBypassImpl(USER_PUBLIC, courses, 3, {
+        completed: 10,
+        total_seconds: 7200,
+      }) as typeof withBypassRLS
     );
 
     const result = await service.getPublicProfile('user-1');
@@ -100,7 +129,9 @@ describe('PublicProfileService', () => {
   });
 
   it('does not expose email or tenantId in public profile', async () => {
-    mockWithBypassRLS.mockImplementation(makeBypassImpl(USER_PUBLIC) as typeof withBypassRLS);
+    mockWithBypassRLS.mockImplementation(
+      makeBypassImpl(USER_PUBLIC) as typeof withBypassRLS
+    );
     const result = await service.getPublicProfile('user-1');
     expect(result).not.toBeNull();
     expect(result).not.toHaveProperty('email');
@@ -112,10 +143,14 @@ describe('PublicProfileService', () => {
     // The service uses a raw SQL query with is_published = TRUE filter.
     // We verify that completed courses list reflects only what the DB returns.
     const publishedOnly = [
-      { course_id: 'c-pub', title: 'Published Course', completed_at: '2025-03-01T00:00:00Z' },
+      {
+        course_id: 'c-pub',
+        title: 'Published Course',
+        completed_at: '2025-03-01T00:00:00Z',
+      },
     ];
     mockWithBypassRLS.mockImplementation(
-      makeBypassImpl(USER_PUBLIC, publishedOnly) as typeof withBypassRLS,
+      makeBypassImpl(USER_PUBLIC, publishedOnly) as typeof withBypassRLS
     );
 
     const result = await service.getPublicProfile('user-1');
@@ -124,7 +159,9 @@ describe('PublicProfileService', () => {
   });
 
   it('returns displayName from display_name field, not email', async () => {
-    mockWithBypassRLS.mockImplementation(makeBypassImpl(USER_PUBLIC) as typeof withBypassRLS);
+    mockWithBypassRLS.mockImplementation(
+      makeBypassImpl(USER_PUBLIC) as typeof withBypassRLS
+    );
     const result = await service.getPublicProfile('user-1');
     expect(result?.displayName).toBe('Alice');
   });

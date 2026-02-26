@@ -24,4 +24,6 @@ export const recordScenarioChoiceInputSchema = z.object({
 });
 
 export type ScenarioContentInput = z.infer<typeof scenarioContentSchema>;
-export type RecordScenarioChoiceInput = z.infer<typeof recordScenarioChoiceInputSchema>;
+export type RecordScenarioChoiceInput = z.infer<
+  typeof recordScenarioChoiceInputSchema
+>;

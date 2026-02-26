@@ -33,12 +33,21 @@ export function buildSearchKnowledgeGraphTool(
       'Search the knowledge graph for concepts and transcript segments related to a query. ' +
       'Use this when the user asks about a topic to find relevant knowledge and context.',
     parameters: z.object({
-      query: z.string().describe('The search query to find relevant concepts or content'),
-      limit: z.number().int().min(1).max(20).default(5).describe('Maximum number of results to return'),
+      query: z
+        .string()
+        .describe('The search query to find relevant concepts or content'),
+      limit: z
+        .number()
+        .int()
+        .min(1)
+        .max(20)
+        .default(5)
+        .describe('Maximum number of results to return'),
     }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    execute: async (params: any) => execute(params.query as string, params.limit as number),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    execute: async (params: any) =>
+      execute(params.query as string, params.limit as number),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
 
@@ -57,7 +66,7 @@ export function buildFetchCourseContentTool(
     }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     execute: async (params: any) => execute(params.contentItemId as string),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
 

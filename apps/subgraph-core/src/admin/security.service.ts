@@ -14,9 +14,13 @@ export interface SecuritySettingsData {
   ipAllowlist: string[];
 }
 
-type UpdateInput = Partial<Omit<SecuritySettingsData, 'ipAllowlist'> & { ipAllowlist: string[] | null }>;
+type UpdateInput = Partial<
+  Omit<SecuritySettingsData, 'ipAllowlist'> & { ipAllowlist: string[] | null }
+>;
 
-function mapRow(row: typeof securitySettings.$inferSelect): SecuritySettingsData {
+function mapRow(
+  row: typeof securitySettings.$inferSelect
+): SecuritySettingsData {
   return {
     mfaRequired: row.mfaRequired,
     mfaRequiredForAdmins: row.mfaRequiredForAdmins,
@@ -26,7 +30,9 @@ function mapRow(row: typeof securitySettings.$inferSelect): SecuritySettingsData
     passwordMinLength: row.passwordMinLength,
     passwordRequireSpecialChars: row.passwordRequireSpecialChars,
     passwordExpiryDays: row.passwordExpiryDays ?? null,
-    ipAllowlist: Array.isArray(row.ipAllowlist) ? (row.ipAllowlist as string[]) : [],
+    ipAllowlist: Array.isArray(row.ipAllowlist)
+      ? (row.ipAllowlist as string[])
+      : [],
   };
 }
 
@@ -52,11 +58,14 @@ export class SecurityService implements OnModuleDestroy {
 
   async getSettings(tenantId: string): Promise<SecuritySettingsData> {
     try {
-      const rows = await db.select().from(securitySettings)
+      const rows = await db
+        .select()
+        .from(securitySettings)
         .where(eq(securitySettings.tenantId, tenantId))
         .limit(1);
       if (rows[0]) return mapRow(rows[0]);
-      const [created] = await db.insert(securitySettings)
+      const [created] = await db
+        .insert(securitySettings)
         .values({ tenantId })
         .onConflictDoNothing()
         .returning();
@@ -67,19 +76,33 @@ export class SecurityService implements OnModuleDestroy {
     }
   }
 
-  async updateSettings(tenantId: string, input: UpdateInput): Promise<SecuritySettingsData> {
-    const patch: Partial<typeof securitySettings.$inferInsert> = { updatedAt: new Date() };
+  async updateSettings(
+    tenantId: string,
+    input: UpdateInput
+  ): Promise<SecuritySettingsData> {
+    const patch: Partial<typeof securitySettings.$inferInsert> = {
+      updatedAt: new Date(),
+    };
     if (input.mfaRequired != null) patch.mfaRequired = input.mfaRequired;
-    if (input.mfaRequiredForAdmins != null) patch.mfaRequiredForAdmins = input.mfaRequiredForAdmins;
-    if (input.sessionTimeoutMinutes != null) patch.sessionTimeoutMinutes = input.sessionTimeoutMinutes;
-    if (input.maxConcurrentSessions != null) patch.maxConcurrentSessions = input.maxConcurrentSessions;
-    if (input.loginAttemptLockoutThreshold != null) patch.loginAttemptLockoutThreshold = input.loginAttemptLockoutThreshold;
-    if (input.passwordMinLength != null) patch.passwordMinLength = input.passwordMinLength;
-    if (input.passwordRequireSpecialChars != null) patch.passwordRequireSpecialChars = input.passwordRequireSpecialChars;
-    if (input.passwordExpiryDays !== undefined) patch.passwordExpiryDays = input.passwordExpiryDays ?? null;
-    if (input.ipAllowlist !== undefined) patch.ipAllowlist = input.ipAllowlist ?? [];
+    if (input.mfaRequiredForAdmins != null)
+      patch.mfaRequiredForAdmins = input.mfaRequiredForAdmins;
+    if (input.sessionTimeoutMinutes != null)
+      patch.sessionTimeoutMinutes = input.sessionTimeoutMinutes;
+    if (input.maxConcurrentSessions != null)
+      patch.maxConcurrentSessions = input.maxConcurrentSessions;
+    if (input.loginAttemptLockoutThreshold != null)
+      patch.loginAttemptLockoutThreshold = input.loginAttemptLockoutThreshold;
+    if (input.passwordMinLength != null)
+      patch.passwordMinLength = input.passwordMinLength;
+    if (input.passwordRequireSpecialChars != null)
+      patch.passwordRequireSpecialChars = input.passwordRequireSpecialChars;
+    if (input.passwordExpiryDays !== undefined)
+      patch.passwordExpiryDays = input.passwordExpiryDays ?? null;
+    if (input.ipAllowlist !== undefined)
+      patch.ipAllowlist = input.ipAllowlist ?? [];
 
-    const [row] = await db.insert(securitySettings)
+    const [row] = await db
+      .insert(securitySettings)
       .values({ tenantId, ...patch })
       .onConflictDoUpdate({ target: securitySettings.tenantId, set: patch })
       .returning();

@@ -46,11 +46,16 @@ export class AssessmentService implements OnModuleDestroy {
   async createCampaign(
     input: CreateCampaignInput,
     tenantId: string,
-    createdBy: string,
+    createdBy: string
   ): Promise<typeof schema.assessmentCampaigns.$inferSelect> {
-    const ctx: TenantContext = { tenantId, userId: createdBy, userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: createdBy,
+      userRole: 'ORG_ADMIN',
+    };
     const [campaign] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.assessmentCampaigns)
+      tx
+        .insert(schema.assessmentCampaigns)
         .values({
           tenantId,
           targetUserId: input.targetUserId,
@@ -61,25 +66,35 @@ export class AssessmentService implements OnModuleDestroy {
           status: 'DRAFT',
           createdBy,
         })
-        .returning(),
+        .returning()
     );
-    this.logger.log({ campaignId: campaign!.id, tenantId }, 'Assessment campaign created');
+    this.logger.log(
+      { campaignId: campaign!.id, tenantId },
+      'Assessment campaign created'
+    );
     return campaign!;
   }
 
   async activateCampaign(
     campaignId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<typeof schema.assessmentCampaigns.$inferSelect> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     const [updated] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.assessmentCampaigns)
+      tx
+        .update(schema.assessmentCampaigns)
         .set({ status: 'ACTIVE' })
-        .where(and(
-          eq(schema.assessmentCampaigns.id, campaignId),
-          eq(schema.assessmentCampaigns.tenantId, tenantId),
-        ))
-        .returning(),
+        .where(
+          and(
+            eq(schema.assessmentCampaigns.id, campaignId),
+            eq(schema.assessmentCampaigns.tenantId, tenantId)
+          )
+        )
+        .returning()
     );
     if (!updated) throw new NotFoundException('Campaign not found');
     this.logger.log({ campaignId, tenantId }, 'Assessment campaign activated');
@@ -92,21 +107,38 @@ export class AssessmentService implements OnModuleDestroy {
     raterRole: RaterRole,
     criteriaScores: Record<string, number>,
     narrative: string | null,
-    tenantId: string,
+    tenantId: string
   ): Promise<typeof schema.assessmentResponses.$inferSelect> {
-    const ctx: TenantContext = { tenantId, userId: responderId, userRole: 'STUDENT' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: responderId,
+      userRole: 'STUDENT',
+    };
     try {
       const [response] = await withTenantContext(this.db, ctx, async (tx) =>
-        tx.insert(schema.assessmentResponses)
-          .values({ campaignId, responderId, tenantId, raterRole, criteriaScores, narrative })
-          .returning(),
+        tx
+          .insert(schema.assessmentResponses)
+          .values({
+            campaignId,
+            responderId,
+            tenantId,
+            raterRole,
+            criteriaScores,
+            narrative,
+          })
+          .returning()
       );
-      this.logger.log({ campaignId, responderId, raterRole }, 'Assessment response submitted');
+      this.logger.log(
+        { campaignId, responderId, raterRole },
+        'Assessment response submitted'
+      );
       return response!;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('assessment_responses_responder_unique')) {
-        throw new ConflictException('Response already submitted for this campaign and role');
+        throw new ConflictException(
+          'Response already submitted for this campaign and role'
+        );
       }
       throw err;
     }
@@ -114,61 +146,95 @@ export class AssessmentService implements OnModuleDestroy {
 
   async listCampaignsForTarget(
     targetUserId: string,
-    tenantId: string,
-  ): Promise<typeof schema.assessmentCampaigns.$inferSelect[]> {
-    const ctx: TenantContext = { tenantId, userId: targetUserId, userRole: 'STUDENT' };
+    tenantId: string
+  ): Promise<(typeof schema.assessmentCampaigns.$inferSelect)[]> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: targetUserId,
+      userRole: 'STUDENT',
+    };
     return withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.assessmentCampaigns)
-        .where(and(
-          eq(schema.assessmentCampaigns.targetUserId, targetUserId),
-          eq(schema.assessmentCampaigns.tenantId, tenantId),
-        )),
+      tx
+        .select()
+        .from(schema.assessmentCampaigns)
+        .where(
+          and(
+            eq(schema.assessmentCampaigns.targetUserId, targetUserId),
+            eq(schema.assessmentCampaigns.tenantId, tenantId)
+          )
+        )
     );
   }
 
   async listCampaignsForResponder(
     responderId: string,
-    tenantId: string,
-  ): Promise<typeof schema.assessmentCampaigns.$inferSelect[]> {
-    const ctx: TenantContext = { tenantId, userId: responderId, userRole: 'STUDENT' };
+    tenantId: string
+  ): Promise<(typeof schema.assessmentCampaigns.$inferSelect)[]> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: responderId,
+      userRole: 'STUDENT',
+    };
     return withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.assessmentCampaigns)
-        .where(and(
-          eq(schema.assessmentCampaigns.tenantId, tenantId),
-          eq(schema.assessmentCampaigns.status, 'ACTIVE'),
-        )),
+      tx
+        .select()
+        .from(schema.assessmentCampaigns)
+        .where(
+          and(
+            eq(schema.assessmentCampaigns.tenantId, tenantId),
+            eq(schema.assessmentCampaigns.status, 'ACTIVE')
+          )
+        )
     );
   }
 
   async getResult(
     campaignId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<typeof schema.assessmentResults.$inferSelect | null> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'STUDENT' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'STUDENT',
+    };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.assessmentResults)
-        .where(and(
-          eq(schema.assessmentResults.campaignId, campaignId),
-          eq(schema.assessmentResults.tenantId, tenantId),
-        )),
+      tx
+        .select()
+        .from(schema.assessmentResults)
+        .where(
+          and(
+            eq(schema.assessmentResults.campaignId, campaignId),
+            eq(schema.assessmentResults.tenantId, tenantId)
+          )
+        )
     );
     return rows[0] ?? null;
   }
 
   async completeCampaign(
     campaignId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<typeof schema.assessmentResults.$inferSelect> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.assessmentCampaigns)
+      tx
+        .update(schema.assessmentCampaigns)
         .set({ status: 'COMPLETED' })
-        .where(and(
-          eq(schema.assessmentCampaigns.id, campaignId),
-          eq(schema.assessmentCampaigns.tenantId, tenantId),
-        )),
+        .where(
+          and(
+            eq(schema.assessmentCampaigns.id, campaignId),
+            eq(schema.assessmentCampaigns.tenantId, tenantId)
+          )
+        )
     );
-    this.logger.log({ campaignId, tenantId }, 'Assessment campaign completed — running aggregation');
+    this.logger.log(
+      { campaignId, tenantId },
+      'Assessment campaign completed — running aggregation'
+    );
     return this.aggregator.aggregate(campaignId, tenantId);
   }
 }

@@ -28,10 +28,26 @@ export const BUILT_IN_SCENARIOS: ScenarioSeed[] = [
       'You are a customer service agent receiving a call from an upset customer. ' +
       'Your goal is to de-escalate the situation, show empathy, and offer a practical solution.',
     evaluationRubric: [
-      { name: 'Empathy', description: 'Acknowledged customer feelings', maxScore: 30 },
-      { name: 'Problem Solving', description: 'Offered a concrete solution', maxScore: 30 },
-      { name: 'Professionalism', description: 'Maintained calm and professional tone', maxScore: 20 },
-      { name: 'Clarity', description: 'Communicated clearly and concisely', maxScore: 20 },
+      {
+        name: 'Empathy',
+        description: 'Acknowledged customer feelings',
+        maxScore: 30,
+      },
+      {
+        name: 'Problem Solving',
+        description: 'Offered a concrete solution',
+        maxScore: 30,
+      },
+      {
+        name: 'Professionalism',
+        description: 'Maintained calm and professional tone',
+        maxScore: 20,
+      },
+      {
+        name: 'Clarity',
+        description: 'Communicated clearly and concisely',
+        maxScore: 20,
+      },
     ],
     maxTurns: 8,
   },
@@ -47,10 +63,26 @@ export const BUILT_IN_SCENARIOS: ScenarioSeed[] = [
       'You are a sales rep presenting a SaaS productivity platform. ' +
       'Convince Jordan to schedule a demo by identifying their pain points and articulating value.',
     evaluationRubric: [
-      { name: 'Discovery', description: 'Asked about customer needs before pitching', maxScore: 25 },
-      { name: 'Value Proposition', description: 'Clearly articulated ROI', maxScore: 35 },
-      { name: 'Objection Handling', description: 'Addressed concerns confidently', maxScore: 25 },
-      { name: 'Call to Action', description: 'Asked for a specific next step', maxScore: 15 },
+      {
+        name: 'Discovery',
+        description: 'Asked about customer needs before pitching',
+        maxScore: 25,
+      },
+      {
+        name: 'Value Proposition',
+        description: 'Clearly articulated ROI',
+        maxScore: 35,
+      },
+      {
+        name: 'Objection Handling',
+        description: 'Addressed concerns confidently',
+        maxScore: 25,
+      },
+      {
+        name: 'Call to Action',
+        description: 'Asked for a specific next step',
+        maxScore: 15,
+      },
     ],
     maxTurns: 10,
   },
@@ -67,10 +99,26 @@ export const BUILT_IN_SCENARIOS: ScenarioSeed[] = [
       'Navigate the conversation constructively: deliver feedback, understand the root cause, ' +
       'and agree on an improvement plan.',
     evaluationRubric: [
-      { name: 'Specificity', description: 'Used concrete examples, not generalities', maxScore: 25 },
-      { name: 'Active Listening', description: 'Acknowledged employee perspective', maxScore: 25 },
-      { name: 'Constructiveness', description: 'Focused on improvement, not blame', maxScore: 30 },
-      { name: 'Goal Setting', description: 'Agreed on measurable next steps', maxScore: 20 },
+      {
+        name: 'Specificity',
+        description: 'Used concrete examples, not generalities',
+        maxScore: 25,
+      },
+      {
+        name: 'Active Listening',
+        description: 'Acknowledged employee perspective',
+        maxScore: 25,
+      },
+      {
+        name: 'Constructiveness',
+        description: 'Focused on improvement, not blame',
+        maxScore: 30,
+      },
+      {
+        name: 'Goal Setting',
+        description: 'Agreed on measurable next steps',
+        maxScore: 20,
+      },
     ],
     maxTurns: 12,
   },

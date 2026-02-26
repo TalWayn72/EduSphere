@@ -94,29 +94,29 @@ For **CI/CD**, GitHub Actions with Nx's `affected` commands provides the most so
 
 ## Consolidated technology decisions
 
-| Domain | Primary Choice | License | Alternative |
-|---|---|---|---|
-| Monorepo | **Nx v21 + pnpm v9** | MIT | Turborepo v2.8 |
-| Graph Database | **Apache AGE (PostgreSQL)** | Apache 2.0 | Neo4j CE (AGPL+CC) |
-| Vector Search | **pgvector + pgvectorscale** | PostgreSQL | Qdrant (Apache 2.0) |
-| CRDT/Collaboration | **Yjs v13 + Hocuspocus v2** | MIT | Automerge v3 |
-| Transcription | **faster-whisper** | MIT | whisper.cpp |
-| Video Player | **Video.js v8** | Apache 2.0 | Custom w/ hls.js |
-| Annotation Canvas | **Konva.js v10 (react-konva)** | MIT | Fabric.js v7 |
-| AI Framework | **Vercel AI SDK v6 + LangGraph.js** | Apache 2.0/MIT | Mastra |
-| RAG | **LlamaIndex.TS** | MIT | LangChain.js |
-| LLM Abstraction | **Vercel AI SDK providers** | Apache 2.0 | LiteLLM proxy |
-| ORM | **Drizzle ORM v1** | Apache 2.0 | Prisma v6 |
-| Auth | **Keycloak v26 (Organizations)** | Apache 2.0 | Zitadel |
-| Message Broker | **NATS JetStream v2.11** | Apache 2.0 | Redpanda (BSL) |
-| API Gateway | **GraphQL Yoga + Hive Gateway** | MIT | Apollo Router (ELv2) |
-| Frontend | **React + Vite v6** | MIT | Next.js 15 |
-| State Management | **TanStack Query v5 + Zustand v5** | MIT | Jotai |
-| UI Components | **shadcn/ui** | MIT | Mantine v7 |
-| Mobile | **Expo SDK 54** | MIT | Bare React Native |
-| Reverse Proxy | **Traefik v3.6** | MIT | NGINX |
-| Object Storage | **MinIO** | AGPLv3 | — |
-| Multi-tenancy | **PostgreSQL RLS** | — | Schema-per-tenant |
+| Domain             | Primary Choice                      | License        | Alternative          |
+| ------------------ | ----------------------------------- | -------------- | -------------------- |
+| Monorepo           | **Nx v21 + pnpm v9**                | MIT            | Turborepo v2.8       |
+| Graph Database     | **Apache AGE (PostgreSQL)**         | Apache 2.0     | Neo4j CE (AGPL+CC)   |
+| Vector Search      | **pgvector + pgvectorscale**        | PostgreSQL     | Qdrant (Apache 2.0)  |
+| CRDT/Collaboration | **Yjs v13 + Hocuspocus v2**         | MIT            | Automerge v3         |
+| Transcription      | **faster-whisper**                  | MIT            | whisper.cpp          |
+| Video Player       | **Video.js v8**                     | Apache 2.0     | Custom w/ hls.js     |
+| Annotation Canvas  | **Konva.js v10 (react-konva)**      | MIT            | Fabric.js v7         |
+| AI Framework       | **Vercel AI SDK v6 + LangGraph.js** | Apache 2.0/MIT | Mastra               |
+| RAG                | **LlamaIndex.TS**                   | MIT            | LangChain.js         |
+| LLM Abstraction    | **Vercel AI SDK providers**         | Apache 2.0     | LiteLLM proxy        |
+| ORM                | **Drizzle ORM v1**                  | Apache 2.0     | Prisma v6            |
+| Auth               | **Keycloak v26 (Organizations)**    | Apache 2.0     | Zitadel              |
+| Message Broker     | **NATS JetStream v2.11**            | Apache 2.0     | Redpanda (BSL)       |
+| API Gateway        | **GraphQL Yoga + Hive Gateway**     | MIT            | Apollo Router (ELv2) |
+| Frontend           | **React + Vite v6**                 | MIT            | Next.js 15           |
+| State Management   | **TanStack Query v5 + Zustand v5**  | MIT            | Jotai                |
+| UI Components      | **shadcn/ui**                       | MIT            | Mantine v7           |
+| Mobile             | **Expo SDK 54**                     | MIT            | Bare React Native    |
+| Reverse Proxy      | **Traefik v3.6**                    | MIT            | NGINX                |
+| Object Storage     | **MinIO**                           | AGPLv3         | —                    |
+| Multi-tenancy      | **PostgreSQL RLS**                  | —              | Schema-per-tenant    |
 
 ## Conclusion
 

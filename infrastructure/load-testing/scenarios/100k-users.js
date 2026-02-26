@@ -13,17 +13,17 @@ const queryDuration = new Trend('graphql_query_duration');
 
 export const options = {
   stages: [
-    { duration: '2m', target: 1000 },   // Ramp up to 1k users
-    { duration: '5m', target: 5000 },   // Ramp to 5k
+    { duration: '2m', target: 1000 }, // Ramp up to 1k users
+    { duration: '5m', target: 5000 }, // Ramp to 5k
     { duration: '10m', target: 10000 }, // Ramp to 10k
     { duration: '20m', target: 50000 }, // Ramp to 50k
-    { duration: '20m', target: 100000 },// Target: 100k users
-    { duration: '10m', target: 100000 },// Hold at 100k
-    { duration: '5m', target: 0 },      // Ramp down
+    { duration: '20m', target: 100000 }, // Target: 100k users
+    { duration: '10m', target: 100000 }, // Hold at 100k
+    { duration: '5m', target: 0 }, // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<500', 'p(99)<1000'],
-    http_req_failed: ['rate<0.01'],  // < 1% error rate
+    http_req_failed: ['rate<0.01'], // < 1% error rate
     errors: ['rate<0.01'],
     graphql_query_duration: ['p(95)<500'],
   },

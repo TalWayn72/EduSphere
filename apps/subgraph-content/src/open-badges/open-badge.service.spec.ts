@@ -5,7 +5,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { OpenBadgeService } from './open-badge.service.js';
-import { loadKeyPair, signCredential, verifyCredentialSignature } from './open-badge.crypto.js';
+import {
+  loadKeyPair,
+  signCredential,
+  verifyCredentialSignature,
+} from './open-badge.crypto.js';
 import type { Ob3CredentialBody, OpenBadgeProof } from './open-badge.types.js';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -38,20 +42,34 @@ const mockAssertion = {
 };
 
 vi.mock('@edusphere/db', () => ({
-  createDatabaseConnection: vi.fn(() => ({ select: vi.fn(), insert: vi.fn(), update: vi.fn() })),
+  createDatabaseConnection: vi.fn(() => ({
+    select: vi.fn(),
+    insert: vi.fn(),
+    update: vi.fn(),
+  })),
   schema: {
     openBadgeDefinitions: { id: 'id', tenantId: 'tenantId' },
-    openBadgeAssertions: { id: 'id', recipientId: 'recipientId', tenantId: 'tenantId', revoked: 'revoked' },
+    openBadgeAssertions: {
+      id: 'id',
+      recipientId: 'recipientId',
+      tenantId: 'tenantId',
+      revoked: 'revoked',
+    },
   },
   eq: vi.fn((a: unknown, b: unknown) => ({ a, b })),
   and: vi.fn((...args: unknown[]) => args),
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) => fn({ select: vi.fn(), insert: vi.fn(), update: vi.fn() })),
+  withTenantContext: vi.fn(
+    (_db: unknown, _ctx: unknown, fn: (tx: unknown) => unknown) =>
+      fn({ select: vi.fn(), insert: vi.fn(), update: vi.fn() })
+  ),
   closeAllPools: vi.fn(),
 }));
 
 vi.mock('nats', () => ({
   connect: vi.fn().mockResolvedValue({
-    subscribe: vi.fn(() => ({ [Symbol.asyncIterator]: () => ({ next: () => ({ done: true }) }) })),
+    subscribe: vi.fn(() => ({
+      [Symbol.asyncIterator]: () => ({ next: () => ({ done: true }) }),
+    })),
     drain: vi.fn().mockResolvedValue(undefined),
   }),
 }));
@@ -71,7 +89,9 @@ describe('OpenBadgeService', () => {
       providers: [OpenBadgeService],
     }).compile();
     service = module.get(OpenBadgeService);
-    (service as unknown as { keyPair: ReturnType<typeof loadKeyPair> }).keyPair = loadKeyPair();
+    (
+      service as unknown as { keyPair: ReturnType<typeof loadKeyPair> }
+    ).keyPair = loadKeyPair();
   });
 
   afterEach(async () => {
@@ -88,7 +108,11 @@ describe('OpenBadgeService', () => {
       ],
       id: 'https://edusphere.io/ob3/assertion/pending',
       type: ['VerifiableCredential', 'OpenBadgeCredential'],
-      issuer: { id: 'did:web:edusphere.io', type: 'Profile', name: 'EduSphere' },
+      issuer: {
+        id: 'did:web:edusphere.io',
+        type: 'Profile',
+        name: 'EduSphere',
+      },
       issuanceDate: new Date().toISOString(),
       credentialSubject: {
         id: 'did:example:user-1',
@@ -147,7 +171,7 @@ describe('OpenBadgeService', () => {
     const revokedAssertion = { ...mockAssertion, revoked: true };
     // getAssertionById returns revoked — verifyCredential should short-circuit
     vi.spyOn(service, 'getAssertionById').mockResolvedValueOnce(
-      revokedAssertion as Parameters<typeof service['mapAssertion']>[0],
+      revokedAssertion as Parameters<(typeof service)['mapAssertion']>[0]
     );
     const result = await service.verifyCredential('assertion-uuid-1');
     expect(result.valid).toBe(false);
@@ -161,7 +185,7 @@ describe('OpenBadgeService', () => {
       expiresAt: new Date('2020-01-01T00:00:00Z'), // past date
     };
     vi.spyOn(service, 'getAssertionById').mockResolvedValueOnce(
-      expiredAssertion as Parameters<typeof service['mapAssertion']>[0],
+      expiredAssertion as Parameters<(typeof service)['mapAssertion']>[0]
     );
     const result = await service.verifyCredential('assertion-uuid-1');
     expect(result.valid).toBe(false);
@@ -177,8 +201,15 @@ describe('OpenBadgeService', () => {
       tenantId: 'tenant-1',
     });
     const proof = signCredential(body, keyPair);
-    const tamperedProof: OpenBadgeProof = { ...proof, proofValue: proof.proofValue.split('').reverse().join('') };
-    const valid = verifyCredentialSignature(body, tamperedProof, keyPair.publicKey);
+    const tamperedProof: OpenBadgeProof = {
+      ...proof,
+      proofValue: proof.proofValue.split('').reverse().join(''),
+    };
+    const valid = verifyCredentialSignature(
+      body,
+      tamperedProof,
+      keyPair.publicKey
+    );
     expect(valid).toBe(false);
   });
 
@@ -194,10 +225,11 @@ describe('OpenBadgeService', () => {
             }),
           }),
         }),
-      } as never),
+      } as never)
     );
-    await expect(service.revokeCredential('missing-id', 'Test reason', 'tenant-1'))
-      .rejects.toThrow(NotFoundException);
+    await expect(
+      service.revokeCredential('missing-id', 'Test reason', 'tenant-1')
+    ).rejects.toThrow(NotFoundException);
   });
 
   // Test 8: getUserBadges excludes revoked assertions
@@ -214,8 +246,12 @@ describe('OpenBadgeService', () => {
       badgeDefinitionId: 'def-1',
       tenantId: 'tenant-1',
     });
-    expect(body['@context']).toContain('https://www.w3.org/2018/credentials/v1');
-    expect(body['@context']).toContain('https://purl.imsglobal.org/spec/ob/v3p0/context.json');
+    expect(body['@context']).toContain(
+      'https://www.w3.org/2018/credentials/v1'
+    );
+    expect(body['@context']).toContain(
+      'https://purl.imsglobal.org/spec/ob/v3p0/context.json'
+    );
     expect(body.type).toContain('VerifiableCredential');
     expect(body.type).toContain('OpenBadgeCredential');
   });
@@ -231,6 +267,8 @@ describe('OpenBadgeService', () => {
     expect(body.credentialSubject.id).toBe('did:example:user-uuid-99');
     expect(body.credentialSubject.achievement.type).toContain('Achievement');
     expect(body.credentialSubject.achievement.name).toBe(mockDef.name);
-    expect(body.credentialSubject.achievement.description).toBe(mockDef.description);
+    expect(body.credentialSubject.achievement.description).toBe(
+      mockDef.description
+    );
   });
 });

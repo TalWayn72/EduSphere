@@ -27,24 +27,53 @@ async function settle(page: Page, ms = 500): Promise<void> {
 
 /** Assert no raw SQL is visible anywhere on the page. */
 async function assertNoSql(page: Page): Promise<void> {
-  const text = await page.evaluate(() => document.body?.innerText ?? '').catch(() => '');
-  const sqlPatterns = ['Failed query:', 'SELECT "', 'FROM "', 'INSERT INTO', 'UPDATE SET', 'DELETE FROM', 'params: '];
+  const text = await page
+    .evaluate(() => document.body?.innerText ?? '')
+    .catch(() => '');
+  const sqlPatterns = [
+    'Failed query:',
+    'SELECT "',
+    'FROM "',
+    'INSERT INTO',
+    'UPDATE SET',
+    'DELETE FROM',
+    'params: ',
+  ];
   for (const pattern of sqlPatterns) {
-    expect(text, `Raw SQL must not appear on page: "${pattern}"`).not.toContain(pattern);
+    expect(text, `Raw SQL must not appear on page: "${pattern}"`).not.toContain(
+      pattern
+    );
   }
 }
 
 /** Assert no error boundary / crash message. */
 async function assertNoCrash(page: Page): Promise<void> {
-  const crashText = await page.getByText(/something went wrong/i).isVisible().catch(() => false);
-  expect(crashText, 'Page must not show "Something went wrong" error boundary').toBe(false);
+  const crashText = await page
+    .getByText(/something went wrong/i)
+    .isVisible()
+    .catch(() => false);
+  expect(
+    crashText,
+    'Page must not show "Something went wrong" error boundary'
+  ).toBe(false);
 }
 
 /** Assert page loaded — has a visible heading or substantial content. */
 async function assertPageLoaded(page: Page): Promise<void> {
-  const hasHeading = await page.locator('h1, h2').first().isVisible({ timeout: 8_000 }).catch(() => false);
-  const hasNav = await page.locator('nav, header').first().isVisible({ timeout: 3_000 }).catch(() => false);
-  expect(hasHeading || hasNav, 'Page must have a visible heading or navigation').toBe(true);
+  const hasHeading = await page
+    .locator('h1, h2')
+    .first()
+    .isVisible({ timeout: 8_000 })
+    .catch(() => false);
+  const hasNav = await page
+    .locator('nav, header')
+    .first()
+    .isVisible({ timeout: 3_000 })
+    .catch(() => false);
+  expect(
+    hasHeading || hasNav,
+    'Page must have a visible heading or navigation'
+  ).toBe(true);
 }
 
 // ── Test Suite: Top Navigation ────────────────────────────────────────────────
@@ -54,9 +83,10 @@ test.describe('Top Navigation — all tabs', () => {
     await page.goto('/courses');
     await settle(page);
 
-    const learnLink = page.getByRole('link', { name: /^learn$/i }).or(
-      page.locator('nav a').filter({ hasText: /^learn$/i })
-    ).first();
+    const learnLink = page
+      .getByRole('link', { name: /^learn$/i })
+      .or(page.locator('nav a').filter({ hasText: /^learn$/i }))
+      .first();
     const isVisible = await learnLink.isVisible().catch(() => false);
     if (isVisible) {
       await learnLink.click();
@@ -70,7 +100,10 @@ test.describe('Top Navigation — all tabs', () => {
     await page.goto('/dashboard');
     await settle(page);
 
-    await page.getByRole('link', { name: /courses/i }).first().click();
+    await page
+      .getByRole('link', { name: /courses/i })
+      .first()
+      .click();
     await page.waitForURL(/\/courses/, { timeout: 8_000 });
     await settle(page);
 
@@ -155,9 +188,10 @@ test.describe('Top Navigation — all tabs', () => {
     await page.goto('/courses');
     await settle(page);
 
-    const newCourseBtn = page.getByRole('link', { name: /new course/i }).or(
-      page.getByRole('button', { name: /new course/i })
-    ).first();
+    const newCourseBtn = page
+      .getByRole('link', { name: /new course/i })
+      .or(page.getByRole('button', { name: /new course/i }))
+      .first();
     const isVisible = await newCourseBtn.isVisible().catch(() => false);
     if (isVisible) {
       await newCourseBtn.click();
@@ -183,7 +217,9 @@ test.describe('User Menu', () => {
       .or(page.locator('header').getByRole('button').last())
       .first();
 
-    const isVisible = await menuBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await menuBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -197,7 +233,9 @@ test.describe('User Menu', () => {
     await expect(dropdown).toBeVisible({ timeout: 3_000 });
   });
 
-  test('user menu contains Profile, Settings, Log out items', async ({ page }) => {
+  test('user menu contains Profile, Settings, Log out items', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await settle(page);
 
@@ -207,7 +245,9 @@ test.describe('User Menu', () => {
       .or(page.locator('header').getByRole('button').last())
       .first();
 
-    const isVisible = await menuBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await menuBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -217,18 +257,24 @@ test.describe('User Menu', () => {
     await page.waitForTimeout(400);
 
     const menuItems = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('[role="menuitem"]'))
-        .map((el) => (el as HTMLElement).innerText.trim());
+      return Array.from(document.querySelectorAll('[role="menuitem"]')).map(
+        (el) => (el as HTMLElement).innerText.trim()
+      );
     });
 
     const hasProfile = menuItems.some((i) => /profile/i.test(i));
     const hasSettings = menuItems.some((i) => /settings/i.test(i));
     const hasLogout = menuItems.some((i) => /log out|logout|sign out/i.test(i));
 
-    expect(hasProfile || hasSettings || hasLogout, 'User menu should have Profile, Settings, or Log out').toBe(true);
+    expect(
+      hasProfile || hasSettings || hasLogout,
+      'User menu should have Profile, Settings, or Log out'
+    ).toBe(true);
   });
 
-  test('clicking Profile in user menu navigates to /profile', async ({ page }) => {
+  test('clicking Profile in user menu navigates to /profile', async ({
+    page,
+  }) => {
     await page.goto('/dashboard');
     await settle(page);
 
@@ -238,15 +284,23 @@ test.describe('User Menu', () => {
       .or(page.locator('header').getByRole('button').last())
       .first();
 
-    const isVisible = await menuBtn.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await menuBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await menuBtn.click();
     await page.waitForTimeout(400);
 
     const profileItem = page.getByRole('menuitem', { name: /profile/i });
     const profileVisible = await profileItem.isVisible().catch(() => false);
-    if (!profileVisible) { test.skip(); return; }
+    if (!profileVisible) {
+      test.skip();
+      return;
+    }
 
     await profileItem.click();
     await settle(page);
@@ -259,7 +313,9 @@ test.describe('User Menu', () => {
 // ── Test Suite: Course Detail Page ────────────────────────────────────────────
 
 test.describe('Course Detail Page (/courses/:courseId)', () => {
-  test('navigating to a course ID shows course content, not raw SQL', async ({ page }) => {
+  test('navigating to a course ID shows course content, not raw SQL', async ({
+    page,
+  }) => {
     await page.goto('/courses/mock-course-1');
     await settle(page);
 
@@ -286,9 +342,14 @@ test.describe('Course Detail Page (/courses/:courseId)', () => {
     await page.goto('/courses/mock-course-1');
     await settle(page);
 
-    const backBtn = page.getByRole('button', { name: /back to courses/i }).or(
-      page.locator('button').filter({ has: page.locator('.lucide-arrow-left') })
-    ).first();
+    const backBtn = page
+      .getByRole('button', { name: /back to courses/i })
+      .or(
+        page
+          .locator('button')
+          .filter({ has: page.locator('.lucide-arrow-left') })
+      )
+      .first();
 
     await expect(backBtn).toBeVisible({ timeout: 8_000 });
     await backBtn.click();
@@ -299,9 +360,10 @@ test.describe('Course Detail Page (/courses/:courseId)', () => {
     await page.goto('/courses/mock-course-1');
     await settle(page);
 
-    const enrollBtn = page.locator('[data-testid="enroll-button"]').or(
-      page.getByRole('button', { name: /enroll/i })
-    ).first();
+    const enrollBtn = page
+      .locator('[data-testid="enroll-button"]')
+      .or(page.getByRole('button', { name: /enroll/i }))
+      .first();
 
     await expect(enrollBtn).toBeVisible({ timeout: 8_000 });
     // Click and verify no crash
@@ -311,7 +373,9 @@ test.describe('Course Detail Page (/courses/:courseId)', () => {
     await assertNoSql(page);
   });
 
-  test('clicking a course from /courses navigates to course detail', async ({ page }) => {
+  test('clicking a course from /courses navigates to course detail', async ({
+    page,
+  }) => {
     await page.goto('/courses');
     await settle(page);
 
@@ -327,7 +391,9 @@ test.describe('Course Detail Page (/courses/:courseId)', () => {
     await assertNoCrash(page);
   });
 
-  test('course with UUID navigates to detail page with mock data', async ({ page }) => {
+  test('course with UUID navigates to detail page with mock data', async ({
+    page,
+  }) => {
     // This was the exact failing URL from the bug report
     await page.goto('/courses/22222222-2222-2222-2222-222222222221');
     await settle(page);
@@ -348,7 +414,9 @@ test.describe('Dashboard — all interactive elements', () => {
     await page.goto('/dashboard');
     await settle(page);
 
-    await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible(
+      { timeout: 8_000 }
+    );
     await assertNoCrash(page);
     await assertNoSql(page);
   });
@@ -374,7 +442,9 @@ test.describe('Courses Page — all interactions', () => {
     await page.goto('/courses');
     await settle(page);
 
-    await expect(page.getByRole('heading', { name: /courses/i })).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('heading', { name: /courses/i })).toBeVisible({
+      timeout: 8_000,
+    });
     await assertNoSql(page);
     await assertNoCrash(page);
   });
@@ -401,11 +471,14 @@ test.describe('Courses Page — all interactions', () => {
     await assertNoCrash(page);
   });
 
-  test('New Course / + button exists and is clickable (instructor)', async ({ page }) => {
+  test('New Course / + button exists and is clickable (instructor)', async ({
+    page,
+  }) => {
     await page.goto('/courses');
     await settle(page);
 
-    const newBtn = page.getByRole('link', { name: /new course/i })
+    const newBtn = page
+      .getByRole('link', { name: /new course/i })
       .or(page.getByRole('button', { name: /new course|\+ course/i }))
       .first();
 
@@ -436,8 +509,13 @@ test.describe('Content Viewer — all interactions', () => {
     await settle(page, 1000);
 
     const transcriptTab = page.getByRole('tab', { name: /transcript/i });
-    const isVisible = await transcriptTab.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await transcriptTab
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await transcriptTab.click();
     await page.waitForTimeout(300);
@@ -451,9 +529,16 @@ test.describe('Content Viewer — all interactions', () => {
     await page.goto('/learn/content-1');
     await settle(page, 1000);
 
-    const annotationsTab = page.getByRole('tab', { name: /annotations/i }).first();
-    const isVisible = await annotationsTab.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const annotationsTab = page
+      .getByRole('tab', { name: /annotations/i })
+      .first();
+    const isVisible = await annotationsTab
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await annotationsTab.click();
     await page.waitForTimeout(300);
@@ -466,8 +551,13 @@ test.describe('Content Viewer — all interactions', () => {
     await settle(page, 1000);
 
     const searchTab = page.getByRole('tab', { name: /search/i });
-    const isVisible = await searchTab.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await searchTab
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await searchTab.click();
     await page.waitForTimeout(300);
@@ -481,9 +571,17 @@ test.describe('Content Viewer — all interactions', () => {
 
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
-    const playBtn = page.getByRole('button').filter({ has: page.locator('.lucide-play') }).first();
-    const isVisible = await playBtn.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const playBtn = page
+      .getByRole('button')
+      .filter({ has: page.locator('.lucide-play') })
+      .first();
+    const isVisible = await playBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await playBtn.click();
     await page.waitForTimeout(300);
@@ -502,22 +600,36 @@ test.describe('Content Viewer — all interactions', () => {
       .getByRole('button')
       .filter({ has: page.locator('.lucide-volume2, .lucide-volume-x') })
       .first();
-    const isVisible = await muteBtn.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await muteBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await muteBtn.click();
     await page.waitForTimeout(200);
     await assertNoCrash(page);
   });
 
-  test('layer toggle buttons toggle annotation visibility', async ({ page }) => {
+  test('layer toggle buttons toggle annotation visibility', async ({
+    page,
+  }) => {
     await page.goto('/learn/content-1');
     await settle(page, 1000);
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
-    const layerBtn = page.getByRole('button', { name: /personal annotations/i }).first();
-    const isVisible = await layerBtn.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const layerBtn = page
+      .getByRole('button', { name: /personal annotations/i })
+      .first();
+    const isVisible = await layerBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await layerBtn.click();
     await page.waitForTimeout(200);
@@ -531,8 +643,13 @@ test.describe('Content Viewer — all interactions', () => {
     await page.locator('video').waitFor({ state: 'visible', timeout: 8_000 });
 
     const addBtn = page.getByRole('button', { name: /^add$/i });
-    const isVisible = await addBtn.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await addBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await addBtn.click();
     const textarea = page.locator('textarea[placeholder*="annotation"]');
@@ -557,8 +674,13 @@ test.describe('Annotations Page — all tabs', () => {
     await settle(page);
 
     const allTab = page.getByRole('tab', { name: /^all$/i }).first();
-    const isVisible = await allTab.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await allTab
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await allTab.click();
     await page.waitForTimeout(300);
@@ -571,8 +693,13 @@ test.describe('Annotations Page — all tabs', () => {
     await settle(page);
 
     const privateTab = page.getByRole('tab', { name: /private/i }).first();
-    const isVisible = await privateTab.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await privateTab
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await privateTab.click();
     await page.waitForTimeout(300);
@@ -584,8 +711,13 @@ test.describe('Annotations Page — all tabs', () => {
     await settle(page);
 
     const publicTab = page.getByRole('tab', { name: /public/i }).first();
-    const isVisible = await publicTab.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await publicTab
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await publicTab.click();
     await page.waitForTimeout(300);
@@ -596,9 +728,16 @@ test.describe('Annotations Page — all tabs', () => {
     await page.goto('/annotations');
     await settle(page);
 
-    const authorityTab = page.getByRole('tab', { name: /authority|instructor/i }).first();
-    const isVisible = await authorityTab.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const authorityTab = page
+      .getByRole('tab', { name: /authority|instructor/i })
+      .first();
+    const isVisible = await authorityTab
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await authorityTab.click();
     await page.waitForTimeout(300);
@@ -622,15 +761,28 @@ test.describe('Agents Page — all agent templates and interactions', () => {
     await page.goto('/agents');
     await settle(page);
 
-    const agentNames = ['Chavruta Debate', 'Quiz Master', 'Summarizer', 'Research Scout', 'Explainer'];
+    const agentNames = [
+      'Chavruta Debate',
+      'Quiz Master',
+      'Summarizer',
+      'Research Scout',
+      'Explainer',
+    ];
     for (const name of agentNames) {
       const card = page.getByText(name).first();
-      const visible = await card.isVisible({ timeout: 3_000 }).catch(() => false);
+      const visible = await card
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
       if (!visible) {
         // Try partial text matching
         const partCard = page.getByText(name.split(' ')[0]).first();
-        const partVisible = await partCard.isVisible({ timeout: 2_000 }).catch(() => false);
-        expect(partVisible, `Agent template card for "${name}" should be visible`).toBe(true);
+        const partVisible = await partCard
+          .isVisible({ timeout: 2_000 })
+          .catch(() => false);
+        expect(
+          partVisible,
+          `Agent template card for "${name}" should be visible`
+        ).toBe(true);
       }
     }
   });
@@ -640,8 +792,13 @@ test.describe('Agents Page — all agent templates and interactions', () => {
     await settle(page);
 
     const chavrutaCard = page.getByText(/chavruta/i).first();
-    const isVisible = await chavrutaCard.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await chavrutaCard
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await chavrutaCard.click();
     await page.waitForTimeout(500);
@@ -654,8 +811,13 @@ test.describe('Agents Page — all agent templates and interactions', () => {
     await settle(page);
 
     const card = page.getByText(/quiz master/i).first();
-    const isVisible = await card.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await card
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await card.click();
     await page.waitForTimeout(500);
@@ -668,17 +830,27 @@ test.describe('Agents Page — all agent templates and interactions', () => {
     await settle(page);
 
     // Click first available agent card
-    const firstCard = page.locator('[class*="cursor-pointer"], [class*="hover\\:"]')
+    const firstCard = page
+      .locator('[class*="cursor-pointer"], [class*="hover\\:"]')
       .filter({ hasText: /chavruta|quiz|summar|research|explain/i })
       .first();
-    const isVisible = await firstCard.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await firstCard
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await firstCard.click();
     await page.waitForTimeout(800);
 
-    const chatInput = page.locator('input[placeholder], textarea[placeholder]').last();
-    const inputVisible = await chatInput.isVisible({ timeout: 5_000 }).catch(() => false);
+    const chatInput = page
+      .locator('input[placeholder], textarea[placeholder]')
+      .last();
+    const inputVisible = await chatInput
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (inputVisible) {
       await chatInput.fill('What is the meaning of Talmud?');
       await assertNoCrash(page);
@@ -701,9 +873,19 @@ test.describe('Knowledge Graph page', () => {
     await page.goto('/graph');
     await settle(page, 2000);
 
-    const hasCanvas = await page.locator('canvas').first().isVisible({ timeout: 5_000 }).catch(() => false);
-    const hasSvg = await page.locator('svg').first().isVisible({ timeout: 3_000 }).catch(() => false);
-    expect(hasCanvas || hasSvg, 'Graph page should render canvas or SVG').toBe(true);
+    const hasCanvas = await page
+      .locator('canvas')
+      .first()
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    const hasSvg = await page
+      .locator('svg')
+      .first()
+      .isVisible({ timeout: 3_000 })
+      .catch(() => false);
+    expect(hasCanvas || hasSvg, 'Graph page should render canvas or SVG').toBe(
+      true
+    );
     await assertNoSql(page);
   });
 
@@ -711,9 +893,18 @@ test.describe('Knowledge Graph page', () => {
     await page.goto('/graph');
     await settle(page, 2000);
 
-    const searchInput = page.locator('input[placeholder*="search"], input[placeholder*="Search"], input[placeholder*="concept"]').first();
-    const isVisible = await searchInput.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const searchInput = page
+      .locator(
+        'input[placeholder*="search"], input[placeholder*="Search"], input[placeholder*="concept"]'
+      )
+      .first();
+    const isVisible = await searchInput
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await searchInput.fill('Talmud');
     await page.waitForTimeout(500);
@@ -739,7 +930,9 @@ test.describe('Search Page — input and results', () => {
     await settle(page);
 
     const searchInput = page
-      .locator('input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]')
+      .locator(
+        'input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]'
+      )
       .first();
     await expect(searchInput).toBeVisible({ timeout: 8_000 });
 
@@ -755,7 +948,9 @@ test.describe('Search Page — input and results', () => {
     await settle(page);
 
     const searchInput = page
-      .locator('input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]')
+      .locator(
+        'input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]'
+      )
       .first();
     await expect(searchInput).toBeVisible({ timeout: 8_000 });
 
@@ -773,7 +968,9 @@ test.describe('Search Page — input and results', () => {
     await settle(page);
 
     const searchInput = page
-      .locator('input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]')
+      .locator(
+        'input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]'
+      )
       .first();
     await expect(searchInput).toBeVisible({ timeout: 8_000 });
 
@@ -805,11 +1002,19 @@ test.describe('Course Creation Wizard (/courses/new)', () => {
     await page.goto('/courses/new');
     await settle(page);
 
-    const titleInput = page.getByLabel(/title/i).or(
-      page.locator('input[placeholder*="title"], input[placeholder*="Title"]')
-    ).first();
-    const isVisible = await titleInput.isVisible({ timeout: 8_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const titleInput = page
+      .getByLabel(/title/i)
+      .or(
+        page.locator('input[placeholder*="title"], input[placeholder*="Title"]')
+      )
+      .first();
+    const isVisible = await titleInput
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await titleInput.fill('My Test Course');
     await page.waitForTimeout(200);
@@ -820,46 +1025,75 @@ test.describe('Course Creation Wizard (/courses/new)', () => {
     await page.goto('/courses/new');
     await settle(page);
 
-    const descInput = page.getByLabel(/description/i).or(
-      page.locator('textarea[placeholder*="description"], textarea[placeholder*="Description"]')
-    ).first();
-    const isVisible = await descInput.isVisible({ timeout: 8_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const descInput = page
+      .getByLabel(/description/i)
+      .or(
+        page.locator(
+          'textarea[placeholder*="description"], textarea[placeholder*="Description"]'
+        )
+      )
+      .first();
+    const isVisible = await descInput
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
-    await descInput.fill('This is a test course description with enough characters.');
+    await descInput.fill(
+      'This is a test course description with enough characters.'
+    );
     await assertNoCrash(page);
   });
 
-  test('wizard difficulty selector has BEGINNER, INTERMEDIATE, ADVANCED options', async ({ page }) => {
+  test('wizard difficulty selector has BEGINNER, INTERMEDIATE, ADVANCED options', async ({
+    page,
+  }) => {
     await page.goto('/courses/new');
     await settle(page);
 
-    const difficultyTrigger = page.getByRole('combobox').or(
-      page.locator('[class*="SelectTrigger"]')
-    ).first();
-    const isVisible = await difficultyTrigger.isVisible({ timeout: 8_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const difficultyTrigger = page
+      .getByRole('combobox')
+      .or(page.locator('[class*="SelectTrigger"]'))
+      .first();
+    const isVisible = await difficultyTrigger
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await difficultyTrigger.click();
     await page.waitForTimeout(300);
 
-    const beginner = page.getByRole('option', { name: /beginner/i }).or(
-      page.locator('[role="option"]').filter({ hasText: /beginner/i })
-    );
-    const beginnerVisible = await beginner.isVisible({ timeout: 3_000 }).catch(() => false);
+    const beginner = page
+      .getByRole('option', { name: /beginner/i })
+      .or(page.locator('[role="option"]').filter({ hasText: /beginner/i }));
+    const beginnerVisible = await beginner
+      .isVisible({ timeout: 3_000 })
+      .catch(() => false);
     expect(beginnerVisible, 'BEGINNER option should be visible').toBe(true);
 
     await assertNoCrash(page);
   });
 
-  test('empty title disables the Next button (validation gate)', async ({ page }) => {
+  test('empty title disables the Next button (validation gate)', async ({
+    page,
+  }) => {
     await page.goto('/courses/new');
     await settle(page);
 
     // Next button is disabled when title is empty (canAdvanceStep1 = false)
     const nextBtn = page.getByRole('button', { name: /next/i }).first();
-    const isVisible = await nextBtn.isVisible({ timeout: 8_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await nextBtn
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     // Button should be disabled — this IS the validation mechanism (not a visible error)
     await expect(nextBtn).toBeDisabled();
@@ -892,7 +1126,9 @@ test.describe('Settings Page', () => {
         .getByRole('radio', { name: new RegExp(theme, 'i') })
         .or(page.getByLabel(new RegExp(theme, 'i')))
         .first();
-      const visible = await option.isVisible({ timeout: 3_000 }).catch(() => false);
+      const visible = await option
+        .isVisible({ timeout: 3_000 })
+        .catch(() => false);
       if (visible) {
         await option.click();
         await page.waitForTimeout(200);
@@ -907,17 +1143,29 @@ test.describe('Settings Page', () => {
 
     const langSelector = page
       .getByRole('combobox', { name: /language/i })
-      .or(page.locator('[class*="SelectTrigger"]').filter({ has: page.locator('[class*="flag"], [class*="Flag"]') }))
+      .or(
+        page
+          .locator('[class*="SelectTrigger"]')
+          .filter({ has: page.locator('[class*="flag"], [class*="Flag"]') })
+      )
       .first();
-    const isVisible = await langSelector.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await langSelector
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await langSelector.click();
     await page.waitForTimeout(300);
 
     const options = page.locator('[role="option"]');
     const count = await options.count();
-    expect(count, 'Language selector should have at least 2 options').toBeGreaterThanOrEqual(2);
+    expect(
+      count,
+      'Language selector should have at least 2 options'
+    ).toBeGreaterThanOrEqual(2);
 
     // Close dropdown
     await page.keyboard.press('Escape');
@@ -942,9 +1190,19 @@ test.describe('Profile Page', () => {
     await settle(page);
 
     // Should show some user info (name, email, or avatar)
-    const hasUserInfo = await page.locator('text=/student|instructor|admin|@/i').first().isVisible({ timeout: 5_000 }).catch(() => false);
-    const hasAvatar = await page.locator('[class*="Avatar"], [class*="avatar"]').first().isVisible({ timeout: 3_000 }).catch(() => false);
-    expect(hasUserInfo || hasAvatar, 'Profile page should show user info').toBe(true);
+    const hasUserInfo = await page
+      .locator('text=/student|instructor|admin|@/i')
+      .first()
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    const hasAvatar = await page
+      .locator('[class*="Avatar"], [class*="avatar"]')
+      .first()
+      .isVisible({ timeout: 3_000 })
+      .catch(() => false);
+    expect(hasUserInfo || hasAvatar, 'Profile page should show user info').toBe(
+      true
+    );
     await assertNoSql(page);
   });
 });
@@ -964,8 +1222,12 @@ test.describe('Collaboration Page', () => {
     await page.goto('/collaboration');
     await settle(page);
 
-    const createBtn = page.getByRole('button', { name: /create|new discussion/i }).first();
-    const isVisible = await createBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const createBtn = page
+      .getByRole('button', { name: /create|new discussion/i })
+      .first();
+    const isVisible = await createBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (isVisible) {
       await createBtn.click();
       await page.waitForTimeout(300);
@@ -1018,8 +1280,13 @@ test.describe('Mobile Navigation', () => {
       .or(page.locator('button').filter({ has: page.locator('.lucide-menu') }))
       .first();
 
-    const isVisible = await hamburger.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!isVisible) { test.skip(); return; }
+    const isVisible = await hamburger
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
 
     await hamburger.click();
     await page.waitForTimeout(300);

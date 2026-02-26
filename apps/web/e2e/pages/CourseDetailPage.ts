@@ -37,13 +37,19 @@ export class CourseDetailPage {
     this.courseTitle = page.locator('h2, [class*="CardTitle"]').first();
     this.thumbnail = page.locator('span.text-5xl').first();
     this.estimatedHours = page.locator('text=/\\d+h estimated/').first();
-    this.enrollButton = page.locator('[data-testid="enroll-button"]').or(
-      page.getByRole('button', { name: /enroll|unenroll/i })
-    ).first();
+    this.enrollButton = page
+      .locator('[data-testid="enroll-button"]')
+      .or(page.getByRole('button', { name: /enroll|unenroll/i }))
+      .first();
     this.progressBar = page.locator('[role="progressbar"]').first();
-    this.backButton = page.getByRole('button', { name: /back to courses/i }).or(
-      page.locator('button').filter({ has: page.locator('.lucide-arrow-left') })
-    ).first();
+    this.backButton = page
+      .getByRole('button', { name: /back to courses/i })
+      .or(
+        page
+          .locator('button')
+          .filter({ has: page.locator('.lucide-arrow-left') })
+      )
+      .first();
     this.offlineBanner = page.locator('[data-testid="offline-banner"]').first();
 
     // Modules
@@ -52,7 +58,10 @@ export class CourseDetailPage {
       .filter({ hasText: /Module/ })
       .or(page.locator('[data-testid="module-item"]'));
     this.contentItems = page.locator('[data-testid="content-item"]').or(
-      page.locator('li').filter({ has: page.locator('button, a') }).filter({ hasText: /Video|PDF|Quiz|Audio|Markdown|Assignment|Link/i })
+      page
+        .locator('li')
+        .filter({ has: page.locator('button, a') })
+        .filter({ hasText: /Video|PDF|Quiz|Audio|Markdown|Assignment|Link/i })
     );
   }
 
@@ -73,23 +82,35 @@ export class CourseDetailPage {
 
   /** Assert the course detail page has loaded (no spinner, has title). */
   async assertLoaded(): Promise<void> {
-    await expect(this.page.locator('.lucide-loader-2.animate-spin')).not.toBeVisible({ timeout: 8_000 });
+    await expect(
+      this.page.locator('.lucide-loader-2.animate-spin')
+    ).not.toBeVisible({ timeout: 8_000 });
     await expect(this.courseTitle).toBeVisible({ timeout: 8_000 });
   }
 
   /** Assert that no raw SQL is visible on the page. */
   async assertNoSqlInPage(): Promise<void> {
     const body = await this.page.evaluate(() => document.body?.innerText ?? '');
-    const sqlKeywords = ['SELECT ', 'FROM "', 'WHERE "', 'INSERT INTO', 'UPDATE "', 'DELETE FROM', 'Failed query:'];
+    const sqlKeywords = [
+      'SELECT ',
+      'FROM "',
+      'WHERE "',
+      'INSERT INTO',
+      'UPDATE "',
+      'DELETE FROM',
+      'Failed query:',
+    ];
     for (const kw of sqlKeywords) {
-      expect(body, `SQL keyword "${kw}" must not appear in page`).not.toContain(kw);
+      expect(body, `SQL keyword "${kw}" must not appear in page`).not.toContain(
+        kw
+      );
     }
   }
 
   /** Assert the offline banner shows (without SQL) when backend fails. */
   async assertOfflineBannerVisible(): Promise<void> {
     await expect(this.offlineBanner).toBeVisible({ timeout: 5_000 });
-    const bannerText = await this.offlineBanner.textContent() ?? '';
+    const bannerText = (await this.offlineBanner.textContent()) ?? '';
     expect(bannerText).not.toContain('Failed query:');
     expect(bannerText).not.toContain('SELECT ');
   }
@@ -107,17 +128,20 @@ export class CourseDetailPage {
 
   /** Expand or collapse a module at the given index (0-based). */
   async toggleModule(index: number): Promise<void> {
-    const modules = this.page
-      .locator('button')
-      .filter({ has: this.page.locator('.lucide-chevron-down, .lucide-chevron-right, .lucide-chevron-up') });
+    const modules = this.page.locator('button').filter({
+      has: this.page.locator(
+        '.lucide-chevron-down, .lucide-chevron-right, .lucide-chevron-up'
+      ),
+    });
     await modules.nth(index).click();
   }
 
   /** Click a content item and verify navigation to /learn/:id. */
   async clickContentItem(index = 0): Promise<void> {
-    const buttons = this.page
-      .locator('button')
-      .filter({ hasText: /Video|PDF|Quiz|Audio|Markdown|Assignment|Link|Introduction|Deep Dive|Advanced|Reading|Final/i });
+    const buttons = this.page.locator('button').filter({
+      hasText:
+        /Video|PDF|Quiz|Audio|Markdown|Assignment|Link|Introduction|Deep Dive|Advanced|Reading|Final/i,
+    });
     await buttons.nth(index).click();
     await this.page.waitForURL(/\/learn\//, { timeout: 10_000 });
   }

@@ -11,18 +11,18 @@ const errorRate = new Rate('errors');
 
 export const options = {
   stages: [
-    { duration: '1m', target: 100 },    // Normal load
-    { duration: '10s', target: 5000 },  // SPIKE: sudden surge (class start)
-    { duration: '5m', target: 5000 },   // Hold spike
-    { duration: '10s', target: 100 },   // Drop back
-    { duration: '2m', target: 100 },    // Recovery period
+    { duration: '1m', target: 100 }, // Normal load
+    { duration: '10s', target: 5000 }, // SPIKE: sudden surge (class start)
+    { duration: '5m', target: 5000 }, // Hold spike
+    { duration: '10s', target: 100 }, // Drop back
+    { duration: '2m', target: 100 }, // Recovery period
     { duration: '10s', target: 10000 }, // Second spike
-    { duration: '5m', target: 10000 },  // Hold
-    { duration: '2m', target: 0 },      // Ramp down
+    { duration: '5m', target: 10000 }, // Hold
+    { duration: '2m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<1000'],  // Allow 1s during spikes
-    http_req_failed: ['rate<0.05'],     // < 5% errors during spike
+    http_req_duration: ['p(95)<1000'], // Allow 1s during spikes
+    http_req_failed: ['rate<0.05'], // < 5% errors during spike
     errors: ['rate<0.05'],
   },
 };

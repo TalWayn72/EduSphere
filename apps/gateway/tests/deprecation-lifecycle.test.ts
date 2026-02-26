@@ -36,7 +36,9 @@ function findGraphqlFiles(dir: string): string[] {
 }
 
 /** Extract all @deprecated directives with their reasons from SDL text */
-function extractDeprecations(sdl: string): Array<{ reason: string; context: string }> {
+function extractDeprecations(
+  sdl: string
+): Array<{ reason: string; context: string }> {
   const results: Array<{ reason: string; context: string }> = [];
   // Match @deprecated(reason: "...") patterns
   const regex = /@deprecated\(reason:\s*"([^"]+)"\)/g;
@@ -44,7 +46,10 @@ function extractDeprecations(sdl: string): Array<{ reason: string; context: stri
   while ((match = regex.exec(sdl)) !== null) {
     results.push({
       reason: match[1] ?? '',
-      context: sdl.substring(Math.max(0, match.index - 80), match.index + match[0].length),
+      context: sdl.substring(
+        Math.max(0, match.index - 80),
+        match.index + match[0].length
+      ),
     });
   }
   return results;
@@ -60,7 +65,11 @@ function parseRemovalDate(reason: string): Date | null {
 
 describe('Deprecation Lifecycle Policy Enforcement', () => {
   const allGraphqlFiles: string[] = [];
-  const allDeprecations: Array<{ file: string; reason: string; context: string }> = [];
+  const allDeprecations: Array<{
+    file: string;
+    reason: string;
+    context: string;
+  }> = [];
 
   // Collect all subgraph SDL files and their @deprecated usages
   for (const subgraph of SUBGRAPH_NAMES) {
@@ -83,11 +92,11 @@ describe('Deprecation Lifecycle Policy Enforcement', () => {
 
   it('all @deprecated directives include "Will be removed YYYY-MM-DD" in reason', () => {
     const violations = allDeprecations.filter(
-      ({ reason }) => !/Will be removed \d{4}-\d{2}-\d{2}/.test(reason),
+      ({ reason }) => !/Will be removed \d{4}-\d{2}-\d{2}/.test(reason)
     );
     expect(
       violations,
-      `Deprecations missing removal date:\n${violations.map(v => `  ${v.file}: "${v.reason}"`).join('\n')}`,
+      `Deprecations missing removal date:\n${violations.map((v) => `  ${v.file}: "${v.reason}"`).join('\n')}`
     ).toHaveLength(0);
   });
 
@@ -106,7 +115,7 @@ describe('Deprecation Lifecycle Policy Enforcement', () => {
 
     expect(
       violations,
-      `Deprecations with removal dates less than 90 days from plan date (2026-02-22):\n${violations.map(v => `  ${v.file}: "${v.reason}"`).join('\n')}`,
+      `Deprecations with removal dates less than 90 days from plan date (2026-02-22):\n${violations.map((v) => `  ${v.file}: "${v.reason}"`).join('\n')}`
     ).toHaveLength(0);
   });
 
@@ -117,7 +126,7 @@ describe('Deprecation Lifecycle Policy Enforcement', () => {
     });
     expect(
       violations,
-      `Deprecations with invalid date format:\n${violations.map(v => `  ${v.file}: "${v.reason}"`).join('\n')}`,
+      `Deprecations with invalid date format:\n${violations.map((v) => `  ${v.file}: "${v.reason}"`).join('\n')}`
     ).toHaveLength(0);
   });
 

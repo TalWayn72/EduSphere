@@ -2,11 +2,7 @@
  * MarketplaceEarningsService — earnings calculation and payout processing
  * Split from MarketplaceService to keep files under 150 lines.
  */
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -17,7 +13,11 @@ import {
 import type { TenantContext } from '@edusphere/db';
 import { sql } from 'drizzle-orm';
 import type { StripeClient } from './stripe.client.js';
-import type { EarningsSummary, InstructorPayout, Purchase } from './marketplace.types.js';
+import type {
+  EarningsSummary,
+  InstructorPayout,
+  Purchase,
+} from './marketplace.types.js';
 
 @Injectable()
 export class MarketplaceEarningsService {
@@ -26,52 +26,62 @@ export class MarketplaceEarningsService {
 
   async getInstructorEarnings(
     instructorId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<EarningsSummary> {
-    const ctx: TenantContext = { tenantId, userId: instructorId, userRole: 'INSTRUCTOR' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: instructorId,
+      userRole: 'INSTRUCTOR',
+    };
 
     // Get all courses owned by this instructor with their listings and purchases
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select({
-        purchaseId: schema.purchases.id,
-        courseId: schema.purchases.courseId,
-        amountCents: schema.purchases.amountCents,
-        status: schema.purchases.status,
-        purchasedAt: schema.purchases.purchasedAt,
-        userId: schema.purchases.userId,
-        tenantId: schema.purchases.tenantId,
-        stripePaymentIntentId: schema.purchases.stripePaymentIntentId,
-        revenueSplitPercent: schema.courseListings.revenueSplitPercent,
-      })
+      tx
+        .select({
+          purchaseId: schema.purchases.id,
+          courseId: schema.purchases.courseId,
+          amountCents: schema.purchases.amountCents,
+          status: schema.purchases.status,
+          purchasedAt: schema.purchases.purchasedAt,
+          userId: schema.purchases.userId,
+          tenantId: schema.purchases.tenantId,
+          stripePaymentIntentId: schema.purchases.stripePaymentIntentId,
+          revenueSplitPercent: schema.courseListings.revenueSplitPercent,
+        })
         .from(schema.purchases)
         .innerJoin(
           schema.courseListings,
           and(
             eq(schema.purchases.courseId, schema.courseListings.courseId),
-            eq(schema.purchases.tenantId, schema.courseListings.tenantId),
-          ),
+            eq(schema.purchases.tenantId, schema.courseListings.tenantId)
+          )
         )
         .innerJoin(
           schema.courses,
           and(
             eq(schema.purchases.courseId, schema.courses.id),
-            sql`${schema.courses.instructor_id}::text = ${instructorId}`,
-          ),
+            sql`${schema.courses.instructor_id}::text = ${instructorId}`
+          )
         )
-        .where(and(
-          eq(schema.purchases.tenantId, tenantId),
-          sql`${schema.purchases.status} = 'COMPLETE'`,
-        )),
+        .where(
+          and(
+            eq(schema.purchases.tenantId, tenantId),
+            sql`${schema.purchases.status} = 'COMPLETE'`
+          )
+        )
     );
 
     // Calculate payout totals
     const payouts = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.instructorPayouts)
-        .where(and(
-          eq(schema.instructorPayouts.instructorId, instructorId),
-          eq(schema.instructorPayouts.tenantId, tenantId),
-        )),
+        .where(
+          and(
+            eq(schema.instructorPayouts.instructorId, instructorId),
+            eq(schema.instructorPayouts.tenantId, tenantId)
+          )
+        )
     );
 
     const paidOutCents = payouts
@@ -102,34 +112,45 @@ export class MarketplaceEarningsService {
   async requestPayout(
     instructorId: string,
     tenantId: string,
-    stripeClient: StripeClient,
+    stripeClient: StripeClient
   ): Promise<InstructorPayout> {
-    const ctx: TenantContext = { tenantId, userId: instructorId, userRole: 'INSTRUCTOR' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: instructorId,
+      userRole: 'INSTRUCTOR',
+    };
     const earnings = await this.getInstructorEarnings(instructorId, tenantId);
 
     if (earnings.pendingPayoutCents <= 0) {
       throw new BadRequestException('No pending earnings available for payout');
     }
 
-    const instructorStripeAccountId = process.env['INSTRUCTOR_STRIPE_ACCOUNT_' + instructorId];
+    const instructorStripeAccountId =
+      process.env['INSTRUCTOR_STRIPE_ACCOUNT_' + instructorId];
     let stripeTransferId: string | undefined;
 
     if (instructorStripeAccountId) {
       const transfer = await stripeClient.createTransfer(
         earnings.pendingPayoutCents,
         instructorStripeAccountId,
-        `EduSphere payout for instructor ${instructorId}`,
+        `EduSphere payout for instructor ${instructorId}`
       );
       stripeTransferId = transfer.id;
     } else {
-      this.logger.warn({ instructorId }, 'No Stripe account ID found for instructor — payout recorded without transfer');
+      this.logger.warn(
+        { instructorId },
+        'No Stripe account ID found for instructor — payout recorded without transfer'
+      );
     }
 
     const periodEnd = new Date();
-    const periodStart = new Date(periodEnd.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const periodStart = new Date(
+      periodEnd.getTime() - 30 * 24 * 60 * 60 * 1000
+    );
 
     const [payout] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.instructorPayouts)
+      tx
+        .insert(schema.instructorPayouts)
         .values({
           instructorId,
           tenantId,
@@ -139,12 +160,16 @@ export class MarketplaceEarningsService {
           periodEnd,
           status: stripeTransferId ? 'PAID' : 'PENDING',
         })
-        .returning(),
+        .returning()
     );
 
     this.logger.log(
-      { instructorId, amountCents: earnings.pendingPayoutCents, stripeTransferId },
-      'Instructor payout created',
+      {
+        instructorId,
+        amountCents: earnings.pendingPayoutCents,
+        stripeTransferId,
+      },
+      'Instructor payout created'
     );
     return payout!;
   }

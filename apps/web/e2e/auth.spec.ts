@@ -58,9 +58,9 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
     // ProtectedRoute passes in DEV_MODE because isAuthenticated() returns true
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' })
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('authenticated user sees their display name in the header', async ({

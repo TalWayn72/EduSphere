@@ -33,7 +33,8 @@ export function ScormContentViewer() {
           <h1 className="text-xl font-semibold">SCORM Content</h1>
           {session && (
             <span className="text-sm text-muted-foreground">
-              Status: <span className="font-medium">{session.lessonStatus}</span>
+              Status:{' '}
+              <span className="font-medium">{session.lessonStatus}</span>
               {session.scoreRaw !== null && (
                 <span className="ml-3">Score: {session.scoreRaw}</span>
               )}
@@ -46,14 +47,19 @@ export function ScormContentViewer() {
             {fetching && (
               <div className="flex items-center justify-center h-full gap-3">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                <span className="text-muted-foreground">Initializing SCORM session...</span>
+                <span className="text-muted-foreground">
+                  Initializing SCORM session...
+                </span>
               </div>
             )}
             {error && (
               <div className="flex flex-col items-center justify-center h-full gap-4">
                 <AlertCircle className="h-10 w-10 text-destructive" />
                 <p className="text-destructive font-medium">{error}</p>
-                <Button variant="outline" onClick={() => void initSession(contentId)}>
+                <Button
+                  variant="outline"
+                  onClick={() => void initSession(contentId)}
+                >
                   Retry
                 </Button>
               </div>

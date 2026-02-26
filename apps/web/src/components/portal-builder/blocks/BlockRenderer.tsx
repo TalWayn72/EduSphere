@@ -9,8 +9,11 @@ interface Props {
 }
 
 function HeroBannerPreview({ config }: { config: Record<string, unknown> }) {
-  const title = (config['title'] as string | undefined) ?? 'Welcome to Your Learning Portal';
-  const subtitle = (config['subtitle'] as string | undefined) ?? 'Start learning today';
+  const title =
+    (config['title'] as string | undefined) ??
+    'Welcome to Your Learning Portal';
+  const subtitle =
+    (config['subtitle'] as string | undefined) ?? 'Start learning today';
   const ctaText = (config['ctaText'] as string | undefined) ?? 'Get Started';
 
   return (
@@ -24,14 +27,21 @@ function HeroBannerPreview({ config }: { config: Record<string, unknown> }) {
   );
 }
 
-function FeaturedCoursesPreview({ config }: { config: Record<string, unknown> }) {
+function FeaturedCoursesPreview({
+  config,
+}: {
+  config: Record<string, unknown>;
+}) {
   const title = (config['title'] as string | undefined) ?? 'Featured Courses';
   return (
     <div className="p-6">
       <h2 className="text-lg font-semibold mb-4">{title}</h2>
       <div className="grid grid-cols-3 gap-3">
         {[1, 2, 3].map((n) => (
-          <div key={n} className="h-24 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground">
+          <div
+            key={n}
+            className="h-24 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground"
+          >
             Course {n}
           </div>
         ))}
@@ -58,9 +68,16 @@ function StatWidgetPreview() {
 }
 
 function TextBlockPreview({ config }: { config: Record<string, unknown> }) {
-  const content = (config['content'] as string | undefined) ?? 'Add your text content here...';
+  const content =
+    (config['content'] as string | undefined) ??
+    'Add your text content here...';
   const alignment = (config['alignment'] as string | undefined) ?? 'left';
-  const alignClass = alignment === 'center' ? 'text-center' : alignment === 'right' ? 'text-right' : 'text-left';
+  const alignClass =
+    alignment === 'center'
+      ? 'text-center'
+      : alignment === 'right'
+        ? 'text-right'
+        : 'text-left';
   return (
     <div className={`p-6 ${alignClass}`}>
       <p className="text-sm text-foreground">{content}</p>
@@ -83,12 +100,15 @@ function ImageBlockPreview({ config }: { config: Record<string, unknown> }) {
 function CTAButtonPreview({ config }: { config: Record<string, unknown> }) {
   const text = (config['text'] as string | undefined) ?? 'Click Here';
   const variant = (config['variant'] as string | undefined) ?? 'primary';
-  const btnClass = variant === 'primary'
-    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-    : 'border border-primary text-primary hover:bg-primary/10';
+  const btnClass =
+    variant === 'primary'
+      ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+      : 'border border-primary text-primary hover:bg-primary/10';
   return (
     <div className="p-6 flex justify-center">
-      <button className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${btnClass}`}>
+      <button
+        className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${btnClass}`}
+      >
         {text}
       </button>
     </div>
@@ -111,7 +131,9 @@ export function BlockRenderer({ block }: Props) {
       return <CTAButtonPreview config={block.config} />;
     default:
       return (
-        <div className="p-4 text-sm text-muted-foreground">Unknown block type</div>
+        <div className="p-4 text-sm text-muted-foreground">
+          Unknown block type
+        </div>
       );
   }
 }

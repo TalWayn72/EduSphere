@@ -6,7 +6,10 @@ import { CollaborationSessionPage } from './CollaborationSessionPage';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
@@ -14,9 +17,15 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
     useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
-    useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useSubscription: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
   };
 });
 
@@ -31,12 +40,22 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/CollaborativeEditor', () => ({
-  CollaborativeEditor: ({ content, onChange }: { content: string; onChange: (v: string) => void }) => (
-    <div data-testid="editor" onClick={() => onChange('<p>updated</p>')}>{content}</div>
+  CollaborativeEditor: ({
+    content,
+    onChange,
+  }: {
+    content: string;
+    onChange: (v: string) => void;
+  }) => (
+    <div data-testid="editor" onClick={() => onChange('<p>updated</p>')}>
+      {content}
+    </div>
   ),
 }));
 
@@ -91,7 +110,9 @@ describe('CollaborationSessionPage', () => {
 
   it('updates document title when input changes', () => {
     renderPage('?partner=Bob');
-    const input = screen.getByDisplayValue('Shared Study Notes') as HTMLInputElement;
+    const input = screen.getByDisplayValue(
+      'Shared Study Notes'
+    ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'My Notes' } });
     expect(input.value).toBe('My Notes');
   });

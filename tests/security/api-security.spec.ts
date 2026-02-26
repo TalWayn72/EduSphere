@@ -19,7 +19,9 @@ const read = (p: string): string => {
 
 describe('G-09: Rate Limiting', () => {
   it('rate-limit.ts middleware exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/gateway/src/middleware/rate-limit.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/gateway/src/middleware/rate-limit.ts'))
+    ).toBe(true);
   });
 
   it('rate limiter uses sliding window (not fixed)', () => {
@@ -66,7 +68,9 @@ describe('G-09: Rate Limiting', () => {
 describe('G-10: Query Depth and Complexity', () => {
   it('query-complexity.ts middleware exists', () => {
     expect(
-      existsSync(resolve(ROOT, 'apps/gateway/src/middleware/query-complexity.ts')),
+      existsSync(
+        resolve(ROOT, 'apps/gateway/src/middleware/query-complexity.ts')
+      )
     ).toBe(true);
   });
 
@@ -82,7 +86,9 @@ describe('G-10: Query Depth and Complexity', () => {
 
   it('depth limit default is 10 or less', () => {
     const c = read('apps/gateway/src/middleware/query-complexity.ts');
-    const match = c.match(/GRAPHQL_MAX_DEPTH.*?'(\d+)'|MAX_DEPTH\s*=\s*parseInt[^,]+,\s*(\d+)/);
+    const match = c.match(
+      /GRAPHQL_MAX_DEPTH.*?'(\d+)'|MAX_DEPTH\s*=\s*parseInt[^,]+,\s*(\d+)/
+    );
     if (match) {
       const depth = parseInt(match[1] ?? match[2] ?? '10', 10);
       expect(depth).toBeLessThanOrEqual(10);
@@ -94,7 +100,9 @@ describe('G-10: Query Depth and Complexity', () => {
 
   it('complexity limit default is 1000 or less', () => {
     const c = read('apps/gateway/src/middleware/query-complexity.ts');
-    const match = c.match(/GRAPHQL_MAX_COMPLEXITY.*?'(\d+)'|MAX_COMPLEXITY\s*=\s*parseInt[^,]+,\s*(\d+)/);
+    const match = c.match(
+      /GRAPHQL_MAX_COMPLEXITY.*?'(\d+)'|MAX_COMPLEXITY\s*=\s*parseInt[^,]+,\s*(\d+)/
+    );
     if (match) {
       const complexity = parseInt(match[1] ?? match[2] ?? '1000', 10);
       expect(complexity).toBeLessThanOrEqual(1000);

@@ -1,5 +1,17 @@
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, asc, inArray, closeAllPools } from '@edusphere/db';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  asc,
+  inArray,
+  closeAllPools,
+} from '@edusphere/db';
 import {
   microlessonContentSchema,
   MICROLESSON_MAX_DURATION_SECONDS,
@@ -34,13 +46,18 @@ export class ContentItemService implements OnModuleDestroy {
    * When contentType is MICROLESSON, validate the structured JSON content and
    * enforce the 7-minute (420 s) duration ceiling.
    */
-  validateMicrolessonIfNeeded(contentType: string, content: string | null): void {
+  validateMicrolessonIfNeeded(
+    contentType: string,
+    content: string | null
+  ): void {
     if (contentType !== 'MICROLESSON') return;
     if (!content) {
       throw new BadRequestException('MICROLESSON content is required');
     }
     let parsed: unknown;
-    try { parsed = JSON.parse(content); } catch {
+    try {
+      parsed = JSON.parse(content);
+    } catch {
       throw new BadRequestException('MICROLESSON content must be valid JSON');
     }
     const result = microlessonContentSchema.safeParse(parsed);
@@ -50,7 +67,7 @@ export class ContentItemService implements OnModuleDestroy {
     }
     if (result.data.durationSeconds > MICROLESSON_MAX_DURATION_SECONDS) {
       throw new BadRequestException(
-        `MICROLESSON durationSeconds must not exceed ${MICROLESSON_MAX_DURATION_SECONDS} (7 minutes)`,
+        `MICROLESSON durationSeconds must not exceed ${MICROLESSON_MAX_DURATION_SECONDS} (7 minutes)`
       );
     }
   }
@@ -85,7 +102,9 @@ export class ContentItemService implements OnModuleDestroy {
     return this.map(row);
   }
 
-  async findByModuleIdBatch(moduleIds: string[]): Promise<Map<string, ContentItemMapped[]>> {
+  async findByModuleIdBatch(
+    moduleIds: string[]
+  ): Promise<Map<string, ContentItemMapped[]>> {
     if (moduleIds.length === 0) return new Map();
     const rows = await this.db
       .select()

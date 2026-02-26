@@ -3,7 +3,14 @@
  * lti_platforms: registered LMS platforms (Canvas, Moodle, Blackboard)
  * lti_launches: audit log of LTI launches
  */
-import { pgTable, uuid, text, boolean, jsonb, unique } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  boolean,
+  jsonb,
+  unique,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk, tenantId, timestamps } from './_shared';
 
@@ -21,19 +28,22 @@ export const ltiPlatforms = pgTable('lti_platforms', {
   ...timestamps,
 });
 
-export const ltiLaunches = pgTable('lti_launches', {
-  id: pk(),
-  tenant_id: tenantId(),
-  platform_id: uuid('platform_id')
-    .notNull()
-    .references(() => ltiPlatforms.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull(),
-  course_id: uuid('course_id'),
-  launch_nonce: text('launch_nonce').notNull(),
-  launch_data: jsonb('launch_data').notNull(),
-  launched_at: timestamps.created_at,
-},
-(t) => [unique('lti_launches_nonce_unique').on(t.launch_nonce)]);
+export const ltiLaunches = pgTable(
+  'lti_launches',
+  {
+    id: pk(),
+    tenant_id: tenantId(),
+    platform_id: uuid('platform_id')
+      .notNull()
+      .references(() => ltiPlatforms.id, { onDelete: 'cascade' }),
+    user_id: uuid('user_id').notNull(),
+    course_id: uuid('course_id'),
+    launch_nonce: text('launch_nonce').notNull(),
+    launch_data: jsonb('launch_data').notNull(),
+    launched_at: timestamps.created_at,
+  },
+  (t) => [unique('lti_launches_nonce_unique').on(t.launch_nonce)]
+);
 
 export const ltiPlatformsRLS = sql`
 ALTER TABLE lti_platforms ENABLE ROW LEVEL SECURITY;

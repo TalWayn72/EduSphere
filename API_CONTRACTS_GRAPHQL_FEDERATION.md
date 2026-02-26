@@ -96,14 +96,14 @@ EduSphere uses **GraphQL Federation v2.7+** (Apollo Federation v2 spec compatibl
 
 ## 2. Subgraph Decomposition Map
 
-| Subgraph | Port | Owned Entities | Extended Entities | Domain |
-|-----------|------|----------------|-------------------|--------|
-| **Core** | 4001 | `Tenant`, `User` | — | Identity, tenancy, auth |
-| **Content** | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment` | `User` (createdCourses), `Tenant` | Courses, media pipeline, transcription |
-| **Annotation** | 4003 | `Annotation` | `User`, `MediaAsset` | Markings, sketches, spatial comments |
-| **Collaboration** | 4004 | `CollabDocument`, `CollabSession` | `User`, `Annotation` | CRDT persistence, real-time presence |
-| **Agent** | 4005 | `AgentDefinition`, `AgentExecution` | `User`, `Annotation`, `Course` | AI agents, templates, executions |
-| **Knowledge** | 4006 | `Concept`, `Person`, `Term`, `Source`, `TopicCluster`, `KnowledgeRelation`, `SemanticSearchResult` | `MediaAsset`, `TranscriptSegment`, `Annotation` | Knowledge graph, embeddings, search |
+| Subgraph          | Port | Owned Entities                                                                                     | Extended Entities                               | Domain                                 |
+| ----------------- | ---- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------- |
+| **Core**          | 4001 | `Tenant`, `User`                                                                                   | —                                               | Identity, tenancy, auth                |
+| **Content**       | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment`                                | `User` (createdCourses), `Tenant`               | Courses, media pipeline, transcription |
+| **Annotation**    | 4003 | `Annotation`                                                                                       | `User`, `MediaAsset`                            | Markings, sketches, spatial comments   |
+| **Collaboration** | 4004 | `CollabDocument`, `CollabSession`                                                                  | `User`, `Annotation`                            | CRDT persistence, real-time presence   |
+| **Agent**         | 4005 | `AgentDefinition`, `AgentExecution`                                                                | `User`, `Annotation`, `Course`                  | AI agents, templates, executions       |
+| **Knowledge**     | 4006 | `Concept`, `Person`, `Term`, `Source`, `TopicCluster`, `KnowledgeRelation`, `SemanticSearchResult` | `MediaAsset`, `TranscriptSegment`, `Annotation` | Knowledge graph, embeddings, search    |
 
 ### Entity Ownership Rules
 
@@ -138,19 +138,29 @@ All subgraphs MUST import the following shared definitions. These are declared i
 ```graphql
 # ─── File: packages/graphql-shared/src/scalars.graphql ───
 
-"""ISO 8601 date-time string with timezone (e.g. "2025-01-15T10:30:00Z")"""
+"""
+ISO 8601 date-time string with timezone (e.g. "2025-01-15T10:30:00Z")
+"""
 scalar DateTime
 
-"""UUID v4 string (e.g. "550e8400-e29b-41d4-a716-446655440000")"""
+"""
+UUID v4 string (e.g. "550e8400-e29b-41d4-a716-446655440000")
+"""
 scalar UUID
 
-"""Arbitrary JSON object"""
+"""
+Arbitrary JSON object
+"""
 scalar JSON
 
-"""Arbitrary JSON object (alias for interoperability)"""
+"""
+Arbitrary JSON object (alias for interoperability)
+"""
 scalar JSONObject
 
-"""Base64-encoded binary data"""
+"""
+Base64-encoded binary data
+"""
 scalar Base64
 
 """
@@ -159,19 +169,29 @@ Clients MUST NOT parse or construct cursors — treat as opaque tokens.
 """
 scalar Cursor
 
-"""URL string (validated as a valid URL)"""
+"""
+URL string (validated as a valid URL)
+"""
 scalar URL
 
-"""Email address string (validated)"""
+"""
+Email address string (validated)
+"""
 scalar EmailAddress
 
-"""Non-negative integer (≥ 0)"""
+"""
+Non-negative integer (≥ 0)
+"""
 scalar NonNegativeInt
 
-"""Positive integer (> 0)"""
+"""
+Positive integer (> 0)
+"""
 scalar PositiveInt
 
-"""Float between 0.0 and 1.0 inclusive"""
+"""
+Float between 0.0 and 1.0 inclusive
+"""
 scalar UnitFloat
 ```
 
@@ -256,7 +276,9 @@ enum TenantPlan {
   ENTERPRISE
 }
 
-"""Sort direction for ordered queries"""
+"""
+Sort direction for ordered queries
+"""
 enum SortDirection {
   ASC
   DESC
@@ -279,13 +301,21 @@ Relay-compliant page info for cursor-based pagination.
 Used by all Connection types across every subgraph.
 """
 type PageInfo {
-  """When paginating forwards, are there more items?"""
+  """
+  When paginating forwards, are there more items?
+  """
   hasNextPage: Boolean!
-  """When paginating backwards, are there more items?"""
+  """
+  When paginating backwards, are there more items?
+  """
   hasPreviousPage: Boolean!
-  """Cursor of the first edge in the current page"""
+  """
+  Cursor of the first edge in the current page
+  """
   startCursor: Cursor
-  """Cursor of the last edge in the current page"""
+  """
+  Cursor of the last edge in the current page
+  """
   endCursor: Cursor
 }
 
@@ -297,13 +327,21 @@ last + before = backward pagination.
 Providing both first AND last is STRONGLY DISCOURAGED.
 """
 input ConnectionArgs {
-  """Returns the first N edges after the cursor"""
+  """
+  Returns the first N edges after the cursor
+  """
   first: PositiveInt
-  """Returns edges after this cursor"""
+  """
+  Returns edges after this cursor
+  """
   after: Cursor
-  """Returns the last N edges before the cursor"""
+  """
+  Returns the last N edges before the cursor
+  """
   last: PositiveInt
-  """Returns edges before this cursor"""
+  """
+  Returns edges before this cursor
+  """
   before: Cursor
 }
 ```
@@ -311,6 +349,7 @@ input ConnectionArgs {
 ### Naming Convention for Connections
 
 Every entity `Foo` generates:
+
 - `FooConnection` — contains `edges` and `pageInfo`
 - `FooEdge` — contains `node` and `cursor`
 
@@ -319,7 +358,9 @@ Every entity `Foo` generates:
 type CourseConnection {
   edges: [CourseEdge!]!
   pageInfo: PageInfo!
-  """Total count of items matching filters (computed only if requested)"""
+  """
+  Total count of items matching filters (computed only if requested)
+  """
   totalCount: NonNegativeInt
 }
 
@@ -331,13 +372,13 @@ type CourseEdge {
 
 ### Pagination Limits
 
-| Context | Default `first` | Max `first`/`last` |
-|---------|----------------|-------------------|
-| Standard lists | 20 | 100 |
-| Transcript segments | 50 | 500 |
-| Search results | 10 | 50 |
-| Agent executions | 20 | 100 |
-| Knowledge graph relations | 20 | 200 |
+| Context                   | Default `first` | Max `first`/`last` |
+| ------------------------- | --------------- | ------------------ |
+| Standard lists            | 20              | 100                |
+| Transcript segments       | 50              | 500                |
+| Search results            | 10              | 50                 |
+| Agent executions          | 20              | 100                |
+| Knowledge graph relations | 20              | 200                |
 
 If `first`/`last` exceeds the maximum, the server clamps to max and returns a `PAGINATION_CLAMPED` extension warning.
 
@@ -388,9 +429,7 @@ directive @public on FIELD_DEFINITION | OBJECT
 Requires the caller to have one of the specified roles.
 Evaluated in subgraph resolvers using context.user.role.
 """
-directive @requiresRole(
-  roles: [UserRole!]!
-) on FIELD_DEFINITION | OBJECT
+directive @requiresRole(roles: [UserRole!]!) on FIELD_DEFINITION | OBJECT
 
 """
 Marks a field as only accessible by the resource owner.
@@ -404,7 +443,7 @@ Evaluated at the router level via the rate-limiter plugin.
 """
 directive @rateLimit(
   max: Int!
-  window: String!  # e.g., "1m", "1h", "1d"
+  window: String! # e.g., "1m", "1h", "1d"
 ) on FIELD_DEFINITION
 
 """
@@ -413,28 +452,28 @@ Clients using deprecated fields will see warnings in tooling.
 """
 directive @deprecated(
   reason: String!
-  removalDate: String  # ISO 8601 date
+  removalDate: String # ISO 8601 date
 ) on FIELD_DEFINITION | ENUM_VALUE | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Role-to-Scope Mapping
 
-| Role | JWT Scopes | Capabilities |
-|------|-----------|-------------|
-| `SUPER_ADMIN` | `admin:*` | Full system access, cross-tenant |
-| `ORG_ADMIN` | `org:manage`, `org:users`, `org:billing` | Manage tenant settings, users, billing |
-| `INSTRUCTOR` | `course:write`, `annotation:write`, `agent:write`, `media:upload` | Create/edit courses, annotations, agents |
-| `STUDENT` | `course:read`, `annotation:write:own`, `agent:execute` | View courses, create own annotations, run agents |
-| `RESEARCHER` | `course:read`, `annotation:read`, `knowledge:read`, `knowledge:write` | Read content, query knowledge graph, add concepts |
+| Role          | JWT Scopes                                                            | Capabilities                                      |
+| ------------- | --------------------------------------------------------------------- | ------------------------------------------------- |
+| `SUPER_ADMIN` | `admin:*`                                                             | Full system access, cross-tenant                  |
+| `ORG_ADMIN`   | `org:manage`, `org:users`, `org:billing`                              | Manage tenant settings, users, billing            |
+| `INSTRUCTOR`  | `course:write`, `annotation:write`, `agent:write`, `media:upload`     | Create/edit courses, annotations, agents          |
+| `STUDENT`     | `course:read`, `annotation:write:own`, `agent:execute`                | View courses, create own annotations, run agents  |
+| `RESEARCHER`  | `course:read`, `annotation:read`, `knowledge:read`, `knowledge:write` | Read content, query knowledge graph, add concepts |
 
 ### JWT Claims Structure (Propagated by Router)
 
 ```typescript
 // Extracted from Keycloak JWT and propagated as headers
 interface JWTClaims {
-  sub: string;          // Keycloak user ID
-  tenant_id: string;    // UUID of the tenant
-  user_id: string;      // EduSphere internal user UUID
+  sub: string; // Keycloak user ID
+  tenant_id: string; // UUID of the tenant
+  user_id: string; // EduSphere internal user UUID
   email: string;
   roles: UserRole[];
   scopes: string[];
@@ -451,19 +490,19 @@ headers:
   all:
     request:
       - propagate:
-          named: "x-tenant-id"
+          named: 'x-tenant-id'
       - propagate:
-          named: "x-user-id"
+          named: 'x-user-id'
       - propagate:
-          named: "x-user-role"
+          named: 'x-user-role'
       - propagate:
-          named: "x-user-scopes"
+          named: 'x-user-scopes'
       - propagate:
-          named: "authorization"
+          named: 'authorization'
       - propagate:
-          named: "x-request-id"
+          named: 'x-request-id'
       - propagate:
-          named: "x-correlation-id"
+          named: 'x-correlation-id'
 ```
 
 ---
@@ -482,39 +521,51 @@ All subgraphs MUST return errors following this structure. The `extensions` fiel
 Standard error extension fields returned in every GraphQL error.
 """
 type ErrorExtension {
-  """Machine-readable error code (UPPER_SNAKE_CASE)"""
+  """
+  Machine-readable error code (UPPER_SNAKE_CASE)
+  """
   code: String!
-  """HTTP-equivalent status code"""
+  """
+  HTTP-equivalent status code
+  """
   status: Int!
-  """ISO 8601 timestamp of the error"""
+  """
+  ISO 8601 timestamp of the error
+  """
   timestamp: DateTime!
-  """Correlation ID for tracing"""
+  """
+  Correlation ID for tracing
+  """
   requestId: String!
-  """Field path that caused the error"""
+  """
+  Field path that caused the error
+  """
   path: [String!]
-  """Additional context for debugging (only in development)"""
+  """
+  Additional context for debugging (only in development)
+  """
   debug: JSON
 }
 ```
 
 ### Error Codes Catalog
 
-| Code | HTTP Status | Description | Retryable |
-|------|------------|-------------|-----------|
-| `UNAUTHENTICATED` | 401 | Missing or invalid JWT | No |
-| `FORBIDDEN` | 403 | Valid JWT but insufficient permissions | No |
-| `NOT_FOUND` | 404 | Requested resource does not exist | No |
-| `CONFLICT` | 409 | Resource version conflict (optimistic locking) | Yes |
-| `VALIDATION_ERROR` | 400 | Input validation failure | No |
-| `RATE_LIMITED` | 429 | Too many requests | Yes (after `retryAfter`) |
-| `TENANT_QUOTA_EXCEEDED` | 403 | Tenant has exceeded plan limits | No |
-| `MEDIA_PROCESSING_ERROR` | 500 | Media transcoding/transcription failure | Yes |
-| `AGENT_EXECUTION_ERROR` | 500 | Agent runtime failure | Yes |
-| `GRAPH_QUERY_ERROR` | 500 | Apache AGE query failure | Yes |
-| `EMBEDDING_ERROR` | 500 | Vector embedding generation failure | Yes |
-| `INTERNAL_ERROR` | 500 | Unhandled server error | Yes |
-| `PAGINATION_CLAMPED` | 200 | Requested page size was clamped (warning) | N/A |
-| `OPTIMISTIC_LOCK_FAILED` | 409 | Version mismatch on update | Yes |
+| Code                     | HTTP Status | Description                                    | Retryable                |
+| ------------------------ | ----------- | ---------------------------------------------- | ------------------------ |
+| `UNAUTHENTICATED`        | 401         | Missing or invalid JWT                         | No                       |
+| `FORBIDDEN`              | 403         | Valid JWT but insufficient permissions         | No                       |
+| `NOT_FOUND`              | 404         | Requested resource does not exist              | No                       |
+| `CONFLICT`               | 409         | Resource version conflict (optimistic locking) | Yes                      |
+| `VALIDATION_ERROR`       | 400         | Input validation failure                       | No                       |
+| `RATE_LIMITED`           | 429         | Too many requests                              | Yes (after `retryAfter`) |
+| `TENANT_QUOTA_EXCEEDED`  | 403         | Tenant has exceeded plan limits                | No                       |
+| `MEDIA_PROCESSING_ERROR` | 500         | Media transcoding/transcription failure        | Yes                      |
+| `AGENT_EXECUTION_ERROR`  | 500         | Agent runtime failure                          | Yes                      |
+| `GRAPH_QUERY_ERROR`      | 500         | Apache AGE query failure                       | Yes                      |
+| `EMBEDDING_ERROR`        | 500         | Vector embedding generation failure            | Yes                      |
+| `INTERNAL_ERROR`         | 500         | Unhandled server error                         | Yes                      |
+| `PAGINATION_CLAMPED`     | 200         | Requested page size was clamped (warning)      | N/A                      |
+| `OPTIMISTIC_LOCK_FAILED` | 409         | Version mismatch on update                     | Yes                      |
 
 ### Error Response Example
 
@@ -571,17 +622,19 @@ union MutationResult = MutationSuccess | MutationError
 # ─── File: apps/subgraph-core/src/schema.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7",
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
     import: [
-      "@key",
-      "@shareable",
-      "@inaccessible",
-      "@authenticated",
-      "@requiresScopes",
-      "@policy",
-      "@tag",
+      "@key"
+      "@shareable"
+      "@inaccessible"
+      "@authenticated"
+      "@requiresScopes"
+      "@policy"
+      "@tag"
       "@override"
-    ])
+    ]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Tenant
@@ -593,17 +646,29 @@ Each tenant represents an educational institution, organization, or team.
 """
 type Tenant @key(fields: "id") {
   id: UUID!
-  """Human-readable name of the organization"""
+  """
+  Human-readable name of the organization
+  """
   name: String!
-  """URL-friendly unique slug (e.g., "bar-ilan-university")"""
+  """
+  URL-friendly unique slug (e.g., "bar-ilan-university")
+  """
   slug: String!
-  """Current subscription plan"""
+  """
+  Current subscription plan
+  """
   plan: TenantPlan!
-  """Whether the tenant is active (deactivated tenants cannot access the system)"""
+  """
+  Whether the tenant is active (deactivated tenants cannot access the system)
+  """
   isActive: Boolean!
-  """Maximum number of users allowed under current plan"""
+  """
+  Maximum number of users allowed under current plan
+  """
   maxUsers: NonNegativeInt!
-  """Tenant-specific settings and branding"""
+  """
+  Tenant-specific settings and branding
+  """
   settings: TenantSettings
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -641,17 +706,29 @@ Users are synced from Keycloak on first login.
 """
 type User @key(fields: "id") {
   id: UUID!
-  """Email address (unique within tenant)"""
+  """
+  Email address (unique within tenant)
+  """
   email: EmailAddress!
-  """Display name shown in UI and collaboration features"""
+  """
+  Display name shown in UI and collaboration features
+  """
   displayName: String!
-  """URL to avatar image"""
+  """
+  URL to avatar image
+  """
   avatarUrl: URL
-  """Role within the tenant"""
+  """
+  Role within the tenant
+  """
   role: UserRole!
-  """Whether the user can currently access the system"""
+  """
+  Whether the user can currently access the system
+  """
   isActive: Boolean!
-  """User preferences for UI and behavior"""
+  """
+  User preferences for UI and behavior
+  """
   preferences: UserPreferences
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -671,12 +748,18 @@ User UI and localization preferences stored in users.preferences JSONB.
 Updated via updateUserPreferences mutation; locale is propagated to i18next and localStorage.
 """
 type UserPreferences {
-  """BCP 47 locale code (e.g., "en", "es", "zh-CN"). Drives i18n across web and mobile."""
+  """
+  BCP 47 locale code (e.g., "en", "es", "zh-CN"). Drives i18n across web and mobile.
+  """
   locale: String
   theme: ThemePreference
-  """Whether email notifications are enabled"""
+  """
+  Whether email notifications are enabled
+  """
   emailNotifications: Boolean
-  """Whether push notifications are enabled (mobile)"""
+  """
+  Whether push notifications are enabled (mobile)
+  """
   pushNotifications: Boolean
   defaultAnnotationLayer: AnnotationLayer
   notificationsEnabled: Boolean
@@ -705,7 +788,9 @@ type Query {
   """
   me: User! @authenticated
 
-  """Fetch a user by ID within the current tenant"""
+  """
+  Fetch a user by ID within the current tenant
+  """
   user(id: UUID!): User @authenticated
 
   """
@@ -748,37 +833,37 @@ type Mutation {
   Locale change is immediately reflected in AI agent responses and UI language.
   Stored in users.preferences JSONB column.
   """
-  updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
+  updateUserPreferences(input: UpdateUserPreferencesInput!): User!
+    @authenticated
 
   """
   Update a user's role. Requires ORG_ADMIN or SUPER_ADMIN.
   """
-  updateUserRole(
-    userId: UUID!
-    role: UserRole!
-  ): User! @authenticated @requiresScopes(scopes: [["org:users"]])
+  updateUserRole(userId: UUID!, role: UserRole!): User!
+    @authenticated
+    @requiresScopes(scopes: [["org:users"]])
 
   """
   Deactivate a user (soft). Requires ORG_ADMIN.
   Deactivated users cannot log in.
   """
-  deactivateUser(
-    userId: UUID!
-  ): User! @authenticated @requiresScopes(scopes: [["org:users"]])
+  deactivateUser(userId: UUID!): User!
+    @authenticated
+    @requiresScopes(scopes: [["org:users"]])
 
   """
   Reactivate a previously deactivated user.
   """
-  reactivateUser(
-    userId: UUID!
-  ): User! @authenticated @requiresScopes(scopes: [["org:users"]])
+  reactivateUser(userId: UUID!): User!
+    @authenticated
+    @requiresScopes(scopes: [["org:users"]])
 
   """
   Update tenant settings. Requires ORG_ADMIN.
   """
-  updateTenantSettings(
-    input: UpdateTenantSettingsInput!
-  ): Tenant! @authenticated @requiresScopes(scopes: [["org:manage"]])
+  updateTenantSettings(input: UpdateTenantSettingsInput!): Tenant!
+    @authenticated
+    @requiresScopes(scopes: [["org:manage"]])
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -804,7 +889,9 @@ Input for the updateUserPreferences mutation.
 All fields are optional — only provided fields are updated (PATCH semantics).
 """
 input UpdateUserPreferencesInput {
-  """BCP 47 locale code. Must be one of the supported locales (en, zh-CN, hi, es, fr, bn, pt, ru, id)."""
+  """
+  BCP 47 locale code. Must be one of the supported locales (en, zh-CN, hi, es, fr, bn, pt, ru, id).
+  """
   locale: String
   theme: ThemePreference
   emailNotifications: Boolean
@@ -835,11 +922,17 @@ input OntologyFieldDefInput {
 }
 
 input UserFilterInput {
-  """Filter by role"""
+  """
+  Filter by role
+  """
   role: UserRole
-  """Filter by active status"""
+  """
+  Filter by active status
+  """
   isActive: Boolean
-  """Full-text search on displayName and email"""
+  """
+  Full-text search on displayName and email
+  """
   search: String
 }
 
@@ -885,11 +978,19 @@ type UserEdge {
 # ─── File: apps/subgraph-content/src/schema.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7",
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
     import: [
-      "@key", "@shareable", "@external", "@provides",
-      "@requires", "@authenticated", "@requiresScopes", "@tag"
-    ])
+      "@key"
+      "@shareable"
+      "@external"
+      "@provides"
+      "@requires"
+      "@authenticated"
+      "@requiresScopes"
+      "@tag"
+    ]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Entity Stubs (owned by other subgraphs)
@@ -908,7 +1009,9 @@ type Tenant @key(fields: "id", resolvable: false) {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type User {
-  """Courses created by this user (instructors/admins only)"""
+  """
+  Courses created by this user (instructors/admins only)
+  """
   createdCourses(
     first: PositiveInt = 20
     after: Cursor
@@ -929,25 +1032,41 @@ type Course @key(fields: "id") {
   id: UUID!
   title: String!
   description: String
-  """Structured syllabus as a JSON tree"""
+  """
+  Structured syllabus as a JSON tree
+  """
   syllabusJson: JSON
-  """Monotonically increasing version number"""
+  """
+  Monotonically increasing version number
+  """
   version: NonNegativeInt!
-  """Whether the course is visible to students"""
+  """
+  Whether the course is visible to students
+  """
   isPublished: Boolean!
-  """Tags for categorization and search"""
+  """
+  Tags for categorization and search
+  """
   tags: [String!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 
   # ─── Relationships ───
-  """The user who created this course"""
+  """
+  The user who created this course
+  """
   creator: User!
-  """The tenant this course belongs to"""
+  """
+  The tenant this course belongs to
+  """
   tenant: Tenant!
-  """If this course was forked, the original course"""
+  """
+  If this course was forked, the original course
+  """
   forkedFrom: Course
-  """Ordered list of modules in this course"""
+  """
+  Ordered list of modules in this course
+  """
   modules(
     first: PositiveInt = 50
     after: Cursor
@@ -967,14 +1086,18 @@ type Module @key(fields: "id") {
   id: UUID!
   title: String!
   description: String
-  """Position within the course (0-indexed)"""
+  """
+  Position within the course (0-indexed)
+  """
   orderIndex: NonNegativeInt!
   createdAt: DateTime!
   updatedAt: DateTime!
 
   # ─── Relationships ───
   course: Course!
-  """Media assets attached to this module"""
+  """
+  Media assets attached to this module
+  """
   mediaAssets(
     first: PositiveInt = 20
     after: Cursor
@@ -995,35 +1118,61 @@ type MediaAsset @key(fields: "id") {
   type: MediaType!
   title: String!
   description: String
-  """Original filename as uploaded"""
+  """
+  Original filename as uploaded
+  """
   originalFilename: String
-  """MIME type of the original file"""
+  """
+  MIME type of the original file
+  """
   mimeType: String
-  """File size in bytes"""
+  """
+  File size in bytes
+  """
   fileSizeBytes: NonNegativeInt
-  """Duration in seconds (video/audio only)"""
+  """
+  Duration in seconds (video/audio only)
+  """
   durationSeconds: Float
-  """Current transcription status"""
+  """
+  Current transcription status
+  """
   transcriptionStatus: TranscriptionStatus
-  """Presigned URL to the HLS manifest for video playback"""
+  """
+  Presigned URL to the HLS manifest for video playback
+  """
   hlsManifestUrl: URL
-  """Presigned URL to the thumbnail image"""
+  """
+  Presigned URL to the thumbnail image
+  """
   thumbnailUrl: URL
-  """Presigned URL for direct download"""
+  """
+  Presigned URL for direct download
+  """
   downloadUrl: URL
-  """Additional technical metadata"""
+  """
+  Additional technical metadata
+  """
   metadata: MediaMetadata
   createdAt: DateTime!
   updatedAt: DateTime!
 
   # ─── Relationships ───
-  """The user who uploaded this asset"""
+  """
+  The user who uploaded this asset
+  """
   uploader: User
-  """The module this asset belongs to"""
+  """
+  The module this asset belongs to
+  """
   module: Module
-  """Transcription of this asset (if available)"""
+  """
+  Transcription of this asset (if available)
+  """
   transcript: Transcript
-  """Time-aligned transcript segments"""
+  """
+  Time-aligned transcript segments
+  """
   segments(
     first: PositiveInt = 50
     after: Cursor
@@ -1049,25 +1198,34 @@ Generated by Whisper or other speech-to-text models.
 """
 type Transcript @key(fields: "id") {
   id: UUID!
-  """The complete transcription text"""
+  """
+  The complete transcription text
+  """
   fullText: String!
-  """ISO 639-1 language code (e.g., "he", "en")"""
+  """
+  ISO 639-1 language code (e.g., "he", "en")
+  """
   language: String!
-  """Model used for transcription (e.g., "whisper-large-v3")"""
+  """
+  Model used for transcription (e.g., "whisper-large-v3")
+  """
   modelUsed: String
-  """Average confidence score (0-1)"""
+  """
+  Average confidence score (0-1)
+  """
   confidence: UnitFloat
-  """Total word count"""
+  """
+  Total word count
+  """
   wordCount: NonNegativeInt
   createdAt: DateTime!
 
   # ─── Relationships ───
   asset: MediaAsset!
-  """Time-aligned segments of this transcript"""
-  segments(
-    first: PositiveInt = 50
-    after: Cursor
-  ): TranscriptSegmentConnection!
+  """
+  Time-aligned segments of this transcript
+  """
+  segments(first: PositiveInt = 50, after: Cursor): TranscriptSegmentConnection!
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1080,15 +1238,25 @@ Used for video synchronization, search, and knowledge graph anchoring.
 """
 type TranscriptSegment @key(fields: "id") {
   id: UUID!
-  """Start time in seconds from the beginning of the media"""
+  """
+  Start time in seconds from the beginning of the media
+  """
   startTime: Float!
-  """End time in seconds from the beginning of the media"""
+  """
+  End time in seconds from the beginning of the media
+  """
   endTime: Float!
-  """Transcribed text for this segment"""
+  """
+  Transcribed text for this segment
+  """
   text: String!
-  """Speaker name (if speaker diarization was performed)"""
+  """
+  Speaker name (if speaker diarization was performed)
+  """
   speaker: String
-  """Confidence score for this segment (0-1)"""
+  """
+  Confidence score for this segment (0-1)
+  """
   confidence: UnitFloat
   createdAt: DateTime!
 
@@ -1106,13 +1274,21 @@ Lifecycle status of an on-demand content translation.
 Translations are generated asynchronously via NATS JetStream.
 """
 enum TranslationStatus {
-  """Translation has been requested but not yet started"""
+  """
+  Translation has been requested but not yet started
+  """
   PENDING
-  """Translation is currently being generated by the AI service"""
+  """
+  Translation is currently being generated by the AI service
+  """
   PROCESSING
-  """Translation is complete and ready to read"""
+  """
+  Translation is complete and ready to read
+  """
   COMPLETED
-  """Translation generation failed; requestContentTranslation can be retried"""
+  """
+  Translation generation failed; requestContentTranslation can be retried
+  """
   FAILED
 }
 
@@ -1123,23 +1299,41 @@ Cache-first: a COMPLETED translation is returned immediately without re-triggeri
 """
 type ContentTranslation {
   id: UUID!
-  """The source content item being translated"""
+  """
+  The source content item being translated
+  """
   contentItemId: UUID!
-  """BCP 47 locale code of the translation (e.g., "es", "zh-CN")"""
+  """
+  BCP 47 locale code of the translation (e.g., "es", "zh-CN")
+  """
   locale: String!
-  """Translated title (null while PENDING/PROCESSING)"""
+  """
+  Translated title (null while PENDING/PROCESSING)
+  """
   translatedTitle: String
-  """Translated description (null while PENDING/PROCESSING)"""
+  """
+  Translated description (null while PENDING/PROCESSING)
+  """
   translatedDescription: String
-  """Translated AI-generated summary (null while PENDING/PROCESSING)"""
+  """
+  Translated AI-generated summary (null while PENDING/PROCESSING)
+  """
   translatedSummary: String
-  """Translated transcript text (null while PENDING/PROCESSING)"""
+  """
+  Translated transcript text (null while PENDING/PROCESSING)
+  """
   translatedTranscript: String
-  """Quality score from 0.00 to 1.00 (null until COMPLETED)"""
+  """
+  Quality score from 0.00 to 1.00 (null until COMPLETED)
+  """
   qualityScore: Float
-  """AI model used to generate the translation (e.g., "ollama/llama3.2")"""
+  """
+  AI model used to generate the translation (e.g., "ollama/llama3.2")
+  """
   modelUsed: String!
-  """Current translation lifecycle status"""
+  """
+  Current translation lifecycle status
+  """
   status: TranslationStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -1150,7 +1344,9 @@ type ContentTranslation {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Query {
-  """Fetch a single course by ID"""
+  """
+  Fetch a single course by ID
+  """
   course(id: UUID!): Course @authenticated
 
   """
@@ -1166,10 +1362,14 @@ type Query {
     orderBy: CourseOrderByInput
   ): CourseConnection! @authenticated
 
-  """Fetch a single module by ID"""
+  """
+  Fetch a single module by ID
+  """
   module(id: UUID!): Module @authenticated
 
-  """Fetch a single media asset by ID"""
+  """
+  Fetch a single media asset by ID
+  """
   mediaAsset(id: UUID!): MediaAsset @authenticated
 
   """
@@ -1183,14 +1383,18 @@ type Query {
     orderBy: MediaAssetOrderByInput
   ): MediaAssetConnection! @authenticated
 
-  """Fetch transcript segments for a time range within a media asset"""
+  """
+  Fetch transcript segments for a time range within a media asset
+  """
   segmentsForTimeRange(
     assetId: UUID!
     startTime: Float!
     endTime: Float!
   ): [TranscriptSegment!]! @authenticated
 
-  """Full-text search across all transcripts in the current tenant"""
+  """
+  Full-text search across all transcripts in the current tenant
+  """
   searchTranscripts(
     query: String!
     first: PositiveInt = 10
@@ -1203,10 +1407,8 @@ type Query {
   Returns null if no translation has been requested yet.
   Use requestContentTranslation to initiate a new translation.
   """
-  contentTranslation(
-    contentItemId: UUID!
-    locale: String!
-  ): ContentTranslation @authenticated
+  contentTranslation(contentItemId: UUID!, locale: String!): ContentTranslation
+    @authenticated
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1216,43 +1418,70 @@ type Query {
 type Mutation {
   # ─── Courses ───
 
-  """Create a new course. Requires INSTRUCTOR or ORG_ADMIN role."""
+  """
+  Create a new course. Requires INSTRUCTOR or ORG_ADMIN role.
+  """
   createCourse(input: CreateCourseInput!): Course!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Update a course. Only the creator or ORG_ADMIN can update."""
+  """
+  Update a course. Only the creator or ORG_ADMIN can update.
+  """
   updateCourse(id: UUID!, input: UpdateCourseInput!): Course!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Soft-delete a course. Only the creator or ORG_ADMIN can delete."""
+  """
+  Soft-delete a course. Only the creator or ORG_ADMIN can delete.
+  """
   deleteCourse(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Publish or unpublish a course."""
+  """
+  Publish or unpublish a course.
+  """
   toggleCoursePublished(id: UUID!, isPublished: Boolean!): Course!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Fork a course (creates a copy linked to the original)."""
+  """
+  Fork a course (creates a copy linked to the original).
+  """
   forkCourse(courseId: UUID!): Course!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   # ─── Modules ───
 
-  """Add a module to a course."""
+  """
+  Add a module to a course.
+  """
   createModule(input: CreateModuleInput!): Module!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Update a module."""
+  """
+  Update a module.
+  """
   updateModule(id: UUID!, input: UpdateModuleInput!): Module!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Delete a module (cascades to media assets)."""
+  """
+  Delete a module (cascades to media assets).
+  """
   deleteModule(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Reorder modules within a course."""
+  """
+  Reorder modules within a course.
+  """
   reorderModules(courseId: UUID!, moduleOrder: [UUID!]!): [Module!]!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   # ─── Media Assets ───
 
@@ -1261,26 +1490,37 @@ type Mutation {
   The client uploads directly to S3, then calls completeMediaUpload.
   """
   initiateMediaUpload(input: InitiateUploadInput!): UploadTicket!
-    @authenticated @requiresScopes(scopes: [["media:upload"]])
+    @authenticated
+    @requiresScopes(scopes: [["media:upload"]])
     @rateLimit(max: 20, window: "1h")
 
   """
   Mark an upload as complete. Triggers transcoding/transcription pipelines.
   """
   completeMediaUpload(uploadId: UUID!): MediaAsset!
-    @authenticated @requiresScopes(scopes: [["media:upload"]])
+    @authenticated
+    @requiresScopes(scopes: [["media:upload"]])
 
-  """Update media asset metadata."""
+  """
+  Update media asset metadata.
+  """
   updateMediaAsset(id: UUID!, input: UpdateMediaAssetInput!): MediaAsset!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Soft-delete a media asset."""
+  """
+  Soft-delete a media asset.
+  """
   deleteMediaAsset(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
-  """Re-trigger transcription for a media asset."""
+  """
+  Re-trigger transcription for a media asset.
+  """
   retriggerTranscription(assetId: UUID!): MediaAsset!
-    @authenticated @requiresScopes(scopes: [["course:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:write"]])
 
   # ─── Content Translations (i18n Phase B) ───
 
@@ -1293,10 +1533,13 @@ type Mutation {
   """
   requestContentTranslation(
     contentItemId: UUID!
-    """BCP 47 target locale code (must be a supported locale: en, zh-CN, hi, es, fr, bn, pt, ru, id)"""
+    """
+    BCP 47 target locale code (must be a supported locale: en, zh-CN, hi, es, fr, bn, pt, ru, id)
+    """
     locale: String!
   ): ContentTranslation!
-    @authenticated @requiresScopes(scopes: [["course:read"]])
+    @authenticated
+    @requiresScopes(scopes: [["course:read"]])
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1316,7 +1559,9 @@ input UpdateCourseInput {
   description: String
   syllabusJson: JSON
   tags: [String!]
-  """Used for optimistic locking — must match current version"""
+  """
+  Used for optimistic locking — must match current version
+  """
   expectedVersion: NonNegativeInt
 }
 
@@ -1349,13 +1594,21 @@ input UpdateMediaAssetInput {
 }
 
 input CourseFilterInput {
-  """Filter by published status"""
+  """
+  Filter by published status
+  """
   isPublished: Boolean
-  """Filter by creator ID"""
+  """
+  Filter by creator ID
+  """
   creatorId: UUID
-  """Full-text search on title and description"""
+  """
+  Full-text search on title and description
+  """
   search: String
-  """Filter by tags (ANY match)"""
+  """
+  Filter by tags (ANY match)
+  """
   tags: [String!]
 }
 
@@ -1372,13 +1625,21 @@ enum CourseSortField {
 }
 
 input MediaAssetFilterInput {
-  """Filter by media type"""
+  """
+  Filter by media type
+  """
   type: MediaType
-  """Filter by transcription status"""
+  """
+  Filter by transcription status
+  """
   transcriptionStatus: TranscriptionStatus
-  """Filter by module"""
+  """
+  Filter by module
+  """
   moduleId: UUID
-  """Full-text search on title"""
+  """
+  Full-text search on title
+  """
   search: String
 }
 
@@ -1407,11 +1668,17 @@ enum ModuleSortField {
 }
 
 input SegmentFilterInput {
-  """Filter by speaker name"""
+  """
+  Filter by speaker name
+  """
   speaker: String
-  """Full-text search within segment text"""
+  """
+  Full-text search within segment text
+  """
   search: String
-  """Minimum confidence threshold"""
+  """
+  Minimum confidence threshold
+  """
   minConfidence: UnitFloat
 }
 
@@ -1470,13 +1737,21 @@ Returned by initiateMediaUpload. Contains a presigned S3 URL
 for the client to upload the file directly.
 """
 type UploadTicket {
-  """Unique ID for this upload session"""
+  """
+  Unique ID for this upload session
+  """
   uploadId: UUID!
-  """Presigned PUT URL for direct upload to S3"""
+  """
+  Presigned PUT URL for direct upload to S3
+  """
   presignedUrl: URL!
-  """Expiration time of the presigned URL"""
+  """
+  Expiration time of the presigned URL
+  """
   expiresAt: DateTime!
-  """Required headers to include in the PUT request"""
+  """
+  Required headers to include in the PUT request
+  """
   requiredHeaders: JSON
 }
 
@@ -1485,9 +1760,13 @@ type UploadTicket {
 type TranscriptSearchResult {
   segment: TranscriptSegment!
   asset: MediaAsset!
-  """Relevance score"""
+  """
+  Relevance score
+  """
   score: Float!
-  """Highlighted text snippet with <mark> tags"""
+  """
+  Highlighted text snippet with <mark> tags
+  """
   highlightedText: String!
 }
 
@@ -1517,8 +1796,16 @@ type TranscriptSearchResultEdge {
 # ─── File: apps/subgraph-annotation/src/schema.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7",
-    import: ["@key", "@external", "@requires", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: [
+      "@key"
+      "@external"
+      "@requires"
+      "@authenticated"
+      "@requiresScopes"
+    ]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Entity Stubs
@@ -1537,7 +1824,9 @@ type MediaAsset @key(fields: "id", resolvable: false) {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type User {
-  """All annotations created by this user"""
+  """
+  All annotations created by this user
+  """
   annotations(
     first: PositiveInt = 20
     after: Cursor
@@ -1546,14 +1835,18 @@ extend type User {
 }
 
 extend type MediaAsset {
-  """All annotations on this media asset"""
+  """
+  All annotations on this media asset
+  """
   annotations(
     first: PositiveInt = 20
     after: Cursor
     filter: AnnotationFilterInput
   ): AnnotationConnection!
 
-  """Annotations at a specific timestamp (±tolerance seconds)"""
+  """
+  Annotations at a specific timestamp (±tolerance seconds)
+  """
   annotationsAtTimestamp(
     timestamp: Float!
     toleranceSeconds: Float = 2.0
@@ -1574,33 +1867,53 @@ and can be temporally/spatially anchored to media.
 type Annotation @key(fields: "id") {
   id: UUID!
   type: AnnotationType!
-  """Visibility layer"""
+  """
+  Visibility layer
+  """
   layer: AnnotationLayer!
 
   # ─── Content ───
-  """Text content or markdown (for text, link, bookmark types)"""
+  """
+  Text content or markdown (for text, link, bookmark types)
+  """
   content: String
-  """Konva.js sketch data (for sketch type)"""
+  """
+  Konva.js sketch data (for sketch type)
+  """
   sketchData: JSON
 
   # ─── Temporal anchoring ───
-  """Start time in seconds (null for non-temporal annotations)"""
+  """
+  Start time in seconds (null for non-temporal annotations)
+  """
   timestampStart: Float
-  """End time in seconds (null for point annotations)"""
+  """
+  End time in seconds (null for point annotations)
+  """
   timestampEnd: Float
 
   # ─── Spatial anchoring (video frame) ───
-  """Normalized X position (0-1) on the video frame"""
+  """
+  Normalized X position (0-1) on the video frame
+  """
   spatialX: Float
-  """Normalized Y position (0-1) on the video frame"""
+  """
+  Normalized Y position (0-1) on the video frame
+  """
   spatialY: Float
 
   # ─── PDF anchoring ───
-  """Page number (1-indexed) for PDF annotations"""
+  """
+  Page number (1-indexed) for PDF annotations
+  """
   pageNumber: NonNegativeInt
-  """Character offset start for text range selection"""
+  """
+  Character offset start for text range selection
+  """
   textRangeStart: NonNegativeInt
-  """Character offset end for text range selection"""
+  """
+  Character offset end for text range selection
+  """
   textRangeEnd: NonNegativeInt
 
   # ─── Metadata ───
@@ -1609,18 +1922,25 @@ type Annotation @key(fields: "id") {
   updatedAt: DateTime!
 
   # ─── Relationships ───
-  """The user who created this annotation"""
+  """
+  The user who created this annotation
+  """
   author: User!
-  """The media asset this annotation is attached to"""
+  """
+  The media asset this annotation is attached to
+  """
   asset: MediaAsset!
-  """Parent annotation (for reply chains)"""
+  """
+  Parent annotation (for reply chains)
+  """
   parent: Annotation
-  """Replies to this annotation"""
-  replies(
-    first: PositiveInt = 20
-    after: Cursor
-  ): AnnotationConnection!
-  """Agent that created this annotation (if AI-generated)"""
+  """
+  Replies to this annotation
+  """
+  replies(first: PositiveInt = 20, after: Cursor): AnnotationConnection!
+  """
+  Agent that created this annotation (if AI-generated)
+  """
   agentId: UUID
 }
 
@@ -1637,7 +1957,9 @@ type AnnotationMetadata {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Query {
-  """Fetch a single annotation by ID"""
+  """
+  Fetch a single annotation by ID
+  """
   annotation(id: UUID!): Annotation @authenticated
 
   """
@@ -1653,7 +1975,9 @@ type Query {
     orderBy: AnnotationOrderByInput
   ): AnnotationConnection! @authenticated
 
-  """Get annotation thread (all replies to a root annotation)"""
+  """
+  Get annotation thread (all replies to a root annotation)
+  """
   annotationThread(rootId: UUID!): [Annotation!]! @authenticated
 }
 
@@ -1662,9 +1986,10 @@ type Query {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Mutation {
-  """Create a new annotation on a media asset."""
-  createAnnotation(input: CreateAnnotationInput!): Annotation!
-    @authenticated
+  """
+  Create a new annotation on a media asset.
+  """
+  createAnnotation(input: CreateAnnotationInput!): Annotation! @authenticated
 
   """
   Update an annotation. Users can only update their own annotations.
@@ -1677,23 +2002,29 @@ type Mutation {
   Delete an annotation and all its replies (cascade).
   Users can only delete their own annotations.
   """
-  deleteAnnotation(id: UUID!): Boolean!
-    @authenticated
+  deleteAnnotation(id: UUID!): Boolean! @authenticated
 
-  """Pin or unpin an annotation (instructors/admins)."""
+  """
+  Pin or unpin an annotation (instructors/admins).
+  """
   toggleAnnotationPin(id: UUID!, pinned: Boolean!): Annotation!
-    @authenticated @requiresScopes(scopes: [["annotation:write"]])
-
-  """Mark an annotation as resolved."""
-  resolveAnnotation(id: UUID!): Annotation!
     @authenticated
+    @requiresScopes(scopes: [["annotation:write"]])
 
-  """Batch-move annotations between layers (instructor/admin only)."""
+  """
+  Mark an annotation as resolved.
+  """
+  resolveAnnotation(id: UUID!): Annotation! @authenticated
+
+  """
+  Batch-move annotations between layers (instructor/admin only).
+  """
   moveAnnotationsToLayer(
     annotationIds: [UUID!]!
     targetLayer: AnnotationLayer!
   ): [Annotation!]!
-    @authenticated @requiresScopes(scopes: [["annotation:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["annotation:write"]])
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1733,27 +2064,49 @@ input AnnotationMetadataInput {
 }
 
 input AnnotationFilterInput {
-  """Filter by media asset"""
+  """
+  Filter by media asset
+  """
   assetId: UUID
-  """Filter by annotation type"""
+  """
+  Filter by annotation type
+  """
   type: AnnotationType
-  """Filter by layer(s)"""
+  """
+  Filter by layer(s)
+  """
   layers: [AnnotationLayer!]
-  """Filter by author"""
+  """
+  Filter by author
+  """
   userId: UUID
-  """Only show pinned annotations"""
+  """
+  Only show pinned annotations
+  """
   pinnedOnly: Boolean
-  """Only show unresolved annotations"""
+  """
+  Only show unresolved annotations
+  """
   unresolvedOnly: Boolean
-  """Only show root annotations (no replies)"""
+  """
+  Only show root annotations (no replies)
+  """
   rootOnly: Boolean
-  """Full-text search in content"""
+  """
+  Full-text search in content
+  """
   search: String
-  """Filter by time range (start)"""
+  """
+  Filter by time range (start)
+  """
   timestampFrom: Float
-  """Filter by time range (end)"""
+  """
+  Filter by time range (end)
+  """
   timestampTo: Float
-  """Filter by page number (PDF)"""
+  """
+  Filter by page number (PDF)
+  """
   pageNumber: NonNegativeInt
 }
 
@@ -1799,8 +2152,10 @@ type AnnotationEdge {
 # ─── File: apps/subgraph-collaboration/src/schema.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7",
-    import: ["@key", "@external", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@external", "@authenticated", "@requiresScopes"]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Entity Stubs
@@ -1820,25 +2175,41 @@ Used for shared annotation layers, course notes, and real-time editing.
 """
 type CollabDocument @key(fields: "id") {
   id: UUID!
-  """Hocuspocus document name (unique within tenant)"""
+  """
+  Hocuspocus document name (unique within tenant)
+  """
   documentName: String!
-  """Human-readable title"""
+  """
+  Human-readable title
+  """
   title: String
-  """Type of entity this document is associated with"""
+  """
+  Type of entity this document is associated with
+  """
   entityType: String
-  """ID of the associated entity"""
+  """
+  ID of the associated entity
+  """
   entityId: UUID
-  """Number of pending (uncompacted) CRDT updates"""
+  """
+  Number of pending (uncompacted) CRDT updates
+  """
   pendingUpdates: NonNegativeInt!
-  """Whether a compacted state vector snapshot exists"""
+  """
+  Whether a compacted state vector snapshot exists
+  """
   hasSnapshot: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 
   # ─── Relationships ───
-  """Currently active collaboration sessions"""
+  """
+  Currently active collaboration sessions
+  """
   activeSessions: [CollabSession!]!
-  """Number of active collaborators"""
+  """
+  Number of active collaborators
+  """
   activeCollaboratorCount: NonNegativeInt!
 }
 
@@ -1852,28 +2223,46 @@ Ephemeral — cleaned up when the user disconnects.
 """
 type CollabSession @key(fields: "id") {
   id: UUID!
-  """The user participating in this session"""
+  """
+  The user participating in this session
+  """
   user: User!
-  """The document being collaborated on"""
+  """
+  The document being collaborated on
+  """
   document: CollabDocument!
-  """Current cursor position of this collaborator"""
+  """
+  Current cursor position of this collaborator
+  """
   cursorPosition: CursorPosition
-  """When the user connected"""
+  """
+  When the user connected
+  """
   connectedAt: DateTime!
-  """Last heartbeat from the user"""
+  """
+  Last heartbeat from the user
+  """
   lastSeenAt: DateTime!
 }
 
 type CursorPosition {
   x: Float
   y: Float
-  """Video timestamp if collaborating on video annotations"""
+  """
+  Video timestamp if collaborating on video annotations
+  """
   timestamp: Float
-  """PDF page number if collaborating on PDF annotations"""
+  """
+  PDF page number if collaborating on PDF annotations
+  """
   pageNumber: NonNegativeInt
-  """Display name for the cursor label"""
+  """
+  Display name for the cursor label
+  """
   userName: String
-  """Color assigned to this collaborator"""
+  """
+  Color assigned to this collaborator
+  """
   color: String
 }
 
@@ -1882,30 +2271,42 @@ type CursorPosition {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Query {
-  """Fetch a collaborative document by ID"""
+  """
+  Fetch a collaborative document by ID
+  """
   collabDocument(id: UUID!): CollabDocument @authenticated
 
-  """Fetch a collaborative document by its document name"""
+  """
+  Fetch a collaborative document by its document name
+  """
   collabDocumentByName(documentName: String!): CollabDocument @authenticated
 
-  """List collaborative documents for an entity"""
+  """
+  List collaborative documents for an entity
+  """
   collabDocumentsForEntity(
     entityType: String!
     entityId: UUID!
   ): [CollabDocument!]! @authenticated
 
-  """Get the Hocuspocus WebSocket URL for a document"""
-  collabConnectionInfo(
-    documentId: UUID!
-  ): CollabConnectionInfo! @authenticated
+  """
+  Get the Hocuspocus WebSocket URL for a document
+  """
+  collabConnectionInfo(documentId: UUID!): CollabConnectionInfo! @authenticated
 }
 
 type CollabConnectionInfo {
-  """WebSocket URL for Hocuspocus connection"""
+  """
+  WebSocket URL for Hocuspocus connection
+  """
   wsUrl: URL!
-  """Authentication token for the WebSocket connection"""
+  """
+  Authentication token for the WebSocket connection
+  """
   authToken: String!
-  """Document name to use in the Hocuspocus protocol"""
+  """
+  Document name to use in the Hocuspocus protocol
+  """
   documentName: String!
 }
 
@@ -1914,13 +2315,18 @@ type CollabConnectionInfo {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Mutation {
-  """Create a new collaborative document"""
+  """
+  Create a new collaborative document
+  """
   createCollabDocument(input: CreateCollabDocumentInput!): CollabDocument!
     @authenticated
 
-  """Force-compact CRDT updates into a snapshot (admin)"""
+  """
+  Force-compact CRDT updates into a snapshot (admin)
+  """
   compactCollabDocument(documentId: UUID!): CollabDocument!
-    @authenticated @requiresScopes(scopes: [["org:manage"]])
+    @authenticated
+    @requiresScopes(scopes: [["org:manage"]])
 }
 
 input CreateCollabDocumentInput {
@@ -1945,8 +2351,10 @@ input CreateCollabDocumentInput {
 # ─── File: apps/subgraph-agent/src/schema.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7",
-    import: ["@key", "@external", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: ["@key", "@external", "@authenticated", "@requiresScopes"]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Entity Stubs
@@ -1965,14 +2373,18 @@ type Course @key(fields: "id", resolvable: false) {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type User {
-  """Agent definitions created by this user"""
+  """
+  Agent definitions created by this user
+  """
   agentDefinitions(
     first: PositiveInt = 20
     after: Cursor
     filter: AgentDefinitionFilterInput
   ): AgentDefinitionConnection!
 
-  """Agent execution history for this user"""
+  """
+  Agent execution history for this user
+  """
   agentExecutions(
     first: PositiveInt = 20
     after: Cursor
@@ -1993,31 +2405,47 @@ type AgentDefinition @key(fields: "id") {
   id: UUID!
   name: String!
   description: String
-  """Base template type"""
+  """
+  Base template type
+  """
   templateType: AgentTemplate!
-  """Whether this is a system-provided built-in agent"""
+  """
+  Whether this is a system-provided built-in agent
+  """
   isBuiltIn: Boolean!
-  """Whether this agent is visible to all users in the tenant"""
+  """
+  Whether this agent is visible to all users in the tenant
+  """
   isPublic: Boolean!
 
   # ─── Configuration ───
   config: AgentConfig!
 
   # ─── Usage Stats ───
-  """Total number of times this agent has been executed"""
+  """
+  Total number of times this agent has been executed
+  """
   executionCount: NonNegativeInt!
-  """Average execution time in milliseconds"""
+  """
+  Average execution time in milliseconds
+  """
   avgExecutionMs: Float
-  """Last time this agent was executed"""
+  """
+  Last time this agent was executed
+  """
   lastExecutedAt: DateTime
 
   createdAt: DateTime!
   updatedAt: DateTime!
 
   # ─── Relationships ───
-  """User who created this agent definition"""
+  """
+  User who created this agent definition
+  """
   creator: User!
-  """Recent executions of this agent"""
+  """
+  Recent executions of this agent
+  """
   recentExecutions(
     first: PositiveInt = 10
     after: Cursor
@@ -2025,27 +2453,49 @@ type AgentDefinition @key(fields: "id") {
 }
 
 type AgentConfig {
-  """Scope of data the agent can access"""
+  """
+  Scope of data the agent can access
+  """
   dataScope: AgentDataScope!
-  """Custom Cypher query for CUSTOM_QUERY scope"""
+  """
+  Custom Cypher query for CUSTOM_QUERY scope
+  """
   customQuery: String
-  """What triggers the agent"""
+  """
+  What triggers the agent
+  """
   triggerType: AgentTrigger!
-  """How the agent's output is displayed"""
+  """
+  How the agent's output is displayed
+  """
   outputFormat: AgentOutputFormat!
-  """Agent personality description"""
+  """
+  Agent personality description
+  """
   personality: String
-  """Difficulty level for educational agents"""
+  """
+  Difficulty level for educational agents
+  """
   difficulty: AgentDifficulty
-  """Override the default LLM model"""
+  """
+  Override the default LLM model
+  """
   modelOverride: String
-  """Maximum tokens for the response"""
+  """
+  Maximum tokens for the response
+  """
   maxTokens: NonNegativeInt
-  """LLM temperature (0.0-2.0)"""
+  """
+  LLM temperature (0.0-2.0)
+  """
   temperature: Float
-  """Custom system prompt"""
+  """
+  Custom system prompt
+  """
   systemPrompt: String
-  """List of MCP tools this agent can use"""
+  """
+  List of MCP tools this agent can use
+  """
   toolsEnabled: [String!]
 }
 
@@ -2072,34 +2522,54 @@ Contains input, output, performance metrics, and debugging info.
 """
 type AgentExecution @key(fields: "id") {
   id: UUID!
-  """Current status of the execution"""
+  """
+  Current status of the execution
+  """
   status: ExecutionStatus!
 
   # ─── Input / Output ───
-  """Input provided to the agent"""
+  """
+  Input provided to the agent
+  """
   input: JSON!
-  """Agent's output (null while running)"""
+  """
+  Agent's output (null while running)
+  """
   output: JSON
-  """Chain-of-thought reasoning (for debugging)"""
+  """
+  Chain-of-thought reasoning (for debugging)
+  """
   reasoning: String
-  """Error message if execution failed"""
+  """
+  Error message if execution failed
+  """
   errorMessage: String
 
   # ─── Performance ───
-  """Number of tokens consumed"""
+  """
+  Number of tokens consumed
+  """
   tokensUsed: NonNegativeInt
-  """Execution time in milliseconds"""
+  """
+  Execution time in milliseconds
+  """
   executionMs: NonNegativeInt
-  """LLM model used for this execution"""
+  """
+  LLM model used for this execution
+  """
   modelUsed: String
 
   createdAt: DateTime!
   updatedAt: DateTime!
 
   # ─── Relationships ───
-  """The agent definition that was executed"""
+  """
+  The agent definition that was executed
+  """
   agent: AgentDefinition!
-  """The user who triggered the execution"""
+  """
+  The user who triggered the execution
+  """
   user: User!
 }
 
@@ -2108,10 +2578,14 @@ type AgentExecution @key(fields: "id") {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Query {
-  """Fetch an agent definition by ID"""
+  """
+  Fetch an agent definition by ID
+  """
   agentDefinition(id: UUID!): AgentDefinition @authenticated
 
-  """List available agent definitions (includes public + own)"""
+  """
+  List available agent definitions (includes public + own)
+  """
   agentDefinitions(
     first: PositiveInt = 20
     after: Cursor
@@ -2119,13 +2593,19 @@ type Query {
     orderBy: AgentDefinitionOrderByInput
   ): AgentDefinitionConnection! @authenticated
 
-  """List built-in agent templates"""
+  """
+  List built-in agent templates
+  """
   agentTemplates: [AgentTemplateInfo!]! @authenticated
 
-  """Fetch a specific agent execution"""
+  """
+  Fetch a specific agent execution
+  """
   agentExecution(id: UUID!): AgentExecution @authenticated
 
-  """List agent executions with filtering"""
+  """
+  List agent executions with filtering
+  """
   agentExecutions(
     first: PositiveInt = 20
     after: Cursor
@@ -2133,14 +2613,20 @@ type Query {
   ): AgentExecutionConnection! @authenticated
 }
 
-"""Information about a built-in agent template"""
+"""
+Information about a built-in agent template
+"""
 type AgentTemplateInfo {
   templateType: AgentTemplate!
   name: String!
   description: String!
-  """Default configuration for this template"""
+  """
+  Default configuration for this template
+  """
   defaultConfig: AgentConfig!
-  """Icon identifier for UI"""
+  """
+  Icon identifier for UI
+  """
   icon: String!
 }
 
@@ -2149,29 +2635,41 @@ type AgentTemplateInfo {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Mutation {
-  """Create a new agent definition"""
+  """
+  Create a new agent definition
+  """
   createAgentDefinition(input: CreateAgentDefinitionInput!): AgentDefinition!
-    @authenticated @requiresScopes(scopes: [["agent:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["agent:write"]])
 
-  """Update an agent definition (creator only)"""
-  updateAgentDefinition(id: UUID!, input: UpdateAgentDefinitionInput!): AgentDefinition!
-    @authenticated @requiresScopes(scopes: [["agent:write"]])
+  """
+  Update an agent definition (creator only)
+  """
+  updateAgentDefinition(
+    id: UUID!
+    input: UpdateAgentDefinitionInput!
+  ): AgentDefinition! @authenticated @requiresScopes(scopes: [["agent:write"]])
 
-  """Delete an agent definition (creator only, cascades executions)"""
+  """
+  Delete an agent definition (creator only, cascades executions)
+  """
   deleteAgentDefinition(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["agent:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["agent:write"]])
 
   """
   Execute an agent. Returns immediately with QUEUED status.
   Use the agentExecutionUpdated subscription to track progress.
   """
   executeAgent(input: ExecuteAgentInput!): AgentExecution!
-    @authenticated @requiresScopes(scopes: [["agent:execute"]])
+    @authenticated
+    @requiresScopes(scopes: [["agent:execute"]])
     @rateLimit(max: 30, window: "1h")
 
-  """Cancel a running agent execution"""
-  cancelAgentExecution(executionId: UUID!): AgentExecution!
-    @authenticated
+  """
+  Cancel a running agent execution
+  """
+  cancelAgentExecution(executionId: UUID!): AgentExecution! @authenticated
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2209,7 +2707,9 @@ input AgentConfigInput {
 
 input ExecuteAgentInput {
   agentId: UUID!
-  """Context-specific input (e.g., annotation ID, course ID, free-text prompt)"""
+  """
+  Context-specific input (e.g., annotation ID, course ID, free-text prompt)
+  """
   input: JSON!
 }
 
@@ -2280,8 +2780,16 @@ type AgentExecutionEdge {
 # ─── File: apps/subgraph-knowledge/src/schema.graphql ───
 
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7",
-    import: ["@key", "@external", "@requires", "@authenticated", "@requiresScopes"])
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.7"
+    import: [
+      "@key"
+      "@external"
+      "@requires"
+      "@authenticated"
+      "@requiresScopes"
+    ]
+  )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  Entity Stubs
@@ -2304,11 +2812,10 @@ type Annotation @key(fields: "id", resolvable: false) {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 extend type MediaAsset {
-  """Concepts mentioned in this media asset's transcript"""
-  mentionedConcepts(
-    first: PositiveInt = 20
-    after: Cursor
-  ): ConceptConnection!
+  """
+  Concepts mentioned in this media asset's transcript
+  """
+  mentionedConcepts(first: PositiveInt = 20, after: Cursor): ConceptConnection!
 
   """
   Semantic context for a specific timestamp.
@@ -2318,12 +2825,16 @@ extend type MediaAsset {
 }
 
 extend type TranscriptSegment {
-  """Concepts mentioned in this specific segment"""
+  """
+  Concepts mentioned in this specific segment
+  """
   mentionedConcepts: [ConceptMention!]!
 }
 
 extend type Annotation {
-  """Concepts linked to this annotation"""
+  """
+  Concepts linked to this annotation
+  """
   linkedConcepts: [Concept!]!
 }
 
@@ -2338,47 +2849,70 @@ the backbone of the knowledge graph.
 """
 type Concept @key(fields: "id") {
   id: UUID!
-  """Primary label (Hebrew/English)"""
+  """
+  Primary label (Hebrew/English)
+  """
   label: String!
-  """Detailed description of the concept"""
+  """
+  Detailed description of the concept
+  """
   description: String
-  """Alternative names, abbreviations, synonyms"""
+  """
+  Alternative names, abbreviations, synonyms
+  """
   aliases: [String!]!
-  """Academic or knowledge domain (e.g., "Physics", "Talmud")"""
+  """
+  Academic or knowledge domain (e.g., "Physics", "Talmud")
+  """
   domain: String
-  """Confidence: 1.0 = manually created, <1.0 = AI-extracted"""
+  """
+  Confidence: 1.0 = manually created, <1.0 = AI-extracted
+  """
   confidence: UnitFloat!
-  """How this concept was created"""
+  """
+  How this concept was created
+  """
   sourceType: ConceptSourceType!
   createdAt: DateTime!
 
   # ─── Knowledge Graph Relationships ───
-  """Concepts related to this one (with strength scores)"""
+  """
+  Concepts related to this one (with strength scores)
+  """
   relatedConcepts(
     first: PositiveInt = 20
     after: Cursor
     minStrength: UnitFloat
   ): KnowledgeRelationConnection!
 
-  """Concepts that contradict this one"""
+  """
+  Concepts that contradict this one
+  """
   contradictions: [Contradiction!]!
 
-  """Prerequisites for understanding this concept"""
+  """
+  Prerequisites for understanding this concept
+  """
   prerequisites: [PrerequisiteLink!]!
 
-  """Concepts that require this concept as a prerequisite"""
+  """
+  Concepts that require this concept as a prerequisite
+  """
   dependents: [PrerequisiteLink!]!
 
-  """Full prerequisite learning path (up to 5 levels deep)"""
+  """
+  Full prerequisite learning path (up to 5 levels deep)
+  """
   prerequisiteChain: [Concept!]!
 
-  """Media segments where this concept is mentioned"""
-  mentions(
-    first: PositiveInt = 20
-    after: Cursor
-  ): ConceptMentionConnection!
+  """
+  Media segments where this concept is mentioned
+  """
+  mentions(first: PositiveInt = 20, after: Cursor): ConceptMentionConnection!
 
-  """Topic cluster this concept belongs to"""
+  """
+  Topic cluster this concept belongs to
+  """
   topicCluster: TopicCluster
 }
 
@@ -2392,15 +2926,25 @@ enum ConceptSourceType {
 #  Knowledge Graph Edge Types
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-"""A relationship between two concepts"""
+"""
+A relationship between two concepts
+"""
 type KnowledgeRelation {
-  """The related concept"""
+  """
+  The related concept
+  """
   concept: Concept!
-  """Semantic similarity or relationship strength (0-1)"""
+  """
+  Semantic similarity or relationship strength (0-1)
+  """
   strength: UnitFloat!
-  """How the relationship was established"""
+  """
+  How the relationship was established
+  """
   method: RelationMethod!
-  """Human-readable explanation"""
+  """
+  Human-readable explanation
+  """
   evidence: String
 }
 
@@ -2411,19 +2955,33 @@ enum RelationMethod {
   CITATION
 }
 
-"""A contradiction between two concepts"""
+"""
+A contradiction between two concepts
+"""
 type Contradiction {
-  """The contradicting concept"""
+  """
+  The contradicting concept
+  """
   concept: Concept!
-  """Explanation of why they contradict"""
+  """
+  Explanation of why they contradict
+  """
   evidence: String!
-  """Severity of the contradiction"""
+  """
+  Severity of the contradiction
+  """
   severity: ContradictionSeverity!
-  """How the contradiction was detected"""
+  """
+  How the contradiction was detected
+  """
   detectedBy: ContradictionDetector!
-  """Source media asset A"""
+  """
+  Source media asset A
+  """
   sourceAssetA: MediaAsset
-  """Source media asset B"""
+  """
+  Source media asset B
+  """
   sourceAssetB: MediaAsset
 }
 
@@ -2439,11 +2997,17 @@ enum ContradictionDetector {
   AI_INFERENCE
 }
 
-"""A prerequisite relationship between concepts"""
+"""
+A prerequisite relationship between concepts
+"""
 type PrerequisiteLink {
-  """The prerequisite (or dependent) concept"""
+  """
+  The prerequisite (or dependent) concept
+  """
   concept: Concept!
-  """How strongly this is recommended"""
+  """
+  How strongly this is recommended
+  """
   strength: PrerequisiteStrength!
 }
 
@@ -2453,7 +3017,9 @@ enum PrerequisiteStrength {
   OPTIONAL
 }
 
-"""A mention of a concept in a specific transcript segment"""
+"""
+A mention of a concept in a specific transcript segment
+"""
 type ConceptMention {
   concept: Concept!
   segment: TranscriptSegment!
@@ -2463,17 +3029,18 @@ type ConceptMention {
   confidence: UnitFloat!
 }
 
-"""Auto-generated grouping of related concepts"""
+"""
+Auto-generated grouping of related concepts
+"""
 type TopicCluster {
   id: UUID!
   label: String!
   conceptCount: NonNegativeInt!
   coherenceScore: UnitFloat!
-  """Concepts in this cluster"""
-  concepts(
-    first: PositiveInt = 20
-    after: Cursor
-  ): ConceptConnection!
+  """
+  Concepts in this cluster
+  """
+  concepts(first: PositiveInt = 20, after: Cursor): ConceptConnection!
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2486,18 +3053,25 @@ Stored as a vertex in the Apache AGE knowledge graph.
 """
 type Person @key(fields: "id") {
   id: UUID!
-  """Full name of the person"""
+  """
+  Full name of the person
+  """
   name: String!
-  """Role in context (e.g., "Speaker", "Author", "Historical")"""
+  """
+  Role in context (e.g., "Speaker", "Author", "Historical")
+  """
   role: String
-  """External reference URL (e.g., Wikipedia)"""
+  """
+  External reference URL (e.g., Wikipedia)
+  """
   externalUrl: URL
-  """Content this person authored"""
-  authoredSources(
-    first: PositiveInt = 10
-    after: Cursor
-  ): SourceConnection!
-  """Concepts this person is associated with"""
+  """
+  Content this person authored
+  """
+  authoredSources(first: PositiveInt = 10, after: Cursor): SourceConnection!
+  """
+  Concepts this person is associated with
+  """
   relatedConcepts: [Concept!]!
   createdAt: DateTime!
 }
@@ -2512,13 +3086,21 @@ Terms are leaf nodes in the knowledge graph, linked to parent Concepts.
 """
 type Term @key(fields: "id") {
   id: UUID!
-  """Display label of the term"""
+  """
+  Display label of the term
+  """
   label: String!
-  """Knowledge domain (e.g., "Physics", "Talmud")"""
+  """
+  Knowledge domain (e.g., "Physics", "Talmud")
+  """
   domain: String!
-  """Formal definition of the term"""
+  """
+  Formal definition of the term
+  """
   definition: String
-  """Parent concept this term belongs to"""
+  """
+  Parent concept this term belongs to
+  """
   parentConcept: Concept
   createdAt: DateTime!
 }
@@ -2534,25 +3116,38 @@ Concepts via CITES or REFERS_TO edges.
 """
 type Source @key(fields: "id") {
   id: UUID!
-  """Title of the source material"""
+  """
+  Title of the source material
+  """
   title: String!
-  """Type of source"""
+  """
+  Type of source
+  """
   type: SourceType!
-  """External URL (for web resources)"""
+  """
+  External URL (for web resources)
+  """
   externalUrl: URL
-  """Internal media asset (if type is INTERNAL_ASSET)"""
+  """
+  Internal media asset (if type is INTERNAL_ASSET)
+  """
   internalAsset: MediaAsset
-  """ISBN for books"""
+  """
+  ISBN for books
+  """
   isbn: String
-  """DOI for papers"""
+  """
+  DOI for papers
+  """
   doi: String
-  """Person(s) who authored this source"""
+  """
+  Person(s) who authored this source
+  """
   authors: [Person!]!
-  """Concepts cited or referenced in this source"""
-  citedConcepts(
-    first: PositiveInt = 20
-    after: Cursor
-  ): ConceptConnection!
+  """
+  Concepts cited or referenced in this source
+  """
+  citedConcepts(first: PositiveInt = 20, after: Cursor): ConceptConnection!
   createdAt: DateTime!
 }
 
@@ -2574,19 +3169,29 @@ Combines knowledge graph traversal with vector similarity.
 Powers the "Contextual Copilot" sidebar in the video player.
 """
 type SemanticContext {
-  """Concepts being discussed at this timestamp"""
+  """
+  Concepts being discussed at this timestamp
+  """
   activeConcepts: [ConceptWithRelations!]!
-  """Suggested related content from other assets"""
+  """
+  Suggested related content from other assets
+  """
   relatedContent: [RelatedContentSuggestion!]!
-  """Detected contradictions at this point"""
+  """
+  Detected contradictions at this point
+  """
   activeContradictions: [Contradiction!]!
-  """Suggested prerequisite concepts the viewer may need"""
+  """
+  Suggested prerequisite concepts the viewer may need
+  """
   suggestedPrerequisites: [Concept!]!
 }
 
 type ConceptWithRelations {
   concept: Concept!
-  """How this concept connects to other active concepts"""
+  """
+  How this concept connects to other active concepts
+  """
   connections: [ConceptConnection!]!
 }
 
@@ -2597,13 +3202,21 @@ type ConceptConnection {
 }
 
 type RelatedContentSuggestion {
-  """The related media asset"""
+  """
+  The related media asset
+  """
   asset: MediaAsset!
-  """The segment within the asset that is most relevant"""
+  """
+  The segment within the asset that is most relevant
+  """
   segment: TranscriptSegment
-  """Why this content is suggested"""
+  """
+  Why this content is suggested
+  """
   reason: String!
-  """Relevance score"""
+  """
+  Relevance score
+  """
   relevance: UnitFloat!
 }
 
@@ -2616,15 +3229,25 @@ Result of a semantic (vector) search across content.
 Combines pgvector nearest-neighbor search with knowledge graph context.
 """
 type SemanticSearchResult {
-  """The transcript segment that matched"""
+  """
+  The transcript segment that matched
+  """
   segment: TranscriptSegment!
-  """The media asset containing the match"""
+  """
+  The media asset containing the match
+  """
   asset: MediaAsset!
-  """The text that was matched"""
+  """
+  The text that was matched
+  """
   matchedText: String!
-  """Cosine similarity score"""
+  """
+  Cosine similarity score
+  """
   similarity: UnitFloat!
-  """Concepts mentioned in the matched segment"""
+  """
+  Concepts mentioned in the matched segment
+  """
   relatedConcepts: [Concept!]!
 }
 
@@ -2633,10 +3256,14 @@ type SemanticSearchResult {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Query {
-  """Fetch a concept by ID"""
+  """
+  Fetch a concept by ID
+  """
   concept(id: UUID!): Concept @authenticated
 
-  """Search concepts by label, alias, or description"""
+  """
+  Search concepts by label, alias, or description
+  """
   concepts(
     first: PositiveInt = 20
     after: Cursor
@@ -2649,13 +3276,19 @@ type Query {
   Uses pgvector HNSW index for approximate nearest neighbor search.
   """
   semanticSearch(
-    """Natural language query (will be embedded by the server)"""
+    """
+    Natural language query (will be embedded by the server)
+    """
     query: String!
     first: PositiveInt = 10
     after: Cursor
-    """Minimum similarity threshold (0-1)"""
+    """
+    Minimum similarity threshold (0-1)
+    """
     minSimilarity: UnitFloat = 0.7
-    """Limit search to specific asset IDs"""
+    """
+    Limit search to specific asset IDs
+    """
     assetIds: [UUID!]
   ): SemanticSearchResultConnection! @authenticated
 
@@ -2666,30 +3299,38 @@ type Query {
   hybridSearch(
     query: String!
     first: PositiveInt = 10
-    """How many graph hops to follow from vector results"""
+    """
+    How many graph hops to follow from vector results
+    """
     graphDepth: PositiveInt = 2
   ): HybridSearchResultConnection! @authenticated
 
-  """Find concepts related to a given concept (graph traversal)"""
+  """
+  Find concepts related to a given concept (graph traversal)
+  """
   relatedConcepts(
     conceptId: UUID!
-    """Max graph traversal depth"""
+    """
+    Max graph traversal depth
+    """
     maxDepth: PositiveInt = 3
     first: PositiveInt = 50
   ): KnowledgeRelationConnection! @authenticated
 
-  """Find contradictions for a concept"""
-  contradictions(
-    conceptId: UUID!
-  ): [Contradiction!]! @authenticated
+  """
+  Find contradictions for a concept
+  """
+  contradictions(conceptId: UUID!): [Contradiction!]! @authenticated
 
-  """Build a learning path (prerequisite chain) for a concept"""
-  learningPath(
-    conceptId: UUID!
-    maxDepth: PositiveInt = 5
-  ): [Concept!]! @authenticated
+  """
+  Build a learning path (prerequisite chain) for a concept
+  """
+  learningPath(conceptId: UUID!, maxDepth: PositiveInt = 5): [Concept!]!
+    @authenticated
 
-  """List topic clusters"""
+  """
+  List topic clusters
+  """
   topicClusters(
     first: PositiveInt = 20
     after: Cursor
@@ -2697,10 +3338,14 @@ type Query {
 
   # ─── Person queries ───
 
-  """Fetch a person by ID"""
+  """
+  Fetch a person by ID
+  """
   person(id: UUID!): Person @authenticated
 
-  """Search people referenced in the knowledge graph"""
+  """
+  Search people referenced in the knowledge graph
+  """
   people(
     first: PositiveInt = 20
     after: Cursor
@@ -2709,10 +3354,14 @@ type Query {
 
   # ─── Term queries ───
 
-  """Fetch a term by ID"""
+  """
+  Fetch a term by ID
+  """
   term(id: UUID!): Term @authenticated
 
-  """Search domain-specific terms"""
+  """
+  Search domain-specific terms
+  """
   terms(
     first: PositiveInt = 20
     after: Cursor
@@ -2722,10 +3371,14 @@ type Query {
 
   # ─── Source queries ───
 
-  """Fetch a source by ID"""
+  """
+  Fetch a source by ID
+  """
   source(id: UUID!): Source @authenticated
 
-  """Search sources (books, papers, URLs, etc.)"""
+  """
+  Search sources (books, papers, URLs, etc.)
+  """
   sources(
     first: PositiveInt = 20
     after: Cursor
@@ -2739,104 +3392,153 @@ type Query {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Mutation {
-  """Manually create a concept in the knowledge graph"""
+  """
+  Manually create a concept in the knowledge graph
+  """
   createConcept(input: CreateConceptInput!): Concept!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Update a concept's label, description, aliases, or domain"""
+  """
+  Update a concept's label, description, aliases, or domain
+  """
   updateConcept(id: UUID!, input: UpdateConceptInput!): Concept!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Delete a concept and all its edges from the knowledge graph"""
+  """
+  Delete a concept and all its edges from the knowledge graph
+  """
   deleteConcept(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Create a relationship between two concepts"""
+  """
+  Create a relationship between two concepts
+  """
   createRelation(input: CreateRelationInput!): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Remove a relationship between two concepts"""
+  """
+  Remove a relationship between two concepts
+  """
   deleteRelation(
     fromConceptId: UUID!
     toConceptId: UUID!
     relationType: String!
-  ): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+  ): Boolean! @authenticated @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Mark a contradiction between two concepts"""
+  """
+  Mark a contradiction between two concepts
+  """
   createContradiction(input: CreateContradictionInput!): Contradiction!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
   """
   Trigger re-indexing of embeddings for a media asset.
   Used after transcript updates or corrections.
   """
   reindexAssetEmbeddings(assetId: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Review and approve/reject an AI-inferred relationship"""
+  """
+  Review and approve/reject an AI-inferred relationship
+  """
   reviewInferredRelation(
     fromConceptId: UUID!
     toConceptId: UUID!
     approved: Boolean!
-  ): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+  ): Boolean! @authenticated @requiresScopes(scopes: [["knowledge:write"]])
 
   # ─── Person mutations ───
 
-  """Create a person reference in the knowledge graph"""
+  """
+  Create a person reference in the knowledge graph
+  """
   createPerson(input: CreatePersonInput!): Person!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Update a person's details"""
+  """
+  Update a person's details
+  """
   updatePerson(id: UUID!, input: UpdatePersonInput!): Person!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Delete a person from the knowledge graph"""
+  """
+  Delete a person from the knowledge graph
+  """
   deletePerson(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
   # ─── Term mutations ───
 
-  """Create a domain-specific term"""
+  """
+  Create a domain-specific term
+  """
   createTerm(input: CreateTermInput!): Term!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Update a term's details"""
+  """
+  Update a term's details
+  """
   updateTerm(id: UUID!, input: UpdateTermInput!): Term!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Delete a term from the knowledge graph"""
+  """
+  Delete a term from the knowledge graph
+  """
   deleteTerm(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
   # ─── Source mutations ───
 
-  """Create a source reference (book, paper, URL, etc.)"""
+  """
+  Create a source reference (book, paper, URL, etc.)
+  """
   createSource(input: CreateSourceInput!): Source!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Update a source's details"""
+  """
+  Update a source's details
+  """
   updateSource(id: UUID!, input: UpdateSourceInput!): Source!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Delete a source from the knowledge graph"""
+  """
+  Delete a source from the knowledge graph
+  """
   deleteSource(id: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Link a person as author of a source (AUTHORED_BY edge)"""
+  """
+  Link a person as author of a source (AUTHORED_BY edge)
+  """
   linkAuthorToSource(personId: UUID!, sourceId: UUID!): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+    @authenticated
+    @requiresScopes(scopes: [["knowledge:write"]])
 
-  """Link a source to a concept (CITES edge)"""
+  """
+  Link a source to a concept (CITES edge)
+  """
   linkSourceToConcept(
     sourceId: UUID!
     conceptId: UUID!
     page: Int
     timestamp: Float
     context: String
-  ): Boolean!
-    @authenticated @requiresScopes(scopes: [["knowledge:write"]])
+  ): Boolean! @authenticated @requiresScopes(scopes: [["knowledge:write"]])
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2870,25 +3572,45 @@ All relationship/edge types in the Apache AGE knowledge graph.
 Maps directly to edge labels defined in the graph ontology.
 """
 enum RelationType {
-  """Semantic similarity or co-occurrence relationship"""
+  """
+  Semantic similarity or co-occurrence relationship
+  """
   RELATED_TO
-  """Concept A is a prerequisite for understanding Concept B"""
+  """
+  Concept A is a prerequisite for understanding Concept B
+  """
   PREREQUISITE_OF
-  """Concept B was derived from Concept A"""
+  """
+  Concept B was derived from Concept A
+  """
   DERIVED_FROM
-  """Source cites a concept (with optional page/timestamp)"""
+  """
+  Source cites a concept (with optional page/timestamp)
+  """
   CITES
-  """Term/Concept belongs to a TopicCluster"""
+  """
+  Term/Concept belongs to a TopicCluster
+  """
   BELONGS_TO
-  """A transcript segment mentions a concept"""
+  """
+  A transcript segment mentions a concept
+  """
   MENTIONS
-  """A source or concept refers to another entity"""
+  """
+  A source or concept refers to another entity
+  """
   REFERS_TO
-  """Two concepts contradict each other"""
+  """
+  Two concepts contradict each other
+  """
   CONTRADICTS
-  """A source was authored by a person"""
+  """
+  A source was authored by a person
+  """
   AUTHORED_BY
-  """AI-inferred relationship (pending review)"""
+  """
+  AI-inferred relationship (pending review)
+  """
   INFERRED_RELATED
 }
 
@@ -2902,13 +3624,21 @@ input CreateContradictionInput {
 }
 
 input ConceptFilterInput {
-  """Full-text search on label, aliases, and description"""
+  """
+  Full-text search on label, aliases, and description
+  """
   search: String
-  """Filter by domain"""
+  """
+  Filter by domain
+  """
   domain: String
-  """Filter by source type"""
+  """
+  Filter by source type
+  """
   sourceType: ConceptSourceType
-  """Minimum confidence threshold"""
+  """
+  Minimum confidence threshold
+  """
   minConfidence: UnitFloat
 }
 
@@ -2972,16 +3702,24 @@ type SemanticSearchResultEdge {
   cursor: Cursor!
 }
 
-"""Hybrid search result combining vector similarity with graph context"""
+"""
+Hybrid search result combining vector similarity with graph context
+"""
 type HybridSearchResult {
-  """Vector search result"""
+  """
+  Vector search result
+  """
   segment: TranscriptSegment!
   asset: MediaAsset!
   matchedText: String!
   similarity: UnitFloat!
-  """Additional context from knowledge graph traversal"""
+  """
+  Additional context from knowledge graph traversal
+  """
   graphContext: [ConceptWithRelations!]!
-  """Combined relevance score (vector + graph)"""
+  """
+  Combined relevance score (vector + graph)
+  """
   combinedScore: Float!
 }
 
@@ -3027,7 +3765,9 @@ input CreateTermInput {
   label: String!
   domain: String!
   definition: String
-  """Link to a parent concept"""
+  """
+  Link to a parent concept
+  """
   parentConceptId: UUID
 }
 
@@ -3042,7 +3782,9 @@ input CreateSourceInput {
   title: String!
   type: SourceType!
   externalUrl: URL
-  """Link to an existing internal media asset"""
+  """
+  Link to an existing internal media asset
+  """
   internalAssetId: UUID
   isbn: String
   doi: String
@@ -3143,11 +3885,17 @@ type Subscription {
 }
 
 type AnnotationChangeEvent {
-  """Type of change"""
+  """
+  Type of change
+  """
   changeType: ChangeType!
-  """The annotation that changed (null if deleted)"""
+  """
+  The annotation that changed (null if deleted)
+  """
   annotation: Annotation
-  """ID of the deleted annotation (only for DELETE)"""
+  """
+  ID of the deleted annotation (only for DELETE)
+  """
   deletedAnnotationId: UUID
 }
 
@@ -3167,9 +3915,7 @@ type Subscription {
   Fired when collaborators join/leave or update cursor position.
   Used for showing live presence indicators.
   """
-  collaboratorPresenceChanged(
-    documentId: UUID!
-  ): PresenceEvent! @authenticated
+  collaboratorPresenceChanged(documentId: UUID!): PresenceEvent! @authenticated
 }
 
 type PresenceEvent {
@@ -3195,26 +3941,30 @@ type Subscription {
   Stream updates from QUEUED → RUNNING → COMPLETED/FAILED.
   Also streams partial output during RUNNING state.
   """
-  agentExecutionUpdated(
-    executionId: UUID!
-  ): AgentExecution! @authenticated
+  agentExecutionUpdated(executionId: UUID!): AgentExecution! @authenticated
 
   """
   Stream the agent's response tokens as they're generated.
   Enables showing the agent's response character by character.
   """
-  agentResponseStream(
-    executionId: UUID!
-  ): AgentStreamChunk! @authenticated
+  agentResponseStream(executionId: UUID!): AgentStreamChunk! @authenticated
 }
 
-"""A chunk of the agent's streaming response"""
+"""
+A chunk of the agent's streaming response
+"""
 type AgentStreamChunk {
-  """The text chunk"""
+  """
+  The text chunk
+  """
   text: String!
-  """Whether this is the final chunk"""
+  """
+  Whether this is the final chunk
+  """
   done: Boolean!
-  """Running token count"""
+  """
+  Running token count
+  """
   tokensSoFar: NonNegativeInt!
 }
 
@@ -3228,23 +3978,21 @@ type Subscription {
   Fired when new concepts are extracted from content
   (e.g., after transcription completes and NLP pipeline runs).
   """
-  conceptsExtracted(
-    assetId: UUID!
-  ): [Concept!]! @authenticated
+  conceptsExtracted(assetId: UUID!): [Concept!]! @authenticated
 }
 ```
 
 ### NATS Subject Mapping
 
-| Subscription | NATS Subject Pattern | Publisher |
-|-------------|---------------------|-----------|
-| `transcriptionStatusChanged` | `edusphere.{tenant_id}.media.{asset_id}.transcription.status` | Media Worker |
-| `transcriptSegmentAdded` | `edusphere.{tenant_id}.media.{asset_id}.segment.added` | Transcription Worker |
-| `annotationChanged` | `edusphere.{tenant_id}.annotation.{asset_id}.changed` | Annotation Service |
-| `collaboratorPresenceChanged` | `edusphere.{tenant_id}.collab.{document_id}.presence` | Hocuspocus Server |
-| `agentExecutionUpdated` | `edusphere.{tenant_id}.agent.execution.{execution_id}.updated` | Agent Runner |
-| `agentResponseStream` | `edusphere.{tenant_id}.agent.execution.{execution_id}.stream` | Agent Runner |
-| `conceptsExtracted` | `edusphere.{tenant_id}.knowledge.{asset_id}.concepts.extracted` | NLP Pipeline |
+| Subscription                  | NATS Subject Pattern                                            | Publisher            |
+| ----------------------------- | --------------------------------------------------------------- | -------------------- |
+| `transcriptionStatusChanged`  | `edusphere.{tenant_id}.media.{asset_id}.transcription.status`   | Media Worker         |
+| `transcriptSegmentAdded`      | `edusphere.{tenant_id}.media.{asset_id}.segment.added`          | Transcription Worker |
+| `annotationChanged`           | `edusphere.{tenant_id}.annotation.{asset_id}.changed`           | Annotation Service   |
+| `collaboratorPresenceChanged` | `edusphere.{tenant_id}.collab.{document_id}.presence`           | Hocuspocus Server    |
+| `agentExecutionUpdated`       | `edusphere.{tenant_id}.agent.execution.{execution_id}.updated`  | Agent Runner         |
+| `agentResponseStream`         | `edusphere.{tenant_id}.agent.execution.{execution_id}.stream`   | Agent Runner         |
+| `conceptsExtracted`           | `edusphere.{tenant_id}.knowledge.{asset_id}.concepts.extracted` | NLP Pipeline         |
 
 ---
 
@@ -3282,12 +4030,12 @@ File uploads follow the **two-phase upload pattern**:
 
 **Max file sizes per plan:**
 
-| Plan | Max File Size | Max Total Storage |
-|------|-------------|-------------------|
-| Free | 100 MB | 1 GB |
-| Starter | 500 MB | 25 GB |
-| Professional | 2 GB | 100 GB |
-| Enterprise | 10 GB | Unlimited |
+| Plan         | Max File Size | Max Total Storage |
+| ------------ | ------------- | ----------------- |
+| Free         | 100 MB        | 1 GB              |
+| Starter      | 500 MB        | 25 GB             |
+| Professional | 2 GB          | 100 GB            |
+| Enterprise   | 10 GB         | Unlimited         |
 
 ---
 
@@ -3336,7 +4084,7 @@ export const gatewayConfig = defineConfig({
     ],
     // Claims are extracted and propagated as headers to subgraphs
     forward: {
-      payload: true,        // Forward full JWT payload
+      payload: true, // Forward full JWT payload
       extensions: true,
     },
   },
@@ -3344,7 +4092,7 @@ export const gatewayConfig = defineConfig({
   // Subscription support (WebSocket passthrough)
   subscriptions: {
     enabled: true,
-    protocol: 'ws',         // graphql-ws protocol
+    protocol: 'ws', // graphql-ws protocol
     path: '/ws',
   },
 
@@ -3356,7 +4104,8 @@ export const gatewayConfig = defineConfig({
         'x-tenant-id': request.headers.get('x-tenant-id') ?? '',
         'x-user-id': request.headers.get('x-user-id') ?? '',
         'x-user-role': request.headers.get('x-user-role') ?? '',
-        'x-request-id': request.headers.get('x-request-id') ?? crypto.randomUUID(),
+        'x-request-id':
+          request.headers.get('x-request-id') ?? crypto.randomUUID(),
         'x-correlation-id': request.headers.get('x-correlation-id') ?? '',
         'x-gateway-version': '1.0.0',
       };
@@ -3416,7 +4165,10 @@ export const gatewayConfig = defineConfig({
 
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@graphql-yoga/nestjs';
-import { YogaFederationDriver, YogaFederationDriverConfig } from '@graphql-yoga/nestjs/federation';
+import {
+  YogaFederationDriver,
+  YogaFederationDriverConfig,
+} from '@graphql-yoga/nestjs/federation';
 
 @Module({
   imports: [
@@ -3504,18 +4256,18 @@ subgraphs:
 
 ### Breaking Change Policy
 
-| Change Type | Allowed? | Process |
-|-------------|----------|---------|
-| Add field to type | ✅ Always | PR review |
-| Add optional argument | ✅ Always | PR review |
-| Add new type/enum value | ✅ Always | PR review |
-| Add required argument | ⚠️ With default | PR + migration guide |
-| Rename field | ❌ Never | Add new field, deprecate old |
-| Remove field | ❌ Never (immediately) | Deprecate → 90-day sunset |
-| Change field type | ❌ Never | Add new field, deprecate old |
-| Remove enum value | ❌ Never (immediately) | Deprecate → 90-day sunset |
-| Change nullability (nullable → non-null) | ❌ Output fields | PR review for input fields |
-| Change nullability (non-null → nullable) | ✅ Output fields | PR review |
+| Change Type                              | Allowed?               | Process                      |
+| ---------------------------------------- | ---------------------- | ---------------------------- |
+| Add field to type                        | ✅ Always              | PR review                    |
+| Add optional argument                    | ✅ Always              | PR review                    |
+| Add new type/enum value                  | ✅ Always              | PR review                    |
+| Add required argument                    | ⚠️ With default        | PR + migration guide         |
+| Rename field                             | ❌ Never               | Add new field, deprecate old |
+| Remove field                             | ❌ Never (immediately) | Deprecate → 90-day sunset    |
+| Change field type                        | ❌ Never               | Add new field, deprecate old |
+| Remove enum value                        | ❌ Never (immediately) | Deprecate → 90-day sunset    |
+| Change nullability (nullable → non-null) | ❌ Output fields       | PR review for input fields   |
+| Change nullability (non-null → nullable) | ✅ Output fields       | PR review                    |
 
 ### Deprecation Lifecycle
 
@@ -3529,20 +4281,20 @@ subgraphs:
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| Types | PascalCase | `MediaAsset`, `AgentExecution` |
-| Fields | camelCase | `createdAt`, `syllabusJson` |
-| Enums | UPPER_SNAKE_CASE | `QUIZ_MASTER`, `AI_GENERATED` |
-| Enum types | PascalCase | `AnnotationLayer`, `MediaType` |
-| Input types | PascalCase + `Input` suffix | `CreateCourseInput` |
-| Filter inputs | PascalCase + `FilterInput` suffix | `CourseFilterInput` |
-| Connection types | PascalCase + `Connection` suffix | `CourseConnection` |
-| Edge types | PascalCase + `Edge` suffix | `CourseEdge` |
-| Mutations | camelCase verb+noun | `createCourse`, `toggleCoursePublished` |
-| Queries (single) | camelCase noun | `course`, `user` |
-| Queries (list) | camelCase plural noun | `courses`, `users` |
-| Subscriptions | camelCase event description | `annotationChanged`, `agentResponseStream` |
+| Element          | Convention                        | Example                                    |
+| ---------------- | --------------------------------- | ------------------------------------------ |
+| Types            | PascalCase                        | `MediaAsset`, `AgentExecution`             |
+| Fields           | camelCase                         | `createdAt`, `syllabusJson`                |
+| Enums            | UPPER_SNAKE_CASE                  | `QUIZ_MASTER`, `AI_GENERATED`              |
+| Enum types       | PascalCase                        | `AnnotationLayer`, `MediaType`             |
+| Input types      | PascalCase + `Input` suffix       | `CreateCourseInput`                        |
+| Filter inputs    | PascalCase + `FilterInput` suffix | `CourseFilterInput`                        |
+| Connection types | PascalCase + `Connection` suffix  | `CourseConnection`                         |
+| Edge types       | PascalCase + `Edge` suffix        | `CourseEdge`                               |
+| Mutations        | camelCase verb+noun               | `createCourse`, `toggleCoursePublished`    |
+| Queries (single) | camelCase noun                    | `course`, `user`                           |
+| Queries (list)   | camelCase plural noun             | `courses`, `users`                         |
+| Subscriptions    | camelCase event description       | `annotationChanged`, `agentResponseStream` |
 
 ---
 
@@ -3668,7 +4420,10 @@ query CoursePlayerView($courseId: UUID!, $assetId: UUID!, $timestamp: Float!) {
         }
       }
       activeContradictions {
-        concept { id label }
+        concept {
+          id
+          label
+        }
         evidence
         severity
       }
@@ -3685,10 +4440,12 @@ query CoursePlayerView($courseId: UUID!, $assetId: UUID!, $timestamp: Float!) {
 
 ```graphql
 mutation RunChavruta($agentId: UUID!, $annotationId: UUID!) {
-  executeAgent(input: {
-    agentId: $agentId
-    input: { annotationId: $annotationId, mode: "debate" }
-  }) {
+  executeAgent(
+    input: {
+      agentId: $agentId
+      input: { annotationId: $annotationId, mode: "debate" }
+    }
+  ) {
     id
     status
   }
@@ -3732,7 +4489,10 @@ query SmartSearch($query: String!) {
             domain
           }
           connections {
-            relatedConcept { id label }
+            relatedConcept {
+              id
+              label
+            }
             relationType
             strength
           }
@@ -3769,17 +4529,11 @@ const config: CodegenConfig = {
     'apps/subgraph-knowledge/src/schema.graphql',
     'packages/graphql-shared/src/**/*.graphql',
   ],
-  documents: [
-    'apps/web/src/**/*.graphql',
-    'apps/mobile/src/**/*.graphql',
-  ],
+  documents: ['apps/web/src/**/*.graphql', 'apps/mobile/src/**/*.graphql'],
   generates: {
     // ─── Shared types for all packages ───
     'packages/graphql-types/src/generated/types.ts': {
-      plugins: [
-        'typescript',
-        'typescript-operations',
-      ],
+      plugins: ['typescript', 'typescript-operations'],
       config: {
         scalars: {
           UUID: 'string',
@@ -3808,7 +4562,7 @@ const config: CodegenConfig = {
       plugins: [
         'typescript',
         'typescript-operations',
-        'typescript-react-query',       // TanStack Query hooks
+        'typescript-react-query', // TanStack Query hooks
       ],
       config: {
         fetcher: {
@@ -3894,114 +4648,114 @@ hive schema:check \
 
 ### Queries (44 total)
 
-| Subgraph | Query | Auth |
-|----------|-------|------|
-| Core | `me` | ✅ |
-| Core | `user(id)` | ✅ |
-| Core | `users(filter, orderBy, pagination)` | ✅ |
-| Core | `currentTenant` | ✅ |
-| Core | `tenantBySlug(slug)` | Public |
-| Content | `course(id)` | ✅ |
-| Content | `courses(filter, orderBy, pagination)` | ✅ |
-| Content | `module(id)` | ✅ |
-| Content | `mediaAsset(id)` | ✅ |
-| Content | `mediaAssets(filter, orderBy, pagination)` | ✅ |
-| Content | `segmentsForTimeRange(assetId, start, end)` | ✅ |
-| Content | `searchTranscripts(query, pagination)` | ✅ |
-| Annotation | `annotation(id)` | ✅ |
-| Annotation | `annotations(filter, orderBy, pagination)` | ✅ |
-| Annotation | `annotationThread(rootId)` | ✅ |
-| Collaboration | `collabDocument(id)` | ✅ |
-| Collaboration | `collabDocumentByName(name)` | ✅ |
-| Collaboration | `collabDocumentsForEntity(type, id)` | ✅ |
-| Collaboration | `collabConnectionInfo(docId)` | ✅ |
-| Agent | `agentDefinition(id)` | ✅ |
-| Agent | `agentDefinitions(filter, orderBy, pagination)` | ✅ |
-| Agent | `agentTemplates` | ✅ |
-| Agent | `agentExecution(id)` | ✅ |
-| Agent | `agentExecutions(filter, pagination)` | ✅ |
-| Knowledge | `concept(id)` | ✅ |
-| Knowledge | `concepts(filter, orderBy, pagination)` | ✅ |
-| Knowledge | `semanticSearch(query, pagination)` | ✅ |
-| Knowledge | `hybridSearch(query, graphDepth)` | ✅ |
-| Knowledge | `relatedConcepts(conceptId, maxDepth)` | ✅ |
-| Knowledge | `contradictions(conceptId)` | ✅ |
-| Knowledge | `learningPath(conceptId, maxDepth)` | ✅ |
-| Knowledge | `topicClusters(pagination)` | ✅ |
-| Knowledge | `person(id)` | ✅ |
-| Knowledge | `people(search, pagination)` | ✅ |
-| Knowledge | `term(id)` | ✅ |
-| Knowledge | `terms(domain, search, pagination)` | ✅ |
-| Knowledge | `source(id)` | ✅ |
-| Knowledge | `sources(type, search, pagination)` | ✅ |
+| Subgraph      | Query                                           | Auth   |
+| ------------- | ----------------------------------------------- | ------ |
+| Core          | `me`                                            | ✅     |
+| Core          | `user(id)`                                      | ✅     |
+| Core          | `users(filter, orderBy, pagination)`            | ✅     |
+| Core          | `currentTenant`                                 | ✅     |
+| Core          | `tenantBySlug(slug)`                            | Public |
+| Content       | `course(id)`                                    | ✅     |
+| Content       | `courses(filter, orderBy, pagination)`          | ✅     |
+| Content       | `module(id)`                                    | ✅     |
+| Content       | `mediaAsset(id)`                                | ✅     |
+| Content       | `mediaAssets(filter, orderBy, pagination)`      | ✅     |
+| Content       | `segmentsForTimeRange(assetId, start, end)`     | ✅     |
+| Content       | `searchTranscripts(query, pagination)`          | ✅     |
+| Annotation    | `annotation(id)`                                | ✅     |
+| Annotation    | `annotations(filter, orderBy, pagination)`      | ✅     |
+| Annotation    | `annotationThread(rootId)`                      | ✅     |
+| Collaboration | `collabDocument(id)`                            | ✅     |
+| Collaboration | `collabDocumentByName(name)`                    | ✅     |
+| Collaboration | `collabDocumentsForEntity(type, id)`            | ✅     |
+| Collaboration | `collabConnectionInfo(docId)`                   | ✅     |
+| Agent         | `agentDefinition(id)`                           | ✅     |
+| Agent         | `agentDefinitions(filter, orderBy, pagination)` | ✅     |
+| Agent         | `agentTemplates`                                | ✅     |
+| Agent         | `agentExecution(id)`                            | ✅     |
+| Agent         | `agentExecutions(filter, pagination)`           | ✅     |
+| Knowledge     | `concept(id)`                                   | ✅     |
+| Knowledge     | `concepts(filter, orderBy, pagination)`         | ✅     |
+| Knowledge     | `semanticSearch(query, pagination)`             | ✅     |
+| Knowledge     | `hybridSearch(query, graphDepth)`               | ✅     |
+| Knowledge     | `relatedConcepts(conceptId, maxDepth)`          | ✅     |
+| Knowledge     | `contradictions(conceptId)`                     | ✅     |
+| Knowledge     | `learningPath(conceptId, maxDepth)`             | ✅     |
+| Knowledge     | `topicClusters(pagination)`                     | ✅     |
+| Knowledge     | `person(id)`                                    | ✅     |
+| Knowledge     | `people(search, pagination)`                    | ✅     |
+| Knowledge     | `term(id)`                                      | ✅     |
+| Knowledge     | `terms(domain, search, pagination)`             | ✅     |
+| Knowledge     | `source(id)`                                    | ✅     |
+| Knowledge     | `sources(type, search, pagination)`             | ✅     |
 
 ### Mutations (44 total)
 
-| Subgraph | Mutation | Required Scope |
-|----------|---------|----------------|
-| Core | `updateMyProfile` | authenticated |
-| Core | `updateUserRole` | `org:users` |
-| Core | `deactivateUser` | `org:users` |
-| Core | `reactivateUser` | `org:users` |
-| Core | `updateTenantSettings` | `org:manage` |
-| Content | `createCourse` | `course:write` |
-| Content | `updateCourse` | `course:write` |
-| Content | `deleteCourse` | `course:write` |
-| Content | `toggleCoursePublished` | `course:write` |
-| Content | `forkCourse` | `course:write` |
-| Content | `createModule` | `course:write` |
-| Content | `updateModule` | `course:write` |
-| Content | `deleteModule` | `course:write` |
-| Content | `reorderModules` | `course:write` |
-| Content | `initiateMediaUpload` | `media:upload` |
-| Content | `completeMediaUpload` | `media:upload` |
-| Content | `updateMediaAsset` | `course:write` |
-| Content | `deleteMediaAsset` | `course:write` |
-| Content | `retriggerTranscription` | `course:write` |
-| Annotation | `createAnnotation` | authenticated |
-| Annotation | `updateAnnotation` | authenticated (owner) |
-| Annotation | `deleteAnnotation` | authenticated (owner) |
-| Annotation | `toggleAnnotationPin` | `annotation:write` |
-| Annotation | `resolveAnnotation` | authenticated |
-| Annotation | `moveAnnotationsToLayer` | `annotation:write` |
-| Collaboration | `createCollabDocument` | authenticated |
-| Collaboration | `compactCollabDocument` | `org:manage` |
-| Agent | `createAgentDefinition` | `agent:write` |
-| Agent | `updateAgentDefinition` | `agent:write` (owner) |
-| Agent | `deleteAgentDefinition` | `agent:write` (owner) |
-| Agent | `executeAgent` | `agent:execute` |
-| Agent | `cancelAgentExecution` | authenticated |
-| Knowledge | `createConcept` | `knowledge:write` |
-| Knowledge | `updateConcept` | `knowledge:write` |
-| Knowledge | `deleteConcept` | `knowledge:write` |
-| Knowledge | `createRelation` | `knowledge:write` |
-| Knowledge | `deleteRelation` | `knowledge:write` |
-| Knowledge | `createContradiction` | `knowledge:write` |
-| Knowledge | `reindexAssetEmbeddings` | `knowledge:write` |
-| Knowledge | `reviewInferredRelation` | `knowledge:write` |
-| Knowledge | `createPerson` | `knowledge:write` |
-| Knowledge | `updatePerson` | `knowledge:write` |
-| Knowledge | `deletePerson` | `knowledge:write` |
-| Knowledge | `createTerm` | `knowledge:write` |
-| Knowledge | `updateTerm` | `knowledge:write` |
-| Knowledge | `deleteTerm` | `knowledge:write` |
-| Knowledge | `createSource` | `knowledge:write` |
-| Knowledge | `updateSource` | `knowledge:write` |
-| Knowledge | `deleteSource` | `knowledge:write` |
-| Knowledge | `linkAuthorToSource` | `knowledge:write` |
-| Knowledge | `linkSourceToConcept` | `knowledge:write` |
+| Subgraph      | Mutation                 | Required Scope        |
+| ------------- | ------------------------ | --------------------- |
+| Core          | `updateMyProfile`        | authenticated         |
+| Core          | `updateUserRole`         | `org:users`           |
+| Core          | `deactivateUser`         | `org:users`           |
+| Core          | `reactivateUser`         | `org:users`           |
+| Core          | `updateTenantSettings`   | `org:manage`          |
+| Content       | `createCourse`           | `course:write`        |
+| Content       | `updateCourse`           | `course:write`        |
+| Content       | `deleteCourse`           | `course:write`        |
+| Content       | `toggleCoursePublished`  | `course:write`        |
+| Content       | `forkCourse`             | `course:write`        |
+| Content       | `createModule`           | `course:write`        |
+| Content       | `updateModule`           | `course:write`        |
+| Content       | `deleteModule`           | `course:write`        |
+| Content       | `reorderModules`         | `course:write`        |
+| Content       | `initiateMediaUpload`    | `media:upload`        |
+| Content       | `completeMediaUpload`    | `media:upload`        |
+| Content       | `updateMediaAsset`       | `course:write`        |
+| Content       | `deleteMediaAsset`       | `course:write`        |
+| Content       | `retriggerTranscription` | `course:write`        |
+| Annotation    | `createAnnotation`       | authenticated         |
+| Annotation    | `updateAnnotation`       | authenticated (owner) |
+| Annotation    | `deleteAnnotation`       | authenticated (owner) |
+| Annotation    | `toggleAnnotationPin`    | `annotation:write`    |
+| Annotation    | `resolveAnnotation`      | authenticated         |
+| Annotation    | `moveAnnotationsToLayer` | `annotation:write`    |
+| Collaboration | `createCollabDocument`   | authenticated         |
+| Collaboration | `compactCollabDocument`  | `org:manage`          |
+| Agent         | `createAgentDefinition`  | `agent:write`         |
+| Agent         | `updateAgentDefinition`  | `agent:write` (owner) |
+| Agent         | `deleteAgentDefinition`  | `agent:write` (owner) |
+| Agent         | `executeAgent`           | `agent:execute`       |
+| Agent         | `cancelAgentExecution`   | authenticated         |
+| Knowledge     | `createConcept`          | `knowledge:write`     |
+| Knowledge     | `updateConcept`          | `knowledge:write`     |
+| Knowledge     | `deleteConcept`          | `knowledge:write`     |
+| Knowledge     | `createRelation`         | `knowledge:write`     |
+| Knowledge     | `deleteRelation`         | `knowledge:write`     |
+| Knowledge     | `createContradiction`    | `knowledge:write`     |
+| Knowledge     | `reindexAssetEmbeddings` | `knowledge:write`     |
+| Knowledge     | `reviewInferredRelation` | `knowledge:write`     |
+| Knowledge     | `createPerson`           | `knowledge:write`     |
+| Knowledge     | `updatePerson`           | `knowledge:write`     |
+| Knowledge     | `deletePerson`           | `knowledge:write`     |
+| Knowledge     | `createTerm`             | `knowledge:write`     |
+| Knowledge     | `updateTerm`             | `knowledge:write`     |
+| Knowledge     | `deleteTerm`             | `knowledge:write`     |
+| Knowledge     | `createSource`           | `knowledge:write`     |
+| Knowledge     | `updateSource`           | `knowledge:write`     |
+| Knowledge     | `deleteSource`           | `knowledge:write`     |
+| Knowledge     | `linkAuthorToSource`     | `knowledge:write`     |
+| Knowledge     | `linkSourceToConcept`    | `knowledge:write`     |
 
 ### Subscriptions (7 total)
 
-| Subgraph | Subscription | Trigger |
-|----------|-------------|---------|
-| Content | `transcriptionStatusChanged(assetId)` | Media pipeline |
-| Content | `transcriptSegmentAdded(assetId)` | Transcription worker |
-| Annotation | `annotationChanged(assetId, layers)` | Annotation CRUD |
-| Collaboration | `collaboratorPresenceChanged(documentId)` | Hocuspocus |
-| Agent | `agentExecutionUpdated(executionId)` | Agent runner |
-| Agent | `agentResponseStream(executionId)` | Agent LLM stream |
-| Knowledge | `conceptsExtracted(assetId)` | NLP pipeline |
+| Subgraph      | Subscription                              | Trigger              |
+| ------------- | ----------------------------------------- | -------------------- |
+| Content       | `transcriptionStatusChanged(assetId)`     | Media pipeline       |
+| Content       | `transcriptSegmentAdded(assetId)`         | Transcription worker |
+| Annotation    | `annotationChanged(assetId, layers)`      | Annotation CRUD      |
+| Collaboration | `collaboratorPresenceChanged(documentId)` | Hocuspocus           |
+| Agent         | `agentExecutionUpdated(executionId)`      | Agent runner         |
+| Agent         | `agentResponseStream(executionId)`        | Agent LLM stream     |
+| Knowledge     | `conceptsExtracted(assetId)`              | NLP pipeline         |
 
 ---
 
@@ -4049,14 +4803,14 @@ This section documents how the GraphQL API integrates with the platform's three-
 
 Each `AgentTemplate` enum value maps to a pre-built LangGraph.js state machine:
 
-| Template | LangGraph Workflow | Description |
-|----------|-------------------|-------------|
-| `CHAVRUTA` | `chavruta-debate-graph` | Dialectical debate: present thesis → find contradictions → argue both sides → synthesize. Uses `CONTRADICTS` edges from knowledge graph |
-| `SUMMARIZER` | `summarize-graph` | Progressive summarization: chunk → summarize → merge → condense. Operates on transcript segments |
-| `QUIZ_MASTER` | `quiz-assess-graph` | Adaptive quizzing: assess level → generate questions → evaluate answers → adjust difficulty. Uses `PREREQUISITE_OF` edges |
-| `RESEARCH_SCOUT` | `research-scout-graph` | Cross-reference finder: semantic search → graph traversal → contradiction detection → report. Powers deep research |
-| `EXPLAINER` | `explain-graph` | Adaptive explanation: detect knowledge gaps → explain with analogies → verify understanding. Uses prerequisite chains |
-| `CUSTOM` | User-defined via JSON config | Custom LangGraph state machine loaded from `AgentConfig.systemPrompt` with configurable nodes |
+| Template         | LangGraph Workflow           | Description                                                                                                                             |
+| ---------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `CHAVRUTA`       | `chavruta-debate-graph`      | Dialectical debate: present thesis → find contradictions → argue both sides → synthesize. Uses `CONTRADICTS` edges from knowledge graph |
+| `SUMMARIZER`     | `summarize-graph`            | Progressive summarization: chunk → summarize → merge → condense. Operates on transcript segments                                        |
+| `QUIZ_MASTER`    | `quiz-assess-graph`          | Adaptive quizzing: assess level → generate questions → evaluate answers → adjust difficulty. Uses `PREREQUISITE_OF` edges               |
+| `RESEARCH_SCOUT` | `research-scout-graph`       | Cross-reference finder: semantic search → graph traversal → contradiction detection → report. Powers deep research                      |
+| `EXPLAINER`      | `explain-graph`              | Adaptive explanation: detect knowledge gaps → explain with analogies → verify understanding. Uses prerequisite chains                   |
+| `CUSTOM`         | User-defined via JSON config | Custom LangGraph state machine loaded from `AgentConfig.systemPrompt` with configurable nodes                                           |
 
 ### MCP (Model Context Protocol) Integration
 
@@ -4065,12 +4819,12 @@ Agents use MCP for tool integrations. The `AgentConfig.toolsEnabled` field speci
 ```typescript
 // Available MCP tool categories
 type MCPToolCategory =
-  | 'knowledge_graph'     // Query/create concepts, relations, contradictions
-  | 'semantic_search'     // Vector search across content
-  | 'transcript_reader'   // Read transcript segments by time range
-  | 'annotation_writer'   // Create annotations on behalf of user
-  | 'web_search'          // External web search (sandboxed)
-  | 'calculator'          // Mathematical computation
+  | 'knowledge_graph' // Query/create concepts, relations, contradictions
+  | 'semantic_search' // Vector search across content
+  | 'transcript_reader' // Read transcript segments by time range
+  | 'annotation_writer' // Create annotations on behalf of user
+  | 'web_search' // External web search (sandboxed)
+  | 'calculator' // Mathematical computation
   | 'citation_formatter'; // Format academic citations
 ```
 
@@ -4167,68 +4921,68 @@ For multi-tenant safety, agent executions are sandboxed:
 
 This table maps every technology choice to its usage in the GraphQL API layer:
 
-| Technology | License | GraphQL API Usage |
-|-----------|---------|-------------------|
-| **Hive Gateway v2** | MIT | Supergraph gateway, query planning, auth enforcement, subscriptions |
-| **GraphQL Yoga** | MIT | Subgraph HTTP server within each NestJS service |
-| **NestJS** | MIT | Service framework for all 6 subgraphs |
-| **Drizzle ORM** | Apache 2.0 | Database access in resolvers, RLS via `withTenantContext()` |
-| **PostgreSQL 16+** | PostgreSQL | Relational data store with RLS policies |
-| **Apache AGE** | Apache 2.0 | Knowledge graph queries (Cypher via `cypher()` function) |
-| **pgvector** | PostgreSQL | Embedding storage and HNSW semantic search |
-| **Keycloak v26** | Apache 2.0 | JWT issuer, JWKS endpoint for gateway validation |
-| **NATS JetStream** | Apache 2.0 | Event transport for subscriptions, async agent execution |
-| **Yjs + Hocuspocus** | MIT | CRDT collaboration (CollabDocument, WebSocket URLs) |
-| **Vercel AI SDK v6** | Apache 2.0 | LLM calls in Agent subgraph resolvers |
-| **LangGraph.js** | MIT | Agent workflow orchestration (state machines) |
-| **LlamaIndex.TS** | MIT | RAG pipeline, knowledge graph indexing |
-| **MinIO** | AGPLv3 | S3-compatible storage for media uploads (presigned URLs) |
-| **faster-whisper** | MIT | Transcription pipeline (triggers via NATS events) |
-| **Video.js v8** | Apache 2.0 | Client-side: video player consuming HLS manifests |
-| **Konva.js v10** | MIT | Client-side: sketch annotation canvas rendering |
-| **React + Vite** | MIT | Web client consuming the supergraph |
-| **TanStack Query v5** | MIT | Client-side: GraphQL data fetching and caching |
-| **Expo SDK 54** | MIT | Mobile client with offline-first patterns |
-| **GraphQL Hive** | MIT | Schema registry, breaking change detection |
-| **Traefik v3.6** | MIT | Reverse proxy / ingress controller in production |
+| Technology            | License    | GraphQL API Usage                                                   |
+| --------------------- | ---------- | ------------------------------------------------------------------- |
+| **Hive Gateway v2**   | MIT        | Supergraph gateway, query planning, auth enforcement, subscriptions |
+| **GraphQL Yoga**      | MIT        | Subgraph HTTP server within each NestJS service                     |
+| **NestJS**            | MIT        | Service framework for all 6 subgraphs                               |
+| **Drizzle ORM**       | Apache 2.0 | Database access in resolvers, RLS via `withTenantContext()`         |
+| **PostgreSQL 16+**    | PostgreSQL | Relational data store with RLS policies                             |
+| **Apache AGE**        | Apache 2.0 | Knowledge graph queries (Cypher via `cypher()` function)            |
+| **pgvector**          | PostgreSQL | Embedding storage and HNSW semantic search                          |
+| **Keycloak v26**      | Apache 2.0 | JWT issuer, JWKS endpoint for gateway validation                    |
+| **NATS JetStream**    | Apache 2.0 | Event transport for subscriptions, async agent execution            |
+| **Yjs + Hocuspocus**  | MIT        | CRDT collaboration (CollabDocument, WebSocket URLs)                 |
+| **Vercel AI SDK v6**  | Apache 2.0 | LLM calls in Agent subgraph resolvers                               |
+| **LangGraph.js**      | MIT        | Agent workflow orchestration (state machines)                       |
+| **LlamaIndex.TS**     | MIT        | RAG pipeline, knowledge graph indexing                              |
+| **MinIO**             | AGPLv3     | S3-compatible storage for media uploads (presigned URLs)            |
+| **faster-whisper**    | MIT        | Transcription pipeline (triggers via NATS events)                   |
+| **Video.js v8**       | Apache 2.0 | Client-side: video player consuming HLS manifests                   |
+| **Konva.js v10**      | MIT        | Client-side: sketch annotation canvas rendering                     |
+| **React + Vite**      | MIT        | Web client consuming the supergraph                                 |
+| **TanStack Query v5** | MIT        | Client-side: GraphQL data fetching and caching                      |
+| **Expo SDK 54**       | MIT        | Mobile client with offline-first patterns                           |
+| **GraphQL Hive**      | MIT        | Schema registry, breaking change detection                          |
+| **Traefik v3.6**      | MIT        | Reverse proxy / ingress controller in production                    |
 
 ### Database Schema → GraphQL Type Mapping
 
-| Database Table | GraphQL Type | Subgraph |
-|---------------|-------------|----------|
-| `tenants` | `Tenant` | Core |
-| `users` | `User` | Core |
-| `courses` | `Course` | Content |
-| `modules` | `Module` | Content |
-| `media_assets` | `MediaAsset` | Content |
-| `transcripts` | `Transcript` | Content |
-| `transcript_segments` | `TranscriptSegment` | Content |
-| `annotations` | `Annotation` | Annotation |
-| `collab_documents` | `CollabDocument` | Collaboration |
-| `crdt_updates` | _(internal, not exposed)_ | Collaboration |
-| `collab_sessions` | `CollabSession` | Collaboration |
-| `agent_definitions` | `AgentDefinition` | Agent |
-| `agent_executions` | `AgentExecution` | Agent |
-| `content_embeddings` | _(internal, powers semanticSearch)_ | Knowledge |
-| `annotation_embeddings` | _(internal, powers semanticSearch)_ | Knowledge |
-| `concept_embeddings` | _(internal, powers hybridSearch)_ | Knowledge |
+| Database Table          | GraphQL Type                        | Subgraph      |
+| ----------------------- | ----------------------------------- | ------------- |
+| `tenants`               | `Tenant`                            | Core          |
+| `users`                 | `User`                              | Core          |
+| `courses`               | `Course`                            | Content       |
+| `modules`               | `Module`                            | Content       |
+| `media_assets`          | `MediaAsset`                        | Content       |
+| `transcripts`           | `Transcript`                        | Content       |
+| `transcript_segments`   | `TranscriptSegment`                 | Content       |
+| `annotations`           | `Annotation`                        | Annotation    |
+| `collab_documents`      | `CollabDocument`                    | Collaboration |
+| `crdt_updates`          | _(internal, not exposed)_           | Collaboration |
+| `collab_sessions`       | `CollabSession`                     | Collaboration |
+| `agent_definitions`     | `AgentDefinition`                   | Agent         |
+| `agent_executions`      | `AgentExecution`                    | Agent         |
+| `content_embeddings`    | _(internal, powers semanticSearch)_ | Knowledge     |
+| `annotation_embeddings` | _(internal, powers semanticSearch)_ | Knowledge     |
+| `concept_embeddings`    | _(internal, powers hybridSearch)_   | Knowledge     |
 
 ### Apache AGE Graph → GraphQL Type Mapping
 
-| AGE Vertex/Edge | GraphQL Type | Notes |
-|----------------|-------------|-------|
-| `Concept` vertex | `Concept` | Primary knowledge graph entity |
-| `Person` vertex | `Person` | Authors, speakers, historical figures |
-| `Term` vertex | `Term` | Domain-specific terms |
-| `Source` vertex | `Source` | External references (books, papers, URLs) |
-| `TopicCluster` vertex | `TopicCluster` | Auto-generated concept groupings |
-| `RELATED_TO` edge | `KnowledgeRelation` | Returned via `relatedConcepts` query |
-| `CONTRADICTS` edge | `Contradiction` | Returned via `contradictions` query |
-| `PREREQUISITE_OF` edge | `PrerequisiteLink` | Returned via `prerequisites` / `dependents` |
-| `MENTIONS` edge | `ConceptMention` | Segment-to-concept temporal links |
-| `CITES` edge | _(via `citedConcepts`)_ | Source-to-concept citations |
-| `AUTHORED_BY` edge | _(via `authors`)_ | Person-to-source authorship |
-| `INFERRED_RELATED` edge | `KnowledgeRelation` | AI-inferred, pending review |
-| `REFERS_TO` edge | `KnowledgeRelation` | General reference between entities |
-| `DERIVED_FROM` edge | `KnowledgeRelation` | Concept derivation chain |
-| `BELONGS_TO` edge | _(via `topicCluster`)_ | Concept-to-cluster membership |
+| AGE Vertex/Edge         | GraphQL Type            | Notes                                       |
+| ----------------------- | ----------------------- | ------------------------------------------- |
+| `Concept` vertex        | `Concept`               | Primary knowledge graph entity              |
+| `Person` vertex         | `Person`                | Authors, speakers, historical figures       |
+| `Term` vertex           | `Term`                  | Domain-specific terms                       |
+| `Source` vertex         | `Source`                | External references (books, papers, URLs)   |
+| `TopicCluster` vertex   | `TopicCluster`          | Auto-generated concept groupings            |
+| `RELATED_TO` edge       | `KnowledgeRelation`     | Returned via `relatedConcepts` query        |
+| `CONTRADICTS` edge      | `Contradiction`         | Returned via `contradictions` query         |
+| `PREREQUISITE_OF` edge  | `PrerequisiteLink`      | Returned via `prerequisites` / `dependents` |
+| `MENTIONS` edge         | `ConceptMention`        | Segment-to-concept temporal links           |
+| `CITES` edge            | _(via `citedConcepts`)_ | Source-to-concept citations                 |
+| `AUTHORED_BY` edge      | _(via `authors`)_       | Person-to-source authorship                 |
+| `INFERRED_RELATED` edge | `KnowledgeRelation`     | AI-inferred, pending review                 |
+| `REFERS_TO` edge        | `KnowledgeRelation`     | General reference between entities          |
+| `DERIVED_FROM` edge     | `KnowledgeRelation`     | Concept derivation chain                    |
+| `BELONGS_TO` edge       | _(via `topicCluster`)_  | Concept-to-cluster membership               |

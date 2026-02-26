@@ -9,7 +9,12 @@ import { HlsModule } from '../hls/hls.module';
 
 @Module({
   imports: [NatsModule, KnowledgeModule, HlsModule],
-  providers: [WhisperClient, MinioClient, TranscriptionService, TranscriptionWorker],
+  providers: [
+    WhisperClient,
+    MinioClient,
+    TranscriptionService,
+    TranscriptionWorker,
+  ],
   exports: [TranscriptionService],
 })
 export class TranscriptionModule {}

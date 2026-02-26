@@ -33,7 +33,7 @@ const WCAG_TAGS = [
 /** Navigate to a URL, wait for the network to settle, then run axe. */
 async function auditPage(
   page: import('@playwright/test').Page,
-  url: string,
+  url: string
 ): Promise<Result[]> {
   await page.goto(url);
   await page.waitForLoadState('networkidle');
@@ -51,7 +51,7 @@ function formatViolations(violations: Result[]): string {
     .map(
       (v) =>
         `\n[${v.impact ?? 'unknown'}] ${v.id}: ${v.description}` +
-        `\n  Affected: ${v.nodes.map((n) => n.target.join(', ')).join('\n  ')}`,
+        `\n  Affected: ${v.nodes.map((n) => n.target.join(', ')).join('\n  ')}`
     )
     .join('\n');
 }
@@ -105,7 +105,9 @@ test.describe('Accessibility @a11y', () => {
     expect(violations, formatViolations(violations)).toHaveLength(0);
   });
 
-  test('pages are accessible on mobile viewport (375x812)', async ({ page }) => {
+  test('pages are accessible on mobile viewport (375x812)', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     const violations = await auditPage(page, '/courses');
     expect(violations, formatViolations(violations)).toHaveLength(0);
@@ -124,7 +126,9 @@ test.describe('WCAG 2.2 SC 2.5.8 - Target Size @a11y', () => {
   const PAGES = ['/', '/courses', '/annotations', '/agents', '/dashboard'];
 
   for (const url of PAGES) {
-    test(`interactive elements on ${url} meet 24x24 px target size`, async ({ page }) => {
+    test(`interactive elements on ${url} meet 24x24 px target size`, async ({
+      page,
+    }) => {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
 
@@ -156,8 +160,13 @@ test.describe('WCAG 2.2 SC 2.5.8 - Target Size @a11y', () => {
                 selector: sel,
                 width: Math.round(box.width),
                 height: Math.round(box.height),
-                text: (el.textContent ?? el.getAttribute('aria-label') ?? el.tagName)
-                  .trim().slice(0, 60),
+                text: (
+                  el.textContent ??
+                  el.getAttribute('aria-label') ??
+                  el.tagName
+                )
+                  .trim()
+                  .slice(0, 60),
               });
             }
           });
@@ -171,7 +180,7 @@ test.describe('WCAG 2.2 SC 2.5.8 - Target Size @a11y', () => {
 
       expect(
         violations,
-        `Target size violations on ${url}:\n${summary}`,
+        `Target size violations on ${url}:\n${summary}`
       ).toHaveLength(0);
     });
   }
@@ -187,28 +196,36 @@ test.describe('WCAG 2.2 SC 2.5.8 - Target Size @a11y', () => {
 // -------------------------------------------------------------------------
 
 test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
-  test('first focusable element on / has visible outline on keyboard focus', async ({ page }) => {
+  test('first focusable element on / has visible outline on keyboard focus', async ({
+    page,
+  }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     await page.keyboard.press('Tab');
 
     const focused = page.locator(':focus');
     const outlineWidth = await focused.evaluate(
-      (el) => window.getComputedStyle(el).outlineWidth,
+      (el) => window.getComputedStyle(el).outlineWidth
     );
     const outlineStyle = await focused.evaluate(
-      (el) => window.getComputedStyle(el).outlineStyle,
+      (el) => window.getComputedStyle(el).outlineStyle
     );
     const outlineColor = await focused.evaluate(
-      (el) => window.getComputedStyle(el).outlineColor,
+      (el) => window.getComputedStyle(el).outlineColor
     );
 
     expect(outlineWidth, 'Focus outline-width must not be 0px').not.toBe('0px');
-    expect(outlineStyle, 'Focus outline-style must not be none').not.toBe('none');
-    expect(outlineColor, 'Focus outline must not be transparent').not.toContain('rgba(0, 0, 0, 0)');
+    expect(outlineStyle, 'Focus outline-style must not be none').not.toBe(
+      'none'
+    );
+    expect(outlineColor, 'Focus outline must not be transparent').not.toContain(
+      'rgba(0, 0, 0, 0)'
+    );
   });
 
-  test('focusable elements on /courses each receive a visible outline', async ({ page }) => {
+  test('focusable elements on /courses each receive a visible outline', async ({
+    page,
+  }) => {
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
 
@@ -231,7 +248,9 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
         const cs = window.getComputedStyle(el);
         return {
           tag: el.tagName,
-          text: (el.textContent ?? el.getAttribute('aria-label') ?? '').trim().slice(0, 40),
+          text: (el.textContent ?? el.getAttribute('aria-label') ?? '')
+            .trim()
+            .slice(0, 40),
           outlineWidth: cs.outlineWidth,
           outlineStyle: cs.outlineStyle,
         };
@@ -249,7 +268,7 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
 
     expect(
       noOutlineElements,
-      `Elements missing focus outline:\n${noOutlineElements.join('\n')}`,
+      `Elements missing focus outline:\n${noOutlineElements.join('\n')}`
     ).toHaveLength(0);
   });
 });
@@ -264,7 +283,9 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
 // -------------------------------------------------------------------------
 
 test.describe('WCAG 2.2 SC 2.4.12 - Focus Not Obscured @a11y', () => {
-  test('focused elements are not fully hidden by the header on /courses', async ({ page }) => {
+  test('focused elements are not fully hidden by the header on /courses', async ({
+    page,
+  }) => {
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
 
@@ -288,7 +309,9 @@ test.describe('WCAG 2.2 SC 2.4.12 - Focus Not Obscured @a11y', () => {
         const box = el.getBoundingClientRect();
         return {
           tag: el.tagName,
-          text: (el.textContent ?? el.getAttribute('aria-label') ?? '').trim().slice(0, 40),
+          text: (el.textContent ?? el.getAttribute('aria-label') ?? '')
+            .trim()
+            .slice(0, 40),
           fullyAbove: box.bottom <= 0,
           fullyBelow: box.top >= vpHeight,
         };
@@ -298,14 +321,14 @@ test.describe('WCAG 2.2 SC 2.4.12 - Focus Not Obscured @a11y', () => {
 
       if (result.fullyAbove || result.fullyBelow) {
         obscuredElements.push(
-          `${result.tag}: "${result.text}" (${result.fullyAbove ? 'above viewport' : 'below viewport'})`,
+          `${result.tag}: "${result.text}" (${result.fullyAbove ? 'above viewport' : 'below viewport'})`
         );
       }
     }
 
     expect(
       obscuredElements,
-      `Focused elements fully hidden from viewport:\n${obscuredElements.join('\n')}`,
+      `Focused elements fully hidden from viewport:\n${obscuredElements.join('\n')}`
     ).toHaveLength(0);
   });
 });

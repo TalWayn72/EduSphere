@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CachedEmbeddings, createEmbeddings, EmbeddingOptions } from './embeddings';
+import {
+  CachedEmbeddings,
+  createEmbeddings,
+  EmbeddingOptions,
+} from './embeddings';
 
 // ---------------------------------------------------------------------------
 // Mock @langchain/openai so no real OpenAI calls are made
@@ -57,7 +61,9 @@ describe('CachedEmbeddings', () => {
 
     mockEmbedInstance = {
       embedQuery: vi.fn().mockResolvedValue(makeFakeEmbedding()),
-      embedDocuments: vi.fn().mockResolvedValue([makeFakeEmbedding(1), makeFakeEmbedding(2)]),
+      embedDocuments: vi
+        .fn()
+        .mockResolvedValue([makeFakeEmbedding(1), makeFakeEmbedding(2)]),
     };
 
     mockRedisInstance = {
@@ -125,7 +131,9 @@ describe('CachedEmbeddings', () => {
 
   describe('embedQuery — without cache', () => {
     it('calls OpenAI embedQuery when cache is disabled', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: false });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: false,
+      });
       const result = await embeddings.embedQuery('test query');
 
       expect(mockEmbedInstance.embedQuery).toHaveBeenCalledWith('test query');
@@ -133,7 +141,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('returns 768-dimension embedding by default', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: false });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: false,
+      });
       const result = await embeddings.embedQuery('dimension test');
 
       expect(result).toHaveLength(768);
@@ -142,7 +152,9 @@ describe('CachedEmbeddings', () => {
 
   describe('embedQuery — with Redis cache', () => {
     it('caches embedding on first call', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       mockRedisInstance.get.mockResolvedValue(null);
@@ -154,7 +166,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('returns cached embedding on second call without hitting OpenAI', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       const cachedValue = makeFakeEmbedding(99);
@@ -167,7 +181,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('stores embedding with correct TTL (24 hours = 86400s by default)', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       mockRedisInstance.get.mockResolvedValue(null);
@@ -198,7 +214,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('cache key is prefixed with "embedding:"', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       mockRedisInstance.get.mockResolvedValue(null);
@@ -210,7 +228,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('does not use cache when redis is not configured even if cacheEnabled=true', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       // No configureCache call
 
       await embeddings.embedQuery('no redis');
@@ -222,7 +242,9 @@ describe('CachedEmbeddings', () => {
 
   describe('embedDocuments', () => {
     it('embeds multiple documents without cache', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: false });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: false,
+      });
       const docs = ['doc one', 'doc two'];
       const result = await embeddings.embedDocuments(docs);
 
@@ -231,7 +253,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('embeds uncached documents and caches results', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       mockRedisInstance.get.mockResolvedValue(null);
@@ -248,7 +272,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('uses cached documents and skips embedding for cached ones', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       const cachedEmbedding = makeFakeEmbedding(5);
@@ -256,12 +282,19 @@ describe('CachedEmbeddings', () => {
       mockRedisInstance.get
         .mockResolvedValueOnce(JSON.stringify(cachedEmbedding))
         .mockResolvedValueOnce(null);
-      mockEmbedInstance.embedDocuments.mockResolvedValue([makeFakeEmbedding(20)]);
+      mockEmbedInstance.embedDocuments.mockResolvedValue([
+        makeFakeEmbedding(20),
+      ]);
 
-      const result = await embeddings.embedDocuments(['cached-doc', 'uncached-doc']);
+      const result = await embeddings.embedDocuments([
+        'cached-doc',
+        'uncached-doc',
+      ]);
 
       // Only one doc should have been passed to the LLM
-      expect(mockEmbedInstance.embedDocuments).toHaveBeenCalledWith(['uncached-doc']);
+      expect(mockEmbedInstance.embedDocuments).toHaveBeenCalledWith([
+        'uncached-doc',
+      ]);
       expect(result[0]).toEqual(cachedEmbedding);
       expect(result).toHaveLength(2);
     });
@@ -269,7 +302,9 @@ describe('CachedEmbeddings', () => {
 
   describe('clearCache', () => {
     it('deletes all embedding keys from Redis', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       const fakeKeys = ['embedding:abc123', 'embedding:def456'];
@@ -282,7 +317,9 @@ describe('CachedEmbeddings', () => {
     });
 
     it('does not call del when no keys exist', async () => {
-      const embeddings = new CachedEmbeddings('test-key', { cacheEnabled: true });
+      const embeddings = new CachedEmbeddings('test-key', {
+        cacheEnabled: true,
+      });
       embeddings.configureCache('redis://localhost:6379');
 
       mockRedisInstance.keys.mockResolvedValue([]);

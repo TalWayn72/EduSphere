@@ -24,10 +24,15 @@ export const openBadgeDefinitions = pgTable(
     description: text('description').notNull(),
     imageUrl: text('image_url'),
     criteriaUrl: text('criteria_url'),
-    tags: text('tags').array().notNull().default(sql`'{}'::text[]`),
+    tags: text('tags')
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
     version: text('version').notNull().default('3.0'),
     issuerId: text('issuer_id').notNull(), // DID or URL for the issuer
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     index('open_badge_definitions_tenant_idx').on(t.tenantId),
@@ -41,7 +46,7 @@ export const openBadgeDefinitions = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type OpenBadgeDefinition = typeof openBadgeDefinitions.$inferSelect;
@@ -52,10 +57,14 @@ export const openBadgeAssertions = pgTable(
   'open_badge_assertions',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    badgeDefinitionId: uuid('badge_definition_id').notNull().references(() => openBadgeDefinitions.id),
+    badgeDefinitionId: uuid('badge_definition_id')
+      .notNull()
+      .references(() => openBadgeDefinitions.id),
     recipientId: uuid('recipient_id').notNull(),
     tenantId: uuid('tenant_id').notNull(),
-    issuedAt: timestamp('issued_at', { withTimezone: true }).notNull().defaultNow(),
+    issuedAt: timestamp('issued_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     evidenceUrl: text('evidence_url'),
     // JSON-LD proof object: { type, created, verificationMethod, proofPurpose, proofValue }
@@ -77,7 +86,7 @@ export const openBadgeAssertions = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type OpenBadgeAssertion = typeof openBadgeAssertions.$inferSelect;

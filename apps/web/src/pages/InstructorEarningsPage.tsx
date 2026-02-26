@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const GRAPHQL_URL = import.meta.env['VITE_GRAPHQL_URL'] as string ?? '/graphql';
+const GRAPHQL_URL =
+  (import.meta.env['VITE_GRAPHQL_URL'] as string) ?? '/graphql';
 
 const EARNINGS_QUERY = gql`
   query InstructorEarnings {
@@ -53,7 +54,9 @@ function formatCents(cents: number): string {
   }).format(cents / 100);
 }
 
-function statusVariant(status: string): 'default' | 'secondary' | 'destructive' {
+function statusVariant(
+  status: string
+): 'default' | 'secondary' | 'destructive' {
   if (status === 'COMPLETE') return 'default';
   if (status === 'FAILED') return 'destructive';
   return 'secondary';
@@ -62,10 +65,12 @@ function statusVariant(status: string): 'default' | 'secondary' | 'destructive' 
 export function InstructorEarningsPage() {
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery<{ instructorEarnings: EarningsSummary }>({
-    queryKey: ['instructor-earnings'],
-    queryFn: () => request(GRAPHQL_URL, EARNINGS_QUERY),
-  });
+  const { data, isLoading } = useQuery<{ instructorEarnings: EarningsSummary }>(
+    {
+      queryKey: ['instructor-earnings'],
+      queryFn: () => request(GRAPHQL_URL, EARNINGS_QUERY),
+    }
+  );
 
   const { mutate: requestPayout, isPending: isRequestingPayout } = useMutation({
     mutationFn: () => request(GRAPHQL_URL, REQUEST_PAYOUT_MUTATION),
@@ -91,7 +96,9 @@ export function InstructorEarningsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Total Earned</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              Total Earned
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-primary">
@@ -101,7 +108,9 @@ export function InstructorEarningsPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Pending Payout</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              Pending Payout
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-yellow-600">
@@ -111,7 +120,9 @@ export function InstructorEarningsPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Paid Out</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              Paid Out
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">
@@ -124,7 +135,9 @@ export function InstructorEarningsPage() {
       <div className="flex justify-end mb-4">
         <Button
           onClick={() => requestPayout()}
-          disabled={isRequestingPayout || (earnings?.pendingPayoutCents ?? 0) <= 0}
+          disabled={
+            isRequestingPayout || (earnings?.pendingPayoutCents ?? 0) <= 0
+          }
         >
           {isRequestingPayout ? 'Requesting...' : 'Request Payout'}
         </Button>
@@ -136,7 +149,9 @@ export function InstructorEarningsPage() {
         </CardHeader>
         <CardContent>
           {(earnings?.purchases ?? []).length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">No purchases yet.</p>
+            <p className="text-muted-foreground text-center py-8">
+              No purchases yet.
+            </p>
           ) : (
             <table className="w-full text-sm">
               <thead>
@@ -150,11 +165,19 @@ export function InstructorEarningsPage() {
               <tbody>
                 {earnings!.purchases.map((p) => (
                   <tr key={p.id} className="border-b last:border-0">
-                    <td className="py-2 pr-4 font-mono text-xs">{p.courseId.slice(0, 8)}...</td>
-                    <td className="py-2 pr-4 text-right">{formatCents(p.amountCents)}</td>
-                    <td className="py-2 pr-4">{new Date(p.purchasedAt).toLocaleDateString()}</td>
+                    <td className="py-2 pr-4 font-mono text-xs">
+                      {p.courseId.slice(0, 8)}...
+                    </td>
+                    <td className="py-2 pr-4 text-right">
+                      {formatCents(p.amountCents)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {new Date(p.purchasedAt).toLocaleDateString()}
+                    </td>
                     <td className="py-2">
-                      <Badge variant={statusVariant(p.status)}>{p.status}</Badge>
+                      <Badge variant={statusVariant(p.status)}>
+                        {p.status}
+                      </Badge>
                     </td>
                   </tr>
                 ))}

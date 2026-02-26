@@ -5,7 +5,7 @@ import type { Response } from 'express';
 @Controller()
 export class MetricsController {
   constructor(
-    @Inject('METRICS_REGISTRY') private readonly registry: Registry,
+    @Inject('METRICS_REGISTRY') private readonly registry: Registry
   ) {}
 
   @Get('metrics')

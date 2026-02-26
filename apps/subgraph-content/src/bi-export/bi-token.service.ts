@@ -6,7 +6,12 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import {
-  createDatabaseConnection, closeAllPools, schema, withTenantContext, eq, and,
+  createDatabaseConnection,
+  closeAllPools,
+  schema,
+  withTenantContext,
+  eq,
+  and,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 
@@ -43,11 +48,16 @@ export class BiTokenService implements OnModuleDestroy {
   async generateToken(tenantId: string, description: string): Promise<string> {
     const rawToken = randomBytes(32).toString('hex');
     const tokenHash = this.hashToken(rawToken);
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.biApiTokens)
+      tx
+        .insert(schema.biApiTokens)
         .values({ tenantId, tokenHash, description, isActive: true })
-        .returning(),
+        .returning()
     );
     if (!rows[0]) throw new Error('Failed to create BI API token');
     this.logger.log({ tenantId, description }, 'BI API token generated');
@@ -84,9 +94,16 @@ export class BiTokenService implements OnModuleDestroy {
   }
 
   async listTokens(tenantId: string): Promise<BiTokenMetadata[]> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.biApiTokens).where(eq(schema.biApiTokens.tenantId, tenantId)),
+      tx
+        .select()
+        .from(schema.biApiTokens)
+        .where(eq(schema.biApiTokens.tenantId, tenantId))
     );
     return rows.map((r) => ({
       id: r.id,
@@ -98,15 +115,27 @@ export class BiTokenService implements OnModuleDestroy {
   }
 
   async revokeToken(tokenId: string, tenantId: string): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.biApiTokens)
+      tx
+        .update(schema.biApiTokens)
         .set({ isActive: false })
-        .where(and(eq(schema.biApiTokens.id, tokenId), eq(schema.biApiTokens.tenantId, tenantId))),
+        .where(
+          and(
+            eq(schema.biApiTokens.id, tokenId),
+            eq(schema.biApiTokens.tenantId, tenantId)
+          )
+        )
     );
     // Invalidate all cache entries for this token (by tenantId match is not unique enough — clear hash-matched entries)
     for (const [k, v] of tokenCache) {
-      if (v === tenantId) { tokenCache.delete(k); }
+      if (v === tenantId) {
+        tokenCache.delete(k);
+      }
     }
     this.logger.log({ tenantId, tokenId }, 'BI API token revoked');
   }

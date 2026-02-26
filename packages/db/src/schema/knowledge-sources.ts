@@ -21,7 +21,12 @@ export const SOURCE_TYPES = [
 ] as const;
 export type SourceType = (typeof SOURCE_TYPES)[number];
 
-export const SOURCE_STATUSES = ['PENDING', 'PROCESSING', 'READY', 'FAILED'] as const;
+export const SOURCE_STATUSES = [
+  'PENDING',
+  'PROCESSING',
+  'READY',
+  'FAILED',
+] as const;
 export type SourceStatus = (typeof SOURCE_STATUSES)[number];
 
 /**
@@ -32,7 +37,9 @@ export type SourceStatus = (typeof SOURCE_STATUSES)[number];
 export const knowledgeSources = pgTable('knowledge_sources', {
   id: pk(),
   tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
-  course_id: uuid('course_id').references(() => courses.id, { onDelete: 'cascade' }),
+  course_id: uuid('course_id').references(() => courses.id, {
+    onDelete: 'cascade',
+  }),
 
   /** Display name shown in the sources panel */
   title: text('title').notNull(),
@@ -56,7 +63,9 @@ export const knowledgeSources = pgTable('knowledge_sources', {
   raw_content: text('raw_content'),
 
   /** Processing state */
-  status: text('status', { enum: SOURCE_STATUSES }).notNull().default('PENDING'),
+  status: text('status', { enum: SOURCE_STATUSES })
+    .notNull()
+    .default('PENDING'),
 
   /** Number of embedding chunks generated */
   chunk_count: integer('chunk_count').notNull().default(0),

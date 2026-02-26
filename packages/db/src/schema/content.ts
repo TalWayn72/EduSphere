@@ -21,7 +21,9 @@ export const courses = pgTable('courses', {
   slug: text('slug').notNull().default(''),
   description: text('description'),
   thumbnail_url: text('thumbnail_url'),
-  creator_id: uuid('creator_id').references(() => users.id, { onDelete: 'set null' }),
+  creator_id: uuid('creator_id').references(() => users.id, {
+    onDelete: 'set null',
+  }),
   instructor_id: uuid('instructor_id').references(() => users.id),
   is_published: boolean('is_published').notNull().default(false),
   is_public: boolean('is_public').notNull().default(false),

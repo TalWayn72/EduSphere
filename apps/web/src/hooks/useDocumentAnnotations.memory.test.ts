@@ -13,7 +13,10 @@ import type { Annotation } from '@/types/annotations';
 
 // ── Mock urql useMutation ────────────────────────────────────────────────────
 vi.mock('urql', () => ({
-  useMutation: vi.fn(() => [{}, vi.fn().mockResolvedValue({ data: null, error: null })]),
+  useMutation: vi.fn(() => [
+    {},
+    vi.fn().mockResolvedValue({ data: null, error: null }),
+  ]),
 }));
 
 // ── Mock useAnnotations ──────────────────────────────────────────────────────
@@ -135,7 +138,7 @@ describe('useDocumentAnnotations — memory safety', () => {
   it('changing contentId passes the new id to useAnnotations', () => {
     const { rerender } = renderHook(
       ({ id }: { id: string }) => useDocumentAnnotations(id),
-      { initialProps: { id: 'doc-a' } },
+      { initialProps: { id: 'doc-a' } }
     );
     rerender({ id: 'doc-b' });
     const calls = vi.mocked(useAnnotations).mock.calls;
@@ -159,7 +162,7 @@ describe('useDocumentAnnotations — memory safety', () => {
         layer: AnnotationLayer.PERSONAL,
         from: 0,
         to: 10,
-      }),
+      })
     ).rejects.toThrow('Network error');
   });
 });

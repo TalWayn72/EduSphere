@@ -38,7 +38,8 @@ export class NatsKVClient {
   private readonly stores = new Map<string, KV>();
 
   constructor(options?: KVClientOptions) {
-    this.url = options?.url ?? process.env['NATS_URL'] ?? 'nats://localhost:4222';
+    this.url =
+      options?.url ?? process.env['NATS_URL'] ?? 'nats://localhost:4222';
     this.defaultTtlNs = options?.defaultTtlNs ?? DEFAULT_TTL_NS;
   }
 

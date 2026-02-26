@@ -17,13 +17,13 @@ chunks it, and generates pgvector embeddings for semantic search and AI-assisted
 
 ## User Stories
 
-| Story | Description |
-|-------|-------------|
+| Story    | Description                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------- |
 | **US-1** | As an instructor, I can attach a URL to a course so the system indexes the web page content |
-| **US-2** | As an instructor, I can paste raw text so it becomes a searchable knowledge source |
-| **US-3** | As an instructor, I can upload a DOCX file and have the system extract its text |
-| **US-4** | As a learner, I can see which sources are attached to a course and their processing status |
-| **US-5** | As an instructor, I can delete a source when it is no longer relevant |
+| **US-2** | As an instructor, I can paste raw text so it becomes a searchable knowledge source          |
+| **US-3** | As an instructor, I can upload a DOCX file and have the system extract its text             |
+| **US-4** | As a learner, I can see which sources are attached to a course and their processing status  |
+| **US-5** | As an instructor, I can delete a source when it is no longer relevant                       |
 
 ---
 
@@ -61,6 +61,7 @@ to demonstrate the feature. The Siddur Nahar Shalom text (505K chars, ~500 chunk
 by Rabbi Shalom Sharabi (Rashash, ~1760) was attached as a FILE_DOCX source.
 
 Seed files:
+
 - `packages/db/src/seed/nahar-shalom-course.ts` — 8 modules, 27 content items
 - `packages/db/src/seed/nahar-shalom-source.ts` — DOCX source + chunking
 - `packages/db/src/seed/assets/nahar-shalom.docx` — 248KB Word file
@@ -71,11 +72,11 @@ Seed files:
 
 ### Database
 
-| File | Change |
-|------|--------|
-| `packages/db/src/schema/knowledge-sources.ts` | NEW — `knowledge_sources` table |
-| `packages/db/src/schema/index.ts` | Export `knowledgeSources` |
-| `packages/db/src/seed.ts` | Call `seedNaharShalomCourse()` + `seedNaharShalomSource()` |
+| File                                          | Change                                                     |
+| --------------------------------------------- | ---------------------------------------------------------- |
+| `packages/db/src/schema/knowledge-sources.ts` | NEW — `knowledge_sources` table                            |
+| `packages/db/src/schema/index.ts`             | Export `knowledgeSources`                                  |
+| `packages/db/src/seed.ts`                     | Call `seedNaharShalomCourse()` + `seedNaharShalomSource()` |
 
 #### Schema: `knowledge_sources`
 
@@ -100,20 +101,20 @@ CREATE TABLE knowledge_sources (
 
 ### Backend (subgraph-knowledge, port 4006)
 
-| File | Description |
-|------|-------------|
-| `src/sources/document-parser.service.ts` | Parse DOCX / URL / text → plaintext + chunk |
-| `src/sources/knowledge-source.service.ts` | CRUD + processing pipeline |
-| `src/sources/knowledge-source.resolver.ts` | GraphQL queries + mutations |
-| `src/sources/knowledge-source.graphql` | SDL schema |
-| `src/sources/knowledge-source.module.ts` | NestJS module |
-| `src/app.module.ts` | Import `KnowledgeSourceModule` |
+| File                                       | Description                                 |
+| ------------------------------------------ | ------------------------------------------- |
+| `src/sources/document-parser.service.ts`   | Parse DOCX / URL / text → plaintext + chunk |
+| `src/sources/knowledge-source.service.ts`  | CRUD + processing pipeline                  |
+| `src/sources/knowledge-source.resolver.ts` | GraphQL queries + mutations                 |
+| `src/sources/knowledge-source.graphql`     | SDL schema                                  |
+| `src/sources/knowledge-source.module.ts`   | NestJS module                               |
+| `src/app.module.ts`                        | Import `KnowledgeSourceModule`              |
 
 ### Frontend (apps/web)
 
-| File | Description |
-|------|-------------|
-| `src/components/SourceManager.tsx` | NotebookLM-style panel component |
+| File                                 | Description                      |
+| ------------------------------------ | -------------------------------- |
+| `src/components/SourceManager.tsx`   | NotebookLM-style panel component |
 | `src/lib/graphql/sources.queries.ts` | GraphQL query/mutation documents |
 
 ---
@@ -123,8 +124,20 @@ CREATE TABLE knowledge_sources (
 ### Types
 
 ```graphql
-enum SourceType { FILE_DOCX FILE_PDF FILE_TXT URL YOUTUBE TEXT }
-enum SourceStatus { PENDING PROCESSING READY FAILED }
+enum SourceType {
+  FILE_DOCX
+  FILE_PDF
+  FILE_TXT
+  URL
+  YOUTUBE
+  TEXT
+}
+enum SourceStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
 
 type KnowledgeSource {
   id: ID!
@@ -168,6 +181,7 @@ deleteKnowledgeSource(id: ID!): Boolean!
 - **Delete** — confirm dialog + immediate refetch
 
 Status colors:
+
 - `PENDING` → yellow
 - `PROCESSING` → blue (animated pulse)
 - `READY` → green
@@ -177,10 +191,10 @@ Status colors:
 
 ## Testing
 
-| Test File | Coverage |
-|-----------|----------|
-| `src/sources/document-parser.service.spec.ts` | parseText, chunkText, parseUrl, parseDocx |
-| `src/sources/knowledge-source.service.spec.ts` | CRUD, processSource (TEXT/URL/DOCX), embedding failure handling |
+| Test File                                             | Coverage                                                                     |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `src/sources/document-parser.service.spec.ts`         | parseText, chunkText, parseUrl, parseDocx                                    |
+| `src/sources/knowledge-source.service.spec.ts`        | CRUD, processSource (TEXT/URL/DOCX), embedding failure handling              |
 | `src/sources/knowledge-source.service.memory.spec.ts` | onModuleDestroy closes pool, idempotent destroy, no orphaned PROCESSING rows |
 
 ---

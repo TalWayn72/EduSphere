@@ -20,7 +20,10 @@ async function bootstrap() {
   await app.listen(port);
 
   const logger = app.get(Logger);
-  logger.log('Content subgraph running on http://localhost:' + port + '/graphql', 'Bootstrap');
+  logger.log(
+    'Content subgraph running on http://localhost:' + port + '/graphql',
+    'Bootstrap'
+  );
   logger.log('Serving: Courses, Modules, ContentItems', 'Bootstrap');
 }
 

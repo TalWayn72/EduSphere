@@ -12,10 +12,7 @@ export const offlineLink = new ApolloLink((operation, forward) => {
 
       // For queries, try cache first if offline
       const firstDef = operation.query.definitions[0];
-      if (
-        !isOnline &&
-        firstDef?.kind === 'OperationDefinition'
-      ) {
+      if (!isOnline && firstDef?.kind === 'OperationDefinition') {
         const def = firstDef as OperationDefinitionNode;
         if (def.operation === 'query') {
           database

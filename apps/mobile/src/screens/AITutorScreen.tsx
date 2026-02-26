@@ -92,7 +92,9 @@ export default function AITutorScreen() {
             ]}
           >
             <Text style={styles.messageRole}>
-              {item.role === 'USER' ? `👤 ${t('common:profile')}` : `🤖 ${t('chatPanel.title')}`}
+              {item.role === 'USER'
+                ? `👤 ${t('common:profile')}`
+                : `🤖 ${t('chatPanel.title')}`}
             </Text>
             <Text style={styles.messageContent}>{item.content}</Text>
             <Text style={styles.messageTime}>
@@ -104,9 +106,7 @@ export default function AITutorScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🤖</Text>
-            <Text style={styles.emptyText}>
-              {t('startConversation')}
-            </Text>
+            <Text style={styles.emptyText}>{t('startConversation')}</Text>
           </View>
         }
       />

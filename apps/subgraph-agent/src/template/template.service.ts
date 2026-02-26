@@ -1,5 +1,11 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc, closeAllPools } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  desc,
+  closeAllPools,
+} from '@edusphere/db';
 
 // ── Default template definitions ──────────────────────────────────────────────
 

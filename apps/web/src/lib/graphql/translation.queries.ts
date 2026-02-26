@@ -15,8 +15,14 @@ export const CONTENT_TRANSLATION_QUERY = gql`
 `;
 
 export const REQUEST_CONTENT_TRANSLATION_MUTATION = gql`
-  mutation RequestContentTranslation($contentItemId: ID!, $targetLocale: String!) {
-    requestContentTranslation(contentItemId: $contentItemId, targetLocale: $targetLocale) {
+  mutation RequestContentTranslation(
+    $contentItemId: ID!
+    $targetLocale: String!
+  ) {
+    requestContentTranslation(
+      contentItemId: $contentItemId
+      targetLocale: $targetLocale
+    ) {
       id
       locale
       translationStatus

@@ -61,7 +61,9 @@ export class PortalResolver {
   }
 
   @Query('publicPortal')
-  async publicPortal(@Context() ctx: GqlContext): Promise<PortalPageGql | null> {
+  async publicPortal(
+    @Context() ctx: GqlContext
+  ): Promise<PortalPageGql | null> {
     const tenantId = ctx.req.headers['x-tenant-id'];
     if (!tenantId) return null;
     const page = await this.portalService.getPublishedPortalPage(tenantId);
@@ -72,13 +74,18 @@ export class PortalResolver {
   async savePortalLayout(
     @Args('title') title: string,
     @Args('blocksJson') blocksJson: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<PortalPageGql> {
     const tenantId = ctx.req.headers['x-tenant-id'];
     const userId = ctx.req.headers['x-user-id'] ?? 'unknown';
     if (!tenantId) throw new Error('Missing tenant context');
     const blocks = JSON.parse(blocksJson) as PortalBlock[];
-    const page = await this.portalService.createOrUpdatePortal(tenantId, blocks, title, userId);
+    const page = await this.portalService.createOrUpdatePortal(
+      tenantId,
+      blocks,
+      title,
+      userId
+    );
     return toGqlPage(page);
   }
 

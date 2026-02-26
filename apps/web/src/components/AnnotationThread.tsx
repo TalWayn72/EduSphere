@@ -8,7 +8,13 @@
  *  - Click on the card (not reply area) fires onSeek(contentTimestamp)
  */
 import { useState } from 'react';
-import { Clock, MessageSquare, Send, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Clock,
+  MessageSquare,
+  Send,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
 import { LAYER_META, formatTime } from '@/pages/content-viewer.utils';
@@ -125,7 +131,9 @@ export function AnnotationThread({
         >
           {annotation.replies?.map((reply) => (
             <div key={reply.id} className="text-xs text-muted-foreground">
-              <span className={`font-semibold ${LAYER_META[reply.layer]?.color ?? ''}`}>
+              <span
+                className={`font-semibold ${LAYER_META[reply.layer]?.color ?? ''}`}
+              >
                 {reply.userName}:{' '}
               </span>
               {reply.content}

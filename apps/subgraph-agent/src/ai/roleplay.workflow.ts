@@ -25,7 +25,7 @@ import type { RubricCriterion, EvaluationResult } from '@edusphere/db';
 export const EvaluationSchema = z.object({
   overallScore: z.number().min(0).max(100),
   criteriaScores: z.array(
-    z.object({ name: z.string(), score: z.number(), feedback: z.string() }),
+    z.object({ name: z.string(), score: z.number(), feedback: z.string() })
   ),
   strengths: z.array(z.string()),
   areasForImprovement: z.array(z.string()),
@@ -65,13 +65,15 @@ function buildModel(): LanguageModel {
   const ollama = createOllama({
     baseURL: `${process.env.OLLAMA_URL ?? 'http://localhost:11434'}/api`,
   });
-  return ollama(process.env.OLLAMA_MODEL ?? 'llama3.2') as unknown as LanguageModel;
+  return ollama(
+    process.env.OLLAMA_MODEL ?? 'llama3.2'
+  ) as unknown as LanguageModel;
 }
 
 // ── Node: scene_setting ───────────────────────────────────────────────────────
 
 async function sceneSettingNode(
-  state: RoleplayStateType,
+  state: RoleplayStateType
 ): Promise<Partial<RoleplayStateType>> {
   const model = buildModel();
   try {
@@ -92,7 +94,7 @@ async function sceneSettingNode(
 // ── Node: awaiting_learner ────────────────────────────────────────────────────
 
 function awaitingLearnerNode(
-  state: RoleplayStateType,
+  state: RoleplayStateType
 ): Partial<RoleplayStateType> {
   // interrupt() suspends the graph and returns a value when resumed
   const learnerMessage = interrupt<string>('Waiting for learner response');
@@ -106,7 +108,7 @@ function awaitingLearnerNode(
 // ── Node: character_response ──────────────────────────────────────────────────
 
 async function characterResponseNode(
-  state: RoleplayStateType,
+  state: RoleplayStateType
 ): Promise<Partial<RoleplayStateType>> {
   if (!state.currentLearnerMessage) return {};
   const model = buildModel();
@@ -133,14 +135,16 @@ async function characterResponseNode(
 
 // ── Node: check_completion (pure routing) ─────────────────────────────────────
 
-function checkCompletionNode(_state: RoleplayStateType): Partial<RoleplayStateType> {
+function checkCompletionNode(
+  _state: RoleplayStateType
+): Partial<RoleplayStateType> {
   return {};
 }
 
 // ── Node: evaluation ──────────────────────────────────────────────────────────
 
 async function evaluationNode(
-  state: RoleplayStateType,
+  state: RoleplayStateType
 ): Promise<Partial<RoleplayStateType>> {
   const model = buildModel();
   const learnerTurns = state.history
@@ -154,7 +158,8 @@ async function evaluationNode(
     const { object } = await generateObject({
       model: model as Parameters<typeof generateObject>[0]['model'],
       schema: EvaluationSchema,
-      system: 'You are an expert communication coach. Be specific and constructive.',
+      system:
+        'You are an expert communication coach. Be specific and constructive.',
       prompt:
         `Rubric:\n${rubricText}\n\nLearner messages:\n${learnerTurns}\n\n` +
         `Score each criterion (as a percentage of maxScore), identify strengths and areas for improvement.`,
@@ -180,7 +185,7 @@ export function createRoleplayWorkflow() {
     .addEdge('awaiting_learner', 'character_response')
     .addEdge('character_response', 'check_completion')
     .addConditionalEdges('check_completion', (state: RoleplayStateType) =>
-      state.turnCount >= state.maxTurns ? 'evaluation' : 'awaiting_learner',
+      state.turnCount >= state.maxTurns ? 'evaluation' : 'awaiting_learner'
     )
     .addEdge('evaluation', '__end__');
 

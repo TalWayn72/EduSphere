@@ -65,7 +65,7 @@ const BASE_URL = (() => {
   if (E2E_PROFILE !== 'local') {
     throw new Error(
       `E2E_BASE_URL must be set when E2E_ENV=${E2E_PROFILE}. ` +
-        'Example: E2E_BASE_URL=https://staging.edusphere.io',
+        'Example: E2E_BASE_URL=https://staging.edusphere.io'
     );
   }
   return 'http://localhost:5175';
@@ -102,7 +102,11 @@ export default defineConfig({
 
   /* Reporter — GitHub annotations in CI, rich HTML report locally */
   reporter: process.env.CI
-    ? [['github'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/results.json' }]]
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results/results.json' }],
+      ]
     : [['html'], ['json', { outputFile: 'test-results/results.json' }]],
 
   use: {
@@ -210,10 +214,13 @@ export default defineConfig({
         env: {
           // Forward all VITE_* variables plus E2E-specific overrides
           VITE_DEV_MODE: process.env.VITE_DEV_MODE ?? 'true',
-          VITE_GRAPHQL_URL: process.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
-          VITE_KEYCLOAK_URL: process.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080',
+          VITE_GRAPHQL_URL:
+            process.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
+          VITE_KEYCLOAK_URL:
+            process.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080',
           VITE_KEYCLOAK_REALM: process.env.VITE_KEYCLOAK_REALM ?? 'edusphere',
-          VITE_KEYCLOAK_CLIENT_ID: process.env.VITE_KEYCLOAK_CLIENT_ID ?? 'edusphere-app',
+          VITE_KEYCLOAK_CLIENT_ID:
+            process.env.VITE_KEYCLOAK_CLIENT_ID ?? 'edusphere-app',
         },
         /** Wait up to 120s for Vite cold start + TypeScript compilation */
         timeout: 120_000,

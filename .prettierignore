@@ -14,3 +14,16 @@ build/
 .turbo/
 coverage/
 pnpm-lock.yaml
+
+# Claude Code internal memory files
+memory/
+
+# Helm templates use Go template syntax ({{ }}) that trips Prettier's YAML parser
+infrastructure/k8s/
+
+# k6 load-testing files: scenarios use template placeholders (const Q = ;) that fail JS parse
+infrastructure/load-testing/
+
+# k6 NDJSON output files (one JSON object per line — invalid for Prettier's JSON parser)
+tests/performance/results/
+test_output.txt

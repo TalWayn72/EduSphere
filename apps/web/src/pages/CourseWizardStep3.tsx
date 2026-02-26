@@ -21,18 +21,20 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
   };
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">
-        {t('wizard.reviewText')}
-      </p>
+      <p className="text-sm text-muted-foreground">{t('wizard.reviewText')}</p>
 
       {/* Course preview card */}
       <Card className="p-6 space-y-4">
         <div className="flex items-start gap-4">
           <span className="text-5xl">{data.thumbnail}</span>
           <div className="flex-1 space-y-1">
-            <h3 className="text-xl font-semibold">{data.title || t('wizard.noTitle')}</h3>
+            <h3 className="text-xl font-semibold">
+              {data.title || t('wizard.noTitle')}
+            </h3>
             {data.description && (
-              <p className="text-sm text-muted-foreground">{data.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {data.description}
+              </p>
             )}
           </div>
         </div>
@@ -50,7 +52,9 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
           )}
           <div className="flex items-center gap-2 text-muted-foreground">
             <Layers className="h-4 w-4 shrink-0" />
-            <span>{t('wizard.moduleCount', { count: data.modules.length })}</span>
+            <span>
+              {t('wizard.moduleCount', { count: data.modules.length })}
+            </span>
           </div>
         </div>
       </Card>
@@ -58,10 +62,15 @@ export function CourseWizardStep3({ data, onPublish, isSubmitting }: Props) {
       {/* Modules list */}
       {data.modules.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium">{t('modules')} ({data.modules.length})</p>
+          <p className="text-sm font-medium">
+            {t('modules')} ({data.modules.length})
+          </p>
           <div className="space-y-1">
             {data.modules.map((mod, i) => (
-              <div key={mod.id} className="flex items-center gap-2 text-sm py-1.5 border-b last:border-0">
+              <div
+                key={mod.id}
+                className="flex items-center gap-2 text-sm py-1.5 border-b last:border-0"
+              >
                 <span className="text-muted-foreground font-mono w-6 text-right shrink-0">
                   {i + 1}.
                 </span>

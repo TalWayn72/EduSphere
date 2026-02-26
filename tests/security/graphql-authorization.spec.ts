@@ -18,20 +18,26 @@ function read(relativePath: string): string {
 }
 
 function extractMutationBlock(sdl: string): string {
-  const idx = sdl.indexOf("type Mutation {");
-  if (idx < 0) return "";
+  const idx = sdl.indexOf('type Mutation {');
+  if (idx < 0) return '';
   // Find closing brace of Mutation block by scanning forward
-  let depth = 0, pos = idx;
+  let depth = 0,
+    pos = idx;
   while (pos < sdl.length) {
-    if (sdl[pos] === "{") depth++;
-    if (sdl[pos] === "}") { depth--; if (depth === 0) break; }
+    if (sdl[pos] === '{') depth++;
+    if (sdl[pos] === '}') {
+      depth--;
+      if (depth === 0) break;
+    }
     pos++;
   }
   return sdl.slice(idx + 16, pos);
 }
 describe('G-15: directive definitions in graphql-shared', () => {
   let directives: string;
-  beforeAll(() => { directives = read('packages/graphql-shared/src/directives.ts'); });
+  beforeAll(() => {
+    directives = read('packages/graphql-shared/src/directives.ts');
+  });
 
   it('@authenticated directive is defined', () => {
     expect(directives).toContain('@authenticated');
@@ -59,9 +65,13 @@ describe('G-15: directive definitions in graphql-shared', () => {
 });
 describe('G-15: user.graphql -- admin mutations have fine-grained auth', () => {
   let schema: string;
-  beforeAll(() => { schema = read('apps/subgraph-core/src/user/user.graphql'); });
+  beforeAll(() => {
+    schema = read('apps/subgraph-core/src/user/user.graphql');
+  });
 
-  it('schema file exists', () => { expect(schema.length).toBeGreaterThan(0); });
+  it('schema file exists', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
   it('@link imports @requiresRole for federation awareness', () => {
     expect(schema).toContain('@requiresRole');
   });
@@ -69,20 +79,38 @@ describe('G-15: user.graphql -- admin mutations have fine-grained auth', () => {
     expect(schema).toContain('@requiresScopes');
   });
   it('createUser mutation has @requiresRole with SUPER_ADMIN and ORG_ADMIN', () => {
-    const b = schema.slice(schema.indexOf('createUser'), schema.indexOf('updateUser'));
-    expect(b).toContain('@requiresRole'); expect(b).toContain('SUPER_ADMIN'); expect(b).toContain('ORG_ADMIN');
+    const b = schema.slice(
+      schema.indexOf('createUser'),
+      schema.indexOf('updateUser')
+    );
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('SUPER_ADMIN');
+    expect(b).toContain('ORG_ADMIN');
   });
   it('createUser mutation has @requiresScopes with write:users', () => {
-    const b = schema.slice(schema.indexOf('createUser'), schema.indexOf('updateUser'));
-    expect(b).toContain('@requiresScopes'); expect(b).toContain('write:users');
+    const b = schema.slice(
+      schema.indexOf('createUser'),
+      schema.indexOf('updateUser')
+    );
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('write:users');
   });
   it('updateUser mutation has @requiresRole with SUPER_ADMIN and ORG_ADMIN', () => {
-    const b = schema.slice(schema.indexOf('updateUser('), schema.indexOf('updateUserPreferences'));
-    expect(b).toContain('@requiresRole'); expect(b).toContain('SUPER_ADMIN'); expect(b).toContain('ORG_ADMIN');
+    const b = schema.slice(
+      schema.indexOf('updateUser('),
+      schema.indexOf('updateUserPreferences')
+    );
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('SUPER_ADMIN');
+    expect(b).toContain('ORG_ADMIN');
   });
   it('updateUser mutation has @requiresScopes with write:users', () => {
-    const b = schema.slice(schema.indexOf('updateUser('), schema.indexOf('updateUserPreferences'));
-    expect(b).toContain('@requiresScopes'); expect(b).toContain('write:users');
+    const b = schema.slice(
+      schema.indexOf('updateUser('),
+      schema.indexOf('updateUserPreferences')
+    );
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('write:users');
   });
   it('updateUserPreferences is self-service: @authenticated but NOT @requiresRole', () => {
     const i = schema.indexOf('updateUserPreferences');
@@ -90,7 +118,8 @@ describe('G-15: user.graphql -- admin mutations have fine-grained auth', () => {
     // later admin-only mutations with @requiresRole don't pollute the window.
     const nextDef = schema.indexOf('updateProfileVisibility', i);
     const b = schema.slice(i, nextDef > i ? nextDef : i + 200);
-    expect(b).toContain('@authenticated'); expect(b).not.toContain('@requiresRole');
+    expect(b).toContain('@authenticated');
+    expect(b).not.toContain('@requiresRole');
   });
   it('all mutations retain @authenticated as baseline guard', () => {
     expect(schema).toContain('@authenticated');
@@ -98,31 +127,54 @@ describe('G-15: user.graphql -- admin mutations have fine-grained auth', () => {
 });
 describe('G-15: annotation.graphql -- write mutations have @requiresScopes', () => {
   let schema: string;
-  beforeAll(() => { schema = read('apps/subgraph-annotation/src/annotation/annotation.graphql'); });
+  beforeAll(() => {
+    schema = read('apps/subgraph-annotation/src/annotation/annotation.graphql');
+  });
 
-  it('schema file exists', () => { expect(schema.length).toBeGreaterThan(0); });
-  it('@link imports @requiresScopes', () => { expect(schema).toContain('@requiresScopes'); });
+  it('schema file exists', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+  it('@link imports @requiresScopes', () => {
+    expect(schema).toContain('@requiresScopes');
+  });
 
   it('createAnnotation has @requiresScopes with write:annotations', () => {
-    const b = schema.slice(schema.indexOf('createAnnotation'), schema.indexOf('updateAnnotation'));
-    expect(b).toContain('@requiresScopes'); expect(b).toContain('write:annotations');
+    const b = schema.slice(
+      schema.indexOf('createAnnotation'),
+      schema.indexOf('updateAnnotation')
+    );
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('write:annotations');
   });
   it('updateAnnotation has @requiresScopes with write:annotations', () => {
-    const b = schema.slice(schema.indexOf('updateAnnotation'), schema.indexOf('deleteAnnotation'));
-    expect(b).toContain('@requiresScopes'); expect(b).toContain('write:annotations');
+    const b = schema.slice(
+      schema.indexOf('updateAnnotation'),
+      schema.indexOf('deleteAnnotation')
+    );
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('write:annotations');
   });
   it('deleteAnnotation has @requiresScopes with write:annotations', () => {
-    const b = schema.slice(schema.indexOf('deleteAnnotation'), schema.indexOf('resolveAnnotation'));
-    expect(b).toContain('@requiresScopes'); expect(b).toContain('write:annotations');
+    const b = schema.slice(
+      schema.indexOf('deleteAnnotation'),
+      schema.indexOf('resolveAnnotation')
+    );
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('write:annotations');
   });
   it('resolveAnnotation has @requiresScopes with write:annotations', () => {
-    const b = schema.slice(schema.indexOf('resolveAnnotation'), schema.indexOf('replyToAnnotation'));
-    expect(b).toContain('@requiresScopes'); expect(b).toContain('write:annotations');
+    const b = schema.slice(
+      schema.indexOf('resolveAnnotation'),
+      schema.indexOf('replyToAnnotation')
+    );
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('write:annotations');
   });
   it('replyToAnnotation has @requiresScopes with write:annotations', () => {
     const i = schema.indexOf('replyToAnnotation');
     const b = schema.slice(i, i + 800);
-    expect(b).toContain('@requiresScopes'); expect(b).toContain('write:annotations');
+    expect(b).toContain('@requiresScopes');
+    expect(b).toContain('write:annotations');
   });
   it('all annotation write mutations retain @authenticated as baseline', () => {
     expect(extractMutationBlock(schema)).toContain('@authenticated');
@@ -131,15 +183,19 @@ describe('G-15: annotation.graphql -- write mutations have @requiresScopes', () 
 
 describe('G-15: aggregate -- least privilege principle across all schemas', () => {
   it('at least one schema enforces @requiresRole on admin mutations', () => {
-    expect(read('apps/subgraph-core/src/user/user.graphql')).toContain('@requiresRole');
+    expect(read('apps/subgraph-core/src/user/user.graphql')).toContain(
+      '@requiresRole'
+    );
   });
   it('at least one schema enforces @requiresScopes on write mutations', () => {
-    const combined = read('apps/subgraph-annotation/src/annotation/annotation.graphql')
-      + read('apps/subgraph-core/src/user/user.graphql');
+    const combined =
+      read('apps/subgraph-annotation/src/annotation/annotation.graphql') +
+      read('apps/subgraph-core/src/user/user.graphql');
     expect(combined).toContain('@requiresScopes');
   });
   it('graphql-shared exports UserRole and AuthScope enumerations', () => {
     const d = read('packages/graphql-shared/src/directives.ts');
-    expect(d).toContain('UserRole'); expect(d).toContain('AuthScope');
+    expect(d).toContain('UserRole');
+    expect(d).toContain('AuthScope');
   });
 });

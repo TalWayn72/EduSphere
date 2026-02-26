@@ -7,7 +7,9 @@ interface Props {
   disabled?: boolean;
 }
 
-function parseQuestion(question: string): Array<{ type: 'text' | 'blank'; content: string }> {
+function parseQuestion(
+  question: string
+): Array<{ type: 'text' | 'blank'; content: string }> {
   const parts = question.split('{{blank}}');
   return parts.flatMap((text, idx) => {
     const segment: Array<{ type: 'text' | 'blank'; content: string }> = [
@@ -42,7 +44,7 @@ export function FillBlankQuestion({ item, value, onChange, disabled }: Props) {
                 aria-label="Fill in the blank"
                 className="inline-block min-w-[8rem] border-b-2 border-primary bg-transparent px-1 text-sm focus:outline-none focus:border-primary/80 disabled:opacity-70"
               />
-            ),
+            )
           )}
         </p>
       ) : (

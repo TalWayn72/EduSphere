@@ -2,7 +2,10 @@ import React from 'react';
 import { useMutation } from 'urql';
 import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
-import { FOLLOW_USER_MUTATION, UNFOLLOW_USER_MUTATION } from '@/lib/graphql/profile.queries';
+import {
+  FOLLOW_USER_MUTATION,
+  UNFOLLOW_USER_MUTATION,
+} from '@/lib/graphql/profile.queries';
 
 interface FollowButtonProps {
   userId: string;
@@ -10,12 +13,20 @@ interface FollowButtonProps {
   followersCount: number;
 }
 
-export function FollowButton({ userId, initialIsFollowing, followersCount }: FollowButtonProps) {
+export function FollowButton({
+  userId,
+  initialIsFollowing,
+  followersCount,
+}: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = React.useState(initialIsFollowing);
   const [localCount, setLocalCount] = React.useState(followersCount);
 
-  const [followResult, follow] = useMutation<{ followUser: boolean }>(FOLLOW_USER_MUTATION);
-  const [unfollowResult, unfollow] = useMutation<{ unfollowUser: boolean }>(UNFOLLOW_USER_MUTATION);
+  const [followResult, follow] = useMutation<{ followUser: boolean }>(
+    FOLLOW_USER_MUTATION
+  );
+  const [unfollowResult, unfollow] = useMutation<{ unfollowUser: boolean }>(
+    UNFOLLOW_USER_MUTATION
+  );
 
   const isLoading = followResult.fetching || unfollowResult.fetching;
 

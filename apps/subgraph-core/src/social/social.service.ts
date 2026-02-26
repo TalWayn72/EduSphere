@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -30,7 +35,10 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
       this.nats = await connect(buildNatsOptions());
       this.logger.log('SocialService: NATS connected');
     } catch (err) {
-      this.logger.warn({ err }, 'SocialService: NATS unavailable — events will be skipped');
+      this.logger.warn(
+        { err },
+        'SocialService: NATS unavailable — events will be skipped'
+      );
     }
   }
 
@@ -46,7 +54,11 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
     return { tenantId, userId, userRole: 'STUDENT' };
   }
 
-  async followUser(followerId: string, followingId: string, tenantId: string): Promise<boolean> {
+  async followUser(
+    followerId: string,
+    followingId: string,
+    tenantId: string
+  ): Promise<boolean> {
     const ctx = this.tenantCtx(tenantId, followerId);
     await withTenantContext(this.db, ctx, async (tx) => {
       await tx
@@ -58,7 +70,11 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
     return true;
   }
 
-  async unfollowUser(followerId: string, followingId: string, tenantId: string): Promise<boolean> {
+  async unfollowUser(
+    followerId: string,
+    followingId: string,
+    tenantId: string
+  ): Promise<boolean> {
     const ctx = this.tenantCtx(tenantId, followerId);
     const result = await withTenantContext(this.db, ctx, async (tx) => {
       return tx
@@ -66,8 +82,8 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
         .where(
           and(
             eq(schema.userFollows.followerId, followerId),
-            eq(schema.userFollows.followingId, followingId),
-          ),
+            eq(schema.userFollows.followingId, followingId)
+          )
         )
         .returning({ id: schema.userFollows.id });
     });
@@ -98,7 +114,11 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async isFollowing(followerId: string, followingId: string, tenantId: string): Promise<boolean> {
+  async isFollowing(
+    followerId: string,
+    followingId: string,
+    tenantId: string
+  ): Promise<boolean> {
     const ctx = this.tenantCtx(tenantId, followerId);
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
       tx
@@ -107,10 +127,10 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
         .where(
           and(
             eq(schema.userFollows.followerId, followerId),
-            eq(schema.userFollows.followingId, followingId),
-          ),
+            eq(schema.userFollows.followingId, followingId)
+          )
         )
-        .limit(1),
+        .limit(1)
     );
     return rows.length > 0;
   }
@@ -137,7 +157,7 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
   private async publishFollowEvent(
     followerId: string,
     followingId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<void> {
     if (!this.nats) return;
     try {
@@ -147,7 +167,10 @@ export class SocialService implements OnModuleInit, OnModuleDestroy {
         tenantId,
         timestamp: new Date().toISOString(),
       };
-      this.nats.publish(SUBJECT_USER_FOLLOWED, new TextEncoder().encode(JSON.stringify(payload)));
+      this.nats.publish(
+        SUBJECT_USER_FOLLOWED,
+        new TextEncoder().encode(JSON.stringify(payload))
+      );
     } catch (err) {
       this.logger.warn({ err }, 'Failed to publish user.followed event');
     }

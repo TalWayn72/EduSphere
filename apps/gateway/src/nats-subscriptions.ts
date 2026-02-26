@@ -23,7 +23,10 @@ import type { Logger } from 'pino';
 
 export interface PubSubEngine {
   publish(topic: string, payload: unknown): Promise<void>;
-  subscribe(topic: string, onMessage: (payload: unknown) => void): Promise<() => void>;
+  subscribe(
+    topic: string,
+    onMessage: (payload: unknown) => void
+  ): Promise<() => void>;
   close(): Promise<void>;
 }
 
@@ -36,7 +39,10 @@ class InProcessPubSub implements PubSubEngine {
     this.emitter.emit(topic, payload);
   }
 
-  async subscribe(topic: string, onMessage: (payload: unknown) => void): Promise<() => void> {
+  async subscribe(
+    topic: string,
+    onMessage: (payload: unknown) => void
+  ): Promise<() => void> {
     this.emitter.on(topic, onMessage);
     return () => {
       this.emitter.off(topic, onMessage);
@@ -72,7 +78,7 @@ class NatsPubSub implements PubSubEngine {
 
   constructor(
     private readonly nc: NatsConnection,
-    private readonly logger: Logger,
+    private readonly logger: Logger
   ) {}
 
   /** Publish a message to all gateway replicas subscribed to this topic. */
@@ -90,7 +96,10 @@ class NatsPubSub implements PubSubEngine {
    * Subscribe to a topic across all replicas.
    * Returns an unsubscribe function that callers must invoke to release resources.
    */
-  async subscribe(topic: string, onMessage: (payload: unknown) => void): Promise<() => void> {
+  async subscribe(
+    topic: string,
+    onMessage: (payload: unknown) => void
+  ): Promise<() => void> {
     const subject = `gw.sub.${topic}`;
     const sub = this.nc.subscribe(subject);
 
@@ -101,12 +110,18 @@ class NatsPubSub implements PubSubEngine {
           const payload: unknown = JSON.parse(this.decoder.decode(msg.data));
           onMessage(payload);
         } catch (err) {
-          this.logger.warn({ err, topic }, '[nats-pubsub] message parse error — skipped');
+          this.logger.warn(
+            { err, topic },
+            '[nats-pubsub] message parse error — skipped'
+          );
         }
       }
     })().catch((err: unknown) => {
       // Subscription closed normally or with error — log at debug level
-      this.logger.debug({ err, topic }, '[nats-pubsub] subscription loop exited');
+      this.logger.debug(
+        { err, topic },
+        '[nats-pubsub] subscription loop exited'
+      );
     });
 
     return () => {
@@ -140,7 +155,7 @@ export async function createNatsPubSub(logger: Logger): Promise<PubSubEngine> {
   if (!natsUrl) {
     logger.warn(
       '[nats-pubsub] NATS_URL not set — using in-process pub/sub (single-replica only). ' +
-        'Set NATS_URL to enable distributed subscriptions across multiple gateway replicas.',
+        'Set NATS_URL to enable distributed subscriptions across multiple gateway replicas.'
     );
     singleton = new InProcessPubSub();
     return singleton;
@@ -153,7 +168,10 @@ export async function createNatsPubSub(logger: Logger): Promise<PubSubEngine> {
     };
 
     const nc = await connect({ servers: natsUrl });
-    logger.info({ natsUrl }, '[nats-pubsub] connected to NATS — distributed subscriptions enabled');
+    logger.info(
+      { natsUrl },
+      '[nats-pubsub] connected to NATS — distributed subscriptions enabled'
+    );
 
     singleton = new NatsPubSub(nc, logger);
 
@@ -161,7 +179,10 @@ export async function createNatsPubSub(logger: Logger): Promise<PubSubEngine> {
     nc.closed()
       .then((err) => {
         if (err) {
-          logger.error({ err }, '[nats-pubsub] NATS connection closed with error');
+          logger.error(
+            { err },
+            '[nats-pubsub] NATS connection closed with error'
+          );
         } else {
           logger.info('[nats-pubsub] NATS connection closed gracefully');
         }
@@ -176,7 +197,7 @@ export async function createNatsPubSub(logger: Logger): Promise<PubSubEngine> {
     logger.warn(
       { err, natsUrl },
       '[nats-pubsub] NATS connection failed — falling back to in-process pub/sub. ' +
-        'Subscriptions will NOT be shared across gateway replicas.',
+        'Subscriptions will NOT be shared across gateway replicas.'
     );
     singleton = new InProcessPubSub();
     return singleton;

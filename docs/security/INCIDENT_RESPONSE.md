@@ -1,14 +1,16 @@
 # EduSphere — Incident Response Procedure
+
 **Version:** 1.0  
 **Owner:** Security Engineering  
 **Review cycle:** Quarterly  
-**Standards:** GDPR Art.33-34, SOC 2 CC7.3-7.4  
+**Standards:** GDPR Art.33-34, SOC 2 CC7.3-7.4
 
 ---
 
 ## 1. SCOPE
 
 This procedure applies to all security incidents affecting EduSphere infrastructure, including:
+
 - Unauthorized access to tenant data or personal information
 - Ransomware, malware, or destructive attack
 - Credential compromise (admin, service account, API key)
@@ -20,23 +22,23 @@ This procedure applies to all security incidents affecting EduSphere infrastruct
 
 ## 2. ROLES & RESPONSIBILITIES
 
-| Role | Responsibility | On-Call |
-|------|---------------|---------|
-| **Incident Commander (IC)** | Overall coordination, external comms | Security lead |
-| **Tech Lead** | Root cause analysis, remediation | On-call engineer |
-| **DPO (Data Protection Officer)** | GDPR notification decisions | Legal/DPO team |
-| **Communications Lead** | Internal + customer comms | Product/Support |
+| Role                              | Responsibility                       | On-Call          |
+| --------------------------------- | ------------------------------------ | ---------------- |
+| **Incident Commander (IC)**       | Overall coordination, external comms | Security lead    |
+| **Tech Lead**                     | Root cause analysis, remediation     | On-call engineer |
+| **DPO (Data Protection Officer)** | GDPR notification decisions          | Legal/DPO team   |
+| **Communications Lead**           | Internal + customer comms            | Product/Support  |
 
 ---
 
 ## 3. SEVERITY CLASSIFICATION
 
-| Level | Criteria | Max Response Time | Max Notification Time |
-|-------|----------|------------------|-----------------------|
-| 🔴 **P0 — Critical** | Personal data confirmed exposed; system-wide breach | 15 min | GDPR: 72h DPA; <24h affected tenants |
-| 🟠 **P1 — High** | Suspected data access; significant availability impact | 1 hour | 24h internal; 48h tenants if confirmed |
-| 🟡 **P2 — Medium** | Anomalous activity; limited impact | 4 hours | 72h if escalates to P0/P1 |
-| 🟢 **P3 — Low** | Minor policy violation; no data impact | 24 hours | N/A |
+| Level                | Criteria                                               | Max Response Time | Max Notification Time                  |
+| -------------------- | ------------------------------------------------------ | ----------------- | -------------------------------------- |
+| 🔴 **P0 — Critical** | Personal data confirmed exposed; system-wide breach    | 15 min            | GDPR: 72h DPA; <24h affected tenants   |
+| 🟠 **P1 — High**     | Suspected data access; significant availability impact | 1 hour            | 24h internal; 48h tenants if confirmed |
+| 🟡 **P2 — Medium**   | Anomalous activity; limited impact                     | 4 hours           | 72h if escalates to P0/P1              |
+| 🟢 **P3 — Low**      | Minor policy violation; no data impact                 | 24 hours          | N/A                                    |
 
 ---
 
@@ -47,6 +49,7 @@ This procedure applies to all security incidents affecting EduSphere infrastruct
 **Sources:** Wazuh alert | Falco alert | User report | Monitoring alert | Third-party notification
 
 Actions:
+
 1. Assign Incident Commander immediately
 2. Open dedicated incident channel: `#incident-YYYY-MM-DD-N`
 3. Create incident ticket with timestamp, source, initial description
@@ -60,6 +63,7 @@ Actions:
 ### Phase 2 — Containment & Evidence (0:15 to 4:00)
 
 **Evidence preservation (BEFORE any remediation):**
+
 ```bash
 # Preserve logs to tamper-evident storage before touching affected systems
 kubectl logs -l app=subgraph-core --since=24h > /incident/$(date +%Y%m%d)/core.log
@@ -78,6 +82,7 @@ curl -k -u admin:$WAZUH_PASSWORD \
 ```
 
 **Containment actions (severity-dependent):**
+
 ```bash
 # P0: Isolate affected namespace immediately
 kubectl cordon <node-name>
@@ -97,9 +102,10 @@ kubectl drain <node-name> --ignore-daemonsets
 #### GDPR Article 33 — Supervisory Authority Notification (within 72 hours)
 
 **Required information for DPA notification:**
+
 - Nature of the breach (accidental/unauthorized disclosure/alteration/destruction)
 - Categories and approximate number of affected data subjects
-- Categories and approximate number of affected records  
+- Categories and approximate number of affected records
 - Name and contact details of Data Protection Officer
 - Likely consequences of the breach
 - Measures taken or proposed to address the breach
@@ -115,6 +121,7 @@ kubectl drain <node-name> --ignore-daemonsets
 #### GDPR Article 34 — User Notification (if high risk)
 
 Notify affected users if the breach is likely to result in high risk to their rights:
+
 - Identity theft or fraud risk
 - Financial loss risk
 - Significant social harm (especially for minors)
@@ -124,6 +131,7 @@ Notify affected users if the breach is likely to result in high risk to their ri
 #### Tenant Notification (contractual obligation)
 
 Notify affected tenants (ORG_ADMIN) within **24 hours** of confirmed P0/P1 incident via:
+
 1. Email to tenant's registered DPO/admin contact
 2. In-platform notification (system banner)
 3. Dedicated status page update
@@ -138,6 +146,7 @@ Notify affected tenants (ORG_ADMIN) within **24 hours** of confirmed P0/P1 incid
 4. **Access restored** — lift isolation/quarantine in phases, verify system integrity
 
 **Recovery checklist:**
+
 - [ ] Root cause confirmed and patch deployed
 - [ ] All affected credentials rotated in OpenBao
 - [ ] Affected tenant data integrity verified (checksums, audit log review)
@@ -150,6 +159,7 @@ Notify affected tenants (ORG_ADMIN) within **24 hours** of confirmed P0/P1 incid
 ### Phase 5 — Post-Incident (within 7 days)
 
 **Required deliverables:**
+
 1. **Root Cause Analysis (RCA)** — 5-Why analysis, timeline, contributing factors
 2. **Action items** — each with owner, due date, severity
 3. **SOC 2 evidence package** — filed for auditor review (CC7.4)
@@ -160,25 +170,25 @@ Notify affected tenants (ORG_ADMIN) within **24 hours** of confirmed P0/P1 incid
 
 ## 5. AUTOMATED DETECTION SOURCES
 
-| Source | Tool | Alert Channel |
-|--------|------|---------------|
-| Cross-tenant RLS violation | Wazuh rule 100001 | `#security-alerts` |
+| Source                          | Tool              | Alert Channel      |
+| ------------------------------- | ----------------- | ------------------ |
+| Cross-tenant RLS violation      | Wazuh rule 100001 | `#security-alerts` |
 | Mass data export (>100 records) | Wazuh rule 100002 | `#security-alerts` |
-| Authentication brute force | Wazuh rule 100003 | `#security-alerts` |
-| Unexpected container outbound | Falco | `#security-alerts` |
-| Direct DB access bypass | Falco | `#security-alerts` |
-| Failed login spike | Keycloak + Wazuh | `#security-alerts` |
-| pgAudit: SELECT on PII tables | pgAudit + Wazuh | `#audit-log` |
+| Authentication brute force      | Wazuh rule 100003 | `#security-alerts` |
+| Unexpected container outbound   | Falco             | `#security-alerts` |
+| Direct DB access bypass         | Falco             | `#security-alerts` |
+| Failed login spike              | Keycloak + Wazuh  | `#security-alerts` |
+| pgAudit: SELECT on PII tables   | pgAudit + Wazuh   | `#audit-log`       |
 
 ---
 
 ## 6. CONTACT LIST
 
-| Role | Name | Email | Phone |
-|------|------|-------|-------|
-| DPO | TBD — appoint before EU market entry | dpo@edusphere.io | — |
-| Security Lead | TBD | security@edusphere.io | — |
-| Legal Counsel | TBD | legal@edusphere.io | — |
+| Role          | Name                                 | Email                 | Phone |
+| ------------- | ------------------------------------ | --------------------- | ----- |
+| DPO           | TBD — appoint before EU market entry | dpo@edusphere.io      | —     |
+| Security Lead | TBD                                  | security@edusphere.io | —     |
+| Legal Counsel | TBD                                  | legal@edusphere.io    | —     |
 
 > **Action required:** Appoint a named DPO before GDPR compliance audit.
 
@@ -187,6 +197,7 @@ Notify affected tenants (ORG_ADMIN) within **24 hours** of confirmed P0/P1 incid
 ## 7. EVIDENCE RETENTION
 
 All incident artifacts must be retained for **7 years** (SOC 2 CC7.4):
+
 - Incident tickets and communications
 - Evidence packages (logs, audit exports)
 - Notification copies (DPA, user, tenant)

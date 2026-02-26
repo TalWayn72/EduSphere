@@ -35,24 +35,23 @@ export class AdminOverviewService implements OnModuleDestroy {
 
   async getOverview(tenantId: string): Promise<AdminOverviewData> {
     try {
-      const [totalUsersResult, activeUsersResult, lastScimResult] = await Promise.all([
-        db
-          .select({ value: count() })
-          .from(users)
-          .where(eq(users.tenant_id, tenantId)),
-        db
-          .select({ value: count() })
-          .from(users)
-          .where(
-            gte(users.updated_at, sql`NOW() - INTERVAL '30 days'`)
-          ),
-        db
-          .select({ createdAt: scimSyncLog.createdAt })
-          .from(scimSyncLog)
-          .where(eq(scimSyncLog.tenantId, tenantId))
-          .orderBy(desc(scimSyncLog.createdAt))
-          .limit(1),
-      ]);
+      const [totalUsersResult, activeUsersResult, lastScimResult] =
+        await Promise.all([
+          db
+            .select({ value: count() })
+            .from(users)
+            .where(eq(users.tenant_id, tenantId)),
+          db
+            .select({ value: count() })
+            .from(users)
+            .where(gte(users.updated_at, sql`NOW() - INTERVAL '30 days'`)),
+          db
+            .select({ createdAt: scimSyncLog.createdAt })
+            .from(scimSyncLog)
+            .where(eq(scimSyncLog.tenantId, tenantId))
+            .orderBy(desc(scimSyncLog.createdAt))
+            .limit(1),
+        ]);
 
       const totalUsers = totalUsersResult[0]?.value ?? 0;
       const activeUsersThisMonth = activeUsersResult[0]?.value ?? 0;

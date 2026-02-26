@@ -52,15 +52,15 @@ test.describe('Content Viewer — Graph | Search tabs', () => {
   test('Graph tab is visible in the knowledge panel', async ({ page }) => {
     // The mini panel at the bottom of the middle column contains Tabs
     // TabsTrigger for "graph" renders with the Network icon + "Graph" text
-    await expect(
-      page.getByRole('tab', { name: /graph/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('tab', { name: /graph/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('Search tab is visible in the knowledge panel', async ({ page }) => {
-    await expect(
-      page.getByRole('tab', { name: /search/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('tab', { name: /search/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('Graph tab is active by default and shows concept nodes', async ({
@@ -88,11 +88,10 @@ test.describe('Content Viewer — Graph | Search tabs', () => {
     });
 
     // The search panel contains a text input for transcript search
-    const searchInput = page.locator(
-      'input[placeholder*="search"]',
-    ).or(
-      page.locator('input[placeholder*="Search"]')
-    ).last();
+    const searchInput = page
+      .locator('input[placeholder*="search"]')
+      .or(page.locator('input[placeholder*="Search"]'))
+      .last();
     await expect(searchInput).toBeVisible({ timeout: 3_000 });
   });
 
@@ -104,9 +103,13 @@ test.describe('Content Viewer — Graph | Search tabs', () => {
 
     // Switch back and forth
     await searchTab.click();
-    await expect(searchTab).toHaveAttribute('data-state', 'active', { timeout: 3_000 });
+    await expect(searchTab).toHaveAttribute('data-state', 'active', {
+      timeout: 3_000,
+    });
     await graphTab.click();
-    await expect(graphTab).toHaveAttribute('data-state', 'active', { timeout: 3_000 });
+    await expect(graphTab).toHaveAttribute('data-state', 'active', {
+      timeout: 3_000,
+    });
 
     // Video player must still be present
     await expect(page.locator('video')).toBeVisible({ timeout: 3_000 });
@@ -119,11 +122,10 @@ test.describe('Content Viewer — Graph | Search tabs', () => {
     await searchTab.click();
 
     // Last input on page is the mini transcript search (distinct from main input)
-    const searchInput = page.locator(
-      'input[placeholder*="search"]',
-    ).or(
-      page.locator('input[placeholder*="Search"]')
-    ).last();
+    const searchInput = page
+      .locator('input[placeholder*="search"]')
+      .or(page.locator('input[placeholder*="Search"]'))
+      .last();
     await searchInput.fill('kal');
     await page.waitForTimeout(300);
 
@@ -151,7 +153,9 @@ test.describe('Content Viewer — Graph | Search tabs', () => {
     const graphTab = page.getByRole('tab', { name: /graph/i }).first();
     await graphTab.click();
 
-    const exploreBtn = page.getByRole('button', { name: /explore full graph/i });
+    const exploreBtn = page.getByRole('button', {
+      name: /explore full graph/i,
+    });
     await expect(exploreBtn).toBeVisible({ timeout: 5_000 });
     await exploreBtn.click();
     await page.waitForTimeout(500);
@@ -178,35 +182,35 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
 
   test('"All" tab is visible in the TabsList', async ({ page }) => {
     // Radix Tabs: value="all"
-    await expect(
-      page.getByRole('tab', { name: /all/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('tab', { name: /all/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('PERSONAL tab is visible', async ({ page }) => {
     // TabsTrigger value="PERSONAL" — label "Personal" from ANNOTATION_LAYER_META
-    await expect(
-      page.getByRole('tab', { name: /Personal/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('tab', { name: /Personal/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('SHARED tab is visible', async ({ page }) => {
-    await expect(
-      page.getByRole('tab', { name: /Shared/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('tab', { name: /Shared/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('INSTRUCTOR tab is visible', async ({ page }) => {
-    await expect(
-      page.getByRole('tab', { name: /Instructor/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('tab', { name: /Instructor/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('AI_GENERATED tab is visible', async ({ page }) => {
     // Label is "AI" in ANNOTATION_LAYER_META
-    await expect(
-      page.getByRole('tab', { name: /AI/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('tab', { name: /AI/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('"All" tab is active by default', async ({ page }) => {
@@ -227,9 +231,7 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
     });
 
     // The tabpanel for PERSONAL should be visible
-    await expect(
-      page.getByRole('tabpanel')
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('tabpanel')).toBeVisible({ timeout: 3_000 });
   });
 
   test('clicking Shared tab activates the Shared panel', async ({ page }) => {
@@ -265,9 +267,9 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
     }
 
     // Page heading should still be visible after cycling
-    await expect(
-      page.getByRole('heading', { level: 1 })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('switching tabs shows different content (no annotations message is tab-specific)', async ({
@@ -279,9 +281,7 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
     await personalTab.click();
 
     // TabsContent for PERSONAL shows "no personal annotations" or similar empty state
-    await expect(
-      page.getByRole('tabpanel')
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('tabpanel')).toBeVisible({ timeout: 3_000 });
   });
 
   // ── Layer summary cards ──────────────────────────────────────────────────────
@@ -291,7 +291,9 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
   }) => {
     // ALL_LAYERS = [PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED]
     // Rendered as Card with role="button" and aria-pressed
-    const layerCards = page.getByRole('button', { name: /(Personal|Shared|Instructor|AI)/i });
+    const layerCards = page.getByRole('button', {
+      name: /(Personal|Shared|Instructor|AI)/i,
+    });
     const count = await layerCards.count();
     expect(count).toBeGreaterThanOrEqual(4);
   });
@@ -361,15 +363,15 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
 
   test('sort "By Time" button is visible', async ({ page }) => {
     // AnnotationsPage renders sort toggle buttons
-    await expect(
-      page.getByRole('button', { name: /time/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('button', { name: /time/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('sort "By Layer" button is visible', async ({ page }) => {
-    await expect(
-      page.getByRole('button', { name: /layer/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('button', { name: /layer/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('clicking "By Layer" sort button activates it', async ({ page }) => {
@@ -391,9 +393,9 @@ test.describe('Annotations page — layer tabs and summary cards', () => {
     await page.waitForTimeout(200);
 
     // Page heading must still be visible
-    await expect(
-      page.getByRole('heading', { level: 1 })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
+      timeout: 3_000,
+    });
   });
 });
 
@@ -411,19 +413,34 @@ test.describe('Agents page — 5 agent template mode cards', () => {
   test('all 5 agent mode cards are rendered', async ({ page }) => {
     // AGENT_MODES: chavruta, quiz, summarize, research, explain
     await expect(
-      page.locator('button').filter({ hasText: /Chavruta Debate/i }).first()
+      page
+        .locator('button')
+        .filter({ hasText: /Chavruta Debate/i })
+        .first()
     ).toBeVisible({ timeout: 8_000 });
     await expect(
-      page.locator('button').filter({ hasText: /Quiz Master/i }).first()
+      page
+        .locator('button')
+        .filter({ hasText: /Quiz Master/i })
+        .first()
     ).toBeVisible();
     await expect(
-      page.locator('button').filter({ hasText: /Summarizer/i }).first()
+      page
+        .locator('button')
+        .filter({ hasText: /Summarizer/i })
+        .first()
     ).toBeVisible();
     await expect(
-      page.locator('button').filter({ hasText: /Research Scout/i }).first()
+      page
+        .locator('button')
+        .filter({ hasText: /Research Scout/i })
+        .first()
     ).toBeVisible();
     await expect(
-      page.locator('button').filter({ hasText: /Explainer/i }).first()
+      page
+        .locator('button')
+        .filter({ hasText: /Explainer/i })
+        .first()
     ).toBeVisible();
   });
 
@@ -518,9 +535,9 @@ test.describe('Agents page — 5 agent template mode cards', () => {
     await quizCard.click();
 
     // Quiz greeting: "test your knowledge"
-    await expect(
-      page.getByText(/test your knowledge/i)
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/test your knowledge/i)).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('switching between all 5 modes sequentially does not crash', async ({
@@ -535,10 +552,7 @@ test.describe('Agents page — 5 agent template mode cards', () => {
     ];
 
     for (const name of modes) {
-      const card = page
-        .locator('button')
-        .filter({ hasText: name })
-        .first();
+      const card = page.locator('button').filter({ hasText: name }).first();
       await card.click();
       await page.waitForTimeout(200);
       await expect(card).toHaveClass(/ring-2/, { timeout: 2_000 });
@@ -560,26 +574,30 @@ test.describe('Agents page — 5 agent template mode cards', () => {
     ];
 
     for (const desc of expectedDescriptions) {
-      await expect(
-        page.getByText(desc).first()
-      ).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText(desc).first()).toBeVisible({
+        timeout: 5_000,
+      });
     }
   });
 
   test('quick prompt chips change when switching modes', async ({ page }) => {
     // Chavruta prompts
-    await expect(
-      page.getByText('Debate free will')
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Debate free will')).toBeVisible({
+      timeout: 5_000,
+    });
 
     // Switch to Quiz Master
-    await page.locator('button').filter({ hasText: /Quiz Master/i }).first().click();
+    await page
+      .locator('button')
+      .filter({ hasText: /Quiz Master/i })
+      .first()
+      .click();
     await page.waitForTimeout(300);
 
     // Quiz prompts appear
-    await expect(
-      page.getByText(/Quiz me/i).first()
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Quiz me/i).first()).toBeVisible({
+      timeout: 3_000,
+    });
 
     // Chavruta prompt should be gone (different mode chips)
     await expect(
@@ -625,15 +643,13 @@ test.describe('Course wizard — Difficulty select/combobox', () => {
     const trigger = page.getByRole('combobox').first();
     await trigger.click();
 
-    await expect(
-      page.getByRole('option', { name: /Beginner/i })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('option', { name: /Beginner/i })).toBeVisible({
+      timeout: 3_000,
+    });
     await expect(
       page.getByRole('option', { name: /Intermediate/i })
     ).toBeVisible();
-    await expect(
-      page.getByRole('option', { name: /Advanced/i })
-    ).toBeVisible();
+    await expect(page.getByRole('option', { name: /Advanced/i })).toBeVisible();
   });
 
   test('selecting Intermediate closes dropdown and shows Intermediate', async ({
@@ -678,9 +694,9 @@ test.describe('Course wizard — Difficulty select/combobox', () => {
     await trigger.press('Enter');
 
     // Options should be visible after pressing Enter
-    await expect(
-      page.getByRole('option', { name: /Beginner/i })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('option', { name: /Beginner/i })).toBeVisible({
+      timeout: 3_000,
+    });
 
     // Escape closes the dropdown
     await page.keyboard.press('Escape');
@@ -692,7 +708,9 @@ test.describe('Course wizard — Difficulty select/combobox', () => {
   test('changing difficulty does not affect the title field', async ({
     page,
   }) => {
-    const titleInput = page.locator('input[placeholder*="Introduction"]').first();
+    const titleInput = page
+      .locator('input[placeholder*="Introduction"]')
+      .first();
     await titleInput.fill('Original Title');
 
     const trigger = page.getByRole('combobox').first();
@@ -740,9 +758,9 @@ test.describe('Settings page — Language combobox', () => {
     const selector = page.getByRole('combobox').first();
     await selector.click();
 
-    await expect(
-      page.getByRole('option', { name: /English/i })
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('option', { name: /English/i })).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('selecting a locale from the dropdown closes the dropdown', async ({
@@ -755,9 +773,9 @@ test.describe('Settings page — Language combobox', () => {
     await firstOption.click();
 
     // Dropdown should close
-    await expect(
-      page.getByRole('option').first()
-    ).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('option').first()).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('language combobox shows flag + native name + English name in each option', async ({
@@ -771,7 +789,9 @@ test.describe('Settings page — Language combobox', () => {
     const englishOption = page.getByRole('option', { name: /English/i });
     await expect(englishOption).toBeVisible({ timeout: 3_000 });
     // The option contains a flag emoji span and the English label span
-    await expect(englishOption.locator('[role="img"]')).toBeAttached({ timeout: 2_000 });
+    await expect(englishOption.locator('[role="img"]')).toBeAttached({
+      timeout: 2_000,
+    });
   });
 
   test('language combobox is disabled when isSaving=true (simulated via multiple rapid selections)', async ({
@@ -822,9 +842,11 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
     // Open the annotation form
     const addBtn = page.getByRole('button', { name: /^Add$/i });
     await addBtn.click();
-    await page.locator('textarea[placeholder*="annotation"]').or(
-      page.locator('textarea[placeholder*="note"]')
-    ).first().waitFor({ state: 'visible', timeout: 5_000 });
+    await page
+      .locator('textarea[placeholder*="annotation"]')
+      .or(page.locator('textarea[placeholder*="note"]'))
+      .first()
+      .waitFor({ state: 'visible', timeout: 5_000 });
   });
 
   test('layer buttons are rendered inside the annotation form', async ({
@@ -832,7 +854,9 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   }) => {
     // Layer buttons use text labels from LAYER_META: Personal, Shared, Instructor, AI
     const layerSection = page.locator('div.px-4.py-3.border-b').first();
-    await expect(layerSection.getByText('Personal')).toBeVisible({ timeout: 5_000 });
+    await expect(layerSection.getByText('Personal')).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(layerSection.getByText('Shared')).toBeVisible();
     await expect(layerSection.getByText('Instructor')).toBeVisible();
   });
@@ -842,7 +866,10 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   }) => {
     // Default layer is AnnotationLayer.PERSONAL
     // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
-    const personalBtn = page.locator('button').filter({ hasText: /^Personal$/ }).last();
+    const personalBtn = page
+      .locator('button')
+      .filter({ hasText: /^Personal$/ })
+      .last();
     await expect(personalBtn).toBeVisible({ timeout: 5_000 });
     await expect(personalBtn).toHaveClass(/ring-2/, { timeout: 2_000 });
   });
@@ -851,8 +878,14 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
     page,
   }) => {
     // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
-    const personalBtn = page.locator('button').filter({ hasText: /^Personal$/ }).last();
-    const sharedBtn = page.locator('button').filter({ hasText: /^Shared$/ }).last();
+    const personalBtn = page
+      .locator('button')
+      .filter({ hasText: /^Personal$/ })
+      .last();
+    const sharedBtn = page
+      .locator('button')
+      .filter({ hasText: /^Shared$/ })
+      .last();
 
     await sharedBtn.click();
 
@@ -864,7 +897,10 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
 
   test('clicking INSTRUCTOR layer selects it', async ({ page }) => {
     // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
-    const instructorBtn = page.locator('button').filter({ hasText: /^Instructor$/ }).last();
+    const instructorBtn = page
+      .locator('button')
+      .filter({ hasText: /^Instructor$/ })
+      .last();
     await instructorBtn.click();
     await expect(instructorBtn).toHaveClass(/ring-2/, { timeout: 2_000 });
   });
@@ -878,9 +914,18 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
 
   test('only one layer can be selected at a time', async ({ page }) => {
     // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
-    const personalBtn = page.locator('button').filter({ hasText: /^Personal$/ }).last();
-    const sharedBtn = page.locator('button').filter({ hasText: /^Shared$/ }).last();
-    const instructorBtn = page.locator('button').filter({ hasText: /^Instructor$/ }).last();
+    const personalBtn = page
+      .locator('button')
+      .filter({ hasText: /^Personal$/ })
+      .last();
+    const sharedBtn = page
+      .locator('button')
+      .filter({ hasText: /^Shared$/ })
+      .last();
+    const instructorBtn = page
+      .locator('button')
+      .filter({ hasText: /^Instructor$/ })
+      .last();
 
     await sharedBtn.click();
     await expect(sharedBtn).toHaveClass(/ring-2/, { timeout: 2_000 });
@@ -893,12 +938,16 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   }) => {
     // Select SHARED layer, fill text, and save
     // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
-    const sharedBtn = page.locator('button').filter({ hasText: /^Shared$/ }).last();
+    const sharedBtn = page
+      .locator('button')
+      .filter({ hasText: /^Shared$/ })
+      .last();
     await sharedBtn.click();
 
-    const textarea = page.locator('textarea[placeholder*="annotation"]').or(
-      page.locator('textarea[placeholder*="note"]')
-    ).first();
+    const textarea = page
+      .locator('textarea[placeholder*="annotation"]')
+      .or(page.locator('textarea[placeholder*="note"]'))
+      .first();
     const uniqueText = `Shared layer annotation ${Date.now()}`;
     await textarea.fill(uniqueText);
 
@@ -906,8 +955,6 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
     await saveBtn.click();
 
     // Annotation should appear in the list (layer stored internally)
-    await expect(
-      page.getByText(uniqueText)
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(uniqueText)).toBeVisible({ timeout: 5_000 });
   });
 });

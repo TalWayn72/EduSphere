@@ -32,7 +32,9 @@ export function ScheduleLiveSessionModal({
   const [scheduledAt, setScheduledAt] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const [{ fetching }, createSession] = useMutation(CREATE_LIVE_SESSION_MUTATION);
+  const [{ fetching }, createSession] = useMutation(
+    CREATE_LIVE_SESSION_MUTATION
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,10 +69,7 @@ export function ScheduleLiveSessionModal({
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <label
-              htmlFor="meeting-name"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="meeting-name" className="text-sm font-medium">
               {t('liveSession.meetingName')}
             </label>
             <input
@@ -85,10 +84,7 @@ export function ScheduleLiveSessionModal({
           </div>
 
           <div className="space-y-1.5">
-            <label
-              htmlFor="scheduled-at"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="scheduled-at" className="text-sm font-medium">
               {t('liveSession.scheduledAt')}
             </label>
             <input
@@ -108,11 +104,18 @@ export function ScheduleLiveSessionModal({
           )}
 
           <DialogFooter className="pt-2">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={fetching}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onClose}
+              disabled={fetching}
+            >
               {t('common:cancel')}
             </Button>
             <Button type="submit" disabled={fetching}>
-              {fetching ? t('liveSession.scheduling') : t('liveSession.scheduleButton')}
+              {fetching
+                ? t('liveSession.scheduling')
+                : t('liveSession.scheduleButton')}
             </Button>
           </DialogFooter>
         </form>

@@ -4,7 +4,13 @@ import {
   NotFoundException,
   OnModuleDestroy,
 } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, and, closeAllPools } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  and,
+  closeAllPools,
+} from '@edusphere/db';
 
 export interface ScormSessionData {
   id: string;
@@ -20,7 +26,9 @@ export interface ScormSessionData {
 
 const COMPLETED_STATUSES = ['passed', 'completed'];
 
-function mapSession(row: typeof schema.scormSessions.$inferSelect): ScormSessionData {
+function mapSession(
+  row: typeof schema.scormSessions.$inferSelect
+): ScormSessionData {
   return {
     id: row.id,
     userId: row.user_id,
@@ -46,7 +54,7 @@ export class ScormSessionService implements OnModuleDestroy {
   async initSession(
     userId: string,
     contentItemId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<ScormSessionData> {
     // Return existing session if present, otherwise create
     const [existing] = await this.db
@@ -55,8 +63,8 @@ export class ScormSessionService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.scormSessions.user_id, userId),
-          eq(schema.scormSessions.content_item_id, contentItemId),
-        ),
+          eq(schema.scormSessions.content_item_id, contentItemId)
+        )
       )
       .limit(1);
 
@@ -83,7 +91,7 @@ export class ScormSessionService implements OnModuleDestroy {
   async updateSession(
     sessionId: string,
     userId: string,
-    cmiData: Record<string, string>,
+    cmiData: Record<string, string>
   ): Promise<void> {
     const lessonStatus = cmiData['cmi.core.lesson_status'] ?? undefined;
     const scoreRaw = cmiData['cmi.core.score.raw']
@@ -100,9 +108,12 @@ export class ScormSessionService implements OnModuleDestroy {
 
     const updates: Record<string, unknown> = { updated_at: new Date() };
     if (lessonStatus !== undefined) updates['lesson_status'] = lessonStatus;
-    if (scoreRaw !== undefined && !isNaN(scoreRaw)) updates['score_raw'] = scoreRaw;
-    if (scoreMin !== undefined && !isNaN(scoreMin)) updates['score_min'] = scoreMin;
-    if (scoreMax !== undefined && !isNaN(scoreMax)) updates['score_max'] = scoreMax;
+    if (scoreRaw !== undefined && !isNaN(scoreRaw))
+      updates['score_raw'] = scoreRaw;
+    if (scoreMin !== undefined && !isNaN(scoreMin))
+      updates['score_min'] = scoreMin;
+    if (scoreMax !== undefined && !isNaN(scoreMax))
+      updates['score_max'] = scoreMax;
     if (suspendData !== undefined) updates['suspend_data'] = suspendData;
     if (sessionTime !== undefined) updates['session_time'] = sessionTime;
 
@@ -112,8 +123,8 @@ export class ScormSessionService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.scormSessions.id, sessionId),
-          eq(schema.scormSessions.user_id, userId),
-        ),
+          eq(schema.scormSessions.user_id, userId)
+        )
       );
 
     this.logger.debug(`Updated SCORM session: id=${sessionId}`);
@@ -122,7 +133,7 @@ export class ScormSessionService implements OnModuleDestroy {
   async finishSession(
     sessionId: string,
     userId: string,
-    cmiData: Record<string, string>,
+    cmiData: Record<string, string>
   ): Promise<void> {
     await this.updateSession(sessionId, userId, cmiData);
 
@@ -134,8 +145,8 @@ export class ScormSessionService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.scormSessions.id, sessionId),
-            eq(schema.scormSessions.user_id, userId),
-          ),
+            eq(schema.scormSessions.user_id, userId)
+          )
         );
       this.logger.log(`SCORM session completed: id=${sessionId}`);
     }
@@ -143,7 +154,7 @@ export class ScormSessionService implements OnModuleDestroy {
 
   async findSession(
     userId: string,
-    contentItemId: string,
+    contentItemId: string
   ): Promise<ScormSessionData | null> {
     const [row] = await this.db
       .select()
@@ -151,8 +162,8 @@ export class ScormSessionService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.scormSessions.user_id, userId),
-          eq(schema.scormSessions.content_item_id, contentItemId),
-        ),
+          eq(schema.scormSessions.content_item_id, contentItemId)
+        )
       )
       .limit(1);
 
@@ -166,7 +177,8 @@ export class ScormSessionService implements OnModuleDestroy {
       .where(eq(schema.scormSessions.id, sessionId))
       .limit(1);
 
-    if (!row) throw new NotFoundException(`SCORM session ${sessionId} not found`);
+    if (!row)
+      throw new NotFoundException(`SCORM session ${sessionId} not found`);
     return mapSession(row);
   }
 }

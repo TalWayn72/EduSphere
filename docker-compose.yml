@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   # ═══════════════════════════════════════════════════════════════
@@ -13,21 +13,21 @@ services:
     image: edusphere:latest
     ports:
       # GraphQL Gateway + Subgraphs
-      - "4000:4000"   # Gateway
-      - "4001:4001"   # Core Subgraph
-      - "4002:4002"   # Content Subgraph (future)
-      - "4003:4003"   # Annotation Subgraph (future)
-      - "4004:4004"   # Collaboration Subgraph (future)
-      - "4005:4005"   # Agent Subgraph (future)
-      - "4006:4006"   # Knowledge Subgraph (future)
+      - "4000:4000" # Gateway
+      - "4001:4001" # Core Subgraph
+      - "4002:4002" # Content Subgraph (future)
+      - "4003:4003" # Annotation Subgraph (future)
+      - "4004:4004" # Collaboration Subgraph (future)
+      - "4005:4005" # Agent Subgraph (future)
+      - "4006:4006" # Knowledge Subgraph (future)
       # Infrastructure
-      - "5432:5432"   # PostgreSQL
-      - "6379:6379"   # Redis
-      - "8080:8080"   # Keycloak
-      - "4222:4222"   # NATS Client
-      - "8222:8222"   # NATS Monitoring
-      - "9000:9000"   # MinIO API
-      - "9001:9001"   # MinIO Console
+      - "5432:5432" # PostgreSQL
+      - "6379:6379" # Redis
+      - "8080:8080" # Keycloak
+      - "4222:4222" # NATS Client
+      - "8222:8222" # NATS Monitoring
+      - "9000:9000" # MinIO API
+      - "9001:9001" # MinIO Console
       - "11434:11434" # Ollama
     volumes:
       # Persist data outside container

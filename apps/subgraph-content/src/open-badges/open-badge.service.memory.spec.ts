@@ -11,7 +11,9 @@ import { OpenBadgeService } from './open-badge.service.js';
 const { mockSub, mockNats } = vi.hoisted(() => {
   const mockSub = {
     unsubscribe: vi.fn(),
-    [Symbol.asyncIterator]: function* () { /* noop */ },
+    [Symbol.asyncIterator]: function* () {
+      /* noop */
+    },
   };
   const mockNats = {
     subscribe: vi.fn(() => mockSub),

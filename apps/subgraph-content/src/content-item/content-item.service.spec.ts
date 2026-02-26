@@ -44,7 +44,11 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
   asc: vi.fn((col: unknown) => ({ col, dir: 'asc' })),
-  inArray: vi.fn((col: unknown, vals: unknown) => ({ col, vals, op: 'inArray' })),
+  inArray: vi.fn((col: unknown, vals: unknown) => ({
+    col,
+    vals,
+    op: 'inArray',
+  })),
 }));
 
 // Mock the microlearning schemas used by validateMicrolessonIfNeeded
@@ -66,11 +70,20 @@ vi.mock('../microlearning/microlearning.schemas', () => ({
 
 // ── Fixture helpers ───────────────────────────────────────────────────────────
 
-function makeDbRow(overrides: Partial<{
-  id: string; moduleId: string; title: string; type: string;
-  content: string | null; fileId: string | null; duration: number | null;
-  orderIndex: number; createdAt: Date; updatedAt: Date;
-}> = {}) {
+function makeDbRow(
+  overrides: Partial<{
+    id: string;
+    moduleId: string;
+    title: string;
+    type: string;
+    content: string | null;
+    fileId: string | null;
+    duration: number | null;
+    orderIndex: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }> = {}
+) {
   return {
     id: 'item-1',
     moduleId: 'module-1',
@@ -119,7 +132,9 @@ describe('ContentItemService', () => {
   it('should throw NotFoundException when item is not found', async () => {
     mockSelectBuilder.limit.mockResolvedValueOnce([]);
 
-    await expect(service.findById('nonexistent')).rejects.toThrow(NotFoundException);
+    await expect(service.findById('nonexistent')).rejects.toThrow(
+      NotFoundException
+    );
   });
 
   // ── Test 3 ──────────────────────────────────────────────────────────────────
@@ -165,25 +180,33 @@ describe('ContentItemService', () => {
 
   // ── Test 6 ──────────────────────────────────────────────────────────────────
   it('should pass validation for a valid MICROLESSON payload', () => {
-    const validContent = JSON.stringify({ title: 'Quick Quiz', durationSeconds: 300 });
+    const validContent = JSON.stringify({
+      title: 'Quick Quiz',
+      durationSeconds: 300,
+    });
 
-    expect(() => service.validateMicrolessonIfNeeded('MICROLESSON', validContent)).not.toThrow();
+    expect(() =>
+      service.validateMicrolessonIfNeeded('MICROLESSON', validContent)
+    ).not.toThrow();
   });
 
   // ── Test 7 ──────────────────────────────────────────────────────────────────
   it('should throw BadRequestException for invalid JSON in MICROLESSON content', () => {
     expect(() =>
-      service.validateMicrolessonIfNeeded('MICROLESSON', '{ not valid json }'),
+      service.validateMicrolessonIfNeeded('MICROLESSON', '{ not valid json }')
     ).toThrow(BadRequestException);
   });
 
   // ── Test 8 ──────────────────────────────────────────────────────────────────
   it('should throw BadRequestException when MICROLESSON durationSeconds exceeds 420', () => {
-    const tooLong = JSON.stringify({ title: 'Long Lesson', durationSeconds: 421 });
+    const tooLong = JSON.stringify({
+      title: 'Long Lesson',
+      durationSeconds: 421,
+    });
 
-    expect(() => service.validateMicrolessonIfNeeded('MICROLESSON', tooLong)).toThrow(
-      BadRequestException,
-    );
+    expect(() =>
+      service.validateMicrolessonIfNeeded('MICROLESSON', tooLong)
+    ).toThrow(BadRequestException);
   });
 
   // ── Test 9 ──────────────────────────────────────────────────────────────────

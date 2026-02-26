@@ -4,7 +4,10 @@ import { CustomRoleService } from './custom-role.service.js';
 import type { AuthContext } from '@edusphere/auth';
 import type { TenantContext } from '@edusphere/db';
 
-interface GraphQLContext { req: unknown; authContext?: AuthContext }
+interface GraphQLContext {
+  req: unknown;
+  authContext?: AuthContext;
+}
 
 @Resolver()
 export class CustomRoleResolver {
@@ -15,7 +18,8 @@ export class CustomRoleResolver {
     return {
       tenantId: ctx.authContext.tenantId ?? '',
       userId: ctx.authContext.userId ?? '',
-      userRole: (ctx.authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
+      userRole: (ctx.authContext.roles[0] ??
+        'STUDENT') as TenantContext['userRole'],
     };
   }
 
@@ -30,14 +34,21 @@ export class CustomRoleResolver {
   }
 
   @Query('userDelegations')
-  async getUserDelegations(@Args('userId') userId: string, @Context() ctx: GraphQLContext) {
-    return this.customRoleService.getUserDelegations(userId, this.tenantCtx(ctx));
+  async getUserDelegations(
+    @Args('userId') userId: string,
+    @Context() ctx: GraphQLContext
+  ) {
+    return this.customRoleService.getUserDelegations(
+      userId,
+      this.tenantCtx(ctx)
+    );
   }
 
   @Mutation('createRole')
   async createRole(
-    @Args('input') input: { name: string; description?: string; permissions: string[] },
-    @Context() ctx: GraphQLContext,
+    @Args('input')
+    input: { name: string; description?: string; permissions: string[] },
+    @Context() ctx: GraphQLContext
   ) {
     return this.customRoleService.createRole(input, this.tenantCtx(ctx));
   }
@@ -45,8 +56,9 @@ export class CustomRoleResolver {
   @Mutation('updateRole')
   async updateRole(
     @Args('id') id: string,
-    @Args('input') input: { name?: string; description?: string; permissions?: string[] },
-    @Context() ctx: GraphQLContext,
+    @Args('input')
+    input: { name?: string; description?: string; permissions?: string[] },
+    @Context() ctx: GraphQLContext
   ) {
     return this.customRoleService.updateRole(id, input, this.tenantCtx(ctx));
   }
@@ -61,13 +73,24 @@ export class CustomRoleResolver {
     @Args('userId') userId: string,
     @Args('roleId') roleId: string,
     @Args('validUntil') validUntil: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
-    return this.customRoleService.delegateRole(userId, roleId, validUntil ?? null, this.tenantCtx(ctx));
+    return this.customRoleService.delegateRole(
+      userId,
+      roleId,
+      validUntil ?? null,
+      this.tenantCtx(ctx)
+    );
   }
 
   @Mutation('revokeDelegation')
-  async revokeDelegation(@Args('delegationId') delegationId: string, @Context() ctx: GraphQLContext) {
-    return this.customRoleService.revokeDelegation(delegationId, this.tenantCtx(ctx));
+  async revokeDelegation(
+    @Args('delegationId') delegationId: string,
+    @Context() ctx: GraphQLContext
+  ) {
+    return this.customRoleService.revokeDelegation(
+      delegationId,
+      this.tenantCtx(ctx)
+    );
   }
 }

@@ -26,7 +26,10 @@ import { getCurrentUser } from '@/lib/auth';
 // ── Zod schema for Step 1 fields ─────────────────────────────────────────────
 export const courseSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters').or(z.literal('')),
+  description: z
+    .string()
+    .min(10, 'Description must be at least 10 characters')
+    .or(z.literal('')),
   difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   duration: z.string().optional(),
   thumbnail: z.string().min(1, 'Thumbnail required'),
@@ -66,10 +69,22 @@ export function CourseCreatePage() {
   const user = getCurrentUser();
 
   const STEPS = [
-    { label: t('wizard.step1Label'), description: t('wizard.step1Description') },
-    { label: t('wizard.step2Label'), description: t('wizard.step2Description') },
-    { label: t('wizard.mediaLabel'), description: t('wizard.mediaDescription') },
-    { label: t('wizard.publishLabel'), description: t('wizard.publishDescription') },
+    {
+      label: t('wizard.step1Label'),
+      description: t('wizard.step1Description'),
+    },
+    {
+      label: t('wizard.step2Label'),
+      description: t('wizard.step2Description'),
+    },
+    {
+      label: t('wizard.mediaLabel'),
+      description: t('wizard.mediaDescription'),
+    },
+    {
+      label: t('wizard.publishLabel'),
+      description: t('wizard.publishDescription'),
+    },
   ];
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
@@ -87,9 +102,10 @@ export function CourseCreatePage() {
     mode: 'onTouched',
   });
 
-  const [createResult, executeMutation] = useMutation<CreateCourseResult, CreateCourseVariables>(
-    CREATE_COURSE_MUTATION
-  );
+  const [createResult, executeMutation] = useMutation<
+    CreateCourseResult,
+    CreateCourseVariables
+  >(CREATE_COURSE_MUTATION);
 
   const isSubmitting = createResult.fetching;
 
@@ -129,7 +145,10 @@ export function CourseCreatePage() {
     });
 
     if (error) {
-      const msg = error.graphQLErrors?.[0]?.message ?? error.message ?? 'Failed to create course';
+      const msg =
+        error.graphQLErrors?.[0]?.message ??
+        error.message ??
+        'Failed to create course';
       toast.error(msg);
       return;
     }
@@ -148,7 +167,8 @@ export function CourseCreatePage() {
     ...wizardData,
     title: form.watch('title') || wizardData.title,
     description: form.watch('description') || wizardData.description,
-    difficulty: (form.watch('difficulty') as Difficulty) || wizardData.difficulty,
+    difficulty:
+      (form.watch('difficulty') as Difficulty) || wizardData.difficulty,
     thumbnail: form.watch('thumbnail') || wizardData.thumbnail,
   };
 
@@ -164,7 +184,11 @@ export function CourseCreatePage() {
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/courses')}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('title')}
           </Button>
@@ -188,7 +212,9 @@ export function CourseCreatePage() {
                   {i < step ? <Check className="h-4 w-4" /> : i + 1}
                 </div>
                 <div className="text-center hidden sm:block">
-                  <p className={`text-xs font-medium ${i === step ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  <p
+                    className={`text-xs font-medium ${i === step ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
                     {s.label}
                   </p>
                 </div>
@@ -208,13 +234,20 @@ export function CourseCreatePage() {
         <Card className="p-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold">{STEPS[step]?.label}</h2>
-            <p className="text-sm text-muted-foreground">{STEPS[step]?.description}</p>
+            <p className="text-sm text-muted-foreground">
+              {STEPS[step]?.description}
+            </p>
           </div>
 
           <Form {...form}>
             {step === 0 && <CourseWizardStep1 control={form.control} />}
           </Form>
-          {step === 1 && <CourseWizardStep2 modules={wizardData.modules} onChange={updateWizard} />}
+          {step === 1 && (
+            <CourseWizardStep2
+              modules={wizardData.modules}
+              onChange={updateWizard}
+            />
+          )}
           {step === 2 && (
             <CourseWizardMediaStep
               courseId={DRAFT_COURSE_ID}
@@ -223,7 +256,11 @@ export function CourseCreatePage() {
             />
           )}
           {step === 3 && (
-            <CourseWizardStep3 data={currentData} onPublish={handlePublish} isSubmitting={isSubmitting} />
+            <CourseWizardStep3
+              data={currentData}
+              onPublish={handlePublish}
+              isSubmitting={isSubmitting}
+            />
           )}
         </Card>
 
@@ -239,7 +276,9 @@ export function CourseCreatePage() {
               {t('wizard.back')}
             </Button>
             <Button
-              onClick={step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)}
+              onClick={
+                step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)
+              }
               disabled={step === 0 && !canAdvanceStep1}
             >
               {t('wizard.next')}

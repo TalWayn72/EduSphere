@@ -104,7 +104,11 @@ describe('SrsService', () => {
       };
       mockInsert.mockReturnValue(chain);
 
-      const result = await service.createCard('user-1', 'tenant-1', 'Photosynthesis');
+      const result = await service.createCard(
+        'user-1',
+        'tenant-1',
+        'Photosynthesis'
+      );
       expect(result.conceptName).toBe('Photosynthesis');
       expect(result.intervalDays).toBe(1);
       expect(result.easeFactor).toBe(2.5);
@@ -121,7 +125,11 @@ describe('SrsService', () => {
       };
       mockSelect.mockReturnValue(selectChain);
 
-      const updatedCard = makeCard({ repetitions: 2, intervalDays: 6, dueDate: tomorrow });
+      const updatedCard = makeCard({
+        repetitions: 2,
+        intervalDays: 6,
+        dueDate: tomorrow,
+      });
       const updateChain = {
         set: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
@@ -129,7 +137,12 @@ describe('SrsService', () => {
       };
       mockUpdate.mockReturnValue(updateChain);
 
-      const result = await service.submitReview('card-1', 'user-1', 'tenant-1', 4);
+      const result = await service.submitReview(
+        'card-1',
+        'user-1',
+        'tenant-1',
+        4
+      );
       expect(result.repetitions).toBe(2);
       expect(result.intervalDays).toBe(6);
     });
@@ -150,20 +163,25 @@ describe('SrsService', () => {
       };
       mockUpdate.mockReturnValue(updateChain);
 
-      const result = await service.submitReview('card-1', 'user-1', 'tenant-1', 1);
+      const result = await service.submitReview(
+        'card-1',
+        'user-1',
+        'tenant-1',
+        1
+      );
       expect(result.repetitions).toBe(0);
       expect(result.intervalDays).toBe(1);
     });
 
     it('throws RangeError for quality outside 0-5', async () => {
       await expect(
-        service.submitReview('card-1', 'user-1', 'tenant-1', 7),
+        service.submitReview('card-1', 'user-1', 'tenant-1', 7)
       ).rejects.toThrow(RangeError);
     });
 
     it('throws RangeError for negative quality', async () => {
       await expect(
-        service.submitReview('card-1', 'user-1', 'tenant-1', -1),
+        service.submitReview('card-1', 'user-1', 'tenant-1', -1)
       ).rejects.toThrow(RangeError);
     });
   });

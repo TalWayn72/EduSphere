@@ -49,7 +49,12 @@ export const mockVideo: VideoContent = {
 
 export const mockBookmarks: Bookmark[] = [
   { id: 'b1', timestamp: 15, label: 'Pilpul definition', color: '#3b82f6' },
-  { id: 'b2', timestamp: 30, label: 'Kal vachomer explained', color: '#10b981' },
+  {
+    id: 'b2',
+    timestamp: 30,
+    label: 'Kal vachomer explained',
+    color: '#10b981',
+  },
   { id: 'b3', timestamp: 75, label: 'Binyan av principle', color: '#f59e0b' },
   { id: 'b4', timestamp: 120, label: 'Analyzing sugya', color: '#8b5cf6' },
   { id: 'b5', timestamp: 210, label: 'Machloket value', color: '#ec4899' },

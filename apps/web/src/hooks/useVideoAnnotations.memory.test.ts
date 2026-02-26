@@ -31,7 +31,12 @@ vi.mock('@/lib/graphql/annotation.mutations', () => ({
 }));
 
 vi.mock('@/types/annotations', () => ({
-  AnnotationLayer: { PERSONAL: 'PERSONAL', SHARED: 'SHARED', INSTRUCTOR: 'INSTRUCTOR', AI_GENERATED: 'AI_GENERATED' },
+  AnnotationLayer: {
+    PERSONAL: 'PERSONAL',
+    SHARED: 'SHARED',
+    INSTRUCTOR: 'INSTRUCTOR',
+    AI_GENERATED: 'AI_GENERATED',
+  },
 }));
 
 import { useVideoAnnotations } from './useVideoAnnotations.js';
@@ -44,9 +49,10 @@ function setupUrqlMocks(subscriptionData: unknown = null) {
     { data: { annotationsByAsset: [] }, fetching: false, error: undefined },
     vi.fn(),
   ] as ReturnType<typeof urql.useQuery>);
-  vi.mocked(urql.useMutation).mockReturnValue(
-    [{ fetching: false }, vi.fn().mockResolvedValue({ data: null })] as ReturnType<typeof urql.useMutation>,
-  );
+  vi.mocked(urql.useMutation).mockReturnValue([
+    { fetching: false },
+    vi.fn().mockResolvedValue({ data: null }),
+  ] as ReturnType<typeof urql.useMutation>);
   vi.mocked(urql.useSubscription).mockReturnValue([
     { data: subscriptionData, fetching: false },
     vi.fn(),
@@ -65,14 +71,18 @@ describe('useVideoAnnotations — memory safety (subscription cleanup)', () => {
   // ── Test 1: subscription pauses on unmount ────────────────────────────────
   it('passes pause:true to useSubscription after component unmounts', () => {
     setupUrqlMocks();
-    const { unmount } = renderHook(() => useVideoAnnotations(VIDEO_ID, 'tenant-1'));
+    const { unmount } = renderHook(() =>
+      useVideoAnnotations(VIDEO_ID, 'tenant-1')
+    );
 
     // Verify subscription was initially active
     const firstCall = vi.mocked(urql.useSubscription).mock.calls[0];
     expect(firstCall?.[0]).toMatchObject({ pause: false });
 
     // Unmount triggers the useEffect cleanup which sets subscriptionPaused = true
-    act(() => { unmount(); });
+    act(() => {
+      unmount();
+    });
 
     // After unmount React calls cleanup — next rerender would use pause:true.
     // We verify the cleanup ran without error and useSubscription was called.
@@ -82,7 +92,9 @@ describe('useVideoAnnotations — memory safety (subscription cleanup)', () => {
   // ── Test 2: unmounting with active subscription does not throw ────────────
   it('does not throw when unmounting with an active subscription', () => {
     setupUrqlMocks();
-    const { unmount } = renderHook(() => useVideoAnnotations(VIDEO_ID, 'tenant-1'));
+    const { unmount } = renderHook(() =>
+      useVideoAnnotations(VIDEO_ID, 'tenant-1')
+    );
     expect(() => unmount()).not.toThrow();
   });
 
@@ -116,20 +128,29 @@ describe('useVideoAnnotations — memory safety (subscription cleanup)', () => {
     };
 
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { annotationsByAsset: [existingAnnotation] }, fetching: false, error: undefined },
+      {
+        data: { annotationsByAsset: [existingAnnotation] },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as ReturnType<typeof urql.useQuery>);
-    vi.mocked(urql.useMutation).mockReturnValue(
-      [{ fetching: false }, vi.fn()] as ReturnType<typeof urql.useMutation>,
-    );
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      vi.fn(),
+    ] as ReturnType<typeof urql.useMutation>);
     // Subscription returns the SAME annotation id as the one from the query
     vi.mocked(urql.useSubscription).mockReturnValue([
       { data: { annotationAdded: existingAnnotation }, fetching: false },
       vi.fn(),
     ] as ReturnType<typeof urql.useSubscription>);
 
-    const { result } = renderHook(() => useVideoAnnotations(VIDEO_ID, 'tenant-1'));
-    const matching = result.current.annotations.filter((a) => a.id === 'ann-existing');
+    const { result } = renderHook(() =>
+      useVideoAnnotations(VIDEO_ID, 'tenant-1')
+    );
+    const matching = result.current.annotations.filter(
+      (a) => a.id === 'ann-existing'
+    );
     expect(matching).toHaveLength(1);
   });
 });

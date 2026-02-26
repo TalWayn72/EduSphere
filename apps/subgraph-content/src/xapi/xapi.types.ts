@@ -37,20 +37,20 @@ export interface XapiContext {
 }
 
 export interface XapiStatement {
-  id: string;             // UUID
+  id: string; // UUID
   actor: XapiActor;
   verb: XapiVerb;
   object: XapiObject;
   result?: XapiResult;
   context?: XapiContext;
-  timestamp?: string;     // ISO 8601
-  stored?: string;        // ISO 8601
+  timestamp?: string; // ISO 8601
+  stored?: string; // ISO 8601
 }
 
 export interface XapiQueryParams {
   limit?: number;
-  since?: string;         // ISO 8601
-  until?: string;         // ISO 8601
+  since?: string; // ISO 8601
+  until?: string; // ISO 8601
   verb?: string;
   agent?: string;
 }
@@ -58,27 +58,27 @@ export interface XapiQueryParams {
 // ─── Verb URIs (xAPI 1.0.3 standard) ────────────────────────────────────────
 
 export const XAPI_VERBS = {
-  COMPLETED:  'http://adlnet.gov/expapi/verbs/completed',
-  LAUNCHED:   'http://adlnet.gov/expapi/verbs/launched',
-  VIEWED:     'http://id.tincanapi.com/verb/viewed',
-  PASSED:     'http://adlnet.gov/expapi/verbs/passed',
-  FAILED:     'http://adlnet.gov/expapi/verbs/failed',
-  ANNOTATED:  'http://risc-inc.com/annotator/verbs/annotated',
-  FOLLOWED:   'http://activitystrea.ms/schema/1.0/follow',
+  COMPLETED: 'http://adlnet.gov/expapi/verbs/completed',
+  LAUNCHED: 'http://adlnet.gov/expapi/verbs/launched',
+  VIEWED: 'http://id.tincanapi.com/verb/viewed',
+  PASSED: 'http://adlnet.gov/expapi/verbs/passed',
+  FAILED: 'http://adlnet.gov/expapi/verbs/failed',
+  ANNOTATED: 'http://risc-inc.com/annotator/verbs/annotated',
+  FOLLOWED: 'http://activitystrea.ms/schema/1.0/follow',
 } as const;
 
-export type XapiVerbId = typeof XAPI_VERBS[keyof typeof XAPI_VERBS];
+export type XapiVerbId = (typeof XAPI_VERBS)[keyof typeof XAPI_VERBS];
 
 // ─── NATS subject → verb mapping ─────────────────────────────────────────────
 
 export const SUBJECT_TO_VERB: Record<string, XapiVerbId> = {
-  'EDUSPHERE.course.completed':   XAPI_VERBS.COMPLETED,
-  'EDUSPHERE.course.started':     XAPI_VERBS.LAUNCHED,
-  'EDUSPHERE.content.viewed':     XAPI_VERBS.VIEWED,
-  'EDUSPHERE.quiz.passed':        XAPI_VERBS.PASSED,
-  'EDUSPHERE.quiz.failed':        XAPI_VERBS.FAILED,
+  'EDUSPHERE.course.completed': XAPI_VERBS.COMPLETED,
+  'EDUSPHERE.course.started': XAPI_VERBS.LAUNCHED,
+  'EDUSPHERE.content.viewed': XAPI_VERBS.VIEWED,
+  'EDUSPHERE.quiz.passed': XAPI_VERBS.PASSED,
+  'EDUSPHERE.quiz.failed': XAPI_VERBS.FAILED,
   'EDUSPHERE.annotation.created': XAPI_VERBS.ANNOTATED,
-  'EDUSPHERE.user.followed':      XAPI_VERBS.FOLLOWED,
+  'EDUSPHERE.user.followed': XAPI_VERBS.FOLLOWED,
 };
 
 export interface MappableNatsPayload {

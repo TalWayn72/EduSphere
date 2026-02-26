@@ -51,6 +51,7 @@ src/
 ## GraphQL Queries
 
 ### Courses
+
 ```graphql
 query Courses {
   courses(limit: 20) {
@@ -63,12 +64,10 @@ query Courses {
 ```
 
 ### AI Tutor
+
 ```graphql
 mutation CreateSession {
-  createAgentSession(input: {
-    userId: $userId
-    agentType: "TUTOR"
-  }) {
+  createAgentSession(input: { userId: $userId, agentType: "TUTOR" }) {
     id
   }
 }
@@ -89,6 +88,7 @@ pnpm build
 Output: `dist/`
 
 Serve with any static file server:
+
 ```bash
 npx serve -s dist
 ```
@@ -96,6 +96,7 @@ npx serve -s dist
 ## Integration with Gateway
 
 The client connects to the GraphQL Gateway (port 4000) which federates all 6 subgraphs:
+
 - Core (Users, Auth)
 - Content (Courses, Modules)
 - Annotation (Notes, Highlights)

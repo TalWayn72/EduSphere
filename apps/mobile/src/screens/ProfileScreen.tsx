@@ -27,7 +27,8 @@ const ME_QUERY = gql`
 export default function ProfileScreen() {
   const { data, loading } = useQuery(ME_QUERY);
   const { t } = useTranslation(['common', 'settings']);
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <ScrollView style={styles.container}>
@@ -55,41 +56,58 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>{t('settings:account.title')}</Text>
 
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>{t('settings:account.editProfile')}</Text>
+          <Text style={styles.menuItemText}>
+            {t('settings:account.editProfile')}
+          </Text>
           <Text style={styles.menuItemChevron}>›</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>{t('settings:notifications.title')}</Text>
+          <Text style={styles.menuItemText}>
+            {t('settings:notifications.title')}
+          </Text>
           <Text style={styles.menuItemChevron}>›</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>{t('settings:account.privacy')}</Text>
+          <Text style={styles.menuItemText}>
+            {t('settings:account.privacy')}
+          </Text>
           <Text style={styles.menuItemChevron}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Settings')}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Settings')}
+        >
           <Text style={styles.menuItemText}>{t('common:settings')}</Text>
           <Text style={styles.menuItemChevron}>›</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('settings:account.myLearning')}</Text>
+        <Text style={styles.sectionTitle}>
+          {t('settings:account.myLearning')}
+        </Text>
 
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>{t('settings:account.myLearning')}</Text>
+          <Text style={styles.menuItemText}>
+            {t('settings:account.myLearning')}
+          </Text>
           <Text style={styles.menuItemChevron}>›</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>{t('settings:account.progress')}</Text>
+          <Text style={styles.menuItemText}>
+            {t('settings:account.progress')}
+          </Text>
           <Text style={styles.menuItemChevron}>›</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>{t('settings:account.achievements')}</Text>
+          <Text style={styles.menuItemText}>
+            {t('settings:account.achievements')}
+          </Text>
           <Text style={styles.menuItemChevron}>›</Text>
         </TouchableOpacity>
       </View>
@@ -100,7 +118,9 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.version}>{t('settings:account.version', { version: '1.0.0' })}</Text>
+      <Text style={styles.version}>
+        {t('settings:account.version', { version: '1.0.0' })}
+      </Text>
     </ScrollView>
   );
 }

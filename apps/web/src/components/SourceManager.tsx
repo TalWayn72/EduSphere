@@ -28,12 +28,19 @@ import {
 // ─── DEV_MODE flag ────────────────────────────────────────────────────────────
 
 const IS_DEV_MODE =
-  import.meta.env.VITE_DEV_MODE === 'true' || !import.meta.env.VITE_KEYCLOAK_URL;
+  import.meta.env.VITE_DEV_MODE === 'true' ||
+  !import.meta.env.VITE_KEYCLOAK_URL;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type SourceStatus = 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED';
-type SourceType = 'FILE_DOCX' | 'FILE_PDF' | 'FILE_TXT' | 'URL' | 'YOUTUBE' | 'TEXT';
+type SourceType =
+  | 'FILE_DOCX'
+  | 'FILE_PDF'
+  | 'FILE_TXT'
+  | 'URL'
+  | 'YOUTUBE'
+  | 'TEXT';
 
 interface KnowledgeSource {
   id: string;
@@ -52,25 +59,25 @@ interface KnowledgeSource {
 
 const SOURCE_ICONS: Record<SourceType, string> = {
   FILE_DOCX: '📄',
-  FILE_PDF:  '📕',
-  FILE_TXT:  '📝',
-  URL:       '🌐',
-  YOUTUBE:   '▶️',
-  TEXT:      '✏️',
+  FILE_PDF: '📕',
+  FILE_TXT: '📝',
+  URL: '🌐',
+  YOUTUBE: '▶️',
+  TEXT: '✏️',
 };
 
 const STATUS_COLORS: Record<SourceStatus, string> = {
-  PENDING:    'text-yellow-500',
+  PENDING: 'text-yellow-500',
   PROCESSING: 'text-blue-500 animate-pulse',
-  READY:      'text-green-600',
-  FAILED:     'text-red-500',
+  READY: 'text-green-600',
+  FAILED: 'text-red-500',
 };
 
 const STATUS_LABELS: Record<SourceStatus, string> = {
-  PENDING:    'ממתין...',
+  PENDING: 'ממתין...',
   PROCESSING: 'מעבד...',
-  READY:      'מוכן',
-  FAILED:     'שגיאה',
+  READY: 'מוכן',
+  FAILED: 'שגיאה',
 };
 
 // ─── DEV_MODE mock data ───────────────────────────────────────────────────────
@@ -135,7 +142,9 @@ function AddSourceModal({
 
   // Close modal on Escape key
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
@@ -145,7 +154,10 @@ function AddSourceModal({
       ? devMutationFn
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_URL_SOURCE, { input }),
-    onSuccess: () => { onAdded(); onClose(); },
+    onSuccess: () => {
+      onAdded();
+      onClose();
+    },
     onError: (e) => setError(String(e)),
   });
 
@@ -154,7 +166,10 @@ function AddSourceModal({
       ? devMutationFn
       : (input: { courseId: string; title: string; text: string }) =>
           graphqlClient.request(ADD_TEXT_SOURCE, { input }),
-    onSuccess: () => { onAdded(); onClose(); },
+    onSuccess: () => {
+      onAdded();
+      onClose();
+    },
     onError: (e) => setError(String(e)),
   });
 
@@ -163,7 +178,10 @@ function AddSourceModal({
       ? devMutationFn
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }),
-    onSuccess: () => { onAdded(); onClose(); },
+    onSuccess: () => {
+      onAdded();
+      onClose();
+    },
     onError: (e) => setError(String(e)),
   });
 
@@ -209,11 +227,19 @@ function AddSourceModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-[520px] rounded-2xl bg-white shadow-2xl flex flex-col" dir="rtl">
+      <div
+        className="w-[520px] rounded-2xl bg-white shadow-2xl flex flex-col"
+        dir="rtl"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-semibold">הוספת מקור מידע</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 text-xl"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Tabs */}
@@ -225,7 +251,13 @@ function AddSourceModal({
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors
                 ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             >
-              {t === 'url' ? '🌐 קישור' : t === 'text' ? '✏️ טקסט' : t === 'youtube' ? '▶️ YouTube' : '📄 קובץ'}
+              {t === 'url'
+                ? '🌐 קישור'
+                : t === 'text'
+                  ? '✏️ טקסט'
+                  : t === 'youtube'
+                    ? '▶️ YouTube'
+                    : '📄 קובץ'}
             </button>
           ))}
         </div>
@@ -234,19 +266,21 @@ function AddSourceModal({
         <div className="p-6 flex flex-col gap-4">
           {tab === 'url' && (
             <>
-              <label className="text-xs font-medium text-gray-700">כתובת URL</label>
+              <label className="text-xs font-medium text-gray-700">
+                כתובת URL
+              </label>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="https://..."
                 value={url}
-                onChange={e => setUrl(e.target.value)}
+                onChange={(e) => setUrl(e.target.value)}
                 dir="ltr"
               />
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="כותרת (אופציונלי)"
                 value={urlTitle}
-                onChange={e => setUrlTitle(e.target.value)}
+                onChange={(e) => setUrlTitle(e.target.value)}
               />
               <p className="text-xs text-gray-500">
                 המערכת תאסוף את תוכן העמוד, תחלק לחלקים ותצור embeddings.
@@ -260,13 +294,13 @@ function AddSourceModal({
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 placeholder="כותרת למקור"
                 value={textTitle}
-                onChange={e => setTextTitle(e.target.value)}
+                onChange={(e) => setTextTitle(e.target.value)}
               />
               <textarea
                 className="w-full border rounded-lg px-3 py-2 text-sm h-40 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="הדבק כאן טקסט חופשי — מאמר, קטע ספר, הערות..."
                 value={text}
-                onChange={e => setText(e.target.value)}
+                onChange={(e) => setText(e.target.value)}
               />
             </>
           )}
@@ -277,17 +311,18 @@ function AddSourceModal({
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="https://youtube.com/watch?v=..."
                 value={youtubeUrl}
-                onChange={e => setYoutubeUrl(e.target.value)}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
                 dir="ltr"
               />
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 placeholder="כותרת (אופציונלי)"
                 value={youtubeTitle}
-                onChange={e => setYoutubeTitle(e.target.value)}
+                onChange={(e) => setYoutubeTitle(e.target.value)}
               />
               <p className="text-xs text-gray-500">
-                המערכת תוריד את תמלול הווידאו ותיצור ממנו embeddings לחיפוש סמנטי.
+                המערכת תוריד את תמלול הווידאו ותיצור ממנו embeddings לחיפוש
+                סמנטי.
               </p>
             </>
           )}
@@ -298,18 +333,22 @@ function AddSourceModal({
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 placeholder="כותרת (אופציונלי)"
                 value={fileTitle}
-                onChange={e => setFileTitle(e.target.value)}
+                onChange={(e) => setFileTitle(e.target.value)}
               />
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors">
                 <span className="text-3xl mb-1">📂</span>
-                <span className="text-sm text-gray-600">גרור קובץ לכאן או לחץ לבחירה</span>
-                <span className="text-xs text-gray-400 mt-1">DOCX, PDF, TXT</span>
+                <span className="text-sm text-gray-600">
+                  גרור קובץ לכאן או לחץ לבחירה
+                </span>
+                <span className="text-xs text-gray-400 mt-1">
+                  DOCX, PDF, TXT
+                </span>
                 <input
                   ref={fileRef}
                   type="file"
                   accept=".docx,.pdf,.txt"
                   className="hidden"
-                  onChange={e => {
+                  onChange={(e) => {
                     const f = e.target.files?.[0];
                     if (f && !fileTitle) setFileTitle(f.name);
                   }}
@@ -319,13 +358,18 @@ function AddSourceModal({
           )}
 
           {error && (
-            <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+            <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">
+              {error}
+            </p>
           )}
         </div>
 
         {/* Footer */}
         <div className="flex gap-3 justify-end px-6 py-4 border-t">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+          >
             ביטול
           </button>
           <button
@@ -353,24 +397,32 @@ function SourceDetailDrawer({
   const { data, isLoading } = useQuery({
     queryKey: ['knowledge-source', sourceId],
     queryFn: IS_DEV_MODE
-      ? () => Promise.resolve(DEV_SOURCES.find((s) => s.id === sourceId) ?? DEV_SOURCES[0])
+      ? () =>
+          Promise.resolve(
+            DEV_SOURCES.find((s) => s.id === sourceId) ?? DEV_SOURCES[0]
+          )
       : () =>
           graphqlClient
             .request(KNOWLEDGE_SOURCE_DETAIL, { id: sourceId })
-            .then((r: { knowledgeSource: KnowledgeSource }) => r.knowledgeSource),
+            .then(
+              (r: { knowledgeSource: KnowledgeSource }) => r.knowledgeSource
+            ),
   });
 
   return (
     <div className="absolute inset-0 z-10 bg-white flex flex-col" dir="rtl">
       <div className="flex items-center gap-2 px-4 py-3 border-b">
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-700">← חזרה</button>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
+          ← חזרה
+        </button>
         <span className="font-medium truncate">{data?.title ?? '...'}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
         {isLoading ? 'טוען...' : (data?.rawContent ?? 'אין תוכן זמין.')}
       </div>
       <div className="px-4 py-2 border-t text-xs text-gray-400">
-        {data && `${data.chunkCount} קטעים • נוצר ${new Date(data.createdAt).toLocaleDateString('he-IL')}`}
+        {data &&
+          `${data.chunkCount} קטעים • נוצר ${new Date(data.createdAt).toLocaleDateString('he-IL')}`}
       </div>
     </div>
   );
@@ -389,13 +441,16 @@ export function SourceManager({ courseId }: { courseId: string }) {
       : () =>
           graphqlClient
             .request(COURSE_KNOWLEDGE_SOURCES, { courseId })
-            .then((r: { courseKnowledgeSources: KnowledgeSource[] }) => r.courseKnowledgeSources),
+            .then(
+              (r: { courseKnowledgeSources: KnowledgeSource[] }) =>
+                r.courseKnowledgeSources
+            ),
     refetchInterval: IS_DEV_MODE
       ? false
       : (query) => {
           const sources = query.state.data as KnowledgeSource[] | undefined;
           const hasProcessing = sources?.some(
-            (s) => s.status === 'PENDING' || s.status === 'PROCESSING',
+            (s) => s.status === 'PENDING' || s.status === 'PROCESSING'
           );
           return hasProcessing ? 3000 : false;
         },
@@ -413,11 +468,14 @@ export function SourceManager({ courseId }: { courseId: string }) {
       e.stopPropagation();
       if (confirm('להסיר מקור זה?')) deleteSource.mutate(id);
     },
-    [deleteSource],
+    [deleteSource]
   );
 
   return (
-    <div className="relative flex flex-col h-full bg-gray-50 border-r" dir="rtl">
+    <div
+      className="relative flex flex-col h-full bg-gray-50 border-r"
+      dir="rtl"
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-white">
         <div>
@@ -438,13 +496,17 @@ export function SourceManager({ courseId }: { courseId: string }) {
       {/* Source list */}
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
         {isLoading && (
-          <div className="text-center text-sm text-gray-400 mt-8">טוען מקורות...</div>
+          <div className="text-center text-sm text-gray-400 mt-8">
+            טוען מקורות...
+          </div>
         )}
 
         {!isLoading && data?.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <span className="text-5xl mb-3">📚</span>
-            <p className="text-sm font-medium text-gray-700">אין מקורות עדיין</p>
+            <p className="text-sm font-medium text-gray-700">
+              אין מקורות עדיין
+            </p>
             <p className="text-xs text-gray-500 mt-1">
               הוסף קישורים, מסמכים או טקסט — המערכת תנתח ותאנדקס אותם
             </p>
@@ -457,11 +519,17 @@ export function SourceManager({ courseId }: { courseId: string }) {
             onClick={() => setDetailId(source.id)}
             className="flex items-start gap-3 p-3 rounded-xl bg-white border hover:border-blue-300 cursor-pointer transition-all group"
           >
-            <span className="text-xl mt-0.5 shrink-0">{SOURCE_ICONS[source.sourceType]}</span>
+            <span className="text-xl mt-0.5 shrink-0">
+              {SOURCE_ICONS[source.sourceType]}
+            </span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-800 truncate">{source.title}</p>
+              <p className="text-sm font-medium text-gray-800 truncate">
+                {source.title}
+              </p>
               {source.origin && (
-                <p className="text-xs text-gray-400 truncate mt-0.5">{source.origin}</p>
+                <p className="text-xs text-gray-400 truncate mt-0.5">
+                  {source.origin}
+                </p>
               )}
               {source.preview && source.status === 'READY' && (
                 <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
@@ -469,14 +537,20 @@ export function SourceManager({ courseId }: { courseId: string }) {
                 </p>
               )}
               <div className="flex items-center gap-2 mt-1.5">
-                <span className={`text-xs font-medium ${STATUS_COLORS[source.status]}`}>
+                <span
+                  className={`text-xs font-medium ${STATUS_COLORS[source.status]}`}
+                >
                   {STATUS_LABELS[source.status]}
                 </span>
                 {source.status === 'READY' && (
-                  <span className="text-xs text-gray-400">· {source.chunkCount} קטעים</span>
+                  <span className="text-xs text-gray-400">
+                    · {source.chunkCount} קטעים
+                  </span>
                 )}
                 {source.status === 'FAILED' && source.errorMessage && (
-                  <span className="text-xs text-red-400 truncate">— {source.errorMessage}</span>
+                  <span className="text-xs text-red-400 truncate">
+                    — {source.errorMessage}
+                  </span>
                 )}
               </div>
             </div>
@@ -511,7 +585,10 @@ export function SourceManager({ courseId }: { courseId: string }) {
         <AddSourceModal
           courseId={courseId}
           onClose={() => setShowAdd(false)}
-          onAdded={() => { refetch(); setShowAdd(false); }}
+          onAdded={() => {
+            refetch();
+            setShowAdd(false);
+          }}
         />
       )}
     </div>

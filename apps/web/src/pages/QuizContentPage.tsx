@@ -21,7 +21,8 @@ function SkeletonBlock() {
 
 export function QuizContentPage() {
   const { contentId = '' } = useParams<{ contentId: string }>();
-  const { isQuiz, quizContent, title, fetching, error } = useQuizContent(contentId);
+  const { isQuiz, quizContent, title, fetching, error } =
+    useQuizContent(contentId);
 
   return (
     <Layout>

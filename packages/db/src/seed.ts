@@ -153,9 +153,13 @@ async function seed() {
       '   - 5 users (1 super admin, 1 org admin, 1 instructor, 2 students)'
     );
     console.log('   - 1 course with 2 modules (Jewish Philosophy)');
-    console.log('   - 1 example course: נהר שלום (8 modules, 27 content items)');
+    console.log(
+      '   - 1 example course: נהר שלום (8 modules, 27 content items)'
+    );
     console.log('   - 1 KnowledgeSource: נהר שלום DOCX (full text + chunks)');
-    console.log('   - Apache AGE graph initialized + 15 Kabbalistic concept nodes');
+    console.log(
+      '   - Apache AGE graph initialized + 15 Kabbalistic concept nodes'
+    );
   } catch (error) {
     console.error('❌ Seed failed:', error);
     process.exit(1);

@@ -80,8 +80,9 @@ describe('EnrollmentService', () => {
       // Two sequential selects: course exists, then not-enrolled-yet
       const chain1 = makeSelectChain([{ id: 'course-1' }]);
       const chain2 = makeSelectChain([]);
-      mockSelect.mockReturnValueOnce({ from: chain1.from })
-                .mockReturnValueOnce({ from: chain2.from });
+      mockSelect
+        .mockReturnValueOnce({ from: chain1.from })
+        .mockReturnValueOnce({ from: chain2.from });
 
       const mockReturning = vi.fn().mockResolvedValue([MOCK_ENROLLMENT]);
       const mockValues = vi.fn().mockReturnValue({ returning: mockReturning });
@@ -101,25 +102,33 @@ describe('EnrollmentService', () => {
     it('throws NotFoundException when course not found', async () => {
       const chain = makeSelectChain([]);
       mockSelect.mockReturnValueOnce({ from: chain.from });
-      await expect(service.enrollCourse('no-course', TENANT_CTX)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.enrollCourse('no-course', TENANT_CTX)
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('throws ConflictException when already enrolled', async () => {
       const chain1 = makeSelectChain([{ id: 'course-1' }]);
       const chain2 = makeSelectChain([{ id: 'enroll-1' }]);
-      mockSelect.mockReturnValueOnce({ from: chain1.from })
-                .mockReturnValueOnce({ from: chain2.from });
-      await expect(service.enrollCourse('course-1', TENANT_CTX)).rejects.toThrow(ConflictException);
+      mockSelect
+        .mockReturnValueOnce({ from: chain1.from })
+        .mockReturnValueOnce({ from: chain2.from });
+      await expect(
+        service.enrollCourse('course-1', TENANT_CTX)
+      ).rejects.toThrow(ConflictException);
     });
 
     it('maps enrolledAt to ISO string', async () => {
       const chain1 = makeSelectChain([{ id: 'course-1' }]);
       const chain2 = makeSelectChain([]);
-      mockSelect.mockReturnValueOnce({ from: chain1.from })
-                .mockReturnValueOnce({ from: chain2.from });
+      mockSelect
+        .mockReturnValueOnce({ from: chain1.from })
+        .mockReturnValueOnce({ from: chain2.from });
 
       const mockReturning = vi.fn().mockResolvedValue([MOCK_ENROLLMENT]);
-      mockInsert.mockReturnValue({ values: vi.fn().mockReturnValue({ returning: mockReturning }) });
+      mockInsert.mockReturnValue({
+        values: vi.fn().mockReturnValue({ returning: mockReturning }),
+      });
 
       const result = await service.enrollCourse('course-1', TENANT_CTX);
       expect(typeof result.enrolledAt).toBe('string');
@@ -129,11 +138,16 @@ describe('EnrollmentService', () => {
     it('maps null completedAt correctly', async () => {
       const chain1 = makeSelectChain([{ id: 'course-1' }]);
       const chain2 = makeSelectChain([]);
-      mockSelect.mockReturnValueOnce({ from: chain1.from })
-                .mockReturnValueOnce({ from: chain2.from });
+      mockSelect
+        .mockReturnValueOnce({ from: chain1.from })
+        .mockReturnValueOnce({ from: chain2.from });
 
-      const mockReturning = vi.fn().mockResolvedValue([{ ...MOCK_ENROLLMENT, completedAt: null }]);
-      mockInsert.mockReturnValue({ values: vi.fn().mockReturnValue({ returning: mockReturning }) });
+      const mockReturning = vi
+        .fn()
+        .mockResolvedValue([{ ...MOCK_ENROLLMENT, completedAt: null }]);
+      mockInsert.mockReturnValue({
+        values: vi.fn().mockReturnValue({ returning: mockReturning }),
+      });
 
       const result = await service.enrollCourse('course-1', TENANT_CTX);
       expect(result.completedAt).toBeNull();
@@ -156,7 +170,9 @@ describe('EnrollmentService', () => {
       const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
       mockDelete.mockReturnValue({ where: mockWhere });
 
-      await expect(service.unenrollCourse('course-1', TENANT_CTX)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.unenrollCourse('course-1', TENANT_CTX)
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('calls delete on userCourses table', async () => {
@@ -204,7 +220,9 @@ describe('EnrollmentService', () => {
   describe('markContentViewed()', () => {
     it('returns true on success', async () => {
       const mockOnConflict = vi.fn().mockResolvedValue(undefined);
-      const mockValues = vi.fn().mockReturnValue({ onConflictDoUpdate: mockOnConflict });
+      const mockValues = vi
+        .fn()
+        .mockReturnValue({ onConflictDoUpdate: mockOnConflict });
       mockInsert.mockReturnValue({ values: mockValues });
 
       const result = await service.markContentViewed('item-1', TENANT_CTX);
@@ -213,7 +231,9 @@ describe('EnrollmentService', () => {
 
     it('calls insert on userProgress table', async () => {
       const mockOnConflict = vi.fn().mockResolvedValue(undefined);
-      mockInsert.mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoUpdate: mockOnConflict }) });
+      mockInsert.mockReturnValue({
+        values: vi.fn().mockReturnValue({ onConflictDoUpdate: mockOnConflict }),
+      });
 
       await service.markContentViewed('item-1', TENANT_CTX);
       expect(mockInsert).toHaveBeenCalled();
@@ -221,7 +241,9 @@ describe('EnrollmentService', () => {
 
     it('uses onConflictDoUpdate for upsert behavior', async () => {
       const mockOnConflict = vi.fn().mockResolvedValue(undefined);
-      mockInsert.mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoUpdate: mockOnConflict }) });
+      mockInsert.mockReturnValue({
+        values: vi.fn().mockReturnValue({ onConflictDoUpdate: mockOnConflict }),
+      });
 
       await service.markContentViewed('item-1', TENANT_CTX);
       expect(mockOnConflict).toHaveBeenCalled();

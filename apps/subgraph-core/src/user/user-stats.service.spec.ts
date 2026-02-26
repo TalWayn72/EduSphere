@@ -21,7 +21,8 @@ const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 
 // withTenantContext just calls the callback with the db directly in tests
 const mockWithTenantContext = vi.fn(
-  (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => fn(_db),
+  (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
+    fn(_db)
 );
 
 const mockSelectBuilder = {
@@ -42,11 +43,17 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => mockDb,
   closeAllPools: (...args: unknown[]) => mockCloseAllPools(...args),
-  withTenantContext: (...args: unknown[]) => mockWithTenantContext(...(args as Parameters<typeof mockWithTenantContext>)),
+  withTenantContext: (...args: unknown[]) =>
+    mockWithTenantContext(
+      ...(args as Parameters<typeof mockWithTenantContext>)
+    ),
   schema: {
     annotations: { user_id: 'user_id', tenant_id: 'tenant_id' },
   },
-  sql: vi.fn((strings: TemplateStringsArray, ...vals: unknown[]) => ({ strings, vals })),
+  sql: vi.fn((strings: TemplateStringsArray, ...vals: unknown[]) => ({
+    strings,
+    vals,
+  })),
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
   and: vi.fn((...conds: unknown[]) => ({ conds, op: 'and' })),
 }));
@@ -67,20 +74,23 @@ describe('UserStatsService', () => {
     enrolledCount: number,
     completedCount: number,
     totalSeconds: number,
-    activityRows: { date: string; count: number }[],
+    activityRows: { date: string; count: number }[]
   ) {
     mockExecute
       .mockResolvedValueOnce({ rows: [{ count: enrolledCount }] }) // countEnrolled
-      .mockResolvedValueOnce({                                       // sumLearningMinutes
+      .mockResolvedValueOnce({
+        // sumLearningMinutes
         rows: [{ completed: completedCount, total_seconds: totalSeconds }],
       })
-      .mockResolvedValueOnce({ rows: activityRows });                // fetchWeeklyActivity
+      .mockResolvedValueOnce({ rows: activityRows }); // fetchWeeklyActivity
   }
 
   /** Sets up what the select chain resolves with for countAnnotations. */
   function setupAnnotationsMock(count: number) {
     mockSelectBuilder.from = vi.fn().mockReturnThis();
-    mockSelectBuilder.where = vi.fn().mockResolvedValue([{ count: String(count) }]);
+    mockSelectBuilder.where = vi
+      .fn()
+      .mockResolvedValue([{ count: String(count) }]);
     mockDb.select = vi.fn().mockReturnValue(mockSelectBuilder);
   }
 

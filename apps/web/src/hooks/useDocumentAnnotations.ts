@@ -48,7 +48,7 @@ export interface DocumentAnnotationInput {
 
 /** Returns true when ann has a valid textRange (either normalised or raw spatialData). */
 function hasTextRange(
-  ann: Annotation,
+  ann: Annotation
 ): ann is Annotation & { textRange: { from: number; to: number } } {
   if (ann.textRange != null) return true;
   // Backwards-compatibility: spatialData may arrive un-normalised in the JSON field.
@@ -64,10 +64,9 @@ function hasTextRange(
 
 function getTextRange(ann: Annotation): { from: number; to: number } {
   if (ann.textRange != null) return ann.textRange;
-  const sd = (ann as unknown as Record<string, unknown>)['spatialData'] as Record<
-    string,
-    unknown
-  >;
+  const sd = (ann as unknown as Record<string, unknown>)[
+    'spatialData'
+  ] as Record<string, unknown>;
   return { from: sd['from'] as number, to: sd['to'] as number };
 }
 
@@ -86,10 +85,13 @@ export interface UseDocumentAnnotationsReturn {
 }
 
 export function useDocumentAnnotations(
-  contentId: string,
+  contentId: string
 ): UseDocumentAnnotationsReturn {
   // Delegate query + subscription to useAnnotations — one urql subscription only.
-  const { annotations, fetching, error } = useAnnotations(contentId, ALL_LAYERS);
+  const { annotations, fetching, error } = useAnnotations(
+    contentId,
+    ALL_LAYERS
+  );
 
   const { focusedAnnotationId, setFocusedAnnotationId } = useUIStore();
 
@@ -114,7 +116,7 @@ export function useDocumentAnnotations(
       annotations
         .filter(hasTextRange)
         .sort((a, b) => getTextRange(a).from - getTextRange(b).from),
-    [annotations],
+    [annotations]
   );
 
   // ── addTextAnnotation ───────────────────────────────────────────────────────
@@ -131,7 +133,7 @@ export function useDocumentAnnotations(
         },
       });
     },
-    [contentId, createAnnotation],
+    [contentId, createAnnotation]
   );
 
   return {

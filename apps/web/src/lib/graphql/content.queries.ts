@@ -80,8 +80,16 @@ export const SEARCH_SEMANTIC_BY_TEXT_QUERY = gql`
 `;
 
 export const PRESIGNED_UPLOAD_QUERY = gql`
-  query GetPresignedUploadUrl($fileName: String!, $contentType: String!, $courseId: ID!) {
-    getPresignedUploadUrl(fileName: $fileName, contentType: $contentType, courseId: $courseId) {
+  query GetPresignedUploadUrl(
+    $fileName: String!
+    $contentType: String!
+    $courseId: ID!
+  ) {
+    getPresignedUploadUrl(
+      fileName: $fileName
+      contentType: $contentType
+      courseId: $courseId
+    ) {
       uploadUrl
       fileKey
       expiresAt
@@ -90,7 +98,11 @@ export const PRESIGNED_UPLOAD_QUERY = gql`
 `;
 
 export const CONFIRM_MEDIA_UPLOAD_MUTATION = gql`
-  mutation ConfirmMediaUpload($fileKey: String!, $courseId: ID!, $title: String!) {
+  mutation ConfirmMediaUpload(
+    $fileKey: String!
+    $courseId: ID!
+    $title: String!
+  ) {
     confirmMediaUpload(fileKey: $fileKey, courseId: $courseId, title: $title) {
       id
       courseId

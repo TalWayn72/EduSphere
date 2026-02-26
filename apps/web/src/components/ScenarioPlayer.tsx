@@ -52,7 +52,10 @@ const ENDING_COLORS: Record<string, string> = {
   NEUTRAL: 'border-gray-200 bg-gray-50',
 };
 
-export function ScenarioPlayer({ rootContentItemId, initialNode }: ScenarioPlayerProps) {
+export function ScenarioPlayer({
+  rootContentItemId,
+  initialNode,
+}: ScenarioPlayerProps) {
   const [currentNode, setCurrentNode] = useState<ScenarioNodeData>(initialNode);
   const [breadcrumb, setBreadcrumb] = useState<string[]>([initialNode.title]);
   const [isComplete, setIsComplete] = useState(initialNode.isEndNode);
@@ -73,7 +76,8 @@ export function ScenarioPlayer({ rootContentItemId, initialNode }: ScenarioPlaye
       scenarioRootId: rootContentItemId,
     });
     if (result.error) return;
-    const nextNode = result.data?.recordScenarioChoice as ScenarioNodeData | null;
+    const nextNode = result.data
+      ?.recordScenarioChoice as ScenarioNodeData | null;
     if (!nextNode) {
       setIsComplete(true);
       return;
@@ -92,13 +96,19 @@ export function ScenarioPlayer({ rootContentItemId, initialNode }: ScenarioPlaye
   if (isComplete) {
     const endingType = currentNode.endingType ?? 'NEUTRAL';
     return (
-      <Card className={`border-2 ${ENDING_COLORS[endingType] ?? ENDING_COLORS.NEUTRAL}`}>
+      <Card
+        className={`border-2 ${ENDING_COLORS[endingType] ?? ENDING_COLORS.NEUTRAL}`}
+      >
         <CardContent className="p-8 flex flex-col items-center gap-4 text-center">
           {ENDING_ICONS[endingType] ?? ENDING_ICONS.NEUTRAL}
           <h2 className="text-xl font-bold">{currentNode.title}</h2>
           <p className="text-muted-foreground">{currentNode.description}</p>
           <p className="text-sm font-medium">{ENDING_LABELS[endingType]}</p>
-          <Button variant="outline" onClick={handleRestart} className="mt-2 gap-2">
+          <Button
+            variant="outline"
+            onClick={handleRestart}
+            className="mt-2 gap-2"
+          >
             <RotateCcw className="h-4 w-4" /> Try Again
           </Button>
         </CardContent>
@@ -116,7 +126,13 @@ export function ScenarioPlayer({ rootContentItemId, initialNode }: ScenarioPlaye
             {breadcrumb.map((step, i) => (
               <span key={i} className="text-xs text-muted-foreground">
                 {i > 0 && <span className="mx-1">{'>'}</span>}
-                <span className={i === breadcrumb.length - 1 ? 'font-semibold text-foreground' : ''}>
+                <span
+                  className={
+                    i === breadcrumb.length - 1
+                      ? 'font-semibold text-foreground'
+                      : ''
+                  }
+                >
                   {step}
                 </span>
               </span>

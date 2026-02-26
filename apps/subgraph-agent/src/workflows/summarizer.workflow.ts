@@ -139,8 +139,7 @@ function parseSummaryOutput(raw: string): SummaryOutput | null {
       learningObjectives: Array.isArray(parsed['learningObjectives'])
         ? (parsed['learningObjectives'] as string[])
         : [],
-      summary:
-        typeof parsed['summary'] === 'string' ? parsed['summary'] : raw,
+      summary: typeof parsed['summary'] === 'string' ? parsed['summary'] : raw,
       estimatedReadTime:
         typeof parsed['estimatedReadTime'] === 'number'
           ? parsed['estimatedReadTime']
@@ -153,7 +152,10 @@ function parseSummaryOutput(raw: string): SummaryOutput | null {
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
-export function createSummarizerWorkflow(model: LanguageModel, locale: string = 'en') {
+export function createSummarizerWorkflow(
+  model: LanguageModel,
+  locale: string = 'en'
+) {
   const BASE_SYSTEM = 'You are an expert educational content summarizer.';
   const system = injectLocale(BASE_SYSTEM, locale);
 

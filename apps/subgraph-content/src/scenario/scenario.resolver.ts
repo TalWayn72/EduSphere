@@ -13,17 +13,19 @@ export class ScenarioResolver {
   @Query('scenarioNode')
   async getScenarioNode(
     @Args('contentItemId') contentItemId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tenantCtx = this.requireAuth(ctx);
-    this.logger.debug(`scenarioNode: id=${contentItemId} user=${tenantCtx.userId}`);
+    this.logger.debug(
+      `scenarioNode: id=${contentItemId} user=${tenantCtx.userId}`
+    );
     return this.scenarioService.getScenarioNode(contentItemId, tenantCtx);
   }
 
   @Query('myScenarioProgress')
   async getMyScenarioProgress(
     @Args('scenarioRootId') scenarioRootId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tenantCtx = this.requireAuth(ctx);
     return this.scenarioService.getScenarioProgress(scenarioRootId, tenantCtx);
@@ -34,17 +36,17 @@ export class ScenarioResolver {
     @Args('fromContentItemId') fromContentItemId: string,
     @Args('choiceId') choiceId: string,
     @Args('scenarioRootId') scenarioRootId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const tenantCtx = this.requireAuth(ctx);
     this.logger.log(
-      `recordScenarioChoice: from=${fromContentItemId} choice=${choiceId} user=${tenantCtx.userId}`,
+      `recordScenarioChoice: from=${fromContentItemId} choice=${choiceId} user=${tenantCtx.userId}`
     );
     return this.scenarioService.recordChoice(
       fromContentItemId,
       choiceId,
       scenarioRootId,
-      tenantCtx,
+      tenantCtx
     );
   }
 

@@ -27,13 +27,17 @@ export class LibraryResolver {
   @Query('libraryCourses')
   async listLibraryCourses(
     @Args('topic') topic: LibraryTopic | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const auth = requireAuth(ctx);
-    const courses = await this.libraryService.listLibraryCourses(topic ? { topic } : undefined);
+    const courses = await this.libraryService.listLibraryCourses(
+      topic ? { topic } : undefined
+    );
 
     // Resolve isActivated per course for this tenant
-    const activations = await this.libraryService.getTenantActivations(auth.tenantId);
+    const activations = await this.libraryService.getTenantActivations(
+      auth.tenantId
+    );
     const activatedIds = new Set(activations.map((a) => a.libraryCourseId));
 
     return courses.map((c) => ({
@@ -51,7 +55,9 @@ export class LibraryResolver {
   @Query('myLibraryActivations')
   async getMyLibraryActivations(@Context() ctx: GqlContext) {
     const auth = requireAuth(ctx);
-    const activations = await this.libraryService.getTenantActivations(auth.tenantId);
+    const activations = await this.libraryService.getTenantActivations(
+      auth.tenantId
+    );
     return activations.map((a) => ({
       id: a.id,
       libraryCourseId: a.libraryCourseId,
@@ -63,13 +69,13 @@ export class LibraryResolver {
   @Mutation('activateLibraryCourse')
   async activateCourse(
     @Args('libraryCourseId') libraryCourseId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const auth = requireAuth(ctx);
     const activation = await this.libraryService.activateCourse(
       auth.tenantId,
       libraryCourseId,
-      auth.userId,
+      auth.userId
     );
     return {
       id: activation.id,
@@ -82,7 +88,7 @@ export class LibraryResolver {
   @Mutation('deactivateLibraryCourse')
   async deactivateCourse(
     @Args('libraryCourseId') libraryCourseId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const auth = requireAuth(ctx);
     await this.libraryService.deactivateCourse(auth.tenantId, libraryCourseId);

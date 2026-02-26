@@ -4,15 +4,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Mocks (using vi.hoisted so variables are available inside vi.mock factory) ─
-const { mockAddConflict, mockDequeue, mockPeek, mockQueueSize } = vi.hoisted(() => ({
-  mockAddConflict: vi.fn(),
-  mockDequeue: vi.fn(),
-  mockPeek: vi.fn().mockReturnValue([]),
-  mockQueueSize: vi.fn().mockReturnValue(0),
-}));
+const { mockAddConflict, mockDequeue, mockPeek, mockQueueSize } = vi.hoisted(
+  () => ({
+    mockAddConflict: vi.fn(),
+    mockDequeue: vi.fn(),
+    mockPeek: vi.fn().mockReturnValue([]),
+    mockQueueSize: vi.fn().mockReturnValue(0),
+  })
+);
 
 vi.mock('expo-network', () => ({
-  getNetworkStateAsync: vi.fn().mockResolvedValue({ isConnected: true, isInternetReachable: true }),
+  getNetworkStateAsync: vi
+    .fn()
+    .mockResolvedValue({ isConnected: true, isInternetReachable: true }),
 }));
 
 vi.mock('../OfflineQueue', () => ({
@@ -41,14 +45,20 @@ afterEach(() => {
 describe('SyncEngine — lifecycle', () => {
   it('dispose() clears the interval (memory-safe)', () => {
     const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => 'token');
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => 'token'
+    );
     engine.start();
     engine.dispose();
     expect(clearIntervalSpy).toHaveBeenCalled();
   });
 
   it('status listener receives no events when queue is empty', () => {
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => null);
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => null
+    );
     const listener = vi.fn();
     engine.addStatusListener(listener);
     engine.start();
@@ -59,7 +69,10 @@ describe('SyncEngine — lifecycle', () => {
   });
 
   it('addStatusListener returns unsubscribe function', () => {
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => null);
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => null
+    );
     const listener = vi.fn();
     const unsub = engine.addStatusListener(listener);
     unsub();
@@ -80,7 +93,10 @@ describe('SyncEngine — offline behaviour', () => {
     mockQueueSize.mockReturnValue(1); // pretend there's something in the queue
 
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => 'token');
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => 'token'
+    );
     engine.start();
     // flush microtasks from immediate _trySyncAll call
     await new Promise((resolve) => setTimeout(resolve, 10));
@@ -112,15 +128,23 @@ describe('SyncEngine — conflict routing (MAX_RETRIES exceeded)', () => {
     mockPeek.mockReturnValue([exhaustedMutation]);
     mockQueueSize.mockReturnValue(1);
 
-    vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('network error'));
+    vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(
+      new Error('network error')
+    );
 
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => 'token');
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => 'token'
+    );
     engine.start();
     // flush the immediate _trySyncAll() call
     await new Promise((resolve) => setTimeout(resolve, 50));
     engine.dispose();
 
-    expect(mockAddConflict).toHaveBeenCalledWith(exhaustedMutation, 'max_retries_exceeded');
+    expect(mockAddConflict).toHaveBeenCalledWith(
+      exhaustedMutation,
+      'max_retries_exceeded'
+    );
     expect(mockDequeue).toHaveBeenCalledWith(exhaustedMutation.id);
   });
 });

@@ -7,20 +7,20 @@ on:
       - master
   schedule:
     # Run nightly at 02:00 UTC
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
   workflow_dispatch:
     inputs:
       scenario:
-        description: 'Scenario to run'
+        description: "Scenario to run"
         required: false
-        default: '02-course-list'
+        default: "02-course-list"
         type: choice
         options:
-          - '01-health-check'
-          - '02-course-list'
-          - '03-annotations'
-          - '04-semantic-search'
-          - '05-agent-session'
+          - "01-health-check"
+          - "02-course-list"
+          - "03-annotations"
+          - "04-semantic-search"
+          - "05-agent-session"
 
 jobs:
   k6-smoke-tests:
@@ -36,7 +36,7 @@ jobs:
           POSTGRES_USER: edusphere
           POSTGRES_PASSWORD: edusphere_test_password
         ports:
-          - '5432:5432'
+          - "5432:5432"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -46,7 +46,7 @@ jobs:
       nats:
         image: nats:2.10-alpine
         ports:
-          - '4222:4222'
+          - "4222:4222"
         options: >-
           --health-cmd "nats-server --help"
           --health-interval 10s
@@ -66,7 +66,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -112,7 +112,7 @@ jobs:
         run: npm install -g pnpm@10.30.1
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
       - run: pnpm install --frozen-lockfile
       - name: Run k6 config unit tests
         run: pnpm --filter @edusphere/performance-tests run test

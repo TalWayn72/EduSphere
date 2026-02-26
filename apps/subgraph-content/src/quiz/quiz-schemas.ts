@@ -38,7 +38,7 @@ export const HotspotSchema = z.object({
       y: z.number().min(0).max(100),
       radius: z.number().default(5),
       label: z.string(),
-    }),
+    })
   ),
   correctHotspotIds: z.array(z.string()).min(1),
 });
@@ -48,9 +48,7 @@ export const MatchingSchema = z.object({
   question: z.string().min(1),
   leftItems: z.array(z.object({ id: z.string(), text: z.string() })).min(2),
   rightItems: z.array(z.object({ id: z.string(), text: z.string() })).min(2),
-  correctPairs: z.array(
-    z.object({ leftId: z.string(), rightId: z.string() }),
-  ),
+  correctPairs: z.array(z.object({ leftId: z.string(), rightId: z.string() })),
 });
 
 export const LikertSchema = z.object({

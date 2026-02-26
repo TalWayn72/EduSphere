@@ -92,8 +92,16 @@ const makeMessage = (role: string, content: string, createdAt: Date) => ({
 });
 
 const MOCK_MESSAGES = [
-  makeMessage('ASSISTANT', 'Hello, how can I help?', new Date('2025-01-01T10:02:00Z')),
-  makeMessage('USER', 'Explain photosynthesis', new Date('2025-01-01T10:01:00Z')),
+  makeMessage(
+    'ASSISTANT',
+    'Hello, how can I help?',
+    new Date('2025-01-01T10:02:00Z')
+  ),
+  makeMessage(
+    'USER',
+    'Explain photosynthesis',
+    new Date('2025-01-01T10:01:00Z')
+  ),
 ];
 
 describe('MemoryService', () => {
@@ -115,7 +123,9 @@ describe('MemoryService', () => {
 
     // Delete chain
     mockWhere.mockReturnValue({ orderBy: mockOrderBy, rowCount: 1 });
-    mockDelete.mockReturnValue({ where: vi.fn().mockResolvedValue({ rowCount: 1 }) });
+    mockDelete.mockReturnValue({
+      where: vi.fn().mockResolvedValue({ rowCount: 1 }),
+    });
 
     // NATS KV defaults
     mockKvSet.mockResolvedValue(undefined);
@@ -164,7 +174,9 @@ describe('MemoryService', () => {
     });
 
     it('maps content correctly from DB row', async () => {
-      mockLimit.mockResolvedValue([makeMessage('USER', 'Test content', new Date())]);
+      mockLimit.mockResolvedValue([
+        makeMessage('USER', 'Test content', new Date()),
+      ]);
       const result = await service.getConversationHistory('session-1', 10);
       expect(result[0].content).toBe('Test content');
     });
@@ -259,7 +271,9 @@ describe('MemoryService', () => {
 
   describe('clearConversation()', () => {
     it('resolves without throwing', async () => {
-      await expect(service.clearConversation('session-1')).resolves.toBeUndefined();
+      await expect(
+        service.clearConversation('session-1')
+      ).resolves.toBeUndefined();
     });
 
     it('calls delete on the agentMessages table', async () => {
@@ -295,26 +309,42 @@ describe('MemoryService', () => {
     it('writes context to NATS KV under the correct bucket', async () => {
       await service.saveContext('session-42', { messages: [] });
       expect(mockKvSet).toHaveBeenCalledOnce();
-      const [bucket, key] = mockKvSet.mock.calls[0] as [string, string, unknown];
+      const [bucket, key] = mockKvSet.mock.calls[0] as [
+        string,
+        string,
+        unknown,
+      ];
       expect(bucket).toBe('agent-memory');
       expect(key).toBe('session-42');
     });
 
     it('stamps updatedAt on the saved payload', async () => {
       await service.saveContext('session-99', { messages: [] });
-      const [, , payload] = mockKvSet.mock.calls[0] as [string, string, ConversationContext];
+      const [, , payload] = mockKvSet.mock.calls[0] as [
+        string,
+        string,
+        ConversationContext,
+      ];
       expect(typeof payload.updatedAt).toBe('string');
-      expect(new Date(payload.updatedAt).getTime()).toBeLessThanOrEqual(Date.now());
+      expect(new Date(payload.updatedAt).getTime()).toBeLessThanOrEqual(
+        Date.now()
+      );
     });
 
     it('embeds sessionId in the saved payload', async () => {
       await service.saveContext('session-abc', { messages: [] });
-      const [, , payload] = mockKvSet.mock.calls[0] as [string, string, ConversationContext];
+      const [, , payload] = mockKvSet.mock.calls[0] as [
+        string,
+        string,
+        ConversationContext,
+      ];
       expect(payload.sessionId).toBe('session-abc');
     });
 
     it('resolves without throwing when KV write succeeds', async () => {
-      await expect(service.saveContext('s1', { messages: [] })).resolves.toBeUndefined();
+      await expect(
+        service.saveContext('s1', { messages: [] })
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -337,7 +367,9 @@ describe('MemoryService', () => {
 
     it('falls back to database when KV returns null', async () => {
       mockKvGet.mockResolvedValue(null);
-      mockLimit.mockResolvedValue([makeMessage('USER', 'DB fallback msg', new Date())]);
+      mockLimit.mockResolvedValue([
+        makeMessage('USER', 'DB fallback msg', new Date()),
+      ]);
 
       const result = await service.loadContext('session-1');
       expect(result.sessionId).toBe('session-1');

@@ -4,7 +4,7 @@
 > **Date:** 2026-02-24  
 > **Ticket:** F-024  
 > **Baseline:** WCAG 2.1 AA (full coverage)  
-> **Target:** WCAG 2.2 AA (full coverage)  
+> **Target:** WCAG 2.2 AA (full coverage)
 
 WCAG 2.2 adds 9 new success criteria on top of WCAG 2.1. This document records
 the implementation status of each new criterion for EduSphere.
@@ -16,19 +16,21 @@ the implementation status of each new criterion for EduSphere.
 ### SC 2.4.11 — Focus Appearance (Minimum) — Level AA
 
 **Requirement:** When a UI component receives keyboard focus the focus indicator must:
+
 - Have a contrast ratio of at least 3:1 against adjacent colours
 - Enclose the component (or an area >= the perimeter of the component x 1 CSS px)
 
 **Status:** Done
 
 **Implementation:**
-- Added  to
-   (global base layer).
--  (blue-600) has a 4.5:1 contrast ratio against white and >= 3:1 against
+
+- Added to
+  (global base layer).
+- (blue-600) has a 4.5:1 contrast ratio against white and >= 3:1 against
   the light-grey page background used by EduSphere.
-- Added  to suppress the outline for
+- Added to suppress the outline for
   mouse/touch users while keeping it for keyboard users (progressive enhancement).
-- Automated test:  in accessibility.spec.ts
+- Automated test: in accessibility.spec.ts
 
 ---
 
@@ -41,12 +43,13 @@ cookie banners).
 **Status:** Done
 
 **Implementation:**
-- Added  with 
+
+- Added with
   to .
-- EduSphere header is not  — it scrolls with the page. The
-   rule ensures browser-scroll-into-view reserves header space.
-- If the header is ever made sticky, update  to match.
-- Automated test:  in accessibility.spec.ts
+- EduSphere header is not — it scrolls with the page. The
+  rule ensures browser-scroll-into-view reserves header space.
+- If the header is ever made sticky, update to match.
+- Automated test: in accessibility.spec.ts
 
 ---
 
@@ -59,6 +62,7 @@ achievable with a single pointer without dragging.
 
 **Rationale:**
 EduSphere does not use drag-only interactions:
+
 - Sliders (Radix UI) support click-to-set in addition to drag.
 - Knowledge graph renderer shows read-only visualisations; nodes are not draggable.
 - No Kanban boards, sortable lists, or other drag-only components exist.
@@ -75,13 +79,13 @@ If drag interactions are added, provide a click/tap alternative for every drag o
 **Status:** Done
 
 **Implementation:**
+
 - Added CSS floor rule to :
-  
 - Added inline-anchor exemption (, , ) per SC 2.5.8 Exception 2.
-- Updated  to add 
+- Updated to add
   on the Radix root (activation area 24x24 px, visual indicator stays 16x16 px).
 - Button component already uses // (36-44 px) — no changes needed.
-- Automated test:  in accessibility.spec.ts
+- Automated test: in accessibility.spec.ts
 
 ---
 
@@ -123,17 +127,19 @@ authentication without an alternative that does not rely on a cognitive function
 **Status:** Done — Configuration (No Code Change Required)
 
 **Implementation:**
+
 - EduSphere authentication is handled by Keycloak (OIDC).
 - No CAPTCHA authenticator is configured in the Keycloak Browser Flow.
 - Brute-force protection (time-delay lockout) is allowed per WCAG 2.2.
 
 **Keycloak verification steps:**
+
 1. Log in to Keycloak Admin Console ().
 2. Select realm .
 3. Go to **Authentication** > **Flows** > **Browser**.
-4. Confirm no  or  authenticator is present.
+4. Confirm no or authenticator is present.
 5. Go to **Realm Settings** > **Security Defenses** > **Brute Force Detection**.
-6. Confirm ,  (per SI-4 in CLAUDE.md).
+6. Confirm , (per SI-4 in CLAUDE.md).
 
 ---
 
@@ -150,20 +156,18 @@ the target compliance level is AA. See SC 3.3.8 implementation notes above.
 
 ## Files Changed
 
-| File | Change |
-| ---- | ------ |
-|  | SC 2.4.11 focus-visible rule, SC 2.4.12 scroll-padding-top, SC 2.5.8 target size floor |
-|  | Added  for SC 2.5.8 |
-|  | Updated axe tags to include ; added SC 2.4.11, 2.4.12, 2.5.8 tests |
-|  | Added WCAG 2.2 AA badge |
-|  | This file |
+| File | Change                                                                                 |
+| ---- | -------------------------------------------------------------------------------------- |
+|      | SC 2.4.11 focus-visible rule, SC 2.4.12 scroll-padding-top, SC 2.5.8 target size floor |
+|      | Added for SC 2.5.8                                                                     |
+|      | Updated axe tags to include ; added SC 2.4.11, 2.4.12, 2.5.8 tests                     |
+|      | Added WCAG 2.2 AA badge                                                                |
+|      | This file                                                                              |
 
 ---
 
 ## Running the Tests
 
-
-
 ---
 
-*Last updated: 2026-02-24*
+_Last updated: 2026-02-24_

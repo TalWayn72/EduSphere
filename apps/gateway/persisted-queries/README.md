@@ -122,8 +122,8 @@ Add to `.github/workflows/ci.yml`:
   env:
     HIVE_TOKEN: ${{ secrets.HIVE_TOKEN }}
   run: pnpm hive persisted-documents publish \
-         --token "$HIVE_TOKEN" \
-         apps/gateway/persisted-queries/manifest.json
+    --token "$HIVE_TOKEN" \
+    apps/gateway/persisted-queries/manifest.json
 ```
 
 ## Security Notes

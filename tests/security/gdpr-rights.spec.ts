@@ -15,7 +15,9 @@ import { readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
-const SCHEMA_DIR = resolve(join(import.meta.dirname, '../../packages/db/src/schema'));
+const SCHEMA_DIR = resolve(
+  join(import.meta.dirname, '../../packages/db/src/schema')
+);
 
 function readSchema(filename: string): string {
   return readFileSync(resolve(SCHEMA_DIR, filename), 'utf-8');
@@ -75,20 +77,30 @@ describe('GDPR prerequisite — RLS uses correct variable names (SI-1)', () => {
   it('annotations.ts RLS must use app.current_user_id (not app.current_user)', () => {
     const content = readSchema('annotations.ts');
     // Must have the correct variable
-    expect(content).toMatch(/current_setting\(\s*['"`]app\.current_user_id['"`]/);
+    expect(content).toMatch(
+      /current_setting\(\s*['"`]app\.current_user_id['"`]/
+    );
     // Must NOT have the buggy variable (BUG-23 root cause)
-    expect(content).not.toMatch(/current_setting\(\s*['"`]app\.current_user['"`]/);
+    expect(content).not.toMatch(
+      /current_setting\(\s*['"`]app\.current_user['"`]/
+    );
   });
 
   it('users.ts RLS must use app.current_tenant (not app.current_user)', () => {
     const content = readSchema('users.ts');
-    expect(content).toMatch(/current_setting\(\s*['"`]app\.current_tenant['"`]/);
+    expect(content).toMatch(
+      /current_setting\(\s*['"`]app\.current_tenant['"`]/
+    );
   });
 
   it('agentSessions.ts RLS must use app.current_user_id', () => {
     const content = readSchema('agentSessions.ts');
-    expect(content).toMatch(/current_setting\(\s*['"`]app\.current_user_id['"`]/);
-    expect(content).not.toMatch(/current_setting\(\s*['"`]app\.current_user['"`]/);
+    expect(content).toMatch(
+      /current_setting\(\s*['"`]app\.current_user_id['"`]/
+    );
+    expect(content).not.toMatch(
+      /current_setting\(\s*['"`]app\.current_user['"`]/
+    );
   });
 });
 

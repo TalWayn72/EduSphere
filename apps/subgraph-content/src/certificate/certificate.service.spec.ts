@@ -30,7 +30,9 @@ vi.mock('@edusphere/db', () => ({
 vi.mock('nats', () => ({
   connect: vi.fn().mockResolvedValue({
     subscribe: vi.fn().mockReturnValue({
-      [Symbol.asyncIterator]: vi.fn(() => ({ next: vi.fn().mockResolvedValue({ done: true }) })),
+      [Symbol.asyncIterator]: vi.fn(() => ({
+        next: vi.fn().mockResolvedValue({ done: true }),
+      })),
       unsubscribe: vi.fn(),
     }),
     close: vi.fn().mockResolvedValue(undefined),
@@ -52,7 +54,11 @@ const MOCK_CERT = {
   metadata: { courseName: 'Intro to Talmud', learnerName: 'Test User' },
 };
 
-const TENANT_CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+const TENANT_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'STUDENT' as const,
+};
 
 const EVENT = {
   tenantId: 'tenant-1',
@@ -69,7 +75,9 @@ describe('CertificateService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     pdfService = {
-      generateAndUpload: vi.fn().mockResolvedValue('tenant-1/certificates/user-1/cert.pdf'),
+      generateAndUpload: vi
+        .fn()
+        .mockResolvedValue('tenant-1/certificates/user-1/cert.pdf'),
     } as unknown as CertificatePdfService;
     service = new CertificateService(pdfService);
   });
@@ -90,7 +98,7 @@ describe('CertificateService', () => {
 
       expect(pdfService.generateAndUpload).toHaveBeenCalledOnce();
       expect(pdfService.generateAndUpload).toHaveBeenCalledWith(
-        expect.objectContaining({ verificationCode: 'vc-uuid-1234' }),
+        expect.objectContaining({ verificationCode: 'vc-uuid-1234' })
       );
       expect(mockInsert).toHaveBeenCalledOnce();
       expect(mockUpdate).toHaveBeenCalledOnce();

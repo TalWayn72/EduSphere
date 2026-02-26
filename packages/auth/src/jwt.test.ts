@@ -123,7 +123,9 @@ describe('JWTValidator', () => {
     });
 
     it('constructs without throwing for valid arguments', () => {
-      expect(() => new JWTValidator(KEYCLOAK_URL, REALM, CLIENT_ID)).not.toThrow();
+      expect(
+        () => new JWTValidator(KEYCLOAK_URL, REALM, CLIENT_ID)
+      ).not.toThrow();
     });
   });
 
@@ -154,7 +156,9 @@ describe('JWTValidator', () => {
 
     it('sets isSuperAdmin=true when realm_access contains SUPER_ADMIN', async () => {
       mockJwtVerify.mockResolvedValueOnce({
-        payload: makePayload({ realm_access: { roles: ['SUPER_ADMIN', 'STUDENT'] } }),
+        payload: makePayload({
+          realm_access: { roles: ['SUPER_ADMIN', 'STUDENT'] },
+        }),
       } as never);
 
       const ctx = await validator.validate('admin.token');
@@ -166,7 +170,9 @@ describe('JWTValidator', () => {
     it('filters out Keycloak system roles not in the UserRole enum', async () => {
       mockJwtVerify.mockResolvedValueOnce({
         payload: makePayload({
-          realm_access: { roles: ['STUDENT', 'offline_access', 'uma_authorization'] },
+          realm_access: {
+            roles: ['STUDENT', 'offline_access', 'uma_authorization'],
+          },
         }),
       } as never);
 
@@ -177,7 +183,9 @@ describe('JWTValidator', () => {
 
     it('preserves multiple valid roles', async () => {
       mockJwtVerify.mockResolvedValueOnce({
-        payload: makePayload({ realm_access: { roles: ['INSTRUCTOR', 'RESEARCHER'] } }),
+        payload: makePayload({
+          realm_access: { roles: ['INSTRUCTOR', 'RESEARCHER'] },
+        }),
       } as never);
 
       const ctx = await validator.validate('multi-role.token');
@@ -188,7 +196,12 @@ describe('JWTValidator', () => {
     });
 
     it('handles absent optional fields (given_name / family_name / tenant_id)', async () => {
-      const { given_name: _gn, family_name: _fn, tenant_id: _tid, ...rest } = makePayload();
+      const {
+        given_name: _gn,
+        family_name: _fn,
+        tenant_id: _tid,
+        ...rest
+      } = makePayload();
       mockJwtVerify.mockResolvedValueOnce({ payload: rest } as never);
 
       const ctx = await validator.validate('minimal.token');
@@ -266,7 +279,9 @@ describe('JWTValidator', () => {
     });
 
     it('throws "JWT validation failed: signature verification failed" for bad signature', async () => {
-      mockJwtVerify.mockRejectedValueOnce(new Error('signature verification failed'));
+      mockJwtVerify.mockRejectedValueOnce(
+        new Error('signature verification failed')
+      );
 
       await expect(validator.validate('bad-sig.jwt')).rejects.toThrow(
         'JWT validation failed: signature verification failed'
@@ -285,7 +300,9 @@ describe('JWTValidator', () => {
       // jose can throw non-Error objects in edge cases
       mockJwtVerify.mockRejectedValueOnce('raw string error');
 
-      await expect(validator.validate('weird.jwt')).rejects.toThrow('JWT validation failed');
+      await expect(validator.validate('weird.jwt')).rejects.toThrow(
+        'JWT validation failed'
+      );
     });
 
     it('throws when claims fail Zod validation — sub is not a UUID', async () => {
@@ -293,14 +310,18 @@ describe('JWTValidator', () => {
         payload: makePayload({ sub: 'not-a-uuid' }),
       } as never);
 
-      await expect(validator.validate('bad-sub.jwt')).rejects.toThrow('JWT validation failed');
+      await expect(validator.validate('bad-sub.jwt')).rejects.toThrow(
+        'JWT validation failed'
+      );
     });
 
     it('throws when email claim is missing', async () => {
       const { email: _em, ...noEmail } = makePayload();
       mockJwtVerify.mockResolvedValueOnce({ payload: noEmail } as never);
 
-      await expect(validator.validate('no-email.jwt')).rejects.toThrow('JWT validation failed');
+      await expect(validator.validate('no-email.jwt')).rejects.toThrow(
+        'JWT validation failed'
+      );
     });
 
     it('throws when email is not a valid email address', async () => {
@@ -308,21 +329,27 @@ describe('JWTValidator', () => {
         payload: makePayload({ email: 'not-an-email' }),
       } as never);
 
-      await expect(validator.validate('bad-email.jwt')).rejects.toThrow('JWT validation failed');
+      await expect(validator.validate('bad-email.jwt')).rejects.toThrow(
+        'JWT validation failed'
+      );
     });
 
     it('throws when preferred_username is missing', async () => {
       const { preferred_username: _u, ...noUsername } = makePayload();
       mockJwtVerify.mockResolvedValueOnce({ payload: noUsername } as never);
 
-      await expect(validator.validate('no-username.jwt')).rejects.toThrow('JWT validation failed');
+      await expect(validator.validate('no-username.jwt')).rejects.toThrow(
+        'JWT validation failed'
+      );
     });
 
     it('throws when realm_access is absent', async () => {
       const { realm_access: _ra, ...noRealm } = makePayload();
       mockJwtVerify.mockResolvedValueOnce({ payload: noRealm } as never);
 
-      await expect(validator.validate('no-realm.jwt')).rejects.toThrow('JWT validation failed');
+      await expect(validator.validate('no-realm.jwt')).rejects.toThrow(
+        'JWT validation failed'
+      );
     });
 
     it('throws when tenant_id is present but not a valid UUID', async () => {
@@ -330,7 +357,9 @@ describe('JWTValidator', () => {
         payload: makePayload({ tenant_id: 'not-a-uuid' }),
       } as never);
 
-      await expect(validator.validate('bad-tenant.jwt')).rejects.toThrow('JWT validation failed');
+      await expect(validator.validate('bad-tenant.jwt')).rejects.toThrow(
+        'JWT validation failed'
+      );
     });
   });
 
@@ -344,7 +373,9 @@ describe('JWTValidator', () => {
     });
 
     it('extracts the token from a valid "Bearer <token>" header', () => {
-      expect(validator.extractToken('Bearer my.jwt.token')).toBe('my.jwt.token');
+      expect(validator.extractToken('Bearer my.jwt.token')).toBe(
+        'my.jwt.token'
+      );
     });
 
     it('returns null when authHeader is undefined', () => {
@@ -493,16 +524,16 @@ describe('requireTenantAccess()', () => {
   });
 
   it('throws Forbidden when tenantId does not match', () => {
-    expect(() =>
-      requireTenantAccess(STUDENT_CTX, 'other-tenant-uuid')
-    ).toThrow('Forbidden: Access to this tenant is not allowed');
+    expect(() => requireTenantAccess(STUDENT_CTX, 'other-tenant-uuid')).toThrow(
+      'Forbidden: Access to this tenant is not allowed'
+    );
   });
 
   it('throws Forbidden when context has no tenantId (undefined) but resource requires one', () => {
     const noTenantCtx: AuthContext = { ...STUDENT_CTX, tenantId: undefined };
-    expect(() =>
-      requireTenantAccess(noTenantCtx, TENANT_ID)
-    ).toThrow('Forbidden: Access to this tenant is not allowed');
+    expect(() => requireTenantAccess(noTenantCtx, TENANT_ID)).toThrow(
+      'Forbidden: Access to this tenant is not allowed'
+    );
   });
 
   it('throws Unauthorized when context is null', () => {
@@ -517,12 +548,15 @@ describe('requireTenantAccess()', () => {
 // ═══════════════════════════════════════════════════════════════
 
 describe('UserRole (Zod enum)', () => {
-  it.each(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER'] as const)(
-    'accepts valid role "%s"',
-    (role) => {
-      expect(UserRole.safeParse(role).success).toBe(true);
-    }
-  );
+  it.each([
+    'SUPER_ADMIN',
+    'ORG_ADMIN',
+    'INSTRUCTOR',
+    'STUDENT',
+    'RESEARCHER',
+  ] as const)('accepts valid role "%s"', (role) => {
+    expect(UserRole.safeParse(role).success).toBe(true);
+  });
 
   it('rejects unknown string values', () => {
     expect(UserRole.safeParse('MODERATOR').success).toBe(false);
@@ -551,7 +585,12 @@ describe('JWTClaimsSchema', () => {
   });
 
   it('parses when optional fields are absent (given_name / family_name / tenant_id)', () => {
-    const { given_name: _gn, family_name: _fn, tenant_id: _tid, ...minimal } = makePayload();
+    const {
+      given_name: _gn,
+      family_name: _fn,
+      tenant_id: _tid,
+      ...minimal
+    } = makePayload();
     expect(JWTClaimsSchema.safeParse(minimal).success).toBe(true);
   });
 
@@ -563,21 +602,28 @@ describe('JWTClaimsSchema', () => {
 
   it('accepts audience as an array of strings', () => {
     expect(
-      JWTClaimsSchema.safeParse(makePayload({ aud: ['edusphere-app', 'account'] })).success
+      JWTClaimsSchema.safeParse(
+        makePayload({ aud: ['edusphere-app', 'account'] })
+      ).success
     ).toBe(true);
   });
 
   it('fails when sub is not a UUID', () => {
-    expect(JWTClaimsSchema.safeParse(makePayload({ sub: 'not-a-uuid' })).success).toBe(false);
+    expect(
+      JWTClaimsSchema.safeParse(makePayload({ sub: 'not-a-uuid' })).success
+    ).toBe(false);
   });
 
   it('fails when email is not a valid email address', () => {
-    expect(JWTClaimsSchema.safeParse(makePayload({ email: 'bad@' })).success).toBe(false);
+    expect(
+      JWTClaimsSchema.safeParse(makePayload({ email: 'bad@' })).success
+    ).toBe(false);
   });
 
   it('fails when tenant_id is present but not a UUID', () => {
     expect(
-      JWTClaimsSchema.safeParse(makePayload({ tenant_id: 'not-a-uuid' })).success
+      JWTClaimsSchema.safeParse(makePayload({ tenant_id: 'not-a-uuid' }))
+        .success
     ).toBe(false);
   });
 
@@ -588,7 +634,8 @@ describe('JWTClaimsSchema', () => {
 
   it('fails when exp is not a number', () => {
     expect(
-      JWTClaimsSchema.safeParse({ ...makePayload(), exp: 'not-a-number' }).success
+      JWTClaimsSchema.safeParse({ ...makePayload(), exp: 'not-a-number' })
+        .success
     ).toBe(false);
   });
 

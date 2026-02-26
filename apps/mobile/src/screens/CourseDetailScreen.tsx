@@ -48,7 +48,9 @@ export default function CourseDetailScreen({ route }: Props) {
   if (error) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>{t('failedToLoad', { message: error.message })}</Text>
+        <Text style={styles.error}>
+          {t('failedToLoad', { message: error.message })}
+        </Text>
       </View>
     );
   }

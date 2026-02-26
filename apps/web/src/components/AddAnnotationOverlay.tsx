@@ -99,7 +99,12 @@ export function AddAnnotationOverlay({
 
           {/* Actions */}
           <div className="flex gap-2 justify-end">
-            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleCancel}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 text-xs"
+              onClick={handleCancel}
+            >
               Cancel
             </Button>
             <Button

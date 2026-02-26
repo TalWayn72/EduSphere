@@ -48,7 +48,7 @@ function buildItems(items: ContentItem[]): string {
       (item) =>
         `      <item identifier="${itemIdentifier(item)}" identifierref="${resourceIdentifier(item)}" isvisible="true">\n` +
         `        <title>${escapeXml(item.title)}</title>\n` +
-        `      </item>`,
+        `      </item>`
     )
     .join('\n');
 }
@@ -60,12 +60,15 @@ function buildResources(items: ContentItem[]): string {
         `    <resource identifier="${resourceIdentifier(item)}" type="webcontent" ` +
         `adlcp:scormType="sco" href="${resourceHref(item)}">\n` +
         `      <file href="${resourceHref(item)}"/>\n` +
-        `    </resource>`,
+        `    </resource>`
     )
     .join('\n');
 }
 
-export function generateManifest2004(course: CourseData, items: ContentItem[]): string {
+export function generateManifest2004(
+  course: CourseData,
+  items: ContentItem[]
+): string {
   const orgId = `ORG-${course.id}`;
   const title = escapeXml(course.title);
 

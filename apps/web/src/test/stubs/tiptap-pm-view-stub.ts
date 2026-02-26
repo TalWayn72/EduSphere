@@ -8,7 +8,9 @@ export const Decoration = {
   widget: (_pos: number, _toDOM: () => globalThis.Node) => ({}),
 };
 export const DecorationSet = {
-  create: (_doc: unknown, _decorations: unknown[]) => ({ decorations: _decorations }),
+  create: (_doc: unknown, _decorations: unknown[]) => ({
+    decorations: _decorations,
+  }),
   empty: { decorations: [] },
 };
 export const EditorView = class {};

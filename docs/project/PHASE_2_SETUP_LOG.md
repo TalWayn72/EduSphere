@@ -3,22 +3,26 @@
 ## ✅ מה נוצר
 
 ### 1. Keycloak Authentication
+
 - ✅ Keycloak realm configuration (`infrastructure/docker/keycloak-realm.json`)
 - ✅ Docker Compose updated with Keycloak service
 - ✅ 5 demo users with roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, STUDENT, RESEARCHER)
 
 ### 2. packages/auth - JWT Validation
+
 - ✅ JWT validator with Keycloak JWKS
 - ✅ Role-based access control (RBAC)
 - ✅ Tenant isolation helpers
 
 ### 3. apps/subgraph-core - Users & Tenants
+
 - ✅ GraphQL schema with Federation v2.7
 - ✅ Resolvers with RLS enforcement
 - ✅ Queries: me, user, users, tenant, tenants
 - ✅ Mutations: updateUser
 
 ### 4. apps/subgraph-content - Courses & Media
+
 - ✅ GraphQL schema with Federation v2.7
 - ✅ Resolvers with RLS enforcement
 - ✅ Queries: course, courses, myCourses, mediaAsset, searchTranscripts
@@ -94,6 +98,7 @@ pnpm --filter @edusphere/subgraph-content dev
 ## המשך ל-Phase 3
 
 Phase 3 יכלול:
+
 - Gateway configuration (Hive Gateway v2.7)
 - Supergraph composition
 - GraphQL introspection

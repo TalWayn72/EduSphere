@@ -19,7 +19,9 @@ export const CreateAnnotationInputSchema = z.object({
   assetId: z.string().uuid(),
   annotationType: AnnotationType,
   layer: AnnotationLayer.default('PERSONAL'),
-  content: z.record(z.string(), z.unknown()).describe('JSON content of the annotation'),
+  content: z
+    .record(z.string(), z.unknown())
+    .describe('JSON content of the annotation'),
   spatialData: z
     .record(z.string(), z.unknown())
     .optional()

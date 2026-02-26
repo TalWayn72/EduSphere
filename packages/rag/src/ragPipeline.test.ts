@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { RAGPipeline, createRAGPipeline, RAGOptions, RAGResult } from './ragPipeline';
+import {
+  RAGPipeline,
+  createRAGPipeline,
+  RAGOptions,
+  RAGResult,
+} from './ragPipeline';
 import type { SemanticRetriever, RetrievalResult } from './retriever';
 
 // ---------------------------------------------------------------------------
@@ -22,7 +27,9 @@ const mockStreamText = vi.mocked(streamText);
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-function makeRetrievalResult(overrides: Partial<RetrievalResult> = {}): RetrievalResult {
+function makeRetrievalResult(
+  overrides: Partial<RetrievalResult> = {}
+): RetrievalResult {
   return {
     id: 'doc-1',
     content: 'This document explains neural networks in detail.',
@@ -44,12 +51,15 @@ function makeMockRetriever(
     .join('\n');
 
   return {
-    retrieve: vi.fn<[string, string, RetrievalResult?], Promise<RetrievalResult[]>>()
+    retrieve: vi
+      .fn<[string, string, RetrievalResult?], Promise<RetrievalResult[]>>()
       .mockResolvedValue(results),
-    retrieveWithContext: vi.fn<
-      [string, string, RetrievalResult?],
-      Promise<{ results: RetrievalResult[]; context: string }>
-    >().mockResolvedValue({ results, context: contextStr }),
+    retrieveWithContext: vi
+      .fn<
+        [string, string, RetrievalResult?],
+        Promise<{ results: RetrievalResult[]; context: string }>
+      >()
+      .mockResolvedValue({ results, context: contextStr }),
   } as unknown as SemanticRetriever;
 }
 
@@ -127,12 +137,15 @@ describe('RAGPipeline', () => {
     it('returns sources array derived from retrieval results', async () => {
       const results = [
         makeRetrievalResult({ id: 'src-1', similarity: 0.95 }),
-        makeRetrievalResult({ id: 'src-2', similarity: 0.80 }),
+        makeRetrievalResult({ id: 'src-2', similarity: 0.8 }),
       ];
       mockRetriever = makeMockRetriever(results);
       const pipeline = new RAGPipeline(mockRetriever);
 
-      const ragResult: RAGResult = await pipeline.generate('question', 'tenant-abc');
+      const ragResult: RAGResult = await pipeline.generate(
+        'question',
+        'tenant-abc'
+      );
 
       expect(ragResult.sources).toHaveLength(2);
       expect(ragResult.sources[0]!.id).toBe('src-1');
@@ -185,8 +198,9 @@ describe('RAGPipeline', () => {
 
       await pipeline.generate('what is the answer?', 'tenant-abc');
 
-      const promptArg = (mockGenerateText.mock.calls[0]![0] as Record<string, unknown>)
-        .prompt as string;
+      const promptArg = (
+        mockGenerateText.mock.calls[0]![0] as Record<string, unknown>
+      ).prompt as string;
       expect(promptArg).toContain('The answer is 42.');
     });
 
@@ -194,14 +208,17 @@ describe('RAGPipeline', () => {
       const pipeline = new RAGPipeline(mockRetriever);
       await pipeline.generate('Explain gradient descent', 'tenant-abc');
 
-      const promptArg = (mockGenerateText.mock.calls[0]![0] as Record<string, unknown>)
-        .prompt as string;
+      const promptArg = (
+        mockGenerateText.mock.calls[0]![0] as Record<string, unknown>
+      ).prompt as string;
       expect(promptArg).toContain('Explain gradient descent');
     });
 
     it('respects custom model in options', async () => {
       const pipeline = new RAGPipeline(mockRetriever);
-      await pipeline.generate('question', 'tenant-abc', { model: 'gpt-3.5-turbo' });
+      await pipeline.generate('question', 'tenant-abc', {
+        model: 'gpt-3.5-turbo',
+      });
 
       // openai() is called with the model string
       const { openai } = await import('@ai-sdk/openai');
@@ -212,7 +229,10 @@ describe('RAGPipeline', () => {
       const pipeline = new RAGPipeline(mockRetriever);
       await pipeline.generate('question', 'tenant-abc', { temperature: 0.2 });
 
-      const callArg = mockGenerateText.mock.calls[0]![0] as Record<string, unknown>;
+      const callArg = mockGenerateText.mock.calls[0]![0] as Record<
+        string,
+        unknown
+      >;
       expect(callArg.temperature).toBe(0.2);
     });
 
@@ -220,22 +240,32 @@ describe('RAGPipeline', () => {
       const pipeline = new RAGPipeline(mockRetriever);
       await pipeline.generate('question', 'tenant-abc', { maxTokens: 500 });
 
-      const callArg = mockGenerateText.mock.calls[0]![0] as Record<string, unknown>;
+      const callArg = mockGenerateText.mock.calls[0]![0] as Record<
+        string,
+        unknown
+      >;
       expect(callArg.maxTokens).toBe(500);
     });
 
     it('respects custom systemPrompt in options', async () => {
       const customSystem = 'You are a specialized tutor.';
       const pipeline = new RAGPipeline(mockRetriever);
-      await pipeline.generate('question', 'tenant-abc', { systemPrompt: customSystem });
+      await pipeline.generate('question', 'tenant-abc', {
+        systemPrompt: customSystem,
+      });
 
-      const callArg = mockGenerateText.mock.calls[0]![0] as Record<string, unknown>;
+      const callArg = mockGenerateText.mock.calls[0]![0] as Record<
+        string,
+        unknown
+      >;
       expect(callArg.system).toBe(customSystem);
     });
 
     it('passes retrievalOptions to retriever', async () => {
       const pipeline = new RAGPipeline(mockRetriever);
-      const opts: RAGOptions = { retrievalOptions: { topK: 8, similarityThreshold: 0.75 } };
+      const opts: RAGOptions = {
+        retrievalOptions: { topK: 8, similarityThreshold: 0.75 },
+      };
       await pipeline.generate('question', 'tenant-abc', opts);
 
       expect(mockRetriever.retrieveWithContext).toHaveBeenCalledWith(
@@ -290,7 +320,10 @@ describe('RAGPipeline', () => {
 
       const pipeline = new RAGPipeline(mockRetriever);
       const collected: string[] = [];
-      for await (const chunk of pipeline.generateStream('question', 'tenant-abc')) {
+      for await (const chunk of pipeline.generateStream(
+        'question',
+        'tenant-abc'
+      )) {
         collected.push(chunk);
       }
 
@@ -298,12 +331,17 @@ describe('RAGPipeline', () => {
     });
 
     it('calls retrieveWithContext before streaming', async () => {
-      const fakeStream = (async function* () { yield 'ok'; })();
+      const fakeStream = (async function* () {
+        yield 'ok';
+      })();
       mockStreamText.mockReturnValue({ textStream: fakeStream } as never);
 
       const pipeline = new RAGPipeline(mockRetriever);
       const chunks: string[] = [];
-      for await (const c of pipeline.generateStream('stream query', 'tenant-abc')) {
+      for await (const c of pipeline.generateStream(
+        'stream query',
+        'tenant-abc'
+      )) {
         chunks.push(c);
       }
 
@@ -318,7 +356,9 @@ describe('RAGPipeline', () => {
   describe('chat()', () => {
     it('throws when messages array is empty', async () => {
       const pipeline = new RAGPipeline(mockRetriever);
-      await expect(pipeline.chat([], 'tenant-abc')).rejects.toThrow('Messages array is empty');
+      await expect(pipeline.chat([], 'tenant-abc')).rejects.toThrow(
+        'Messages array is empty'
+      );
     });
 
     it('throws when last message is not from user', async () => {
@@ -367,8 +407,9 @@ describe('RAGPipeline', () => {
         'tenant-abc'
       );
 
-      const promptArg = (mockGenerateText.mock.calls[0]![0] as Record<string, unknown>)
-        .prompt as string;
+      const promptArg = (
+        mockGenerateText.mock.calls[0]![0] as Record<string, unknown>
+      ).prompt as string;
       expect(promptArg).toContain('Previous question');
       expect(promptArg).toContain('Previous answer');
     });
@@ -380,8 +421,9 @@ describe('RAGPipeline', () => {
         'tenant-abc'
       );
 
-      const promptArg = (mockGenerateText.mock.calls[0]![0] as Record<string, unknown>)
-        .prompt as string;
+      const promptArg = (
+        mockGenerateText.mock.calls[0]![0] as Record<string, unknown>
+      ).prompt as string;
       expect(promptArg).toContain('What is photosynthesis?');
     });
 

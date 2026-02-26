@@ -32,14 +32,16 @@ export class QuizGraderService {
 
   grade(quiz: QuizContent, answers: QuizAnswers): GradeResult {
     const itemResults: ItemResult[] = quiz.items.map((item, idx) =>
-      this.gradeItem(item, answers[idx], idx),
+      this.gradeItem(item, answers[idx], idx)
     );
 
-    const gradableItems = itemResults.filter((r) => r.partialScore !== undefined);
+    const gradableItems = itemResults.filter(
+      (r) => r.partialScore !== undefined
+    );
     const totalGradable = gradableItems.length || 1;
     const totalScore = gradableItems.reduce(
       (sum, r) => sum + (r.partialScore ?? 0),
-      0,
+      0
     );
     const score = Math.round((totalScore / totalGradable) * 100);
     const passed = score >= quiz.passingScore;
@@ -70,7 +72,7 @@ export class QuizGraderService {
   private gradeMultipleChoice(
     item: MultipleChoice,
     answer: unknown,
-    idx: number,
+    idx: number
   ): ItemResult {
     const selected = Array.isArray(answer) ? answer : [answer];
     const correct =
@@ -87,7 +89,7 @@ export class QuizGraderService {
   private gradeDragOrder(
     item: DragOrder,
     answer: unknown,
-    idx: number,
+    idx: number
   ): ItemResult {
     if (!Array.isArray(answer)) {
       return { itemIndex: idx, correct: false, partialScore: 0 };
@@ -99,7 +101,7 @@ export class QuizGraderService {
   private gradeHotspot(
     item: Hotspot,
     answer: unknown,
-    idx: number,
+    idx: number
   ): ItemResult {
     const selected = Array.isArray(answer) ? answer : [];
     const correct =
@@ -111,15 +113,15 @@ export class QuizGraderService {
   private gradeMatching(
     item: Matching,
     answer: unknown,
-    idx: number,
+    idx: number
   ): ItemResult {
     if (!Array.isArray(answer)) {
       return { itemIndex: idx, correct: false, partialScore: 0 };
     }
     const matched = answer.filter((pair) =>
       item.correctPairs.some(
-        (cp) => cp.leftId === pair.leftId && cp.rightId === pair.rightId,
-      ),
+        (cp) => cp.leftId === pair.leftId && cp.rightId === pair.rightId
+      )
     ).length;
     const total = item.correctPairs.length || 1;
     const partialScore = matched / total;
@@ -133,11 +135,12 @@ export class QuizGraderService {
   private gradeFillBlank(
     item: FillBlank,
     answer: unknown,
-    idx: number,
+    idx: number
   ): ItemResult {
-    const userAnswer = String(answer ?? '').trim().toLowerCase();
-    const correct =
-      item.correctAnswer.trim().toLowerCase() === userAnswer;
+    const userAnswer = String(answer ?? '')
+      .trim()
+      .toLowerCase();
+    const correct = item.correctAnswer.trim().toLowerCase() === userAnswer;
     return { itemIndex: idx, correct, partialScore: correct ? 1 : 0 };
   }
 }

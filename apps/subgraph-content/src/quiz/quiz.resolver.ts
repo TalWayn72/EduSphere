@@ -13,7 +13,7 @@ export class QuizResolver {
   async gradeQuizSubmission(
     @Args('contentItemId') contentItemId: string,
     @Args('answers') answers: Record<number, unknown>,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
@@ -32,21 +32,21 @@ export class QuizResolver {
     };
 
     this.logger.log(
-      `gradeQuizSubmission: contentItemId=${contentItemId} userId=${auth.userId}`,
+      `gradeQuizSubmission: contentItemId=${contentItemId} userId=${auth.userId}`
     );
 
     return this.quizService.gradeAndSave(
       contentItemId,
       auth.userId,
       tenantCtx,
-      answers,
+      answers
     );
   }
 
   @Query('myQuizResults')
   async myQuizResults(
     @Args('contentItemId') contentItemId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {

@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException as _NotFoundException } from '@nestjs/common';
 import AdmZip from 'adm-zip';
-import { generateManifest2004, injectScormApiShim } from './scorm-manifest.generator';
+import {
+  generateManifest2004,
+  injectScormApiShim,
+} from './scorm-manifest.generator';
 import type { CourseData } from './scorm-manifest.generator';
 import type { ContentItem } from '@edusphere/db';
 
@@ -16,7 +19,9 @@ class MockPutObjectCommand {
 class MockGetObjectCommand {
   constructor(public args: unknown) {}
 }
-const mockGetSignedUrl = vi.fn().mockResolvedValue('https://minio.example.com/presigned');
+const mockGetSignedUrl = vi
+  .fn()
+  .mockResolvedValue('https://minio.example.com/presigned');
 
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: MockS3Client,
@@ -48,7 +53,12 @@ vi.mock('@edusphere/db', () => ({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function makeCourse(overrides: Partial<CourseData> = {}): CourseData {
-  return { id: 'course-123', title: 'Test Course', description: null, ...overrides };
+  return {
+    id: 'course-123',
+    title: 'Test Course',
+    description: null,
+    ...overrides,
+  };
 }
 
 function makeItem(overrides: Partial<ContentItem> = {}): ContentItem {
@@ -67,7 +77,11 @@ function makeItem(overrides: Partial<ContentItem> = {}): ContentItem {
   } as ContentItem;
 }
 
-const TENANT_CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'INSTRUCTOR' as const };
+const TENANT_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'INSTRUCTOR' as const,
+};
 
 // ── Unit tests for generateManifest2004 (pure function — no service needed) ──
 
@@ -79,7 +93,10 @@ describe('generateManifest2004', () => {
   });
 
   it('includes all content items as <item> elements', () => {
-    const items = [makeItem({ id: 'i1', title: 'Intro' }), makeItem({ id: 'i2', title: 'Quiz' })];
+    const items = [
+      makeItem({ id: 'i1', title: 'Intro' }),
+      makeItem({ id: 'i2', title: 'Quiz' }),
+    ];
     const xml = generateManifest2004(makeCourse(), items);
     expect(xml).toContain('ITEM-i1');
     expect(xml).toContain('ITEM-i2');
@@ -144,9 +161,22 @@ describe('ScormExportService', () => {
       (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
         fn({
           select: () => ({
-            from: () => ({ where: () => ({ limit: () => Promise.resolve([{ id: 'course-123', title: 'Test', description: null, tenant_id: 'tenant-1', deleted_at: null }]) }) }),
+            from: () => ({
+              where: () => ({
+                limit: () =>
+                  Promise.resolve([
+                    {
+                      id: 'course-123',
+                      title: 'Test',
+                      description: null,
+                      tenant_id: 'tenant-1',
+                      deleted_at: null,
+                    },
+                  ]),
+              }),
+            }),
           }),
-        }),
+        })
     );
 
     // Should call withTenantContext at least once
@@ -159,7 +189,7 @@ describe('ScormExportService', () => {
     expect(mockWithTenantContext).toHaveBeenCalledWith(
       expect.anything(),
       TENANT_CTX,
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -167,24 +197,34 @@ describe('ScormExportService', () => {
     const { ScormExportService } = await import('./scorm-export.service');
     const service = new ScormExportService();
 
-    mockWithTenantContext.mockResolvedValue({ course: makeCourse(), items: [] });
+    mockWithTenantContext.mockResolvedValue({
+      course: makeCourse(),
+      items: [],
+    });
 
     await service.exportCourse('course-123', TENANT_CTX);
 
     expect(mockS3Send).toHaveBeenCalledWith(expect.any(MockPutObjectCommand));
-    const putCall = (mockS3Send.mock.calls as Array<[MockPutObjectCommand]>).find(
-      (c) => c[0] instanceof MockPutObjectCommand,
-    );
+    const putCall = (
+      mockS3Send.mock.calls as Array<[MockPutObjectCommand]>
+    ).find((c) => c[0] instanceof MockPutObjectCommand);
     expect(putCall).toBeDefined();
-    const putArgs = (putCall![0] as MockPutObjectCommand).args as { Key: string };
-    expect(putArgs.Key).toMatch(/^scorm-exports\/tenant-1\/course-123-\d+\.zip$/);
+    const putArgs = (putCall![0] as MockPutObjectCommand).args as {
+      Key: string;
+    };
+    expect(putArgs.Key).toMatch(
+      /^scorm-exports\/tenant-1\/course-123-\d+\.zip$/
+    );
   });
 
   it('exportCourse returns presigned URL string', async () => {
     const { ScormExportService } = await import('./scorm-export.service');
     const service = new ScormExportService();
 
-    mockWithTenantContext.mockResolvedValue({ course: makeCourse(), items: [] });
+    mockWithTenantContext.mockResolvedValue({
+      course: makeCourse(),
+      items: [],
+    });
 
     const url = await service.exportCourse('course-123', TENANT_CTX);
     expect(typeof url).toBe('string');
@@ -205,7 +245,8 @@ describe('ScormExportService', () => {
     let capturedBuffer: Buffer | null = null;
     mockS3Send.mockImplementation((cmd: object) => {
       if (cmd instanceof MockPutObjectCommand) {
-        capturedBuffer = (cmd as MockPutObjectCommand).args as unknown as Buffer;
+        capturedBuffer = (cmd as MockPutObjectCommand)
+          .args as unknown as Buffer;
         const args = (cmd as MockPutObjectCommand).args as { Body?: Buffer };
         capturedBuffer = args.Body ?? Buffer.alloc(0);
         return Promise.resolve({});

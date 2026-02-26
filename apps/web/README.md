@@ -24,11 +24,13 @@ React 19 + Vite 6 frontend application for the EduSphere Knowledge Graph Educati
 ### Environment Setup
 
 1. Copy `.env.example` to `.env`:
+
 ```bash
 cp .env.example .env
 ```
 
 2. Configure environment variables:
+
 ```env
 VITE_GRAPHQL_URL=http://localhost:4000/graphql
 VITE_GRAPHQL_WS_URL=ws://localhost:4000/graphql
@@ -120,6 +122,7 @@ src/
 ## GraphQL Integration
 
 The app uses urql with the following exchanges:
+
 - **Cache Exchange:** GraphQL response caching
 - **Fetch Exchange:** HTTP requests to Gateway
 - **Subscription Exchange:** WebSocket for real-time updates
@@ -129,6 +132,7 @@ All GraphQL queries automatically include JWT authentication header.
 ## UI Components
 
 Uses shadcn/ui components built on Radix UI primitives:
+
 - Accessible by default
 - Fully customizable with Tailwind
 - Dark mode ready
@@ -136,6 +140,7 @@ Uses shadcn/ui components built on Radix UI primitives:
 ## Path Aliases
 
 The `@/*` alias maps to `src/*`:
+
 ```typescript
 import { Button } from '@/components/ui/button';
 import { urqlClient } from '@/lib/urql-client';

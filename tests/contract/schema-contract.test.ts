@@ -11,7 +11,10 @@ import path from 'path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '../..');
 
-const supergraphSDL = readFileSync(path.join(root, 'apps/gateway/supergraph.graphql'), 'utf-8');
+const supergraphSDL = readFileSync(
+  path.join(root, 'apps/gateway/supergraph.graphql'),
+  'utf-8'
+);
 
 const schema = buildASTSchema(parse(supergraphSDL), { assumeValidSDL: true });
 
@@ -178,7 +181,6 @@ const MESSAGE_STREAM_SUBSCRIPTION_DOC = parse(`
   subscription MessageStream($sessionId: ID!) { messageStream(sessionId: $sessionId) { id role content createdAt } }
 `);
 
-
 describe('Schema Contract - annotation.queries.ts', () => {
   it('ANNOTATIONS_QUERY is valid', () => {
     assertValid('ANNOTATIONS_QUERY', ANNOTATIONS_QUERY_DOC);
@@ -191,10 +193,12 @@ describe('Schema Contract - annotation.queries.ts', () => {
   });
 
   it('REPLY_TO_ANNOTATION_MUTATION is valid', () => {
-    assertValid('REPLY_TO_ANNOTATION_MUTATION', REPLY_TO_ANNOTATION_MUTATION_DOC);
+    assertValid(
+      'REPLY_TO_ANNOTATION_MUTATION',
+      REPLY_TO_ANNOTATION_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - annotation.mutations.ts', () => {
@@ -219,10 +223,12 @@ describe('Schema Contract - annotation.mutations.ts', () => {
   });
 
   it('ANNOTATION_ADDED_SUBSCRIPTION is valid', () => {
-    assertValid('ANNOTATION_ADDED_SUBSCRIPTION', ANNOTATION_ADDED_SUBSCRIPTION_DOC);
+    assertValid(
+      'ANNOTATION_ADDED_SUBSCRIPTION',
+      ANNOTATION_ADDED_SUBSCRIPTION_DOC
+    );
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - content.queries.ts', () => {
@@ -242,7 +248,10 @@ describe('Schema Contract - content.queries.ts', () => {
   });
 
   it('SEARCH_SEMANTIC_BY_TEXT_QUERY is valid', () => {
-    assertValid('SEARCH_SEMANTIC_BY_TEXT_QUERY', SEARCH_SEMANTIC_BY_TEXT_QUERY_DOC);
+    assertValid(
+      'SEARCH_SEMANTIC_BY_TEXT_QUERY',
+      SEARCH_SEMANTIC_BY_TEXT_QUERY_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -252,7 +261,10 @@ describe('Schema Contract - content.queries.ts', () => {
   });
 
   it('CONFIRM_MEDIA_UPLOAD_MUTATION is valid', () => {
-    assertValid('CONFIRM_MEDIA_UPLOAD_MUTATION', CONFIRM_MEDIA_UPLOAD_MUTATION_DOC);
+    assertValid(
+      'CONFIRM_MEDIA_UPLOAD_MUTATION',
+      CONFIRM_MEDIA_UPLOAD_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -282,10 +294,12 @@ describe('Schema Contract - content.queries.ts', () => {
   });
 
   it('MARK_CONTENT_VIEWED_MUTATION is valid', () => {
-    assertValid('MARK_CONTENT_VIEWED_MUTATION', MARK_CONTENT_VIEWED_MUTATION_DOC);
+    assertValid(
+      'MARK_CONTENT_VIEWED_MUTATION',
+      MARK_CONTENT_VIEWED_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - knowledge.queries.ts', () => {
@@ -325,7 +339,10 @@ describe('Schema Contract - knowledge.queries.ts', () => {
   });
 
   it('RELATED_CONCEPTS_BY_NAME_QUERY is valid', () => {
-    assertValid('RELATED_CONCEPTS_BY_NAME_QUERY', RELATED_CONCEPTS_BY_NAME_QUERY_DOC);
+    assertValid(
+      'RELATED_CONCEPTS_BY_NAME_QUERY',
+      RELATED_CONCEPTS_BY_NAME_QUERY_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -333,12 +350,14 @@ describe('Schema Contract - knowledge.queries.ts', () => {
     assertValid('PREREQUISITE_CHAIN_QUERY', PREREQUISITE_CHAIN_QUERY_DOC);
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - agent.queries.ts', () => {
   it('START_AGENT_SESSION_MUTATION is valid', () => {
-    assertValid('START_AGENT_SESSION_MUTATION', START_AGENT_SESSION_MUTATION_DOC);
+    assertValid(
+      'START_AGENT_SESSION_MUTATION',
+      START_AGENT_SESSION_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -371,5 +390,4 @@ describe('Schema Contract - agent.queries.ts', () => {
     assertValid('MESSAGE_STREAM_SUBSCRIPTION', MESSAGE_STREAM_SUBSCRIPTION_DOC);
     expect(true).toBe(true);
   });
-
 });

@@ -38,7 +38,7 @@ export class BigBlueButtonClient {
     meetingId: string,
     name: string,
     attendeePW: string,
-    moderatorPW: string,
+    moderatorPW: string
   ): Promise<void> {
     const url = this.buildUrl('create', {
       meetingID: meetingId,
@@ -54,16 +54,13 @@ export class BigBlueButtonClient {
     const text = await response.text();
 
     if (!text.includes('<returncode>SUCCESS</returncode>')) {
-      const message = this.extractXmlField(text, 'message') ?? text.slice(0, 200);
+      const message =
+        this.extractXmlField(text, 'message') ?? text.slice(0, 200);
       throw new Error(`BBB create meeting failed: ${message}`);
     }
   }
 
-  buildJoinUrl(
-    meetingId: string,
-    fullName: string,
-    password: string,
-  ): string {
+  buildJoinUrl(meetingId: string, fullName: string, password: string): string {
     return this.buildUrl('join', {
       meetingID: meetingId,
       fullName,
@@ -97,7 +94,7 @@ export class BigBlueButtonClient {
    */
   async sendBreakoutRooms(
     meetingId: string,
-    rooms: Array<{ name: string; sequence: number; durationMinutes: number }>,
+    rooms: Array<{ name: string; sequence: number; durationMinutes: number }>
   ): Promise<void> {
     for (const room of rooms) {
       const url = this.buildUrl('create', {
@@ -113,7 +110,8 @@ export class BigBlueButtonClient {
       const response = await fetch(url);
       const text = await response.text();
       if (!text.includes('<returncode>SUCCESS</returncode>')) {
-        const message = this.extractXmlField(text, 'message') ?? text.slice(0, 200);
+        const message =
+          this.extractXmlField(text, 'message') ?? text.slice(0, 200);
         throw new Error(`BBB breakout room create failed: ${message}`);
       }
     }

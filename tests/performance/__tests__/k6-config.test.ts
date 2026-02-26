@@ -6,9 +6,19 @@ const K6_CONFIG_PATH = new URL('../k6.config.js', import.meta.url);
 
 describe('k6 Configuration Safety Checks', () => {
   let config: {
-    SMOKE_OPTIONS: { vus: number; duration: string; thresholds: Record<string, string[]> };
-    LOAD_OPTIONS: { stages: Array<{ duration: string; target: number }>; thresholds: Record<string, string[]> };
-    STRESS_OPTIONS: { stages: Array<{ duration: string; target: number }>; thresholds: Record<string, string[]> };
+    SMOKE_OPTIONS: {
+      vus: number;
+      duration: string;
+      thresholds: Record<string, string[]>;
+    };
+    LOAD_OPTIONS: {
+      stages: Array<{ duration: string; target: number }>;
+      thresholds: Record<string, string[]>;
+    };
+    STRESS_OPTIONS: {
+      stages: Array<{ duration: string; target: number }>;
+      thresholds: Record<string, string[]>;
+    };
     SLA_THRESHOLDS: Record<string, string[]>;
   };
 

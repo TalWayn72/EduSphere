@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { connect, StringCodec, type NatsConnection } from 'nats';
 import {
   createDatabaseConnection,
@@ -61,7 +66,7 @@ export class PollService implements OnModuleDestroy {
     question: string,
     options: string[],
     tenantId: string,
-    callerUserId: string,
+    callerUserId: string
   ): Promise<SessionPollResult> {
     const [poll] = await withTenantContext(
       this.db,
@@ -70,7 +75,7 @@ export class PollService implements OnModuleDestroy {
         tx
           .insert(schema.sessionPolls)
           .values({ sessionId, tenantId, question, options })
-          .returning(),
+          .returning()
     );
     if (!poll) throw new Error('Failed to insert poll');
     this.logger.log(`Poll created: pollId=${poll.id} sessionId=${sessionId}`);
@@ -80,7 +85,7 @@ export class PollService implements OnModuleDestroy {
   async activatePoll(
     pollId: string,
     tenantId: string,
-    callerUserId: string,
+    callerUserId: string
   ): Promise<SessionPollResult> {
     const [updated] = await withTenantContext(
       this.db,
@@ -89,8 +94,13 @@ export class PollService implements OnModuleDestroy {
         tx
           .update(schema.sessionPolls)
           .set({ isActive: true })
-          .where(and(eq(schema.sessionPolls.id, pollId), eq(schema.sessionPolls.tenantId, tenantId)))
-          .returning(),
+          .where(
+            and(
+              eq(schema.sessionPolls.id, pollId),
+              eq(schema.sessionPolls.tenantId, tenantId)
+            )
+          )
+          .returning()
     );
     if (!updated) throw new NotFoundException(`Poll ${pollId} not found`);
     this.logger.log(`Poll activated: pollId=${pollId}`);
@@ -100,7 +110,7 @@ export class PollService implements OnModuleDestroy {
   async closePoll(
     pollId: string,
     tenantId: string,
-    callerUserId: string,
+    callerUserId: string
   ): Promise<PollResults> {
     const [updated] = await withTenantContext(
       this.db,
@@ -109,8 +119,13 @@ export class PollService implements OnModuleDestroy {
         tx
           .update(schema.sessionPolls)
           .set({ isActive: false, closedAt: new Date() })
-          .where(and(eq(schema.sessionPolls.id, pollId), eq(schema.sessionPolls.tenantId, tenantId)))
-          .returning(),
+          .where(
+            and(
+              eq(schema.sessionPolls.id, pollId),
+              eq(schema.sessionPolls.tenantId, tenantId)
+            )
+          )
+          .returning()
     );
     if (!updated) throw new NotFoundException(`Poll ${pollId} not found`);
     this.logger.log(`Poll closed: pollId=${pollId}`);
@@ -121,7 +136,7 @@ export class PollService implements OnModuleDestroy {
     pollId: string,
     userId: string,
     optionIndex: number,
-    tenantId: string,
+    tenantId: string
   ): Promise<void> {
     await withTenantContext(
       this.db,
@@ -131,7 +146,12 @@ export class PollService implements OnModuleDestroy {
         const [existing] = await tx
           .select()
           .from(schema.pollVotes)
-          .where(and(eq(schema.pollVotes.pollId, pollId), eq(schema.pollVotes.userId, userId)))
+          .where(
+            and(
+              eq(schema.pollVotes.pollId, pollId),
+              eq(schema.pollVotes.userId, userId)
+            )
+          )
           .limit(1);
 
         if (existing) {
@@ -144,17 +164,19 @@ export class PollService implements OnModuleDestroy {
             .insert(schema.pollVotes)
             .values({ pollId, userId, tenantId, optionIndex });
         }
-      },
+      }
     );
 
-    this.logger.log(`Vote recorded: pollId=${pollId} userId=${userId} option=${optionIndex}`);
+    this.logger.log(
+      `Vote recorded: pollId=${pollId} userId=${userId} option=${optionIndex}`
+    );
     await this.publishVoteEvent(pollId, tenantId, optionIndex);
   }
 
   async getPollResults(
     pollId: string,
     tenantId: string,
-    callerUserId: string,
+    callerUserId: string
   ): Promise<PollResults> {
     const [poll] = await withTenantContext(
       this.db,
@@ -163,8 +185,13 @@ export class PollService implements OnModuleDestroy {
         tx
           .select()
           .from(schema.sessionPolls)
-          .where(and(eq(schema.sessionPolls.id, pollId), eq(schema.sessionPolls.tenantId, tenantId)))
-          .limit(1),
+          .where(
+            and(
+              eq(schema.sessionPolls.id, pollId),
+              eq(schema.sessionPolls.tenantId, tenantId)
+            )
+          )
+          .limit(1)
     );
     if (!poll) throw new NotFoundException(`Poll ${pollId} not found`);
 
@@ -175,7 +202,12 @@ export class PollService implements OnModuleDestroy {
         tx
           .select()
           .from(schema.pollVotes)
-          .where(and(eq(schema.pollVotes.pollId, pollId), eq(schema.pollVotes.tenantId, tenantId))),
+          .where(
+            and(
+              eq(schema.pollVotes.pollId, pollId),
+              eq(schema.pollVotes.tenantId, tenantId)
+            )
+          )
     );
 
     const optionTexts = poll.options as string[];
@@ -194,7 +226,10 @@ export class PollService implements OnModuleDestroy {
       options: optionTexts.map((text, i) => ({
         text,
         count: counts[i] ?? 0,
-        percentage: totalVotes > 0 ? Math.round(((counts[i] ?? 0) / totalVotes) * 100) : 0,
+        percentage:
+          totalVotes > 0
+            ? Math.round(((counts[i] ?? 0) / totalVotes) * 100)
+            : 0,
       })),
     };
   }
@@ -202,7 +237,7 @@ export class PollService implements OnModuleDestroy {
   async listPolls(
     sessionId: string,
     tenantId: string,
-    callerUserId: string,
+    callerUserId: string
   ): Promise<SessionPollResult[]> {
     const rows = await withTenantContext(
       this.db,
@@ -211,7 +246,12 @@ export class PollService implements OnModuleDestroy {
         tx
           .select()
           .from(schema.sessionPolls)
-          .where(and(eq(schema.sessionPolls.sessionId, sessionId), eq(schema.sessionPolls.tenantId, tenantId))),
+          .where(
+            and(
+              eq(schema.sessionPolls.sessionId, sessionId),
+              eq(schema.sessionPolls.tenantId, tenantId)
+            )
+          )
     );
     return rows.map((r) => this.mapPoll(r));
   }
@@ -235,7 +275,7 @@ export class PollService implements OnModuleDestroy {
   private async publishVoteEvent(
     pollId: string,
     tenantId: string,
-    optionIndex: number,
+    optionIndex: number
   ): Promise<void> {
     try {
       const votes = await this.db

@@ -53,7 +53,7 @@ describe('UserResolver', () => {
       mockUserService as any,
       mockUserStatsService as any,
       mockUserPreferencesService as any,
-      mockPublicProfileService as any,
+      mockPublicProfileService as any
     );
   });
 
@@ -72,7 +72,10 @@ describe('UserResolver', () => {
       mockUserService.findById.mockResolvedValue(MOCK_USER);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.getUser('user-1', ctx);
-      expect(mockUserService.findById).toHaveBeenCalledWith('user-1', MOCK_AUTH);
+      expect(mockUserService.findById).toHaveBeenCalledWith(
+        'user-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual(MOCK_USER);
     });
 
@@ -80,7 +83,10 @@ describe('UserResolver', () => {
       mockUserService.findById.mockResolvedValue(null);
       const ctx = { req: {} };
       await resolver.getUser('user-1', ctx);
-      expect(mockUserService.findById).toHaveBeenCalledWith('user-1', undefined);
+      expect(mockUserService.findById).toHaveBeenCalledWith(
+        'user-1',
+        undefined
+      );
     });
   });
 
@@ -110,20 +116,28 @@ describe('UserResolver', () => {
       mockUserService.findById.mockResolvedValue(MOCK_USER);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.getCurrentUser(ctx);
-      expect(mockUserService.findById).toHaveBeenCalledWith('user-1', MOCK_AUTH);
+      expect(mockUserService.findById).toHaveBeenCalledWith(
+        'user-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual(MOCK_USER);
     });
 
     it('throws "Unauthenticated" when no authContext', async () => {
       const ctx = { req: {} };
-      await expect(resolver.getCurrentUser(ctx)).rejects.toThrow('Unauthenticated');
+      await expect(resolver.getCurrentUser(ctx)).rejects.toThrow(
+        'Unauthenticated'
+      );
     });
 
     it('uses userId from authContext', async () => {
       mockUserService.findById.mockResolvedValue(MOCK_USER);
       const customAuth: AuthContext = { ...MOCK_AUTH, userId: 'admin-99' };
       await resolver.getCurrentUser({ req: {}, authContext: customAuth });
-      expect(mockUserService.findById).toHaveBeenCalledWith('admin-99', customAuth);
+      expect(mockUserService.findById).toHaveBeenCalledWith(
+        'admin-99',
+        customAuth
+      );
     });
   });
 
@@ -150,7 +164,9 @@ describe('UserResolver', () => {
       const ctx = { req: {} };
       try {
         await resolver.createUser({}, ctx);
-      } catch { /* expected */ }
+      } catch {
+        /* expected */
+      }
       expect(mockUserService.create).not.toHaveBeenCalled();
     });
   });
@@ -162,23 +178,33 @@ describe('UserResolver', () => {
       const updated = { ...MOCK_USER, display_name: 'Updated Name' };
       mockUserService.update.mockResolvedValue(updated);
       const ctx = { req: {}, authContext: MOCK_AUTH };
-      const result = await resolver.updateUser('user-1', { firstName: 'Updated' }, ctx);
-      expect(mockUserService.update).toHaveBeenCalledWith('user-1', { firstName: 'Updated' }, MOCK_AUTH);
+      const result = await resolver.updateUser(
+        'user-1',
+        { firstName: 'Updated' },
+        ctx
+      );
+      expect(mockUserService.update).toHaveBeenCalledWith(
+        'user-1',
+        { firstName: 'Updated' },
+        MOCK_AUTH
+      );
       expect(result).toEqual(updated);
     });
 
     it('throws "Unauthenticated" when no authContext', async () => {
       const ctx = { req: {} };
-      await expect(
-        resolver.updateUser('user-1', {}, ctx)
-      ).rejects.toThrow('Unauthenticated');
+      await expect(resolver.updateUser('user-1', {}, ctx)).rejects.toThrow(
+        'Unauthenticated'
+      );
     });
 
     it('does not call service when unauthenticated', async () => {
       const ctx = { req: {} };
       try {
         await resolver.updateUser('user-1', {}, ctx);
-      } catch { /* expected */ }
+      } catch {
+        /* expected */
+      }
       expect(mockUserService.update).not.toHaveBeenCalled();
     });
   });
@@ -195,7 +221,7 @@ describe('UserResolver', () => {
       expect(mockUserPreferencesService.updatePreferences).toHaveBeenCalledWith(
         'user-1',
         expect.objectContaining({ locale: 'fr', theme: 'dark' }),
-        MOCK_AUTH,
+        MOCK_AUTH
       );
       expect(result).toEqual(updated);
     });
@@ -211,8 +237,12 @@ describe('UserResolver', () => {
       const ctx = { req: {} };
       try {
         await resolver.updateUserPreferences({}, ctx);
-      } catch { /* expected */ }
-      expect(mockUserPreferencesService.updatePreferences).not.toHaveBeenCalled();
+      } catch {
+        /* expected */
+      }
+      expect(
+        mockUserPreferencesService.updatePreferences
+      ).not.toHaveBeenCalled();
     });
 
     it('rejects invalid locale', async () => {

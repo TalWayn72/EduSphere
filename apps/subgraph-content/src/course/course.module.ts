@@ -7,7 +7,12 @@ import { ModuleModule } from '../module/module.module';
 
 @Module({
   imports: [ModuleModule],
-  providers: [CourseResolver, CourseService, EnrollmentService, AdminEnrollmentService],
+  providers: [
+    CourseResolver,
+    CourseService,
+    EnrollmentService,
+    AdminEnrollmentService,
+  ],
   exports: [CourseService, EnrollmentService, AdminEnrollmentService],
 })
 export class CourseModule {}

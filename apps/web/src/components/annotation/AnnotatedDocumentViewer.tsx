@@ -62,8 +62,8 @@ export function AnnotatedDocumentViewer({
   const extension = useRef(
     createAnnotationExtension(
       () => annotationsRef.current,
-      () => focusedIdRef.current,
-    ),
+      () => focusedIdRef.current
+    )
   ).current;
 
   const handleSelectionUpdate = useCallback(
@@ -82,7 +82,7 @@ export function AnnotatedDocumentViewer({
         onSelectionChange(null);
       }
     },
-    [onSelectionChange],
+    [onSelectionChange]
   );
 
   const handleClick = useCallback(
@@ -94,7 +94,7 @@ export function AnnotatedDocumentViewer({
         if (id) onAnnotationClick(id);
       }
     },
-    [onAnnotationClick],
+    [onAnnotationClick]
   );
 
   return (

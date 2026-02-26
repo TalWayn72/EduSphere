@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   # ═══════════════════════════════════════════════════════════════
@@ -10,12 +10,12 @@ services:
     image: prom/prometheus:v3.2.1
     container_name: edusphere-prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=30d'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
     volumes:
       - ./infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./infrastructure/monitoring/rules:/etc/prometheus/rules
@@ -79,7 +79,7 @@ services:
       - /var/log:/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - "12345:12345"   # Alloy UI (optional)
+      - "12345:12345" # Alloy UI (optional)
     mem_limit: 256m
     mem_reservation: 64m
     networks:
@@ -93,8 +93,8 @@ services:
     image: prom/alertmanager:v0.27.0
     container_name: edusphere-alertmanager
     command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
     volumes:
       - ./infrastructure/monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/config.yml
       - alertmanager_data:/alertmanager

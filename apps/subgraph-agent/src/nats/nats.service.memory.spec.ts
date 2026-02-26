@@ -54,9 +54,7 @@ import { NatsService } from './nats.service';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Access private `subscriptions` array via type casting. */
-const getSubscriptions = (
-  svc: NatsService,
-): Array<() => void> =>
+const getSubscriptions = (svc: NatsService): Array<() => void> =>
   (svc as unknown as { subscriptions: Array<() => void> }).subscriptions;
 
 const noopHandler = vi.fn().mockResolvedValue(undefined);

@@ -67,7 +67,9 @@ describe('AtRiskService — memory safety', () => {
   it('should close NATS connection if open on onModuleDestroy', async () => {
     const service = new AtRiskService();
     // Manually inject a NATS connection to simulate it being open
-    (service as { nc: { close: () => Promise<void> } | null }).nc = { close: mockClose };
+    (service as { nc: { close: () => Promise<void> } | null }).nc = {
+      close: mockClose,
+    };
     await service.onModuleDestroy();
     expect(mockClose).toHaveBeenCalled();
   });

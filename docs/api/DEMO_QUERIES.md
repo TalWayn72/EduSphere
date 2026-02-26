@@ -14,6 +14,7 @@ Test all 6 subgraphs + cross-subgraph federation
 ```
 
 **Expected Response:**
+
 ```json
 {
   "data": {
@@ -27,15 +28,18 @@ Test all 6 subgraphs + cross-subgraph federation
 ## 👤 Core Subgraph (Port 4001)
 
 ### Create User
+
 ```graphql
 mutation {
-  createUser(input: {
-    email: "student@example.com"
-    firstName: "John"
-    lastName: "Doe"
-    role: STUDENT
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createUser(
+    input: {
+      email: "student@example.com"
+      firstName: "John"
+      lastName: "Doe"
+      role: STUDENT
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     email
     firstName
@@ -47,6 +51,7 @@ mutation {
 ```
 
 ### Query Users
+
 ```graphql
 query {
   users(limit: 10, offset: 0) {
@@ -61,6 +66,7 @@ query {
 ```
 
 ### Get Current User
+
 ```graphql
 query {
   me {
@@ -78,13 +84,16 @@ query {
 ## 📚 Content Subgraph (Port 4002)
 
 ### Create Course
+
 ```graphql
 mutation {
-  createCourse(input: {
-    title: "Introduction to Quantum Computing"
-    description: "Learn the fundamentals of quantum mechanics and quantum algorithms"
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createCourse(
+    input: {
+      title: "Introduction to Quantum Computing"
+      description: "Learn the fundamentals of quantum mechanics and quantum algorithms"
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     title
     description
@@ -95,6 +104,7 @@ mutation {
 ```
 
 ### Query Courses
+
 ```graphql
 query {
   courses(limit: 10) {
@@ -109,6 +119,7 @@ query {
 ```
 
 ### Publish Course
+
 ```graphql
 mutation {
   publishCourse(id: "course-id-here") {
@@ -120,15 +131,18 @@ mutation {
 ```
 
 ### Create Module
+
 ```graphql
 mutation {
-  createModule(input: {
-    courseId: "course-id-here"
-    title: "Week 1: Quantum States"
-    description: "Introduction to qubits and superposition"
-    orderIndex: 1
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createModule(
+    input: {
+      courseId: "course-id-here"
+      title: "Week 1: Quantum States"
+      description: "Introduction to qubits and superposition"
+      orderIndex: 1
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     title
     description
@@ -138,16 +152,19 @@ mutation {
 ```
 
 ### Create Content Item
+
 ```graphql
 mutation {
-  createContentItem(input: {
-    moduleId: "module-id-here"
-    title: "Video: Quantum Superposition Explained"
-    type: VIDEO
-    content: "https://example.com/video.mp4"
-    orderIndex: 1
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createContentItem(
+    input: {
+      moduleId: "module-id-here"
+      title: "Video: Quantum Superposition Explained"
+      type: VIDEO
+      content: "https://example.com/video.mp4"
+      orderIndex: 1
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     title
     type
@@ -162,16 +179,19 @@ mutation {
 ## 📝 Annotation Subgraph (Port 4003)
 
 ### Create Highlight
+
 ```graphql
 mutation {
-  createAnnotation(input: {
-    type: HIGHLIGHT
-    content: "This is important!"
-    targetType: "CONTENT_ITEM"
-    targetId: "content-item-id"
-    userId: "user-id-here"
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createAnnotation(
+    input: {
+      type: HIGHLIGHT
+      content: "This is important!"
+      targetType: "CONTENT_ITEM"
+      targetId: "content-item-id"
+      userId: "user-id-here"
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     type
     content
@@ -181,16 +201,19 @@ mutation {
 ```
 
 ### Create Note
+
 ```graphql
 mutation {
-  createAnnotation(input: {
-    type: NOTE
-    content: "Remember to review this section before the exam"
-    targetType: "MODULE"
-    targetId: "module-id"
-    userId: "user-id-here"
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createAnnotation(
+    input: {
+      type: NOTE
+      content: "Remember to review this section before the exam"
+      targetType: "MODULE"
+      targetId: "module-id"
+      userId: "user-id-here"
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     type
     content
@@ -200,6 +223,7 @@ mutation {
 ```
 
 ### Query User Annotations
+
 ```graphql
 query {
   annotations(userId: "user-id-here", limit: 20) {
@@ -218,15 +242,18 @@ query {
 ## 💬 Collaboration Subgraph (Port 4004)
 
 ### Create Discussion
+
 ```graphql
 mutation {
-  createDiscussion(input: {
-    title: "Question about quantum entanglement"
-    content: "Can someone explain how quantum entanglement works?"
-    courseId: "course-id-here"
-    userId: "user-id-here"
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createDiscussion(
+    input: {
+      title: "Question about quantum entanglement"
+      content: "Can someone explain how quantum entanglement works?"
+      courseId: "course-id-here"
+      userId: "user-id-here"
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     title
     content
@@ -237,16 +264,19 @@ mutation {
 ```
 
 ### Reply to Discussion
+
 ```graphql
 mutation {
-  createDiscussion(input: {
-    title: "Re: Question about quantum entanglement"
-    content: "Great question! Entanglement occurs when..."
-    courseId: "course-id-here"
-    parentId: "discussion-id-here"
-    userId: "user-id-here"
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createDiscussion(
+    input: {
+      title: "Re: Question about quantum entanglement"
+      content: "Great question! Entanglement occurs when..."
+      courseId: "course-id-here"
+      parentId: "discussion-id-here"
+      userId: "user-id-here"
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     title
     content
@@ -256,6 +286,7 @@ mutation {
 ```
 
 ### Upvote Discussion
+
 ```graphql
 mutation {
   upvoteDiscussion(id: "discussion-id-here") {
@@ -267,6 +298,7 @@ mutation {
 ```
 
 ### Query Discussions
+
 ```graphql
 query {
   discussions(courseId: "course-id-here", limit: 10) {
@@ -289,14 +321,17 @@ query {
 ## 🤖 Agent Subgraph (Port 4005)
 
 ### Create AI Tutor Session
+
 ```graphql
 mutation {
-  createAgentSession(input: {
-    userId: "user-id-here"
-    agentType: "TUTOR"
-    context: "{\"courseId\": \"course-123\", \"topic\": \"quantum computing\"}"
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createAgentSession(
+    input: {
+      userId: "user-id-here"
+      agentType: "TUTOR"
+      context: "{\"courseId\": \"course-123\", \"topic\": \"quantum computing\"}"
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     agentType
     status
@@ -306,14 +341,17 @@ mutation {
 ```
 
 ### Send Message to AI
+
 ```graphql
 mutation {
-  createAgentMessage(input: {
-    sessionId: "session-id-here"
-    role: "USER"
-    content: "Explain quantum superposition in simple terms"
-    tenantId: "00000000-0000-0000-0000-000000000001"
-  }) {
+  createAgentMessage(
+    input: {
+      sessionId: "session-id-here"
+      role: "USER"
+      content: "Explain quantum superposition in simple terms"
+      tenantId: "00000000-0000-0000-0000-000000000001"
+    }
+  ) {
     id
     role
     content
@@ -323,6 +361,7 @@ mutation {
 ```
 
 ### Query Session Messages
+
 ```graphql
 query {
   agentMessages(sessionId: "session-id-here") {
@@ -339,6 +378,7 @@ query {
 ## 🧠 Knowledge Subgraph (Port 4006)
 
 ### Create Embedding
+
 ```graphql
 mutation {
   createEmbedding(input: {
@@ -357,6 +397,7 @@ mutation {
 ```
 
 ### Semantic Search
+
 ```graphql
 query {
   semanticSearch(
@@ -381,6 +422,7 @@ query {
 ## 🔗 Federation - Cross-Subgraph Queries
 
 ### User with All Related Data
+
 ```graphql
 query {
   me {
@@ -429,6 +471,7 @@ query {
 ```
 
 ### Course with All Metadata
+
 ```graphql
 query {
   course(id: "course-id-here") {
@@ -477,111 +520,133 @@ query {
 ## 📊 Example: Full Learning Flow
 
 ### 1. Create Student Account
+
 ```graphql
 mutation CreateStudent {
-  createUser(input: {
-    email: "alice@university.edu"
-    firstName: "Alice"
-    lastName: "Johnson"
-    role: STUDENT
-    tenantId: "univ-001"
-  }) {
+  createUser(
+    input: {
+      email: "alice@university.edu"
+      firstName: "Alice"
+      lastName: "Johnson"
+      role: STUDENT
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }
 ```
 
 ### 2. Create Course
+
 ```graphql
 mutation CreateCourse {
-  createCourse(input: {
-    title: "Quantum Computing 101"
-    description: "Introduction to quantum computing"
-    tenantId: "univ-001"
-  }) {
+  createCourse(
+    input: {
+      title: "Quantum Computing 101"
+      description: "Introduction to quantum computing"
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }
 ```
 
 ### 3. Add Module & Content
+
 ```graphql
 mutation AddModule {
-  createModule(input: {
-    courseId: "course-123"
-    title: "Week 1: Basics"
-    orderIndex: 1
-    tenantId: "univ-001"
-  }) {
+  createModule(
+    input: {
+      courseId: "course-123"
+      title: "Week 1: Basics"
+      orderIndex: 1
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }
 
 mutation AddVideo {
-  createContentItem(input: {
-    moduleId: "module-123"
-    title: "Introduction Video"
-    type: VIDEO
-    content: "https://cdn.example.com/intro.mp4"
-    orderIndex: 1
-    tenantId: "univ-001"
-  }) {
+  createContentItem(
+    input: {
+      moduleId: "module-123"
+      title: "Introduction Video"
+      type: VIDEO
+      content: "https://cdn.example.com/intro.mp4"
+      orderIndex: 1
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }
 ```
 
 ### 4. Student Takes Notes
+
 ```graphql
 mutation TakeNote {
-  createAnnotation(input: {
-    type: NOTE
-    content: "Key concept: Superposition allows multiple states simultaneously"
-    targetType: "CONTENT_ITEM"
-    targetId: "content-item-123"
-    userId: "alice-id"
-    tenantId: "univ-001"
-  }) {
+  createAnnotation(
+    input: {
+      type: NOTE
+      content: "Key concept: Superposition allows multiple states simultaneously"
+      targetType: "CONTENT_ITEM"
+      targetId: "content-item-123"
+      userId: "alice-id"
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }
 ```
 
 ### 5. Ask Question
+
 ```graphql
 mutation AskQuestion {
-  createDiscussion(input: {
-    title: "Clarification needed on superposition"
-    content: "How does measurement collapse the quantum state?"
-    courseId: "course-123"
-    userId: "alice-id"
-    tenantId: "univ-001"
-  }) {
+  createDiscussion(
+    input: {
+      title: "Clarification needed on superposition"
+      content: "How does measurement collapse the quantum state?"
+      courseId: "course-123"
+      userId: "alice-id"
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }
 ```
 
 ### 6. Get AI Help
+
 ```graphql
 mutation GetAIHelp {
-  createAgentSession(input: {
-    userId: "alice-id"
-    agentType: "TUTOR"
-    context: "{\"topic\": \"quantum superposition\"}"
-    tenantId: "univ-001"
-  }) {
+  createAgentSession(
+    input: {
+      userId: "alice-id"
+      agentType: "TUTOR"
+      context: "{\"topic\": \"quantum superposition\"}"
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }
 
 mutation AskAI {
-  createAgentMessage(input: {
-    sessionId: "session-123"
-    role: "USER"
-    content: "Explain superposition simply"
-    tenantId: "univ-001"
-  }) {
+  createAgentMessage(
+    input: {
+      sessionId: "session-123"
+      role: "USER"
+      content: "Explain superposition simply"
+      tenantId: "univ-001"
+    }
+  ) {
     id
   }
 }

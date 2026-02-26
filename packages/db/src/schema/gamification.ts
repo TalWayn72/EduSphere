@@ -3,7 +3,13 @@
  * RLS: tenant-scoped; users see own data; admins see all in tenant.
  */
 import {
-  pgTable, uuid, text, timestamp, integer, jsonb, pgPolicy,
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  integer,
+  jsonb,
+  pgPolicy,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -18,7 +24,9 @@ export const badges = pgTable('badges', {
   conditionType: text('condition_type').notNull(),
   conditionValue: integer('condition_value').notNull(),
   tenantId: uuid('tenant_id'), // null = platform-wide
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type Badge = typeof badges.$inferSelect;
@@ -30,9 +38,13 @@ export const userBadges = pgTable(
   {
     id: uuid('id').defaultRandom().primaryKey(),
     userId: uuid('user_id').notNull(),
-    badgeId: uuid('badge_id').notNull().references(() => badges.id),
+    badgeId: uuid('badge_id')
+      .notNull()
+      .references(() => badges.id),
     tenantId: uuid('tenant_id').notNull(),
-    earnedAt: timestamp('earned_at', { withTimezone: true }).notNull().defaultNow(),
+    earnedAt: timestamp('earned_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     context: jsonb('context'),
   },
   (table) => [
@@ -43,7 +55,7 @@ export const userBadges = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type UserBadge = typeof userBadges.$inferSelect;
@@ -57,14 +69,16 @@ export const userPoints = pgTable(
     userId: uuid('user_id').notNull().unique(),
     tenantId: uuid('tenant_id').notNull(),
     totalPoints: integer('total_points').notNull().default(0),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     pgPolicy('user_points_rls', {
       using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type UserPoints = typeof userPoints.$inferSelect;
@@ -80,7 +94,9 @@ export const pointEvents = pgTable(
     eventType: text('event_type').notNull(),
     points: integer('points').notNull(),
     description: text('description').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     pgPolicy('point_events_rls', {
@@ -90,7 +106,7 @@ export const pointEvents = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type PointEvent = typeof pointEvents.$inferSelect;

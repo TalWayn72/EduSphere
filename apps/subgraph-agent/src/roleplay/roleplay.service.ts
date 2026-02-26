@@ -31,26 +31,40 @@ export class RoleplayService implements OnModuleDestroy {
       .where(
         and(
           eq(scenario_templates.tenant_id, tenantId),
-          eq(scenario_templates.is_active, true),
-        ),
+          eq(scenario_templates.is_active, true)
+        )
       );
   }
 
   async createScenario(
     tenantId: string,
     createdBy: string,
-    data: Omit<NewScenarioTemplate, 'id' | 'tenant_id' | 'created_by' | 'is_builtin'>,
+    data: Omit<
+      NewScenarioTemplate,
+      'id' | 'tenant_id' | 'created_by' | 'is_builtin'
+    >
   ) {
     const [row] = await this.db
       .insert(scenario_templates)
-      .values({ ...data, tenant_id: tenantId, created_by: createdBy, is_builtin: false })
+      .values({
+        ...data,
+        tenant_id: tenantId,
+        created_by: createdBy,
+        is_builtin: false,
+      })
       .returning();
     if (!row) throw new Error('Failed to create scenario template');
-    this.logger.log({ tenantId, title: data.title }, 'Scenario template created');
+    this.logger.log(
+      { tenantId, title: data.title },
+      'Scenario template created'
+    );
     return row;
   }
 
-  async seedBuiltInsForTenant(tenantId: string, createdBy: string): Promise<void> {
+  async seedBuiltInsForTenant(
+    tenantId: string,
+    createdBy: string
+  ): Promise<void> {
     for (const seed of BUILT_IN_SCENARIOS) {
       await this.db
         .insert(scenario_templates)

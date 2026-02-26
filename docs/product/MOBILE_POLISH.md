@@ -5,10 +5,15 @@ Complete native features for production-ready mobile experience.
 ## Features Added
 
 ### ✅ Push Notifications (expo-notifications)
+
 ### ✅ Biometric Authentication (expo-local-authentication)
+
 ### ✅ Camera Integration (expo-camera, expo-image-picker)
+
 ### ✅ Offline Course Downloads (expo-file-system)
+
 ### ✅ Background Sync (expo-background-fetch, expo-task-manager)
+
 ### ✅ Deep Linking (expo-linking)
 
 ## 1. Push Notifications
@@ -16,6 +21,7 @@ Complete native features for production-ready mobile experience.
 **File:** [apps/mobile/src/services/notifications.ts](../apps/mobile/src/services/notifications.ts)
 
 ### Features
+
 - Local and remote push notifications
 - Permission handling
 - Notification channels (Android)
@@ -85,6 +91,7 @@ await fetch('https://exp.host/--/api/v2/push/send', {
 **File:** [apps/mobile/src/services/biometrics.ts](../apps/mobile/src/services/biometrics.ts)
 
 ### Features
+
 - Fingerprint recognition
 - Face ID / Face recognition
 - Iris scanning
@@ -162,6 +169,7 @@ function LoginScreen() {
 **File:** [apps/mobile/src/services/camera.ts](../apps/mobile/src/services/camera.ts)
 
 ### Features
+
 - Take photos
 - Record videos
 - Pick from gallery
@@ -232,6 +240,7 @@ async function uploadImage(uri: string) {
 **File:** [apps/mobile/src/services/downloads.ts](../apps/mobile/src/services/downloads.ts)
 
 ### Features
+
 - Download entire courses
 - Progress tracking
 - Pause/resume downloads
@@ -244,14 +253,10 @@ async function uploadImage(uri: string) {
 import { downloadService } from './services/downloads';
 
 // Download course
-await downloadService.downloadCourse(
-  'course-123',
-  courseData,
-  (progress) => {
-    console.log(`${progress.percentage.toFixed(1)}%`);
-    setDownloadProgress(progress.percentage);
-  }
-);
+await downloadService.downloadCourse('course-123', courseData, (progress) => {
+  console.log(`${progress.percentage.toFixed(1)}%`);
+  setDownloadProgress(progress.percentage);
+});
 
 // Get offline courses
 const courses = await downloadService.getOfflineCourses();
@@ -307,6 +312,7 @@ function CourseDownloadButton({ course }) {
 **File:** [apps/mobile/src/services/backgroundSync.ts](../apps/mobile/src/services/backgroundSync.ts)
 
 ### Features
+
 - Sync offline mutations when app is closed
 - Runs every 15 minutes
 - Battery-efficient
@@ -355,6 +361,7 @@ useEffect(() => {
 **File:** [apps/mobile/src/services/deepLinking.ts](../apps/mobile/src/services/deepLinking.ts)
 
 ### Features
+
 - Universal links (iOS)
 - App links (Android)
 - Custom URL scheme
@@ -455,6 +462,7 @@ CREATE INDEX IF NOT EXISTS idx_downloaded_at ON offline_courses(downloaded_at);
 ## Production Checklist
 
 ### Push Notifications
+
 - [ ] Register for push certificate (iOS)
 - [ ] Configure FCM (Android)
 - [ ] Test foreground notifications
@@ -463,6 +471,7 @@ CREATE INDEX IF NOT EXISTS idx_downloaded_at ON offline_courses(downloaded_at);
 - [ ] Implement notification settings
 
 ### Biometrics
+
 - [ ] Test on real devices
 - [ ] Handle permission denials gracefully
 - [ ] Implement fallback authentication
@@ -470,6 +479,7 @@ CREATE INDEX IF NOT EXISTS idx_downloaded_at ON offline_courses(downloaded_at);
 - [ ] Document supported devices
 
 ### Camera
+
 - [ ] Request camera permissions properly
 - [ ] Handle permission denials
 - [ ] Test image compression
@@ -477,6 +487,7 @@ CREATE INDEX IF NOT EXISTS idx_downloaded_at ON offline_courses(downloaded_at);
 - [ ] Test on low-storage devices
 
 ### Downloads
+
 - [ ] Implement download queue
 - [ ] Handle network interruptions
 - [ ] Monitor storage usage
@@ -484,6 +495,7 @@ CREATE INDEX IF NOT EXISTS idx_downloaded_at ON offline_courses(downloaded_at);
 - [ ] Test pause/resume functionality
 
 ### Background Sync
+
 - [ ] Test on iOS background refresh
 - [ ] Test on Android Doze mode
 - [ ] Monitor battery impact
@@ -491,6 +503,7 @@ CREATE INDEX IF NOT EXISTS idx_downloaded_at ON offline_courses(downloaded_at);
 - [ ] Log sync results
 
 ### Deep Linking
+
 - [ ] Configure universal links
 - [ ] Test deep link routing
 - [ ] Handle invalid URLs
@@ -507,6 +520,7 @@ CREATE INDEX IF NOT EXISTS idx_downloaded_at ON offline_courses(downloaded_at);
 ## Next Steps
 
 ### Production Release
+
 1. Configure EAS Build
 2. Submit to App Store / Play Store
 3. Setup analytics (Firebase, Amplitude)

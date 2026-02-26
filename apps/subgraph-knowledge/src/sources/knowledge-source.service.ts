@@ -47,7 +47,7 @@ export class KnowledgeSourceService implements OnModuleDestroy {
 
   constructor(
     private readonly parser: DocumentParserService,
-    private readonly embeddings: EmbeddingService,
+    private readonly embeddings: EmbeddingService
   ) {}
 
   async onModuleDestroy(): Promise<void> {
@@ -58,15 +58,18 @@ export class KnowledgeSourceService implements OnModuleDestroy {
   // Queries
   // ---------------------------------------------------------------------------
 
-  async listByCourseSources(tenantId: string, courseId: string): Promise<KnowledgeSource[]> {
+  async listByCourseSources(
+    tenantId: string,
+    courseId: string
+  ): Promise<KnowledgeSource[]> {
     return this.db
       .select()
       .from(schema.knowledgeSources)
       .where(
         and(
           eq(schema.knowledgeSources.tenant_id, tenantId),
-          eq(schema.knowledgeSources.course_id, courseId),
-        ),
+          eq(schema.knowledgeSources.course_id, courseId)
+        )
       )
       .orderBy(schema.knowledgeSources.created_at);
   }
@@ -78,8 +81,8 @@ export class KnowledgeSourceService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.knowledgeSources.id, id),
-          eq(schema.knowledgeSources.tenant_id, tenantId),
-        ),
+          eq(schema.knowledgeSources.tenant_id, tenantId)
+        )
       );
 
     if (!source) throw new NotFoundException(`KnowledgeSource ${id} not found`);
@@ -114,7 +117,7 @@ export class KnowledgeSourceService implements OnModuleDestroy {
 
   private async processSource(
     sourceId: string,
-    input: CreateSourceInput,
+    input: CreateSourceInput
   ): Promise<KnowledgeSource> {
     try {
       // Mark as PROCESSING
@@ -124,12 +127,17 @@ export class KnowledgeSourceService implements OnModuleDestroy {
         .where(eq(schema.knowledgeSources.id, sourceId));
 
       // Extract text based on type
-      let parsed: { text: string; wordCount: number; metadata: Record<string, unknown> };
+      let parsed: {
+        text: string;
+        wordCount: number;
+        metadata: Record<string, unknown>;
+      };
 
       if (input.sourceType === 'FILE_DOCX') {
         parsed = await this.parser.parseDocx(input.fileBuffer ?? input.origin);
       } else if (input.sourceType === 'FILE_PDF') {
-        if (!input.fileBuffer) throw new Error('FILE_PDF requires a file buffer');
+        if (!input.fileBuffer)
+          throw new Error('FILE_PDF requires a file buffer');
         parsed = await this.parser.parsePdf(input.fileBuffer);
       } else if (input.sourceType === 'FILE_TXT') {
         const text = input.fileBuffer?.toString('utf-8') ?? '';
@@ -141,7 +149,11 @@ export class KnowledgeSourceService implements OnModuleDestroy {
       } else if (input.sourceType === 'TEXT') {
         parsed = this.parser.parseText(input.rawText ?? '');
       } else {
-        parsed = { text: '', wordCount: 0, metadata: { note: 'unsupported type' } };
+        parsed = {
+          text: '',
+          wordCount: 0,
+          metadata: { note: 'unsupported type' },
+        };
       }
 
       // Chunk
@@ -172,12 +184,13 @@ export class KnowledgeSourceService implements OnModuleDestroy {
         .returning();
 
       this.logger.log(
-        `Source ${sourceId} ready: ${embeddedCount}/${chunks.length} chunks embedded`,
+        `Source ${sourceId} ready: ${embeddedCount}/${chunks.length} chunks embedded`
       );
 
       return updated!;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.error(`Source ${sourceId} failed: ${errorMessage}`);
 
       const [failed] = await this.db
@@ -197,8 +210,8 @@ export class KnowledgeSourceService implements OnModuleDestroy {
       .where(
         and(
           eq(schema.knowledgeSources.id, id),
-          eq(schema.knowledgeSources.tenant_id, tenantId),
-        ),
+          eq(schema.knowledgeSources.tenant_id, tenantId)
+        )
       );
     this.logger.log(`Deleted knowledge source ${id}`);
   }

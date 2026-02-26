@@ -4,7 +4,12 @@ import {
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 import { generateText, type LanguageModel } from 'ai';
@@ -61,7 +66,10 @@ export class AltTextGeneratorService implements OnModuleInit, OnModuleDestroy {
       this.logger.log(`Subscribed to ${ALT_TEXT_SUBJECT}`);
       void this.consumeMessages();
     } catch (err) {
-      this.logger.error('Failed to connect to NATS for alt-text generation', err);
+      this.logger.error(
+        'Failed to connect to NATS for alt-text generation',
+        err
+      );
     }
   }
 
@@ -88,9 +96,13 @@ export class AltTextGeneratorService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private async handleMediaUploaded(payload: MediaUploadedPayload): Promise<void> {
+  private async handleMediaUploaded(
+    payload: MediaUploadedPayload
+  ): Promise<void> {
     if (!payload.contentType.startsWith('image/')) {
-      this.logger.debug(`Skipping alt-text for non-image: ${payload.contentType}`);
+      this.logger.debug(
+        `Skipping alt-text for non-image: ${payload.contentType}`
+      );
       return;
     }
 
@@ -102,22 +114,34 @@ export class AltTextGeneratorService implements OnModuleInit, OnModuleDestroy {
       await this.saveAltText(payload.assetId, altText);
       this.logger.log(`Alt-text saved: asset=${payload.assetId}`);
     } catch (err) {
-      this.logger.error(`Alt-text generation failed for asset=${payload.assetId}`, err);
+      this.logger.error(
+        `Alt-text generation failed for asset=${payload.assetId}`,
+        err
+      );
     }
   }
 
   private async getPresignedUrl(fileKey: string): Promise<string> {
     const command = new GetObjectCommand({ Bucket: this.bucket, Key: fileKey });
-    return getSignedUrl(this.s3, command, { expiresIn: PRESIGNED_URL_EXPIRY_SECONDS });
+    return getSignedUrl(this.s3, command, {
+      expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
+    });
   }
 
-  private async generateAltText(presignedUrl: string, assetId: string): Promise<string> {
+  private async generateAltText(
+    presignedUrl: string,
+    assetId: string
+  ): Promise<string> {
     const isExternal = !process.env.OLLAMA_URL;
     const model = (isExternal
       ? createOpenAI({ apiKey: process.env.OPENAI_API_KEY })('gpt-4o')
-      : createOllama({ baseURL: `${process.env.OLLAMA_URL}/api` })('llava')) as unknown as LanguageModel;
+      : createOllama({ baseURL: `${process.env.OLLAMA_URL}/api` })(
+          'llava'
+        )) as unknown as LanguageModel;
 
-    this.logger.debug(`Using ${isExternal ? 'OpenAI gpt-4o' : 'Ollama llava'} for asset=${assetId}`);
+    this.logger.debug(
+      `Using ${isExternal ? 'OpenAI gpt-4o' : 'Ollama llava'} for asset=${assetId}`
+    );
 
     const result = await generateText({
       model,
