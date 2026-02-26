@@ -20,6 +20,17 @@ type AuditLogResult {
   total: Int!
 }
 
+enum AuditExportFormat {
+  CSV
+  JSON
+}
+
+type AuditExportResult {
+  presignedUrl: String!
+  expiresAt: String!
+  recordCount: Int!
+}
+
 extend type Query {
   adminAuditLog(
     limit: Int = 50
@@ -29,6 +40,20 @@ extend type Query {
     since: String
     until: String
   ): AuditLogResult!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  exportAuditLog(
+    fromDate: String!
+    toDate: String!
+    format: AuditExportFormat! = CSV
+  ): AuditExportResult!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  scheduleGdprErasure(userId: ID!): Boolean!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }

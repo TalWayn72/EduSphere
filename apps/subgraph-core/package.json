@@ -14,7 +14,10 @@
     "test:memory": "vitest run --reporter=verbose **/*.memory.spec.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/s3-request-presigner": "^3.600.0",
     "@edusphere/auth": "workspace:*",
+    "@edusphere/config": "workspace:*",
     "@edusphere/db": "workspace:*",
     "@edusphere/metrics": "workspace:*",
     "@edusphere/nats-client": "workspace:*",
