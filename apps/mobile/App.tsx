@@ -17,6 +17,10 @@ import { useLoadAssets } from './src/hooks/useLoadAssets';
 import { database } from './src/services/database';
 import { offlineLink } from './src/apollo/offlineLink';
 import { initMobileI18n } from './src/lib/i18n';
+import {
+  configurePushNotifications,
+  registerForPushNotifications,
+} from './src/services/push-notifications';
 
 // GraphQL setup
 const GATEWAY_URL = __DEV__
@@ -66,6 +70,13 @@ export default function App() {
   const isLoadingComplete = useLoadAssets();
   const [dbReady, setDbReady] = useState(false);
   const [i18nReady, setI18nReady] = useState(false);
+
+  useEffect(() => {
+    configurePushNotifications();
+    registerForPushNotifications().catch(() => {
+      // Non-fatal: continue without push token
+    });
+  }, []);
 
   useEffect(() => {
     async function initDatabase() {

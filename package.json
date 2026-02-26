@@ -25,7 +25,8 @@
     "db:studio": "pnpm --filter @edusphere/db studio",
     "compose": "pnpm --filter @edusphere/gateway compose",
     "codegen": "graphql-codegen --config codegen.ts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "changelog": "bash scripts/generate-changelog.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
