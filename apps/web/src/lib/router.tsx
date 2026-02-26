@@ -11,10 +11,14 @@ const ContentViewer = lazy(() =>
   import('@/pages/ContentViewer').then((m) => ({ default: m.ContentViewer }))
 );
 const QuizContentPage = lazy(() =>
-  import('@/pages/QuizContentPage').then((m) => ({ default: m.QuizContentPage }))
+  import('@/pages/QuizContentPage').then((m) => ({
+    default: m.QuizContentPage,
+  }))
 );
-const RichDocumentPage = lazy(() =>
-  import('@/pages/RichDocumentPage').then((m) => ({ default: m.RichDocumentPage }))
+const DocumentAnnotationPage = lazy(() =>
+  import('@/pages/DocumentAnnotationPage').then((m) => ({
+    default: m.DocumentAnnotationPage,
+  }))
 );
 const CourseList = lazy(() =>
   import('@/pages/CourseList').then((m) => ({ default: m.CourseList }))
@@ -26,7 +30,9 @@ const AgentsPage = lazy(() =>
   import('@/pages/AgentsPage').then((m) => ({ default: m.AgentsPage }))
 );
 const AnnotationsPage = lazy(() =>
-  import('@/pages/AnnotationsPage').then((m) => ({ default: m.AnnotationsPage }))
+  import('@/pages/AnnotationsPage').then((m) => ({
+    default: m.AnnotationsPage,
+  }))
 );
 const CollaborationPage = lazy(() =>
   import('@/pages/CollaborationPage').then((m) => ({
@@ -68,27 +74,33 @@ const ComplianceReportsPage = lazy(() =>
   }))
 );
 const ScimSettingsPage = lazy(() =>
-  import("@/pages/ScimSettingsPage").then((m) => ({
+  import('@/pages/ScimSettingsPage').then((m) => ({
     default: m.ScimSettingsPage,
   }))
 );
 const XapiSettingsPage = lazy(() =>
-  import("@/pages/XapiSettingsPage").then((m) => ({
+  import('@/pages/XapiSettingsPage').then((m) => ({
     default: m.XapiSettingsPage,
   }))
 );
 const AnnotationDemo = lazy(() => import('@/pages/AnnotationDemo'));
 const ChavrutaPage = lazy(() =>
-  import('@/pages/chavruta/ChavrutaPage').then((m) => ({ default: m.ChavrutaPage }))
+  import('@/pages/chavruta/ChavrutaPage').then((m) => ({
+    default: m.ChavrutaPage,
+  }))
 );
 const LtiSettingsPage = lazy(() =>
-  import('@/pages/LtiSettingsPage').then((m) => ({ default: m.LtiSettingsPage }))
+  import('@/pages/LtiSettingsPage').then((m) => ({
+    default: m.LtiSettingsPage,
+  }))
 );
 const ScenariosPage = lazy(() =>
   import('@/pages/ScenariosPage').then((m) => ({ default: m.ScenariosPage }))
 );
 const PublicProfilePage = lazy(() =>
-  import('@/pages/PublicProfilePage').then((m) => ({ default: m.PublicProfilePage }))
+  import('@/pages/PublicProfilePage').then((m) => ({
+    default: m.PublicProfilePage,
+  }))
 );
 const AccessibilityStatementPage = lazy(() =>
   import('@/pages/AccessibilityStatementPage').then((m) => ({
@@ -99,73 +111,115 @@ const ProgramsPage = lazy(() =>
   import('@/pages/ProgramsPage').then((m) => ({ default: m.ProgramsPage }))
 );
 const ProgramDetailPage = lazy(() =>
-  import('@/pages/ProgramDetailPage').then((m) => ({ default: m.ProgramDetailPage }))
+  import('@/pages/ProgramDetailPage').then((m) => ({
+    default: m.ProgramDetailPage,
+  }))
 );
 const AssessmentCampaignPage = lazy(() =>
-  import('@/pages/AssessmentCampaignPage').then((m) => ({ default: m.AssessmentCampaignPage }))
+  import('@/pages/AssessmentCampaignPage').then((m) => ({
+    default: m.AssessmentCampaignPage,
+  }))
 );
 const CrmSettingsPage = lazy(() =>
-  import('@/pages/CrmSettingsPage').then((m) => ({ default: m.CrmSettingsPage }))
+  import('@/pages/CrmSettingsPage').then((m) => ({
+    default: m.CrmSettingsPage,
+  }))
 );
 const MarketplacePage = lazy(() =>
-  import('@/pages/MarketplacePage').then((m) => ({ default: m.MarketplacePage }))
+  import('@/pages/MarketplacePage').then((m) => ({
+    default: m.MarketplacePage,
+  }))
 );
 const InstructorEarningsPage = lazy(() =>
-  import('@/pages/InstructorEarningsPage').then((m) => ({ default: m.InstructorEarningsPage }))
+  import('@/pages/InstructorEarningsPage').then((m) => ({
+    default: m.InstructorEarningsPage,
+  }))
 );
 const BadgeVerifierPage = lazy(() =>
-  import('@/pages/BadgeVerifierPage').then((m) => ({ default: m.BadgeVerifierPage }))
+  import('@/pages/BadgeVerifierPage').then((m) => ({
+    default: m.BadgeVerifierPage,
+  }))
 );
 const CourseLibraryPage = lazy(() =>
-  import('@/pages/CourseLibraryPage').then((m) => ({ default: m.CourseLibraryPage }))
+  import('@/pages/CourseLibraryPage').then((m) => ({
+    default: m.CourseLibraryPage,
+  }))
 );
 const PortalBuilderPage = lazy(() =>
-  import('@/pages/PortalBuilderPage').then((m) => ({ default: m.PortalBuilderPage }))
+  import('@/pages/PortalBuilderPage').then((m) => ({
+    default: m.PortalBuilderPage,
+  }))
 );
 const PortalPage = lazy(() =>
   import('@/pages/PortalPage').then((m) => ({ default: m.PortalPage }))
 );
 const LanguageSettingsPage = lazy(() =>
-  import('@/pages/LanguageSettingsPage').then((m) => ({ default: m.LanguageSettingsPage }))
+  import('@/pages/LanguageSettingsPage').then((m) => ({
+    default: m.LanguageSettingsPage,
+  }))
 );
 const AdminDashboardPage = lazy(() =>
-  import('@/pages/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage }))
+  import('@/pages/AdminDashboardPage').then((m) => ({
+    default: m.AdminDashboardPage,
+  }))
 );
 const BrandingSettingsPage = lazy(() =>
-  import('@/pages/BrandingSettingsPage').then((m) => ({ default: m.BrandingSettingsPage }))
+  import('@/pages/BrandingSettingsPage').then((m) => ({
+    default: m.BrandingSettingsPage,
+  }))
 );
 const UserManagementPage = lazy(() =>
-  import('@/pages/UserManagementPage').then((m) => ({ default: m.UserManagementPage }))
+  import('@/pages/UserManagementPage').then((m) => ({
+    default: m.UserManagementPage,
+  }))
 );
 const RoleManagementPage = lazy(() =>
-  import('@/pages/RoleManagementPage').then((m) => ({ default: m.RoleManagementPage }))
+  import('@/pages/RoleManagementPage').then((m) => ({
+    default: m.RoleManagementPage,
+  }))
 );
 const GamificationSettingsPage = lazy(() =>
-  import('@/pages/GamificationSettingsPage').then((m) => ({ default: m.GamificationSettingsPage }))
+  import('@/pages/GamificationSettingsPage').then((m) => ({
+    default: m.GamificationSettingsPage,
+  }))
 );
 const AnnouncementsPage = lazy(() =>
-  import('@/pages/AnnouncementsPage').then((m) => ({ default: m.AnnouncementsPage }))
+  import('@/pages/AnnouncementsPage').then((m) => ({
+    default: m.AnnouncementsPage,
+  }))
 );
 const EnrollmentManagementPage = lazy(() =>
-  import('@/pages/EnrollmentManagementPage').then((m) => ({ default: m.EnrollmentManagementPage }))
+  import('@/pages/EnrollmentManagementPage').then((m) => ({
+    default: m.EnrollmentManagementPage,
+  }))
 );
 const AtRiskDashboardPage = lazy(() =>
-  import('@/pages/AtRiskDashboardPage').then((m) => ({ default: m.AtRiskDashboardPage }))
+  import('@/pages/AtRiskDashboardPage').then((m) => ({
+    default: m.AtRiskDashboardPage,
+  }))
 );
 const SecuritySettingsPage = lazy(() =>
-  import('@/pages/SecuritySettingsPage').then((m) => ({ default: m.SecuritySettingsPage }))
+  import('@/pages/SecuritySettingsPage').then((m) => ({
+    default: m.SecuritySettingsPage,
+  }))
 );
 const AuditLogPage = lazy(() =>
   import('@/pages/AuditLogPage').then((m) => ({ default: m.AuditLogPage }))
 );
 const NotificationTemplatesPage = lazy(() =>
-  import('@/pages/NotificationTemplatesPage').then((m) => ({ default: m.NotificationTemplatesPage }))
+  import('@/pages/NotificationTemplatesPage').then((m) => ({
+    default: m.NotificationTemplatesPage,
+  }))
 );
 const BiExportSettingsPage = lazy(() =>
-  import('@/pages/BiExportSettingsPage').then((m) => ({ default: m.BiExportSettingsPage }))
+  import('@/pages/BiExportSettingsPage').then((m) => ({
+    default: m.BiExportSettingsPage,
+  }))
 );
 const CpdSettingsPage = lazy(() =>
-  import('@/pages/CPDSettingsPage').then((m) => ({ default: m.CPDSettingsPage }))
+  import('@/pages/CPDSettingsPage').then((m) => ({
+    default: m.CPDSettingsPage,
+  }))
 );
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
@@ -226,7 +280,7 @@ export const router = createBrowserRouter([
   {
     // Dedicated route for RICH_DOCUMENT content items
     path: '/document/:contentId',
-    element: guarded(<RichDocumentPage />),
+    element: guarded(<DocumentAnnotationPage />),
   },
   {
     path: '/courses',
@@ -253,11 +307,11 @@ export const router = createBrowserRouter([
     element: guarded(<ComplianceReportsPage />),
   },
   {
-    path: "/admin/scim",
+    path: '/admin/scim',
     element: guarded(<ScimSettingsPage />),
   },
   {
-    path: "/admin/xapi",
+    path: '/admin/xapi',
     element: guarded(<XapiSettingsPage />),
   },
   {
@@ -363,13 +417,19 @@ export const router = createBrowserRouter([
   { path: '/admin/languages', element: guarded(<LanguageSettingsPage />) },
   { path: '/admin/users', element: guarded(<UserManagementPage />) },
   { path: '/admin/roles', element: guarded(<RoleManagementPage />) },
-  { path: '/admin/gamification', element: guarded(<GamificationSettingsPage />) },
+  {
+    path: '/admin/gamification',
+    element: guarded(<GamificationSettingsPage />),
+  },
   { path: '/admin/announcements', element: guarded(<AnnouncementsPage />) },
   { path: '/admin/enrollment', element: guarded(<EnrollmentManagementPage />) },
   { path: '/admin/at-risk', element: guarded(<AtRiskDashboardPage />) },
   { path: '/admin/security', element: guarded(<SecuritySettingsPage />) },
   { path: '/admin/audit', element: guarded(<AuditLogPage />) },
-  { path: '/admin/notifications', element: guarded(<NotificationTemplatesPage />) },
+  {
+    path: '/admin/notifications',
+    element: guarded(<NotificationTemplatesPage />),
+  },
   { path: '/admin/bi-export', element: guarded(<BiExportSettingsPage />) },
   { path: '/admin/cpd', element: guarded(<CpdSettingsPage />) },
   {

@@ -9,6 +9,25 @@ import path from 'path';
 // "Failed to resolve import".
 const tiptapStub = path.resolve(__dirname, './src/test/stubs/tiptap-stub.ts');
 
+// Separate stubs for ProseMirror packages — each MUST map to a different file
+// so that vi.mock() cache keys are distinct (same resolved path = shared mock registry).
+const tiptapCoreStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-core-stub.ts'
+);
+const tiptapPmStateStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-pm-state-stub.ts'
+);
+const tiptapPmViewStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-pm-view-stub.ts'
+);
+const tiptapPmModelStub = path.resolve(
+  __dirname,
+  './src/test/stubs/tiptap-pm-model-stub.ts'
+);
+
 export default defineConfig({
   plugins: [react()],
   define: {
@@ -35,10 +54,18 @@ export default defineConfig({
       '@tiptap/extension-image': tiptapStub,
       '@tiptap/react': tiptapStub,
       '@tiptap/starter-kit': tiptapStub,
-      'lowlight': tiptapStub,
+      lowlight: tiptapStub,
       '@hocuspocus/provider': tiptapStub,
       // CSS imports from katex — not needed in jsdom tests
       'katex/dist/katex.min.css': tiptapStub,
+      // Separate stubs for @tiptap/core and ProseMirror internals (each must
+      // have a UNIQUE resolved path to avoid vi.mock() cache collisions).
+      '@tiptap/core': tiptapCoreStub,
+      '@tiptap/pm/state': tiptapPmStateStub,
+      '@tiptap/pm/view': tiptapPmViewStub,
+      '@tiptap/pm/model': tiptapPmModelStub,
+      // react-resizable-panels is ESM-only; alias to stub in jsdom test env
+      'react-resizable-panels': tiptapStub,
     },
   },
   test: {
@@ -126,6 +153,10 @@ export default defineConfig({
         'src/lib/graphql/audit.queries.ts',
         'src/lib/graphql/branding.queries.ts',
         'src/lib/graphql/security.queries.ts',
+        // DocumentAnnotationPage covered by its own test; exclude heavy sub-components
+        'src/pages/DocumentAnnotationPage.tsx',
+        'src/pages/DocumentAnnotationPage.toolbar.tsx',
+        'src/components/annotation/AnnotatedDocumentViewer.tsx',
       ],
       thresholds: {
         lines: 80,

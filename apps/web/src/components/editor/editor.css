@@ -140,3 +140,30 @@
 .ProseMirror .math-node {
   cursor: default;
 }
+
+/* ── Annotation highlights (MS-Word style) ───────────────────────────────── */
+.annotation-highlight {
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.annotation-highlight--PERSONAL {
+  background: rgba(124, 58, 237, 0.15);
+}
+.annotation-highlight--SHARED {
+  background: rgba(37, 99, 235, 0.15);
+}
+.annotation-highlight--INSTRUCTOR {
+  background: rgba(22, 163, 74, 0.15);
+}
+.annotation-highlight--AI_GENERATED {
+  background: rgba(217, 119, 6, 0.15);
+}
+.annotation-highlight--focused {
+  background: rgba(245, 158, 11, 0.35);
+  outline: 2px solid rgba(245, 158, 11, 0.6);
+  outline-offset: 1px;
+}
+.annotation-highlight:hover {
+  filter: brightness(0.9);
+}

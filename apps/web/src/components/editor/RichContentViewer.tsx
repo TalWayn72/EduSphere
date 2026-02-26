@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
+import type { AnyExtension, Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { Image } from '@tiptap/extension-image';
 import { Table } from '@tiptap/extension-table';
@@ -18,9 +19,20 @@ const lowlight = createLowlight();
 
 export interface RichContentViewerProps {
   content: string;
+  /** Additional Tiptap extensions (e.g. annotation decoration plugin) */
+  extensions?: AnyExtension[];
+  /** Called whenever the editor selection changes */
+  onSelectionUpdate?: (params: { editor: Editor }) => void;
+  /** Called once after the editor instance is created */
+  onEditorReady?: (editor: Editor) => void;
 }
 
-export function RichContentViewer({ content }: RichContentViewerProps) {
+export function RichContentViewer({
+  content,
+  extensions,
+  onSelectionUpdate,
+  onEditorReady,
+}: RichContentViewerProps) {
   const parsedContent = React.useMemo(() => {
     if (!content) return { type: 'doc', content: [] };
     try {
@@ -42,9 +54,14 @@ export function RichContentViewer({ content }: RichContentViewerProps) {
       TaskItem.configure({ nested: true }),
       CodeBlockLowlight.configure({ lowlight }),
       Mathematics,
+      ...(extensions ?? []),
     ],
     content: parsedContent,
     editable: false,
+    onSelectionUpdate,
+    onCreate({ editor: e }) {
+      onEditorReady?.(e);
+    },
     editorProps: {
       attributes: {
         class: 'focus:outline-none',

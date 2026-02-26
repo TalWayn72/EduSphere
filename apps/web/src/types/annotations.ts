@@ -5,6 +5,11 @@ export enum AnnotationLayer {
   AI_GENERATED = 'AI_GENERATED',
 }
 
+export interface TextRange {
+  from: number;
+  to: number;
+}
+
 export interface Annotation {
   id: string;
   content: string;
@@ -17,6 +22,7 @@ export interface Annotation {
   contentTimestamp?: number; // For video/audio annotations
   parentId?: string; // For threaded replies
   replies?: Annotation[];
+  textRange?: TextRange; // For document text-range annotations
   createdAt: string;
   updatedAt: string;
 }

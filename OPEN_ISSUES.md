@@ -7,6 +7,85 @@
 
 ---
 
+## DOC-ANN-001: MS-Word Style Document Annotation System (26 Feb 2026) — ✅ Complete
+
+**Status:** ✅ Complete | **Severity:** 🟢 Feature | **Branch:** `fix/bug-16-23-g18`
+
+### Summary
+Replaced the basic read-only `RichDocumentPage` with a full MS-Word-style document annotation experience on the `/document/:contentId` route.
+
+### Features Implemented
+
+| Feature | Status |
+|---------|--------|
+| 3-panel resizable layout (drag handle between doc + comments) | ✅ |
+| Document zoom: 75% / 100% / 125% / 150% | ✅ |
+| Text selection → floating "Add Comment" button | ✅ |
+| Comment form with layer selector (Private/Public/Authority) | ✅ |
+| Semi-transparent colored highlights on annotated text | ✅ |
+| Click comment card → scrolls document to linked text | ✅ |
+| Click highlighted text → scrolls comment to top of panel | ✅ |
+| Layer filter tabs in comments panel | ✅ |
+| "Welcome back" toast with user name when returning to document | ✅ |
+| Scroll position restore (last read position) | ✅ |
+| Default annotation layer preference (persisted to localStorage) | ✅ |
+| Recently viewed documents tracking (localStorage, LRU 10) | ✅ |
+
+### Data Flow
+1. User selects text → `onSelectionUpdate` → `SelectionCommentButton` appears
+2. Click "Add Comment" → `CommentForm` popover opens
+3. Save → `addTextAnnotation` → `CREATE_ANNOTATION_MUTATION` with `spatialData: { from, to }`
+4. Annotation stored in DB via existing GraphQL schema (`spatialData: JSON`)
+5. Decoration plugin reads annotations → builds `DecorationSet` → colored inline spans
+6. Click highlight → `data-annotation-id` → `setFocusedAnnotationId` → panel scrolls
+7. Click card → `setFocusedAnnotationId` → editor scrolls to `from` position
+
+### New Files Created (Frontend — `apps/web/src/`)
+
+| File | Description |
+|------|-------------|
+| `components/ui/resizable.tsx` | shadcn/ui wrappers for react-resizable-panels v4 |
+| `components/annotation/AnnotationDecorationsPlugin.ts` | ProseMirror DecorationSet plugin for inline highlights |
+| `components/annotation/AnnotatedDocumentViewer.tsx` | Tiptap viewer with decoration, selection, click handling |
+| `components/annotation/CommentCard.tsx` | MS-Word style comment card (layer badge, date, reply thread) |
+| `components/annotation/CommentForm.tsx` | Floating comment form (Esc/Ctrl+Enter shortcuts) |
+| `components/annotation/SelectionCommentButton.tsx` | Floating "Add Comment" button on text selection |
+| `components/annotation/WordCommentPanel.tsx` | Right panel: filter tabs, sorted card list, auto-scroll |
+| `pages/DocumentAnnotationPage.tsx` | Main 3-panel assembly page |
+| `pages/DocumentAnnotationPage.toolbar.tsx` | Toolbar: back nav, zoom, default layer selector |
+| `hooks/useDocumentAnnotations.ts` | Data hook: fetches + filters text-range annotations |
+| `hooks/useDocumentScrollMemory.ts` | Persists scroll position (30-day TTL, debounced) |
+| `hooks/useRecentDocuments.ts` | LRU-10 recent documents in localStorage |
+| `test/stubs/tiptap-core-stub.ts` | Separate stub for @tiptap/core (avoids vi.mock cache collision) |
+| `test/stubs/tiptap-pm-state-stub.ts` | Separate stub for @tiptap/pm/state |
+| `test/stubs/tiptap-pm-view-stub.ts` | Separate stub for @tiptap/pm/view |
+| `test/stubs/tiptap-pm-model-stub.ts` | Separate stub for @tiptap/pm/model |
+
+### Modified Files
+
+| File | Change |
+|------|--------|
+| `lib/store.ts` | Added `focusedAnnotationId` to `useUIStore`; new `useDocumentUIStore` (persisted: zoom, panelWidth, defaultLayer) |
+| `types/annotations.ts` | Added `TextRange` interface + `textRange?` on `Annotation` |
+| `components/editor/RichContentViewer.tsx` | Added optional `extensions?`, `onSelectionUpdate?`, `onEditorReady?` props |
+| `components/editor/editor.css` | Appended annotation highlight CSS (PERSONAL/SHARED/INSTRUCTOR/AI_GENERATED/focused) |
+| `lib/router.tsx` | `/document/:contentId` → `DocumentAnnotationPage` (was `RichDocumentPage`) |
+| `vitest.config.ts` | Added @tiptap/core, @tiptap/pm/* and react-resizable-panels stubs |
+| `apps/web/package.json` | Added `react-resizable-panels@4.6.5` |
+
+### Key Technical Decisions
+- **ProseMirror decorations via refs**: Plugin reads `annotationsRef.current` (not stale closure) to rebuild `DecorationSet` whenever `tr.setMeta(annotationPluginKey, true)` is dispatched
+- **No DB schema change**: `spatialData: JSON` column already existed; text-range uses `{ from, to }` keys
+- **`addAnnotation` bypass**: `useAnnotations.addAnnotation` only accepts `timestamp` as 3rd param → `useDocumentAnnotations` calls `useMutation(CREATE_ANNOTATION_MUTATION)` directly
+- **Separate PM stubs**: Each `@tiptap/pm/*` package must alias to its own stub file (same resolved path = shared `vi.mock()` registry = mock overwrites)
+- **react-resizable-panels v4**: Uses `Group/Panel/Separator` (not `PanelGroup/PanelResizeHandle`), `orientation` (not `direction`), no `order` prop
+
+### Tests
+- All 569 web unit tests pass (569/569)
+- TypeScript: 0 errors (`tsc --noEmit`)
+
+---
+
 ## CI-001: Codegen Validation Fix (25 Feb 2026) — ✅ Fixed
 
 **Status:** ✅ Fixed | **Severity:** 🔴 CI-blocking | **Branch:** `docs/normalize-file-naming`
