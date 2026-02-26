@@ -11,7 +11,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { basename, resolve } from 'path';
 
 export type ParseResult = {
   text: string;
@@ -27,7 +27,9 @@ export class DocumentParserService {
   async parseDocx(source: string | Buffer): Promise<ParseResult> {
     const { default: mammoth } = await import('mammoth');
     const buffer =
-      typeof source === 'string' ? readFileSync(resolve(source)) : source;
+      typeof source === 'string'
+        ? readFileSync(resolve(basename(source)))
+        : source;
     const result = await mammoth.extractRawText({ buffer });
 
     if (result.messages.length > 0) {
@@ -68,6 +70,17 @@ export class DocumentParserService {
 
   /** Fetch a URL and extract readable text (strips HTML tags) */
   async parseUrl(url: string): Promise<ParseResult> {
+    // SSRF guard: only allow http/https and block private/loopback IPs
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      throw new Error(`Disallowed URL protocol: ${parsed.protocol}`);
+    }
+    const privateIpPattern =
+      /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1|0\.0\.0\.0)/i;
+    if (privateIpPattern.test(parsed.hostname)) {
+      throw new Error(`SSRF protection: private/loopback host not allowed`);
+    }
+
     this.logger.log(`Fetching URL: ${url}`);
     const res = await fetch(url, {
       headers: { 'User-Agent': 'EduSphere-KnowledgeBot/1.0' },
@@ -87,7 +100,7 @@ export class DocumentParserService {
       // Entity decoding is intentionally limited to safe characters only
       // (no &lt;/&gt; conversion) to prevent reintroducing angle brackets.
       text = raw
-        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
         .replace(/<style[\s\S]*?<\/style>/gi, '')
         .replace(/<[^>]+>/g, ' ')
         .replace(/&nbsp;/g, ' ')

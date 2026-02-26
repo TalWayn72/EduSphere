@@ -17,6 +17,14 @@ interface Props {
   saved: boolean;
 }
 
+/** Strip script tags and inline event handlers to prevent XSS in the preview pane. */
+function sanitizeEmailHtml(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
+    .replace(/\son\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
+    .replace(/javascript\s*:/gi, '');
+}
+
 const ALL_VARIABLES = [
   '{{user.name}}',
   '{{user.email}}',
@@ -105,7 +113,7 @@ export function NotificationTemplateEditor({
           <TabsContent value="preview">
             <div
               className="border rounded-md p-4 min-h-[14rem] text-sm prose prose-sm max-w-none overflow-auto"
-              dangerouslySetInnerHTML={{ __html: bodyHtml }}
+              dangerouslySetInnerHTML={{ __html: sanitizeEmailHtml(bodyHtml) }}
             />
           </TabsContent>
         </Tabs>

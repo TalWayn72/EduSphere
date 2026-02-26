@@ -946,7 +946,7 @@ async function seedKabbalisticConcepts(
       db as Parameters<typeof executeCypher>[0],
       GRAPH_NAME,
       `MERGE (c:Concept {name: '${concept.name}', tenant_id: '${DEMO_TENANT}'})
-       SET c.definition = '${concept.definition.replace(/'/g, "\\'")}',
+       SET c.definition = '${concept.definition.replace(/'/g, "\\\\'")}',
            c.updated_at = timestamp()
        RETURN c`
     );

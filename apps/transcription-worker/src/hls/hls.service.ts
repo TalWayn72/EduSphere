@@ -11,7 +11,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { lookup as mimeLookup } from 'mime-types';
-import { randomUUID } from 'crypto';
+import { randomUUID, randomBytes } from 'crypto';
 import { minioConfig } from '@edusphere/config';
 
 export interface HlsResult {
@@ -71,7 +71,7 @@ export class HlsService {
 
     try {
       await mkdir(workDir, { recursive: true });
-      sourcePath = join(workDir, 'source.mp4');
+      sourcePath = join(workDir, `source-${randomBytes(8).toString('hex')}.mp4`);
 
       // Step 1 – Download source from MinIO
       this.logger.log(`HLS: downloading source key=${sourceKey}`);

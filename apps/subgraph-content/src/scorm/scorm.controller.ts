@@ -80,13 +80,23 @@ export class ScormController {
     });
   }
 
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+  }
+
   @Get('launch/:sessionId')
   async launchScorm(
     @Param('sessionId') sessionId: string,
     @Res() res: Response
   ): Promise<void> {
+    const safeSessionId = this.escapeHtml(sessionId);
     // Load session to get content item
-    const session = await this.sessionService.findSessionById(sessionId);
+    const session = await this.sessionService.findSessionById(safeSessionId);
 
     // Lookup SCORM package for content item
     const [pkg] = await this.db
@@ -123,10 +133,10 @@ export class ScormController {
     // Inject API shim before </head>
     const shimWithSession = SCORM_SHIM_SCRIPT.replace(
       "data-session''",
-      `data-session='${sessionId}'`
+      `data-session='${safeSessionId}'`
     ).replace(
       "getAttribute('data-session')",
-      `getAttribute('data-session') || '${sessionId}'`
+      `getAttribute('data-session') || '${safeSessionId}'`
     );
 
     const injected = htmlContent.includes('</head>')

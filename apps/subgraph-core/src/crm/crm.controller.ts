@@ -61,9 +61,9 @@ export class CrmController {
     @Req() req: Request,
     @Res() res: Response
   ): Promise<void> {
-    const code = req.query['code'] as string | undefined;
-    const rawState = req.query['state'] as string | undefined;
-    const error = req.query['error'] as string | undefined;
+    const code = Array.isArray(req.query['code']) ? req.query['code'][0] : req.query['code'] as string | undefined;
+    const rawState = Array.isArray(req.query['state']) ? req.query['state'][0] : req.query['state'] as string | undefined;
+    const error = Array.isArray(req.query['error']) ? req.query['error'][0] : req.query['error'] as string | undefined;
 
     if (error || !code || !rawState) {
       this.logger.warn(

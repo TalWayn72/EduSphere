@@ -74,6 +74,15 @@ export class LrsController {
     res.status(HttpStatus.OK).json({ version: [XAPI_VERSION], extensions: {} });
   }
 
+  private sanitizeString(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+  }
+
   @Post('statements')
   async postStatements(
     @Req() req: Request,
@@ -97,7 +106,7 @@ export class LrsController {
         return;
       }
       await this.statementService.storeStatement(auth.tenantId, stmt);
-      ids.push(stmt.id);
+      ids.push(this.sanitizeString(String(stmt.id)));
     }
 
     this.logger.log(
