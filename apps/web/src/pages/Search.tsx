@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import {
   Clock,
   ChevronRight,
   Loader2,
+  X,
 } from 'lucide-react';
 import { SEARCH_SEMANTIC_QUERY } from '@/lib/graphql/knowledge.queries';
 import { mockTranscript } from '@/lib/mock-content-data';
@@ -21,6 +22,23 @@ import { getThreadedAnnotations } from '@/lib/mock-annotations';
 import { mockGraphData } from '@/lib/mock-graph-data';
 
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
+// ─── Recent searches (localStorage) ──────────────────────────────────────────
+const RECENT_KEY = 'edusphere_recent_searches';
+const MAX_RECENT = 8;
+
+function loadRecent(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+function persistRecent(term: string) {
+  const list = loadRecent().filter((s) => s !== term);
+  localStorage.setItem(RECENT_KEY, JSON.stringify([term, ...list].slice(0, MAX_RECENT)));
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ResultType = 'transcript' | 'annotation' | 'concept' | 'course';
@@ -81,9 +99,10 @@ function mockSearch(query: string): SearchResult[] {
       snippet: a.content,
       meta: a.layer,
       timestamp: a.contentTimestamp,
-      href: a.contentTimestamp !== undefined
-        ? `/learn/content-1?t=${a.contentTimestamp}`
-        : '/annotations',
+      href:
+        a.contentTimestamp !== undefined
+          ? `/learn/content-1?t=${a.contentTimestamp}`
+          : '/annotations',
     }));
 
   const conceptResults: SearchResult[] = mockGraphData.nodes
@@ -114,7 +133,12 @@ function mockSearch(query: string): SearchResult[] {
     href: '/courses',
   }));
 
-  return [...courseResults, ...transcriptResults, ...annotationResults, ...conceptResults];
+  return [
+    ...courseResults,
+    ...transcriptResults,
+    ...annotationResults,
+    ...conceptResults,
+  ];
 }
 
 function formatTime(s: number) {
@@ -164,7 +188,10 @@ function Highlight({ text, query }: { text: string; query: string }) {
     <>
       {parts.map((part, i) =>
         part.toLowerCase() === lower ? (
-          <mark key={i} className="bg-yellow-200 text-yellow-900 rounded px-0.5">
+          <mark
+            key={i}
+            className="bg-yellow-200 text-yellow-900 rounded px-0.5"
+          >
             {part}
           </mark>
         ) : (
@@ -184,8 +211,12 @@ export function SearchPage() {
   const [inputValue, setInputValue] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
   const [isSearching, setIsSearching] = useState(false);
+  const [activeTypeFilter, setActiveTypeFilter] = useState<ResultType | null>(null);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => loadRecent());
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // GraphQL semantic search (real mode)
   const [searchResult] = useQuery({
@@ -194,15 +225,27 @@ export function SearchPage() {
     pause: DEV_MODE || query.length < 2,
   });
 
+  const clearRecent = useCallback(() => {
+    localStorage.removeItem(RECENT_KEY);
+    setRecentSearches([]);
+  }, []);
+
+  const applySearch = useCallback((term: string) => {
+    setInputValue(term);
+  }, []);
+
   // Debounce input
   useEffect(() => {
     clearTimeout(debounceRef.current);
     if (inputValue.trim().length >= 2) {
       setIsSearching(true);
       debounceRef.current = setTimeout(() => {
-        setQuery(inputValue);
-        setSearchParams({ q: inputValue }, { replace: true });
+        const trimmed = inputValue.trim();
+        setQuery(trimmed);
+        setSearchParams({ q: trimmed }, { replace: true });
         setIsSearching(false);
+        persistRecent(trimmed);
+        setRecentSearches(loadRecent());
       }, 300);
     } else {
       setQuery('');
@@ -232,7 +275,9 @@ export function SearchPage() {
     return {
       id: r.id,
       type,
-      title: isConceptType ? r.text.split('\n')[0]?.slice(0, 80) ?? r.entityType : query,
+      title: isConceptType
+        ? (r.text.split('\n')[0]?.slice(0, 80) ?? r.entityType)
+        : query,
       snippet: r.text,
       meta: `${Math.round(r.similarity * 100)}% match`,
       href: isConceptType ? '/graph' : `/learn/${r.entityId}`,
@@ -240,7 +285,8 @@ export function SearchPage() {
   });
 
   // Determine if GraphQL failed and we need to fall back to offline mock search
-  const isOfflineFallback = !DEV_MODE && !!searchResult.error && query.length >= 2;
+  const isOfflineFallback =
+    !DEV_MODE && !!searchResult.error && query.length >= 2;
 
   // Build results: dev mode → mock, real mode with error → offline mock fallback, real mode ok → real
   const results: SearchResult[] = DEV_MODE
@@ -249,11 +295,15 @@ export function SearchPage() {
       ? mockSearch(query)
       : realResults;
 
-  const loading =
-    (!DEV_MODE && searchResult.fetching) || isSearching;
+  const loading = (!DEV_MODE && searchResult.fetching) || isSearching;
+
+  // Apply type filter
+  const filteredResults = activeTypeFilter
+    ? results.filter((r) => r.type === activeTypeFilter)
+    : results;
 
   // Group by type
-  const grouped = results.reduce<Partial<Record<ResultType, SearchResult[]>>>(
+  const grouped = filteredResults.reduce<Partial<Record<ResultType, SearchResult[]>>>(
     (acc, r) => {
       (acc[r.type] ??= []).push(r);
       return acc;
@@ -261,7 +311,12 @@ export function SearchPage() {
     {}
   );
 
-  const typeOrder: ResultType[] = ['course', 'transcript', 'annotation', 'concept'];
+  const typeOrder: ResultType[] = [
+    'course',
+    'transcript',
+    'annotation',
+    'concept',
+  ];
 
   return (
     <Layout>
@@ -291,16 +346,26 @@ export function SearchPage() {
             aria-live="polite"
             className="flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-800"
           >
-            <span className="inline-block h-2 w-2 rounded-full bg-amber-400 flex-shrink-0" aria-hidden="true" />
+            <span
+              className="inline-block h-2 w-2 rounded-full bg-amber-400 flex-shrink-0"
+              aria-hidden="true"
+            />
             Offline mode — showing cached results
           </div>
         )}
 
         {/* Loading skeleton */}
         {loading && query.length >= 2 && (
-          <div className="space-y-3" aria-busy="true" aria-label="Loading results">
+          <div
+            className="space-y-3"
+            aria-busy="true"
+            aria-label="Loading results"
+          >
             {[1, 2, 3].map((n) => (
-              <div key={n} className="rounded-xl border bg-muted/30 p-4 animate-pulse">
+              <div
+                key={n}
+                className="rounded-xl border bg-muted/30 p-4 animate-pulse"
+              >
                 <div className="h-4 w-1/3 rounded bg-muted mb-2" />
                 <div className="h-3 w-full rounded bg-muted mb-1" />
                 <div className="h-3 w-2/3 rounded bg-muted" />
@@ -309,91 +374,173 @@ export function SearchPage() {
           </div>
         )}
 
+        {/* Type filter chips + result count */}
+        {query.length >= 2 && !loading && results.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setActiveTypeFilter(null)}
+              className={`px-3 py-1 rounded-full text-xs border transition-colors ${
+                activeTypeFilter === null
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'hover:bg-muted/60 border-border text-muted-foreground'
+              }`}
+            >
+              All ({results.length})
+            </button>
+            {typeOrder.map((type) => {
+              const count = results.filter((r) => r.type === type).length;
+              if (count === 0) return null;
+              const config = TYPE_CONFIG[type];
+              const Icon = config.icon;
+              return (
+                <button
+                  key={type}
+                  onClick={() => setActiveTypeFilter(activeTypeFilter === type ? null : type)}
+                  className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs border transition-colors ${
+                    activeTypeFilter === type
+                      ? `${config.bg} ${config.color} border-current font-semibold`
+                      : 'hover:bg-muted/60 border-border text-muted-foreground'
+                  }`}
+                >
+                  <Icon className="h-3 w-3" />
+                  {config.label}s ({count})
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* Result count */}
         {query.length >= 2 && !loading && (
           <p className="text-sm text-muted-foreground px-1">
-            {results.length === 0
+            {filteredResults.length === 0
               ? t('noResults')
-              : `${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"`}
+              : `${filteredResults.length} result${filteredResults.length !== 1 ? 's' : ''} for "${query}"${activeTypeFilter ? ` in ${TYPE_CONFIG[activeTypeFilter].label}s` : ''}`}
           </p>
         )}
 
         {/* Empty state */}
         {query.length < 2 && (
-          <div className="text-center py-16 space-y-3">
+          <div className="text-center py-12 space-y-4">
             <SearchIcon className="h-12 w-12 text-muted-foreground/30 mx-auto" />
-            <p className="text-muted-foreground">
-              {t('searchHint')}
-            </p>
-            <div className="flex flex-wrap gap-2 justify-center mt-4">
-              {['Talmud', 'chavruta', 'kal vachomer', 'Rambam', 'pilpul'].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setInputValue(s)}
-                  className="px-3 py-1.5 rounded-full border text-sm hover:bg-muted/60 transition-colors"
-                >
-                  {s}
-                </button>
-              ))}
+            <p className="text-muted-foreground">{t('searchHint')}</p>
+
+            {/* Recent searches */}
+            {recentSearches.length > 0 && (
+              <div className="mt-4 text-left">
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Recent
+                  </span>
+                  <button
+                    onClick={clearRecent}
+                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                    aria-label="Clear recent searches"
+                  >
+                    <X className="h-3 w-3" /> Clear
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {recentSearches.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => applySearch(s)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm hover:bg-muted/60 transition-colors"
+                    >
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Suggested searches */}
+            <div className="flex flex-wrap gap-2 justify-center mt-2">
+              {['Talmud', 'chavruta', 'kal vachomer', 'Rambam', 'pilpul'].map(
+                (s) => (
+                  <button
+                    key={s}
+                    onClick={() => applySearch(s)}
+                    className="px-3 py-1.5 rounded-full border text-sm hover:bg-muted/60 transition-colors"
+                  >
+                    {s}
+                  </button>
+                )
+              )}
             </div>
           </div>
         )}
 
         {/* Results grouped by type */}
-        {!loading && typeOrder.map((type) => {
-          const items = grouped[type];
-          if (!items || items.length === 0) return null;
-          const config = TYPE_CONFIG[type];
-          const Icon = config.icon;
-          return (
-            <div key={type} className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Icon className={`h-4 w-4 ${config.color}`} />
-                <h3 className={`text-sm font-semibold uppercase tracking-wide ${config.color}`}>
-                  {config.label}s
-                </h3>
-                <span className="text-xs text-muted-foreground">({items.length})</span>
-              </div>
-              <div className="space-y-2">
-                {items.map((r) => (
-                  <Card
-                    key={r.id}
-                    className={`cursor-pointer hover:shadow-md transition-shadow border ${config.bg}`}
-                    onClick={() => r.href && navigate(r.href)}
+        {!loading &&
+          typeOrder.map((type) => {
+            const items = grouped[type];
+            if (!items || items.length === 0) return null;
+            const config = TYPE_CONFIG[type];
+            const Icon = config.icon;
+            return (
+              <div key={type} className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Icon className={`h-4 w-4 ${config.color}`} />
+                  <h3
+                    className={`text-sm font-semibold uppercase tracking-wide ${config.color}`}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-semibold ${config.color} truncate`}>
-                            <Highlight text={r.title} query={query} />
-                          </p>
-                          <p className="text-sm text-foreground/80 mt-0.5 line-clamp-2">
-                            <Highlight text={r.snippet} query={query} />
-                          </p>
-                          {r.meta && (
-                            <div className="flex items-center gap-1 mt-1.5">
-                              {r.timestamp !== undefined ? (
-                                <Clock className="h-3 w-3 text-muted-foreground" />
-                              ) : null}
-                              <span className="text-xs text-muted-foreground">{r.meta}</span>
-                            </div>
-                          )}
+                    {config.label}s
+                  </h3>
+                  <span className="text-xs text-muted-foreground">
+                    ({items.length})
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {items.map((r) => (
+                    <Card
+                      key={r.id}
+                      className={`cursor-pointer hover:shadow-md transition-shadow border ${config.bg}`}
+                      onClick={() => r.href && navigate(r.href)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className={`text-sm font-semibold ${config.color} truncate`}
+                            >
+                              <Highlight text={r.title} query={query} />
+                            </p>
+                            <p className="text-sm text-foreground/80 mt-0.5 line-clamp-2">
+                              <Highlight text={r.snippet} query={query} />
+                            </p>
+                            {r.meta && (
+                              <div className="flex items-center gap-1 mt-1.5">
+                                {r.timestamp !== undefined ? (
+                                  <Clock className="h-3 w-3 text-muted-foreground" />
+                                ) : null}
+                                <span className="text-xs text-muted-foreground">
+                                  {r.meta}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 flex-shrink-0"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
                         </div>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
         {DEV_MODE && query.length >= 2 && (
           <p className="text-xs text-center text-muted-foreground pb-4">
-            Dev Mode — mock search results. Set VITE_DEV_MODE=false for live semantic search.
+            Dev Mode — mock search results. Set VITE_DEV_MODE=false for live
+            semantic search.
           </p>
         )}
       </div>
