@@ -77,15 +77,15 @@ export class DocumentParserService {
 
     let text: string;
     if (contentType.includes('text/html')) {
-      // Strip HTML tags and collapse whitespace
+      // Strip HTML tags and collapse whitespace.
+      // Entity decoding is intentionally limited to safe characters only
+      // (no &lt;/&gt; conversion) to prevent reintroducing angle brackets.
       text = raw
         .replace(/<script[\s\S]*?<\/script>/gi, '')
         .replace(/<style[\s\S]*?<\/style>/gi, '')
         .replace(/<[^>]+>/g, ' ')
         .replace(/&nbsp;/g, ' ')
         .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
         .replace(/\s{2,}/g, ' ')
         .trim();
     } else {
