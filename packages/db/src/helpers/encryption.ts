@@ -3,7 +3,12 @@
  * SI-3: All PII fields must be encrypted at rest using these helpers.
  * Key derivation: HMAC-SHA256(ENCRYPTION_MASTER_KEY, tenantId) → 32-byte tenant key
  */
-import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'node:crypto';
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHmac,
+  randomBytes,
+} from 'node:crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12; // 96-bit IV for GCM
@@ -17,7 +22,9 @@ const KEY_LENGTH = 32;
 export function deriveTenantKey(tenantId: string): Buffer {
   const masterKey = process.env['ENCRYPTION_MASTER_KEY'];
   if (!masterKey || masterKey.length < 32) {
-    throw new Error('ENCRYPTION_MASTER_KEY must be set and at least 32 characters');
+    throw new Error(
+      'ENCRYPTION_MASTER_KEY must be set and at least 32 characters'
+    );
   }
   return createHmac('sha256', Buffer.from(masterKey, 'utf8'))
     .update(tenantId)
@@ -53,7 +60,9 @@ export function encryptField(value: string, tenantKey: Buffer): string {
 export function decryptField(ciphertext: string, tenantKey: Buffer): string {
   const parts = ciphertext.split(':');
   if (parts.length !== 3) {
-    throw new Error('Invalid encrypted field format — expected iv:authTag:ciphertext');
+    throw new Error(
+      'Invalid encrypted field format — expected iv:authTag:ciphertext'
+    );
   }
 
   const [ivHex, authTagHex, encryptedHex] = parts as [string, string, string];
@@ -66,7 +75,10 @@ export function decryptField(ciphertext: string, tenantKey: Buffer): string {
   });
   decipher.setAuthTag(authTag);
 
-  return Buffer.concat([decipher.update(encryptedData), decipher.final()]).toString('utf8');
+  return Buffer.concat([
+    decipher.update(encryptedData),
+    decipher.final(),
+  ]).toString('utf8');
 }
 
 /**
@@ -74,7 +86,7 @@ export function decryptField(ciphertext: string, tenantKey: Buffer): string {
  */
 export function encryptFieldNullable(
   value: string | null | undefined,
-  tenantKey: Buffer,
+  tenantKey: Buffer
 ): string | null {
   if (value == null) return null;
   return encryptField(value, tenantKey);
@@ -85,7 +97,7 @@ export function encryptFieldNullable(
  */
 export function decryptFieldNullable(
   ciphertext: string | null | undefined,
-  tenantKey: Buffer,
+  tenantKey: Buffer
 ): string | null {
   if (ciphertext == null) return null;
   return decryptField(ciphertext, tenantKey);

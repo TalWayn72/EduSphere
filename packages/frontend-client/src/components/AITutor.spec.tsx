@@ -75,7 +75,7 @@ function renderAITutor(mocks: MockedResponse[] = []) {
   return render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <AITutor />
-    </MockedProvider>,
+    </MockedProvider>
   );
 }
 
@@ -91,12 +91,16 @@ describe('AITutor', () => {
 
   it('shows "Start New Session" button when no session is active', () => {
     renderAITutor();
-    expect(screen.getByRole('button', { name: /Start New Session/i })).toBeDefined();
+    expect(
+      screen.getByRole('button', { name: /Start New Session/i })
+    ).toBeDefined();
   });
 
   it('shows prompt text before session starts', () => {
     renderAITutor();
-    expect(screen.getByText(/Start a conversation with your AI tutor/i)).toBeDefined();
+    expect(
+      screen.getByText(/Start a conversation with your AI tutor/i)
+    ).toBeDefined();
   });
 
   it('calls createAgentSession mutation when "Start New Session" is clicked', async () => {
@@ -115,7 +119,9 @@ describe('AITutor', () => {
 
     // After the mutation resolves, the chat UI should appear
     await vi.waitFor(() => {
-      expect(screen.queryByRole('button', { name: /Start New Session/i })).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: /Start New Session/i })
+      ).toBeNull();
     });
   });
 
@@ -180,7 +186,9 @@ describe('AITutor', () => {
       expect(screen.getByPlaceholderText(/Ask a question/i)).toBeDefined();
     });
 
-    const input = screen.getByPlaceholderText(/Ask a question/i) as HTMLInputElement;
+    const input = screen.getByPlaceholderText(
+      /Ask a question/i
+    ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'What is recursion?' } });
     expect(input.value).toBe('What is recursion?');
 
@@ -218,7 +226,9 @@ describe('AITutor', () => {
       expect(screen.getByPlaceholderText(/Ask a question/i)).toBeDefined();
     });
 
-    const form = screen.getByPlaceholderText(/Ask a question/i).closest('form')!;
+    const form = screen
+      .getByPlaceholderText(/Ask a question/i)
+      .closest('form')!;
     fireEvent.submit(form);
     // No error thrown = test passes
   });

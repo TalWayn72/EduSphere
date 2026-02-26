@@ -55,12 +55,14 @@ EduSphere is a **knowledge graph-based educational platform** designed for 100,0
 **Rationale**: Running Apache AGE (graph queries), pgvector (semantic search), and relational data in a single PostgreSQL instance eliminates the operational complexity of managing 3–4 separate databases. This doesn't prevent future separation but provides the simplest viable starting point.
 
 **Benefits**:
+
 - **Single ACID boundary**: Transactional consistency across graph, vector, and relational mutations
 - **Unified backups**: One database to backup/restore/replicate
 - **Simplified connection pooling**: PgBouncer manages all data access
 - **RLS enforcement**: Tenant isolation enforced at the database layer for all data types
 
 **Trade-offs**:
+
 - **Resource contention**: Graph traversals and vector searches compete for CPU/memory with OLTP queries (mitigated via read replicas)
 - **Specialized tooling**: Apache AGE lacks the ecosystem maturity of Neo4j (fewer tutorials, integrations)
 - **Scalability ceiling**: PostgreSQL vertical scaling limits vs. horizontally-scalable graph databases
@@ -74,12 +76,14 @@ EduSphere is a **knowledge graph-based educational platform** designed for 100,0
 **Rationale**: GraphQL Federation enables **domain-driven microservice decomposition** while presenting a unified API to clients. SDL-first design ensures the schema is the contract, not the implementation.
 
 **Benefits**:
+
 - **Subgraph autonomy**: Teams own their domain end-to-end (schema, resolvers, database)
 - **Gradual rollout**: New features deploy to individual subgraphs without full-system releases
 - **Client simplicity**: Clients query a single endpoint; the gateway handles distributed resolution
 - **Breaking change detection**: GraphQL Hive schema registry prevents incompatible updates
 
 **Entity ownership rules**:
+
 - Each entity (`Course`, `User`, `Annotation`) is owned by exactly one subgraph
 - Other subgraphs reference entities via `@key` stubs and extend with domain-specific fields
 - Example: `User` owned by Core; Content extends with `createdCourses`, Annotation with `annotations`
@@ -93,6 +97,7 @@ EduSphere is a **knowledge graph-based educational platform** designed for 100,0
 **Rationale**: RLS enforces tenant isolation at the PostgreSQL query-optimizer level, making data leakage architecturally impossible even if application code has bugs.
 
 **Pattern**:
+
 ```sql
 -- Every tenant-scoped table
 CREATE POLICY tenant_isolation ON courses
@@ -108,6 +113,7 @@ COMMIT;
 ```
 
 **Safety with connection pooling**:
+
 - **Always use `SET LOCAL`** (not `SET SESSION`) — resets automatically on transaction end
 - Safe with PgBouncer in transaction mode
 - No risk of context bleeding between requests
@@ -115,6 +121,7 @@ COMMIT;
 **Performance**: Simple RLS policies (`tenant_id = current_setting(...)`) execute via index scans with minimal overhead. Verified via `EXPLAIN ANALYZE` on all tenant-scoped queries.
 
 **Exceptions**:
+
 - `SUPER_ADMIN` role can query across tenants via explicit role check: `OR current_setting('app.current_user_role') = 'SUPER_ADMIN'`
 
 ---
@@ -260,6 +267,7 @@ sequenceDiagram
 - **RLS Enforcement**: Each subgraph sets PostgreSQL session variables before executing queries
 
 **Performance Optimizations**:
+
 - **Batching**: Gateway batches entity resolution requests (`User(ids: [1, 2, 3])` instead of 3 separate queries)
 - **@defer**: Slow fields can be deferred to stream results progressively
 - **Persisted Queries**: Production clients use pre-registered query IDs to skip parsing
@@ -315,6 +323,7 @@ graph TD
 6. **Concept Extraction** (async): LlamaIndex.TS analyzes transcript → creates knowledge graph vertices/edges
 
 **Scalability Considerations**:
+
 - **Transcription bottleneck**: GPU-accelerated faster-whisper achieves ~4x real-time speed. For 100K users, deploy 5–10 worker replicas with GPU nodes
 - **Embedding throughput**: nomic-embed-text processes ~500 segments/sec on CPU. Use NATS consumer groups for horizontal scaling
 - **NATS JetStream**: Handles 10M+ messages/sec with at-least-once delivery. Message retention configurable per stream
@@ -382,6 +391,7 @@ sequenceDiagram
 6. **Transaction-Scoped Context**: `SET LOCAL` ensures no context bleeding between requests
 
 **Token Lifecycle**:
+
 - **Access token TTL**: 5 minutes (short-lived to limit exposure)
 - **Refresh token TTL**: 30 days (httpOnly cookie)
 - **Token refresh**: React app refreshes access token silently before expiration
@@ -466,11 +476,13 @@ graph TD
 3. **Layer 3: LlamaIndex.TS** — RAG indexing and retrieval strategies
 
 **HybridRAG Pattern**:
+
 - **Parallel retrieval**: Vector search (semantic similarity) + Graph traversal (structured relationships)
 - **Fusion scoring**: Combined relevance = `0.6 * vector_score + 0.4 * graph_centrality`
 - **Proven accuracy**: 96% factual faithfulness (NVIDIA/BlackRock), 91.4% retrieval accuracy (KA-RAG)
 
 **MCP Tool Integration**:
+
 - **knowledge_graph**: Query/create concepts, traverse relations via Apache AGE
 - **semantic_search**: Vector search via pgvector
 - **transcript_reader**: Read segments by time range
@@ -478,6 +490,7 @@ graph TD
 - **web_search**: External search (sandboxed, rate-limited)
 
 **Sandboxing** (Production):
+
 - **gVisor**: User-space kernel providing container isolation with 10–20% overhead
 - **Resource limits**: Per-tenant quotas (10 exec/day on FREE, 1000 on PROFESSIONAL)
 - **Timeout enforcement**: 30s FREE, 60s STARTER, 120s PROFESSIONAL, 300s ENTERPRISE
@@ -488,37 +501,37 @@ graph TD
 
 ### 4.1 Comprehensive Stack Overview
 
-| Layer | Technology | Version | License | Rationale |
-|-------|-----------|---------|---------|-----------|
-| **Gateway** | Hive Gateway v2 | v2.x | MIT | 100% Federation v2.7 compliance, 189/189 tests pass. MIT-licensed alternative to Apollo Router (ELv2). Event-driven subscriptions, runtime log-level switching. |
-| **Gateway (Prod Option)** | Hive Router (Rust) | latest | MIT | ~1830 RPS, p95 ~48ms. Consider for production upgrade path when Node.js becomes bottleneck. |
-| **Subgraph Runtime** | GraphQL Yoga | v5.x | MIT | `YogaFederationDriver` with NestJS integration. Actively maintained (last publish: weeks ago). Supports schema-first SDL. |
-| **Backend Framework** | NestJS | v11.x | MIT | Enterprise-grade dependency injection, module system, guards, interceptors. Mature ecosystem for GraphQL, NATS, OpenTelemetry. |
-| **ORM** | Drizzle ORM | v1.x | Apache 2.0 | Native RLS support via `pgTable.withRLS()`. SQL-first, zero dependencies, 14x lower latency than N+1-prone ORMs. Native pgvector support. |
-| **Database** | PostgreSQL | v16.x | PostgreSQL | ACID compliance, mature ecosystem, proven at 100K+ user scale. With Apache AGE and pgvector extensions. |
-| **Graph Database** | Apache AGE | v1.5.0 | Apache 2.0 | openCypher queries within PostgreSQL. Pattern-matching for educational relationships (PREREQUISITE_OF, CONTRADICTS). |
-| **Vector Search** | pgvector | v0.8.0 | PostgreSQL | HNSW indexes, 768-dim embeddings. Achieves 471 QPS at 99% recall on 50M vectors with pgvectorscale. |
-| **Authentication** | Keycloak | v26.x | Apache 2.0 | OIDC/JWT, multi-tenant realms via Organizations feature. CNCF incubating project. Custom protocol mappers for tenant_id injection. |
-| **Message Broker** | NATS JetStream | v2.11 | Apache 2.0 | 20 MB binary, 128 MB RAM footprint. Subject wildcarding for event hierarchies. Built-in KV store for ephemeral state. |
-| **Object Storage** | MinIO | latest | AGPLv3* | S3-compatible presigned URLs. Local dev only — production uses AWS S3/GCS. *AGPL acceptable for infrastructure. |
-| **CRDT/Collaboration** | Yjs + Hocuspocus | v13.6 + v2.x | MIT | 3–4x faster than Automerge. Processes 260K edits in ~0.5s. Built-in WebSocket server with JWT auth. |
-| **AI Layer 1** | Vercel AI SDK | v6.x | Apache 2.0 | Unified LLM abstraction. Swap providers with single line change. 2.8M weekly npm downloads. |
-| **AI Layer 2** | LangGraph.js | latest | MIT | State-machine agent workflows. 529K weekly downloads. Graph-based pedagogical flows. |
-| **AI Layer 3** | LlamaIndex.TS | latest | MIT | RAG pipeline, knowledge graph indexing. Best-in-class data connectors. |
-| **Transcription** | faster-whisper | latest | MIT | 4x faster than original Whisper, 50–70% less VRAM. CTranslate2 engine with GPU support. |
-| **Embeddings (Dev)** | nomic-embed-text | v1.5 | Apache 2.0 | 768 dimensions via Ollama. Zero cost for development. |
-| **Embeddings (Prod)** | text-embedding-3-small | — | OpenAI API | Production-grade embeddings via OpenAI. Swappable via Vercel AI SDK. |
-| **LLM (Dev)** | Ollama | latest | MIT | Local LLM runtime. Supports phi4:14b (reasoning), llama3.1:8b (general). |
-| **Frontend** | React + Vite | v19 + v6 | MIT | Near-instant HMR, smaller bundles than Next.js. TanStack Query v5 for data layer. |
-| **Mobile** | Expo SDK | v54 | MIT | Officially recommended by React Native team. expo-sqlite for offline-first patterns. |
-| **UI Components** | shadcn/ui | latest | MIT | Radix primitives + Tailwind. Copy-paste components with full code ownership. |
-| **State Management** | TanStack Query + Zustand | v5 | MIT | Industry-standard pairing. Query for server state, Zustand for client UI state. |
-| **Video Player** | Video.js | v8.23 | Apache 2.0 | 39.4K stars. Best plugin ecosystem for annotations (videojs-overlay, videojs-markers). |
-| **Canvas Annotation** | Konva.js + react-konva | v10 | MIT | 2.5x better rendering than Fabric.js. Declarative React integration. Layer system for annotation types. |
-| **Reverse Proxy** | Traefik | v3.6 | MIT | Auto-discovery via Docker labels. Built-in Let's Encrypt. Native K8s Ingress Controller. |
-| **Schema Registry** | GraphQL Hive | latest | MIT | Breaking change detection, schema composition. Open-source alternative to Apollo Studio. |
-| **Observability** | OpenTelemetry → Jaeger | latest | Apache 2.0 | Distributed tracing. Hive Gateway v2 native integration. Vendor-neutral telemetry. |
-| **Monorepo** | pnpm + Turborepo | v9 + latest | MIT | 60–80% disk savings. 3–5x faster than npm. Content-addressable storage prevents phantom deps. |
+| Layer                     | Technology               | Version      | License    | Rationale                                                                                                                                                       |
+| ------------------------- | ------------------------ | ------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Gateway**               | Hive Gateway v2          | v2.x         | MIT        | 100% Federation v2.7 compliance, 189/189 tests pass. MIT-licensed alternative to Apollo Router (ELv2). Event-driven subscriptions, runtime log-level switching. |
+| **Gateway (Prod Option)** | Hive Router (Rust)       | latest       | MIT        | ~1830 RPS, p95 ~48ms. Consider for production upgrade path when Node.js becomes bottleneck.                                                                     |
+| **Subgraph Runtime**      | GraphQL Yoga             | v5.x         | MIT        | `YogaFederationDriver` with NestJS integration. Actively maintained (last publish: weeks ago). Supports schema-first SDL.                                       |
+| **Backend Framework**     | NestJS                   | v11.x        | MIT        | Enterprise-grade dependency injection, module system, guards, interceptors. Mature ecosystem for GraphQL, NATS, OpenTelemetry.                                  |
+| **ORM**                   | Drizzle ORM              | v1.x         | Apache 2.0 | Native RLS support via `pgTable.withRLS()`. SQL-first, zero dependencies, 14x lower latency than N+1-prone ORMs. Native pgvector support.                       |
+| **Database**              | PostgreSQL               | v16.x        | PostgreSQL | ACID compliance, mature ecosystem, proven at 100K+ user scale. With Apache AGE and pgvector extensions.                                                         |
+| **Graph Database**        | Apache AGE               | v1.5.0       | Apache 2.0 | openCypher queries within PostgreSQL. Pattern-matching for educational relationships (PREREQUISITE_OF, CONTRADICTS).                                            |
+| **Vector Search**         | pgvector                 | v0.8.0       | PostgreSQL | HNSW indexes, 768-dim embeddings. Achieves 471 QPS at 99% recall on 50M vectors with pgvectorscale.                                                             |
+| **Authentication**        | Keycloak                 | v26.x        | Apache 2.0 | OIDC/JWT, multi-tenant realms via Organizations feature. CNCF incubating project. Custom protocol mappers for tenant_id injection.                              |
+| **Message Broker**        | NATS JetStream           | v2.11        | Apache 2.0 | 20 MB binary, 128 MB RAM footprint. Subject wildcarding for event hierarchies. Built-in KV store for ephemeral state.                                           |
+| **Object Storage**        | MinIO                    | latest       | AGPLv3\*   | S3-compatible presigned URLs. Local dev only — production uses AWS S3/GCS. \*AGPL acceptable for infrastructure.                                                |
+| **CRDT/Collaboration**    | Yjs + Hocuspocus         | v13.6 + v2.x | MIT        | 3–4x faster than Automerge. Processes 260K edits in ~0.5s. Built-in WebSocket server with JWT auth.                                                             |
+| **AI Layer 1**            | Vercel AI SDK            | v6.x         | Apache 2.0 | Unified LLM abstraction. Swap providers with single line change. 2.8M weekly npm downloads.                                                                     |
+| **AI Layer 2**            | LangGraph.js             | latest       | MIT        | State-machine agent workflows. 529K weekly downloads. Graph-based pedagogical flows.                                                                            |
+| **AI Layer 3**            | LlamaIndex.TS            | latest       | MIT        | RAG pipeline, knowledge graph indexing. Best-in-class data connectors.                                                                                          |
+| **Transcription**         | faster-whisper           | latest       | MIT        | 4x faster than original Whisper, 50–70% less VRAM. CTranslate2 engine with GPU support.                                                                         |
+| **Embeddings (Dev)**      | nomic-embed-text         | v1.5         | Apache 2.0 | 768 dimensions via Ollama. Zero cost for development.                                                                                                           |
+| **Embeddings (Prod)**     | text-embedding-3-small   | —            | OpenAI API | Production-grade embeddings via OpenAI. Swappable via Vercel AI SDK.                                                                                            |
+| **LLM (Dev)**             | Ollama                   | latest       | MIT        | Local LLM runtime. Supports phi4:14b (reasoning), llama3.1:8b (general).                                                                                        |
+| **Frontend**              | React + Vite             | v19 + v6     | MIT        | Near-instant HMR, smaller bundles than Next.js. TanStack Query v5 for data layer.                                                                               |
+| **Mobile**                | Expo SDK                 | v54          | MIT        | Officially recommended by React Native team. expo-sqlite for offline-first patterns.                                                                            |
+| **UI Components**         | shadcn/ui                | latest       | MIT        | Radix primitives + Tailwind. Copy-paste components with full code ownership.                                                                                    |
+| **State Management**      | TanStack Query + Zustand | v5           | MIT        | Industry-standard pairing. Query for server state, Zustand for client UI state.                                                                                 |
+| **Video Player**          | Video.js                 | v8.23        | Apache 2.0 | 39.4K stars. Best plugin ecosystem for annotations (videojs-overlay, videojs-markers).                                                                          |
+| **Canvas Annotation**     | Konva.js + react-konva   | v10          | MIT        | 2.5x better rendering than Fabric.js. Declarative React integration. Layer system for annotation types.                                                         |
+| **Reverse Proxy**         | Traefik                  | v3.6         | MIT        | Auto-discovery via Docker labels. Built-in Let's Encrypt. Native K8s Ingress Controller.                                                                        |
+| **Schema Registry**       | GraphQL Hive             | latest       | MIT        | Breaking change detection, schema composition. Open-source alternative to Apollo Studio.                                                                        |
+| **Observability**         | OpenTelemetry → Jaeger   | latest       | Apache 2.0 | Distributed tracing. Hive Gateway v2 native integration. Vendor-neutral telemetry.                                                                              |
+| **Monorepo**              | pnpm + Turborepo         | v9 + latest  | MIT        | 60–80% disk savings. 3–5x faster than npm. Content-addressable storage prevents phantom deps.                                                                   |
 
 **\*License Note**: MinIO's AGPLv3 license is acceptable for infrastructure services (object storage) but not for application code. Production deployments use AWS S3 or Google Cloud Storage.
 
@@ -527,22 +540,27 @@ graph TD
 ### 4.2 Why These Choices Matter
 
 #### PostgreSQL Maximalism
+
 **Alternative considered**: Neo4j (graph) + Qdrant (vector) + PostgreSQL (relational)
 **Why rejected**: Operational complexity of 3 databases (backups, monitoring, connection pools). Apache AGE provides sufficient Cypher expressiveness for educational graphs.
 
 #### Hive Gateway over Apollo Router
+
 **Alternative**: Apollo Router (Rust-based, faster)
 **Why rejected**: Elastic License v2 restricts offering as a managed service. Hive Gateway is MIT-licensed, fully Federation v2.7 compliant, and fast enough (2x faster than other JS gateways).
 
 #### NATS over Kafka
+
 **Alternative**: Apache Kafka
 **Why rejected**: Kafka's 1.5–3 GB JVM footprint vs. NATS's 20 MB binary. Educational platform's event volume doesn't justify Kafka's complexity. NATS JetStream provides at-least-once delivery with 10M+ msg/sec throughput.
 
 #### Drizzle over Prisma
+
 **Alternative**: Prisma
 **Why rejected**: Prisma lacks native RLS schema support (requires raw SQL). Drizzle's SQL-first approach generates optimized queries with 14x lower latency.
 
 #### Vercel AI SDK over LangChain.js
+
 **Alternative**: LangChain.js
 **Why chosen**: Vercel AI SDK provides cleaner provider abstraction. LlamaIndex.TS used alongside for RAG-specific features.
 
@@ -554,24 +572,24 @@ graph TD
 
 **16 Core Tables** (all with RLS enabled):
 
-| Table | Purpose | Key Columns | Extensions Used |
-|-------|---------|------------|-----------------|
-| `tenants` | Multi-tenant isolation | `id`, `slug`, `plan`, `is_active` | uuid-ossp |
-| `users` | User accounts | `id`, `tenant_id`, `email`, `role` | uuid-ossp, RLS |
-| `courses` | Course catalog | `id`, `tenant_id`, `creator_id`, `is_published` | RLS, soft-delete |
-| `modules` | Course subdivisions | `id`, `course_id`, `order_index` | RLS |
-| `media_assets` | Uploaded files | `id`, `tenant_id`, `type`, `transcription_status` | RLS, soft-delete |
-| `transcripts` | Full transcripts | `id`, `media_asset_id`, `language` | RLS |
-| `transcript_segments` | Time-aligned segments | `id`, `transcript_id`, `start_time`, `end_time`, `text` | RLS |
-| `annotations` | User annotations | `id`, `tenant_id`, `user_id`, `layer`, `type` | RLS, JSONB |
-| `collab_documents` | CRDT documents | `id`, `tenant_id`, `entity_type`, `entity_id` | RLS |
-| `crdt_updates` | Y.js binary updates | `id`, `document_id`, `clock`, `update_data` | BYTEA |
-| `collab_sessions` | Active presence | `id`, `document_id`, `user_id`, `last_seen_at` | RLS |
-| `agent_definitions` | AI agent templates | `id`, `tenant_id`, `template`, `config` | RLS, JSONB |
-| `agent_executions` | Execution history | `id`, `definition_id`, `status`, `input`, `output` | RLS, JSONB |
-| `content_embeddings` | Media embeddings | `id`, `segment_id`, `embedding` | pgvector, RLS |
-| `annotation_embeddings` | Annotation vectors | `id`, `annotation_id`, `embedding` | pgvector, RLS |
-| `concept_embeddings` | Concept vectors | `id`, `concept_id`, `embedding` | pgvector, RLS |
+| Table                   | Purpose                | Key Columns                                             | Extensions Used  |
+| ----------------------- | ---------------------- | ------------------------------------------------------- | ---------------- |
+| `tenants`               | Multi-tenant isolation | `id`, `slug`, `plan`, `is_active`                       | uuid-ossp        |
+| `users`                 | User accounts          | `id`, `tenant_id`, `email`, `role`                      | uuid-ossp, RLS   |
+| `courses`               | Course catalog         | `id`, `tenant_id`, `creator_id`, `is_published`         | RLS, soft-delete |
+| `modules`               | Course subdivisions    | `id`, `course_id`, `order_index`                        | RLS              |
+| `media_assets`          | Uploaded files         | `id`, `tenant_id`, `type`, `transcription_status`       | RLS, soft-delete |
+| `transcripts`           | Full transcripts       | `id`, `media_asset_id`, `language`                      | RLS              |
+| `transcript_segments`   | Time-aligned segments  | `id`, `transcript_id`, `start_time`, `end_time`, `text` | RLS              |
+| `annotations`           | User annotations       | `id`, `tenant_id`, `user_id`, `layer`, `type`           | RLS, JSONB       |
+| `collab_documents`      | CRDT documents         | `id`, `tenant_id`, `entity_type`, `entity_id`           | RLS              |
+| `crdt_updates`          | Y.js binary updates    | `id`, `document_id`, `clock`, `update_data`             | BYTEA            |
+| `collab_sessions`       | Active presence        | `id`, `document_id`, `user_id`, `last_seen_at`          | RLS              |
+| `agent_definitions`     | AI agent templates     | `id`, `tenant_id`, `template`, `config`                 | RLS, JSONB       |
+| `agent_executions`      | Execution history      | `id`, `definition_id`, `status`, `input`, `output`      | RLS, JSONB       |
+| `content_embeddings`    | Media embeddings       | `id`, `segment_id`, `embedding`                         | pgvector, RLS    |
+| `annotation_embeddings` | Annotation vectors     | `id`, `annotation_id`, `embedding`                      | pgvector, RLS    |
+| `concept_embeddings`    | Concept vectors        | `id`, `concept_id`, `embedding`                         | pgvector, RLS    |
 
 **Soft Deletes**: All user-facing tables include `deleted_at TIMESTAMPTZ`. Never exposed via GraphQL; filtered in resolvers.
 
@@ -594,6 +612,7 @@ CREATE POLICY tenant_isolation ON courses
 ```
 
 **How it works**:
+
 1. Every GraphQL resolver wraps DB queries with `withTenantContext(tenantId, userId, role, () => { ... })`
 2. `withTenantContext` executes: `SET LOCAL app.current_tenant = '<uuid>'`
 3. PostgreSQL query planner automatically appends `WHERE tenant_id = '<uuid>'` to every query
@@ -612,6 +631,7 @@ CREATE POLICY personal_annotation_access ON annotations
 ```
 
 **Layered Access Control**:
+
 - `PERSONAL`: Only owner + instructors + admins
 - `SHARED`: All users in tenant
 - `INSTRUCTOR`: Instructors + admins
@@ -625,26 +645,26 @@ CREATE POLICY personal_annotation_access ON annotations
 
 #### Vertex Labels
 
-| Label | Properties | Purpose |
-|-------|-----------|---------|
-| `Concept` | `id`, `tenant_id`, `name`, `description`, `created_at` | Core concepts (e.g., "Rambam's View on Divine Attributes") |
-| `Person` | `id`, `tenant_id`, `name`, `bio`, `era` | Historical figures (e.g., "Maimonides") |
-| `Term` | `id`, `tenant_id`, `term`, `definition`, `language` | Glossary terms (e.g., "Sephirot") |
-| `Source` | `id`, `tenant_id`, `title`, `author`, `year` | Primary sources (e.g., "Guide for the Perplexed") |
-| `TopicCluster` | `id`, `tenant_id`, `name`, `member_count` | AI-generated topic groupings |
+| Label          | Properties                                             | Purpose                                                    |
+| -------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
+| `Concept`      | `id`, `tenant_id`, `name`, `description`, `created_at` | Core concepts (e.g., "Rambam's View on Divine Attributes") |
+| `Person`       | `id`, `tenant_id`, `name`, `bio`, `era`                | Historical figures (e.g., "Maimonides")                    |
+| `Term`         | `id`, `tenant_id`, `term`, `definition`, `language`    | Glossary terms (e.g., "Sephirot")                          |
+| `Source`       | `id`, `tenant_id`, `title`, `author`, `year`           | Primary sources (e.g., "Guide for the Perplexed")          |
+| `TopicCluster` | `id`, `tenant_id`, `name`, `member_count`              | AI-generated topic groupings                               |
 
 #### Edge Labels
 
-| Edge | From → To | Properties | Purpose |
-|------|-----------|-----------|---------|
-| `PREREQUISITE_OF` | Concept → Concept | `strength` (0.0–1.0) | Learning path dependencies |
-| `CONTRADICTS` | Concept → Concept | `severity`, `explanation` | Conflicting viewpoints |
-| `RELATED_TO` | Concept → Concept | `relationship_type`, `bidirectional` | General semantic relationships |
-| `MENTIONS` | Concept → Term | `frequency` | Concept references term |
-| `CITES` | Concept → Source | `page_number`, `quote` | Provenance tracking |
-| `AUTHORED_BY` | Source → Person | — | Authorship |
-| `BELONGS_TO` | Concept → TopicCluster | `relevance_score` | Cluster membership |
-| `INFERRED_RELATED` | Concept → Concept | `confidence`, `status: PENDING/ACCEPTED/REJECTED` | AI-suggested relations pending review |
+| Edge               | From → To              | Properties                                        | Purpose                               |
+| ------------------ | ---------------------- | ------------------------------------------------- | ------------------------------------- |
+| `PREREQUISITE_OF`  | Concept → Concept      | `strength` (0.0–1.0)                              | Learning path dependencies            |
+| `CONTRADICTS`      | Concept → Concept      | `severity`, `explanation`                         | Conflicting viewpoints                |
+| `RELATED_TO`       | Concept → Concept      | `relationship_type`, `bidirectional`              | General semantic relationships        |
+| `MENTIONS`         | Concept → Term         | `frequency`                                       | Concept references term               |
+| `CITES`            | Concept → Source       | `page_number`, `quote`                            | Provenance tracking                   |
+| `AUTHORED_BY`      | Source → Person        | —                                                 | Authorship                            |
+| `BELONGS_TO`       | Concept → TopicCluster | `relevance_score`                                 | Cluster membership                    |
+| `INFERRED_RELATED` | Concept → Concept      | `confidence`, `status: PENDING/ACCEPTED/REJECTED` | AI-suggested relations pending review |
 
 #### Example Cypher Query (Learning Path)
 
@@ -701,10 +721,12 @@ CREATE POLICY tenant_isolation ON content_embeddings
 ```
 
 **Index Parameters**:
+
 - `m = 16`: Max number of bi-directional links per node (trade-off: higher = better recall, slower inserts)
 - `ef_construction = 64`: Size of candidate list during index build (higher = better quality)
 
 **Search Performance** (pgvectorscale benchmarks):
+
 - **50M vectors**: 471 QPS at 99% recall
 - **10M vectors**: 1200+ QPS at 99% recall
 - **p95 latency**: ~15ms for top-10 results
@@ -765,11 +787,13 @@ async function hybridSearch(query: string, tenantId: string, maxDepth: number = 
 ```
 
 **Why Hybrid Beats Pure Vector**:
+
 - **Vector search**: Captures semantic similarity ("Maimonides' philosophy" ≈ "Rambam's teachings")
 - **Graph traversal**: Captures structured relationships ("Concept A is a prerequisite for Concept B")
 - **Fusion**: Combines implicit semantics with explicit ontology
 
 **Research Validation**:
+
 - NVIDIA/BlackRock study: 96% factual faithfulness vs. 87% for vector-only RAG
 - KA-RAG framework: 91.4% retrieval accuracy in course-oriented Q&A
 
@@ -781,16 +805,17 @@ async function hybridSearch(query: string, tenantId: string, maxDepth: number = 
 
 **Domain-Driven Design**: Each subgraph owns a bounded context with full autonomy (schema, resolvers, database).
 
-| Subgraph | Owned Entities | Extended Entities | Port | Purpose |
-|----------|---------------|-------------------|------|---------|
-| **Core** | `Tenant`, `User` | — | 4001 | Identity, tenancy, user management |
-| **Content** | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment` | `User` (createdCourses), `Tenant` (courses) | 4002 | Content catalog, media pipeline |
-| **Annotation** | `Annotation` | `User` (annotations), `MediaAsset` (annotations) | 4003 | Annotations, sketches, spatial comments |
-| **Collaboration** | `CollabDocument`, `CollabSession` | `User`, `Annotation` | 4004 | CRDT persistence, real-time presence |
-| **Agent** | `AgentDefinition`, `AgentExecution` | `User`, `Annotation`, `Course` | 4005 | AI agent templates, executions |
-| **Knowledge** | `Concept`, `Person`, `Term`, `Source`, `TopicCluster`, `KnowledgeRelation`, `SemanticSearchResult` | `MediaAsset`, `TranscriptSegment`, `Annotation` | 4006 | Knowledge graph, embeddings, search |
+| Subgraph          | Owned Entities                                                                                     | Extended Entities                                | Port | Purpose                                 |
+| ----------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---- | --------------------------------------- |
+| **Core**          | `Tenant`, `User`                                                                                   | —                                                | 4001 | Identity, tenancy, user management      |
+| **Content**       | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment`                                | `User` (createdCourses), `Tenant` (courses)      | 4002 | Content catalog, media pipeline         |
+| **Annotation**    | `Annotation`                                                                                       | `User` (annotations), `MediaAsset` (annotations) | 4003 | Annotations, sketches, spatial comments |
+| **Collaboration** | `CollabDocument`, `CollabSession`                                                                  | `User`, `Annotation`                             | 4004 | CRDT persistence, real-time presence    |
+| **Agent**         | `AgentDefinition`, `AgentExecution`                                                                | `User`, `Annotation`, `Course`                   | 4005 | AI agent templates, executions          |
+| **Knowledge**     | `Concept`, `Person`, `Term`, `Source`, `TopicCluster`, `KnowledgeRelation`, `SemanticSearchResult` | `MediaAsset`, `TranscriptSegment`, `Annotation`  | 4006 | Knowledge graph, embeddings, search     |
 
 **Entity Ownership Rules**:
+
 1. Each entity has exactly one owning subgraph
 2. Other subgraphs reference entities via `@key` stubs (`resolvable: false`)
 3. Extensions add domain-specific fields (e.g., Content extends `User` with `createdCourses`)
@@ -819,6 +844,7 @@ extend type User {
 ```
 
 **Gateway Resolution**:
+
 1. Client queries: `{ user(id: "...") { id email createdCourses { edges { node { title } } } } }`
 2. Gateway sends to Core: `{ user(id: "...") { id email } }`
 3. Gateway sends to Content: `{ _entities(representations: [{ __typename: "User", id: "..." }]) { ... on User { createdCourses { ... } } } }`
@@ -849,6 +875,7 @@ type Mutation {
 ```
 
 **Evaluation Flow**:
+
 1. **Gateway**: `@authenticated` (validates JWT), `@requiresScopes` (checks JWT claims)
 2. **Subgraph**: `@requiresRole` (checks `x-user-role` header), `@ownerOnly` (compares user ID)
 
@@ -890,11 +917,13 @@ type PageInfo {
 ```
 
 **Cursor Format** (base64-encoded JSON):
+
 ```json
 { "offset": 20, "orderBy": "created_at", "direction": "DESC" }
 ```
 
 **Why Relay over Offset-Based**:
+
 - **Stable cursors**: Inserting new items doesn't shift pages
 - **Bi-directional**: Forward pagination (`first`/`after`) and backward (`last`/`before`)
 - **Client-friendly**: `hasNextPage` flag eliminates guesswork
@@ -974,7 +1003,7 @@ const wsProvider = new HocuspocusProvider({
   url: 'ws://localhost:4004/collaboration',
   name: 'annotation-doc-123',
   document: ydoc,
-  token: '<JWT>'
+  token: '<JWT>',
 });
 
 // Shared state
@@ -988,6 +1017,7 @@ yText.observe((event) => {
 ```
 
 **Hocuspocus Server**:
+
 ```typescript
 import { Server } from '@hocuspocus/server';
 import { Database } from '@hocuspocus/extension-database';
@@ -1006,19 +1036,21 @@ const server = Server.configure({
     new Database({
       fetch: async ({ documentName }) => {
         // Load CRDT binary from crdt_updates table
-        const updates = await db.select().from(crdtUpdates)
+        const updates = await db
+          .select()
+          .from(crdtUpdates)
           .where(eq(crdtUpdates.documentId, documentName));
-        return Y.mergeUpdates(updates.map(u => u.updateData));
+        return Y.mergeUpdates(updates.map((u) => u.updateData));
       },
       store: async ({ documentName, state }) => {
         // Append CRDT update
         await db.insert(crdtUpdates).values({
           documentId: documentName,
           updateData: state,
-          clock: Y.encodeStateVector(state)
+          clock: Y.encodeStateVector(state),
         });
-      }
-    })
+      },
+    }),
   ],
 
   // Lifecycle hooks
@@ -1026,7 +1058,7 @@ const server = Server.configure({
     // Denormalize for SQL queries
     const json = document.toJSON();
     await updateCollabDocumentCache(documentName, json);
-  }
+  },
 });
 ```
 
@@ -1035,11 +1067,13 @@ const server = Server.configure({
 ### 7.2 Conflict Resolution
 
 **Yjs Conflict Semantics**:
+
 - **Text**: Concurrent insertions at same position are ordered deterministically by unique client IDs
 - **Map**: Last-writer-wins based on Lamport timestamps
 - **Array**: Position-based concurrent inserts preserved
 
 **Example**:
+
 ```typescript
 // User A and User B both insert at position 5 while offline
 // User A: "Hello |World" → "Hello Amazing World"
@@ -1065,12 +1099,12 @@ awareness.setLocalStateField('user', {
   id: currentUser.id,
   displayName: currentUser.displayName,
   color: '#FF5733',
-  cursor: { x: 100, y: 200 }
+  cursor: { x: 100, y: 200 },
 });
 
 // Listen to remote state
 awareness.on('change', ({ added, updated, removed }) => {
-  added.forEach(clientId => {
+  added.forEach((clientId) => {
     const user = awareness.getStates().get(clientId)?.user;
     console.log(`${user.displayName} joined`);
   });
@@ -1078,6 +1112,7 @@ awareness.on('change', ({ added, updated, removed }) => {
 ```
 
 **Presence Tracking**:
+
 - **Active collaborators**: Stored in `collab_sessions` table with `last_seen_at` timestamp
 - **Cursor positions**: Broadcast via Yjs Awareness (ephemeral, not persisted)
 - **Heartbeat**: Client sends presence every 10 seconds; server removes stale sessions after 30s
@@ -1171,8 +1206,8 @@ const chavrutaGraph = new StateGraph({
     thesis: { value: (x, y) => y ?? x },
     antithesis: { value: (x, y) => y ?? x },
     contradictions: { value: (x, y) => [...(x ?? []), ...(y ?? [])] },
-    synthesis: { value: (x, y) => y ?? x }
-  }
+    synthesis: { value: (x, y) => y ?? x },
+  },
 })
   .addNode('analyze_thesis', async (state) => {
     const relatedConcepts = await knowledgeGraph.relatedConcepts(state.topic);
@@ -1183,10 +1218,16 @@ const chavrutaGraph = new StateGraph({
     return { contradictions };
   })
   .addNode('argue_antithesis', async (state) => {
-    return { antithesis: await llm.invoke(`Counter-argument to ${state.thesis}`) };
+    return {
+      antithesis: await llm.invoke(`Counter-argument to ${state.thesis}`),
+    };
   })
   .addNode('synthesize', async (state) => {
-    return { synthesis: await llm.invoke(`Synthesize: ${state.thesis} vs ${state.antithesis}`) };
+    return {
+      synthesis: await llm.invoke(
+        `Synthesize: ${state.thesis} vs ${state.antithesis}`
+      ),
+    };
   })
   .addEdge('analyze_thesis', 'find_contradictions')
   .addEdge('find_contradictions', 'argue_antithesis')
@@ -1197,6 +1238,7 @@ const workflow = chavrutaGraph.compile();
 ```
 
 **Graph Flow**:
+
 1. **Analyze Thesis**: Query knowledge graph for related concepts, generate initial perspective
 2. **Find Contradictions**: Use Apache AGE `CONTRADICTS` edges to find opposing views
 3. **Argue Antithesis**: LLM generates counter-argument
@@ -1214,16 +1256,20 @@ const quizGraph = new StateGraph({
     difficulty: { value: (x, y) => y ?? x },
     correctAnswers: { value: (x, y) => (x ?? 0) + (y ?? 0) },
     currentQuestion: { value: (x, y) => y ?? x },
-    done: { value: (x, y) => y ?? x }
-  }
+    done: { value: (x, y) => y ?? x },
+  },
 })
   .addNode('generate_question', async (state) => {
     const prerequisites = await knowledgeGraph.learningPath(state.topic);
-    const question = await llm.invoke(`Generate ${state.difficulty} question on ${state.topic}`);
+    const question = await llm.invoke(
+      `Generate ${state.difficulty} question on ${state.topic}`
+    );
     return { currentQuestion: question };
   })
   .addNode('evaluate_answer', async (state) => {
-    const isCorrect = await llm.invoke(`Is this answer correct? ${state.userAnswer}`);
+    const isCorrect = await llm.invoke(
+      `Is this answer correct? ${state.userAnswer}`
+    );
     return { correctAnswers: isCorrect ? 1 : 0 };
   })
   .addNode('adjust_difficulty', async (state) => {
@@ -1232,12 +1278,13 @@ const quizGraph = new StateGraph({
   })
   .addConditionalEdges(
     'evaluate_answer',
-    (state) => state.correctAnswers < 5 ? 'continue' : 'done',
+    (state) => (state.correctAnswers < 5 ? 'continue' : 'done'),
     { continue: 'adjust_difficulty', done: '__end__' }
   );
 ```
 
 **Adaptive Logic**:
+
 - Start at medium difficulty
 - 3 correct → increase difficulty
 - 2 incorrect → decrease difficulty
@@ -1256,21 +1303,25 @@ const mcpServer = new MCPServer({
   tools: [
     {
       name: 'knowledge_graph',
-      description: 'Query or create concepts and relations in the knowledge graph',
+      description:
+        'Query or create concepts and relations in the knowledge graph',
       inputSchema: {
         type: 'object',
         properties: {
           action: { enum: ['query', 'create_concept', 'create_relation'] },
           conceptId: { type: 'string' },
-          relationType: { type: 'string' }
-        }
+          relationType: { type: 'string' },
+        },
       },
       async handler({ action, conceptId, relationType }) {
         if (action === 'query') {
-          return await knowledgeSubgraph.relatedConcepts({ conceptId, maxDepth: 2 });
+          return await knowledgeSubgraph.relatedConcepts({
+            conceptId,
+            maxDepth: 2,
+          });
         }
         // ... other actions
-      }
+      },
     },
     {
       name: 'semantic_search',
@@ -1279,23 +1330,24 @@ const mcpServer = new MCPServer({
         type: 'object',
         properties: {
           query: { type: 'string' },
-          topK: { type: 'number', default: 10 }
-        }
+          topK: { type: 'number', default: 10 },
+        },
       },
       async handler({ query, topK }) {
         const embedding = await generateEmbedding(query);
         return await semanticSearch(embedding, topK);
-      }
-    }
-  ]
+      },
+    },
+  ],
 });
 ```
 
 **Agent Invocation**:
+
 ```typescript
 const result = await llm.invoke('Find prerequisites for Concept X', {
   tools: [mcpServer.tools.knowledge_graph],
-  toolChoice: 'auto'
+  toolChoice: 'auto',
 });
 ```
 
@@ -1314,34 +1366,37 @@ async function hybridRAG(query: string, tenantId: string) {
     // 2. Graph traversal (structured relations)
     knowledgeSubgraph.relatedConcepts({
       conceptId: extractConceptFromQuery(query),
-      maxDepth: 2
-    })
+      maxDepth: 2,
+    }),
   ]);
 
   // 3. Fusion scoring
-  const fused = vectorResults.map(vr => {
-    const graphBoost = graphResults.find(gr => gr.id === vr.conceptId)
-      ? 0.2 // Boost if also found in graph traversal
-      : 0.0;
+  const fused = vectorResults
+    .map((vr) => {
+      const graphBoost = graphResults.find((gr) => gr.id === vr.conceptId)
+        ? 0.2 // Boost if also found in graph traversal
+        : 0.0;
 
-    return {
-      ...vr,
-      score: vr.similarity * 0.6 + graphBoost * 0.4
-    };
-  }).sort((a, b) => b.score - a.score);
+      return {
+        ...vr,
+        score: vr.similarity * 0.6 + graphBoost * 0.4,
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 
   // 4. Return top-K with graph context
-  return fused.slice(0, 10).map(r => ({
+  return fused.slice(0, 10).map((r) => ({
     text: r.text,
     source: r.source,
-    graphContext: graphResults.filter(gr =>
-      gr.relations.some(rel => rel.targetId === r.conceptId)
-    )
+    graphContext: graphResults.filter((gr) =>
+      gr.relations.some((rel) => rel.targetId === r.conceptId)
+    ),
   }));
 }
 ```
 
 **Fusion Formula**:
+
 ```
 final_score = 0.6 * vector_similarity + 0.4 * graph_centrality
 ```
@@ -1354,12 +1409,12 @@ final_score = 0.6 * vector_similarity + 0.4 * graph_centrality
 
 #### Per-Tenant Quotas
 
-| Plan | Executions/Day | Timeout | Memory | Concurrent Agents |
-|------|---------------|---------|--------|------------------|
-| FREE | 10 | 30s | 256 MB | 1 |
-| STARTER | 100 | 60s | 512 MB | 3 |
-| PROFESSIONAL | 1000 | 120s | 1 GB | 10 |
-| ENTERPRISE | Unlimited | 300s | 2 GB | 50 |
+| Plan         | Executions/Day | Timeout | Memory | Concurrent Agents |
+| ------------ | -------------- | ------- | ------ | ----------------- |
+| FREE         | 10             | 30s     | 256 MB | 1                 |
+| STARTER      | 100            | 60s     | 512 MB | 3                 |
+| PROFESSIONAL | 1000           | 120s    | 1 GB   | 10                |
+| ENTERPRISE   | Unlimited      | 300s    | 2 GB   | 50                |
 
 #### gVisor Isolation (Production)
 
@@ -1368,24 +1423,25 @@ final_score = 0.6 * vector_similarity + 0.4 * graph_centrality
 apiVersion: v1
 kind: Pod
 spec:
-  runtimeClassName: gvisor  # User-space kernel
+  runtimeClassName: gvisor # User-space kernel
   containers:
-  - name: agent-runner
-    image: edusphere/agent-executor:latest
-    resources:
-      requests:
-        memory: "512Mi"
-        cpu: "500m"
-      limits:
-        memory: "1Gi"
-        cpu: "1000m"
-    securityContext:
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: true
+    - name: agent-runner
+      image: edusphere/agent-executor:latest
+      resources:
+        requests:
+          memory: '512Mi'
+          cpu: '500m'
+        limits:
+          memory: '1Gi'
+          cpu: '1000m'
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
 ```
 
 **gVisor Benefits**:
+
 - **Syscall interception**: Prevents malicious code from accessing host kernel
 - **10–20% overhead**: Acceptable for CPU-bound LLM inference
 - **Kubernetes-native**: Seamless integration via `runtimeClassName`
@@ -1427,15 +1483,15 @@ Client Request → Traefik → Hive Gateway → Keycloak JWKS → Subgraph → P
 
 ### 9.2 Multi-Layer Defense
 
-| Layer | Mechanism | Prevents |
-|-------|-----------|----------|
-| **1. Transport** | HTTPS/TLS 1.3 | Man-in-the-middle attacks |
-| **2. Gateway** | JWT signature validation | Forged tokens |
-| **3. Directive Enforcement** | `@authenticated`, `@requiresScopes` | Unauthorized API access |
-| **4. Application Logic** | `@requiresRole`, `@ownerOnly` guards | Privilege escalation |
-| **5. Database RLS** | `tenant_id` policies | Cross-tenant data leakage |
-| **6. Network Isolation** | Kubernetes NetworkPolicies | Lateral movement |
-| **7. Audit Logging** | OpenTelemetry traces | Forensic analysis |
+| Layer                        | Mechanism                            | Prevents                  |
+| ---------------------------- | ------------------------------------ | ------------------------- |
+| **1. Transport**             | HTTPS/TLS 1.3                        | Man-in-the-middle attacks |
+| **2. Gateway**               | JWT signature validation             | Forged tokens             |
+| **3. Directive Enforcement** | `@authenticated`, `@requiresScopes`  | Unauthorized API access   |
+| **4. Application Logic**     | `@requiresRole`, `@ownerOnly` guards | Privilege escalation      |
+| **5. Database RLS**          | `tenant_id` policies                 | Cross-tenant data leakage |
+| **6. Network Isolation**     | Kubernetes NetworkPolicies           | Lateral movement          |
+| **7. Audit Logging**         | OpenTelemetry traces                 | Forensic analysis         |
 
 **Defense in Depth**: Even if Layer 3 is bypassed (application bug), Layer 5 (RLS) prevents data exfiltration.
 
@@ -1468,11 +1524,12 @@ rateLimit:
 ```graphql
 type Mutation {
   createAnnotation(input: CreateAnnotationInput!): Annotation!
-    @rateLimit(max: 60, window: "1m")  # 60 annotations/min per user
+    @rateLimit(max: 60, window: "1m") # 60 annotations/min per user
 }
 ```
 
 **Breach Response**:
+
 - **Soft limit**: 429 response with `Retry-After` header
 - **Hard limit (abuse)**: Temporary tenant suspension + admin notification
 
@@ -1487,7 +1544,7 @@ const complexityLimit = createComplexityLimitRule(1000, {
   scalarCost: 1,
   objectCost: 2,
   listFactor: 10,
-  introspectionListFactor: 2
+  introspectionListFactor: 2,
 });
 
 // Example query cost calculation:
@@ -1496,6 +1553,7 @@ const complexityLimit = createComplexityLimitRule(1000, {
 ```
 
 **Limits**:
+
 - **Max depth**: 10 (prevents deeply nested queries)
 - **Max complexity**: 1000 (prevents expensive joins)
 - **Max breadth**: 100 (limits connection `first`/`last`)
@@ -1539,6 +1597,7 @@ async createCourse(
 ```
 
 **Defense Against**:
+
 - **SQL Injection**: Drizzle uses parameterized queries (impossible by design)
 - **NoSQL Injection**: Apache AGE Cypher queries use prepared statements
 - **XSS**: HTML sanitization on all user-provided text
@@ -1564,9 +1623,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -1582,19 +1641,19 @@ services:
     volumes:
       - ./infrastructure/keycloak/realm-export.json:/opt/keycloak/data/import/realm.json
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
       postgres:
         condition: service_healthy
 
   nats:
     image: nats:2.11-alpine
-    command: "-js -sd /data"
+    command: '-js -sd /data'
     volumes:
       - nats_data:/data
     ports:
-      - "4222:4222"  # Client connections
-      - "8222:8222"  # HTTP monitoring
+      - '4222:4222' # Client connections
+      - '8222:8222' # HTTP monitoring
 
   minio:
     image: quay.io/minio/minio:latest
@@ -1605,17 +1664,17 @@ services:
     volumes:
       - minio_data:/data
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
 
   jaeger:
     image: jaegertracing/all-in-one:latest
     environment:
       COLLECTOR_OTLP_ENABLED: true
     ports:
-      - "16686:16686"  # UI
-      - "4317:4317"    # OTLP gRPC
-      - "4318:4318"    # OTLP HTTP
+      - '16686:16686' # UI
+      - '4317:4317' # OTLP gRPC
+      - '4318:4318' # OTLP HTTP
 
   gateway:
     build: ./apps/gateway
@@ -1624,7 +1683,7 @@ services:
       PORT: 4000
       KEYCLOAK_JWKS_URL: http://keycloak:8080/realms/edusphere/protocol/openid-connect/certs
     ports:
-      - "4000:4000"
+      - '4000:4000'
     depends_on:
       - keycloak
       - nats
@@ -1637,7 +1696,7 @@ services:
       DATABASE_URL: postgresql://postgres:dev_password@postgres:5432/edusphere
       NATS_URL: nats://nats:4222
     ports:
-      - "4001:4001"
+      - '4001:4001'
     depends_on:
       - postgres
       - nats
@@ -1649,6 +1708,7 @@ volumes:
 ```
 
 **Health Check Script**:
+
 ```bash
 #!/bin/bash
 # scripts/health-check.sh
@@ -1728,6 +1788,7 @@ echo "🎉 All services healthy!"
 #### Deployment Manifests
 
 **Gateway Deployment**:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1745,37 +1806,37 @@ spec:
         app: hive-gateway
     spec:
       containers:
-      - name: gateway
-        image: edusphere/hive-gateway:v1.0.0
-        ports:
-        - containerPort: 4000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: KEYCLOAK_JWKS_URL
-          valueFrom:
-            secretKeyRef:
-              name: keycloak-config
-              key: jwks-url
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 4000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 4000
-          initialDelaySeconds: 10
-          periodSeconds: 5
+        - name: gateway
+          image: edusphere/hive-gateway:v1.0.0
+          ports:
+            - containerPort: 4000
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: KEYCLOAK_JWKS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-config
+                  key: jwks-url
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '500m'
+            limits:
+              memory: '1Gi'
+              cpu: '1000m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 5
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -1790,18 +1851,18 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -1816,6 +1877,7 @@ spec:
 ```
 
 **Subgraph Deployment (Example: Core)**:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1833,27 +1895,27 @@ spec:
         app: subgraph-core
     spec:
       containers:
-      - name: core
-        image: edusphere/subgraph-core:v1.0.0
-        ports:
-        - containerPort: 4001
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: connection-string
-        - name: NATS_URL
-          value: "nats://nats-cluster:4222"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+        - name: core
+          image: edusphere/subgraph-core:v1.0.0
+          ports:
+            - containerPort: 4001
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: connection-string
+            - name: NATS_URL
+              value: 'nats://nats-cluster:4222'
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -1868,15 +1930,16 @@ spec:
   minReplicas: 2
   maxReplicas: 20
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
 ```
 
 **PostgreSQL StatefulSet**:
+
 ```yaml
 apiVersion: apps/v1
 kind: StatefulSet
@@ -1895,45 +1958,46 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: edusphere/postgres-age-pgvector:16
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_DB
-          value: "edusphere"
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: username
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: password
-        volumeMounts:
-        - name: postgres-data
-          mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: edusphere/postgres-age-pgvector:16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: 'edusphere'
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: '4Gi'
+              cpu: '2000m'
+            limits:
+              memory: '8Gi'
+              cpu: '4000m'
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ['ReadWriteOnce']
+        storageClassName: 'fast-ssd'
         resources:
           requests:
-            memory: "4Gi"
-            cpu: "2000m"
-          limits:
-            memory: "8Gi"
-            cpu: "4000m"
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: "fast-ssd"
-      resources:
-        requests:
-          storage: 500Gi
+            storage: 500Gi
 ```
 
 **NATS JetStream Cluster**:
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -1973,38 +2037,38 @@ spec:
         app: nats
     spec:
       containers:
-      - name: nats
-        image: nats:2.11-alpine
-        command: ["/nats-server"]
-        args: ["-c", "/etc/nats/nats.conf"]
-        ports:
-        - containerPort: 4222
-        - containerPort: 6222
-        - containerPort: 8222
-        volumeMounts:
+        - name: nats
+          image: nats:2.11-alpine
+          command: ['/nats-server']
+          args: ['-c', '/etc/nats/nats.conf']
+          ports:
+            - containerPort: 4222
+            - containerPort: 6222
+            - containerPort: 8222
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nats
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '2Gi'
+              cpu: '1000m'
+      volumes:
         - name: config
-          mountPath: /etc/nats
-        - name: data
-          mountPath: /data
+          configMap:
+            name: nats-config
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ['ReadWriteOnce']
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
-      volumes:
-      - name: config
-        configMap:
-          name: nats-config
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 50Gi
+            storage: 50Gi
 ```
 
 ---
@@ -2112,6 +2176,7 @@ jobs:
 ```
 
 **Deployment Pipeline**:
+
 ```yaml
 # .github/workflows/cd.yml
 name: CD
@@ -2144,15 +2209,16 @@ jobs:
 
 **Capacity Planning**:
 
-| Component | Single Instance | Target Throughput | Replicas Needed |
-|-----------|----------------|-------------------|----------------|
-| Hive Gateway | 2000 RPS | 20,000 RPS | 10 |
-| Subgraph (Core) | 5000 RPS | 50,000 RPS | 10 |
-| Subgraph (Content) | 3000 RPS | 30,000 RPS | 10 |
-| PostgreSQL (Write) | 10K TPS | 50K TPS | 1 primary + 4 read replicas |
-| NATS JetStream | 10M msg/sec | 100K msg/sec | 3-node cluster |
+| Component          | Single Instance | Target Throughput | Replicas Needed             |
+| ------------------ | --------------- | ----------------- | --------------------------- |
+| Hive Gateway       | 2000 RPS        | 20,000 RPS        | 10                          |
+| Subgraph (Core)    | 5000 RPS        | 50,000 RPS        | 10                          |
+| Subgraph (Content) | 3000 RPS        | 30,000 RPS        | 10                          |
+| PostgreSQL (Write) | 10K TPS         | 50K TPS           | 1 primary + 4 read replicas |
+| NATS JetStream     | 10M msg/sec     | 100K msg/sec      | 3-node cluster              |
 
 **Bottleneck Analysis**:
+
 1. **Database Writes**: Mitigated via read replicas for search-heavy queries, write batching for embeddings
 2. **Gateway CPU**: Horizontal scaling via HPA, target CPU 70%
 3. **WebSocket Connections**: Hocuspocus distributed mode via Redis for 100K+ concurrent editors
@@ -2164,6 +2230,7 @@ jobs:
 #### Database Scaling
 
 **Read Replicas** (PostgreSQL Streaming Replication):
+
 ```yaml
 # Primary: Handles all writes
 postgres-primary:
@@ -2183,9 +2250,10 @@ postgres-replica-2:
 ```
 
 **Connection Pooling** (PgBouncer):
+
 ```yaml
 pgbouncer:
-  poolMode: transaction  # Safe for SET LOCAL
+  poolMode: transaction # Safe for SET LOCAL
   maxClientConnections: 10000
   defaultPoolSize: 25
   servers:
@@ -2195,6 +2263,7 @@ pgbouncer:
 ```
 
 **Query Offloading**:
+
 - **Semantic search**: Route to read replicas (no writes)
 - **Graph traversal**: Read replicas
 - **Analytics**: Dedicated replica with pgvector indexes
@@ -2204,6 +2273,7 @@ pgbouncer:
 #### Subgraph Scaling
 
 **Auto-Scaling Policy**:
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -2211,32 +2281,33 @@ spec:
   minReplicas: 2
   maxReplicas: 20
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          averageUtilization: 80
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
       policies:
-      - type: Percent
-        value: 50  # Scale up by 50% at a time
-        periodSeconds: 60
+        - type: Percent
+          value: 50 # Scale up by 50% at a time
+          periodSeconds: 60
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Pods
-        value: 1  # Scale down 1 pod at a time
-        periodSeconds: 60
+        - type: Pods
+          value: 1 # Scale down 1 pod at a time
+          periodSeconds: 60
 ```
 
 **Load Distribution**:
+
 - **Kubernetes Service**: Round-robin load balancing across subgraph replicas
 - **Gateway batching**: Entity resolution batches reduce per-request overhead
 
@@ -2245,30 +2316,32 @@ spec:
 #### NATS Clustering
 
 **JetStream 3-Node Cluster**:
+
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: nats-cluster
 spec:
-  clusterIP: None  # Headless service for StatefulSet
+  clusterIP: None # Headless service for StatefulSet
   selector:
     app: nats
   ports:
-  - name: client
-    port: 4222
-  - name: cluster
-    port: 6222
-  - name: monitor
-    port: 8222
+    - name: client
+      port: 4222
+    - name: cluster
+      port: 6222
+    - name: monitor
+      port: 8222
 ```
 
 **Consumer Groups** (Horizontal Scaling):
+
 ```typescript
 // Transcription worker with consumer group
 const subscription = await natsClient.subscribe('edusphere.*.media.uploaded', {
-  queue: 'transcription-workers',  // Load-balanced across workers
-  durable: 'transcription-durable'  // Persistent across restarts
+  queue: 'transcription-workers', // Load-balanced across workers
+  durable: 'transcription-durable', // Persistent across restarts
 });
 ```
 
@@ -2281,6 +2354,7 @@ const subscription = await natsClient.subscribe('edusphere.*.media.uploaded', {
 #### Gateway-Level Caching
 
 **Persisted Queries**:
+
 ```typescript
 // Client sends query ID instead of full query
 {
@@ -2297,27 +2371,29 @@ const query = queryRegistry.get('abc123def456');
 ```
 
 **Response Caching** (Redis):
+
 ```typescript
 import { useResponseCache } from '@graphql-yoga/plugin-response-cache';
 
 const yoga = createYoga({
   plugins: [
     useResponseCache({
-      ttl: 60_000,  // 60 seconds
+      ttl: 60_000, // 60 seconds
       includeExtensionMetadata: true,
       session: (request) => request.headers.get('x-tenant-id'),
-      shouldCacheResult: ({ result }) => !result.errors
-    })
-  ]
+      shouldCacheResult: ({ result }) => !result.errors,
+    }),
+  ],
 });
 ```
 
 **Cache Invalidation** (NATS-driven):
+
 ```typescript
 // Invalidate cache on mutation
 natsClient.publish('edusphere.cache.invalidate', {
   tenantId: 'tenant-uuid',
-  patterns: ['courses:*', 'modules:*']
+  patterns: ['courses:*', 'modules:*'],
 });
 ```
 
@@ -2326,6 +2402,7 @@ natsClient.publish('edusphere.cache.invalidate', {
 #### CDN for Static Assets
 
 **MinIO → CloudFront**:
+
 ```yaml
 # Production S3 bucket
 aws s3 mb s3://edusphere-media-prod
@@ -2337,11 +2414,12 @@ aws cloudfront create-distribution \
 ```
 
 **Presigned URL Generation**:
+
 ```typescript
 const presignedUrl = await s3Client.getSignedUrl('getObject', {
   Bucket: 'edusphere-media-prod',
   Key: `${tenantId}/videos/${assetId}.m3u8`,
-  Expires: 3600  // 1 hour
+  Expires: 3600, // 1 hour
 });
 ```
 
@@ -2350,6 +2428,7 @@ const presignedUrl = await s3Client.getSignedUrl('getObject', {
 ### 11.4 Observability for Scale
 
 **Distributed Tracing** (OpenTelemetry → Jaeger):
+
 ```typescript
 import { trace, context } from '@opentelemetry/api';
 
@@ -2357,7 +2436,7 @@ const tracer = trace.getTracer('edusphere-core-subgraph');
 
 async function resolveUser(id: string) {
   const span = tracer.startSpan('resolve_user', {
-    attributes: { 'user.id': id }
+    attributes: { 'user.id': id },
   });
 
   try {
@@ -2374,6 +2453,7 @@ async function resolveUser(id: string) {
 ```
 
 **Metrics** (Prometheus + Grafana):
+
 ```yaml
 # ServiceMonitor for Prometheus scraping
 apiVersion: monitoring.coreos.com/v1
@@ -2385,11 +2465,12 @@ spec:
     matchLabels:
       app: subgraph-core
   endpoints:
-  - port: metrics
-    interval: 15s
+    - port: metrics
+      interval: 15s
 ```
 
 **Key Metrics**:
+
 - **Gateway**: QPS, p50/p95/p99 latency, error rate, active subscriptions
 - **Subgraphs**: Request duration, database query time, RLS overhead
 - **PostgreSQL**: Active connections, transaction rate, cache hit ratio, replication lag
@@ -2401,9 +2482,9 @@ spec:
 
 ### 12.1 Internal Documentation
 
-- **IMPLEMENTATION-ROADMAP.md**: Phased build plan with acceptance criteria
-- **API-CONTRACTS-GRAPHQL-FEDERATION.md**: Complete GraphQL schema definitions
-- **DATABASE-SCHEMA.md**: PostgreSQL tables, RLS policies, Apache AGE ontology
+- **IMPLEMENTATION_ROADMAP.md**: Phased build plan with acceptance criteria
+- **API_CONTRACTS_GRAPHQL_FEDERATION.md**: Complete GraphQL schema definitions
+- **docs/database/DATABASE_SCHEMA.md**: PostgreSQL tables, RLS policies, Apache AGE ontology
 - **CLAUDE.md**: AI assistant configuration and development protocols
 
 ---
@@ -2411,27 +2492,32 @@ spec:
 ### 12.2 External Resources
 
 #### GraphQL Federation
+
 - [Apollo Federation Specification v2.7](https://specs.apollo.dev/federation/v2.7)
 - [Hive Gateway Documentation](https://the-guild.dev/graphql/gateway)
 - [GraphQL Yoga Federation](https://the-guild.dev/graphql/yoga-server/docs/features/apollo-federation)
 
 #### Database & Graph
+
 - [Apache AGE Documentation](https://age.apache.org/docs/master/index.html)
 - [pgvector Performance Tuning](https://github.com/pgvector/pgvector#performance)
 - [PostgreSQL Row-Level Security](https://www.postgresql.org/docs/16/ddl-rowsecurity.html)
 
 #### AI/ML
+
 - [Vercel AI SDK](https://sdk.vercel.ai/docs)
 - [LangGraph.js Documentation](https://langchain-ai.github.io/langgraphjs/)
 - [LlamaIndex.TS](https://ts.llamaindex.ai/)
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
 
 #### Real-time Collaboration
+
 - [Yjs Documentation](https://docs.yjs.dev/)
 - [Hocuspocus Server](https://tiptap.dev/hocuspocus/introduction)
 - [CRDT Survey](https://crdt.tech/)
 
 #### Infrastructure
+
 - [NATS JetStream](https://docs.nats.io/nats-concepts/jetstream)
 - [Keycloak Organizations](https://www.keycloak.org/docs/latest/server_admin/#organizations)
 - [Traefik Kubernetes Ingress](https://doc.traefik.io/traefik/providers/kubernetes-ingress/)
@@ -2452,6 +2538,7 @@ spec:
 EduSphere's architecture balances **simplicity** (PostgreSQL maximalism, schema-first GraphQL) with **sophistication** (HybridRAG, LangGraph.js workflows, CRDT collaboration). The technology stack prioritizes **zero lock-in** (100% MIT/Apache 2.0 licenses) and **production readiness** (battle-tested at 100K+ user scale).
 
 **Key Architectural Decisions**:
+
 1. **Apache AGE + pgvector** consolidate graph and vector data in PostgreSQL
 2. **Hive Gateway v2** provides MIT-licensed Federation v2.7 compliance
 3. **RLS at database layer** makes tenant isolation architecturally guaranteed
@@ -2460,25 +2547,28 @@ EduSphere's architecture balances **simplicity** (PostgreSQL maximalism, schema-
 6. **NATS JetStream** replaces heavyweight Kafka with 20 MB binary
 
 **Scalability Path**: Current architecture supports 10K concurrent users on single PostgreSQL instance. Horizontal scaling to 100K+ requires:
+
 - Read replicas (4–6 replicas)
 - Subgraph auto-scaling (HPA to 20 replicas)
 - Redis-backed cache at gateway
 - CDN for media delivery
 
 **Migration Risks Mitigated**:
+
 - Apache AGE abstracted behind service layer (swappable to Neo4j)
 - Vercel AI SDK abstracts LLM provider (Ollama → OpenAI/Anthropic)
 - GraphQL Federation enables gradual subgraph rewrites
 
 ---
 
-**For Implementation Details**: See [IMPLEMENTATION-ROADMAP.md](../plans/IMPLEMENTATION-ROADMAP.md) for phased build plan with acceptance criteria.
+**For Implementation Details**: See [IMPLEMENTATION_ROADMAP.md](../plans/IMPLEMENTATION_ROADMAP.md) for phased build plan with acceptance criteria.
 
-**For API Contracts**: See [API-CONTRACTS-GRAPHQL-FEDERATION.md](../api/API-CONTRACTS-GRAPHQL-FEDERATION.md) for complete GraphQL schema definitions.
+**For API Contracts**: See [API_CONTRACTS_GRAPHQL_FEDERATION.md](../api/API_CONTRACTS_GRAPHQL_FEDERATION.md) for complete GraphQL schema definitions.
 
-**For Database Schema**: See DATABASE-SCHEMA.md for PostgreSQL tables, RLS policies, and Apache AGE ontology (to be created in Phase 1).
+**For Database Schema**: See docs/database/DATABASE_SCHEMA.md for PostgreSQL tables, RLS policies, and Apache AGE ontology (to be created in Phase 1).
 
 ---
 
 **Document Version History**:
+
 - **v1.0.0** (2026-02-17): Initial comprehensive architecture documentation

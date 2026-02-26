@@ -1,0 +1,15 @@
+extend type User @key(fields: "id") {
+  followersCount: Int!
+  followingCount: Int!
+  isFollowedByMe: Boolean!
+}
+
+extend type Query {
+  myFollowers(limit: Int): [ID!]! @authenticated
+  myFollowing(limit: Int): [ID!]! @authenticated
+}
+
+extend type Mutation {
+  followUser(userId: ID!): Boolean! @authenticated
+  unfollowUser(userId: ID!): Boolean! @authenticated
+}

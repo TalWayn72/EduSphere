@@ -11,12 +11,12 @@ const latencyTrend = new Trend('latency_over_time');
 
 export const options = {
   stages: [
-    { duration: '5m', target: 500 },    // Ramp up
-    { duration: '23h50m', target: 500 },// Hold at moderate load for 24h
-    { duration: '5m', target: 0 },      // Ramp down
+    { duration: '5m', target: 500 }, // Ramp up
+    { duration: '23h50m', target: 500 }, // Hold at moderate load for 24h
+    { duration: '5m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<750'],   // Allow 750ms during soak
+    http_req_duration: ['p(95)<750'], // Allow 750ms during soak
     http_req_failed: ['rate<0.01'],
     // Key: latency should NOT increase over time (memory leaks show as degradation)
     latency_over_time: ['p(95)<750'],

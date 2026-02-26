@@ -36,7 +36,11 @@ export interface UseVideoAnnotationsReturn {
   annotations: VideoAnnotation[];
   isLoading: boolean;
   error: string | null;
-  addAnnotation: (text: string, timestamp: number, layer?: AnnotationLayer) => Promise<void>;
+  addAnnotation: (
+    text: string,
+    timestamp: number,
+    layer?: AnnotationLayer
+  ) => Promise<void>;
   updateAnnotation: (id: string, text: string) => Promise<void>;
   deleteAnnotation: (id: string) => Promise<void>;
 }
@@ -122,13 +126,16 @@ export function useVideoAnnotations(
 
     if (incomingAnnotation) {
       const incoming = incomingAnnotation as Record<string, unknown>;
-      const alreadyPresent = base.some((a) => a.id === String(incoming['id'] ?? ''));
+      const alreadyPresent = base.some(
+        (a) => a.id === String(incoming['id'] ?? '')
+      );
       if (!alreadyPresent) {
         base.push({
           id: String(incoming['id'] ?? ''),
           assetId: String(incoming['assetId'] ?? ''),
           userId: String(incoming['userId'] ?? ''),
-          layer: (incoming['layer'] as AnnotationLayer) ?? AnnotationLayer.PERSONAL,
+          layer:
+            (incoming['layer'] as AnnotationLayer) ?? AnnotationLayer.PERSONAL,
           text: extractText(incoming['content']),
           timestamp: extractSpatialTimestamp(incoming['spatialData']),
           endTimestamp: extractSpatialEndTimestamp(incoming['spatialData']),
@@ -143,7 +150,11 @@ export function useVideoAnnotations(
   })();
 
   const addAnnotation = useCallback(
-    async (text: string, timestamp: number, layer: AnnotationLayer = AnnotationLayer.PERSONAL) => {
+    async (
+      text: string,
+      timestamp: number,
+      layer: AnnotationLayer = AnnotationLayer.PERSONAL
+    ) => {
       await execCreate({
         input: {
           assetId: videoId,

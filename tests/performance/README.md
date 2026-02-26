@@ -46,12 +46,12 @@ k6 run --env SCENARIO=load tests/performance/scenarios/02-course-list.k6.js \
 
 ## SLA Thresholds
 
-| Metric               | Threshold |
-| -------------------- | --------- |
-| p95 response time    | < 500ms   |
-| p99 response time    | < 1000ms  |
-| Error rate           | < 1%      |
-| Time to first byte (p95) | < 400ms |
+| Metric                   | Threshold |
+| ------------------------ | --------- |
+| p95 response time        | < 500ms   |
+| p99 response time        | < 1000ms  |
+| Error rate               | < 1%      |
+| Time to first byte (p95) | < 400ms   |
 
 ## CI Integration
 
@@ -60,10 +60,10 @@ See `.github/workflows/performance.yml` for the CI configuration.
 
 ## Scenario Overview
 
-| Scenario             | VUs | Duration | Auth Required |
-| -------------------- | --- | -------- | ------------- |
-| 01-health-check      | 5   | 15s      | No            |
-| 02-course-list       | 20  | 30s      | No            |
-| 03-annotations       | 10  | 30s      | Optional      |
-| 04-semantic-search   | 10  | 30s      | Optional      |
-| 05-agent-session     | 5   | 30s      | Yes           |
+| Scenario           | VUs | Duration | Auth Required |
+| ------------------ | --- | -------- | ------------- |
+| 01-health-check    | 5   | 15s      | No            |
+| 02-course-list     | 20  | 30s      | No            |
+| 03-annotations     | 10  | 30s      | Optional      |
+| 04-semantic-search | 10  | 30s      | Optional      |
+| 05-agent-session   | 5   | 30s      | Yes           |

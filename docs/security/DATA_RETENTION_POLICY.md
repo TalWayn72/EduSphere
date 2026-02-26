@@ -15,6 +15,7 @@ This Data Retention Policy defines how EduSphere handles the storage, retention,
 ### Compliance Framework
 
 This policy ensures compliance with:
+
 - GDPR (EU General Data Protection Regulation)
 - CCPA (California Consumer Privacy Act)
 - Educational data protection requirements
@@ -27,6 +28,7 @@ EduSphere processes and stores the following categories of data:
 ### 2.1 Personal Data (PII)
 
 Personal Identifiable Information including:
+
 - User account details (name, email, username)
 - Authentication credentials (hashed passwords, OAuth tokens)
 - Profile information (avatar, bio, preferences)
@@ -39,6 +41,7 @@ Personal Identifiable Information including:
 ### 2.2 Learning Data
 
 Educational content and user interactions:
+
 - Course enrollments and progress
 - Course content (documents, videos, materials)
 - Annotations and highlights on content
@@ -52,6 +55,7 @@ Educational content and user interactions:
 ### 2.3 System Logs
 
 Technical logs for system operation:
+
 - Application logs (errors, warnings, info)
 - Audit logs (administrative actions, security events)
 - Access logs (authentication attempts, API requests)
@@ -63,6 +67,7 @@ Technical logs for system operation:
 ### 2.4 Analytics Data
 
 Usage analytics and metrics:
+
 - Page views and navigation patterns
 - Feature usage statistics
 - Performance metrics
@@ -75,14 +80,17 @@ Usage analytics and metrics:
 ## 3. Retention Periods
 
 ### 3.1 User Profiles
+
 **Retention**: Account lifetime + 30 days post-deletion
 **Justification**: Grace period for account recovery and audit trail
 
 After account deletion:
+
 - Soft delete for 30 days (recoverable)
 - Hard delete after 30 days (permanent removal)
 
 ### 3.2 Course Content
+
 **Retention**: Indefinite (with soft delete capability)
 **Justification**: Educational value, institutional requirements
 
@@ -91,6 +99,7 @@ After account deletion:
 - Hard delete: Only upon explicit instructor request after 90-day grace period
 
 ### 3.3 Annotations and Highlights
+
 **Retention**: Indefinite (with soft delete capability)
 **Justification**: Core user-generated content with educational value
 
@@ -99,6 +108,7 @@ After account deletion:
 - Hard delete: Automatic purge after 30 days from soft delete
 
 ### 3.4 Audit Logs
+
 **Retention**: 2 years
 **Justification**: Security compliance, incident investigation, regulatory requirements
 
@@ -108,6 +118,7 @@ After account deletion:
 - Automatic purge after retention period
 
 ### 3.5 Application Logs
+
 **Retention**: 90 days
 **Justification**: Troubleshooting, debugging, performance monitoring
 
@@ -117,6 +128,7 @@ After account deletion:
 - Debug logs: 7 days (if enabled)
 
 ### 3.6 AI Agent Executions
+
 **Retention**: 1 year
 **Justification**: Quality assurance, model improvement, audit trail
 
@@ -126,6 +138,7 @@ After account deletion:
 - Automatic purge after retention period
 
 ### 3.7 Analytics Data
+
 **Retention**: Varies by type
 
 - **Raw analytics**: 90 days
@@ -143,6 +156,7 @@ After account deletion:
   - No PII or identifiable information
 
 ### 3.8 Backups
+
 **Retention**: 30 days
 **Justification**: Disaster recovery, data protection
 
@@ -158,6 +172,7 @@ After account deletion:
 Soft delete marks records as deleted without removing them from the database.
 
 **Implementation**:
+
 ```sql
 -- Add deleted_at column to tables
 ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP;
@@ -169,6 +184,7 @@ UPDATE users SET deleted_at = NOW() WHERE id = ?;
 ```
 
 **Characteristics**:
+
 - Record remains in database with `deleted_at` timestamp
 - Excluded from normal queries via WHERE clauses
 - Recoverable within grace period
@@ -176,6 +192,7 @@ UPDATE users SET deleted_at = NOW() WHERE id = ?;
 - Preserves audit trail
 
 **Use Cases**:
+
 - User account deletion
 - Course content removal
 - Annotation deletion
@@ -186,18 +203,21 @@ UPDATE users SET deleted_at = NOW() WHERE id = ?;
 Hard delete permanently removes records from the database.
 
 **Implementation**:
+
 ```sql
 -- Permanent deletion
 DELETE FROM users WHERE id = ? AND deleted_at < NOW() - INTERVAL '30 days';
 ```
 
 **Characteristics**:
+
 - Permanent and irreversible
 - Frees storage space
 - Complies with data minimization principles
 - Requires cascading delete or orphan cleanup
 
 **Use Cases**:
+
 - After soft delete grace period expires
 - Expired log data
 - Temporary session data
@@ -210,12 +230,14 @@ DELETE FROM users WHERE id = ? AND deleted_at < NOW() - INTERVAL '30 days';
 Users can request a copy of all their personal data.
 
 **Implementation**:
+
 - Self-service data export via user dashboard
 - API endpoint: `GET /api/user/data-export`
 - Delivery: Downloadable JSON/ZIP file
 - Response time: Within 30 days of request
 
 **Included Data**:
+
 - Profile information
 - Course enrollments and progress
 - Annotations and highlights
@@ -227,6 +249,7 @@ Users can request a copy of all their personal data.
 Users can correct inaccurate or incomplete personal data.
 
 **Implementation**:
+
 - Profile editing interface
 - API endpoints: `PATCH /api/user/profile`
 - Audit log of all modifications
@@ -237,6 +260,7 @@ Users can correct inaccurate or incomplete personal data.
 Users can request deletion of their personal data ("right to be forgotten").
 
 **Implementation**:
+
 - Self-service account deletion
 - API endpoint: `DELETE /api/user/account`
 - 30-day grace period with soft delete
@@ -244,6 +268,7 @@ Users can request deletion of their personal data ("right to be forgotten").
 - Notification to user before hard delete
 
 **Exceptions**:
+
 - Legal obligations requiring retention
 - Legitimate interest (e.g., fraud prevention)
 - Public interest (e.g., academic research with consent)
@@ -253,12 +278,14 @@ Users can request deletion of their personal data ("right to be forgotten").
 Users can receive their data in a structured, machine-readable format.
 
 **Implementation**:
+
 - Export format: JSON (standard), CSV (optional)
 - API endpoint: `GET /api/user/data-export`
 - Includes all user-generated content
 - Response time: Within 30 days of request
 
 **Export Structure**:
+
 ```json
 {
   "user_profile": {...},
@@ -279,6 +306,7 @@ Users can receive their data in a structured, machine-readable format.
 **Endpoint**: `POST /api/user/data-export/request`
 
 **Process**:
+
 1. User requests data export
 2. System generates unique export ID
 3. Background job collects all user data
@@ -287,6 +315,7 @@ Users can receive their data in a structured, machine-readable format.
 6. Download link valid for 7 days
 
 **Implementation Example**:
+
 ```typescript
 async function requestDataExport(userId: string) {
   const exportId = generateUUID();
@@ -312,6 +341,7 @@ async function requestDataExport(userId: string) {
 ### 6.2 Export Format
 
 **JSON Structure**:
+
 ```json
 {
   "export_metadata": {
@@ -356,10 +386,12 @@ async function requestDataExport(userId: string) {
 7. **Hard Delete**: Automatic purge after 30 days
 
 **Implementation**:
+
 ```typescript
 async function deleteUserAccount(userId: string) {
   // Soft delete user
-  await db.update(users)
+  await db
+    .update(users)
     .set({ deleted_at: new Date() })
     .where(eq(users.id, userId));
 
@@ -373,7 +405,7 @@ async function deleteUserAccount(userId: string) {
   await sendEmail({
     to: user.email,
     subject: 'Account Deletion Confirmation',
-    body: 'Your account will be permanently deleted in 30 days...'
+    body: 'Your account will be permanently deleted in 30 days...',
   });
 }
 ```
@@ -408,6 +440,7 @@ WHERE created_at < NOW() - INTERVAL '90 days';
 ```
 
 **Monitoring**:
+
 - Log number of records deleted
 - Alert if deletion fails
 - Track storage space reclaimed
@@ -424,6 +457,7 @@ WHERE created_at < NOW() - INTERVAL '90 days';
 5. **Compliance Report**: Generate monthly deletion summary
 
 **Verification Query**:
+
 ```sql
 -- Verify user data completely removed
 SELECT
@@ -444,6 +478,7 @@ GROUP BY table_name;
 ### 8.1 When Deletion Not Possible
 
 Anonymization is used when:
+
 - Data required for legal/regulatory compliance
 - Aggregated statistics need historical data
 - Academic research requires longitudinal data
@@ -458,7 +493,8 @@ async function anonymizeUserData(userId: string) {
   const anonymousId = `anon_${generateHash(userId)}`;
 
   // Anonymize user profile
-  await db.update(users)
+  await db
+    .update(users)
     .set({
       email: `${anonymousId}@anonymized.local`,
       name: 'Anonymized User',
@@ -470,12 +506,14 @@ async function anonymizeUserData(userId: string) {
     .where(eq(users.id, userId));
 
   // Update analytics records
-  await db.update(analyticsEvents)
+  await db
+    .update(analyticsEvents)
     .set({ user_id: anonymousId })
     .where(eq(analyticsEvents.user_id, userId));
 
   // Update audit logs
-  await db.update(auditLogs)
+  await db
+    .update(auditLogs)
     .set({
       user_id: anonymousId,
       user_email: null,
@@ -489,19 +527,21 @@ async function anonymizeUserData(userId: string) {
 
 1. **Pseudonymization**: Replace identifiers with pseudonyms
 2. **Generalization**: Reduce precision (exact age -> age range)
-3. **Data Masking**: Replace characters (email: j***@example.com)
+3. **Data Masking**: Replace characters (email: j\*\*\*@example.com)
 4. **Aggregation**: Combine data into statistical summaries
 5. **Hashing**: One-way hash for consistency across datasets
 
 ### 8.3 Anonymized Data Retention
 
 **Retention Rules**:
+
 - Anonymized analytics: Indefinite
 - Anonymized audit logs: 5 years
 - Aggregated statistics: Indefinite
 - Research datasets: Per study protocol
 
 **Validation**:
+
 - Quarterly audits to verify anonymization effectiveness
 - Re-identification risk assessment
 - Compliance with GDPR recital 26 (anonymized data outside GDPR scope)
@@ -512,18 +552,20 @@ async function anonymizeUserData(userId: string) {
 
 **Backup Schedule**:
 
-| Frequency | Retention | Purpose |
-|-----------|-----------|---------|
-| Daily | 7 days | Recent recovery |
-| Weekly | 4 weeks | Short-term recovery |
-| Monthly | 3 months | Medium-term recovery |
+| Frequency | Retention | Purpose              |
+| --------- | --------- | -------------------- |
+| Daily     | 7 days    | Recent recovery      |
+| Weekly    | 4 weeks   | Short-term recovery  |
+| Monthly   | 3 months  | Medium-term recovery |
 
 **Backup Types**:
+
 - **Full Backup**: Complete database snapshot
 - **Incremental Backup**: Changes since last backup
 - **Transaction Logs**: Point-in-time recovery
 
 **Implementation**:
+
 ```bash
 # Daily backup with 7-day retention
 0 2 * * * /scripts/backup-database.sh --retain-days=7
@@ -537,12 +579,14 @@ async function anonymizeUserData(userId: string) {
 **Important**: Backups are subject to the same deletion requirements as primary data.
 
 **Process**:
+
 1. When user requests deletion, mark account for backup purge
 2. Run backup sanitization job to remove user data from backups
 3. Re-encrypt backups after sanitization
 4. Verify user data no longer present in any backup
 
 **Backup Sanitization Script**:
+
 ```bash
 #!/bin/bash
 # Extract backup, remove user data, re-compress
@@ -566,12 +610,14 @@ mv ${BACKUP_FILE}.sanitized $BACKUP_FILE
 ### 9.3 Archive Storage
 
 **Long-Term Archives**:
+
 - Cold storage for compliance (if required)
 - Encrypted and access-controlled
 - Indexed for retrieval
 - Regular integrity checks
 
 **Archive Criteria**:
+
 - Legal hold requirements
 - Regulatory compliance (e.g., financial records)
 - Historical significance (institutional archives)
@@ -624,7 +670,6 @@ const dailyCleanup = new CronJob('0 2 * * *', async () => {
       RETURNING id
     `);
     logger.info(`Purged ${deletedSessions.rows.length} expired sessions`);
-
   } catch (error) {
     logger.error('Daily cleanup job failed', error);
     // Alert administrators
@@ -663,7 +708,6 @@ const weeklyCleanup = new CronJob('0 3 * * 0', async () => {
 
     // Vacuum database
     await db.execute(sql`VACUUM ANALYZE`);
-
   } catch (error) {
     logger.error('Weekly cleanup job failed', error);
     await sendAlert('Weekly Cleanup Failed', error.message);
@@ -676,6 +720,7 @@ weeklyCleanup.start();
 ### 10.2 Monitoring and Alerting
 
 **Metrics to Track**:
+
 - Number of records deleted per job run
 - Job execution time
 - Storage space reclaimed
@@ -683,6 +728,7 @@ weeklyCleanup.start();
 - Compliance with retention schedules
 
 **Implementation**:
+
 ```typescript
 interface CleanupMetrics {
   job_name: string;
@@ -697,8 +743,14 @@ async function recordCleanupMetrics(metrics: CleanupMetrics) {
   await db.insert(cleanupMetrics).values(metrics);
 
   // Send to monitoring system
-  await prometheusClient.gauge('cleanup_records_deleted', metrics.records_deleted);
-  await prometheusClient.gauge('cleanup_execution_time', metrics.execution_time_ms);
+  await prometheusClient.gauge(
+    'cleanup_records_deleted',
+    metrics.records_deleted
+  );
+  await prometheusClient.gauge(
+    'cleanup_execution_time',
+    metrics.execution_time_ms
+  );
 
   // Alert on failures
   if (metrics.errors.length > 0) {
@@ -708,6 +760,7 @@ async function recordCleanupMetrics(metrics: CleanupMetrics) {
 ```
 
 **Alerts**:
+
 - Job execution failure
 - Execution time exceeds threshold (> 30 minutes)
 - Deletion count anomalies (too high or too low)
@@ -720,12 +773,14 @@ async function recordCleanupMetrics(metrics: CleanupMetrics) {
 When data must be preserved for legal or regulatory reasons:
 
 **Initiation**:
+
 1. Legal team issues legal hold request
 2. Specify user/data scope and duration
 3. Document reason for hold
 4. Create hold record in database
 
 **Implementation**:
+
 ```sql
 -- Legal holds table
 CREATE TABLE legal_holds (
@@ -745,15 +800,16 @@ VALUES (gen_random_uuid(), ?, 'Litigation hold - Case #12345', ?, 'Preserve all 
 ```
 
 **Enforcement**:
+
 ```typescript
 async function canDeleteUser(userId: string): Promise<boolean> {
   // Check for active legal holds
-  const holds = await db.select()
+  const holds = await db
+    .select()
     .from(legalHolds)
-    .where(and(
-      eq(legalHolds.user_id, userId),
-      eq(legalHolds.status, 'active')
-    ));
+    .where(
+      and(eq(legalHolds.user_id, userId), eq(legalHolds.status, 'active'))
+    );
 
   if (holds.length > 0) {
     logger.warn(`Cannot delete user ${userId}: active legal hold`);
@@ -765,7 +821,7 @@ async function canDeleteUser(userId: string): Promise<boolean> {
 
 async function deleteUserAccount(userId: string) {
   // Verify no legal holds
-  if (!await canDeleteUser(userId)) {
+  if (!(await canDeleteUser(userId))) {
     throw new Error('Cannot delete user: active legal hold');
   }
 
@@ -777,17 +833,20 @@ async function deleteUserAccount(userId: string) {
 ### 11.2 Legal Hold Management
 
 **Responsibilities**:
+
 - Legal team: Initiates and releases holds
 - Compliance officer: Reviews and approves holds
 - Engineering team: Implements technical controls
 - Data protection officer: Ensures GDPR compliance
 
 **Duration**:
+
 - Holds remain active until explicitly released
 - Regular review (quarterly) of active holds
 - Automatic alerts for holds exceeding 1 year
 
 **Release Process**:
+
 1. Legal team approves hold release
 2. Update hold record with `released_at` timestamp
 3. Review if data should now be deleted
@@ -869,7 +928,8 @@ export const users = pgTable('users', {
 const users = await db.select().from(usersTable);
 
 // After: Exclude soft-deleted
-const users = await db.select()
+const users = await db
+  .select()
   .from(usersTable)
   .where(isNull(usersTable.deleted_at));
 
@@ -879,7 +939,8 @@ export function excludeDeleted<T extends { deleted_at?: Date }>(table: T) {
 }
 
 // Usage
-const activeUsers = await db.select()
+const activeUsers = await db
+  .select()
   .from(usersTable)
   .where(excludeDeleted(usersTable));
 ```
@@ -1004,29 +1065,36 @@ WHERE owner_id NOT IN (SELECT id FROM users WHERE deleted_at IS NULL)
 # Data Retention Audit Report - Q[X] 2026
 
 ## Executive Summary
+
 - Audit period: [Start] to [End]
 - Auditor: [Name]
 - Overall compliance status: [Compliant/Non-Compliant]
 
 ## Findings
+
 ### Compliant Areas
+
 - [List compliant areas]
 
 ### Non-Compliant Areas
+
 - [Issue 1]: Description, Impact, Remediation plan
 - [Issue 2]: Description, Impact, Remediation plan
 
 ## Metrics
+
 - Users deleted: [Count]
 - Data export requests: [Count]
 - Cleanup job failures: [Count]
 - Storage reclaimed: [GB]
 
 ## Recommendations
+
 1. [Recommendation 1]
 2. [Recommendation 2]
 
 ## Action Items
+
 - [ ] Action item 1 - Owner: [Name], Due: [Date]
 - [ ] Action item 2 - Owner: [Name], Due: [Date]
 ```
@@ -1053,7 +1121,9 @@ const complianceCheck = new CronJob('0 4 * * *', async () => {
   `);
 
   if (overdueUsers.rows[0].count > 0) {
-    issues.push(`${overdueUsers.rows[0].count} users not purged after 30-day period`);
+    issues.push(
+      `${overdueUsers.rows[0].count} users not purged after 30-day period`
+    );
   }
 
   // Check 2: Old logs not cleaned
@@ -1077,7 +1147,9 @@ const complianceCheck = new CronJob('0 4 * * *', async () => {
   `);
 
   if (failedJobs.rows[0].count > 0) {
-    issues.push(`${failedJobs.rows[0].count} cleanup job failures in last 24 hours`);
+    issues.push(
+      `${failedJobs.rows[0].count} cleanup job failures in last 24 hours`
+    );
   }
 
   // Check 4: Stale legal holds
@@ -1089,7 +1161,9 @@ const complianceCheck = new CronJob('0 4 * * *', async () => {
   `);
 
   if (staleLegalHolds.rows[0].count > 0) {
-    issues.push(`${staleLegalHolds.rows[0].count} legal holds active over 1 year - review needed`);
+    issues.push(
+      `${staleLegalHolds.rows[0].count} legal holds active over 1 year - review needed`
+    );
   }
 
   // Report issues
@@ -1147,17 +1221,18 @@ WHERE requested_at > NOW() - INTERVAL '30 days';
 
 **Key Performance Indicators (KPIs)**:
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Data deletion success rate | 99.9% | % of scheduled deletions completed |
+| Metric                         | Target     | Measurement                             |
+| ------------------------------ | ---------- | --------------------------------------- |
+| Data deletion success rate     | 99.9%      | % of scheduled deletions completed      |
 | User data export response time | < 24 hours | Average time to fulfill export requests |
-| Cleanup job success rate | 100% | % of cron jobs completing successfully |
-| Retention policy violations | 0 | # of data retained beyond policy |
-| Legal hold review frequency | Quarterly | # of reviews per year |
-| Backup sanitization time | < 7 days | Days to remove user from all backups |
-| Anonymization effectiveness | 100% | % of PII successfully anonymized |
+| Cleanup job success rate       | 100%       | % of cron jobs completing successfully  |
+| Retention policy violations    | 0          | # of data retained beyond policy        |
+| Legal hold review frequency    | Quarterly  | # of reviews per year                   |
+| Backup sanitization time       | < 7 days   | Days to remove user from all backups    |
+| Anonymization effectiveness    | 100%       | % of PII successfully anonymized        |
 
 **Reporting**:
+
 - Daily: Automated compliance check results
 - Weekly: Cleanup job metrics
 - Monthly: User rights request fulfillment
@@ -1195,6 +1270,7 @@ WHERE requested_at > NOW() - INTERVAL '30 days';
 ## Contact
 
 For questions about this policy, contact:
+
 - **Data Protection Officer**: dpo@edusphere.com
 - **Legal Team**: legal@edusphere.com
 - **Compliance Team**: compliance@edusphere.com

@@ -33,8 +33,14 @@ export type TutorState = z.infer<typeof TutorStateSchema>;
 
 const TutorStateAnnotation = Annotation.Root({
   question: Annotation<string>(),
-  context: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  studentLevel: Annotation<TutorState['studentLevel']>({ value: (_, u) => u, default: () => 'intermediate' }),
+  context: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  studentLevel: Annotation<TutorState['studentLevel']>({
+    value: (_, u) => u,
+    default: () => 'intermediate',
+  }),
   conversationHistory: Annotation<TutorState['conversationHistory']>({
     reducer: (existing, incoming) => {
       const merged = [...existing, ...incoming];
@@ -44,10 +50,22 @@ const TutorStateAnnotation = Annotation.Root({
     },
     default: () => [],
   }),
-  currentStep: Annotation<TutorState['currentStep']>({ value: (_, u) => u, default: () => 'assess' }),
-  explanation: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  comprehensionCheck: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  followupSuggestions: Annotation<string[]>({ value: (_, u) => u, default: () => [] }),
+  currentStep: Annotation<TutorState['currentStep']>({
+    value: (_, u) => u,
+    default: () => 'assess',
+  }),
+  explanation: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  comprehensionCheck: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  followupSuggestions: Annotation<string[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
@@ -210,6 +228,9 @@ Suggest 3 related topics the student might want to explore next. Return as a num
   }
 }
 
-export function createTutorWorkflow(model?: string, locale: string = 'en'): AdaptiveTutorWorkflow {
+export function createTutorWorkflow(
+  model?: string,
+  locale: string = 'en'
+): AdaptiveTutorWorkflow {
   return new AdaptiveTutorWorkflow(model, locale);
 }

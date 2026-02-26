@@ -18,9 +18,24 @@ export interface OfflineAnnotation {
 }
 
 const ADD_ANNOTATION_MUTATION = /* GraphQL */ `
-  mutation AddAnnotation($assetId: ID!, $timestamp: Float!, $text: String!, $layer: AnnotationLayer!) {
-    addAnnotation(assetId: $assetId, timestamp: $timestamp, text: $text, layer: $layer) {
-      id assetId timestamp text layer createdAt
+  mutation AddAnnotation(
+    $assetId: ID!
+    $timestamp: Float!
+    $text: String!
+    $layer: AnnotationLayer!
+  ) {
+    addAnnotation(
+      assetId: $assetId
+      timestamp: $timestamp
+      text: $text
+      layer: $layer
+    ) {
+      id
+      assetId
+      timestamp
+      text
+      layer
+      createdAt
     }
   }
 `;
@@ -34,7 +49,9 @@ interface UseOfflineAnnotationsOptions {
 
 export function useOfflineAnnotations(options: UseOfflineAnnotationsOptions) {
   const { graphqlEndpoint, tenantId, userId, getAuthToken } = options;
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'error'>('idle');
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'error'>(
+    'idle'
+  );
   const [pendingCount, setPendingCount] = useState(queueSize());
   const engineRef = useRef<SyncEngine | null>(null);
   // Track pending-only local list (optimistic UI)
@@ -61,9 +78,21 @@ export function useOfflineAnnotations(options: UseOfflineAnnotationsOptions) {
   }, [graphqlEndpoint, getAuthToken]);
 
   const addAnnotation = useCallback(
-    (assetId: string, timestamp: number, text: string, layer: OfflineAnnotation['layer'] = 'PERSONAL') => {
+    (
+      assetId: string,
+      timestamp: number,
+      text: string,
+      layer: OfflineAnnotation['layer'] = 'PERSONAL'
+    ) => {
       const id = `offline-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const optimistic: OfflineAnnotation = { id, assetId, timestamp, text, layer, syncStatus: 'pending' };
+      const optimistic: OfflineAnnotation = {
+        id,
+        assetId,
+        timestamp,
+        text,
+        layer,
+        syncStatus: 'pending',
+      };
       setLocalPending((prev) => [...prev.slice(-99), optimistic]); // cap at 100 optimistic items
       engineRef.current?.enqueueOfflineMutation({
         id,
@@ -75,7 +104,7 @@ export function useOfflineAnnotations(options: UseOfflineAnnotationsOptions) {
         createdAt: Date.now(),
       });
     },
-    [tenantId, userId],
+    [tenantId, userId]
   );
 
   return { addAnnotation, syncStatus, pendingCount, localPending };

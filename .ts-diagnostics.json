@@ -1,0 +1,16 @@
+{
+  "tsConfigs": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\tsconfig.json",
+  "autoDetectWorkspaces": false,
+  "maxCacheSize": 50,
+  "debounceMs": 1000,
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+    "**/coverage/**",
+    "**/.turbo/**",
+    "**/.next/**",
+    "**/*.min.js"
+  ]
+}

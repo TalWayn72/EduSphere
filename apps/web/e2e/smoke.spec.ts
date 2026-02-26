@@ -20,21 +20,23 @@ test.describe('Smoke Tests — Critical Page Loads', () => {
     expect(page.url()).toContain('/learn/');
   });
 
-  test('login page redirects authenticated users to dashboard in DEV_MODE', async ({ page }) => {
+  test('login page redirects authenticated users to dashboard in DEV_MODE', async ({
+    page,
+  }) => {
     // In DEV_MODE (VITE_DEV_MODE=true) the app auto-authenticates every visitor.
     // Login.tsx's useEffect detects isAuthenticated()=true and navigates to /dashboard.
     // This test verifies that redirect chain works end-to-end.
     await page.goto('/login');
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' })
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('dashboard page loads with stats cards', async ({ page }) => {
     await page.goto('/dashboard');
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' })
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 10_000,
+    });
     // Primary stats row — labels from dashboard i18n (stats.* keys)
     await expect(page.getByText('Courses Enrolled')).toBeVisible();
     await expect(page.getByText('Study Time')).toBeVisible();
@@ -70,7 +72,9 @@ test.describe('Smoke Tests — Critical Page Loads', () => {
     await coursePage.assertContentViewerLoaded();
   });
 
-  test('agents page loads with AI Learning Agents heading', async ({ page }) => {
+  test('agents page loads with AI Learning Agents heading', async ({
+    page,
+  }) => {
     await page.goto('/agents');
     await expect(
       page.getByRole('heading', { name: 'AI Learning Agents' })
@@ -97,9 +101,9 @@ test.describe('Smoke Tests — Navigation', () => {
 
   test('EduSphere logo link is visible in header', async ({ page }) => {
     await page.goto('/dashboard');
-    await expect(
-      page.getByRole('link', { name: /EduSphere/i })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByRole('link', { name: /EduSphere/i })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('search button in header navigates to /search', async ({ page }) => {

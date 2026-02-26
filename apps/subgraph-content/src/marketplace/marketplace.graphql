@@ -1,0 +1,49 @@
+type CourseListing {
+  id: ID!
+  courseId: ID!
+  priceCents: Int!
+  currency: String!
+  isPublished: Boolean!
+  revenueSplitPercent: Int!
+}
+
+type MarketplacePurchase {
+  id: ID!
+  courseId: ID!
+  amountCents: Int!
+  status: String!
+  purchasedAt: String!
+}
+
+type EarningsSummary {
+  totalEarnedCents: Int!
+  pendingPayoutCents: Int!
+  paidOutCents: Int!
+  purchases: [MarketplacePurchase!]!
+}
+
+type PaymentIntentResult {
+  clientSecret: String!
+  paymentIntentId: String!
+}
+
+extend type Query {
+  courseListings: [CourseListing!]! @authenticated
+  myPurchases: [MarketplacePurchase!]! @authenticated
+  instructorEarnings: EarningsSummary! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+}
+
+extend type Mutation {
+  createCourseListing(
+    courseId: ID!
+    priceCents: Int!
+    currency: String!
+    revenueSplitPercent: Int
+  ): CourseListing! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+
+  publishListing(courseId: ID!): Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+
+  purchaseCourse(courseId: ID!): PaymentIntentResult! @authenticated
+
+  requestPayout: Boolean! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+}

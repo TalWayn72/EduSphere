@@ -21,6 +21,8 @@ export interface UserStats {
   conceptsMastered: number;
   totalLearningMinutes: number;
   weeklyActivity: DayActivity[];
+  currentStreak: number;
+  longestStreak: number;
 }
 
 @Injectable()
@@ -51,6 +53,8 @@ export class UserStatsService implements OnModuleDestroy {
         this.fetchWeeklyActivity(tx, userId, tenantId),
       ]);
 
+      const { currentStreak, longestStreak } = this.computeStreaks(activity);
+
       this.logger.debug(
         { userId, tenantId, enrolled, annotated },
         'myStats aggregated'
@@ -62,8 +66,53 @@ export class UserStatsService implements OnModuleDestroy {
         conceptsMastered: progress.completed,
         totalLearningMinutes: progress.minutes,
         weeklyActivity: activity,
+        currentStreak,
+        longestStreak,
       };
     });
+  }
+
+  private computeStreaks(activity: DayActivity[]): {
+    currentStreak: number;
+    longestStreak: number;
+  } {
+    // Only consider days with count > 0
+    const activeDates = activity
+      .filter((a) => a.count > 0)
+      .map((a) => a.date)
+      .sort();
+
+    if (activeDates.length === 0) {
+      return { currentStreak: 0, longestStreak: 0 };
+    }
+
+    // currentStreak: count consecutive days going back from today
+    const today = new Date().toISOString().slice(0, 10);
+    const dateSet = new Set(activeDates);
+    let currentStreak = 0;
+    const checkDate = new Date(today);
+    while (dateSet.has(checkDate.toISOString().slice(0, 10))) {
+      currentStreak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+
+    // longestStreak: max run of consecutive calendar dates in the sorted list
+    let longestStreak = 1;
+    let run = 1;
+    for (let i = 1; i < activeDates.length; i++) {
+      const prev = new Date(activeDates[i - 1] as string);
+      const curr = new Date(activeDates[i] as string);
+      const diffMs = curr.getTime() - prev.getTime();
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
+        run++;
+        if (run > longestStreak) longestStreak = run;
+      } else {
+        run = 1;
+      }
+    }
+
+    return { currentStreak, longestStreak };
   }
 
   private async countEnrolled(tx: Database, userId: string): Promise<number> {

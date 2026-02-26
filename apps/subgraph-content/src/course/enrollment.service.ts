@@ -1,5 +1,18 @@
-import { Injectable, Logger, ConflictException, NotFoundException, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, and, withTenantContext, closeAllPools } from '@edusphere/db';
+import {
+  Injectable,
+  Logger,
+  ConflictException,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  and,
+  withTenantContext,
+  closeAllPools,
+} from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 
 @Injectable()
@@ -60,7 +73,9 @@ export class EnrollmentService implements OnModuleDestroy {
         )
         .returning();
       if (!deleted) {
-        throw new NotFoundException(`Enrollment not found for course ${courseId}`);
+        throw new NotFoundException(
+          `Enrollment not found for course ${courseId}`
+        );
       }
       this.logger.log(`User ${ctx.userId} unenrolled from course ${courseId}`);
       return true;
@@ -77,7 +92,10 @@ export class EnrollmentService implements OnModuleDestroy {
     });
   }
 
-  async markContentViewed(contentItemId: string, ctx: TenantContext): Promise<boolean> {
+  async markContentViewed(
+    contentItemId: string,
+    ctx: TenantContext
+  ): Promise<boolean> {
     return withTenantContext(this.db, ctx, async (tx) => {
       await tx
         .insert(schema.userProgress)
@@ -90,7 +108,10 @@ export class EnrollmentService implements OnModuleDestroy {
           completedAt: new Date(),
         })
         .onConflictDoUpdate({
-          target: [schema.userProgress.userId, schema.userProgress.contentItemId],
+          target: [
+            schema.userProgress.userId,
+            schema.userProgress.contentItemId,
+          ],
           set: {
             isCompleted: true,
             progress: 100,
@@ -98,7 +119,9 @@ export class EnrollmentService implements OnModuleDestroy {
             completedAt: new Date(),
           },
         });
-      this.logger.debug(`User ${ctx.userId} marked content ${contentItemId} as viewed`);
+      this.logger.debug(
+        `User ${ctx.userId} marked content ${contentItemId} as viewed`
+      );
       return true;
     });
   }
@@ -109,12 +132,20 @@ export class EnrollmentService implements OnModuleDestroy {
       const allItems = await tx
         .select({ id: schema.contentItems.id })
         .from(schema.contentItems)
-        .innerJoin(schema.modules, eq(schema.contentItems.moduleId, schema.modules.id))
+        .innerJoin(
+          schema.modules,
+          eq(schema.contentItems.moduleId, schema.modules.id)
+        )
         .where(eq(schema.modules.course_id, courseId));
 
       const totalItems = allItems.length;
       if (totalItems === 0) {
-        return { courseId, totalItems: 0, completedItems: 0, percentComplete: 0 };
+        return {
+          courseId,
+          totalItems: 0,
+          completedItems: 0,
+          percentComplete: 0,
+        };
       }
 
       const itemIds = allItems.map((i) => i.id);
@@ -134,9 +165,16 @@ export class EnrollmentService implements OnModuleDestroy {
       ).length;
 
       const percentComplete =
-        totalItems > 0 ? Math.round((completedInCourse / totalItems) * 100 * 10) / 10 : 0;
+        totalItems > 0
+          ? Math.round((completedInCourse / totalItems) * 100 * 10) / 10
+          : 0;
 
-      return { courseId, totalItems, completedItems: completedInCourse, percentComplete };
+      return {
+        courseId,
+        totalItems,
+        completedItems: completedInCourse,
+        percentComplete,
+      };
     });
   }
 

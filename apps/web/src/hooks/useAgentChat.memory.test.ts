@@ -36,13 +36,15 @@ import * as urql from 'urql';
 function setupUrqlWithNoSession() {
   vi.mocked(urql.useMutation).mockImplementation((mutation) => {
     if (mutation === 'START_AGENT_SESSION_MUTATION') {
-      return [{ fetching: false }, vi.fn().mockResolvedValue({ data: null })] as ReturnType<
-        typeof urql.useMutation
-      >;
+      return [
+        { fetching: false },
+        vi.fn().mockResolvedValue({ data: null }),
+      ] as ReturnType<typeof urql.useMutation>;
     }
-    return [{ fetching: false }, vi.fn().mockResolvedValue({ data: null })] as ReturnType<
-      typeof urql.useMutation
-    >;
+    return [
+      { fetching: false },
+      vi.fn().mockResolvedValue({ data: null }),
+    ] as ReturnType<typeof urql.useMutation>;
   });
 
   vi.mocked(urql.useSubscription).mockReturnValue([
@@ -60,13 +62,16 @@ function setupUrqlWithSession() {
     if (mutation === 'START_AGENT_SESSION_MUTATION') {
       return [
         { fetching: false },
-        vi.fn().mockResolvedValue({ data: { startAgentSession: { id: 'session-abc' } } }),
+        vi.fn().mockResolvedValue({
+          data: { startAgentSession: { id: 'session-abc' } },
+        }),
       ] as ReturnType<typeof urql.useMutation>;
     }
     // SEND_AGENT_MESSAGE_MUTATION returns no content → streaming path → sets streamingTimeoutRef
-    return [{ fetching: false }, vi.fn().mockResolvedValue({ data: null })] as ReturnType<
-      typeof urql.useMutation
-    >;
+    return [
+      { fetching: false },
+      vi.fn().mockResolvedValue({ data: null }),
+    ] as ReturnType<typeof urql.useMutation>;
   });
 
   vi.mocked(urql.useSubscription).mockReturnValue([

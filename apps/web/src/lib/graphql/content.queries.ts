@@ -80,8 +80,16 @@ export const SEARCH_SEMANTIC_BY_TEXT_QUERY = gql`
 `;
 
 export const PRESIGNED_UPLOAD_QUERY = gql`
-  query GetPresignedUploadUrl($fileName: String!, $contentType: String!, $courseId: ID!) {
-    getPresignedUploadUrl(fileName: $fileName, contentType: $contentType, courseId: $courseId) {
+  query GetPresignedUploadUrl(
+    $fileName: String!
+    $contentType: String!
+    $courseId: ID!
+  ) {
+    getPresignedUploadUrl(
+      fileName: $fileName
+      contentType: $contentType
+      courseId: $courseId
+    ) {
       uploadUrl
       fileKey
       expiresAt
@@ -90,7 +98,11 @@ export const PRESIGNED_UPLOAD_QUERY = gql`
 `;
 
 export const CONFIRM_MEDIA_UPLOAD_MUTATION = gql`
-  mutation ConfirmMediaUpload($fileKey: String!, $courseId: ID!, $title: String!) {
+  mutation ConfirmMediaUpload(
+    $fileKey: String!
+    $courseId: ID!
+    $title: String!
+  ) {
     confirmMediaUpload(fileKey: $fileKey, courseId: $courseId, title: $title) {
       id
       courseId
@@ -165,3 +177,8 @@ export const MARK_CONTENT_VIEWED_MUTATION = gql`
     markContentViewed(contentItemId: $contentItemId)
   }
 `;
+
+// NOTE: Tier-3 content queries (analytics, microlearning, at-risk, scenarios,
+// admin enrollment, alt-text) have been moved to content-tier3.queries.ts,
+// which is excluded from codegen until the supergraph is recomposed with
+// the full subgraph SDL set.

@@ -10,12 +10,14 @@
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
-    "test:cov": "vitest --coverage"
+    "test:cov": "vitest --coverage",
+    "test:memory": "vitest run --reporter=verbose **/*.memory.spec.ts"
   },
   "dependencies": {
     "ollama-ai-provider": "^1.2.0",
     "@ai-sdk/openai": "^3.0.30",
     "@edusphere/auth": "workspace:*",
+    "@edusphere/metrics": "workspace:*",
     "@edusphere/db": "workspace:*",
     "@edusphere/telemetry": "workspace:*",
     "@opentelemetry/api": "^1.9.0",

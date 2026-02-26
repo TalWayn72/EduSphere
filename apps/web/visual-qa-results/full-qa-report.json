@@ -40,9 +40,7 @@
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
-    "notes": [
-      "On Keycloak page: http://localhost:5174/dashboard"
-    ],
+    "notes": ["On Keycloak page: http://localhost:5174/dashboard"],
     "loadedOk": false
   },
   {
@@ -101,10 +99,7 @@
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
-    "notes": [
-      "Course cards visible: 4",
-      "Enroll button visible: false"
-    ],
+    "notes": ["Course cards visible: 4", "Enroll button visible: false"],
     "loadedOk": true
   },
   {
@@ -132,9 +127,7 @@
     "label": "S1.06 — AI Agents",
     "url": "http://localhost:5174/agents",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_06-agents.png",
-    "headings": [
-      "AI Learning Agents"
-    ],
+    "headings": ["AI Learning Agents"],
     "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\n(current page)\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Agents\n\nChoose an agent mode to enhance your learningDev Mode — mock responses\n\nChavruta Debate\n\nDialectical partner — challenges your arguments using Talmudic reasoning\n\nQui",
     "consoleErrors": [
       "Failed to load resource: net::ERR_CONNECTION_REFUSED",
@@ -158,9 +151,7 @@
     "label": "S1.07 — Knowledge Graph",
     "url": "http://localhost:5174/graph",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_07-knowledge-graph.png",
-    "headings": [
-      "Knowledge Graph"
-    ],
+    "headings": ["Knowledge Graph"],
     "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\n(current page)\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nKnowledge Graph\n\nExplore concepts, people, and sources in the knowledge graph\n\n💡 CONCEPT\n👤 PERSON\n📚 SOURCE\nRambam\nAristotle\nFree Will\nDeterminism\nEthics\nMetaphysics\nGuide for the Perp",
     "consoleErrors": [
       "Failed to load resource: net::ERR_CONNECTION_REFUSED",
@@ -196,20 +187,14 @@
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
-    "notes": [
-      "Header/nav visible: true"
-    ],
+    "notes": ["Header/nav visible: true"],
     "loadedOk": true
   },
   {
     "label": "S1.09 — Search (Talmud)",
     "url": "http://localhost:5174/search?q=Talmud",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_09b-search-talmud-results.png",
-    "headings": [
-      "COURSES",
-      "TRANSCRIPTS",
-      "CONCEPTS"
-    ],
+    "headings": ["COURSES", "TRANSCRIPTS", "CONCEPTS"],
     "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\n\n7 results for \"Talmud\"\n\nCOURSES\n(2)\n\nIntroduction to Talmud Study\n\nFundamentals of Talmudic reasoning and argumentation\n\nAdvanced Chavruta Techniques\n\nCollaborative Talmud learning with AI assistance\n",
     "consoleErrors": [
       "Failed to load resource: net::ERR_CONNECTION_REFUSED",
@@ -219,9 +204,7 @@
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
       "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
-    "notes": [
-      "Search results for \"Talmud\": 7 cards"
-    ],
+    "notes": ["Search results for \"Talmud\": 7 cards"],
     "loadedOk": true
   },
   {
@@ -388,9 +371,7 @@
     "label": "S3.02 — Super Admin Route Check",
     "url": "http://localhost:5174/annotations",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S3_02-admin-routes.png",
-    "headings": [
-      "Annotations"
-    ],
+    "headings": ["Annotations"],
     "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\n(current page)\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nFailed to load annotations\nAnnotations\n\n0 notes\n\nSort:\nBy time\nBy layer\n\n🔒\n\n0\n\nPersonal\n\n👥\n\n0\n\nShared\n\n🎓\n\n0\n\nInstructor\n\n🤖\n\n0\n\nAI\n\nAll (0)\n🔒 Personal (0)\n👥 Shared (0)\n🎓 Instructor",
     "consoleErrors": [
       "Failed to load resource: net::ERR_CONNECTION_REFUSED",

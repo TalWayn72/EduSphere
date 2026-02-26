@@ -32,7 +32,9 @@ function getRoleBadgeColor(role: string): string {
 function getInitials(user: AuthUser): string {
   const first = user.firstName?.[0] ?? '';
   const last = user.lastName?.[0] ?? '';
-  return (first + last).toUpperCase() || (user.username[0] ?? 'U').toUpperCase();
+  return (
+    (first + last).toUpperCase() || (user.username[0] ?? 'U').toUpperCase()
+  );
 }
 
 export function UserMenu({ user }: UserMenuProps) {
@@ -48,7 +50,7 @@ export function UserMenu({ user }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex items-center gap-2 rounded-full p-1 hover:bg-accent transition-colors outline-none"
+          className="flex items-center gap-2 rounded-full p-1 hover:bg-accent transition-colors"
           aria-label="User menu"
         >
           <Avatar className="h-8 w-8">
@@ -67,8 +69,12 @@ export function UserMenu({ user }: UserMenuProps) {
             <p className="text-sm font-semibold">
               {user.firstName} {user.lastName}
             </p>
-            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-            <p className={`text-xs font-medium ${getRoleBadgeColor(user.role)}`}>
+            <p className="text-xs text-muted-foreground truncate">
+              {user.email}
+            </p>
+            <p
+              className={`text-xs font-medium ${getRoleBadgeColor(user.role)}`}
+            >
               {(user.role ?? '').replace('_', ' ')}
             </p>
           </div>

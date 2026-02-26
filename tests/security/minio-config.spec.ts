@@ -113,16 +113,14 @@ describe('G-07: Database SSL Mode', () => {
 
   it('withTenantContext helper enforces RLS tenant isolation', () => {
     const withTenantContext = readFile(
-      'packages/db/src/rls/withTenantContext.ts',
+      'packages/db/src/rls/withTenantContext.ts'
     );
     if (!withTenantContext) return; // file may not exist yet — advisory
     expect(withTenantContext).toContain('app.current_tenant');
   });
 
   it('user service uses tenant context wrapper (not raw DB queries)', () => {
-    const userService = readFile(
-      'apps/subgraph-core/src/user/user.service.ts',
-    );
+    const userService = readFile('apps/subgraph-core/src/user/user.service.ts');
     if (!userService || !userService.includes('db.')) return; // advisory
     expect(userService).toMatch(/withTenantContext|tenantContext/);
   });

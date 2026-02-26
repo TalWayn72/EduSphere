@@ -13,7 +13,7 @@ let schemaSDL = '';
 beforeAll(() => {
   if (!existsSync(SUPERGRAPH_PATH)) {
     throw new Error(
-      `supergraph.graphql not found at ${SUPERGRAPH_PATH}.\nRun: pnpm --filter @edusphere/gateway compose`,
+      `supergraph.graphql not found at ${SUPERGRAPH_PATH}.\nRun: pnpm --filter @edusphere/gateway compose`
     );
   }
   schemaSDL = readFileSync(SUPERGRAPH_PATH, 'utf-8');
@@ -41,7 +41,9 @@ describe('Schema Structural Validation', () => {
   });
 
   it('all @deprecated directives include a reason argument', () => {
-    const deprecatedWithReason = (schemaSDL.match(/@deprecated\(reason:/g) ?? []).length;
+    const deprecatedWithReason = (
+      schemaSDL.match(/@deprecated\(reason:/g) ?? []
+    ).length;
     const deprecatedTotal = (schemaSDL.match(/@deprecated/g) ?? []).length;
     // Every @deprecated must have a reason
     expect(deprecatedWithReason).toBe(deprecatedTotal);
@@ -52,12 +54,16 @@ describe('Schema Structural Validation', () => {
     const violations = inputTypeMatches
       .map((match) => match.replace(/^input\s+/, ''))
       .filter((name) => !name.endsWith('Input'));
-    expect(violations, `Input types not ending with 'Input': ${violations.join(', ')}`).toHaveLength(0);
+    expect(
+      violations,
+      `Input types not ending with 'Input': ${violations.join(', ')}`
+    ).toHaveLength(0);
   });
 
   it('has at least 6 entity types (join__type with key field)', () => {
     // Federation supergraph marks entities with @join__type(... key: "id") instead of @key(...)
-    const entityCount = (schemaSDL.match(/@join__type\([^)]*key:/g) ?? []).length;
+    const entityCount = (schemaSDL.match(/@join__type\([^)]*key:/g) ?? [])
+      .length;
     expect(entityCount).toBeGreaterThanOrEqual(6);
   });
 

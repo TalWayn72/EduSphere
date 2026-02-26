@@ -1,0 +1,29 @@
+type ContentItemMetric {
+  contentItemId: ID!
+  title: String!
+  viewCount: Int!
+  avgTimeSpentSeconds: Int!
+  completionRate: Float!
+}
+
+type FunnelStep {
+  moduleId: ID!
+  moduleName: String!
+  learnersStarted: Int!
+  learnersCompleted: Int!
+  dropOffRate: Float!
+}
+
+type CourseAnalytics {
+  courseId: ID!
+  enrollmentCount: Int!
+  activeLearnersLast7Days: Int!
+  completionRate: Float!
+  avgQuizScore: Float
+  contentItemMetrics: [ContentItemMetric!]!
+  dropOffFunnel: [FunnelStep!]!
+}
+
+extend type Query {
+  courseAnalytics(courseId: ID!): CourseAnalytics! @authenticated
+}

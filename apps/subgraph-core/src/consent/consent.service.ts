@@ -29,8 +29,8 @@ export class ConsentService {
         and(
           eq(schema.userConsents.userId, userId),
           eq(schema.userConsents.consentType, consentType),
-          eq(schema.userConsents.given, true),
-        ),
+          eq(schema.userConsents.given, true)
+        )
       );
 
     return rows.length > 0;
@@ -82,14 +82,18 @@ export class ConsentService {
     });
 
     this.logger.log(
-      { userId: params.userId, consentType: params.consentType, given: params.given },
-      'Consent updated',
+      {
+        userId: params.userId,
+        consentType: params.consentType,
+        given: params.given,
+      },
+      'Consent updated'
     );
   }
 
   async getUserConsents(
-    userId: string,
-  ): Promise<typeof schema.userConsents.$inferSelect[]> {
+    userId: string
+  ): Promise<(typeof schema.userConsents.$inferSelect)[]> {
     return this.db
       .select()
       .from(schema.userConsents)

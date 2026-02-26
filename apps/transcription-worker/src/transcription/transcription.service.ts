@@ -36,12 +36,14 @@ export class TranscriptionService {
     private readonly natsService: NatsService,
     private readonly conceptExtractor: ConceptExtractor,
     private readonly graphBuilder: GraphBuilder,
-    private readonly hlsService: HlsService,
+    private readonly hlsService: HlsService
   ) {}
 
   async transcribeFile(event: MediaUploadedEvent): Promise<void> {
     const { fileKey, assetId, courseId, tenantId } = event;
-    this.logger.log(`Starting transcription: assetId=${assetId} fileKey=${fileKey}`);
+    this.logger.log(
+      `Starting transcription: assetId=${assetId} fileKey=${fileKey}`
+    );
 
     let tempPath: string | null = null;
 
@@ -63,7 +65,7 @@ export class TranscriptionService {
         assetId,
         result.text,
         result.language ?? 'en',
-        result.segments,
+        result.segments
       );
 
       // Step 5: Mark as COMPLETED
@@ -78,8 +80,13 @@ export class TranscriptionService {
         segmentCount: result.segments.length,
         language: result.language ?? 'en',
       };
-      await this.natsService.publish('transcription.completed', completedEvent as any);
-      this.logger.log(`Transcription completed: assetId=${assetId} transcriptId=${transcriptId}`);
+      await this.natsService.publish(
+        'transcription.completed',
+        completedEvent as any
+      );
+      this.logger.log(
+        `Transcription completed: assetId=${assetId} transcriptId=${transcriptId}`
+      );
 
       // Step 7: Request embedding generation for all segments
       if (segmentIds.length > 0) {
@@ -100,7 +107,11 @@ export class TranscriptionService {
       // Step 8: Extract concepts and publish to knowledge graph pipeline
       // Non-blocking: errors here must not fail the transcription job.
       this.extractAndPublishConcepts(result.text, courseId, tenantId).catch(
-        (err) => this.logger.error({ err, assetId }, 'Concept pipeline error (non-fatal)')
+        (err) =>
+          this.logger.error(
+            { err, assetId },
+            'Concept pipeline error (non-fatal)'
+          )
       );
 
       // Step 9: HLS transcode (non-blocking, fire-and-forget)
@@ -110,15 +121,15 @@ export class TranscriptionService {
         .then(async (hlsResult) => {
           if (!hlsResult) return; // non-video asset — skipped silently
           this.logger.log(
-            `HLS transcode complete: assetId=${assetId} manifest=${hlsResult.manifestKey}`,
+            `HLS transcode complete: assetId=${assetId} manifest=${hlsResult.manifestKey}`
           );
           await this.updateAssetHlsManifest(assetId, hlsResult.manifestKey);
         })
         .catch((err) =>
           this.logger.error(
             { err, assetId },
-            'HLS transcode failed (non-fatal)',
-          ),
+            'HLS transcode failed (non-fatal)'
+          )
         );
     } catch (err) {
       this.logger.error(`Transcription failed for assetId=${assetId}`, err);
@@ -130,7 +141,10 @@ export class TranscriptionService {
         tenantId,
         error: err instanceof Error ? err.message : String(err),
       };
-      await this.natsService.publish('transcription.failed', failedEvent as any);
+      await this.natsService.publish(
+        'transcription.failed',
+        failedEvent as any
+      );
     } finally {
       // Step 7: Clean up temp file
       if (tempPath) {
@@ -148,7 +162,11 @@ export class TranscriptionService {
     courseId: string,
     tenantId: string
   ): Promise<void> {
-    const concepts = await this.conceptExtractor.extract(fullText, courseId, tenantId);
+    const concepts = await this.conceptExtractor.extract(
+      fullText,
+      courseId,
+      tenantId
+    );
     await this.graphBuilder.publishConcepts(concepts, courseId, tenantId);
   }
 
@@ -156,7 +174,12 @@ export class TranscriptionService {
     assetId: string,
     fullText: string,
     language: string,
-    segments: Array<{ start: number; end: number; text: string; speaker?: string }>,
+    segments: Array<{
+      start: number;
+      end: number;
+      text: string;
+      speaker?: string;
+    }>
   ): Promise<{ transcriptId: string; segmentIds: string[] }> {
     const [transcript] = await this.db
       .insert(schema.transcripts)
@@ -194,7 +217,7 @@ export class TranscriptionService {
 
   private async updateAssetStatus(
     assetId: string,
-    status: 'PROCESSING' | 'COMPLETED' | 'FAILED',
+    status: 'PROCESSING' | 'COMPLETED' | 'FAILED'
   ): Promise<void> {
     await this.db
       .update(schema.media_assets)
@@ -204,7 +227,7 @@ export class TranscriptionService {
 
   private async updateAssetHlsManifest(
     assetId: string,
-    manifestKey: string,
+    manifestKey: string
   ): Promise<void> {
     await this.db
       .update(schema.media_assets)

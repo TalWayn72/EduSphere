@@ -1,16 +1,40 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPgQuery, MockPool, mockPing, MockRedis, routeHandlers, mockRouterGet, MockExpressRouter } = vi.hoisted(() => {
+const {
+  mockPgQuery,
+  MockPool,
+  mockPing,
+  MockRedis,
+  routeHandlers,
+  mockRouterGet,
+  MockExpressRouter,
+} = vi.hoisted(() => {
   const mockPgQuery = vi.fn();
-  const MockPool = vi.fn(function() { return { query: mockPgQuery }; });
+  const MockPool = vi.fn(function () {
+    return { query: mockPgQuery };
+  });
   const mockPing = vi.fn();
-  const MockRedis = vi.fn(function() { return { ping: mockPing }; });
+  const MockRedis = vi.fn(function () {
+    return { ping: mockPing };
+  });
   const routeHandlers: Record<string, (...args: unknown[]) => unknown> = {};
   const MockExpressRouter = vi.fn();
-  const mockRouterGet = vi.fn().mockImplementation((path: string, handler: (...args: unknown[]) => unknown) => {
-    routeHandlers[path] = handler;
-  });
-  return { mockPgQuery, MockPool, mockPing, MockRedis, routeHandlers, mockRouterGet, MockExpressRouter };
+  const mockRouterGet = vi
+    .fn()
+    .mockImplementation(
+      (path: string, handler: (...args: unknown[]) => unknown) => {
+        routeHandlers[path] = handler;
+      }
+    );
+  return {
+    mockPgQuery,
+    MockPool,
+    mockPing,
+    MockRedis,
+    routeHandlers,
+    mockRouterGet,
+    MockExpressRouter,
+  };
 });
 
 vi.mock('pg', () => ({ Pool: MockPool }));
@@ -27,12 +51,18 @@ describe('HealthService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRouterGet.mockImplementation((path: string, handler: (...args: unknown[]) => unknown) => {
-      routeHandlers[path] = handler;
-    });
+    mockRouterGet.mockImplementation(
+      (path: string, handler: (...args: unknown[]) => unknown) => {
+        routeHandlers[path] = handler;
+      }
+    );
     MockExpressRouter.mockReturnValue({ get: mockRouterGet });
-    MockPool.mockImplementation(function() { return { query: mockPgQuery }; });
-    MockRedis.mockImplementation(function() { return { ping: mockPing }; });
+    MockPool.mockImplementation(function () {
+      return { query: mockPgQuery };
+    });
+    MockRedis.mockImplementation(function () {
+      return { ping: mockPing };
+    });
     service = new HealthService('2.0.0');
   });
 
@@ -56,7 +86,9 @@ describe('HealthService', () => {
   describe('configurePG()', () => {
     it('creates a pg Pool with the given connection string', () => {
       service.configurePG('postgresql://localhost/edusphere');
-      expect(MockPool).toHaveBeenCalledWith({ connectionString: 'postgresql://localhost/edusphere' });
+      expect(MockPool).toHaveBeenCalledWith({
+        connectionString: 'postgresql://localhost/edusphere',
+      });
     });
   });
 
@@ -161,19 +193,37 @@ describe('HealthService', () => {
       expect(check.message).toMatch(/MB/);
     });
     it('reports unhealthy when heap usage exceeds 90%', async () => {
-      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 950*1024*1024, heapTotal: 1000*1024*1024, rss: 1024*1024*1024, external: 0, arrayBuffers: 0 });
+      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({
+        heapUsed: 950 * 1024 * 1024,
+        heapTotal: 1000 * 1024 * 1024,
+        rss: 1024 * 1024 * 1024,
+        external: 0,
+        arrayBuffers: 0,
+      });
       const check = await service.checkMemory();
       expect(check.status).toBe('unhealthy');
       spy.mockRestore();
     });
     it('reports degraded when heap usage is between 80% and 90%', async () => {
-      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 850*1024*1024, heapTotal: 1000*1024*1024, rss: 1024*1024*1024, external: 0, arrayBuffers: 0 });
+      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({
+        heapUsed: 850 * 1024 * 1024,
+        heapTotal: 1000 * 1024 * 1024,
+        rss: 1024 * 1024 * 1024,
+        external: 0,
+        arrayBuffers: 0,
+      });
       const check = await service.checkMemory();
       expect(check.status).toBe('degraded');
       spy.mockRestore();
     });
     it('reports healthy when heap usage is below 80%', async () => {
-      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 500*1024*1024, heapTotal: 1000*1024*1024, rss: 1024*1024*1024, external: 0, arrayBuffers: 0 });
+      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({
+        heapUsed: 500 * 1024 * 1024,
+        heapTotal: 1000 * 1024 * 1024,
+        rss: 1024 * 1024 * 1024,
+        external: 0,
+        arrayBuffers: 0,
+      });
       const check = await service.checkMemory();
       expect(check.status).toBe('healthy');
       spy.mockRestore();
@@ -223,7 +273,13 @@ describe('HealthService', () => {
       service.configurePG('postgresql://localhost/test');
       mockPing.mockResolvedValue('PONG');
       service.configureRedis('redis://localhost:6379');
-      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 400*1024*1024, heapTotal: 1000*1024*1024, rss: 500*1024*1024, external: 0, arrayBuffers: 0 });
+      const spy = vi.spyOn(process, 'memoryUsage').mockReturnValue({
+        heapUsed: 400 * 1024 * 1024,
+        heapTotal: 1000 * 1024 * 1024,
+        rss: 500 * 1024 * 1024,
+        external: 0,
+        arrayBuffers: 0,
+      });
       const report = await service.getHealthReport();
       expect(report.status).toBe('healthy');
       spy.mockRestore();
@@ -241,32 +297,58 @@ describe('HealthService', () => {
     });
     it('registers GET /health/live route', () => {
       service.createHealthEndpoint();
-      expect(mockRouterGet).toHaveBeenCalledWith('/health/live', expect.any(Function));
+      expect(mockRouterGet).toHaveBeenCalledWith(
+        '/health/live',
+        expect.any(Function)
+      );
     });
     it('registers GET /health/ready route', () => {
       service.createHealthEndpoint();
-      expect(mockRouterGet).toHaveBeenCalledWith('/health/ready', expect.any(Function));
+      expect(mockRouterGet).toHaveBeenCalledWith(
+        '/health/ready',
+        expect.any(Function)
+      );
     });
     it('registers GET /health route', () => {
       service.createHealthEndpoint();
-      expect(mockRouterGet).toHaveBeenCalledWith('/health', expect.any(Function));
+      expect(mockRouterGet).toHaveBeenCalledWith(
+        '/health',
+        expect.any(Function)
+      );
     });
     it('/health/live handler responds with alive status', () => {
       service.createHealthEndpoint();
-      const handler = routeHandlers['/health/live'] as (req: unknown, res: { json: ReturnType<typeof vi.fn> }) => void;
+      const handler = routeHandlers['/health/live'] as (
+        req: unknown,
+        res: { json: ReturnType<typeof vi.fn> }
+      ) => void;
       const mockRes = { json: vi.fn() };
       handler({}, mockRes);
-      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({ status: 'alive' }));
+      expect(mockRes.json).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'alive' })
+      );
     });
     it('/health/ready handler returns 200 for healthy status', async () => {
       mockPgQuery.mockResolvedValue({ rows: [{ health: 1 }] });
       service.configurePG('postgresql://localhost/test');
       mockPing.mockResolvedValue('PONG');
       service.configureRedis('redis://localhost:6379');
-      vi.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 400*1024*1024, heapTotal: 1000*1024*1024, rss: 500*1024*1024, external: 0, arrayBuffers: 0 });
+      vi.spyOn(process, 'memoryUsage').mockReturnValue({
+        heapUsed: 400 * 1024 * 1024,
+        heapTotal: 1000 * 1024 * 1024,
+        rss: 500 * 1024 * 1024,
+        external: 0,
+        arrayBuffers: 0,
+      });
       service.createHealthEndpoint();
-      type ResType = { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> };
-      const handler = routeHandlers['/health/ready'] as (req: unknown, res: ResType) => Promise<void>;
+      type ResType = {
+        status: ReturnType<typeof vi.fn>;
+        json: ReturnType<typeof vi.fn>;
+      };
+      const handler = routeHandlers['/health/ready'] as (
+        req: unknown,
+        res: ResType
+      ) => Promise<void>;
       const mockResJson = vi.fn();
       const mockResStatus = vi.fn().mockReturnValue({ json: mockResJson });
       await handler({}, { status: mockResStatus, json: mockResJson });
@@ -279,8 +361,14 @@ describe('HealthService', () => {
       mockPing.mockRejectedValue(new Error('Redis down'));
       service.configureRedis('redis://localhost:6379');
       service.createHealthEndpoint();
-      type ResType = { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> };
-      const handler = routeHandlers['/health/ready'] as (req: unknown, res: ResType) => Promise<void>;
+      type ResType = {
+        status: ReturnType<typeof vi.fn>;
+        json: ReturnType<typeof vi.fn>;
+      };
+      const handler = routeHandlers['/health/ready'] as (
+        req: unknown,
+        res: ResType
+      ) => Promise<void>;
       const mockResJson = vi.fn();
       const mockResStatus = vi.fn().mockReturnValue({ json: mockResJson });
       await handler({}, { status: mockResStatus, json: mockResJson });
@@ -288,8 +376,14 @@ describe('HealthService', () => {
     });
     it('/health/ready handler returns 200 for degraded status', async () => {
       service.createHealthEndpoint();
-      type ResType = { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> };
-      const handler = routeHandlers['/health/ready'] as (req: unknown, res: ResType) => Promise<void>;
+      type ResType = {
+        status: ReturnType<typeof vi.fn>;
+        json: ReturnType<typeof vi.fn>;
+      };
+      const handler = routeHandlers['/health/ready'] as (
+        req: unknown,
+        res: ResType
+      ) => Promise<void>;
       const mockResJson = vi.fn();
       const mockResStatus = vi.fn().mockReturnValue({ json: mockResJson });
       await handler({}, { status: mockResStatus, json: mockResJson });
@@ -300,10 +394,22 @@ describe('HealthService', () => {
       service.configurePG('postgresql://localhost/test');
       mockPing.mockResolvedValue('PONG');
       service.configureRedis('redis://localhost:6379');
-      vi.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 400*1024*1024, heapTotal: 1000*1024*1024, rss: 500*1024*1024, external: 0, arrayBuffers: 0 });
+      vi.spyOn(process, 'memoryUsage').mockReturnValue({
+        heapUsed: 400 * 1024 * 1024,
+        heapTotal: 1000 * 1024 * 1024,
+        rss: 500 * 1024 * 1024,
+        external: 0,
+        arrayBuffers: 0,
+      });
       service.createHealthEndpoint();
-      type ResType = { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> };
-      const handler = routeHandlers['/health'] as (req: unknown, res: ResType) => Promise<void>;
+      type ResType = {
+        status: ReturnType<typeof vi.fn>;
+        json: ReturnType<typeof vi.fn>;
+      };
+      const handler = routeHandlers['/health'] as (
+        req: unknown,
+        res: ResType
+      ) => Promise<void>;
       const mockResJson = vi.fn();
       const mockResStatus = vi.fn().mockReturnValue({ json: mockResJson });
       await handler({}, { status: mockResStatus, json: mockResJson });
@@ -316,8 +422,14 @@ describe('HealthService', () => {
       mockPing.mockRejectedValue(new Error('Redis down'));
       service.configureRedis('redis://localhost:6379');
       service.createHealthEndpoint();
-      type ResType = { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> };
-      const handler = routeHandlers['/health'] as (req: unknown, res: ResType) => Promise<void>;
+      type ResType = {
+        status: ReturnType<typeof vi.fn>;
+        json: ReturnType<typeof vi.fn>;
+      };
+      const handler = routeHandlers['/health'] as (
+        req: unknown,
+        res: ResType
+      ) => Promise<void>;
       const mockResJson = vi.fn();
       const mockResStatus = vi.fn().mockReturnValue({ json: mockResJson });
       await handler({}, { status: mockResStatus, json: mockResJson });
@@ -325,8 +437,14 @@ describe('HealthService', () => {
     });
     it('/health handler returns 200 for degraded status', async () => {
       service.createHealthEndpoint();
-      type ResType = { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> };
-      const handler = routeHandlers['/health'] as (req: unknown, res: ResType) => Promise<void>;
+      type ResType = {
+        status: ReturnType<typeof vi.fn>;
+        json: ReturnType<typeof vi.fn>;
+      };
+      const handler = routeHandlers['/health'] as (
+        req: unknown,
+        res: ResType
+      ) => Promise<void>;
       const mockResJson = vi.fn();
       const mockResStatus = vi.fn().mockReturnValue({ json: mockResJson });
       await handler({}, { status: mockResStatus, json: mockResJson });

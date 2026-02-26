@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { ollamaConfig } from '@edusphere/config';
 
 /**
  * Thin HTTP client for Ollama / OpenAI embeddings.
@@ -22,10 +23,10 @@ interface OpenAIEmbeddingResponse {
 export async function embed(text: string): Promise<number[]> {
   const ollamaUrl = process.env.OLLAMA_URL;
   const openaiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.EMBEDDING_MODEL ?? 'nomic-embed-text';
+  const model = ollamaConfig.embeddingModel;
 
   if (ollamaUrl) {
-    return embedWithOllama(ollamaUrl, model, text);
+    return embedWithOllama(ollamaConfig.url, model, text);
   }
 
   if (openaiKey) {
@@ -77,7 +78,7 @@ async function embedWithOpenAI(
     body: JSON.stringify({
       model: 'text-embedding-3-small',
       input: text,
-      dimensions: 768,
+      dimensions: ollamaConfig.embeddingDimension,
     }),
   });
 

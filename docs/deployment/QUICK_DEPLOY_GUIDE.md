@@ -453,6 +453,7 @@ docker compose -f docker-compose.prod.yml run --rm seeder
 ```
 
 **Demo accounts created (password: `Demo123!`):**
+
 - admin@edusphere.dev (Super Admin)
 - orgadmin@edusphere.dev (Org Admin)
 - instructor@edusphere.dev (Instructor)
@@ -490,41 +491,41 @@ services:
     container_name: edusphere-traefik
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"  # Traefik dashboard (restrict in production)
+      - '80:80'
+      - '443:443'
+      - '8080:8080' # Traefik dashboard (restrict in production)
     command:
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.caserver=${ACME_CA_SERVER}"
-      - "--metrics.prometheus=true"
-      - "--log.level=INFO"
+      - '--api.dashboard=true'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.websecure.address=:443'
+      - '--certificatesresolvers.letsencrypt.acme.httpchallenge=true'
+      - '--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web'
+      - '--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}'
+      - '--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json'
+      - '--certificatesresolvers.letsencrypt.acme.caserver=${ACME_CA_SERVER}'
+      - '--metrics.prometheus=true'
+      - '--log.level=INFO'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt_data:/letsencrypt
     networks:
       - edusphere-network
     labels:
-      - "traefik.enable=true"
+      - 'traefik.enable=true'
       # HTTP to HTTPS redirect
-      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - 'traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)'
+      - 'traefik.http.routers.http-catchall.entrypoints=web'
+      - 'traefik.http.routers.http-catchall.middlewares=redirect-to-https'
+      - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
       # Dashboard
-      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.${DOMAIN}`)"
-      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
-      - "traefik.http.routers.traefik-dashboard.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.traefik-dashboard.service=api@internal"
-      - "traefik.http.routers.traefik-dashboard.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
+      - 'traefik.http.routers.traefik-dashboard.rule=Host(`traefik.${DOMAIN}`)'
+      - 'traefik.http.routers.traefik-dashboard.entrypoints=websecure'
+      - 'traefik.http.routers.traefik-dashboard.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.traefik-dashboard.service=api@internal'
+      - 'traefik.http.routers.traefik-dashboard.middlewares=traefik-auth'
+      - 'traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}'
 
   # ==========================================
   # DATABASE (PostgreSQL 16 + AGE + pgvector)
@@ -544,7 +545,7 @@ services:
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -577,11 +578,11 @@ services:
     networks:
       - edusphere-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`auth.${DOMAIN}`)"
-      - "traefik.http.routers.keycloak.entrypoints=websecure"
-      - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
-      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.keycloak.rule=Host(`auth.${DOMAIN}`)'
+      - 'traefik.http.routers.keycloak.entrypoints=websecure'
+      - 'traefik.http.routers.keycloak.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.keycloak.loadbalancer.server.port=8080'
 
   # ==========================================
   # MESSAGING (NATS JetStream)
@@ -591,17 +592,17 @@ services:
     container_name: edusphere-nats
     restart: unless-stopped
     command:
-      - "--jetstream"
-      - "--store_dir=/data"
-      - "--user=${NATS_USER}"
-      - "--pass=${NATS_PASSWORD}"
-      - "--max_payload=8MB"
+      - '--jetstream'
+      - '--store_dir=/data'
+      - '--user=${NATS_USER}'
+      - '--pass=${NATS_PASSWORD}'
+      - '--max_payload=8MB'
     volumes:
       - nats_data:/data
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz"]
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8222/healthz']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -622,22 +623,22 @@ services:
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 10s
       timeout: 5s
       retries: 5
     labels:
-      - "traefik.enable=true"
+      - 'traefik.enable=true'
       # MinIO API
-      - "traefik.http.routers.minio-api.rule=Host(`cdn.${DOMAIN}`)"
-      - "traefik.http.routers.minio-api.entrypoints=websecure"
-      - "traefik.http.routers.minio-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
+      - 'traefik.http.routers.minio-api.rule=Host(`cdn.${DOMAIN}`)'
+      - 'traefik.http.routers.minio-api.entrypoints=websecure'
+      - 'traefik.http.routers.minio-api.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.minio-api.loadbalancer.server.port=9000'
       # MinIO Console
-      - "traefik.http.routers.minio-console.rule=Host(`minio.${DOMAIN}`)"
-      - "traefik.http.routers.minio-console.entrypoints=websecure"
-      - "traefik.http.routers.minio-console.tls.certresolver=letsencrypt"
-      - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+      - 'traefik.http.routers.minio-console.rule=Host(`minio.${DOMAIN}`)'
+      - 'traefik.http.routers.minio-console.entrypoints=websecure'
+      - 'traefik.http.routers.minio-console.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.minio-console.loadbalancer.server.port=9001'
 
   # ==========================================
   # GRAPHQL GATEWAY (Hive Gateway v2)
@@ -669,13 +670,13 @@ services:
     networks:
       - edusphere-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.gateway.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/graphql`)"
-      - "traefik.http.routers.gateway.entrypoints=websecure"
-      - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
-      - "traefik.http.services.gateway.loadbalancer.server.port=4000"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.gateway.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/graphql`)'
+      - 'traefik.http.routers.gateway.entrypoints=websecure'
+      - 'traefik.http.routers.gateway.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.gateway.loadbalancer.server.port=4000'
     deploy:
-      replicas: 3  # HA setup
+      replicas: 3 # HA setup
       resources:
         limits:
           memory: 2G
@@ -768,7 +769,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 4G  # Higher memory for AI operations
+          memory: 4G # Higher memory for AI operations
 
   subgraph-knowledge:
     image: edusphere/subgraph-knowledge:latest
@@ -799,11 +800,11 @@ services:
     networks:
       - edusphere-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.web.entrypoints=websecure"
-      - "traefik.http.routers.web.tls.certresolver=letsencrypt"
-      - "traefik.http.services.web.loadbalancer.server.port=80"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.web.rule=Host(`${DOMAIN}`)'
+      - 'traefik.http.routers.web.entrypoints=websecure'
+      - 'traefik.http.routers.web.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.web.loadbalancer.server.port=80'
 
   # ==========================================
   # MONITORING (Prometheus + Grafana + Jaeger)
@@ -822,11 +823,11 @@ services:
     networks:
       - edusphere-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)"
-      - "traefik.http.routers.prometheus.entrypoints=websecure"
-      - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
-      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)'
+      - 'traefik.http.routers.prometheus.entrypoints=websecure'
+      - 'traefik.http.routers.prometheus.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.prometheus.loadbalancer.server.port=9090'
 
   grafana:
     image: grafana/grafana:latest
@@ -843,11 +844,11 @@ services:
     networks:
       - edusphere-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
-      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)'
+      - 'traefik.http.routers.grafana.entrypoints=websecure'
+      - 'traefik.http.routers.grafana.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.grafana.loadbalancer.server.port=3000'
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -856,17 +857,17 @@ services:
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: :9411
       SPAN_STORAGE_TYPE: badger
-      BADGER_EPHEMERAL: "false"
+      BADGER_EPHEMERAL: 'false'
       BADGER_DIRECTORY_VALUE: /badger/data
       BADGER_DIRECTORY_KEY: /badger/key
     networks:
       - edusphere-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.jaeger.rule=Host(`jaeger.${DOMAIN}`)"
-      - "traefik.http.routers.jaeger.entrypoints=websecure"
-      - "traefik.http.routers.jaeger.tls.certresolver=letsencrypt"
-      - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jaeger.rule=Host(`jaeger.${DOMAIN}`)'
+      - 'traefik.http.routers.jaeger.entrypoints=websecure'
+      - 'traefik.http.routers.jaeger.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.jaeger.loadbalancer.server.port=16686'
 ```
 
 ### 4.2 Deploy All Services
@@ -975,25 +976,25 @@ tls:
 
 Configure the following DNS records with your domain registrar:
 
-| Type | Name | Value | TTL |
-|------|------|-------|-----|
-| A | @ | `YOUR_SERVER_IP` | 300 |
-| A | www | `YOUR_SERVER_IP` | 300 |
-| A | auth | `YOUR_SERVER_IP` | 300 |
-| A | cdn | `YOUR_SERVER_IP` | 300 |
-| A | minio | `YOUR_SERVER_IP` | 300 |
-| A | grafana | `YOUR_SERVER_IP` | 300 |
-| A | prometheus | `YOUR_SERVER_IP` | 300 |
-| A | jaeger | `YOUR_SERVER_IP` | 300 |
-| A | traefik | `YOUR_SERVER_IP` | 300 |
-| CNAME | api | `edusphere.yourdomain.com` | 300 |
+| Type  | Name       | Value                      | TTL |
+| ----- | ---------- | -------------------------- | --- |
+| A     | @          | `YOUR_SERVER_IP`           | 300 |
+| A     | www        | `YOUR_SERVER_IP`           | 300 |
+| A     | auth       | `YOUR_SERVER_IP`           | 300 |
+| A     | cdn        | `YOUR_SERVER_IP`           | 300 |
+| A     | minio      | `YOUR_SERVER_IP`           | 300 |
+| A     | grafana    | `YOUR_SERVER_IP`           | 300 |
+| A     | prometheus | `YOUR_SERVER_IP`           | 300 |
+| A     | jaeger     | `YOUR_SERVER_IP`           | 300 |
+| A     | traefik    | `YOUR_SERVER_IP`           | 300 |
+| CNAME | api        | `edusphere.yourdomain.com` | 300 |
 
 **Optional (if using Cloudflare CDN):**
 
-| Type | Name | Value | Proxy Status |
-|------|------|-------|--------------|
-| A | @ | `YOUR_SERVER_IP` | Proxied |
-| CNAME | cdn | `edusphere.yourdomain.com` | Proxied |
+| Type  | Name | Value                      | Proxy Status |
+| ----- | ---- | -------------------------- | ------------ |
+| A     | @    | `YOUR_SERVER_IP`           | Proxied      |
+| CNAME | cdn  | `edusphere.yourdomain.com` | Proxied      |
 
 ### 6.2 Verify DNS Propagation
 
@@ -1550,8 +1551,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "{{ $labels.job }} is down"
-          description: "{{ $labels.job }} has been down for more than 1 minute."
+          summary: '{{ $labels.job }} is down'
+          description: '{{ $labels.job }} has been down for more than 1 minute.'
 
       # High error rate
       - alert: HighErrorRate
@@ -1560,8 +1561,8 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "High error rate on {{ $labels.service }}"
-          description: "Error rate is {{ $value }}% on {{ $labels.service }}"
+          summary: 'High error rate on {{ $labels.service }}'
+          description: 'Error rate is {{ $value }}% on {{ $labels.service }}'
 
       # Database connection issues
       - alert: DatabaseDown
@@ -1570,8 +1571,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "PostgreSQL database is down"
-          description: "Cannot connect to PostgreSQL database."
+          summary: 'PostgreSQL database is down'
+          description: 'Cannot connect to PostgreSQL database.'
 
       # High response time
       - alert: HighResponseTime
@@ -1580,8 +1581,8 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "High response time on {{ $labels.service }}"
-          description: "P95 response time is {{ $value }}s on {{ $labels.service }}"
+          summary: 'High response time on {{ $labels.service }}'
+          description: 'P95 response time is {{ $value }}s on {{ $labels.service }}'
 
       # Disk space
       - alert: DiskSpaceLow
@@ -1590,8 +1591,8 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Low disk space"
-          description: "Only {{ $value | humanizePercentage }} disk space remaining."
+          summary: 'Low disk space'
+          description: 'Only {{ $value | humanizePercentage }} disk space remaining.'
 
       # Memory usage
       - alert: HighMemoryUsage
@@ -1600,8 +1601,8 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "High memory usage"
-          description: "Memory usage is {{ $value | humanizePercentage }}."
+          summary: 'High memory usage'
+          description: 'Memory usage is {{ $value | humanizePercentage }}.'
 
       # SSL certificate expiration
       - alert: SSLCertificateExpiringSoon
@@ -1610,8 +1611,8 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "SSL certificate expiring soon"
-          description: "SSL certificate for {{ $labels.domain }} expires in {{ $value }} days."
+          summary: 'SSL certificate expiring soon'
+          description: 'SSL certificate for {{ $labels.domain }} expires in {{ $value }} days.'
 ```
 
 ### 10.4 Access Monitoring Dashboards
@@ -1639,6 +1640,7 @@ https://traefik.yourdomain.com
 ### 11.1 SSL Certificate Not Generating
 
 **Symptoms:**
+
 - HTTPS not working
 - Certificate errors in browser
 
@@ -1670,6 +1672,7 @@ docker restart edusphere-traefik
 ### 11.2 Database Connection Errors
 
 **Symptoms:**
+
 - GraphQL errors: "Cannot connect to database"
 - Services failing health checks
 
@@ -1700,6 +1703,7 @@ docker restart edusphere-postgres
 ### 11.3 GraphQL Federation Errors
 
 **Symptoms:**
+
 - Gateway returns 500 errors
 - Subgraph composition fails
 
@@ -1727,6 +1731,7 @@ docker compose -f docker-compose.prod.yml restart gateway subgraph-core subgraph
 ### 11.4 High Memory Usage
 
 **Symptoms:**
+
 - OOM (Out of Memory) errors
 - Containers being killed
 
@@ -1760,6 +1765,7 @@ sudo swapon /swapfile
 ### 11.5 MinIO Connection Issues
 
 **Symptoms:**
+
 - File upload failures
 - Presigned URL errors
 
@@ -1789,6 +1795,7 @@ docker exec edusphere-minio mc mb local/edusphere
 ### 11.6 Keycloak Authentication Errors
 
 **Symptoms:**
+
 - Login failures
 - JWT validation errors
 
@@ -1822,6 +1829,7 @@ docker restart edusphere-keycloak
 ### 11.7 Slow Query Performance
 
 **Symptoms:**
+
 - High API response times
 - Database CPU at 100%
 
@@ -1856,44 +1864,48 @@ docker exec edusphere-postgres psql -U edusphere_app -d edusphere -c "VACUUM ANA
 
 ### 12.1 Internal Team
 
-| Role | Contact | Availability |
-|------|---------|--------------|
-| **DevOps Lead** | devops@yourcompany.com | 24/7 (on-call) |
-| **Backend Lead** | backend@yourcompany.com | Mon-Fri 9am-6pm EST |
-| **Database Admin** | dba@yourcompany.com | Mon-Fri 9am-6pm EST |
-| **Security Team** | security@yourcompany.com | 24/7 (critical issues) |
+| Role               | Contact                  | Availability           |
+| ------------------ | ------------------------ | ---------------------- |
+| **DevOps Lead**    | devops@yourcompany.com   | 24/7 (on-call)         |
+| **Backend Lead**   | backend@yourcompany.com  | Mon-Fri 9am-6pm EST    |
+| **Database Admin** | dba@yourcompany.com      | Mon-Fri 9am-6pm EST    |
+| **Security Team**  | security@yourcompany.com | 24/7 (critical issues) |
 
 ### 12.2 Escalation Procedure
 
 **P1 - Critical (Production Down):**
+
 1. Contact DevOps Lead immediately (Slack: @devops-oncall)
 2. Create incident ticket: https://tickets.yourcompany.com
 3. If no response in 15 minutes, escalate to CTO
 
 **P2 - High (Degraded Performance):**
+
 1. Contact Backend Lead via email
 2. Create ticket with performance metrics
 3. Escalate to DevOps if unresolved in 2 hours
 
 **P3 - Medium (Non-critical Issues):**
+
 1. Create ticket with detailed description
 2. Assign to appropriate team
 3. Expect response within 24 hours
 
 **P4 - Low (Questions, Documentation):**
+
 1. Post in #edusphere-support Slack channel
 2. Check documentation: https://docs.edusphere.yourdomain.com
 
 ### 12.3 External Vendor Support
 
-| Service | Support Portal | SLA |
-|---------|---------------|-----|
+| Service        | Support Portal                      | SLA                     |
+| -------------- | ----------------------------------- | ----------------------- |
 | **PostgreSQL** | https://www.postgresql.org/support/ | Community (best effort) |
-| **Keycloak** | https://www.keycloak.org/support | Community (best effort) |
-| **Traefik** | https://traefik.io/support/ | Community (best effort) |
-| **OpenAI** | https://help.openai.com | Paid (24-hour response) |
-| **Anthropic** | https://support.anthropic.com | Paid (24-hour response) |
-| **Cloudflare** | https://dash.cloudflare.com | Varies by plan |
+| **Keycloak**   | https://www.keycloak.org/support    | Community (best effort) |
+| **Traefik**    | https://traefik.io/support/         | Community (best effort) |
+| **OpenAI**     | https://help.openai.com             | Paid (24-hour response) |
+| **Anthropic**  | https://support.anthropic.com       | Paid (24-hour response) |
+| **Cloudflare** | https://dash.cloudflare.com         | Varies by plan          |
 
 ### 12.4 Community Resources
 

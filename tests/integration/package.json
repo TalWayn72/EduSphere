@@ -1,0 +1,17 @@
+{
+  "name": "@edusphere/integration-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@edusphere/nats-client": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.18",
+    "typescript": "^5.9.3"
+  }
+}

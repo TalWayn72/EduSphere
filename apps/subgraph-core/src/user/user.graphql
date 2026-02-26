@@ -6,6 +6,7 @@ type UserPreferences {
   theme: String!
   emailNotifications: Boolean!
   pushNotifications: Boolean!
+  isPublicProfile: Boolean!
 }
 
 type User @key(fields: "id") {
@@ -41,6 +42,39 @@ type DayActivity {
   count: Int!
 }
 
+type PublicCourse {
+  id: ID!
+  title: String!
+  completedAt: DateTime!
+}
+
+type PublicProfile {
+  userId: ID!
+  displayName: String!
+  bio: String
+  avatarUrl: String
+  joinedAt: DateTime!
+  currentStreak: Int!
+  longestStreak: Int!
+  completedCoursesCount: Int!
+  completedCourses: [PublicCourse!]!
+  badgesCount: Int!
+  conceptsMastered: Int!
+  totalLearningMinutes: Int!
+}
+
+type BulkImportResult {
+  created: Int!
+  updated: Int!
+  failed: Int!
+  errors: [String!]!
+}
+
+type AdminUsersResult {
+  users: [User!]!
+  total: Int!
+}
+
 type Query {
   _health: String! @shareable
   user(id: ID!): User
@@ -50,6 +84,14 @@ type Query {
   ): [User!]!
   me: User
   myStats: UserStats! @authenticated
+  publicProfile(userId: ID!): PublicProfile
+  # Admin: get all users with filters
+  adminUsers(
+    limit: Int = 50
+    offset: Int = 0
+    search: String
+    role: UserRole
+  ): AdminUsersResult! @authenticated @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
 }
 
 type Mutation {
@@ -65,6 +107,23 @@ type Mutation {
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
   # Self-service: any authenticated user may update their own preferences
   updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
+  # Toggle public profile visibility (self-service)
+  updateProfileVisibility(isPublic: Boolean!): UserPreferences! @authenticated
+  # Soft-deactivate a user (admin only)
+  deactivateUser(id: ID!): Boolean!
+    @authenticated
+    @requiresScopes(scopes: ["write:users"])
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+  # Trigger Keycloak password reset email (admin only)
+  resetUserPassword(userId: ID!): Boolean!
+    @authenticated
+    @requiresScopes(scopes: ["write:users"])
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+  # Bulk import users from CSV data (admin only)
+  bulkImportUsers(csvData: String!): BulkImportResult!
+    @authenticated
+    @requiresScopes(scopes: ["write:users"])
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
 }
 
 input CreateUserInput {

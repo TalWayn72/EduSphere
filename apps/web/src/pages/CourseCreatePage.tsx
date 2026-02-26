@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -11,10 +11,22 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
+// Step 1 is shown immediately — keep eager
 import { CourseWizardStep1 } from './CourseWizardStep1';
-import { CourseWizardStep2 } from './CourseWizardStep2';
-import { CourseWizardMediaStep } from './CourseWizardMediaStep';
-import { CourseWizardStep3 } from './CourseWizardStep3';
+// Steps 2–4 are lazy: avoids pulling TipTap+KaTeX (~450 KB) on initial page load.
+// RichEditor (TipTap StarterKit + 8 extensions + lowlight + KaTeX) lives in
+// CourseWizardMediaStep and must NOT be downloaded until the user reaches step 2.
+const CourseWizardStep2 = lazy(() =>
+  import('./CourseWizardStep2').then((m) => ({ default: m.CourseWizardStep2 }))
+);
+const CourseWizardMediaStep = lazy(() =>
+  import('./CourseWizardMediaStep').then((m) => ({
+    default: m.CourseWizardMediaStep,
+  }))
+);
+const CourseWizardStep3 = lazy(() =>
+  import('./CourseWizardStep3').then((m) => ({ default: m.CourseWizardStep3 }))
+);
 import {
   DEFAULT_FORM,
   type CourseFormData,
@@ -26,7 +38,10 @@ import { getCurrentUser } from '@/lib/auth';
 // ── Zod schema for Step 1 fields ─────────────────────────────────────────────
 export const courseSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters').or(z.literal('')),
+  description: z
+    .string()
+    .min(10, 'Description must be at least 10 characters')
+    .or(z.literal('')),
   difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   duration: z.string().optional(),
   thumbnail: z.string().min(1, 'Thumbnail required'),
@@ -66,10 +81,22 @@ export function CourseCreatePage() {
   const user = getCurrentUser();
 
   const STEPS = [
-    { label: t('wizard.step1Label'), description: t('wizard.step1Description') },
-    { label: t('wizard.step2Label'), description: t('wizard.step2Description') },
-    { label: t('wizard.mediaLabel'), description: t('wizard.mediaDescription') },
-    { label: t('wizard.publishLabel'), description: t('wizard.publishDescription') },
+    {
+      label: t('wizard.step1Label'),
+      description: t('wizard.step1Description'),
+    },
+    {
+      label: t('wizard.step2Label'),
+      description: t('wizard.step2Description'),
+    },
+    {
+      label: t('wizard.mediaLabel'),
+      description: t('wizard.mediaDescription'),
+    },
+    {
+      label: t('wizard.publishLabel'),
+      description: t('wizard.publishDescription'),
+    },
   ];
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
@@ -87,9 +114,10 @@ export function CourseCreatePage() {
     mode: 'onTouched',
   });
 
-  const [createResult, executeMutation] = useMutation<CreateCourseResult, CreateCourseVariables>(
-    CREATE_COURSE_MUTATION
-  );
+  const [createResult, executeMutation] = useMutation<
+    CreateCourseResult,
+    CreateCourseVariables
+  >(CREATE_COURSE_MUTATION);
 
   const isSubmitting = createResult.fetching;
 
@@ -129,7 +157,10 @@ export function CourseCreatePage() {
     });
 
     if (error) {
-      const msg = error.graphQLErrors?.[0]?.message ?? error.message ?? 'Failed to create course';
+      const msg =
+        error.graphQLErrors?.[0]?.message ??
+        error.message ??
+        'Failed to create course';
       toast.error(msg);
       return;
     }
@@ -143,20 +174,28 @@ export function CourseCreatePage() {
     }
   };
 
+  // Single subscription for all watched fields — avoids 5 separate re-render cycles per keystroke.
+  const [
+    watchedTitle,
+    watchedDescription,
+    watchedDifficulty,
+    watchedThumbnail,
+  ] = form.watch(['title', 'description', 'difficulty', 'thumbnail']);
+
   // Merged view of form data for steps 2–4 that display wizard state
   const currentData: CourseFormData = {
     ...wizardData,
-    title: form.watch('title') || wizardData.title,
-    description: form.watch('description') || wizardData.description,
-    difficulty: (form.watch('difficulty') as Difficulty) || wizardData.difficulty,
-    thumbnail: form.watch('thumbnail') || wizardData.thumbnail,
+    title: watchedTitle || wizardData.title,
+    description: watchedDescription || wizardData.description,
+    difficulty: (watchedDifficulty as Difficulty) || wizardData.difficulty,
+    thumbnail: watchedThumbnail || wizardData.thumbnail,
   };
 
   const updateWizard = (updates: Partial<CourseFormData>) => {
     setWizardData((prev) => ({ ...prev, ...updates }));
   };
 
-  const canAdvanceStep1 = form.watch('title')?.trim().length >= 3;
+  const canAdvanceStep1 = watchedTitle?.trim().length >= 3;
   const lastContentStep = STEPS.length - 2;
 
   return (
@@ -164,7 +203,11 @@ export function CourseCreatePage() {
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/courses')}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('title')}
           </Button>
@@ -188,7 +231,9 @@ export function CourseCreatePage() {
                   {i < step ? <Check className="h-4 w-4" /> : i + 1}
                 </div>
                 <div className="text-center hidden sm:block">
-                  <p className={`text-xs font-medium ${i === step ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  <p
+                    className={`text-xs font-medium ${i === step ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
                     {s.label}
                   </p>
                 </div>
@@ -208,23 +253,42 @@ export function CourseCreatePage() {
         <Card className="p-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold">{STEPS[step]?.label}</h2>
-            <p className="text-sm text-muted-foreground">{STEPS[step]?.description}</p>
+            <p className="text-sm text-muted-foreground">
+              {STEPS[step]?.description}
+            </p>
           </div>
 
           <Form {...form}>
             {step === 0 && <CourseWizardStep1 control={form.control} />}
           </Form>
-          {step === 1 && <CourseWizardStep2 modules={wizardData.modules} onChange={updateWizard} />}
-          {step === 2 && (
-            <CourseWizardMediaStep
-              courseId={DRAFT_COURSE_ID}
-              mediaList={wizardData.mediaList}
-              onChange={updateWizard}
-            />
-          )}
-          {step === 3 && (
-            <CourseWizardStep3 data={currentData} onPublish={handlePublish} isSubmitting={isSubmitting} />
-          )}
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+              </div>
+            }
+          >
+            {step === 1 && (
+              <CourseWizardStep2
+                modules={wizardData.modules}
+                onChange={updateWizard}
+              />
+            )}
+            {step === 2 && (
+              <CourseWizardMediaStep
+                courseId={DRAFT_COURSE_ID}
+                mediaList={wizardData.mediaList}
+                onChange={updateWizard}
+              />
+            )}
+            {step === 3 && (
+              <CourseWizardStep3
+                data={currentData}
+                onPublish={handlePublish}
+                isSubmitting={isSubmitting}
+              />
+            )}
+          </Suspense>
         </Card>
 
         {/* Navigation */}
@@ -239,7 +303,9 @@ export function CourseCreatePage() {
               {t('wizard.back')}
             </Button>
             <Button
-              onClick={step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)}
+              onClick={
+                step === 0 ? handleNextFromStep1 : () => setStep((s) => s + 1)
+              }
               disabled={step === 0 && !canAdvanceStep1}
             >
               {t('wizard.next')}

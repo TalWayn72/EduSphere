@@ -10,8 +10,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 describe('packages/i18n exports', () => {
-  it('exports exactly 9 supported locales', () => {
-    expect(SUPPORTED_LOCALES).toHaveLength(9);
+  it('exports exactly 10 supported locales', () => {
+    expect(SUPPORTED_LOCALES).toHaveLength(10);
     expect(SUPPORTED_LOCALES).toContain('en');
     expect(SUPPORTED_LOCALES).toContain('zh-CN');
     expect(SUPPORTED_LOCALES).toContain('hi');
@@ -21,6 +21,7 @@ describe('packages/i18n exports', () => {
     expect(SUPPORTED_LOCALES).toContain('pt');
     expect(SUPPORTED_LOCALES).toContain('ru');
     expect(SUPPORTED_LOCALES).toContain('id');
+    expect(SUPPORTED_LOCALES).toContain('he');
   });
 
   it('default locale is English', () => {
@@ -38,24 +39,26 @@ describe('packages/i18n exports', () => {
     }
   });
 
-  it('exports exactly 12 namespaces', () => {
-    expect(NAMESPACES).toHaveLength(12);
+  it('exports exactly 13 namespaces', () => {
+    expect(NAMESPACES).toHaveLength(13);
   });
 
-  it('all locale directories exist with all 12 namespace files', () => {
+  it('all locale directories exist with all 13 namespace files', () => {
     const localesDir = path.join(__dirname, '..', 'locales');
     for (const locale of SUPPORTED_LOCALES) {
       for (const ns of NAMESPACES) {
         const filePath = path.join(localesDir, locale, `${ns}.json`);
-        expect(fs.existsSync(filePath), `Missing: ${locale}/${ns}.json`).toBe(true);
+        expect(fs.existsSync(filePath), `Missing: ${locale}/${ns}.json`).toBe(
+          true
+        );
       }
     }
   });
 });
 
 describe('SUPPORTED_LOCALES', () => {
-  it('contains exactly 9 locales', () => {
-    expect(SUPPORTED_LOCALES).toHaveLength(9);
+  it('contains exactly 10 locales', () => {
+    expect(SUPPORTED_LOCALES).toHaveLength(10);
   });
 
   it('includes English as first locale', () => {
@@ -86,15 +89,24 @@ describe('DEFAULT_LOCALE', () => {
 });
 
 describe('NAMESPACES', () => {
-  it('contains exactly 12 namespaces', () => {
-    expect(NAMESPACES).toHaveLength(12);
+  it('contains exactly 13 namespaces', () => {
+    expect(NAMESPACES).toHaveLength(13);
   });
 
   it('includes all required namespaces', () => {
     const required = [
-      'common', 'nav', 'auth', 'dashboard', 'courses',
-      'content', 'annotations', 'agents', 'collaboration',
-      'knowledge', 'settings', 'errors',
+      'common',
+      'nav',
+      'auth',
+      'dashboard',
+      'courses',
+      'content',
+      'annotations',
+      'agents',
+      'collaboration',
+      'knowledge',
+      'settings',
+      'errors',
     ];
     for (const ns of required) {
       expect(NAMESPACES).toContain(ns);

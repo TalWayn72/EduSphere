@@ -109,7 +109,9 @@ describe('EmbeddingService', () => {
       mockSelectChain([]);
       mockSelectChain([]);
       mockSelectChain([]);
-      await expect(service.findById('missing')).rejects.toThrow(NotFoundException);
+      await expect(service.findById('missing')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('NotFoundException message includes the missing ID', async () => {
@@ -171,9 +173,9 @@ describe('EmbeddingService', () => {
     it('throws when db.execute returns empty', async () => {
       vi.spyOn(service, 'callEmbeddingProvider').mockResolvedValue([0.1]);
       mockExecute.mockResolvedValue([]);
-      await expect(
-        service.generateEmbedding('text', 'seg-x')
-      ).rejects.toThrow('Failed to upsert');
+      await expect(service.generateEmbedding('text', 'seg-x')).rejects.toThrow(
+        'Failed to upsert'
+      );
     });
   });
 
@@ -245,9 +247,9 @@ describe('EmbeddingService', () => {
       mockSelect.mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              { id: 'seg-1', text: 'match text' },
-            ]),
+            limit: vi
+              .fn()
+              .mockResolvedValue([{ id: 'seg-1', text: 'match text' }]),
           }),
         }),
       });

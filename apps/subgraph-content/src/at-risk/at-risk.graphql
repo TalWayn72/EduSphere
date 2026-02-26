@@ -1,0 +1,22 @@
+type RiskFactor {
+  key: String!
+  description: String!
+}
+
+type AtRiskLearner {
+  learnerId: ID!
+  courseId: ID!
+  riskScore: Float!
+  riskFactors: [RiskFactor!]!
+  flaggedAt: DateTime!
+  daysSinceLastActivity: Int!
+  progressPercent: Float!
+}
+
+extend type Query {
+  atRiskLearners(courseId: ID!): [AtRiskLearner!]! @authenticated
+}
+
+extend type Mutation {
+  resolveAtRiskFlag(flagId: ID!): Boolean! @authenticated
+}

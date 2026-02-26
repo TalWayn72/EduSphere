@@ -68,10 +68,12 @@ export function CollaborationSessionPage() {
   });
 
   const discussion: BackendDiscussion | null =
-    (discussionData as { discussion?: BackendDiscussion } | undefined)?.discussion ?? null;
+    (discussionData as { discussion?: BackendDiscussion } | undefined)
+      ?.discussion ?? null;
 
   const latestMessage: BackendMessage | null =
-    (subData as { messageAdded?: BackendMessage } | undefined)?.messageAdded ?? null;
+    (subData as { messageAdded?: BackendMessage } | undefined)?.messageAdded ??
+    null;
 
   const participantCount = discussion?.participantCount ?? 1;
 
@@ -97,14 +99,23 @@ export function CollaborationSessionPage() {
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/collaboration')}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/collaboration')}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('sessions')}
           </Button>
 
           <div className="flex-1" />
 
-          <Button variant="outline" size="sm" onClick={handleSave} className="gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSave}
+            className="gap-1.5"
+          >
             <Save className="h-3.5 w-3.5" />
             {saved ? t('saved') : t('save')}
           </Button>
@@ -126,7 +137,9 @@ export function CollaborationSessionPage() {
           {infoNote && (
             <>
               <span className="text-muted-foreground">·</span>
-              <span className="text-xs text-blue-600 font-medium">{infoNote}</span>
+              <span className="text-xs text-blue-600 font-medium">
+                {infoNote}
+              </span>
             </>
           )}
           <div className="flex-1" />

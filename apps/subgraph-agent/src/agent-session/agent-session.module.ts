@@ -6,10 +6,21 @@ import { NatsService } from '../nats/nats.service';
 import { AIService } from '../ai/ai.service';
 import { SessionCleanupService } from './session-cleanup.service';
 import { LangGraphService } from '../ai/langgraph.service';
+import { AiLanggraphRunnerService } from '../ai/ai-langgraph-runner.service';
+import { AiLegacyRunnerService } from '../ai/ai-legacy-runner.service';
 
 @Module({
   imports: [AgentMessageModule],
-  providers: [AgentSessionResolver, AgentSessionService, NatsService, AIService, LangGraphService, SessionCleanupService],
+  providers: [
+    AgentSessionResolver,
+    AgentSessionService,
+    NatsService,
+    AIService,
+    LangGraphService,
+    AiLanggraphRunnerService,
+    AiLegacyRunnerService,
+    SessionCleanupService,
+  ],
   exports: [AgentSessionService],
 })
 export class AgentSessionModule {}

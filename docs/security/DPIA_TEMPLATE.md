@@ -11,11 +11,13 @@
 ## When a DPIA is Required
 
 A DPIA is **mandatory** (GDPR Art.35(3)) before processing that is likely to result in a high risk:
+
 - Large-scale processing of special categories of data (Art.9)
 - Systematic monitoring of a publicly accessible area
 - Systematic and extensive profiling with significant effects
 
 A DPIA is **strongly recommended** for EduSphere when:
+
 - Adding a new AI feature that processes user learning behavior at scale
 - Introducing biometric or behavioral analytics
 - Processing data of children under 16
@@ -28,10 +30,10 @@ A DPIA is **strongly recommended** for EduSphere when:
 
 ## DPIA Form
 
-**Project Name:** _________________________________
-**Prepared By:** _________________________________
-**Date:** _________________________________
-**DPO Review Date:** _________________________________
+**Project Name:** **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
+**Prepared By:** **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
+**Date:** **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
+**DPO Review Date:** **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
 **Status:** Draft | Under Review | Approved | Rejected
 
 ---
@@ -41,8 +43,8 @@ A DPIA is **strongly recommended** for EduSphere when:
 ### 1.1 What data will be processed?
 
 | Data Category | Classification | Approximate Volume |
-|--------------|---------------|-------------------|
-| | | |
+| ------------- | -------------- | ------------------ |
+|               |                |                    |
 
 ### 1.2 What is the purpose of processing?
 
@@ -58,10 +60,10 @@ _Describe the specific, explicit, and legitimate purpose(s):_
 
 ### 1.4 Who processes the data?
 
-| Actor | Role (Controller/Processor) | Location | DPA in place? |
-|-------|---------------------------|---------|--------------|
-| EduSphere | Processor | EU | N/A (this DPIA) |
-| | | | |
+| Actor     | Role (Controller/Processor) | Location | DPA in place?   |
+| --------- | --------------------------- | -------- | --------------- |
+| EduSphere | Processor                   | EU       | N/A (this DPIA) |
+|           |                             |          |                 |
 
 ---
 
@@ -78,17 +80,17 @@ _What data could be removed without affecting the purpose?_
 ### 2.3 Retention
 
 | Data Type | Proposed Retention | Justification |
-|---------|------------------|--------------|
-| | | |
+| --------- | ------------------ | ------------- |
+|           |                    |               |
 
 ### 2.4 Data subjects' rights
 
-| Right | How fulfilled | Timeline |
-|-------|--------------|---------|
-| Art.15 Access | | |
-| Art.17 Erasure | | |
-| Art.20 Portability | | |
-| Art.21 Object | | |
+| Right              | How fulfilled | Timeline |
+| ------------------ | ------------- | -------- |
+| Art.15 Access      |               |          |
+| Art.17 Erasure     |               |          |
+| Art.20 Portability |               |          |
+| Art.21 Object      |               |          |
 
 ---
 
@@ -96,61 +98,61 @@ _What data could be removed without affecting the purpose?_
 
 ### 3.1 Risk Identification
 
-| # | Risk | Likelihood (1-5) | Impact (1-5) | Risk Score |
-|---|------|-----------------|-------------|-----------|
-| R1 | Unauthorized access to personal data | | | |
-| R2 | Data breach or exfiltration | | | |
-| R3 | Data used beyond stated purpose | | | |
-| R4 | Denial of data subject rights | | | |
-| R5 | Cross-tenant data leak | | | |
-| R6 | AI bias or discrimination | | | |
+| #   | Risk                                 | Likelihood (1-5) | Impact (1-5) | Risk Score |
+| --- | ------------------------------------ | ---------------- | ------------ | ---------- |
+| R1  | Unauthorized access to personal data |                  |              |            |
+| R2  | Data breach or exfiltration          |                  |              |            |
+| R3  | Data used beyond stated purpose      |                  |              |            |
+| R4  | Denial of data subject rights        |                  |              |            |
+| R5  | Cross-tenant data leak               |                  |              |            |
+| R6  | AI bias or discrimination            |                  |              |            |
 
 **Risk Score = Likelihood × Impact. High = 15-25, Medium = 8-14, Low = 1-7**
 
 ### 3.2 Risk Treatment
 
 | Risk # | Treatment | Residual Risk | Owner |
-|--------|-----------|--------------|-------|
-| | | | |
+| ------ | --------- | ------------- | ----- |
+|        |           |               |       |
 
 ---
 
 ## Section 4: Security Measures
 
-| Control | Implemented? | Evidence |
-|---------|-------------|---------|
-| AES-256-GCM encryption at rest | [ ] | |
-| TLS 1.3 in transit | [ ] | |
-| PostgreSQL RLS (tenant isolation) | [ ] | |
-| JWT authentication + scopes | [ ] | |
-| Audit logging (Art.32) | [ ] | |
-| PII scrubbing (for AI calls) | [ ] | |
-| User consent gate (for LLM) | [ ] | |
-| Data retention enforcement | [ ] | |
-| Access restricted to minimum necessary | [ ] | |
-| Pseudonymization applied where possible | [ ] | |
+| Control                                 | Implemented? | Evidence |
+| --------------------------------------- | ------------ | -------- |
+| AES-256-GCM encryption at rest          | [ ]          |          |
+| TLS 1.3 in transit                      | [ ]          |          |
+| PostgreSQL RLS (tenant isolation)       | [ ]          |          |
+| JWT authentication + scopes             | [ ]          |          |
+| Audit logging (Art.32)                  | [ ]          |          |
+| PII scrubbing (for AI calls)            | [ ]          |          |
+| User consent gate (for LLM)             | [ ]          |          |
+| Data retention enforcement              | [ ]          |          |
+| Access restricted to minimum necessary  | [ ]          |          |
+| Pseudonymization applied where possible | [ ]          |          |
 
 ---
 
 ## Section 5: DPO Opinion
 
-**DPO Name:** _________________________________
-**Date:** _________________________________
+**DPO Name:** **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
+**Date:** **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
 
 - [ ] **Approved** — Processing may proceed. Residual risks are acceptable.
-- [ ] **Approved with conditions** — Processing may proceed after implementing: _______
-- [ ] **Rejected** — Processing must not proceed. Reason: _______
-- [ ] **Supervisory Authority consultation required** (Art.36) — Reason: _______
+- [ ] **Approved with conditions** — Processing may proceed after implementing: **\_\_\_**
+- [ ] **Rejected** — Processing must not proceed. Reason: **\_\_\_**
+- [ ] **Supervisory Authority consultation required** (Art.36) — Reason: **\_\_\_**
 
-**DPO signature:** _________________________________
+**DPO signature:** **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
 
 ---
 
 ## Section 6: Review History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | | | Initial assessment |
+| Version | Date | Author | Changes            |
+| ------- | ---- | ------ | ------------------ |
+| 1.0     |      |        | Initial assessment |
 
 ---
 
@@ -162,5 +164,5 @@ _What data could be removed without affecting the purpose?_
 - [ ] Risk treatments documented (Section 3.2)
 - [ ] Security measures verified (Section 4)
 - [ ] DPO review completed (Section 5)
-- [ ] Records of Processing updated (PROCESSING_ACTIVITIES.md)
+- [ ] Records of Processing updated (GDPR_PROCESSING_ACTIVITIES.md)
 - [ ] Project team informed of approved conditions

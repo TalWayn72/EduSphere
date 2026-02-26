@@ -12,12 +12,31 @@ const { composeServices } = require('@theguild/federation-composition');
 const { parse } = require('graphql');
 
 const SUBGRAPHS = [
-  { name: 'core',          url: 'http://localhost:4001/graphql' },
-  { name: 'content',       url: 'http://localhost:4002/graphql' },
-  { name: 'annotation',    url: 'http://localhost:4003/graphql' },
-  { name: 'collaboration', url: 'http://localhost:4004/graphql' },
-  { name: 'agent',         url: 'http://localhost:4005/graphql' },
-  { name: 'knowledge',     url: 'http://localhost:4006/graphql' },
+  {
+    name: 'core',
+    url: process.env.SUBGRAPH_CORE_URL ?? 'http://localhost:4001/graphql',
+  },
+  {
+    name: 'content',
+    url: process.env.SUBGRAPH_CONTENT_URL ?? 'http://localhost:4002/graphql',
+  },
+  {
+    name: 'annotation',
+    url: process.env.SUBGRAPH_ANNOTATION_URL ?? 'http://localhost:4003/graphql',
+  },
+  {
+    name: 'collaboration',
+    url:
+      process.env.SUBGRAPH_COLLABORATION_URL ?? 'http://localhost:4004/graphql',
+  },
+  {
+    name: 'agent',
+    url: process.env.SUBGRAPH_AGENT_URL ?? 'http://localhost:4005/graphql',
+  },
+  {
+    name: 'knowledge',
+    url: process.env.SUBGRAPH_KNOWLEDGE_URL ?? 'http://localhost:4006/graphql',
+  },
 ];
 
 async function fetchSDL(name, url) {
@@ -59,7 +78,7 @@ async function main() {
 
   if (result.errors && result.errors.length > 0) {
     console.error('Composition errors:');
-    result.errors.forEach(e => console.error(' -', e.message));
+    result.errors.forEach((e) => console.error(' -', e.message));
     if (!result.supergraphSdl) process.exit(1);
     console.warn('Continuing with warnings...');
   }
@@ -70,4 +89,7 @@ async function main() {
   console.log(`Schema size: ${result.supergraphSdl.length} chars`);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

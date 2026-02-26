@@ -23,7 +23,9 @@ function readFile(relativePath: string): string {
 
 describe('OpenTelemetry SDK (packages/telemetry)', () => {
   it('packages/telemetry/src/index.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/telemetry/src/index.ts'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'packages/telemetry/src/index.ts'))).toBe(
+      true
+    );
   });
 
   it('exports initTelemetry function', () => {
@@ -43,7 +45,9 @@ describe('OpenTelemetry SDK (packages/telemetry)', () => {
 
   it('sets service name resource attribute', () => {
     const content = readFile('packages/telemetry/src/index.ts');
-    expect(content).toMatch(/SERVICE_NAME|SEMRESATTRS_SERVICE_NAME|service\.name/);
+    expect(content).toMatch(
+      /SERVICE_NAME|SEMRESATTRS_SERVICE_NAME|service\.name/
+    );
   });
 
   it('gateway initializes telemetry as first import', () => {
@@ -52,7 +56,9 @@ describe('OpenTelemetry SDK (packages/telemetry)', () => {
   });
 
   it('telemetry package has unit tests', () => {
-    expect(existsSync(resolve(ROOT, 'packages/telemetry/src/index.spec.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'packages/telemetry/src/index.spec.ts'))
+    ).toBe(true);
   });
 });
 
@@ -62,7 +68,9 @@ describe('Prometheus Configuration (infrastructure/monitoring/prometheus.yml)', 
   const content = readFile('infrastructure/monitoring/prometheus.yml');
 
   it('infrastructure/monitoring/prometheus.yml exists', () => {
-    expect(existsSync(resolve(ROOT, 'infrastructure/monitoring/prometheus.yml'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'infrastructure/monitoring/prometheus.yml'))
+    ).toBe(true);
   });
 
   it('scrapes gateway metrics', () => {
@@ -101,7 +109,9 @@ describe('Prometheus Alert Rules (infrastructure/monitoring/rules/alerts.yml)', 
   const content = readFile('infrastructure/monitoring/rules/alerts.yml');
 
   it('infrastructure/monitoring/rules/alerts.yml exists', () => {
-    expect(existsSync(resolve(ROOT, 'infrastructure/monitoring/rules/alerts.yml'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'infrastructure/monitoring/rules/alerts.yml'))
+    ).toBe(true);
   });
 
   it('has HighErrorRate alert (SOC2 CC7.1)', () => {
@@ -133,11 +143,16 @@ describe('Prometheus Alert Rules (infrastructure/monitoring/rules/alerts.yml)', 
 
 describe('Grafana Monitoring (infrastructure/monitoring/grafana)', () => {
   it('grafana dashboards directory exists', () => {
-    expect(existsSync(resolve(ROOT, 'infrastructure/monitoring/grafana'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'infrastructure/monitoring/grafana'))).toBe(
+      true
+    );
   });
 
   it('grafana provisioning directory exists', () => {
-    const grafanaPath = resolve(ROOT, 'infrastructure/monitoring/grafana/provisioning');
+    const grafanaPath = resolve(
+      ROOT,
+      'infrastructure/monitoring/grafana/provisioning'
+    );
     expect(existsSync(grafanaPath)).toBe(true);
   });
 });

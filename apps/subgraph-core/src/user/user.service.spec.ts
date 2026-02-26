@@ -64,6 +64,7 @@ const MOCK_USER = {
     theme: 'system',
     emailNotifications: true,
     pushNotifications: true,
+    isPublicProfile: false,
   },
   id: 'user-1',
   tenant_id: 'tenant-1',
@@ -73,6 +74,8 @@ const MOCK_USER = {
   firstName: 'Test',
   lastName: 'User',
   tenantId: 'tenant-1',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
 };
 
 describe('UserService', () => {
@@ -154,7 +157,9 @@ describe('UserService', () => {
       mockLimit.mockResolvedValue([MOCK_USER]);
       const result = await service.findById('user-1');
       expect(result).not.toBeNull();
-      const prefs = (result as Record<string, unknown>)['preferences'] as Record<string, unknown>;
+      const prefs = (result as Record<string, unknown>)[
+        'preferences'
+      ] as Record<string, unknown>;
       expect(typeof prefs['locale']).toBe('string');
       expect(typeof prefs['theme']).toBe('string');
     });
@@ -163,7 +168,9 @@ describe('UserService', () => {
       mockLimit.mockResolvedValue([{ ...MOCK_USER, preferences: null }]);
       const result = await service.findById('user-1');
       expect(result).not.toBeNull();
-      const prefs = (result as Record<string, unknown>)['preferences'] as Record<string, unknown>;
+      const prefs = (result as Record<string, unknown>)[
+        'preferences'
+      ] as Record<string, unknown>;
       expect(prefs['locale']).toBe('en');
       expect(prefs['theme']).toBe('system');
       expect(prefs['emailNotifications']).toBe(true);
@@ -176,14 +183,18 @@ describe('UserService', () => {
   describe('findAll()', () => {
     it('returns users array without auth', async () => {
       const mockOffset2 = vi.fn().mockResolvedValue([MOCK_USER]);
-      mockFrom.mockReturnValue({ limit: vi.fn().mockReturnValue({ offset: mockOffset2 }) });
+      mockFrom.mockReturnValue({
+        limit: vi.fn().mockReturnValue({ offset: mockOffset2 }),
+      });
       const result = await service.findAll(10, 0);
       expect(Array.isArray(result)).toBe(true);
     });
 
     it('calls withTenantContext with correct pagination when auth provided', async () => {
       const mockOffset2 = vi.fn().mockResolvedValue([MOCK_USER]);
-      mockFrom.mockReturnValue({ limit: vi.fn().mockReturnValue({ offset: mockOffset2 }) });
+      mockFrom.mockReturnValue({
+        limit: vi.fn().mockReturnValue({ offset: mockOffset2 }),
+      });
       await service.findAll(5, 10, MOCK_AUTH);
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
@@ -251,13 +262,22 @@ describe('UserService', () => {
 
   describe('update()', () => {
     it('returns updated user', async () => {
-      const updated = { ...MOCK_USER, display_name: 'New Name', firstName: 'New', lastName: 'Name' };
+      const updated = {
+        ...MOCK_USER,
+        display_name: 'New Name',
+        firstName: 'New',
+        lastName: 'Name',
+      };
       mockReturning.mockResolvedValue([updated]);
       mockWhere.mockReturnValue({ returning: mockReturning });
       mockSet.mockReturnValue({ where: mockWhere });
       mockUpdate.mockReturnValue({ set: mockSet });
 
-      const result = await service.update('user-1', { firstName: 'New', lastName: 'Name' }, MOCK_AUTH);
+      const result = await service.update(
+        'user-1',
+        { firstName: 'New', lastName: 'Name' },
+        MOCK_AUTH
+      );
       expect(result).toEqual(updated);
     });
 

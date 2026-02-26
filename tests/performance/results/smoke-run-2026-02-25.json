@@ -1,0 +1,307 @@
+{
+  "runDate": "2026-02-25",
+  "runType": "smoke",
+  "gatewayUrl": "http://host.docker.internal:4000",
+  "k6Version": "grafana/k6:latest",
+  "unitTests": {
+    "passed": 19,
+    "failed": 0,
+    "files": ["k6-config.test.ts", "baseline-comparison.test.ts"]
+  },
+  "scenarios": [
+    {
+      "id": "01-health-check",
+      "description": "Health endpoint GET /health",
+      "vus": 5,
+      "duration": "15s",
+      "status": "PASSED",
+      "thresholds": {
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 16.76,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 50.62,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
+        "http_req_waiting_p95": { "sla": 400, "actual": 16.66, "passed": true }
+      },
+      "metrics": {
+        "totalRequests": 365,
+        "requestsPerSecond": 24.21,
+        "p50_ms": 3.57,
+        "p90_ms": 9.9,
+        "p95_ms": 16.76,
+        "p99_ms": 50.62,
+        "avg_ms": 5.62,
+        "min_ms": 1.48,
+        "max_ms": 51.53,
+        "errorRate": 0.0,
+        "checksSucceeded": "100.00%",
+        "checksFailed": "0.00%",
+        "dataReceived_kb": 56,
+        "dataSent_kb": 32
+      },
+      "checks": {
+        "health endpoint returns 200": "PASS",
+        "response time under 100ms": "PASS"
+      },
+      "notes": "Excellent performance. Health endpoint responding in avg 5.62ms."
+    },
+    {
+      "id": "02-course-list",
+      "description": "GraphQL CourseList query (20 VUs, 30s)",
+      "vus": 20,
+      "duration": "30s",
+      "status": "PASSED",
+      "thresholds": {
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 148.65,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 801.77,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
+        "http_req_waiting_p95": { "sla": 400, "actual": 148.57, "passed": true }
+      },
+      "metrics": {
+        "totalRequests": 1063,
+        "requestsPerSecond": 34.79,
+        "p50_ms": 44.41,
+        "p90_ms": 117.81,
+        "p95_ms": 148.65,
+        "p99_ms": 801.77,
+        "avg_ms": 70.1,
+        "min_ms": 9.34,
+        "max_ms": 821.69,
+        "errorRate": 0.0,
+        "checksSucceeded": "100.00%",
+        "checksFailed": "0.00%",
+        "dataReceived_kb": 637,
+        "dataSent_kb": 316
+      },
+      "checks": {
+        "status is 200": "PASS",
+        "no GraphQL errors": "PASS",
+        "courses array returned": "PASS"
+      },
+      "notes": "Strong performance at 20 VUs. p99 at 801ms is within 1000ms SLA but worth monitoring at higher load."
+    },
+    {
+      "id": "03-annotations",
+      "description": "GraphQL Annotations query (10 VUs, 30s)",
+      "vus": 10,
+      "duration": "30s",
+      "status": "PASSED",
+      "thresholds": {
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 334.66,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 489.62,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
+        "http_req_waiting_p95": { "sla": 400, "actual": 334.53, "passed": true }
+      },
+      "metrics": {
+        "totalRequests": 498,
+        "requestsPerSecond": 16.34,
+        "p50_ms": 79.62,
+        "p90_ms": 230.54,
+        "p95_ms": 334.66,
+        "p99_ms": 489.62,
+        "avg_ms": 108.29,
+        "min_ms": 10.77,
+        "max_ms": 626.11,
+        "errorRate": 0.0,
+        "checksSucceeded": "100.00%",
+        "checksFailed": "0.00%",
+        "dataReceived_kb": 191,
+        "dataSent_kb": 178
+      },
+      "checks": {
+        "status is 200": "PASS",
+        "no auth errors": "PASS",
+        "annotations field present": "PASS"
+      },
+      "notes": "p95 at 334ms is within SLA. Cross-subgraph annotation query performing well without JWT."
+    },
+    {
+      "id": "04-semantic-search",
+      "description": "GraphQL SemanticSearch query via pgvector (10 VUs, 30s)",
+      "vus": 10,
+      "duration": "30s",
+      "status": "PASSED",
+      "thresholds": {
+        "http_req_duration_p95": {
+          "sla": 500,
+          "actual": 164.79,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1000,
+          "actual": 207.74,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true },
+        "http_req_waiting_p95": { "sla": 400, "actual": 164.66, "passed": true }
+      },
+      "metrics": {
+        "totalRequests": 290,
+        "requestsPerSecond": 9.42,
+        "p50_ms": 32.67,
+        "p90_ms": 123.31,
+        "p95_ms": 164.79,
+        "p99_ms": 207.74,
+        "avg_ms": 49.61,
+        "min_ms": 4.97,
+        "max_ms": 274.38,
+        "errorRate": 0.0,
+        "checksSucceeded": "66.66%",
+        "checksFailed": "33.33%",
+        "dataReceived_kb": 216,
+        "dataSent_kb": 118
+      },
+      "checks": {
+        "status is 200": "PASS",
+        "no server errors": "PASS",
+        "search results returned": "FAIL"
+      },
+      "notes": "All SLA thresholds PASSED. Functional check 'search results returned' failed — searchSemantic query returns no data field (feature not yet populated with embeddings or resolver returns null data). HTTP-level performance is excellent (p95=164ms). Gateway exit code: 0."
+    },
+    {
+      "id": "05-agent-session",
+      "description": "Agent session mutation (5 VUs, 30s) — requires JWT",
+      "vus": 5,
+      "duration": "30s",
+      "status": "PASSED",
+      "thresholds": {
+        "http_req_duration_p95": { "sla": 3000, "actual": 0, "passed": true },
+        "http_req_duration_p99": { "sla": 5000, "actual": 0, "passed": true },
+        "http_req_failed_rate": { "sla": 0.02, "actual": 0.0, "passed": true }
+      },
+      "metrics": {
+        "totalRequests": 0,
+        "requestsPerSecond": 0,
+        "p95_ms": 0,
+        "p99_ms": 0,
+        "errorRate": 0.0,
+        "iterations": 150,
+        "notes": "No HTTP requests — scenario correctly skipped all iterations (JWT_TOKEN not set). Agent mutations require authentication."
+      },
+      "checks": {},
+      "notes": "Skipped gracefully as designed. No JWT_TOKEN provided — all 150 iterations executed sleep(1) and returned. All thresholds passed vacuously."
+    },
+    {
+      "id": "06-knowledge-graph",
+      "description": "Knowledge graph: concept search + learning path traversal (10 VUs, 30s)",
+      "vus": 10,
+      "duration": "30s",
+      "status": "PASSED",
+      "thresholds": {
+        "http_req_duration_p95": {
+          "sla": 800,
+          "actual": 233.05,
+          "passed": true
+        },
+        "http_req_duration_p99": {
+          "sla": 1500,
+          "actual": 485.09,
+          "passed": true
+        },
+        "http_req_failed_rate": { "sla": 0.01, "actual": 0.0, "passed": true }
+      },
+      "metrics": {
+        "totalRequests": 380,
+        "requestsPerSecond": 12.46,
+        "p50_ms": 17.97,
+        "p90_ms": 87.75,
+        "p95_ms": 233.05,
+        "p99_ms": 485.09,
+        "avg_ms": 46.48,
+        "min_ms": 3.12,
+        "max_ms": 526.7,
+        "errorRate": 0.0,
+        "checksSucceeded": "80.00%",
+        "checksFailed": "20.00%",
+        "dataReceived_kb": 332,
+        "dataSent_kb": 130,
+        "iterations": 190
+      },
+      "checks": {
+        "concept search status 200": "PASS",
+        "concept search no server errors": "PASS",
+        "concept search data present": "FAIL",
+        "learning path status 200": "PASS",
+        "learning path no server errors": "PASS"
+      },
+      "notes": "All SLA thresholds PASSED (p95=233ms well within 800ms SLA). Functional check 'concept search data present' failed — searchConcepts resolver returns no data field (embeddings/AGE graph not seeded with test data). Learning path queries returning 200 with no server errors. HTTP performance excellent."
+    },
+    {
+      "id": "07-collaboration-ws",
+      "description": "WebSocket collaboration",
+      "status": "SKIPPED",
+      "notes": "Skipped — requires special WebSocket setup and pre-configured collaboration rooms."
+    },
+    {
+      "id": "08-transcription",
+      "description": "Transcription worker",
+      "status": "SKIPPED",
+      "notes": "Skipped — requires transcription worker service and MinIO/media setup."
+    },
+    {
+      "id": "09-agent-concurrent",
+      "description": "Concurrent AI agent sessions (15 VUs, 30s) — requires JWT",
+      "vus": 15,
+      "duration": "30s",
+      "status": "PASSED",
+      "thresholds": {
+        "http_req_duration_p95": { "sla": 5000, "actual": 0, "passed": true },
+        "http_req_duration_p99": { "sla": 10000, "actual": 0, "passed": true },
+        "http_req_failed_rate": { "sla": 0.05, "actual": 0.0, "passed": true }
+      },
+      "metrics": {
+        "totalRequests": 0,
+        "requestsPerSecond": 0,
+        "p95_ms": 0,
+        "p99_ms": 0,
+        "errorRate": 0.0,
+        "iterations": 450
+      },
+      "checks": {},
+      "notes": "Skipped gracefully as designed. No JWT_TOKEN provided — all 450 iterations executed sleep(1) and returned. All thresholds passed vacuously."
+    }
+  ],
+  "summary": {
+    "scenariosRun": 7,
+    "scenariosSkipped": 2,
+    "thresholdsPassed": 7,
+    "thresholdsFailed": 0,
+    "functionalCheckFailures": [
+      {
+        "scenario": "04-semantic-search",
+        "check": "search results returned",
+        "cause": "searchSemantic resolver returns body.data=null — embeddings not populated or resolver returns null data for unauthenticated query"
+      },
+      {
+        "scenario": "06-knowledge-graph",
+        "check": "concept search data present",
+        "cause": "searchConcepts resolver returns body.data=null — Apache AGE graph not seeded with test concept data"
+      }
+    ],
+    "totalHttpRequests": 2896,
+    "overallErrorRate": "0.00%",
+    "slaBreaches": 0
+  }
+}

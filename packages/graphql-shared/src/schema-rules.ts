@@ -56,7 +56,7 @@ export function getRuleSeverity(rule: SchemaLintRule): SchemaLintSeverity {
  */
 export function getBlockingRules(): SchemaLintRule[] {
   return (Object.keys(SCHEMA_LINT_RULES) as SchemaLintRule[]).filter(
-    (rule) => SCHEMA_LINT_RULES[rule] === 'error',
+    (rule) => SCHEMA_LINT_RULES[rule] === 'error'
   );
 }
 
@@ -65,6 +65,6 @@ export function getBlockingRules(): SchemaLintRule[] {
  */
 export function getWarningRules(): SchemaLintRule[] {
   return (Object.keys(SCHEMA_LINT_RULES) as SchemaLintRule[]).filter(
-    (rule) => SCHEMA_LINT_RULES[rule] === 'warn',
+    (rule) => SCHEMA_LINT_RULES[rule] === 'warn'
   );
 }

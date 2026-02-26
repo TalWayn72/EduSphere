@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PgVectorStore, createVectorStore, VectorDocument, SearchResult } from './vectorStore';
+import {
+  PgVectorStore,
+  createVectorStore,
+  VectorDocument,
+  SearchResult,
+} from './vectorStore';
 
 // ---------------------------------------------------------------------------
 // We intercept Pool at the module level; each test creates its own mock pool
@@ -26,7 +31,9 @@ function makeFakeEmbedding(seed = 0): number[] {
   return Array.from({ length: 3 }, (_, i) => (i + seed) * 0.1);
 }
 
-function makeVectorDoc(overrides: Partial<VectorDocument> = {}): VectorDocument {
+function makeVectorDoc(
+  overrides: Partial<VectorDocument> = {}
+): VectorDocument {
   return {
     id: 'doc-1',
     content: 'This is test content',
@@ -76,7 +83,11 @@ describe('PgVectorStore', () => {
     });
 
     it('factory accepts tableName and dimensions overrides', () => {
-      const store = createVectorStore('postgresql://test', 'custom_table', 1536);
+      const store = createVectorStore(
+        'postgresql://test',
+        'custom_table',
+        1536
+      );
       expect(store).toBeInstanceOf(PgVectorStore);
     });
 
@@ -93,11 +104,17 @@ describe('PgVectorStore', () => {
 
   describe('initialize()', () => {
     it('creates the vector extension', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.initialize();
 
       const calls: string[] = mockPoolQuery.mock.calls.map((c) => String(c[0]));
-      expect(calls.some((q) => q.includes('CREATE EXTENSION IF NOT EXISTS vector'))).toBe(true);
+      expect(
+        calls.some((q) => q.includes('CREATE EXTENSION IF NOT EXISTS vector'))
+      ).toBe(true);
     });
 
     it('creates the documents table with correct table name', async () => {
@@ -105,11 +122,17 @@ describe('PgVectorStore', () => {
       await store.initialize();
 
       const calls: string[] = mockPoolQuery.mock.calls.map((c) => String(c[0]));
-      expect(calls.some((q) => q.includes('CREATE TABLE IF NOT EXISTS my_docs'))).toBe(true);
+      expect(
+        calls.some((q) => q.includes('CREATE TABLE IF NOT EXISTS my_docs'))
+      ).toBe(true);
     });
 
     it('creates HNSW index on embedding column', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.initialize();
 
       const calls: string[] = mockPoolQuery.mock.calls.map((c) => String(c[0]));
@@ -117,17 +140,28 @@ describe('PgVectorStore', () => {
     });
 
     it('creates tenant_id index', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.initialize();
 
       const calls: string[] = mockPoolQuery.mock.calls.map((c) => String(c[0]));
       expect(
-        calls.some((q) => q.toLowerCase().includes('tenant_id') && q.includes('CREATE INDEX'))
+        calls.some(
+          (q) =>
+            q.toLowerCase().includes('tenant_id') && q.includes('CREATE INDEX')
+        )
       ).toBe(true);
     });
 
     it('makes exactly 4 pool.query calls during initialization', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.initialize();
 
       // extension + table + HNSW index + tenant index = 4 calls
@@ -137,18 +171,32 @@ describe('PgVectorStore', () => {
 
   describe('addDocument()', () => {
     it('inserts a document with correct parameters', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       const doc = makeVectorDoc();
       await store.addDocument(doc);
 
       expect(mockPoolQuery).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO vector_documents'),
-        [doc.id, doc.content, JSON.stringify(doc.embedding), JSON.stringify(doc.metadata), doc.tenantId]
+        [
+          doc.id,
+          doc.content,
+          JSON.stringify(doc.embedding),
+          JSON.stringify(doc.metadata),
+          doc.tenantId,
+        ]
       );
     });
 
     it('uses ON CONFLICT DO UPDATE (upsert) semantics', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.addDocument(makeVectorDoc());
 
       const queryStr = String(mockPoolQuery.mock.calls[0]![0]);
@@ -156,7 +204,11 @@ describe('PgVectorStore', () => {
     });
 
     it('serializes embedding as JSON string for pgvector', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       const embedding = [0.1, 0.2, 0.3];
       await store.addDocument(makeVectorDoc({ embedding }));
 
@@ -165,7 +217,11 @@ describe('PgVectorStore', () => {
     });
 
     it('passes tenant_id as the 5th parameter', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.addDocument(makeVectorDoc({ tenantId: 'my-tenant' }));
 
       const params = mockPoolQuery.mock.calls[0]![1] as unknown[];
@@ -175,24 +231,38 @@ describe('PgVectorStore', () => {
 
   describe('addDocuments()', () => {
     it('uses a transaction (BEGIN/COMMIT) for batch inserts', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       const docs = [makeVectorDoc({ id: 'a' }), makeVectorDoc({ id: 'b' })];
       await store.addDocuments(docs);
 
-      const queries: string[] = mockClientQuery.mock.calls.map((c) => String(c[0]));
+      const queries: string[] = mockClientQuery.mock.calls.map((c) =>
+        String(c[0])
+      );
       expect(queries).toContain('BEGIN');
       expect(queries).toContain('COMMIT');
     });
 
     it('calls connect() on the pool to get a client', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.addDocuments([makeVectorDoc()]);
 
       expect(mockPoolConnect).toHaveBeenCalledOnce();
     });
 
     it('releases the client after successful batch insert', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.addDocuments([makeVectorDoc()]);
 
       expect(mockClientRelease).toHaveBeenCalledOnce();
@@ -203,12 +273,18 @@ describe('PgVectorStore', () => {
         .mockResolvedValueOnce(undefined) // BEGIN
         .mockRejectedValueOnce(new Error('DB write error')); // first INSERT fails
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await expect(
         store.addDocuments([makeVectorDoc({ id: 'fail-doc' })])
       ).rejects.toThrow('DB write error');
 
-      const queries: string[] = mockClientQuery.mock.calls.map((c) => String(c[0]));
+      const queries: string[] = mockClientQuery.mock.calls.map((c) =>
+        String(c[0])
+      );
       expect(queries).toContain('ROLLBACK');
     });
 
@@ -217,7 +293,11 @@ describe('PgVectorStore', () => {
         .mockResolvedValueOnce(undefined) // BEGIN
         .mockRejectedValueOnce(new Error('fail'));
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.addDocuments([makeVectorDoc()]).catch(() => undefined);
 
       expect(mockClientRelease).toHaveBeenCalled();
@@ -227,11 +307,23 @@ describe('PgVectorStore', () => {
   describe('similaritySearch()', () => {
     it('returns search results with id, content, metadata, similarity', async () => {
       mockPoolQuery.mockResolvedValueOnce({
-        rows: [makeSearchRow(), makeSearchRow({ id: 'result-2', similarity: '0.72' })],
+        rows: [
+          makeSearchRow(),
+          makeSearchRow({ id: 'result-2', similarity: '0.72' }),
+        ],
       });
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
-      const results = await store.similaritySearch(makeFakeEmbedding(), 'tenant-abc', 5, 0.5);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
+      const results = await store.similaritySearch(
+        makeFakeEmbedding(),
+        'tenant-abc',
+        5,
+        0.5
+      );
 
       expect(results).toHaveLength(2);
       expect(results[0]!.id).toBe('result-1');
@@ -241,7 +333,11 @@ describe('PgVectorStore', () => {
     it('filters by tenant_id in the WHERE clause', async () => {
       mockPoolQuery.mockResolvedValueOnce({ rows: [] });
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.similaritySearch(makeFakeEmbedding(), 'my-tenant', 5, 0.5);
 
       const params = mockPoolQuery.mock.calls[0]![1] as unknown[];
@@ -251,7 +347,11 @@ describe('PgVectorStore', () => {
     it('applies similarity threshold from parameters', async () => {
       mockPoolQuery.mockResolvedValueOnce({ rows: [] });
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.similaritySearch(makeFakeEmbedding(), 'tenant-abc', 10, 0.75);
 
       const params = mockPoolQuery.mock.calls[0]![1] as unknown[];
@@ -261,7 +361,11 @@ describe('PgVectorStore', () => {
     it('applies limit from parameters', async () => {
       mockPoolQuery.mockResolvedValueOnce({ rows: [] });
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.similaritySearch(makeFakeEmbedding(), 'tenant-abc', 7, 0.5);
 
       const params = mockPoolQuery.mock.calls[0]![1] as unknown[];
@@ -273,7 +377,11 @@ describe('PgVectorStore', () => {
         rows: [makeSearchRow({ similarity: '0.654321' })],
       });
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       const results: SearchResult[] = await store.similaritySearch(
         makeFakeEmbedding(),
         'tenant-abc',
@@ -288,8 +396,17 @@ describe('PgVectorStore', () => {
     it('returns empty array when no results match threshold', async () => {
       mockPoolQuery.mockResolvedValueOnce({ rows: [] });
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
-      const results = await store.similaritySearch(makeFakeEmbedding(), 'tenant-abc', 5, 0.99);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
+      const results = await store.similaritySearch(
+        makeFakeEmbedding(),
+        'tenant-abc',
+        5,
+        0.99
+      );
 
       expect(results).toHaveLength(0);
     });
@@ -298,7 +415,11 @@ describe('PgVectorStore', () => {
       mockPoolQuery.mockResolvedValueOnce({ rows: [] });
       const embedding = [0.1, 0.2, 0.3];
 
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.similaritySearch(embedding, 'tenant-abc', 5, 0.5);
 
       const params = mockPoolQuery.mock.calls[0]![1] as unknown[];
@@ -308,7 +429,11 @@ describe('PgVectorStore', () => {
 
   describe('deleteDocument()', () => {
     it('deletes by id and tenantId', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.deleteDocument('doc-123', 'tenant-abc');
 
       expect(mockPoolQuery).toHaveBeenCalledWith(
@@ -320,7 +445,11 @@ describe('PgVectorStore', () => {
 
   describe('deleteByMetadata()', () => {
     it('deletes documents matching metadata filter and tenantId', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       const meta = { courseId: 'course-001' };
       await store.deleteByMetadata(meta, 'tenant-xyz');
 
@@ -333,7 +462,11 @@ describe('PgVectorStore', () => {
 
   describe('close()', () => {
     it('ends the connection pool', async () => {
-      const store = new PgVectorStore('postgresql://test', 'vector_documents', 768);
+      const store = new PgVectorStore(
+        'postgresql://test',
+        'vector_documents',
+        768
+      );
       await store.close();
 
       expect(mockPoolEnd).toHaveBeenCalledOnce();

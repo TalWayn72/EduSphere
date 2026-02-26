@@ -18,7 +18,7 @@ interface MockRedisInstance {
 const { createdInstances, MockRedis } = vi.hoisted(() => {
   const createdInstances: MockRedisInstance[] = [];
 
-  const MockRedis = vi.fn(function() {
+  const MockRedis = vi.fn(function () {
     const instance: MockRedisInstance = {
       publish: vi.fn().mockResolvedValue(1),
       subscribe: vi.fn().mockResolvedValue(undefined),
@@ -27,7 +27,7 @@ const { createdInstances, MockRedis } = vi.hoisted(() => {
       on: vi.fn().mockImplementation(function (
         this: MockRedisInstance,
         event: string,
-        handler: MessageHandler,
+        handler: MessageHandler
       ) {
         if (event === 'message') {
           this._messageHandler = handler;
@@ -63,7 +63,11 @@ function getSubscriber(): MockRedisInstance {
   return createdInstances[createdInstances.length - 1];
 }
 
-function fireMessage(subscriber: MockRedisInstance, channel: string, msg: PubSubMessage): void {
+function fireMessage(
+  subscriber: MockRedisInstance,
+  channel: string,
+  msg: PubSubMessage
+): void {
   if (subscriber._messageHandler) {
     subscriber._messageHandler(channel, JSON.stringify(msg));
   }
@@ -79,7 +83,7 @@ describe('RedisPubSub', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     createdInstances.length = 0;
-    MockRedis.mockImplementation(function() {
+    MockRedis.mockImplementation(function () {
       const instance: MockRedisInstance = {
         publish: vi.fn().mockResolvedValue(1),
         subscribe: vi.fn().mockResolvedValue(undefined),
@@ -88,7 +92,7 @@ describe('RedisPubSub', () => {
         on: vi.fn().mockImplementation(function (
           this: MockRedisInstance,
           event: string,
-          handler: MessageHandler,
+          handler: MessageHandler
         ) {
           if (event === 'message') {
             this._messageHandler = handler;
@@ -135,7 +139,9 @@ describe('RedisPubSub', () => {
     it('calls subscriber.subscribe with the channel name', async () => {
       const handler = vi.fn();
       await pubsub.subscribe(CHANNELS.COURSE_UPDATES, handler);
-      expect(getSubscriber().subscribe).toHaveBeenCalledWith(CHANNELS.COURSE_UPDATES);
+      expect(getSubscriber().subscribe).toHaveBeenCalledWith(
+        CHANNELS.COURSE_UPDATES
+      );
     });
 
     it('does NOT call subscriber.subscribe again for the same channel', async () => {
@@ -187,7 +193,9 @@ describe('RedisPubSub', () => {
 
   describe('publish()', () => {
     it('calls publisher.publish with the channel and a JSON payload', async () => {
-      await pubsub.publish(CHANNELS.COURSE_UPDATES, EVENTS.COURSE_CREATED, { id: 'abc' });
+      await pubsub.publish(CHANNELS.COURSE_UPDATES, EVENTS.COURSE_CREATED, {
+        id: 'abc',
+      });
 
       const pub = getPublisher();
       expect(pub.publish).toHaveBeenCalledOnce();
@@ -213,7 +221,7 @@ describe('RedisPubSub', () => {
         CHANNELS.ANNOTATION_UPDATES,
         EVENTS.ANNOTATION_CREATED,
         {},
-        'tenant-99',
+        'tenant-99'
       );
 
       const [, rawMessage] = getPublisher().publish.mock.calls[0];
@@ -237,7 +245,9 @@ describe('RedisPubSub', () => {
       const handler = vi.fn();
       await pubsub.subscribe(CHANNELS.COURSE_UPDATES, handler);
       await pubsub.unsubscribe(CHANNELS.COURSE_UPDATES, handler);
-      expect(getSubscriber().unsubscribe).toHaveBeenCalledWith(CHANNELS.COURSE_UPDATES);
+      expect(getSubscriber().unsubscribe).toHaveBeenCalledWith(
+        CHANNELS.COURSE_UPDATES
+      );
     });
 
     it('does nothing when channel has no listeners', async () => {
@@ -269,7 +279,9 @@ describe('RedisPubSub', () => {
     it('unsubscribes from Redis when no callback argument is passed', async () => {
       await pubsub.subscribe(CHANNELS.DISCUSSION_UPDATES, vi.fn());
       await pubsub.unsubscribe(CHANNELS.DISCUSSION_UPDATES);
-      expect(getSubscriber().unsubscribe).toHaveBeenCalledWith(CHANNELS.DISCUSSION_UPDATES);
+      expect(getSubscriber().unsubscribe).toHaveBeenCalledWith(
+        CHANNELS.DISCUSSION_UPDATES
+      );
     });
   });
 

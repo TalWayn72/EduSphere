@@ -13,7 +13,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useVideoAnnotations, type VideoAnnotation } from '@/hooks/useVideoAnnotations';
+import {
+  useVideoAnnotations,
+  type VideoAnnotation,
+} from '@/hooks/useVideoAnnotations';
 import { AnnotationTimeline } from './AnnotationTimeline';
 import { AddAnnotationForm } from './AddAnnotationForm';
 
@@ -39,7 +42,10 @@ export function VideoAnnotationLayer({
   onSeek,
 }: VideoAnnotationLayerProps) {
   const [showForm, setShowForm] = useState(false);
-  const { annotations, isLoading, addAnnotation } = useVideoAnnotations(videoId, tenantId);
+  const { annotations, isLoading, addAnnotation } = useVideoAnnotations(
+    videoId,
+    tenantId
+  );
 
   const handleSave = async (text: string, timestamp: number) => {
     await addAnnotation(text, timestamp);
@@ -108,7 +114,7 @@ export function VideoAnnotationLayer({
             variant="outline"
             className="h-7 text-xs"
             onClick={() => setShowForm(true)}
-            aria-label="Add annotation at current time"
+            aria-label="Add note at current time"
           >
             + Add Note
           </Button>

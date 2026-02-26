@@ -50,7 +50,7 @@ vi.mock('@edusphere/db', () => ({
       sql: String(strings[0]),
       values,
     }),
-    { raw: (s: string) => ({ sql: s }) },
+    { raw: (s: string) => ({ sql: s }) }
   ),
 }));
 
@@ -96,8 +96,16 @@ describe('searchKnowledgeGraph', () => {
 
     // pgvector raw execute result
     dbExecuteImpl = vi.fn().mockResolvedValue([
-      { segment_id: 'seg-1', text: 'photosynthesis occurs in chloroplasts', similarity: '0.92' },
-      { segment_id: 'seg-2', text: 'light reactions in thylakoid', similarity: '0.85' },
+      {
+        segment_id: 'seg-1',
+        text: 'photosynthesis occurs in chloroplasts',
+        similarity: '0.92',
+      },
+      {
+        segment_id: 'seg-2',
+        text: 'light reactions in thylakoid',
+        similarity: '0.85',
+      },
     ]);
 
     // ILIKE fallback (remaining=0 so should not be called, but set up anyway)
@@ -120,7 +128,10 @@ describe('searchKnowledgeGraph', () => {
     delete process.env.OPENAI_API_KEY;
 
     // Ollama fails
-    (global.fetch as Mock).mockResolvedValueOnce({ ok: false, json: async () => ({}) });
+    (global.fetch as Mock).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
 
     // ILIKE returns results
     const { tx } = buildSelectChain([
@@ -132,14 +143,20 @@ describe('searchKnowledgeGraph', () => {
     const results = await searchKnowledgeGraph('algebra', TENANT, 5);
 
     expect(results.length).toBeGreaterThanOrEqual(2);
-    expect(results[0]).toMatchObject({ id: 'seg-ilike-1', type: 'transcript_segment', similarity: 0 });
+    expect(results[0]).toMatchObject({
+      id: 'seg-ilike-1',
+      type: 'transcript_segment',
+      similarity: 0,
+    });
   });
 
   it('falls back to ILIKE when no embedding provider is configured', async () => {
     delete process.env.OLLAMA_URL;
     delete process.env.OPENAI_API_KEY;
 
-    const { tx } = buildSelectChain([{ id: 'seg-3', text: 'calculus derivatives' }]);
+    const { tx } = buildSelectChain([
+      { id: 'seg-3', text: 'calculus derivatives' },
+    ]);
     withTenantContextImpl = async (_db, _ctx, op) => op(tx);
 
     const results = await searchKnowledgeGraph('calculus', TENANT, 5);
@@ -160,8 +177,16 @@ describe('searchKnowledgeGraph', () => {
 
     // Vector returns seg-1 and seg-2
     dbExecuteImpl = vi.fn().mockResolvedValue([
-      { segment_id: 'seg-1', text: 'mitochondria powerhouse', similarity: '0.9' },
-      { segment_id: 'seg-2', text: 'cell membrane structure', similarity: '0.8' },
+      {
+        segment_id: 'seg-1',
+        text: 'mitochondria powerhouse',
+        similarity: '0.9',
+      },
+      {
+        segment_id: 'seg-2',
+        text: 'cell membrane structure',
+        similarity: '0.8',
+      },
     ]);
 
     // ILIKE returns seg-1 (duplicate) and seg-3 (new)
@@ -194,7 +219,7 @@ describe('searchKnowledgeGraph', () => {
         segment_id: `seg-${i}`,
         text: `content ${i}`,
         similarity: String(0.9 - i * 0.05),
-      })),
+      }))
     );
 
     const { tx } = buildSelectChain([]);
@@ -271,7 +296,12 @@ describe('fetchContentItem', () => {
   it('truncates content to 500 characters', async () => {
     const longContent = 'x'.repeat(800);
     const { tx } = buildSelectChain([
-      { id: ITEM_ID, title: 'Long Item', type: 'MARKDOWN', content: longContent },
+      {
+        id: ITEM_ID,
+        title: 'Long Item',
+        type: 'MARKDOWN',
+        content: longContent,
+      },
     ]);
     withTenantContextImpl = async (_db, _ctx, op) => op(tx);
 
@@ -308,7 +338,7 @@ describe('fetchContentItem', () => {
     expect(withTenantContext).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ tenantId: 'tenant-xyz' }),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 

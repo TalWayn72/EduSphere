@@ -4,4 +4,3 @@ const ANNOTATIONS_QUERY_DOC = parse(`
     annotations(assetId: $assetId) { id layer annotationType content }
   }
 `);
-

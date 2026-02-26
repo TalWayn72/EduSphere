@@ -24,7 +24,7 @@ export const JWTClaimsSchema = z.object({
   realm_access: z.object({
     roles: z.array(z.string()),
   }),
-  tenant_id: z.string().uuid().optional(),
+  tenant_id: z.string().optional(),
   iss: z.string(),
   aud: z.union([z.string(), z.array(z.string())]).optional(),
   exp: z.number(),
@@ -65,6 +65,26 @@ export class JWTValidator {
   }
 
   async validate(token: string): Promise<AuthContext> {
+    // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
+    // non-production environments so Playwright tests work without a live Keycloak.
+    // NEVER active in production (NODE_ENV === 'production').
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      token === 'dev-token-mock-jwt'
+    ) {
+      return {
+        userId: 'dev-user-1',
+        email: 'dev@edusphere.local',
+        username: 'developer',
+        firstName: 'Dev',
+        lastName: 'User',
+        roles: ['SUPER_ADMIN'],
+        scopes: [],
+        tenantId: 'dev-tenant-1',
+        isSuperAdmin: true,
+      };
+    }
+
     try {
       const { payload } = await jwtVerify(token, this.jwks, {
         issuer: this.issuer,

@@ -1,0 +1,38 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole"])
+
+type SecuritySettings {
+  mfaRequired: Boolean!
+  mfaRequiredForAdmins: Boolean!
+  sessionTimeoutMinutes: Int!
+  maxConcurrentSessions: Int!
+  loginAttemptLockoutThreshold: Int!
+  passwordMinLength: Int!
+  passwordRequireSpecialChars: Boolean!
+  passwordExpiryDays: Int
+  ipAllowlist: [String!]!
+}
+
+input UpdateSecuritySettingsInput {
+  mfaRequired: Boolean
+  mfaRequiredForAdmins: Boolean
+  sessionTimeoutMinutes: Int
+  maxConcurrentSessions: Int
+  loginAttemptLockoutThreshold: Int
+  passwordMinLength: Int
+  passwordRequireSpecialChars: Boolean
+  passwordExpiryDays: Int
+  ipAllowlist: [String!]
+}
+
+extend type Query {
+  mySecuritySettings: SecuritySettings!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  updateSecuritySettings(input: UpdateSecuritySettingsInput!): SecuritySettings!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

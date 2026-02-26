@@ -18,6 +18,14 @@ vi.mock('@/lib/queries', () => ({
   UPDATE_USER_PREFERENCES_MUTATION: 'UPDATE_USER_PREFERENCES_MUTATION',
 }));
 
+vi.mock('@/lib/graphql/tenant-language.queries', () => ({
+  MY_TENANT_LANGUAGE_SETTINGS_QUERY: 'MY_TENANT_LANGUAGE_SETTINGS_QUERY',
+}));
+
+vi.mock('@/lib/i18n', () => ({
+  applyDocumentDirection: vi.fn(),
+}));
+
 // ── Import after mocks ─────────────────────────────────────────────────────
 import { useUserPreferences } from './useUserPreferences';
 import * as urql from 'urql';
@@ -28,9 +36,21 @@ import * as urql from 'urql';
 function makeQueryResult(locale: string | null, fetching = false) {
   const data =
     locale !== null
-      ? { me: { id: 'u-1', preferences: { locale, theme: 'light', emailNotifications: true, pushNotifications: false } } }
+      ? {
+          me: {
+            id: 'u-1',
+            preferences: {
+              locale,
+              theme: 'light',
+              emailNotifications: true,
+              pushNotifications: false,
+            },
+          },
+        }
       : undefined;
-  return [{ data, fetching, error: undefined }, vi.fn()] as ReturnType<typeof urql.useQuery>;
+  return [{ data, fetching, error: undefined }, vi.fn()] as ReturnType<
+    typeof urql.useQuery
+  >;
 }
 
 function setupMocks({
@@ -53,8 +73,13 @@ function setupMocks({
   }));
 
   vi.mocked(urql.useQuery).mockReturnValue(makeQueryResult(dbLocale, fetching));
-  mockUpdatePreferences.mockResolvedValue({ data: { updateUserPreferences: { id: 'u-1' } } });
-  vi.mocked(urql.useMutation).mockReturnValue([{ fetching }, mockUpdatePreferences] as ReturnType<typeof urql.useMutation>);
+  mockUpdatePreferences.mockResolvedValue({
+    data: { updateUserPreferences: { id: 'u-1' } },
+  });
+  vi.mocked(urql.useMutation).mockReturnValue([
+    { fetching },
+    mockUpdatePreferences,
+  ] as ReturnType<typeof urql.useMutation>);
 
   return { changeLanguage };
 }
@@ -118,14 +143,22 @@ describe('useUserPreferences', () => {
     });
 
     expect(mockUpdatePreferences).toHaveBeenCalledTimes(1);
-    expect(mockUpdatePreferences).toHaveBeenCalledWith({ input: { locale: 'zh-CN' } });
+    expect(mockUpdatePreferences).toHaveBeenCalledWith({
+      input: { locale: 'zh-CN' },
+    });
   });
 
   it('setLocale calls i18n.changeLanguage with the new locale', async () => {
-    const { changeLanguage } = setupMocks({ dbLocale: 'en', i18nLanguage: 'en' });
+    const { changeLanguage } = setupMocks({
+      dbLocale: 'en',
+      i18nLanguage: 'en',
+    });
     // Re-mock react-i18next inline to capture the spy
     vi.mocked(urql.useQuery).mockReturnValue(makeQueryResult('en'));
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockUpdatePreferences] as ReturnType<typeof urql.useMutation>);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockUpdatePreferences,
+    ] as ReturnType<typeof urql.useMutation>);
 
     // Use the global setup.ts mock (language:'en', changeLanguage is a spy there)
     // For this test we verify via the mock returned by setupMocks.
@@ -139,7 +172,9 @@ describe('useUserPreferences', () => {
     });
 
     // Mutation called proves the full setLocale path ran (changeLanguage included)
-    expect(mockUpdatePreferences).toHaveBeenCalledWith({ input: { locale: 'ru' } });
+    expect(mockUpdatePreferences).toHaveBeenCalledWith({
+      input: { locale: 'ru' },
+    });
     // localStorage updated as a side-effect proof
     expect(localStorage.getItem('edusphere_locale')).toBe('ru');
     void changeLanguage; // referenced to avoid unused-var lint
@@ -177,5 +212,152 @@ describe('useUserPreferences', () => {
     expect(result.current).toHaveProperty('locale');
     expect(result.current).toHaveProperty('setLocale');
     expect(result.current).toHaveProperty('isSaving');
+  });
+
+  // ── Auto-fallback: current locale not in tenant availableLocales (lines 71-75) ─
+
+  it('auto-switches to tenant default locale when current locale is not in availableLocales', async () => {
+    // Reset all mock implementations to clear any queued mockReturnValueOnce values
+    vi.resetAllMocks();
+    // User's DB locale is 'de', but tenant only allows ['en', 'fr']
+    // → hook must auto-switch to tenant default 'en'
+    const changeLanguage = vi.fn().mockResolvedValue(undefined);
+
+    vi.doMock('react-i18next', () => ({
+      useTranslation: () => ({
+        i18n: { language: 'de', changeLanguage },
+      }),
+    }));
+
+    // First useQuery call → ME_QUERY (locale: 'de')
+    const meResult = [
+      {
+        data: {
+          me: {
+            id: 'u-1',
+            preferences: {
+              locale: 'de',
+              theme: 'light',
+              emailNotifications: true,
+              pushNotifications: false,
+            },
+          },
+        },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as ReturnType<typeof urql.useQuery>;
+
+    // Second useQuery call → MY_TENANT_LANGUAGE_SETTINGS_QUERY
+    const tenantResult = [
+      {
+        data: {
+          myTenantLanguageSettings: {
+            supportedLanguages: ['en', 'fr'],
+            defaultLanguage: 'en',
+          },
+        },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as ReturnType<typeof urql.useQuery>;
+
+    vi.mocked(urql.useQuery)
+      .mockReturnValueOnce(meResult)
+      .mockReturnValueOnce(tenantResult)
+      // Subsequent render cycles: repeat the same values
+      .mockReturnValueOnce(meResult)
+      .mockReturnValueOnce(tenantResult)
+      .mockReturnValueOnce(meResult)
+      .mockReturnValueOnce(tenantResult);
+
+    mockUpdatePreferences.mockResolvedValue({
+      data: { updateUserPreferences: { id: 'u-1' } },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockUpdatePreferences,
+    ] as ReturnType<typeof urql.useMutation>);
+
+    await act(async () => {
+      renderHook(() => useUserPreferences());
+    });
+
+    // The auto-fallback effect must have called updatePreferences with the tenant default
+    expect(mockUpdatePreferences).toHaveBeenCalledWith({
+      input: { locale: 'en' },
+    });
+
+    // localStorage should be updated to the tenant default
+    expect(localStorage.getItem('edusphere_locale')).toBe('en');
+  });
+
+  it('does NOT auto-switch when current locale is in availableLocales', async () => {
+    // Reset all mock implementations to clear any queued mockReturnValueOnce values
+    vi.resetAllMocks();
+    // User's locale is 'fr', tenant allows ['en', 'fr'] — no fallback needed
+    const changeLanguage = vi.fn().mockResolvedValue(undefined);
+
+    vi.doMock('react-i18next', () => ({
+      useTranslation: () => ({
+        i18n: { language: 'fr', changeLanguage },
+      }),
+    }));
+
+    const meResult = [
+      {
+        data: {
+          me: {
+            id: 'u-1',
+            preferences: {
+              locale: 'fr',
+              theme: 'light',
+              emailNotifications: true,
+              pushNotifications: false,
+            },
+          },
+        },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as ReturnType<typeof urql.useQuery>;
+
+    const tenantResult = [
+      {
+        data: {
+          myTenantLanguageSettings: {
+            supportedLanguages: ['en', 'fr'],
+            defaultLanguage: 'en',
+          },
+        },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as ReturnType<typeof urql.useQuery>;
+
+    vi.mocked(urql.useQuery)
+      .mockReturnValueOnce(meResult)
+      .mockReturnValueOnce(tenantResult)
+      .mockReturnValueOnce(meResult)
+      .mockReturnValueOnce(tenantResult);
+
+    mockUpdatePreferences.mockResolvedValue({
+      data: { updateUserPreferences: { id: 'u-1' } },
+    });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockUpdatePreferences,
+    ] as ReturnType<typeof urql.useMutation>);
+
+    await act(async () => {
+      renderHook(() => useUserPreferences());
+    });
+
+    // No auto-fallback mutation should fire (locale 'fr' is in allowed list)
+    expect(mockUpdatePreferences).not.toHaveBeenCalled();
   });
 });

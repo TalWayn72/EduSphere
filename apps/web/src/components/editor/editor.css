@@ -1,0 +1,204 @@
+/* Tiptap ProseMirror base styles — scoped to avoid global conflicts */
+.ProseMirror {
+  min-height: 300px;
+  padding: 1rem;
+  outline: none;
+}
+
+.ProseMirror h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem;
+  line-height: 1.2;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.875rem 0 0.5rem;
+  line-height: 1.25;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.ProseMirror p {
+  margin-bottom: 0.5rem;
+  line-height: 1.625;
+}
+
+.ProseMirror code {
+  background: #f4f4f5;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: ui-monospace, monospace;
+}
+
+.dark .ProseMirror code {
+  background: #27272a;
+}
+
+.ProseMirror pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  font-family: ui-monospace, monospace;
+  font-size: 0.875rem;
+}
+
+.ProseMirror pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75rem 0;
+}
+
+.ProseMirror td,
+.ProseMirror th {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+}
+
+.dark .ProseMirror td,
+.dark .ProseMirror th {
+  border-color: #3f3f46;
+}
+
+.ProseMirror th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.dark .ProseMirror th {
+  background: #27272a;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.ProseMirror .task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  list-style: none;
+}
+
+.ProseMirror .task-list-item input[type='checkbox'] {
+  margin-top: 0.2rem;
+  cursor: pointer;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 1rem;
+  margin: 0.75rem 0;
+  font-style: italic;
+  color: #64748b;
+}
+
+.dark .ProseMirror blockquote {
+  border-left-color: #52525b;
+  color: #a1a1aa;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+}
+
+/* Mathematics (KaTeX) */
+.ProseMirror .math-node {
+  cursor: default;
+}
+
+/* ── Annotation text-range highlights ──────────────────────────────────────── */
+
+.annotation-highlight {
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.annotation-highlight--PERSONAL    { background-color: rgba(250, 204, 21, 0.25); }
+.annotation-highlight--SHARED      { background-color: rgba(59, 130, 246, 0.20); }
+.annotation-highlight--INSTRUCTOR  { background-color: rgba(34, 197, 94, 0.20); }
+.annotation-highlight--AI_GENERATED { background-color: rgba(168, 85, 247, 0.20); }
+
+/* Focused: stronger colour + underline (overrides layer colour) */
+.annotation-highlight--focused {
+  background-color: rgba(249, 115, 22, 0.30) !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(249, 115, 22, 0.70);
+  text-underline-offset: 2px;
+}
+
+/* Dark-mode overrides */
+.dark .annotation-highlight--PERSONAL     { background-color: rgba(250, 204, 21, 0.20); }
+.dark .annotation-highlight--SHARED       { background-color: rgba(59, 130, 246, 0.18); }
+.dark .annotation-highlight--INSTRUCTOR   { background-color: rgba(34, 197, 94, 0.18); }
+.dark .annotation-highlight--AI_GENERATED { background-color: rgba(168, 85, 247, 0.18); }
+.dark .annotation-highlight--focused      { background-color: rgba(249, 115, 22, 0.28) !important; }
+
+/* ── MS-Word Style Annotation Highlights ──────────────────────────────────── */
+/* Applied by ProseMirror DecorationSet plugin in AnnotationDecorationsPlugin  */
+.annotation-highlight {
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 150ms ease, outline 150ms ease;
+}
+
+.annotation-highlight--PERSONAL {
+  background-color: rgba(124, 58, 237, 0.15); /* violet */
+}
+
+.annotation-highlight--SHARED {
+  background-color: rgba(37, 99, 235, 0.15); /* blue */
+}
+
+.annotation-highlight--INSTRUCTOR {
+  background-color: rgba(22, 163, 74, 0.15); /* green */
+}
+
+.annotation-highlight--AI_GENERATED {
+  background-color: rgba(217, 119, 6, 0.15); /* amber */
+}
+
+.annotation-highlight--focused {
+  background-color: rgba(245, 158, 11, 0.35) !important; /* stronger amber */
+  outline: 2px solid rgba(245, 158, 11, 0.6);
+  border-radius: 2px;
+}
+
+.annotation-highlight:hover {
+  filter: brightness(0.92);
+}

@@ -5,14 +5,27 @@ import { NatsKVClient } from './kv.client.js';
 // vi.hoisted() ensures all variables are initialized before vi.mock() hoisting.
 
 const {
-  mockStorePut, mockStoreGet, mockStoreDelete, mockKvStore,
-  mockStreamsAdd, mockJsm, mockKvView, mockJs,
-  mockDrain, mockJetstreamManager, mockJetstream, mockNc,
+  mockStorePut,
+  mockStoreGet,
+  mockStoreDelete,
+  mockKvStore,
+  mockStreamsAdd,
+  mockJsm,
+  mockKvView,
+  mockJs,
+  mockDrain,
+  mockJetstreamManager,
+  mockJetstream,
+  mockNc,
 } = vi.hoisted(() => {
   const mockStorePut = vi.fn();
   const mockStoreGet = vi.fn();
   const mockStoreDelete = vi.fn();
-  const mockKvStore = { put: mockStorePut, get: mockStoreGet, delete: mockStoreDelete };
+  const mockKvStore = {
+    put: mockStorePut,
+    get: mockStoreGet,
+    delete: mockStoreDelete,
+  };
   const mockStreamsAdd = vi.fn();
   const mockJsm = { streams: { add: mockStreamsAdd } };
   const mockKvView = vi.fn();
@@ -20,11 +33,24 @@ const {
   const mockDrain = vi.fn().mockResolvedValue(undefined);
   const mockJetstreamManager = vi.fn().mockResolvedValue(mockJsm);
   const mockJetstream = vi.fn().mockReturnValue(mockJs);
-  const mockNc = { jetstream: mockJetstream, jetstreamManager: mockJetstreamManager, drain: mockDrain };
+  const mockNc = {
+    jetstream: mockJetstream,
+    jetstreamManager: mockJetstreamManager,
+    drain: mockDrain,
+  };
   return {
-    mockStorePut, mockStoreGet, mockStoreDelete, mockKvStore,
-    mockStreamsAdd, mockJsm, mockKvView, mockJs,
-    mockDrain, mockJetstreamManager, mockJetstream, mockNc,
+    mockStorePut,
+    mockStoreGet,
+    mockStoreDelete,
+    mockKvStore,
+    mockStreamsAdd,
+    mockJsm,
+    mockKvView,
+    mockJs,
+    mockDrain,
+    mockJetstreamManager,
+    mockJetstream,
+    mockNc,
   };
 });
 
@@ -97,20 +123,30 @@ describe('NatsKVClient', () => {
       mockStorePut.mockResolvedValue(undefined);
       await client.set('agent-memory', 'session-abc', { messages: ['hello'] });
       expect(mockStorePut).toHaveBeenCalledOnce();
-      const [key, encodedValue] = mockStorePut.mock.calls[0] as [string, Uint8Array];
+      const [key, encodedValue] = mockStorePut.mock.calls[0] as [
+        string,
+        Uint8Array,
+      ];
       expect(key).toBe('session-abc');
-      expect(JSON.parse(new TextDecoder().decode(encodedValue))).toEqual({ messages: ['hello'] });
+      expect(JSON.parse(new TextDecoder().decode(encodedValue))).toEqual({
+        messages: ['hello'],
+      });
     });
 
     it('stores primitive values (string) without throwing', async () => {
       mockStorePut.mockResolvedValue(undefined);
-      await expect(client.set('bucket', 'key', 'simple-string')).resolves.toBeUndefined();
+      await expect(
+        client.set('bucket', 'key', 'simple-string')
+      ).resolves.toBeUndefined();
     });
 
     it('stores null as a valid JSON value', async () => {
       mockStorePut.mockResolvedValue(undefined);
       await client.set('bucket', 'key', null);
-      const [, encodedValue] = mockStorePut.mock.calls[0] as [string, Uint8Array];
+      const [, encodedValue] = mockStorePut.mock.calls[0] as [
+        string,
+        Uint8Array,
+      ];
       expect(JSON.parse(new TextDecoder().decode(encodedValue))).toBeNull();
     });
   });
@@ -119,8 +155,13 @@ describe('NatsKVClient', () => {
 
   describe('get()', () => {
     it('returns the deserialised value when the key exists', async () => {
-      mockStoreGet.mockResolvedValue(makeEntry({ role: 'user', content: 'hello' }));
-      const result = await client.get<{ role: string; content: string }>('agent-memory', 'session-1');
+      mockStoreGet.mockResolvedValue(
+        makeEntry({ role: 'user', content: 'hello' })
+      );
+      const result = await client.get<{ role: string; content: string }>(
+        'agent-memory',
+        'session-1'
+      );
       expect(result).toEqual({ role: 'user', content: 'hello' });
     });
 
@@ -137,7 +178,10 @@ describe('NatsKVClient', () => {
     });
 
     it('correctly deserialises nested objects', async () => {
-      const payload = { sessionId: 'abc', messages: [{ role: 'user', content: 'hi' }] };
+      const payload = {
+        sessionId: 'abc',
+        messages: [{ role: 'user', content: 'hi' }],
+      };
       mockStoreGet.mockResolvedValue(makeEntry(payload));
       const result = await client.get<typeof payload>('bucket', 'key');
       expect(result).toEqual(payload);

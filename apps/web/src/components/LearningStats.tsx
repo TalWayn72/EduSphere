@@ -72,7 +72,9 @@ export function LearningStats({ courses, weeklyStats }: LearningStatsProps) {
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">{t('courseProgress')}</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t('courseProgress')}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {courses.map((course) => (
@@ -111,7 +113,9 @@ export function LearningStats({ courses, weeklyStats }: LearningStatsProps) {
             </div>
             <div>
               <span className="text-muted-foreground">{t('bestWeek')}</span>
-              <p className="font-medium">{maxMinutes} {t('min')}</p>
+              <p className="font-medium">
+                {maxMinutes} {t('min')}
+              </p>
             </div>
           </div>
         </CardContent>

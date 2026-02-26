@@ -35,9 +35,7 @@ test.describe('Course List — page load and content', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test('each course card shows duration icon', async ({
-    page,
-  }) => {
+  test('each course card shows duration icon', async ({ page }) => {
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
 
@@ -54,9 +52,7 @@ test.describe('Course List — page load and content', () => {
     await page.waitForLoadState('networkidle');
 
     // Click the first course card (not the "Open" ghost button — the card itself)
-    const firstTitle = page
-      .getByText('Introduction to Talmud Study')
-      .first();
+    const firstTitle = page.getByText('Introduction to Talmud Study').first();
     await firstTitle.click();
 
     // CourseList navigates to /courses/:id (CourseDetail), not /learn/
@@ -132,9 +128,7 @@ test.describe('Content Viewer — video player', () => {
     await expect(video).toBeVisible({ timeout: 8_000 });
 
     // Get the third transcript segment (index 2) — it has a non-zero startTime
-    const segments = page.locator(
-      '.flex.gap-3.p-2.rounded-md.cursor-pointer'
-    );
+    const segments = page.locator('.flex.gap-3.p-2.rounded-md.cursor-pointer');
     await expect(segments.nth(2)).toBeVisible({ timeout: 5_000 });
 
     // Read the timestamp shown on that segment
@@ -155,7 +149,9 @@ test.describe('Content Viewer — video player', () => {
     expect(displayText).toBeTruthy();
     // The clicked segment's time text should appear somewhere in the current time
     if (segTimestamp) {
-      expect(displayText).toContain(segTimestamp.trim().split('/')[0]?.trim() ?? '');
+      expect(displayText).toContain(
+        segTimestamp.trim().split('/')[0]?.trim() ?? ''
+      );
     }
   });
 

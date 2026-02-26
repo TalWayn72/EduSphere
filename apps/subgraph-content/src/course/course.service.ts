@@ -1,5 +1,12 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc, closeAllPools } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  desc,
+  closeAllPools,
+  withReadReplica,
+} from '@edusphere/db';
 
 interface CreateCourseInput {
   tenantId?: string;
@@ -35,15 +42,21 @@ export class CourseService implements OnModuleDestroy {
     return {
       ...course,
       tenantId: course['tenant_id'] || course['tenantId'] || '',
-      instructorId: course['instructor_id'] || course['creator_id'] || course['instructorId'] || '',
-      isPublished: course['is_published'] !== undefined
-        ? course['is_published']
-        : (course['isPublished'] || course['is_public'] || false),
+      instructorId:
+        course['instructor_id'] ||
+        course['creator_id'] ||
+        course['instructorId'] ||
+        '',
+      isPublished:
+        course['is_published'] !== undefined
+          ? course['is_published']
+          : course['isPublished'] || course['is_public'] || false,
       slug: course['slug'] || '',
       thumbnailUrl: course['thumbnail_url'] || course['thumbnailUrl'] || null,
-      estimatedHours: course['estimated_hours'] !== undefined
-        ? course['estimated_hours']
-        : (course['estimatedHours'] || null),
+      estimatedHours:
+        course['estimated_hours'] !== undefined
+          ? course['estimated_hours']
+          : course['estimatedHours'] || null,
       // content.ts schema uses snake_case timestamps via the ...timestamps helper
       createdAt: course['created_at'] || course['createdAt'] || null,
       updatedAt: course['updated_at'] || course['updatedAt'] || null,
@@ -51,26 +64,27 @@ export class CourseService implements OnModuleDestroy {
   }
 
   async findById(id: string) {
-    const [course] = await this.db
-      .select()
-      .from(schema.courses)
-      .where(eq(schema.courses.id, id))
-      .limit(1);
+    const [course] = await withReadReplica((db) =>
+      db.select().from(schema.courses).where(eq(schema.courses.id, id)).limit(1)
+    );
     return this.mapCourse(course as Record<string, unknown>) || null;
   }
 
   async findAll(limit: number, offset: number) {
-    const rows = await this.db
-      .select()
-      .from(schema.courses)
-      .orderBy(desc(schema.courses.created_at))
-      .limit(limit)
-      .offset(offset);
+    const rows = await withReadReplica((db) =>
+      db
+        .select()
+        .from(schema.courses)
+        .orderBy(desc(schema.courses.created_at))
+        .limit(limit)
+        .offset(offset)
+    );
     return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
   }
 
   async create(input: CreateCourseInput) {
-    const slug = input.slug || input.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const slug =
+      input.slug || input.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const instructorId = input.instructorId || input.creatorId || '';
     const [course] = await this.db
       .insert(schema.courses)
@@ -92,10 +106,13 @@ export class CourseService implements OnModuleDestroy {
   async update(id: string, input: UpdateCourseInput) {
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
     if (input.title !== undefined) updateData['title'] = input.title;
-    if (input.description !== undefined) updateData['description'] = input.description;
+    if (input.description !== undefined)
+      updateData['description'] = input.description;
     if (input.slug !== undefined) updateData['slug'] = input.slug;
-    if (input.thumbnailUrl !== undefined) updateData['thumbnailUrl'] = input.thumbnailUrl;
-    if (input.estimatedHours !== undefined) updateData['estimatedHours'] = input.estimatedHours;
+    if (input.thumbnailUrl !== undefined)
+      updateData['thumbnailUrl'] = input.thumbnailUrl;
+    if (input.estimatedHours !== undefined)
+      updateData['estimatedHours'] = input.estimatedHours;
 
     const [course] = await this.db
       .update(schema.courses)

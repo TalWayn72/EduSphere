@@ -28,7 +28,7 @@ function renderDiscussionLive(courseId: string, mocks: MockedResponse[] = []) {
   return render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <DiscussionLive courseId={courseId} />
-    </MockedProvider>,
+    </MockedProvider>
   );
 }
 
@@ -75,7 +75,9 @@ describe('DiscussionLive', () => {
     renderDiscussionLive('course-1', [subMock]);
 
     await vi.waitFor(() => {
-      expect(screen.getByText('I am confused about the event loop.')).toBeDefined();
+      expect(
+        screen.getByText('I am confused about the event loop.')
+      ).toBeDefined();
     });
   });
 

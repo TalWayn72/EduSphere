@@ -30,7 +30,7 @@ describe('AuditService', () => {
         action: 'CREATE',
         resourceType: 'ANNOTATION',
         status: 'SUCCESS',
-      }),
+      })
     ).resolves.not.toThrow();
   });
 
@@ -38,13 +38,13 @@ describe('AuditService', () => {
     const { db } = await import('@edusphere/db');
     vi.mocked(db.insert).mockReturnValueOnce({
       values: vi.fn().mockRejectedValue(new Error('DB connection lost')),
-    } as ReturnType<typeof db.insert>);
+    } as unknown as ReturnType<typeof db.insert>);
 
     await expect(
       service.log({
         tenantId: 'tenant-1',
         action: 'DELETE',
-      }),
+      })
     ).resolves.not.toThrow();
   });
 
@@ -62,7 +62,7 @@ describe('AuditService', () => {
         requestId: 'req-123',
         status: 'SUCCESS',
         metadata: { gdprArticle: '17' },
-      }),
+      })
     ).resolves.not.toThrow();
   });
 });

@@ -14,6 +14,7 @@ export interface UploadedMedia {
   contentType: string;
   status: 'UPLOADING' | 'PROCESSING' | 'READY' | 'ERROR';
   downloadUrl: string | null;
+  altText: string | null;
 }
 
 export interface CourseFormData {
@@ -33,7 +34,18 @@ export const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
   { value: 'ADVANCED', label: 'Advanced' },
 ];
 
-export const THUMBNAIL_OPTIONS = ['📚', '🎓', '🕍', '📜', '🔍', '🧠', '🤝', '⚖️', '🕯️', '🌟'];
+export const THUMBNAIL_OPTIONS = [
+  '📚',
+  '🎓',
+  '🕍',
+  '📜',
+  '🔍',
+  '🧠',
+  '🤝',
+  '⚖️',
+  '🕯️',
+  '🌟',
+];
 
 export const DEFAULT_FORM: CourseFormData = {
   title: '',

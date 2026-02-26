@@ -30,7 +30,9 @@ export const agentMessages = pgTable('agent_messages', {
   // EU AI Act transparency fields (Art.50 — effective Aug 2026)
   isAiGenerated: boolean('is_ai_generated').notNull().default(false),
   modelUsed: varchar('model_used', { length: 100 }),
-  humanReviewRequired: boolean('human_review_required').notNull().default(false),
+  humanReviewRequired: boolean('human_review_required')
+    .notNull()
+    .default(false),
 });
 
 export const agentMessagesRLS = sql`

@@ -65,10 +65,10 @@ const BASE_URL = (() => {
   if (E2E_PROFILE !== 'local') {
     throw new Error(
       `E2E_BASE_URL must be set when E2E_ENV=${E2E_PROFILE}. ` +
-        'Example: E2E_BASE_URL=https://staging.edusphere.io',
+        'Example: E2E_BASE_URL=https://staging.edusphere.io'
     );
   }
-  return 'http://localhost:5174';
+  return 'http://localhost:5175';
 })();
 
 // Whether a Vite dev server should be started automatically.
@@ -86,6 +86,9 @@ export default defineConfig({
   /* Fail build in CI if test.only() was accidentally committed */
   forbidOnly: !!process.env.CI,
 
+  /* Skip snapshot comparisons in CI — no baseline images committed to repo */
+  ignoreSnapshots: !!process.env.CI,
+
   /**
    * Retry flaky tests.
    * CI: 2 retries for timing-sensitive streaming assertions.
@@ -102,7 +105,11 @@ export default defineConfig({
 
   /* Reporter — GitHub annotations in CI, rich HTML report locally */
   reporter: process.env.CI
-    ? [['github'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/results.json' }]]
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results/results.json' }],
+      ]
     : [['html'], ['json', { outputFile: 'test-results/results.json' }]],
 
   use: {
@@ -170,9 +177,9 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        // Use installed system Chrome when Playwright's own Chromium is
-        // unavailable (e.g. corporate proxy blocks playwright.dev downloads).
-        channel: 'chrome',
+        // Use system Chrome locally (faster startup).
+        // In CI, playwright install installs Chromium — do not use 'chrome' channel there.
+        ...(process.env.CI ? {} : { channel: 'chrome' }),
       },
     },
     /* Uncomment to test additional browsers in CI:
@@ -204,16 +211,19 @@ export default defineConfig({
    */
   webServer: USE_LOCAL_SERVER
     ? {
-        command: 'pnpm dev --port 5174',
-        url: 'http://localhost:5174',
-        reuseExistingServer: true,
+        command: 'pnpm dev --port 5175',
+        url: 'http://localhost:5175',
+        reuseExistingServer: false,
         env: {
           // Forward all VITE_* variables plus E2E-specific overrides
           VITE_DEV_MODE: process.env.VITE_DEV_MODE ?? 'true',
-          VITE_GRAPHQL_URL: process.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
-          VITE_KEYCLOAK_URL: process.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080',
+          VITE_GRAPHQL_URL:
+            process.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
+          VITE_KEYCLOAK_URL:
+            process.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080',
           VITE_KEYCLOAK_REALM: process.env.VITE_KEYCLOAK_REALM ?? 'edusphere',
-          VITE_KEYCLOAK_CLIENT_ID: process.env.VITE_KEYCLOAK_CLIENT_ID ?? 'edusphere-app',
+          VITE_KEYCLOAK_CLIENT_ID:
+            process.env.VITE_KEYCLOAK_CLIENT_ID ?? 'edusphere-app',
         },
         /** Wait up to 120s for Vite cold start + TypeScript compilation */
         timeout: 120_000,

@@ -11,7 +11,10 @@ import path from 'path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '../..');
 
-const supergraphSDL = readFileSync(path.join(root, 'apps/gateway/supergraph.graphql'), 'utf-8');
+const supergraphSDL = readFileSync(
+  path.join(root, 'apps/gateway/supergraph.graphql'),
+  'utf-8'
+);
 
 const schema = buildASTSchema(parse(supergraphSDL), { assumeValidSDL: true });
 
@@ -178,7 +181,6 @@ const MESSAGE_STREAM_SUBSCRIPTION_DOC = parse(`
   subscription MessageStream($sessionId: ID!) { messageStream(sessionId: $sessionId) { id role content createdAt } }
 `);
 
-
 describe('Schema Contract - annotation.queries.ts', () => {
   it('ANNOTATIONS_QUERY is valid', () => {
     assertValid('ANNOTATIONS_QUERY', ANNOTATIONS_QUERY_DOC);
@@ -191,10 +193,12 @@ describe('Schema Contract - annotation.queries.ts', () => {
   });
 
   it('REPLY_TO_ANNOTATION_MUTATION is valid', () => {
-    assertValid('REPLY_TO_ANNOTATION_MUTATION', REPLY_TO_ANNOTATION_MUTATION_DOC);
+    assertValid(
+      'REPLY_TO_ANNOTATION_MUTATION',
+      REPLY_TO_ANNOTATION_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - annotation.mutations.ts', () => {
@@ -219,10 +223,12 @@ describe('Schema Contract - annotation.mutations.ts', () => {
   });
 
   it('ANNOTATION_ADDED_SUBSCRIPTION is valid', () => {
-    assertValid('ANNOTATION_ADDED_SUBSCRIPTION', ANNOTATION_ADDED_SUBSCRIPTION_DOC);
+    assertValid(
+      'ANNOTATION_ADDED_SUBSCRIPTION',
+      ANNOTATION_ADDED_SUBSCRIPTION_DOC
+    );
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - content.queries.ts', () => {
@@ -242,7 +248,10 @@ describe('Schema Contract - content.queries.ts', () => {
   });
 
   it('SEARCH_SEMANTIC_BY_TEXT_QUERY is valid', () => {
-    assertValid('SEARCH_SEMANTIC_BY_TEXT_QUERY', SEARCH_SEMANTIC_BY_TEXT_QUERY_DOC);
+    assertValid(
+      'SEARCH_SEMANTIC_BY_TEXT_QUERY',
+      SEARCH_SEMANTIC_BY_TEXT_QUERY_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -252,7 +261,10 @@ describe('Schema Contract - content.queries.ts', () => {
   });
 
   it('CONFIRM_MEDIA_UPLOAD_MUTATION is valid', () => {
-    assertValid('CONFIRM_MEDIA_UPLOAD_MUTATION', CONFIRM_MEDIA_UPLOAD_MUTATION_DOC);
+    assertValid(
+      'CONFIRM_MEDIA_UPLOAD_MUTATION',
+      CONFIRM_MEDIA_UPLOAD_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -282,10 +294,12 @@ describe('Schema Contract - content.queries.ts', () => {
   });
 
   it('MARK_CONTENT_VIEWED_MUTATION is valid', () => {
-    assertValid('MARK_CONTENT_VIEWED_MUTATION', MARK_CONTENT_VIEWED_MUTATION_DOC);
+    assertValid(
+      'MARK_CONTENT_VIEWED_MUTATION',
+      MARK_CONTENT_VIEWED_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - knowledge.queries.ts', () => {
@@ -325,7 +339,10 @@ describe('Schema Contract - knowledge.queries.ts', () => {
   });
 
   it('RELATED_CONCEPTS_BY_NAME_QUERY is valid', () => {
-    assertValid('RELATED_CONCEPTS_BY_NAME_QUERY', RELATED_CONCEPTS_BY_NAME_QUERY_DOC);
+    assertValid(
+      'RELATED_CONCEPTS_BY_NAME_QUERY',
+      RELATED_CONCEPTS_BY_NAME_QUERY_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -333,12 +350,14 @@ describe('Schema Contract - knowledge.queries.ts', () => {
     assertValid('PREREQUISITE_CHAIN_QUERY', PREREQUISITE_CHAIN_QUERY_DOC);
     expect(true).toBe(true);
   });
-
 });
 
 describe('Schema Contract - agent.queries.ts', () => {
   it('START_AGENT_SESSION_MUTATION is valid', () => {
-    assertValid('START_AGENT_SESSION_MUTATION', START_AGENT_SESSION_MUTATION_DOC);
+    assertValid(
+      'START_AGENT_SESSION_MUTATION',
+      START_AGENT_SESSION_MUTATION_DOC
+    );
     expect(true).toBe(true);
   });
 
@@ -371,5 +390,367 @@ describe('Schema Contract - agent.queries.ts', () => {
     assertValid('MESSAGE_STREAM_SUBSCRIPTION', MESSAGE_STREAM_SUBSCRIPTION_DOC);
     expect(true).toBe(true);
   });
+});
 
+// ---- queries.ts (Dashboard / global queries) — previously untested, caused BUG-024/BUG-025
+const ME_QUERY_DOC = parse(`
+  query Me {
+    me {
+      id
+      email
+      firstName
+      lastName
+      role
+      tenantId
+      createdAt
+      updatedAt
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
+    }
+  }
+`);
+
+const UPDATE_USER_PREFERENCES_MUTATION_DOC = parse(`
+  mutation UpdateUserPreferences($input: UpdateUserPreferencesInput!) {
+    updateUserPreferences(input: $input) {
+      id
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
+    }
+  }
+`);
+
+const COURSES_QUERY_DOC = parse(`
+  query Courses($limit: Int, $offset: Int) {
+    courses(limit: $limit, offset: $offset) {
+      id
+      title
+      description
+      slug
+      thumbnailUrl
+      instructorId
+      isPublished
+      estimatedHours
+    }
+  }
+`);
+
+const MY_STATS_QUERY_DOC = parse(`
+  query MyStats {
+    myStats {
+      coursesEnrolled
+      annotationsCreated
+      conceptsMastered
+      totalLearningMinutes
+      weeklyActivity {
+        date
+        count
+      }
+    }
+  }
+`);
+
+// ---- content-tier3.queries.ts / DailyLearningWidget — previously caused BUG-025
+const DAILY_MICROLESSON_QUERY_DOC = parse(`
+  query DailyMicrolesson {
+    dailyMicrolesson {
+      id
+      title
+      content
+      contentType
+      duration
+    }
+  }
+`);
+
+describe('Schema Contract - queries.ts (Dashboard)', () => {
+  it('ME_QUERY with preferences is valid', () => {
+    assertValid('ME_QUERY', ME_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('UPDATE_USER_PREFERENCES_MUTATION is valid', () => {
+    assertValid(
+      'UPDATE_USER_PREFERENCES_MUTATION',
+      UPDATE_USER_PREFERENCES_MUTATION_DOC
+    );
+    expect(true).toBe(true);
+  });
+
+  it('COURSES_QUERY is valid', () => {
+    assertValid('COURSES_QUERY', COURSES_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('MY_STATS_QUERY is valid', () => {
+    assertValid('MY_STATS_QUERY', MY_STATS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+});
+
+describe('Schema Contract - content-tier3.queries.ts (Microlearning)', () => {
+  it('DAILY_MICROLESSON_QUERY is valid', () => {
+    assertValid('DAILY_MICROLESSON_QUERY', DAILY_MICROLESSON_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+});
+
+// ---- badges.queries.ts — BUG-026: was missing from contract tests, allowing runtime
+// "Cannot query field 'myOpenBadges' on type 'Query'" to go undetected.
+const MY_OPEN_BADGES_QUERY_DOC = parse(`
+  query MyOpenBadges {
+    myOpenBadges {
+      id
+      badgeDefinitionId
+      recipientId
+      issuedAt
+      expiresAt
+      evidenceUrl
+      revoked
+      revokedAt
+      revokedReason
+      definition {
+        id
+        name
+        description
+        imageUrl
+        criteriaUrl
+        tags
+        issuerId
+        createdAt
+      }
+      vcDocument
+    }
+  }
+`);
+
+const VERIFY_OPEN_BADGE_QUERY_DOC = parse(`
+  query VerifyOpenBadge($assertionId: ID!) {
+    verifyOpenBadge(assertionId: $assertionId)
+  }
+`);
+
+describe('Schema Contract - badges.queries.ts (BUG-026 regression)', () => {
+  it('MY_OPEN_BADGES_QUERY is valid against supergraph', () => {
+    assertValid('MY_OPEN_BADGES_QUERY', MY_OPEN_BADGES_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('VERIFY_OPEN_BADGE_QUERY is valid against supergraph', () => {
+    assertValid('VERIFY_OPEN_BADGE_QUERY', VERIFY_OPEN_BADGE_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+});
+
+// ---- collaboration.queries.ts — previously unvalidated in contract tests
+const DISCUSSIONS_QUERY_DOC = parse(`
+  query Discussions($courseId: ID!, $limit: Int, $offset: Int) {
+    discussions(courseId: $courseId, limit: $limit, offset: $offset) {
+      id courseId title description creatorId discussionType
+      participantCount messageCount createdAt updatedAt
+    }
+  }
+`);
+
+const MY_DISCUSSIONS_QUERY_DOC = parse(`
+  query MyDiscussions($limit: Int, $offset: Int) {
+    myDiscussions(limit: $limit, offset: $offset) {
+      id courseId title description creatorId discussionType
+      participantCount messageCount createdAt updatedAt
+    }
+  }
+`);
+
+const DISCUSSION_QUERY_DOC = parse(`
+  query Discussion($id: ID!) {
+    discussion(id: $id) {
+      id courseId title description creatorId discussionType
+      participantCount messageCount
+      messages(limit: 50, offset: 0) {
+        id userId content messageType parentMessageId replyCount createdAt
+      }
+      participants { id userId joinedAt }
+      createdAt updatedAt
+    }
+  }
+`);
+
+const CREATE_DISCUSSION_MUTATION_DOC = parse(`
+  mutation CreateDiscussion($input: CreateDiscussionInput!) {
+    createDiscussion(input: $input) {
+      id courseId title description discussionType
+      participantCount messageCount createdAt updatedAt
+    }
+  }
+`);
+
+const ADD_MESSAGE_MUTATION_DOC = parse(`
+  mutation AddMessage($discussionId: ID!, $input: AddMessageInput!) {
+    addMessage(discussionId: $discussionId, input: $input) {
+      id discussionId userId content messageType parentMessageId replyCount createdAt
+    }
+  }
+`);
+
+const JOIN_DISCUSSION_MUTATION_DOC = parse(`
+  mutation JoinDiscussion($discussionId: ID!) {
+    joinDiscussion(discussionId: $discussionId)
+  }
+`);
+
+const LEAVE_DISCUSSION_MUTATION_DOC = parse(`
+  mutation LeaveDiscussion($discussionId: ID!) {
+    leaveDiscussion(discussionId: $discussionId)
+  }
+`);
+
+const MESSAGE_ADDED_SUBSCRIPTION_DOC = parse(`
+  subscription MessageAdded($discussionId: ID!) {
+    messageAdded(discussionId: $discussionId) {
+      id discussionId userId content messageType parentMessageId createdAt
+    }
+  }
+`);
+
+describe('Schema Contract - collaboration.queries.ts', () => {
+  it('DISCUSSIONS_QUERY is valid', () => {
+    assertValid('DISCUSSIONS_QUERY', DISCUSSIONS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('MY_DISCUSSIONS_QUERY is valid', () => {
+    assertValid('MY_DISCUSSIONS_QUERY', MY_DISCUSSIONS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('DISCUSSION_QUERY is valid', () => {
+    assertValid('DISCUSSION_QUERY', DISCUSSION_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('CREATE_DISCUSSION_MUTATION is valid', () => {
+    assertValid('CREATE_DISCUSSION_MUTATION', CREATE_DISCUSSION_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('ADD_MESSAGE_MUTATION is valid', () => {
+    assertValid('ADD_MESSAGE_MUTATION', ADD_MESSAGE_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('JOIN_DISCUSSION_MUTATION is valid', () => {
+    assertValid('JOIN_DISCUSSION_MUTATION', JOIN_DISCUSSION_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('LEAVE_DISCUSSION_MUTATION is valid', () => {
+    assertValid('LEAVE_DISCUSSION_MUTATION', LEAVE_DISCUSSION_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('MESSAGE_ADDED_SUBSCRIPTION is valid', () => {
+    assertValid('MESSAGE_ADDED_SUBSCRIPTION', MESSAGE_ADDED_SUBSCRIPTION_DOC);
+    expect(true).toBe(true);
+  });
+});
+
+// ---- notifications.subscriptions.ts — previously unvalidated in contract tests
+const NOTIFICATION_RECEIVED_SUBSCRIPTION_DOC = parse(`
+  subscription NotificationReceived($userId: ID!) {
+    notificationReceived(userId: $userId) {
+      id type title body payload readAt createdAt
+    }
+  }
+`);
+
+describe('Schema Contract - notifications.subscriptions.ts', () => {
+  it('NOTIFICATION_RECEIVED_SUBSCRIPTION is valid', () => {
+    assertValid(
+      'NOTIFICATION_RECEIVED_SUBSCRIPTION',
+      NOTIFICATION_RECEIVED_SUBSCRIPTION_DOC
+    );
+    expect(true).toBe(true);
+  });
+});
+
+// ---- scim.queries.ts — SCIM token management for HRIS provisioning (F-019)
+const SCIM_TOKENS_QUERY_DOC = parse(`
+  query ScimTokens {
+    scimTokens {
+      id
+      description
+      lastUsedAt
+      expiresAt
+      isActive
+      createdAt
+    }
+  }
+`);
+
+const SCIM_SYNC_LOG_QUERY_DOC = parse(`
+  query ScimSyncLog($limit: Int) {
+    scimSyncLog(limit: $limit) {
+      id
+      operation
+      externalId
+      status
+      errorMessage
+      createdAt
+    }
+  }
+`);
+
+const GENERATE_SCIM_TOKEN_MUTATION_DOC = parse(`
+  mutation GenerateScimToken($input: GenerateScimTokenInput!) {
+    generateScimToken(input: $input) {
+      rawToken
+      token {
+        id
+        description
+        lastUsedAt
+        expiresAt
+        isActive
+        createdAt
+      }
+    }
+  }
+`);
+
+const REVOKE_SCIM_TOKEN_MUTATION_DOC = parse(`
+  mutation RevokeScimToken($id: ID!) {
+    revokeScimToken(id: $id)
+  }
+`);
+
+describe('Schema Contract - scim.queries.ts (F-019)', () => {
+  it('SCIM_TOKENS_QUERY is valid against supergraph', () => {
+    assertValid('SCIM_TOKENS_QUERY', SCIM_TOKENS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('SCIM_SYNC_LOG_QUERY is valid against supergraph', () => {
+    assertValid('SCIM_SYNC_LOG_QUERY', SCIM_SYNC_LOG_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('GENERATE_SCIM_TOKEN_MUTATION is valid against supergraph', () => {
+    assertValid(
+      'GENERATE_SCIM_TOKEN_MUTATION',
+      GENERATE_SCIM_TOKEN_MUTATION_DOC
+    );
+    expect(true).toBe(true);
+  });
+
+  it('REVOKE_SCIM_TOKEN_MUTATION is valid against supergraph', () => {
+    assertValid('REVOKE_SCIM_TOKEN_MUTATION', REVOKE_SCIM_TOKEN_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
 });

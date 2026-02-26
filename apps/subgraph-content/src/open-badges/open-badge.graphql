@@ -1,0 +1,75 @@
+"""OpenBadges 3.0 badge definition (issuer-managed, tenant-scoped)"""
+type OpenBadgeDefinition {
+  id: ID!
+  name: String!
+  description: String!
+  imageUrl: String
+  criteriaUrl: String
+  tags: [String!]!
+  version: String!
+  issuerId: String!
+}
+
+"""OpenBadges 3.0 assertion — one earned credential per user"""
+type OpenBadgeAssertion {
+  id: ID!
+  badgeDefinitionId: ID!
+  badgeName: String!
+  badgeDescription: String!
+  recipientId: ID!
+  issuedAt: String!
+  expiresAt: String
+  evidenceUrl: String
+  revoked: Boolean!
+  """Public JSON-LD URL (no auth) — shareable"""
+  verifyUrl: String!
+  """LinkedIn certifications deep-link"""
+  shareUrl: String!
+}
+
+"""Result of verifying a badge assertion's Ed25519 proof"""
+type BadgeVerificationResult {
+  valid: Boolean!
+  error: String
+  assertion: OpenBadgeAssertion
+}
+
+extend type Query {
+  """List all non-revoked badges earned by the current user"""
+  myBadges: [OpenBadgeAssertion!]! @authenticated
+
+  """List all badge definitions for the tenant (admin/instructor only)"""
+  badgeDefinitions: [OpenBadgeDefinition!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  """
+  Verify a badge assertion by ID — public (no auth required).
+  Checks signature validity, revocation status and expiry.
+  """
+  verifyBadge(assertionId: ID!): BadgeVerificationResult!
+}
+
+extend type Mutation {
+  """Create a new badge definition for the tenant"""
+  createBadgeDefinition(
+    name: String!
+    description: String!
+    imageUrl: String
+    criteriaUrl: String
+    tags: [String!]
+  ): OpenBadgeDefinition! @authenticated @requiresRole(roles: [ORG_ADMIN])
+
+  """Manually issue a badge to a user (admin or instructor action)"""
+  issueBadge(
+    userId: ID!
+    badgeDefinitionId: ID!
+    evidenceUrl: String
+  ): OpenBadgeAssertion! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  """Revoke a previously issued badge (cannot be undone)"""
+  revokeBadge(
+    assertionId: ID!
+    reason: String!
+  ): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+}

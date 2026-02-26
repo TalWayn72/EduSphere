@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ChavrutaDebateWorkflow, createDebateWorkflow, DebateState } from './debateWorkflow';
+import {
+  ChavrutaDebateWorkflow,
+  createDebateWorkflow,
+  DebateState,
+} from './debateWorkflow';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -18,7 +22,9 @@ vi.mock('@ai-sdk/openai', () => ({
 // Uses per-instance state so each new StateGraph() starts fresh.
 // ---------------------------------------------------------------------------
 vi.mock('@langchain/langgraph', () => {
-  type NodeFn = (state: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  type NodeFn = (
+    state: Record<string, unknown>
+  ) => Promise<Record<string, unknown>>;
 
   // Annotation must be callable as a function AND have a .Root static method
   const AnnotationFn = (config?: unknown) => config ?? {};
@@ -73,12 +79,16 @@ vi.mock('@langchain/langgraph', () => {
               state = { ...state, ...partial };
 
               // Find next node via conditional or static edge
-              const conditionalEdge = conditionalEdges.find((e) => e.from === currentNode);
+              const conditionalEdge = conditionalEdges.find(
+                (e) => e.from === currentNode
+              );
               if (conditionalEdge) {
                 const nextNode = conditionalEdge.condition(state);
                 currentNode = nextNode;
               } else {
-                const staticEdge = staticEdges.find(([from]) => from === currentNode);
+                const staticEdge = staticEdges.find(
+                  ([from]) => from === currentNode
+                );
                 currentNode = staticEdge ? staticEdge[1]! : '__end__';
               }
             }
@@ -136,7 +146,9 @@ describe('ChavrutaDebateWorkflow', () => {
     it('defaults rounds to 3, currentRound to 1', async () => {
       // rounds=1: argue → counter → synthesize (3 LLM calls)
       mockGenerateText
-        .mockResolvedValueOnce(makeTextResponse('Opening argument for') as never)
+        .mockResolvedValueOnce(
+          makeTextResponse('Opening argument for') as never
+        )
         .mockResolvedValueOnce(makeTextResponse('Counter argument') as never)
         .mockResolvedValueOnce(makeTextResponse('Synthesis') as never);
 
@@ -152,8 +164,9 @@ describe('ChavrutaDebateWorkflow', () => {
     });
 
     it('defaults position and topic required from initial state', async () => {
-      mockGenerateText
-        .mockResolvedValue(makeTextResponse('Some response') as never);
+      mockGenerateText.mockResolvedValue(
+        makeTextResponse('Some response') as never
+      );
 
       const workflow = new ChavrutaDebateWorkflow();
       const result = await workflow.run({
@@ -187,8 +200,7 @@ describe('ChavrutaDebateWorkflow', () => {
     });
 
     it('includes topic in the LLM prompt for argue node', async () => {
-      mockGenerateText
-        .mockResolvedValue(makeTextResponse('Response') as never);
+      mockGenerateText.mockResolvedValue(makeTextResponse('Response') as never);
 
       const workflow = new ChavrutaDebateWorkflow();
       await workflow.run({
@@ -197,8 +209,11 @@ describe('ChavrutaDebateWorkflow', () => {
         rounds: 1,
       });
 
-      const firstCall = mockGenerateText.mock.calls[0]![0] as Record<string, unknown>;
-      expect((firstCall.prompt as string)).toContain('Universal basic income');
+      const firstCall = mockGenerateText.mock.calls[0]![0] as Record<
+        string,
+        unknown
+      >;
+      expect(firstCall.prompt as string).toContain('Universal basic income');
     });
 
     it('includes position "FOR" in argue prompt when position=for', async () => {
@@ -207,8 +222,11 @@ describe('ChavrutaDebateWorkflow', () => {
       const workflow = new ChavrutaDebateWorkflow();
       await workflow.run({ topic: 'Topic X', position: 'for', rounds: 1 });
 
-      const firstCall = mockGenerateText.mock.calls[0]![0] as Record<string, unknown>;
-      expect((firstCall.prompt as string)).toContain('FOR');
+      const firstCall = mockGenerateText.mock.calls[0]![0] as Record<
+        string,
+        unknown
+      >;
+      expect(firstCall.prompt as string).toContain('FOR');
     });
 
     it('includes position "AGAINST" in argue prompt when position=against', async () => {
@@ -217,8 +235,11 @@ describe('ChavrutaDebateWorkflow', () => {
       const workflow = new ChavrutaDebateWorkflow();
       await workflow.run({ topic: 'Topic Y', position: 'against', rounds: 1 });
 
-      const firstCall = mockGenerateText.mock.calls[0]![0] as Record<string, unknown>;
-      expect((firstCall.prompt as string)).toContain('AGAINST');
+      const firstCall = mockGenerateText.mock.calls[0]![0] as Record<
+        string,
+        unknown
+      >;
+      expect(firstCall.prompt as string).toContain('AGAINST');
     });
   });
 
@@ -264,11 +285,18 @@ describe('ChavrutaDebateWorkflow', () => {
         .mockResolvedValueOnce(makeTextResponse('Synthesis') as never);
 
       const workflow = new ChavrutaDebateWorkflow();
-      await workflow.run({ topic: 'Renewable energy', position: 'for', rounds: 1 });
+      await workflow.run({
+        topic: 'Renewable energy',
+        position: 'for',
+        rounds: 1,
+      });
 
       // Second call is the counter node — should say AGAINST
-      const counterCall = mockGenerateText.mock.calls[1]![0] as Record<string, unknown>;
-      expect((counterCall.prompt as string)).toContain('AGAINST');
+      const counterCall = mockGenerateText.mock.calls[1]![0] as Record<
+        string,
+        unknown
+      >;
+      expect(counterCall.prompt as string).toContain('AGAINST');
     });
   });
 
@@ -277,7 +305,9 @@ describe('ChavrutaDebateWorkflow', () => {
       mockGenerateText
         .mockResolvedValueOnce(makeTextResponse('Arg') as never)
         .mockResolvedValueOnce(makeTextResponse('Counter') as never)
-        .mockResolvedValueOnce(makeTextResponse('Balanced synthesis text') as never);
+        .mockResolvedValueOnce(
+          makeTextResponse('Balanced synthesis text') as never
+        );
 
       const workflow = new ChavrutaDebateWorkflow();
       const result = await workflow.run({
@@ -312,10 +342,17 @@ describe('ChavrutaDebateWorkflow', () => {
         .mockResolvedValueOnce(makeTextResponse('Synthesis') as never);
 
       const workflow = new ChavrutaDebateWorkflow();
-      await workflow.run({ topic: 'Vegetarianism', position: 'for', rounds: 1 });
+      await workflow.run({
+        topic: 'Vegetarianism',
+        position: 'for',
+        rounds: 1,
+      });
 
-      const synthesisCall = mockGenerateText.mock.calls[2]![0] as Record<string, unknown>;
-      expect((synthesisCall.prompt as string)).toContain('Vegetarianism');
+      const synthesisCall = mockGenerateText.mock.calls[2]![0] as Record<
+        string,
+        unknown
+      >;
+      expect(synthesisCall.prompt as string).toContain('Vegetarianism');
     });
   });
 
@@ -339,7 +376,9 @@ describe('ChavrutaDebateWorkflow', () => {
     });
 
     it('workflow completes with rounds > 1', async () => {
-      mockGenerateText.mockResolvedValue(makeTextResponse('Any response') as never);
+      mockGenerateText.mockResolvedValue(
+        makeTextResponse('Any response') as never
+      );
 
       const workflow = new ChavrutaDebateWorkflow();
       const result = await workflow.run({
@@ -355,7 +394,9 @@ describe('ChavrutaDebateWorkflow', () => {
 
   describe('error handling', () => {
     it('propagates LLM error from argue node', async () => {
-      mockGenerateText.mockRejectedValueOnce(new Error('Network error') as never);
+      mockGenerateText.mockRejectedValueOnce(
+        new Error('Network error') as never
+      );
 
       const workflow = new ChavrutaDebateWorkflow();
       await expect(

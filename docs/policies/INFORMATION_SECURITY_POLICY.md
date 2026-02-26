@@ -17,6 +17,7 @@ This policy establishes the information security framework for EduSphere to prot
 ## 2. Scope
 
 Applies to all EduSphere employees, contractors, subprocessors, and systems that process, store, or transmit EduSphere or customer data including:
+
 - SaaS platform (edusphere.dev and tenant subdomains)
 - On-premises deployments at customer sites
 - Mobile applications (iOS, Android)
@@ -26,12 +27,12 @@ Applies to all EduSphere employees, contractors, subprocessors, and systems that
 
 ### 3.1 Information Classification
 
-| Class | Definition | Examples | Controls |
-|-------|-----------|---------|---------|
-| **RESTRICTED** | Highly sensitive, regulatory | PII, credentials, encryption keys | Encrypt at rest+transit, MFA, audit all access |
-| **CONFIDENTIAL** | Business sensitive | Source code, contracts, security configs | Encrypt at rest, role-based access |
-| **INTERNAL** | Internal use only | Architecture docs, runbooks | Access controls, no external sharing |
-| **PUBLIC** | Approved for public | Marketing, open-source code | No restrictions beyond IP policy |
+| Class            | Definition                   | Examples                                 | Controls                                       |
+| ---------------- | ---------------------------- | ---------------------------------------- | ---------------------------------------------- |
+| **RESTRICTED**   | Highly sensitive, regulatory | PII, credentials, encryption keys        | Encrypt at rest+transit, MFA, audit all access |
+| **CONFIDENTIAL** | Business sensitive           | Source code, contracts, security configs | Encrypt at rest, role-based access             |
+| **INTERNAL**     | Internal use only            | Architecture docs, runbooks              | Access controls, no external sharing           |
+| **PUBLIC**       | Approved for public          | Marketing, open-source code              | No restrictions beyond IP policy               |
 
 ### 3.2 Security Controls
 
@@ -55,13 +56,13 @@ Applies to all EduSphere employees, contractors, subprocessors, and systems that
 
 ## 4. Roles and Responsibilities
 
-| Role | Responsibility |
-|------|---------------|
-| **CISO** | Policy owner, annual review, exception approval |
-| **Security Team** | Implementation, monitoring, incident response |
-| **Engineering** | Secure SDLC, code review, dependency management |
-| **DevOps/SRE** | Infrastructure hardening, patching, secrets management |
-| **All Staff** | Compliance with this policy, incident reporting |
+| Role              | Responsibility                                         |
+| ----------------- | ------------------------------------------------------ |
+| **CISO**          | Policy owner, annual review, exception approval        |
+| **Security Team** | Implementation, monitoring, incident response          |
+| **Engineering**   | Secure SDLC, code review, dependency management        |
+| **DevOps/SRE**    | Infrastructure hardening, patching, secrets management |
+| **All Staff**     | Compliance with this policy, incident reporting        |
 
 ## 5. Compliance
 
@@ -70,6 +71,7 @@ Violations of this policy may result in disciplinary action up to and including 
 ## 6. Exceptions
 
 Exceptions require written approval from CISO with:
+
 - Business justification
 - Risk assessment and compensating controls
 - Expiry date (maximum 90 days; renewable with re-approval)
@@ -85,4 +87,4 @@ Exceptions require written approval from CISO with:
 
 ---
 
-*This policy is reviewed annually and after any significant security incident or regulatory change.*
+_This policy is reviewed annually and after any significant security incident or regulatory change._

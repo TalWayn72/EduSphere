@@ -56,7 +56,7 @@ test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
   test('page loads with "Knowledge Graph" heading', async ({ page }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
     await expect(
-      page.getByRole('heading', { name: 'Knowledge Graph' }),
+      page.getByRole('heading', { name: 'Knowledge Graph' })
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -65,9 +65,13 @@ test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
     await expect(page.locator('svg').first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('graph statistics panel shows Nodes and Edges counts', async ({ page }) => {
+  test('graph statistics panel shows Nodes and Edges counts', async ({
+    page,
+  }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Graph Statistics')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Graph Statistics')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText('Nodes')).toBeVisible();
     await expect(page.getByText('Edges')).toBeVisible();
   });
@@ -82,7 +86,9 @@ test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
 
   test('Learning Path panel is visible', async ({ page }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Learning Path')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Learning Path')).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByPlaceholder('From concept...')).toBeVisible();
     await expect(page.getByPlaceholder('To concept...')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Find Path' })).toBeVisible();
@@ -94,30 +100,42 @@ test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
    * Even in DEV_MODE the query is paused, so the backend is never called.
    * Asserts both the generic banner and the specific AGE error fragment are absent.
    */
-  test('no AGE error banner visible — mock mode regression guard', async ({ page }) => {
+  test('no AGE error banner visible — mock mode regression guard', async ({
+    page,
+  }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2_000); // ensure React has settled
 
     // Generic "Failed to load graph" text must not appear
-    await expect(page.getByText('Failed to load graph', { exact: false })).not.toBeVisible({
+    await expect(
+      page.getByText('Failed to load graph', { exact: false })
+    ).not.toBeVisible({
       timeout: 3_000,
     });
 
     // Specific AGE 1.7.0 + PG-17 error fragment must not appear
-    await expect(page.getByText(AGE_PG17_ERROR, { exact: false })).not.toBeVisible({
+    await expect(
+      page.getByText(AGE_PG17_ERROR, { exact: false })
+    ).not.toBeVisible({
       timeout: 3_000,
     });
 
     // Drizzle parameterized SET LOCAL error must not appear
     // (caused by sql`SET LOCAL ... = ${var}` instead of sql.raw())
-    await expect(page.getByText(SET_LOCAL_PARAM_ERROR, { exact: false })).not.toBeVisible({
+    await expect(
+      page.getByText(SET_LOCAL_PARAM_ERROR, { exact: false })
+    ).not.toBeVisible({
       timeout: 3_000,
     });
   });
 
-  test('no crash overlay ("Something went wrong") visible', async ({ page }) => {
+  test('no crash overlay ("Something went wrong") visible', async ({
+    page,
+  }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('visual snapshot — DEV_MODE graph render', async ({ page }) => {
@@ -138,7 +156,10 @@ test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
 const LIVE_BACKEND = process.env.VITE_DEV_MODE === 'false';
 
 test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression guard)', () => {
-  test.skip(!LIVE_BACKEND, 'Set VITE_DEV_MODE=false to run live-backend regression tests');
+  test.skip(
+    !LIVE_BACKEND,
+    'Set VITE_DEV_MODE=false to run live-backend regression tests'
+  );
 
   /**
    * PRIMARY REGRESSION TEST.
@@ -152,13 +173,18 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
    *
    * Fix: verify packages/db/src/graph/client.ts substituteParams fallback.
    */
-  test('AGE PG-17 error does NOT appear after /graph load', async ({ page }) => {
+  test('AGE PG-17 error does NOT appear after /graph load', async ({
+    page,
+  }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
 
-    await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await page.goto(`${BASE}/graph`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
 
     // Wait generously for the GraphQL concepts query to resolve
     await page.waitForTimeout(6_000);
@@ -171,11 +197,15 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
 
     // CRITICAL: Drizzle SET LOCAL parameterization error must not appear
     // (caused by sql`SET LOCAL ... = ${var}` template literal in withTenantContext)
-    const setLocalErrorEl = page.getByText(SET_LOCAL_PARAM_ERROR, { exact: false });
+    const setLocalErrorEl = page.getByText(SET_LOCAL_PARAM_ERROR, {
+      exact: false,
+    });
     await expect(setLocalErrorEl).not.toBeVisible({ timeout: 2_000 });
 
     // Generic load-error banner must also be absent
-    const loadErrorEl = page.getByText('Failed to load graph', { exact: false });
+    const loadErrorEl = page.getByText('Failed to load graph', {
+      exact: false,
+    });
     await expect(loadErrorEl).not.toBeVisible();
 
     // Attach any captured console errors to the test output for debugging
@@ -185,18 +215,30 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
   });
 
   test('SVG graph nodes render from real API data', async ({ page }) => {
-    await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await page.goto(`${BASE}/graph`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
     await page.waitForTimeout(6_000);
 
     // At least one SVG circle (graph node) must be rendered from real API data
-    await expect(page.locator('svg circle').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('svg circle').first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('graph statistics show non-zero node count from real API', async ({ page }) => {
-    await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+  test('graph statistics show non-zero node count from real API', async ({
+    page,
+  }) => {
+    await page.goto(`${BASE}/graph`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
     await page.waitForTimeout(6_000);
 
-    await expect(page.getByText('Graph Statistics')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Graph Statistics')).toBeVisible({
+      timeout: 5_000,
+    });
 
     // Node count must be a number > 0 (i.e., concepts loaded from DB)
     const nodeCountEl = page
@@ -205,11 +247,17 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
       .locator('p.text-lg');
     const countText = await nodeCountEl.textContent().catch(() => '0');
     const count = parseInt(countText ?? '0', 10);
-    expect(count, 'Expected at least 1 concept from the real API').toBeGreaterThan(0);
+    expect(
+      count,
+      'Expected at least 1 concept from the real API'
+    ).toBeGreaterThan(0);
   });
 
   test('visual snapshot — live backend graph render', async ({ page }) => {
-    await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await page.goto(`${BASE}/graph`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
     await page.waitForTimeout(6_000);
 
     const file = path.join(SCREENSHOTS_DIR, 'knowledge-graph-live-backend.png');

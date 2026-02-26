@@ -13,7 +13,9 @@ vi.mock('react-router-dom', async (importOriginal) => {
   const mod = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...mod,
-    BrowserRouter: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    BrowserRouter: ({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ),
   };
 });
 
@@ -56,7 +58,7 @@ function renderApp(mocks: MockedResponse[] = [], initialEntry = '/') {
       <MemoryRouter initialEntries={[initialEntry]}>
         <App />
       </MemoryRouter>
-    </MockedProvider>,
+    </MockedProvider>
   );
 }
 

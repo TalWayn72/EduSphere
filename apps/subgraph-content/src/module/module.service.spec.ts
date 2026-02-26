@@ -22,14 +22,27 @@ const mocks = vi.hoisted(() => {
   };
 
   return {
-    mockSelect, mockFrom, mockWhere, mockLimit, mockOrderBy,
-    mockInsert, mockValues, mockReturning, mockUpdate, mockSet, mockDelete,
+    mockSelect,
+    mockFrom,
+    mockWhere,
+    mockLimit,
+    mockOrderBy,
+    mockInsert,
+    mockValues,
+    mockReturning,
+    mockUpdate,
+    mockSet,
+    mockDelete,
     mockDb,
   };
 });
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mocks.mockDb),
+  withReadReplica: vi.fn((fn: (db: typeof mocks.mockDb) => unknown) =>
+    fn(mocks.mockDb)
+  ),
+  closeAllPools: vi.fn(),
   schema: {
     modules: { id: 'id', course_id: 'course_id', order_index: 'order_index' },
   },
@@ -81,12 +94,18 @@ describe('ModuleService', () => {
 
     it('returns mapped module when found', async () => {
       const result = await service.findById('mod-1');
-      expect(result).toMatchObject({ id: 'mod-1', courseId: 'course-1', orderIndex: 0 });
+      expect(result).toMatchObject({
+        id: 'mod-1',
+        courseId: 'course-1',
+        orderIndex: 0,
+      });
     });
 
     it('throws NotFoundException when module not found', async () => {
       mocks.mockLimit.mockResolvedValue([]);
-      await expect(service.findById('nonexistent')).rejects.toThrow(NotFoundException);
+      await expect(service.findById('nonexistent')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -124,7 +143,11 @@ describe('ModuleService', () => {
     });
 
     it('inserts with snake_case keys and returns mapped module', async () => {
-      const input = { courseId: 'course-1', title: 'New Module', orderIndex: 0 };
+      const input = {
+        courseId: 'course-1',
+        title: 'New Module',
+        orderIndex: 0,
+      };
       const result = await service.create(input);
       expect(result).toMatchObject({ courseId: 'course-1', orderIndex: 0 });
       const insertedValues = mocks.mockValues.mock.calls[0]![0];
@@ -160,7 +183,9 @@ describe('ModuleService', () => {
 
     it('throws NotFoundException when module not found for update', async () => {
       mocks.mockReturning.mockResolvedValue([]);
-      await expect(service.update('nonexistent', { title: 'x' })).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('nonexistent', { title: 'x' })
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

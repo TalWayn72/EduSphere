@@ -15,6 +15,10 @@ import { AIChatPanel } from '@/components/AIChatPanel';
 import { ActivityHeatmap } from '@/components/ActivityHeatmap';
 import { LearningStats } from '@/components/LearningStats';
 import { ActivityFeed } from '@/components/ActivityFeed';
+import { SRSWidget } from '@/components/SRSWidget';
+import { LeaderboardWidget } from '@/components/LeaderboardWidget';
+import { SkillGapWidget } from '@/components/SkillGapWidget';
+import { DailyLearningWidget } from '@/components/DailyLearningWidget';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
 import { MY_ANNOTATIONS_QUERY } from '@/lib/graphql/annotation.queries';
 import {
@@ -99,16 +103,16 @@ export function Dashboard() {
   // --- Derived real stats (fall back to MOCK_STATS when real data unavailable) ---
 
   // REAL: total courses from the catalog (limit raised to 100 so the count is meaningful)
-  const coursesEnrolled =
-    coursesResult.fetching
-      ? null
-      : (coursesResult.data?.courses?.length ?? MOCK_STATS.coursesEnrolled);
+  const coursesEnrolled = coursesResult.fetching
+    ? null
+    : (coursesResult.data?.courses?.length ?? MOCK_STATS.coursesEnrolled);
 
   // REAL: annotation count from annotationsByUser
   const annotationsCreated =
     !currentUserId || annotationsResult.fetching
       ? null
-      : (annotationsResult.data?.annotationsByUser?.length ?? MOCK_STATS.annotationsCreated);
+      : (annotationsResult.data?.annotationsByUser?.length ??
+        MOCK_STATS.annotationsCreated);
 
   // MOCK: no backend query yet for study time or concepts mastered
   const totalLearningMinutes = MOCK_STATS.totalLearningMinutes;
@@ -133,40 +137,45 @@ export function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-            {firstName ? t('welcomeBack', { name: firstName }) : t('welcomeBack', { name: '' }).trimEnd()}
+            {firstName
+              ? t('welcomeBack', { name: firstName })
+              : t('welcomeBack', { name: '' }).trimEnd()}
           </p>
         </div>
 
         {/* Instructor / Admin quick actions */}
-        {localUser && ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(localUser.role) && (
-          <Card className="border-primary/20 bg-primary/5">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Settings className="h-4 w-4 text-primary" />
-                {t('instructorTools')}
-                <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                  {localUser.role.replace('_', ' ')}
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex gap-3">
-              <Link
-                to="/courses/new"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-              >
-                <PlusCircle className="h-4 w-4" />
-                {t('createCourse')}
-              </Link>
-              <Link
-                to="/courses"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent transition-colors"
-              >
-                <BookOpen className="h-4 w-4" />
-                {t('manageCourses')}
-              </Link>
-            </CardContent>
-          </Card>
-        )}
+        {localUser &&
+          ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(
+            localUser.role
+          ) && (
+            <Card className="border-primary/20 bg-primary/5">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Settings className="h-4 w-4 text-primary" />
+                  {t('instructorTools')}
+                  <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    {localUser.role.replace('_', ' ')}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex gap-3">
+                <Link
+                  to="/courses/new"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  {t('createCourse')}
+                </Link>
+                <Link
+                  to="/courses"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent transition-colors"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  {t('manageCourses')}
+                </Link>
+              </CardContent>
+            </Card>
+          )}
 
         {meResult.error && (
           <Card className="border-destructive">
@@ -182,7 +191,9 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('stats.coursesEnrolled')}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t('stats.coursesEnrolled')}
+              </CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -190,12 +201,16 @@ export function Dashboard() {
               <div className="text-2xl font-bold">
                 {coursesEnrolled === null ? '...' : coursesEnrolled}
               </div>
-              <p className="text-xs text-muted-foreground">Available in catalog</p>
+              <p className="text-xs text-muted-foreground">
+                Available in catalog
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('stats.studyTime')}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t('stats.studyTime')}
+              </CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -205,12 +220,18 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('stats.conceptsMastered')}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t('stats.conceptsMastered')}
+              </CardTitle>
               <Brain className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{MOCK_STATS.conceptsMastered}</div>
-              <p className="text-xs text-muted-foreground">Completed content items</p>
+              <div className="text-2xl font-bold">
+                {MOCK_STATS.conceptsMastered}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Completed content items
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -219,7 +240,9 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('stats.activeCourses')}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t('stats.activeCourses')}
+              </CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -227,12 +250,16 @@ export function Dashboard() {
               <div className="text-2xl font-bold">
                 {coursesEnrolled === null ? '...' : coursesEnrolled}
               </div>
-              <p className="text-xs text-muted-foreground">Available in catalog</p>
+              <p className="text-xs text-muted-foreground">
+                Available in catalog
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('stats.annotationsCreated')}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {t('stats.annotationsCreated')}
+              </CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -240,34 +267,52 @@ export function Dashboard() {
               <div className="text-2xl font-bold">
                 {annotationsCreated === null ? '...' : annotationsCreated}
               </div>
-              <p className="text-xs text-muted-foreground">Notes and highlights</p>
+              <p className="text-xs text-muted-foreground">
+                Notes and highlights
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Study Groups</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Study Groups
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                <Bot className="h-4 w-4 inline mr-1 text-muted-foreground" />
-                —
+                <Bot className="h-4 w-4 inline mr-1 text-muted-foreground" />—
               </div>
-              <p className="text-xs text-muted-foreground">Active collaborations</p>
+              <p className="text-xs text-muted-foreground">
+                Active collaborations
+              </p>
             </CardContent>
           </Card>
         </div>
 
+        {/* Daily Learning Widget (F-021 Microlearning) */}
+        <DailyLearningWidget />
+
+        {/* SRS Review Queue Widget (F-001) */}
+        <SRSWidget />
+
+        {/* Leaderboard Widget (F-011) */}
+        <LeaderboardWidget />
+
+        {/* Skill Gap Analysis Widget (F-006) */}
+        <SkillGapWidget />
+
         {/* Course Progress + Weekly Stats */}
-        <LearningStats courses={MOCK_COURSE_PROGRESS} weeklyStats={MOCK_WEEKLY_STATS} />
+        <LearningStats
+          courses={MOCK_COURSE_PROGRESS}
+          weeklyStats={MOCK_WEEKLY_STATS}
+        />
 
         {/* Activity Heatmap */}
         <Card>
           <CardHeader>
             <CardTitle>{t('studyActivity')}</CardTitle>
-            <CardDescription>
-              {t('activityDescription')}
-            </CardDescription>
+            <CardDescription>{t('activityDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ActivityHeatmap data={deferredActivity} />
@@ -288,19 +333,25 @@ export function Dashboard() {
 
           {(() => {
             // Use real GraphQL data when available, fall back to JWT-parsed user
-            const profile = meResult.data?.me ?? (localUser ? {
-              firstName: localUser.firstName,
-              lastName: localUser.lastName,
-              email: localUser.email,
-              role: localUser.role,
-              tenantId: localUser.tenantId,
-            } : null);
+            const profile =
+              meResult.data?.me ??
+              (localUser
+                ? {
+                    firstName: localUser.firstName,
+                    lastName: localUser.lastName,
+                    email: localUser.email,
+                    role: localUser.role,
+                    tenantId: localUser.tenantId,
+                  }
+                : null);
 
             if (meResult.fetching && !localUser) {
               return (
                 <Card>
                   <CardContent className="pt-6">
-                    <p className="text-sm text-muted-foreground">{t('common:loading')}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t('common:loading')}
+                    </p>
                   </CardContent>
                 </Card>
               );
@@ -310,25 +361,39 @@ export function Dashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>{t('common:profile')}</CardTitle>
-                  <CardDescription>{t('common:accountInformation')}</CardDescription>
+                  <CardDescription>
+                    {t('common:accountInformation')}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
-                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</dt>
-                      <dd className="text-sm mt-1">{profile.firstName} {profile.lastName}</dd>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Name
+                      </dt>
+                      <dd className="text-sm mt-1">
+                        {profile.firstName} {profile.lastName}
+                      </dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</dt>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Email
+                      </dt>
                       <dd className="text-sm mt-1">{profile.email}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Role</dt>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Role
+                      </dt>
                       <dd className="text-sm mt-1">{profile.role}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tenant</dt>
-                      <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">{profile.tenantId || '—'}</dd>
+                      <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Tenant
+                      </dt>
+                      <dd className="text-xs mt-1 font-mono text-muted-foreground truncate">
+                        {profile.tenantId || '—'}
+                      </dd>
                     </div>
                   </dl>
                 </CardContent>

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG NODE_VERSION=20
-ARG PNPM_VERSION=9
+ARG PNPM_VERSION=10
 
 FROM node:${NODE_VERSION}-alpine AS base
 ARG PNPM_VERSION
@@ -8,7 +8,7 @@ RUN npm install -g pnpm@${PNPM_VERSION} --no-fund --no-audit
 WORKDIR /app
 
 FROM base AS deps
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.json tsconfig.base.json ./
 COPY packages/ packages/
 # Copy all apps so pnpm workspace resolution succeeds with --frozen-lockfile
 COPY apps/ apps/

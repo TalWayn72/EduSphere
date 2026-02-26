@@ -1,0 +1,114 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// Grafana Alloy v1.8.2 — Log collection configuration
+// Replaces Promtail (EOL March 2, 2026)
+//
+// Collects:
+//   1. Docker container logs (via Docker socket)
+//   2. Application log files (/var/log/edusphere/*.log)
+//
+// Forwards to: Loki at http://loki:3100
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Loki write endpoint ────────────────────────────────────────────────────────
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// ── Docker container discovery ─────────────────────────────────────────────────
+discovery.docker "containers" {
+  host             = "unix:///var/run/docker.sock"
+  refresh_interval = "5s"
+}
+
+// ── Relabel Docker metadata → log labels ──────────────────────────────────────
+discovery.relabel "docker" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_log_stream"]
+    target_label  = "stream"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+}
+
+// ── Scrape Docker container logs ──────────────────────────────────────────────
+loki.source.docker "containers" {
+  host             = "unix:///var/run/docker.sock"
+  targets          = discovery.relabel.docker.output
+  forward_to       = [loki.process.parse_docker.receiver]
+  refresh_interval = "5s"
+}
+
+// ── Parse JSON logs from Docker containers ────────────────────────────────────
+loki.process "parse_docker" {
+  forward_to = [loki.write.default.receiver]
+
+  // Extract structured fields from Pino JSON logs
+  stage.json {
+    expressions = {
+      level     = "level",
+      msg       = "msg",
+      timestamp = "time",
+      tenant_id = "tenantId",
+      user_id   = "userId",
+    }
+  }
+
+  // Promote level + tenant_id to Loki labels (low-cardinality fields only)
+  stage.labels {
+    values = {
+      level     = "",
+      tenant_id = "",
+    }
+  }
+
+  // Use log-embedded timestamp (RFC3339Nano from Pino)
+  stage.timestamp {
+    source = "timestamp"
+    format = "RFC3339Nano"
+  }
+}
+
+// ── Application log files ─────────────────────────────────────────────────────
+local.file_match "app_logs" {
+  path_targets = [{
+    __path__ = "/var/log/edusphere/*.log",
+    job      = "edusphere",
+  }]
+}
+
+loki.source.file "app_logs" {
+  targets    = local.file_match.app_logs.targets
+  forward_to = [loki.process.parse_app_logs.receiver]
+}
+
+// ── Parse JSON logs from application files ────────────────────────────────────
+loki.process "parse_app_logs" {
+  forward_to = [loki.write.default.receiver]
+
+  stage.json {
+    expressions = {
+      level   = "level",
+      msg     = "msg",
+      service = "service",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level   = "",
+      service = "",
+    }
+  }
+}

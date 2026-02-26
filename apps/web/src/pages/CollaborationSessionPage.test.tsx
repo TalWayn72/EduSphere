@@ -6,17 +6,33 @@ import { CollaborationSessionPage } from './CollaborationSessionPage';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return { ...actual, useNavigate: () => mockNavigate };
 });
+
+// Stable mock for the JOIN_DISCUSSION_MUTATION execute function so that
+// we can assert it was called with the correct discussionId argument.
+const mockJoinFn = vi.fn();
 
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
-    useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
-    useSubscription: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
+    useMutation: vi.fn(() => [
+      { fetching: false, error: undefined },
+      mockJoinFn,
+    ]),
+    useSubscription: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
   };
 });
 
@@ -31,12 +47,22 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/CollaborativeEditor', () => ({
-  CollaborativeEditor: ({ content, onChange }: { content: string; onChange: (v: string) => void }) => (
-    <div data-testid="editor" onClick={() => onChange('<p>updated</p>')}>{content}</div>
+  CollaborativeEditor: ({
+    content,
+    onChange,
+  }: {
+    content: string;
+    onChange: (v: string) => void;
+  }) => (
+    <div data-testid="editor" onClick={() => onChange('<p>updated</p>')}>
+      {content}
+    </div>
   ),
 }));
 
@@ -91,7 +117,9 @@ describe('CollaborationSessionPage', () => {
 
   it('updates document title when input changes', () => {
     renderPage('?partner=Bob');
-    const input = screen.getByDisplayValue('Shared Study Notes') as HTMLInputElement;
+    const input = screen.getByDisplayValue(
+      'Shared Study Notes'
+    ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'My Notes' } });
     expect(input.value).toBe('My Notes');
   });
@@ -116,5 +144,38 @@ describe('CollaborationSessionPage', () => {
   it('renders the Chavruta session info bar', () => {
     renderPage('?partner=Alice');
     expect(screen.getByText(/Chavruta with/i)).toBeInTheDocument();
+  });
+
+  // ── Auto-join mutation (line ~59 — useEffect with discussionId guard) ────────
+
+  it('calls JOIN_DISCUSSION_MUTATION on mount when discussionId is present', () => {
+    renderPage('?discussionId=disc-abc-123&partner=Bob');
+    // useEffect fires synchronously after mount in jsdom
+    expect(mockJoinFn).toHaveBeenCalledTimes(1);
+    expect(mockJoinFn).toHaveBeenCalledWith({ discussionId: 'disc-abc-123' });
+  });
+
+  it('does NOT call JOIN_DISCUSSION_MUTATION when discussionId is absent', () => {
+    renderPage('?partner=Bob&topic=Talmud');
+    // No discussionId → useEffect guard (if discussionId) prevents the call
+    expect(mockJoinFn).not.toHaveBeenCalled();
+  });
+
+  it('auto-join fires without any user interaction', () => {
+    renderPage('?discussionId=disc-xyz&partner=Alice');
+    // Mutation called purely from mount-time useEffect — no click needed
+    expect(mockJoinFn).toHaveBeenCalledWith({ discussionId: 'disc-xyz' });
+  });
+
+  it('shows CRDT sync active note with truncated discussionId', () => {
+    renderPage('?discussionId=disc-abc-123');
+    // Footer text contains the first 8 chars of discussionId
+    expect(screen.getByText(/disc-abc/i)).toBeInTheDocument();
+  });
+
+  it('shows CRDT sync inactive note when no discussionId', () => {
+    renderPage('?partner=Bob');
+    // collaboration.json: crdtSyncInactive = "Sync inactive"
+    expect(screen.getByText('Sync inactive')).toBeInTheDocument();
   });
 });

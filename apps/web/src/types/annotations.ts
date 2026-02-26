@@ -1,3 +1,8 @@
+export interface TextRange {
+  from: number;
+  to: number;
+}
+
 export enum AnnotationLayer {
   PERSONAL = 'PERSONAL',
   SHARED = 'SHARED',
@@ -19,6 +24,7 @@ export interface Annotation {
   replies?: Annotation[];
   createdAt: string;
   updatedAt: string;
+  textRange?: TextRange;
 }
 
 export interface AnnotationThread {

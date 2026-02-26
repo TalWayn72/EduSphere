@@ -40,7 +40,10 @@ export class GraphBuilder {
     };
 
     try {
-      await this.natsService.publish(SUBJECT, payload as unknown as Record<string, unknown>);
+      await this.natsService.publish(
+        SUBJECT,
+        payload as unknown as Record<string, unknown>
+      );
       this.logger.log(
         { courseId, tenantId, count: concepts.length, subject: SUBJECT },
         'Published concepts to NATS'

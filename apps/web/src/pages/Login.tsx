@@ -36,9 +36,7 @@ export function Login() {
             </div>
           </div>
           <CardTitle className="text-3xl">{t('welcome')}</CardTitle>
-          <CardDescription>
-            {t('subtitle')}
-          </CardDescription>
+          <CardDescription>{t('subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

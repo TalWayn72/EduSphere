@@ -13,12 +13,14 @@ GraphQL Federation subgraph for real-time collaboration features including CRDT-
 ## Features
 
 ### Collaboration Documents
+
 - CRDT-based collaborative editing using Yjs
 - Entity-based documents (annotations, course notes, shared canvas)
 - Binary snapshot storage for efficient sync
 - Real-time update streaming
 
 ### Collaboration Sessions
+
 - Active user tracking per document
 - Connection management
 - Last-active timestamps
@@ -78,17 +80,20 @@ src/
 ## Database Tables
 
 ### collab_documents
+
 - Primary table for collaborative documents
 - Stores Yjs CRDT snapshots as bytea
 - Unique constraint on (entity_type, entity_id)
 - RLS enabled for tenant isolation
 
 ### crdt_updates
+
 - Stores individual CRDT updates for streaming
 - Binary update data stored as bytea
 - Linked to parent document via document_id
 
 ### collab_sessions
+
 - Tracks active collaboration sessions
 - Maps connection_id to user_id and document_id
 - Includes last_active timestamp for presence
@@ -96,32 +101,38 @@ src/
 ## Development
 
 ### Install Dependencies
+
 ```bash
 pnpm install
 ```
 
 ### Run Development Server
+
 ```bash
 pnpm dev
 # Server starts on http://localhost:4004/graphql
 ```
 
 ### Build
+
 ```bash
 pnpm build
 ```
 
 ### Type Check
+
 ```bash
 pnpm typecheck
 ```
 
 ### Lint
+
 ```bash
 pnpm lint
 ```
 
 ### Test
+
 ```bash
 pnpm test
 ```
@@ -143,6 +154,7 @@ CORS_ORIGIN=http://localhost:5173,http://localhost:3000
 ## Authentication
 
 All mutations require authentication via JWT:
+
 - JWT extracted from `Authorization: Bearer <token>` header
 - Validated against Keycloak JWKS endpoint
 - Tenant ID and User ID extracted from JWT claims
@@ -153,6 +165,7 @@ All mutations require authentication via JWT:
 ### How It Works
 
 1. **Client joins session:**
+
    ```graphql
    mutation {
      joinSession(documentId: "...", connectionId: "unique-conn-id") {
@@ -163,6 +176,7 @@ All mutations require authentication via JWT:
    ```
 
 2. **Client subscribes to updates:**
+
    ```graphql
    subscription {
      documentUpdated(documentId: "...") {
@@ -174,6 +188,7 @@ All mutations require authentication via JWT:
    ```
 
 3. **Client applies local update:**
+
    ```graphql
    mutation {
      applyUpdate(documentId: "...", updateData: "base64-encoded-crdt-update") {
@@ -208,16 +223,19 @@ This subgraph is part of the EduSphere GraphQL Federation:
 ## Security
 
 ### Row-Level Security (RLS)
+
 - All queries use `withTenantContext()` wrapper
 - Tenant ID enforced at database level
 - Cross-tenant access blocked automatically
 
 ### Multi-tenancy
+
 - All documents isolated by tenant_id
 - JWT tenant_id claim validated
 - No cross-tenant queries allowed
 
 ### Input Validation
+
 - Binary data transmitted as base64
 - Connection IDs must be unique
 - Entity types restricted to enum values
@@ -225,12 +243,14 @@ This subgraph is part of the EduSphere GraphQL Federation:
 ## Performance Considerations
 
 ### Binary Data Handling
+
 - CRDT snapshots stored as bytea (not text)
 - Updates streamed incrementally
 - Snapshots periodically compacted
 - Base64 encoding only at API boundary
 
 ### Subscription Scaling
+
 - PubSub in-memory for development
 - Production: Use Redis PubSub or NATS
 - Document-scoped channels prevent global broadcasts

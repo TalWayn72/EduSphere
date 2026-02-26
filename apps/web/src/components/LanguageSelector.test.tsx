@@ -1,7 +1,11 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SUPPORTED_LOCALES, LOCALE_LABELS, type SupportedLocale } from '@edusphere/i18n';
+import {
+  SUPPORTED_LOCALES,
+  LOCALE_LABELS,
+  type SupportedLocale,
+} from '@edusphere/i18n';
 
 // ── Mocks ──────────────────────────────────────────────────────────────────
 
@@ -20,7 +24,11 @@ vi.mock('@/components/ui/select', () => {
     children?: React.ReactNode;
   }) {
     return (
-      <div data-testid="select-root" data-value={value} data-disabled={String(Boolean(disabled))}>
+      <div
+        data-testid="select-root"
+        data-value={value}
+        data-disabled={String(Boolean(disabled))}
+      >
         <select
           aria-label="Language"
           value={value}
@@ -33,15 +41,37 @@ vi.mock('@/components/ui/select', () => {
       </div>
     );
   }
-  function SelectTrigger({ children, 'aria-label': ariaLabel }: { children?: React.ReactNode; 'aria-label'?: string }) {
-    return <div aria-label={ariaLabel} data-testid="select-trigger">{children}</div>;
+  function SelectTrigger({
+    children,
+    'aria-label': ariaLabel,
+  }: {
+    children?: React.ReactNode;
+    'aria-label'?: string;
+  }) {
+    return (
+      <div aria-label={ariaLabel} data-testid="select-trigger">
+        {children}
+      </div>
+    );
   }
-  function SelectValue() { return null; }
+  function SelectValue() {
+    return null;
+  }
   function SelectContent({ children }: { children?: React.ReactNode }) {
     return <>{children}</>;
   }
-  function SelectItem({ value, children }: { value: string; children?: React.ReactNode }) {
-    return <option value={value} data-testid={`option-${value}`}>{children}</option>;
+  function SelectItem({
+    value,
+    children,
+  }: {
+    value: string;
+    children?: React.ReactNode;
+  }) {
+    return (
+      <option value={value} data-testid={`option-${value}`}>
+        {children}
+      </option>
+    );
   }
   return { Select, SelectTrigger, SelectValue, SelectContent, SelectItem };
 });
@@ -56,10 +86,10 @@ import { LanguageSelector } from './LanguageSelector';
 const renderSelector = (
   value: SupportedLocale = 'en',
   onChange: Mock<(locale: string) => void> = vi.fn<(locale: string) => void>(),
-  disabled = false,
+  disabled = false
 ) =>
   render(
-    <LanguageSelector value={value} onChange={onChange} disabled={disabled} />,
+    <LanguageSelector value={value} onChange={onChange} disabled={disabled} />
   );
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -76,12 +106,12 @@ describe('LanguageSelector', () => {
     expect(screen.getByTestId('select-native')).toBeInTheDocument();
   });
 
-  it('renders all 9 supported locales as options', () => {
+  it('renders all 10 supported locales as options', () => {
     renderSelector('en', onChange);
     SUPPORTED_LOCALES.forEach((locale) => {
       expect(screen.getByTestId(`option-${locale}`)).toBeInTheDocument();
     });
-    expect(SUPPORTED_LOCALES).toHaveLength(9);
+    expect(SUPPORTED_LOCALES).toHaveLength(10);
   });
 
   it('renders the native language name for each locale', () => {
@@ -101,7 +131,9 @@ describe('LanguageSelector', () => {
 
   it('calls onChange when a different language is selected', () => {
     renderSelector('en', onChange);
-    fireEvent.change(screen.getByTestId('select-native'), { target: { value: 'es' } });
+    fireEvent.change(screen.getByTestId('select-native'), {
+      target: { value: 'es' },
+    });
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith('es');
   });
@@ -129,7 +161,9 @@ describe('LanguageSelector', () => {
 
   it('does not call onChange when the same locale is re-selected', () => {
     renderSelector('en', onChange);
-    fireEvent.change(screen.getByTestId('select-native'), { target: { value: 'en' } });
+    fireEvent.change(screen.getByTestId('select-native'), {
+      target: { value: 'en' },
+    });
     // onChange still fires (browser behaviour); caller deduplicates if needed.
     // This test validates the call signature, not deduplication logic.
     expect(onChange).toHaveBeenCalledWith('en');

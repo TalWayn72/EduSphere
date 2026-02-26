@@ -3,6 +3,7 @@ import { generateObject } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createOllama } from 'ollama-ai-provider';
 import { z } from 'zod';
+import { ollamaConfig } from '@edusphere/config';
 
 export interface ExtractedConcept {
   name: string;
@@ -87,7 +88,7 @@ export class ConceptExtractor {
       return openai('gpt-4o-mini');
     }
 
-    const ollamaUrl = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+    const ollamaUrl = ollamaConfig.url;
     const ollama = createOllama({ baseURL: `${ollamaUrl}/api` });
     return ollama('llama3.2');
   }

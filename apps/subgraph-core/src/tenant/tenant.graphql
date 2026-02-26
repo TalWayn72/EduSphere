@@ -1,5 +1,5 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole"])
 
 type Tenant @key(fields: "id") {
   id: ID!
@@ -17,7 +17,62 @@ enum TenantPlan {
   ENTERPRISE
 }
 
+type TenantLanguageSettings {
+  supportedLanguages: [String!]!
+  defaultLanguage: String!
+}
+
+input UpdateTenantLanguageSettingsInput {
+  supportedLanguages: [String!]!
+  defaultLanguage: String!
+}
+
+type TenantBranding {
+  logoUrl: String!
+  logoMarkUrl: String
+  faviconUrl: String!
+  primaryColor: String!
+  secondaryColor: String!
+  accentColor: String!
+  backgroundColor: String!
+  fontFamily: String!
+  organizationName: String!
+  tagline: String
+  privacyPolicyUrl: String
+  termsOfServiceUrl: String
+  supportEmail: String
+  hideEduSphereBranding: Boolean!
+}
+
+input UpdateTenantBrandingInput {
+  logoUrl: String
+  logoMarkUrl: String
+  faviconUrl: String
+  primaryColor: String
+  secondaryColor: String
+  accentColor: String
+  backgroundColor: String
+  fontFamily: String
+  organizationName: String
+  tagline: String
+  privacyPolicyUrl: String
+  termsOfServiceUrl: String
+  supportEmail: String
+  hideEduSphereBranding: Boolean
+}
+
 type Query {
   tenant(id: ID!): Tenant
   tenants(limit: Int = 10, offset: Int = 0): [Tenant!]!
+  myTenantLanguageSettings: TenantLanguageSettings! @authenticated
+  myTenantBranding: TenantBranding! @authenticated
+}
+
+type Mutation {
+  updateTenantLanguageSettings(input: UpdateTenantLanguageSettingsInput!): TenantLanguageSettings!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  updateTenantBranding(input: UpdateTenantBrandingInput!): TenantBranding!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }

@@ -9,6 +9,7 @@ enum TemplateType {
   RESEARCH_SCOUT
   EXPLAIN
   CUSTOM
+  ROLEPLAY_SIMULATOR
 }
 
 type AgentTemplate @key(fields: "id") {

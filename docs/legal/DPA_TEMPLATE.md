@@ -9,6 +9,7 @@
 ## 1. Parties
 
 **Controller (Client):**
+
 - Legal Name: [CLIENT_LEGAL_NAME]
 - Registered Address: [CLIENT_ADDRESS]
 - Registration Number: [CLIENT_REGISTRATION_NUMBER]
@@ -19,6 +20,7 @@
 (hereinafter referred to as the **Controller**)
 
 **Processor:**
+
 - Legal Name: EduSphere Technologies Ltd.
 - Registered Address: [EDUSPHERE_REGISTERED_ADDRESS]
 - Registration Number: [EDUSPHERE_REGISTRATION_NUMBER]
@@ -73,16 +75,16 @@ Personal data shall be processed solely for the following purposes:
 
 ## 4. Type of Personal Data
 
-| Category | Examples | Special Category? |
-|----------|----------|-------------------|
-| Identity data | Full name, username, profile picture | No |
-| Contact data | Email address, institutional affiliation | No |
-| Authentication data | Hashed passwords, OAuth tokens, session identifiers | No |
-| Learning data | Course progress, assessment scores, quiz responses, completion records | No |
-| AI conversation data | Prompts, responses, debate transcripts, tutoring session logs | No |
-| Annotation data | Personal notes, highlights, comments on content | No |
-| Behavioral data | Page views, feature interactions, time-on-task (aggregated) | No |
-| Technical data | IP address (masked to /24 for audit logs), device type, browser agent | No |
+| Category             | Examples                                                               | Special Category? |
+| -------------------- | ---------------------------------------------------------------------- | ----------------- |
+| Identity data        | Full name, username, profile picture                                   | No                |
+| Contact data         | Email address, institutional affiliation                               | No                |
+| Authentication data  | Hashed passwords, OAuth tokens, session identifiers                    | No                |
+| Learning data        | Course progress, assessment scores, quiz responses, completion records | No                |
+| AI conversation data | Prompts, responses, debate transcripts, tutoring session logs          | No                |
+| Annotation data      | Personal notes, highlights, comments on content                        | No                |
+| Behavioral data      | Page views, feature interactions, time-on-task (aggregated)            | No                |
+| Technical data       | IP address (masked to /24 for audit logs), device type, browser agent  | No                |
 
 **Special categories (GDPR Art.9):** The Processor does not intentionally process special category data. The Controller shall not submit special category data without a separate written agreement.
 
@@ -90,12 +92,12 @@ Personal data shall be processed solely for the following purposes:
 
 ## 5. Categories of Data Subjects
 
-| Category | Description |
-|----------|-------------|
-| Students / Learners | End users enrolled in courses on the platform |
-| Instructors / Educators | Users who create and manage course content |
-| Administrators | Controller staff managing the platform instance |
-| Guest / Preview Users | Unauthenticated or limited-access users (minimal data) |
+| Category                | Description                                            |
+| ----------------------- | ------------------------------------------------------ |
+| Students / Learners     | End users enrolled in courses on the platform          |
+| Instructors / Educators | Users who create and manage course content             |
+| Administrators          | Controller staff managing the platform instance        |
+| Guest / Preview Users   | Unauthenticated or limited-access users (minimal data) |
 
 ---
 
@@ -123,7 +125,7 @@ The Processor shall implement and maintain appropriate technical and organisatio
 
 ### 6.4 Sub-processor Obligations (Art.28(3)(d))
 
-The Processor shall not engage another processor (sub-processor) without prior written authorisation of the Controller. The Controller hereby grants general written authorisation for the sub-processors listed in docs/security/SUBPROCESSORS.md.
+The Processor shall not engage another processor (sub-processor) without prior written authorisation of the Controller. The Controller hereby grants general written authorisation for the sub-processors listed in docs/security/SUBPROCESSOR_REGISTER.md.
 
 ### 6.5 Data Subject Rights Assistance (Art.28(3)(e))
 
@@ -160,6 +162,7 @@ Deletion shall be completed within **30 calendar days** of termination. Cryptogr
 The Processor shall make available to the Controller all information necessary to demonstrate compliance with GDPR Article 28 and shall allow for audits conducted by the Controller or an auditor mandated by the Controller.
 
 **Audit process:**
+
 - Remote audit: Controller may request audit documentation (SOC 2 Type II report, penetration test summaries) once per year at no charge
 - On-site audit: Available with 30 days written notice; costs borne by Controller
 - Automated compliance reports available via platform administration dashboard
@@ -170,7 +173,7 @@ The Processor shall make available to the Controller all information necessary t
 
 ### 7.1 Authorised Sub-processors
 
-The Controller provides general authorisation for the Processor to engage the sub-processors listed in docs/security/SUBPROCESSORS.md.
+The Controller provides general authorisation for the Processor to engage the sub-processors listed in docs/security/SUBPROCESSOR_REGISTER.md.
 
 ### 7.2 Change Notification
 
@@ -186,62 +189,62 @@ The Processor shall ensure that each sub-processor is bound by a written agreeme
 
 ### 8.1 Encryption at Rest
 
-| Measure | Implementation |
-|---------|----------------|
-| Algorithm | AES-256-GCM (Galois/Counter Mode) |
-| Key management | Tenant-specific encryption keys, rotated annually |
-| Scope | All personal data fields in PostgreSQL (PII columns via field-level encryption) |
-| Database volumes | Full-disk encryption on all storage volumes |
+| Measure          | Implementation                                                                  |
+| ---------------- | ------------------------------------------------------------------------------- |
+| Algorithm        | AES-256-GCM (Galois/Counter Mode)                                               |
+| Key management   | Tenant-specific encryption keys, rotated annually                               |
+| Scope            | All personal data fields in PostgreSQL (PII columns via field-level encryption) |
+| Database volumes | Full-disk encryption on all storage volumes                                     |
 
 ### 8.2 Encryption in Transit
 
-| Measure | Implementation |
-|---------|----------------|
-| Protocol | TLS 1.3 minimum (TLS 1.0 and 1.1 disabled) |
-| Cipher suites | ECDHE-RSA-AES256-GCM-SHA384 and equivalents |
-| Certificate management | Automated renewal via internal CA |
-| Internal services | mTLS between microservices via Linkerd service mesh |
-| HSTS | Enforced with min-age=31536000; includeSubDomains |
+| Measure                | Implementation                                      |
+| ---------------------- | --------------------------------------------------- |
+| Protocol               | TLS 1.3 minimum (TLS 1.0 and 1.1 disabled)          |
+| Cipher suites          | ECDHE-RSA-AES256-GCM-SHA384 and equivalents         |
+| Certificate management | Automated renewal via internal CA                   |
+| Internal services      | mTLS between microservices via Linkerd service mesh |
+| HSTS                   | Enforced with min-age=31536000; includeSubDomains   |
 
 ### 8.3 Access Controls
 
-| Measure | Implementation |
-|---------|----------------|
-| Authentication | JWT via Keycloak (OIDC), MFA enforced for administrators |
-| Authorization | RBAC: STUDENT, INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN |
-| Row-Level Security | PostgreSQL RLS policies enforcing tenant isolation |
-| API security | Scope-based authorization (@requiresScopes), query complexity limits |
-| Privileged access | Least privilege; production access requires approved change request |
+| Measure            | Implementation                                                       |
+| ------------------ | -------------------------------------------------------------------- |
+| Authentication     | JWT via Keycloak (OIDC), MFA enforced for administrators             |
+| Authorization      | RBAC: STUDENT, INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN                    |
+| Row-Level Security | PostgreSQL RLS policies enforcing tenant isolation                   |
+| API security       | Scope-based authorization (@requiresScopes), query complexity limits |
+| Privileged access  | Least privilege; production access requires approved change request  |
 
 ### 8.4 Audit Logging
 
-| Measure | Implementation |
-|---------|----------------|
-| Events logged | Create, read (sensitive), update, delete on personal data resources |
-| Log fields | Timestamp, action, resource_type, resource_id, actor_id, tenant_id, IP (/24 masked) |
-| Retention | 7 years (GDPR legitimate interest basis - see docs/security/LIA_SECURITY_MONITORING.md) |
-| Access restriction | SUPER_ADMIN only; logs never used for profiling |
-| Integrity | Append-only storage; tamper-evident hash chain |
+| Measure            | Implementation                                                                          |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| Events logged      | Create, read (sensitive), update, delete on personal data resources                     |
+| Log fields         | Timestamp, action, resource_type, resource_id, actor_id, tenant_id, IP (/24 masked)     |
+| Retention          | 7 years (GDPR legitimate interest basis - see docs/security/LIA_SECURITY_MONITORING.md) |
+| Access restriction | SUPER_ADMIN only; logs never used for profiling                                         |
+| Integrity          | Append-only storage; tamper-evident hash chain                                          |
 
 ### 8.5 Incident Response
 
-| Measure | Implementation |
-|---------|----------------|
-| Detection | Automated anomaly detection on audit logs and infrastructure metrics |
-| Response time | Critical incidents: 1-hour initial response; 4-hour containment target |
-| GDPR notification | DPA notification within 72 hours of becoming aware of breach (Art.33) |
-| User notification | Within 72 hours of DPA notification where high risk to individuals (Art.34) |
-| Register | Breach register maintained per Art.33(5) - see docs/security/BREACH_REGISTER.md |
-| Tabletop exercises | Quarterly incident response exercises |
+| Measure            | Implementation                                                                  |
+| ------------------ | ------------------------------------------------------------------------------- |
+| Detection          | Automated anomaly detection on audit logs and infrastructure metrics            |
+| Response time      | Critical incidents: 1-hour initial response; 4-hour containment target          |
+| GDPR notification  | DPA notification within 72 hours of becoming aware of breach (Art.33)           |
+| User notification  | Within 72 hours of DPA notification where high risk to individuals (Art.34)     |
+| Register           | Breach register maintained per Art.33(5) - see docs/security/BREACH_REGISTER.md |
+| Tabletop exercises | Quarterly incident response exercises                                           |
 
 ### 8.6 Pseudonymisation
 
-| Measure | Implementation |
-|---------|----------------|
-| Analytics | User IDs replaced with pseudonymous tokens for analytics processing |
-| Audit logs | Actor identity stored as internal UUID; not exposed in exports |
-| AI training | No personal data used for model training without explicit consent |
-| Data minimisation | Only data necessary for each function collected and retained |
+| Measure           | Implementation                                                      |
+| ----------------- | ------------------------------------------------------------------- |
+| Analytics         | User IDs replaced with pseudonymous tokens for analytics processing |
+| Audit logs        | Actor identity stored as internal UUID; not exposed in exports      |
+| AI training       | No personal data used for model training without explicit consent   |
+| Data minimisation | Only data necessary for each function collected and retained        |
 
 ### 8.7 Physical Security
 
@@ -251,13 +254,13 @@ The Processor shall ensure that each sub-processor is bound by a written agreeme
 
 ### 8.8 Organisational Measures
 
-| Measure | Implementation |
-|---------|----------------|
-| Data protection training | Annual mandatory training for all staff with data access |
-| Background checks | Conducted for all staff with access to personal data |
-| DPO | Appointed Data Protection Officer (dpo@edusphere.dev) |
-| Privacy by design | Privacy impact assessments required for new features |
-| Vendor management | All vendors assessed for GDPR compliance before engagement |
+| Measure                  | Implementation                                             |
+| ------------------------ | ---------------------------------------------------------- |
+| Data protection training | Annual mandatory training for all staff with data access   |
+| Background checks        | Conducted for all staff with access to personal data       |
+| DPO                      | Appointed Data Protection Officer (dpo@edusphere.dev)      |
+| Privacy by design        | Privacy impact assessments required for new features       |
+| Vendor management        | All vendors assessed for GDPR compliance before engagement |
 
 ---
 
@@ -269,7 +272,7 @@ Where processing involves a transfer of personal data to a third country (outsid
 - Adequacy decisions (where applicable)
 - Binding Corporate Rules (where applicable)
 
-Details are specified in the Sub-processor register (docs/security/SUBPROCESSORS.md).
+Details are specified in the Sub-processor register (docs/security/SUBPROCESSOR_REGISTER.md).
 
 ---
 
@@ -291,38 +294,38 @@ In the event of any conflict between this DPA and the Main Agreement, this DPA s
 
 **Signed for and on behalf of the Controller:**
 
-| Field | Details |
-|-------|--------|
-| Name | ______________________________ |
-| Title | ______________________________ |
-| Date | ______________________________ |
-| Signature | ______________________________ |
+| Field     | Details                                      |
+| --------- | -------------------------------------------- |
+| Name      | **\*\***\*\***\*\***\_\_**\*\***\*\***\*\*** |
+| Title     | **\*\***\*\***\*\***\_\_**\*\***\*\***\*\*** |
+| Date      | **\*\***\*\***\*\***\_\_**\*\***\*\***\*\*** |
+| Signature | **\*\***\*\***\*\***\_\_**\*\***\*\***\*\*** |
 
 **Signed for and on behalf of the Processor (EduSphere Technologies Ltd.):**
 
-| Field | Details |
-|-------|--------|
-| Name | ______________________________ |
-| Title | Data Protection Officer |
-| Date | ______________________________ |
-| Signature | ______________________________ |
+| Field     | Details                                      |
+| --------- | -------------------------------------------- |
+| Name      | **\*\***\*\***\*\***\_\_**\*\***\*\***\*\*** |
+| Title     | Data Protection Officer                      |
+| Date      | **\*\***\*\***\*\***\_\_**\*\***\*\***\*\*** |
+| Signature | **\*\***\*\***\*\***\_\_**\*\***\*\***\*\*** |
 
 ---
 
 ## Annex A - Processing Details Summary
 
-| Field | Details |
-|-------|--------|
-| Subject matter | EduSphere educational platform services |
-| Duration | Term of Main Agreement |
-| Nature | Storage, analysis, transmission, AI-assisted processing |
-| Purpose | Educational platform delivery and administration |
-| Data types | Identity, contact, learning, AI conversation, annotation, behavioral, technical |
-| Data subjects | Students, instructors, administrators |
-| Legal basis (Controller) | Contract (Art.6(1)(b)); Legitimate Interest (Art.6(1)(f)) |
+| Field                    | Details                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| Subject matter           | EduSphere educational platform services                                         |
+| Duration                 | Term of Main Agreement                                                          |
+| Nature                   | Storage, analysis, transmission, AI-assisted processing                         |
+| Purpose                  | Educational platform delivery and administration                                |
+| Data types               | Identity, contact, learning, AI conversation, annotation, behavioral, technical |
+| Data subjects            | Students, instructors, administrators                                           |
+| Legal basis (Controller) | Contract (Art.6(1)(b)); Legitimate Interest (Art.6(1)(f))                       |
 
 ---
 
-*This document is a template. Bracketed fields [LIKE_THIS] must be completed before execution.*
-*For customization instructions, see docs/legal/DPA_INSTRUCTIONS.md*
-*EduSphere DPA v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev*
+_This document is a template. Bracketed fields [LIKE_THIS] must be completed before execution._
+_For customization instructions, see docs/legal/DPA_INSTRUCTIONS.md_
+_EduSphere DPA v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev_

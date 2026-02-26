@@ -29,5 +29,33 @@
     "progress": "Progreso",
     "achievements": "Logros",
     "version": "Versión {{version}}"
+  },
+  "storage": {
+    "title": "Almacenamiento sin conexión",
+    "description": "Gestiona el almacenamiento local para el aprendizaje sin conexión. EduSphere está limitado al 50% del disco de tu dispositivo.",
+    "overLimitWarning": "El almacenamiento sin conexión está lleno — el modo sin conexión está desactivado. Libera espacio para continuar aprendiendo sin conexión.",
+    "approachingLimitWarning": "El almacenamiento sin conexión está casi lleno. Libera espacio para seguir trabajando sin conexión.",
+    "clearCache": "Limpiar caché de consultas",
+    "clearDownloads": "Eliminar cursos descargados",
+    "clearCacheTitle": "¿Limpiar caché de consultas?",
+    "clearCacheConfirm": "Esto elimina los datos de lecciones en caché. Puedes volver a descargarlos cuando estés en línea.",
+    "clearDownloadsTitle": "¿Eliminar cursos descargados?",
+    "clearDownloadsConfirm": "Todos los cursos descargados se eliminarán de este dispositivo. Puedes volver a descargarlos cuando estés en línea.",
+    "cleared": "Almacenamiento limpiado",
+    "freedBytes": "{{bytes}} liberados",
+    "deviceFree": "{{free}} disponibles en el dispositivo",
+    "used": "usado",
+    "limitOf": "límite"
+  },
+  "downloads": {
+    "wifiOnlyTitle": "Descargas solo por WiFi",
+    "wifiOnlyDescription": "Descarga cursos solo cuando estés conectado a WiFi para ahorrar datos móviles",
+    "wifiOnlyLabel": "Solo WiFi",
+    "deleteTitle": "Eliminar curso",
+    "deleteConfirm": "¿Eliminar '{{title}}' de este dispositivo?",
+    "coursesTitle": "Cursos descargados",
+    "coursesDescription": "Cursos guardados en tu dispositivo para verlos sin conexión",
+    "noCourses": "No hay cursos descargados",
+    "deleteLabel": "Eliminar {{title}}"
   }
 }

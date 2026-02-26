@@ -53,7 +53,9 @@ async function loginKeycloak(page: Page) {
   await page.goto(`${BASE}/login`);
   await page.waitForLoadState('domcontentloaded');
 
-  const signInBtn = page.getByRole('button', { name: /sign in with keycloak/i });
+  const signInBtn = page.getByRole('button', {
+    name: /sign in with keycloak/i,
+  });
   await signInBtn.waitFor({ timeout: 10_000 });
   await signInBtn.click();
 
@@ -69,12 +71,12 @@ async function loginKeycloak(page: Page) {
 // ── Pages to audit ─────────────────────────────────────────────────────────
 
 const PAGES = [
-  { label: '03-dashboard',      path: '/dashboard' },
-  { label: '04-courses',        path: '/courses' },
+  { label: '03-dashboard', path: '/dashboard' },
+  { label: '04-courses', path: '/courses' },
   { label: '05-content-viewer', path: '/learn/content-1' },
-  { label: '06-knowledge-graph',path: '/knowledge-graph' },
-  { label: '07-collaboration',  path: '/collaboration' },
-  { label: '08-profile',        path: '/profile' },
+  { label: '06-knowledge-graph', path: '/knowledge-graph' },
+  { label: '07-collaboration', path: '/collaboration' },
+  { label: '08-profile', path: '/profile' },
 ];
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -82,7 +84,13 @@ const PAGES = [
 test.describe.configure({ mode: 'serial' });
 
 test('01 — Login page renders', async ({ page }) => {
-  const entry: AuditEntry = { page: '01-login', url: '', screenshot: '', consoleErrors: [], networkErrors: [] };
+  const entry: AuditEntry = {
+    page: '01-login',
+    url: '',
+    screenshot: '',
+    consoleErrors: [],
+    networkErrors: [],
+  };
   collectErrors(page, entry);
 
   await page.goto(`${BASE}/login`);
@@ -97,9 +105,13 @@ test('01 — Login page renders', async ({ page }) => {
   // — the Sign In button is never rendered. Only assert it when not in DEV_MODE.
   const isDevMode = process.env.VITE_DEV_MODE !== 'false';
   if (!isDevMode) {
-    await expect(page.getByRole('button', { name: /sign in with keycloak/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /sign in with keycloak/i })
+    ).toBeVisible();
   } else {
-    console.log('01-login: DEV_MODE active — skipping Sign In button assertion (page redirected to app)');
+    console.log(
+      '01-login: DEV_MODE active — skipping Sign In button assertion (page redirected to app)'
+    );
   }
 
   console.log('01-login errors:', entry.consoleErrors, entry.networkErrors);
@@ -107,9 +119,18 @@ test('01 — Login page renders', async ({ page }) => {
 
 test('02 — Keycloak login flow', async ({ page }) => {
   // Keycloak is not reachable in DEV_MODE — the Sign In button never renders.
-  test.skip(process.env.VITE_DEV_MODE !== 'false', 'Keycloak login requires VITE_DEV_MODE=false');
+  test.skip(
+    process.env.VITE_DEV_MODE !== 'false',
+    'Keycloak login requires VITE_DEV_MODE=false'
+  );
 
-  const entry: AuditEntry = { page: '02-keycloak-login', url: '', screenshot: '', consoleErrors: [], networkErrors: [] };
+  const entry: AuditEntry = {
+    page: '02-keycloak-login',
+    url: '',
+    screenshot: '',
+    consoleErrors: [],
+    networkErrors: [],
+  };
   collectErrors(page, entry);
 
   await loginKeycloak(page);
@@ -126,9 +147,18 @@ test('02 — Keycloak login flow', async ({ page }) => {
 for (const { label, path: pagePath } of PAGES) {
   test(`Audit — ${label}`, async ({ page }) => {
     // Keycloak-based SSO is not available in DEV_MODE.
-    test.skip(process.env.VITE_DEV_MODE !== 'false', 'Keycloak login requires VITE_DEV_MODE=false');
+    test.skip(
+      process.env.VITE_DEV_MODE !== 'false',
+      'Keycloak login requires VITE_DEV_MODE=false'
+    );
 
-    const entry: AuditEntry = { page: label, url: '', screenshot: '', consoleErrors: [], networkErrors: [] };
+    const entry: AuditEntry = {
+      page: label,
+      url: '',
+      screenshot: '',
+      consoleErrors: [],
+      networkErrors: [],
+    };
     collectErrors(page, entry);
 
     // restore session via silent SSO

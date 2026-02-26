@@ -1,0 +1,52 @@
+type CredentialProgram {
+  id: ID!
+  title: String!
+  description: String!
+  badgeEmoji: String!
+  requiredCourseIds: [ID!]!
+  totalHours: Int!
+  published: Boolean!
+  enrollmentCount: Int!
+}
+
+type ProgramEnrollment {
+  id: ID!
+  programId: ID!
+  userId: ID!
+  enrolledAt: String!
+  completedAt: String
+  certificateId: ID
+}
+
+type ProgramProgress {
+  totalCourses: Int!
+  completedCourses: Int!
+  completedCourseIds: [ID!]!
+  percentComplete: Float!
+}
+
+extend type Query {
+  programs: [CredentialProgram!]! @authenticated
+  program(id: ID!): CredentialProgram @authenticated
+  myProgramEnrollments: [ProgramEnrollment!]! @authenticated
+  programProgress(programId: ID!): ProgramProgress! @authenticated
+}
+
+extend type Mutation {
+  createProgram(
+    title: String!
+    description: String!
+    requiredCourseIds: [ID!]!
+    badgeEmoji: String
+    totalHours: Int
+  ): CredentialProgram! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  updateProgram(
+    id: ID!
+    title: String
+    description: String
+    published: Boolean
+  ): CredentialProgram! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+
+  enrollInProgram(programId: ID!): ProgramEnrollment! @authenticated
+}

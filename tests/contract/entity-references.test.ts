@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, '../..');
 
 const supergraphSDL = readFileSync(
   path.join(root, 'apps/gateway/supergraph.graphql'),
-  'utf-8',
+  'utf-8'
 );
 
 /**
@@ -43,7 +43,9 @@ function getSubgraphsForType(typeName: string): string[] {
 
 describe('Entity References - Federation subgraph coverage', () => {
   it('supergraph SDL is parseable', () => {
-    expect(() => buildASTSchema(parse(supergraphSDL), { assumeValidSDL: true })).not.toThrow();
+    expect(() =>
+      buildASTSchema(parse(supergraphSDL), { assumeValidSDL: true })
+    ).not.toThrow();
   });
 
   it('join__Graph enum has at least 6 subgraphs', () => {
@@ -54,7 +56,9 @@ describe('Entity References - Federation subgraph coverage', () => {
     const closeBrace = supergraphSDL.indexOf('}', openBrace);
     const block = supergraphSDL.slice(openBrace + 1, closeBrace);
     const nl = String.fromCharCode(10);
-    const entries = block.trim().split(nl)
+    const entries = block
+      .trim()
+      .split(nl)
       .map((l) => l.trim())
       .filter((l) => l.length > 0 && !l.startsWith('//'));
     expect(entries.length).toBeGreaterThanOrEqual(6);

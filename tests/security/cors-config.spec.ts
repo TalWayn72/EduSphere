@@ -15,7 +15,7 @@ import { resolve, join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
 const GATEWAY_INDEX = resolve(
-  join(import.meta.dirname, '../../apps/gateway/src/index.ts'),
+  join(import.meta.dirname, '../../apps/gateway/src/index.ts')
 );
 
 function loadGatewaySource(): string {

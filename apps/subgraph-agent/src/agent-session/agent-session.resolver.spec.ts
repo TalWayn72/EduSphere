@@ -71,7 +71,10 @@ describe('AgentSessionResolver', () => {
       mockAgentSessionService.findById.mockResolvedValue(MOCK_SESSION);
       const ctx = buildContext();
       const result = await resolver.getAgentSession('session-1', ctx);
-      expect(mockAgentSessionService.findById).toHaveBeenCalledWith('session-1', MOCK_AUTH);
+      expect(mockAgentSessionService.findById).toHaveBeenCalledWith(
+        'session-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual(MOCK_SESSION);
     });
 
@@ -90,13 +93,18 @@ describe('AgentSessionResolver', () => {
       mockAgentSessionService.findByUser.mockResolvedValue([MOCK_SESSION]);
       const ctx = buildContext();
       const result = await resolver.getMyAgentSessions(ctx);
-      expect(mockAgentSessionService.findByUser).toHaveBeenCalledWith('user-1', MOCK_AUTH);
+      expect(mockAgentSessionService.findByUser).toHaveBeenCalledWith(
+        'user-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual([MOCK_SESSION]);
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
       const ctx = buildContext(false);
-      await expect(resolver.getMyAgentSessions(ctx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getMyAgentSessions(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -139,13 +147,17 @@ describe('AgentSessionResolver', () => {
 
     it('includes DEBATE_FACILITATOR template', async () => {
       const result = await resolver.getAgentTemplates();
-      const debate = result.find((t: any) => t.templateType === 'DEBATE_FACILITATOR');
+      const debate = result.find(
+        (t: any) => t.templateType === 'DEBATE_FACILITATOR'
+      );
       expect(debate).toBeDefined();
     });
 
     it('includes EXPLANATION_GENERATOR template', async () => {
       const result = await resolver.getAgentTemplates();
-      const explainer = result.find((t: any) => t.templateType === 'EXPLANATION_GENERATOR');
+      const explainer = result.find(
+        (t: any) => t.templateType === 'EXPLANATION_GENERATOR'
+      );
       expect(explainer).toBeDefined();
     });
   });
@@ -162,16 +174,16 @@ describe('AgentSessionResolver', () => {
 
     it('throws UnauthorizedException when not authenticated', async () => {
       const ctx = buildContext(false);
-      await expect(resolver.startAgentSession('TUTOR', {}, 'en', ctx)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(
+        resolver.startAgentSession('TUTOR', {}, 'en', ctx)
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws BadRequestException for invalid templateType', async () => {
       const ctx = buildContext();
-      await expect(resolver.startAgentSession('INVALID_TYPE', {}, 'en', ctx)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(
+        resolver.startAgentSession('INVALID_TYPE', {}, 'en', ctx)
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('passes userId from authContext to session create', async () => {
@@ -217,7 +229,11 @@ describe('AgentSessionResolver', () => {
     it('creates user message and returns assistant message', async () => {
       mockAgentMessageService.create
         .mockResolvedValueOnce(MOCK_MESSAGE)
-        .mockResolvedValueOnce({ ...MOCK_MESSAGE, role: 'ASSISTANT', content: `Echo: Hello` });
+        .mockResolvedValueOnce({
+          ...MOCK_MESSAGE,
+          role: 'ASSISTANT',
+          content: `Echo: Hello`,
+        });
       const ctx = buildContext();
       const result = await resolver.sendMessage(VALID_SESSION_ID, 'Hello', ctx);
       expect(result.role).toBe('ASSISTANT');
@@ -225,23 +241,23 @@ describe('AgentSessionResolver', () => {
 
     it('throws UnauthorizedException when not authenticated', async () => {
       const ctx = buildContext(false);
-      await expect(resolver.sendMessage(VALID_SESSION_ID, 'Hello', ctx)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(
+        resolver.sendMessage(VALID_SESSION_ID, 'Hello', ctx)
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws BadRequestException for empty content', async () => {
       const ctx = buildContext();
-      await expect(resolver.sendMessage(VALID_SESSION_ID, '', ctx)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(
+        resolver.sendMessage(VALID_SESSION_ID, '', ctx)
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('throws BadRequestException for invalid session UUID', async () => {
       const ctx = buildContext();
-      await expect(resolver.sendMessage('not-a-uuid', 'Hello', ctx)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(
+        resolver.sendMessage('not-a-uuid', 'Hello', ctx)
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('creates user message with role USER', async () => {
@@ -261,16 +277,24 @@ describe('AgentSessionResolver', () => {
 
   describe('endSession()', () => {
     it('calls agentSessionService.complete with session id', async () => {
-      mockAgentSessionService.complete.mockResolvedValue({ ...MOCK_SESSION, status: 'COMPLETED' });
+      mockAgentSessionService.complete.mockResolvedValue({
+        ...MOCK_SESSION,
+        status: 'COMPLETED',
+      });
       const ctx = buildContext();
       const result = await resolver.endSession('session-1', ctx);
-      expect(mockAgentSessionService.complete).toHaveBeenCalledWith('session-1', MOCK_AUTH);
+      expect(mockAgentSessionService.complete).toHaveBeenCalledWith(
+        'session-1',
+        MOCK_AUTH
+      );
       expect(result).toBe(true);
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
       const ctx = buildContext(false);
-      await expect(resolver.endSession('session-1', ctx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.endSession('session-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -291,7 +315,10 @@ describe('AgentSessionResolver', () => {
       mockAgentMessageService.findBySession.mockResolvedValue([MOCK_MESSAGE]);
       const ctx = buildContext();
       const result = await resolver.getMessages({ id: 'session-1' }, ctx);
-      expect(mockAgentMessageService.findBySession).toHaveBeenCalledWith('session-1', MOCK_AUTH);
+      expect(mockAgentMessageService.findBySession).toHaveBeenCalledWith(
+        'session-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual([MOCK_MESSAGE]);
     });
   });

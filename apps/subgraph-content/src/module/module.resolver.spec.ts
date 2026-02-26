@@ -27,8 +27,12 @@ describe('ModuleResolver', () => {
     reorder: ReturnType<typeof vi.fn>;
   };
 
-  const contentItemService = {
-    findByModule: vi.fn().mockResolvedValue([]),
+  const contentItemLoader = {
+    byModuleId: { load: vi.fn().mockResolvedValue([]) },
+  };
+
+  const moduleLoader = {
+    byId: { load: vi.fn() },
   };
 
   beforeEach(() => {
@@ -40,7 +44,12 @@ describe('ModuleResolver', () => {
       delete: vi.fn(),
       reorder: vi.fn(),
     };
-    resolver = new ModuleResolver(moduleService as never, contentItemService as never);
+    moduleLoader.byId.load.mockReset();
+    resolver = new ModuleResolver(
+      moduleService as never,
+      contentItemLoader as never,
+      moduleLoader as never
+    );
   });
 
   describe('getModule()', () => {
@@ -52,8 +61,12 @@ describe('ModuleResolver', () => {
     });
 
     it('propagates NotFoundException from service', async () => {
-      moduleService.findById.mockRejectedValue(new NotFoundException('Module not found'));
-      await expect(resolver.getModule('bad-id')).rejects.toThrow(NotFoundException);
+      moduleService.findById.mockRejectedValue(
+        new NotFoundException('Module not found')
+      );
+      await expect(resolver.getModule('bad-id')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -74,7 +87,11 @@ describe('ModuleResolver', () => {
 
   describe('createModule()', () => {
     it('creates and returns new module', async () => {
-      const input = { courseId: 'course-1', title: 'New Module', orderIndex: 1 };
+      const input = {
+        courseId: 'course-1',
+        title: 'New Module',
+        orderIndex: 1,
+      };
       moduleService.create.mockResolvedValue({ ...MOCK_MODULE, ...input });
       const result = await resolver.createModule(input);
       expect(result).toMatchObject(input);
@@ -93,7 +110,9 @@ describe('ModuleResolver', () => {
 
     it('propagates NotFoundException from service', async () => {
       moduleService.update.mockRejectedValue(new NotFoundException());
-      await expect(resolver.updateModule('bad-id', {})).rejects.toThrow(NotFoundException);
+      await expect(resolver.updateModule('bad-id', {})).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -123,25 +142,35 @@ describe('ModuleResolver', () => {
     it('passes courseId and moduleIds to service', async () => {
       moduleService.reorder.mockResolvedValue([]);
       await resolver.reorderModules('c-1', ['m-2', 'm-1', 'm-3']);
-      expect(moduleService.reorder).toHaveBeenCalledWith('c-1', ['m-2', 'm-1', 'm-3']);
+      expect(moduleService.reorder).toHaveBeenCalledWith('c-1', [
+        'm-2',
+        'm-1',
+        'm-3',
+      ]);
     });
   });
 
   describe('getContentItems() (ResolveField)', () => {
-    it('delegates to contentItemService.findByModule', async () => {
-      contentItemService.findByModule.mockResolvedValue([]);
-      const result = await resolver.getContentItems(MOCK_MODULE as never);
-      expect(contentItemService.findByModule).toHaveBeenCalledWith('mod-1');
+    it('delegates to contentItemLoader.byModuleId.load', async () => {
+      contentItemLoader.byModuleId.load.mockResolvedValue([]);
+      const result = await resolver.getContentItems(
+        MOCK_MODULE as never,
+        {} as never
+      );
+      expect(contentItemLoader.byModuleId.load).toHaveBeenCalledWith('mod-1');
       expect(result).toEqual([]);
     });
   });
 
   describe('resolveReference()', () => {
-    it('resolves module by id from federation reference', async () => {
-      moduleService.findById.mockResolvedValue(MOCK_MODULE);
-      const result = await resolver.resolveReference({ __typename: 'Module', id: 'mod-1' });
+    it('resolves module by id via moduleLoader.byId.load (batched federation lookup)', async () => {
+      moduleLoader.byId.load.mockResolvedValue(MOCK_MODULE);
+      const result = await resolver.resolveReference({
+        __typename: 'Module',
+        id: 'mod-1',
+      });
       expect(result).toEqual(MOCK_MODULE);
-      expect(moduleService.findById).toHaveBeenCalledWith('mod-1');
+      expect(moduleLoader.byId.load).toHaveBeenCalledWith('mod-1');
     });
   });
 });

@@ -22,7 +22,9 @@ describe('SUBPROCESSORS.md — GDPR Art.28 Subprocessor List', () => {
   const content = readFile('docs/security/SUBPROCESSORS.md');
 
   it('docs/security/SUBPROCESSORS.md exists', () => {
-    expect(existsSync(resolve(ROOT, 'docs/security/SUBPROCESSORS.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/security/SUBPROCESSORS.md'))).toBe(
+      true
+    );
   });
 
   it('has 30-day advance notice obligation', () => {
@@ -71,7 +73,9 @@ describe('VENDOR_REGISTER.md — SOC2 CC9.1 Vendor Risk Register', () => {
   const content = readFile('docs/security/VENDOR_REGISTER.md');
 
   it('docs/security/VENDOR_REGISTER.md exists', () => {
-    expect(existsSync(resolve(ROOT, 'docs/security/VENDOR_REGISTER.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/security/VENDOR_REGISTER.md'))).toBe(
+      true
+    );
   });
 
   it('defines Tier 1, Tier 2, Tier 3 vendor classification', () => {

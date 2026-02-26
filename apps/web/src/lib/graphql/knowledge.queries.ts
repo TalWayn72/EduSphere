@@ -141,3 +141,7 @@ export const PREREQUISITE_CHAIN_QUERY = gql`
     }
   }
 `;
+
+// NOTE: Tier-3 knowledge queries (skill gap analysis, social feed/recommendations)
+// have been moved to knowledge-tier3.queries.ts, which is excluded from codegen
+// until the supergraph is recomposed with the full subgraph-knowledge SDL.

@@ -5,11 +5,7 @@ export const GRAPHQL_URL = `${BASE_URL}/graphql`;
 
 export function graphqlPost(url, query, variables, headers) {
   const http = require('k6/http');
-  return http.post(
-    url,
-    JSON.stringify({ query, variables }),
-    { headers }
-  );
+  return http.post(url, JSON.stringify({ query, variables }), { headers });
 }
 
 export function checkResponse(res, expectedStatus = 200) {

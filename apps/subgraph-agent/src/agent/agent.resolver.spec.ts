@@ -110,7 +110,11 @@ describe('AgentResolver', () => {
   describe('startAgentExecution()', () => {
     it('delegates to agentService.startExecution with input', async () => {
       mockAgentService.startExecution.mockResolvedValue(MOCK_EXECUTION);
-      const input = { agentId: 'agent-1', userId: 'user-1', input: { msg: 'hi' } };
+      const input = {
+        agentId: 'agent-1',
+        userId: 'user-1',
+        input: { msg: 'hi' },
+      };
       const result = await resolver.startAgentExecution(input);
       expect(mockAgentService.startExecution).toHaveBeenCalledWith(input);
       expect(result).toEqual(MOCK_EXECUTION);
@@ -118,7 +122,11 @@ describe('AgentResolver', () => {
 
     it('returns the created execution', async () => {
       mockAgentService.startExecution.mockResolvedValue(MOCK_EXECUTION);
-      const result = await resolver.startAgentExecution({ agentId: 'a', userId: 'u', input: {} });
+      const result = await resolver.startAgentExecution({
+        agentId: 'a',
+        userId: 'u',
+        input: {},
+      });
       expect(result).toHaveProperty('id', 'exec-1');
     });
 

@@ -6,7 +6,10 @@ import { Login } from './Login';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
@@ -38,22 +41,30 @@ describe('Login', () => {
 
   it('renders the platform description', () => {
     renderLogin();
-    expect(screen.getByText('Knowledge Graph Educational Platform')).toBeInTheDocument();
+    expect(
+      screen.getByText('Knowledge Graph Educational Platform')
+    ).toBeInTheDocument();
   });
 
   it('renders the Sign In button', () => {
     renderLogin();
-    expect(screen.getByRole('button', { name: /sign in with keycloak/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /sign in with keycloak/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the sign-in description text', () => {
     renderLogin();
-    expect(screen.getByText(/sign in with your organizational account/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/sign in with your organizational account/i)
+    ).toBeInTheDocument();
   });
 
   it('calls login() when Sign In button is clicked', () => {
     renderLogin();
-    fireEvent.click(screen.getByRole('button', { name: /sign in with keycloak/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /sign in with keycloak/i })
+    );
     expect(mockLogin).toHaveBeenCalledTimes(1);
   });
 

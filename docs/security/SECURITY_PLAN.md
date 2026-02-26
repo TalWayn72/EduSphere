@@ -12,6 +12,7 @@
 ### Current Maturity Level
 
 **Level 2: Managed**
+
 - Basic security controls implemented
 - Authentication and authorization in place
 - Security awareness established
@@ -20,6 +21,7 @@
 ### Target State
 
 **Level 4: Optimized** (Target: Q4 2026)
+
 - Proactive threat detection and response
 - Automated security testing in CI/CD
 - Comprehensive security monitoring
@@ -28,19 +30,20 @@
 
 ### Maturity Roadmap
 
-| Level | Description | Timeline | Status |
-|-------|-------------|----------|--------|
-| Level 1: Initial | Ad-hoc security practices | Completed | ✓ |
-| Level 2: Managed | Basic controls implemented | Current | ✓ |
-| Level 3: Defined | Documented processes and standards | Q2 2026 | In Progress |
-| Level 4: Optimized | Proactive and automated security | Q4 2026 | Planned |
-| Level 5: Continuous | Security embedded in culture | 2027 | Future |
+| Level               | Description                        | Timeline  | Status      |
+| ------------------- | ---------------------------------- | --------- | ----------- |
+| Level 1: Initial    | Ad-hoc security practices          | Completed | ✓           |
+| Level 2: Managed    | Basic controls implemented         | Current   | ✓           |
+| Level 3: Defined    | Documented processes and standards | Q2 2026   | In Progress |
+| Level 4: Optimized  | Proactive and automated security   | Q4 2026   | Planned     |
+| Level 5: Continuous | Security embedded in culture       | 2027      | Future      |
 
 ## 2. Threat Model
 
 ### Assets
 
 #### Critical Assets
+
 1. **Student Data**
    - Personal information (PII)
    - Academic records
@@ -75,6 +78,7 @@
 ### Threat Actors
 
 #### External Threats
+
 1. **Script Kiddies**
    - Motivation: Vandalism, curiosity
    - Capability: Low to Medium
@@ -100,6 +104,7 @@
    - Impact: Medium
 
 #### Internal Threats
+
 1. **Malicious Insiders**
    - Risk Level: Medium
    - Mitigation: Least privilege, audit logging
@@ -111,6 +116,7 @@
 ### Attack Vectors
 
 #### Primary Attack Vectors
+
 1. **Web Application Attacks**
    - SQL Injection
    - Cross-Site Scripting (XSS)
@@ -149,41 +155,48 @@
 ### Defense in Depth (7 Layers)
 
 #### Layer 1: Physical Security
+
 - **Cloud Infrastructure**: Azure/AWS data centers
 - **Physical Controls**: Vendor-managed
 - **Compliance**: SOC 2, ISO 27001 certified facilities
 
 #### Layer 2: Network Security
+
 - **Firewalls**: Azure NSG / AWS Security Groups
 - **DDoS Protection**: CloudFlare / Azure DDoS Protection
 - **Segmentation**: VPC/VNET isolation
 - **Monitoring**: Network flow logs, IDS/IPS
 
 #### Layer 3: Host Security
+
 - **Hardening**: CIS benchmarks for container images
 - **Patching**: Automated security updates
 - **Anti-malware**: Container scanning
 - **Monitoring**: Host-based intrusion detection
 
 #### Layer 4: Application Security
+
 - **Secure Coding**: OWASP guidelines
 - **Input Validation**: All user inputs sanitized
 - **Output Encoding**: Context-aware encoding
 - **Error Handling**: Secure error messages
 
 #### Layer 5: Data Security
+
 - **Encryption at Rest**: AES-256
 - **Encryption in Transit**: TLS 1.3
 - **Data Classification**: PII, sensitive, public
 - **Masking**: PII masking in logs
 
 #### Layer 6: Identity & Access
+
 - **Authentication**: Keycloak SSO
 - **MFA**: TOTP, WebAuthn
 - **Authorization**: RBAC + ABAC
 - **Session Management**: Secure tokens, short expiry
 
 #### Layer 7: User Security
+
 - **Security Training**: Quarterly training
 - **Awareness**: Phishing simulations
 - **Policies**: Acceptable use policy
@@ -192,21 +205,25 @@
 ### Zero-Trust Principles
 
 #### Never Trust, Always Verify
+
 - Every request authenticated and authorized
 - No implicit trust based on network location
 - Continuous verification of security posture
 
 #### Least Privilege Access
+
 - Minimum necessary permissions
 - Time-bound access grants
 - Just-in-time privilege elevation
 
 #### Assume Breach
+
 - Micro-segmentation
 - Lateral movement prevention
 - Comprehensive logging and monitoring
 
 #### Explicit Verification
+
 - Multi-factor authentication
 - Device compliance checks
 - Continuous risk assessment
@@ -216,6 +233,7 @@
 ### Keycloak Architecture
 
 #### Components
+
 1. **Keycloak Server**
    - Standalone deployment
    - High availability setup (3+ nodes)
@@ -236,16 +254,19 @@
 #### Authentication Flows
 
 ##### Standard Flow (Authorization Code)
+
 ```
 User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange → Access Token
 ```
 
 ##### Refresh Token Flow
+
 - Access token lifetime: 15 minutes
 - Refresh token lifetime: 8 hours
 - Refresh token rotation enabled
 
 ##### Direct Grant (Service Accounts)
+
 - Used for system integrations
 - Client credentials flow
 - Restricted to specific clients
@@ -253,12 +274,14 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 ### Single Sign-On (SSO)
 
 #### Supported Protocols
+
 - **SAML 2.0**: Enterprise integrations
 - **OAuth 2.0**: API authorization
 - **OpenID Connect**: Modern applications
 - **LDAP**: Active Directory integration
 
 #### Identity Providers
+
 1. **Google Workspace**
    - For institutional accounts
    - Automatic user provisioning
@@ -274,6 +297,7 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 ### Multi-Factor Authentication (MFA)
 
 #### Supported Methods
+
 1. **TOTP (Time-based One-Time Password)**
    - Google Authenticator
    - Microsoft Authenticator
@@ -294,12 +318,14 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
    - Low-security scenarios
 
 #### MFA Enforcement
+
 - **Required**: Administrators, teachers with sensitive data access
 - **Optional but Encouraged**: Students, parents
 - **Risk-Based**: Adaptive MFA based on login context
 - **Grace Period**: 7 days for new users
 
 #### Recovery Mechanisms
+
 - Recovery codes (10 single-use codes)
 - Backup email verification
 - Admin reset (with approval workflow)
@@ -307,12 +333,14 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 ### Session Management
 
 #### Session Security
+
 - **Session ID**: Cryptographically random (256-bit)
 - **Transmission**: HTTPS only, Secure flag
 - **Storage**: HttpOnly cookies, SameSite=Strict
 - **Invalidation**: Logout, timeout, password change
 
 #### Session Timeouts
+
 - **Idle timeout**: 30 minutes
 - **Absolute timeout**: 8 hours
 - **Remember me**: 30 days (with reduced privileges)
@@ -324,7 +352,9 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 #### Core Roles
 
 ##### 1. Super Admin
+
 **Permissions:**
+
 - Full system access
 - User management (all roles)
 - System configuration
@@ -333,12 +363,15 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 - Database access (emergency only)
 
 **Assignment:**
+
 - Manual approval required
 - Background check required
 - Limited to 3-5 users
 
 ##### 2. School Admin
+
 **Permissions:**
+
 - Manage school/organization
 - Create and manage teachers
 - Enroll students
@@ -347,11 +380,14 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 - Limited user support
 
 **Assignment:**
+
 - Approved by Super Admin
 - Organization-scoped
 
 ##### 3. Teacher
+
 **Permissions:**
+
 - Create and manage courses
 - Grade assignments
 - View enrolled students
@@ -360,11 +396,14 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 - Configure course settings
 
 **Assignment:**
+
 - Approved by School Admin
 - Course-scoped
 
 ##### 4. Student
+
 **Permissions:**
+
 - Enroll in courses
 - Submit assignments
 - View own grades
@@ -373,17 +412,21 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 - Use AI tutoring agents
 
 **Assignment:**
+
 - Self-registration or bulk import
 - Course enrollment required
 
 ##### 5. Parent/Guardian
+
 **Permissions:**
+
 - View linked student progress
 - View grades and assignments
 - Communicate with teachers
 - Read-only access to course materials
 
 **Assignment:**
+
 - Linked to student account
 - Requires verification
 
@@ -392,6 +435,7 @@ User → Frontend → Keycloak → Auth Code → Frontend → Token Exchange →
 #### Scopes and Attributes
 
 ##### User Scopes
+
 ```
 student:read       # View student profile
 student:write      # Update student profile
@@ -416,12 +460,14 @@ analytics:export   # Export analytics data
 ```
 
 ##### Context Attributes
+
 - **Time**: Time-based access restrictions
 - **Location**: IP/geography-based restrictions
 - **Device**: Device compliance requirements
 - **Risk Score**: Adaptive access based on risk
 
 ##### Resource Attributes
+
 - **Ownership**: Creator/owner checks
 - **Visibility**: Public, private, restricted
 - **Classification**: PII, sensitive, public
@@ -507,10 +553,11 @@ CREATE POLICY school_admin_users_policy ON users
 #### RLS Enforcement
 
 1. **Connection-Level Settings**
+
    ```javascript
    // Set user context at connection
    await db.query(
-     "SET app.user_id = $1; SET app.role = $2; SET app.organization_id = $3",
+     'SET app.user_id = $1; SET app.role = $2; SET app.organization_id = $3',
      [userId, role, organizationId]
    );
    ```
@@ -532,12 +579,14 @@ CREATE POLICY school_admin_users_policy ON users
 #### PostgreSQL Encryption
 
 ##### Transparent Data Encryption (TDE)
+
 - **Method**: AES-256-GCM
 - **Scope**: All database files, WAL logs, backups
 - **Key Management**: Azure Key Vault / AWS KMS
 - **Rotation**: Annual key rotation
 
 ##### Column-Level Encryption
+
 ```sql
 -- Sensitive PII fields encrypted
 CREATE TABLE users (
@@ -555,6 +604,7 @@ INSERT INTO users (ssn) VALUES (
 ```
 
 ##### Encrypted Fields
+
 - Social Security Numbers
 - Date of Birth
 - Payment information
@@ -564,11 +614,13 @@ INSERT INTO users (ssn) VALUES (
 #### File Storage Encryption
 
 ##### Cloud Storage
+
 - **Azure Blob**: Server-side encryption (SSE) with customer-managed keys
 - **AWS S3**: SSE-KMS with automatic key rotation
 - **Encryption**: AES-256
 
 ##### Local Storage
+
 - Container volumes encrypted
 - Ephemeral storage encrypted
 - Backup encryption enabled
@@ -578,6 +630,7 @@ INSERT INTO users (ssn) VALUES (
 #### TLS 1.3 Configuration
 
 ##### Minimum Standards
+
 ```nginx
 # Nginx TLS configuration
 ssl_protocols TLSv1.3;
@@ -593,12 +646,14 @@ add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; prelo
 ```
 
 ##### Certificate Management
+
 - **Provider**: Let's Encrypt / DigiCert
 - **Validation**: Domain validation (DV)
 - **Renewal**: Automated (certbot/ACME)
 - **Monitoring**: Certificate expiry alerts (30/7 days)
 
 ##### Internal Communication
+
 - Service-to-service: mTLS (mutual TLS)
 - Database connections: TLS required
 - Redis: TLS enabled
@@ -607,11 +662,13 @@ add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; prelo
 #### API Security
 
 ##### GraphQL Over HTTPS
+
 - All GraphQL endpoints HTTPS-only
 - HTTP redirects to HTTPS (301)
 - No mixed content allowed
 
 ##### WebSocket Security
+
 - WSS (WebSocket Secure) only
 - Token-based authentication
 - Origin validation
@@ -632,12 +689,14 @@ Master Encryption Key (MEK)
 #### Key Storage
 
 ##### Azure Key Vault / AWS KMS
+
 - **Master Keys**: HSM-backed
 - **Access Control**: Managed identities only
 - **Audit**: All key operations logged
 - **Rotation**: Automatic annual rotation
 
 ##### Application Secrets
+
 ```yaml
 # Kubernetes Secrets (encrypted at rest)
 apiVersion: v1
@@ -652,13 +711,13 @@ data:
 
 #### Key Rotation Schedule
 
-| Key Type | Rotation Frequency | Automation |
-|----------|-------------------|------------|
-| Master Encryption Key | Annual | Manual with approval |
-| Database DEK | Annual | Automated |
-| JWT Signing Key | Quarterly | Automated |
-| API Keys | On compromise | Manual |
-| Service Account Keys | 90 days | Automated |
+| Key Type              | Rotation Frequency | Automation           |
+| --------------------- | ------------------ | -------------------- |
+| Master Encryption Key | Annual             | Manual with approval |
+| Database DEK          | Annual             | Automated            |
+| JWT Signing Key       | Quarterly          | Automated            |
+| API Keys              | On compromise      | Manual               |
+| Service Account Keys  | 90 days            | Automated            |
 
 #### Key Lifecycle
 
@@ -674,24 +733,28 @@ data:
 #### Classification Levels
 
 ##### Critical (Level 1)
+
 - Student SSN, financial data
 - Authentication credentials
 - Encryption keys
 - Retention: 7 years, encrypted storage
 
 ##### Sensitive (Level 2)
+
 - Student grades, PII
 - Assessment data
 - Communications
 - Retention: 5 years, encrypted storage
 
 ##### Internal (Level 3)
+
 - Course content
 - Internal documents
 - Logs
 - Retention: 3 years, standard storage
 
 ##### Public (Level 4)
+
 - Marketing materials
 - Public course catalogs
 - Retention: As needed
@@ -699,6 +762,7 @@ data:
 ### Data Retention and Disposal
 
 #### Retention Policies
+
 - **Active Students**: Data retained while enrolled
 - **Graduated Students**: 7 years post-graduation
 - **Withdrawn Students**: 5 years post-withdrawal
@@ -706,6 +770,7 @@ data:
 - **Logs**: 1 year operational, 3 years security
 
 #### Secure Disposal
+
 - **Database Records**: Cryptographic erasure
 - **File Storage**: Secure deletion (overwrite)
 - **Backups**: Secure deletion after retention
@@ -743,6 +808,7 @@ Internet
 #### Inbound Rules
 
 ##### Public Zone (DMZ)
+
 ```
 ALLOW TCP 443 FROM 0.0.0.0/0      # HTTPS
 ALLOW TCP 80 FROM 0.0.0.0/0       # HTTP (redirect to HTTPS)
@@ -750,6 +816,7 @@ DENY ALL FROM 0.0.0.0/0           # Default deny
 ```
 
 ##### Application Zone
+
 ```
 ALLOW TCP 3000 FROM web-tier      # GraphQL API
 ALLOW TCP 8080 FROM web-tier      # Keycloak
@@ -757,6 +824,7 @@ DENY ALL FROM 0.0.0.0/0           # Default deny
 ```
 
 ##### Data Zone
+
 ```
 ALLOW TCP 5432 FROM app-tier      # PostgreSQL
 ALLOW TCP 6379 FROM app-tier      # Redis
@@ -765,6 +833,7 @@ DENY ALL FROM 0.0.0.0/0           # Default deny
 ```
 
 #### Outbound Rules
+
 ```
 ALLOW TCP 443 TO 0.0.0.0/0        # HTTPS outbound
 ALLOW TCP 80 TO 0.0.0.0/0         # HTTP outbound
@@ -775,17 +844,20 @@ DENY ALL TO 0.0.0.0/0             # Default deny
 ### DDoS Protection
 
 #### Layer 3/4 Protection
+
 - **Provider**: CloudFlare / Azure DDoS Protection
 - **Capacity**: 100+ Gbps mitigation
 - **Methods**: SYN flood, UDP flood, ICMP flood protection
 
 #### Layer 7 Protection
+
 - **WAF Rules**: OWASP Core Rule Set
 - **Rate Limiting**: Per IP, per endpoint
 - **Bot Detection**: Challenge-response (CAPTCHA)
 - **Traffic Shaping**: Queue management
 
 #### Monitoring and Response
+
 - Real-time DDoS dashboards
 - Automatic mitigation triggers
 - Alert thresholds: 10x baseline traffic
@@ -796,6 +868,7 @@ DENY ALL TO 0.0.0.0/0             # Default deny
 #### API Rate Limits
 
 ##### Unauthenticated Users
+
 ```
 10 requests/minute per IP
 100 requests/hour per IP
@@ -804,6 +877,7 @@ DENY ALL TO 0.0.0.0/0             # Default deny
 ##### Authenticated Users
 
 ###### Students
+
 ```
 100 requests/minute
 5,000 requests/hour
@@ -811,6 +885,7 @@ DENY ALL TO 0.0.0.0/0             # Default deny
 ```
 
 ###### Teachers
+
 ```
 200 requests/minute
 10,000 requests/hour
@@ -818,6 +893,7 @@ DENY ALL TO 0.0.0.0/0             # Default deny
 ```
 
 ###### Administrators
+
 ```
 500 requests/minute
 20,000 requests/hour
@@ -827,6 +903,7 @@ Unlimited daily
 #### Resource-Specific Limits
 
 ##### AI Agent Execution
+
 ```
 Students: 10 concurrent agents, 100 agents/day
 Teachers: 50 concurrent agents, 500 agents/day
@@ -834,6 +911,7 @@ Admins: 100 concurrent agents, unlimited daily
 ```
 
 ##### File Uploads
+
 ```
 Max file size: 50 MB
 Max files/hour: 100 per user
@@ -841,6 +919,7 @@ Max storage: 1 GB per student, 10 GB per teacher
 ```
 
 ##### GraphQL Complexity
+
 ```
 Max query depth: 7 levels
 Max query complexity: 1000 points
@@ -848,6 +927,7 @@ Timeout: 30 seconds
 ```
 
 #### Rate Limit Headers
+
 ```http
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
@@ -856,6 +936,7 @@ Retry-After: 60
 ```
 
 #### Rate Limit Enforcement
+
 - Redis-based rate limiting
 - Distributed rate limit sharing
 - Progressive penalties (soft → hard limits)
@@ -864,12 +945,14 @@ Retry-After: 60
 ### Intrusion Detection/Prevention
 
 #### Network IDS/IPS
+
 - **Solution**: Suricata / Snort
 - **Rules**: ET Open ruleset + custom rules
 - **Mode**: Inline prevention mode
 - **Updates**: Daily signature updates
 
 #### Host-Based IDS
+
 - **Solution**: OSSEC / Wazuh
 - **Monitoring**: File integrity, rootkit detection
 - **Alerts**: Slack, email, PagerDuty
@@ -878,12 +961,14 @@ Retry-After: 60
 #### Web Application Firewall (WAF)
 
 ##### CloudFlare WAF Rules
+
 - OWASP Top 10 protection
 - Custom rule sets for GraphQL
 - Zero-day vulnerability patches
 - Virtual patching for known CVEs
 
 ##### Managed Rules
+
 - SQL injection prevention
 - XSS protection
 - Path traversal blocking
@@ -895,12 +980,15 @@ Retry-After: 60
 ### OWASP Top 10 Mitigations
 
 #### A01: Broken Access Control
+
 **Risks:**
+
 - Unauthorized data access
 - Privilege escalation
 - IDOR (Insecure Direct Object Reference)
 
 **Mitigations:**
+
 - Centralized authorization checks
 - Row-level security (RLS)
 - Object-level permission validation
@@ -908,6 +996,7 @@ Retry-After: 60
 - Default deny access control
 
 **Implementation:**
+
 ```javascript
 // Authorization middleware
 async function checkPermission(userId, resource, action) {
@@ -924,12 +1013,15 @@ async function checkPermission(userId, resource, action) {
 ```
 
 #### A02: Cryptographic Failures
+
 **Risks:**
+
 - Data exposure in transit
 - Weak encryption algorithms
 - Insecure key storage
 
 **Mitigations:**
+
 - TLS 1.3 for all connections
 - AES-256 encryption at rest
 - Secure key management (KMS/Key Vault)
@@ -937,13 +1029,16 @@ async function checkPermission(userId, resource, action) {
 - Regular key rotation
 
 #### A03: Injection
+
 **Risks:**
+
 - SQL injection
 - NoSQL injection
 - Command injection
 - GraphQL injection
 
 **Mitigations:**
+
 - Parameterized queries (prepared statements)
 - Input validation and sanitization
 - GraphQL query complexity limits
@@ -951,28 +1046,32 @@ async function checkPermission(userId, resource, action) {
 - Least privilege database accounts
 
 **Implementation:**
+
 ```javascript
 // Safe parameterized query
 const result = await db.query(
   'SELECT * FROM users WHERE email = $1',
-  [userEmail]  // Never use string concatenation
+  [userEmail] // Never use string concatenation
 );
 
 // GraphQL validation
 const validationRules = [
   depthLimit(7),
   createComplexityLimit({ maximumComplexity: 1000 }),
-  costAnalysis({ maximumCost: 2000 })
+  costAnalysis({ maximumCost: 2000 }),
 ];
 ```
 
 #### A04: Insecure Design
+
 **Risks:**
+
 - Missing security controls
 - Flawed business logic
 - Inadequate threat modeling
 
 **Mitigations:**
+
 - Threat modeling (documented in section 2)
 - Security requirements in design phase
 - Secure design patterns
@@ -980,13 +1079,16 @@ const validationRules = [
 - Regular architecture reviews
 
 #### A05: Security Misconfiguration
+
 **Risks:**
+
 - Default credentials
 - Unnecessary features enabled
 - Verbose error messages
 - Missing security headers
 
 **Mitigations:**
+
 - Infrastructure as Code (IaC) with security baselines
 - Automated security scans
 - Disable unused features
@@ -994,40 +1096,46 @@ const validationRules = [
 - Security headers (HSTS, CSP, etc.)
 
 **Security Headers:**
+
 ```javascript
 // Express.js security headers
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://api.edusphere.com"],
-      fontSrc: ["'self'", "https://fonts.googleapis.com"],
-      objectSrc: ["'none'"],
-      frameAncestors: ["'none'"]
-    }
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  },
-  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-  xssFilter: true,
-  noSniff: true,
-  frameguard: { action: "deny" }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https://api.edusphere.com'],
+        fontSrc: ["'self'", 'https://fonts.googleapis.com'],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    xssFilter: true,
+    noSniff: true,
+    frameguard: { action: 'deny' },
+  })
+);
 ```
 
 #### A06: Vulnerable and Outdated Components
+
 **Risks:**
+
 - Known CVEs in dependencies
 - Outdated frameworks
 - Unmaintained libraries
 
 **Mitigations:**
+
 - Automated dependency scanning (npm audit, Snyk)
 - Regular dependency updates
 - SBOM (Software Bill of Materials)
@@ -1035,12 +1143,15 @@ app.use(helmet({
 - Patch management process
 
 #### A07: Identification and Authentication Failures
+
 **Risks:**
+
 - Weak passwords
 - Credential stuffing
 - Session hijacking
 
 **Mitigations:**
+
 - Keycloak-based authentication
 - Multi-factor authentication (MFA)
 - Password complexity requirements
@@ -1048,12 +1159,15 @@ app.use(helmet({
 - Secure session management
 
 #### A08: Software and Data Integrity Failures
+
 **Risks:**
+
 - Unsigned updates
 - Insecure CI/CD
 - Deserialization attacks
 
 **Mitigations:**
+
 - Signed commits (GPG)
 - Container image signing
 - CI/CD pipeline security
@@ -1061,12 +1175,15 @@ app.use(helmet({
 - Integrity checks for updates
 
 #### A09: Security Logging and Monitoring Failures
+
 **Risks:**
+
 - Undetected breaches
 - Missing audit trails
 - Insufficient incident response
 
 **Mitigations:**
+
 - Centralized logging (ELK stack)
 - Security event monitoring
 - Audit logs for sensitive operations
@@ -1074,12 +1191,15 @@ app.use(helmet({
 - Log retention policies
 
 #### A10: Server-Side Request Forgery (SSRF)
+
 **Risks:**
+
 - Internal network scanning
 - Cloud metadata access
 - Unauthorized API calls
 
 **Mitigations:**
+
 - Whitelist allowed domains
 - Network segmentation
 - Input validation for URLs
@@ -1091,7 +1211,10 @@ app.use(helmet({
 #### Query Complexity Limiting
 
 ```javascript
-import { createComplexityLimit, getComplexity } from 'graphql-validation-complexity';
+import {
+  createComplexityLimit,
+  getComplexity,
+} from 'graphql-validation-complexity';
 
 const complexityLimit = createComplexityLimit({
   maximumComplexity: 1000,
@@ -1104,7 +1227,7 @@ const complexityLimit = createComplexityLimit({
   },
   scalarCost: 1,
   objectCost: 2,
-  listFactor: 10
+  listFactor: 10,
 });
 ```
 
@@ -1115,8 +1238,8 @@ import depthLimit from 'graphql-depth-limit';
 
 const validationRules = [
   depthLimit(7, {
-    ignore: ['__typename']
-  })
+    ignore: ['__typename'],
+  }),
 ];
 ```
 
@@ -1128,10 +1251,8 @@ const schema = new GraphQLSchema({
   query: QueryType,
   mutation: MutationType,
   validationRules: [
-    process.env.NODE_ENV === 'production'
-      ? NoIntrospection
-      : null
-  ].filter(Boolean)
+    process.env.NODE_ENV === 'production' ? NoIntrospection : null,
+  ].filter(Boolean),
 });
 ```
 
@@ -1140,8 +1261,8 @@ const schema = new GraphQLSchema({
 ```javascript
 // Only allow pre-approved queries in production
 const persistedQueries = {
-  'query1Hash': 'query GetUser($id: ID!) { user(id: $id) { name email } }',
-  'query2Hash': 'query GetCourse($id: ID!) { course(id: $id) { title } }'
+  query1Hash: 'query GetUser($id: ID!) { user(id: $id) { name email } }',
+  query2Hash: 'query GetCourse($id: ID!) { course(id: $id) { title } }',
 };
 
 // Validate query hash
@@ -1168,8 +1289,8 @@ const resolvers = {
         throw new ForbiddenError('Insufficient permissions');
       }
       return user.ssn;
-    }
-  }
+    },
+  },
 };
 ```
 
@@ -1178,11 +1299,13 @@ const resolvers = {
 #### Validation Strategy
 
 ##### Client-Side Validation
+
 - Immediate user feedback
 - Not relied upon for security
 - UX improvement only
 
 ##### Server-Side Validation
+
 - Mandatory security validation
 - Schema validation (Zod, Joi, Yup)
 - Business logic validation
@@ -1191,19 +1314,23 @@ const resolvers = {
 #### Validation Rules
 
 ##### Email Validation
+
 ```javascript
 import { z } from 'zod';
 
-const emailSchema = z.string()
+const emailSchema = z
+  .string()
   .email()
   .max(255)
   .toLowerCase()
-  .transform(s => s.trim());
+  .transform((s) => s.trim());
 ```
 
 ##### Password Validation
+
 ```javascript
-const passwordSchema = z.string()
+const passwordSchema = z
+  .string()
   .min(12, 'Password must be at least 12 characters')
   .max(128)
   .regex(/[A-Z]/, 'Must contain uppercase letter')
@@ -1213,6 +1340,7 @@ const passwordSchema = z.string()
 ```
 
 ##### Input Sanitization
+
 ```javascript
 import DOMPurify from 'isomorphic-dompurify';
 
@@ -1220,12 +1348,13 @@ function sanitizeInput(input) {
   // Remove potentially dangerous HTML
   return DOMPurify.sanitize(input, {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a'],
-    ALLOWED_ATTR: ['href']
+    ALLOWED_ATTR: ['href'],
   });
 }
 ```
 
 ##### SQL Injection Prevention
+
 ```javascript
 // ALWAYS use parameterized queries
 // NEVER concatenate user input into SQL
@@ -1238,13 +1367,14 @@ db.query(`SELECT * FROM users WHERE email = '${email}'`);
 ```
 
 ##### GraphQL Injection Prevention
+
 ```javascript
 // Validate GraphQL variables
 const validateVariables = (variables) => {
   const schema = z.object({
     id: z.string().uuid(),
     limit: z.number().int().min(1).max(100),
-    offset: z.number().int().min(0)
+    offset: z.number().int().min(0),
   });
 
   return schema.parse(variables);
@@ -1255,7 +1385,8 @@ const validateVariables = (variables) => {
 
 ```javascript
 const fileUploadSchema = z.object({
-  filename: z.string()
+  filename: z
+    .string()
     .regex(/^[a-zA-Z0-9_\-\.]+$/)
     .max(255),
   mimetype: z.enum([
@@ -1263,9 +1394,9 @@ const fileUploadSchema = z.object({
     'image/png',
     'application/pdf',
     'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ]),
-  size: z.number().max(50 * 1024 * 1024) // 50MB max
+  size: z.number().max(50 * 1024 * 1024), // 50MB max
 });
 
 // Additional file content validation
@@ -1348,8 +1479,8 @@ scheduling:
     runtime: gvisor
 overhead:
   podFixed:
-    cpu: "100m"
-    memory: "20Mi"
+    cpu: '100m'
+    memory: '20Mi'
 ```
 
 #### Container Security
@@ -1385,22 +1516,22 @@ spec:
     seccompProfile:
       type: RuntimeDefault
   containers:
-  - name: agent
-    image: edusphere/agent:latest
-    securityContext:
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      capabilities:
-        drop:
-        - ALL
-    resources:
-      limits:
-        cpu: 500m
-        memory: 512Mi
-        ephemeral-storage: 100Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
+    - name: agent
+      image: edusphere/agent:latest
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+          ephemeral-storage: 100Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
 ```
 
 ### Resource Quotas
@@ -1408,6 +1539,7 @@ spec:
 #### Compute Resources
 
 ##### Per Agent Limits
+
 ```yaml
 Student Agent:
   CPU: 500m (0.5 cores)
@@ -1429,6 +1561,7 @@ Admin Agent:
 ```
 
 ##### Concurrent Agent Limits
+
 ```
 Students: 10 concurrent agents per user
 Teachers: 50 concurrent agents per user
@@ -1478,7 +1611,7 @@ function sanitizePrompt(userInput) {
     /\<\|system\|\>/i,
     /assistant:/i,
     /you are now/i,
-    /pretend you are/i
+    /pretend you are/i,
   ];
 
   for (const pattern of blockedPatterns) {
@@ -1527,7 +1660,7 @@ function validateAgentOutput(output) {
     /[0-9]{3}-[0-9]{2}-[0-9]{4}/, // SSN
     /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i, // Email
     /api[_-]?key/i, // API keys
-    /password/i
+    /password/i,
   ];
 
   for (const pattern of sensitivePatterns) {
@@ -1552,7 +1685,7 @@ const jailbreakPatterns = [
   'do anything now',
   'DAN mode',
   'developer mode',
-  'sudo mode'
+  'sudo mode',
 ];
 
 function detectJailbreak(input) {
@@ -1577,25 +1710,27 @@ const aiRateLimits = {
   student: {
     requestsPerMinute: 10,
     requestsPerHour: 100,
-    tokensPerDay: 100000
+    tokensPerDay: 100000,
   },
   teacher: {
     requestsPerMinute: 30,
     requestsPerHour: 500,
-    tokensPerDay: 500000
-  }
+    tokensPerDay: 500000,
+  },
 };
 ```
 
 ### Code Execution Security
 
 #### Allowed Operations
+
 - Read provided context files
 - Perform calculations
 - Generate educational content
 - Run pre-approved libraries
 
 #### Blocked Operations
+
 ```python
 # System calls blocked
 import os  # Blocked
@@ -1620,7 +1755,7 @@ function analyzeAgentCode(code) {
     'socket',
     'sys.exit',
     'eval',
-    'exec'
+    'exec',
   ];
 
   for (const blocked of blockedImports) {
@@ -1691,18 +1826,21 @@ jobs:
 #### Third-Party Tools
 
 ##### Snyk
+
 - Real-time vulnerability database
 - Automated pull requests for fixes
 - License compliance checking
 - Container image scanning
 
 ##### OWASP Dependency-Check
+
 - CVE database matching
 - NIST NVD integration
 - Multi-language support
 - CI/CD integration
 
 ##### Dependabot
+
 - Automated dependency updates
 - Security advisories
 - Version compatibility checks
@@ -1730,12 +1868,12 @@ jobs:
 
 #### Severity Classification
 
-| CVSS Score | Severity | Response Time | Action |
-|------------|----------|---------------|--------|
-| 9.0 - 10.0 | Critical | 24 hours | Emergency patch |
-| 7.0 - 8.9 | High | 7 days | Priority patch |
-| 4.0 - 6.9 | Medium | 30 days | Scheduled patch |
-| 0.1 - 3.9 | Low | 90 days | Routine update |
+| CVSS Score | Severity | Response Time | Action          |
+| ---------- | -------- | ------------- | --------------- |
+| 9.0 - 10.0 | Critical | 24 hours      | Emergency patch |
+| 7.0 - 8.9  | High     | 7 days        | Priority patch  |
+| 4.0 - 6.9  | Medium   | 30 days       | Scheduled patch |
+| 0.1 - 3.9  | Low      | 90 days       | Routine update  |
 
 #### CVE Monitoring
 
@@ -1753,12 +1891,14 @@ jobs:
 ### Patch Management Schedule
 
 #### Emergency Patches (Critical CVEs)
+
 ```
 Discovery → Assessment (4 hours) → Patching (12 hours) → Testing (8 hours) → Deployment (4 hours)
 Total: 24 hours
 ```
 
 #### Priority Patches (High CVEs)
+
 ```
 Discovery → Assessment (1 day) → Patching (2 days) → Testing (2 days) → Deployment (2 days)
 Total: 7 days
@@ -1819,6 +1959,7 @@ sbom-generator -p ./ -o sbom-spdx.json
 ```
 
 #### SBOM Contents
+
 - Component name and version
 - License information
 - Supplier/author information
@@ -1827,6 +1968,7 @@ sbom-generator -p ./ -o sbom-spdx.json
 - Hash values for integrity
 
 #### SBOM Distribution
+
 - Included in release artifacts
 - Available in security portal
 - Shared with enterprise customers
@@ -1839,6 +1981,7 @@ sbom-generator -p ./ -o sbom-spdx.json
 #### Annual Penetration Test
 
 **Scope:**
+
 - Web application (frontend and API)
 - Authentication and authorization
 - AI agent execution environment
@@ -1846,11 +1989,13 @@ sbom-generator -p ./ -o sbom-spdx.json
 - Database security
 
 **Methodology:**
+
 - OWASP Testing Guide
 - PTES (Penetration Testing Execution Standard)
 - NIST SP 800-115
 
 **Deliverables:**
+
 - Executive summary
 - Detailed findings report
 - Risk ratings (CVSS)
@@ -1858,6 +2003,7 @@ sbom-generator -p ./ -o sbom-spdx.json
 - Retest validation
 
 **Schedule:**
+
 - Annual comprehensive test (Q4)
 - Post-major-release testing
 - After significant architecture changes
@@ -1867,12 +2013,14 @@ sbom-generator -p ./ -o sbom-spdx.json
 **Frequency:** Bi-annual
 
 **Objectives:**
+
 - Test incident response
 - Identify security gaps
 - Validate detection capabilities
 - Improve security posture
 
 **Scope:**
+
 - Social engineering
 - Physical security (if applicable)
 - Lateral movement
@@ -1884,6 +2032,7 @@ sbom-generator -p ./ -o sbom-spdx.json
 #### Internal Security Audits
 
 **Quarterly Reviews:**
+
 - Access control reviews
 - User permission audits
 - Configuration reviews
@@ -1891,6 +2040,7 @@ sbom-generator -p ./ -o sbom-spdx.json
 - Compliance checks
 
 **Annual Code Audits:**
+
 - Static analysis (SonarQube, Semgrep)
 - Manual code review
 - Dependency audits
@@ -1899,12 +2049,14 @@ sbom-generator -p ./ -o sbom-spdx.json
 #### External Security Audits
 
 **SOC 2 Type II Audit:**
+
 - Frequency: Annual
 - Scope: Security, availability, confidentiality
 - Auditor: Third-party CPA firm
 - Timeline: 6-9 months
 
 **ISO 27001 Certification:**
+
 - Target: 2027
 - Preparation: 2026
 - Gap analysis completed
@@ -1917,7 +2069,8 @@ sbom-generator -p ./ -o sbom-spdx.json
 **Platform:** HackerOne / Bugcrowd
 
 **Scope:**
-- *.edusphere.com (in scope)
+
+- \*.edusphere.com (in scope)
 - api.edusphere.com (in scope)
 - app.edusphere.com (in scope)
 - admin.edusphere.com (in scope)
@@ -1926,22 +2079,24 @@ sbom-generator -p ./ -o sbom-spdx.json
 
 #### Vulnerability Rewards
 
-| Severity | Reward Range | Example |
-|----------|-------------|---------|
-| Critical | $5,000 - $15,000 | RCE, SQL injection with data access |
-| High | $2,000 - $5,000 | Authentication bypass, privilege escalation |
-| Medium | $500 - $2,000 | XSS, CSRF, information disclosure |
-| Low | $100 - $500 | Security misconfiguration, low-impact issues |
+| Severity | Reward Range     | Example                                      |
+| -------- | ---------------- | -------------------------------------------- |
+| Critical | $5,000 - $15,000 | RCE, SQL injection with data access          |
+| High     | $2,000 - $5,000  | Authentication bypass, privilege escalation  |
+| Medium   | $500 - $2,000    | XSS, CSRF, information disclosure            |
+| Low      | $100 - $500      | Security misconfiguration, low-impact issues |
 
 #### Rules of Engagement
 
 **Allowed:**
+
 - Web application testing
 - API testing
 - Authentication testing
 - Non-destructive testing
 
 **Prohibited:**
+
 - Social engineering
 - Phishing
 - Physical attacks
@@ -1950,6 +2105,7 @@ sbom-generator -p ./ -o sbom-spdx.json
 - Automated scanning (without approval)
 
 **Responsible Disclosure:**
+
 - Report privately to security@edusphere.com
 - 90-day disclosure timeline
 - Coordinated public disclosure
@@ -1981,6 +2137,7 @@ sonar.qualitygate.timeout=300
 ```
 
 **Tools:**
+
 - SonarQube (code quality + security)
 - Semgrep (custom rules)
 - ESLint security plugins
@@ -1989,11 +2146,13 @@ sonar.qualitygate.timeout=300
 #### Dynamic Application Security Testing (DAST)
 
 **Tools:**
+
 - OWASP ZAP (Zed Attack Proxy)
 - Burp Suite (Professional)
 - Nuclei (template-based scanning)
 
 **CI/CD Integration:**
+
 ```yaml
 # GitHub Actions - DAST scan
 - name: Run OWASP ZAP scan
@@ -2009,6 +2168,7 @@ sonar.qualitygate.timeout=300
 **Tool:** Contrast Security
 
 **Benefits:**
+
 - Real-time vulnerability detection
 - Accurate results (fewer false positives)
 - Integration with runtime protection
@@ -2027,6 +2187,7 @@ sonar.qualitygate.timeout=300
 ```
 
 **Tools:**
+
 - Trivy (comprehensive scanner)
 - Grype (Anchore)
 - Snyk Container
@@ -2039,12 +2200,14 @@ sonar.qualitygate.timeout=300
 #### Security Monitoring
 
 **SIEM (Security Information and Event Management):**
+
 - Solution: Elastic Security / Splunk
 - Log sources: Application, infrastructure, network, cloud
 - Real-time correlation rules
 - Machine learning anomaly detection
 
 **Alert Sources:**
+
 1. **Application Logs**
    - Failed authentication attempts
    - Authorization failures
@@ -2071,6 +2234,7 @@ sonar.qualitygate.timeout=300
 #### Alert Rules
 
 **Critical Alerts (Immediate Response):**
+
 ```
 - Multiple failed login attempts (>5 in 5 minutes)
 - Privilege escalation attempts
@@ -2081,6 +2245,7 @@ sonar.qualitygate.timeout=300
 ```
 
 **High Priority Alerts (1 hour response):**
+
 ```
 - Unusual access patterns
 - Suspicious GraphQL queries
@@ -2090,6 +2255,7 @@ sonar.qualitygate.timeout=300
 ```
 
 **Medium Priority Alerts (4 hour response):**
+
 ```
 - Failed authorization attempts
 - Input validation failures
@@ -2102,6 +2268,7 @@ sonar.qualitygate.timeout=300
 #### Immediate Actions (0-15 minutes)
 
 1. **Isolate Affected Systems**
+
    ```bash
    # Block suspicious IP
    kubectl exec cloudflare-controller -- \
@@ -2160,6 +2327,7 @@ sonar.qualitygate.timeout=300
 #### Recovery Phases
 
 **Phase 1: Eradication (24-48 hours)**
+
 - Remove malware/backdoors
 - Close attack vectors
 - Patch vulnerabilities
@@ -2167,12 +2335,14 @@ sonar.qualitygate.timeout=300
 - Verify clean state
 
 **Phase 2: System Restoration (2-7 days)**
+
 - Restore services from clean backups
 - Gradual service restoration
 - Continuous monitoring
 - Validation testing
 
 **Phase 3: Monitoring (1-4 weeks)**
+
 - Enhanced monitoring
 - Threat hunting
 - Verify no re-infection
@@ -2181,12 +2351,14 @@ sonar.qualitygate.timeout=300
 #### Recovery Validation
 
 **Technical Validation:**
+
 - Vulnerability re-scan
 - Penetration test (limited scope)
 - Integrity verification
 - Log analysis
 
 **Business Validation:**
+
 - Service availability
 - Data integrity
 - User access restoration
@@ -2197,12 +2369,14 @@ sonar.qualitygate.timeout=300
 #### Post-Incident Review (Within 7 days)
 
 **Participants:**
+
 - Incident response team
 - Engineering team
 - Security team
 - Management (if significant)
 
 **Agenda:**
+
 1. Timeline reconstruction
 2. Root cause analysis
 3. Impact assessment
@@ -2213,49 +2387,60 @@ sonar.qualitygate.timeout=300
 #### Post-Mortem Report
 
 **Structure:**
+
 ```markdown
 # Incident Post-Mortem: [Incident ID]
 
 ## Executive Summary
+
 Brief overview of incident
 
 ## Timeline
+
 - [Time]: Event description
 - [Time]: Response action
-...
+  ...
 
 ## Root Cause
+
 Detailed analysis of underlying cause
 
 ## Impact
+
 - Users affected: X
 - Data compromised: Y/N
 - Downtime: Z hours
 - Financial impact: $XXX
 
 ## What Went Well
+
 - Positive aspects of response
 
 ## What Went Wrong
+
 - Areas for improvement
 
 ## Action Items
+
 - [ ] Action 1 (Owner: X, Due: Date)
 - [ ] Action 2 (Owner: Y, Due: Date)
 
 ## Lessons Learned
+
 Key takeaways
 ```
 
 #### Continuous Improvement
 
 **Quarterly Reviews:**
+
 - Incident trend analysis
 - Response time metrics
 - Detection capability assessment
 - Playbook updates
 
 **Annual Exercises:**
+
 - Tabletop exercises
 - Disaster recovery drills
 - Red team exercises
@@ -2300,6 +2485,7 @@ Key takeaways
 ### GDPR (General Data Protection Regulation)
 
 #### Applicability
+
 - EU users and data subjects
 - Cross-border data transfers
 - Student and teacher PII
@@ -2307,11 +2493,13 @@ Key takeaways
 #### Key Requirements
 
 **Lawful Basis for Processing:**
+
 - Consent for marketing
 - Contractual necessity for service delivery
 - Legitimate interest for analytics (with safeguards)
 
 **Data Subject Rights:**
+
 1. **Right to Access (Article 15)**
    - User dashboard with personal data export
    - API endpoint: `/api/users/me/data-export`
@@ -2337,17 +2525,20 @@ Key takeaways
    - Granular consent management
 
 **Privacy by Design:**
+
 - Data minimization (collect only necessary data)
 - Purpose limitation (use data only for stated purpose)
 - Storage limitation (delete after retention period)
 - Pseudonymization where possible
 
 **Data Protection Impact Assessment (DPIA):**
+
 - Conducted for AI agent processing
 - Conducted for learning analytics
 - Reviewed annually
 
 **Data Processing Agreement (DPA):**
+
 - Signed with all third-party processors
 - Reviewed for GDPR compliance
 - Includes standard contractual clauses (SCCs)
@@ -2362,7 +2553,7 @@ const userConsent = {
   aiTutoring: true,
   thirdPartySharing: false,
   timestamp: '2024-01-15T10:30:00Z',
-  ipAddress: '203.0.113.42'
+  ipAddress: '203.0.113.42',
 };
 
 // Data retention policies
@@ -2371,13 +2562,14 @@ const retentionPolicies = {
   inactiveUsers: '2 years',
   deletedUsers: '30 days (then purged)',
   logs: '1 year',
-  backups: '90 days'
+  backups: '90 days',
 };
 ```
 
 ### FERPA (Family Educational Rights and Privacy Act)
 
 #### Applicability
+
 - U.S. educational institutions
 - Student education records
 - Parent/guardian access rights
@@ -2385,26 +2577,31 @@ const retentionPolicies = {
 #### Key Requirements
 
 **Educational Records:**
+
 - Grades, transcripts, assessments
 - Disciplinary records
 - Financial information
 - Protected from unauthorized disclosure
 
 **Parental Rights (Students under 18):**
+
 - Right to inspect and review records
 - Right to request amendments
 - Right to consent to disclosures
 
 **Student Rights (18+ or attending college):**
+
 - Rights transfer to student
 - Parent access only with student consent
 
 **Directory Information:**
+
 - Name, email, enrollment status (can be disclosed)
 - Opt-out mechanism provided
 - Annual notification required
 
 **FERPA Exceptions (Disclosure without Consent):**
+
 - School officials with legitimate educational interest
 - Other schools (with transfer)
 - Authorized audits
@@ -2426,7 +2623,10 @@ function canAccessEducationRecord(requester, student) {
     return requester.id === student.parentId; // With consent
   }
 
-  if (requester.role === 'teacher' && hasLegitimateEducationalInterest(requester, student)) {
+  if (
+    requester.role === 'teacher' &&
+    hasLegitimateEducationalInterest(requester, student)
+  ) {
     return true; // Legitimate educational interest
   }
 
@@ -2439,6 +2639,7 @@ function canAccessEducationRecord(requester, student) {
 #### Current Status: Pre-Audit Preparation
 
 **Timeline:**
+
 - **Q1 2026:** Gap analysis and remediation (Current)
 - **Q2 2026:** Control implementation and testing
 - **Q3 2026:** Observation period begins (6 months)
@@ -2449,6 +2650,7 @@ function canAccessEducationRecord(requester, student) {
 #### Trust Services Criteria
 
 ##### Security (All Organizations)
+
 - **CC6.1:** Logical and Physical Access Controls
   - Status: 80% complete
   - Gaps: HSM implementation, biometric access
@@ -2462,6 +2664,7 @@ function canAccessEducationRecord(requester, student) {
   - Gaps: SIEM correlation rules, automated response
 
 ##### Availability (Optional)
+
 - **A1.1:** Availability Commitments
   - SLA: 99.9% uptime
   - Status: Monitoring in place
@@ -2472,6 +2675,7 @@ function canAccessEducationRecord(requester, student) {
   - Status: Tested quarterly
 
 ##### Confidentiality (Optional)
+
 - **C1.1:** Confidential Information
   - Encryption at rest and in transit
   - Access controls
@@ -2479,22 +2683,24 @@ function canAccessEducationRecord(requester, student) {
 
 #### Gap Remediation Plan
 
-| Control | Gap | Remediation | Owner | Due Date |
-|---------|-----|-------------|-------|----------|
-| CC6.1 | MFA not enforced for all admins | Enforce MFA policy | Security Team | Q1 2026 |
-| CC6.7 | Missing automated incident response | Implement SOAR | DevOps | Q2 2026 |
-| CC7.2 | Change management documentation | Formalize change process | Engineering | Q1 2026 |
-| CC8.1 | Vendor security assessment incomplete | Complete assessments | Procurement | Q2 2026 |
+| Control | Gap                                   | Remediation              | Owner         | Due Date |
+| ------- | ------------------------------------- | ------------------------ | ------------- | -------- |
+| CC6.1   | MFA not enforced for all admins       | Enforce MFA policy       | Security Team | Q1 2026  |
+| CC6.7   | Missing automated incident response   | Implement SOAR           | DevOps        | Q2 2026  |
+| CC7.2   | Change management documentation       | Formalize change process | Engineering   | Q1 2026  |
+| CC8.1   | Vendor security assessment incomplete | Complete assessments     | Procurement   | Q2 2026  |
 
 #### Evidence Collection
 
 **Continuous Collection (Automated):**
+
 - Audit logs (all access, changes)
 - System availability metrics
 - Security scan results
 - Backup verification logs
 
 **Periodic Collection (Manual):**
+
 - Quarterly access reviews
 - Annual security training records
 - Vendor security assessments
@@ -2505,6 +2711,7 @@ function canAccessEducationRecord(requester, student) {
 **Target:** 2027
 
 **Current Activities:**
+
 1. Information Security Management System (ISMS) design
 2. Risk assessment methodology
 3. Statement of Applicability (SoA) development
@@ -2513,6 +2720,7 @@ function canAccessEducationRecord(requester, student) {
 ### Other Compliance Considerations
 
 #### COPPA (Children's Online Privacy Protection Act)
+
 - **Applicability:** Users under 13
 - **Requirements:**
   - Parental consent before data collection
@@ -2520,6 +2728,7 @@ function canAccessEducationRecord(requester, student) {
   - No marketing to children
 
 #### CCPA (California Consumer Privacy Act)
+
 - **Applicability:** California residents
 - **Requirements:**
   - Data disclosure upon request
@@ -2527,6 +2736,7 @@ function canAccessEducationRecord(requester, student) {
   - Non-discrimination for privacy choices
 
 #### Accessibility (ADA, Section 508, WCAG 2.1 AA)
+
 - **Requirements:**
   - Screen reader compatibility
   - Keyboard navigation
@@ -2540,6 +2750,7 @@ function canAccessEducationRecord(requester, student) {
 #### Onboarding (Day 1-7)
 
 **Required Training:**
+
 1. **Security Fundamentals (4 hours)**
    - EduSphere threat model
    - Security policies and procedures
@@ -2560,18 +2771,21 @@ function canAccessEducationRecord(requester, student) {
 #### Ongoing Training
 
 **Quarterly Security Training (1 hour):**
+
 - Q1: Web application security
 - Q2: API security and GraphQL
 - Q3: Cloud security best practices
 - Q4: Incident response and security culture
 
 **Monthly Security Bulletins:**
+
 - Recent vulnerabilities
 - Security best practices
 - New threats and trends
 - Internal security updates
 
 **Annual Certification:**
+
 - Secure coding certification
 - Completion required for performance review
 - Renewal annually
@@ -2579,12 +2793,14 @@ function canAccessEducationRecord(requester, student) {
 #### Advanced Training (Optional)
 
 **Specialized Topics:**
+
 - AI/ML security (for AI team)
 - Container security (for DevOps)
 - Cryptography deep dive
 - Threat modeling workshops
 
 **External Training:**
+
 - OWASP conferences
 - Security certifications (CISSP, CEH, OSCP)
 - Bug bounty participation
@@ -2595,6 +2811,7 @@ function canAccessEducationRecord(requester, student) {
 #### All Staff Training
 
 **Annual Security Awareness (2 hours):**
+
 - Phishing awareness
 - Password best practices
 - Social engineering
@@ -2603,12 +2820,14 @@ function canAccessEducationRecord(requester, student) {
 - Incident reporting
 
 **Monthly Phishing Simulations:**
+
 - Realistic phishing emails sent
 - Click tracking (educational, not punitive)
 - Immediate feedback and training
 - Metrics reported to management
 
 **Security Champions Program:**
+
 - Volunteer security advocates in each team
 - Additional training and resources
 - Monthly security champion meetings
@@ -2617,18 +2836,21 @@ function canAccessEducationRecord(requester, student) {
 #### User Education
 
 **Student Security Training:**
+
 - Password security
 - Recognizing phishing
 - Safe internet practices
 - Privacy settings
 
 **Teacher Security Training:**
+
 - Student data protection
 - FERPA compliance
 - Secure file sharing
 - Incident reporting
 
 **Parent Resources:**
+
 - Online safety guides
 - Privacy controls
 - Monitoring student activity
@@ -2637,18 +2859,21 @@ function canAccessEducationRecord(requester, student) {
 ### Security Culture
 
 #### Blameless Post-Mortems
+
 - Focus on systems, not individuals
 - Encourage reporting without fear
 - Learn from mistakes
 - Continuous improvement
 
 #### Security Champions Network
+
 - Cross-functional security advocates
 - Regular knowledge sharing
 - Security best practice dissemination
 - Early security feedback
 
 #### Recognition Programs
+
 - Bug bounty (internal and external)
 - Security innovation awards
 - Public recognition for security contributions
@@ -2657,12 +2882,14 @@ function canAccessEducationRecord(requester, student) {
 #### Metrics and KPIs
 
 **Training Metrics:**
+
 - Training completion rate: >95%
 - Phishing simulation click rate: <5% (target)
 - Security certification count
 - Security champion participation
 
 **Cultural Metrics:**
+
 - Security issue reporting rate (higher is better)
 - Time to report security issues
 - Security discussion participation
@@ -2673,11 +2900,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 0: Foundation (Q4 2025 - Q1 2026) ✓ Complete
 
 **Objectives:**
+
 - Establish core security controls
 - Implement authentication and authorization
 - Deploy basic monitoring
 
 **Deliverables:**
+
 - [x] Keycloak SSO deployment
 - [x] RBAC implementation (5 roles)
 - [x] PostgreSQL RLS policies
@@ -2688,11 +2917,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 1: Maturity (Q1 2026 - Q2 2026) - In Progress
 
 **Objectives:**
+
 - Enhance detection and response
 - Implement advanced security controls
 - Establish security testing processes
 
 **Deliverables:**
+
 - [x] MFA enforcement for admins
 - [ ] SIEM deployment (Elastic Security)
 - [ ] Vulnerability scanning automation
@@ -2705,11 +2936,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 2: AI Security Hardening (Q2 2026 - Q3 2026) - Planned
 
 **Objectives:**
+
 - Secure AI agent execution
 - Implement advanced sandboxing
 - Enhance prompt injection defenses
 
 **Deliverables:**
+
 - [ ] gVisor sandbox deployment
 - [ ] AI agent resource quotas
 - [ ] Prompt injection detection
@@ -2720,11 +2953,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 3: Compliance (Q3 2026 - Q4 2026) - Planned
 
 **Objectives:**
+
 - Achieve SOC 2 Type II readiness
 - Complete GDPR/FERPA compliance
 - Establish formal compliance program
 
 **Deliverables:**
+
 - [ ] SOC 2 gap remediation
 - [ ] GDPR DPIA completion
 - [ ] FERPA compliance audit
@@ -2735,11 +2970,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 4: Advanced Threat Protection (Q4 2026 - Q1 2027) - Planned
 
 **Objectives:**
+
 - Implement advanced threat detection
 - Deploy deception technologies
 - Enhance threat intelligence
 
 **Deliverables:**
+
 - [ ] User and Entity Behavior Analytics (UEBA)
 - [ ] Honeypots and canary tokens
 - [ ] Threat intelligence feeds
@@ -2750,11 +2987,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 5: Zero Trust Architecture (Q1 2027 - Q2 2027) - Future
 
 **Objectives:**
+
 - Implement comprehensive zero trust
 - Micro-segmentation
 - Continuous authentication
 
 **Deliverables:**
+
 - [ ] Service mesh (Istio) with mTLS
 - [ ] Network micro-segmentation
 - [ ] Device trust verification
@@ -2765,11 +3004,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 6: Security Automation (Q2 2027 - Q3 2027) - Future
 
 **Objectives:**
+
 - Automate security operations
 - Self-healing infrastructure
 - AI-powered security
 
 **Deliverables:**
+
 - [ ] Automated incident response
 - [ ] Self-patching systems
 - [ ] AI-based anomaly detection
@@ -2780,11 +3021,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 7: Continuous Compliance (Q3 2027 - Q4 2027) - Future
 
 **Objectives:**
+
 - Continuous compliance monitoring
 - Automated evidence collection
 - Real-time compliance reporting
 
 **Deliverables:**
+
 - [ ] Continuous compliance platform
 - [ ] Automated audit readiness
 - [ ] Real-time compliance dashboards
@@ -2795,11 +3038,13 @@ function canAccessEducationRecord(requester, student) {
 ### Phase 8: Security Excellence (Q4 2027 - Ongoing) - Future
 
 **Objectives:**
+
 - Industry-leading security posture
 - Proactive threat prevention
 - Security thought leadership
 
 **Deliverables:**
+
 - [ ] Threat intelligence sharing
 - [ ] Open-source security contributions
 - [ ] Security research publication
@@ -2814,16 +3059,19 @@ function canAccessEducationRecord(requester, student) {
 ### Security Contacts
 
 **Security Team:**
+
 - Email: security@edusphere.com
 - PGP Key: [Download](https://edusphere.com/security/pgp-key.asc)
 - Emergency Hotline: +1-XXX-XXX-XXXX
 
 **Incident Response:**
+
 - On-Call Engineer: incidents@edusphere.com
 - PagerDuty: [Link to PagerDuty]
 - Slack Channel: #security-incidents
 
 **Vulnerability Reporting:**
+
 - Bug Bounty: https://hackerone.com/edusphere
 - Email: vulnerabilities@edusphere.com
 - Response SLA: 24 hours (critical), 48 hours (high)
@@ -2854,18 +3102,18 @@ function canAccessEducationRecord(requester, student) {
 
 ### Revision History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2026-02-17 | Security Team | Initial security plan |
+| Version | Date       | Author        | Changes               |
+| ------- | ---------- | ------------- | --------------------- |
+| 1.0.0   | 2026-02-17 | Security Team | Initial security plan |
 
 ### Approval
 
 This security plan has been reviewed and approved by:
 
-- **CTO:** _________________ Date: _______
-- **CISO:** _________________ Date: _______
-- **Legal:** _________________ Date: _______
-- **Compliance:** _________________ Date: _______
+- **CTO:** **\*\*\*\***\_**\*\*\*\*** Date: **\_\_\_**
+- **CISO:** **\*\*\*\***\_**\*\*\*\*** Date: **\_\_\_**
+- **Legal:** **\*\*\*\***\_**\*\*\*\*** Date: **\_\_\_**
+- **Compliance:** **\*\*\*\***\_**\*\*\*\*** Date: **\_\_\_**
 
 ---
 

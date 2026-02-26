@@ -9,7 +9,9 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }]),
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+    ]),
   };
 });
 
@@ -21,12 +23,24 @@ vi.mock('@/components/Layout', () => ({
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, title }: { children: React.ReactNode; onClick?: () => void; title?: string }) => (
-    <button onClick={onClick} title={title}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    title,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    title?: string;
+  }) => (
+    <button onClick={onClick} title={title}>
+      {children}
+    </button>
   ),
 }));
 
@@ -130,7 +144,10 @@ describe('KnowledgeGraph', () => {
 
   it('clicking a type filter toggles it', () => {
     renderKG();
-    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [HTMLElement, ...HTMLElement[]];
+    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [
+      HTMLElement,
+      ...HTMLElement[],
+    ];
     fireEvent.click(conceptBtn);
     // After click filter is active — component re-renders without error
     expect(screen.getAllByText(/CONCEPT/).length).toBeGreaterThan(0);
@@ -138,7 +155,10 @@ describe('KnowledgeGraph', () => {
 
   it('clicking the same type filter again removes the filter', () => {
     renderKG();
-    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [HTMLElement, ...HTMLElement[]];
+    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [
+      HTMLElement,
+      ...HTMLElement[],
+    ];
     fireEvent.click(conceptBtn); // activate
     fireEvent.click(conceptBtn); // deactivate
     expect(screen.getAllByText(/CONCEPT/).length).toBeGreaterThan(0);
@@ -241,5 +261,19 @@ describe('KnowledgeGraph', () => {
   it('component renders without crash regardless of DEV_MODE', () => {
     renderKG();
     expect(screen.getByText('Knowledge Graph')).toBeDefined();
+  });
+
+  // ─── Regression: graph must not vanish when API returns empty array ───────────
+  // Bug: `!data?.concepts` evaluated to false for `[]` (truthy), causing the
+  // component to build an empty graph instead of falling back to mock data.
+  // Fix: changed to `!data?.concepts?.length` so empty arrays also trigger fallback.
+  it('regression: shows mock graph nodes when API returns empty concepts array', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      { data: { concepts: [] }, fetching: false, error: undefined },
+    ]);
+    renderKG();
+    // Mock graph has nodes — at least the default selected "Free Will" label must appear
+    expect(screen.getAllByText('Free Will').length).toBeGreaterThan(0);
   });
 });

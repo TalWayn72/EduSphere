@@ -5,7 +5,13 @@ import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  Bot, Zap, BookOpen, FlaskConical, Lightbulb, Send, RotateCcw,
+  Bot,
+  Zap,
+  BookOpen,
+  FlaskConical,
+  Lightbulb,
+  Send,
+  RotateCcw,
 } from 'lucide-react';
 import {
   START_AGENT_SESSION_MUTATION,
@@ -24,8 +30,13 @@ const AGENT_MODES = [
     icon: <Bot className="h-5 w-5" />,
     color: 'text-blue-600',
     bg: 'bg-blue-50 border-blue-200',
-    description: 'Dialectical partner — challenges your arguments using Talmudic reasoning',
-    prompts: ['Debate free will', 'Argue against Rambam', 'Challenge my thesis'],
+    description:
+      'Dialectical partner — challenges your arguments using Talmudic reasoning',
+    prompts: [
+      'Debate free will',
+      'Argue against Rambam',
+      'Challenge my thesis',
+    ],
     responses: [
       "An interesting position! But consider the counter-argument: if consciousness is purely deterministic, how can Rambam's framework of moral responsibility hold?",
       'You raise a valid point from the Mishneh Torah. However, the Ramban argues the opposite. How do you reconcile these two authorities?',
@@ -38,8 +49,13 @@ const AGENT_MODES = [
     icon: <Zap className="h-5 w-5" />,
     color: 'text-green-600',
     bg: 'bg-green-50 border-green-200',
-    description: 'Adaptive quizzes based on your learning history and prerequisite gaps',
-    prompts: ['Quiz me on free will', 'Test my Rambam knowledge', 'Random concept quiz'],
+    description:
+      'Adaptive quizzes based on your learning history and prerequisite gaps',
+    prompts: [
+      'Quiz me on free will',
+      'Test my Rambam knowledge',
+      'Random concept quiz',
+    ],
     responses: [
       "Question 1: Rambam's concept of free will is found primarily in which of his works? A) Guide for the Perplexed B) Mishneh Torah C) Commentary on the Mishnah",
       'Correct! Now a harder question: What is the Hebrew term for the principle that all events are predetermined?',
@@ -52,8 +68,13 @@ const AGENT_MODES = [
     icon: <BookOpen className="h-5 w-5" />,
     color: 'text-purple-600',
     bg: 'bg-purple-50 border-purple-200',
-    description: 'Progressive summaries of your studied content with key concept extraction',
-    prompts: ['Summarize lesson 1', 'Key concepts only', 'One-paragraph overview'],
+    description:
+      'Progressive summaries of your studied content with key concept extraction',
+    prompts: [
+      'Summarize lesson 1',
+      'Key concepts only',
+      'One-paragraph overview',
+    ],
     responses: [
       '**Lesson 1 Summary:** The introductory lesson covers Talmudic reasoning methods including *kal vachomer*, *gezera shava*, and *binyan av*.',
       '**Key Concepts:** (1) Pilpul — rigorous analytical debate. (2) Svara — logical reasoning. (3) Machloket — structured dispute. (4) Kushya — a challenge.',
@@ -66,8 +87,13 @@ const AGENT_MODES = [
     icon: <FlaskConical className="h-5 w-5" />,
     color: 'text-amber-600',
     bg: 'bg-amber-50 border-amber-200',
-    description: 'Cross-reference finder — discovers connections across texts and time periods',
-    prompts: ['Find contradictions', 'Cross-reference Aristotle', 'Related sources'],
+    description:
+      'Cross-reference finder — discovers connections across texts and time periods',
+    prompts: [
+      'Find contradictions',
+      'Cross-reference Aristotle',
+      'Related sources',
+    ],
     responses: [
       '**Contradiction detected:** Rambam (Guide III:17) argues for limited divine providence. Nahmanides argues for universal providence. Both cite Job 34:21 with opposite conclusions.',
       '**Aristotle connections:** (1) Kal vachomer ↔ a fortiori (Prior Analytics). (2) Pilpul ↔ Socratic dialectic.',
@@ -80,8 +106,13 @@ const AGENT_MODES = [
     icon: <Lightbulb className="h-5 w-5" />,
     color: 'text-orange-600',
     bg: 'bg-orange-50 border-orange-200',
-    description: 'Adaptive explanations that adjust to your understanding level',
-    prompts: ["Explain like I'm 5", 'Advanced explanation', 'Practical examples'],
+    description:
+      'Adaptive explanations that adjust to your understanding level',
+    prompts: [
+      "Explain like I'm 5",
+      'Advanced explanation',
+      'Practical examples',
+    ],
     responses: [
       "**Simple:** Imagine a court case. 'If a small thing requires proof, a big thing *definitely* requires proof.' That's *kal vachomer*.",
       '**Advanced:** *Kal vachomer* operates through *binyan av* — establishing a norm from a clear case and extending it to an ambiguous one.',
@@ -108,11 +139,15 @@ const TEMPLATE_TYPE: Record<AgentModeId, string> = {
 };
 
 const INITIAL_MESSAGES: Record<AgentModeId, string> = {
-  chavruta: "שלום! I'm your Chavruta partner. Present an argument and I will challenge it.",
+  chavruta:
+    "שלום! I'm your Chavruta partner. Present an argument and I will challenge it.",
   quiz: 'Ready to test your knowledge! Tell me which topic to quiz you on.',
-  summarize: 'I can summarize any lesson or concept. Which content would you like summarized?',
-  research: 'Research mode active. I will find cross-references and contradictions. What should I investigate?',
-  explain: 'Explain mode ready. Tell me what concept you want explained and at what level.',
+  summarize:
+    'I can summarize any lesson or concept. Which content would you like summarized?',
+  research:
+    'Research mode active. I will find cross-references and contradictions. What should I investigate?',
+  explain:
+    'Explain mode ready. Tell me what concept you want explained and at what level.',
 };
 
 function buildInitialSessions(): Record<AgentModeId, ChatMsg[]> {
@@ -138,14 +173,21 @@ export function AgentsPage() {
 
   const [activeMode, setActiveMode] = useState<AgentModeId>('chavruta');
   const [chatInput, setChatInput] = useState('');
-  const [agentSessionIds, setAgentSessionIds] = useState<Partial<Record<AgentModeId, string>>>({});
-  const [sessions, setSessions] = useState<Record<AgentModeId, ChatMsg[]>>(buildInitialSessions);
+  const [agentSessionIds, setAgentSessionIds] = useState<
+    Partial<Record<AgentModeId, string>>
+  >({});
+  const [sessions, setSessions] =
+    useState<Record<AgentModeId, ChatMsg[]>>(buildInitialSessions);
   const [isTyping, setIsTyping] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
 
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const streamRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
-  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const streamRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined
+  );
+  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
   const [, sendMessage] = useMutation(SEND_AGENT_MESSAGE_MUTATION);
@@ -186,7 +228,11 @@ export function AgentsPage() {
         ...prev,
         [activeMode]: [
           ...current,
-          { id: msg.id as string, role: 'agent' as const, content: msg.content as string },
+          {
+            id: msg.id as string,
+            role: 'agent' as const,
+            content: msg.content as string,
+          },
         ],
       };
     });
@@ -214,11 +260,18 @@ export function AgentsPage() {
 
   const handleSend = useCallback(async () => {
     if (!chatInput.trim() || isTyping || streamingContent) return;
-    const userMsg: ChatMsg = { id: Date.now().toString(), role: 'user', content: chatInput };
+    const userMsg: ChatMsg = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: chatInput,
+    };
     const capturedMode = activeMode;
     const capturedInput = chatInput;
     setChatInput('');
-    setSessions((prev) => ({ ...prev, [capturedMode]: [...prev[capturedMode], userMsg] }));
+    setSessions((prev) => ({
+      ...prev,
+      [capturedMode]: [...prev[capturedMode], userMsg],
+    }));
 
     if (!DEV_MODE) {
       setIsTyping(true);
@@ -244,7 +297,11 @@ export function AgentsPage() {
               ...prev,
               [capturedMode]: [
                 ...prev[capturedMode],
-                { id: reply.id as string, role: 'agent', content: reply.content as string },
+                {
+                  id: reply.id as string,
+                  role: 'agent',
+                  content: reply.content as string,
+                },
               ],
             }));
             gotResponse = true;
@@ -257,10 +314,18 @@ export function AgentsPage() {
       if (!gotResponse) {
         const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
         const fullText =
-          modeData.responses[Math.floor(Math.random() * modeData.responses.length)] ??
-          modeData.responses[0];
-        const reply: ChatMsg = { id: (Date.now() + 1).toString(), role: 'agent', content: fullText };
-        setSessions((prev) => ({ ...prev, [capturedMode]: [...prev[capturedMode], reply] }));
+          modeData.responses[
+            Math.floor(Math.random() * modeData.responses.length)
+          ] ?? modeData.responses[0];
+        const reply: ChatMsg = {
+          id: (Date.now() + 1).toString(),
+          role: 'agent',
+          content: fullText,
+        };
+        setSessions((prev) => ({
+          ...prev,
+          [capturedMode]: [...prev[capturedMode], reply],
+        }));
       }
       return;
     }
@@ -270,8 +335,9 @@ export function AgentsPage() {
     streamTimeoutRef.current = setTimeout(() => {
       const modeData = AGENT_MODES.find((m) => m.id === capturedMode)!;
       const fullText =
-        modeData.responses[Math.floor(Math.random() * modeData.responses.length)] ??
-        modeData.responses[0];
+        modeData.responses[
+          Math.floor(Math.random() * modeData.responses.length)
+        ] ?? modeData.responses[0];
       setIsTyping(false);
       let charIdx = 0;
       setStreamingContent('');
@@ -293,11 +359,24 @@ export function AgentsPage() {
         }
       }, 18);
     }, 600);
-  }, [chatInput, activeMode, isTyping, streamingContent, agentSessionIds, startSession, sendMessage, i18n.language]);
+  }, [
+    chatInput,
+    activeMode,
+    isTyping,
+    streamingContent,
+    agentSessionIds,
+    startSession,
+    sendMessage,
+    i18n.language,
+  ]);
 
   const handleReset = () => {
     setSessions((prev) => ({ ...prev, [activeMode]: [prev[activeMode][0]!] }));
-    setAgentSessionIds((prev) => { const next = { ...prev }; delete next[activeMode]; return next; });
+    setAgentSessionIds((prev) => {
+      const next = { ...prev };
+      delete next[activeMode];
+      return next;
+    });
   };
 
   const mode = AGENT_MODES.find((m) => m.id === activeMode)!;
@@ -347,25 +426,44 @@ export function AgentsPage() {
         </div>
 
         {/* Active agent chat */}
-        <Card className="flex flex-col" style={{ height: 'calc(100vh - 22rem)' }}>
-          <div className={`flex items-center gap-3 px-4 py-3 border-b rounded-t-lg ${mode.bg}`}>
+        <Card
+          className="flex flex-col"
+          style={{ height: 'calc(100vh - 22rem)' }}
+        >
+          <div
+            className={`flex items-center gap-3 px-4 py-3 border-b rounded-t-lg ${mode.bg}`}
+          >
             <div className={mode.color}>{mode.icon}</div>
             <div className="flex-1">
               <p className="font-semibold text-sm">{translatedMode.label}</p>
-              <p className="text-xs text-muted-foreground">{translatedMode.description}</p>
+              <p className="text-xs text-muted-foreground">
+                {translatedMode.description}
+              </p>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={handleReset}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={handleReset}
+            >
               <RotateCcw className="h-3 w-3 mr-1" /> {t('reset')}
             </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-3 py-2 rounded-lg text-sm leading-relaxed whitespace-pre-wrap
-                  ${msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-none'
-                    : 'bg-muted rounded-bl-none'}`}>
+              <div
+                key={msg.id}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] px-3 py-2 rounded-lg text-sm leading-relaxed whitespace-pre-wrap
+                  ${
+                    msg.role === 'user'
+                      ? 'bg-primary text-primary-foreground rounded-br-none'
+                      : 'bg-muted rounded-bl-none'
+                  }`}
+                >
                   {msg.content}
                 </div>
               </div>
@@ -374,8 +472,11 @@ export function AgentsPage() {
               <div className="flex justify-start">
                 <div className="bg-muted rounded-lg rounded-bl-none px-4 py-3 flex gap-1 items-center">
                   {[0, 1, 2].map((i) => (
-                    <span key={i} className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce"
-                      style={{ animationDelay: `${i * 120}ms` }} />
+                    <span
+                      key={i}
+                      className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce"
+                      style={{ animationDelay: `${i * 120}ms` }}
+                    />
                   ))}
                 </div>
               </div>
@@ -393,8 +494,11 @@ export function AgentsPage() {
 
           <div className="px-4 py-2 border-t border-b flex gap-2 overflow-x-auto">
             {mode.prompts.map((p) => (
-              <button key={p} onClick={() => setChatInput(p)}
-                className="text-xs px-2.5 py-1.5 rounded-full border bg-muted/40 hover:bg-primary/10 hover:border-primary/30 whitespace-nowrap transition-colors">
+              <button
+                key={p}
+                onClick={() => setChatInput(p)}
+                className="text-xs px-2.5 py-1.5 rounded-full border bg-muted/40 hover:bg-primary/10 hover:border-primary/30 whitespace-nowrap transition-colors"
+              >
                 {p}
               </button>
             ))}
@@ -404,13 +508,23 @@ export function AgentsPage() {
             <input
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-              placeholder={isTyping || streamingContent ? t('responding') : t('askAgent', { agentLabel: translatedMode.label })}
+              onKeyDown={(e) =>
+                e.key === 'Enter' && !e.shiftKey && handleSend()
+              }
+              placeholder={
+                isTyping || streamingContent
+                  ? t('responding')
+                  : t('askAgent', { agentLabel: translatedMode.label })
+              }
               disabled={isTyping || !!streamingContent}
               className="flex-1 text-sm px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60 disabled:cursor-not-allowed"
             />
-            <Button size="sm" className="h-9 w-9 p-0" onClick={handleSend}
-              disabled={isTyping || !!streamingContent}>
+            <Button
+              size="sm"
+              className="h-9 w-9 p-0"
+              onClick={handleSend}
+              disabled={isTyping || !!streamingContent}
+            >
               <Send className="h-4 w-4" />
             </Button>
           </div>

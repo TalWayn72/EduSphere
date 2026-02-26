@@ -1,5 +1,10 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import type { AgentSessionPayload } from '@edusphere/nats-client';
 import {
   validateAgentSessionEvent,
@@ -47,7 +52,7 @@ export class NatsService implements OnModuleDestroy {
       const subject = `agent.session.${tenantSegment}`;
       nc.publish(subject, this.sc.encode(JSON.stringify(event)));
       this.logger.debug(
-        `Published ${event.type} for session ${event.sessionId} on ${subject}`,
+        `Published ${event.type} for session ${event.sessionId} on ${subject}`
       );
     } catch (err) {
       this.logger.error('Failed to publish agent event', err);
@@ -66,7 +71,7 @@ export class NatsService implements OnModuleDestroy {
    */
   async subscribe(
     subject: string,
-    handler: (event: AgentSessionPayload) => Promise<void>,
+    handler: (event: AgentSessionPayload) => Promise<void>
   ): Promise<() => void> {
     const nc = await this.getConnection();
     const sub: Subscription = nc.subscribe(subject);
@@ -80,7 +85,7 @@ export class NatsService implements OnModuleDestroy {
         } catch (err) {
           if (err instanceof EventValidationError) {
             this.logger.warn(
-              `Invalid NATS event on ${subject}: ${err.violations.join(', ')}`,
+              `Invalid NATS event on ${subject}: ${err.violations.join(', ')}`
             );
           } else {
             this.logger.error('Error processing NATS message', err);

@@ -52,10 +52,15 @@ describe('NatsConsumer memory safety', () => {
 
   it('ensureStream creates stream with max_age and max_bytes when stream does not exist', async () => {
     mockJsmStreamsInfo.mockRejectedValueOnce(new Error('stream not found'));
-    mockSubscribe.mockReturnValue({ [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }) });
+    mockSubscribe.mockReturnValue({
+      [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+    });
     await consumer.onModuleInit();
     expect(mockJsmStreamsAdd).toHaveBeenCalledOnce();
-    const callArgs = mockJsmStreamsAdd.mock.calls[0][0] as Record<string, unknown>;
+    const callArgs = mockJsmStreamsAdd.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(callArgs.name).toBe('KNOWLEDGE');
     expect((callArgs.subjects as string[]).includes('knowledge.*')).toBe(true);
     expect(typeof callArgs.max_age).toBe('number');
@@ -66,14 +71,18 @@ describe('NatsConsumer memory safety', () => {
 
   it('ensureStream skips stream creation when stream already exists', async () => {
     mockJsmStreamsInfo.mockResolvedValueOnce({ config: { name: 'KNOWLEDGE' } });
-    mockSubscribe.mockReturnValue({ [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }) });
+    mockSubscribe.mockReturnValue({
+      [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+    });
     await consumer.onModuleInit();
     expect(mockJsmStreamsAdd).not.toHaveBeenCalled();
   });
 
   it('onModuleDestroy calls connection.drain() to prevent dangling NATS connections', async () => {
     mockJsmStreamsInfo.mockResolvedValueOnce({ config: {} });
-    mockSubscribe.mockReturnValue({ [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }) });
+    mockSubscribe.mockReturnValue({
+      [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+    });
     await consumer.onModuleInit();
     await consumer.onModuleDestroy();
     expect(mockDrain).toHaveBeenCalledOnce();
@@ -86,38 +95,63 @@ describe('NatsConsumer memory safety', () => {
 
   it('ensureStream sets max_age to 24 hours in nanoseconds', async () => {
     mockJsmStreamsInfo.mockRejectedValueOnce(new Error('not found'));
-    mockSubscribe.mockReturnValue({ [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }) });
+    mockSubscribe.mockReturnValue({
+      [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+    });
     await consumer.onModuleInit();
-    const callArgs = mockJsmStreamsAdd.mock.calls[0][0] as Record<string, unknown>;
+    const callArgs = mockJsmStreamsAdd.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(callArgs.max_age).toBe(24 * 60 * 60 * 1_000_000_000);
   });
 
   it('ensureStream sets max_bytes to 100 MB', async () => {
     mockJsmStreamsInfo.mockRejectedValueOnce(new Error('not found'));
-    mockSubscribe.mockReturnValue({ [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }) });
+    mockSubscribe.mockReturnValue({
+      [Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+    });
     await consumer.onModuleInit();
-    const callArgs = mockJsmStreamsAdd.mock.calls[0][0] as Record<string, unknown>;
+    const callArgs = mockJsmStreamsAdd.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(callArgs.max_bytes).toBe(100 * 1024 * 1024);
   });
 
   it('processes an incoming message via processConcepts when subscribed', async () => {
     mockJsmStreamsInfo.mockResolvedValueOnce({ config: {} });
     const payload = JSON.stringify({
-      concepts: [{ name: 'Epistemology', definition: 'Study of knowledge', relatedTerms: [] }],
-      courseId: 'course-mem-1', tenantId: 'tenant-mem-1'
+      concepts: [
+        {
+          name: 'Epistemology',
+          definition: 'Study of knowledge',
+          relatedTerms: [],
+        },
+      ],
+      courseId: 'course-mem-1',
+      tenantId: 'tenant-mem-1',
     });
     const fakeMsg = { data: Buffer.from(payload) };
     mockSubscribe.mockReturnValue({
       [Symbol.asyncIterator]: () => {
         let done = false;
-        return { next: async () => { if (!done) { done = true; return { value: fakeMsg, done: false }; } return { value: undefined, done: true }; } };
+        return {
+          next: async () => {
+            if (!done) {
+              done = true;
+              return { value: fakeMsg, done: false };
+            }
+            return { value: undefined, done: true };
+          },
+        };
       },
     });
     await consumer.onModuleInit();
     await new Promise<void>((r) => setTimeout(r, 20));
-    expect(mockCypherService.findConceptByNameCaseInsensitive).toHaveBeenCalledWith(
-      'Epistemology', 'tenant-mem-1'
-    );
+    expect(
+      mockCypherService.findConceptByNameCaseInsensitive
+    ).toHaveBeenCalledWith('Epistemology', 'tenant-mem-1');
   });
 
   it('onModuleInit swallows NATS connection errors and leaves consumer inactive', async () => {

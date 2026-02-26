@@ -2,17 +2,20 @@ import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from './schema';
 import { initializeGraphOntology } from './graph';
+import { seedNaharShalomCourse } from './seed/nahar-shalom-course.js';
+import { seedNaharShalomSource } from './seed/nahar-shalom-source.js';
 
 const { tenants, users, courses, modules, media_assets } = schema;
 
 async function seed() {
   console.log('🌱 Seeding database...');
 
-  const pool = new Pool({
-    connectionString:
-      process.env.DATABASE_URL ||
-      'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere',
-  });
+  // Ensure DATABASE_URL is set so helper modules (createDatabaseConnection) pick it up
+  process.env.DATABASE_URL =
+    process.env.DATABASE_URL ||
+    'postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere';
+
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   const db = drizzle(pool, { schema });
 
@@ -134,6 +137,14 @@ async function seed() {
     console.log('🔄 Initializing Apache AGE graph ontology...');
     await initializeGraphOntology(db);
 
+    // Seed example course: נהר שלום — הרש"ש
+    console.log('📚 Seeding example Kabbalah course: נהר שלום...');
+    await seedNaharShalomCourse();
+
+    // Attach the DOCX as a KnowledgeSource
+    console.log('📎 Attaching nahar-shalom.docx as KnowledgeSource...');
+    await seedNaharShalomSource();
+
     console.log('✅ Seed completed successfully!');
     console.log('');
     console.log('📊 Summary:');
@@ -141,8 +152,14 @@ async function seed() {
     console.log(
       '   - 5 users (1 super admin, 1 org admin, 1 instructor, 2 students)'
     );
-    console.log('   - 1 course with 2 modules');
-    console.log('   - Apache AGE graph initialized');
+    console.log('   - 1 course with 2 modules (Jewish Philosophy)');
+    console.log(
+      '   - 1 example course: נהר שלום (8 modules, 27 content items)'
+    );
+    console.log('   - 1 KnowledgeSource: נהר שלום DOCX (full text + chunks)');
+    console.log(
+      '   - Apache AGE graph initialized + 15 Kabbalistic concept nodes'
+    );
   } catch (error) {
     console.error('❌ Seed failed:', error);
     process.exit(1);

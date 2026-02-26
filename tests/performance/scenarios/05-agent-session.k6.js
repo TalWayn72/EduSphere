@@ -42,14 +42,17 @@ export default function () {
     return;
   }
 
-  const templateId = TEMPLATE_IDS[Math.floor(Math.random() * TEMPLATE_IDS.length)];
+  const templateId =
+    TEMPLATE_IDS[Math.floor(Math.random() * TEMPLATE_IDS.length)];
 
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${JWT_TOKEN}`,
   };
 
-  const res = http.post(GATEWAY_URL, START_SESSION_MUTATION(templateId), { headers });
+  const res = http.post(GATEWAY_URL, START_SESSION_MUTATION(templateId), {
+    headers,
+  });
 
   check(res, {
     'status is 200': (r) => r.status === 200,
@@ -60,7 +63,7 @@ export default function () {
         return (
           body.data?.startAgentSession !== undefined ||
           body.errors?.some((e) =>
-            ['UNAUTHENTICATED', 'FORBIDDEN'].includes(e.extensions?.code),
+            ['UNAUTHENTICATED', 'FORBIDDEN'].includes(e.extensions?.code)
           )
         );
       } catch {

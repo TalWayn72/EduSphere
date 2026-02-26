@@ -18,7 +18,9 @@ function readFile(relativePath: string): string {
 
 describe('G-08: Audit Log Schema', () => {
   it('auditLog.ts schema file exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/db/src/schema/auditLog.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'packages/db/src/schema/auditLog.ts'))
+    ).toBe(true);
   });
 
   it('audit_log table has tenant_id column', () => {
@@ -61,7 +63,9 @@ describe('G-08: Audit Log Schema', () => {
 
 describe('G-08: Audit Service', () => {
   it('AuditService file exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/audit/src/audit.service.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'packages/audit/src/audit.service.ts'))
+    ).toBe(true);
   });
 
   it('AuditService never throws (fire-and-forget pattern)', () => {
@@ -72,7 +76,9 @@ describe('G-08: Audit Service', () => {
   });
 
   it('AuditInterceptor file exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/audit/src/audit.interceptor.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'packages/audit/src/audit.interceptor.ts'))
+    ).toBe(true);
   });
 
   it('AuditInterceptor logs both success and failure', () => {

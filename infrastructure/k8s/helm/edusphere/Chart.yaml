@@ -3,7 +3,7 @@ name: edusphere
 description: EduSphere - AI Knowledge Graph Educational Platform
 type: application
 version: 1.0.0
-appVersion: "1.0.0"
+appVersion: '1.0.0'
 keywords:
   - edusphere
   - knowledge-graph
@@ -14,10 +14,10 @@ maintainers:
 home: https://github.com/edusphere/edusphere
 dependencies:
   - name: postgresql
-    version: "15.5.x"
+    version: '15.5.x'
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
   - name: redis
-    version: "18.x.x"
+    version: '18.x.x'
     repository: https://charts.bitnami.com/bitnami
     condition: redis.enabled

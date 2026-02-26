@@ -1,6 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { LOCALE_LABELS, SUPPORTED_LOCALES, type SupportedLocale } from '@edusphere/i18n';
+import {
+  LOCALE_LABELS,
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+} from '@edusphere/i18n';
 import {
   Select,
   SelectContent,
@@ -13,10 +17,17 @@ interface LanguageSelectorProps {
   value: SupportedLocale;
   onChange: (locale: SupportedLocale) => void;
   disabled?: boolean;
+  availableLocales?: readonly SupportedLocale[];
 }
 
-export function LanguageSelector({ value, onChange, disabled }: LanguageSelectorProps) {
+export function LanguageSelector({
+  value,
+  onChange,
+  disabled,
+  availableLocales,
+}: LanguageSelectorProps) {
   const { t } = useTranslation('settings');
+  const locales = availableLocales ?? SUPPORTED_LOCALES;
 
   return (
     <div className="space-y-2">
@@ -28,21 +39,22 @@ export function LanguageSelector({ value, onChange, disabled }: LanguageSelector
         onValueChange={(v) => onChange(v as SupportedLocale)}
         disabled={disabled}
       >
-        <SelectTrigger
-          className="w-[300px]"
-          aria-label={t('language.title')}
-        >
+        <SelectTrigger className="w-[300px]" aria-label={t('language.title')}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {SUPPORTED_LOCALES.map((locale) => {
+          {locales.map((locale) => {
             const info = LOCALE_LABELS[locale];
             return (
               <SelectItem key={locale} value={locale}>
                 <span className="flex items-center gap-2">
-                  <span role="img" aria-label={info.english}>{info.flag}</span>
+                  <span role="img" aria-label={info.english}>
+                    {info.flag}
+                  </span>
                   <span className="font-medium">{info.native}</span>
-                  <span className="text-muted-foreground text-xs">({info.english})</span>
+                  <span className="text-muted-foreground text-xs">
+                    ({info.english})
+                  </span>
                 </span>
               </SelectItem>
             );

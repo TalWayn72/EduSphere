@@ -8,11 +8,16 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const ROOT = resolve(__dirname, '../..');
-const read = (p: string) => existsSync(resolve(ROOT, p)) ? readFileSync(resolve(ROOT, p), 'utf-8') : '';
+const read = (p: string) =>
+  existsSync(resolve(ROOT, p)) ? readFileSync(resolve(ROOT, p), 'utf-8') : '';
 
 describe('SI-10: LLM Consent Gate', () => {
   it('llm-consent.guard.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/subgraph-agent/src/ai/llm-consent.guard.ts'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-agent/src/ai/llm-consent.guard.ts')
+      )
+    ).toBe(true);
   });
 
   it('consent guard checks THIRD_PARTY_LLM consent type', () => {
@@ -36,13 +41,19 @@ describe('SI-10: LLM Consent Gate', () => {
   });
 
   it('consent guard has unit tests', () => {
-    expect(existsSync(resolve(ROOT, 'apps/subgraph-agent/src/ai/llm-consent.guard.spec.ts'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-agent/src/ai/llm-consent.guard.spec.ts')
+      )
+    ).toBe(true);
   });
 });
 
 describe('EU AI Act: PII Scrubbing', () => {
   it('pii-scrubber.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/subgraph-agent/src/ai/pii-scrubber.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/subgraph-agent/src/ai/pii-scrubber.ts'))
+    ).toBe(true);
   });
 
   it('PII scrubber detects email addresses', () => {
@@ -67,6 +78,10 @@ describe('EU AI Act: PII Scrubbing', () => {
   });
 
   it('PII scrubber has unit tests', () => {
-    expect(existsSync(resolve(ROOT, 'apps/subgraph-agent/src/ai/pii-scrubber.spec.ts'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-agent/src/ai/pii-scrubber.spec.ts')
+      )
+    ).toBe(true);
   });
 });

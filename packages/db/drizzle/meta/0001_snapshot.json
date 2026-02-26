@@ -54,12 +54,8 @@
           "name": "agent_messages_session_id_agent_sessions_id_fk",
           "tableFrom": "agent_messages",
           "tableTo": "agent_sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -127,12 +123,8 @@
           "name": "agent_sessions_user_id_users_id_fk",
           "tableFrom": "agent_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -224,12 +216,8 @@
           "name": "annotations_content_item_id_content_items_id_fk",
           "tableFrom": "annotations",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -237,12 +225,8 @@
           "name": "annotations_user_id_users_id_fk",
           "tableFrom": "annotations",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -329,12 +313,8 @@
           "name": "content_items_module_id_modules_id_fk",
           "tableFrom": "content_items",
           "tableTo": "modules",
-          "columnsFrom": [
-            "module_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["module_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -426,12 +406,8 @@
           "name": "courses_tenant_id_organizations_id_fk",
           "tableFrom": "courses",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -439,12 +415,8 @@
           "name": "courses_instructor_id_users_id_fk",
           "tableFrom": "courses",
           "tableTo": "users",
-          "columnsFrom": [
-            "instructor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["instructor_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -524,12 +496,8 @@
           "name": "discussions_content_item_id_content_items_id_fk",
           "tableFrom": "discussions",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -537,12 +505,8 @@
           "name": "discussions_author_id_users_id_fk",
           "tableFrom": "discussions",
           "tableTo": "users",
-          "columnsFrom": [
-            "author_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["author_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -602,12 +566,8 @@
           "name": "embeddings_content_item_id_content_items_id_fk",
           "tableFrom": "embeddings",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -691,12 +651,8 @@
           "name": "files_uploaded_by_users_id_fk",
           "tableFrom": "files",
           "tableTo": "users",
-          "columnsFrom": [
-            "uploaded_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -772,9 +728,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -851,9 +805,7 @@
         "organizations_slug_unique": {
           "name": "organizations_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -917,12 +869,8 @@
           "name": "modules_course_id_courses_id_fk",
           "tableFrom": "modules",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -984,12 +932,8 @@
           "name": "user_courses_user_id_users_id_fk",
           "tableFrom": "user_courses",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -997,12 +941,8 @@
           "name": "user_courses_course_id_courses_id_fk",
           "tableFrom": "user_courses",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1077,12 +1017,8 @@
           "name": "user_progress_user_id_users_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1090,12 +1026,8 @@
           "name": "user_progress_content_item_id_content_items_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "content_items",
-          "columnsFrom": [
-            "content_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["content_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1162,32 +1094,17 @@
     "public.message_role": {
       "name": "message_role",
       "schema": "public",
-      "values": [
-        "USER",
-        "ASSISTANT",
-        "SYSTEM",
-        "TOOL"
-      ]
+      "values": ["USER", "ASSISTANT", "SYSTEM", "TOOL"]
     },
     "public.session_status": {
       "name": "session_status",
       "schema": "public",
-      "values": [
-        "ACTIVE",
-        "COMPLETED",
-        "FAILED",
-        "CANCELLED"
-      ]
+      "values": ["ACTIVE", "COMPLETED", "FAILED", "CANCELLED"]
     },
     "public.annotation_type": {
       "name": "annotation_type",
       "schema": "public",
-      "values": [
-        "HIGHLIGHT",
-        "NOTE",
-        "QUESTION",
-        "BOOKMARK"
-      ]
+      "values": ["HIGHLIGHT", "NOTE", "QUESTION", "BOOKMARK"]
     },
     "public.content_type": {
       "name": "content_type",
@@ -1216,12 +1133,7 @@
     "public.enrollment_status": {
       "name": "enrollment_status",
       "schema": "public",
-      "values": [
-        "ACTIVE",
-        "COMPLETED",
-        "DROPPED",
-        "SUSPENDED"
-      ]
+      "values": ["ACTIVE", "COMPLETED", "DROPPED", "SUSPENDED"]
     }
   },
   "schemas": {},

@@ -26,7 +26,9 @@ vi.mock('fs/promises', () => ({
 import { TranscriptionService } from './transcription.service';
 import type { MediaUploadedEvent } from './transcription.types';
 
-const makeEvent = (overrides: Partial<MediaUploadedEvent> = {}): MediaUploadedEvent => ({
+const makeEvent = (
+  overrides: Partial<MediaUploadedEvent> = {}
+): MediaUploadedEvent => ({
   fileKey: 'media/test.mp3',
   assetId: 'asset-uuid',
   courseId: 'course-uuid',
@@ -65,7 +67,9 @@ describe('TranscriptionService', () => {
 
   const mockHls = {
     transcodeToHls: vi.fn().mockResolvedValue(null),
-    getManifestPresignedUrl: vi.fn().mockResolvedValue('https://minio/hls/master.m3u8'),
+    getManifestPresignedUrl: vi
+      .fn()
+      .mockResolvedValue('https://minio/hls/master.m3u8'),
   };
 
   beforeEach(() => {
@@ -76,7 +80,7 @@ describe('TranscriptionService', () => {
       mockNats as any,
       mockConceptExtractor as any,
       mockGraphBuilder as any,
-      mockHls as any,
+      mockHls as any
     );
   });
 
@@ -97,9 +101,13 @@ describe('TranscriptionService', () => {
     });
 
     it('publishes transcription.failed and does not throw when Whisper errors', async () => {
-      mockWhisper.transcribe.mockRejectedValueOnce(new Error('Whisper timeout'));
+      mockWhisper.transcribe.mockRejectedValueOnce(
+        new Error('Whisper timeout')
+      );
 
-      await expect(service.transcribeFile(makeEvent())).resolves.toBeUndefined();
+      await expect(
+        service.transcribeFile(makeEvent())
+      ).resolves.toBeUndefined();
       expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.failed',
         expect.objectContaining({
@@ -110,7 +118,9 @@ describe('TranscriptionService', () => {
     });
 
     it('publishes transcription.failed when MinIO download fails', async () => {
-      mockMinio.downloadToTemp.mockRejectedValueOnce(new Error('MinIO unreachable'));
+      mockMinio.downloadToTemp.mockRejectedValueOnce(
+        new Error('MinIO unreachable')
+      );
 
       await service.transcribeFile(makeEvent());
       expect(mockNats.publish).toHaveBeenCalledWith(
@@ -152,19 +162,21 @@ describe('TranscriptionService', () => {
 
       expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.completed',
-        expect.objectContaining({ assetId: 'asset-uuid' }),
+        expect.objectContaining({ assetId: 'asset-uuid' })
       );
 
       await new Promise((r) => setTimeout(r, 20));
 
       expect(mockHls.transcodeToHls).toHaveBeenCalledWith(
         'tenant/course/id/lecture.mp4',
-        'tenant-uuid/course-uuid/asset-uuid/hls',
+        'tenant-uuid/course-uuid/asset-uuid/hls'
       );
     });
 
     it('does not fail transcription when HLS transcode rejects', async () => {
-      mockHls.transcodeToHls.mockRejectedValueOnce(new Error('FFmpeg unavailable'));
+      mockHls.transcodeToHls.mockRejectedValueOnce(
+        new Error('FFmpeg unavailable')
+      );
 
       const videoEvent = makeEvent({
         fileKey: 'tenant/course/id/lecture.mp4',
@@ -175,7 +187,7 @@ describe('TranscriptionService', () => {
 
       expect(mockNats.publish).toHaveBeenCalledWith(
         'transcription.completed',
-        expect.objectContaining({ assetId: 'asset-uuid' }),
+        expect.objectContaining({ assetId: 'asset-uuid' })
       );
 
       await new Promise((r) => setTimeout(r, 20));

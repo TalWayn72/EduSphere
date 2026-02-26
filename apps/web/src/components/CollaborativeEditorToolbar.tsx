@@ -1,10 +1,22 @@
 import React from 'react';
 import type { Editor } from '@tiptap/react';
 import {
-  Bold, Italic, Heading1, Heading2,
-  List, ListOrdered, Quote, Code, Code2,
-  CheckSquare, Table, Sigma, Undo2, Redo2,
-  Wifi, WifiOff,
+  Bold,
+  Italic,
+  Heading1,
+  Heading2,
+  List,
+  ListOrdered,
+  Quote,
+  Code,
+  Code2,
+  CheckSquare,
+  Table,
+  Sigma,
+  Undo2,
+  Redo2,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -68,10 +80,13 @@ export function CollaborativeEditorToolbar({
   canRedo,
 }: CollaborativeEditorToolbarProps) {
   const insertTable = () =>
-    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    editor
+      .chain()
+      .focus()
+      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+      .run();
 
-  const toggleMath = () =>
-    editor.chain().focus().insertContent('$...$').run();
+  const toggleMath = () => editor.chain().focus().insertContent('$...$').run();
 
   return (
     <div className="flex items-center gap-0.5 px-2 py-1.5 border-b bg-muted/40 flex-wrap">

@@ -22,14 +22,8 @@ export function ContentViewerBreadcrumb({ contentId, contentTitle }: Props) {
   const [searchParams] = useSearchParams();
   const courseIdParam = searchParams.get('courseId');
 
-  const {
-    courseId,
-    courseTitle,
-    moduleName,
-    prevItemId,
-    nextItemId,
-    ready,
-  } = useCourseNavigation(contentId);
+  const { courseId, courseTitle, moduleName, prevItemId, nextItemId, ready } =
+    useCourseNavigation(contentId);
 
   // Only render when we have course context from the URL param
   if (!ready || !courseIdParam || !courseId) return null;

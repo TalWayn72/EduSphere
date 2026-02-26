@@ -1,0 +1,60 @@
+scalar JSON
+
+"""
+Structured content for a MICROLESSON content item.
+Enforced max duration: 420 seconds (7 minutes).
+"""
+type MicrolessonContent {
+  objective: String!
+  conceptName: String!
+  body: String!
+  durationSeconds: Int!
+  quizQuestion: MicrolessonQuizQuestion
+}
+
+type MicrolessonQuizQuestion {
+  question: String!
+  options: [MicrolessonQuizOption!]!
+  explanation: String
+}
+
+type MicrolessonQuizOption {
+  text: String!
+  isCorrect: Boolean!
+}
+
+"""
+An ordered collection of MICROLESSON content items forming a learning path.
+"""
+type MicrolearningPath {
+  id: ID!
+  title: String!
+  topicClusterId: ID
+  contentItemIds: [ID!]!
+  itemCount: Int!
+  createdAt: String!
+}
+
+extend type Query {
+  """
+  Returns the next unviewed MICROLESSON for the authenticated user today.
+  Returns null when no lessons are available.
+  """
+  dailyMicrolesson: ContentItem @authenticated
+
+  """
+  Lists all microlearning paths for the authenticated user's tenant.
+  """
+  microlearningPaths: [MicrolearningPath!]! @authenticated
+}
+
+extend type Mutation {
+  """
+  Creates a new ordered microlearning path from existing MICROLESSON content items.
+  """
+  createMicrolearningPath(
+    title: String!
+    contentItemIds: [ID!]!
+    topicClusterId: ID
+  ): MicrolearningPath! @authenticated
+}

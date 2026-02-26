@@ -67,7 +67,11 @@ describe('TemplateService', () => {
 
     // Default chain for insert/update
     mockReturning.mockResolvedValue([MOCK_TEMPLATE]);
-    mockWhere.mockReturnValue({ limit: mockLimit, orderBy: mockOrderBy, returning: mockReturning });
+    mockWhere.mockReturnValue({
+      limit: mockLimit,
+      orderBy: mockOrderBy,
+      returning: mockReturning,
+    });
     mockSet.mockReturnValue({ where: mockWhere });
     mockUpdate.mockReturnValue({ set: mockSet });
     mockValues.mockReturnValue({ returning: mockReturning });
@@ -104,7 +108,9 @@ describe('TemplateService', () => {
   describe('findAll()', () => {
     it('returns array of templates with limit and offset', async () => {
       mockOffset.mockResolvedValue([MOCK_TEMPLATE]);
-      mockOrderBy.mockReturnValue({ limit: vi.fn().mockReturnValue({ offset: mockOffset }) });
+      mockOrderBy.mockReturnValue({
+        limit: vi.fn().mockReturnValue({ offset: mockOffset }),
+      });
       const result = await service.findAll(10, 0);
       expect(Array.isArray(result)).toBe(true);
     });
@@ -182,7 +188,12 @@ describe('TemplateService', () => {
       });
       mockReturning.mockResolvedValue([MOCK_TEMPLATE]);
 
-      await service.create({ tenantId: 'tenant-99', creatorId: 'u', name: 'T', template: 'TUTOR' });
+      await service.create({
+        tenantId: 'tenant-99',
+        creatorId: 'u',
+        name: 'T',
+        template: 'TUTOR',
+      });
       expect(capturedValues.tenant_id).toBe('tenant-99');
     });
 
@@ -194,7 +205,12 @@ describe('TemplateService', () => {
       });
       mockReturning.mockResolvedValue([MOCK_TEMPLATE]);
 
-      await service.create({ tenantId: 't', creatorId: 'u', name: 'T', template: 'TUTOR' });
+      await service.create({
+        tenantId: 't',
+        creatorId: 'u',
+        name: 'T',
+        template: 'TUTOR',
+      });
       expect(capturedValues.is_active).toBe(true);
     });
 
@@ -206,7 +222,12 @@ describe('TemplateService', () => {
       });
       mockReturning.mockResolvedValue([MOCK_TEMPLATE]);
 
-      await service.create({ tenantId: 't', creatorId: 'u', name: 'T', template: 'TUTOR' });
+      await service.create({
+        tenantId: 't',
+        creatorId: 'u',
+        name: 'T',
+        template: 'TUTOR',
+      });
       expect(capturedValues.config).toEqual({});
     });
 
@@ -219,7 +240,13 @@ describe('TemplateService', () => {
       mockReturning.mockResolvedValue([MOCK_TEMPLATE]);
 
       const config = { temperature: 0.9, maxTokens: 500 };
-      await service.create({ tenantId: 't', creatorId: 'u', name: 'T', template: 'TUTOR', config });
+      await service.create({
+        tenantId: 't',
+        creatorId: 'u',
+        name: 'T',
+        template: 'TUTOR',
+        config,
+      });
       expect(capturedValues.config).toEqual(config);
     });
   });

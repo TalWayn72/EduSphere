@@ -27,6 +27,7 @@ import { Button } from '@edusphere/ui';
 ```
 
 **Props:**
+
 - `title` (string, required): Button text
 - `onPress` (function, required): Click handler
 - `variant` (string): Visual style
@@ -50,6 +51,7 @@ import { Card } from '@edusphere/ui';
 ```
 
 **Props:**
+
 - `children` (ReactNode, required): Card content
 - `variant` (string): elevated | outlined | filled
 - `padding` (number): Internal padding (default: 16)
@@ -75,6 +77,7 @@ import { Input } from '@edusphere/ui';
 ```
 
 **Props:**
+
 - All standard TextInput props
 - `label` (string): Field label
 - `error` (string): Error message
@@ -95,6 +98,7 @@ import { Text } from '@edusphere/ui';
 ```
 
 **Props:**
+
 - `children` (ReactNode, required): Text content
 - `variant` (string): h1 | h2 | h3 | body | caption | label
 - `color` (string): Text color
@@ -103,6 +107,7 @@ import { Text } from '@edusphere/ui';
 - `style` (TextStyle): Custom styles
 
 **Variants:**
+
 - `h1`: 32px, bold, for main headings
 - `h2`: 24px, bold, for section headings
 - `h3`: 20px, semibold, for subsection headings
@@ -128,6 +133,7 @@ import { Avatar } from '@edusphere/ui';
 ```
 
 **Props:**
+
 - `name` (string): User name for initials
 - `uri` (string): Image URL
 - `size` (number): Avatar diameter (default: 40)
@@ -148,6 +154,7 @@ import { Badge } from '@edusphere/ui';
 ```
 
 **Props:**
+
 - `label` (string, required): Badge text
 - `variant` (string): primary | success | warning | error | info
 - `size` (string): sm | md
@@ -155,6 +162,7 @@ import { Badge } from '@edusphere/ui';
 - `textStyle` (TextStyle): Custom text styles
 
 **Variant Colors:**
+
 - `primary`: #007AFF (iOS blue)
 - `success`: #34C759 (green)
 - `warning`: #FF9500 (orange)
@@ -205,12 +213,12 @@ Components use a consistent color scheme:
 
 ```typescript
 const colors = {
-  primary: '#007AFF',      // iOS Blue
-  secondary: '#5856D6',    // Purple
-  success: '#34C759',      // Green
-  warning: '#FF9500',      // Orange
-  error: '#FF3B30',        // Red
-  info: '#5856D6',         // Purple
+  primary: '#007AFF', // iOS Blue
+  secondary: '#5856D6', // Purple
+  success: '#34C759', // Green
+  warning: '#FF9500', // Orange
+  error: '#FF3B30', // Red
+  info: '#5856D6', // Purple
 
   // Grays
   gray50: '#f5f5f5',
@@ -287,15 +295,18 @@ Components follow accessibility best practices:
 Most components work identically across platforms, but some have minor differences:
 
 ### Shadows
+
 - **iOS/Android**: Uses shadowColor, shadowOffset, elevation
 - **Web**: Automatically converted to CSS box-shadow
 
 ### Fonts
+
 - **iOS**: San Francisco
 - **Android**: Roboto
 - **Web**: System font stack
 
 ### Touch Feedback
+
 - **iOS**: Opacity animation
 - **Android**: Ripple effect
 - **Web**: Hover states

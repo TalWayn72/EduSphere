@@ -66,7 +66,8 @@ describe('injectLocale()', () => {
   });
 
   it('preserves original prompt content', () => {
-    const longPrompt = 'You are an expert AI tutor.\n\nFocus on Socratic questioning.';
+    const longPrompt =
+      'You are an expert AI tutor.\n\nFocus on Socratic questioning.';
     const result = injectLocale(longPrompt, 'es');
     expect(result).toContain(longPrompt);
   });

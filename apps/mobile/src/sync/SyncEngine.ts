@@ -5,7 +5,15 @@
  * Max 3 retries per mutation; permanently failed items are dequeued with error log.
  */
 import * as Network from 'expo-network';
-import { enqueue, dequeue, peek, incrementRetry, queueSize, QueuedMutation } from './OfflineQueue';
+import {
+  enqueue,
+  dequeue,
+  peek,
+  incrementRetry,
+  queueSize,
+  addConflict,
+  QueuedMutation,
+} from './OfflineQueue';
 
 export type SyncStatus = 'idle' | 'syncing' | 'error';
 type StatusListener = (status: SyncStatus, pending: number) => void;
@@ -21,7 +29,10 @@ export class SyncEngine {
   private _graphqlEndpoint: string;
   private _getAuthToken: () => Promise<string | null>;
 
-  constructor(graphqlEndpoint: string, getAuthToken: () => Promise<string | null>) {
+  constructor(
+    graphqlEndpoint: string,
+    getAuthToken: () => Promise<string | null>
+  ) {
     this._graphqlEndpoint = graphqlEndpoint;
     this._getAuthToken = getAuthToken;
   }
@@ -80,9 +91,10 @@ export class SyncEngine {
       } else {
         incrementRetry(mutation.id);
         if (mutation.retryCount + 1 >= MAX_RETRIES) {
-          // Give up — remove from queue to prevent permanent blockage
+          // Give up — remove from queue, persist to conflicts table for user review
           dequeue(mutation.id);
-          console.warn('[SyncEngine] Permanently failed mutation dropped', mutation.operationName);
+          addConflict(mutation, 'max_retries_exceeded');
+          this._emit('error', queueSize());
         }
         hadError = true;
       }
@@ -101,7 +113,10 @@ export class SyncEngine {
           'x-tenant-id': mutation.tenantId,
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ query: mutation.query, variables: mutation.variables }),
+        body: JSON.stringify({
+          query: mutation.query,
+          variables: mutation.variables,
+        }),
       });
       if (!response.ok) return false;
       const json = (await response.json()) as { errors?: unknown[] };

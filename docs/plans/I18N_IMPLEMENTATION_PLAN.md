@@ -1,4 +1,5 @@
 # EduSphere — Complete i18n Implementation Plan
+
 ### Full Internationalization: UI + Content + LLM · 9 Languages · Web + Mobile
 
 ---
@@ -14,19 +15,20 @@ This plan delivers a complete i18n overhaul in two sequential phases:
 
 **Target languages (9):**
 
-| Code | Language | Native Script | Flag |
-|------|----------|--------------|------|
-| `en` | English | English | 🇬🇧 |
-| `zh-CN` | Mandarin Chinese | 中文 | 🇨🇳 |
-| `hi` | Hindi | हिन्दी | 🇮🇳 |
-| `es` | Spanish | Español | 🇪🇸 |
-| `fr` | French | Français | 🇫🇷 |
-| `bn` | Bengali | বাংলা | 🇧🇩 |
-| `pt` | Portuguese | Português | 🇧🇷 |
-| `ru` | Russian | Русский | 🇷🇺 |
-| `id` | Indonesian | Bahasa Indonesia | 🇮🇩 |
+| Code    | Language         | Native Script    | Flag |
+| ------- | ---------------- | ---------------- | ---- |
+| `en`    | English          | English          | 🇬🇧   |
+| `zh-CN` | Mandarin Chinese | 中文             | 🇨🇳   |
+| `hi`    | Hindi            | हिन्दी           | 🇮🇳   |
+| `es`    | Spanish          | Español          | 🇪🇸   |
+| `fr`    | French           | Français         | 🇫🇷   |
+| `bn`    | Bengali          | বাংলা            | 🇧🇩   |
+| `pt`    | Portuguese       | Português        | 🇧🇷   |
+| `ru`    | Russian          | Русский          | 🇷🇺   |
+| `id`    | Indonesian       | Bahasa Indonesia | 🇮🇩   |
 
 **Confirmed decisions:**
+
 - Translation generation: on-demand + DB cache (first request triggers LLM, result cached permanently)
 - Platform scope: Web (`apps/web`) + Mobile (`apps/mobile`) implemented simultaneously
 - AI responses: automatically in user's selected language via locale-injected system prompts
@@ -83,20 +85,20 @@ This plan delivers a complete i18n overhaul in two sequential phases:
 
 ### Complete Agent Roster (12 Agents)
 
-| ID | Agent Role | Phase | Wave | Responsibility |
-|----|-----------|-------|------|---------------|
-| **A-1** | i18n Package Architect | A | 1 | Create `packages/i18n` — all 9 locales × 12 namespaces, TypeScript types, dual config |
-| **A-2** | Backend Schema Engineer | A | 2 | `user.graphql` + `user.service.ts` + `user.resolver.ts` + Zod schemas |
-| **A-3** | Web Infrastructure Engineer | A | 2 | `i18n.ts` config, `App.tsx` bootstrap, `queries.ts` mutation, urql client update |
-| **A-4** | Web Pages Engineer α | A | 3 | Dashboard, Login, ProfilePage, AgentsPage — full `useTranslation` migration |
-| **A-5** | Web Pages Engineer β | A | 3 | CourseList, CourseDetailPage, CourseCreatePage + wizard steps |
-| **A-6** | Web Pages Engineer γ | A | 3 | AnnotationsPage, CollaborationPage, CollaborationSessionPage, Search, KnowledgeGraph, ContentViewer |
-| **A-7** | Web Components Engineer | A | 3 | Layout (NAV_ITEMS hook), UserMenu, AIChatPanel, all annotation/dashboard components |
-| **A-8** | Settings & Hook Engineer | A | 3 | SettingsPage, LanguageSelector, useUserPreferences hook, router update |
-| **A-9** | Mobile Engineer | A | 3 | All 7 screens + navigation + SettingsScreen + mobile i18n setup |
-| **B-1** | DB & Content Translation Engineer | B | 4 | content_translations table, Drizzle schema, translation NestJS module in subgraph-content |
-| **B-2** | AI Localization Engineer | B | 4 | locale-prompt.ts, ai.service.ts locale param, all 5 workflow factories, agent-session schema |
-| **T-1** | Test & Visual QA Engineer | A+B | Cross-wave | All test files: unit, integration, component, E2E, visual regression, a11y |
+| ID      | Agent Role                        | Phase | Wave       | Responsibility                                                                                      |
+| ------- | --------------------------------- | ----- | ---------- | --------------------------------------------------------------------------------------------------- |
+| **A-1** | i18n Package Architect            | A     | 1          | Create `packages/i18n` — all 9 locales × 12 namespaces, TypeScript types, dual config               |
+| **A-2** | Backend Schema Engineer           | A     | 2          | `user.graphql` + `user.service.ts` + `user.resolver.ts` + Zod schemas                               |
+| **A-3** | Web Infrastructure Engineer       | A     | 2          | `i18n.ts` config, `App.tsx` bootstrap, `queries.ts` mutation, urql client update                    |
+| **A-4** | Web Pages Engineer α              | A     | 3          | Dashboard, Login, ProfilePage, AgentsPage — full `useTranslation` migration                         |
+| **A-5** | Web Pages Engineer β              | A     | 3          | CourseList, CourseDetailPage, CourseCreatePage + wizard steps                                       |
+| **A-6** | Web Pages Engineer γ              | A     | 3          | AnnotationsPage, CollaborationPage, CollaborationSessionPage, Search, KnowledgeGraph, ContentViewer |
+| **A-7** | Web Components Engineer           | A     | 3          | Layout (NAV_ITEMS hook), UserMenu, AIChatPanel, all annotation/dashboard components                 |
+| **A-8** | Settings & Hook Engineer          | A     | 3          | SettingsPage, LanguageSelector, useUserPreferences hook, router update                              |
+| **A-9** | Mobile Engineer                   | A     | 3          | All 7 screens + navigation + SettingsScreen + mobile i18n setup                                     |
+| **B-1** | DB & Content Translation Engineer | B     | 4          | content_translations table, Drizzle schema, translation NestJS module in subgraph-content           |
+| **B-2** | AI Localization Engineer          | B     | 4          | locale-prompt.ts, ai.service.ts locale param, all 5 workflow factories, agent-session schema        |
+| **T-1** | Test & Visual QA Engineer         | A+B   | Cross-wave | All test files: unit, integration, component, E2E, visual regression, a11y                          |
 
 ### Agent Dependency Graph
 
@@ -156,6 +158,7 @@ Wave 5:   [T-1]                         (Tests run after each wave completes)
 This package is the single source of truth for all translation content. Every other agent depends on its TypeScript exports. It must be completed before Wave 2 begins.
 
 **Directory structure:**
+
 ```
 packages/i18n/
 ├── package.json
@@ -190,6 +193,7 @@ packages/i18n/
 ```
 
 **`package.json`**:
+
 ```json
 {
   "name": "@edusphere/i18n",
@@ -212,65 +216,90 @@ packages/i18n/
 ```
 
 **`src/index.ts`**:
+
 ```typescript
 export const SUPPORTED_LOCALES = [
-  'en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id'
+  'en',
+  'zh-CN',
+  'hi',
+  'es',
+  'fr',
+  'bn',
+  'pt',
+  'ru',
+  'id',
 ] as const;
-export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
+export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: SupportedLocale = 'en';
 
-export const LOCALE_LABELS: Record<SupportedLocale, {
-  native: string; english: string; flag: string;
-}> = {
-  'en':    { native: 'English',          english: 'English',    flag: '🇬🇧' },
-  'zh-CN': { native: '中文',              english: 'Chinese',    flag: '🇨🇳' },
-  'hi':    { native: 'हिन्दी',            english: 'Hindi',      flag: '🇮🇳' },
-  'es':    { native: 'Español',          english: 'Spanish',    flag: '🇪🇸' },
-  'fr':    { native: 'Français',         english: 'French',     flag: '🇫🇷' },
-  'bn':    { native: 'বাংলা',             english: 'Bengali',    flag: '🇧🇩' },
-  'pt':    { native: 'Português',        english: 'Portuguese', flag: '🇧🇷' },
-  'ru':    { native: 'Русский',          english: 'Russian',    flag: '🇷🇺' },
-  'id':    { native: 'Bahasa Indonesia', english: 'Indonesian', flag: '🇮🇩' },
+export const LOCALE_LABELS: Record<
+  SupportedLocale,
+  {
+    native: string;
+    english: string;
+    flag: string;
+  }
+> = {
+  en: { native: 'English', english: 'English', flag: '🇬🇧' },
+  'zh-CN': { native: '中文', english: 'Chinese', flag: '🇨🇳' },
+  hi: { native: 'हिन्दी', english: 'Hindi', flag: '🇮🇳' },
+  es: { native: 'Español', english: 'Spanish', flag: '🇪🇸' },
+  fr: { native: 'Français', english: 'French', flag: '🇫🇷' },
+  bn: { native: 'বাংলা', english: 'Bengali', flag: '🇧🇩' },
+  pt: { native: 'Português', english: 'Portuguese', flag: '🇧🇷' },
+  ru: { native: 'Русский', english: 'Russian', flag: '🇷🇺' },
+  id: { native: 'Bahasa Indonesia', english: 'Indonesian', flag: '🇮🇩' },
 };
 
 export const NAMESPACES = [
-  'common', 'nav', 'auth', 'dashboard', 'courses', 'content',
-  'annotations', 'agents', 'collaboration', 'knowledge', 'settings', 'errors',
+  'common',
+  'nav',
+  'auth',
+  'dashboard',
+  'courses',
+  'content',
+  'annotations',
+  'agents',
+  'collaboration',
+  'knowledge',
+  'settings',
+  'errors',
 ] as const;
-export type I18nNamespace = typeof NAMESPACES[number];
+export type I18nNamespace = (typeof NAMESPACES)[number];
 ```
 
 **`src/types.d.ts`** — TypeScript autocomplete for `t()` key paths:
+
 ```typescript
-import type commonEn      from './locales/en/common.json';
-import type navEn         from './locales/en/nav.json';
-import type authEn        from './locales/en/auth.json';
-import type dashboardEn   from './locales/en/dashboard.json';
-import type coursesEn     from './locales/en/courses.json';
-import type contentEn     from './locales/en/content.json';
+import type commonEn from './locales/en/common.json';
+import type navEn from './locales/en/nav.json';
+import type authEn from './locales/en/auth.json';
+import type dashboardEn from './locales/en/dashboard.json';
+import type coursesEn from './locales/en/courses.json';
+import type contentEn from './locales/en/content.json';
 import type annotationsEn from './locales/en/annotations.json';
-import type agentsEn      from './locales/en/agents.json';
+import type agentsEn from './locales/en/agents.json';
 import type collaborationEn from './locales/en/collaboration.json';
-import type knowledgeEn   from './locales/en/knowledge.json';
-import type settingsEn    from './locales/en/settings.json';
-import type errorsEn      from './locales/en/errors.json';
+import type knowledgeEn from './locales/en/knowledge.json';
+import type settingsEn from './locales/en/settings.json';
+import type errorsEn from './locales/en/errors.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'common';
     resources: {
-      common:        typeof commonEn;
-      nav:           typeof navEn;
-      auth:          typeof authEn;
-      dashboard:     typeof dashboardEn;
-      courses:       typeof coursesEn;
-      content:       typeof contentEn;
-      annotations:   typeof annotationsEn;
-      agents:        typeof agentsEn;
+      common: typeof commonEn;
+      nav: typeof navEn;
+      auth: typeof authEn;
+      dashboard: typeof dashboardEn;
+      courses: typeof coursesEn;
+      content: typeof contentEn;
+      annotations: typeof annotationsEn;
+      agents: typeof agentsEn;
       collaboration: typeof collaborationEn;
-      knowledge:     typeof knowledgeEn;
-      settings:      typeof settingsEn;
-      errors:        typeof errorsEn;
+      knowledge: typeof knowledgeEn;
+      settings: typeof settingsEn;
+      errors: typeof errorsEn;
     };
   }
 }
@@ -279,6 +308,7 @@ declare module 'i18next' {
 **Key namespace content samples** (English source — all 8 other locales are human-quality translations):
 
 `en/common.json`:
+
 ```json
 {
   "loading": "Loading...",
@@ -305,6 +335,7 @@ declare module 'i18next' {
 ```
 
 `en/dashboard.json`:
+
 ```json
 {
   "title": "Dashboard",
@@ -335,6 +366,7 @@ declare module 'i18next' {
 ```
 
 `en/agents.json`:
+
 ```json
 {
   "title": "AI Learning Agents",
@@ -376,6 +408,7 @@ declare module 'i18next' {
 ```
 
 `en/settings.json`:
+
 ```json
 {
   "title": "Settings",
@@ -402,6 +435,7 @@ declare module 'i18next' {
 ```
 
 `en/content.json`:
+
 ```json
 {
   "translating": "Translating content...",
@@ -426,6 +460,7 @@ declare module 'i18next' {
 **Files to modify:**
 
 **`apps/subgraph-core/src/user/user.graphql`** — add `UserPreferences` type, extend `User`, add mutation:
+
 ```graphql
 type UserPreferences {
   locale: String!
@@ -451,6 +486,7 @@ input UpdateUserPreferencesInput {
 **`apps/subgraph-core/src/user/user.service.ts`** — two changes:
 
 1. Extend `mapUser()` to parse the `preferences` JSONB with safe defaults:
+
 ```typescript
 const rawPrefs = (user.preferences as Record<string, unknown>) ?? {};
 preferences: {
@@ -464,6 +500,7 @@ preferences: {
 2. Add `updatePreferences(id, input, authContext)` method: fetch existing JSONB → merge patch (only defined fields) → `withTenantContext()` update → return mapped user.
 
 **`apps/subgraph-core/src/user/user.resolver.ts`** — add:
+
 ```typescript
 @Mutation('updateUserPreferences')
 async updateUserPreferences(
@@ -481,6 +518,7 @@ async updateUserPreferences(
 **Files to create:**
 
 **`apps/subgraph-core/src/user/user.schemas.ts`** — Zod validation (validates locale against SUPPORTED_LOCALES at runtime):
+
 ```typescript
 import { z } from 'zod';
 import { SUPPORTED_LOCALES } from '@edusphere/i18n';
@@ -498,6 +536,7 @@ export const UpdateUserPreferencesSchema = z.object({
 #### Agent A-3: Web i18n Infrastructure
 
 **`apps/web/package.json`** — add:
+
 ```json
 "i18next": "^23.16.0",
 "react-i18next": "^15.0.0",
@@ -520,7 +559,7 @@ const ViteLocaleBackend = {
   async read(
     language: string,
     namespace: string,
-    callback: (err: unknown, data: unknown) => void,
+    callback: (err: unknown, data: unknown) => void
   ): Promise<void> {
     try {
       const data = await import(
@@ -578,13 +617,25 @@ setKeycloakReady(true);
 The existing loading splash ("Initializing authentication...") remains hardcoded English — it is displayed for less than 200ms before i18n loads and is acceptable as a pre-i18n bootstrap message.
 
 **Modify `apps/web/src/lib/queries.ts`** — extend `ME_QUERY` and add mutation:
+
 ```typescript
 export const ME_QUERY = gql`
   query Me {
     me {
-      id email firstName lastName role tenantId
-      preferences { locale theme emailNotifications pushNotifications }
-      createdAt updatedAt
+      id
+      email
+      firstName
+      lastName
+      role
+      tenantId
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -593,7 +644,12 @@ export const UPDATE_USER_PREFERENCES_MUTATION = gql`
   mutation UpdateUserPreferences($input: UpdateUserPreferencesInput!) {
     updateUserPreferences(input: $input) {
       id
-      preferences { locale theme emailNotifications pushNotifications }
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
     }
   }
 `;
@@ -608,27 +664,32 @@ export const UPDATE_USER_PREFERENCES_MUTATION = gql`
 Files to migrate with `useTranslation()`:
 
 **`apps/web/src/pages/Dashboard.tsx`** — `useTranslation(['dashboard', 'common'])`:
+
 - All stat card titles → `t('stats.activeCourses')` etc.
 - Welcome message → `t('welcomeBack', { name: firstName })`
 - Section headings → `t('studyActivity')`, `t('recentActivity')`
 - Button labels → `t('common:create')`, `t('createCourse')`
 
 **`apps/web/src/pages/Login.tsx`** — `useTranslation('auth')`:
+
 - "Welcome to EduSphere" → `t('welcome')`
 - "Knowledge Graph Educational Platform" → `t('subtitle')`
 - "Sign In with Keycloak" → `t('signInWith', { provider: 'Keycloak' })`
 
 **`apps/web/src/pages/ProfilePage.tsx`** — `useTranslation(['common', 'dashboard'])`:
+
 - Section headings, field labels, stat titles
 
 **`apps/web/src/pages/AgentsPage.tsx`** — `useTranslation('agents')`:
+
 - **Critical**: `AGENT_MODES` is a module-level constant with hardcoded English `label` and `description`. It must become a `useAgentModes()` hook:
+
 ```typescript
 function useAgentModes() {
   const { t } = useTranslation('agents');
   return AGENT_MODE_IDS.map((id) => ({
-    ...AGENT_MODE_STATIC[id],        // icon, color, bg, prompts — unchanged
-    label:       t(`modes.${id}.label`),
+    ...AGENT_MODE_STATIC[id], // icon, color, bg, prompts — unchanged
+    label: t(`modes.${id}.label`),
     description: t(`modes.${id}.description`),
   }));
 }
@@ -641,6 +702,7 @@ function useAgentModes() {
 **`apps/web/src/pages/CourseList.tsx`** — `useTranslation('courses')`
 **`apps/web/src/pages/CourseDetailPage.tsx`** — `useTranslation('courses')`
 **`apps/web/src/pages/CourseCreatePage.tsx`** + wizard step files — `useTranslation('courses')`:
+
 - Wizard step titles, field placeholders, validation messages, button labels
 
 ---
@@ -665,22 +727,27 @@ The `NAV_ITEMS` array (currently a module-level constant) must become a `useNavI
 ```typescript
 function useNavItems() {
   const { t } = useTranslation('nav');
-  return useMemo(() => [
-    { to: '/learn/content-1', icon: BookOpen,    label: t('learn')         },
-    { to: '/courses',         icon: BookOpen,    label: t('courses')       },
-    { to: '/graph',           icon: Network,     label: t('graph')         },
-    { to: '/annotations',     icon: FileText,    label: t('annotations')   },
-    { to: '/agents',          icon: Bot,         label: t('agents')        },
-    { to: '/collaboration',   icon: Users,       label: t('chavruta')      },
-    { to: '/dashboard',       icon: GitBranch,   label: t('dashboard')     },
-  ], [t]);
+  return useMemo(
+    () => [
+      { to: '/learn/content-1', icon: BookOpen, label: t('learn') },
+      { to: '/courses', icon: BookOpen, label: t('courses') },
+      { to: '/graph', icon: Network, label: t('graph') },
+      { to: '/annotations', icon: FileText, label: t('annotations') },
+      { to: '/agents', icon: Bot, label: t('agents') },
+      { to: '/collaboration', icon: Users, label: t('chavruta') },
+      { to: '/dashboard', icon: GitBranch, label: t('dashboard') },
+    ],
+    [t]
+  );
 }
 ```
 
 **`apps/web/src/components/UserMenu.tsx`** — `useTranslation('common')`:
+
 - "Profile" → `t('profile')`, "Settings" → `t('settings')`, "Log out" → `t('logOut')`
 
 **`apps/web/src/components/AIChatPanel.tsx`** — `useTranslation('agents')`:
+
 - Panel title, select label, placeholder
 
 **Annotation components** (`AnnotationForm`, `AnnotationItem`, `AnnotationPanel`, `AnnotationThread`) — `useTranslation('annotations')`
@@ -711,7 +778,9 @@ interface UseUserPreferencesReturn {
 export function useUserPreferences(): UseUserPreferencesReturn {
   const { i18n } = useTranslation();
   const [meResult] = useQuery({ query: ME_QUERY });
-  const [{ fetching }, updatePreferences] = useMutation(UPDATE_USER_PREFERENCES_MUTATION);
+  const [{ fetching }, updatePreferences] = useMutation(
+    UPDATE_USER_PREFERENCES_MUTATION
+  );
 
   // Sync DB locale → i18next + localStorage after ME_QUERY resolves
   useEffect(() => {
@@ -722,29 +791,33 @@ export function useUserPreferences(): UseUserPreferencesReturn {
     }
   }, [meResult.data?.me?.preferences?.locale, i18n]);
 
-  const setLocale = useCallback(async (locale: SupportedLocale): Promise<void> => {
-    // Optimistic: update i18next + localStorage immediately for instant UX
-    await i18n.changeLanguage(locale);
-    localStorage.setItem('edusphere_locale', locale);
-    // Persist to DB (background — non-blocking)
-    await updatePreferences({ input: { locale } });
-  }, [i18n, updatePreferences]);
+  const setLocale = useCallback(
+    async (locale: SupportedLocale): Promise<void> => {
+      // Optimistic: update i18next + localStorage immediately for instant UX
+      await i18n.changeLanguage(locale);
+      localStorage.setItem('edusphere_locale', locale);
+      // Persist to DB (background — non-blocking)
+      await updatePreferences({ input: { locale } });
+    },
+    [i18n, updatePreferences]
+  );
 
-  const currentLocale = (
-    meResult.data?.me?.preferences?.locale ?? i18n.language
-  ) as SupportedLocale;
+  const currentLocale = (meResult.data?.me?.preferences?.locale ??
+    i18n.language) as SupportedLocale;
 
   return { locale: currentLocale, setLocale, isSaving: fetching };
 }
 ```
 
 **New file — `apps/web/src/components/LanguageSelector.tsx`**:
+
 - `<Select>` (shadcn) populated from `SUPPORTED_LOCALES` × `LOCALE_LABELS`
 - Each `<SelectItem>`: `{flag}  {native}  ({english})`
 - Props: `value: SupportedLocale`, `onChange: (l: SupportedLocale) => void`, `disabled?: boolean`
 - Accessible: `aria-label={t('settings:language.title')}`
 
 **New file — `apps/web/src/pages/SettingsPage.tsx`**:
+
 - `<Layout>` wrapper (same as all other pages)
 - `useUserPreferences()` + `useTranslation('settings')`
 - `<Card>` → Language section → `<LanguageSelector>`
@@ -752,6 +825,7 @@ export function useUserPreferences(): UseUserPreferencesReturn {
 - `disabled={isSaving}` propagated to selector
 
 **Modify `apps/web/src/lib/router.tsx`** — line 130-132: replace `<ProfilePage />` with lazy-loaded `<SettingsPage />`:
+
 ```typescript
 const SettingsPage = lazy(() =>
   import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage }))
@@ -780,11 +854,17 @@ const MetroLocaleBackend = {
   type: 'backend' as const,
   init() {},
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  read(language: string, namespace: string, callback: (e: unknown, d: unknown) => void) {
+  read(
+    language: string,
+    namespace: string,
+    callback: (e: unknown, d: unknown) => void
+  ) {
     try {
       // Metro resolves this at bundle time across all locale/ns combinations
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const data = require(`@edusphere/i18n/locales/${language}/${namespace}.json`);
+      const data = require(
+        `@edusphere/i18n/locales/${language}/${namespace}.json`
+      );
       callback(null, data);
     } catch {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -819,17 +899,18 @@ export { i18n };
 
 **7 screens to migrate** — `useTranslation()` added to each:
 
-| Screen | Namespaces |
-|--------|-----------|
-| `HomeScreen.tsx` | `['dashboard', 'common']` |
-| `CoursesScreen.tsx` | `['courses', 'common']` |
-| `CourseDetailScreen.tsx` | `'courses'` |
-| `ProfileScreen.tsx` | `['common', 'settings']` |
-| `AITutorScreen.tsx` | `'agents'` |
-| `DiscussionsScreen.tsx` | `'collaboration'` |
-| `KnowledgeGraphScreen.tsx` | `'knowledge'` |
+| Screen                     | Namespaces                |
+| -------------------------- | ------------------------- |
+| `HomeScreen.tsx`           | `['dashboard', 'common']` |
+| `CoursesScreen.tsx`        | `['courses', 'common']`   |
+| `CourseDetailScreen.tsx`   | `'courses'`               |
+| `ProfileScreen.tsx`        | `['common', 'settings']`  |
+| `AITutorScreen.tsx`        | `'agents'`                |
+| `DiscussionsScreen.tsx`    | `'collaboration'`         |
+| `KnowledgeGraphScreen.tsx` | `'knowledge'`             |
 
 **`apps/mobile/src/navigation/index.tsx`** — tab labels must be reactive to language changes. Wrap the `Tab.Navigator` in a component that calls `useTranslation('nav')` and passes translated titles as props:
+
 ```typescript
 function MainTabs() {
   const { t } = useTranslation('nav');
@@ -847,6 +928,7 @@ function MainTabs() {
 ```
 
 **New file — `apps/mobile/src/screens/SettingsScreen.tsx`**:
+
 - `FlatList` of 9 locales: `{flag} {native}` + `{english}` + checkmark on selected
 - `onPress` → `saveMobileLocale(locale)` + GraphQL mutation to persist to DB
 - Added as option in `ProfileScreen.tsx` settings menu: "Language & Settings" → navigate to SettingsScreen
@@ -862,36 +944,55 @@ function MainTabs() {
 **New file — `packages/db/src/schema/contentTranslations.ts`**:
 
 ```typescript
-import { pgTable, text, uuid, numeric, unique, index, check } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  uuid,
+  numeric,
+  unique,
+  index,
+  check,
+} from 'drizzle-orm/pg-core';
 import { pk, timestamps } from './_shared';
 import { contentItems } from './contentItems';
 
-export const translationStatuses = ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'] as const;
-export type TranslationStatus = typeof translationStatuses[number];
+export const translationStatuses = [
+  'PENDING',
+  'PROCESSING',
+  'COMPLETED',
+  'FAILED',
+] as const;
+export type TranslationStatus = (typeof translationStatuses)[number];
 
 export const contentTranslations = pgTable(
   'content_translations',
   {
-    id:                   pk(),
-    content_item_id:      uuid('content_item_id').notNull()
-                            .references(() => contentItems.id, { onDelete: 'cascade' }),
-    locale:               text('locale').notNull(),
-    translated_title:     text('translated_title'),
+    id: pk(),
+    content_item_id: uuid('content_item_id')
+      .notNull()
+      .references(() => contentItems.id, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    translated_title: text('translated_title'),
     translated_description: text('translated_description'),
-    translated_summary:   text('translated_summary'),
+    translated_summary: text('translated_summary'),
     translated_transcript: text('translated_transcript'),
-    quality_score:        numeric('quality_score', { precision: 3, scale: 2 }),
-    model_used:           text('model_used').notNull().default('ollama/llama3.2'),
-    translation_status:   text('translation_status',
-                            { enum: translationStatuses }
-                          ).notNull().default('PENDING'),
+    quality_score: numeric('quality_score', { precision: 3, scale: 2 }),
+    model_used: text('model_used').notNull().default('ollama/llama3.2'),
+    translation_status: text('translation_status', {
+      enum: translationStatuses,
+    })
+      .notNull()
+      .default('PENDING'),
     ...timestamps,
   },
   (t) => ({
-    item_locale_unique: unique('ct_item_locale_uq').on(t.content_item_id, t.locale),
-    locale_idx:         index('ct_locale_idx').on(t.locale),
-    status_idx:         index('ct_status_idx').on(t.translation_status),
-  }),
+    item_locale_unique: unique('ct_item_locale_uq').on(
+      t.content_item_id,
+      t.locale
+    ),
+    locale_idx: index('ct_locale_idx').on(t.locale),
+    status_idx: index('ct_status_idx').on(t.translation_status),
+  })
 );
 
 export type ContentTranslation = typeof contentTranslations.$inferSelect;
@@ -915,6 +1016,7 @@ translation.schemas.ts
 ```
 
 **`translation.graphql`**:
+
 ```graphql
 type ContentTranslation {
   id: ID!
@@ -938,7 +1040,8 @@ enum TranslationStatus {
 }
 
 extend type Query {
-  contentTranslation(contentItemId: ID!, locale: String!): ContentTranslation @authenticated
+  contentTranslation(contentItemId: ID!, locale: String!): ContentTranslation
+    @authenticated
 }
 
 extend type Mutation {
@@ -950,6 +1053,7 @@ extend type Mutation {
 ```
 
 **`translation.service.ts`** — cache-first logic:
+
 1. Query `content_translations` WHERE `(content_item_id, locale)` AND status = COMPLETED → return immediately
 2. If row exists with status PROCESSING → return row (frontend polls `contentTranslation` query)
 3. If no row or FAILED → upsert with status PROCESSING + publish NATS `content.translate.requested`
@@ -958,18 +1062,25 @@ extend type Mutation {
 **Modify `apps/subgraph-content/src/app.module.ts`** — add `TranslationModule` to imports array.
 
 **Frontend — new file `apps/web/src/lib/graphql/translation.queries.ts`**:
+
 ```typescript
 export const CONTENT_TRANSLATION_QUERY = gql`
   query ContentTranslation($contentItemId: ID!, $locale: String!) {
     contentTranslation(contentItemId: $contentItemId, locale: $locale) {
-      id locale translatedTitle translatedTranscript
-      translationStatus qualityScore createdAt
+      id
+      locale
+      translatedTitle
+      translatedTranscript
+      translationStatus
+      qualityScore
+      createdAt
     }
   }
 `;
 ```
 
 **Modify `apps/web/src/pages/ContentViewer.tsx`**:
+
 - When `i18n.language !== 'en'`: fire `contentTranslation` query
 - Status badge: PROCESSING → `⟳ {t('content:translating')}`, COMPLETED → `✓ {t('content:translatedTo', { language: LOCALE_LABELS[locale].native })}`
 - Display translated title/transcript when COMPLETED; fall back to original while PROCESSING
@@ -984,14 +1095,15 @@ This utility is extracted into its own file to keep `ai.service.ts` under 150 li
 
 ```typescript
 const LANGUAGE_INSTRUCTIONS: Readonly<Record<string, string>> = {
-  'zh-CN': 'Always respond in Simplified Chinese (中文). Do not switch to English.',
-  'hi':    'Always respond in Hindi (हिन्दी). Do not switch to English.',
-  'es':    'Always respond in Spanish (Español). Do not switch to English.',
-  'fr':    'Always respond in French (Français). Do not switch to English.',
-  'bn':    'Always respond in Bengali (বাংলা). Do not switch to English.',
-  'pt':    'Always respond in Brazilian Portuguese (Português). Do not switch to English.',
-  'ru':    'Always respond in Russian (Русский). Do not switch to English.',
-  'id':    'Always respond in Indonesian (Bahasa Indonesia). Do not switch to English.',
+  'zh-CN':
+    'Always respond in Simplified Chinese (中文). Do not switch to English.',
+  hi: 'Always respond in Hindi (हिन्दी). Do not switch to English.',
+  es: 'Always respond in Spanish (Español). Do not switch to English.',
+  fr: 'Always respond in French (Français). Do not switch to English.',
+  bn: 'Always respond in Bengali (বাংলা). Do not switch to English.',
+  pt: 'Always respond in Brazilian Portuguese (Português). Do not switch to English.',
+  ru: 'Always respond in Russian (Русский). Do not switch to English.',
+  id: 'Always respond in Indonesian (Bahasa Indonesia). Do not switch to English.',
 };
 
 /**
@@ -1007,32 +1119,41 @@ export function injectLocale(systemPrompt: string, locale: string): string {
 **Modify `apps/subgraph-agent/src/ai/ai.service.ts`** — add `locale: string = 'en'` to `continueSession()` signature. Pass to all 5 dispatch branches by wrapping each system prompt with `injectLocale(prompt, locale)`.
 
 **Modify all 3 local workflows**:
+
 - `apps/subgraph-agent/src/workflows/chavruta.workflow.ts` — `createChavrutaWorkflow(model, locale)`: inject locale into all 5 state system prompts
 - `apps/subgraph-agent/src/workflows/quiz.workflow.ts` — `createQuizWorkflow(model, locale)`
 - `apps/subgraph-agent/src/workflows/summarizer.workflow.ts` — `createSummarizerWorkflow(model, locale)`
 
 **Modify all 4 LangGraph workflows in `packages/langgraph-workflows/`**:
+
 - `tutorWorkflow.ts`, `debateWorkflow.ts`, `quizWorkflow.ts`, `assessmentWorkflow.ts`
 - Each factory/constructor gains `locale: string = 'en'` parameter
 - Each node that builds a system prompt calls `injectLocale(basePrompt, this.locale)`
 
 **Modify `apps/subgraph-agent/src/agent-session/agent-session.schemas.ts`**:
+
 ```typescript
 export const StartAgentSessionSchema = z.object({
   templateType: TemplateTypeEnum,
   context: z.record(z.string(), z.unknown()).optional(),
-  locale: z.enum(SUPPORTED_LOCALES as [string, ...string[]]).optional().default('en'),
+  locale: z
+    .enum(SUPPORTED_LOCALES as [string, ...string[]])
+    .optional()
+    .default('en'),
 });
 ```
 
 **Modify `apps/subgraph-agent/src/agent-session/agent-session.resolver.ts`**:
+
 - On `startAgentSession`: store `locale` in session `metadata` JSONB
 - On `sendMessage`: read `locale` from session metadata and pass to `continueSession()`
 
 **Frontend — `apps/web/src/pages/AgentsPage.tsx`**:
+
 - When calling `startAgentSession` mutation, include `locale: i18n.language` in context
 
 **Mobile — `apps/mobile/src/screens/SettingsScreen.tsx`**:
+
 - `translationCache.ts` using `expo-sqlite`:
   - `initTranslationCache()` → create `translation_cache` SQLite table
   - `getCachedTranslation(contentItemId, locale)` → cached row or null
@@ -1047,36 +1168,36 @@ export const StartAgentSessionSchema = z.object({
 
 ### Layer 1: Unit Tests (Vitest / Jest)
 
-| File | Scope | Key Assertions |
-|------|-------|---------------|
-| `packages/i18n/src/index.test.ts` | Package exports | `SUPPORTED_LOCALES` has 9 entries; `LOCALE_LABELS` covers all locales; every locale directory has all 12 namespace files |
-| `packages/i18n/src/locale-completeness.test.ts` | Translation completeness | For each non-English locale: all keys present in `en/` also exist in target locale (no missing keys) |
-| `apps/subgraph-core/src/user/user.service.spec.ts` | `updatePreferences()` | JSONB merge with partial input; RLS tenant isolation; default fallbacks in `mapUser()` |
-| `apps/subgraph-core/src/user/user.resolver.spec.ts` | GraphQL mutation | `updateUserPreferences` resolves; unauthenticated access throws 401; invalid locale fails Zod |
-| `apps/subgraph-agent/src/ai/locale-prompt.test.ts` | `injectLocale()` | English returns prompt unchanged; all 8 non-English locales append correct instruction; unknown locale passthrough |
-| `apps/subgraph-agent/src/ai/ai.service.spec.ts` | `continueSession()` | Locale injected into chavruta/quiz/summarizer system prompts; default locale 'en' when omitted |
-| `apps/subgraph-content/src/translation/translation.service.spec.ts` | Cache logic | Cache HIT returns COMPLETED row; PROCESSING returns in-progress row; new request upserts PROCESSING + publishes NATS |
-| `apps/web/src/hooks/useUserPreferences.test.ts` | Preferences hook | DB locale syncs to i18next; optimistic locale update precedes DB call; localStorage fallback when unauthenticated |
-| `apps/mobile/src/services/translationCache.test.ts` | SQLite cache | `initTranslationCache` creates table; cache miss returns null; upsert replaces existing row |
+| File                                                                | Scope                    | Key Assertions                                                                                                           |
+| ------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `packages/i18n/src/index.test.ts`                                   | Package exports          | `SUPPORTED_LOCALES` has 9 entries; `LOCALE_LABELS` covers all locales; every locale directory has all 12 namespace files |
+| `packages/i18n/src/locale-completeness.test.ts`                     | Translation completeness | For each non-English locale: all keys present in `en/` also exist in target locale (no missing keys)                     |
+| `apps/subgraph-core/src/user/user.service.spec.ts`                  | `updatePreferences()`    | JSONB merge with partial input; RLS tenant isolation; default fallbacks in `mapUser()`                                   |
+| `apps/subgraph-core/src/user/user.resolver.spec.ts`                 | GraphQL mutation         | `updateUserPreferences` resolves; unauthenticated access throws 401; invalid locale fails Zod                            |
+| `apps/subgraph-agent/src/ai/locale-prompt.test.ts`                  | `injectLocale()`         | English returns prompt unchanged; all 8 non-English locales append correct instruction; unknown locale passthrough       |
+| `apps/subgraph-agent/src/ai/ai.service.spec.ts`                     | `continueSession()`      | Locale injected into chavruta/quiz/summarizer system prompts; default locale 'en' when omitted                           |
+| `apps/subgraph-content/src/translation/translation.service.spec.ts` | Cache logic              | Cache HIT returns COMPLETED row; PROCESSING returns in-progress row; new request upserts PROCESSING + publishes NATS     |
+| `apps/web/src/hooks/useUserPreferences.test.ts`                     | Preferences hook         | DB locale syncs to i18next; optimistic locale update precedes DB call; localStorage fallback when unauthenticated        |
+| `apps/mobile/src/services/translationCache.test.ts`                 | SQLite cache             | `initTranslationCache` creates table; cache miss returns null; upsert replaces existing row                              |
 
 ### Layer 2: Integration Tests
 
-| File | Scope | Key Assertions |
-|------|-------|---------------|
-| `apps/subgraph-core/src/test/integration/preferences.spec.ts` | Full GraphQL round-trip | `updateUserPreferences` → DB persists → `me.preferences.locale` reflects change; tenant isolation (Tenant A cannot affect Tenant B preferences) |
-| `apps/subgraph-content/src/test/integration/translation.spec.ts` | Translation API | `contentTranslation` query returns PROCESSING on first call; NATS event published; row upserted correctly |
-| `apps/subgraph-agent/src/test/integration/locale-agent.spec.ts` | AI session locale | `startAgentSession` with `locale: 'es'` → session metadata stores locale; subsequent `sendMessage` passes locale to AI service |
-| `packages/db/src/rls/content-translations.test.ts` | RLS isolation | Cross-tenant content translation access blocked; FK join correctly restricts via `content_items` RLS |
+| File                                                             | Scope                   | Key Assertions                                                                                                                                  |
+| ---------------------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/subgraph-core/src/test/integration/preferences.spec.ts`    | Full GraphQL round-trip | `updateUserPreferences` → DB persists → `me.preferences.locale` reflects change; tenant isolation (Tenant A cannot affect Tenant B preferences) |
+| `apps/subgraph-content/src/test/integration/translation.spec.ts` | Translation API         | `contentTranslation` query returns PROCESSING on first call; NATS event published; row upserted correctly                                       |
+| `apps/subgraph-agent/src/test/integration/locale-agent.spec.ts`  | AI session locale       | `startAgentSession` with `locale: 'es'` → session metadata stores locale; subsequent `sendMessage` passes locale to AI service                  |
+| `packages/db/src/rls/content-translations.test.ts`               | RLS isolation           | Cross-tenant content translation access blocked; FK join correctly restricts via `content_items` RLS                                            |
 
 ### Layer 3: Component Tests (React Testing Library)
 
-| File | Scope | Key Assertions |
-|------|-------|---------------|
-| `apps/web/src/components/LanguageSelector.test.tsx` | Selector component | Renders all 9 locales; `onChange` fires with correct `SupportedLocale`; `disabled` prop prevents interaction; native scripts render correctly |
-| `apps/web/src/pages/SettingsPage.test.tsx` | Settings page | Renders within i18n provider; changing language fires `setLocale`; success toast appears; saves button disabled during mutation |
-| `apps/web/src/components/UserMenu.test.tsx` | UserMenu translations | "Log out", "Profile", "Settings" render in selected locale |
-| `apps/web/src/components/Layout.test.tsx` | Navigation translations | All 7 nav items render translated labels; switching locale via i18n context updates labels |
-| `apps/web/src/hooks/useUserPreferences.test.ts` | Hook behavior | Renders with RTL wrapper; tests locale sync path |
+| File                                                | Scope                   | Key Assertions                                                                                                                                |
+| --------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/LanguageSelector.test.tsx` | Selector component      | Renders all 9 locales; `onChange` fires with correct `SupportedLocale`; `disabled` prop prevents interaction; native scripts render correctly |
+| `apps/web/src/pages/SettingsPage.test.tsx`          | Settings page           | Renders within i18n provider; changing language fires `setLocale`; success toast appears; saves button disabled during mutation               |
+| `apps/web/src/components/UserMenu.test.tsx`         | UserMenu translations   | "Log out", "Profile", "Settings" render in selected locale                                                                                    |
+| `apps/web/src/components/Layout.test.tsx`           | Navigation translations | All 7 nav items render translated labels; switching locale via i18n context updates labels                                                    |
+| `apps/web/src/hooks/useUserPreferences.test.ts`     | Hook behavior           | Renders with RTL wrapper; tests locale sync path                                                                                              |
 
 ### Layer 4: E2E Tests (Playwright)
 
@@ -1110,7 +1231,9 @@ test.describe('Language selection', () => {
     await expect(page.getByText('仪表板')).toBeVisible(); // "Dashboard" in Chinese
   });
 
-  test('Language preference persists after logout + login', async ({ page }) => {
+  test('Language preference persists after logout + login', async ({
+    page,
+  }) => {
     // Set to Spanish
     await page.goto('/settings');
     await page.getByRole('combobox').click();
@@ -1133,16 +1256,21 @@ test.describe('Language selection', () => {
     await page.getByPlaceholder(/ask/i).fill('Explain photosynthesis');
     await page.getByRole('button', { name: /send/i }).click();
     // Response should contain French
-    await expect(page.locator('[data-testid="agent-response"]'))
-      .toContainText(/photosynth/i, { timeout: 15000 });
+    await expect(page.locator('[data-testid="agent-response"]')).toContainText(
+      /photosynth/i,
+      { timeout: 15000 }
+    );
     // Basic check: response not purely English alphabet (French has accents)
   });
 });
 ```
 
 **New file — `apps/web/e2e/content-translation.spec.ts`**:
+
 ```typescript
-test('Content viewer shows translation badge and translated content', async ({ page }) => {
+test('Content viewer shows translation badge and translated content', async ({
+  page,
+}) => {
   // Set language to Hindi
   await page.goto('/settings');
   await page.getByRole('combobox').click();
@@ -1150,8 +1278,9 @@ test('Content viewer shows translation badge and translated content', async ({ p
   // Open a content item
   await page.goto('/learn/content-1');
   // Should show "Translating..." badge
-  await expect(page.locator('[data-testid="translation-status"]'))
-    .toContainText(/translat/i);
+  await expect(
+    page.locator('[data-testid="translation-status"]')
+  ).toContainText(/translat/i);
 });
 ```
 
@@ -1166,11 +1295,11 @@ import { test, expect } from '@playwright/test';
 import { SUPPORTED_LOCALES } from '@edusphere/i18n';
 
 const PAGES_TO_SNAPSHOT = [
-  { path: '/settings',   name: 'settings'   },
-  { path: '/dashboard',  name: 'dashboard'  },
-  { path: '/courses',    name: 'courses'    },
-  { path: '/agents',     name: 'agents'     },
-  { path: '/profile',    name: 'profile'    },
+  { path: '/settings', name: 'settings' },
+  { path: '/dashboard', name: 'dashboard' },
+  { path: '/courses', name: 'courses' },
+  { path: '/agents', name: 'agents' },
+  { path: '/profile', name: 'profile' },
 ];
 
 for (const locale of SUPPORTED_LOCALES) {
@@ -1186,14 +1315,11 @@ for (const locale of SUPPORTED_LOCALES) {
       // Allow fonts to load (CJK, Devanagari)
       await page.waitForTimeout(500);
 
-      await expect(page).toHaveScreenshot(
-        `${name}-${locale}.png`,
-        {
-          fullPage: true,
-          maxDiffPixelRatio: 0.02, // 2% tolerance for anti-aliasing
-          animations: 'disabled',
-        }
-      );
+      await expect(page).toHaveScreenshot(`${name}-${locale}.png`, {
+        fullPage: true,
+        maxDiffPixelRatio: 0.02, // 2% tolerance for anti-aliasing
+        animations: 'disabled',
+      });
     });
   }
 }
@@ -1202,6 +1328,7 @@ for (const locale of SUPPORTED_LOCALES) {
 **Visual test coverage**: 9 locales × 5 pages = **45 baseline screenshots**. Run `pnpm --filter @edusphere/web test:visual --update-snapshots` to regenerate baselines.
 
 **Component visual tests** (`apps/web/e2e/visual/components.spec.ts`):
+
 - `LanguageSelector` — all 9 locales listed correctly
 - `UserMenu` — translated labels in 3 representative locales (en, zh-CN, ar — future)
 - `AIChatPanel` — agent names/descriptions in 3 locales
@@ -1217,7 +1344,9 @@ import AxeBuilder from '@axe-core/playwright';
 const TEST_LOCALES = ['en', 'zh-CN', 'hi', 'ru'] as const; // representative subset
 
 for (const locale of TEST_LOCALES) {
-  test(`[${locale}] Settings page is WCAG 2.1 AA compliant`, async ({ page }) => {
+  test(`[${locale}] Settings page is WCAG 2.1 AA compliant`, async ({
+    page,
+  }) => {
     await page.addInitScript((l) => {
       localStorage.setItem('edusphere_locale', l);
     }, locale);
@@ -1234,6 +1363,7 @@ for (const locale of TEST_LOCALES) {
 ```
 
 Key assertions:
+
 - Language selector has correct `aria-label` in the active locale
 - Native script font rendering does not cause layout overflow violations
 - Color contrast meets AA standards across all language button states
@@ -1264,8 +1394,16 @@ describe('Translation completeness', () => {
 
     for (const locale of SUPPORTED_LOCALES.filter((l) => l !== 'en')) {
       it(`[${locale}] ${ns} — no missing keys vs English`, () => {
-        const localePath = path.join(__dirname, '..', 'locales', locale, `${ns}.json`);
-        const localeKeys = getAllKeys(JSON.parse(fs.readFileSync(localePath, 'utf-8')));
+        const localePath = path.join(
+          __dirname,
+          '..',
+          'locales',
+          locale,
+          `${ns}.json`
+        );
+        const localeKeys = getAllKeys(
+          JSON.parse(fs.readFileSync(localePath, 'utf-8'))
+        );
         const missing = enKeys.filter((k) => !localeKeys.includes(k));
         expect(missing).toEqual([]); // Zero missing keys
       });
@@ -1278,53 +1416,53 @@ This test prevents silent fallbacks at runtime: if a translator missed a key, CI
 
 ### Complete Test File Inventory
 
-| Layer | File | Agent |
-|-------|------|-------|
-| Unit | `packages/i18n/src/__tests__/index.test.ts` | T-1 |
-| Unit | `packages/i18n/src/__tests__/completeness.test.ts` | T-1 |
-| Unit | `apps/subgraph-core/src/user/user.service.spec.ts` (extended) | T-1 |
-| Unit | `apps/subgraph-core/src/user/user.resolver.spec.ts` (extended) | T-1 |
-| Unit | `apps/subgraph-agent/src/ai/locale-prompt.test.ts` | T-1 |
-| Unit | `apps/subgraph-agent/src/ai/ai.service.spec.ts` (extended) | T-1 |
-| Unit | `apps/subgraph-content/src/translation/translation.service.spec.ts` | T-1 |
-| Unit | `apps/subgraph-content/src/translation/translation.resolver.spec.ts` | T-1 |
-| Unit | `apps/mobile/src/services/translationCache.test.ts` | T-1 |
-| Integration | `apps/subgraph-core/src/test/integration/preferences.spec.ts` | T-1 |
-| Integration | `apps/subgraph-content/src/test/integration/translation.spec.ts` | T-1 |
-| Integration | `apps/subgraph-agent/src/test/integration/locale-agent.spec.ts` | T-1 |
-| Integration | `packages/db/src/rls/content-translations.test.ts` | T-1 |
-| Component | `apps/web/src/components/LanguageSelector.test.tsx` | T-1 |
-| Component | `apps/web/src/pages/SettingsPage.test.tsx` | T-1 |
-| Component | `apps/web/src/components/UserMenu.test.tsx` (extended) | T-1 |
-| Component | `apps/web/src/components/Layout.test.tsx` (extended) | T-1 |
-| Component | `apps/web/src/hooks/useUserPreferences.test.ts` | T-1 |
-| E2E | `apps/web/e2e/i18n.spec.ts` | T-1 |
-| E2E | `apps/web/e2e/content-translation.spec.ts` | T-1 |
-| Visual | `apps/web/e2e/visual/i18n-visual.spec.ts` (45 snapshots) | T-1 |
-| Visual | `apps/web/e2e/visual/components.spec.ts` | T-1 |
-| A11y | `apps/web/e2e/a11y/i18n-a11y.spec.ts` | T-1 |
+| Layer       | File                                                                 | Agent |
+| ----------- | -------------------------------------------------------------------- | ----- |
+| Unit        | `packages/i18n/src/__tests__/index.test.ts`                          | T-1   |
+| Unit        | `packages/i18n/src/__tests__/completeness.test.ts`                   | T-1   |
+| Unit        | `apps/subgraph-core/src/user/user.service.spec.ts` (extended)        | T-1   |
+| Unit        | `apps/subgraph-core/src/user/user.resolver.spec.ts` (extended)       | T-1   |
+| Unit        | `apps/subgraph-agent/src/ai/locale-prompt.test.ts`                   | T-1   |
+| Unit        | `apps/subgraph-agent/src/ai/ai.service.spec.ts` (extended)           | T-1   |
+| Unit        | `apps/subgraph-content/src/translation/translation.service.spec.ts`  | T-1   |
+| Unit        | `apps/subgraph-content/src/translation/translation.resolver.spec.ts` | T-1   |
+| Unit        | `apps/mobile/src/services/translationCache.test.ts`                  | T-1   |
+| Integration | `apps/subgraph-core/src/test/integration/preferences.spec.ts`        | T-1   |
+| Integration | `apps/subgraph-content/src/test/integration/translation.spec.ts`     | T-1   |
+| Integration | `apps/subgraph-agent/src/test/integration/locale-agent.spec.ts`      | T-1   |
+| Integration | `packages/db/src/rls/content-translations.test.ts`                   | T-1   |
+| Component   | `apps/web/src/components/LanguageSelector.test.tsx`                  | T-1   |
+| Component   | `apps/web/src/pages/SettingsPage.test.tsx`                           | T-1   |
+| Component   | `apps/web/src/components/UserMenu.test.tsx` (extended)               | T-1   |
+| Component   | `apps/web/src/components/Layout.test.tsx` (extended)                 | T-1   |
+| Component   | `apps/web/src/hooks/useUserPreferences.test.ts`                      | T-1   |
+| E2E         | `apps/web/e2e/i18n.spec.ts`                                          | T-1   |
+| E2E         | `apps/web/e2e/content-translation.spec.ts`                           | T-1   |
+| Visual      | `apps/web/e2e/visual/i18n-visual.spec.ts` (45 snapshots)             | T-1   |
+| Visual      | `apps/web/e2e/visual/components.spec.ts`                             | T-1   |
+| A11y        | `apps/web/e2e/a11y/i18n-a11y.spec.ts`                                | T-1   |
 
 ---
 
 ## Critical Files Reference
 
-| File | Action | Dependency | Why Critical |
-|------|--------|-----------|-------------|
-| `packages/i18n/src/index.ts` | CREATE | None | Foundation — all 11 other agents import `SUPPORTED_LOCALES` |
-| `apps/subgraph-core/src/user/user.graphql` | MODIFY | A-1 | Exposes `preferences` — unlocks DB persistence chain |
-| `apps/subgraph-core/src/user/user.service.ts` | MODIFY | A-2 | JSONB merge logic + `mapUser()` defaults |
-| `apps/subgraph-core/src/user/user.schemas.ts` | CREATE | A-1, A-2 | Runtime locale validation against SUPPORTED_LOCALES |
-| `apps/web/src/App.tsx` | MODIFY | A-3 | i18n must initialize before `RouterProvider` renders |
-| `apps/web/src/components/Layout.tsx` | MODIFY | A-1, A-3 | `NAV_ITEMS` → `useNavItems()` — affects every protected page |
-| `apps/web/src/hooks/useUserPreferences.ts` | CREATE | A-2, A-3 | Central sync: DB ↔ i18next ↔ localStorage |
-| `apps/web/src/pages/SettingsPage.tsx` | CREATE | A-8 | The primary user-facing entry point for language selection |
-| `apps/web/src/lib/router.tsx` | MODIFY | A-8 | `/settings` (line 130-132) → `SettingsPage` |
-| `apps/web/src/pages/AgentsPage.tsx` | MODIFY | A-1, A-4 | `AGENT_MODES` → `useAgentModes()` hook — non-trivial refactor |
-| `apps/subgraph-agent/src/ai/locale-prompt.ts` | CREATE | A-1 | `injectLocale()` — single injection point for all AI workflows |
-| `apps/subgraph-agent/src/ai/ai.service.ts` | MODIFY | B-2 | `continueSession()` signature change — cascades to all callers |
-| `apps/mobile/src/lib/i18n.ts` | CREATE | A-1 | Metro-compatible backend (require vs import) — architectural constraint |
-| `apps/mobile/src/navigation/index.tsx` | MODIFY | A-9 | Reactive tab titles — must use hook pattern, not static labels |
-| `packages/db/src/schema/contentTranslations.ts` | CREATE | None | Phase B cache table |
+| File                                            | Action | Dependency | Why Critical                                                            |
+| ----------------------------------------------- | ------ | ---------- | ----------------------------------------------------------------------- |
+| `packages/i18n/src/index.ts`                    | CREATE | None       | Foundation — all 11 other agents import `SUPPORTED_LOCALES`             |
+| `apps/subgraph-core/src/user/user.graphql`      | MODIFY | A-1        | Exposes `preferences` — unlocks DB persistence chain                    |
+| `apps/subgraph-core/src/user/user.service.ts`   | MODIFY | A-2        | JSONB merge logic + `mapUser()` defaults                                |
+| `apps/subgraph-core/src/user/user.schemas.ts`   | CREATE | A-1, A-2   | Runtime locale validation against SUPPORTED_LOCALES                     |
+| `apps/web/src/App.tsx`                          | MODIFY | A-3        | i18n must initialize before `RouterProvider` renders                    |
+| `apps/web/src/components/Layout.tsx`            | MODIFY | A-1, A-3   | `NAV_ITEMS` → `useNavItems()` — affects every protected page            |
+| `apps/web/src/hooks/useUserPreferences.ts`      | CREATE | A-2, A-3   | Central sync: DB ↔ i18next ↔ localStorage                               |
+| `apps/web/src/pages/SettingsPage.tsx`           | CREATE | A-8        | The primary user-facing entry point for language selection              |
+| `apps/web/src/lib/router.tsx`                   | MODIFY | A-8        | `/settings` (line 130-132) → `SettingsPage`                             |
+| `apps/web/src/pages/AgentsPage.tsx`             | MODIFY | A-1, A-4   | `AGENT_MODES` → `useAgentModes()` hook — non-trivial refactor           |
+| `apps/subgraph-agent/src/ai/locale-prompt.ts`   | CREATE | A-1        | `injectLocale()` — single injection point for all AI workflows          |
+| `apps/subgraph-agent/src/ai/ai.service.ts`      | MODIFY | B-2        | `continueSession()` signature change — cascades to all callers          |
+| `apps/mobile/src/lib/i18n.ts`                   | CREATE | A-1        | Metro-compatible backend (require vs import) — architectural constraint |
+| `apps/mobile/src/navigation/index.tsx`          | MODIFY | A-9        | Reactive tab titles — must use hook pattern, not static labels          |
+| `packages/db/src/schema/contentTranslations.ts` | CREATE | None       | Phase B cache table                                                     |
 
 ---
 
@@ -1372,6 +1510,7 @@ pnpm --filter @edusphere/web build -- --report
 ```
 
 **Visual regression baseline generation** (run once, commit snapshots):
+
 ```bash
 pnpm --filter @edusphere/web test:visual -- --update-snapshots
 git add apps/web/e2e/visual/__snapshots__/
@@ -1398,20 +1537,20 @@ git commit -m "test(visual): add i18n baseline snapshots for 9 locales × 5 page
 
 ## Files Count Summary
 
-| Category | New Files | Modified Files |
-|----------|-----------|---------------|
-| `packages/i18n` | ~115 (9×12 JSON + 5 TS) | 0 |
-| `packages/db` | 2 | 1 |
-| `subgraph-core` | 1 | 3 |
-| `subgraph-content` | 5 | 2 |
-| `subgraph-agent` | 1 | 3 |
-| `langgraph-workflows` | 0 | 4 |
-| `apps/web` (setup + settings) | 4 | 4 |
-| `apps/web` (pages + components) | 0 | ~22 |
-| `apps/mobile` | 3 | 8 |
-| Tests (all layers) | ~24 | ~10 |
-| **Total** | **~155** | **~57** |
+| Category                        | New Files               | Modified Files |
+| ------------------------------- | ----------------------- | -------------- |
+| `packages/i18n`                 | ~115 (9×12 JSON + 5 TS) | 0              |
+| `packages/db`                   | 2                       | 1              |
+| `subgraph-core`                 | 1                       | 3              |
+| `subgraph-content`              | 5                       | 2              |
+| `subgraph-agent`                | 1                       | 3              |
+| `langgraph-workflows`           | 0                       | 4              |
+| `apps/web` (setup + settings)   | 4                       | 4              |
+| `apps/web` (pages + components) | 0                       | ~22            |
+| `apps/mobile`                   | 3                       | 8              |
+| Tests (all layers)              | ~24                     | ~10            |
+| **Total**                       | **~155**                | **~57**        |
 
 ---
 
-*Document version: 2.0 | Updated: 2026-02-21 | Mandatory parallel execution: 12 agents | Test coverage: 7 layers including visual regression (45 snapshots)*
+_Document version: 2.0 | Updated: 2026-02-21 | Mandatory parallel execution: 12 agents | Test coverage: 7 layers including visual regression (45 snapshots)_

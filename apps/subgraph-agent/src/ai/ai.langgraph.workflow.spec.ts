@@ -47,18 +47,22 @@ const { mockCompiledInvoke, MockCompiledGraph } = vi.hoisted(() => {
   return { mockCompiledInvoke, MockCompiledGraph };
 });
 
-const { mockDebateWorkflow, mockQuizWorkflow, mockTutorWorkflow, mockAssessmentWorkflow } =
-  vi.hoisted(() => {
-    const makeWorkflow = () => ({
-      compile: vi.fn().mockReturnValue(MockCompiledGraph),
-    });
-    return {
-      mockDebateWorkflow: makeWorkflow(),
-      mockQuizWorkflow: makeWorkflow(),
-      mockTutorWorkflow: makeWorkflow(),
-      mockAssessmentWorkflow: makeWorkflow(),
-    };
+const {
+  mockDebateWorkflow,
+  mockQuizWorkflow,
+  mockTutorWorkflow,
+  mockAssessmentWorkflow,
+} = vi.hoisted(() => {
+  const makeWorkflow = () => ({
+    compile: vi.fn().mockReturnValue(MockCompiledGraph),
   });
+  return {
+    mockDebateWorkflow: makeWorkflow(),
+    mockQuizWorkflow: makeWorkflow(),
+    mockTutorWorkflow: makeWorkflow(),
+    mockAssessmentWorkflow: makeWorkflow(),
+  };
+});
 
 vi.mock('@edusphere/langgraph-workflows', () => ({
   createDebateWorkflow: vi.fn().mockReturnValue(mockDebateWorkflow),
@@ -94,22 +98,28 @@ describe('ai.langgraph.ts: file exists and defines the four adapters', () => {
 
   it('exports runLangGraphDebate', () => {
     const src = readSrc('ai.langgraph.ts');
+    // eslint-disable-next-line security/detect-unsafe-regex
     expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphDebate/);
   });
 
   it('exports runLangGraphQuiz', () => {
     const src = readSrc('ai.langgraph.ts');
+    // eslint-disable-next-line security/detect-unsafe-regex
     expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphQuiz/);
   });
 
   it('exports runLangGraphTutor', () => {
     const src = readSrc('ai.langgraph.ts');
+    // eslint-disable-next-line security/detect-unsafe-regex
     expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphTutor/);
   });
 
   it('exports runLangGraphAssessment', () => {
     const src = readSrc('ai.langgraph.ts');
-    expect(src).toMatch(/export\s+(async\s+)?function\s+runLangGraphAssessment/);
+    expect(src).toMatch(
+      // eslint-disable-next-line security/detect-unsafe-regex
+      /export\s+(async\s+)?function\s+runLangGraphAssessment/
+    );
   });
 });
 
@@ -185,29 +195,31 @@ describe('ai.service.ts: orchestration layer structure', () => {
     expect(src).toContain('runLangGraphDebate');
   });
 
-  it('ai.service.ts imports runLangGraphQuiz from ai.langgraph', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts imports runLangGraphQuiz from ai.langgraph', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('runLangGraphQuiz');
   });
 
-  it('ai.service.ts imports runLangGraphTutor from ai.langgraph', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts imports runLangGraphTutor from ai.langgraph', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('runLangGraphTutor');
   });
 
-  it('ai.service.ts uses LangGraphService to get checkpointer', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts uses LangGraphService to get checkpointer', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('langGraphService.getCheckpointer()');
   });
 
-  it('ai.service.ts passes sessionId as LangGraph thread_id', () => {
-    // continueSession passes sessionId as the first arg (used as thread_id)
+  it('ai.service.ts passes sessionId to the chavruta workflow for CHAVRUTA_DEBATE', () => {
+    // CHAVRUTA_DEBATE now routes to the conversational chavruta.workflow.ts,
+    // using sessionId as ChavrutaContext.sessionId (not runLangGraphDebate).
     const src = readSrc('ai.service.ts');
-    expect(src).toContain('runLangGraphDebate(sessionId');
+    expect(src).toContain('sessionId,');
+    expect(src).toContain('createChavrutaWorkflow');
   });
 
-  it('ai.service.ts defines LANGGRAPH_TEMPLATES set', () => {
-    const src = readSrc('ai.service.ts');
+  it('ai-langgraph-runner.service.ts defines LANGGRAPH_TEMPLATES set', () => {
+    const src = readSrc('ai-langgraph-runner.service.ts');
     expect(src).toContain('LANGGRAPH_TEMPLATES');
     expect(src).toContain('CHAVRUTA_DEBATE');
     expect(src).toContain('TUTOR');
@@ -309,15 +321,21 @@ describe('runLangGraphDebate()', () => {
   });
 
   it('calls compile() with a checkpointer', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ synthesis: 'ok', arguments: [] });
+    mockCompiledInvoke.mockResolvedValueOnce({
+      synthesis: 'ok',
+      arguments: [],
+    });
     await runLangGraphDebate('thread-3', 'msg', {});
     expect(mockDebateWorkflow.compile).toHaveBeenCalledWith(
-      expect.objectContaining({ checkpointer: expect.anything() }),
+      expect.objectContaining({ checkpointer: expect.anything() })
     );
   });
 
   it('invokes the compiled graph with threadConfig containing thread_id', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ synthesis: 'ok', arguments: [] });
+    mockCompiledInvoke.mockResolvedValueOnce({
+      synthesis: 'ok',
+      arguments: [],
+    });
     await runLangGraphDebate('my-thread', 'msg', {});
     const callArgs = mockCompiledInvoke.mock.calls[0];
     // Second argument must be { configurable: { thread_id: 'my-thread' } }
@@ -325,23 +343,39 @@ describe('runLangGraphDebate()', () => {
   });
 
   it('passes provided locale to createDebateWorkflow', async () => {
-    const { createDebateWorkflow } = await import('@edusphere/langgraph-workflows');
-    mockCompiledInvoke.mockResolvedValueOnce({ synthesis: 'ok', arguments: [] });
+    const { createDebateWorkflow } =
+      await import('@edusphere/langgraph-workflows');
+    mockCompiledInvoke.mockResolvedValueOnce({
+      synthesis: 'ok',
+      arguments: [],
+    });
     await runLangGraphDebate('t', 'msg', {}, 'he');
     expect(createDebateWorkflow).toHaveBeenCalledWith(undefined, 'he');
   });
 
   it('defaults to "for" position when context.position is missing', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ synthesis: 'ok', arguments: [] });
+    mockCompiledInvoke.mockResolvedValueOnce({
+      synthesis: 'ok',
+      arguments: [],
+    });
     await runLangGraphDebate('t', 'msg', {});
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(state['position']).toBe('for');
   });
 
   it('defaults to 2 rounds when context.rounds is missing', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ synthesis: 'ok', arguments: [] });
+    mockCompiledInvoke.mockResolvedValueOnce({
+      synthesis: 'ok',
+      arguments: [],
+    });
     await runLangGraphDebate('t', 'msg', {});
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(state['rounds']).toBe(2);
   });
 });
@@ -388,13 +422,17 @@ describe('runLangGraphQuiz()', () => {
   it('defaults to 5 questions and medium difficulty', async () => {
     mockCompiledInvoke.mockResolvedValueOnce({ questions: [], score: 0 });
     await runLangGraphQuiz('t', 'topic', {});
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(state['numQuestions']).toBe(5);
     expect(state['difficulty']).toBe('medium');
   });
 
   it('passes provided locale to createQuizWorkflow', async () => {
-    const { createQuizWorkflow } = await import('@edusphere/langgraph-workflows');
+    const { createQuizWorkflow } =
+      await import('@edusphere/langgraph-workflows');
     mockCompiledInvoke.mockResolvedValueOnce({ questions: [], score: 0 });
     await runLangGraphQuiz('t', 'topic', {}, 'fr');
     expect(createQuizWorkflow).toHaveBeenCalledWith(undefined, 'fr');
@@ -426,7 +464,11 @@ describe('runLangGraphTutor()', () => {
       isComplete: true,
     });
 
-    const result = await runLangGraphTutor('thread-t1', 'What is integration?', {});
+    const result = await runLangGraphTutor(
+      'thread-t1',
+      'What is integration?',
+      {}
+    );
 
     expect(result.text).toBe('Integration is the reverse of differentiation.');
     expect(result.workflowResult).toMatchObject({
@@ -447,14 +489,20 @@ describe('runLangGraphTutor()', () => {
   it('passes content from context to the state', async () => {
     mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'ok' });
     await runLangGraphTutor('t', 'question', { content: 'lecture text' });
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(state['context']).toBe('lecture text');
   });
 
   it('defaults currentStep to "assess"', async () => {
     mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'ok' });
     await runLangGraphTutor('t', 'question', {});
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(state['currentStep']).toBe('assess');
   });
 
@@ -467,7 +515,8 @@ describe('runLangGraphTutor()', () => {
   });
 
   it('passes locale to createTutorWorkflow', async () => {
-    const { createTutorWorkflow } = await import('@edusphere/langgraph-workflows');
+    const { createTutorWorkflow } =
+      await import('@edusphere/langgraph-workflows');
     mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'ok' });
     await runLangGraphTutor('t', 'q', {}, 'he');
     expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'he');
@@ -492,9 +541,13 @@ describe('runLangGraphAssessment()', () => {
       isComplete: true,
     });
 
-    const result = await runLangGraphAssessment('thread-a1', 'What is gravity?', {
-      answer: 'It is a force',
-    });
+    const result = await runLangGraphAssessment(
+      'thread-a1',
+      'What is gravity?',
+      {
+        answer: 'It is a force',
+      }
+    );
 
     expect(result.text).toBe('Good answer, but lacks depth.');
     expect(result.workflowResult).toMatchObject({ isComplete: true });
@@ -507,31 +560,50 @@ describe('runLangGraphAssessment()', () => {
   });
 
   it('passes student answer from context to submission', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ overallAssessment: { summary: 'ok' } });
-    await runLangGraphAssessment('t', 'question text', { answer: 'student answer' });
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    mockCompiledInvoke.mockResolvedValueOnce({
+      overallAssessment: { summary: 'ok' },
+    });
+    await runLangGraphAssessment('t', 'question text', {
+      answer: 'student answer',
+    });
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     const submissions = state['submissions'] as Array<Record<string, unknown>>;
     expect(submissions[0]['studentAnswer']).toBe('student answer');
   });
 
   it('uses the message as the question in submission', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ overallAssessment: { summary: 'ok' } });
+    mockCompiledInvoke.mockResolvedValueOnce({
+      overallAssessment: { summary: 'ok' },
+    });
     await runLangGraphAssessment('t', 'Is the Earth round?', {});
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     const submissions = state['submissions'] as Array<Record<string, unknown>>;
     expect(submissions[0]['question']).toBe('Is the Earth round?');
   });
 
   it('initialises with an empty evaluations array', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ overallAssessment: { summary: 'ok' } });
+    mockCompiledInvoke.mockResolvedValueOnce({
+      overallAssessment: { summary: 'ok' },
+    });
     await runLangGraphAssessment('t', 'q', {});
-    const state = mockCompiledInvoke.mock.calls[0][0] as Record<string, unknown>;
+    const state = mockCompiledInvoke.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >;
     expect(Array.isArray(state['evaluations'])).toBe(true);
     expect((state['evaluations'] as unknown[]).length).toBe(0);
   });
 
   it('invokes compiled graph with correct thread_id', async () => {
-    mockCompiledInvoke.mockResolvedValueOnce({ overallAssessment: { summary: 'ok' } });
+    mockCompiledInvoke.mockResolvedValueOnce({
+      overallAssessment: { summary: 'ok' },
+    });
     await runLangGraphAssessment('assess-thread', 'q', {});
     expect(mockCompiledInvoke.mock.calls[0][1]).toEqual({
       configurable: { thread_id: 'assess-thread' },
@@ -539,8 +611,11 @@ describe('runLangGraphAssessment()', () => {
   });
 
   it('passes locale to createAssessmentWorkflow', async () => {
-    const { createAssessmentWorkflow } = await import('@edusphere/langgraph-workflows');
-    mockCompiledInvoke.mockResolvedValueOnce({ overallAssessment: { summary: 'ok' } });
+    const { createAssessmentWorkflow } =
+      await import('@edusphere/langgraph-workflows');
+    mockCompiledInvoke.mockResolvedValueOnce({
+      overallAssessment: { summary: 'ok' },
+    });
     await runLangGraphAssessment('t', 'q', {}, 'ar');
     expect(createAssessmentWorkflow).toHaveBeenCalledWith(undefined, 'ar');
   });
@@ -566,7 +641,7 @@ describe('langgraph.service.ts: structural requirements', () => {
   });
 
   it('defines MAX_MEMORY_SAVER_SESSIONS constant', () => {
-    expect(src).toContain('MAX_MEMORY_SAVER_SESSIONS');
+    expect(src).toContain('LANGGRAPH_MAX_MEMORY_SESSIONS');
   });
 
   it('defines CLEANUP_INTERVAL_MS constant', () => {

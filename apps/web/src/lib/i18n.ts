@@ -1,7 +1,12 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE, NAMESPACES, RTL_LOCALES } from '@edusphere/i18n';
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  NAMESPACES,
+  RTL_LOCALES,
+} from '@edusphere/i18n';
 
 // Custom backend: lazy-loads namespace JSONs via Vite's dynamic import()
 // Vite resolves these at build time via the workspace package
@@ -11,7 +16,7 @@ const ViteLocaleBackend = {
   async read(
     language: string,
     namespace: string,
-    callback: (err: unknown, data: unknown) => void,
+    callback: (err: unknown, data: unknown) => void
   ): Promise<void> {
     try {
       // Dynamic import resolved by Vite from @edusphere/i18n workspace package

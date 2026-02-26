@@ -133,26 +133,37 @@ docker exec edusphere-postgres psql -U postgres -d edusphere -c "
 ### 3.1 Shared Column Patterns
 
 **Primary Key Pattern**:
+
 ```typescript
 // Drizzle helper: packages/db/src/schema/_shared.ts
 export const pk = () => uuid('id').primaryKey().defaultRandom();
 ```
 
 **Tenant Isolation Pattern**:
+
 ```typescript
-export const tenantId = () => uuid('tenant_id').notNull().references(() => tenants.id);
+export const tenantId = () =>
+  uuid('tenant_id')
+    .notNull()
+    .references(() => tenants.id);
 ```
 
 **Timestamp Pattern**:
+
 ```typescript
 export const timestamps = () => ({
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow()
     .$onUpdate(() => new Date()),
 });
 ```
 
 **Soft Delete Pattern**:
+
 ```typescript
 export const softDelete = () => ({
   deleted_at: timestamp('deleted_at', { withTimezone: true }),
@@ -187,15 +198,21 @@ CREATE INDEX idx_tenants_plan ON tenants(plan);
 ```
 
 **Drizzle Schema** (`packages/db/src/schema/core.ts`):
+
 ```typescript
 export const tenants = pgTable('tenants', {
   id: pk(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
-  plan: text('plan', { enum: ['FREE', 'STARTER', 'PROFESSIONAL', 'ENTERPRISE'] })
-    .notNull().default('FREE'),
+  plan: text('plan', {
+    enum: ['FREE', 'STARTER', 'PROFESSIONAL', 'ENTERPRISE'],
+  })
+    .notNull()
+    .default('FREE'),
   settings: jsonb('settings').notNull().default({}),
-  subscription_expires_at: timestamp('subscription_expires_at', { withTimezone: true }),
+  subscription_expires_at: timestamp('subscription_expires_at', {
+    withTimezone: true,
+  }),
   ...timestamps(),
 });
 ```
@@ -235,22 +252,29 @@ CREATE INDEX idx_users_deleted_at ON users(deleted_at) WHERE deleted_at IS NOT N
 ```
 
 **Drizzle Schema**:
+
 ```typescript
-export const users = pgTable('users', {
-  id: pk(),
-  tenant_id: tenantId(),
-  email: text('email').notNull(),
-  display_name: text('display_name').notNull(),
-  role: text('role', {
-    enum: ['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER']
-  }).notNull().default('STUDENT'),
-  avatar_url: text('avatar_url'),
-  preferences: jsonb('preferences').notNull().default({}),
-  ...timestamps(),
-  ...softDelete(),
-}, (table) => ({
-  email_tenant_unique: unique().on(table.email, table.tenant_id),
-})).withRLS();
+export const users = pgTable(
+  'users',
+  {
+    id: pk(),
+    tenant_id: tenantId(),
+    email: text('email').notNull(),
+    display_name: text('display_name').notNull(),
+    role: text('role', {
+      enum: ['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER'],
+    })
+      .notNull()
+      .default('STUDENT'),
+    avatar_url: text('avatar_url'),
+    preferences: jsonb('preferences').notNull().default({}),
+    ...timestamps(),
+    ...softDelete(),
+  },
+  (table) => ({
+    email_tenant_unique: unique().on(table.email, table.tenant_id),
+  })
+).withRLS();
 ```
 
 ---
@@ -288,13 +312,16 @@ CREATE INDEX idx_courses_tags ON courses USING GIN(tags);
 ```
 
 **Drizzle Schema** (`packages/db/src/schema/content.ts`):
+
 ```typescript
 export const courses = pgTable('courses', {
   id: pk(),
   tenant_id: tenantId(),
   title: text('title').notNull(),
   description: text('description'),
-  creator_id: uuid('creator_id').notNull().references(() => users.id, { onDelete: 'set null' }),
+  creator_id: uuid('creator_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'set null' }),
   prerequisites: jsonb('prerequisites').notNull().default([]),
   is_public: boolean('is_public').notNull().default(false),
   tags: jsonb('tags').notNull().default([]),
@@ -332,18 +359,25 @@ CREATE INDEX idx_modules_course_id ON modules(course_id, order_index) WHERE dele
 ```
 
 **Drizzle Schema**:
+
 ```typescript
-export const modules = pgTable('modules', {
-  id: pk(),
-  course_id: uuid('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
-  title: text('title').notNull(),
-  description: text('description'),
-  order_index: integer('order_index').notNull().default(0),
-  ...timestamps(),
-  ...softDelete(),
-}, (table) => ({
-  course_order_unique: unique().on(table.course_id, table.order_index),
-})).withRLS();
+export const modules = pgTable(
+  'modules',
+  {
+    id: pk(),
+    course_id: uuid('course_id')
+      .notNull()
+      .references(() => courses.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    description: text('description'),
+    order_index: integer('order_index').notNull().default(0),
+    ...timestamps(),
+    ...softDelete(),
+  },
+  (table) => ({
+    course_order_unique: unique().on(table.course_id, table.order_index),
+  })
+).withRLS();
 ```
 
 ---
@@ -387,19 +421,28 @@ CREATE INDEX idx_media_assets_metadata ON media_assets USING GIN(metadata);
 ```
 
 **Drizzle Schema**:
+
 ```typescript
 export const media_assets = pgTable('media_assets', {
   id: pk(),
   tenant_id: tenantId(),
-  course_id: uuid('course_id').references(() => courses.id, { onDelete: 'cascade' }),
-  module_id: uuid('module_id').references(() => modules.id, { onDelete: 'cascade' }),
+  course_id: uuid('course_id').references(() => courses.id, {
+    onDelete: 'cascade',
+  }),
+  module_id: uuid('module_id').references(() => modules.id, {
+    onDelete: 'cascade',
+  }),
   title: text('title').notNull(),
-  media_type: text('media_type', { enum: ['VIDEO', 'AUDIO', 'DOCUMENT'] }).notNull(),
+  media_type: text('media_type', {
+    enum: ['VIDEO', 'AUDIO', 'DOCUMENT'],
+  }).notNull(),
   file_url: text('file_url').notNull(),
   duration: integer('duration'),
   transcription_status: text('transcription_status', {
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED']
-  }).notNull().default('PENDING'),
+    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'],
+  })
+    .notNull()
+    .default('PENDING'),
   metadata: jsonb('metadata').notNull().default({}),
   ...timestamps(),
   ...softDelete(),
@@ -432,16 +475,23 @@ CREATE INDEX idx_transcripts_full_text ON transcripts USING GIN(to_tsvector('eng
 ```
 
 **Drizzle Schema**:
+
 ```typescript
-export const transcripts = pgTable('transcripts', {
-  id: pk(),
-  asset_id: uuid('asset_id').notNull().references(() => media_assets.id, { onDelete: 'cascade' }),
-  language: text('language').notNull().default('en'),
-  full_text: text('full_text').notNull(),
-  ...timestamps(),
-}, (table) => ({
-  asset_language_unique: unique().on(table.asset_id, table.language),
-}));
+export const transcripts = pgTable(
+  'transcripts',
+  {
+    id: pk(),
+    asset_id: uuid('asset_id')
+      .notNull()
+      .references(() => media_assets.id, { onDelete: 'cascade' }),
+    language: text('language').notNull().default('en'),
+    full_text: text('full_text').notNull(),
+    ...timestamps(),
+  },
+  (table) => ({
+    asset_language_unique: unique().on(table.asset_id, table.language),
+  })
+);
 ```
 
 ---
@@ -475,19 +525,28 @@ CREATE INDEX idx_segments_text ON transcript_segments USING GIN(to_tsvector('eng
 ```
 
 **Drizzle Schema**:
+
 ```typescript
-export const transcript_segments = pgTable('transcript_segments', {
-  id: pk(),
-  transcript_id: uuid('transcript_id').notNull()
-    .references(() => transcripts.id, { onDelete: 'cascade' }),
-  start_time: numeric('start_time', { precision: 10, scale: 3 }).notNull(),
-  end_time: numeric('end_time', { precision: 10, scale: 3 }).notNull(),
-  text: text('text').notNull(),
-  speaker: text('speaker'),
-  ...timestamps(),
-}, (table) => ({
-  time_order: check('segments_time_order', sql`${table.end_time} > ${table.start_time}`),
-}));
+export const transcript_segments = pgTable(
+  'transcript_segments',
+  {
+    id: pk(),
+    transcript_id: uuid('transcript_id')
+      .notNull()
+      .references(() => transcripts.id, { onDelete: 'cascade' }),
+    start_time: numeric('start_time', { precision: 10, scale: 3 }).notNull(),
+    end_time: numeric('end_time', { precision: 10, scale: 3 }).notNull(),
+    text: text('text').notNull(),
+    speaker: text('speaker'),
+    ...timestamps(),
+  },
+  (table) => ({
+    time_order: check(
+      'segments_time_order',
+      sql`${table.end_time} > ${table.start_time}`
+    ),
+  })
+);
 ```
 
 ---
@@ -533,21 +592,30 @@ CREATE INDEX idx_annotations_spatial ON annotations USING GIN(spatial_data);
 ```
 
 **Drizzle Schema** (`packages/db/src/schema/annotation.ts`):
+
 ```typescript
 export const annotations = pgTable('annotations', {
   id: pk(),
   tenant_id: tenantId(),
-  asset_id: uuid('asset_id').notNull().references(() => media_assets.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  asset_id: uuid('asset_id')
+    .notNull()
+    .references(() => media_assets.id, { onDelete: 'cascade' }),
+  user_id: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   annotation_type: text('annotation_type', {
-    enum: ['TEXT', 'SKETCH', 'LINK', 'BOOKMARK', 'SPATIAL_COMMENT']
+    enum: ['TEXT', 'SKETCH', 'LINK', 'BOOKMARK', 'SPATIAL_COMMENT'],
   }).notNull(),
   layer: text('layer', {
-    enum: ['PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED']
-  }).notNull().default('PERSONAL'),
+    enum: ['PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED'],
+  })
+    .notNull()
+    .default('PERSONAL'),
   content: jsonb('content').notNull(),
   spatial_data: jsonb('spatial_data'),
-  parent_id: uuid('parent_id').references((): any => annotations.id, { onDelete: 'cascade' }),
+  parent_id: uuid('parent_id').references((): any => annotations.id, {
+    onDelete: 'cascade',
+  }),
   is_resolved: boolean('is_resolved').notNull().default(false),
   ...timestamps(),
   ...softDelete(),
@@ -587,20 +655,25 @@ CREATE INDEX idx_collab_docs_entity ON collab_documents(entity_type, entity_id);
 ```
 
 **Drizzle Schema** (`packages/db/src/schema/collaboration.ts`):
+
 ```typescript
-export const collab_documents = pgTable('collab_documents', {
-  id: pk(),
-  tenant_id: tenantId(),
-  entity_type: text('entity_type', {
-    enum: ['ANNOTATION', 'COURSE_NOTES', 'SHARED_CANVAS']
-  }).notNull(),
-  entity_id: uuid('entity_id').notNull(),
-  name: text('name').notNull(),
-  ydoc_snapshot: bytea('ydoc_snapshot'),
-  ...timestamps(),
-}, (table) => ({
-  entity_unique: unique().on(table.entity_type, table.entity_id),
-})).withRLS();
+export const collab_documents = pgTable(
+  'collab_documents',
+  {
+    id: pk(),
+    tenant_id: tenantId(),
+    entity_type: text('entity_type', {
+      enum: ['ANNOTATION', 'COURSE_NOTES', 'SHARED_CANVAS'],
+    }).notNull(),
+    entity_id: uuid('entity_id').notNull(),
+    name: text('name').notNull(),
+    ydoc_snapshot: bytea('ydoc_snapshot'),
+    ...timestamps(),
+  },
+  (table) => ({
+    entity_unique: unique().on(table.entity_type, table.entity_id),
+  })
+).withRLS();
 ```
 
 ---
@@ -623,13 +696,17 @@ CREATE INDEX idx_crdt_updates_document_id ON crdt_updates(document_id, created_a
 ```
 
 **Drizzle Schema**:
+
 ```typescript
 export const crdt_updates = pgTable('crdt_updates', {
   id: pk(),
-  document_id: uuid('document_id').notNull()
+  document_id: uuid('document_id')
+    .notNull()
     .references(() => collab_documents.id, { onDelete: 'cascade' }),
   update_data: bytea('update_data').notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 ```
 
@@ -659,15 +736,23 @@ CREATE INDEX idx_collab_sessions_last_active ON collab_sessions(last_active);
 ```
 
 **Drizzle Schema**:
+
 ```typescript
 export const collab_sessions = pgTable('collab_sessions', {
   id: pk(),
-  document_id: uuid('document_id').notNull()
+  document_id: uuid('document_id')
+    .notNull()
     .references(() => collab_documents.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   connection_id: text('connection_id').notNull().unique(),
-  last_active: timestamp('last_active', { withTimezone: true }).notNull().defaultNow(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  last_active: timestamp('last_active', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 ```
 
@@ -704,14 +789,24 @@ CREATE INDEX idx_agent_defs_template ON agent_definitions(template) WHERE is_act
 ```
 
 **Drizzle Schema** (`packages/db/src/schema/agent.ts`):
+
 ```typescript
 export const agent_definitions = pgTable('agent_definitions', {
   id: pk(),
   tenant_id: tenantId(),
-  creator_id: uuid('creator_id').notNull().references(() => users.id, { onDelete: 'set null' }),
+  creator_id: uuid('creator_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'set null' }),
   name: text('name').notNull(),
   template: text('template', {
-    enum: ['CHAVRUTA_DEBATE', 'SUMMARIZE', 'QUIZ_ASSESS', 'RESEARCH_SCOUT', 'EXPLAIN', 'CUSTOM']
+    enum: [
+      'CHAVRUTA_DEBATE',
+      'SUMMARIZE',
+      'QUIZ_ASSESS',
+      'RESEARCH_SCOUT',
+      'EXPLAIN',
+      'CUSTOM',
+    ],
   }).notNull(),
   config: jsonb('config').notNull().default({}),
   is_active: boolean('is_active').notNull().default(true),
@@ -755,17 +850,23 @@ CREATE INDEX idx_agent_exec_status ON agent_executions(status, started_at);
 ```
 
 **Drizzle Schema**:
+
 ```typescript
 export const agent_executions = pgTable('agent_executions', {
   id: pk(),
-  agent_id: uuid('agent_id').notNull()
+  agent_id: uuid('agent_id')
+    .notNull()
     .references(() => agent_definitions.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   input: jsonb('input').notNull(),
   output: jsonb('output'),
   status: text('status', {
-    enum: ['QUEUED', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED']
-  }).notNull().default('QUEUED'),
+    enum: ['QUEUED', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'],
+  })
+    .notNull()
+    .default('QUEUED'),
   started_at: timestamp('started_at', { withTimezone: true }),
   completed_at: timestamp('completed_at', { withTimezone: true }),
   metadata: jsonb('metadata').notNull().default({}),
@@ -799,15 +900,20 @@ CREATE INDEX idx_content_embeddings_hnsw ON content_embeddings
 ```
 
 **Drizzle Schema** (`packages/db/src/schema/embeddings.ts`):
+
 ```typescript
 import { vector } from 'drizzle-orm/pg-core';
 
 export const content_embeddings = pgTable('content_embeddings', {
   id: pk(),
-  segment_id: uuid('segment_id').notNull()
-    .references(() => transcript_segments.id, { onDelete: 'cascade' }).unique(),
+  segment_id: uuid('segment_id')
+    .notNull()
+    .references(() => transcript_segments.id, { onDelete: 'cascade' })
+    .unique(),
   embedding: vector('embedding', { dimensions: 768 }).notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 ```
 
@@ -837,13 +943,18 @@ CREATE INDEX idx_annotation_embeddings_hnsw ON annotation_embeddings
 ```
 
 **Drizzle Schema**:
+
 ```typescript
 export const annotation_embeddings = pgTable('annotation_embeddings', {
   id: pk(),
-  annotation_id: uuid('annotation_id').notNull()
-    .references(() => annotations.id, { onDelete: 'cascade' }).unique(),
+  annotation_id: uuid('annotation_id')
+    .notNull()
+    .references(() => annotations.id, { onDelete: 'cascade' })
+    .unique(),
   embedding: vector('embedding', { dimensions: 768 }).notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 ```
 
@@ -874,13 +985,16 @@ CREATE INDEX idx_concept_embeddings_hnsw ON concept_embeddings
 ```
 
 **Drizzle Schema**:
+
 ```typescript
 export const concept_embeddings = pgTable('concept_embeddings', {
   id: pk(),
   concept_id: uuid('concept_id').notNull().unique(),
   // Note: No FK to AGE graph — conceptually references ag_catalog vertex
   embedding: vector('embedding', { dimensions: 768 }).notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 ```
 
@@ -923,28 +1037,39 @@ CREATE INDEX ct_status_idx ON content_translations(translation_status);
 ```
 
 **Drizzle Schema** (`packages/db/src/schema/contentTranslations.ts`):
+
 ```typescript
-export const content_translations = pgTable('content_translations', {
-  id: pk(),
-  content_item_id: uuid('content_item_id').notNull(),
+export const content_translations = pgTable(
+  'content_translations',
+  {
+    id: pk(),
+    content_item_id: uuid('content_item_id').notNull(),
     // FK to content_items.id (application-level; no cross-schema FK constraint)
-  locale: text('locale').notNull(),
-  translated_title: text('translated_title'),
-  translated_description: text('translated_description'),
-  translated_summary: text('translated_summary'),
-  translated_transcript: text('translated_transcript'),
-  quality_score: numeric('quality_score', { precision: 3, scale: 2 }),
-  model_used: text('model_used').notNull().default('ollama/llama3.2'),
-  translation_status: text('translation_status', {
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED']
-  }).notNull().default('PENDING'),
-  ...timestamps(),
-}, (table) => ({
-  ct_item_locale_uq: unique('ct_item_locale_uq').on(table.content_item_id, table.locale),
-}));
+    locale: text('locale').notNull(),
+    translated_title: text('translated_title'),
+    translated_description: text('translated_description'),
+    translated_summary: text('translated_summary'),
+    translated_transcript: text('translated_transcript'),
+    quality_score: numeric('quality_score', { precision: 3, scale: 2 }),
+    model_used: text('model_used').notNull().default('ollama/llama3.2'),
+    translation_status: text('translation_status', {
+      enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'],
+    })
+      .notNull()
+      .default('PENDING'),
+    ...timestamps(),
+  },
+  (table) => ({
+    ct_item_locale_uq: unique('ct_item_locale_uq').on(
+      table.content_item_id,
+      table.locale
+    ),
+  })
+);
 ```
 
 **Notes:**
+
 - **Idempotent upsert**: concurrent `requestContentTranslation` calls for the same `(content_item_id, locale)` are safe — the unique constraint prevents duplicate rows.
 - **RLS**: Inherits tenant isolation via the `content_items` join. Translations are accessible only to users who have access to the source content item.
 - **Cache-first**: TranslationService checks for an existing COMPLETED record before publishing to NATS. Only PENDING/FAILED records trigger a new NATS event.
@@ -956,6 +1081,7 @@ export const content_translations = pgTable('content_translations', {
 ### 4.1 Index Strategy
 
 EduSphere uses a multi-layered index strategy optimized for:
+
 1. **Tenant isolation queries** (most common pattern)
 2. **Soft-delete filtering** (partial indexes exclude deleted records)
 3. **Full-text search** (GIN indexes on tsvector)
@@ -1020,6 +1146,7 @@ CREATE INDEX idx_segments_text ON transcript_segments
 ### 4.4 HNSW Indexes (Vector Similarity)
 
 **HNSW Parameters**:
+
 - `m = 16`: Max connections per layer (higher = better recall, larger index)
 - `ef_construction = 64`: Construction-time effort (higher = better quality, slower build)
 - **Distance metric**: Cosine similarity (`vector_cosine_ops`)
@@ -1042,6 +1169,7 @@ CREATE INDEX idx_concept_embeddings_hnsw ON concept_embeddings
 ```
 
 **Query Performance**:
+
 ```sql
 -- Semantic search query (target: <100ms p95)
 SELECT
@@ -1079,6 +1207,7 @@ CREATE INDEX idx_collab_sessions_document_id ON collab_sessions(document_id, las
 **Principle**: Database-level security as **primary** defense. GraphQL resolvers provide defense-in-depth.
 
 All user-facing tables have RLS enabled:
+
 ```sql
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE courses ENABLE ROW LEVEL SECURITY;
@@ -1104,7 +1233,9 @@ export async function withTenantContext<T>(
     // Set session variables for RLS policies
     await tx.execute(sql`SET LOCAL app.current_tenant = ${context.tenantId}`);
     await tx.execute(sql`SET LOCAL app.current_user_id = ${context.userId}`);
-    await tx.execute(sql`SET LOCAL app.current_user_role = ${context.userRole}`);
+    await tx.execute(
+      sql`SET LOCAL app.current_user_role = ${context.userRole}`
+    );
 
     return operation(tx);
   });
@@ -1220,6 +1351,7 @@ RESET ROLE;
 ### 5.5 RLS Testing
 
 **Test Isolation**:
+
 ```sql
 -- Set tenant A context
 SET app.current_tenant = 'tenant-a-uuid';
@@ -1236,6 +1368,7 @@ VALUES ('tenant-b-uuid', 'Hacked Course', 'user-a-uuid');
 ```
 
 **Integration Tests** (`packages/db/src/rls/__tests__/tenant-isolation.test.ts`):
+
 ```typescript
 describe('Tenant Isolation', () => {
   it('prevents cross-tenant data access', async () => {
@@ -1263,6 +1396,7 @@ describe('Tenant Isolation', () => {
 ### 6.1 Graph Overview
 
 The **EduSphere Knowledge Graph** uses Apache AGE to model domain knowledge as a property graph:
+
 - **Vertices**: Concepts, People, Terms, Sources, TopicClusters
 - **Edges**: Relationships between vertices (semantic, hierarchical, citation)
 
@@ -1275,6 +1409,7 @@ The **EduSphere Knowledge Graph** uses Apache AGE to model domain knowledge as a
 **Purpose**: Core knowledge concepts (e.g., "Divine Simplicity", "Maimonidean Ethics")
 
 **Properties**:
+
 ```typescript
 {
   id: UUID,              // Unique identifier (maps to concept_embeddings.concept_id)
@@ -1288,6 +1423,7 @@ The **EduSphere Knowledge Graph** uses Apache AGE to model domain knowledge as a
 ```
 
 **Cypher Creation**:
+
 ```cypher
 LOAD 'age';
 SET search_path = ag_catalog, "$user", public;
@@ -1313,6 +1449,7 @@ $$) AS (concept agtype);
 **Purpose**: Authors, scholars, historical figures (e.g., "Maimonides", "Aquinas")
 
 **Properties**:
+
 ```typescript
 {
   id: UUID,
@@ -1327,6 +1464,7 @@ $$) AS (concept agtype);
 ```
 
 **Cypher Creation**:
+
 ```cypher
 SELECT * FROM cypher('edusphere_graph', $$
   CREATE (p:Person {
@@ -1350,6 +1488,7 @@ $$) AS (person agtype);
 **Purpose**: Technical terms, jargon, Hebrew/Aramaic terms (e.g., "Tzimtzum", "Sefirot")
 
 **Properties**:
+
 ```typescript
 {
   id: UUID,
@@ -1369,6 +1508,7 @@ $$) AS (person agtype);
 **Purpose**: Primary sources, texts, books (e.g., "Guide for the Perplexed", "Summa Theologica")
 
 **Properties**:
+
 ```typescript
 {
   id: UUID,
@@ -1389,6 +1529,7 @@ $$) AS (person agtype);
 **Purpose**: High-level topic groupings for navigation (e.g., "Jewish Philosophy", "Medieval Scholasticism")
 
 **Properties**:
+
 ```typescript
 {
   id: UUID,
@@ -1409,6 +1550,7 @@ $$) AS (person agtype);
 **Purpose**: General semantic relationship between concepts.
 
 **Properties**:
+
 ```typescript
 {
   strength: float,       // 0.0 - 1.0 (relationship strength)
@@ -1418,6 +1560,7 @@ $$) AS (person agtype);
 ```
 
 **Cypher**:
+
 ```cypher
 SELECT * FROM cypher('edusphere_graph', $$
   MATCH (c1:Concept {id: 'concept-1-uuid'})
@@ -1438,6 +1581,7 @@ $$) AS (relation agtype);
 **Purpose**: Identifies conflicting viewpoints (key for Chavruta debate agent).
 
 **Properties**:
+
 ```typescript
 {
   description: string,   // Description of the contradiction
@@ -1447,6 +1591,7 @@ $$) AS (relation agtype);
 ```
 
 **Cypher**:
+
 ```cypher
 SELECT * FROM cypher('edusphere_graph', $$
   MATCH (c1:Concept {name: 'Divine Simplicity'})
@@ -1467,6 +1612,7 @@ $$) AS (contradiction agtype);
 **Purpose**: Prerequisite relationships for learning paths.
 
 **Properties**:
+
 ```typescript
 {
   necessity: string,     // 'REQUIRED' | 'RECOMMENDED' | 'OPTIONAL'
@@ -1475,6 +1621,7 @@ $$) AS (contradiction agtype);
 ```
 
 **Cypher**:
+
 ```cypher
 SELECT * FROM cypher('edusphere_graph', $$
   MATCH (prereq:Concept {name: 'Basic Logic'})
@@ -1494,6 +1641,7 @@ $$) AS (prerequisite agtype);
 **Purpose**: Links transcript segments to concepts mentioned in the content.
 
 **Properties**:
+
 ```typescript
 {
   segment_id: UUID,      // References transcript_segments.id
@@ -1510,6 +1658,7 @@ $$) AS (prerequisite agtype);
 **Purpose**: Source citation relationships.
 
 **Properties**:
+
 ```typescript
 {
   page_number: string,   // Optional page/section reference
@@ -1519,6 +1668,7 @@ $$) AS (prerequisite agtype);
 ```
 
 **Cypher**:
+
 ```cypher
 SELECT * FROM cypher('edusphere_graph', $$
   MATCH (c:Concept {name: 'Divine Simplicity'})
@@ -1539,9 +1689,10 @@ $$) AS (citation agtype);
 **Purpose**: Links sources to their authors.
 
 **Properties**:
+
 ```typescript
 {
-  created_at: timestamp
+  created_at: timestamp;
 }
 ```
 
@@ -1552,6 +1703,7 @@ $$) AS (citation agtype);
 **Purpose**: AI-inferred relationships (requires manual review).
 
 **Properties**:
+
 ```typescript
 {
   confidence: float,     // AI confidence score
@@ -1568,9 +1720,10 @@ $$) AS (citation agtype);
 **Purpose**: Terms referring to concepts.
 
 **Properties**:
+
 ```typescript
 {
-  created_at: timestamp
+  created_at: timestamp;
 }
 ```
 
@@ -1581,6 +1734,7 @@ $$) AS (citation agtype);
 **Purpose**: Concept derivation (e.g., "Kantian Ethics" derived from "Deontology").
 
 **Properties**:
+
 ```typescript
 {
   description: string,
@@ -1595,9 +1749,10 @@ $$) AS (citation agtype);
 **Purpose**: Concepts belonging to topic clusters.
 
 **Properties**:
+
 ```typescript
 {
-  created_at: timestamp
+  created_at: timestamp;
 }
 ```
 
@@ -1680,7 +1835,11 @@ export async function addVertex(
     CREATE (v:${label} ${props})
     RETURN v.id::text
   `;
-  const result = await executeCypher<{ id: string }>(db, 'edusphere_graph', query);
+  const result = await executeCypher<{ id: string }>(
+    db,
+    'edusphere_graph',
+    query
+  );
   return result[0].id;
 }
 
@@ -1714,7 +1873,10 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
   console.log('Graph ontology initialized with labels:', labels);
 
   // Create sample vertices for testing
-  await executeCypher(db, 'edusphere_graph', `
+  await executeCypher(
+    db,
+    'edusphere_graph',
+    `
     CREATE (c:Concept {
       id: gen_random_uuid()::text,
       tenant_id: 'default',
@@ -1724,7 +1886,8 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
       created_at: timestamp(),
       updated_at: timestamp()
     })
-  `);
+  `
+  );
 }
 ```
 
@@ -1742,6 +1905,7 @@ export async function initializeGraphOntology(db: DrizzleDB): Promise<void> {
 **Trigger**: After transcript segment creation, annotation creation, or concept creation.
 
 **Workflow**:
+
 ```typescript
 // Example: Generate embedding for transcript segment
 import { embed } from '@vercel/ai-sdk';
@@ -1763,11 +1927,13 @@ async function generateSegmentEmbedding(segmentId: string, text: string) {
 ### 7.3 HNSW Index Configuration
 
 **Parameters**:
+
 - `m = 16`: Moderate recall (~95%) with reasonable index size
 - `ef_construction = 64`: Good build quality without excessive construction time
 - **Distance metric**: Cosine similarity (`vector_cosine_ops`)
 
 **Query-time tuning** (`ef_search`):
+
 ```sql
 -- Higher ef_search = better recall, slower query
 SET hnsw.ef_search = 100; -- Default is 40
@@ -1815,14 +1981,20 @@ export async function semanticSearchSegments(
 const vectorResults = await semanticSearchSegments(db, queryEmbedding, 50);
 
 // 2. Extract mentioned concepts from top results
-const conceptIds = vectorResults.flatMap(r => extractConceptIds(r.segment_id));
+const conceptIds = vectorResults.flatMap((r) =>
+  extractConceptIds(r.segment_id)
+);
 
 // 3. Graph expansion (2-hop from concepts)
-const graphContext = await executeCypher(db, 'edusphere_graph', `
+const graphContext = await executeCypher(
+  db,
+  'edusphere_graph',
+  `
   MATCH (c:Concept)-[r:RELATED_TO*1..2]-(related:Concept)
   WHERE c.id IN ['${conceptIds.join("','")}']
   RETURN related.id, related.name, r[0].strength
-`);
+`
+);
 
 // 4. Re-rank by fusion score (vector similarity + graph centrality)
 const hybridResults = fuseResults(vectorResults, graphContext);
@@ -1835,16 +2007,19 @@ const hybridResults = fuseResults(vectorResults, graphContext);
 ### 8.1 Drizzle Migrations
 
 **Generate Migration**:
+
 ```bash
 pnpm --filter @edusphere/db exec drizzle-kit generate
 ```
 
 **Apply Migration**:
+
 ```bash
 pnpm --filter @edusphere/db exec drizzle-kit migrate
 ```
 
 **Migration File Structure** (`packages/db/migrations/`):
+
 ```
 migrations/
 ├── 0000_initial_schema.sql
@@ -1869,6 +2044,7 @@ migrations/
 **Idempotency**: Use `onConflictDoNothing()` or `onConflictDoUpdate()` for all inserts.
 
 **Seed Workflow**:
+
 ```bash
 # Run seed
 pnpm --filter @edusphere/db exec tsx src/seed.ts
@@ -1883,34 +2059,45 @@ docker exec edusphere-postgres psql -U postgres -d edusphere -c "
 ```
 
 **Example Seed**:
+
 ```typescript
 import { db } from './index';
 import { tenants, users, courses } from './schema';
 
 export async function seed() {
   // Default tenant
-  const [tenant] = await db.insert(tenants).values({
-    id: 'default-tenant-uuid',
-    name: 'EduSphere Demo',
-    slug: 'demo',
-    plan: 'PROFESSIONAL',
-  }).onConflictDoNothing().returning();
+  const [tenant] = await db
+    .insert(tenants)
+    .values({
+      id: 'default-tenant-uuid',
+      name: 'EduSphere Demo',
+      slug: 'demo',
+      plan: 'PROFESSIONAL',
+    })
+    .onConflictDoNothing()
+    .returning();
 
   // Admin user
-  await db.insert(users).values({
-    tenant_id: tenant.id,
-    email: 'admin@edusphere.dev',
-    display_name: 'Admin User',
-    role: 'ORG_ADMIN',
-  }).onConflictDoNothing();
+  await db
+    .insert(users)
+    .values({
+      tenant_id: tenant.id,
+      email: 'admin@edusphere.dev',
+      display_name: 'Admin User',
+      role: 'ORG_ADMIN',
+    })
+    .onConflictDoNothing();
 
   // Sample course
-  await db.insert(courses).values({
-    tenant_id: tenant.id,
-    title: 'Introduction to Jewish Philosophy',
-    creator_id: adminUser.id,
-    is_public: true,
-  }).onConflictDoNothing();
+  await db
+    .insert(courses)
+    .values({
+      tenant_id: tenant.id,
+      title: 'Introduction to Jewish Philosophy',
+      creator_id: adminUser.id,
+      is_public: true,
+    })
+    .onConflictDoNothing();
 }
 ```
 
@@ -1921,11 +2108,13 @@ export async function seed() {
 ### 9.1 Backup Strategy
 
 **Frequency**:
+
 - **Continuous**: PostgreSQL WAL archiving (point-in-time recovery)
 - **Daily**: Full database dump
 - **Weekly**: Full database dump + retention (4 weeks)
 
 **Backup Command** (pg_dump):
+
 ```bash
 # Full database backup
 docker exec edusphere-postgres pg_dump -U postgres -d edusphere \
@@ -1943,6 +2132,7 @@ docker exec edusphere-postgres pg_dump -U postgres -d edusphere \
 ### 9.2 Recovery Procedures
 
 **Full Restore**:
+
 ```bash
 # Restore from custom-format dump
 docker exec edusphere-postgres pg_restore -U postgres -d edusphere \
@@ -1950,6 +2140,7 @@ docker exec edusphere-postgres pg_restore -U postgres -d edusphere \
 ```
 
 **Point-in-Time Recovery (PITR)**:
+
 ```bash
 # Requires WAL archiving enabled in postgresql.conf
 # Restore to specific timestamp
@@ -1960,12 +2151,14 @@ recovery_target_time = '2026-02-17 14:30:00'
 ### 9.3 Disaster Recovery Testing
 
 **Quarterly DR Drill**:
+
 1. Restore production backup to staging
 2. Verify data integrity (row counts, foreign keys)
 3. Run smoke tests against restored database
 4. Document recovery time objective (RTO)
 
 **Acceptance Criteria**:
+
 - RTO: < 1 hour for full restore
 - RPO: < 5 minutes (via WAL archiving)
 
@@ -2221,6 +2414,7 @@ graph TB
 ### Common Queries
 
 **Get user with tenant**:
+
 ```sql
 SELECT u.*, t.name AS tenant_name
 FROM users u
@@ -2229,6 +2423,7 @@ WHERE u.id = 'user-uuid' AND u.deleted_at IS NULL;
 ```
 
 **Get course with modules**:
+
 ```sql
 SELECT c.*,
   json_agg(m.* ORDER BY m.order_index) AS modules
@@ -2239,6 +2434,7 @@ GROUP BY c.id;
 ```
 
 **Get transcript segments by time range**:
+
 ```sql
 SELECT * FROM transcript_segments
 WHERE transcript_id = 'transcript-uuid'
@@ -2248,6 +2444,7 @@ ORDER BY start_time;
 ```
 
 **Semantic search with context**:
+
 ```sql
 WITH vector_search AS (
   SELECT

@@ -18,12 +18,12 @@ This register documents all personal data breaches in accordance with GDPR Artic
 
 ## Severity Levels
 
-| Level | Definition | Examples |
-|-------|------------|----------|
-| **Critical** | Breach involving special category data, financial data, or large-scale exposure (>1,000 individuals); likely to result in high risk to individuals | Mass credential compromise; database with special category data exposed publicly |
-| **High** | Breach involving significant personal data exposure; risk to individuals likely but not certain; DPA notification threshold crossed | Tenant data exposed to another tenant; user PII accessible without authentication |
-| **Medium** | Limited personal data exposure; risk to individuals possible but low; DPA notification threshold may apply | Single user account compromised; small number of records inadvertently shared |
-| **Low** | Minimal personal data involved; risk to individuals unlikely; no DPA notification required | Accidental internal access log review; temporary misconfiguration with no data accessed |
+| Level        | Definition                                                                                                                                         | Examples                                                                                |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Critical** | Breach involving special category data, financial data, or large-scale exposure (>1,000 individuals); likely to result in high risk to individuals | Mass credential compromise; database with special category data exposed publicly        |
+| **High**     | Breach involving significant personal data exposure; risk to individuals likely but not certain; DPA notification threshold crossed                | Tenant data exposed to another tenant; user PII accessible without authentication       |
+| **Medium**   | Limited personal data exposure; risk to individuals possible but low; DPA notification threshold may apply                                         | Single user account compromised; small number of records inadvertently shared           |
+| **Low**      | Minimal personal data involved; risk to individuals unlikely; no DPA notification required                                                         | Accidental internal access log review; temporary misconfiguration with no data accessed |
 
 ---
 
@@ -34,6 +34,7 @@ This register documents all personal data breaches in accordance with GDPR Artic
 Notify the competent supervisory authority **within 72 hours** of becoming aware of a breach if the breach is likely to result in a risk to the rights and freedoms of natural persons.
 
 **Exceptions (no DPA notification required):**
+
 - The breach is unlikely to result in a risk to individuals (e.g., data was encrypted with AES-256-GCM and keys are not compromised)
 - Low severity breaches where affected data is pseudonymous and there is no realistic risk of harm
 
@@ -44,6 +45,7 @@ Notify the competent supervisory authority **within 72 hours** of becoming aware
 Notify affected data subjects **without undue delay** if the breach is likely to result in **high risk** to the rights and freedoms of natural persons.
 
 **Exceptions (no data subject notification required):**
+
 - Affected data was encrypted and the decryption key has not been compromised
 - Subsequent measures eliminate the high risk to data subjects
 - Notification would require disproportionate effort (use public communication instead)
@@ -52,9 +54,9 @@ Notify affected data subjects **without undue delay** if the breach is likely to
 
 ## Breach Register
 
-| Ref # | Date Discovered | Date Reported to DPO | Description | Data Subjects Affected | Categories of Data | Severity | Notified DPA? | DPA Notification Date | Users Notified? | Root Cause | Remediation | Status |
-|--------|-----------------|----------------------|-------------|----------------------|-------------------|----------|----------------|----------------------|----------------|-----------|-------------|--------|
-| BR-2026-001 | 2026-02-22 | 2026-02-22 | [TEMPLATE ENTRY] Hypothetical example: Misconfigured API endpoint temporarily exposed user profile data for Tenant A to authenticated users of Tenant B. No evidence of data exfiltration. Affected window: 2026-02-20 14:00 to 2026-02-22 09:00 UTC. | Up to 47 students (Tenant A) | Email addresses, course enrollment records | High | Pending | - | Pending | RLS policy gap: missing tenant_id check on /api/v1/users/search endpoint | (1) Endpoint patched with tenant_id filter; (2) Full RLS audit of all API endpoints initiated; (3) Affected users to be notified per Art.34 | Open |
+| Ref #       | Date Discovered | Date Reported to DPO | Description                                                                                                                                                                                                                                           | Data Subjects Affected       | Categories of Data                         | Severity | Notified DPA? | DPA Notification Date | Users Notified? | Root Cause                                                               | Remediation                                                                                                                                 | Status |
+| ----------- | --------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------ | -------- | ------------- | --------------------- | --------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| BR-2026-001 | 2026-02-22      | 2026-02-22           | [TEMPLATE ENTRY] Hypothetical example: Misconfigured API endpoint temporarily exposed user profile data for Tenant A to authenticated users of Tenant B. No evidence of data exfiltration. Affected window: 2026-02-20 14:00 to 2026-02-22 09:00 UTC. | Up to 47 students (Tenant A) | Email addresses, course enrollment records | High     | Pending       | -                     | Pending         | RLS policy gap: missing tenant_id check on /api/v1/users/search endpoint | (1) Endpoint patched with tenant_id filter; (2) Full RLS audit of all API endpoints initiated; (3) Affected users to be notified per Art.34 | Open   |
 
 ---
 
@@ -128,13 +130,13 @@ This register must be reviewed annually by the DPO to:
 
 ## Supervisory Authority Contact Details
 
-| Jurisdiction | Authority | Contact |
-|-------------|-----------|--------|
-| Ireland (lead SA for EU operations) | Data Protection Commission (DPC) | www.dataprotection.ie / +353 57 868 4800 |
-| UK | Information Commissioner Office (ICO) | ico.org.uk / 0303 123 1113 |
-| Germany | Relevant Landesbehoerde (per state) | bfdi.bund.de |
-| France | CNIL | cnil.fr |
+| Jurisdiction                        | Authority                             | Contact                                  |
+| ----------------------------------- | ------------------------------------- | ---------------------------------------- |
+| Ireland (lead SA for EU operations) | Data Protection Commission (DPC)      | www.dataprotection.ie / +353 57 868 4800 |
+| UK                                  | Information Commissioner Office (ICO) | ico.org.uk / 0303 123 1113               |
+| Germany                             | Relevant Landesbehoerde (per state)   | bfdi.bund.de                             |
+| France                              | CNIL                                  | cnil.fr                                  |
 
 ---
 
-*EduSphere Breach Register v1.0 - 2026-02-22 - Owner: dpo@edusphere.dev - Review: Annual*
+_EduSphere Breach Register v1.0 - 2026-02-22 - Owner: dpo@edusphere.dev - Review: Annual_

@@ -127,14 +127,14 @@ External entity stubs
 """
 type User @join__type(graph: AGENT, key: "id")  @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: CORE, key: "id")  {
   id: ID!
-  email: String! @join__field(graph: CORE) 
-  firstName: String! @join__field(graph: CORE) 
-  lastName: String! @join__field(graph: CORE) 
-  role: UserRole! @join__field(graph: CORE) 
-  tenantId: ID! @join__field(graph: CORE) 
-  createdAt: DateTime! @join__field(graph: CORE) 
-  updatedAt: DateTime! @join__field(graph: CORE) 
-  preferences: UserPreferences @join__field(graph: CORE) 
+  email: String! @join__field(graph: CORE)
+  firstName: String! @join__field(graph: CORE)
+  lastName: String! @join__field(graph: CORE)
+  role: UserRole! @join__field(graph: CORE)
+  tenantId: ID! @join__field(graph: CORE)
+  preferences: UserPreferences! @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+  updatedAt: DateTime! @join__field(graph: CORE)
 }
 
 type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
@@ -198,15 +198,52 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   myEnrollments: [UserCourse!]! @join__field(graph: CONTENT)  @authenticated
   myCourseProgress(courseId: ID!) : CourseProgress! @join__field(graph: CONTENT)  @authenticated
   getPresignedUploadUrl(fileName: String!, contentType: String!, courseId: ID!) : PresignedUploadUrl! @join__field(graph: CONTENT)  @authenticated
-  module(id: ID!) : Module @join__field(graph: CONTENT) 
-  modulesByCourse(courseId: ID!) : [Module!]! @join__field(graph: CONTENT) 
-  tenant(id: ID!) : Tenant @join__field(graph: CORE) 
+  module(id: ID!) : Module @join__field(graph: CONTENT)
+  modulesByCourse(courseId: ID!) : [Module!]! @join__field(graph: CONTENT)
+  """
+  Returns the next unviewed MICROLESSON for the authenticated user today.
+  """
+  dailyMicrolesson: ContentItem @join__field(graph: CONTENT)  @authenticated
+  """
+  Lists all microlearning paths for the authenticated user's tenant.
+  """
+  microlearningPaths: [MicrolearningPath!]! @join__field(graph: CONTENT)  @authenticated
+  tenant(id: ID!) : Tenant @join__field(graph: CORE)
   tenants(limit: Int = 10, offset: Int = 0) : [Tenant!]! @join__field(graph: CORE) 
   user(id: ID!) : User @join__field(graph: CORE) 
   users(limit: Int = 10, offset: Int = 0) : [User!]! @join__field(graph: CORE) 
-  me: User @join__field(graph: CORE) 
+  me: User @join__field(graph: CORE)
   myStats: UserStats! @join__field(graph: CORE)  @authenticated
-  embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE) 
+  adminOverview: AdminOverview! @join__field(graph: CORE)  @authenticated
+  adminAnnouncements(limit: Int = 20, offset: Int = 0) : AnnouncementResult! @join__field(graph: CORE)  @authenticated
+  activeAnnouncements: [Announcement!]! @join__field(graph: CORE)  @authenticated
+  adminAuditLog(limit: Int = 50, offset: Int = 0, action: String, userId: ID, since: String, until: String) : AuditLogResult! @join__field(graph: CORE)  @authenticated
+  roles: [Role!]! @join__field(graph: CORE)  @authenticated
+  role(id: ID!) : Role @join__field(graph: CORE)  @authenticated
+  userDelegations(userId: ID!) : [RoleDelegation!]! @join__field(graph: CORE)  @authenticated
+  mySecuritySettings: SecuritySettings! @join__field(graph: CORE)  @authenticated
+  adminUsers(limit: Int = 50, offset: Int = 0, search: String, role: UserRole) : AdminUsersResult! @join__field(graph: CORE)  @authenticated
+  publicProfile(userId: ID!) : PublicProfile @join__field(graph: CORE)
+  myTenantBranding: TenantBranding! @join__field(graph: CORE)  @authenticated
+  myTenantLanguageSettings: TenantLanguageSettings! @join__field(graph: CORE)  @authenticated
+  myBadges: [UserBadge!]! @join__field(graph: CORE)  @authenticated
+  leaderboard(limit: Int) : [LeaderboardEntry!]! @join__field(graph: CORE)  @authenticated
+  myRank: Int! @join__field(graph: CORE)  @authenticated
+  myTotalPoints: Int! @join__field(graph: CORE)  @authenticated
+  adminBadges: [Badge!]! @join__field(graph: CORE)  @authenticated
+  myOpenBadges: [OpenBadgeAssertion!]! @join__field(graph: CORE)  @authenticated
+  verifyOpenBadge(assertionId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  dueReviews(limit: Int) : [SRSCard!]! @join__field(graph: CORE)  @authenticated
+  srsQueueCount: Int! @join__field(graph: CORE)  @authenticated
+  scimTokens: [ScimToken!]! @join__field(graph: CORE)  @authenticated
+  scimSyncLog(limit: Int) : [ScimSyncEntry!]! @join__field(graph: CORE)  @authenticated
+  crmConnection: CrmConnection @join__field(graph: CORE)  @authenticated
+  crmSyncLog(limit: Int) : [CrmSyncLogEntry!]! @join__field(graph: CORE)  @authenticated
+  myPortal: PortalPage @join__field(graph: CORE)  @authenticated
+  publicPortal: PortalPage @join__field(graph: CORE)
+  myFollowers(limit: Int) : [ID!]! @join__field(graph: CORE)  @authenticated
+  myFollowing(limit: Int) : [ID!]! @join__field(graph: CORE)  @authenticated
+  embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE)
   embeddingsByContentItem(contentItemId: ID!) : [Embedding!]! @join__field(graph: KNOWLEDGE) 
   semanticSearch(query: [Float!]!, limit: Int = 10, minSimilarity: Float = 0.7) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
   semanticSearchByContentItem(contentItemId: ID!, query: [Float!]!, limit: Int = 5) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
@@ -287,7 +324,40 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   reorderModules(courseId: ID!, moduleIds: [ID!]!) : [Module!]! @join__field(graph: CONTENT)  @authenticated
   createUser(input: CreateUserInput!) : User! @join__field(graph: CORE)  @authenticated
   updateUser(id: ID!, input: UpdateUserInput!) : User! @join__field(graph: CORE)  @authenticated
+  createAnnouncement(input: CreateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
+  updateAnnouncement(id: ID!, input: UpdateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
+  deleteAnnouncement(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  publishAnnouncement(id: ID!) : Announcement! @join__field(graph: CORE)  @authenticated
+  createRole(input: CreateRoleInput!) : Role! @join__field(graph: CORE)  @authenticated
+  updateRole(id: ID!, input: UpdateRoleInput!) : Role! @join__field(graph: CORE)  @authenticated
+  deleteRole(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  delegateRole(userId: ID!, roleId: ID!, validUntil: String) : RoleDelegation! @join__field(graph: CORE)  @authenticated
+  revokeDelegation(delegationId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  updateSecuritySettings(input: UpdateSecuritySettingsInput!) : SecuritySettings! @join__field(graph: CORE)  @authenticated
   updateUserPreferences(input: UpdateUserPreferencesInput!) : User! @join__field(graph: CORE)  @authenticated
+  updateProfileVisibility(isPublic: Boolean!) : UserPreferences! @join__field(graph: CORE)  @authenticated
+  deactivateUser(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  resetUserPassword(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  bulkImportUsers(csvData: String!) : BulkImportResult! @join__field(graph: CORE)  @authenticated
+  updateTenantBranding(input: UpdateTenantBrandingInput!) : TenantBranding! @join__field(graph: CORE)  @authenticated
+  updateTenantLanguageSettings(input: UpdateTenantLanguageSettingsInput!) : TenantLanguageSettings! @join__field(graph: CORE)  @authenticated
+  createBadge(input: CreateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
+  updateBadge(id: ID!, input: UpdateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
+  deleteBadge(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  issueBadge(badgeDefinitionId: ID!, recipientId: ID!, evidenceUrl: String) : OpenBadgeAssertion! @join__field(graph: CORE)  @authenticated
+  revokeOpenBadge(assertionId: ID!, reason: String!) : Boolean! @join__field(graph: CORE)  @authenticated
+  submitReview(cardId: ID!, quality: Int!) : SRSCard! @join__field(graph: CORE)  @authenticated
+  createReviewCard(conceptName: String!) : SRSCard! @join__field(graph: CORE)  @authenticated
+  generateScimToken(input: GenerateScimTokenInput!) : GenerateScimTokenResult! @join__field(graph: CORE)  @authenticated
+  revokeScimToken(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  followUser(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  unfollowUser(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  disconnectCrm: Boolean! @join__field(graph: CORE)  @authenticated
+  savePortalLayout(title: String!, blocksJson: String!) : PortalPage! @join__field(graph: CORE)  @authenticated
+  publishPortal: Boolean! @join__field(graph: CORE)  @authenticated
+  unpublishPortal: Boolean! @join__field(graph: CORE)  @authenticated
+  exportAuditLog(fromDate: String!, toDate: String!, format: AuditExportFormat!) : AuditExportResult! @join__field(graph: CORE)  @authenticated
+  scheduleGdprErasure(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
   createEmbedding(input: CreateEmbeddingInput!) : Embedding! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbedding(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbeddingsByContentItem(contentItemId: ID!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated
@@ -330,7 +400,11 @@ type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @jo
   """
   Real-time user status updates
   """
-  userStatusChanged(userId: ID!) : UserStatus! @join__field(graph: CORE) 
+  userStatusChanged(userId: ID!) : UserStatus! @join__field(graph: CORE)
+  """
+  Real-time notification stream for a user
+  """
+  notificationReceived(userId: ID!) : Notification! @join__field(graph: CORE)
 }
 
 type AgentExecution @join__type(graph: AGENT, key: "id")  {
@@ -374,15 +448,27 @@ type Annotation @join__type(graph: ANNOTATION, key: "id")  {
 
 type ContentItem @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
   id: ID!
-  moduleId: ID! @join__field(graph: CONTENT) 
-  title: String! @join__field(graph: CONTENT) 
-  contentType: String! @join__field(graph: CONTENT) 
-  content: String @join__field(graph: CONTENT) 
-  fileId: ID @join__field(graph: CONTENT) 
-  duration: Int @join__field(graph: CONTENT) 
-  orderIndex: Int! @join__field(graph: CONTENT) 
-  createdAt: String! @join__field(graph: CONTENT) 
-  updatedAt: String! @join__field(graph: CONTENT) 
+  moduleId: ID! @join__field(graph: CONTENT)
+  title: String! @join__field(graph: CONTENT)
+  contentType: String! @join__field(graph: CONTENT)
+  content: String @join__field(graph: CONTENT)
+  fileId: ID @join__field(graph: CONTENT)
+  duration: Int @join__field(graph: CONTENT)
+  orderIndex: Int! @join__field(graph: CONTENT)
+  createdAt: String! @join__field(graph: CONTENT)
+  updatedAt: String! @join__field(graph: CONTENT)
+}
+
+"""
+An ordered collection of MICROLESSON content items forming a learning path.
+"""
+type MicrolearningPath @join__type(graph: CONTENT)  {
+  id: ID! @join__field(graph: CONTENT)
+  title: String! @join__field(graph: CONTENT)
+  topicClusterId: ID @join__field(graph: CONTENT)
+  contentItemIds: [ID!]! @join__field(graph: CONTENT)
+  itemCount: Int! @join__field(graph: CONTENT)
+  createdAt: String! @join__field(graph: CONTENT)
 }
 
 """
@@ -513,11 +599,86 @@ type UserStatus @join__type(graph: CORE)  {
   lastSeen: DateTime!
 }
 
-type UserPreferences @join__type(graph: CORE)  {
-  locale: String!
-  theme: String!
-  emailNotifications: Boolean!
-  pushNotifications: Boolean!
+type AdminOverview @join__type(graph: CORE)  {
+  totalUsers: Int! @join__field(graph: CORE)
+  activeUsersThisMonth: Int! @join__field(graph: CORE)
+  totalCourses: Int! @join__field(graph: CORE)
+  completionsThisMonth: Int! @join__field(graph: CORE)
+  atRiskCount: Int! @join__field(graph: CORE)
+  lastScimSync: String @join__field(graph: CORE)
+  lastComplianceReport: String @join__field(graph: CORE)
+  storageUsedMb: Float! @join__field(graph: CORE)
+}
+
+type Announcement @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  body: String! @join__field(graph: CORE)
+  priority: String! @join__field(graph: CORE)
+  targetAudience: String! @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  publishAt: String @join__field(graph: CORE)
+  expiresAt: String @join__field(graph: CORE)
+  createdBy: ID @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type AnnouncementResult @join__type(graph: CORE)  {
+  announcements: [Announcement!]! @join__field(graph: CORE)
+  total: Int! @join__field(graph: CORE)
+}
+
+type AuditLogEntry @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  tenantId: ID! @join__field(graph: CORE)
+  userId: ID @join__field(graph: CORE)
+  action: String! @join__field(graph: CORE)
+  resourceType: String @join__field(graph: CORE)
+  resourceId: ID @join__field(graph: CORE)
+  status: String! @join__field(graph: CORE)
+  ipAddress: String @join__field(graph: CORE)
+  requestId: String @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+  metadata: String @join__field(graph: CORE)
+}
+
+type AuditLogResult @join__type(graph: CORE)  {
+  entries: [AuditLogEntry!]! @join__field(graph: CORE)
+  total: Int! @join__field(graph: CORE)
+}
+
+type Role @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  tenantId: ID! @join__field(graph: CORE)
+  name: String! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  permissions: [String!]! @join__field(graph: CORE)
+  isSystem: Boolean! @join__field(graph: CORE)
+  userCount: Int! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+  updatedAt: String! @join__field(graph: CORE)
+}
+
+type RoleDelegation @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  userId: ID! @join__field(graph: CORE)
+  roleId: ID! @join__field(graph: CORE)
+  delegatedBy: ID! @join__field(graph: CORE)
+  validUntil: String @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type SecuritySettings @join__type(graph: CORE)  {
+  mfaRequired: Boolean! @join__field(graph: CORE)
+  mfaRequiredForAdmins: Boolean! @join__field(graph: CORE)
+  sessionTimeoutMinutes: Int! @join__field(graph: CORE)
+  maxConcurrentSessions: Int! @join__field(graph: CORE)
+  loginAttemptLockoutThreshold: Int! @join__field(graph: CORE)
+  passwordMinLength: Int! @join__field(graph: CORE)
+  passwordRequireSpecialChars: Boolean! @join__field(graph: CORE)
+  passwordExpiryDays: Int @join__field(graph: CORE)
+  ipAllowlist: [String!]! @join__field(graph: CORE)
 }
 
 type Embedding @join__type(graph: KNOWLEDGE, key: "id")  {
@@ -809,11 +970,47 @@ input UpdateUserInput @join__type(graph: CORE)  {
   role: UserRole
 }
 
-input UpdateUserPreferencesInput @join__type(graph: CORE)  {
-  locale: String
-  theme: String
-  emailNotifications: Boolean
-  pushNotifications: Boolean
+input CreateAnnouncementInput @join__type(graph: CORE)  {
+  title: String!
+  body: String!
+  priority: String!
+  targetAudience: String!
+  publishAt: String
+  expiresAt: String
+}
+
+input UpdateAnnouncementInput @join__type(graph: CORE)  {
+  title: String
+  body: String
+  priority: String
+  targetAudience: String
+  isActive: Boolean
+  publishAt: String
+  expiresAt: String
+}
+
+input CreateRoleInput @join__type(graph: CORE)  {
+  name: String!
+  description: String
+  permissions: [String!]!
+}
+
+input UpdateRoleInput @join__type(graph: CORE)  {
+  name: String
+  description: String
+  permissions: [String!]
+}
+
+input UpdateSecuritySettingsInput @join__type(graph: CORE)  {
+  mfaRequired: Boolean
+  mfaRequiredForAdmins: Boolean
+  sessionTimeoutMinutes: Int
+  maxConcurrentSessions: Int
+  loginAttemptLockoutThreshold: Int
+  passwordMinLength: Int
+  passwordRequireSpecialChars: Boolean
+  passwordExpiryDays: Int
+  ipAllowlist: [String!]
 }
 
 input CreateEmbeddingInput @join__type(graph: KNOWLEDGE)  {
@@ -855,4 +1052,282 @@ input CreateTopicClusterInput @join__type(graph: KNOWLEDGE)  {
   name: String!
   description: String
 }
-    
+
+# ── User extended types (user.graphql) ────────────────────────────────────────
+
+type UserPreferences @join__type(graph: CORE)  {
+  locale: String! @join__field(graph: CORE)
+  theme: String! @join__field(graph: CORE)
+  emailNotifications: Boolean! @join__field(graph: CORE)
+  pushNotifications: Boolean! @join__field(graph: CORE)
+  isPublicProfile: Boolean! @join__field(graph: CORE)
+}
+
+type PublicCourse @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  completedAt: DateTime! @join__field(graph: CORE)
+}
+
+type PublicProfile @join__type(graph: CORE)  {
+  userId: ID! @join__field(graph: CORE)
+  displayName: String! @join__field(graph: CORE)
+  bio: String @join__field(graph: CORE)
+  avatarUrl: String @join__field(graph: CORE)
+  joinedAt: DateTime! @join__field(graph: CORE)
+  currentStreak: Int! @join__field(graph: CORE)
+  longestStreak: Int! @join__field(graph: CORE)
+  completedCoursesCount: Int! @join__field(graph: CORE)
+  completedCourses: [PublicCourse!]! @join__field(graph: CORE)
+  badgesCount: Int! @join__field(graph: CORE)
+  conceptsMastered: Int! @join__field(graph: CORE)
+  totalLearningMinutes: Int! @join__field(graph: CORE)
+}
+
+type BulkImportResult @join__type(graph: CORE)  {
+  created: Int! @join__field(graph: CORE)
+  updated: Int! @join__field(graph: CORE)
+  failed: Int! @join__field(graph: CORE)
+  errors: [String!]! @join__field(graph: CORE)
+}
+
+type AdminUsersResult @join__type(graph: CORE)  {
+  users: [User!]! @join__field(graph: CORE)
+  total: Int! @join__field(graph: CORE)
+}
+
+input UpdateUserPreferencesInput @join__type(graph: CORE)  {
+  locale: String
+  theme: String
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+}
+
+# ── Gamification + Open Badges 3.0 (gamification.graphql) ────────────────────
+
+type Badge @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  name: String! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  iconEmoji: String! @join__field(graph: CORE)
+  category: String! @join__field(graph: CORE)
+  pointsReward: Int! @join__field(graph: CORE)
+  conditionType: String! @join__field(graph: CORE)
+  conditionValue: Int! @join__field(graph: CORE)
+}
+
+type UserBadge @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  badge: Badge! @join__field(graph: CORE)
+  earnedAt: DateTime! @join__field(graph: CORE)
+}
+
+type LeaderboardEntry @join__type(graph: CORE)  {
+  rank: Int! @join__field(graph: CORE)
+  userId: ID! @join__field(graph: CORE)
+  displayName: String! @join__field(graph: CORE)
+  totalPoints: Int! @join__field(graph: CORE)
+  badgeCount: Int! @join__field(graph: CORE)
+}
+
+type OpenBadgeDefinition @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  name: String! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  imageUrl: String @join__field(graph: CORE)
+  criteriaUrl: String @join__field(graph: CORE)
+  tags: [String!]! @join__field(graph: CORE)
+  issuerId: String! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type OpenBadgeAssertion @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  badgeDefinitionId: ID! @join__field(graph: CORE)
+  recipientId: ID! @join__field(graph: CORE)
+  issuedAt: String! @join__field(graph: CORE)
+  expiresAt: String @join__field(graph: CORE)
+  evidenceUrl: String @join__field(graph: CORE)
+  revoked: Boolean! @join__field(graph: CORE)
+  revokedAt: String @join__field(graph: CORE)
+  revokedReason: String @join__field(graph: CORE)
+  definition: OpenBadgeDefinition! @join__field(graph: CORE)
+  vcDocument: String! @join__field(graph: CORE)
+}
+
+input CreateBadgeInput @join__type(graph: CORE)  {
+  name: String!
+  description: String!
+  iconEmoji: String!
+  category: String!
+  pointsReward: Int!
+  conditionType: String!
+  conditionValue: Int!
+}
+
+input UpdateBadgeInput @join__type(graph: CORE)  {
+  name: String
+  description: String
+  iconEmoji: String
+  category: String
+  pointsReward: Int
+  conditionType: String
+  conditionValue: Int
+}
+
+# ── SRS / Spaced-Repetition (srs.graphql) ─────────────────────────────────────
+
+type SRSCard @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  conceptName: String! @join__field(graph: CORE)
+  dueDate: DateTime! @join__field(graph: CORE)
+  intervalDays: Int! @join__field(graph: CORE)
+  easeFactor: Float! @join__field(graph: CORE)
+  repetitions: Int! @join__field(graph: CORE)
+  lastReviewedAt: DateTime @join__field(graph: CORE)
+}
+
+# ── Tenant branding & language (tenant.graphql) ───────────────────────────────
+
+type TenantLanguageSettings @join__type(graph: CORE)  {
+  supportedLanguages: [String!]! @join__field(graph: CORE)
+  defaultLanguage: String! @join__field(graph: CORE)
+}
+
+type TenantBranding @join__type(graph: CORE)  {
+  logoUrl: String! @join__field(graph: CORE)
+  logoMarkUrl: String @join__field(graph: CORE)
+  faviconUrl: String! @join__field(graph: CORE)
+  primaryColor: String! @join__field(graph: CORE)
+  secondaryColor: String! @join__field(graph: CORE)
+  accentColor: String! @join__field(graph: CORE)
+  backgroundColor: String! @join__field(graph: CORE)
+  fontFamily: String! @join__field(graph: CORE)
+  organizationName: String! @join__field(graph: CORE)
+  tagline: String @join__field(graph: CORE)
+  privacyPolicyUrl: String @join__field(graph: CORE)
+  termsOfServiceUrl: String @join__field(graph: CORE)
+  supportEmail: String @join__field(graph: CORE)
+  hideEduSphereBranding: Boolean! @join__field(graph: CORE)
+}
+
+input UpdateTenantBrandingInput @join__type(graph: CORE)  {
+  logoUrl: String
+  logoMarkUrl: String
+  faviconUrl: String
+  primaryColor: String
+  secondaryColor: String
+  accentColor: String
+  backgroundColor: String
+  fontFamily: String
+  organizationName: String
+  tagline: String
+  privacyPolicyUrl: String
+  termsOfServiceUrl: String
+  supportEmail: String
+  hideEduSphereBranding: Boolean
+}
+
+input UpdateTenantLanguageSettingsInput @join__type(graph: CORE)  {
+  supportedLanguages: [String!]!
+  defaultLanguage: String!
+}
+
+# ── SCIM provisioning (scim.graphql) ─────────────────────────────────────────
+
+type ScimToken @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  lastUsedAt: DateTime @join__field(graph: CORE)
+  expiresAt: DateTime @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+}
+
+type ScimSyncEntry @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  operation: String! @join__field(graph: CORE)
+  externalId: String @join__field(graph: CORE)
+  status: String! @join__field(graph: CORE)
+  errorMessage: String @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+}
+
+type GenerateScimTokenResult @join__type(graph: CORE)  {
+  token: ScimToken! @join__field(graph: CORE)
+  rawToken: String! @join__field(graph: CORE)
+}
+
+input GenerateScimTokenInput @join__type(graph: CORE)  {
+  description: String!
+  expiresInDays: Int
+}
+
+# ── CRM integration (crm.graphql) ─────────────────────────────────────────────
+
+type CrmConnection @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  provider: String! @join__field(graph: CORE)
+  instanceUrl: String! @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type CrmSyncLogEntry @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  operation: String! @join__field(graph: CORE)
+  externalId: String @join__field(graph: CORE)
+  status: String! @join__field(graph: CORE)
+  errorMessage: String @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+# ── Portal builder (portal.graphql) ───────────────────────────────────────────
+
+type PortalBlock @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  type: String! @join__field(graph: CORE)
+  order: Int! @join__field(graph: CORE)
+  config: String! @join__field(graph: CORE)
+}
+
+type PortalPage @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  published: Boolean! @join__field(graph: CORE)
+  blocks: [PortalBlock!]! @join__field(graph: CORE)
+  updatedAt: String! @join__field(graph: CORE)
+}
+
+# ── Audit export (audit.graphql) ──────────────────────────────────────────────
+
+enum AuditExportFormat @join__type(graph: CORE)  {
+  CSV @join__enumValue(graph: CORE)
+  JSON @join__enumValue(graph: CORE)
+}
+
+type AuditExportResult @join__type(graph: CORE)  {
+  presignedUrl: String! @join__field(graph: CORE)
+  expiresAt: String! @join__field(graph: CORE)
+  recordCount: Int! @join__field(graph: CORE)
+}
+
+# ── Notifications (notifications.graphql) ─────────────────────────────────────
+
+type Notification @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  type: NotificationType! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  body: String! @join__field(graph: CORE)
+  payload: JSON @join__field(graph: CORE)
+  readAt: DateTime @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+}
+
+enum NotificationType @join__type(graph: CORE)  {
+  BADGE_ISSUED @join__enumValue(graph: CORE)
+  COURSE_ENROLLED @join__enumValue(graph: CORE)
+  USER_FOLLOWED @join__enumValue(graph: CORE)
+  SRS_REVIEW_DUE @join__enumValue(graph: CORE)
+  ANNOUNCEMENT @join__enumValue(graph: CORE)
+}

@@ -3,7 +3,7 @@
 # Local development with hot reload
 # ═══════════════════════════════════════════════════════════════
 
-version: '3.9'
+version: "3.9"
 
 services:
   # ═══════════════════════════════════════════════════════════════
@@ -32,6 +32,59 @@ services:
       retries: 5
     mem_limit: 2g
     mem_reservation: 512m
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
+  # PgBouncer — Connection Pooler (Port 5433 → PostgreSQL 5432)
+  #
+  # Pool mode: transaction — each client statement borrows a server
+  # connection from the pool and releases it immediately after the
+  # transaction completes. This is safe for Drizzle ORM workloads.
+  #
+  # WARNING: session-level features (SET LOCAL, LISTEN/NOTIFY,
+  # advisory locks, temporary tables) require pool_mode=session.
+  # Apache AGE Cypher queries use SET LOCAL app.current_tenant so
+  # those connections MUST go directly to postgres:5432, NOT via
+  # PgBouncer. Use PGBOUNCER_URL only for standard Drizzle queries.
+  #
+  # Max connections: 1000 clients → 25 server connections per pool
+  # ═══════════════════════════════════════════════════════════════
+  pgbouncer:
+    image: pgbouncer/pgbouncer:1.22.1
+    container_name: edusphere-pgbouncer
+    environment:
+      DATABASES_HOST: postgres
+      DATABASES_PORT: 5432
+      DATABASES_DBNAME: edusphere
+      DATABASES_USER: ${POSTGRES_USER:-edusphere}
+      DATABASES_PASSWORD: ${POSTGRES_PASSWORD:-edusphere_dev_password}
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 1000
+      PGBOUNCER_DEFAULT_POOL_SIZE: 25
+      PGBOUNCER_SERVER_IDLE_TIMEOUT: 60
+      # Reject unauthenticated connections
+      PGBOUNCER_AUTH_TYPE: scram-sha-256
+      # Log connections and disconnections for debugging
+      PGBOUNCER_LOG_CONNECTIONS: 1
+      PGBOUNCER_LOG_DISCONNECTIONS: 1
+    ports:
+      - "5433:5432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h 127.0.0.1 -p 5432 -U ${POSTGRES_USER:-edusphere}",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    mem_limit: 128m
+    mem_reservation: 64m
+    restart: unless-stopped
     networks:
       - edusphere
 
@@ -102,7 +155,11 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -123,9 +180,9 @@ services:
     # OTLP enabled by default — COLLECTOR_OTLP_ENABLED removed
     # Port 14268 (Jaeger Thrift HTTP) removed in v2; use OTLP on 4318 instead
     ports:
-      - "16686:16686"   # Jaeger UI
-      - "4317:4317"     # OTLP gRPC
-      - "4318:4318"     # OTLP HTTP (used by @edusphere/telemetry)
+      - "16686:16686" # Jaeger UI
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP (used by @edusphere/telemetry)
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:16686/ || exit 1"]
       interval: 10s
@@ -469,11 +526,11 @@ services:
       - ./infrastructure/monitoring/rules:/etc/prometheus/rules:ro
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
     ports:
       - "9090:9090"
     networks:

@@ -5,7 +5,10 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
@@ -13,11 +16,22 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: { courses: [] }, fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { data: { courses: [] }, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
     // useMutation must be mocked to avoid the "No client specified" urql Provider error.
     // The execute function resolves with { error: null } so that enrollment handlers
     // can destructure without throwing.
-    useMutation: vi.fn(() => [{ fetching: false }, vi.fn().mockResolvedValue({ error: null })]),
+    useMutation: vi.fn(() => [
+      { fetching: false },
+      vi.fn().mockResolvedValue({ error: null }),
+    ]),
+    // useSubscription must be mocked for AiCourseCreatorModal (rendered inside CourseList).
+    useSubscription: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
   };
 });
 
@@ -27,7 +41,9 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 import { CourseList } from './CourseList';
@@ -72,13 +88,27 @@ const MOCK_COURSES = [
   },
 ];
 
-const STUDENT_USER = { id: 'u1', role: 'STUDENT', firstName: 'Alice', lastName: 'B', tenantId: 't1' };
-const INSTRUCTOR_USER = { id: 'u2', role: 'INSTRUCTOR', firstName: 'Bob', lastName: 'C', tenantId: 't1' };
+const STUDENT_USER = {
+  id: 'u1',
+  role: 'STUDENT',
+  firstName: 'Alice',
+  lastName: 'B',
+  tenantId: 't1',
+};
+const INSTRUCTOR_USER = {
+  id: 'u2',
+  role: 'INSTRUCTOR',
+  firstName: 'Bob',
+  lastName: 'C',
+  tenantId: 't1',
+};
 
 function renderCourseList(user = STUDENT_USER, locationState: unknown = {}) {
   mockGetCurrentUser.mockReturnValue(user);
   return render(
-    <MemoryRouter initialEntries={[{ pathname: '/courses', state: locationState }]}>
+    <MemoryRouter
+      initialEntries={[{ pathname: '/courses', state: locationState }]}
+    >
       <Routes>
         <Route path="/courses" element={<CourseList />} />
         <Route path="/learn/:id" element={<div>Content Viewer</div>} />
@@ -111,8 +141,12 @@ describe('CourseList', () => {
 
   it('renders courses from urql data', () => {
     renderCourseList();
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
-    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Advanced Chavruta Techniques')
+    ).toBeInTheDocument();
     expect(screen.getByText('Knowledge Graph Navigation')).toBeInTheDocument();
   });
 
@@ -132,11 +166,17 @@ describe('CourseList', () => {
     ] as unknown as ReturnType<typeof useQuery>);
     renderCourseList();
     // Non-blocking warning banner is shown
-    expect(screen.getByText(/\[Network\] Failed to fetch/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/\[Network\] Failed to fetch/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/showing cached data/i)).toBeInTheDocument();
     // Page still renders with mock fallback courses — not a blank error page
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
-    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Advanced Chavruta Techniques')
+    ).toBeInTheDocument();
     expect(screen.getByText('Courses')).toBeInTheDocument();
   });
 
@@ -148,17 +188,23 @@ describe('CourseList', () => {
 
   it('does not show Enroll buttons for instructors', () => {
     renderCourseList(INSTRUCTOR_USER);
-    expect(screen.queryByRole('button', { name: /^enroll$/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^enroll$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows New Course button for instructors', () => {
     renderCourseList(INSTRUCTOR_USER);
-    expect(screen.getByRole('button', { name: /new course/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /new course/i })
+    ).toBeInTheDocument();
   });
 
   it('does not show New Course button for students', () => {
     renderCourseList(STUDENT_USER);
-    expect(screen.queryByRole('button', { name: /new course/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /new course/i })
+    ).not.toBeInTheDocument();
   });
 
   it('navigates to /courses/new when New Course is clicked', () => {
@@ -171,7 +217,9 @@ describe('CourseList', () => {
     renderCourseList(STUDENT_USER);
     const enrollBtns = screen.getAllByRole('button', { name: /^enroll$/i });
     fireEvent.click(enrollBtns[0]!);
-    await waitFor(() => expect(screen.getByText(/enrolled in/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/enrolled in/i)).toBeInTheDocument()
+    );
   });
 
   it('unenrolls after enrolling', async () => {
@@ -184,7 +232,14 @@ describe('CourseList', () => {
         data: {
           courses: MOCK_COURSES,
           myEnrollments: [
-            { id: 'e1', courseId: 'course-1', userId: 'u1', status: 'ACTIVE', enrolledAt: '', completedAt: null },
+            {
+              id: 'e1',
+              courseId: 'course-1',
+              userId: 'u1',
+              status: 'ACTIVE',
+              enrolledAt: '',
+              completedAt: null,
+            },
           ],
         },
         fetching: false,
@@ -196,17 +251,23 @@ describe('CourseList', () => {
     // course-1 should show "Enrolled" button
     const enrolledBtns = screen.getAllByRole('button', { name: /enrolled/i });
     fireEvent.click(enrolledBtns[0]!);
-    await waitFor(() => expect(screen.getByText(/unenrolled from/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/unenrolled from/i)).toBeInTheDocument()
+    );
   });
 
   it('shows Unpublish for published courses (instructor)', () => {
     renderCourseList(INSTRUCTOR_USER);
-    expect(screen.getAllByRole('button', { name: /unpublish/i }).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('button', { name: /unpublish/i }).length
+    ).toBeGreaterThan(0);
   });
 
   it('shows Publish for draft courses (instructor)', () => {
     renderCourseList(INSTRUCTOR_USER);
-    expect(screen.getAllByRole('button', { name: /^publish$/i }).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('button', { name: /^publish$/i }).length
+    ).toBeGreaterThan(0);
   });
 
   it('shows Draft badge for unpublished course', () => {
@@ -225,19 +286,32 @@ describe('CourseList', () => {
     // The new course itself is loaded via the query (which is mocked to return
     // MOCK_COURSES), so the "My New Course" title won't appear unless refetched.
     renderCourseList(STUDENT_USER, {
-      newCourse: { title: 'My New Course', description: 'Great', thumbnail: '📖', published: true, duration: '3 weeks', modules: [] },
+      newCourse: {
+        title: 'My New Course',
+        description: 'Great',
+        thumbnail: '📖',
+        published: true,
+        duration: '3 weeks',
+        modules: [],
+      },
       message: 'Course published!',
     });
-    await waitFor(() => expect(screen.getByText(/course published/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/course published/i)).toBeInTheDocument()
+    );
     // Existing courses from mock query still appear
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
   });
 
   it('works when user is null (unauthenticated)', () => {
     mockGetCurrentUser.mockReturnValue(null);
     renderCourseList(undefined);
     expect(screen.getByText('Courses')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /new course/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /new course/i })
+    ).not.toBeInTheDocument();
   });
 
   it('renders layout wrapper', () => {
@@ -252,5 +326,84 @@ describe('CourseList', () => {
     ] as unknown as ReturnType<typeof useQuery>);
     renderCourseList();
     expect(screen.getByText('Courses')).toBeInTheDocument();
+  });
+
+  // ── Open button (inside card header) ────────────────────────────────────────
+
+  it('clicking the "Open" ghost button navigates to /courses/:id', () => {
+    renderCourseList(STUDENT_USER);
+    // The "Open" button is opacity-0 by default (group-hover) but always in DOM
+    const openButtons = screen.getAllByRole('button', { name: /^open$/i });
+    expect(openButtons.length).toBe(MOCK_COURSES.length);
+    fireEvent.click(openButtons[0]!);
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+  });
+
+  it('Open button stopPropagation prevents duplicate navigation calls', () => {
+    renderCourseList(STUDENT_USER);
+    const openButtons = screen.getAllByRole('button', { name: /^open$/i });
+    fireEvent.click(openButtons[1]!);
+    // Only one navigation call — stopPropagation prevents the card onClick firing twice
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-2');
+  });
+
+  // ── Instructor Edit button ──────────────────────────────────────────────────
+
+  it('instructor sees one Edit button per course', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    const editBtns = screen.getAllByRole('button', { name: /^edit$/i });
+    expect(editBtns.length).toBe(MOCK_COURSES.length);
+  });
+
+  it('clicking Edit button navigates to /courses/:id', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    const editBtns = screen.getAllByRole('button', { name: /^edit$/i });
+    fireEvent.click(editBtns[0]!);
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+  });
+
+  it('non-instructor does not see Edit button', () => {
+    renderCourseList(STUDENT_USER);
+    expect(
+      screen.queryByRole('button', { name: /^edit$/i })
+    ).not.toBeInTheDocument();
+  });
+
+  // ── Publish / Unpublish toggle (instructor) ──────────────────────────────────
+
+  it('clicking Unpublish toggles course to unpublished state locally', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    // course-1 and course-2 are published — grab first Unpublish and click it
+    const unpublishBtns = screen.getAllByRole('button', {
+      name: /unpublish/i,
+    });
+    fireEvent.click(unpublishBtns[0]!);
+    // After toggling, Publish buttons should increase by 1
+    const publishBtnsAfter = screen.getAllByRole('button', {
+      name: /^publish$/i,
+    });
+    expect(publishBtnsAfter.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('clicking Publish on a draft course toggles it to published locally', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    // course-3 is a draft — click its Publish button
+    const publishBtns = screen.getAllByRole('button', { name: /^publish$/i });
+    fireEvent.click(publishBtns[0]!);
+    // All 3 courses now show Unpublish
+    const unpublishBtnsAfter = screen.getAllByRole('button', {
+      name: /unpublish/i,
+    });
+    expect(unpublishBtnsAfter.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('Unpublish button click does not navigate away', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    const unpublishBtns = screen.getAllByRole('button', {
+      name: /unpublish/i,
+    });
+    fireEvent.click(unpublishBtns[0]!);
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });

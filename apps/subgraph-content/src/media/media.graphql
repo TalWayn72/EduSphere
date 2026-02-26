@@ -18,6 +18,8 @@ type MediaAsset {
   Valid for 1 hour after generation.
   """
   hlsManifestUrl: String
+  captionsUrl: String
+  altText: String
 }
 
 enum MediaStatus {
@@ -41,4 +43,6 @@ extend type Mutation {
     courseId: ID!
     title: String!
   ): MediaAsset! @authenticated
+
+  updateMediaAltText(mediaId: ID!, altText: String!): MediaAsset! @authenticated
 }

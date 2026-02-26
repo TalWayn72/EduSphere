@@ -7,6 +7,7 @@ A next-generation knowledge graph educational platform built for scale. Powered 
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-336791)](https://www.postgresql.org/)
 [![Apache AGE](https://img.shields.io/badge/Apache%20AGE-1.5.0-orange)](https://age.apache.org/)
 [![License](https://img.shields.io/badge/license-Private-red)](LICENSE)
+[![WCAG 2.2 AA](https://img.shields.io/badge/WCAG%202.2-AA-brightgreen)](https://www.w3.org/TR/WCAG22/)
 
 ---
 
@@ -165,7 +166,7 @@ edusphere/
 └── .env.example                 # Environment variables template
 ```
 
-For detailed architecture diagrams: [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md)
+For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md)
 
 ---
 
@@ -319,7 +320,7 @@ For detailed architecture diagrams: [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-R
 
 **Current Status:** ALL 17 phases complete ✅ — Backend + Frontend fully built. GraphQL integration active (KnowledgeGraph + AgentsPage + ContentViewer + Dashboard wired to real API with DEV_MODE fallback). Next: Phase 7 Production Hardening (K8s) + Phase 8 Mobile (Expo). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
-See [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) for detailed phase breakdown and acceptance criteria.
+See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
 ---
 
@@ -329,8 +330,8 @@ See [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) for detailed phase br
 | ---------------- | ------------------------------------------------------------------------------------------------------ |
 | **Project**      | [CLAUDE.md](CLAUDE.md) -- AI assistant configuration and work rules                                    |
 |                  | [OPEN_ISSUES.md](OPEN_ISSUES.md) -- Issue tracking and status                                          |
-| **Architecture** | [IMPLEMENTATION-ROADMAP.md](IMPLEMENTATION-ROADMAP.md) -- Phased build plan                            |
-|                  | [API-CONTRACTS-GRAPHQL-FEDERATION.md](API-CONTRACTS-GRAPHQL-FEDERATION.md) -- GraphQL schema contracts |
+| **Architecture** | [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) -- Phased build plan                            |
+|                  | [API_CONTRACTS_GRAPHQL_FEDERATION.md](API_CONTRACTS_GRAPHQL_FEDERATION.md) -- GraphQL schema contracts |
 |                  | [EduSphere Claude.pdf](docs/reference/EduSphere%20Claude.pdf) -- Architecture guide and tech decisions |
 |                  | [EduSphere DB.pdf](docs/reference/EduSphere%20DB.pdf) -- Database design deep-dive                     |
 | **API**          | GraphQL Playground: http://localhost:4000/graphql                                                      |

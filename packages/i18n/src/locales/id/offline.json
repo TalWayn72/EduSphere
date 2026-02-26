@@ -1,0 +1,8 @@
+{
+  "conflicts": {
+    "title": "{{count}} operasi sinkronisasi gagal",
+    "subtitle": "Perubahan ini tidak dapat disimpan. Tutup untuk menghapus.",
+    "dismissAll": "Tutup Semua",
+    "dismiss": "Tutup"
+  }
+}

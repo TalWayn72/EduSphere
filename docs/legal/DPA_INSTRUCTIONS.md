@@ -20,16 +20,16 @@ The DPA is required under GDPR Article 28 whenever EduSphere processes personal 
 
 Collect the following information from the client before filling the template:
 
-| Field | Required? | Source |
-|-------|-----------|--------|
-| CLIENT_LEGAL_NAME | Yes | Client legal registration documents |
-| CLIENT_ADDRESS | Yes | Registered office address |
-| CLIENT_REGISTRATION_NUMBER | Yes | Company registration / VAT number |
-| CLIENT_CONTACT_NAME | Yes | Designated contact for DPA matters |
-| CLIENT_CONTACT_EMAIL | Yes | Email for DPA notifications (sub-processor changes) |
-| CLIENT_DPO_EMAIL | If appointed | Required if client has >250 employees or high-risk processing |
-| MEMBER_STATE | Yes (EU/EEA) | Member State whose law governs the agreement |
-| JURISDICTION | Yes (EU/EEA) | Courts with jurisdiction for disputes |
+| Field                      | Required?    | Source                                                        |
+| -------------------------- | ------------ | ------------------------------------------------------------- |
+| CLIENT_LEGAL_NAME          | Yes          | Client legal registration documents                           |
+| CLIENT_ADDRESS             | Yes          | Registered office address                                     |
+| CLIENT_REGISTRATION_NUMBER | Yes          | Company registration / VAT number                             |
+| CLIENT_CONTACT_NAME        | Yes          | Designated contact for DPA matters                            |
+| CLIENT_CONTACT_EMAIL       | Yes          | Email for DPA notifications (sub-processor changes)           |
+| CLIENT_DPO_EMAIL           | If appointed | Required if client has >250 employees or high-risk processing |
+| MEMBER_STATE               | Yes (EU/EEA) | Member State whose law governs the agreement                  |
+| JURISDICTION               | Yes (EU/EEA) | Courts with jurisdiction for disputes                         |
 
 ### Step 2: Review the Technical and Organisational Measures (TOMs)
 
@@ -50,18 +50,18 @@ Section 8 of the DPA describes EduSphere technical controls. Before sending to a
 
 **Fields to customize:**
 
-| Placeholder | Section | Notes |
-|-------------|---------|-------|
-| [CLIENT_LEGAL_NAME] | 1 | Full legal entity name as registered |
-| [CLIENT_ADDRESS] | 1 | Registered office, not trading address |
-| [CLIENT_REGISTRATION_NUMBER] | 1 | Company number / VAT registration |
-| [CLIENT_CONTACT_NAME] | 1 | Primary contact for DPA matters |
-| [CLIENT_CONTACT_EMAIL] | 1 | Receives sub-processor change notifications |
-| [CLIENT_DPO_EMAIL] | 1 | Leave blank if no DPO appointed |
-| [EDUSPHERE_REGISTERED_ADDRESS] | 1 | Fill from EduSphere legal entity details |
-| [EDUSPHERE_REGISTRATION_NUMBER] | 1 | EduSphere company registration number |
-| [MEMBER_STATE] | 10 | E.g., Ireland, Germany, Netherlands |
-| [JURISDICTION] | 10 | E.g., Dublin, Munich, Amsterdam courts |
+| Placeholder                     | Section | Notes                                       |
+| ------------------------------- | ------- | ------------------------------------------- |
+| [CLIENT_LEGAL_NAME]             | 1       | Full legal entity name as registered        |
+| [CLIENT_ADDRESS]                | 1       | Registered office, not trading address      |
+| [CLIENT_REGISTRATION_NUMBER]    | 1       | Company number / VAT registration           |
+| [CLIENT_CONTACT_NAME]           | 1       | Primary contact for DPA matters             |
+| [CLIENT_CONTACT_EMAIL]          | 1       | Receives sub-processor change notifications |
+| [CLIENT_DPO_EMAIL]              | 1       | Leave blank if no DPO appointed             |
+| [EDUSPHERE_REGISTERED_ADDRESS]  | 1       | Fill from EduSphere legal entity details    |
+| [EDUSPHERE_REGISTRATION_NUMBER] | 1       | EduSphere company registration number       |
+| [MEMBER_STATE]                  | 10      | E.g., Ireland, Germany, Netherlands         |
+| [JURISDICTION]                  | 10      | E.g., Dublin, Munich, Amsterdam courts      |
 
 ### Step 4: Legal Review
 
@@ -86,21 +86,21 @@ A new DPA must be executed or the existing DPA must be amended in the following 
 
 ### Sub-processor Changes
 
-| Trigger | Action | Timeline |
-|---------|--------|----------|
-| New sub-processor added to docs/security/SUBPROCESSORS.md | Send change notification to all clients at CLIENT_CONTACT_EMAIL | 30 days before activation |
-| Sub-processor removed | Update SUBPROCESSORS.md; notify clients | Within 14 days |
-| Sub-processor changes data transfer mechanism | Update SUBPROCESSORS.md and DPA Annex if applicable | Before change |
+| Trigger                                                           | Action                                                          | Timeline                  |
+| ----------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------- |
+| New sub-processor added to docs/security/SUBPROCESSOR_REGISTER.md | Send change notification to all clients at CLIENT_CONTACT_EMAIL | 30 days before activation |
+| Sub-processor removed                                             | Update SUBPROCESSOR_REGISTER.md; notify clients                 | Within 14 days            |
+| Sub-processor changes data transfer mechanism                     | Update SUBPROCESSOR_REGISTER.md and DPA Annex if applicable     | Before change             |
 
 ### Scope Changes
 
-| Trigger | Action |
-|---------|--------|
-| Client adds new types of personal data not listed in Section 4 | Amend DPA Annex A or re-execute |
-| Client deploys platform for new categories of data subjects (e.g., minors <16) | Re-execute with appropriate addendum |
-| Client changes governing law jurisdiction | Re-execute Section 10 |
-| EduSphere changes data centre region (EU to non-EU) | Re-execute with updated TOMs and transfer mechanism |
-| New GDPR obligation requires TOM update | Notify all clients; amend via DPA amendment letter |
+| Trigger                                                                        | Action                                              |
+| ------------------------------------------------------------------------------ | --------------------------------------------------- |
+| Client adds new types of personal data not listed in Section 4                 | Amend DPA Annex A or re-execute                     |
+| Client deploys platform for new categories of data subjects (e.g., minors <16) | Re-execute with appropriate addendum                |
+| Client changes governing law jurisdiction                                      | Re-execute Section 10                               |
+| EduSphere changes data centre region (EU to non-EU)                            | Re-execute with updated TOMs and transfer mechanism |
+| New GDPR obligation requires TOM update                                        | Notify all clients; amend via DPA amendment letter  |
 
 ### Annual Review
 
@@ -113,13 +113,13 @@ A new DPA must be executed or the existing DPA must be amended in the following 
 
 ## Contact and Escalation
 
-| Matter | Contact | Response SLA |
-|--------|---------|-------------|
-| DPA questions from clients | dpo@edusphere.dev | 2 business days |
-| Client objects to sub-processor change | dpo@edusphere.dev + legal@edusphere.dev | Within 7 days |
-| Client requests on-site audit | dpo@edusphere.dev | 30-day scheduling |
-| DPA amendment requests | dpo@edusphere.dev | 5 business days |
-| Data subject rights requests forwarded by client | privacy@edusphere.dev | 48-hour acknowledgment |
+| Matter                                           | Contact                                 | Response SLA           |
+| ------------------------------------------------ | --------------------------------------- | ---------------------- |
+| DPA questions from clients                       | dpo@edusphere.dev                       | 2 business days        |
+| Client objects to sub-processor change           | dpo@edusphere.dev + legal@edusphere.dev | Within 7 days          |
+| Client requests on-site audit                    | dpo@edusphere.dev                       | 30-day scheduling      |
+| DPA amendment requests                           | dpo@edusphere.dev                       | 5 business days        |
+| Data subject rights requests forwarded by client | privacy@edusphere.dev                   | 48-hour acknowledgment |
 
 **DPO Contact:** dpo@edusphere.dev
 
@@ -127,10 +127,10 @@ A new DPA must be executed or the existing DPA must be amended in the following 
 
 ## DPA Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2026-02-22 | Initial release |
+| Version | Date       | Changes         |
+| ------- | ---------- | --------------- |
+| 1.0     | 2026-02-22 | Initial release |
 
 ---
 
-*EduSphere DPA Instructions v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev*
+_EduSphere DPA Instructions v1.0 - 2026-02-22 - Contact: dpo@edusphere.dev_

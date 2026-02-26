@@ -67,6 +67,14 @@ Thumbs.db
 
 # Temporary files
 *.tmp
+.tmp-*.js
+.tmp-*.mjs
+.tmp-*.cjs
+
+# Playwright generated reports (contain minified JS that triggers CodeQL false positives)
+apps/web/playwright-report/
+apps/web/test-results/
+test_output.txt
 *.temp
 *.bak
 *.swp
@@ -110,3 +118,6 @@ apps/web/nul
 apps/web/C:*
 apps/web/C*Users*AppData*
 "apps/web/C*"
+ci_runs.json
+job_logs.txt
+run_jobs.json

@@ -31,6 +31,7 @@
 Every code change MUST pass ALL of these checks before commit:
 
 ### XSS Prevention
+
 - [ ] **No unsanitized user input in GraphQL responses**
   - Example: All user-generated content (annotations, course titles, etc.) sanitized via `escape-html` or DOMPurify
   - Check: Search codebase for direct variable interpolation in responses without sanitization
@@ -42,6 +43,7 @@ Every code change MUST pass ALL of these checks before commit:
   - File: Review all `.tsx` files with innerHTML patterns
 
 ### SQL Injection Prevention
+
 - [ ] **ALL database queries use Drizzle ORM parameterized queries**
   - Example: `db.select().from(users).where(eq(users.id, userId))` NOT raw SQL
   - Check: No `db.execute(...)` calls with string concatenation
@@ -53,6 +55,7 @@ Every code change MUST pass ALL of these checks before commit:
   - Check: All user input is parameterized, never interpolated into SQL strings
 
 ### NoSQL Injection Prevention (Cypher Queries)
+
 - [ ] **ALL Cypher queries use parameterized prepared statements**
   - Example:
     ```typescript
@@ -68,6 +71,7 @@ Every code change MUST pass ALL of these checks before commit:
   - File: `packages/db/src/graph/client.ts` and all graph helpers
 
 ### Row-Level Security (RLS) Validation
+
 - [ ] **All tenant-scoped tables have RLS enabled**
   - Example: 16 tables (tenants, users, courses, modules, media_assets, transcripts, transcript_segments, annotations, collab_documents, crdt_updates, collab_sessions, agent_definitions, agent_executions, content_embeddings, annotation_embeddings, concept_embeddings)
   - Check: Run RLS validation tests
@@ -94,6 +98,7 @@ Every code change MUST pass ALL of these checks before commit:
   - File: `packages/db/src/schema/annotation.ts` RLS policies
 
 ### JWT Validation & Scopes
+
 - [ ] **All mutations use `@authenticated` directive**
   - Example: `type Mutation { createCourse(...): Course! @authenticated }`
   - Check: Search for mutations without `@authenticated`
@@ -110,6 +115,7 @@ Every code change MUST pass ALL of these checks before commit:
   - Roles: `SUPER_ADMIN`, `ORG_ADMIN`, `INSTRUCTOR`, `STUDENT`, `RESEARCHER`
 
 ### Input Validation
+
 - [ ] **All mutations have Zod schemas for input validation**
   - Example:
     ```typescript
@@ -127,6 +133,7 @@ Every code change MUST pass ALL of these checks before commit:
   - Check: All file upload/download operations sanitize paths
 
 ### Secrets in Code
+
 - [ ] **No API keys, passwords, tokens, or secrets in code**
   - Example: Use `process.env.KEYCLOAK_CLIENT_SECRET`, never hardcoded strings
   - Check: Search for common secret patterns
@@ -169,6 +176,7 @@ Every code change MUST pass ALL of these checks before commit:
 
 - [ ] **Tenant ID extracted from JWT, NOT from GraphQL arguments**
   - Example:
+
     ```typescript
     // CORRECT: Use context.tenantId from JWT
     const courses = await getCourses(context.tenantId);
@@ -176,6 +184,7 @@ Every code change MUST pass ALL of these checks before commit:
     // WRONG: Accept tenantId from client
     const courses = await getCourses(args.tenantId); // DANGEROUS!
     ```
+
   - Check: No resolvers accept `tenantId` as GraphQL argument
   - File: Review all resolver signatures
 
@@ -417,14 +426,16 @@ Every code change MUST pass ALL of these checks before commit:
 - [ ] **Zod schemas validate all mutation inputs**
   - Example:
     ```typescript
-    const CreateAnnotationInputSchema = z.object({
-      content: z.string().min(1).max(10000),
-      startTime: z.number().min(0),
-      endTime: z.number().min(0),
-      layer: z.enum(['PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED']),
-    }).refine(data => data.endTime >= data.startTime, {
-      message: 'endTime must be >= startTime'
-    });
+    const CreateAnnotationInputSchema = z
+      .object({
+        content: z.string().min(1).max(10000),
+        startTime: z.number().min(0),
+        endTime: z.number().min(0),
+        layer: z.enum(['PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED']),
+      })
+      .refine((data) => data.endTime >= data.startTime, {
+        message: 'endTime must be >= startTime',
+      });
     ```
   - Check: Every mutation validates input before processing
   - File: `apps/subgraph-*/src/schemas/*.schemas.ts`
@@ -453,13 +464,15 @@ Every code change MUST pass ALL of these checks before commit:
   - Example:
     ```json
     {
-      "errors": [{
-        "message": "Not authorized",
-        "extensions": {
-          "code": "FORBIDDEN",
-          "timestamp": "2026-02-17T10:00:00Z"
+      "errors": [
+        {
+          "message": "Not authorized",
+          "extensions": {
+            "code": "FORBIDDEN",
+            "timestamp": "2026-02-17T10:00:00Z"
+          }
         }
-      }]
+      ]
     }
     ```
   - Check: All errors include `code` in extensions
@@ -841,7 +854,7 @@ Every code change MUST pass ALL of these checks before commit:
       tenantId: context.tenantId,
       userId: context.userId,
       ip: req.ip,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
     ```
 
@@ -1038,12 +1051,12 @@ Every code change MUST pass ALL of these checks before commit:
 
 ### Escalation Paths
 
-| Severity | Response Time | Escalation |
-|----------|--------------|------------|
-| **P0 - Critical** (Data breach, RLS bypass, production down) | 15 minutes | On-call engineer → Engineering lead → CTO → CEO (if data breach) |
-| **P1 - High** (Auth bypass, XSS, SQL injection) | 1 hour | On-call engineer → Engineering lead |
-| **P2 - Medium** (Rate limit bypass, CSP violation) | 4 hours | Assigned engineer → Engineering lead |
-| **P3 - Low** (Deprecated API usage, minor config issue) | 24 hours | Assigned engineer |
+| Severity                                                     | Response Time | Escalation                                                       |
+| ------------------------------------------------------------ | ------------- | ---------------------------------------------------------------- |
+| **P0 - Critical** (Data breach, RLS bypass, production down) | 15 minutes    | On-call engineer → Engineering lead → CTO → CEO (if data breach) |
+| **P1 - High** (Auth bypass, XSS, SQL injection)              | 1 hour        | On-call engineer → Engineering lead                              |
+| **P2 - Medium** (Rate limit bypass, CSP violation)           | 4 hours       | Assigned engineer → Engineering lead                             |
+| **P3 - Low** (Deprecated API usage, minor config issue)      | 24 hours      | Assigned engineer                                                |
 
 ### Communication Plan
 
@@ -1094,15 +1107,15 @@ Every code change MUST pass ALL of these checks before commit:
 
 ## Security Review Cadence
 
-| Review Type | Frequency | Responsible |
-|-------------|-----------|-------------|
-| **Code Review (Security Focus)** | Every PR | Senior Engineer + Security Champion |
-| **Dependency Audit** | Weekly | Automated (Renovate bot + manual review) |
-| **Penetration Testing** | Quarterly | External security firm |
-| **Security Checklist Review** | Monthly | Security team |
-| **Incident Response Drill** | Quarterly | Engineering team |
-| **Compliance Audit (GDPR)** | Annually | Legal + Engineering |
-| **Secrets Rotation** | Every 90 days | DevOps team |
+| Review Type                      | Frequency     | Responsible                              |
+| -------------------------------- | ------------- | ---------------------------------------- |
+| **Code Review (Security Focus)** | Every PR      | Senior Engineer + Security Champion      |
+| **Dependency Audit**             | Weekly        | Automated (Renovate bot + manual review) |
+| **Penetration Testing**          | Quarterly     | External security firm                   |
+| **Security Checklist Review**    | Monthly       | Security team                            |
+| **Incident Response Drill**      | Quarterly     | Engineering team                         |
+| **Compliance Audit (GDPR)**      | Annually      | Legal + Engineering                      |
+| **Secrets Rotation**             | Every 90 days | DevOps team                              |
 
 ---
 

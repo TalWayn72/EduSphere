@@ -29,32 +29,53 @@ export class UserExportService {
   async exportUserData(
     userId: string,
     tenantId: string,
-    userRole: 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER' = 'STUDENT',
+    userRole:
+      | 'SUPER_ADMIN'
+      | 'ORG_ADMIN'
+      | 'INSTRUCTOR'
+      | 'STUDENT'
+      | 'RESEARCHER' = 'STUDENT'
   ): Promise<UserDataExport> {
     const tenantCtx = { tenantId, userId, userRole };
 
-    const exportData = await withTenantContext(this.db, tenantCtx, async (tx) => {
-      const [profile, annotations, agentSessions, progress, enrollments] =
-        await Promise.all([
-          tx.select().from(schema.users).where(eq(schema.users.id, userId)),
-          tx.select().from(schema.annotations).where(eq(schema.annotations.user_id, userId)),
-          tx.select().from(schema.agentSessions).where(eq(schema.agentSessions.userId, userId)),
-          tx.select().from(schema.userProgress).where(eq(schema.userProgress.userId, userId)),
-          tx.select().from(schema.userCourses).where(eq(schema.userCourses.userId, userId)),
-        ]);
+    const exportData = await withTenantContext(
+      this.db,
+      tenantCtx,
+      async (tx) => {
+        const [profile, annotations, agentSessions, progress, enrollments] =
+          await Promise.all([
+            tx.select().from(schema.users).where(eq(schema.users.id, userId)),
+            tx
+              .select()
+              .from(schema.annotations)
+              .where(eq(schema.annotations.user_id, userId)),
+            tx
+              .select()
+              .from(schema.agentSessions)
+              .where(eq(schema.agentSessions.userId, userId)),
+            tx
+              .select()
+              .from(schema.userProgress)
+              .where(eq(schema.userProgress.userId, userId)),
+            tx
+              .select()
+              .from(schema.userCourses)
+              .where(eq(schema.userCourses.userId, userId)),
+          ]);
 
-      return {
-        exportedAt: new Date().toISOString(),
-        gdprArticle: '20' as const,
-        format: 'EduSphere-UserExport/1.0',
-        userId,
-        profile: (profile[0] as Record<string, unknown>) ?? null,
-        annotations: annotations as Record<string, unknown>[],
-        agentSessions: agentSessions as Record<string, unknown>[],
-        learningProgress: progress as Record<string, unknown>[],
-        enrollments: enrollments as Record<string, unknown>[],
-      };
-    });
+        return {
+          exportedAt: new Date().toISOString(),
+          gdprArticle: '20' as const,
+          format: 'EduSphere-UserExport/1.0',
+          userId,
+          profile: (profile[0] as Record<string, unknown>) ?? null,
+          annotations: annotations as Record<string, unknown>[],
+          agentSessions: agentSessions as Record<string, unknown>[],
+          learningProgress: progress as Record<string, unknown>[],
+          enrollments: enrollments as Record<string, unknown>[],
+        };
+      }
+    );
 
     // Write audit log for the export operation
     await this.writeAuditLog(tenantId, userId, exportData);
@@ -67,7 +88,7 @@ export class UserExportService {
   private async writeAuditLog(
     tenantId: string,
     userId: string,
-    exportData: UserDataExport,
+    exportData: UserDataExport
   ): Promise<void> {
     try {
       await this.db.insert(schema.auditLog).values({
@@ -90,7 +111,7 @@ export class UserExportService {
     } catch (auditError) {
       this.logger.error(
         { tenantId, userId, auditError },
-        'Failed to write GDPR export audit log',
+        'Failed to write GDPR export audit log'
       );
     }
   }

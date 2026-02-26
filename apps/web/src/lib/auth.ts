@@ -147,7 +147,13 @@ export function isAuthenticated(): boolean {
 }
 
 // Roles assigned in Keycloak realm (appear in realm_access.roles in the JWT).
-const KNOWN_ROLES = ['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR', 'STUDENT', 'RESEARCHER'] as const;
+const KNOWN_ROLES = [
+  'SUPER_ADMIN',
+  'ORG_ADMIN',
+  'INSTRUCTOR',
+  'STUDENT',
+  'RESEARCHER',
+] as const;
 
 export function getCurrentUser(): AuthUser | null {
   if (DEV_MODE) {
@@ -162,12 +168,13 @@ export function getCurrentUser(): AuthUser | null {
 
   // Roles live in realm_access.roles (Keycloak default).
   // Fall back to a top-level `role` claim if a custom mapper is configured.
-  const realmRoles =
-    ((token.realm_access as { roles?: string[] })?.roles ?? []);
+  const realmRoles = (token.realm_access as { roles?: string[] })?.roles ?? [];
   const role =
-    realmRoles.find((r) => KNOWN_ROLES.includes(r as typeof KNOWN_ROLES[number]))
-    ?? (token.role as string | undefined)
-    ?? 'STUDENT';
+    realmRoles.find((r) =>
+      KNOWN_ROLES.includes(r as (typeof KNOWN_ROLES)[number])
+    ) ??
+    (token.role as string | undefined) ??
+    'STUDENT';
 
   return {
     id: token.sub as string,

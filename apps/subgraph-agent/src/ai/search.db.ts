@@ -11,7 +11,11 @@
 
 import { Logger } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
-import { createDatabaseConnection, schema, withTenantContext } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  withTenantContext,
+} from '@edusphere/db';
 import type { KnowledgeSearchResult } from './tools/agent-tools';
 
 const logger = new Logger('SearchDb');
@@ -25,11 +29,14 @@ async function generateQueryEmbedding(text: string): Promise<number[] | null> {
 
   try {
     if (ollamaUrl) {
-      const resp = await fetch(`${ollamaUrl.replace(/\/$/, '')}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt: text }),
-      });
+      const resp = await fetch(
+        `${ollamaUrl.replace(/\/$/, '')}/api/embeddings`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model, prompt: text }),
+        }
+      );
       if (!resp.ok) return null;
       const data = (await resp.json()) as { embedding: number[] };
       return data.embedding;
@@ -42,10 +49,16 @@ async function generateQueryEmbedding(text: string): Promise<number[] | null> {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${openaiKey}`,
         },
-        body: JSON.stringify({ model: 'text-embedding-3-small', input: text, dimensions: 768 }),
+        body: JSON.stringify({
+          model: 'text-embedding-3-small',
+          input: text,
+          dimensions: 768,
+        }),
       });
       if (!resp.ok) return null;
-      const data = (await resp.json()) as { data: Array<{ embedding: number[] }> };
+      const data = (await resp.json()) as {
+        data: Array<{ embedding: number[] }>;
+      };
       return data.data[0]?.embedding ?? null;
     }
   } catch (err) {
@@ -59,9 +72,11 @@ async function generateQueryEmbedding(text: string): Promise<number[] | null> {
 export async function searchKnowledgeGraph(
   query: string,
   tenantId: string,
-  limit: number = 5,
+  limit: number = 5
 ): Promise<KnowledgeSearchResult[]> {
-  logger.debug(`searchKnowledgeGraph: query="${query}" tenant=${tenantId} limit=${limit}`);
+  logger.debug(
+    `searchKnowledgeGraph: query="${query}" tenant=${tenantId} limit=${limit}`
+  );
 
   const db = createDatabaseConnection();
   const seen = new Set<string>();
@@ -98,7 +113,9 @@ export async function searchKnowledgeGraph(
         });
       }
     } catch (err) {
-      logger.warn(`pgvector search failed, continuing with ILIKE: ${String(err)}`);
+      logger.warn(
+        `pgvector search failed, continuing with ILIKE: ${String(err)}`
+      );
     }
   }
 
@@ -123,10 +140,15 @@ export async function searchKnowledgeGraph(
           for (const row of ilikeRows) {
             if (seen.has(row.id)) continue;
             seen.add(row.id);
-            results.push({ id: row.id, text: row.text.slice(0, 200), type: 'transcript_segment', similarity: 0 });
+            results.push({
+              id: row.id,
+              text: row.text.slice(0, 200),
+              type: 'transcript_segment',
+              similarity: 0,
+            });
             if (results.length >= limit) break;
           }
-        },
+        }
       );
     } catch (err) {
       logger.warn(`ILIKE fallback failed: ${String(err)}`);

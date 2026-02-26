@@ -5,6 +5,7 @@ Complete guide to the EduSphere mobile application built with Expo SDK 54.
 ## Overview
 
 The mobile app provides a native iOS/Android experience with:
+
 - ✅ 70-80% code sharing with web client
 - ✅ Offline-first architecture with SQLite
 - ✅ Real-time updates via WebSocket subscriptions
@@ -19,6 +20,7 @@ The mobile app provides a native iOS/Android experience with:
 All screens located in `apps/mobile/src/screens/`:
 
 #### CoursesScreen.tsx
+
 - Lists all available courses
 - Uses FlatList for performance
 - Pull-to-refresh support
@@ -35,12 +37,14 @@ const { data, loading, refetch } = useQuery(COURSES_QUERY);
 ```
 
 #### CourseDetailScreen.tsx
+
 - Detailed course view with lessons
 - Enrollment functionality
 - Progress tracking
 - Uses shared Card and Button components
 
 #### DiscussionsScreen.tsx
+
 - Real-time discussion feed
 - Live updates via subscriptions
 - Upvote/downvote functionality
@@ -49,18 +53,20 @@ const { data, loading, refetch } = useQuery(COURSES_QUERY);
 ```typescript
 useSubscription(DISCUSSION_SUB, {
   onData: ({ data }) => {
-    setDiscussions(prev => [data.discussionCreated, ...prev]);
-  }
+    setDiscussions((prev) => [data.discussionCreated, ...prev]);
+  },
 });
 ```
 
 #### AITutorScreen.tsx
+
 - Streaming AI chat interface
 - Real-time message delivery
 - Message history with auto-scroll
 - Typing indicators
 
 #### ProfileScreen.tsx
+
 - User profile management
 - Settings and preferences
 - Logout functionality
@@ -71,8 +77,8 @@ useSubscription(DISCUSSION_SUB, {
 
 ```typescript
 const link = ApolloLink.from([
-  offlineLink,      // Handles offline caching
-  splitLink,        // Routes subscriptions to WebSocket
+  offlineLink, // Handles offline caching
+  splitLink, // Routes subscriptions to WebSocket
 ]);
 
 const client = new ApolloClient({
@@ -84,6 +90,7 @@ const client = new ApolloClient({
 #### Offline Link ([apps/mobile/src/apollo/offlineLink.ts](../apps/mobile/src/apollo/offlineLink.ts))
 
 Custom Apollo Link that:
+
 1. Detects network status
 2. Returns cached data when offline
 3. Queues mutations for later sync
@@ -96,11 +103,13 @@ Custom Apollo Link that:
 Two main tables:
 
 **cached_queries**
+
 - Stores query results with variables
 - Indexed by timestamp for efficient cleanup
 - 7-day retention (configurable)
 
 **offline_mutations**
+
 - Queues mutations when offline
 - Tracks sync status (pending/synced/failed)
 - Ordered by timestamp
@@ -130,7 +139,8 @@ CREATE TABLE offline_mutations (
 Monitors network status and syncs pending mutations:
 
 ```typescript
-const { isOnline, isSyncing, pendingCount, syncPendingMutations } = useOfflineSync();
+const { isOnline, isSyncing, pendingCount, syncPendingMutations } =
+  useOfflineSync();
 
 // Automatically syncs when coming back online
 // Shows sync status in UI
@@ -258,7 +268,7 @@ const wsLink = new GraphQLWsLink(
     connectionParams: async () => ({
       authorization: await getAuthToken(),
     }),
-  }),
+  })
 );
 ```
 
@@ -270,7 +280,10 @@ const DISCUSSION_SUB = gql`
     discussionCreated(courseId: $courseId) {
       id
       content
-      author { firstName lastName }
+      author {
+        firstName
+        lastName
+      }
       createdAt
     }
   }
@@ -278,13 +291,13 @@ const DISCUSSION_SUB = gql`
 
 function DiscussionsScreen() {
   const { data } = useSubscription(DISCUSSION_SUB, {
-    variables: { courseId }
+    variables: { courseId },
   });
 
   useEffect(() => {
     if (data?.discussionCreated) {
       // Add to list with animation
-      setDiscussions(prev => [data.discussionCreated, ...prev]);
+      setDiscussions((prev) => [data.discussionCreated, ...prev]);
     }
   }, [data]);
 }
@@ -296,7 +309,10 @@ function DiscussionsScreen() {
 const MESSAGE_SUB = gql`
   subscription OnMessage($sessionId: ID!) {
     agentMessageCreated(sessionId: $sessionId) {
-      id role content createdAt
+      id
+      role
+      content
+      createdAt
     }
   }
 `;
@@ -306,7 +322,7 @@ function AITutorScreen() {
 
   useEffect(() => {
     if (data?.agentMessageCreated) {
-      setMessages(prev => [...prev, data.agentMessageCreated]);
+      setMessages((prev) => [...prev, data.agentMessageCreated]);
       flatListRef.current?.scrollToEnd({ animated: true });
     }
   }, [data]);
@@ -414,6 +430,7 @@ const CourseCard = React.memo(({ course }) => (
 ## Code Sharing Strategy
 
 ### Shared (70-80%)
+
 - ✅ GraphQL queries and mutations
 - ✅ Business logic and hooks
 - ✅ UI components (@edusphere/ui)
@@ -421,6 +438,7 @@ const CourseCard = React.memo(({ course }) => (
 - ✅ Utilities and helpers
 
 ### Platform-Specific (20-30%)
+
 - ❌ Navigation (React Navigation vs React Router)
 - ❌ Native modules (Camera, Push Notifications)
 - ❌ Platform APIs (SecureStore, FileSystem)
@@ -452,18 +470,21 @@ function CoursesScreen() {
 ## Testing Strategy
 
 ### Unit Tests
+
 ```bash
 # Test hooks and utilities
 jest apps/mobile/src/hooks/__tests__
 ```
 
 ### Integration Tests
+
 ```bash
 # Test screens with mocked Apollo
 jest apps/mobile/src/screens/__tests__
 ```
 
 ### E2E Tests
+
 ```bash
 # Detox for native e2e testing
 detox test --configuration ios.sim.debug
@@ -472,12 +493,14 @@ detox test --configuration ios.sim.debug
 ## Build & Deployment
 
 ### Development Build
+
 ```bash
 cd apps/mobile
 expo start
 ```
 
 ### Production Build (EAS)
+
 ```bash
 # Android
 eas build --platform android --profile production
@@ -487,6 +510,7 @@ eas build --platform ios --profile production
 ```
 
 ### Over-the-Air Updates
+
 ```bash
 # Push updates without app store review
 eas update --branch production --message "Bug fixes"
@@ -513,6 +537,7 @@ const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 ## Monitoring & Analytics
 
 ### Sentry Error Tracking
+
 ```typescript
 import * as Sentry from 'sentry-expo';
 
@@ -524,6 +549,7 @@ Sentry.init({
 ```
 
 ### Analytics
+
 ```typescript
 import * as Analytics from 'expo-firebase-analytics';
 
@@ -536,16 +562,19 @@ Analytics.logEvent('course_enrolled', {
 ## Next Steps
 
 ### Phase 13: Production Monitoring
+
 - Add Prometheus metrics
 - Setup Grafana dashboards
 - Configure alerts
 
 ### Phase 14: AI/ML Pipeline
+
 - Integrate RAG for semantic search
 - Add LangGraph for complex workflows
 - Build knowledge graph
 
 ### Mobile Enhancements
+
 - Push notifications (expo-notifications)
 - Biometric auth (expo-local-authentication)
 - Camera integration (expo-camera)

@@ -8,6 +8,7 @@ workflows were failing. Multiple fix rounds addressed the pnpm/action-setup@v4�
 endings, but 4 remaining categories of failure persist and need root-cause solutions.
 
 **Current state after previous fixes:**
+
 - ✅ CI workflow (`ci.yml`): passing (pnpm v2 fix worked)
 - ✅ Federation workflow (`federation.yml`): passing
 - ✅ Performance workflow (`performance.yml`): passing
@@ -22,6 +23,7 @@ endings, but 4 remaining categories of failure persist and need root-cause solut
 ## Fix 1 — test.yml "0 Jobs" (P0 — Root Cause Confirmed)
 
 ### Root Cause
+
 `args: ["-js"]` is **NOT a valid field** in GitHub Actions service container configuration.
 The GitHub Actions workflow YAML schema validator rejects the entire workflow file → 0 jobs start.
 This is why the UI shows the filename ("test.yml") instead of the workflow name ("Full Test Suite").
@@ -67,15 +69,16 @@ nats:
 
 Secondary failures that will appear AFTER the YAML validation is fixed:
 
-| Command in test.yml | Issue | Fix |
-|---|---|---|
-| `pnpm turbo test:integration --concurrency=2` | No `test:integration` task in `turbo.json` | Change to `pnpm turbo test --concurrency=2` |
-| `pnpm --filter @edusphere/db test:rls` | No `test:rls` script in `packages/db/package.json` | Change to `pnpm --filter @edusphere/db test` |
-| `pnpm --filter @edusphere/${{ matrix.package }} test:graphql` | No `test:graphql` script in any subgraph | Change to `pnpm --filter @edusphere/${{ matrix.package }} test` |
+| Command in test.yml                                           | Issue                                              | Fix                                                             |
+| ------------------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------- |
+| `pnpm turbo test:integration --concurrency=2`                 | No `test:integration` task in `turbo.json`         | Change to `pnpm turbo test --concurrency=2`                     |
+| `pnpm --filter @edusphere/db test:rls`                        | No `test:rls` script in `packages/db/package.json` | Change to `pnpm --filter @edusphere/db test`                    |
+| `pnpm --filter @edusphere/${{ matrix.package }} test:graphql` | No `test:graphql` script in any subgraph           | Change to `pnpm --filter @edusphere/${{ matrix.package }} test` |
 
 **File:** `.github/workflows/test.yml`
 
 ### Fix 1C — Fix missing newline at end of file (test-complete job)
+
 The `test-complete` job at line 380 ends without a trailing newline, which can cause GitHub Actions
 YAML parsing issues in some environments. Add a trailing newline.
 
@@ -84,21 +87,22 @@ YAML parsing issues in some environments. Add a trailing newline.
 ## Fix 2 — Docker Image Builds (P1 — Create 8 Dockerfiles)
 
 ### Root Cause
+
 `docker-build.yml` uses `file: apps/${{ matrix.service }}/Dockerfile` for 8 services.
 None of these Dockerfiles exist (only root `Dockerfile` and `apps/transcription-worker/Dockerfile`).
 
 ### Required Dockerfiles
 
-| File | Service | Base Pattern | Port |
-|---|---|---|---|
-| `apps/gateway/Dockerfile` | Hive Gateway v2 (tsx runtime) | node:20-alpine + tsx | 4000 |
-| `apps/subgraph-core/Dockerfile` | NestJS | node:20-alpine + nest build | 4001 |
-| `apps/subgraph-content/Dockerfile` | NestJS | node:20-alpine + nest build | 4002 |
-| `apps/subgraph-annotation/Dockerfile` | NestJS | node:20-alpine + nest build | 4003 |
-| `apps/subgraph-collaboration/Dockerfile` | NestJS | node:20-alpine + nest build | 4004 |
-| `apps/subgraph-agent/Dockerfile` | NestJS | node:20-alpine + nest build | 4005 |
-| `apps/subgraph-knowledge/Dockerfile` | NestJS | node:20-alpine + nest build | 4006 |
-| `apps/web/Dockerfile` | React + Vite → nginx | node:20-alpine + nginx:alpine | 80 |
+| File                                     | Service                       | Base Pattern                  | Port |
+| ---------------------------------------- | ----------------------------- | ----------------------------- | ---- |
+| `apps/gateway/Dockerfile`                | Hive Gateway v2 (tsx runtime) | node:20-alpine + tsx          | 4000 |
+| `apps/subgraph-core/Dockerfile`          | NestJS                        | node:20-alpine + nest build   | 4001 |
+| `apps/subgraph-content/Dockerfile`       | NestJS                        | node:20-alpine + nest build   | 4002 |
+| `apps/subgraph-annotation/Dockerfile`    | NestJS                        | node:20-alpine + nest build   | 4003 |
+| `apps/subgraph-collaboration/Dockerfile` | NestJS                        | node:20-alpine + nest build   | 4004 |
+| `apps/subgraph-agent/Dockerfile`         | NestJS                        | node:20-alpine + nest build   | 4005 |
+| `apps/subgraph-knowledge/Dockerfile`     | NestJS                        | node:20-alpine + nest build   | 4006 |
+| `apps/web/Dockerfile`                    | React + Vite → nginx          | node:20-alpine + nginx:alpine | 80   |
 
 ### Pattern A — NestJS Subgraphs (apps/subgraph-{name}/Dockerfile)
 
@@ -226,10 +230,12 @@ CMD ["nginx", "-g", "daemon off;"]
 ## Fix 3 — cd.yml Deployment Guards (P2)
 
 ### Root Cause
+
 The CD workflow immediately fails trying to decode `KUBECONFIG_STAGING` secret which doesn't exist.
 The workflow needs to **skip gracefully** when K8s infrastructure is not configured.
 
 ### Fix Strategy
+
 Add a prerequisite check job using a repository variable `DEPLOYMENT_ENABLED` (not a secret —
 variables can be checked safely). When the variable is not set to `true`, all deployment jobs skip.
 
@@ -264,6 +270,7 @@ deploy-staging:
 **File:** `.github/workflows/cd.yml`
 
 **To enable K8s deployment when ready:**
+
 1. Set up K8s cluster (AKS / EKS / GKE / k3s)
 2. Add `KUBECONFIG_STAGING` secret (base64-encoded kubeconfig)
 3. Add `KUBECONFIG_PRODUCTION` secret
@@ -275,20 +282,22 @@ deploy-staging:
 ## Fix 4 — TruffleHog Stability (P3)
 
 ### Root Cause
+
 `trufflesecurity/trufflehog@main` uses an unstable HEAD reference. GitHub recommends pinning
 actions to specific versions to prevent unexpected breakage when the action is updated.
 
 ### Fix
+
 Pin to the stable v3 tag and add `--fail` flag to properly fail on found secrets:
 
 ```yaml
 - name: TruffleHog OSS
-  uses: trufflesecurity/trufflehog@v3   # ← pin to stable major version
+  uses: trufflesecurity/trufflehog@v3 # ← pin to stable major version
   with:
     path: ./
     base: ${{ github.event.repository.default_branch }}
     head: HEAD
-    extra_args: --only-verified        # keep --only-verified (no false positives)
+    extra_args: --only-verified # keep --only-verified (no false positives)
 ```
 
 **File:** `.github/workflows/codeql.yml`
@@ -298,11 +307,14 @@ Pin to the stable v3 tag and add `--fail` flag to properly fail on found secrets
 ## Fix 5 — Vitest Version Alignment (P4)
 
 ### Root Cause
+
 `tests/contract/package.json` specifies `"vitest": "^3.0.0"` while all other packages use `"^4.0.18"`.
 This causes version conflicts in the monorepo and may cause `pnpm --filter @edusphere/contract-tests run test` to use a different vitest version than CI expects.
 
 ### Fix
+
 Update `tests/contract/package.json`:
+
 ```json
 "devDependencies": {
   "vitest": "^4.0.18"   // was: "^3.0.0"
@@ -327,20 +339,20 @@ All 3 agents run in parallel — zero dependencies between them.
 
 ## Files Modified / Created
 
-| File | Change | Fix |
-|---|---|---|
-| `.github/workflows/test.yml` | Remove `args: ["-js"]` NATS service entries; add docker run steps; fix missing scripts | 1A + 1B + 1C |
-| `apps/gateway/Dockerfile` | New — multi-stage with tsx runtime | 2 |
-| `apps/subgraph-core/Dockerfile` | New — multi-stage NestJS | 2 |
-| `apps/subgraph-content/Dockerfile` | New — multi-stage NestJS | 2 |
-| `apps/subgraph-annotation/Dockerfile` | New — multi-stage NestJS | 2 |
-| `apps/subgraph-collaboration/Dockerfile` | New — multi-stage NestJS | 2 |
-| `apps/subgraph-agent/Dockerfile` | New — multi-stage NestJS | 2 |
-| `apps/subgraph-knowledge/Dockerfile` | New — multi-stage NestJS | 2 |
-| `apps/web/Dockerfile` | New — Vite build → nginx:alpine | 2 |
-| `.github/workflows/cd.yml` | Add `check-prerequisites` job; add `needs:` guards on deploy jobs | 3 |
-| `.github/workflows/codeql.yml` | Pin TruffleHog to `@v3` | 4 |
-| `tests/contract/package.json` | Vitest `^3.0.0` → `^4.0.18` | 5 |
+| File                                     | Change                                                                                 | Fix          |
+| ---------------------------------------- | -------------------------------------------------------------------------------------- | ------------ |
+| `.github/workflows/test.yml`             | Remove `args: ["-js"]` NATS service entries; add docker run steps; fix missing scripts | 1A + 1B + 1C |
+| `apps/gateway/Dockerfile`                | New — multi-stage with tsx runtime                                                     | 2            |
+| `apps/subgraph-core/Dockerfile`          | New — multi-stage NestJS                                                               | 2            |
+| `apps/subgraph-content/Dockerfile`       | New — multi-stage NestJS                                                               | 2            |
+| `apps/subgraph-annotation/Dockerfile`    | New — multi-stage NestJS                                                               | 2            |
+| `apps/subgraph-collaboration/Dockerfile` | New — multi-stage NestJS                                                               | 2            |
+| `apps/subgraph-agent/Dockerfile`         | New — multi-stage NestJS                                                               | 2            |
+| `apps/subgraph-knowledge/Dockerfile`     | New — multi-stage NestJS                                                               | 2            |
+| `apps/web/Dockerfile`                    | New — Vite build → nginx:alpine                                                        | 2            |
+| `.github/workflows/cd.yml`               | Add `check-prerequisites` job; add `needs:` guards on deploy jobs                      | 3            |
+| `.github/workflows/codeql.yml`           | Pin TruffleHog to `@v3`                                                                | 4            |
+| `tests/contract/package.json`            | Vitest `^3.0.0` → `^4.0.18`                                                            | 5            |
 
 **Total:** 9 new files + 4 modified files
 
@@ -349,6 +361,7 @@ All 3 agents run in parallel — zero dependencies between them.
 ## Verification
 
 After commit + push:
+
 ```bash
 # 1. Verify test.yml now has jobs (wait ~2 min after push)
 gh run list --workflow=test.yml --limit=3

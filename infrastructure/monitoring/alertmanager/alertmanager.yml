@@ -1,45 +1,45 @@
 global:
   resolve_timeout: 5m
-  smtp_smarthost: 'smtp.gmail.com:587'
-  smtp_from: 'alerts@edusphere.com'
-  smtp_auth_username: 'alerts@edusphere.com'
-  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_smarthost: "smtp.gmail.com:587"
+  smtp_from: "alerts@edusphere.com"
+  smtp_auth_username: "alerts@edusphere.com"
+  smtp_auth_password: "${SMTP_PASSWORD}"
 
 # Templates for notifications
 templates:
-  - '/etc/alertmanager/templates/*.tmpl'
+  - "/etc/alertmanager/templates/*.tmpl"
 
 # Route tree
 route:
-  group_by: ['alertname', 'severity', 'service']
+  group_by: ["alertname", "severity", "service"]
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 12h
-  receiver: 'null'
+  receiver: "null"
 
   # Child routes
   routes:
     # Critical alerts go to PagerDuty
     - match:
         severity: critical
-      receiver: 'pagerduty'
+      receiver: "pagerduty"
       continue: true
 
     # All alerts go to Slack
     - match_re:
         severity: critical|warning|info
-      receiver: 'team-slack'
+      receiver: "team-slack"
 
 receivers:
   # Null/no-op receiver — used in dev (Slack/PagerDuty/Email require env vars)
   # In production: replace 'null' route receiver with 'team-slack' and set env vars:
   #   SLACK_WEBHOOK_URL, PAGERDUTY_SERVICE_KEY, SMTP_PASSWORD
-  - name: 'null'
+  - name: "null"
 
   # Placeholder receivers — inactive in dev (routes point to 'null')
-  - name: 'team-slack'
-  - name: 'pagerduty'
-  - name: 'team-email'
+  - name: "team-slack"
+  - name: "pagerduty"
+  - name: "team-email"
 
 # Inhibition rules
 inhibit_rules:
@@ -48,4 +48,4 @@ inhibit_rules:
       alertname: ServiceDown
     target_match:
       alertname: HighResponseTime
-    equal: ['service']
+    equal: ["service"]

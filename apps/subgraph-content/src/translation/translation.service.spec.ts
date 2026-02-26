@@ -28,7 +28,9 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args: unknown[]) => ({ and: args })),
-  withTenantContext: vi.fn((_db, _ctx, cb: (tx: typeof mockTx) => unknown) => cb(mockTx)),
+  withTenantContext: vi.fn((_db, _ctx, cb: (tx: typeof mockTx) => unknown) =>
+    cb(mockTx)
+  ),
 }));
 
 vi.mock('nats', () => ({
@@ -47,7 +49,11 @@ const MOCK_TRANSLATION = {
   updated_at: new Date('2026-01-01'),
 };
 
-const AUTH_CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+const AUTH_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'STUDENT' as const,
+};
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 describe('TranslationService', () => {
@@ -66,13 +72,21 @@ describe('TranslationService', () => {
   // ── findTranslation ────────────────────────────────────────────────────
   describe('findTranslation()', () => {
     it('returns a translation when one exists', async () => {
-      const result = await service.findTranslation('item-uuid-1', 'he', AUTH_CTX);
+      const result = await service.findTranslation(
+        'item-uuid-1',
+        'he',
+        AUTH_CTX
+      );
       expect(result).toEqual(MOCK_TRANSLATION);
     });
 
     it('returns null when translation not found', async () => {
       mockLimit.mockResolvedValue([]);
-      const result = await service.findTranslation('item-uuid-1', 'fr', AUTH_CTX);
+      const result = await service.findTranslation(
+        'item-uuid-1',
+        'fr',
+        AUTH_CTX
+      );
       expect(result).toBeNull();
     });
 
@@ -82,7 +96,7 @@ describe('TranslationService', () => {
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
         expect.objectContaining({ tenantId: 'tenant-1' }),
-        expect.any(Function),
+        expect.any(Function)
       );
     });
 
@@ -103,56 +117,87 @@ describe('TranslationService', () => {
   describe('requestTranslation()', () => {
     beforeEach(() => {
       // Default insert chain
-      mockReturning.mockResolvedValue([{ ...MOCK_TRANSLATION, translation_status: 'PROCESSING' }]);
+      mockReturning.mockResolvedValue([
+        { ...MOCK_TRANSLATION, translation_status: 'PROCESSING' },
+      ]);
       mockOnConflictDoUpdate.mockReturnValue({ returning: mockReturning });
-      mockValues.mockReturnValue({ onConflictDoUpdate: mockOnConflictDoUpdate });
+      mockValues.mockReturnValue({
+        onConflictDoUpdate: mockOnConflictDoUpdate,
+      });
       mockInsert.mockReturnValue({ values: mockValues });
     });
 
     it('returns existing COMPLETED translation without upserting', async () => {
-      mockLimit.mockResolvedValue([{ ...MOCK_TRANSLATION, translation_status: 'COMPLETED' }]);
-      const result = await service.requestTranslation('item-uuid-1', 'he', AUTH_CTX);
+      mockLimit.mockResolvedValue([
+        { ...MOCK_TRANSLATION, translation_status: 'COMPLETED' },
+      ]);
+      const result = await service.requestTranslation(
+        'item-uuid-1',
+        'he',
+        AUTH_CTX
+      );
       expect(result.translation_status).toBe('COMPLETED');
       expect(mockInsert).not.toHaveBeenCalled();
     });
 
     it('returns existing PROCESSING translation without upserting', async () => {
-      mockLimit.mockResolvedValue([{ ...MOCK_TRANSLATION, translation_status: 'PROCESSING' }]);
-      const result = await service.requestTranslation('item-uuid-1', 'he', AUTH_CTX);
+      mockLimit.mockResolvedValue([
+        { ...MOCK_TRANSLATION, translation_status: 'PROCESSING' },
+      ]);
+      const result = await service.requestTranslation(
+        'item-uuid-1',
+        'he',
+        AUTH_CTX
+      );
       expect(result.translation_status).toBe('PROCESSING');
       expect(mockInsert).not.toHaveBeenCalled();
     });
 
     it('upserts a new PROCESSING record when none exists', async () => {
       mockLimit.mockResolvedValue([]);
-      const result = await service.requestTranslation('item-uuid-1', 'fr', AUTH_CTX);
+      const result = await service.requestTranslation(
+        'item-uuid-1',
+        'fr',
+        AUTH_CTX
+      );
       expect(mockInsert).toHaveBeenCalled();
       expect(result.translation_status).toBe('PROCESSING');
     });
 
     it('publishes content.translate.requested for new translations', async () => {
       const { connect } = await import('nats');
-      const mockNc = { publish: vi.fn(), flush: vi.fn().mockResolvedValue(undefined), close: vi.fn().mockResolvedValue(undefined) };
+      const mockNc = {
+        publish: vi.fn(),
+        flush: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockResolvedValue(undefined),
+      };
       (connect as ReturnType<typeof vi.fn>).mockResolvedValue(mockNc);
       mockLimit.mockResolvedValue([]);
       await service.requestTranslation('item-uuid-1', 'fr', AUTH_CTX);
       expect(connect).toHaveBeenCalled();
-      expect(mockNc.publish).toHaveBeenCalledWith('content.translate.requested', expect.anything());
+      expect(mockNc.publish).toHaveBeenCalledWith(
+        'content.translate.requested',
+        expect.anything()
+      );
     });
 
     it('does not throw when NATS publish fails', async () => {
       const { connect } = await import('nats');
-      (connect as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('NATS down'));
+      (connect as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new Error('NATS down')
+      );
       mockLimit.mockResolvedValue([]);
-      await expect(service.requestTranslation('item-uuid-1', 'fr', AUTH_CTX)).resolves.toBeDefined();
+      await expect(
+        service.requestTranslation('item-uuid-1', 'fr', AUTH_CTX)
+      ).resolves.toBeDefined();
     });
 
     it('throws when insert returns no row', async () => {
       mockLimit.mockResolvedValue([]);
       mockReturning.mockResolvedValue([]);
-      await expect(service.requestTranslation('item-uuid-1', 'fr', AUTH_CTX)).rejects.toThrow(
-        'Failed to upsert translation record',
-      );
+      await expect(
+        service.requestTranslation('item-uuid-1', 'fr', AUTH_CTX)
+      ).rejects.toThrow('Failed to upsert translation record');
     });
   });
 });

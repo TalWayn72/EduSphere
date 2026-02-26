@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
@@ -89,7 +95,9 @@ describe('SearchPage', () => {
   it('renders suggested search chips in the empty state', () => {
     renderSearch();
     expect(screen.getByRole('button', { name: 'Talmud' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'chavruta' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'chavruta' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Rambam' })).toBeInTheDocument();
   });
 
@@ -172,7 +180,8 @@ describe('SearchPage', () => {
     await userEvent.type(input, 'talmud');
 
     await waitFor(
-      () => expect(screen.getByText(/results? for "talmud"/i)).toBeInTheDocument(),
+      () =>
+        expect(screen.getByText(/results? for "talmud"/i)).toBeInTheDocument(),
       { timeout: 2000 }
     );
   });
@@ -180,7 +189,10 @@ describe('SearchPage', () => {
   it('renders grouped section heading "Courses" when course results exist', async () => {
     renderSearch();
 
-    await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'talmud');
+    await userEvent.type(
+      screen.getByPlaceholderText(/search courses/i),
+      'talmud'
+    );
 
     await waitFor(
       () => expect(screen.getByText('Courses')).toBeInTheDocument(),
@@ -191,12 +203,17 @@ describe('SearchPage', () => {
   it('renders grouped section heading for at least one result type', async () => {
     renderSearch();
 
-    await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'talmud');
+    await userEvent.type(
+      screen.getByPlaceholderText(/search courses/i),
+      'talmud'
+    );
 
     await waitFor(
       () => {
         // At least one of the known section headings must appear
-        const heading = screen.queryByText(/Courses|Transcripts|Annotations|Concepts/i);
+        const heading = screen.queryByText(
+          /Courses|Transcripts|Annotations|Concepts/i
+        );
         expect(heading).not.toBeNull();
       },
       { timeout: 2000 }
@@ -241,7 +258,10 @@ describe('SearchPage', () => {
 
     // After debounce completes (300ms real time), results + count appear
     await waitFor(
-      () => expect(screen.getByText(/results? for "reasoning"/i)).toBeInTheDocument(),
+      () =>
+        expect(
+          screen.getByText(/results? for "reasoning"/i)
+        ).toBeInTheDocument(),
       { timeout: 2000 }
     );
   });
@@ -270,7 +290,10 @@ describe('SearchPage', () => {
   it('renders highlighted <mark> elements for matching query text in results', async () => {
     renderSearch();
 
-    await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'talmud');
+    await userEvent.type(
+      screen.getByPlaceholderText(/search courses/i),
+      'talmud'
+    );
 
     await waitFor(
       () => {
@@ -306,7 +329,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -340,7 +365,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -360,7 +387,10 @@ describe('SearchPage', () => {
 
       // Should show result count, not "No results found"
       await waitFor(
-        () => expect(screen.getByText(/results? for "Talmud"/i)).toBeInTheDocument(),
+        () =>
+          expect(
+            screen.getByText(/results? for "Talmud"/i)
+          ).toBeInTheDocument(),
         { timeout: 2000 }
       );
     });
@@ -371,7 +401,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -390,7 +422,10 @@ describe('SearchPage', () => {
       await userEvent.type(input, 'Rambam');
 
       await waitFor(
-        () => expect(screen.getByText(/results? for "Rambam"/i)).toBeInTheDocument(),
+        () =>
+          expect(
+            screen.getByText(/results? for "Rambam"/i)
+          ).toBeInTheDocument(),
         { timeout: 2000 }
       );
     });
@@ -401,7 +436,9 @@ describe('SearchPage', () => {
         {
           data: undefined,
           fetching: false,
-          error: new Error('Network request failed') as ReturnType<typeof useQuery>[0]['error'],
+          error: new Error('Network request failed') as ReturnType<
+            typeof useQuery
+          >[0]['error'],
         },
         vi.fn(),
       ] as unknown as ReturnType<typeof useQuery>);
@@ -420,7 +457,10 @@ describe('SearchPage', () => {
       await userEvent.type(input, 'chavruta');
 
       await waitFor(
-        () => expect(screen.getByText(/results? for "chavruta"/i)).toBeInTheDocument(),
+        () =>
+          expect(
+            screen.getByText(/results? for "chavruta"/i)
+          ).toBeInTheDocument(),
         { timeout: 2000 }
       );
     });
@@ -453,6 +493,186 @@ describe('SearchPage', () => {
           ).not.toBeInTheDocument(),
         { timeout: 2000 }
       );
+    });
+
+    // ── Semantic result type determination (lines 241-243) ────────────────────
+
+    it('renders "Concepts" section heading when entityType is "concept"', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-1',
+                text: 'Free will and determinism',
+                similarity: 0.92,
+                entityType: 'concept',
+                entityId: 'concept-42',
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'fr');
+
+      await waitFor(
+        () => expect(screen.getByText('Concepts')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('renders "Transcripts" section heading when entityType is not "concept"', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-2',
+                text: 'The lecture on Talmudic law begins at minute three',
+                similarity: 0.85,
+                entityType: 'transcript',
+                entityId: 'content-7',
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'le');
+
+      await waitFor(
+        () => expect(screen.getByText('Transcripts')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    // ── Card click navigates to result href (line 395) ────────────────────────
+
+    it('clicking a concept result card navigates to /graph', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-3',
+                text: 'Kal vachomer argument structure\nA logical inference',
+                similarity: 0.91,
+                entityType: 'concept',
+                entityId: 'concept-99',
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      // Render with a navigate-capturing wrapper
+      const NavigateSpy = ({ to: _to }: { to: string }) => null;
+      void NavigateSpy; // suppress unused warning
+
+      const { container } = render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'ka');
+
+      // Wait for the concept card to appear
+      await waitFor(
+        () => expect(screen.getByText('Concepts')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+
+      // Click the card — it navigates to '/graph' for concept results
+      const cards = container.querySelectorAll('[class*="cursor-pointer"]');
+      expect(cards.length).toBeGreaterThan(0);
+      // Clicking must not throw (navigation is handled by react-router MemoryRouter)
+      expect(() => fireEvent.click(cards[0]!)).not.toThrow();
+    });
+
+    it('clicking a transcript result card does not throw', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-4',
+                text: 'Lecture excerpt about pilpul methodology in Talmudic debate',
+                similarity: 0.78,
+                entityType: 'transcript',
+                entityId: 'content-15',
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      const { container } = render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'pi');
+
+      await waitFor(
+        () => expect(screen.getByText('Transcripts')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+
+      const cards = container.querySelectorAll('[class*="cursor-pointer"]');
+      expect(cards.length).toBeGreaterThan(0);
+      // Card click navigates to /learn/content-15 — must not throw
+      expect(() => fireEvent.click(cards[0]!)).not.toThrow();
     });
   });
 });

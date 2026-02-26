@@ -10,15 +10,15 @@ import { GRAPHQL_URL, checkResponse, randomSleep } from '../utils/helpers.js';
 
 export const options = {
   stages: [
-    { duration: '2m', target: 200 },   // Ramp up
-    { duration: '5m', target: 1000 },  // Sustained load
-    { duration: '2m', target: 1000 },  // Hold
-    { duration: '1m', target: 0 },     // Ramp down
+    { duration: '2m', target: 200 }, // Ramp up
+    { duration: '5m', target: 1000 }, // Sustained load
+    { duration: '2m', target: 1000 }, // Hold
+    { duration: '1m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_failed: ['rate<0.05'],          // < 5% error rate
-    http_req_duration: ['p(95)<2000'],       // 95th percentile < 2s
-    'http_req_duration{scenario:default}': ['p(99)<5000'],  // 99th percentile < 5s
+    http_req_failed: ['rate<0.05'], // < 5% error rate
+    http_req_duration: ['p(95)<2000'], // 95th percentile < 2s
+    'http_req_duration{scenario:default}': ['p(99)<5000'], // 99th percentile < 5s
   },
 };
 
@@ -43,11 +43,7 @@ export default function (data) {
   const headers = authHeaders(data.token);
   const query = QUERIES[Math.floor(Math.random() * QUERIES.length)];
 
-  const res = http.post(
-    GRAPHQL_URL,
-    JSON.stringify({ query }),
-    { headers }
-  );
+  const res = http.post(GRAPHQL_URL, JSON.stringify({ query }), { headers });
 
   checkResponse(res);
   randomSleep(1, 5);

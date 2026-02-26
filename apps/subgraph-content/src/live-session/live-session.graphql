@@ -1,0 +1,24 @@
+type LiveSession {
+  id: ID!
+  contentItemId: ID!
+  meetingName: String!
+  scheduledAt: String!
+  status: String!
+  recordingUrl: String
+}
+
+extend type Query {
+  liveSession(contentItemId: ID!): LiveSession @authenticated
+}
+
+extend type Mutation {
+  createLiveSession(
+    contentItemId: ID!
+    scheduledAt: String!
+    meetingName: String!
+  ): LiveSession! @authenticated
+
+  joinLiveSession(sessionId: ID!): String! @authenticated
+
+  endLiveSession(sessionId: ID!): LiveSession! @authenticated
+}

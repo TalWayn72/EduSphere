@@ -6,9 +6,11 @@ import {
   ResolveField,
   Parent,
   ResolveReference,
+  Context,
 } from '@nestjs/graphql';
 import { ModuleService } from './module.service';
-import { ContentItemService } from '../content-item/content-item.service';
+import { ContentItemLoader } from '../content-item/content-item.loader';
+import { ModuleLoader } from './module.loader';
 
 interface ModuleParent {
   id: string;
@@ -21,11 +23,18 @@ interface ModuleInput {
   orderIndex?: number;
 }
 
+interface GraphQLContext {
+  loaders?: {
+    contentItems?: ContentItemLoader;
+  };
+}
+
 @Resolver('Module')
 export class ModuleResolver {
   constructor(
     private readonly moduleService: ModuleService,
-    private readonly contentItemService: ContentItemService,
+    private readonly contentItemLoader: ContentItemLoader,
+    private readonly moduleLoader: ModuleLoader
   ) {}
 
   @Query('module')
@@ -44,7 +53,10 @@ export class ModuleResolver {
   }
 
   @Mutation('updateModule')
-  async updateModule(@Args('id') id: string, @Args('input') input: ModuleInput) {
+  async updateModule(
+    @Args('id') id: string,
+    @Args('input') input: ModuleInput
+  ) {
     return this.moduleService.update(id, input);
   }
 
@@ -61,13 +73,30 @@ export class ModuleResolver {
     return this.moduleService.reorder(courseId, moduleIds);
   }
 
+  /**
+   * ResolveField uses ContentItemLoader (DataLoader) to batch all
+   * contentItems requests for a list of modules into one DB query,
+   * eliminating the N+1 problem.
+   *
+   * Falls back to the injected loader instance if the GraphQL context
+   * does not carry a per-request loader (e.g. in unit tests).
+   */
   @ResolveField('contentItems')
-  async getContentItems(@Parent() mod: ModuleParent) {
-    return this.contentItemService.findByModule(mod.id);
+  async getContentItems(
+    @Parent() mod: ModuleParent,
+    @Context() ctx: GraphQLContext
+  ) {
+    const loader = ctx.loaders?.contentItems ?? this.contentItemLoader;
+    return loader.byModuleId.load(mod.id);
   }
 
+  /**
+   * ResolveReference uses ModuleLoader byId (DataLoader) to batch
+   * federation entity resolution calls into one DB query per request tick,
+   * eliminating the N+1 problem for @ResolveReference.
+   */
   @ResolveReference()
   async resolveReference(reference: { __typename: string; id: string }) {
-    return this.moduleService.findById(reference.id);
+    return this.moduleLoader.byId.load(reference.id);
   }
 }

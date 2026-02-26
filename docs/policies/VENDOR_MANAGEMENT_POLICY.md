@@ -16,31 +16,35 @@ Manage the security and privacy risks introduced by third-party vendors and subp
 
 ## 2. Vendor Classification
 
-| Tier | Definition | Examples | Controls |
-|------|-----------|---------|---------|
-| **Tier 1 — Critical** | Access to customer PII or production systems | OpenAI, Anthropic, AWS, Keycloak | Full security review, DPA, annual audit |
-| **Tier 2 — Important** | Access to non-PII operational data | GitHub, Sentry, Datadog | Security review, DPA if EU data |
-| **Tier 3 — Standard** | No data access (tools only) | Figma, Notion | Standard contract, ToS review |
+| Tier                   | Definition                                   | Examples                         | Controls                                |
+| ---------------------- | -------------------------------------------- | -------------------------------- | --------------------------------------- |
+| **Tier 1 — Critical**  | Access to customer PII or production systems | OpenAI, Anthropic, AWS, Keycloak | Full security review, DPA, annual audit |
+| **Tier 2 — Important** | Access to non-PII operational data           | GitHub, Sentry, Datadog          | Security review, DPA if EU data         |
+| **Tier 3 — Standard**  | No data access (tools only)                  | Figma, Notion                    | Standard contract, ToS review           |
 
 ## 3. Vendor Onboarding Process
 
 ### Step 1: Security Assessment
+
 - Complete Vendor Security Questionnaire (VSQ)
 - Review SOC2 Type II report (Tier 1 required; Tier 2 preferred)
 - Review ISO 27001 certificate or equivalent
 - Verify GDPR DPA availability (required for EU data processors)
 
 ### Step 2: Legal Review
+
 - Data Processing Agreement (DPA) executed before any data sharing
 - Review data residency (EU data must stay in EU unless adequacy decision exists)
 - Confirm subprocessor notification obligations if applicable
 
 ### Step 3: Approval
+
 - Tier 1: CISO + Legal approval required
 - Tier 2: CISO approval required
 - Tier 3: Engineering Lead approval sufficient
 
 ### Step 4: Registration
+
 - Added to Vendor Register (`docs/security/VENDOR_REGISTER.md`)
 - DPA filed in legal document management system
 - Review date set (Tier 1: annual; Tier 2: annual; Tier 3: biennial)
@@ -58,7 +62,7 @@ All LLM providers (OpenAI, Anthropic) are Tier 1 vendors with additional control
 
 ## 5. Subprocessor List
 
-EduSphere's current subprocessor list is maintained at `docs/security/SUBPROCESSORS.md` and updated within 30 days of any change. Customers receive 30-day advance notice of new subprocessors (GDPR Art.28(2)).
+EduSphere's current subprocessor list is maintained at `docs/security/SUBPROCESSOR_REGISTER.md` and updated within 30 days of any change. Customers receive 30-day advance notice of new subprocessors (GDPR Art.28(2)).
 
 Key subprocessors:
 | Subprocessor | Purpose | Data | Region | DPA |
@@ -77,6 +81,7 @@ Key subprocessors:
 ## 7. Vendor Incident Response
 
 If a vendor reports a security incident affecting EduSphere data:
+
 1. Activate incident response process (P1 minimum)
 2. Obtain incident report from vendor within 24 hours
 3. Assess customer impact and GDPR notification obligation

@@ -7,8 +7,16 @@ import { createYoga } from 'graphql-yoga';
 import { createServer } from 'http';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import pino from 'pino';
-import { checkRateLimit } from './middleware/rate-limit.js';
-import { depthLimitRule, complexityLimitRule } from './middleware/query-complexity.js';
+import {
+  checkRateLimit,
+  stopRateLimitCleanup,
+  PREMIUM_MAX_REQUESTS,
+  MAX_REQUESTS,
+} from './middleware/rate-limit.js';
+import {
+  depthLimitRule,
+  complexityLimitRule,
+} from './middleware/query-complexity.js';
 import { createNatsPubSub, shutdownNatsPubSub } from './nats-subscriptions.js';
 
 const logger = pino({
@@ -31,12 +39,38 @@ const gateway = createGateway({
     type: 'config',
     config: {
       subgraphs: [
-        { name: 'core', url: process.env.SUBGRAPH_CORE_URL || 'http://localhost:4001/graphql' },
-        { name: 'content', url: process.env.SUBGRAPH_CONTENT_URL || 'http://localhost:4002/graphql' },
-        { name: 'annotation', url: process.env.SUBGRAPH_ANNOTATION_URL || 'http://localhost:4003/graphql' },
-        { name: 'collaboration', url: process.env.SUBGRAPH_COLLABORATION_URL || 'http://localhost:4004/graphql' },
-        { name: 'agent', url: process.env.SUBGRAPH_AGENT_URL || 'http://localhost:4005/graphql' },
-        { name: 'knowledge', url: process.env.SUBGRAPH_KNOWLEDGE_URL || 'http://localhost:4006/graphql' },
+        {
+          name: 'core',
+          url: process.env.SUBGRAPH_CORE_URL || 'http://localhost:4001/graphql',
+        },
+        {
+          name: 'content',
+          url:
+            process.env.SUBGRAPH_CONTENT_URL || 'http://localhost:4002/graphql',
+        },
+        {
+          name: 'annotation',
+          url:
+            process.env.SUBGRAPH_ANNOTATION_URL ||
+            'http://localhost:4003/graphql',
+        },
+        {
+          name: 'collaboration',
+          url:
+            process.env.SUBGRAPH_COLLABORATION_URL ||
+            'http://localhost:4004/graphql',
+        },
+        {
+          name: 'agent',
+          url:
+            process.env.SUBGRAPH_AGENT_URL || 'http://localhost:4005/graphql',
+        },
+        {
+          name: 'knowledge',
+          url:
+            process.env.SUBGRAPH_KNOWLEDGE_URL ||
+            'http://localhost:4006/graphql',
+        },
       ],
     },
   },
@@ -62,7 +96,7 @@ function rateLimitedResponse(resetAt: number): Response {
         'Content-Type': 'application/json',
         'Retry-After': String(retryAfterSec),
       },
-    },
+    }
   );
 }
 
@@ -91,7 +125,10 @@ const yoga = createYoga({
 
     const rateCheck = checkRateLimit(tenantId);
     if (!rateCheck.allowed) {
-      logger.warn({ tenantId, resetAt: rateCheck.resetAt }, 'G-09: rate limit exceeded');
+      logger.warn(
+        { tenantId, resetAt: rateCheck.resetAt },
+        'G-09: rate limit exceeded'
+      );
       // Yoga supports returning a Response from context to short-circuit
       throw Object.assign(new Error('Rate limit exceeded'), {
         _rateLimitResponse: rateLimitedResponse(rateCheck.resetAt),
@@ -106,14 +143,32 @@ const yoga = createYoga({
 
     if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.slice(7);
-      try {
-        const { payload } = await jwtVerify(token, JWKS, { issuer: KEYCLOAK_ISSUER });
-        resolvedTenantId = (payload['tenant_id'] as string) ?? null;
-        userId = payload.sub ?? null;
-        role = (payload['role'] as string) ?? null;
+
+      // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
+      // non-production environments. NEVER active when NODE_ENV=production.
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        token === 'dev-token-mock-jwt'
+      ) {
+        resolvedTenantId = 'dev-tenant-1';
+        userId = 'dev-user-1';
+        role = 'SUPER_ADMIN';
         isAuthenticated = true;
-      } catch (error) {
-        logger.warn({ err: error }, 'JWT verification failed — request proceeds unauthenticated');
+      } else {
+        try {
+          const { payload } = await jwtVerify(token, JWKS, {
+            issuer: KEYCLOAK_ISSUER,
+          });
+          resolvedTenantId = (payload['tenant_id'] as string) ?? null;
+          userId = payload.sub ?? null;
+          role = (payload['role'] as string) ?? null;
+          isAuthenticated = true;
+        } catch (error) {
+          logger.warn(
+            { err: error },
+            'JWT verification failed — request proceeds unauthenticated'
+          );
+        }
       }
     }
 
@@ -151,7 +206,10 @@ const server = createServer(async (req, res) => {
   const rateCheck = checkRateLimit(key ?? 'unknown');
   if (!rateCheck.allowed) {
     const retryAfterSec = Math.ceil((rateCheck.resetAt - Date.now()) / 1000);
-    logger.warn({ key, resetAt: rateCheck.resetAt }, 'G-09: rate limit exceeded (HTTP layer)');
+    logger.warn(
+      { key, resetAt: rateCheck.resetAt },
+      'G-09: rate limit exceeded (HTTP layer)'
+    );
     res.writeHead(429, {
       'Content-Type': 'application/json',
       'Retry-After': String(retryAfterSec),
@@ -161,10 +219,13 @@ const server = createServer(async (req, res) => {
         errors: [
           {
             message: 'Rate limit exceeded. Please retry later.',
-            extensions: { code: 'RATE_LIMIT_EXCEEDED', retryAfter: rateCheck.resetAt },
+            extensions: {
+              code: 'RATE_LIMIT_EXCEEDED',
+              retryAfter: rateCheck.resetAt,
+            },
           },
         ],
-      }),
+      })
     );
     return;
   }
@@ -177,8 +238,14 @@ server.listen(port, () => {
   logger.info(`Gateway running on http://localhost:${port}/graphql`);
   logger.info('GraphQL Playground available');
   logger.info(
-    { maxDepth: process.env['GRAPHQL_MAX_DEPTH'] ?? 10, maxComplexity: process.env['GRAPHQL_MAX_COMPLEXITY'] ?? 1000, rateLimitMax: process.env['RATE_LIMIT_MAX'] ?? 100 },
-    'G-09/G-10: rate limiting + query guards active',
+    {
+      maxDepth: process.env['GRAPHQL_MAX_DEPTH'] ?? 10,
+      maxComplexity: process.env['GRAPHQL_MAX_COMPLEXITY'] ?? 1000,
+      rateLimitStandardPerMin: MAX_REQUESTS,
+      rateLimitPremiumPerMin: PREMIUM_MAX_REQUESTS,
+      premiumTenants: process.env['RATE_LIMIT_PREMIUM_TENANTS'] ?? '(none)',
+    },
+    'G-09/G-10: per-tenant rate limiting (standard/premium tiers) + query guards active'
   );
 });
 
@@ -190,6 +257,9 @@ async function shutdown(signal: string): Promise<void> {
   server.close(() => {
     logger.info('HTTP server closed');
   });
+
+  stopRateLimitCleanup();
+  logger.info('Rate-limit cleanup stopped');
 
   await shutdownNatsPubSub();
   logger.info('NATS pub/sub drained');

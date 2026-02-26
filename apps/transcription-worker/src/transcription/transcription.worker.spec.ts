@@ -45,7 +45,7 @@ describe('TranscriptionWorker', () => {
     });
     worker = new TranscriptionWorker(
       mockTranscriptionService as any,
-      mockNatsService as any,
+      mockNatsService as any
     );
   });
 
@@ -64,10 +64,9 @@ describe('TranscriptionWorker', () => {
 
       await worker.onModuleInit();
 
-      expect(mockConn.subscribe).toHaveBeenCalledWith(
-        'media.uploaded',
-        { queue: 'transcription-workers' }
-      );
+      expect(mockConn.subscribe).toHaveBeenCalledWith('media.uploaded', {
+        queue: 'transcription-workers',
+      });
     });
   });
 
@@ -90,7 +89,9 @@ describe('TranscriptionWorker', () => {
       // Allow async message loop to run
       await new Promise((r) => setTimeout(r, 50));
 
-      expect(mockTranscriptionService.transcribeFile).toHaveBeenCalledWith(event);
+      expect(mockTranscriptionService.transcribeFile).toHaveBeenCalledWith(
+        event
+      );
     });
 
     it('does not crash on malformed JSON messages', async () => {

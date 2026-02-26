@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { useState } from 'react';
 import type { AuthUser } from '@/lib/auth';
 
 // ── Mocks ──────────────────────────────────────────────────────────────────
@@ -27,12 +34,20 @@ vi.mock('@/components/ui/select', () => ({
   Select: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select">{children}</div>
   ),
-  SelectTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectValue: () => <span>Beginner</span>,
-  SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <div data-value={value}>{children}</div>
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
+  SelectValue: () => <span>Beginner</span>,
+  SelectContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  SelectItem: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => <div data-value={value}>{children}</div>,
 }));
 
 // Stub Media step — requires Hocuspocus/Yjs which can't run in jsdom
@@ -40,17 +55,136 @@ vi.mock('./CourseWizardMediaStep', () => ({
   CourseWizardMediaStep: () => <div data-testid="media-step">Media Upload</div>,
 }));
 
+// Stub Step 2 — now lazy-loaded; mock so Suspense resolves synchronously in jsdom
+vi.mock('./CourseWizardStep2', () => ({
+  CourseWizardStep2: ({
+    modules,
+    onChange,
+  }: {
+    modules: Array<{ title: string; order: number }>;
+    onChange: (updates: {
+      modules: Array<{ title: string; order: number }>;
+    }) => void;
+  }) => {
+    const [moduleTitle, setModuleTitle] = useState('');
+    return (
+      <div>
+        {modules.length === 0 ? (
+          <p>No modules yet</p>
+        ) : (
+          <ul>
+            {modules.map((m, i) => (
+              <li key={i}>
+                <span>Module {i + 1}</span>
+                <span>{m.title}</span>
+                <button
+                  type="button"
+                  aria-label="Remove module"
+                  onClick={() =>
+                    onChange({ modules: modules.filter((_, idx) => idx !== i) })
+                  }
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <label htmlFor="mock-module-title">Module Title</label>
+        <input
+          id="mock-module-title"
+          value={moduleTitle}
+          onChange={(e) => setModuleTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && moduleTitle.trim()) {
+              onChange({
+                modules: [
+                  ...modules,
+                  { title: moduleTitle.trim(), order: modules.length + 1 },
+                ],
+              });
+              setModuleTitle('');
+            }
+          }}
+        />
+        <button
+          type="button"
+          disabled={!moduleTitle.trim()}
+          onClick={() => {
+            onChange({
+              modules: [
+                ...modules,
+                { title: moduleTitle.trim(), order: modules.length + 1 },
+              ],
+            });
+            setModuleTitle('');
+          }}
+        >
+          Add Module
+        </button>
+      </div>
+    );
+  },
+}));
+
+// Stub Step 3 (Publish/Review) — now lazy-loaded; mock so Suspense resolves synchronously
+vi.mock('./CourseWizardStep3', () => ({
+  CourseWizardStep3: ({
+    data,
+    onPublish,
+    isSubmitting,
+  }: {
+    data: { title: string; modules: Array<{ title: string }> };
+    onPublish: (isPublished: boolean) => void;
+    isSubmitting: boolean;
+  }) => (
+    <div>
+      <p>Review your course before publishing</p>
+      <p>{data.title}</p>
+      {data.modules.length > 0 && (
+        <>
+          <p>
+            {data.modules.length} module{data.modules.length !== 1 ? 's' : ''}
+          </p>
+          {data.modules.map((m, i) => (
+            <p key={i}>{m.title}</p>
+          ))}
+        </>
+      )}
+      <button
+        type="button"
+        disabled={isSubmitting}
+        onClick={() => onPublish(true)}
+      >
+        Publish Course
+      </button>
+      <button
+        type="button"
+        disabled={isSubmitting}
+        onClick={() => onPublish(false)}
+      >
+        Save as Draft
+      </button>
+    </div>
+  ),
+}));
+
 // Stub sonner toast — prevents real toast system from mounting
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 // Mock urql so useMutation doesn't throw "No client" in tests.
 // We spread the real module so `gql` and other named exports remain available.
-const mockExecuteMutation = vi.fn().mockResolvedValue({ data: null, error: null });
+const mockExecuteMutation = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: null });
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useMutation: () => [{ fetching: false, data: null, error: null }, mockExecuteMutation],
+    useMutation: () => [
+      { fetching: false, data: null, error: null },
+      mockExecuteMutation,
+    ],
     useQuery: () => [{ fetching: false, data: null, error: null }, vi.fn()],
     Provider: ({ children }: { children: React.ReactNode }) => children,
   };
@@ -89,6 +223,10 @@ async function advanceToStep2(title = 'Test Course That Is Long Enough') {
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
   });
+  // CourseWizardStep2 is lazy-loaded — wait for it to mount before interacting
+  await waitFor(() =>
+    expect(screen.getByLabelText(/module title/i)).toBeInTheDocument()
+  );
 }
 
 /** Navigate the wizard to Step 3 (Publish/Review) */
@@ -98,10 +236,20 @@ async function advanceToStep3(title = 'Test Course That Is Long Enough') {
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
   });
+  // CourseWizardMediaStep is lazy-loaded (mocked) — wait for it to mount
+  await waitFor(() =>
+    expect(screen.getByTestId('media-step')).toBeInTheDocument()
+  );
   // Step 3 (Media) → Step 4 (Publish)
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
   });
+  // CourseWizardStep3 is lazy-loaded — wait for Publish button to appear
+  await waitFor(() =>
+    expect(
+      screen.getByRole('button', { name: /publish course/i })
+    ).toBeInTheDocument()
+  );
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -121,12 +269,16 @@ describe('CourseCreatePage', () => {
 
   it('renders the page heading "Create New Course"', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /create new course/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /create new course/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Step 1 (Course Info) card heading initially', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /course info/i, level: 2 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /course info/i, level: 2 })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/course title/i)).toBeInTheDocument();
   });
 
@@ -179,7 +331,9 @@ describe('CourseCreatePage', () => {
     fireEvent.change(titleInput, { target: { value: 'AB' } });
     fireEvent.blur(titleInput);
     await waitFor(() => {
-      expect(screen.getByText(/title must be at least 3 characters/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/title must be at least 3 characters/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -188,7 +342,9 @@ describe('CourseCreatePage', () => {
   it('entering a title and clicking Next advances to Step 2 (Modules card heading)', async () => {
     renderPage();
     await advanceToStep2('Introduction to Talmud Study');
-    expect(screen.getByRole('heading', { name: /^modules$/i, level: 2 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /^modules$/i, level: 2 })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/module title/i)).toBeInTheDocument();
   });
 
@@ -225,7 +381,9 @@ describe('CourseCreatePage', () => {
     await advanceToStep2();
 
     const moduleTitleInput = screen.getByLabelText(/module title/i);
-    fireEvent.change(moduleTitleInput, { target: { value: 'Tractate Berakhot' } });
+    fireEvent.change(moduleTitleInput, {
+      target: { value: 'Tractate Berakhot' },
+    });
     fireEvent.keyDown(moduleTitleInput, { key: 'Enter' });
 
     expect(screen.getByText('Tractate Berakhot')).toBeInTheDocument();
@@ -259,8 +417,12 @@ describe('CourseCreatePage', () => {
     renderPage();
     await advanceToStep3('GraphQL Mastery Course');
     expect(screen.getByText('GraphQL Mastery Course')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /publish course/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /save as draft/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /publish course/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /save as draft/i })
+    ).toBeInTheDocument();
   });
 
   it('"Back to Media" button on Step 3 returns to Media step', async () => {
@@ -293,7 +455,9 @@ describe('CourseCreatePage', () => {
 
   it('clicking "Publish Course" calls executeMutation with isPublished=true', async () => {
     mockExecuteMutation.mockResolvedValue({
-      data: { createCourse: { id: 'course-1', title: 'GraphQL Mastery Course' } },
+      data: {
+        createCourse: { id: 'course-1', title: 'GraphQL Mastery Course' },
+      },
       error: null,
     });
     renderPage();
@@ -312,7 +476,9 @@ describe('CourseCreatePage', () => {
 
   it('clicking "Save as Draft" calls executeMutation with isPublished=false', async () => {
     mockExecuteMutation.mockResolvedValue({
-      data: { createCourse: { id: 'course-2', title: 'Draft Course Enough Chars' } },
+      data: {
+        createCourse: { id: 'course-2', title: 'Draft Course Enough Chars' },
+      },
       error: null,
     });
     renderPage();
@@ -346,13 +512,17 @@ describe('CourseCreatePage', () => {
   it('Step 3 review shows "Review and publish" description', async () => {
     renderPage();
     await advanceToStep3();
-    expect(screen.getByText(/review your course before publishing/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/review your course before publishing/i)
+    ).toBeInTheDocument();
   });
 
   it('difficulty options are displayed in Step 1', () => {
     renderPage();
     expect(screen.getAllByText('Beginner').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Intermediate').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Intermediate').length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getAllByText('Advanced').length).toBeGreaterThanOrEqual(1);
   });
 });

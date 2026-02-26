@@ -9,15 +9,36 @@ import { ContentItemModule } from './content-item/content-item.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
 import { TranslationModule } from './translation/translation.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { LiveSessionModule } from './live-session/live-session.module';
+import { QuizModule } from './quiz/quiz.module';
+import { ComplianceModule } from './compliance/compliance.module';
+import { MicrolearningModule } from './microlearning/microlearning.module';
+import { PlagiarismModule } from './plagiarism/plagiarism.module';
+import { AtRiskModule } from './at-risk/at-risk.module';
+import { ScenarioModule } from './scenario/scenario.module';
+import { LtiModule } from './lti/lti.module';
+import { BiExportModule } from './bi-export/bi-export.module';
+import { CpdModule } from './cpd/cpd.module';
+import { XapiModule } from './xapi/xapi.module';
+import { ProgramModule } from './programs/program.module';
+import { AssessmentModule } from './assessment/assessment.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
+import { OpenBadgeModule } from './open-badges/open-badge.module';
+import { LibraryModule } from './course-library/library.module';
 
 @Module({
   imports: [
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-        transport: process.env.NODE_ENV !== 'production'
-          ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
-          : undefined,
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? {
+                target: 'pino-pretty',
+                options: { singleLine: true, colorize: true },
+              }
+            : undefined,
         redact: ['req.headers.authorization', 'req.headers.cookie'],
         customProps: (req: any) => ({
           tenantId: req.headers['x-tenant-id'],
@@ -42,6 +63,23 @@ import { TranslationModule } from './translation/translation.module';
     MediaModule,
     ContentItemModule,
     TranslationModule,
+    AnalyticsModule,
+    LiveSessionModule,
+    QuizModule,
+    ComplianceModule,
+    MicrolearningModule,
+    PlagiarismModule,
+    AtRiskModule,
+    ScenarioModule,
+    LtiModule,
+    BiExportModule,
+    CpdModule,
+    XapiModule,
+    ProgramModule,
+    AssessmentModule,
+    MarketplaceModule,
+    OpenBadgeModule,
+    LibraryModule,
   ],
 })
 export class AppModule {}

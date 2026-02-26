@@ -184,3 +184,63 @@ type LearningPath {
   concepts: [ConceptNode!]!
   steps: Int!
 }
+
+# ─── F-006: Skill Gap Analysis ───────────────────────────────────────────────
+
+"""
+A single concept gap item: whether it is mastered and what content is recommended.
+"""
+type SkillGapItem {
+  conceptName: String!
+  isMastered: Boolean!
+  recommendedContentItems: [ID!]!
+  recommendedContentTitles: [String!]!
+  relevanceScore: Float!
+}
+
+"""
+Full skill gap report comparing a learner's mastery against a role profile.
+"""
+type SkillGapReport {
+  roleId: ID!
+  roleName: String!
+  totalRequired: Int!
+  mastered: Int!
+  gapCount: Int!
+  completionPercentage: Float!
+  gaps: [SkillGapItem!]!
+}
+
+"""
+A brief view of a skill profile (role/goal definition).
+"""
+type SkillProfile {
+  id: ID!
+  roleName: String!
+  description: String
+  requiredConceptsCount: Int!
+}
+
+extend type Query {
+  """
+  Analyze skill gap between the current user's mastery and a named skill profile.
+  """
+  skillGapAnalysis(roleId: ID!): SkillGapReport! @authenticated
+
+  """
+  List all skill profiles available within the current tenant.
+  """
+  skillProfiles: [SkillProfile!]! @authenticated
+}
+
+extend type Mutation {
+  """
+  Create a new skill profile defining required concepts for a role/goal.
+  Only instructors and admins may create profiles.
+  """
+  createSkillProfile(
+    roleName: String!
+    description: String
+    requiredConcepts: [String!]!
+  ): SkillProfile! @authenticated
+}

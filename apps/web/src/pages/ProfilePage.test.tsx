@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser } from '@/lib/auth';
 
@@ -22,16 +22,23 @@ vi.mock('@/components/Layout', () => ({
   ),
 }));
 
-// Mock urql — ProfilePage now uses useQuery for ME_QUERY and COURSES_QUERY
+// Mock urql — ProfilePage uses useQuery for ME_QUERY and COURSES_QUERY.
+// useMutation is mocked so that ProfileVisibilityCard (rendered when userId is
+// truthy) does not throw "No client specified" when it calls useMutation().
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
+    useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
   };
 });
 
 import { getCurrentUser } from '@/lib/auth';
+import * as urqlModule from 'urql';
 import { ProfilePage } from './ProfilePage';
 
 // ── Fixtures ───────────────────────────────────────────────────────────────
@@ -75,7 +82,9 @@ describe('ProfilePage', () => {
 
   it('renders "Profile" page heading', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /^profile$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /^profile$/i })
+    ).toBeInTheDocument();
   });
 
   it('renders user full name (firstName + lastName)', () => {
@@ -123,7 +132,9 @@ describe('ProfilePage', () => {
 
   it('renders Permissions section when user has scopes', () => {
     renderPage();
-    expect(screen.getByText('Permissions', { selector: 'h3' })).toBeInTheDocument();
+    expect(
+      screen.getByText('Permissions', { selector: 'h3' })
+    ).toBeInTheDocument();
     expect(screen.getByText('content:read')).toBeInTheDocument();
     expect(screen.getByText('annotation:write')).toBeInTheDocument();
   });
@@ -131,7 +142,9 @@ describe('ProfilePage', () => {
   it('does not render Permissions section when user has no scopes', () => {
     vi.mocked(getCurrentUser).mockReturnValue({ ...STUDENT_USER, scopes: [] });
     renderPage();
-    expect(screen.queryByText('Permissions', { selector: 'h3' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Permissions', { selector: 'h3' })
+    ).not.toBeInTheDocument();
   });
 
   it('renders Learning Overview section with real stats labels', () => {
@@ -156,7 +169,9 @@ describe('ProfilePage', () => {
     renderPage();
     // ProfilePage uses <Navigate to="/login" replace /> (declarative redirect),
     // so the profile heading is not rendered rather than calling navigate() imperatively.
-    expect(screen.queryByRole('heading', { name: /^profile$/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /^profile$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('renders Back button for navigation', () => {
@@ -165,14 +180,146 @@ describe('ProfilePage', () => {
   });
 
   it('renders ORG_ADMIN role label correctly', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...STUDENT_USER, role: 'ORG_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      role: 'ORG_ADMIN',
+    });
     renderPage();
-    expect(screen.getAllByText('Organization Admin').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('Organization Admin').length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('renders SUPER_ADMIN role label correctly', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...STUDENT_USER, role: 'SUPER_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      role: 'SUPER_ADMIN',
+    });
     renderPage();
     expect(screen.getAllByText('Super Admin').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // ── Back button navigation ────────────────────────────────────────────────
+
+  it('clicking the Back button calls navigate(-1)', () => {
+    renderPage();
+    const backBtn = screen.getByRole('button', { name: /back/i });
+    fireEvent.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  // ── Courses fetching state (line 107 branch) ──────────────────────────────
+
+  it('shows "..." in Courses Available stat when courses are loading', () => {
+    vi.mocked(urqlModule.useQuery)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: true, error: undefined },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    // coursesResult.fetching = true → stats value is '...'
+    expect(screen.getByText('...')).toBeInTheDocument();
+  });
+
+  // ── Courses available count (line 101 branch) ─────────────────────────────
+
+  it('shows courses count when course data is available', () => {
+    vi.mocked(urqlModule.useQuery)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        {
+          data: { courses: [{ id: 'c1' }, { id: 'c2' }, { id: 'c3' }] },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    // coursesCount = 3 → stats value is '3'
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  // ── Missing tenantId fallback (line 186-190 branch) ──────────────────────
+
+  it('renders fallback span when tenantId is empty', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      tenantId: '',
+    });
+    renderPage();
+    // t('profile.fields.tenantIdMissing', ...) returns the key when not in
+    // the test translation resources — the important thing is the fallback
+    // branch of `{tenantId || (...)}` is exercised
+    expect(
+      screen.getByText('profile.fields.tenantIdMissing')
+    ).toBeInTheDocument();
+  });
+
+  // ── getInitials ?? / || fallback branches (lines 69-71) ──────────────────
+
+  it('renders "U" avatar when firstName, lastName, and username are all empty (lines 69-71 ?? / || branches)', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      firstName: '',
+      lastName: '',
+      username: '',
+    });
+    renderPage();
+    // getInitials('','','') → first=''?.[0]??''='', last=''?.[0]??''=''
+    // ''||  (''[0]??'U').toUpperCase()  →  'U'
+    expect(screen.getByText('U')).toBeInTheDocument();
+  });
+
+  // ── ROLE_LABELS / ROLE_COLORS ?? fallback branches (lines 99-100) ─────────
+
+  it('renders raw role string for unknown role (lines 99-100 ?? fallbacks)', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      role: 'CUSTOM_ROLE',
+    });
+    renderPage();
+    // ROLE_LABELS['CUSTOM_ROLE'] → undefined → ?? 'CUSTOM_ROLE' (raw role)
+    // ROLE_COLORS['CUSTOM_ROLE'] → undefined → ?? 'bg-gray-100 text-gray-700'
+    expect(screen.getAllByText('CUSTOM_ROLE').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // ── ProfileVisibilityCard rendered when userId is truthy (line 241) ────────
+
+  it('renders ProfileVisibilityCard when ME_QUERY returns a userId (line 241 && truthy branch)', () => {
+    vi.mocked(urqlModule.useQuery)
+      .mockReturnValueOnce([
+        {
+          data: {
+            me: {
+              id: 'user-123',
+              firstName: 'Test',
+              lastName: 'User',
+              email: 'test@example.com',
+              role: 'STUDENT',
+              tenantId: 'tenant-abc-123',
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z',
+              preferences: null,
+            },
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    // ProfileVisibilityCard is rendered → shows "Public Profile" heading
+    expect(screen.getByText('Public Profile')).toBeInTheDocument();
   });
 });

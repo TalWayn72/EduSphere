@@ -1,0 +1,21 @@
+type SocialRecommendation {
+  contentItemId: ID!
+  contentTitle: String!
+  followersCount: Int!
+  isMutualFollower: Boolean!
+  lastActivity: String!
+}
+
+type SocialFeedItem {
+  userId: ID!
+  userDisplayName: String!
+  action: String!
+  contentItemId: ID!
+  contentTitle: String!
+  timestamp: String!
+}
+
+extend type Query {
+  socialRecommendations(limit: Int): [SocialRecommendation!]! @authenticated
+  socialFeed(limit: Int): [SocialFeedItem!]! @authenticated
+}

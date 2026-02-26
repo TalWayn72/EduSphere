@@ -35,9 +35,7 @@ export function buildNatsOptions(): ConnectionOptions {
   // NKey authentication when provided
   const nkey = process.env['NATS_NKEY'];
   if (nkey) {
-    options.authenticator = nkeyAuthenticator(
-      new TextEncoder().encode(nkey),
-    );
+    options.authenticator = nkeyAuthenticator(new TextEncoder().encode(nkey));
   }
 
   return options;

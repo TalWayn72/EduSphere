@@ -7,6 +7,7 @@ import {
   integer,
   numeric,
   unique,
+  timestamp,
 } from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
@@ -20,13 +21,18 @@ export const courses = pgTable('courses', {
   slug: text('slug').notNull().default(''),
   description: text('description'),
   thumbnail_url: text('thumbnail_url'),
-  creator_id: uuid('creator_id').references(() => users.id, { onDelete: 'set null' }),
+  creator_id: uuid('creator_id').references(() => users.id, {
+    onDelete: 'set null',
+  }),
   instructor_id: uuid('instructor_id').references(() => users.id),
   is_published: boolean('is_published').notNull().default(false),
   is_public: boolean('is_public').notNull().default(false),
   estimated_hours: integer('estimated_hours'),
   prerequisites: jsonb('prerequisites').notNull().default([]),
   tags: jsonb('tags').notNull().default([]),
+  // F-016: Compliance Training Report Export
+  is_compliance: boolean('is_compliance').notNull().default(false),
+  compliance_due_date: timestamp('compliance_due_date', { withTimezone: true }),
   ...timestamps,
   ...softDelete,
 });
@@ -67,6 +73,12 @@ export const media_assets = pgTable('media_assets', {
   file_url: text('file_url').notNull(),
   /** MinIO object key for the HLS master manifest (.m3u8). Null until HLS transcode completes. */
   hls_manifest_key: text('hls_manifest_key'),
+  /**
+   * AI-generated alt-text description for image assets (F-023).
+   * Populated asynchronously after upload via NATS + AltTextGeneratorService.
+   * Instructors can review and edit via updateMediaAltText mutation.
+   */
+  alt_text: text('alt_text'),
   duration: integer('duration'),
   transcription_status: text('transcription_status', {
     enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'],

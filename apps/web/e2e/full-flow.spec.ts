@@ -34,9 +34,9 @@ test('complete learning loop — student session from login to logout', async ({
   // ─── Step 2: Navigate to Dashboard ───────────────────────────────────────
   await page.goto('/dashboard');
   await page.waitForLoadState('networkidle');
-  await expect(
-    page.getByRole('heading', { name: 'Dashboard' })
-  ).toBeVisible({ timeout: 8_000 });
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+    timeout: 8_000,
+  });
 
   // Stats cards are visible (Learning Streak is in i18n but not rendered in Dashboard.tsx)
   await expect(page.getByText('Active Courses')).toBeVisible();
@@ -47,9 +47,9 @@ test('complete learning loop — student session from login to logout', async ({
   // ─── Step 3: Navigate to Course List ─────────────────────────────────────
   await page.goto('/courses');
   await page.waitForLoadState('networkidle');
-  await expect(
-    page.getByRole('heading', { name: 'Courses' })
-  ).toBeVisible({ timeout: 8_000 });
+  await expect(page.getByRole('heading', { name: 'Courses' })).toBeVisible({
+    timeout: 8_000,
+  });
 
   // Verify at least one course card is shown
   const courseTitle = page.getByText('Introduction to Talmud Study');
@@ -94,9 +94,9 @@ test('complete learning loop — student session from login to logout', async ({
   await expect(textarea).not.toBeVisible({ timeout: 3_000 });
 
   // Annotation appears in the list
-  await expect(
-    page.getByText('Full flow E2E annotation — step 6')
-  ).toBeVisible({ timeout: 5_000 });
+  await expect(page.getByText('Full flow E2E annotation — step 6')).toBeVisible(
+    { timeout: 5_000 }
+  );
 
   // ─── Step 7: Navigate to Search ──────────────────────────────────────────
   await page.goto('/search');
@@ -114,7 +114,9 @@ test('complete learning loop — student session from login to logout', async ({
 
   // Results should appear — "Talmud" matches "Introduction to Talmud Study" in MOCK_COURSES
   // shadcn/ui uses Tailwind so [class*="CardContent"] doesn't exist; use the result title directly
-  await expect(page.getByText('Introduction to Talmud Study')).toBeVisible({ timeout: 5_000 });
+  await expect(page.getByText('Introduction to Talmud Study')).toBeVisible({
+    timeout: 5_000,
+  });
   const results = page.getByText('Introduction to Talmud Study');
 
   // ─── Step 8: Click a search result ───────────────────────────────────────
@@ -130,8 +132,11 @@ test('complete learning loop — student session from login to logout', async ({
   // Navigation may go to /courses or /learn/<id> depending on result type
   // Use pathname (not the full URL) to extract the first path segment.
   const firstPathSegment =
-    new URL(page.url()).pathname.split('/').filter((s) => s.length > 0)[0] ?? 'search';
-  expect(['courses', 'learn', 'search', 'annotations', 'graph']).toContain(firstPathSegment);
+    new URL(page.url()).pathname.split('/').filter((s) => s.length > 0)[0] ??
+    'search';
+  expect(['courses', 'learn', 'search', 'annotations', 'graph']).toContain(
+    firstPathSegment
+  );
 
   // ─── Step 9: Navigate to Agents — select Chavruta mode ───────────────────
   await page.goto('/agents');
@@ -160,8 +165,7 @@ test('complete learning loop — student session from login to logout', async ({
   // Wait for mock AI response (600ms delay + streaming ~1–2s)
   // The response will be one of the mock responses from AGENT_MODES[chavruta].responses
   // We wait for a second agent-role bubble to appear
-  const agentBubbles = page
-    .locator('[class*="bg-muted"][class*="rounded-lg"]');
+  const agentBubbles = page.locator('[class*="bg-muted"][class*="rounded-lg"]');
   await expect(agentBubbles.nth(1)).toBeVisible({ timeout: 10_000 });
 
   // ─── Step 11: Logout via UserMenu ────────────────────────────────────────
@@ -203,9 +207,9 @@ test('annotations page is reachable and shows layer tabs', async ({ page }) => {
   await page.goto('/annotations');
   await page.waitForLoadState('networkidle');
 
-  await expect(
-    page.getByRole('heading', { name: 'Annotations' })
-  ).toBeVisible({ timeout: 8_000 });
+  await expect(page.getByRole('heading', { name: 'Annotations' })).toBeVisible({
+    timeout: 8_000,
+  });
 
   // Tabs: All, PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED
   await expect(page.getByRole('tab', { name: /All/i })).toBeVisible();

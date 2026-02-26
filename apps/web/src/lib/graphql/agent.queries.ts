@@ -90,3 +90,7 @@ export const MESSAGE_STREAM_SUBSCRIPTION = gql`
     }
   }
 `;
+
+// NOTE: generateCourseFromPrompt and executionStatus subscriptions have been
+// moved to agent-course-gen.queries.ts, which is excluded from codegen until
+// the supergraph is recomposed with the full subgraph-agent SDL.

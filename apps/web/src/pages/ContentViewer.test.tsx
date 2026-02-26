@@ -6,6 +6,26 @@ import { mockTranscript } from '@/lib/mock-content-data';
 import { getThreadedAnnotations } from '@/lib/mock-annotations';
 import { AnnotationLayer } from '@/types/annotations';
 
+// ─── Mock urql — ContentViewer calls useQuery for live session data ────────────
+vi.mock('urql', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('urql')>();
+  return {
+    ...actual,
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
+    useMutation: vi.fn(() => [
+      { fetching: false },
+      vi.fn().mockResolvedValue({ error: null }),
+    ]),
+    useSubscription: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
+  };
+});
+
 // ─── Mock hooks ────────────────────────────────────────────────────────────────
 
 vi.mock('@/hooks/useContentData', () => ({
@@ -32,7 +52,11 @@ vi.mock('@/hooks/useAnnotations', () => ({
 vi.mock('@/hooks/useAgentChat', () => ({
   useAgentChat: () => ({
     messages: [
-      { id: 'init', role: 'agent', content: 'שלום! I am your Chavruta learning partner.' },
+      {
+        id: 'init',
+        role: 'agent',
+        content: 'שלום! I am your Chavruta learning partner.',
+      },
     ],
     chatInput: '',
     setChatInput: vi.fn(),
@@ -66,8 +90,15 @@ vi.mock('@/components/AddAnnotationOverlay', () => ({
 }));
 
 vi.mock('@/components/LayerToggleBar', () => ({
-  LayerToggleBar: ({ onToggle }: { onToggle: (layer: AnnotationLayer) => void }) => (
-    <div data-testid="layer-toggle-bar" onClick={() => onToggle(AnnotationLayer.PERSONAL)} />
+  LayerToggleBar: ({
+    onToggle,
+  }: {
+    onToggle: (layer: AnnotationLayer) => void;
+  }) => (
+    <div
+      data-testid="layer-toggle-bar"
+      onClick={() => onToggle(AnnotationLayer.PERSONAL)}
+    />
   ),
 }));
 
@@ -79,7 +110,9 @@ vi.mock('@/components/AnnotationThread', () => ({
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
@@ -171,7 +204,9 @@ describe('ContentViewer', () => {
 
   it('renders transcript search input', () => {
     renderCV();
-    const input = screen.getByPlaceholderText('Search transcript, annotations...');
+    const input = screen.getByPlaceholderText(
+      'Search transcript, annotations...'
+    );
     expect(input).toBeDefined();
   });
 
@@ -272,7 +307,9 @@ describe('ContentViewer', () => {
 
   it('renders video title from useContentData hook', () => {
     renderCV();
-    expect(screen.getByText('Introduction to Talmudic Reasoning')).toBeDefined();
+    expect(
+      screen.getByText('Introduction to Talmudic Reasoning')
+    ).toBeDefined();
   });
 
   it('renders the chat input placeholder', () => {
@@ -311,7 +348,9 @@ describe('ContentViewer', () => {
   it('shows annotation textarea when Add button clicked and allows typing', () => {
     renderCV();
     fireEvent.click(screen.getByText('Add'));
-    const textarea = screen.getByPlaceholderText('Add annotation at current timestamp...');
+    const textarea = screen.getByPlaceholderText(
+      'Add annotation at current timestamp...'
+    );
     fireEvent.change(textarea, { target: { value: 'My new annotation' } });
     expect((textarea as HTMLTextAreaElement).value).toBe('My new annotation');
   });
@@ -319,14 +358,18 @@ describe('ContentViewer', () => {
   it('calls addAnnotation when Save annotation button is clicked with text', async () => {
     renderCV();
     fireEvent.click(screen.getByText('Add'));
-    const textarea = screen.getByPlaceholderText('Add annotation at current timestamp...');
+    const textarea = screen.getByPlaceholderText(
+      'Add annotation at current timestamp...'
+    );
     fireEvent.change(textarea, { target: { value: 'Test annotation text' } });
     // Save button includes timestamp text e.g. 'Save @ 0:00'
     const saveBtn = screen.getByText(/Save @/);
     fireEvent.click(saveBtn);
     // After save, form closes (textarea gone)
     await new Promise((r) => setTimeout(r, 0));
-    expect(screen.queryByPlaceholderText('Add annotation at current timestamp...')).toBeNull();
+    expect(
+      screen.queryByPlaceholderText('Add annotation at current timestamp...')
+    ).toBeNull();
   });
 
   it('chat send button click does not crash', () => {

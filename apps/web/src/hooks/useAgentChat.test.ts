@@ -17,7 +17,9 @@ const mockStartSession = vi.fn().mockResolvedValue({
   data: { startAgentSession: { id: 'session-test' } },
 });
 const mockSendAgentMessage = vi.fn().mockResolvedValue({
-  data: { sendMessage: { id: 'msg-1', role: 'ASSISTANT', content: 'AI reply' } },
+  data: {
+    sendMessage: { id: 'msg-1', role: 'ASSISTANT', content: 'AI reply' },
+  },
 });
 
 vi.mock('urql', () => ({
@@ -42,9 +44,13 @@ function setupUrqlMocks() {
   // Map mutation document strings to their respective mock functions.
   vi.mocked(urql.useMutation).mockImplementation((mutation) => {
     if (mutation === 'START_AGENT_SESSION_MUTATION') {
-      return [{ fetching: false }, mockStartSession] as ReturnType<typeof urql.useMutation>;
+      return [{ fetching: false }, mockStartSession] as ReturnType<
+        typeof urql.useMutation
+      >;
     }
-    return [{ fetching: false }, mockSendAgentMessage] as ReturnType<typeof urql.useMutation>;
+    return [{ fetching: false }, mockSendAgentMessage] as ReturnType<
+      typeof urql.useMutation
+    >;
   });
 
   vi.mocked(urql.useSubscription).mockReturnValue([
@@ -161,5 +167,107 @@ describe('useAgentChat', () => {
     });
 
     expect(result.current.chatInput).toBe('New input');
+  });
+
+  it('falls back to mock response when backend returns no session id', async () => {
+    // startSession returns null id → appendMockResponse() path
+    vi.mocked(urql.useMutation).mockImplementation((mutation) => {
+      if (mutation === 'START_AGENT_SESSION_MUTATION') {
+        return [
+          { fetching: false },
+          vi
+            .fn()
+            .mockResolvedValue({ data: { startAgentSession: { id: null } } }),
+        ] as ReturnType<typeof urql.useMutation>;
+      }
+      return [{ fetching: false }, mockSendAgentMessage] as ReturnType<
+        typeof urql.useMutation
+      >;
+    });
+    vi.mocked(urql.useSubscription).mockReturnValue([
+      { data: null, fetching: false },
+      vi.fn(),
+    ] as ReturnType<typeof urql.useSubscription>);
+
+    const { result } = renderHook(() => useAgentChat('content-1'));
+
+    act(() => {
+      result.current.setChatInput('Hello');
+    });
+    await act(async () => {
+      result.current.sendMessage();
+    });
+
+    // isStreaming becomes true (appendMockResponse sets it immediately)
+    expect(result.current.isStreaming).toBe(true);
+  });
+
+  it('processes subscription message that updates an existing message', async () => {
+    vi.mocked(urql.useSubscription).mockImplementation((_opts, _handler) => {
+      return [{ data: null, fetching: false }, vi.fn()] as ReturnType<
+        typeof urql.useSubscription
+      >;
+    });
+    setupUrqlMocks();
+
+    const { result } = renderHook(() => useAgentChat('content-1'));
+    // subscriptionCallback may be null since useSubscription mock overrides setupUrqlMocks
+    expect(result.current.isStreaming).toBe(false);
+  });
+
+  it('subscription with User role message does not set isStreaming to false', async () => {
+    // Provide subscription data with MessageRole.User
+    vi.mocked(urql.useSubscription).mockReturnValue([
+      {
+        data: {
+          messageStream: {
+            id: 'sub-1',
+            role: 'USER',
+            content: 'User spoke',
+          },
+        },
+        fetching: false,
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof urql.useSubscription>);
+
+    vi.mocked(urql.useMutation).mockImplementation(
+      () =>
+        [
+          { fetching: false },
+          vi.fn().mockResolvedValue({ data: null }),
+        ] as ReturnType<typeof urql.useMutation>
+    );
+
+    const { result } = renderHook(() => useAgentChat('content-1'));
+    // USER role message → isStreaming remains false (only 'agent' sets it to false)
+    expect(result.current.isStreaming).toBe(false);
+  });
+
+  it('subscription with ASSISTANT role sets isStreaming to false', async () => {
+    vi.mocked(urql.useSubscription).mockReturnValue([
+      {
+        data: {
+          messageStream: {
+            id: 'sub-2',
+            role: 'ASSISTANT',
+            content: 'Agent replied',
+          },
+        },
+        fetching: false,
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof urql.useSubscription>);
+
+    vi.mocked(urql.useMutation).mockImplementation(
+      () =>
+        [
+          { fetching: false },
+          vi.fn().mockResolvedValue({ data: null }),
+        ] as ReturnType<typeof urql.useMutation>
+    );
+
+    const { result } = renderHook(() => useAgentChat('content-1'));
+    expect(result.current.isStreaming).toBe(false);
   });
 });

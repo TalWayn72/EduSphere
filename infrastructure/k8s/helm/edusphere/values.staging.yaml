@@ -22,13 +22,13 @@ image:
   registry: ghcr.io
   repository: edusphere-org/edusphere
   pullPolicy: Always
-  tag: ""   # Set by CD: --set image.tag=main-<sha>
+  tag: '' # Set by CD: --set image.tag=main-<sha>
 
 # ── Gateway ───────────────────────────────────────────────────────────────────
 gateway:
   enabled: true
   autoscaling:
-    enabled: false   # No HPA in staging — predictable load
+    enabled: false # No HPA in staging — predictable load
     minReplicas: 1
     maxReplicas: 3
   podDisruptionBudget:
@@ -124,17 +124,17 @@ ingress:
     secretName: edusphere-staging-tls
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-staging
-    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls: 'true'
 
 # ── External services — shared staging cluster ────────────────────────────────
 # Staging uses a shared PostgreSQL and Redis instance (not bundled via Helm).
 # Connection strings are pulled from the 'edusphere-staging-secrets' Secret
 # managed by External Secrets Operator.
 postgresql:
-  enabled: false   # Use shared staging PostgreSQL instance (external)
+  enabled: false # Use shared staging PostgreSQL instance (external)
 
 redis:
-  enabled: false   # Use shared staging Redis instance (external)
+  enabled: false # Use shared staging Redis instance (external)
 
 # ── Pod security (same as production) ────────────────────────────────────────
 podSecurityContext:
@@ -152,7 +152,7 @@ securityContext:
 # ── Service account ───────────────────────────────────────────────────────────
 serviceAccount:
   create: true
-  name: "edusphere-staging"
+  name: 'edusphere-staging'
 
 # ── Observability ─────────────────────────────────────────────────────────────
 monitoring:

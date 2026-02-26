@@ -25,7 +25,11 @@ describe('GraphQL Query Complexity Middleware (apps/gateway/src/middleware/query
   const content = readFile('apps/gateway/src/middleware/query-complexity.ts');
 
   it('apps/gateway/src/middleware/query-complexity.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/gateway/src/middleware/query-complexity.ts'))).toBe(true);
+    expect(
+      existsSync(
+        resolve(ROOT, 'apps/gateway/src/middleware/query-complexity.ts')
+      )
+    ).toBe(true);
   });
 
   it('exports depthLimitRule function', () => {
@@ -116,16 +120,22 @@ describe('Gateway: Query Hardening Rules Applied (apps/gateway/src/index.ts)', (
 
 describe('Gateway: Rate Limiting (G-09)', () => {
   it('apps/gateway/tests/rate-limit.test.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/gateway/tests/rate-limit.test.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/gateway/tests/rate-limit.test.ts'))
+    ).toBe(true);
   });
 
   it('rate-limit test covers request blocking / limit enforcement', () => {
     const content = readFile('apps/gateway/tests/rate-limit.test.ts');
-    expect(content).toMatch(/allowed.*false|false.*allowed|blocked|limit.*enforc/i);
+    expect(content).toMatch(
+      /allowed.*false|false.*allowed|blocked|limit.*enforc/i
+    );
   });
 
   it('rate-limit middleware exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/gateway/src/middleware/rate-limit.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/gateway/src/middleware/rate-limit.ts'))
+    ).toBe(true);
   });
 
   it('gateway returns 429 on rate-limit exceeded', () => {
@@ -138,7 +148,9 @@ describe('Gateway: Rate Limiting (G-09)', () => {
 
 describe('Gateway: Query Complexity Tests (G-10)', () => {
   it('apps/gateway/tests/query-complexity.test.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/gateway/tests/query-complexity.test.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/gateway/tests/query-complexity.test.ts'))
+    ).toBe(true);
   });
 
   it('query-complexity test covers depth limit', () => {
@@ -161,7 +173,9 @@ describe('Gateway: Query Complexity Tests (G-10)', () => {
 
 describe('GraphQL Schema Security (schema-lint)', () => {
   it('apps/gateway/tests/schema-lint.test.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/gateway/tests/schema-lint.test.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'apps/gateway/tests/schema-lint.test.ts'))
+    ).toBe(true);
   });
 
   it('schema lint verifies @authenticated directive usage', () => {
@@ -174,7 +188,9 @@ describe('GraphQL Schema Security (schema-lint)', () => {
 
 describe('CORS Security (SI-2)', () => {
   it('apps/gateway/tests/cors.test.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'apps/gateway/tests/cors.test.ts'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'apps/gateway/tests/cors.test.ts'))).toBe(
+      true
+    );
   });
 
   it('cors test verifies empty array fallback (fail-closed)', () => {
@@ -200,7 +216,9 @@ describe('API Security Tests (api-security.spec.ts)', () => {
   const content = readFile('tests/security/api-security.spec.ts');
 
   it('api-security.spec.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'tests/security/api-security.spec.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'tests/security/api-security.spec.ts'))
+    ).toBe(true);
   });
 
   it('verifies query depth limit configurable via GRAPHQL_MAX_DEPTH', () => {

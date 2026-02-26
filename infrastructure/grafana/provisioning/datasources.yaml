@@ -23,7 +23,7 @@ datasources:
       exemplarTraceIdDestinations:
         - name: trace_id
           datasourceUid: jaeger-main
-          urlDisplayLabel: "Open in Jaeger"
+          urlDisplayLabel: 'Open in Jaeger'
 
   # ─── Loki (log aggregation) ────────────────────────────────────────────────
   - name: Loki
@@ -40,8 +40,8 @@ datasources:
         - datasourceUid: jaeger-main
           matcherRegex: '"traceId":"(\w+)"'
           name: TraceID
-          url: "$${__value.raw}"
-          urlDisplayLabel: "Open trace in Jaeger"
+          url: '$${__value.raw}'
+          urlDisplayLabel: 'Open trace in Jaeger'
 
   # ─── Jaeger (distributed tracing) ──────────────────────────────────────────
   - name: Jaeger
@@ -64,7 +64,7 @@ datasources:
     editable: false
     secureJsonData:
       # Override via Grafana secret management (GF_SECURITY_ADMIN_PASSWORD env)
-      password: "${POSTGRES_PASSWORD}"
+      password: '${POSTGRES_PASSWORD}'
     jsonData:
       sslmode: disable
       postgresVersion: 1600

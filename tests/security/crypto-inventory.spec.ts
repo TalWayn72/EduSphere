@@ -25,7 +25,9 @@ describe('CRYPTO_INVENTORY.md -- Cryptographic Implementation Inventory', () => 
   const content = readFile('docs/security/CRYPTO_INVENTORY.md');
 
   it('docs/security/CRYPTO_INVENTORY.md exists', () => {
-    expect(existsSync(resolve(ROOT, 'docs/security/CRYPTO_INVENTORY.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/security/CRYPTO_INVENTORY.md'))).toBe(
+      true
+    );
   });
 
   it('documents AES-256-GCM for PII field encryption', () => {
@@ -120,7 +122,9 @@ describe('Encryption Implementation (packages/db/src/helpers/encryption.ts)', ()
   const content = readFile('packages/db/src/helpers/encryption.ts');
 
   it('encryption.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/db/src/helpers/encryption.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'packages/db/src/helpers/encryption.ts'))
+    ).toBe(true);
   });
 
   it('uses aes-256-gcm algorithm', () => {
@@ -140,15 +144,21 @@ describe('Encryption Implementation (packages/db/src/helpers/encryption.ts)', ()
   });
 
   it('exports encryptField function', () => {
-    expect(content).toMatch(/export.*function encryptField|export.*encryptField/);
+    expect(content).toMatch(
+      /export.*function encryptField|export.*encryptField/
+    );
   });
 
   it('exports decryptField function', () => {
-    expect(content).toMatch(/export.*function decryptField|export.*decryptField/);
+    expect(content).toMatch(
+      /export.*function decryptField|export.*decryptField/
+    );
   });
 
   it('exports deriveTenantKey function', () => {
-    expect(content).toMatch(/export.*function deriveTenantKey|export.*deriveTenantKey/);
+    expect(content).toMatch(
+      /export.*function deriveTenantKey|export.*deriveTenantKey/
+    );
   });
 });
 
@@ -172,7 +182,9 @@ describe('NATS Cryptography (packages/nats-client/src/connection.ts)', () => {
   const content = readFile('packages/nats-client/src/connection.ts');
 
   it('connection.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/nats-client/src/connection.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'packages/nats-client/src/connection.ts'))
+    ).toBe(true);
   });
 
   it('uses TLS options for NATS connection', () => {
@@ -194,7 +206,9 @@ describe('MODEL_CARDS.md -- EU AI Act Art.53 (docs/security/)', () => {
   const content = readFile('docs/security/MODEL_CARDS.md');
 
   it('docs/security/MODEL_CARDS.md exists', () => {
-    expect(existsSync(resolve(ROOT, 'docs/security/MODEL_CARDS.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/security/MODEL_CARDS.md'))).toBe(
+      true
+    );
   });
 
   it('references EU AI Act transparency requirements', () => {

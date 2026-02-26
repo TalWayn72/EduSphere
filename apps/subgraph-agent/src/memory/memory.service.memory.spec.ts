@@ -53,14 +53,12 @@ vi.mock('@edusphere/db', () => ({
 // ── @edusphere/nats-client mock ───────────────────────────────────────────────
 
 vi.mock('@edusphere/nats-client', () => ({
-  NatsKVClient: vi.fn().mockImplementation(function (
-    this: {
-      set: ReturnType<typeof vi.fn>;
-      get: ReturnType<typeof vi.fn>;
-      delete: ReturnType<typeof vi.fn>;
-      close: ReturnType<typeof vi.fn>;
-    },
-  ) {
+  NatsKVClient: vi.fn().mockImplementation(function (this: {
+    set: ReturnType<typeof vi.fn>;
+    get: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    close: ReturnType<typeof vi.fn>;
+  }) {
     this.set = vi.fn().mockResolvedValue(undefined);
     this.get = vi.fn().mockResolvedValue(null);
     this.delete = vi.fn().mockResolvedValue(undefined);

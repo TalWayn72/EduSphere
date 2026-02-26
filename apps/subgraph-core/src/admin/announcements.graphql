@@ -1,0 +1,65 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole"])
+
+type Announcement {
+  id: ID!
+  title: String!
+  body: String!
+  priority: String!
+  targetAudience: String!
+  isActive: Boolean!
+  publishAt: String
+  expiresAt: String
+  createdBy: ID
+  createdAt: String!
+}
+
+type AnnouncementResult {
+  announcements: [Announcement!]!
+  total: Int!
+}
+
+input CreateAnnouncementInput {
+  title: String!
+  body: String!
+  priority: String!
+  targetAudience: String!
+  publishAt: String
+  expiresAt: String
+}
+
+input UpdateAnnouncementInput {
+  title: String
+  body: String
+  priority: String
+  targetAudience: String
+  isActive: Boolean
+  publishAt: String
+  expiresAt: String
+}
+
+extend type Query {
+  adminAnnouncements(limit: Int = 20, offset: Int = 0): AnnouncementResult!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  activeAnnouncements: [Announcement!]! @authenticated
+}
+
+extend type Mutation {
+  createAnnouncement(input: CreateAnnouncementInput!): Announcement!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  updateAnnouncement(id: ID!, input: UpdateAnnouncementInput!): Announcement!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  deleteAnnouncement(id: ID!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  publishAnnouncement(id: ID!): Announcement!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

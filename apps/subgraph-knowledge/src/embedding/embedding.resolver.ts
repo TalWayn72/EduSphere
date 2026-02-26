@@ -48,9 +48,7 @@ export class EmbeddingResolver {
 
   @Mutation('createEmbedding')
   async createEmbedding(@Args('input') _input: unknown) {
-    throw new Error(
-      'Use generateEmbedding or generateBatchEmbeddings instead'
-    );
+    throw new Error('Use generateEmbedding or generateBatchEmbeddings instead');
   }
 
   @Mutation('deleteEmbedding')

@@ -1,0 +1,86 @@
+"""
+KnowledgeSource — an information source attached to a course.
+Modelled after NotebookLM: users can attach DOCX, PDF, URLs, YouTube, or raw text.
+"""
+type KnowledgeSource {
+  id: ID!
+  courseId: ID!
+  tenantId: ID!
+  title: String!
+  sourceType: SourceType!
+  """ Original file name, URL, or YouTube link """
+  origin: String
+  """ Full extracted plaintext (may be large — use with care) """
+  rawContent: String
+  """ Preview of first 500 chars """
+  preview: String
+  status: SourceStatus!
+  chunkCount: Int!
+  errorMessage: String
+  metadata: JSON
+  createdAt: String!
+}
+
+enum SourceType {
+  FILE_DOCX
+  FILE_PDF
+  FILE_TXT
+  URL
+  YOUTUBE
+  TEXT
+}
+
+enum SourceStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+input AddUrlSourceInput {
+  courseId: ID!
+  title: String!
+  url: String!
+}
+
+input AddTextSourceInput {
+  courseId: ID!
+  title: String!
+  text: String!
+}
+
+input AddYoutubeSourceInput {
+  courseId: ID!
+  title: String!
+  """ Full YouTube video URL (youtube.com/watch?v=... or youtu.be/...) """
+  url: String!
+}
+
+extend type Query {
+  courseKnowledgeSources(courseId: ID!): [KnowledgeSource!]!
+  knowledgeSource(id: ID!): KnowledgeSource
+}
+
+extend type Mutation {
+  """
+  Add a URL as a knowledge source.
+  The system fetches the page, extracts text, chunks it and embeds it.
+  """
+  addUrlSource(input: AddUrlSourceInput!): KnowledgeSource!
+
+  """
+  Add raw text as a knowledge source.
+  """
+  addTextSource(input: AddTextSourceInput!): KnowledgeSource!
+
+  """
+  Add a YouTube video as a knowledge source.
+  The system fetches the auto-generated transcript and indexes it.
+  """
+  addYoutubeSource(input: AddYoutubeSourceInput!): KnowledgeSource!
+
+  """
+  Remove a knowledge source (and its embeddings).
+  """
+  deleteKnowledgeSource(id: ID!): Boolean!
+}

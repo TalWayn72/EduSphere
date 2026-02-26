@@ -6,6 +6,7 @@ import { AgentSessionModule } from './agent-session/agent-session.module';
 import { AgentMessageModule } from './agent-message/agent-message.module';
 import { TemplateModule } from './template/template.module';
 import { AgentModule } from './agent/agent.module';
+import { RoleplayModule } from './roleplay/roleplay.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
 
@@ -14,9 +15,13 @@ import { authMiddleware } from './auth/auth.middleware';
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-        transport: process.env.NODE_ENV !== 'production'
-          ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
-          : undefined,
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? {
+                target: 'pino-pretty',
+                options: { singleLine: true, colorize: true },
+              }
+            : undefined,
         redact: ['req.headers.authorization', 'req.headers.cookie'],
         customProps: (req: any) => ({
           tenantId: req.headers['x-tenant-id'],
@@ -40,6 +45,7 @@ import { authMiddleware } from './auth/auth.middleware';
     AgentMessageModule,
     TemplateModule,
     AgentModule,
+    RoleplayModule,
   ],
 })
 export class AppModule {}

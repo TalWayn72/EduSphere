@@ -54,14 +54,14 @@ EduSphere's GraphQL API is built using **GraphQL Federation v2.7** with **Hive G
 
 ### Subgraph Decomposition
 
-| Subgraph | Port | Owned Entities | Domain |
-|----------|------|----------------|--------|
-| **Core** | 4001 | `Tenant`, `User` | Identity, tenancy, auth |
-| **Content** | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment` | Courses, media pipeline, transcription |
-| **Annotation** | 4003 | `Annotation` | Markings, sketches, spatial comments |
-| **Collaboration** | 4004 | `CollabDocument`, `CollabSession` | CRDT persistence, real-time presence |
-| **Agent** | 4005 | `AgentDefinition`, `AgentExecution` | AI agents, templates, executions |
-| **Knowledge** | 4006 | `Concept`, `Person`, `Term`, `Source`, `TopicCluster` | Knowledge graph, embeddings, semantic search |
+| Subgraph          | Port | Owned Entities                                                      | Domain                                       |
+| ----------------- | ---- | ------------------------------------------------------------------- | -------------------------------------------- |
+| **Core**          | 4001 | `Tenant`, `User`                                                    | Identity, tenancy, auth                      |
+| **Content**       | 4002 | `Course`, `Module`, `MediaAsset`, `Transcript`, `TranscriptSegment` | Courses, media pipeline, transcription       |
+| **Annotation**    | 4003 | `Annotation`                                                        | Markings, sketches, spatial comments         |
+| **Collaboration** | 4004 | `CollabDocument`, `CollabSession`                                   | CRDT persistence, real-time presence         |
+| **Agent**         | 4005 | `AgentDefinition`, `AgentExecution`                                 | AI agents, templates, executions             |
+| **Knowledge**     | 4006 | `Concept`, `Person`, `Term`, `Source`, `TopicCluster`               | Knowledge graph, embeddings, semantic search |
 
 ### Technology Stack
 
@@ -89,11 +89,13 @@ EduSphere uses **GraphQL Hive** for schema management and governance.
 ### Accessing the Schema
 
 **Production Schema:**
+
 ```
 https://gateway.edusphere.com/graphql
 ```
 
 **Introspection Query:**
+
 ```bash
 curl https://gateway.edusphere.com/graphql \
   -H "Authorization: Bearer $JWT_TOKEN" \
@@ -102,6 +104,7 @@ curl https://gateway.edusphere.com/graphql \
 ```
 
 **GraphQL Playground:**
+
 ```
 https://gateway.edusphere.com/graphql-playground
 ```
@@ -135,6 +138,7 @@ Returns the currently authenticated user. This is the primary entry point for cl
 **RLS**: Returns only the authenticated user's record
 
 **Example:**
+
 ```graphql
 query CurrentUser {
   me {
@@ -159,6 +163,7 @@ query CurrentUser {
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -195,6 +200,7 @@ Fetch a user by ID within the current tenant.
 **Authorization**: Accessible to all authenticated users
 
 **Example:**
+
 ```graphql
 query GetUser($userId: UUID!) {
   user(id: $userId) {
@@ -207,6 +213,7 @@ query GetUser($userId: UUID!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "userId": "550e8400-e29b-41d4-a716-446655440000"
@@ -224,6 +231,7 @@ List all users within the current tenant with filtering, sorting, and pagination
 **Pagination**: Relay Cursor Connection
 
 **Arguments:**
+
 - `first: PositiveInt = 20` - Returns the first N edges
 - `after: Cursor` - Returns edges after this cursor
 - `last: PositiveInt` - Returns the last N edges
@@ -232,6 +240,7 @@ List all users within the current tenant with filtering, sorting, and pagination
 - `orderBy: UserOrderByInput` - Sort by field and direction
 
 **Example:**
+
 ```graphql
 query ListUsers(
   $first: PositiveInt!
@@ -262,6 +271,7 @@ query ListUsers(
 ```
 
 **Variables:**
+
 ```json
 {
   "first": 20,
@@ -273,11 +283,12 @@ query ListUsers(
 ```
 
 **Input Types:**
+
 ```graphql
 input UserFilterInput {
   roles: [UserRole!]
   isActive: Boolean
-  search: String  # Searches displayName and email
+  search: String # Searches displayName and email
 }
 
 input UserOrderByInput {
@@ -303,6 +314,7 @@ Fetch the current tenant's details based on the JWT `tenant_id` claim.
 **RLS**: Returns only the tenant from the JWT
 
 **Example:**
+
 ```graphql
 query CurrentTenant {
   currentTenant {
@@ -337,6 +349,7 @@ Fetch a tenant by its URL-friendly slug. Used for SSO login flow to resolve tena
 **Use Case**: Login page needs to resolve tenant before authentication
 
 **Example:**
+
 ```graphql
 query ResolveOrgForLogin($slug: String!) {
   tenantBySlug(slug: $slug) {
@@ -349,6 +362,7 @@ query ResolveOrgForLogin($slug: String!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "slug": "bar-ilan-university"
@@ -368,6 +382,7 @@ Fetch a single course by ID.
 **Authorization**: Students see only published courses; instructors/admins see all
 
 **Example:**
+
 ```graphql
 query GetCourse($courseId: UUID!) {
   course(id: $courseId) {
@@ -409,6 +424,7 @@ List courses within the current tenant with filtering and pagination.
 **Authorization**: Students see only published courses; instructors see their own + published
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `last: PositiveInt`
@@ -417,11 +433,9 @@ List courses within the current tenant with filtering and pagination.
 - `orderBy: CourseOrderByInput`
 
 **Example:**
+
 ```graphql
-query ListCourses(
-  $first: PositiveInt!
-  $filter: CourseFilterInput
-) {
+query ListCourses($first: PositiveInt!, $filter: CourseFilterInput) {
   courses(first: $first, filter: $filter) {
     edges {
       node {
@@ -450,12 +464,13 @@ query ListCourses(
 ```
 
 **Input Types:**
+
 ```graphql
 input CourseFilterInput {
-  search: String         # Searches title and description
-  creatorId: UUID        # Filter by creator
-  isPublished: Boolean   # Published status
-  tags: [String!]        # Match any of these tags
+  search: String # Searches title and description
+  creatorId: UUID # Filter by creator
+  isPublished: Boolean # Published status
+  tags: [String!] # Match any of these tags
 }
 
 input CourseOrderByInput {
@@ -481,6 +496,7 @@ Fetch a single module by ID.
 **RLS**: Returns only modules within the same tenant
 
 **Example:**
+
 ```graphql
 query GetModule($moduleId: UUID!) {
   module(id: $moduleId) {
@@ -517,6 +533,7 @@ Fetch a single media asset by ID.
 **RLS**: Returns only media assets within the same tenant
 
 **Example:**
+
 ```graphql
 query GetMediaAsset($assetId: UUID!) {
   mediaAsset(id: $assetId) {
@@ -560,17 +577,16 @@ List media assets within the current tenant.
 **Pagination**: Relay Cursor Connection
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `filter: MediaAssetFilterInput`
 - `orderBy: MediaAssetOrderByInput`
 
 **Example:**
+
 ```graphql
-query ListMediaAssets(
-  $first: PositiveInt!
-  $filter: MediaAssetFilterInput
-) {
+query ListMediaAssets($first: PositiveInt!, $filter: MediaAssetFilterInput) {
   mediaAssets(first: $first, filter: $filter) {
     edges {
       node {
@@ -594,6 +610,7 @@ query ListMediaAssets(
 ```
 
 **Input Types:**
+
 ```graphql
 input MediaAssetFilterInput {
   type: MediaType
@@ -624,22 +641,16 @@ Fetch transcript segments for a specific time range within a media asset. Useful
 **RLS**: Returns segments only if the user has access to the parent media asset
 
 **Arguments:**
+
 - `assetId: UUID!` - The media asset ID
 - `startTime: Float!` - Start time in seconds
 - `endTime: Float!` - End time in seconds
 
 **Example:**
+
 ```graphql
-query GetSegmentsForPlayer(
-  $assetId: UUID!
-  $start: Float!
-  $end: Float!
-) {
-  segmentsForTimeRange(
-    assetId: $assetId
-    startTime: $start
-    endTime: $end
-  ) {
+query GetSegmentsForPlayer($assetId: UUID!, $start: Float!, $end: Float!) {
+  segmentsForTimeRange(assetId: $assetId, startTime: $start, endTime: $end) {
     id
     startTime
     endTime
@@ -651,6 +662,7 @@ query GetSegmentsForPlayer(
 ```
 
 **Variables:**
+
 ```json
 {
   "assetId": "asset-uuid",
@@ -670,17 +682,16 @@ Full-text search across all transcripts in the current tenant.
 **Pagination**: Relay Cursor Connection (default 10, max 50)
 
 **Arguments:**
+
 - `query: String!` - Search query
 - `first: PositiveInt = 10`
 - `after: Cursor`
 - `assetIds: [UUID!]` - Optionally limit search to specific assets
 
 **Example:**
+
 ```graphql
-query SearchTranscripts(
-  $query: String!
-  $first: PositiveInt!
-) {
+query SearchTranscripts($query: String!, $first: PositiveInt!) {
   searchTranscripts(query: $query, first: $first) {
     edges {
       node {
@@ -710,6 +721,7 @@ query SearchTranscripts(
 ```
 
 **Variables:**
+
 ```json
 {
   "query": "machine learning",
@@ -730,6 +742,7 @@ Fetch a single annotation by ID.
 **Authorization**: Users see their own PERSONAL layer + SHARED/INSTRUCTOR/AI_GENERATED layers
 
 **Example:**
+
 ```graphql
 query GetAnnotation($annotationId: UUID!) {
   annotation(id: $annotationId) {
@@ -783,6 +796,7 @@ List annotations with filtering and pagination.
 **Authorization**: Students see their own PERSONAL layer + shared/instructor/AI layers
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `last: PositiveInt`
@@ -791,18 +805,10 @@ List annotations with filtering and pagination.
 - `orderBy: AnnotationOrderByInput`
 
 **Example:**
+
 ```graphql
-query ListAnnotations(
-  $assetId: UUID!
-  $layers: [AnnotationLayer!]
-) {
-  annotations(
-    first: 30
-    filter: {
-      assetId: $assetId
-      layers: $layers
-    }
-  ) {
+query ListAnnotations($assetId: UUID!, $layers: [AnnotationLayer!]) {
+  annotations(first: 30, filter: { assetId: $assetId, layers: $layers }) {
     edges {
       node {
         id
@@ -831,6 +837,7 @@ query ListAnnotations(
 ```
 
 **Input Types:**
+
 ```graphql
 input AnnotationFilterInput {
   assetId: UUID
@@ -869,6 +876,7 @@ Get all replies to a root annotation, returned as a flat list ordered by creatio
 **RLS**: Returns only annotations within the same tenant
 
 **Example:**
+
 ```graphql
 query GetThread($rootId: UUID!) {
   annotationThread(rootId: $rootId) {
@@ -897,6 +905,7 @@ Fetch a collaborative document by ID.
 **RLS**: Returns only documents within the same tenant
 
 **Example:**
+
 ```graphql
 query GetCollabDoc($docId: UUID!) {
   collabDocument(id: $docId) {
@@ -931,6 +940,7 @@ Fetch a collaborative document by its unique document name.
 **RLS**: Returns only documents within the same tenant
 
 **Example:**
+
 ```graphql
 query GetDocByName($name: String!) {
   collabDocumentByName(documentName: $name) {
@@ -951,19 +961,15 @@ List all collaborative documents associated with a specific entity (e.g., all do
 **RLS**: Returns only documents within the same tenant
 
 **Arguments:**
+
 - `entityType: String!` - e.g., "Course", "Annotation"
 - `entityId: UUID!` - The entity's UUID
 
 **Example:**
+
 ```graphql
-query GetCourseDocuments(
-  $entityType: String!
-  $entityId: UUID!
-) {
-  collabDocumentsForEntity(
-    entityType: $entityType
-    entityId: $entityId
-  ) {
+query GetCourseDocuments($entityType: String!, $entityId: UUID!) {
+  collabDocumentsForEntity(entityType: $entityType, entityId: $entityId) {
     id
     documentName
     title
@@ -974,6 +980,7 @@ query GetCourseDocuments(
 ```
 
 **Variables:**
+
 ```json
 {
   "entityType": "Course",
@@ -991,6 +998,7 @@ Get WebSocket connection information for real-time collaboration via Hocuspocus.
 **RLS**: Returns connection info only for documents within the same tenant
 
 **Example:**
+
 ```graphql
 query GetWSInfo($docId: UUID!) {
   collabConnectionInfo(documentId: $docId) {
@@ -1002,6 +1010,7 @@ query GetWSInfo($docId: UUID!) {
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -1027,6 +1036,7 @@ Fetch an agent definition by ID.
 **Authorization**: Users see public agents + their own private agents
 
 **Example:**
+
 ```graphql
 query GetAgent($agentId: UUID!) {
   agentDefinition(id: $agentId) {
@@ -1067,12 +1077,14 @@ List available agent definitions.
 **Authorization**: Users see public agents + their own private agents
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `filter: AgentDefinitionFilterInput`
 - `orderBy: AgentDefinitionOrderByInput`
 
 **Example:**
+
 ```graphql
 query ListAgents($first: PositiveInt!) {
   agentDefinitions(first: $first) {
@@ -1099,6 +1111,7 @@ query ListAgents($first: PositiveInt!) {
 ```
 
 **Input Types:**
+
 ```graphql
 input AgentDefinitionFilterInput {
   templateType: AgentTemplate
@@ -1128,6 +1141,7 @@ List all built-in agent templates (predefined agent types).
 **Authentication**: Required
 
 **Example:**
+
 ```graphql
 query GetTemplates {
   agentTemplates {
@@ -1150,6 +1164,7 @@ query GetTemplates {
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -1186,6 +1201,7 @@ Fetch a specific agent execution.
 **Authorization**: Users can only see their own executions
 
 **Example:**
+
 ```graphql
 query GetExecution($execId: UUID!) {
   agentExecution(id: $execId) {
@@ -1221,16 +1237,15 @@ List agent executions with filtering.
 **Authorization**: Users see only their own executions
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `filter: AgentExecutionFilterInput`
 
 **Example:**
+
 ```graphql
-query ListExecutions(
-  $first: PositiveInt!
-  $filter: AgentExecutionFilterInput
-) {
+query ListExecutions($first: PositiveInt!, $filter: AgentExecutionFilterInput) {
   agentExecutions(first: $first, filter: $filter) {
     edges {
       node {
@@ -1254,6 +1269,7 @@ query ListExecutions(
 ```
 
 **Input Types:**
+
 ```graphql
 input AgentExecutionFilterInput {
   agentId: UUID
@@ -1274,6 +1290,7 @@ Fetch a concept by ID.
 **RLS**: Returns only concepts within the same tenant
 
 **Example:**
+
 ```graphql
 query GetConcept($conceptId: UUID!) {
   concept(id: $conceptId) {
@@ -1316,12 +1333,14 @@ Search concepts by label, alias, or description.
 **Pagination**: Relay Cursor Connection
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `filter: ConceptFilterInput`
 - `orderBy: ConceptOrderByInput`
 
 **Example:**
+
 ```graphql
 query SearchConcepts($search: String!) {
   concepts(first: 20, filter: { search: $search }) {
@@ -1345,6 +1364,7 @@ query SearchConcepts($search: String!) {
 ```
 
 **Input Types:**
+
 ```graphql
 input ConceptFilterInput {
   search: String
@@ -1375,6 +1395,7 @@ Semantic search across all content using natural language. Uses pgvector HNSW in
 **Pagination**: Relay Cursor Connection (default 10, max 50)
 
 **Arguments:**
+
 - `query: String!` - Natural language query (will be embedded by the server)
 - `first: PositiveInt = 10`
 - `after: Cursor`
@@ -1382,13 +1403,10 @@ Semantic search across all content using natural language. Uses pgvector HNSW in
 - `assetIds: [UUID!]` - Optionally limit search to specific assets
 
 **Example:**
+
 ```graphql
 query SemanticSearch($query: String!, $first: PositiveInt!) {
-  semanticSearch(
-    query: $query
-    first: $first
-    minSimilarity: 0.75
-  ) {
+  semanticSearch(query: $query, first: $first, minSimilarity: 0.75) {
     edges {
       node {
         segment {
@@ -1417,6 +1435,7 @@ query SemanticSearch($query: String!, $first: PositiveInt!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "query": "What is machine learning?",
@@ -1435,21 +1454,16 @@ HybridRAG search: combines vector search + knowledge graph traversal. Best for c
 **Pagination**: Relay Cursor Connection (default 10, max 50)
 
 **Arguments:**
+
 - `query: String!` - Natural language query
 - `first: PositiveInt = 10`
 - `graphDepth: PositiveInt = 2` - How many graph hops to follow from vector results
 
 **Example:**
+
 ```graphql
-query HybridSearch(
-  $query: String!
-  $graphDepth: PositiveInt!
-) {
-  hybridSearch(
-    query: $query
-    first: 10
-    graphDepth: $graphDepth
-  ) {
+query HybridSearch($query: String!, $graphDepth: PositiveInt!) {
+  hybridSearch(query: $query, first: 10, graphDepth: $graphDepth) {
     edges {
       node {
         segment {
@@ -1495,6 +1509,7 @@ query HybridSearch(
 ```
 
 **Variables:**
+
 ```json
 {
   "query": "Explain the relationship between supervised and unsupervised learning",
@@ -1512,18 +1527,16 @@ Find concepts related to a given concept via graph traversal.
 **RLS**: Returns only concepts within the same tenant
 
 **Arguments:**
+
 - `conceptId: UUID!` - The starting concept
 - `maxDepth: PositiveInt = 3` - Max graph traversal depth
 - `first: PositiveInt = 50`
 
 **Example:**
+
 ```graphql
 query GetRelated($conceptId: UUID!, $maxDepth: PositiveInt!) {
-  relatedConcepts(
-    conceptId: $conceptId
-    maxDepth: $maxDepth
-    first: 50
-  ) {
+  relatedConcepts(conceptId: $conceptId, maxDepth: $maxDepth, first: 50) {
     edges {
       node {
         id
@@ -1549,6 +1562,7 @@ query GetRelated($conceptId: UUID!, $maxDepth: PositiveInt!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "conceptId": "concept-uuid",
@@ -1566,6 +1580,7 @@ Find contradictions for a concept (where different sources present conflicting i
 **RLS**: Returns only contradictions within the same tenant
 
 **Example:**
+
 ```graphql
 query GetContradictions($conceptId: UUID!) {
   contradictions(conceptId: $conceptId) {
@@ -1600,10 +1615,12 @@ Generate a learning path from a starting concept (prerequisites first, then depe
 **RLS**: Returns only concepts within the same tenant
 
 **Arguments:**
+
 - `conceptId: UUID!` - The target concept
 - `maxDepth: PositiveInt = 5` - Max depth for prerequisite traversal
 
 **Example:**
+
 ```graphql
 query GetPath($conceptId: UUID!) {
   learningPath(conceptId: $conceptId, maxDepth: 5) {
@@ -1626,6 +1643,7 @@ List topic clusters (groups of related concepts).
 **RLS**: Returns only clusters within the same tenant
 
 **Example:**
+
 ```graphql
 query GetClusters($first: PositiveInt!) {
   topicClusters(first: $first) {
@@ -1661,6 +1679,7 @@ Fetch a person reference by ID.
 **RLS**: Returns only people within the same tenant
 
 **Example:**
+
 ```graphql
 query GetPerson($personId: UUID!) {
   person(id: $personId) {
@@ -1693,11 +1712,13 @@ Search for people by name.
 **RLS**: Returns only people within the same tenant
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `search: String`
 
 **Example:**
+
 ```graphql
 query SearchPeople($search: String!, $first: PositiveInt!) {
   people(search: $search, first: $first) {
@@ -1729,6 +1750,7 @@ Fetch a term (technical vocabulary) by ID.
 **RLS**: Returns only terms within the same tenant
 
 **Example:**
+
 ```graphql
 query GetTerm($termId: UUID!) {
   term(id: $termId) {
@@ -1756,12 +1778,14 @@ Search for terms by label or domain.
 **RLS**: Returns only terms within the same tenant
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `domain: String`
 - `search: String`
 
 **Example:**
+
 ```graphql
 query SearchTerms($domain: String, $search: String!) {
   terms(domain: $domain, search: $search, first: 20) {
@@ -1793,6 +1817,7 @@ Fetch a source (citation, reference) by ID.
 **RLS**: Returns only sources within the same tenant
 
 **Example:**
+
 ```graphql
 query GetSource($sourceId: UUID!) {
   source(id: $sourceId) {
@@ -1825,12 +1850,14 @@ Search for sources by type or title.
 **RLS**: Returns only sources within the same tenant
 
 **Arguments:**
+
 - `first: PositiveInt = 20`
 - `after: Cursor`
 - `type: String`
 - `search: String`
 
 **Example:**
+
 ```graphql
 query SearchSources($type: String, $search: String!) {
   sources(type: $type, search: $search, first: 20) {
@@ -1871,6 +1898,7 @@ Update the current user's profile and preferences.
 **RLS**: Updates only the authenticated user's record
 
 **Input Type:**
+
 ```graphql
 input UpdateProfileInput {
   displayName: String
@@ -1892,6 +1920,7 @@ enum ThemePreference {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateProfile($input: UpdateProfileInput!) {
   updateMyProfile(input: $input) {
@@ -1909,6 +1938,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -1922,6 +1952,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 ```
 
 **Validation:**
+
 - `displayName`: 1-100 characters
 - `avatarUrl`: Must be a valid URL
 
@@ -1936,6 +1967,7 @@ Update a user's role. Requires ORG_ADMIN or SUPER_ADMIN.
 **RLS**: Can only update users within the same tenant
 
 **Example:**
+
 ```graphql
 mutation UpdateRole($userId: UUID!, $role: UserRole!) {
   updateUserRole(userId: $userId, role: $role) {
@@ -1949,6 +1981,7 @@ mutation UpdateRole($userId: UUID!, $role: UserRole!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "userId": "user-uuid",
@@ -1967,6 +2000,7 @@ Deactivate a user (soft delete). Requires ORG_ADMIN.
 **RLS**: Can only deactivate users within the same tenant
 
 **Example:**
+
 ```graphql
 mutation DeactivateUser($userId: UUID!) {
   deactivateUser(userId: $userId) {
@@ -1989,6 +2023,7 @@ Reactivate a previously deactivated user.
 **RLS**: Can only reactivate users within the same tenant
 
 **Example:**
+
 ```graphql
 mutation ReactivateUser($userId: UUID!) {
   reactivateUser(userId: $userId) {
@@ -2011,6 +2046,7 @@ Update tenant settings. Requires ORG_ADMIN.
 **RLS**: Can only update the authenticated user's tenant
 
 **Input Type:**
+
 ```graphql
 input UpdateTenantSettingsInput {
   defaultLanguage: String
@@ -2026,6 +2062,7 @@ input BrandingColorsInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateTenant($input: UpdateTenantSettingsInput!) {
   updateTenantSettings(input: $input) {
@@ -2045,6 +2082,7 @@ mutation UpdateTenant($input: UpdateTenantSettingsInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2071,6 +2109,7 @@ Create a new course. Requires INSTRUCTOR or ORG_ADMIN role.
 **RLS**: Creates course within the authenticated user's tenant
 
 **Input Type:**
+
 ```graphql
 input CreateCourseInput {
   title: String!
@@ -2082,6 +2121,7 @@ input CreateCourseInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateCourse($input: CreateCourseInput!) {
   createCourse(input: $input) {
@@ -2099,6 +2139,7 @@ mutation CreateCourse($input: CreateCourseInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2111,6 +2152,7 @@ mutation CreateCourse($input: CreateCourseInput!) {
 ```
 
 **Validation:**
+
 - `title`: Required, 1-200 characters
 - `description`: Optional, max 2000 characters
 - `tags`: Max 10 tags, each max 50 characters
@@ -2126,6 +2168,7 @@ Update a course. Only the creator or ORG_ADMIN can update.
 **RLS**: Can only update courses within the same tenant
 
 **Input Type:**
+
 ```graphql
 input UpdateCourseInput {
   title: String
@@ -2136,6 +2179,7 @@ input UpdateCourseInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateCourse($id: UUID!, $input: UpdateCourseInput!) {
   updateCourse(id: $id, input: $input) {
@@ -2160,6 +2204,7 @@ Soft-delete a course. Only the creator or ORG_ADMIN can delete.
 **RLS**: Can only delete courses within the same tenant
 
 **Example:**
+
 ```graphql
 mutation DeleteCourse($id: UUID!) {
   deleteCourse(id: $id)
@@ -2167,6 +2212,7 @@ mutation DeleteCourse($id: UUID!) {
 ```
 
 **Returns:**
+
 ```json
 {
   "data": {
@@ -2185,6 +2231,7 @@ Publish or unpublish a course.
 **Authorization**: `course:write` scope + ownership check
 
 **Example:**
+
 ```graphql
 mutation PublishCourse($id: UUID!, $published: Boolean!) {
   toggleCoursePublished(id: $id, isPublished: $published) {
@@ -2206,6 +2253,7 @@ Fork a course (creates a copy linked to the original).
 **Authorization**: `course:write` scope
 
 **Example:**
+
 ```graphql
 mutation ForkCourse($courseId: UUID!) {
   forkCourse(courseId: $courseId) {
@@ -2237,6 +2285,7 @@ Add a module to a course.
 **Authorization**: `course:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreateModuleInput {
   courseId: UUID!
@@ -2247,6 +2296,7 @@ input CreateModuleInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateModule($input: CreateModuleInput!) {
   createModule(input: $input) {
@@ -2264,6 +2314,7 @@ mutation CreateModule($input: CreateModuleInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2285,6 +2336,7 @@ Update a module.
 **Authorization**: `course:write` scope
 
 **Input Type:**
+
 ```graphql
 input UpdateModuleInput {
   title: String
@@ -2294,6 +2346,7 @@ input UpdateModuleInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateModule($id: UUID!, $input: UpdateModuleInput!) {
   updateModule(id: $id, input: $input) {
@@ -2316,6 +2369,7 @@ Delete a module (cascades to media assets).
 **Authorization**: `course:write` scope
 
 **Example:**
+
 ```graphql
 mutation DeleteModule($id: UUID!) {
   deleteModule(id: $id)
@@ -2332,6 +2386,7 @@ Reorder modules within a course.
 **Authorization**: `course:write` scope
 
 **Example:**
+
 ```graphql
 mutation ReorderModules($courseId: UUID!, $order: [UUID!]!) {
   reorderModules(courseId: $courseId, moduleOrder: $order) {
@@ -2343,6 +2398,7 @@ mutation ReorderModules($courseId: UUID!, $order: [UUID!]!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "courseId": "course-uuid",
@@ -2361,6 +2417,7 @@ Initiate a media upload. Returns a presigned S3 upload URL.
 **Rate Limit**: 20 uploads per hour per user
 
 **Input Type:**
+
 ```graphql
 input InitiateUploadInput {
   moduleId: UUID!
@@ -2372,6 +2429,7 @@ input InitiateUploadInput {
 ```
 
 **Response Type:**
+
 ```graphql
 type UploadTicket {
   uploadId: UUID!
@@ -2382,6 +2440,7 @@ type UploadTicket {
 ```
 
 **Example:**
+
 ```graphql
 mutation InitiateUpload($input: InitiateUploadInput!) {
   initiateMediaUpload(input: $input) {
@@ -2394,6 +2453,7 @@ mutation InitiateUpload($input: InitiateUploadInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2407,6 +2467,7 @@ mutation InitiateUpload($input: InitiateUploadInput!) {
 ```
 
 **Validation:**
+
 - `sizeBytes` must be within tenant plan limits
 - `contentType` must match `mediaType`
 
@@ -2420,6 +2481,7 @@ Complete a media upload after the client uploads directly to S3.
 **Authorization**: `media:upload` scope
 
 **Example:**
+
 ```graphql
 mutation CompleteUpload($uploadId: UUID!, $title: String!) {
   completeMediaUpload(uploadId: $uploadId, title: $title) {
@@ -2434,6 +2496,7 @@ mutation CompleteUpload($uploadId: UUID!, $title: String!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "uploadId": "upload-uuid",
@@ -2451,6 +2514,7 @@ Update media asset metadata.
 **Authorization**: `course:write` scope
 
 **Input Type:**
+
 ```graphql
 input UpdateMediaAssetInput {
   title: String
@@ -2460,6 +2524,7 @@ input UpdateMediaAssetInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateAsset($id: UUID!, $input: UpdateMediaAssetInput!) {
   updateMediaAsset(id: $id, input: $input) {
@@ -2482,6 +2547,7 @@ Delete a media asset (cascades to transcript and segments).
 **Authorization**: `course:write` scope
 
 **Example:**
+
 ```graphql
 mutation DeleteAsset($id: UUID!) {
   deleteMediaAsset(id: $id)
@@ -2498,6 +2564,7 @@ Retrigger transcription for a media asset (if it failed).
 **Authorization**: `course:write` scope
 
 **Example:**
+
 ```graphql
 mutation RetryTranscription($assetId: UUID!) {
   retriggerTranscription(assetId: $assetId) {
@@ -2520,6 +2587,7 @@ Create a new annotation on a media asset.
 **RLS**: Creates annotation within the authenticated user's tenant
 
 **Input Type:**
+
 ```graphql
 input CreateAnnotationInput {
   assetId: UUID!
@@ -2534,11 +2602,12 @@ input CreateAnnotationInput {
   pageNumber: NonNegativeInt
   textRangeStart: NonNegativeInt
   textRangeEnd: NonNegativeInt
-  parentId: UUID  # For replies
+  parentId: UUID # For replies
 }
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateAnnotation($input: CreateAnnotationInput!) {
   createAnnotation(input: $input) {
@@ -2558,6 +2627,7 @@ mutation CreateAnnotation($input: CreateAnnotationInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2572,6 +2642,7 @@ mutation CreateAnnotation($input: CreateAnnotationInput!) {
 ```
 
 **Validation:**
+
 - `content`: Required for TEXT type, max 10000 characters
 - `sketchData`: Required for SKETCH type
 - `timestampStart`/`timestampEnd`: Required for time-based annotations
@@ -2587,6 +2658,7 @@ Update an annotation. Users can only update their own annotations.
 **Authorization**: Owner only (or instructor for SHARED layer)
 
 **Input Type:**
+
 ```graphql
 input UpdateAnnotationInput {
   content: String
@@ -2596,6 +2668,7 @@ input UpdateAnnotationInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateAnnotation($id: UUID!, $input: UpdateAnnotationInput!) {
   updateAnnotation(id: $id, input: $input) {
@@ -2617,6 +2690,7 @@ Delete an annotation and all its replies (cascade).
 **Authorization**: Owner only (or instructor for SHARED layer)
 
 **Example:**
+
 ```graphql
 mutation DeleteAnnotation($id: UUID!) {
   deleteAnnotation(id: $id)
@@ -2633,6 +2707,7 @@ Pin or unpin an annotation (instructors/admins only).
 **Authorization**: `annotation:write` scope
 
 **Example:**
+
 ```graphql
 mutation PinAnnotation($id: UUID!, $pinned: Boolean!) {
   toggleAnnotationPin(id: $id, pinned: $pinned) {
@@ -2653,6 +2728,7 @@ Mark an annotation as resolved.
 **Authorization**: Owner or instructor
 
 **Example:**
+
 ```graphql
 mutation ResolveAnnotation($id: UUID!) {
   resolveAnnotation(id: $id) {
@@ -2673,6 +2749,7 @@ Batch-move annotations between layers (instructor/admin only).
 **Authorization**: `annotation:write` scope
 
 **Example:**
+
 ```graphql
 mutation MoveToShared($ids: [UUID!]!, $layer: AnnotationLayer!) {
   moveAnnotationsToLayer(annotationIds: $ids, targetLayer: $layer) {
@@ -2684,6 +2761,7 @@ mutation MoveToShared($ids: [UUID!]!, $layer: AnnotationLayer!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "ids": ["ann-uuid-1", "ann-uuid-2"],
@@ -2703,6 +2781,7 @@ Create a new collaborative document.
 **RLS**: Creates document within the authenticated user's tenant
 
 **Input Type:**
+
 ```graphql
 input CreateCollabDocumentInput {
   documentName: String!
@@ -2713,6 +2792,7 @@ input CreateCollabDocumentInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateDoc($input: CreateCollabDocumentInput!) {
   createCollabDocument(input: $input) {
@@ -2727,6 +2807,7 @@ mutation CreateDoc($input: CreateCollabDocumentInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2748,6 +2829,7 @@ Force-compact CRDT updates into a snapshot (admin only).
 **Authorization**: `org:manage` scope
 
 **Example:**
+
 ```graphql
 mutation CompactDoc($docId: UUID!) {
   compactCollabDocument(documentId: $docId) {
@@ -2771,6 +2853,7 @@ Create a new agent definition.
 **Authorization**: `agent:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreateAgentDefinitionInput {
   name: String!
@@ -2799,6 +2882,7 @@ input AgentDataScope {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateAgent($input: CreateAgentDefinitionInput!) {
   createAgentDefinition(input: $input) {
@@ -2821,6 +2905,7 @@ mutation CreateAgent($input: CreateAgentDefinitionInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2853,6 +2938,7 @@ Update an agent definition (creator only).
 **Authorization**: `agent:write` scope + ownership check
 
 **Input Type:**
+
 ```graphql
 input UpdateAgentDefinitionInput {
   name: String
@@ -2863,6 +2949,7 @@ input UpdateAgentDefinitionInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateAgent($id: UUID!, $input: UpdateAgentDefinitionInput!) {
   updateAgentDefinition(id: $id, input: $input) {
@@ -2885,6 +2972,7 @@ Delete an agent definition (creator only, cascades executions).
 **Authorization**: `agent:write` scope + ownership check
 
 **Example:**
+
 ```graphql
 mutation DeleteAgent($id: UUID!) {
   deleteAgentDefinition(id: $id)
@@ -2902,6 +2990,7 @@ Execute an agent. Returns immediately with QUEUED status.
 **Rate Limit**: 30 executions per hour per user
 
 **Input Type:**
+
 ```graphql
 input ExecuteAgentInput {
   agentId: UUID!
@@ -2911,6 +3000,7 @@ input ExecuteAgentInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation RunAgent($input: ExecuteAgentInput!) {
   executeAgent(input: $input) {
@@ -2926,6 +3016,7 @@ mutation RunAgent($input: ExecuteAgentInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -2951,6 +3042,7 @@ Cancel a running agent execution.
 **Authorization**: Owner only
 
 **Example:**
+
 ```graphql
 mutation CancelAgent($execId: UUID!) {
   cancelAgentExecution(executionId: $execId) {
@@ -2973,6 +3065,7 @@ Manually create a concept in the knowledge graph.
 **Authorization**: `knowledge:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreateConceptInput {
   label: String!
@@ -2983,6 +3076,7 @@ input CreateConceptInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateConcept($input: CreateConceptInput!) {
   createConcept(input: $input) {
@@ -2997,6 +3091,7 @@ mutation CreateConcept($input: CreateConceptInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -3018,6 +3113,7 @@ Update a concept's label, description, aliases, or domain.
 **Authorization**: `knowledge:write` scope
 
 **Input Type:**
+
 ```graphql
 input UpdateConceptInput {
   label: String
@@ -3028,6 +3124,7 @@ input UpdateConceptInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation UpdateConcept($id: UUID!, $input: UpdateConceptInput!) {
   updateConcept(id: $id, input: $input) {
@@ -3051,6 +3148,7 @@ Delete a concept and all its edges from the knowledge graph.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation DeleteConcept($id: UUID!) {
   deleteConcept(id: $id)
@@ -3067,6 +3165,7 @@ Create a relationship between two concepts.
 **Authorization**: `knowledge:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreateRelationInput {
   fromConceptId: UUID!
@@ -3077,6 +3176,7 @@ input CreateRelationInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateRelation($input: CreateRelationInput!) {
   createRelation(input: $input)
@@ -3084,6 +3184,7 @@ mutation CreateRelation($input: CreateRelationInput!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "input": {
@@ -3096,6 +3197,7 @@ mutation CreateRelation($input: CreateRelationInput!) {
 ```
 
 **Common Relation Types:**
+
 - `IS_A` - Subclass relationship
 - `PART_OF` - Compositional relationship
 - `PREREQUISITE` - Learning dependency
@@ -3112,17 +3214,10 @@ Remove a relationship between two concepts.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
-mutation DeleteRelation(
-  $from: UUID!
-  $to: UUID!
-  $type: String!
-) {
-  deleteRelation(
-    fromConceptId: $from
-    toConceptId: $to
-    relationType: $type
-  )
+mutation DeleteRelation($from: UUID!, $to: UUID!, $type: String!) {
+  deleteRelation(fromConceptId: $from, toConceptId: $to, relationType: $type)
 }
 ```
 
@@ -3136,6 +3231,7 @@ Mark a contradiction between two concepts.
 **Authorization**: `knowledge:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreateContradictionInput {
   concept1Id: UUID!
@@ -3154,6 +3250,7 @@ enum ContradictionSeverity {
 ```
 
 **Example:**
+
 ```graphql
 mutation MarkContradiction($input: CreateContradictionInput!) {
   createContradiction(input: $input) {
@@ -3183,6 +3280,7 @@ Trigger re-indexing of embeddings for a media asset.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation ReindexEmbeddings($assetId: UUID!) {
   reindexAssetEmbeddings(assetId: $assetId)
@@ -3199,12 +3297,9 @@ Review and approve/reject an AI-inferred relationship.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
-mutation ReviewRelation(
-  $from: UUID!
-  $to: UUID!
-  $approved: Boolean!
-) {
+mutation ReviewRelation($from: UUID!, $to: UUID!, $approved: Boolean!) {
   reviewInferredRelation(
     fromConceptId: $from
     toConceptId: $to
@@ -3223,6 +3318,7 @@ Create a person reference in the knowledge graph.
 **Authorization**: `knowledge:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreatePersonInput {
   fullName: String!
@@ -3234,6 +3330,7 @@ input CreatePersonInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreatePerson($input: CreatePersonInput!) {
   createPerson(input: $input) {
@@ -3256,6 +3353,7 @@ Update a person's details.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation UpdatePerson($id: UUID!, $input: UpdatePersonInput!) {
   updatePerson(id: $id, input: $input) {
@@ -3277,6 +3375,7 @@ Delete a person from the knowledge graph.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation DeletePerson($id: UUID!) {
   deletePerson(id: $id)
@@ -3293,6 +3392,7 @@ Create a term (technical vocabulary).
 **Authorization**: `knowledge:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreateTermInput {
   label: String!
@@ -3303,6 +3403,7 @@ input CreateTermInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateTerm($input: CreateTermInput!) {
   createTerm(input: $input) {
@@ -3325,6 +3426,7 @@ Update a term.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation UpdateTerm($id: UUID!, $input: UpdateTermInput!) {
   updateTerm(id: $id, input: $input) {
@@ -3346,6 +3448,7 @@ Delete a term.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation DeleteTerm($id: UUID!) {
   deleteTerm(id: $id)
@@ -3362,6 +3465,7 @@ Create a source (citation, reference).
 **Authorization**: `knowledge:write` scope
 
 **Input Type:**
+
 ```graphql
 input CreateSourceInput {
   title: String!
@@ -3372,6 +3476,7 @@ input CreateSourceInput {
 ```
 
 **Example:**
+
 ```graphql
 mutation CreateSource($input: CreateSourceInput!) {
   createSource(input: $input) {
@@ -3395,6 +3500,7 @@ Update a source.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation UpdateSource($id: UUID!, $input: UpdateSourceInput!) {
   updateSource(id: $id, input: $input) {
@@ -3416,6 +3522,7 @@ Delete a source.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation DeleteSource($id: UUID!) {
   deleteSource(id: $id)
@@ -3432,6 +3539,7 @@ Link a person as an author to a source.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation LinkAuthor($personId: UUID!, $sourceId: UUID!) {
   linkAuthorToSource(personId: $personId, sourceId: $sourceId)
@@ -3448,6 +3556,7 @@ Link a source to a concept.
 **Authorization**: `knowledge:write` scope
 
 **Example:**
+
 ```graphql
 mutation LinkSource($sourceId: UUID!, $conceptId: UUID!) {
   linkSourceToConcept(sourceId: $sourceId, conceptId: $conceptId)
@@ -3463,6 +3572,7 @@ All subscriptions require authentication and use WebSocket transport. The gatewa
 ### 5.1 WebSocket Setup
 
 **Connection URL:**
+
 ```
 wss://gateway.edusphere.com/graphql
 ```
@@ -3472,6 +3582,7 @@ wss://gateway.edusphere.com/graphql
 **Authentication:** Send JWT in the `connectionParams` during connection initialization.
 
 **Example Connection (graphql-ws):**
+
 ```typescript
 import { createClient } from 'graphql-ws';
 
@@ -3495,6 +3606,7 @@ Fired when the transcription status of a media asset changes.
 **NATS Subject:** `edusphere.{tenant_id}.media.{asset_id}.transcription.status`
 
 **Example:**
+
 ```graphql
 subscription OnTranscriptionStatus($assetId: UUID!) {
   transcriptionStatusChanged(assetId: $assetId) {
@@ -3511,6 +3623,7 @@ subscription OnTranscriptionStatus($assetId: UUID!) {
 ```
 
 **Emitted Events:**
+
 - Status changes: `PENDING` → `PROCESSING` → `COMPLETED` or `FAILED`
 
 ---
@@ -3523,6 +3636,7 @@ Fired when a new transcript segment is available during live transcription.
 **NATS Subject:** `edusphere.{tenant_id}.media.{asset_id}.segment.added`
 
 **Example:**
+
 ```graphql
 subscription OnSegmentAdded($assetId: UUID!) {
   transcriptSegmentAdded(assetId: $assetId) {
@@ -3548,6 +3662,7 @@ Fired when an annotation is created, updated, or deleted on an asset.
 **NATS Subject:** `edusphere.{tenant_id}.annotation.{asset_id}.changed`
 
 **Event Type:**
+
 ```graphql
 type AnnotationChangeEvent {
   changeType: ChangeType!
@@ -3563,11 +3678,9 @@ enum ChangeType {
 ```
 
 **Example:**
+
 ```graphql
-subscription OnAnnotationChange(
-  $assetId: UUID!
-  $layers: [AnnotationLayer!]
-) {
+subscription OnAnnotationChange($assetId: UUID!, $layers: [AnnotationLayer!]) {
   annotationChanged(assetId: $assetId, layers: $layers) {
     changeType
     annotation {
@@ -3588,6 +3701,7 @@ subscription OnAnnotationChange(
 ```
 
 **Variables:**
+
 ```json
 {
   "assetId": "asset-uuid",
@@ -3607,6 +3721,7 @@ Fired when collaborators join/leave or update cursor position.
 **NATS Subject:** `edusphere.{tenant_id}.collab.{document_id}.presence`
 
 **Event Type:**
+
 ```graphql
 type PresenceEvent {
   eventType: PresenceEventType!
@@ -3622,6 +3737,7 @@ enum PresenceEventType {
 ```
 
 **Example:**
+
 ```graphql
 subscription OnPresenceChange($documentId: UUID!) {
   collaboratorPresenceChanged(documentId: $documentId) {
@@ -3653,6 +3769,7 @@ Fired when an agent execution's status changes.
 **NATS Subject:** `edusphere.{tenant_id}.agent.execution.{execution_id}.updated`
 
 **Example:**
+
 ```graphql
 subscription OnAgentProgress($executionId: UUID!) {
   agentExecutionUpdated(executionId: $executionId) {
@@ -3668,6 +3785,7 @@ subscription OnAgentProgress($executionId: UUID!) {
 ```
 
 **Emitted Events:**
+
 - Status changes: `QUEUED` → `RUNNING` → `COMPLETED` or `FAILED`
 - Partial output updates during `RUNNING` state
 
@@ -3681,6 +3799,7 @@ Stream the agent's response tokens as they're generated.
 **NATS Subject:** `edusphere.{tenant_id}.agent.execution.{execution_id}.stream`
 
 **Chunk Type:**
+
 ```graphql
 type AgentStreamChunk {
   text: String!
@@ -3690,6 +3809,7 @@ type AgentStreamChunk {
 ```
 
 **Example:**
+
 ```graphql
 subscription StreamResponse($executionId: UUID!) {
   agentResponseStream(executionId: $executionId) {
@@ -3701,6 +3821,7 @@ subscription StreamResponse($executionId: UUID!) {
 ```
 
 **Client Handling:**
+
 ```typescript
 const subscription = client.subscribe({
   query: StreamResponseDocument,
@@ -3735,6 +3856,7 @@ Fired when new concepts are extracted from content.
 **NATS Subject:** `edusphere.{tenant_id}.knowledge.{asset_id}.concepts.extracted`
 
 **Example:**
+
 ```graphql
 subscription OnConceptsExtracted($assetId: UUID!) {
   conceptsExtracted(assetId: $assetId) {
@@ -3758,33 +3880,36 @@ All GraphQL requests (except `tenantBySlug`) require a valid JWT (JSON Web Token
 EduSphere uses **Keycloak** for identity management. JWTs are issued by Keycloak and validated by the Hive Gateway.
 
 **JWT Claims:**
+
 ```typescript
 interface JWTClaims {
-  sub: string;          // Keycloak user ID
-  tenant_id: string;    // UUID of the tenant
-  user_id: string;      // EduSphere internal user UUID
+  sub: string; // Keycloak user ID
+  tenant_id: string; // UUID of the tenant
+  user_id: string; // EduSphere internal user UUID
   email: string;
-  roles: UserRole[];    // ["INSTRUCTOR", "STUDENT", etc.]
-  scopes: string[];     // ["course:write", "agent:execute", etc.]
-  iat: number;          // Issued at (Unix timestamp)
-  exp: number;          // Expires at (Unix timestamp)
+  roles: UserRole[]; // ["INSTRUCTOR", "STUDENT", etc.]
+  scopes: string[]; // ["course:write", "agent:execute", etc.]
+  iat: number; // Issued at (Unix timestamp)
+  exp: number; // Expires at (Unix timestamp)
 }
 ```
 
 ### Sending Requests
 
 **HTTP Header:**
+
 ```
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Example (fetch):**
+
 ```typescript
 const response = await fetch('https://gateway.edusphere.com/graphql', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${jwtToken}`,
+    Authorization: `Bearer ${jwtToken}`,
   },
   body: JSON.stringify({
     query: `
@@ -3801,6 +3926,7 @@ const response = await fetch('https://gateway.edusphere.com/graphql', {
 ```
 
 **Example (graphql-request):**
+
 ```typescript
 import { GraphQLClient } from 'graphql-request';
 
@@ -3843,15 +3969,18 @@ function isTokenExpiringSoon(token: string): boolean {
 
 // Refresh token via Keycloak
 async function refreshToken(refreshToken: string): Promise<string> {
-  const response = await fetch('https://keycloak.edusphere.com/realms/{tenant}/protocol/openid-connect/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-      client_id: 'edusphere-web',
-    }),
-  });
+  const response = await fetch(
+    'https://keycloak.edusphere.com/realms/{tenant}/protocol/openid-connect/token',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: 'edusphere-web',
+      }),
+    }
+  );
   const data = await response.json();
   return data.access_token;
 }
@@ -3859,12 +3988,12 @@ async function refreshToken(refreshToken: string): Promise<string> {
 
 ### Authorization Levels
 
-| Directive | Enforcement | Example |
-|-----------|-------------|---------|
-| `@authenticated` | Gateway validates JWT | All queries/mutations except `tenantBySlug` |
-| `@requiresScopes(scopes: [["course:write"]])` | Gateway checks JWT scopes | `createCourse`, `updateCourse` |
-| `@ownerOnly` | Subgraph resolver checks ownership | `updateAnnotation` (user can only update their own) |
-| `@requiresRole(roles: [INSTRUCTOR])` | Subgraph resolver checks role | `toggleCoursePublished` |
+| Directive                                     | Enforcement                        | Example                                             |
+| --------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
+| `@authenticated`                              | Gateway validates JWT              | All queries/mutations except `tenantBySlug`         |
+| `@requiresScopes(scopes: [["course:write"]])` | Gateway checks JWT scopes          | `createCourse`, `updateCourse`                      |
+| `@ownerOnly`                                  | Subgraph resolver checks ownership | `updateAnnotation` (user can only update their own) |
+| `@requiresRole(roles: [INSTRUCTOR])`          | Subgraph resolver checks role      | `toggleCoursePublished`                             |
 
 ---
 
@@ -3899,26 +4028,27 @@ All errors follow the standard GraphQL error format with additional `extensions`
 
 ### Error Codes Catalog
 
-| Code | HTTP Status | Description | Retryable |
-|------|------------|-------------|-----------|
-| `UNAUTHENTICATED` | 401 | Missing or invalid JWT | No |
-| `FORBIDDEN` | 403 | Valid JWT but insufficient permissions | No |
-| `NOT_FOUND` | 404 | Requested resource does not exist | No |
-| `CONFLICT` | 409 | Resource version conflict (optimistic locking) | Yes |
-| `VALIDATION_ERROR` | 400 | Input validation failure | No |
-| `RATE_LIMITED` | 429 | Too many requests | Yes (after `retryAfter`) |
-| `TENANT_QUOTA_EXCEEDED` | 403 | Tenant has exceeded plan limits | No |
-| `MEDIA_PROCESSING_ERROR` | 500 | Media transcoding/transcription failure | Yes |
-| `AGENT_EXECUTION_ERROR` | 500 | Agent runtime failure | Yes |
-| `GRAPH_QUERY_ERROR` | 500 | Apache AGE query failure | Yes |
-| `EMBEDDING_ERROR` | 500 | Vector embedding generation failure | Yes |
-| `INTERNAL_ERROR` | 500 | Unhandled server error | Yes |
-| `PAGINATION_CLAMPED` | 200 | Requested page size was clamped (warning) | N/A |
-| `OPTIMISTIC_LOCK_FAILED` | 409 | Version mismatch on update | Yes |
+| Code                     | HTTP Status | Description                                    | Retryable                |
+| ------------------------ | ----------- | ---------------------------------------------- | ------------------------ |
+| `UNAUTHENTICATED`        | 401         | Missing or invalid JWT                         | No                       |
+| `FORBIDDEN`              | 403         | Valid JWT but insufficient permissions         | No                       |
+| `NOT_FOUND`              | 404         | Requested resource does not exist              | No                       |
+| `CONFLICT`               | 409         | Resource version conflict (optimistic locking) | Yes                      |
+| `VALIDATION_ERROR`       | 400         | Input validation failure                       | No                       |
+| `RATE_LIMITED`           | 429         | Too many requests                              | Yes (after `retryAfter`) |
+| `TENANT_QUOTA_EXCEEDED`  | 403         | Tenant has exceeded plan limits                | No                       |
+| `MEDIA_PROCESSING_ERROR` | 500         | Media transcoding/transcription failure        | Yes                      |
+| `AGENT_EXECUTION_ERROR`  | 500         | Agent runtime failure                          | Yes                      |
+| `GRAPH_QUERY_ERROR`      | 500         | Apache AGE query failure                       | Yes                      |
+| `EMBEDDING_ERROR`        | 500         | Vector embedding generation failure            | Yes                      |
+| `INTERNAL_ERROR`         | 500         | Unhandled server error                         | Yes                      |
+| `PAGINATION_CLAMPED`     | 200         | Requested page size was clamped (warning)      | N/A                      |
+| `OPTIMISTIC_LOCK_FAILED` | 409         | Version mismatch on update                     | Yes                      |
 
 ### Handling Errors in Clients
 
 **TypeScript Example:**
+
 ```typescript
 import { GraphQLClient, ClientError } from 'graphql-request';
 
@@ -4033,10 +4163,10 @@ All connection fields accept these arguments:
 
 ```graphql
 input ConnectionArgs {
-  first: PositiveInt        # Forward pagination: get first N items
-  after: Cursor             # Forward pagination: after this cursor
-  last: PositiveInt         # Backward pagination: get last N items
-  before: Cursor            # Backward pagination: before this cursor
+  first: PositiveInt # Forward pagination: get first N items
+  after: Cursor # Forward pagination: after this cursor
+  last: PositiveInt # Backward pagination: get last N items
+  before: Cursor # Backward pagination: before this cursor
 }
 ```
 
@@ -4126,13 +4256,13 @@ query PreviousPage($cursor: Cursor!) {
 
 ### Pagination Limits
 
-| Context | Default `first` | Max `first`/`last` |
-|---------|----------------|-------------------|
-| Standard lists | 20 | 100 |
-| Transcript segments | 50 | 500 |
-| Search results | 10 | 50 |
-| Agent executions | 20 | 100 |
-| Knowledge graph relations | 20 | 200 |
+| Context                   | Default `first` | Max `first`/`last` |
+| ------------------------- | --------------- | ------------------ |
+| Standard lists            | 20              | 100                |
+| Transcript segments       | 50              | 500                |
+| Search results            | 10              | 50                 |
+| Agent executions          | 20              | 100                |
+| Knowledge graph relations | 20              | 200                |
 
 If `first`/`last` exceeds the maximum, the server clamps to max and returns a `PAGINATION_CLAMPED` warning in `extensions`.
 
@@ -4152,7 +4282,7 @@ query CoursesWithTotal {
     pageInfo {
       hasNextPage
     }
-    totalCount  # Only request if you need it
+    totalCount # Only request if you need it
   }
 }
 ```
@@ -4180,23 +4310,23 @@ The Hive Gateway enforces per-tenant and per-user rate limits to prevent abuse a
 
 ### Rate Limit Tiers
 
-| Plan | Queries/min | Mutations/min | Subscriptions (concurrent) | Agent Executions/hour |
-|------|------------|---------------|---------------------------|---------------------|
-| Free | 60 | 20 | 5 | 10 |
-| Starter | 300 | 100 | 20 | 30 |
-| Professional | 1000 | 500 | 100 | 100 |
-| Enterprise | Unlimited | Unlimited | Unlimited | Unlimited |
+| Plan         | Queries/min | Mutations/min | Subscriptions (concurrent) | Agent Executions/hour |
+| ------------ | ----------- | ------------- | -------------------------- | --------------------- |
+| Free         | 60          | 20            | 5                          | 10                    |
+| Starter      | 300         | 100           | 20                         | 30                    |
+| Professional | 1000        | 500           | 100                        | 100                   |
+| Enterprise   | Unlimited   | Unlimited     | Unlimited                  | Unlimited             |
 
 ### Per-Operation Rate Limits
 
 Some operations have additional rate limits:
 
-| Operation | Rate Limit |
-|-----------|-----------|
-| `initiateMediaUpload` | 20/hour per user |
-| `executeAgent` | 30/hour per user |
-| `semanticSearch` | 100/hour per user |
-| `hybridSearch` | 50/hour per user |
+| Operation             | Rate Limit        |
+| --------------------- | ----------------- |
+| `initiateMediaUpload` | 20/hour per user  |
+| `executeAgent`        | 30/hour per user  |
+| `semanticSearch`      | 100/hour per user |
+| `hybridSearch`        | 50/hour per user  |
 
 ### Rate Limit Headers
 
@@ -4231,6 +4361,7 @@ When rate-limited, the server returns a `RATE_LIMITED` error:
 ```
 
 **Client Retry Logic:**
+
 ```typescript
 async function requestWithRetry(query, variables, maxRetries = 3) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -4269,6 +4400,7 @@ pnpm add -D @graphql-codegen/cli \
 ### Configuration
 
 **File: `codegen.ts`**
+
 ```typescript
 import { CodegenConfig } from '@graphql-codegen/cli';
 
@@ -4326,6 +4458,7 @@ pnpm graphql-codegen --watch
 ### Using Generated Types
 
 **Define Operation:**
+
 ```graphql
 # src/queries/courses.graphql
 query GetCourses($first: PositiveInt!) {
@@ -4349,6 +4482,7 @@ query GetCourses($first: PositiveInt!) {
 ```
 
 **Use in React:**
+
 ```typescript
 import { useGetCoursesQuery } from './generated/graphql';
 
@@ -4410,11 +4544,13 @@ query GetMe {
 ### 11.1 urql (Recommended)
 
 **Installation:**
+
 ```bash
 pnpm add urql graphql
 ```
 
 **Setup:**
+
 ```typescript
 import { createClient, cacheExchange, fetchExchange } from 'urql';
 
@@ -4430,6 +4566,7 @@ const client = createClient({
 ```
 
 **React Integration:**
+
 ```typescript
 import { Provider, useQuery } from 'urql';
 
@@ -4471,6 +4608,7 @@ function CourseList() {
 ```
 
 **Subscriptions with urql:**
+
 ```typescript
 import { useSubscription } from 'urql';
 
@@ -4496,11 +4634,13 @@ function TranscriptionProgress({ assetId }) {
 ### 11.2 Apollo Client
 
 **Installation:**
+
 ```bash
 pnpm add @apollo/client graphql
 ```
 
 **Setup:**
+
 ```typescript
 import { ApolloClient, InMemoryCache, HttpLink, split } from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
@@ -4542,6 +4682,7 @@ const client = new ApolloClient({
 ```
 
 **React Integration:**
+
 ```typescript
 import { ApolloProvider, useQuery, gql } from '@apollo/client';
 
@@ -4590,11 +4731,13 @@ function CourseList() {
 ### 11.3 graphql-request (Lightweight)
 
 **Installation:**
+
 ```bash
 pnpm add graphql-request graphql
 ```
 
 **Basic Usage:**
+
 ```typescript
 import { GraphQLClient, gql } from 'graphql-request';
 
@@ -4622,6 +4765,7 @@ console.log(data.courses.edges);
 ```
 
 **Mutations:**
+
 ```typescript
 const mutation = gql`
   mutation CreateCourse($input: CreateCourseInput!) {
@@ -4836,7 +4980,7 @@ Persisted queries reduce bandwidth by sending a query hash instead of the full q
 plugins:
   - name: persisted-queries
     config:
-      allowArbitraryQueries: true  # Allow non-persisted in dev
+      allowArbitraryQueries: true # Allow non-persisted in dev
       storage: redis
       redis:
         host: localhost
@@ -4871,6 +5015,7 @@ const client = createClient({
 5. Gateway caches the mapping
 
 **Benefits:**
+
 - Reduced request size (especially for large queries)
 - Faster parsing on the server
 - Better caching
@@ -4892,7 +5037,8 @@ const client = createClient({
   exchanges: [
     cacheExchange,
     requestPolicyExchange({
-      shouldUpgrade: (operation) => operation.context.requestPolicy !== 'cache-only',
+      shouldUpgrade: (operation) =>
+        operation.context.requestPolicy !== 'cache-only',
     }),
     fetchExchange,
   ],
@@ -4929,10 +5075,7 @@ import { createClient, cacheExchange, fetchExchange } from 'urql';
 
 const client = createClient({
   url: 'https://gateway.edusphere.com/graphql',
-  exchanges: [
-    cacheExchange,
-    fetchExchange,
-  ],
+  exchanges: [cacheExchange, fetchExchange],
   requestPolicy: 'cache-first', // or 'cache-and-network', 'network-only'
 });
 ```
@@ -4960,12 +5103,12 @@ const [result] = useQuery({
 plugins:
   - name: response-cache
     config:
-      ttl: 300000  # 5 minutes in milliseconds
+      ttl: 300000 # 5 minutes in milliseconds
       ttlPerType:
-        Query.courses: 60000    # 1 minute
-        Query.me: 0             # No cache
+        Query.courses: 60000 # 1 minute
+        Query.me: 0 # No cache
       ttlPerSchemaCoordinate:
-        Query.semanticSearch: 300000  # 5 minutes
+        Query.semanticSearch: 300000 # 5 minutes
 ```
 
 ---

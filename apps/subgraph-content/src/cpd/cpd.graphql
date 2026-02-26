@@ -1,0 +1,44 @@
+type CpdCreditType {
+  id: ID!
+  name: String!
+  regulatoryBody: String!
+  creditHoursPerHour: Float!
+  isActive: Boolean!
+}
+
+type CpdLogEntry {
+  id: ID!
+  courseId: ID!
+  creditTypeName: String!
+  earnedHours: Float!
+  completionDate: String!
+}
+
+type CpdReport {
+  totalHours: Float!
+  byType: [CpdTypeSummary!]!
+  entries: [CpdLogEntry!]!
+}
+
+type CpdTypeSummary {
+  name: String!
+  regulatoryBody: String!
+  totalHours: Float!
+}
+
+extend type Query {
+  myCpdReport(startDate: String, endDate: String): CpdReport! @authenticated
+  cpdCreditTypes: [CpdCreditType!]! @authenticated
+}
+
+extend type Mutation {
+  exportCpdReport(format: CpdExportFormat!): String! @authenticated
+  createCpdCreditType(name: String!, regulatoryBody: String!, creditHoursPerHour: Float!): CpdCreditType! @authenticated @requiresRole(roles: [ORG_ADMIN])
+  assignCpdCreditsToCourse(courseId: ID!, creditTypeId: ID!, creditHours: Float!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN, INSTRUCTOR])
+}
+
+enum CpdExportFormat {
+  NASBA
+  AMA
+  CSV
+}

@@ -44,7 +44,9 @@ export default function () {
   });
 
   if (!ok) {
-    console.error(`Request failed: ${res.status} - ${res.body.substring(0, 200)}`);
+    console.error(
+      `Request failed: ${res.status} - ${res.body.substring(0, 200)}`
+    );
   }
 
   sleep(0.5);

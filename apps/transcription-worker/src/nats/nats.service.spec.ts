@@ -49,7 +49,9 @@ describe('NatsService', () => {
     it('connects to NATS using NATS_URL env var', async () => {
       const { connect } = await import('nats');
       await service.onModuleInit();
-      expect(connect).toHaveBeenCalledWith({ servers: 'nats://localhost:4222' });
+      expect(connect).toHaveBeenCalledWith({
+        servers: 'nats://localhost:4222',
+      });
     });
 
     it('does not throw when NATS is unreachable', async () => {
@@ -62,7 +64,10 @@ describe('NatsService', () => {
   describe('publish', () => {
     it('encodes JSON payload and publishes to the given subject', async () => {
       await service.onModuleInit();
-      await service.publish('transcription.completed', { assetId: 'abc', segmentCount: 5 });
+      await service.publish('transcription.completed', {
+        assetId: 'abc',
+        segmentCount: 5,
+      });
 
       const { connect } = await import('nats');
       const conn = await (connect as any).mock.results[0].value;

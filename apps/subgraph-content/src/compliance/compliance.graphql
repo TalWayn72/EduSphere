@@ -1,0 +1,41 @@
+type ComplianceSummary {
+  totalUsers: Int!
+  totalEnrollments: Int!
+  completedCount: Int!
+  completionRate: Float!
+  overdueCount: Int!
+  generatedAt: String!
+}
+
+type ComplianceReportResult {
+  csvUrl: String!
+  pdfUrl: String!
+  summary: ComplianceSummary!
+}
+
+type ComplianceCourse {
+  id: ID!
+  title: String!
+  slug: String!
+  isCompliance: Boolean!
+  complianceDueDate: String
+  isPublished: Boolean!
+  estimatedHours: Int
+}
+
+extend type Query {
+  complianceCourses: [ComplianceCourse!]! @authenticated
+}
+
+extend type Mutation {
+  generateComplianceReport(
+    courseIds: [ID!]!
+    asOf: String
+  ): ComplianceReportResult! @authenticated
+
+  updateCourseComplianceSettings(
+    courseId: ID!
+    isCompliance: Boolean!
+    complianceDueDate: String
+  ): ComplianceCourse! @authenticated
+}

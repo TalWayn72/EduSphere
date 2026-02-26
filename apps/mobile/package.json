@@ -15,7 +15,7 @@
     "submit:ios": "eas submit --platform ios",
     "typecheck:expo": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "node run-tests.mjs"
+    "test": "node run-tests.mjs && vitest run"
   },
   "dependencies": {
     "@apollo/client": "^3.11.11",

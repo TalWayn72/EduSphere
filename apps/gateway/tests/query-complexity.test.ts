@@ -2,7 +2,11 @@
  * Unit tests for G-10: query depth and complexity validators.
  */
 import { describe, it, expect } from 'vitest';
-import { estimateComplexity, MAX_DEPTH, MAX_COMPLEXITY } from '../src/middleware/query-complexity.js';
+import {
+  estimateComplexity,
+  MAX_DEPTH,
+  MAX_COMPLEXITY,
+} from '../src/middleware/query-complexity.js';
 
 // Minimal AST-like node builder
 type Node = { selectionSet?: { selections: Node[] }; name?: { value: string } };

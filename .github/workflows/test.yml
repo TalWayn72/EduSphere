@@ -53,7 +53,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -61,17 +60,15 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
-
+          version: 10.30.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: pnpm
-
+          cache: "pnpm"
 
       - name: Start NATS JetStream
         run: |
@@ -94,21 +91,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared packages
+        run: |
+          pnpm --filter @edusphere/db build
+          pnpm --filter @edusphere/config build
+          pnpm --filter @edusphere/nats-client build
+          pnpm --filter @edusphere/auth build
+          pnpm --filter @edusphere/metrics build
+
       - name: Generate database schema
         run: pnpm --filter @edusphere/db generate
-        continue-on-error: true  # Apache AGE not available in pgvector CI image
+        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
-        continue-on-error: true  # Apache AGE not available in pgvector CI image
+        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Seed test data
         run: pnpm --filter @edusphere/db seed
-        continue-on-error: true  # Seed depends on AGE migration; skip if migration skipped
+        continue-on-error: true # Seed depends on AGE migration; skip if migration skipped
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
           NODE_ENV: test
@@ -159,16 +164,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
-
+          version: 10.30.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: pnpm
+          cache: "pnpm"
 
       - name: Enable pgvector extension
         run: |
@@ -180,6 +184,7 @@ jobs:
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
+        continue-on-error: true # Apache AGE not in pgvector CI image; RLS tests use mocks
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
@@ -228,7 +233,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-
     strategy:
       fail-fast: false
       matrix:
@@ -247,17 +251,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
-
+          version: 10.30.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: pnpm
-
+          cache: "pnpm"
 
       - name: Start NATS JetStream
         run: |
@@ -278,15 +280,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared packages
+        run: |
+          pnpm --filter @edusphere/db build
+          pnpm --filter @edusphere/config build
+          pnpm --filter @edusphere/nats-client build
+          pnpm --filter @edusphere/auth build
+          pnpm --filter @edusphere/metrics build
+
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
-        continue-on-error: true  # Apache AGE not available in pgvector CI image
+        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Seed test data
         run: pnpm --filter @edusphere/db seed
-        continue-on-error: true  # Seed depends on AGE migration; skip if migration skipped
+        continue-on-error: true # Seed depends on AGE migration; skip if migration skipped
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
           NODE_ENV: test
@@ -307,7 +317,6 @@ jobs:
           path: apps/${{ matrix.package }}/test-results
           retention-days: 7
 
-
   # Consumer contract tests - validate frontend GraphQL ops against supergraph
   contract-tests:
     name: Contract Tests (Schema + Entity References)
@@ -319,16 +328,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
-
+          version: 10.30.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: pnpm
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

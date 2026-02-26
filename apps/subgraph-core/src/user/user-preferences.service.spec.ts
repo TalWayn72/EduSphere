@@ -1,16 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
-import { parsePreferences, UserPreferencesService } from './user-preferences.service';
+import {
+  parsePreferences,
+  UserPreferencesService,
+} from './user-preferences.service';
 import type { AuthContext } from '@edusphere/auth';
 
-const mockLimit     = vi.fn();
-const mockWhere     = vi.fn();
-const mockFrom      = vi.fn();
+const mockLimit = vi.fn();
+const mockWhere = vi.fn();
+const mockFrom = vi.fn();
 const mockReturning = vi.fn();
-const mockSet       = vi.fn();
-const mockUpdate    = vi.fn();
-const mockTx  = { select: () => ({ from: mockFrom }), update: mockUpdate };
-const mockDb  = { select: () => ({ from: mockFrom }), update: mockUpdate };
+const mockSet = vi.fn();
+const mockUpdate = vi.fn();
+const mockTx = { select: () => ({ from: mockFrom }), update: mockUpdate };
+const mockDb = { select: () => ({ from: mockFrom }), update: mockUpdate };
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
@@ -22,20 +25,45 @@ vi.mock('@edusphere/db', () => ({
 import { withTenantContext } from '@edusphere/db';
 
 const MOCK_AUTH: AuthContext = {
-  userId: 'user-1', email: 'student@example.com', username: 'student',
-  tenantId: 'tenant-1', roles: ['STUDENT'], scopes: ['read'], isSuperAdmin: false,
+  userId: 'user-1',
+  email: 'student@example.com',
+  username: 'student',
+  tenantId: 'tenant-1',
+  roles: ['STUDENT'],
+  scopes: ['read'],
+  isSuperAdmin: false,
 };
-const STORED_PREFS = { locale: 'fr', theme: 'dark', emailNotifications: false, pushNotifications: true };
-const MOCK_USER = { id: 'user-1', tenant_id: 'tenant-1', email: 'test@example.com', preferences: STORED_PREFS };
+const STORED_PREFS = {
+  locale: 'fr',
+  theme: 'dark',
+  emailNotifications: false,
+  pushNotifications: true,
+  isPublicProfile: false,
+};
+const MOCK_USER = {
+  id: 'user-1',
+  tenant_id: 'tenant-1',
+  email: 'test@example.com',
+  preferences: STORED_PREFS,
+};
 
 // ─── parsePreferences ────────────────────────────────────────────────────────
 
 describe('parsePreferences()', () => {
-  const DEFAULTS = { locale: 'en', theme: 'system', emailNotifications: true, pushNotifications: true };
+  const DEFAULTS = {
+    locale: 'en',
+    theme: 'system',
+    emailNotifications: true,
+    pushNotifications: true,
+    isPublicProfile: false,
+  };
 
-  it('returns defaults for null', () => expect(parsePreferences(null)).toEqual(DEFAULTS));
-  it('returns defaults for undefined', () => expect(parsePreferences(undefined)).toEqual(DEFAULTS));
-  it('returns defaults for a non-object scalar', () => expect(parsePreferences('bad')).toEqual(DEFAULTS));
+  it('returns defaults for null', () =>
+    expect(parsePreferences(null)).toEqual(DEFAULTS));
+  it('returns defaults for undefined', () =>
+    expect(parsePreferences(undefined)).toEqual(DEFAULTS));
+  it('returns defaults for a non-object scalar', () =>
+    expect(parsePreferences('bad')).toEqual(DEFAULTS));
 
   it('parses a fully specified valid JSONB object', () => {
     expect(parsePreferences(STORED_PREFS)).toEqual(STORED_PREFS);
@@ -47,16 +75,26 @@ describe('parsePreferences()', () => {
 
   it('falls back to defaults for missing fields (partial input)', () => {
     const result = parsePreferences({ locale: 'hi' });
-    expect(result).toEqual({ locale: 'hi', theme: 'system', emailNotifications: true, pushNotifications: true });
+    expect(result).toEqual({
+      locale: 'hi',
+      theme: 'system',
+      emailNotifications: true,
+      pushNotifications: true,
+      isPublicProfile: false,
+    });
   });
 
   it('correctly parses explicit emailNotifications and pushNotifications false', () => {
-    const result = parsePreferences({ emailNotifications: false, pushNotifications: false });
+    const result = parsePreferences({
+      emailNotifications: false,
+      pushNotifications: false,
+    });
     expect(result).toEqual({
       locale: 'en',
       theme: 'system',
       emailNotifications: false,
       pushNotifications: false,
+      isPublicProfile: false,
     });
   });
 
@@ -67,6 +105,7 @@ describe('parsePreferences()', () => {
       theme: 'dark',
       emailNotifications: true,
       pushNotifications: true,
+      isPublicProfile: false,
     });
   });
 
@@ -110,48 +149,77 @@ describe('UserPreferencesService', () => {
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
         expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' }),
-        expect.any(Function),
+        expect.any(Function)
       );
     });
 
     it('extracts first role as userRole', async () => {
-      await service.updatePreferences('user-1', {}, { ...MOCK_AUTH, roles: ['ORG_ADMIN'] });
+      await service.updatePreferences(
+        'user-1',
+        {},
+        { ...MOCK_AUTH, roles: ['ORG_ADMIN'] }
+      );
       expect(withTenantContext).toHaveBeenCalledWith(
-        mockDb, expect.objectContaining({ userRole: 'ORG_ADMIN' }), expect.any(Function),
+        mockDb,
+        expect.objectContaining({ userRole: 'ORG_ADMIN' }),
+        expect.any(Function)
       );
     });
 
     it('defaults userRole to STUDENT when roles array is empty', async () => {
-      await service.updatePreferences('user-1', {}, { ...MOCK_AUTH, roles: [] });
+      await service.updatePreferences(
+        'user-1',
+        {},
+        { ...MOCK_AUTH, roles: [] }
+      );
       expect(withTenantContext).toHaveBeenCalledWith(
-        mockDb, expect.objectContaining({ userRole: 'STUDENT' }), expect.any(Function),
+        mockDb,
+        expect.objectContaining({ userRole: 'STUDENT' }),
+        expect.any(Function)
       );
     });
 
     it('merges only the provided fields (PATCH semantics)', async () => {
       let capturedSet: Record<string, unknown> | undefined;
-      mockSet.mockImplementation((v: Record<string, unknown>) => { capturedSet = v; return { where: mockWhere }; });
+      mockSet.mockImplementation((v: Record<string, unknown>) => {
+        capturedSet = v;
+        return { where: mockWhere };
+      });
 
       await service.updatePreferences('user-1', { locale: 'es' }, MOCK_AUTH);
 
       expect(capturedSet).toEqual({
-        preferences: { locale: 'es', theme: 'dark', emailNotifications: false, pushNotifications: true },
+        preferences: {
+          locale: 'es',
+          theme: 'dark',
+          emailNotifications: false,
+          pushNotifications: true,
+          isPublicProfile: false,
+        },
       });
     });
 
     it('returns the updated user row from DB', async () => {
-      const result = await service.updatePreferences('user-1', { theme: 'light' }, MOCK_AUTH);
+      const result = await service.updatePreferences(
+        'user-1',
+        { theme: 'light' },
+        MOCK_AUTH
+      );
       expect(result).toEqual(MOCK_USER);
     });
 
     it('throws NotFoundException when select returns no user', async () => {
       mockLimit.mockResolvedValue([]);
-      await expect(service.updatePreferences('ghost', {}, MOCK_AUTH)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.updatePreferences('ghost', {}, MOCK_AUTH)
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('throws NotFoundException when update returning is empty', async () => {
       mockReturning.mockResolvedValue([]);
-      await expect(service.updatePreferences('user-1', {}, MOCK_AUTH)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.updatePreferences('user-1', {}, MOCK_AUTH)
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('passes empty string as tenantId when authContext.tenantId is undefined-like', async () => {
@@ -160,31 +228,50 @@ describe('UserPreferencesService', () => {
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
         expect.objectContaining({ tenantId: '' }),
-        expect.any(Function),
+        expect.any(Function)
       );
     });
 
     it('performs a full PATCH merge — all fields supplied', async () => {
       let capturedSet: Record<string, unknown> | undefined;
-      mockSet.mockImplementation((v: Record<string, unknown>) => { capturedSet = v; return { where: mockWhere }; });
+      mockSet.mockImplementation((v: Record<string, unknown>) => {
+        capturedSet = v;
+        return { where: mockWhere };
+      });
 
-      await service.updatePreferences('user-1', {
-        locale: 'zh-CN',
-        theme: 'light',
-        emailNotifications: true,
-        pushNotifications: false,
-      }, MOCK_AUTH);
+      await service.updatePreferences(
+        'user-1',
+        {
+          locale: 'zh-CN',
+          theme: 'light',
+          emailNotifications: true,
+          pushNotifications: false,
+        },
+        MOCK_AUTH
+      );
 
       // STORED_PREFS = { locale: 'fr', theme: 'dark', emailNotifications: false, pushNotifications: true }
       // All fields overridden by input
       expect(capturedSet).toEqual({
-        preferences: { locale: 'zh-CN', theme: 'light', emailNotifications: true, pushNotifications: false },
+        preferences: {
+          locale: 'zh-CN',
+          theme: 'light',
+          emailNotifications: true,
+          pushNotifications: false,
+          isPublicProfile: false,
+        },
       });
     });
 
     it('calls withTenantContext exactly once per invocation', async () => {
       await service.updatePreferences('user-1', { locale: 'pt' }, MOCK_AUTH);
       expect(withTenantContext).toHaveBeenCalledOnce();
+    });
+
+    it('accepts Hebrew locale (he) without throwing', async () => {
+      await expect(
+        service.updatePreferences('user-1', { locale: 'he' }, MOCK_AUTH)
+      ).resolves.toBeDefined();
     });
   });
 });

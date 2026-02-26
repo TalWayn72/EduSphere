@@ -1,0 +1,8 @@
+{
+  "conflicts": {
+    "title": "{{count}} operações de sincronização falharam",
+    "subtitle": "Estas alterações não puderam ser salvas. Feche para limpar.",
+    "dismissAll": "Fechar tudo",
+    "dismiss": "Fechar"
+  }
+}

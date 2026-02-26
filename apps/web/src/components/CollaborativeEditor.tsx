@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -36,8 +42,14 @@ type ConnectionStatus = 'connecting' | 'connected' | 'disconnected';
 // ─── Random user color ────────────────────────────────────────────────────────
 
 const USER_COLORS = [
-  '#10b981', '#6366f1', '#f59e0b', '#ef4444',
-  '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16',
+  '#10b981',
+  '#6366f1',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#06b6d4',
+  '#ec4899',
+  '#84cc16',
 ];
 
 function getUserColor(userId: string): string {
@@ -79,7 +91,7 @@ export function CollaborativeEditor({
   // ── UndoManager ─────────────────────────────────────────────────────────────
   const undoManager = useMemo(
     () => new Y.UndoManager(ydocRef.current.getXmlFragment('default')),
-    [],
+    []
   );
 
   const [canUndo, setCanUndo] = useState(false);
@@ -98,8 +110,12 @@ export function CollaborativeEditor({
     };
   }, [undoManager]);
 
-  const handleUndo = useCallback(() => { undoManager.undo(); }, [undoManager]);
-  const handleRedo = useCallback(() => { undoManager.redo(); }, [undoManager]);
+  const handleUndo = useCallback(() => {
+    undoManager.undo();
+  }, [undoManager]);
+  const handleRedo = useCallback(() => {
+    undoManager.redo();
+  }, [undoManager]);
 
   const hocuspocusUrl =
     import.meta.env.VITE_HOCUSPOCUS_URL ?? 'ws://localhost:1234';
@@ -119,10 +135,18 @@ export function CollaborativeEditor({
       document: ydoc,
       token: token ?? undefined,
 
-      onOpen() { setStatus('connecting'); },
-      onConnect() { setStatus('connected'); },
-      onClose() { setStatus('disconnected'); },
-      onDisconnect() { setStatus('disconnected'); },
+      onOpen() {
+        setStatus('connecting');
+      },
+      onConnect() {
+        setStatus('connected');
+      },
+      onClose() {
+        setStatus('disconnected');
+      },
+      onDisconnect() {
+        setStatus('disconnected');
+      },
     });
 
     const currentUser = getCurrentUser();
@@ -130,18 +154,23 @@ export function CollaborativeEditor({
       const color = getUserColor(currentUser.id);
       provider.awareness.setLocalStateField('user', {
         id: currentUser.id,
-        name: `${currentUser.firstName ?? ''} ${currentUser.lastName ?? ''}`.trim() || currentUser.username,
+        name:
+          `${currentUser.firstName ?? ''} ${currentUser.lastName ?? ''}`.trim() ||
+          currentUser.username,
         color,
-        initials: `${currentUser.firstName?.[0] ?? ''}${currentUser.lastName?.[0] ?? ''}`.toUpperCase() || 'U',
+        initials:
+          `${currentUser.firstName?.[0] ?? ''}${currentUser.lastName?.[0] ?? ''}`.toUpperCase() ||
+          'U',
       });
     }
 
     const updatePresence = () => {
       if (!provider.awareness) return;
-      const states = Array.from(provider.awareness.getStates().values()) as
-        Array<{ user?: PresenceUser }>;
+      const states = Array.from(
+        provider.awareness.getStates().values()
+      ) as Array<{ user?: PresenceUser }>;
       setLiveUsers(
-        states.filter((s) => s.user?.id).map((s) => s.user as PresenceUser),
+        states.filter((s) => s.user?.id).map((s) => s.user as PresenceUser)
       );
     };
 
@@ -157,20 +186,23 @@ export function CollaborativeEditor({
   }, [documentId, hocuspocusUrl]);
 
   // ── TipTap extensions ───────────────────────────────────────────────────────
-  const richExtensions = useMemo(() => [
-    CodeBlockLowlight.configure({ lowlight }),
-    TaskList,
-    TaskItem.configure({ nested: true }),
-    Table.configure({ resizable: true }),
-    TableRow,
-    TableCell,
-    TableHeader,
-    Mathematics,
-    Mention.configure({
-      HTMLAttributes: { class: 'mention' },
-      suggestion: { items: mentionSuggestionItems },
-    }),
-  ], []);
+  const richExtensions = useMemo(
+    () => [
+      CodeBlockLowlight.configure({ lowlight }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableCell,
+      TableHeader,
+      Mathematics,
+      Mention.configure({
+        HTMLAttributes: { class: 'mention' },
+        suggestion: { items: mentionSuggestionItems },
+      }),
+    ],
+    []
+  );
 
   const extensions = useMemo(() => {
     const base = [Placeholder.configure({ placeholder }), ...richExtensions];
@@ -185,7 +217,9 @@ export function CollaborativeEditor({
           provider: providerRef.current,
           user: currentUser
             ? {
-                name: `${currentUser.firstName ?? ''} ${currentUser.lastName ?? ''}`.trim() || currentUser.username,
+                name:
+                  `${currentUser.firstName ?? ''} ${currentUser.lastName ?? ''}`.trim() ||
+                  currentUser.username,
                 color: getUserColor(currentUser.id),
               }
             : { name: 'Anonymous', color: '#6366f1' },
@@ -209,7 +243,9 @@ export function CollaborativeEditor({
   if (!editor) return null;
 
   const displayUsers: PresenceUser[] =
-    status === 'connected' && liveUsers.length > 0 ? liveUsers : externalPresence;
+    status === 'connected' && liveUsers.length > 0
+      ? liveUsers
+      : externalPresence;
 
   return (
     <div className="border rounded-lg overflow-hidden">

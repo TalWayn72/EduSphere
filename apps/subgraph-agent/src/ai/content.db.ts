@@ -12,14 +12,18 @@
 
 import { Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { createDatabaseConnection, schema, withTenantContext } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  withTenantContext,
+} from '@edusphere/db';
 import type { ContentItemResult } from './tools/agent-tools';
 
 const logger = new Logger('ContentDb');
 
 export async function fetchContentItem(
   contentItemId: string,
-  tenantId: string,
+  tenantId: string
 ): Promise<ContentItemResult | null> {
   logger.debug(`fetchContentItem: id=${contentItemId} tenant=${tenantId}`);
 
@@ -42,7 +46,7 @@ export async function fetchContentItem(
           .limit(1);
 
         return item ?? null;
-      },
+      }
     );
 
     if (!result) return null;

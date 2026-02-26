@@ -1,52 +1,36 @@
-# ─── Build stage ─────────────────────────────────────────────────────────────
-FROM node:22-alpine AS builder
+# syntax=docker/dockerfile:1
+ARG NODE_VERSION=22
+ARG PNPM_VERSION=10
 
+FROM node:${NODE_VERSION}-alpine AS base
+ARG PNPM_VERSION
+RUN npm install -g pnpm@${PNPM_VERSION} --no-fund --no-audit
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Copy workspace manifests
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/transcription-worker/package.json ./apps/transcription-worker/
-COPY packages/db/package.json ./packages/db/
-COPY packages/tsconfig/package.json ./packages/tsconfig/ 2>/dev/null || true
-COPY packages/eslint-config/package.json ./packages/eslint-config/ 2>/dev/null || true
-
-# Install dependencies (workspace-aware)
+FROM base AS deps
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.json tsconfig.base.json ./
+COPY packages/ packages/
+# Copy all apps so pnpm workspace resolution succeeds with --frozen-lockfile
+COPY apps/ apps/
 RUN pnpm install --frozen-lockfile
 
-# Copy source
-COPY apps/transcription-worker ./apps/transcription-worker
-COPY packages/db ./packages/db
-COPY packages/tsconfig ./packages/tsconfig
-
-# Build shared packages first, then the worker
-RUN pnpm --filter @edusphere/db build
+FROM deps AS builder
+RUN pnpm turbo build --filter='./packages/*'
 RUN pnpm --filter @edusphere/transcription-worker build
 
-# ─── Runtime stage ────────────────────────────────────────────────────────────
-FROM node:22-alpine AS runner
-
-WORKDIR /app
-
-# Create non-root user
-RUN addgroup -S edusphere && adduser -S worker -G edusphere
-
-# Copy built artefacts
-COPY --from=builder --chown=worker:edusphere /app/apps/transcription-worker/dist ./dist
-COPY --from=builder --chown=worker:edusphere /app/apps/transcription-worker/package.json ./package.json
-COPY --from=builder --chown=worker:edusphere /app/node_modules ./node_modules
-
+FROM base AS runner
+RUN addgroup -g 1001 -S edusphere && adduser -u 1001 -S worker -G edusphere
+COPY --from=deps --chown=worker:edusphere /app/node_modules ./node_modules
+COPY --from=deps --chown=worker:edusphere /app/packages ./packages
+COPY --from=builder --chown=worker:edusphere /app/apps/transcription-worker/dist ./apps/transcription-worker/dist
 USER worker
 
-# Env defaults (override via docker-compose / K8s)
 ENV NODE_ENV=production
 ENV PORT=3100
 
 EXPOSE 3100
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s \
   CMD wget -qO- http://localhost:3100/health || exit 1
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "apps/transcription-worker/dist/main.js"]

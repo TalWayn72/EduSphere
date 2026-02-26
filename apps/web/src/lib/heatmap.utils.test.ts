@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { getHeatmapColor, formatHeatmapDate, calcHeatmapStats } from './heatmap.utils';
+import {
+  getHeatmapColor,
+  formatHeatmapDate,
+  calcHeatmapStats,
+} from './heatmap.utils';
 
 describe('getHeatmapColor', () => {
   it('returns bg-muted for count 0', () => {

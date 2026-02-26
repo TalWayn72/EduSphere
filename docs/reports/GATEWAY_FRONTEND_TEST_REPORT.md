@@ -12,6 +12,7 @@
 **Overall Status:** ✅ **PASSED WITH FIXES**
 
 All critical systems are operational after applying necessary fixes:
+
 - Gateway configuration is valid and ready to start
 - Frontend builds successfully with TypeScript strict mode
 - All code quality checks pass (linting, type checking)
@@ -27,6 +28,7 @@ All critical systems are operational after applying necessary fixes:
 **Command:** `pnpm --filter @edusphere/gateway build`
 
 **Result:** ✅ **PASSED**
+
 ```
 > @edusphere/gateway@0.1.0 build C:\Users\P0039217\.claude\projects\EduSphere\apps\gateway
 > echo 'Gateway is config-based, no build needed'
@@ -35,11 +37,13 @@ All critical systems are operational after applying necessary fixes:
 ```
 
 **Analysis:**
+
 - Gateway uses Hive Gateway v2 which is runtime-configured (no build step required)
 - Configuration loads from `src/index.ts` with environment variables
 - Subgraph URLs properly configured with fallback defaults
 
 **Configuration Verified:**
+
 ```typescript
 - Core subgraph: http://localhost:4001/graphql
 - Content subgraph: http://localhost:4002/graphql
@@ -58,6 +62,7 @@ All critical systems are operational after applying necessary fixes:
 **Result:** ✅ **PASSED** (after fix)
 
 **Issues Found & Fixed:**
+
 1. **TypeScript Config Error:**
    - **Problem:** `rootDir` inheritance from base config caused path resolution issues
    - **Fix:** Explicitly set `rootDir: "./src"` in web app's `tsconfig.json`
@@ -70,6 +75,7 @@ All critical systems are operational after applying necessary fixes:
    - **Impact:** Queries and mutations work; real-time subscriptions deferred
 
 **Final Result:**
+
 ```bash
 npx tsc --noEmit
 # Exit code: 0 (success - zero TypeScript errors)
@@ -82,6 +88,7 @@ npx tsc --noEmit
 **Command:** `pnpm --filter @edusphere/web build`
 
 **Result:** ✅ **PASSED**
+
 ```
 vite v6.4.1 building for production...
 ✓ 1605 modules transformed.
@@ -94,12 +101,14 @@ Output:
 ```
 
 **Build Performance:**
+
 - Total modules: 1,605
 - Build time: 4.45 seconds
 - Bundle size: 340 KB (gzipped: 107 KB)
 - CSS size: 12 KB (gzipped: 3 KB)
 
 **Bundle Analysis:**
+
 - React 19 + React Router v6 + urql GraphQL client
 - Radix UI components (shadcn/ui)
 - Tailwind CSS with production optimization
@@ -114,6 +123,7 @@ Output:
 **Result:** ✅ **PASSED** (after fixes)
 
 **Issues Found & Fixed:**
+
 1. **ESLint v9 Migration:**
    - **Problem:** Old `.eslintrc.cjs` format not supported in ESLint v9
    - **Fix:** Created new flat config `eslint.config.js` with ESM format
@@ -134,6 +144,7 @@ Output:
    - **Fix:** Updated package.json to only lint `src/` directory
 
 **Final Result:**
+
 ```bash
 eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0
 # Exit code: 0 (success - zero errors, zero warnings)
@@ -146,6 +157,7 @@ eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0
 **File Analyzed:** `C:\Users\P0039217\.claude\projects\EduSphere\apps\gateway\src\index.ts`
 
 **JWT Flow Verified:**
+
 ```typescript
 1. Gateway receives request with Authorization: Bearer <JWT>
 2. Extract JWT from header → Parse base64 payload
@@ -157,6 +169,7 @@ eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0
 ```
 
 **Code Analysis:**
+
 ```typescript
 context: async ({ request }) => {
   const authHeader = request.headers.get('authorization');
@@ -178,13 +191,14 @@ context: async ({ request }) => {
   return {
     headers: {
       authorization: authHeader, // ✅ Forwards JWT to subgraphs
-      'x-tenant-id': tenantId,   // ✅ Propagates tenant for RLS
+      'x-tenant-id': tenantId, // ✅ Propagates tenant for RLS
     },
   };
-}
+};
 ```
 
 **Status:** ✅ **VERIFIED**
+
 - JWT parsing implemented correctly
 - Tenant isolation ready for RLS enforcement
 - Error handling with graceful degradation
@@ -196,6 +210,7 @@ context: async ({ request }) => {
 **File Analyzed:** `C:\Users\P0039217\.claude\projects\EduSphere\apps\web\src\lib\urql-client.ts`
 
 **Client Configuration:**
+
 ```typescript
 ✅ URL: import.meta.env.VITE_GRAPHQL_URL (http://localhost:4000/graphql)
 ✅ Cache: GraphCache exchange with PageInfo key handling
@@ -205,6 +220,7 @@ context: async ({ request }) => {
 ```
 
 **Authentication Flow:**
+
 ```typescript
 fetchOptions: () => {
   const token = getToken(); // ✅ Gets token from Keycloak
@@ -213,10 +229,11 @@ fetchOptions: () => {
       authorization: token ? `Bearer ${token}` : '', // ✅ Attaches JWT
     },
   };
-}
+};
 ```
 
 **Status:** ✅ **VERIFIED**
+
 - GraphQL client properly configured
 - JWT automatically attached to all requests
 - Cache configured for Relay-style pagination
@@ -228,6 +245,7 @@ fetchOptions: () => {
 **File Analyzed:** `C:\Users\P0039217\.claude\projects\EduSphere\apps\web\src\lib\auth.ts`
 
 **Keycloak Integration:**
+
 ```typescript
 ✅ Keycloak.js v26 configured
 ✅ OIDC flow: check-sso with PKCE (S256)
@@ -237,6 +255,7 @@ fetchOptions: () => {
 ```
 
 **Token Claims Extracted:**
+
 - `sub` → User ID
 - `preferred_username` → Username
 - `email` → Email
@@ -245,6 +264,7 @@ fetchOptions: () => {
 - `scope` → Permissions array
 
 **Status:** ✅ **VERIFIED**
+
 - Full OIDC authentication flow implemented
 - Multi-tenant JWT structure followed
 - Token refresh prevents session expiration
@@ -254,6 +274,7 @@ fetchOptions: () => {
 ### 8. Environment Configuration ✅
 
 **Gateway `.env.example`:**
+
 ```env
 PORT=4000
 CORS_ORIGIN=http://localhost:5173
@@ -266,6 +287,7 @@ SUBGRAPH_KNOWLEDGE_URL=http://localhost:4006/graphql
 ```
 
 **Frontend `.env.example`:**
+
 ```env
 VITE_GRAPHQL_URL=http://localhost:4000/graphql
 VITE_GRAPHQL_WS_URL=ws://localhost:4000/graphql
@@ -275,6 +297,7 @@ VITE_KEYCLOAK_CLIENT_ID=edusphere-app
 ```
 
 **Status:** ✅ **VERIFIED**
+
 - All environment variables documented
 - Proper separation of concerns (Gateway vs Frontend)
 - CORS configured for local development
@@ -317,11 +340,13 @@ VITE_KEYCLOAK_CLIENT_ID=edusphere-app
 **Status:** ⏳ **Deferred to Phase 11**
 
 **Reason:**
+
 - Type incompatibility between urql's `subscriptionExchange` and `graphql-ws`
 - Not critical for initial deployment (queries/mutations work)
 - Will be properly implemented with WebSocket transport in Phase 11
 
 **Workaround:**
+
 - Frontend uses polling for real-time updates (if needed)
 - Backend subscriptions infrastructure already in place (GraphQL Yoga)
 
@@ -336,6 +361,7 @@ VITE_KEYCLOAK_CLIENT_ID=edusphere-app
 **Category:** NestJS Version Mismatch
 
 **Details:**
+
 ```
 @graphql-yoga/nestjs-federation requires:
   - @nestjs/core@^11.0.0 (found: 10.4.22)
@@ -344,11 +370,13 @@ VITE_KEYCLOAK_CLIENT_ID=edusphere-app
 ```
 
 **Status:** ⚠️ **Known Issue**
+
 - GraphQL Yoga v3.19 requires NestJS v11
 - Current subgraphs use NestJS v10
 - Functionality not affected (GraphQL Yoga is backwards compatible)
 
 **Resolution Plan:**
+
 - Upgrade NestJS to v11 in Phase 12 (Production Hardening)
 - Test all subgraphs after upgrade
 - Update dependencies in lockfile
@@ -360,12 +388,14 @@ VITE_KEYCLOAK_CLIENT_ID=edusphere-app
 **Category:** Mobile vs Web React Versions
 
 **Details:**
+
 ```
 apps/mobile expects react@^18.2.0
 apps/web uses react@^19.0.0
 ```
 
 **Status:** ⚠️ **Known Issue**
+
 - Expo SDK 54 requires React 18
 - Web app uses React 19 for latest features
 - Managed by pnpm workspaces (isolated node_modules)
@@ -378,30 +408,32 @@ apps/web uses react@^19.0.0
 
 ### Frontend Build Performance
 
-| Metric | Value |
-|--------|-------|
-| Total modules | 1,605 |
-| Build time | 4.45 seconds |
-| Bundle size (JS) | 340 KB |
-| Bundle size (gzipped) | 107 KB |
-| CSS size | 12 KB |
-| CSS size (gzipped) | 3 KB |
+| Metric                | Value        |
+| --------------------- | ------------ |
+| Total modules         | 1,605        |
+| Build time            | 4.45 seconds |
+| Bundle size (JS)      | 340 KB       |
+| Bundle size (gzipped) | 107 KB       |
+| CSS size              | 12 KB        |
+| CSS size (gzipped)    | 3 KB         |
 
 **Analysis:**
+
 - ✅ Bundle size under target (<500 KB)
 - ✅ Build time acceptable (<10 seconds)
 - ✅ Gzip compression efficient (68% reduction)
 
 ### TypeScript Compilation
 
-| Metric | Value |
-|--------|-------|
-| Files checked | ~50 TypeScript files |
-| Errors | 0 |
-| Warnings | 0 |
-| Compilation time | ~3 seconds |
+| Metric           | Value                |
+| ---------------- | -------------------- |
+| Files checked    | ~50 TypeScript files |
+| Errors           | 0                    |
+| Warnings         | 0                    |
+| Compilation time | ~3 seconds           |
 
 **Analysis:**
+
 - ✅ Strict mode enabled (no `any` types)
 - ✅ Zero type errors
 - ✅ Fast incremental compilation
@@ -413,12 +445,14 @@ apps/web uses react@^19.0.0
 ### 1. JWT Validation ✅
 
 **Gateway Level:**
+
 - ✅ JWT extracted from Authorization header
 - ✅ Tenant ID parsed from JWT payload
 - ✅ Propagated to all subgraphs via `x-tenant-id` header
 - ⏳ Full JWT signature validation (requires Keycloak JWKS - Phase 12)
 
 **Frontend Level:**
+
 - ✅ JWT stored in Keycloak.js (memory-only, not localStorage)
 - ✅ Auto-refresh prevents expiration
 - ✅ Logout clears tokens properly
@@ -426,6 +460,7 @@ apps/web uses react@^19.0.0
 ### 2. CORS Configuration ✅
 
 **Gateway CORS:**
+
 ```typescript
 cors: {
   origin: process.env.CORS_ORIGIN?.split(',') || '*',
@@ -434,12 +469,14 @@ cors: {
 ```
 
 **Status:** ✅ Configured for development
+
 - ⚠️ Uses wildcard in .env.example (change in production)
 - ✅ Credentials enabled for cookie-based auth
 
 ### 3. Input Validation ⏳
 
 **Status:** Deferred to subgraph implementation
+
 - Frontend uses Zod schemas (React Hook Form)
 - Backend validation enforced per subgraph (Phases 4-6)
 
@@ -450,6 +487,7 @@ cors: {
 ### New Packages Added
 
 **Frontend (`apps/web`):**
+
 ```json
 {
   "devDependencies": {
@@ -507,6 +545,7 @@ cors: {
 ### Immediate Actions (Phase 0-1)
 
 1. **Start Infrastructure:**
+
    ```bash
    docker-compose up -d
    pnpm --filter @edusphere/db migrate
@@ -514,11 +553,13 @@ cors: {
    ```
 
 2. **Verify Health:**
+
    ```bash
    ./scripts/health-check.sh
    ```
 
 3. **Start Gateway:**
+
    ```bash
    pnpm --filter @edusphere/gateway dev
    ```
@@ -571,9 +612,13 @@ cors: {
 ## Test Execution Summary
 
 ### Tests Executed: 8
+
 ### Passed: 7
+
 ### Failed: 0
+
 ### Fixed: 5
+
 ### Deferred: 1
 
 **Total Time:** ~15 minutes (including fixes)
@@ -603,24 +648,26 @@ The Gateway and Frontend integration is **fully functional** after applying nece
 
 ### Build Status Summary
 
-| Subgraph | Build Status | Issues Found | Notes |
-|----------|-------------|--------------|-------|
-| **Core** | ✅ PASSED | 1 fixed | Schema field name mismatch (snake_case vs camelCase) |
-| **Content** | ✅ PASSED | 0 | Clean build |
-| **Knowledge** | ✅ PASSED | 0 | Clean build |
-| **Annotation** | ✅ PASSED | 0 | Clean build |
-| **Collaboration** | ✅ PASSED | 0 | Clean build |
-| **Agent** | ❌ FAILED | 9 errors | References non-existent schema tables |
+| Subgraph          | Build Status | Issues Found | Notes                                                |
+| ----------------- | ------------ | ------------ | ---------------------------------------------------- |
+| **Core**          | ✅ PASSED    | 1 fixed      | Schema field name mismatch (snake_case vs camelCase) |
+| **Content**       | ✅ PASSED    | 0            | Clean build                                          |
+| **Knowledge**     | ✅ PASSED    | 0            | Clean build                                          |
+| **Annotation**    | ✅ PASSED    | 0            | Clean build                                          |
+| **Collaboration** | ✅ PASSED    | 0            | Clean build                                          |
+| **Agent**         | ❌ FAILED    | 9 errors     | References non-existent schema tables                |
 
 **Success Rate:** 5/6 subgraphs (83%)
 
 ### Core Subgraph Fixes Applied
 
 **Problem:** Type mismatch in `user.service.ts` line 67-71
+
 - Database schema uses snake_case: `tenant_id`, `display_name`
 - Code was using camelCase: `tenantId`, `firstName`, `lastName`
 
 **Solution:**
+
 ```typescript
 // Before (incorrect):
 .values({
@@ -642,6 +689,7 @@ if (input.role) {
 ```
 
 **Files Modified:**
+
 - `apps/subgraph-core/src/user/user.service.ts`
 
 ### Agent Subgraph Issues (Deferred)
@@ -649,17 +697,20 @@ if (input.role) {
 **Build Errors:** 9 TypeScript errors across 4 files
 
 **Root Cause:** Old code referencing schema tables that don't exist:
+
 - `schema.agent_executions` (not defined)
 - `schema.agent_definitions` (not defined)
 - Missing type exports from `@edusphere/db`
 
 **Affected Files:**
+
 1. `apps/subgraph-agent/src/agent/agent.service.ts` - Uses `agent_executions`, `agent_definitions`
 2. `apps/subgraph-agent/src/memory/memory.service.ts` - Missing `@edusphere/db` imports
 3. `apps/subgraph-agent/src/template/template.service.ts` - Missing `@edusphere/db` imports
 4. `apps/subgraph-agent/src/agent-session/agent-session.service.ts` - `tenantId` type error (string | undefined)
 
 **Recommended Fix:**
+
 1. Update schema to include `agent_executions` and `agent_definitions` tables
 2. Or remove old code and use only `agent_sessions` and `agent_messages`
 3. Fix `authContext.tenantId` to guarantee non-null value
@@ -671,6 +722,7 @@ if (input.role) {
 **Issue:** TypeScript compilation failed initially due to workspace dependencies not being built
 
 **Solution:** Build packages in dependency order:
+
 ```bash
 1. pnpm --filter @edusphere/db build          # Core database package
 2. pnpm --filter @edusphere/auth build        # Auth utilities
@@ -685,6 +737,7 @@ if (input.role) {
 **File:** `apps/gateway/src/test/integration/federation.test.ts`
 
 **Test Coverage:**
+
 - ✅ Supergraph composition from 6 subgraphs
 - ✅ Schema includes User type (Core)
 - ✅ Schema includes Course type (Content)
@@ -703,16 +756,17 @@ if (input.role) {
 ### Updated Build Summary
 
 **Fully Buildable Subgraphs:**
+
 1. ✅ Core (User, Tenant, Organization)
 2. ✅ Content (Course, Module, ContentItem)
 3. ✅ Annotation (Annotation, AnnotationLayer)
 4. ✅ Collaboration (Discussion, DiscussionMessage)
 5. ✅ Knowledge (Embedding, Graph entities)
 
-**Partially Implemented:**
-6. ⚠️ Agent (AgentSession, AgentMessage work; old Agent/Template/Memory code broken)
+**Partially Implemented:** 6. ⚠️ Agent (AgentSession, AgentMessage work; old Agent/Template/Memory code broken)
 
 **Gateway Compatibility:**
+
 - Gateway configuration references all 6 subgraphs
 - 5/6 subgraphs can respond to GraphQL introspection
 - Agent subgraph will fail health checks until fixed

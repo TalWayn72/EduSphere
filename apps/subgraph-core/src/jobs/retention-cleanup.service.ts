@@ -1,6 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { lt } from 'drizzle-orm';
-import { db, RETENTION_DEFAULTS, agentMessages, agentSessions, userProgress, annotations } from '@edusphere/db';
+import {
+  db,
+  RETENTION_DEFAULTS,
+  agentMessages,
+  agentSessions,
+  userProgress,
+  annotations,
+} from '@edusphere/db';
 
 /**
  * Retention Cleanup Service — GDPR Art.5(e) storage limitation.
@@ -29,7 +36,11 @@ export class RetentionCleanupService {
         const cutoff = new Date();
         cutoff.setDate(cutoff.getDate() - defaults.days);
 
-        const result = await this.cleanupEntity(entityType, cutoff, defaults.mode);
+        const result = await this.cleanupEntity(
+          entityType,
+          cutoff,
+          defaults.mode
+        );
         report.results.push({ entityType, cutoff, ...result });
 
         this.logger.log(
@@ -44,10 +55,13 @@ export class RetentionCleanupService {
               mode: defaults.mode,
             },
           },
-          'Retention cleanup succeeded for entity type',
+          'Retention cleanup succeeded for entity type'
         );
       } catch (error) {
-        this.logger.error({ entityType, error }, 'Retention cleanup failed for entity type');
+        this.logger.error(
+          { entityType, error },
+          'Retention cleanup failed for entity type'
+        );
         report.results.push({
           entityType,
           cutoff: new Date(),
@@ -66,7 +80,7 @@ export class RetentionCleanupService {
   private async cleanupEntity(
     entityType: string,
     cutoff: Date,
-    mode: 'HARD_DELETE' | 'ANONYMIZE',
+    mode: 'HARD_DELETE' | 'ANONYMIZE'
   ): Promise<{ deletedCount: number; mode: string }> {
     // Map entity type keys to the actual Drizzle table objects (typed as any to avoid
     // complex Drizzle generic constraints that vary between table definitions)
@@ -81,7 +95,10 @@ export class RetentionCleanupService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const table: any = tableMap[entityType];
     if (!table) {
-      this.logger.warn({ entityType }, 'No table mapped for entity type — skipping');
+      this.logger.warn(
+        { entityType },
+        'No table mapped for entity type — skipping'
+      );
       return { deletedCount: 0, mode: 'SKIPPED' };
     }
 
@@ -94,7 +111,10 @@ export class RetentionCleanupService {
     }
 
     // ANONYMIZE mode — preserve row but nullify PII fields; not yet implemented for all types
-    this.logger.warn({ entityType }, 'ANONYMIZE mode not implemented for this entity — skipping');
+    this.logger.warn(
+      { entityType },
+      'ANONYMIZE mode not implemented for this entity — skipping'
+    );
     return { deletedCount: 0, mode: 'ANONYMIZE_SKIPPED' };
   }
 }

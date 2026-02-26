@@ -17,9 +17,11 @@ Complete implementation of the Annotation subgraph (port 4003) with RLS, JWT aut
 ### Source Files
 
 #### Authentication
+
 - `src/auth/auth.middleware.ts` - JWT validation middleware using Keycloak JWKS
 
 #### GraphQL Schema
+
 - `src/annotation/annotation.graphql` - Complete SDL with Federation v2.7 directives
   - Types: Annotation, AnnotationLayer, AnnotationType
   - Queries: annotation, annotations, annotationsByAsset, annotationsByUser
@@ -27,6 +29,7 @@ Complete implementation of the Annotation subgraph (port 4003) with RLS, JWT aut
   - Entity stubs: User @external, ContentItem @external
 
 #### Business Logic
+
 - `src/annotation/annotation.service.ts` - RLS-enforced service layer
   - All methods use `withTenantContext()` for tenant isolation
   - Pino logger integration
@@ -34,26 +37,31 @@ Complete implementation of the Annotation subgraph (port 4003) with RLS, JWT aut
   - Full CRUD operations
 
 #### Resolvers
+
 - `src/annotation/annotation.resolver.ts` - GraphQL resolvers with auth context
   - All mutations require authentication
   - Zod validation for inputs
   - Federation @ResolveReference support
 
 #### Validation
+
 - `src/annotation/annotation.schemas.ts` - Zod schemas
   - CreateAnnotationInputSchema
   - UpdateAnnotationInputSchema
   - Type exports for TypeScript
 
 #### Module Configuration
+
 - `src/annotation/annotation.module.ts` - NestJS module
 - `src/app.module.ts` - Root module with GraphQL Yoga Federation driver
 - `src/main.ts` - Bootstrap with CORS and Pino logger
 
 #### Tests
+
 - `src/annotation/__tests__/annotation.service.spec.ts` - Unit tests for service
 
 ### Documentation
+
 - `README.md` - Complete subgraph documentation
 - `IMPLEMENTATION.md` - This file
 
@@ -79,37 +87,48 @@ annotations table:
 ## Key Features Implemented
 
 ### 1. Row-Level Security (RLS)
+
 All database queries wrapped in `withTenantContext()`:
+
 ```typescript
-return withTenantContext(this.db, { tenantId, userId, userRole }, async (tx) => {
-  return tx.select().from(schema.annotations);
-});
+return withTenantContext(
+  this.db,
+  { tenantId, userId, userRole },
+  async (tx) => {
+    return tx.select().from(schema.annotations);
+  }
+);
 ```
 
 ### 2. JWT Authentication
+
 - Keycloak JWKS validation
 - Bearer token extraction
 - Auth context propagation to all resolvers
 - Role-based access control
 
 ### 3. Soft Deletes
+
 - All queries filter `deleted_at IS NULL`
 - Delete mutations set `deleted_at` timestamp
 - Data preservation for audit trails
 
 ### 4. Input Validation
+
 - Zod schemas for all mutations
 - UUID validation for IDs
 - Enum validation for types and layers
 - JSON validation for content/spatial data
 
 ### 5. Federation v2.7
+
 - `@key` directives for entity resolution
 - `@external` stubs for User and ContentItem
 - `@ResolveReference` for cross-subgraph queries
 - Proper SDL schema composition
 
 ### 6. Logging
+
 - Pino structured logging
 - All CRUD operations logged with context
 - Error logging with stack traces
@@ -118,15 +137,18 @@ return withTenantContext(this.db, { tenantId, userId, userRole }, async (tx) => 
 ## GraphQL Queries Examples
 
 ### Create Annotation
+
 ```graphql
 mutation {
-  createAnnotation(input: {
-    assetId: "123e4567-e89b-12d3-a456-426614174000"
-    annotationType: TEXT
-    layer: PERSONAL
-    content: { text: "Important concept here!", color: "#FFD700" }
-    spatialData: { x: 100, y: 200, page: 1 }
-  }) {
+  createAnnotation(
+    input: {
+      assetId: "123e4567-e89b-12d3-a456-426614174000"
+      annotationType: TEXT
+      layer: PERSONAL
+      content: { text: "Important concept here!", color: "#FFD700" }
+      spatialData: { x: 100, y: 200, page: 1 }
+    }
+  ) {
     id
     annotationType
     layer
@@ -137,9 +159,13 @@ mutation {
 ```
 
 ### Query Annotations by Asset
+
 ```graphql
 query {
-  annotationsByAsset(assetId: "123e4567-e89b-12d3-a456-426614174000", layer: SHARED) {
+  annotationsByAsset(
+    assetId: "123e4567-e89b-12d3-a456-426614174000"
+    layer: SHARED
+  ) {
     id
     userId
     user {
@@ -156,14 +182,12 @@ query {
 ```
 
 ### Update Annotation
+
 ```graphql
 mutation {
   updateAnnotation(
     id: "123e4567-e89b-12d3-a456-426614174001"
-    input: {
-      content: { text: "Updated annotation text" }
-      isResolved: true
-    }
+    input: { content: { text: "Updated annotation text" }, isResolved: true }
   ) {
     id
     content
@@ -176,11 +200,13 @@ mutation {
 ## Environment Setup
 
 Required services:
+
 1. PostgreSQL 16+ with annotations table
 2. Keycloak 23+ with edusphere realm
 3. NATS JetStream (optional for events)
 
 Environment variables in `.env`:
+
 ```env
 PORT=4003
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/edusphere

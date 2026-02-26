@@ -1,6 +1,7 @@
 # EduSphere — Air-Gapped Installation Guide
+
 **For:** Deployments with no internet access (government, healthcare, high-security)  
-**Prerequisites:** EduSphere release package downloaded on internet-connected machine  
+**Prerequisites:** EduSphere release package downloaded on internet-connected machine
 
 ---
 
@@ -47,12 +48,14 @@ echo "  edusphere-$VERSION-infra-images.tar.gz"
 ## STEP 2: Transfer to Air-Gapped Environment
 
 Transfer via approved media (USB, physical courier, secure file transfer):
+
 - `edusphere-$VERSION-images.tar.gz`
 - `edusphere-$VERSION-infra-images.tar.gz`
 - `edusphere-$VERSION-helm-charts.tar.gz` (from GitHub releases)
 - `edusphere-$VERSION-keys.tar.gz` (encrypted, separate courier)
 
 **Verify checksums:**
+
 ```bash
 sha256sum edusphere-$VERSION-images.tar.gz
 # Compare with published checksums at: https://github.com/edusphere/releases
@@ -86,16 +89,18 @@ See [SECURITY_HARDENING.md — Internal CA Setup](./SECURITY_HARDENING.md#intern
 ## STEP 5: Configure Services for Air-Gap
 
 ### Keycloak (offline mode)
+
 ```yaml
 # In keycloak environment
 KC_HOSTNAME: keycloak.edusphere.internal
-KC_HOSTNAME_STRICT: "true"
+KC_HOSTNAME_STRICT: 'true'
 KC_PROXY: edge
 # DISABLE theme auto-download (requires internet)
 KC_THEME_STATIC_MAX_AGE: 31536000
 ```
 
 ### Subgraph-Agent (local LLM only)
+
 ```env
 # Force local Ollama — no OpenAI/Anthropic calls
 OLLAMA_URL=http://ollama.edusphere.internal:11434
@@ -105,11 +110,13 @@ LOCAL_LLM_ONLY=true
 ```
 
 ### Node.js services (internal CA)
+
 ```env
 NODE_EXTRA_CA_CERTS=/etc/edusphere/ca/root_ca.crt
 ```
 
 ### Corporate proxy bypass
+
 ```env
 NO_PROXY=.edusphere.internal,postgres.internal,nats.internal,minio.internal
 # If proxy required for specific traffic:

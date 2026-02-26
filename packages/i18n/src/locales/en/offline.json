@@ -1,0 +1,8 @@
+{
+  "conflicts": {
+    "title": "{{count}} failed sync operations",
+    "subtitle": "These changes could not be saved. Dismiss to clear.",
+    "dismissAll": "Dismiss All",
+    "dismiss": "Dismiss"
+  }
+}

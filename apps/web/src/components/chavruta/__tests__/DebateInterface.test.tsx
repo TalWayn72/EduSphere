@@ -19,8 +19,18 @@ beforeAll(() => {
 const TOPIC = 'Does free will exist in a deterministic universe?';
 
 const makeMessages = (): DebateMessage[] => [
-  { id: '1', role: 'user', content: 'Free will is an illusion.', timestamp: new Date('2026-02-22T10:00:00Z') },
-  { id: '2', role: 'ai',   content: 'Interesting! But consider Rambam…', timestamp: new Date('2026-02-22T10:00:05Z') },
+  {
+    id: '1',
+    role: 'user',
+    content: 'Free will is an illusion.',
+    timestamp: new Date('2026-02-22T10:00:00Z'),
+  },
+  {
+    id: '2',
+    role: 'ai',
+    content: 'Interesting! But consider Rambam…',
+    timestamp: new Date('2026-02-22T10:00:05Z'),
+  },
 ];
 
 const noop = vi.fn().mockResolvedValue(undefined);
@@ -28,7 +38,11 @@ const noop = vi.fn().mockResolvedValue(undefined);
 // ── Helper ────────────────────────────────────────────────────────────────────
 
 function renderInterface(
-  overrides: Partial<{ messages: DebateMessage[]; isLoading: boolean; onSubmit: () => Promise<void> }> = {}
+  overrides: Partial<{
+    messages: DebateMessage[];
+    isLoading: boolean;
+    onSubmit: () => Promise<void>;
+  }> = {}
 ) {
   return render(
     <DebateInterface
@@ -55,7 +69,9 @@ describe('DebateInterface', () => {
 
   it('renders AI message text', () => {
     renderInterface();
-    expect(screen.getByText('Interesting! But consider Rambam…')).toBeInTheDocument();
+    expect(
+      screen.getByText('Interesting! But consider Rambam…')
+    ).toBeInTheDocument();
   });
 
   it('user messages are right-aligned (justify-end wrapper)', () => {
@@ -76,7 +92,9 @@ describe('DebateInterface', () => {
   it('AI messages display the AI disclosure badge', () => {
     renderInterface();
     // The badge is aria-labelled for accessibility
-    expect(screen.getByLabelText('Generated with AI assistance')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Generated with AI assistance')
+    ).toBeInTheDocument();
   });
 
   it('calls onSubmit when the form is submitted via the Send button', async () => {
@@ -121,6 +139,8 @@ describe('DebateInterface', () => {
 
   it('shows empty-state prompt when there are no messages', () => {
     renderInterface({ messages: [] });
-    expect(screen.getByText(/Present your opening argument/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Present your opening argument/i)
+    ).toBeInTheDocument();
   });
 });

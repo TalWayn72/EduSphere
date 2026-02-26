@@ -68,7 +68,8 @@ export function AnnotationTimeline({
         onClick={handleBarClick}
         onKeyDown={(e) => {
           if (e.key === 'ArrowLeft') onSeek(Math.max(0, currentTime - 5));
-          if (e.key === 'ArrowRight') onSeek(Math.min(duration, currentTime + 5));
+          if (e.key === 'ArrowRight')
+            onSeek(Math.min(duration, currentTime + 5));
         }}
       >
         {/* Played portion */}
@@ -106,7 +107,10 @@ export function AnnotationTimeline({
       </div>
 
       {/* Time labels */}
-      <div className="flex justify-between mt-1 pointer-events-none" aria-hidden="true">
+      <div
+        className="flex justify-between mt-1 pointer-events-none"
+        aria-hidden="true"
+      >
         <span className="text-xs text-muted-foreground font-mono">
           {formatTime(currentTime)}
         </span>

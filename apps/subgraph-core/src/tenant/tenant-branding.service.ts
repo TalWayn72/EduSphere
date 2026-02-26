@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { db, tenantBranding } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 
@@ -31,12 +31,35 @@ const DEFAULT_BRANDING: TenantBrandingData = {
   hideEduSphereBranding: false,
 };
 
+export const BRANDING_CACHE_MAX_SIZE = 500;
+
 @Injectable()
-export class TenantBrandingService {
+export class TenantBrandingService implements OnModuleDestroy {
   private readonly logger = new Logger(TenantBrandingService.name);
   // Simple in-memory TTL cache — key=tenantId, value={data, expiresAt}
-  private readonly cache = new Map<string, { data: TenantBrandingData; expiresAt: number }>();
+  private readonly cache = new Map<
+    string,
+    { data: TenantBrandingData; expiresAt: number }
+  >();
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+  onModuleDestroy(): void {
+    this.cache.clear();
+  }
+
+  private setCached(
+    key: string,
+    value: { data: TenantBrandingData; expiresAt: number }
+  ): void {
+    // LRU eviction: if at max, remove oldest (first) key before inserting new one
+    if (this.cache.size >= BRANDING_CACHE_MAX_SIZE) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
+    }
+    this.cache.set(key, value);
+  }
 
   async getBranding(tenantId: string): Promise<TenantBrandingData> {
     const cached = this.cache.get(tenantId);
@@ -67,17 +90,26 @@ export class TenantBrandingService {
         }
       : { ...DEFAULT_BRANDING };
 
-    this.cache.set(tenantId, { data, expiresAt: Date.now() + this.CACHE_TTL_MS });
+    this.setCached(tenantId, {
+      data,
+      expiresAt: Date.now() + this.CACHE_TTL_MS,
+    });
     return data;
   }
 
   async updateBranding(
     tenantId: string,
-    input: Partial<Omit<TenantBrandingData, 'organizationName'>> & { organizationName?: string },
+    input: Partial<Omit<TenantBrandingData, 'organizationName'>> & {
+      organizationName?: string;
+    }
   ): Promise<TenantBrandingData> {
     await db
       .insert(tenantBranding)
-      .values({ tenantId, organizationName: input.organizationName ?? 'My Organization', ...input })
+      .values({
+        tenantId,
+        organizationName: input.organizationName ?? 'My Organization',
+        ...input,
+      })
       .onConflictDoUpdate({
         target: tenantBranding.tenantId,
         set: { ...input, updatedAt: new Date() },

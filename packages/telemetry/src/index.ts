@@ -13,7 +13,12 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 
-export { trace, SpanStatusCode, context, propagation } from '@opentelemetry/api';
+export {
+  trace,
+  SpanStatusCode,
+  context,
+  propagation,
+} from '@opentelemetry/api';
 export type { Span, Tracer } from '@opentelemetry/api';
 
 /**

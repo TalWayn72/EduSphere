@@ -16,10 +16,7 @@ export class LlmConsentGuard {
    * Check if user has consented to the required LLM processing.
    * Throws GraphQLError with CONSENT_REQUIRED code if not consented.
    */
-  async assertConsent(
-    userId: string,
-    isExternalLLM: boolean,
-  ): Promise<void> {
+  async assertConsent(userId: string, isExternalLLM: boolean): Promise<void> {
     const requiredType = isExternalLLM ? 'THIRD_PARTY_LLM' : 'AI_PROCESSING';
 
     const rows = await db
@@ -29,12 +26,15 @@ export class LlmConsentGuard {
         and(
           eq(userConsents.userId, userId),
           eq(userConsents.consentType, requiredType),
-          eq(userConsents.given, true),
-        ),
+          eq(userConsents.given, true)
+        )
       );
 
     if (rows.length === 0) {
-      this.logger.warn({ userId, requiredType }, 'LLM call blocked — consent not given');
+      this.logger.warn(
+        { userId, requiredType },
+        'LLM call blocked — consent not given'
+      );
       throw new GraphQLError(
         isExternalLLM
           ? 'External AI service requires your explicit consent. Please update your privacy settings to enable AI assistance.'
@@ -45,7 +45,7 @@ export class LlmConsentGuard {
             consentType: requiredType,
             settingsUrl: '/settings/privacy',
           },
-        },
+        }
       );
     }
   }

@@ -32,7 +32,7 @@ export function getReadPool() {
       process.stderr.write(
         '[db/readReplica] REPLICA_DATABASE_URL not set — ' +
           'read queries will use the primary pool. ' +
-          'Set REPLICA_DATABASE_URL in production to enable read/write split.\n',
+          'Set REPLICA_DATABASE_URL in production to enable read/write split.\n'
       );
       _replicaWarningEmitted = true;
     }
@@ -77,7 +77,7 @@ export function createWriteConnection() {
  * );
  */
 export async function withReadReplica<T>(
-  fn: (db: ReturnType<typeof createReadConnection>) => Promise<T>,
+  fn: (db: ReturnType<typeof createReadConnection>) => Promise<T>
 ): Promise<T> {
   const db = createReadConnection();
   return fn(db);

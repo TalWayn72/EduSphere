@@ -15,7 +15,8 @@ export type DrizzleDB = NodePgDatabase<any>;
  */
 export function toCypherLiteral(value: unknown): string {
   if (value === null || value === undefined) return 'null';
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (typeof value === 'number' || typeof value === 'boolean')
+    return String(value);
   const escaped = String(value)
     .replace(/\\/g, '\\\\')
     .replace(/"/g, '\\"')
@@ -34,7 +35,7 @@ export function toCypherLiteral(value: unknown): string {
  */
 export function substituteParams(
   query: string,
-  params: Record<string, unknown>,
+  params: Record<string, unknown>
 ): string {
   return query.replace(/\$([A-Za-z_]\w*)/g, (match, key) => {
     if (!(key in params)) return match;
@@ -70,7 +71,7 @@ export async function executeCypher<T = any>(
   graphName: string,
   query: string,
   params?: Record<string, unknown>,
-  tenantId?: string,
+  tenantId?: string
 ): Promise<T[]> {
   const pool = (db as any).$client as Pool;
   const client = await pool.connect();
@@ -92,26 +93,28 @@ export async function executeCypher<T = any>(
         // Requires AGE ≥1.9 on PostgreSQL 17; works on AGE 1.7 + PG 16.
         const result = await client.query(
           `SELECT * FROM cypher('${graphName}', $$${query}$$, $1) AS (result agtype)`,
-          [JSON.stringify(params)],
+          [JSON.stringify(params)]
         );
         return result.rows as T[];
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
-        if (!msg.includes('third argument of cypher function must be a parameter')) {
+        if (
+          !msg.includes('third argument of cypher function must be a parameter')
+        ) {
           throw err;
         }
         // Fallback: AGE 1.7.0 + PostgreSQL 17 cannot use the $1 form.
         // Substitute values as safe Cypher literals and use the 2-argument form.
         const substituted = substituteParams(query, params);
         const result = await client.query(
-          `SELECT * FROM cypher('${graphName}', $$${substituted}$$) AS (result agtype)`,
+          `SELECT * FROM cypher('${graphName}', $$${substituted}$$) AS (result agtype)`
         );
         return result.rows as T[];
       }
     }
 
     const result = await client.query(
-      `SELECT * FROM cypher('${graphName}', $$${query}$$) AS (result agtype)`,
+      `SELECT * FROM cypher('${graphName}', $$${query}$$) AS (result agtype)`
     );
     return result.rows as T[];
   } finally {

@@ -21,7 +21,7 @@ image:
   registry: ghcr.io
   repository: edusphere-org/edusphere
   pullPolicy: Always
-  tag: ""   # Set by CD: --set image.tag=main-<sha>
+  tag: '' # Set by CD: --set image.tag=main-<sha>
 
 # ── Gateway ───────────────────────────────────────────────────────────────────
 gateway:
@@ -44,7 +44,7 @@ gateway:
       memory: 1Gi
   env:
     NODE_ENV: production
-    PERSISTED_QUERIES_ONLY: "true"
+    PERSISTED_QUERIES_ONLY: 'true'
 
 # ── Subgraphs ─────────────────────────────────────────────────────────────────
 subgraphs:
@@ -157,7 +157,7 @@ ingress:
   annotations:
     # cert-manager issues and renews TLS certificates automatically
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls: 'true'
 
 # ── Pod Disruption Budget (cluster-level availability guarantee) ──────────────
 podDisruptionBudget:
@@ -207,12 +207,12 @@ topologySpreadConstraints:
 
 # ── External services — secrets injected via External Secrets Operator ────────
 postgresql:
-  enabled: false   # External managed PostgreSQL 16 (RDS / CloudSQL / etc.)
+  enabled: false # External managed PostgreSQL 16 (RDS / CloudSQL / etc.)
   # Connection string pulled from Kubernetes Secret 'edusphere-secrets'
   # key: database-url — managed by External Secrets Operator
 
 redis:
-  enabled: false   # External managed Redis (ElastiCache / Upstash / etc.)
+  enabled: false # External managed Redis (ElastiCache / Upstash / etc.)
 
 # ── Pod security (enforced) ───────────────────────────────────────────────────
 podSecurityContext:
@@ -230,7 +230,7 @@ securityContext:
 # ── Service account ───────────────────────────────────────────────────────────
 serviceAccount:
   create: true
-  name: "edusphere-production"
+  name: 'edusphere-production'
 
 # ── Observability ─────────────────────────────────────────────────────────────
 monitoring:

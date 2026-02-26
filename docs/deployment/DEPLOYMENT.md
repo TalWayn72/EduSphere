@@ -7,8 +7,11 @@
 ## 🚀 Deployment Options
 
 ### Option 1: Docker Single Container (Simplest)
+
 ### Option 2: Docker Compose (Development/Staging)
+
 ### Option 3: Kubernetes (Production)
+
 ### Option 4: Google Cloud Run (Serverless)
 
 ---
@@ -18,6 +21,7 @@
 **Best for:** Small deployments, demos, testing
 
 ### Build Image
+
 ```bash
 # Build production image
 docker build -t edusphere:latest .
@@ -27,6 +31,7 @@ docker tag edusphere:latest registry.example.com/edusphere:v1.0.0
 ```
 
 ### Push to Registry
+
 ```bash
 # Docker Hub
 docker push registry.example.com/edusphere:v1.0.0
@@ -41,6 +46,7 @@ docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/edusphere:v1.0.0
 ```
 
 ### Run Container
+
 ```bash
 docker run -d \
   --name edusphere \
@@ -61,6 +67,7 @@ docker run -d \
 **Best for:** Development, staging, multi-container setups
 
 ### Production docker-compose.yml
+
 ```yaml
 version: '3.9'
 
@@ -73,7 +80,7 @@ services:
       - NODE_ENV=production
       - PORT=4000
     ports:
-      - "4000:4000"
+      - '4000:4000'
     depends_on:
       - postgres
       - redis
@@ -87,7 +94,7 @@ services:
       - PORT=4001
       - DATABASE_URL=postgresql://user:pass@postgres:5432/edusphere
     ports:
-      - "4001:4001"
+      - '4001:4001'
 
   # ... (repeat for all 6 subgraphs)
 
@@ -100,7 +107,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
 
   redis:
     image: redis:7-alpine
@@ -114,6 +121,7 @@ volumes:
 ```
 
 ### Deploy
+
 ```bash
 # Set environment variables
 export DB_PASSWORD=secure_password
@@ -136,6 +144,7 @@ docker-compose down
 **Best for:** Production, high availability, auto-scaling
 
 ### Prerequisites
+
 ```bash
 # Install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -149,6 +158,7 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ### Kubernetes Manifests
 
 #### 1. Namespace
+
 ```yaml
 # k8s/namespace.yaml
 apiVersion: v1
@@ -158,6 +168,7 @@ metadata:
 ```
 
 #### 2. ConfigMap
+
 ```yaml
 # k8s/configmap.yaml
 apiVersion: v1
@@ -166,12 +177,13 @@ metadata:
   name: edusphere-config
   namespace: edusphere
 data:
-  NODE_ENV: "production"
-  PORT: "4000"
-  LOG_LEVEL: "info"
+  NODE_ENV: 'production'
+  PORT: '4000'
+  LOG_LEVEL: 'info'
 ```
 
 #### 3. Secrets
+
 ```yaml
 # k8s/secrets.yaml
 apiVersion: v1
@@ -181,12 +193,13 @@ metadata:
   namespace: edusphere
 type: Opaque
 stringData:
-  DATABASE_URL: "postgresql://user:pass@postgres:5432/edusphere"
-  REDIS_URL: "redis://:password@redis:6379"
-  JWT_SECRET: "your-secret-key"
+  DATABASE_URL: 'postgresql://user:pass@postgres:5432/edusphere'
+  REDIS_URL: 'redis://:password@redis:6379'
+  JWT_SECRET: 'your-secret-key'
 ```
 
 #### 4. PostgreSQL StatefulSet
+
 ```yaml
 # k8s/postgres.yaml
 apiVersion: apps/v1
@@ -206,34 +219,34 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:16
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_DB
-          value: edusphere
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: edusphere-secrets
-              key: DB_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: edusphere-secrets
-              key: DB_PASSWORD
-        volumeMounts:
-        - name: postgres-data
-          mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: edusphere
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: edusphere-secrets
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: edusphere-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
   volumeClaimTemplates:
-  - metadata:
-      name: postgres-data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 100Gi
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ['ReadWriteOnce']
+        resources:
+          requests:
+            storage: 100Gi
 ---
 apiVersion: v1
 kind: Service
@@ -244,11 +257,12 @@ spec:
   selector:
     app: postgres
   ports:
-  - port: 5432
-    targetPort: 5432
+    - port: 5432
+      targetPort: 5432
 ```
 
 #### 5. Gateway Deployment
+
 ```yaml
 # k8s/gateway-deployment.yaml
 apiVersion: apps/v1
@@ -267,41 +281,41 @@ spec:
         app: gateway
     spec:
       containers:
-      - name: gateway
-        image: gcr.io/project-id/edusphere:v1.0.0
-        workingDir: /app/apps/gateway
-        command: ["pnpm", "start"]
-        ports:
-        - containerPort: 4000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: PORT
-          value: "4000"
-        envFrom:
-        - configMapRef:
-            name: edusphere-config
-        - secretRef:
-            name: edusphere-secrets
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 4000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 4000
-          initialDelaySeconds: 10
-          periodSeconds: 5
+        - name: gateway
+          image: gcr.io/project-id/edusphere:v1.0.0
+          workingDir: /app/apps/gateway
+          command: ['pnpm', 'start']
+          ports:
+            - containerPort: 4000
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: PORT
+              value: '4000'
+          envFrom:
+            - configMapRef:
+                name: edusphere-config
+            - secretRef:
+                name: edusphere-secrets
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '500m'
+            limits:
+              memory: '1Gi'
+              cpu: '1000m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service
@@ -313,11 +327,12 @@ spec:
   selector:
     app: gateway
   ports:
-  - port: 80
-    targetPort: 4000
+    - port: 80
+      targetPort: 4000
 ```
 
 #### 6. Subgraph Deployments (Example: Core)
+
 ```yaml
 # k8s/subgraph-core-deployment.yaml
 apiVersion: apps/v1
@@ -336,20 +351,20 @@ spec:
         app: subgraph-core
     spec:
       containers:
-      - name: subgraph-core
-        image: gcr.io/project-id/edusphere:v1.0.0
-        workingDir: /app/apps/subgraph-core
-        command: ["pnpm", "start"]
-        ports:
-        - containerPort: 4001
-        env:
-        - name: PORT
-          value: "4001"
-        envFrom:
-        - configMapRef:
-            name: edusphere-config
-        - secretRef:
-            name: edusphere-secrets
+        - name: subgraph-core
+          image: gcr.io/project-id/edusphere:v1.0.0
+          workingDir: /app/apps/subgraph-core
+          command: ['pnpm', 'start']
+          ports:
+            - containerPort: 4001
+          env:
+            - name: PORT
+              value: '4001'
+          envFrom:
+            - configMapRef:
+                name: edusphere-config
+            - secretRef:
+                name: edusphere-secrets
 ---
 apiVersion: v1
 kind: Service
@@ -360,11 +375,12 @@ spec:
   selector:
     app: subgraph-core
   ports:
-  - port: 4001
-    targetPort: 4001
+    - port: 4001
+      targetPort: 4001
 ```
 
 ### Deploy to Kubernetes
+
 ```bash
 # Create namespace
 kubectl apply -f k8s/namespace.yaml
@@ -408,6 +424,7 @@ kubectl scale deployment gateway --replicas=5 -n edusphere
 **Best for:** Serverless, auto-scaling, pay-per-use
 
 ### Deploy to Cloud Run
+
 ```bash
 # Build and push image
 gcloud builds submit --tag gcr.io/PROJECT_ID/edusphere
@@ -446,6 +463,7 @@ gcloud run deploy edusphere \
 ## 📊 Monitoring & Observability
 
 ### Prometheus + Grafana
+
 ```yaml
 # k8s/prometheus-config.yaml
 apiVersion: v1
@@ -469,6 +487,7 @@ data:
 ```
 
 ### Health Checks
+
 ```bash
 # Gateway health
 curl https://your-domain.com/health
@@ -482,6 +501,7 @@ curl http://gateway:4000/health
 ## 🔄 CI/CD Pipeline
 
 ### GitHub Actions Example
+
 ```yaml
 # .github/workflows/deploy.yml
 name: Deploy to Production
@@ -523,6 +543,7 @@ jobs:
 **🎉 Deployment Complete!**
 
 Your EduSphere platform is now running in production with:
+
 - ✅ High availability
 - ✅ Auto-scaling
 - ✅ Monitoring & logging
