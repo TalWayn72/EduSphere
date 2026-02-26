@@ -4,7 +4,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { toast } from 'sonner';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -70,9 +72,11 @@ export function UserManagementPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [editingRole, setEditingRole] = useState<Record<string, string>>({});
-  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(
-    null
-  );
+  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(null);
+  const [confirmRoleChange, setConfirmRoleChange] = useState<{
+    userId: string;
+    newRole: string;
+  } | null>(null);
 
   const [, deactivateUser] = useMutation(DEACTIVATE_USER);
   const [, resetPassword] = useMutation(RESET_PASSWORD);
@@ -107,22 +111,49 @@ export function UserManagementPage() {
   };
 
   const handleDeactivate = async (id: string) => {
-    await deactivateUser({ id });
+    const result = await deactivateUser({ id });
     setConfirmDeactivate(null);
-    refetch({ requestPolicy: 'network-only' });
+    if (result.error) {
+      toast.error('Failed to deactivate user');
+    } else {
+      toast.success('User deactivated');
+      refetch({ requestPolicy: 'network-only' });
+    }
   };
 
   const handleResetPassword = async (userId: string) => {
-    await resetPassword({ userId });
+    const result = await resetPassword({ userId });
+    if (result.error) {
+      toast.error('Failed to send password reset');
+    } else {
+      toast.success('Password reset email sent');
+    }
   };
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
+  const handleRoleChange = (userId: string, newRole: string) => {
+    setConfirmRoleChange({ userId, newRole });
+  };
+
+  const handleConfirmRoleChange = async () => {
+    if (!confirmRoleChange) return;
+    const { userId, newRole } = confirmRoleChange;
     setEditingRole((prev) => ({ ...prev, [userId]: newRole }));
-    await updateUser({ id: userId, input: { role: newRole } });
-    refetch({ requestPolicy: 'network-only' });
+    const result = await updateUser({ id: userId, input: { role: newRole } });
+    setConfirmRoleChange(null);
+    if (result.error) {
+      setEditingRole((prev) => {
+        const next = { ...prev };
+        delete next[userId];
+        return next;
+      });
+      toast.error('Failed to update role');
+    } else {
+      toast.success('Role updated successfully');
+      refetch({ requestPolicy: 'network-only' });
+    }
   };
 
-  const tenantId = users[0]?.tenantId ?? '';
+  const tenantId = getCurrentUser()?.tenantId ?? '';
 
   return (
     <AdminLayout
@@ -201,31 +232,53 @@ export function UserManagementPage() {
                   </TableCell>
                   <TableCell>{u.email}</TableCell>
                   <TableCell>
-                    <Select
-                      value={editingRole[u.id] ?? u.role}
-                      onValueChange={(v) => {
-                        void handleRoleChange(u.id, v);
-                      }}
-                    >
-                      <SelectTrigger className="w-36 h-7 text-xs">
-                        <Badge
-                          className={
-                            ROLE_BADGE[
-                              (editingRole[u.id] as UserRole) ?? u.role
-                            ]
-                          }
+                    {confirmRoleChange?.userId === u.id ? (
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">
+                          → {confirmRoleChange.newRole}?
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => void handleConfirmRoleChange()}
                         >
-                          {editingRole[u.id] ?? u.role}
-                        </Badge>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(Object.keys(ROLE_BADGE) as UserRole[]).map((r) => (
-                          <SelectItem key={r} value={r}>
-                            {r}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                          Confirm
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => setConfirmRoleChange(null)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Select
+                        value={editingRole[u.id] ?? u.role}
+                        onValueChange={(v) => handleRoleChange(u.id, v)}
+                      >
+                        <SelectTrigger className="w-36 h-7 text-xs">
+                          <Badge
+                            className={
+                              ROLE_BADGE[
+                                (editingRole[u.id] as UserRole) ?? u.role
+                              ]
+                            }
+                          >
+                            {editingRole[u.id] ?? u.role}
+                          </Badge>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.keys(ROLE_BADGE) as UserRole[]).map((r) => (
+                            <SelectItem key={r} value={r}>
+                              {r}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(u.createdAt).toLocaleDateString()}
