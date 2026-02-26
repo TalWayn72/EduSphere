@@ -21,10 +21,7 @@ import { useAnnotations } from '@/hooks/useAnnotations';
 import { useAgentChat } from '@/hooks/useAgentChat';
 import { mockGraphData } from '@/lib/mock-graph-data';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
-import {
-  LAYER_META,
-  formatTime,
-} from './content-viewer.utils';
+import { LAYER_META, formatTime } from './content-viewer.utils';
 import {
   FileText,
   Network,
@@ -236,7 +233,11 @@ export function ContentViewer() {
           <Card className="flex-shrink-0">
             <CardContent className="p-0">
               {contentFetching ? (
-                <div className="w-full bg-muted animate-pulse rounded-lg" style={{ aspectRatio: '16/9' }} aria-hidden="true" />
+                <div
+                  className="w-full bg-muted animate-pulse rounded-lg"
+                  style={{ aspectRatio: '16/9' }}
+                  aria-hidden="true"
+                />
               ) : (
                 <div className="relative">
                   <VideoPlayerCore
@@ -273,7 +274,9 @@ export function ContentViewer() {
               {contentFetching ? (
                 <SkeletonLine className="h-3 w-32" />
               ) : (
-                <span className="text-xs text-muted-foreground">{videoTitle}</span>
+                <span className="text-xs text-muted-foreground">
+                  {videoTitle}
+                </span>
               )}
             </div>
             {contentFetching ? (

@@ -26,9 +26,7 @@ describe('CommentForm — rendering', () => {
         onCancel={vi.fn()}
       />
     );
-    expect(
-      screen.getByPlaceholderText(/Add a comment/i)
-    ).toBeTruthy();
+    expect(screen.getByPlaceholderText(/Add a comment/i)).toBeTruthy();
   });
 
   it('renders all four layer options in the select', () => {
@@ -110,7 +108,11 @@ describe('CommentForm — cancel', () => {
         onCancel={onCancel}
       />
     );
-    fireEvent.keyDown(window, { key: 'Escape', code: 'Escape', ctrlKey: false });
+    fireEvent.keyDown(window, {
+      key: 'Escape',
+      code: 'Escape',
+      ctrlKey: false,
+    });
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 });
@@ -145,7 +147,10 @@ describe('CommentForm — submit', () => {
     const textarea = screen.getByPlaceholderText(/Add a comment/i);
     fireEvent.change(textarea, { target: { value: 'Quick note' } });
     fireEvent.keyDown(window, { key: 'Enter', ctrlKey: true });
-    expect(onSubmit).toHaveBeenCalledWith('Quick note', AnnotationLayer.PERSONAL);
+    expect(onSubmit).toHaveBeenCalledWith(
+      'Quick note',
+      AnnotationLayer.PERSONAL
+    );
   });
 
   it('pressing Ctrl+Enter does NOT call onSubmit when text is empty', () => {
@@ -236,6 +241,9 @@ describe('CommentForm — layer selector', () => {
     const textarea = screen.getByPlaceholderText(/Add a comment/i);
     fireEvent.change(textarea, { target: { value: 'Meta submit' } });
     fireEvent.keyDown(window, { key: 'Enter', metaKey: true });
-    expect(onSubmit).toHaveBeenCalledWith('Meta submit', AnnotationLayer.AI_GENERATED);
+    expect(onSubmit).toHaveBeenCalledWith(
+      'Meta submit',
+      AnnotationLayer.AI_GENERATED
+    );
   });
 });

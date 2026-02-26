@@ -1,7 +1,13 @@
 import { useQuery } from 'urql';
 import { Trophy } from 'lucide-react';
 import { Layout } from '@/components/Layout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Award, Download } from 'lucide-react';
 import { MY_OPEN_BADGES_QUERY } from '@/lib/graphql/badges.queries';
@@ -64,7 +70,9 @@ function BadgeSkeleton() {
           </div>
         </div>
       </CardHeader>
-      <CardContent><div className="h-3 w-1/3 rounded bg-muted" /></CardContent>
+      <CardContent>
+        <div className="h-3 w-1/3 rounded bg-muted" />
+      </CardContent>
     </Card>
   );
 }
@@ -77,8 +85,11 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           {definition.imageUrl ? (
-            <img src={definition.imageUrl} alt={definition.name}
-              className="h-12 w-12 rounded-lg object-cover shrink-0 border" />
+            <img
+              src={definition.imageUrl}
+              alt={definition.name}
+              className="h-12 w-12 rounded-lg object-cover shrink-0 border"
+            />
           ) : (
             <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
               <Award className="h-6 w-6 text-primary" />
@@ -86,7 +97,9 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <CardTitle className="text-base leading-tight">{definition.name}</CardTitle>
+              <CardTitle className="text-base leading-tight">
+                {definition.name}
+              </CardTitle>
               {assertion.revoked ? (
                 <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20">
                   Revoked
@@ -97,7 +110,9 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
                 </span>
               )}
             </div>
-            <CardDescription className="mt-1 line-clamp-2">{definition.description}</CardDescription>
+            <CardDescription className="mt-1 line-clamp-2">
+              {definition.description}
+            </CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -107,12 +122,17 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
             <p>Issued: {formatDate(assertion.issuedAt)}</p>
             {assertion.revokedAt && assertion.revokedReason && (
               <p className="text-destructive">
-                Revoked: {formatDate(assertion.revokedAt)} — {assertion.revokedReason}
+                Revoked: {formatDate(assertion.revokedAt)} —{' '}
+                {assertion.revokedReason}
               </p>
             )}
           </div>
-          <Button variant="outline" size="sm" className="gap-1.5 shrink-0"
-            onClick={() => downloadVC(assertion.id, assertion.vcDocument)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 shrink-0"
+            onClick={() => downloadVC(assertion.id, assertion.vcDocument)}
+          >
             <Download className="h-3.5 w-3.5" />
             Download VC
           </Button>
@@ -126,7 +146,9 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
 export function MyOpenBadgesPage() {
   const [result] = useQuery({ query: MY_OPEN_BADGES_QUERY });
   const { data, fetching, error } = result;
-  const badges: OpenBadgeAssertion[] = (data as { myOpenBadges?: OpenBadgeAssertion[] } | undefined)?.myOpenBadges ?? [];
+  const badges: OpenBadgeAssertion[] =
+    (data as { myOpenBadges?: OpenBadgeAssertion[] } | undefined)
+      ?.myOpenBadges ?? [];
 
   return (
     <Layout>
@@ -134,7 +156,8 @@ export function MyOpenBadgesPage() {
         <div>
           <h1 className="text-2xl font-bold">My Open Badges</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Your earned Open Badges 3.0 credentials with verifiable VC documents.
+            Your earned Open Badges 3.0 credentials with verifiable VC
+            documents.
           </p>
         </div>
 
@@ -146,7 +169,9 @@ export function MyOpenBadgesPage() {
 
         {fetching && (
           <div className="grid gap-4">
-            <BadgeSkeleton /><BadgeSkeleton /><BadgeSkeleton />
+            <BadgeSkeleton />
+            <BadgeSkeleton />
+            <BadgeSkeleton />
           </div>
         )}
 

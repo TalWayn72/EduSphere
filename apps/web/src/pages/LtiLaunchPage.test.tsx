@@ -15,11 +15,20 @@ function renderAt(url: string) {
     <MemoryRouter initialEntries={[url]}>
       <Routes>
         <Route path="/lti/launch" element={<LtiLaunchPage />} />
-        <Route path="/dashboard" element={<div data-testid="dashboard">Dashboard</div>} />
-        <Route path="/courses/:id" element={<div data-testid="courses">Courses</div>} />
-        <Route path="/learn/:id" element={<div data-testid="learn">Learn</div>} />
+        <Route
+          path="/dashboard"
+          element={<div data-testid="dashboard">Dashboard</div>}
+        />
+        <Route
+          path="/courses/:id"
+          element={<div data-testid="courses">Courses</div>}
+        />
+        <Route
+          path="/learn/:id"
+          element={<div data-testid="learn">Learn</div>}
+        />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -51,7 +60,9 @@ describe('LtiLaunchPage', () => {
   });
 
   it('redirects to /dashboard when target is an absolute URL (open-redirect guard)', () => {
-    renderAt('/lti/launch?lti_token=tok3&target=https%3A%2F%2Fevil.example.com');
+    renderAt(
+      '/lti/launch?lti_token=tok3&target=https%3A%2F%2Fevil.example.com'
+    );
     expect(screen.getByTestId('dashboard')).toBeInTheDocument();
   });
 
@@ -76,7 +87,7 @@ describe('LtiLaunchPage', () => {
           <Route path="/lti/launch" element={<LtiLaunchPage />} />
           <Route path="/dashboard" element={<div data-testid="dashboard" />} />
         </Routes>
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     // Either the spinner text or the dashboard should be present after render
     const spinner = screen.queryByText('Redirecting...');

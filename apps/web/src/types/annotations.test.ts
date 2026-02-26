@@ -54,11 +54,19 @@ describe('ANNOTATION_LAYER_CONFIGS — structure', () => {
 
 describe('PERSONAL layer', () => {
   const cfg = ANNOTATION_LAYER_CONFIGS[AnnotationLayer.PERSONAL];
-  const ann = { ...baseAnnotation, layer: AnnotationLayer.PERSONAL, userId: 'user-1', userRole: 'student' as const };
+  const ann = {
+    ...baseAnnotation,
+    layer: AnnotationLayer.PERSONAL,
+    userId: 'user-1',
+    userRole: 'student' as const,
+  };
 
-  it('canCreate returns true for student', () => expect(cfg.canCreate('student')).toBe(true));
-  it('canCreate returns true for instructor', () => expect(cfg.canCreate('instructor')).toBe(true));
-  it('canCreate returns true for ai', () => expect(cfg.canCreate('ai')).toBe(true));
+  it('canCreate returns true for student', () =>
+    expect(cfg.canCreate('student')).toBe(true));
+  it('canCreate returns true for instructor', () =>
+    expect(cfg.canCreate('instructor')).toBe(true));
+  it('canCreate returns true for ai', () =>
+    expect(cfg.canCreate('ai')).toBe(true));
 
   it('canEdit returns true when userId matches', () => {
     expect(cfg.canEdit(ann, 'user-1')).toBe(true);
@@ -77,11 +85,19 @@ describe('PERSONAL layer', () => {
 
 describe('SHARED layer', () => {
   const cfg = ANNOTATION_LAYER_CONFIGS[AnnotationLayer.SHARED];
-  const ann = { ...baseAnnotation, layer: AnnotationLayer.SHARED, userId: 'user-2', userRole: 'student' as const };
+  const ann = {
+    ...baseAnnotation,
+    layer: AnnotationLayer.SHARED,
+    userId: 'user-2',
+    userRole: 'student' as const,
+  };
 
-  it('canCreate returns true for student', () => expect(cfg.canCreate('student')).toBe(true));
-  it('canCreate returns true for instructor', () => expect(cfg.canCreate('instructor')).toBe(true));
-  it('canCreate returns true for ai', () => expect(cfg.canCreate('ai')).toBe(true));
+  it('canCreate returns true for student', () =>
+    expect(cfg.canCreate('student')).toBe(true));
+  it('canCreate returns true for instructor', () =>
+    expect(cfg.canCreate('instructor')).toBe(true));
+  it('canCreate returns true for ai', () =>
+    expect(cfg.canCreate('ai')).toBe(true));
 
   it('canEdit returns true when userId matches', () => {
     expect(cfg.canEdit(ann, 'user-2')).toBe(true);
@@ -113,9 +129,12 @@ describe('INSTRUCTOR layer', () => {
     userRole: 'student' as const,
   };
 
-  it('canCreate returns false for student', () => expect(cfg.canCreate('student')).toBe(false));
-  it('canCreate returns true for instructor', () => expect(cfg.canCreate('instructor')).toBe(true));
-  it('canCreate returns false for ai', () => expect(cfg.canCreate('ai')).toBe(false));
+  it('canCreate returns false for student', () =>
+    expect(cfg.canCreate('student')).toBe(false));
+  it('canCreate returns true for instructor', () =>
+    expect(cfg.canCreate('instructor')).toBe(true));
+  it('canCreate returns false for ai', () =>
+    expect(cfg.canCreate('ai')).toBe(false));
 
   it('canEdit returns true for instructor who owns annotation', () => {
     expect(cfg.canEdit(instructorAnn, 'inst-1')).toBe(true);
@@ -140,11 +159,19 @@ describe('INSTRUCTOR layer', () => {
 
 describe('AI_GENERATED layer', () => {
   const cfg = ANNOTATION_LAYER_CONFIGS[AnnotationLayer.AI_GENERATED];
-  const ann = { ...baseAnnotation, layer: AnnotationLayer.AI_GENERATED, userId: 'ai-bot', userRole: 'ai' as const };
+  const ann = {
+    ...baseAnnotation,
+    layer: AnnotationLayer.AI_GENERATED,
+    userId: 'ai-bot',
+    userRole: 'ai' as const,
+  };
 
-  it('canCreate returns false for student', () => expect(cfg.canCreate('student')).toBe(false));
-  it('canCreate returns false for instructor', () => expect(cfg.canCreate('instructor')).toBe(false));
-  it('canCreate returns true for ai', () => expect(cfg.canCreate('ai')).toBe(true));
+  it('canCreate returns false for student', () =>
+    expect(cfg.canCreate('student')).toBe(false));
+  it('canCreate returns false for instructor', () =>
+    expect(cfg.canCreate('instructor')).toBe(false));
+  it('canCreate returns true for ai', () =>
+    expect(cfg.canCreate('ai')).toBe(true));
 
   it('canEdit always returns false (even for owner)', () => {
     expect(cfg.canEdit(ann, 'ai-bot')).toBe(false);

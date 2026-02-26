@@ -139,7 +139,9 @@ describe('MyOpenBadgesPage', () => {
   it('does not render empty state while fetching', () => {
     mockQuery({ fetching: true });
     renderPage();
-    expect(screen.queryByText(/haven't earned any Open Badges/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/haven't earned any Open Badges/)
+    ).not.toBeInTheDocument();
   });
 
   // ── Empty state ───────────────────────────────────────────────────────────
@@ -224,7 +226,9 @@ describe('MyOpenBadgesPage', () => {
   it('renders "Download VC" button for each badge', () => {
     mockQuery({ data: { myOpenBadges: MOCK_BADGES } });
     renderPage();
-    const downloadButtons = screen.getAllByRole('button', { name: /Download VC/i });
+    const downloadButtons = screen.getAllByRole('button', {
+      name: /Download VC/i,
+    });
     expect(downloadButtons.length).toBe(2);
   });
 
@@ -236,8 +240,14 @@ describe('MyOpenBadgesPage', () => {
     const createObjectURL = vi.fn(() => 'blob:mock-url');
     const revokeObjectURL = vi.fn();
     const clickSpy = vi.fn();
-    Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, writable: true });
-    Object.defineProperty(URL, 'revokeObjectURL', { value: revokeObjectURL, writable: true });
+    Object.defineProperty(URL, 'createObjectURL', {
+      value: createObjectURL,
+      writable: true,
+    });
+    Object.defineProperty(URL, 'revokeObjectURL', {
+      value: revokeObjectURL,
+      writable: true,
+    });
 
     // Stub createElement to intercept anchor click
     const origCreateElement = document.createElement.bind(document);
@@ -265,7 +275,9 @@ describe('MyOpenBadgesPage', () => {
   it('renders error message when query returns an error', () => {
     mockQuery({ error: { message: 'Network error' } });
     renderPage();
-    expect(screen.getByText(/Failed to load badges: Network error/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Failed to load badges: Network error/i)
+    ).toBeInTheDocument();
   });
 
   it('does not render badge cards when error is set', () => {
@@ -280,7 +292,10 @@ describe('MyOpenBadgesPage', () => {
     const badgeWithImage = [
       {
         ...MOCK_BADGES[0]!,
-        definition: { ...MOCK_BADGES[0]!.definition, imageUrl: 'https://example.com/badge.png' },
+        definition: {
+          ...MOCK_BADGES[0]!.definition,
+          imageUrl: 'https://example.com/badge.png',
+        },
       },
     ];
     mockQuery({ data: { myOpenBadges: badgeWithImage } });

@@ -128,31 +128,46 @@ describe('Layout', () => {
   // ── Admin-only compliance nav items ────────────────────────────────────
 
   it('shows "Admin Panel" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'ORG_ADMIN',
+    });
     renderLayout();
     expect(screen.getByText('Admin Panel')).toBeInTheDocument();
   });
 
   it('shows "LTI 1.3" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'ORG_ADMIN',
+    });
     renderLayout();
     expect(screen.getByText('LTI 1.3')).toBeInTheDocument();
   });
 
   it('shows "Compliance" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'ORG_ADMIN',
+    });
     renderLayout();
     expect(screen.getByText('Compliance')).toBeInTheDocument();
   });
 
   it('shows "SCIM / HRIS" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'ORG_ADMIN',
+    });
     renderLayout();
     expect(screen.getByText('SCIM / HRIS')).toBeInTheDocument();
   });
 
   it('shows compliance nav items for SUPER_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'SUPER_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'SUPER_ADMIN',
+    });
     renderLayout();
     expect(screen.getByText('Admin Panel')).toBeInTheDocument();
     expect(screen.getByText('LTI 1.3')).toBeInTheDocument();
@@ -178,7 +193,9 @@ describe('Layout', () => {
 
   it('renders mobile menu button with "Open menu" label when closed', () => {
     renderLayout();
-    expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Open menu' })
+    ).toBeInTheDocument();
   });
 
   it('opens mobile nav panel when hamburger button is clicked', () => {
@@ -186,7 +203,9 @@ describe('Layout', () => {
     const hamburger = screen.getByRole('button', { name: 'Open menu' });
     fireEvent.click(hamburger);
     // After click, aria-label toggles to "Close menu"
-    expect(screen.getByRole('button', { name: 'Close menu' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Close menu' })
+    ).toBeInTheDocument();
   });
 
   it('shows nav links in mobile menu after opening', () => {
@@ -206,7 +225,10 @@ describe('Layout', () => {
   });
 
   it('shows admin panel links in mobile menu for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'ORG_ADMIN',
+    });
     renderLayout();
     fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
     // Admin Panel appears twice (desktop + mobile)
@@ -227,7 +249,10 @@ describe('Layout', () => {
   it('registers Ctrl+K keyboard event listener on mount', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
     renderLayout();
-    expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      'keydown',
+      expect.any(Function)
+    );
     vi.restoreAllMocks();
   });
 
@@ -235,7 +260,10 @@ describe('Layout', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
     const { unmount } = renderLayout();
     unmount();
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'keydown',
+      expect.any(Function)
+    );
     vi.restoreAllMocks();
   });
 });

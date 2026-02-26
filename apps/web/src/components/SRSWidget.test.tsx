@@ -20,14 +20,22 @@ vi.mock('urql', async (importOriginal) => {
     ]),
     useMutation: vi.fn(() => [
       { fetching: false, error: undefined },
-      vi.fn().mockResolvedValue({ data: { createReviewCard: { id: 'card-1' } }, error: undefined }),
+      vi.fn().mockResolvedValue({
+        data: { createReviewCard: { id: 'card-1' } },
+        error: undefined,
+      }),
     ]),
   };
 });
 
 // Mock SRSReviewSession — complex component, unit-test stub only
 vi.mock('@/components/SRSReviewSession', () => ({
-  SRSReviewSession: ({ onComplete }: { cards: unknown[]; onComplete: () => void }) => (
+  SRSReviewSession: ({
+    onComplete,
+  }: {
+    cards: unknown[];
+    onComplete: () => void;
+  }) => (
     <div data-testid="srs-review-session">
       <button onClick={onComplete}>Complete Review</button>
     </div>
@@ -74,7 +82,13 @@ function mockCountQuery(overrides: {
     }
     // Second call: DUE_REVIEWS_QUERY
     return [
-      { data: { dueReviews: [] }, fetching: false, error: undefined, stale: false, operation: undefined },
+      {
+        data: { dueReviews: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        operation: undefined,
+      },
       vi.fn(),
       vi.fn(),
     ] as unknown as UseQueryResponse;
@@ -161,13 +175,17 @@ describe('SRSWidget', () => {
   it('shows "Start Review" button when cards are due', () => {
     mockCountQuery({ data: { srsQueueCount: 3 } });
     renderWidget();
-    expect(screen.getByRole('button', { name: /Start Review/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Start Review/i })
+    ).toBeInTheDocument();
   });
 
   it('does not show "Start Review" when queue count is 0', () => {
     mockCountQuery({ data: { srsQueueCount: 0 } });
     renderWidget();
-    expect(screen.queryByRole('button', { name: /Start Review/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Start Review/i })
+    ).not.toBeInTheDocument();
   });
 
   // ── Start review — enters reviewing mode (lines 61-63, 82-83) ────────────
@@ -211,7 +229,9 @@ describe('SRSWidget', () => {
   it('shows "+ Add Review Card" button when queue is 0 (line 111)', () => {
     mockCountQuery({ data: { srsQueueCount: 0 }, fetching: false });
     renderWidget();
-    expect(screen.getByRole('button', { name: /\+ Add Review Card/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /\+ Add Review Card/i })
+    ).toBeInTheDocument();
   });
 
   it('does not show "All caught up!" while loading', () => {
@@ -223,7 +243,9 @@ describe('SRSWidget', () => {
   it('does not show "+ Add Review Card" when cards are due', () => {
     mockCountQuery({ data: { srsQueueCount: 5 } });
     renderWidget();
-    expect(screen.queryByRole('button', { name: /Add Review Card/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Add Review Card/i })
+    ).not.toBeInTheDocument();
   });
 
   // ── handleAddDemo (lines 70-73) ───────────────────────────────────────────
@@ -237,7 +259,9 @@ describe('SRSWidget', () => {
     mockCountQuery({ data: { srsQueueCount: 0 } });
 
     renderWidget();
-    fireEvent.click(screen.getByRole('button', { name: /\+ Add Review Card/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /\+ Add Review Card/i })
+    );
 
     await waitFor(() => {
       expect(executeFn).toHaveBeenCalledWith({

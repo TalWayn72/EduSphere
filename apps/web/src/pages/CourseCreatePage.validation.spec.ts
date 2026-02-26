@@ -6,7 +6,10 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('@/lib/urql-client', () => ({ urqlClient: {}, disposeWsClient: vi.fn() }));
+vi.mock('@/lib/urql-client', () => ({
+  urqlClient: {},
+  disposeWsClient: vi.fn(),
+}));
 
 import { courseSchema } from './CourseCreatePage';
 

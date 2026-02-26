@@ -124,7 +124,9 @@ describe('CourseWizardStep3', () => {
 
   it('does not show error message when title is present (line 110 falsy branch)', () => {
     const { container } = renderStep();
-    expect(container.querySelector('p.text-destructive')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('p.text-destructive')
+    ).not.toBeInTheDocument();
   });
 
   it('both buttons are disabled when title is empty (lines 94, 103)', () => {

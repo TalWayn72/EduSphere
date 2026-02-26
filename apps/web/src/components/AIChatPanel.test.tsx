@@ -357,7 +357,9 @@ describe('AIChatPanel', () => {
     expect(inputAfter.placeholder).toMatch(/Quiz Master/i);
 
     // Restore the original mock
-    vi.spyOn(selectModule, 'Select').mockImplementation(originalSelect as typeof selectModule.Select);
+    vi.spyOn(selectModule, 'Select').mockImplementation(
+      originalSelect as typeof selectModule.Select
+    );
   });
 
   // 12. Mobile backdrop click closes the panel (lines 298-302) ─────────────────

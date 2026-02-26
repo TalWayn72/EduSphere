@@ -175,10 +175,14 @@ describe('useAgentChat', () => {
       if (mutation === 'START_AGENT_SESSION_MUTATION') {
         return [
           { fetching: false },
-          vi.fn().mockResolvedValue({ data: { startAgentSession: { id: null } } }),
+          vi
+            .fn()
+            .mockResolvedValue({ data: { startAgentSession: { id: null } } }),
         ] as ReturnType<typeof urql.useMutation>;
       }
-      return [{ fetching: false }, mockSendAgentMessage] as ReturnType<typeof urql.useMutation>;
+      return [{ fetching: false }, mockSendAgentMessage] as ReturnType<
+        typeof urql.useMutation
+      >;
     });
     vi.mocked(urql.useSubscription).mockReturnValue([
       { data: null, fetching: false },
@@ -199,11 +203,10 @@ describe('useAgentChat', () => {
   });
 
   it('processes subscription message that updates an existing message', async () => {
-    let _subscriptionCallback: ((data: unknown) => void) | null = null;
-
-    vi.mocked(urql.useSubscription).mockImplementation((_opts, handler) => {
-      _subscriptionCallback = handler ?? null;
-      return [{ data: null, fetching: false }, vi.fn()] as ReturnType<typeof urql.useSubscription>;
+    vi.mocked(urql.useSubscription).mockImplementation((_opts, _handler) => {
+      return [{ data: null, fetching: false }, vi.fn()] as ReturnType<
+        typeof urql.useSubscription
+      >;
     });
     setupUrqlMocks();
 
@@ -228,8 +231,12 @@ describe('useAgentChat', () => {
       vi.fn(),
     ] as unknown as ReturnType<typeof urql.useSubscription>);
 
-    vi.mocked(urql.useMutation).mockImplementation(() =>
-      [{ fetching: false }, vi.fn().mockResolvedValue({ data: null })] as ReturnType<typeof urql.useMutation>
+    vi.mocked(urql.useMutation).mockImplementation(
+      () =>
+        [
+          { fetching: false },
+          vi.fn().mockResolvedValue({ data: null }),
+        ] as ReturnType<typeof urql.useMutation>
     );
 
     const { result } = renderHook(() => useAgentChat('content-1'));
@@ -252,8 +259,12 @@ describe('useAgentChat', () => {
       vi.fn(),
     ] as unknown as ReturnType<typeof urql.useSubscription>);
 
-    vi.mocked(urql.useMutation).mockImplementation(() =>
-      [{ fetching: false }, vi.fn().mockResolvedValue({ data: null })] as ReturnType<typeof urql.useMutation>
+    vi.mocked(urql.useMutation).mockImplementation(
+      () =>
+        [
+          { fetching: false },
+          vi.fn().mockResolvedValue({ data: null }),
+        ] as ReturnType<typeof urql.useMutation>
     );
 
     const { result } = renderHook(() => useAgentChat('content-1'));

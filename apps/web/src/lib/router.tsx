@@ -236,7 +236,9 @@ const LtiLaunchPage = lazy(() =>
   import('@/pages/LtiLaunchPage').then((m) => ({ default: m.LtiLaunchPage }))
 );
 const MyOpenBadgesPage = lazy(() =>
-  import('@/pages/MyOpenBadgesPage').then((m) => ({ default: m.MyOpenBadgesPage }))
+  import('@/pages/MyOpenBadgesPage').then((m) => ({
+    default: m.MyOpenBadgesPage,
+  }))
 );
 
 // ── Loading fallback ──────────────────────────────────────────────────────────

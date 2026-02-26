@@ -20,25 +20,56 @@ const mockGetCurrentUser = vi.mocked(auth.getCurrentUser);
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const ENTRIES = [
-  { rank: 1, userId: 'u1', displayName: 'Alice Cohen', totalPoints: 1500, badgeCount: 5 },
-  { rank: 2, userId: 'u2', displayName: 'Bob Levi',   totalPoints: 1200, badgeCount: 4 },
-  { rank: 3, userId: 'u3', displayName: 'Carol Gold',  totalPoints: 900,  badgeCount: 3 },
-  { rank: 4, userId: 'u4', displayName: 'Dave Green',  totalPoints: 700,  badgeCount: 2 },
+  {
+    rank: 1,
+    userId: 'u1',
+    displayName: 'Alice Cohen',
+    totalPoints: 1500,
+    badgeCount: 5,
+  },
+  {
+    rank: 2,
+    userId: 'u2',
+    displayName: 'Bob Levi',
+    totalPoints: 1200,
+    badgeCount: 4,
+  },
+  {
+    rank: 3,
+    userId: 'u3',
+    displayName: 'Carol Gold',
+    totalPoints: 900,
+    badgeCount: 3,
+  },
+  {
+    rank: 4,
+    userId: 'u4',
+    displayName: 'Dave Green',
+    totalPoints: 700,
+    badgeCount: 2,
+  },
 ];
 
 function makeLeaderboardResponse(
   overrides: Partial<UseQueryResponse[0]> = {}
 ): UseQueryResponse {
   return [
-    { data: { leaderboard: ENTRIES }, fetching: false, stale: false, ...overrides },
+    {
+      data: { leaderboard: ENTRIES },
+      fetching: false,
+      stale: false,
+      ...overrides,
+    },
     vi.fn(),
   ] as unknown as UseQueryResponse;
 }
-function makeRankResponse(
-  rank?: number
-): UseQueryResponse {
+function makeRankResponse(rank?: number): UseQueryResponse {
   return [
-    { data: rank !== undefined ? { myRank: rank } : undefined, fetching: false, stale: false },
+    {
+      data: rank !== undefined ? { myRank: rank } : undefined,
+      fetching: false,
+      stale: false,
+    },
     vi.fn(),
   ] as unknown as UseQueryResponse;
 }
@@ -48,7 +79,16 @@ function makeRankResponse(
 describe('LeaderboardWidget', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetCurrentUser.mockReturnValue({ id: 'me', firstName: 'Alice', lastName: 'Cohen', username: 'alice', email: 'alice@example.com', tenantId: 'tenant-1', role: 'STUDENT', scopes: [] });
+    mockGetCurrentUser.mockReturnValue({
+      id: 'me',
+      firstName: 'Alice',
+      lastName: 'Cohen',
+      username: 'alice',
+      email: 'alice@example.com',
+      tenantId: 'tenant-1',
+      role: 'STUDENT',
+      scopes: [],
+    });
   });
 
   it('renders "Leaderboard" heading', () => {
@@ -61,7 +101,9 @@ describe('LeaderboardWidget', () => {
 
   it('shows loading skeletons when fetching', () => {
     mockUseQuery
-      .mockReturnValueOnce(makeLeaderboardResponse({ fetching: true, data: undefined }))
+      .mockReturnValueOnce(
+        makeLeaderboardResponse({ fetching: true, data: undefined })
+      )
       .mockReturnValueOnce(makeRankResponse());
     const { container } = render(<LeaderboardWidget />);
     const skeletons = container.querySelectorAll('.animate-pulse');

@@ -53,7 +53,11 @@ describe('AnnotationCard — basic rendering', () => {
   it('renders INSTRUCTOR layer label', () => {
     render(
       <AnnotationCard
-        ann={{ ...baseAnnotation, layer: AnnotationLayer.INSTRUCTOR, userRole: 'instructor' }}
+        ann={{
+          ...baseAnnotation,
+          layer: AnnotationLayer.INSTRUCTOR,
+          userRole: 'instructor',
+        }}
         onSeek={vi.fn()}
       />
     );
@@ -63,7 +67,11 @@ describe('AnnotationCard — basic rendering', () => {
   it('renders AI layer label', () => {
     render(
       <AnnotationCard
-        ann={{ ...baseAnnotation, layer: AnnotationLayer.AI_GENERATED, userRole: 'ai' }}
+        ann={{
+          ...baseAnnotation,
+          layer: AnnotationLayer.AI_GENERATED,
+          userRole: 'ai',
+        }}
         onSeek={vi.fn()}
       />
     );
@@ -97,7 +105,11 @@ describe('AnnotationCard — timestamp seek button', () => {
     const onSeek = vi.fn();
     render(
       <AnnotationCard
-        ann={{ ...baseAnnotation, contentId: 'content-42', contentTimestamp: 90 }}
+        ann={{
+          ...baseAnnotation,
+          contentId: 'content-42',
+          contentTimestamp: 90,
+        }}
         onSeek={onSeek}
       />
     );
@@ -158,10 +170,7 @@ describe('AnnotationCard — replies rendering', () => {
   it('renders 1 reply with singular "reply" label', () => {
     const replies = [makeReply('r-1', 'Carol', 'Interesting point')];
     render(
-      <AnnotationCard
-        ann={{ ...baseAnnotation, replies }}
-        onSeek={vi.fn()}
-      />
+      <AnnotationCard ann={{ ...baseAnnotation, replies }} onSeek={vi.fn()} />
     );
     expect(screen.getByText('Carol:')).toBeTruthy();
     expect(screen.getByText('Interesting point')).toBeTruthy();
@@ -175,10 +184,7 @@ describe('AnnotationCard — replies rendering', () => {
       makeReply('r-2', 'Dave', 'Second reply'),
     ];
     render(
-      <AnnotationCard
-        ann={{ ...baseAnnotation, replies }}
-        onSeek={vi.fn()}
-      />
+      <AnnotationCard ann={{ ...baseAnnotation, replies }} onSeek={vi.fn()} />
     );
     expect(screen.getByText('Carol:')).toBeTruthy();
     expect(screen.getByText('First reply')).toBeTruthy();
@@ -194,10 +200,7 @@ describe('AnnotationCard — replies rendering', () => {
       makeReply('r-3', 'Grace', 'Comment C'),
     ];
     render(
-      <AnnotationCard
-        ann={{ ...baseAnnotation, replies }}
-        onSeek={vi.fn()}
-      />
+      <AnnotationCard ann={{ ...baseAnnotation, replies }} onSeek={vi.fn()} />
     );
     ['Eve', 'Frank', 'Grace'].forEach((name) => {
       expect(screen.getByText(`${name}:`)).toBeTruthy();

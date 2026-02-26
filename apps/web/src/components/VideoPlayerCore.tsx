@@ -137,8 +137,7 @@ export function VideoPlayerCore({
 
   // ── Fullscreen change tracking ──────────────────────────────────────────────
   useEffect(() => {
-    const handler = () =>
-      setIsFullscreen(!!document.fullscreenElement);
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handler);
     return () => document.removeEventListener('fullscreenchange', handler);
   }, []);
@@ -272,7 +271,9 @@ export function VideoPlayerCore({
         >
           <div
             className="h-full bg-primary rounded-full"
-            style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
+            style={{
+              width: `${duration ? (currentTime / duration) * 100 : 0}%`,
+            }}
           />
           {/* Bookmark markers */}
           {bookmarks.map((bm) => (
@@ -286,7 +287,8 @@ export function VideoPlayerCore({
               title={bm.label}
               onClick={(e) => {
                 e.stopPropagation();
-                if (videoRef.current) videoRef.current.currentTime = bm.timestamp;
+                if (videoRef.current)
+                  videoRef.current.currentTime = bm.timestamp;
               }}
             />
           ))}
@@ -302,7 +304,11 @@ export function VideoPlayerCore({
             onClick={togglePlay}
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            {isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
           </Button>
 
           {/* Mute */}
@@ -318,7 +324,11 @@ export function VideoPlayerCore({
             }}
             aria-label={isMuted ? 'Unmute' : 'Mute'}
           >
-            {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            {isMuted ? (
+              <VolumeX className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
           </Button>
 
           {/* Volume slider */}
@@ -379,7 +389,9 @@ export function VideoPlayerCore({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   onClick={() => selectLevel(-1)}
-                  className={cn(currentLevel === -1 && 'font-semibold text-primary')}
+                  className={cn(
+                    currentLevel === -1 && 'font-semibold text-primary'
+                  )}
                 >
                   Auto
                 </DropdownMenuItem>

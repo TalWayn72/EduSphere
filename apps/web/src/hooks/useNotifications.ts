@@ -55,7 +55,7 @@ const MAX_NOTIFICATIONS = 100;
 
 function prependNotification(
   prev: AppNotification[],
-  incoming: AppNotification,
+  incoming: AppNotification
 ): AppNotification[] {
   const deduped = prev.filter((n) => n.id !== incoming.id);
   return [incoming, ...deduped].slice(0, MAX_NOTIFICATIONS);
@@ -105,8 +105,8 @@ export function useNotifications(userId: string): UseNotificationsReturn {
   const markAsRead = useCallback((id: string) => {
     setNotifications((prev) =>
       prev.map((n) =>
-        n.id === id ? { ...n, readAt: new Date().toISOString() } : n,
-      ),
+        n.id === id ? { ...n, readAt: new Date().toISOString() } : n
+      )
     );
   }, []);
 

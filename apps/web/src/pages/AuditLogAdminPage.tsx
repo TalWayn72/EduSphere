@@ -59,7 +59,8 @@ function thirtyDaysAgoIso(): string {
 export function AuditLogAdminPage() {
   const [fromDate, setFromDate] = useState<string>(thirtyDaysAgoIso());
   const [toDate, setToDate] = useState<string>(todayIso());
-  const [exportingFormat, setExportingFormat] = useState<AuditExportFormat | null>(null);
+  const [exportingFormat, setExportingFormat] =
+    useState<AuditExportFormat | null>(null);
 
   const [exportResult, exportAuditLog] = useMutation<ExportAuditLogResult>(
     EXPORT_AUDIT_LOG_MUTATION
@@ -102,7 +103,8 @@ export function AuditLogAdminPage() {
       {
         action: {
           label: 'Open again',
-          onClick: () => window.open(data.presignedUrl, '_blank', 'noopener,noreferrer'),
+          onClick: () =>
+            window.open(data.presignedUrl, '_blank', 'noopener,noreferrer'),
         },
         duration: 8000,
       }
@@ -123,14 +125,18 @@ export function AuditLogAdminPage() {
           <CardHeader>
             <CardTitle className="text-base">Export Audit Log</CardTitle>
             <CardDescription>
-              Select a date range and download the audit events in your preferred format.
+              Select a date range and download the audit events in your
+              preferred format.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Date range inputs */}
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 space-y-1">
-                <label htmlFor="audit-from-date" className="text-sm font-medium">
+                <label
+                  htmlFor="audit-from-date"
+                  className="text-sm font-medium"
+                >
                   Start Date
                 </label>
                 <Input

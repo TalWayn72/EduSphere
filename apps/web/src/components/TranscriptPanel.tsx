@@ -38,7 +38,10 @@ export function TranscriptPanel({
   // Auto-scroll to active segment when it changes
   useEffect(() => {
     if (!searchQuery && activeRef.current) {
-      activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      activeRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
     }
   }, [currentTime, searchQuery]);
 

@@ -114,7 +114,9 @@ describe('LearningStats', () => {
       <LearningStats courses={[]} weeklyStats={MOCK_WEEKLY} />
     );
     expect(container).toBeInTheDocument();
-    expect(screen.queryByText('Introduction to Talmud')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Introduction to Talmud')
+    ).not.toBeInTheDocument();
   });
 
   it('renders totalMinutes converted to hours in CourseProgressBar', () => {

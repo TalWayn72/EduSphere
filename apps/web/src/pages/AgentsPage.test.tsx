@@ -449,8 +449,12 @@ describe('AgentsPage', () => {
     });
 
     // Advance through the 600ms typing delay then run all interval ticks
-    act(() => { vi.advanceTimersByTime(700); });
-    act(() => { vi.runAllTimers(); });
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
+    act(() => {
+      vi.runAllTimers();
+    });
 
     // After the interval fires to completion the streaming cursor is gone
     const cursors = document.querySelectorAll('.animate-pulse');
@@ -475,15 +479,21 @@ describe('AgentsPage', () => {
     });
 
     // Advance past typing delay into the streaming interval ticks
-    act(() => { vi.advanceTimersByTime(700); });
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
     // Two ticks of the 18ms interval — partial content visible, cursor present
-    act(() => { vi.advanceTimersByTime(36); });
+    act(() => {
+      vi.advanceTimersByTime(36);
+    });
 
     const cursorMid = document.querySelector('.animate-pulse');
     expect(cursorMid).toBeInTheDocument();
 
     // Run all remaining timers — streaming finishes, cursor disappears
-    act(() => { vi.runAllTimers(); });
+    act(() => {
+      vi.runAllTimers();
+    });
     const cursorDone = document.querySelector('.animate-pulse');
     expect(cursorDone).not.toBeInTheDocument();
 

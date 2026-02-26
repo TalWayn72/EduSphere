@@ -74,10 +74,7 @@ type MutationExecuteFn = (vars: Record<string, unknown>) => Promise<{
   error?: { message: string } | undefined;
 }>;
 
-function mockMutation(
-  executeFn: MutationExecuteFn,
-  fetching = false
-) {
+function mockMutation(executeFn: MutationExecuteFn, fetching = false) {
   vi.mocked(useMutation).mockReturnValue([
     { fetching, error: undefined } as UseMutationResponse[0],
     executeFn as unknown as UseMutationResponse[1],
@@ -109,7 +106,9 @@ describe('AuditLogAdminPage', () => {
   it('renders the page title "Audit Log"', () => {
     renderPage();
     // Use h1 role specifically to avoid matching "Export Audit Log" card heading
-    expect(screen.getByRole('heading', { name: 'Audit Log', level: 1 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Audit Log', level: 1 })
+    ).toBeInTheDocument();
   });
 
   it('renders inside the Layout wrapper', () => {
@@ -129,17 +128,23 @@ describe('AuditLogAdminPage', () => {
 
   it('renders "Export CSV" button', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /Export audit log as CSV/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    ).toBeInTheDocument();
   });
 
   it('renders "Export JSON" button', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /Export audit log as JSON/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Export audit log as JSON/i })
+    ).toBeInTheDocument();
   });
 
   it('renders description text', () => {
     renderPage();
-    expect(screen.getByText(/Select a date range and download/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Select a date range and download/i)
+    ).toBeInTheDocument();
   });
 
   // ── Date inputs are pre-populated ─────────────────────────────────────────
@@ -151,7 +156,7 @@ describe('AuditLogAdminPage', () => {
     expect(fromInput.value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
-  it('pre-populates toDate with today\'s date', () => {
+  it("pre-populates toDate with today's date", () => {
     renderPage();
     const toInput = screen.getByLabelText(/End Date/i) as HTMLInputElement;
     expect(toInput.value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -167,7 +172,9 @@ describe('AuditLogAdminPage', () => {
     fireEvent.change(fromInput, { target: { value: '2024-12-31' } });
     fireEvent.change(toInput, { target: { value: '2024-01-01' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
@@ -177,7 +184,9 @@ describe('AuditLogAdminPage', () => {
   });
 
   it('does not call mutation when fromDate > toDate', async () => {
-    const executeFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+    const executeFn = vi
+      .fn()
+      .mockResolvedValue({ data: undefined, error: undefined });
     mockMutation(executeFn);
     renderPage();
 
@@ -186,7 +195,9 @@ describe('AuditLogAdminPage', () => {
     fireEvent.change(fromInput, { target: { value: '2025-06-01' } });
     fireEvent.change(toInput, { target: { value: '2025-01-01' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(executeFn).not.toHaveBeenCalled();
@@ -214,7 +225,9 @@ describe('AuditLogAdminPage', () => {
     fireEvent.change(fromInput, { target: { value: '2024-01-01' } });
     fireEvent.change(toInput, { target: { value: '2024-12-31' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(executeFn).toHaveBeenCalledWith({
@@ -228,16 +241,28 @@ describe('AuditLogAdminPage', () => {
   it('calls window.open with presignedUrl on successful CSV export', async () => {
     const presignedUrl = 'https://minio.example.com/audit-export.csv';
     const executeFn = vi.fn().mockResolvedValue({
-      data: { exportAuditLog: { presignedUrl, expiresAt: '2026-02-26T16:00:00Z', recordCount: 10 } },
+      data: {
+        exportAuditLog: {
+          presignedUrl,
+          expiresAt: '2026-02-26T16:00:00Z',
+          recordCount: 10,
+        },
+      },
       error: undefined,
     });
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
-      expect(window.open).toHaveBeenCalledWith(presignedUrl, '_blank', 'noopener,noreferrer');
+      expect(window.open).toHaveBeenCalledWith(
+        presignedUrl,
+        '_blank',
+        'noopener,noreferrer'
+      );
     });
   });
 
@@ -255,7 +280,9 @@ describe('AuditLogAdminPage', () => {
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
@@ -286,7 +313,9 @@ describe('AuditLogAdminPage', () => {
     fireEvent.change(fromInput, { target: { value: '2024-01-01' } });
     fireEvent.change(toInput, { target: { value: '2024-12-31' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as JSON/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as JSON/i })
+    );
 
     await waitFor(() => {
       expect(executeFn).toHaveBeenCalledWith(
@@ -305,7 +334,9 @@ describe('AuditLogAdminPage', () => {
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
@@ -322,7 +353,9 @@ describe('AuditLogAdminPage', () => {
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
@@ -336,12 +369,16 @@ describe('AuditLogAdminPage', () => {
   it('shows "Preparing your export…" text while exporting', async () => {
     // Never resolves synchronously — use a pending promise to keep loading state
     let resolveExport!: (value: unknown) => void;
-    const pendingPromise = new Promise((res) => { resolveExport = res; });
+    const pendingPromise = new Promise((res) => {
+      resolveExport = res;
+    });
     const executeFn = vi.fn().mockReturnValue(pendingPromise);
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(screen.getByText(/Preparing your export/i)).toBeInTheDocument();
@@ -353,16 +390,24 @@ describe('AuditLogAdminPage', () => {
 
   it('disables both export buttons while exporting', async () => {
     let resolveExport!: (value: unknown) => void;
-    const pendingPromise = new Promise((res) => { resolveExport = res; });
+    const pendingPromise = new Promise((res) => {
+      resolveExport = res;
+    });
     const executeFn = vi.fn().mockReturnValue(pendingPromise);
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Export audit log as CSV/i })).toBeDisabled();
-      expect(screen.getByRole('button', { name: /Export audit log as JSON/i })).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: /Export audit log as CSV/i })
+      ).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: /Export audit log as JSON/i })
+      ).toBeDisabled();
     });
 
     resolveExport({ data: undefined, error: undefined });
@@ -370,15 +415,21 @@ describe('AuditLogAdminPage', () => {
 
   it('shows "Exporting…" text on CSV button while CSV export is in progress', async () => {
     let resolveExport!: (value: unknown) => void;
-    const pendingPromise = new Promise((res) => { resolveExport = res; });
+    const pendingPromise = new Promise((res) => {
+      resolveExport = res;
+    });
     const executeFn = vi.fn().mockReturnValue(pendingPromise);
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
-      const csvButton = screen.getByRole('button', { name: /Export audit log as CSV/i });
+      const csvButton = screen.getByRole('button', {
+        name: /Export audit log as CSV/i,
+      });
       expect(csvButton).toHaveTextContent(/Exporting/i);
     });
 
@@ -423,7 +474,9 @@ describe('AuditLogAdminPage', () => {
     fireEvent.change(fromInput, { target: { value: '2024-03-01' } });
     fireEvent.change(toInput, { target: { value: '2024-03-31' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as JSON/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as JSON/i })
+    );
 
     await waitFor(() => {
       expect(executeFn).toHaveBeenCalledWith({
@@ -449,10 +502,16 @@ describe('AuditLogAdminPage', () => {
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as JSON/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as JSON/i })
+    );
 
     await waitFor(() => {
-      expect(window.open).toHaveBeenCalledWith(presignedUrl, '_blank', 'noopener,noreferrer');
+      expect(window.open).toHaveBeenCalledWith(
+        presignedUrl,
+        '_blank',
+        'noopener,noreferrer'
+      );
     });
   });
 
@@ -473,7 +532,9 @@ describe('AuditLogAdminPage', () => {
     mockMutation(executeFn);
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     await waitFor(() => {
       expect(vi.mocked(toast.success)).toHaveBeenCalled();
@@ -493,7 +554,11 @@ describe('AuditLogAdminPage', () => {
     // Invoke "Open again" — must call window.open with the presigned URL
     toastOptions.action.onClick();
 
-    expect(window.open).toHaveBeenCalledWith(presignedUrl, '_blank', 'noopener,noreferrer');
+    expect(window.open).toHaveBeenCalledWith(
+      presignedUrl,
+      '_blank',
+      'noopener,noreferrer'
+    );
     // window.open was called at least twice: once from handleExport + once from "Open again"
     expect(vi.mocked(window.open)).toHaveBeenCalledTimes(2);
   });
@@ -520,12 +585,17 @@ describe('AuditLogAdminPage', () => {
     fireEvent.change(fromInput, { target: { value: '2025-01-15' } });
     fireEvent.change(toInput, { target: { value: '2025-01-15' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Export audit log as CSV/i })
+    );
 
     // Same day is valid — mutation should be called
     await waitFor(() => {
       expect(executeFn).toHaveBeenCalledWith(
-        expect.objectContaining({ fromDate: '2025-01-15', toDate: '2025-01-15' })
+        expect.objectContaining({
+          fromDate: '2025-01-15',
+          toDate: '2025-01-15',
+        })
       );
     });
   });
