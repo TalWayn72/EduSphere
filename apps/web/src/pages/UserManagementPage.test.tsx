@@ -62,9 +62,23 @@ vi.mock('./UserManagementPage.modals', () => ({
   BulkImportModal: () => null,
 }));
 
+// Mock shadcn Select with native <select> so fireEvent.change triggers onValueChange
+vi.mock('@/components/ui/select', () => ({
+  Select: ({ value, onValueChange, children }: { value: string; onValueChange?: (v: string) => void; children: React.ReactNode }) => (
+    <select value={value} onChange={(e) => onValueChange?.(e.target.value)}>
+      {children}
+    </select>
+  ),
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  SelectContent: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) => <option value={value}>{children}</option>,
+  SelectValue: ({ placeholder }: { placeholder?: string }) => <span>{placeholder}</span>,
+}));
+
 import { useQuery, useMutation } from 'urql';
 import { toast } from 'sonner';
 import { getCurrentUser } from '@/lib/auth';
+import { useAuthRole } from '@/hooks/useAuthRole';
 
 const MOCK_USERS = [
   {
@@ -193,10 +207,7 @@ describe('UserManagementPage', () => {
   });
 
   it('redirects non-admin users to /dashboard', () => {
-    const { useAuthRole } = vi.mocked(
-      require('@/hooks/useAuthRole') as typeof import('@/hooks/useAuthRole')
-    );
-    useAuthRole.mockReturnValueOnce('STUDENT');
+    vi.mocked(useAuthRole).mockReturnValueOnce('STUDENT');
     renderPage();
     expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
@@ -231,91 +242,46 @@ describe('UserManagementPage', () => {
   it('shows role confirmation UI when role is changed', () => {
     renderPage();
 
-    // The per-row role Select for Alice (u1 — INSTRUCTOR). Simulate onValueChange
-    // by firing a change on the hidden native select rendered by Radix under the hood,
-    // or by directly invoking the onValueChange prop via fireEvent on the trigger.
-    // Because Radix Select is heavily mocked by jsdom, we locate the SelectTrigger
-    // for Alice's row and fire the custom 'change' event with the new value.
-    // The reliable approach is to find the trigger by its displayed badge text and
-    // fire the value-change through the component's event handler.
+    // With the native-select mock, all <select> elements respond to fireEvent.change.
+    // Index 0 = role-filter select, index 1 = Alice's row select.
+    const selects = screen.getAllByRole('combobox');
+    // Alice is first user row → index 1
+    fireEvent.change(selects[1], { target: { value: 'STUDENT' } });
 
-    // Locate Alice's role trigger (displays her current role "INSTRUCTOR")
-    const roleTriggers = screen.getAllByRole('combobox');
-    // First combobox is the role-filter Select; subsequent ones are per-user row Selects.
-    // Alice is the first user row → index 1
-    const aliceRoleTrigger = roleTriggers[1];
-
-    // Radix renders a native <select> alongside the styled trigger for accessibility.
-    // fireEvent.change on that native select triggers onValueChange.
-    const nativeSelects = document.querySelectorAll('select');
-    // The second native select corresponds to Alice's row role Select
-    const aliceNativeSelect = nativeSelects[1];
-    if (aliceNativeSelect) {
-      fireEvent.change(aliceNativeSelect, { target: { value: 'STUDENT' } });
-    } else {
-      // Fallback: fire change on the trigger element itself
-      fireEvent.change(aliceRoleTrigger, { target: { value: 'STUDENT' } });
-    }
-
-    // After handleRoleChange fires, confirmRoleChange state is set.
-    // The UI should now show "→ STUDENT?" and Confirm/Cancel buttons.
+    // confirmRoleChange state set → shows "→ STUDENT?" + Confirm/Cancel
     expect(screen.getByText(/→ STUDENT\?/)).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /^confirm$/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /^cancel$/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^confirm$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^cancel$/i })).toBeInTheDocument();
   });
 
   it('cancels role confirmation on Cancel click', () => {
     renderPage();
 
-    // Trigger role change for Alice to open confirmation UI
-    const nativeSelects = document.querySelectorAll('select');
-    const aliceNativeSelect = nativeSelects[1];
-    if (aliceNativeSelect) {
-      fireEvent.change(aliceNativeSelect, { target: { value: 'STUDENT' } });
-    } else {
-      const roleTriggers = screen.getAllByRole('combobox');
-      fireEvent.change(roleTriggers[1], { target: { value: 'STUDENT' } });
-    }
-
-    // Confirmation UI should be visible
+    const selects = screen.getAllByRole('combobox');
+    fireEvent.change(selects[1], { target: { value: 'STUDENT' } });
     expect(screen.getByText(/→ STUDENT\?/)).toBeInTheDocument();
 
-    // Click Cancel
     fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }));
 
-    // Confirmation UI should disappear; the role Select should be back
     expect(screen.queryByText(/→ STUDENT\?/)).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /^confirm$/i })
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^confirm$/i })).not.toBeInTheDocument();
   });
 
   it('calls updateUser and shows success toast on Confirm', async () => {
     const mockUpdateUser = vi.fn().mockResolvedValue({ error: undefined });
-    vi.mocked(useMutation).mockReturnValue([
+    // useMutation called 3×: deactivate, reset, update — return mockUpdateUser for all
+    // so that whichever call resolves, updateUser is captured
+    vi.mocked(useMutation).mockImplementation(() => [
       { fetching: false, error: undefined },
       mockUpdateUser,
     ] as unknown as ReturnType<typeof useMutation>);
 
     renderPage();
 
-    // Open confirmation UI for Alice
-    const nativeSelects = document.querySelectorAll('select');
-    const aliceNativeSelect = nativeSelects[1];
-    if (aliceNativeSelect) {
-      fireEvent.change(aliceNativeSelect, { target: { value: 'STUDENT' } });
-    } else {
-      const roleTriggers = screen.getAllByRole('combobox');
-      fireEvent.change(roleTriggers[1], { target: { value: 'STUDENT' } });
-    }
-
+    const selects = screen.getAllByRole('combobox');
+    fireEvent.change(selects[1], { target: { value: 'STUDENT' } });
     expect(screen.getByText(/→ STUDENT\?/)).toBeInTheDocument();
 
-    // Click the role-change Confirm button
     fireEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
 
     await waitFor(() => {
@@ -367,29 +333,17 @@ describe('UserManagementPage', () => {
       .fn()
       .mockResolvedValue({ error: new Error('server error') });
 
-    vi.mocked(useMutation)
-      .mockReturnValueOnce([
-        { fetching: false, error: undefined },
-        mockDeactivateUser, // deactivateUser
-      ] as unknown as ReturnType<typeof useMutation>)
-      .mockReturnValueOnce([
-        { fetching: false, error: undefined },
-        vi.fn().mockResolvedValue({ error: undefined }), // resetPassword
-      ] as unknown as ReturnType<typeof useMutation>)
-      .mockReturnValueOnce([
-        { fetching: false, error: undefined },
-        vi.fn().mockResolvedValue({ error: undefined }), // updateUser
-      ] as unknown as ReturnType<typeof useMutation>);
+    // mockImplementation is stable across re-renders (unlike mockReturnValueOnce)
+    vi.mocked(useMutation).mockImplementation(() => [
+      { fetching: false, error: undefined },
+      mockDeactivateUser,
+    ] as unknown as ReturnType<typeof useMutation>);
 
     renderPage();
 
-    // Click "Deactivate" for Alice to enter confirmation state
-    const deactivateButtons = screen.getAllByRole('button', {
-      name: /deactivate/i,
-    });
+    const deactivateButtons = screen.getAllByRole('button', { name: /deactivate/i });
     fireEvent.click(deactivateButtons[0]);
 
-    // Now the row shows a "Confirm" button for deactivation
     const confirmButton = screen.getByRole('button', { name: /^confirm$/i });
     fireEvent.click(confirmButton);
 
