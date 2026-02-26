@@ -36,6 +36,55 @@ services:
       - edusphere
 
   # ═══════════════════════════════════════════════════════════════
+  # PgBouncer — Connection Pooler (Port 5433 → PostgreSQL 5432)
+  #
+  # Pool mode: transaction — each client statement borrows a server
+  # connection from the pool and releases it immediately after the
+  # transaction completes. This is safe for Drizzle ORM workloads.
+  #
+  # WARNING: session-level features (SET LOCAL, LISTEN/NOTIFY,
+  # advisory locks, temporary tables) require pool_mode=session.
+  # Apache AGE Cypher queries use SET LOCAL app.current_tenant so
+  # those connections MUST go directly to postgres:5432, NOT via
+  # PgBouncer. Use PGBOUNCER_URL only for standard Drizzle queries.
+  #
+  # Max connections: 1000 clients → 25 server connections per pool
+  # ═══════════════════════════════════════════════════════════════
+  pgbouncer:
+    image: pgbouncer/pgbouncer:1.22.1
+    container_name: edusphere-pgbouncer
+    environment:
+      DATABASES_HOST: postgres
+      DATABASES_PORT: 5432
+      DATABASES_DBNAME: edusphere
+      DATABASES_USER: ${POSTGRES_USER:-edusphere}
+      DATABASES_PASSWORD: ${POSTGRES_PASSWORD:-edusphere_dev_password}
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 1000
+      PGBOUNCER_DEFAULT_POOL_SIZE: 25
+      PGBOUNCER_SERVER_IDLE_TIMEOUT: 60
+      # Reject unauthenticated connections
+      PGBOUNCER_AUTH_TYPE: scram-sha-256
+      # Log connections and disconnections for debugging
+      PGBOUNCER_LOG_CONNECTIONS: 1
+      PGBOUNCER_LOG_DISCONNECTIONS: 1
+    ports:
+      - "5433:5432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U ${POSTGRES_USER:-edusphere}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    mem_limit: 128m
+    mem_reservation: 64m
+    restart: unless-stopped
+    networks:
+      - edusphere
+
+  # ═══════════════════════════════════════════════════════════════
   # Redis
   # ═══════════════════════════════════════════════════════════════
   redis:

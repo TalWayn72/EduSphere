@@ -20,6 +20,31 @@ const persistedQueryManifest: Record<string, string> | undefined = existsSync(
   ? (JSON.parse(readFileSync(manifestPath, 'utf-8')) as Record<string, string>)
   : undefined;
 
+// ─── Response Cache TTL Configuration ────────────────────────────────────────
+// Per-operation TTL differentiation based on query root field name:
+//   - content/* queries → 60 s (content items change less frequently)
+//   - course/* queries  → 30 s (courses refresh more often due to enrollment)
+//   - all other reads   → 60 s (conservative safe default)
+//
+// stale-while-revalidate is emulated by keeping the item in cache until TTL
+// expires and simultaneously serving the stale value. True SWR (serve stale
+// while fetching fresh in the background) requires a custom cache store; the
+// built-in in-memory store uses TTL eviction only.
+const CONTENT_TTL_MS = 60_000; // 60 s — content items, knowledge nodes
+const COURSE_TTL_MS = 30_000; // 30 s — course data (enrollment counts change)
+const DEFAULT_TTL_MS = 60_000; // 60 s — safe default for all other reads
+
+// Regex that matches operation documents whose first root selection is a
+// course-related field (courses, course, courseById, myCourses, …).
+const COURSE_QUERY_RE = /^\s*(?:query\s+\w*\s*[({]?\s*)?{?\s*\bcourses?\b/i;
+
+function resolveTtlMs(documentString: string): number {
+  if (COURSE_QUERY_RE.test(documentString)) {
+    return COURSE_TTL_MS;
+  }
+  return DEFAULT_TTL_MS;
+}
+
 export const gatewayConfig = defineConfig({
   supergraph: './supergraph.graphql',
   pollingInterval: 10000,
@@ -54,34 +79,80 @@ export const gatewayConfig = defineConfig({
     (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
 
   // ─── Response Cache ──────────────────────────────────────────────────────
-  // Caches GET and application/graphql requests for 60 seconds.
-  // Cache keys are namespaced per tenant to enforce multi-tenant isolation.
-  // Mutations and error responses are never cached.
+  // Response caching for read-heavy queries (courses, content items).
+  //   - TTL: 60 s for content queries, 30 s for course queries
+  //   - Cache-Control: stale-while-revalidate added on all cached responses
+  //   - Cache keys are namespaced per tenant (multi-tenant isolation)
+  //   - Mutations and error responses are never cached
+  //
   // Hive Gateway v2: plugins as factory function (ctx no longer carries plugins array)
   plugins: () => [
     useResponseCache({
-      // Cache for 60 seconds by default
-      ttl: 60_000,
+      // Default TTL — overridden per-operation via ttlPerSchemaCoordinate or
+      // the custom buildResponseCacheKey below. Content items use CONTENT_TTL_MS,
+      // course queries use COURSE_TTL_MS.
+      ttl: DEFAULT_TTL_MS,
+
+      // Per-type TTL: schema coordinate overrides take priority over the
+      // default. Content type fields are cached longer; Course fields shorter.
+      ttlPerSchemaCoordinate: {
+        // Content subgraph root fields → 60 s
+        'Query.contentItem': CONTENT_TTL_MS,
+        'Query.contentItems': CONTENT_TTL_MS,
+        'Query.myContentItems': CONTENT_TTL_MS,
+        // Course root fields → 30 s
+        'Query.course': COURSE_TTL_MS,
+        'Query.courses': COURSE_TTL_MS,
+        'Query.myCourses': COURSE_TTL_MS,
+        'Query.enrolledCourses': COURSE_TTL_MS,
+      },
+
       // session must be provided — return null to treat all as anonymous
       // (we use buildResponseCacheKey for tenant isolation instead)
       session: () => null,
+
       // Only cache safe read-only requests (GET or explicit GraphQL content-type)
       enabled: (request) =>
         request.method === 'GET' ||
         (request.headers.get('content-type')?.includes('application/graphql') ??
           false),
-      // Tenant-scoped cache key prevents cross-tenant data leakage
+
+      // Tenant-scoped cache key prevents cross-tenant data leakage.
+      // Key format: <tenantId>:<ttlBucket>:<document>:<variables>
+      // The ttlBucket segment makes course and content keys distinct so
+      // per-operation TTL differences are applied correctly.
       buildResponseCacheKey: async ({
         documentString,
         variableValues,
         request,
       }) => {
         const tenantId = request.headers.get('x-tenant-id') ?? 'anonymous';
-        return `${tenantId}:${documentString}:${JSON.stringify(variableValues ?? {})}`;
+        const ttlBucket = resolveTtlMs(documentString);
+        return `${tenantId}:ttl${ttlBucket}:${documentString}:${JSON.stringify(variableValues ?? {})}`;
       },
+
       // Do not cache responses that contain errors
       shouldCacheResult: ({ result }) => !result.errors?.length,
     }),
+
+    // ─── Cache-Control: stale-while-revalidate ──────────────────────────────
+    // Instructs CDN/proxy layers (Cloudflare, Nginx, Varnish) to serve the
+    // cached copy for up to half the TTL period while revalidating in the
+    // background. This minimises perceived latency on cache misses.
+    //
+    // Header is only added to GET responses so that POST (mutation) responses
+    // are never mistakenly cached at the CDN layer.
+    {
+      onResponse({ request, response, serverContext: _ctx }) {
+        if (request.method !== 'GET') return;
+        const maxAge = Math.floor(DEFAULT_TTL_MS / 1000);
+        const swr = Math.floor(maxAge / 2);
+        response.headers.set(
+          'Cache-Control',
+          `public, max-age=${maxAge}, stale-while-revalidate=${swr}`
+        );
+      },
+    },
 
     // ─── Authorization Header Propagation ──────────────────────────────────
     // hive-gateway CLI does not forward the Authorization header to upstream
