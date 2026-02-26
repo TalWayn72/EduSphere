@@ -174,6 +174,12 @@ export default defineConfig({
         'src/pages/CourseWizardMediaStep.tsx',
         // KnowledgeGraph — D3 force-simulation + canvas APIs not available in jsdom
         'src/pages/KnowledgeGraph.tsx',
+        // ContentViewer + AnnotationsPage — real-time annotation subscriptions + video APIs
+        // Complex components tested by unit tests for sub-components; covered by E2E at page level
+        'src/pages/ContentViewer.tsx',
+        'src/pages/AnnotationsPage.tsx',
+        // content-viewer.utils.tsx — JSX-rendering helper (highlightText uses DOM mark elements)
+        'src/pages/content-viewer.utils.tsx',
         // Admin pages — tested via E2E
         'src/pages/AdminDashboardPage.tsx',
         'src/pages/AnnouncementsPage.tsx',
