@@ -22,7 +22,9 @@ vi.mock('@/components/Layout', () => ({
   ),
 }));
 
-// Mock urql — ProfilePage now uses useQuery for ME_QUERY and COURSES_QUERY
+// Mock urql — ProfilePage uses useQuery for ME_QUERY and COURSES_QUERY.
+// useMutation is mocked so that ProfileVisibilityCard (rendered when userId is
+// truthy) does not throw "No client specified" when it calls useMutation().
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
@@ -31,6 +33,7 @@ vi.mock('urql', async (importOriginal) => {
       { data: undefined, fetching: false, error: undefined },
       vi.fn(),
     ]),
+    useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
   };
 });
 
@@ -208,8 +211,7 @@ describe('ProfilePage', () => {
   // ── Courses fetching state (line 107 branch) ──────────────────────────────
 
   it('shows "..." in Courses Available stat when courses are loading', () => {
-    const { useQuery } = await import('urql');
-    vi.mocked(useQuery)
+    vi.mocked(urqlModule.useQuery)
       .mockReturnValueOnce([
         { data: undefined, fetching: false, error: undefined },
         vi.fn(),
@@ -226,8 +228,7 @@ describe('ProfilePage', () => {
   // ── Courses available count (line 101 branch) ─────────────────────────────
 
   it('shows courses count when course data is available', () => {
-    const { useQuery } = await import('urql');
-    vi.mocked(useQuery)
+    vi.mocked(urqlModule.useQuery)
       .mockReturnValueOnce([
         { data: undefined, fetching: false, error: undefined },
         vi.fn(),
@@ -247,12 +248,78 @@ describe('ProfilePage', () => {
 
   // ── Missing tenantId fallback (line 186-190 branch) ──────────────────────
 
-  it('shows "Not available" when tenantId is empty', () => {
+  it('renders fallback span when tenantId is empty', () => {
     vi.mocked(getCurrentUser).mockReturnValue({
       ...STUDENT_USER,
       tenantId: '',
     });
     renderPage();
-    expect(screen.getByText(/Not available/i)).toBeInTheDocument();
+    // t('profile.fields.tenantIdMissing', ...) returns the key when not in
+    // the test translation resources — the important thing is the fallback
+    // branch of `{tenantId || (...)}` is exercised
+    expect(
+      screen.getByText('profile.fields.tenantIdMissing')
+    ).toBeInTheDocument();
+  });
+
+  // ── getInitials ?? / || fallback branches (lines 69-71) ──────────────────
+
+  it('renders "U" avatar when firstName, lastName, and username are all empty (lines 69-71 ?? / || branches)', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      firstName: '',
+      lastName: '',
+      username: '',
+    });
+    renderPage();
+    // getInitials('','','') → first=''?.[0]??''='', last=''?.[0]??''=''
+    // ''||  (''[0]??'U').toUpperCase()  →  'U'
+    expect(screen.getByText('U')).toBeInTheDocument();
+  });
+
+  // ── ROLE_LABELS / ROLE_COLORS ?? fallback branches (lines 99-100) ─────────
+
+  it('renders raw role string for unknown role (lines 99-100 ?? fallbacks)', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      role: 'CUSTOM_ROLE',
+    });
+    renderPage();
+    // ROLE_LABELS['CUSTOM_ROLE'] → undefined → ?? 'CUSTOM_ROLE' (raw role)
+    // ROLE_COLORS['CUSTOM_ROLE'] → undefined → ?? 'bg-gray-100 text-gray-700'
+    expect(screen.getAllByText('CUSTOM_ROLE').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // ── ProfileVisibilityCard rendered when userId is truthy (line 241) ────────
+
+  it('renders ProfileVisibilityCard when ME_QUERY returns a userId (line 241 && truthy branch)', () => {
+    vi.mocked(urqlModule.useQuery)
+      .mockReturnValueOnce([
+        {
+          data: {
+            me: {
+              id: 'user-123',
+              firstName: 'Test',
+              lastName: 'User',
+              email: 'test@example.com',
+              role: 'STUDENT',
+              tenantId: 'tenant-abc-123',
+              createdAt: '2024-01-01T00:00:00Z',
+              updatedAt: '2024-01-01T00:00:00Z',
+              preferences: null,
+            },
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    // ProfileVisibilityCard is rendered → shows "Public Profile" heading
+    expect(screen.getByText('Public Profile')).toBeInTheDocument();
   });
 });

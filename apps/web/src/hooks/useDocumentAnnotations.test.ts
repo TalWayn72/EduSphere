@@ -307,6 +307,27 @@ describe('useDocumentAnnotations', () => {
     expect(result.current.textAnnotations).toHaveLength(0);
   });
 
+  it('excludes annotation where spatialData has from (number) but no to (line 60 false branch)', () => {
+    const missingTo = {
+      ...BASE_ANNOTATION,
+      id: 'ann-missing-to',
+      layer: AnnotationLayer.PERSONAL,
+      spatialData: { from: 50 }, // 'to' is absent → typeof undefined !== 'number'
+    } as unknown as Annotation;
+
+    vi.mocked(useAnnotations).mockReturnValue({
+      annotations: [missingTo],
+      addAnnotation: vi.fn(),
+      addReply: vi.fn(),
+      fetching: false,
+      isPending: false,
+      error: null,
+    });
+
+    const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
+    expect(result.current.textAnnotations).toHaveLength(0);
+  });
+
   it('delegates to useAnnotations — no second subscription created', () => {
     renderHook(() => useDocumentAnnotations('doc-1'));
     expect(vi.mocked(useAnnotations)).toHaveBeenCalledTimes(1);

@@ -10,6 +10,10 @@ function buildMockMetrics(): MetricsService {
   return {
     recordHttpRequest: vi.fn(),
     recordGraphqlOperation: vi.fn(),
+    resolverDuration: { observe: vi.fn() },
+    rlsDuration: { observe: vi.fn() },
+    agentDuration: { observe: vi.fn() },
+    ragDuration: { observe: vi.fn() },
   } as unknown as MetricsService;
 }
 

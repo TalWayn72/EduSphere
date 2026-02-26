@@ -293,7 +293,7 @@ describe('AIChatPanel', () => {
 
   it('clears mockTimerRef and mockStreamRef timeouts when unmounted mid-stream', () => {
     vi.useFakeTimers();
-    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
 
     const { container, unmount } = renderPanel();
     openPanel(container);

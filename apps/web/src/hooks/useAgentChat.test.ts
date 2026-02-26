@@ -199,10 +199,10 @@ describe('useAgentChat', () => {
   });
 
   it('processes subscription message that updates an existing message', async () => {
-    let subscriptionCallback: ((data: unknown) => void) | null = null;
+    let _subscriptionCallback: ((data: unknown) => void) | null = null;
 
     vi.mocked(urql.useSubscription).mockImplementation((_opts, handler) => {
-      subscriptionCallback = handler ?? null;
+      _subscriptionCallback = handler ?? null;
       return [{ data: null, fetching: false }, vi.fn()] as ReturnType<typeof urql.useSubscription>;
     });
     setupUrqlMocks();

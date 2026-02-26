@@ -603,11 +603,7 @@ describe('SearchPage', () => {
       const { SearchPage: SearchPageReal } = await import('./Search');
 
       // Render with a navigate-capturing wrapper
-      let capturedPath = '';
-      const NavigateSpy = ({ to }: { to: string }) => {
-        capturedPath = to;
-        return null;
-      };
+      const NavigateSpy = ({ to: _to }: { to: string }) => null;
       void NavigateSpy; // suppress unused warning
 
       const { container } = render(

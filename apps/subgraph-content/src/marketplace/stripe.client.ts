@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 
-const STRIPE_API_VERSION = '2026-01-28.clover' as const;
+const STRIPE_API_VERSION = '2025-02-24.acacia' as const;
 
 @Injectable()
 export class StripeClient {

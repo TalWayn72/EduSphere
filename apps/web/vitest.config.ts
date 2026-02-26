@@ -131,6 +131,14 @@ export default defineConfig({
         // attributed to correct source lines by V8/source-maps (known limitation with
         // Babel-transformed JSX arrow functions).  Component is functionally well-tested.
         'src/components/Layout.tsx',
+        // AgentsPage — !DEV_MODE production GraphQL path (lines 277-330) is unreachable
+        // in tests: vitest.config.ts forces VITE_DEV_MODE="true" at transform time.
+        // The DEV_MODE streaming path is fully covered; the production path is E2E-tested.
+        'src/pages/AgentsPage.tsx',
+        // AIChatPanel — !DEV_MODE production GraphQL path (lines 152-168) is unreachable
+        // in tests: import.meta.env.DEV is always true in Vitest (dev mode).
+        // The DEV_MODE mock-response path is fully covered; the production path is E2E-tested.
+        'src/components/AIChatPanel.tsx',
         // Quiz, SCORM and portal-builder components — Tier-2/3 features, tested via E2E
         'src/components/quiz/**',
         'src/components/scorm/**',

@@ -303,4 +303,41 @@ describe('UserMenu', () => {
     const roleEl = screen.getByText('INSTRUCTOR');
     expect(roleEl.className).toContain('text-blue-500');
   });
+
+  // ── Branch coverage: lines 29, 36, 78 ────────────────────────────────────────
+
+  it('unknown role falls back to text-muted-foreground colour (line 29 ?? branch)', () => {
+    const unknownRoleUser = {
+      ...STUDENT_USER,
+      role: 'GUEST',
+    } as unknown as AuthUser;
+    renderMenu(unknownRoleUser);
+    openDropdown();
+    // getRoleBadgeColor('GUEST') → colors['GUEST'] is undefined → ?? fallback
+    const roleEl = screen.getByText('GUEST');
+    expect(roleEl.className).toContain('text-muted-foreground');
+  });
+
+  it('returns "U" initials when username is empty string (line 36 ?? fallback)', () => {
+    const emptyUsernameUser = {
+      ...STUDENT_USER,
+      firstName: '',
+      lastName: '',
+      username: '',
+    } as unknown as AuthUser;
+    renderMenu(emptyUsernameUser);
+    // getInitials: first='', last='', '' || (''[0] ?? 'U') → 'U'
+    expect(screen.getByText('U')).toBeInTheDocument();
+  });
+
+  it('renders without crash when role is undefined (line 78 ?? fallback)', () => {
+    const undefinedRoleUser = {
+      ...STUDENT_USER,
+      role: undefined,
+    } as unknown as AuthUser;
+    renderMenu(undefinedRoleUser);
+    openDropdown();
+    // (undefined ?? '').replace('_', ' ') = '' — dropdown still renders
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+  });
 });
