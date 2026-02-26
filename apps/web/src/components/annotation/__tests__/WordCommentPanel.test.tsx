@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { WordCommentPanel } from '@/components/annotation/WordCommentPanel';
 import { AnnotationLayer } from '@/types/annotations';
@@ -78,6 +78,13 @@ describe('WordCommentPanel', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // jsdom does not implement scrollIntoView — stub it
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
+  });
+
+  afterEach(() => {
+    // Restore prototype after each test
+    delete (window.HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
   });
 
   it('renders "Comments" heading', () => {
