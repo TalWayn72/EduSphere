@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { Histogram, Registry } from 'prom-client';
+import { Histogram } from 'prom-client';
 import type { DrizzleDB } from '../index';
 
 // Lazily-initialised histogram — shared across all DB connections in this process.
@@ -13,7 +13,6 @@ function getRlsHistogram(): Histogram {
       help: 'Row-Level Security withTenantContext evaluation duration',
       labelNames: ['operation'],
       buckets: [0.0005, 0.001, 0.005, 0.01, 0.025, 0.05, 0.1],
-      registers: [Registry.globalRegistry],
     });
   }
   return _rlsHistogram;

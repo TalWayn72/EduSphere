@@ -1,9 +1,9 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 26 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅**
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569 | Backend subgraphs: 1,764+ | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,524 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **ALL E2E PASS** | **813/813 security tests ✅** | **ALL turbo test PASS (38/38 tasks) ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅**
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅**
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88 | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,600 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88/88 ✅** | **Web 19/19 (UserManagement) ✅**
 
 ---
 
@@ -114,7 +114,7 @@ Added all missing types, input types, queries and mutations to `apps/gateway/sup
 
 ## HIVE-001 — GraphQL Hive Schema Registry Integration (26 Feb 2026)
 
-**Status:** 🟡 Pending Token Setup | **Severity:** 🟢 Low | **Branch:** `fix/bug-16-23-g18`
+**Status:** ✅ CI gate added — awaiting HIVE_TOKEN secret in GitHub | **Severity:** 🟢 Low | **Branch:** `feat/improvements-wave1`
 
 ### What Was Done
 
@@ -123,6 +123,7 @@ Added all missing types, input types, queries and mutations to `apps/gateway/sup
 - `turbo.json` already had `schema:check` and `schema:publish` tasks (no change needed)
 - `apps/gateway/.env.example` already documented `HIVE_TOKEN` (no change needed)
 - Schema composition validated: 6 subgraphs composed to 27,847-char supergraph
+- Added conditional `schema-check` job to `.github/workflows/ci.yml` — runs `pnpm --filter @edusphere/gateway schema:check` only when `HIVE_TOKEN` secret is set; skips gracefully with a `::notice::` annotation otherwise
 
 ### Pending: HIVE_TOKEN Setup
 
@@ -145,9 +146,10 @@ Added all missing types, input types, queries and mutations to `apps/gateway/sup
 
 ### Files Changed
 
-| File                        | Change                                                                       |
-| --------------------------- | ---------------------------------------------------------------------------- |
-| `apps/gateway/package.json` | Added `@graphql-hive/cli` devDep + `schema:check` + `schema:publish` scripts |
+| File                              | Change                                                                        |
+| --------------------------------- | ----------------------------------------------------------------------------- |
+| `apps/gateway/package.json`       | Added `@graphql-hive/cli` devDep + `schema:check` + `schema:publish` scripts |
+| `.github/workflows/ci.yml`        | Added `schema-check` job with conditional `HIVE_TOKEN` guard (HIVE-001)      |
 
 ---
 

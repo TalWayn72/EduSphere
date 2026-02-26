@@ -299,6 +299,46 @@ jobs:
           path: apps/web/playwright-report/
           retention-days: 7
 
+  # HIVE-001: skip if HIVE_TOKEN not configured
+  schema-check:
+    name: GraphQL Hive Schema Check (conditional)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint, typecheck]
+    env:
+      HIVE_TOKEN: ${{ secrets.HIVE_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # HIVE-001: skip if HIVE_TOKEN not configured
+      - name: Run schema:check against Hive registry
+        if: env.HIVE_TOKEN != ''
+        run: pnpm --filter @edusphere/gateway schema:check
+        env:
+          HIVE_TOKEN: ${{ secrets.HIVE_TOKEN }}
+
+      - name: Skip schema:check (HIVE_TOKEN not set)
+        if: env.HIVE_TOKEN == ''
+        run: |
+          echo "::notice::HIVE-001: HIVE_TOKEN secret is not configured — skipping schema:check."
+          echo "To enable breaking-change detection, add HIVE_TOKEN to GitHub repository secrets."
+
   codegen-validation:
     name: GraphQL Codegen Validation
     runs-on: ubuntu-latest
@@ -409,12 +449,15 @@ jobs:
         build,
         e2e-tests,
         codegen-validation,
+        schema-check,
       ]
     if: always()
 
     steps:
       - name: Check all jobs succeeded
         run: |
+          # HIVE-001: schema-check is always "success" even when HIVE_TOKEN is absent
+          # because the conditional step reports skip (not failure) and the job succeeds.
           if [[ "${{ needs.lint.result }}" != "success" || \
                 "${{ needs.typecheck.result }}" != "success" || \
                 "${{ needs.unit-tests.result }}" != "success" || \
