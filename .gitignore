@@ -111,3 +111,10 @@ apps/web/nul
 apps/web/C:*
 apps/web/C*Users*AppData*
 "apps/web/C*"
+.tmp-ci-check.cjs
+.tmp-ci-detailed.cjs
+.tmp-ci-history.cjs
+.tmp-ci-logs.cjs
+.tmp-ci-prev.cjs
+ci_docs.json
+ci_docs_jobs.json
