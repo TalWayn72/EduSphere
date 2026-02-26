@@ -1,10 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationLayer } from '@/types/annotations';
 
-// Mock all ProseMirror/Tiptap imports (aliased to stub in vitest.config.ts)
+// Mock all ProseMirror/Tiptap imports (aliased to stub in vitest.config.ts).
+// Plugin and PluginKey are used with `new` in production code, so their mocks
+// must be constructable — use function expressions, not arrow functions.
 vi.mock('@tiptap/pm/state', () => ({
-  Plugin: vi.fn().mockImplementation((config) => ({ ...config, isPlugin: true })),
-  PluginKey: vi.fn().mockImplementation((name) => ({ name, getState: vi.fn() })),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Plugin: vi.fn(function (this: Record<string, unknown>, config: Record<string, unknown>) {
+    Object.assign(this, config);
+    (this as Record<string, unknown>).isPlugin = true;
+  }),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PluginKey: vi.fn(function (this: Record<string, unknown>, name: string) {
+    this.name = name;
+    this.getState = vi.fn();
+  }),
 }));
 
 vi.mock('@tiptap/pm/view', () => {
