@@ -48,7 +48,7 @@ function makeRankResponse(
 describe('LeaderboardWidget', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetCurrentUser.mockReturnValue({ id: 'me', firstName: 'Alice', lastName: 'Cohen' });
+    mockGetCurrentUser.mockReturnValue({ id: 'me', firstName: 'Alice', lastName: 'Cohen', username: 'alice', email: 'alice@example.com', tenantId: 'tenant-1', role: 'STUDENT', scopes: [] });
   });
 
   it('renders "Leaderboard" heading', () => {

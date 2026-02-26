@@ -118,7 +118,7 @@ describe('CommentCard — long text truncation', () => {
         onFocus={onFocus}
       />
     );
-    fireEvent.click(screen.getAllByText('show more')[0]);
+    fireEvent.click(screen.getAllByText('show more')[0]!);
     expect(onFocus).not.toHaveBeenCalled();
   });
 });

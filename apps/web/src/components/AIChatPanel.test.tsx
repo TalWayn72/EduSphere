@@ -330,10 +330,7 @@ describe('AIChatPanel', () => {
       ({
         children,
         onValueChange,
-      }: {
-        children: React.ReactNode;
-        onValueChange?: (value: string) => void;
-      }) => (
+      }: React.ComponentProps<typeof selectModule.Select>) => (
         <div data-testid="select-root">
           {/* Expose a hidden button so tests can trigger onValueChange */}
           <button

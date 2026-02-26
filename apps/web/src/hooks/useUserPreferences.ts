@@ -75,8 +75,7 @@ export function useUserPreferences(): UseUserPreferencesReturn {
         await updatePreferences({ input: { locale: tenantDefault } });
       })();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availableLocales, tenantDefault]);
+  }, [availableLocales, currentLocale, tenantDefault, i18n, updatePreferences]);
 
   const setLocale = useCallback(
     async (locale: SupportedLocale): Promise<void> => {

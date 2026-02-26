@@ -286,10 +286,10 @@ jobs:
         run: pnpm --filter @edusphere/web exec playwright install --with-deps chromium
 
       - name: Run Playwright E2E tests
-        run: pnpm --filter @edusphere/web test:e2e -- --ignore-snapshots
+        run: pnpm --filter @edusphere/web test:e2e
         env:
           # CI mode: no real backend, Playwright starts Vite dev server automatically
-          # --ignore-snapshots: skip visual regression baselines (not committed to repo)
+          # ignoreSnapshots is set in playwright.config.ts when CI=true
           CI: true
 
       - name: Upload Playwright report

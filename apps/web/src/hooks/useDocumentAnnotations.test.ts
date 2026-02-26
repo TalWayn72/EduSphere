@@ -263,6 +263,50 @@ describe('useDocumentAnnotations', () => {
     });
   });
 
+  // ── hasSpatialData false-branch coverage (lines 59-61) ─────────────────
+
+  it('excludes annotation where spatialData.to <= spatialData.from (invalid range)', () => {
+    const badRange = {
+      ...BASE_ANNOTATION,
+      id: 'ann-bad-range',
+      layer: AnnotationLayer.PERSONAL,
+      spatialData: { from: 50, to: 30 }, // to < from → invalid
+    } as unknown as Annotation;
+
+    vi.mocked(useAnnotations).mockReturnValue({
+      annotations: [badRange],
+      addAnnotation: vi.fn(),
+      addReply: vi.fn(),
+      fetching: false,
+      isPending: false,
+      error: null,
+    });
+
+    const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
+    expect(result.current.textAnnotations).toHaveLength(0);
+  });
+
+  it('excludes annotation with no textRange and no spatialData', () => {
+    const noRange = {
+      ...BASE_ANNOTATION,
+      id: 'ann-no-range',
+      layer: AnnotationLayer.PERSONAL,
+      // neither textRange nor spatialData
+    } as unknown as Annotation;
+
+    vi.mocked(useAnnotations).mockReturnValue({
+      annotations: [noRange],
+      addAnnotation: vi.fn(),
+      addReply: vi.fn(),
+      fetching: false,
+      isPending: false,
+      error: null,
+    });
+
+    const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
+    expect(result.current.textAnnotations).toHaveLength(0);
+  });
+
   it('delegates to useAnnotations — no second subscription created', () => {
     renderHook(() => useDocumentAnnotations('doc-1'));
     expect(vi.mocked(useAnnotations)).toHaveBeenCalledTimes(1);

@@ -631,7 +631,7 @@ describe('SearchPage', () => {
       const cards = container.querySelectorAll('[class*="cursor-pointer"]');
       expect(cards.length).toBeGreaterThan(0);
       // Clicking must not throw (navigation is handled by react-router MemoryRouter)
-      expect(() => fireEvent.click(cards[0])).not.toThrow();
+      expect(() => fireEvent.click(cards[0]!)).not.toThrow();
     });
 
     it('clicking a transcript result card does not throw', async () => {
@@ -676,7 +676,7 @@ describe('SearchPage', () => {
       const cards = container.querySelectorAll('[class*="cursor-pointer"]');
       expect(cards.length).toBeGreaterThan(0);
       // Card click navigates to /learn/content-15 — must not throw
-      expect(() => fireEvent.click(cards[0])).not.toThrow();
+      expect(() => fireEvent.click(cards[0]!)).not.toThrow();
     });
   });
 });

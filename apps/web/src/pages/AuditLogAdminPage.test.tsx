@@ -480,7 +480,7 @@ describe('AuditLogAdminPage', () => {
     });
 
     // Extract the action.onClick from the toast.success call and invoke it
-    const toastSuccessCall = vi.mocked(toast.success).mock.calls[0];
+    const toastSuccessCall = vi.mocked(toast.success).mock.calls[0]!;
     // toastSuccessCall[1] is the options object: { action: { label, onClick }, duration }
     const toastOptions = toastSuccessCall[1] as {
       action: { label: string; onClick: () => void };

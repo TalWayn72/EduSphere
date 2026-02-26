@@ -4,8 +4,8 @@ import { ModuleService } from './module.service.js';
 
 type ModuleMapped = Awaited<
   ReturnType<ModuleService['findByCourseIdBatch']>
-> extends Map<string, infer V>
-  ? V[number]
+> extends Map<string, Array<infer V>>
+  ? V
   : never;
 
 /**

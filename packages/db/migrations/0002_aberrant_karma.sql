@@ -829,13 +829,13 @@ CREATE TABLE "knowledge_sources" (
 --> statement-breakpoint
 ALTER TABLE "users" ALTER COLUMN "display_name" SET DEFAULT '';--> statement-breakpoint
 ALTER TABLE "courses" ALTER COLUMN "creator_id" DROP NOT NULL;--> statement-breakpoint
-ALTER TABLE "users" ADD COLUMN "first_name" varchar(100) DEFAULT '' NOT NULL;--> statement-breakpoint
-ALTER TABLE "users" ADD COLUMN "last_name" varchar(100) DEFAULT '' NOT NULL;--> statement-breakpoint
-ALTER TABLE "courses" ADD COLUMN "slug" text DEFAULT '' NOT NULL;--> statement-breakpoint
-ALTER TABLE "courses" ADD COLUMN "thumbnail_url" text;--> statement-breakpoint
-ALTER TABLE "courses" ADD COLUMN "instructor_id" uuid;--> statement-breakpoint
-ALTER TABLE "courses" ADD COLUMN "is_published" boolean DEFAULT false NOT NULL;--> statement-breakpoint
-ALTER TABLE "courses" ADD COLUMN "estimated_hours" integer;--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "first_name" varchar(100) DEFAULT '' NOT NULL;--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "last_name" varchar(100) DEFAULT '' NOT NULL;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN IF NOT EXISTS "slug" text DEFAULT '' NOT NULL;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN IF NOT EXISTS "thumbnail_url" text;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN IF NOT EXISTS "instructor_id" uuid;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN IF NOT EXISTS "is_published" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN IF NOT EXISTS "estimated_hours" integer;--> statement-breakpoint
 ALTER TABLE "courses" ADD COLUMN "is_compliance" boolean DEFAULT false NOT NULL;--> statement-breakpoint
 ALTER TABLE "courses" ADD COLUMN "compliance_due_date" timestamp with time zone;--> statement-breakpoint
 ALTER TABLE "media_assets" ADD COLUMN "hls_manifest_key" text;--> statement-breakpoint

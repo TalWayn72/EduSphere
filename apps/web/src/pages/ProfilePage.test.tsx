@@ -35,6 +35,7 @@ vi.mock('urql', async (importOriginal) => {
 });
 
 import { getCurrentUser } from '@/lib/auth';
+import * as urqlModule from 'urql';
 import { ProfilePage } from './ProfilePage';
 
 // ── Fixtures ───────────────────────────────────────────────────────────────
@@ -202,5 +203,56 @@ describe('ProfilePage', () => {
     const backBtn = screen.getByRole('button', { name: /back/i });
     fireEvent.click(backBtn);
     expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  // ── Courses fetching state (line 107 branch) ──────────────────────────────
+
+  it('shows "..." in Courses Available stat when courses are loading', () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: true, error: undefined },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    // coursesResult.fetching = true → stats value is '...'
+    expect(screen.getByText('...')).toBeInTheDocument();
+  });
+
+  // ── Courses available count (line 101 branch) ─────────────────────────────
+
+  it('shows courses count when course data is available', () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        {
+          data: { courses: [{ id: 'c1' }, { id: 'c2' }, { id: 'c3' }] },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    // coursesCount = 3 → stats value is '3'
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  // ── Missing tenantId fallback (line 186-190 branch) ──────────────────────
+
+  it('shows "Not available" when tenantId is empty', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...STUDENT_USER,
+      tenantId: '',
+    });
+    renderPage();
+    expect(screen.getByText(/Not available/i)).toBeInTheDocument();
   });
 });

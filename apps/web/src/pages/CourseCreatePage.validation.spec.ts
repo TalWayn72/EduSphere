@@ -4,7 +4,10 @@
  * These tests validate the courseSchema directly (no DOM required) and
  * confirm that the correct error messages are produced for each field.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('@/lib/urql-client', () => ({ urqlClient: {}, disposeWsClient: vi.fn() }));
+
 import { courseSchema } from './CourseCreatePage';
 
 describe('courseSchema', () => {

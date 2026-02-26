@@ -279,8 +279,8 @@ describe('MyOpenBadgesPage', () => {
   it('renders badge image when imageUrl is provided', () => {
     const badgeWithImage = [
       {
-        ...MOCK_BADGES[0],
-        definition: { ...MOCK_BADGES[0].definition, imageUrl: 'https://example.com/badge.png' },
+        ...MOCK_BADGES[0]!,
+        definition: { ...MOCK_BADGES[0]!.definition, imageUrl: 'https://example.com/badge.png' },
       },
     ];
     mockQuery({ data: { myOpenBadges: badgeWithImage } });

@@ -86,6 +86,9 @@ export default defineConfig({
   /* Fail build in CI if test.only() was accidentally committed */
   forbidOnly: !!process.env.CI,
 
+  /* Skip snapshot comparisons in CI — no baseline images committed to repo */
+  ignoreSnapshots: !!process.env.CI,
+
   /**
    * Retry flaky tests.
    * CI: 2 retries for timing-sensitive streaming assertions.
@@ -174,9 +177,9 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        // Use installed system Chrome when Playwright's own Chromium is
-        // unavailable (e.g. corporate proxy blocks playwright.dev downloads).
-        channel: 'chrome',
+        // Use system Chrome locally (faster startup).
+        // In CI, playwright install installs Chromium — do not use 'chrome' channel there.
+        ...(process.env.CI ? {} : { channel: 'chrome' }),
       },
     },
     /* Uncomment to test additional browsers in CI:
