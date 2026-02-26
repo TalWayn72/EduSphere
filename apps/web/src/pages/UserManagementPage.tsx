@@ -72,7 +72,9 @@ export function UserManagementPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [editingRole, setEditingRole] = useState<Record<string, string>>({});
-  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(null);
+  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(
+    null
+  );
   const [confirmRoleChange, setConfirmRoleChange] = useState<{
     userId: string;
     newRole: string;
@@ -94,7 +96,9 @@ export function UserManagementPage() {
       limit: PAGE_SIZE,
       offset: page * PAGE_SIZE,
       search: appliedSearch || undefined,
-      role: (appliedRole === 'all' ? undefined : appliedRole) as UserRole | undefined,
+      role: (appliedRole === 'all' ? undefined : appliedRole) as
+        | UserRole
+        | undefined,
     },
   });
 

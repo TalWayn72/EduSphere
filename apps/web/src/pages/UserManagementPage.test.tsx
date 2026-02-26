@@ -65,16 +65,36 @@ vi.mock('./UserManagementPage.modals', () => ({
 // Mock shadcn Select: <div> wrapper (so SelectValue text is visible) +
 // hidden native <select> (implicit combobox role) for fireEvent.change interaction
 vi.mock('@/components/ui/select', () => ({
-  Select: ({ value, onValueChange, children }: { value: string; onValueChange?: (v: string) => void; children: React.ReactNode }) => (
+  Select: ({
+    value,
+    onValueChange,
+    children,
+  }: {
+    value: string;
+    onValueChange?: (v: string) => void;
+    children: React.ReactNode;
+  }) => (
     <div>
       {children}
       <select value={value} onChange={(e) => onValueChange?.(e.target.value)} />
     </div>
   ),
-  SelectTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectContent: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) => <option value={value}>{children}</option>,
-  SelectValue: ({ placeholder }: { placeholder?: string }) => <span>{placeholder}</span>,
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  SelectContent: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
+  SelectItem: ({
+    value,
+    children,
+  }: {
+    value: string;
+    children: React.ReactNode;
+  }) => <option value={value}>{children}</option>,
+  SelectValue: ({ placeholder }: { placeholder?: string }) => (
+    <span>{placeholder}</span>
+  ),
 }));
 
 import { useQuery, useMutation } from 'urql';
@@ -127,7 +147,9 @@ describe('UserManagementPage', () => {
       vi.fn().mockResolvedValue({ error: undefined }),
     ] as unknown as ReturnType<typeof useMutation>);
 
-    vi.mocked(getCurrentUser).mockReturnValue({ tenantId: 'auth-tenant-1' } as ReturnType<typeof getCurrentUser>);
+    vi.mocked(getCurrentUser).mockReturnValue({
+      tenantId: 'auth-tenant-1',
+    } as ReturnType<typeof getCurrentUser>);
     vi.mocked(toast.success).mockClear();
     vi.mocked(toast.error).mockClear();
     mockNavigate.mockClear();
@@ -216,9 +238,7 @@ describe('UserManagementPage', () => {
 
   it('Previous page button is disabled on first page', () => {
     renderPage();
-    expect(
-      screen.getByRole('button', { name: /previous/i })
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
   });
 
   it('search input triggers apply on Enter key', () => {
@@ -252,8 +272,12 @@ describe('UserManagementPage', () => {
 
     // confirmRoleChange state set → shows "→ STUDENT?" + Confirm/Cancel
     expect(screen.getByText(/→ STUDENT\?/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^confirm$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^cancel$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^confirm$/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^cancel$/i })
+    ).toBeInTheDocument();
   });
 
   it('cancels role confirmation on Cancel click', () => {
@@ -266,17 +290,22 @@ describe('UserManagementPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }));
 
     expect(screen.queryByText(/→ STUDENT\?/)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /^confirm$/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^confirm$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls updateUser and shows success toast on Confirm', async () => {
     const mockUpdateUser = vi.fn().mockResolvedValue({ error: undefined });
     // useMutation called 3×: deactivate, reset, update — return mockUpdateUser for all
     // so that whichever call resolves, updateUser is captured
-    vi.mocked(useMutation).mockImplementation(() => [
-      { fetching: false, error: undefined },
-      mockUpdateUser,
-    ] as unknown as ReturnType<typeof useMutation>);
+    vi.mocked(useMutation).mockImplementation(
+      () =>
+        [
+          { fetching: false, error: undefined },
+          mockUpdateUser,
+        ] as unknown as ReturnType<typeof useMutation>
+    );
 
     renderPage();
 
@@ -336,14 +365,19 @@ describe('UserManagementPage', () => {
       .mockResolvedValue({ error: new Error('server error') });
 
     // mockImplementation is stable across re-renders (unlike mockReturnValueOnce)
-    vi.mocked(useMutation).mockImplementation(() => [
-      { fetching: false, error: undefined },
-      mockDeactivateUser,
-    ] as unknown as ReturnType<typeof useMutation>);
+    vi.mocked(useMutation).mockImplementation(
+      () =>
+        [
+          { fetching: false, error: undefined },
+          mockDeactivateUser,
+        ] as unknown as ReturnType<typeof useMutation>
+    );
 
     renderPage();
 
-    const deactivateButtons = screen.getAllByRole('button', { name: /deactivate/i });
+    const deactivateButtons = screen.getAllByRole('button', {
+      name: /deactivate/i,
+    });
     fireEvent.click(deactivateButtons[0]);
 
     const confirmButton = screen.getByRole('button', { name: /^confirm$/i });

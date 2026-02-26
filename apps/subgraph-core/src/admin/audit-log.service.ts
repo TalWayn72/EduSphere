@@ -206,16 +206,11 @@ export class AuditLogService implements OnModuleDestroy {
     return { presignedUrl, expiresAt, recordCount: entries.length };
   }
 
-  async scheduleGdprErasure(
-    userId: string,
-    tenantId: string
-  ): Promise<void> {
+  async scheduleGdprErasure(userId: string, tenantId: string): Promise<void> {
     // Delete audit log entries for user (GDPR Art.17 right to erasure).
     // Entries older than 30 days are permanently deleted; newer entries are
     // anonymised (userId set to null, IP/userAgent cleared).
-    const thirtyDaysAgo = new Date(
-      Date.now() - 30 * 24 * 60 * 60 * 1000
-    );
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
     // Anonymise recent entries (keep audit trail but remove PII)
     await db

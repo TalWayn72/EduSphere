@@ -44,8 +44,12 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const mockTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const mockStreamRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mockTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const mockStreamRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
   const { t } = useTranslation('agents');
 
   const [, startSession] = useMutation(START_AGENT_SESSION_MUTATION);
@@ -73,7 +77,11 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
       if (exists) {
         return prev.map((m) =>
           m.id === (msg as { id: string }).id
-            ? { ...m, content: (msg as { content: string }).content, isStreaming: false }
+            ? {
+                ...m,
+                content: (msg as { content: string }).content,
+                isStreaming: false,
+              }
             : m
         );
       }
@@ -131,7 +139,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
         setMessages((prev) => [...prev, agentMsg]);
         mockStreamRef.current = setTimeout(() => {
           setMessages((prev) =>
-            prev.map((m) => (m.id === agentMsg.id ? { ...m, isStreaming: false } : m))
+            prev.map((m) =>
+              m.id === agentMsg.id ? { ...m, isStreaming: false } : m
+            )
           );
           setIsStreaming(false);
         }, 1000);
@@ -146,7 +156,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           templateType: AGENT_TO_TEMPLATE[selectedAgent],
           context: {},
         });
-        sid = (res.data?.startAgentSession as { id?: string } | undefined)?.id ?? null;
+        sid =
+          (res.data?.startAgentSession as { id?: string } | undefined)?.id ??
+          null;
         if (sid) setSessionId(sid);
       }
       if (sid) {
@@ -191,14 +203,25 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
             <Sparkles className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">{t('chatPanel.title')}</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8" aria-label="Close AI chat">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsOpen(false)}
+            className="h-8 w-8"
+            aria-label="Close AI chat"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
 
         <div className="p-4 border-b bg-background">
-          <label className="text-sm font-medium mb-2 block">{t('selectAgent')}</label>
-          <Select value={selectedAgent} onValueChange={(v) => setSelectedAgent(v as AgentType)}>
+          <label className="text-sm font-medium mb-2 block">
+            {t('selectAgent')}
+          </label>
+          <Select
+            value={selectedAgent}
+            onValueChange={(v) => setSelectedAgent(v as AgentType)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -224,7 +247,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
               <Sparkles className="h-12 w-12 mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">{t('chatPanel.startConversation')}</p>
+              <p className="text-lg font-medium mb-2">
+                {t('chatPanel.startConversation')}
+              </p>
               <p className="text-sm max-w-xs">
                 Ask me anything about {currentAgent.name.toLowerCase()} topics!
               </p>
@@ -232,7 +257,11 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           ) : (
             <>
               {messages.map((message) => (
-                <ChatMessage key={message.id} message={message} agentName={currentAgent.name} />
+                <ChatMessage
+                  key={message.id}
+                  message={message}
+                  agentName={currentAgent.name}
+                />
               ))}
               <div ref={messagesEndRef} />
             </>
@@ -260,7 +289,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">{t('chatPanel.inputHint')}</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            {t('chatPanel.inputHint')}
+          </p>
         </div>
       </div>
 
