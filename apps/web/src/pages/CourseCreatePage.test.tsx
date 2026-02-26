@@ -7,6 +7,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { useState } from 'react';
 import type { AuthUser } from '@/lib/auth';
 
 // ── Mocks ──────────────────────────────────────────────────────────────────
@@ -52,6 +53,94 @@ vi.mock('@/components/ui/select', () => ({
 // Stub Media step — requires Hocuspocus/Yjs which can't run in jsdom
 vi.mock('./CourseWizardMediaStep', () => ({
   CourseWizardMediaStep: () => <div data-testid="media-step">Media Upload</div>,
+}));
+
+// Stub Step 2 — now lazy-loaded; mock so Suspense resolves synchronously in jsdom
+vi.mock('./CourseWizardStep2', () => ({
+  CourseWizardStep2: ({
+    modules,
+    onChange,
+  }: {
+    modules: Array<{ title: string; order: number }>;
+    onChange: (updates: { modules: Array<{ title: string; order: number }> }) => void;
+  }) => {
+    const [moduleTitle, setModuleTitle] = useState('');
+    return (
+      <div>
+        {modules.length === 0 ? (
+          <p>No modules yet</p>
+        ) : (
+          <ul>
+            {modules.map((m, i) => (
+              <li key={i}>
+                <span>Module {i + 1}</span>
+                <span>{m.title}</span>
+                <button
+                  type="button"
+                  aria-label="Remove module"
+                  onClick={() => onChange({ modules: modules.filter((_, idx) => idx !== i) })}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <label htmlFor="mock-module-title">Module Title</label>
+        <input
+          id="mock-module-title"
+          value={moduleTitle}
+          onChange={(e) => setModuleTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && moduleTitle.trim()) {
+              onChange({ modules: [...modules, { title: moduleTitle.trim(), order: modules.length + 1 }] });
+              setModuleTitle('');
+            }
+          }}
+        />
+        <button
+          type="button"
+          disabled={!moduleTitle.trim()}
+          onClick={() => {
+            onChange({ modules: [...modules, { title: moduleTitle.trim(), order: modules.length + 1 }] });
+            setModuleTitle('');
+          }}
+        >
+          Add Module
+        </button>
+      </div>
+    );
+  },
+}));
+
+// Stub Step 3 (Publish/Review) — now lazy-loaded; mock so Suspense resolves synchronously
+vi.mock('./CourseWizardStep3', () => ({
+  CourseWizardStep3: ({
+    data,
+    onPublish,
+    isSubmitting,
+  }: {
+    data: { title: string; modules: Array<{ title: string }> };
+    onPublish: (isPublished: boolean) => void;
+    isSubmitting: boolean;
+  }) => (
+    <div>
+      <p>Review your course before publishing</p>
+      <p>{data.title}</p>
+      {data.modules.length > 0 && (
+        <>
+          <p>{data.modules.length} module{data.modules.length !== 1 ? 's' : ''}</p>
+          {data.modules.map((m, i) => <p key={i}>{m.title}</p>)}
+        </>
+      )}
+      <button type="button" disabled={isSubmitting} onClick={() => onPublish(true)}>
+        Publish Course
+      </button>
+      <button type="button" disabled={isSubmitting} onClick={() => onPublish(false)}>
+        Save as Draft
+      </button>
+    </div>
+  ),
 }));
 
 // Stub sonner toast — prevents real toast system from mounting
@@ -108,6 +197,10 @@ async function advanceToStep2(title = 'Test Course That Is Long Enough') {
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
   });
+  // CourseWizardStep2 is lazy-loaded — wait for it to mount before interacting
+  await waitFor(() =>
+    expect(screen.getByLabelText(/module title/i)).toBeInTheDocument()
+  );
 }
 
 /** Navigate the wizard to Step 3 (Publish/Review) */
@@ -117,10 +210,20 @@ async function advanceToStep3(title = 'Test Course That Is Long Enough') {
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
   });
+  // CourseWizardMediaStep is lazy-loaded (mocked) — wait for it to mount
+  await waitFor(() =>
+    expect(screen.getByTestId('media-step')).toBeInTheDocument()
+  );
   // Step 3 (Media) → Step 4 (Publish)
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
   });
+  // CourseWizardStep3 is lazy-loaded — wait for Publish button to appear
+  await waitFor(() =>
+    expect(
+      screen.getByRole('button', { name: /publish course/i })
+    ).toBeInTheDocument()
+  );
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────
