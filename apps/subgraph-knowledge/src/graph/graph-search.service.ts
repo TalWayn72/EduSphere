@@ -81,7 +81,7 @@ export class GraphSearchService {
         const remaining = limit - vectorResults.length;
         let textResults: SemanticResult[] = [];
         if (remaining > 0) {
-          const searchTerm = `%${query.replace(/%/g, '\%').replace(/_/g, '\_')}%`;
+          const searchTerm = `%${query.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`;
           const segments = await db
             .select({
               id: transcript_segments.id,

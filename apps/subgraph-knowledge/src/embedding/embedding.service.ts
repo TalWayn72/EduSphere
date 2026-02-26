@@ -261,7 +261,7 @@ export class EmbeddingService implements OnModuleDestroy {
     query: string,
     limit: number
   ): Promise<SearchResult[]> {
-    const escaped = query.replace(/%/g, '\%').replace(/_/g, '\_');
+    const escaped = query.replace(/%/g, '\\%').replace(/_/g, '\\_');
     const term = '%' + escaped + '%';
     const rows = await this.db
       .select({

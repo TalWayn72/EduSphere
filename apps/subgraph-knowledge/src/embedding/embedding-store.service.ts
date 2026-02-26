@@ -163,7 +163,7 @@ export class EmbeddingStoreService implements OnModuleDestroy {
   }
 
   async ilikeFallback(query: string, limit: number): Promise<SearchResult[]> {
-    const term = `%${query.replace(/%/g, '\%').replace(/_/g, '\_')}%`;
+    const term = `%${query.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`;
     const rows = await this.db
       .select({
         id: schema.transcript_segments.id,

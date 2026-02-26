@@ -70,6 +70,10 @@ Thumbs.db
 .tmp-*.js
 .tmp-*.mjs
 .tmp-*.cjs
+
+# Playwright generated reports (contain minified JS that triggers CodeQL false positives)
+apps/web/playwright-report/
+apps/web/test-results/
 test_output.txt
 *.temp
 *.bak

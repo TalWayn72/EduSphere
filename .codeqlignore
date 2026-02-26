@@ -1,0 +1,21 @@
+# Files excluded from CodeQL analysis
+
+# Generated Playwright HTML reports — contain minified third-party JS
+# that triggers false-positive CodeQL alerts (not our code)
+apps/web/playwright-report/
+apps/web/test-results/
+
+# Generated GraphQL types — codegen output, not source code
+packages/graphql-types/src/generated/
+
+# Compiled build output
+apps/*/dist/
+apps/*/build/
+packages/*/dist/
+
+# Seed data — not production code, acceptable escaping patterns
+packages/db/src/seed/
+
+# Test fixture data
+**/*.fixture.ts
+**/*.fixtures.ts
