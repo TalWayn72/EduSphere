@@ -121,7 +121,10 @@ export default defineConfig({
         'src/components/editor/RichContentViewer.tsx',
         'src/components/editor/RichDocumentEditor.tsx',
         'src/components/editor/RichEditor.tsx',
+        'src/components/editor/EditorToolbar.tsx',
         'src/components/editor/index.ts',
+        // ProseMirror plugin — requires live Tiptap EditorView (DOM), not testable in jsdom
+        'src/components/annotation/AnnotationDecorationsPlugin.ts',
         // Quiz, SCORM and portal-builder components — Tier-2/3 features, tested via E2E
         'src/components/quiz/**',
         'src/components/scorm/**',
@@ -242,6 +245,8 @@ export default defineConfig({
         'src/hooks/useSubmitAssignment.ts',
         // useVideoAnnotations requires HTMLVideoElement APIs not available in jsdom
         'src/hooks/useVideoAnnotations.ts',
+        // useNotifications uses GraphQL subscription (WebSocket + NATS) — requires live server
+        'src/hooks/useNotifications.ts',
         // urql client config — instantiates real HTTP/WS connections, not unit-testable
         'src/lib/urql-client.ts',
         // auth.ts wraps Keycloak-js which requires a real browser + OIDC server

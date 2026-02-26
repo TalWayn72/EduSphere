@@ -1027,4 +1027,262 @@ input CreateTopicClusterInput @join__type(graph: KNOWLEDGE)  {
   name: String!
   description: String
 }
-    
+
+# ── User extended types (user.graphql) ────────────────────────────────────────
+
+type UserPreferences @join__type(graph: CORE)  {
+  locale: String! @join__field(graph: CORE)
+  theme: String! @join__field(graph: CORE)
+  emailNotifications: Boolean! @join__field(graph: CORE)
+  pushNotifications: Boolean! @join__field(graph: CORE)
+  isPublicProfile: Boolean! @join__field(graph: CORE)
+}
+
+type PublicCourse @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  completedAt: DateTime! @join__field(graph: CORE)
+}
+
+type PublicProfile @join__type(graph: CORE)  {
+  userId: ID! @join__field(graph: CORE)
+  displayName: String! @join__field(graph: CORE)
+  bio: String @join__field(graph: CORE)
+  avatarUrl: String @join__field(graph: CORE)
+  joinedAt: DateTime! @join__field(graph: CORE)
+  currentStreak: Int! @join__field(graph: CORE)
+  longestStreak: Int! @join__field(graph: CORE)
+  completedCoursesCount: Int! @join__field(graph: CORE)
+  completedCourses: [PublicCourse!]! @join__field(graph: CORE)
+  badgesCount: Int! @join__field(graph: CORE)
+  conceptsMastered: Int! @join__field(graph: CORE)
+  totalLearningMinutes: Int! @join__field(graph: CORE)
+}
+
+type BulkImportResult @join__type(graph: CORE)  {
+  created: Int! @join__field(graph: CORE)
+  updated: Int! @join__field(graph: CORE)
+  failed: Int! @join__field(graph: CORE)
+  errors: [String!]! @join__field(graph: CORE)
+}
+
+type AdminUsersResult @join__type(graph: CORE)  {
+  users: [User!]! @join__field(graph: CORE)
+  total: Int! @join__field(graph: CORE)
+}
+
+input UpdateUserPreferencesInput @join__type(graph: CORE)  {
+  locale: String
+  theme: String
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+}
+
+# ── Gamification + Open Badges 3.0 (gamification.graphql) ────────────────────
+
+type Badge @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  name: String! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  iconEmoji: String! @join__field(graph: CORE)
+  category: String! @join__field(graph: CORE)
+  pointsReward: Int! @join__field(graph: CORE)
+  conditionType: String! @join__field(graph: CORE)
+  conditionValue: Int! @join__field(graph: CORE)
+}
+
+type UserBadge @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  badge: Badge! @join__field(graph: CORE)
+  earnedAt: DateTime! @join__field(graph: CORE)
+}
+
+type LeaderboardEntry @join__type(graph: CORE)  {
+  rank: Int! @join__field(graph: CORE)
+  userId: ID! @join__field(graph: CORE)
+  displayName: String! @join__field(graph: CORE)
+  totalPoints: Int! @join__field(graph: CORE)
+  badgeCount: Int! @join__field(graph: CORE)
+}
+
+type OpenBadgeDefinition @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  name: String! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  imageUrl: String @join__field(graph: CORE)
+  criteriaUrl: String @join__field(graph: CORE)
+  tags: [String!]! @join__field(graph: CORE)
+  issuerId: String! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type OpenBadgeAssertion @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  badgeDefinitionId: ID! @join__field(graph: CORE)
+  recipientId: ID! @join__field(graph: CORE)
+  issuedAt: String! @join__field(graph: CORE)
+  expiresAt: String @join__field(graph: CORE)
+  evidenceUrl: String @join__field(graph: CORE)
+  revoked: Boolean! @join__field(graph: CORE)
+  revokedAt: String @join__field(graph: CORE)
+  revokedReason: String @join__field(graph: CORE)
+  definition: OpenBadgeDefinition! @join__field(graph: CORE)
+  vcDocument: String! @join__field(graph: CORE)
+}
+
+input CreateBadgeInput @join__type(graph: CORE)  {
+  name: String!
+  description: String!
+  iconEmoji: String!
+  category: String!
+  pointsReward: Int!
+  conditionType: String!
+  conditionValue: Int!
+}
+
+input UpdateBadgeInput @join__type(graph: CORE)  {
+  name: String
+  description: String
+  iconEmoji: String
+  category: String
+  pointsReward: Int
+  conditionType: String
+  conditionValue: Int
+}
+
+# ── SRS / Spaced-Repetition (srs.graphql) ─────────────────────────────────────
+
+type SRSCard @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  conceptName: String! @join__field(graph: CORE)
+  dueDate: DateTime! @join__field(graph: CORE)
+  intervalDays: Int! @join__field(graph: CORE)
+  easeFactor: Float! @join__field(graph: CORE)
+  repetitions: Int! @join__field(graph: CORE)
+  lastReviewedAt: DateTime @join__field(graph: CORE)
+}
+
+# ── Tenant branding & language (tenant.graphql) ───────────────────────────────
+
+type TenantLanguageSettings @join__type(graph: CORE)  {
+  supportedLanguages: [String!]! @join__field(graph: CORE)
+  defaultLanguage: String! @join__field(graph: CORE)
+}
+
+type TenantBranding @join__type(graph: CORE)  {
+  logoUrl: String! @join__field(graph: CORE)
+  logoMarkUrl: String @join__field(graph: CORE)
+  faviconUrl: String! @join__field(graph: CORE)
+  primaryColor: String! @join__field(graph: CORE)
+  secondaryColor: String! @join__field(graph: CORE)
+  accentColor: String! @join__field(graph: CORE)
+  backgroundColor: String! @join__field(graph: CORE)
+  fontFamily: String! @join__field(graph: CORE)
+  organizationName: String! @join__field(graph: CORE)
+  tagline: String @join__field(graph: CORE)
+  privacyPolicyUrl: String @join__field(graph: CORE)
+  termsOfServiceUrl: String @join__field(graph: CORE)
+  supportEmail: String @join__field(graph: CORE)
+  hideEduSphereBranding: Boolean! @join__field(graph: CORE)
+}
+
+input UpdateTenantBrandingInput @join__type(graph: CORE)  {
+  logoUrl: String
+  logoMarkUrl: String
+  faviconUrl: String
+  primaryColor: String
+  secondaryColor: String
+  accentColor: String
+  backgroundColor: String
+  fontFamily: String
+  organizationName: String
+  tagline: String
+  privacyPolicyUrl: String
+  termsOfServiceUrl: String
+  supportEmail: String
+  hideEduSphereBranding: Boolean
+}
+
+input UpdateTenantLanguageSettingsInput @join__type(graph: CORE)  {
+  supportedLanguages: [String!]!
+  defaultLanguage: String!
+}
+
+# ── SCIM provisioning (scim.graphql) ─────────────────────────────────────────
+
+type ScimToken @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  lastUsedAt: DateTime @join__field(graph: CORE)
+  expiresAt: DateTime @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+}
+
+type ScimSyncEntry @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  operation: String! @join__field(graph: CORE)
+  externalId: String @join__field(graph: CORE)
+  status: String! @join__field(graph: CORE)
+  errorMessage: String @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+}
+
+type GenerateScimTokenResult @join__type(graph: CORE)  {
+  token: ScimToken! @join__field(graph: CORE)
+  rawToken: String! @join__field(graph: CORE)
+}
+
+input GenerateScimTokenInput @join__type(graph: CORE)  {
+  description: String!
+  expiresInDays: Int
+}
+
+# ── CRM integration (crm.graphql) ─────────────────────────────────────────────
+
+type CrmConnection @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  provider: String! @join__field(graph: CORE)
+  instanceUrl: String! @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type CrmSyncLogEntry @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  operation: String! @join__field(graph: CORE)
+  externalId: String @join__field(graph: CORE)
+  status: String! @join__field(graph: CORE)
+  errorMessage: String @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+# ── Portal builder (portal.graphql) ───────────────────────────────────────────
+
+type PortalBlock @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  type: String! @join__field(graph: CORE)
+  order: Int! @join__field(graph: CORE)
+  config: String! @join__field(graph: CORE)
+}
+
+type PortalPage @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  published: Boolean! @join__field(graph: CORE)
+  blocks: [PortalBlock!]! @join__field(graph: CORE)
+  updatedAt: String! @join__field(graph: CORE)
+}
+
+# ── Audit export (audit.graphql) ──────────────────────────────────────────────
+
+enum AuditExportFormat @join__type(graph: CORE)  {
+  CSV @join__enumValue(graph: CORE)
+  JSON @join__enumValue(graph: CORE)
+}
+
+type AuditExportResult @join__type(graph: CORE)  {
+  presignedUrl: String! @join__field(graph: CORE)
+  expiresAt: String! @join__field(graph: CORE)
+  recordCount: Int! @join__field(graph: CORE)
+}
