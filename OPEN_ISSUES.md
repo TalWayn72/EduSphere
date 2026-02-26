@@ -4195,3 +4195,45 @@ Full SCORM 1.2/2004 import pipeline + SCORM 1.2 API shim for in-platform playbac
 ### Test Results
 
 - 245 tests pass in subgraph-content (26 test files) ✅
+
+---
+
+## ✅ FIX-TEST-001: ResizeObserver + AIChatPanel Test Failures (26 פברואר 2026)
+
+| Field | Value |
+|-------|-------|
+| **Status** | ✅ Fixed |
+| **Severity** | 🟡 Medium |
+| **Branch** | `feat/improvements-wave1` |
+| **Commit** | `ce20f4a` |
+
+### Problem
+
+36 unit tests failing in `apps/web`:
+
+1. **ContentViewer.test.tsx (34 tests)** — `ReferenceError: ResizeObserver is not defined`
+   - Triggered by `@radix-ui/react-use-size` (used by Radix Select, Tooltip, etc.) — not available in jsdom
+2. **AIChatPanel.test.tsx (2 tests)**:
+   - `in DEV_MODE: a mock agent response appears after the timer fires` — Test timed out at 30s because `vi.useFakeTimers()` froze `waitFor`'s internal `setInterval`
+   - `renders a message that arrives via the subscription` — `useEffect([selectedAgent])` on mount cleared messages set by `useEffect([streamResult.data])`
+
+### Root Causes
+
+1. `ResizeObserver` is not defined in jsdom — needed a global stub in `src/test/setup.ts`
+2. `vi.useFakeTimers()` freezes ALL timers including `@testing-library/react`'s `waitFor` polling — must call `vi.useRealTimers()` before `waitFor`
+3. Multiple `useEffect` hooks on mount competing: `selectedAgent` effect calls `setMessages([])` after `streamResult.data` effect adds the message
+
+### Fix
+
+- `src/test/setup.ts`: Added `global.ResizeObserver` stub (observe/unobserve/disconnect no-ops)
+- `AIChatPanel.test.tsx`: Moved `vi.useRealTimers()` before `waitFor` in timer test
+- `AIChatPanel.test.tsx`: Subscription test renders first, then calls `rerender()` after mock update to simulate data arriving after mount
+
+### Files
+
+- `apps/web/src/test/setup.ts`
+- `apps/web/src/components/AIChatPanel.test.tsx`
+
+### Test Results After Fix
+
+- **686/686 tests pass** across 53 test files
