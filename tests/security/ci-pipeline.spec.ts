@@ -38,7 +38,8 @@ describe('CI Pipeline: Security Scanning Job (Phase 7)', () => {
   });
 
   it('should block on HIGH and CRITICAL Trivy findings', () => {
-    expect(CI_YML).toContain("severity: 'HIGH,CRITICAL'");
+    // Accept both single-quoted and double-quoted YAML values (Prettier may reformat)
+    expect(CI_YML).toMatch(/severity:\s+['"]HIGH,CRITICAL['"]/);
   });
 
   it('should generate SBOM in CycloneDX format', () => {
