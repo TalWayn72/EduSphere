@@ -213,7 +213,28 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   role(id: ID!) : Role @join__field(graph: CORE)  @authenticated
   userDelegations(userId: ID!) : [RoleDelegation!]! @join__field(graph: CORE)  @authenticated
   mySecuritySettings: SecuritySettings! @join__field(graph: CORE)  @authenticated
-  embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE) 
+  adminUsers(limit: Int = 50, offset: Int = 0, search: String, role: UserRole) : AdminUsersResult! @join__field(graph: CORE)  @authenticated
+  publicProfile(userId: ID!) : PublicProfile @join__field(graph: CORE)
+  myTenantBranding: TenantBranding! @join__field(graph: CORE)  @authenticated
+  myTenantLanguageSettings: TenantLanguageSettings! @join__field(graph: CORE)  @authenticated
+  myBadges: [UserBadge!]! @join__field(graph: CORE)  @authenticated
+  leaderboard(limit: Int) : [LeaderboardEntry!]! @join__field(graph: CORE)  @authenticated
+  myRank: Int! @join__field(graph: CORE)  @authenticated
+  myTotalPoints: Int! @join__field(graph: CORE)  @authenticated
+  adminBadges: [Badge!]! @join__field(graph: CORE)  @authenticated
+  myOpenBadges: [OpenBadgeAssertion!]! @join__field(graph: CORE)  @authenticated
+  verifyOpenBadge(assertionId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  dueReviews(limit: Int) : [SRSCard!]! @join__field(graph: CORE)  @authenticated
+  srsQueueCount: Int! @join__field(graph: CORE)  @authenticated
+  scimTokens: [ScimToken!]! @join__field(graph: CORE)  @authenticated
+  scimSyncLog(limit: Int) : [ScimSyncEntry!]! @join__field(graph: CORE)  @authenticated
+  crmConnection: CrmConnection @join__field(graph: CORE)  @authenticated
+  crmSyncLog(limit: Int) : [CrmSyncLogEntry!]! @join__field(graph: CORE)  @authenticated
+  myPortal: PortalPage @join__field(graph: CORE)  @authenticated
+  publicPortal: PortalPage @join__field(graph: CORE)
+  myFollowers(limit: Int) : [ID!]! @join__field(graph: CORE)  @authenticated
+  myFollowing(limit: Int) : [ID!]! @join__field(graph: CORE)  @authenticated
+  embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE)
   embeddingsByContentItem(contentItemId: ID!) : [Embedding!]! @join__field(graph: KNOWLEDGE) 
   semanticSearch(query: [Float!]!, limit: Int = 10, minSimilarity: Float = 0.7) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
   semanticSearchByContentItem(contentItemId: ID!, query: [Float!]!, limit: Int = 5) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
@@ -304,6 +325,30 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   delegateRole(userId: ID!, roleId: ID!, validUntil: String) : RoleDelegation! @join__field(graph: CORE)  @authenticated
   revokeDelegation(delegationId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
   updateSecuritySettings(input: UpdateSecuritySettingsInput!) : SecuritySettings! @join__field(graph: CORE)  @authenticated
+  updateUserPreferences(input: UpdateUserPreferencesInput!) : User! @join__field(graph: CORE)  @authenticated
+  updateProfileVisibility(isPublic: Boolean!) : UserPreferences! @join__field(graph: CORE)  @authenticated
+  deactivateUser(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  resetUserPassword(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  bulkImportUsers(csvData: String!) : BulkImportResult! @join__field(graph: CORE)  @authenticated
+  updateTenantBranding(input: UpdateTenantBrandingInput!) : TenantBranding! @join__field(graph: CORE)  @authenticated
+  updateTenantLanguageSettings(input: UpdateTenantLanguageSettingsInput!) : TenantLanguageSettings! @join__field(graph: CORE)  @authenticated
+  createBadge(input: CreateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
+  updateBadge(id: ID!, input: UpdateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
+  deleteBadge(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  issueBadge(badgeDefinitionId: ID!, recipientId: ID!, evidenceUrl: String) : OpenBadgeAssertion! @join__field(graph: CORE)  @authenticated
+  revokeOpenBadge(assertionId: ID!, reason: String!) : Boolean! @join__field(graph: CORE)  @authenticated
+  submitReview(cardId: ID!, quality: Int!) : SRSCard! @join__field(graph: CORE)  @authenticated
+  createReviewCard(conceptName: String!) : SRSCard! @join__field(graph: CORE)  @authenticated
+  generateScimToken(input: GenerateScimTokenInput!) : GenerateScimTokenResult! @join__field(graph: CORE)  @authenticated
+  revokeScimToken(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  followUser(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  unfollowUser(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  disconnectCrm: Boolean! @join__field(graph: CORE)  @authenticated
+  savePortalLayout(title: String!, blocksJson: String!) : PortalPage! @join__field(graph: CORE)  @authenticated
+  publishPortal: Boolean! @join__field(graph: CORE)  @authenticated
+  unpublishPortal: Boolean! @join__field(graph: CORE)  @authenticated
+  exportAuditLog(fromDate: String!, toDate: String!, format: AuditExportFormat!) : AuditExportResult! @join__field(graph: CORE)  @authenticated
+  scheduleGdprErasure(userId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
   createEmbedding(input: CreateEmbeddingInput!) : Embedding! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbedding(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbeddingsByContentItem(contentItemId: ID!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated
