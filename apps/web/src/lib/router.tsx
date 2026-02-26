@@ -212,6 +212,11 @@ const SecuritySettingsPage = lazy(() =>
 const AuditLogPage = lazy(() =>
   import('@/pages/AuditLogPage').then((m) => ({ default: m.AuditLogPage }))
 );
+const AuditLogAdminPage = lazy(() =>
+  import('@/pages/AuditLogAdminPage').then((m) => ({
+    default: m.AuditLogAdminPage,
+  }))
+);
 const NotificationTemplatesPage = lazy(() =>
   import('@/pages/NotificationTemplatesPage').then((m) => ({
     default: m.NotificationTemplatesPage,
@@ -451,6 +456,7 @@ export const router = createBrowserRouter([
   { path: '/admin/at-risk', element: guarded(<AtRiskDashboardPage />) },
   { path: '/admin/security', element: guarded(<SecuritySettingsPage />) },
   { path: '/admin/audit', element: guarded(<AuditLogPage />) },
+  { path: '/admin/audit-log', element: guarded(<AuditLogAdminPage />) },
   {
     path: '/admin/notifications',
     element: guarded(<NotificationTemplatesPage />),
