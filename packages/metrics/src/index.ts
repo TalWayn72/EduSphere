@@ -15,6 +15,11 @@ export class MetricsService {
   private dbQueryDuration: Histogram;
   private graphqlOperations: Counter;
   private cacheHitRate: Counter;
+  // Dashboards-aligned histograms (names match Grafana panel queries exactly)
+  readonly resolverDuration: Histogram;
+  readonly rlsDuration: Histogram;
+  readonly agentDuration: Histogram;
+  readonly ragDuration: Histogram;
 
   constructor(serviceName: string) {
     this.registry = new Registry();
@@ -67,6 +72,39 @@ export class MetricsService {
       name: 'edusphere_cache_operations_total',
       help: 'Total number of cache operations',
       labelNames: ['operation', 'result'],
+      registers: [this.registry],
+    });
+
+    // Dashboards-aligned histograms — queried by Grafana dashboards
+    this.resolverDuration = new Histogram({
+      name: 'graphql_resolver_duration_seconds',
+      help: 'GraphQL resolver execution duration in seconds',
+      labelNames: ['subgraph', 'field', 'status'],
+      buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5],
+      registers: [this.registry],
+    });
+
+    this.rlsDuration = new Histogram({
+      name: 'rls_policy_evaluation_duration_seconds',
+      help: 'Row-Level Security withTenantContext evaluation duration',
+      labelNames: ['operation'],
+      buckets: [0.0005, 0.001, 0.005, 0.01, 0.025, 0.05, 0.1],
+      registers: [this.registry],
+    });
+
+    this.agentDuration = new Histogram({
+      name: 'ai_agent_execution_duration_seconds',
+      help: 'AI agent workflow execution duration in seconds',
+      labelNames: ['workflow', 'status'],
+      buckets: [0.1, 0.5, 1, 2, 5, 10, 30, 60],
+      registers: [this.registry],
+    });
+
+    this.ragDuration = new Histogram({
+      name: 'ai_rag_retrieval_duration_seconds',
+      help: 'RAG retrieval pipeline duration in seconds',
+      labelNames: ['query_type'],
+      buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5],
       registers: [this.registry],
     });
   }

@@ -57,7 +57,7 @@ export class MetricsInterceptor implements NestInterceptor {
   private handleGraphql(
     context: ExecutionContext,
     next: CallHandler,
-    _start: bigint
+    start: bigint
   ): Observable<unknown> {
     const info = context.getArgByIndex<{
       operation?: { operation?: string };
@@ -68,6 +68,11 @@ export class MetricsInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(() => {
+        const duration = Number(process.hrtime.bigint() - start) / 1e9;
+        this.metricsService.resolverDuration.observe(
+          { subgraph: 'unknown', field: operationName, status: 'success' },
+          duration
+        );
         this.metricsService.recordGraphqlOperation(
           operationType,
           operationName,
@@ -75,6 +80,11 @@ export class MetricsInterceptor implements NestInterceptor {
         );
       }),
       catchError((err: unknown) => {
+        const duration = Number(process.hrtime.bigint() - start) / 1e9;
+        this.metricsService.resolverDuration.observe(
+          { subgraph: 'unknown', field: operationName, status: 'error' },
+          duration
+        );
         this.metricsService.recordGraphqlOperation(
           operationType,
           operationName,
