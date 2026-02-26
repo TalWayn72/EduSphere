@@ -217,6 +217,8 @@ describe('useUserPreferences', () => {
   // ── Auto-fallback: current locale not in tenant availableLocales (lines 71-75) ─
 
   it('auto-switches to tenant default locale when current locale is not in availableLocales', async () => {
+    // Reset all mock implementations to clear any queued mockReturnValueOnce values
+    vi.resetAllMocks();
     // User's DB locale is 'de', but tenant only allows ['en', 'fr']
     // → hook must auto-switch to tenant default 'en'
     const changeLanguage = vi.fn().mockResolvedValue(undefined);
@@ -293,6 +295,8 @@ describe('useUserPreferences', () => {
   });
 
   it('does NOT auto-switch when current locale is in availableLocales', async () => {
+    // Reset all mock implementations to clear any queued mockReturnValueOnce values
+    vi.resetAllMocks();
     // User's locale is 'fr', tenant allows ['en', 'fr'] — no fallback needed
     const changeLanguage = vi.fn().mockResolvedValue(undefined);
 
