@@ -188,10 +188,14 @@ export function LtiSettingsPage() {
                   ] as const
                 ).map((field) => (
                   <div key={field}>
-                    <label className="text-sm font-medium capitalize">
+                    <label
+                      htmlFor={`lti-${field}`}
+                      className="text-sm font-medium capitalize"
+                    >
                       {field.replace(/([A-Z])/g, ' $1')}
                     </label>
                     <input
+                      id={`lti-${field}`}
                       className="w-full border rounded px-3 py-2 text-sm mt-1"
                       required
                       value={form[field]}
@@ -271,6 +275,11 @@ export function LtiSettingsPage() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    aria-label={
+                      platform.isActive
+                        ? `Deactivate ${platform.platformName}`
+                        : `Activate ${platform.platformName}`
+                    }
                     onClick={() => {
                       void handleToggle(platform.id, platform.isActive);
                     }}

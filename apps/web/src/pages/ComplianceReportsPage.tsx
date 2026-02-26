@@ -192,10 +192,11 @@ export function ComplianceReportsPage() {
               ))}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label htmlFor="as-of-date" className="block text-sm font-medium mb-1">
                 As of date (optional)
               </label>
               <input
+                id="as-of-date"
                 type="date"
                 value={asOfDate}
                 onChange={(e) => setAsOfDate(e.target.value)}
