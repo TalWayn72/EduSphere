@@ -1,9 +1,41 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 26 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅**
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,641 tests** (+11) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5 (BUG-026) ✅** | **Contract 36+11 (BUG-026) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅**
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅**
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,658 tests** (+17) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5+13 (BUG-026/027) ✅** | **Contract 36+11+4 (BUG-026/027) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
+
+---
+
+## ✅ BUG-027 — `/admin/scim`: Modal closes on number input + missing contract tests (26 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium (UX regression + contract gap) | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+1. **Modal closes unexpectedly** when filling the "Expires in days" field in the "Generate SCIM Token" modal. The field is `<input type="number">` — Chrome's native spinner buttons (↑↓ arrows) dispatch `click` events outside React's synthetic event system, bypassing the `stopPropagation()` guard on the inner div. The backdrop's `onClick` handler then fired and closed the modal.
+2. **Console 400 errors** — `scimTokens` and `scimSyncLog` queries return 400 from the gateway when the Core subgraph is not running at gateway startup (same structural gap as BUG-026).
+3. **Zero contract test coverage** — `scim.queries.ts` (4 operations: `ScimTokens`, `ScimSyncLog`, `GenerateScimToken`, `RevokeScimToken`) was never added to `schema-contract.test.ts`, and no federation regression spec existed.
+
+### Root Cause
+
+**Modal bug:** `onClick={(e) => e.stopPropagation()}` on the inner dialog div only stops React synthetic events. Native browser spinner controls on `<input type="number">` fire raw DOM `click` events that bypassed this guard, reaching the backdrop's `onClick`.
+
+**400 errors:** Same as BUG-026 — gateway composes from live subgraphs at startup (`type: 'config'`). If Core subgraph is down at gateway start, `scimTokens`/`scimSyncLog` are absent from the composed schema.
+
+### Solution
+
+1. **Modal fix** — Changed backdrop `onClick` to `e.target === e.currentTarget` guard. The modal now ONLY closes when clicking directly on the semi-transparent overlay, never on any child element regardless of event origin.
+2. **Contract tests** — Added 4 tests to `tests/contract/schema-contract.test.ts` for all SCIM operations.
+3. **Federation spec** — Created `apps/gateway/src/test/federation/scim-supergraph.spec.ts` with 13 assertions (types in supergraph + subgraph SDL).
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/ScimSettingsPage.tsx` | backdrop `onClick`: use `e.target === e.currentTarget` guard; remove inner `stopPropagation()` |
+| `tests/contract/schema-contract.test.ts` | +4 SCIM contract tests |
+| `apps/gateway/src/test/federation/scim-supergraph.spec.ts` | New file — 13 regression assertions |
 
 ---
 

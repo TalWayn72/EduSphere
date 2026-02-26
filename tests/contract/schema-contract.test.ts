@@ -680,3 +680,77 @@ describe('Schema Contract - notifications.subscriptions.ts', () => {
     expect(true).toBe(true);
   });
 });
+
+// ---- scim.queries.ts — SCIM token management for HRIS provisioning (F-019)
+const SCIM_TOKENS_QUERY_DOC = parse(`
+  query ScimTokens {
+    scimTokens {
+      id
+      description
+      lastUsedAt
+      expiresAt
+      isActive
+      createdAt
+    }
+  }
+`);
+
+const SCIM_SYNC_LOG_QUERY_DOC = parse(`
+  query ScimSyncLog($limit: Int) {
+    scimSyncLog(limit: $limit) {
+      id
+      operation
+      externalId
+      status
+      errorMessage
+      createdAt
+    }
+  }
+`);
+
+const GENERATE_SCIM_TOKEN_MUTATION_DOC = parse(`
+  mutation GenerateScimToken($input: GenerateScimTokenInput!) {
+    generateScimToken(input: $input) {
+      rawToken
+      token {
+        id
+        description
+        lastUsedAt
+        expiresAt
+        isActive
+        createdAt
+      }
+    }
+  }
+`);
+
+const REVOKE_SCIM_TOKEN_MUTATION_DOC = parse(`
+  mutation RevokeScimToken($id: ID!) {
+    revokeScimToken(id: $id)
+  }
+`);
+
+describe('Schema Contract - scim.queries.ts (F-019)', () => {
+  it('SCIM_TOKENS_QUERY is valid against supergraph', () => {
+    assertValid('SCIM_TOKENS_QUERY', SCIM_TOKENS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('SCIM_SYNC_LOG_QUERY is valid against supergraph', () => {
+    assertValid('SCIM_SYNC_LOG_QUERY', SCIM_SYNC_LOG_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('GENERATE_SCIM_TOKEN_MUTATION is valid against supergraph', () => {
+    assertValid(
+      'GENERATE_SCIM_TOKEN_MUTATION',
+      GENERATE_SCIM_TOKEN_MUTATION_DOC
+    );
+    expect(true).toBe(true);
+  });
+
+  it('REVOKE_SCIM_TOKEN_MUTATION is valid against supergraph', () => {
+    assertValid('REVOKE_SCIM_TOKEN_MUTATION', REVOKE_SCIM_TOKEN_MUTATION_DOC);
+    expect(true).toBe(true);
+  });
+});
