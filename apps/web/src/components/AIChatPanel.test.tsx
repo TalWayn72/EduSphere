@@ -63,6 +63,7 @@ vi.mock('@/lib/graphql/agent.queries', () => ({
 // ── Component import (after mocks) ────────────────────────────────────────────
 import { AIChatPanel } from './AIChatPanel';
 import { useSubscription } from 'urql';
+import * as selectModule from '@/components/ui/select';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -286,5 +287,107 @@ describe('AIChatPanel', () => {
   it('applies custom className to the panel wrapper', () => {
     const { container } = render(<AIChatPanel className="my-custom-class" />);
     expect(container.querySelector('.my-custom-class')).toBeInTheDocument();
+  });
+
+  // 10. Cleanup effect clears mock timers on unmount (line 68) ──────────────────
+
+  it('clears mockTimerRef and mockStreamRef timeouts when unmounted mid-stream', () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+
+    const { container, unmount } = renderPanel();
+    openPanel(container);
+
+    // Trigger a DEV_MODE message send so the timers are set
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'trigger timers' } });
+
+    act(() => {
+      fireEvent.keyPress(input, { key: 'Enter', code: 'Enter', charCode: 13 });
+    });
+
+    // Advance past the first mock timer (800ms) so the nested timer is also set
+    act(() => {
+      vi.advanceTimersByTime(850);
+    });
+
+    // Unmount while the 1000ms stream-end timer is still pending
+    unmount();
+
+    // clearTimeout must have been called (cleanup effect ran)
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+
+    clearTimeoutSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  // 11. Agent Select onValueChange changes the selected agent (line 223) ────────
+
+  it('changing agent via Select onValueChange resets messages and updates agent name', () => {
+    // Override the Select mock to wire onValueChange → trigger on SelectItem click
+    const originalSelect = selectModule.Select;
+    vi.spyOn(selectModule, 'Select').mockImplementation(
+      ({
+        children,
+        onValueChange,
+      }: {
+        children: React.ReactNode;
+        onValueChange?: (value: string) => void;
+      }) => (
+        <div data-testid="select-root">
+          {/* Expose a hidden button so tests can trigger onValueChange */}
+          <button
+            data-testid="select-change-trigger"
+            onClick={() => onValueChange?.('quiz-master')}
+          />
+          {children}
+        </div>
+      )
+    );
+
+    const { container } = renderPanel();
+    openPanel(container);
+
+    // Initially defaults to 'chavruta' — placeholder shows agent input hint
+    const inputBefore = screen.getByRole('textbox') as HTMLInputElement;
+    expect(inputBefore.placeholder).toMatch(/Chavruta/i);
+
+    // Trigger onValueChange to switch agent to 'quiz-master'
+    fireEvent.click(screen.getByTestId('select-change-trigger'));
+
+    // After switching, the input placeholder changes to reflect the new agent
+    const inputAfter = screen.getByRole('textbox') as HTMLInputElement;
+    expect(inputAfter.placeholder).toMatch(/Quiz Master/i);
+
+    // Restore the original mock
+    vi.spyOn(selectModule, 'Select').mockImplementation(originalSelect as typeof selectModule.Select);
+  });
+
+  // 12. Mobile backdrop click closes the panel (lines 298-302) ─────────────────
+
+  it('clicking the mobile backdrop div closes the panel', () => {
+    const { container } = renderPanel();
+    openPanel(container);
+
+    // Verify panel is open
+    expect(container.querySelector('.translate-x-0')).toBeInTheDocument();
+
+    // The backdrop is rendered when isOpen=true — it's a fixed inset-0 div
+    // with class 'bg-black/50' and onClick={() => setIsOpen(false)}
+    const backdrop = container.querySelector('.bg-black\\/50');
+    expect(backdrop).toBeInTheDocument();
+
+    fireEvent.click(backdrop!);
+
+    // Panel slides back off-screen
+    expect(container.querySelector('.translate-x-full')).toBeInTheDocument();
+    // Backdrop is no longer rendered (conditional on isOpen)
+    expect(container.querySelector('.bg-black\\/50')).not.toBeInTheDocument();
+  });
+
+  it('backdrop is NOT present when panel is closed', () => {
+    const { container } = renderPanel();
+    // Panel starts closed — backdrop should not be in the DOM
+    expect(container.querySelector('.bg-black\\/50')).not.toBeInTheDocument();
   });
 });

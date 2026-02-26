@@ -274,6 +274,11 @@ export default defineConfig({
         // Mock data files — imported in tests but the data itself needs no testing
         'src/lib/mock-chat.ts',
         'src/lib/mock-dashboard.data.ts',
+        // Remaining mock data files — static fixture data, no executable logic to test
+        'src/lib/mock-annotations.ts',
+        'src/lib/mock-annotations.data.ts',
+        'src/lib/mock-transcript.data.ts',
+        'src/lib/mock-video-annotations.data.ts',
         // All GraphQL operation files — pure string definitions, no executable logic
         'src/lib/graphql/**',
         // Services — Tier-3 features, tested via E2E

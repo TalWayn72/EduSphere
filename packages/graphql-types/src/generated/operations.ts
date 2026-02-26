@@ -24,6 +24,24 @@ export type AddMessageInput = {
   parentMessageId?: InputMaybe<Scalars['ID']['input']>;
 };
 
+export type AdminOverview = {
+  __typename?: 'AdminOverview';
+  activeUsersThisMonth: Scalars['Int']['output'];
+  atRiskCount: Scalars['Int']['output'];
+  completionsThisMonth: Scalars['Int']['output'];
+  lastComplianceReport?: Maybe<Scalars['String']['output']>;
+  lastScimSync?: Maybe<Scalars['String']['output']>;
+  storageUsedMb: Scalars['Float']['output'];
+  totalCourses: Scalars['Int']['output'];
+  totalUsers: Scalars['Int']['output'];
+};
+
+export type AdminUsersResult = {
+  __typename?: 'AdminUsersResult';
+  total: Scalars['Int']['output'];
+  users: Array<User>;
+};
+
 export type AgentExecution = {
   __typename?: 'AgentExecution';
   agent: AgentTemplate;
@@ -119,6 +137,79 @@ export enum AnnotationType {
   Text = 'TEXT'
 }
 
+export type Announcement = {
+  __typename?: 'Announcement';
+  body: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  createdBy?: Maybe<Scalars['ID']['output']>;
+  expiresAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  priority: Scalars['String']['output'];
+  publishAt?: Maybe<Scalars['String']['output']>;
+  targetAudience: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type AnnouncementResult = {
+  __typename?: 'AnnouncementResult';
+  announcements: Array<Announcement>;
+  total: Scalars['Int']['output'];
+};
+
+export enum AuditExportFormat {
+  Csv = 'CSV',
+  Json = 'JSON'
+}
+
+export type AuditExportResult = {
+  __typename?: 'AuditExportResult';
+  expiresAt: Scalars['String']['output'];
+  presignedUrl: Scalars['String']['output'];
+  recordCount: Scalars['Int']['output'];
+};
+
+export type AuditLogEntry = {
+  __typename?: 'AuditLogEntry';
+  action: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  ipAddress?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<Scalars['String']['output']>;
+  requestId?: Maybe<Scalars['String']['output']>;
+  resourceId?: Maybe<Scalars['ID']['output']>;
+  resourceType?: Maybe<Scalars['String']['output']>;
+  status: Scalars['String']['output'];
+  tenantId: Scalars['ID']['output'];
+  userId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type AuditLogResult = {
+  __typename?: 'AuditLogResult';
+  entries: Array<AuditLogEntry>;
+  total: Scalars['Int']['output'];
+};
+
+export type Badge = {
+  __typename?: 'Badge';
+  category: Scalars['String']['output'];
+  conditionType: Scalars['String']['output'];
+  conditionValue: Scalars['Int']['output'];
+  description: Scalars['String']['output'];
+  iconEmoji: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  pointsReward: Scalars['Int']['output'];
+};
+
+export type BulkImportResult = {
+  __typename?: 'BulkImportResult';
+  created: Scalars['Int']['output'];
+  errors: Array<Scalars['String']['output']>;
+  failed: Scalars['Int']['output'];
+  updated: Scalars['Int']['output'];
+};
+
 export type Concept = {
   __typename?: 'Concept';
   createdAt: Scalars['String']['output'];
@@ -206,6 +297,25 @@ export type CreateAnnotationInput = {
   spatialData?: InputMaybe<Scalars['JSON']['input']>;
 };
 
+export type CreateAnnouncementInput = {
+  body: Scalars['String']['input'];
+  expiresAt?: InputMaybe<Scalars['String']['input']>;
+  priority: Scalars['String']['input'];
+  publishAt?: InputMaybe<Scalars['String']['input']>;
+  targetAudience: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type CreateBadgeInput = {
+  category: Scalars['String']['input'];
+  conditionType: Scalars['String']['input'];
+  conditionValue: Scalars['Int']['input'];
+  description: Scalars['String']['input'];
+  iconEmoji: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  pointsReward: Scalars['Int']['input'];
+};
+
 export type CreateConceptInput = {
   definition: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -248,6 +358,12 @@ export type CreatePersonInput = {
   name: Scalars['String']['input'];
 };
 
+export type CreateRoleInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  permissions: Array<Scalars['String']['input']>;
+};
+
 export type CreateSourceInput = {
   title: Scalars['String']['input'];
   type: Scalars['String']['input'];
@@ -270,6 +386,25 @@ export type CreateUserInput = {
   lastName: Scalars['String']['input'];
   role: UserRole;
   tenantId: Scalars['ID']['input'];
+};
+
+export type CrmConnection = {
+  __typename?: 'CrmConnection';
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  instanceUrl: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
+  provider: Scalars['String']['output'];
+};
+
+export type CrmSyncLogEntry = {
+  __typename?: 'CrmSyncLogEntry';
+  createdAt: Scalars['String']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  externalId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  operation: Scalars['String']['output'];
+  status: Scalars['String']['output'];
 };
 
 export type DayActivity = {
@@ -358,6 +493,26 @@ export type Embedding = {
   metadata?: Maybe<Scalars['JSON']['output']>;
 };
 
+export type GenerateScimTokenInput = {
+  description: Scalars['String']['input'];
+  expiresInDays?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type GenerateScimTokenResult = {
+  __typename?: 'GenerateScimTokenResult';
+  rawToken: Scalars['String']['output'];
+  token: ScimToken;
+};
+
+export type LeaderboardEntry = {
+  __typename?: 'LeaderboardEntry';
+  badgeCount: Scalars['Int']['output'];
+  displayName: Scalars['String']['output'];
+  rank: Scalars['Int']['output'];
+  totalPoints: Scalars['Int']['output'];
+  userId: Scalars['ID']['output'];
+};
+
 /**
  * Result of a shortestPath query between two concepts.
  * concepts: ordered list of ConceptNodes along the path (start inclusive, end inclusive).
@@ -425,10 +580,13 @@ export type Mutation = {
   activateAgentTemplate: AgentTemplate;
   /** Add a message to a discussion */
   addMessage: DiscussionMessage;
+  bulkImportUsers: BulkImportResult;
   cancelAgentExecution: AgentExecution;
   confirmMediaUpload: MediaAsset;
   createAgentTemplate: AgentTemplate;
   createAnnotation: Annotation;
+  createAnnouncement: Announcement;
+  createBadge: Badge;
   createConcept: Concept;
   createCourse: Course;
   /** Create a new discussion */
@@ -436,42 +594,73 @@ export type Mutation = {
   createEmbedding: Embedding;
   createModule: Module;
   createPerson: Person;
+  createReviewCard: SrsCard;
+  createRole: Role;
   createSource: Source;
   createTerm: Term;
   createTopicCluster: TopicCluster;
   createUser: User;
   deactivateAgentTemplate: AgentTemplate;
+  deactivateUser: Scalars['Boolean']['output'];
+  delegateRole: RoleDelegation;
   deleteAgentTemplate: Scalars['Boolean']['output'];
   deleteAnnotation: Scalars['Boolean']['output'];
+  deleteAnnouncement: Scalars['Boolean']['output'];
+  deleteBadge: Scalars['Boolean']['output'];
   deleteConcept: Scalars['Boolean']['output'];
   deleteCourse: Scalars['Boolean']['output'];
   deleteEmbedding: Scalars['Boolean']['output'];
   deleteEmbeddingsByContentItem: Scalars['Int']['output'];
   deleteModule: Scalars['Boolean']['output'];
+  deleteRole: Scalars['Boolean']['output'];
+  disconnectCrm: Scalars['Boolean']['output'];
   endSession: Scalars['Boolean']['output'];
   enrollCourse: UserCourse;
+  exportAuditLog: AuditExportResult;
+  followUser: Scalars['Boolean']['output'];
   generateEmbedding: Scalars['Boolean']['output'];
+  generateScimToken: GenerateScimTokenResult;
+  issueBadge: OpenBadgeAssertion;
   /** Join a discussion as a participant */
   joinDiscussion: Scalars['Boolean']['output'];
   /** Leave a discussion */
   leaveDiscussion: Scalars['Boolean']['output'];
   linkConcepts: ConceptRelationship;
   markContentViewed: Scalars['Boolean']['output'];
+  publishAnnouncement: Announcement;
   publishCourse: Course;
+  publishPortal: Scalars['Boolean']['output'];
   reorderModules: Array<Module>;
   replyToAnnotation: Annotation;
+  resetUserPassword: Scalars['Boolean']['output'];
   resolveAnnotation: Annotation;
+  revokeDelegation: Scalars['Boolean']['output'];
+  revokeOpenBadge: Scalars['Boolean']['output'];
+  revokeScimToken: Scalars['Boolean']['output'];
+  savePortalLayout: PortalPage;
+  scheduleGdprErasure: Scalars['Boolean']['output'];
   sendMessage: AgentMessage;
   startAgentExecution: AgentExecution;
   startAgentSession: AgentSession;
+  submitReview: SrsCard;
   unenrollCourse: Scalars['Boolean']['output'];
+  unfollowUser: Scalars['Boolean']['output'];
   unpublishCourse: Course;
+  unpublishPortal: Scalars['Boolean']['output'];
   updateAgentTemplate: AgentTemplate;
   updateAnnotation: Annotation;
+  updateAnnouncement: Announcement;
+  updateBadge: Badge;
   updateConcept: Concept;
   updateCourse: Course;
   updateModule: Module;
+  updateProfileVisibility: UserPreferences;
+  updateRole: Role;
+  updateSecuritySettings: SecuritySettings;
+  updateTenantBranding: TenantBranding;
+  updateTenantLanguageSettings: TenantLanguageSettings;
   updateUser: User;
+  updateUserPreferences: User;
 };
 
 
@@ -483,6 +672,11 @@ export type MutationActivateAgentTemplateArgs = {
 export type MutationAddMessageArgs = {
   discussionId: Scalars['ID']['input'];
   input: AddMessageInput;
+};
+
+
+export type MutationBulkImportUsersArgs = {
+  csvData: Scalars['String']['input'];
 };
 
 
@@ -505,6 +699,16 @@ export type MutationCreateAgentTemplateArgs = {
 
 export type MutationCreateAnnotationArgs = {
   input: CreateAnnotationInput;
+};
+
+
+export type MutationCreateAnnouncementArgs = {
+  input: CreateAnnouncementInput;
+};
+
+
+export type MutationCreateBadgeArgs = {
+  input: CreateBadgeInput;
 };
 
 
@@ -538,6 +742,16 @@ export type MutationCreatePersonArgs = {
 };
 
 
+export type MutationCreateReviewCardArgs = {
+  conceptName: Scalars['String']['input'];
+};
+
+
+export type MutationCreateRoleArgs = {
+  input: CreateRoleInput;
+};
+
+
 export type MutationCreateSourceArgs = {
   input: CreateSourceInput;
 };
@@ -563,12 +777,34 @@ export type MutationDeactivateAgentTemplateArgs = {
 };
 
 
+export type MutationDeactivateUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDelegateRoleArgs = {
+  roleId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  validUntil?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationDeleteAgentTemplateArgs = {
   id: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteAnnotationArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAnnouncementArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteBadgeArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -598,6 +834,11 @@ export type MutationDeleteModuleArgs = {
 };
 
 
+export type MutationDeleteRoleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationEndSessionArgs = {
   sessionId: Scalars['ID']['input'];
 };
@@ -608,10 +849,34 @@ export type MutationEnrollCourseArgs = {
 };
 
 
+export type MutationExportAuditLogArgs = {
+  format: AuditExportFormat;
+  fromDate: Scalars['String']['input'];
+  toDate: Scalars['String']['input'];
+};
+
+
+export type MutationFollowUserArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationGenerateEmbeddingArgs = {
   entityId: Scalars['ID']['input'];
   entityType: Scalars['String']['input'];
   text: Scalars['String']['input'];
+};
+
+
+export type MutationGenerateScimTokenArgs = {
+  input: GenerateScimTokenInput;
+};
+
+
+export type MutationIssueBadgeArgs = {
+  badgeDefinitionId: Scalars['ID']['input'];
+  evidenceUrl?: InputMaybe<Scalars['String']['input']>;
+  recipientId: Scalars['ID']['input'];
 };
 
 
@@ -639,6 +904,11 @@ export type MutationMarkContentViewedArgs = {
 };
 
 
+export type MutationPublishAnnouncementArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationPublishCourseArgs = {
   id: Scalars['ID']['input'];
 };
@@ -656,8 +926,40 @@ export type MutationReplyToAnnotationArgs = {
 };
 
 
+export type MutationResetUserPasswordArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationResolveAnnotationArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeDelegationArgs = {
+  delegationId: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeOpenBadgeArgs = {
+  assertionId: Scalars['ID']['input'];
+  reason: Scalars['String']['input'];
+};
+
+
+export type MutationRevokeScimTokenArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationSavePortalLayoutArgs = {
+  blocksJson: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
+
+export type MutationScheduleGdprErasureArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -678,8 +980,19 @@ export type MutationStartAgentSessionArgs = {
 };
 
 
+export type MutationSubmitReviewArgs = {
+  cardId: Scalars['ID']['input'];
+  quality: Scalars['Int']['input'];
+};
+
+
 export type MutationUnenrollCourseArgs = {
   courseId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnfollowUserArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -697,6 +1010,18 @@ export type MutationUpdateAgentTemplateArgs = {
 export type MutationUpdateAnnotationArgs = {
   id: Scalars['ID']['input'];
   input: UpdateAnnotationInput;
+};
+
+
+export type MutationUpdateAnnouncementArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAnnouncementInput;
+};
+
+
+export type MutationUpdateBadgeArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateBadgeInput;
 };
 
 
@@ -718,9 +1043,86 @@ export type MutationUpdateModuleArgs = {
 };
 
 
+export type MutationUpdateProfileVisibilityArgs = {
+  isPublic: Scalars['Boolean']['input'];
+};
+
+
+export type MutationUpdateRoleArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateRoleInput;
+};
+
+
+export type MutationUpdateSecuritySettingsArgs = {
+  input: UpdateSecuritySettingsInput;
+};
+
+
+export type MutationUpdateTenantBrandingArgs = {
+  input: UpdateTenantBrandingInput;
+};
+
+
+export type MutationUpdateTenantLanguageSettingsArgs = {
+  input: UpdateTenantLanguageSettingsInput;
+};
+
+
 export type MutationUpdateUserArgs = {
   id: Scalars['ID']['input'];
   input: UpdateUserInput;
+};
+
+
+export type MutationUpdateUserPreferencesArgs = {
+  input: UpdateUserPreferencesInput;
+};
+
+export type Notification = {
+  __typename?: 'Notification';
+  body: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  payload?: Maybe<Scalars['JSON']['output']>;
+  readAt?: Maybe<Scalars['DateTime']['output']>;
+  title: Scalars['String']['output'];
+  type: NotificationType;
+};
+
+export enum NotificationType {
+  Announcement = 'ANNOUNCEMENT',
+  BadgeIssued = 'BADGE_ISSUED',
+  CourseEnrolled = 'COURSE_ENROLLED',
+  SrsReviewDue = 'SRS_REVIEW_DUE',
+  UserFollowed = 'USER_FOLLOWED'
+}
+
+export type OpenBadgeAssertion = {
+  __typename?: 'OpenBadgeAssertion';
+  badgeDefinitionId: Scalars['ID']['output'];
+  definition: OpenBadgeDefinition;
+  evidenceUrl?: Maybe<Scalars['String']['output']>;
+  expiresAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  issuedAt: Scalars['String']['output'];
+  recipientId: Scalars['ID']['output'];
+  revoked: Scalars['Boolean']['output'];
+  revokedAt?: Maybe<Scalars['String']['output']>;
+  revokedReason?: Maybe<Scalars['String']['output']>;
+  vcDocument: Scalars['String']['output'];
+};
+
+export type OpenBadgeDefinition = {
+  __typename?: 'OpenBadgeDefinition';
+  createdAt: Scalars['String']['output'];
+  criteriaUrl?: Maybe<Scalars['String']['output']>;
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  issuerId: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  tags: Array<Scalars['String']['output']>;
 };
 
 export type Person = {
@@ -733,6 +1135,23 @@ export type Person = {
   updatedAt: Scalars['String']['output'];
 };
 
+export type PortalBlock = {
+  __typename?: 'PortalBlock';
+  config: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  order: Scalars['Int']['output'];
+  type: Scalars['String']['output'];
+};
+
+export type PortalPage = {
+  __typename?: 'PortalPage';
+  blocks: Array<PortalBlock>;
+  id: Scalars['ID']['output'];
+  published: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
 export type PresignedUploadUrl = {
   __typename?: 'PresignedUploadUrl';
   expiresAt: Scalars['String']['output'];
@@ -740,9 +1159,38 @@ export type PresignedUploadUrl = {
   uploadUrl: Scalars['String']['output'];
 };
 
+export type PublicCourse = {
+  __typename?: 'PublicCourse';
+  completedAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type PublicProfile = {
+  __typename?: 'PublicProfile';
+  avatarUrl?: Maybe<Scalars['String']['output']>;
+  badgesCount: Scalars['Int']['output'];
+  bio?: Maybe<Scalars['String']['output']>;
+  completedCourses: Array<PublicCourse>;
+  completedCoursesCount: Scalars['Int']['output'];
+  conceptsMastered: Scalars['Int']['output'];
+  currentStreak: Scalars['Int']['output'];
+  displayName: Scalars['String']['output'];
+  joinedAt: Scalars['DateTime']['output'];
+  longestStreak: Scalars['Int']['output'];
+  totalLearningMinutes: Scalars['Int']['output'];
+  userId: Scalars['ID']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _health: Scalars['String']['output'];
+  activeAnnouncements: Array<Announcement>;
+  adminAnnouncements: AnnouncementResult;
+  adminAuditLog: AuditLogResult;
+  adminBadges: Array<Badge>;
+  adminOverview: AdminOverview;
+  adminUsers: AdminUsersResult;
   agentExecution?: Maybe<AgentExecution>;
   agentExecutionsByAgent: Array<AgentExecution>;
   agentExecutionsByUser: Array<AgentExecution>;
@@ -762,15 +1210,19 @@ export type Query = {
   course?: Maybe<Course>;
   courses: Array<Course>;
   coursesByInstructor: Array<Course>;
+  crmConnection?: Maybe<CrmConnection>;
+  crmSyncLog: Array<CrmSyncLogEntry>;
   /** Get a single discussion by ID */
   discussion?: Maybe<Discussion>;
   /** Get all messages in a discussion */
   discussionMessages: Array<DiscussionMessage>;
   /** Get all discussions for a course */
   discussions: Array<Discussion>;
+  dueReviews: Array<SrsCard>;
   embedding?: Maybe<Embedding>;
   embeddingsByContentItem: Array<Embedding>;
   getPresignedUploadUrl: PresignedUploadUrl;
+  leaderboard: Array<LeaderboardEntry>;
   /**
    * Find the shortest learning path between two concepts identified by name.
    * Returns null when no path exists between the two concepts.
@@ -781,11 +1233,21 @@ export type Query = {
   module?: Maybe<Module>;
   modulesByCourse: Array<Module>;
   myAgentSessions: Array<AgentSession>;
+  myBadges: Array<UserBadge>;
   myCourseProgress: CourseProgress;
   /** Get all discussions the current user has participated in */
   myDiscussions: Array<Discussion>;
   myEnrollments: Array<UserCourse>;
+  myFollowers: Array<Scalars['ID']['output']>;
+  myFollowing: Array<Scalars['ID']['output']>;
+  myOpenBadges: Array<OpenBadgeAssertion>;
+  myPortal?: Maybe<PortalPage>;
+  myRank: Scalars['Int']['output'];
+  mySecuritySettings: SecuritySettings;
   myStats: UserStats;
+  myTenantBranding: TenantBranding;
+  myTenantLanguageSettings: TenantLanguageSettings;
+  myTotalPoints: Scalars['Int']['output'];
   person?: Maybe<Person>;
   personByName?: Maybe<Person>;
   /**
@@ -793,17 +1255,24 @@ export type Query = {
    * Returns nodes ordered from root prerequisite to the target concept.
    */
   prerequisiteChain: Array<ConceptNode>;
+  publicPortal?: Maybe<PortalPage>;
+  publicProfile?: Maybe<PublicProfile>;
   relatedConcepts: Array<RelatedConcept>;
   /**
    * Collect all distinct concepts reachable from a named concept within `depth` hops
    * (default depth 2, max 5) via RELATED_TO edges using COLLECT(DISTINCT ...) aggregation.
    */
   relatedConceptsByName: Array<ConceptNode>;
+  role?: Maybe<Role>;
+  roles: Array<Role>;
   runningExecutions: Array<AgentExecution>;
+  scimSyncLog: Array<ScimSyncEntry>;
+  scimTokens: Array<ScimToken>;
   searchSemantic: Array<SemanticResult>;
   semanticSearch: Array<SimilarityResult>;
   semanticSearchByContentItem: Array<SimilarityResult>;
   source?: Maybe<Source>;
+  srsQueueCount: Scalars['Int']['output'];
   tenant?: Maybe<Tenant>;
   tenants: Array<Tenant>;
   term?: Maybe<Term>;
@@ -811,7 +1280,33 @@ export type Query = {
   topicCluster?: Maybe<TopicCluster>;
   topicClustersByCourse: Array<TopicCluster>;
   user?: Maybe<User>;
+  userDelegations: Array<RoleDelegation>;
   users: Array<User>;
+  verifyOpenBadge: Scalars['Boolean']['output'];
+};
+
+
+export type QueryAdminAnnouncementsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAdminAuditLogArgs = {
+  action?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  since?: InputMaybe<Scalars['String']['input']>;
+  until?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryAdminUsersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  role?: InputMaybe<UserRole>;
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -916,6 +1411,11 @@ export type QueryCoursesByInstructorArgs = {
 };
 
 
+export type QueryCrmSyncLogArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryDiscussionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -935,6 +1435,11 @@ export type QueryDiscussionsArgs = {
 };
 
 
+export type QueryDueReviewsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryEmbeddingArgs = {
   id: Scalars['ID']['input'];
 };
@@ -949,6 +1454,11 @@ export type QueryGetPresignedUploadUrlArgs = {
   contentType: Scalars['String']['input'];
   courseId: Scalars['ID']['input'];
   fileName: Scalars['String']['input'];
+};
+
+
+export type QueryLeaderboardArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -979,6 +1489,16 @@ export type QueryMyDiscussionsArgs = {
 };
 
 
+export type QueryMyFollowersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryMyFollowingArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryPersonArgs = {
   id: Scalars['ID']['input'];
 };
@@ -991,6 +1511,11 @@ export type QueryPersonByNameArgs = {
 
 export type QueryPrerequisiteChainArgs = {
   conceptName: Scalars['String']['input'];
+};
+
+
+export type QueryPublicProfileArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -1007,8 +1532,18 @@ export type QueryRelatedConceptsByNameArgs = {
 };
 
 
+export type QueryRoleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryRunningExecutionsArgs = {
   userId: Scalars['ID']['input'];
+};
+
+
+export type QueryScimSyncLogArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1073,15 +1608,93 @@ export type QueryUserArgs = {
 };
 
 
+export type QueryUserDelegationsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type QueryUsersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryVerifyOpenBadgeArgs = {
+  assertionId: Scalars['ID']['input'];
 };
 
 export type RelatedConcept = {
   __typename?: 'RelatedConcept';
   concept: Concept;
   strength: Scalars['Float']['output'];
+};
+
+export type Role = {
+  __typename?: 'Role';
+  createdAt: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isSystem: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  permissions: Array<Scalars['String']['output']>;
+  tenantId: Scalars['ID']['output'];
+  updatedAt: Scalars['String']['output'];
+  userCount: Scalars['Int']['output'];
+};
+
+export type RoleDelegation = {
+  __typename?: 'RoleDelegation';
+  createdAt: Scalars['String']['output'];
+  delegatedBy: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  roleId: Scalars['ID']['output'];
+  userId: Scalars['ID']['output'];
+  validUntil?: Maybe<Scalars['String']['output']>;
+};
+
+export type SrsCard = {
+  __typename?: 'SRSCard';
+  conceptName: Scalars['String']['output'];
+  dueDate: Scalars['DateTime']['output'];
+  easeFactor: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+  intervalDays: Scalars['Int']['output'];
+  lastReviewedAt?: Maybe<Scalars['DateTime']['output']>;
+  repetitions: Scalars['Int']['output'];
+};
+
+export type ScimSyncEntry = {
+  __typename?: 'ScimSyncEntry';
+  createdAt: Scalars['DateTime']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  externalId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  operation: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
+export type ScimToken = {
+  __typename?: 'ScimToken';
+  createdAt: Scalars['DateTime']['output'];
+  description: Scalars['String']['output'];
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type SecuritySettings = {
+  __typename?: 'SecuritySettings';
+  ipAllowlist: Array<Scalars['String']['output']>;
+  loginAttemptLockoutThreshold: Scalars['Int']['output'];
+  maxConcurrentSessions: Scalars['Int']['output'];
+  mfaRequired: Scalars['Boolean']['output'];
+  mfaRequiredForAdmins: Scalars['Boolean']['output'];
+  passwordExpiryDays?: Maybe<Scalars['Int']['output']>;
+  passwordMinLength: Scalars['Int']['output'];
+  passwordRequireSpecialChars: Scalars['Boolean']['output'];
+  sessionTimeoutMinutes: Scalars['Int']['output'];
 };
 
 export type SemanticResult = {
@@ -1126,6 +1739,8 @@ export type Subscription = {
   /** Subscribe to new messages in a discussion */
   messageAdded: DiscussionMessage;
   messageStream: AgentMessage;
+  /** Real-time notification stream for a user */
+  notificationReceived: Notification;
   /** User created event */
   userCreated: User;
   /** Real-time user status updates */
@@ -1152,6 +1767,11 @@ export type SubscriptionMessageAddedArgs = {
 
 export type SubscriptionMessageStreamArgs = {
   sessionId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionNotificationReceivedArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -1193,6 +1813,30 @@ export type Tenant = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type TenantBranding = {
+  __typename?: 'TenantBranding';
+  accentColor: Scalars['String']['output'];
+  backgroundColor: Scalars['String']['output'];
+  faviconUrl: Scalars['String']['output'];
+  fontFamily: Scalars['String']['output'];
+  hideEduSphereBranding: Scalars['Boolean']['output'];
+  logoMarkUrl?: Maybe<Scalars['String']['output']>;
+  logoUrl: Scalars['String']['output'];
+  organizationName: Scalars['String']['output'];
+  primaryColor: Scalars['String']['output'];
+  privacyPolicyUrl?: Maybe<Scalars['String']['output']>;
+  secondaryColor: Scalars['String']['output'];
+  supportEmail?: Maybe<Scalars['String']['output']>;
+  tagline?: Maybe<Scalars['String']['output']>;
+  termsOfServiceUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type TenantLanguageSettings = {
+  __typename?: 'TenantLanguageSettings';
+  defaultLanguage: Scalars['String']['output'];
+  supportedLanguages: Array<Scalars['String']['output']>;
+};
+
 export enum TenantPlan {
   Enterprise = 'ENTERPRISE',
   Free = 'FREE',
@@ -1232,6 +1876,26 @@ export type UpdateAnnotationInput = {
   spatialData?: InputMaybe<Scalars['JSON']['input']>;
 };
 
+export type UpdateAnnouncementInput = {
+  body?: InputMaybe<Scalars['String']['input']>;
+  expiresAt?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  priority?: InputMaybe<Scalars['String']['input']>;
+  publishAt?: InputMaybe<Scalars['String']['input']>;
+  targetAudience?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateBadgeInput = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  conditionType?: InputMaybe<Scalars['String']['input']>;
+  conditionValue?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  iconEmoji?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  pointsReward?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type UpdateConceptInput = {
   definition?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -1252,10 +1916,57 @@ export type UpdateModuleInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateRoleInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  permissions?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UpdateSecuritySettingsInput = {
+  ipAllowlist?: InputMaybe<Array<Scalars['String']['input']>>;
+  loginAttemptLockoutThreshold?: InputMaybe<Scalars['Int']['input']>;
+  maxConcurrentSessions?: InputMaybe<Scalars['Int']['input']>;
+  mfaRequired?: InputMaybe<Scalars['Boolean']['input']>;
+  mfaRequiredForAdmins?: InputMaybe<Scalars['Boolean']['input']>;
+  passwordExpiryDays?: InputMaybe<Scalars['Int']['input']>;
+  passwordMinLength?: InputMaybe<Scalars['Int']['input']>;
+  passwordRequireSpecialChars?: InputMaybe<Scalars['Boolean']['input']>;
+  sessionTimeoutMinutes?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateTenantBrandingInput = {
+  accentColor?: InputMaybe<Scalars['String']['input']>;
+  backgroundColor?: InputMaybe<Scalars['String']['input']>;
+  faviconUrl?: InputMaybe<Scalars['String']['input']>;
+  fontFamily?: InputMaybe<Scalars['String']['input']>;
+  hideEduSphereBranding?: InputMaybe<Scalars['Boolean']['input']>;
+  logoMarkUrl?: InputMaybe<Scalars['String']['input']>;
+  logoUrl?: InputMaybe<Scalars['String']['input']>;
+  organizationName?: InputMaybe<Scalars['String']['input']>;
+  primaryColor?: InputMaybe<Scalars['String']['input']>;
+  privacyPolicyUrl?: InputMaybe<Scalars['String']['input']>;
+  secondaryColor?: InputMaybe<Scalars['String']['input']>;
+  supportEmail?: InputMaybe<Scalars['String']['input']>;
+  tagline?: InputMaybe<Scalars['String']['input']>;
+  termsOfServiceUrl?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateTenantLanguageSettingsInput = {
+  defaultLanguage: Scalars['String']['input'];
+  supportedLanguages: Array<Scalars['String']['input']>;
+};
+
 export type UpdateUserInput = {
   firstName?: InputMaybe<Scalars['String']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
+};
+
+export type UpdateUserPreferencesInput = {
+  emailNotifications?: InputMaybe<Scalars['Boolean']['input']>;
+  locale?: InputMaybe<Scalars['String']['input']>;
+  pushNotifications?: InputMaybe<Scalars['Boolean']['input']>;
+  theme?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** External entity stubs */
@@ -1271,6 +1982,13 @@ export type User = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type UserBadge = {
+  __typename?: 'UserBadge';
+  badge: Badge;
+  earnedAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+};
+
 export type UserCourse = {
   __typename?: 'UserCourse';
   completedAt?: Maybe<Scalars['String']['output']>;
@@ -1279,6 +1997,15 @@ export type UserCourse = {
   id: Scalars['ID']['output'];
   status: Scalars['String']['output'];
   userId: Scalars['ID']['output'];
+};
+
+export type UserPreferences = {
+  __typename?: 'UserPreferences';
+  emailNotifications: Scalars['Boolean']['output'];
+  isPublicProfile: Scalars['Boolean']['output'];
+  locale: Scalars['String']['output'];
+  pushNotifications: Scalars['Boolean']['output'];
+  theme: Scalars['String']['output'];
 };
 
 export enum UserRole {
@@ -1428,6 +2155,18 @@ export type ReplyToAnnotationMutationVariables = Exact<{
 
 
 export type ReplyToAnnotationMutation = { __typename?: 'Mutation', replyToAnnotation: { __typename?: 'Annotation', id: string, content: unknown, userId: string, parentId?: string | null, layer: AnnotationLayer, annotationType: AnnotationType, createdAt: string, updatedAt: string } };
+
+export type MyOpenBadgesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyOpenBadgesQuery = { __typename?: 'Query', myOpenBadges: Array<{ __typename?: 'OpenBadgeAssertion', id: string, badgeDefinitionId: string, recipientId: string, issuedAt: string, expiresAt?: string | null, evidenceUrl?: string | null, revoked: boolean, revokedAt?: string | null, revokedReason?: string | null, vcDocument: string, definition: { __typename?: 'OpenBadgeDefinition', id: string, name: string, description: string, imageUrl?: string | null, criteriaUrl?: string | null, tags: Array<string>, issuerId: string, createdAt: string } }> };
+
+export type VerifyOpenBadgeQueryVariables = Exact<{
+  assertionId: Scalars['ID']['input'];
+}>;
+
+
+export type VerifyOpenBadgeQuery = { __typename?: 'Query', verifyOpenBadge: boolean };
 
 export type DiscussionsQueryVariables = Exact<{
   courseId: Scalars['ID']['input'];
@@ -1646,3 +2385,10 @@ export type PrerequisiteChainQueryVariables = Exact<{
 
 
 export type PrerequisiteChainQuery = { __typename?: 'Query', prerequisiteChain: Array<{ __typename?: 'ConceptNode', id: string, name: string }> };
+
+export type NotificationReceivedSubscriptionVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type NotificationReceivedSubscription = { __typename?: 'Subscription', notificationReceived: { __typename?: 'Notification', id: string, type: NotificationType, title: string, body: string, payload?: unknown | null, readAt?: string | null, createdAt: string } };

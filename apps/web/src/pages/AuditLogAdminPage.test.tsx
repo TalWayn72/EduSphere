@@ -400,4 +400,133 @@ describe('AuditLogAdminPage', () => {
     fireEvent.change(toInput, { target: { value: '2025-06-30' } });
     expect(toInput.value).toBe('2025-06-30');
   });
+
+  // ── JSON export button path (line 105 — "Open again" toast action) ──────────
+
+  it('Export JSON button calls mutation with format JSON (line 105 path)', async () => {
+    const presignedUrl = 'https://minio.example.com/audit-export.json';
+    const executeFn = vi.fn().mockResolvedValue({
+      data: {
+        exportAuditLog: {
+          presignedUrl,
+          expiresAt: '2026-02-26T16:00:00Z',
+          recordCount: 77,
+        },
+      },
+      error: undefined,
+    });
+    mockMutation(executeFn);
+    renderPage();
+
+    const fromInput = screen.getByLabelText(/Start Date/i);
+    const toInput = screen.getByLabelText(/End Date/i);
+    fireEvent.change(fromInput, { target: { value: '2024-03-01' } });
+    fireEvent.change(toInput, { target: { value: '2024-03-31' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /Export audit log as JSON/i }));
+
+    await waitFor(() => {
+      expect(executeFn).toHaveBeenCalledWith({
+        fromDate: '2024-03-01',
+        toDate: '2024-03-31',
+        format: 'JSON',
+      });
+    });
+  });
+
+  it('JSON export opens presigned URL in new tab', async () => {
+    const presignedUrl = 'https://minio.example.com/audit-export.json';
+    const executeFn = vi.fn().mockResolvedValue({
+      data: {
+        exportAuditLog: {
+          presignedUrl,
+          expiresAt: '2026-02-26T16:00:00Z',
+          recordCount: 77,
+        },
+      },
+      error: undefined,
+    });
+    mockMutation(executeFn);
+    renderPage();
+
+    fireEvent.click(screen.getByRole('button', { name: /Export audit log as JSON/i }));
+
+    await waitFor(() => {
+      expect(window.open).toHaveBeenCalledWith(presignedUrl, '_blank', 'noopener,noreferrer');
+    });
+  });
+
+  it('"Open again" toast action (line 105) reopens the presigned URL', async () => {
+    // The toast.success call includes an `action.onClick` callback that calls window.open again.
+    // This test extracts that callback and invokes it to cover line 105.
+    const presignedUrl = 'https://minio.example.com/reopen.json';
+    const executeFn = vi.fn().mockResolvedValue({
+      data: {
+        exportAuditLog: {
+          presignedUrl,
+          expiresAt: '2026-02-26T16:00:00Z',
+          recordCount: 12,
+        },
+      },
+      error: undefined,
+    });
+    mockMutation(executeFn);
+    renderPage();
+
+    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+
+    await waitFor(() => {
+      expect(vi.mocked(toast.success)).toHaveBeenCalled();
+    });
+
+    // Extract the action.onClick from the toast.success call and invoke it
+    const toastSuccessCall = vi.mocked(toast.success).mock.calls[0];
+    // toastSuccessCall[1] is the options object: { action: { label, onClick }, duration }
+    const toastOptions = toastSuccessCall[1] as {
+      action: { label: string; onClick: () => void };
+      duration: number;
+    };
+
+    expect(toastOptions.action).toBeDefined();
+    expect(typeof toastOptions.action.onClick).toBe('function');
+
+    // Invoke "Open again" — must call window.open with the presigned URL
+    toastOptions.action.onClick();
+
+    expect(window.open).toHaveBeenCalledWith(presignedUrl, '_blank', 'noopener,noreferrer');
+    // window.open was called at least twice: once from handleExport + once from "Open again"
+    expect(vi.mocked(window.open)).toHaveBeenCalledTimes(2);
+  });
+
+  // ── Additional date validation edge cases ──────────────────────────────────
+
+  it('shows toast.error when fromDate equals toDate (same day is valid — no error)', async () => {
+    // Same day (fromDate === toDate) is valid: fromDate > toDate is false
+    const executeFn = vi.fn().mockResolvedValue({
+      data: {
+        exportAuditLog: {
+          presignedUrl: 'https://example.com/same-day.csv',
+          expiresAt: '2026-02-26T16:00:00Z',
+          recordCount: 5,
+        },
+      },
+      error: undefined,
+    });
+    mockMutation(executeFn);
+    renderPage();
+
+    const fromInput = screen.getByLabelText(/Start Date/i);
+    const toInput = screen.getByLabelText(/End Date/i);
+    fireEvent.change(fromInput, { target: { value: '2025-01-15' } });
+    fireEvent.change(toInput, { target: { value: '2025-01-15' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /Export audit log as CSV/i }));
+
+    // Same day is valid — mutation should be called
+    await waitFor(() => {
+      expect(executeFn).toHaveBeenCalledWith(
+        expect.objectContaining({ fromDate: '2025-01-15', toDate: '2025-01-15' })
+      );
+    });
+  });
 });

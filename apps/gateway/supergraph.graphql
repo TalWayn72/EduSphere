@@ -391,7 +391,11 @@ type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @jo
   """
   Real-time user status updates
   """
-  userStatusChanged(userId: ID!) : UserStatus! @join__field(graph: CORE) 
+  userStatusChanged(userId: ID!) : UserStatus! @join__field(graph: CORE)
+  """
+  Real-time notification stream for a user
+  """
+  notificationReceived(userId: ID!) : Notification! @join__field(graph: CORE)
 }
 
 type AgentExecution @join__type(graph: AGENT, key: "id")  {
@@ -1285,4 +1289,24 @@ type AuditExportResult @join__type(graph: CORE)  {
   presignedUrl: String! @join__field(graph: CORE)
   expiresAt: String! @join__field(graph: CORE)
   recordCount: Int! @join__field(graph: CORE)
+}
+
+# ── Notifications (notifications.graphql) ─────────────────────────────────────
+
+type Notification @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  type: NotificationType! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  body: String! @join__field(graph: CORE)
+  payload: JSON @join__field(graph: CORE)
+  readAt: DateTime @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+}
+
+enum NotificationType @join__type(graph: CORE)  {
+  BADGE_ISSUED @join__enumValue(graph: CORE)
+  COURSE_ENROLLED @join__enumValue(graph: CORE)
+  USER_FOLLOWED @join__enumValue(graph: CORE)
+  SRS_REVIEW_DUE @join__enumValue(graph: CORE)
+  ANNOUNCEMENT @join__enumValue(graph: CORE)
 }
