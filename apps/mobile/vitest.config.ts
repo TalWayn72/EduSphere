@@ -8,6 +8,7 @@ export default defineConfig({
       'src/sync/__tests__/**/*.test.ts',
       'src/hooks/__tests__/**/*.test.ts',
       'src/hooks/__tests__/**/*.test.tsx',
+      'src/screens/__tests__/**/*.test.tsx',
     ],
     // useOfflineAnnotations.test.tsx imports @testing-library/react-hooks which
     // is not installed — exclude until the package is added as a dev dependency
