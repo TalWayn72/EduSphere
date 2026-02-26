@@ -10,6 +10,8 @@ import pino from 'pino';
 import {
   checkRateLimit,
   stopRateLimitCleanup,
+  PREMIUM_MAX_REQUESTS,
+  MAX_REQUESTS,
 } from './middleware/rate-limit.js';
 import {
   depthLimitRule,
@@ -239,9 +241,11 @@ server.listen(port, () => {
     {
       maxDepth: process.env['GRAPHQL_MAX_DEPTH'] ?? 10,
       maxComplexity: process.env['GRAPHQL_MAX_COMPLEXITY'] ?? 1000,
-      rateLimitMax: process.env['RATE_LIMIT_MAX'] ?? 100,
+      rateLimitStandardPerMin: MAX_REQUESTS,
+      rateLimitPremiumPerMin: PREMIUM_MAX_REQUESTS,
+      premiumTenants: process.env['RATE_LIMIT_PREMIUM_TENANTS'] ?? '(none)',
     },
-    'G-09/G-10: rate limiting + query guards active'
+    'G-09/G-10: per-tenant rate limiting (standard/premium tiers) + query guards active'
   );
 });
 

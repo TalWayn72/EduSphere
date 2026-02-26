@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Search, Clock } from 'lucide-react';
@@ -18,6 +18,8 @@ export function TranscriptPanel({
 }: TranscriptPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation('content');
+  const activeRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -33,6 +35,13 @@ export function TranscriptPanel({
     return currentTime >= segment.startTime && currentTime < segment.endTime;
   };
 
+  // Auto-scroll to active segment when it changes
+  useEffect(() => {
+    if (!searchQuery && activeRef.current) {
+      activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [currentTime, searchQuery]);
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
@@ -47,12 +56,13 @@ export function TranscriptPanel({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-2">
         {filteredSegments.map((segment) => {
           const isActive = isSegmentActive(segment);
           return (
             <div
               key={segment.id}
+              ref={isActive ? activeRef : null}
               onClick={() => onSeek(segment.startTime)}
               className={cn(
                 'p-3 rounded-lg cursor-pointer transition-colors border',
