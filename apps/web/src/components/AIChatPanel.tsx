@@ -151,7 +151,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
             value={selectedAgent}
             onValueChange={(value) => setSelectedAgent(value as AgentType)}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full" aria-label={t('selectAgent')}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
