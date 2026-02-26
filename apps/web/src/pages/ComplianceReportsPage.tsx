@@ -192,7 +192,10 @@ export function ComplianceReportsPage() {
               ))}
             </div>
             <div>
-              <label htmlFor="as-of-date" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="as-of-date"
+                className="block text-sm font-medium mb-1"
+              >
                 As of date (optional)
               </label>
               <input
