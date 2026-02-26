@@ -62,8 +62,9 @@ vi.mock('./UserManagementPage.modals', () => ({
   BulkImportModal: () => null,
 }));
 
-// Mock shadcn Select: <div> wrapper (so SelectValue text is visible) +
-// hidden native <select> (implicit combobox role) for fireEvent.change interaction
+// Mock shadcn Select as a native <select> with real <option> children so that
+// fireEvent.change can set element.value and trigger onChange properly.
+// SelectTrigger / SelectValue render null — not needed for these tests.
 vi.mock('@/components/ui/select', () => ({
   Select: ({
     value,
@@ -74,14 +75,11 @@ vi.mock('@/components/ui/select', () => ({
     onValueChange?: (v: string) => void;
     children: React.ReactNode;
   }) => (
-    <div>
+    <select value={value} onChange={(e) => onValueChange?.(e.target.value)}>
       {children}
-      <select value={value} onChange={(e) => onValueChange?.(e.target.value)} />
-    </div>
+    </select>
   ),
-  SelectTrigger: ({ children }: { children: React.ReactNode }) => (
-    <div>{children}</div>
-  ),
+  SelectTrigger: () => null,
   SelectContent: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>
   ),
@@ -92,9 +90,7 @@ vi.mock('@/components/ui/select', () => ({
     value: string;
     children: React.ReactNode;
   }) => <option value={value}>{children}</option>,
-  SelectValue: ({ placeholder }: { placeholder?: string }) => (
-    <span>{placeholder}</span>
-  ),
+  SelectValue: () => null,
 }));
 
 import { useQuery, useMutation } from 'urql';
