@@ -39,6 +39,13 @@ export default defineConfig({
       '@hocuspocus/provider': tiptapStub,
       // CSS imports from katex — not needed in jsdom tests
       'katex/dist/katex.min.css': tiptapStub,
+      // ProseMirror packages used by AnnotationDecorationsPlugin — real packages that work in jsdom
+      // but alias them to stub for test isolation
+      '@tiptap/pm/state': tiptapStub,
+      '@tiptap/pm/view': tiptapStub,
+      '@tiptap/pm/model': tiptapStub,
+      // react-resizable-panels — not testable in jsdom, stub for UI component tests
+      'react-resizable-panels': tiptapStub,
     },
   },
   test: {

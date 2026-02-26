@@ -16,7 +16,6 @@ export interface ScrubResult {
 const PII_PATTERNS: Array<{ name: string; pattern: RegExp; replacement: string }> = [
   {
     name: 'EMAIL',
-    // eslint-disable-next-line security/detect-unsafe-regex
     pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
     replacement: '[EMAIL]',
   },
@@ -29,6 +28,7 @@ const PII_PATTERNS: Array<{ name: string; pattern: RegExp; replacement: string }
   },
   {
     name: 'PHONE_IL',
+    // eslint-disable-next-line security/detect-unsafe-regex
     pattern: /\b(?:\+972|0)(?:-?\d){9,10}\b/g,
     replacement: '[PHONE]',
   },

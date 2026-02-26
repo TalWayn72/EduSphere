@@ -69,6 +69,7 @@ Thumbs.db
 *.tmp
 .tmp-*.js
 .tmp-*.mjs
+.tmp-*.cjs
 test_output.txt
 *.temp
 *.bak

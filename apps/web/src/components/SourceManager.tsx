@@ -104,7 +104,6 @@ function devQueryFn(): Promise<KnowledgeSource[]> {
 }
 
 /** Mock mutation for DEV_MODE — no-op that resolves immediately. */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function devMutationFn(_: unknown): Promise<void> {
   return Promise.resolve();
 }

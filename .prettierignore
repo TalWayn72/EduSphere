@@ -1,0 +1,16 @@
+# Files excluded from Prettier formatting
+
+# This workflow YAML uses a multi-line run block with embedded shell commit
+# message that contains bare colons (SOC2 CC3.3: ...) at column 0 inside the
+# YAML block scalar, which trips Prettier's YAML parser ("All collection items
+# must start at the same column").  The file is valid YAML and valid for
+# GitHub Actions; exclude from Prettier to avoid a false-positive parse error.
+.github/workflows/audit-export.yml
+
+# Generated / vendor directories
+node_modules/
+dist/
+build/
+.turbo/
+coverage/
+pnpm-lock.yaml

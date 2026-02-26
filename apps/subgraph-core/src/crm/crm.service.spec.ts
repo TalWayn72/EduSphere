@@ -86,7 +86,7 @@ describe('CrmService', () => {
 
     const svc = makeService();
     // Expose private method via casting for unit test
-    const syncFn = (svc as unknown as Record<string, Function>)['syncCompletion'];
+    const syncFn = (svc as unknown as Record<string, (...args: unknown[]) => unknown>)['syncCompletion'];
     if (syncFn) {
       await syncFn.call(svc, 't1', 'u1', 'TypeScript Basics', new Date().toISOString(), 2);
     }
@@ -110,7 +110,7 @@ describe('CrmService', () => {
     mockSfClient.createCompletionActivity.mockResolvedValue('SF-new-act');
 
     const svc = makeService();
-    const syncFn = (svc as unknown as Record<string, Function>)['syncCompletion'];
+    const syncFn = (svc as unknown as Record<string, (...args: unknown[]) => unknown>)['syncCompletion'];
     if (syncFn) {
       await syncFn.call(svc, 't1', 'u1', 'Course', new Date().toISOString());
     }
@@ -133,7 +133,7 @@ describe('CrmService', () => {
     );
 
     const svc = makeService();
-    const syncFn = (svc as unknown as Record<string, Function>)['syncCompletion'];
+    const syncFn = (svc as unknown as Record<string, (...args: unknown[]) => unknown>)['syncCompletion'];
     if (syncFn) {
       await syncFn.call(svc, 't1', 'u1', 'Course', new Date().toISOString());
     }
@@ -153,7 +153,7 @@ describe('CrmService', () => {
     withTenantContext.mockResolvedValue([]);
 
     const svc = makeService();
-    const syncFn = (svc as unknown as Record<string, Function>)['syncCompletion'];
+    const syncFn = (svc as unknown as Record<string, (...args: unknown[]) => unknown>)['syncCompletion'];
     if (syncFn) {
       // Should not throw — error is caught and logged
       await expect(syncFn.call(svc, 't1', 'u1', 'Course', new Date().toISOString())).resolves.toBeUndefined();

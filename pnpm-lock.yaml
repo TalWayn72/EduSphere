@@ -601,9 +601,6 @@ importers:
 
   apps/subgraph-content:
     dependencies:
-      '@ai-sdk/openai':
-        specifier: ^3.0.30
-        version: 3.0.30(zod@4.3.6)
       '@aws-sdk/client-s3':
         specifier: ^3.729.0
         version: 3.993.0
@@ -661,9 +658,6 @@ importers:
       adm-zip:
         specifier: ^0.5.16
         version: 0.5.16
-      ai:
-        specifier: ^5.0.0
-        version: 5.0.137(zod@4.3.6)
       dataloader:
         specifier: ^2.2.3
         version: 2.2.3
@@ -691,9 +685,6 @@ importers:
       nestjs-pino:
         specifier: ^4.3.0
         version: 4.6.0(@nestjs/common@11.1.14(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@10.5.0)(pino@10.3.1)(rxjs@7.8.2)
-      ollama-ai-provider:
-        specifier: ^1.2.0
-        version: 1.2.0(zod@4.3.6)
       pdfkit:
         specifier: ^0.17.2
         version: 0.17.2
@@ -876,9 +867,6 @@ importers:
       '@edusphere/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@edusphere/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@edusphere/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -888,9 +876,6 @@ importers:
       '@edusphere/metrics':
         specifier: workspace:*
         version: link:../../packages/metrics
-      '@edusphere/nats-client':
-        specifier: workspace:*
-        version: link:../../packages/nats-client
       '@edusphere/telemetry':
         specifier: workspace:*
         version: link:../../packages/telemetry
@@ -1235,12 +1220,6 @@ importers:
       graphql:
         specifier: ^16.12.0
         version: 16.12.0
-      graphql-request:
-        specifier: ^7.4.0
-        version: 7.4.0(graphql@16.12.0)
-      graphql-tag:
-        specifier: ^2.12.6
-        version: 2.12.6(graphql@16.12.0)
       graphql-ws:
         specifier: ^5.16.0
         version: 5.16.0(graphql@16.12.0)
@@ -1280,6 +1259,9 @@ importers:
       react-i18next:
         specifier: ^15.0.0
         version: 15.7.4(i18next@23.16.8)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      react-resizable-panels:
+        specifier: ^4.6.5
+        version: 4.6.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react-router-dom:
         specifier: ^7.12.1
         version: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -14114,6 +14096,12 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  react-resizable-panels@4.6.5:
+    resolution: {integrity: sha512-pmQP6qv9KmsesNMvWVNvVfVJAwYSOWWbAOAtrPR8Cre20+j1NWIlyft0btjtDQE+OepXmI6g3VPrCXQY0oD7+Q==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
 
   react-router-dom@7.13.0:
     resolution: {integrity: sha512-5CO/l5Yahi2SKC6rGZ+HDEjpjkGaG/ncEP7eWFTvFxbHP8yeeI0PxTDjimtpXYlR3b3i9/WIL4VJttPrESIf2g==}
@@ -29041,7 +29029,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.3
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.13.5(debug@4.4.3))
+      retry-axios: 2.6.0(axios@1.13.5)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -32164,6 +32152,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
+  react-resizable-panels@4.6.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
   react-router-dom@7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       react: 19.2.4
@@ -32445,7 +32438,7 @@ snapshots:
 
   restructure@3.0.2: {}
 
-  retry-axios@2.6.0(axios@1.13.5(debug@4.4.3)):
+  retry-axios@2.6.0(axios@1.13.5):
     dependencies:
       axios: 1.13.5(debug@4.4.3)
 
