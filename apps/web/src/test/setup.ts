@@ -149,8 +149,8 @@ vi.mock('react-i18next', () => ({
 // ── Browser API stubs (not available in jsdom) ──────────────────────────────
 
 // ResizeObserver: used by @radix-ui/react-use-size (Radix Select, Tooltip, etc.)
-if (!global.ResizeObserver) {
-  global.ResizeObserver = class ResizeObserver {
+if (!globalThis.ResizeObserver) {
+  globalThis.ResizeObserver = class ResizeObserver {
     observe() {}
     unobserve() {}
     disconnect() {}
