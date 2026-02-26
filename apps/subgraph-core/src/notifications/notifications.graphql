@@ -1,0 +1,21 @@
+type Notification {
+  id: ID!
+  type: NotificationType!
+  title: String!
+  body: String!
+  payload: JSON
+  readAt: DateTime
+  createdAt: DateTime!
+}
+
+enum NotificationType {
+  BADGE_ISSUED
+  COURSE_ENROLLED
+  USER_FOLLOWED
+  SRS_REVIEW_DUE
+  ANNOUNCEMENT
+}
+
+extend type Subscription {
+  notificationReceived(userId: ID!): Notification! @authenticated
+}

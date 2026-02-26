@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { TenantModule } from './tenant/tenant.module';
 import { authMiddleware } from './auth/auth.middleware';
 import { MetricsModule } from './metrics/metrics.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { MetricsModule } from './metrics/metrics.module';
     }),
     UserModule,
     TenantModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
