@@ -14,6 +14,7 @@ import DiscussionsScreen from '../screens/DiscussionsScreen';
 import AITutorScreen from '../screens/AITutorScreen';
 import AIChatScreen from '../screens/AIChatScreen';
 import KnowledgeGraphScreen from '../screens/KnowledgeGraphScreen';
+import MyBadgesScreen from '../screens/MyBadgesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
@@ -31,6 +32,7 @@ export type MainTabParamList = {
   Discussions: undefined;
   AITutor: undefined;
   KnowledgeGraph: undefined;
+  Badges: undefined;
   Profile: undefined;
 };
 
@@ -55,6 +57,8 @@ function MainTabs() {
             iconName = focused ? 'bulb' : 'bulb-outline';
           } else if (route.name === 'KnowledgeGraph') {
             iconName = focused ? 'git-network' : 'git-network-outline';
+          } else if (route.name === 'Badges') {
+            iconName = focused ? 'ribbon' : 'ribbon-outline';
           } else {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -89,6 +93,11 @@ function MainTabs() {
         name="KnowledgeGraph"
         component={KnowledgeGraphScreen}
         options={{ title: t('graph') }}
+      />
+      <Tab.Screen
+        name="Badges"
+        component={MyBadgesScreen}
+        options={{ title: t('badges', { defaultValue: 'Badges' }) }}
       />
       <Tab.Screen
         name="Profile"
