@@ -29,6 +29,7 @@ export class BigBlueButtonClient {
   }
 
   private extractXmlField(xml: string, field: string): string | null {
+    // eslint-disable-next-line security/detect-non-literal-regexp
     const match = xml.match(new RegExp(`<${field}>(.*?)<\/${field}>`));
     return match?.[1] ?? null;
   }

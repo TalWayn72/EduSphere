@@ -59,7 +59,7 @@ describe('BiTokenService — memory safety', () => {
   });
 
   it('token cache evicts at max-500: insert 501 tokens, cache size stays <= 500', async () => {
-    const { schema, eq } = await import('@edusphere/db');
+    const { schema: _schema, eq: _eq } = await import('@edusphere/db');
 
     // Populate cache by making 501 validateToken calls with mock DB hits
     for (let i = 0; i < 501; i++) {

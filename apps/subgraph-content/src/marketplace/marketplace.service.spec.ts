@@ -6,9 +6,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BadRequestException } from '@nestjs/common';
 
 // ── DB mock ───────────────────────────────────────────────────────────────────
-const mockSelect = vi.fn();
-const mockInsert = vi.fn();
-const mockUpdate = vi.fn();
+const _mockSelect = vi.fn();
+const _mockInsert = vi.fn();
+const _mockUpdate = vi.fn();
 const mockWithTenantContext = vi.fn();
 const mockCloseAllPools = vi.fn();
 const mockPublish = vi.fn();

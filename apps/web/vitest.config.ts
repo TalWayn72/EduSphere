@@ -8,6 +8,14 @@ import path from 'path';
 // the aliases let Vitest resolve the module path without throwing
 // "Failed to resolve import".
 const tiptapStub = path.resolve(__dirname, './src/test/stubs/tiptap-stub.ts');
+// Each @tiptap/pm/* package and @tiptap/core needs its own distinct stub file.
+// Vitest uses the resolved file path as the module-cache key, so if multiple
+// packages alias to the same file, vi.mock() calls overwrite each other
+// (last writer wins).  Separate files = separate cache slots = safe isolation.
+const tiptapCoreStub = path.resolve(__dirname, './src/test/stubs/tiptap-core-stub.ts');
+const tiptapPmStateStub = path.resolve(__dirname, './src/test/stubs/tiptap-pm-state-stub.ts');
+const tiptapPmViewStub = path.resolve(__dirname, './src/test/stubs/tiptap-pm-view-stub.ts');
+const tiptapPmModelStub = path.resolve(__dirname, './src/test/stubs/tiptap-pm-model-stub.ts');
 
 export default defineConfig({
   plugins: [react()],
@@ -39,11 +47,14 @@ export default defineConfig({
       '@hocuspocus/provider': tiptapStub,
       // CSS imports from katex — not needed in jsdom tests
       'katex/dist/katex.min.css': tiptapStub,
-      // ProseMirror packages used by AnnotationDecorationsPlugin — real packages that work in jsdom
-      // but alias them to stub for test isolation
-      '@tiptap/pm/state': tiptapStub,
-      '@tiptap/pm/view': tiptapStub,
-      '@tiptap/pm/model': tiptapStub,
+      // Each ProseMirror / Tiptap-core package gets a dedicated stub file so that
+      // Vitest assigns each a separate module-cache slot.  If multiple packages
+      // alias to the same file, vi.mock() calls for each share one slot and
+      // overwrite each other (last writer wins).
+      '@tiptap/core': tiptapCoreStub,
+      '@tiptap/pm/state': tiptapPmStateStub,
+      '@tiptap/pm/view': tiptapPmViewStub,
+      '@tiptap/pm/model': tiptapPmModelStub,
       // react-resizable-panels — not testable in jsdom, stub for UI component tests
       'react-resizable-panels': tiptapStub,
     },

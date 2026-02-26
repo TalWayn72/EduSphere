@@ -12,7 +12,7 @@
  *  8. checkProgramCompletion calls certificate service on full completion
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { NotFoundException, ConflictException } from '@nestjs/common';
+import { NotFoundException as _NotFoundException, ConflictException as _ConflictException } from '@nestjs/common';
 
 // ─── Mocks (must be before any import of mocked module) ──────────────────────
 
@@ -76,7 +76,7 @@ vi.mock('../certificate/certificate.service.js', () => ({
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 import { ProgramService } from './program.service';
-import { withTenantContext, schema } from '@edusphere/db';
+import { withTenantContext, schema as _schema } from '@edusphere/db';
 import { CertificateService } from '../certificate/certificate.service.js';
 
 function buildPublishedProgram(overrides: Partial<Record<string, unknown>> = {}) {

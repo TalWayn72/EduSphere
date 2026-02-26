@@ -5,7 +5,7 @@
  */
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import {
-  createDatabaseConnection, closeAllPools, schema, withTenantContext, eq, and, isNotNull, desc, asc,
+  createDatabaseConnection, closeAllPools, schema, withTenantContext, eq, isNotNull, desc,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 

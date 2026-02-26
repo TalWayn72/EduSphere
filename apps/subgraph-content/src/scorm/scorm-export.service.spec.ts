@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException as _NotFoundException } from '@nestjs/common';
 import AdmZip from 'adm-zip';
 import { generateManifest2004, injectScormApiShim } from './scorm-manifest.generator';
 import type { CourseData } from './scorm-manifest.generator';
