@@ -17,38 +17,44 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// ── Shared mock db instance ───────────────────────────────────────────────────
+// ── Hoisted mock variables (must be declared with vi.hoisted so they are
+//    available inside the vi.mock() factory, which is hoisted above all
+//    const declarations) ────────────────────────────────────────────────────
 
-const mockInsertReturning = vi.fn().mockResolvedValue([{
-  id: 'assertion-1',
-  badgeDefinitionId: 'badge-class-1',
-  recipientId: 'user-1',
-  tenantId: 'tenant-1',
-  issuedAt: new Date('2026-01-01T00:00:00.000Z'),
-  evidenceUrl: null,
-  revoked: false,
-  revokedAt: null,
-  revokedReason: null,
-  proof: {},
-}]);
+const { mockDb, mockSelectFrom, mockInsertReturning } = vi.hoisted(() => {
+  const mockInsertReturning = vi.fn().mockResolvedValue([{
+    id: 'assertion-1',
+    badgeDefinitionId: 'badge-class-1',
+    recipientId: 'user-1',
+    tenantId: 'tenant-1',
+    issuedAt: new Date('2026-01-01T00:00:00.000Z'),
+    evidenceUrl: null,
+    revoked: false,
+    revokedAt: null,
+    revokedReason: null,
+    proof: {},
+  }]);
 
-const mockSelectFrom = {
-  from: vi.fn(),
-};
+  const mockSelectFrom = {
+    from: vi.fn(),
+  };
 
-const mockDb = {
-  select: vi.fn().mockReturnValue(mockSelectFrom),
-  insert: vi.fn().mockReturnValue({
-    values: vi.fn().mockReturnValue({
-      returning: mockInsertReturning,
+  const mockDb = {
+    select: vi.fn().mockReturnValue(mockSelectFrom),
+    insert: vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({
+        returning: mockInsertReturning,
+      }),
     }),
-  }),
-  update: vi.fn().mockReturnValue({
-    set: vi.fn().mockReturnValue({
-      where: vi.fn().mockResolvedValue(undefined),
+    update: vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue(undefined),
+      }),
     }),
-  }),
-};
+  };
+
+  return { mockDb, mockSelectFrom, mockInsertReturning };
+});
 
 // ── @edusphere/db mock — matches actual named exports used by the service ─────
 // The service imports: db, openBadgeDefinitions, openBadgeAssertions, eq, and

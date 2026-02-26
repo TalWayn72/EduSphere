@@ -94,8 +94,8 @@ describe('OpenBadgesService', () => {
       });
 
       const result = await service.issueBadge('def-1', 'user-1', 'tenant-1');
-      expect(result.badgeDefinitionId).toBe('def-1');
-      expect(result.recipientId).toBe('user-1');
+      expect(result.assertion.badgeDefinitionId).toBe('def-1');
+      expect(result.assertion.recipientId).toBe('user-1');
     });
   });
 

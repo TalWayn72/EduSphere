@@ -29,6 +29,13 @@
       "when": 1772098306179,
       "tag": "0003_massive_archangel",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1772200000000,
+      "tag": "0004_discussion_tables",
+      "breakpoints": true
     }
   ]
 }
