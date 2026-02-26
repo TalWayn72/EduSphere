@@ -146,6 +146,17 @@ vi.mock('react-i18next', () => ({
   I18nextProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+// ── Browser API stubs (not available in jsdom) ──────────────────────────────
+
+// ResizeObserver: used by @radix-ui/react-use-size (Radix Select, Tooltip, etc.)
+if (!global.ResizeObserver) {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 // ── MSW server ──────────────────────────────────────────────────────────────
 
 // Start MSW server before all tests

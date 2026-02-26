@@ -8,7 +8,13 @@
  * by providing a mock subscription return value.
  */
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // ── Polyfills required by jsdom ───────────────────────────────────────────────
@@ -27,8 +33,16 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select-content">{children}</div>
   ),
-  SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <div data-testid={`select-item-${value}`} role="option">{children}</div>
+  SelectItem: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => (
+    <div data-testid={`select-item-${value}`} role="option">
+      {children}
+    </div>
   ),
 }));
 
@@ -146,14 +160,20 @@ describe('AIChatPanel', () => {
     });
 
     // Advance past the 800 ms mock delay + 1000 ms stream-end delay
-    act(() => { vi.advanceTimersByTime(2000); });
-
-    await waitFor(() => {
-      const agentResponse = screen.queryAllByText(/counter-argument|Rambam|challenge|interesting/i);
-      expect(agentResponse.length).toBeGreaterThan(0);
+    act(() => {
+      vi.advanceTimersByTime(2000);
     });
 
+    // Restore real timers before waitFor — waitFor uses setInterval internally
+    // which gets frozen when fake timers are active.
     vi.useRealTimers();
+
+    await waitFor(() => {
+      const agentResponse = screen.queryAllByText(
+        /counter-argument|Rambam|challenge|interesting/i
+      );
+      expect(agentResponse.length).toBeGreaterThan(0);
+    });
   });
 
   // 5. Changing agent selector resets messages (empty state) ───────────────────
@@ -162,16 +182,22 @@ describe('AIChatPanel', () => {
     const { container } = render(<AIChatPanel />);
     openPanel(container);
     // Agent selector area is visible
-    expect(container.querySelector('[data-testid="select-root"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="select-root"]')
+    ).toBeInTheDocument();
     // No ChatMessage nodes yet
-    const chatMessages = container.querySelectorAll('[data-testid="chat-message"]');
+    const chatMessages = container.querySelectorAll(
+      '[data-testid="chat-message"]'
+    );
     expect(chatMessages.length).toBe(0);
   });
 
   it('agent selector area is rendered inside the open panel', () => {
     const { container } = renderPanel();
     openPanel(container);
-    expect(container.querySelector('[data-testid="select-root"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="select-root"]')
+    ).toBeInTheDocument();
   });
 
   // 6. Close button closes the panel ───────────────────────────────────────────
@@ -212,13 +238,20 @@ describe('AIChatPanel', () => {
     const input = screen.getByRole('textbox');
     fireEvent.keyPress(input, { key: 'Enter', code: 'Enter', charCode: 13 });
     // No ChatMessage elements rendered
-    const chatMessages = container.querySelectorAll('[data-testid="chat-message"]');
+    const chatMessages = container.querySelectorAll(
+      '[data-testid="chat-message"]'
+    );
     expect(chatMessages.length).toBe(0);
   });
 
   // 8. Subscription data renders correctly ──────────────────────────────────────
 
   it('renders a message that arrives via the subscription', async () => {
+    // Render first with no subscription data (realistic initial state)
+    const { container, rerender } = render(<AIChatPanel />);
+    openPanel(container);
+
+    // Simulate subscription data arriving after mount (push from server)
     vi.mocked(useSubscription).mockReturnValue([
       {
         data: {
@@ -233,16 +266,18 @@ describe('AIChatPanel', () => {
         error: undefined,
         stale: false,
         hasNext: false,
-        operation: undefined as unknown as ReturnType<typeof useSubscription>[0]['operation'],
+        operation: undefined as unknown as ReturnType<
+          typeof useSubscription
+        >[0]['operation'],
       },
       vi.fn(),
     ] as unknown as ReturnType<typeof useSubscription>);
-
-    const { container } = renderPanel();
-    openPanel(container);
+    rerender(<AIChatPanel />);
 
     await waitFor(() => {
-      expect(screen.getByText('Streaming response from backend.')).toBeInTheDocument();
+      expect(
+        screen.getByText('Streaming response from backend.')
+      ).toBeInTheDocument();
     });
   });
 
