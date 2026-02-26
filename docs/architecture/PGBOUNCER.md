@@ -47,15 +47,15 @@ gives maximum server connection reuse.
 
 ### Implications for EduSphere
 
-| Feature | Safe via PgBouncer? | Notes |
-|---------|---------------------|-------|
-| Regular `SELECT` / `INSERT` / `UPDATE` / `DELETE` | Yes | Standard Drizzle ORM queries |
-| Explicit `BEGIN … COMMIT` transactions | Yes | Connection held for full transaction |
-| `SET LOCAL app.current_tenant` (RLS context) | **No** | `SET LOCAL` is session-scoped; cleared on connection release |
-| `LISTEN` / `NOTIFY` | **No** | Requires persistent session connection |
-| Advisory locks (`pg_advisory_lock`) | **No** | Session-level state lost on release |
-| Apache AGE Cypher (`LOAD 'age'; SELECT cypher(…)`) | **No** | `LOAD` is session-scoped |
-| Temporary tables | **No** | Session-scoped objects |
+| Feature                                            | Safe via PgBouncer? | Notes                                                        |
+| -------------------------------------------------- | ------------------- | ------------------------------------------------------------ |
+| Regular `SELECT` / `INSERT` / `UPDATE` / `DELETE`  | Yes                 | Standard Drizzle ORM queries                                 |
+| Explicit `BEGIN … COMMIT` transactions             | Yes                 | Connection held for full transaction                         |
+| `SET LOCAL app.current_tenant` (RLS context)       | **No**              | `SET LOCAL` is session-scoped; cleared on connection release |
+| `LISTEN` / `NOTIFY`                                | **No**              | Requires persistent session connection                       |
+| Advisory locks (`pg_advisory_lock`)                | **No**              | Session-level state lost on release                          |
+| Apache AGE Cypher (`LOAD 'age'; SELECT cypher(…)`) | **No**              | `LOAD` is session-scoped                                     |
+| Temporary tables                                   | **No**              | Session-scoped objects                                       |
 
 ### Routing Rule (enforced in application code)
 
@@ -80,7 +80,7 @@ pgbouncer:
   mem_limit: 128m
   mem_reservation: 64m
   ports:
-    - "5433:5432"
+    - '5433:5432'
   environment:
     DATABASES_HOST: postgres
     DATABASES_PORT: 5432
@@ -98,12 +98,12 @@ pgbouncer:
 
 ### Environment Variables
 
-| Variable | Dev default | Description |
-|----------|-------------|-------------|
-| `PGBOUNCER_URL` | `postgresql://edusphere:…@localhost:5433/edusphere` | Use for standard Drizzle queries |
-| `PGBOUNCER_HOST` | `localhost` | PgBouncer hostname |
-| `PGBOUNCER_PORT` | `5433` | PgBouncer port |
-| `DATABASE_URL` | `postgresql://…@localhost:5432/edusphere` | Direct PostgreSQL — use for RLS / AGE / LISTEN |
+| Variable         | Dev default                                         | Description                                    |
+| ---------------- | --------------------------------------------------- | ---------------------------------------------- |
+| `PGBOUNCER_URL`  | `postgresql://edusphere:…@localhost:5433/edusphere` | Use for standard Drizzle queries               |
+| `PGBOUNCER_HOST` | `localhost`                                         | PgBouncer hostname                             |
+| `PGBOUNCER_PORT` | `5433`                                              | PgBouncer port                                 |
+| `DATABASE_URL`   | `postgresql://…@localhost:5432/edusphere`           | Direct PostgreSQL — use for RLS / AGE / LISTEN |
 
 ---
 

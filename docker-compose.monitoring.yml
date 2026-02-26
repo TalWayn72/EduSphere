@@ -49,8 +49,6 @@ services:
     networks:
       - monitoring
     restart: unless-stopped
-    mem_limit: 256m
-    mem_reservation: 128m
     depends_on:
       - prometheus
       - loki

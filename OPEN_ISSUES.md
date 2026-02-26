@@ -31,11 +31,11 @@
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/ScimSettingsPage.tsx` | backdrop `onClick`: use `e.target === e.currentTarget` guard; remove inner `stopPropagation()` |
-| `tests/contract/schema-contract.test.ts` | +4 SCIM contract tests |
-| `apps/gateway/src/test/federation/scim-supergraph.spec.ts` | New file — 13 regression assertions |
+| File                                                       | Change                                                                                         |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `apps/web/src/pages/ScimSettingsPage.tsx`                  | backdrop `onClick`: use `e.target === e.currentTarget` guard; remove inner `stopPropagation()` |
+| `tests/contract/schema-contract.test.ts`                   | +4 SCIM contract tests                                                                         |
+| `apps/gateway/src/test/federation/scim-supergraph.spec.ts` | New file — 13 regression assertions                                                            |
 
 ---
 
@@ -46,6 +46,7 @@
 ### Problem
 
 `/my-badges` showed a red error banner:
+
 > Failed to load badges: [GraphQL] Cannot query field "myOpenBadges" on type "Query".
 
 `MyOpenBadgesPage.tsx` imports `MY_OPEN_BADGES_QUERY` from `@/lib/graphql/badges.queries` and queries `myOpenBadges` via urql at runtime. The field was correctly defined in both the CORE subgraph SDL (`apps/subgraph-core/src/gamification/gamification.graphql:113`) and in the manually-maintained `apps/gateway/supergraph.graphql:234`, but the **live Hive Gateway did not serve the field** because the gateway composes its schema dynamically from running subgraphs — not from `supergraph.graphql`.
@@ -54,10 +55,10 @@
 
 **Structural gap — two sources of truth:**
 
-| Source | `myOpenBadges` present? | Used by |
-|--------|------------------------|---------|
-| `supergraph.graphql` (static file) | ✅ Added in Wave 5C | `pnpm codegen`, `schema-contract.test.ts` |
-| Live Hive Gateway (composes from `_service` SDL) | ❌ Only if subgraph-core is running at compose time | Runtime browser requests |
+| Source                                           | `myOpenBadges` present?                             | Used by                                   |
+| ------------------------------------------------ | --------------------------------------------------- | ----------------------------------------- |
+| `supergraph.graphql` (static file)               | ✅ Added in Wave 5C                                 | `pnpm codegen`, `schema-contract.test.ts` |
+| Live Hive Gateway (composes from `_service` SDL) | ❌ Only if subgraph-core is running at compose time | Runtime browser requests                  |
 
 The gateway uses `@graphql-hive/gateway` with `type: 'config'`, which fetches the SDL from each subgraph at startup. If `subgraph-core` was **not running** when the gateway started (or was restarted without subgraph-core), `myOpenBadges` is absent from the composed schema even though `supergraph.graphql` has it.
 
@@ -77,14 +78,15 @@ The gateway uses `@graphql-hive/gateway` with `type: 'config'`, which fetches th
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `tests/contract/schema-contract.test.ts` | +11 tests: badges (2), collaboration (8), notifications (1) |
+| File                                                              | Change                                                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `tests/contract/schema-contract.test.ts`                          | +11 tests: badges (2), collaboration (8), notifications (1)                     |
 | `apps/gateway/src/test/federation/open-badges-supergraph.spec.ts` | New file — 9 regression assertions for Open Badges in supergraph + subgraph SDL |
 
 ### Prevention Pattern (updated)
 
 For **every** query file in `apps/web/src/lib/graphql/` that is:
+
 - NOT excluded from `codegen.ts`, OR
 - Used by a rendered component (even if excluded from codegen)
 
@@ -94,6 +96,7 @@ For **every** domain feature added to the core subgraph SDL:
 → There **MUST** be a regression spec in `apps/gateway/src/test/federation/<domain>-supergraph.spec.ts` that verifies the fields are in `supergraph.graphql` AND in the subgraph SDL.
 
 **Checklist for future features:**
+
 - [ ] Query file in `apps/web/src/lib/graphql/` → entry in `schema-contract.test.ts`
 - [ ] New subgraph SDL fields → regression spec in `apps/gateway/src/test/federation/`
 - [ ] Unit/E2E tests mock GraphQL → contract test covers real field validity
@@ -108,6 +111,7 @@ For **every** domain feature added to the core subgraph SDL:
 ### Problem
 
 `/dashboard` showed a red error banner:
+
 > שגיאה בטעינת נתוני משתמש: "Cannot query field "preferences" on type "User" [GraphQL]."
 
 `ME_QUERY` in `apps/web/src/lib/queries.ts` requests `preferences { locale theme emailNotifications pushNotifications }` on the `User` type. The subgraph SDL (`apps/subgraph-core/src/user/user.graphql:19`) correctly defines `preferences: UserPreferences!` on `User`, but the field was **missing from the manually maintained `apps/gateway/supergraph.graphql`**.
@@ -117,6 +121,7 @@ For **every** domain feature added to the core subgraph SDL:
 `supergraph.graphql` is maintained manually (live `pnpm compose` requires running services). When the `UserPreferences` type and its resolver were added to the core subgraph, the `preferences` field was added to `UserPreferences` type definition in the supergraph, but was **not added to the `User` type's field list** in the same file. This is a structural gap in manual supergraph maintenance.
 
 **Why tests didn't catch it:**
+
 - `tests/contract/schema-contract.test.ts` validated 36 operations (annotation, content, knowledge, agent) but **omitted `ME_QUERY`** from `apps/web/src/lib/queries.ts` entirely.
 - `apps/web/src/pages/Dashboard.test.tsx` mocks all urql calls with `vi.mock()`, so it never validates the real schema.
 
@@ -127,10 +132,10 @@ For **every** domain feature added to the core subgraph SDL:
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/gateway/supergraph.graphql:128` | Added `preferences: UserPreferences! @join__field(graph: CORE)` to `User` type |
-| `tests/contract/schema-contract.test.ts` | Added `Schema Contract - queries.ts (Dashboard)` suite (4 new tests) |
+| File                                     | Change                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------ |
+| `apps/gateway/supergraph.graphql:128`    | Added `preferences: UserPreferences! @join__field(graph: CORE)` to `User` type |
+| `tests/contract/schema-contract.test.ts` | Added `Schema Contract - queries.ts (Dashboard)` suite (4 new tests)           |
 
 ---
 
@@ -141,6 +146,7 @@ For **every** domain feature added to the core subgraph SDL:
 ### Problem
 
 `/dashboard` showed an error inside the Daily Learning widget:
+
 > Could not load lesson: [GraphQL] Cannot query field "dailyMicrolesson" on type "Query".
 
 `DailyLearningWidget.tsx` imports `DAILY_MICROLESSON_QUERY` from `@/lib/graphql/content-tier3.queries` and executes it via urql at runtime. The content subgraph SDL (`apps/subgraph-content/src/microlearning/microlearning.graphql:43`) defines `dailyMicrolesson: ContentItem @authenticated` in `extend type Query`, but this field was **missing from `apps/gateway/supergraph.graphql`**.
@@ -152,6 +158,7 @@ Same structural issue as BUG-024 — manual supergraph maintenance. The `dailyMi
 The `MicrolearningPath` type was also missing from the supergraph.
 
 **Why tests didn't catch it:**
+
 - `content-tier3.queries.ts` is excluded from codegen (so no TS compile error), but was never included in schema contract tests.
 - No test verified that queries imported by rendered components are valid against the supergraph.
 
@@ -163,10 +170,10 @@ The `MicrolearningPath` type was also missing from the supergraph.
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/gateway/supergraph.graphql` | Added `dailyMicrolesson` + `microlearningPaths` to `Query` type; added `MicrolearningPath` type |
-| `tests/contract/schema-contract.test.ts` | Added `Schema Contract - content-tier3.queries.ts (Microlearning)` suite (1 new test) |
+| File                                     | Change                                                                                          |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `apps/gateway/supergraph.graphql`        | Added `dailyMicrolesson` + `microlearningPaths` to `Query` type; added `MicrolearningPath` type |
+| `tests/contract/schema-contract.test.ts` | Added `Schema Contract - content-tier3.queries.ts (Microlearning)` suite (1 new test)           |
 
 ### Prevention Pattern
 
@@ -181,6 +188,7 @@ For any query used in a **rendered component** (not excluded from codegen), the 
 ### Problem
 
 `/admin/users` threw `Unexpected Application Error` on load:
+
 > A `<Select.Item />` must have a value prop that is not an empty string.
 
 Radix UI reserves `value=""` for the placeholder/clear mechanism — using it on a real item causes a render-time throw.
@@ -188,9 +196,11 @@ Radix UI reserves `value=""` for the placeholder/clear mechanism — using it on
 ### Root Cause
 
 `UserManagementPage.tsx:149` — "All Roles" filter item had `value=""`:
+
 ```tsx
-<SelectItem value="">All Roles</SelectItem>  // WRONG
+<SelectItem value="">All Roles</SelectItem> // WRONG
 ```
+
 State initializers `roleFilter` and `appliedRole` were also `''`, and the query variable used `appliedRole || undefined` which silently converted `'all'` to `undefined`.
 
 ### Solution
@@ -201,13 +211,14 @@ State initializers `roleFilter` and `appliedRole` were also `''`, and the query 
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
+| File                                        | Change                                             |
+| ------------------------------------------- | -------------------------------------------------- |
 | `apps/web/src/pages/UserManagementPage.tsx` | `value=""` → `value="all"`, state init + query var |
 
 ### Tests
 
 `apps/web/src/pages/UserManagementPage.test.tsx` — 12 tests including regression:
+
 - `role filter Select does not use empty string as SelectItem value`
 - `role filter defaults to "All Roles" option (value="all")`
 
@@ -220,6 +231,7 @@ State initializers `roleFilter` and `appliedRole` were also `''`, and the query 
 ### Problem
 
 Three UX/safety gaps in `/admin/users`:
+
 1. Role changes applied immediately to API with no confirmation — accidental clicks changed user roles
 2. No feedback (toast) on any action (reset password, deactivate, role change)
 3. `tenantId` for InviteUserModal taken from `users[0]?.tenantId` — empty string when list was empty/loading
@@ -232,10 +244,10 @@ Three UX/safety gaps in `/admin/users`:
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/UserManagementPage.tsx` | Role confirmation state + handlers + UI + toast + tenantId from auth |
-| `apps/web/src/pages/UserManagementPage.test.tsx` | Added 6 new tests covering all improvements |
+| File                                             | Change                                                               |
+| ------------------------------------------------ | -------------------------------------------------------------------- |
+| `apps/web/src/pages/UserManagementPage.tsx`      | Role confirmation state + handlers + UI + toast + tenantId from auth |
+| `apps/web/src/pages/UserManagementPage.test.tsx` | Added 6 new tests covering all improvements                          |
 
 ---
 
@@ -255,6 +267,7 @@ Approximately 8 subgraph-core SDL files had types, queries, and mutations that w
 ### Solution
 
 Manually added all missing types and operations from the following SDL files into `supergraph.graphql`:
+
 - `user.graphql` — `adminUsers`, `publicProfile`, `followUser`, `UserPublicProfile`, `AdminUserConnection`
 - `gamification.graphql` — `myBadges`, `leaderboard`, Open Badges 3.0 types (`OpenBadge`, `OpenBadgeCredential`, `issueBadge`, `revokeOpenBadge`, `myOpenBadges`, `verifyOpenBadge`)
 - `srs.graphql` — `dueReviews`, `SrsCard`, `SrsReviewInput`
@@ -267,8 +280,8 @@ Manually added all missing types and operations from the following SDL files int
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
+| File                              | Change                                                       |
+| --------------------------------- | ------------------------------------------------------------ |
 | `apps/gateway/supergraph.graphql` | Added all missing types, queries, mutations from 9 SDL files |
 
 ### Tests
@@ -284,6 +297,7 @@ Manually added all missing types and operations from the following SDL files int
 ### Problem
 
 Three admin pages had no unit tests, reducing web frontend coverage below threshold:
+
 - `AdminDashboardPage` — role guards and overview stats not tested
 - `AuditLogPage` — user-facing audit log filtering/pagination not tested
 - `AuditLogAdminPage` — admin-level audit log mutations and export not tested
@@ -291,6 +305,7 @@ Three admin pages had no unit tests, reducing web frontend coverage below thresh
 ### Solution
 
 Written three test files with 30+ tests total covering:
+
 - Role guards (redirects non-admin users)
 - Loading state rendering
 - Error state rendering
@@ -301,11 +316,11 @@ Written three test files with 30+ tests total covering:
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/AdminDashboardPage.test.tsx` | New — 10+ tests for role guards, loading, error, stats display |
-| `apps/web/src/pages/AuditLogPage.test.tsx` | New — 10+ tests for filtering, pagination, loading/error states |
-| `apps/web/src/pages/AuditLogAdminPage.test.tsx` | New — 10+ tests for mutations, export, GDPR erasure, role guard |
+| File                                             | Change                                                          |
+| ------------------------------------------------ | --------------------------------------------------------------- |
+| `apps/web/src/pages/AdminDashboardPage.test.tsx` | New — 10+ tests for role guards, loading, error, stats display  |
+| `apps/web/src/pages/AuditLogPage.test.tsx`       | New — 10+ tests for filtering, pagination, loading/error states |
+| `apps/web/src/pages/AuditLogAdminPage.test.tsx`  | New — 10+ tests for mutations, export, GDPR erasure, role guard |
 
 ---
 
@@ -315,23 +330,24 @@ Severity: 🔴 Critical (Admin Panel blank) | Status: ✅ Fixed | Scope: apps/ga
 
 ### Problem
 
-`localhost:5173/admin` displayed: *"Failed to load dashboard data: [GraphQL] Cannot query field "adminOverview" on type "Query"."* — the entire Admin Panel was blank.
+`localhost:5173/admin` displayed: _"Failed to load dashboard data: [GraphQL] Cannot query field "adminOverview" on type "Query"."_ — the entire Admin Panel was blank.
 
 ### Root Cause
 
 `apps/gateway/supergraph.graphql` was composed before the Admin Upgrade (F-101–F-113) was merged. All 5 admin SDL files (`admin.graphql`, `announcements.graphql`, `audit.graphql`, `custom-role.graphql`, `security.graphql`) defined types and queries in `apps/subgraph-core/src/admin/` but were **never included** in the static supergraph SDL that the gateway serves.
 
-| File | Types missing |
-|------|---------------|
-| `admin.graphql` | `AdminOverview`, query `adminOverview` |
+| File                    | Types missing                                             |
+| ----------------------- | --------------------------------------------------------- |
+| `admin.graphql`         | `AdminOverview`, query `adminOverview`                    |
 | `announcements.graphql` | `Announcement`, `AnnouncementResult`, queries + mutations |
-| `audit.graphql` | `AuditLogEntry`, `AuditLogResult`, query `adminAuditLog` |
-| `custom-role.graphql` | `Role`, `RoleDelegation`, queries + mutations |
-| `security.graphql` | `SecuritySettings`, query + mutation |
+| `audit.graphql`         | `AuditLogEntry`, `AuditLogResult`, query `adminAuditLog`  |
+| `custom-role.graphql`   | `Role`, `RoleDelegation`, queries + mutations             |
+| `security.graphql`      | `SecuritySettings`, query + mutation                      |
 
 ### Solution
 
 Added all missing types, input types, queries and mutations to `apps/gateway/supergraph.graphql` with `@join__type(graph: CORE)` / `@join__field(graph: CORE)` + `@authenticated` directives:
+
 - 8 object types (AdminOverview, Announcement, AnnouncementResult, AuditLogEntry, AuditLogResult, Role, RoleDelegation, SecuritySettings)
 - 10 queries added to Query type
 - 12 mutations added to Mutation type
@@ -339,8 +355,8 @@ Added all missing types, input types, queries and mutations to `apps/gateway/sup
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
+| File                              | Change                                         |
+| --------------------------------- | ---------------------------------------------- |
 | `apps/gateway/supergraph.graphql` | +145 lines — all admin types/queries/mutations |
 
 ### Regression Test
@@ -383,10 +399,10 @@ Added all missing types, input types, queries and mutations to `apps/gateway/sup
 
 ### Files Changed
 
-| File                              | Change                                                                        |
-| --------------------------------- | ----------------------------------------------------------------------------- |
-| `apps/gateway/package.json`       | Added `@graphql-hive/cli` devDep + `schema:check` + `schema:publish` scripts |
-| `.github/workflows/ci.yml`        | Added `schema-check` job with conditional `HIVE_TOKEN` guard (HIVE-001)      |
+| File                        | Change                                                                       |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| `apps/gateway/package.json` | Added `@graphql-hive/cli` devDep + `schema:check` + `schema:publish` scripts |
+| `.github/workflows/ci.yml`  | Added `schema-check` job with conditional `HIVE_TOKEN` guard (HIVE-001)      |
 
 ---
 
@@ -4439,12 +4455,12 @@ Full SCORM 1.2/2004 import pipeline + SCORM 1.2 API shim for in-platform playbac
 
 ## ✅ FIX-TEST-001: ResizeObserver + AIChatPanel Test Failures (26 פברואר 2026)
 
-| Field | Value |
-|-------|-------|
-| **Status** | ✅ Fixed |
-| **Severity** | 🟡 Medium |
-| **Branch** | `feat/improvements-wave1` |
-| **Commit** | `ce20f4a` |
+| Field        | Value                     |
+| ------------ | ------------------------- |
+| **Status**   | ✅ Fixed                  |
+| **Severity** | 🟡 Medium                 |
+| **Branch**   | `feat/improvements-wave1` |
+| **Commit**   | `ce20f4a`                 |
 
 ### Problem
 
@@ -4481,21 +4497,21 @@ Full SCORM 1.2/2004 import pipeline + SCORM 1.2 API shim for in-platform playbac
 
 ## ✅ CI-002: Full Test Suite — 4 Remaining Failures (26 February 2026)
 
-| Field | Value |
-|-------|-------|
-| **Status** | ✅ Fixed |
+| Field        | Value                          |
+| ------------ | ------------------------------ |
+| **Status**   | ✅ Fixed                       |
 | **Severity** | 🔴 Critical (blocked CI merge) |
-| **Branch** | `feat/improvements-wave1` |
-| **Commit** | `02a6464` |
+| **Branch**   | `feat/improvements-wave1`      |
+| **Commit**   | `02a6464`                      |
 
 ### Problems (4 failures in "Full Test Suite" workflow)
 
-| # | Failure | Root Cause |
-|---|---------|------------|
-| 1 | `relation 'discussion_messages' does not exist` | `0004_discussion_tables.sql` created but NOT registered in `_journal.json` — Drizzle ignores unregistered migrations |
-| 2 | `Error: Test timed out in 30000ms` in `subgraph-core/src/metrics/metrics.interceptor.spec.ts` | `MetricsInterceptor.handleGraphql()` calls `this.metricsService.resolverDuration.observe()` inside `tap()`. Mock was missing `resolverDuration`, so `tap()` threw TypeError → Observable never completed |
-| 3 | `ReferenceError: Cannot access 'mockDb' before initialization` in `open-badges.service.memory.spec.ts` | `vi.mock()` factories are hoisted above all `const` declarations; `mockDb` was a module-level `const` referenced inside the mock factory |
-| 4 | `AssertionError: expected undefined to be 'def-1'` in `open-badges.service.spec.ts:97` | `issueBadge()` returns `{ assertion, definition }` (not a flat object); test accessed `result.badgeDefinitionId` instead of `result.assertion.badgeDefinitionId` |
+| #   | Failure                                                                                                | Root Cause                                                                                                                                                                                               |
+| --- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `relation 'discussion_messages' does not exist`                                                        | `0004_discussion_tables.sql` created but NOT registered in `_journal.json` — Drizzle ignores unregistered migrations                                                                                     |
+| 2   | `Error: Test timed out in 30000ms` in `subgraph-core/src/metrics/metrics.interceptor.spec.ts`          | `MetricsInterceptor.handleGraphql()` calls `this.metricsService.resolverDuration.observe()` inside `tap()`. Mock was missing `resolverDuration`, so `tap()` threw TypeError → Observable never completed |
+| 3   | `ReferenceError: Cannot access 'mockDb' before initialization` in `open-badges.service.memory.spec.ts` | `vi.mock()` factories are hoisted above all `const` declarations; `mockDb` was a module-level `const` referenced inside the mock factory                                                                 |
+| 4   | `AssertionError: expected undefined to be 'def-1'` in `open-badges.service.spec.ts:97`                 | `issueBadge()` returns `{ assertion, definition }` (not a flat object); test accessed `result.badgeDefinitionId` instead of `result.assertion.badgeDefinitionId`                                         |
 
 ### Solutions
 
@@ -4506,14 +4522,12 @@ Full SCORM 1.2/2004 import pipeline + SCORM 1.2 API shim for in-platform playbac
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `packages/db/migrations/meta/_journal.json` | Added `0004_discussion_tables` entry at idx 4 |
-| `apps/subgraph-core/src/metrics/metrics.interceptor.spec.ts` | Added 4 histogram mocks to `mockService` |
-| `apps/subgraph-core/src/gamification/open-badges.service.memory.spec.ts` | Rewrote with `vi.hoisted()` |
-| `apps/subgraph-core/src/gamification/open-badges.service.spec.ts` | Fixed `result.assertion.*` access |
-
-
+| File                                                                     | Change                                        |
+| ------------------------------------------------------------------------ | --------------------------------------------- |
+| `packages/db/migrations/meta/_journal.json`                              | Added `0004_discussion_tables` entry at idx 4 |
+| `apps/subgraph-core/src/metrics/metrics.interceptor.spec.ts`             | Added 4 histogram mocks to `mockService`      |
+| `apps/subgraph-core/src/gamification/open-badges.service.memory.spec.ts` | Rewrote with `vi.hoisted()`                   |
+| `apps/subgraph-core/src/gamification/open-badges.service.spec.ts`        | Fixed `result.assertion.*` access             |
 
 ---
 
@@ -4529,31 +4543,36 @@ Full SCORM 1.2/2004 import pipeline + SCORM 1.2 API shim for in-platform playbac
 
 Two compounding issues:
 
-| # | Issue | Impact |
-|---|-------|--------|
-| P1 | `CourseCreatePage` statically imported `CourseWizardMediaStep`, which statically imported `RichEditor`, which pulled in the full TipTap stack (StarterKit + 8 extensions + `lowlight` + KaTeX CSS ≈ 450 KB uncompressed) — **on every `/courses/new` visit, before the user saw Step 1** | Slow first paint |
-| P2 | 5 separate `form.watch('fieldName')` calls in a single render function = 5 independent RHF subscriptions → the component re-rendered 5× per keystroke | Sluggish typing in Step 1 |
+| #   | Issue                                                                                                                                                                                                                                                                                    | Impact                    |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| P1  | `CourseCreatePage` statically imported `CourseWizardMediaStep`, which statically imported `RichEditor`, which pulled in the full TipTap stack (StarterKit + 8 extensions + `lowlight` + KaTeX CSS ≈ 450 KB uncompressed) — **on every `/courses/new` visit, before the user saw Step 1** | Slow first paint          |
+| P2  | 5 separate `form.watch('fieldName')` calls in a single render function = 5 independent RHF subscriptions → the component re-rendered 5× per keystroke                                                                                                                                    | Sluggish typing in Step 1 |
 
 ### Why Tests Didn't Catch It
 
 `CourseCreatePage.test.tsx` fully mocked `CourseWizardMediaStep` (line 52):
+
 ```typescript
 vi.mock('./CourseWizardMediaStep', () => ({
   CourseWizardMediaStep: () => <div data-testid="media-step">Media Upload</div>,
 }));
 ```
+
 This bypassed all real imports — TipTap/KaTeX was never loaded in tests, making the bundle-size regression invisible. No bundle-size or performance regression test existed.
 
 ### Fix
 
 **`apps/web/src/pages/CourseCreatePage.tsx`**
+
 - `CourseWizardStep2`, `CourseWizardMediaStep`, `CourseWizardStep3` changed from static imports to `React.lazy()` + `<Suspense>` boundaries. `CourseWizardStep1` stays eager (renders immediately on Step 0).
 - 5× `form.watch('field')` calls replaced with single `form.watch(['title', 'description', 'difficulty', 'thumbnail'])` — 1 subscription instead of 5.
 
 **`apps/web/src/pages/CourseCreatePage.test.tsx`**
+
 - `advanceToStep2` / `advanceToStep3` helpers updated with `waitFor(...)` after each navigation to wait for lazy-loaded components to mount.
 
 **`apps/web/src/pages/CourseCreatePage.perf.test.ts`** _(new file)_
+
 - 8 static-analysis tests that will fail if lazy imports are accidentally reverted to static:
   - Verifies `CourseWizardMediaStep`, `Step2`, `Step3` use `lazy(() => import(...))` in source
   - Verifies `CourseWizardStep1` stays as a static import
@@ -4562,8 +4581,8 @@ This bypassed all real imports — TipTap/KaTeX was never loaded in tests, makin
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/CourseCreatePage.tsx` | `lazy()` for Steps 2/3/Media; single `form.watch` array call; `<Suspense>` wrapper |
-| `apps/web/src/pages/CourseCreatePage.test.tsx` | `advanceToStep2/3` helpers add `waitFor` for lazy component resolution |
-| `apps/web/src/pages/CourseCreatePage.perf.test.ts` | New — 8 performance regression tests |
+| File                                               | Change                                                                             |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `apps/web/src/pages/CourseCreatePage.tsx`          | `lazy()` for Steps 2/3/Media; single `form.watch` array call; `<Suspense>` wrapper |
+| `apps/web/src/pages/CourseCreatePage.test.tsx`     | `advanceToStep2/3` helpers add `waitFor` for lazy component resolution             |
+| `apps/web/src/pages/CourseCreatePage.perf.test.ts` | New — 8 performance regression tests                                               |

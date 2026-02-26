@@ -75,8 +75,12 @@ export const scimGroups = pgTable('scim_groups', {
   displayName: varchar('display_name', { length: 255 }).notNull(),
   memberIds: jsonb('member_ids').$type<string[]>().default([]),
   courseIds: jsonb('course_ids').$type<string[]>().default([]),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 }).enableRLS();
 
 export const scimGroupsRLS = sql`

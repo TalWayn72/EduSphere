@@ -15,7 +15,12 @@
       "automerge": false
     },
     {
-      "matchPackageNames": ["hls.js", "video.js", "@graphql-hive/*", "drizzle-orm"],
+      "matchPackageNames": [
+        "hls.js",
+        "video.js",
+        "@graphql-hive/*",
+        "drizzle-orm"
+      ],
       "stabilityDays": 7
     }
   ],
