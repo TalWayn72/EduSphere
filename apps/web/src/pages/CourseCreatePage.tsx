@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -11,10 +11,22 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
+// Step 1 is shown immediately — keep eager
 import { CourseWizardStep1 } from './CourseWizardStep1';
-import { CourseWizardStep2 } from './CourseWizardStep2';
-import { CourseWizardMediaStep } from './CourseWizardMediaStep';
-import { CourseWizardStep3 } from './CourseWizardStep3';
+// Steps 2–4 are lazy: avoids pulling TipTap+KaTeX (~450 KB) on initial page load.
+// RichEditor (TipTap StarterKit + 8 extensions + lowlight + KaTeX) lives in
+// CourseWizardMediaStep and must NOT be downloaded until the user reaches step 2.
+const CourseWizardStep2 = lazy(() =>
+  import('./CourseWizardStep2').then((m) => ({ default: m.CourseWizardStep2 }))
+);
+const CourseWizardMediaStep = lazy(() =>
+  import('./CourseWizardMediaStep').then((m) => ({
+    default: m.CourseWizardMediaStep,
+  }))
+);
+const CourseWizardStep3 = lazy(() =>
+  import('./CourseWizardStep3').then((m) => ({ default: m.CourseWizardStep3 }))
+);
 import {
   DEFAULT_FORM,
   type CourseFormData,
@@ -162,21 +174,24 @@ export function CourseCreatePage() {
     }
   };
 
+  // Single subscription for all watched fields — avoids 5 separate re-render cycles per keystroke.
+  const [watchedTitle, watchedDescription, watchedDifficulty, watchedThumbnail] =
+    form.watch(['title', 'description', 'difficulty', 'thumbnail']);
+
   // Merged view of form data for steps 2–4 that display wizard state
   const currentData: CourseFormData = {
     ...wizardData,
-    title: form.watch('title') || wizardData.title,
-    description: form.watch('description') || wizardData.description,
-    difficulty:
-      (form.watch('difficulty') as Difficulty) || wizardData.difficulty,
-    thumbnail: form.watch('thumbnail') || wizardData.thumbnail,
+    title: watchedTitle || wizardData.title,
+    description: watchedDescription || wizardData.description,
+    difficulty: (watchedDifficulty as Difficulty) || wizardData.difficulty,
+    thumbnail: watchedThumbnail || wizardData.thumbnail,
   };
 
   const updateWizard = (updates: Partial<CourseFormData>) => {
     setWizardData((prev) => ({ ...prev, ...updates }));
   };
 
-  const canAdvanceStep1 = form.watch('title')?.trim().length >= 3;
+  const canAdvanceStep1 = watchedTitle?.trim().length >= 3;
   const lastContentStep = STEPS.length - 2;
 
   return (
@@ -242,26 +257,34 @@ export function CourseCreatePage() {
           <Form {...form}>
             {step === 0 && <CourseWizardStep1 control={form.control} />}
           </Form>
-          {step === 1 && (
-            <CourseWizardStep2
-              modules={wizardData.modules}
-              onChange={updateWizard}
-            />
-          )}
-          {step === 2 && (
-            <CourseWizardMediaStep
-              courseId={DRAFT_COURSE_ID}
-              mediaList={wizardData.mediaList}
-              onChange={updateWizard}
-            />
-          )}
-          {step === 3 && (
-            <CourseWizardStep3
-              data={currentData}
-              onPublish={handlePublish}
-              isSubmitting={isSubmitting}
-            />
-          )}
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+              </div>
+            }
+          >
+            {step === 1 && (
+              <CourseWizardStep2
+                modules={wizardData.modules}
+                onChange={updateWizard}
+              />
+            )}
+            {step === 2 && (
+              <CourseWizardMediaStep
+                courseId={DRAFT_COURSE_ID}
+                mediaList={wizardData.mediaList}
+                onChange={updateWizard}
+              />
+            )}
+            {step === 3 && (
+              <CourseWizardStep3
+                data={currentData}
+                onPublish={handlePublish}
+                isSubmitting={isSubmitting}
+              />
+            )}
+          </Suspense>
         </Card>
 
         {/* Navigation */}
