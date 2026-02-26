@@ -45,7 +45,7 @@ const MOCK_COURSE_TITLE = 'Introduction to Talmud Study';
 test.describe('CourseDetailPage — page load', () => {
   test('page loads at /courses/:courseId without crashing', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // The Layout header is always rendered — confirms the page did not crash.
     await expect(page.locator('header')).toBeVisible({ timeout: 10_000 });
@@ -56,7 +56,7 @@ test.describe('CourseDetailPage — page load', () => {
 
   test('course title is visible in an h2 element', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // CourseDetailPage renders <CardTitle className="text-2xl ..."> which maps to h2
     // or a div styled as h2 — the mock title is "Introduction to Talmud Study".
@@ -69,7 +69,7 @@ test.describe('CourseDetailPage — page load', () => {
     // Visiting a real courseId that doesn't exist in the backend still renders
     // because the error path falls back to MOCK_COURSE_DETAIL_DEFAULT.
     await page.goto('/courses/some-unknown-id');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await expect(page.locator('header')).toBeVisible({ timeout: 10_000 });
     // Course title from mock should be visible even for unknown IDs
@@ -84,7 +84,7 @@ test.describe('CourseDetailPage — page load', () => {
 test.describe('CourseDetailPage — navigation', () => {
   test('"All Courses" back button is visible', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // courses.json: backToCourses → "All Courses"
     // Rendered as a ghost Button with ArrowLeft icon.
@@ -94,7 +94,7 @@ test.describe('CourseDetailPage — navigation', () => {
 
   test('"All Courses" back button navigates to /courses', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const backBtn = page.getByRole('button', { name: /All Courses/i });
     await backBtn.click();
@@ -105,7 +105,7 @@ test.describe('CourseDetailPage — navigation', () => {
 
   test('clicking a course card on the list navigates to the detail page', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Click the first course title — CourseList navigates to /courses/:id
     const firstCourseTitle = page.getByText('Introduction to Talmud Study').first();
@@ -126,7 +126,7 @@ test.describe('CourseDetailPage — navigation', () => {
 test.describe('CourseDetailPage — enroll button', () => {
   test('Enroll button is visible on the course detail page', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // The enroll button always renders; its label toggles between "Enroll" and "Unenroll"
     // depending on enrollment state. data-testid="enroll-button" is set on the element.
@@ -136,7 +136,7 @@ test.describe('CourseDetailPage — enroll button', () => {
 
   test('Enroll button is clickable and does not throw', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const enrollBtn = page.locator('[data-testid="enroll-button"]');
     await expect(enrollBtn).toBeVisible({ timeout: 8_000 });
@@ -153,7 +153,7 @@ test.describe('CourseDetailPage — enroll button', () => {
 test.describe('CourseDetailPage — module list', () => {
   test('"Course Content" section heading is visible', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // courses.json: courseContent → "Course Content"
     // Rendered as <h2 className="text-lg font-semibold"> by CourseModuleList
@@ -164,7 +164,7 @@ test.describe('CourseDetailPage — module list', () => {
 
   test('at least one module card is rendered', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Mock has 3 modules: "Module 1: Foundations", "Module 2: Core Concepts", "Module 3: Advanced Topics"
     await expect(
@@ -174,7 +174,7 @@ test.describe('CourseDetailPage — module list', () => {
 
   test('all 3 mock modules are listed', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await expect(page.getByText('Module 1: Foundations', { exact: false })).toBeVisible({ timeout: 8_000 });
     await expect(page.getByText('Module 2: Core Concepts', { exact: false })).toBeVisible();
@@ -183,7 +183,7 @@ test.describe('CourseDetailPage — module list', () => {
 
   test('first module is expanded by default', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // defaultOpen={idx === 0} means Module 1 renders its content items immediately.
     // The first content item title "Introduction Video" should be visible without clicking.
@@ -194,7 +194,7 @@ test.describe('CourseDetailPage — module list', () => {
 
   test('second module is collapsed by default (content items not visible)', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // "Deep Dive Video" is in Module 2 which starts collapsed
     await expect(
@@ -208,7 +208,7 @@ test.describe('CourseDetailPage — module list', () => {
 test.describe('CourseDetailPage — module expand/collapse', () => {
   test('clicking a collapsed module expands it to show content items', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Module 2 starts collapsed — click its header to expand
     const module2Header = page
@@ -225,7 +225,7 @@ test.describe('CourseDetailPage — module expand/collapse', () => {
 
   test('clicking an expanded module collapses it', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Module 1 is open by default; click to collapse it
     const module1Header = page
@@ -243,7 +243,7 @@ test.describe('CourseDetailPage — module expand/collapse', () => {
 
   test('all modules can be expanded individually', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Expand Module 2
     await page.getByText('Module 2: Core Concepts', { exact: false }).first().click();
@@ -256,7 +256,7 @@ test.describe('CourseDetailPage — module expand/collapse', () => {
 
   test('chevron icon changes between ChevronRight (collapsed) and ChevronDown (expanded)', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Module 2 is collapsed — has lucide-chevron-right icon
     // Module 1 is expanded — has lucide-chevron-down icon
@@ -271,7 +271,7 @@ test.describe('CourseDetailPage — module expand/collapse', () => {
 test.describe('CourseDetailPage — content type icons', () => {
   test('VIDEO content items show a Play icon (blue)', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Module 1 is open — "Introduction Video" (VIDEO) should show lucide-play icon
     // lucide-play renders as svg.lucide-play with class containing text-blue-500
@@ -282,7 +282,7 @@ test.describe('CourseDetailPage — content type icons', () => {
 
   test('PDF content items show a FileText icon (red)', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // "Course Overview" is PDF — renders lucide-file-text
     await expect(
@@ -292,7 +292,7 @@ test.describe('CourseDetailPage — content type icons', () => {
 
   test('QUIZ content items show a HelpCircle icon', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // "Foundations Quiz" is QUIZ — Lucide v0.4+ renders HelpCircle as lucide-circle-help
     await expect(
@@ -306,7 +306,7 @@ test.describe('CourseDetailPage — content type icons', () => {
 test.describe('CourseDetailPage — content item navigation', () => {
   test('clicking a content item navigates to /learn/:itemId', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Module 1 is open — click "Introduction Video" (id: content-1)
     const videoItem = page.getByRole('button', { name: /Introduction Video/i });
@@ -320,7 +320,7 @@ test.describe('CourseDetailPage — content item navigation', () => {
 
   test('navigation to content viewer includes courseId query param', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const videoItem = page.getByRole('button', { name: /Introduction Video/i });
     await videoItem.click();
@@ -336,7 +336,7 @@ test.describe('CourseDetailPage — content item navigation', () => {
 test.describe('CourseDetailPage — duration display', () => {
   test('duration is formatted as "Xm Ys" for VIDEO items', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // "Introduction Video" has duration=600 seconds → "10m 0s"
     // formatDuration(600) = "10m 0s"
@@ -347,7 +347,7 @@ test.describe('CourseDetailPage — duration display', () => {
 
   test('items without duration show no duration text', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // "Course Overview" (PDF, duration=null) — no duration badge rendered
     // The item title should be visible but no "m 0s" text directly next to it
@@ -376,7 +376,7 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
   for (const sqlPattern of SQL_PATTERNS) {
     test(`"${sqlPattern}" never appears in page content`, async ({ page }) => {
       await page.goto(`/courses/${MOCK_COURSE_ID}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(1_000); // allow any async error state to settle
 
       await expect(
@@ -387,7 +387,7 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
 
   test('offline banner shows a user-friendly message, not SQL', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // When GraphQL errors out, the offline banner renders with [data-testid="offline-banner"]
     // and shows "Backend unavailable — showing demo data." (from offlineMockData translation key)
@@ -407,7 +407,7 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
 
   test('no raw error stack trace is visible anywhere on the page', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await page.waitForTimeout(1_000);
 
     // Stack trace indicators
@@ -421,7 +421,7 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
 test.describe('CourseDetailPage — progress bar accessibility', () => {
   test('progress bar has correct ARIA attributes when visible', async ({ page }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // The progress bar only renders when isEnrolled && progress && totalItems > 0.
     // In DEV_MODE the user is not enrolled, so the bar may not be visible.
