@@ -264,7 +264,7 @@ describe('UserManagementPage', () => {
     // Index 0 = role-filter select, index 1 = Alice's row select.
     const selects = screen.getAllByRole('combobox');
     // Alice is first user row → index 1
-    fireEvent.change(selects[1], { target: { value: 'STUDENT' } });
+    fireEvent.change(selects[1]!, { target: { value: 'STUDENT' } });
 
     // confirmRoleChange state set → shows "→ STUDENT?" + Confirm/Cancel
     expect(screen.getByText(/→ STUDENT\?/)).toBeInTheDocument();
@@ -280,7 +280,7 @@ describe('UserManagementPage', () => {
     renderPage();
 
     const selects = screen.getAllByRole('combobox');
-    fireEvent.change(selects[1], { target: { value: 'STUDENT' } });
+    fireEvent.change(selects[1]!, { target: { value: 'STUDENT' } });
     expect(screen.getByText(/→ STUDENT\?/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }));
@@ -306,7 +306,7 @@ describe('UserManagementPage', () => {
     renderPage();
 
     const selects = screen.getAllByRole('combobox');
-    fireEvent.change(selects[1], { target: { value: 'STUDENT' } });
+    fireEvent.change(selects[1]!, { target: { value: 'STUDENT' } });
     expect(screen.getByText(/→ STUDENT\?/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
@@ -347,7 +347,7 @@ describe('UserManagementPage', () => {
 
     // Click "Reset Pw" for Alice (first Reset Pw button)
     const resetButtons = screen.getAllByRole('button', { name: /reset pw/i });
-    fireEvent.click(resetButtons[0]);
+    fireEvent.click(resetButtons[0]!);
 
     await waitFor(() => {
       expect(mockResetPassword).toHaveBeenCalledWith({ userId: 'u1' });
@@ -374,7 +374,7 @@ describe('UserManagementPage', () => {
     const deactivateButtons = screen.getAllByRole('button', {
       name: /deactivate/i,
     });
-    fireEvent.click(deactivateButtons[0]);
+    fireEvent.click(deactivateButtons[0]!);
 
     const confirmButton = screen.getByRole('button', { name: /^confirm$/i });
     fireEvent.click(confirmButton);
