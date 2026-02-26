@@ -391,3 +391,114 @@ describe('Schema Contract - agent.queries.ts', () => {
     expect(true).toBe(true);
   });
 });
+
+// ---- queries.ts (Dashboard / global queries) — previously untested, caused BUG-024/BUG-025
+const ME_QUERY_DOC = parse(`
+  query Me {
+    me {
+      id
+      email
+      firstName
+      lastName
+      role
+      tenantId
+      createdAt
+      updatedAt
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
+    }
+  }
+`);
+
+const UPDATE_USER_PREFERENCES_MUTATION_DOC = parse(`
+  mutation UpdateUserPreferences($input: UpdateUserPreferencesInput!) {
+    updateUserPreferences(input: $input) {
+      id
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
+    }
+  }
+`);
+
+const COURSES_QUERY_DOC = parse(`
+  query Courses($limit: Int, $offset: Int) {
+    courses(limit: $limit, offset: $offset) {
+      id
+      title
+      description
+      slug
+      thumbnailUrl
+      instructorId
+      isPublished
+      estimatedHours
+    }
+  }
+`);
+
+const MY_STATS_QUERY_DOC = parse(`
+  query MyStats {
+    myStats {
+      coursesEnrolled
+      annotationsCreated
+      conceptsMastered
+      totalLearningMinutes
+      weeklyActivity {
+        date
+        count
+      }
+    }
+  }
+`);
+
+// ---- content-tier3.queries.ts / DailyLearningWidget — previously caused BUG-025
+const DAILY_MICROLESSON_QUERY_DOC = parse(`
+  query DailyMicrolesson {
+    dailyMicrolesson {
+      id
+      title
+      content
+      contentType
+      duration
+    }
+  }
+`);
+
+describe('Schema Contract - queries.ts (Dashboard)', () => {
+  it('ME_QUERY with preferences is valid', () => {
+    assertValid('ME_QUERY', ME_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('UPDATE_USER_PREFERENCES_MUTATION is valid', () => {
+    assertValid(
+      'UPDATE_USER_PREFERENCES_MUTATION',
+      UPDATE_USER_PREFERENCES_MUTATION_DOC
+    );
+    expect(true).toBe(true);
+  });
+
+  it('COURSES_QUERY is valid', () => {
+    assertValid('COURSES_QUERY', COURSES_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+
+  it('MY_STATS_QUERY is valid', () => {
+    assertValid('MY_STATS_QUERY', MY_STATS_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+});
+
+describe('Schema Contract - content-tier3.queries.ts (Microlearning)', () => {
+  it('DAILY_MICROLESSON_QUERY is valid', () => {
+    assertValid('DAILY_MICROLESSON_QUERY', DAILY_MICROLESSON_QUERY_DOC);
+    expect(true).toBe(true);
+  });
+});

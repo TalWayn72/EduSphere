@@ -127,13 +127,14 @@ External entity stubs
 """
 type User @join__type(graph: AGENT, key: "id")  @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: CORE, key: "id")  {
   id: ID!
-  email: String! @join__field(graph: CORE) 
-  firstName: String! @join__field(graph: CORE) 
-  lastName: String! @join__field(graph: CORE) 
-  role: UserRole! @join__field(graph: CORE) 
-  tenantId: ID! @join__field(graph: CORE) 
-  createdAt: DateTime! @join__field(graph: CORE) 
-  updatedAt: DateTime! @join__field(graph: CORE) 
+  email: String! @join__field(graph: CORE)
+  firstName: String! @join__field(graph: CORE)
+  lastName: String! @join__field(graph: CORE)
+  role: UserRole! @join__field(graph: CORE)
+  tenantId: ID! @join__field(graph: CORE)
+  preferences: UserPreferences! @join__field(graph: CORE)
+  createdAt: DateTime! @join__field(graph: CORE)
+  updatedAt: DateTime! @join__field(graph: CORE)
 }
 
 type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
@@ -197,9 +198,17 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   myEnrollments: [UserCourse!]! @join__field(graph: CONTENT)  @authenticated
   myCourseProgress(courseId: ID!) : CourseProgress! @join__field(graph: CONTENT)  @authenticated
   getPresignedUploadUrl(fileName: String!, contentType: String!, courseId: ID!) : PresignedUploadUrl! @join__field(graph: CONTENT)  @authenticated
-  module(id: ID!) : Module @join__field(graph: CONTENT) 
-  modulesByCourse(courseId: ID!) : [Module!]! @join__field(graph: CONTENT) 
-  tenant(id: ID!) : Tenant @join__field(graph: CORE) 
+  module(id: ID!) : Module @join__field(graph: CONTENT)
+  modulesByCourse(courseId: ID!) : [Module!]! @join__field(graph: CONTENT)
+  """
+  Returns the next unviewed MICROLESSON for the authenticated user today.
+  """
+  dailyMicrolesson: ContentItem @join__field(graph: CONTENT)  @authenticated
+  """
+  Lists all microlearning paths for the authenticated user's tenant.
+  """
+  microlearningPaths: [MicrolearningPath!]! @join__field(graph: CONTENT)  @authenticated
+  tenant(id: ID!) : Tenant @join__field(graph: CORE)
   tenants(limit: Int = 10, offset: Int = 0) : [Tenant!]! @join__field(graph: CORE) 
   user(id: ID!) : User @join__field(graph: CORE) 
   users(limit: Int = 10, offset: Int = 0) : [User!]! @join__field(graph: CORE) 
@@ -439,15 +448,27 @@ type Annotation @join__type(graph: ANNOTATION, key: "id")  {
 
 type ContentItem @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
   id: ID!
-  moduleId: ID! @join__field(graph: CONTENT) 
-  title: String! @join__field(graph: CONTENT) 
-  contentType: String! @join__field(graph: CONTENT) 
-  content: String @join__field(graph: CONTENT) 
-  fileId: ID @join__field(graph: CONTENT) 
-  duration: Int @join__field(graph: CONTENT) 
-  orderIndex: Int! @join__field(graph: CONTENT) 
-  createdAt: String! @join__field(graph: CONTENT) 
-  updatedAt: String! @join__field(graph: CONTENT) 
+  moduleId: ID! @join__field(graph: CONTENT)
+  title: String! @join__field(graph: CONTENT)
+  contentType: String! @join__field(graph: CONTENT)
+  content: String @join__field(graph: CONTENT)
+  fileId: ID @join__field(graph: CONTENT)
+  duration: Int @join__field(graph: CONTENT)
+  orderIndex: Int! @join__field(graph: CONTENT)
+  createdAt: String! @join__field(graph: CONTENT)
+  updatedAt: String! @join__field(graph: CONTENT)
+}
+
+"""
+An ordered collection of MICROLESSON content items forming a learning path.
+"""
+type MicrolearningPath @join__type(graph: CONTENT)  {
+  id: ID! @join__field(graph: CONTENT)
+  title: String! @join__field(graph: CONTENT)
+  topicClusterId: ID @join__field(graph: CONTENT)
+  contentItemIds: [ID!]! @join__field(graph: CONTENT)
+  itemCount: Int! @join__field(graph: CONTENT)
+  createdAt: String! @join__field(graph: CONTENT)
 }
 
 """

@@ -7,6 +7,79 @@
 
 ---
 
+## ✅ BUG-024 — Dashboard: `Cannot query field "preferences" on type "User"` (26 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (dashboard error banner) | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+`/dashboard` showed a red error banner:
+> שגיאה בטעינת נתוני משתמש: "Cannot query field "preferences" on type "User" [GraphQL]."
+
+`ME_QUERY` in `apps/web/src/lib/queries.ts` requests `preferences { locale theme emailNotifications pushNotifications }` on the `User` type. The subgraph SDL (`apps/subgraph-core/src/user/user.graphql:19`) correctly defines `preferences: UserPreferences!` on `User`, but the field was **missing from the manually maintained `apps/gateway/supergraph.graphql`**.
+
+### Root Cause
+
+`supergraph.graphql` is maintained manually (live `pnpm compose` requires running services). When the `UserPreferences` type and its resolver were added to the core subgraph, the `preferences` field was added to `UserPreferences` type definition in the supergraph, but was **not added to the `User` type's field list** in the same file. This is a structural gap in manual supergraph maintenance.
+
+**Why tests didn't catch it:**
+- `tests/contract/schema-contract.test.ts` validated 36 operations (annotation, content, knowledge, agent) but **omitted `ME_QUERY`** from `apps/web/src/lib/queries.ts` entirely.
+- `apps/web/src/pages/Dashboard.test.tsx` mocks all urql calls with `vi.mock()`, so it never validates the real schema.
+
+### Solution
+
+1. Added `preferences: UserPreferences! @join__field(graph: CORE)` to the `User` type in `apps/gateway/supergraph.graphql`
+2. Added `ME_QUERY`, `UPDATE_USER_PREFERENCES_MUTATION`, `COURSES_QUERY`, `MY_STATS_QUERY` to `tests/contract/schema-contract.test.ts`
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/gateway/supergraph.graphql:128` | Added `preferences: UserPreferences! @join__field(graph: CORE)` to `User` type |
+| `tests/contract/schema-contract.test.ts` | Added `Schema Contract - queries.ts (Dashboard)` suite (4 new tests) |
+
+---
+
+## ✅ BUG-025 — Dashboard: `Cannot query field "dailyMicrolesson" on type "Query"` (26 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (dashboard widget error) | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+`/dashboard` showed an error inside the Daily Learning widget:
+> Could not load lesson: [GraphQL] Cannot query field "dailyMicrolesson" on type "Query".
+
+`DailyLearningWidget.tsx` imports `DAILY_MICROLESSON_QUERY` from `@/lib/graphql/content-tier3.queries` and executes it via urql at runtime. The content subgraph SDL (`apps/subgraph-content/src/microlearning/microlearning.graphql:43`) defines `dailyMicrolesson: ContentItem @authenticated` in `extend type Query`, but this field was **missing from `apps/gateway/supergraph.graphql`**.
+
+### Root Cause
+
+Same structural issue as BUG-024 — manual supergraph maintenance. The `dailyMicrolesson` query was correctly identified as "not yet in supergraph" in a comment in `content-tier3.queries.ts`, but `DailyLearningWidget.tsx` was already rendering in the Dashboard and executing the query at runtime.
+
+The `MicrolearningPath` type was also missing from the supergraph.
+
+**Why tests didn't catch it:**
+- `content-tier3.queries.ts` is excluded from codegen (so no TS compile error), but was never included in schema contract tests.
+- No test verified that queries imported by rendered components are valid against the supergraph.
+
+### Solution
+
+1. Added `dailyMicrolesson: ContentItem @join__field(graph: CONTENT) @authenticated` and `microlearningPaths: [MicrolearningPath!]! @join__field(graph: CONTENT) @authenticated` to `Query` type in `apps/gateway/supergraph.graphql`
+2. Added `MicrolearningPath` type definition to `apps/gateway/supergraph.graphql`
+3. Added `DAILY_MICROLESSON_QUERY` to `tests/contract/schema-contract.test.ts` in new `Schema Contract - content-tier3.queries.ts (Microlearning)` suite
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/gateway/supergraph.graphql` | Added `dailyMicrolesson` + `microlearningPaths` to `Query` type; added `MicrolearningPath` type |
+| `tests/contract/schema-contract.test.ts` | Added `Schema Contract - content-tier3.queries.ts (Microlearning)` suite (1 new test) |
+
+### Prevention Pattern
+
+For any query used in a **rendered component** (not excluded from codegen), the corresponding operation **must** appear in `tests/contract/schema-contract.test.ts`. Files excluded from codegen are not automatically protected by the TypeScript compiler.
+
+---
+
 ## ✅ BUG-SELECT-001 — Radix `<Select.Item value="">` crash at `/admin/users` (26 Feb 2026)
 
 **Status:** ✅ Fixed | **Severity:** 🔴 Critical (page crash) | **Branch:** `feat/improvements-wave1`
