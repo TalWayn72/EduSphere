@@ -3,6 +3,7 @@
  * Uses vitest + mocked Apollo and NetInfo.
  */
 import React from 'react';
+import { ActivityIndicator } from 'react-native';
 import { render } from '@testing-library/react-native';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -78,7 +79,6 @@ describe('CourseViewerScreen', () => {
     );
 
     // ActivityIndicator is rendered during loading
-    const { ActivityIndicator } = require('react-native');
     expect(getByType(ActivityIndicator)).toBeTruthy();
   });
 
