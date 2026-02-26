@@ -9,8 +9,10 @@ import { useTranslation } from 'react-i18next';
 import HomeScreen from '../screens/HomeScreen';
 import CoursesScreen from '../screens/CoursesScreen';
 import CourseDetailScreen from '../screens/CourseDetailScreen';
+import CourseViewerScreen from '../screens/CourseViewerScreen';
 import DiscussionsScreen from '../screens/DiscussionsScreen';
 import AITutorScreen from '../screens/AITutorScreen';
+import AIChatScreen from '../screens/AIChatScreen';
 import KnowledgeGraphScreen from '../screens/KnowledgeGraphScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -18,6 +20,8 @@ import SettingsScreen from '../screens/SettingsScreen';
 export type RootStackParamList = {
   Main: undefined;
   CourseDetail: { courseId: string };
+  CourseViewer: { courseId: string };
+  AIChat: { sessionId: string };
   Settings: undefined;
 };
 
@@ -109,6 +113,16 @@ export default function Navigation() {
           name="CourseDetail"
           component={CourseDetailScreen}
           options={{ title: t('courseDetails') }}
+        />
+        <Stack.Screen
+          name="CourseViewer"
+          component={CourseViewerScreen}
+          options={{ title: t('courseDetails') }}
+        />
+        <Stack.Screen
+          name="AIChat"
+          component={AIChatScreen}
+          options={{ title: 'AI Chat' }}
         />
         <Stack.Screen
           name="Settings"
