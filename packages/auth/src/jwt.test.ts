@@ -352,14 +352,14 @@ describe('JWTValidator', () => {
       );
     });
 
-    it('throws when tenant_id is present but not a valid UUID', async () => {
+    it('accepts tenant_id that is not a UUID (non-UUID strings are now allowed)', async () => {
       mockJwtVerify.mockResolvedValueOnce({
         payload: makePayload({ tenant_id: 'not-a-uuid' }),
       } as never);
 
-      await expect(validator.validate('bad-tenant.jwt')).rejects.toThrow(
-        'JWT validation failed'
-      );
+      // After relaxing UUID validation, non-UUID tenant_id strings are accepted.
+      const result = await validator.validate('non-uuid-tenant.jwt');
+      expect(result.tenantId).toBe('not-a-uuid');
     });
   });
 
@@ -620,11 +620,11 @@ describe('JWTClaimsSchema', () => {
     ).toBe(false);
   });
 
-  it('fails when tenant_id is present but not a UUID', () => {
+  it('succeeds when tenant_id is a non-UUID string (non-UUID strings are now allowed)', () => {
     expect(
       JWTClaimsSchema.safeParse(makePayload({ tenant_id: 'not-a-uuid' }))
         .success
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('fails when realm_access is missing', () => {
