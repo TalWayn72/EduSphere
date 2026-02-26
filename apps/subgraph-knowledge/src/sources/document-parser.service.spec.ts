@@ -170,8 +170,12 @@ describe('DocumentParserService', () => {
       });
 
       const result = await service.parseUrl('https://example.com');
+      // &amp; is decoded to & for readability
       expect(result.text).toContain('&');
-      expect(result.text).toContain('<tag>');
+      // &lt;/&gt; are intentionally NOT decoded (see service comment: prevents
+      // reintroducing angle brackets that could confuse downstream parsers)
+      expect(result.text).toContain('&lt;tag&gt;');
+      expect(result.text).not.toContain('<tag>');
     });
   });
 });
