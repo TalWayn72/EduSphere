@@ -35,7 +35,7 @@ test.describe('Compliance Training Reports', () => {
   test('page renders at /admin/compliance with heading', async ({ page }) => {
     await gotoCompliance(page);
     await expect(
-      page.getByRole('heading', { name: /Compliance Training Reports/i }),
+      page.getByRole('heading', { name: /Compliance Training Reports/i })
     ).toBeVisible();
   });
 
@@ -57,19 +57,21 @@ test.describe('Compliance Training Reports', () => {
   test('Compliance Courses card is rendered', async ({ page }) => {
     await gotoCompliance(page);
     await expect(
-      page.getByRole('heading', { name: /Compliance Courses/i }),
+      page.getByRole('heading', { name: /Compliance Courses/i })
     ).toBeVisible();
   });
 
   test('card description mentions compliance tracking', async ({ page }) => {
     await gotoCompliance(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     expect(/compliance tracking/i.test(body)).toBe(true);
   });
 
-  test('courses list renders or shows empty-state message', async ({ page }) => {
+  test('courses list renders or shows empty-state message', async ({
+    page,
+  }) => {
     await gotoCompliance(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     const hasState =
       /No compliance courses configured/i.test(body) ||
       // Courses are listed with "Add to Compliance" or "Remove" buttons
@@ -90,7 +92,7 @@ test.describe('Compliance Training Reports', () => {
       expect(addCount + removeCount).toBeGreaterThan(0);
     } else {
       // Empty state is acceptable
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
       expect(/No compliance courses configured/i.test(body)).toBe(true);
     }
   });
@@ -100,13 +102,15 @@ test.describe('Compliance Training Reports', () => {
   test('Generate Report card is rendered', async ({ page }) => {
     await gotoCompliance(page);
     await expect(
-      page.getByRole('heading', { name: /Generate Report/i }),
+      page.getByRole('heading', { name: /Generate Report/i })
     ).toBeVisible();
   });
 
-  test('Generate Report card description mentions CSV and PDF', async ({ page }) => {
+  test('Generate Report card description mentions CSV and PDF', async ({
+    page,
+  }) => {
     await gotoCompliance(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     expect(/CSV/i.test(body) && /PDF/i.test(body)).toBe(true);
   });
 
@@ -115,14 +119,18 @@ test.describe('Compliance Training Reports', () => {
     await expect(page.locator('input[type="date"]')).toBeVisible();
   });
 
-  test('Generate Report button is disabled when no courses are selected', async ({ page }) => {
+  test('Generate Report button is disabled when no courses are selected', async ({
+    page,
+  }) => {
     await gotoCompliance(page);
     const generateBtn = page.getByRole('button', { name: /Generate Report/i });
     // The button is disabled initially because selectedIds.size === 0
     await expect(generateBtn).toBeDisabled();
   });
 
-  test('selecting a course checkbox enables the Generate Report button', async ({ page }) => {
+  test('selecting a course checkbox enables the Generate Report button', async ({
+    page,
+  }) => {
     await gotoCompliance(page);
     const checkboxes = page.locator('input[type="checkbox"]');
     const count = await checkboxes.count();
@@ -130,11 +138,11 @@ test.describe('Compliance Training Reports', () => {
     if (count > 0) {
       await checkboxes.first().check();
       await expect(
-        page.getByRole('button', { name: /Generate Report/i }),
+        page.getByRole('button', { name: /Generate Report/i })
       ).toBeEnabled();
     } else {
       // No courses to select — skip assertion
-      const body = await page.locator('body').textContent() ?? '';
+      const body = (await page.locator('body').textContent()) ?? '';
       expect(/No compliance courses/i.test(body)).toBe(true);
     }
   });
@@ -144,7 +152,9 @@ test.describe('Compliance Training Reports', () => {
   }) => {
     await gotoCompliance(page);
     const checkboxes = page.locator('input[type="checkbox"]');
-    const addBtns = page.getByRole('button', { name: /Add to Compliance|Remove/i });
+    const addBtns = page.getByRole('button', {
+      name: /Add to Compliance|Remove/i,
+    });
 
     const checkboxCount = await checkboxes.count();
     const courseRowCount = await addBtns.count();
@@ -160,7 +170,7 @@ test.describe('Compliance Training Reports', () => {
   }) => {
     test.skip(
       IS_DEV_MODE,
-      'DEV_MODE auto-authenticates as SUPER_ADMIN — role redirect cannot be tested',
+      'DEV_MODE auto-authenticates as SUPER_ADMIN — role redirect cannot be tested'
     );
 
     // Open a fresh context with no authentication
@@ -171,7 +181,7 @@ test.describe('Compliance Training Reports', () => {
 
     // Should redirect to /dashboard or show a 403/not-found
     const finalUrl = page.url();
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     const redirectedOrBlocked =
       !finalUrl.includes('/admin/compliance') ||
       /403|Forbidden|Unauthorized|Access Denied/i.test(body);
@@ -185,29 +195,36 @@ test.describe('Compliance Training Reports', () => {
   test.describe('Report generation (write)', () => {
     test.skip(!RUN_WRITE_TESTS, 'Skipped: RUN_WRITE_TESTS=false');
 
-    test('generating a report shows summary stats and download links', async ({ page }) => {
+    test('generating a report shows summary stats and download links', async ({
+      page,
+    }) => {
       await gotoCompliance(page);
       const checkboxes = page.locator('input[type="checkbox"]');
       const count = await checkboxes.count();
 
-      test.skip(count === 0, 'No compliance courses available to generate report');
+      test.skip(
+        count === 0,
+        'No compliance courses available to generate report'
+      );
 
       // Select first available course
       await checkboxes.first().check();
       await page.getByRole('button', { name: /Generate Report/i }).click();
 
       // Wait for the report result section
-      await expect(
-        page.getByText(/Report Ready/i),
-      ).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByText(/Report Ready/i)).toBeVisible({
+        timeout: 15_000,
+      });
 
       // Download links should be present
       await expect(page.getByRole('link', { name: /CSV/i })).toBeVisible();
       await expect(page.getByRole('link', { name: /PDF/i })).toBeVisible();
 
       // Summary stats rendered
-      const body = await page.locator('body').textContent() ?? '';
-      expect(/Completion Rate|Total Enrollments|Overdue/i.test(body)).toBe(true);
+      const body = (await page.locator('body').textContent()) ?? '';
+      expect(/Completion Rate|Total Enrollments|Overdue/i.test(body)).toBe(
+        true
+      );
     });
   });
 
@@ -222,7 +239,9 @@ test.describe('Compliance Training Reports', () => {
     });
   });
 
-  test('visual: Generate Report section with course selected @visual', async ({ page }) => {
+  test('visual: Generate Report section with course selected @visual', async ({
+    page,
+  }) => {
     await gotoCompliance(page);
     const checkboxes = page.locator('input[type="checkbox"]');
     const count = await checkboxes.count();
@@ -232,9 +251,12 @@ test.describe('Compliance Training Reports', () => {
     }
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expect(page).toHaveScreenshot('compliance-reports-course-selected.png', {
-      maxDiffPixels: 200,
-      animations: 'disabled',
-    });
+    await expect(page).toHaveScreenshot(
+      'compliance-reports-course-selected.png',
+      {
+        maxDiffPixels: 200,
+        animations: 'disabled',
+      }
+    );
   });
 });

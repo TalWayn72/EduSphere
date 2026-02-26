@@ -9,7 +9,9 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }]),
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+    ]),
   };
 });
 
@@ -21,12 +23,24 @@ vi.mock('@/components/Layout', () => ({
 
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, title }: { children: React.ReactNode; onClick?: () => void; title?: string }) => (
-    <button onClick={onClick} title={title}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    title,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    title?: string;
+  }) => (
+    <button onClick={onClick} title={title}>
+      {children}
+    </button>
   ),
 }));
 
@@ -130,7 +144,10 @@ describe('KnowledgeGraph', () => {
 
   it('clicking a type filter toggles it', () => {
     renderKG();
-    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [HTMLElement, ...HTMLElement[]];
+    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [
+      HTMLElement,
+      ...HTMLElement[],
+    ];
     fireEvent.click(conceptBtn);
     // After click filter is active — component re-renders without error
     expect(screen.getAllByText(/CONCEPT/).length).toBeGreaterThan(0);
@@ -138,7 +155,10 @@ describe('KnowledgeGraph', () => {
 
   it('clicking the same type filter again removes the filter', () => {
     renderKG();
-    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [HTMLElement, ...HTMLElement[]];
+    const [conceptBtn] = screen.getAllByText(/CONCEPT/) as [
+      HTMLElement,
+      ...HTMLElement[],
+    ];
     fireEvent.click(conceptBtn); // activate
     fireEvent.click(conceptBtn); // deactivate
     expect(screen.getAllByText(/CONCEPT/).length).toBeGreaterThan(0);

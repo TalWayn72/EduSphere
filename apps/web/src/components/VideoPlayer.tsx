@@ -144,7 +144,8 @@ export function VideoPlayer({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getBookmarkPosition = (timestamp: number) => (timestamp / duration) * 100;
+  const getBookmarkPosition = (timestamp: number) =>
+    (timestamp / duration) * 100;
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (

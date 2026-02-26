@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: "Target environment"
         required: true
         type: choice
         options:
@@ -18,15 +18,15 @@ on:
           - production
         default: staging
       force_production:
-        description: 'Skip staging gate and deploy directly to production (emergency only)'
+        description: "Skip staging gate and deploy directly to production (emergency only)"
         required: false
         type: boolean
         default: false
       rollback_revision:
-        description: 'Helm revision number to roll back to (rollback job only — leave blank for auto)'
+        description: "Helm revision number to roll back to (rollback job only — leave blank for auto)"
         required: false
         type: string
-        default: ''
+        default: ""
 
 # Prevent concurrent deployments to the same environment.
 # A staging deploy must finish before another starts; same for production.
@@ -38,8 +38,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ${{ github.repository_owner }}/edusphere
   HELM_CHART_PATH: ./infrastructure/k8s/helm/edusphere
-  KUBECTL_VERSION: 'v1.29.0'
-  HELM_VERSION: 'v3.14.0'
+  KUBECTL_VERSION: "v1.29.0"
+  HELM_VERSION: "v3.14.0"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # JOB 0 — Build and push Docker images to GHCR
@@ -137,7 +137,7 @@ jobs:
           format: sarif
           output: trivy-${{ matrix.service }}.sarif
           severity: HIGH,CRITICAL
-          exit-code: '1'
+          exit-code: "1"
           ignore-unfixed: true
           vuln-type: os,library
 

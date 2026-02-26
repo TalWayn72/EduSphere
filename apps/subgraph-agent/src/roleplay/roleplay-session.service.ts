@@ -25,7 +25,9 @@ export class RoleplaySessionService {
   constructor(private readonly consentGuard: LlmConsentGuard) {}
 
   async startSession(scenarioId: string, userId: string, tenantId: string) {
-    const isExternal = Boolean(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY);
+    const isExternal = Boolean(
+      process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY
+    );
     await this.consentGuard.assertConsent(userId, isExternal);
 
     const [template] = await this.db
@@ -35,8 +37,8 @@ export class RoleplaySessionService {
         and(
           eq(scenario_templates.id, scenarioId),
           eq(scenario_templates.tenant_id, tenantId),
-          eq(scenario_templates.is_active, true),
-        ),
+          eq(scenario_templates.is_active, true)
+        )
       )
       .limit(1);
 
@@ -51,14 +53,25 @@ export class RoleplaySessionService {
 
     this.runWorkflowAsync(session.id, template).catch((err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error({ sessionId: session.id, err: msg }, 'Roleplay start failed');
+      this.logger.error(
+        { sessionId: session.id, err: msg },
+        'Roleplay start failed'
+      );
     });
 
-    this.logger.log({ sessionId: session.id, scenarioId }, 'Roleplay session started');
+    this.logger.log(
+      { sessionId: session.id, scenarioId },
+      'Roleplay session started'
+    );
     return session;
   }
 
-  async sendMessage(sessionId: string, message: string, userId: string, tenantId: string): Promise<boolean> {
+  async sendMessage(
+    sessionId: string,
+    message: string,
+    userId: string,
+    tenantId: string
+  ): Promise<boolean> {
     const safeMessage = message.slice(0, MAX_MESSAGE_LENGTH);
 
     const [session] = await this.db
@@ -69,12 +82,13 @@ export class RoleplaySessionService {
           eq(scenario_sessions.id, sessionId),
           eq(scenario_sessions.user_id, userId),
           eq(scenario_sessions.tenant_id, tenantId),
-          eq(scenario_sessions.status, 'IN_PROGRESS'),
-        ),
+          eq(scenario_sessions.status, 'IN_PROGRESS')
+        )
       )
       .limit(1);
 
-    if (!session) throw new NotFoundException('Session not found or not in progress');
+    if (!session)
+      throw new NotFoundException('Session not found or not in progress');
 
     const [template] = await this.db
       .select()
@@ -84,12 +98,15 @@ export class RoleplaySessionService {
 
     if (!template) throw new NotFoundException('Scenario template not found');
 
-    this.resumeWorkflowAsync(sessionId, safeMessage, template, session.turn_count).catch(
-      (err: unknown) => {
-        const msg = err instanceof Error ? err.message : String(err);
-        this.logger.error({ sessionId, err: msg }, 'Roleplay resume failed');
-      },
-    );
+    this.resumeWorkflowAsync(
+      sessionId,
+      safeMessage,
+      template,
+      session.turn_count
+    ).catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.error({ sessionId, err: msg }, 'Roleplay resume failed');
+    });
     return true;
   }
 
@@ -101,8 +118,8 @@ export class RoleplaySessionService {
         and(
           eq(scenario_sessions.id, sessionId),
           eq(scenario_sessions.user_id, userId),
-          eq(scenario_sessions.tenant_id, tenantId),
-        ),
+          eq(scenario_sessions.tenant_id, tenantId)
+        )
       )
       .limit(1);
     return session ?? null;
@@ -110,7 +127,7 @@ export class RoleplaySessionService {
 
   private async runWorkflowAsync(
     sessionId: string,
-    template: typeof scenario_templates.$inferSelect,
+    template: typeof scenario_templates.$inferSelect
   ): Promise<void> {
     const workflow = createRoleplayWorkflow();
     try {
@@ -127,11 +144,14 @@ export class RoleplaySessionService {
           evaluation: undefined,
           error: undefined,
         },
-        { configurable: { thread_id: sessionId } },
+        { configurable: { thread_id: sessionId } }
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      this.logger.debug({ sessionId, msg }, 'Workflow paused on interrupt (expected)');
+      this.logger.debug(
+        { sessionId, msg },
+        'Workflow paused on interrupt (expected)'
+      );
     }
   }
 
@@ -139,7 +159,7 @@ export class RoleplaySessionService {
     sessionId: string,
     message: string,
     template: typeof scenario_templates.$inferSelect,
-    currentTurnCount: number,
+    currentTurnCount: number
   ): Promise<void> {
     const workflow = createRoleplayWorkflow();
     const newTurnCount = currentTurnCount + 1;
@@ -147,7 +167,7 @@ export class RoleplaySessionService {
     try {
       const result = await workflow.invoke(
         { currentLearnerMessage: message } as Partial<RoleplayStateType>,
-        { configurable: { thread_id: sessionId } },
+        { configurable: { thread_id: sessionId } }
       );
       await this.db
         .update(scenario_sessions)

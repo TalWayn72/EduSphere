@@ -2,25 +2,46 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ForbiddenException } from '@nestjs/common';
 
 // ── Hoist mocks so they can be referenced in vi.mock factories ────────────────
-const { MockS3Client, MockPutObjectCommand, MockGetObjectCommand,
-        mockCloseAllPools, mockWithTenantContext, mockGetSignedUrl } =
-  vi.hoisted(() => {
-    const mockWithTenantContext = vi.fn();
-    const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
-    const mockGetSignedUrl = vi.fn().mockResolvedValue('https://minio.example.com/report?X-Amz-Expires=3600');
-    // Must be actual constructors (function, not arrow) for `new X()` to work
-    const MockS3Client = vi.fn().mockImplementation(function (this: object) {
-      (this as { send: ReturnType<typeof vi.fn> }).send = vi.fn().mockResolvedValue({});
-    });
-    const MockPutObjectCommand = vi.fn().mockImplementation(function (this: object, args: unknown) {
-      Object.assign(this as object, args as object);
-    });
-    const MockGetObjectCommand = vi.fn().mockImplementation(function (this: object, args: unknown) {
-      Object.assign(this as object, args as object);
-    });
-    return { MockS3Client, MockPutObjectCommand, MockGetObjectCommand,
-             mockCloseAllPools, mockWithTenantContext, mockGetSignedUrl };
+const {
+  MockS3Client,
+  MockPutObjectCommand,
+  MockGetObjectCommand,
+  mockCloseAllPools,
+  mockWithTenantContext,
+  mockGetSignedUrl,
+} = vi.hoisted(() => {
+  const mockWithTenantContext = vi.fn();
+  const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+  const mockGetSignedUrl = vi
+    .fn()
+    .mockResolvedValue('https://minio.example.com/report?X-Amz-Expires=3600');
+  // Must be actual constructors (function, not arrow) for `new X()` to work
+  const MockS3Client = vi.fn().mockImplementation(function (this: object) {
+    (this as { send: ReturnType<typeof vi.fn> }).send = vi
+      .fn()
+      .mockResolvedValue({});
   });
+  const MockPutObjectCommand = vi.fn().mockImplementation(function (
+    this: object,
+    args: unknown
+  ) {
+    Object.assign(this as object, args as object);
+  });
+  const MockGetObjectCommand = vi.fn().mockImplementation(function (
+    this: object,
+    args: unknown
+  ) {
+    Object.assign(this as object, args as object);
+  });
+  return {
+    MockS3Client,
+    MockPutObjectCommand,
+    MockGetObjectCommand,
+    mockCloseAllPools,
+    mockWithTenantContext,
+    mockGetSignedUrl,
+  };
+});
 
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: MockS3Client,
@@ -36,11 +57,29 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: mockCloseAllPools,
   schema: {
-    courses: { id: 'id', tenant_id: 'tenant_id', title: 'title', slug: 'slug',
-      is_compliance: 'is_compliance', compliance_due_date: 'compliance_due_date',
-      is_published: 'is_published', estimated_hours: 'estimated_hours', deleted_at: 'deleted_at' },
-    userCourses: { userId: 'userId', courseId: 'courseId', enrolledAt: 'enrolledAt', completedAt: 'completedAt' },
-    users: { id: 'id', email: 'email', first_name: 'first_name', last_name: 'last_name' },
+    courses: {
+      id: 'id',
+      tenant_id: 'tenant_id',
+      title: 'title',
+      slug: 'slug',
+      is_compliance: 'is_compliance',
+      compliance_due_date: 'compliance_due_date',
+      is_published: 'is_published',
+      estimated_hours: 'estimated_hours',
+      deleted_at: 'deleted_at',
+    },
+    userCourses: {
+      userId: 'userId',
+      courseId: 'courseId',
+      enrolledAt: 'enrolledAt',
+      completedAt: 'completedAt',
+    },
+    users: {
+      id: 'id',
+      email: 'email',
+      first_name: 'first_name',
+      last_name: 'last_name',
+    },
   },
   withTenantContext: mockWithTenantContext,
   eq: vi.fn(),
@@ -52,9 +91,21 @@ vi.mock('@edusphere/db', () => ({
 import { ComplianceService } from './compliance.service.js';
 import { CompliancePdfService } from './compliance-pdf.service.js';
 
-const ADMIN_CTX = { tenantId: 'tenant-1', userId: 'admin-1', userRole: 'ORG_ADMIN' as const };
-const SUPER_CTX = { tenantId: 'tenant-1', userId: 'super-1', userRole: 'SUPER_ADMIN' as const };
-const STUDENT_CTX = { tenantId: 'tenant-1', userId: 'student-1', userRole: 'STUDENT' as const };
+const ADMIN_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'admin-1',
+  userRole: 'ORG_ADMIN' as const,
+};
+const SUPER_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'super-1',
+  userRole: 'SUPER_ADMIN' as const,
+};
+const STUDENT_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'student-1',
+  userRole: 'STUDENT' as const,
+};
 
 /**
  * Build a mock tx that makes the select/join chain return the given rows.
@@ -84,18 +135,22 @@ describe('ComplianceService', () => {
 
   describe('role guard', () => {
     it('throws ForbiddenException for STUDENT on generateComplianceReport', async () => {
-      await expect(service.generateComplianceReport(['c1'], STUDENT_CTX)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(
+        service.generateComplianceReport(['c1'], STUDENT_CTX)
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('throws ForbiddenException for STUDENT on listComplianceCourses', async () => {
-      await expect(service.listComplianceCourses(STUDENT_CTX)).rejects.toThrow(ForbiddenException);
+      await expect(service.listComplianceCourses(STUDENT_CTX)).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('throws ForbiddenException for INSTRUCTOR role', async () => {
       const ctx = { ...ADMIN_CTX, userRole: 'INSTRUCTOR' as const };
-      await expect(service.generateComplianceReport(['c1'], ctx)).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.generateComplianceReport(['c1'], ctx)
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -110,14 +165,33 @@ describe('ComplianceService', () => {
 
     it('computes 100% completion rate when all rows are completed', async () => {
       const rawRows = [
-        { userId: 'u1', courseId: 'c1', enrolledAt: new Date('2026-01-01'), completedAt: new Date('2026-01-10'),
-          courseTitle: 'Safety', courseDueDate: new Date('2026-02-01'), userEmail: 'a@b.com', userFirstName: 'Alice', userLastName: 'Smith' },
-        { userId: 'u2', courseId: 'c1', enrolledAt: new Date('2026-01-02'), completedAt: new Date('2026-01-11'),
-          courseTitle: 'Safety', courseDueDate: new Date('2026-02-01'), userEmail: 'b@b.com', userFirstName: 'Bob', userLastName: 'Jones' },
+        {
+          userId: 'u1',
+          courseId: 'c1',
+          enrolledAt: new Date('2026-01-01'),
+          completedAt: new Date('2026-01-10'),
+          courseTitle: 'Safety',
+          courseDueDate: new Date('2026-02-01'),
+          userEmail: 'a@b.com',
+          userFirstName: 'Alice',
+          userLastName: 'Smith',
+        },
+        {
+          userId: 'u2',
+          courseId: 'c1',
+          enrolledAt: new Date('2026-01-02'),
+          completedAt: new Date('2026-01-11'),
+          courseTitle: 'Safety',
+          courseDueDate: new Date('2026-02-01'),
+          userEmail: 'b@b.com',
+          userFirstName: 'Bob',
+          userLastName: 'Jones',
+        },
       ];
       // withTenantContext invokes the callback with our mock tx
-      mockWithTenantContext.mockImplementationOnce((_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
-        fn(makeMockTx(rawRows)),
+      mockWithTenantContext.mockImplementationOnce(
+        (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
+          fn(makeMockTx(rawRows))
       );
       const result = await service.generateComplianceReport(['c1'], ADMIN_CTX);
       expect(result.summary.completionRate).toBe(100);
@@ -127,20 +201,35 @@ describe('ComplianceService', () => {
 
     it('marks enrollment as overdue when due date is before asOf and not completed', async () => {
       const rawRows = [
-        { userId: 'u1', courseId: 'c1', enrolledAt: new Date('2025-11-01'), completedAt: null,
-          courseTitle: 'GDPR', courseDueDate: new Date('2025-12-01'), userEmail: 'x@y.com', userFirstName: 'X', userLastName: 'Y' },
+        {
+          userId: 'u1',
+          courseId: 'c1',
+          enrolledAt: new Date('2025-11-01'),
+          completedAt: null,
+          courseTitle: 'GDPR',
+          courseDueDate: new Date('2025-12-01'),
+          userEmail: 'x@y.com',
+          userFirstName: 'X',
+          userLastName: 'Y',
+        },
       ];
-      mockWithTenantContext.mockImplementationOnce((_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
-        fn(makeMockTx(rawRows)),
+      mockWithTenantContext.mockImplementationOnce(
+        (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
+          fn(makeMockTx(rawRows))
       );
-      const result = await service.generateComplianceReport(['c1'], ADMIN_CTX, new Date('2026-01-01'));
+      const result = await service.generateComplianceReport(
+        ['c1'],
+        ADMIN_CTX,
+        new Date('2026-01-01')
+      );
       expect(result.summary.overdueCount).toBe(1);
       expect(result.summary.completionRate).toBe(0);
     });
 
     it('accepts SUPER_ADMIN role without throwing', async () => {
-      mockWithTenantContext.mockImplementationOnce((_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
-        fn(makeMockTx([])),
+      mockWithTenantContext.mockImplementationOnce(
+        (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
+          fn(makeMockTx([]))
       );
       const result = await service.generateComplianceReport(['c1'], SUPER_CTX);
       expect(result.summary.totalEnrollments).toBe(0);
@@ -155,17 +244,27 @@ describe('ComplianceService', () => {
 
   describe('listComplianceCourses — BUG-004 regression', () => {
     it('throws ForbiddenException for non-admin role', async () => {
-      await expect(service.listComplianceCourses(STUDENT_CTX)).rejects.toThrow(ForbiddenException);
+      await expect(service.listComplianceCourses(STUDENT_CTX)).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('calls withTenantContext and returns courses', async () => {
       const fakeCourses = [
-        { id: 'c1', title: 'Safety', slug: 'safety', is_compliance: false,
-          is_published: true, compliance_due_date: null, estimated_hours: null, deleted_at: null },
+        {
+          id: 'c1',
+          title: 'Safety',
+          slug: 'safety',
+          is_compliance: false,
+          is_published: true,
+          compliance_due_date: null,
+          estimated_hours: null,
+          deleted_at: null,
+        },
       ];
       mockWithTenantContext.mockImplementationOnce(
         (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
-          fn(makeMockTx(fakeCourses)),
+          fn(makeMockTx(fakeCourses))
       );
 
       const result = await service.listComplianceCourses(ADMIN_CTX);
@@ -176,7 +275,7 @@ describe('ComplianceService', () => {
       const { eq } = await import('@edusphere/db');
       mockWithTenantContext.mockImplementationOnce(
         (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
-          fn(makeMockTx([])),
+          fn(makeMockTx([]))
       );
 
       await service.listComplianceCourses(ADMIN_CTX);

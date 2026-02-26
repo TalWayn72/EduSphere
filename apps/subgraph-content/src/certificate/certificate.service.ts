@@ -12,7 +12,12 @@ import {
   closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import { CertificatePdfService } from './certificate-pdf.service.js';
 
 interface CourseCompletedEvent {
@@ -61,7 +66,9 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
       this.logger.log('Subscribed to EDUSPHERE.course.completed');
       void this.processMessages();
     } catch (err) {
-      this.logger.warn(`NATS connection failed — certificates will not auto-generate: ${err}`);
+      this.logger.warn(
+        `NATS connection failed — certificates will not auto-generate: ${err}`
+      );
     }
   }
 
@@ -69,7 +76,9 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
     if (!this.sub) return;
     for await (const msg of this.sub) {
       try {
-        const event = JSON.parse(this.sc.decode(msg.data)) as CourseCompletedEvent;
+        const event = JSON.parse(
+          this.sc.decode(msg.data)
+        ) as CourseCompletedEvent;
         await this.generateCertificate(event);
       } catch (err) {
         this.logger.error(`Failed to process course.completed event: ${err}`);
@@ -77,7 +86,9 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async generateCertificate(event: CourseCompletedEvent): Promise<CertificateResult> {
+  async generateCertificate(
+    event: CourseCompletedEvent
+  ): Promise<CertificateResult> {
     const ctx: TenantContext = {
       tenantId: event.tenantId,
       userId: event.userId,
@@ -86,12 +97,18 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
 
     // Step 1: Insert stub row to get the DB-generated verification_code
     const [cert] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.certificates).values({
-        tenant_id: event.tenantId,
-        user_id: event.userId,
-        course_id: event.courseId,
-        metadata: { learnerName: event.learnerName, courseName: event.courseName },
-      }).returning(),
+      tx
+        .insert(schema.certificates)
+        .values({
+          tenant_id: event.tenantId,
+          user_id: event.userId,
+          course_id: event.courseId,
+          metadata: {
+            learnerName: event.learnerName,
+            courseName: event.courseName,
+          },
+        })
+        .returning()
     );
 
     if (!cert) throw new Error('Certificate insert returned no record');
@@ -108,19 +125,24 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
     });
 
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.certificates)
+      tx
+        .update(schema.certificates)
         .set({ pdf_url: pdfKey })
-        .where(eq(schema.certificates.id, cert.id)),
+        .where(eq(schema.certificates.id, cert.id))
     );
 
-    this.logger.log(`Certificate issued: id=${cert.id} user=${event.userId} course=${event.courseId}`);
+    this.logger.log(
+      `Certificate issued: id=${cert.id} user=${event.userId} course=${event.courseId}`
+    );
     return this.mapCert({ ...cert, pdf_url: pdfKey }, event.courseName);
   }
 
   async getMyCertificates(ctx: TenantContext): Promise<CertificateResult[]> {
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.certificates)
-        .where(eq(schema.certificates.user_id, ctx.userId)),
+      tx
+        .select()
+        .from(schema.certificates)
+        .where(eq(schema.certificates.user_id, ctx.userId))
     );
 
     return rows.map((row) => {
@@ -143,7 +165,7 @@ export class CertificateService implements OnModuleInit, OnModuleDestroy {
 
   private mapCert(
     row: typeof schema.certificates.$inferSelect,
-    courseName: string,
+    courseName: string
   ): CertificateResult {
     return {
       id: row.id,

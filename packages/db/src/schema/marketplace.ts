@@ -59,7 +59,7 @@ export const courseListings = pgTable(
       using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type CourseListing = typeof courseListings.$inferSelect;
@@ -84,7 +84,7 @@ export const stripeCustomers = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type StripeCustomer = typeof stripeCustomers.$inferSelect;
@@ -113,7 +113,7 @@ export const purchases = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type Purchase = typeof purchases.$inferSelect;
@@ -142,7 +142,7 @@ export const instructorPayouts = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type InstructorPayout = typeof instructorPayouts.$inferSelect;

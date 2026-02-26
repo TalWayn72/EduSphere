@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import type { Matching } from '@/types/quiz';
 
-interface Pair { leftId: string; rightId: string }
+interface Pair {
+  leftId: string;
+  rightId: string;
+}
 
 interface Props {
   item: Matching;
@@ -23,7 +26,7 @@ export function MatchingQuestion({ item, value, onChange, disabled }: Props) {
 
   const getPairColor = (id: string, side: 'left' | 'right'): string => {
     const idx = value.findIndex((p) =>
-      side === 'left' ? p.leftId === id : p.rightId === id,
+      side === 'left' ? p.leftId === id : p.rightId === id
     );
     return idx >= 0 ? (PAIR_COLORS[idx % PAIR_COLORS.length] ?? '') : '';
   };
@@ -35,7 +38,9 @@ export function MatchingQuestion({ item, value, onChange, disabled }: Props) {
 
   const handleRight = (rightId: string) => {
     if (disabled || !selectedLeft) return;
-    const existing = value.filter((p) => p.leftId !== selectedLeft && p.rightId !== rightId);
+    const existing = value.filter(
+      (p) => p.leftId !== selectedLeft && p.rightId !== rightId
+    );
     onChange([...existing, { leftId: selectedLeft, rightId }]);
     setSelectedLeft(null);
   };

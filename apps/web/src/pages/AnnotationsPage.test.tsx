@@ -9,7 +9,10 @@ vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+    useQuery: vi.fn(() => [
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]),
     useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
   };
 });
@@ -69,14 +72,20 @@ describe('AnnotationsPage', () => {
   beforeEach(() => {
     // Provide annotationsByUser data so the component has annotations to render
     vi.mocked(useQuery).mockReturnValue([
-      { data: { annotationsByUser: BACKEND_ANNOTATIONS }, fetching: false, error: undefined },
+      {
+        data: { annotationsByUser: BACKEND_ANNOTATIONS },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
   });
 
   it('renders Annotations heading', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /annotations/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /annotations/i })
+    ).toBeInTheDocument();
   });
 
   it('shows total annotation count in subtitle', () => {
@@ -87,12 +96,16 @@ describe('AnnotationsPage', () => {
 
   it('renders "By time" sort button', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /by time/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /by time/i })
+    ).toBeInTheDocument();
   });
 
   it('renders "By layer" sort button', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /by layer/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /by layer/i })
+    ).toBeInTheDocument();
   });
 
   it('"By time" is active by default', () => {
@@ -105,7 +118,9 @@ describe('AnnotationsPage', () => {
   it('renders All tab with correct count', () => {
     renderPage();
     expect(
-      screen.getByRole('tab', { name: new RegExp(`All \\(${mockAnnotations.length}\\)`) })
+      screen.getByRole('tab', {
+        name: new RegExp(`All \\(${mockAnnotations.length}\\)`),
+      })
     ).toBeInTheDocument();
   });
 
@@ -121,7 +136,9 @@ describe('AnnotationsPage', () => {
 
   it('renders Instructor tab', () => {
     renderPage();
-    expect(screen.getByRole('tab', { name: /instructor/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /instructor/i })
+    ).toBeInTheDocument();
   });
 
   it('renders AI tab (AI_GENERATED layer)', () => {

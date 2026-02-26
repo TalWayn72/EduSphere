@@ -69,7 +69,9 @@ describe('DocumentParserService', () => {
     });
 
     it('returns multiple chunks for long text', () => {
-      const text = Array.from({ length: 20 }, (_, i) => `word${i} `.repeat(100)).join(' ');
+      const text = Array.from({ length: 20 }, (_, i) =>
+        `word${i} `.repeat(100)
+      ).join(' ');
       const chunks = service.chunkText(text, 1000, 200);
       expect(chunks.length).toBeGreaterThan(1);
     });
@@ -109,21 +111,26 @@ describe('DocumentParserService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         headers: { get: () => 'text/html; charset=utf-8' },
-        text: async () => '<html><body><h1>Title</h1><p>Content here</p></body></html>',
+        text: async () =>
+          '<html><body><h1>Title</h1><p>Content here</p></body></html>',
       });
 
       const result = await service.parseUrl('https://example.com/page');
       expect(result.text).toContain('Title');
       expect(result.text).toContain('Content here');
       expect(result.text).not.toContain('<h1>');
-      expect(result.metadata).toMatchObject({ source_type: 'URL', url: 'https://example.com/page' });
+      expect(result.metadata).toMatchObject({
+        source_type: 'URL',
+        url: 'https://example.com/page',
+      });
     });
 
     it('strips <script> and <style> blocks entirely', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         headers: { get: () => 'text/html' },
-        text: async () => '<html><head><script>alert("xss")</script><style>.h{color:red}</style></head><body>Clean text</body></html>',
+        text: async () =>
+          '<html><head><script>alert("xss")</script><style>.h{color:red}</style></head><body>Clean text</body></html>',
       });
 
       const result = await service.parseUrl('https://example.com');
@@ -150,7 +157,9 @@ describe('DocumentParserService', () => {
         headers: { get: () => 'text/html' },
       });
 
-      await expect(service.parseUrl('https://example.com/missing')).rejects.toThrow('HTTP 404');
+      await expect(
+        service.parseUrl('https://example.com/missing')
+      ).rejects.toThrow('HTTP 404');
     });
 
     it('decodes HTML entities (&amp; &nbsp; &lt; &gt;)', async () => {

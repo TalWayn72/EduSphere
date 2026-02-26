@@ -48,7 +48,9 @@ describe('packages/i18n exports', () => {
     for (const locale of SUPPORTED_LOCALES) {
       for (const ns of NAMESPACES) {
         const filePath = path.join(localesDir, locale, `${ns}.json`);
-        expect(fs.existsSync(filePath), `Missing: ${locale}/${ns}.json`).toBe(true);
+        expect(fs.existsSync(filePath), `Missing: ${locale}/${ns}.json`).toBe(
+          true
+        );
       }
     }
   });
@@ -93,9 +95,18 @@ describe('NAMESPACES', () => {
 
   it('includes all required namespaces', () => {
     const required = [
-      'common', 'nav', 'auth', 'dashboard', 'courses',
-      'content', 'annotations', 'agents', 'collaboration',
-      'knowledge', 'settings', 'errors',
+      'common',
+      'nav',
+      'auth',
+      'dashboard',
+      'courses',
+      'content',
+      'annotations',
+      'agents',
+      'collaboration',
+      'knowledge',
+      'settings',
+      'errors',
     ];
     for (const ns of required) {
       expect(NAMESPACES).toContain(ns);

@@ -28,8 +28,12 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const outerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const innerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const outerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const innerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
   const { t } = useTranslation('agents');
 
   // Cleanup both timeouts on unmount
@@ -171,7 +175,9 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
               <Sparkles className="h-12 w-12 mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">{t('chatPanel.startConversation')}</p>
+              <p className="text-lg font-medium mb-2">
+                {t('chatPanel.startConversation')}
+              </p>
               <p className="text-sm max-w-xs">
                 Ask me anything about {currentAgent.name.toLowerCase()} topics!
               </p>

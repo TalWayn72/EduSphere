@@ -101,7 +101,12 @@ function EnrollUserDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onClose();
+      }}
+    >
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>Enroll User</DialogTitle>
@@ -110,12 +115,17 @@ function EnrollUserDialog({
           <Input
             placeholder="User ID (UUID)"
             value={userId}
-            onChange={(e) => { setUserId(e.target.value); setError(''); }}
+            onChange={(e) => {
+              setUserId(e.target.value);
+              setError('');
+            }}
           />
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button onClick={handleEnroll}>Enroll</Button>
         </DialogFooter>
       </DialogContent>
@@ -153,7 +163,8 @@ function BulkEnrollDialog({
     if (result.error) {
       setError(result.error.message);
     } else {
-      const count = (result.data as { adminBulkEnroll: number })?.adminBulkEnroll ?? 0;
+      const count =
+        (result.data as { adminBulkEnroll: number })?.adminBulkEnroll ?? 0;
       setRawInput('');
       setError('');
       onSuccess(count);
@@ -162,7 +173,12 @@ function BulkEnrollDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onClose();
+      }}
+    >
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Bulk Enroll Users</DialogTitle>
@@ -173,14 +189,19 @@ function BulkEnrollDialog({
           </p>
           <textarea
             className="w-full h-32 rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            placeholder={"user-uuid-1\nuser-uuid-2\nuser-uuid-3"}
+            placeholder={'user-uuid-1\nuser-uuid-2\nuser-uuid-3'}
             value={rawInput}
-            onChange={(e) => { setRawInput(e.target.value); setError(''); }}
+            onChange={(e) => {
+              setRawInput(e.target.value);
+              setError('');
+            }}
           />
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button onClick={handleBulkEnroll}>Enroll All</Button>
         </DialogFooter>
       </DialogContent>
@@ -197,10 +218,18 @@ export function EnrollmentManagementPage() {
   const [showEnroll, setShowEnroll] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [confirmUnenroll, setConfirmUnenroll] = useState<{ userId: string; courseId: string } | null>(null);
+  const [confirmUnenroll, setConfirmUnenroll] = useState<{
+    userId: string;
+    courseId: string;
+  } | null>(null);
   const [, unenrollUser] = useMutation(ADMIN_UNENROLL_USER_MUTATION);
   const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (successTimerRef.current) clearTimeout(successTimerRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    },
+    []
+  );
 
   if (!role || !ADMIN_ROLES.has(role)) {
     navigate('/dashboard');
@@ -248,10 +277,15 @@ export function EnrollmentManagementPage() {
 
   const completedCount = enrollments.filter((e) => e.completedAt).length;
   const completionRate =
-    enrollments.length > 0 ? Math.round((completedCount / enrollments.length) * 100) : 0;
+    enrollments.length > 0
+      ? Math.round((completedCount / enrollments.length) * 100)
+      : 0;
 
   return (
-    <AdminLayout title="Enrollment" description="Manage course enrollments and learning paths">
+    <AdminLayout
+      title="Enrollment"
+      description="Manage course enrollments and learning paths"
+    >
       {/* Course selector + actions */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
@@ -263,7 +297,9 @@ export function EnrollmentManagementPage() {
               <SelectItem key={c.id} value={c.id}>
                 {c.title}
                 {!c.isPublished && (
-                  <span className="ml-2 text-xs text-muted-foreground">(draft)</span>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    (draft)
+                  </span>
                 )}
               </SelectItem>
             ))}
@@ -275,14 +311,20 @@ export function EnrollmentManagementPage() {
             <Button onClick={() => setShowEnroll(true)} size="sm">
               Enroll User
             </Button>
-            <Button variant="outline" onClick={() => setShowBulk(true)} size="sm">
+            <Button
+              variant="outline"
+              onClick={() => setShowBulk(true)}
+              size="sm"
+            >
               Bulk Enroll
             </Button>
           </>
         )}
 
         {successMessage && (
-          <span className="text-sm text-green-600 font-medium">{successMessage}</span>
+          <span className="text-sm text-green-600 font-medium">
+            {successMessage}
+          </span>
         )}
       </div>
 
@@ -290,13 +332,16 @@ export function EnrollmentManagementPage() {
       {selectedCourseId && !enrollmentsResult.fetching && (
         <div className="flex gap-6 mb-4 text-sm text-muted-foreground">
           <span>
-            <strong className="text-foreground">{enrollments.length}</strong> enrolled
+            <strong className="text-foreground">{enrollments.length}</strong>{' '}
+            enrolled
           </span>
           <span>
-            <strong className="text-foreground">{completedCount}</strong> completed
+            <strong className="text-foreground">{completedCount}</strong>{' '}
+            completed
           </span>
           <span>
-            <strong className="text-foreground">{completionRate}%</strong> completion rate
+            <strong className="text-foreground">{completionRate}%</strong>{' '}
+            completion rate
           </span>
         </div>
       )}
@@ -345,7 +390,9 @@ export function EnrollmentManagementPage() {
                     {e.completedAt ? 'Completed' : e.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm">{formatDate(e.enrolledAt)}</TableCell>
+                <TableCell className="text-sm">
+                  {formatDate(e.enrolledAt)}
+                </TableCell>
                 <TableCell className="text-sm">
                   {e.completedAt ? formatDate(e.completedAt) : '—'}
                 </TableCell>
@@ -354,7 +401,12 @@ export function EnrollmentManagementPage() {
                     variant="ghost"
                     size="sm"
                     className="text-destructive hover:text-destructive"
-                    onClick={() => setConfirmUnenroll({ userId: e.userId, courseId: e.courseId })}
+                    onClick={() =>
+                      setConfirmUnenroll({
+                        userId: e.userId,
+                        courseId: e.courseId,
+                      })
+                    }
                   >
                     Unenroll
                   </Button>
@@ -382,13 +434,19 @@ export function EnrollmentManagementPage() {
       />
 
       {/* Confirm unenroll dialog */}
-      <Dialog open={!!confirmUnenroll} onOpenChange={(v) => { if (!v) setConfirmUnenroll(null); }}>
+      <Dialog
+        open={!!confirmUnenroll}
+        onOpenChange={(v) => {
+          if (!v) setConfirmUnenroll(null);
+        }}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Confirm Unenroll</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground py-2">
-            Remove this user from the course? Their progress data will be preserved.
+            Remove this user from the course? Their progress data will be
+            preserved.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmUnenroll(null)}>

@@ -42,7 +42,9 @@ function ContentItemChart({ metrics }: { metrics: ContentItemMetric[] }) {
           <CardTitle className="text-sm">Content Engagement</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-sm text-center py-8">No content item data yet.</p>
+          <p className="text-muted-foreground text-sm text-center py-8">
+            No content item data yet.
+          </p>
         </CardContent>
       </Card>
     );
@@ -55,17 +57,31 @@ function ContentItemChart({ metrics }: { metrics: ContentItemMetric[] }) {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 40 }}>
+          <BarChart
+            data={data}
+            margin={{ top: 4, right: 8, left: 0, bottom: 40 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-30} textAnchor="end" />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 11 }}
+              angle={-30}
+              textAnchor="end"
+            />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip
               // @ts-expect-error Recharts Formatter types are overly strict
               formatter={(value: number | undefined, name: string) =>
-                name === 'viewCount' ? [`${value} views`, 'Views'] : [`${value}%`, 'Completion']
+                name === 'viewCount'
+                  ? [`${value} views`, 'Views']
+                  : [`${value}%`, 'Completion']
               }
             />
-            <Bar dataKey="viewCount" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
+            <Bar
+              dataKey="viewCount"
+              fill="hsl(var(--primary))"
+              radius={[3, 3, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -77,7 +93,8 @@ function ContentItemChart({ metrics }: { metrics: ContentItemMetric[] }) {
 
 function DropOffFunnelChart({ funnel }: { funnel: FunnelStep[] }) {
   const data = funnel.map((s) => ({
-    name: s.moduleName.length > 18 ? `${s.moduleName.slice(0, 16)}…` : s.moduleName,
+    name:
+      s.moduleName.length > 18 ? `${s.moduleName.slice(0, 16)}…` : s.moduleName,
     started: s.learnersStarted,
     completed: s.learnersCompleted,
     dropOff: s.dropOffRate,
@@ -90,7 +107,9 @@ function DropOffFunnelChart({ funnel }: { funnel: FunnelStep[] }) {
           <CardTitle className="text-sm">Module Drop-off Funnel</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-sm text-center py-8">No funnel data yet.</p>
+          <p className="text-muted-foreground text-sm text-center py-8">
+            No funnel data yet.
+          </p>
         </CardContent>
       </Card>
     );
@@ -103,9 +122,17 @@ function DropOffFunnelChart({ funnel }: { funnel: FunnelStep[] }) {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 40 }}>
+          <BarChart
+            data={data}
+            margin={{ top: 4, right: 8, left: 0, bottom: 40 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-30} textAnchor="end" />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 11 }}
+              angle={-30}
+              textAnchor="end"
+            />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip
               // @ts-expect-error Recharts Formatter types are overly strict
@@ -113,16 +140,24 @@ function DropOffFunnelChart({ funnel }: { funnel: FunnelStep[] }) {
                 name === 'started'
                   ? [`${value}`, 'Started']
                   : name === 'completed'
-                  ? [`${value}`, 'Completed']
-                  : [`${value}%`, 'Drop-off Rate']
+                    ? [`${value}`, 'Completed']
+                    : [`${value}%`, 'Drop-off Rate']
               }
             />
-            <Bar dataKey="started" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]}>
+            <Bar
+              dataKey="started"
+              fill="hsl(var(--primary))"
+              radius={[3, 3, 0, 0]}
+            >
               {data.map((_entry, i) => (
                 <Cell key={i} fill="hsl(var(--primary))" opacity={0.8} />
               ))}
             </Bar>
-            <Bar dataKey="completed" fill="hsl(142 76% 36%)" radius={[3, 3, 0, 0]} />
+            <Bar
+              dataKey="completed"
+              fill="hsl(142 76% 36%)"
+              radius={[3, 3, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -132,7 +167,10 @@ function DropOffFunnelChart({ funnel }: { funnel: FunnelStep[] }) {
 
 // ── Exported Composite ────────────────────────────────────────────────────────
 
-export function AnalyticsCharts({ contentItemMetrics, dropOffFunnel }: AnalyticsChartsProps) {
+export function AnalyticsCharts({
+  contentItemMetrics,
+  dropOffFunnel,
+}: AnalyticsChartsProps) {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <ContentItemChart metrics={contentItemMetrics} />

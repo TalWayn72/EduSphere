@@ -32,9 +32,13 @@ import { LibraryModule } from './course-library/library.module';
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-        transport: process.env.NODE_ENV !== 'production'
-          ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
-          : undefined,
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? {
+                target: 'pino-pretty',
+                options: { singleLine: true, colorize: true },
+              }
+            : undefined,
         redact: ['req.headers.authorization', 'req.headers.cookie'],
         customProps: (req: any) => ({
           tenantId: req.headers['x-tenant-id'],

@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 import { S3Client, CopyObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
@@ -8,11 +13,20 @@ import {
   closeAllPools,
   withTenantContext,
 } from '@edusphere/db';
-import type { LibraryCourse, TenantLibraryActivation, TenantContext } from '@edusphere/db';
+import type {
+  LibraryCourse,
+  TenantLibraryActivation,
+  TenantContext,
+} from '@edusphere/db';
 
 export type LibraryTopic =
-  | 'GDPR' | 'SOC2' | 'HIPAA' | 'AML'
-  | 'DEI' | 'CYBERSECURITY' | 'HARASSMENT_PREVENTION';
+  | 'GDPR'
+  | 'SOC2'
+  | 'HIPAA'
+  | 'AML'
+  | 'DEI'
+  | 'CYBERSECURITY'
+  | 'HARASSMENT_PREVENTION';
 
 export type LibraryLicense = 'FREE' | 'PAID';
 
@@ -47,7 +61,9 @@ export class LibraryService implements OnModuleDestroy {
   }
 
   // Global catalog — no tenant context required
-  async listLibraryCourses(filter?: LibraryCourseFilter): Promise<LibraryCourse[]> {
+  async listLibraryCourses(
+    filter?: LibraryCourseFilter
+  ): Promise<LibraryCourse[]> {
     const rows = await this.db
       .select()
       .from(schema.libraryCourses)
@@ -55,7 +71,8 @@ export class LibraryService implements OnModuleDestroy {
 
     return rows.filter((r) => {
       if (filter?.topic && r.topic !== filter.topic) return false;
-      if (filter?.licenseType && r.licenseType !== filter.licenseType) return false;
+      if (filter?.licenseType && r.licenseType !== filter.licenseType)
+        return false;
       return true;
     });
   }
@@ -64,27 +81,42 @@ export class LibraryService implements OnModuleDestroy {
     const [row] = await this.db
       .select()
       .from(schema.libraryCourses)
-      .where(and(eq(schema.libraryCourses.id, id), eq(schema.libraryCourses.isActive, true)));
+      .where(
+        and(
+          eq(schema.libraryCourses.id, id),
+          eq(schema.libraryCourses.isActive, true)
+        )
+      );
     return row ?? null;
   }
 
-  async getTenantActivations(tenantId: string): Promise<TenantLibraryActivation[]> {
-    const ctx: TenantContext = { tenantId, userId: tenantId, userRole: 'ORG_ADMIN' };
+  async getTenantActivations(
+    tenantId: string
+  ): Promise<TenantLibraryActivation[]> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: tenantId,
+      userRole: 'ORG_ADMIN',
+    };
     return withTenantContext(this.db, ctx, (tx) =>
       tx
         .select()
         .from(schema.tenantLibraryActivations)
-        .where(eq(schema.tenantLibraryActivations.tenantId, tenantId)),
+        .where(eq(schema.tenantLibraryActivations.tenantId, tenantId))
     );
   }
 
   async activateCourse(
     tenantId: string,
     libraryCourseId: string,
-    activatedBy: string,
+    activatedBy: string
   ): Promise<TenantLibraryActivation> {
     // 1. Idempotency — return existing activation if already activated
-    const ctx: TenantContext = { tenantId, userId: activatedBy, userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: activatedBy,
+      userRole: 'ORG_ADMIN',
+    };
     const existing = await withTenantContext(this.db, ctx, (tx) =>
       tx
         .select()
@@ -92,14 +124,14 @@ export class LibraryService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.tenantLibraryActivations.tenantId, tenantId),
-            eq(schema.tenantLibraryActivations.libraryCourseId, libraryCourseId),
-          ),
-        ),
+            eq(schema.tenantLibraryActivations.libraryCourseId, libraryCourseId)
+          )
+        )
     );
 
     if (existing.length > 0 && existing[0]) {
       this.logger.log(
-        `Library course already activated: tenantId=${tenantId} libraryCourseId=${libraryCourseId}`,
+        `Library course already activated: tenantId=${tenantId} libraryCourseId=${libraryCourseId}`
       );
       return existing[0];
     }
@@ -107,7 +139,9 @@ export class LibraryService implements OnModuleDestroy {
     // 2. Fetch library course
     const libraryCourse = await this.getLibraryCourse(libraryCourseId);
     if (!libraryCourse) {
-      throw new NotFoundException(`Library course not found: ${libraryCourseId}`);
+      throw new NotFoundException(
+        `Library course not found: ${libraryCourseId}`
+      );
     }
 
     // 3. Copy SCORM package to tenant's MinIO folder
@@ -117,13 +151,18 @@ export class LibraryService implements OnModuleDestroy {
         Bucket: this.bucket,
         CopySource: `${this.bucket}/${libraryCourse.scormPackageUrl}`,
         Key: destKey,
-      }),
+      })
     );
-    this.logger.log(`Copied SCORM package: src=${libraryCourse.scormPackageUrl} dest=${destKey}`);
+    this.logger.log(
+      `Copied SCORM package: src=${libraryCourse.scormPackageUrl} dest=${destKey}`
+    );
 
     // 4. Create a course in tenant's catalog
     const courseId = randomUUID();
-    const slug = libraryCourse.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 100);
+    const slug = libraryCourse.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .slice(0, 100);
 
     await withTenantContext(this.db, ctx, (tx) =>
       tx.insert(schema.courses).values({
@@ -135,7 +174,7 @@ export class LibraryService implements OnModuleDestroy {
         instructor_id: activatedBy,
         is_published: false,
         is_compliance: true,
-      }),
+      })
     );
 
     // 5. Store activation record
@@ -143,31 +182,39 @@ export class LibraryService implements OnModuleDestroy {
       tx
         .insert(schema.tenantLibraryActivations)
         .values({ tenantId, libraryCourseId, activatedBy, courseId })
-        .returning(),
+        .returning()
     );
 
-    if (!activation) throw new Error('Failed to create library activation record');
+    if (!activation)
+      throw new Error('Failed to create library activation record');
 
     this.logger.log(
-      `Library course activated: tenantId=${tenantId} libraryCourseId=${libraryCourseId} courseId=${courseId}`,
+      `Library course activated: tenantId=${tenantId} libraryCourseId=${libraryCourseId} courseId=${courseId}`
     );
     return activation;
   }
 
-  async deactivateCourse(tenantId: string, libraryCourseId: string): Promise<void> {
-    const deactivateCtx: TenantContext = { tenantId, userId: tenantId, userRole: 'ORG_ADMIN' };
+  async deactivateCourse(
+    tenantId: string,
+    libraryCourseId: string
+  ): Promise<void> {
+    const deactivateCtx: TenantContext = {
+      tenantId,
+      userId: tenantId,
+      userRole: 'ORG_ADMIN',
+    };
     await withTenantContext(this.db, deactivateCtx, (tx) =>
       tx
         .delete(schema.tenantLibraryActivations)
         .where(
           and(
             eq(schema.tenantLibraryActivations.tenantId, tenantId),
-            eq(schema.tenantLibraryActivations.libraryCourseId, libraryCourseId),
-          ),
-        ),
+            eq(schema.tenantLibraryActivations.libraryCourseId, libraryCourseId)
+          )
+        )
     );
     this.logger.log(
-      `Library course deactivated: tenantId=${tenantId} libraryCourseId=${libraryCourseId}`,
+      `Library course deactivated: tenantId=${tenantId} libraryCourseId=${libraryCourseId}`
     );
   }
 }

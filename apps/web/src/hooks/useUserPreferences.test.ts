@@ -28,9 +28,21 @@ import * as urql from 'urql';
 function makeQueryResult(locale: string | null, fetching = false) {
   const data =
     locale !== null
-      ? { me: { id: 'u-1', preferences: { locale, theme: 'light', emailNotifications: true, pushNotifications: false } } }
+      ? {
+          me: {
+            id: 'u-1',
+            preferences: {
+              locale,
+              theme: 'light',
+              emailNotifications: true,
+              pushNotifications: false,
+            },
+          },
+        }
       : undefined;
-  return [{ data, fetching, error: undefined }, vi.fn()] as ReturnType<typeof urql.useQuery>;
+  return [{ data, fetching, error: undefined }, vi.fn()] as ReturnType<
+    typeof urql.useQuery
+  >;
 }
 
 function setupMocks({
@@ -53,8 +65,13 @@ function setupMocks({
   }));
 
   vi.mocked(urql.useQuery).mockReturnValue(makeQueryResult(dbLocale, fetching));
-  mockUpdatePreferences.mockResolvedValue({ data: { updateUserPreferences: { id: 'u-1' } } });
-  vi.mocked(urql.useMutation).mockReturnValue([{ fetching }, mockUpdatePreferences] as ReturnType<typeof urql.useMutation>);
+  mockUpdatePreferences.mockResolvedValue({
+    data: { updateUserPreferences: { id: 'u-1' } },
+  });
+  vi.mocked(urql.useMutation).mockReturnValue([
+    { fetching },
+    mockUpdatePreferences,
+  ] as ReturnType<typeof urql.useMutation>);
 
   return { changeLanguage };
 }
@@ -118,14 +135,22 @@ describe('useUserPreferences', () => {
     });
 
     expect(mockUpdatePreferences).toHaveBeenCalledTimes(1);
-    expect(mockUpdatePreferences).toHaveBeenCalledWith({ input: { locale: 'zh-CN' } });
+    expect(mockUpdatePreferences).toHaveBeenCalledWith({
+      input: { locale: 'zh-CN' },
+    });
   });
 
   it('setLocale calls i18n.changeLanguage with the new locale', async () => {
-    const { changeLanguage } = setupMocks({ dbLocale: 'en', i18nLanguage: 'en' });
+    const { changeLanguage } = setupMocks({
+      dbLocale: 'en',
+      i18nLanguage: 'en',
+    });
     // Re-mock react-i18next inline to capture the spy
     vi.mocked(urql.useQuery).mockReturnValue(makeQueryResult('en'));
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockUpdatePreferences] as ReturnType<typeof urql.useMutation>);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockUpdatePreferences,
+    ] as ReturnType<typeof urql.useMutation>);
 
     // Use the global setup.ts mock (language:'en', changeLanguage is a spy there)
     // For this test we verify via the mock returned by setupMocks.
@@ -139,7 +164,9 @@ describe('useUserPreferences', () => {
     });
 
     // Mutation called proves the full setLocale path ran (changeLanguage included)
-    expect(mockUpdatePreferences).toHaveBeenCalledWith({ input: { locale: 'ru' } });
+    expect(mockUpdatePreferences).toHaveBeenCalledWith({
+      input: { locale: 'ru' },
+    });
     // localStorage updated as a side-effect proof
     expect(localStorage.getItem('edusphere_locale')).toBe('ru');
     void changeLanguage; // referenced to avoid unused-var lint

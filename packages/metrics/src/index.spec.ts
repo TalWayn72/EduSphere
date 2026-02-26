@@ -21,16 +21,28 @@ const {
   const mockObserve = vi.fn();
   const mockInc = vi.fn();
   const mockDec = vi.fn();
-  const mockMetrics = vi.fn().mockResolvedValue('# HELP edusphere_test\nmetric 1');
+  const mockMetrics = vi
+    .fn()
+    .mockResolvedValue('# HELP edusphere_test\nmetric 1');
   const mockSetDefaultLabels = vi.fn();
   const mockContentType = 'text/plain; version=0.0.4; charset=utf-8';
   const mockCollectDefaultMetrics = vi.fn();
 
-  const MockHistogram = vi.fn(function() { return { observe: mockObserve }; });
-  const MockCounter = vi.fn(function() { return { inc: mockInc }; });
-  const MockGauge = vi.fn(function() { return { inc: mockInc, dec: mockDec }; });
-  const MockRegistry = vi.fn(function() {
-    return { setDefaultLabels: mockSetDefaultLabels, metrics: mockMetrics, contentType: mockContentType };
+  const MockHistogram = vi.fn(function () {
+    return { observe: mockObserve };
+  });
+  const MockCounter = vi.fn(function () {
+    return { inc: mockInc };
+  });
+  const MockGauge = vi.fn(function () {
+    return { inc: mockInc, dec: mockDec };
+  });
+  const MockRegistry = vi.fn(function () {
+    return {
+      setDefaultLabels: mockSetDefaultLabels,
+      metrics: mockMetrics,
+      contentType: mockContentType,
+    };
   });
 
   return {
@@ -79,12 +91,22 @@ describe('MetricsService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    MockRegistry.mockImplementation(function() {
-      return { setDefaultLabels: mockSetDefaultLabels, metrics: mockMetrics, contentType: mockContentType };
+    MockRegistry.mockImplementation(function () {
+      return {
+        setDefaultLabels: mockSetDefaultLabels,
+        metrics: mockMetrics,
+        contentType: mockContentType,
+      };
     });
-    MockHistogram.mockImplementation(function() { return { observe: mockObserve }; });
-    MockCounter.mockImplementation(function() { return { inc: mockInc }; });
-    MockGauge.mockImplementation(function() { return { inc: mockInc, dec: mockDec }; });
+    MockHistogram.mockImplementation(function () {
+      return { observe: mockObserve };
+    });
+    MockCounter.mockImplementation(function () {
+      return { inc: mockInc };
+    });
+    MockGauge.mockImplementation(function () {
+      return { inc: mockInc, dec: mockDec };
+    });
 
     service = new MetricsService('test-service');
   });
@@ -97,25 +119,27 @@ describe('MetricsService', () => {
     });
 
     it('sets default labels with the provided service name', () => {
-      expect(mockSetDefaultLabels).toHaveBeenCalledWith({ service: 'test-service' });
+      expect(mockSetDefaultLabels).toHaveBeenCalledWith({
+        service: 'test-service',
+      });
     });
 
     it('calls collectDefaultMetrics with the registry and edusphere_ prefix', () => {
       expect(mockCollectDefaultMetrics).toHaveBeenCalledWith(
-        expect.objectContaining({ prefix: 'edusphere_' }),
+        expect.objectContaining({ prefix: 'edusphere_' })
       );
     });
 
     it('registers httpRequestDuration Histogram with correct name', () => {
       const httpDurationCall = MockHistogram.mock.calls.find(
-        ([cfg]) => cfg.name === 'edusphere_http_request_duration_seconds',
+        ([cfg]) => cfg.name === 'edusphere_http_request_duration_seconds'
       );
       expect(httpDurationCall).toBeDefined();
     });
 
     it('registers httpRequestTotal Counter with method/route/status_code labels', () => {
       const httpTotalCall = MockCounter.mock.calls.find(
-        ([cfg]) => cfg.name === 'edusphere_http_requests_total',
+        ([cfg]) => cfg.name === 'edusphere_http_requests_total'
       );
       expect(httpTotalCall).toBeDefined();
       expect(httpTotalCall?.[0].labelNames).toContain('method');
@@ -125,14 +149,14 @@ describe('MetricsService', () => {
 
     it('registers activeConnections Gauge', () => {
       const connGaugeCall = MockGauge.mock.calls.find(
-        ([cfg]) => cfg.name === 'edusphere_active_connections',
+        ([cfg]) => cfg.name === 'edusphere_active_connections'
       );
       expect(connGaugeCall).toBeDefined();
     });
 
     it('registers dbQueryDuration Histogram with operation/table labels', () => {
       const dbDurationCall = MockHistogram.mock.calls.find(
-        ([cfg]) => cfg.name === 'edusphere_db_query_duration_seconds',
+        ([cfg]) => cfg.name === 'edusphere_db_query_duration_seconds'
       );
       expect(dbDurationCall).toBeDefined();
       expect(dbDurationCall?.[0].labelNames).toContain('operation');
@@ -141,14 +165,14 @@ describe('MetricsService', () => {
 
     it('registers graphqlOperations Counter', () => {
       const gqlCall = MockCounter.mock.calls.find(
-        ([cfg]) => cfg.name === 'edusphere_graphql_operations_total',
+        ([cfg]) => cfg.name === 'edusphere_graphql_operations_total'
       );
       expect(gqlCall).toBeDefined();
     });
 
     it('registers cacheHitRate Counter', () => {
       const cacheCall = MockCounter.mock.calls.find(
-        ([cfg]) => cfg.name === 'edusphere_cache_operations_total',
+        ([cfg]) => cfg.name === 'edusphere_cache_operations_total'
       );
       expect(cacheCall).toBeDefined();
     });
@@ -161,14 +185,18 @@ describe('MetricsService', () => {
       service.recordHttpRequest('GET', '/api/courses', 200, 0.123);
       expect(mockObserve).toHaveBeenCalledWith(
         { method: 'GET', route: '/api/courses', status_code: 200 },
-        0.123,
+        0.123
       );
     });
 
     it('calls inc on httpRequestTotal counter with correct labels', () => {
       service.recordHttpRequest('POST', '/graphql', 201, 0.05);
       expect(mockInc).toHaveBeenCalledWith(
-        expect.objectContaining({ method: 'POST', route: '/graphql', status_code: 201 }),
+        expect.objectContaining({
+          method: 'POST',
+          route: '/graphql',
+          status_code: 201,
+        })
       );
     });
 
@@ -184,12 +212,18 @@ describe('MetricsService', () => {
   describe('recordDbQuery()', () => {
     it('calls observe on dbQueryDuration histogram', () => {
       service.recordDbQuery('SELECT', 'users', 0.042);
-      expect(mockObserve).toHaveBeenCalledWith({ operation: 'SELECT', table: 'users' }, 0.042);
+      expect(mockObserve).toHaveBeenCalledWith(
+        { operation: 'SELECT', table: 'users' },
+        0.042
+      );
     });
 
     it('handles different operation types correctly', () => {
       service.recordDbQuery('INSERT', 'courses', 0.01);
-      expect(mockObserve).toHaveBeenCalledWith({ operation: 'INSERT', table: 'courses' }, 0.01);
+      expect(mockObserve).toHaveBeenCalledWith(
+        { operation: 'INSERT', table: 'courses' },
+        0.01
+      );
     });
   });
 
@@ -203,14 +237,14 @@ describe('MetricsService', () => {
           operation_type: 'query',
           operation_name: 'GetCourses',
           status: 'success',
-        }),
+        })
       );
     });
 
     it('increments graphqlOperations counter with error status', () => {
       service.recordGraphqlOperation('mutation', 'CreateUser', 'error');
       expect(mockInc).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 'error' }),
+        expect.objectContaining({ status: 'error' })
       );
     });
   });
@@ -225,7 +259,10 @@ describe('MetricsService', () => {
 
     it('records a cache miss', () => {
       service.recordCacheOperation('get', 'miss');
-      expect(mockInc).toHaveBeenCalledWith({ operation: 'get', result: 'miss' });
+      expect(mockInc).toHaveBeenCalledWith({
+        operation: 'get',
+        result: 'miss',
+      });
     });
 
     it('records a cache set operation', () => {
@@ -284,12 +321,22 @@ describe('MetricsService', () => {
 describe('createMetricsMiddleware()', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    MockRegistry.mockImplementation(function() {
-      return { setDefaultLabels: vi.fn(), metrics: vi.fn().mockResolvedValue(''), contentType: '' };
+    MockRegistry.mockImplementation(function () {
+      return {
+        setDefaultLabels: vi.fn(),
+        metrics: vi.fn().mockResolvedValue(''),
+        contentType: '',
+      };
     });
-    MockHistogram.mockImplementation(function() { return { observe: mockObserve }; });
-    MockCounter.mockImplementation(function() { return { inc: mockInc }; });
-    MockGauge.mockImplementation(function() { return { inc: mockInc, dec: mockDec }; });
+    MockHistogram.mockImplementation(function () {
+      return { observe: mockObserve };
+    });
+    MockCounter.mockImplementation(function () {
+      return { inc: mockInc };
+    });
+    MockGauge.mockImplementation(function () {
+      return { inc: mockInc, dec: mockDec };
+    });
   });
 
   it('calls incrementActiveConnections when a request arrives and decrements on finish', () => {
@@ -316,7 +363,12 @@ describe('createMetricsMiddleware()', () => {
 
     onHandlers['finish']();
     expect(decSpy).toHaveBeenCalledOnce();
-    expect(recordSpy).toHaveBeenCalledWith('GET', '/test', 200, expect.any(Number));
+    expect(recordSpy).toHaveBeenCalledWith(
+      'GET',
+      '/test',
+      200,
+      expect.any(Number)
+    );
   });
 
   it('uses req.route.path when route is available', () => {
@@ -330,14 +382,23 @@ describe('createMetricsMiddleware()', () => {
       },
       statusCode: 201,
     };
-    const mockReq = { method: 'POST', path: '/actual', route: { path: '/route-pattern' } };
+    const mockReq = {
+      method: 'POST',
+      path: '/actual',
+      route: { path: '/route-pattern' },
+    };
     const next = vi.fn();
 
     const middleware = createMetricsMiddleware(service);
     middleware(mockReq as never, mockRes as never, next);
     onHandlers['finish']();
 
-    expect(recordSpy).toHaveBeenCalledWith('POST', '/route-pattern', 201, expect.any(Number));
+    expect(recordSpy).toHaveBeenCalledWith(
+      'POST',
+      '/route-pattern',
+      201,
+      expect.any(Number)
+    );
   });
 
   it('records a non-negative duration in seconds', () => {

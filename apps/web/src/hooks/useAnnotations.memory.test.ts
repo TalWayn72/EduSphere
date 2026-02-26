@@ -62,11 +62,19 @@ const SERVER_ANNOTATION = {
 function setupUrqlMocks(options: { subscriptionData?: unknown } = {}) {
   const { subscriptionData = null } = options;
   vi.mocked(urql.useQuery).mockReturnValue([
-    { data: { annotations: [SERVER_ANNOTATION] }, fetching: false, error: undefined },
+    {
+      data: { annotations: [SERVER_ANNOTATION] },
+      fetching: false,
+      error: undefined,
+    },
     vi.fn(),
   ] as ReturnType<typeof urql.useQuery>);
-  vi.mocked(urql.useMutation).mockImplementation((_m) =>
-    [{ fetching: false }, vi.fn().mockResolvedValue({ data: null })] as ReturnType<typeof urql.useMutation>
+  vi.mocked(urql.useMutation).mockImplementation(
+    (_m) =>
+      [
+        { fetching: false },
+        vi.fn().mockResolvedValue({ data: null }),
+      ] as ReturnType<typeof urql.useMutation>
   );
   vi.mocked(urql.useSubscription).mockReturnValue([
     { data: subscriptionData, fetching: false },
@@ -75,8 +83,12 @@ function setupUrqlMocks(options: { subscriptionData?: unknown } = {}) {
 }
 
 describe('useAnnotations subscription cleanup (memory safety)', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
-  afterEach(() => { vi.restoreAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it('passes pause:true to useSubscription when contentId is not a UUID', () => {
     setupUrqlMocks();
@@ -94,13 +106,17 @@ describe('useAnnotations subscription cleanup (memory safety)', () => {
 
   it('does not throw when unmounting with an active subscription', () => {
     setupUrqlMocks();
-    const { unmount } = renderHook(() => useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL]));
+    const { unmount } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
     expect(() => unmount()).not.toThrow();
   });
 
   it('does not throw when unmounting with a paused subscription', () => {
     setupUrqlMocks();
-    const { unmount } = renderHook(() => useAnnotations(SLUG_ID, [AnnotationLayer.PERSONAL]));
+    const { unmount } = renderHook(() =>
+      useAnnotations(SLUG_ID, [AnnotationLayer.PERSONAL])
+    );
     expect(() => unmount()).not.toThrow();
   });
 
@@ -125,7 +141,10 @@ describe('useAnnotations subscription cleanup (memory safety)', () => {
     };
     setupUrqlMocks({ subscriptionData: incoming });
     const { result, unmount } = renderHook(() =>
-      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL, AnnotationLayer.SHARED])
+      useAnnotations(VALID_UUID, [
+        AnnotationLayer.PERSONAL,
+        AnnotationLayer.SHARED,
+      ])
     );
     // Subscription must have been called with the correct assetId
     const subCall = vi.mocked(urql.useSubscription).mock.calls[0];
@@ -151,8 +170,12 @@ describe('useAnnotations subscription cleanup (memory safety)', () => {
       },
     };
     setupUrqlMocks({ subscriptionData: dup });
-    const { result } = renderHook(() => useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL]));
-    const matching = result.current.annotations.filter((a) => a.id === SERVER_ANNOTATION.id);
+    const { result } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+    const matching = result.current.annotations.filter(
+      (a) => a.id === SERVER_ANNOTATION.id
+    );
     expect(matching).toHaveLength(1);
   });
 
@@ -160,19 +183,23 @@ describe('useAnnotations subscription cleanup (memory safety)', () => {
     setupUrqlMocks();
     const SECOND_UUID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
     const { rerender } = renderHook(
-      ({ id }: { id: string }) => useAnnotations(id, [AnnotationLayer.PERSONAL]),
+      ({ id }: { id: string }) =>
+        useAnnotations(id, [AnnotationLayer.PERSONAL]),
       { initialProps: { id: VALID_UUID } }
     );
     rerender({ id: SECOND_UUID });
     const calls = vi.mocked(urql.useSubscription).mock.calls;
     const lastCall = calls[calls.length - 1];
-    expect(lastCall?.[0]).toMatchObject({ variables: { assetId: SECOND_UUID } });
+    expect(lastCall?.[0]).toMatchObject({
+      variables: { assetId: SECOND_UUID },
+    });
   });
 
   it('pauses subscription when contentId changes from UUID to non-UUID', () => {
     setupUrqlMocks();
     const { rerender } = renderHook(
-      ({ id }: { id: string }) => useAnnotations(id, [AnnotationLayer.PERSONAL]),
+      ({ id }: { id: string }) =>
+        useAnnotations(id, [AnnotationLayer.PERSONAL]),
       { initialProps: { id: VALID_UUID } }
     );
     rerender({ id: SLUG_ID });
@@ -183,15 +210,28 @@ describe('useAnnotations subscription cleanup (memory safety)', () => {
 
   it('does not throw when addAnnotation is called and the hook is unmounted', () => {
     setupUrqlMocks();
-    const { result, unmount } = renderHook(() => useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL]));
-    act(() => { result.current.addAnnotation('Test note', AnnotationLayer.PERSONAL, 0); });
+    const { result, unmount } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+    act(() => {
+      result.current.addAnnotation('Test note', AnnotationLayer.PERSONAL, 0);
+    });
     expect(() => unmount()).not.toThrow();
   });
 
   it('does not throw when addReply is called and the hook is unmounted', () => {
     setupUrqlMocks();
-    const { result, unmount } = renderHook(() => useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL]));
-    act(() => { result.current.addReply(SERVER_ANNOTATION.id, 'Reply text', AnnotationLayer.PERSONAL, 0); });
+    const { result, unmount } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+    act(() => {
+      result.current.addReply(
+        SERVER_ANNOTATION.id,
+        'Reply text',
+        AnnotationLayer.PERSONAL,
+        0
+      );
+    });
     expect(() => unmount()).not.toThrow();
   });
 });

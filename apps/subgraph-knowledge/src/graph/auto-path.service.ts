@@ -30,7 +30,7 @@ export class AutoPathService {
     targetConceptName: string,
     userId: string,
     tenantId: string,
-    role: string,
+    role: string
   ): Promise<AutoPath | null> {
     const ctx = { tenantId, userId, userRole: toUserRole(role) };
 
@@ -45,12 +45,19 @@ export class AutoPathService {
         WHERE up.user_id = ${userId}::uuid
           AND up.is_completed = TRUE
       `);
-      return (rows.rows as { concept_name: string }[]).map((r) => r.concept_name);
+      return (rows.rows as { concept_name: string }[]).map(
+        (r) => r.concept_name
+      );
     });
 
     this.logger.debug(
-      { userId, tenantId, targetConceptName, masteredCount: masteredNames.length },
-      'resolving autoPath',
+      {
+        userId,
+        tenantId,
+        targetConceptName,
+        masteredCount: masteredNames.length,
+      },
+      'resolving autoPath'
     );
 
     // 2. Find shortest path from any mastered concept to the target.
@@ -58,14 +65,14 @@ export class AutoPathService {
     let bestPath = await this.learningPath.findShortestLearningPath(
       masteredNames[0] ?? targetConceptName,
       targetConceptName,
-      tenantId,
+      tenantId
     );
 
     for (const name of masteredNames.slice(1)) {
       const candidate = await this.learningPath.findShortestLearningPath(
         name,
         targetConceptName,
-        tenantId,
+        tenantId
       );
       if (candidate && (!bestPath || candidate.steps < bestPath.steps)) {
         bestPath = candidate;
@@ -74,7 +81,10 @@ export class AutoPathService {
 
     // 3. Fall back to prerequisite chain when no mastered concepts
     if (!bestPath) {
-      const chain = await this.learningPath.findPrerequisiteChain(targetConceptName, tenantId);
+      const chain = await this.learningPath.findPrerequisiteChain(
+        targetConceptName,
+        tenantId
+      );
       if (!chain || chain.length === 0) return null;
       bestPath = { concepts: chain, steps: chain.length - 1 };
     }

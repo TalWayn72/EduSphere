@@ -13,7 +13,9 @@ const read = (p: string): string =>
 
 describe('G-13: Data Retention Schema', () => {
   it('retentionPolicies.ts exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/db/src/schema/retentionPolicies.ts'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, 'packages/db/src/schema/retentionPolicies.ts'))
+    ).toBe(true);
   });
 
   it('defines RETENTION_DEFAULTS with agent message TTL', () => {
@@ -71,7 +73,12 @@ describe('G-13: Data Retention Schema', () => {
 describe('G-13: Retention Cleanup Service', () => {
   it('retention-cleanup.service.ts exists', () => {
     expect(
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/jobs/retention-cleanup.service.ts')),
+      existsSync(
+        resolve(
+          ROOT,
+          'apps/subgraph-core/src/jobs/retention-cleanup.service.ts'
+        )
+      )
     ).toBe(true);
   });
 
@@ -100,7 +107,12 @@ describe('G-13: Retention Cleanup Service', () => {
 
   it('unit test file exists', () => {
     expect(
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/jobs/retention-cleanup.service.spec.ts')),
+      existsSync(
+        resolve(
+          ROOT,
+          'apps/subgraph-core/src/jobs/retention-cleanup.service.spec.ts'
+        )
+      )
     ).toBe(true);
   });
 });

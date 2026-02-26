@@ -43,14 +43,15 @@ export function useGradeQuiz(contentItemId: string): UseGradeQuizReturn {
         }
         return result.data?.gradeQuizSubmission ?? null;
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Submission failed';
+        const message =
+          err instanceof Error ? err.message : 'Submission failed';
         setError(message);
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [contentItemId, executeMutation],
+    [contentItemId, executeMutation]
   );
 
   return { gradeQuiz, loading, error };

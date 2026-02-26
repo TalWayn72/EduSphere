@@ -1,5 +1,11 @@
 import {
-  Resolver, Query, Mutation, Args, Context, ResolveField, Parent,
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Context,
+  ResolveField,
+  Parent,
 } from '@nestjs/graphql';
 import { UnauthorizedException } from '@nestjs/common';
 import { SocialService } from './social.service';
@@ -22,7 +28,7 @@ export class SocialResolver {
   @ResolveField('followersCount')
   async followersCount(
     @Parent() user: UserRef,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<number> {
     const tenantId = ctx.authContext?.tenantId ?? user.tenantId ?? '';
     return this.socialService.getFollowersCount(user.id, tenantId);
@@ -31,7 +37,7 @@ export class SocialResolver {
   @ResolveField('followingCount')
   async followingCount(
     @Parent() user: UserRef,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<number> {
     const tenantId = ctx.authContext?.tenantId ?? user.tenantId ?? '';
     return this.socialService.getFollowingCount(user.id, tenantId);
@@ -40,50 +46,70 @@ export class SocialResolver {
   @ResolveField('isFollowedByMe')
   async isFollowedByMe(
     @Parent() user: UserRef,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<boolean> {
     if (!ctx.authContext) return false;
     const tenantId = ctx.authContext.tenantId ?? '';
-    return this.socialService.isFollowing(ctx.authContext.userId, user.id, tenantId);
+    return this.socialService.isFollowing(
+      ctx.authContext.userId,
+      user.id,
+      tenantId
+    );
   }
 
   @Query('myFollowers')
   async myFollowers(
     @Args('limit') limit: number | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<string[]> {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
     const tenantId = ctx.authContext.tenantId ?? '';
-    return this.socialService.getFollowers(ctx.authContext.userId, tenantId, limit);
+    return this.socialService.getFollowers(
+      ctx.authContext.userId,
+      tenantId,
+      limit
+    );
   }
 
   @Query('myFollowing')
   async myFollowing(
     @Args('limit') limit: number | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<string[]> {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
     const tenantId = ctx.authContext.tenantId ?? '';
-    return this.socialService.getFollowing(ctx.authContext.userId, tenantId, limit);
+    return this.socialService.getFollowing(
+      ctx.authContext.userId,
+      tenantId,
+      limit
+    );
   }
 
   @Mutation('followUser')
   async followUser(
     @Args('userId') userId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<boolean> {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
     const tenantId = ctx.authContext.tenantId ?? '';
-    return this.socialService.followUser(ctx.authContext.userId, userId, tenantId);
+    return this.socialService.followUser(
+      ctx.authContext.userId,
+      userId,
+      tenantId
+    );
   }
 
   @Mutation('unfollowUser')
   async unfollowUser(
     @Args('userId') userId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<boolean> {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
     const tenantId = ctx.authContext.tenantId ?? '';
-    return this.socialService.unfollowUser(ctx.authContext.userId, userId, tenantId);
+    return this.socialService.unfollowUser(
+      ctx.authContext.userId,
+      userId,
+      tenantId
+    );
   }
 }

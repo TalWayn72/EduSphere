@@ -13,12 +13,42 @@ interface PaletteItem {
 }
 
 const PALETTE_ITEMS: PaletteItem[] = [
-  { type: 'HeroBanner', label: 'Hero Banner', icon: '🎯', description: 'Full-width header with CTA' },
-  { type: 'FeaturedCourses', label: 'Featured Courses', icon: '📚', description: 'Showcase selected courses' },
-  { type: 'StatWidget', label: 'Stat Widget', icon: '📊', description: 'Key metrics at a glance' },
-  { type: 'TextBlock', label: 'Text Block', icon: '📝', description: 'Rich text content' },
-  { type: 'ImageBlock', label: 'Image Block', icon: '🖼️', description: 'Display an image' },
-  { type: 'CTAButton', label: 'CTA Button', icon: '🔗', description: 'Call-to-action button' },
+  {
+    type: 'HeroBanner',
+    label: 'Hero Banner',
+    icon: '🎯',
+    description: 'Full-width header with CTA',
+  },
+  {
+    type: 'FeaturedCourses',
+    label: 'Featured Courses',
+    icon: '📚',
+    description: 'Showcase selected courses',
+  },
+  {
+    type: 'StatWidget',
+    label: 'Stat Widget',
+    icon: '📊',
+    description: 'Key metrics at a glance',
+  },
+  {
+    type: 'TextBlock',
+    label: 'Text Block',
+    icon: '📝',
+    description: 'Rich text content',
+  },
+  {
+    type: 'ImageBlock',
+    label: 'Image Block',
+    icon: '🖼️',
+    description: 'Display an image',
+  },
+  {
+    type: 'CTAButton',
+    label: 'CTA Button',
+    icon: '🔗',
+    description: 'Call-to-action button',
+  },
 ];
 
 interface Props {
@@ -46,13 +76,18 @@ export function BlockPalette({ onDragStart }: Props) {
             hover:border-primary/50 hover:shadow-sm active:cursor-grabbing transition-all select-none"
           aria-label={`Drag to add ${item.label}`}
         >
-          <GripVertical className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" aria-hidden />
+          <GripVertical
+            className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0"
+            aria-hidden
+          />
           <div className="flex flex-col gap-0.5 min-w-0">
             <span className="text-sm font-medium flex items-center gap-1.5">
               <span aria-hidden>{item.icon}</span>
               {item.label}
             </span>
-            <span className="text-xs text-muted-foreground truncate">{item.description}</span>
+            <span className="text-xs text-muted-foreground truncate">
+              {item.description}
+            </span>
           </div>
         </div>
       ))}

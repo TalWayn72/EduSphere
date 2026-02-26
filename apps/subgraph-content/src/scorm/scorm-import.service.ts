@@ -1,4 +1,9 @@
-import { Injectable, Logger, BadRequestException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import AdmZip from 'adm-zip';
 import { randomUUID } from 'crypto';
@@ -27,9 +32,11 @@ const MIME_MAP: Record<string, string> = {
 
 function getMime(filename: string): string {
   const ext = filename.split('.').pop()?.toLowerCase() ?? '';
-  return (Object.prototype.hasOwnProperty.call(MIME_MAP, ext)
-    ? MIME_MAP[ext as keyof typeof MIME_MAP]
-    : undefined) ?? 'application/octet-stream';
+  return (
+    (Object.prototype.hasOwnProperty.call(MIME_MAP, ext)
+      ? MIME_MAP[ext as keyof typeof MIME_MAP]
+      : undefined) ?? 'application/octet-stream'
+  );
 }
 
 @Injectable()
@@ -60,7 +67,7 @@ export class ScormImportService implements OnModuleDestroy {
   async importScormPackage(
     zipBuffer: Buffer,
     tenantId: string,
-    userId: string,
+    userId: string
   ): Promise<ScormImportResult> {
     // 1. Extract ZIP
     let zip: AdmZip;
@@ -73,12 +80,14 @@ export class ScormImportService implements OnModuleDestroy {
     // 2. Find and parse imsmanifest.xml
     const manifestEntry = zip.getEntry('imsmanifest.xml');
     if (!manifestEntry) {
-      throw new BadRequestException('ZIP does not contain imsmanifest.xml at root level');
+      throw new BadRequestException(
+        'ZIP does not contain imsmanifest.xml at root level'
+      );
     }
     const manifestXml = manifestEntry.getData().toString('utf-8');
     const manifest = parseScormManifest(manifestXml);
     this.logger.log(
-      `Parsed SCORM manifest: version=${manifest.version} title="${manifest.title}"`,
+      `Parsed SCORM manifest: version=${manifest.version} title="${manifest.title}"`
     );
 
     // 3. Upload all files to MinIO
@@ -87,7 +96,10 @@ export class ScormImportService implements OnModuleDestroy {
     await this.uploadZipContents(zip, minioPrefix);
 
     // 4. Create Course record (content.ts schema — snake_case fields)
-    const slug = manifest.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 100);
+    const slug = manifest.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .slice(0, 100);
     const [course] = await this.db
       .insert(schema.courses)
       .values({
@@ -143,14 +155,16 @@ export class ScormImportService implements OnModuleDestroy {
     });
 
     this.logger.log(
-      `SCORM import complete: courseId=${courseId} items=${insertedItems.length}`,
+      `SCORM import complete: courseId=${courseId} items=${insertedItems.length}`
     );
     return { courseId, itemCount: insertedItems.length };
   }
 
   private async uploadZipContents(zip: AdmZip, prefix: string): Promise<void> {
     const entries = zip.getEntries().filter((e) => !e.isDirectory);
-    this.logger.debug(`Uploading ${entries.length} SCORM files to MinIO prefix=${prefix}`);
+    this.logger.debug(
+      `Uploading ${entries.length} SCORM files to MinIO prefix=${prefix}`
+    );
 
     const uploads = entries.map(async (entry) => {
       const key = `${prefix}/${entry.entryName}`;
@@ -161,7 +175,7 @@ export class ScormImportService implements OnModuleDestroy {
           Key: key,
           Body: data,
           ContentType: getMime(entry.name),
-        }),
+        })
       );
     });
 

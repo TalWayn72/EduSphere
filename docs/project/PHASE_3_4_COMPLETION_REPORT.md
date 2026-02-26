@@ -8,14 +8,14 @@
 
 ## 📊 סיכום ביצועים
 
-| Phase | רכיב | Status | Build | Port |
-|-------|------|--------|-------|------|
-| **Phase 3** | Gateway (Hive v2.7) | ✅ Complete | ✅ Pass | 4000 |
-| **Phase 3** | Frontend React App | ✅ Complete | ✅ Pass | 5173 |
-| **Phase 4** | Annotation Subgraph | ✅ Complete | ✅ Pass | 4003 |
+| Phase       | רכיב                   | Status      | Build   | Port |
+| ----------- | ---------------------- | ----------- | ------- | ---- |
+| **Phase 3** | Gateway (Hive v2.7)    | ✅ Complete | ✅ Pass | 4000 |
+| **Phase 3** | Frontend React App     | ✅ Complete | ✅ Pass | 5173 |
+| **Phase 4** | Annotation Subgraph    | ✅ Complete | ✅ Pass | 4003 |
 | **Phase 4** | Collaboration Subgraph | ✅ Complete | ✅ Pass | 4004 |
-| **Phase 5** | Agent Subgraph | ✅ Complete | ✅ Pass | 4005 |
-| **Phase 6** | Knowledge Subgraph | ✅ Complete | ✅ Pass | 4006 |
+| **Phase 5** | Agent Subgraph         | ✅ Complete | ✅ Pass | 4005 |
+| **Phase 6** | Knowledge Subgraph     | ✅ Complete | ✅ Pass | 4006 |
 
 **סה"כ:** 6 רכיבים חדשים | כולם נבנו בהצלחה ✅
 
@@ -24,12 +24,14 @@
 ## 🎯 Gateway (Hive Gateway v2.7) - Phase 3
 
 ### מה נוצר:
+
 - ✅ `apps/gateway/package.json` - תלויות (@graphql-hive/gateway)
 - ✅ `apps/gateway/src/index.ts` - תצורת 6 subgraphs
 - ✅ `apps/gateway/tsconfig.json` - TypeScript config
 - ✅ `apps/gateway/.env.example` - משתני סביבה
 
 ### תכונות מרכזיות:
+
 - **GraphQL Federation v2.7** - Hive Gateway (MIT license, Apollo alternative)
 - **JWT Propagation** - חילוץ tenant_id מ-JWT → הפצה ב-header `x-tenant-id`
 - **CORS** - תצורת CORS עם credentials support
@@ -44,6 +46,7 @@
 - **Error Handling** - טיפול בשגיאות JWT parsing
 
 ### קוד מרכזי (JWT Extraction):
+
 ```typescript
 context: async ({ request }) => {
   const authHeader = request.headers.get('authorization');
@@ -64,7 +67,7 @@ context: async ({ request }) => {
       'x-tenant-id': tenantId,
     },
   };
-}
+};
 ```
 
 ---
@@ -74,6 +77,7 @@ context: async ({ request }) => {
 ### מה נוצר (24 קבצים):
 
 #### תצורה:
+
 - ✅ `apps/web/package.json` - React 19 + Vite 6 + urql + Keycloak
 - ✅ `apps/web/tsconfig.json` - TypeScript config (תוקן ל-`react.json`)
 - ✅ `apps/web/vite.config.ts` - Vite עם path aliases `@/*`
@@ -84,6 +88,7 @@ context: async ({ request }) => {
 - ✅ `apps/web/index.html` - HTML entry point
 
 #### קוד מקור:
+
 - ✅ `src/main.tsx` - נקודת כניסה
 - ✅ `src/App.tsx` - routing + authentication
 - ✅ `src/lib/auth.ts` - Keycloak integration
@@ -99,6 +104,7 @@ context: async ({ request }) => {
 - ✅ `src/styles/globals.css` - Global styles
 
 ### תכונות מרכזיות:
+
 - **React 19** + **Vite 6** - מהיר ומודרני
 - **urql GraphQL Client** - אוטומטי JWT attachment
 - **Keycloak Authentication** - OIDC + PKCE
@@ -108,6 +114,7 @@ context: async ({ request }) => {
 - **TanStack Query** - Server state management (ready)
 
 ### תיקון שבוצע:
+
 **קובץ:** `apps/web/tsconfig.json`
 **לפני:** `"extends": "@edusphere/tsconfig/react-library.json"`
 **אחרי:** `"extends": "@edusphere/tsconfig/react.json"` ✅
@@ -117,31 +124,36 @@ context: async ({ request }) => {
 ## 📝 Annotation Subgraph - Phase 4
 
 ### סטטוס:
+
 **כבר קיים** מ-Phase קודם - **שודרג** עם layer-based access control מתקדם.
 
 ### שדרוגים שבוצעו:
+
 - ✅ **Layer visibility filtering** - PERSONAL רק לבעלים, SHARED לכולם
 - ✅ **Permission checks** - update/delete רק ל-owner או instructor
 - ✅ **Role-based access** - instructors רואים יותר מ-students
 - ✅ **Fixed nest-cli.json** - GraphQL assets configuration
 
 ### קבצים ששודרגו:
+
 - `apps/subgraph-annotation/src/annotation/annotation.service.ts`
 - `apps/subgraph-annotation/nest-cli.json`
 
 ### תיעוד נוצר:
+
 - ✅ `apps/subgraph-annotation/LAYER_ACCESS_CONTROL.md` (400+ שורות)
 - ✅ `apps/subgraph-annotation/README.md`
 - ✅ `apps/subgraph-annotation/IMPLEMENTATION.md`
 - ✅ `apps/subgraph-annotation/SUMMARY.md`
 
 ### Layer Visibility Rules:
-| Layer | Student View | Instructor View |
-|-------|--------------|-----------------|
-| PERSONAL | Own only | Own only |
-| SHARED | All | All |
-| INSTRUCTOR | All | All |
-| AI_GENERATED | All | All |
+
+| Layer        | Student View | Instructor View |
+| ------------ | ------------ | --------------- |
+| PERSONAL     | Own only     | Own only        |
+| SHARED       | All          | All             |
+| INSTRUCTOR   | All          | All             |
+| AI_GENERATED | All          | All             |
 
 ---
 
@@ -150,6 +162,7 @@ context: async ({ request }) => {
 ### מה נוצר:
 
 #### Database Schema:
+
 - ✅ `packages/db/src/schema/discussion.ts` (140 lines)
   - `discussions` table - FORUM/CHAVRUTA/DEBATE
   - `discussion_messages` table - Threaded messages with parent_message_id
@@ -157,6 +170,7 @@ context: async ({ request }) => {
   - Full RLS policies + indexes
 
 #### GraphQL SDL:
+
 - ✅ `apps/subgraph-collaboration/src/discussion/discussion.graphql` (150 lines)
   - Discussion, DiscussionMessage, DiscussionParticipant types
   - Enums: DiscussionType, MessageType
@@ -166,6 +180,7 @@ context: async ({ request }) => {
   - Entity stubs: Course, User
 
 #### Service Layer:
+
 - ✅ `apps/subgraph-collaboration/src/discussion/discussion.service.ts` (250 lines)
   - Full RLS enforcement with `withTenantContext()`
   - CRUD for discussions, messages, participants
@@ -174,6 +189,7 @@ context: async ({ request }) => {
   - Count methods
 
 #### Resolvers:
+
 - ✅ `apps/subgraph-collaboration/src/discussion/discussion.resolver.ts` (180 lines)
   - All queries, mutations, subscriptions
   - Field resolvers for relationships
@@ -181,10 +197,12 @@ context: async ({ request }) => {
   - Authentication via AuthContext
 
 #### Validation:
+
 - ✅ `apps/subgraph-collaboration/src/discussion/discussion.schemas.ts`
   - Zod schemas for input validation
 
 ### תכונות מרכזיות:
+
 - **Real-time Subscriptions** - GraphQL Yoga PubSub
 - **Threaded Discussions** - parent_message_id support
 - **Media Types** - TEXT/IMAGE/VIDEO/AUDIO
@@ -193,6 +211,7 @@ context: async ({ request }) => {
 - **Authentication** - JWT middleware
 
 ### תיעוד נוצר:
+
 - ✅ `apps/subgraph-collaboration/DISCUSSION_FEATURE.md`
 - ✅ `apps/subgraph-collaboration/IMPLEMENTATION_NOTES.md`
 - ✅ `apps/subgraph-collaboration/README.md`
@@ -206,6 +225,7 @@ context: async ({ request }) => {
 ### מה נוצר:
 
 #### GraphQL Schema (3 modules):
+
 - ✅ **AgentSession Module**
   - `src/agent-session/agent-session.graphql`
   - Types: AgentSession, AgentSessionStatus enum
@@ -225,6 +245,7 @@ context: async ({ request }) => {
   - 10 template types: TUTOR, QUIZ_GENERATOR, DEBATE_FACILITATOR, etc.
 
 #### Service Layer (7 services):
+
 - ✅ `src/agent-session/agent-session.service.ts` - Session management with RLS
 - ✅ `src/agent-message/agent-message.service.ts` - Message CRUD with RLS
 - ✅ `src/template/template.service.ts` - Template CRUD (agent_definitions table)
@@ -234,13 +255,16 @@ context: async ({ request }) => {
 - ✅ `src/nats/nats.service.ts` - **NATS JetStream** event publishing
 
 #### Validation:
+
 - ✅ `src/agent-session/agent-session.schemas.ts`
   - Zod schemas: StartAgentSessionSchema, SendMessageSchema, EndSessionSchema
 
 #### Authentication:
+
 - ✅ `src/auth/auth.middleware.ts` - JWT validation
 
 ### תכונות מרכזיות:
+
 - **RLS Enforcement** - All services use `withTenantContext()`
 - **AI Integration** - Vercel AI SDK v6 (placeholders for OpenAI/Anthropic)
 - **Memory Management** - Conversation history & summarization
@@ -250,6 +274,7 @@ context: async ({ request }) => {
 - **Authentication** - JWT via Keycloak
 
 ### Database Tables Used:
+
 - `agent_sessions` (from agentSessions.ts)
 - `agent_messages` (from agentMessages.ts)
 - `agent_definitions` (templates)
@@ -264,6 +289,7 @@ context: async ({ request }) => {
 ### מה נוצר:
 
 #### Graph Module (Apache AGE):
+
 - ✅ `src/graph/graph.graphql` (144 lines)
   - 5 graph entities: Concept, Person, Term, Source, TopicCluster
   - 11 queries: searchSemantic(), conceptByName(), relatedConcepts(), topicClusters(), etc.
@@ -294,6 +320,7 @@ context: async ({ request }) => {
   - NestJS module wiring
 
 #### Embedding Module (Updated):
+
 - ✅ `src/embedding/embedding.service.ts` (updated)
   - pgvector HNSW semantic search
   - 3 embedding tables: content_embeddings, annotation_embeddings, concept_embeddings
@@ -301,9 +328,11 @@ context: async ({ request }) => {
   - Cosine similarity scoring (768-dim vectors)
 
 #### Authentication:
+
 - ✅ `src/auth/auth.middleware.ts` - JWT validation
 
 ### תכונות מרכזיות:
+
 - **Apache AGE Graph Queries** - Cypher via packages/db/src/graph helpers
 - **Graph Entities** - Concept, Person, Term, Source, TopicCluster
 - **Relationship Types** - RELATED_TO, CONTRADICTS, PREREQUISITE_OF, MENTIONS, CITES
@@ -320,19 +349,23 @@ context: async ({ request }) => {
 ## 🔧 תיקונים שבוצעו
 
 ### 1. Frontend tsconfig.json
+
 **קובץ:** `apps/web/tsconfig.json`
 **בעיה:** `react-library.json` לא קיים
 **תיקון:** ✅ שונה ל-`react.json`
 
 ### 2. Core Subgraph User Service
+
 **קובץ:** `apps/subgraph-core/src/user/user.service.ts`
 **בעיה:** camelCase במקום snake_case
 **תיקון:** ✅ `tenantId` → `tenant_id`, `firstName`/`lastName` → `display_name`
 
 ### 3. Build Order
+
 **בעיה:** Agent subgraph נכשל בבנייה עם 9 TypeScript errors
 **סיבה:** packages לא נבנו בסדר הנכון
 **תיקון:** ✅ בניית packages בסדר:
+
 1. `@edusphere/db`
 2. `@edusphere/auth`
 3. כל ה-subgraphs
@@ -343,18 +376,18 @@ context: async ({ request }) => {
 
 ## 📦 סטטוס בנייה סופי
 
-| Package | Build Status | TypeScript | Linting |
-|---------|--------------|------------|---------|
-| @edusphere/db | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/auth | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/subgraph-core | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/subgraph-content | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/subgraph-annotation | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/subgraph-collaboration | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/subgraph-agent | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/subgraph-knowledge | ✅ Success | ✅ Pass | ✅ Pass |
-| @edusphere/gateway | ✅ Success | N/A | ✅ Pass |
-| @edusphere/web | ✅ Success | ✅ Pass (1 warning) | ✅ Pass |
+| Package                           | Build Status | TypeScript          | Linting |
+| --------------------------------- | ------------ | ------------------- | ------- |
+| @edusphere/db                     | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/auth                   | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/subgraph-core          | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/subgraph-content       | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/subgraph-annotation    | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/subgraph-collaboration | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/subgraph-agent         | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/subgraph-knowledge     | ✅ Success   | ✅ Pass             | ✅ Pass |
+| @edusphere/gateway                | ✅ Success   | N/A                 | ✅ Pass |
+| @edusphere/web                    | ✅ Success   | ✅ Pass (1 warning) | ✅ Pass |
 
 **סה"כ:** 10/10 packages built successfully ✅
 
@@ -363,9 +396,11 @@ context: async ({ request }) => {
 ## 🧪 Integration Tests
 
 ### קובץ נוצר:
+
 ✅ `apps/gateway/src/test/integration/federation.test.ts`
 
 ### כיסוי בדיקות:
+
 - Supergraph composition from 6 subgraphs
 - Schema validation (User, Course, Annotation, Discussion, AgentSession, Concept)
 - Cross-subgraph queries (User → Course relationship)
@@ -373,6 +408,7 @@ context: async ({ request }) => {
 - Tenant isolation verification
 
 ### Documentation:
+
 ✅ `GATEWAY_FRONTEND_TEST_REPORT.md` - דוח מפורט של כל הבדיקות
 
 ---
@@ -380,12 +416,14 @@ context: async ({ request }) => {
 ## 📊 סטטיסטיקות
 
 ### קבצים שנוצרו/שודרגו:
+
 - **קבצים חדשים:** ~120 קבצים
 - **קבצים ששודרגו:** ~40 קבצים
 - **שורות קוד נוספו:** ~15,000 שורות
 - **תיעוד:** 8 מסמכי תיעוד חדשים
 
 ### Agents שהורצו במקביל:
+
 1. **Knowledge Agent** (a29e9d7) - ✅ Complete
 2. **Annotation Agent** (ab04873) - ✅ Complete
 3. **Collaboration Agent** (af4f8d5) - ✅ Complete
@@ -395,6 +433,7 @@ context: async ({ request }) => {
 **סה"כ:** 5 agents במקביל - כולם הצליחו ✅
 
 ### זמן ביצוע:
+
 - **Knowledge Subgraph:** 12.8 דקות (770 שניות)
 - **Annotation Enhancement:** 7.5 דקות (453 שניות)
 - **Collaboration Subgraph:** 16.3 דקות (981 שניות)
@@ -409,19 +448,19 @@ context: async ({ request }) => {
 
 ## 🎯 Phase Progress
 
-| Phase | Description | Status | Progress |
-|-------|-------------|--------|----------|
-| Phase 0 | Foundation (Docker, monorepo) | ✅ Complete | 100% |
-| Phase 1 | Data Layer (16 tables + RLS) | ✅ Complete | 100% |
-| Phase 2 | Authentication (Keycloak + JWT) | ✅ Complete | 100% |
-| **Phase 3** | **Gateway + Frontend** | ✅ **Complete** | **100%** |
-| **Phase 4** | **Annotation + Collaboration** | ✅ **Complete** | **100%** |
-| **Phase 5** | **Agent Subgraph** | ✅ **Complete** | **100%** |
-| **Phase 6** | **Knowledge Subgraph** | ✅ **Complete** | **100%** |
-| Phase 7 | Integration & Testing | ⏳ Pending | 15% |
-| Phase 8 | Docker Containers | ⏳ Pending | 0% |
-| Phase 9 | DevTools & Monitoring | ⏳ Pending | 0% |
-| Phase 10 | Mobile App (Expo) | ⏳ Pending | 0% |
+| Phase       | Description                     | Status          | Progress |
+| ----------- | ------------------------------- | --------------- | -------- |
+| Phase 0     | Foundation (Docker, monorepo)   | ✅ Complete     | 100%     |
+| Phase 1     | Data Layer (16 tables + RLS)    | ✅ Complete     | 100%     |
+| Phase 2     | Authentication (Keycloak + JWT) | ✅ Complete     | 100%     |
+| **Phase 3** | **Gateway + Frontend**          | ✅ **Complete** | **100%** |
+| **Phase 4** | **Annotation + Collaboration**  | ✅ **Complete** | **100%** |
+| **Phase 5** | **Agent Subgraph**              | ✅ **Complete** | **100%** |
+| **Phase 6** | **Knowledge Subgraph**          | ✅ **Complete** | **100%** |
+| Phase 7     | Integration & Testing           | ⏳ Pending      | 15%      |
+| Phase 8     | Docker Containers               | ⏳ Pending      | 0%       |
+| Phase 9     | DevTools & Monitoring           | ⏳ Pending      | 0%       |
+| Phase 10    | Mobile App (Expo)               | ⏳ Pending      | 0%       |
 
 **התקדמות כוללת:** 6 מתוך 11 phases = **55% הושלם** 🎉
 
@@ -430,6 +469,7 @@ context: async ({ request }) => {
 ## 🚀 מה הבא?
 
 ### Phase 7: Integration & Testing
+
 - [ ] Start all services with `docker-compose up -d`
 - [ ] Apply database migrations
 - [ ] Start Gateway + 6 Subgraphs
@@ -439,6 +479,7 @@ context: async ({ request }) => {
 - [ ] Test real-time subscriptions
 
 ### Quick Start:
+
 ```bash
 # 1. Infrastructure
 docker-compose up -d
@@ -461,6 +502,7 @@ pnpm turbo test
 ```
 
 ### URLs:
+
 - **Frontend:** http://localhost:5173
 - **Gateway:** http://localhost:4000/graphql
 - **Core:** http://localhost:4001/graphql
@@ -475,6 +517,7 @@ pnpm turbo test
 ## ✅ Acceptance Criteria
 
 ### Phase 3 (Gateway + Frontend):
+
 - ✅ Gateway configured with 6 subgraphs
 - ✅ JWT extraction and tenant_id propagation
 - ✅ Frontend React app with authentication
@@ -484,6 +527,7 @@ pnpm turbo test
 - ✅ All builds passing
 
 ### Phase 4 (Annotation + Collaboration):
+
 - ✅ Annotation subgraph enhanced with layer-based access control
 - ✅ Collaboration subgraph created with discussions + messages
 - ✅ Real-time subscriptions working
@@ -492,6 +536,7 @@ pnpm turbo test
 - ✅ All builds passing
 
 ### Phase 5 (Agent):
+
 - ✅ Agent subgraph created with sessions + messages
 - ✅ AI service placeholders (Vercel AI SDK)
 - ✅ Memory service for conversation history
@@ -501,6 +546,7 @@ pnpm turbo test
 - ✅ All builds passing
 
 ### Phase 6 (Knowledge):
+
 - ✅ Knowledge subgraph created with graph + embeddings
 - ✅ Apache AGE Cypher integration
 - ✅ pgvector semantic search
@@ -513,6 +559,7 @@ pnpm turbo test
 ## 🎉 סיכום
 
 **הושלמו בהצלחה:**
+
 - ✅ Gateway עם 6 subgraphs
 - ✅ Frontend React מלא עם authentication
 - ✅ 4 Subgraphs נוספים (Annotation, Collaboration, Agent, Knowledge)

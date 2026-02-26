@@ -47,7 +47,9 @@ function StarRating({ criteriaId, label, value, onChange }: StarRatingProps) {
             />
             <Star
               className={`h-6 w-6 transition-colors ${
-                value >= score ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground'
+                value >= score
+                  ? 'fill-amber-400 text-amber-400'
+                  : 'text-muted-foreground'
               }`}
             />
           </label>
@@ -57,7 +59,12 @@ function StarRating({ criteriaId, label, value, onChange }: StarRatingProps) {
   );
 }
 
-export function AssessmentForm({ campaignId, raterRole, criteria, onSubmitted }: Props) {
+export function AssessmentForm({
+  campaignId,
+  raterRole,
+  criteria,
+  onSubmitted,
+}: Props) {
   const [scores, setScores] = useState<Record<string, number>>({});
   const [narrative, setNarrative] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -73,7 +80,11 @@ export function AssessmentForm({ campaignId, raterRole, criteria, onSubmitted }:
   async function handleSubmit() {
     if (!allRated) return;
     // Build JSON array with criteriaId and label for aggregator
-    const scoreArray = criteria.map((c) => ({ criteriaId: c.id, label: c.label, score: scores[c.id]! }));
+    const scoreArray = criteria.map((c) => ({
+      criteriaId: c.id,
+      label: c.label,
+      score: scores[c.id]!,
+    }));
     const res = await submit({
       campaignId,
       raterRole,
@@ -90,7 +101,9 @@ export function AssessmentForm({ campaignId, raterRole, criteria, onSubmitted }:
     return (
       <Card>
         <CardContent className="pt-6 text-center">
-          <p className="text-green-600 font-medium">Your feedback has been submitted. Thank you!</p>
+          <p className="text-green-600 font-medium">
+            Your feedback has been submitted. Thank you!
+          </p>
         </CardContent>
       </Card>
     );
@@ -100,7 +113,9 @@ export function AssessmentForm({ campaignId, raterRole, criteria, onSubmitted }:
     <Card>
       <CardHeader>
         <CardTitle>Submit Your Feedback</CardTitle>
-        <p className="text-sm text-muted-foreground">Role: {raterRole.replace('_', ' ')}</p>
+        <p className="text-sm text-muted-foreground">
+          Role: {raterRole.replace('_', ' ')}
+        </p>
       </CardHeader>
       <CardContent className="space-y-5">
         {criteria.map((c) => (
@@ -113,7 +128,9 @@ export function AssessmentForm({ campaignId, raterRole, criteria, onSubmitted }:
           />
         ))}
         <div className="space-y-1">
-          <label className="text-sm font-medium">Additional Comments (optional)</label>
+          <label className="text-sm font-medium">
+            Additional Comments (optional)
+          </label>
           <Textarea
             value={narrative}
             onChange={(e) => setNarrative(e.target.value)}
@@ -122,7 +139,11 @@ export function AssessmentForm({ campaignId, raterRole, criteria, onSubmitted }:
           />
         </div>
         {error && <p className="text-sm text-destructive">{error.message}</p>}
-        <Button onClick={() => void handleSubmit()} disabled={fetching || !allRated} className="w-full">
+        <Button
+          onClick={() => void handleSubmit()}
+          disabled={fetching || !allRated}
+          className="w-full"
+        >
           {fetching ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
           Submit Feedback
         </Button>

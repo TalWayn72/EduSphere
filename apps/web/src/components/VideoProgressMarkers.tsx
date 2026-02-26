@@ -9,10 +9,10 @@ import { formatTime } from '@/pages/content-viewer.utils';
 
 /** Map each layer to a dot color (Tailwind background) */
 const LAYER_DOT_COLOR: Record<string, string> = {
-  PERSONAL: '#7c3aed',      // violet-600
-  SHARED: '#2563eb',        // blue-600
-  INSTRUCTOR: '#16a34a',    // green-600
-  AI_GENERATED: '#d97706',  // amber-600
+  PERSONAL: '#7c3aed', // violet-600
+  SHARED: '#2563eb', // blue-600
+  INSTRUCTOR: '#16a34a', // green-600
+  AI_GENERATED: '#d97706', // amber-600
 };
 
 export interface VideoMarker {

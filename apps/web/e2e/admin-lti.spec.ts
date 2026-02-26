@@ -34,36 +34,42 @@ test.describe('LTI 1.3 Admin Settings', () => {
 
   test('page renders at /admin/lti with heading', async ({ page }) => {
     await gotoLti(page);
-    await expect(page.getByRole('heading', { name: /LTI 1\.3 Platforms/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /LTI 1\.3 Platforms/i })
+    ).toBeVisible();
   });
 
   test('subtitle describes supported LMS platforms', async ({ page }) => {
     await gotoLti(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     expect(/Canvas|Moodle|Blackboard/i.test(body)).toBe(true);
   });
 
   test('Copy Launch URL button is visible in page header', async ({ page }) => {
     await gotoLti(page);
     await expect(
-      page.getByRole('button', { name: /copy launch url/i }),
+      page.getByRole('button', { name: /copy launch url/i })
     ).toBeVisible();
   });
 
-  test('Register Platform button is visible in page header', async ({ page }) => {
+  test('Register Platform button is visible in page header', async ({
+    page,
+  }) => {
     await gotoLti(page);
     await expect(
-      page.getByRole('button', { name: /register platform/i }),
+      page.getByRole('button', { name: /register platform/i })
     ).toBeVisible();
   });
 
   // ── Empty state ───────────────────────────────────────────────────────────
 
-  test('shows empty-state message when no platforms are registered', async ({ page }) => {
+  test('shows empty-state message when no platforms are registered', async ({
+    page,
+  }) => {
     await gotoLti(page);
     // In DEV_MODE there is no live GraphQL backend, so the query returns
     // an empty list and the empty-state text is rendered.
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     const hasEmptyState =
       /No LTI platforms registered/i.test(body) ||
       /register platform/i.test(body);
@@ -72,14 +78,16 @@ test.describe('LTI 1.3 Admin Settings', () => {
 
   // ── Register form ─────────────────────────────────────────────────────────
 
-  test('clicking Register Platform toggles the registration form', async ({ page }) => {
+  test('clicking Register Platform toggles the registration form', async ({
+    page,
+  }) => {
     await gotoLti(page);
     const btn = page.getByRole('button', { name: /register platform/i });
     await btn.click();
 
     // Form card with title should now be visible
     await expect(
-      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i }),
+      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i })
     ).toBeVisible();
   });
 
@@ -87,7 +95,7 @@ test.describe('LTI 1.3 Admin Settings', () => {
     await gotoLti(page);
     await page.getByRole('button', { name: /register platform/i }).click();
 
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
 
     // Verify all expected field labels are rendered (case-insensitive)
     const expectedLabels = [
@@ -100,15 +108,21 @@ test.describe('LTI 1.3 Admin Settings', () => {
       /deployment\s*id/i,
     ];
     for (const pattern of expectedLabels) {
-      expect(pattern.test(bodyText), `Expected label matching ${pattern}`).toBe(true);
+      expect(pattern.test(bodyText), `Expected label matching ${pattern}`).toBe(
+        true
+      );
     }
   });
 
-  test('registration form has Save Platform and Cancel buttons', async ({ page }) => {
+  test('registration form has Save Platform and Cancel buttons', async ({
+    page,
+  }) => {
     await gotoLti(page);
     await page.getByRole('button', { name: /register platform/i }).click();
 
-    await expect(page.getByRole('button', { name: /save platform/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /save platform/i })
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: /cancel/i })).toBeVisible();
   });
 
@@ -116,29 +130,31 @@ test.describe('LTI 1.3 Admin Settings', () => {
     await gotoLti(page);
     await page.getByRole('button', { name: /register platform/i }).click();
     await expect(
-      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i }),
+      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i })
     ).toBeVisible();
 
     await page.getByRole('button', { name: /cancel/i }).click();
     await expect(
-      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i }),
+      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i })
     ).not.toBeVisible();
   });
 
-  test('toggling Register Platform button a second time hides the form', async ({ page }) => {
+  test('toggling Register Platform button a second time hides the form', async ({
+    page,
+  }) => {
     await gotoLti(page);
     const btn = page.getByRole('button', { name: /register platform/i });
 
     // First click — open
     await btn.click();
     await expect(
-      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i }),
+      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i })
     ).toBeVisible();
 
     // Second click — close
     await btn.click();
     await expect(
-      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i }),
+      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i })
     ).not.toBeVisible();
   });
 
@@ -156,16 +172,18 @@ test.describe('LTI 1.3 Admin Settings', () => {
     await copyBtn.click();
 
     // After clicking, the button label transitions to "Copied!"
-    await expect(
-      page.getByRole('button', { name: /copied!/i }),
-    ).toBeVisible({ timeout: 3_000 });
+    await expect(page.getByRole('button', { name: /copied!/i })).toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   // ── Platform table columns (when platforms are present) ───────────────────
 
-  test('platform cards show platform name, client ID, and status', async ({ page }) => {
+  test('platform cards show platform name, client ID, and status', async ({
+    page,
+  }) => {
     await gotoLti(page);
-    const body = await page.locator('body').textContent() ?? '';
+    const body = (await page.locator('body').textContent()) ?? '';
     // When the list is empty the card structure is absent — that is acceptable.
     // When platforms exist, these columns MUST be present. We verify the heading
     // labels exist on the cards if any platform cards are rendered.
@@ -174,7 +192,7 @@ test.describe('LTI 1.3 Admin Settings', () => {
 
     if (count > 1) {
       // At least one platform card (first card is the form trigger area)
-      const cardText = await platformCards.nth(1).textContent() ?? '';
+      const cardText = (await platformCards.nth(1).textContent()) ?? '';
       expect(/active|inactive/i.test(cardText)).toBe(true);
     } else {
       // No platform cards — empty state is fine
@@ -184,7 +202,10 @@ test.describe('LTI 1.3 Admin Settings', () => {
 
   // ── Mutation tests (skipped in read-only/production runs) ─────────────────
 
-  test.skip(!RUN_WRITE_TESTS || !IS_DEV_MODE, 'Write tests skipped — production or live backend');
+  test.skip(
+    !RUN_WRITE_TESTS || !IS_DEV_MODE,
+    'Write tests skipped — production or live backend'
+  );
 
   // ── Visual regression ─────────────────────────────────────────────────────
 
@@ -198,11 +219,13 @@ test.describe('LTI 1.3 Admin Settings', () => {
     });
   });
 
-  test('visual: LTI settings with registration form open @visual', async ({ page }) => {
+  test('visual: LTI settings with registration form open @visual', async ({
+    page,
+  }) => {
     await gotoLti(page);
     await page.getByRole('button', { name: /register platform/i }).click();
     await expect(
-      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i }),
+      page.getByRole('heading', { name: /Register LTI 1\.3 Platform/i })
     ).toBeVisible();
 
     await page.emulateMedia({ reducedMotion: 'reduce' });

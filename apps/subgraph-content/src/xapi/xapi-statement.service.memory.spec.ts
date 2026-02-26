@@ -8,21 +8,22 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect } = vi.hoisted(() => {
-  const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
-  const mockUnsubscribe = vi.fn();
-  const mockDrain = vi.fn().mockResolvedValue(undefined);
-  const asyncIter = { next: vi.fn().mockResolvedValue({ done: true }) };
-  const mockSub = {
-    unsubscribe: mockUnsubscribe,
-    [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter),
-  };
-  const mockNatsConnect = vi.fn().mockResolvedValue({
-    subscribe: vi.fn().mockReturnValue(mockSub),
-    drain: mockDrain,
+const { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect } =
+  vi.hoisted(() => {
+    const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+    const mockUnsubscribe = vi.fn();
+    const mockDrain = vi.fn().mockResolvedValue(undefined);
+    const asyncIter = { next: vi.fn().mockResolvedValue({ done: true }) };
+    const mockSub = {
+      unsubscribe: mockUnsubscribe,
+      [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter),
+    };
+    const mockNatsConnect = vi.fn().mockResolvedValue({
+      subscribe: vi.fn().mockReturnValue(mockSub),
+      drain: mockDrain,
+    });
+    return { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect };
   });
-  return { mockCloseAllPools, mockUnsubscribe, mockDrain, mockNatsConnect };
-});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => ({}),
@@ -32,16 +33,25 @@ vi.mock('@edusphere/db', () => ({
   and: vi.fn((...args: unknown[]) => args),
   gte: vi.fn(),
   lte: vi.fn(),
-  withTenantContext: vi.fn().mockImplementation(async (_d: unknown, _c: unknown, fn: (tx: unknown) => unknown) => fn({})),
+  withTenantContext: vi
+    .fn()
+    .mockImplementation(
+      async (_d: unknown, _c: unknown, fn: (tx: unknown) => unknown) => fn({})
+    ),
 }));
 
 vi.mock('nats', () => ({
   connect: mockNatsConnect,
-  StringCodec: vi.fn().mockReturnValue({ decode: vi.fn().mockReturnValue('{}'), encode: vi.fn() }),
+  StringCodec: vi.fn().mockReturnValue({
+    decode: vi.fn().mockReturnValue('{}'),
+    encode: vi.fn(),
+  }),
 }));
 
 vi.mock('@edusphere/nats-client', () => ({
-  buildNatsOptions: vi.fn().mockReturnValue({ servers: 'nats://localhost:4222' }),
+  buildNatsOptions: vi
+    .fn()
+    .mockReturnValue({ servers: 'nats://localhost:4222' }),
 }));
 
 import { XapiStatementService } from './xapi-statement.service.js';
@@ -54,9 +64,17 @@ function makeService() {
 
 const sampleStatement: XapiStatement = {
   id: 'stmt-mem-1',
-  actor: { objectType: 'Agent', name: 'u-1', mbox: 'mailto:u-1@edusphere.local' },
+  actor: {
+    objectType: 'Agent',
+    name: 'u-1',
+    mbox: 'mailto:u-1@edusphere.local',
+  },
   verb: { id: XAPI_VERBS.COMPLETED, display: { en: 'completed' } },
-  object: { objectType: 'Activity', id: 'https://edusphere.io/activities/c-1', definition: { name: { en: 'Course' } } },
+  object: {
+    objectType: 'Activity',
+    id: 'https://edusphere.io/activities/c-1',
+    definition: { name: { en: 'Course' } },
+  },
 };
 
 describe('XapiStatementService - memory safety', () => {
@@ -64,8 +82,14 @@ describe('XapiStatementService - memory safety', () => {
     vi.clearAllMocks();
     mockDrain.mockResolvedValue(undefined);
     const asyncIter = { next: vi.fn().mockResolvedValue({ done: true }) };
-    const mockSub = { unsubscribe: mockUnsubscribe, [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter) };
-    mockNatsConnect.mockResolvedValue({ subscribe: vi.fn().mockReturnValue(mockSub), drain: mockDrain });
+    const mockSub = {
+      unsubscribe: mockUnsubscribe,
+      [Symbol.asyncIterator]: vi.fn().mockReturnValue(asyncIter),
+    };
+    mockNatsConnect.mockResolvedValue({
+      subscribe: vi.fn().mockReturnValue(mockSub),
+      drain: mockDrain,
+    });
   });
 
   it('test 1: onModuleDestroy calls closeAllPools and unsubscribes NATS', async () => {
@@ -96,7 +120,11 @@ describe('XapiStatementService - memory safety', () => {
     vi.stubGlobal('fetch', vi.fn().mockReturnValue(neverResolve));
 
     const svc = makeService();
-    const forwardPromise = svc.forwardToExternalLrs('https://slow.example.com', 'tok', sampleStatement);
+    const forwardPromise = svc.forwardToExternalLrs(
+      'https://slow.example.com',
+      'tok',
+      sampleStatement
+    );
 
     // Advance past 5-second timeout
     vi.advanceTimersByTime(5100);

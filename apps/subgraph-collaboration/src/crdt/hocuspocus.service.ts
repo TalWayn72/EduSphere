@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   Server,
   type onAuthenticatePayload,
@@ -8,7 +13,12 @@ import {
   type onStoreDocumentPayload,
 } from '@hocuspocus/server';
 import { JWTValidator, type AuthContext } from '@edusphere/auth';
-import { createDatabaseConnection, schema, eq, type Database } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  type Database,
+} from '@edusphere/db';
 import * as Y from 'yjs';
 
 interface ConnectionContext {
@@ -41,7 +51,9 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
       async onAuthenticate(data: onAuthenticatePayload) {
         const token = self.extractToken(data.requestParameters, data.token);
         if (!token) {
-          self.logger.warn(`Auth rejected — no token for doc "${data.documentName}"`);
+          self.logger.warn(
+            `Auth rejected — no token for doc "${data.documentName}"`
+          );
           throw new Error('Unauthorized: missing token');
         }
 
@@ -53,7 +65,9 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
           );
           return data.context;
         } catch (err) {
-          self.logger.warn(`Auth rejected — invalid JWT for doc "${data.documentName}": ${err}`);
+          self.logger.warn(
+            `Auth rejected — invalid JWT for doc "${data.documentName}": ${err}`
+          );
           throw new Error('Unauthorized: invalid token');
         }
       },
@@ -84,7 +98,9 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
     this.server
       .listen()
       .then(() => {
-        this.logger.log(`Hocuspocus CRDT server listening on ws://0.0.0.0:${port}`);
+        this.logger.log(
+          `Hocuspocus CRDT server listening on ws://0.0.0.0:${port}`
+        );
       })
       .catch((err: unknown) => {
         this.logger.error('Failed to start Hocuspocus server', err);
@@ -117,10 +133,14 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
           `Document "${documentName}" restored (${row.ydoc_snapshot.length} bytes)`
         );
       } else {
-        this.logger.debug(`Document "${documentName}" not in DB — starting fresh`);
+        this.logger.debug(
+          `Document "${documentName}" not in DB — starting fresh`
+        );
       }
     } catch (err) {
-      this.logger.warn(`Could not load document "${documentName}" from DB: ${err}`);
+      this.logger.warn(
+        `Could not load document "${documentName}" from DB: ${err}`
+      );
     }
 
     return document;
@@ -132,7 +152,9 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
     const entityId = this.parseEntityId(documentName);
     const ctx = context as ConnectionContext;
 
-    this.logger.debug(`Storing document "${documentName}" (${snapshot.length} bytes)`);
+    this.logger.debug(
+      `Storing document "${documentName}" (${snapshot.length} bytes)`
+    );
 
     try {
       const [existing] = await this.db
@@ -181,6 +203,8 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
   private parseEntityId(documentName: string): string {
     // Expected format: "discussion:<uuid>"
     const colonIndex = documentName.indexOf(':');
-    return colonIndex !== -1 ? documentName.substring(colonIndex + 1) : documentName;
+    return colonIndex !== -1
+      ? documentName.substring(colonIndex + 1)
+      : documentName;
   }
 }

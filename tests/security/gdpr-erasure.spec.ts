@@ -95,16 +95,22 @@ describe('G-03: Right to Erasure (GDPR Art.17)', () => {
   });
 
   it('erasure service has unit tests', () => {
-    expect(fileExists('apps/subgraph-core/src/user/user-erasure.service.spec.ts')).toBe(true);
+    expect(
+      fileExists('apps/subgraph-core/src/user/user-erasure.service.spec.ts')
+    ).toBe(true);
   });
 
   it('unit test file covers COMPLETED status case', () => {
-    const content = readFile('apps/subgraph-core/src/user/user-erasure.service.spec.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/user/user-erasure.service.spec.ts'
+    );
     expect(content).toContain('COMPLETED');
   });
 
   it('unit test file covers FAILED status case', () => {
-    const content = readFile('apps/subgraph-core/src/user/user-erasure.service.spec.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/user/user-erasure.service.spec.ts'
+    );
     expect(content).toContain('FAILED');
   });
 });

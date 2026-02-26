@@ -1,4 +1,11 @@
-import { pgTable, text, uuid, jsonb, boolean, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  uuid,
+  jsonb,
+  boolean,
+  index,
+} from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 import { users } from './core';
@@ -36,7 +43,7 @@ export const annotations = pgTable(
     index('idx_annotations_tenant').on(t.tenant_id),
     index('idx_annotations_tenant_user').on(t.tenant_id, t.user_id),
     index('idx_annotations_tenant_date').on(t.tenant_id, t.created_at),
-  ],
+  ]
 );
 
 export type Annotation = typeof annotations.$inferSelect;

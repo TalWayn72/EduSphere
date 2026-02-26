@@ -78,7 +78,9 @@ describe('TemplateResolver', () => {
     it('delegates to templateService.findByType with template string', async () => {
       mockTemplateService.findByType.mockResolvedValue([MOCK_TEMPLATE]);
       const result = await resolver.getAgentTemplatesByType('CHAVRUTA_DEBATE');
-      expect(mockTemplateService.findByType).toHaveBeenCalledWith('CHAVRUTA_DEBATE');
+      expect(mockTemplateService.findByType).toHaveBeenCalledWith(
+        'CHAVRUTA_DEBATE'
+      );
       expect(result).toEqual([MOCK_TEMPLATE]);
     });
 
@@ -102,7 +104,11 @@ describe('TemplateResolver', () => {
   describe('createAgentTemplate()', () => {
     it('delegates to templateService.create with input', async () => {
       mockTemplateService.create.mockResolvedValue(MOCK_TEMPLATE);
-      const input = { tenantId: 'tenant-1', name: 'New Agent', template: 'TUTOR' };
+      const input = {
+        tenantId: 'tenant-1',
+        name: 'New Agent',
+        template: 'TUTOR',
+      };
       const result = await resolver.createAgentTemplate(input);
       expect(mockTemplateService.create).toHaveBeenCalledWith(input);
       expect(result).toEqual(MOCK_TEMPLATE);
@@ -121,8 +127,12 @@ describe('TemplateResolver', () => {
     it('delegates to templateService.update with id and input', async () => {
       const updated = { ...MOCK_TEMPLATE, name: 'Updated' };
       mockTemplateService.update.mockResolvedValue(updated);
-      const result = await resolver.updateAgentTemplate('tmpl-1', { name: 'Updated' });
-      expect(mockTemplateService.update).toHaveBeenCalledWith('tmpl-1', { name: 'Updated' });
+      const result = await resolver.updateAgentTemplate('tmpl-1', {
+        name: 'Updated',
+      });
+      expect(mockTemplateService.update).toHaveBeenCalledWith('tmpl-1', {
+        name: 'Updated',
+      });
       expect(result).toEqual(updated);
     });
   });

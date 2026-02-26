@@ -42,7 +42,8 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn((a, b) => ({ field: a, value: b })),
   and: vi.fn((...args: unknown[]) => args),
   withTenantContext: vi.fn(
-    async (_db: unknown, _ctx: unknown, fn: (db: unknown) => unknown) => fn(mockDb),
+    async (_db: unknown, _ctx: unknown, fn: (db: unknown) => unknown) =>
+      fn(mockDb)
   ),
 }));
 
@@ -53,7 +54,11 @@ import { withTenantContext } from '@edusphere/db';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 'tenant-1', userId: 'admin-1', userRole: 'ORG_ADMIN' };
+const TENANT_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'admin-1',
+  userRole: 'ORG_ADMIN',
+};
 const COURSE_ID = 'course-abc';
 const USER_ID = 'user-xyz';
 
@@ -90,7 +95,7 @@ describe('AdminEnrollmentService', () => {
             where: vi.fn().mockResolvedValue([row]),
           }),
         }),
-      } as never),
+      } as never)
     );
 
     const result = await service.getEnrollments(COURSE_ID, TENANT_CTX);
@@ -107,22 +112,29 @@ describe('AdminEnrollmentService', () => {
     vi.mocked(withTenantContext).mockImplementationOnce(async (_db, _ctx, fn) =>
       fn({
         // course check
-        select: vi.fn()
+        select: vi
+          .fn()
           .mockReturnValueOnce({
             from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([{ id: COURSE_ID }]) }),
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([{ id: COURSE_ID }]),
+              }),
             }),
           })
           // existing check → empty
           .mockReturnValueOnce({
             from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }),
+              where: vi
+                .fn()
+                .mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }),
             }),
           }),
         insert: vi.fn().mockReturnValue({
-          values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([row]) }),
+          values: vi
+            .fn()
+            .mockReturnValue({ returning: vi.fn().mockResolvedValue([row]) }),
         }),
-      } as never),
+      } as never)
     );
 
     const result = await service.enrollUser(COURSE_ID, USER_ID, TENANT_CTX);
@@ -137,21 +149,26 @@ describe('AdminEnrollmentService', () => {
     const row = buildEnrollmentRow();
     vi.mocked(withTenantContext).mockImplementationOnce(async (_db, _ctx, fn) =>
       fn({
-        select: vi.fn()
+        select: vi
+          .fn()
           // course check
           .mockReturnValueOnce({
             from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([{ id: COURSE_ID }]) }),
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([{ id: COURSE_ID }]),
+              }),
             }),
           })
           // existing enrollment found
           .mockReturnValueOnce({
             from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([row]) }),
+              where: vi
+                .fn()
+                .mockReturnValue({ limit: vi.fn().mockResolvedValue([row]) }),
             }),
           }),
         insert: vi.fn(),
-      } as never),
+      } as never)
     );
 
     const result = await service.enrollUser(COURSE_ID, USER_ID, TENANT_CTX);
@@ -168,15 +185,17 @@ describe('AdminEnrollmentService', () => {
       fn({
         select: vi.fn().mockReturnValue({
           from: vi.fn().mockReturnValue({
-            where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }),
+            where: vi
+              .fn()
+              .mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }),
           }),
         }),
-      } as never),
+      } as never)
     );
 
-    await expect(service.enrollUser('no-course', USER_ID, TENANT_CTX)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.enrollUser('no-course', USER_ID, TENANT_CTX)
+    ).rejects.toThrow(NotFoundException);
   });
 
   // ── 5. unenrollUser removes enrollment ────────────────────────────────────
@@ -186,9 +205,11 @@ describe('AdminEnrollmentService', () => {
     vi.mocked(withTenantContext).mockImplementationOnce(async (_db, _ctx, fn) =>
       fn({
         delete: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([row]) }),
+          where: vi
+            .fn()
+            .mockReturnValue({ returning: vi.fn().mockResolvedValue([row]) }),
         }),
-      } as never),
+      } as never)
     );
 
     const result = await service.unenrollUser(COURSE_ID, USER_ID, TENANT_CTX);
@@ -201,14 +222,16 @@ describe('AdminEnrollmentService', () => {
     vi.mocked(withTenantContext).mockImplementationOnce(async (_db, _ctx, fn) =>
       fn({
         delete: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+          where: vi
+            .fn()
+            .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
         }),
-      } as never),
+      } as never)
     );
 
-    await expect(service.unenrollUser(COURSE_ID, 'ghost-user', TENANT_CTX)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.unenrollUser(COURSE_ID, 'ghost-user', TENANT_CTX)
+    ).rejects.toThrow(NotFoundException);
   });
 
   // ── 7. bulkEnroll skips already-enrolled users ─────────────────────────────
@@ -216,11 +239,14 @@ describe('AdminEnrollmentService', () => {
   it('bulkEnroll skips already-enrolled users and returns count of new enrollments', async () => {
     vi.mocked(withTenantContext).mockImplementationOnce(async (_db, _ctx, fn) =>
       fn({
-        select: vi.fn()
+        select: vi
+          .fn()
           // course check
           .mockReturnValueOnce({
             from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([{ id: COURSE_ID }]) }),
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([{ id: COURSE_ID }]),
+              }),
             }),
           })
           // existing enrollments — user-1 already enrolled
@@ -229,14 +255,16 @@ describe('AdminEnrollmentService', () => {
               where: vi.fn().mockResolvedValue([{ userId: 'user-1' }]),
             }),
           }),
-        insert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue([]) }),
-      } as never),
+        insert: vi
+          .fn()
+          .mockReturnValue({ values: vi.fn().mockResolvedValue([]) }),
+      } as never)
     );
 
     const result = await service.bulkEnroll(
       COURSE_ID,
       ['user-1', 'user-2', 'user-3'],
-      TENANT_CTX,
+      TENANT_CTX
     );
     // Only user-2 and user-3 are new
     expect(result).toBe(2);

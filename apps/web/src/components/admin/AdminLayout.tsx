@@ -12,7 +12,11 @@ interface AdminLayoutProps {
   description?: string;
 }
 
-export function AdminLayout({ children, title, description }: AdminLayoutProps) {
+export function AdminLayout({
+  children,
+  title,
+  description,
+}: AdminLayoutProps) {
   return (
     <Layout>
       <div className="flex gap-6">
@@ -22,7 +26,9 @@ export function AdminLayout({ children, title, description }: AdminLayoutProps) 
             <div className="mb-6">
               <h1 className="text-2xl font-bold">{title}</h1>
               {description && (
-                <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {description}
+                </p>
               )}
             </div>
           )}

@@ -49,7 +49,9 @@ describe('ActivityHeatmap', () => {
     const data = makeData(7);
     const { container } = render(<ActivityHeatmap data={data} />);
     // The legend renders 5 colored divs (counts: 0,2,4,6,8)
-    const legendRow = container.querySelectorAll('.flex.items-center.gap-1 .w-3.h-3');
+    const legendRow = container.querySelectorAll(
+      '.flex.items-center.gap-1 .w-3.h-3'
+    );
     expect(legendRow.length).toBe(5);
   });
 

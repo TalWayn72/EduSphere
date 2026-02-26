@@ -5,10 +5,12 @@ Complete AI/ML infrastructure with RAG, LangGraph workflows, and semantic search
 ## Overview
 
 **Packages:**
+
 - ✅ `@edusphere/rag` - Retrieval Augmented Generation pipeline
 - ✅ `@edusphere/langgraph-workflows` - AI agent workflows
 
 **Features:**
+
 - Semantic search with pgvector
 - Hybrid search (semantic + keyword + graph)
 - Cached embeddings with Redis
@@ -30,6 +32,7 @@ Query → Embeddings → Vector Search → Retrieval → LLM → Answer
 ### Components
 
 #### 1. Cached Embeddings
+
 ```typescript
 import { createEmbeddings } from '@edusphere/rag';
 
@@ -53,6 +56,7 @@ const vectors = await embeddings.embedDocuments([
 ```
 
 #### 2. Vector Store (pgvector)
+
 ```typescript
 import { createVectorStore } from '@edusphere/rag';
 
@@ -83,6 +87,7 @@ const results = await store.similaritySearch(
 ```
 
 #### 3. Semantic Retriever
+
 ```typescript
 import { createRetriever } from '@edusphere/rag';
 
@@ -103,6 +108,7 @@ const { results, context } = await retriever.retrieveWithContext(
 ```
 
 #### 4. RAG Pipeline
+
 ```typescript
 import { createRAGPipeline } from '@edusphere/rag';
 
@@ -139,6 +145,7 @@ const chatResult = await rag.chat(
 ```
 
 #### 5. Hybrid Search
+
 ```typescript
 import { Pool } from 'pg';
 import { createHybridSearch } from '@edusphere/rag';
@@ -360,16 +367,19 @@ RAG_CACHE_TTL=86400
 ### Performance Tuning
 
 **Embedding Cache:**
+
 - Cache TTL: 24 hours for stable content, 1 hour for dynamic
 - Redis cluster for high availability
 - Monitor cache hit rate (target: > 80%)
 
 **Vector Search:**
+
 - HNSW index with m=16, ef_construction=64
 - Adjust similarity threshold based on precision/recall needs
 - Use pagination for large result sets
 
 **LLM Optimization:**
+
 - Use streaming for better UX
 - Implement request queuing for rate limits
 - Monitor token usage and costs
@@ -377,6 +387,7 @@ RAG_CACHE_TTL=86400
 ## Next Steps
 
 ### Phase 15: Mobile App Polish
+
 - Push notifications
 - Biometric authentication
 - Offline course downloads

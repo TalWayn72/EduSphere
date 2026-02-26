@@ -44,7 +44,7 @@ jobs:
 
       - name: Build all subgraphs
         run: pnpm turbo build --filter='./apps/subgraph-*'
-        continue-on-error: true  # Building NestJS apps in CI without full env may fail
+        continue-on-error: true # Building NestJS apps in CI without full env may fail
         env:
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
           TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -165,7 +165,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -175,7 +175,7 @@ jobs:
         with:
           name: supergraph-schema
           path: apps/gateway
-        continue-on-error: true  # Fall back to committed supergraph if artifact not found
+        continue-on-error: true # Fall back to committed supergraph if artifact not found
 
       - name: Check input type naming conventions
         run: |
@@ -321,7 +321,7 @@ jobs:
         run: npm install -g @graphql-hive/cli
 
       - name: Publish schema to Hive
-        continue-on-error: true  # HIVE_TOKEN may not be configured; skip gracefully
+        continue-on-error: true # HIVE_TOKEN may not be configured; skip gracefully
         run: |
           # Publish each subgraph schema to Hive registry
           echo "Publishing Core subgraph..."

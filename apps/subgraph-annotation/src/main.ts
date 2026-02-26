@@ -20,7 +20,10 @@ async function bootstrap() {
   await app.listen(port);
 
   const logger = app.get(Logger);
-  logger.log('Annotation subgraph running on http://localhost:' + port + '/graphql', 'Bootstrap');
+  logger.log(
+    'Annotation subgraph running on http://localhost:' + port + '/graphql',
+    'Bootstrap'
+  );
   logger.log('Serving: PDF/Video Annotations', 'Bootstrap');
 }
 

@@ -10,7 +10,13 @@
  * All responses include X-Experience-API-Version: 1.0.3 header.
  */
 import {
-  Controller, Get, Post, Req, Res, HttpStatus, Logger,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { XapiTokenService } from './xapi-token.service.js';
@@ -26,7 +32,7 @@ export class LrsController {
 
   constructor(
     private readonly tokenService: XapiTokenService,
-    private readonly statementService: XapiStatementService,
+    private readonly statementService: XapiStatementService
   ) {}
 
   private setXapiHeaders(res: Response): void {
@@ -36,19 +42,27 @@ export class LrsController {
 
   private async authorize(
     req: Request,
-    res: Response,
-  ): Promise<{ tenantId: string; tokenId: string; lrsEndpoint: string | null } | null> {
+    res: Response
+  ): Promise<{
+    tenantId: string;
+    tokenId: string;
+    lrsEndpoint: string | null;
+  } | null> {
     const auth = req.headers.authorization;
     if (!auth?.startsWith('Bearer ')) {
       this.setXapiHeaders(res);
-      res.status(HttpStatus.UNAUTHORIZED).json({ error: 'Bearer token required' });
+      res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ error: 'Bearer token required' });
       return null;
     }
     const raw = auth.slice(7);
     const result = await this.tokenService.validateToken(raw);
     if (!result) {
       this.setXapiHeaders(res);
-      res.status(HttpStatus.UNAUTHORIZED).json({ error: 'Invalid or expired token' });
+      res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ error: 'Invalid or expired token' });
       return null;
     }
     return result;
@@ -61,31 +75,44 @@ export class LrsController {
   }
 
   @Post('statements')
-  async postStatements(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async postStatements(
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
     const auth = await this.authorize(req, res);
     if (!auth) return;
 
     const body = req.body as unknown;
-    const statements: XapiStatement[] = Array.isArray(body) ? body : [body as XapiStatement];
+    const statements: XapiStatement[] = Array.isArray(body)
+      ? body
+      : [body as XapiStatement];
     const ids: string[] = [];
 
     for (const stmt of statements) {
       if (!stmt.id || !stmt.actor || !stmt.verb || !stmt.object) {
         this.setXapiHeaders(res);
-        res.status(HttpStatus.BAD_REQUEST).json({ error: 'Invalid xAPI statement: id, actor, verb, object required' });
+        res.status(HttpStatus.BAD_REQUEST).json({
+          error: 'Invalid xAPI statement: id, actor, verb, object required',
+        });
         return;
       }
       await this.statementService.storeStatement(auth.tenantId, stmt);
       ids.push(stmt.id);
     }
 
-    this.logger.log({ tenantId: auth.tenantId, count: ids.length }, 'xAPI statements stored via HTTP');
+    this.logger.log(
+      { tenantId: auth.tenantId, count: ids.length },
+      'xAPI statements stored via HTTP'
+    );
     this.setXapiHeaders(res);
     res.status(HttpStatus.OK).json(ids);
   }
 
   @Get('statements')
-  async getStatements(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async getStatements(
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
     const auth = await this.authorize(req, res);
     if (!auth) return;
 
@@ -93,11 +120,14 @@ export class LrsController {
       limit: req.query['limit'] ? Number(req.query['limit']) : 20,
       since: req.query['since'] ? String(req.query['since']) : undefined,
       until: req.query['until'] ? String(req.query['until']) : undefined,
-      verb:  req.query['verb']  ? String(req.query['verb'])  : undefined,
+      verb: req.query['verb'] ? String(req.query['verb']) : undefined,
       agent: req.query['agent'] ? String(req.query['agent']) : undefined,
     };
 
-    const statements = await this.statementService.queryStatements(auth.tenantId, params);
+    const statements = await this.statementService.queryStatements(
+      auth.tenantId,
+      params
+    );
     this.setXapiHeaders(res);
     res.status(HttpStatus.OK).json({
       statements,

@@ -19,7 +19,9 @@ vi.mock('@edusphere/db', () => ({
 import { AdminOverviewService } from './admin-overview.service.js';
 
 describe('AdminOverviewService — memory safety', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('constructs without errors', () => {
     expect(() => new AdminOverviewService()).not.toThrow();

@@ -14,7 +14,7 @@ export class PlagiarismResolver {
 
   constructor(
     private readonly submissionService: SubmissionService,
-    private readonly plagiarismService: PlagiarismService,
+    private readonly plagiarismService: PlagiarismService
   ) {}
 
   @Mutation('submitTextAssignment')
@@ -22,7 +22,7 @@ export class PlagiarismResolver {
     @Args('contentItemId') contentItemId: string,
     @Args('textContent') textContent: string,
     @Args('courseId') courseId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
@@ -36,7 +36,7 @@ export class PlagiarismResolver {
     };
 
     this.logger.log(
-      `submitTextAssignment: contentItemId=${contentItemId} userId=${auth.userId}`,
+      `submitTextAssignment: contentItemId=${contentItemId} userId=${auth.userId}`
     );
 
     return this.submissionService.submitAssignment(
@@ -45,14 +45,14 @@ export class PlagiarismResolver {
       auth.tenantId,
       courseId,
       textContent,
-      tenantCtx,
+      tenantCtx
     );
   }
 
   @Query('mySubmissions')
   async mySubmissions(
     @Args('contentItemId') contentItemId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
@@ -68,14 +68,14 @@ export class PlagiarismResolver {
     return this.submissionService.getMySubmissions(
       contentItemId,
       auth.userId,
-      tenantCtx,
+      tenantCtx
     );
   }
 
   @Query('submissionPlagiarismReport')
   async submissionPlagiarismReport(
     @Args('submissionId') submissionId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
@@ -89,13 +89,13 @@ export class PlagiarismResolver {
     };
 
     this.logger.log(
-      `submissionPlagiarismReport: submissionId=${submissionId} userId=${auth.userId}`,
+      `submissionPlagiarismReport: submissionId=${submissionId} userId=${auth.userId}`
     );
 
     return this.submissionService.getPlagiarismReport(
       submissionId,
       auth.userId,
-      tenantCtx,
+      tenantCtx
     );
   }
 }

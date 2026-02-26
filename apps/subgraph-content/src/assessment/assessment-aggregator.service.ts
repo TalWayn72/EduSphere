@@ -44,7 +44,7 @@ function buildSummary(criteria: AggregatedCriteria[]): string {
   if (criteria.length === 0) return 'No criteria were rated.';
   const sorted = [...criteria].sort((a, b) => b.overallAvg - a.overallAvg);
   const overall = roundTwo(
-    criteria.reduce((s, c) => s + c.overallAvg, 0) / criteria.length,
+    criteria.reduce((s, c) => s + c.overallAvg, 0) / criteria.length
   );
   const strongest = sorted[0]!;
   const weakest = sorted[sorted.length - 1]!;
@@ -53,7 +53,9 @@ function buildSummary(criteria: AggregatedCriteria[]): string {
     `Strongest: ${strongest.label} (${roundTwo(strongest.overallAvg)}/5).`,
   ];
   if (weakest.criteriaId !== strongest.criteriaId) {
-    parts.push(`Growth area: ${weakest.label} (${roundTwo(weakest.overallAvg)}/5).`);
+    parts.push(
+      `Growth area: ${weakest.label} (${roundTwo(weakest.overallAvg)}/5).`
+    );
   }
   return parts.join(' ');
 }
@@ -65,52 +67,82 @@ export class AssessmentAggregatorService {
 
   async aggregate(
     campaignId: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<typeof schema.assessmentResults.$inferSelect> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
 
     const [campaign] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.assessmentCampaigns)
-        .where(and(
-          eq(schema.assessmentCampaigns.id, campaignId),
-          eq(schema.assessmentCampaigns.tenantId, tenantId),
-        )),
+      tx
+        .select()
+        .from(schema.assessmentCampaigns)
+        .where(
+          and(
+            eq(schema.assessmentCampaigns.id, campaignId),
+            eq(schema.assessmentCampaigns.tenantId, tenantId)
+          )
+        )
     );
-    if (!campaign) throw new NotFoundException(`Campaign ${campaignId} not found`);
+    if (!campaign)
+      throw new NotFoundException(`Campaign ${campaignId} not found`);
 
     const responses = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.assessmentResponses)
-        .where(and(
-          eq(schema.assessmentResponses.campaignId, campaignId),
-          eq(schema.assessmentResponses.tenantId, tenantId),
-        )),
+      tx
+        .select()
+        .from(schema.assessmentResponses)
+        .where(
+          and(
+            eq(schema.assessmentResponses.campaignId, campaignId),
+            eq(schema.assessmentResponses.tenantId, tenantId)
+          )
+        )
     );
 
     // Group scores by criteriaId and rater role
-    const byId = new Map<string, {
-      label: string;
-      self: number[];
-      peer: number[];
-      manager: number[];
-      directReport: number[];
-    }>();
+    const byId = new Map<
+      string,
+      {
+        label: string;
+        self: number[];
+        peer: number[];
+        manager: number[];
+        directReport: number[];
+      }
+    >();
 
     for (const resp of responses) {
       const scores = resp.criteriaScores as CriteriaScore[];
       for (const cs of scores) {
         if (!byId.has(cs.criteriaId)) {
-          byId.set(cs.criteriaId, { label: cs.label, self: [], peer: [], manager: [], directReport: [] });
+          byId.set(cs.criteriaId, {
+            label: cs.label,
+            self: [],
+            peer: [],
+            manager: [],
+            directReport: [],
+          });
         }
         const entry = byId.get(cs.criteriaId)!;
         if (resp.raterRole === 'SELF') entry.self.push(cs.score);
         else if (resp.raterRole === 'PEER') entry.peer.push(cs.score);
         else if (resp.raterRole === 'MANAGER') entry.manager.push(cs.score);
-        else if (resp.raterRole === 'DIRECT_REPORT') entry.directReport.push(cs.score);
+        else if (resp.raterRole === 'DIRECT_REPORT')
+          entry.directReport.push(cs.score);
       }
     }
 
-    const aggregatedScores: AggregatedCriteria[] = Array.from(byId.entries()).map(([criteriaId, data]) => {
-      const all = [...data.self, ...data.peer, ...data.manager, ...data.directReport];
+    const aggregatedScores: AggregatedCriteria[] = Array.from(
+      byId.entries()
+    ).map(([criteriaId, data]) => {
+      const all = [
+        ...data.self,
+        ...data.peer,
+        ...data.manager,
+        ...data.directReport,
+      ];
       return {
         criteriaId,
         label: data.label,
@@ -118,29 +150,45 @@ export class AssessmentAggregatorService {
         peerAvg: avg(data.peer),
         managerScore: avg(data.manager),
         directReportAvg: avg(data.directReport),
-        overallAvg: roundTwo(all.reduce((s, v) => s + v, 0) / (all.length || 1)),
+        overallAvg: roundTwo(
+          all.reduce((s, v) => s + v, 0) / (all.length || 1)
+        ),
       };
     });
 
     const summary = buildSummary(aggregatedScores);
 
     const [result] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.assessmentResults)
+      tx
+        .insert(schema.assessmentResults)
         .values({
           campaignId,
           targetUserId: campaign.targetUserId,
           tenantId,
-          aggregatedScores: aggregatedScores as unknown as Record<string, unknown>[],
+          aggregatedScores: aggregatedScores as unknown as Record<
+            string,
+            unknown
+          >[],
           summary,
         })
         .onConflictDoUpdate({
           target: schema.assessmentResults.campaignId,
-          set: { aggregatedScores: aggregatedScores as unknown as Record<string, unknown>[], summary, generatedAt: new Date() },
+          set: {
+            aggregatedScores: aggregatedScores as unknown as Record<
+              string,
+              unknown
+            >[],
+            summary,
+            generatedAt: new Date(),
+          },
         })
-        .returning(),
+        .returning()
     );
 
-    this.logger.log({ campaignId, tenantId, criteriaCount: aggregatedScores.length }, 'Assessment aggregation complete');
+    this.logger.log(
+      { campaignId, tenantId, criteriaCount: aggregatedScores.length },
+      'Assessment aggregation complete'
+    );
     return result!;
   }
 }

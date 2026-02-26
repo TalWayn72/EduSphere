@@ -63,7 +63,9 @@ describe('SrsService — memory safety', () => {
   it('drains the NATS connection on destroy', async () => {
     // Access the mock nats connection's drain spy
     const mockConnect = nats.connect as ReturnType<typeof vi.fn>;
-    const mockNatsConn = await mockConnect.mock.results[0]?.value as { drain: ReturnType<typeof vi.fn> };
+    const mockNatsConn = (await mockConnect.mock.results[0]?.value) as {
+      drain: ReturnType<typeof vi.fn>;
+    };
     await service.onModuleDestroy();
     expect(mockNatsConn.drain).toHaveBeenCalledTimes(1);
   });

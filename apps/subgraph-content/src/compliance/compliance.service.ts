@@ -5,7 +5,11 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   createDatabaseConnection,
@@ -66,16 +70,21 @@ export class ComplianceService implements OnModuleDestroy {
     await closeAllPools();
   }
 
-  async listComplianceCourses(ctx: TenantContext): Promise<typeof schema.courses.$inferSelect[]> {
+  async listComplianceCourses(
+    ctx: TenantContext
+  ): Promise<(typeof schema.courses.$inferSelect)[]> {
     this.requireAdmin(ctx);
     return withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.courses)
-        .where(and(
-          eq(schema.courses.tenant_id, ctx.tenantId),
-          eq(schema.courses.is_published, true),
-          sql`${schema.courses.deleted_at} IS NULL`,
-        )),
+        .where(
+          and(
+            eq(schema.courses.tenant_id, ctx.tenantId),
+            eq(schema.courses.is_published, true),
+            sql`${schema.courses.deleted_at} IS NULL`
+          )
+        )
     );
   }
 
@@ -83,27 +92,36 @@ export class ComplianceService implements OnModuleDestroy {
     courseId: string,
     isCompliance: boolean,
     complianceDueDate: Date | null,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<typeof schema.courses.$inferSelect> {
     this.requireAdmin(ctx);
     const [updated] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.courses)
-        .set({ is_compliance: isCompliance, compliance_due_date: complianceDueDate })
-        .where(and(
-          eq(schema.courses.id, courseId),
-          eq(schema.courses.tenant_id, ctx.tenantId),
-        ))
-        .returning(),
+      tx
+        .update(schema.courses)
+        .set({
+          is_compliance: isCompliance,
+          compliance_due_date: complianceDueDate,
+        })
+        .where(
+          and(
+            eq(schema.courses.id, courseId),
+            eq(schema.courses.tenant_id, ctx.tenantId)
+          )
+        )
+        .returning()
     );
-    if (!updated) throw new ForbiddenException('Course not found or access denied');
-    this.logger.log(`Compliance settings updated: courseId=${courseId} isCompliance=${isCompliance}`);
+    if (!updated)
+      throw new ForbiddenException('Course not found or access denied');
+    this.logger.log(
+      `Compliance settings updated: courseId=${courseId} isCompliance=${isCompliance}`
+    );
     return updated;
   }
 
   async generateComplianceReport(
     courseIds: string[],
     ctx: TenantContext,
-    asOf?: Date,
+    asOf?: Date
   ): Promise<ComplianceReportResult> {
     this.requireAdmin(ctx);
     const reportDate = asOf ?? new Date();
@@ -114,7 +132,13 @@ export class ComplianceService implements OnModuleDestroy {
 
     const [csvBuffer, pdfBuffer] = await Promise.all([
       Promise.resolve(Buffer.from(generateCsvReport(rows, title), 'utf-8')),
-      this.pdfService.generatePdf({ title, tenantName: ctx.tenantId, asOf: reportDate, rows, summary }),
+      this.pdfService.generatePdf({
+        title,
+        tenantName: ctx.tenantId,
+        asOf: reportDate,
+        rows,
+        summary,
+      }),
     ]);
 
     const reportId = randomUUID();
@@ -131,14 +155,16 @@ export class ComplianceService implements OnModuleDestroy {
       this.getPresignedUrl(pdfKey),
     ]);
 
-    this.logger.log(`Compliance report generated: reportId=${reportId} tenant=${ctx.tenantId} rows=${rows.length}`);
+    this.logger.log(
+      `Compliance report generated: reportId=${reportId} tenant=${ctx.tenantId} rows=${rows.length}`
+    );
     return { csvUrl, pdfUrl, summary };
   }
 
   private async fetchReportRows(
     courseIds: string[],
     ctx: TenantContext,
-    asOf: Date,
+    asOf: Date
   ): Promise<ComplianceReportRow[]> {
     if (courseIds.length === 0) return [];
 
@@ -156,42 +182,53 @@ export class ComplianceService implements OnModuleDestroy {
           userLastName: schema.users.last_name,
         })
         .from(schema.userCourses)
-        .innerJoin(schema.courses, eq(schema.userCourses.courseId, schema.courses.id))
+        .innerJoin(
+          schema.courses,
+          eq(schema.userCourses.courseId, schema.courses.id)
+        )
         .innerJoin(schema.users, eq(schema.userCourses.userId, schema.users.id))
-        .where(and(
-          inArray(schema.userCourses.courseId, courseIds),
-          eq(schema.courses.tenant_id, ctx.tenantId),
-          sql`${schema.courses.deleted_at} IS NULL`,
-        ));
+        .where(
+          and(
+            inArray(schema.userCourses.courseId, courseIds),
+            eq(schema.courses.tenant_id, ctx.tenantId),
+            sql`${schema.courses.deleted_at} IS NULL`
+          )
+        );
 
-      return enrollments.map((row): ComplianceReportRow => ({
-        userName: `${row.userFirstName} ${row.userLastName}`.trim(),
-        userEmail: row.userEmail,
-        courseName: row.courseTitle,
-        enrolledAt: row.enrolledAt.toISOString(),
-        completedAt: row.completedAt?.toISOString() ?? null,
-        score: null,
-        status: this.computeStatus(row.completedAt, row.courseDueDate, asOf),
-        complianceDueDate: row.courseDueDate?.toISOString() ?? null,
-      }));
+      return enrollments.map(
+        (row): ComplianceReportRow => ({
+          userName: `${row.userFirstName} ${row.userLastName}`.trim(),
+          userEmail: row.userEmail,
+          courseName: row.courseTitle,
+          enrolledAt: row.enrolledAt.toISOString(),
+          completedAt: row.completedAt?.toISOString() ?? null,
+          score: null,
+          status: this.computeStatus(row.completedAt, row.courseDueDate, asOf),
+          complianceDueDate: row.courseDueDate?.toISOString() ?? null,
+        })
+      );
     });
   }
 
   private computeStatus(
     completedAt: Date | null | undefined,
     dueDate: Date | null | undefined,
-    asOf: Date,
+    asOf: Date
   ): ComplianceStatus {
     if (completedAt) return 'completed';
     if (dueDate && dueDate < asOf) return 'overdue';
     return 'in_progress';
   }
 
-  private computeSummary(rows: ComplianceReportRow[], generatedAt: Date): ComplianceSummary {
+  private computeSummary(
+    rows: ComplianceReportRow[],
+    generatedAt: Date
+  ): ComplianceSummary {
     const uniqueUsers = new Set(rows.map((r) => r.userEmail)).size;
     const completedCount = rows.filter((r) => r.status === 'completed').length;
     const overdueCount = rows.filter((r) => r.status === 'overdue').length;
-    const completionRate = rows.length > 0 ? (completedCount / rows.length) * 100 : 0;
+    const completionRate =
+      rows.length > 0 ? (completedCount / rows.length) * 100 : 0;
     return {
       totalUsers: uniqueUsers,
       totalEnrollments: rows.length,
@@ -202,23 +239,33 @@ export class ComplianceService implements OnModuleDestroy {
     };
   }
 
-  private async uploadToMinio(key: string, body: Buffer, contentType: string): Promise<void> {
-    await this.s3.send(new PutObjectCommand({
-      Bucket: this.bucket,
-      Key: key,
-      Body: body,
-      ContentType: contentType,
-    }));
+  private async uploadToMinio(
+    key: string,
+    body: Buffer,
+    contentType: string
+  ): Promise<void> {
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+      })
+    );
   }
 
   private async getPresignedUrl(key: string): Promise<string> {
     const command = new GetObjectCommand({ Bucket: this.bucket, Key: key });
-    return getSignedUrl(this.s3, command, { expiresIn: REPORT_URL_EXPIRY_SECONDS });
+    return getSignedUrl(this.s3, command, {
+      expiresIn: REPORT_URL_EXPIRY_SECONDS,
+    });
   }
 
   private requireAdmin(ctx: TenantContext): void {
     if (!ADMIN_ROLES.has(ctx.userRole)) {
-      throw new ForbiddenException('Only ORG_ADMIN or SUPER_ADMIN can access compliance reports');
+      throw new ForbiddenException(
+        'Only ORG_ADMIN or SUPER_ADMIN can access compliance reports'
+      );
     }
   }
 }

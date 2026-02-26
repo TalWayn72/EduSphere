@@ -300,11 +300,7 @@ export class AnnotationService implements OnModuleDestroy {
     return this.update(id, { isResolved: true }, authContext);
   }
 
-  async replyTo(
-    parentId: string,
-    content: string,
-    authContext: AuthContext
-  ) {
+  async replyTo(parentId: string, content: string, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');
     }

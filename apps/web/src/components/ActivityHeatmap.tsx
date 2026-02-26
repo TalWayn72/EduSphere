@@ -64,7 +64,10 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
         <div className="flex items-center gap-1">
           <span>{t('heatmap.less')}</span>
           {[0, 2, 4, 6, 8].map((c) => (
-            <div key={c} className={`w-3 h-3 rounded-sm ${getHeatmapColor(c)}`} />
+            <div
+              key={c}
+              className={`w-3 h-3 rounded-sm ${getHeatmapColor(c)}`}
+            />
           ))}
           <span>{t('heatmap.more')}</span>
         </div>

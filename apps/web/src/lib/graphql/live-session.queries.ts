@@ -80,7 +80,11 @@ export const POLL_RESULTS_QUERY = gql`
 `;
 
 export const CREATE_POLL_MUTATION = gql`
-  mutation CreatePoll($sessionId: ID!, $question: String!, $options: [String!]!) {
+  mutation CreatePoll(
+    $sessionId: ID!
+    $question: String!
+    $options: [String!]!
+  ) {
     createPoll(sessionId: $sessionId, question: $question, options: $options) {
       id
       question
@@ -150,7 +154,10 @@ export const BREAKOUT_ROOMS_QUERY = gql`
 `;
 
 export const CREATE_BREAKOUT_ROOMS_MUTATION = gql`
-  mutation CreateBreakoutRooms($sessionId: ID!, $rooms: [CreateBreakoutRoomInput!]!) {
+  mutation CreateBreakoutRooms(
+    $sessionId: ID!
+    $rooms: [CreateBreakoutRoomInput!]!
+  ) {
     createBreakoutRooms(sessionId: $sessionId, rooms: $rooms) {
       id
       roomName

@@ -2,7 +2,12 @@
  * AdminEnrollmentService — Admin-facing enrollment management (F-108).
  * Allows ORG_ADMIN / SUPER_ADMIN to enroll, unenroll, and bulk-enroll users.
  */
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -31,7 +36,10 @@ export class AdminEnrollmentService implements OnModuleDestroy {
     await closeAllPools();
   }
 
-  async getEnrollments(courseId: string, tenantCtx: TenantContext): Promise<AdminEnrollmentRecord[]> {
+  async getEnrollments(
+    courseId: string,
+    tenantCtx: TenantContext
+  ): Promise<AdminEnrollmentRecord[]> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const rows = await tx
         .select()
@@ -44,7 +52,7 @@ export class AdminEnrollmentService implements OnModuleDestroy {
   async enrollUser(
     courseId: string,
     targetUserId: string,
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<AdminEnrollmentRecord> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [course] = await tx
@@ -63,13 +71,13 @@ export class AdminEnrollmentService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.userCourses.userId, targetUserId),
-            eq(schema.userCourses.courseId, courseId),
-          ),
+            eq(schema.userCourses.courseId, courseId)
+          )
         )
         .limit(1);
       if (existing) {
         this.logger.log(
-          `User ${targetUserId} already enrolled in course ${courseId} — idempotent return`,
+          `User ${targetUserId} already enrolled in course ${courseId} — idempotent return`
         );
         return this.mapEnrollment(existing);
       }
@@ -79,7 +87,9 @@ export class AdminEnrollmentService implements OnModuleDestroy {
         .values({ userId: targetUserId, courseId, status: 'ACTIVE' })
         .returning();
       if (!enrollment) throw new Error('Enrollment insert failed');
-      this.logger.log(`Admin enrolled user ${targetUserId} in course ${courseId}`);
+      this.logger.log(
+        `Admin enrolled user ${targetUserId} in course ${courseId}`
+      );
       return this.mapEnrollment(enrollment);
     });
   }
@@ -87,7 +97,7 @@ export class AdminEnrollmentService implements OnModuleDestroy {
   async unenrollUser(
     courseId: string,
     targetUserId: string,
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<boolean> {
     return withTenantContext(this.db, tenantCtx, async (tx) => {
       const [deleted] = await tx
@@ -95,16 +105,18 @@ export class AdminEnrollmentService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.userCourses.userId, targetUserId),
-            eq(schema.userCourses.courseId, courseId),
-          ),
+            eq(schema.userCourses.courseId, courseId)
+          )
         )
         .returning();
       if (!deleted) {
         throw new NotFoundException(
-          `Enrollment not found for user ${targetUserId} in course ${courseId}`,
+          `Enrollment not found for user ${targetUserId} in course ${courseId}`
         );
       }
-      this.logger.log(`Admin unenrolled user ${targetUserId} from course ${courseId}`);
+      this.logger.log(
+        `Admin unenrolled user ${targetUserId} from course ${courseId}`
+      );
       return true;
     });
   }
@@ -112,7 +124,7 @@ export class AdminEnrollmentService implements OnModuleDestroy {
   async bulkEnroll(
     courseId: string,
     userIds: string[],
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<number> {
     if (userIds.length === 0) return 0;
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -134,10 +146,16 @@ export class AdminEnrollmentService implements OnModuleDestroy {
       const toEnroll = userIds.filter((id) => !enrolledSet.has(id));
       if (toEnroll.length === 0) return 0;
 
-      await tx
-        .insert(schema.userCourses)
-        .values(toEnroll.map((userId) => ({ userId, courseId, status: 'ACTIVE' as const })));
-      this.logger.log(`Admin bulk-enrolled ${toEnroll.length} users in course ${courseId}`);
+      await tx.insert(schema.userCourses).values(
+        toEnroll.map((userId) => ({
+          userId,
+          courseId,
+          status: 'ACTIVE' as const,
+        }))
+      );
+      this.logger.log(
+        `Admin bulk-enrolled ${toEnroll.length} users in course ${courseId}`
+      );
       return toEnroll.length;
     });
   }

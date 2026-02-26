@@ -21,9 +21,15 @@ export interface LtiIdToken {
   'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest';
   'https://purl.imsglobal.org/spec/lti/claim/version': '1.3.0';
   'https://purl.imsglobal.org/spec/lti/claim/deployment_id': string;
-  'https://purl.imsglobal.org/spec/lti/claim/resource_link': { id: string; title?: string };
+  'https://purl.imsglobal.org/spec/lti/claim/resource_link': {
+    id: string;
+    title?: string;
+  };
   'https://purl.imsglobal.org/spec/lti/claim/roles': string[];
-  'https://purl.imsglobal.org/spec/lti/claim/context'?: { id: string; title?: string };
+  'https://purl.imsglobal.org/spec/lti/claim/context'?: {
+    id: string;
+    title?: string;
+  };
   email?: string;
   name?: string;
   given_name?: string;

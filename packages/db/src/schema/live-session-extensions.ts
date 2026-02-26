@@ -26,7 +26,7 @@ export const breakoutRooms = pgTable(
   (t) => ({
     sessionIdx: index('breakout_rooms_session_idx').on(t.sessionId),
     tenantIdx: index('breakout_rooms_tenant_idx').on(t.tenantId),
-  }),
+  })
 );
 
 // Polls created during sessions
@@ -45,7 +45,7 @@ export const sessionPolls = pgTable(
   (t) => ({
     sessionIdx: index('session_polls_session_idx').on(t.sessionId),
     tenantIdx: index('session_polls_tenant_idx').on(t.tenantId),
-  }),
+  })
 );
 
 // Individual vote records
@@ -62,7 +62,7 @@ export const pollVotes = pgTable(
   (t) => ({
     pollUserIdx: index('poll_votes_poll_user_idx').on(t.pollId, t.userId),
     tenantIdx: index('poll_votes_tenant_idx').on(t.tenantId),
-  }),
+  })
 );
 
 // RLS policies: users see polls/rooms for sessions they're in; moderators see all

@@ -12,26 +12,28 @@
 **Status:** ✅ Complete | **Severity:** 🟢 Feature | **Branch:** `fix/bug-16-23-g18`
 
 ### Summary
+
 Replaced the basic read-only `RichDocumentPage` with a full MS-Word-style document annotation experience on the `/document/:contentId` route.
 
 ### Features Implemented
 
-| Feature | Status |
-|---------|--------|
-| 3-panel resizable layout (drag handle between doc + comments) | ✅ |
-| Document zoom: 75% / 100% / 125% / 150% | ✅ |
-| Text selection → floating "Add Comment" button | ✅ |
-| Comment form with layer selector (Private/Public/Authority) | ✅ |
-| Semi-transparent colored highlights on annotated text | ✅ |
-| Click comment card → scrolls document to linked text | ✅ |
-| Click highlighted text → scrolls comment to top of panel | ✅ |
-| Layer filter tabs in comments panel | ✅ |
-| "Welcome back" toast with user name when returning to document | ✅ |
-| Scroll position restore (last read position) | ✅ |
-| Default annotation layer preference (persisted to localStorage) | ✅ |
-| Recently viewed documents tracking (localStorage, LRU 10) | ✅ |
+| Feature                                                         | Status |
+| --------------------------------------------------------------- | ------ |
+| 3-panel resizable layout (drag handle between doc + comments)   | ✅     |
+| Document zoom: 75% / 100% / 125% / 150%                         | ✅     |
+| Text selection → floating "Add Comment" button                  | ✅     |
+| Comment form with layer selector (Private/Public/Authority)     | ✅     |
+| Semi-transparent colored highlights on annotated text           | ✅     |
+| Click comment card → scrolls document to linked text            | ✅     |
+| Click highlighted text → scrolls comment to top of panel        | ✅     |
+| Layer filter tabs in comments panel                             | ✅     |
+| "Welcome back" toast with user name when returning to document  | ✅     |
+| Scroll position restore (last read position)                    | ✅     |
+| Default annotation layer preference (persisted to localStorage) | ✅     |
+| Recently viewed documents tracking (localStorage, LRU 10)       | ✅     |
 
 ### Data Flow
+
 1. User selects text → `onSelectionUpdate` → `SelectionCommentButton` appears
 2. Click "Add Comment" → `CommentForm` popover opens
 3. Save → `addTextAnnotation` → `CREATE_ANNOTATION_MUTATION` with `spatialData: { from, to }`
@@ -42,38 +44,39 @@ Replaced the basic read-only `RichDocumentPage` with a full MS-Word-style docume
 
 ### New Files Created (Frontend — `apps/web/src/`)
 
-| File | Description |
-|------|-------------|
-| `components/ui/resizable.tsx` | shadcn/ui wrappers for react-resizable-panels v4 |
-| `components/annotation/AnnotationDecorationsPlugin.ts` | ProseMirror DecorationSet plugin for inline highlights |
-| `components/annotation/AnnotatedDocumentViewer.tsx` | Tiptap viewer with decoration, selection, click handling |
-| `components/annotation/CommentCard.tsx` | MS-Word style comment card (layer badge, date, reply thread) |
-| `components/annotation/CommentForm.tsx` | Floating comment form (Esc/Ctrl+Enter shortcuts) |
-| `components/annotation/SelectionCommentButton.tsx` | Floating "Add Comment" button on text selection |
-| `components/annotation/WordCommentPanel.tsx` | Right panel: filter tabs, sorted card list, auto-scroll |
-| `pages/DocumentAnnotationPage.tsx` | Main 3-panel assembly page |
-| `pages/DocumentAnnotationPage.toolbar.tsx` | Toolbar: back nav, zoom, default layer selector |
-| `hooks/useDocumentAnnotations.ts` | Data hook: fetches + filters text-range annotations |
-| `hooks/useDocumentScrollMemory.ts` | Persists scroll position (30-day TTL, debounced) |
-| `hooks/useRecentDocuments.ts` | LRU-10 recent documents in localStorage |
-| `test/stubs/tiptap-core-stub.ts` | Separate stub for @tiptap/core (avoids vi.mock cache collision) |
-| `test/stubs/tiptap-pm-state-stub.ts` | Separate stub for @tiptap/pm/state |
-| `test/stubs/tiptap-pm-view-stub.ts` | Separate stub for @tiptap/pm/view |
-| `test/stubs/tiptap-pm-model-stub.ts` | Separate stub for @tiptap/pm/model |
+| File                                                   | Description                                                     |
+| ------------------------------------------------------ | --------------------------------------------------------------- |
+| `components/ui/resizable.tsx`                          | shadcn/ui wrappers for react-resizable-panels v4                |
+| `components/annotation/AnnotationDecorationsPlugin.ts` | ProseMirror DecorationSet plugin for inline highlights          |
+| `components/annotation/AnnotatedDocumentViewer.tsx`    | Tiptap viewer with decoration, selection, click handling        |
+| `components/annotation/CommentCard.tsx`                | MS-Word style comment card (layer badge, date, reply thread)    |
+| `components/annotation/CommentForm.tsx`                | Floating comment form (Esc/Ctrl+Enter shortcuts)                |
+| `components/annotation/SelectionCommentButton.tsx`     | Floating "Add Comment" button on text selection                 |
+| `components/annotation/WordCommentPanel.tsx`           | Right panel: filter tabs, sorted card list, auto-scroll         |
+| `pages/DocumentAnnotationPage.tsx`                     | Main 3-panel assembly page                                      |
+| `pages/DocumentAnnotationPage.toolbar.tsx`             | Toolbar: back nav, zoom, default layer selector                 |
+| `hooks/useDocumentAnnotations.ts`                      | Data hook: fetches + filters text-range annotations             |
+| `hooks/useDocumentScrollMemory.ts`                     | Persists scroll position (30-day TTL, debounced)                |
+| `hooks/useRecentDocuments.ts`                          | LRU-10 recent documents in localStorage                         |
+| `test/stubs/tiptap-core-stub.ts`                       | Separate stub for @tiptap/core (avoids vi.mock cache collision) |
+| `test/stubs/tiptap-pm-state-stub.ts`                   | Separate stub for @tiptap/pm/state                              |
+| `test/stubs/tiptap-pm-view-stub.ts`                    | Separate stub for @tiptap/pm/view                               |
+| `test/stubs/tiptap-pm-model-stub.ts`                   | Separate stub for @tiptap/pm/model                              |
 
 ### Modified Files
 
-| File | Change |
-|------|--------|
-| `lib/store.ts` | Added `focusedAnnotationId` to `useUIStore`; new `useDocumentUIStore` (persisted: zoom, panelWidth, defaultLayer) |
-| `types/annotations.ts` | Added `TextRange` interface + `textRange?` on `Annotation` |
-| `components/editor/RichContentViewer.tsx` | Added optional `extensions?`, `onSelectionUpdate?`, `onEditorReady?` props |
-| `components/editor/editor.css` | Appended annotation highlight CSS (PERSONAL/SHARED/INSTRUCTOR/AI_GENERATED/focused) |
-| `lib/router.tsx` | `/document/:contentId` → `DocumentAnnotationPage` (was `RichDocumentPage`) |
-| `vitest.config.ts` | Added @tiptap/core, @tiptap/pm/* and react-resizable-panels stubs |
-| `apps/web/package.json` | Added `react-resizable-panels@4.6.5` |
+| File                                      | Change                                                                                                            |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `lib/store.ts`                            | Added `focusedAnnotationId` to `useUIStore`; new `useDocumentUIStore` (persisted: zoom, panelWidth, defaultLayer) |
+| `types/annotations.ts`                    | Added `TextRange` interface + `textRange?` on `Annotation`                                                        |
+| `components/editor/RichContentViewer.tsx` | Added optional `extensions?`, `onSelectionUpdate?`, `onEditorReady?` props                                        |
+| `components/editor/editor.css`            | Appended annotation highlight CSS (PERSONAL/SHARED/INSTRUCTOR/AI_GENERATED/focused)                               |
+| `lib/router.tsx`                          | `/document/:contentId` → `DocumentAnnotationPage` (was `RichDocumentPage`)                                        |
+| `vitest.config.ts`                        | Added @tiptap/core, @tiptap/pm/\* and react-resizable-panels stubs                                                |
+| `apps/web/package.json`                   | Added `react-resizable-panels@4.6.5`                                                                              |
 
 ### Key Technical Decisions
+
 - **ProseMirror decorations via refs**: Plugin reads `annotationsRef.current` (not stale closure) to rebuild `DecorationSet` whenever `tr.setMeta(annotationPluginKey, true)` is dispatched
 - **No DB schema change**: `spatialData: JSON` column already existed; text-range uses `{ from, to }` keys
 - **`addAnnotation` bypass**: `useAnnotations.addAnnotation` only accepts `timestamp` as 3rd param → `useDocumentAnnotations` calls `useMutation(CREATE_ANNOTATION_MUTATION)` directly
@@ -81,6 +84,7 @@ Replaced the basic read-only `RichDocumentPage` with a full MS-Word-style docume
 - **react-resizable-panels v4**: Uses `Group/Panel/Separator` (not `PanelGroup/PanelResizeHandle`), `orientation` (not `direction`), no `order` prop
 
 ### Tests
+
 - All 569 web unit tests pass (569/569)
 - TypeScript: 0 errors (`tsc --noEmit`)
 
@@ -118,27 +122,29 @@ Replaced the basic read-only `RichDocumentPage` with a full MS-Word-style docume
 
 All Hive infrastructure is in place. The following were verified and/or created:
 
-| Asset | Path | State |
-|-------|------|-------|
-| Hive CLI dependency | `apps/gateway/devDependencies["@graphql-hive/cli"]` | ✅ Exists (`latest`) |
-| `hive.json` config | `apps/gateway/hive.json` | ✅ Exists — uses `${HIVE_TOKEN}` env var |
-| `.env.example` placeholder | `apps/gateway/.env.example` — `HIVE_TOKEN=<your-graphql-hive-token>` | ✅ Exists |
-| `supergraph.graphql` | `apps/gateway/supergraph.graphql` | ✅ Exists (committed) |
-| CI `schema:check` step | `.github/workflows/federation.yml` — `breaking-changes` job | ✅ Exists — `continue-on-error` when token absent |
-| CI `schema:publish` step | `.github/workflows/federation.yml` — `publish-schema` job | ✅ Exists — publishes on push to `main`/`master` |
-| `schema:check` npm script | `apps/gateway/package.json` | ✅ Fixed path (`supergraph.graphql`, `--registry.accessToken $HIVE_TOKEN`) |
-| `schema:publish` npm script | `apps/gateway/package.json` | ✅ Fixed path (`supergraph.graphql`, `--registry.accessToken $HIVE_TOKEN`) |
+| Asset                       | Path                                                                 | State                                                                      |
+| --------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Hive CLI dependency         | `apps/gateway/devDependencies["@graphql-hive/cli"]`                  | ✅ Exists (`latest`)                                                       |
+| `hive.json` config          | `apps/gateway/hive.json`                                             | ✅ Exists — uses `${HIVE_TOKEN}` env var                                   |
+| `.env.example` placeholder  | `apps/gateway/.env.example` — `HIVE_TOKEN=<your-graphql-hive-token>` | ✅ Exists                                                                  |
+| `supergraph.graphql`        | `apps/gateway/supergraph.graphql`                                    | ✅ Exists (committed)                                                      |
+| CI `schema:check` step      | `.github/workflows/federation.yml` — `breaking-changes` job          | ✅ Exists — `continue-on-error` when token absent                          |
+| CI `schema:publish` step    | `.github/workflows/federation.yml` — `publish-schema` job            | ✅ Exists — publishes on push to `main`/`master`                           |
+| `schema:check` npm script   | `apps/gateway/package.json`                                          | ✅ Fixed path (`supergraph.graphql`, `--registry.accessToken $HIVE_TOKEN`) |
+| `schema:publish` npm script | `apps/gateway/package.json`                                          | ✅ Fixed path (`supergraph.graphql`, `--registry.accessToken $HIVE_TOKEN`) |
 
 ### Script Fixes Applied
 
 The `schema:check` and `schema:publish` scripts in `apps/gateway/package.json` were corrected:
 
 **Before (wrong — path was relative to project root, not gateway CWD):**
+
 ```
 "schema:check": "hive schema:check --service gateway --url http://localhost:4000/graphql --sdl apps/gateway/supergraph.graphql"
 ```
 
 **After (correct — path relative to gateway CWD, token from env var):**
+
 ```
 "schema:check": "hive schema:check --registry.accessToken $HIVE_TOKEN supergraph.graphql"
 "schema:publish": "hive schema:publish --registry.accessToken $HIVE_TOKEN --commit $npm_package_version supergraph.graphql"
@@ -147,6 +153,7 @@ The `schema:check` and `schema:publish` scripts in `apps/gateway/package.json` w
 ### `hive.json` Structure
 
 `apps/gateway/hive.json` is correctly configured with:
+
 - `"type": "federation"` + `"version": "2"` for Federation v2.7
 - `targets.production.registry.accessToken: "${HIVE_TOKEN}"` (env var, never hardcoded)
 - `targets.production.usage.accessToken: "${HIVE_TOKEN}"` (operation usage reporting)
@@ -154,10 +161,10 @@ The `schema:check` and `schema:publish` scripts in `apps/gateway/package.json` w
 
 ### CI Behavior
 
-| Scenario | Behavior |
-|----------|----------|
+| Scenario                               | Behavior                                                                                                                                              |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `HIVE_TOKEN` not set in GitHub Secrets | `breaking-changes` job runs but `hive schema:check` exits gracefully (`continue-on-error: true`). `publish-schema` job skips silently. No CI failure. |
-| `HIVE_TOKEN` set in GitHub Secrets | `breaking-changes` job validates against Hive registry on every PR. `publish-schema` job uploads supergraph after every push to `main`/`master`. |
+| `HIVE_TOKEN` set in GitHub Secrets     | `breaking-changes` job validates against Hive registry on every PR. `publish-schema` job uploads supergraph after every push to `main`/`master`.      |
 
 ### User Action Required
 

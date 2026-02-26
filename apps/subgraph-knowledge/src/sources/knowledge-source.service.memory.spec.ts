@@ -17,23 +17,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { mockCloseAllPools, mockDb } = vi.hoisted(() => {
   const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 
-  const mockReturning = vi.fn().mockResolvedValue([{
-    id: 'ks-mem-1',
-    tenant_id: 't-1',
-    course_id: 'c-1',
-    title: 'Memory Test',
-    source_type: 'TEXT',
-    origin: 'manual',
-    status: 'READY',
-    raw_content: 'hello',
-    chunk_count: 1,
-    error_message: null,
-    metadata: {},
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }]);
+  const mockReturning = vi.fn().mockResolvedValue([
+    {
+      id: 'ks-mem-1',
+      tenant_id: 't-1',
+      course_id: 'c-1',
+      title: 'Memory Test',
+      source_type: 'TEXT',
+      origin: 'manual',
+      status: 'READY',
+      raw_content: 'hello',
+      chunk_count: 1,
+      error_message: null,
+      metadata: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  ]);
 
-  const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning, orderBy: vi.fn().mockResolvedValue([]) });
+  const mockWhere = vi.fn().mockReturnValue({
+    returning: mockReturning,
+    orderBy: vi.fn().mockResolvedValue([]),
+  });
   const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
   const mockValues = vi.fn().mockReturnValue({ returning: mockReturning });
   const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
@@ -71,9 +76,15 @@ vi.mock('@edusphere/db', () => ({
 import { KnowledgeSourceService } from './knowledge-source.service.js';
 
 const mockParser = {
-  parseText: vi.fn().mockReturnValue({ text: 'hello', wordCount: 1, metadata: {} }),
-  parseUrl: vi.fn().mockResolvedValue({ text: 'url text', wordCount: 2, metadata: {} }),
-  parseDocx: vi.fn().mockResolvedValue({ text: 'docx', wordCount: 1, metadata: {} }),
+  parseText: vi
+    .fn()
+    .mockReturnValue({ text: 'hello', wordCount: 1, metadata: {} }),
+  parseUrl: vi
+    .fn()
+    .mockResolvedValue({ text: 'url text', wordCount: 2, metadata: {} }),
+  parseDocx: vi
+    .fn()
+    .mockResolvedValue({ text: 'docx', wordCount: 1, metadata: {} }),
   chunkText: vi.fn().mockReturnValue([{ index: 0, text: 'chunk' }]),
 };
 
@@ -87,11 +98,18 @@ describe('KnowledgeSourceService — memory safety', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Restore default mock implementations
-    mockParser.parseText.mockReturnValue({ text: 'hello', wordCount: 1, metadata: {} });
+    mockParser.parseText.mockReturnValue({
+      text: 'hello',
+      wordCount: 1,
+      metadata: {},
+    });
     mockParser.chunkText.mockReturnValue([{ index: 0, text: 'chunk' }]);
     mockEmbeddings.generateEmbedding.mockResolvedValue({ id: 'emb-1' });
 
-    service = new KnowledgeSourceService(mockParser as any, mockEmbeddings as any);
+    service = new KnowledgeSourceService(
+      mockParser as any,
+      mockEmbeddings as any
+    );
   });
 
   // ── Test 1: onModuleDestroy releases DB pool ───────────────────────────────
@@ -109,14 +127,25 @@ describe('KnowledgeSourceService — memory safety', () => {
 
   // ── Test 3: embedding failures do not throw (no dangling rejections) ───────
   it('createAndProcess() does not throw when all embeddings fail', async () => {
-    mockEmbeddings.generateEmbedding.mockRejectedValue(new Error('provider unavailable'));
+    mockEmbeddings.generateEmbedding.mockRejectedValue(
+      new Error('provider unavailable')
+    );
 
     // Ensure update resolves even for FAILED path
     const failedRow = {
-      id: 'ks-mem-1', status: 'FAILED', tenant_id: 't-1', course_id: 'c-1',
-      title: 'Test', source_type: 'TEXT', origin: 'manual',
-      chunk_count: 0, error_message: null, metadata: {}, raw_content: '',
-      created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      id: 'ks-mem-1',
+      status: 'FAILED',
+      tenant_id: 't-1',
+      course_id: 'c-1',
+      title: 'Test',
+      source_type: 'TEXT',
+      origin: 'manual',
+      chunk_count: 0,
+      error_message: null,
+      metadata: {},
+      raw_content: '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     // insert returns PENDING row
@@ -138,14 +167,16 @@ describe('KnowledgeSourceService — memory safety', () => {
     });
 
     // Should not throw — embedding errors are logged and counted, not re-thrown
-    await expect(service.createAndProcess({
-      tenantId: 't-1',
-      courseId: 'c-1',
-      title: 'Embed fail test',
-      sourceType: 'TEXT',
-      origin: 'manual',
-      rawText: 'embed fail',
-    })).resolves.toBeDefined();
+    await expect(
+      service.createAndProcess({
+        tenantId: 't-1',
+        courseId: 'c-1',
+        title: 'Embed fail test',
+        sourceType: 'TEXT',
+        origin: 'manual',
+        rawText: 'embed fail',
+      })
+    ).resolves.toBeDefined();
   });
 
   // ── Test 4: PROCESSING state is always resolved (no orphaned rows) ─────────
@@ -155,13 +186,26 @@ describe('KnowledgeSourceService — memory safety', () => {
     });
 
     const pendingRow = {
-      id: 'ks-orphan', status: 'PENDING', tenant_id: 't-1', course_id: 'c-1',
-      title: 'Orphan test', source_type: 'TEXT', origin: 'manual',
-      chunk_count: 0, error_message: null, metadata: {}, raw_content: '',
-      created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      id: 'ks-orphan',
+      status: 'PENDING',
+      tenant_id: 't-1',
+      course_id: 'c-1',
+      title: 'Orphan test',
+      source_type: 'TEXT',
+      origin: 'manual',
+      chunk_count: 0,
+      error_message: null,
+      metadata: {},
+      raw_content: '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
-    const failedRow = { ...pendingRow, status: 'FAILED', error_message: 'parser crash' };
+    const failedRow = {
+      ...pendingRow,
+      status: 'FAILED',
+      error_message: 'parser crash',
+    };
 
     mockDb.insert.mockReturnValue({
       values: vi.fn().mockReturnValue({

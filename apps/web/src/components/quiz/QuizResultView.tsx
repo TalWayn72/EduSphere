@@ -49,7 +49,9 @@ export function QuizResultView({ result, quiz, onRetry }: Props) {
                   <div>
                     <p className="font-medium">{item?.question}</p>
                     {ir.explanation && (
-                      <p className="text-xs text-muted-foreground mt-1">{ir.explanation}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {ir.explanation}
+                      </p>
                     )}
                   </div>
                 </div>

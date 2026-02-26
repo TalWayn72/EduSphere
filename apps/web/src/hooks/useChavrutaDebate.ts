@@ -35,7 +35,9 @@ const MOCK_RESPONSES = [
 
 const AI_CONSENT_KEY = 'edusphere_consent_AI_PROCESSING';
 
-function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)] as T; }
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)] as T;
+}
 
 export interface UseChavrutaDebateReturn {
   messages: DebateMessage[];
@@ -54,7 +56,9 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [needsConsent, setNeedsConsent] = useState(() => localStorage.getItem(AI_CONSENT_KEY) !== 'true');
+  const [needsConsent, setNeedsConsent] = useState(
+    () => localStorage.getItem(AI_CONSENT_KEY) !== 'true'
+  );
   const [subPaused, setSubPaused] = useState(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -80,8 +84,17 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
     if (!msg) return;
     setMessages((prev) => {
       const idx = prev.findIndex((m) => m.id === (msg.id as string));
-      const incoming: DebateMessage = { id: msg.id as string, role: 'ai', content: msg.content as string, timestamp: new Date() };
-      if (idx !== -1) { const u = [...prev]; u[idx] = incoming; return u; }
+      const incoming: DebateMessage = {
+        id: msg.id as string,
+        role: 'ai',
+        content: msg.content as string,
+        timestamp: new Date(),
+      };
+      if (idx !== -1) {
+        const u = [...prev];
+        u[idx] = incoming;
+        return u;
+      }
       return [...prev, incoming];
     });
     setIsLoading(false);
@@ -92,41 +105,80 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
     setNeedsConsent(false);
   }, []);
 
-  const submitArgument = useCallback(async (text: string): Promise<void> => {
-    if (!text.trim() || needsConsent) return;
-    setMessages((prev) => [...prev, { id: `user-${Date.now()}`, role: 'user', content: text.trim(), timestamp: new Date() }]);
-    setIsLoading(true);
-    setError(null);
+  const submitArgument = useCallback(
+    async (text: string): Promise<void> => {
+      if (!text.trim() || needsConsent) return;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `user-${Date.now()}`,
+          role: 'user',
+          content: text.trim(),
+          timestamp: new Date(),
+        },
+      ]);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      let sid = sessionId;
-      if (!sid) {
-        const res = await startSession({ templateType: 'CHAVRUTA_DEBATE', context: { topicId: topicId ?? topic }, locale: i18n.language });
-        sid = (res.data?.startAgentSession?.id as string | null) ?? null;
-        if (sid) { setSessionId(sid); setSubPaused(false); }
-      }
-      if (sid) {
-        const res = await sendAgentMessage({ sessionId: sid, content: text.trim() });
-        const reply = res.data?.sendMessage;
-        if (reply) {
-          setMessages((prev) => [...prev, { id: reply.id as string, role: 'ai', content: reply.content as string, timestamp: new Date() }]);
-          setIsLoading(false);
+      try {
+        let sid = sessionId;
+        if (!sid) {
+          const res = await startSession({
+            templateType: 'CHAVRUTA_DEBATE',
+            context: { topicId: topicId ?? topic },
+            locale: i18n.language,
+          });
+          sid = (res.data?.startAgentSession?.id as string | null) ?? null;
+          if (sid) {
+            setSessionId(sid);
+            setSubPaused(false);
+          }
+        }
+        if (sid) {
+          const res = await sendAgentMessage({
+            sessionId: sid,
+            content: text.trim(),
+          });
+          const reply = res.data?.sendMessage;
+          if (reply) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: reply.id as string,
+                role: 'ai',
+                content: reply.content as string,
+                timestamp: new Date(),
+              },
+            ]);
+            setIsLoading(false);
+            return;
+          }
+          // Streaming response arrives via subscription; watchdog prevents infinite spinner
+          timerRef.current = setTimeout(() => setIsLoading(false), 30_000);
           return;
         }
-        // Streaming response arrives via subscription; watchdog prevents infinite spinner
-        timerRef.current = setTimeout(() => setIsLoading(false), 30_000);
-        return;
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to send argument'
+        );
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send argument');
-    }
 
-    // Fallback mock when backend is unavailable
-    timerRef.current = setTimeout(() => {
-      setMessages((prev) => [...prev, { id: `ai-${Date.now()}`, role: 'ai', content: pick(MOCK_RESPONSES), timestamp: new Date() }]);
-      setIsLoading(false);
-    }, 900);
-  }, [needsConsent, sessionId, startSession, sendAgentMessage, topicId, topic]);
+      // Fallback mock when backend is unavailable
+      timerRef.current = setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `ai-${Date.now()}`,
+            role: 'ai',
+            content: pick(MOCK_RESPONSES),
+            timestamp: new Date(),
+          },
+        ]);
+        setIsLoading(false);
+      }, 900);
+    },
+    [needsConsent, sessionId, startSession, sendAgentMessage, topicId, topic]
+  );
 
   const startNewTopic = useCallback(() => {
     setMessages([]);
@@ -138,5 +190,14 @@ export function useChavrutaDebate(topicId?: string): UseChavrutaDebateReturn {
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
 
-  return { messages, topic, isLoading, error, needsConsent, grantConsent, submitArgument, startNewTopic };
+  return {
+    messages,
+    topic,
+    isLoading,
+    error,
+    needsConsent,
+    grantConsent,
+    submitArgument,
+    startNewTopic,
+  };
 }

@@ -28,6 +28,7 @@
 EduSphere is a next-generation educational platform that leverages knowledge graphs, AI agents, and semantic search to transform passive content consumption into active, personalized learning experiences. Built on a modern GraphQL Federation architecture with Apache AGE knowledge graphs and pgvector semantic search, EduSphere enables educational institutions to deliver rich, interconnected learning content at scale.
 
 **Key Differentiators:**
+
 - **Knowledge Graph-Native Learning**: Every concept, annotation, and piece of content is connected in a semantic graph, enabling discovery of relationships, contradictions, and prerequisites
 - **AI-Powered Learning Companions**: Multiple AI agent templates (Chavruta debate partner, quiz master, research scout) adapt to individual learning styles
 - **HybridRAG Architecture**: Combines vector semantic search with graph traversal for contextually rich AI responses
@@ -44,6 +45,7 @@ EduSphere is a next-generation educational platform that leverages knowledge gra
 **Deployment Model:** Multi-tenant SaaS with enterprise self-hosted option
 
 **Pricing Tiers:**
+
 - **FREE**: 10 users, 5GB storage, basic AI agents (10 executions/day)
 - **STARTER**: 100 users, 50GB storage, all AI templates (100 executions/day)
 - **PROFESSIONAL**: 1,000 users, 500GB storage, unlimited AI (1,000 executions/day)
@@ -68,6 +70,7 @@ EduSphere is a next-generation educational platform that leverages knowledge gra
 ### 2.2 Mission Statement
 
 EduSphere empowers learners, instructors, and researchers to:
+
 - **Discover** hidden connections between concepts across courses and domains
 - **Debate** ideas with AI partners trained in dialectical reasoning (Chavruta methodology)
 - **Annotate** content collaboratively across multiple semantic layers
@@ -79,6 +82,7 @@ EduSphere empowers learners, instructors, and researchers to:
 
 **Knowledge as a Graph, Not a Tree**
 Traditional learning platforms organize content hierarchically (courses → modules → lessons). EduSphere treats knowledge as a **directed graph** where:
+
 - Concepts have PREREQUISITE_OF, RELATED_TO, and CONTRADICTS edges
 - Annotations reference transcript segments, which are anchored to media assets
 - AI agents traverse the graph to provide contextually rich explanations
@@ -86,6 +90,7 @@ Traditional learning platforms organize content hierarchically (courses → modu
 
 **AI as a Learning Partner, Not an Oracle**
 EduSphere's AI agents are designed to:
+
 - Ask Socratic questions rather than provide direct answers
 - Present contradictory viewpoints to stimulate critical thinking
 - Generate adaptive quizzes based on prerequisite chains
@@ -93,6 +98,7 @@ EduSphere's AI agents are designed to:
 
 **Collaboration with Semantic Layers**
 Annotations are not flat comments but structured, layered contributions:
+
 - **PERSONAL**: Private notes and highlights
 - **SHARED**: Public student contributions
 - **INSTRUCTOR**: Authoritative guidance and corrections
@@ -105,24 +111,28 @@ Annotations are not flat comments but structured, layered contributions:
 ### 3.1 Persona 1: Dr. Sarah Cohen — University Professor
 
 **Demographics:**
+
 - Age: 42
 - Role: Associate Professor of Medieval Jewish Philosophy
 - Institution: Bar-Ilan University
 - Tech Proficiency: Moderate (comfortable with LMS, Google Workspace)
 
 **Goals:**
+
 - Deliver engaging lectures on complex Talmudic debates
 - Enable students to explore contradictions between Rambam and Rashi interpretations
 - Track which students are struggling with prerequisite concepts
 - Create reusable knowledge graphs for future cohorts
 
 **Pain Points:**
+
 - Existing LMS platforms treat content as isolated files, not interconnected knowledge
 - Students passively watch lecture recordings without engaging critically
 - No way to visualize how concepts build upon each other or contradict
 - Grading annotations is time-consuming with no semantic organization
 
 **User Journey:**
+
 1. Uploads lecture video (automatically transcribed)
 2. Reviews AI-generated concept extraction and contradiction detection
 3. Adds INSTRUCTOR layer annotations to highlight key debates
@@ -131,6 +141,7 @@ Annotations are not flat comments but structured, layered contributions:
 6. Dr. Cohen reviews the knowledge graph to identify gaps in understanding
 
 **Success Metrics:**
+
 - 80% of students actively create annotations (vs. 20% in traditional LMS)
 - Average session time increases 3x with AI agent engagement
 - Prerequisite concept mastery improves by 40% based on quiz performance
@@ -140,24 +151,28 @@ Annotations are not flat comments but structured, layered contributions:
 ### 3.2 Persona 2: Michael Kim — Graduate Student
 
 **Demographics:**
+
 - Age: 26
 - Role: PhD candidate in Comparative Religion
 - Institution: Columbia University
 - Tech Proficiency: High (uses Zotero, Obsidian, Python for text analysis)
 
 **Goals:**
+
 - Trace the intellectual lineage of a theological concept across 10+ scholars
 - Identify contradictory interpretations in primary sources
 - Collaborate with peers on shared annotations
 - Export knowledge graph data for dissertation analysis
 
 **Pain Points:**
+
 - Video lectures lack searchable transcripts
 - No way to annotate PDFs and videos in the same system
 - Contradictions are discovered manually through note comparison
 - Can't visualize how different scholars' ideas are interconnected
 
 **User Journey:**
+
 1. Searches semantically for "divine attributes" across all course content
 2. HybridRAG returns transcript segments + related concepts from knowledge graph
 3. Creates spatial comments on video timestamps and PDF passages
@@ -166,6 +181,7 @@ Annotations are not flat comments but structured, layered contributions:
 6. Shares annotations with study group using SHARED layer
 
 **Success Metrics:**
+
 - Discovery time for cross-domain connections reduced from 10 hours to 30 minutes
 - 50+ contradictions identified automatically vs. 5 manually
 - 90% of dissertation citations come from EduSphere knowledge graph
@@ -175,24 +191,28 @@ Annotations are not flat comments but structured, layered contributions:
 ### 3.3 Persona 3: Jessica Martinez — Undergraduate Student
 
 **Demographics:**
+
 - Age: 19
 - Role: Sophomore studying Biology
 - Institution: Community College
 - Tech Proficiency: Moderate (uses TikTok, Google Docs, basic LMS)
 
 **Goals:**
+
 - Understand prerequisite concepts before exams
 - Get personalized quiz questions based on her weak areas
 - Study collaboratively with classmates in real-time
 - Receive immediate feedback without waiting for TA office hours
 
 **Pain Points:**
+
 - Doesn't know which concepts to review first
 - Static quizzes don't adapt to her knowledge gaps
 - Video lectures are long and hard to navigate
 - Peer study sessions are disorganized and lack structure
 
 **User Journey:**
+
 1. Opens course and sees recommended learning path based on prerequisites
 2. Watches lecture video with AI-generated bookmarks for key concepts
 3. Creates PERSONAL layer highlights on confusing segments
@@ -201,6 +221,7 @@ Annotations are not flat comments but structured, layered contributions:
 6. Reviews AI-generated summary of the session with action items
 
 **Success Metrics:**
+
 - Exam scores improve 15% vs. control group using traditional LMS
 - 70% of students use adaptive quizzing weekly
 - Peer collaboration sessions increase from 1/month to 4/month
@@ -210,24 +231,28 @@ Annotations are not flat comments but structured, layered contributions:
 ### 3.4 Persona 4: David Schwartz — IT Administrator
 
 **Demographics:**
+
 - Age: 38
 - Role: Director of Educational Technology
 - Institution: Yeshiva University
 - Tech Proficiency: Expert (manages Keycloak, Kubernetes, PostgreSQL)
 
 **Goals:**
+
 - Deploy EduSphere for 5,000 users with SSO integration
 - Ensure data residency compliance (GDPR, FERPA)
 - Monitor platform performance and resource usage
 - Customize branding and ontology fields for Judaic studies
 
 **Pain Points:**
+
 - Vendor lock-in with proprietary LMS solutions
 - No visibility into actual usage patterns or bottlenecks
 - AI costs are unpredictable and can spike unexpectedly
 - Can't extend the data model for institution-specific metadata
 
 **User Journey:**
+
 1. Deploys EduSphere via Kubernetes Helm chart
 2. Configures Keycloak realm with university SSO
 3. Customizes tenant settings to add "Masechta" and "Perek" ontology fields
@@ -236,6 +261,7 @@ Annotations are not flat comments but structured, layered contributions:
 6. Reviews audit logs for FERPA compliance
 
 **Success Metrics:**
+
 - Zero data breaches or compliance violations
 - 99.9% uptime SLA achieved
 - AI costs stay within $2/user/month budget
@@ -246,24 +272,28 @@ Annotations are not flat comments but structured, layered contributions:
 ### 3.5 Persona 5: Dr. Amara Okafor — Educational Researcher
 
 **Demographics:**
+
 - Age: 51
 - Role: Senior Research Scientist at Learning Sciences Institute
 - Institution: Carnegie Mellon University
 - Tech Proficiency: High (R, Python, SQL, graph databases)
 
 **Goals:**
+
 - Study how students form mental models of interconnected concepts
 - Analyze annotation patterns to identify learning bottlenecks
 - Test hypotheses about AI agent effectiveness on learning outcomes
 - Publish findings on knowledge graph-augmented learning
 
 **Pain Points:**
+
 - Can't access raw data from commercial LMS platforms
 - No API for querying knowledge graph structure
 - Annotation data is unstructured and lacks semantic metadata
 - AI agent interactions are black boxes
 
 **User Journey:**
+
 1. Exports anonymized knowledge graph data via GraphQL API
 2. Queries `relatedConcepts(maxDepth: 3)` to analyze concept clustering
 3. Analyzes annotation layers to measure instructor vs. student contribution ratios
@@ -272,6 +302,7 @@ Annotations are not flat comments but structured, layered contributions:
 6. Publishes paper: "HybridRAG Improves Retention by 28% in STEM Courses"
 
 **Success Metrics:**
+
 - 10+ research papers published using EduSphere data
 - Platform cited in 50+ education technology studies
 - 3 patent applications for graph-based learning analytics
@@ -284,37 +315,37 @@ Annotations are not flat comments but structured, layered contributions:
 
 #### 4.1.1 Course & Module Structure
 
-| Feature | Description | User Roles | Priority |
-|---------|-------------|-----------|----------|
-| **Course Creation** | Create courses with title, description, structured syllabus (JSON tree), version control | Instructor, Org Admin | P0 |
-| **Module Organization** | Organize courses into modules with drag-and-drop reordering | Instructor | P0 |
-| **Course Publishing** | Toggle course visibility (draft vs. published for students) | Instructor | P0 |
-| **Course Forking** | Clone a course while maintaining lineage link to original | Instructor | P1 |
-| **Versioning** | Monotonically increasing version numbers with change tracking | Instructor | P1 |
-| **Tags & Metadata** | Categorize courses with searchable tags and custom metadata | Instructor, Org Admin | P1 |
+| Feature                 | Description                                                                              | User Roles            | Priority |
+| ----------------------- | ---------------------------------------------------------------------------------------- | --------------------- | -------- |
+| **Course Creation**     | Create courses with title, description, structured syllabus (JSON tree), version control | Instructor, Org Admin | P0       |
+| **Module Organization** | Organize courses into modules with drag-and-drop reordering                              | Instructor            | P0       |
+| **Course Publishing**   | Toggle course visibility (draft vs. published for students)                              | Instructor            | P0       |
+| **Course Forking**      | Clone a course while maintaining lineage link to original                                | Instructor            | P1       |
+| **Versioning**          | Monotonically increasing version numbers with change tracking                            | Instructor            | P1       |
+| **Tags & Metadata**     | Categorize courses with searchable tags and custom metadata                              | Instructor, Org Admin | P1       |
 
 #### 4.1.2 Media Asset Management
 
-| Feature | Description | User Roles | Priority |
-|---------|-------------|-----------|----------|
-| **Multipart File Upload** | Presigned S3 URLs for direct upload (videos, PDFs, audio, images) | Instructor, Student (limited) | P0 |
-| **Automatic Transcription** | faster-whisper GPU-accelerated speech-to-text with speaker diarization | System | P0 |
-| **HLS Video Streaming** | Adaptive bitrate streaming via HLS manifests | All authenticated | P0 |
-| **Thumbnail Generation** | Auto-generate video thumbnails and PDF previews | System | P1 |
-| **Media Metadata** | Extract and store codec, bitrate, duration, resolution | System | P1 |
-| **Transcript Search** | Full-text search across all transcript segments | All authenticated | P0 |
-| **Time-Range Queries** | Retrieve transcript segments for specific video timestamps | All authenticated | P0 |
-| **Re-transcription** | Manually trigger re-transcription (e.g., after model upgrade) | Instructor | P2 |
+| Feature                     | Description                                                            | User Roles                    | Priority |
+| --------------------------- | ---------------------------------------------------------------------- | ----------------------------- | -------- |
+| **Multipart File Upload**   | Presigned S3 URLs for direct upload (videos, PDFs, audio, images)      | Instructor, Student (limited) | P0       |
+| **Automatic Transcription** | faster-whisper GPU-accelerated speech-to-text with speaker diarization | System                        | P0       |
+| **HLS Video Streaming**     | Adaptive bitrate streaming via HLS manifests                           | All authenticated             | P0       |
+| **Thumbnail Generation**    | Auto-generate video thumbnails and PDF previews                        | System                        | P1       |
+| **Media Metadata**          | Extract and store codec, bitrate, duration, resolution                 | System                        | P1       |
+| **Transcript Search**       | Full-text search across all transcript segments                        | All authenticated             | P0       |
+| **Time-Range Queries**      | Retrieve transcript segments for specific video timestamps             | All authenticated             | P0       |
+| **Re-transcription**        | Manually trigger re-transcription (e.g., after model upgrade)          | Instructor                    | P2       |
 
 #### 4.1.3 Transcript Management
 
-| Feature | Description | User Roles | Priority |
-|---------|-------------|-----------|----------|
-| **Segment-Level Granularity** | Store transcripts as time-aligned segments (start/end timestamps) | System | P0 |
-| **Confidence Scores** | Track per-segment and overall confidence from transcription model | System | P1 |
-| **Language Detection** | Automatic ISO 639-1 language code detection | System | P1 |
-| **Speaker Diarization** | Tag segments with speaker identifiers | System | P1 |
-| **Embedding Generation** | Auto-generate pgvector embeddings (768-dim nomic-embed-text) for each segment | System | P0 |
+| Feature                       | Description                                                                   | User Roles | Priority |
+| ----------------------------- | ----------------------------------------------------------------------------- | ---------- | -------- |
+| **Segment-Level Granularity** | Store transcripts as time-aligned segments (start/end timestamps)             | System     | P0       |
+| **Confidence Scores**         | Track per-segment and overall confidence from transcription model             | System     | P1       |
+| **Language Detection**        | Automatic ISO 639-1 language code detection                                   | System     | P1       |
+| **Speaker Diarization**       | Tag segments with speaker identifiers                                         | System     | P1       |
+| **Embedding Generation**      | Auto-generate pgvector embeddings (768-dim nomic-embed-text) for each segment | System     | P0       |
 
 ---
 
@@ -322,34 +353,34 @@ Annotations are not flat comments but structured, layered contributions:
 
 #### 4.2.1 Annotation Types
 
-| Type | Description | Use Cases | Priority |
-|------|-------------|-----------|----------|
-| **TEXT** | Text highlights with optional comments | Note-taking, emphasis | P0 |
-| **SKETCH** | Canvas-based drawings (Konva.js) overlaid on video/PDF | Visual explanations, diagrams | P1 |
-| **LINK** | Hyperlinks to external resources or internal content | Citations, cross-references | P1 |
-| **BOOKMARK** | Timestamp markers with labels | Quick navigation, key moments | P0 |
-| **SPATIAL_COMMENT** | Positioned comments at specific video timestamps or PDF coordinates | Contextual discussion | P0 |
+| Type                | Description                                                         | Use Cases                     | Priority |
+| ------------------- | ------------------------------------------------------------------- | ----------------------------- | -------- |
+| **TEXT**            | Text highlights with optional comments                              | Note-taking, emphasis         | P0       |
+| **SKETCH**          | Canvas-based drawings (Konva.js) overlaid on video/PDF              | Visual explanations, diagrams | P1       |
+| **LINK**            | Hyperlinks to external resources or internal content                | Citations, cross-references   | P1       |
+| **BOOKMARK**        | Timestamp markers with labels                                       | Quick navigation, key moments | P0       |
+| **SPATIAL_COMMENT** | Positioned comments at specific video timestamps or PDF coordinates | Contextual discussion         | P0       |
 
 #### 4.2.2 Annotation Layers
 
-| Layer | Visibility | Use Case | Priority |
-|-------|-----------|----------|----------|
-| **PERSONAL** | Only the creator | Private study notes | P0 |
-| **SHARED** | All students in tenant | Peer collaboration | P0 |
-| **INSTRUCTOR** | All users (read), instructor (write) | Authoritative guidance | P0 |
-| **AI_GENERATED** | All users (read), AI agents (write) | AI insights, concept highlights | P0 |
+| Layer            | Visibility                           | Use Case                        | Priority |
+| ---------------- | ------------------------------------ | ------------------------------- | -------- |
+| **PERSONAL**     | Only the creator                     | Private study notes             | P0       |
+| **SHARED**       | All students in tenant               | Peer collaboration              | P0       |
+| **INSTRUCTOR**   | All users (read), instructor (write) | Authoritative guidance          | P0       |
+| **AI_GENERATED** | All users (read), AI agents (write)  | AI insights, concept highlights | P0       |
 
 #### 4.2.3 Annotation Features
 
-| Feature | Description | User Roles | Priority |
-|---------|-------------|-----------|----------|
-| **Thread Support** | Nested replies to annotations (root annotation + children) | All authenticated | P0 |
-| **Layer Filtering** | Toggle visibility of each layer independently | All authenticated | P0 |
-| **Pin Annotations** | Mark annotations as "starred" for quick access | All authenticated | P1 |
-| **Resolve Annotations** | Mark discussion threads as resolved | Instructor | P1 |
-| **Move Between Layers** | Promote student annotations to INSTRUCTOR layer | Instructor | P1 |
-| **Real-Time Sync** | WebSocket subscriptions for live annotation updates | All authenticated | P0 |
-| **Owner-Only Enforcement** | PERSONAL layer annotations are RLS-protected | System | P0 |
+| Feature                    | Description                                                | User Roles        | Priority |
+| -------------------------- | ---------------------------------------------------------- | ----------------- | -------- |
+| **Thread Support**         | Nested replies to annotations (root annotation + children) | All authenticated | P0       |
+| **Layer Filtering**        | Toggle visibility of each layer independently              | All authenticated | P0       |
+| **Pin Annotations**        | Mark annotations as "starred" for quick access             | All authenticated | P1       |
+| **Resolve Annotations**    | Mark discussion threads as resolved                        | Instructor        | P1       |
+| **Move Between Layers**    | Promote student annotations to INSTRUCTOR layer            | Instructor        | P1       |
+| **Real-Time Sync**         | WebSocket subscriptions for live annotation updates        | All authenticated | P0       |
+| **Owner-Only Enforcement** | PERSONAL layer annotations are RLS-protected               | System            | P0       |
 
 ---
 
@@ -357,23 +388,23 @@ Annotations are not flat comments but structured, layered contributions:
 
 #### 4.3.1 Real-Time Collaborative Editing
 
-| Feature | Description | Technology | Priority |
-|---------|-------------|-----------|----------|
-| **CRDT Sync** | Yjs-based conflict-free replicated data type synchronization | Yjs + Hocuspocus | P0 |
-| **Presence Awareness** | Live cursors and participant list | Yjs awareness | P0 |
-| **WebSocket Connection** | Persistent WebSocket for low-latency updates | Hocuspocus server | P0 |
-| **Document Persistence** | CRDT updates stored in `crdt_updates` table | PostgreSQL | P0 |
-| **Compaction** | Periodic CRDT history compaction to reduce storage | Background job | P1 |
-| **Offline Support** | Queue changes while offline, sync on reconnect | Yjs offline provider | P1 |
+| Feature                  | Description                                                  | Technology           | Priority |
+| ------------------------ | ------------------------------------------------------------ | -------------------- | -------- |
+| **CRDT Sync**            | Yjs-based conflict-free replicated data type synchronization | Yjs + Hocuspocus     | P0       |
+| **Presence Awareness**   | Live cursors and participant list                            | Yjs awareness        | P0       |
+| **WebSocket Connection** | Persistent WebSocket for low-latency updates                 | Hocuspocus server    | P0       |
+| **Document Persistence** | CRDT updates stored in `crdt_updates` table                  | PostgreSQL           | P0       |
+| **Compaction**           | Periodic CRDT history compaction to reduce storage           | Background job       | P1       |
+| **Offline Support**      | Queue changes while offline, sync on reconnect               | Yjs offline provider | P1       |
 
 #### 4.3.2 Collaboration Sessions
 
-| Feature | Description | User Roles | Priority |
-|---------|-------------|-----------|----------|
-| **Session Tracking** | Track active collaboration sessions with participant list | System | P1 |
-| **Session History** | View past collaboration sessions and participants | All authenticated | P2 |
-| **Access Control** | Session-level permissions tied to annotation layers | System | P1 |
-| **Connection Info** | Provide WebSocket URL + JWT auth token for CRDT connection | All authenticated | P0 |
+| Feature              | Description                                                | User Roles        | Priority |
+| -------------------- | ---------------------------------------------------------- | ----------------- | -------- |
+| **Session Tracking** | Track active collaboration sessions with participant list  | System            | P1       |
+| **Session History**  | View past collaboration sessions and participants          | All authenticated | P2       |
+| **Access Control**   | Session-level permissions tied to annotation layers        | System            | P1       |
+| **Connection Info**  | Provide WebSocket URL + JWT auth token for CRDT connection | All authenticated | P0       |
 
 ---
 
@@ -381,36 +412,36 @@ Annotations are not flat comments but structured, layered contributions:
 
 #### 4.4.1 Agent Templates
 
-| Template | Description | Methodology | Priority |
-|----------|-------------|-------------|----------|
-| **CHAVRUTA** | Dialectical debate partner using CONTRADICTS edges | Socratic questioning | P0 |
-| **SUMMARIZER** | Progressive summarization (overview → detailed → expert) | Hierarchical abstraction | P0 |
-| **QUIZ_MASTER** | Adaptive quiz generation based on PREREQUISITE_OF chains | Mastery learning | P0 |
-| **RESEARCH_SCOUT** | Cross-reference finder with contradiction detection | Graph traversal | P1 |
-| **EXPLAINER** | Adaptive explanations with prerequisite scaffolding | Bloom's taxonomy | P1 |
-| **CUSTOM** | User-defined JSON state machine | LangGraph.js | P2 |
+| Template           | Description                                              | Methodology              | Priority |
+| ------------------ | -------------------------------------------------------- | ------------------------ | -------- |
+| **CHAVRUTA**       | Dialectical debate partner using CONTRADICTS edges       | Socratic questioning     | P0       |
+| **SUMMARIZER**     | Progressive summarization (overview → detailed → expert) | Hierarchical abstraction | P0       |
+| **QUIZ_MASTER**    | Adaptive quiz generation based on PREREQUISITE_OF chains | Mastery learning         | P0       |
+| **RESEARCH_SCOUT** | Cross-reference finder with contradiction detection      | Graph traversal          | P1       |
+| **EXPLAINER**      | Adaptive explanations with prerequisite scaffolding      | Bloom's taxonomy         | P1       |
+| **CUSTOM**         | User-defined JSON state machine                          | LangGraph.js             | P2       |
 
 #### 4.4.2 Agent Features
 
-| Feature | Description | Technology | Priority |
-|---------|-------------|-----------|----------|
-| **State Machine Workflows** | LangGraph.js graphs with nodes/edges/checkpoints | LangGraph.js | P0 |
-| **Streaming Responses** | Token-by-token streaming via NATS subjects | Vercel AI SDK | P0 |
-| **MCP Tool Integration** | Sandboxed tools: knowledge_graph, semantic_search, transcript_reader, annotation_writer | Custom MCP proxy | P0 |
-| **Execution Lifecycle** | QUEUED → RUNNING → COMPLETED/FAILED/CANCELLED | State machine | P0 |
-| **Resource Limits** | Per-tenant execution quotas, timeouts, memory limits | NestJS guards | P0 |
-| **Cancellation** | User-triggered execution cancellation | GraphQL mutation | P1 |
-| **Execution History** | Audit log of all agent executions with inputs/outputs | PostgreSQL | P1 |
+| Feature                     | Description                                                                             | Technology       | Priority |
+| --------------------------- | --------------------------------------------------------------------------------------- | ---------------- | -------- |
+| **State Machine Workflows** | LangGraph.js graphs with nodes/edges/checkpoints                                        | LangGraph.js     | P0       |
+| **Streaming Responses**     | Token-by-token streaming via NATS subjects                                              | Vercel AI SDK    | P0       |
+| **MCP Tool Integration**    | Sandboxed tools: knowledge_graph, semantic_search, transcript_reader, annotation_writer | Custom MCP proxy | P0       |
+| **Execution Lifecycle**     | QUEUED → RUNNING → COMPLETED/FAILED/CANCELLED                                           | State machine    | P0       |
+| **Resource Limits**         | Per-tenant execution quotas, timeouts, memory limits                                    | NestJS guards    | P0       |
+| **Cancellation**            | User-triggered execution cancellation                                                   | GraphQL mutation | P1       |
+| **Execution History**       | Audit log of all agent executions with inputs/outputs                                   | PostgreSQL       | P1       |
 
 #### 4.4.3 AI Agent Sandboxing
 
-| Feature | Description | Priority |
-|---------|-------------|----------|
-| **No Direct DB Access** | Agents interact via MCP tools, not raw SQL/Cypher | P0 |
-| **Tenant Isolation** | Agents cannot access other tenants' data | P0 |
-| **Rate Limiting** | Per-tenant execution quotas enforced at gateway | P0 |
-| **Timeout Enforcement** | Execution killed after plan-specific timeout (30s–300s) | P0 |
-| **Memory Limits** | Plan-specific memory caps (256MB–2GB) | P1 |
+| Feature                 | Description                                             | Priority |
+| ----------------------- | ------------------------------------------------------- | -------- |
+| **No Direct DB Access** | Agents interact via MCP tools, not raw SQL/Cypher       | P0       |
+| **Tenant Isolation**    | Agents cannot access other tenants' data                | P0       |
+| **Rate Limiting**       | Per-tenant execution quotas enforced at gateway         | P0       |
+| **Timeout Enforcement** | Execution killed after plan-specific timeout (30s–300s) | P0       |
+| **Memory Limits**       | Plan-specific memory caps (256MB–2GB)                   | P1       |
 
 ---
 
@@ -420,42 +451,42 @@ Annotations are not flat comments but structured, layered contributions:
 
 **Vertex Types:**
 
-| Type | Description | Properties | Priority |
-|------|-------------|-----------|----------|
-| **Concept** | Abstract idea or term | `name`, `definition`, `tenant_id`, `created_at` | P0 |
-| **Person** | Author, scholar, historical figure | `name`, `bio`, `born`, `died` | P1 |
-| **Term** | Specialized vocabulary | `term`, `definition`, `language` | P1 |
-| **Source** | Primary text or reference | `title`, `author`, `year`, `url` | P1 |
-| **TopicCluster** | Thematic grouping of concepts | `name`, `description`, `color` | P1 |
+| Type             | Description                        | Properties                                      | Priority |
+| ---------------- | ---------------------------------- | ----------------------------------------------- | -------- |
+| **Concept**      | Abstract idea or term              | `name`, `definition`, `tenant_id`, `created_at` | P0       |
+| **Person**       | Author, scholar, historical figure | `name`, `bio`, `born`, `died`                   | P1       |
+| **Term**         | Specialized vocabulary             | `term`, `definition`, `language`                | P1       |
+| **Source**       | Primary text or reference          | `title`, `author`, `year`, `url`                | P1       |
+| **TopicCluster** | Thematic grouping of concepts      | `name`, `description`, `color`                  | P1       |
 
 **Edge Types:**
 
-| Type | Description | Properties | Priority |
-|------|-------------|-----------|----------|
-| **RELATED_TO** | General semantic relationship | `strength` (0-1), `bidirectional` | P0 |
-| **CONTRADICTS** | Logical contradiction | `description`, `severity` | P0 |
-| **PREREQUISITE_OF** | Learning dependency | `required_mastery_level` (0-1) | P0 |
-| **MENTIONS** | Concept appears in segment/annotation | `context`, `timestamp` | P0 |
-| **CITES** | Formal citation relationship | `citation_text` | P1 |
-| **AUTHORED_BY** | Authorship | — | P1 |
-| **INFERRED_RELATED** | AI-generated relationship (pending review) | `confidence`, `source_model` | P1 |
-| **REFERS_TO** | Cross-reference | — | P2 |
-| **DERIVED_FROM** | Intellectual lineage | `transformation_type` | P2 |
-| **BELONGS_TO** | Cluster membership | — | P1 |
+| Type                 | Description                                | Properties                        | Priority |
+| -------------------- | ------------------------------------------ | --------------------------------- | -------- |
+| **RELATED_TO**       | General semantic relationship              | `strength` (0-1), `bidirectional` | P0       |
+| **CONTRADICTS**      | Logical contradiction                      | `description`, `severity`         | P0       |
+| **PREREQUISITE_OF**  | Learning dependency                        | `required_mastery_level` (0-1)    | P0       |
+| **MENTIONS**         | Concept appears in segment/annotation      | `context`, `timestamp`            | P0       |
+| **CITES**            | Formal citation relationship               | `citation_text`                   | P1       |
+| **AUTHORED_BY**      | Authorship                                 | —                                 | P1       |
+| **INFERRED_RELATED** | AI-generated relationship (pending review) | `confidence`, `source_model`      | P1       |
+| **REFERS_TO**        | Cross-reference                            | —                                 | P2       |
+| **DERIVED_FROM**     | Intellectual lineage                       | `transformation_type`             | P2       |
+| **BELONGS_TO**       | Cluster membership                         | —                                 | P1       |
 
 #### 4.5.2 Knowledge Graph Features
 
-| Feature | Description | Technology | Priority |
-|---------|-------------|-----------|----------|
-| **Concept CRUD** | Create, read, update, delete concepts | GraphQL mutations | P0 |
-| **Relation CRUD** | Create, delete edges between vertices | GraphQL mutations | P0 |
-| **Graph Traversal** | `relatedConcepts(maxDepth)` — multi-hop Cypher queries | Apache AGE | P0 |
-| **Contradiction Detection** | Find all CONTRADICTS edges for a concept | Cypher query | P0 |
-| **Learning Paths** | Traverse PREREQUISITE_OF chains | Cypher query | P0 |
-| **Concept Mentions** | Track where concepts appear in transcripts/annotations | MENTIONS edges | P0 |
-| **Inferred Relations** | AI-generated relations flagged for review | Review workflow | P1 |
-| **Topic Clustering** | Group concepts into thematic clusters | K-means on embeddings | P1 |
-| **Graph Export** | Export subgraphs as JSON or GraphML | GraphQL query | P2 |
+| Feature                     | Description                                            | Technology            | Priority |
+| --------------------------- | ------------------------------------------------------ | --------------------- | -------- |
+| **Concept CRUD**            | Create, read, update, delete concepts                  | GraphQL mutations     | P0       |
+| **Relation CRUD**           | Create, delete edges between vertices                  | GraphQL mutations     | P0       |
+| **Graph Traversal**         | `relatedConcepts(maxDepth)` — multi-hop Cypher queries | Apache AGE            | P0       |
+| **Contradiction Detection** | Find all CONTRADICTS edges for a concept               | Cypher query          | P0       |
+| **Learning Paths**          | Traverse PREREQUISITE_OF chains                        | Cypher query          | P0       |
+| **Concept Mentions**        | Track where concepts appear in transcripts/annotations | MENTIONS edges        | P0       |
+| **Inferred Relations**      | AI-generated relations flagged for review              | Review workflow       | P1       |
+| **Topic Clustering**        | Group concepts into thematic clusters                  | K-means on embeddings | P1       |
+| **Graph Export**            | Export subgraphs as JSON or GraphML                    | GraphQL query         | P2       |
 
 ---
 
@@ -467,28 +498,28 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 **Supported Languages:**
 
-| Code | Language | Native Name |
-|------|----------|-------------|
-| en | English | English |
-| zh-CN | Simplified Chinese | 中文 |
-| hi | Hindi | हिन्दी |
-| es | Spanish | Español |
-| fr | French | Français |
-| bn | Bengali | বাংলা |
-| pt | Portuguese (BR) | Português |
-| ru | Russian | Русский |
-| id | Indonesian | Bahasa Indonesia |
+| Code  | Language           | Native Name      |
+| ----- | ------------------ | ---------------- |
+| en    | English            | English          |
+| zh-CN | Simplified Chinese | 中文             |
+| hi    | Hindi              | हिन्दी           |
+| es    | Spanish            | Español          |
+| fr    | French             | Français         |
+| bn    | Bengali            | বাংলা            |
+| pt    | Portuguese (BR)    | Português        |
+| ru    | Russian            | Русский          |
+| id    | Indonesian         | Bahasa Indonesia |
 
 **Implementation Architecture:**
 
-| Layer | Technology | Details |
-|-------|-----------|---------|
-| **Shared Translation Package** | `@edusphere/i18n` | 9 locales × 12 namespaces = 108 JSON files, TypeScript strict `t()` autocomplete |
-| **Web (React 19)** | i18next + react-i18next | Vite dynamic import backend; all 14 pages and all components translated |
-| **Mobile (Expo SDK 54)** | i18next | Metro-compatible `require()` backend; all 7 screens translated |
-| **Language Settings** | `/settings` page + `useUserPreferences` hook | Locale persisted to DB (`users.preferences` JSONB) + localStorage |
-| **AI Agent Responses** | `injectLocale()` system prompt injection | All workflows (Chavruta, Quiz, Summarizer, Tutor, Debate, Assessment) respond in user's language |
-| **Content Translation** | `content_translations` table + NATS pipeline | On-demand async translation with DB cache; GraphQL query/mutation for requesting and fetching |
+| Layer                          | Technology                                   | Details                                                                                          |
+| ------------------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Shared Translation Package** | `@edusphere/i18n`                            | 9 locales × 12 namespaces = 108 JSON files, TypeScript strict `t()` autocomplete                 |
+| **Web (React 19)**             | i18next + react-i18next                      | Vite dynamic import backend; all 14 pages and all components translated                          |
+| **Mobile (Expo SDK 54)**       | i18next                                      | Metro-compatible `require()` backend; all 7 screens translated                                   |
+| **Language Settings**          | `/settings` page + `useUserPreferences` hook | Locale persisted to DB (`users.preferences` JSONB) + localStorage                                |
+| **AI Agent Responses**         | `injectLocale()` system prompt injection     | All workflows (Chavruta, Quiz, Summarizer, Tutor, Debate, Assessment) respond in user's language |
+| **Content Translation**        | `content_translations` table + NATS pipeline | On-demand async translation with DB cache; GraphQL query/mutation for requesting and fetching    |
 
 **Namespaces (12):**
 `common`, `nav`, `auth`, `dashboard`, `courses`, `content`, `annotations`, `agents`, `collaboration`, `knowledge`, `settings`, `errors`
@@ -499,32 +530,32 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 #### 4.7.1 Semantic Search
 
-| Feature | Description | Technology | Priority |
-|---------|-------------|-----------|----------|
-| **Vector Embedding** | 768-dim nomic-embed-text embeddings via Ollama/OpenAI | Vercel AI SDK | P0 |
-| **HNSW Indexing** | Fast approximate nearest neighbor search | pgvector HNSW | P0 |
-| **Similarity Ranking** | Cosine distance-based relevance scores | pgvector | P0 |
-| **Cross-Content Search** | Search across transcript segments, annotations, concepts | Unified embedding table | P0 |
-| **Result Highlighting** | Return matched text snippets with context | Full-text search | P1 |
+| Feature                  | Description                                              | Technology              | Priority |
+| ------------------------ | -------------------------------------------------------- | ----------------------- | -------- |
+| **Vector Embedding**     | 768-dim nomic-embed-text embeddings via Ollama/OpenAI    | Vercel AI SDK           | P0       |
+| **HNSW Indexing**        | Fast approximate nearest neighbor search                 | pgvector HNSW           | P0       |
+| **Similarity Ranking**   | Cosine distance-based relevance scores                   | pgvector                | P0       |
+| **Cross-Content Search** | Search across transcript segments, annotations, concepts | Unified embedding table | P0       |
+| **Result Highlighting**  | Return matched text snippets with context                | Full-text search        | P1       |
 
 #### 4.7.2 Hybrid Search (HybridRAG)
 
-| Feature | Description | Fusion Strategy | Priority |
-|---------|-------------|----------------|----------|
-| **Vector + Graph Fusion** | Parallel vector search + 2-hop graph traversal | Rank by combined similarity + centrality | P0 |
-| **Graph Context** | Include related concepts, contradictions, prerequisites in results | Apache AGE traversal | P0 |
-| **Configurable Depth** | User-specified graph traversal depth (1-5 hops) | Query parameter | P1 |
-| **Citation Paths** | Trace intellectual lineage from search results | DERIVED_FROM chains | P2 |
+| Feature                   | Description                                                        | Fusion Strategy                          | Priority |
+| ------------------------- | ------------------------------------------------------------------ | ---------------------------------------- | -------- |
+| **Vector + Graph Fusion** | Parallel vector search + 2-hop graph traversal                     | Rank by combined similarity + centrality | P0       |
+| **Graph Context**         | Include related concepts, contradictions, prerequisites in results | Apache AGE traversal                     | P0       |
+| **Configurable Depth**    | User-specified graph traversal depth (1-5 hops)                    | Query parameter                          | P1       |
+| **Citation Paths**        | Trace intellectual lineage from search results                     | DERIVED_FROM chains                      | P2       |
 
 #### 4.7.3 Search Features
 
-| Feature | Description | User Roles | Priority |
-|---------|-------------|-----------|----------|
-| **Transcript Search** | Full-text search across all transcript segments | All authenticated | P0 |
-| **Time-Range Filtering** | Restrict search to specific video time ranges | All authenticated | P1 |
-| **Asset Filtering** | Search within specific courses or media assets | All authenticated | P1 |
-| **Multi-Language Support** | Search across Hebrew, English, Aramaic transcripts | All authenticated | P1 |
-| **Saved Searches** | Bookmark frequent searches | All authenticated | P2 |
+| Feature                    | Description                                        | User Roles        | Priority |
+| -------------------------- | -------------------------------------------------- | ----------------- | -------- |
+| **Transcript Search**      | Full-text search across all transcript segments    | All authenticated | P0       |
+| **Time-Range Filtering**   | Restrict search to specific video time ranges      | All authenticated | P1       |
+| **Asset Filtering**        | Search within specific courses or media assets     | All authenticated | P1       |
+| **Multi-Language Support** | Search across Hebrew, English, Aramaic transcripts | All authenticated | P1       |
+| **Saved Searches**         | Bookmark frequent searches                         | All authenticated | P2       |
 
 ---
 
@@ -654,82 +685,82 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 ### 6.1 Scale & Performance
 
-| Requirement | Target | Justification |
-|-------------|--------|---------------|
-| **Concurrent Users** | 100,000+ | Enterprise institutional deployment scale |
-| **API Latency (p95)** | < 500ms | Ensures responsive UI for synchronous operations |
-| **API Latency (p99)** | < 1000ms | Prevents outlier slowdowns from degrading UX |
-| **Search Latency (p95)** | < 200ms | Real-time search-as-you-type experience |
-| **Agent Response Streaming** | < 100ms first token | Immediate feedback for AI interactions |
-| **Subscription Throughput** | 10,000 concurrent WebSocket connections per gateway instance | Real-time collaboration and annotation updates |
-| **Media Upload** | Support 10GB video files | Typical university lecture recording size |
-| **Transcript Throughput** | Process 1 hour of audio in < 2 minutes (GPU) | Timely availability of searchable content |
-| **Embedding Generation** | 1,000 segments/minute | Keep pace with transcription pipeline |
-| **Database Connections** | 1,000 per subgraph (via PgBouncer) | Support high concurrency without pool exhaustion |
+| Requirement                  | Target                                                       | Justification                                    |
+| ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+| **Concurrent Users**         | 100,000+                                                     | Enterprise institutional deployment scale        |
+| **API Latency (p95)**        | < 500ms                                                      | Ensures responsive UI for synchronous operations |
+| **API Latency (p99)**        | < 1000ms                                                     | Prevents outlier slowdowns from degrading UX     |
+| **Search Latency (p95)**     | < 200ms                                                      | Real-time search-as-you-type experience          |
+| **Agent Response Streaming** | < 100ms first token                                          | Immediate feedback for AI interactions           |
+| **Subscription Throughput**  | 10,000 concurrent WebSocket connections per gateway instance | Real-time collaboration and annotation updates   |
+| **Media Upload**             | Support 10GB video files                                     | Typical university lecture recording size        |
+| **Transcript Throughput**    | Process 1 hour of audio in < 2 minutes (GPU)                 | Timely availability of searchable content        |
+| **Embedding Generation**     | 1,000 segments/minute                                        | Keep pace with transcription pipeline            |
+| **Database Connections**     | 1,000 per subgraph (via PgBouncer)                           | Support high concurrency without pool exhaustion |
 
 ### 6.2 Architecture Requirements
 
-| Component | Technology | Justification |
-|-----------|-----------|---------------|
-| **API Gateway** | Hive Gateway v2 (MIT) | Federation v2.7 compliance, 100% test pass, MIT license vs. Apollo Router ELv2 |
-| **Subgraph Runtime** | GraphQL Yoga + NestJS | `YogaFederationDriver` actively maintained, MIT licensed |
-| **Database** | PostgreSQL 16+ | RLS, JSON support, mature ecosystem |
-| **Graph Database** | Apache AGE 1.5+ | Cypher queries within PostgreSQL, Apache 2.0 license |
-| **Vector Search** | pgvector 0.8+ | HNSW indexes, 768-dim support, PostgreSQL native |
-| **ORM** | Drizzle ORM 1.x | Native RLS, pgvector support, type-safe, Apache 2.0 |
-| **Authentication** | Keycloak v26+ | OIDC/JWT, multi-tenant, Apache 2.0 |
-| **Messaging** | NATS JetStream | At-least-once delivery, event-driven subscriptions, Apache 2.0 |
-| **Object Storage** | MinIO | S3-compatible presigned URLs, AGPLv3 |
-| **CRDT** | Yjs + Hocuspocus | Real-time collaboration, MIT |
-| **AI Layer 1** | Vercel AI SDK v6 | Unified LLM abstraction, Apache 2.0 |
-| **AI Layer 2** | LangGraph.js | State machine agent workflows, MIT |
-| **AI Layer 3** | LlamaIndex.TS | RAG pipelines, MIT |
-| **Transcription** | faster-whisper | GPU-accelerated, MIT |
-| **Frontend** | React 19 + Vite 6 | Fast HMR, MIT |
-| **Mobile** | Expo SDK 54 | Offline-first, MIT |
-| **Reverse Proxy** | Traefik v3.6 | Auto-discovery, Let's Encrypt, MIT |
-| **Monitoring** | OpenTelemetry + Jaeger | Distributed tracing, Apache 2.0 |
-| **Monorepo** | pnpm workspaces + Turborepo | Efficient dependency hoisting, MIT |
+| Component            | Technology                  | Justification                                                                  |
+| -------------------- | --------------------------- | ------------------------------------------------------------------------------ |
+| **API Gateway**      | Hive Gateway v2 (MIT)       | Federation v2.7 compliance, 100% test pass, MIT license vs. Apollo Router ELv2 |
+| **Subgraph Runtime** | GraphQL Yoga + NestJS       | `YogaFederationDriver` actively maintained, MIT licensed                       |
+| **Database**         | PostgreSQL 16+              | RLS, JSON support, mature ecosystem                                            |
+| **Graph Database**   | Apache AGE 1.5+             | Cypher queries within PostgreSQL, Apache 2.0 license                           |
+| **Vector Search**    | pgvector 0.8+               | HNSW indexes, 768-dim support, PostgreSQL native                               |
+| **ORM**              | Drizzle ORM 1.x             | Native RLS, pgvector support, type-safe, Apache 2.0                            |
+| **Authentication**   | Keycloak v26+               | OIDC/JWT, multi-tenant, Apache 2.0                                             |
+| **Messaging**        | NATS JetStream              | At-least-once delivery, event-driven subscriptions, Apache 2.0                 |
+| **Object Storage**   | MinIO                       | S3-compatible presigned URLs, AGPLv3                                           |
+| **CRDT**             | Yjs + Hocuspocus            | Real-time collaboration, MIT                                                   |
+| **AI Layer 1**       | Vercel AI SDK v6            | Unified LLM abstraction, Apache 2.0                                            |
+| **AI Layer 2**       | LangGraph.js                | State machine agent workflows, MIT                                             |
+| **AI Layer 3**       | LlamaIndex.TS               | RAG pipelines, MIT                                                             |
+| **Transcription**    | faster-whisper              | GPU-accelerated, MIT                                                           |
+| **Frontend**         | React 19 + Vite 6           | Fast HMR, MIT                                                                  |
+| **Mobile**           | Expo SDK 54                 | Offline-first, MIT                                                             |
+| **Reverse Proxy**    | Traefik v3.6                | Auto-discovery, Let's Encrypt, MIT                                             |
+| **Monitoring**       | OpenTelemetry + Jaeger      | Distributed tracing, Apache 2.0                                                |
+| **Monorepo**         | pnpm workspaces + Turborepo | Efficient dependency hoisting, MIT                                             |
 
 ### 6.3 Security Requirements
 
-| Requirement | Implementation | Priority |
-|-------------|---------------|----------|
-| **Multi-Tenant Isolation** | Row-Level Security (RLS) on all tables with `tenant_id` filter | P0 |
-| **Authentication** | JWT validation via Keycloak JWKS endpoint | P0 |
-| **Authorization** | Role-based (`@requiresRole`) and scope-based (`@requiresScopes`) enforcement | P0 |
-| **Data Encryption in Transit** | TLS 1.3 for all external connections | P0 |
-| **Data Encryption at Rest** | PostgreSQL TDE (Transparent Data Encryption) | P1 |
-| **PII Protection** | Anonymize user IDs in analytics exports | P0 |
-| **Rate Limiting** | Per-tenant, per-IP, per-operation limits at gateway | P0 |
-| **Query Complexity** | Block queries with depth > 10 or breadth > 100 | P0 |
-| **Persisted Queries** | Production allows only pre-registered queries | P1 |
-| **Secret Management** | Vault or cloud-native secrets (no .env in production) | P0 |
-| **Audit Logging** | Log all admin actions and data exports | P0 |
-| **Dependency Scanning** | `pnpm audit --audit-level=high` in CI | P0 |
-| **gVisor Sandboxing** | AI agent executions run in gVisor sandbox | P1 |
+| Requirement                    | Implementation                                                               | Priority |
+| ------------------------------ | ---------------------------------------------------------------------------- | -------- |
+| **Multi-Tenant Isolation**     | Row-Level Security (RLS) on all tables with `tenant_id` filter               | P0       |
+| **Authentication**             | JWT validation via Keycloak JWKS endpoint                                    | P0       |
+| **Authorization**              | Role-based (`@requiresRole`) and scope-based (`@requiresScopes`) enforcement | P0       |
+| **Data Encryption in Transit** | TLS 1.3 for all external connections                                         | P0       |
+| **Data Encryption at Rest**    | PostgreSQL TDE (Transparent Data Encryption)                                 | P1       |
+| **PII Protection**             | Anonymize user IDs in analytics exports                                      | P0       |
+| **Rate Limiting**              | Per-tenant, per-IP, per-operation limits at gateway                          | P0       |
+| **Query Complexity**           | Block queries with depth > 10 or breadth > 100                               | P0       |
+| **Persisted Queries**          | Production allows only pre-registered queries                                | P1       |
+| **Secret Management**          | Vault or cloud-native secrets (no .env in production)                        | P0       |
+| **Audit Logging**              | Log all admin actions and data exports                                       | P0       |
+| **Dependency Scanning**        | `pnpm audit --audit-level=high` in CI                                        | P0       |
+| **gVisor Sandboxing**          | AI agent executions run in gVisor sandbox                                    | P1       |
 
 ### 6.4 Compliance Requirements
 
-| Standard | Requirements | Priority |
-|----------|-------------|----------|
-| **FERPA** | Student data isolation, access controls, audit logs | P0 |
-| **GDPR** | Data export, right to erasure, consent tracking | P0 |
-| **WCAG 2.1 AA** | Accessibility for all UI components | P1 |
-| **SOC 2 Type II** | Security, availability, confidentiality controls | P1 |
+| Standard          | Requirements                                        | Priority |
+| ----------------- | --------------------------------------------------- | -------- |
+| **FERPA**         | Student data isolation, access controls, audit logs | P0       |
+| **GDPR**          | Data export, right to erasure, consent tracking     | P0       |
+| **WCAG 2.1 AA**   | Accessibility for all UI components                 | P1       |
+| **SOC 2 Type II** | Security, availability, confidentiality controls    | P1       |
 
 ### 6.5 Data Requirements
 
-| Entity | Retention | Backup | Priority |
-|--------|-----------|--------|----------|
-| **User Data** | Indefinite (until user deletion request) | Daily incremental, weekly full | P0 |
-| **Course Content** | Indefinite (soft delete with 30-day retention) | Daily | P0 |
-| **Annotations** | Indefinite (soft delete with 30-day retention) | Daily | P0 |
-| **Knowledge Graph** | Indefinite | Daily | P0 |
-| **CRDT Updates** | 90 days (then compacted) | Weekly | P1 |
-| **Agent Executions** | 1 year | Monthly | P1 |
-| **Audit Logs** | 7 years | Monthly | P0 |
-| **Media Files** | Indefinite (soft delete with 30-day retention) | Weekly (MinIO replication) | P0 |
+| Entity               | Retention                                      | Backup                         | Priority |
+| -------------------- | ---------------------------------------------- | ------------------------------ | -------- |
+| **User Data**        | Indefinite (until user deletion request)       | Daily incremental, weekly full | P0       |
+| **Course Content**   | Indefinite (soft delete with 30-day retention) | Daily                          | P0       |
+| **Annotations**      | Indefinite (soft delete with 30-day retention) | Daily                          | P0       |
+| **Knowledge Graph**  | Indefinite                                     | Daily                          | P0       |
+| **CRDT Updates**     | 90 days (then compacted)                       | Weekly                         | P1       |
+| **Agent Executions** | 1 year                                         | Monthly                        | P1       |
+| **Audit Logs**       | 7 years                                        | Monthly                        | P0       |
+| **Media Files**      | Indefinite (soft delete with 30-day retention) | Weekly (MinIO replication)     | P0       |
 
 ### 6.6 Technology-Specific Requirements
 
@@ -769,61 +800,61 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 ### 7.1 Product Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **User Activation Rate** | 80% of invited users create at least 1 annotation within 7 days | Daily cohort analysis |
-| **DAU/MAU Ratio** | > 0.4 (indicating high engagement) | Google Analytics events |
-| **Avg. Session Duration** | > 25 minutes (vs. 8 min in traditional LMS) | Session tracking |
-| **Annotation Creation Rate** | 5+ annotations per user per week | Database query |
-| **AI Agent Usage** | 60% of active users trigger at least 1 agent per week | Execution logs |
-| **Search Usage** | 3+ searches per session | GraphQL query logs |
-| **Knowledge Graph Growth** | 100+ new concepts per tenant per month | Database query |
-| **Collaboration Sessions** | 2+ sessions per user per month | Session tracking |
+| Metric                       | Target                                                          | Measurement             |
+| ---------------------------- | --------------------------------------------------------------- | ----------------------- |
+| **User Activation Rate**     | 80% of invited users create at least 1 annotation within 7 days | Daily cohort analysis   |
+| **DAU/MAU Ratio**            | > 0.4 (indicating high engagement)                              | Google Analytics events |
+| **Avg. Session Duration**    | > 25 minutes (vs. 8 min in traditional LMS)                     | Session tracking        |
+| **Annotation Creation Rate** | 5+ annotations per user per week                                | Database query          |
+| **AI Agent Usage**           | 60% of active users trigger at least 1 agent per week           | Execution logs          |
+| **Search Usage**             | 3+ searches per session                                         | GraphQL query logs      |
+| **Knowledge Graph Growth**   | 100+ new concepts per tenant per month                          | Database query          |
+| **Collaboration Sessions**   | 2+ sessions per user per month                                  | Session tracking        |
 
 ### 7.2 Learning Outcome Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Quiz Score Improvement** | 15% higher vs. control group (no AI agents) | A/B testing |
-| **Concept Mastery** | 70% of students achieve mastery (>80% quiz accuracy) within 4 weeks | Quiz analytics |
-| **Prerequisite Gap Reduction** | 40% fewer students fail quizzes due to missing prerequisites | Learning path analytics |
-| **Contradiction Awareness** | 80% of students identify at least 1 contradiction per course | Annotation analysis |
-| **Peer Collaboration** | 50% of annotations are SHARED layer (vs. PERSONAL) | Layer distribution analysis |
+| Metric                         | Target                                                              | Measurement                 |
+| ------------------------------ | ------------------------------------------------------------------- | --------------------------- |
+| **Quiz Score Improvement**     | 15% higher vs. control group (no AI agents)                         | A/B testing                 |
+| **Concept Mastery**            | 70% of students achieve mastery (>80% quiz accuracy) within 4 weeks | Quiz analytics              |
+| **Prerequisite Gap Reduction** | 40% fewer students fail quizzes due to missing prerequisites        | Learning path analytics     |
+| **Contradiction Awareness**    | 80% of students identify at least 1 contradiction per course        | Annotation analysis         |
+| **Peer Collaboration**         | 50% of annotations are SHARED layer (vs. PERSONAL)                  | Layer distribution analysis |
 
 ### 7.3 Technical Performance Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **API p95 Latency** | < 500ms | OpenTelemetry traces |
-| **API p99 Latency** | < 1000ms | OpenTelemetry traces |
-| **Search p95 Latency** | < 200ms | OpenTelemetry traces |
-| **Uptime** | 99.9% (43 min downtime/month) | Prometheus uptime checks |
-| **Error Rate** | < 0.1% | Error logs aggregated in Jaeger |
-| **Database CPU** | < 70% avg. utilization | PostgreSQL metrics |
-| **Gateway RPS** | > 10,000 requests per second per instance | Load testing (k6) |
-| **Subscription Stability** | < 0.01% dropped WebSocket connections | Gateway metrics |
+| Metric                     | Target                                    | Measurement                     |
+| -------------------------- | ----------------------------------------- | ------------------------------- |
+| **API p95 Latency**        | < 500ms                                   | OpenTelemetry traces            |
+| **API p99 Latency**        | < 1000ms                                  | OpenTelemetry traces            |
+| **Search p95 Latency**     | < 200ms                                   | OpenTelemetry traces            |
+| **Uptime**                 | 99.9% (43 min downtime/month)             | Prometheus uptime checks        |
+| **Error Rate**             | < 0.1%                                    | Error logs aggregated in Jaeger |
+| **Database CPU**           | < 70% avg. utilization                    | PostgreSQL metrics              |
+| **Gateway RPS**            | > 10,000 requests per second per instance | Load testing (k6)               |
+| **Subscription Stability** | < 0.01% dropped WebSocket connections     | Gateway metrics                 |
 
 ### 7.4 Business Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **MRR Growth** | 20% MoM | Billing system |
-| **Churn Rate** | < 5% monthly | Subscription analytics |
-| **Net Promoter Score (NPS)** | > 50 | Quarterly surveys |
-| **Free → Paid Conversion** | 15% within 90 days | Cohort analysis |
-| **Enterprise Deals** | 10 ENTERPRISE tier contracts in Year 1 | Sales CRM |
-| **AI Cost per User** | < $2/month | LLM API usage tracking |
-| **Customer Support Tickets** | < 2 tickets per 100 active users per month | Helpdesk system |
+| Metric                       | Target                                     | Measurement            |
+| ---------------------------- | ------------------------------------------ | ---------------------- |
+| **MRR Growth**               | 20% MoM                                    | Billing system         |
+| **Churn Rate**               | < 5% monthly                               | Subscription analytics |
+| **Net Promoter Score (NPS)** | > 50                                       | Quarterly surveys      |
+| **Free → Paid Conversion**   | 15% within 90 days                         | Cohort analysis        |
+| **Enterprise Deals**         | 10 ENTERPRISE tier contracts in Year 1     | Sales CRM              |
+| **AI Cost per User**         | < $2/month                                 | LLM API usage tracking |
+| **Customer Support Tickets** | < 2 tickets per 100 active users per month | Helpdesk system        |
 
 ### 7.5 Leading Indicators
 
-| Indicator | Why It Matters | Target |
-|-----------|---------------|--------|
-| **Time to First Annotation** | Faster = better onboarding | < 5 minutes |
-| **Knowledge Graph Depth** | Deeper graphs = richer learning context | Avg. 3 hops from any concept |
-| **AI Agent Retry Rate** | High retry = poor answers | < 10% of executions |
-| **Search Zero-Result Rate** | High = poor content discoverability | < 5% |
-| **Collaboration Invite Acceptance** | High = viral growth | > 70% |
+| Indicator                           | Why It Matters                          | Target                       |
+| ----------------------------------- | --------------------------------------- | ---------------------------- |
+| **Time to First Annotation**        | Faster = better onboarding              | < 5 minutes                  |
+| **Knowledge Graph Depth**           | Deeper graphs = richer learning context | Avg. 3 hops from any concept |
+| **AI Agent Retry Rate**             | High retry = poor answers               | < 10% of executions          |
+| **Search Zero-Result Rate**         | High = poor content discoverability     | < 5%                         |
+| **Collaboration Invite Acceptance** | High = viral growth                     | > 70%                        |
 
 ---
 
@@ -833,28 +864,28 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 EduSphere's 8-phase implementation roadmap (detailed in IMPLEMENTATION_ROADMAP.md) delivers features incrementally:
 
-| Phase | Duration | Key Features Delivered | PRD Section Alignment |
-|-------|----------|------------------------|----------------------|
-| **Phase 0: Foundation** | 1-2 days | Docker stack, monorepo, health checks | Technical Requirements §6.2 |
-| **Phase 1: Data Layer** | 2-3 days | All 16 tables, RLS, Apache AGE ontology, pgvector embeddings, seed data | Technical Requirements §6.6.1, §6.6.2 |
-| **Phase 2: Core + Content** | 3-5 days | Auth (JWT/Keycloak), Core subgraph (users, tenants), Content subgraph (courses, media, transcripts), file upload | Content Management §4.1, User Stories CM-01 to CM-08 |
-| **Phase 3: Annotation + Collab** | 3-4 days | Annotation subgraph (all layers, threads), Collaboration subgraph (CRDT, presence) | Annotation §4.2, Collaboration §4.3, User Stories AN-01 to AN-07, CO-01 to CO-04 |
-| **Phase 4: Knowledge** | 4-5 days | Knowledge subgraph (graph CRUD, traversal, contradictions), semantic search, HybridRAG | Knowledge Graph §4.5, Search §4.6, User Stories KG-01 to KG-06, SD-01 to SD-04 |
-| **Phase 5: Agents** | 4-5 days | Agent subgraph (CRUD, execution), LangGraph.js templates (Chavruta, Summarizer, Quiz Master, etc.), MCP tools, sandboxing | AI Agents §4.4, User Stories AI-01 to AI-06 |
-| **Phase 6: Frontend** | 5-7 days | React SPA (course UI, video player, annotations, search, AI chat) | All user-facing features |
-| **Phase 7: Production** | 5-7 days | Performance optimization, observability (Jaeger, Grafana), security hardening, K8s deployment, load testing (100K users) | Performance §6.1, Security §6.3, Compliance §6.4 |
-| **Phase 8: Mobile + Advanced** | 5-7 days | Expo mobile app (offline-first), transcription worker (faster-whisper), Chavruta partner learning | Content Management §4.1.2 (transcription), Collaboration §4.3 (Chavruta sessions) |
-| **Phase i18n: Internationalization** | 3-4 days | 9 languages UI (packages/i18n, web, mobile, settings), AI locale injection, content_translations pipeline | Multi-Language Support §4.6, User Stories I18N-01 to I18N-04 |
+| Phase                                | Duration | Key Features Delivered                                                                                                    | PRD Section Alignment                                                             |
+| ------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Phase 0: Foundation**              | 1-2 days | Docker stack, monorepo, health checks                                                                                     | Technical Requirements §6.2                                                       |
+| **Phase 1: Data Layer**              | 2-3 days | All 16 tables, RLS, Apache AGE ontology, pgvector embeddings, seed data                                                   | Technical Requirements §6.6.1, §6.6.2                                             |
+| **Phase 2: Core + Content**          | 3-5 days | Auth (JWT/Keycloak), Core subgraph (users, tenants), Content subgraph (courses, media, transcripts), file upload          | Content Management §4.1, User Stories CM-01 to CM-08                              |
+| **Phase 3: Annotation + Collab**     | 3-4 days | Annotation subgraph (all layers, threads), Collaboration subgraph (CRDT, presence)                                        | Annotation §4.2, Collaboration §4.3, User Stories AN-01 to AN-07, CO-01 to CO-04  |
+| **Phase 4: Knowledge**               | 4-5 days | Knowledge subgraph (graph CRUD, traversal, contradictions), semantic search, HybridRAG                                    | Knowledge Graph §4.5, Search §4.6, User Stories KG-01 to KG-06, SD-01 to SD-04    |
+| **Phase 5: Agents**                  | 4-5 days | Agent subgraph (CRUD, execution), LangGraph.js templates (Chavruta, Summarizer, Quiz Master, etc.), MCP tools, sandboxing | AI Agents §4.4, User Stories AI-01 to AI-06                                       |
+| **Phase 6: Frontend**                | 5-7 days | React SPA (course UI, video player, annotations, search, AI chat)                                                         | All user-facing features                                                          |
+| **Phase 7: Production**              | 5-7 days | Performance optimization, observability (Jaeger, Grafana), security hardening, K8s deployment, load testing (100K users)  | Performance §6.1, Security §6.3, Compliance §6.4                                  |
+| **Phase 8: Mobile + Advanced**       | 5-7 days | Expo mobile app (offline-first), transcription worker (faster-whisper), Chavruta partner learning                         | Content Management §4.1.2 (transcription), Collaboration §4.3 (Chavruta sessions) |
+| **Phase i18n: Internationalization** | 3-4 days | 9 languages UI (packages/i18n, web, mobile, settings), AI locale injection, content_translations pipeline                 | Multi-Language Support §4.6, User Stories I18N-01 to I18N-04                      |
 
 **Total Duration:** 32-45 working days (25-35 days with parallelization)
 
 ### 8.2 Feature Prioritization by Phase
 
-| Priority | Phase Delivery | Rationale |
-|----------|---------------|-----------|
-| **P0 (MVP)** | Phases 0-5 | Core platform functionality: auth, content, annotations, knowledge graph, AI agents |
-| **P1 (Early Adopter)** | Phases 6-7 | Production-ready with web UI, security, scalability |
-| **P2 (Advanced)** | Phase 8 | Mobile support, advanced transcription, specialized collaboration features |
+| Priority               | Phase Delivery | Rationale                                                                           |
+| ---------------------- | -------------- | ----------------------------------------------------------------------------------- |
+| **P0 (MVP)**           | Phases 0-5     | Core platform functionality: auth, content, annotations, knowledge graph, AI agents |
+| **P1 (Early Adopter)** | Phases 6-7     | Production-ready with web UI, security, scalability                                 |
+| **P2 (Advanced)**      | Phase 8        | Mobile support, advanced transcription, specialized collaboration features          |
 
 ### 8.3 Deferred Features (Post-Launch)
 
@@ -871,24 +902,24 @@ The following features are identified in user stories but deferred to post-launc
 
 ### 9.1 Technical Constraints
 
-| Constraint | Impact | Mitigation |
-|-----------|--------|-----------|
-| **PostgreSQL Single-Point-of-Failure** | Database outage = full platform downtime | Deploy PostgreSQL HA cluster (Patroni) or use managed RDS/CloudSQL in production |
-| **Apache AGE Maturity** | AGE 1.5 is relatively new; potential bugs | Comprehensive integration testing, contribute fixes upstream, fallback to Neo4j if critical issues arise |
-| **pgvector Performance** | HNSW index build time increases with scale | Build indexes asynchronously, use partitioning for >10M embeddings |
-| **NATS JetStream Learning Curve** | Team unfamiliar with NATS | Allocate 2 days for training, use managed NATS if self-hosting proves difficult |
-| **LLM API Costs** | OpenAI/Anthropic costs can spike unpredictably | Enforce strict per-tenant quotas, use local Ollama models for FREE/STARTER tiers |
-| **WebSocket Connection Limits** | Default OS limits ~1024 connections | Tune OS (`ulimit -n 65536`), use connection pooling, horizontal scaling |
-| **Keycloak Configuration Complexity** | Multi-tenant realm setup is intricate | Use infrastructure-as-code (Terraform), provide detailed runbook |
+| Constraint                             | Impact                                         | Mitigation                                                                                               |
+| -------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **PostgreSQL Single-Point-of-Failure** | Database outage = full platform downtime       | Deploy PostgreSQL HA cluster (Patroni) or use managed RDS/CloudSQL in production                         |
+| **Apache AGE Maturity**                | AGE 1.5 is relatively new; potential bugs      | Comprehensive integration testing, contribute fixes upstream, fallback to Neo4j if critical issues arise |
+| **pgvector Performance**               | HNSW index build time increases with scale     | Build indexes asynchronously, use partitioning for >10M embeddings                                       |
+| **NATS JetStream Learning Curve**      | Team unfamiliar with NATS                      | Allocate 2 days for training, use managed NATS if self-hosting proves difficult                          |
+| **LLM API Costs**                      | OpenAI/Anthropic costs can spike unpredictably | Enforce strict per-tenant quotas, use local Ollama models for FREE/STARTER tiers                         |
+| **WebSocket Connection Limits**        | Default OS limits ~1024 connections            | Tune OS (`ulimit -n 65536`), use connection pooling, horizontal scaling                                  |
+| **Keycloak Configuration Complexity**  | Multi-tenant realm setup is intricate          | Use infrastructure-as-code (Terraform), provide detailed runbook                                         |
 
 ### 9.2 Business Constraints
 
-| Constraint | Impact | Mitigation |
-|-----------|--------|-----------|
-| **Budget for AI Inference** | LLM costs must stay < $2/user/month | Use tiered quotas, cache AI responses, prefer local models when possible |
-| **Go-to-Market Timeline** | Pressure to launch in 6 months | Follow phased roadmap strictly, avoid scope creep |
-| **Limited Initial Marketing Budget** | Can't afford paid ads | Focus on academic partnerships, open-source community evangelism |
-| **Dependency on Keycloak** | No SSO = no enterprise adoption | Ensure Keycloak is robust, document self-hosted setup, offer managed option |
+| Constraint                           | Impact                              | Mitigation                                                                  |
+| ------------------------------------ | ----------------------------------- | --------------------------------------------------------------------------- |
+| **Budget for AI Inference**          | LLM costs must stay < $2/user/month | Use tiered quotas, cache AI responses, prefer local models when possible    |
+| **Go-to-Market Timeline**            | Pressure to launch in 6 months      | Follow phased roadmap strictly, avoid scope creep                           |
+| **Limited Initial Marketing Budget** | Can't afford paid ads               | Focus on academic partnerships, open-source community evangelism            |
+| **Dependency on Keycloak**           | No SSO = no enterprise adoption     | Ensure Keycloak is robust, document self-hosted setup, offer managed option |
 
 ### 9.3 Assumptions
 
@@ -954,14 +985,14 @@ The following features are identified in user stories but deferred to post-launc
 
 ### 9.4 Dependencies
 
-| Dependency | Owner | Risk Level | Mitigation |
-|-----------|-------|-----------|-----------|
-| **Keycloak v26+ Stability** | External (Red Hat) | Medium | Contribute to Keycloak community, maintain fork if needed |
-| **Hive Gateway v2 Maintenance** | External (The Guild) | Low | Actively participate in community, sponsor development |
-| **Apache AGE PostgreSQL Compatibility** | External (Apache) | Medium | Test with each PostgreSQL minor release, maintain compatibility matrix |
-| **Vercel AI SDK LangGraph.js Support** | External (Vercel) | Low | Both are actively maintained, stable APIs |
-| **Ollama Local Model Availability** | External (Ollama community) | Low | Fall back to OpenAI/Anthropic if local models unavailable |
-| **MinIO S3 API Compatibility** | External (MinIO Inc.) | Low | S3 API is stable, minimal breaking changes |
+| Dependency                              | Owner                       | Risk Level | Mitigation                                                             |
+| --------------------------------------- | --------------------------- | ---------- | ---------------------------------------------------------------------- |
+| **Keycloak v26+ Stability**             | External (Red Hat)          | Medium     | Contribute to Keycloak community, maintain fork if needed              |
+| **Hive Gateway v2 Maintenance**         | External (The Guild)        | Low        | Actively participate in community, sponsor development                 |
+| **Apache AGE PostgreSQL Compatibility** | External (Apache)           | Medium     | Test with each PostgreSQL minor release, maintain compatibility matrix |
+| **Vercel AI SDK LangGraph.js Support**  | External (Vercel)           | Low        | Both are actively maintained, stable APIs                              |
+| **Ollama Local Model Availability**     | External (Ollama community) | Low        | Fall back to OpenAI/Anthropic if local models unavailable              |
+| **MinIO S3 API Compatibility**          | External (MinIO Inc.)       | Low        | S3 API is stable, minimal breaking changes                             |
 
 ### 9.5 Exclusions (Out of Scope)
 
@@ -980,24 +1011,24 @@ The following features are **explicitly out of scope** for the initial release:
 
 ## Appendix A: Glossary
 
-| Term | Definition |
-|------|------------|
-| **AGE** | Apache AGE (A Graph Extension) — PostgreSQL extension for graph database queries using Cypher |
-| **CRDT** | Conflict-Free Replicated Data Type — data structure enabling distributed collaboration without conflicts |
-| **Chavruta** | Traditional Jewish learning methodology where two partners debate texts to deepen understanding |
-| **Cypher** | Graph query language (originally from Neo4j, used by Apache AGE) |
-| **Federation** | GraphQL architectural pattern where multiple subgraphs compose into a unified API |
-| **HybridRAG** | Retrieval-Augmented Generation combining vector search and graph traversal |
-| **HNSW** | Hierarchical Navigable Small World — algorithm for fast approximate nearest neighbor search |
-| **HLS** | HTTP Live Streaming — adaptive bitrate video streaming protocol |
-| **JWT** | JSON Web Token — standard for secure token-based authentication |
-| **LangGraph** | Framework for building stateful AI agent workflows as directed graphs |
-| **MCP** | Model Context Protocol — interface for AI tools to interact with data sources |
-| **OIDC** | OpenID Connect — authentication layer on top of OAuth 2.0 |
-| **pgvector** | PostgreSQL extension for vector similarity search |
-| **RLS** | Row-Level Security — PostgreSQL feature for tenant-isolated data access |
-| **WebSocket** | Protocol for full-duplex communication over a single TCP connection |
-| **Yjs** | CRDT library for real-time collaborative applications |
+| Term           | Definition                                                                                               |
+| -------------- | -------------------------------------------------------------------------------------------------------- |
+| **AGE**        | Apache AGE (A Graph Extension) — PostgreSQL extension for graph database queries using Cypher            |
+| **CRDT**       | Conflict-Free Replicated Data Type — data structure enabling distributed collaboration without conflicts |
+| **Chavruta**   | Traditional Jewish learning methodology where two partners debate texts to deepen understanding          |
+| **Cypher**     | Graph query language (originally from Neo4j, used by Apache AGE)                                         |
+| **Federation** | GraphQL architectural pattern where multiple subgraphs compose into a unified API                        |
+| **HybridRAG**  | Retrieval-Augmented Generation combining vector search and graph traversal                               |
+| **HNSW**       | Hierarchical Navigable Small World — algorithm for fast approximate nearest neighbor search              |
+| **HLS**        | HTTP Live Streaming — adaptive bitrate video streaming protocol                                          |
+| **JWT**        | JSON Web Token — standard for secure token-based authentication                                          |
+| **LangGraph**  | Framework for building stateful AI agent workflows as directed graphs                                    |
+| **MCP**        | Model Context Protocol — interface for AI tools to interact with data sources                            |
+| **OIDC**       | OpenID Connect — authentication layer on top of OAuth 2.0                                                |
+| **pgvector**   | PostgreSQL extension for vector similarity search                                                        |
+| **RLS**        | Row-Level Security — PostgreSQL feature for tenant-isolated data access                                  |
+| **WebSocket**  | Protocol for full-duplex communication over a single TCP connection                                      |
+| **Yjs**        | CRDT library for real-time collaborative applications                                                    |
 
 ---
 
@@ -1013,17 +1044,17 @@ The following features are **explicitly out of scope** for the initial release:
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2026-02-17 | Product Management | Initial PRD creation based on roadmap and API contracts |
+| Version | Date       | Author             | Changes                                                 |
+| ------- | ---------- | ------------------ | ------------------------------------------------------- |
+| 1.0     | 2026-02-17 | Product Management | Initial PRD creation based on roadmap and API contracts |
 
 ---
 
 **Approval Signatures:**
 
-- **Product Owner:** _______________________  Date: __________
-- **Engineering Lead:** _______________________  Date: __________
-- **Architecture Review:** _______________________  Date: __________
+- **Product Owner:** \***\*\*\*\*\***\_\_\_\***\*\*\*\*\*** Date: \***\*\_\_\*\***
+- **Engineering Lead:** \***\*\*\*\*\***\_\_\_\***\*\*\*\*\*** Date: \***\*\_\_\*\***
+- **Architecture Review:** \***\*\*\*\*\***\_\_\_\***\*\*\*\*\*** Date: \***\*\_\_\*\***
 
 ---
 

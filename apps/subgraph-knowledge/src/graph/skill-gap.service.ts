@@ -51,7 +51,7 @@ export class SkillGapService {
     userId: string,
     tenantId: string,
     role: string,
-    roleId: string,
+    roleId: string
   ): Promise<SkillGapReport> {
     const ctx = { tenantId, userId, userRole: toUserRole(role) };
 
@@ -59,30 +59,43 @@ export class SkillGapService {
       const [row] = await tx
         .select()
         .from(skillProfiles)
-        .where(and(eq(skillProfiles.id, roleId), eq(skillProfiles.tenantId, tenantId)))
+        .where(
+          and(
+            eq(skillProfiles.id, roleId),
+            eq(skillProfiles.tenantId, tenantId)
+          )
+        )
         .limit(1);
       return row ?? null;
     });
 
-    if (!profile) throw new NotFoundException(`Skill profile ${roleId} not found`);
+    if (!profile)
+      throw new NotFoundException(`Skill profile ${roleId} not found`);
 
     const requiredConcepts: string[] = profile.requiredConcepts ?? [];
-    const masteredSet = await this.getMasteredConceptSet(userId, tenantId, role);
+    const masteredSet = await this.getMasteredConceptSet(
+      userId,
+      tenantId,
+      role
+    );
 
     const gapConcepts = requiredConcepts
       .filter((c) => !masteredSet.has(c.toLowerCase()))
       .slice(0, MAX_GAP_CONCEPTS);
 
     const masteredCount = requiredConcepts.filter((c) =>
-      masteredSet.has(c.toLowerCase()),
+      masteredSet.has(c.toLowerCase())
     ).length;
 
     const total = requiredConcepts.length;
-    const gaps = await this.recommendations.buildGapItems(gapConcepts, tenantId);
+    const gaps = await this.recommendations.buildGapItems(
+      gapConcepts,
+      tenantId
+    );
 
     this.logger.debug(
       { userId, roleId, total, masteredCount, gaps: gapConcepts.length },
-      'skillGapAnalysis complete',
+      'skillGapAnalysis complete'
     );
 
     return {
@@ -91,7 +104,8 @@ export class SkillGapService {
       totalRequired: total,
       mastered: masteredCount,
       gapCount: gapConcepts.length,
-      completionPercentage: total === 0 ? 100 : Math.round((masteredCount / total) * 100),
+      completionPercentage:
+        total === 0 ? 100 : Math.round((masteredCount / total) * 100),
       gaps,
     };
   }
@@ -102,17 +116,26 @@ export class SkillGapService {
     role: string,
     roleName: string,
     description: string | null,
-    requiredConcepts: string[],
+    requiredConcepts: string[]
   ): Promise<SkillProfileDto> {
     const ctx = { tenantId, userId: createdBy, userRole: toUserRole(role) };
 
     return withTenantContext(db, ctx, async (tx) => {
       const [row] = await tx
         .insert(skillProfiles)
-        .values({ tenantId, createdBy, roleName, description, requiredConcepts })
+        .values({
+          tenantId,
+          createdBy,
+          roleName,
+          description,
+          requiredConcepts,
+        })
         .returning();
 
-      this.logger.log({ tenantId, createdBy, roleName }, 'skill profile created');
+      this.logger.log(
+        { tenantId, createdBy, roleName },
+        'skill profile created'
+      );
       return this.toDto(row!);
     });
   }
@@ -120,7 +143,7 @@ export class SkillGapService {
   async listSkillProfiles(
     tenantId: string,
     userId: string,
-    role: string,
+    role: string
   ): Promise<SkillProfileDto[]> {
     const ctx = { tenantId, userId, userRole: toUserRole(role) };
 
@@ -138,7 +161,7 @@ export class SkillGapService {
   async getMasteredConceptSet(
     userId: string,
     tenantId: string,
-    role: string,
+    role: string
   ): Promise<Set<string>> {
     const ctx = { tenantId, userId, userRole: toUserRole(role) };
 
@@ -153,7 +176,9 @@ export class SkillGapService {
       return (result.rows ?? result) as { concept_name: string }[];
     });
 
-    const names = rows.map((r) => r.concept_name?.toLowerCase()).filter(Boolean);
+    const names = rows
+      .map((r) => r.concept_name?.toLowerCase())
+      .filter(Boolean);
     return new Set(names);
   }
 

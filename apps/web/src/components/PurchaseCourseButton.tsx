@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
-const GRAPHQL_URL = import.meta.env['VITE_GRAPHQL_URL'] as string ?? '/graphql';
+const GRAPHQL_URL =
+  (import.meta.env['VITE_GRAPHQL_URL'] as string) ?? '/graphql';
 
 const PURCHASE_COURSE_MUTATION = gql`
   mutation PurchaseCourse($courseId: ID!) {
@@ -47,7 +48,9 @@ export function PurchaseCourseButton({
 
   const { mutate, isPending } = useMutation<PurchaseResult, Error>({
     mutationFn: () =>
-      request<PurchaseResult>(GRAPHQL_URL, PURCHASE_COURSE_MUTATION, { courseId }),
+      request<PurchaseResult>(GRAPHQL_URL, PURCHASE_COURSE_MUTATION, {
+        courseId,
+      }),
     onSuccess: (data) => {
       const { paymentIntentId } = data.purchaseCourse;
       // Redirect to checkout page where Stripe.js renders the payment form.

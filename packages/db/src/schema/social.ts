@@ -3,7 +3,12 @@
  * RLS: users see own follows + public profiles within same tenant.
  */
 import {
-  pgTable, uuid, timestamp, uniqueIndex, index, pgPolicy,
+  pgTable,
+  uuid,
+  timestamp,
+  uniqueIndex,
+  index,
+  pgPolicy,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -14,7 +19,9 @@ export const userFollows = pgTable(
     followerId: uuid('follower_id').notNull(),
     followingId: uuid('following_id').notNull(),
     tenantId: uuid('tenant_id').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     uniqueIndex('user_follows_unique').on(t.followerId, t.followingId),
@@ -31,7 +38,7 @@ export const userFollows = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type UserFollow = typeof userFollows.$inferSelect;

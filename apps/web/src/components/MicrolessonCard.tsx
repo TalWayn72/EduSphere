@@ -1,6 +1,17 @@
 import { useState } from 'react';
-import { CheckCircle, ChevronLeft, ChevronRight, Clock, Target } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import {
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Target,
+} from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 interface QuizOption {
@@ -35,12 +46,19 @@ interface MicrolessonCardProps {
 
 function ProgressDots({ current, total }: { current: number; total: number }) {
   return (
-    <div className="flex gap-1.5 justify-center" aria-label={`Lesson ${current + 1} of ${total}`}>
+    <div
+      className="flex gap-1.5 justify-center"
+      aria-label={`Lesson ${current + 1} of ${total}`}
+    >
       {Array.from({ length: total }, (_, i) => (
         <span
           key={i}
           className={`w-2 h-2 rounded-full transition-colors ${
-            i === current ? 'bg-primary' : i < current ? 'bg-primary/50' : 'bg-muted'
+            i === current
+              ? 'bg-primary'
+              : i < current
+                ? 'bg-primary/50'
+                : 'bg-muted'
           }`}
         />
       ))}
@@ -58,20 +76,30 @@ function QuizSection({ quiz }: { quiz: QuizQuestion }) {
       <div className="space-y-2">
         {quiz.options.map((opt, i) => {
           const isSelected = selected === i;
-          let cls = 'w-full text-left text-sm px-3 py-2 rounded-md border transition-colors ';
+          let cls =
+            'w-full text-left text-sm px-3 py-2 rounded-md border transition-colors ';
           if (!answered) cls += 'hover:bg-accent cursor-pointer';
-          else if (opt.isCorrect) cls += 'border-green-500 bg-green-50 text-green-800';
-          else if (isSelected) cls += 'border-destructive bg-destructive/10 text-destructive';
+          else if (opt.isCorrect)
+            cls += 'border-green-500 bg-green-50 text-green-800';
+          else if (isSelected)
+            cls += 'border-destructive bg-destructive/10 text-destructive';
           else cls += 'opacity-50';
           return (
-            <button key={i} className={cls} disabled={answered} onClick={() => setSelected(i)}>
+            <button
+              key={i}
+              className={cls}
+              disabled={answered}
+              onClick={() => setSelected(i)}
+            >
               {opt.text}
             </button>
           );
         })}
       </div>
       {answered && quiz.explanation && (
-        <p className="text-xs text-muted-foreground italic">{quiz.explanation}</p>
+        <p className="text-xs text-muted-foreground italic">
+          {quiz.explanation}
+        </p>
       )}
       {answered && selected !== null && !quiz.options[selected]?.isCorrect && (
         <p className="text-xs text-destructive">
@@ -109,11 +137,15 @@ export function MicrolessonCard({
               {durationLabel}
             </div>
           </div>
-          {isCompleted && <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-1" />}
+          {isCompleted && (
+            <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-1" />
+          )}
         </div>
         <div className="flex items-start gap-2 text-sm bg-primary/5 rounded-md p-2">
           <Target className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <p className="text-primary font-medium leading-snug">{lesson.objective}</p>
+          <p className="text-primary font-medium leading-snug">
+            {lesson.objective}
+          </p>
         </div>
       </CardHeader>
 
@@ -135,7 +167,11 @@ export function MicrolessonCard({
         </Button>
 
         {!isCompleted && currentIndex === totalCount - 1 ? (
-          <Button size="sm" onClick={() => onComplete?.(lesson.id)} className="gap-1">
+          <Button
+            size="sm"
+            onClick={() => onComplete?.(lesson.id)}
+            className="gap-1"
+          >
             <CheckCircle className="h-4 w-4" /> Mark Complete
           </Button>
         ) : (

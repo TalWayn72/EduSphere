@@ -34,7 +34,9 @@ export class CypherLearningPathService {
   parseAgtypeScalar(raw: string | number | null | undefined): unknown {
     if (raw === null || raw === undefined) return null;
     if (typeof raw === 'number') return raw;
-    const cleaned = String(raw).replace(/::[\w]+$/, '').trim();
+    const cleaned = String(raw)
+      .replace(/::[\w]+$/, '')
+      .trim();
     const n = Number(cleaned);
     return Number.isNaN(n) ? cleaned : n;
   }
@@ -42,11 +44,16 @@ export class CypherLearningPathService {
   parseAgtypeArray(raw: string | null | undefined): unknown[] {
     if (!raw) return [];
     try {
-      const cleaned = String(raw).replace(/::[\w]+(?=[,\}\]])/g, '').trim();
+      const cleaned = String(raw)
+        .replace(/::[\w]+(?=[,\}\]])/g, '')
+        .trim();
       const parsed = JSON.parse(cleaned);
       return Array.isArray(parsed) ? parsed : [];
     } catch (err) {
-      this.logger.warn({ err, raw }, 'parseAgtypeArray: failed to parse agtype array');
+      this.logger.warn(
+        { err, raw },
+        'parseAgtypeArray: failed to parse agtype array'
+      );
       return [];
     }
   }
@@ -56,7 +63,10 @@ export class CypherLearningPathService {
     const client = await pool.connect();
     await client.query("LOAD 'age'");
     await client.query('SET search_path = ag_catalog, "$user", public');
-    await client.query('SELECT set_config($1, $2, TRUE)', ['app.current_tenant', tenantId]);
+    await client.query('SELECT set_config($1, $2, TRUE)', [
+      'app.current_tenant',
+      tenantId,
+    ]);
     return client;
   }
 
@@ -64,7 +74,7 @@ export class CypherLearningPathService {
     client: Awaited<ReturnType<typeof this.acquireClient>>,
     cypherQuery: string,
     cypherParams: Record<string, unknown>,
-    asClause: string,
+    asClause: string
   ): Promise<T[]> {
     try {
       const q = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${cypherQuery}$$, $1) ${asClause}`;
@@ -72,7 +82,10 @@ export class CypherLearningPathService {
       return result.rows as T[];
     } catch (ageErr) {
       const msg = ageErr instanceof Error ? ageErr.message : String(ageErr);
-      if (!msg.includes('third argument of cypher function must be a parameter')) throw ageErr;
+      if (
+        !msg.includes('third argument of cypher function must be a parameter')
+      )
+        throw ageErr;
       const substituted = substituteParams(cypherQuery, cypherParams);
       const qDirect = `SELECT * FROM ag_catalog.cypher('${GRAPH_NAME}', $$${substituted}$$) ${asClause}`;
       const result = await client.query(qDirect);
@@ -81,7 +94,9 @@ export class CypherLearningPathService {
   }
 
   async findShortestLearningPath(
-    fromName: string, toName: string, tenantId: string
+    fromName: string,
+    toName: string,
+    tenantId: string
   ): Promise<LearningPathResult | null> {
     const client = await this.acquireClient(tenantId);
     try {
@@ -92,8 +107,10 @@ export class CypherLearningPathService {
         RETURN [node IN nodes(path) | {id: node.id, name: node.name, type: node.type}] AS concepts,
                length(path) AS steps`;
       const rows = await this.runAgeQuery<{ concepts: string; steps: string }>(
-        client, cypherQuery, { fromName, toName, tenantId },
-        'AS (concepts ag_catalog.agtype, steps ag_catalog.agtype)',
+        client,
+        cypherQuery,
+        { fromName, toName, tenantId },
+        'AS (concepts ag_catalog.agtype, steps ag_catalog.agtype)'
       );
       if (!rows || rows.length === 0 || !rows[0]) return null;
       return {
@@ -101,7 +118,10 @@ export class CypherLearningPathService {
         steps: this.parseAgtypeScalar(rows[0].steps) as number,
       };
     } catch (err) {
-      this.logger.error({ err, fromName, toName, tenantId }, 'findShortestLearningPath failed');
+      this.logger.error(
+        { err, fromName, toName, tenantId },
+        'findShortestLearningPath failed'
+      );
       return null;
     } finally {
       client.release();
@@ -109,7 +129,9 @@ export class CypherLearningPathService {
   }
 
   async collectRelatedConcepts(
-    conceptName: string, depth: number, tenantId: string
+    conceptName: string,
+    depth: number,
+    tenantId: string
   ): Promise<ConceptNode[]> {
     const safeDepth = Math.max(1, Math.min(5, Math.trunc(depth)));
     const client = await this.acquireClient(tenantId);
@@ -120,19 +142,28 @@ export class CypherLearningPathService {
         MATCH (c)-[:RELATED_TO*1..${safeDepth}]-(related:Concept {tenant_id: $tenantId})
         RETURN COLLECT(DISTINCT {id: related.id, name: related.name, type: related.type}) AS related`;
       const rows = await this.runAgeQuery<{ related: string }>(
-        client, cypherQuery, { conceptName, tenantId }, 'AS (related ag_catalog.agtype)',
+        client,
+        cypherQuery,
+        { conceptName, tenantId },
+        'AS (related ag_catalog.agtype)'
       );
       if (!rows || rows.length === 0 || !rows[0]) return [];
       return this.parseAgtypeArray(rows[0].related) as ConceptNode[];
     } catch (err) {
-      this.logger.error({ err, conceptName, tenantId }, 'collectRelatedConcepts failed');
+      this.logger.error(
+        { err, conceptName, tenantId },
+        'collectRelatedConcepts failed'
+      );
       return [];
     } finally {
       client.release();
     }
   }
 
-  async findPrerequisiteChain(conceptName: string, tenantId: string): Promise<ConceptNode[]> {
+  async findPrerequisiteChain(
+    conceptName: string,
+    tenantId: string
+  ): Promise<ConceptNode[]> {
     const client = await this.acquireClient(tenantId);
     try {
       const cypherQuery = `
@@ -142,12 +173,18 @@ export class CypherLearningPathService {
         RETURN [node IN nodes(path) | {id: node.id, name: node.name}] AS chain
         ORDER BY length(path) DESC LIMIT 1`;
       const rows = await this.runAgeQuery<{ chain: string }>(
-        client, cypherQuery, { conceptName, tenantId }, 'AS (chain ag_catalog.agtype)',
+        client,
+        cypherQuery,
+        { conceptName, tenantId },
+        'AS (chain ag_catalog.agtype)'
       );
       if (!rows || rows.length === 0 || !rows[0]) return [];
       return this.parseAgtypeArray(rows[0].chain) as ConceptNode[];
     } catch (err) {
-      this.logger.error({ err, conceptName, tenantId }, 'findPrerequisiteChain failed');
+      this.logger.error(
+        { err, conceptName, tenantId },
+        'findPrerequisiteChain failed'
+      );
       return [];
     } finally {
       client.release();

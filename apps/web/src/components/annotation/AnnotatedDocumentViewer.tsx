@@ -60,7 +60,6 @@ export function AnnotatedDocumentViewer({
 
   const extension = React.useMemo(
     () => createAnnotationExtension(annotationsRef, focusedIdRef),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 

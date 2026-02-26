@@ -12,7 +12,12 @@ const __dirname = path.dirname(__filename);
 
 const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 export const SESSION_FILE = path.resolve(
-  __dirname, '..', '..', '..', 'test-results', 'instructor-session.json'
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'test-results',
+  'instructor-session.json'
 );
 
 export default async function globalSetup(_config: FullConfig) {
@@ -46,7 +51,10 @@ export default async function globalSetup(_config: FullConfig) {
     console.log('[setup] Already authenticated via SSO');
   } else {
     // Click Sign In with Keycloak
-    const btn = page.locator('button').filter({ hasText: /sign in with keycloak/i }).first();
+    const btn = page
+      .locator('button')
+      .filter({ hasText: /sign in with keycloak/i })
+      .first();
     await btn.waitFor({ state: 'visible', timeout: 10_000 });
     await btn.click();
 
@@ -55,7 +63,9 @@ export default async function globalSetup(_config: FullConfig) {
     console.log(`[setup] Keycloak: ${page.url()}`);
 
     // Fill login form
-    await page.locator('#username').waitFor({ state: 'visible', timeout: 10_000 });
+    await page
+      .locator('#username')
+      .waitFor({ state: 'visible', timeout: 10_000 });
     await page.fill('#username', 'instructor@example.com');
     await page.fill('#password', 'Instructor123!');
     await page.click('#kc-login');

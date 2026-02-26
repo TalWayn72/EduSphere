@@ -24,8 +24,11 @@ function parseBlocks(raw: RawBlock[]): PortalBlock[] {
       type: b.type as BlockType,
       order: b.order,
       config: (() => {
-        try { return JSON.parse(b.config) as Record<string, unknown>; }
-        catch { return {}; }
+        try {
+          return JSON.parse(b.config) as Record<string, unknown>;
+        } catch {
+          return {};
+        }
       })(),
     }))
     .sort((a, b) => a.order - b.order);

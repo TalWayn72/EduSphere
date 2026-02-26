@@ -22,7 +22,11 @@ import {
 import type { Database, TenantContext } from '@edusphere/db';
 import { connect, type NatsConnection, type Subscription } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
-import { loadKeyPair, signCredential, verifyCredentialSignature } from './open-badge.crypto.js';
+import {
+  loadKeyPair,
+  signCredential,
+  verifyCredentialSignature,
+} from './open-badge.crypto.js';
 import { buildLinkedInShareUrl } from './open-badge.types.js';
 import type {
   Ed25519KeyPair,
@@ -78,14 +82,19 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
       void this.handleCourseCompletionEvents(sub);
       this.logger.log('OpenBadgeService: NATS subscribed to course.completed');
     } catch (err) {
-      this.logger.warn({ err }, 'OpenBadgeService: NATS unavailable — auto-issuance disabled');
+      this.logger.warn(
+        { err },
+        'OpenBadgeService: NATS unavailable — auto-issuance disabled'
+      );
     }
   }
 
   private async handleCourseCompletionEvents(sub: Subscription): Promise<void> {
     for await (const msg of sub) {
       try {
-        const event = JSON.parse(new TextDecoder().decode(msg.data)) as CourseCompletedEvent;
+        const event = JSON.parse(
+          new TextDecoder().decode(msg.data)
+        ) as CourseCompletedEvent;
         if (!event.badgeDefinitionId) continue;
         await this.issueCredential({
           userId: event.userId,
@@ -93,21 +102,37 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
           badgeDefinitionId: event.badgeDefinitionId,
         });
       } catch (err) {
-        this.logger.error({ err }, 'Failed to auto-issue badge on course completion');
+        this.logger.error(
+          { err },
+          'Failed to auto-issue badge on course completion'
+        );
       }
     }
   }
 
-  async issueCredential(input: IssueCredentialInput): Promise<BadgeAssertionResult> {
-    const ctx: TenantContext = { tenantId: input.tenantId, userId: input.userId, userRole: 'STUDENT' };
+  async issueCredential(
+    input: IssueCredentialInput
+  ): Promise<BadgeAssertionResult> {
+    const ctx: TenantContext = {
+      tenantId: input.tenantId,
+      userId: input.userId,
+      userRole: 'STUDENT',
+    };
     return withTenantContext(this.db, ctx, async (tx) => {
       const [def] = await tx
-        .select().from(schema.openBadgeDefinitions)
-        .where(and(
-          eq(schema.openBadgeDefinitions.id, input.badgeDefinitionId),
-          eq(schema.openBadgeDefinitions.tenantId, input.tenantId),
-        )).limit(1);
-      if (!def) throw new NotFoundException(`Badge definition ${input.badgeDefinitionId} not found`);
+        .select()
+        .from(schema.openBadgeDefinitions)
+        .where(
+          and(
+            eq(schema.openBadgeDefinitions.id, input.badgeDefinitionId),
+            eq(schema.openBadgeDefinitions.tenantId, input.tenantId)
+          )
+        )
+        .limit(1);
+      if (!def)
+        throw new NotFoundException(
+          `Badge definition ${input.badgeDefinitionId} not found`
+        );
 
       const credentialBody = this.buildCredentialBody(def, input);
       const proof = signCredential(credentialBody, this.keyPair);
@@ -121,10 +146,14 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
           expiresAt: input.expiresAt,
           evidenceUrl: input.evidenceUrl,
           proof: proof as unknown as Record<string, unknown>,
-        }).returning();
+        })
+        .returning();
 
       if (!assertion) throw new Error('Assertion insert returned no record');
-      this.logger.log({ assertionId: assertion.id, userId: input.userId }, 'OpenBadge issued');
+      this.logger.log(
+        { assertionId: assertion.id, userId: input.userId },
+        'OpenBadge issued'
+      );
       return this.mapAssertion(assertion, def.name, def.description);
     });
   }
@@ -132,7 +161,8 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
   async verifyCredential(assertionId: string): Promise<VerificationResult> {
     const assertion = await this.getAssertionById(assertionId);
     if (!assertion) return { valid: false, error: 'Assertion not found' };
-    if (assertion.revoked) return { valid: false, error: 'Credential has been revoked' };
+    if (assertion.revoked)
+      return { valid: false, error: 'Credential has been revoked' };
     if (assertion.expiresAt && assertion.expiresAt < new Date()) {
       return { valid: false, error: 'Credential has expired' };
     }
@@ -145,52 +175,94 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
       tenantId: assertion.tenantId,
     });
     const proof = assertion.proof as unknown as OpenBadgeProof;
-    const valid = verifyCredentialSignature(body, proof, this.keyPair.publicKey);
+    const valid = verifyCredentialSignature(
+      body,
+      proof,
+      this.keyPair.publicKey
+    );
     if (!valid) return { valid: false, error: 'Signature verification failed' };
-    return { valid: true, assertion: this.mapAssertion(assertion, def.name, def.description) };
+    return {
+      valid: true,
+      assertion: this.mapAssertion(assertion, def.name, def.description),
+    };
   }
 
-  async revokeCredential(assertionId: string, reason: string, tenantId: string): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+  async revokeCredential(
+    assertionId: string,
+    reason: string,
+    tenantId: string
+  ): Promise<void> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) => {
       const [existing] = await tx
-        .select({ id: schema.openBadgeAssertions.id, tenantId: schema.openBadgeAssertions.tenantId })
+        .select({
+          id: schema.openBadgeAssertions.id,
+          tenantId: schema.openBadgeAssertions.tenantId,
+        })
         .from(schema.openBadgeAssertions)
-        .where(eq(schema.openBadgeAssertions.id, assertionId)).limit(1);
-      if (!existing) throw new NotFoundException(`Assertion ${assertionId} not found`);
-      if (existing.tenantId !== tenantId) throw new ForbiddenException('Cross-tenant revocation denied');
-      await tx.update(schema.openBadgeAssertions)
+        .where(eq(schema.openBadgeAssertions.id, assertionId))
+        .limit(1);
+      if (!existing)
+        throw new NotFoundException(`Assertion ${assertionId} not found`);
+      if (existing.tenantId !== tenantId)
+        throw new ForbiddenException('Cross-tenant revocation denied');
+      await tx
+        .update(schema.openBadgeAssertions)
         .set({ revoked: true, revokedAt: new Date(), revokedReason: reason })
         .where(eq(schema.openBadgeAssertions.id, assertionId));
     });
     this.logger.log({ assertionId, reason }, 'OpenBadge revoked');
   }
 
-  async getUserBadges(userId: string, tenantId: string): Promise<BadgeAssertionResult[]> {
+  async getUserBadges(
+    userId: string,
+    tenantId: string
+  ): Promise<BadgeAssertionResult[]> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
     return withTenantContext(this.db, ctx, async (tx) => {
       const rows = await tx
-        .select({ assertion: schema.openBadgeAssertions, def: schema.openBadgeDefinitions })
+        .select({
+          assertion: schema.openBadgeAssertions,
+          def: schema.openBadgeDefinitions,
+        })
         .from(schema.openBadgeAssertions)
-        .innerJoin(schema.openBadgeDefinitions,
-          eq(schema.openBadgeAssertions.badgeDefinitionId, schema.openBadgeDefinitions.id))
-        .where(and(
-          eq(schema.openBadgeAssertions.recipientId, userId),
-          eq(schema.openBadgeAssertions.tenantId, tenantId),
-          eq(schema.openBadgeAssertions.revoked, false),
-        ));
-      return rows.map((r) => this.mapAssertion(r.assertion, r.def.name, r.def.description));
+        .innerJoin(
+          schema.openBadgeDefinitions,
+          eq(
+            schema.openBadgeAssertions.badgeDefinitionId,
+            schema.openBadgeDefinitions.id
+          )
+        )
+        .where(
+          and(
+            eq(schema.openBadgeAssertions.recipientId, userId),
+            eq(schema.openBadgeAssertions.tenantId, tenantId),
+            eq(schema.openBadgeAssertions.revoked, false)
+          )
+        );
+      return rows.map((r) =>
+        this.mapAssertion(r.assertion, r.def.name, r.def.description)
+      );
     });
   }
 
   async createBadgeDefinition(
     input: CreateBadgeDefinitionInput,
     tenantId: string,
-    issuerId?: string,
+    issuerId?: string
   ): Promise<typeof schema.openBadgeDefinitions.$inferSelect> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     return withTenantContext(this.db, ctx, async (tx) => {
-      const [def] = await tx.insert(schema.openBadgeDefinitions)
+      const [def] = await tx
+        .insert(schema.openBadgeDefinitions)
         .values({
           tenantId,
           name: input.name,
@@ -199,38 +271,61 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
           criteriaUrl: input.criteriaUrl,
           tags: input.tags ?? [],
           issuerId: issuerId ?? this.keyPair.issuerDid,
-        }).returning();
+        })
+        .returning();
       if (!def) throw new Error('Badge definition insert returned no record');
-      this.logger.log({ defId: def.id, name: def.name }, 'OpenBadge definition created');
+      this.logger.log(
+        { defId: def.id, name: def.name },
+        'OpenBadge definition created'
+      );
       return def;
     });
   }
 
-  async getBadgeDefinitions(tenantId: string): Promise<(typeof schema.openBadgeDefinitions.$inferSelect)[]> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+  async getBadgeDefinitions(
+    tenantId: string
+  ): Promise<(typeof schema.openBadgeDefinitions.$inferSelect)[]> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     return withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.openBadgeDefinitions)
-        .where(eq(schema.openBadgeDefinitions.tenantId, tenantId)),
+      tx
+        .select()
+        .from(schema.openBadgeDefinitions)
+        .where(eq(schema.openBadgeDefinitions.tenantId, tenantId))
     );
   }
 
-  async getAssertionById(assertionId: string): Promise<typeof schema.openBadgeAssertions.$inferSelect | null> {
+  async getAssertionById(
+    assertionId: string
+  ): Promise<typeof schema.openBadgeAssertions.$inferSelect | null> {
     const [assertion] = await this.db
-      .select().from(schema.openBadgeAssertions)
-      .where(eq(schema.openBadgeAssertions.id, assertionId)).limit(1);
+      .select()
+      .from(schema.openBadgeAssertions)
+      .where(eq(schema.openBadgeAssertions.id, assertionId))
+      .limit(1);
     return assertion ?? null;
   }
 
-  async getDefinitionById(definitionId: string): Promise<typeof schema.openBadgeDefinitions.$inferSelect | null> {
+  async getDefinitionById(
+    definitionId: string
+  ): Promise<typeof schema.openBadgeDefinitions.$inferSelect | null> {
     const [def] = await this.db
-      .select().from(schema.openBadgeDefinitions)
-      .where(eq(schema.openBadgeDefinitions.id, definitionId)).limit(1);
+      .select()
+      .from(schema.openBadgeDefinitions)
+      .where(eq(schema.openBadgeDefinitions.id, definitionId))
+      .limit(1);
     return def ?? null;
   }
 
   buildCredentialBody(
     def: typeof schema.openBadgeDefinitions.$inferSelect,
-    input: Pick<IssueCredentialInput, 'userId' | 'badgeDefinitionId' | 'tenantId' | 'expiresAt'>,
+    input: Pick<
+      IssueCredentialInput,
+      'userId' | 'badgeDefinitionId' | 'tenantId' | 'expiresAt'
+    >
   ): Ob3CredentialBody {
     return {
       '@context': [
@@ -239,9 +334,15 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
       ],
       id: `${BASE_URL}/ob3/assertion/pending`,
       type: ['VerifiableCredential', 'OpenBadgeCredential'],
-      issuer: { id: this.keyPair.issuerDid, type: 'Profile', name: 'EduSphere' },
+      issuer: {
+        id: this.keyPair.issuerDid,
+        type: 'Profile',
+        name: 'EduSphere',
+      },
       issuanceDate: new Date().toISOString(),
-      ...(input.expiresAt ? { expirationDate: input.expiresAt.toISOString() } : {}),
+      ...(input.expiresAt
+        ? { expirationDate: input.expiresAt.toISOString() }
+        : {}),
       credentialSubject: {
         id: `did:example:${input.userId}`,
         type: ['AchievementSubject'],
@@ -250,8 +351,12 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
           type: ['Achievement'],
           name: def.name,
           description: def.description,
-          criteria: { narrative: def.criteriaUrl ?? `${BASE_URL}/ob3/badge/${def.id}` },
-          ...(def.imageUrl ? { image: { id: def.imageUrl, type: 'Image' as const } } : {}),
+          criteria: {
+            narrative: def.criteriaUrl ?? `${BASE_URL}/ob3/badge/${def.id}`,
+          },
+          ...(def.imageUrl
+            ? { image: { id: def.imageUrl, type: 'Image' as const } }
+            : {}),
         },
       },
     };
@@ -260,7 +365,7 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
   mapAssertion(
     assertion: typeof schema.openBadgeAssertions.$inferSelect,
     badgeName: string,
-    badgeDescription: string,
+    badgeDescription: string
   ): BadgeAssertionResult {
     const verifyUrl = `${BASE_URL}/ob3/assertion/${assertion.id}`;
     return {
@@ -274,7 +379,11 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
       evidenceUrl: assertion.evidenceUrl ?? null,
       revoked: assertion.revoked,
       verifyUrl,
-      shareUrl: buildLinkedInShareUrl(badgeName, assertion.issuedAt.toISOString(), verifyUrl),
+      shareUrl: buildLinkedInShareUrl(
+        badgeName,
+        assertion.issuedAt.toISOString(),
+        verifyUrl
+      ),
       proof: assertion.proof as unknown as OpenBadgeProof,
     };
   }

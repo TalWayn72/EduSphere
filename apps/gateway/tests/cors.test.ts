@@ -19,7 +19,8 @@ describe('CORS origin resolution', () => {
   });
 
   it('returns both origins when CORS_ORIGIN contains two comma-separated values', () => {
-    process.env.CORS_ORIGIN = 'https://app.example.com,https://admin.example.com';
+    process.env.CORS_ORIGIN =
+      'https://app.example.com,https://admin.example.com';
     const origins = resolveCorsOrigins();
     expect(origins).toContain('https://app.example.com');
     expect(origins).toContain('https://admin.example.com');
@@ -27,7 +28,8 @@ describe('CORS origin resolution', () => {
   });
 
   it('trims whitespace around each origin', () => {
-    process.env.CORS_ORIGIN = '  https://app.example.com , https://admin.example.com  ';
+    process.env.CORS_ORIGIN =
+      '  https://app.example.com , https://admin.example.com  ';
     const origins = resolveCorsOrigins();
     expect(origins).toContain('https://app.example.com');
     expect(origins).toContain('https://admin.example.com');
@@ -47,7 +49,8 @@ describe('CORS origin resolution', () => {
     expect(resolveCorsOrigins()).not.toContain('*');
 
     // Case 2: env set to specific origins
-    process.env.CORS_ORIGIN = 'https://app.example.com,https://admin.example.com';
+    process.env.CORS_ORIGIN =
+      'https://app.example.com,https://admin.example.com';
     expect(resolveCorsOrigins()).not.toContain('*');
 
     // Case 3: env is empty string (edge case — treat as unset → fail closed)

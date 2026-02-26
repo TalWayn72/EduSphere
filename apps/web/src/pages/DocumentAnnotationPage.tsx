@@ -80,7 +80,7 @@ export function DocumentAnnotationPage() {
       }, 400);
       return () => clearTimeout(timer);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item?.id, fetching]);
 
   const handleScroll = useCallback(() => {

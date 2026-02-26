@@ -5,4 +5,6 @@ export const RequestContentTranslationSchema = z.object({
   targetLocale: z.string().min(2).max(10),
 });
 
-export type RequestContentTranslationInput = z.infer<typeof RequestContentTranslationSchema>;
+export type RequestContentTranslationInput = z.infer<
+  typeof RequestContentTranslationSchema
+>;

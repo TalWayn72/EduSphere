@@ -27,11 +27,20 @@ interface Props {
 }
 
 const FONT_OPTIONS = [
-  'Inter', 'Roboto', 'Open Sans', 'Lato', 'Poppins', 'Nunito', 'System Default',
+  'Inter',
+  'Roboto',
+  'Open Sans',
+  'Lato',
+  'Poppins',
+  'Nunito',
+  'System Default',
 ];
 
 function ColorField({
-  label, field, value, onChange,
+  label,
+  field,
+  value,
+  onChange,
 }: {
   label: string;
   field: keyof BrandingFormState;
@@ -63,10 +72,14 @@ function ColorField({
 export function BrandingIdentityCard({ form, onChange }: Props) {
   return (
     <Card>
-      <CardHeader><CardTitle>Organization Identity</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Organization Identity</CardTitle>
+      </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
-          <label className="text-sm font-medium">Organization Name <span className="text-destructive">*</span></label>
+          <label className="text-sm font-medium">
+            Organization Name <span className="text-destructive">*</span>
+          </label>
           <input
             type="text"
             value={form.organizationName}
@@ -103,7 +116,9 @@ export function BrandingIdentityCard({ form, onChange }: Props) {
 export function BrandingLogosCard({ form, onChange }: Props) {
   return (
     <Card>
-      <CardHeader><CardTitle>Logos &amp; Favicon</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Logos &amp; Favicon</CardTitle>
+      </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
           <label className="text-sm font-medium">Logo URL</label>
@@ -116,12 +131,19 @@ export function BrandingLogosCard({ form, onChange }: Props) {
               placeholder="https://..."
             />
             {form.logoUrl && (
-              <img src={form.logoUrl} alt="Logo preview" className="h-8 max-w-[80px] object-contain rounded border" />
+              <img
+                src={form.logoUrl}
+                alt="Logo preview"
+                className="h-8 max-w-[80px] object-contain rounded border"
+              />
             )}
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium">Logo Mark URL <span className="text-muted-foreground text-xs">(optional)</span></label>
+          <label className="text-sm font-medium">
+            Logo Mark URL{' '}
+            <span className="text-muted-foreground text-xs">(optional)</span>
+          </label>
           <input
             type="text"
             value={form.logoMarkUrl}
@@ -150,12 +172,34 @@ export function BrandingColorsCard({ form, onChange }: Props) {
     onChange(field, value);
   return (
     <Card>
-      <CardHeader><CardTitle>Colors</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Colors</CardTitle>
+      </CardHeader>
       <CardContent className="grid grid-cols-2 gap-4">
-        <ColorField label="Primary Color" field="primaryColor" value={form.primaryColor} onChange={handleColor} />
-        <ColorField label="Secondary Color" field="secondaryColor" value={form.secondaryColor} onChange={handleColor} />
-        <ColorField label="Accent Color" field="accentColor" value={form.accentColor} onChange={handleColor} />
-        <ColorField label="Background Color" field="backgroundColor" value={form.backgroundColor} onChange={handleColor} />
+        <ColorField
+          label="Primary Color"
+          field="primaryColor"
+          value={form.primaryColor}
+          onChange={handleColor}
+        />
+        <ColorField
+          label="Secondary Color"
+          field="secondaryColor"
+          value={form.secondaryColor}
+          onChange={handleColor}
+        />
+        <ColorField
+          label="Accent Color"
+          field="accentColor"
+          value={form.accentColor}
+          onChange={handleColor}
+        />
+        <ColorField
+          label="Background Color"
+          field="backgroundColor"
+          value={form.backgroundColor}
+          onChange={handleColor}
+        />
       </CardContent>
     </Card>
   );
@@ -164,7 +208,9 @@ export function BrandingColorsCard({ form, onChange }: Props) {
 export function BrandingMiscCard({ form, onChange }: Props) {
   return (
     <Card>
-      <CardHeader><CardTitle>Typography, Policies &amp; Branding</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Typography, Policies &amp; Branding</CardTitle>
+      </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
           <label className="text-sm font-medium">Font Family</label>
@@ -174,7 +220,9 @@ export function BrandingMiscCard({ form, onChange }: Props) {
             className="w-full border rounded px-3 py-2 text-sm bg-background"
           >
             {FONT_OPTIONS.map((f) => (
-              <option key={f} value={f}>{f}</option>
+              <option key={f} value={f}>
+                {f}
+              </option>
             ))}
           </select>
         </div>
@@ -203,13 +251,20 @@ export function BrandingMiscCard({ form, onChange }: Props) {
             id="hide-branding"
             type="checkbox"
             checked={form.hideEduSphereBranding}
-            onChange={(e) => onChange('hideEduSphereBranding', e.target.checked)}
+            onChange={(e) =>
+              onChange('hideEduSphereBranding', e.target.checked)
+            }
             className="h-4 w-4 rounded border"
           />
-          <label htmlFor="hide-branding" className="text-sm font-medium cursor-pointer">
+          <label
+            htmlFor="hide-branding"
+            className="text-sm font-medium cursor-pointer"
+          >
             Hide EduSphere Branding
           </label>
-          <span className="text-xs text-muted-foreground">Remove "Powered by EduSphere" footer</span>
+          <span className="text-xs text-muted-foreground">
+            Remove "Powered by EduSphere" footer
+          </span>
         </div>
       </CardContent>
     </Card>

@@ -39,8 +39,16 @@ export const EXPORT_CPD_REPORT_MUTATION = gql`
 `;
 
 export const CREATE_CPD_CREDIT_TYPE_MUTATION = gql`
-  mutation CreateCpdCreditType($name: String!, $regulatoryBody: String!, $creditHoursPerHour: Float!) {
-    createCpdCreditType(name: $name, regulatoryBody: $regulatoryBody, creditHoursPerHour: $creditHoursPerHour) {
+  mutation CreateCpdCreditType(
+    $name: String!
+    $regulatoryBody: String!
+    $creditHoursPerHour: Float!
+  ) {
+    createCpdCreditType(
+      name: $name
+      regulatoryBody: $regulatoryBody
+      creditHoursPerHour: $creditHoursPerHour
+    ) {
       id
       name
       regulatoryBody
@@ -51,7 +59,15 @@ export const CREATE_CPD_CREDIT_TYPE_MUTATION = gql`
 `;
 
 export const ASSIGN_CPD_CREDITS_MUTATION = gql`
-  mutation AssignCpdCreditsToCourse($courseId: ID!, $creditTypeId: ID!, $creditHours: Float!) {
-    assignCpdCreditsToCourse(courseId: $courseId, creditTypeId: $creditTypeId, creditHours: $creditHours)
+  mutation AssignCpdCreditsToCourse(
+    $courseId: ID!
+    $creditTypeId: ID!
+    $creditHours: Float!
+  ) {
+    assignCpdCreditsToCourse(
+      courseId: $courseId
+      creditTypeId: $creditTypeId
+      creditHours: $creditHours
+    )
   }
 `;

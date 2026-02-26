@@ -78,7 +78,9 @@ export function CommentCard({
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-muted text-[10px] font-semibold shrink-0">
           {getInitials(annotation.userName)}
         </span>
-        <span className="font-medium truncate flex-1">{annotation.userName}</span>
+        <span className="font-medium truncate flex-1">
+          {annotation.userName}
+        </span>
         <span
           className={cn(
             'text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0',

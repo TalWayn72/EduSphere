@@ -26,7 +26,11 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
     if (!newTitle.trim()) return;
     const updated: CourseModule[] = [
       ...modules,
-      { id: generateId(), title: newTitle.trim(), description: newDescription.trim() },
+      {
+        id: generateId(),
+        title: newTitle.trim(),
+        description: newDescription.trim(),
+      },
     ];
     onChange({ modules: updated });
     setNewTitle('');
@@ -119,11 +123,18 @@ export function CourseWizardStep2({ modules, onChange }: Props) {
             placeholder={t('wizard.addModuleTitlePlaceholder')}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addModule(); } }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addModule();
+              }
+            }}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="module-desc">{t('wizard.addModuleDescriptionLabel')}</Label>
+          <Label htmlFor="module-desc">
+            {t('wizard.addModuleDescriptionLabel')}
+          </Label>
           <Textarea
             id="module-desc"
             placeholder={t('wizard.addModuleDescriptionPlaceholder')}

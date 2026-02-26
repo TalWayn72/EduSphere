@@ -59,7 +59,7 @@ describe('Schema versioning: timestamp is required on session and annotation eve
         userId: 'uuid-u',
         data: {},
         // timestamp intentionally missing
-      }),
+      })
     ).toThrow(EventValidationError);
   });
 
@@ -71,7 +71,7 @@ describe('Schema versioning: timestamp is required on session and annotation eve
         userId: 'uuid-u',
         data: {},
         timestamp: 'not-a-valid-date',
-      }),
+      })
     ).toThrow(EventValidationError);
   });
 
@@ -105,7 +105,7 @@ describe('Schema versioning: timestamp is required on session and annotation eve
         userId: 'uuid-u',
         data: {},
         timestamp: '2026-01-01T00:00:00Z',
-      }),
+      })
     ).toBe(true);
   });
 });
@@ -125,7 +125,7 @@ describe('Consumer group isolation: tenantId is required on tenant-scoped events
         userId: 'user-1',
         // tenantId missing
         timestamp: '2026-01-01T00:00:00Z',
-      }),
+      })
     ).toThrow(EventValidationError);
   });
 
@@ -138,7 +138,7 @@ describe('Consumer group isolation: tenantId is required on tenant-scoped events
         userId: 'user-1',
         tenantId: '',
         timestamp: '2026-01-01T00:00:00Z',
-      }),
+      })
     ).toThrow(EventValidationError);
   });
 
@@ -162,7 +162,7 @@ describe('Consumer group isolation: tenantId is required on tenant-scoped events
         contentItemId: 'item-1',
         // tenantId missing
         timestamp: '2026-01-01T00:00:00Z',
-      }),
+      })
     ).toThrow(EventValidationError);
   });
 
@@ -173,7 +173,7 @@ describe('Consumer group isolation: tenantId is required on tenant-scoped events
         contentItemId: 'item-1',
         tenantId: '',
         timestamp: '2026-01-01T00:00:00Z',
-      }),
+      })
     ).toThrow(EventValidationError);
   });
 
@@ -237,7 +237,7 @@ describe('Required vs optional fields: AgentMessagePayload', () => {
         sessionId: 'session-1',
         userId: '',
         timestamp: '2026-01-01T00:00:00Z',
-      }),
+      })
     ).toThrow(EventValidationError);
   });
 });
@@ -339,7 +339,7 @@ describe('Event type definitions use readonly modifiers (immutability)', () => {
     // Check that the interface uses "readonly" on its fields
     const agentSessionBlock = src.slice(
       src.indexOf('interface AgentSessionPayload'),
-      src.indexOf('}', src.indexOf('interface AgentSessionPayload')) + 1,
+      src.indexOf('}', src.indexOf('interface AgentSessionPayload')) + 1
     );
     expect(agentSessionBlock).toContain('readonly type');
     expect(agentSessionBlock).toContain('readonly sessionId');
@@ -350,7 +350,7 @@ describe('Event type definitions use readonly modifiers (immutability)', () => {
   it('AgentMessagePayload fields are readonly', () => {
     const block = src.slice(
       src.indexOf('interface AgentMessagePayload'),
-      src.indexOf('}', src.indexOf('interface AgentMessagePayload')) + 1,
+      src.indexOf('}', src.indexOf('interface AgentMessagePayload')) + 1
     );
     expect(block).toContain('readonly type');
     expect(block).toContain('readonly sessionId');
@@ -359,7 +359,7 @@ describe('Event type definitions use readonly modifiers (immutability)', () => {
   it('AnnotationPayload fields are readonly', () => {
     const block = src.slice(
       src.indexOf('interface AnnotationPayload'),
-      src.indexOf('}', src.indexOf('interface AnnotationPayload')) + 1,
+      src.indexOf('}', src.indexOf('interface AnnotationPayload')) + 1
     );
     expect(block).toContain('readonly type');
     expect(block).toContain('readonly tenantId');
@@ -368,7 +368,7 @@ describe('Event type definitions use readonly modifiers (immutability)', () => {
   it('ContentPayload fields are readonly', () => {
     const block = src.slice(
       src.indexOf('interface ContentPayload'),
-      src.indexOf('}', src.indexOf('interface ContentPayload')) + 1,
+      src.indexOf('}', src.indexOf('interface ContentPayload')) + 1
     );
     expect(block).toContain('readonly type');
     expect(block).toContain('readonly tenantId');
@@ -377,7 +377,7 @@ describe('Event type definitions use readonly modifiers (immutability)', () => {
   it('KnowledgeConceptPayload fields are readonly', () => {
     const block = src.slice(
       src.indexOf('interface KnowledgeConceptPayload'),
-      src.indexOf('}', src.indexOf('interface KnowledgeConceptPayload')) + 1,
+      src.indexOf('}', src.indexOf('interface KnowledgeConceptPayload')) + 1
     );
     expect(block).toContain('readonly assetId');
     expect(block).toContain('readonly concepts');
@@ -445,7 +445,7 @@ describe('isKnowledgeConceptEvent: concept item structure', () => {
           { name: 'Algebra', description: 'Branch of mathematics' },
           { name: 'Calculus', relationships: ['Algebra'] },
         ],
-      }),
+      })
     ).toBe(true);
   });
 
@@ -455,7 +455,7 @@ describe('isKnowledgeConceptEvent: concept item structure', () => {
         type: 'content.created',
         assetId: 'asset-1',
         concepts: [],
-      }),
+      })
     ).toBe(false);
   });
 });
@@ -468,7 +468,7 @@ describe('isTranscriptionEvent: all fields validated', () => {
         assetId: 'asset-1',
         segmentCount: 99,
         language: 'he',
-      }),
+      })
     ).toBe(true);
   });
 
@@ -478,7 +478,7 @@ describe('isTranscriptionEvent: all fields validated', () => {
         type: 'transcription.failed',
         assetId: 'asset-1',
         errorMessage: 'CUDA out of memory',
-      }),
+      })
     ).toBe(true);
   });
 
@@ -487,7 +487,7 @@ describe('isTranscriptionEvent: all fields validated', () => {
       isTranscriptionEvent({
         type: 'content.created',
         assetId: 'asset-1',
-      }),
+      })
     ).toBe(false);
   });
 });
@@ -513,7 +513,7 @@ describe('isContentEvent: all content event subtypes recognised', () => {
           contentItemId: 'item-1',
           tenantId: 'tenant-1',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
   }

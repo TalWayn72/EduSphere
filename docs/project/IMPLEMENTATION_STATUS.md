@@ -6,6 +6,7 @@
 ## ✅ Completed Components
 
 ### Phase 0: Foundation (100%)
+
 - ✅ Docker Compose with all services (PostgreSQL, Keycloak, NATS, MinIO, Jaeger)
 - ✅ Monorepo structure (pnpm workspaces + Turborepo)
 - ✅ Health check scripts
@@ -14,6 +15,7 @@
 **Commit:** `8928798` - feat(db): Phase 0 & 1 - Foundation + Data Layer complete
 
 ### Phase 1: Data Layer (100%)
+
 - ✅ 16 Database tables (Drizzle ORM)
   - Tenants, Users (core)
   - Courses, Modules, MediaAssets, Transcripts, TranscriptSegments (content)
@@ -29,6 +31,7 @@
 **Commit:** `8928798` - feat(db): Phase 0 & 1 - Foundation + Data Layer complete
 
 ### Phase 2: Authentication Infrastructure (100%)
+
 - ✅ packages/auth
   - JWT validation with Keycloak JWKS
   - Zod schemas for claims validation
@@ -42,11 +45,13 @@
   - 5 demo users with roles
   - 3 OAuth clients (backend, web, mobile)
 
-**Commits:** 
+**Commits:**
+
 - `c95273b` - feat(auth): Phase 2 - Keycloak authentication complete
 - `bbbbf79` - feat(auth): Phase 2 - Keycloak authentication infrastructure
 
 ### Phase 3: Content Subgraph (Partial - 60%)
+
 - ✅ apps/subgraph-content (Port 4002)
   - Course module (GraphQL + Service + Resolver)
   - Module entities
@@ -59,11 +64,11 @@
 ## 🔴 Missing Critical Components
 
 ### High Priority (Blocking)
+
 1. **Gateway** - GraphQL Federation gateway (Port 4000)
    - Hive Gateway v2.7 configuration
    - Supergraph composition
    - JWT propagation to subgraphs
-   
 2. **Frontend** - React 19 + Vite 6 (Port 5173)
    - urql GraphQL client
    - TanStack Query for state
@@ -71,6 +76,7 @@
    - Basic UI components
 
 ### Medium Priority (Core Features)
+
 3. **Annotation Subgraph** (Port 4003)
    - 4-layer annotation system
    - Sketch + Link + Bookmark support
@@ -92,6 +98,7 @@
    - Learning path generation
 
 ### Lower Priority (Enhanced Features)
+
 7. Mobile App (Expo SDK 54)
 8. Transcription Worker (faster-whisper)
 9. Monitoring & Observability
@@ -99,30 +106,33 @@
 
 ## 📊 Statistics
 
-| Metric | Value |
-|--------|-------|
-| **Commits** | 5 total (3 major features) |
-| **Packages Built** | 3/10 (auth, db, subgraph-core) |
-| **Subgraphs Running** | 2/6 (core, content partial) |
-| **Database Tables** | 16/16 ✅ |
-| **GraphQL Schemas** | 2/6 (User, Tenant) |
-| **Test Coverage** | 0% (no tests yet) |
+| Metric                | Value                          |
+| --------------------- | ------------------------------ |
+| **Commits**           | 5 total (3 major features)     |
+| **Packages Built**    | 3/10 (auth, db, subgraph-core) |
+| **Subgraphs Running** | 2/6 (core, content partial)    |
+| **Database Tables**   | 16/16 ✅                       |
+| **GraphQL Schemas**   | 2/6 (User, Tenant)             |
+| **Test Coverage**     | 0% (no tests yet)              |
 
 ## 🎯 Next Session Priorities
 
 Based on PRD requirements and current gaps:
 
 ### Critical Path (Must Have - Week 1)
+
 1. **Gateway** - Enable federation (2-3 hours)
 2. **Frontend** - User authentication + course list (3-4 hours)
 3. **Complete Content Subgraph** - Media + Auth (1-2 hours)
 
 ### Secondary Path (Should Have - Week 2)
+
 4. **Annotation Subgraph** - Core annotation features (4-5 hours)
 5. **Knowledge Subgraph** - Graph queries + RAG (5-6 hours)
 6. **Agent Subgraph** - Basic AI workflows (4-5 hours)
 
 ### Testing & Quality (Week 3)
+
 7. Integration tests for all subgraphs
 8. E2E tests for critical user flows
 9. Performance testing (100K concurrent users target)

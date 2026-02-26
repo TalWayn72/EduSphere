@@ -4,7 +4,9 @@ import { keycloakConfig } from '@edusphere/config';
 import { JWTValidator, type AuthContext } from './jwt.js';
 
 export interface GraphQLContext {
-  req: IncomingMessage & { headers: Record<string, string | string[] | undefined> };
+  req: IncomingMessage & {
+    headers: Record<string, string | string[] | undefined>;
+  };
   authContext?: AuthContext;
 }
 
@@ -16,7 +18,7 @@ export class AuthMiddleware {
     this.jwtValidator = new JWTValidator(
       keycloakConfig.url,
       keycloakConfig.realm,
-      keycloakConfig.clientId,
+      keycloakConfig.clientId
     );
     this.logger.log(`JWT Validator initialized: ${keycloakConfig.issuer}`);
   }
@@ -40,7 +42,7 @@ export class AuthMiddleware {
       context.authContext = authContext;
 
       this.logger.debug(
-        `Authenticated: ${authContext.email} (${authContext.roles.join(', ')}) - Tenant: ${authContext.tenantId}`,
+        `Authenticated: ${authContext.email} (${authContext.roles.join(', ')}) - Tenant: ${authContext.tenantId}`
       );
     } catch (error) {
       this.logger.error(`JWT validation failed: ${error}`);

@@ -91,13 +91,19 @@ describe('Layout', () => {
   });
 
   it('shows "New Course" link for ORG_ADMIN role', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'ORG_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'ORG_ADMIN',
+    });
     renderLayout();
     expect(screen.getByText('New Course')).toBeInTheDocument();
   });
 
   it('shows "New Course" link for SUPER_ADMIN role', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({ ...MOCK_USER, role: 'SUPER_ADMIN' });
+    vi.mocked(getCurrentUser).mockReturnValue({
+      ...MOCK_USER,
+      role: 'SUPER_ADMIN',
+    });
     renderLayout();
     expect(screen.getByText('New Course')).toBeInTheDocument();
   });

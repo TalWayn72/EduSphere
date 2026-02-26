@@ -38,9 +38,9 @@ test.describe('Dashboard Widgets — Page shell', () => {
   });
 
   test('dashboard heading is visible', async ({ page }) => {
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('no crash overlay on /dashboard', async ({ page }) => {
@@ -58,7 +58,9 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
   test('DailyLearningWidget card title "Daily Learning" is visible', async ({
     page,
   }) => {
-    await expect(page.getByText('Daily Learning')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Daily Learning')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('DailyLearningWidget card description is visible', async ({ page }) => {
@@ -67,23 +69,42 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
     await expect(desc.first()).toBeVisible({ timeout: 8_000 });
   });
 
-  test('DailyLearningWidget shows lesson CTA or no-lesson state', async ({ page }) => {
+  test('DailyLearningWidget shows lesson CTA or no-lesson state', async ({
+    page,
+  }) => {
     // When lesson available and not started: "Start Today's Lesson" button
     // When no lesson available: "No microlessons available yet."
     // When completed: "All done for today!" with big emoji text
     // When error: "Could not load lesson: ..."
-    const startBtn = page.getByRole('button', { name: /Start Today's Lesson/i });
+    const startBtn = page.getByRole('button', {
+      name: /Start Today's Lesson/i,
+    });
     const noLesson = page.getByText(/No microlessons available yet/i);
     const allDone = page.getByText(/All done for today!/i);
     const loadingMsg = page.getByText(/Loading today's lesson/i);
     const errorMsg = page.getByText(/Could not load lesson/i);
 
     const anyVisible = await Promise.any([
-      startBtn.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      noLesson.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      allDone.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      loadingMsg.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      errorMsg.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
+      startBtn.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      noLesson.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      allDone.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      loadingMsg.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      errorMsg.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
     ]).catch(() => false);
 
     expect(anyVisible).toBe(true);
@@ -92,8 +113,12 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
   test('clicking "Start Today\'s Lesson" shows MicrolessonCard', async ({
     page,
   }) => {
-    const startBtn = page.getByRole('button', { name: /Start Today's Lesson/i });
-    const isVisible = await startBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const startBtn = page.getByRole('button', {
+      name: /Start Today's Lesson/i,
+    });
+    const isVisible = await startBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -108,9 +133,18 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
     const nextBtn = page.getByRole('button', { name: /Next/i });
 
     const cardVisible = await Promise.any([
-      prevBtn.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      markComplete.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      nextBtn.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
+      prevBtn.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      markComplete.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      nextBtn.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
     ]).catch(() => false);
 
     expect(cardVisible).toBe(true);
@@ -119,8 +153,12 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
   test('MicrolessonCard shows concept name badge when started', async ({
     page,
   }) => {
-    const startBtn = page.getByRole('button', { name: /Start Today's Lesson/i });
-    const isVisible = await startBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const startBtn = page.getByRole('button', {
+      name: /Start Today's Lesson/i,
+    });
+    const isVisible = await startBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -138,8 +176,12 @@ test.describe('Dashboard Widgets — DailyLearningWidget', () => {
   test('MicrolessonCard Prev button is disabled on first card', async ({
     page,
   }) => {
-    const startBtn = page.getByRole('button', { name: /Start Today's Lesson/i });
-    const isVisible = await startBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const startBtn = page.getByRole('button', {
+      name: /Start Today's Lesson/i,
+    });
+    const isVisible = await startBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -170,18 +212,22 @@ test.describe('Dashboard Widgets — SkillGapWidget', () => {
   });
 
   test('"Skill Gap Analysis" card title is visible', async ({ page }) => {
-    await expect(page.getByText('Skill Gap Analysis')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Skill Gap Analysis')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('SkillGapWidget description text is visible', async ({ page }) => {
     await expect(
-      page.getByText(/Compare your knowledge against a role profile/i),
+      page.getByText(/Compare your knowledge against a role profile/i)
     ).toBeVisible({ timeout: 8_000 });
   });
 
-  test('"New Profile" button is visible in SkillGapWidget', async ({ page }) => {
+  test('"New Profile" button is visible in SkillGapWidget', async ({
+    page,
+  }) => {
     await expect(
-      page.getByRole('button', { name: /New Profile/i }),
+      page.getByRole('button', { name: /New Profile/i })
     ).toBeVisible({ timeout: 8_000 });
   });
 
@@ -192,7 +238,7 @@ test.describe('Dashboard Widgets — SkillGapWidget', () => {
 
     // Dialog renders a DialogTitle "Create Skill Profile"
     await expect(
-      page.getByRole('heading', { name: 'Create Skill Profile' }),
+      page.getByRole('heading', { name: 'Create Skill Profile' })
     ).toBeVisible({ timeout: 5_000 });
   });
 
@@ -201,12 +247,12 @@ test.describe('Dashboard Widgets — SkillGapWidget', () => {
   }) => {
     await page.getByRole('button', { name: /New Profile/i }).click();
 
-    await expect(
-      page.getByPlaceholder(/Role name/i),
-    ).toBeVisible({ timeout: 5_000 });
-    await expect(
-      page.getByPlaceholder(/Required concepts/i),
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByPlaceholder(/Role name/i)).toBeVisible({
+      timeout: 5_000,
+    });
+    await expect(page.getByPlaceholder(/Required concepts/i)).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('Create Profile button is disabled when inputs are empty', async ({
@@ -232,12 +278,14 @@ test.describe('Dashboard Widgets — SkillGapWidget', () => {
 
   test('Cancel button closes the dialog', async ({ page }) => {
     await page.getByRole('button', { name: /New Profile/i }).click();
-    await page.getByRole('heading', { name: 'Create Skill Profile' }).waitFor({ state: 'visible' });
+    await page
+      .getByRole('heading', { name: 'Create Skill Profile' })
+      .waitFor({ state: 'visible' });
 
     await page.getByRole('button', { name: /Cancel/i }).click();
 
     await expect(
-      page.getByRole('heading', { name: 'Create Skill Profile' }),
+      page.getByRole('heading', { name: 'Create Skill Profile' })
     ).not.toBeVisible({ timeout: 3_000 });
   });
 
@@ -250,15 +298,26 @@ test.describe('Dashboard Widgets — SkillGapWidget', () => {
 
     // Any of these valid states is acceptable
     const anyVisible = await Promise.any([
-      selectTrigger.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      profilesLoading.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      noProfiles.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
+      selectTrigger.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      profilesLoading.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      noProfiles.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
     ]).catch(() => false);
 
     expect(anyVisible).toBe(true);
   });
 
-  test('BarChart3 icon is visible in SkillGapWidget title', async ({ page }) => {
+  test('BarChart3 icon is visible in SkillGapWidget title', async ({
+    page,
+  }) => {
     const icon = page.locator('svg.lucide-bar-chart3').first();
     await expect(icon).toBeVisible({ timeout: 8_000 });
   });
@@ -273,23 +332,38 @@ test.describe('Dashboard Widgets — LeaderboardWidget', () => {
 
   test('"Leaderboard" card title is visible', async ({ page }) => {
     // CardTitle text: "🏆 Leaderboard"
-    await expect(page.getByText(/Leaderboard/i).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Leaderboard/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test('leaderboard shows entries or empty state or loading', async ({ page }) => {
+  test('leaderboard shows entries or empty state or loading', async ({
+    page,
+  }) => {
     // With backend: div rows with rank + name + points
     // Without backend: "No data yet" paragraph
     // While fetching: skeleton divs h-8.animate-pulse
     const noData = page.getByText(/No data yet/i);
-    const skeleton = page.locator('.h-8.rounded.animate-pulse.bg-muted').first();
+    const skeleton = page
+      .locator('.h-8.rounded.animate-pulse.bg-muted')
+      .first();
     const firstEntry = page
       .locator('.flex.items-center.gap-3.px-2.py-1\\.5.rounded.text-sm')
       .first();
 
     const anyVisible = await Promise.any([
-      noData.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      skeleton.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
-      firstEntry.isVisible().then((v) => { if (!v) throw new Error(); return v; }),
+      noData.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      skeleton.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      firstEntry.isVisible().then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
     ]).catch(() => false);
 
     expect(anyVisible).toBe(true);
@@ -298,8 +372,9 @@ test.describe('Dashboard Widgets — LeaderboardWidget', () => {
   test('leaderboard entries show points when data is available', async ({
     page,
   }) => {
-    const entries = page
-      .locator('.flex.items-center.gap-3.px-2.py-1\\.5.rounded.text-sm');
+    const entries = page.locator(
+      '.flex.items-center.gap-3.px-2.py-1\\.5.rounded.text-sm'
+    );
     const count = await entries.count();
     if (count === 0) {
       test.skip();
@@ -314,8 +389,9 @@ test.describe('Dashboard Widgets — LeaderboardWidget', () => {
   test('leaderboard entries show badge count when data is available', async ({
     page,
   }) => {
-    const entries = page
-      .locator('.flex.items-center.gap-3.px-2.py-1\\.5.rounded.text-sm');
+    const entries = page.locator(
+      '.flex.items-center.gap-3.px-2.py-1\\.5.rounded.text-sm'
+    );
     const count = await entries.count();
     if (count === 0) {
       test.skip();
@@ -333,7 +409,9 @@ test.describe('Dashboard Widgets — LeaderboardWidget', () => {
     // Footer: "Your rank: #N" — only renders when myRank !== undefined
     const rankFooter = page.getByText(/Your rank: #\d+/i);
     // May not be visible without backend — just assert it doesn't crash
-    const visible = await rankFooter.isVisible({ timeout: 3_000 }).catch(() => false);
+    const visible = await rankFooter
+      .isVisible({ timeout: 3_000 })
+      .catch(() => false);
     expect(visible || !visible).toBe(true); // always passes — just ensures no throw
   });
 
@@ -385,20 +463,36 @@ test.describe('Dashboard Widgets — BadgesGrid', () => {
     const skeleton = page.locator('.h-32.animate-pulse.bg-muted').first();
 
     const anyVisible = await Promise.any([
-      badgeCards.first().isVisible({ timeout: 5_000 }).then((v) => { if (!v) throw new Error(); return v; }),
-      emptyState.isVisible({ timeout: 5_000 }).then((v) => { if (!v) throw new Error(); return v; }),
-      skeleton.isVisible({ timeout: 5_000 }).then((v) => { if (!v) throw new Error(); return v; }),
+      badgeCards
+        .first()
+        .isVisible({ timeout: 5_000 })
+        .then((v) => {
+          if (!v) throw new Error();
+          return v;
+        }),
+      emptyState.isVisible({ timeout: 5_000 }).then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      skeleton.isVisible({ timeout: 5_000 }).then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
     ]).catch(() => false);
 
     expect(anyVisible).toBe(true);
   });
 
-  test('badge card shows emoji icon when badges available', async ({ page }) => {
+  test('badge card shows emoji icon when badges available', async ({
+    page,
+  }) => {
     await gotoBadgesPage(page);
 
     // Badge emoji: span[role="img"] with aria-label set to badge name
     const badgeEmoji = page.locator('span[role="img"]').first();
-    const isVisible = await badgeEmoji.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await badgeEmoji
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -412,8 +506,12 @@ test.describe('Dashboard Widgets — BadgesGrid', () => {
   }) => {
     await gotoBadgesPage(page);
 
-    const ptsText = page.locator('span.text-xs.text-primary.font-medium').first();
-    const isVisible = await ptsText.isVisible({ timeout: 5_000 }).catch(() => false);
+    const ptsText = page
+      .locator('span.text-xs.text-primary.font-medium')
+      .first();
+    const isVisible = await ptsText
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -428,7 +526,9 @@ test.describe('Dashboard Widgets — BadgesGrid', () => {
     await gotoBadgesPage(page);
 
     const emptyState = page.getByText(/No badges earned yet — keep learning!/i);
-    const isVisible = await emptyState.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await emptyState
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -471,9 +571,18 @@ test.describe('Dashboard Widgets — AtRiskLearnersTable', () => {
     const errorMsg = page.getByText(/error|Failed/i).first();
 
     const anyVisible = await Promise.any([
-      tableHeader.isVisible({ timeout: 5_000 }).then((v) => { if (!v) throw new Error(); return v; }),
-      emptyMsg.isVisible({ timeout: 5_000 }).then((v) => { if (!v) throw new Error(); return v; }),
-      errorMsg.isVisible({ timeout: 5_000 }).then((v) => { if (!v) throw new Error(); return v; }),
+      tableHeader.isVisible({ timeout: 5_000 }).then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      emptyMsg.isVisible({ timeout: 5_000 }).then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
+      errorMsg.isVisible({ timeout: 5_000 }).then((v) => {
+        if (!v) throw new Error();
+        return v;
+      }),
     ]).catch(() => false);
 
     expect(anyVisible).toBe(true);
@@ -487,7 +596,9 @@ test.describe('Dashboard Widgets — AtRiskLearnersTable', () => {
     const riskBadge = page
       .locator('span.px-2.py-0\\.5.rounded.border.text-xs.font-semibold')
       .first();
-    const isVisible = await riskBadge.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await riskBadge
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -504,7 +615,9 @@ test.describe('Dashboard Widgets — AtRiskLearnersTable', () => {
 
     // riskBadgeClass: score > 0.7 → bg-red-100 text-red-800
     const redBadge = page.locator('span.bg-red-100.text-red-800').first();
-    const isVisible = await redBadge.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await redBadge
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -518,7 +631,9 @@ test.describe('Dashboard Widgets — AtRiskLearnersTable', () => {
     await gotoAnalyticsPage(page);
 
     const resolveBtn = page.getByRole('button', { name: /Resolve/i }).first();
-    const isVisible = await resolveBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await resolveBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -526,21 +641,33 @@ test.describe('Dashboard Widgets — AtRiskLearnersTable', () => {
     await expect(resolveBtn).toBeEnabled();
   });
 
-  test('table column headers are present when table renders', async ({ page }) => {
+  test('table column headers are present when table renders', async ({
+    page,
+  }) => {
     await gotoAnalyticsPage(page);
 
     const tableHeader = page.getByRole('columnheader', { name: /Learner ID/i });
-    const isVisible = await tableHeader.isVisible({ timeout: 5_000 }).catch(() => false);
+    const isVisible = await tableHeader
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
     }
 
     // Verify all expected column headers
-    await expect(page.getByRole('columnheader', { name: /Risk Score/i })).toBeVisible();
-    await expect(page.getByRole('columnheader', { name: /Days Inactive/i })).toBeVisible();
-    await expect(page.getByRole('columnheader', { name: /Progress/i })).toBeVisible();
-    await expect(page.getByRole('columnheader', { name: /Action/i })).toBeVisible();
+    await expect(
+      page.getByRole('columnheader', { name: /Risk Score/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('columnheader', { name: /Days Inactive/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('columnheader', { name: /Progress/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('columnheader', { name: /Action/i })
+    ).toBeVisible();
   });
 });
 
@@ -558,7 +685,9 @@ test.describe('Dashboard Widgets — SRSWidget', () => {
     const srsHeading = page
       .getByText(/Spaced Repetition|Review Queue|Due for review|SRS/i)
       .first();
-    const visible = await srsHeading.isVisible({ timeout: 5_000 }).catch(() => false);
+    const visible = await srsHeading
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     // Just confirm no crash — SRS widget is optional in layout
     expect(visible || !visible).toBe(true);
   });
@@ -589,7 +718,9 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
       .filter({ has: page.getByText('Daily Learning') })
       .first();
 
-    const isVisible = await widgetCard.isVisible({ timeout: 8_000 }).catch(() => false);
+    const isVisible = await widgetCard
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -610,7 +741,9 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
       .filter({ has: page.getByText(/Leaderboard/i) })
       .first();
 
-    const isVisible = await widgetCard.isVisible({ timeout: 8_000 }).catch(() => false);
+    const isVisible = await widgetCard
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -631,7 +764,9 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
       .filter({ has: page.getByText('Skill Gap Analysis') })
       .first();
 
-    const isVisible = await widgetCard.isVisible({ timeout: 8_000 }).catch(() => false);
+    const isVisible = await widgetCard
+      .isVisible({ timeout: 8_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -660,8 +795,12 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await gotoDashboard(page);
 
-    const startBtn = page.getByRole('button', { name: /Start Today's Lesson/i });
-    const isVisible = await startBtn.isVisible({ timeout: 5_000 }).catch(() => false);
+    const startBtn = page.getByRole('button', {
+      name: /Start Today's Lesson/i,
+    });
+    const isVisible = await startBtn
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!isVisible) {
       test.skip();
       return;
@@ -671,10 +810,10 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
     await page.waitForTimeout(500);
 
     // Capture just the MicrolessonCard area
-    const card = page
-      .locator('.shadow-lg.border-0')
-      .first();
-    const cardVisible = await card.isVisible({ timeout: 5_000 }).catch(() => false);
+    const card = page.locator('.shadow-lg.border-0').first();
+    const cardVisible = await card
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     if (!cardVisible) {
       test.skip();
       return;

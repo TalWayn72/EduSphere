@@ -6,7 +6,11 @@ import { EmbeddingModule } from '../embedding/embedding.module.js';
 
 @Module({
   imports: [EmbeddingModule],
-  providers: [KnowledgeSourceService, KnowledgeSourceResolver, DocumentParserService],
+  providers: [
+    KnowledgeSourceService,
+    KnowledgeSourceResolver,
+    DocumentParserService,
+  ],
   exports: [KnowledgeSourceService],
 })
 export class KnowledgeSourceModule {}

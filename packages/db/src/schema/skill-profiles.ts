@@ -12,10 +12,15 @@ export const skillProfiles = pgTable(
     roleName: text('role_name').notNull(),
     description: text('description'),
     /** Ordered list of concept names required for this role/goal */
-    requiredConcepts: text('required_concepts').array().notNull().default(sql`'{}'::text[]`),
+    requiredConcepts: text('required_concepts')
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
     tenantId: uuid('tenant_id').notNull(),
     createdBy: uuid('created_by').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     pgPolicy('skill_profiles_tenant_isolation', {
@@ -29,7 +34,7 @@ export const skillProfiles = pgTable(
         )
       `,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type SkillProfile = typeof skillProfiles.$inferSelect;

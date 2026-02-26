@@ -147,7 +147,10 @@ function parseQuestions(raw: string): QuizQuestion[] {
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
-export function createQuizWorkflow(model: LanguageModel, locale: string = 'en') {
+export function createQuizWorkflow(
+  model: LanguageModel,
+  locale: string = 'en'
+) {
   const BASE_SYSTEM = 'You are an educational quiz assistant.';
   const system = injectLocale(BASE_SYSTEM, locale);
 
@@ -216,8 +219,7 @@ export function createQuizWorkflow(model: LanguageModel, locale: string = 'en') 
         });
         const newScore = ctx.score + (isCorrect ? 1 : 0);
         const newAnswers = [...ctx.answers, answerIdx];
-        const hasMore =
-          ctx.currentQuestionIndex < ctx.questions.length - 1;
+        const hasMore = ctx.currentQuestionIndex < ctx.questions.length - 1;
         return {
           text,
           nextState: hasMore ? 'NEXT_QUESTION' : 'SCORE',
@@ -259,7 +261,11 @@ export function createQuizWorkflow(model: LanguageModel, locale: string = 'en') 
       ctx.currentState === 'ASK' && q
         ? ASK_QUESTION_PROMPT(q, ctx.currentQuestionIndex + 1)
         : ctx.currentState === 'EVALUATE_ANSWER' && q
-          ? EVALUATE_PROMPT(q, userAnswer ?? 0, (userAnswer ?? 0) === q.correctIndex)
+          ? EVALUATE_PROMPT(
+              q,
+              userAnswer ?? 0,
+              (userAnswer ?? 0) === q.correctIndex
+            )
           : SCORE_PROMPT(ctx.score, ctx.questions.length);
 
     return streamText({

@@ -38,19 +38,18 @@ export function useUserPreferences(): UseUserPreferencesReturn {
   const [tenantLangResult] = useQuery<TenantLanguageSettingsResult>({
     query: MY_TENANT_LANGUAGE_SETTINGS_QUERY,
   });
-  const [{ fetching }, updatePreferences] = useMutation(UPDATE_USER_PREFERENCES_MUTATION);
+  const [{ fetching }, updatePreferences] = useMutation(
+    UPDATE_USER_PREFERENCES_MUTATION
+  );
 
-  const availableLocales = (
-    tenantLangResult.data?.myTenantLanguageSettings?.supportedLanguages ?? SUPPORTED_LOCALES
-  ) as readonly SupportedLocale[];
+  const availableLocales = (tenantLangResult.data?.myTenantLanguageSettings
+    ?.supportedLanguages ?? SUPPORTED_LOCALES) as readonly SupportedLocale[];
 
-  const tenantDefault = (
-    tenantLangResult.data?.myTenantLanguageSettings?.defaultLanguage ?? 'en'
-  ) as SupportedLocale;
+  const tenantDefault = (tenantLangResult.data?.myTenantLanguageSettings
+    ?.defaultLanguage ?? 'en') as SupportedLocale;
 
-  const currentLocale = (
-    meResult.data?.me?.preferences?.locale ?? i18n.language
-  ) as SupportedLocale;
+  const currentLocale = (meResult.data?.me?.preferences?.locale ??
+    i18n.language) as SupportedLocale;
 
   // Sync DB locale → i18next + localStorage + document direction after ME_QUERY resolves
   useEffect(() => {
@@ -76,17 +75,25 @@ export function useUserPreferences(): UseUserPreferencesReturn {
         await updatePreferences({ input: { locale: tenantDefault } });
       })();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableLocales, tenantDefault]);
 
-  const setLocale = useCallback(async (locale: SupportedLocale): Promise<void> => {
-    // Optimistic: update i18next + localStorage + document direction immediately for instant UX
-    await i18n.changeLanguage(locale);
-    localStorage.setItem('edusphere_locale', locale);
-    applyDocumentDirection(locale);
-    // Persist to DB (background — non-blocking)
-    await updatePreferences({ input: { locale } });
-  }, [i18n, updatePreferences]);
+  const setLocale = useCallback(
+    async (locale: SupportedLocale): Promise<void> => {
+      // Optimistic: update i18next + localStorage + document direction immediately for instant UX
+      await i18n.changeLanguage(locale);
+      localStorage.setItem('edusphere_locale', locale);
+      applyDocumentDirection(locale);
+      // Persist to DB (background — non-blocking)
+      await updatePreferences({ input: { locale } });
+    },
+    [i18n, updatePreferences]
+  );
 
-  return { locale: currentLocale, setLocale, isSaving: fetching, availableLocales };
+  return {
+    locale: currentLocale,
+    setLocale,
+    isSaving: fetching,
+    availableLocales,
+  };
 }

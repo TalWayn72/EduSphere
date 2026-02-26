@@ -16,7 +16,9 @@ vi.mock('@edusphere/db', () => ({
 import { SecurityService } from './security.service.js';
 
 describe('SecurityService — memory safety', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('constructs without errors', () => {
     expect(() => new SecurityService()).not.toThrow();

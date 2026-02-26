@@ -35,7 +35,10 @@ export function CourseWizardStep1({ control }: Props) {
           <FormItem>
             <FormLabel>{t('wizard.courseTitleLabel')}</FormLabel>
             <FormControl>
-              <Input placeholder={t('wizard.courseTitlePlaceholder')} {...field} />
+              <Input
+                placeholder={t('wizard.courseTitlePlaceholder')}
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -93,7 +96,10 @@ export function CourseWizardStep1({ control }: Props) {
             <FormItem>
               <FormLabel>{t('wizard.durationLabel')}</FormLabel>
               <FormControl>
-                <Input placeholder={t('wizard.durationPlaceholder')} {...field} />
+                <Input
+                  placeholder={t('wizard.durationPlaceholder')}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

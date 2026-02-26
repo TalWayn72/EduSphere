@@ -14,22 +14,43 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Hoist mocks ───────────────────────────────────────────────────────────────
 
-const { mockCloseAllPools, MockS3Client, mockGetSignedUrl, mockNatsClose, mockNatsConnect } =
-  vi.hoisted(() => {
-    const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
-    const mockGetSignedUrl = vi.fn().mockResolvedValue('https://presigned.example.com/upload');
-    const mockNatsClose = vi.fn().mockResolvedValue(undefined);
-    const mockNatsConnect = vi.fn().mockResolvedValue({ publish: vi.fn(), flush: vi.fn().mockResolvedValue(undefined), close: mockNatsClose });
-    const MockS3Client = vi.fn().mockImplementation(function() { return {}; });
-
-    return { mockCloseAllPools, MockS3Client, mockGetSignedUrl, mockNatsClose, mockNatsConnect };
+const {
+  mockCloseAllPools,
+  MockS3Client,
+  mockGetSignedUrl,
+  mockNatsClose,
+  mockNatsConnect,
+} = vi.hoisted(() => {
+  const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
+  const mockGetSignedUrl = vi
+    .fn()
+    .mockResolvedValue('https://presigned.example.com/upload');
+  const mockNatsClose = vi.fn().mockResolvedValue(undefined);
+  const mockNatsConnect = vi.fn().mockResolvedValue({
+    publish: vi.fn(),
+    flush: vi.fn().mockResolvedValue(undefined),
+    close: mockNatsClose,
   });
+  const MockS3Client = vi.fn().mockImplementation(function () {
+    return {};
+  });
+
+  return {
+    mockCloseAllPools,
+    MockS3Client,
+    mockGetSignedUrl,
+    mockNatsClose,
+    mockNatsConnect,
+  };
+});
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: () => ({
     insert: vi.fn().mockReturnValue({
       values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([{ id: 'asset-1', course_id: 'course-1' }]),
+        returning: vi
+          .fn()
+          .mockResolvedValue([{ id: 'asset-1', course_id: 'course-1' }]),
       }),
     }),
   }),
@@ -51,8 +72,12 @@ vi.mock('@edusphere/config', () => ({
 
 vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: MockS3Client,
-  PutObjectCommand: vi.fn().mockImplementation(function(args) { return args; }),
-  GetObjectCommand: vi.fn().mockImplementation(function(args) { return args; }),
+  PutObjectCommand: vi.fn().mockImplementation(function (args) {
+    return args;
+  }),
+  GetObjectCommand: vi.fn().mockImplementation(function (args) {
+    return args;
+  }),
 }));
 
 vi.mock('@aws-sdk/s3-request-presigner', () => ({
@@ -61,7 +86,9 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
 
 vi.mock('nats', () => ({
   connect: mockNatsConnect,
-  StringCodec: vi.fn().mockReturnValue({ encode: vi.fn().mockReturnValue(new Uint8Array()) }),
+  StringCodec: vi
+    .fn()
+    .mockReturnValue({ encode: vi.fn().mockReturnValue(new Uint8Array()) }),
 }));
 
 import { MediaService } from './media.service.js';
@@ -95,7 +122,12 @@ describe('MediaService — memory safety', () => {
   // ── Test 3: NATS connection is closed after publish (finally block) ───────
   it('closes the NATS connection after publishing media.uploaded', async () => {
     const svc = new MediaService();
-    await svc.getPresignedUploadUrl('video.mp4', 'video/mp4', 'course-1', 'tenant-1');
+    await svc.getPresignedUploadUrl(
+      'video.mp4',
+      'video/mp4',
+      'course-1',
+      'tenant-1'
+    );
     // publishMediaUploaded is triggered by confirmUpload, not presigned URL generation.
     // Verify NATS was NOT opened (presigned URL path skips NATS entirely).
     expect(mockNatsConnect).not.toHaveBeenCalled();

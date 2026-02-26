@@ -23,7 +23,8 @@ function App() {
         // Keycloak init failure is non-fatal — app continues in unauthenticated state
       }
       // Initialize i18n with cached locale from localStorage (before DB fetch)
-      const cachedLocale = localStorage.getItem('edusphere_locale') ?? undefined;
+      const cachedLocale =
+        localStorage.getItem('edusphere_locale') ?? undefined;
       await initI18n(cachedLocale);
       // Apply RTL direction immediately from cached locale (before DB fetch)
       if (cachedLocale) applyDocumentDirection(cachedLocale);

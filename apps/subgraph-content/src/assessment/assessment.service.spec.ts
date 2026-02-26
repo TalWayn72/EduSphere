@@ -17,7 +17,12 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: mockCloseAllPools,
   withTenantContext: mockWithTenantContext,
   schema: {
-    assessmentCampaigns: { id: 'id', tenantId: 'tenant_id', targetUserId: 'target_user_id', status: 'status' },
+    assessmentCampaigns: {
+      id: 'id',
+      tenantId: 'tenant_id',
+      targetUserId: 'target_user_id',
+      status: 'status',
+    },
     assessmentResponses: {},
     assessmentResults: { campaignId: 'campaign_id', tenantId: 'tenant_id' },
   },
@@ -69,7 +74,9 @@ describe('AssessmentService', () => {
       aggregate: vi.fn().mockResolvedValue(mockResult),
     } as unknown as vi.Mocked<AssessmentAggregatorService>;
 
-    svc = new AssessmentService(aggregatorMock as unknown as AssessmentAggregatorService);
+    svc = new AssessmentService(
+      aggregatorMock as unknown as AssessmentAggregatorService
+    );
   });
 
   // Test 1
@@ -78,7 +85,7 @@ describe('AssessmentService', () => {
     const result = await svc.createCampaign(
       { title: 'Q1 Review', targetUserId: 'user-target', rubric: {} },
       'tenant-1',
-      'admin-1',
+      'admin-1'
     );
     expect(result.status).toBe('DRAFT');
     expect(mockWithTenantContext).toHaveBeenCalled();
@@ -86,7 +93,9 @@ describe('AssessmentService', () => {
 
   // Test 2
   it('activateCampaign sets status to ACTIVE', async () => {
-    mockWithTenantContext.mockResolvedValue([{ ...mockCampaign, status: 'ACTIVE' }]);
+    mockWithTenantContext.mockResolvedValue([
+      { ...mockCampaign, status: 'ACTIVE' },
+    ]);
     const result = await svc.activateCampaign('camp-1', 'tenant-1');
     expect(result.status).toBe('ACTIVE');
   });
@@ -94,16 +103,32 @@ describe('AssessmentService', () => {
   // Test 3
   it('submitResponse stores criteria scores', async () => {
     mockWithTenantContext.mockResolvedValue([mockResponse]);
-    const result = await svc.submitResponse('camp-1', 'user-rater', 'PEER', { comm: 4 }, 'Good', 'tenant-1');
+    const result = await svc.submitResponse(
+      'camp-1',
+      'user-rater',
+      'PEER',
+      { comm: 4 },
+      'Good',
+      'tenant-1'
+    );
     expect(result.criteriaScores).toEqual({ comm: 4 });
     expect(mockWithTenantContext).toHaveBeenCalled();
   });
 
   // Test 4
   it('submitResponse throws ConflictException on duplicate responder+role', async () => {
-    mockWithTenantContext.mockRejectedValue(new Error('assessment_responses_responder_unique violation'));
+    mockWithTenantContext.mockRejectedValue(
+      new Error('assessment_responses_responder_unique violation')
+    );
     await expect(
-      svc.submitResponse('camp-1', 'user-rater', 'PEER', { comm: 4 }, null, 'tenant-1'),
+      svc.submitResponse(
+        'camp-1',
+        'user-rater',
+        'PEER',
+        { comm: 4 },
+        null,
+        'tenant-1'
+      )
     ).rejects.toThrow(ConflictException);
   });
 
@@ -120,7 +145,10 @@ describe('AssessmentService', () => {
   it('listCampaignsForResponder returns active campaigns to respond to', async () => {
     const activeCampaign = { ...mockCampaign, status: 'ACTIVE' };
     mockWithTenantContext.mockResolvedValue([activeCampaign]);
-    const result = await svc.listCampaignsForResponder('user-rater', 'tenant-1');
+    const result = await svc.listCampaignsForResponder(
+      'user-rater',
+      'tenant-1'
+    );
     expect(result).toHaveLength(1);
     expect(result[0]!.status).toBe('ACTIVE');
   });
@@ -151,11 +179,18 @@ describe('AssessmentService', () => {
   // Test 10
   it('submitResponse wraps DB call in withTenantContext', async () => {
     mockWithTenantContext.mockResolvedValue([mockResponse]);
-    await svc.submitResponse('camp-1', 'user-rater', 'SELF', { comm: 5 }, null, 'tenant-1');
+    await svc.submitResponse(
+      'camp-1',
+      'user-rater',
+      'SELF',
+      { comm: 5 },
+      null,
+      'tenant-1'
+    );
     expect(mockWithTenantContext).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-rater' }),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 

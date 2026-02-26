@@ -17,15 +17,22 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   schema: {
     annotations: {
-      id: 'id', asset_id: 'asset_id', user_id: 'user_id',
-      layer: 'layer', deleted_at: 'deleted_at',
-      tenant_id: 'tenant_id', created_at: 'created_at',
+      id: 'id',
+      asset_id: 'asset_id',
+      user_id: 'user_id',
+      layer: 'layer',
+      deleted_at: 'deleted_at',
+      tenant_id: 'tenant_id',
+      created_at: 'created_at',
     },
   },
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args) => args),
   desc: vi.fn((col) => ({ desc: col })),
-  sql: Object.assign(vi.fn((str) => str), { placeholder: vi.fn() }),
+  sql: Object.assign(
+    vi.fn((str) => str),
+    { placeholder: vi.fn() }
+  ),
   withTenantContext: vi.fn(async (_db, _ctx, cb) => cb({})),
 }));
 
@@ -50,7 +57,10 @@ const MOCK_ANNOTATION = {
   deleted_at: null,
 };
 
-const ctxWith = (auth: AuthContext | undefined) => ({ req: {}, authContext: auth });
+const ctxWith = (auth: AuthContext | undefined) => ({
+  req: {},
+  authContext: auth,
+});
 
 describe('AnnotationResolver', () => {
   let resolver: AnnotationResolver;
@@ -70,69 +80,137 @@ describe('AnnotationResolver', () => {
       mockAnnotationService.findById.mockResolvedValue(MOCK_ANNOTATION);
       const result = await resolver.getAnnotation('ann-1', ctxWith(MOCK_AUTH));
       expect(mockAnnotationService.findById).toHaveBeenCalledOnce();
-      expect(mockAnnotationService.findById).toHaveBeenCalledWith('ann-1', MOCK_AUTH);
+      expect(mockAnnotationService.findById).toHaveBeenCalledWith(
+        'ann-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual(MOCK_ANNOTATION);
     });
     it('passes undefined authContext when context has no authContext', async () => {
       mockAnnotationService.findById.mockResolvedValue(null);
       await resolver.getAnnotation('ann-1', { req: {} });
-      expect(mockAnnotationService.findById).toHaveBeenCalledWith('ann-1', undefined);
+      expect(mockAnnotationService.findById).toHaveBeenCalledWith(
+        'ann-1',
+        undefined
+      );
     });
   });
 
   describe('getAnnotations()', () => {
     it('delegates to service.findAll with filters object', async () => {
       mockAnnotationService.findAll.mockResolvedValue([MOCK_ANNOTATION]);
-      const result = await resolver.getAnnotations('asset-1', 'user-1', 'SHARED', 10, 5, ctxWith(MOCK_AUTH));
+      const result = await resolver.getAnnotations(
+        'asset-1',
+        'user-1',
+        'SHARED',
+        10,
+        5,
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.findAll).toHaveBeenCalledOnce();
       expect(mockAnnotationService.findAll).toHaveBeenCalledWith(
-        { assetId: 'asset-1', userId: 'user-1', layer: 'SHARED', limit: 10, offset: 5 },
+        {
+          assetId: 'asset-1',
+          userId: 'user-1',
+          layer: 'SHARED',
+          limit: 10,
+          offset: 5,
+        },
         MOCK_AUTH
       );
       expect(result).toEqual([MOCK_ANNOTATION]);
     });
     it('delegates with undefined filters when not provided', async () => {
       mockAnnotationService.findAll.mockResolvedValue([]);
-      await resolver.getAnnotations(undefined, undefined, undefined, 20, 0, ctxWith(MOCK_AUTH));
+      await resolver.getAnnotations(
+        undefined,
+        undefined,
+        undefined,
+        20,
+        0,
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.findAll).toHaveBeenCalledWith(
-        { assetId: undefined, userId: undefined, layer: undefined, limit: 20, offset: 0 },
+        {
+          assetId: undefined,
+          userId: undefined,
+          layer: undefined,
+          limit: 20,
+          offset: 0,
+        },
         MOCK_AUTH
       );
     });
     it('passes undefined authContext when not in context', async () => {
       mockAnnotationService.findAll.mockResolvedValue([]);
-      await resolver.getAnnotations('a', undefined, undefined, 20, 0, { req: {} });
-      expect(mockAnnotationService.findAll).toHaveBeenCalledWith(expect.any(Object), undefined);
+      await resolver.getAnnotations('a', undefined, undefined, 20, 0, {
+        req: {},
+      });
+      expect(mockAnnotationService.findAll).toHaveBeenCalledWith(
+        expect.any(Object),
+        undefined
+      );
     });
   });
 
   describe('getAnnotationsByAsset()', () => {
     it('delegates to service.findByAsset with assetId, layer, authContext', async () => {
       mockAnnotationService.findByAsset.mockResolvedValue([MOCK_ANNOTATION]);
-      const result = await resolver.getAnnotationsByAsset('asset-1', 'INSTRUCTOR', ctxWith(MOCK_AUTH));
+      const result = await resolver.getAnnotationsByAsset(
+        'asset-1',
+        'INSTRUCTOR',
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.findByAsset).toHaveBeenCalledOnce();
-      expect(mockAnnotationService.findByAsset).toHaveBeenCalledWith('asset-1', 'INSTRUCTOR', MOCK_AUTH);
+      expect(mockAnnotationService.findByAsset).toHaveBeenCalledWith(
+        'asset-1',
+        'INSTRUCTOR',
+        MOCK_AUTH
+      );
       expect(result).toEqual([MOCK_ANNOTATION]);
     });
     it('passes undefined layer when not provided', async () => {
       mockAnnotationService.findByAsset.mockResolvedValue([]);
-      await resolver.getAnnotationsByAsset('asset-1', undefined, ctxWith(MOCK_AUTH));
-      expect(mockAnnotationService.findByAsset).toHaveBeenCalledWith('asset-1', undefined, MOCK_AUTH);
+      await resolver.getAnnotationsByAsset(
+        'asset-1',
+        undefined,
+        ctxWith(MOCK_AUTH)
+      );
+      expect(mockAnnotationService.findByAsset).toHaveBeenCalledWith(
+        'asset-1',
+        undefined,
+        MOCK_AUTH
+      );
     });
   });
 
   describe('getAnnotationsByUser()', () => {
     it('delegates to service.findByUser with userId, limit, offset, authContext', async () => {
       mockAnnotationService.findByUser.mockResolvedValue([MOCK_ANNOTATION]);
-      const result = await resolver.getAnnotationsByUser('user-1', 15, 5, ctxWith(MOCK_AUTH));
+      const result = await resolver.getAnnotationsByUser(
+        'user-1',
+        15,
+        5,
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.findByUser).toHaveBeenCalledOnce();
-      expect(mockAnnotationService.findByUser).toHaveBeenCalledWith('user-1', 15, 5, MOCK_AUTH);
+      expect(mockAnnotationService.findByUser).toHaveBeenCalledWith(
+        'user-1',
+        15,
+        5,
+        MOCK_AUTH
+      );
       expect(result).toEqual([MOCK_ANNOTATION]);
     });
     it('uses default limit and offset values', async () => {
       mockAnnotationService.findByUser.mockResolvedValue([]);
       await resolver.getAnnotationsByUser('user-1', 20, 0, ctxWith(MOCK_AUTH));
-      expect(mockAnnotationService.findByUser).toHaveBeenCalledWith('user-1', 20, 0, MOCK_AUTH);
+      expect(mockAnnotationService.findByUser).toHaveBeenCalledWith(
+        'user-1',
+        20,
+        0,
+        MOCK_AUTH
+      );
     });
   });
 
@@ -145,7 +223,10 @@ describe('AnnotationResolver', () => {
     };
     it('delegates to service.create after Zod validation', async () => {
       mockAnnotationService.create.mockResolvedValue(MOCK_ANNOTATION);
-      const result = await resolver.createAnnotation(validInput, ctxWith(MOCK_AUTH));
+      const result = await resolver.createAnnotation(
+        validInput,
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.create).toHaveBeenCalledOnce();
       expect(result).toEqual(MOCK_ANNOTATION);
     });
@@ -175,7 +256,11 @@ describe('AnnotationResolver', () => {
     it('delegates to service.update after Zod validation', async () => {
       const updated = { ...MOCK_ANNOTATION, content: { text: 'Updated' } };
       mockAnnotationService.update.mockResolvedValue(updated);
-      const result = await resolver.updateAnnotation('ann-1', updateInput, ctxWith(MOCK_AUTH));
+      const result = await resolver.updateAnnotation(
+        'ann-1',
+        updateInput,
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.update).toHaveBeenCalledOnce();
       expect(mockAnnotationService.update).toHaveBeenCalledWith(
         'ann-1',
@@ -195,9 +280,15 @@ describe('AnnotationResolver', () => {
   describe('deleteAnnotation()', () => {
     it('delegates to service.delete with id and authContext', async () => {
       mockAnnotationService.delete.mockResolvedValue(true);
-      const result = await resolver.deleteAnnotation('ann-1', ctxWith(MOCK_AUTH));
+      const result = await resolver.deleteAnnotation(
+        'ann-1',
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.delete).toHaveBeenCalledOnce();
-      expect(mockAnnotationService.delete).toHaveBeenCalledWith('ann-1', MOCK_AUTH);
+      expect(mockAnnotationService.delete).toHaveBeenCalledWith(
+        'ann-1',
+        MOCK_AUTH
+      );
       expect(result).toBe(true);
     });
     it('throws Unauthenticated when no authContext', async () => {
@@ -212,9 +303,15 @@ describe('AnnotationResolver', () => {
     it('delegates to service.resolve with id and authContext', async () => {
       const resolved = { ...MOCK_ANNOTATION, is_resolved: true };
       mockAnnotationService.resolve.mockResolvedValue(resolved);
-      const result = await resolver.resolveAnnotation('ann-1', ctxWith(MOCK_AUTH));
+      const result = await resolver.resolveAnnotation(
+        'ann-1',
+        ctxWith(MOCK_AUTH)
+      );
       expect(mockAnnotationService.resolve).toHaveBeenCalledOnce();
-      expect(mockAnnotationService.resolve).toHaveBeenCalledWith('ann-1', MOCK_AUTH);
+      expect(mockAnnotationService.resolve).toHaveBeenCalledWith(
+        'ann-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual(resolved);
     });
     it('throws Unauthenticated when no authContext', async () => {
@@ -230,7 +327,10 @@ describe('AnnotationResolver', () => {
       mockAnnotationService.findById.mockResolvedValue(MOCK_ANNOTATION);
       const ref = { __typename: 'Annotation', id: 'ann-1' };
       const result = await resolver.resolveReference(ref, ctxWith(MOCK_AUTH));
-      expect(mockAnnotationService.findById).toHaveBeenCalledWith('ann-1', MOCK_AUTH);
+      expect(mockAnnotationService.findById).toHaveBeenCalledWith(
+        'ann-1',
+        MOCK_AUTH
+      );
       expect(result).toEqual(MOCK_ANNOTATION);
     });
   });

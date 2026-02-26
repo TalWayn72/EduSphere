@@ -68,11 +68,15 @@ export function useCourseNavigation(contentId: string): CourseNavContext {
   }
 
   // Flatten all items across modules in sorted order
-  const sortedModules = [...course.modules].sort((a, b) => a.orderIndex - b.orderIndex);
+  const sortedModules = [...course.modules].sort(
+    (a, b) => a.orderIndex - b.orderIndex
+  );
   const flatItems: Array<{ itemId: string; moduleTitle: string }> = [];
 
   for (const mod of sortedModules) {
-    const sorted = [...mod.contentItems].sort((a, b) => a.orderIndex - b.orderIndex);
+    const sorted = [...mod.contentItems].sort(
+      (a, b) => a.orderIndex - b.orderIndex
+    );
     for (const item of sorted) {
       flatItems.push({ itemId: item.id, moduleTitle: mod.title });
     }
@@ -86,7 +90,9 @@ export function useCourseNavigation(contentId: string): CourseNavContext {
     moduleName: idx >= 0 ? (flatItems[idx]?.moduleTitle ?? null) : null,
     prevItemId: idx > 0 ? (flatItems[idx - 1]?.itemId ?? null) : null,
     nextItemId:
-      idx >= 0 && idx < flatItems.length - 1 ? (flatItems[idx + 1]?.itemId ?? null) : null,
+      idx >= 0 && idx < flatItems.length - 1
+        ? (flatItems[idx + 1]?.itemId ?? null)
+        : null,
     ready: true,
   };
 }

@@ -45,18 +45,25 @@ export const userConsents = pgTable(
     userAgent: text('user_agent'),
     consentVersion: varchar('consent_version', { length: 20 }).notNull(),
     method: varchar('method', { length: 50 }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    unique('user_consents_user_type_unique').on(table.userId, table.consentType),
+    unique('user_consents_user_type_unique').on(
+      table.userId,
+      table.consentType
+    ),
     pgPolicy('user_consents_rls', {
       using: sql`
         user_id::text = current_setting('app.current_user_id', TRUE)
         OR current_setting('app.current_user_role', TRUE) IN ('SUPER_ADMIN', 'ORG_ADMIN')
       `,
     }),
-  ],
+  ]
 ).enableRLS();
 
 export type UserConsent = typeof userConsents.$inferSelect;

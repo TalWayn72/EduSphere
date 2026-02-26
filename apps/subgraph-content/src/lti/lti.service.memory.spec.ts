@@ -40,7 +40,9 @@ describe('LtiService memory safety', () => {
   it('nonce map is bounded at MAX_NONCES=1000 (LRU eviction fires)', async () => {
     const { LtiService } = await import('./lti.service');
     const service = new LtiService();
-    const storeNonce = (service as unknown as { storeNonce: (n: string, s: string) => void }).storeNonce.bind(service);
+    const storeNonce = (
+      service as unknown as { storeNonce: (n: string, s: string) => void }
+    ).storeNonce.bind(service);
     const getSize = service.getNonceMapSize.bind(service);
 
     // Insert 1001 nonces — map should cap at 1000 via LRU eviction

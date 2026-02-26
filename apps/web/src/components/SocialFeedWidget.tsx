@@ -4,12 +4,7 @@
  */
 import { useQuery } from 'urql';
 import { Users } from 'lucide-react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { SOCIAL_FEED_QUERY } from '@/lib/graphql/knowledge-tier3.queries';
 
 interface SocialFeedItem {
@@ -50,10 +45,10 @@ function FeedItemRow({ item }: { item: SocialFeedItem }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm leading-snug">
-          <span className="font-medium">{item.userDisplayName}</span>
-          {' '}
-          <span className="text-muted-foreground">{getActionLabel(item.action)}</span>
-          {' '}
+          <span className="font-medium">{item.userDisplayName}</span>{' '}
+          <span className="text-muted-foreground">
+            {getActionLabel(item.action)}
+          </span>{' '}
           <span className="font-medium truncate">{item.contentTitle}</span>
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
@@ -93,7 +88,10 @@ export function SocialFeedWidget() {
         {!fetching && feed.length > 0 && (
           <ul className="divide-y divide-border -mx-1 px-1">
             {feed.map((item) => (
-              <FeedItemRow key={`${item.userId}-${item.contentItemId}-${item.timestamp}`} item={item} />
+              <FeedItemRow
+                key={`${item.userId}-${item.contentItemId}-${item.timestamp}`}
+                item={item}
+              />
             ))}
           </ul>
         )}

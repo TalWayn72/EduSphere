@@ -13,7 +13,11 @@ export interface ScrubResult {
 }
 
 // PII patterns to detect and redact — ORDER MATTERS: more specific patterns first.
-const PII_PATTERNS: Array<{ name: string; pattern: RegExp; replacement: string }> = [
+const PII_PATTERNS: Array<{
+  name: string;
+  pattern: RegExp;
+  replacement: string;
+}> = [
   {
     name: 'EMAIL',
     // eslint-disable-next-line security/detect-unsafe-regex
@@ -29,6 +33,7 @@ const PII_PATTERNS: Array<{ name: string; pattern: RegExp; replacement: string }
   },
   {
     name: 'PHONE_IL',
+    // eslint-disable-next-line security/detect-unsafe-regex
     pattern: /\b(?:\+972|0)(?:-?\d){9,10}\b/g,
     replacement: '[PHONE]',
   },

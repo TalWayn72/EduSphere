@@ -9,7 +9,11 @@ import {
   ResolveReference,
   Context,
 } from '@nestjs/graphql';
-import { Logger, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Logger,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
 import { createPubSub } from 'graphql-yoga';
 import type { AuthContext } from '@edusphere/auth';
@@ -34,7 +38,8 @@ const tracer = trace.getTracer('subgraph-agent');
 @Resolver('AgentSession')
 export class AgentSessionResolver {
   private readonly logger = new Logger(AgentSessionResolver.name);
-  private readonly pubSub = createPubSub<Record<string, [{ messageStream: AgentMessagePayload }]>>();
+  private readonly pubSub =
+    createPubSub<Record<string, [{ messageStream: AgentMessagePayload }]>>();
 
   constructor(
     private readonly agentSessionService: AgentSessionService,
@@ -131,7 +136,10 @@ export class AgentSessionResolver {
   ) {
     const authContext = this.extractAuthContext(context);
 
-    const validationResult = SendMessageSchema.safeParse({ sessionId, content });
+    const validationResult = SendMessageSchema.safeParse({
+      sessionId,
+      content,
+    });
     if (!validationResult.success) {
       throw new BadRequestException(validationResult.error.issues);
     }
@@ -159,13 +167,22 @@ export class AgentSessionResolver {
       let agentReply = `Echo: ${content}`;
       let templateType = 'EXPLAIN';
       try {
-        const session = await this.agentSessionService.findById(sessionId, authContext);
+        const session = await this.agentSessionService.findById(
+          sessionId,
+          authContext
+        );
         templateType =
-          (session as Record<string, unknown>)['agentType'] as string ?? 'EXPLAIN';
+          ((session as Record<string, unknown>)['agentType'] as string) ??
+          'EXPLAIN';
         const sessionMeta =
-          (session as Record<string, unknown>)['metadata'] as Record<string, unknown> ?? {};
+          ((session as Record<string, unknown>)['metadata'] as Record<
+            string,
+            unknown
+          >) ?? {};
         const sessionLocale =
-          typeof sessionMeta['locale'] === 'string' ? sessionMeta['locale'] : 'en';
+          typeof sessionMeta['locale'] === 'string'
+            ? sessionMeta['locale']
+            : 'en';
 
         span.setAttribute('template.type', templateType);
         span.setAttribute('session.locale', sessionLocale);
@@ -209,10 +226,7 @@ export class AgentSessionResolver {
   }
 
   @Mutation('endSession')
-  async endSession(
-    @Args('sessionId') id: string,
-    @Context() context: unknown
-  ) {
+  async endSession(@Args('sessionId') id: string, @Context() context: unknown) {
     const authContext = this.extractAuthContext(context);
     await this.agentSessionService.complete(id, authContext);
     // Signal subscribers that the stream is done

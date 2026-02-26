@@ -20,7 +20,14 @@ function requireAuth(ctx: GqlContext): TenantContext {
   };
 }
 
-function formatListing(l: { id: string; courseId: string; priceCents: number; currency: string; isPublished: boolean; revenueSplitPercent: number }) {
+function formatListing(l: {
+  id: string;
+  courseId: string;
+  priceCents: number;
+  currency: string;
+  isPublished: boolean;
+  revenueSplitPercent: number;
+}) {
   return {
     id: l.id,
     courseId: l.courseId,
@@ -38,14 +45,19 @@ export class MarketplaceResolver {
   @Query('courseListings')
   async getCourseListings(@Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
-    const listings = await this.marketplaceService.getListings(tenantCtx.tenantId);
+    const listings = await this.marketplaceService.getListings(
+      tenantCtx.tenantId
+    );
     return listings.map(formatListing);
   }
 
   @Query('myPurchases')
   async getMyPurchases(@Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
-    const purchases = await this.marketplaceService.getUserPurchases(tenantCtx.userId, tenantCtx.tenantId);
+    const purchases = await this.marketplaceService.getUserPurchases(
+      tenantCtx.userId,
+      tenantCtx.tenantId
+    );
     return purchases.map((p) => ({
       id: p.id,
       courseId: p.courseId,
@@ -58,7 +70,10 @@ export class MarketplaceResolver {
   @Query('instructorEarnings')
   async getInstructorEarnings(@Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
-    const earnings = await this.marketplaceService.getInstructorEarnings(tenantCtx.userId, tenantCtx.tenantId);
+    const earnings = await this.marketplaceService.getInstructorEarnings(
+      tenantCtx.userId,
+      tenantCtx.tenantId
+    );
     return {
       totalEarnedCents: earnings.totalEarnedCents,
       pendingPayoutCents: earnings.pendingPayoutCents,
@@ -79,7 +94,7 @@ export class MarketplaceResolver {
     @Args('priceCents') priceCents: number,
     @Args('currency') currency: string,
     @Args('revenueSplitPercent') revenueSplitPercent: number | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     const listing = await this.marketplaceService.createListing(
@@ -87,7 +102,7 @@ export class MarketplaceResolver {
       priceCents,
       currency,
       revenueSplitPercent ?? 70,
-      tenantCtx.tenantId,
+      tenantCtx.tenantId
     );
     return formatListing(listing);
   }
@@ -95,7 +110,7 @@ export class MarketplaceResolver {
   @Mutation('publishListing')
   async publishListing(
     @Args('courseId') courseId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ): Promise<boolean> {
     const tenantCtx = requireAuth(ctx);
     await this.marketplaceService.publishListing(courseId, tenantCtx.tenantId);
@@ -105,24 +120,29 @@ export class MarketplaceResolver {
   @Mutation('purchaseCourse')
   async purchaseCourse(
     @Args('courseId') courseId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     const auth = ctx.authContext!;
-    const name = [auth.firstName, auth.lastName].filter(Boolean).join(' ') || auth.username;
+    const name =
+      [auth.firstName, auth.lastName].filter(Boolean).join(' ') ||
+      auth.username;
     return this.marketplaceService.purchaseCourse(
       courseId,
       tenantCtx.userId,
       tenantCtx.tenantId,
       auth.email,
-      name,
+      name
     );
   }
 
   @Mutation('requestPayout')
   async requestPayout(@Context() ctx: GqlContext): Promise<boolean> {
     const tenantCtx = requireAuth(ctx);
-    await this.marketplaceService.requestPayout(tenantCtx.userId, tenantCtx.tenantId);
+    await this.marketplaceService.requestPayout(
+      tenantCtx.userId,
+      tenantCtx.tenantId
+    );
     return true;
   }
 }

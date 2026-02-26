@@ -13,15 +13,22 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   schema: {
     annotations: {
-      id: 'id', asset_id: 'asset_id', user_id: 'user_id',
-      layer: 'layer', deleted_at: 'deleted_at',
-      tenant_id: 'tenant_id', created_at: 'created_at',
+      id: 'id',
+      asset_id: 'asset_id',
+      user_id: 'user_id',
+      layer: 'layer',
+      deleted_at: 'deleted_at',
+      tenant_id: 'tenant_id',
+      created_at: 'created_at',
     },
   },
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args) => args),
   desc: vi.fn((col) => ({ desc: col })),
-  sql: Object.assign(vi.fn((str) => str), { placeholder: vi.fn() }),
+  sql: Object.assign(
+    vi.fn((str) => str),
+    { placeholder: vi.fn() }
+  ),
   withTenantContext: vi.fn(async (_db, _ctx, callback) => callback(mockTx)),
   closeAllPools: vi.fn(),
 }));
@@ -29,21 +36,51 @@ vi.mock('@edusphere/db', () => ({
 import { withTenantContext } from '@edusphere/db';
 
 const studentAuth: AuthContext = {
-  userId: 'student-1', email: 's@e.com', username: 'student',
-  tenantId: 'tenant-1', roles: ['STUDENT'], scopes: [], isSuperAdmin: false,
+  userId: 'student-1',
+  email: 's@e.com',
+  username: 'student',
+  tenantId: 'tenant-1',
+  roles: ['STUDENT'],
+  scopes: [],
+  isSuperAdmin: false,
 };
 const instructorAuth: AuthContext = {
-  userId: 'instr-1', email: 'i@e.com', username: 'instructor',
-  tenantId: 'tenant-1', roles: ['INSTRUCTOR'], scopes: [], isSuperAdmin: false,
+  userId: 'instr-1',
+  email: 'i@e.com',
+  username: 'instructor',
+  tenantId: 'tenant-1',
+  roles: ['INSTRUCTOR'],
+  scopes: [],
+  isSuperAdmin: false,
 };
 const anonAuth: AuthContext = {
-  userId: 'anon-1', email: '', username: 'anon',
-  tenantId: 'tenant-1', roles: [], scopes: [], isSuperAdmin: false,
+  userId: 'anon-1',
+  email: '',
+  username: 'anon',
+  tenantId: 'tenant-1',
+  roles: [],
+  scopes: [],
+  isSuperAdmin: false,
 };
 
-const personalAnnotation = { id: 'p-1', layer: 'PERSONAL', user_id: 'student-1', deleted_at: null };
-const instructorAnnotation = { id: 'i-1', layer: 'INSTRUCTOR', user_id: 'instr-1', deleted_at: null };
-const publicAnnotation = { id: 'pub-1', layer: 'SHARED', user_id: 'instr-1', deleted_at: null };
+const personalAnnotation = {
+  id: 'p-1',
+  layer: 'PERSONAL',
+  user_id: 'student-1',
+  deleted_at: null,
+};
+const instructorAnnotation = {
+  id: 'i-1',
+  layer: 'INSTRUCTOR',
+  user_id: 'instr-1',
+  deleted_at: null,
+};
+const publicAnnotation = {
+  id: 'pub-1',
+  layer: 'SHARED',
+  user_id: 'instr-1',
+  deleted_at: null,
+};
 
 describe('AnnotationService — layer visibility rules', () => {
   let service: AnnotationService;
@@ -61,7 +98,10 @@ describe('AnnotationService — layer visibility rules', () => {
   describe('STUDENT visibility', () => {
     it('findAll with PERSONAL layer passes student userId for owner-only filter', async () => {
       mockOffset.mockResolvedValue([personalAnnotation]);
-      await service.findAll({ layer: 'PERSONAL', limit: 10, offset: 0 }, studentAuth);
+      await service.findAll(
+        { layer: 'PERSONAL', limit: 10, offset: 0 },
+        studentAuth
+      );
       expect(withTenantContext).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ userId: 'student-1', userRole: 'STUDENT' }),
@@ -71,7 +111,10 @@ describe('AnnotationService — layer visibility rules', () => {
 
     it('findAll with SHARED layer returns results for student', async () => {
       mockOffset.mockResolvedValue([publicAnnotation]);
-      const result = await service.findAll({ layer: 'SHARED', limit: 10, offset: 0 }, studentAuth);
+      const result = await service.findAll(
+        { layer: 'SHARED', limit: 10, offset: 0 },
+        studentAuth
+      );
       expect(Array.isArray(result)).toBe(true);
     });
 
@@ -88,7 +131,11 @@ describe('AnnotationService — layer visibility rules', () => {
 
   describe('INSTRUCTOR visibility', () => {
     it('findAll without layer filter uses INSTRUCTOR role context', async () => {
-      mockOffset.mockResolvedValue([personalAnnotation, instructorAnnotation, publicAnnotation]);
+      mockOffset.mockResolvedValue([
+        personalAnnotation,
+        instructorAnnotation,
+        publicAnnotation,
+      ]);
       await service.findAll({ limit: 20, offset: 0 }, instructorAuth);
       expect(withTenantContext).toHaveBeenCalledWith(
         expect.anything(),
@@ -98,7 +145,11 @@ describe('AnnotationService — layer visibility rules', () => {
     });
 
     it('findByAsset without layer filter uses INSTRUCTOR role context', async () => {
-      mockOrderBy.mockResolvedValue([personalAnnotation, instructorAnnotation, publicAnnotation]);
+      mockOrderBy.mockResolvedValue([
+        personalAnnotation,
+        instructorAnnotation,
+        publicAnnotation,
+      ]);
       await service.findByAsset('asset-1', undefined, instructorAuth);
       expect(withTenantContext).toHaveBeenCalledWith(
         expect.anything(),

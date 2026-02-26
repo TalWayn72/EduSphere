@@ -29,7 +29,7 @@ export class RoleplayResolver {
 
   constructor(
     private readonly roleplayService: RoleplayService,
-    private readonly sessionService: RoleplaySessionService,
+    private readonly sessionService: RoleplaySessionService
   ) {}
 
   @Query('scenarioTemplates')
@@ -48,20 +48,37 @@ export class RoleplayResolver {
   }
 
   @Query('myScenarioSession')
-  async myScenarioSession(@Args('sessionId') sessionId: string, @Context() ctx: GqlContext) {
+  async myScenarioSession(
+    @Args('sessionId') sessionId: string,
+    @Context() ctx: GqlContext
+  ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);
-    const session = await this.sessionService.getSession(sessionId, userId, tenantId);
+    const session = await this.sessionService.getSession(
+      sessionId,
+      userId,
+      tenantId
+    );
     if (!session) return null;
     return this.mapSession(session);
   }
 
   @Mutation('startRoleplaySession')
-  async startRoleplaySession(@Args('scenarioId') scenarioId: string, @Context() ctx: GqlContext) {
+  async startRoleplaySession(
+    @Args('scenarioId') scenarioId: string,
+    @Context() ctx: GqlContext
+  ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);
-    const session = await this.sessionService.startSession(scenarioId, userId, tenantId);
-    this.logger.log({ sessionId: session.id }, 'Roleplay session started via resolver');
+    const session = await this.sessionService.startSession(
+      scenarioId,
+      userId,
+      tenantId
+    );
+    this.logger.log(
+      { sessionId: session.id },
+      'Roleplay session started via resolver'
+    );
     return this.mapSession(session);
   }
 
@@ -69,11 +86,16 @@ export class RoleplayResolver {
   async sendRoleplayMessage(
     @Args('sessionId') sessionId: string,
     @Args('message') message: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);
-    return this.sessionService.sendMessage(sessionId, message, userId, tenantId);
+    return this.sessionService.sendMessage(
+      sessionId,
+      message,
+      userId,
+      tenantId
+    );
   }
 
   @Mutation('createScenarioTemplate')
@@ -84,43 +106,59 @@ export class RoleplayResolver {
     @Args('characterPersona') characterPersona: string,
     @Args('sceneDescription') sceneDescription: string,
     @Args('maxTurns') maxTurns: number | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const userId = getUserId(ctx);
     const tenantId = getTenantId(ctx);
     const row = await this.roleplayService.createScenario(tenantId, userId, {
       title,
       domain,
-      difficulty_level: difficultyLevel as 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED',
+      difficulty_level: difficultyLevel as
+        | 'BEGINNER'
+        | 'INTERMEDIATE'
+        | 'ADVANCED',
       character_persona: characterPersona,
       scene_description: sceneDescription,
       evaluation_rubric: [] as RubricCriterion[],
       max_turns: maxTurns ?? 10,
     });
     return {
-      id: row.id, title: row.title, domain: row.domain,
+      id: row.id,
+      title: row.title,
+      domain: row.domain,
       difficultyLevel: row.difficulty_level,
       sceneDescription: row.scene_description,
-      maxTurns: row.max_turns, isBuiltin: row.is_builtin,
+      maxTurns: row.max_turns,
+      isBuiltin: row.is_builtin,
     };
   }
 
   private mapSession(session: {
-    id: string; scenario_id: string; status: string; turn_count: number;
-    evaluation_result: unknown; started_at: Date; completed_at: Date | null;
+    id: string;
+    scenario_id: string;
+    status: string;
+    turn_count: number;
+    evaluation_result: unknown;
+    started_at: Date;
+    completed_at: Date | null;
   }) {
     const evalRaw = session.evaluation_result as EvaluationResult | null;
     return {
-      id: session.id, scenarioId: session.scenario_id, status: session.status,
-      turnCount: session.turn_count, startedAt: session.started_at,
+      id: session.id,
+      scenarioId: session.scenario_id,
+      status: session.status,
+      turnCount: session.turn_count,
+      startedAt: session.started_at,
       completedAt: session.completed_at,
-      evaluation: evalRaw ? {
-        overallScore: evalRaw.overallScore,
-        criteriaScores: evalRaw.criteriaScores,
-        strengths: evalRaw.strengths,
-        areasForImprovement: evalRaw.areasForImprovement,
-        summary: evalRaw.summary,
-      } : null,
+      evaluation: evalRaw
+        ? {
+            overallScore: evalRaw.overallScore,
+            criteriaScores: evalRaw.criteriaScores,
+            strengths: evalRaw.strengths,
+            areasForImprovement: evalRaw.areasForImprovement,
+            summary: evalRaw.summary,
+          }
+        : null,
     };
   }
 }

@@ -30,15 +30,22 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   schema: {
     annotations: {
-      id: 'id', asset_id: 'asset_id', user_id: 'user_id',
-      layer: 'layer', deleted_at: 'deleted_at',
-      tenant_id: 'tenant_id', created_at: 'created_at',
+      id: 'id',
+      asset_id: 'asset_id',
+      user_id: 'user_id',
+      layer: 'layer',
+      deleted_at: 'deleted_at',
+      tenant_id: 'tenant_id',
+      created_at: 'created_at',
     },
   },
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args) => args),
   desc: vi.fn((col) => ({ desc: col })),
-  sql: Object.assign(vi.fn((str) => str), { placeholder: vi.fn() }),
+  sql: Object.assign(
+    vi.fn((str) => str),
+    { placeholder: vi.fn() }
+  ),
   withTenantContext: vi.fn(async (_db, _ctx, callback) => callback(mockTx)),
 }));
 
@@ -86,7 +93,11 @@ describe('AnnotationService', () => {
     mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
     mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
     mockOrderBy.mockReturnValue({ limit: mockLimit, offset: mockOffset });
-    mockWhere.mockReturnValue({ limit: mockLimit, orderBy: mockOrderBy, returning: mockReturning });
+    mockWhere.mockReturnValue({
+      limit: mockLimit,
+      orderBy: mockOrderBy,
+      returning: mockReturning,
+    });
     mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
@@ -110,16 +121,16 @@ describe('AnnotationService', () => {
     });
 
     it('throws Authentication required when no authContext', async () => {
-      await expect(
-        service.findById('ann-1', undefined)
-      ).rejects.toThrow('Authentication required');
+      await expect(service.findById('ann-1', undefined)).rejects.toThrow(
+        'Authentication required'
+      );
     });
 
     it('throws Authentication required when tenantId is missing', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: undefined };
-      await expect(
-        service.findById('ann-1', noTenantAuth)
-      ).rejects.toThrow('Authentication required');
+      await expect(service.findById('ann-1', noTenantAuth)).rejects.toThrow(
+        'Authentication required'
+      );
     });
 
     it('calls withTenantContext with correct tenant context', async () => {
@@ -127,7 +138,11 @@ describe('AnnotationService', () => {
       await service.findById('ann-1', MOCK_AUTH);
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
-        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' }),
+        expect.objectContaining({
+          tenantId: 'tenant-1',
+          userId: 'user-1',
+          userRole: 'STUDENT',
+        }),
         expect.any(Function)
       );
     });
@@ -137,7 +152,9 @@ describe('AnnotationService', () => {
   describe('findAll()', () => {
     it('returns annotations array', async () => {
       mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
-      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+      mockOrderBy.mockReturnValue({
+        limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+      });
       const result = await service.findAll({ limit: 10, offset: 0 }, MOCK_AUTH);
       expect(Array.isArray(result)).toBe(true);
     });
@@ -157,7 +174,9 @@ describe('AnnotationService', () => {
 
     it('calls withTenantContext with correct tenant context', async () => {
       mockOffset.mockResolvedValue([]);
-      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+      mockOrderBy.mockReturnValue({
+        limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+      });
       await service.findAll({ limit: 10, offset: 0 }, MOCK_AUTH);
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
@@ -203,7 +222,9 @@ describe('AnnotationService', () => {
   describe('findByUser()', () => {
     it('returns annotations for user', async () => {
       mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
-      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+      mockOrderBy.mockReturnValue({
+        limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+      });
       const result = await service.findByUser('user-1', 10, 0, MOCK_AUTH);
       expect(Array.isArray(result)).toBe(true);
     });
@@ -239,9 +260,9 @@ describe('AnnotationService', () => {
 
     it('throws Authentication required when no tenantId', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: undefined };
-      await expect(
-        service.create(createInput, noTenantAuth)
-      ).rejects.toThrow('Authentication required');
+      await expect(service.create(createInput, noTenantAuth)).rejects.toThrow(
+        'Authentication required'
+      );
     });
 
     it('calls withTenantContext with tenant context', async () => {
@@ -272,7 +293,7 @@ describe('AnnotationService', () => {
     });
 
     it('throws Unauthorized when non-owner non-instructor tries to update', async () => {
-      const otherAnnotation = { ...MOCK_ANNOTATION, user_id: "other-user" };
+      const otherAnnotation = { ...MOCK_ANNOTATION, user_id: 'other-user' };
       mockLimit.mockResolvedValue([otherAnnotation]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
       await expect(
@@ -281,11 +302,15 @@ describe('AnnotationService', () => {
     });
 
     it('allows instructor to update any annotation', async () => {
-      const otherAnnotation = { ...MOCK_ANNOTATION, user_id: "other-user" };
+      const otherAnnotation = { ...MOCK_ANNOTATION, user_id: 'other-user' };
       mockLimit.mockResolvedValue([otherAnnotation]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
       mockReturning.mockResolvedValue([{ ...otherAnnotation }]);
-      const result = await service.update("ann-1", { content: { text: "updated" } }, INSTRUCTOR_AUTH);
+      const result = await service.update(
+        'ann-1',
+        { content: { text: 'updated' } },
+        INSTRUCTOR_AUTH
+      );
       expect(result).toBeDefined();
     });
   });
@@ -295,32 +320,34 @@ describe('AnnotationService', () => {
     it('throws Annotation not found when annotation does not exist', async () => {
       mockLimit.mockResolvedValue([]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      await expect(
-        service.delete('ann-1', MOCK_AUTH)
-      ).rejects.toThrow('Annotation not found');
+      await expect(service.delete('ann-1', MOCK_AUTH)).rejects.toThrow(
+        'Annotation not found'
+      );
     });
 
     it('throws Authentication required when no tenantId', async () => {
       const noTenantAuth: AuthContext = { ...MOCK_AUTH, tenantId: undefined };
-      await expect(
-        service.delete('ann-1', noTenantAuth)
-      ).rejects.toThrow('Authentication required');
+      await expect(service.delete('ann-1', noTenantAuth)).rejects.toThrow(
+        'Authentication required'
+      );
     });
 
     it('throws Unauthorized when non-owner non-instructor tries to delete', async () => {
       const otherAnnotation = { ...MOCK_ANNOTATION, user_id: 'other-user' };
       mockLimit.mockResolvedValue([otherAnnotation]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      await expect(
-        service.delete('ann-1', MOCK_AUTH)
-      ).rejects.toThrow('Unauthorized');
+      await expect(service.delete('ann-1', MOCK_AUTH)).rejects.toThrow(
+        'Unauthorized'
+      );
     });
 
     it('allows instructor to delete any annotation (owner-check bypass)', async () => {
       const otherAnnotation = { ...MOCK_ANNOTATION, user_id: 'other-user' };
       mockLimit.mockResolvedValue([otherAnnotation]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      mockReturning.mockResolvedValue([{ ...otherAnnotation, deleted_at: new Date() }]);
+      mockReturning.mockResolvedValue([
+        { ...otherAnnotation, deleted_at: new Date() },
+      ]);
       const result = await service.delete('ann-1', INSTRUCTOR_AUTH);
       expect(result).toBe(true);
     });
@@ -328,7 +355,9 @@ describe('AnnotationService', () => {
     it('allows annotation owner to delete their own annotation', async () => {
       mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      mockReturning.mockResolvedValue([{ ...MOCK_ANNOTATION, deleted_at: new Date() }]);
+      mockReturning.mockResolvedValue([
+        { ...MOCK_ANNOTATION, deleted_at: new Date() },
+      ]);
       const result = await service.delete('ann-1', MOCK_AUTH);
       expect(result).toBe(true);
     });
@@ -338,8 +367,13 @@ describe('AnnotationService', () => {
   describe('Layer-based visibility rules', () => {
     it('findAll() with PERSONAL layer filter only returns requesting user annotations', async () => {
       mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
-      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
-      await service.findAll({ layer: 'PERSONAL', limit: 10, offset: 0 }, MOCK_AUTH);
+      mockOrderBy.mockReturnValue({
+        limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+      });
+      await service.findAll(
+        { layer: 'PERSONAL', limit: 10, offset: 0 },
+        MOCK_AUTH
+      );
       // withTenantContext is called — the layer filter is applied inside the tx callback
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
@@ -350,18 +384,29 @@ describe('AnnotationService', () => {
 
     it('findAll() with SHARED layer filter returns results for student', async () => {
       mockOffset.mockResolvedValue([{ ...MOCK_ANNOTATION, layer: 'SHARED' }]);
-      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
-      const result = await service.findAll({ layer: 'SHARED', limit: 10, offset: 0 }, MOCK_AUTH);
+      mockOrderBy.mockReturnValue({
+        limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+      });
+      const result = await service.findAll(
+        { layer: 'SHARED', limit: 10, offset: 0 },
+        MOCK_AUTH
+      );
       expect(Array.isArray(result)).toBe(true);
     });
 
     it('findAll() called with INSTRUCTOR role uses instructor visibility rules', async () => {
       mockOffset.mockResolvedValue([MOCK_ANNOTATION]);
-      mockOrderBy.mockReturnValue({ limit: mockLimit.mockReturnValue({ offset: mockOffset }) });
+      mockOrderBy.mockReturnValue({
+        limit: mockLimit.mockReturnValue({ offset: mockOffset }),
+      });
       await service.findAll({ limit: 10, offset: 0 }, INSTRUCTOR_AUTH);
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
-        expect.objectContaining({ tenantId: 'tenant-1', userId: 'instructor-1', userRole: 'INSTRUCTOR' }),
+        expect.objectContaining({
+          tenantId: 'tenant-1',
+          userId: 'instructor-1',
+          userRole: 'INSTRUCTOR',
+        }),
         expect.any(Function)
       );
     });
@@ -381,7 +426,10 @@ describe('AnnotationService', () => {
       await service.findByAsset('asset-1', undefined, INSTRUCTOR_AUTH);
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
-        expect.objectContaining({ userId: 'instructor-1', userRole: 'INSTRUCTOR' }),
+        expect.objectContaining({
+          userId: 'instructor-1',
+          userRole: 'INSTRUCTOR',
+        }),
         expect.any(Function)
       );
     });
@@ -402,7 +450,9 @@ describe('AnnotationService', () => {
     it('delegates to update() with isResolved: true', async () => {
       mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      mockReturning.mockResolvedValue([{ ...MOCK_ANNOTATION, is_resolved: true }]);
+      mockReturning.mockResolvedValue([
+        { ...MOCK_ANNOTATION, is_resolved: true },
+      ]);
       const result = await service.resolve('ann-1', MOCK_AUTH);
       expect(result).toBeDefined();
     });
@@ -410,9 +460,9 @@ describe('AnnotationService', () => {
     it('throws Annotation not found when resolving non-existent annotation', async () => {
       mockLimit.mockResolvedValue([]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      await expect(
-        service.resolve('nonexistent', MOCK_AUTH)
-      ).rejects.toThrow('Annotation not found');
+      await expect(service.resolve('nonexistent', MOCK_AUTH)).rejects.toThrow(
+        'Annotation not found'
+      );
     });
   });
 
@@ -421,22 +471,25 @@ describe('AnnotationService', () => {
     it('create() throws Failed to create annotation when returning is empty', async () => {
       mockReturning.mockResolvedValue([]);
       await expect(
-        service.create({
-          assetId: 'asset-1',
-          annotationType: 'TEXT',
-          layer: 'PERSONAL',
-          content: { text: 'fail' },
-        }, MOCK_AUTH)
+        service.create(
+          {
+            assetId: 'asset-1',
+            annotationType: 'TEXT',
+            layer: 'PERSONAL',
+            content: { text: 'fail' },
+          },
+          MOCK_AUTH
+        )
       ).rejects.toThrow('Failed to create annotation');
     });
 
     it('update() throws Failed to update annotation when returning is empty', async () => {
       // First call (findById): returns existing annotation
       mockLimit
-        .mockResolvedValueOnce([MOCK_ANNOTATION])  // findById check
-        .mockResolvedValueOnce([]);                 // update returning empty
+        .mockResolvedValueOnce([MOCK_ANNOTATION]) // findById check
+        .mockResolvedValueOnce([]); // update returning empty
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      mockReturning.mockResolvedValue([]);          // update .returning() empty
+      mockReturning.mockResolvedValue([]); // update .returning() empty
       await expect(
         service.update('ann-1', { content: { text: 'x' } }, MOCK_AUTH)
       ).rejects.toThrow('Failed to update annotation');
@@ -459,11 +512,19 @@ describe('AnnotationService', () => {
       mockLimit.mockReturnValue({ offset: mockOffset });
       mockOrderBy.mockReturnValue({ limit: mockLimit });
       mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
-      mockWhere.mockReturnValue({ limit: mockLimit, orderBy: mockOrderBy, returning: mockReturning });
+      mockWhere.mockReturnValue({
+        limit: mockLimit,
+        orderBy: mockOrderBy,
+        returning: mockReturning,
+      });
       await service.findByUser('user-1', 5, 0, MOCK_AUTH);
       expect(withTenantContext).toHaveBeenCalledWith(
         mockDb,
-        expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' }),
+        expect.objectContaining({
+          tenantId: 'tenant-1',
+          userId: 'user-1',
+          userRole: 'STUDENT',
+        }),
         expect.any(Function)
       );
     });
@@ -473,17 +534,31 @@ describe('AnnotationService', () => {
       mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
       mockLimit.mockResolvedValue([MOCK_ANNOTATION]);
       mockWhere.mockReturnValue({ limit: mockLimit, returning: mockReturning });
-      mockReturning.mockResolvedValue([{ ...MOCK_ANNOTATION, is_resolved: true }]);
-      const result = await service.update('ann-1', {
-        spatialData: { x: 10, y: 20 },
-        isResolved: true,
-      }, MOCK_AUTH);
+      mockReturning.mockResolvedValue([
+        { ...MOCK_ANNOTATION, is_resolved: true },
+      ]);
+      const result = await service.update(
+        'ann-1',
+        {
+          spatialData: { x: 10, y: 20 },
+          isResolved: true,
+        },
+        MOCK_AUTH
+      );
       expect(result).toBeDefined();
     });
 
     it('create() throws Authentication required when no authContext', async () => {
       await expect(
-        service.create({ assetId: 'a', annotationType: 'TEXT', layer: 'PERSONAL', content: {} }, undefined as any)
+        service.create(
+          {
+            assetId: 'a',
+            annotationType: 'TEXT',
+            layer: 'PERSONAL',
+            content: {},
+          },
+          undefined as any
+        )
       ).rejects.toThrow('Authentication required');
     });
 

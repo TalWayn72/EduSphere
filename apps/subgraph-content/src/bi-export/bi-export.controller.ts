@@ -3,9 +3,7 @@
  * Authenticates via Bearer token (API key), extracts tenant, returns OData JSON.
  * Endpoints: GET /odata/v1/$metadata, /Enrollments, /Completions, /QuizResults, /ActivityLog
  */
-import {
-  Controller, Get, Req, Res, HttpStatus, Logger,
-} from '@nestjs/common';
+import { Controller, Get, Req, Res, HttpStatus, Logger } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { BiTokenService } from './bi-token.service.js';
 import { BiExportService } from './bi-export.service.js';
@@ -29,13 +27,16 @@ export class BiExportController {
 
   constructor(
     private readonly tokenService: BiTokenService,
-    private readonly exportService: BiExportService,
+    private readonly exportService: BiExportService
   ) {}
 
   private odataError(res: Response, status: number, message: string): void {
-    res.status(status).type(ODATA_CT).json({
-      error: { code: String(status), message },
-    });
+    res
+      .status(status)
+      .type(ODATA_CT)
+      .json({
+        error: { code: String(status), message },
+      });
   }
 
   private async authorize(req: Request, res: Response): Promise<string | null> {
@@ -68,7 +69,10 @@ export class BiExportController {
   }
 
   @Get('Enrollments')
-  async getEnrollments(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async getEnrollments(
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
     const tenantId = await this.authorize(req, res);
     if (!tenantId) return;
     const params = this.parseODataParams(req);
@@ -77,7 +81,10 @@ export class BiExportController {
   }
 
   @Get('Completions')
-  async getCompletions(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async getCompletions(
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
     const tenantId = await this.authorize(req, res);
     if (!tenantId) return;
     const params = this.parseODataParams(req);
@@ -86,7 +93,10 @@ export class BiExportController {
   }
 
   @Get('QuizResults')
-  async getQuizResults(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async getQuizResults(
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
     const tenantId = await this.authorize(req, res);
     if (!tenantId) return;
     const params = this.parseODataParams(req);
@@ -95,7 +105,10 @@ export class BiExportController {
   }
 
   @Get('ActivityLog')
-  async getActivityLog(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async getActivityLog(
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
     const tenantId = await this.authorize(req, res);
     if (!tenantId) return;
     const params = this.parseODataParams(req);

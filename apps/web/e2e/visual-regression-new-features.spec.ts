@@ -82,7 +82,9 @@ async function goTo(page: Page, path: string) {
 test.describe('Visual Regression — Quiz Player @visual-new', () => {
   test.setTimeout(30_000);
 
-  test('quiz page — multiple choice question renders correctly', async ({ page }) => {
+  test('quiz page — multiple choice question renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/quiz/quiz-mc-1');
     await expect(page).toHaveScreenshot('quiz-multiple-choice.png', {
       ...STABLE_OPTS,
@@ -90,7 +92,9 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
     });
   });
 
-  test('quiz page — fill-in-the-blank question renders correctly', async ({ page }) => {
+  test('quiz page — fill-in-the-blank question renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/quiz/quiz-fill-1');
     await expect(page).toHaveScreenshot('quiz-fill-blank.png', {
       ...STABLE_OPTS,
@@ -98,7 +102,9 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
     });
   });
 
-  test('quiz page — likert scale question renders correctly', async ({ page }) => {
+  test('quiz page — likert scale question renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/quiz/quiz-likert-1');
     await expect(page).toHaveScreenshot('quiz-likert.png', {
       ...STABLE_OPTS,
@@ -119,7 +125,10 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
     // Take screenshot of the progress indicator region only
     const progressBar = page.locator('.rounded-full.h-1\\.5').first();
     if (await progressBar.isVisible().catch(() => false)) {
-      await expect(progressBar).toHaveScreenshot('quiz-progress-bar.png', STABLE_OPTS);
+      await expect(progressBar).toHaveScreenshot(
+        'quiz-progress-bar.png',
+        STABLE_OPTS
+      );
     } else {
       await expect(page).toHaveScreenshot('quiz-progress-fallback.png', {
         ...STABLE_OPTS,
@@ -137,17 +146,24 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
     });
   });
 
-  test('quiz page — result view renders correctly after submission', async ({ page }) => {
+  test('quiz page — result view renders correctly after submission', async ({
+    page,
+  }) => {
     await goTo(page, '/quiz/quiz-mc-1');
 
     // Submit the quiz if possible — select first option then submit
-    const firstOption = page.locator('button, label').filter({ hasText: /option|answer/i }).first();
+    const firstOption = page
+      .locator('button, label')
+      .filter({ hasText: /option|answer/i })
+      .first();
     const optionVisible = await firstOption.isVisible().catch(() => false);
     if (optionVisible) {
       await firstOption.click();
     }
 
-    const submitBtn = page.locator('button').filter({ hasText: /submit quiz/i });
+    const submitBtn = page
+      .locator('button')
+      .filter({ hasText: /submit quiz/i });
     const submitVisible = await submitBtn.isVisible().catch(() => false);
     if (submitVisible) {
       await submitBtn.click();
@@ -168,7 +184,9 @@ test.describe('Visual Regression — Quiz Player @visual-new', () => {
 test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
   test.setTimeout(30_000);
 
-  test('scenarios page — grid of scenario cards renders correctly', async ({ page }) => {
+  test('scenarios page — grid of scenario cards renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/scenarios');
     await expect(page).toHaveScreenshot('scenarios-grid.png', {
       ...STABLE_OPTS,
@@ -176,14 +194,21 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     });
   });
 
-  test('scenarios page — page heading and create button visible', async ({ page }) => {
+  test('scenarios page — page heading and create button visible', async ({
+    page,
+  }) => {
     await goTo(page, '/scenarios');
     // Screenshot just the header section for focused comparison
-    const header = page.locator('h1').filter({ hasText: /role-play scenarios/i });
+    const header = page
+      .locator('h1')
+      .filter({ hasText: /role-play scenarios/i });
     const headerVisible = await header.isVisible().catch(() => false);
     if (headerVisible) {
       const headerSection = page.locator('.space-y-6').first();
-      await expect(headerSection).toHaveScreenshot('scenarios-header.png', STABLE_OPTS);
+      await expect(headerSection).toHaveScreenshot(
+        'scenarios-header.png',
+        STABLE_OPTS
+      );
     } else {
       await expect(page).toHaveScreenshot('scenarios-heading-fallback.png', {
         ...STABLE_OPTS,
@@ -192,13 +217,18 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     }
   });
 
-  test('scenarios page — empty state renders correctly when no scenarios', async ({ page }) => {
+  test('scenarios page — empty state renders correctly when no scenarios', async ({
+    page,
+  }) => {
     await goTo(page, '/scenarios');
     // If fetching fails or returns empty, the empty state card should render
     const emptyCard = page.locator('text=No scenarios available yet');
     const loadingSkeletons = page.locator('.animate-pulse');
     const hasEmpty = await emptyCard.isVisible().catch(() => false);
-    const hasSkeletons = await loadingSkeletons.first().isVisible().catch(() => false);
+    const hasSkeletons = await loadingSkeletons
+      .first()
+      .isVisible()
+      .catch(() => false);
 
     if (hasEmpty || !hasSkeletons) {
       await expect(page).toHaveScreenshot('scenarios-empty-state.png', {
@@ -214,7 +244,9 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     }
   });
 
-  test('scenarios page — full page screenshot (desktop 1280x720)', async ({ page }) => {
+  test('scenarios page — full page screenshot (desktop 1280x720)', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await goTo(page, '/scenarios');
     await expect(page).toHaveScreenshot('scenarios-full-page-desktop.png', {
@@ -224,7 +256,9 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     });
   });
 
-  test('roleplay simulator — chat interface layout (via scenario click)', async ({ page }) => {
+  test('roleplay simulator — chat interface layout (via scenario click)', async ({
+    page,
+  }) => {
     await goTo(page, '/scenarios');
     // Click the first scenario card to enter the roleplay simulator
     const firstCard = page.locator('[class*="cursor-pointer"]').first();
@@ -243,7 +277,9 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     });
   });
 
-  test('roleplay simulator — header bar renders correctly', async ({ page }) => {
+  test('roleplay simulator — header bar renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/scenarios');
     const firstCard = page.locator('[class*="cursor-pointer"]').first();
     const cardVisible = await firstCard.isVisible().catch(() => false);
@@ -254,16 +290,24 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     const header = page.locator('.bg-gray-900').first();
     const headerVisible = await header.isVisible().catch(() => false);
     if (headerVisible) {
-      await expect(header).toHaveScreenshot('roleplay-simulator-header.png', STABLE_OPTS);
+      await expect(header).toHaveScreenshot(
+        'roleplay-simulator-header.png',
+        STABLE_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('roleplay-simulator-header-fallback.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(page).toHaveScreenshot(
+        'roleplay-simulator-header-fallback.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     }
   });
 
-  test('roleplay simulator — input area renders correctly', async ({ page }) => {
+  test('roleplay simulator — input area renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/scenarios');
     const firstCard = page.locator('[class*="cursor-pointer"]').first();
     const cardVisible = await firstCard.isVisible().catch(() => false);
@@ -274,7 +318,10 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     const inputArea = page.locator('.bg-gray-900').last();
     const inputVisible = await inputArea.isVisible().catch(() => false);
     if (inputVisible) {
-      await expect(inputArea).toHaveScreenshot('roleplay-input-area.png', STABLE_OPTS);
+      await expect(inputArea).toHaveScreenshot(
+        'roleplay-input-area.png',
+        STABLE_OPTS
+      );
     } else {
       await expect(page).toHaveScreenshot('roleplay-input-area-fallback.png', {
         ...STABLE_OPTS,
@@ -300,7 +347,9 @@ test.describe('Visual Regression — Content Types @visual-new', () => {
     });
   });
 
-  test('rich document page — not found / missing content state', async ({ page }) => {
+  test('rich document page — not found / missing content state', async ({
+    page,
+  }) => {
     await goTo(page, '/document/does-not-exist');
     await expect(page).toHaveScreenshot('rich-document-not-found.png', {
       ...STABLE_OPTS,
@@ -308,13 +357,20 @@ test.describe('Visual Regression — Content Types @visual-new', () => {
     });
   });
 
-  test('quiz content page — breadcrumb and layout render correctly', async ({ page }) => {
+  test('quiz content page — breadcrumb and layout render correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/quiz/quiz-mc-1');
     // Check breadcrumb region
-    const breadcrumb = page.locator('nav[aria-label*="breadcrumb"], [data-testid="breadcrumb"]').first();
+    const breadcrumb = page
+      .locator('nav[aria-label*="breadcrumb"], [data-testid="breadcrumb"]')
+      .first();
     const breadcrumbVisible = await breadcrumb.isVisible().catch(() => false);
     if (breadcrumbVisible) {
-      await expect(breadcrumb).toHaveScreenshot('quiz-breadcrumb.png', STABLE_OPTS);
+      await expect(breadcrumb).toHaveScreenshot(
+        'quiz-breadcrumb.png',
+        STABLE_OPTS
+      );
     }
     await expect(page).toHaveScreenshot('quiz-content-page-layout.png', {
       ...STABLE_OPTS,
@@ -326,23 +382,25 @@ test.describe('Visual Regression — Content Types @visual-new', () => {
     await goTo(page, '/learn/content-1');
     await expect(page).toHaveScreenshot('content-viewer-standard.png', {
       ...LOOSE_OPTS,
-      mask: [
-        ...dynamicMasks(page),
-        page.locator('video'),
-      ],
+      mask: [...dynamicMasks(page), page.locator('video')],
     });
   });
 
   test('microlesson card — widget visible on dashboard', async ({ page }) => {
     await goTo(page, '/dashboard');
     // DailyLearningWidget renders a MicrolessonCard when lesson is started
-    const dailyWidget = page.locator('.card', { hasText: 'Daily Learning' }).first();
+    const dailyWidget = page
+      .locator('.card', { hasText: 'Daily Learning' })
+      .first();
     const widgetVisible = await dailyWidget.isVisible().catch(() => false);
     if (widgetVisible) {
-      await expect(dailyWidget).toHaveScreenshot('microlesson-card-widget.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(dailyWidget).toHaveScreenshot(
+        'microlesson-card-widget.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('microlesson-card-fallback.png', {
         ...STABLE_OPTS,
@@ -359,7 +417,9 @@ test.describe('Visual Regression — Content Types @visual-new', () => {
 test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
   test.setTimeout(45_000);
 
-  test('dashboard — full page with all new widgets renders correctly', async ({ page }) => {
+  test('dashboard — full page with all new widgets renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     await expect(page).toHaveScreenshot('dashboard-full-page.png', {
       fullPage: true,
@@ -372,24 +432,34 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     });
   });
 
-  test('dashboard — DailyLearningWidget — lesson available state', async ({ page }) => {
+  test('dashboard — DailyLearningWidget — lesson available state', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     const widget = page.locator('.card', { hasText: 'Daily Learning' }).first();
     const visible = await widget.isVisible().catch(() => false);
     if (visible) {
-      await expect(widget).toHaveScreenshot('widget-daily-learning-available.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(widget).toHaveScreenshot(
+        'widget-daily-learning-available.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('widget-daily-learning-fallback.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(page).toHaveScreenshot(
+        'widget-daily-learning-fallback.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     }
   });
 
-  test('dashboard — DailyLearningWidget — all done state after completion', async ({ page }) => {
+  test('dashboard — DailyLearningWidget — all done state after completion', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     // Simulate completed state by clicking "Start Today's Lesson"
     const startBtn = page.locator('button', { hasText: /start today/i });
@@ -398,19 +468,29 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
       await startBtn.click();
       await page.waitForTimeout(500);
     }
-    const widget = page.locator('.card', { hasText: /all done for today/i }).first();
+    const widget = page
+      .locator('.card', { hasText: /all done for today/i })
+      .first();
     const doneVisible = await widget.isVisible().catch(() => false);
     if (doneVisible) {
-      await expect(widget).toHaveScreenshot('widget-daily-learning-done.png', STABLE_OPTS);
+      await expect(widget).toHaveScreenshot(
+        'widget-daily-learning-done.png',
+        STABLE_OPTS
+      );
     } else {
-      await expect(page).toHaveScreenshot('widget-daily-learning-done-fallback.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(page).toHaveScreenshot(
+        'widget-daily-learning-done-fallback.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     }
   });
 
-  test('dashboard — LeaderboardWidget — top 5 list renders correctly', async ({ page }) => {
+  test('dashboard — LeaderboardWidget — top 5 list renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     const widget = page.locator('.card', { hasText: /leaderboard/i }).first();
     const visible = await widget.isVisible().catch(() => false);
@@ -430,7 +510,9 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     }
   });
 
-  test('dashboard — SkillGapWidget — empty profile state renders correctly', async ({ page }) => {
+  test('dashboard — SkillGapWidget — empty profile state renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     const widget = page.locator('.card', { hasText: /skill gap/i }).first();
     const visible = await widget.isVisible().catch(() => false);
@@ -447,7 +529,9 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     }
   });
 
-  test('dashboard — SkillGapWidget — create profile dialog renders correctly', async ({ page }) => {
+  test('dashboard — SkillGapWidget — create profile dialog renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     const newProfileBtn = page.locator('button', { hasText: /new profile/i });
     const btnVisible = await newProfileBtn.isVisible().catch(() => false);
@@ -457,7 +541,10 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
       const dialog = page.locator('[role="dialog"]');
       const dialogVisible = await dialog.isVisible().catch(() => false);
       if (dialogVisible) {
-        await expect(dialog).toHaveScreenshot('widget-skill-gap-create-dialog.png', STABLE_OPTS);
+        await expect(dialog).toHaveScreenshot(
+          'widget-skill-gap-create-dialog.png',
+          STABLE_OPTS
+        );
       }
     }
     // Also capture the full page state
@@ -469,7 +556,9 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
 
   test('dashboard — SRSWidget — renders correctly', async ({ page }) => {
     await goTo(page, '/dashboard');
-    const widget = page.locator('.card', { hasText: /review|srs|spaced/i }).first();
+    const widget = page
+      .locator('.card', { hasText: /review|srs|spaced/i })
+      .first();
     const visible = await widget.isVisible().catch(() => false);
     if (visible) {
       await expect(widget).toHaveScreenshot('widget-srs.png', {
@@ -484,7 +573,9 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     }
   });
 
-  test('dashboard — stats cards section renders correctly', async ({ page }) => {
+  test('dashboard — stats cards section renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     const statsGrid = page.locator('.grid.gap-4').first();
     const gridVisible = await statsGrid.isVisible().catch(() => false);
@@ -494,20 +585,28 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
         mask: dynamicMasks(page),
       });
     } else {
-      await expect(page).toHaveScreenshot('dashboard-stats-cards-fallback.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(page).toHaveScreenshot(
+        'dashboard-stats-cards-fallback.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     }
   });
 
-  test('dashboard — instructor tools card visible for instructor role', async ({ page }) => {
+  test('dashboard — instructor tools card visible for instructor role', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     // In DEV_MODE the mock user may include an instructor role — check the tools card
     const toolsCard = page.locator('.card', { hasText: /instructor tools/i });
     const toolsVisible = await toolsCard.isVisible().catch(() => false);
     if (toolsVisible) {
-      await expect(toolsCard).toHaveScreenshot('dashboard-instructor-tools.png', STABLE_OPTS);
+      await expect(toolsCard).toHaveScreenshot(
+        'dashboard-instructor-tools.png',
+        STABLE_OPTS
+      );
     } else {
       // Student view — tools card is hidden
       await expect(page).toHaveScreenshot('dashboard-student-view.png', {
@@ -525,7 +624,9 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
 test.describe('Visual Regression — Profile & Portfolio @visual-new', () => {
   test.setTimeout(30_000);
 
-  test('public profile page — hero card renders correctly', async ({ page }) => {
+  test('public profile page — hero card renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/u/user-1');
     await expect(page).toHaveScreenshot('public-profile-full.png', {
       fullPage: true,
@@ -538,7 +639,9 @@ test.describe('Visual Regression — Profile & Portfolio @visual-new', () => {
     });
   });
 
-  test('public profile page — private / not found state renders correctly', async ({ page }) => {
+  test('public profile page — private / not found state renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/u/non-existent-user-xyz');
     await expect(page).toHaveScreenshot('public-profile-private.png', {
       ...STABLE_OPTS,
@@ -546,7 +649,9 @@ test.describe('Visual Regression — Profile & Portfolio @visual-new', () => {
     });
   });
 
-  test('public profile page — stats row renders correctly', async ({ page }) => {
+  test('public profile page — stats row renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/u/user-1');
     const statsRow = page.locator('.grid-cols-3, .grid-cols-5').first();
     const statsVisible = await statsRow.isVisible().catch(() => false);
@@ -575,15 +680,22 @@ test.describe('Visual Regression — Profile & Portfolio @visual-new', () => {
     });
   });
 
-  test('profile page — preferences section renders correctly', async ({ page }) => {
+  test('profile page — preferences section renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/profile');
-    const prefsSection = page.locator('.card', { hasText: /preferences/i }).first();
+    const prefsSection = page
+      .locator('.card', { hasText: /preferences/i })
+      .first();
     const prefsVisible = await prefsSection.isVisible().catch(() => false);
     if (prefsVisible) {
-      await expect(prefsSection).toHaveScreenshot('profile-preferences-section.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(prefsSection).toHaveScreenshot(
+        'profile-preferences-section.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     } else {
       await expect(page).toHaveScreenshot('profile-preferences-fallback.png', {
         ...STABLE_OPTS,
@@ -600,7 +712,9 @@ test.describe('Visual Regression — Profile & Portfolio @visual-new', () => {
 test.describe('Visual Regression — Admin Pages @visual-new', () => {
   test.setTimeout(30_000);
 
-  test('LTI settings page — empty platforms list renders correctly', async ({ page }) => {
+  test('LTI settings page — empty platforms list renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/admin/lti');
     await expect(page).toHaveScreenshot('admin-lti-empty.png', {
       fullPage: true,
@@ -613,16 +727,17 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     });
   });
 
-  test('LTI settings page — page heading and action buttons visible', async ({ page }) => {
+  test('LTI settings page — page heading and action buttons visible', async ({
+    page,
+  }) => {
     await goTo(page, '/admin/lti');
     const heading = page.locator('h1', { hasText: /LTI 1.3 Platforms/i });
     const headingVisible = await heading.isVisible().catch(() => false);
     if (headingVisible) {
       const headerSection = page.locator('.max-w-4xl').first();
-      await expect(headerSection.locator('.flex.items-center').first()).toHaveScreenshot(
-        'admin-lti-header.png',
-        STABLE_OPTS,
-      );
+      await expect(
+        headerSection.locator('.flex.items-center').first()
+      ).toHaveScreenshot('admin-lti-header.png', STABLE_OPTS);
     } else {
       await expect(page).toHaveScreenshot('admin-lti-header-fallback.png', {
         ...STABLE_OPTS,
@@ -631,17 +746,26 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     }
   });
 
-  test('LTI settings page — register platform form renders correctly', async ({ page }) => {
+  test('LTI settings page — register platform form renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/admin/lti');
-    const registerBtn = page.locator('button', { hasText: /register platform/i });
+    const registerBtn = page.locator('button', {
+      hasText: /register platform/i,
+    });
     const btnVisible = await registerBtn.isVisible().catch(() => false);
     if (btnVisible) {
       await registerBtn.click();
       await page.waitForTimeout(300);
-      const form = page.locator('.card', { hasText: /Register LTI 1.3 Platform/i });
+      const form = page.locator('.card', {
+        hasText: /Register LTI 1.3 Platform/i,
+      });
       const formVisible = await form.isVisible().catch(() => false);
       if (formVisible) {
-        await expect(form).toHaveScreenshot('admin-lti-register-form.png', STABLE_OPTS);
+        await expect(form).toHaveScreenshot(
+          'admin-lti-register-form.png',
+          STABLE_OPTS
+        );
       }
     }
     await expect(page).toHaveScreenshot('admin-lti-with-form.png', {
@@ -663,7 +787,9 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     });
   });
 
-  test('SCIM settings page — generate token modal renders correctly', async ({ page }) => {
+  test('SCIM settings page — generate token modal renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/admin/scim');
     const generateBtn = page.locator('button', { hasText: /generate token/i });
     const btnVisible = await generateBtn.isVisible().catch(() => false);
@@ -673,7 +799,10 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
       const modal = page.locator('[class*="fixed inset-0"]').first();
       const modalVisible = await modal.isVisible().catch(() => false);
       if (modalVisible) {
-        await expect(modal).toHaveScreenshot('admin-scim-token-modal.png', STABLE_OPTS);
+        await expect(modal).toHaveScreenshot(
+          'admin-scim-token-modal.png',
+          STABLE_OPTS
+        );
       }
     }
     await expect(page).toHaveScreenshot('admin-scim-with-modal.png', {
@@ -682,7 +811,9 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     });
   });
 
-  test('compliance reports page — full page renders correctly', async ({ page }) => {
+  test('compliance reports page — full page renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/admin/compliance');
     await expect(page).toHaveScreenshot('admin-compliance-full.png', {
       fullPage: true,
@@ -695,27 +826,41 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     });
   });
 
-  test('compliance reports page — heading and compliance courses section', async ({ page }) => {
+  test('compliance reports page — heading and compliance courses section', async ({
+    page,
+  }) => {
     await goTo(page, '/admin/compliance');
-    const heading = page.locator('h1', { hasText: /compliance training reports/i });
+    const heading = page.locator('h1', {
+      hasText: /compliance training reports/i,
+    });
     const headingVisible = await heading.isVisible().catch(() => false);
     if (headingVisible) {
-      const coursesCard = page.locator('.card', { hasText: /Compliance Courses/i }).first();
+      const coursesCard = page
+        .locator('.card', { hasText: /Compliance Courses/i })
+        .first();
       const cardVisible = await coursesCard.isVisible().catch(() => false);
       if (cardVisible) {
-        await expect(coursesCard).toHaveScreenshot('admin-compliance-courses-card.png', {
-          ...STABLE_OPTS,
-          mask: dynamicMasks(page),
-        });
+        await expect(coursesCard).toHaveScreenshot(
+          'admin-compliance-courses-card.png',
+          {
+            ...STABLE_OPTS,
+            mask: dynamicMasks(page),
+          }
+        );
       }
     }
-    await expect(page).toHaveScreenshot('admin-compliance-heading-section.png', {
-      ...STABLE_OPTS,
-      mask: dynamicMasks(page),
-    });
+    await expect(page).toHaveScreenshot(
+      'admin-compliance-heading-section.png',
+      {
+        ...STABLE_OPTS,
+        mask: dynamicMasks(page),
+      }
+    );
   });
 
-  test('course analytics page — renders correctly with metrics', async ({ page }) => {
+  test('course analytics page — renders correctly with metrics', async ({
+    page,
+  }) => {
     await goTo(page, '/courses/course-1/analytics');
     await expect(page).toHaveScreenshot('course-analytics-full.png', {
       fullPage: true,
@@ -728,41 +873,59 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
     });
   });
 
-  test('course analytics page — stat cards render correctly', async ({ page }) => {
+  test('course analytics page — stat cards render correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/courses/course-1/analytics');
     const statsGrid = page.locator('.grid-cols-2, .grid-cols-4').first();
     const gridVisible = await statsGrid.isVisible().catch(() => false);
     if (gridVisible) {
-      await expect(statsGrid).toHaveScreenshot('course-analytics-stat-cards.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(statsGrid).toHaveScreenshot(
+        'course-analytics-stat-cards.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('course-analytics-stat-cards-fallback.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(page).toHaveScreenshot(
+        'course-analytics-stat-cards-fallback.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     }
   });
 
-  test('course analytics page — at-risk learners table renders correctly', async ({ page }) => {
+  test('course analytics page — at-risk learners table renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/courses/course-1/analytics');
-    const atRiskCard = page.locator('.card', { hasText: /at-risk learners/i }).first();
+    const atRiskCard = page
+      .locator('.card', { hasText: /at-risk learners/i })
+      .first();
     const visible = await atRiskCard.isVisible().catch(() => false);
     if (visible) {
-      await expect(atRiskCard).toHaveScreenshot('course-analytics-at-risk-table.png', {
-        ...STABLE_OPTS,
-        mask: [
-          ...dynamicMasks(page),
-          page.locator('[data-testid="learner-name"]'),
-          page.locator('[data-testid="learner-email"]'),
-        ],
-      });
+      await expect(atRiskCard).toHaveScreenshot(
+        'course-analytics-at-risk-table.png',
+        {
+          ...STABLE_OPTS,
+          mask: [
+            ...dynamicMasks(page),
+            page.locator('[data-testid="learner-name"]'),
+            page.locator('[data-testid="learner-email"]'),
+          ],
+        }
+      );
     } else {
-      await expect(page).toHaveScreenshot('course-analytics-at-risk-fallback.png', {
-        ...STABLE_OPTS,
-        mask: dynamicMasks(page),
-      });
+      await expect(page).toHaveScreenshot(
+        'course-analytics-at-risk-fallback.png',
+        {
+          ...STABLE_OPTS,
+          mask: dynamicMasks(page),
+        }
+      );
     }
   });
 });
@@ -776,15 +939,14 @@ test.describe('Visual Regression — Mobile Views @visual-new', () => {
 
   test.use({ viewport: { width: 375, height: 812 } });
 
-  test('dashboard — mobile layout with widgets renders correctly', async ({ page }) => {
+  test('dashboard — mobile layout with widgets renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/dashboard');
     await expect(page).toHaveScreenshot('mobile-dashboard-full.png', {
       fullPage: true,
       ...LOOSE_OPTS,
-      mask: [
-        ...dynamicMasks(page),
-        page.locator('canvas'),
-      ],
+      mask: [...dynamicMasks(page), page.locator('canvas')],
     });
   });
 
@@ -806,15 +968,14 @@ test.describe('Visual Regression — Mobile Views @visual-new', () => {
     });
   });
 
-  test('public profile page — mobile layout renders correctly', async ({ page }) => {
+  test('public profile page — mobile layout renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/u/user-1');
     await expect(page).toHaveScreenshot('mobile-public-profile.png', {
       fullPage: true,
       ...STABLE_OPTS,
-      mask: [
-        ...dynamicMasks(page),
-        page.locator('time'),
-      ],
+      mask: [...dynamicMasks(page), page.locator('time')],
     });
   });
 
@@ -823,14 +984,13 @@ test.describe('Visual Regression — Mobile Views @visual-new', () => {
     await expect(page).toHaveScreenshot('mobile-admin-lti.png', {
       fullPage: true,
       ...STABLE_OPTS,
-      mask: [
-        ...dynamicMasks(page),
-        page.locator('.font-mono'),
-      ],
+      mask: [...dynamicMasks(page), page.locator('.font-mono')],
     });
   });
 
-  test('compliance page — mobile layout renders correctly', async ({ page }) => {
+  test('compliance page — mobile layout renders correctly', async ({
+    page,
+  }) => {
     await goTo(page, '/admin/compliance');
     await expect(page).toHaveScreenshot('mobile-compliance-page.png', {
       fullPage: true,
@@ -855,16 +1015,15 @@ test.describe('Visual Regression — RTL Layout (Hebrew) @visual-new', () => {
     });
   }
 
-  test('dashboard — RTL layout with Hebrew locale renders correctly', async ({ page }) => {
+  test('dashboard — RTL layout with Hebrew locale renders correctly', async ({
+    page,
+  }) => {
     await applyRTL(page);
     await goTo(page, '/dashboard?lang=he');
     await expect(page).toHaveScreenshot('rtl-dashboard.png', {
       fullPage: true,
       ...LOOSE_OPTS,
-      mask: [
-        ...dynamicMasks(page),
-        page.locator('canvas'),
-      ],
+      mask: [...dynamicMasks(page), page.locator('canvas')],
     });
   });
 
@@ -898,7 +1057,9 @@ test.describe('Visual Regression — RTL Layout (Hebrew) @visual-new', () => {
     });
   });
 
-  test('admin compliance page — RTL layout renders correctly', async ({ page }) => {
+  test('admin compliance page — RTL layout renders correctly', async ({
+    page,
+  }) => {
     await applyRTL(page);
     await goTo(page, '/admin/compliance?lang=he');
     await expect(page).toHaveScreenshot('rtl-admin-compliance.png', {

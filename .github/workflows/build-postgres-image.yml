@@ -8,17 +8,17 @@ on:
       - main
       - master
     paths:
-      - 'infrastructure/docker/postgres-age/Dockerfile'
+      - "infrastructure/docker/postgres-age/Dockerfile"
   workflow_dispatch:
     inputs:
       force_push:
-        description: 'Force push image even if no Dockerfile change'
+        description: "Force push image even if no Dockerfile change"
         type: boolean
         default: false
 
 concurrency:
   group: build-postgres-image
-  cancel-in-progress: false  # Never cancel an in-progress build — could break running tests
+  cancel-in-progress: false # Never cancel an in-progress build — could break running tests
 
 jobs:
   build-and-push:
@@ -28,7 +28,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write  # Required to push to GHCR
+      packages: write # Required to push to GHCR
 
     steps:
       - name: Checkout repository

@@ -1,4 +1,8 @@
-export type ComplianceStatus = 'completed' | 'in_progress' | 'not_started' | 'overdue';
+export type ComplianceStatus =
+  | 'completed'
+  | 'in_progress'
+  | 'not_started'
+  | 'overdue';
 
 export interface ComplianceReportRow {
   userName: string;
@@ -31,7 +35,10 @@ function formatDate(d: Date | string | null | undefined): string {
   return date.toISOString().split('T')[0] ?? '';
 }
 
-export function generateCsvReport(rows: ComplianceReportRow[], title: string): string {
+export function generateCsvReport(
+  rows: ComplianceReportRow[],
+  title: string
+): string {
   const headers = [
     'Name',
     'Email',
@@ -55,7 +62,7 @@ export function generateCsvReport(rows: ComplianceReportRow[], title: string): s
       row.score !== null && row.score !== undefined ? String(row.score) : '',
       row.status,
       row.complianceDueDate ? formatDate(row.complianceDueDate) : '',
-    ].join(','),
+    ].join(',')
   );
 
   const titleRow = sanitizeCell(title);

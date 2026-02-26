@@ -23,7 +23,10 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) => fn(mockDb)),
+  withTenantContext: vi.fn(
+    (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      fn(mockDb)
+  ),
   schema: {
     biApiTokens: {
       id: 'id',
@@ -59,7 +62,7 @@ describe('BiTokenService — memory safety', () => {
   });
 
   it('token cache evicts at max-500: insert 501 tokens, cache size stays <= 500', async () => {
-    const { schema, eq } = await import('@edusphere/db');
+    const { schema: _schema, eq: _eq } = await import('@edusphere/db');
 
     // Populate cache by making 501 validateToken calls with mock DB hits
     for (let i = 0; i < 501; i++) {
@@ -68,15 +71,17 @@ describe('BiTokenService — memory safety', () => {
       const tenantId = `tenant-${i}`;
 
       // Mock DB to return a valid active token row for this hash
-      vi.mocked(mockDb.limit).mockResolvedValueOnce([{
-        id: `token-id-${i}`,
-        tenantId,
-        tokenHash,
-        isActive: true,
-        lastUsedAt: null,
-        createdAt: new Date(),
-        description: `test-${i}`,
-      }]);
+      vi.mocked(mockDb.limit).mockResolvedValueOnce([
+        {
+          id: `token-id-${i}`,
+          tenantId,
+          tokenHash,
+          isActive: true,
+          lastUsedAt: null,
+          createdAt: new Date(),
+          description: `test-${i}`,
+        },
+      ]);
 
       await service.validateToken(rawToken);
     }
@@ -96,15 +101,17 @@ describe('BiTokenService — memory safety', () => {
     const tenantId = 'test-tenant';
 
     // First validate — DB returns active token, populates cache
-    vi.mocked(mockDb.limit).mockResolvedValueOnce([{
-      id: tokenId,
-      tenantId,
-      tokenHash: makeHash(rawToken),
-      isActive: true,
-      lastUsedAt: null,
-      createdAt: new Date(),
-      description: 'test',
-    }]);
+    vi.mocked(mockDb.limit).mockResolvedValueOnce([
+      {
+        id: tokenId,
+        tenantId,
+        tokenHash: makeHash(rawToken),
+        isActive: true,
+        lastUsedAt: null,
+        createdAt: new Date(),
+        description: 'test',
+      },
+    ]);
 
     const firstResult = await service.validateToken(rawToken);
     expect(firstResult).toBe(tenantId);
@@ -113,15 +120,17 @@ describe('BiTokenService — memory safety', () => {
     await service.revokeToken(tokenId, tenantId);
 
     // After revoke, validateToken should hit DB again — mock returns null (isActive: false)
-    vi.mocked(mockDb.limit).mockResolvedValueOnce([{
-      id: tokenId,
-      tenantId,
-      tokenHash: makeHash(rawToken),
-      isActive: false,
-      lastUsedAt: null,
-      createdAt: new Date(),
-      description: 'test',
-    }]);
+    vi.mocked(mockDb.limit).mockResolvedValueOnce([
+      {
+        id: tokenId,
+        tenantId,
+        tokenHash: makeHash(rawToken),
+        isActive: false,
+        lastUsedAt: null,
+        createdAt: new Date(),
+        description: 'test',
+      },
+    ]);
 
     const secondResult = await service.validateToken(rawToken);
     expect(secondResult).toBeNull();

@@ -30,8 +30,12 @@ export function GoalPathPanel({ goal }: { goal: CompetencyGoal }) {
   });
 
   const path = data?.myLearningPath;
-  if (fetching) return <p className="text-xs text-muted-foreground mt-1">Loading path...</p>;
-  if (!path) return <p className="text-xs text-muted-foreground mt-1">No path found</p>;
+  if (fetching)
+    return (
+      <p className="text-xs text-muted-foreground mt-1">Loading path...</p>
+    );
+  if (!path)
+    return <p className="text-xs text-muted-foreground mt-1">No path found</p>;
 
   return (
     <div className="mt-2 space-y-1">

@@ -51,7 +51,7 @@ export class ScenarioService implements OnModuleDestroy {
   /** Fetch and return a scenario node (content item) as ScenarioNodeDto */
   async getScenarioNode(
     contentItemId: string,
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<ScenarioNodeDto> {
     return withTenantContext(this.db, tenantCtx, async () => {
       const [row] = await this.db
@@ -75,7 +75,7 @@ export class ScenarioService implements OnModuleDestroy {
     fromContentItemId: string,
     choiceId: string,
     scenarioRootId: string,
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<ScenarioNodeDto | null> {
     return withTenantContext(this.db, tenantCtx, async () => {
       const [row] = await this.db
@@ -84,12 +84,16 @@ export class ScenarioService implements OnModuleDestroy {
         .where(eq(schema.contentItems.id, fromContentItemId))
         .limit(1);
       if (!row) {
-        throw new NotFoundException(`ContentItem ${fromContentItemId} not found`);
+        throw new NotFoundException(
+          `ContentItem ${fromContentItemId} not found`
+        );
       }
       const content = this.parseScenarioContent(row.content ?? null);
       const choice = content.choices.find((c) => c.id === choiceId);
       if (!choice) {
-        throw new NotFoundException(`Choice ${choiceId} not found in node ${fromContentItemId}`);
+        throw new NotFoundException(
+          `Choice ${choiceId} not found in node ${fromContentItemId}`
+        );
       }
       await this.db.insert(schema.scenario_choices).values({
         user_id: tenantCtx.userId,
@@ -100,7 +104,7 @@ export class ScenarioService implements OnModuleDestroy {
         scenario_root_id: scenarioRootId,
       });
       this.logger.log(
-        `Scenario choice recorded: user=${tenantCtx.userId} from=${fromContentItemId} choice=${choiceId}`,
+        `Scenario choice recorded: user=${tenantCtx.userId} from=${fromContentItemId} choice=${choiceId}`
       );
       if (!choice.nextContentItemId) return null;
       return this.getScenarioNode(choice.nextContentItemId, tenantCtx);
@@ -110,7 +114,7 @@ export class ScenarioService implements OnModuleDestroy {
   /** Return the ordered list of choices made for a scenario root */
   async getScenarioProgress(
     scenarioRootId: string,
-    tenantCtx: TenantContext,
+    tenantCtx: TenantContext
   ): Promise<ScenarioProgressEntryDto[]> {
     return withTenantContext(this.db, tenantCtx, async () => {
       const rows = await this.db
@@ -119,8 +123,8 @@ export class ScenarioService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.scenario_choices.scenario_root_id, scenarioRootId),
-            eq(schema.scenario_choices.user_id, tenantCtx.userId),
-          ),
+            eq(schema.scenario_choices.user_id, tenantCtx.userId)
+          )
         )
         .orderBy(asc(schema.scenario_choices.chosen_at));
 
@@ -135,7 +139,8 @@ export class ScenarioService implements OnModuleDestroy {
           ? this.parseScenarioContent(itemRow.content ?? null)
           : null;
         const choiceText =
-          content?.choices.find((c) => c.id === r.choice_id)?.text ?? r.choice_id;
+          content?.choices.find((c) => c.id === r.choice_id)?.text ??
+          r.choice_id;
         entries.push({
           fromContentItemId: r.from_content_item_id,
           choiceId: r.choice_id,
@@ -150,7 +155,7 @@ export class ScenarioService implements OnModuleDestroy {
   private mapNode(
     id: string,
     title: string,
-    content: ScenarioContent,
+    content: ScenarioContent
   ): ScenarioNodeDto {
     return {
       id,

@@ -57,14 +57,14 @@ export class MicrolearningService implements OnModuleDestroy {
     }
     if (result.data.durationSeconds > MICROLESSON_MAX_DURATION_SECONDS) {
       throw new BadRequestException(
-        `MICROLESSON durationSeconds must not exceed ${MICROLESSON_MAX_DURATION_SECONDS} (7 minutes)`,
+        `MICROLESSON durationSeconds must not exceed ${MICROLESSON_MAX_DURATION_SECONDS} (7 minutes)`
       );
     }
   }
 
   async createPath(
     input: CreateMicrolearningPathInput,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<MicrolearningPathDto> {
     const validated = createMicrolearningPathInputSchema.safeParse(input);
     if (!validated.success) {
@@ -85,12 +85,16 @@ export class MicrolearningService implements OnModuleDestroy {
           createdBy: ctx.userId,
         })
         .returning();
-      if (!row) throw new BadRequestException('Failed to create microlearning path');
+      if (!row)
+        throw new BadRequestException('Failed to create microlearning path');
       return this.mapPath(row);
     });
   }
 
-  async getPath(pathId: string, ctx: TenantContext): Promise<MicrolearningPathDto> {
+  async getPath(
+    pathId: string,
+    ctx: TenantContext
+  ): Promise<MicrolearningPathDto> {
     return withTenantContext(this.db, ctx, async (tx) => {
       const [row] = await tx
         .select()
@@ -98,11 +102,12 @@ export class MicrolearningService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.microlearningPaths.id, pathId),
-            eq(schema.microlearningPaths.tenantId, ctx.tenantId),
-          ),
+            eq(schema.microlearningPaths.tenantId, ctx.tenantId)
+          )
         )
         .limit(1);
-      if (!row) throw new NotFoundException(`MicrolearningPath ${pathId} not found`);
+      if (!row)
+        throw new NotFoundException(`MicrolearningPath ${pathId} not found`);
       return this.mapPath(row);
     });
   }
@@ -126,9 +131,15 @@ export class MicrolearningService implements OnModuleDestroy {
     return firstPath.contentItemIds[0] ?? null;
   }
 
-  private mapPath(row: typeof schema.microlearningPaths.$inferSelect): MicrolearningPathDto {
+  private mapPath(
+    row: typeof schema.microlearningPaths.$inferSelect
+  ): MicrolearningPathDto {
     const ids: string[] = (() => {
-      try { return JSON.parse(row.contentItemIds) as string[]; } catch { return []; }
+      try {
+        return JSON.parse(row.contentItemIds) as string[];
+      } catch {
+        return [];
+      }
     })();
     return {
       id: row.id,

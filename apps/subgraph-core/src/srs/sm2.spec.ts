@@ -52,7 +52,11 @@ describe('computeNextReview', () => {
     });
 
     it('quality 2 — incorrect: resets to interval=1', () => {
-      const card: SM2Card = { intervalDays: 10, easeFactor: 2.5, repetitions: 5 };
+      const card: SM2Card = {
+        intervalDays: 10,
+        easeFactor: 2.5,
+        repetitions: 5,
+      };
       const result = computeNextReview(card, 2);
       expect(result.repetitions).toBe(0);
       expect(result.intervalDays).toBe(1);
@@ -61,14 +65,22 @@ describe('computeNextReview', () => {
 
   describe('second review (repetitions === 1)', () => {
     it('quality 4 — correct: sets interval to 6 days', () => {
-      const card: SM2Card = { intervalDays: 1, easeFactor: 2.5, repetitions: 1 };
+      const card: SM2Card = {
+        intervalDays: 1,
+        easeFactor: 2.5,
+        repetitions: 1,
+      };
       const result = computeNextReview(card, 4);
       expect(result.intervalDays).toBe(6);
       expect(result.repetitions).toBe(2);
     });
 
     it('quality 5 — correct: sets interval to 6 days', () => {
-      const card: SM2Card = { intervalDays: 1, easeFactor: 2.5, repetitions: 1 };
+      const card: SM2Card = {
+        intervalDays: 1,
+        easeFactor: 2.5,
+        repetitions: 1,
+      };
       const result = computeNextReview(card, 5);
       expect(result.intervalDays).toBe(6);
     });
@@ -76,7 +88,11 @@ describe('computeNextReview', () => {
 
   describe('third+ review (repetitions >= 2)', () => {
     it('uses ease_factor multiplication for interval', () => {
-      const card: SM2Card = { intervalDays: 6, easeFactor: 2.5, repetitions: 2 };
+      const card: SM2Card = {
+        intervalDays: 6,
+        easeFactor: 2.5,
+        repetitions: 2,
+      };
       const result = computeNextReview(card, 4);
       // interval = round(6 * 2.5) = 15
       expect(result.intervalDays).toBe(15);
@@ -115,7 +131,10 @@ describe('computeNextReview', () => {
       const ef = 2.5;
       const q = 4;
       const expected = ef + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02);
-      const result = computeNextReview({ intervalDays: 1, easeFactor: ef, repetitions: 1 }, q);
+      const result = computeNextReview(
+        { intervalDays: 1, easeFactor: ef, repetitions: 1 },
+        q
+      );
       // Use second review (repetitions=1) to avoid repetitions=0 branching
       expect(result.easeFactor).toBeCloseTo(expected, 5);
     });
@@ -132,12 +151,18 @@ describe('computeNextReview', () => {
       const result = computeNextReview(INITIAL_CARD, 5);
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      const diffMs = Math.abs(result.dueDate.getTime() - tomorrow.setUTCHours(0, 0, 0, 0));
+      const diffMs = Math.abs(
+        result.dueDate.getTime() - tomorrow.setUTCHours(0, 0, 0, 0)
+      );
       expect(diffMs).toBeLessThan(1000); // within 1 second
     });
 
     it('does not mutate the original card', () => {
-      const card: SM2Card = { intervalDays: 6, easeFactor: 2.5, repetitions: 2 };
+      const card: SM2Card = {
+        intervalDays: 6,
+        easeFactor: 2.5,
+        repetitions: 2,
+      };
       computeNextReview(card, 5);
       expect(card.intervalDays).toBe(6);
       expect(card.easeFactor).toBe(2.5);

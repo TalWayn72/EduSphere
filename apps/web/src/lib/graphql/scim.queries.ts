@@ -1,4 +1,4 @@
-import { gql } from "urql";
+import { gql } from 'urql';
 
 export const SCIM_TOKENS_QUERY = gql`
   query ScimTokens {

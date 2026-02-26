@@ -1,7 +1,16 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'urql';
-import { Flame, BookOpen, Award, Brain, Clock, Copy, Check, Lock } from 'lucide-react';
+import {
+  Flame,
+  BookOpen,
+  Award,
+  Brain,
+  Clock,
+  Copy,
+  Check,
+  Lock,
+} from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -38,11 +47,21 @@ interface PublicProfileResult {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+  });
 }
 
 function getInitials(name: string): string {
-  return name.split(' ').map((p) => p[0] ?? '').join('').toUpperCase().slice(0, 2) || 'U';
+  return (
+    name
+      .split(' ')
+      .map((p) => p[0] ?? '')
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'U'
+  );
 }
 
 function useCopyLink(userId: string) {
@@ -70,7 +89,8 @@ type FollowListType = 'followers' | 'following' | null;
 export function PublicProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const { copied, copy } = useCopyLink(userId ?? '');
-  const [followListOpen, setFollowListOpen] = React.useState<FollowListType>(null);
+  const [followListOpen, setFollowListOpen] =
+    React.useState<FollowListType>(null);
 
   const [{ data, fetching, error }] = useQuery<PublicProfileResult>({
     query: PUBLIC_PROFILE_QUERY,
@@ -107,11 +127,27 @@ export function PublicProfilePage() {
   const followingCount = profile.followingCount ?? 0;
 
   const stats = [
-    { icon: Flame, label: 'Current Streak', value: `${profile.currentStreak}d` },
-    { icon: BookOpen, label: 'Courses Completed', value: String(profile.completedCoursesCount) },
+    {
+      icon: Flame,
+      label: 'Current Streak',
+      value: `${profile.currentStreak}d`,
+    },
+    {
+      icon: BookOpen,
+      label: 'Courses Completed',
+      value: String(profile.completedCoursesCount),
+    },
     { icon: Award, label: 'Badges Earned', value: String(profile.badgesCount) },
-    { icon: Brain, label: 'Concepts Mastered', value: String(profile.conceptsMastered) },
-    { icon: Clock, label: 'Learning Minutes', value: String(profile.totalLearningMinutes) },
+    {
+      icon: Brain,
+      label: 'Concepts Mastered',
+      value: String(profile.conceptsMastered),
+    },
+    {
+      icon: Clock,
+      label: 'Learning Minutes',
+      value: String(profile.totalLearningMinutes),
+    },
   ];
 
   return (
@@ -120,15 +156,25 @@ export function PublicProfilePage() {
       <Card className="p-6 flex items-center gap-6">
         <Avatar className="h-20 w-20">
           {profile.avatarUrl ? (
-            <img src={profile.avatarUrl} alt={profile.displayName} className="rounded-full object-cover" />
+            <img
+              src={profile.avatarUrl}
+              alt={profile.displayName}
+              className="rounded-full object-cover"
+            />
           ) : (
-            <AvatarFallback className="text-2xl">{getInitials(profile.displayName)}</AvatarFallback>
+            <AvatarFallback className="text-2xl">
+              {getInitials(profile.displayName)}
+            </AvatarFallback>
           )}
         </Avatar>
         <div className="flex-1 space-y-1">
           <h1 className="text-2xl font-bold">{profile.displayName}</h1>
-          {profile.bio && <p className="text-sm text-muted-foreground">{profile.bio}</p>}
-          <p className="text-xs text-muted-foreground">Member since {formatDate(profile.joinedAt)}</p>
+          {profile.bio && (
+            <p className="text-sm text-muted-foreground">{profile.bio}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Member since {formatDate(profile.joinedAt)}
+          </p>
           {/* Follower / following counts */}
           <div className="flex gap-3 pt-1 text-xs">
             <button
@@ -136,14 +182,20 @@ export function PublicProfilePage() {
               className="text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setFollowListOpen('followers')}
             >
-              <span className="font-semibold text-foreground">{followersCount}</span> followers
+              <span className="font-semibold text-foreground">
+                {followersCount}
+              </span>{' '}
+              followers
             </button>
             <button
               type="button"
               className="text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setFollowListOpen('following')}
             >
-              <span className="font-semibold text-foreground">{followingCount}</span> following
+              <span className="font-semibold text-foreground">
+                {followingCount}
+              </span>{' '}
+              following
             </button>
           </div>
         </div>
@@ -156,7 +208,11 @@ export function PublicProfilePage() {
             />
           )}
           <Button variant="outline" size="sm" onClick={copy}>
-            {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+            {copied ? (
+              <Check className="h-4 w-4 mr-1" />
+            ) : (
+              <Copy className="h-4 w-4 mr-1" />
+            )}
             {copied ? 'Copied!' : 'Share'}
           </Button>
         </div>
@@ -171,7 +227,9 @@ export function PublicProfilePage() {
                 <Icon className="h-5 w-5 text-primary" />
               </div>
               <p className="text-xl font-bold">{value}</p>
-              <p className="text-xs text-muted-foreground leading-tight">{label}</p>
+              <p className="text-xs text-muted-foreground leading-tight">
+                {label}
+              </p>
             </div>
           ))}
         </div>
@@ -185,9 +243,14 @@ export function PublicProfilePage() {
           </h2>
           <ul className="space-y-2">
             {profile.completedCourses.slice(0, 10).map((course) => (
-              <li key={course.id} className="flex items-center justify-between text-sm">
+              <li
+                key={course.id}
+                className="flex items-center justify-between text-sm"
+              >
                 <span className="font-medium">{course.title}</span>
-                <span className="text-xs text-muted-foreground">{formatDate(course.completedAt)}</span>
+                <span className="text-xs text-muted-foreground">
+                  {formatDate(course.completedAt)}
+                </span>
               </li>
             ))}
           </ul>

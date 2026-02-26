@@ -1,4 +1,5 @@
 # EduSphere — Testing Infrastructure Upgrade Plan
+
 **Date:** 2026-02-24 | **Scope:** Comprehensive test quality uplift across all layers
 
 ---
@@ -14,36 +15,38 @@ EduSphere is a production-scale GraphQL Federation platform (100,000+ concurrent
 ## Current State Assessment
 
 ### What Works Well ✅
-| Area | Status |
-|------|--------|
-| 276+ test files across all layers | ✅ |
-| 32 security tests (SI-1..SI-10 + GDPR/SOC2) | ✅ |
-| 11 memory leak tests for critical services | ✅ |
-| 24 E2E Playwright scenarios | ✅ |
-| 9 GitHub Actions workflows with quality gates | ✅ |
-| k6 smoke/load/stress configs defined | ✅ |
-| Federation contract tests for entity references | ✅ |
-| Full observability stack (Prometheus/Grafana/Loki) | ✅ |
-| RLS policy tests with PostgreSQL container | ✅ |
-| Matrix parallelization for subgraph tests | ✅ |
+
+| Area                                               | Status |
+| -------------------------------------------------- | ------ |
+| 276+ test files across all layers                  | ✅     |
+| 32 security tests (SI-1..SI-10 + GDPR/SOC2)        | ✅     |
+| 11 memory leak tests for critical services         | ✅     |
+| 24 E2E Playwright scenarios                        | ✅     |
+| 9 GitHub Actions workflows with quality gates      | ✅     |
+| k6 smoke/load/stress configs defined               | ✅     |
+| Federation contract tests for entity references    | ✅     |
+| Full observability stack (Prometheus/Grafana/Loki) | ✅     |
+| RLS policy tests with PostgreSQL container         | ✅     |
+| Matrix parallelization for subgraph tests          | ✅     |
 
 ### Critical Gaps Identified ❌
-| # | Gap | Severity | Risk |
-|---|-----|----------|------|
-| G-1 | pnpm v9 in CI but project uses v10+ | 🔴 Critical | Dependency resolution drift |
-| G-2 | Apache AGE tests skipped in CI (`continue-on-error: true`) | 🔴 Critical | Knowledge graph untested in CI |
-| G-3 | subgraph-annotation: only 2 tests | 🔴 High | Core feature untested |
-| G-4 | subgraph-collaboration: CRDT/Hocuspocus untested | 🔴 High | Real-time feature untested |
-| G-5 | No shared test factories/fixtures package | 🟡 Medium | Test duplication, fragile mocks |
-| G-6 | Missing memory tests: annotation, collab, content | 🟡 Medium | Silent memory leaks |
-| G-7 | No `test:integration` task separate from unit | 🟡 Medium | Slow local dev loop |
-| G-8 | k6 LOAD/STRESS profiles never run in CI | 🟡 Medium | Performance regressions undetected |
-| G-9 | No NATS subscription end-to-end tests | 🟡 Medium | Event delivery untested |
-| G-10 | No accessibility tests (a11y) | 🟡 Medium | WCAG compliance risk (educational platform) |
-| G-11 | No visual regression tests | 🟢 Low | UI drift undetected |
-| G-12 | No log structure validation tests | 🟢 Low | Observability blind spots |
-| G-13 | No chaos/resilience tests | 🟢 Low | No circuit-breaker verification |
-| G-14 | No mutation error-shape contract tests | 🟢 Low | Frontend error handling untested |
+
+| #    | Gap                                                        | Severity    | Risk                                        |
+| ---- | ---------------------------------------------------------- | ----------- | ------------------------------------------- |
+| G-1  | pnpm v9 in CI but project uses v10+                        | 🔴 Critical | Dependency resolution drift                 |
+| G-2  | Apache AGE tests skipped in CI (`continue-on-error: true`) | 🔴 Critical | Knowledge graph untested in CI              |
+| G-3  | subgraph-annotation: only 2 tests                          | 🔴 High     | Core feature untested                       |
+| G-4  | subgraph-collaboration: CRDT/Hocuspocus untested           | 🔴 High     | Real-time feature untested                  |
+| G-5  | No shared test factories/fixtures package                  | 🟡 Medium   | Test duplication, fragile mocks             |
+| G-6  | Missing memory tests: annotation, collab, content          | 🟡 Medium   | Silent memory leaks                         |
+| G-7  | No `test:integration` task separate from unit              | 🟡 Medium   | Slow local dev loop                         |
+| G-8  | k6 LOAD/STRESS profiles never run in CI                    | 🟡 Medium   | Performance regressions undetected          |
+| G-9  | No NATS subscription end-to-end tests                      | 🟡 Medium   | Event delivery untested                     |
+| G-10 | No accessibility tests (a11y)                              | 🟡 Medium   | WCAG compliance risk (educational platform) |
+| G-11 | No visual regression tests                                 | 🟢 Low      | UI drift undetected                         |
+| G-12 | No log structure validation tests                          | 🟢 Low      | Observability blind spots                   |
+| G-13 | No chaos/resilience tests                                  | 🟢 Low      | No circuit-breaker verification             |
+| G-14 | No mutation error-shape contract tests                     | 🟢 Low      | Frontend error handling untested            |
 
 ---
 
@@ -56,6 +59,7 @@ EduSphere is a production-scale GraphQL Federation platform (100,000+ concurrent
 #### W1-1: Fix pnpm version in all CI workflows
 
 **Files to modify:**
+
 - `.github/workflows/ci.yml` — 3 occurrences
 - `.github/workflows/test.yml` — 2 occurrences
 - `.github/workflows/federation.yml` — 2 occurrences
@@ -89,17 +93,20 @@ Also update `pnpm/action-setup@v2` → `@v4` (v2 is deprecated, v4 is current).
 **Solution:** Use a custom Docker image with both pgvector AND Apache AGE pre-installed. Build it from `infrastructure/docker/postgres-age/` and push to GHCR.
 
 **New file:** `infrastructure/docker/postgres-age/Dockerfile`
+
 ```dockerfile
 FROM pgvector/pgvector:pg16
 RUN apt-get update && apt-get install -y postgresql-16-age && rm -rf /var/lib/apt/lists/*
 ```
 
 **New file:** `.github/workflows/build-postgres-image.yml`
+
 - Trigger: push to `infrastructure/docker/postgres-age/**`
 - Build + push to `ghcr.io/edusphere/postgres-age-pgvector:pg16`
 - Manual dispatch for forced rebuild
 
 **Modify:** `.github/workflows/test.yml`
+
 ```yaml
 # BEFORE
 postgres:
@@ -112,6 +119,7 @@ postgres:
 Remove `continue-on-error: true` from migration step.
 
 Add to Enable extensions step:
+
 ```bash
 psql ... -c "LOAD 'age';" -c "CREATE EXTENSION IF NOT EXISTS age;"
 ```
@@ -125,6 +133,7 @@ psql ... -c "LOAD 'age';" -c "CREATE EXTENSION IF NOT EXISTS age;"
 **Files to modify:**
 
 `turbo.json` — Add new task:
+
 ```json
 "test:integration": {
   "dependsOn": ["^build"],
@@ -135,17 +144,20 @@ psql ... -c "LOAD 'age';" -c "CREATE EXTENSION IF NOT EXISTS age;"
 ```
 
 `package.json` (root) — Add script:
+
 ```json
 "test:unit": "turbo test -- --testPathPattern='(?<!integration)(\\.spec|\\.test)\\.(ts|tsx)$'",
 "test:integration": "turbo test:integration"
 ```
 
 **Each subgraph `package.json`** — Add:
+
 ```json
 "test:integration": "vitest run --config vitest.integration.config.ts"
 ```
 
 **New file per subgraph:** `apps/subgraph-*/vitest.integration.config.ts`
+
 ```ts
 import { defineConfig } from 'vitest/config';
 export default defineConfig({
@@ -168,6 +180,7 @@ export default defineConfig({
 **Purpose:** Centralize all test mock factories, builders, and fixtures to eliminate per-file mock duplication.
 
 **Structure:**
+
 ```
 packages/test-utils/
   src/
@@ -189,10 +202,13 @@ packages/test-utils/
 ```
 
 **Factory pattern (example):**
+
 ```ts
 // packages/test-utils/src/factories/user.factory.ts
 import type { AuthContext } from '@edusphere/auth';
-export const createAuthContext = (overrides?: Partial<AuthContext>): AuthContext => ({
+export const createAuthContext = (
+  overrides?: Partial<AuthContext>
+): AuthContext => ({
   userId: 'user-test-001',
   tenantId: 'tenant-test-001',
   role: 'STUDENT',
@@ -211,6 +227,7 @@ export const createAuthContext = (overrides?: Partial<AuthContext>): AuthContext
 **Target:** 10 tests
 
 **New test files to create:**
+
 ```
 apps/subgraph-annotation/src/
   annotation/annotation.rls.spec.ts      # RLS: tenant isolation, layer visibility per role
@@ -224,6 +241,7 @@ apps/subgraph-annotation/src/
 ```
 
 **Key scenarios to cover:**
+
 - `annotation.rls.spec.ts`: A student cannot see INSTRUCTOR-layer annotations
 - `annotation.gdpr.spec.ts`: GDPR erasure removes annotation text but keeps audit trail
 - `annotation.nats.spec.ts`: Publishing `annotation.added` event with correct payload
@@ -238,6 +256,7 @@ apps/subgraph-annotation/src/
 **Target:** 10 tests
 
 **New test files to create:**
+
 ```
 apps/subgraph-collaboration/src/
   crdt/hocuspocus.service.spec.ts        # Hocuspocus: document load, auth hook, sync
@@ -249,6 +268,7 @@ apps/subgraph-collaboration/src/
 ```
 
 **Key scenarios:**
+
 - `hocuspocus.memory.spec.ts`: verify all WebSocket connections are closed when `OnModuleDestroy` fires
 - `discussion.rls.spec.ts`: Tenant A cannot see Tenant B discussions (cross-tenant isolation)
 - `hocuspocus.service.spec.ts`: document auth hook rejects invalid JWT
@@ -259,15 +279,16 @@ apps/subgraph-collaboration/src/
 
 **Files to create:**
 
-| New File | Validates |
-|----------|-----------|
-| `apps/subgraph-annotation/src/annotation/annotation.memory.spec.ts` | DB pool + NATS cleanup |
-| `apps/subgraph-collaboration/src/crdt/hocuspocus.memory.spec.ts` | WebSocket connection cleanup |
+| New File                                                                    | Validates                               |
+| --------------------------------------------------------------------------- | --------------------------------------- |
+| `apps/subgraph-annotation/src/annotation/annotation.memory.spec.ts`         | DB pool + NATS cleanup                  |
+| `apps/subgraph-collaboration/src/crdt/hocuspocus.memory.spec.ts`            | WebSocket connection cleanup            |
 | `apps/subgraph-content/src/content-item/content-item.loader.memory.spec.ts` | DataLoader cache doesn't grow unbounded |
-| `apps/web/src/hooks/useCollaboration.memory.test.ts` | Hocuspocus provider cleanup on unmount |
-| `packages/redis-pubsub/src/redis-pubsub.memory.spec.ts` | Redis subscriber cleanup |
+| `apps/web/src/hooks/useCollaboration.memory.test.ts`                        | Hocuspocus provider cleanup on unmount  |
+| `packages/redis-pubsub/src/redis-pubsub.memory.spec.ts`                     | Redis subscriber cleanup                |
 
 **Pattern (backend):**
+
 ```ts
 it('closes all pools on module destroy', async () => {
   const moduleRef = await Test.createTestingModule({...}).compile();
@@ -279,6 +300,7 @@ it('closes all pools on module destroy', async () => {
 ```
 
 **Pattern (frontend):**
+
 ```ts
 it('clears interval on unmount', () => {
   const clearSpy = vi.spyOn(globalThis, 'clearInterval');
@@ -295,6 +317,7 @@ it('clears interval on unmount', () => {
 **New file:** `tests/integration/nats-events.spec.ts` (in new `tests/integration/` workspace)
 
 **Scenarios:**
+
 - `content.created` event is published when content item is created
 - `annotation.added` event triggers knowledge graph update
 - `agent.message` event is published and consumed correctly
@@ -315,7 +338,7 @@ it('clears interval on unmount', () => {
 name: Nightly Performance Tests
 on:
   schedule:
-    - cron: '0 2 * * *'  # 2am UTC daily
+    - cron: '0 2 * * *' # 2am UTC daily
   workflow_dispatch:
     inputs:
       profile:
@@ -336,6 +359,7 @@ jobs:
 ```
 
 **Scenarios to add (new k6 files):**
+
 ```
 tests/performance/scenarios/
   06-knowledge-graph.k6.js    # Cypher queries, concept traversal
@@ -353,6 +377,7 @@ tests/performance/scenarios/
 **New file:** `tests/performance/__tests__/baseline-comparison.test.ts`
 
 Logic:
+
 - After each k6 run, store `{ scenario, p95, p99, errorRate, timestamp }` as JSON artifact
 - Compare against rolling 7-day average baseline
 - Fail if p95 increased >20% or errorRate increased >50%
@@ -383,6 +408,7 @@ test('course page has no WCAG 2.1 AA violations', async ({ page }) => {
 ```
 
 **Pages to audit (8 critical paths):**
+
 1. `/login` — authentication form
 2. `/courses` — course list
 3. `/courses/:id` — course viewer (video + transcript + annotations)
@@ -413,12 +439,13 @@ test('course page matches snapshot', async ({ page }) => {
   await page.goto('/courses');
   await expect(page).toHaveScreenshot('courses-list.png', {
     maxDiffPixels: 100,
-    animations: 'disabled',  // disable CSS animations for stable snapshots
+    animations: 'disabled', // disable CSS animations for stable snapshots
   });
 });
 ```
 
 **CI integration:**
+
 - Run only on PRs touching `apps/web/src/` (path filter)
 - Upload diff PNGs as artifacts on failure
 - `playwright.config.ts`: add `snapshotDir: './e2e/snapshots'` and `updateSnapshots: 'none'` in CI
@@ -438,11 +465,17 @@ test('course page matches snapshot', async ({ page }) => {
 ```ts
 describe('Mutation error shapes', () => {
   it('unauthenticated mutation returns UNAUTHENTICATED code', async () => {
-    const result = await executeGraphQL(CREATE_COURSE, { input: {} }, { noAuth: true });
+    const result = await executeGraphQL(
+      CREATE_COURSE,
+      { input: {} },
+      { noAuth: true }
+    );
     expect(result.errors[0].extensions.code).toBe('UNAUTHENTICATED');
   });
   it('validation error returns BAD_USER_INPUT with details', async () => {
-    const result = await executeGraphQL(CREATE_COURSE, { input: { title: '' } });
+    const result = await executeGraphQL(CREATE_COURSE, {
+      input: { title: '' },
+    });
     expect(result.errors[0].extensions.code).toBe('BAD_USER_INPUT');
     expect(result.errors[0].extensions.details).toBeDefined();
   });
@@ -458,6 +491,7 @@ describe('Mutation error shapes', () => {
 **New file:** `tests/resilience/circuit-breaker.spec.ts`
 
 **Scenarios:**
+
 - PostgreSQL connection lost: service returns graceful error (not crash)
 - NATS unavailable: service queues events locally, reconnects
 - Redis down: service falls back to in-memory cache
@@ -477,6 +511,7 @@ describe('Mutation error shapes', () => {
 **New file:** `tests/observability/log-structure.spec.ts`
 
 **Validates:**
+
 - All Pino logs include `{ level, time, msg, tenantId, requestId }` fields
 - No `console.log` calls exist in production code (static source analysis)
 - Loki query returns logs for test request ID
@@ -487,6 +522,7 @@ describe('Mutation error shapes', () => {
 #### W5-2: Coverage badges in README
 
 **New files:**
+
 - `.github/badges/coverage-backend.svg` (generated in CI)
 - `.github/badges/coverage-frontend.svg` (generated in CI)
 
@@ -501,6 +537,7 @@ describe('Mutation error shapes', () => {
 **New file:** `infrastructure/monitoring/grafana/dashboards/tests.json`
 
 **Panels:**
+
 - Test run duration over time (all workflows)
 - Test failure rate by subgraph
 - k6 p95 latency over time (nightly runs)
@@ -513,30 +550,33 @@ describe('Mutation error shapes', () => {
 
 ## CI Workflow Modifications Summary
 
-| Workflow | Change |
-|----------|--------|
-| `ci.yml` | Fix pnpm v10, add `accessibility-tests` job |
-| `test.yml` | Fix pnpm v10, use AGE+pgvector image, add `test:events` job, add NATS subscription tests |
-| `federation.yml` | Fix pnpm v10 |
-| `performance.yml` | Fix pnpm v10 |
-| `docker-build.yml` | Fix pnpm v10 |
-| `codeql.yml` | Fix pnpm v10 |
-| `pr-gate.yml` | Fix pnpm v10 |
-| `cd.yml` | Fix pnpm v10 |
-| `.github/workflows/performance-nightly.yml` | **NEW** — nightly k6 load/stress runs |
-| `.github/workflows/build-postgres-image.yml` | **NEW** — build AGE+pgvector image |
+| Workflow                                     | Change                                                                                   |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `ci.yml`                                     | Fix pnpm v10, add `accessibility-tests` job                                              |
+| `test.yml`                                   | Fix pnpm v10, use AGE+pgvector image, add `test:events` job, add NATS subscription tests |
+| `federation.yml`                             | Fix pnpm v10                                                                             |
+| `performance.yml`                            | Fix pnpm v10                                                                             |
+| `docker-build.yml`                           | Fix pnpm v10                                                                             |
+| `codeql.yml`                                 | Fix pnpm v10                                                                             |
+| `pr-gate.yml`                                | Fix pnpm v10                                                                             |
+| `cd.yml`                                     | Fix pnpm v10                                                                             |
+| `.github/workflows/performance-nightly.yml`  | **NEW** — nightly k6 load/stress runs                                                    |
+| `.github/workflows/build-postgres-image.yml` | **NEW** — build AGE+pgvector image                                                       |
 
 ---
 
 ## New Files Summary
 
 ### Packages
+
 - `packages/test-utils/` — shared factories + mocks (new package)
 
 ### Infrastructure
+
 - `infrastructure/docker/postgres-age/Dockerfile` — PostgreSQL + AGE + pgvector image
 
 ### Test Files — Subgraph Annotation (8 new)
+
 - `apps/subgraph-annotation/src/annotation/annotation.rls.spec.ts`
 - `apps/subgraph-annotation/src/annotation/annotation.gdpr.spec.ts`
 - `apps/subgraph-annotation/src/annotation/annotation.nats.spec.ts`
@@ -547,6 +587,7 @@ describe('Mutation error shapes', () => {
 - `apps/subgraph-annotation/src/metrics/metrics.interceptor.spec.ts`
 
 ### Test Files — Subgraph Collaboration (6 new)
+
 - `apps/subgraph-collaboration/src/crdt/hocuspocus.service.spec.ts`
 - `apps/subgraph-collaboration/src/crdt/hocuspocus.memory.spec.ts`
 - `apps/subgraph-collaboration/src/discussion/discussion.rls.spec.ts`
@@ -555,11 +596,13 @@ describe('Mutation error shapes', () => {
 - `apps/subgraph-collaboration/src/metrics/metrics.interceptor.spec.ts`
 
 ### Test Files — Memory (5 new)
+
 - `apps/subgraph-content/src/content-item/content-item.loader.memory.spec.ts`
 - `apps/web/src/hooks/useCollaboration.memory.test.ts`
 - `packages/redis-pubsub/src/redis-pubsub.memory.spec.ts`
 
 ### Test Files — Cross-cutting (8 new)
+
 - `tests/integration/nats-events.spec.ts`
 - `tests/integration/vitest.config.ts`
 - `tests/integration/package.json`
@@ -570,20 +613,24 @@ describe('Mutation error shapes', () => {
 - `tests/observability/log-structure.spec.ts`
 
 ### Test Files — E2E (2 new)
+
 - `apps/web/e2e/accessibility.spec.ts`
 - `apps/web/e2e/visual-regression.spec.ts`
 
 ### k6 Performance (4 new scenarios)
+
 - `tests/performance/scenarios/06-knowledge-graph.k6.js`
 - `tests/performance/scenarios/07-collaboration-ws.k6.js`
 - `tests/performance/scenarios/08-transcription.k6.js`
 - `tests/performance/scenarios/09-agent-concurrent.k6.js`
 
 ### GitHub Workflows (2 new)
+
 - `.github/workflows/performance-nightly.yml`
 - `.github/workflows/build-postgres-image.yml`
 
 ### Grafana (1 new)
+
 - `infrastructure/monitoring/grafana/dashboards/tests.json`
 
 ---
@@ -622,7 +669,7 @@ describe('Mutation error shapes', () => {
 packages:
   - 'apps/*'
   - 'packages/*'
-  - 'tests/*'         # already includes security, performance, contract
+  - 'tests/*' # already includes security, performance, contract
   # tests/integration and tests/resilience will be under tests/* automatically
 ```
 
@@ -658,11 +705,11 @@ Wave 5 (parallel — 2 agents):
 
 ## User Decisions
 
-| Decision | Choice |
-|----------|--------|
-| Scope | All 5 Waves (complete uplift) |
+| Decision          | Choice                                                                 |
+| ----------------- | ---------------------------------------------------------------------- |
+| Scope             | All 5 Waves (complete uplift)                                          |
 | Visual Regression | Local Git — Playwright built-in snapshots in `apps/web/e2e/snapshots/` |
-| Accessibility | **CI Blocking** — zero WCAG 2.1 AA violations, PRs blocked on failure |
+| Accessibility     | **CI Blocking** — zero WCAG 2.1 AA violations, PRs blocked on failure  |
 
 ---
 
@@ -706,31 +753,31 @@ ls .github/workflows/performance-nightly.yml
 
 ## Risk & Mitigation
 
-| Risk | Mitigation |
-|------|------------|
-| AGE Docker image build takes long | Pre-build on schedule, cache in GHCR |
-| test-utils adds coupling | Factory functions return plain objects, no DI dependencies |
-| Accessibility tests are flaky | Run with `--retries=2`, exclude animation-heavy pages initially |
-| Nightly performance tests are flaky | `--abort-on-fail` only for p99>5000ms; p95 regressions are warnings first cycle |
-| Visual regression snapshots pollute git history | Store in separate `test-snapshots` branch or use Argos cloud |
+| Risk                                            | Mitigation                                                                      |
+| ----------------------------------------------- | ------------------------------------------------------------------------------- |
+| AGE Docker image build takes long               | Pre-build on schedule, cache in GHCR                                            |
+| test-utils adds coupling                        | Factory functions return plain objects, no DI dependencies                      |
+| Accessibility tests are flaky                   | Run with `--retries=2`, exclude animation-heavy pages initially                 |
+| Nightly performance tests are flaky             | `--abort-on-fail` only for p99>5000ms; p95 regressions are warnings first cycle |
+| Visual regression snapshots pollute git history | Store in separate `test-snapshots` branch or use Argos cloud                    |
 
 ---
 
 ## Files Modified (existing)
 
-| File | Change |
-|------|--------|
-| `turbo.json` | Add 4 new test tasks |
-| `package.json` (root) | Add test:unit, test:events, test:resilience, test:a11y scripts |
-| `.github/workflows/ci.yml` | pnpm v10, add accessibility job |
-| `.github/workflows/test.yml` | pnpm v10, AGE image, test:events job |
-| `.github/workflows/federation.yml` | pnpm v10 |
-| `.github/workflows/performance.yml` | pnpm v10 |
-| `.github/workflows/docker-build.yml` | pnpm v10 |
-| `.github/workflows/codeql.yml` | pnpm v10 |
-| `.github/workflows/pr-gate.yml` | pnpm v10 |
-| `.github/workflows/cd.yml` | pnpm v10 |
-| `pnpm-workspace.yaml` | No change needed (tests/* already there) |
-| `apps/web/vitest.config.ts` | Add visual regression snapshot dir |
-| `README.md` | Add coverage badges |
-| `OPEN_ISSUES.md` | Document this upgrade task |
+| File                                 | Change                                                         |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `turbo.json`                         | Add 4 new test tasks                                           |
+| `package.json` (root)                | Add test:unit, test:events, test:resilience, test:a11y scripts |
+| `.github/workflows/ci.yml`           | pnpm v10, add accessibility job                                |
+| `.github/workflows/test.yml`         | pnpm v10, AGE image, test:events job                           |
+| `.github/workflows/federation.yml`   | pnpm v10                                                       |
+| `.github/workflows/performance.yml`  | pnpm v10                                                       |
+| `.github/workflows/docker-build.yml` | pnpm v10                                                       |
+| `.github/workflows/codeql.yml`       | pnpm v10                                                       |
+| `.github/workflows/pr-gate.yml`      | pnpm v10                                                       |
+| `.github/workflows/cd.yml`           | pnpm v10                                                       |
+| `pnpm-workspace.yaml`                | No change needed (tests/\* already there)                      |
+| `apps/web/vitest.config.ts`          | Add visual regression snapshot dir                             |
+| `README.md`                          | Add coverage badges                                            |
+| `OPEN_ISSUES.md`                     | Document this upgrade task                                     |

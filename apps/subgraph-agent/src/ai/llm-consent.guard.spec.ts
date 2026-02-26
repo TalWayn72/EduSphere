@@ -10,9 +10,12 @@ vi.mock('@edusphere/db', () => ({
       }),
     }),
   },
-  userConsents: { userId: 'userId', consentType: 'consentType', given: 'given' },
+  userConsents: {
+    userId: 'userId',
+    consentType: 'consentType',
+    given: 'given',
+  },
 }));
-
 
 describe('LlmConsentGuard', () => {
   let guard: LlmConsentGuard;
@@ -34,7 +37,9 @@ describe('LlmConsentGuard', () => {
       }),
     } as ReturnType<typeof db.select>);
 
-    await expect(guard.assertConsent('user-1', true)).rejects.toThrow(GraphQLError);
+    await expect(guard.assertConsent('user-1', true)).rejects.toThrow(
+      GraphQLError
+    );
   });
 
   it('throws with CONSENT_REQUIRED extension code', async () => {

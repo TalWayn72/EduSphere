@@ -85,7 +85,9 @@ export default function CoursesScreen() {
   if (error && courses.length === 0) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>{t('failedToLoad', { message: error.message })}</Text>
+        <Text style={styles.error}>
+          {t('failedToLoad', { message: error.message })}
+        </Text>
         <Text style={styles.hint}>{t('common:retry')}</Text>
       </View>
     );
@@ -95,9 +97,7 @@ export default function CoursesScreen() {
     <View style={styles.container}>
       {isShowingCache && (
         <View style={styles.offlineBanner}>
-          <Text style={styles.offlineBannerText}>
-            {t('showingCachedData')}
-          </Text>
+          <Text style={styles.offlineBannerText}>{t('showingCachedData')}</Text>
         </View>
       )}
       <FlatList

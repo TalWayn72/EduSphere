@@ -1,0 +1,29 @@
+# Files excluded from Prettier formatting
+
+# This workflow YAML uses a multi-line run block with embedded shell commit
+# message that contains bare colons (SOC2 CC3.3: ...) at column 0 inside the
+# YAML block scalar, which trips Prettier's YAML parser ("All collection items
+# must start at the same column").  The file is valid YAML and valid for
+# GitHub Actions; exclude from Prettier to avoid a false-positive parse error.
+.github/workflows/audit-export.yml
+
+# Generated / vendor directories
+node_modules/
+dist/
+build/
+.turbo/
+coverage/
+pnpm-lock.yaml
+
+# Claude Code internal memory files
+memory/
+
+# Helm templates use Go template syntax ({{ }}) that trips Prettier's YAML parser
+infrastructure/k8s/
+
+# k6 load-testing files: scenarios use template placeholders (const Q = ;) that fail JS parse
+infrastructure/load-testing/
+
+# k6 NDJSON output files (one JSON object per line — invalid for Prettier's JSON parser)
+tests/performance/results/
+test_output.txt

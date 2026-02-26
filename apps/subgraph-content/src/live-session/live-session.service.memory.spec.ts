@@ -13,19 +13,21 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockResolvedValue([{
-      id: 'sid',
-      contentItemId: 'cid',
-      tenantId: 'tid',
-      bbbMeetingId: 'bmid',
-      meetingName: 'Test',
-      scheduledAt: new Date(),
-      status: 'SCHEDULED',
-      attendeePassword: 'ap',
-      moderatorPassword: 'mp',
-      recordingUrl: null,
-      createdAt: new Date(),
-    }]),
+    returning: vi.fn().mockResolvedValue([
+      {
+        id: 'sid',
+        contentItemId: 'cid',
+        tenantId: 'tid',
+        bbbMeetingId: 'bmid',
+        meetingName: 'Test',
+        scheduledAt: new Date(),
+        status: 'SCHEDULED',
+        attendeePassword: 'ap',
+        moderatorPassword: 'mp',
+        recordingUrl: null,
+        createdAt: new Date(),
+      },
+    ]),
     select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
@@ -34,7 +36,13 @@ vi.mock('@edusphere/db', () => ({
     set: vi.fn().mockReturnThis(),
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  schema: { liveSessions: { id: 'id', contentItemId: 'contentItemId', tenantId: 'tenantId' } },
+  schema: {
+    liveSessions: {
+      id: 'id',
+      contentItemId: 'contentItemId',
+      tenantId: 'tenantId',
+    },
+  },
   eq: vi.fn(),
   and: vi.fn(),
 }));
@@ -76,8 +84,13 @@ describe('LiveSessionService — memory safety', () => {
   });
 
   it('unsubscribes from NATS on destroy', async () => {
-    const natsConn = await (vi.mocked(connect).mock.results[0]?.value as Promise<{ subscribe: ReturnType<typeof vi.fn>; drain: ReturnType<typeof vi.fn> }>);
-    const unsubscribeSpy = natsConn?.subscribe?.mock?.results?.[0]?.value?.unsubscribe;
+    const natsConn = await (vi.mocked(connect).mock.results[0]
+      ?.value as Promise<{
+      subscribe: ReturnType<typeof vi.fn>;
+      drain: ReturnType<typeof vi.fn>;
+    }>);
+    const unsubscribeSpy =
+      natsConn?.subscribe?.mock?.results?.[0]?.value?.unsubscribe;
 
     await service.onModuleDestroy();
 
@@ -112,7 +125,10 @@ describe('LiveSessionService — memory safety', () => {
 
   it('does not expose passwords in LiveSessionResult', async () => {
     const result = await service.createLiveSession(
-      'content-1', 'tenant-1', new Date(), 'Test Session',
+      'content-1',
+      'tenant-1',
+      new Date(),
+      'Test Session'
     );
     const keys = Object.keys(result);
     expect(keys).not.toContain('attendeePassword');
@@ -123,7 +139,10 @@ describe('LiveSessionService — memory safety', () => {
 
   it('returns null recordingUrl for new sessions', async () => {
     const result = await service.createLiveSession(
-      'content-1', 'tenant-1', new Date(), 'Test',
+      'content-1',
+      'tenant-1',
+      new Date(),
+      'Test'
     );
     expect(result.recordingUrl).toBeNull();
   });

@@ -28,9 +28,18 @@ export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 const QuizStateAnnotation = Annotation.Root({
   topic: Annotation<string>(),
   numQuestions: Annotation<number>({ value: (_, u) => u, default: () => 5 }),
-  difficulty: Annotation<QuizState['difficulty']>({ value: (_, u) => u, default: () => 'medium' }),
-  questions: Annotation<QuizQuestion[]>({ value: (_, u) => u, default: () => [] }),
-  currentQuestionIndex: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
+  difficulty: Annotation<QuizState['difficulty']>({
+    value: (_, u) => u,
+    default: () => 'medium',
+  }),
+  questions: Annotation<QuizQuestion[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
+  currentQuestionIndex: Annotation<number>({
+    value: (_, u) => u,
+    default: () => 0,
+  }),
   userAnswers: Annotation<number[]>({ value: (_, u) => u, default: () => [] }),
   score: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
@@ -70,7 +79,10 @@ export class QuizGeneratorWorkflow {
       const { object } = await generateObject({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         model: openai(this.model) as any,
-        system: injectLocale('You are an expert educational quiz generator.', this.locale),
+        system: injectLocale(
+          'You are an expert educational quiz generator.',
+          this.locale
+        ),
         schema: QuizQuestionSchema,
         prompt: `Generate a ${state.difficulty} difficulty multiple-choice question about: ${state.topic}
 
@@ -108,6 +120,9 @@ Requirements:
   }
 }
 
-export function createQuizWorkflow(model?: string, locale: string = 'en'): QuizGeneratorWorkflow {
+export function createQuizWorkflow(
+  model?: string,
+  locale: string = 'en'
+): QuizGeneratorWorkflow {
   return new QuizGeneratorWorkflow(model, locale);
 }

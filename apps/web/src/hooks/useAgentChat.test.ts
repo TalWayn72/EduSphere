@@ -17,7 +17,9 @@ const mockStartSession = vi.fn().mockResolvedValue({
   data: { startAgentSession: { id: 'session-test' } },
 });
 const mockSendAgentMessage = vi.fn().mockResolvedValue({
-  data: { sendMessage: { id: 'msg-1', role: 'ASSISTANT', content: 'AI reply' } },
+  data: {
+    sendMessage: { id: 'msg-1', role: 'ASSISTANT', content: 'AI reply' },
+  },
 });
 
 vi.mock('urql', () => ({
@@ -42,9 +44,13 @@ function setupUrqlMocks() {
   // Map mutation document strings to their respective mock functions.
   vi.mocked(urql.useMutation).mockImplementation((mutation) => {
     if (mutation === 'START_AGENT_SESSION_MUTATION') {
-      return [{ fetching: false }, mockStartSession] as ReturnType<typeof urql.useMutation>;
+      return [{ fetching: false }, mockStartSession] as ReturnType<
+        typeof urql.useMutation
+      >;
     }
-    return [{ fetching: false }, mockSendAgentMessage] as ReturnType<typeof urql.useMutation>;
+    return [{ fetching: false }, mockSendAgentMessage] as ReturnType<
+      typeof urql.useMutation
+    >;
   });
 
   vi.mocked(urql.useSubscription).mockReturnValue([

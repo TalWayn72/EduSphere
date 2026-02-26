@@ -36,9 +36,11 @@ export class SearchPage {
     // Tailwind classes — the React component name "CardContent" is NOT a CSS class.
     // Use the actual DOM classes: cursor-pointer (added to clickable cards) + rounded-lg
     // filtered by the presence of a font-semibold paragraph inside.
-    this.resultCards = page.locator('[class*="rounded-lg"][class*="cursor-pointer"]').filter({
-      has: page.locator('[class*="font-semibold"]'),
-    });
+    this.resultCards = page
+      .locator('[class*="rounded-lg"][class*="cursor-pointer"]')
+      .filter({
+        has: page.locator('[class*="font-semibold"]'),
+      });
     this.resultCount = page.locator('text=/\\d+ result/');
     this.emptyStateIcon = page.locator('.lucide-search').last();
     this.suggestedChips = page.locator(

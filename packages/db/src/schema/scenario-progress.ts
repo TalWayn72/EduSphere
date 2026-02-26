@@ -8,12 +8,7 @@
  *   - Users see only their own choices
  *   - Instructors see all choices within their tenant
  */
-import {
-  pgTable,
-  uuid,
-  text,
-  timestamp,
-} from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { pk, tenantId } from './_shared';
 import { users } from './core';

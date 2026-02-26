@@ -17,8 +17,8 @@ const SCALAR_CONFIG = {
   // Federation v2 internal scalars present in the composed supergraph SDL.
   // These are never queried by client operations; mapping them to string
   // prevents "Unknown scalar" errors during codegen.
-  'join__FieldSet': 'string',
-  'link__Import': 'string',
+  join__FieldSet: 'string',
+  link__Import: 'string',
 } as const;
 
 const config: CodegenConfig = {

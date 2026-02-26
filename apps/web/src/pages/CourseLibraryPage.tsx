@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { request } from 'graphql-request';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,9 +24,17 @@ import {
   ACTIVATE_LIBRARY_COURSE_MUTATION,
 } from '@/lib/graphql/library.queries';
 
-const GRAPHQL_URL = (import.meta.env['VITE_GRAPHQL_URL'] as string | undefined) ?? '/graphql';
+const GRAPHQL_URL =
+  (import.meta.env['VITE_GRAPHQL_URL'] as string | undefined) ?? '/graphql';
 
-type LibraryTopic = 'ALL' | 'GDPR' | 'SOC2' | 'HIPAA' | 'AML' | 'DEI' | 'CYBERSECURITY';
+type LibraryTopic =
+  | 'ALL'
+  | 'GDPR'
+  | 'SOC2'
+  | 'HIPAA'
+  | 'AML'
+  | 'DEI'
+  | 'CYBERSECURITY';
 
 interface LibraryCourse {
   id: string;
@@ -43,22 +57,27 @@ const TOPIC_COLORS: Record<string, string> = {
   HARASSMENT_PREVENTION: 'bg-orange-100 text-orange-800',
 };
 
-const TABS: { value: LibraryTopic | 'HARASSMENT_PREVENTION'; label: string }[] = [
-  { value: 'ALL', label: 'All' },
-  { value: 'GDPR', label: 'GDPR' },
-  { value: 'SOC2', label: 'SOC 2' },
-  { value: 'HIPAA', label: 'HIPAA' },
-  { value: 'AML', label: 'AML' },
-  { value: 'DEI', label: 'DEI' },
-  { value: 'CYBERSECURITY', label: 'Cybersecurity' },
-];
+const TABS: { value: LibraryTopic | 'HARASSMENT_PREVENTION'; label: string }[] =
+  [
+    { value: 'ALL', label: 'All' },
+    { value: 'GDPR', label: 'GDPR' },
+    { value: 'SOC2', label: 'SOC 2' },
+    { value: 'HIPAA', label: 'HIPAA' },
+    { value: 'AML', label: 'AML' },
+    { value: 'DEI', label: 'DEI' },
+    { value: 'CYBERSECURITY', label: 'Cybersecurity' },
+  ];
 
 export function CourseLibraryPage() {
   const queryClient = useQueryClient();
   const [activeTopic, setActiveTopic] = useState<string>('ALL');
-  const [confirmCourse, setConfirmCourse] = useState<LibraryCourse | null>(null);
+  const [confirmCourse, setConfirmCourse] = useState<LibraryCourse | null>(
+    null
+  );
 
-  const { data, isLoading, error } = useQuery<{ libraryCourses: LibraryCourse[] }>({
+  const { data, isLoading, error } = useQuery<{
+    libraryCourses: LibraryCourse[];
+  }>({
     queryKey: ['library-courses', activeTopic],
     queryFn: () =>
       request(GRAPHQL_URL, LIBRARY_COURSES_QUERY, {
@@ -68,7 +87,9 @@ export function CourseLibraryPage() {
 
   const { mutate: activate, isPending } = useMutation({
     mutationFn: (libraryCourseId: string) =>
-      request(GRAPHQL_URL, ACTIVATE_LIBRARY_COURSE_MUTATION, { libraryCourseId }),
+      request(GRAPHQL_URL, ACTIVATE_LIBRARY_COURSE_MUTATION, {
+        libraryCourseId,
+      }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['library-courses'] });
       setConfirmCourse(null);
@@ -97,7 +118,8 @@ export function CourseLibraryPage() {
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-1">Compliance Course Library</h1>
       <p className="text-muted-foreground mb-6">
-        Activate pre-built compliance courses to add them to your catalog instantly.
+        Activate pre-built compliance courses to add them to your catalog
+        instantly.
       </p>
 
       <Tabs value={activeTopic} onValueChange={setActiveTopic} className="mb-6">
@@ -131,15 +153,22 @@ export function CourseLibraryPage() {
                     </Badge>
                   )}
                 </div>
-                <CardTitle className="text-base leading-tight">{course.title}</CardTitle>
+                <CardTitle className="text-base leading-tight">
+                  {course.title}
+                </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 text-sm text-muted-foreground">
                 <p className="line-clamp-3">{course.description}</p>
-                <p className="mt-3 text-xs font-medium">{course.durationMinutes} min</p>
+                <p className="mt-3 text-xs font-medium">
+                  {course.durationMinutes} min
+                </p>
               </CardContent>
               <CardFooter>
                 {course.isActivated ? (
-                  <Badge variant="outline" className="w-full justify-center py-2 text-green-700 border-green-300">
+                  <Badge
+                    variant="outline"
+                    className="w-full justify-center py-2 text-green-700 border-green-300"
+                  >
                     Activated
                   </Badge>
                 ) : (
@@ -157,13 +186,17 @@ export function CourseLibraryPage() {
         </div>
       )}
 
-      <Dialog open={confirmCourse !== null} onOpenChange={() => setConfirmCourse(null)}>
+      <Dialog
+        open={confirmCourse !== null}
+        onOpenChange={() => setConfirmCourse(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Activate Course</DialogTitle>
             <DialogDescription>
-              This will add <strong>{confirmCourse?.title}</strong> to your tenant catalog. Learners
-              will be able to enroll once you publish it.
+              This will add <strong>{confirmCourse?.title}</strong> to your
+              tenant catalog. Learners will be able to enroll once you publish
+              it.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

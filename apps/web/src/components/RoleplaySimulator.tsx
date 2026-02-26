@@ -72,28 +72,36 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
       const id = result.data?.startRoleplaySession?.id as string | undefined;
       if (id) {
         setSessionId(id);
-        setMessages([{
-          id: 'opening',
-          role: 'character',
-          content: scenario.sceneDescription,
-        }]);
+        setMessages([
+          {
+            id: 'opening',
+            role: 'character',
+            content: scenario.sceneDescription,
+          },
+        ]);
       }
     };
     void start();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [scenario.id, scenario.sceneDescription, startSession]);
 
   // Poll for completion
   useEffect(() => {
     if (!sessionId) return;
     pollRef.current = setInterval(() => {
-      const status = sessionResult.data?.myScenarioSession?.status as string | undefined;
+      const status = sessionResult.data?.myScenarioSession?.status as
+        | string
+        | undefined;
       if (status === 'COMPLETED') {
         clearInterval(pollRef.current);
         setShowEvaluation(true);
       }
     }, POLL_INTERVAL_MS);
-    return () => { clearInterval(pollRef.current); };
+    return () => {
+      clearInterval(pollRef.current);
+    };
   }, [sessionId, sessionResult.data]);
 
   // Scroll to bottom when messages change
@@ -143,13 +151,20 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
           <p className="text-gray-400 text-sm">{scenario.sceneDescription}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${DIFFICULTY_COLORS[scenario.difficultyLevel] ?? 'bg-gray-700 text-gray-200'}`}>
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full font-medium ${DIFFICULTY_COLORS[scenario.difficultyLevel] ?? 'bg-gray-700 text-gray-200'}`}
+          >
             {scenario.difficultyLevel}
           </span>
           <span className="text-gray-400 text-sm">
             {turnCount} / {scenario.maxTurns} turns
           </span>
-          <Button variant="ghost" size="sm" onClick={onClose} className="text-gray-400 hover:text-white">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="text-gray-400 hover:text-white"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -159,14 +174,19 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
       <div className="h-1 bg-gray-800">
         <div
           className="h-full bg-blue-500 transition-all duration-500"
-          style={{ width: `${Math.min((turnCount / scenario.maxTurns) * 100, 100)}%` }}
+          style={{
+            width: `${Math.min((turnCount / scenario.maxTurns) * 100, 100)}%`,
+          }}
         />
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === 'learner' ? 'justify-end' : 'justify-start'}`}>
+          <div
+            key={msg.id}
+            className={`flex ${msg.role === 'learner' ? 'justify-end' : 'justify-start'}`}
+          >
             <div
               className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === 'learner'
@@ -182,8 +202,11 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
           <div className="flex justify-start">
             <div className="bg-blue-600 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
               {[0, 1, 2].map((i) => (
-                <span key={i} className="h-2 w-2 rounded-full bg-white/60 animate-bounce"
-                  style={{ animationDelay: `${i * 120}ms` }} />
+                <span
+                  key={i}
+                  className="h-2 w-2 rounded-full bg-white/60 animate-bounce"
+                  style={{ animationDelay: `${i * 120}ms` }}
+                />
               ))}
             </div>
           </div>
@@ -196,8 +219,15 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSend(); } }}
-          placeholder={isSending ? 'Waiting for response...' : 'Type your response...'}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              void handleSend();
+            }
+          }}
+          placeholder={
+            isSending ? 'Waiting for response...' : 'Type your response...'
+          }
           disabled={isSending || !sessionId}
           className="flex-1 bg-gray-800 text-white placeholder-gray-500 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />

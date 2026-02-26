@@ -5,6 +5,7 @@
 This document defines the **comprehensive testing strategy** for EduSphere, a production-scale GraphQL Federation platform targeting 100,000+ concurrent users. It establishes testing patterns, coverage requirements, and quality gates for all code contributions.
 
 **Reference Documents:**
+
 - `CLAUDE.md` — Testing section (§Testing Requirements)
 - `IMPLEMENTATION_ROADMAP.md` — Phase-by-phase testing acceptance criteria
 - `API_CONTRACTS_GRAPHQL_FEDERATION.md` — GraphQL schema contract
@@ -46,31 +47,32 @@ EduSphere follows the **inverted pyramid** approach optimized for GraphQL Federa
 ```
 
 **Rationale:**
+
 - **60% Unit Tests**: Fast feedback loop, high coverage of business logic
 - **30% Integration Tests**: Validate GraphQL contracts, RLS policies, event flows
 - **10% E2E Tests**: Prove core user journeys work end-to-end
 
 ### Coverage Targets
 
-| Layer | Target | Critical Path |
-|-------|--------|--------------|
-| **Backend** (Subgraphs) | >90% line coverage | >95% for RLS-related code |
-| **Frontend** (React Components) | >80% component coverage | >90% for auth/payment flows |
-| **RLS Policies** | **100% coverage** | Security-critical — zero tolerance |
-| **GraphQL Schema** | 100% resolver coverage | All queries/mutations/subscriptions tested |
-| **Federation Composition** | 100% entity resolution | All `@key` fields validated |
+| Layer                           | Target                  | Critical Path                              |
+| ------------------------------- | ----------------------- | ------------------------------------------ |
+| **Backend** (Subgraphs)         | >90% line coverage      | >95% for RLS-related code                  |
+| **Frontend** (React Components) | >80% component coverage | >90% for auth/payment flows                |
+| **RLS Policies**                | **100% coverage**       | Security-critical — zero tolerance         |
+| **GraphQL Schema**              | 100% resolver coverage  | All queries/mutations/subscriptions tested |
+| **Federation Composition**      | 100% entity resolution  | All `@key` fields validated                |
 
 ### When to Test
 
-| Change Type | Required Tests |
-|-------------|----------------|
+| Change Type                | Required Tests                                               |
+| -------------------------- | ------------------------------------------------------------ |
 | **New GraphQL type/field** | Unit test for resolver + Integration test for query/mutation |
-| **New mutation** | Unit + RLS validation + E2E (if user-facing) |
-| **Bug fix** | Regression test + root cause documented in `OPEN_ISSUES.md` |
-| **Database schema change** | Migration test + RLS policy test |
-| **New subgraph** | Federation composition test + health check test |
-| **AI agent template** | Agent workflow test + sandboxing test + token streaming test |
-| **Frontend component** | Unit test + visual regression test (if design-critical) |
+| **New mutation**           | Unit + RLS validation + E2E (if user-facing)                 |
+| **Bug fix**                | Regression test + root cause documented in `OPEN_ISSUES.md`  |
+| **Database schema change** | Migration test + RLS policy test                             |
+| **New subgraph**           | Federation composition test + health check test              |
+| **AI agent template**      | Agent workflow test + sandboxing test + token streaming test |
+| **Frontend component**     | Unit test + visual regression test (if design-critical)      |
 
 ### Quality Gates (Enforced at Every Phase)
 
@@ -103,6 +105,7 @@ pnpm audit --audit-level=high
 **Purpose:** Test individual functions, services, and resolvers in isolation.
 
 **Scope:**
+
 - GraphQL resolvers (per function)
 - Service layer business logic
 - Utility functions
@@ -111,6 +114,7 @@ pnpm audit --audit-level=high
 - Context extractors
 
 **Location Pattern:**
+
 ```
 apps/subgraph-core/
   src/
@@ -181,7 +185,9 @@ describe('UserResolver', () => {
       const unauthContext = { ...mockContext, isAuthenticated: false };
 
       // Act & Assert
-      await expect(resolver.me(unauthContext)).rejects.toThrow('UNAUTHENTICATED');
+      await expect(resolver.me(unauthContext)).rejects.toThrow(
+        'UNAUTHENTICATED'
+      );
     });
   });
 
@@ -208,6 +214,7 @@ describe('UserResolver', () => {
 ```
 
 **Command:**
+
 ```bash
 # Run unit tests for specific subgraph
 pnpm --filter @edusphere/subgraph-core test
@@ -226,6 +233,7 @@ pnpm --filter @edusphere/subgraph-core test -- --watch
 **Purpose:** Test interactions between layers (GraphQL → Service → Drizzle → PostgreSQL).
 
 **Scope:**
+
 - Database operations with real PostgreSQL
 - NATS event publishing/consuming
 - Redis caching
@@ -233,6 +241,7 @@ pnpm --filter @edusphere/subgraph-core test -- --watch
 - Federation entity resolution
 
 **Location Pattern:**
+
 ```
 apps/subgraph-core/
   src/
@@ -247,7 +256,10 @@ apps/subgraph-core/
 ```typescript
 // apps/subgraph-core/src/test/integration/user.integration.spec.ts
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import {
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
+} from '@testcontainers/postgresql';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { users, tenants } from '@edusphere/db/schema';
@@ -277,11 +289,14 @@ describe('UserService Integration', () => {
 
   beforeEach(async () => {
     // Seed test tenant
-    const [tenant] = await db.insert(tenants).values({
-      name: 'Test Tenant',
-      slug: 'test-tenant',
-      plan: 'FREE',
-    }).returning();
+    const [tenant] = await db
+      .insert(tenants)
+      .values({
+        name: 'Test Tenant',
+        slug: 'test-tenant',
+        plan: 'FREE',
+      })
+      .returning();
     testTenantId = tenant.id;
 
     userService = new UserService(db);
@@ -309,7 +324,10 @@ describe('UserService Integration', () => {
       expect(createdUser.tenantId).toBe(testTenantId);
 
       // Verify in DB
-      const [dbUser] = await db.select().from(users).where(eq(users.id, createdUser.id));
+      const [dbUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, createdUser.id));
       expect(dbUser.tenantId).toBe(testTenantId);
     });
   });
@@ -317,12 +335,15 @@ describe('UserService Integration', () => {
   describe('findById() with RLS', () => {
     it('should return user from same tenant', async () => {
       // Arrange
-      const [user] = await db.insert(users).values({
-        tenantId: testTenantId,
-        email: 'user@edusphere.dev',
-        displayName: 'Test User',
-        role: 'STUDENT',
-      }).returning();
+      const [user] = await db
+        .insert(users)
+        .values({
+          tenantId: testTenantId,
+          email: 'user@edusphere.dev',
+          displayName: 'Test User',
+          role: 'STUDENT',
+        })
+        .returning();
 
       // Act
       const foundUser = await withTenantContext(
@@ -339,18 +360,24 @@ describe('UserService Integration', () => {
 
     it('should NOT return user from different tenant', async () => {
       // Arrange — create second tenant
-      const [tenant2] = await db.insert(tenants).values({
-        name: 'Tenant 2',
-        slug: 'tenant-2',
-        plan: 'FREE',
-      }).returning();
+      const [tenant2] = await db
+        .insert(tenants)
+        .values({
+          name: 'Tenant 2',
+          slug: 'tenant-2',
+          plan: 'FREE',
+        })
+        .returning();
 
-      const [userTenant1] = await db.insert(users).values({
-        tenantId: testTenantId,
-        email: 'user1@edusphere.dev',
-        displayName: 'User 1',
-        role: 'STUDENT',
-      }).returning();
+      const [userTenant1] = await db
+        .insert(users)
+        .values({
+          tenantId: testTenantId,
+          email: 'user1@edusphere.dev',
+          displayName: 'User 1',
+          role: 'STUDENT',
+        })
+        .returning();
 
       // Act — try to query Tenant 1 user from Tenant 2 context
       const foundUser = await withTenantContext(
@@ -368,6 +395,7 @@ describe('UserService Integration', () => {
 ```
 
 **Commands:**
+
 ```bash
 # Run integration tests
 pnpm --filter @edusphere/subgraph-core test -- --testPathPattern=integration
@@ -383,6 +411,7 @@ pnpm turbo test -- --testPathPattern=integration
 **Purpose:** **Security-critical** — Prove Row-Level Security policies enforce tenant isolation and role-based access.
 
 **Scope:**
+
 - Tenant A cannot read Tenant B data
 - Role-based access (STUDENT vs INSTRUCTOR vs ADMIN)
 - Owner-only policies (PERSONAL annotations)
@@ -390,6 +419,7 @@ pnpm turbo test -- --testPathPattern=integration
 - Cross-tenant access (SUPER_ADMIN only)
 
 **Location:**
+
 ```
 packages/db/
   src/
@@ -430,31 +460,47 @@ describe('RLS: Tenant Isolation', () => {
 
   beforeEach(async () => {
     // Create two tenants
-    const [tenantA] = await db.insert(tenants).values({
-      name: 'Tenant A', slug: 'tenant-a', plan: 'FREE',
-    }).returning();
+    const [tenantA] = await db
+      .insert(tenants)
+      .values({
+        name: 'Tenant A',
+        slug: 'tenant-a',
+        plan: 'FREE',
+      })
+      .returning();
     tenantA_id = tenantA.id;
 
-    const [tenantB] = await db.insert(tenants).values({
-      name: 'Tenant B', slug: 'tenant-b', plan: 'FREE',
-    }).returning();
+    const [tenantB] = await db
+      .insert(tenants)
+      .values({
+        name: 'Tenant B',
+        slug: 'tenant-b',
+        plan: 'FREE',
+      })
+      .returning();
     tenantB_id = tenantB.id;
 
     // Create users in each tenant
-    const [userA] = await db.insert(users).values({
-      tenantId: tenantA_id,
-      email: 'userA@edusphere.dev',
-      displayName: 'User A',
-      role: 'STUDENT',
-    }).returning();
+    const [userA] = await db
+      .insert(users)
+      .values({
+        tenantId: tenantA_id,
+        email: 'userA@edusphere.dev',
+        displayName: 'User A',
+        role: 'STUDENT',
+      })
+      .returning();
     userA_id = userA.id;
 
-    const [userB] = await db.insert(users).values({
-      tenantId: tenantB_id,
-      email: 'userB@edusphere.dev',
-      displayName: 'User B',
-      role: 'STUDENT',
-    }).returning();
+    const [userB] = await db
+      .insert(users)
+      .values({
+        tenantId: tenantB_id,
+        email: 'userB@edusphere.dev',
+        displayName: 'User B',
+        role: 'STUDENT',
+      })
+      .returning();
     userB_id = userB.id;
   });
 
@@ -475,11 +521,14 @@ describe('RLS: Tenant Isolation', () => {
 
   it('should block cross-tenant course access', async () => {
     // Arrange — Create course in Tenant A
-    const [courseA] = await db.insert(courses).values({
-      tenantId: tenantA_id,
-      title: 'Course A',
-      creatorId: userA_id,
-    }).returning();
+    const [courseA] = await db
+      .insert(courses)
+      .values({
+        tenantId: tenantA_id,
+        title: 'Course A',
+        creatorId: userA_id,
+      })
+      .returning();
 
     // Act — Try to query from Tenant B context
     const coursesFromB = await withTenantContext(
@@ -495,12 +544,15 @@ describe('RLS: Tenant Isolation', () => {
 
   it('should allow SUPER_ADMIN to query across tenants', async () => {
     // Arrange — Create SUPER_ADMIN user
-    const [admin] = await db.insert(users).values({
-      tenantId: tenantA_id, // Belongs to Tenant A
-      email: 'admin@edusphere.dev',
-      displayName: 'Super Admin',
-      role: 'SUPER_ADMIN',
-    }).returning();
+    const [admin] = await db
+      .insert(users)
+      .values({
+        tenantId: tenantA_id, // Belongs to Tenant A
+        email: 'admin@edusphere.dev',
+        displayName: 'Super Admin',
+        role: 'SUPER_ADMIN',
+      })
+      .returning();
 
     // Act — Query all users as SUPER_ADMIN
     const allUsers = await withTenantContext(
@@ -512,7 +564,7 @@ describe('RLS: Tenant Isolation', () => {
 
     // Assert — SUPER_ADMIN sees users from ALL tenants
     expect(allUsers.length).toBeGreaterThanOrEqual(2); // At least userA, userB, admin
-    const tenantIds = allUsers.map(u => u.tenantId);
+    const tenantIds = allUsers.map((u) => u.tenantId);
     expect(tenantIds).toContain(tenantA_id);
     expect(tenantIds).toContain(tenantB_id);
   });
@@ -537,6 +589,7 @@ pnpm --filter @edusphere/db test -- --testPathPattern=rls --coverage
 **Purpose:** Test GraphQL API contracts — all queries, mutations, and subscriptions.
 
 **Scope:**
+
 - All 44 queries (per `API-CONTRACTS.md`)
 - All 44 mutations
 - All 7 subscriptions
@@ -545,6 +598,7 @@ pnpm --filter @edusphere/db test -- --testPathPattern=rls --coverage
 - Error responses
 
 **Location:**
+
 ```
 apps/subgraph-core/
   src/
@@ -719,6 +773,7 @@ describe('GraphQL: User Mutations', () => {
 ```
 
 **Commands:**
+
 ```bash
 # Run GraphQL tests for subgraph
 pnpm --filter @edusphere/subgraph-core test -- --testPathPattern=graphql
@@ -734,12 +789,14 @@ pnpm test:graphql  # Custom workspace script
 **Purpose:** Validate GraphQL Federation composition and entity resolution across subgraphs.
 
 **Scope:**
+
 - Supergraph composition succeeds
 - Entity `@key` resolution (User, Course, MediaAsset, etc.)
 - Cross-subgraph field extensions
 - Reference resolver execution
 
 **Location:**
+
 ```
 apps/gateway/
   src/
@@ -865,6 +922,7 @@ describe('Federation: Entity Resolution', () => {
 ```
 
 **Commands:**
+
 ```bash
 # Run federation tests
 pnpm --filter @edusphere/gateway test -- --testPathPattern=federation
@@ -880,6 +938,7 @@ pnpm --filter @edusphere/gateway compose
 **Purpose:** Prove critical user flows work end-to-end in real browsers.
 
 **Scope:**
+
 - Authentication flow (Keycloak OIDC)
 - Course browsing and creation
 - Video playback with annotations
@@ -888,11 +947,13 @@ pnpm --filter @edusphere/gateway compose
 - Mobile responsive views
 
 **Browser Coverage:**
+
 - Chromium (Desktop + Mobile)
 - Firefox (Desktop)
 - WebKit (Safari simulation)
 
 **Location:**
+
 ```
 apps/web/
   e2e/
@@ -920,7 +981,9 @@ test.describe('Authentication Flow', () => {
     dashboardPage = new DashboardPage(page);
   });
 
-  test('should login via Keycloak and redirect to dashboard', async ({ page }) => {
+  test('should login via Keycloak and redirect to dashboard', async ({
+    page,
+  }) => {
     // Arrange
     await loginPage.goto();
 
@@ -1005,7 +1068,9 @@ import { VideoPlayerPage } from './pages/video-player.page';
 test.describe('Video Annotation', () => {
   test.use({ storageState: 'e2e/.auth/student.json' }); // Reuse auth state
 
-  test('should create text annotation at current timestamp', async ({ page }) => {
+  test('should create text annotation at current timestamp', async ({
+    page,
+  }) => {
     // Arrange
     const videoPage = new VideoPlayerPage(page);
     await videoPage.goto('known-course-id', 'known-asset-id');
@@ -1017,13 +1082,17 @@ test.describe('Video Annotation', () => {
     await videoPage.createTextAnnotation('This is an important point!');
 
     // Assert
-    await expect(videoPage.annotationList).toContainText('This is an important point!');
+    await expect(videoPage.annotationList).toContainText(
+      'This is an important point!'
+    );
     await expect(videoPage.getAnnotationTimestamp(0)).toContain('00:30');
 
     // Verify annotation persists after reload
     await page.reload();
     await videoPage.waitForPlayerReady();
-    await expect(videoPage.annotationList).toContainText('This is an important point!');
+    await expect(videoPage.annotationList).toContainText(
+      'This is an important point!'
+    );
   });
 
   test('should filter annotations by layer', async ({ page }) => {
@@ -1044,7 +1113,10 @@ test.describe('Video Annotation', () => {
     }
   });
 
-  test('should create sketch annotation with canvas', async ({ page, isMobile }) => {
+  test('should create sketch annotation with canvas', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(isMobile, 'Sketch annotation requires mouse events');
 
     // Arrange
@@ -1072,6 +1144,7 @@ test.describe('Video Annotation', () => {
 ```
 
 **Commands:**
+
 ```bash
 # Run E2E tests
 pnpm --filter @edusphere/web test:e2e
@@ -1096,6 +1169,7 @@ pnpm --filter @edusphere/web test:e2e -- --reporter=html
 **Purpose:** Validate system performance under production-scale load (100,000+ concurrent users).
 
 **Scope:**
+
 - Smoke test (1-10 users, validate no errors)
 - Load test (sustained 10K-50K users)
 - Stress test (ramp to 100K+ users)
@@ -1103,6 +1177,7 @@ pnpm --filter @edusphere/web test:e2e -- --reporter=html
 - Soak test (sustained load for 6+ hours)
 
 **Location:**
+
 ```
 scripts/
   load-tests/
@@ -1127,14 +1202,14 @@ const queryLatency = new Trend('query_latency');
 // Test configuration
 export const options = {
   stages: [
-    { duration: '2m', target: 1000 },   // Ramp up to 1K users
-    { duration: '5m', target: 10000 },  // Ramp to 10K users
+    { duration: '2m', target: 1000 }, // Ramp up to 1K users
+    { duration: '5m', target: 10000 }, // Ramp to 10K users
     { duration: '10m', target: 10000 }, // Stay at 10K for 10 min
-    { duration: '2m', target: 0 },      // Ramp down
+    { duration: '2m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'],    // 95% of requests < 500ms
-    http_req_failed: ['rate<0.01'],       // Error rate < 1%
+    http_req_duration: ['p(95)<500'], // 95% of requests < 500ms
+    http_req_failed: ['rate<0.01'], // Error rate < 1%
     errors: ['rate<0.01'],
   },
 };
@@ -1168,7 +1243,7 @@ export default function () {
   const res = http.post(GRAPHQL_URL, JSON.stringify(coursesQuery), {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${AUTH_TOKEN}`,
+      Authorization: `Bearer ${AUTH_TOKEN}`,
     },
   });
   const duration = Date.now() - start;
@@ -1207,13 +1282,14 @@ export default function () {
   const searchRes = http.post(GRAPHQL_URL, JSON.stringify(searchQuery), {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${AUTH_TOKEN}`,
+      Authorization: `Bearer ${AUTH_TOKEN}`,
     },
   });
 
   check(searchRes, {
     'search status is 200': (r) => r.status === 200,
-    'search returns results': (r) => r.json('data.semanticSearch.edges').length > 0,
+    'search returns results': (r) =>
+      r.json('data.semanticSearch.edges').length > 0,
   });
 
   // Think time — simulate user reading results
@@ -1230,15 +1306,15 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '5m', target: 10000 },   // Ramp to 10K
-    { duration: '10m', target: 50000 },  // Ramp to 50K
+    { duration: '5m', target: 10000 }, // Ramp to 10K
+    { duration: '10m', target: 50000 }, // Ramp to 50K
     { duration: '10m', target: 100000 }, // Ramp to 100K (stress point)
-    { duration: '5m', target: 100000 },  // Sustain 100K
-    { duration: '5m', target: 0 },       // Ramp down
+    { duration: '5m', target: 100000 }, // Sustain 100K
+    { duration: '5m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<1000'],   // Relaxed threshold for stress test
-    http_req_failed: ['rate<0.05'],      // Allow up to 5% errors at peak
+    http_req_duration: ['p(95)<1000'], // Relaxed threshold for stress test
+    http_req_failed: ['rate<0.05'], // Allow up to 5% errors at peak
   },
 };
 
@@ -1247,16 +1323,17 @@ export const options = {
 
 **Metrics to Track:**
 
-| Metric | Target (Normal Load) | Target (Stress) |
-|--------|---------------------|-----------------|
-| **p50 latency** | <100ms | <200ms |
-| **p95 latency** | <500ms | <1000ms |
-| **p99 latency** | <1000ms | <2000ms |
-| **Error rate** | <0.1% | <5% |
-| **Throughput** | 10K RPS | 50K RPS |
-| **Active WebSocket connections** | 100K sustained | 100K sustained |
+| Metric                           | Target (Normal Load) | Target (Stress) |
+| -------------------------------- | -------------------- | --------------- |
+| **p50 latency**                  | <100ms               | <200ms          |
+| **p95 latency**                  | <500ms               | <1000ms         |
+| **p99 latency**                  | <1000ms              | <2000ms         |
+| **Error rate**                   | <0.1%                | <5%             |
+| **Throughput**                   | 10K RPS              | 50K RPS         |
+| **Active WebSocket connections** | 100K sustained       | 100K sustained  |
 
 **Commands:**
+
 ```bash
 # Smoke test (quick validation)
 k6 run scripts/load-tests/smoke.js
@@ -1277,14 +1354,14 @@ open http://localhost:3000/d/k6
 
 ### File Naming
 
-| Test Type | Pattern | Example |
-|-----------|---------|---------|
-| **Unit Tests** | `*.spec.ts` | `user.resolver.spec.ts` |
-| **Integration Tests** | `*.integration.spec.ts` | `user.integration.spec.ts` |
-| **GraphQL Tests** | `*.graphql.spec.ts` | `user.graphql.spec.ts` |
-| **RLS Tests** | `*.rls.test.ts` or `*.test.ts` | `tenant-isolation.test.ts` |
-| **E2E Tests** | `*.spec.ts` (in `e2e/` directory) | `auth.spec.ts` |
-| **Load Tests** | `*.js` (in `scripts/load-tests/`) | `load.js` |
+| Test Type             | Pattern                           | Example                    |
+| --------------------- | --------------------------------- | -------------------------- |
+| **Unit Tests**        | `*.spec.ts`                       | `user.resolver.spec.ts`    |
+| **Integration Tests** | `*.integration.spec.ts`           | `user.integration.spec.ts` |
+| **GraphQL Tests**     | `*.graphql.spec.ts`               | `user.graphql.spec.ts`     |
+| **RLS Tests**         | `*.rls.test.ts` or `*.test.ts`    | `tenant-isolation.test.ts` |
+| **E2E Tests**         | `*.spec.ts` (in `e2e/` directory) | `auth.spec.ts`             |
+| **Load Tests**        | `*.js` (in `scripts/load-tests/`) | `load.js`                  |
 
 ### Test Suite Naming
 
@@ -1408,10 +1485,13 @@ describe('UserService with Database', () => {
   // Run before each test
   beforeEach(async () => {
     // Seed test tenant (fresh for each test)
-    const tenant = await db.insert(tenants).values({
-      name: 'Test Tenant',
-      slug: 'test-tenant',
-    }).returning();
+    const tenant = await db
+      .insert(tenants)
+      .values({
+        name: 'Test Tenant',
+        slug: 'test-tenant',
+      })
+      .returning();
     testTenantId = tenant.id;
 
     userService = new UserService(db);
@@ -1525,7 +1605,9 @@ describe('Course Creation with Events (Integration)', () => {
       .withExposedPorts(4222)
       .withCommand(['-js']) // Enable JetStream
       .start();
-    natsClient = await NatsClient.connect(`nats://localhost:${natsContainer.getMappedPort(4222)}`);
+    natsClient = await NatsClient.connect(
+      `nats://localhost:${natsContainer.getMappedPort(4222)}`
+    );
   }, 120000); // 2 min timeout
 
   afterAll(async () => {
@@ -1536,11 +1618,15 @@ describe('Course Creation with Events (Integration)', () => {
 
   it('should create course and publish event to NATS', async () => {
     // Arrange
-    const subscription = await natsClient.subscribe('edusphere.*.course.created');
+    const subscription = await natsClient.subscribe(
+      'edusphere.*.course.created'
+    );
     const courseService = new CourseService(db, natsClient);
 
     // Act
-    const course = await courseService.create({ title: 'Integration Test Course' });
+    const course = await courseService.create({
+      title: 'Integration Test Course',
+    });
 
     // Assert — Wait for event
     const event = await subscription.nextMessage(5000); // 5s timeout
@@ -1610,9 +1696,7 @@ describe('GraphQL Authorization', () => {
     const query = `query { me { id } }`;
 
     // Act — No auth token
-    const response = await request(app)
-      .post('/graphql')
-      .send({ query });
+    const response = await request(app).post('/graphql').send({ query });
 
     // Assert
     expect(response.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
@@ -1673,7 +1757,7 @@ describe('GraphQL RLS Enforcement', () => {
       .send({ query });
 
     // Assert — Only sees Tenant 1 courses
-    const courses = response.body.data.courses.edges.map(e => e.node);
+    const courses = response.body.data.courses.edges.map((e) => e.node);
     expect(courses).toHaveLength(1);
     expect(courses[0].title).toBe('Tenant 1 Course');
   });
@@ -1738,13 +1822,24 @@ describe('RLS: Tenant Isolation', () => {
     // Arrange
     const [tenantA] = await createTenant('Tenant A');
     const [tenantB] = await createTenant('Tenant B');
-    const [userA] = await createUser({ tenantId: tenantA.id, email: 'a@example.com' });
-    const [userB] = await createUser({ tenantId: tenantB.id, email: 'b@example.com' });
+    const [userA] = await createUser({
+      tenantId: tenantA.id,
+      email: 'a@example.com',
+    });
+    const [userB] = await createUser({
+      tenantId: tenantB.id,
+      email: 'b@example.com',
+    });
 
     // Act — Query as Tenant A
-    const users = await withTenantContext(tenantA.id, userA.id, 'STUDENT', async () => {
-      return db.select().from(usersTable);
-    });
+    const users = await withTenantContext(
+      tenantA.id,
+      userA.id,
+      'STUDENT',
+      async () => {
+        return db.select().from(usersTable);
+      }
+    );
 
     // Assert — Only sees Tenant A users
     expect(users).toHaveLength(1);
@@ -1755,15 +1850,23 @@ describe('RLS: Tenant Isolation', () => {
     // Arrange
     const [tenantA] = await createTenant('Tenant A');
     const [tenantB] = await createTenant('Tenant B');
-    const [courseB] = await createCourse({ tenantId: tenantB.id, title: 'Tenant B Course' });
+    const [courseB] = await createCourse({
+      tenantId: tenantB.id,
+      title: 'Tenant B Course',
+    });
 
     // Act — Try to enroll Tenant A user in Tenant B course
-    const enrollmentAttempt = withTenantContext(tenantA.id, 'user-a-id', 'STUDENT', async () => {
-      return db.insert(enrollments).values({
-        userId: 'user-a-id',
-        courseId: courseB.id, // Cross-tenant!
-      });
-    });
+    const enrollmentAttempt = withTenantContext(
+      tenantA.id,
+      'user-a-id',
+      'STUDENT',
+      async () => {
+        return db.insert(enrollments).values({
+          userId: 'user-a-id',
+          courseId: courseB.id, // Cross-tenant!
+        });
+      }
+    );
 
     // Assert — RLS blocks insert
     await expect(enrollmentAttempt).rejects.toThrow(); // Or returns 0 rows affected
@@ -1780,8 +1883,14 @@ describe('RLS: Role-Based Access', () => {
   it('should allow INSTRUCTOR to see all course annotations', async () => {
     // Arrange
     const [tenant] = await createTenant('Test Tenant');
-    const [instructor] = await createUser({ tenantId: tenant.id, role: 'INSTRUCTOR' });
-    const [student] = await createUser({ tenantId: tenant.id, role: 'STUDENT' });
+    const [instructor] = await createUser({
+      tenantId: tenant.id,
+      role: 'INSTRUCTOR',
+    });
+    const [student] = await createUser({
+      tenantId: tenant.id,
+      role: 'STUDENT',
+    });
     const [annotation] = await createAnnotation({
       tenantId: tenant.id,
       authorId: student.id,
@@ -1789,9 +1898,14 @@ describe('RLS: Role-Based Access', () => {
     });
 
     // Act — Query as INSTRUCTOR
-    const annotations = await withTenantContext(tenant.id, instructor.id, 'INSTRUCTOR', async () => {
-      return db.select().from(annotationsTable);
-    });
+    const annotations = await withTenantContext(
+      tenant.id,
+      instructor.id,
+      'INSTRUCTOR',
+      async () => {
+        return db.select().from(annotationsTable);
+      }
+    );
 
     // Assert — Sees student's annotation
     expect(annotations).toHaveLength(1);
@@ -1801,8 +1915,14 @@ describe('RLS: Role-Based Access', () => {
   it('should block STUDENT from seeing INSTRUCTOR layer', async () => {
     // Arrange
     const [tenant] = await createTenant('Test Tenant');
-    const [instructor] = await createUser({ tenantId: tenant.id, role: 'INSTRUCTOR' });
-    const [student] = await createUser({ tenantId: tenant.id, role: 'STUDENT' });
+    const [instructor] = await createUser({
+      tenantId: tenant.id,
+      role: 'INSTRUCTOR',
+    });
+    const [student] = await createUser({
+      tenantId: tenant.id,
+      role: 'STUDENT',
+    });
     const [annotation] = await createAnnotation({
       tenantId: tenant.id,
       authorId: instructor.id,
@@ -1810,9 +1930,14 @@ describe('RLS: Role-Based Access', () => {
     });
 
     // Act — Query as STUDENT
-    const annotations = await withTenantContext(tenant.id, student.id, 'STUDENT', async () => {
-      return db.select().from(annotationsTable);
-    });
+    const annotations = await withTenantContext(
+      tenant.id,
+      student.id,
+      'STUDENT',
+      async () => {
+        return db.select().from(annotationsTable);
+      }
+    );
 
     // Assert — RLS hides INSTRUCTOR layer
     expect(annotations).toHaveLength(0);
@@ -1835,9 +1960,14 @@ describe('RLS: Owner-Only Access', () => {
     });
 
     // Act
-    const annotations = await withTenantContext(tenant.id, owner.id, 'STUDENT', async () => {
-      return db.select().from(annotationsTable);
-    });
+    const annotations = await withTenantContext(
+      tenant.id,
+      owner.id,
+      'STUDENT',
+      async () => {
+        return db.select().from(annotationsTable);
+      }
+    );
 
     // Assert
     expect(annotations).toHaveLength(1);
@@ -1848,7 +1978,10 @@ describe('RLS: Owner-Only Access', () => {
     // Arrange
     const [tenant] = await createTenant('Test Tenant');
     const [owner] = await createUser({ tenantId: tenant.id, role: 'STUDENT' });
-    const [otherStudent] = await createUser({ tenantId: tenant.id, role: 'STUDENT' });
+    const [otherStudent] = await createUser({
+      tenantId: tenant.id,
+      role: 'STUDENT',
+    });
     await createAnnotation({
       tenantId: tenant.id,
       authorId: owner.id,
@@ -1856,9 +1989,14 @@ describe('RLS: Owner-Only Access', () => {
     });
 
     // Act — Query as different student
-    const annotations = await withTenantContext(tenant.id, otherStudent.id, 'STUDENT', async () => {
-      return db.select().from(annotationsTable);
-    });
+    const annotations = await withTenantContext(
+      tenant.id,
+      otherStudent.id,
+      'STUDENT',
+      async () => {
+        return db.select().from(annotationsTable);
+      }
+    );
 
     // Assert — RLS hides owner's PERSONAL annotation
     expect(annotations).toHaveLength(0);
@@ -1867,8 +2005,14 @@ describe('RLS: Owner-Only Access', () => {
   it('should allow INSTRUCTOR to see PERSONAL annotations', async () => {
     // Arrange
     const [tenant] = await createTenant('Test Tenant');
-    const [student] = await createUser({ tenantId: tenant.id, role: 'STUDENT' });
-    const [instructor] = await createUser({ tenantId: tenant.id, role: 'INSTRUCTOR' });
+    const [student] = await createUser({
+      tenantId: tenant.id,
+      role: 'STUDENT',
+    });
+    const [instructor] = await createUser({
+      tenantId: tenant.id,
+      role: 'INSTRUCTOR',
+    });
     const [annotation] = await createAnnotation({
       tenantId: tenant.id,
       authorId: student.id,
@@ -1876,9 +2020,14 @@ describe('RLS: Owner-Only Access', () => {
     });
 
     // Act — Query as INSTRUCTOR
-    const annotations = await withTenantContext(tenant.id, instructor.id, 'INSTRUCTOR', async () => {
-      return db.select().from(annotationsTable);
-    });
+    const annotations = await withTenantContext(
+      tenant.id,
+      instructor.id,
+      'INSTRUCTOR',
+      async () => {
+        return db.select().from(annotationsTable);
+      }
+    );
 
     // Assert — Instructors can see student PERSONAL annotations
     expect(annotations).toHaveLength(1);
@@ -1959,13 +2108,17 @@ export const test = base.extend<AuthFixtures>({
   },
 
   studentContext: async ({ browser }, use) => {
-    const context = await browser.newContext({ storageState: 'e2e/.auth/student.json' });
+    const context = await browser.newContext({
+      storageState: 'e2e/.auth/student.json',
+    });
     await use(context);
     await context.close();
   },
 
   instructorContext: async ({ browser }, use) => {
-    const context = await browser.newContext({ storageState: 'e2e/.auth/instructor.json' });
+    const context = await browser.newContext({
+      storageState: 'e2e/.auth/instructor.json',
+    });
     await use(context);
     await context.close();
   },
@@ -1982,7 +2135,9 @@ import { test, expect } from './fixtures/auth.fixture';
 import { CourseManagementPage } from './pages/course-management.page';
 
 test.describe('Course Management (Authenticated)', () => {
-  test('should create new course as instructor', async ({ authenticatedPage }) => {
+  test('should create new course as instructor', async ({
+    authenticatedPage,
+  }) => {
     const coursePage = new CourseManagementPage(authenticatedPage);
     await coursePage.goto();
     await coursePage.createCourse('New Course', 'Test description');
@@ -2007,34 +2162,46 @@ export async function seedTestData() {
   await db.delete(users).where(like(users.email, '%@e2e-test.dev'));
 
   // Create test tenant
-  const [tenant] = await db.insert(tenants).values({
-    name: 'E2E Test Tenant',
-    slug: 'e2e-test-tenant',
-    plan: 'PROFESSIONAL',
-  }).returning();
+  const [tenant] = await db
+    .insert(tenants)
+    .values({
+      name: 'E2E Test Tenant',
+      slug: 'e2e-test-tenant',
+      plan: 'PROFESSIONAL',
+    })
+    .returning();
 
   // Create test users
-  const [instructor] = await db.insert(users).values({
-    tenantId: tenant.id,
-    email: 'instructor@e2e-test.dev',
-    displayName: 'Test Instructor',
-    role: 'INSTRUCTOR',
-  }).returning();
+  const [instructor] = await db
+    .insert(users)
+    .values({
+      tenantId: tenant.id,
+      email: 'instructor@e2e-test.dev',
+      displayName: 'Test Instructor',
+      role: 'INSTRUCTOR',
+    })
+    .returning();
 
-  const [student] = await db.insert(users).values({
-    tenantId: tenant.id,
-    email: 'student@e2e-test.dev',
-    displayName: 'Test Student',
-    role: 'STUDENT',
-  }).returning();
+  const [student] = await db
+    .insert(users)
+    .values({
+      tenantId: tenant.id,
+      email: 'student@e2e-test.dev',
+      displayName: 'Test Student',
+      role: 'STUDENT',
+    })
+    .returning();
 
   // Create test course
-  const [course] = await db.insert(courses).values({
-    tenantId: tenant.id,
-    creatorId: instructor.id,
-    title: 'E2E Test Course',
-    description: 'Course for E2E testing',
-  }).returning();
+  const [course] = await db
+    .insert(courses)
+    .values({
+      tenantId: tenant.id,
+      creatorId: instructor.id,
+      title: 'E2E Test Course',
+      description: 'Course for E2E testing',
+    })
+    .returning();
 
   return { tenant, instructor, student, course };
 }
@@ -2094,7 +2261,7 @@ export default async function globalTeardown() {
 ```javascript
 // scripts/load-tests/smoke.js
 export const options = {
-  vus: 1,        // 1 virtual user
+  vus: 1, // 1 virtual user
   duration: '1m', // 1 minute
   thresholds: {
     http_req_failed: ['rate<0.01'], // Less than 1% errors
@@ -2110,13 +2277,13 @@ export const options = {
 // scripts/load-tests/load.js
 export const options = {
   stages: [
-    { duration: '5m', target: 10000 },  // Ramp to 10K users
+    { duration: '5m', target: 10000 }, // Ramp to 10K users
     { duration: '30m', target: 10000 }, // Sustain 10K
-    { duration: '5m', target: 0 },      // Ramp down
+    { duration: '5m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'],   // 95th percentile < 500ms
-    http_req_failed: ['rate<0.01'],     // Error rate < 1%
+    http_req_duration: ['p(95)<500'], // 95th percentile < 500ms
+    http_req_failed: ['rate<0.01'], // Error rate < 1%
   },
 };
 ```
@@ -2129,14 +2296,14 @@ export const options = {
 // scripts/load-tests/stress.js
 export const options = {
   stages: [
-    { duration: '10m', target: 50000 },  // Ramp to 50K
+    { duration: '10m', target: 50000 }, // Ramp to 50K
     { duration: '10m', target: 100000 }, // Ramp to 100K
-    { duration: '5m', target: 100000 },  // Sustain 100K
-    { duration: '10m', target: 0 },      // Ramp down
+    { duration: '5m', target: 100000 }, // Sustain 100K
+    { duration: '10m', target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<2000'],   // Relaxed threshold
-    http_req_failed: ['rate<0.05'],      // Allow 5% errors at peak
+    http_req_duration: ['p(95)<2000'], // Relaxed threshold
+    http_req_failed: ['rate<0.05'], // Allow 5% errors at peak
   },
 };
 ```
@@ -2149,26 +2316,26 @@ export const options = {
 // scripts/load-tests/spike.js
 export const options = {
   stages: [
-    { duration: '1m', target: 1000 },   // Normal load
+    { duration: '1m', target: 1000 }, // Normal load
     { duration: '30s', target: 50000 }, // Sudden spike!
-    { duration: '2m', target: 50000 },  // Sustain spike
-    { duration: '1m', target: 1000 },   // Back to normal
-    { duration: '1m', target: 0 },      // Ramp down
+    { duration: '2m', target: 50000 }, // Sustain spike
+    { duration: '1m', target: 1000 }, // Back to normal
+    { duration: '1m', target: 0 }, // Ramp down
   ],
 };
 ```
 
 ### Metrics to Track
 
-| Metric | Description | Normal Load Target | Stress Target |
-|--------|-------------|-------------------|--------------|
-| **http_req_duration (p50)** | Median response time | <100ms | <200ms |
-| **http_req_duration (p95)** | 95th percentile latency | <500ms | <1000ms |
-| **http_req_duration (p99)** | 99th percentile latency | <1000ms | <2000ms |
-| **http_req_failed** | Error rate | <0.1% | <5% |
-| **http_reqs** | Requests per second | 10K RPS | 50K RPS |
-| **ws_connecting** | WebSocket connection time | <200ms | <500ms |
-| **ws_sessions** | Active WebSocket sessions | 100K sustained | 100K sustained |
+| Metric                      | Description               | Normal Load Target | Stress Target  |
+| --------------------------- | ------------------------- | ------------------ | -------------- |
+| **http_req_duration (p50)** | Median response time      | <100ms             | <200ms         |
+| **http_req_duration (p95)** | 95th percentile latency   | <500ms             | <1000ms        |
+| **http_req_duration (p99)** | 99th percentile latency   | <1000ms            | <2000ms        |
+| **http_req_failed**         | Error rate                | <0.1%              | <5%            |
+| **http_reqs**               | Requests per second       | 10K RPS            | 50K RPS        |
+| **ws_connecting**           | WebSocket connection time | <200ms             | <500ms         |
+| **ws_sessions**             | Active WebSocket sessions | 100K sustained     | 100K sustained |
 
 ### Acceptance Criteria Per Phase
 
@@ -2507,53 +2674,77 @@ export async function seed() {
   console.log('🌱 Seeding database...');
 
   // Create default tenant
-  const [tenant] = await db.insert(tenants).values({
-    id: '550e8400-e29b-41d4-a716-446655440000', // Known UUID for dev
-    name: 'EduSphere Demo',
-    slug: 'edusphere-demo',
-    plan: 'PROFESSIONAL',
-  }).onConflictDoNothing().returning();
+  const [tenant] = await db
+    .insert(tenants)
+    .values({
+      id: '550e8400-e29b-41d4-a716-446655440000', // Known UUID for dev
+      name: 'EduSphere Demo',
+      slug: 'edusphere-demo',
+      plan: 'PROFESSIONAL',
+    })
+    .onConflictDoNothing()
+    .returning();
 
   console.log(`✅ Created tenant: ${tenant.name}`);
 
   // Create users
   await withTenantContext(tenant.id, 'system', 'SUPER_ADMIN', async () => {
-    const [admin] = await db.insert(users).values({
-      email: 'admin@edusphere.dev',
-      displayName: 'Admin User',
-      role: 'SUPER_ADMIN',
-    }).onConflictDoNothing().returning();
+    const [admin] = await db
+      .insert(users)
+      .values({
+        email: 'admin@edusphere.dev',
+        displayName: 'Admin User',
+        role: 'SUPER_ADMIN',
+      })
+      .onConflictDoNothing()
+      .returning();
 
-    const [instructor] = await db.insert(users).values({
-      email: 'instructor@edusphere.dev',
-      displayName: 'Test Instructor',
-      role: 'INSTRUCTOR',
-    }).onConflictDoNothing().returning();
+    const [instructor] = await db
+      .insert(users)
+      .values({
+        email: 'instructor@edusphere.dev',
+        displayName: 'Test Instructor',
+        role: 'INSTRUCTOR',
+      })
+      .onConflictDoNothing()
+      .returning();
 
-    const [student] = await db.insert(users).values({
-      email: 'student@edusphere.dev',
-      displayName: 'Test Student',
-      role: 'STUDENT',
-    }).onConflictDoNothing().returning();
+    const [student] = await db
+      .insert(users)
+      .values({
+        email: 'student@edusphere.dev',
+        displayName: 'Test Student',
+        role: 'STUDENT',
+      })
+      .onConflictDoNothing()
+      .returning();
 
-    console.log(`✅ Created users: ${admin.email}, ${instructor.email}, ${student.email}`);
+    console.log(
+      `✅ Created users: ${admin.email}, ${instructor.email}, ${student.email}`
+    );
 
     // Create sample course
-    const [course] = await db.insert(courses).values({
-      title: 'Introduction to Talmud',
-      description: 'Learn the basics of Talmudic study',
-      creatorId: instructor.id,
-      isPublished: true,
-    }).returning();
+    const [course] = await db
+      .insert(courses)
+      .values({
+        title: 'Introduction to Talmud',
+        description: 'Learn the basics of Talmudic study',
+        creatorId: instructor.id,
+        isPublished: true,
+      })
+      .returning();
 
     console.log(`✅ Created course: ${course.title}`);
 
     // Create modules
-    const [module1] = await db.insert(modules).values({
-      courseId: course.id,
-      title: 'Module 1: Foundations',
-      orderIndex: 1,
-    }).returning();
+    const [module1] = await db
+      .insert(modules)
+      .values({
+        courseId: course.id,
+        title: 'Module 1: Foundations',
+        orderIndex: 1,
+      })
+      .returning();
 
     // Create media asset
     await db.insert(mediaAssets).values({
@@ -2588,22 +2779,31 @@ import { db } from '../../client';
 import { users } from '../../schema';
 import { faker } from '@faker-js/faker';
 
-export async function createUser(overrides?: Partial<typeof users.$inferInsert>) {
-  const [user] = await db.insert(users).values({
-    email: faker.internet.email(),
-    displayName: faker.person.fullName(),
-    role: 'STUDENT',
-    ...overrides,
-  }).returning();
+export async function createUser(
+  overrides?: Partial<typeof users.$inferInsert>
+) {
+  const [user] = await db
+    .insert(users)
+    .values({
+      email: faker.internet.email(),
+      displayName: faker.person.fullName(),
+      role: 'STUDENT',
+      ...overrides,
+    })
+    .returning();
 
   return user;
 }
 
-export async function createInstructor(overrides?: Partial<typeof users.$inferInsert>) {
+export async function createInstructor(
+  overrides?: Partial<typeof users.$inferInsert>
+) {
   return createUser({ role: 'INSTRUCTOR', ...overrides });
 }
 
-export async function createAdmin(overrides?: Partial<typeof users.$inferInsert>) {
+export async function createAdmin(
+  overrides?: Partial<typeof users.$inferInsert>
+) {
   return createUser({ role: 'SUPER_ADMIN', ...overrides });
 }
 ```
@@ -2703,11 +2903,13 @@ psql postgres://postgres:password@localhost:5432/edusphere -c "SELECT 1"
 **Checklist:**
 
 1. Verify RLS is enabled on table:
+
    ```sql
    SELECT relname, relrowsecurity FROM pg_class WHERE relname = 'users';
    ```
 
 2. Check RLS policy exists:
+
    ```sql
    SELECT * FROM pg_policies WHERE tablename = 'users';
    ```
@@ -2739,7 +2941,7 @@ expect(payload.sub).toBeDefined();
 // Check Authorization header
 const response = await request(app)
   .post('/graphql')
-  .set('Authorization', `Bearer ${token}`)  // Must include "Bearer "
+  .set('Authorization', `Bearer ${token}`) // Must include "Bearer "
   .send({ query });
 ```
 
@@ -2758,7 +2960,9 @@ test('should upload video', async ({ page }) => {
 
 // Wait for specific network conditions
 await page.waitForLoadState('domcontentloaded');
-await page.waitForSelector('[data-testid="video-player"]', { state: 'visible' });
+await page.waitForSelector('[data-testid="video-player"]', {
+  state: 'visible',
+});
 ```
 
 #### Issue: Integration tests fail with Testcontainers startup timeout
@@ -2789,7 +2993,10 @@ const passed = check(res, {
   'status is 200': (r) => r.status === 200,
   'no errors': (r) => {
     if (r.json('errors')) {
-      console.error('GraphQL Error:', JSON.stringify(r.json('errors'), null, 2));
+      console.error(
+        'GraphQL Error:',
+        JSON.stringify(r.json('errors'), null, 2)
+      );
       return false;
     }
     return true;
@@ -2802,6 +3009,7 @@ if (!passed) {
 ```
 
 **Common causes:**
+
 - Connection pool exhaustion → Increase `DATABASE_POOL_SIZE`
 - Rate limiting → Adjust rate limit thresholds
 - Memory leaks → Profile with `NODE_OPTIONS=--max-old-space-size=4096`
@@ -2813,12 +3021,24 @@ if (!passed) {
 ```typescript
 // Ensure all RLS paths are tested
 describe('RLS: Comprehensive Coverage', () => {
-  it('should test SUPER_ADMIN cross-tenant access', async () => { /* ... */ });
-  it('should test ORG_ADMIN within tenant', async () => { /* ... */ });
-  it('should test INSTRUCTOR role', async () => { /* ... */ });
-  it('should test STUDENT role', async () => { /* ... */ });
-  it('should test RESEARCHER role', async () => { /* ... */ });
-  it('should test soft-deleted records hidden', async () => { /* ... */ });
+  it('should test SUPER_ADMIN cross-tenant access', async () => {
+    /* ... */
+  });
+  it('should test ORG_ADMIN within tenant', async () => {
+    /* ... */
+  });
+  it('should test INSTRUCTOR role', async () => {
+    /* ... */
+  });
+  it('should test STUDENT role', async () => {
+    /* ... */
+  });
+  it('should test RESEARCHER role', async () => {
+    /* ... */
+  });
+  it('should test soft-deleted records hidden', async () => {
+    /* ... */
+  });
 });
 ```
 
@@ -2895,33 +3115,39 @@ beforeEach(async () => {
 it('should CRUD course', async () => {
   const course = await create();
   const updated = await update(course.id);
-  await delete(course.id);
+  await delete course.id;
   // If update fails, delete never runs — test is flaky
 });
 
 // ✅ GOOD: Separate tests
-it('should create course', async () => { /* ... */ });
-it('should update course', async () => { /* ... */ });
-it('should delete course', async () => { /* ... */ });
+it('should create course', async () => {
+  /* ... */
+});
+it('should update course', async () => {
+  /* ... */
+});
+it('should delete course', async () => {
+  /* ... */
+});
 ```
 
 ---
 
 ## Appendix: Test File Locations Reference
 
-| Test Type | Location Pattern | Example |
-|-----------|-----------------|---------|
-| **Subgraph Unit Tests** | `apps/subgraph-*/src/**/*.spec.ts` | `apps/subgraph-core/src/resolvers/user.resolver.spec.ts` |
+| Test Type                      | Location Pattern                                 | Example                                                            |
+| ------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------ |
+| **Subgraph Unit Tests**        | `apps/subgraph-*/src/**/*.spec.ts`               | `apps/subgraph-core/src/resolvers/user.resolver.spec.ts`           |
 | **Subgraph Integration Tests** | `apps/subgraph-*/src/test/integration/*.spec.ts` | `apps/subgraph-core/src/test/integration/user.integration.spec.ts` |
-| **GraphQL API Tests** | `apps/subgraph-*/src/test/graphql/*.spec.ts` | `apps/subgraph-core/src/test/graphql/user.graphql.spec.ts` |
-| **RLS Validation Tests** | `packages/db/src/rls/*.test.ts` | `packages/db/src/rls/tenant-isolation.test.ts` |
-| **Federation Tests** | `apps/gateway/src/test/federation/*.spec.ts` | `apps/gateway/src/test/federation/entity-resolution.spec.ts` |
-| **Frontend Unit Tests** | `apps/web/src/**/*.test.{ts,tsx}` | `apps/web/src/components/CourseCard.test.tsx` |
-| **E2E Tests** | `apps/web/e2e/*.spec.ts` | `apps/web/e2e/auth.spec.ts` |
-| **Load Tests** | `scripts/load-tests/*.js` | `scripts/load-tests/stress.js` |
-| **Test Helpers** | `**/test/helpers/*.ts` | `apps/subgraph-core/src/test/helpers/auth.helper.ts` |
-| **Test Fixtures** | `**/test/fixtures/*.ts` | `apps/web/e2e/fixtures/auth.fixture.ts` |
-| **Test Factories** | `packages/db/src/test/factories/*.ts` | `packages/db/src/test/factories/user.factory.ts` |
+| **GraphQL API Tests**          | `apps/subgraph-*/src/test/graphql/*.spec.ts`     | `apps/subgraph-core/src/test/graphql/user.graphql.spec.ts`         |
+| **RLS Validation Tests**       | `packages/db/src/rls/*.test.ts`                  | `packages/db/src/rls/tenant-isolation.test.ts`                     |
+| **Federation Tests**           | `apps/gateway/src/test/federation/*.spec.ts`     | `apps/gateway/src/test/federation/entity-resolution.spec.ts`       |
+| **Frontend Unit Tests**        | `apps/web/src/**/*.test.{ts,tsx}`                | `apps/web/src/components/CourseCard.test.tsx`                      |
+| **E2E Tests**                  | `apps/web/e2e/*.spec.ts`                         | `apps/web/e2e/auth.spec.ts`                                        |
+| **Load Tests**                 | `scripts/load-tests/*.js`                        | `scripts/load-tests/stress.js`                                     |
+| **Test Helpers**               | `**/test/helpers/*.ts`                           | `apps/subgraph-core/src/test/helpers/auth.helper.ts`               |
+| **Test Fixtures**              | `**/test/fixtures/*.ts`                          | `apps/web/e2e/fixtures/auth.fixture.ts`                            |
+| **Test Factories**             | `packages/db/src/test/factories/*.ts`            | `packages/db/src/test/factories/user.factory.ts`                   |
 
 ---
 
@@ -2930,6 +3156,7 @@ it('should delete course', async () => { /* ... */ });
 **Maintained By:** EduSphere Development Team
 
 For questions or clarifications, refer to:
+
 - `CLAUDE.md` — AI assistant configuration
 - `IMPLEMENTATION_ROADMAP.md` — Phase-by-phase testing acceptance criteria
 - `API_CONTRACTS_GRAPHQL_FEDERATION.md` — GraphQL schema contracts

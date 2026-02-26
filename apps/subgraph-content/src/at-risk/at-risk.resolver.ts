@@ -37,7 +37,7 @@ export class AtRiskResolver {
   @Query('atRiskLearners')
   async getAtRiskLearners(
     @Args('courseId') courseId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireInstructor(ctx);
     return this.atRiskService.getAtRiskLearners(courseId, tenantCtx);
@@ -46,7 +46,7 @@ export class AtRiskResolver {
   @Mutation('resolveAtRiskFlag')
   async resolveAtRiskFlag(
     @Args('flagId') flagId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireInstructor(ctx);
     return this.atRiskService.dismissFlag(flagId, tenantCtx);

@@ -7,13 +7,20 @@ interface Props {
   disabled?: boolean;
 }
 
-export function MultipleChoiceQuestion({ item, value, onChange, disabled }: Props) {
+export function MultipleChoiceQuestion({
+  item,
+  value,
+  onChange,
+  disabled,
+}: Props) {
   const isMulti = item.correctOptionIds.length > 1;
 
   const toggle = (id: string) => {
     if (disabled) return;
     if (isMulti) {
-      onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
+      onChange(
+        value.includes(id) ? value.filter((v) => v !== id) : [...value, id]
+      );
     } else {
       onChange([id]);
     }
@@ -32,9 +39,11 @@ export function MultipleChoiceQuestion({ item, value, onChange, disabled }: Prop
             onClick={() => toggle(opt.id)}
             aria-pressed={selected}
             className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors
-              ${selected
-                ? 'border-primary bg-primary/10 font-medium'
-                : 'border-border hover:border-primary/50 hover:bg-muted/40'}
+              ${
+                selected
+                  ? 'border-primary bg-primary/10 font-medium'
+                  : 'border-border hover:border-primary/50 hover:bg-muted/40'
+              }
               ${disabled ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
           >
             <span className="flex items-center gap-3">

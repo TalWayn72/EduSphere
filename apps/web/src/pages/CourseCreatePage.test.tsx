@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser } from '@/lib/auth';
 
@@ -27,12 +33,20 @@ vi.mock('@/components/ui/select', () => ({
   Select: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select">{children}</div>
   ),
-  SelectTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectValue: () => <span>Beginner</span>,
-  SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-    <div data-value={value}>{children}</div>
+  SelectTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   ),
+  SelectValue: () => <span>Beginner</span>,
+  SelectContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  SelectItem: ({
+    children,
+    value,
+  }: {
+    children: React.ReactNode;
+    value: string;
+  }) => <div data-value={value}>{children}</div>,
 }));
 
 // Stub Media step — requires Hocuspocus/Yjs which can't run in jsdom
@@ -45,12 +59,17 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 // Mock urql so useMutation doesn't throw "No client" in tests.
 // We spread the real module so `gql` and other named exports remain available.
-const mockExecuteMutation = vi.fn().mockResolvedValue({ data: null, error: null });
+const mockExecuteMutation = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: null });
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
     ...actual,
-    useMutation: () => [{ fetching: false, data: null, error: null }, mockExecuteMutation],
+    useMutation: () => [
+      { fetching: false, data: null, error: null },
+      mockExecuteMutation,
+    ],
     useQuery: () => [{ fetching: false, data: null, error: null }, vi.fn()],
     Provider: ({ children }: { children: React.ReactNode }) => children,
   };
@@ -121,12 +140,16 @@ describe('CourseCreatePage', () => {
 
   it('renders the page heading "Create New Course"', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /create new course/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /create new course/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Step 1 (Course Info) card heading initially', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /course info/i, level: 2 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /course info/i, level: 2 })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/course title/i)).toBeInTheDocument();
   });
 
@@ -179,7 +202,9 @@ describe('CourseCreatePage', () => {
     fireEvent.change(titleInput, { target: { value: 'AB' } });
     fireEvent.blur(titleInput);
     await waitFor(() => {
-      expect(screen.getByText(/title must be at least 3 characters/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/title must be at least 3 characters/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -188,7 +213,9 @@ describe('CourseCreatePage', () => {
   it('entering a title and clicking Next advances to Step 2 (Modules card heading)', async () => {
     renderPage();
     await advanceToStep2('Introduction to Talmud Study');
-    expect(screen.getByRole('heading', { name: /^modules$/i, level: 2 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /^modules$/i, level: 2 })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/module title/i)).toBeInTheDocument();
   });
 
@@ -225,7 +252,9 @@ describe('CourseCreatePage', () => {
     await advanceToStep2();
 
     const moduleTitleInput = screen.getByLabelText(/module title/i);
-    fireEvent.change(moduleTitleInput, { target: { value: 'Tractate Berakhot' } });
+    fireEvent.change(moduleTitleInput, {
+      target: { value: 'Tractate Berakhot' },
+    });
     fireEvent.keyDown(moduleTitleInput, { key: 'Enter' });
 
     expect(screen.getByText('Tractate Berakhot')).toBeInTheDocument();
@@ -259,8 +288,12 @@ describe('CourseCreatePage', () => {
     renderPage();
     await advanceToStep3('GraphQL Mastery Course');
     expect(screen.getByText('GraphQL Mastery Course')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /publish course/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /save as draft/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /publish course/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /save as draft/i })
+    ).toBeInTheDocument();
   });
 
   it('"Back to Media" button on Step 3 returns to Media step', async () => {
@@ -293,7 +326,9 @@ describe('CourseCreatePage', () => {
 
   it('clicking "Publish Course" calls executeMutation with isPublished=true', async () => {
     mockExecuteMutation.mockResolvedValue({
-      data: { createCourse: { id: 'course-1', title: 'GraphQL Mastery Course' } },
+      data: {
+        createCourse: { id: 'course-1', title: 'GraphQL Mastery Course' },
+      },
       error: null,
     });
     renderPage();
@@ -312,7 +347,9 @@ describe('CourseCreatePage', () => {
 
   it('clicking "Save as Draft" calls executeMutation with isPublished=false', async () => {
     mockExecuteMutation.mockResolvedValue({
-      data: { createCourse: { id: 'course-2', title: 'Draft Course Enough Chars' } },
+      data: {
+        createCourse: { id: 'course-2', title: 'Draft Course Enough Chars' },
+      },
       error: null,
     });
     renderPage();
@@ -346,13 +383,17 @@ describe('CourseCreatePage', () => {
   it('Step 3 review shows "Review and publish" description', async () => {
     renderPage();
     await advanceToStep3();
-    expect(screen.getByText(/review your course before publishing/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/review your course before publishing/i)
+    ).toBeInTheDocument();
   });
 
   it('difficulty options are displayed in Step 1', () => {
     renderPage();
     expect(screen.getAllByText('Beginner').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Intermediate').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Intermediate').length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getAllByText('Advanced').length).toBeGreaterThanOrEqual(1);
   });
 });

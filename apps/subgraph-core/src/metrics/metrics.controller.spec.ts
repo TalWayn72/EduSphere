@@ -14,9 +14,7 @@ describe('MetricsController', () => {
 
     const module = await Test.createTestingModule({
       controllers: [MetricsController],
-      providers: [
-        { provide: 'METRICS_REGISTRY', useValue: mockRegistry },
-      ],
+      providers: [{ provide: 'METRICS_REGISTRY', useValue: mockRegistry }],
     }).compile();
 
     controller = module.get<MetricsController>(MetricsController);
@@ -26,7 +24,10 @@ describe('MetricsController', () => {
     it('sets Content-Type header to registry contentType', async () => {
       const mockRes = { set: vi.fn(), end: vi.fn() } as any;
       await controller.getMetrics(mockRes);
-      expect(mockRes.set).toHaveBeenCalledWith('Content-Type', mockRegistry.contentType);
+      expect(mockRes.set).toHaveBeenCalledWith(
+        'Content-Type',
+        mockRegistry.contentType
+      );
     });
 
     it('calls registry.metrics() to retrieve prometheus data', async () => {
@@ -46,7 +47,9 @@ describe('MetricsController', () => {
     it('propagates errors from registry.metrics()', async () => {
       mockRegistry.metrics.mockRejectedValue(new Error('Registry error'));
       const mockRes = { set: vi.fn(), end: vi.fn() } as any;
-      await expect(controller.getMetrics(mockRes)).rejects.toThrow('Registry error');
+      await expect(controller.getMetrics(mockRes)).rejects.toThrow(
+        'Registry error'
+      );
     });
   });
 });

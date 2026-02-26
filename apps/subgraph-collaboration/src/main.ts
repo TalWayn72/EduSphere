@@ -20,7 +20,10 @@ async function bootstrap() {
   await app.listen(port);
 
   const logger = app.get(Logger);
-  logger.log('Collaboration subgraph running on http://localhost:' + port + '/graphql', 'Bootstrap');
+  logger.log(
+    'Collaboration subgraph running on http://localhost:' + port + '/graphql',
+    'Bootstrap'
+  );
   logger.log('GraphQL Playground available', 'Bootstrap');
 }
 

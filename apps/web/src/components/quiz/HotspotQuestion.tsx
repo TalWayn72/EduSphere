@@ -10,13 +10,17 @@ interface Props {
 export function HotspotQuestion({ item, value, onChange, disabled }: Props) {
   const toggle = (id: string) => {
     if (disabled) return;
-    onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
+    onChange(
+      value.includes(id) ? value.filter((v) => v !== id) : [...value, id]
+    );
   };
 
   return (
     <div className="space-y-3">
       <p className="font-medium text-sm">{item.question}</p>
-      <p className="text-xs text-muted-foreground">Click on the correct area(s) in the image</p>
+      <p className="text-xs text-muted-foreground">
+        Click on the correct area(s) in the image
+      </p>
       <div className="relative inline-block w-full max-w-2xl">
         <img
           src={item.imageUrl}
@@ -39,7 +43,9 @@ export function HotspotQuestion({ item, value, onChange, disabled }: Props) {
                   cy={hs.y}
                   r={hs.radius}
                   className={`cursor-pointer transition-colors ${disabled ? 'cursor-default' : ''}`}
-                  fill={selected ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.3)'}
+                  fill={
+                    selected ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.3)'
+                  }
                   stroke={selected ? '#3b82f6' : '#6b7280'}
                   strokeWidth="0.8"
                   onClick={() => toggle(hs.id)}

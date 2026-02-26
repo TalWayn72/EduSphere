@@ -77,14 +77,19 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const mockTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const streamingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mockTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const streamingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (mockTimeoutRef.current) clearTimeout(mockTimeoutRef.current);
-      if (streamingTimeoutRef.current) clearTimeout(streamingTimeoutRef.current);
+      if (streamingTimeoutRef.current)
+        clearTimeout(streamingTimeoutRef.current);
     };
   }, []);
 
@@ -109,7 +114,11 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
   // Subscribe to streaming agent responses when a session is active.
   // useSubscription<Data, Result, Variables>: Variables is the 3rd param.
   // Pass only Data here; use `satisfies` on variables for compile-time safety.
-  const [streamResult] = useSubscription<MessageStreamSubscription, MessageStreamSubscription, MessageStreamSubscriptionVariables>({
+  const [streamResult] = useSubscription<
+    MessageStreamSubscription,
+    MessageStreamSubscription,
+    MessageStreamSubscriptionVariables
+  >({
     query: MESSAGE_STREAM_SUBSCRIPTION,
     variables: { sessionId: sessionId ?? '' },
     pause: !sessionId,
@@ -133,7 +142,10 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
         };
         return updated;
       }
-      return [...prev, { id: msg.id, role: incomingRole, content: msg.content }];
+      return [
+        ...prev,
+        { id: msg.id, role: incomingRole, content: msg.content },
+      ];
     });
 
     if (incomingRole === 'agent') {
@@ -186,7 +198,8 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
         // TODO: TemplateType.Chavruta does not exist in the schema — use
         // TemplateType.ChavrutaDebate when the agent subgraph is updated.
         const res = await startSession({
-          templateType: 'CHAVRUTA' as import('@edusphere/graphql-types').TemplateType,
+          templateType:
+            'CHAVRUTA' as import('@edusphere/graphql-types').TemplateType,
           context: { contentId },
         });
         sid = res.data?.startAgentSession?.id ?? null;
@@ -194,7 +207,10 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
       }
 
       if (sid) {
-        const res = await sendAgentMessage({ sessionId: sid, content: trimmed });
+        const res = await sendAgentMessage({
+          sessionId: sid,
+          content: trimmed,
+        });
         const reply = res.data?.sendMessage;
         if (reply) {
           setConfirmedMessages((prev) => {
@@ -213,7 +229,10 @@ export function useAgentChat(contentId: string): UseAgentChatReturn {
           return;
         }
         // Streaming response will arrive via subscription
-        streamingTimeoutRef.current = setTimeout(() => setIsStreaming(false), 30_000);
+        streamingTimeoutRef.current = setTimeout(
+          () => setIsStreaming(false),
+          30_000
+        );
         return;
       }
 

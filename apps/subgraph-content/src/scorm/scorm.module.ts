@@ -7,7 +7,12 @@ import { ScormController } from './scorm.controller';
 
 @Module({
   controllers: [ScormController],
-  providers: [ScormResolver, ScormImportService, ScormSessionService, ScormExportService],
+  providers: [
+    ScormResolver,
+    ScormImportService,
+    ScormSessionService,
+    ScormExportService,
+  ],
   exports: [ScormSessionService, ScormExportService],
 })
 export class ScormModule {}

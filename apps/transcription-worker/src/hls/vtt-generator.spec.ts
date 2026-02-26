@@ -47,7 +47,7 @@ describe('generateWebVTT', () => {
       { start: 0, end: 2.5, text: 'Hello world' },
     ]);
     expect(result).toBe(
-      'WEBVTT\n\n1\n00:00:00.000 --> 00:00:02.500\nHello world\n',
+      'WEBVTT\n\n1\n00:00:00.000 --> 00:00:02.500\nHello world\n'
     );
   });
 
@@ -67,9 +67,7 @@ describe('generateWebVTT', () => {
   });
 
   it('trims leading/trailing whitespace from cue text', () => {
-    const result = generateWebVTT([
-      { start: 0, end: 1, text: '  trimmed  ' },
-    ]);
+    const result = generateWebVTT([{ start: 0, end: 1, text: '  trimmed  ' }]);
     expect(result).toContain('\ntrimmed\n');
   });
 

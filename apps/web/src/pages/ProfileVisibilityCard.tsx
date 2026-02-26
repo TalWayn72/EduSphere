@@ -23,10 +23,15 @@ interface VisibilityResult {
   updateProfileVisibility: UserPreferences;
 }
 
-export function ProfileVisibilityCard({ userId, preferences }: ProfileVisibilityCardProps) {
+export function ProfileVisibilityCard({
+  userId,
+  preferences,
+}: ProfileVisibilityCardProps) {
   const isPublic = preferences?.isPublicProfile ?? false;
   const [copied, setCopied] = React.useState(false);
-  const [, executeMutation] = useMutation<VisibilityResult>(UPDATE_PROFILE_VISIBILITY_MUTATION);
+  const [, executeMutation] = useMutation<VisibilityResult>(
+    UPDATE_PROFILE_VISIBILITY_MUTATION
+  );
 
   const toggle = React.useCallback(async () => {
     await executeMutation({ isPublic: !isPublic });
@@ -86,8 +91,17 @@ export function ProfileVisibilityCard({ userId, preferences }: ProfileVisibility
               View public profile
             </Link>
           </Button>
-          <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={copyLink}>
-            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs gap-1"
+            onClick={copyLink}
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
             {copied ? 'Copied!' : 'Copy link'}
           </Button>
         </div>

@@ -9,11 +9,13 @@
 ## 📊 סיכום מצב
 
 ### ✅ מה יושם (Phases 13-15)
+
 - ✅ Production Monitoring (Prometheus, Grafana, Loki, AlertManager)
 - ✅ AI/ML Pipeline (RAG, LangGraph, Hybrid Search)
 - ✅ Mobile App Polish (Notifications, Biometrics, Camera, Downloads)
 
 ### ❌ מה חסר (Phases 1-6)
+
 - ❌ Data Layer (16 tables, RLS, Apache AGE, pgvector)
 - ❌ Authentication (Keycloak, JWT, multi-tenant)
 - ❌ Content Management (courses, media, transcripts)
@@ -29,9 +31,11 @@
 ### Sprint 1: Foundation + Content (7 ימים) - CRITICAL ⚡
 
 #### Milestone 1.1: Data Layer (2 ימים)
+
 **מטרה:** מסד נתונים מלא עם RLS + Apache AGE + pgvector
 
 **משימות:**
+
 1. ✅ **Create 16 PostgreSQL tables** (docs/database/DATABASE_SCHEMA.md)
    - Users, Tenants, Courses, Modules, Lessons
    - MediaAssets, Transcripts, TranscriptSegments
@@ -62,6 +66,7 @@
    - Sample knowledge graph
 
 **Acceptance Criteria:**
+
 - `psql` shows all 16 tables created
 - `SELECT * FROM ag_graph` shows ontology
 - RLS test: Tenant A can't read Tenant B data
@@ -70,9 +75,11 @@
 ---
 
 #### Milestone 1.2: Authentication (1 יום)
+
 **מטרה:** Keycloak SSO + JWT validation
 
 **משימות:**
+
 1. ✅ **Setup Keycloak realm**
    - Create `edusphere` realm
    - Configure OIDC client
@@ -88,6 +95,7 @@
    - Propagate `x-tenant-id` header from gateway
 
 **Acceptance Criteria:**
+
 - Login at `http://localhost:8080/realms/edusphere`
 - JWT contains `tenant_id`, `role`, `scopes`
 - Gateway propagates `x-tenant-id` header
@@ -96,10 +104,13 @@
 ---
 
 #### Milestone 1.3: Subgraph-Core (1 יום)
+
 **מטרה:** User & Tenant CRUD
 
 **משימות:**
+
 1. ✅ **GraphQL schema**
+
    ```graphql
    type User @key(fields: "id") {
      id: ID!
@@ -117,8 +128,18 @@
      users: [User!]!
    }
 
-   enum Role { SUPER_ADMIN ORG_ADMIN INSTRUCTOR STUDENT }
-   enum Plan { FREE STARTER PROFESSIONAL ENTERPRISE }
+   enum Role {
+     SUPER_ADMIN
+     ORG_ADMIN
+     INSTRUCTOR
+     STUDENT
+   }
+   enum Plan {
+     FREE
+     STARTER
+     PROFESSIONAL
+     ENTERPRISE
+   }
 
    type Query {
      me: User!
@@ -144,6 +165,7 @@
    - JWT: Invalid token rejected
 
 **Acceptance Criteria:**
+
 - Query `{ me { id email role } }` works
 - RLS prevents cross-tenant queries
 - Role enforcement works
@@ -151,10 +173,13 @@
 ---
 
 #### Milestone 1.4: Subgraph-Content (3 ימים)
+
 **מטרה:** Course CRUD + Media Upload + Transcription
 
 **משימות:**
+
 1. ✅ **GraphQL schema**
+
    ```graphql
    type Course @key(fields: "id") {
      id: ID!
@@ -209,7 +234,12 @@
      embedding: [Float!]
    }
 
-   enum TranscriptStatus { QUEUED PROCESSING COMPLETED FAILED }
+   enum TranscriptStatus {
+     QUEUED
+     PROCESSING
+     COMPLETED
+     FAILED
+   }
 
    type Query {
      course(id: ID!): Course
@@ -221,7 +251,10 @@
      createCourse(input: CreateCourseInput!): Course!
      updateCourse(id: ID!, input: UpdateCourseInput!): Course!
      publishCourse(id: ID!): Course!
-     createPresignedUploadUrl(filename: String!, mimeType: String!): PresignedUrl!
+     createPresignedUploadUrl(
+       filename: String!
+       mimeType: String!
+     ): PresignedUrl!
      triggerTranscription(assetId: ID!): Transcript!
    }
    ```
@@ -244,6 +277,7 @@
    - Hybrid search (semantic + keyword)
 
 **Acceptance Criteria:**
+
 - Create course: `mutation { createCourse(...) { id } }`
 - Upload video: Get presigned URL, upload succeeds
 - Auto-transcription: Segment created within 2 min
@@ -254,10 +288,13 @@
 ### Sprint 2: Annotation + Knowledge Graph (7 ימים)
 
 #### Milestone 2.1: Subgraph-Annotation (3 ימים)
+
 **מטרה:** 4-layer annotation system
 
 **משימות:**
+
 1. ✅ **GraphQL schema**
+
    ```graphql
    type Annotation @key(fields: "id") {
      id: ID!
@@ -274,8 +311,19 @@
      isResolved: Boolean
    }
 
-   enum AnnotationLayer { PERSONAL SHARED INSTRUCTOR AI_GENERATED }
-   enum AnnotationType { TEXT SKETCH LINK BOOKMARK SPATIAL_COMMENT }
+   enum AnnotationLayer {
+     PERSONAL
+     SHARED
+     INSTRUCTOR
+     AI_GENERATED
+   }
+   enum AnnotationType {
+     TEXT
+     SKETCH
+     LINK
+     BOOKMARK
+     SPATIAL_COMMENT
+   }
 
    type Query {
      annotations(
@@ -312,6 +360,7 @@
    - NATS PubSub for event distribution
 
 **Acceptance Criteria:**
+
 - PERSONAL annotation visible only to creator
 - SHARED annotation visible to all in tenant
 - Reply creates nested thread
@@ -320,10 +369,13 @@
 ---
 
 #### Milestone 2.2: Subgraph-Knowledge (4 ימים)
+
 **מטרה:** Knowledge graph with Apache AGE
 
 **משימות:**
+
 1. ✅ **GraphQL schema**
+
    ```graphql
    type Concept @key(fields: "id") {
      id: ID!
@@ -375,7 +427,11 @@
 
    type Mutation {
      createConcept(input: CreateConceptInput!): Concept!
-     createRelation(fromId: ID!, toId: ID!, type: RelationType!): ConceptRelation!
+     createRelation(
+       fromId: ID!
+       toId: ID!
+       type: RelationType!
+     ): ConceptRelation!
      deleteRelation(fromId: ID!, toId: ID!, type: RelationType!): Boolean!
    }
    ```
@@ -395,6 +451,7 @@
    - Review workflow for instructors
 
 **Acceptance Criteria:**
+
 - Create concept: `mutation { createConcept(...) { id } }`
 - Traverse graph: `{ concept(id:"...") { relatedConcepts(maxDepth:3) } }`
 - Find contradictions: `{ concept { contradictions { description } } }`
@@ -405,15 +462,18 @@
 ### Sprint 3: Collaboration + Frontend (10 ימים)
 
 #### Milestone 3.1: Subgraph-Collaboration (3 ימים)
+
 **מטרה:** Real-time CRDT collaboration
 
 **משימות:**
+
 1. ✅ **Yjs + Hocuspocus setup**
    - Deploy Hocuspocus WebSocket server
    - Store CRDT updates in `crdt_updates` table
    - Compaction job (monthly)
 
 2. ✅ **GraphQL schema**
+
    ```graphql
    type CollaborationSession {
      id: ID!
@@ -443,6 +503,7 @@
    - Yjs awareness protocol
 
 **Acceptance Criteria:**
+
 - Join session: `mutation { joinCollaboration(documentId:"...") { wsUrl } }`
 - Connect to WebSocket with JWT
 - See live cursor positions
@@ -451,9 +512,11 @@
 ---
 
 #### Milestone 3.2: Frontend - Course UI (3 ימים)
+
 **מטרה:** Web app לצפייה בקורסים
 
 **משימות:**
+
 1. ✅ **Setup React SPA** (apps/web)
    - Vite 6 + React 19
    - TanStack Query + Zustand
@@ -472,6 +535,7 @@
    - Fullscreen mode
 
 **Acceptance Criteria:**
+
 - Browse courses
 - Watch video with HLS
 - Resume playback
@@ -479,9 +543,11 @@
 ---
 
 #### Milestone 3.3: Frontend - Annotations (2 ימים)
+
 **מטרה:** Annotation canvas on video
 
 **משימות:**
+
 1. ✅ **Konva.js canvas**
    - Drawing tools (pen, highlighter, shapes)
    - Touch/mouse gestures
@@ -494,6 +560,7 @@
    - Real-time updates (WebSocket)
 
 **Acceptance Criteria:**
+
 - Draw on video frame
 - Create text annotation
 - See annotations from other students
@@ -502,9 +569,11 @@
 ---
 
 #### Milestone 3.4: Frontend - Search + AI Chat (2 ימים)
+
 **מטרה:** Search UI + AI chat interface
 
 **משימות:**
+
 1. ✅ **Global search**
    - Search bar with autocomplete
    - Results: courses, transcripts, annotations
@@ -517,6 +586,7 @@
    - Message history
 
 **Acceptance Criteria:**
+
 - Search returns relevant results
 - Chat with AI agent works
 - Streaming responses render
@@ -526,16 +596,19 @@
 ## 📋 סיכום משימות לפי סדר ביצוע
 
 ### Week 1: Foundation (Sprint 1)
+
 **ימים 1-2:** Data Layer + Apache AGE + pgvector
 **יום 3:** Authentication (Keycloak + JWT)
 **יום 4:** Subgraph-Core (Users + Tenants)
 **ימים 5-7:** Subgraph-Content (Courses + Media + Transcription)
 
 ### Week 2: Core Features (Sprint 2)
+
 **ימים 8-10:** Subgraph-Annotation (4 layers + threads)
 **ימים 11-14:** Subgraph-Knowledge (Apache AGE graph)
 
 ### Week 3: User Experience (Sprint 3)
+
 **ימים 15-17:** Subgraph-Collaboration (CRDT + Yjs)
 **ימים 18-20:** Frontend - Course UI + Video Player
 **ימים 21-22:** Frontend - Annotations UI
@@ -546,6 +619,7 @@
 ## 🎯 Success Criteria (End of 3 Sprints)
 
 ### Functional Requirements
+
 - ✅ Instructor can create course with video lessons
 - ✅ Auto-transcription works (faster-whisper)
 - ✅ Student can watch video and create annotations
@@ -556,6 +630,7 @@
 - ✅ Collaboration session works with live cursors
 
 ### Technical Requirements
+
 - ✅ All 6 subgraphs operational (Core, Content, Annotation, Collaboration, Agent, Knowledge)
 - ✅ Gateway composes supergraph successfully
 - ✅ RLS prevents cross-tenant data access
@@ -565,6 +640,7 @@
 - ✅ JWT authentication enforced
 
 ### User Stories Completed
+
 - ✅ CM-01, CM-02, CM-03, CM-05 (Content Management)
 - ✅ AN-01, AN-02, AN-03, AN-04, AN-06 (Annotations)
 - ✅ KG-01, KG-02, KG-03, KG-04 (Knowledge Graph)
@@ -577,6 +653,7 @@
 ## 🚨 Critical Path Items
 
 ### Must Have (Blockers)
+
 1. **Database Schema** - כל השאר תלוי בזה
 2. **Authentication** - אבטחה בסיסית
 3. **Subgraph-Content** - אין תוכן = אין פלטפורמה
@@ -584,11 +661,13 @@
 5. **Frontend** - אין UI = אין מוצר
 
 ### Should Have (Important)
+
 6. **Subgraph-Knowledge** - ה-differentiator המרכזי
 7. **Subgraph-Collaboration** - real-time experience
 8. **Transcription Worker** - automation is key
 
 ### Nice to Have (Post-MVP)
+
 9. Course forking (CM-04)
 10. Graph export (KG-06)
 11. Session history (CO-03)
@@ -597,18 +676,19 @@
 
 ## 📊 Effort Estimation
 
-| Sprint | Days | Complexity | Risk Level |
-|--------|------|------------|------------|
-| **Sprint 1** (Foundation + Content) | 7 | High (DB + Auth + Transcription) | Medium |
-| **Sprint 2** (Annotation + Graph) | 7 | Medium (Known patterns) | Low |
-| **Sprint 3** (Collab + Frontend) | 10 | Medium-High (CRDT + UI) | Medium |
-| **Total** | **24 days** | **~4 weeks** | **Can deliver MVP** |
+| Sprint                              | Days        | Complexity                       | Risk Level          |
+| ----------------------------------- | ----------- | -------------------------------- | ------------------- |
+| **Sprint 1** (Foundation + Content) | 7           | High (DB + Auth + Transcription) | Medium              |
+| **Sprint 2** (Annotation + Graph)   | 7           | Medium (Known patterns)          | Low                 |
+| **Sprint 3** (Collab + Frontend)    | 10          | Medium-High (CRDT + UI)          | Medium              |
+| **Total**                           | **24 days** | **~4 weeks**                     | **Can deliver MVP** |
 
 ---
 
 ## 🎬 Next Steps
 
 ### Immediate Actions (התחל מחר!)
+
 1. **Day 1 Morning:** Create all 16 database tables (docs/database/DATABASE_SCHEMA.md)
 2. **Day 1 Afternoon:** Initialize Apache AGE graph + pgvector
 3. **Day 2 Morning:** Seed demo data (2 tenants, 10 users, 5 courses)
@@ -617,6 +697,7 @@
 6. **Days 4-7:** Build Subgraph-Content + transcription
 
 ### Success Metrics
+
 - **Day 7:** Can create course and upload video
 - **Day 14:** Can annotate videos and see knowledge graph
 - **Day 24:** Full web app with all features working

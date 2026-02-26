@@ -13,6 +13,11 @@ import { PublicProfileService } from './public-profile.service';
     UserPreferencesService,
     PublicProfileService,
   ],
-  exports: [UserService, UserStatsService, UserPreferencesService, PublicProfileService],
+  exports: [
+    UserService,
+    UserStatsService,
+    UserPreferencesService,
+    PublicProfileService,
+  ],
 })
 export class UserModule {}

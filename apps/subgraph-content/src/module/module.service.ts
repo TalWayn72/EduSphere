@@ -1,5 +1,17 @@
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, asc, inArray, closeAllPools } from '@edusphere/db';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  asc,
+  inArray,
+  closeAllPools,
+} from '@edusphere/db';
 
 type DbModule = typeof schema.modules.$inferSelect;
 
@@ -76,8 +88,10 @@ export class ModuleService implements OnModuleDestroy {
   async update(id: string, input: ModuleInput) {
     const updateData: Record<string, unknown> = { updated_at: new Date() };
     if (input.title !== undefined) updateData['title'] = input.title;
-    if (input.description !== undefined) updateData['description'] = input.description;
-    if (input.orderIndex !== undefined) updateData['order_index'] = input.orderIndex;
+    if (input.description !== undefined)
+      updateData['description'] = input.description;
+    if (input.orderIndex !== undefined)
+      updateData['order_index'] = input.orderIndex;
 
     const [row] = await this.db
       .update(schema.modules)
@@ -101,7 +115,9 @@ export class ModuleService implements OnModuleDestroy {
   }
 
   async reorder(courseId: string, moduleIds: string[]) {
-    this.logger.debug(`Reordering ${moduleIds.length} modules in course: ${courseId}`);
+    this.logger.debug(
+      `Reordering ${moduleIds.length} modules in course: ${courseId}`
+    );
     const updates = moduleIds.map((id, index) =>
       this.db
         .update(schema.modules)

@@ -11,6 +11,7 @@
 **Status:** ✅ Done — Ready for Deployment
 
 ### Key Highlights
+
 - **Phases 1-17** complete — GraphQL Federation, NestJS subgraphs, React frontend, Expo mobile, AI agents, knowledge graph
 - **Phase 7** Production Hardening — Helm chart, k6 load tests, Kubernetes deployment
 - **Phase 8** Mobile — Expo SDK 54 offline-first app
@@ -20,22 +21,24 @@
 - **Apache AGE** graph ontology initialized + **pgvector** HNSW indexes ready
 
 ### Infrastructure (Docker All-in-One)
-| Service | Status | Port |
-|---------|--------|------|
-| Hive Gateway | ✅ Running | 4000 |
-| subgraph-core | ✅ Running | 4001 |
-| subgraph-content | ✅ Running | 4002 |
-| subgraph-annotation | ✅ Running | 4003 |
-| subgraph-collaboration | ✅ Running | 4004 |
-| subgraph-agent | ✅ Running | 4005 |
-| subgraph-knowledge | ✅ Running | 4006 |
+
+| Service                        | Status     | Port |
+| ------------------------------ | ---------- | ---- |
+| Hive Gateway                   | ✅ Running | 4000 |
+| subgraph-core                  | ✅ Running | 4001 |
+| subgraph-content               | ✅ Running | 4002 |
+| subgraph-annotation            | ✅ Running | 4003 |
+| subgraph-collaboration         | ✅ Running | 4004 |
+| subgraph-agent                 | ✅ Running | 4005 |
+| subgraph-knowledge             | ✅ Running | 4006 |
 | PostgreSQL 17 + AGE + pgvector | ✅ Running | 5432 |
-| Redis | ✅ Running | 6379 |
-| NATS JetStream | ✅ Running | 4222 |
-| MinIO | ✅ Running | 9000 |
-| Keycloak 26.5.3 | ✅ Running | 8080 |
+| Redis                          | ✅ Running | 6379 |
+| NATS JetStream                 | ✅ Running | 4222 |
+| MinIO                          | ✅ Running | 9000 |
+| Keycloak 26.5.3                | ✅ Running | 8080 |
 
 ### Current Blockers
+
 - None — system is fully operational
 - `@edusphere/langgraph-workflows` has TypeScript type errors (LangGraph API breaking changes in v0.2.74) — does not block runtime, scheduled fix in next sprint
 
@@ -44,17 +47,20 @@
 ## 2. Phase Breakdown
 
 ### Phase 0: Foundation Setup (Q1 2026)
+
 **Status:** Not Started
 **Planned Duration:** 2-3 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Initialize Next.js 14+ project with App Router
 - Configure PostgreSQL database with Drizzle ORM
 - Implement Hive Gateway for authentication
 - Set up development environment and tooling
 
 **Acceptance Criteria:**
+
 - [ ] Next.js project initialized with TypeScript
 - [ ] PostgreSQL database running locally and in staging
 - [ ] Drizzle ORM configured with migration system
@@ -65,17 +71,20 @@
 ---
 
 ### Phase 1: Core Authentication & User Management (Q1 2026)
+
 **Status:** Not Started
 **Planned Duration:** 3-4 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Implement role-based access control (RBAC)
 - Build user profile management
 - Create organization/institution structure
 - Develop admin dashboard foundation
 
 **Acceptance Criteria:**
+
 - [ ] Multi-role authentication (Admin, Teacher, Student, Parent)
 - [ ] User registration and profile management
 - [ ] Organization hierarchy implemented
@@ -86,17 +95,20 @@
 ---
 
 ### Phase 2: Academic Structure (Q1-Q2 2026)
+
 **Status:** Not Started
 **Planned Duration:** 4-5 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Build course and class management
 - Implement curriculum framework
 - Create subject and grade structure
 - Develop academic calendar system
 
 **Acceptance Criteria:**
+
 - [ ] Course creation and management
 - [ ] Class/section assignment
 - [ ] Teacher-course associations
@@ -107,17 +119,20 @@
 ---
 
 ### Phase 3: Teaching & Learning Tools (Q2 2026)
+
 **Status:** Not Started
 **Planned Duration:** 5-6 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Build lesson planning tools
 - Implement assignment system
 - Create resource library
 - Develop content management
 
 **Acceptance Criteria:**
+
 - [ ] Lesson plan creator and templates
 - [ ] Assignment creation and distribution
 - [ ] File upload and storage (Cloudflare R2)
@@ -128,17 +143,20 @@
 ---
 
 ### Phase 4: Assessment & Grading (Q2-Q3 2026)
+
 **Status:** Not Started
 **Planned Duration:** 5-6 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Create comprehensive grading system
 - Build quiz and test builders
 - Implement automated grading
 - Develop gradebook interface
 
 **Acceptance Criteria:**
+
 - [ ] Multiple assessment types (quizzes, tests, essays)
 - [ ] Rubric-based grading
 - [ ] Automated grading for objective questions
@@ -149,17 +167,20 @@
 ---
 
 ### Phase 5: Communication & Collaboration (Q3 2026)
+
 **Status:** Not Started
 **Planned Duration:** 4-5 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Implement messaging system
 - Build announcement platform
 - Create discussion forums
 - Develop notification system
 
 **Acceptance Criteria:**
+
 - [ ] Real-time messaging (teachers-students-parents)
 - [ ] Announcement broadcasting
 - [ ] Discussion boards per class/course
@@ -170,17 +191,20 @@
 ---
 
 ### Phase 6: Analytics & Reporting (Q3-Q4 2026)
+
 **Status:** Not Started
 **Planned Duration:** 4-5 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Build comprehensive analytics dashboard
 - Create report generation system
 - Implement data visualization
 - Develop performance insights
 
 **Acceptance Criteria:**
+
 - [ ] Student performance analytics
 - [ ] Teacher effectiveness metrics
 - [ ] Course completion statistics
@@ -191,11 +215,13 @@
 ---
 
 ### Phase 7: Advanced Features & Polish (Q4 2026)
+
 **Status:** Not Started
 **Planned Duration:** 6-8 weeks
 **Completion:** 0%
 
 **Objectives:**
+
 - Implement attendance tracking
 - Build scheduling system
 - Add advanced integrations
@@ -203,6 +229,7 @@
 - Security hardening
 
 **Acceptance Criteria:**
+
 - [ ] Attendance management system
 - [ ] Timetable and schedule builder
 - [ ] Third-party LTI integrations
@@ -216,6 +243,7 @@
 ## 3. Completed Milestones
 
 ### Documentation Phase (Completed: 2026-02-17)
+
 - [x] **CLAUDE.md** - AI assistant onboarding and project overview
 - [x] **README.md** - Project introduction and setup guide
 - [x] **OPEN_ISSUES.md** - Known issues and technical debt tracking
@@ -227,6 +255,7 @@
 - [x] **GUIDELINES.md** - Development guidelines and conventions
 
 ### Planning Artifacts Completed
+
 - [x] Technology stack finalized
 - [x] Database schema designed (40+ tables)
 - [x] Security framework established
@@ -239,14 +268,17 @@
 ## 4. In Progress
 
 ### Current Sprint: Documentation & Planning
+
 **Focus:** Finalizing project artifacts before development kickoff
 
 **Active Work Items:**
+
 1. **PROJECT_STATUS.md** - This document (In Progress)
 2. **Environment Setup Preparation** - Gathering dependencies and tools
 3. **Repository Structure Planning** - Organizing codebase layout
 
 **Next Immediate Steps:**
+
 1. Complete PROJECT_STATUS.md
 2. Initialize Git repository
 3. Set up initial project structure
@@ -259,11 +291,13 @@
 ### Next 3 Phases Preview
 
 #### Phase 0: Foundation Setup (Starts: Q1 2026)
+
 **Duration:** 2-3 weeks
 **Priority:** Critical
 **Dependencies:** None
 
 **Key Deliverables:**
+
 - Next.js 14+ application scaffold
 - PostgreSQL database infrastructure
 - Drizzle ORM configuration
@@ -271,22 +305,26 @@
 - CI/CD pipeline basics
 
 #### Phase 1: Core Authentication & User Management (Starts: Q1 2026)
+
 **Duration:** 3-4 weeks
 **Priority:** Critical
 **Dependencies:** Phase 0 complete
 
 **Key Deliverables:**
+
 - RBAC system (Admin, Teacher, Student, Parent)
 - User profile management
 - Organization structure
 - Admin dashboard foundation
 
 #### Phase 2: Academic Structure (Starts: Q1-Q2 2026)
+
 **Duration:** 4-5 weeks
 **Priority:** High
 **Dependencies:** Phase 1 complete
 
 **Key Deliverables:**
+
 - Course and class management
 - Curriculum framework
 - Academic calendar
@@ -297,6 +335,7 @@
 ## 6. Statistics
 
 ### Documentation Metrics
+
 - **Total Documentation Files:** 10+ comprehensive documents
 - **Lines of Documentation:** ~5,000+ lines
 - **Database Tables Designed:** 40+ tables
@@ -304,6 +343,7 @@
 - **User Roles Defined:** 4 primary roles + 10+ granular permissions
 
 ### Code Metrics (Planned Targets)
+
 - **Test Coverage Target:** 80%+ overall
   - Unit Tests: 85%+
   - Integration Tests: 75%+
@@ -315,6 +355,7 @@
 - **Accessibility:** WCAG 2.1 AA compliance
 
 ### Infrastructure (Planned)
+
 - **Deployment Targets:** 3 environments (Dev, Staging, Production)
 - **Database Instances:** PostgreSQL (primary + read replicas)
 - **CDN:** Cloudflare for static assets and R2 for file storage
@@ -325,6 +366,7 @@
 ## 7. Team & Resources
 
 ### Key Personnel
+
 - **Project Lead:** TBD
 - **Backend Development:** TBD
 - **Frontend Development:** TBD
@@ -336,16 +378,19 @@
 ### Infrastructure Status
 
 #### Development Environment
+
 - **Status:** Ready to Configure
 - **Requirements:** Node.js 18+, PostgreSQL 14+, pnpm
 - **IDE:** VS Code with recommended extensions
 
 #### Staging Environment
+
 - **Status:** Not Configured
 - **Target Platform:** Vercel or similar
 - **Database:** PostgreSQL (managed service)
 
 #### Production Environment
+
 - **Status:** Not Configured
 - **Target Platform:** Vercel or similar
 - **Database:** PostgreSQL with replication
@@ -359,6 +404,7 @@
 ### High Priority Risks
 
 #### Risk 1: Authentication Integration Complexity
+
 - **Category:** Technical
 - **Probability:** Medium
 - **Impact:** High
@@ -369,6 +415,7 @@
   - Detailed authentication flow documentation
 
 #### Risk 2: Database Performance at Scale
+
 - **Category:** Technical
 - **Probability:** Medium
 - **Impact:** High
@@ -381,6 +428,7 @@
   - Materialized views for reporting
 
 #### Risk 3: Multi-Tenant Data Isolation
+
 - **Category:** Security
 - **Probability:** Low
 - **Impact:** Critical
@@ -394,6 +442,7 @@
 ### Medium Priority Risks
 
 #### Risk 4: File Storage Costs
+
 - **Category:** Operational
 - **Probability:** Medium
 - **Impact:** Medium
@@ -405,6 +454,7 @@
   - Archive strategy for old content
 
 #### Risk 5: Real-Time Feature Scalability
+
 - **Category:** Technical
 - **Probability:** Medium
 - **Impact:** Medium
@@ -418,6 +468,7 @@
 ### Low Priority Risks
 
 #### Risk 6: Third-Party Integration Dependencies
+
 - **Category:** Technical
 - **Probability:** Low
 - **Impact:** Medium
@@ -434,6 +485,7 @@
 ### Major Architectural Decisions
 
 #### Decision 1: PostgreSQL Maximalism
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need for reliable, ACID-compliant data storage with complex relationships
@@ -447,6 +499,7 @@
 - **Alternatives Considered:** MongoDB (rejected: lack of ACID), MySQL (rejected: weaker JSON support)
 
 #### Decision 2: Hive Gateway for Authentication
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need secure, scalable authentication for multiple user roles
@@ -459,6 +512,7 @@
 - **Alternatives Considered:** Auth.js/NextAuth (fallback option), Clerk (cost concerns)
 
 #### Decision 3: Drizzle ORM
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need type-safe database layer with excellent DX
@@ -472,6 +526,7 @@
 - **Alternatives Considered:** Prisma (rejected: performance overhead), raw SQL (rejected: lack of type safety)
 
 #### Decision 4: Next.js 14+ with App Router
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need modern, performant full-stack framework
@@ -485,6 +540,7 @@
 - **Alternatives Considered:** Remix (less mature), SvelteKit (smaller ecosystem)
 
 #### Decision 5: Cloudflare R2 for File Storage
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need cost-effective, scalable object storage
@@ -497,6 +553,7 @@
 - **Alternatives Considered:** AWS S3 (higher egress costs), Azure Blob Storage (lock-in concerns)
 
 #### Decision 6: Monorepo Structure
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need to manage multiple packages and shared code
@@ -509,6 +566,7 @@
 - **Alternatives Considered:** Multi-repo (rejected: code duplication and sync issues)
 
 #### Decision 7: PostgreSQL Row-Level Security for Multi-Tenancy
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need secure data isolation between organizations
@@ -521,6 +579,7 @@
 - **Alternatives Considered:** Application-level filtering (rejected: security risk)
 
 #### Decision 8: Zod for Validation
+
 - **Date:** 2026-02-17
 - **Status:** Approved
 - **Context:** Need runtime validation for API inputs and forms
@@ -589,6 +648,7 @@
 ## Project Health Indicators
 
 ### Green Flags
+
 - Comprehensive documentation complete
 - Clear technical architecture
 - Well-defined phases and milestones
@@ -596,11 +656,13 @@
 - Security-first approach
 
 ### Yellow Flags
+
 - Team not yet fully staffed
 - No code written yet (planning phase)
 - Hive Gateway integration unproven
 
 ### Red Flags
+
 - None identified at this time
 
 ---
@@ -608,6 +670,7 @@
 ## Appendix
 
 ### Key Documents Reference
+
 - **Technical Overview:** `docs/CLAUDE.md`
 - **Product Requirements:** `docs/PRODUCT_REQUIREMENTS.md`
 - **System Architecture:** `docs/ARCHITECTURE.md`
@@ -617,6 +680,7 @@
 - **Development Guidelines:** `docs/GUIDELINES.md`
 
 ### Contact & Communication
+
 - **Project Repository:** TBD
 - **Issue Tracker:** TBD
 - **Documentation Wiki:** TBD

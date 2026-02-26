@@ -37,7 +37,10 @@ function loadRecent(): string[] {
 
 function persistRecent(term: string) {
   const list = loadRecent().filter((s) => s !== term);
-  localStorage.setItem(RECENT_KEY, JSON.stringify([term, ...list].slice(0, MAX_RECENT)));
+  localStorage.setItem(
+    RECENT_KEY,
+    JSON.stringify([term, ...list].slice(0, MAX_RECENT))
+  );
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -211,8 +214,12 @@ export function SearchPage() {
   const [inputValue, setInputValue] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
   const [isSearching, setIsSearching] = useState(false);
-  const [activeTypeFilter, setActiveTypeFilter] = useState<ResultType | null>(null);
-  const [recentSearches, setRecentSearches] = useState<string[]>(() => loadRecent());
+  const [activeTypeFilter, setActiveTypeFilter] = useState<ResultType | null>(
+    null
+  );
+  const [recentSearches, setRecentSearches] = useState<string[]>(() =>
+    loadRecent()
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
@@ -303,13 +310,12 @@ export function SearchPage() {
     : results;
 
   // Group by type
-  const grouped = filteredResults.reduce<Partial<Record<ResultType, SearchResult[]>>>(
-    (acc, r) => {
-      (acc[r.type] ??= []).push(r);
-      return acc;
-    },
-    {}
-  );
+  const grouped = filteredResults.reduce<
+    Partial<Record<ResultType, SearchResult[]>>
+  >((acc, r) => {
+    (acc[r.type] ??= []).push(r);
+    return acc;
+  }, {});
 
   const typeOrder: ResultType[] = [
     'course',
@@ -395,7 +401,9 @@ export function SearchPage() {
               return (
                 <button
                   key={type}
-                  onClick={() => setActiveTypeFilter(activeTypeFilter === type ? null : type)}
+                  onClick={() =>
+                    setActiveTypeFilter(activeTypeFilter === type ? null : type)
+                  }
                   className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs border transition-colors ${
                     activeTypeFilter === type
                       ? `${config.bg} ${config.color} border-current font-semibold`

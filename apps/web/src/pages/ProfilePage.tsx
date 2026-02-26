@@ -2,7 +2,16 @@ import React from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, User, Mail, Shield, Key, BookOpen, Brain, MessageSquare } from 'lucide-react';
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Shield,
+  Key,
+  BookOpen,
+  Brain,
+  MessageSquare,
+} from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -52,7 +61,11 @@ interface CoursesQueryResult {
   courses: { id: string }[];
 }
 
-function getInitials(firstName: string, lastName: string, fallback: string): string {
+function getInitials(
+  firstName: string,
+  lastName: string,
+  fallback: string
+): string {
   const first = firstName?.[0] ?? '';
   const last = lastName?.[0] ?? '';
   return (first + last).toUpperCase() || (fallback[0] ?? 'U').toUpperCase();
@@ -88,9 +101,17 @@ export function ProfilePage() {
   const coursesCount = coursesResult.data?.courses?.length ?? '—';
 
   const stats = [
-    { icon: BookOpen, label: t('profile.stats.coursesAvailable'), value: coursesResult.fetching ? '...' : String(coursesCount) },
+    {
+      icon: BookOpen,
+      label: t('profile.stats.coursesAvailable'),
+      value: coursesResult.fetching ? '...' : String(coursesCount),
+    },
     { icon: Brain, label: t('profile.stats.conceptsMastered'), value: '—' },
-    { icon: MessageSquare, label: t('profile.stats.annotationsCreated'), value: '—' },
+    {
+      icon: MessageSquare,
+      label: t('profile.stats.annotationsCreated'),
+      value: '—',
+    },
   ];
 
   return (
@@ -116,9 +137,13 @@ export function ProfilePage() {
                 <h2 className="text-xl font-semibold">
                   {firstName} {lastName}
                 </h2>
-                <p className="text-sm text-muted-foreground">@{localUser.username}</p>
+                <p className="text-sm text-muted-foreground">
+                  @{localUser.username}
+                </p>
               </div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColor}`}>
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColor}`}
+              >
                 {roleLabel}
               </span>
             </div>
@@ -133,23 +158,33 @@ export function ProfilePage() {
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
               <User className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">{t('profile.fields.username')}</span>
+              <span className="text-muted-foreground w-24">
+                {t('profile.fields.username')}
+              </span>
               <span className="font-medium">{localUser.username}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">{t('profile.fields.email')}</span>
+              <span className="text-muted-foreground w-24">
+                {t('profile.fields.email')}
+              </span>
               <span className="font-medium">{email}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Shield className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">{t('profile.fields.role')}</span>
+              <span className="text-muted-foreground w-24">
+                {t('profile.fields.role')}
+              </span>
               <span className="font-medium">{roleLabel}</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Key className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground w-24">{t('profile.fields.tenantId')}</span>
-              <span className="font-mono text-xs text-muted-foreground truncate">{tenantId}</span>
+              <span className="text-muted-foreground w-24">
+                {t('profile.fields.tenantId')}
+              </span>
+              <span className="font-mono text-xs text-muted-foreground truncate">
+                {tenantId}
+              </span>
             </div>
           </div>
         </Card>

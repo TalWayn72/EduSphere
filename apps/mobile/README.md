@@ -84,11 +84,13 @@ pnpm web
 The app includes comprehensive offline functionality:
 
 ### Query Caching
+
 - All GraphQL queries are automatically cached in SQLite
 - Cached data is returned when offline
 - Cache is automatically refreshed when online
 
 ### Offline Mutations
+
 - Mutations are queued when offline
 - Automatically synced when connection is restored
 - Failed mutations are marked and can be retried
@@ -162,7 +164,7 @@ const MESSAGE_SUB = gql`
 
 function ChatScreen() {
   const { data } = useSubscription(MESSAGE_SUB, {
-    variables: { sessionId: '123' }
+    variables: { sessionId: '123' },
   });
 
   // Handle new messages...
@@ -195,7 +197,7 @@ Update API URLs in [App.tsx:12-18](App.tsx#L12-L18):
 
 ```typescript
 const GATEWAY_URL = __DEV__
-  ? 'http://10.0.2.2:4000/graphql'  // Android emulator
+  ? 'http://10.0.2.2:4000/graphql' // Android emulator
   : 'https://api.edusphere.com/graphql';
 
 const WS_URL = __DEV__
@@ -208,6 +210,7 @@ For iOS simulator, use `http://localhost:4000/graphql`.
 ## Database Management
 
 The app automatically:
+
 - Creates tables on first launch
 - Caches queries for 7 days (configurable)
 - Cleans up old cache entries
@@ -246,16 +249,19 @@ The app shares ~70% of its code with the web client:
 ## Troubleshooting
 
 ### Metro bundler issues
+
 ```bash
 expo start -c  # Clear cache
 ```
 
 ### iOS build errors
+
 ```bash
 cd ios && pod install
 ```
 
 ### Android emulator connection
+
 - Use `10.0.2.2` instead of `localhost`
 - Enable port forwarding: `adb reverse tcp:4000 tcp:4000`
 

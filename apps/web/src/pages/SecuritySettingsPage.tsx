@@ -8,7 +8,10 @@ import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { useAuthRole } from '@/hooks/useAuthRole';
-import { SECURITY_SETTINGS_QUERY, UPDATE_SECURITY_SETTINGS_MUTATION } from '@/lib/graphql/security.queries';
+import {
+  SECURITY_SETTINGS_QUERY,
+  UPDATE_SECURITY_SETTINGS_MUTATION,
+} from '@/lib/graphql/security.queries';
 import {
   MfaSection,
   SessionSection,
@@ -46,9 +49,15 @@ function toFormValues(data: SecurityData): SecurityFormValues {
 }
 
 const DEFAULTS: SecurityFormValues = {
-  mfaRequired: false, mfaRequiredForAdmins: true, sessionTimeoutMinutes: 480,
-  maxConcurrentSessions: 5, loginAttemptLockoutThreshold: 5, passwordMinLength: 8,
-  passwordRequireSpecialChars: false, passwordExpiryDays: '0', ipAllowlist: '',
+  mfaRequired: false,
+  mfaRequiredForAdmins: true,
+  sessionTimeoutMinutes: 480,
+  maxConcurrentSessions: 5,
+  loginAttemptLockoutThreshold: 5,
+  passwordMinLength: 8,
+  passwordRequireSpecialChars: false,
+  passwordExpiryDays: '0',
+  ipAllowlist: '',
 };
 
 export function SecuritySettingsPage() {
@@ -58,7 +67,9 @@ export function SecuritySettingsPage() {
   const [saved, setSaved] = useState(false);
 
   const [{ data, fetching }] = useQuery({ query: SECURITY_SETTINGS_QUERY });
-  const [{ fetching: saving }, execUpdate] = useMutation(UPDATE_SECURITY_SETTINGS_MUTATION);
+  const [{ fetching: saving }, execUpdate] = useMutation(
+    UPDATE_SECURITY_SETTINGS_MUTATION
+  );
 
   useEffect(() => {
     if (data?.mySecuritySettings) {
@@ -66,11 +77,17 @@ export function SecuritySettingsPage() {
     }
   }, [data]);
 
-  if (!role || !ADMIN_ROLES.has(role)) { void navigate('/dashboard'); return null; }
+  if (!role || !ADMIN_ROLES.has(role)) {
+    void navigate('/dashboard');
+    return null;
+  }
 
   const handleSave = async () => {
     const expiryRaw = Number(form.passwordExpiryDays);
-    const ipList = form.ipAllowlist.split('\n').map(s => s.trim()).filter(Boolean);
+    const ipList = form.ipAllowlist
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
     await execUpdate({
       input: {
         mfaRequired: form.mfaRequired,
@@ -91,7 +108,10 @@ export function SecuritySettingsPage() {
   const props = { values: form, onChange: setForm };
 
   return (
-    <AdminLayout title="Security Settings" description="Configure authentication and access policies">
+    <AdminLayout
+      title="Security Settings"
+      description="Configure authentication and access policies"
+    >
       {fetching ? (
         <p className="text-sm text-muted-foreground">Loading settings...</p>
       ) : (
@@ -105,9 +125,13 @@ export function SecuritySettingsPage() {
             <Button onClick={handleSave} disabled={saving}>
               {saving ? 'Saving...' : 'Save Settings'}
             </Button>
-            {saved && <span className="text-sm text-green-600">Settings saved.</span>}
+            {saved && (
+              <span className="text-sm text-green-600">Settings saved.</span>
+            )}
           </div>
-          <p className="text-xs text-muted-foreground">Settings will take effect for new sessions.</p>
+          <p className="text-xs text-muted-foreground">
+            Settings will take effect for new sessions.
+          </p>
         </div>
       )}
     </AdminLayout>

@@ -1,4 +1,12 @@
-import { pgTable, uuid, text, boolean, timestamp, decimal, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  boolean,
+  timestamp,
+  decimal,
+  index,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 // Table 1: Credit type definitions (e.g., "NASBA CPE", "AMA PRA Category 1")
@@ -7,7 +15,12 @@ export const cpdCreditTypes = pgTable('cpd_credit_types', {
   tenantId: uuid('tenant_id').notNull(),
   name: text('name').notNull(),
   regulatoryBody: text('regulatory_body').notNull(),
-  creditHoursPerHour: decimal('credit_hours_per_hour', { precision: 4, scale: 2 }).notNull().default('1.00'),
+  creditHoursPerHour: decimal('credit_hours_per_hour', {
+    precision: 4,
+    scale: 2,
+  })
+    .notNull()
+    .default('1.00'),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
@@ -24,20 +37,24 @@ export const courseCpdCredits = pgTable('course_cpd_credits', {
 });
 
 // Table 3: User CPD log - one record per completion
-export const userCpdLog = pgTable('user_cpd_log', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull(),
-  tenantId: uuid('tenant_id').notNull(),
-  courseId: uuid('course_id').notNull(),
-  creditTypeId: uuid('credit_type_id').notNull(),
-  earnedHours: decimal('earned_hours', { precision: 6, scale: 2 }).notNull(),
-  completionDate: timestamp('completion_date').notNull(),
-  certificateId: uuid('certificate_id'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-}, (t) => ({
-  userIdx: index('user_cpd_log_user_idx').on(t.userId),
-  tenantIdx: index('user_cpd_log_tenant_idx').on(t.tenantId),
-}));
+export const userCpdLog = pgTable(
+  'user_cpd_log',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull(),
+    tenantId: uuid('tenant_id').notNull(),
+    courseId: uuid('course_id').notNull(),
+    creditTypeId: uuid('credit_type_id').notNull(),
+    earnedHours: decimal('earned_hours', { precision: 6, scale: 2 }).notNull(),
+    completionDate: timestamp('completion_date').notNull(),
+    certificateId: uuid('certificate_id'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => ({
+    userIdx: index('user_cpd_log_user_idx').on(t.userId),
+    tenantIdx: index('user_cpd_log_tenant_idx').on(t.tenantId),
+  })
+);
 
 // RLS: users see own records, admins see all tenant records
 export const cpdRLS = sql`

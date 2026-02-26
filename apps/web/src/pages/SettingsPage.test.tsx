@@ -67,7 +67,7 @@ const renderPage = () =>
   render(
     <MemoryRouter>
       <SettingsPage />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -83,7 +83,9 @@ describe('SettingsPage', () => {
 
   it('renders the page heading "Settings"', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /settings/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /settings/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the layout wrapper', () => {
@@ -99,7 +101,9 @@ describe('SettingsPage', () => {
   it('passes the current locale to LanguageSelector as value', () => {
     mockLocale = 'fr';
     renderPage();
-    const selector = screen.getByTestId('language-selector') as HTMLSelectElement;
+    const selector = screen.getByTestId(
+      'language-selector'
+    ) as HTMLSelectElement;
     expect(selector.value).toBe('fr');
   });
 
@@ -137,7 +141,7 @@ describe('SettingsPage', () => {
       target: { value: 'es' },
     });
     await waitFor(() =>
-      expect(mockToastSuccess).toHaveBeenCalledWith('Language preference saved'),
+      expect(mockToastSuccess).toHaveBeenCalledWith('Language preference saved')
     );
   });
 
@@ -149,8 +153,8 @@ describe('SettingsPage', () => {
     });
     await waitFor(() =>
       expect(mockToastError).toHaveBeenCalledWith(
-        'Failed to save language preference. Please try again.',
-      ),
+        'Failed to save language preference. Please try again.'
+      )
     );
   });
 

@@ -33,7 +33,7 @@ function renderAITutorLive(sessionId: string, mocks: MockedResponse[] = []) {
   return render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <AITutorLive sessionId={sessionId} />
-    </MockedProvider>,
+    </MockedProvider>
   );
 }
 

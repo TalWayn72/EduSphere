@@ -39,7 +39,10 @@ const EN_RESOURCES: Record<string, TranslationRecord> = {
 };
 
 /** Resolve a dot-notation key path inside a translation object. */
-function resolvePath(obj: TranslationRecord, keyPath: string): string | undefined {
+function resolvePath(
+  obj: TranslationRecord,
+  keyPath: string
+): string | undefined {
   const parts = keyPath.split('.');
   let current: unknown = obj;
   for (const part of parts) {
@@ -65,7 +68,7 @@ function interpolate(template: string, vars?: Record<string, unknown>): string {
 function resolveWithPlurals(
   dict: TranslationRecord,
   keyPath: string,
-  count: number | undefined,
+  count: number | undefined
 ): string | undefined {
   if (count !== undefined) {
     // Try plural-specific key first: _one for count=1, _other otherwise
@@ -92,7 +95,8 @@ function makeTFunction(ns: string | string[]) {
   return (key: string, options?: Record<string, unknown>): string => {
     let resolveKey = key;
     let resolveNs = namespaces;
-    const count = typeof options?.count === 'number' ? options.count : undefined;
+    const count =
+      typeof options?.count === 'number' ? options.count : undefined;
 
     // Support "namespace:key" prefix syntax
     if (key.includes(':')) {

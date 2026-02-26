@@ -5,6 +5,7 @@ Complete observability stack for EduSphere with metrics, logs, alerts, and dashb
 ## Overview
 
 The monitoring stack provides:
+
 - ✅ **Prometheus**: Time-series metrics collection
 - ✅ **Grafana**: Visualization dashboards
 - ✅ **Loki**: Log aggregation and querying
@@ -49,12 +50,12 @@ docker-compose -f docker-compose.monitoring.yml logs -f
 
 ### 2. Access Dashboards
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| **Grafana** | http://localhost:3001 | admin / admin |
-| **Prometheus** | http://localhost:9090 | - |
-| **AlertManager** | http://localhost:9093 | - |
-| **cAdvisor** | http://localhost:8081 | - |
+| Service          | URL                   | Credentials   |
+| ---------------- | --------------------- | ------------- |
+| **Grafana**      | http://localhost:3001 | admin / admin |
+| **Prometheus**   | http://localhost:9090 | -             |
+| **AlertManager** | http://localhost:9093 | -             |
+| **cAdvisor**     | http://localhost:8081 | -             |
 
 ### 3. Configure Alerts
 
@@ -105,25 +106,30 @@ metrics.recordCacheOperation('get', 'hit');
 ### Available Metrics
 
 #### HTTP Metrics
+
 - `edusphere_http_request_duration_seconds` - Request latency histogram
 - `edusphere_http_requests_total` - Total request count
 - `edusphere_active_connections` - Active connections gauge
 
 #### Database Metrics
+
 - `edusphere_db_query_duration_seconds` - Query latency histogram
 - `edusphere_db_pool_active_connections` - Active connections
 - `edusphere_db_pool_max_connections` - Max connections
 
 #### GraphQL Metrics
+
 - `edusphere_graphql_operations_total` - Operations count
 - `edusphere_graphql_query_complexity` - Query complexity
 - `edusphere_graphql_errors_total` - Error count
 
 #### Cache Metrics
+
 - `edusphere_cache_operations_total` - Cache operations
 - `edusphere_cache_hit_rate` - Cache hit rate percentage
 
 #### System Metrics (Default)
+
 - `process_cpu_seconds_total` - CPU usage
 - `process_resident_memory_bytes` - Memory usage
 - `nodejs_eventloop_lag_seconds` - Event loop lag
@@ -160,6 +166,7 @@ app.use(health.createHealthEndpoint());
 ### Endpoints
 
 #### GET /health/live
+
 Liveness probe - returns 200 if service is alive.
 
 ```json
@@ -170,6 +177,7 @@ Liveness probe - returns 200 if service is alive.
 ```
 
 #### GET /health/ready
+
 Readiness probe - checks all dependencies.
 
 ```json
@@ -204,6 +212,7 @@ Readiness probe - checks all dependencies.
 ```
 
 #### GET /health
+
 Full health report (same as `/health/ready`).
 
 ### Kubernetes Integration
@@ -236,16 +245,19 @@ spec:
 ### Critical Alerts
 
 **ServiceDown**
+
 - Trigger: Service unavailable for 1+ minute
 - Notification: PagerDuty + Slack
 - Action: Immediate investigation required
 
 **HighErrorRate**
+
 - Trigger: 5xx error rate > 5% for 5+ minutes
 - Notification: PagerDuty + Slack
 - Action: Check logs, investigate root cause
 
 **DatabasePoolExhaustion**
+
 - Trigger: Connection pool > 90% for 5+ minutes
 - Notification: Slack
 - Action: Scale database connections or investigate queries
@@ -253,16 +265,19 @@ spec:
 ### Warning Alerts
 
 **HighResponseTime**
+
 - Trigger: p95 latency > 2s for 10+ minutes
 - Notification: Slack
 - Action: Investigate slow queries/endpoints
 
 **HighMemoryUsage**
+
 - Trigger: Memory > 1.5GB for 5+ minutes
 - Notification: Slack
 - Action: Check for memory leaks
 
 **DiskSpaceLow**
+
 - Trigger: Disk space < 10% remaining
 - Notification: Slack + Email
 - Action: Clean up logs or scale storage
@@ -270,6 +285,7 @@ spec:
 ### Info Alerts
 
 **LowCacheHitRate**
+
 - Trigger: Cache hit rate < 50% for 15+ minutes
 - Notification: Slack
 - Action: Review caching strategy
@@ -279,6 +295,7 @@ spec:
 ### EduSphere Overview Dashboard
 
 **Panels:**
+
 1. HTTP Request Rate (by service)
 2. Error Rate (by service)
 3. Response Time p95 (by service)
@@ -289,6 +306,7 @@ spec:
 8. CPU Usage (by service)
 
 **Filters:**
+
 - Time range (last 5m, 15m, 1h, 6h, 24h, 7d)
 - Service selector
 - Tenant ID filter
@@ -296,6 +314,7 @@ spec:
 ### Database Dashboard
 
 **Panels:**
+
 1. Query Duration Heatmap
 2. Connection Pool Usage
 3. Slow Query Log
@@ -306,6 +325,7 @@ spec:
 ### GraphQL Dashboard
 
 **Panels:**
+
 1. Operations by Type (Query/Mutation/Subscription)
 2. Operation Duration by Name
 3. Query Complexity Distribution
@@ -318,26 +338,31 @@ spec:
 ### Query Examples
 
 **View all logs from gateway:**
+
 ```logql
 {service="gateway"}
 ```
 
 **Find errors in last 5 minutes:**
+
 ```logql
 {level="error"} |= "error" | json
 ```
 
 **Search for specific tenant:**
+
 ```logql
 {service="subgraph-core"} | json | tenant_id="550e8400-e29b-41d4-a716-446655440000"
 ```
 
 **Count errors by service:**
+
 ```logql
 sum(rate({level="error"}[5m])) by (service)
 ```
 
 **GraphQL operation logs:**
+
 ```logql
 {service=~"subgraph-.*"} | json | operation_type=~"query|mutation"
 ```
@@ -370,11 +395,13 @@ logger.info({
 ### Service Health
 
 **Request rate:**
+
 ```promql
 sum(rate(edusphere_http_requests_total[5m])) by (service)
 ```
 
 **Error percentage:**
+
 ```promql
 100 * (
   sum(rate(edusphere_http_requests_total{status_code=~"5.."}[5m]))
@@ -384,6 +411,7 @@ sum(rate(edusphere_http_requests_total[5m])) by (service)
 ```
 
 **p95 latency:**
+
 ```promql
 histogram_quantile(0.95,
   sum(rate(edusphere_http_request_duration_seconds_bucket[5m])) by (le, service)
@@ -393,6 +421,7 @@ histogram_quantile(0.95,
 ### Database Health
 
 **Query duration p99:**
+
 ```promql
 histogram_quantile(0.99,
   sum(rate(edusphere_db_query_duration_seconds_bucket[5m])) by (le, operation)
@@ -400,6 +429,7 @@ histogram_quantile(0.99,
 ```
 
 **Connection pool usage:**
+
 ```promql
 edusphere_db_pool_active_connections / edusphere_db_pool_max_connections * 100
 ```
@@ -407,16 +437,19 @@ edusphere_db_pool_active_connections / edusphere_db_pool_max_connections * 100
 ### System Health
 
 **Memory usage:**
+
 ```promql
 process_resident_memory_bytes / (1024 * 1024)
 ```
 
 **CPU usage:**
+
 ```promql
 rate(process_cpu_seconds_total[5m]) * 100
 ```
 
 **Event loop lag:**
+
 ```promql
 nodejs_eventloop_lag_seconds
 ```
@@ -426,16 +459,19 @@ nodejs_eventloop_lag_seconds
 ### Prometheus not scraping targets
 
 **Check target status:**
+
 ```bash
 curl http://localhost:9090/api/v1/targets
 ```
 
 **Common issues:**
+
 - Service not exposing `/metrics` endpoint
 - Network connectivity issues
 - Wrong port in `prometheus.yml`
 
 **Solution:**
+
 ```bash
 # Verify metrics endpoint
 curl http://localhost:4001/metrics
@@ -447,11 +483,13 @@ docker logs edusphere-prometheus
 ### Grafana dashboard not showing data
 
 **Check data source:**
+
 1. Go to Configuration → Data Sources
 2. Click "Test" on Prometheus data source
 3. Verify connection is successful
 
 **Check queries:**
+
 1. Open dashboard panel
 2. Click "Edit"
 3. Verify metric name exists in Prometheus
@@ -459,16 +497,19 @@ docker logs edusphere-prometheus
 ### Alerts not firing
 
 **Check alert rules:**
+
 ```bash
 curl http://localhost:9090/api/v1/rules
 ```
 
 **Check AlertManager:**
+
 ```bash
 curl http://localhost:9093/api/v2/alerts
 ```
 
 **Verify notification channels:**
+
 - Slack webhook URL is correct
 - PagerDuty service key is valid
 - SMTP credentials are correct
@@ -478,6 +519,7 @@ curl http://localhost:9093/api/v2/alerts
 **Problem:** Too many unique label combinations.
 
 **Solution:**
+
 - Limit dynamic labels (avoid user IDs, request IDs)
 - Use aggregation (count by service, not by individual user)
 - Set label limits in Prometheus config
@@ -485,28 +527,33 @@ curl http://localhost:9093/api/v2/alerts
 ## Best Practices
 
 ### 1. Metric Naming
+
 - Use `edusphere_` prefix for all custom metrics
 - Use snake_case for metric names
 - Include unit suffix (`_seconds`, `_bytes`, `_total`)
 
 ### 2. Label Usage
+
 - Keep labels low cardinality (< 100 unique values)
 - Use labels for aggregation dimensions
 - Avoid high-cardinality labels (user_id, request_id)
 
 ### 3. Alert Design
+
 - Set appropriate thresholds based on SLOs
 - Use `for` duration to avoid flapping
 - Group related alerts
 - Include actionable annotations
 
 ### 4. Dashboard Design
+
 - Start with high-level overview
 - Drill down to service-specific views
 - Use consistent time ranges
 - Add descriptions to panels
 
 ### 5. Log Volume
+
 - Use appropriate log levels
 - Avoid logging sensitive data
 - Set retention policies
@@ -528,11 +575,13 @@ curl http://localhost:9093/api/v2/alerts
 ## Next Steps
 
 ### Phase 14: AI/ML Pipeline
+
 - RAG implementation
 - LangGraph workflows
 - Knowledge graph integration
 
 ### Phase 15: Mobile App Polish
+
 - Push notifications
 - Biometric auth
 - Offline course downloads

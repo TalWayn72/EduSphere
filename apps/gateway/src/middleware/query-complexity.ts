@@ -1,7 +1,10 @@
 import { GraphQLError, type ValidationContext, type ASTVisitor } from 'graphql';
 
 export const MAX_DEPTH = parseInt(process.env['GRAPHQL_MAX_DEPTH'] ?? '10', 10);
-export const MAX_COMPLEXITY = parseInt(process.env['GRAPHQL_MAX_COMPLEXITY'] ?? '1000', 10);
+export const MAX_COMPLEXITY = parseInt(
+  process.env['GRAPHQL_MAX_COMPLEXITY'] ?? '1000',
+  10
+);
 
 // ── Internal tree-walk helpers ────────────────────────────────────────────────
 
@@ -12,7 +15,9 @@ type SelectableNode = {
 
 function measureDepth(node: SelectableNode, depth = 0): number {
   if (!node.selectionSet) return depth;
-  const depths = node.selectionSet.selections.map((s) => measureDepth(s, depth + 1));
+  const depths = node.selectionSet.selections.map((s) =>
+    measureDepth(s, depth + 1)
+  );
   return depths.length > 0 ? Math.max(...depths) : depth;
 }
 
@@ -23,7 +28,11 @@ function measureDepth(node: SelectableNode, depth = 0): number {
  * cardinality. The `fieldName` parameter carries the name of the *current* node
  * being costed so the parent can apply the list multiplier correctly.
  */
-export function estimateComplexity(node: SelectableNode, depth = 0, fieldName = ''): number {
+export function estimateComplexity(
+  node: SelectableNode,
+  depth = 0,
+  fieldName = ''
+): number {
   if (depth > 20) return 1;
   const isList = fieldName.endsWith('s') && fieldName.length > 1;
   if (!node.selectionSet) return isList ? 10 : 1;
@@ -55,8 +64,8 @@ export function depthLimitRule(maxDepth: number = MAX_DEPTH) {
             context.reportError(
               new GraphQLError(
                 `Query depth ${depth} exceeds maximum allowed depth of ${maxDepth}`,
-                { nodes: [def] },
-              ),
+                { nodes: [def] }
+              )
             );
           }
         }
@@ -80,8 +89,8 @@ export function complexityLimitRule(maxComplexity: number = MAX_COMPLEXITY) {
             context.reportError(
               new GraphQLError(
                 `Query complexity ${complexity} exceeds maximum allowed complexity of ${maxComplexity}`,
-                { nodes: [def] },
-              ),
+                { nodes: [def] }
+              )
             );
           }
         }

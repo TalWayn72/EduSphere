@@ -27,6 +27,7 @@ EduSphere uses PgBouncer as a connection pooler between NestJS subgraphs and Pos
 ## Configuration
 
 **Files:**
+
 - `infrastructure/pgbouncer/pgbouncer.ini` — Main PgBouncer configuration
 - `infrastructure/pgbouncer/userlist.txt` — User credentials (SCRAM-SHA-256 hashes)
 - `infrastructure/docker-compose.pgbouncer.yml` — Docker override for local development
@@ -34,6 +35,7 @@ EduSphere uses PgBouncer as a connection pooler between NestJS subgraphs and Pos
 ### Pool Mode: Transaction (Required)
 
 PgBouncer is configured in **transaction pooling** mode, which is mandatory for:
+
 - PostgreSQL Row-Level Security using `SET LOCAL` (GDPR tenant isolation)
 - Drizzle ORM transaction blocks
 - `BEGIN ... SET LOCAL app.current_tenant = '...' ... COMMIT` pattern
@@ -45,15 +47,15 @@ PgBouncer is configured in **transaction pooling** mode, which is mandatory for:
 
 Each subgraph has a named pool in `pgbouncer.ini`:
 
-| Subgraph | Pool Name | Pool Size |
-|----------|-----------|-----------|
-| Core | `edusphere_core` | 25 connections |
-| Content | `edusphere_content` | 25 connections |
-| Annotation | `edusphere_annotation` | 25 connections |
-| Collaboration | `edusphere_collaboration` | 25 connections |
-| Agent | `edusphere_agent` | 35 connections (larger for LangGraph) |
-| Knowledge | `edusphere_knowledge` | 35 connections (larger for pgvector/AGE) |
-| Default | `edusphere` | 10 connections (migrations, admin) |
+| Subgraph      | Pool Name                 | Pool Size                                |
+| ------------- | ------------------------- | ---------------------------------------- |
+| Core          | `edusphere_core`          | 25 connections                           |
+| Content       | `edusphere_content`       | 25 connections                           |
+| Annotation    | `edusphere_annotation`    | 25 connections                           |
+| Collaboration | `edusphere_collaboration` | 25 connections                           |
+| Agent         | `edusphere_agent`         | 35 connections (larger for LangGraph)    |
+| Knowledge     | `edusphere_knowledge`     | 35 connections (larger for pgvector/AGE) |
+| Default       | `edusphere`               | 10 connections (migrations, admin)       |
 
 **Total server-side connections:** 170 max (PostgreSQL `max_connections` set to >=200)
 **Total client-side connections:** Up to 1,000
@@ -83,7 +85,6 @@ In Kubernetes, PgBouncer runs as a sidecar or a shared deployment:
 
 # 1. Generate hash from PostgreSQL:
 psql -c "SELECT rolpassword FROM pg_authid WHERE rolname = 'edusphere';"
-
 # 2. Or use pgbouncer's pg_shadow_show tool:
 # See infrastructure/pgbouncer/userlist.txt header comments for instructions.
 ```

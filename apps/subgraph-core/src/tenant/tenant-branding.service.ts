@@ -37,14 +37,20 @@ export const BRANDING_CACHE_MAX_SIZE = 500;
 export class TenantBrandingService implements OnModuleDestroy {
   private readonly logger = new Logger(TenantBrandingService.name);
   // Simple in-memory TTL cache — key=tenantId, value={data, expiresAt}
-  private readonly cache = new Map<string, { data: TenantBrandingData; expiresAt: number }>();
+  private readonly cache = new Map<
+    string,
+    { data: TenantBrandingData; expiresAt: number }
+  >();
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   onModuleDestroy(): void {
     this.cache.clear();
   }
 
-  private setCached(key: string, value: { data: TenantBrandingData; expiresAt: number }): void {
+  private setCached(
+    key: string,
+    value: { data: TenantBrandingData; expiresAt: number }
+  ): void {
     // LRU eviction: if at max, remove oldest (first) key before inserting new one
     if (this.cache.size >= BRANDING_CACHE_MAX_SIZE) {
       const firstKey = this.cache.keys().next().value;
@@ -84,17 +90,26 @@ export class TenantBrandingService implements OnModuleDestroy {
         }
       : { ...DEFAULT_BRANDING };
 
-    this.setCached(tenantId, { data, expiresAt: Date.now() + this.CACHE_TTL_MS });
+    this.setCached(tenantId, {
+      data,
+      expiresAt: Date.now() + this.CACHE_TTL_MS,
+    });
     return data;
   }
 
   async updateBranding(
     tenantId: string,
-    input: Partial<Omit<TenantBrandingData, 'organizationName'>> & { organizationName?: string },
+    input: Partial<Omit<TenantBrandingData, 'organizationName'>> & {
+      organizationName?: string;
+    }
   ): Promise<TenantBrandingData> {
     await db
       .insert(tenantBranding)
-      .values({ tenantId, organizationName: input.organizationName ?? 'My Organization', ...input })
+      .values({
+        tenantId,
+        organizationName: input.organizationName ?? 'My Organization',
+        ...input,
+      })
       .onConflictDoUpdate({
         target: tenantBranding.tenantId,
         set: { ...input, updatedAt: new Date() },

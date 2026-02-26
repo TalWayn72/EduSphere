@@ -1,7 +1,8 @@
 # EduSphere — Security Hardening Checklist
+
 **For:** On-premises and private-cloud deployments  
 **Standards:** GDPR Art.32, SOC 2 CC6.7, OWASP  
-**Review:** Before every production deployment  
+**Review:** Before every production deployment
 
 ---
 
@@ -179,6 +180,7 @@ step ca renew --daemon postgres.crt postgres.key
 ```
 
 Configure all services to trust the internal CA root certificate:
+
 ```bash
 # Add to system trust store
 cp /etc/step-ca/certs/root_ca.crt /usr/local/share/ca-certificates/edusphere-ca.crt

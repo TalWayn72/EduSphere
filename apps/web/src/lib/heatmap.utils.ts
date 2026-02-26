@@ -26,9 +26,10 @@ export function formatHeatmapDate(dateStr: string): string {
 /**
  * Calculate summary statistics from heatmap data.
  */
-export function calcHeatmapStats(
-  data: { date: string; count: number }[]
-): { totalStudyDays: number; totalSessions: number } {
+export function calcHeatmapStats(data: { date: string; count: number }[]): {
+  totalStudyDays: number;
+  totalSessions: number;
+} {
   return {
     totalStudyDays: data.filter((d) => d.count > 0).length,
     totalSessions: data.reduce((sum, d) => sum + d.count, 0),

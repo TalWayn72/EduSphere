@@ -62,7 +62,12 @@ describe('CompetencyGoalService', () => {
         }),
       });
 
-      const result = await service.addGoal('user-a', 'tenant-1', 'GraphQL', 'ADVANCED');
+      const result = await service.addGoal(
+        'user-a',
+        'tenant-1',
+        'GraphQL',
+        'ADVANCED'
+      );
 
       expect(result.id).toBe('goal-1');
       expect(result.targetConceptName).toBe('GraphQL');
@@ -107,9 +112,9 @@ describe('CompetencyGoalService', () => {
         }),
       });
 
-      await expect(service.removeGoal('goal-1', 'user-b', 'tenant-1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.removeGoal('goal-1', 'user-b', 'tenant-1')
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

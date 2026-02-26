@@ -24,38 +24,82 @@ vi.mock('@/components/ui/dropdown-menu', () => {
     const [open, setOpen] = React.useState(false);
     // Inject open state via context so children can read it
     return (
-      <div data-testid="dropdown-root" data-open={String(open)} onClick={() => setOpen((o: boolean) => !o)}>
+      <div
+        data-testid="dropdown-root"
+        data-open={String(open)}
+        onClick={() => setOpen((o: boolean) => !o)}
+      >
         {React.Children.map(children, (child) =>
-          React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { __open: open, __setOpen: setOpen })
+          React.cloneElement(
+            child as React.ReactElement<Record<string, unknown>>,
+            { __open: open, __setOpen: setOpen }
+          )
         )}
       </div>
     );
   }
-  function DropdownMenuTrigger({ children, _asChild, __open, __setOpen, ..._rest }: {
-    children: React.ReactNode; _asChild?: boolean;
-    __open?: boolean; __setOpen?: (v: boolean) => void;
+  function DropdownMenuTrigger({
+    children,
+    _asChild,
+    __open,
+    __setOpen,
+    ..._rest
+  }: {
+    children: React.ReactNode;
+    _asChild?: boolean;
+    __open?: boolean;
+    __setOpen?: (v: boolean) => void;
   }) {
-    const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>;
+    const child = React.Children.only(children) as React.ReactElement<
+      Record<string, unknown>
+    >;
     return React.cloneElement(child, {
-      onClick: (e: React.MouseEvent) => { e.stopPropagation(); __setOpen?.(!__open); },
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        __setOpen?.(!__open);
+      },
       'aria-expanded': __open,
       'aria-haspopup': 'menu',
     });
   }
-  function DropdownMenuContent({ children, _align, _className, __open }: {
-    children: React.ReactNode; _align?: string; _className?: string; __open?: boolean;
+  function DropdownMenuContent({
+    children,
+    _align,
+    _className,
+    __open,
+  }: {
+    children: React.ReactNode;
+    _align?: string;
+    _className?: string;
+    __open?: boolean;
   }) {
     if (!__open) return null;
-    return <div role="menu" data-testid="dropdown-content">{children}</div>;
+    return (
+      <div role="menu" data-testid="dropdown-content">
+        {children}
+      </div>
+    );
   }
-  function DropdownMenuLabel({ children, _className }: { children: React.ReactNode; _className?: string }) {
+  function DropdownMenuLabel({
+    children,
+    _className,
+  }: {
+    children: React.ReactNode;
+    _className?: string;
+  }) {
     return <div data-testid="dropdown-label">{children}</div>;
   }
   function DropdownMenuSeparator() {
     return <hr data-testid="dropdown-separator" />;
   }
-  function DropdownMenuItem({ children, onClick, className }: {
-    children: React.ReactNode; onClick?: () => void; className?: string;
+  function DropdownMenuItem({
+    children,
+    onClick,
+    className,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    className?: string;
   }) {
     return (
       <button role="menuitem" onClick={onClick} className={className}>
@@ -121,7 +165,9 @@ describe('UserMenu', () => {
 
   it('renders trigger button with aria-label "User menu"', () => {
     renderMenu();
-    expect(screen.getByRole('button', { name: /user menu/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /user menu/i })
+    ).toBeInTheDocument();
   });
 
   it('renders avatar initials for the user (TU for Test User)', () => {
@@ -180,19 +226,25 @@ describe('UserMenu', () => {
   it('dropdown contains "Profile" menu item', () => {
     renderMenu();
     openDropdown();
-    expect(screen.getByRole('menuitem', { name: /profile/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('menuitem', { name: /profile/i })
+    ).toBeInTheDocument();
   });
 
   it('dropdown contains "Settings" menu item', () => {
     renderMenu();
     openDropdown();
-    expect(screen.getByRole('menuitem', { name: /settings/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('menuitem', { name: /settings/i })
+    ).toBeInTheDocument();
   });
 
   it('dropdown contains "Log out" menu item', () => {
     renderMenu();
     openDropdown();
-    expect(screen.getByRole('menuitem', { name: /log out/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('menuitem', { name: /log out/i })
+    ).toBeInTheDocument();
   });
 
   // ── Actions ─────────────────────────────────────────────────────────────

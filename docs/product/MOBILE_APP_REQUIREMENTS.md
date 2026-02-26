@@ -3,6 +3,7 @@
 ## 1. Overview
 
 ### Technology Stack
+
 - **Framework**: Expo SDK 54
 - **React Native Version**: 0.81
 - **Target Platforms**: iOS and Android
@@ -12,11 +13,13 @@
 - **Navigation**: Expo Router (file-based routing)
 
 ### App Type
+
 Native mobile application for EduSphere learning platform, providing full-featured educational experience with offline capabilities and AI-powered learning assistance.
 
 ## 2. Target Devices
 
 ### iOS Requirements
+
 - **Minimum OS Version**: iOS 14.0
 - **Target OS Version**: iOS 18.0
 - **Supported Devices**:
@@ -28,6 +31,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 - **Orientations**: Portrait (primary), Landscape (supported on tablets)
 
 ### Android Requirements
+
 - **Minimum API Level**: API 26 (Android 8.0 Oreo)
 - **Target API Level**: API 35 (Android 15)
 - **Supported Devices**:
@@ -37,6 +41,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 - **Orientations**: Portrait (primary), Landscape (supported on tablets)
 
 ### Device Capabilities
+
 - **Minimum RAM**: 2GB (3GB recommended)
 - **Storage**: 500MB minimum free space (2GB for offline content)
 - **Network**: WiFi or cellular data (offline mode supported)
@@ -50,6 +55,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 3. Core Features
 
 ### 3.1 Authentication
+
 - **Sign In Methods**:
   - Email/Password
   - Google OAuth
@@ -69,6 +75,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Automatic logout after inactivity (configurable)
 
 ### 3.2 Course Browsing
+
 - **Course Discovery**:
   - Browse by category, subject, difficulty
   - Search with filters (instructor, rating, duration)
@@ -87,6 +94,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Gift course option
 
 ### 3.3 Video Player with Annotations
+
 - **Video Playback**:
   - HLS streaming support
   - Adaptive bitrate streaming
@@ -110,6 +118,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Export annotations to PDF/notes
 
 ### 3.4 Offline Mode
+
 - **Content Download**:
   - Download individual lessons or entire courses
   - Choose video quality for downloads
@@ -130,6 +139,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Network-aware syncing (WiFi vs cellular)
 
 ### 3.5 AI Chat Interface
+
 - **Chat Experience**:
   - Real-time message streaming
   - Markdown rendering for responses
@@ -155,6 +165,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Ask about annotations
 
 ### 3.6 Search
+
 - **Global Search**:
   - Courses, lessons, instructors
   - Notes and annotations
@@ -175,6 +186,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 4. Offline-First Architecture
 
 ### 4.1 Local Database
+
 - **Technology**: expo-sqlite with SQLite 3.x
 - **Schema**:
   - Users (profile, preferences, auth tokens)
@@ -186,6 +198,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - SyncQueue (pending operations)
 
 ### 4.2 Data Synchronization
+
 - **TanStack Query Configuration**:
   - Persistent query cache using AsyncStorage
   - Stale-while-revalidate strategy
@@ -205,6 +218,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Clear queue option for user
 
 ### 4.3 Storage Management
+
 - **Cache Strategy**:
   - API responses: 24 hours
   - Images: 7 days
@@ -224,6 +238,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 5. Push Notifications
 
 ### 5.1 FCM Integration
+
 - **Setup**:
   - Firebase Cloud Messaging (FCM) for both platforms
   - Apple Push Notification service (APNs) certificate
@@ -236,6 +251,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Option to enable in settings
 
 ### 5.2 Notification Types
+
 - **Learning Reminders**:
   - Daily study streak reminders
   - Course completion prompts
@@ -258,6 +274,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - App updates available
 
 ### 5.3 Notification Management
+
 - **User Controls**:
   - Granular notification preferences
   - Quiet hours configuration
@@ -276,6 +293,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 6. Media Handling
 
 ### 6.1 Video Playback
+
 - **Player Technology**:
   - expo-av for local playback
   - HLS (HTTP Live Streaming) support
@@ -294,6 +312,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - GPU-accelerated rendering
 
 ### 6.2 HLS Streaming
+
 - **Streaming Configuration**:
   - Automatic quality adjustment based on bandwidth
   - Support for multiple audio tracks
@@ -312,6 +331,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Show buffering indicator
 
 ### 6.3 Download for Offline
+
 - **Download Manager**:
   - Background download support
   - Pause/resume individual downloads
@@ -337,6 +357,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 7. Annotation on Mobile
 
 ### 7.1 Touch Gestures
+
 - **Drawing Gestures**:
   - Single finger: Draw/write
   - Two fingers: Pan canvas
@@ -350,6 +371,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Gesture conflicts resolution (drawing vs player controls)
 
 ### 7.2 Drawing Tools
+
 - **Tool Types**:
   - Pen (freehand drawing)
   - Highlighter (semi-transparent)
@@ -370,6 +392,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Share annotations
 
 ### 7.3 Voice Notes
+
 - **Recording**:
   - One-tap record at current timestamp
   - Visual waveform during recording
@@ -393,6 +416,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Local storage in SQLite database
 
 ### 7.4 Annotation Organization
+
 - **Timeline View**:
   - Chronological list of all annotations
   - Filter by type (text, drawing, voice)
@@ -411,6 +435,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 8. AI Chat Interface
 
 ### 8.1 Token Streaming
+
 - **Streaming Implementation**:
   - Server-Sent Events (SSE) for token streaming
   - WebSocket fallback for poor connections
@@ -429,6 +454,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Background thread for token processing
 
 ### 8.2 Message History
+
 - **Storage**:
   - Local SQLite database for all messages
   - Sync to cloud for cross-device access
@@ -447,6 +473,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Show context window indicator
 
 ### 8.3 Agent Selection
+
 - **Agent Discovery**:
   - Browse available learning agents
   - Filter by subject, expertise, capabilities
@@ -464,6 +491,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Custom agent creation (for instructors)
 
 ### 8.4 Advanced Chat Features
+
 - **Rich Content**:
   - Render markdown (bold, italic, lists, code blocks)
   - Syntax highlighting for code
@@ -490,6 +518,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 9. Performance Requirements
 
 ### 9.1 Startup Time
+
 - **Target**: App ready in <3 seconds (cold start)
 - **Optimization Strategies**:
   - Lazy load non-critical modules
@@ -504,6 +533,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Bundle size monitoring
 
 ### 9.2 Animations
+
 - **Target**: Maintain 60fps for all animations
 - **Implementation**:
   - Use Reanimated 3 for performant animations
@@ -518,6 +548,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Disable animations on low-end devices
 
 ### 9.3 Memory Usage
+
 - **Target**: <100MB memory footprint during normal use
 - **Optimization**:
   - Image caching with size limits
@@ -533,6 +564,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Performance budgets in CI/CD
 
 ### 9.4 Network Performance
+
 - **Targets**:
   - API response time: <500ms (P95)
   - Video start time: <2 seconds
@@ -546,6 +578,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Parallel resource loading
 
 ### 9.5 Battery Optimization
+
 - **Strategies**:
   - Batch network requests
   - Reduce location updates frequency
@@ -561,6 +594,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 10. Platform-Specific Requirements
 
 ### 10.1 iOS Human Interface Guidelines
+
 - **Navigation**:
   - Tab bar for primary navigation (max 5 tabs)
   - Navigation bar with back button
@@ -589,6 +623,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Siri integration (future)
 
 ### 10.2 Material Design 3
+
 - **Navigation**:
   - Bottom navigation bar (3-5 destinations)
   - Navigation drawer for secondary nav
@@ -617,6 +652,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Edge-to-edge display support
 
 ### 10.3 Platform Parity
+
 - **Shared Experiences**:
   - Consistent feature set across platforms
   - Same color scheme and branding
@@ -630,6 +666,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 11. App Store Requirements
 
 ### 11.1 Privacy Policy
+
 - **Content Requirements**:
   - Data collection practices
   - Third-party services and SDKs
@@ -646,6 +683,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - User consent management
 
 ### 11.2 Permissions
+
 - **Permission Requests**:
   - **Camera**: "Take profile photos and scan documents for your courses"
   - **Microphone**: "Record voice notes and audio annotations"
@@ -660,6 +698,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Offer alternative workflows
 
 ### 11.3 App Store Metadata
+
 - **iOS App Store**:
   - App name (30 characters max)
   - Subtitle (30 characters)
@@ -682,6 +721,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Content rating questionnaire
 
 ### 11.4 Screenshots and Media
+
 - **iOS Requirements**:
   - 6.9" iPhone (1320 x 2868 pixels): 3-10 screenshots
   - 13" iPad Pro (2048 x 2732 pixels): 3-10 screenshots
@@ -701,6 +741,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Demonstrate value proposition
 
 ### 11.5 App Review Guidelines
+
 - **iOS App Review**:
   - No crashes or bugs
   - Functional without content
@@ -720,6 +761,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 12. Testing Strategy
 
 ### 12.1 Detox E2E Testing
+
 - **Setup**:
   - Detox framework for end-to-end tests
   - Test on iOS Simulator and Android Emulator
@@ -745,6 +787,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Network request timing
 
 ### 12.2 Manual QA on Physical Devices
+
 - **Device Lab**:
   - **iOS**: iPhone 12, iPhone 14 Pro, iPhone 15, iPad Air, iPad Pro
   - **Android**: Samsung Galaxy S21, Google Pixel 7, OnePlus 10, Samsung Tab S8
@@ -766,6 +809,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Iterate before public release
 
 ### 12.3 Unit and Integration Testing
+
 - **Unit Tests**:
   - Jest for component and logic testing
   - 80% code coverage target
@@ -782,6 +826,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Update snapshots on intentional changes
 
 ### 12.4 Automated Testing in CI/CD
+
 - **Continuous Integration**:
   - Run tests on every pull request
   - Lint and type checking
@@ -796,6 +841,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 13. Build & Release
 
 ### 13.1 EAS Build
+
 - **Build Configuration**:
   - EAS Build service for cloud builds
   - Separate build profiles (development, preview, production)
@@ -814,6 +860,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - .apk for Android (sideloading)
 
 ### 13.2 OTA Updates
+
 - **Expo Updates**:
   - Over-the-air JavaScript and asset updates
   - No app store review for minor updates
@@ -834,6 +881,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Requires app store update for major changes
 
 ### 13.3 Versioning
+
 - **Version Scheme**:
   - Semantic versioning: MAJOR.MINOR.PATCH
   - Example: 1.2.3
@@ -855,6 +903,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - OTA updates: Weekly (for critical fixes)
 
 ### 13.4 Release Process
+
 - **Pre-Release**:
   1. Feature freeze (1 week before release)
   2. QA testing on physical devices
@@ -877,6 +926,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## 14. Analytics & Monitoring
 
 ### 14.1 Sentry
+
 - **Error Tracking**:
   - Automatic crash reporting
   - JavaScript error tracking
@@ -902,6 +952,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Alert rules for critical issues
 
 ### 14.2 Firebase Analytics
+
 - **Event Tracking**:
   - Screen views
   - User actions (button clicks, video plays)
@@ -927,6 +978,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Custom audiences for marketing
 
 ### 14.3 Custom Analytics
+
 - **Learning Analytics**:
   - Video watch time and completion rate
   - Average session duration
@@ -946,6 +998,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - Download speeds
 
 ### 14.4 Monitoring Dashboards
+
 - **Real-Time Monitoring**:
   - Active users
   - Crash rate (last 1 hour, 24 hours)
@@ -965,6 +1018,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - User satisfaction scores
 
 ### 14.5 Privacy and Compliance
+
 - **Data Collection**:
   - Anonymized user data
   - Opt-out option for analytics
@@ -985,6 +1039,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
 ## Appendix
 
 ### Technology Dependencies
+
 - **Core**:
   - expo: ^54.0.0
   - react: ^18.2.0
@@ -1015,6 +1070,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - @react-native-firebase/analytics: ^21.0.0
 
 ### Future Enhancements
+
 - **Phase 2**:
   - Social learning features (study groups, peer chat)
   - Live streaming for webinars
@@ -1027,6 +1083,7 @@ Native mobile application for EduSphere learning platform, providing full-featur
   - VR learning experiences
 
 ### References
+
 - Expo Documentation: https://docs.expo.dev/
 - React Native Documentation: https://reactnative.dev/
 - iOS Human Interface Guidelines: https://developer.apple.com/design/human-interface-guidelines/

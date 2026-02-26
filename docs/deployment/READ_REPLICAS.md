@@ -38,12 +38,12 @@
 
 ## Why Read Replicas
 
-| Driver | Detail |
-|--------|--------|
-| **Scale** | 100k concurrent users generate a read-heavy workload (GraphQL queries, embeddings, graph traversals). Read replicas absorb 70–80% of SELECT traffic. |
+| Driver                  | Detail                                                                                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Scale**               | 100k concurrent users generate a read-heavy workload (GraphQL queries, embeddings, graph traversals). Read replicas absorb 70–80% of SELECT traffic.                    |
 | **Analytics isolation** | LLM/RAG pipeline queries (pgvector HNSW scans, Apache AGE Cypher traversals) can take seconds. Running them on a replica prevents starvation on the primary write path. |
-| **HA / Failover** | Replicas are pre-warmed standbys — promotion to primary takes seconds via `pg_ctl promote`. |
-| **Compliance** | Read replicas provide a point-in-time consistent view for GDPR audit reports without impacting production traffic. |
+| **HA / Failover**       | Replicas are pre-warmed standbys — promotion to primary takes seconds via `pg_ctl promote`.                                                                             |
+| **Compliance**          | Read replicas provide a point-in-time consistent view for GDPR audit reports without impacting production traffic.                                                      |
 
 ---
 
@@ -122,10 +122,10 @@ SELECT pg_is_in_recovery();
 
 ## Application Connection Strings
 
-| Pool | Environment Variable | Direction |
-|------|---------------------|-----------|
-| Primary (write) | `DATABASE_URL` | All INSERT/UPDATE/DELETE |
-| Replica (read) | `REPLICA_DATABASE_URL` | SELECT-only queries |
+| Pool            | Environment Variable   | Direction                |
+| --------------- | ---------------------- | ------------------------ |
+| Primary (write) | `DATABASE_URL`         | All INSERT/UPDATE/DELETE |
+| Replica (read)  | `REPLICA_DATABASE_URL` | SELECT-only queries      |
 
 Example `.env`:
 
@@ -151,13 +151,14 @@ const courses = await withReadReplica((db) =>
 
 ### CloudFront (AWS)
 
-| Rule | Path Pattern | TTL | Cache Behavior |
-|------|-------------|-----|----------------|
-| Vite assets | `/assets/*` | 31536000s (1 year) | Cache + forward headers |
-| index.html | `/*` | 0s | No cache (pass-through) |
-| GraphQL | `/graphql*` | 0s | No cache, pass-through |
+| Rule        | Path Pattern | TTL                | Cache Behavior          |
+| ----------- | ------------ | ------------------ | ----------------------- |
+| Vite assets | `/assets/*`  | 31536000s (1 year) | Cache + forward headers |
+| index.html  | `/*`         | 0s                 | No cache (pass-through) |
+| GraphQL     | `/graphql*`  | 0s                 | No cache, pass-through  |
 
 **CloudFront Cache-Control forwarding:**
+
 - Origin (`Nginx`) sets `Cache-Control: public, max-age=31536000, immutable` on `/assets/*`.
 - CloudFront respects origin headers — no separate TTL override needed.
 
@@ -173,6 +174,7 @@ aws cloudfront create-invalidation \
 ### Cloudflare (alternative)
 
 Create a Page Rule:
+
 - URL: `https://app.edusphere.com/assets/*`
 - Cache Level: Cache Everything
 - Edge Cache TTL: 1 month
@@ -192,6 +194,7 @@ Create a Page Rule:
 ### Nginx Configuration
 
 See `infrastructure/nginx/nginx.conf` for the full Nginx config including:
+
 - `/assets/*` → `Cache-Control: public, max-age=31536000, immutable`
 - `/graphql` → `Cache-Control: no-store` + WebSocket upgrade
 - `/*` → SPA fallback to `index.html`

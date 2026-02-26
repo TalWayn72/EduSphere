@@ -34,7 +34,18 @@ export const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
   { value: 'ADVANCED', label: 'Advanced' },
 ];
 
-export const THUMBNAIL_OPTIONS = ['📚', '🎓', '🕍', '📜', '🔍', '🧠', '🤝', '⚖️', '🕯️', '🌟'];
+export const THUMBNAIL_OPTIONS = [
+  '📚',
+  '🎓',
+  '🕍',
+  '📜',
+  '🔍',
+  '🧠',
+  '🤝',
+  '⚖️',
+  '🕯️',
+  '🌟',
+];
 
 export const DEFAULT_FORM: CourseFormData = {
   title: '',

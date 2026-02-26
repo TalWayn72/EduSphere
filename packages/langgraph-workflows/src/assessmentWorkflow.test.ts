@@ -19,7 +19,9 @@ vi.mock('@ai-sdk/openai', () => ({
 
 // LangGraph mock: evaluate → synthesize → END (per-instance state)
 vi.mock('@langchain/langgraph', () => {
-  type NodeFn = (state: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  type NodeFn = (
+    state: Record<string, unknown>
+  ) => Promise<Record<string, unknown>>;
 
   // Annotation must be callable as a function AND have a .Root static method
   const AnnotationFn = (config?: unknown) => config ?? {};
@@ -54,7 +56,9 @@ vi.mock('@langchain/langgraph', () => {
             let state = { ...(initialState as Record<string, unknown>) };
             const order = [
               entryPoint,
-              ...edges.map(([, to]: [string, string]) => to).filter((n: string) => n !== '__end__'),
+              ...edges
+                .map(([, to]: [string, string]) => to)
+                .filter((n: string) => n !== '__end__'),
             ];
             const seen = new Set<string>();
             for (const nodeName of order) {
@@ -80,7 +84,10 @@ const mockGenerateObject = vi.mocked(generateObject);
 // Helpers
 // ---------------------------------------------------------------------------
 function makeEvaluationResponse(score: number, feedback: string) {
-  return { text: `Score: ${score}\nFeedback: ${feedback}`, usage: { totalTokens: 15 } };
+  return {
+    text: `Score: ${score}\nFeedback: ${feedback}`,
+    usage: { totalTokens: 15 },
+  };
 }
 
 function makeAssessmentObject() {
@@ -88,7 +95,11 @@ function makeAssessmentObject() {
     object: {
       strengths: ['Good understanding of basics', 'Clear reasoning'],
       weaknesses: ['Needs more detail', 'Missed edge cases'],
-      recommendations: ['Review chapter 3', 'Practice more examples', 'Study worked solutions'],
+      recommendations: [
+        'Review chapter 3',
+        'Practice more examples',
+        'Study worked solutions',
+      ],
       overallScore: 75,
     },
   };
@@ -141,8 +152,12 @@ describe('AssessmentWorkflow', () => {
   describe('evaluateNode — per-submission evaluation', () => {
     it('evaluates each submission and returns evaluations array', async () => {
       mockGenerateText
-        .mockResolvedValueOnce(makeEvaluationResponse(80, 'Good answer on Q1') as never)
-        .mockResolvedValueOnce(makeEvaluationResponse(90, 'Excellent answer on Q2') as never);
+        .mockResolvedValueOnce(
+          makeEvaluationResponse(80, 'Good answer on Q1') as never
+        )
+        .mockResolvedValueOnce(
+          makeEvaluationResponse(90, 'Excellent answer on Q2') as never
+        );
       mockGenerateObject.mockResolvedValueOnce(makeAssessmentObject() as never);
 
       const workflow = new AssessmentWorkflow();
@@ -153,8 +168,12 @@ describe('AssessmentWorkflow', () => {
 
     it('correctly parses score from LLM text format "Score: N"', async () => {
       mockGenerateText
-        .mockResolvedValueOnce(makeEvaluationResponse(85, 'Good explanation') as never)
-        .mockResolvedValueOnce(makeEvaluationResponse(70, 'Partially correct') as never);
+        .mockResolvedValueOnce(
+          makeEvaluationResponse(85, 'Good explanation') as never
+        )
+        .mockResolvedValueOnce(
+          makeEvaluationResponse(70, 'Partially correct') as never
+        );
       mockGenerateObject.mockResolvedValueOnce(makeAssessmentObject() as never);
 
       const workflow = new AssessmentWorkflow();
@@ -166,7 +185,10 @@ describe('AssessmentWorkflow', () => {
 
     it('defaults score to 50 when LLM response has no score pattern', async () => {
       mockGenerateText
-        .mockResolvedValueOnce({ text: 'This is feedback with no score number', usage: {} } as never)
+        .mockResolvedValueOnce({
+          text: 'This is feedback with no score number',
+          usage: {},
+        } as never)
         .mockResolvedValueOnce(makeEvaluationResponse(80, 'Good') as never);
       mockGenerateObject.mockResolvedValueOnce(makeAssessmentObject() as never);
 
@@ -178,8 +200,12 @@ describe('AssessmentWorkflow', () => {
 
     it('assigns correct questionId to each evaluation', async () => {
       mockGenerateText
-        .mockResolvedValueOnce(makeEvaluationResponse(80, 'Feedback Q1') as never)
-        .mockResolvedValueOnce(makeEvaluationResponse(90, 'Feedback Q2') as never);
+        .mockResolvedValueOnce(
+          makeEvaluationResponse(80, 'Feedback Q1') as never
+        )
+        .mockResolvedValueOnce(
+          makeEvaluationResponse(90, 'Feedback Q2') as never
+        );
       mockGenerateObject.mockResolvedValueOnce(makeAssessmentObject() as never);
 
       const workflow = new AssessmentWorkflow();
@@ -198,8 +224,9 @@ describe('AssessmentWorkflow', () => {
       const workflow = new AssessmentWorkflow();
       await workflow.run({ submissions: sampleSubmissions });
 
-      const firstCallPrompt = (mockGenerateText.mock.calls[0]![0] as Record<string, unknown>)
-        .prompt as string;
+      const firstCallPrompt = (
+        mockGenerateText.mock.calls[0]![0] as Record<string, unknown>
+      ).prompt as string;
       expect(firstCallPrompt).toContain('Must mention ordering property');
     });
 
@@ -212,13 +239,16 @@ describe('AssessmentWorkflow', () => {
       const workflow = new AssessmentWorkflow();
       await workflow.run({ submissions: sampleSubmissions });
 
-      const secondCallPrompt = (mockGenerateText.mock.calls[1]![0] as Record<string, unknown>)
-        .prompt as string;
+      const secondCallPrompt = (
+        mockGenerateText.mock.calls[1]![0] as Record<string, unknown>
+      ).prompt as string;
       expect(secondCallPrompt).not.toContain('Rubric:');
     });
 
     it('calls generateText once per submission', async () => {
-      mockGenerateText.mockResolvedValue(makeEvaluationResponse(75, 'OK') as never);
+      mockGenerateText.mockResolvedValue(
+        makeEvaluationResponse(75, 'OK') as never
+      );
       mockGenerateObject.mockResolvedValueOnce(makeAssessmentObject() as never);
 
       const workflow = new AssessmentWorkflow();
@@ -284,7 +314,9 @@ describe('AssessmentWorkflow', () => {
 
   describe('error handling', () => {
     it('propagates LLM error from evaluateNode', async () => {
-      mockGenerateText.mockRejectedValueOnce(new Error('Rate limit exceeded') as never);
+      mockGenerateText.mockRejectedValueOnce(
+        new Error('Rate limit exceeded') as never
+      );
 
       const workflow = new AssessmentWorkflow();
       await expect(
@@ -293,8 +325,12 @@ describe('AssessmentWorkflow', () => {
     });
 
     it('propagates LLM error from synthesizeNode', async () => {
-      mockGenerateText.mockResolvedValue(makeEvaluationResponse(80, 'FB') as never);
-      mockGenerateObject.mockRejectedValueOnce(new Error('Synthesis API error') as never);
+      mockGenerateText.mockResolvedValue(
+        makeEvaluationResponse(80, 'FB') as never
+      );
+      mockGenerateObject.mockRejectedValueOnce(
+        new Error('Synthesis API error') as never
+      );
 
       const workflow = new AssessmentWorkflow();
       await expect(
@@ -303,7 +339,9 @@ describe('AssessmentWorkflow', () => {
     });
 
     it('handles single-submission assessment', async () => {
-      mockGenerateText.mockResolvedValueOnce(makeEvaluationResponse(95, 'Excellent') as never);
+      mockGenerateText.mockResolvedValueOnce(
+        makeEvaluationResponse(95, 'Excellent') as never
+      );
       mockGenerateObject.mockResolvedValueOnce(makeAssessmentObject() as never);
 
       const workflow = new AssessmentWorkflow();
@@ -325,11 +363,15 @@ describe('AssessmentWorkflow', () => {
 
   describe('AssessmentState type correctness', () => {
     it('evaluations default to empty array', async () => {
-      mockGenerateText.mockResolvedValue(makeEvaluationResponse(70, 'OK') as never);
+      mockGenerateText.mockResolvedValue(
+        makeEvaluationResponse(70, 'OK') as never
+      );
       mockGenerateObject.mockResolvedValueOnce(makeAssessmentObject() as never);
 
       const workflow = new AssessmentWorkflow();
-      const result: AssessmentState = await workflow.run({ submissions: sampleSubmissions });
+      const result: AssessmentState = await workflow.run({
+        submissions: sampleSubmissions,
+      });
 
       expect(Array.isArray(result.evaluations)).toBe(true);
     });

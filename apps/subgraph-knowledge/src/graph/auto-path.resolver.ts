@@ -29,14 +29,14 @@ export class AutoPathResolver {
   @Query('myLearningPath')
   async myLearningPath(
     @Args('targetConceptName') targetConceptName: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.autoPathService.getMyLearningPath(
       targetConceptName,
       userId,
       tenantId,
-      role,
+      role
     );
   }
 }

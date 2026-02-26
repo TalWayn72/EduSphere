@@ -12,13 +12,18 @@ import {
 
 describe('searchKnowledgeGraphSchema', () => {
   it('accepts a valid query with default limit', () => {
-    const result = searchKnowledgeGraphSchema.safeParse({ query: 'photosynthesis' });
+    const result = searchKnowledgeGraphSchema.safeParse({
+      query: 'photosynthesis',
+    });
     expect(result.success).toBe(true);
     if (result.success) expect(result.data.limit).toBe(5);
   });
 
   it('accepts a valid query with explicit limit', () => {
-    const result = searchKnowledgeGraphSchema.safeParse({ query: 'algebra', limit: 10 });
+    const result = searchKnowledgeGraphSchema.safeParse({
+      query: 'algebra',
+      limit: 10,
+    });
     expect(result.success).toBe(true);
     if (result.success) expect(result.data.limit).toBe(10);
   });
@@ -29,17 +34,26 @@ describe('searchKnowledgeGraphSchema', () => {
   });
 
   it('rejects when limit is below 1', () => {
-    const result = searchKnowledgeGraphSchema.safeParse({ query: 'test', limit: 0 });
+    const result = searchKnowledgeGraphSchema.safeParse({
+      query: 'test',
+      limit: 0,
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects when limit exceeds 20', () => {
-    const result = searchKnowledgeGraphSchema.safeParse({ query: 'test', limit: 21 });
+    const result = searchKnowledgeGraphSchema.safeParse({
+      query: 'test',
+      limit: 21,
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects a non-integer limit', () => {
-    const result = searchKnowledgeGraphSchema.safeParse({ query: 'test', limit: 3.5 });
+    const result = searchKnowledgeGraphSchema.safeParse({
+      query: 'test',
+      limit: 3.5,
+    });
     expect(result.success).toBe(false);
   });
 });
@@ -54,7 +68,9 @@ describe('fetchCourseContentSchema', () => {
   });
 
   it('rejects a non-UUID string', () => {
-    const result = fetchCourseContentSchema.safeParse({ contentItemId: 'not-a-uuid' });
+    const result = fetchCourseContentSchema.safeParse({
+      contentItemId: 'not-a-uuid',
+    });
     expect(result.success).toBe(false);
   });
 
@@ -68,25 +84,35 @@ describe('fetchCourseContentSchema', () => {
 
 describe('buildSearchKnowledgeGraphTool', () => {
   it('returns a tool object with a description string', () => {
-    const execute = vi.fn<(q: string, l: number) => Promise<KnowledgeSearchResult[]>>();
+    const execute =
+      vi.fn<(q: string, l: number) => Promise<KnowledgeSearchResult[]>>();
     const t = buildSearchKnowledgeGraphTool(execute);
     expect(typeof t.description).toBe('string');
     expect(t.description.length).toBeGreaterThan(0);
   });
 
   it('returns a tool object with a parameters schema', () => {
-    const execute = vi.fn<(q: string, l: number) => Promise<KnowledgeSearchResult[]>>();
+    const execute =
+      vi.fn<(q: string, l: number) => Promise<KnowledgeSearchResult[]>>();
     const t = buildSearchKnowledgeGraphTool(execute);
     expect(t.parameters).toBeDefined();
   });
 
   it('calls the provided execute function with query and limit', async () => {
     const mockResults: KnowledgeSearchResult[] = [
-      { id: 'seg-1', text: 'photosynthesis occurs in chloroplasts', type: 'transcript_segment', similarity: 0.92 },
+      {
+        id: 'seg-1',
+        text: 'photosynthesis occurs in chloroplasts',
+        type: 'transcript_segment',
+        similarity: 0.92,
+      },
     ];
     const execute = vi.fn().mockResolvedValue(mockResults);
     const t = buildSearchKnowledgeGraphTool(execute);
-    const result = await t.execute({ query: 'photosynthesis', limit: 3 }, { messages: [], toolCallId: 'tc-1' });
+    const result = await t.execute(
+      { query: 'photosynthesis', limit: 3 },
+      { messages: [], toolCallId: 'tc-1' }
+    );
     expect(execute).toHaveBeenCalledWith('photosynthesis', 3);
     expect(result).toEqual(mockResults);
   });
@@ -95,14 +121,27 @@ describe('buildSearchKnowledgeGraphTool', () => {
     const execute = vi.fn().mockRejectedValue(new Error('DB unavailable'));
     const t = buildSearchKnowledgeGraphTool(execute);
     await expect(
-      t.execute({ query: 'algebra', limit: 5 }, { messages: [], toolCallId: 'tc-2' })
+      t.execute(
+        { query: 'algebra', limit: 5 },
+        { messages: [], toolCallId: 'tc-2' }
+      )
     ).rejects.toThrow('DB unavailable');
   });
 
   it('returns an array of KnowledgeSearchResult shaped objects', async () => {
     const mockResults: KnowledgeSearchResult[] = [
-      { id: 'id-1', text: 'mitochondria', type: 'transcript_segment', similarity: 0.88 },
-      { id: 'id-2', text: 'cellular respiration', type: 'transcript_segment', similarity: 0.75 },
+      {
+        id: 'id-1',
+        text: 'mitochondria',
+        type: 'transcript_segment',
+        similarity: 0.88,
+      },
+      {
+        id: 'id-2',
+        text: 'cellular respiration',
+        type: 'transcript_segment',
+        similarity: 0.75,
+      },
     ];
     const execute = vi.fn().mockResolvedValue(mockResults);
     const t = buildSearchKnowledgeGraphTool(execute);

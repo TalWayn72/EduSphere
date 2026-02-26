@@ -22,7 +22,11 @@ function DebateSkeleton() {
   return (
     <div className="space-y-3 p-4" aria-busy="true" aria-label="Loading debate">
       {[80, 60, 90].map((w) => (
-        <div key={w} className={`h-10 rounded-xl bg-muted animate-pulse`} style={{ width: `${w}%` }} />
+        <div
+          key={w}
+          className={`h-10 rounded-xl bg-muted animate-pulse`}
+          style={{ width: `${w}%` }}
+        />
       ))}
     </div>
   );
@@ -36,9 +40,10 @@ function ConsentPrompt({ onGrant }: { onGrant: () => void }) {
       <div className="space-y-1">
         <p className="font-semibold text-sm">AI Processing Consent Required</p>
         <p className="text-xs text-muted-foreground max-w-xs">
-          Chavruta uses a third-party AI service (OpenAI / Anthropic) to generate debate
-          responses. Your arguments will be processed by that service.
-          Please consent before continuing. (EU AI Act Art.&nbsp;50 / SI-10)
+          Chavruta uses a third-party AI service (OpenAI / Anthropic) to
+          generate debate responses. Your arguments will be processed by that
+          service. Please consent before continuing. (EU AI Act Art.&nbsp;50 /
+          SI-10)
         </p>
       </div>
       <Button size="sm" onClick={onGrant}>
@@ -106,7 +111,10 @@ export function ChavrutaPage() {
         </div>
 
         {/* Debate card */}
-        <Card className="flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 16rem)' }}>
+        <Card
+          className="flex flex-col overflow-hidden"
+          style={{ height: 'calc(100vh - 16rem)' }}
+        >
           {error && <ErrorBanner message={error} />}
 
           {needsConsent ? (

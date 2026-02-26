@@ -19,7 +19,7 @@ const GRAPH_NAME = 'edusphere_graph';
 // Stable deterministic UUIDs — allows idempotent re-runs via onConflictDoNothing
 const IDS = {
   instructor: 'cc000000-0000-0000-0000-000000000001',
-  course:     'cc000000-0000-0000-0000-000000000002',
+  course: 'cc000000-0000-0000-0000-000000000002',
   m1: 'cc100000-0000-0000-0000-000000000001',
   m2: 'cc100000-0000-0000-0000-000000000002',
   m3: 'cc100000-0000-0000-0000-000000000003',
@@ -410,30 +410,62 @@ type ModuleRow = {
 };
 
 const MODULES: ModuleRow[] = [
-  { id: IDS.m1, course_id: IDS.course, order_index: 0,
+  {
+    id: IDS.m1,
+    course_id: IDS.course,
+    order_index: 0,
     title: 'מבוא: הרש"ש וחייו',
-    description: 'קורות חיי הרש"ש, מקומו בשרשרת הקבלה, וסקירת חיבוריו.' },
-  { id: IDS.m2, course_id: IDS.course, order_index: 1,
+    description: 'קורות חיי הרש"ש, מקומו בשרשרת הקבלה, וסקירת חיבוריו.',
+  },
+  {
+    id: IDS.m2,
+    course_id: IDS.course,
+    order_index: 1,
     title: 'רחובות הנהר — ד׳ עקרי השיטה',
-    description: 'ד׳ העקרים שקבע הרש"ש כבסיס ללימוד כתבי האר"י.' },
-  { id: IDS.m3, course_id: IDS.course, order_index: 2,
+    description: 'ד׳ העקרים שקבע הרש"ש כבסיס ללימוד כתבי האר"י.',
+  },
+  {
+    id: IDS.m3,
+    course_id: IDS.course,
+    order_index: 2,
     title: 'יסודות הקבלה הלוריאנית',
-    description: 'צמצום, עולמות, ספירות ופרצופים — כפי שמפרש אותם הרש"ש.' },
-  { id: IDS.m4, course_id: IDS.course, order_index: 3,
+    description: 'צמצום, עולמות, ספירות ופרצופים — כפי שמפרש אותם הרש"ש.',
+  },
+  {
+    id: IDS.m4,
+    course_id: IDS.course,
+    order_index: 3,
     title: 'שאלות א–כ: כוונות התפילה היומית',
-    description: 'עשרים השאלות הראשונות: כוונות ברכות השחר, שמע ועמידה.' },
-  { id: IDS.m5, course_id: IDS.course, order_index: 4,
+    description: 'עשרים השאלות הראשונות: כוונות ברכות השחר, שמע ועמידה.',
+  },
+  {
+    id: IDS.m5,
+    course_id: IDS.course,
+    order_index: 4,
     title: 'שאלות כא–מה: כוונות פרטיות',
-    description: 'כוונות "אמן", מגן אברהם, קדושה ועוד.' },
-  { id: IDS.m6, course_id: IDS.course, order_index: 5,
+    description: 'כוונות "אמן", מגן אברהם, קדושה ועוד.',
+  },
+  {
+    id: IDS.m6,
+    course_id: IDS.course,
+    order_index: 5,
     title: 'שאלות מו–ע: כוונות מצוות ומועדות',
-    description: 'כוונות הלל, מזוזה, וסיכום שיטת הרש"ש.' },
-  { id: IDS.m7, course_id: IDS.course, order_index: 6,
+    description: 'כוונות הלל, מזוזה, וסיכום שיטת הרש"ש.',
+  },
+  {
+    id: IDS.m7,
+    course_id: IDS.course,
+    order_index: 6,
     title: 'סדר כוונות שחרית',
-    description: 'הכוונות המלאות לתפילת שחרית לפי סידור נהר שלום.' },
-  { id: IDS.m8, course_id: IDS.course, order_index: 7,
+    description: 'הכוונות המלאות לתפילת שחרית לפי סידור נהר שלום.',
+  },
+  {
+    id: IDS.m8,
+    course_id: IDS.course,
+    order_index: 7,
     title: 'כוונות שבת, ראש השנה ויום כיפור',
-    description: 'כוונות ליל שבת, שחרית שבת, מוסף, ר"ה ויוה"כ.' },
+    description: 'כוונות ליל שבת, שחרית שבת, מוסף, ר"ה ויוה"כ.',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -449,165 +481,463 @@ type ContentRow = {
 
 const CONTENT_ITEMS: ContentRow[] = [
   // Module 1 — Introduction
-  { moduleId: IDS.m1, orderIndex: 0, type: 'MARKDOWN',
-    title: 'הרש"ש — ביוגרפיה ומקומו בקבלה', content: BIO_MD },
-  { moduleId: IDS.m1, orderIndex: 1, type: 'LINK',
+  {
+    moduleId: IDS.m1,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'הרש"ש — ביוגרפיה ומקומו בקבלה',
+    content: BIO_MD,
+  },
+  {
+    moduleId: IDS.m1,
+    orderIndex: 1,
+    type: 'LINK',
     title: 'ספר נהר שלום — HebrewBooks.org (ציבורי, חינמי)',
-    content: 'https://hebrewbooks.org/21991' },
-  { moduleId: IDS.m1, orderIndex: 2, type: 'LINK',
-    title: 'שיעורים ומאמרים חיצוניים על הרש"ש', content: SHIURIM_LINK_MD },
-  { moduleId: IDS.m1, orderIndex: 3, type: 'QUIZ',
+    content: 'https://hebrewbooks.org/21991',
+  },
+  {
+    moduleId: IDS.m1,
+    orderIndex: 2,
+    type: 'LINK',
+    title: 'שיעורים ומאמרים חיצוניים על הרש"ש',
+    content: SHIURIM_LINK_MD,
+  },
+  {
+    moduleId: IDS.m1,
+    orderIndex: 3,
+    type: 'QUIZ',
     title: 'חידון: הרש"ש — ביוגרפיה',
     content: JSON.stringify({
       questions: [
-        { q: 'באיזו עיר נולד הרש"ש?', options: ['ירושלים', 'צנעא', 'צפת', 'קהיר'], answer: 1 },
-        { q: 'מי היה רבו של הרש"ש שגילה את גדלותו?', options: ['ר"ח ויטאל', 'ר"ג חייון', 'האר"י', 'הבעש"ט'], answer: 1 },
-        { q: 'מהו השם המלא של ספר נהר שלום?', options: ['שו"ת לע\' שאלות', 'כוונות לאר"י', 'עץ חיים', 'שערי קדושה'], answer: 0 },
-        { q: 'באיזו שנה נפטר הרש"ש?', options: ['תק"י', 'תקל"ז', 'תק"נ', 'תר"כ'], answer: 1 },
-        { q: 'מה אמר הרב קדורי על רחובות הנהר?', options: ['שצריך ללמוד בחיפזון', 'שעד שלא למדת אותו לא למדת קבלה', 'שהוא לרמה גבוהה בלבד', 'שהוא ספר ציוני'], answer: 1 },
+        {
+          q: 'באיזו עיר נולד הרש"ש?',
+          options: ['ירושלים', 'צנעא', 'צפת', 'קהיר'],
+          answer: 1,
+        },
+        {
+          q: 'מי היה רבו של הרש"ש שגילה את גדלותו?',
+          options: ['ר"ח ויטאל', 'ר"ג חייון', 'האר"י', 'הבעש"ט'],
+          answer: 1,
+        },
+        {
+          q: 'מהו השם המלא של ספר נהר שלום?',
+          options: ['שו"ת לע\' שאלות', 'כוונות לאר"י', 'עץ חיים', 'שערי קדושה'],
+          answer: 0,
+        },
+        {
+          q: 'באיזו שנה נפטר הרש"ש?',
+          options: ['תק"י', 'תקל"ז', 'תק"נ', 'תר"כ'],
+          answer: 1,
+        },
+        {
+          q: 'מה אמר הרב קדורי על רחובות הנהר?',
+          options: [
+            'שצריך ללמוד בחיפזון',
+            'שעד שלא למדת אותו לא למדת קבלה',
+            'שהוא לרמה גבוהה בלבד',
+            'שהוא ספר ציוני',
+          ],
+          answer: 1,
+        },
       ],
-    }) },
+    }),
+  },
 
   // Module 2 — Rehovot HaNahar
-  { moduleId: IDS.m2, orderIndex: 0, type: 'MARKDOWN',
-    title: 'רחובות הנהר — מבוא וד׳ עקרים', content: REHOVOT_MD },
-  { moduleId: IDS.m2, orderIndex: 1, type: 'LINK',
+  {
+    moduleId: IDS.m2,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'רחובות הנהר — מבוא וד׳ עקרים',
+    content: REHOVOT_MD,
+  },
+  {
+    moduleId: IDS.m2,
+    orderIndex: 1,
+    type: 'LINK',
     title: 'טקסט מקורי: רחובות הנהר, נהר שלום דף ל"ב ע"א',
-    content: 'https://hebrewbooks.org/pdfpager.aspx?req=21991&pgnum=32' },
-  { moduleId: IDS.m2, orderIndex: 2, type: 'LINK',
+    content: 'https://hebrewbooks.org/pdfpager.aspx?req=21991&pgnum=32',
+  },
+  {
+    moduleId: IDS.m2,
+    orderIndex: 2,
+    type: 'LINK',
     title: 'מאמר: "ד׳ עקרי הרש"ש" — Kabbalah Empowerment',
-    content: 'https://www.kabbalahempowerment.com/rabbi-shalom-sharabi-rechovo-hanahar/' },
-  { moduleId: IDS.m2, orderIndex: 3, type: 'QUIZ',
+    content:
+      'https://www.kabbalahempowerment.com/rabbi-shalom-sharabi-rechovo-hanahar/',
+  },
+  {
+    moduleId: IDS.m2,
+    orderIndex: 3,
+    type: 'QUIZ',
     title: 'חידון: ד׳ עקרי רחובות הנהר',
     content: JSON.stringify({
       questions: [
-        { q: 'על מה מסתמך הרש"ש לפי עיקר א?', options: ['הזוהר', 'כתבי האר"י בלבד', 'הרמב"ם', 'ספר יצירה'], answer: 1 },
-        { q: 'מה עושים כשיש סתירה בין מקומות לפי עיקר ב?', options: ['הולכים לפי המאוחר', 'משוים ומתיישבים', 'בוחרים כרצוננו', 'שואלים פוסק'], answer: 1 },
-        { q: 'לפי עיקר ג, אילו כתבים גוברים?', options: ['הקדומים', 'המאוחרים', 'הסודיים', 'הגלויים'], answer: 1 },
+        {
+          q: 'על מה מסתמך הרש"ש לפי עיקר א?',
+          options: ['הזוהר', 'כתבי האר"י בלבד', 'הרמב"ם', 'ספר יצירה'],
+          answer: 1,
+        },
+        {
+          q: 'מה עושים כשיש סתירה בין מקומות לפי עיקר ב?',
+          options: [
+            'הולכים לפי המאוחר',
+            'משוים ומתיישבים',
+            'בוחרים כרצוננו',
+            'שואלים פוסק',
+          ],
+          answer: 1,
+        },
+        {
+          q: 'לפי עיקר ג, אילו כתבים גוברים?',
+          options: ['הקדומים', 'המאוחרים', 'הסודיים', 'הגלויים'],
+          answer: 1,
+        },
       ],
-    }) },
+    }),
+  },
 
   // Module 3 — Foundations
-  { moduleId: IDS.m3, orderIndex: 0, type: 'MARKDOWN',
-    title: 'הצמצום — יסוד הבריאה', content: TZIMTZUM_MD },
-  { moduleId: IDS.m3, orderIndex: 1, type: 'MARKDOWN',
-    title: 'הספירות העשר והפרצופים', content: SEFIROT_MD },
-  { moduleId: IDS.m3, orderIndex: 2, type: 'LINK',
+  {
+    moduleId: IDS.m3,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'הצמצום — יסוד הבריאה',
+    content: TZIMTZUM_MD,
+  },
+  {
+    moduleId: IDS.m3,
+    orderIndex: 1,
+    type: 'MARKDOWN',
+    title: 'הספירות העשר והפרצופים',
+    content: SEFIROT_MD,
+  },
+  {
+    moduleId: IDS.m3,
+    orderIndex: 2,
+    type: 'LINK',
     title: 'מאמר אקדמי: "Lurianic Kavvanot: from Vital to Rashash" (2025)',
-    content: 'https://kavvanah.blog/2025/08/25/lurianic-kavvanot-from-vital-to-rashash-to-zhidichov-jeremy-tibbetts/' },
-  { moduleId: IDS.m3, orderIndex: 3, type: 'QUIZ',
+    content:
+      'https://kavvanah.blog/2025/08/25/lurianic-kavvanot-from-vital-to-rashash-to-zhidichov-jeremy-tibbetts/',
+  },
+  {
+    moduleId: IDS.m3,
+    orderIndex: 3,
+    type: 'QUIZ',
     title: 'חידון: יסודות הקבלה הלוריאנית',
     content: JSON.stringify({
       questions: [
-        { q: 'מהו הצמצום?', options: ['ירידת האדם', 'כיווץ האור האלוקי לאפשר בריאה', 'תפילה בלחש', 'שמירת מצוות'], answer: 1 },
-        { q: 'מה נשאר בחלל אחרי הצמצום?', options: ['אין כלום', 'רשימו וקו', 'מלאכים', 'כוכבים'], answer: 1 },
+        {
+          q: 'מהו הצמצום?',
+          options: [
+            'ירידת האדם',
+            'כיווץ האור האלוקי לאפשר בריאה',
+            'תפילה בלחש',
+            'שמירת מצוות',
+          ],
+          answer: 1,
+        },
+        {
+          q: 'מה נשאר בחלל אחרי הצמצום?',
+          options: ['אין כלום', 'רשימו וקו', 'מלאכים', 'כוכבים'],
+          answer: 1,
+        },
         { q: 'כמה ספירות יש?', options: ['7', '10', '12', '22'], answer: 1 },
-        { q: 'איזה פרצוף מקביל לבינה?', options: ['אבא', 'אמא', 'ז"א', 'עתיק'], answer: 1 },
-        { q: 'מהו עולם האצילות?', options: ['עולם הגשמי', 'עולם המלאכים', 'עולם האלוהות', 'עולם הנשמות'], answer: 2 },
+        {
+          q: 'איזה פרצוף מקביל לבינה?',
+          options: ['אבא', 'אמא', 'ז"א', 'עתיק'],
+          answer: 1,
+        },
+        {
+          q: 'מהו עולם האצילות?',
+          options: [
+            'עולם הגשמי',
+            'עולם המלאכים',
+            'עולם האלוהות',
+            'עולם הנשמות',
+          ],
+          answer: 2,
+        },
       ],
-    }) },
+    }),
+  },
 
   // Module 4 — Questions 1–20
-  { moduleId: IDS.m4, orderIndex: 0, type: 'MARKDOWN',
-    title: 'שאלות א–כ: כוונות ברכות השחר, שמע ועמידה', content: Q1_20_MD },
-  { moduleId: IDS.m4, orderIndex: 1, type: 'LINK',
+  {
+    moduleId: IDS.m4,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'שאלות א–כ: כוונות ברכות השחר, שמע ועמידה',
+    content: Q1_20_MD,
+  },
+  {
+    moduleId: IDS.m4,
+    orderIndex: 1,
+    type: 'LINK',
     title: 'נהר שלום דף א–כ — HebrewBooks.org',
-    content: 'https://hebrewbooks.org/21991' },
-  { moduleId: IDS.m4, orderIndex: 2, type: 'QUIZ',
+    content: 'https://hebrewbooks.org/21991',
+  },
+  {
+    moduleId: IDS.m4,
+    orderIndex: 2,
+    type: 'QUIZ',
     title: 'חידון: שאלות א–כ',
     content: JSON.stringify({
       questions: [
-        { q: 'לאיזה ספירה מכוונת ברכת "על נטילת ידים"?', options: ['כתר', 'מלכות', 'יסוד', 'תפארת'], answer: 2 },
-        { q: 'מה הכוונה במילה "אחד" בשמע ישראל לפי הרש"ש?', options: ['אחדות ישראל', 'יחוד ז"א ונוקבא', 'אחד הוא ה\'', 'אחדות הספירות'], answer: 1 },
-        { q: 'כנגד מה מכוונות ג\' ברכות הראשונות בעמידה?', options: ['ג\' אבות', 'אמא מעלה ז"א', 'ג\' עולמות', 'ג\' תפילות'], answer: 1 },
+        {
+          q: 'לאיזה ספירה מכוונת ברכת "על נטילת ידים"?',
+          options: ['כתר', 'מלכות', 'יסוד', 'תפארת'],
+          answer: 2,
+        },
+        {
+          q: 'מה הכוונה במילה "אחד" בשמע ישראל לפי הרש"ש?',
+          options: [
+            'אחדות ישראל',
+            'יחוד ז"א ונוקבא',
+            "אחד הוא ה'",
+            'אחדות הספירות',
+          ],
+          answer: 1,
+        },
+        {
+          q: "כנגד מה מכוונות ג' ברכות הראשונות בעמידה?",
+          options: ["ג' אבות", 'אמא מעלה ז"א', "ג' עולמות", "ג' תפילות"],
+          answer: 1,
+        },
       ],
-    }) },
+    }),
+  },
 
   // Module 5 — Questions 21–45
-  { moduleId: IDS.m5, orderIndex: 0, type: 'MARKDOWN',
-    title: 'שאלות כא–מה: כוונות אמן, מגן אברהם וקדושה', content: Q21_45_MD },
-  { moduleId: IDS.m5, orderIndex: 1, type: 'LINK',
+  {
+    moduleId: IDS.m5,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'שאלות כא–מה: כוונות אמן, מגן אברהם וקדושה',
+    content: Q21_45_MD,
+  },
+  {
+    moduleId: IDS.m5,
+    orderIndex: 1,
+    type: 'LINK',
     title: 'נהר שלום דף כא–מה — HebrewBooks.org',
-    content: 'https://hebrewbooks.org/21991' },
-  { moduleId: IDS.m5, orderIndex: 2, type: 'QUIZ',
+    content: 'https://hebrewbooks.org/21991',
+  },
+  {
+    moduleId: IDS.m5,
+    orderIndex: 2,
+    type: 'QUIZ',
     title: 'חידון: שאלות כא–מה',
     content: JSON.stringify({
       questions: [
-        { q: '"אמן" בגימטריה שווה?', options: ['72', '91', '26', '65'], answer: 1 },
-        { q: 'אברהם מקביל לאיזה ספירה?', options: ['גבורה', 'חסד', 'תפארת', 'כתר'], answer: 1 },
-        { q: 'שלש פעמים "קדוש" בקדושה מכוונות לאיזה עולמות?', options: ['ג\' אבות', 'אצילות בריאה יצירה', 'ז"א ונוקבא', 'ג\' ספירות'], answer: 1 },
+        {
+          q: '"אמן" בגימטריה שווה?',
+          options: ['72', '91', '26', '65'],
+          answer: 1,
+        },
+        {
+          q: 'אברהם מקביל לאיזה ספירה?',
+          options: ['גבורה', 'חסד', 'תפארת', 'כתר'],
+          answer: 1,
+        },
+        {
+          q: 'שלש פעמים "קדוש" בקדושה מכוונות לאיזה עולמות?',
+          options: ["ג' אבות", 'אצילות בריאה יצירה', 'ז"א ונוקבא', "ג' ספירות"],
+          answer: 1,
+        },
       ],
-    }) },
+    }),
+  },
 
   // Module 6 — Questions 46–70
-  { moduleId: IDS.m6, orderIndex: 0, type: 'MARKDOWN',
-    title: 'שאלות מו–ע: הלל, מזוזה וסיכום השיטה', content: Q46_70_MD },
-  { moduleId: IDS.m6, orderIndex: 1, type: 'LINK',
+  {
+    moduleId: IDS.m6,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'שאלות מו–ע: הלל, מזוזה וסיכום השיטה',
+    content: Q46_70_MD,
+  },
+  {
+    moduleId: IDS.m6,
+    orderIndex: 1,
+    type: 'LINK',
     title: 'נהר שלום דף מו–ע — HebrewBooks.org',
-    content: 'https://hebrewbooks.org/21991' },
-  { moduleId: IDS.m6, orderIndex: 2, type: 'QUIZ',
+    content: 'https://hebrewbooks.org/21991',
+  },
+  {
+    moduleId: IDS.m6,
+    orderIndex: 2,
+    type: 'QUIZ',
     title: 'חידון: שאלות מו–ע',
     content: JSON.stringify({
       questions: [
-        { q: 'ה"הלל" מסדר את מה?', options: ['עולם הבריאה', 'פרצופי אצילות', 'תיקון הניצוצות', 'שם הוי"ה'], answer: 0 },
-        { q: 'שם שד"י במזוזה מקביל לאיזה ספירה?', options: ['מלכות', 'כתר', 'יסוד', 'תפארת'], answer: 2 },
-        { q: 'מה אמר הרש"ש בתשובה האחרונה (שאלה ע)?', options: ['יש לפסוק כרמב"ם', 'לא לזוז מכתבי האר"י', 'לקבל כל פירוש', 'לשאול רב'], answer: 1 },
+        {
+          q: 'ה"הלל" מסדר את מה?',
+          options: [
+            'עולם הבריאה',
+            'פרצופי אצילות',
+            'תיקון הניצוצות',
+            'שם הוי"ה',
+          ],
+          answer: 0,
+        },
+        {
+          q: 'שם שד"י במזוזה מקביל לאיזה ספירה?',
+          options: ['מלכות', 'כתר', 'יסוד', 'תפארת'],
+          answer: 2,
+        },
+        {
+          q: 'מה אמר הרש"ש בתשובה האחרונה (שאלה ע)?',
+          options: [
+            'יש לפסוק כרמב"ם',
+            'לא לזוז מכתבי האר"י',
+            'לקבל כל פירוש',
+            'לשאול רב',
+          ],
+          answer: 1,
+        },
       ],
-    }) },
+    }),
+  },
 
   // Module 7 — Kavvanot Shacharit
-  { moduleId: IDS.m7, orderIndex: 0, type: 'MARKDOWN',
-    title: 'סדר כוונות שחרית לפי הרש"ש', content: SHACHARIT_MD },
-  { moduleId: IDS.m7, orderIndex: 1, type: 'LINK',
+  {
+    moduleId: IDS.m7,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'סדר כוונות שחרית לפי הרש"ש',
+    content: SHACHARIT_MD,
+  },
+  {
+    moduleId: IDS.m7,
+    orderIndex: 1,
+    type: 'LINK',
     title: 'סידור נהר שלום — שחרית (HebrewBooks.org)',
-    content: 'https://hebrewbooks.org/21991' },
-  { moduleId: IDS.m7, orderIndex: 2, type: 'QUIZ',
+    content: 'https://hebrewbooks.org/21991',
+  },
+  {
+    moduleId: IDS.m7,
+    orderIndex: 2,
+    type: 'QUIZ',
     title: 'חידון: כוונות שחרית',
     content: JSON.stringify({
       questions: [
-        { q: 'כוונת תפילין של יד היא ספירת?', options: ['כתר', 'יסוד', 'מלכות', 'חכמה'], answer: 2 },
-        { q: 'פסוקי דזמרה מסדרים את עולם?', options: ['האצילות', 'הבריאה', 'היצירה', 'העשיה'], answer: 1 },
-        { q: 'מנהג ישיבת בית אל לאחר תפילה?', options: ['ארוחת בוקר', 'שיעור בעץ חיים ונהר שלום', 'מנוחה', 'עבודה'], answer: 1 },
+        {
+          q: 'כוונת תפילין של יד היא ספירת?',
+          options: ['כתר', 'יסוד', 'מלכות', 'חכמה'],
+          answer: 2,
+        },
+        {
+          q: 'פסוקי דזמרה מסדרים את עולם?',
+          options: ['האצילות', 'הבריאה', 'היצירה', 'העשיה'],
+          answer: 1,
+        },
+        {
+          q: 'מנהג ישיבת בית אל לאחר תפילה?',
+          options: ['ארוחת בוקר', 'שיעור בעץ חיים ונהר שלום', 'מנוחה', 'עבודה'],
+          answer: 1,
+        },
       ],
-    }) },
+    }),
+  },
 
   // Module 8 — Kavvanot Shabbat
-  { moduleId: IDS.m8, orderIndex: 0, type: 'MARKDOWN',
-    title: 'כוונות שבת, ראש השנה ויום כיפור', content: SHABBAT_MD },
-  { moduleId: IDS.m8, orderIndex: 1, type: 'LINK',
+  {
+    moduleId: IDS.m8,
+    orderIndex: 0,
+    type: 'MARKDOWN',
+    title: 'כוונות שבת, ראש השנה ויום כיפור',
+    content: SHABBAT_MD,
+  },
+  {
+    moduleId: IDS.m8,
+    orderIndex: 1,
+    type: 'LINK',
     title: 'סידור נהר שלום — שבת ומועד (HebrewBooks.org)',
-    content: 'https://hebrewbooks.org/21955' },
-  { moduleId: IDS.m8, orderIndex: 2, type: 'QUIZ',
+    content: 'https://hebrewbooks.org/21955',
+  },
+  {
+    moduleId: IDS.m8,
+    orderIndex: 2,
+    type: 'QUIZ',
     title: 'חידון: כוונות שבת',
     content: JSON.stringify({
       questions: [
-        { q: 'באיזה עולם מאיר שבת לפי הרש"ש?', options: ['הבריאה', 'היצירה', 'האצילות', 'העשיה'], answer: 2 },
-        { q: 'מוסף שבת מכוון כנגד?', options: ['תפארת', 'כתר', 'יסוד', 'מלכות'], answer: 1 },
-        { q: 'כוונת נר הבדלה היא?', options: ['חסד', 'גבורה', 'יסוד', 'נצח'], answer: 1 },
+        {
+          q: 'באיזה עולם מאיר שבת לפי הרש"ש?',
+          options: ['הבריאה', 'היצירה', 'האצילות', 'העשיה'],
+          answer: 2,
+        },
+        {
+          q: 'מוסף שבת מכוון כנגד?',
+          options: ['תפארת', 'כתר', 'יסוד', 'מלכות'],
+          answer: 1,
+        },
+        {
+          q: 'כוונת נר הבדלה היא?',
+          options: ['חסד', 'גבורה', 'יסוד', 'נצח'],
+          answer: 1,
+        },
       ],
-    }) },
+    }),
+  },
 ];
 
 // ---------------------------------------------------------------------------
 // Kabbalistic concepts for the knowledge graph (Apache AGE)
 // ---------------------------------------------------------------------------
-async function seedKabbalisticConcepts(db: ReturnType<typeof createDatabaseConnection>): Promise<void> {
+async function seedKabbalisticConcepts(
+  db: ReturnType<typeof createDatabaseConnection>
+): Promise<void> {
   const concepts: Array<{ name: string; definition: string }> = [
-    { name: 'צמצום', definition: 'כיווץ האור האלוקי שאפשר בריאת עולמות מוגבלים' },
+    {
+      name: 'צמצום',
+      definition: 'כיווץ האור האלוקי שאפשר בריאת עולמות מוגבלים',
+    },
     { name: 'רשימו', definition: 'רושם עדין של האור שנשאר בחלל לאחר הצמצום' },
     { name: 'קו', definition: 'קו אור דק שנכנס לחלל מהאין סוף לאחר הצמצום' },
-    { name: 'אצילות', definition: 'עולם האצילות — עולם האלוהות, הגבוה בארבעה עולמות' },
+    {
+      name: 'אצילות',
+      definition: 'עולם האצילות — עולם האלוהות, הגבוה בארבעה עולמות',
+    },
     { name: 'בריאה', definition: 'עולם הבריאה — עולם נשמות הצדיקים ובינה' },
     { name: 'יצירה', definition: 'עולם היצירה — עולם המלאכים' },
     { name: 'עשיה', definition: 'עולם העשיה — העולם הגשמי' },
-    { name: 'ספירות', definition: 'עשרת הכוחות האלוקיים: כתר חכמה בינה חסד גבורה תפארת נצח הוד יסוד מלכות' },
-    { name: 'פרצופים', definition: 'מבנים מורכבים של הספירות: עתיק, אריך, אבא, אמא, ז"א, נוקבא' },
-    { name: 'כוונות', definition: 'כוונות — מחשבות מיסטיות מכוונות בעת התפילה ועשיית מצוות' },
-    { name: 'תיקון', definition: 'תיקון — תהליך תיקון השברים שנגרמו בשבירת הכלים' },
-    { name: 'שבירת הכלים', definition: 'שבירת הכלים — שבירת ספירות עולם הנקודים שאפשרה בריאת הרע' },
-    { name: 'נהר שלום', definition: 'ספר שו"ת הרש"ש — ע\' תשובות לחכמי תוניס על ענייני קבלה וכוונות' },
-    { name: 'רחובות הנהר', definition: 'הקדמת הרש"ש לנהר שלום — ד\' עקרים ללימוד כתבי האר"י' },
-    { name: 'הרש"ש', definition: 'רבי שלום שרעבי (1720–1777) — ראש ישיבת בית אל, מפרש כוונות האר"י' },
+    {
+      name: 'ספירות',
+      definition:
+        'עשרת הכוחות האלוקיים: כתר חכמה בינה חסד גבורה תפארת נצח הוד יסוד מלכות',
+    },
+    {
+      name: 'פרצופים',
+      definition: 'מבנים מורכבים של הספירות: עתיק, אריך, אבא, אמא, ז"א, נוקבא',
+    },
+    {
+      name: 'כוונות',
+      definition: 'כוונות — מחשבות מיסטיות מכוונות בעת התפילה ועשיית מצוות',
+    },
+    {
+      name: 'תיקון',
+      definition: 'תיקון — תהליך תיקון השברים שנגרמו בשבירת הכלים',
+    },
+    {
+      name: 'שבירת הכלים',
+      definition: 'שבירת הכלים — שבירת ספירות עולם הנקודים שאפשרה בריאת הרע',
+    },
+    {
+      name: 'נהר שלום',
+      definition:
+        'ספר שו"ת הרש"ש — ע\' תשובות לחכמי תוניס על ענייני קבלה וכוונות',
+    },
+    {
+      name: 'רחובות הנהר',
+      definition: 'הקדמת הרש"ש לנהר שלום — ד\' עקרים ללימוד כתבי האר"י',
+    },
+    {
+      name: 'הרש"ש',
+      definition:
+        'רבי שלום שרעבי (1720–1777) — ראש ישיבת בית אל, מפרש כוונות האר"י',
+    },
   ];
 
   for (const concept of concepts) {
@@ -659,46 +989,55 @@ export async function seedNaharShalomCourse(): Promise<void> {
   const db = createDatabaseConnection();
 
   // 1. Instructor
-  await db.insert(schema.users).values({
-    id: IDS.instructor,
-    tenant_id: DEMO_TENANT,
-    email: 'kabbalah.instructor@edusphere.dev',
-    display_name: 'ר\' מרדכי כהן — מקובל',
-    first_name: 'מרדכי',
-    last_name: 'כהן',
-    role: 'INSTRUCTOR',
-  }).onConflictDoNothing();
+  await db
+    .insert(schema.users)
+    .values({
+      id: IDS.instructor,
+      tenant_id: DEMO_TENANT,
+      email: 'kabbalah.instructor@edusphere.dev',
+      display_name: "ר' מרדכי כהן — מקובל",
+      first_name: 'מרדכי',
+      last_name: 'כהן',
+      role: 'INSTRUCTOR',
+    })
+    .onConflictDoNothing();
 
   // 2. Course
-  await db.insert(schema.courses).values({
-    id: IDS.course,
-    tenant_id: DEMO_TENANT,
-    title: 'נהר שלום — פנינים מאוצר הרש"ש',
-    slug: 'nahar-shalom-rashash',
-    description:
-      'לימוד שיטתי של ספר נהר שלום לרבי שלום שרעבי (הרש"ש). ' +
-      'הקורס כולל: ביוגרפיה, ד\' עקרי רחובות הנהר, ע\' תשובות, ' +
-      'וסדר הכוונות המלא לשחרית, שבת ומועד.',
-    creator_id: IDS.instructor,
-    instructor_id: IDS.instructor,
-    is_published: true,
-    is_public: true,
-    estimated_hours: 40,
-    tags: ['קבלה', 'הרש"ש', 'נהר-שלום', 'כוונות', 'לוריאנית'],
-  }).onConflictDoNothing();
+  await db
+    .insert(schema.courses)
+    .values({
+      id: IDS.course,
+      tenant_id: DEMO_TENANT,
+      title: 'נהר שלום — פנינים מאוצר הרש"ש',
+      slug: 'nahar-shalom-rashash',
+      description:
+        'לימוד שיטתי של ספר נהר שלום לרבי שלום שרעבי (הרש"ש). ' +
+        "הקורס כולל: ביוגרפיה, ד' עקרי רחובות הנהר, ע' תשובות, " +
+        'וסדר הכוונות המלא לשחרית, שבת ומועד.',
+      creator_id: IDS.instructor,
+      instructor_id: IDS.instructor,
+      is_published: true,
+      is_public: true,
+      estimated_hours: 40,
+      tags: ['קבלה', 'הרש"ש', 'נהר-שלום', 'כוונות', 'לוריאנית'],
+    })
+    .onConflictDoNothing();
 
   // 3. Modules
   await db.insert(schema.modules).values(MODULES).onConflictDoNothing();
 
   // 4. Content items (using camelCase per contentItems.ts schema)
   for (const item of CONTENT_ITEMS) {
-    await db.insert(schema.contentItems).values({
-      moduleId: item.moduleId,
-      title: item.title,
-      type: item.type,
-      content: item.content,
-      orderIndex: item.orderIndex,
-    }).onConflictDoNothing();
+    await db
+      .insert(schema.contentItems)
+      .values({
+        moduleId: item.moduleId,
+        title: item.title,
+        type: item.type,
+        content: item.content,
+        orderIndex: item.orderIndex,
+      })
+      .onConflictDoNothing();
   }
 
   // 5. Knowledge graph
@@ -706,8 +1045,12 @@ export async function seedNaharShalomCourse(): Promise<void> {
     await seedKabbalisticConcepts(db);
   } catch {
     // Graph may not be initialized in all environments; skip gracefully
-    console.warn('⚠️  Knowledge graph unavailable — skipping Kabbalistic concepts');
+    console.warn(
+      '⚠️  Knowledge graph unavailable — skipping Kabbalistic concepts'
+    );
   }
 
-  console.log('✅ נהר שלום course seeded: 8 modules, 27 content items, 15 graph concepts');
+  console.log(
+    '✅ נהר שלום course seeded: 8 modules, 27 content items, 15 graph concepts'
+  );
 }

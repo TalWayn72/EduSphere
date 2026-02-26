@@ -108,7 +108,10 @@ function buildMessages(
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
-export function createChavrutaWorkflow(model: LanguageModel, locale: string = 'en') {
+export function createChavrutaWorkflow(
+  model: LanguageModel,
+  locale: string = 'en'
+) {
   async function step(ctx: ChavrutaContext): Promise<ChavrutaResult> {
     const system = injectLocale(SYSTEM_PROMPTS[ctx.currentState], locale);
     const messages = buildMessages(ctx);

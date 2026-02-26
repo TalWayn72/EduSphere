@@ -14,19 +14,26 @@ export class CpdResolver {
   async myCpdReport(
     @Args('startDate') startDate: string | undefined,
     @Args('endDate') endDate: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
 
-    const dateRange = startDate && endDate
-      ? { start: new Date(startDate), end: new Date(endDate) }
-      : undefined;
+    const dateRange =
+      startDate && endDate
+        ? { start: new Date(startDate), end: new Date(endDate) }
+        : undefined;
 
-    this.logger.log(`myCpdReport: userId=${auth.userId} tenantId=${auth.tenantId}`);
-    return this.cpdService.getUserCpdReport(auth.userId, auth.tenantId, dateRange);
+    this.logger.log(
+      `myCpdReport: userId=${auth.userId} tenantId=${auth.tenantId}`
+    );
+    return this.cpdService.getUserCpdReport(
+      auth.userId,
+      auth.tenantId,
+      dateRange
+    );
   }
 
   @Query('cpdCreditTypes')
@@ -41,7 +48,7 @@ export class CpdResolver {
   @Mutation('exportCpdReport')
   async exportCpdReport(
     @Args('format') format: 'NASBA' | 'AMA' | 'CSV',
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<string> {
     const auth = ctx.authContext;
     if (!auth?.userId || !auth?.tenantId) {
@@ -56,14 +63,20 @@ export class CpdResolver {
     @Args('name') name: string,
     @Args('regulatoryBody') regulatoryBody: string,
     @Args('creditHoursPerHour') creditHoursPerHour: number,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
     if (!auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-    const input: CreateCreditTypeInput = { name, regulatoryBody, creditHoursPerHour };
-    this.logger.log(`createCpdCreditType: name=${name} regulatoryBody=${regulatoryBody} tenant=${auth.tenantId}`);
+    const input: CreateCreditTypeInput = {
+      name,
+      regulatoryBody,
+      creditHoursPerHour,
+    };
+    this.logger.log(
+      `createCpdCreditType: name=${name} regulatoryBody=${regulatoryBody} tenant=${auth.tenantId}`
+    );
     return this.cpdService.createCreditType(input, auth.tenantId);
   }
 
@@ -72,14 +85,21 @@ export class CpdResolver {
     @Args('courseId') courseId: string,
     @Args('creditTypeId') creditTypeId: string,
     @Args('creditHours') creditHours: number,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<boolean> {
     const auth = ctx.authContext;
     if (!auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-    this.logger.log(`assignCpdCreditsToCourse: courseId=${courseId} creditTypeId=${creditTypeId} tenant=${auth.tenantId}`);
-    await this.cpdService.assignCreditsToCourse(courseId, creditTypeId, creditHours, auth.tenantId);
+    this.logger.log(
+      `assignCpdCreditsToCourse: courseId=${courseId} creditTypeId=${creditTypeId} tenant=${auth.tenantId}`
+    );
+    await this.cpdService.assignCreditsToCourse(
+      courseId,
+      creditTypeId,
+      creditHours,
+      auth.tenantId
+    );
     return true;
   }
 }

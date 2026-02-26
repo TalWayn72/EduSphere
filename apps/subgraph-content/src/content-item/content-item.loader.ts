@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import DataLoader from 'dataloader';
-import { ContentItemService, ContentItemMapped } from './content-item.service.js';
+import {
+  ContentItemService,
+  ContentItemMapped,
+} from './content-item.service.js';
 
 /**
  * ContentItemLoader — NestJS-injectable DataLoader that batches multiple
@@ -16,12 +19,14 @@ export class ContentItemLoader {
   constructor(private readonly contentItemService: ContentItemService) {
     this.byModuleId = new DataLoader<string, ContentItemMapped[]>(
       async (moduleIds: readonly string[]): Promise<ContentItemMapped[][]> => {
-        const batchMap = await this.contentItemService.findByModuleIdBatch([...moduleIds]);
+        const batchMap = await this.contentItemService.findByModuleIdBatch([
+          ...moduleIds,
+        ]);
 
         // DataLoader requires results in the SAME ORDER as the input keys
         return moduleIds.map((id) => batchMap.get(id) ?? []);
       },
-      { cache: false }, // Disable per-request caching — NestJS DI handles scope
+      { cache: false } // Disable per-request caching — NestJS DI handles scope
     );
   }
 }

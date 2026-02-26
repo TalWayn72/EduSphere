@@ -39,7 +39,8 @@ export class SalesforceClient {
     this.clientId = process.env['SALESFORCE_CLIENT_ID'] ?? '';
     this.clientSecret = process.env['SALESFORCE_CLIENT_SECRET'] ?? '';
     this.redirectUri =
-      process.env['SALESFORCE_REDIRECT_URI'] ?? '/crm/salesforce/oauth-callback';
+      process.env['SALESFORCE_REDIRECT_URI'] ??
+      '/crm/salesforce/oauth-callback';
   }
 
   getAuthorizationUrl(tenantId: string, state: string): string {
@@ -71,13 +72,18 @@ export class SalesforceClient {
       throw new Error(`Salesforce token exchange failed: ${text}`);
     }
     const data = (await res.json()) as {
-      access_token: string; refresh_token: string;
-      instance_url: string; issued_at?: string;
+      access_token: string;
+      refresh_token: string;
+      instance_url: string;
+      issued_at?: string;
     };
     // Salesforce tokens expire in ~2 hours; use issued_at + 7200s
     const issuedMs = data.issued_at ? Number(data.issued_at) : Date.now();
     const expiresAt = new Date(issuedMs + 7_200_000);
-    this.logger.log({ instanceUrl: data.instance_url }, 'Salesforce code exchanged');
+    this.logger.log(
+      { instanceUrl: data.instance_url },
+      'Salesforce code exchanged'
+    );
     return {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
@@ -102,42 +108,59 @@ export class SalesforceClient {
       const text = await res.text();
       throw new Error(`Salesforce token refresh failed: ${text}`);
     }
-    const data = (await res.json()) as { access_token: string; issued_at?: string };
+    const data = (await res.json()) as {
+      access_token: string;
+      issued_at?: string;
+    };
     const issuedMs = data.issued_at ? Number(data.issued_at) : Date.now();
-    return { accessToken: data.access_token, expiresAt: new Date(issuedMs + 7_200_000) };
+    return {
+      accessToken: data.access_token,
+      expiresAt: new Date(issuedMs + 7_200_000),
+    };
   }
 
   async createCompletionActivity(
     instanceUrl: string,
     accessToken: string,
-    payload: CompletionActivityInput,
+    payload: CompletionActivityInput
   ): Promise<string> {
     const body = {
       Subject: `Course Completed: ${payload.courseTitle}`,
       Status: 'Completed',
       ActivityDate: payload.completionDate.toISOString().split('T')[0],
-      Description: `User ${payload.userId} completed "${payload.courseTitle}"` +
+      Description:
+        `User ${payload.userId} completed "${payload.courseTitle}"` +
         (payload.durationHours ? ` (${payload.durationHours}h)` : ''),
       Type: 'Other',
     };
-    const res = await fetch(`${instanceUrl}/services/data/${SF_API_VERSION}/sobjects/Task/`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+    const res = await fetch(
+      `${instanceUrl}/services/data/${SF_API_VERSION}/sobjects/Task/`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`Salesforce createTask failed (${res.status}): ${text}`);
     }
     const data = (await res.json()) as { id: string };
-    this.logger.log({ activityId: data.id, courseTitle: payload.courseTitle }, 'Salesforce activity created');
+    this.logger.log(
+      { activityId: data.id, courseTitle: payload.courseTitle },
+      'Salesforce activity created'
+    );
     return data.id;
   }
 
-  verifyWebhookSignature(body: string, signature: string, secret: string): boolean {
+  verifyWebhookSignature(
+    body: string,
+    signature: string,
+    secret: string
+  ): boolean {
     const expected = createHmac('sha256', secret).update(body).digest('hex');
     // Constant-time comparison to prevent timing attacks
     if (expected.length !== signature.length) return false;

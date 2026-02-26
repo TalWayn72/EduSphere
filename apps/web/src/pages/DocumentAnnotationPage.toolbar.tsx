@@ -59,7 +59,9 @@ export function DocumentAnnotationToolbar({
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
-      <span className="text-sm font-medium truncate flex-1 min-w-0">{title}</span>
+      <span className="text-sm font-medium truncate flex-1 min-w-0">
+        {title}
+      </span>
 
       {/* Zoom controls */}
       <div className="flex items-center gap-0.5">

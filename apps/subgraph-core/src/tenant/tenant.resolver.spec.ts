@@ -10,7 +10,10 @@ const MOCK_TENANT = {
 
 describe('TenantResolver', () => {
   let resolver: TenantResolver;
-  let tenantService: { findById: ReturnType<typeof vi.fn>; findAll: ReturnType<typeof vi.fn> };
+  let tenantService: {
+    findById: ReturnType<typeof vi.fn>;
+    findAll: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     tenantService = {

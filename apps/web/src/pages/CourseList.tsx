@@ -3,9 +3,27 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Clock, Users, Plus, Globe, EyeOff, CheckCircle2, Loader2, AlertTriangle, Pencil, Sparkles } from 'lucide-react';
+import {
+  BookOpen,
+  Clock,
+  Users,
+  Plus,
+  Globe,
+  EyeOff,
+  CheckCircle2,
+  Loader2,
+  AlertTriangle,
+  Pencil,
+  Sparkles,
+} from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { COURSES_QUERY } from '@/lib/queries';
 import {
@@ -33,7 +51,8 @@ const MOCK_COURSES_FALLBACK: CourseItem[] = [
   {
     id: 'mock-course-1',
     title: 'Introduction to Talmud Study',
-    description: 'Learn the fundamentals of Talmudic reasoning and argumentation',
+    description:
+      'Learn the fundamentals of Talmudic reasoning and argumentation',
     slug: 'intro-talmud',
     thumbnailUrl: '📚',
     instructorId: 'instructor-demo',
@@ -43,7 +62,8 @@ const MOCK_COURSES_FALLBACK: CourseItem[] = [
   {
     id: 'mock-course-2',
     title: 'Advanced Chavruta Techniques',
-    description: 'Master the art of collaborative Talmud learning with AI assistance',
+    description:
+      'Master the art of collaborative Talmud learning with AI assistance',
     slug: 'advanced-chavruta',
     thumbnailUrl: '🤝',
     instructorId: 'instructor-demo',
@@ -53,7 +73,8 @@ const MOCK_COURSES_FALLBACK: CourseItem[] = [
   {
     id: 'mock-course-3',
     title: 'Knowledge Graph Navigation',
-    description: 'Explore interconnected concepts in Jewish texts using graph-based learning',
+    description:
+      'Explore interconnected concepts in Jewish texts using graph-based learning',
     slug: 'knowledge-graph',
     thumbnailUrl: '🕸️',
     instructorId: 'instructor-demo',
@@ -63,7 +84,8 @@ const MOCK_COURSES_FALLBACK: CourseItem[] = [
   {
     id: 'mock-course-4',
     title: 'Jewish Philosophy: Rambam & Ramban',
-    description: 'A comparative study of Maimonides and Nachmanides on faith and reason',
+    description:
+      'A comparative study of Maimonides and Nachmanides on faith and reason',
     slug: 'jewish-philosophy',
     thumbnailUrl: '🔭',
     instructorId: 'instructor-demo',
@@ -72,7 +94,13 @@ const MOCK_COURSES_FALLBACK: CourseItem[] = [
   },
 ];
 
-function OfflineBanner({ message, cachedLabel }: { message: string; cachedLabel: string }) {
+function OfflineBanner({
+  message,
+  cachedLabel,
+}: {
+  message: string;
+  cachedLabel: string;
+}) {
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md">
       <AlertTriangle className="h-3 w-3 flex-shrink-0" />
@@ -112,10 +140,11 @@ export function CourseList() {
 
   // MY_ENROLLMENTS_QUERY is not in the running gateway supergraph (Docker image predates
   // the feature). Pause until the image is rebuilt. Tracked in OPEN_ISSUES.md (BUG-DOCKER-001).
-  const [{ data: enrollmentsData }, reexecuteEnrollments] = useQuery<MyEnrollmentsResult>({
-    query: MY_ENROLLMENTS_QUERY,
-    pause: true,
-  });
+  const [{ data: enrollmentsData }, reexecuteEnrollments] =
+    useQuery<MyEnrollmentsResult>({
+      query: MY_ENROLLMENTS_QUERY,
+      pause: true,
+    });
 
   const [, executeEnroll] = useMutation<
     { enrollCourse: UserEnrollment },
@@ -127,10 +156,14 @@ export function CourseList() {
     { courseId: string }
   >(UNENROLL_COURSE_MUTATION);
 
-  const [localPublishState, setLocalPublishState] = useState<Map<string, boolean>>(new Map());
+  const [localPublishState, setLocalPublishState] = useState<
+    Map<string, boolean>
+  >(new Map());
   const [toast, setToast] = useState<string | null>(null);
   const [aiModalOpen, setAiModalOpen] = useState(false);
-  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Cleanup toast timeout on unmount
   useEffect(() => {
@@ -160,14 +193,20 @@ export function CourseList() {
       .map((e) => e.courseId)
   );
 
-  const handleEnroll = async (e: React.MouseEvent, courseId: string, title: string) => {
+  const handleEnroll = async (
+    e: React.MouseEvent,
+    courseId: string,
+    title: string
+  ) => {
     e.stopPropagation();
     const alreadyEnrolled = enrolledCourseIds.has(courseId);
 
     if (alreadyEnrolled) {
       const { error } = await executeUnenroll({ courseId });
       if (error) {
-        showToast(`Failed to unenroll: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+        showToast(
+          `Failed to unenroll: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+        );
       } else {
         showToast(`Unenrolled from "${title}"`);
         reexecuteEnrollments({ requestPolicy: 'network-only' });
@@ -175,7 +214,9 @@ export function CourseList() {
     } else {
       const { error } = await executeEnroll({ courseId });
       if (error) {
-        showToast(`Failed to enroll: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+        showToast(
+          `Failed to enroll: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+        );
       } else {
         showToast(`Enrolled in "${title}"!`);
         reexecuteEnrollments({ requestPolicy: 'network-only' });
@@ -183,7 +224,11 @@ export function CourseList() {
     }
   };
 
-  const togglePublish = (e: React.MouseEvent, courseId: string, current: boolean) => {
+  const togglePublish = (
+    e: React.MouseEvent,
+    courseId: string,
+    current: boolean
+  ) => {
     e.stopPropagation();
     setLocalPublishState((prev) => new Map(prev).set(courseId, !current));
   };
@@ -207,23 +252,31 @@ export function CourseList() {
 
       <div className="space-y-6">
         {error && (
-          <OfflineBanner message={`[Network] Failed to fetch — ${error.message}`} cachedLabel={t('showingCachedData')} />
+          <OfflineBanner
+            message={`[Network] Failed to fetch — ${error.message}`}
+            cachedLabel={t('showingCachedData')}
+          />
         )}
 
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-            <p className="text-muted-foreground">
-              {t('exploreCollection')}
-            </p>
+            <p className="text-muted-foreground">{t('exploreCollection')}</p>
           </div>
           {isInstructor && (
             <div className="flex gap-2 shrink-0">
-              <Button variant="outline" onClick={() => setAiModalOpen(true)} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setAiModalOpen(true)}
+                className="gap-2"
+              >
                 <Sparkles className="h-4 w-4" />
                 AI Create Course
               </Button>
-              <Button onClick={() => navigate('/courses/new')} className="gap-2">
+              <Button
+                onClick={() => navigate('/courses/new')}
+                className="gap-2"
+              >
                 <Plus className="h-4 w-4" />
                 {t('newCourse')}
               </Button>
@@ -261,7 +314,9 @@ export function CourseList() {
 
                 <CardHeader>
                   <div className="flex items-start justify-between mb-2">
-                    <div className="text-4xl">{course.thumbnailUrl ?? '📚'}</div>
+                    <div className="text-4xl">
+                      {course.thumbnailUrl ?? '📚'}
+                    </div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -274,8 +329,12 @@ export function CourseList() {
                       {t('open')}
                     </Button>
                   </div>
-                  <CardTitle className="text-xl leading-snug">{course.title}</CardTitle>
-                  <CardDescription className="line-clamp-2">{course.description}</CardDescription>
+                  <CardTitle className="text-xl leading-snug">
+                    {course.title}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {course.description}
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent>
@@ -283,12 +342,18 @@ export function CourseList() {
                     {course.estimatedHours != null && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="h-4 w-4 shrink-0" />
-                        <span>{t('hoursEstimated', { hours: course.estimatedHours })}</span>
+                        <span>
+                          {t('hoursEstimated', {
+                            hours: course.estimatedHours,
+                          })}
+                        </span>
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <BookOpen className="h-4 w-4 shrink-0" />
-                      <span className="truncate font-mono text-xs">{course.instructorId}</span>
+                      <span className="truncate font-mono text-xs">
+                        {course.instructorId}
+                      </span>
                     </div>
 
                     {!isInstructor && (
@@ -296,7 +361,9 @@ export function CourseList() {
                         variant={isEnrolled ? 'secondary' : 'default'}
                         size="sm"
                         className="w-full mt-1 gap-1.5"
-                        onClick={(e) => handleEnroll(e, course.id, course.title)}
+                        onClick={(e) =>
+                          handleEnroll(e, course.id, course.title)
+                        }
                       >
                         {isEnrolled ? (
                           <>
@@ -327,7 +394,9 @@ export function CourseList() {
                           variant="ghost"
                           size="sm"
                           className="flex-1 gap-1.5"
-                          onClick={(e) => togglePublish(e, course.id, published)}
+                          onClick={(e) =>
+                            togglePublish(e, course.id, published)
+                          }
                         >
                           {published ? (
                             <>
@@ -354,12 +423,17 @@ export function CourseList() {
           <Card>
             <CardContent className="pt-6 text-center">
               <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{t('noCoursesYet')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('noCoursesYet')}
+              </p>
             </CardContent>
           </Card>
         )}
       </div>
-      <AiCourseCreatorModal open={aiModalOpen} onClose={() => setAiModalOpen(false)} />
+      <AiCourseCreatorModal
+        open={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+      />
     </Layout>
   );
 }

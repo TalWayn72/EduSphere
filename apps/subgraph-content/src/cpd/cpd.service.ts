@@ -24,12 +24,22 @@ import {
   withTenantContext,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import { connect, StringCodec, type NatsConnection, type Subscription } from 'nats';
+import {
+  connect,
+  StringCodec,
+  type NatsConnection,
+  type Subscription,
+} from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { isCourseCompletedEvent } from '@edusphere/nats-client';
 import type { CourseCompletedPayload } from '@edusphere/nats-client';
 import { CpdExportService } from './cpd-export.service.js';
-import type { CpdReport, CpdLogEntry, CpdTypeSummary, CreateCreditTypeInput } from './cpd.types.js';
+import type {
+  CpdReport,
+  CpdLogEntry,
+  CpdTypeSummary,
+  CreateCreditTypeInput,
+} from './cpd.types.js';
 
 const COURSE_COMPLETED_SUBJECT = 'EDUSPHERE.course.completed';
 
@@ -78,22 +88,35 @@ export class CpdService implements OnModuleInit, OnModuleDestroy {
           await this.handleCourseCompleted(raw);
         }
       } catch (err) {
-        this.logger.warn({ err }, 'CpdService: failed to process course.completed message');
+        this.logger.warn(
+          { err },
+          'CpdService: failed to process course.completed message'
+        );
       }
     }
   }
 
-  private async handleCourseCompleted(payload: CourseCompletedPayload): Promise<void> {
-    const { courseId, userId, tenantId, completionDate, certificateId } = payload;
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+  private async handleCourseCompleted(
+    payload: CourseCompletedPayload
+  ): Promise<void> {
+    const { courseId, userId, tenantId, completionDate, certificateId } =
+      payload;
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
 
     const credits = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.courseCpdCredits)
-        .where(and(
-          eq(schema.courseCpdCredits.courseId, courseId),
-          eq(schema.courseCpdCredits.tenantId, tenantId),
-        )),
+        .where(
+          and(
+            eq(schema.courseCpdCredits.courseId, courseId),
+            eq(schema.courseCpdCredits.tenantId, tenantId)
+          )
+        )
     );
 
     if (credits.length === 0) return;
@@ -113,36 +136,44 @@ export class CpdService implements OnModuleInit, OnModuleDestroy {
 
     this.logger.log(
       { userId, courseId, tenantId, creditCount: credits.length },
-      'CpdService: CPD log entries created from course completion',
+      'CpdService: CPD log entries created from course completion'
     );
   }
 
   async getUserCpdReport(
     userId: string,
     tenantId: string,
-    dateRange?: { start: Date; end: Date },
+    dateRange?: { start: Date; end: Date }
   ): Promise<CpdReport> {
     const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
 
     const rows = await withTenantContext(this.db, ctx, async (tx) => {
-      let query = tx.select({
-        id: schema.userCpdLog.id,
-        courseId: schema.userCpdLog.courseId,
-        earnedHours: schema.userCpdLog.earnedHours,
-        completionDate: schema.userCpdLog.completionDate,
-        creditTypeName: schema.cpdCreditTypes.name,
-        regulatoryBody: schema.cpdCreditTypes.regulatoryBody,
-      })
+      let query = tx
+        .select({
+          id: schema.userCpdLog.id,
+          courseId: schema.userCpdLog.courseId,
+          earnedHours: schema.userCpdLog.earnedHours,
+          completionDate: schema.userCpdLog.completionDate,
+          creditTypeName: schema.cpdCreditTypes.name,
+          regulatoryBody: schema.cpdCreditTypes.regulatoryBody,
+        })
         .from(schema.userCpdLog)
-        .innerJoin(schema.cpdCreditTypes, eq(schema.cpdCreditTypes.id, schema.userCpdLog.creditTypeId))
-        .where(and(
-          eq(schema.userCpdLog.userId, userId),
-          eq(schema.userCpdLog.tenantId, tenantId),
-          ...(dateRange ? [
-            gte(schema.userCpdLog.completionDate, dateRange.start),
-            lte(schema.userCpdLog.completionDate, dateRange.end),
-          ] : []),
-        ));
+        .innerJoin(
+          schema.cpdCreditTypes,
+          eq(schema.cpdCreditTypes.id, schema.userCpdLog.creditTypeId)
+        )
+        .where(
+          and(
+            eq(schema.userCpdLog.userId, userId),
+            eq(schema.userCpdLog.tenantId, tenantId),
+            ...(dateRange
+              ? [
+                  gte(schema.userCpdLog.completionDate, dateRange.start),
+                  lte(schema.userCpdLog.completionDate, dateRange.end),
+                ]
+              : [])
+          )
+        );
       return query;
     });
 
@@ -162,7 +193,11 @@ export class CpdService implements OnModuleInit, OnModuleDestroy {
       if (existing) {
         existing.totalHours += hours;
       } else {
-        byTypeMap.set(key, { name: r.creditTypeName, regulatoryBody: r.regulatoryBody, totalHours: hours });
+        byTypeMap.set(key, {
+          name: r.creditTypeName,
+          regulatoryBody: r.regulatoryBody,
+          totalHours: hours,
+        });
       }
     }
 
@@ -175,7 +210,7 @@ export class CpdService implements OnModuleInit, OnModuleDestroy {
   async exportCpdReport(
     userId: string,
     tenantId: string,
-    format: 'NASBA' | 'AMA' | 'CSV',
+    format: 'NASBA' | 'AMA' | 'CSV'
   ): Promise<string> {
     const report = await this.getUserCpdReport(userId, tenantId);
     return this.exportService.generateReport(report, userId, tenantId, format);
@@ -185,9 +220,13 @@ export class CpdService implements OnModuleInit, OnModuleDestroy {
     courseId: string,
     creditTypeId: string,
     creditHours: number,
-    tenantId: string,
+    tenantId: string
   ): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
       tx.insert(schema.courseCpdCredits).values({
         courseId,
@@ -195,39 +234,59 @@ export class CpdService implements OnModuleInit, OnModuleDestroy {
         creditTypeId,
         creditHours: creditHours.toFixed(2),
         approvedAt: new Date(),
-      }),
+      })
     );
-    this.logger.log({ courseId, creditTypeId, creditHours, tenantId }, 'CPD credits assigned to course');
+    this.logger.log(
+      { courseId, creditTypeId, creditHours, tenantId },
+      'CPD credits assigned to course'
+    );
   }
 
-  async listCreditTypes(tenantId: string): Promise<typeof schema.cpdCreditTypes.$inferSelect[]> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+  async listCreditTypes(
+    tenantId: string
+  ): Promise<(typeof schema.cpdCreditTypes.$inferSelect)[]> {
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
     return withTenantContext(this.db, ctx, async (tx) =>
-      tx.select()
+      tx
+        .select()
         .from(schema.cpdCreditTypes)
-        .where(and(
-          eq(schema.cpdCreditTypes.tenantId, tenantId),
-          eq(schema.cpdCreditTypes.isActive, true),
-        )),
+        .where(
+          and(
+            eq(schema.cpdCreditTypes.tenantId, tenantId),
+            eq(schema.cpdCreditTypes.isActive, true)
+          )
+        )
     );
   }
 
   async createCreditType(
     input: CreateCreditTypeInput,
-    tenantId: string,
+    tenantId: string
   ): Promise<typeof schema.cpdCreditTypes.$inferSelect> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'SUPER_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'SUPER_ADMIN',
+    };
     const [created] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.cpdCreditTypes)
+      tx
+        .insert(schema.cpdCreditTypes)
         .values({
           tenantId,
           name: input.name,
           regulatoryBody: input.regulatoryBody,
           creditHoursPerHour: input.creditHoursPerHour.toFixed(2),
         })
-        .returning(),
+        .returning()
     );
-    this.logger.log({ name: input.name, regulatoryBody: input.regulatoryBody, tenantId }, 'CPD credit type created');
+    this.logger.log(
+      { name: input.name, regulatoryBody: input.regulatoryBody, tenantId },
+      'CPD credit type created'
+    );
     return created!;
   }
 }

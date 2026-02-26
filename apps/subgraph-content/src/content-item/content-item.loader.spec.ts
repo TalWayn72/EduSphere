@@ -90,7 +90,8 @@ describe('ContentItemLoader', () => {
       expect(serviceMock.findByModuleIdBatch).toHaveBeenCalledTimes(1);
 
       // All three moduleIds were passed in one batch call
-      const calledWith: string[] = serviceMock.findByModuleIdBatch.mock.calls[0]![0];
+      const calledWith: string[] =
+        serviceMock.findByModuleIdBatch.mock.calls[0]![0];
       expect(calledWith).toHaveLength(3);
       expect(calledWith).toContain('module-a');
       expect(calledWith).toContain('module-b');

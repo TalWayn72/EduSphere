@@ -3,9 +3,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // ── Mock @aws-sdk/client-s3 ──────────────────────────────────────────────────
 const mockS3Send = vi.fn();
 vi.mock('@aws-sdk/client-s3', () => ({
-  S3Client: vi.fn().mockImplementation(function() { return { send: mockS3Send }; }),
-  PutObjectCommand: vi.fn().mockImplementation(function(args) { return args; }),
-  GetObjectCommand: vi.fn().mockImplementation(function(args) { return args; }),
+  S3Client: vi.fn().mockImplementation(function () {
+    return { send: mockS3Send };
+  }),
+  PutObjectCommand: vi.fn().mockImplementation(function (args) {
+    return args;
+  }),
+  GetObjectCommand: vi.fn().mockImplementation(function (args) {
+    return args;
+  }),
 }));
 
 // ── Mock @aws-sdk/s3-request-presigner ──────────────────────────────────────
@@ -39,7 +45,9 @@ vi.mock('child_process', () => ({
 
 // ── Mock fs/promises ─────────────────────────────────────────────────────────
 const mockMkdir = vi.fn().mockResolvedValue(undefined);
-const mockReaddir = vi.fn().mockResolvedValue(['master.m3u8', '720p.m3u8', '720p_0000.ts']);
+const mockReaddir = vi
+  .fn()
+  .mockResolvedValue(['master.m3u8', '720p.m3u8', '720p_0000.ts']);
 const mockUnlink = vi.fn().mockResolvedValue(undefined);
 const mockRmdir = vi.fn().mockResolvedValue(undefined);
 const mockWriteFile = vi.fn().mockResolvedValue(undefined);
@@ -54,7 +62,9 @@ vi.mock('fs/promises', () => ({
 // ── Mock fs ──────────────────────────────────────────────────────────────────
 vi.mock('fs', () => ({
   createReadStream: vi.fn().mockReturnValue({ pipe: vi.fn() }),
-  createWriteStream: vi.fn().mockReturnValue({ write: vi.fn(), end: vi.fn(), on: vi.fn() }),
+  createWriteStream: vi
+    .fn()
+    .mockReturnValue({ write: vi.fn(), end: vi.fn(), on: vi.fn() }),
 }));
 
 // ── Mock stream/promises ─────────────────────────────────────────────────────
@@ -74,24 +84,26 @@ vi.mock('stream', () => ({
  * Called inside a single tick via Promise.resolve().then() so the service's
  * spawn-based promise resolves correctly.
  */
-function simulateFfmpegSuccess(durationLine = 'Duration: 00:10:30.00, start: 0') {
+function simulateFfmpegSuccess(
+  durationLine = 'Duration: 00:10:30.00, start: 0'
+) {
   // FFmpeg stderr data callback
-  const stderrCallback = mockStderrOn.mock.calls.find(([event]: [string]) => event === 'data')?.[1] as
-    | ((data: Buffer) => void)
-    | undefined;
+  const stderrCallback = mockStderrOn.mock.calls.find(
+    ([event]: [string]) => event === 'data'
+  )?.[1] as ((data: Buffer) => void) | undefined;
   if (stderrCallback) stderrCallback(Buffer.from(durationLine));
 
   // FFmpeg close callback with code 0
-  const closeCallback = mockFfmpegOn.mock.calls.find(([event]: [string]) => event === 'close')?.[1] as
-    | ((code: number) => void)
-    | undefined;
+  const closeCallback = mockFfmpegOn.mock.calls.find(
+    ([event]: [string]) => event === 'close'
+  )?.[1] as ((code: number) => void) | undefined;
   if (closeCallback) closeCallback(0);
 }
 
 function simulateFfmpegFailure(code = 1) {
-  const closeCallback = mockFfmpegOn.mock.calls.find(([event]: [string]) => event === 'close')?.[1] as
-    | ((code: number) => void)
-    | undefined;
+  const closeCallback = mockFfmpegOn.mock.calls.find(
+    ([event]: [string]) => event === 'close'
+  )?.[1] as ((code: number) => void) | undefined;
   if (closeCallback) closeCallback(code);
 }
 
@@ -132,7 +144,7 @@ describe('HlsService', () => {
       const { S3Client } = await import('@aws-sdk/client-s3');
       new HlsService();
       expect(S3Client).toHaveBeenCalledWith(
-        expect.objectContaining({ endpoint: 'http://custom-minio:9001' }),
+        expect.objectContaining({ endpoint: 'http://custom-minio:9001' })
       );
       delete process.env.MINIO_ENDPOINT;
     });
@@ -144,7 +156,10 @@ describe('HlsService', () => {
     it('returns null for audio files without running FFmpeg', async () => {
       const { spawn } = await import('child_process');
       const service = new HlsService();
-      const result = await service.transcodeToHls('tenant/course/id/file.mp3', 'tenant/course/id/hls');
+      const result = await service.transcodeToHls(
+        'tenant/course/id/file.mp3',
+        'tenant/course/id/hls'
+      );
 
       expect(result).toBeNull();
       expect(spawn).not.toHaveBeenCalled();
@@ -153,7 +168,10 @@ describe('HlsService', () => {
     it('returns null for PDF files without running FFmpeg', async () => {
       const { spawn } = await import('child_process');
       const service = new HlsService();
-      const result = await service.transcodeToHls('tenant/course/id/slide.pdf', 'tenant/course/id/hls');
+      const result = await service.transcodeToHls(
+        'tenant/course/id/slide.pdf',
+        'tenant/course/id/hls'
+      );
 
       expect(result).toBeNull();
       expect(spawn).not.toHaveBeenCalled();
@@ -165,7 +183,7 @@ describe('HlsService', () => {
       // Run transcodeToHls and simultaneously simulate FFmpeg success
       const transcodePromise = service.transcodeToHls(
         'tenant/course/id/video.mp4',
-        'tenant/course/id/hls',
+        'tenant/course/id/hls'
       );
       // Wait for spawn to be called (more async steps than 2 ticks)
       const { spawn } = await import('child_process');
@@ -185,7 +203,7 @@ describe('HlsService', () => {
 
       await import('@aws-sdk/client-s3');
       expect(mockS3Send).toHaveBeenCalledWith(
-        expect.objectContaining({ Key: 'tenant/course/id/video.mp4' }),
+        expect.objectContaining({ Key: 'tenant/course/id/video.mp4' })
       );
     });
 
@@ -194,7 +212,7 @@ describe('HlsService', () => {
 
       const transcodePromise = service.transcodeToHls(
         'tenant/course/id/video.mp4',
-        'tenant/course/id/hls',
+        'tenant/course/id/hls'
       );
       // Wait for spawn to be called before simulating FFmpeg
       const { spawn: _spawn } = await import('child_process');
@@ -223,7 +241,7 @@ describe('HlsService', () => {
 
       const transcodePromise = service.transcodeToHls(
         'tenant/course/id/video.mp4',
-        'tenant/course/id/hls',
+        'tenant/course/id/hls'
       );
       // Wait for spawn to be called before simulating FFmpeg
       const { spawn: _spawn } = await import('child_process');
@@ -251,7 +269,7 @@ describe('HlsService', () => {
 
       const transcodePromise = service.transcodeToHls(
         'tenant/course/id/video.mp4',
-        'tenant/course/id/hls',
+        'tenant/course/id/hls'
       );
       // Wait for spawn to be called before simulating FFmpeg
       const { spawn: _spawn } = await import('child_process');
@@ -267,7 +285,9 @@ describe('HlsService', () => {
       });
       simulateFfmpegFailure(1);
 
-      await expect(transcodePromise).rejects.toThrow(/FFmpeg exited with code 1/);
+      await expect(transcodePromise).rejects.toThrow(
+        /FFmpeg exited with code 1/
+      );
 
       // cleanup must still have been called
       expect(mockRmdir).toHaveBeenCalled();
@@ -278,7 +298,7 @@ describe('HlsService', () => {
 
       const transcodePromise = service.transcodeToHls(
         'tenant/course/id/video.mp4',
-        'tenant/course/id/hls',
+        'tenant/course/id/hls'
       );
       // Wait for spawn to be called before simulating FFmpeg
       const { spawn: _spawn } = await import('child_process');
@@ -304,7 +324,7 @@ describe('HlsService', () => {
 
       const transcodePromise = service.transcodeToHls(
         'tenant/course/id/video.mp4',
-        'tenant/course/id/hls',
+        'tenant/course/id/hls'
       );
       // Wait for spawn to be called before simulating FFmpeg
       const { spawn: _spawn } = await import('child_process');
@@ -331,7 +351,9 @@ describe('HlsService', () => {
     it('returns a presigned URL for a given manifest key', async () => {
       const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
       const service = new HlsService();
-      const url = await service.getManifestPresignedUrl('tenant/course/id/hls/master.m3u8');
+      const url = await service.getManifestPresignedUrl(
+        'tenant/course/id/hls/master.m3u8'
+      );
 
       expect(url).toBe('https://minio/presigned-url');
       expect(getSignedUrl).toHaveBeenCalled();
@@ -363,7 +385,8 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
       eq: vi.fn(),
     }));
 
-    const { TranscriptionService } = await import('../transcription/transcription.service');
+    const { TranscriptionService } =
+      await import('../transcription/transcription.service');
 
     const mockWhisper = {
       transcribe: vi.fn().mockResolvedValue({
@@ -372,12 +395,18 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
         segments: [{ id: 0, start: 0, end: 1, text: 'Hello' }],
       }),
     };
-    const mockMinio = { downloadToTemp: vi.fn().mockResolvedValue('/tmp/video.mp4') };
+    const mockMinio = {
+      downloadToTemp: vi.fn().mockResolvedValue('/tmp/video.mp4'),
+    };
     const mockNats = { publish: vi.fn().mockResolvedValue(undefined) };
     const mockConceptExtractor = { extract: vi.fn().mockResolvedValue([]) };
-    const mockGraphBuilder = { publishConcepts: vi.fn().mockResolvedValue(undefined) };
+    const mockGraphBuilder = {
+      publishConcepts: vi.fn().mockResolvedValue(undefined),
+    };
     const mockHls = {
-      transcodeToHls: vi.fn().mockRejectedValue(new Error('FFmpeg not installed')),
+      transcodeToHls: vi
+        .fn()
+        .mockRejectedValue(new Error('FFmpeg not installed')),
       getManifestPresignedUrl: vi.fn(),
     };
 
@@ -387,7 +416,7 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
       mockNats as any,
       mockConceptExtractor as any,
       mockGraphBuilder as any,
-      mockHls as any,
+      mockHls as any
     );
 
     await service.transcribeFile({
@@ -402,7 +431,7 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
     // Transcription must have published COMPLETED despite HLS failure
     expect(mockNats.publish).toHaveBeenCalledWith(
       'transcription.completed',
-      expect.objectContaining({ assetId: 'asset-uuid' }),
+      expect.objectContaining({ assetId: 'asset-uuid' })
     );
 
     // Give the fire-and-forget HLS promise time to settle
@@ -411,7 +440,7 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
     // HLS was attempted
     expect(mockHls.transcodeToHls).toHaveBeenCalledWith(
       'tenant/course/id/video.mp4',
-      'tenant-uuid/course-uuid/asset-uuid/hls',
+      'tenant-uuid/course-uuid/asset-uuid/hls'
     );
   });
 });

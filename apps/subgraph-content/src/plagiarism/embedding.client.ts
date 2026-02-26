@@ -21,14 +21,14 @@ export class EmbeddingClient {
       return this.embedWithOpenAI(openaiKey, text);
     }
     throw new Error(
-      'No embedding provider configured: set OLLAMA_URL or OPENAI_API_KEY',
+      'No embedding provider configured: set OLLAMA_URL or OPENAI_API_KEY'
     );
   }
 
   private async embedWithOllama(
     baseUrl: string,
     model: string,
-    text: string,
+    text: string
   ): Promise<number[]> {
     const url = `${baseUrl.replace(/\/$/, '')}/api/embeddings`;
     const resp = await fetch(url, {
@@ -44,11 +44,16 @@ export class EmbeddingClient {
     if (!Array.isArray(json.embedding) || json.embedding.length === 0) {
       throw new Error('Ollama returned empty embedding vector');
     }
-    this.logger.debug(`Ollama embed: model=${model} dim=${json.embedding.length}`);
+    this.logger.debug(
+      `Ollama embed: model=${model} dim=${json.embedding.length}`
+    );
     return json.embedding;
   }
 
-  private async embedWithOpenAI(apiKey: string, text: string): Promise<number[]> {
+  private async embedWithOpenAI(
+    apiKey: string,
+    text: string
+  ): Promise<number[]> {
     const resp = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: {
@@ -65,7 +70,9 @@ export class EmbeddingClient {
       const body = await resp.text().catch(() => '');
       throw new Error(`OpenAI embeddings error ${resp.status}: ${body}`);
     }
-    const json = (await resp.json()) as { data: Array<{ embedding: number[] }> };
+    const json = (await resp.json()) as {
+      data: Array<{ embedding: number[] }>;
+    };
     const vector = json.data?.[0]?.embedding;
     if (!Array.isArray(vector) || vector.length === 0) {
       throw new Error('OpenAI returned empty embedding vector');

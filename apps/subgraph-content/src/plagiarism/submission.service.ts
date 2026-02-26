@@ -53,7 +53,7 @@ export class SubmissionService implements OnModuleDestroy {
     tenantId: string,
     courseId: string,
     textContent: string,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<TextSubmissionResult> {
     const wordCount = textContent.trim().split(/\s+/).filter(Boolean).length;
 
@@ -85,7 +85,7 @@ export class SubmissionService implements OnModuleDestroy {
     });
 
     this.logger.log(
-      `SubmissionService: submitted ${submission.id} for user=${userId} contentItem=${contentItemId}`,
+      `SubmissionService: submitted ${submission.id} for user=${userId} contentItem=${contentItemId}`
     );
 
     return {
@@ -102,7 +102,7 @@ export class SubmissionService implements OnModuleDestroy {
   async getMySubmissions(
     contentItemId: string,
     userId: string,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<TextSubmissionResult[]> {
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
       tx
@@ -111,9 +111,9 @@ export class SubmissionService implements OnModuleDestroy {
         .where(
           and(
             eq(schema.textSubmissions.contentItemId, contentItemId),
-            eq(schema.textSubmissions.userId, userId),
-          ),
-        ),
+            eq(schema.textSubmissions.userId, userId)
+          )
+        )
     );
 
     return rows.map((r) => ({
@@ -130,7 +130,7 @@ export class SubmissionService implements OnModuleDestroy {
   async getPlagiarismReport(
     submissionId: string,
     requesterId: string,
-    ctx: TenantContext,
+    ctx: TenantContext
   ): Promise<PlagiarismReport | null> {
     const adminCtx: TenantContext = { ...ctx, userRole: 'SUPER_ADMIN' };
 
@@ -139,13 +139,16 @@ export class SubmissionService implements OnModuleDestroy {
         .select()
         .from(schema.textSubmissions)
         .where(eq(schema.textSubmissions.id, submissionId))
-        .limit(1),
+        .limit(1)
     );
 
-    if (!sub) throw new NotFoundException(`Submission ${submissionId} not found`);
+    if (!sub)
+      throw new NotFoundException(`Submission ${submissionId} not found`);
 
     const isOwner = sub.userId === requesterId;
-    const isElevated = ['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR'].includes(ctx.userRole);
+    const isElevated = ['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR'].includes(
+      ctx.userRole
+    );
     if (!isOwner && !isElevated) {
       throw new ForbiddenException('Access denied to this submission');
     }
@@ -155,7 +158,7 @@ export class SubmissionService implements OnModuleDestroy {
         .select()
         .from(schema.submissionEmbeddings)
         .where(eq(schema.submissionEmbeddings.submissionId, submissionId))
-        .limit(1),
+        .limit(1)
     );
 
     if (!embRow) return null;
@@ -192,15 +195,24 @@ export class SubmissionService implements OnModuleDestroy {
 
   // ── NATS publish ───────────────────────────────────────────────────────────
 
-  private async publishSubmissionCreated(payload: SubmissionCreatedPayload): Promise<void> {
+  private async publishSubmissionCreated(
+    payload: SubmissionCreatedPayload
+  ): Promise<void> {
     let nc;
     try {
       nc = await connect(buildNatsOptions());
-      nc.publish('EDUSPHERE.submission.created', this.sc.encode(JSON.stringify(payload)));
+      nc.publish(
+        'EDUSPHERE.submission.created',
+        this.sc.encode(JSON.stringify(payload))
+      );
       await nc.flush();
-      this.logger.debug(`Published EDUSPHERE.submission.created: id=${payload.submissionId}`);
+      this.logger.debug(
+        `Published EDUSPHERE.submission.created: id=${payload.submissionId}`
+      );
     } catch (err) {
-      this.logger.error(`Failed to publish EDUSPHERE.submission.created: ${String(err)}`);
+      this.logger.error(
+        `Failed to publish EDUSPHERE.submission.created: ${String(err)}`
+      );
     } finally {
       if (nc) await nc.close().catch(() => undefined);
     }

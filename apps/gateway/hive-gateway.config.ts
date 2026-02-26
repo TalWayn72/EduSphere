@@ -13,7 +13,10 @@ export default defineConfig({
 
   // CORS configuration
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN?.split(',') || [
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ],
     credentials: true,
   },
 
@@ -28,7 +31,8 @@ export default defineConfig({
 
   // Logging configuration
   logging: {
-    level: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
+    level:
+      (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
   },
 
   // Polling interval for schema updates (10 seconds)

@@ -17,7 +17,12 @@ interface ContentItemResult {
 }
 
 function SkeletonBlock() {
-  return <div className="bg-muted animate-pulse rounded h-4 w-full" aria-hidden="true" />;
+  return (
+    <div
+      className="bg-muted animate-pulse rounded h-4 w-full"
+      aria-hidden="true"
+    />
+  );
 }
 
 export function RichDocumentPage() {
@@ -38,7 +43,10 @@ export function RichDocumentPage() {
       <div className="max-w-3xl mx-auto py-6 space-y-4">
         {fetching && (
           <div className="space-y-3">
-            <div className="bg-muted animate-pulse rounded h-8 w-1/2" aria-hidden="true" />
+            <div
+              className="bg-muted animate-pulse rounded h-8 w-1/2"
+              aria-hidden="true"
+            />
             {Array.from({ length: 5 }).map((_, i) => (
               <SkeletonBlock key={i} />
             ))}
@@ -60,7 +68,9 @@ export function RichDocumentPage() {
                 {item.contentType === 'RICH_DOCUMENT' && item.content ? (
                   <RichContentViewer content={item.content} />
                 ) : (
-                  <p className="p-6 text-muted-foreground text-sm">No content available.</p>
+                  <p className="p-6 text-muted-foreground text-sm">
+                    No content available.
+                  </p>
                 )}
               </CardContent>
             </Card>

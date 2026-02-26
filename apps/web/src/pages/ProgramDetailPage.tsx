@@ -48,7 +48,9 @@ export function ProgramDetailPage(): React.ReactElement {
     pause: !id,
   });
 
-  const [enrollmentsResult] = useQuery<{ myProgramEnrollments: ProgramEnrollment[] }>({
+  const [enrollmentsResult] = useQuery<{
+    myProgramEnrollments: ProgramEnrollment[];
+  }>({
     query: MY_PROGRAM_ENROLLMENTS_QUERY,
   });
 
@@ -81,9 +83,7 @@ export function ProgramDetailPage(): React.ReactElement {
   }
 
   if (!program) {
-    return (
-      <div className="p-6 text-destructive">Program not found.</div>
-    );
+    return <div className="p-6 text-destructive">Program not found.</div>;
   }
 
   const completedSet = new Set(progress?.completedCourseIds ?? []);
@@ -93,7 +93,11 @@ export function ProgramDetailPage(): React.ReactElement {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-3xl">
-      <Button variant="ghost" className="mb-4" onClick={() => navigate('/programs')}>
+      <Button
+        variant="ghost"
+        className="mb-4"
+        onClick={() => navigate('/programs')}
+      >
         Back to Programs
       </Button>
 
@@ -104,10 +108,16 @@ export function ProgramDetailPage(): React.ReactElement {
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <CardTitle className="text-2xl">{program.title}</CardTitle>
-                {isCompleted && <Badge className="bg-green-500">Completed</Badge>}
-                {isEnrolled && !isCompleted && <Badge variant="secondary">In Progress</Badge>}
+                {isCompleted && (
+                  <Badge className="bg-green-500">Completed</Badge>
+                )}
+                {isEnrolled && !isCompleted && (
+                  <Badge variant="secondary">In Progress</Badge>
+                )}
               </div>
-              <p className="text-muted-foreground mt-2">{program.description}</p>
+              <p className="text-muted-foreground mt-2">
+                {program.description}
+              </p>
               <div className="flex gap-4 text-sm text-muted-foreground mt-3">
                 <span>{totalCourses} courses required</span>
                 <span>{program.totalHours}h total</span>
@@ -121,10 +131,18 @@ export function ProgramDetailPage(): React.ReactElement {
           <CardContent>
             <div className="mb-1 flex justify-between text-sm text-muted-foreground">
               <span>Progress</span>
-              <span>{completedCourses}/{totalCourses} courses</span>
+              <span>
+                {completedCourses}/{totalCourses} courses
+              </span>
             </div>
-            <Progress value={pct} className="h-3" aria-label={`${pct}% complete`} />
-            <p className="text-sm text-muted-foreground mt-1">{pct}% complete</p>
+            <Progress
+              value={pct}
+              className="h-3"
+              aria-label={`${pct}% complete`}
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              {pct}% complete
+            </p>
           </CardContent>
         )}
       </Card>
@@ -135,14 +153,18 @@ export function ProgramDetailPage(): React.ReactElement {
         </CardHeader>
         <CardContent>
           {program.requiredCourseIds.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No courses defined yet.</p>
+            <p className="text-muted-foreground text-sm">
+              No courses defined yet.
+            </p>
           ) : (
             <ul className="space-y-2">
               {program.requiredCourseIds.map((courseId, idx) => {
                 const done = completedSet.has(courseId);
                 return (
                   <li key={courseId} className="flex items-center gap-3">
-                    <span className={`text-lg ${done ? 'text-green-500' : 'text-muted-foreground'}`}>
+                    <span
+                      className={`text-lg ${done ? 'text-green-500' : 'text-muted-foreground'}`}
+                    >
                       {done ? '✓' : '○'}
                     </span>
                     <span
@@ -151,7 +173,14 @@ export function ProgramDetailPage(): React.ReactElement {
                     >
                       Course {idx + 1}: {courseId.slice(0, 8)}…
                     </span>
-                    {done && <Badge variant="outline" className="text-xs text-green-600 border-green-600">Done</Badge>}
+                    {done && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs text-green-600 border-green-600"
+                      >
+                        Done
+                      </Badge>
+                    )}
                   </li>
                 );
               })}
@@ -166,7 +195,9 @@ export function ProgramDetailPage(): React.ReactElement {
             View Nanodegree Certificate
           </Button>
         ) : isEnrolled ? (
-          <Button onClick={() => navigate('/courses')}>Continue Learning</Button>
+          <Button onClick={() => navigate('/courses')}>
+            Continue Learning
+          </Button>
         ) : (
           <Button onClick={handleEnroll}>Enroll in Program</Button>
         )}

@@ -58,10 +58,7 @@ describe('TenantService', () => {
     it('queries by ID using eq operator', async () => {
       const { eq } = await import('@edusphere/db');
       await service.findById('tenant-1');
-      expect(eq).toHaveBeenCalledWith(
-        expect.anything(),
-        'tenant-1'
-      );
+      expect(eq).toHaveBeenCalledWith(expect.anything(), 'tenant-1');
     });
 
     it('applies limit 1', async () => {

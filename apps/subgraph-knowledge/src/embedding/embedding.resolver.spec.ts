@@ -38,8 +38,12 @@ describe('EmbeddingResolver', () => {
 
     it('propagates NotFoundException from service', async () => {
       const { NotFoundException } = await import('@nestjs/common');
-      mockEmbeddingService.findById.mockRejectedValue(new NotFoundException('Not found'));
-      await expect(resolver.getEmbedding('bad-id')).rejects.toThrow(NotFoundException);
+      mockEmbeddingService.findById.mockRejectedValue(
+        new NotFoundException('Not found')
+      );
+      await expect(resolver.getEmbedding('bad-id')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -47,49 +51,73 @@ describe('EmbeddingResolver', () => {
     it('calls embeddingService.findByContentItem with provided contentItemId', async () => {
       mockEmbeddingService.findByContentItem.mockResolvedValue([]);
       const result = await resolver.getEmbeddingsByContentItem('content-1');
-      expect(mockEmbeddingService.findByContentItem).toHaveBeenCalledWith('content-1');
+      expect(mockEmbeddingService.findByContentItem).toHaveBeenCalledWith(
+        'content-1'
+      );
       expect(result).toEqual([]);
     });
   });
 
   describe('semanticSearch()', () => {
     it('calls embeddingService.semanticSearchByVector with correct args', async () => {
-      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([MOCK_EMBED]);
+      mockEmbeddingService.semanticSearchByVector.mockResolvedValue([
+        MOCK_EMBED,
+      ]);
       const query = [0.1, 0.2, 0.3];
       const result = await resolver.semanticSearch(query, 5, 0.8);
-      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(query, 5, 0.8);
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
+        query,
+        5,
+        0.8
+      );
       expect(result).toHaveLength(1);
     });
 
     it('uses default limit=10 and minSimilarity=0.7 when not provided', async () => {
       mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
       await resolver.semanticSearch([0.1, 0.2]);
-      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith([0.1, 0.2], 10, 0.7);
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
+        [0.1, 0.2],
+        10,
+        0.7
+      );
     });
   });
 
   describe('semanticSearchByContentItem()', () => {
     it('delegates to embeddingService.semanticSearchByVector (legacy shim)', async () => {
       mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
-      const result = await resolver.semanticSearchByContentItem('content-1', [0.1, 0.2], 3);
+      const result = await resolver.semanticSearchByContentItem(
+        'content-1',
+        [0.1, 0.2],
+        3
+      );
       // Resolver ignores contentItemId and delegates entirely to semanticSearchByVector
-      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith([0.1, 0.2], 3, 0.7);
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
+        [0.1, 0.2],
+        3,
+        0.7
+      );
       expect(result).toEqual([]);
     });
 
     it('uses default limit=5 when not provided', async () => {
       mockEmbeddingService.semanticSearchByVector.mockResolvedValue([]);
       await resolver.semanticSearchByContentItem('content-1', [0.1]);
-      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith([0.1], 5, 0.7);
+      expect(mockEmbeddingService.semanticSearchByVector).toHaveBeenCalledWith(
+        [0.1],
+        5,
+        0.7
+      );
     });
   });
 
   describe('createEmbedding()', () => {
     it('throws immediately without calling embeddingService.create', async () => {
       // Resolver throws before delegating — create is intentionally disabled
-      await expect(resolver.createEmbedding({ type: 'content' })).rejects.toThrow(
-        'Use generateEmbedding'
-      );
+      await expect(
+        resolver.createEmbedding({ type: 'content' })
+      ).rejects.toThrow('Use generateEmbedding');
       expect(mockEmbeddingService.create).not.toHaveBeenCalled();
     });
   });
@@ -113,7 +141,9 @@ describe('EmbeddingResolver', () => {
     it('calls embeddingService.deleteByContentItem with provided contentItemId', async () => {
       mockEmbeddingService.deleteByContentItem.mockResolvedValue(0);
       const result = await resolver.deleteEmbeddingsByContentItem('content-1');
-      expect(mockEmbeddingService.deleteByContentItem).toHaveBeenCalledWith('content-1');
+      expect(mockEmbeddingService.deleteByContentItem).toHaveBeenCalledWith(
+        'content-1'
+      );
       expect(result).toBe(0);
     });
   });
@@ -121,7 +151,10 @@ describe('EmbeddingResolver', () => {
   describe('resolveReference()', () => {
     it('calls embeddingService.findById with reference id', async () => {
       mockEmbeddingService.findById.mockResolvedValue(MOCK_EMBED);
-      const result = await resolver.resolveReference({ __typename: 'Embedding', id: 'embed-1' });
+      const result = await resolver.resolveReference({
+        __typename: 'Embedding',
+        id: 'embed-1',
+      });
       expect(mockEmbeddingService.findById).toHaveBeenCalledWith('embed-1');
       expect(result).toEqual(MOCK_EMBED);
     });

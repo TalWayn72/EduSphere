@@ -14,15 +14,15 @@ export interface Ed25519KeyPair {
 // ── JSON-LD Proof (Ed25519Signature2020) ──────────────────────────────────────
 export interface OpenBadgeProof {
   readonly type: 'Ed25519Signature2020';
-  readonly created: string;          // ISO 8601
+  readonly created: string; // ISO 8601
   readonly verificationMethod: string; // "{issuerDid}#key-1"
   readonly proofPurpose: 'assertionMethod';
-  readonly proofValue: string;       // base64url-encoded Ed25519 signature
+  readonly proofValue: string; // base64url-encoded Ed25519 signature
 }
 
 // ── OpenBadges 3.0 JSON-LD Achievement (badge definition) ────────────────────
 export interface Ob3Achievement {
-  readonly id: string;               // URL: /ob3/badge/{definitionId}
+  readonly id: string; // URL: /ob3/badge/{definitionId}
   readonly type: ['Achievement'];
   readonly name: string;
   readonly description: string;
@@ -32,7 +32,7 @@ export interface Ob3Achievement {
 
 // ── OpenBadges 3.0 JSON-LD Credential Subject ────────────────────────────────
 export interface Ob3CredentialSubject {
-  readonly id: string;               // did:example:{userId}
+  readonly id: string; // did:example:{userId}
   readonly type: ['AchievementSubject'];
   readonly achievement: Ob3Achievement;
 }
@@ -43,15 +43,15 @@ export interface Ob3CredentialBody {
     'https://www.w3.org/2018/credentials/v1',
     'https://purl.imsglobal.org/spec/ob/v3p0/context.json',
   ];
-  readonly id: string;               // URL: /ob3/assertion/{assertionId}
+  readonly id: string; // URL: /ob3/assertion/{assertionId}
   readonly type: ['VerifiableCredential', 'OpenBadgeCredential'];
   readonly issuer: {
-    readonly id: string;             // DID
+    readonly id: string; // DID
     readonly type: 'Profile';
     readonly name: string;
   };
-  readonly issuanceDate: string;     // ISO 8601
-  readonly expirationDate?: string;  // ISO 8601
+  readonly issuanceDate: string; // ISO 8601
+  readonly expirationDate?: string; // ISO 8601
   readonly credentialSubject: Ob3CredentialSubject;
 }
 
@@ -103,7 +103,7 @@ export interface VerificationResult {
 export function buildLinkedInShareUrl(
   badgeName: string,
   issuedAt: string,
-  verifyUrl: string,
+  verifyUrl: string
 ): string {
   const issued = new Date(issuedAt);
   const params = new URLSearchParams({

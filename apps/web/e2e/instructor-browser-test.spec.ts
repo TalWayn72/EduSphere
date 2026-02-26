@@ -14,7 +14,13 @@
  * which is then shared by all subsequent tests via the browser context fixture.
  */
 
-import { test, expect, type Page, type ConsoleMessage, type Browser } from '@playwright/test';
+import {
+  test,
+  expect,
+  type Page,
+  type ConsoleMessage,
+  type Browser,
+} from '@playwright/test';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
@@ -32,10 +38,20 @@ const INSTRUCTOR = {
 };
 
 const SCREENSHOT_DIR = path.resolve(
-  __dirname, '..', '..', '..', 'test-results', 'instructor-screenshots'
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'test-results',
+  'instructor-screenshots'
 );
 const SESSION_FILE = path.resolve(
-  __dirname, '..', '..', '..', 'test-results', 'instructor-session.json'
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'test-results',
+  'instructor-session.json'
 );
 
 // ---------------------------------------------------------------------------
@@ -58,7 +74,9 @@ async function doLogin(browser: Browser): Promise<void> {
 
   if (process.env.VITE_DEV_MODE !== 'false') {
     // DEV_MODE: auto-authenticated — navigate to app and save (empty) storageState
-    console.log('[login] DEV_MODE: auto-authenticated, skipping Keycloak login');
+    console.log(
+      '[login] DEV_MODE: auto-authenticated, skipping Keycloak login'
+    );
     await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
   } else {
@@ -77,7 +95,10 @@ async function doLogin(browser: Browser): Promise<void> {
       console.log(`[login] Body HTML snippet: ${bodyHTML.slice(0, 300)}`);
 
       // Find the sign-in button
-      const btn = page.locator('button').filter({ hasText: /sign in/i }).first();
+      const btn = page
+        .locator('button')
+        .filter({ hasText: /sign in/i })
+        .first();
       const vis = await btn.isVisible({ timeout: 8000 }).catch(() => false);
       if (!vis) {
         // List all buttons for debugging
@@ -86,14 +107,18 @@ async function doLogin(browser: Browser): Promise<void> {
           const t = await b.textContent().catch(() => '');
           console.log(`  button: "${t?.trim()}"`);
         }
-        console.warn('[login] Sign In button not found — may already be authenticated');
+        console.warn(
+          '[login] Sign In button not found — may already be authenticated'
+        );
       } else {
         console.log('[login] Clicking Sign In with Keycloak...');
         await btn.click();
         await page.waitForURL(/localhost:8080/, { timeout: 20_000 });
         console.log(`[login] Keycloak: ${page.url()}`);
 
-        await page.locator('#username').waitFor({ state: 'visible', timeout: 10_000 });
+        await page
+          .locator('#username')
+          .waitFor({ state: 'visible', timeout: 10_000 });
         await shot(page, '01-keycloak-form');
         await page.fill('#username', INSTRUCTOR.email);
         await page.fill('#password', INSTRUCTOR.password);
@@ -123,7 +148,6 @@ async function doLogin(browser: Browser): Promise<void> {
 let sharedPage: Page;
 
 test.describe.serial('Instructor Browser Session', () => {
-
   test.beforeAll(async ({ browser }) => {
     await doLogin(browser);
 
@@ -150,14 +174,21 @@ test.describe.serial('Instructor Browser Session', () => {
     console.log(`[test1] URL: ${url}`);
     await shot(sharedPage, '04-landing');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
-    const hasAuthError = /Unauthorized|Access Denied|403 Forbidden/i.test(bodyText);
-    const redirectedToLogin = url.includes('/login') || url.includes('8080/realms');
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
+    const hasAuthError = /Unauthorized|Access Denied|403 Forbidden/i.test(
+      bodyText
+    );
+    const redirectedToLogin =
+      url.includes('/login') || url.includes('8080/realms');
 
-    console.log(`[test1] Auth error: ${hasAuthError}, Redirected to login: ${redirectedToLogin}`);
+    console.log(
+      `[test1] Auth error: ${hasAuthError}, Redirected to login: ${redirectedToLogin}`
+    );
 
     if (hasAuthError || redirectedToLogin) {
-      console.warn('[TEST 1] FAIL — instructor not authenticated or auth error visible');
+      console.warn(
+        '[TEST 1] FAIL — instructor not authenticated or auth error visible'
+      );
     } else {
       console.log('[TEST 1] PASS — instructor authenticated, app loaded');
     }
@@ -167,25 +198,35 @@ test.describe.serial('Instructor Browser Session', () => {
   // 2. Dashboard
   // -------------------------------------------------------------------------
   test('2. Dashboard — stats, charts, instructor widgets', async () => {
-    await sharedPage.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/dashboard`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(3000);
     await shot(sharedPage, '05-dashboard');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
     const url = sharedPage.url();
     console.log(`[dashboard] URL: ${url}`);
-    console.log(`[dashboard] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`);
+    console.log(
+      `[dashboard] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`
+    );
 
-    const hasContent = /dashboard|course|student|progress|welcome|analytics|instructor/i.test(bodyText);
+    const hasContent =
+      /dashboard|course|student|progress|welcome|analytics|instructor/i.test(
+        bodyText
+      );
     const hasError = /unauthorized|access denied|403/i.test(bodyText);
     const svgCount = await sharedPage.locator('svg').count();
     const canvasCount = await sharedPage.locator('canvas').count();
 
     console.log(`[dashboard] Has content: ${hasContent}, Error: ${hasError}`);
-    console.log(`[dashboard] SVG: ${svgCount}, Canvas: ${canvasCount} (charts/icons)`);
+    console.log(
+      `[dashboard] SVG: ${svgCount}, Canvas: ${canvasCount} (charts/icons)`
+    );
 
     if (hasError) console.warn('[dashboard] ERROR visible!');
-    if (!hasContent) console.warn('[dashboard] WARNING: No recognizable content');
+    if (!hasContent)
+      console.warn('[dashboard] WARNING: No recognizable content');
 
     await shot(sharedPage, '05b-dashboard-details');
     console.log('[TEST 2] Dashboard test complete');
@@ -195,12 +236,16 @@ test.describe.serial('Instructor Browser Session', () => {
   // 3. Courses List
   // -------------------------------------------------------------------------
   test('3. Courses list — instructor management options', async () => {
-    await sharedPage.goto(`${BASE_URL}/courses`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/courses`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(2500);
     await shot(sharedPage, '06-courses');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
-    console.log(`[courses] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`);
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
+    console.log(
+      `[courses] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`
+    );
 
     const hasCourses = /course|lesson|module|curriculum/i.test(bodyText);
     const hasCreate = /create|new course|add course|\+ course/i.test(bodyText);
@@ -208,15 +253,24 @@ test.describe.serial('Instructor Browser Session', () => {
     const hasError = /unauthorized|access denied|403/i.test(bodyText);
 
     const btns = await sharedPage.locator('button').all();
-    const btnLabels = await Promise.all(btns.map(b => b.textContent().catch(() => '')));
-    const btnStr = btnLabels.map(t => t?.trim()).filter(Boolean).join(' | ');
+    const btnLabels = await Promise.all(
+      btns.map((b) => b.textContent().catch(() => ''))
+    );
+    const btnStr = btnLabels
+      .map((t) => t?.trim())
+      .filter(Boolean)
+      .join(' | ');
 
-    console.log(`[courses] Has courses: ${hasCourses}, Create: ${hasCreate}, Edit: ${hasEdit}`);
+    console.log(
+      `[courses] Has courses: ${hasCourses}, Create: ${hasCreate}, Edit: ${hasEdit}`
+    );
     console.log(`[courses] Error: ${hasError}`);
     console.log(`[courses] Buttons: ${btnStr}`);
 
     if (!hasCreate && !hasEdit) {
-      console.warn('[courses] WARNING: No instructor management options visible (Create/Edit/Manage)');
+      console.warn(
+        '[courses] WARNING: No instructor management options visible (Create/Edit/Manage)'
+      );
     }
     if (hasError) console.warn('[courses] ERROR: Auth error on courses page!');
 
@@ -228,21 +282,27 @@ test.describe.serial('Instructor Browser Session', () => {
   // 4. Collaboration Page — Chavruta
   // -------------------------------------------------------------------------
   test('4. Collaboration — Chavruta panels, discussions', async () => {
-    await sharedPage.goto(`${BASE_URL}/collaboration`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/collaboration`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(2500);
     await shot(sharedPage, '07-collaboration');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
     const url = sharedPage.url();
     console.log(`[collab] URL: ${url}`);
-    console.log(`[collab] Content: ${bodyText.slice(0, 500).replace(/\s+/g, ' ')}`);
+    console.log(
+      `[collab] Content: ${bodyText.slice(0, 500).replace(/\s+/g, ' ')}`
+    );
 
     const hasChav = /chavruta/i.test(bodyText);
     const hasDiscuss = /discussion|debate|forum|session/i.test(bodyText);
     const hasChat = /chat|message/i.test(bodyText);
     const hasError = /unauthorized|access denied|403/i.test(bodyText);
 
-    console.log(`[collab] Chavruta: ${hasChav}, Discussion: ${hasDiscuss}, Chat: ${hasChat}`);
+    console.log(
+      `[collab] Chavruta: ${hasChav}, Discussion: ${hasDiscuss}, Chat: ${hasChat}`
+    );
     console.log(`[collab] Error: ${hasError}`);
 
     if (!hasChav && !hasDiscuss) {
@@ -250,7 +310,9 @@ test.describe.serial('Instructor Browser Session', () => {
     }
     if (hasError) console.warn('[collab] ERROR: Auth error on collaboration!');
 
-    const cards = await sharedPage.locator('[class*="card"], [class*="panel"]').count();
+    const cards = await sharedPage
+      .locator('[class*="card"], [class*="panel"]')
+      .count();
     const inputs = await sharedPage.locator('input, textarea').count();
     console.log(`[collab] Cards/panels: ${cards}, Inputs: ${inputs}`);
 
@@ -262,7 +324,9 @@ test.describe.serial('Instructor Browser Session', () => {
   // 5. Post in Collaboration
   // -------------------------------------------------------------------------
   test('5. Instructor post in collaboration/discussion', async () => {
-    await sharedPage.goto(`${BASE_URL}/collaboration`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/collaboration`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(2000);
 
     const selectors = [
@@ -282,7 +346,11 @@ test.describe.serial('Instructor Browser Session', () => {
         await shot(sharedPage, '08-collab-typed');
         console.log(`[post] Input: ${sel}`);
 
-        for (const s of ['button[type="submit"]', 'button:has-text("Send")', 'button:has-text("Post")']) {
+        for (const s of [
+          'button[type="submit"]',
+          'button:has-text("Send")',
+          'button:has-text("Post")',
+        ]) {
           const b = sharedPage.locator(s).first();
           if (await b.isVisible({ timeout: 2000 }).catch(() => false)) {
             await b.click();
@@ -314,29 +382,40 @@ test.describe.serial('Instructor Browser Session', () => {
   // 6. Knowledge Graph at /graph
   // -------------------------------------------------------------------------
   test('6. Knowledge Graph at /graph', async () => {
-    await sharedPage.goto(`${BASE_URL}/graph`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/graph`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(4000);
     await shot(sharedPage, '09-knowledge-graph');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
     const url = sharedPage.url();
     console.log(`[kg] URL: ${url}`);
     console.log(`[kg] Content: ${bodyText.slice(0, 500).replace(/\s+/g, ' ')}`);
 
     const svgCount = await sharedPage.locator('svg').count();
     const canvasCount = await sharedPage.locator('canvas').count();
-    const hasKG = /knowledge|graph|concept|node|ontology|rambam|aristotle/i.test(bodyText);
+    const hasKG =
+      /knowledge|graph|concept|node|ontology|rambam|aristotle/i.test(bodyText);
     const hasLoadError = /failed to load|network error/i.test(bodyText);
     const hasAuthError = /unauthorized|access denied|403/i.test(bodyText);
 
     console.log(`[kg] SVG: ${svgCount}, Canvas: ${canvasCount}`);
-    console.log(`[kg] KG content: ${hasKG}, Load error: ${hasLoadError}, Auth error: ${hasAuthError}`);
+    console.log(
+      `[kg] KG content: ${hasKG}, Load error: ${hasLoadError}, Auth error: ${hasAuthError}`
+    );
 
-    if (hasLoadError) console.warn('[kg] Network error loading graph (expected without backend)');
-    if (hasAuthError) console.warn('[kg] ERROR: Auth error on knowledge graph!');
+    if (hasLoadError)
+      console.warn(
+        '[kg] Network error loading graph (expected without backend)'
+      );
+    if (hasAuthError)
+      console.warn('[kg] ERROR: Auth error on knowledge graph!');
 
     // Check for visual nodes
-    const nodeEls = await sharedPage.locator('[class*="node"], circle, [data-id*="node"]').count();
+    const nodeEls = await sharedPage
+      .locator('[class*="node"], circle, [data-id*="node"]')
+      .count();
     console.log(`[kg] Node elements: ${nodeEls}`);
 
     await shot(sharedPage, '09b-kg-full');
@@ -347,23 +426,31 @@ test.describe.serial('Instructor Browser Session', () => {
   // 7. Profile Page
   // -------------------------------------------------------------------------
   test('7. Profile page — instructor role visible', async () => {
-    await sharedPage.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/profile`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(2000);
     await shot(sharedPage, '10-profile');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
-    console.log(`[profile] Content: ${bodyText.slice(0, 500).replace(/\s+/g, ' ')}`);
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
+    console.log(
+      `[profile] Content: ${bodyText.slice(0, 500).replace(/\s+/g, ' ')}`
+    );
 
     const hasProfile = /profile|account|settings/i.test(bodyText);
     const hasInstructor = /instructor/i.test(bodyText);
     const hasEmail = /instructor@example\.com/i.test(bodyText);
     const hasError = /unauthorized|access denied|403/i.test(bodyText);
 
-    console.log(`[profile] Profile content: ${hasProfile}, Instructor role: ${hasInstructor}, Email: ${hasEmail}`);
+    console.log(
+      `[profile] Profile content: ${hasProfile}, Instructor role: ${hasInstructor}, Email: ${hasEmail}`
+    );
     console.log(`[profile] Error: ${hasError}`);
 
-    if (!hasInstructor) console.warn('[profile] WARNING: INSTRUCTOR role not shown on profile');
-    if (!hasEmail) console.warn('[profile] WARNING: instructor@example.com not displayed');
+    if (!hasInstructor)
+      console.warn('[profile] WARNING: INSTRUCTOR role not shown on profile');
+    if (!hasEmail)
+      console.warn('[profile] WARNING: instructor@example.com not displayed');
     if (hasError) console.warn('[profile] ERROR: Auth error on profile!');
 
     await shot(sharedPage, '10b-profile-full');
@@ -374,16 +461,22 @@ test.describe.serial('Instructor Browser Session', () => {
   // 8. Navigation
   // -------------------------------------------------------------------------
   test('8. Sidebar navigation — route discovery', async () => {
-    await sharedPage.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/dashboard`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(2000);
     await shot(sharedPage, '11-nav-full');
 
-    const navEls = await sharedPage.locator('nav a, aside a, [role="navigation"] a').all();
+    const navEls = await sharedPage
+      .locator('nav a, aside a, [role="navigation"] a')
+      .all();
     console.log(`[nav] Nav elements: ${navEls.length}`);
 
     const links: Array<{ text: string; href: string }> = [];
     for (const el of navEls) {
-      const text = ((await el.textContent().catch(() => '')) ?? '').trim().replace(/\s+/g, ' ');
+      const text = ((await el.textContent().catch(() => '')) ?? '')
+        .trim()
+        .replace(/\s+/g, ' ');
       const href = (await el.getAttribute('href').catch(() => '')) ?? '';
       if (href && !href.startsWith('http') && href !== '#' && text.length > 0) {
         links.push({ text, href });
@@ -391,11 +484,17 @@ test.describe.serial('Instructor Browser Session', () => {
     }
 
     console.log('[nav] Discovered routes:');
-    links.forEach(l => console.log(`  "${l.text.padEnd(28)}" → ${l.href}`));
+    links.forEach((l) => console.log(`  "${l.text.padEnd(28)}" → ${l.href}`));
 
-    const createRoutes = links.filter(l => /create|new|upload/i.test(l.text) || /new|create/i.test(l.href));
-    console.log(`[nav] Create/management routes (instructor): ${createRoutes.length}`);
-    createRoutes.forEach(l => console.log(`  [INSTRUCTOR ROUTE] "${l.text}" → ${l.href}`));
+    const createRoutes = links.filter(
+      (l) => /create|new|upload/i.test(l.text) || /new|create/i.test(l.href)
+    );
+    console.log(
+      `[nav] Create/management routes (instructor): ${createRoutes.length}`
+    );
+    createRoutes.forEach((l) =>
+      console.log(`  [INSTRUCTOR ROUTE] "${l.text}" → ${l.href}`)
+    );
 
     // Dump header buttons
     const hBtns = await sharedPage.locator('header button, nav button').all();
@@ -426,25 +525,42 @@ test.describe.serial('Instructor Browser Session', () => {
       { path: '/learn/content-1', label: 'Content Viewer' },
     ];
 
-    type Result = { path: string; label: string; status: string; finalUrl: string; note: string };
+    type Result = {
+      path: string;
+      label: string;
+      status: string;
+      finalUrl: string;
+      note: string;
+    };
     const results: Result[] = [];
 
     for (const { path, label } of routes) {
-      await sharedPage.goto(`${BASE_URL}${path}`, { waitUntil: 'domcontentloaded' });
+      await sharedPage.goto(`${BASE_URL}${path}`, {
+        waitUntil: 'domcontentloaded',
+      });
       await sharedPage.waitForTimeout(1200);
 
       const finalUrl = sharedPage.url();
-      const bodyText = await sharedPage.locator('body').textContent() ?? '';
+      const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
 
-      const isAuthErr = /unauthorized|access denied|403 forbidden|forbidden/i.test(bodyText);
-      const isLoginRedir = finalUrl.includes('/login') || finalUrl.includes('8080/realms');
+      const isAuthErr =
+        /unauthorized|access denied|403 forbidden|forbidden/i.test(bodyText);
+      const isLoginRedir =
+        finalUrl.includes('/login') || finalUrl.includes('8080/realms');
       const is404 = /page not found/i.test(bodyText);
 
       let status = 'OK';
       let note = '';
-      if (isAuthErr) { status = 'AUTH_ERROR'; note = bodyText.slice(0, 80); }
-      else if (isLoginRedir) { status = 'REDIRECT_LOGIN'; note = finalUrl; }
-      else if (is404) { status = '404'; note = 'Page not found'; }
+      if (isAuthErr) {
+        status = 'AUTH_ERROR';
+        note = bodyText.slice(0, 80);
+      } else if (isLoginRedir) {
+        status = 'REDIRECT_LOGIN';
+        note = finalUrl;
+      } else if (is404) {
+        status = '404';
+        note = 'Page not found';
+      }
 
       results.push({ path, label, status, finalUrl, note });
 
@@ -456,21 +572,28 @@ test.describe.serial('Instructor Browser Session', () => {
     console.log('\n' + '═'.repeat(68));
     console.log('INSTRUCTOR ACCESS REPORT');
     console.log('═'.repeat(68));
-    results.forEach(r => {
-      const icon = r.status === 'OK' ? 'OK  ' : r.status === '404' ? '404 ' : 'FAIL';
+    results.forEach((r) => {
+      const icon =
+        r.status === 'OK' ? 'OK  ' : r.status === '404' ? '404 ' : 'FAIL';
       console.log(`[${icon}] ${r.label.padEnd(25)} ${r.path}`);
       if (r.note) console.log(`       ${r.note.slice(0, 65)}`);
     });
     console.log('═'.repeat(68));
 
-    const failures = results.filter(r => r.status !== 'OK' && r.status !== '404');
-    const notFounds = results.filter(r => r.status === '404');
-    console.log(`\nSummary: ${results.filter(r => r.status === 'OK').length} OK, ${notFounds.length} 404s, ${failures.length} auth failures`);
+    const failures = results.filter(
+      (r) => r.status !== 'OK' && r.status !== '404'
+    );
+    const notFounds = results.filter((r) => r.status === '404');
+    console.log(
+      `\nSummary: ${results.filter((r) => r.status === 'OK').length} OK, ${notFounds.length} 404s, ${failures.length} auth failures`
+    );
 
     if (failures.length > 0) {
-      console.warn(`AUTH FAILURES: ${failures.map(r => r.label).join(', ')}`);
+      console.warn(`AUTH FAILURES: ${failures.map((r) => r.label).join(', ')}`);
     } else {
-      console.log('No auth failures — instructor can access all expected routes');
+      console.log(
+        'No auth failures — instructor can access all expected routes'
+      );
     }
 
     console.log('[TEST 9] Access check complete');
@@ -480,7 +603,9 @@ test.describe.serial('Instructor Browser Session', () => {
   // 10. UserMenu
   // -------------------------------------------------------------------------
   test('10. UserMenu — role and logout', async () => {
-    await sharedPage.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/dashboard`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(2000);
     await shot(sharedPage, '12-pre-menu');
 
@@ -500,34 +625,46 @@ test.describe.serial('Instructor Browser Session', () => {
       if (await el.isVisible({ timeout: 1500 }).catch(() => false)) {
         const t = await el.textContent().catch(() => '');
         const a = await el.getAttribute('aria-label').catch(() => '');
-        console.log(`[usermenu] Trigger: ${sel} text="${t?.trim()}" aria="${a}"`);
+        console.log(
+          `[usermenu] Trigger: ${sel} text="${t?.trim()}" aria="${a}"`
+        );
         await el.click();
         await sharedPage.waitForTimeout(800);
         await shot(sharedPage, '12b-menu-open');
         opened = true;
 
-        const menuText = await sharedPage.locator('body').textContent() ?? '';
+        const menuText = (await sharedPage.locator('body').textContent()) ?? '';
         const hasLogout = /logout|sign out|log out/i.test(menuText);
         const hasRole = /instructor/i.test(menuText);
         const hasEmail = /instructor@example\.com/i.test(menuText);
 
-        console.log(`[usermenu] Logout: ${hasLogout}, Instructor role: ${hasRole}, Email: ${hasEmail}`);
+        console.log(
+          `[usermenu] Logout: ${hasLogout}, Instructor role: ${hasRole}, Email: ${hasEmail}`
+        );
         if (!hasLogout) console.warn('[usermenu] WARNING: No logout option!');
-        if (!hasRole) console.warn('[usermenu] WARNING: INSTRUCTOR role not shown!');
+        if (!hasRole)
+          console.warn('[usermenu] WARNING: INSTRUCTOR role not shown!');
         break;
       }
     }
 
     if (!opened) {
       // Debug: list all interactive elements in header
-      const hEls = await sharedPage.locator('header *[role], header button, nav button').all();
+      const hEls = await sharedPage
+        .locator('header *[role], header button, nav button')
+        .all();
       console.log(`[usermenu] Header interactive elements: ${hEls.length}`);
       for (const el of hEls) {
         const t = (await el.textContent().catch(() => ''))?.trim().slice(0, 40);
         const role = await el.getAttribute('role').catch(() => '');
         const a = await el.getAttribute('aria-label').catch(() => '');
-        const cls = (await el.getAttribute('class').catch(() => ''))?.slice(0, 60);
-        console.log(`  el: text="${t}" role="${role}" aria="${a}" class="${cls}"`);
+        const cls = (await el.getAttribute('class').catch(() => ''))?.slice(
+          0,
+          60
+        );
+        console.log(
+          `  el: text="${t}" role="${role}" aria="${a}" class="${cls}"`
+        );
       }
       await shot(sharedPage, '12-debug-no-menu');
       console.warn('[usermenu] Could not open user menu');
@@ -540,14 +677,18 @@ test.describe.serial('Instructor Browser Session', () => {
   // 11. Content Viewer
   // -------------------------------------------------------------------------
   test('11. Content Viewer at /learn/content-1', async () => {
-    await sharedPage.goto(`${BASE_URL}/learn/content-1`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/learn/content-1`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(3000);
     await shot(sharedPage, '13-content-viewer');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
     const url = sharedPage.url();
     console.log(`[content] URL: ${url}`);
-    console.log(`[content] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`);
+    console.log(
+      `[content] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`
+    );
 
     const hasContent = /content|lesson|chapter|learn|read|text/i.test(bodyText);
     const hasAnnotation = /annotate|highlight|note|annotation/i.test(bodyText);
@@ -555,10 +696,13 @@ test.describe.serial('Instructor Browser Session', () => {
     const videoCount = await sharedPage.locator('video').count();
     const iframeCount = await sharedPage.locator('iframe').count();
 
-    console.log(`[content] Content: ${hasContent}, Annotations: ${hasAnnotation}, Error: ${hasError}`);
+    console.log(
+      `[content] Content: ${hasContent}, Annotations: ${hasAnnotation}, Error: ${hasError}`
+    );
     console.log(`[content] Videos: ${videoCount}, iframes: ${iframeCount}`);
 
-    if (hasError) console.warn('[content] ERROR: Auth error on content viewer!');
+    if (hasError)
+      console.warn('[content] ERROR: Auth error on content viewer!');
 
     await shot(sharedPage, '13b-content-full');
     console.log('[TEST 11] Content viewer test complete');
@@ -568,22 +712,32 @@ test.describe.serial('Instructor Browser Session', () => {
   // 12. Agents Page
   // -------------------------------------------------------------------------
   test('12. Agents/AI page accessible to instructor', async () => {
-    await sharedPage.goto(`${BASE_URL}/agents`, { waitUntil: 'domcontentloaded' });
+    await sharedPage.goto(`${BASE_URL}/agents`, {
+      waitUntil: 'domcontentloaded',
+    });
     await sharedPage.waitForTimeout(2500);
     await shot(sharedPage, '14-agents');
 
-    const bodyText = await sharedPage.locator('body').textContent() ?? '';
+    const bodyText = (await sharedPage.locator('body').textContent()) ?? '';
     const url = sharedPage.url();
     console.log(`[agents] URL: ${url}`);
-    console.log(`[agents] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`);
+    console.log(
+      `[agents] Content: ${bodyText.slice(0, 400).replace(/\s+/g, ' ')}`
+    );
 
-    const hasAgent = /agent|ai|tutor|assistant|chavruta|quiz|debate/i.test(bodyText);
+    const hasAgent = /agent|ai|tutor|assistant|chavruta|quiz|debate/i.test(
+      bodyText
+    );
     const hasError = /unauthorized|access denied|403/i.test(bodyText);
     const chatInputs = await sharedPage.locator('input, textarea').count();
-    const agentCards = await sharedPage.locator('[class*="agent"], [class*="Agent"]').count();
+    const agentCards = await sharedPage
+      .locator('[class*="agent"], [class*="Agent"]')
+      .count();
 
     console.log(`[agents] Agent content: ${hasAgent}, Error: ${hasError}`);
-    console.log(`[agents] Chat inputs: ${chatInputs}, Agent cards: ${agentCards}`);
+    console.log(
+      `[agents] Chat inputs: ${chatInputs}, Agent cards: ${agentCards}`
+    );
 
     if (hasError) console.warn('[agents] ERROR: Unauthorized on agents!');
     if (!hasAgent) console.warn('[agents] WARNING: No agent content visible');

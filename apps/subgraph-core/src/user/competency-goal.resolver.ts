@@ -32,21 +32,21 @@ export class CompetencyGoalResolver {
   async addCompetencyGoal(
     @Args('targetConceptName') targetConceptName: string,
     @Args('targetLevel') targetLevel: string | undefined,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { userId, tenantId } = this.requireAuth(context);
     return this.competencyGoalService.addGoal(
       userId,
       tenantId,
       targetConceptName,
-      targetLevel,
+      targetLevel
     );
   }
 
   @Mutation('removeCompetencyGoal')
   async removeCompetencyGoal(
     @Args('goalId') goalId: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { userId, tenantId } = this.requireAuth(context);
     return this.competencyGoalService.removeGoal(goalId, userId, tenantId);

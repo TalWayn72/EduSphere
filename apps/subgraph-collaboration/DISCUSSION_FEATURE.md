@@ -1,6 +1,7 @@
 # Discussion Feature Implementation
 
 ## Overview
+
 Complete implementation of the Discussion feature for the Collaboration subgraph (port 4004), supporting forum-style discussions, Chavruta debates, and threaded messaging with real-time subscriptions.
 
 ## Database Schema
@@ -33,12 +34,14 @@ Complete implementation of the Discussion feature for the Collaboration subgraph
    - `joined_at` (timestamp)
 
 ### RLS Policies
+
 - ✅ All tables have tenant isolation via RLS
 - ✅ discussions: `tenant_id = current_setting('app.current_tenant')`
 - ✅ discussion_messages: Joins through discussions table for tenant check
 - ✅ discussion_participants: Joins through discussions table for tenant check
 
 ### Indexes
+
 - `idx_discussions_course` - Fast course discussion lookups
 - `idx_discussions_creator` - Creator-based queries
 - `idx_discussions_type` - Filter by discussion type
@@ -51,6 +54,7 @@ Complete implementation of the Discussion feature for the Collaboration subgraph
 ## GraphQL Schema
 
 ### Types
+
 ```graphql
 type Discussion {
   id: ID!
@@ -96,41 +100,47 @@ type DiscussionParticipant {
 ```
 
 ### Enums
+
 ```graphql
 enum DiscussionType {
-  FORUM      # Traditional forum discussions
-  CHAVRUTA   # Jewish study partner debates
-  DEBATE     # Structured debates
+  FORUM # Traditional forum discussions
+  CHAVRUTA # Jewish study partner debates
+  DEBATE # Structured debates
 }
 
 enum MessageType {
-  TEXT       # Plain text messages
-  IMAGE      # Image attachments
-  VIDEO      # Video attachments
-  AUDIO      # Audio messages
+  TEXT # Plain text messages
+  IMAGE # Image attachments
+  VIDEO # Video attachments
+  AUDIO # Audio messages
 }
 ```
 
 ### Queries
+
 - `discussion(id: ID!): Discussion` - Get single discussion
 - `discussions(courseId: ID!, limit: Int, offset: Int): [Discussion!]!` - List course discussions
 - `discussionMessages(discussionId: ID!, limit: Int, offset: Int): [DiscussionMessage!]!` - Get messages
 
 ### Mutations
+
 - `createDiscussion(input: CreateDiscussionInput!): Discussion!` - Create new discussion
 - `addMessage(discussionId: ID!, input: AddMessageInput!): DiscussionMessage!` - Add message
 - `joinDiscussion(discussionId: ID!): Boolean!` - Join as participant
 - `leaveDiscussion(discussionId: ID!): Boolean!` - Leave discussion (creator cannot leave)
 
 ### Subscriptions
+
 - `messageAdded(discussionId: ID!): DiscussionMessage!` - Real-time message notifications
 
 ## Service Layer
 
 ### DiscussionService
+
 Located: `apps/subgraph-collaboration/src/discussion/discussion.service.ts`
 
 **Key Methods:**
+
 - `findDiscussionById()` - Fetch single discussion with RLS
 - `findDiscussionsByCourse()` - Paginated course discussions
 - `createDiscussion()` - Create discussion + auto-join creator
@@ -146,6 +156,7 @@ Located: `apps/subgraph-collaboration/src/discussion/discussion.service.ts`
 - `leaveDiscussion()` - Remove participant (creator protected)
 
 **RLS Integration:**
+
 - All methods use `withTenantContext(db, tenantCtx, async (tx) => {...})`
 - Tenant context derived from JWT via AuthContext
 - User ID and role passed to RLS context
@@ -153,22 +164,26 @@ Located: `apps/subgraph-collaboration/src/discussion/discussion.service.ts`
 ## Resolvers
 
 ### DiscussionResolver
+
 - Query resolvers for discussions and messages
 - Mutation resolvers with Zod validation
 - Subscription resolver with PubSub
 - Field resolvers for relationships (course, creator, messages, participants, counts)
 
 ### DiscussionMessageResolver
+
 - Field resolvers for message relationships
 - Threading support (parent/replies)
 - User and discussion references
 
 ### DiscussionParticipantResolver
+
 - Field resolvers for participant relationships
 
 ## Validation
 
 ### Zod Schemas
+
 Located: `apps/subgraph-collaboration/src/discussion/discussion.schemas.ts`
 
 ```typescript
@@ -204,6 +219,7 @@ addMessageInputSchema = z.object({
 ## Files Created/Modified
 
 ### New Files
+
 - `packages/db/src/schema/discussion.ts` - Database schema
 - `apps/subgraph-collaboration/src/discussion/discussion.graphql` - GraphQL SDL
 - `apps/subgraph-collaboration/src/discussion/discussion.schemas.ts` - Zod validation
@@ -211,6 +227,7 @@ addMessageInputSchema = z.object({
 - `apps/subgraph-collaboration/src/discussion/discussion.resolver.ts` - GraphQL resolvers (rewritten)
 
 ### Modified Files
+
 - `packages/db/src/schema/index.ts` - Export discussion schema
 - `packages/db/tsconfig.json` - Fixed module resolution (ESNext → CommonJS)
 - `apps/subgraph-collaboration/src/discussion/discussion.module.ts` - Register all resolvers
@@ -235,14 +252,17 @@ GraphQL Playground: http://localhost:4004/graphql
 ### Example Queries
 
 **Create Discussion:**
+
 ```graphql
 mutation {
-  createDiscussion(input: {
-    courseId: "uuid-here"
-    title: "Week 1 Discussion"
-    description: "Discuss the readings from week 1"
-    discussionType: FORUM
-  }) {
+  createDiscussion(
+    input: {
+      courseId: "uuid-here"
+      title: "Week 1 Discussion"
+      description: "Discuss the readings from week 1"
+      discussionType: FORUM
+    }
+  ) {
     id
     title
     creatorId
@@ -252,6 +272,7 @@ mutation {
 ```
 
 **Add Message:**
+
 ```graphql
 mutation {
   addMessage(
@@ -259,7 +280,7 @@ mutation {
     input: {
       content: "Great question!"
       messageType: TEXT
-      parentMessageId: "parent-message-uuid"  # Optional for threading
+      parentMessageId: "parent-message-uuid" # Optional for threading
     }
   ) {
     id
@@ -271,13 +292,16 @@ mutation {
 ```
 
 **Subscribe to Messages:**
+
 ```graphql
 subscription {
   messageAdded(discussionId: "discussion-uuid") {
     id
     content
     userId
-    user { id }
+    user {
+      id
+    }
     createdAt
   }
 }

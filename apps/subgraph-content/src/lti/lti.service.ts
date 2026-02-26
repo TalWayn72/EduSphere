@@ -13,7 +13,13 @@ import {
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { createDatabaseConnection, schema, closeAllPools, eq, and } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  closeAllPools,
+  eq,
+  and,
+} from '@edusphere/db';
 import type {
   LtiLaunchParams,
   LtiIdToken,
@@ -26,7 +32,10 @@ import type {
 const MAX_NONCES = 1000;
 const NONCE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
-interface NonceEntry { state: string; createdAt: number }
+interface NonceEntry {
+  state: string;
+  createdAt: number;
+}
 
 @Injectable()
 export class LtiService implements OnModuleInit, OnModuleDestroy {
@@ -59,13 +68,18 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
     return entry.state === state;
   }
 
-  async registerPlatform(tenantId: string, input: RegisterLtiPlatformInput): Promise<LtiPlatformDto> {
+  async registerPlatform(
+    tenantId: string,
+    input: RegisterLtiPlatformInput
+  ): Promise<LtiPlatformDto> {
     const [row] = await this.db
       .insert(schema.ltiPlatforms)
       .values({ tenant_id: tenantId, ...this.inputToRow(input) })
       .returning();
     if (!row) throw new Error('Failed to insert LTI platform');
-    this.logger.log('LTI platform registered id=' + row.id + ' tenant=' + tenantId);
+    this.logger.log(
+      'LTI platform registered id=' + row.id + ' tenant=' + tenantId
+    );
     return this.rowToDto(row);
   }
 
@@ -73,18 +87,29 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
     const rows = await this.db
       .select()
       .from(schema.ltiPlatforms)
-      .where(and(
-        eq(schema.ltiPlatforms.tenant_id, tenantId),
-        eq(schema.ltiPlatforms.is_active, true),
-      ));
+      .where(
+        and(
+          eq(schema.ltiPlatforms.tenant_id, tenantId),
+          eq(schema.ltiPlatforms.is_active, true)
+        )
+      );
     return rows.map((r) => this.rowToDto(r));
   }
 
-  async togglePlatform(id: string, tenantId: string, isActive: boolean): Promise<LtiPlatformDto> {
+  async togglePlatform(
+    id: string,
+    tenantId: string,
+    isActive: boolean
+  ): Promise<LtiPlatformDto> {
     const [row] = await this.db
       .update(schema.ltiPlatforms)
       .set({ is_active: isActive })
-      .where(and(eq(schema.ltiPlatforms.id, id), eq(schema.ltiPlatforms.tenant_id, tenantId)))
+      .where(
+        and(
+          eq(schema.ltiPlatforms.id, id),
+          eq(schema.ltiPlatforms.tenant_id, tenantId)
+        )
+      )
       .returning();
     if (!row) throw new NotFoundException('LTI platform ' + id + ' not found');
     return this.rowToDto(row);
@@ -106,14 +131,17 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
       .limit(1);
 
     if (!platform) {
-      throw new NotFoundException('LTI platform not found for iss=' + params.iss);
+      throw new NotFoundException(
+        'LTI platform not found for iss=' + params.iss
+      );
     }
 
     const nonce = randomUUID();
     const state = randomUUID();
     this.storeNonce(nonce, state);
 
-    const callbackUrl = (process.env.GATEWAY_URL ?? 'http://localhost:4000') + '/lti/callback';
+    const callbackUrl =
+      (process.env.GATEWAY_URL ?? 'http://localhost:4000') + '/lti/callback';
 
     const query = new URLSearchParams({
       scope: 'openid',
@@ -132,16 +160,23 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
     }
 
     const redirectUrl = platform.auth_login_url + '?' + query.toString();
-    this.logger.debug('LTI login initiated iss=' + params.iss + ' nonce=' + nonce);
+    this.logger.debug(
+      'LTI login initiated iss=' + params.iss + ' nonce=' + nonce
+    );
     return { redirectUrl, state, nonce };
   }
 
-  async handleCallback(idToken: string, state: string): Promise<LtiCallbackResult> {
+  async handleCallback(
+    idToken: string,
+    state: string
+  ): Promise<LtiCallbackResult> {
     let unverifiedPayload: LtiIdToken;
     try {
       const parts = idToken.split('.');
       if (parts.length !== 3) throw new Error('Invalid JWT format');
-      const payloadJson = Buffer.from(parts[1] ?? '', 'base64url').toString('utf-8');
+      const payloadJson = Buffer.from(parts[1] ?? '', 'base64url').toString(
+        'utf-8'
+      );
       unverifiedPayload = JSON.parse(payloadJson) as LtiIdToken;
     } catch (e) {
       throw new BadRequestException('Invalid id_token: ' + String(e));
@@ -154,7 +189,9 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
       .limit(1);
 
     if (!platform) {
-      throw new NotFoundException('No LTI platform for iss=' + unverifiedPayload.iss);
+      throw new NotFoundException(
+        'No LTI platform for iss=' + unverifiedPayload.iss
+      );
     }
 
     let verified: LtiIdToken;
@@ -166,14 +203,19 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
       });
       verified = payload;
     } catch (e) {
-      throw new UnauthorizedException('LTI token verification failed: ' + String(e));
+      throw new UnauthorizedException(
+        'LTI token verification failed: ' + String(e)
+      );
     }
 
     if (!this.consumeNonce(verified.nonce, state)) {
-      throw new UnauthorizedException('LTI nonce invalid, expired, or already used');
+      throw new UnauthorizedException(
+        'LTI nonce invalid, expired, or already used'
+      );
     }
 
-    const courseId = verified['https://purl.imsglobal.org/spec/lti/claim/context']?.id;
+    const courseId =
+      verified['https://purl.imsglobal.org/spec/lti/claim/context']?.id;
 
     const [launch] = await this.db
       .insert(schema.ltiLaunches)
@@ -190,11 +232,18 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
     if (!launch) throw new Error('Failed to record LTI launch');
 
     const sessionToken = Buffer.from(
-      JSON.stringify({ sub: verified.sub, iss: verified.iss, iat: Date.now() }),
+      JSON.stringify({ sub: verified.sub, iss: verified.iss, iat: Date.now() })
     ).toString('base64url');
 
-    this.logger.log('LTI callback success launchId=' + launch.id + ' sub=' + verified.sub);
-    return { sessionToken, userId: verified.sub, courseId, launchId: launch.id };
+    this.logger.log(
+      'LTI callback success launchId=' + launch.id + ' sub=' + verified.sub
+    );
+    return {
+      sessionToken,
+      userId: verified.sub,
+      courseId,
+      launchId: launch.id,
+    };
   }
 
   private inputToRow(input: RegisterLtiPlatformInput) {
@@ -209,7 +258,9 @@ export class LtiService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private rowToDto(row: typeof schema.ltiPlatforms.$inferSelect): LtiPlatformDto {
+  private rowToDto(
+    row: typeof schema.ltiPlatforms.$inferSelect
+  ): LtiPlatformDto {
     return {
       id: row.id,
       tenantId: row.tenant_id,

@@ -52,7 +52,7 @@ export async function loginInDevMode(page: Page): Promise<void> {
  */
 export async function loginViaKeycloak(
   page: Page,
-  user: Pick<TestUser, 'email' | 'password'> = TEST_USERS.superAdmin,
+  user: Pick<TestUser, 'email' | 'password'> = TEST_USERS.superAdmin
 ): Promise<void> {
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
 
@@ -62,7 +62,7 @@ export async function loginViaKeycloak(
       () =>
         !!document.querySelector('button') &&
         !document.body.textContent?.includes('Initializing authentication...'),
-      { timeout: 15_000 },
+      { timeout: 15_000 }
     )
     .catch(() => {
       // init is hanging — try to click the button anyway
@@ -75,9 +75,12 @@ export async function loginViaKeycloak(
   await signInBtn.click();
 
   // Wait for Keycloak login form
-  await page.waitForURL(new RegExp(KEYCLOAK_REALM_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), {
-    timeout: 20_000,
-  });
+  await page.waitForURL(
+    new RegExp(KEYCLOAK_REALM_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+    {
+      timeout: 20_000,
+    }
+  );
   await page.locator('#username').waitFor({ timeout: 10_000 });
 
   await page.fill('#username', user.email);
@@ -85,14 +88,17 @@ export async function loginViaKeycloak(
   await page.click('#kc-login');
 
   // Wait for Keycloak to redirect back to the app
-  const appHostPattern = BASE_URL.replace(/^https?:\/\//, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const appHostPattern = BASE_URL.replace(/^https?:\/\//, '').replace(
+    /[.*+?^${}()|[\]\\]/g,
+    '\\$&'
+  );
   await page.waitForURL(new RegExp(appHostPattern), { timeout: 30_000 });
 
   // Wait for the router to navigate to an authenticated route
   await page
     .waitForURL(
       /\/(learn|courses|dashboard|agents|search|annotations|graph|profile)/,
-      { timeout: 20_000 },
+      { timeout: 20_000 }
     )
     .catch(() => {
       // Acceptable — router may have settled on a different route
@@ -111,7 +117,7 @@ export async function loginViaKeycloak(
  */
 export async function login(
   page: Page,
-  user?: Pick<TestUser, 'email' | 'password'>,
+  user?: Pick<TestUser, 'email' | 'password'>
 ): Promise<void> {
   if (IS_DEV_MODE) {
     await loginInDevMode(page);
@@ -145,10 +151,7 @@ export function attachNetworkMonitor(page: Page): NetworkErrorEntry[] {
     // Only track errors from our own services
     if (!url.includes('localhost') && !url.includes('edusphere')) return;
     // Skip expected non-200 Keycloak SSO iframe requests
-    if (
-      url.includes('silent-check-sso') ||
-      url.includes('login-status-iframe')
-    )
+    if (url.includes('silent-check-sso') || url.includes('login-status-iframe'))
       return;
     errors.push({ type: 'response', status: res.status(), url });
   });

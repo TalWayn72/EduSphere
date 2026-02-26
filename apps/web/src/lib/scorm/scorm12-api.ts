@@ -31,7 +31,7 @@ export class SCORM12API {
     this.commitTimer = setTimeout(() => {
       window.parent.postMessage(
         { type: 'SCORM_SET', element, value, sessionId: this.sessionId },
-        PARENT_ORIGIN,
+        PARENT_ORIGIN
       );
       this.commitTimer = null;
     }, 300);
@@ -48,8 +48,12 @@ export class SCORM12API {
       this.commitTimer = null;
     }
     window.parent.postMessage(
-      { type: 'SCORM_COMMIT', data: { ...this.data }, sessionId: this.sessionId },
-      PARENT_ORIGIN,
+      {
+        type: 'SCORM_COMMIT',
+        data: { ...this.data },
+        sessionId: this.sessionId,
+      },
+      PARENT_ORIGIN
     );
     return 'true';
   }
@@ -60,8 +64,12 @@ export class SCORM12API {
       this.commitTimer = null;
     }
     window.parent.postMessage(
-      { type: 'SCORM_FINISH', data: { ...this.data }, sessionId: this.sessionId },
-      PARENT_ORIGIN,
+      {
+        type: 'SCORM_FINISH',
+        data: { ...this.data },
+        sessionId: this.sessionId,
+      },
+      PARENT_ORIGIN
     );
     return 'true';
   }

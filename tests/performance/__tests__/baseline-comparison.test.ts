@@ -44,7 +44,7 @@ const SLA: SlaThresholds = {
 function isRegression(
   current: number,
   baseline: number,
-  thresholdFraction: number,
+  thresholdFraction: number
 ): boolean {
   if (baseline === 0) return false; // first run — no baseline to regress against
   return current > baseline * (1 + thresholdFraction);
@@ -53,7 +53,7 @@ function isRegression(
 function isErrorRateRegression(
   current: number,
   baseline: number,
-  thresholdFraction: number,
+  thresholdFraction: number
 ): boolean {
   if (baseline === 0) return current > 0;
   return current > baseline * (1 + thresholdFraction);
@@ -141,7 +141,9 @@ describe('Performance Baseline Contracts', () => {
 
     it('result object has required fields: scenario, p95, p99, errorRate, timestamp', () => {
       expect(isValidResult(validResult)).toBe(true);
-      expect(isValidResult({ scenario: 'x', p95: 1, p99: 2, errorRate: 0 })).toBe(false);
+      expect(
+        isValidResult({ scenario: 'x', p95: 1, p99: 2, errorRate: 0 })
+      ).toBe(false);
       expect(isValidResult(null)).toBe(false);
     });
 

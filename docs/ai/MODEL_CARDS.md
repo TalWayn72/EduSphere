@@ -1,4 +1,5 @@
 # EduSphere AI Model Cards
+
 <!-- EU AI Act Art.53 — GPAI Model Documentation Requirements -->
 <!-- Last Updated: 2026-02-22 -->
 
@@ -12,6 +13,7 @@ transparency information about the AI models used, as required by the EU AI Act 
 ## Agent Types
 
 ### CHAVRUTA Agent
+
 - **Purpose:** Socratic dialogue — asks questions to guide student understanding
 - **Model (Development):** `ollama/llama3.2` (local, air-gapped)
 - **Model (Production):** `openai/gpt-4o-mini` or `anthropic/claude-haiku-4-5`
@@ -22,6 +24,7 @@ transparency information about the AI models used, as required by the EU AI Act 
 - **Bias Considerations:** LLM training data may underrepresent non-English educational contexts
 
 ### QUIZ_MASTER Agent
+
 - **Purpose:** Generates questions and evaluates student answers
 - **Model (Development):** `ollama/llama3.2`
 - **Model (Production):** `openai/gpt-4o` (higher accuracy for evaluation)
@@ -30,6 +33,7 @@ transparency information about the AI models used, as required by the EU AI Act 
 - **Known Limitations:** May not detect all forms of correct reasoning in free-text answers
 
 ### SUMMARIZER Agent
+
 - **Purpose:** Generates summaries of course content and discussions
 - **Model (Development):** `ollama/llama3.2`
 - **Model (Production):** `openai/gpt-4o-mini`
@@ -37,6 +41,7 @@ transparency information about the AI models used, as required by the EU AI Act 
 - **Human Oversight:** Not required
 
 ### DEBATE Agent
+
 - **Purpose:** Presents multiple perspectives on a topic for critical thinking
 - **Model (Development):** `ollama/llama3.2`
 - **Model (Production):** `anthropic/claude-sonnet-4-6`
@@ -44,6 +49,7 @@ transparency information about the AI models used, as required by the EU AI Act 
 - **Known Limitations:** Perspectives generated may not represent all viewpoints fairly
 
 ### TUTOR Agent
+
 - **Purpose:** Personalized learning path recommendations
 - **Model (Development):** `ollama/llama3.2`
 - **Model (Production):** `openai/gpt-4o`
@@ -54,12 +60,12 @@ transparency information about the AI models used, as required by the EU AI Act 
 
 ## Data Processing
 
-| Data Type | Sent to External LLM? | Retention |
-|-----------|----------------------|-----------|
-| Student questions | Yes (with consent) | 90 days |
-| Student answers | Yes (with consent) | 90 days |
-| PII (email, name) | No — scrubbed before sending | N/A |
-| IP addresses | No | N/A |
+| Data Type         | Sent to External LLM?        | Retention |
+| ----------------- | ---------------------------- | --------- |
+| Student questions | Yes (with consent)           | 90 days   |
+| Student answers   | Yes (with consent)           | 90 days   |
+| PII (email, name) | No — scrubbed before sending | N/A       |
+| IP addresses      | No                           | N/A       |
 
 ## Opt-Out
 

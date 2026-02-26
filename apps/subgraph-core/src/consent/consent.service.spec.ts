@@ -4,10 +4,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock @edusphere/db before the service is imported
 // ---------------------------------------------------------------------------
 const mockOnConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
-const mockInsertValues = vi.fn().mockReturnValue({ onConflictDoUpdate: mockOnConflictDoUpdate });
+const mockInsertValues = vi
+  .fn()
+  .mockReturnValue({ onConflictDoUpdate: mockOnConflictDoUpdate });
 const mockInsert = vi.fn().mockReturnValue({ values: mockInsertValues });
 
-const mockSelectWhere = vi.fn().mockResolvedValue([{ id: 'consent-1', given: true }]);
+const mockSelectWhere = vi
+  .fn()
+  .mockResolvedValue([{ id: 'consent-1', given: true }]);
 const mockSelectFrom = vi.fn().mockReturnValue({ where: mockSelectWhere });
 const mockSelect = vi.fn().mockReturnValue({ from: mockSelectFrom });
 
@@ -19,7 +23,11 @@ const mockDb = {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
   schema: {
-    userConsents: { userId: 'userId', consentType: 'consentType', given: 'given' },
+    userConsents: {
+      userId: 'userId',
+      consentType: 'consentType',
+      given: 'given',
+    },
     auditLog: {},
   },
   eq: vi.fn((col, val) => ({ col, val })),
@@ -38,7 +46,9 @@ describe('ConsentService', () => {
     // Reset default mocks after clear
     mockSelectWhere.mockResolvedValue([{ id: 'consent-1', given: true }]);
     mockOnConflictDoUpdate.mockResolvedValue(undefined);
-    mockInsertValues.mockReturnValue({ onConflictDoUpdate: mockOnConflictDoUpdate });
+    mockInsertValues.mockReturnValue({
+      onConflictDoUpdate: mockOnConflictDoUpdate,
+    });
     mockInsert.mockReturnValue({ values: mockInsertValues });
     mockSelectFrom.mockReturnValue({ where: mockSelectWhere });
     mockSelect.mockReturnValue({ from: mockSelectFrom });
@@ -125,7 +135,9 @@ describe('ConsentService', () => {
         given: false,
       });
 
-      expect(capturedAuditValues).toMatchObject({ action: 'CONSENT_WITHDRAWN' });
+      expect(capturedAuditValues).toMatchObject({
+        action: 'CONSENT_WITHDRAWN',
+      });
     });
 
     it('audit log metadata includes gdprArticle 7', async () => {
@@ -147,7 +159,9 @@ describe('ConsentService', () => {
         given: true,
       });
 
-      expect((capturedAuditValues?.metadata as Record<string, unknown>)?.gdprArticle).toBe('7');
+      expect(
+        (capturedAuditValues?.metadata as Record<string, unknown>)?.gdprArticle
+      ).toBe('7');
     });
 
     it('uses default consentVersion 1.0 when not provided', async () => {

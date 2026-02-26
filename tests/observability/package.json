@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "test": "vitest run" },
-  "devDependencies": { "vitest": "^4.0.18", "typescript": "^5.9.3" }
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.18",
+    "typescript": "^5.9.3"
+  }
 }

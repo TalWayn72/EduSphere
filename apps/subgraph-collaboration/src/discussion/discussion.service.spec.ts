@@ -26,21 +26,24 @@ const _makeChain = (): typeof chain => {
 
 // Terminal resolvers — called without arguments, resolve to array
 const terminalOffset = vi.fn(async () => _mockResolveValue);
-const terminalLimit  = vi.fn(async () => _mockResolveValue);
+const terminalLimit = vi.fn(async () => _mockResolveValue);
 // .where() for count queries resolves directly
-const _terminalWhere  = vi.fn(async () => _mockResolveValue);
+const _terminalWhere = vi.fn(async () => _mockResolveValue);
 
 // Non-terminal mocks
-const mockOffset  = vi.fn(() => terminalOffset());
-const mockLimit   = vi.fn(() => ({ offset: mockOffset, then: terminalLimit.bind(terminalLimit) }));
+const mockOffset = vi.fn(() => terminalOffset());
+const mockLimit = vi.fn(() => ({
+  offset: mockOffset,
+  then: terminalLimit.bind(terminalLimit),
+}));
 const _mockOrderBy = vi.fn(() => ({ limit: mockLimit }));
-const mockSelect  = vi.fn();
-const mockFrom    = vi.fn();
-const _mockWhere   = vi.fn();
-const mockInsert  = vi.fn();
-const mockValues  = vi.fn();
+const mockSelect = vi.fn();
+const mockFrom = vi.fn();
+const _mockWhere = vi.fn();
+const mockInsert = vi.fn();
+const mockValues = vi.fn();
 const mockReturning = vi.fn();
-const mockDelete  = vi.fn();
+const mockDelete = vi.fn();
 
 // We override mockLimit & mockOffset to resolve promises correctly
 // Vitest mocks: each call returns a thenable chain.
@@ -153,8 +156,11 @@ function setupSelectChain(result: unknown[]) {
   };
   // limit itself should be a thenable (for .limit(1) direct awaiting)
   const limitFn = vi.fn(() => {
-    const p = Promise.resolve(result) as Promise<unknown[]> & { offset: typeof limitObj.offset };
-    (p as unknown as { offset: typeof limitObj.offset }).offset = limitObj.offset;
+    const p = Promise.resolve(result) as Promise<unknown[]> & {
+      offset: typeof limitObj.offset;
+    };
+    (p as unknown as { offset: typeof limitObj.offset }).offset =
+      limitObj.offset;
     return p;
   });
   const orderByObj = { limit: limitFn };
@@ -263,7 +269,12 @@ describe('DiscussionService', () => {
   describe('findDiscussionsByCourse()', () => {
     it('returns list of discussions', async () => {
       setupSelectChain([MOCK_DISCUSSION]);
-      const result = await service.findDiscussionsByCourse('course-1', 20, 0, MOCK_AUTH);
+      const result = await service.findDiscussionsByCourse(
+        'course-1',
+        20,
+        0,
+        MOCK_AUTH
+      );
       expect(Array.isArray(result)).toBe(true);
     });
 
@@ -289,9 +300,12 @@ describe('DiscussionService', () => {
 
   describe('createDiscussion()', () => {
     it('creates a discussion and returns it', async () => {
-      const mockParticipantValues = vi.fn().mockResolvedValue([MOCK_PARTICIPANT]);
-      mockInsert.mockReturnValueOnce({ values: mockValues })
-                .mockReturnValueOnce({ values: mockParticipantValues });
+      const mockParticipantValues = vi
+        .fn()
+        .mockResolvedValue([MOCK_PARTICIPANT]);
+      mockInsert
+        .mockReturnValueOnce({ values: mockValues })
+        .mockReturnValueOnce({ values: mockParticipantValues });
       mockReturning.mockResolvedValue([MOCK_DISCUSSION]);
       mockValues.mockReturnValue({ returning: mockReturning });
 
@@ -323,9 +337,12 @@ describe('DiscussionService', () => {
     });
 
     it('auto-joins creator as participant (two inserts)', async () => {
-      const mockParticipantValues = vi.fn().mockResolvedValue([MOCK_PARTICIPANT]);
-      mockInsert.mockReturnValueOnce({ values: mockValues })
-                .mockReturnValueOnce({ values: mockParticipantValues });
+      const mockParticipantValues = vi
+        .fn()
+        .mockResolvedValue([MOCK_PARTICIPANT]);
+      mockInsert
+        .mockReturnValueOnce({ values: mockValues })
+        .mockReturnValueOnce({ values: mockParticipantValues });
       mockValues.mockReturnValue({ returning: mockReturning });
       mockReturning.mockResolvedValue([MOCK_DISCUSSION]);
 
@@ -345,7 +362,12 @@ describe('DiscussionService', () => {
     it('returns messages when discussion exists', async () => {
       // First chain call resolves discussion; subsequent resolves messages
       setupSelectChain([MOCK_DISCUSSION]);
-      const result = await service.findMessagesByDiscussion('disc-1', 50, 0, MOCK_AUTH);
+      const result = await service.findMessagesByDiscussion(
+        'disc-1',
+        50,
+        0,
+        MOCK_AUTH
+      );
       expect(result).toBeDefined();
     });
 
@@ -383,7 +405,12 @@ describe('DiscussionService', () => {
   describe('findRepliesByParent()', () => {
     it('returns replies for a parent message', async () => {
       setupSelectChain([MOCK_MESSAGE]);
-      const result = await service.findRepliesByParent('msg-1', 20, 0, MOCK_AUTH);
+      const result = await service.findRepliesByParent(
+        'msg-1',
+        20,
+        0,
+        MOCK_AUTH
+      );
       expect(result).toBeDefined();
     });
 
@@ -435,7 +462,11 @@ describe('DiscussionService', () => {
       setupSelectChain([MOCK_DISCUSSION]);
       setupInsertChain([MOCK_MESSAGE]);
 
-      await service.addMessage('disc-1', { content: 'Test', messageType: 'TEXT' as const }, MOCK_AUTH);
+      await service.addMessage(
+        'disc-1',
+        { content: 'Test', messageType: 'TEXT' as const },
+        MOCK_AUTH
+      );
       expect(withTenantContext).toHaveBeenCalled();
     });
 
@@ -443,17 +474,31 @@ describe('DiscussionService', () => {
       // findDiscussionById → MOCK_DISCUSSION; findMessageById → [] (not found)
       setupSelectChain([MOCK_DISCUSSION]);
       // Override for subsequent select (parent lookup) to return empty
-      mockFrom.mockReturnValueOnce({
-        where: vi.fn(() => Object.assign(Promise.resolve([MOCK_DISCUSSION]), {
-          limit: vi.fn(() => Promise.resolve([MOCK_DISCUSSION])),
-          orderBy: vi.fn(() => ({ limit: vi.fn(() => ({ offset: vi.fn(() => Promise.resolve([])) })) })),
-        })),
-      }).mockReturnValue({
-        where: vi.fn(() => Object.assign(Promise.resolve([]), {
-          limit: vi.fn(() => Promise.resolve([])),
-          orderBy: vi.fn(() => ({ limit: vi.fn(() => ({ offset: vi.fn(() => Promise.resolve([])) })) })),
-        })),
-      });
+      mockFrom
+        .mockReturnValueOnce({
+          where: vi.fn(() =>
+            Object.assign(Promise.resolve([MOCK_DISCUSSION]), {
+              limit: vi.fn(() => Promise.resolve([MOCK_DISCUSSION])),
+              orderBy: vi.fn(() => ({
+                limit: vi.fn(() => ({
+                  offset: vi.fn(() => Promise.resolve([])),
+                })),
+              })),
+            })
+          ),
+        })
+        .mockReturnValue({
+          where: vi.fn(() =>
+            Object.assign(Promise.resolve([]), {
+              limit: vi.fn(() => Promise.resolve([])),
+              orderBy: vi.fn(() => ({
+                limit: vi.fn(() => ({
+                  offset: vi.fn(() => Promise.resolve([])),
+                })),
+              })),
+            })
+          ),
+        });
 
       const input = {
         content: 'Reply',
@@ -471,7 +516,10 @@ describe('DiscussionService', () => {
   describe('findParticipantsByDiscussion()', () => {
     it('returns participants array', async () => {
       setupSelectChain([MOCK_DISCUSSION]);
-      const result = await service.findParticipantsByDiscussion('disc-1', MOCK_AUTH);
+      const result = await service.findParticipantsByDiscussion(
+        'disc-1',
+        MOCK_AUTH
+      );
       expect(result).toBeDefined();
     });
 
@@ -537,13 +585,22 @@ describe('DiscussionService', () => {
         const result = callCount === 1 ? [MOCK_DISCUSSION] : [];
         const whereResult = Object.assign(Promise.resolve(result), {
           limit: vi.fn(() => Promise.resolve(result)),
-          orderBy: vi.fn(() => ({ limit: vi.fn(() => ({ offset: vi.fn(() => Promise.resolve(result)) })) })),
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => ({
+              offset: vi.fn(() => Promise.resolve(result)),
+            })),
+          })),
         });
-        return { where: vi.fn(() => whereResult), limit: vi.fn(() => Promise.resolve(result)) };
+        return {
+          where: vi.fn(() => whereResult),
+          limit: vi.fn(() => Promise.resolve(result)),
+        };
       });
       mockSelect.mockReturnValue({ from: mockFrom });
 
-      const mockParticipantValues = vi.fn().mockResolvedValue([MOCK_PARTICIPANT]);
+      const mockParticipantValues = vi
+        .fn()
+        .mockResolvedValue([MOCK_PARTICIPANT]);
       mockInsert.mockReturnValue({ values: mockParticipantValues });
 
       const result = await service.joinDiscussion('disc-1', MOCK_AUTH);
@@ -558,9 +615,16 @@ describe('DiscussionService', () => {
         const result = callCount === 1 ? [MOCK_DISCUSSION] : [MOCK_PARTICIPANT];
         const whereResult = Object.assign(Promise.resolve(result), {
           limit: vi.fn(() => Promise.resolve(result)),
-          orderBy: vi.fn(() => ({ limit: vi.fn(() => ({ offset: vi.fn(() => Promise.resolve(result)) })) })),
+          orderBy: vi.fn(() => ({
+            limit: vi.fn(() => ({
+              offset: vi.fn(() => Promise.resolve(result)),
+            })),
+          })),
         });
-        return { where: vi.fn(() => whereResult), limit: vi.fn(() => Promise.resolve(result)) };
+        return {
+          where: vi.fn(() => whereResult),
+          limit: vi.fn(() => Promise.resolve(result)),
+        };
       });
       mockSelect.mockReturnValue({ from: mockFrom });
 
@@ -571,7 +635,9 @@ describe('DiscussionService', () => {
 
     it('calls withTenantContext', async () => {
       setupSelectChain([MOCK_DISCUSSION]);
-      const mockParticipantValues = vi.fn().mockResolvedValue([MOCK_PARTICIPANT]);
+      const mockParticipantValues = vi
+        .fn()
+        .mockResolvedValue([MOCK_PARTICIPANT]);
       mockInsert.mockReturnValue({ values: mockParticipantValues });
 
       await service.joinDiscussion('disc-1', MOCK_AUTH);

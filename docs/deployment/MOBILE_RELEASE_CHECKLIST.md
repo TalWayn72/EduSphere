@@ -7,6 +7,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 1. Pre-Release
 
 ### Version Bump
+
 - [ ] Update version number in `app.json` or `app.config.js`
   - [ ] Increment `version` (e.g., 1.2.3)
   - [ ] Increment `ios.buildNumber`
@@ -16,6 +17,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Update version in any marketing materials or documentation
 
 ### Changelog
+
 - [ ] Update CHANGELOG.md with all changes since last release
   - [ ] New features
   - [ ] Bug fixes
@@ -27,6 +29,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Keep release notes under character limits (4000 chars for iOS, 500 chars for Play Store)
 
 ### Testing
+
 - [ ] Run full test suite
   - [ ] Unit tests: `npm test` or `yarn test`
   - [ ] Integration tests
@@ -51,6 +54,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 2. iOS App Store
 
 ### Certificates & Provisioning Profiles
+
 - [ ] Verify Apple Developer Program membership is active
 - [ ] Check distribution certificate validity (expires annually)
   - [ ] Location: Apple Developer Portal > Certificates, Identifiers & Profiles
@@ -63,6 +67,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Verify app identifier (Bundle ID) matches
 
 ### Build Configuration
+
 - [ ] Set build configuration to Release
 - [ ] Verify code signing settings in Xcode
   - [ ] Team: Select correct team
@@ -77,6 +82,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Verify app name and display name
 
 ### Build & Upload
+
 - [ ] Build app using EAS Build or Xcode
   - [ ] `eas build --platform ios --profile production`
   - [ ] Or: Archive in Xcode (Product > Archive)
@@ -89,6 +95,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Wait for processing to complete (10-30 minutes)
 
 ### Screenshots & Media
+
 - [ ] Prepare screenshots for all required device sizes
   - [ ] 6.7" (iPhone 14 Pro Max, 15 Pro Max)
   - [ ] 6.5" (iPhone 11 Pro Max, XS Max)
@@ -102,6 +109,7 @@ This comprehensive checklist guides you through the mobile app release process f
   - [ ] Accurate representation of app
 
 ### App Store Connect
+
 - [ ] Log in to App Store Connect
 - [ ] Navigate to "My Apps" > Select your app
 - [ ] Create new version
@@ -128,6 +136,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 3. Google Play
 
 ### Signing Keys
+
 - [ ] Verify upload keystore exists and is backed up securely
   - [ ] Location: `android/app/upload-keystore.jks` or similar
   - [ ] Store keystore password in secure location (password manager)
@@ -139,6 +148,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Check key validity (25+ years from creation)
 
 ### Build Configuration
+
 - [ ] Set build variant to `release`
 - [ ] Verify signing configuration in `android/app/build.gradle`
   ```gradle
@@ -159,6 +169,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Verify app name in `strings.xml`
 
 ### Build Android App Bundle (AAB)
+
 - [ ] Build AAB using EAS Build or Gradle
   - [ ] `eas build --platform android --profile production`
   - [ ] Or: `cd android && ./gradlew bundleRelease`
@@ -170,6 +181,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Check bundle size (under 150MB recommended)
 
 ### Play Console Upload
+
 - [ ] Log in to Google Play Console
 - [ ] Navigate to your app
 - [ ] Go to "Production" or "Open Testing" track
@@ -179,6 +191,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Review any warnings or errors from Play Console
 
 ### Screenshots & Media
+
 - [ ] Prepare screenshots for required device types
   - [ ] Phone: 16:9 and 9:16 aspect ratios (min 320px)
   - [ ] 7-inch tablet (optional)
@@ -190,6 +203,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Ensure all media follows Play Store guidelines
 
 ### Play Console Configuration
+
 - [ ] Fill in release details
   - [ ] Release name (e.g., "v1.2.3")
   - [ ] Release notes (what's new) - max 500 characters
@@ -214,6 +228,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 4. App Review Guidelines
 
 ### iOS Human Interface Guidelines
+
 - [ ] Follow iOS design patterns and conventions
   - [ ] Navigation bars, tab bars, toolbars
   - [ ] System fonts and typography
@@ -230,6 +245,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Provide clear and meaningful error messages
 
 ### iOS App Store Review Guidelines
+
 - [ ] App is complete and functional
 - [ ] No crashes, bugs, or broken features
 - [ ] Metadata is accurate and complete
@@ -242,6 +258,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Complies with legal requirements (COPPA, GDPR, etc.)
 
 ### Android Material Design
+
 - [ ] Follow Material Design 3 guidelines
   - [ ] Material You dynamic theming
   - [ ] Proper use of Material components
@@ -261,6 +278,7 @@ This comprehensive checklist guides you through the mobile app release process f
   - [ ] Widget design (if applicable)
 
 ### Android Play Store Policies
+
 - [ ] App meets quality standards
   - [ ] Crashes on less than 2% of sessions
   - [ ] ANRs on less than 0.5% of sessions
@@ -279,6 +297,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 5. Privacy Policy & Permissions
 
 ### Privacy Policy
+
 - [ ] Privacy policy is up to date
 - [ ] Privacy policy URL is accessible and working
 - [ ] Privacy policy covers all data collection
@@ -296,6 +315,7 @@ This comprehensive checklist guides you through the mobile app release process f
   - [ ] COPPA (children's apps)
 
 ### iOS Permissions
+
 - [ ] Review all requested permissions
 - [ ] Provide clear usage descriptions in Info.plist
   - [ ] `NSCameraUsageDescription`
@@ -312,6 +332,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] App functions gracefully if permission denied
 
 ### Android Permissions
+
 - [ ] Review all requested permissions in AndroidManifest.xml
 - [ ] Declare dangerous permissions appropriately
   - [ ] Camera
@@ -328,6 +349,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Remove unused permissions from manifest
 
 ### App Privacy Details (iOS App Store)
+
 - [ ] Fill out App Privacy questionnaire in App Store Connect
   - [ ] Data types collected
   - [ ] Data used to track users
@@ -337,6 +359,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Update when data practices change
 
 ### Data Safety Section (Google Play)
+
 - [ ] Complete Data Safety form in Play Console
   - [ ] Data collected and shared
   - [ ] Purpose of data collection
@@ -351,6 +374,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 6. Beta Testing
 
 ### TestFlight (iOS)
+
 - [ ] Upload beta build to App Store Connect
 - [ ] Create internal testing group
   - [ ] Add internal testers (email addresses)
@@ -369,6 +393,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] TestFlight builds expire after 90 days
 
 ### Google Play Internal Testing
+
 - [ ] Create internal testing track in Play Console
 - [ ] Upload AAB to internal testing track
 - [ ] Add internal testers (email addresses or Google Groups)
@@ -377,6 +402,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Testers can install immediately (no review)
 
 ### Google Play Closed Testing
+
 - [ ] Create closed testing track (Alpha or Beta)
 - [ ] Upload AAB to closed testing track
 - [ ] Add testers
@@ -389,6 +415,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Monitor pre-launch reports
 
 ### Google Play Open Testing
+
 - [ ] Create open testing track
 - [ ] Upload AAB to open testing track
 - [ ] Anyone can join (public)
@@ -397,6 +424,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Release to open track
 
 ### Testing Best Practices
+
 - [ ] Define clear testing goals
 - [ ] Provide test scenarios and test cases
 - [ ] Create feedback collection mechanism
@@ -413,6 +441,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 7. Production Release
 
 ### Final Pre-Release Checks
+
 - [ ] All beta testing complete
 - [ ] Critical bugs fixed
 - [ ] All testing passed
@@ -423,6 +452,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Backend services ready to handle load
 
 ### iOS Production Release
+
 - [ ] Log in to App Store Connect
 - [ ] Navigate to your app version
 - [ ] Verify all metadata and screenshots
@@ -437,6 +467,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Monitor release status
 
 ### Android Production Release
+
 - [ ] Log in to Google Play Console
 - [ ] Navigate to Production track
 - [ ] Create new release
@@ -445,6 +476,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Configure rollout percentage
 
 ### Phased Rollout Strategy
+
 - [ ] **iOS**: Use phased release option
   - [ ] App Store Connect > App > Pricing and Availability
   - [ ] Enable "Phased Release for Automatic Updates"
@@ -469,6 +501,7 @@ This comprehensive checklist guides you through the mobile app release process f
   - [ ] Backend issues
 
 ### Release Communication
+
 - [ ] Announce release to users
   - [ ] Email newsletter
   - [ ] Social media
@@ -483,6 +516,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 8. Post-Release Monitoring
 
 ### Sentry Configuration
+
 - [ ] Verify Sentry is configured in production build
 - [ ] Check Sentry DSN is correct
 - [ ] Configure release tracking
@@ -495,6 +529,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Monitor Sentry dashboard for first 24-48 hours
 
 ### Firebase Analytics
+
 - [ ] Verify Firebase Analytics is enabled
 - [ ] Confirm events are being tracked
   - [ ] Screen views
@@ -509,6 +544,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Review user properties and demographics
 
 ### Crash Reports
+
 - [ ] Monitor crash-free user rate
   - [ ] Target: >99% crash-free users
 - [ ] Check crash trends in Firebase Crashlytics
@@ -520,6 +556,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Track top crashes by volume
 
 ### Performance Monitoring
+
 - [ ] Monitor app performance metrics
   - [ ] App startup time
   - [ ] Screen rendering time
@@ -531,6 +568,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Review ANR (Application Not Responding) rates on Android
 
 ### User Feedback & Ratings
+
 - [ ] Monitor app store ratings and reviews
   - [ ] iOS: App Store Connect > Ratings and Reviews
   - [ ] Android: Play Console > User feedback > Reviews
@@ -543,6 +581,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Use feedback to prioritize bug fixes and features
 
 ### Backend Monitoring
+
 - [ ] Monitor API server performance
   - [ ] Response times
   - [ ] Error rates
@@ -553,6 +592,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Monitor authentication and authorization systems
 
 ### Key Metrics to Track
+
 - [ ] Downloads/Installs (first 7 days)
 - [ ] Crash-free user rate
 - [ ] User retention (Day 1, Day 7, Day 30)
@@ -568,6 +608,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 9. Hotfix Process
 
 ### When to Issue a Hotfix
+
 - [ ] Critical crash affecting >5% of users
 - [ ] Security vulnerability discovered
 - [ ] Data loss or corruption bug
@@ -576,6 +617,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Severe performance degradation
 
 ### EAS OTA (Over-The-Air) Updates
+
 - [ ] Verify issue can be fixed with OTA update
   - [ ] JavaScript/TypeScript code changes only
   - [ ] Asset changes (images, fonts)
@@ -593,6 +635,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Verify fix resolves issue
 
 ### Full Binary Release (Native Changes)
+
 - [ ] If OTA update is not possible (native code changes)
 - [ ] Create hotfix branch
 - [ ] Implement and test fix
@@ -608,6 +651,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Communicate hotfix to users if needed
 
 ### Hotfix Workflow
+
 1. [ ] Identify and verify issue
 2. [ ] Assess severity and impact
 3. [ ] Determine fix strategy (OTA vs binary)
@@ -624,6 +668,7 @@ This comprehensive checklist guides you through the mobile app release process f
 ## 10. Rollback Procedure
 
 ### When to Rollback
+
 - [ ] Critical crash rate >5%
 - [ ] Data loss or corruption
 - [ ] Security vulnerability introduced
@@ -632,6 +677,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] User rating drops significantly
 
 ### iOS Rollback
+
 - [ ] **Note**: Apple does not support direct rollback
 - [ ] Cannot revert users to previous version automatically
 - [ ] Options:
@@ -642,6 +688,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Communicate issue to users in release notes
 
 ### Android Rollback
+
 - [ ] Log in to Google Play Console
 - [ ] Navigate to Production track
 - [ ] Click on "Releases" tab
@@ -659,6 +706,7 @@ This comprehensive checklist guides you through the mobile app release process f
     - [ ] Fix issue and increase percentage again
 
 ### OTA Rollback (EAS Update)
+
 - [ ] Publish rollback update to previous JavaScript bundle
 - [ ] Identify last known good update/commit
 - [ ] Create rollback update
@@ -669,6 +717,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Users receive rollback on next app launch
 
 ### Rollback Communication
+
 - [ ] Notify stakeholders immediately
   - [ ] Engineering team
   - [ ] Product managers
@@ -683,6 +732,7 @@ This comprehensive checklist guides you through the mobile app release process f
 - [ ] Provide timeline for fix
 
 ### Post-Rollback Actions
+
 - [ ] Conduct incident post-mortem
   - [ ] What went wrong?
   - [ ] Why wasn't it caught in testing?

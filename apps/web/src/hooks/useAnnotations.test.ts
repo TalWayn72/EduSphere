@@ -16,8 +16,12 @@ import type { AnnotationsQuery } from '@edusphere/graphql-types';
 // ── urql mock ────────────────────────────────────────────────────────────────
 // We fully mock urql so no real network calls are made.
 
-const mockCreateAnnotation = vi.fn().mockResolvedValue({ data: null, error: null });
-const mockReplyToAnnotation = vi.fn().mockResolvedValue({ data: null, error: null });
+const mockCreateAnnotation = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: null });
+const mockReplyToAnnotation = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: null });
 
 vi.mock('urql', () => ({
   useQuery: vi.fn(),
@@ -93,9 +97,13 @@ function setupUrqlMocks(options: UrqlMockOptions = {}) {
   // Map mutation document strings to their respective mock functions.
   vi.mocked(urql.useMutation).mockImplementation((mutation) => {
     if (mutation === 'CREATE_ANNOTATION_MUTATION') {
-      return [{ fetching: false }, mockCreateAnnotation] as ReturnType<typeof urql.useMutation>;
+      return [{ fetching: false }, mockCreateAnnotation] as ReturnType<
+        typeof urql.useMutation
+      >;
     }
-    return [{ fetching: false }, mockReplyToAnnotation] as ReturnType<typeof urql.useMutation>;
+    return [{ fetching: false }, mockReplyToAnnotation] as ReturnType<
+      typeof urql.useMutation
+    >;
   });
 
   vi.mocked(urql.useSubscription).mockReturnValue([
@@ -153,7 +161,11 @@ describe('useAnnotations', () => {
     );
 
     act(() => {
-      result.current.addAnnotation('My optimistic note', AnnotationLayer.PERSONAL, 42);
+      result.current.addAnnotation(
+        'My optimistic note',
+        AnnotationLayer.PERSONAL,
+        42
+      );
     });
 
     // The optimistic entry should appear immediately
@@ -188,7 +200,12 @@ describe('useAnnotations', () => {
     );
 
     act(() => {
-      result.current.addReply('ann-server-1', 'My reply', AnnotationLayer.PERSONAL, 0);
+      result.current.addReply(
+        'ann-server-1',
+        'My reply',
+        AnnotationLayer.PERSONAL,
+        0
+      );
     });
 
     const replyIds = result.current.annotations.map((a) => a.id);
@@ -202,7 +219,12 @@ describe('useAnnotations', () => {
     );
 
     act(() => {
-      result.current.addReply('ann-server-1', 'Reply text', AnnotationLayer.PERSONAL, 0);
+      result.current.addReply(
+        'ann-server-1',
+        'Reply text',
+        AnnotationLayer.PERSONAL,
+        0
+      );
     });
 
     const reply = result.current.annotations.find((a) =>

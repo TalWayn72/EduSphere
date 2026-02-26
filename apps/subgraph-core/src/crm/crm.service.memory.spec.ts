@@ -7,7 +7,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mockDrain = vi.fn().mockResolvedValue(undefined);
 const mockSubscription = {
   unsubscribe: vi.fn(),
-  [Symbol.asyncIterator]: vi.fn(() => ({ next: vi.fn().mockResolvedValue({ done: true }) })),
+  [Symbol.asyncIterator]: vi.fn(() => ({
+    next: vi.fn().mockResolvedValue({ done: true }),
+  })),
 };
 const mockNatsConnection = {
   subscribe: vi.fn(() => mockSubscription),
@@ -18,16 +20,22 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: { crmConnections: {}, crmSyncLog: {} },
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: () => unknown) => fn()),
-  eq: vi.fn(), and: vi.fn(), desc: vi.fn(),
+  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: () => unknown) =>
+    fn()
+  ),
+  eq: vi.fn(),
+  and: vi.fn(),
+  desc: vi.fn(),
 }));
 vi.mock('nats', () => ({
   connect: vi.fn().mockResolvedValue(mockNatsConnection),
 }));
 
 const mockSfClient = {
-  exchangeCode: vi.fn(), refreshToken: vi.fn(),
-  createCompletionActivity: vi.fn(), verifyWebhookSignature: vi.fn(),
+  exchangeCode: vi.fn(),
+  refreshToken: vi.fn(),
+  createCompletionActivity: vi.fn(),
+  verifyWebhookSignature: vi.fn(),
   getAuthorizationUrl: vi.fn(),
 };
 const mockEnc = {
@@ -47,9 +55,10 @@ beforeEach(async () => {
 });
 
 function makeService() {
-  return new (CrmService as unknown as new (sf: unknown, enc: unknown) => InstanceType<typeof CrmService>)(
-    mockSfClient, mockEnc,
-  );
+  return new (CrmService as unknown as new (
+    sf: unknown,
+    enc: unknown
+  ) => InstanceType<typeof CrmService>)(mockSfClient, mockEnc);
 }
 
 describe('CrmService — memory safety', () => {
@@ -65,10 +74,12 @@ describe('CrmService — memory safety', () => {
 
   it('CrmController stateMap evicts at MAX_STATE_ENTRIES (100) — insertion order LRU', async () => {
     const { CrmController } = await import('./crm.controller.js');
-    const ctrl = new (CrmController as unknown as new (svc: unknown, sf: unknown) => InstanceType<typeof CrmController>)(
-      makeService(), mockSfClient,
-    );
-    const map = (ctrl as unknown as { stateMap: Map<string, unknown> }).stateMap;
+    const ctrl = new (CrmController as unknown as new (
+      svc: unknown,
+      sf: unknown
+    ) => InstanceType<typeof CrmController>)(makeService(), mockSfClient);
+    const map = (ctrl as unknown as { stateMap: Map<string, unknown> })
+      .stateMap;
 
     // Fill to exactly 100 entries
     for (let i = 0; i < 100; i++) {

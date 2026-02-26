@@ -97,7 +97,7 @@ export class DocumentParserService {
   chunkText(
     text: string,
     chunkSize = 1000,
-    overlap = 200,
+    overlap = 200
   ): Array<{ index: number; text: string }> {
     const chunks: Array<{ index: number; text: string }> = [];
     let start = 0;

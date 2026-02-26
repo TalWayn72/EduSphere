@@ -19,7 +19,13 @@ export const options = {
 const GATEWAY_URL = __ENV.GATEWAY_URL || 'http://localhost:4000/graphql';
 const JWT_TOKEN = __ENV.TEST_JWT || '';
 
-const TOPICS = ['philosophy', 'mathematics', 'computer science', 'biology', 'physics'];
+const TOPICS = [
+  'philosophy',
+  'mathematics',
+  'computer science',
+  'biology',
+  'physics',
+];
 
 const searchPayload = (topic) =>
   JSON.stringify({
@@ -41,8 +47,12 @@ const LEARNING_PATH_PAYLOAD = JSON.stringify({
 
 const noInternalError = (r) => {
   try {
-    return !JSON.parse(r.body).errors?.some((e) => e.extensions?.code === 'INTERNAL_ERROR');
-  } catch { return false; }
+    return !JSON.parse(r.body).errors?.some(
+      (e) => e.extensions?.code === 'INTERNAL_ERROR'
+    );
+  } catch {
+    return false;
+  }
 };
 
 export default function () {
@@ -57,7 +67,11 @@ export default function () {
     'concept search status 200': (r) => r.status === 200,
     'concept search no server errors': noInternalError,
     'concept search data present': (r) => {
-      try { return JSON.parse(r.body).data !== undefined; } catch { return false; }
+      try {
+        return JSON.parse(r.body).data !== undefined;
+      } catch {
+        return false;
+      }
     },
   });
 

@@ -25,7 +25,11 @@ interface RequestBody {
   [key: string]: unknown;
 }
 
-function errorResponse(status: number, code: string, message: string): Response {
+function errorResponse(
+  status: number,
+  code: string,
+  message: string
+): Response {
   return new Response(
     JSON.stringify({
       errors: [{ message, extensions: { code } }],
@@ -33,7 +37,7 @@ function errorResponse(status: number, code: string, message: string): Response 
     {
       status,
       headers: { 'Content-Type': 'application/json' },
-    },
+    }
   );
 }
 
@@ -50,7 +54,7 @@ function errorResponse(status: number, code: string, message: string): Response 
  */
 export function applyPersistedQueryMiddleware(
   _request: Request,
-  body: RequestBody,
+  body: RequestBody
 ): Response | null {
   const hash = body.extensions?.persistedQuery?.sha256Hash;
   const query = body.query;
@@ -72,7 +76,7 @@ export function applyPersistedQueryMiddleware(
     return errorResponse(
       400,
       'PERSISTED_QUERY_NOT_FOUND',
-      'PersistedQueryNotFound: hash not registered. Retry with full query document.',
+      'PersistedQueryNotFound: hash not registered. Retry with full query document.'
     );
   }
 
@@ -81,7 +85,7 @@ export function applyPersistedQueryMiddleware(
     return errorResponse(
       400,
       'PERSISTED_QUERIES_REQUIRED',
-      'Only persisted queries are accepted in this environment.',
+      'Only persisted queries are accepted in this environment.'
     );
   }
 

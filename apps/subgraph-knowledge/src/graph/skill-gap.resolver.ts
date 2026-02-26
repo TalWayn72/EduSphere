@@ -12,10 +12,7 @@ export class SkillGapResolver {
   constructor(private readonly skillGapService: SkillGapService) {}
 
   private getAuthContext(context: GraphQLContext) {
-    if (
-      !context.authContext?.userId ||
-      !context.authContext?.tenantId
-    ) {
+    if (!context.authContext?.userId || !context.authContext?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
     return {
@@ -28,7 +25,7 @@ export class SkillGapResolver {
   @Query('skillGapAnalysis')
   async skillGapAnalysis(
     @Args('roleId') roleId: string,
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.skillGapService.analyzeSkillGap(userId, tenantId, role, roleId);
@@ -45,7 +42,7 @@ export class SkillGapResolver {
     @Args('roleName') roleName: string,
     @Args('description') description: string | null,
     @Args('requiredConcepts') requiredConcepts: string[],
-    @Context() context: GraphQLContext,
+    @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
     return this.skillGapService.createSkillProfile(
@@ -54,7 +51,7 @@ export class SkillGapResolver {
       role,
       roleName,
       description ?? null,
-      requiredConcepts,
+      requiredConcepts
     );
   }
 }

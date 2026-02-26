@@ -169,7 +169,6 @@ jobs:
       - name: Run audit (prod deps — block on critical)
         run: pnpm audit --prod --audit-level=critical
 
-
   # Security policy tests + RLS policy tests (static analysis -- no DB required)
   security-policy-tests:
     name: Security & RLS Policy Tests
@@ -291,7 +290,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -315,7 +314,6 @@ jobs:
       - name: Typecheck web app with generated types
         run: pnpm --filter @edusphere/web typecheck
 
-
   # Advanced security scanning: Trivy IaC + SBOM + OWASP Dependency-Check
   security-scanning:
     name: Security Scanning
@@ -330,8 +328,8 @@ jobs:
         with:
           scan-type: config
           scan-ref: ./infrastructure/
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
           format: table
 
       - name: Generate SBOM (CycloneDX)
@@ -340,7 +338,7 @@ jobs:
           scan-type: fs
           format: cyclonedx
           output: sbom.json
-          exit-code: '0'
+          exit-code: "0"
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
@@ -374,7 +372,18 @@ jobs:
   ci-complete:
     name: CI Complete
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, unit-tests, security-scan, security-policy-tests, security-scanning, build, e2e-tests, codegen-validation]
+    needs:
+      [
+        lint,
+        typecheck,
+        unit-tests,
+        security-scan,
+        security-policy-tests,
+        security-scanning,
+        build,
+        e2e-tests,
+        codegen-validation,
+      ]
     if: always()
 
     steps:

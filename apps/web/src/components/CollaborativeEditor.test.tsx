@@ -48,7 +48,12 @@ vi.mock('@hocuspocus/provider', () => ({
 
   // ── @hocuspocus/provider exports ──
   HocuspocusProvider: vi.fn(() => ({
-    awareness: { setLocalStateField: vi.fn(), on: vi.fn(), off: vi.fn(), getStates: vi.fn(() => new Map()) },
+    awareness: {
+      setLocalStateField: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+      getStates: vi.fn(() => new Map()),
+    },
     destroy: vi.fn(),
   })),
 
@@ -74,16 +79,30 @@ vi.mock('yjs', () => {
   };
 
   class MockDoc {
-    getXmlFragment() { return {}; }
+    getXmlFragment() {
+      return {};
+    }
   }
 
   class MockUndoManager {
-    canUndo() { return mockUndoManager.canUndo(); }
-    canRedo() { return mockUndoManager.canRedo(); }
-    undo() { return mockUndoManager.undo(); }
-    redo() { return mockUndoManager.redo(); }
-    on(...args: Parameters<typeof mockUndoManager.on>) { return mockUndoManager.on(...args); }
-    off(...args: Parameters<typeof mockUndoManager.off>) { return mockUndoManager.off(...args); }
+    canUndo() {
+      return mockUndoManager.canUndo();
+    }
+    canRedo() {
+      return mockUndoManager.canRedo();
+    }
+    undo() {
+      return mockUndoManager.undo();
+    }
+    redo() {
+      return mockUndoManager.redo();
+    }
+    on(...args: Parameters<typeof mockUndoManager.on>) {
+      return mockUndoManager.on(...args);
+    }
+    off(...args: Parameters<typeof mockUndoManager.off>) {
+      return mockUndoManager.off(...args);
+    }
   }
 
   return {
@@ -104,18 +123,33 @@ import * as TiptapReact from '@tiptap/react';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const PRESENCE_USERS: PresenceUser[] = [
-  { id: 'u1', name: 'Alice B.', color: '#6366f1', initials: 'AB', isTyping: true },
-  { id: 'u2', name: 'Charlie D.', color: '#ec4899', initials: 'CD', isTyping: false },
+  {
+    id: 'u1',
+    name: 'Alice B.',
+    color: '#6366f1',
+    initials: 'AB',
+    isTyping: true,
+  },
+  {
+    id: 'u2',
+    name: 'Charlie D.',
+    color: '#ec4899',
+    initials: 'CD',
+    isTyping: false,
+  },
 ];
 
-const renderEditor = (props: Partial<Parameters<typeof CollaborativeEditor>[0]> = {}) =>
-  render(<CollaborativeEditor {...props} />);
+const renderEditor = (
+  props: Partial<Parameters<typeof CollaborativeEditor>[0]> = {}
+) => render(<CollaborativeEditor {...props} />);
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('CollaborativeEditor', () => {
   beforeEach(() => {
-    vi.mocked(TiptapReact.useEditor).mockReturnValue(mockEditor as unknown as ReturnType<typeof TiptapReact.useEditor>);
+    vi.mocked(TiptapReact.useEditor).mockReturnValue(
+      mockEditor as unknown as ReturnType<typeof TiptapReact.useEditor>
+    );
     mockChain.focus.mockReturnThis();
     Object.values(mockChain).forEach((fn) => {
       if (typeof fn === 'function' && 'mockClear' in fn) fn.mockClear();
@@ -133,7 +167,9 @@ describe('CollaborativeEditor', () => {
   });
 
   it('returns null when editor is not yet initialised', () => {
-    vi.mocked(TiptapReact.useEditor).mockReturnValue(null as unknown as ReturnType<typeof TiptapReact.useEditor>);
+    vi.mocked(TiptapReact.useEditor).mockReturnValue(
+      null as unknown as ReturnType<typeof TiptapReact.useEditor>
+    );
     const { container } = renderEditor();
     expect(container.firstChild).toBeNull();
   });
@@ -152,54 +188,74 @@ describe('CollaborativeEditor', () => {
 
   it('renders Inline code toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /inline code/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /inline code/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Heading 1 toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /heading 1/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /heading 1/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Heading 2 toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /heading 2/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /heading 2/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Bullet list toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /bullet list/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /bullet list/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Ordered list toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /ordered list/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /ordered list/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Blockquote toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /blockquote/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /blockquote/i })
+    ).toBeInTheDocument();
   });
 
   // ── New extension toolbar buttons ─────────────────────────────────────────
 
   it('renders Task list toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /task list/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /task list/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Code block toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /code block/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /code block/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Insert table toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /insert table/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /insert table/i })
+    ).toBeInTheDocument();
   });
 
   it('renders Insert math toolbar button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /insert math/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /insert math/i })
+    ).toBeInTheDocument();
   });
 
   // ── Undo / Redo buttons ───────────────────────────────────────────────────
@@ -276,7 +332,11 @@ describe('CollaborativeEditor', () => {
   it('clicking Insert table button calls chain().focus().insertTable().run()', () => {
     renderEditor();
     fireEvent.click(screen.getByRole('button', { name: /insert table/i }));
-    expect(mockChain.insertTable).toHaveBeenCalledWith({ rows: 3, cols: 3, withHeaderRow: true });
+    expect(mockChain.insertTable).toHaveBeenCalledWith({
+      rows: 3,
+      cols: 3,
+      withHeaderRow: true,
+    });
     expect(mockChain.run).toHaveBeenCalled();
   });
 
@@ -290,29 +350,37 @@ describe('CollaborativeEditor', () => {
   // ── Active state ──────────────────────────────────────────────────────────
 
   it('Bold button uses "secondary" variant when bold is active', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockEditor.isActive.mockImplementation(((type: unknown) => type === 'bold') as any);
+    mockEditor.isActive.mockImplementation(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((type: unknown) => type === 'bold') as any
+    );
     renderEditor();
     expect(mockEditor.isActive).toHaveBeenCalledWith('bold');
   });
 
   it('Code block button uses "secondary" variant when codeBlock is active', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockEditor.isActive.mockImplementation(((type: unknown) => type === 'codeBlock') as any);
+    mockEditor.isActive.mockImplementation(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((type: unknown) => type === 'codeBlock') as any
+    );
     renderEditor();
     expect(mockEditor.isActive).toHaveBeenCalledWith('codeBlock');
   });
 
   it('Task list button uses "secondary" variant when taskList is active', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockEditor.isActive.mockImplementation(((type: unknown) => type === 'taskList') as any);
+    mockEditor.isActive.mockImplementation(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((type: unknown) => type === 'taskList') as any
+    );
     renderEditor();
     expect(mockEditor.isActive).toHaveBeenCalledWith('taskList');
   });
 
   it('Table button uses "secondary" variant when table is active', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockEditor.isActive.mockImplementation(((type: unknown) => type === 'table') as any);
+    mockEditor.isActive.mockImplementation(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((type: unknown) => type === 'table') as any
+    );
     renderEditor();
     expect(mockEditor.isActive).toHaveBeenCalledWith('table');
   });

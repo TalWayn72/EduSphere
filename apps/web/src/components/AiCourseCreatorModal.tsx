@@ -1,44 +1,106 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useSubscription } from 'urql';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Sparkles, X, CheckCircle2, AlertTriangle } from 'lucide-react';
+import {
+  Loader2,
+  Sparkles,
+  X,
+  CheckCircle2,
+  AlertTriangle,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { GENERATE_COURSE_FROM_PROMPT_MUTATION, EXECUTION_STATUS_SUBSCRIPTION } from '@/lib/graphql/agent-course-gen.queries';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  GENERATE_COURSE_FROM_PROMPT_MUTATION,
+  EXECUTION_STATUS_SUBSCRIPTION,
+} from '@/lib/graphql/agent-course-gen.queries';
 import { CREATE_COURSE_MUTATION } from '@/lib/graphql/content.queries';
 
-interface GeneratedModule { title: string; description: string; contentItemTitles: string[]; }
-interface GenerateCourseResult { generateCourseFromPrompt: { executionId: string; status: string; courseTitle: string | null; courseDescription: string | null; modules: GeneratedModule[]; }; }
-interface ExecutionOutputData { courseTitle?: string; courseDescription?: string; modules?: GeneratedModule[]; error?: string; }
-interface ExecutionStatusPayload { executionStatusChanged: { id: string; status: string; output: ExecutionOutputData | null; }; }
-interface CreateCourseResult { createCourse: { id: string; title: string }; }
-export interface AiCourseCreatorModalProps { open: boolean; onClose: () => void; }
+interface GeneratedModule {
+  title: string;
+  description: string;
+  contentItemTitles: string[];
+}
+interface GenerateCourseResult {
+  generateCourseFromPrompt: {
+    executionId: string;
+    status: string;
+    courseTitle: string | null;
+    courseDescription: string | null;
+    modules: GeneratedModule[];
+  };
+}
+interface ExecutionOutputData {
+  courseTitle?: string;
+  courseDescription?: string;
+  modules?: GeneratedModule[];
+  error?: string;
+}
+interface ExecutionStatusPayload {
+  executionStatusChanged: {
+    id: string;
+    status: string;
+    output: ExecutionOutputData | null;
+  };
+}
+interface CreateCourseResult {
+  createCourse: { id: string; title: string };
+}
+export interface AiCourseCreatorModalProps {
+  open: boolean;
+  onClose: () => void;
+}
 
-export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProps) {
+export function AiCourseCreatorModal({
+  open,
+  onClose,
+}: AiCourseCreatorModalProps) {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
   const [level, setLevel] = useState('');
   const [hours, setHours] = useState('');
   const [executionId, setExecutionId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [outline, setOutline] = useState<{ title: string; description: string; modules: GeneratedModule[] } | null>(null);
+  const [outline, setOutline] = useState<{
+    title: string;
+    description: string;
+    modules: GeneratedModule[];
+  } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pauseSubscription, setPauseSubscription] = useState(true);
 
-  useEffect(() => { return () => { setPauseSubscription(true); }; }, []);
+  useEffect(() => {
+    return () => {
+      setPauseSubscription(true);
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) {
-      setPrompt(''); setLevel(''); setHours('');
-      setExecutionId(null); setGenerating(false);
-      setOutline(null); setErrorMsg(null);
+      setPrompt('');
+      setLevel('');
+      setHours('');
+      setExecutionId(null);
+      setGenerating(false);
+      setOutline(null);
+      setErrorMsg(null);
       setPauseSubscription(true);
     }
   }, [open]);
 
-  const [, generateCourse] = useMutation<GenerateCourseResult>(GENERATE_COURSE_FROM_PROMPT_MUTATION);
-  const [, createCourse] = useMutation<CreateCourseResult>(CREATE_COURSE_MUTATION);
+  const [, generateCourse] = useMutation<GenerateCourseResult>(
+    GENERATE_COURSE_FROM_PROMPT_MUTATION
+  );
+  const [, createCourse] = useMutation<CreateCourseResult>(
+    CREATE_COURSE_MUTATION
+  );
 
   const [{ data: subData }] = useSubscription<ExecutionStatusPayload>({
     query: EXECUTION_STATUS_SUBSCRIPTION,
@@ -50,21 +112,25 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
     if (!subData) return;
     const exec = subData.executionStatusChanged;
     if (exec.status === 'COMPLETED' && exec.output) {
-      setPauseSubscription(true); setGenerating(false);
+      setPauseSubscription(true);
+      setGenerating(false);
       setOutline({
         title: exec.output.courseTitle ?? 'Untitled Course',
         description: exec.output.courseDescription ?? '',
         modules: exec.output.modules ?? [],
       });
     } else if (exec.status === 'FAILED') {
-      setPauseSubscription(true); setGenerating(false);
+      setPauseSubscription(true);
+      setGenerating(false);
       setErrorMsg(exec.output?.error ?? 'Generation failed. Please try again.');
     }
   }, [subData]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
-    setGenerating(true); setErrorMsg(null); setOutline(null);
+    setGenerating(true);
+    setErrorMsg(null);
+    setOutline(null);
     const { data, error } = await generateCourse({
       input: {
         prompt: prompt.trim(),
@@ -74,7 +140,9 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
     });
     if (error || !data) {
       setGenerating(false);
-      setErrorMsg(error?.graphQLErrors?.[0]?.message ?? 'Failed to start generation');
+      setErrorMsg(
+        error?.graphQLErrors?.[0]?.message ?? 'Failed to start generation'
+      );
       return;
     }
     const { executionId: eid, status } = data.generateCourseFromPrompt;
@@ -82,7 +150,11 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
     if (status === 'COMPLETED') {
       const r = data.generateCourseFromPrompt;
       setGenerating(false);
-      setOutline({ title: r.courseTitle ?? 'Untitled', description: r.courseDescription ?? '', modules: r.modules });
+      setOutline({
+        title: r.courseTitle ?? 'Untitled',
+        description: r.courseDescription ?? '',
+        modules: r.modules,
+      });
     } else {
       setPauseSubscription(false);
     }
@@ -99,7 +171,9 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
       },
     });
     if (error || !data) {
-      setErrorMsg(error?.graphQLErrors?.[0]?.message ?? 'Failed to create course');
+      setErrorMsg(
+        error?.graphQLErrors?.[0]?.message ?? 'Failed to create course'
+      );
       return;
     }
     onClose();
@@ -109,7 +183,12 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onClose();
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -117,14 +196,17 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
             AI Course Creator
           </DialogTitle>
           <DialogDescription>
-            Describe your course topic and let AI generate a full structured outline.
+            Describe your course topic and let AI generate a full structured
+            outline.
           </DialogDescription>
         </DialogHeader>
 
         {!outline && (
           <div className="space-y-4 mt-2">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Course Topic / Description *</label>
+              <label className="text-sm font-medium">
+                Course Topic / Description *
+              </label>
               <Textarea
                 placeholder="e.g. Introduction to Machine Learning for high school students"
                 value={prompt}
@@ -151,7 +233,9 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Estimated Hours</label>
                 <input
-                  type="number" min={1} max={200}
+                  type="number"
+                  min={1}
+                  max={200}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   placeholder="e.g. 10"
                   value={hours}
@@ -171,11 +255,20 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
                 <X className="h-4 w-4 mr-1.5" />
                 Cancel
               </Button>
-              <Button onClick={handleGenerate} disabled={generating || !prompt.trim()}>
+              <Button
+                onClick={handleGenerate}
+                disabled={generating || !prompt.trim()}
+              >
                 {generating ? (
-                  <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Generating...</>
+                  <>
+                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                    Generating...
+                  </>
                 ) : (
-                  <><Sparkles className="h-4 w-4 mr-1.5" />Generate Course</>
+                  <>
+                    <Sparkles className="h-4 w-4 mr-1.5" />
+                    Generate Course
+                  </>
                 )}
               </Button>
             </div>
@@ -186,16 +279,25 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
           <div className="space-y-5 mt-2">
             <div className="space-y-1">
               <h3 className="font-semibold text-lg">{outline.title}</h3>
-              <p className="text-sm text-muted-foreground">{outline.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {outline.description}
+              </p>
             </div>
             <div className="space-y-3">
               {outline.modules.map((mod, idx) => (
                 <div key={idx} className="border rounded-lg p-3 space-y-2">
-                  <p className="font-medium text-sm">Module {idx + 1}: {mod.title}</p>
-                  <p className="text-xs text-muted-foreground">{mod.description}</p>
+                  <p className="font-medium text-sm">
+                    Module {idx + 1}: {mod.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {mod.description}
+                  </p>
                   <ul className="space-y-1">
                     {mod.contentItemTitles.map((item, i) => (
-                      <li key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <li
+                        key={i}
+                        className="flex items-center gap-2 text-xs text-muted-foreground"
+                      >
                         <CheckCircle2 className="h-3 w-3 text-green-500 shrink-0" />
                         {item}
                       </li>
@@ -211,8 +313,12 @@ export function AiCourseCreatorModal({ open, onClose }: AiCourseCreatorModalProp
               </div>
             )}
             <div className="flex justify-end gap-3 pt-2 border-t">
-              <Button variant="outline" onClick={() => setOutline(null)}>Regenerate</Button>
-              <Button variant="outline" onClick={onClose}>Discard</Button>
+              <Button variant="outline" onClick={() => setOutline(null)}>
+                Regenerate
+              </Button>
+              <Button variant="outline" onClick={onClose}>
+                Discard
+              </Button>
               <Button onClick={handleCreateDraft}>
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 Create Draft Course

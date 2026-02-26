@@ -5,7 +5,10 @@
  * Memory-safe: interval cleared on unmount.
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { webStorageManager, type WebStorageStats } from '@/services/StorageManager';
+import {
+  webStorageManager,
+  type WebStorageStats,
+} from '@/services/StorageManager';
 
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 

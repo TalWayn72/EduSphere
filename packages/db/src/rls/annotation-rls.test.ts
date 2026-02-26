@@ -25,7 +25,10 @@ import type { DrizzleDB } from '../index';
 // ---------------------------------------------------------------------------
 
 /** Serialise the sql template tag object produced by drizzle-orm/sql to a string. */
-function sqlToString(sqlObj: { queryChunks?: unknown[]; sql?: string }): string {
+function sqlToString(sqlObj: {
+  queryChunks?: unknown[];
+  sql?: string;
+}): string {
   // drizzle sql.raw() returns an object with a `sql` string property.
   // drizzle sql`` returns an object whose .queryChunks contain SQL strings.
   if (typeof sqlObj.sql === 'string') return sqlObj.sql;
@@ -33,7 +36,10 @@ function sqlToString(sqlObj: { queryChunks?: unknown[]; sql?: string }): string 
     return sqlObj.queryChunks
       .map((chunk) => {
         if (typeof chunk === 'string') return chunk;
-        if (chunk && typeof (chunk as Record<string, unknown>).value === 'string') {
+        if (
+          chunk &&
+          typeof (chunk as Record<string, unknown>).value === 'string'
+        ) {
           return (chunk as Record<string, unknown>).value as string;
         }
         return JSON.stringify(chunk);
@@ -51,7 +57,9 @@ function buildMockDb(capturedCalls: string[]): DrizzleDB {
     }),
   };
   return {
-    transaction: vi.fn(async (cb: (tx: typeof mockTx) => Promise<unknown>) => cb(mockTx)),
+    transaction: vi.fn(async (cb: (tx: typeof mockTx) => Promise<unknown>) =>
+      cb(mockTx)
+    ),
   } as unknown as DrizzleDB;
 }
 
@@ -73,49 +81,65 @@ const USER_B_CTX: TenantContext = {
 
 describe('G-01: RLS policies reference app.current_user_id (not app.current_user)', () => {
   it('annotations policy uses app.current_user_id', () => {
-    const raw = sqlToString(annotationsRLS as Parameters<typeof sqlToString>[0]);
-    expect(raw).toContain("app.current_user_id");
+    const raw = sqlToString(
+      annotationsRLS as Parameters<typeof sqlToString>[0]
+    );
+    expect(raw).toContain('app.current_user_id');
     expect(raw).not.toMatch(/current_setting\('app\.current_user'/);
   });
 
   it('annotations policy has both USING and WITH CHECK clauses', () => {
-    const raw = sqlToString(annotationsRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      annotationsRLS as Parameters<typeof sqlToString>[0]
+    );
     expect(raw.toUpperCase()).toContain('USING');
     expect(raw.toUpperCase()).toContain('WITH CHECK');
   });
 
   it('agentSessions policy uses app.current_user_id', () => {
-    const raw = sqlToString(agentSessionsRLS as Parameters<typeof sqlToString>[0]);
-    expect(raw).toContain("app.current_user_id");
+    const raw = sqlToString(
+      agentSessionsRLS as Parameters<typeof sqlToString>[0]
+    );
+    expect(raw).toContain('app.current_user_id');
     expect(raw).not.toMatch(/current_setting\('app\.current_user'/);
   });
 
   it('agentSessions policy has both USING and WITH CHECK clauses', () => {
-    const raw = sqlToString(agentSessionsRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      agentSessionsRLS as Parameters<typeof sqlToString>[0]
+    );
     expect(raw.toUpperCase()).toContain('USING');
     expect(raw.toUpperCase()).toContain('WITH CHECK');
   });
 
   it('agentMessages policy uses app.current_user_id', () => {
-    const raw = sqlToString(agentMessagesRLS as Parameters<typeof sqlToString>[0]);
-    expect(raw).toContain("app.current_user_id");
+    const raw = sqlToString(
+      agentMessagesRLS as Parameters<typeof sqlToString>[0]
+    );
+    expect(raw).toContain('app.current_user_id');
     expect(raw).not.toMatch(/current_setting\('app\.current_user'/);
   });
 
   it('userCourses policy uses app.current_user_id', () => {
-    const raw = sqlToString(userCoursesRLS as Parameters<typeof sqlToString>[0]);
-    expect(raw).toContain("app.current_user_id");
+    const raw = sqlToString(
+      userCoursesRLS as Parameters<typeof sqlToString>[0]
+    );
+    expect(raw).toContain('app.current_user_id');
     expect(raw).not.toMatch(/current_setting\('app\.current_user'/);
   });
 
   it('userProgress policy uses app.current_user_id', () => {
-    const raw = sqlToString(userProgressRLS as Parameters<typeof sqlToString>[0]);
-    expect(raw).toContain("app.current_user_id");
+    const raw = sqlToString(
+      userProgressRLS as Parameters<typeof sqlToString>[0]
+    );
+    expect(raw).toContain('app.current_user_id');
     expect(raw).not.toMatch(/current_setting\('app\.current_user'/);
   });
 
   it('userProgress policy has both USING and WITH CHECK clauses', () => {
-    const raw = sqlToString(userProgressRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      userProgressRLS as Parameters<typeof sqlToString>[0]
+    );
     expect(raw.toUpperCase()).toContain('USING');
     expect(raw.toUpperCase()).toContain('WITH CHECK');
   });
@@ -137,8 +161,11 @@ describe('withTenantContext sets app.current_user_id to match RLS policies', () 
     expect(userIdCall).toBeDefined();
 
     // Must NOT set a bare `current_user` variable
-    const badCall = calls.find((c) =>
-      c.includes('current_user') && !c.includes('current_user_id') && !c.includes('current_user_role')
+    const badCall = calls.find(
+      (c) =>
+        c.includes('current_user') &&
+        !c.includes('current_user_id') &&
+        !c.includes('current_user_role')
     );
     expect(badCall).toBeUndefined();
   });
@@ -203,19 +230,23 @@ describe('Cross-user isolation via withTenantContext', () => {
   it('a user CANNOT write annotations for another user — policy rejects mismatched user_id', () => {
     // Unit-level: verify the WITH CHECK expression in annotations policy
     // enforces current_user_id match on insert/update.
-    const raw = sqlToString(annotationsRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      annotationsRLS as Parameters<typeof sqlToString>[0]
+    );
     // The WITH CHECK must compare user_id to the session variable
     const withCheckSection = raw.slice(raw.toUpperCase().indexOf('WITH CHECK'));
-    expect(withCheckSection).toContain("app.current_user_id");
+    expect(withCheckSection).toContain('app.current_user_id');
   });
 
   it('a user CAN read their own annotations — policy allows matching user_id', () => {
     // The USING clause must allow access when user_id matches current_user_id
-    const raw = sqlToString(annotationsRLS as Parameters<typeof sqlToString>[0]);
+    const raw = sqlToString(
+      annotationsRLS as Parameters<typeof sqlToString>[0]
+    );
     const usingSection = raw.slice(
       raw.toUpperCase().indexOf('USING'),
-      raw.toUpperCase().indexOf('WITH CHECK'),
+      raw.toUpperCase().indexOf('WITH CHECK')
     );
-    expect(usingSection).toContain("app.current_user_id");
+    expect(usingSection).toContain('app.current_user_id');
   });
 });

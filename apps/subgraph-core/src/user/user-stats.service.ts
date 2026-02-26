@@ -72,7 +72,10 @@ export class UserStatsService implements OnModuleDestroy {
     });
   }
 
-  private computeStreaks(activity: DayActivity[]): { currentStreak: number; longestStreak: number } {
+  private computeStreaks(activity: DayActivity[]): {
+    currentStreak: number;
+    longestStreak: number;
+  } {
     // Only consider days with count > 0
     const activeDates = activity
       .filter((a) => a.count > 0)

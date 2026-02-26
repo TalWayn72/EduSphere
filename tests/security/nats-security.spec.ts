@@ -92,7 +92,9 @@ describe('SI-7: NATS Environment Documentation', () => {
     const combined = gatewayEnv + rootEnv;
     const hasTlsDoc =
       combined.includes('NATS_TLS') ||
-      readFile('packages/nats-client/src/connection.ts').includes('NATS_TLS_CERT');
+      readFile('packages/nats-client/src/connection.ts').includes(
+        'NATS_TLS_CERT'
+      );
     expect(hasTlsDoc).toBe(true);
   });
 });

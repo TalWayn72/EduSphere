@@ -14,13 +14,14 @@ export class XapiResolver {
 
   constructor(
     private readonly tokenService: XapiTokenService,
-    private readonly statementService: XapiStatementService,
+    private readonly statementService: XapiStatementService
   ) {}
 
   @Query('xapiTokens')
   async xapiTokens(@Context() ctx: GraphQLContext) {
     const auth = ctx.authContext;
-    if (!auth?.tenantId) throw new UnauthorizedException('Authentication required');
+    if (!auth?.tenantId)
+      throw new UnauthorizedException('Authentication required');
     return this.tokenService.listTokens(auth.tenantId);
   }
 
@@ -28,11 +29,15 @@ export class XapiResolver {
   async xapiStatements(
     @Args('limit') limit: number | undefined,
     @Args('since') since: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     const auth = ctx.authContext;
-    if (!auth?.tenantId) throw new UnauthorizedException('Authentication required');
-    const statements = await this.statementService.queryStatements(auth.tenantId, { limit, since });
+    if (!auth?.tenantId)
+      throw new UnauthorizedException('Authentication required');
+    const statements = await this.statementService.queryStatements(
+      auth.tenantId,
+      { limit, since }
+    );
     return statements.map((s) => ({
       id: s.id,
       verb: s.verb.id,
@@ -45,21 +50,30 @@ export class XapiResolver {
   async generateXapiToken(
     @Args('description') description: string,
     @Args('lrsEndpoint') lrsEndpoint: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<string> {
     const auth = ctx.authContext;
-    if (!auth?.tenantId) throw new UnauthorizedException('Authentication required');
-    this.logger.log({ tenantId: auth.tenantId, description }, 'generateXapiToken');
-    return this.tokenService.generateToken(auth.tenantId, description, lrsEndpoint);
+    if (!auth?.tenantId)
+      throw new UnauthorizedException('Authentication required');
+    this.logger.log(
+      { tenantId: auth.tenantId, description },
+      'generateXapiToken'
+    );
+    return this.tokenService.generateToken(
+      auth.tenantId,
+      description,
+      lrsEndpoint
+    );
   }
 
   @Mutation('revokeXapiToken')
   async revokeXapiToken(
     @Args('tokenId') tokenId: string,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<boolean> {
     const auth = ctx.authContext;
-    if (!auth?.tenantId) throw new UnauthorizedException('Authentication required');
+    if (!auth?.tenantId)
+      throw new UnauthorizedException('Authentication required');
     this.logger.log({ tenantId: auth.tenantId, tokenId }, 'revokeXapiToken');
     return this.tokenService.revokeToken(tokenId, auth.tenantId);
   }

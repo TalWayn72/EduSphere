@@ -6,7 +6,12 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import {
-  createDatabaseConnection, closeAllPools, schema, withTenantContext, eq, and,
+  createDatabaseConnection,
+  closeAllPools,
+  schema,
+  withTenantContext,
+  eq,
+  and,
 } from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 
@@ -49,15 +54,26 @@ export class XapiTokenService implements OnModuleDestroy {
   async generateToken(
     tenantId: string,
     description: string,
-    lrsEndpoint?: string,
+    lrsEndpoint?: string
   ): Promise<string> {
     const rawToken = randomBytes(32).toString('hex');
     const tokenHash = this.hashToken(rawToken);
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.xapiTokens)
-        .values({ tenantId, tokenHash, description, lrsEndpoint: lrsEndpoint ?? null, isActive: true })
-        .returning(),
+      tx
+        .insert(schema.xapiTokens)
+        .values({
+          tenantId,
+          tokenHash,
+          description,
+          lrsEndpoint: lrsEndpoint ?? null,
+          isActive: true,
+        })
+        .returning()
     );
     this.logger.log({ tenantId, description }, 'xAPI token generated');
     return rawToken;
@@ -91,9 +107,16 @@ export class XapiTokenService implements OnModuleDestroy {
   }
 
   async listTokens(tenantId: string): Promise<XapiTokenMetadata[]> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.xapiTokens).where(eq(schema.xapiTokens.tenantId, tenantId)),
+      tx
+        .select()
+        .from(schema.xapiTokens)
+        .where(eq(schema.xapiTokens.tenantId, tenantId))
     );
     return rows.map((r) => ({
       id: r.id,
@@ -105,14 +128,27 @@ export class XapiTokenService implements OnModuleDestroy {
   }
 
   async revokeToken(tokenId: string, tenantId: string): Promise<boolean> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.xapiTokens)
+      tx
+        .update(schema.xapiTokens)
         .set({ isActive: false })
-        .where(and(eq(schema.xapiTokens.id, tokenId), eq(schema.xapiTokens.tenantId, tenantId))),
+        .where(
+          and(
+            eq(schema.xapiTokens.id, tokenId),
+            eq(schema.xapiTokens.tenantId, tenantId)
+          )
+        )
     );
     for (const [k, v] of tokenCache) {
-      if (v.tokenId === tokenId) { tokenCache.delete(k); break; }
+      if (v.tokenId === tokenId) {
+        tokenCache.delete(k);
+        break;
+      }
     }
     this.logger.log({ tenantId, tokenId }, 'xAPI token revoked');
     return true;

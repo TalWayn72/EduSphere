@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Context, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Context,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UnauthorizedException } from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
 import type { AuthContext } from '@edusphere/auth';
@@ -36,7 +44,7 @@ export class CourseResolver {
     private readonly courseService: CourseService,
     private readonly enrollmentService: EnrollmentService,
     private readonly adminEnrollmentService: AdminEnrollmentService,
-    private readonly moduleService: ModuleService,
+    private readonly moduleService: ModuleService
   ) {}
 
   @Query('_health')
@@ -71,9 +79,14 @@ export class CourseResolver {
   }
 
   @Mutation('createCourse')
-  async createCourse(@Args('input') input: Record<string, unknown>, @Context() ctx: GqlContext) {
+  async createCourse(
+    @Args('input') input: Record<string, unknown>,
+    @Context() ctx: GqlContext
+  ) {
     requireAuth(ctx);
-    return this.courseService.create(input as unknown as Parameters<CourseService['create']>[0]);
+    return this.courseService.create(
+      input as unknown as Parameters<CourseService['create']>[0]
+    );
   }
 
   @Mutation('updateCourse')
@@ -82,7 +95,10 @@ export class CourseResolver {
     @Args('input') input: Record<string, unknown>,
     @Context() _ctx: GqlContext
   ) {
-    return this.courseService.update(id, input as unknown as Parameters<CourseService['update']>[1]);
+    return this.courseService.update(
+      id,
+      input as unknown as Parameters<CourseService['update']>[1]
+    );
   }
 
   // ── Enrollment ───────────────────────────────────────────────
@@ -94,13 +110,19 @@ export class CourseResolver {
   }
 
   @Mutation('enrollCourse')
-  async enrollCourse(@Args('courseId') courseId: string, @Context() ctx: GqlContext) {
+  async enrollCourse(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
     return this.enrollmentService.enrollCourse(courseId, tenantCtx);
   }
 
   @Mutation('unenrollCourse')
-  async unenrollCourse(@Args('courseId') courseId: string, @Context() ctx: GqlContext) {
+  async unenrollCourse(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
     return this.enrollmentService.unenrollCourse(courseId, tenantCtx);
   }
@@ -108,7 +130,10 @@ export class CourseResolver {
   // ── Progress ─────────────────────────────────────────────────
 
   @Query('myCourseProgress')
-  async getMyCourseProgress(@Args('courseId') courseId: string, @Context() ctx: GqlContext) {
+  async getMyCourseProgress(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
     return this.enrollmentService.getCourseProgress(courseId, tenantCtx);
   }
@@ -127,7 +152,7 @@ export class CourseResolver {
   @Query('adminCourseEnrollments')
   async adminCourseEnrollments(
     @Args('courseId') courseId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.adminEnrollmentService.getEnrollments(courseId, tenantCtx);
@@ -137,7 +162,7 @@ export class CourseResolver {
   async adminEnrollUser(
     @Args('courseId') courseId: string,
     @Args('userId') userId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.adminEnrollmentService.enrollUser(courseId, userId, tenantCtx);
@@ -147,17 +172,21 @@ export class CourseResolver {
   async adminUnenrollUser(
     @Args('courseId') courseId: string,
     @Args('userId') userId: string,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
-    return this.adminEnrollmentService.unenrollUser(courseId, userId, tenantCtx);
+    return this.adminEnrollmentService.unenrollUser(
+      courseId,
+      userId,
+      tenantCtx
+    );
   }
 
   @Mutation('adminBulkEnroll')
   async adminBulkEnroll(
     @Args('courseId') courseId: string,
     @Args('userIds') userIds: string[],
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     return this.adminEnrollmentService.bulkEnroll(courseId, userIds, tenantCtx);

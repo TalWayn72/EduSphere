@@ -4,7 +4,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, TrendingUp, BookOpen, CheckCircle, AlertTriangle, Database } from 'lucide-react';
+import {
+  Users,
+  TrendingUp,
+  BookOpen,
+  CheckCircle,
+  AlertTriangle,
+  Database,
+} from 'lucide-react';
 import type { AdminOverviewData } from '@/pages/AdminDashboardPage';
 
 interface StatCard {
@@ -69,7 +76,13 @@ export function AdminStatCards({ overview }: AdminStatCardsProps) {
       {cards.map((card) => {
         const Icon = card.icon;
         const inner = (
-          <Card className={card.linkTo ? 'hover:border-primary/40 transition-colors cursor-pointer' : ''}>
+          <Card
+            className={
+              card.linkTo
+                ? 'hover:border-primary/40 transition-colors cursor-pointer'
+                : ''
+            }
+          >
             <CardContent className="flex items-center gap-4 py-5">
               <div className={`${card.colorClass} shrink-0`}>
                 <Icon className="h-8 w-8" />

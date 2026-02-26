@@ -49,10 +49,11 @@ export class WebStorageManager {
     const browserQuotaBytes = estimate.quota ?? 0;
     const browserUsedBytes = estimate.usage ?? 0;
 
-    const eduSphereQuotaBytes = Math.floor(browserQuotaBytes * STORAGE_QUOTA_FRACTION);
-    const usageRatio = eduSphereQuotaBytes > 0
-      ? browserUsedBytes / eduSphereQuotaBytes
-      : 0;
+    const eduSphereQuotaBytes = Math.floor(
+      browserQuotaBytes * STORAGE_QUOTA_FRACTION
+    );
+    const usageRatio =
+      eduSphereQuotaBytes > 0 ? browserUsedBytes / eduSphereQuotaBytes : 0;
 
     return {
       browserQuotaBytes,

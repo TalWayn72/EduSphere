@@ -68,7 +68,7 @@ test.describe('Health Check — Service Connectivity', () => {
     // Skip in DEV_MODE when no backend is running
     test.skip(
       E2E.IS_DEV_MODE,
-      'GraphQL gateway not required in DEV_MODE (mock data)',
+      'GraphQL gateway not required in DEV_MODE (mock data)'
     );
 
     const ctx = await request.newContext();
@@ -137,7 +137,7 @@ test.describe('Health Check — App Bootstrap', () => {
 
     expect(
       errors,
-      `Console errors on app load:\n${errors.join('\n')}`,
+      `Console errors on app load:\n${errors.join('\n')}`
     ).toHaveLength(0);
   });
 
@@ -150,7 +150,7 @@ test.describe('Health Check — App Bootstrap', () => {
 
     expect(
       pageErrors,
-      `JavaScript exceptions:\n${pageErrors.join('\n')}`,
+      `JavaScript exceptions:\n${pageErrors.join('\n')}`
     ).toHaveLength(0);
   });
 });
@@ -183,7 +183,7 @@ test.describe('Health Check — Critical Pages Load', () => {
 
       expect(
         errors,
-        `JavaScript exceptions on ${name}:\n${errors.join('\n')}`,
+        `JavaScript exceptions on ${name}:\n${errors.join('\n')}`
       ).toHaveLength(0);
     });
   }
@@ -205,16 +205,14 @@ test.describe('Health Check — Zero Network Errors on Load', () => {
       (e) =>
         !(
           // GraphQL gateway returning 400 for unauthenticated DEV queries is acceptable
-          (
-            e.url.includes('4000') && e.status === 400
-          )
-        ),
+          (e.url.includes('4000') && e.status === 400)
+        )
     );
 
     if (unexpectedErrors.length > 0) {
       console.warn(
         '[health-check] Network errors on dashboard:',
-        unexpectedErrors,
+        unexpectedErrors
       );
     }
 
@@ -222,11 +220,11 @@ test.describe('Health Check — Zero Network Errors on Load', () => {
     // This test only fails if there are request-failed (connection refused) errors
     // on the app's own assets.
     const assetErrors = unexpectedErrors.filter(
-      (e) => e.type === 'request_failed' && !e.url.includes('4000'),
+      (e) => e.type === 'request_failed' && !e.url.includes('4000')
     );
     expect(
       assetErrors,
-      `Asset loading errors:\n${assetErrors.map((e) => e.url).join('\n')}`,
+      `Asset loading errors:\n${assetErrors.map((e) => e.url).join('\n')}`
     ).toHaveLength(0);
   });
 
@@ -239,7 +237,7 @@ test.describe('Health Check — Zero Network Errors on Load', () => {
 
     expect(
       pageErrors,
-      `JavaScript exceptions on Agents page:\n${pageErrors.join('\n')}`,
+      `JavaScript exceptions on Agents page:\n${pageErrors.join('\n')}`
     ).toHaveLength(0);
   });
 });

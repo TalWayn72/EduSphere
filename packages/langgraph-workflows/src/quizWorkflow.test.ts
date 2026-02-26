@@ -32,7 +32,10 @@ vi.mock('@langchain/langgraph', () => {
       let entryPoint = '';
       const edges: Array<[string, string]> = [];
 
-      this.addNode = vi.fn(function (name: string, fn: (state: unknown) => Promise<unknown>) {
+      this.addNode = vi.fn(function (
+        name: string,
+        fn: (state: unknown) => Promise<unknown>
+      ) {
         nodes[name] = fn;
       });
       this.setEntryPoint = vi.fn(function (name: string) {
@@ -52,7 +55,9 @@ vi.mock('@langchain/langgraph', () => {
             let state = { ...(initialState as Record<string, unknown>) };
             const order = [
               entryPoint,
-              ...edges.map(([, to]: [string, string]) => to).filter((n: string) => n !== '__end__'),
+              ...edges
+                .map(([, to]: [string, string]) => to)
+                .filter((n: string) => n !== '__end__'),
             ];
             const seen = new Set<string>();
             for (const nodeName of order) {
@@ -223,7 +228,10 @@ describe('QuizGeneratorWorkflow', () => {
       );
 
       const workflow = new QuizGeneratorWorkflow();
-      const result = await workflow.run({ topic: 'Chemistry', numQuestions: 2 });
+      const result = await workflow.run({
+        topic: 'Chemistry',
+        numQuestions: 2,
+      });
 
       for (const q of result.questions) {
         expect(q.correctAnswer).toBeGreaterThanOrEqual(0);
@@ -239,7 +247,10 @@ describe('QuizGeneratorWorkflow', () => {
       );
 
       const workflow = new QuizGeneratorWorkflow();
-      const result = await workflow.run({ topic: 'Astronomy', numQuestions: 2 });
+      const result = await workflow.run({
+        topic: 'Astronomy',
+        numQuestions: 2,
+      });
 
       for (const q of result.questions) {
         expect(q.explanation.length).toBeGreaterThan(0);
@@ -248,12 +259,21 @@ describe('QuizGeneratorWorkflow', () => {
 
     it('passes correct difficulty and topic in the prompt', async () => {
       const questions = makeUniqueQuestions(1);
-      mockGenerateObject.mockResolvedValueOnce({ object: questions[0] } as never);
+      mockGenerateObject.mockResolvedValueOnce({
+        object: questions[0],
+      } as never);
 
       const workflow = new QuizGeneratorWorkflow();
-      await workflow.run({ topic: 'Calculus', numQuestions: 1, difficulty: 'easy' });
+      await workflow.run({
+        topic: 'Calculus',
+        numQuestions: 1,
+        difficulty: 'easy',
+      });
 
-      const call = mockGenerateObject.mock.calls[0]![0] as Record<string, unknown>;
+      const call = mockGenerateObject.mock.calls[0]![0] as Record<
+        string,
+        unknown
+      >;
       expect(typeof call.prompt).toBe('string');
       expect((call.prompt as string).toLowerCase()).toContain('easy');
       expect((call.prompt as string).toLowerCase()).toContain('calculus');
@@ -289,7 +309,9 @@ describe('QuizGeneratorWorkflow', () => {
 
   describe('error handling', () => {
     it('propagates LLM error during generation', async () => {
-      mockGenerateObject.mockRejectedValueOnce(new Error('OpenAI API error') as never);
+      mockGenerateObject.mockRejectedValueOnce(
+        new Error('OpenAI API error') as never
+      );
 
       const workflow = new QuizGeneratorWorkflow();
       await expect(
@@ -299,7 +321,9 @@ describe('QuizGeneratorWorkflow', () => {
 
     it('propagates error on subsequent question in loop', async () => {
       mockGenerateObject
-        .mockResolvedValueOnce({ object: makeQuestion({ question: 'Q1 unique?' }) } as never)
+        .mockResolvedValueOnce({
+          object: makeQuestion({ question: 'Q1 unique?' }),
+        } as never)
         .mockRejectedValueOnce(new Error('Transient failure') as never);
 
       const workflow = new QuizGeneratorWorkflow();

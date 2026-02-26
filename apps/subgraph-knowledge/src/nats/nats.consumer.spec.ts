@@ -30,7 +30,9 @@ describe('NatsConsumer', () => {
   });
 
   it('calls findConceptByNameCaseInsensitive before creating a concept', async () => {
-    vi.mocked(mockCypherService.findConceptByNameCaseInsensitive!).mockResolvedValue(null);
+    vi.mocked(
+      mockCypherService.findConceptByNameCaseInsensitive!
+    ).mockResolvedValue(null);
     vi.mocked(mockCypherService.createConcept!).mockResolvedValue('new-id');
 
     // Access private method via any cast for unit testing
@@ -41,10 +43,9 @@ describe('NatsConsumer', () => {
       'tenant-1'
     );
 
-    expect(mockCypherService.findConceptByNameCaseInsensitive).toHaveBeenCalledWith(
-      'Metaphysics',
-      'tenant-1'
-    );
+    expect(
+      mockCypherService.findConceptByNameCaseInsensitive
+    ).toHaveBeenCalledWith('Metaphysics', 'tenant-1');
     expect(mockCypherService.createConcept).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'Metaphysics',
@@ -55,7 +56,9 @@ describe('NatsConsumer', () => {
   });
 
   it('skips createConcept when concept already exists', async () => {
-    vi.mocked(mockCypherService.findConceptByNameCaseInsensitive!).mockResolvedValue({
+    vi.mocked(
+      mockCypherService.findConceptByNameCaseInsensitive!
+    ).mockResolvedValue({
       id: 'existing-id',
       name: 'Metaphysics',
     });
@@ -71,16 +74,24 @@ describe('NatsConsumer', () => {
   });
 
   it('creates RELATED_TO edges for each relatedTerm', async () => {
-    vi.mocked(mockCypherService.findConceptByNameCaseInsensitive!).mockResolvedValue({
+    vi.mocked(
+      mockCypherService.findConceptByNameCaseInsensitive!
+    ).mockResolvedValue({
       id: 'existing-id',
       name: 'Metaphysics',
     });
-    vi.mocked(mockCypherService.linkConceptsByName!).mockResolvedValue(undefined);
+    vi.mocked(mockCypherService.linkConceptsByName!).mockResolvedValue(
+      undefined
+    );
 
     const process = (consumer as any).processConcepts.bind(consumer);
     await process({
       concepts: [
-        { name: 'Metaphysics', definition: 'Study of being', relatedTerms: ['Ontology', 'Logic'] },
+        {
+          name: 'Metaphysics',
+          definition: 'Study of being',
+          relatedTerms: ['Ontology', 'Logic'],
+        },
       ],
       courseId: 'course-1',
       tenantId: 'tenant-1',
@@ -105,7 +116,9 @@ describe('NatsConsumer', () => {
       .mockRejectedValueOnce(new Error('DB error'))
       .mockResolvedValueOnce(null);
     vi.mocked(mockCypherService.createConcept!).mockResolvedValue('new-id');
-    vi.mocked(mockCypherService.linkConceptsByName!).mockResolvedValue(undefined);
+    vi.mocked(mockCypherService.linkConceptsByName!).mockResolvedValue(
+      undefined
+    );
 
     const process = (consumer as any).processConcepts.bind(consumer);
     await expect(
@@ -123,7 +136,9 @@ describe('NatsConsumer', () => {
   });
 
   it('silently skips linkConceptsByName errors', async () => {
-    vi.mocked(mockCypherService.findConceptByNameCaseInsensitive!).mockResolvedValue({
+    vi.mocked(
+      mockCypherService.findConceptByNameCaseInsensitive!
+    ).mockResolvedValue({
       id: 'id',
       name: 'Metaphysics',
     });
@@ -135,7 +150,11 @@ describe('NatsConsumer', () => {
     await expect(
       process({
         concepts: [
-          { name: 'Metaphysics', definition: 'Study', relatedTerms: ['Unknown'] },
+          {
+            name: 'Metaphysics',
+            definition: 'Study',
+            relatedTerms: ['Unknown'],
+          },
         ],
         courseId: 'course-1',
         tenantId: 'tenant-1',

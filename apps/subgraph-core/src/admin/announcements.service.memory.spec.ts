@@ -22,7 +22,9 @@ vi.mock('@edusphere/db', () => ({
 import { AnnouncementsService } from './announcements.service.js';
 
 describe('AnnouncementsService — memory safety', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('constructs without errors', () => {
     expect(() => new AnnouncementsService()).not.toThrow();

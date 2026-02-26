@@ -33,7 +33,8 @@ export class ComplianceResolver {
   @Query('complianceCourses')
   async getComplianceCourses(@Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
-    const courses = await this.complianceService.listComplianceCourses(tenantCtx);
+    const courses =
+      await this.complianceService.listComplianceCourses(tenantCtx);
     return courses.map((c) => ({
       id: c.id,
       title: c.title,
@@ -49,11 +50,15 @@ export class ComplianceResolver {
   async generateComplianceReport(
     @Args('courseIds') courseIds: string[],
     @Args('asOf') asOf: string | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     const asOfDate = parseOptionalDate(asOf);
-    const result = await this.complianceService.generateComplianceReport(courseIds, tenantCtx, asOfDate);
+    const result = await this.complianceService.generateComplianceReport(
+      courseIds,
+      tenantCtx,
+      asOfDate
+    );
     return {
       csvUrl: result.csvUrl,
       pdfUrl: result.pdfUrl,
@@ -69,12 +74,15 @@ export class ComplianceResolver {
     @Args('courseId') courseId: string,
     @Args('isCompliance') isCompliance: boolean,
     @Args('complianceDueDate') complianceDueDate: string | undefined,
-    @Context() ctx: GqlContext,
+    @Context() ctx: GqlContext
   ) {
     const tenantCtx = requireAuth(ctx);
     const dueDate = parseOptionalDate(complianceDueDate) ?? null;
     const course = await this.complianceService.updateCourseComplianceSettings(
-      courseId, isCompliance, dueDate, tenantCtx,
+      courseId,
+      isCompliance,
+      dueDate,
+      tenantCtx
     );
     return {
       id: course.id,

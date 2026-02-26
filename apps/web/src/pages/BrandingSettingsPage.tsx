@@ -52,8 +52,12 @@ export function BrandingSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const [queryResult] = useQuery<BrandingQueryResult>({ query: TENANT_BRANDING_QUERY });
-  const [mutResult, updateBranding] = useMutation(UPDATE_TENANT_BRANDING_MUTATION);
+  const [queryResult] = useQuery<BrandingQueryResult>({
+    query: TENANT_BRANDING_QUERY,
+  });
+  const [mutResult, updateBranding] = useMutation(
+    UPDATE_TENANT_BRANDING_MUTATION
+  );
 
   useEffect(() => {
     if (queryResult.data?.myTenantBranding) {
@@ -61,9 +65,15 @@ export function BrandingSettingsPage() {
     }
   }, [queryResult.data]);
 
-  if (!role || !ADMIN_ROLES.has(role)) { navigate('/dashboard'); return null; }
+  if (!role || !ADMIN_ROLES.has(role)) {
+    navigate('/dashboard');
+    return null;
+  }
 
-  const handleChange = (field: keyof BrandingFormState, value: string | boolean) => {
+  const handleChange = (
+    field: keyof BrandingFormState,
+    value: string | boolean
+  ) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setSaved(false);
     setSaveError(null);
@@ -95,7 +105,8 @@ export function BrandingSettingsPage() {
 
         {queryResult.fetching ? (
           <div className="flex items-center gap-2 text-muted-foreground py-8">
-            <Loader2 className="h-5 w-5 animate-spin" /> Loading branding settings...
+            <Loader2 className="h-5 w-5 animate-spin" /> Loading branding
+            settings...
           </div>
         ) : (
           <>
@@ -109,12 +120,15 @@ export function BrandingSettingsPage() {
                 onClick={() => void handleSave()}
                 disabled={mutResult.fetching}
               >
-                {mutResult.fetching && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {mutResult.fetching && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
                 Save Changes
               </Button>
               {saved && (
                 <span className="flex items-center gap-1.5 text-sm text-green-600">
-                  <CheckCircle2 className="h-4 w-4" /> Branding saved successfully
+                  <CheckCircle2 className="h-4 w-4" /> Branding saved
+                  successfully
                 </span>
               )}
               {saveError && (

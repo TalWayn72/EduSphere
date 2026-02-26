@@ -28,7 +28,7 @@ describe('Type Guards', () => {
           userId: 'uuid-2',
           data: {},
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -40,7 +40,7 @@ describe('Type Guards', () => {
           userId: 'uuid-2',
           data: {},
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -52,7 +52,7 @@ describe('Type Guards', () => {
           userId: 'uuid-2',
           data: {},
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -64,7 +64,7 @@ describe('Type Guards', () => {
           userId: 'uuid-2',
           data: {},
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -77,7 +77,7 @@ describe('Type Guards', () => {
           userId: 'uuid-3',
           tenantId: 'uuid-4',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(false);
     });
 
@@ -95,13 +95,13 @@ describe('Type Guards', () => {
 
     it('returns false when sessionId is missing', () => {
       expect(
-        isAgentSessionEvent({ type: 'session.created', userId: 'uuid' }),
+        isAgentSessionEvent({ type: 'session.created', userId: 'uuid' })
       ).toBe(false);
     });
 
     it('returns false when userId is missing', () => {
       expect(
-        isAgentSessionEvent({ type: 'session.created', sessionId: 'uuid' }),
+        isAgentSessionEvent({ type: 'session.created', sessionId: 'uuid' })
       ).toBe(false);
     });
 
@@ -111,7 +111,7 @@ describe('Type Guards', () => {
           type: 'message.created',
           sessionId: 'uuid-1',
           userId: 'uuid-2',
-        }),
+        })
       ).toBe(false);
     });
   });
@@ -125,7 +125,7 @@ describe('Type Guards', () => {
           userId: 'uuid-2',
           content: 'Hello',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -136,7 +136,7 @@ describe('Type Guards', () => {
           sessionId: 'uuid-1',
           userId: 'uuid-2',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -147,7 +147,7 @@ describe('Type Guards', () => {
           sessionId: 'uuid-1',
           userId: 'uuid-2',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -158,14 +158,14 @@ describe('Type Guards', () => {
           sessionId: 'uuid-1',
           userId: 'uuid-2',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
     it('returns false when sessionId is missing', () => {
-      expect(isAgentMessageEvent({ type: 'stream.chunk', userId: 'uuid' })).toBe(
-        false,
-      );
+      expect(
+        isAgentMessageEvent({ type: 'stream.chunk', userId: 'uuid' })
+      ).toBe(false);
     });
 
     it('returns false for null', () => {
@@ -174,7 +174,7 @@ describe('Type Guards', () => {
 
     it('returns false for invalid type', () => {
       expect(
-        isAgentMessageEvent({ type: 'session.created', sessionId: 'uuid' }),
+        isAgentMessageEvent({ type: 'session.created', sessionId: 'uuid' })
       ).toBe(false);
     });
   });
@@ -189,7 +189,7 @@ describe('Type Guards', () => {
           userId: 'uuid-3',
           tenantId: 'uuid-4',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -214,7 +214,7 @@ describe('Type Guards', () => {
           contentItemId: 'uuid-1',
           tenantId: 'uuid-2',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toBe(true);
     });
 
@@ -230,7 +230,7 @@ describe('Type Guards', () => {
   describe('isGatewayPubSubEvent', () => {
     it('returns true for valid gateway pub/sub event', () => {
       expect(
-        isGatewayPubSubEvent({ topic: 'annotation-added', data: {} }),
+        isGatewayPubSubEvent({ topic: 'annotation-added', data: {} })
       ).toBe(true);
     });
 
@@ -239,7 +239,7 @@ describe('Type Guards', () => {
         isGatewayPubSubEvent({
           topic: 'annotationAdded_asset-uuid',
           data: { annotationId: 'uuid-1' },
-        }),
+        })
       ).toBe(true);
     });
 
@@ -253,7 +253,7 @@ describe('Type Guards', () => {
 
     it('returns false when data is null', () => {
       expect(isGatewayPubSubEvent({ topic: 'my-topic', data: null })).toBe(
-        false,
+        false
       );
     });
 
@@ -269,7 +269,7 @@ describe('Type Guards', () => {
           type: 'transcription.completed',
           assetId: 'uuid-1',
           segmentCount: 42,
-        }),
+        })
       ).toBe(true);
     });
 
@@ -279,13 +279,13 @@ describe('Type Guards', () => {
           type: 'transcription.failed',
           assetId: 'uuid-1',
           errorMessage: 'GPU OOM',
-        }),
+        })
       ).toBe(true);
     });
 
     it('returns false when assetId is missing', () => {
       expect(isTranscriptionEvent({ type: 'transcription.completed' })).toBe(
-        false,
+        false
       );
     });
 
@@ -301,7 +301,7 @@ describe('Type Guards', () => {
           type: 'knowledge.concepts.extracted',
           assetId: 'uuid-1',
           concepts: [{ name: 'Machine Learning' }],
-        }),
+        })
       ).toBe(true);
     });
 
@@ -311,7 +311,7 @@ describe('Type Guards', () => {
           type: 'knowledge.concepts.persisted',
           assetId: 'uuid-1',
           concepts: [],
-        }),
+        })
       ).toBe(true);
     });
 
@@ -321,7 +321,7 @@ describe('Type Guards', () => {
           type: 'knowledge.concepts.extracted',
           assetId: 'uuid-1',
           concepts: 'not-array',
-        }),
+        })
       ).toBe(false);
     });
 
@@ -330,7 +330,7 @@ describe('Type Guards', () => {
         isKnowledgeConceptEvent({
           type: 'knowledge.concepts.extracted',
           concepts: [],
-        }),
+        })
       ).toBe(false);
     });
 
@@ -396,7 +396,7 @@ describe('Event Validators', () => {
           type: 'session.created',
           userId: 'user-uuid',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -406,7 +406,7 @@ describe('Event Validators', () => {
           type: 'session.created',
           sessionId: 'uuid',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -417,7 +417,7 @@ describe('Event Validators', () => {
           sessionId: 'uuid',
           userId: 'uuid',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -428,17 +428,19 @@ describe('Event Validators', () => {
           sessionId: 'uuid',
           userId: 'uuid',
           timestamp: 'not-a-date',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
     it('throws for null payload', () => {
-      expect(() => validateAgentSessionEvent(null)).toThrow(EventValidationError);
+      expect(() => validateAgentSessionEvent(null)).toThrow(
+        EventValidationError
+      );
     });
 
     it('throws for non-object payload', () => {
       expect(() => validateAgentSessionEvent('invalid')).toThrow(
-        EventValidationError,
+        EventValidationError
       );
     });
 
@@ -476,7 +478,7 @@ describe('Event Validators', () => {
           sessionId: '',
           userId: 'uuid',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
   });
@@ -530,7 +532,7 @@ describe('Event Validators', () => {
         validateAgentMessageEvent({
           type: 'stream.chunk',
           userId: 'uuid',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -539,7 +541,7 @@ describe('Event Validators', () => {
         validateAgentMessageEvent({
           type: 'stream.chunk',
           sessionId: 'uuid',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -549,12 +551,14 @@ describe('Event Validators', () => {
           type: 'session.created',
           sessionId: 'uuid',
           userId: 'uuid',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
     it('throws for null', () => {
-      expect(() => validateAgentMessageEvent(null)).toThrow(EventValidationError);
+      expect(() => validateAgentMessageEvent(null)).toThrow(
+        EventValidationError
+      );
     });
   });
 
@@ -591,7 +595,7 @@ describe('Event Validators', () => {
           annotationId: 'uuid',
           assetId: 'uuid',
           userId: 'uuid',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -603,7 +607,7 @@ describe('Event Validators', () => {
           assetId: 'uuid',
           userId: 'uuid',
           tenantId: 'uuid',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -615,7 +619,7 @@ describe('Event Validators', () => {
           assetId: 'uuid',
           userId: 'uuid',
           tenantId: 'uuid',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -675,7 +679,7 @@ describe('Event Validators', () => {
           type: 'content.created',
           tenantId: 'uuid',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -685,7 +689,7 @@ describe('Event Validators', () => {
           type: 'content.created',
           contentItemId: 'uuid',
           timestamp: '2026-01-01T00:00:00Z',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -695,7 +699,7 @@ describe('Event Validators', () => {
           type: 'invalid.type',
           contentItemId: 'uuid',
           tenantId: 'uuid',
-        }),
+        })
       ).toThrow(EventValidationError);
     });
 
@@ -750,7 +754,9 @@ describe('EventValidationError', () => {
   });
 
   it('stores null payload', () => {
-    const err = new EventValidationError('ch', null, ['payload must be object']);
+    const err = new EventValidationError('ch', null, [
+      'payload must be object',
+    ]);
     expect(err.payload).toBeNull();
   });
 

@@ -27,7 +27,9 @@ export function RiskThresholdConfig() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Risk Threshold Configuration</CardTitle>
+        <CardTitle className="text-base">
+          Risk Threshold Configuration
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -54,7 +56,9 @@ export function RiskThresholdConfig() {
             max={80}
             step={5}
             value={[completionThreshold]}
-            onValueChange={(vals) => setCompletionThreshold(vals[0] ?? completionThreshold)}
+            onValueChange={(vals) =>
+              setCompletionThreshold(vals[0] ?? completionThreshold)
+            }
             className="max-w-xs"
           />
         </div>

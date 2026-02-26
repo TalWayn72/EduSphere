@@ -113,6 +113,8 @@ describe('parseScormManifest', () => {
       </organizations>
       <resources></resources>
     </manifest>`;
-    expect(() => parseScormManifest(noResources)).toThrow('no launchable items');
+    expect(() => parseScormManifest(noResources)).toThrow(
+      'no launchable items'
+    );
   });
 });

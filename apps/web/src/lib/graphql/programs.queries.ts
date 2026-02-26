@@ -103,7 +103,12 @@ export const UPDATE_PROGRAM_MUTATION = gql`
     $description: String
     $published: Boolean
   ) {
-    updateProgram(id: $id, title: $title, description: $description, published: $published) {
+    updateProgram(
+      id: $id
+      title: $title
+      description: $description
+      published: $published
+    ) {
       id
       title
       description

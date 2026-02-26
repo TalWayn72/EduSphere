@@ -87,21 +87,32 @@ describe('DiscussionResolver', () => {
 
   describe('getDiscussion()', () => {
     it('returns discussion when authenticated', async () => {
-      mockDiscussionService.findDiscussionById.mockResolvedValue(MOCK_DISCUSSION);
+      mockDiscussionService.findDiscussionById.mockResolvedValue(
+        MOCK_DISCUSSION
+      );
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.getDiscussion('disc-1', ctx);
       expect(result).toEqual(MOCK_DISCUSSION);
-      expect(mockDiscussionService.findDiscussionById).toHaveBeenCalledWith('disc-1', MOCK_AUTH);
+      expect(mockDiscussionService.findDiscussionById).toHaveBeenCalledWith(
+        'disc-1',
+        MOCK_AUTH
+      );
     });
 
     it('throws Unauthenticated when no authContext', async () => {
       const ctx = { req: {} };
-      await expect(resolver.getDiscussion('disc-1', ctx)).rejects.toThrow('Unauthenticated');
+      await expect(resolver.getDiscussion('disc-1', ctx)).rejects.toThrow(
+        'Unauthenticated'
+      );
     });
 
     it('does not call service when unauthenticated', async () => {
       const ctx = { req: {} };
-      try { await resolver.getDiscussion('disc-1', ctx); } catch { /* expected */ }
+      try {
+        await resolver.getDiscussion('disc-1', ctx);
+      } catch {
+        /* expected */
+      }
       expect(mockDiscussionService.findDiscussionById).not.toHaveBeenCalled();
     });
   });
@@ -110,27 +121,31 @@ describe('DiscussionResolver', () => {
 
   describe('getDiscussions()', () => {
     it('returns list of discussions for a course', async () => {
-      mockDiscussionService.findDiscussionsByCourse.mockResolvedValue([MOCK_DISCUSSION]);
+      mockDiscussionService.findDiscussionsByCourse.mockResolvedValue([
+        MOCK_DISCUSSION,
+      ]);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.getDiscussions('course-1', 20, 0, ctx);
       expect(result).toEqual([MOCK_DISCUSSION]);
-      expect(mockDiscussionService.findDiscussionsByCourse).toHaveBeenCalledWith(
-        'course-1', 20, 0, MOCK_AUTH
-      );
+      expect(
+        mockDiscussionService.findDiscussionsByCourse
+      ).toHaveBeenCalledWith('course-1', 20, 0, MOCK_AUTH);
     });
 
     it('throws Unauthenticated when no authContext', async () => {
       const ctx = { req: {} };
-      await expect(resolver.getDiscussions('course-1', 20, 0, ctx)).rejects.toThrow('Unauthenticated');
+      await expect(
+        resolver.getDiscussions('course-1', 20, 0, ctx)
+      ).rejects.toThrow('Unauthenticated');
     });
 
     it('passes correct pagination params to service', async () => {
       mockDiscussionService.findDiscussionsByCourse.mockResolvedValue([]);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       await resolver.getDiscussions('course-1', 5, 15, ctx);
-      expect(mockDiscussionService.findDiscussionsByCourse).toHaveBeenCalledWith(
-        'course-1', 5, 15, MOCK_AUTH
-      );
+      expect(
+        mockDiscussionService.findDiscussionsByCourse
+      ).toHaveBeenCalledWith('course-1', 5, 15, MOCK_AUTH);
     });
   });
 
@@ -138,7 +153,9 @@ describe('DiscussionResolver', () => {
 
   describe('getDiscussionMessages()', () => {
     it('returns messages for a discussion', async () => {
-      mockDiscussionService.findMessagesByDiscussion.mockResolvedValue([MOCK_MESSAGE]);
+      mockDiscussionService.findMessagesByDiscussion.mockResolvedValue([
+        MOCK_MESSAGE,
+      ]);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.getDiscussionMessages('disc-1', 50, 0, ctx);
       expect(result).toEqual([MOCK_MESSAGE]);
@@ -170,7 +187,9 @@ describe('DiscussionResolver', () => {
 
     it('throws Unauthenticated when no authContext', async () => {
       const ctx = { req: {} };
-      await expect(resolver.createDiscussion(validInput, ctx)).rejects.toThrow('Unauthenticated');
+      await expect(resolver.createDiscussion(validInput, ctx)).rejects.toThrow(
+        'Unauthenticated'
+      );
     });
 
     it('validates input through Zod schema before calling service', async () => {
@@ -186,7 +205,11 @@ describe('DiscussionResolver', () => {
 
     it('rejects invalid input (empty title)', async () => {
       const ctx = { req: {}, authContext: MOCK_AUTH };
-      const badInput = { courseId: '550e8400-e29b-41d4-a716-446655440000', title: '', discussionType: 'FORUM' as const };
+      const badInput = {
+        courseId: '550e8400-e29b-41d4-a716-446655440000',
+        title: '',
+        discussionType: 'FORUM' as const,
+      };
       await expect(resolver.createDiscussion(badInput, ctx)).rejects.toThrow();
     });
   });
@@ -202,7 +225,11 @@ describe('DiscussionResolver', () => {
     it('adds message and returns it', async () => {
       mockDiscussionService.addMessage.mockResolvedValue(MOCK_MESSAGE);
       const ctx = { req: {}, authContext: MOCK_AUTH };
-      const result = await resolver.addMessage('disc-1', validMessageInput, ctx);
+      const result = await resolver.addMessage(
+        'disc-1',
+        validMessageInput,
+        ctx
+      );
       expect(result).toEqual(MOCK_MESSAGE);
     });
 
@@ -226,14 +253,18 @@ describe('DiscussionResolver', () => {
       const ctx = { req: {} };
       try {
         await resolver.addMessage('disc-1', validMessageInput, ctx);
-      } catch { /* expected */ }
+      } catch {
+        /* expected */
+      }
       expect(mockPublish).not.toHaveBeenCalled();
     });
 
     it('rejects message with empty content', async () => {
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const badInput = { content: '', messageType: 'TEXT' as const };
-      await expect(resolver.addMessage('disc-1', badInput, ctx)).rejects.toThrow();
+      await expect(
+        resolver.addMessage('disc-1', badInput, ctx)
+      ).rejects.toThrow();
     });
   });
 
@@ -251,12 +282,17 @@ describe('DiscussionResolver', () => {
       mockDiscussionService.joinDiscussion.mockResolvedValue(true);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       await resolver.joinDiscussion('disc-1', ctx);
-      expect(mockDiscussionService.joinDiscussion).toHaveBeenCalledWith('disc-1', MOCK_AUTH);
+      expect(mockDiscussionService.joinDiscussion).toHaveBeenCalledWith(
+        'disc-1',
+        MOCK_AUTH
+      );
     });
 
     it('throws Unauthenticated when no authContext', async () => {
       const ctx = { req: {} };
-      await expect(resolver.joinDiscussion('disc-1', ctx)).rejects.toThrow('Unauthenticated');
+      await expect(resolver.joinDiscussion('disc-1', ctx)).rejects.toThrow(
+        'Unauthenticated'
+      );
     });
   });
 
@@ -274,12 +310,17 @@ describe('DiscussionResolver', () => {
       mockDiscussionService.leaveDiscussion.mockResolvedValue(true);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       await resolver.leaveDiscussion('disc-1', ctx);
-      expect(mockDiscussionService.leaveDiscussion).toHaveBeenCalledWith('disc-1', MOCK_AUTH);
+      expect(mockDiscussionService.leaveDiscussion).toHaveBeenCalledWith(
+        'disc-1',
+        MOCK_AUTH
+      );
     });
 
     it('throws Unauthenticated when no authContext', async () => {
       const ctx = { req: {} };
-      await expect(resolver.leaveDiscussion('disc-1', ctx)).rejects.toThrow('Unauthenticated');
+      await expect(resolver.leaveDiscussion('disc-1', ctx)).rejects.toThrow(
+        'Unauthenticated'
+      );
     });
   });
 
@@ -317,12 +358,19 @@ describe('DiscussionResolver', () => {
 
   describe('resolveMessages()', () => {
     it('delegates to findMessagesByDiscussion', async () => {
-      mockDiscussionService.findMessagesByDiscussion.mockResolvedValue([MOCK_MESSAGE]);
+      mockDiscussionService.findMessagesByDiscussion.mockResolvedValue([
+        MOCK_MESSAGE,
+      ]);
       const ctx = { req: {}, authContext: MOCK_AUTH };
-      const result = await resolver.resolveMessages(MOCK_DISCUSSION, 50, 0, ctx);
-      expect(mockDiscussionService.findMessagesByDiscussion).toHaveBeenCalledWith(
-        'disc-1', 50, 0, MOCK_AUTH
+      const result = await resolver.resolveMessages(
+        MOCK_DISCUSSION,
+        50,
+        0,
+        ctx
       );
+      expect(
+        mockDiscussionService.findMessagesByDiscussion
+      ).toHaveBeenCalledWith('disc-1', 50, 0, MOCK_AUTH);
       expect(result).toEqual([MOCK_MESSAGE]);
     });
 
@@ -336,10 +384,14 @@ describe('DiscussionResolver', () => {
 
   describe('resolveParticipants()', () => {
     it('delegates to findParticipantsByDiscussion', async () => {
-      mockDiscussionService.findParticipantsByDiscussion.mockResolvedValue([MOCK_PARTICIPANT]);
+      mockDiscussionService.findParticipantsByDiscussion.mockResolvedValue([
+        MOCK_PARTICIPANT,
+      ]);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.resolveParticipants(MOCK_DISCUSSION, ctx);
-      expect(mockDiscussionService.findParticipantsByDiscussion).toHaveBeenCalledWith('disc-1', MOCK_AUTH);
+      expect(
+        mockDiscussionService.findParticipantsByDiscussion
+      ).toHaveBeenCalledWith('disc-1', MOCK_AUTH);
       expect(result).toEqual([MOCK_PARTICIPANT]);
     });
 
@@ -355,7 +407,10 @@ describe('DiscussionResolver', () => {
     it('returns participant count', async () => {
       mockDiscussionService.countParticipants.mockResolvedValue(7);
       const ctx = { req: {}, authContext: MOCK_AUTH };
-      const result = await resolver.resolveParticipantCount(MOCK_DISCUSSION, ctx);
+      const result = await resolver.resolveParticipantCount(
+        MOCK_DISCUSSION,
+        ctx
+      );
       expect(result).toBe(7);
     });
   });
@@ -382,11 +437,16 @@ describe('DiscussionMessageResolver', () => {
 
   describe('resolveDiscussion()', () => {
     it('returns parent discussion', async () => {
-      mockDiscussionService.findDiscussionById.mockResolvedValue(MOCK_DISCUSSION);
+      mockDiscussionService.findDiscussionById.mockResolvedValue(
+        MOCK_DISCUSSION
+      );
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.resolveDiscussion(MOCK_MESSAGE, ctx);
       expect(result).toEqual(MOCK_DISCUSSION);
-      expect(mockDiscussionService.findDiscussionById).toHaveBeenCalledWith('disc-1', MOCK_AUTH);
+      expect(mockDiscussionService.findDiscussionById).toHaveBeenCalledWith(
+        'disc-1',
+        MOCK_AUTH
+      );
     });
 
     it('throws Unauthenticated when no authContext', async () => {
@@ -425,20 +485,29 @@ describe('DiscussionMessageResolver', () => {
     it('throws Unauthenticated when parent_message_id set but no authContext', async () => {
       const message = { ...MOCK_MESSAGE, parent_message_id: 'parent-1' };
       const ctx = { req: {} };
-      await expect(
-        resolver.resolveParentMessage(message, ctx)
-      ).rejects.toThrow('Unauthenticated');
+      await expect(resolver.resolveParentMessage(message, ctx)).rejects.toThrow(
+        'Unauthenticated'
+      );
     });
   });
 
   describe('resolveReplies()', () => {
     it('returns replies for a message', async () => {
-      const reply = { ...MOCK_MESSAGE, id: 'reply-1', parent_message_id: 'msg-1' };
+      const reply = {
+        ...MOCK_MESSAGE,
+        id: 'reply-1',
+        parent_message_id: 'msg-1',
+      };
       mockDiscussionService.findRepliesByParent.mockResolvedValue([reply]);
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.resolveReplies(MOCK_MESSAGE, 20, 0, ctx);
       expect(result).toEqual([reply]);
-      expect(mockDiscussionService.findRepliesByParent).toHaveBeenCalledWith('msg-1', 20, 0, MOCK_AUTH);
+      expect(mockDiscussionService.findRepliesByParent).toHaveBeenCalledWith(
+        'msg-1',
+        20,
+        0,
+        MOCK_AUTH
+      );
     });
 
     it('throws Unauthenticated when no authContext', async () => {
@@ -478,11 +547,16 @@ describe('DiscussionParticipantResolver', () => {
 
   describe('resolveDiscussion()', () => {
     it('returns discussion for participant', async () => {
-      mockDiscussionService.findDiscussionById.mockResolvedValue(MOCK_DISCUSSION);
+      mockDiscussionService.findDiscussionById.mockResolvedValue(
+        MOCK_DISCUSSION
+      );
       const ctx = { req: {}, authContext: MOCK_AUTH };
       const result = await resolver.resolveDiscussion(MOCK_PARTICIPANT, ctx);
       expect(result).toEqual(MOCK_DISCUSSION);
-      expect(mockDiscussionService.findDiscussionById).toHaveBeenCalledWith('disc-1', MOCK_AUTH);
+      expect(mockDiscussionService.findDiscussionById).toHaveBeenCalledWith(
+        'disc-1',
+        MOCK_AUTH
+      );
     });
 
     it('throws Unauthenticated when no authContext', async () => {

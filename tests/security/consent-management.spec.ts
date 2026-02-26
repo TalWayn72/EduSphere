@@ -16,7 +16,9 @@ function readFile(p: string): string {
 
 describe('G-04: Consent Schema', () => {
   it('consent.ts schema file exists', () => {
-    expect(existsSync(resolve(ROOT, 'packages/db/src/schema/consent.ts'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'packages/db/src/schema/consent.ts'))).toBe(
+      true
+    );
   });
 
   it('consent schema defines THIRD_PARTY_LLM type (AI data processing)', () => {
@@ -76,40 +78,54 @@ describe('G-04: Consent Schema', () => {
 describe('G-04: Consent Service', () => {
   it('consent.service.ts exists', () => {
     expect(
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/consent/consent.service.ts')),
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/consent/consent.service.ts')
+      )
     ).toBe(true);
   });
 
   it('ESSENTIAL consent never requires DB check (always true)', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.ts'
+    );
     expect(content).toContain('ESSENTIAL');
     expect(content).toContain('return true');
   });
 
   it('consent service writes audit log on change (GDPR Art.7)', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.ts'
+    );
     expect(content).toContain('CONSENT_GIVEN');
     expect(content).toContain('CONSENT_WITHDRAWN');
   });
 
   it('consent service uses upsert (not insert-only)', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.ts'
+    );
     expect(content).toContain('onConflictDoUpdate');
   });
 
   it('hasConsent supports THIRD_PARTY_LLM type (SI-10 AI gate)', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.ts'
+    );
     expect(content).toContain('THIRD_PARTY_LLM');
   });
 
   it('audit log includes gdprArticle 7 metadata', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.ts'
+    );
     expect(content).toContain('gdprArticle');
     expect(content).toContain("'7'");
   });
 
   it('consent service never exposes raw SQL (uses Drizzle ORM)', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.ts'
+    );
     expect(content).not.toMatch(/query\s*\(/);
     expect(content).not.toMatch(/raw\s*\(/);
   });
@@ -118,22 +134,30 @@ describe('G-04: Consent Service', () => {
 describe('G-04: Consent Service Tests', () => {
   it('consent.service.spec.ts exists', () => {
     expect(
-      existsSync(resolve(ROOT, 'apps/subgraph-core/src/consent/consent.service.spec.ts')),
+      existsSync(
+        resolve(ROOT, 'apps/subgraph-core/src/consent/consent.service.spec.ts')
+      )
     ).toBe(true);
   });
 
   it('spec covers ESSENTIAL bypass path', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.spec.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.spec.ts'
+    );
     expect(content).toContain('ESSENTIAL');
   });
 
   it('spec covers CONSENT_WITHDRAWN case', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.spec.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.spec.ts'
+    );
     expect(content).toContain('CONSENT_WITHDRAWN');
   });
 
   it('spec covers CONSENT_GIVEN case', () => {
-    const content = readFile('apps/subgraph-core/src/consent/consent.service.spec.ts');
+    const content = readFile(
+      'apps/subgraph-core/src/consent/consent.service.spec.ts'
+    );
     expect(content).toContain('CONSENT_GIVEN');
   });
 });

@@ -1,40 +1,49 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 
 // vi.hoisted() ensures these are initialized before vi.mock() hoisting runs.
 const { mockUseQuery, mockUseMutation } = vi.hoisted(() => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mockUseQuery: vi.fn<any>(() => [{ data: undefined, fetching: false, error: undefined }, vi.fn()]),
+  mockUseQuery: vi.fn<any>(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mockUseMutation: vi.fn<any>(() => [{ fetching: false, error: undefined }, vi.fn()]),
+  mockUseMutation: vi.fn<any>(() => [
+    { fetching: false, error: undefined },
+    vi.fn(),
+  ]),
 }));
 
-vi.mock("urql", () => ({
+vi.mock('urql', () => ({
   useQuery: mockUseQuery,
   useMutation: mockUseMutation,
 }));
 
 // Mock react-router-dom navigate
 const mockNavigate = vi.fn();
-vi.mock("react-router-dom", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("react-router-dom")>();
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>();
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
 // Mock Layout to avoid auth/nav complexity
-vi.mock("@/components/Layout", () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 // Mock graphql query strings
-vi.mock("@/lib/graphql/collaboration.queries", () => ({
-  MY_DISCUSSIONS_QUERY: "query MyDiscussions { myDiscussions { id } }",
-  CREATE_DISCUSSION_MUTATION: "mutation CreateDiscussion(: CreateDiscussionInput!) { createDiscussion { id } }",
+vi.mock('@/lib/graphql/collaboration.queries', () => ({
+  MY_DISCUSSIONS_QUERY: 'query MyDiscussions { myDiscussions { id } }',
+  CREATE_DISCUSSION_MUTATION:
+    'mutation CreateDiscussion(: CreateDiscussionInput!) { createDiscussion { id } }',
 }));
 
-import { CollaborationPage } from "./CollaborationPage";
+import { CollaborationPage } from './CollaborationPage';
 
 function renderPage() {
   return render(
@@ -44,65 +53,74 @@ function renderPage() {
   );
 }
 
-describe("CollaborationPage", () => {
+describe('CollaborationPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseQuery.mockReturnValue([{ data: undefined, fetching: false, error: undefined }, vi.fn()]);
-    mockUseMutation.mockReturnValue([{ fetching: false, error: undefined }, vi.fn()]);
+    mockUseQuery.mockReturnValue([
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn(),
+    ]);
+    mockUseMutation.mockReturnValue([
+      { fetching: false, error: undefined },
+      vi.fn(),
+    ]);
   });
 
-  it("renders the Collaboration heading", () => {
+  it('renders the Collaboration heading', () => {
     renderPage();
-    expect(screen.getByText("Collaboration")).toBeInTheDocument();
+    expect(screen.getByText('Collaboration')).toBeInTheDocument();
   });
 
-  it("renders inside Layout wrapper", () => {
+  it('renders inside Layout wrapper', () => {
     renderPage();
-    expect(screen.getByTestId("layout")).toBeInTheDocument();
+    expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 
-  it("renders Human Chavruta section", () => {
+  it('renders Human Chavruta section', () => {
     renderPage();
-    expect(screen.getByText("Human Chavruta")).toBeInTheDocument();
+    expect(screen.getByText('Human Chavruta')).toBeInTheDocument();
   });
 
-  it("renders AI Chavruta section", () => {
+  it('renders AI Chavruta section', () => {
     renderPage();
-    expect(screen.getByText("AI Chavruta")).toBeInTheDocument();
+    expect(screen.getByText('AI Chavruta')).toBeInTheDocument();
   });
 
-  it("renders Find a Chavruta Partner button", () => {
+  it('renders Find a Chavruta Partner button', () => {
     renderPage();
-    expect(screen.getByText("Find a Chavruta Partner")).toBeInTheDocument();
+    expect(screen.getByText('Find a Chavruta Partner')).toBeInTheDocument();
   });
 
-  it("renders Start AI Chavruta button", () => {
+  it('renders Start AI Chavruta button', () => {
     renderPage();
-    expect(screen.getByText("Start AI Chavruta")).toBeInTheDocument();
+    expect(screen.getByText('Start AI Chavruta')).toBeInTheDocument();
   });
 
-  it("shows loading state when fetching is true", () => {
-    mockUseQuery.mockReturnValue([{ data: undefined, fetching: true, error: undefined }, vi.fn()]);
+  it('shows loading state when fetching is true', () => {
+    mockUseQuery.mockReturnValue([
+      { data: undefined, fetching: true, error: undefined },
+      vi.fn(),
+    ]);
     renderPage();
     expect(screen.getByText(/Loading sessions/i)).toBeInTheDocument();
   });
 
-  it("shows error message when query fails", () => {
+  it('shows error message when query fails', () => {
     mockUseQuery.mockReturnValue([
-      { data: undefined, fetching: false, error: { message: "Network error" } },
+      { data: undefined, fetching: false, error: { message: 'Network error' } },
       vi.fn(),
     ]);
     renderPage();
     expect(screen.getByText(/Failed to load sessions/i)).toBeInTheDocument();
   });
 
-  it("shows empty discussions message when no sessions", () => {
+  it('shows empty discussions message when no sessions', () => {
     mockUseQuery.mockReturnValue([
       { data: { myDiscussions: [] }, fetching: false, error: undefined },
       vi.fn(),
     ]);
     renderPage();
-    expect(screen.getByText("No discussions yet.")).toBeInTheDocument();
+    expect(screen.getByText('No discussions yet.')).toBeInTheDocument();
   });
 
   it('shows searching state when Find a Chavruta Partner is clicked', () => {
@@ -180,8 +198,14 @@ describe("CollaborationPage", () => {
   });
 
   it('calls create mutation when New Session button is clicked', async () => {
-    const executeCreate = vi.fn().mockResolvedValue({ data: { createDiscussion: { id: 'new-disc', title: 'Session' } }, error: undefined });
-    mockUseMutation.mockReturnValue([{ fetching: false, error: undefined }, executeCreate]);
+    const executeCreate = vi.fn().mockResolvedValue({
+      data: { createDiscussion: { id: 'new-disc', title: 'Session' } },
+      error: undefined,
+    });
+    mockUseMutation.mockReturnValue([
+      { fetching: false, error: undefined },
+      executeCreate,
+    ]);
     mockUseQuery.mockReturnValue([
       { data: { myDiscussions: [] }, fetching: false, error: undefined },
       vi.fn(),
@@ -198,10 +222,16 @@ describe("CollaborationPage", () => {
         data: {
           myDiscussions: [
             {
-              id: 'disc-3', courseId: 'c1', title: 'Recent Session',
-              description: null, creatorId: 'u1', discussionType: 'CHAVRUTA',
-              participantCount: 1, messageCount: 1,
-              createdAt: justNow, updatedAt: justNow,
+              id: 'disc-3',
+              courseId: 'c1',
+              title: 'Recent Session',
+              description: null,
+              creatorId: 'u1',
+              discussionType: 'CHAVRUTA',
+              participantCount: 1,
+              messageCount: 1,
+              createdAt: justNow,
+              updatedAt: justNow,
             },
           ],
         },

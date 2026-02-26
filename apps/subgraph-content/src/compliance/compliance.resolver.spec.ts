@@ -21,7 +21,11 @@ const mockService = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const ADMIN_AUTH = { tenantId: 'tenant-1', userId: 'admin-1', roles: ['ORG_ADMIN'] };
+const ADMIN_AUTH = {
+  tenantId: 'tenant-1',
+  userId: 'admin-1',
+  roles: ['ORG_ADMIN'],
+};
 const makeCtx = (auth = ADMIN_AUTH) => ({ authContext: auth });
 
 const MOCK_REPORT = {
@@ -54,21 +58,37 @@ describe('ComplianceResolver', () => {
   describe('requireAuth (tested via getComplianceCourses)', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
       await expect(
-        resolver.getComplianceCourses({ authContext: undefined }),
+        resolver.getComplianceCourses({ authContext: undefined })
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = { authContext: { tenantId: undefined, userId: 'u1', roles: ['ORG_ADMIN'] } };
+      const ctx = {
+        authContext: {
+          tenantId: undefined,
+          userId: 'u1',
+          roles: ['ORG_ADMIN'],
+        },
+      };
       await expect(
-        resolver.getComplianceCourses(ctx as Parameters<typeof resolver.getComplianceCourses>[0]),
+        resolver.getComplianceCourses(
+          ctx as Parameters<typeof resolver.getComplianceCourses>[0]
+        )
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = { authContext: { tenantId: 'tenant-1', userId: undefined, roles: ['ORG_ADMIN'] } };
+      const ctx = {
+        authContext: {
+          tenantId: 'tenant-1',
+          userId: undefined,
+          roles: ['ORG_ADMIN'],
+        },
+      };
       await expect(
-        resolver.getComplianceCourses(ctx as Parameters<typeof resolver.getComplianceCourses>[0]),
+        resolver.getComplianceCourses(
+          ctx as Parameters<typeof resolver.getComplianceCourses>[0]
+        )
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -140,7 +160,11 @@ describe('ComplianceResolver', () => {
 
     it('uses first role from roles array as userRole', async () => {
       mockListComplianceCourses.mockResolvedValueOnce([]);
-      const ctx = makeCtx({ tenantId: 't1', userId: 'u1', roles: ['SUPER_ADMIN', 'ORG_ADMIN'] });
+      const ctx = makeCtx({
+        tenantId: 't1',
+        userId: 'u1',
+        roles: ['SUPER_ADMIN', 'ORG_ADMIN'],
+      });
       await resolver.getComplianceCourses(ctx);
 
       const [calledCtx] = mockListComplianceCourses.mock.calls[0];
@@ -163,7 +187,11 @@ describe('ComplianceResolver', () => {
     it('maps generatedAt Date to ISO string', async () => {
       mockGenerateComplianceReport.mockResolvedValueOnce(MOCK_REPORT);
 
-      const result = await resolver.generateComplianceReport(['c1'], undefined, makeCtx());
+      const result = await resolver.generateComplianceReport(
+        ['c1'],
+        undefined,
+        makeCtx()
+      );
 
       expect(result.summary.generatedAt).toBe('2026-02-15T12:00:00.000Z');
     });
@@ -171,7 +199,11 @@ describe('ComplianceResolver', () => {
     it('returns csvUrl and pdfUrl unchanged', async () => {
       mockGenerateComplianceReport.mockResolvedValueOnce(MOCK_REPORT);
 
-      const result = await resolver.generateComplianceReport(['c1'], undefined, makeCtx());
+      const result = await resolver.generateComplianceReport(
+        ['c1'],
+        undefined,
+        makeCtx()
+      );
 
       expect(result.csvUrl).toBe('https://minio.example.com/report.csv');
       expect(result.pdfUrl).toBe('https://minio.example.com/report.pdf');
@@ -208,7 +240,9 @@ describe('ComplianceResolver', () => {
 
     it('throws UnauthorizedException for unauthenticated request', async () => {
       await expect(
-        resolver.generateComplianceReport(['c1'], undefined, { authContext: undefined }),
+        resolver.generateComplianceReport(['c1'], undefined, {
+          authContext: undefined,
+        })
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -228,7 +262,10 @@ describe('ComplianceResolver', () => {
       });
 
       const result = await resolver.updateCourseComplianceSettings(
-        'c1', true, '2026-06-30', makeCtx(),
+        'c1',
+        true,
+        '2026-06-30',
+        makeCtx()
       );
 
       expect(result.isCompliance).toBe(true);
@@ -238,12 +275,21 @@ describe('ComplianceResolver', () => {
 
     it('passes null dueDate to service when complianceDueDate is undefined', async () => {
       mockUpdateCourseComplianceSettings.mockResolvedValueOnce({
-        id: 'c1', title: 'Safety', slug: 'safety',
-        is_compliance: false, compliance_due_date: null,
-        is_published: true, estimated_hours: null,
+        id: 'c1',
+        title: 'Safety',
+        slug: 'safety',
+        is_compliance: false,
+        compliance_due_date: null,
+        is_published: true,
+        estimated_hours: null,
       });
 
-      await resolver.updateCourseComplianceSettings('c1', false, undefined, makeCtx());
+      await resolver.updateCourseComplianceSettings(
+        'c1',
+        false,
+        undefined,
+        makeCtx()
+      );
 
       const [, , dueDateArg] = mockUpdateCourseComplianceSettings.mock.calls[0];
       expect(dueDateArg).toBeNull();
@@ -251,12 +297,21 @@ describe('ComplianceResolver', () => {
 
     it('passes parsed Date to service when valid string provided', async () => {
       mockUpdateCourseComplianceSettings.mockResolvedValueOnce({
-        id: 'c1', title: 'Safety', slug: 'safety',
-        is_compliance: true, compliance_due_date: new Date('2026-12-31'),
-        is_published: true, estimated_hours: null,
+        id: 'c1',
+        title: 'Safety',
+        slug: 'safety',
+        is_compliance: true,
+        compliance_due_date: new Date('2026-12-31'),
+        is_published: true,
+        estimated_hours: null,
       });
 
-      await resolver.updateCourseComplianceSettings('c1', true, '2026-12-31', makeCtx());
+      await resolver.updateCourseComplianceSettings(
+        'c1',
+        true,
+        '2026-12-31',
+        makeCtx()
+      );
 
       const [, , dueDateArg] = mockUpdateCourseComplianceSettings.mock.calls[0];
       expect(dueDateArg).toBeInstanceOf(Date);
@@ -264,7 +319,9 @@ describe('ComplianceResolver', () => {
 
     it('throws UnauthorizedException for unauthenticated request', async () => {
       await expect(
-        resolver.updateCourseComplianceSettings('c1', true, undefined, { authContext: undefined }),
+        resolver.updateCourseComplianceSettings('c1', true, undefined, {
+          authContext: undefined,
+        })
       ).rejects.toThrow(UnauthorizedException);
     });
   });

@@ -28,22 +28,20 @@ function writeList(list: RecentDocument[]): void {
 }
 
 export function useRecentDocuments() {
-  const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>(readList);
+  const [recentDocuments, setRecentDocuments] =
+    useState<RecentDocument[]>(readList);
 
-  const addRecentDocument = useCallback(
-    (contentId: string, title: string) => {
-      setRecentDocuments((prev) => {
-        const filtered = prev.filter((d) => d.contentId !== contentId);
-        const updated: RecentDocument[] = [
-          { contentId, title, lastViewedAt: new Date().toISOString() },
-          ...filtered,
-        ].slice(0, MAX_ITEMS);
-        writeList(updated);
-        return updated;
-      });
-    },
-    []
-  );
+  const addRecentDocument = useCallback((contentId: string, title: string) => {
+    setRecentDocuments((prev) => {
+      const filtered = prev.filter((d) => d.contentId !== contentId);
+      const updated: RecentDocument[] = [
+        { contentId, title, lastViewedAt: new Date().toISOString() },
+        ...filtered,
+      ].slice(0, MAX_ITEMS);
+      writeList(updated);
+      return updated;
+    });
+  }, []);
 
   return { recentDocuments, addRecentDocument };
 }

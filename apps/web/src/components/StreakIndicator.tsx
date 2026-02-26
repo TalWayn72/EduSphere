@@ -12,7 +12,10 @@ interface StreakIndicatorProps {
  * longest streak. Data is computed server-side from weeklyActivity in
  * UserStatsService.computeStreaks().
  */
-export function StreakIndicator({ currentStreak, longestStreak }: StreakIndicatorProps) {
+export function StreakIndicator({
+  currentStreak,
+  longestStreak,
+}: StreakIndicatorProps) {
   const { t } = useTranslation('dashboard');
 
   const isActive = currentStreak > 0;
@@ -36,7 +39,9 @@ export function StreakIndicator({ currentStreak, longestStreak }: StreakIndicato
           </span>
         </div>
         <p className="text-xs text-muted-foreground mt-1">
-          {t('stats.longestStreak', 'Best: {{count}} days', { count: longestStreak })}
+          {t('stats.longestStreak', 'Best: {{count}} days', {
+            count: longestStreak,
+          })}
         </p>
       </CardContent>
     </Card>

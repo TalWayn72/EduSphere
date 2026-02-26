@@ -24,7 +24,9 @@ import { users } from './core';
 export const scenario_templates = pgTable('scenario_templates', {
   id: pk(),
   tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
-  created_by: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+  created_by: uuid('created_by').references(() => users.id, {
+    onDelete: 'set null',
+  }),
 
   title: text('title').notNull(),
   domain: text('domain').notNull(), // 'sales' | 'customer_service' | 'healthcare' | 'management'
@@ -83,7 +85,9 @@ export const scenario_sessions = pgTable('scenario_sessions', {
    */
   evaluation_result: jsonb('evaluation_result'),
 
-  started_at: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+  started_at: timestamp('started_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   completed_at: timestamp('completed_at', { withTimezone: true }),
 });
 

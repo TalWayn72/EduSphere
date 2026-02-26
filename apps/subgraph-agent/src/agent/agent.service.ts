@@ -1,5 +1,12 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { createDatabaseConnection, schema, eq, desc, and, closeAllPools } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  schema,
+  eq,
+  desc,
+  and,
+  closeAllPools,
+} from '@edusphere/db';
 import { AIService } from '../ai/ai.service';
 
 @Injectable()

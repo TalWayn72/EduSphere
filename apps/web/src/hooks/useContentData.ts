@@ -10,7 +10,11 @@
  */
 import { useQuery } from 'urql';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
-import { mockVideo, mockTranscript, TranscriptSegment } from '@/lib/mock-content-data';
+import {
+  mockVideo,
+  mockTranscript,
+  TranscriptSegment,
+} from '@/lib/mock-content-data';
 
 interface MediaAsset {
   id: string;
@@ -87,6 +91,8 @@ export function useContentData(contentId: string): ContentData {
     videoTitle,
     transcript,
     fetching: result.fetching,
-    error: hasError ? (result.error?.message ?? 'Failed to load content') : null,
+    error: hasError
+      ? (result.error?.message ?? 'Failed to load content')
+      : null,
   };
 }

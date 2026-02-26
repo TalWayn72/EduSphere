@@ -29,7 +29,10 @@ export class CrmEncryptionService {
   encrypt(plaintext: string): string {
     const iv = randomBytes(IV_BYTES);
     const cipher = createCipheriv(ALGORITHM, this.key, iv);
-    const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+    const encrypted = Buffer.concat([
+      cipher.update(plaintext, 'utf8'),
+      cipher.final(),
+    ]);
     const tag = cipher.getAuthTag();
     return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
   }
@@ -47,6 +50,8 @@ export class CrmEncryptionService {
     const data = Buffer.from(dataHex, 'hex');
     const decipher = createDecipheriv(ALGORITHM, this.key, iv);
     decipher.setAuthTag(tag);
-    return Buffer.concat([decipher.update(data), decipher.final()]).toString('utf8');
+    return Buffer.concat([decipher.update(data), decipher.final()]).toString(
+      'utf8'
+    );
   }
 }

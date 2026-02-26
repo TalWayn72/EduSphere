@@ -22,7 +22,7 @@ describe('compliance.graphql SDL integrity — BUG-004 regression', () => {
     const matches = SDL.match(/extend\s+schema\s+@link/g) ?? [];
     expect(
       matches.length,
-      'Found duplicate "extend schema @link" — this breaks Federation v2 composition (BUG-004)',
+      'Found duplicate "extend schema @link" — this breaks Federation v2 composition (BUG-004)'
     ).toBe(0);
   });
 

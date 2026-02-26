@@ -52,20 +52,24 @@ function loadPrivateKeyFromBuffer(keyDer: Buffer): KeyObject {
     return createPrivateKey({ key: keyDer, format: 'der', type: 'pkcs8' });
   }
   // Fallback: treat as raw 32-byte Ed25519 seed → wrap in PKCS#8
-  const pkcs8Header = Buffer.from(
-    '302e020100300506032b657004220420',
-    'hex',
-  );
+  const pkcs8Header = Buffer.from('302e020100300506032b657004220420', 'hex');
   const pkcs8Der = Buffer.concat([pkcs8Header, keyDer]);
   return createPrivateKey({ key: pkcs8Der, format: 'der', type: 'pkcs8' });
 }
 
 function generateDevKeyPair(issuerDid: string): Ed25519KeyPair {
   // Fixed-seed dev key: DO NOT use in production
-  const seed = Buffer.from('edusphere-dev-key-seed-2026-test', 'utf8').subarray(0, 32);
+  const seed = Buffer.from('edusphere-dev-key-seed-2026-test', 'utf8').subarray(
+    0,
+    32
+  );
   const pkcs8Header = Buffer.from('302e020100300506032b657004220420', 'hex');
   const pkcs8Der = Buffer.concat([pkcs8Header, seed]);
-  const privateKey = createPrivateKey({ key: pkcs8Der, format: 'der', type: 'pkcs8' });
+  const privateKey = createPrivateKey({
+    key: pkcs8Der,
+    format: 'der',
+    type: 'pkcs8',
+  });
   const publicKey = createPublicKey(privateKey);
   return { privateKey, publicKey, issuerDid };
 }
@@ -99,10 +103,14 @@ export function canonicalJson(value: unknown): string {
  */
 export function signCredential(
   credentialBody: Ob3CredentialBody,
-  keyPair: Ed25519KeyPair,
+  keyPair: Ed25519KeyPair
 ): OpenBadgeProof {
   const canonical = canonicalJson(credentialBody);
-  const signature = sign(null, Buffer.from(canonical, 'utf8'), keyPair.privateKey);
+  const signature = sign(
+    null,
+    Buffer.from(canonical, 'utf8'),
+    keyPair.privateKey
+  );
   const proofValue = signature.toString('base64url');
 
   return {
@@ -121,12 +129,17 @@ export function signCredential(
 export function verifyCredentialSignature(
   credentialBody: Ob3CredentialBody,
   proof: OpenBadgeProof,
-  publicKey: KeyObject,
+  publicKey: KeyObject
 ): boolean {
   try {
     const canonical = canonicalJson(credentialBody);
     const signatureBuffer = Buffer.from(proof.proofValue, 'base64url');
-    return verify(null, Buffer.from(canonical, 'utf8'), publicKey, signatureBuffer);
+    return verify(
+      null,
+      Buffer.from(canonical, 'utf8'),
+      publicKey,
+      signatureBuffer
+    );
   } catch {
     return false;
   }

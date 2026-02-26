@@ -47,7 +47,8 @@ export function PlagiarismReportCard({
   isInstructor = false,
   onReview,
 }: PlagiarismReportCardProps) {
-  const { isFlagged, highestSimilarity, similarSubmissions, checkedAt } = report;
+  const { isFlagged, highestSimilarity, similarSubmissions, checkedAt } =
+    report;
 
   return (
     <Card className="mt-4">

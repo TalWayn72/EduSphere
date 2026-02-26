@@ -28,7 +28,9 @@ async function gotoScenarios(page: import('@playwright/test').Page) {
 /**
  * Returns true when at least one scenario card is visible in the grid.
  */
-async function hasScenariosLoaded(page: import('@playwright/test').Page): Promise<boolean> {
+async function hasScenariosLoaded(
+  page: import('@playwright/test').Page
+): Promise<boolean> {
   // Cards render inside a grid with gap-4; each card has an h3 with the scenario title
   const cards = page.locator('h3.font-semibold');
   const count = await cards.count();
@@ -44,32 +46,36 @@ test.describe('Scenarios — Page load', () => {
 
   test('renders the "Role-Play Scenarios" page heading', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Role-Play Scenarios', level: 1 }),
+      page.getByRole('heading', { name: 'Role-Play Scenarios', level: 1 })
     ).toBeVisible({ timeout: 8_000 });
   });
 
   test('subtitle text is visible', async ({ page }) => {
     await expect(
-      page.getByText(/Practice real-world conversations/i),
+      page.getByText(/Practice real-world conversations/i)
     ).toBeVisible({ timeout: 5_000 });
   });
 
-  test('"Create Scenario" button is visible in the header', async ({ page }) => {
+  test('"Create Scenario" button is visible in the header', async ({
+    page,
+  }) => {
     await expect(
-      page.getByRole('button', { name: /Create Scenario/i }),
+      page.getByRole('button', { name: /Create Scenario/i })
     ).toBeVisible({ timeout: 5_000 });
   });
 
-  test('page shows scenario cards OR the empty-state message', async ({ page }) => {
+  test('page shows scenario cards OR the empty-state message', async ({
+    page,
+  }) => {
     const hasCards = await hasScenariosLoaded(page);
     if (hasCards) {
       // At least one card title is visible
       await expect(page.locator('h3.font-semibold').first()).toBeVisible();
     } else {
       // Empty state message
-      await expect(
-        page.getByText(/No scenarios available yet/i),
-      ).toBeVisible({ timeout: 8_000 });
+      await expect(page.getByText(/No scenarios available yet/i)).toBeVisible({
+        timeout: 8_000,
+      });
     }
   });
 
@@ -87,7 +93,9 @@ test.describe('Scenarios — Scenario card content', () => {
     if (!hasCards) test.skip();
   });
 
-  test('each scenario card shows a title in an h3 element', async ({ page }) => {
+  test('each scenario card shows a title in an h3 element', async ({
+    page,
+  }) => {
     const titles = page.locator('h3.font-semibold');
     await expect(titles.first()).toBeVisible({ timeout: 8_000 });
     const count = await titles.count();
@@ -113,15 +121,21 @@ test.describe('Scenarios — Scenario card content', () => {
 
   test('scene description text is visible on cards', async ({ page }) => {
     // sceneDescription renders in a <p> with line-clamp-3 and text-xs
-    const desc = page.locator('p.text-xs.text-muted-foreground.line-clamp-3').first();
+    const desc = page
+      .locator('p.text-xs.text-muted-foreground.line-clamp-3')
+      .first();
     await expect(desc).toBeVisible({ timeout: 8_000 });
     const text = await desc.textContent();
     expect(text?.trim().length).toBeGreaterThan(0);
   });
 
-  test('domain and turns info is shown in the card footer', async ({ page }) => {
+  test('domain and turns info is shown in the card footer', async ({
+    page,
+  }) => {
     // Footer span: "{domain} · {maxTurns} turns"
-    const footer = page.locator('span.text-xs.text-muted-foreground.capitalize').first();
+    const footer = page
+      .locator('span.text-xs.text-muted-foreground.capitalize')
+      .first();
     await expect(footer).toBeVisible({ timeout: 8_000 });
     const text = await footer.textContent();
     expect(text).toMatch(/turns/i);
@@ -150,20 +164,25 @@ test.describe('Scenarios — Clicking a scenario card', () => {
     await firstCard.click();
 
     // RoleplaySimulator renders as a fixed inset-0 div with bg-gray-950
-    await expect(
-      page.locator('.fixed.inset-0.bg-gray-950'),
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator('.fixed.inset-0.bg-gray-950')).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('RoleplaySimulator shows the scenario title in the header', async ({
     page,
   }) => {
-    const titleText = await page.locator('h3.font-semibold').first().textContent();
+    const titleText = await page
+      .locator('h3.font-semibold')
+      .first()
+      .textContent();
     await page.locator('h3.font-semibold').first().click();
 
     // The title is rendered as <h2> inside the simulator header
     await expect(
-      page.locator('h2.text-white.font-bold').filter({ hasText: titleText?.trim() ?? '' }),
+      page
+        .locator('h2.text-white.font-bold')
+        .filter({ hasText: titleText?.trim() ?? '' })
     ).toBeVisible({ timeout: 8_000 });
   });
 
@@ -173,33 +192,47 @@ test.describe('Scenarios — Clicking a scenario card', () => {
     await page.locator('h3.font-semibold').first().click();
 
     // Difficulty badge: text-xs px-2 py-0.5 rounded-full font-medium inside header
-    await page.locator('.fixed.inset-0.bg-gray-950').waitFor({ state: 'visible', timeout: 8_000 });
+    await page
+      .locator('.fixed.inset-0.bg-gray-950')
+      .waitFor({ state: 'visible', timeout: 8_000 });
     const badge = page
       .locator('.fixed.inset-0 span.text-xs.px-2.rounded-full.font-medium')
       .first();
     await expect(badge).toBeVisible({ timeout: 5_000 });
   });
 
-  test('RoleplaySimulator shows turn counter in the header', async ({ page }) => {
+  test('RoleplaySimulator shows turn counter in the header', async ({
+    page,
+  }) => {
     await page.locator('h3.font-semibold').first().click();
-    await page.locator('.fixed.inset-0.bg-gray-950').waitFor({ state: 'visible', timeout: 8_000 });
+    await page
+      .locator('.fixed.inset-0.bg-gray-950')
+      .waitFor({ state: 'visible', timeout: 8_000 });
 
     // Turn counter: "{turnCount} / {maxTurns} turns"
-    await expect(page.getByText(/\d+ \/ \d+ turns/)).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/\d+ \/ \d+ turns/)).toBeVisible({
+      timeout: 5_000,
+    });
   });
 
   test('RoleplaySimulator chat input field is visible', async ({ page }) => {
     await page.locator('h3.font-semibold').first().click();
-    await page.locator('.fixed.inset-0.bg-gray-950').waitFor({ state: 'visible', timeout: 8_000 });
+    await page
+      .locator('.fixed.inset-0.bg-gray-950')
+      .waitFor({ state: 'visible', timeout: 8_000 });
 
     // Chat input renders at the bottom of the overlay
-    const chatInput = page.locator('input[placeholder*="response"], input[placeholder*="Waiting"]');
+    const chatInput = page.locator(
+      'input[placeholder*="response"], input[placeholder*="Waiting"]'
+    );
     await expect(chatInput.first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('RoleplaySimulator Send button is visible', async ({ page }) => {
     await page.locator('h3.font-semibold').first().click();
-    await page.locator('.fixed.inset-0.bg-gray-950').waitFor({ state: 'visible', timeout: 8_000 });
+    await page
+      .locator('.fixed.inset-0.bg-gray-950')
+      .waitFor({ state: 'visible', timeout: 8_000 });
 
     // Send button contains the Send SVG icon (lucide-send)
     const sendBtn = page.locator('.lucide-send').first();
@@ -210,7 +243,9 @@ test.describe('Scenarios — Clicking a scenario card', () => {
     page,
   }) => {
     await page.locator('h3.font-semibold').first().click();
-    await page.locator('.fixed.inset-0.bg-gray-950').waitFor({ state: 'visible', timeout: 8_000 });
+    await page
+      .locator('.fixed.inset-0.bg-gray-950')
+      .waitFor({ state: 'visible', timeout: 8_000 });
 
     // The opening message is set from scenario.sceneDescription in the 'character' bubble
     // Character messages: bg-blue-600 text-white rounded-bl-sm
@@ -230,7 +265,9 @@ test.describe('Scenarios — RoleplaySimulator chat input', () => {
     if (!hasCards) test.skip();
     // Open first scenario
     await page.locator('h3.font-semibold').first().click();
-    await page.locator('.fixed.inset-0.bg-gray-950').waitFor({ state: 'visible', timeout: 8_000 });
+    await page
+      .locator('.fixed.inset-0.bg-gray-950')
+      .waitFor({ state: 'visible', timeout: 8_000 });
   });
 
   test('typing into the chat input updates its value', async ({ page }) => {
@@ -270,7 +307,7 @@ test.describe('Scenarios — RoleplaySimulator chat input', () => {
 
     // After close the scenarios list heading should be visible again
     await expect(
-      page.getByRole('heading', { name: 'Role-Play Scenarios', level: 1 }),
+      page.getByRole('heading', { name: 'Role-Play Scenarios', level: 1 })
     ).toBeVisible({ timeout: 5_000 });
   });
 });
@@ -278,12 +315,16 @@ test.describe('Scenarios — RoleplaySimulator chat input', () => {
 // ── Suite 5: Error and edge states ────────────────────────────────────────────
 
 test.describe('Scenarios — Error and edge states', () => {
-  test('shows error message when GraphQL fails (no backend)', async ({ page }) => {
+  test('shows error message when GraphQL fails (no backend)', async ({
+    page,
+  }) => {
     await gotoScenarios(page);
 
     // When SCENARIO_TEMPLATES_QUERY fails, the error paragraph renders
     const errorPara = page.getByText(/Failed to load scenarios/i);
-    const hasError = await errorPara.isVisible({ timeout: 5_000 }).catch(() => false);
+    const hasError = await errorPara
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
     const hasCards = await hasScenariosLoaded(page);
     const hasEmptyState = await page
       .getByText(/No scenarios available yet/i)
@@ -294,7 +335,9 @@ test.describe('Scenarios — Error and edge states', () => {
     expect(hasError || hasCards || hasEmptyState).toBe(true);
   });
 
-  test('loading skeletons render during fetch (if observable)', async ({ page }) => {
+  test('loading skeletons render during fetch (if observable)', async ({
+    page,
+  }) => {
     // Navigate and immediately check for skeleton pulses before data resolves
     await page.goto(`${BASE}/scenarios`, { waitUntil: 'domcontentloaded' });
 
@@ -320,7 +363,9 @@ test.describe('Scenarios — Visual regression @visual', () => {
     });
   });
 
-  test('visual: scenario player open (if cards available)', async ({ page }) => {
+  test('visual: scenario player open (if cards available)', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await gotoScenarios(page);
     const hasCards = await hasScenariosLoaded(page);
@@ -330,7 +375,9 @@ test.describe('Scenarios — Visual regression @visual', () => {
     }
 
     await page.locator('h3.font-semibold').first().click();
-    await page.locator('.fixed.inset-0.bg-gray-950').waitFor({ state: 'visible', timeout: 8_000 });
+    await page
+      .locator('.fixed.inset-0.bg-gray-950')
+      .waitFor({ state: 'visible', timeout: 8_000 });
     await page.waitForTimeout(800);
 
     await expect(page).toHaveScreenshot('scenario-player-open.png', {

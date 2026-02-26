@@ -10,7 +10,14 @@ import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, HeartPulse, BarChart3, Users, Plus, ChevronRight } from 'lucide-react';
+import {
+  Briefcase,
+  HeartPulse,
+  BarChart3,
+  Users,
+  Plus,
+  ChevronRight,
+} from 'lucide-react';
 import { RoleplaySimulator } from '@/components/RoleplaySimulator';
 import { SCENARIO_TEMPLATES_QUERY } from '@/lib/graphql/roleplay.queries';
 
@@ -45,7 +52,9 @@ const DIFFICULTY_BADGES: Record<string, string> = {
 };
 
 export function ScenariosPage() {
-  const [activeScenario, setActiveScenario] = useState<ScenarioTemplate | null>(null);
+  const [activeScenario, setActiveScenario] = useState<ScenarioTemplate | null>(
+    null
+  );
 
   const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY });
 
@@ -69,7 +78,8 @@ export function ScenariosPage() {
           <div>
             <h1 className="text-2xl font-bold">Role-Play Scenarios</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Practice real-world conversations with AI-powered characters and get coaching feedback.
+              Practice real-world conversations with AI-powered characters and
+              get coaching feedback.
             </p>
           </div>
           <Button variant="outline" size="sm" className="gap-2">
@@ -102,9 +112,14 @@ export function ScenariosPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {scenarios.map((scenario) => {
-            const icon = DOMAIN_ICONS[scenario.domain] ?? <Briefcase className="h-5 w-5" />;
-            const iconClass = DOMAIN_COLORS[scenario.domain] ?? 'text-gray-500 bg-gray-50';
-            const badgeClass = DIFFICULTY_BADGES[scenario.difficultyLevel] ?? 'bg-gray-100 text-gray-700';
+            const icon = DOMAIN_ICONS[scenario.domain] ?? (
+              <Briefcase className="h-5 w-5" />
+            );
+            const iconClass =
+              DOMAIN_COLORS[scenario.domain] ?? 'text-gray-500 bg-gray-50';
+            const badgeClass =
+              DIFFICULTY_BADGES[scenario.difficultyLevel] ??
+              'bg-gray-100 text-gray-700';
             return (
               <Card
                 key={scenario.id}
@@ -113,19 +128,24 @@ export function ScenariosPage() {
               >
                 <div className="flex items-start justify-between">
                   <div className={`p-2 rounded-lg ${iconClass}`}>{icon}</div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${badgeClass}`}>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full border font-medium ${badgeClass}`}
+                  >
                     {scenario.difficultyLevel}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-sm leading-tight">{scenario.title}</h3>
+                  <h3 className="font-semibold text-sm leading-tight">
+                    {scenario.title}
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
                     {scenario.sceneDescription}
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground capitalize">
-                    {scenario.domain.replace('_', ' ')} · {scenario.maxTurns} turns
+                    {scenario.domain.replace('_', ' ')} · {scenario.maxTurns}{' '}
+                    turns
                   </span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>

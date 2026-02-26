@@ -105,7 +105,9 @@ describe('ollama.client — embed()', () => {
       mockFetchError(500);
 
       const { embed } = await import('./ollama.client');
-      await expect(embed('text')).rejects.toThrow('Ollama embeddings error 500');
+      await expect(embed('text')).rejects.toThrow(
+        'Ollama embeddings error 500'
+      );
     });
 
     it('throws when Ollama returns empty embedding', async () => {
@@ -164,7 +166,9 @@ describe('ollama.client — embed()', () => {
       mockFetchError(401);
 
       const { embed } = await import('./ollama.client');
-      await expect(embed('text')).rejects.toThrow('OpenAI embeddings error 401');
+      await expect(embed('text')).rejects.toThrow(
+        'OpenAI embeddings error 401'
+      );
     });
 
     it('throws when OpenAI returns empty data', async () => {

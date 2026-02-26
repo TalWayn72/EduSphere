@@ -1,14 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { parseLanguageSettings, TenantLanguageService, LANG_CACHE_MAX_SIZE } from './tenant-language.service';
+import {
+  parseLanguageSettings,
+  TenantLanguageService,
+  LANG_CACHE_MAX_SIZE,
+} from './tenant-language.service';
 
 // vi.hoisted ensures these are initialized before the vi.mock factory runs
-const { mockWhere, mockLimit, mockFrom, mockSet, mockUpdate } = vi.hoisted(() => ({
-  mockWhere:  vi.fn(),
-  mockLimit:  vi.fn(),
-  mockFrom:   vi.fn(),
-  mockSet:    vi.fn(),
-  mockUpdate: vi.fn(),
-}));
+const { mockWhere, mockLimit, mockFrom, mockSet, mockUpdate } = vi.hoisted(
+  () => ({
+    mockWhere: vi.fn(),
+    mockLimit: vi.fn(),
+    mockFrom: vi.fn(),
+    mockSet: vi.fn(),
+    mockUpdate: vi.fn(),
+  })
+);
 
 vi.mock('@edusphere/db', () => ({
   db: {
@@ -52,7 +58,10 @@ describe('parseLanguageSettings()', () => {
   });
 
   it('parses a fully specified valid object', () => {
-    const input = { supportedLanguages: ['en', 'fr', 'he'], defaultLanguage: 'fr' };
+    const input = {
+      supportedLanguages: ['en', 'fr', 'he'],
+      defaultLanguage: 'fr',
+    };
     expect(parseLanguageSettings(input)).toEqual(input);
   });
 
@@ -72,8 +81,15 @@ describe('parseLanguageSettings()', () => {
 describe('TenantLanguageService', () => {
   let service: TenantLanguageService;
 
-  const STORED_SETTINGS = { supportedLanguages: ['en', 'he', 'fr'], defaultLanguage: 'he' };
-  const OTHER_SETTINGS = { someOtherKey: 'value', supportedLanguages: ['en'], defaultLanguage: 'en' };
+  const STORED_SETTINGS = {
+    supportedLanguages: ['en', 'he', 'fr'],
+    defaultLanguage: 'he',
+  };
+  const OTHER_SETTINGS = {
+    someOtherKey: 'value',
+    supportedLanguages: ['en'],
+    defaultLanguage: 'en',
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -122,7 +138,10 @@ describe('TenantLanguageService', () => {
         return { where: mockWhere };
       });
 
-      await service.updateSettings('tenant-1', { supportedLanguages: ['en', 'he'], defaultLanguage: 'he' });
+      await service.updateSettings('tenant-1', {
+        supportedLanguages: ['en', 'he'],
+        defaultLanguage: 'he',
+      });
 
       expect(capturedSet?.settings).toEqual({
         someOtherKey: 'value', // preserved
@@ -135,16 +154,23 @@ describe('TenantLanguageService', () => {
       await service.getSettings('tenant-1'); // populates cache
       mockFrom.mockClear();
 
-      await service.updateSettings('tenant-1', { supportedLanguages: ['en'], defaultLanguage: 'en' });
+      await service.updateSettings('tenant-1', {
+        supportedLanguages: ['en'],
+        defaultLanguage: 'en',
+      });
       // After invalidation, next getSettings re-queries DB
       await service.getSettings('tenant-1');
       expect(mockFrom).toHaveBeenCalled();
     });
 
     it('returns updated settings after write', async () => {
-      const updated = { supportedLanguages: ['en', 'es'], defaultLanguage: 'es' };
-      mockLimit.mockResolvedValueOnce([{ settings: {} }]) // read for merge
-               .mockResolvedValueOnce([{ settings: updated }]); // read after invalidation
+      const updated = {
+        supportedLanguages: ['en', 'es'],
+        defaultLanguage: 'es',
+      };
+      mockLimit
+        .mockResolvedValueOnce([{ settings: {} }]) // read for merge
+        .mockResolvedValueOnce([{ settings: updated }]); // read after invalidation
       const result = await service.updateSettings('tenant-1', updated);
       expect(result).toEqual(updated);
     });

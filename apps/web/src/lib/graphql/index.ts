@@ -5,7 +5,7 @@ import { GraphQLClient } from 'graphql-request';
  * Auth-bearing queries should use urqlClient (urql-client.ts) via the urql hooks instead.
  */
 export const gqlClient = new GraphQLClient(
-  import.meta.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql',
+  import.meta.env.VITE_GRAPHQL_URL ?? 'http://localhost:4000/graphql'
 );
 
 export * from './content.queries';

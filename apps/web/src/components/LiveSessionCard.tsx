@@ -30,7 +30,10 @@ const STATUS_COLORS: Record<string, string> = {
   RECORDING: 'bg-yellow-100 text-yellow-800',
 };
 
-export function LiveSessionCard({ liveSession, userRole = 'LEARNER' }: LiveSessionCardProps) {
+export function LiveSessionCard({
+  liveSession,
+  userRole = 'LEARNER',
+}: LiveSessionCardProps) {
   const { t } = useTranslation('content');
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -38,9 +41,11 @@ export function LiveSessionCard({ liveSession, userRole = 'LEARNER' }: LiveSessi
   const [, joinSession] = useMutation(JOIN_LIVE_SESSION_MUTATION);
 
   const isModerator = ['INSTRUCTOR', 'ADMIN', 'ORG_ADMIN'].includes(userRole);
-  const canJoin = liveSession.status === 'LIVE' || liveSession.status === 'SCHEDULED';
+  const canJoin =
+    liveSession.status === 'LIVE' || liveSession.status === 'SCHEDULED';
   const scheduledDate = new Date(liveSession.scheduledAt);
-  const statusClass = STATUS_COLORS[liveSession.status] ?? 'bg-gray-100 text-gray-700';
+  const statusClass =
+    STATUS_COLORS[liveSession.status] ?? 'bg-gray-100 text-gray-700';
 
   const handleJoin = async () => {
     setJoining(true);
@@ -51,7 +56,8 @@ export function LiveSessionCard({ liveSession, userRole = 'LEARNER' }: LiveSessi
         setJoinError(result.error.message);
         return;
       }
-      const joinUrl: string = (result.data as { joinLiveSession?: string })?.joinLiveSession ?? '';
+      const joinUrl: string =
+        (result.data as { joinLiveSession?: string })?.joinLiveSession ?? '';
       if (joinUrl) {
         window.open(joinUrl, '_blank', 'noopener,noreferrer');
       }
@@ -70,7 +76,9 @@ export function LiveSessionCard({ liveSession, userRole = 'LEARNER' }: LiveSessi
             <Video className="h-4 w-4 text-primary" />
             {liveSession.meetingName}
           </CardTitle>
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 ${statusClass}`}>
+          <span
+            className={`text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 ${statusClass}`}
+          >
             {liveSession.status === 'LIVE' && (
               <Radio className="h-3 w-3 animate-pulse" />
             )}
@@ -84,7 +92,10 @@ export function LiveSessionCard({ liveSession, userRole = 'LEARNER' }: LiveSessi
           <Clock className="h-4 w-4" />
           <span>
             {scheduledDate.toLocaleDateString()}{' '}
-            {scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {scheduledDate.toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </span>
         </div>
 
@@ -111,7 +122,9 @@ export function LiveSessionCard({ liveSession, userRole = 'LEARNER' }: LiveSessi
 
         {liveSession.status === 'ENDED' && liveSession.recordingUrl && (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{t('liveSession.recordingAvailable')}</p>
+            <p className="text-sm font-medium">
+              {t('liveSession.recordingAvailable')}
+            </p>
             <video
               src={liveSession.recordingUrl}
               controls

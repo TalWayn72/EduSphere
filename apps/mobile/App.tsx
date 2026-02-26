@@ -82,8 +82,12 @@ export default function App() {
 
   useEffect(() => {
     initMobileI18n()
-      .then(() => { setI18nReady(true); })
-      .catch(() => { setI18nReady(true); }); // Continue even if i18n fails
+      .then(() => {
+        setI18nReady(true);
+      })
+      .catch(() => {
+        setI18nReady(true);
+      }); // Continue even if i18n fails
   }, []);
 
   if (!isLoadingComplete || !dbReady || !i18nReady) {

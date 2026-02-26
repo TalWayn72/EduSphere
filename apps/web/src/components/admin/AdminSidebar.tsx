@@ -91,7 +91,11 @@ const NAV_GROUPS: NavGroup[] = [
   {
     heading: 'Settings',
     items: [
-      { to: '/admin/notifications', icon: Bell, label: 'Notification Templates' },
+      {
+        to: '/admin/notifications',
+        icon: Bell,
+        label: 'Notification Templates',
+      },
     ],
   },
 ];
@@ -115,7 +119,9 @@ export function AdminSidebar() {
                 key={to}
                 to={to}
                 end={to === '/admin'}
-                className={({ isActive }) => (isActive ? activeClass : inactiveClass)}
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 <span>{label}</span>

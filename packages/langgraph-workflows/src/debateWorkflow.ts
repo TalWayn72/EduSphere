@@ -29,7 +29,10 @@ export type DebateState = z.infer<typeof DebateStateSchema>;
 
 const DebateStateAnnotation = Annotation.Root({
   topic: Annotation<string>(),
-  position: Annotation<'for' | 'against'>({ value: (_, u) => u, default: () => 'for' }),
+  position: Annotation<'for' | 'against'>({
+    value: (_, u) => u,
+    default: () => 'for',
+  }),
   rounds: Annotation<number>({ value: (_, u) => u, default: () => 3 }),
   currentRound: Annotation<number>({ value: (_, u) => u, default: () => 1 }),
   arguments: Annotation<DebateState['arguments']>({
@@ -41,7 +44,10 @@ const DebateStateAnnotation = Annotation.Root({
     },
     default: () => [],
   }),
-  synthesis: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  synthesis: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
@@ -86,7 +92,10 @@ export class ChavrutaDebateWorkflow {
     const { text } = await generateText({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       model: openai(this.model) as any,
-      system: injectLocale('You are a skilled debate participant.', this.locale),
+      system: injectLocale(
+        'You are a skilled debate participant.',
+        this.locale
+      ),
       prompt: `You are arguing ${state.position === 'for' ? 'FOR' : 'AGAINST'} the following topic:
 "${state.topic}"
 
@@ -113,7 +122,10 @@ Provide a strong, logical argument for your position. Use evidence and reasoning
     const { text } = await generateText({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       model: openai(this.model) as any,
-      system: injectLocale('You are a skilled debate participant.', this.locale),
+      system: injectLocale(
+        'You are a skilled debate participant.',
+        this.locale
+      ),
       prompt: `You are arguing ${state.position === 'for' ? 'AGAINST' : 'FOR'} the following topic:
 "${state.topic}"
 
@@ -177,6 +189,9 @@ Provide:
   }
 }
 
-export function createDebateWorkflow(model?: string, locale: string = 'en'): ChavrutaDebateWorkflow {
+export function createDebateWorkflow(
+  model?: string,
+  locale: string = 'en'
+): ChavrutaDebateWorkflow {
   return new ChavrutaDebateWorkflow(model, locale);
 }

@@ -1,4 +1,8 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { createReadStream } from 'fs';
 import OpenAI from 'openai';
 import type { WhisperResponse, WhisperSegment } from './transcription.types';
@@ -39,7 +43,10 @@ export class WhisperClient {
     );
   }
 
-  async transcribe(filePath: string, language = 'en'): Promise<WhisperResponse> {
+  async transcribe(
+    filePath: string,
+    language = 'en'
+  ): Promise<WhisperResponse> {
     if (this.useLocal) {
       return this.transcribeLocal(filePath, language);
     }
@@ -48,7 +55,10 @@ export class WhisperClient {
 
   // ─── OpenAI Whisper ────────────────────────────────────────────────────────
 
-  private async transcribeOpenAI(filePath: string, language: string): Promise<WhisperResponse> {
+  private async transcribeOpenAI(
+    filePath: string,
+    language: string
+  ): Promise<WhisperResponse> {
     if (!this.openai) {
       throw new InternalServerErrorException('OpenAI client not initialised');
     }
@@ -62,14 +72,20 @@ export class WhisperClient {
         timestamp_granularities: ['segment'],
       });
 
-      const segments: WhisperSegment[] = (response.segments ?? []).map((s, idx) => ({
-        id: idx,
-        start: s.start,
-        end: s.end,
-        text: s.text.trim(),
-      }));
+      const segments: WhisperSegment[] = (response.segments ?? []).map(
+        (s, idx) => ({
+          id: idx,
+          start: s.start,
+          end: s.end,
+          text: s.text.trim(),
+        })
+      );
 
-      return { text: response.text, language: response.language ?? language, segments };
+      return {
+        text: response.text,
+        language: response.language ?? language,
+        segments,
+      };
     } catch (err) {
       this.logger.error('OpenAI Whisper transcription failed', err);
       throw new InternalServerErrorException('Whisper transcription failed');
@@ -78,9 +94,14 @@ export class WhisperClient {
 
   // ─── Local faster-whisper ──────────────────────────────────────────────────
 
-  private async transcribeLocal(filePath: string, language: string): Promise<WhisperResponse> {
+  private async transcribeLocal(
+    filePath: string,
+    language: string
+  ): Promise<WhisperResponse> {
     try {
-      this.logger.debug(`Sending ${filePath} to local Whisper at ${this.whisperUrl}`);
+      this.logger.debug(
+        `Sending ${filePath} to local Whisper at ${this.whisperUrl}`
+      );
 
       const formData = new FormData();
       const blob = new Blob([createReadStream(filePath) as any]);
@@ -88,29 +109,36 @@ export class WhisperClient {
       formData.append('language', language);
       formData.append('output', 'json');
 
-      const res = await fetch(`${this.whisperUrl}/asr`, { method: 'POST', body: formData });
+      const res = await fetch(`${this.whisperUrl}/asr`, {
+        method: 'POST',
+        body: formData,
+      });
 
       if (!res.ok) {
         throw new Error(`faster-whisper returned HTTP ${res.status}`);
       }
 
-      const data = await res.json() as {
+      const data = (await res.json()) as {
         text: string;
         language?: string;
         segments?: Array<{ start: number; end: number; text: string }>;
       };
 
-      const segments: WhisperSegment[] = (data.segments ?? []).map((s, idx) => ({
-        id: idx,
-        start: s.start,
-        end: s.end,
-        text: s.text.trim(),
-      }));
+      const segments: WhisperSegment[] = (data.segments ?? []).map(
+        (s, idx) => ({
+          id: idx,
+          start: s.start,
+          end: s.end,
+          text: s.text.trim(),
+        })
+      );
 
       return { text: data.text, language: data.language ?? language, segments };
     } catch (err) {
       this.logger.error('Local Whisper transcription failed', err);
-      throw new InternalServerErrorException('Local Whisper transcription failed');
+      throw new InternalServerErrorException(
+        'Local Whisper transcription failed'
+      );
     }
   }
 }

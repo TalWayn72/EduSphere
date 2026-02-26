@@ -20,16 +20,24 @@ import type { SupportedLocale } from '@edusphere/i18n';
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
 export function SettingsPage() {
   const { t } = useTranslation('settings');
-  const { locale, setLocale, isSaving, availableLocales } = useUserPreferences();
-  const { stats, isLoading: storageLoading, clearLocalStorage } = useStorageManager();
+  const { locale, setLocale, isSaving, availableLocales } =
+    useUserPreferences();
+  const {
+    stats,
+    isLoading: storageLoading,
+    clearLocalStorage,
+  } = useStorageManager();
 
-  const handleLocaleChange = async (newLocale: SupportedLocale): Promise<void> => {
+  const handleLocaleChange = async (
+    newLocale: SupportedLocale
+  ): Promise<void> => {
     try {
       await setLocale(newLocale);
       toast.success(t('language.saved'));
@@ -43,12 +51,14 @@ export function SettingsPage() {
     toast.success(t('storage.freedBytes', { bytes: formatBytes(freed) }));
   };
 
-  const usagePercent = stats ? Math.min(Math.round(stats.usageRatio * 100), 100) : 0;
+  const usagePercent = stats
+    ? Math.min(Math.round(stats.usageRatio * 100), 100)
+    : 0;
   const barColor = stats?.isOverLimit
     ? 'bg-destructive'
     : stats?.isApproachingLimit
-    ? 'bg-yellow-500'
-    : 'bg-primary';
+      ? 'bg-yellow-500'
+      : 'bg-primary';
 
   return (
     <Layout>
@@ -70,7 +80,9 @@ export function SettingsPage() {
               availableLocales={availableLocales}
             />
             {isSaving && (
-              <p className="text-xs text-muted-foreground mt-2">{t('language.saving')}</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {t('language.saving')}
+              </p>
             )}
           </CardContent>
         </Card>
@@ -105,12 +117,13 @@ export function SettingsPage() {
                     <Progress value={usagePercent} className={barColor} />
                     <div className="flex justify-between text-xs text-muted-foreground tabular-nums">
                       <span>
-                        {formatBytes(stats?.eduSphereUsedBytes ?? 0)}
-                        {' '}{t('storage.used')}
+                        {formatBytes(stats?.eduSphereUsedBytes ?? 0)}{' '}
+                        {t('storage.used')}
                       </span>
                       <span>
-                        {t('storage.limitOf')} {formatBytes(stats?.eduSphereQuotaBytes ?? 0)}
-                        {' '}({usagePercent}%)
+                        {t('storage.limitOf')}{' '}
+                        {formatBytes(stats?.eduSphereQuotaBytes ?? 0)} (
+                        {usagePercent}%)
                       </span>
                     </div>
                   </div>

@@ -12,25 +12,34 @@ const GRAPH_NAME = graphConfig.graphName;
 export class CypherPersonService {
   async findPersonById(id: string, tenantId: string): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `MATCH (p:Person {id: $id, tenant_id: $tenantId}) RETURN p`,
-      { id, tenantId }, tenantId,
+      { id, tenantId },
+      tenantId
     );
     return result[0] || null;
   }
 
   async findPersonByName(name: string, tenantId: string): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `MATCH (p:Person {name: $name, tenant_id: $tenantId}) RETURN p`,
-      { name, tenantId }, tenantId,
+      { name, tenantId },
+      tenantId
     );
     return result[0] || null;
   }
 
-  async createPerson(name: string, bio: string | null, tenantId: string): Promise<unknown> {
+  async createPerson(
+    name: string,
+    bio: string | null,
+    tenantId: string
+  ): Promise<unknown> {
     const result = await executeCypher(
-      db, GRAPH_NAME,
+      db,
+      GRAPH_NAME,
       `CREATE (p:Person {
         id: gen_random_uuid()::text,
         tenant_id: $tenantId,
@@ -39,7 +48,8 @@ export class CypherPersonService {
         created_at: timestamp(),
         updated_at: timestamp()
       }) RETURN p`,
-      { tenantId, name, bio: bio ?? null }, tenantId,
+      { tenantId, name, bio: bio ?? null },
+      tenantId
     );
     return result[0];
   }

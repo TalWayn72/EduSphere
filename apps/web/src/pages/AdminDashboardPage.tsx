@@ -47,12 +47,42 @@ export interface AdminOverviewData {
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 
 const QUICK_LINKS = [
-  { to: '/admin/branding', icon: Palette, label: 'Branding', desc: 'Logos, colors, themes' },
-  { to: '/admin/users', icon: Users, label: 'Users', desc: 'Manage learners and admins' },
-  { to: '/admin/compliance', icon: ClipboardCheck, label: 'Compliance', desc: 'Reports and deadlines' },
-  { to: '/admin/gamification', icon: Trophy, label: 'Gamification', desc: 'Points, badges, leaderboards' },
-  { to: '/admin/security', icon: Lock, label: 'Security', desc: 'MFA, SSO, session policy' },
-  { to: '/admin/audit', icon: ScrollText, label: 'Audit Log', desc: 'Admin action history' },
+  {
+    to: '/admin/branding',
+    icon: Palette,
+    label: 'Branding',
+    desc: 'Logos, colors, themes',
+  },
+  {
+    to: '/admin/users',
+    icon: Users,
+    label: 'Users',
+    desc: 'Manage learners and admins',
+  },
+  {
+    to: '/admin/compliance',
+    icon: ClipboardCheck,
+    label: 'Compliance',
+    desc: 'Reports and deadlines',
+  },
+  {
+    to: '/admin/gamification',
+    icon: Trophy,
+    label: 'Gamification',
+    desc: 'Points, badges, leaderboards',
+  },
+  {
+    to: '/admin/security',
+    icon: Lock,
+    label: 'Security',
+    desc: 'MFA, SSO, session policy',
+  },
+  {
+    to: '/admin/audit',
+    icon: ScrollText,
+    label: 'Audit Log',
+    desc: 'Admin action history',
+  },
 ];
 
 export function AdminDashboardPage() {
@@ -89,9 +119,7 @@ export function AdminDashboardPage() {
         </Card>
       )}
 
-      {data && (
-        <AdminStatCards overview={data.adminOverview} />
-      )}
+      {data && <AdminStatCards overview={data.adminOverview} />}
 
       {/* Quick Links */}
       <div className="mt-8">

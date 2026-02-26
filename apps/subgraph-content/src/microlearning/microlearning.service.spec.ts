@@ -9,15 +9,27 @@ vi.mock('@edusphere/db', () => {
     createDatabaseConnection: vi.fn(() => ({})),
     closeAllPools: vi.fn(),
     schema: {
-      microlearningPaths: {} as ReturnType<typeof import('@edusphere/db')['schema']['microlearningPaths']>,
+      microlearningPaths: {} as ReturnType<
+        (typeof import('@edusphere/db'))['schema']['microlearningPaths']
+      >,
     },
     eq: vi.fn(),
     and: vi.fn(),
-    withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => fn({})),
+    withTenantContext: vi.fn(
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (tx: unknown) => Promise<unknown>
+      ) => fn({})
+    ),
   };
 });
 
-const CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' } as const;
+const CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'STUDENT',
+} as const;
 
 describe('MicrolearningService', () => {
   let service: MicrolearningService;
@@ -30,11 +42,15 @@ describe('MicrolearningService', () => {
   // ─── validateMicrolessonContent ─────────────────────────────────────────
 
   it('throws BadRequestException when content is null', () => {
-    expect(() => service.validateMicrolessonContent(null)).toThrow(BadRequestException);
+    expect(() => service.validateMicrolessonContent(null)).toThrow(
+      BadRequestException
+    );
   });
 
   it('throws BadRequestException when content is not valid JSON', () => {
-    expect(() => service.validateMicrolessonContent('not json')).toThrow(BadRequestException);
+    expect(() => service.validateMicrolessonContent('not json')).toThrow(
+      BadRequestException
+    );
   });
 
   it('throws BadRequestException when durationSeconds exceeds 420', () => {
@@ -44,7 +60,9 @@ describe('MicrolearningService', () => {
       body: 'Body text',
       durationSeconds: MICROLESSON_MAX_DURATION_SECONDS + 1,
     });
-    expect(() => service.validateMicrolessonContent(content)).toThrow(BadRequestException);
+    expect(() => service.validateMicrolessonContent(content)).toThrow(
+      BadRequestException
+    );
   });
 
   it('throws when durationSeconds equals exactly 421', () => {
@@ -54,7 +72,9 @@ describe('MicrolearningService', () => {
       body: 'Body',
       durationSeconds: 421,
     });
-    expect(() => service.validateMicrolessonContent(content)).toThrow(BadRequestException);
+    expect(() => service.validateMicrolessonContent(content)).toThrow(
+      BadRequestException
+    );
   });
 
   it('does NOT throw for valid content at exactly 420 seconds', () => {
@@ -90,7 +110,9 @@ describe('MicrolearningService', () => {
       body: 'Body',
       durationSeconds: 60,
     });
-    expect(() => service.validateMicrolessonContent(content)).toThrow(BadRequestException);
+    expect(() => service.validateMicrolessonContent(content)).toThrow(
+      BadRequestException
+    );
   });
 
   // ─── MICROLESSON_MAX_DURATION_SECONDS constant ───────────────────────────
@@ -125,8 +147,12 @@ describe('MicrolearningService', () => {
   it('getDailyLesson returns null when first path has no items', async () => {
     vi.spyOn(service, 'listPaths').mockResolvedValue([
       {
-        id: 'path-1', title: 'Empty Path', topicClusterId: null,
-        contentItemIds: [], itemCount: 0, createdAt: new Date().toISOString(),
+        id: 'path-1',
+        title: 'Empty Path',
+        topicClusterId: null,
+        contentItemIds: [],
+        itemCount: 0,
+        createdAt: new Date().toISOString(),
       },
     ]);
     const result = await service.getDailyLesson(CTX);
@@ -137,7 +163,7 @@ describe('MicrolearningService', () => {
 
   it('createPath throws BadRequestException for empty contentItemIds', async () => {
     await expect(
-      service.createPath({ title: 'My Path', contentItemIds: [] }, CTX),
+      service.createPath({ title: 'My Path', contentItemIds: [] }, CTX)
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -145,8 +171,8 @@ describe('MicrolearningService', () => {
     await expect(
       service.createPath(
         { title: '', contentItemIds: ['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'] },
-        CTX,
-      ),
+        CTX
+      )
     ).rejects.toThrow(BadRequestException);
   });
 });

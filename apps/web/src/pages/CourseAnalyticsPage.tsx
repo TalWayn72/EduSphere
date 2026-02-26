@@ -10,8 +10,21 @@ import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { COURSE_ANALYTICS_QUERY, AT_RISK_LEARNERS_QUERY, RESOLVE_AT_RISK_FLAG_MUTATION } from '@/lib/graphql/content-tier3.queries';
-import { ArrowLeft, Users, Activity, TrendingUp, Star, Loader2, AlertCircle, AlertTriangle } from 'lucide-react';
+import {
+  COURSE_ANALYTICS_QUERY,
+  AT_RISK_LEARNERS_QUERY,
+  RESOLVE_AT_RISK_FLAG_MUTATION,
+} from '@/lib/graphql/content-tier3.queries';
+import {
+  ArrowLeft,
+  Users,
+  Activity,
+  TrendingUp,
+  Star,
+  Loader2,
+  AlertCircle,
+  AlertTriangle,
+} from 'lucide-react';
 import { AnalyticsCharts } from './CourseAnalyticsPage.charts';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { AtRiskLearnersTable } from '@/components/AtRiskLearnersTable';
@@ -67,7 +80,9 @@ function StatCard({ icon, label, value, sub }: StatCardProps) {
     <Card>
       <CardHeader className="pb-2 flex flex-row items-center gap-3">
         <span className="text-primary">{icon}</span>
-        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {label}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-2xl font-bold">{value}</p>
@@ -150,7 +165,12 @@ export function CourseAnalyticsPage() {
     <Layout>
       <div className="max-w-5xl mx-auto space-y-6 p-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate(`/courses/${courseId}`)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2"
+            onClick={() => navigate(`/courses/${courseId}`)}
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to Course
           </Button>
@@ -159,8 +179,16 @@ export function CourseAnalyticsPage() {
 
         {/* Stat cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard icon={<Users className="h-4 w-4" />} label="Enrolled" value={a.enrollmentCount} />
-          <StatCard icon={<Activity className="h-4 w-4" />} label="Active (7d)" value={a.activeLearnersLast7Days} />
+          <StatCard
+            icon={<Users className="h-4 w-4" />}
+            label="Enrolled"
+            value={a.enrollmentCount}
+          />
+          <StatCard
+            icon={<Activity className="h-4 w-4" />}
+            label="Active (7d)"
+            value={a.activeLearnersLast7Days}
+          />
           <StatCard
             icon={<TrendingUp className="h-4 w-4" />}
             label="Completion Rate"

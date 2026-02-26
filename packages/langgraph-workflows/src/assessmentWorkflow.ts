@@ -37,9 +37,18 @@ export type AssessmentState = z.infer<typeof AssessmentStateSchema>;
 export type AssessmentResult = z.infer<typeof AssessmentResultSchema>;
 
 const AssessmentStateAnnotation = Annotation.Root({
-  submissions: Annotation<AssessmentState['submissions']>({ value: (_, u) => u, default: () => [] }),
-  evaluations: Annotation<AssessmentState['evaluations']>({ value: (_, u) => u, default: () => [] }),
-  overallAssessment: Annotation<AssessmentResult | undefined>({ value: (_, u) => u, default: () => undefined }),
+  submissions: Annotation<AssessmentState['submissions']>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
+  evaluations: Annotation<AssessmentState['evaluations']>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
+  overallAssessment: Annotation<AssessmentResult | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
@@ -79,7 +88,10 @@ export class AssessmentWorkflow {
       const { text } = await generateText({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         model: openai(this.model) as any,
-        system: injectLocale('You are an expert educational assessor providing fair and constructive feedback.', this.locale),
+        system: injectLocale(
+          'You are an expert educational assessor providing fair and constructive feedback.',
+          this.locale
+        ),
         prompt: `Evaluate this student answer:
 
 Question: "${submission.question}"
@@ -120,7 +132,10 @@ Feedback: [detailed feedback]`,
     const { object } = await generateObject({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       model: openai(this.model) as any,
-      system: injectLocale('You are an expert educational assessor providing fair and constructive feedback.', this.locale),
+      system: injectLocale(
+        'You are an expert educational assessor providing fair and constructive feedback.',
+        this.locale
+      ),
       schema: AssessmentResultSchema,
       prompt: `Based on these evaluations:
 
@@ -150,6 +165,9 @@ Synthesize an overall assessment with:
   }
 }
 
-export function createAssessmentWorkflow(model?: string, locale: string = 'en'): AssessmentWorkflow {
+export function createAssessmentWorkflow(
+  model?: string,
+  locale: string = 'en'
+): AssessmentWorkflow {
   return new AssessmentWorkflow(model, locale);
 }

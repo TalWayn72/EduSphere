@@ -90,13 +90,18 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            {open
-              ? <ChevronDown className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-              : <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />}
-            <CardTitle className="text-base font-semibold truncate">{mod.title}</CardTitle>
+            {open ? (
+              <ChevronDown className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            )}
+            <CardTitle className="text-base font-semibold truncate">
+              {mod.title}
+            </CardTitle>
           </div>
           <span className="text-xs text-muted-foreground shrink-0">
-            {mod.contentItems.length} item{mod.contentItems.length !== 1 ? 's' : ''}
+            {mod.contentItems.length} item
+            {mod.contentItems.length !== 1 ? 's' : ''}
           </span>
         </div>
       </CardHeader>
@@ -104,7 +109,9 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
       {open && (
         <CardContent className="pt-0 pb-2">
           {mod.contentItems.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-2 px-2">{t('noContentItems')}</p>
+            <p className="text-xs text-muted-foreground py-2 px-2">
+              {t('noContentItems')}
+            </p>
           ) : (
             <ul className="space-y-1">
               {mod.contentItems.map((item) => (
@@ -115,7 +122,9 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
                     onClick={() => navigateToItem(item.id)}
                   >
                     <ContentTypeIcon type={item.contentType} />
-                    <span className="flex-1 truncate text-left">{item.title}</span>
+                    <span className="flex-1 truncate text-left">
+                      {item.title}
+                    </span>
                     {item.duration && (
                       <span className="text-xs text-muted-foreground shrink-0">
                         {formatDuration(item.duration)}
@@ -151,7 +160,12 @@ export function CourseModuleList({ modules, courseId }: Props) {
     <div className="space-y-3">
       <h2 className="text-lg font-semibold">{t('courseContent')}</h2>
       {sorted.map((mod, idx) => (
-        <ModuleCard key={mod.id} mod={mod} defaultOpen={idx === 0} courseId={courseId} />
+        <ModuleCard
+          key={mod.id}
+          mod={mod}
+          defaultOpen={idx === 0}
+          courseId={courseId}
+        />
       ))}
     </div>
   );

@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -21,11 +26,11 @@ export interface UserPreferences {
 export function parsePreferences(raw: unknown): UserPreferences {
   const r = (raw as Record<string, unknown>) ?? {};
   return {
-    locale:             (r['locale']             as string)  ?? 'en',
-    theme:              (r['theme']              as string)  ?? 'system',
+    locale: (r['locale'] as string) ?? 'en',
+    theme: (r['theme'] as string) ?? 'system',
     emailNotifications: (r['emailNotifications'] as boolean) ?? true,
-    pushNotifications:  (r['pushNotifications']  as boolean) ?? true,
-    isPublicProfile:    (r['isPublicProfile']    as boolean) ?? false,
+    pushNotifications: (r['pushNotifications'] as boolean) ?? true,
+    isPublicProfile: (r['isPublicProfile'] as boolean) ?? false,
   };
 }
 
@@ -45,15 +50,20 @@ export class UserPreferencesService implements OnModuleDestroy {
   private toTenantContext(authContext: AuthContext) {
     return {
       tenantId: authContext.tenantId || '',
-      userId:   authContext.userId,
-      userRole: (authContext.roles[0] || 'STUDENT') as 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER',
+      userId: authContext.userId,
+      userRole: (authContext.roles[0] || 'STUDENT') as
+        | 'SUPER_ADMIN'
+        | 'ORG_ADMIN'
+        | 'INSTRUCTOR'
+        | 'STUDENT'
+        | 'RESEARCHER',
     };
   }
 
   async updatePreferences(
     id: string,
     input: UpdateUserPreferencesInput,
-    authContext: AuthContext,
+    authContext: AuthContext
   ) {
     const tenantCtx = this.toTenantContext(authContext);
 
@@ -71,11 +81,12 @@ export class UserPreferencesService implements OnModuleDestroy {
       const current = parsePreferences(existing.preferences);
 
       const merged: UserPreferences = {
-        locale:             input.locale             ?? current.locale,
-        theme:              input.theme              ?? current.theme,
-        emailNotifications: input.emailNotifications ?? current.emailNotifications,
-        pushNotifications:  input.pushNotifications  ?? current.pushNotifications,
-        isPublicProfile:    current.isPublicProfile,
+        locale: input.locale ?? current.locale,
+        theme: input.theme ?? current.theme,
+        emailNotifications:
+          input.emailNotifications ?? current.emailNotifications,
+        pushNotifications: input.pushNotifications ?? current.pushNotifications,
+        isPublicProfile: current.isPublicProfile,
       };
 
       const [updated] = await tx
@@ -90,7 +101,7 @@ export class UserPreferencesService implements OnModuleDestroy {
 
       this.logger.debug(
         { userId: id, tenantId: authContext.tenantId },
-        'updatePreferences committed',
+        'updatePreferences committed'
       );
 
       return updated;
@@ -100,7 +111,7 @@ export class UserPreferencesService implements OnModuleDestroy {
   async updateProfileVisibility(
     id: string,
     isPublic: boolean,
-    authContext: AuthContext,
+    authContext: AuthContext
   ): Promise<UserPreferences> {
     const tenantCtx = this.toTenantContext(authContext);
 
@@ -130,7 +141,7 @@ export class UserPreferencesService implements OnModuleDestroy {
 
       this.logger.log(
         { userId: id, isPublic },
-        'updateProfileVisibility committed',
+        'updateProfileVisibility committed'
       );
 
       return parsePreferences(updated.preferences);

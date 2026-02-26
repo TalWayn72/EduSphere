@@ -53,7 +53,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,12 +62,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@10.30.1
 
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-
 
       - name: Start NATS JetStream
         run: |
@@ -101,19 +98,19 @@ jobs:
 
       - name: Generate database schema
         run: pnpm --filter @edusphere/db generate
-        continue-on-error: true  # Apache AGE not available in pgvector CI image
+        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
-        continue-on-error: true  # Apache AGE not available in pgvector CI image
+        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Seed test data
         run: pnpm --filter @edusphere/db seed
-        continue-on-error: true  # Seed depends on AGE migration; skip if migration skipped
+        continue-on-error: true # Seed depends on AGE migration; skip if migration skipped
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
           NODE_ENV: test
@@ -165,7 +162,6 @@ jobs:
 
       - name: Install pnpm
         run: npm install -g pnpm@10.30.1
-
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -230,7 +226,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-
     strategy:
       fail-fast: false
       matrix:
@@ -251,12 +246,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@10.30.1
 
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-
 
       - name: Start NATS JetStream
         run: |
@@ -287,13 +280,13 @@ jobs:
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
-        continue-on-error: true  # Apache AGE not available in pgvector CI image
+        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Seed test data
         run: pnpm --filter @edusphere/db seed
-        continue-on-error: true  # Seed depends on AGE migration; skip if migration skipped
+        continue-on-error: true # Seed depends on AGE migration; skip if migration skipped
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
           NODE_ENV: test
@@ -314,7 +307,6 @@ jobs:
           path: apps/${{ matrix.package }}/test-results
           retention-days: 7
 
-
   # Consumer contract tests - validate frontend GraphQL ops against supergraph
   contract-tests:
     name: Contract Tests (Schema + Entity References)
@@ -327,7 +319,6 @@ jobs:
 
       - name: Install pnpm
         run: npm install -g pnpm@10.30.1
-
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

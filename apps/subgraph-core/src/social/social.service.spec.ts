@@ -26,8 +26,8 @@ vi.mock('@edusphere/db', () => ({
       tenantId: 'tenant_id',
     },
   },
-  withTenantContext: vi.fn(async (_d: unknown, _c: unknown, fn: (t: unknown) => unknown) =>
-    fn(mockTx),
+  withTenantContext: vi.fn(
+    async (_d: unknown, _c: unknown, fn: (t: unknown) => unknown) => fn(mockTx)
   ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   eq: vi.fn((a: unknown, b: unknown) => ({ eq: [a, b] })),
@@ -35,7 +35,9 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 vi.mock('nats', () => ({ connect: vi.fn().mockResolvedValue(mockNatsConn) }));
-vi.mock('@edusphere/nats-client', () => ({ buildNatsOptions: vi.fn(() => ({})) }));
+vi.mock('@edusphere/nats-client', () => ({
+  buildNatsOptions: vi.fn(() => ({})),
+}));
 
 import { SocialService } from './social.service';
 
@@ -66,7 +68,11 @@ describe('SocialService', () => {
     });
     setupSelect([]);
 
-    const result = await service.followUser('follower1', 'following1', 'tenant1');
+    const result = await service.followUser(
+      'follower1',
+      'following1',
+      'tenant1'
+    );
     expect(result).toBe(true);
     expect(mockTx.insert).toHaveBeenCalled();
   });
@@ -151,14 +157,27 @@ describe('SocialService', () => {
         where: vi.fn().mockReturnValue({
           limit: vi.fn().mockImplementation(async () => {
             callCount++;
-            if (callCount === 1) return [{ followerId: 'u1' }, { followerId: 'u2' }, { followerId: 'u3' }];
-            return [{ followerId: 'u2' }, { followerId: 'u3' }, { followerId: 'u4' }];
+            if (callCount === 1)
+              return [
+                { followerId: 'u1' },
+                { followerId: 'u2' },
+                { followerId: 'u3' },
+              ];
+            return [
+              { followerId: 'u2' },
+              { followerId: 'u3' },
+              { followerId: 'u4' },
+            ];
           }),
         }),
       }),
     }));
 
-    const result = await service.getMutualFollowers('user1', 'user2', 'tenant1');
+    const result = await service.getMutualFollowers(
+      'user1',
+      'user2',
+      'tenant1'
+    );
     expect(result).toContain('u2');
     expect(result).toContain('u3');
     expect(result).not.toContain('u1');

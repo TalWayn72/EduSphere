@@ -5,7 +5,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Mocks ───────────────────────────────────────────────────────────────────
 vi.mock('expo-network', () => ({
-  getNetworkStateAsync: vi.fn().mockResolvedValue({ isConnected: true, isInternetReachable: true }),
+  getNetworkStateAsync: vi
+    .fn()
+    .mockResolvedValue({ isConnected: true, isInternetReachable: true }),
 }));
 
 vi.mock('../OfflineQueue', () => ({
@@ -31,14 +33,20 @@ afterEach(() => {
 describe('SyncEngine — lifecycle', () => {
   it('dispose() clears the interval (memory-safe)', () => {
     const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => 'token');
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => 'token'
+    );
     engine.start();
     engine.dispose();
     expect(clearIntervalSpy).toHaveBeenCalled();
   });
 
   it('status listener receives idle after dispose', () => {
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => null);
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => null
+    );
     const listener = vi.fn();
     engine.addStatusListener(listener);
     engine.start();
@@ -50,7 +58,10 @@ describe('SyncEngine — lifecycle', () => {
   });
 
   it('addStatusListener returns unsubscribe function', () => {
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => null);
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => null
+    );
     const listener = vi.fn();
     const unsub = engine.addStatusListener(listener);
     unsub();
@@ -63,10 +74,16 @@ describe('SyncEngine — lifecycle', () => {
 describe('SyncEngine — offline behaviour', () => {
   it('does not attempt sync when offline', async () => {
     const { getNetworkStateAsync } = await import('expo-network');
-    (getNetworkStateAsync as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ isConnected: false, isInternetReachable: false });
+    (getNetworkStateAsync as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      isConnected: false,
+      isInternetReachable: false,
+    });
 
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const engine = new SyncEngine('http://localhost:4000/graphql', async () => 'token');
+    const engine = new SyncEngine(
+      'http://localhost:4000/graphql',
+      async () => 'token'
+    );
     engine.start();
     await vi.runAllTimersAsync();
     engine.dispose();

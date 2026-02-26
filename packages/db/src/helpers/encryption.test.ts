@@ -40,13 +40,17 @@ describe('deriveTenantKey', () => {
   it('throws if ENCRYPTION_MASTER_KEY is not set', () => {
     const saved = process.env['ENCRYPTION_MASTER_KEY'];
     delete process.env['ENCRYPTION_MASTER_KEY'];
-    expect(() => deriveTenantKey(TEST_TENANT_ID)).toThrow('ENCRYPTION_MASTER_KEY');
+    expect(() => deriveTenantKey(TEST_TENANT_ID)).toThrow(
+      'ENCRYPTION_MASTER_KEY'
+    );
     process.env['ENCRYPTION_MASTER_KEY'] = saved;
   });
 
   it('throws if ENCRYPTION_MASTER_KEY is too short', () => {
     process.env['ENCRYPTION_MASTER_KEY'] = 'short';
-    expect(() => deriveTenantKey(TEST_TENANT_ID)).toThrow('ENCRYPTION_MASTER_KEY');
+    expect(() => deriveTenantKey(TEST_TENANT_ID)).toThrow(
+      'ENCRYPTION_MASTER_KEY'
+    );
     process.env['ENCRYPTION_MASTER_KEY'] = TEST_MASTER_KEY;
   });
 });
@@ -91,7 +95,8 @@ describe('encryptField / decryptField', () => {
     // XOR the last byte with 0xff to guarantee the byte value changes
     const hex = parts[2]!;
     const lastByte = parseInt(hex.slice(-2), 16) ^ 0xff;
-    const tamperedHex = hex.slice(0, -2) + lastByte.toString(16).padStart(2, '0');
+    const tamperedHex =
+      hex.slice(0, -2) + lastByte.toString(16).padStart(2, '0');
     const tampered = `${parts[0]}:${parts[1]}:${tamperedHex}`;
     expect(() => decryptField(tampered, tenantKey)).toThrow();
   });
@@ -104,7 +109,7 @@ describe('encryptField / decryptField', () => {
 
   it('throws on malformed ciphertext', () => {
     expect(() => decryptField('not-valid-format', tenantKey)).toThrow(
-      'Invalid encrypted field format',
+      'Invalid encrypted field format'
     );
   });
 

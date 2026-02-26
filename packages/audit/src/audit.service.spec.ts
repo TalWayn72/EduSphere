@@ -30,7 +30,7 @@ describe('AuditService', () => {
         action: 'CREATE',
         resourceType: 'ANNOTATION',
         status: 'SUCCESS',
-      }),
+      })
     ).resolves.not.toThrow();
   });
 
@@ -44,7 +44,7 @@ describe('AuditService', () => {
       service.log({
         tenantId: 'tenant-1',
         action: 'DELETE',
-      }),
+      })
     ).resolves.not.toThrow();
   });
 
@@ -62,7 +62,7 @@ describe('AuditService', () => {
         requestId: 'req-123',
         status: 'SUCCESS',
         metadata: { gdprArticle: '17' },
-      }),
+      })
     ).resolves.not.toThrow();
   });
 });

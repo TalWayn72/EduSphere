@@ -25,11 +25,17 @@ export class LtiResolver {
     if (!auth?.userId || !auth?.tenantId) {
       throw new UnauthorizedException('Authentication required');
     }
-    return { userId: auth.userId, tenantId: auth.tenantId, roles: auth.roles ?? [] };
+    return {
+      userId: auth.userId,
+      tenantId: auth.tenantId,
+      roles: auth.roles ?? [],
+    };
   }
 
   @Query('ltiPlatforms')
-  async ltiPlatforms(@Context() ctx: GraphQLContext): Promise<LtiPlatformDto[]> {
+  async ltiPlatforms(
+    @Context() ctx: GraphQLContext
+  ): Promise<LtiPlatformDto[]> {
     const { tenantId } = this.requireAuth(ctx);
     return this.ltiService.getPlatforms(tenantId);
   }
@@ -37,7 +43,7 @@ export class LtiResolver {
   @Mutation('registerLtiPlatform')
   async registerLtiPlatform(
     @Args('input') input: RegisterLtiPlatformInput,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<LtiPlatformDto> {
     const { tenantId, userId } = this.requireAuth(ctx);
     this.logger.log('registerLtiPlatform by userId=' + userId);
@@ -48,10 +54,17 @@ export class LtiResolver {
   async toggleLtiPlatform(
     @Args('id') id: string,
     @Args('isActive') isActive: boolean,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ): Promise<LtiPlatformDto> {
     const { tenantId, userId } = this.requireAuth(ctx);
-    this.logger.log('toggleLtiPlatform id=' + id + ' isActive=' + String(isActive) + ' by userId=' + userId);
+    this.logger.log(
+      'toggleLtiPlatform id=' +
+        id +
+        ' isActive=' +
+        String(isActive) +
+        ' by userId=' +
+        userId
+    );
     return this.ltiService.togglePlatform(id, tenantId, isActive);
   }
 }

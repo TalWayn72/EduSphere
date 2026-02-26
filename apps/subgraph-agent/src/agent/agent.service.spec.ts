@@ -75,7 +75,11 @@ const MOCK_AGENT_DEF = {
 function makeSelectChain(resolvedValue: unknown[]) {
   const limit = vi.fn().mockResolvedValue(resolvedValue);
   const orderBy = vi.fn().mockReturnValue({ limit });
-  const where = vi.fn().mockReturnValue({ limit, orderBy, returning: vi.fn().mockResolvedValue(resolvedValue) });
+  const where = vi.fn().mockReturnValue({
+    limit,
+    orderBy,
+    returning: vi.fn().mockResolvedValue(resolvedValue),
+  });
   const from = vi.fn().mockReturnValue({ where, orderBy, limit });
   const select = vi.fn().mockReturnValue({ from });
   return { select, from, where, orderBy, limit };
@@ -89,12 +93,17 @@ describe('AgentService', () => {
 
     // Set up a generic select chain for each test
     const chain = makeSelectChain([MOCK_EXECUTION]);
-    mockSelect.mockImplementation(chain.select.getMockImplementation() ?? (() => ({ from: chain.from })));
+    mockSelect.mockImplementation(
+      chain.select.getMockImplementation() ?? (() => ({ from: chain.from }))
+    );
     mockSelect.mockReturnValue({ from: chain.from });
 
     // update chain: update().set().where().returning()
     const mockReturningFn = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
-    const mockWhereFn = vi.fn().mockReturnValue({ returning: mockReturningFn, limit: vi.fn().mockResolvedValue([MOCK_EXECUTION]) });
+    const mockWhereFn = vi.fn().mockReturnValue({
+      returning: mockReturningFn,
+      limit: vi.fn().mockResolvedValue([MOCK_EXECUTION]),
+    });
     const mockSetFn = vi.fn().mockReturnValue({ where: mockWhereFn });
     mockUpdate.mockReturnValue({ set: mockSetFn });
 
@@ -144,7 +153,9 @@ describe('AgentService', () => {
     it('applies the specified limit', async () => {
       const limitFn = vi.fn().mockResolvedValue([]);
       const orderByFn = vi.fn().mockReturnValue({ limit: limitFn });
-      const whereFn = vi.fn().mockReturnValue({ orderBy: orderByFn, limit: vi.fn() });
+      const whereFn = vi
+        .fn()
+        .mockReturnValue({ orderBy: orderByFn, limit: vi.fn() });
       const fromFn = vi.fn().mockReturnValue({ where: whereFn });
       mockSelect.mockReturnValue({ from: fromFn });
       await service.findByUser('user-1', 5);
@@ -154,7 +165,9 @@ describe('AgentService', () => {
     it('orders by started_at descending (calls orderBy)', async () => {
       const limitFn = vi.fn().mockResolvedValue([]);
       const orderByFn = vi.fn().mockReturnValue({ limit: limitFn });
-      const whereFn = vi.fn().mockReturnValue({ orderBy: orderByFn, limit: vi.fn() });
+      const whereFn = vi
+        .fn()
+        .mockReturnValue({ orderBy: orderByFn, limit: vi.fn() });
       const fromFn = vi.fn().mockReturnValue({ where: whereFn });
       mockSelect.mockReturnValue({ from: fromFn });
       await service.findByUser('user-1', 20);
@@ -175,7 +188,9 @@ describe('AgentService', () => {
     it('passes limit to query', async () => {
       const limitFn = vi.fn().mockResolvedValue([]);
       const orderByFn = vi.fn().mockReturnValue({ limit: limitFn });
-      const whereFn = vi.fn().mockReturnValue({ orderBy: orderByFn, limit: vi.fn() });
+      const whereFn = vi
+        .fn()
+        .mockReturnValue({ orderBy: orderByFn, limit: vi.fn() });
       const fromFn = vi.fn().mockReturnValue({ where: whereFn });
       mockSelect.mockReturnValue({ from: fromFn });
       await service.findByAgent('agent-1', 15);
@@ -210,7 +225,10 @@ describe('AgentService', () => {
   describe('startExecution()', () => {
     beforeEach(() => {
       // processExecution runs async; mock its DB calls to succeed silently
-      mockAIService.execute.mockResolvedValue({ text: 'AI response', usage: {} });
+      mockAIService.execute.mockResolvedValue({
+        text: 'AI response',
+        usage: {},
+      });
 
       // The select chain inside processExecution (findById then agent def lookup)
       const execLimit = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
@@ -239,7 +257,11 @@ describe('AgentService', () => {
         return { returning };
       });
       mockInsert.mockReturnValue({ values });
-      await service.startExecution({ agentId: 'agent-1', userId: 'user-1', input: {} });
+      await service.startExecution({
+        agentId: 'agent-1',
+        userId: 'user-1',
+        input: {},
+      });
       expect(capturedValues.status).toBe('QUEUED');
     });
 
@@ -251,7 +273,11 @@ describe('AgentService', () => {
         return { returning };
       });
       mockInsert.mockReturnValue({ values });
-      await service.startExecution({ agentId: 'agent-42', userId: 'user-1', input: {} });
+      await service.startExecution({
+        agentId: 'agent-42',
+        userId: 'user-1',
+        input: {},
+      });
       expect(capturedValues.agent_id).toBe('agent-42');
     });
 
@@ -263,7 +289,11 @@ describe('AgentService', () => {
         return { returning };
       });
       mockInsert.mockReturnValue({ values });
-      await service.startExecution({ agentId: 'agent-1', userId: 'user-99', input: {} });
+      await service.startExecution({
+        agentId: 'agent-1',
+        userId: 'user-99',
+        input: {},
+      });
       expect(capturedValues.user_id).toBe('user-99');
     });
 
@@ -275,7 +305,11 @@ describe('AgentService', () => {
         return { returning };
       });
       mockInsert.mockReturnValue({ values });
-      await service.startExecution({ agentId: 'agent-1', userId: 'user-1', input: {} });
+      await service.startExecution({
+        agentId: 'agent-1',
+        userId: 'user-1',
+        input: {},
+      });
       expect(capturedValues.metadata).toEqual({});
     });
 
@@ -288,7 +322,12 @@ describe('AgentService', () => {
       });
       mockInsert.mockReturnValue({ values });
       const meta = { courseId: 'course-1' };
-      await service.startExecution({ agentId: 'agent-1', userId: 'user-1', input: {}, metadata: meta });
+      await service.startExecution({
+        agentId: 'agent-1',
+        userId: 'user-1',
+        input: {},
+        metadata: meta,
+      });
       expect(capturedValues.metadata).toEqual(meta);
     });
 
@@ -296,7 +335,11 @@ describe('AgentService', () => {
       const returning = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
       const values = vi.fn().mockReturnValue({ returning });
       mockInsert.mockReturnValue({ values });
-      const result = await service.startExecution({ agentId: 'agent-1', userId: 'user-1', input: {} });
+      const result = await service.startExecution({
+        agentId: 'agent-1',
+        userId: 'user-1',
+        input: {},
+      });
       expect(result).toEqual(MOCK_EXECUTION);
     });
   });
@@ -306,7 +349,9 @@ describe('AgentService', () => {
   describe('cancelExecution()', () => {
     it('updates status to CANCELLED', async () => {
       let capturedSet: any;
-      const returning = vi.fn().mockResolvedValue([{ ...MOCK_EXECUTION, status: 'CANCELLED' }]);
+      const returning = vi
+        .fn()
+        .mockResolvedValue([{ ...MOCK_EXECUTION, status: 'CANCELLED' }]);
       const where = vi.fn().mockReturnValue({ returning });
       const set = vi.fn().mockImplementation((data) => {
         capturedSet = data;
@@ -319,7 +364,9 @@ describe('AgentService', () => {
 
     it('sets completed_at on cancellation', async () => {
       let capturedSet: any;
-      const returning = vi.fn().mockResolvedValue([{ ...MOCK_EXECUTION, status: 'CANCELLED' }]);
+      const returning = vi
+        .fn()
+        .mockResolvedValue([{ ...MOCK_EXECUTION, status: 'CANCELLED' }]);
       const where = vi.fn().mockReturnValue({ returning });
       const set = vi.fn().mockImplementation((data) => {
         capturedSet = data;

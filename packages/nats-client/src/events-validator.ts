@@ -19,7 +19,7 @@ export class EventValidationError extends Error {
 
   constructor(channel: string, payload: unknown, violations: string[]) {
     super(
-      `Invalid NATS event on channel '${channel}': ${violations.join('; ')}`,
+      `Invalid NATS event on channel '${channel}': ${violations.join('; ')}`
     );
     this.name = 'EventValidationError';
     this.channel = channel;
@@ -38,14 +38,14 @@ interface FieldCheck {
 
 function collectViolations(
   _obj: Record<string, unknown>,
-  checks: FieldCheck[],
+  checks: FieldCheck[]
 ): string[] {
   return checks.filter(({ check }) => !check()).map(({ message }) => message);
 }
 
 function assertObject(
   channel: string,
-  payload: unknown,
+  payload: unknown
 ): Record<string, unknown> {
   if (!payload || typeof payload !== 'object') {
     throw new EventValidationError(channel, payload, [
@@ -87,7 +87,7 @@ const CONTENT_TYPES = [
 ] as const;
 
 export function validateAgentSessionEvent(
-  payload: unknown,
+  payload: unknown
 ): AgentSessionPayload {
   const obj = assertObject('agent.session.*', payload);
   const violations = collectViolations(obj, [
@@ -127,7 +127,7 @@ export function validateAgentSessionEvent(
 }
 
 export function validateAgentMessageEvent(
-  payload: unknown,
+  payload: unknown
 ): AgentMessagePayload {
   const obj = assertObject('agent.message.*', payload);
   const violations = collectViolations(obj, [

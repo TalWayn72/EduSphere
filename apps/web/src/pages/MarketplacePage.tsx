@@ -1,11 +1,18 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PurchaseCourseButton } from '@/components/PurchaseCourseButton';
 
-const GRAPHQL_URL = import.meta.env['VITE_GRAPHQL_URL'] as string ?? '/graphql';
+const GRAPHQL_URL =
+  (import.meta.env['VITE_GRAPHQL_URL'] as string) ?? '/graphql';
 
 const COURSE_LISTINGS_QUERY = gql`
   query CourseListings {
@@ -76,7 +83,7 @@ export function MarketplacePage() {
   const purchasedCourseIds = new Set(
     (data?.myPurchases ?? [])
       .filter((p) => p.status === 'COMPLETE')
-      .map((p) => p.courseId),
+      .map((p) => p.courseId)
   );
 
   const listings = data?.courseListings ?? [];
@@ -117,7 +124,10 @@ export function MarketplacePage() {
                 </CardContent>
                 <CardFooter>
                   {isPurchased ? (
-                    <Badge variant="secondary" className="w-full justify-center py-2">
+                    <Badge
+                      variant="secondary"
+                      className="w-full justify-center py-2"
+                    >
                       Purchased
                     </Badge>
                   ) : (

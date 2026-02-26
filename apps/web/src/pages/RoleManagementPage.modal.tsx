@@ -7,7 +7,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +19,10 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { PERMISSION_GROUPS, RoleRecord } from '@/lib/graphql/admin-roles.permissions';
+import {
+  PERMISSION_GROUPS,
+  RoleRecord,
+} from '@/lib/graphql/admin-roles.permissions';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -45,28 +52,37 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 export function RoleFormModal({ open, initialRole, onClose, onSave }: Props) {
-  const { register, handleSubmit, watch, setValue, formState: { errors } } =
-    useForm<FormValues>({
-      resolver: zodResolver(schema as unknown as Parameters<typeof zodResolver>[0]),
-      defaultValues: {
-        name: initialRole?.name ?? '',
-        description: initialRole?.description ?? '',
-        permissions: initialRole?.permissions ?? [],
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(
+      schema as unknown as Parameters<typeof zodResolver>[0]
+    ),
+    defaultValues: {
+      name: initialRole?.name ?? '',
+      description: initialRole?.description ?? '',
+      permissions: initialRole?.permissions ?? [],
+    },
+  });
 
   const selected = watch('permissions');
 
   function togglePermission(key: string) {
     setValue(
       'permissions',
-      selected.includes(key) ? selected.filter(p => p !== key) : [...selected, key],
-      { shouldValidate: true },
+      selected.includes(key)
+        ? selected.filter((p) => p !== key)
+        : [...selected, key],
+      { shouldValidate: true }
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={v => !v && onClose()}>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
@@ -78,9 +94,15 @@ export function RoleFormModal({ open, initialRole, onClose, onSave }: Props) {
           <div className="space-y-4 mb-4">
             <div className="space-y-1">
               <Label htmlFor="role-name">Role name</Label>
-              <Input id="role-name" {...register('name')} placeholder="e.g. Content Manager" />
+              <Input
+                id="role-name"
+                {...register('name')}
+                placeholder="e.g. Content Manager"
+              />
               {errors.name && (
-                <p className="text-xs text-destructive">{errors.name.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -99,13 +121,13 @@ export function RoleFormModal({ open, initialRole, onClose, onSave }: Props) {
           <p className="text-sm font-medium mb-2">Permissions</p>
           <ScrollArea className="h-72 pr-3">
             <div className="space-y-4">
-              {PERMISSION_GROUPS.map(group => (
+              {PERMISSION_GROUPS.map((group) => (
                 <div key={group.label}>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
                     {group.label}
                   </p>
                   <div className="grid grid-cols-2 gap-1">
-                    {group.permissions.map(perm => (
+                    {group.permissions.map((perm) => (
                       <label
                         key={perm.key}
                         className="flex items-center gap-2 text-sm cursor-pointer"
@@ -125,8 +147,12 @@ export function RoleFormModal({ open, initialRole, onClose, onSave }: Props) {
         </form>
 
         <DialogFooter className="mt-4">
-          <Button variant="outline" type="button" onClick={onClose}>Cancel</Button>
-          <Button type="submit" form="role-form">Save role</Button>
+          <Button variant="outline" type="button" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" form="role-form">
+            Save role
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

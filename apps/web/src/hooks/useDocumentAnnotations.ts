@@ -15,7 +15,9 @@ const ALL_LAYERS = [
 ];
 
 /** Type guard: annotation has a valid ProseMirror text range */
-function hasTextRange(ann: Annotation): ann is Annotation & { textRange: TextRange } {
+function hasTextRange(
+  ann: Annotation
+): ann is Annotation & { textRange: TextRange } {
   if (ann.textRange) {
     return (
       typeof ann.textRange.from === 'number' &&
@@ -54,7 +56,10 @@ export interface UseDocumentAnnotationsReturn {
 export function useDocumentAnnotations(
   contentId: string
 ): UseDocumentAnnotationsReturn {
-  const { annotations, fetching, error } = useAnnotations(contentId, ALL_LAYERS);
+  const { annotations, fetching, error } = useAnnotations(
+    contentId,
+    ALL_LAYERS
+  );
   const [, createAnnotation] = useMutation(CREATE_ANNOTATION_MUTATION);
 
   // Build text annotation objects for the decoration plugin
@@ -68,7 +73,11 @@ export function useDocumentAnnotations(
     }));
 
   const addTextAnnotation = useCallback(
-    async (text: string, layer: AnnotationLayer, range: { from: number; to: number }) => {
+    async (
+      text: string,
+      layer: AnnotationLayer,
+      range: { from: number; to: number }
+    ) => {
       await createAnnotation({
         input: {
           assetId: contentId,
@@ -84,5 +93,11 @@ export function useDocumentAnnotations(
 
   const allAnnotations = annotations.map(enrichWithTextRange);
 
-  return { allAnnotations, textAnnotations, fetching, error, addTextAnnotation };
+  return {
+    allAnnotations,
+    textAnnotations,
+    fetching,
+    error,
+    addTextAnnotation,
+  };
 }

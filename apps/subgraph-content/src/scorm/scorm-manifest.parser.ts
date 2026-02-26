@@ -44,7 +44,9 @@ function buildResourceMap(resources: unknown): ResourceMap {
   const map: ResourceMap = {};
   if (!resources || typeof resources !== 'object') return map;
   const res = resources as Record<string, unknown>;
-  const list = Array.isArray(res['resource']) ? res['resource'] : [res['resource']];
+  const list = Array.isArray(res['resource'])
+    ? res['resource']
+    : [res['resource']];
   for (const r of list) {
     if (!r || typeof r !== 'object') continue;
     const resource = r as Record<string, unknown>;
@@ -61,7 +63,7 @@ function buildResourceMap(resources: unknown): ResourceMap {
 function collectItems(
   node: unknown,
   resourceMap: ResourceMap,
-  results: ScormItem[],
+  results: ScormItem[]
 ): void {
   if (!node || typeof node !== 'object') return;
   const n = node as Record<string, unknown>;
@@ -77,12 +79,18 @@ function collectItems(
 
   // Map resource reference
   const idref = (n['@_identifierref'] as string | undefined) ?? '';
-  const href = (Object.prototype.hasOwnProperty.call(resourceMap, idref)
-    ? resourceMap[idref as keyof typeof resourceMap]
-    : undefined) ?? '';
+  const href =
+    (Object.prototype.hasOwnProperty.call(resourceMap, idref)
+      ? resourceMap[idref as keyof typeof resourceMap]
+      : undefined) ?? '';
 
   if (identifier && href) {
-    results.push({ identifier, title: title || identifier, resourceHref: href, isVisible });
+    results.push({
+      identifier,
+      title: title || identifier,
+      resourceHref: href,
+      isVisible,
+    });
   }
 
   // Recurse into child items
@@ -110,19 +118,26 @@ export function parseScormManifest(xmlContent: string): ScormManifest {
   try {
     parsed = parser.parse(xmlContent) as Record<string, unknown>;
   } catch (e) {
-    throw new BadRequestException(`Failed to parse imsmanifest.xml: ${String(e)}`);
+    throw new BadRequestException(
+      `Failed to parse imsmanifest.xml: ${String(e)}`
+    );
   }
 
   const manifest = parsed['manifest'] as Record<string, unknown> | undefined;
   if (!manifest) {
-    throw new BadRequestException('imsmanifest.xml is missing <manifest> root element');
+    throw new BadRequestException(
+      'imsmanifest.xml is missing <manifest> root element'
+    );
   }
 
   const version = detectVersion(manifest);
-  const identifier = (manifest['@_identifier'] as string | undefined) ?? 'unknown';
+  const identifier =
+    (manifest['@_identifier'] as string | undefined) ?? 'unknown';
 
   // Extract title from organizations
-  const organizations = manifest['organizations'] as Record<string, unknown> | undefined;
+  const organizations = manifest['organizations'] as
+    | Record<string, unknown>
+    | undefined;
   if (!organizations) {
     throw new BadRequestException('imsmanifest.xml is missing <organizations>');
   }
@@ -132,12 +147,16 @@ export function parseScormManifest(xmlContent: string): ScormManifest {
     : organizations['organization'];
 
   if (!org || typeof org !== 'object') {
-    throw new BadRequestException('imsmanifest.xml has no valid <organization>');
+    throw new BadRequestException(
+      'imsmanifest.xml has no valid <organization>'
+    );
   }
 
   const orgObj = org as Record<string, unknown>;
   const title =
-    typeof orgObj['title'] === 'string' ? orgObj['title'] : String(orgObj['title'] ?? identifier);
+    typeof orgObj['title'] === 'string'
+      ? orgObj['title']
+      : String(orgObj['title'] ?? identifier);
 
   // Build resource map and collect items
   const resources = manifest['resources'];
@@ -152,7 +171,9 @@ export function parseScormManifest(xmlContent: string): ScormManifest {
   }
 
   if (items.length === 0) {
-    throw new BadRequestException('imsmanifest.xml contains no launchable items with resources');
+    throw new BadRequestException(
+      'imsmanifest.xml contains no launchable items with resources'
+    );
   }
 
   return { version, title, identifier, items };

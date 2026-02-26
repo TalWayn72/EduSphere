@@ -33,10 +33,10 @@ import { SocialRecommendationsResolver } from './social-recommendations.resolver
     // ── Layer 2: CypherService facade (depends on all 6 domain Cypher services above)
     CypherService,
     // ── Layer 3: Application sub-services (depend on domain Cypher services)
-    GraphConceptService,   // → CypherConceptService
-    GraphSearchService,    // → CypherConceptService + EmbeddingService
+    GraphConceptService, // → CypherConceptService
+    GraphSearchService, // → CypherConceptService + EmbeddingService
     GraphPersonTermService, // → CypherPersonService, CypherTermService, CypherSourceService,
-                            //   CypherTopicClusterService, CypherLearningPathService
+    //   CypherTopicClusterService, CypherLearningPathService
     // ── Layer 4: Facade (depends on GraphConceptService, GraphSearchService, GraphPersonTermService)
     GraphService,
     // ── Resolvers & supporting services

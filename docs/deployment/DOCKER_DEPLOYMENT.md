@@ -40,18 +40,19 @@ docker-compose down
 
 ## 🌐 Access Services
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| GraphQL Gateway | http://localhost:4000/graphql | - |
-| Keycloak Admin | http://localhost:8080 | admin / admin |
-| MinIO Console | http://localhost:9001 | minioadmin / minioadmin |
-| PostgreSQL | localhost:5432 | edusphere / edusphere_dev_password |
+| Service         | URL                           | Credentials                        |
+| --------------- | ----------------------------- | ---------------------------------- |
+| GraphQL Gateway | http://localhost:4000/graphql | -                                  |
+| Keycloak Admin  | http://localhost:8080         | admin / admin                      |
+| MinIO Console   | http://localhost:9001         | minioadmin / minioadmin            |
+| PostgreSQL      | localhost:5432                | edusphere / edusphere_dev_password |
 
 ---
 
 ## 📦 Data Persistence
 
 Data stored in Docker volumes:
+
 - `postgres_data` - PostgreSQL database
 - `keycloak_data` - Keycloak configuration
 - `minio_data` - Object storage
@@ -62,7 +63,9 @@ Data stored in Docker volumes:
 ## 🔧 Development
 
 ### Hot Reload:
+
 Uncomment in `docker-compose.yml`:
+
 ```yaml
 volumes:
   - ./apps:/app/apps
@@ -70,6 +73,7 @@ volumes:
 ```
 
 ### Check Processes:
+
 ```bash
 docker exec -it edusphere-all-in-one supervisorctl status
 ```

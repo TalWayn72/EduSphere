@@ -28,8 +28,12 @@ mockTx.insert.mockReturnValue({
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({
-    transaction: vi.fn((fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx)),
-    insert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) }),
+    transaction: vi.fn((fn: (tx: typeof mockTx) => Promise<unknown>) =>
+      fn(mockTx)
+    ),
+    insert: vi
+      .fn()
+      .mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) }),
   })),
   schema: {
     agentSessions: { id: 'id', userId: 'userId' },
@@ -44,8 +48,8 @@ vi.mock('@edusphere/db', () => ({
     async (
       _db: unknown,
       _ctx: unknown,
-      fn: (tx: typeof mockTx) => Promise<unknown>,
-    ) => fn(mockTx),
+      fn: (tx: typeof mockTx) => Promise<unknown>
+    ) => fn(mockTx)
   ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   eq: vi.fn((col, val) => ({ col, val })),
@@ -71,7 +75,11 @@ describe('UserErasureService — GDPR Art.17 Right to Erasure', () => {
   });
 
   it('report contains userId and tenantId', async () => {
-    const report = await service.eraseUserData('user-42', 'tenant-7', 'admin-1');
+    const report = await service.eraseUserData(
+      'user-42',
+      'tenant-7',
+      'admin-1'
+    );
 
     expect(report.userId).toBe('user-42');
     expect(report.tenantId).toBe('tenant-7');
@@ -92,7 +100,9 @@ describe('UserErasureService — GDPR Art.17 Right to Erasure', () => {
   it('USER_RECORD count is always 1', async () => {
     const report = await service.eraseUserData('user-1', 'tenant-1', 'admin-1');
 
-    const userRecord = report.deletedEntities.find((e) => e.type === 'USER_RECORD');
+    const userRecord = report.deletedEntities.find(
+      (e) => e.type === 'USER_RECORD'
+    );
     expect(userRecord?.count).toBe(1);
   });
 
@@ -107,7 +117,9 @@ describe('UserErasureService — GDPR Art.17 Right to Erasure', () => {
 
   it('marks report as FAILED when withTenantContext throws', async () => {
     const { withTenantContext } = await import('@edusphere/db');
-    vi.mocked(withTenantContext).mockRejectedValueOnce(new Error('DB connection lost'));
+    vi.mocked(withTenantContext).mockRejectedValueOnce(
+      new Error('DB connection lost')
+    );
 
     const report = await service.eraseUserData('user-1', 'tenant-1', 'admin-1');
 
@@ -120,7 +132,7 @@ describe('UserErasureService — GDPR Art.17 Right to Erasure', () => {
     vi.mocked(withTenantContext).mockRejectedValueOnce(new Error('Unexpected'));
 
     await expect(
-      service.eraseUserData('user-1', 'tenant-1', 'admin-1'),
+      service.eraseUserData('user-1', 'tenant-1', 'admin-1')
     ).resolves.not.toThrow();
   });
 });

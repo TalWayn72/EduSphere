@@ -7,10 +7,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  AuthMiddleware,
-  authMiddleware,
-} from './auth.middleware';
+import { AuthMiddleware, authMiddleware } from './auth.middleware';
 
 import {
   AuthMiddleware as SharedAuthMiddleware,

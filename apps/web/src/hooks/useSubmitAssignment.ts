@@ -38,7 +38,7 @@ interface UseSubmitAssignmentReturn {
 
 export function useSubmitAssignment(
   contentItemId: string,
-  courseId: string,
+  courseId: string
 ): UseSubmitAssignmentReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,17 +58,20 @@ export function useSubmitAssignment(
           setError(result.error.message);
           return null;
         }
-        return (result.data as { submitTextAssignment: SubmittedAssignment } | null)
-          ?.submitTextAssignment ?? null;
+        return (
+          (result.data as { submitTextAssignment: SubmittedAssignment } | null)
+            ?.submitTextAssignment ?? null
+        );
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Submission failed';
+        const message =
+          err instanceof Error ? err.message : 'Submission failed';
         setError(message);
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [contentItemId, courseId, executeMutation],
+    [contentItemId, courseId, executeMutation]
   );
 
   return { submit, loading, error };

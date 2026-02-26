@@ -13,22 +13,24 @@ const mockDb = {
   })),
   insert: vi.fn(() => ({
     values: vi.fn(() => ({
-      returning: vi.fn().mockResolvedValue([{
-        id: 'session-1',
-        user_id: 'user-1',
-        content_item_id: 'item-1',
-        tenant_id: 'tenant-1',
-        lesson_status: 'not attempted',
-        score_raw: null,
-        score_min: null,
-        score_max: null,
-        suspend_data: null,
-        session_time: null,
-        total_time: null,
-        completed_at: null,
-        created_at: new Date(),
-        updated_at: new Date(),
-      }]),
+      returning: vi.fn().mockResolvedValue([
+        {
+          id: 'session-1',
+          user_id: 'user-1',
+          content_item_id: 'item-1',
+          tenant_id: 'tenant-1',
+          lesson_status: 'not attempted',
+          score_raw: null,
+          score_min: null,
+          score_max: null,
+          suspend_data: null,
+          session_time: null,
+          total_time: null,
+          completed_at: null,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      ]),
     })),
   })),
   update: vi.fn(() => ({
@@ -55,8 +57,16 @@ vi.mock('@edusphere/db', () => ({
 describe('ScormSessionService', () => {
   let service: {
     initSession: (u: string, c: string, t: string) => Promise<unknown>;
-    updateSession: (s: string, u: string, d: Record<string, string>) => Promise<void>;
-    finishSession: (s: string, u: string, d: Record<string, string>) => Promise<void>;
+    updateSession: (
+      s: string,
+      u: string,
+      d: Record<string, string>
+    ) => Promise<void>;
+    finishSession: (
+      s: string,
+      u: string,
+      d: Record<string, string>
+    ) => Promise<void>;
     findSession: (u: string, c: string) => Promise<unknown>;
     onModuleDestroy: () => Promise<void>;
   };
@@ -68,8 +78,13 @@ describe('ScormSessionService', () => {
   });
 
   it('creates a new SCORM session on initSession', async () => {
-    const session = await service.initSession('user-1', 'item-1', 'tenant-1') as {
-      id: string; lessonStatus: string;
+    const session = (await service.initSession(
+      'user-1',
+      'item-1',
+      'tenant-1'
+    )) as {
+      id: string;
+      lessonStatus: string;
     };
     expect(session).toBeDefined();
     expect(session.id).toBe('session-1');
@@ -83,7 +98,7 @@ describe('ScormSessionService', () => {
       'cmi.suspend_data': 'some-state',
     };
     await expect(
-      service.updateSession('session-1', 'user-1', cmiData),
+      service.updateSession('session-1', 'user-1', cmiData)
     ).resolves.toBeUndefined();
     expect(mockDb.update).toHaveBeenCalled();
   });
@@ -92,7 +107,9 @@ describe('ScormSessionService', () => {
     const cmiData = { 'cmi.core.score.raw': '92.5' };
     await service.updateSession('session-1', 'user-1', cmiData);
     const setCall = mockDb.update().set as ReturnType<typeof vi.fn>;
-    const args = setCall.mock.calls[0]?.[0] as Record<string, unknown> | undefined;
+    const args = setCall.mock.calls[0]?.[0] as
+      | Record<string, unknown>
+      | undefined;
     if (args) {
       expect(typeof args['score_raw']).toBe('number');
       expect(args['score_raw']).toBe(92.5);

@@ -19,9 +19,9 @@ import { resolve, join } from 'path';
 // Must match the stable course ID from nahar-shalom-course.ts
 const COURSE_ID = 'cc000000-0000-0000-0000-000000000002';
 const DEMO_TENANT = '00000000-0000-0000-0000-000000000000';
-const SOURCE_ID  = 'dd000000-0000-0000-0000-000000000001';
+const SOURCE_ID = 'dd000000-0000-0000-0000-000000000001';
 // __dirname is available in CommonJS (the db package tsconfig uses CommonJS)
-const DOCX_PATH  = join(__dirname, 'assets', 'nahar-shalom.docx');
+const DOCX_PATH = join(__dirname, 'assets', 'nahar-shalom.docx');
 
 /** Simple DOCX text extractor using mammoth (no external service needed). */
 async function extractDocxText(filePath: string): Promise<string> {
@@ -88,5 +88,7 @@ export async function seedNaharShalomSource(): Promise<void> {
     },
   });
 
-  console.log(`✅ Nahar Shalom source registered (PENDING) — process via the running service`);
+  console.log(
+    `✅ Nahar Shalom source registered (PENDING) — process via the running service`
+  );
 }

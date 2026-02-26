@@ -98,7 +98,11 @@ export class NotificationService {
         sound: true,
       },
       trigger: trigger
-        ? { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: trigger, repeats: false }
+        ? {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds: trigger,
+            repeats: false,
+          }
         : null,
     });
   }

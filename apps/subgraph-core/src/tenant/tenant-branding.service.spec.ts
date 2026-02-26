@@ -8,13 +8,33 @@ const mocks = vi.hoisted(() => {
   const mockFrom = vi.fn(() => ({ where: mockWhere }));
   const mockSelect = vi.fn(() => ({ from: mockFrom }));
   const mockOnConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
-  const mockValues = vi.fn(() => ({ onConflictDoUpdate: mockOnConflictDoUpdate }));
+  const mockValues = vi.fn(() => ({
+    onConflictDoUpdate: mockOnConflictDoUpdate,
+  }));
   const mockInsert = vi.fn(() => ({ values: mockValues }));
   const mockDb = { select: mockSelect, insert: mockInsert };
-  return { mockLimit, mockWhere, mockFrom, mockSelect, mockOnConflictDoUpdate, mockValues, mockInsert, mockDb };
+  return {
+    mockLimit,
+    mockWhere,
+    mockFrom,
+    mockSelect,
+    mockOnConflictDoUpdate,
+    mockValues,
+    mockInsert,
+    mockDb,
+  };
 });
 
-const { mockLimit, mockWhere, mockFrom, mockSelect, mockOnConflictDoUpdate, mockValues, mockInsert, mockDb } = mocks;
+const {
+  mockLimit,
+  mockWhere: _mockWhere,
+  mockFrom: _mockFrom,
+  mockSelect,
+  mockOnConflictDoUpdate,
+  mockValues,
+  mockInsert,
+  mockDb: _mockDb,
+} = mocks;
 
 vi.mock('@edusphere/db', () => ({
   db: mocks.mockDb,
@@ -129,7 +149,11 @@ describe('TenantBrandingService', () => {
     });
 
     it('isolates caches between different tenantIds', async () => {
-      const rowB = { ...DB_BRANDING_ROW, organizationName: 'Beta Corp', tenantId: 'tenant-beta' };
+      const rowB = {
+        ...DB_BRANDING_ROW,
+        organizationName: 'Beta Corp',
+        tenantId: 'tenant-beta',
+      };
       mockLimit
         .mockResolvedValueOnce([DB_BRANDING_ROW])
         .mockResolvedValueOnce([rowB]);
@@ -165,7 +189,9 @@ describe('TenantBrandingService', () => {
     });
 
     it('uses provided organizationName when supplied', async () => {
-      await service.updateBranding('tenant-abc', { organizationName: 'New Name' });
+      await service.updateBranding('tenant-abc', {
+        organizationName: 'New Name',
+      });
 
       const [valuesArg] = mockValues.mock.calls[0];
       expect(valuesArg.organizationName).toBe('New Name');

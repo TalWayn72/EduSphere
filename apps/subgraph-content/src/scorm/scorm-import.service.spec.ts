@@ -53,7 +53,10 @@ function createMockZip(hasManifest: boolean): Buffer {
   </resources>
 </manifest>`;
     zip.addFile('imsmanifest.xml', Buffer.from(manifest, 'utf-8'));
-    zip.addFile('index.html', Buffer.from('<html><body>Test</body></html>', 'utf-8'));
+    zip.addFile(
+      'index.html',
+      Buffer.from('<html><body>Test</body></html>', 'utf-8')
+    );
     zip.addFile('style.css', Buffer.from('body { margin: 0; }', 'utf-8'));
   }
   return zip.toBuffer();
@@ -62,7 +65,9 @@ function createMockZip(hasManifest: boolean): Buffer {
 describe('ScormImportService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockReturning.mockResolvedValue([{ id: 'mock-id', course_id: 'mock-course' }]);
+    mockReturning.mockResolvedValue([
+      { id: 'mock-id', course_id: 'mock-course' },
+    ]);
     mockValues.mockReturnValue({ returning: mockReturning });
     mockInsert.mockReturnValue({ values: mockValues });
   });
@@ -71,18 +76,18 @@ describe('ScormImportService', () => {
     const { ScormImportService } = await import('./scorm-import.service');
     const service = new ScormImportService();
     const zip = createMockZip(false);
-    await expect(service.importScormPackage(zip, 'tenant-1', 'user-1')).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(
+      service.importScormPackage(zip, 'tenant-1', 'user-1')
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('throws BadRequestException for invalid ZIP buffer', async () => {
     const { ScormImportService } = await import('./scorm-import.service');
     const service = new ScormImportService();
     const badBuffer = Buffer.from('not a zip file');
-    await expect(service.importScormPackage(badBuffer, 'tenant-1', 'user-1')).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(
+      service.importScormPackage(badBuffer, 'tenant-1', 'user-1')
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('parses manifest and returns courseId and itemCount', async () => {
@@ -92,7 +97,9 @@ describe('ScormImportService', () => {
     const result = await service.importScormPackage(zip, 'tenant-1', 'user-1');
     expect(result).toHaveProperty('courseId');
     expect(result).toHaveProperty('itemCount');
-    expect((result as { itemCount: number }).itemCount).toBeGreaterThanOrEqual(1);
+    expect((result as { itemCount: number }).itemCount).toBeGreaterThanOrEqual(
+      1
+    );
   });
 
   it('calls MinIO PutObject for each file in the ZIP', async () => {

@@ -8,8 +8,21 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { InviteUserModal, BulkImportModal } from './UserManagementPage.modals';
 
@@ -21,11 +34,21 @@ const DEACTIVATE_USER = `mutation DeactivateUser($id: ID!) { deactivateUser(id: 
 const RESET_PASSWORD = `mutation ResetUserPassword($userId: ID!) { resetUserPassword(userId: $userId) }`;
 const UPDATE_USER = `mutation UpdateUser($id: ID!, $input: UpdateUserInput!) { updateUser(id: $id, input: $input) { id email firstName lastName role } }`;
 
-type UserRole = 'SUPER_ADMIN' | 'ORG_ADMIN' | 'INSTRUCTOR' | 'STUDENT' | 'RESEARCHER';
+type UserRole =
+  | 'SUPER_ADMIN'
+  | 'ORG_ADMIN'
+  | 'INSTRUCTOR'
+  | 'STUDENT'
+  | 'RESEARCHER';
 
 interface AdminUser {
-  id: string; email: string; firstName: string; lastName: string;
-  role: UserRole; tenantId: string; createdAt: string;
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  tenantId: string;
+  createdAt: string;
 }
 
 const ROLE_BADGE: Record<UserRole, string> = {
@@ -47,14 +70,18 @@ export function UserManagementPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [editingRole, setEditingRole] = useState<Record<string, string>>({});
-  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(null);
+  const [confirmDeactivate, setConfirmDeactivate] = useState<string | null>(
+    null
+  );
 
   const [, deactivateUser] = useMutation(DEACTIVATE_USER);
   const [, resetPassword] = useMutation(RESET_PASSWORD);
   const [, updateUser] = useMutation(UPDATE_USER);
 
   useEffect(() => {
-    if (!role || !ADMIN_ROLES.has(role)) { void navigate('/dashboard'); }
+    if (!role || !ADMIN_ROLES.has(role)) {
+      void navigate('/dashboard');
+    }
   }, [role, navigate]);
 
   const [{ data, fetching }, refetch] = useQuery({
@@ -73,7 +100,11 @@ export function UserManagementPage() {
   const total: number = (data?.adminUsers?.total ?? 0) as number;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const handleApply = () => { setAppliedSearch(search); setAppliedRole(roleFilter); setPage(0); };
+  const handleApply = () => {
+    setAppliedSearch(search);
+    setAppliedRole(roleFilter);
+    setPage(0);
+  };
 
   const handleDeactivate = async (id: string) => {
     await deactivateUser({ id });
@@ -94,32 +125,44 @@ export function UserManagementPage() {
   const tenantId = users[0]?.tenantId ?? '';
 
   return (
-    <AdminLayout title='User Management' description='Manage users, roles, and access'>
-      <div className='space-y-4'>
-        <div className='flex flex-wrap gap-2 items-end'>
-          <div className='flex-1 min-w-48'>
-            <Input placeholder='Search by name or email...' value={search}
+    <AdminLayout
+      title="User Management"
+      description="Manage users, roles, and access"
+    >
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2 items-end">
+          <div className="flex-1 min-w-48">
+            <Input
+              placeholder="Search by name or email..."
+              value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleApply(); }} />
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleApply();
+              }}
+            />
           </div>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className='w-40'><SelectValue placeholder='All Roles' /></SelectTrigger>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All Roles" />
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value=''>All Roles</SelectItem>
-              <SelectItem value='STUDENT'>Student</SelectItem>
-              <SelectItem value='INSTRUCTOR'>Instructor</SelectItem>
-              <SelectItem value='RESEARCHER'>Researcher</SelectItem>
-              <SelectItem value='ORG_ADMIN'>Org Admin</SelectItem>
-              <SelectItem value='SUPER_ADMIN'>Super Admin</SelectItem>
+              <SelectItem value="">All Roles</SelectItem>
+              <SelectItem value="STUDENT">Student</SelectItem>
+              <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
+              <SelectItem value="RESEARCHER">Researcher</SelectItem>
+              <SelectItem value="ORG_ADMIN">Org Admin</SelectItem>
+              <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={handleApply}>Apply</Button>
-          <div className='ml-auto flex gap-2'>
-            <Button variant='outline' onClick={() => setShowBulk(true)}>Bulk Import</Button>
+          <div className="ml-auto flex gap-2">
+            <Button variant="outline" onClick={() => setShowBulk(true)}>
+              Bulk Import
+            </Button>
             <Button onClick={() => setShowInvite(true)}>+ Invite User</Button>
           </div>
         </div>
-        <div className='rounded-md border'>
+        <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -132,45 +175,93 @@ export function UserManagementPage() {
             </TableHeader>
             <TableBody>
               {fetching && (
-                <TableRow><TableCell colSpan={5} className='text-center py-8 text-muted-foreground'>Loading...</TableCell></TableRow>
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-8 text-muted-foreground"
+                  >
+                    Loading...
+                  </TableCell>
+                </TableRow>
               )}
               {!fetching && users.length === 0 && (
-                <TableRow><TableCell colSpan={5} className='text-center py-8 text-muted-foreground'>No users found</TableCell></TableRow>
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-8 text-muted-foreground"
+                  >
+                    No users found
+                  </TableCell>
+                </TableRow>
               )}
               {users.map((u) => (
                 <TableRow key={u.id}>
-                  <TableCell className='font-medium'>{u.firstName} {u.lastName}</TableCell>
+                  <TableCell className="font-medium">
+                    {u.firstName} {u.lastName}
+                  </TableCell>
                   <TableCell>{u.email}</TableCell>
                   <TableCell>
                     <Select
                       value={editingRole[u.id] ?? u.role}
-                      onValueChange={(v) => { void handleRoleChange(u.id, v); }}
+                      onValueChange={(v) => {
+                        void handleRoleChange(u.id, v);
+                      }}
                     >
-                      <SelectTrigger className='w-36 h-7 text-xs'>
-                        <Badge className={ROLE_BADGE[(editingRole[u.id] as UserRole) ?? u.role]}>
+                      <SelectTrigger className="w-36 h-7 text-xs">
+                        <Badge
+                          className={
+                            ROLE_BADGE[
+                              (editingRole[u.id] as UserRole) ?? u.role
+                            ]
+                          }
+                        >
                           {editingRole[u.id] ?? u.role}
                         </Badge>
                       </SelectTrigger>
                       <SelectContent>
                         {(Object.keys(ROLE_BADGE) as UserRole[]).map((r) => (
-                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell className='text-sm text-muted-foreground'>
+                  <TableCell className="text-sm text-muted-foreground">
                     {new Date(u.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <div className='flex gap-1'>
-                      <Button size='sm' variant='ghost' className='h-7 px-2 text-xs'
-                        onClick={() => { void handleResetPassword(u.id); }}>Reset Pw</Button>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => {
+                          void handleResetPassword(u.id);
+                        }}
+                      >
+                        Reset Pw
+                      </Button>
                       {confirmDeactivate === u.id ? (
-                        <Button size='sm' variant='destructive' className='h-7 px-2 text-xs'
-                          onClick={() => { void handleDeactivate(u.id); }}>Confirm</Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => {
+                            void handleDeactivate(u.id);
+                          }}
+                        >
+                          Confirm
+                        </Button>
                       ) : (
-                        <Button size='sm' variant='outline' className='h-7 px-2 text-xs text-red-600'
-                          onClick={() => setConfirmDeactivate(u.id)}>Deactivate</Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 px-2 text-xs text-red-600"
+                          onClick={() => setConfirmDeactivate(u.id)}
+                        >
+                          Deactivate
+                        </Button>
                       )}
                     </div>
                   </TableCell>
@@ -179,14 +270,28 @@ export function UserManagementPage() {
             </TableBody>
           </Table>
         </div>
-        <div className='flex items-center justify-between text-sm text-muted-foreground'>
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>Total: {total} users</span>
-          <div className='flex gap-2'>
-            <Button variant='outline' size='sm' disabled={page === 0}
-              onClick={() => setPage((prev) => prev - 1)}>Previous</Button>
-            <span className='flex items-center px-2'>{page + 1} / {Math.max(1, totalPages)}</span>
-            <Button variant='outline' size='sm' disabled={page >= totalPages - 1}
-              onClick={() => setPage((prev) => prev + 1)}>Next</Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 0}
+              onClick={() => setPage((prev) => prev - 1)}
+            >
+              Previous
+            </Button>
+            <span className="flex items-center px-2">
+              {page + 1} / {Math.max(1, totalPages)}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </div>
@@ -194,12 +299,16 @@ export function UserManagementPage() {
         open={showInvite}
         onClose={() => setShowInvite(false)}
         tenantId={tenantId}
-        onSuccess={() => { refetch({ requestPolicy: 'network-only' }); }}
+        onSuccess={() => {
+          refetch({ requestPolicy: 'network-only' });
+        }}
       />
       <BulkImportModal
         open={showBulk}
         onClose={() => setShowBulk(false)}
-        onSuccess={() => { refetch({ requestPolicy: 'network-only' }); }}
+        onSuccess={() => {
+          refetch({ requestPolicy: 'network-only' });
+        }}
       />
     </AdminLayout>
   );

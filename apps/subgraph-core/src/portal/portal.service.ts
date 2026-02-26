@@ -3,7 +3,12 @@
  * Manages portal page CRUD: create, update, publish, block management.
  * Memory safety: OnModuleDestroy calls closeAllPools().
  */
-import { Injectable, Logger, BadRequestException, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   closeAllPools,
@@ -32,17 +37,33 @@ export class PortalService implements OnModuleDestroy {
   }
 
   async getPortalPage(tenantId: string): Promise<PortalPage | null> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: ADMIN_ROLE };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: ADMIN_ROLE,
+    };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.portalPages).where(eq(schema.portalPages.tenantId, tenantId)).limit(1),
+      tx
+        .select()
+        .from(schema.portalPages)
+        .where(eq(schema.portalPages.tenantId, tenantId))
+        .limit(1)
     );
     return rows[0] ?? null;
   }
 
   async getPublishedPortalPage(tenantId: string): Promise<PortalPage | null> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: STUDENT_ROLE };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: STUDENT_ROLE,
+    };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.portalPages).where(eq(schema.portalPages.tenantId, tenantId)).limit(1),
+      tx
+        .select()
+        .from(schema.portalPages)
+        .where(eq(schema.portalPages.tenantId, tenantId))
+        .limit(1)
     );
     const page = rows[0] ?? null;
     return page?.published ? page : null;
@@ -52,10 +73,14 @@ export class PortalService implements OnModuleDestroy {
     tenantId: string,
     layout: PortalBlock[],
     title: string,
-    createdBy: string,
+    createdBy: string
   ): Promise<PortalPage> {
     layout.forEach((b) => this.validateBlock(b));
-    const ctx: TenantContext = { tenantId, userId: createdBy, userRole: ADMIN_ROLE };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: createdBy,
+      userRole: ADMIN_ROLE,
+    };
     const existing = await this.getPortalPage(tenantId);
 
     const rows = await withTenantContext(this.db, ctx, async (tx) => {
@@ -79,43 +104,78 @@ export class PortalService implements OnModuleDestroy {
   }
 
   async publishPortal(tenantId: string): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: ADMIN_ROLE };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: ADMIN_ROLE,
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.portalPages)
+      tx
+        .update(schema.portalPages)
         .set({ published: true, updatedAt: new Date() })
-        .where(eq(schema.portalPages.tenantId, tenantId)),
+        .where(eq(schema.portalPages.tenantId, tenantId))
     );
     this.logger.log({ tenantId }, 'Portal published');
   }
 
   async unpublishPortal(tenantId: string): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: ADMIN_ROLE };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: ADMIN_ROLE,
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.portalPages)
+      tx
+        .update(schema.portalPages)
         .set({ published: false, updatedAt: new Date() })
-        .where(eq(schema.portalPages.tenantId, tenantId)),
+        .where(eq(schema.portalPages.tenantId, tenantId))
     );
     this.logger.log({ tenantId }, 'Portal unpublished');
   }
 
-  async addBlock(tenantId: string, block: PortalBlock, createdBy: string): Promise<PortalPage> {
+  async addBlock(
+    tenantId: string,
+    block: PortalBlock,
+    createdBy: string
+  ): Promise<PortalPage> {
     this.validateBlock(block);
     const existing = await this.getPortalPage(tenantId);
     const currentBlocks = (existing?.layout ?? []) as PortalBlock[];
-    const newLayout = [...currentBlocks, { ...block, order: currentBlocks.length }];
-    return this.createOrUpdatePortal(tenantId, newLayout, existing?.title ?? 'Learning Portal', createdBy);
+    const newLayout = [
+      ...currentBlocks,
+      { ...block, order: currentBlocks.length },
+    ];
+    return this.createOrUpdatePortal(
+      tenantId,
+      newLayout,
+      existing?.title ?? 'Learning Portal',
+      createdBy
+    );
   }
 
-  async removeBlock(tenantId: string, blockId: string, userId: string): Promise<PortalPage> {
+  async removeBlock(
+    tenantId: string,
+    blockId: string,
+    userId: string
+  ): Promise<PortalPage> {
     const existing = await this.getPortalPage(tenantId);
     const currentBlocks = (existing?.layout ?? []) as PortalBlock[];
     const filtered = currentBlocks
       .filter((b) => b.id !== blockId)
       .map((b, i) => ({ ...b, order: i }));
-    return this.createOrUpdatePortal(tenantId, filtered, existing?.title ?? 'Learning Portal', userId);
+    return this.createOrUpdatePortal(
+      tenantId,
+      filtered,
+      existing?.title ?? 'Learning Portal',
+      userId
+    );
   }
 
-  async reorderBlocks(tenantId: string, blockIds: string[], userId: string): Promise<PortalPage> {
+  async reorderBlocks(
+    tenantId: string,
+    blockIds: string[],
+    userId: string
+  ): Promise<PortalPage> {
     const existing = await this.getPortalPage(tenantId);
     const currentBlocks = (existing?.layout ?? []) as PortalBlock[];
     const blockMap = new Map(currentBlocks.map((b) => [b.id, b]));
@@ -124,13 +184,18 @@ export class PortalService implements OnModuleDestroy {
       if (!b) throw new BadRequestException(`Block not found: ${id}`);
       return { ...b, order };
     });
-    return this.createOrUpdatePortal(tenantId, reordered, existing?.title ?? 'Learning Portal', userId);
+    return this.createOrUpdatePortal(
+      tenantId,
+      reordered,
+      existing?.title ?? 'Learning Portal',
+      userId
+    );
   }
 
   validateBlock(block: PortalBlock): void {
     if (!(ALLOWED_BLOCK_TYPES as readonly string[]).includes(block.type)) {
       throw new BadRequestException(
-        `Invalid block type: ${block.type}. Allowed: ${ALLOWED_BLOCK_TYPES.join(', ')}`,
+        `Invalid block type: ${block.type}. Allowed: ${ALLOWED_BLOCK_TYPES.join(', ')}`
       );
     }
   }

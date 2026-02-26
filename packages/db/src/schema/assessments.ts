@@ -56,7 +56,7 @@ export const assessmentCampaigns = pgTable(
           OR current_setting('app.current_role', TRUE) IN ('ORG_ADMIN', 'SUPER_ADMIN', 'INSTRUCTOR')
         )`,
     }),
-  }),
+  })
 );
 
 export const assessmentResponses = pgTable(
@@ -76,7 +76,7 @@ export const assessmentResponses = pgTable(
     responderUnique: uniqueIndex('assessment_responses_responder_unique').on(
       t.campaignId,
       t.responderId,
-      t.raterRole,
+      t.raterRole
     ),
     // RLS: responder sees own; admins/instructors see all in tenant
     responderOrAdminPolicy: pgPolicy('assessment_responses_rls', {
@@ -89,7 +89,7 @@ export const assessmentResponses = pgTable(
           OR current_setting('app.current_role', TRUE) IN ('ORG_ADMIN', 'SUPER_ADMIN', 'INSTRUCTOR')
         )`,
     }),
-  }),
+  })
 );
 
 export const assessmentResults = pgTable('assessment_results', {

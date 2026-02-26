@@ -23,7 +23,7 @@ export class OpenBadgeController {
   @Get('assertion/:id')
   async getAssertion(
     @Param('id') assertionId: string,
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     const assertion = await this.badgeService.getAssertionById(assertionId);
     if (!assertion) {
@@ -31,28 +31,31 @@ export class OpenBadgeController {
       return;
     }
 
-    const def = await this.badgeService.getDefinitionById(assertion.badgeDefinitionId);
+    const def = await this.badgeService.getDefinitionById(
+      assertion.badgeDefinitionId
+    );
     if (!def) {
-      res.status(HttpStatus.NOT_FOUND).json({ error: 'Badge definition not found' });
+      res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'Badge definition not found' });
       return;
     }
 
-    const body = this.badgeService.buildCredentialBody(
-      def,
-      {
-        userId: assertion.recipientId,
-        badgeDefinitionId: def.id,
-        tenantId: assertion.tenantId,
-        expiresAt: assertion.expiresAt ?? undefined,
-      },
-    );
+    const body = this.badgeService.buildCredentialBody(def, {
+      userId: assertion.recipientId,
+      badgeDefinitionId: def.id,
+      tenantId: assertion.tenantId,
+      expiresAt: assertion.expiresAt ?? undefined,
+    });
 
     // Replace pending placeholder with real assertion ID
     const credentialWithId = {
       ...body,
       id: `${BASE_URL}/ob3/assertion/${assertion.id}`,
       issuanceDate: assertion.issuedAt.toISOString(),
-      ...(assertion.expiresAt ? { expirationDate: assertion.expiresAt.toISOString() } : {}),
+      ...(assertion.expiresAt
+        ? { expirationDate: assertion.expiresAt.toISOString() }
+        : {}),
     };
 
     const credential: Ob3Credential & { credentialStatus?: unknown } = {
@@ -84,11 +87,13 @@ export class OpenBadgeController {
   @Get('badge/:id')
   async getBadgeDefinition(
     @Param('id') definitionId: string,
-    @Res() res: Response,
+    @Res() res: Response
   ): Promise<void> {
     const def = await this.badgeService.getDefinitionById(definitionId);
     if (!def) {
-      res.status(HttpStatus.NOT_FOUND).json({ error: 'Badge definition not found' });
+      res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'Badge definition not found' });
       return;
     }
 
@@ -101,7 +106,9 @@ export class OpenBadgeController {
       type: ['Achievement'],
       name: def.name,
       description: def.description,
-      criteria: { narrative: def.criteriaUrl ?? `${BASE_URL}/ob3/badge/${def.id}` },
+      criteria: {
+        narrative: def.criteriaUrl ?? `${BASE_URL}/ob3/badge/${def.id}`,
+      },
       tags: def.tags,
       version: def.version,
       ...(def.imageUrl ? { image: { id: def.imageUrl, type: 'Image' } } : {}),

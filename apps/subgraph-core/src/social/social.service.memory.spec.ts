@@ -11,9 +11,23 @@ const { drainMock, mockNatsConn, mockTx } = vi.hoisted(() => {
     drain: drainMock,
   };
   const mockTx = {
-    delete: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }) }),
-    insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue(undefined) }) }),
-    select: vi.fn().mockReturnValue({ from: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }) }) }),
+    delete: vi.fn().mockReturnValue({
+      where: vi
+        .fn()
+        .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+    }),
+    insert: vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({
+        onConflictDoNothing: vi.fn().mockResolvedValue(undefined),
+      }),
+    }),
+    select: vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi
+          .fn()
+          .mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }),
+      }),
+    }),
   };
   return { drainMock, mockNatsConn, mockTx };
 });
@@ -21,16 +35,25 @@ const { drainMock, mockNatsConn, mockTx } = vi.hoisted(() => {
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockTx),
   schema: {
-    userFollows: { id: 'id', followerId: 'follower_id', followingId: 'following_id', tenantId: 'tenant_id' },
+    userFollows: {
+      id: 'id',
+      followerId: 'follower_id',
+      followingId: 'following_id',
+      tenantId: 'tenant_id',
+    },
   },
-  withTenantContext: vi.fn(async (_d: unknown, _c: unknown, fn: (t: unknown) => unknown) => fn(mockTx)),
+  withTenantContext: vi.fn(
+    async (_d: unknown, _c: unknown, fn: (t: unknown) => unknown) => fn(mockTx)
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   eq: vi.fn(),
   and: vi.fn(),
 }));
 
 vi.mock('nats', () => ({ connect: vi.fn().mockResolvedValue(mockNatsConn) }));
-vi.mock('@edusphere/nats-client', () => ({ buildNatsOptions: vi.fn(() => ({})) }));
+vi.mock('@edusphere/nats-client', () => ({
+  buildNatsOptions: vi.fn(() => ({})),
+}));
 
 import { SocialService } from './social.service';
 import { closeAllPools } from '@edusphere/db';
@@ -70,9 +93,12 @@ describe('SocialService memory safety', () => {
 
     const insertValues = vi.fn();
     mockTx.insert.mockReturnValue({
-      values: insertValues.mockImplementation(({ followerId }: { followerId: string }) => ({
-        onConflictDoNothing: () => slowInsert(followerId === 'followerA' ? 'A' : 'B'),
-      })),
+      values: insertValues.mockImplementation(
+        ({ followerId }: { followerId: string }) => ({
+          onConflictDoNothing: () =>
+            slowInsert(followerId === 'followerA' ? 'A' : 'B'),
+        })
+      ),
     });
 
     const promiseA = service.followUser('followerA', 'following1', 'tenant1');

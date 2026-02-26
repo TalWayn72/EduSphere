@@ -17,6 +17,8 @@ export class AdminOverviewResolver {
     if (!context.authContext) {
       throw new UnauthorizedException('Unauthenticated');
     }
-    return this.adminOverviewService.getOverview(context.authContext.tenantId || '');
+    return this.adminOverviewService.getOverview(
+      context.authContext.tenantId || ''
+    );
   }
 }

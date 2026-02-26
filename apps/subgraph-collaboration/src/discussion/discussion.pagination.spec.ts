@@ -5,20 +5,22 @@ import type { AuthContext } from '@edusphere/auth';
 
 let _mockQueryResult: unknown[] = [];
 
-const mockOffset  = vi.fn(async () => _mockQueryResult);
+const mockOffset = vi.fn(async () => _mockQueryResult);
 const mockLimitFn = vi.fn(() => {
-  const p = Promise.resolve(_mockQueryResult) as Promise<unknown[]> & { offset: typeof mockOffset };
+  const p = Promise.resolve(_mockQueryResult) as Promise<unknown[]> & {
+    offset: typeof mockOffset;
+  };
   p.offset = mockOffset;
   return p;
 });
 const mockOrderBy = vi.fn(() => ({ limit: mockLimitFn }));
-const mockWhere   = vi.fn(() =>
+const mockWhere = vi.fn(() =>
   Object.assign(Promise.resolve(_mockQueryResult), {
     limit: mockLimitFn,
     orderBy: mockOrderBy,
   })
 );
-const mockFrom   = vi.fn(() => ({ where: mockWhere, orderBy: mockOrderBy }));
+const mockFrom = vi.fn(() => ({ where: mockWhere, orderBy: mockOrderBy }));
 const mockSelect = vi.fn(() => ({ from: mockFrom }));
 const mockTx = { select: mockSelect };
 
@@ -26,12 +28,21 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockTx),
   schema: {
     discussions: {
-      id: 'id', tenant_id: 'tenant_id', course_id: 'course_id',
-      creator_id: 'creator_id', discussion_type: 'discussion_type', created_at: 'created_at',
+      id: 'id',
+      tenant_id: 'tenant_id',
+      course_id: 'course_id',
+      creator_id: 'creator_id',
+      discussion_type: 'discussion_type',
+      created_at: 'created_at',
     },
-    discussion_participants: { discussion_id: 'discussion_id', user_id: 'user_id' },
+    discussion_participants: {
+      discussion_id: 'discussion_id',
+      user_id: 'user_id',
+    },
     discussion_messages: {
-      id: 'id', discussion_id: 'discussion_id', created_at: 'created_at',
+      id: 'id',
+      discussion_id: 'discussion_id',
+      created_at: 'created_at',
       parent_message_id: 'parent_message_id',
     },
   },
@@ -40,7 +51,10 @@ vi.mock('@edusphere/db', () => ({
   desc: vi.fn((col) => ({ col })),
   sql: vi.fn(() => ({ raw: true })),
   inArray: vi.fn(),
-  withTenantContext: vi.fn(async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => unknown) => cb(mockTx)),
+  withTenantContext: vi.fn(
+    async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => unknown) =>
+      cb(mockTx)
+  ),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -50,20 +64,34 @@ import { DiscussionService } from './discussion.service';
 
 function makeDiscussions(count: number) {
   return Array.from({ length: count }, (_, i) => ({
-    id: `disc-${i}`, tenant_id: 'tenant-1', course_id: 'course-1',
-    title: `Discussion ${i}`, creator_id: 'user-1', discussion_type: 'FORUM',
+    id: `disc-${i}`,
+    tenant_id: 'tenant-1',
+    course_id: 'course-1',
+    title: `Discussion ${i}`,
+    creator_id: 'user-1',
+    discussion_type: 'FORUM',
   }));
 }
 
-function toRelayPage<T>(items: T[], limit: number, offset: number, totalCount: number) {
+function toRelayPage<T>(
+  items: T[],
+  limit: number,
+  offset: number,
+  totalCount: number
+) {
   const edges = items.map((node) => ({ node }));
   const hasNextPage = offset + items.length < totalCount;
   return { edges, pageInfo: { hasNextPage } };
 }
 
 const MOCK_AUTH: AuthContext = {
-  userId: 'user-1', email: 'u@example.com', username: 'u1',
-  tenantId: 'tenant-1', roles: ['STUDENT'], scopes: ['read'], isSuperAdmin: false,
+  userId: 'user-1',
+  email: 'u@example.com',
+  username: 'u1',
+  tenantId: 'tenant-1',
+  roles: ['STUDENT'],
+  scopes: ['read'],
+  isSuperAdmin: false,
 };
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -102,7 +130,12 @@ describe('Discussion — Relay cursor pagination', () => {
     const OFFSET = 10;
     _mockQueryResult = allItems.slice(OFFSET, OFFSET + PAGE_SIZE);
 
-    const result = await service.findDiscussionsByCourse('course-1', PAGE_SIZE, OFFSET, MOCK_AUTH);
+    const result = await service.findDiscussionsByCourse(
+      'course-1',
+      PAGE_SIZE,
+      OFFSET,
+      MOCK_AUTH
+    );
     expect(result).toHaveLength(5);
     expect((result as typeof allItems)[0].id).toBe('disc-10');
   });
@@ -112,7 +145,12 @@ describe('Discussion — Relay cursor pagination', () => {
     const CAPPED = Math.min(LARGE_PAGE, 100);
     _mockQueryResult = makeDiscussions(CAPPED);
 
-    const result = await service.findDiscussionsByCourse('course-1', CAPPED, 0, MOCK_AUTH);
+    const result = await service.findDiscussionsByCourse(
+      'course-1',
+      CAPPED,
+      0,
+      MOCK_AUTH
+    );
     expect((result as unknown[]).length).toBeLessThanOrEqual(100);
   });
 
@@ -120,7 +158,12 @@ describe('Discussion — Relay cursor pagination', () => {
     const PAGE_SIZE = 5;
     _mockQueryResult = makeDiscussions(PAGE_SIZE);
 
-    const result = await service.findDiscussionsByCourse('course-1', PAGE_SIZE, 0, MOCK_AUTH);
+    const result = await service.findDiscussionsByCourse(
+      'course-1',
+      PAGE_SIZE,
+      0,
+      MOCK_AUTH
+    );
     expect(result).toHaveLength(PAGE_SIZE);
   });
 

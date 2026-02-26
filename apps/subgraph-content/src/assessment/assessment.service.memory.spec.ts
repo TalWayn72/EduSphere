@@ -31,7 +31,9 @@ describe('AssessmentService — memory / lifecycle', () => {
   let svc: AssessmentService;
 
   function buildModule() {
-    const aggregator = { aggregate: mockAggregatorAggregate } as unknown as AssessmentAggregatorService;
+    const aggregator = {
+      aggregate: mockAggregatorAggregate,
+    } as unknown as AssessmentAggregatorService;
     return new AssessmentService(aggregator);
   }
 
@@ -62,7 +64,14 @@ describe('AssessmentService — memory / lifecycle', () => {
       targetUserId: 'user-target',
       tenantId: 'tenant-1',
       aggregatedScores: [
-        { criteriaId: 'comm', label: 'Communication', selfScore: 4.5, peerAvg: null, managerScore: null, overallAvg: 4.5 },
+        {
+          criteriaId: 'comm',
+          label: 'Communication',
+          selfScore: 4.5,
+          peerAvg: null,
+          managerScore: null,
+          overallAvg: 4.5,
+        },
       ],
       summary: 'Overall score: 4.5/5. Strongest: Communication (4.5/5).',
       generatedAt: new Date(),
@@ -73,9 +82,15 @@ describe('AssessmentService — memory / lifecycle', () => {
     mockWithTenantContext.mockResolvedValue([]);
 
     const result = await svc.completeCampaign('camp-self', 'tenant-1');
-    expect(mockAggregatorAggregate).toHaveBeenCalledWith('camp-self', 'tenant-1');
+    expect(mockAggregatorAggregate).toHaveBeenCalledWith(
+      'camp-self',
+      'tenant-1'
+    );
     expect(result.aggregatedScores).toHaveLength(1);
-    const firstScore = result.aggregatedScores[0] as { selfScore: number | null; peerAvg: number | null };
+    const firstScore = result.aggregatedScores[0] as {
+      selfScore: number | null;
+      peerAvg: number | null;
+    };
     expect(firstScore.peerAvg).toBeNull();
     expect(firstScore.selfScore).toBe(4.5);
     expect(result.summary).toContain('Communication');

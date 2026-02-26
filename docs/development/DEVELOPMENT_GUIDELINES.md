@@ -63,7 +63,10 @@ For object-oriented code (especially NestJS services):
 
 ```typescript
 // Good: Clear intent, single responsibility
-async function getUserCoursesWithProgress(userId: string, tenantId: string): Promise<CourseProgress[]> {
+async function getUserCoursesWithProgress(
+  userId: string,
+  tenantId: string
+): Promise<CourseProgress[]> {
   return withTenantContext(tenantId, userId, UserRole.STUDENT, async () => {
     const courses = await db.query.courses.findMany({
       with: { modules: true },
@@ -86,9 +89,10 @@ async function getData(id: string, tid: string): Promise<any> {
   });
 
   // Mixing data fetching with business logic
-  return data.map(c => ({
+  return data.map((c) => ({
     ...c,
-    progress: c.modules.filter(m => m.completed).length / c.modules.length * 100,
+    progress:
+      (c.modules.filter((m) => m.completed).length / c.modules.length) * 100,
     formattedDate: new Date(c.createdAt).toLocaleDateString(),
   }));
 }
@@ -161,6 +165,7 @@ apps/subgraph-core/
 ### 2.3 Module Boundaries
 
 **Rule**: Packages can only import from:
+
 - Their own code
 - Shared packages (`@edusphere/*`)
 - External dependencies (npm)
@@ -285,14 +290,15 @@ async function getCourse(id: string) {
 ### 3.4 Type Inference (When to Use)
 
 **Type inference is acceptable** for:
+
 - Local variables with obvious types
 - Array methods (map, filter, etc.) where type is clear from context
 
 ```typescript
 // Good: Inference is clear from context
 const users = await db.query.users.findMany();
-const activeUsers = users.filter(u => u.status === 'active');
-const userNames = activeUsers.map(u => u.displayName);
+const activeUsers = users.filter((u) => u.status === 'active');
+const userNames = activeUsers.map((u) => u.displayName);
 ```
 
 ### 3.5 Union Types and Discriminated Unions
@@ -301,12 +307,15 @@ Use **union types** for values that can be one of several types:
 
 ```typescript
 // Good: Union type for status
-type ExecutionStatus = 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+type ExecutionStatus =
+  | 'QUEUED'
+  | 'RUNNING'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'CANCELLED';
 
 // Good: Discriminated union for type-safe handling
-type Result<T> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+type Result<T> = { success: true; data: T } | { success: false; error: string };
 
 function handleResult<T>(result: Result<T>): void {
   if (result.success) {
@@ -330,11 +339,7 @@ interface Page<T> {
   totalCount: number;
 }
 
-function paginateArray<T>(
-  items: T[],
-  first: number,
-  after?: string
-): Page<T> {
+function paginateArray<T>(items: T[], first: number, after?: string): Page<T> {
   // Implementation
 }
 
@@ -352,6 +357,7 @@ const userPage = paginateArray(users, 20, cursor);
 **Keep files focused and modular** — aim for **maximum 150 lines** per file.
 
 **Why?**
+
 - Easier to understand and test
 - Reduces merge conflicts
 - Encourages single responsibility
@@ -411,9 +417,15 @@ export class UserResolver {
 // user.service.ts (120 lines)
 @Injectable()
 export class UserService {
-  findById(id: string): Promise<User> { /* ... */ }
-  update(id: string, input: UpdateUserInput): Promise<User> { /* ... */ }
-  softDelete(id: string): Promise<boolean> { /* ... */ }
+  findById(id: string): Promise<User> {
+    /* ... */
+  }
+  update(id: string, input: UpdateUserInput): Promise<User> {
+    /* ... */
+  }
+  softDelete(id: string): Promise<boolean> {
+    /* ... */
+  }
 }
 ```
 
@@ -518,16 +530,16 @@ const user = await getUser(); // NOT A_CONSTANT — camelCase is correct
 
 Follow GraphQL best practices:
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| **Types** | PascalCase | `User`, `Course`, `MediaAsset` |
-| **Fields** | camelCase | `displayName`, `createdAt`, `mediaAssets` |
-| **Enums** | SCREAMING_SNAKE_CASE | `USER_ROLE`, `MEDIA_TYPE` |
-| **Enum values** | SCREAMING_SNAKE_CASE | `SUPER_ADMIN`, `ORG_ADMIN`, `STUDENT` |
-| **Input types** | PascalCase + `Input` suffix | `CreateCourseInput`, `UpdateUserInput` |
-| **Queries** | camelCase (verb-noun) | `getUser`, `listCourses`, `searchContent` |
-| **Mutations** | camelCase (verb-noun) | `createCourse`, `updateUser`, `deleteAnnotation` |
-| **Subscriptions** | camelCase (past tense) | `courseCreated`, `annotationChanged` |
+| Element           | Convention                  | Example                                          |
+| ----------------- | --------------------------- | ------------------------------------------------ |
+| **Types**         | PascalCase                  | `User`, `Course`, `MediaAsset`                   |
+| **Fields**        | camelCase                   | `displayName`, `createdAt`, `mediaAssets`        |
+| **Enums**         | SCREAMING_SNAKE_CASE        | `USER_ROLE`, `MEDIA_TYPE`                        |
+| **Enum values**   | SCREAMING_SNAKE_CASE        | `SUPER_ADMIN`, `ORG_ADMIN`, `STUDENT`            |
+| **Input types**   | PascalCase + `Input` suffix | `CreateCourseInput`, `UpdateUserInput`           |
+| **Queries**       | camelCase (verb-noun)       | `getUser`, `listCourses`, `searchContent`        |
+| **Mutations**     | camelCase (verb-noun)       | `createCourse`, `updateUser`, `deleteAnnotation` |
+| **Subscriptions** | camelCase (past tense)      | `courseCreated`, `annotationChanged`             |
 
 **Examples**:
 
@@ -535,7 +547,7 @@ Follow GraphQL best practices:
 # Types: PascalCase
 type User {
   id: ID!
-  displayName: String!       # Fields: camelCase
+  displayName: String! # Fields: camelCase
   role: UserRole!
   createdAt: DateTime!
 }
@@ -583,6 +595,7 @@ type Subscription {
 **SDL files are the source of truth** — resolvers implement the contract defined in `.graphql` files.
 
 **Process**:
+
 1. Define types in `schema.graphql`
 2. Run codegen to generate TypeScript types
 3. Implement resolvers matching the schema
@@ -696,6 +709,7 @@ throw new GraphQLError('User not found', {
 ```
 
 **Error codes** (from API-CONTRACTS §6):
+
 - `UNAUTHENTICATED` — Missing or invalid JWT
 - `FORBIDDEN` — Insufficient permissions
 - `NOT_FOUND` — Resource doesn't exist
@@ -764,7 +778,7 @@ export class UsersModule {}
 export class UserService {
   constructor(
     private readonly db: DatabaseService,
-    private readonly logger: Logger,
+    private readonly logger: Logger
   ) {}
 
   async findById(id: string): Promise<User | null> {
@@ -796,7 +810,8 @@ Use **guards** for authentication and authorization:
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const gqlContext = GqlExecutionContext.create(context).getContext<GraphQLContext>();
+    const gqlContext =
+      GqlExecutionContext.create(context).getContext<GraphQLContext>();
     return gqlContext.isAuthenticated;
   }
 }
@@ -827,7 +842,7 @@ export class LoggingInterceptor implements NestInterceptor {
       tap(() => {
         const duration = Date.now() - now;
         this.logger.info({ duration }, 'Request completed');
-      }),
+      })
     );
   }
 }
@@ -872,7 +887,10 @@ export class GraphQLExceptionFilter implements GqlExceptionFilter {
     if (exception instanceof HttpException) {
       return new GraphQLError(exception.message, {
         extensions: {
-          code: exception.getStatus() === 400 ? 'BAD_USER_INPUT' : 'INTERNAL_SERVER_ERROR',
+          code:
+            exception.getStatus() === 400
+              ? 'BAD_USER_INPUT'
+              : 'INTERNAL_SERVER_ERROR',
         },
       });
     }
@@ -905,7 +923,9 @@ export const tenants = pgTable('tenants', {
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
-  tenantId: uuid('tenant_id').notNull().references(() => tenants.id),
+  tenantId: uuid('tenant_id')
+    .notNull()
+    .references(() => tenants.id),
   email: text('email').notNull(),
   displayName: text('display_name').notNull(),
   role: userRoleEnum('role').notNull().default('STUDENT'),
@@ -918,7 +938,9 @@ export const users = pgTable('users', {
 export const usersIndexes = {
   tenantIdIdx: index('users_tenant_id_idx').on(users.tenantId),
   emailIdx: index('users_email_idx').on(users.email),
-  deletedAtIdx: index('users_deleted_at_idx').on(users.deletedAt).where(isNull(users.deletedAt)),
+  deletedAtIdx: index('users_deleted_at_idx')
+    .on(users.deletedAt)
+    .where(isNull(users.deletedAt)),
 };
 ```
 
@@ -952,11 +974,16 @@ export async function withTenantContext<T>(
 export class CourseResolver {
   @Query(() => [Course])
   async myCourses(@Context() ctx: GraphQLContext): Promise<Course[]> {
-    return withTenantContext(ctx.tenantId, ctx.userId, ctx.userRole, async () => {
-      return db.query.courses.findMany({
-        where: eq(courses.creatorId, ctx.userId),
-      });
-    });
+    return withTenantContext(
+      ctx.tenantId,
+      ctx.userId,
+      ctx.userRole,
+      async () => {
+        return db.query.courses.findMany({
+          where: eq(courses.creatorId, ctx.userId),
+        });
+      }
+    );
   }
 }
 ```
@@ -1012,21 +1039,27 @@ CREATE POLICY "tenant_isolation_courses" ON "courses"
 // packages/db/src/seed/index.ts
 export async function seed() {
   // Insert tenant (idempotent)
-  await db.insert(tenants).values({
-    id: DEMO_TENANT_ID,
-    name: 'Demo Organization',
-    slug: 'demo',
-    plan: 'PROFESSIONAL',
-  }).onConflictDoNothing();
+  await db
+    .insert(tenants)
+    .values({
+      id: DEMO_TENANT_ID,
+      name: 'Demo Organization',
+      slug: 'demo',
+      plan: 'PROFESSIONAL',
+    })
+    .onConflictDoNothing();
 
   // Insert admin user (idempotent)
-  await db.insert(users).values({
-    id: ADMIN_USER_ID,
-    tenantId: DEMO_TENANT_ID,
-    email: 'admin@demo.edusphere.dev',
-    displayName: 'Admin User',
-    role: 'ORG_ADMIN',
-  }).onConflictDoNothing();
+  await db
+    .insert(users)
+    .values({
+      id: ADMIN_USER_ID,
+      tenantId: DEMO_TENANT_ID,
+      email: 'admin@demo.edusphere.dev',
+      displayName: 'Admin User',
+      role: 'ORG_ADMIN',
+    })
+    .onConflictDoNothing();
 }
 ```
 
@@ -1047,6 +1080,7 @@ export async function seed() {
 ```
 
 **JWT claims** (extracted at gateway):
+
 ```json
 {
   "sub": "user-uuid",
@@ -1057,6 +1091,7 @@ export async function seed() {
 ```
 
 **GraphQL context** (propagated to subgraphs):
+
 ```typescript
 interface GraphQLContext {
   tenantId: string;
@@ -1068,6 +1103,7 @@ interface GraphQLContext {
 ```
 
 **RLS enforcement** (at database level):
+
 ```sql
 -- Set by withTenantContext wrapper
 SET LOCAL app.current_tenant = 'tenant-uuid';
@@ -1291,7 +1327,9 @@ export class CourseService {
 
   async findById(id: string): Promise<Course | null> {
     try {
-      return await this.db.query.courses.findFirst({ where: eq(courses.id, id) });
+      return await this.db.query.courses.findFirst({
+        where: eq(courses.id, id),
+      });
     } catch (error) {
       this.logger.error(
         { courseId: id, error: error.message, stack: error.stack },
@@ -1323,13 +1361,13 @@ logger.info({ userId, tenantId, duration: 123 }, 'User fetched successfully');
 
 Use **appropriate log levels**:
 
-| Level | When to Use | Example |
-|-------|------------|---------|
-| `error` | Failures that prevent operation | Database connection failed |
-| `warn` | Recoverable issues | Rate limit approached |
-| `info` | Key business events | User logged in, course created |
-| `debug` | Development debugging | Query parameters, intermediate values |
-| `trace` | Very verbose debugging | Every function call |
+| Level   | When to Use                     | Example                               |
+| ------- | ------------------------------- | ------------------------------------- |
+| `error` | Failures that prevent operation | Database connection failed            |
+| `warn`  | Recoverable issues              | Rate limit approached                 |
+| `info`  | Key business events             | User logged in, course created        |
+| `debug` | Development debugging           | Query parameters, intermediate values |
+| `trace` | Very verbose debugging          | Every function call                   |
 
 ```typescript
 logger.error({ error: err.message }, 'Database connection failed');
@@ -1344,12 +1382,15 @@ logger.debug({ query: 'SELECT * FROM users' }, 'Executing query');
 
 ```typescript
 // Required context
-logger.info({
-  tenantId: ctx.tenantId,
-  userId: ctx.userId,
-  requestId: ctx.requestId, // From tracing
-  // ... event-specific data
-}, 'Event description');
+logger.info(
+  {
+    tenantId: ctx.tenantId,
+    userId: ctx.userId,
+    requestId: ctx.requestId, // From tracing
+    // ... event-specific data
+  },
+  'Event description'
+);
 ```
 
 ### 12.4 Never `console.log` in Production
@@ -1450,11 +1491,14 @@ describe('User Integration Tests', () => {
       ADMIN_ID,
       UserRole.ORG_ADMIN,
       async () => {
-        return db.insert(users).values({
-          tenantId: TENANT_ID,
-          email: 'test@example.com',
-          displayName: 'Test User',
-        }).returning();
+        return db
+          .insert(users)
+          .values({
+            tenantId: TENANT_ID,
+            email: 'test@example.com',
+            displayName: 'Test User',
+          })
+          .returning();
       }
     );
 
@@ -1487,18 +1531,20 @@ describe('Course Creation E2E', () => {
     await page.click('button:has-text("Create")');
 
     // Verify creation
-    await expect(page.locator('text=Course created successfully')).toBeVisible();
+    await expect(
+      page.locator('text=Course created successfully')
+    ).toBeVisible();
   });
 });
 ```
 
 ### 13.5 Coverage Targets
 
-| Component | Target | Required |
-|-----------|--------|----------|
-| Backend services | >90% | Yes |
-| Frontend components | >80% | Yes |
-| RLS policies | 100% | **Critical** |
+| Component           | Target | Required     |
+| ------------------- | ------ | ------------ |
+| Backend services    | >90%   | Yes          |
+| Frontend components | >80%   | Yes          |
+| RLS policies        | 100%   | **Critical** |
 
 **Run coverage**:
 
@@ -1514,16 +1560,17 @@ pnpm turbo test -- --coverage
 
 Use **conventional branch names**:
 
-| Type | Prefix | Example |
-|------|--------|---------|
-| Feature | `feat/` | `feat/chavruta-agent` |
-| Bug fix | `fix/` | `fix/rls-annotation-layer` |
-| Refactor | `refactor/` | `refactor/user-service-split` |
-| Documentation | `docs/` | `docs/update-api-contracts` |
-| Tests | `test/` | `test/add-rls-integration` |
-| Chore | `chore/` | `chore/update-dependencies` |
+| Type          | Prefix      | Example                       |
+| ------------- | ----------- | ----------------------------- |
+| Feature       | `feat/`     | `feat/chavruta-agent`         |
+| Bug fix       | `fix/`      | `fix/rls-annotation-layer`    |
+| Refactor      | `refactor/` | `refactor/user-service-split` |
+| Documentation | `docs/`     | `docs/update-api-contracts`   |
+| Tests         | `test/`     | `test/add-rls-integration`    |
+| Chore         | `chore/`    | `chore/update-dependencies`   |
 
 **Examples**:
+
 ```bash
 git checkout -b feat/hybrid-search-fusion
 git checkout -b fix/jwt-validation-error
@@ -1583,20 +1630,25 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 ```markdown
 ## Summary
+
 Brief description of changes
 
 ## Changes
+
 - Bullet point list of changes
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] Manual testing performed
 
 ## Screenshots (if UI change)
+
 [Add screenshots]
 
 ## Related Issues
+
 Fixes #123
 ```
 
@@ -1607,30 +1659,35 @@ Fixes #123
 ### 15.1 What to Look For
 
 **Correctness**:
+
 - [ ] Does the code do what it claims?
 - [ ] Are edge cases handled?
 - [ ] Is error handling appropriate?
 - [ ] Are tests comprehensive?
 
 **Readability**:
+
 - [ ] Is the code easy to understand?
 - [ ] Are variable/function names descriptive?
 - [ ] Is the logic clear and straightforward?
 - [ ] Are comments used appropriately (why, not what)?
 
 **Performance**:
+
 - [ ] Are there any N+1 queries?
 - [ ] Is caching used appropriately?
 - [ ] Are database indexes present?
 - [ ] Is pagination used for large lists?
 
 **Security**:
+
 - [ ] Is input validated (Zod schemas)?
 - [ ] Is RLS context used for all queries?
 - [ ] Are JWT scopes/roles checked?
 - [ ] Are secrets excluded from code?
 
 **Maintainability**:
+
 - [ ] Does the code follow project conventions?
 - [ ] Is the code properly organized?
 - [ ] Are files under 150 lines (or justified exceptions)?
@@ -1641,7 +1698,8 @@ Fixes #123
 **Be constructive, specific, and actionable**:
 
 **✅ Good feedback**:
-```
+
+````
 The `getUserCourses` function is doing two things: fetching data
 and calculating progress. Consider extracting progress calculation
 into a separate `calculateCourseProgress` function for better testability.
@@ -1651,13 +1709,16 @@ Example:
 function calculateCourseProgress(course: Course): number {
   return (course.completedModules / course.totalModules) * 100;
 }
-```
+````
+
 ```
 
 **❌ Poor feedback**:
 ```
+
 This code is bad.
-```
+
+````
 
 **Use prefixes** to indicate severity:
 - `[nit]` — Minor suggestion, not blocking
@@ -1681,9 +1742,10 @@ for (const course of courses) {
     where: eq(users.id, course.creatorId),
   });
 }
-```
+````
 
 **✅ Solution 1: Drizzle relations**:
+
 ```typescript
 // Good: Single query with JOIN
 const courses = await db.query.courses.findMany({
@@ -1692,13 +1754,14 @@ const courses = await db.query.courses.findMany({
 ```
 
 **✅ Solution 2: DataLoader**:
+
 ```typescript
 // Good: Batches user fetches
 const userLoader = new DataLoader(async (ids: string[]) => {
   const users = await db.query.users.findMany({
     where: inArray(users.id, ids),
   });
-  return ids.map(id => users.find(u => u.id === id));
+  return ids.map((id) => users.find((u) => u.id === id));
 });
 
 const courses = await db.query.courses.findMany();
@@ -1757,23 +1820,30 @@ export class CourseResolver {
 
 ```typescript
 // Drizzle schema
-export const courses = pgTable('courses', {
-  id: uuid('id').primaryKey(),
-  tenantId: uuid('tenant_id').notNull(),
-  title: text('title').notNull(),
-  createdAt: timestamp('created_at').notNull(),
-}, (table) => ({
-  // Index for tenant filtering
-  tenantIdIdx: index('courses_tenant_id_idx').on(table.tenantId),
+export const courses = pgTable(
+  'courses',
+  {
+    id: uuid('id').primaryKey(),
+    tenantId: uuid('tenant_id').notNull(),
+    title: text('title').notNull(),
+    createdAt: timestamp('created_at').notNull(),
+  },
+  (table) => ({
+    // Index for tenant filtering
+    tenantIdIdx: index('courses_tenant_id_idx').on(table.tenantId),
 
-  // Composite index for tenant + created_at (for sorting)
-  tenantCreatedAtIdx: index('courses_tenant_created_at_idx').on(table.tenantId, table.createdAt),
+    // Composite index for tenant + created_at (for sorting)
+    tenantCreatedAtIdx: index('courses_tenant_created_at_idx').on(
+      table.tenantId,
+      table.createdAt
+    ),
 
-  // Partial index for non-deleted courses
-  activeCoursesIdx: index('courses_active_idx')
-    .on(table.tenantId)
-    .where(sql`deleted_at IS NULL`),
-}));
+    // Partial index for non-deleted courses
+    activeCoursesIdx: index('courses_active_idx')
+      .on(table.tenantId)
+      .where(sql`deleted_at IS NULL`),
+  })
+);
 ```
 
 ---
@@ -1855,7 +1925,7 @@ type Mutation {
 
 **Document all public functions**:
 
-```typescript
+````typescript
 /**
  * Finds a user by their unique ID.
  *
@@ -1871,7 +1941,7 @@ type Mutation {
 export async function getUserById(id: string): Promise<User | null> {
   return db.query.users.findFirst({ where: eq(users.id, id) });
 }
-```
+````
 
 ### 18.2 GraphQL Schema Descriptions
 
@@ -1885,16 +1955,24 @@ Users can have different roles (student, instructor, admin) with varying permiss
 type User @key(fields: "id") {
   id: ID!
 
-  """The user's email address (unique within tenant)"""
+  """
+  The user's email address (unique within tenant)
+  """
   email: String!
 
-  """Display name shown in the UI"""
+  """
+  Display name shown in the UI
+  """
   displayName: String!
 
-  """User's role determining their permissions"""
+  """
+  User's role determining their permissions
+  """
   role: UserRole!
 
-  """Timestamp when the user account was created"""
+  """
+  Timestamp when the user account was created
+  """
   createdAt: DateTime!
 }
 ```
@@ -1903,7 +1981,7 @@ type User @key(fields: "id") {
 
 **Every package needs a README**:
 
-```markdown
+````markdown
 # @edusphere/db
 
 Database layer for EduSphere — Drizzle ORM schemas, migrations, and RLS helpers.
@@ -1924,13 +2002,15 @@ const user = await withTenantContext(tenantId, userId, role, async () => {
   return db.query.users.findFirst({ where: eq(users.id, userId) });
 });
 ```
+````
 
 ## Commands
 
 - `pnpm generate` — Generate migrations
 - `pnpm migrate` — Apply migrations
 - `pnpm seed` — Seed database with demo data
-```
+
+````
 
 ### 18.4 Update OPEN_ISSUES.md
 
@@ -1948,7 +2028,7 @@ const user = await withTenantContext(tenantId, userId, role, async () => {
 **Tests:** `packages/db/src/rls/annotation.test.ts`
 **Created:** 2026-02-15
 **Updated:** 2026-02-16
-```
+````
 
 ---
 

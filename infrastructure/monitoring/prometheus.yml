@@ -2,80 +2,80 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    cluster: 'edusphere-production'
-    environment: 'production'
+    cluster: "edusphere-production"
+    environment: "production"
 
 # Alertmanager configuration
 alerting:
   alertmanagers:
     - static_configs:
         - targets:
-            - 'alertmanager:9093'
+            - "alertmanager:9093"
 
 # Load rules once and periodically evaluate them
 rule_files:
-  - '/etc/prometheus/rules/*.yml'
+  - "/etc/prometheus/rules/*.yml"
 
 # Scrape configurations
 scrape_configs:
   # Prometheus self-monitoring
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
   # Gateway
-  - job_name: 'gateway'
+  - job_name: "gateway"
     static_configs:
-      - targets: ['gateway:4000']
-    metrics_path: '/metrics'
+      - targets: ["gateway:4000"]
+    metrics_path: "/metrics"
 
   # Subgraphs
-  - job_name: 'subgraph-core'
+  - job_name: "subgraph-core"
     static_configs:
-      - targets: ['subgraph-core:4001']
-    metrics_path: '/metrics'
+      - targets: ["subgraph-core:4001"]
+    metrics_path: "/metrics"
 
-  - job_name: 'subgraph-content'
+  - job_name: "subgraph-content"
     static_configs:
-      - targets: ['subgraph-content:4002']
-    metrics_path: '/metrics'
+      - targets: ["subgraph-content:4002"]
+    metrics_path: "/metrics"
 
-  - job_name: 'subgraph-annotation'
+  - job_name: "subgraph-annotation"
     static_configs:
-      - targets: ['subgraph-annotation:4003']
-    metrics_path: '/metrics'
+      - targets: ["subgraph-annotation:4003"]
+    metrics_path: "/metrics"
 
-  - job_name: 'subgraph-collaboration'
+  - job_name: "subgraph-collaboration"
     static_configs:
-      - targets: ['subgraph-collaboration:4004']
-    metrics_path: '/metrics'
+      - targets: ["subgraph-collaboration:4004"]
+    metrics_path: "/metrics"
 
-  - job_name: 'subgraph-agent'
+  - job_name: "subgraph-agent"
     static_configs:
-      - targets: ['subgraph-agent:4005']
-    metrics_path: '/metrics'
+      - targets: ["subgraph-agent:4005"]
+    metrics_path: "/metrics"
 
-  - job_name: 'subgraph-knowledge'
+  - job_name: "subgraph-knowledge"
     static_configs:
-      - targets: ['subgraph-knowledge:4006']
-    metrics_path: '/metrics'
+      - targets: ["subgraph-knowledge:4006"]
+    metrics_path: "/metrics"
 
   # PostgreSQL exporter
-  - job_name: 'postgresql'
+  - job_name: "postgresql"
     static_configs:
-      - targets: ['postgres-exporter:9187']
+      - targets: ["postgres-exporter:9187"]
 
   # Redis exporter
-  - job_name: 'redis'
+  - job_name: "redis"
     static_configs:
-      - targets: ['redis-exporter:9121']
+      - targets: ["redis-exporter:9121"]
 
   # Node exporter (system metrics)
-  - job_name: 'node'
+  - job_name: "node"
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
 
   # Cadvisor (container metrics)
-  - job_name: 'cadvisor'
+  - job_name: "cadvisor"
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ["cadvisor:8080"]

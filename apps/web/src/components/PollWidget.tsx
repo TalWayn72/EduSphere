@@ -18,28 +18,62 @@ import {
   POLL_RESULTS_QUERY,
 } from '@/lib/graphql/live-session.queries';
 
-interface PollOption { text: string; count: number; percentage: number }
-interface PollResultsData { pollId: string; question: string; options: PollOption[]; totalVotes: number }
-interface SessionPollData { id: string; sessionId: string; question: string; options: string[]; isActive: boolean }
+interface PollOption {
+  text: string;
+  count: number;
+  percentage: number;
+}
+interface PollResultsData {
+  pollId: string;
+  question: string;
+  options: PollOption[];
+  totalVotes: number;
+}
+interface SessionPollData {
+  id: string;
+  sessionId: string;
+  question: string;
+  options: string[];
+  isActive: boolean;
+}
 
-interface PollWidgetProps { sessionId: string; isModerator: boolean }
+interface PollWidgetProps {
+  sessionId: string;
+  isModerator: boolean;
+}
 
-function PollResults({ pollId, tenantId: _tenantId }: { pollId: string; tenantId?: string }) {
+function PollResults({
+  pollId,
+  tenantId: _tenantId,
+}: {
+  pollId: string;
+  tenantId?: string;
+}) {
   const [paused, setPaused] = useState(false);
   useEffect(() => () => setPaused(true), []);
 
-  const [{ data: subData }] = useSubscription({ query: POLL_UPDATED_SUBSCRIPTION, variables: { pollId }, pause: paused });
-  const [{ data: queryData }] = useQuery({ query: POLL_RESULTS_QUERY, variables: { pollId } });
+  const [{ data: subData }] = useSubscription({
+    query: POLL_UPDATED_SUBSCRIPTION,
+    variables: { pollId },
+    pause: paused,
+  });
+  const [{ data: queryData }] = useQuery({
+    query: POLL_RESULTS_QUERY,
+    variables: { pollId },
+  });
 
   const results: PollResultsData | undefined =
     (subData as { pollUpdated?: PollResultsData } | undefined)?.pollUpdated ??
     (queryData as { pollResults?: PollResultsData } | undefined)?.pollResults;
 
-  if (!results) return <p className="text-xs text-muted-foreground">Loading results...</p>;
+  if (!results)
+    return <p className="text-xs text-muted-foreground">Loading results...</p>;
 
   return (
     <div className="space-y-2 mt-3">
-      <p className="text-xs text-muted-foreground">{results.totalVotes} votes</p>
+      <p className="text-xs text-muted-foreground">
+        {results.totalVotes} votes
+      </p>
       {results.options.map((opt) => (
         <div key={opt.text} className="space-y-1">
           <div className="flex justify-between text-sm">
@@ -57,18 +91,29 @@ export function PollWidget({ sessionId, isModerator }: PollWidgetProps) {
   const [question, setQuestion] = useState('');
   const [optionInputs, setOptionInputs] = useState(['', '']);
   const [votedPollIds, setVotedPollIds] = useState<Set<string>>(new Set());
-  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined
+  );
 
-  useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    },
+    []
+  );
 
-  const [{ data: pollsData }, refetchPolls] = useQuery({ query: SESSION_POLLS_QUERY, variables: { sessionId } });
+  const [{ data: pollsData }, refetchPolls] = useQuery({
+    query: SESSION_POLLS_QUERY,
+    variables: { sessionId },
+  });
   const [, createPoll] = useMutation(CREATE_POLL_MUTATION);
   const [, activatePoll] = useMutation(ACTIVATE_POLL_MUTATION);
   const [, closePoll] = useMutation(CLOSE_POLL_MUTATION);
   const [, votePoll] = useMutation(VOTE_POLL_MUTATION);
 
   const polls: SessionPollData[] =
-    (pollsData as { sessionPolls?: SessionPollData[] } | undefined)?.sessionPolls ?? [];
+    (pollsData as { sessionPolls?: SessionPollData[] } | undefined)
+      ?.sessionPolls ?? [];
 
   const handleCreate = async () => {
     const opts = optionInputs.filter((o) => o.trim().length > 0);
@@ -94,7 +139,9 @@ export function PollWidget({ sessionId, isModerator }: PollWidgetProps) {
       <CardContent className="space-y-4">
         {isModerator && (
           <div className="space-y-2 border rounded p-3">
-            <p className="text-xs font-medium text-muted-foreground">Create Poll</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Create Poll
+            </p>
             <Input
               placeholder="Poll question"
               value={question}
@@ -115,10 +162,16 @@ export function PollWidget({ sessionId, isModerator }: PollWidgetProps) {
               />
             ))}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setOptionInputs([...optionInputs, ''])}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setOptionInputs([...optionInputs, ''])}
+              >
                 + Option
               </Button>
-              <Button size="sm" onClick={() => void handleCreate()}>Create</Button>
+              <Button size="sm" onClick={() => void handleCreate()}>
+                Create
+              </Button>
             </div>
           </div>
         )}
@@ -129,24 +182,42 @@ export function PollWidget({ sessionId, isModerator }: PollWidgetProps) {
             {isModerator ? (
               <div className="flex gap-2">
                 {!poll.isActive && (
-                  <Button size="sm" variant="outline"
-                    onClick={async () => { await activatePoll({ pollId: poll.id }); refetchPolls({ requestPolicy: 'network-only' }); }}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      await activatePoll({ pollId: poll.id });
+                      refetchPolls({ requestPolicy: 'network-only' });
+                    }}
+                  >
                     Activate
                   </Button>
                 )}
                 {poll.isActive && (
-                  <Button size="sm" variant="destructive"
-                    onClick={async () => { await closePoll({ pollId: poll.id }); refetchPolls({ requestPolicy: 'network-only' }); }}>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={async () => {
+                      await closePoll({ pollId: poll.id });
+                      refetchPolls({ requestPolicy: 'network-only' });
+                    }}
+                  >
                     Close Poll
                   </Button>
                 )}
               </div>
             ) : (
-              !votedPollIds.has(poll.id) && poll.isActive && (
+              !votedPollIds.has(poll.id) &&
+              poll.isActive && (
                 <div className="space-y-1">
                   {poll.options.map((opt, i) => (
-                    <Button key={i} variant="outline" size="sm" className="w-full justify-start"
-                      onClick={() => void handleVote(poll.id, i)}>
+                    <Button
+                      key={i}
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={() => void handleVote(poll.id, i)}
+                    >
                       {opt}
                     </Button>
                   ))}
@@ -160,7 +231,9 @@ export function PollWidget({ sessionId, isModerator }: PollWidgetProps) {
         ))}
 
         {activePolls.length === 0 && !isModerator && (
-          <p className="text-xs text-muted-foreground text-center py-4">No active polls</p>
+          <p className="text-xs text-muted-foreground text-center py-4">
+            No active polls
+          </p>
         )}
       </CardContent>
     </Card>

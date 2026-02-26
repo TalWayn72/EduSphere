@@ -10,12 +10,21 @@ When a user changes the language to Hebrew (עברית) in the Settings page, th
 
 ```ts
 const SUPPORTED_LOCALES = [
-  'en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id',
-//                                                          ↑ 'he' missing
+  'en',
+  'zh-CN',
+  'hi',
+  'es',
+  'fr',
+  'bn',
+  'pt',
+  'ru',
+  'id',
+  //                                                          ↑ 'he' missing
 ] as const;
 ```
 
 **Failure chain:**
+
 1. User selects Hebrew → `setLocale('he')` runs optimistic update (i18n + localStorage) ✅
 2. `updatePreferences({ input: { locale: 'he' } })` mutation fires
 3. Resolver calls `UpdateUserPreferencesSchema.parse(input)` → **Zod throws** `ZodError` — `'he'` not in enum
@@ -28,35 +37,47 @@ The `useUserPreferences` hook logic is **correct** — it only overwrites becaus
 ## Fix
 
 ### 1. `apps/subgraph-core/src/user/user.schemas.ts`
+
 Add `'he'` to the `SUPPORTED_LOCALES` array (sync with `packages/i18n/src/index.ts`):
 
 ```ts
 const SUPPORTED_LOCALES = [
-  'en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id', 'he',
+  'en',
+  'zh-CN',
+  'hi',
+  'es',
+  'fr',
+  'bn',
+  'pt',
+  'ru',
+  'id',
+  'he',
 ] as const;
 ```
 
 ### 2. `apps/subgraph-core/src/user/user-preferences.service.spec.ts`
+
 Add regression test at the end of the `updatePreferences()` describe block:
 
 ```ts
 it('accepts Hebrew locale (he) without throwing', async () => {
   await expect(
-    service.updatePreferences('user-1', { locale: 'he' }, MOCK_AUTH),
+    service.updatePreferences('user-1', { locale: 'he' }, MOCK_AUTH)
   ).resolves.toBeDefined();
 });
 ```
 
 ### 3. `OPEN_ISSUES.md`
+
 Document the bug fix with status ✅ Fixed.
 
 ## Files to Modify
 
-| File | Change |
-|------|--------|
-| `apps/subgraph-core/src/user/user.schemas.ts` | Add `'he'` to `SUPPORTED_LOCALES` (line 6) |
-| `apps/subgraph-core/src/user/user-preferences.service.spec.ts` | Add Hebrew locale regression test |
-| `OPEN_ISSUES.md` | Document the fix |
+| File                                                           | Change                                     |
+| -------------------------------------------------------------- | ------------------------------------------ |
+| `apps/subgraph-core/src/user/user.schemas.ts`                  | Add `'he'` to `SUPPORTED_LOCALES` (line 6) |
+| `apps/subgraph-core/src/user/user-preferences.service.spec.ts` | Add Hebrew locale regression test          |
+| `OPEN_ISSUES.md`                                               | Document the fix                           |
 
 ## No Changes Needed In
 

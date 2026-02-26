@@ -23,16 +23,17 @@ const { MockPool, mockPoolEnd, mockPoolConstructor } = vi.hoisted(() => {
   // Track every constructed instance
   const instances: { end: typeof mockPoolEnd }[] = [];
 
-  const mockPoolConstructor = vi.fn().mockImplementation(function (
-    this: { end: typeof mockPoolEnd },
-  ) {
+  const mockPoolConstructor = vi.fn().mockImplementation(function (this: {
+    end: typeof mockPoolEnd;
+  }) {
     this.end = mockPoolEnd;
     instances.push(this);
   });
 
   // Expose the instances array for assertions
-  (mockPoolConstructor as unknown as { instances: typeof instances }).instances =
-    instances;
+  (
+    mockPoolConstructor as unknown as { instances: typeof instances }
+  ).instances = instances;
 
   return { MockPool: mockPoolConstructor, mockPoolEnd, mockPoolConstructor };
 });
@@ -60,9 +61,7 @@ describe('DB pool singleton registry — memory safety', () => {
     // Start every test with a clean registry.
     await closeAllPools();
     vi.clearAllMocks();
-    (
-      MockPool as unknown as { instances: unknown[] }
-    ).instances.length = 0;
+    (MockPool as unknown as { instances: unknown[] }).instances.length = 0;
   });
 
   afterEach(async () => {
@@ -87,7 +86,7 @@ describe('DB pool singleton registry — memory safety', () => {
         (args) => {
           const opts = args[0] as { connectionString?: string };
           return opts.connectionString === TEST_URL_A;
-        },
+        }
       );
       expect(constructorCallsForA).toHaveLength(1);
     });

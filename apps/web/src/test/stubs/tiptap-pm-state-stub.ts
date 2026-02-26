@@ -1,7 +1,13 @@
-export const Plugin = function Plugin(this: Record<string, unknown>, spec: unknown) {
+export const Plugin = function Plugin(
+  this: Record<string, unknown>,
+  spec: unknown
+) {
   Object.assign(this, spec);
 };
-export const PluginKey = function PluginKey(this: Record<string, unknown>, name: string) {
+export const PluginKey = function PluginKey(
+  this: Record<string, unknown>,
+  name: string
+) {
   this.name = name;
   this.key = name + '$';
 };

@@ -43,7 +43,9 @@ const MOCK_COURSE_TITLE = 'Introduction to Talmud Study';
 // ── Suite 1: Page load and basic structure ─────────────────────────────────────
 
 test.describe('CourseDetailPage — page load', () => {
-  test('page loads at /courses/:courseId without crashing', async ({ page }) => {
+  test('page loads at /courses/:courseId without crashing', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
@@ -51,7 +53,9 @@ test.describe('CourseDetailPage — page load', () => {
     await expect(page.locator('header')).toBeVisible({ timeout: 10_000 });
 
     // No React error boundary crash overlay.
-    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 
   test('course title is visible in an h2 element', async ({ page }) => {
@@ -65,7 +69,9 @@ test.describe('CourseDetailPage — page load', () => {
     ).toBeVisible({ timeout: 8_000 });
   });
 
-  test('page renders with any non-mock course ID using fallback data', async ({ page }) => {
+  test('page renders with any non-mock course ID using fallback data', async ({
+    page,
+  }) => {
     // Visiting a real courseId that doesn't exist in the backend still renders
     // because the error path falls back to MOCK_COURSE_DETAIL_DEFAULT.
     await page.goto('/courses/some-unknown-id');
@@ -103,12 +109,16 @@ test.describe('CourseDetailPage — navigation', () => {
     expect(page.url()).toMatch(/\/courses$/);
   });
 
-  test('clicking a course card on the list navigates to the detail page', async ({ page }) => {
+  test('clicking a course card on the list navigates to the detail page', async ({
+    page,
+  }) => {
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
 
     // Click the first course title — CourseList navigates to /courses/:id
-    const firstCourseTitle = page.getByText('Introduction to Talmud Study').first();
+    const firstCourseTitle = page
+      .getByText('Introduction to Talmud Study')
+      .first();
     await firstCourseTitle.click();
 
     await page.waitForURL(/\/courses\//, { timeout: 10_000 });
@@ -124,7 +134,9 @@ test.describe('CourseDetailPage — navigation', () => {
 // ── Suite 3: Enroll button ─────────────────────────────────────────────────────
 
 test.describe('CourseDetailPage — enroll button', () => {
-  test('Enroll button is visible on the course detail page', async ({ page }) => {
+  test('Enroll button is visible on the course detail page', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
@@ -144,7 +156,9 @@ test.describe('CourseDetailPage — enroll button', () => {
 
     // Click should not cause a crash or error overlay
     await enrollBtn.click();
-    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
+      timeout: 3_000,
+    });
   });
 });
 
@@ -176,9 +190,15 @@ test.describe('CourseDetailPage — module list', () => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByText('Module 1: Foundations', { exact: false })).toBeVisible({ timeout: 8_000 });
-    await expect(page.getByText('Module 2: Core Concepts', { exact: false })).toBeVisible();
-    await expect(page.getByText('Module 3: Advanced Topics', { exact: false })).toBeVisible();
+    await expect(
+      page.getByText('Module 1: Foundations', { exact: false })
+    ).toBeVisible({ timeout: 8_000 });
+    await expect(
+      page.getByText('Module 2: Core Concepts', { exact: false })
+    ).toBeVisible();
+    await expect(
+      page.getByText('Module 3: Advanced Topics', { exact: false })
+    ).toBeVisible();
   });
 
   test('first module is expanded by default', async ({ page }) => {
@@ -192,7 +212,9 @@ test.describe('CourseDetailPage — module list', () => {
     ).toBeVisible({ timeout: 8_000 });
   });
 
-  test('second module is collapsed by default (content items not visible)', async ({ page }) => {
+  test('second module is collapsed by default (content items not visible)', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
@@ -206,15 +228,17 @@ test.describe('CourseDetailPage — module list', () => {
 // ── Suite 5: Module expand/collapse ───────────────────────────────────────────
 
 test.describe('CourseDetailPage — module expand/collapse', () => {
-  test('clicking a collapsed module expands it to show content items', async ({ page }) => {
+  test('clicking a collapsed module expands it to show content items', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
     // Module 2 starts collapsed — click its header to expand
     const module2Header = page
       .getByText('Module 2: Core Concepts', { exact: false })
-      .locator('..')  // CardTitle → CardHeader child
-      .locator('..');   // up to CardHeader
+      .locator('..') // CardTitle → CardHeader child
+      .locator('..'); // up to CardHeader
     await module2Header.click();
 
     // After clicking, "Deep Dive Video" should be visible
@@ -246,23 +270,39 @@ test.describe('CourseDetailPage — module expand/collapse', () => {
     await page.waitForLoadState('networkidle');
 
     // Expand Module 2
-    await page.getByText('Module 2: Core Concepts', { exact: false }).first().click();
-    await expect(page.getByText('Deep Dive Video', { exact: false })).toBeVisible({ timeout: 5_000 });
+    await page
+      .getByText('Module 2: Core Concepts', { exact: false })
+      .first()
+      .click();
+    await expect(
+      page.getByText('Deep Dive Video', { exact: false })
+    ).toBeVisible({ timeout: 5_000 });
 
     // Expand Module 3
-    await page.getByText('Module 3: Advanced Topics', { exact: false }).first().click();
-    await expect(page.getByText('Advanced Lecture', { exact: false })).toBeVisible({ timeout: 5_000 });
+    await page
+      .getByText('Module 3: Advanced Topics', { exact: false })
+      .first()
+      .click();
+    await expect(
+      page.getByText('Advanced Lecture', { exact: false })
+    ).toBeVisible({ timeout: 5_000 });
   });
 
-  test('chevron icon changes between ChevronRight (collapsed) and ChevronDown (expanded)', async ({ page }) => {
+  test('chevron icon changes between ChevronRight (collapsed) and ChevronDown (expanded)', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
     // Module 2 is collapsed — has lucide-chevron-right icon
     // Module 1 is expanded — has lucide-chevron-down icon
     // Lucide renders SVG elements with class "lucide lucide-chevron-down" or "lucide-chevron-right"
-    await expect(page.locator('svg.lucide-chevron-down').first()).toBeVisible({ timeout: 8_000 });
-    await expect(page.locator('svg.lucide-chevron-right').first()).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator('svg.lucide-chevron-down').first()).toBeVisible({
+      timeout: 8_000,
+    });
+    await expect(page.locator('svg.lucide-chevron-right').first()).toBeVisible({
+      timeout: 8_000,
+    });
   });
 });
 
@@ -275,9 +315,9 @@ test.describe('CourseDetailPage — content type icons', () => {
 
     // Module 1 is open — "Introduction Video" (VIDEO) should show lucide-play icon
     // lucide-play renders as svg.lucide-play with class containing text-blue-500
-    await expect(
-      page.locator('svg.lucide-play').first()
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator('svg.lucide-play').first()).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('PDF content items show a FileText icon (red)', async ({ page }) => {
@@ -285,9 +325,9 @@ test.describe('CourseDetailPage — content type icons', () => {
     await page.waitForLoadState('networkidle');
 
     // "Course Overview" is PDF — renders lucide-file-text
-    await expect(
-      page.locator('svg.lucide-file-text').first()
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator('svg.lucide-file-text').first()).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('QUIZ content items show a HelpCircle icon', async ({ page }) => {
@@ -295,16 +335,18 @@ test.describe('CourseDetailPage — content type icons', () => {
     await page.waitForLoadState('networkidle');
 
     // "Foundations Quiz" is QUIZ — Lucide v0.4+ renders HelpCircle as lucide-circle-help
-    await expect(
-      page.locator('svg.lucide-circle-help').first()
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator('svg.lucide-circle-help').first()).toBeVisible({
+      timeout: 8_000,
+    });
   });
 });
 
 // ── Suite 7: Content item navigation ──────────────────────────────────────────
 
 test.describe('CourseDetailPage — content item navigation', () => {
-  test('clicking a content item navigates to /learn/:itemId', async ({ page }) => {
+  test('clicking a content item navigates to /learn/:itemId', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
@@ -318,7 +360,9 @@ test.describe('CourseDetailPage — content item navigation', () => {
     expect(page.url()).toContain('/learn/content-1');
   });
 
-  test('navigation to content viewer includes courseId query param', async ({ page }) => {
+  test('navigation to content viewer includes courseId query param', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
@@ -340,9 +384,9 @@ test.describe('CourseDetailPage — duration display', () => {
 
     // "Introduction Video" has duration=600 seconds → "10m 0s"
     // formatDuration(600) = "10m 0s"
-    await expect(
-      page.getByText(/10m/, { exact: false })
-    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByText(/10m/, { exact: false })).toBeVisible({
+      timeout: 8_000,
+    });
   });
 
   test('items without duration show no duration text', async ({ page }) => {
@@ -385,7 +429,9 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
     });
   }
 
-  test('offline banner shows a user-friendly message, not SQL', async ({ page }) => {
+  test('offline banner shows a user-friendly message, not SQL', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 
@@ -396,7 +442,7 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
     // If the banner is visible it must contain a friendly message, not SQL
     const isBannerVisible = await banner.isVisible().catch(() => false);
     if (isBannerVisible) {
-      const bannerText = await banner.textContent() ?? '';
+      const bannerText = (await banner.textContent()) ?? '';
       expect(bannerText).not.toContain('Failed query:');
       expect(bannerText).not.toContain('SELECT');
       expect(bannerText).not.toContain('DrizzleQueryError');
@@ -405,21 +451,29 @@ test.describe('CourseDetailPage — SQL error sanitization (regression guard)', 
     }
   });
 
-  test('no raw error stack trace is visible anywhere on the page', async ({ page }) => {
+  test('no raw error stack trace is visible anywhere on the page', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1_000);
 
     // Stack trace indicators
-    await expect(page.getByText(/at Object\.\<anonymous\>/i)).not.toBeVisible({ timeout: 2_000 });
-    await expect(page.getByText(/\.ts:\d+:\d+/)).not.toBeVisible({ timeout: 2_000 });
+    await expect(page.getByText(/at Object\.\<anonymous\>/i)).not.toBeVisible({
+      timeout: 2_000,
+    });
+    await expect(page.getByText(/\.ts:\d+:\d+/)).not.toBeVisible({
+      timeout: 2_000,
+    });
   });
 });
 
 // ── Suite 10: Progress bar accessibility ──────────────────────────────────────
 
 test.describe('CourseDetailPage — progress bar accessibility', () => {
-  test('progress bar has correct ARIA attributes when visible', async ({ page }) => {
+  test('progress bar has correct ARIA attributes when visible', async ({
+    page,
+  }) => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('networkidle');
 

@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { Eye, Edit2, RefreshCw, Check } from 'lucide-react';
-import {
-  Card, CardContent, CardHeader, CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,11 +18,20 @@ interface Props {
 }
 
 const ALL_VARIABLES = [
-  '{{user.name}}', '{{user.email}}', '{{tenant.name}}',
-  '{{tenant.logo_url}}', '{{course.title}}', '{{due_date}}',
+  '{{user.name}}',
+  '{{user.email}}',
+  '{{tenant.name}}',
+  '{{tenant.logo_url}}',
+  '{{course.title}}',
+  '{{due_date}}',
 ];
 
-export function NotificationTemplateEditor({ template, onSave, onReset, saved }: Props) {
+export function NotificationTemplateEditor({
+  template,
+  onSave,
+  onReset,
+  saved,
+}: Props) {
   const [subject, setSubject] = useState(template.subject);
   const [bodyHtml, setBodyHtml] = useState(template.bodyHtml);
   const [tab, setTab] = useState<'edit' | 'preview'>('edit');
@@ -41,7 +48,9 @@ export function NotificationTemplateEditor({ template, onSave, onReset, saved }:
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base">{template.name}</CardTitle>
-          <Badge variant="outline" className="font-mono text-xs">{template.key}</Badge>
+          <Badge variant="outline" className="font-mono text-xs">
+            {template.key}
+          </Badge>
         </div>
       </CardHeader>
       <Separator />
@@ -72,7 +81,10 @@ export function NotificationTemplateEditor({ template, onSave, onReset, saved }:
           </div>
         </div>
 
-        <Tabs value={tab} onValueChange={(v) => setTab(v as 'edit' | 'preview')}>
+        <Tabs
+          value={tab}
+          onValueChange={(v) => setTab(v as 'edit' | 'preview')}
+        >
           <TabsList className="mb-2">
             <TabsTrigger value="edit" className="gap-1.5">
               <Edit2 className="w-3.5 h-3.5" /> Edit

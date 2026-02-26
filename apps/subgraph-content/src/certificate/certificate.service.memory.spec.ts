@@ -18,7 +18,9 @@ const hoisted = vi.hoisted(() => {
   const idleSub = {
     unsubscribe: mockUnsubscribe,
     [Symbol.asyncIterator]() {
-      return { next: vi.fn().mockResolvedValue({ done: true, value: undefined }) };
+      return {
+        next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+      };
     },
   };
 
@@ -29,7 +31,9 @@ vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   schema: { certificates: {} },
   eq: vi.fn(),
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: (db: unknown) => unknown) => fn({})),
+  withTenantContext: vi.fn(
+    (_db: unknown, _ctx: unknown, fn: (db: unknown) => unknown) => fn({})
+  ),
   closeAllPools: hoisted.mockCloseAllPools,
 }));
 
@@ -47,7 +51,9 @@ describe('CertificateService — memory safety', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    pdfService = { generateAndUpload: vi.fn() } as unknown as CertificatePdfService;
+    pdfService = {
+      generateAndUpload: vi.fn(),
+    } as unknown as CertificatePdfService;
     service = new CertificateService(pdfService);
   });
 

@@ -3,7 +3,10 @@ import { UnauthorizedException } from '@nestjs/common';
 import { AuditLogService } from './audit-log.service.js';
 import type { AuthContext } from '@edusphere/auth';
 
-interface GraphQLContext { req: unknown; authContext?: AuthContext }
+interface GraphQLContext {
+  req: unknown;
+  authContext?: AuthContext;
+}
 
 @Resolver()
 export class AuditLogResolver {
@@ -17,7 +20,7 @@ export class AuditLogResolver {
     @Args('userId') userId: string | undefined,
     @Args('since') since: string | undefined,
     @Args('until') until: string | undefined,
-    @Context() ctx: GraphQLContext,
+    @Context() ctx: GraphQLContext
   ) {
     if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
     return this.auditLogService.getAuditLog(ctx.authContext.tenantId ?? '', {

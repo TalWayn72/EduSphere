@@ -88,9 +88,16 @@ describe('CI Pipeline: Security Policy Tests Gate', () => {
 
   it('security-scanning should depend on lint and typecheck', () => {
     // Find the security-scanning section and check needs
-    const scanningSection = CI_YML.substring(CI_YML.indexOf('security-scanning:'));
-    const needsSection = scanningSection.substring(0, scanningSection.indexOf('\n\n'));
-    expect(needsSection).toMatch(/needs:.*lint.*typecheck|needs:.*\[.*lint.*typecheck/s);
+    const scanningSection = CI_YML.substring(
+      CI_YML.indexOf('security-scanning:')
+    );
+    const needsSection = scanningSection.substring(
+      0,
+      scanningSection.indexOf('\n\n')
+    );
+    expect(needsSection).toMatch(
+      /needs:.*lint.*typecheck|needs:.*\[.*lint.*typecheck/s
+    );
   });
 
   it('ci-complete job should require security-scanning to pass', () => {
@@ -126,7 +133,9 @@ describe('GitHub Audit Log Export Workflow (Phase 7 — SOC2 CC3.3)', () => {
   const AUDIT_WF = readFile('.github/workflows/audit-export.yml');
 
   it('audit-export.yml workflow exists', () => {
-    expect(existsSync(resolve(ROOT, '.github/workflows/audit-export.yml'))).toBe(true);
+    expect(
+      existsSync(resolve(ROOT, '.github/workflows/audit-export.yml'))
+    ).toBe(true);
   });
 
   it('should run on a schedule (cron trigger)', () => {

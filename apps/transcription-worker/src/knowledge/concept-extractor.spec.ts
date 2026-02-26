@@ -38,8 +38,16 @@ describe('ConceptExtractor', () => {
     vi.mocked(generateObject).mockResolvedValueOnce({
       object: {
         concepts: [
-          { name: 'Metaphysics', definition: 'Study of being qua being', relatedTerms: ['Ontology'] },
-          { name: 'Teleology', definition: 'Study of final causes', relatedTerms: ['Aristotle'] },
+          {
+            name: 'Metaphysics',
+            definition: 'Study of being qua being',
+            relatedTerms: ['Ontology'],
+          },
+          {
+            name: 'Teleology',
+            definition: 'Study of final causes',
+            relatedTerms: ['Aristotle'],
+          },
         ],
       },
     } as any);
@@ -65,7 +73,9 @@ describe('ConceptExtractor', () => {
   });
 
   it('returns empty array and logs error when AI call fails', async () => {
-    vi.mocked(generateObject).mockRejectedValueOnce(new Error('AI service unavailable'));
+    vi.mocked(generateObject).mockRejectedValueOnce(
+      new Error('AI service unavailable')
+    );
 
     const result = await extractor.extract(SAMPLE_TEXT, 'course-1', 'tenant-1');
 
@@ -76,7 +86,11 @@ describe('ConceptExtractor', () => {
     vi.mocked(generateObject).mockResolvedValueOnce({
       object: {
         concepts: [
-          { name: '  Aristotle  ', definition: '  Greek philosopher  ', relatedTerms: [] },
+          {
+            name: '  Aristotle  ',
+            definition: '  Greek philosopher  ',
+            relatedTerms: [],
+          },
         ],
       },
     } as any);
@@ -91,7 +105,11 @@ describe('ConceptExtractor', () => {
     vi.mocked(generateObject).mockResolvedValueOnce({
       object: {
         concepts: [
-          { name: 'Concept', definition: 'A thing', relatedTerms: ['', 'Ontology', '  '] },
+          {
+            name: 'Concept',
+            definition: 'A thing',
+            relatedTerms: ['', 'Ontology', '  '],
+          },
         ],
       },
     } as any);
@@ -126,7 +144,9 @@ describe('ConceptExtractor', () => {
 
     await extractor.extract(SAMPLE_TEXT, 'course-1', 'tenant-1');
 
-    expect(createOllama).toHaveBeenCalledWith({ baseURL: 'http://ollama:11434/api' });
+    expect(createOllama).toHaveBeenCalledWith({
+      baseURL: 'http://ollama:11434/api',
+    });
   });
 
   it('truncates long text to 8000 chars', async () => {

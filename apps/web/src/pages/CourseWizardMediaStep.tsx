@@ -1,12 +1,24 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload, FileVideo, FileAudio, FileText, X, CheckCircle2, AlertCircle, PenLine } from 'lucide-react';
+import {
+  Upload,
+  FileVideo,
+  FileAudio,
+  FileText,
+  X,
+  CheckCircle2,
+  AlertCircle,
+  PenLine,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { urqlClient } from '@/lib/urql-client';
-import { PRESIGNED_UPLOAD_QUERY, CONFIRM_MEDIA_UPLOAD_MUTATION } from '@/lib/graphql/content.queries';
+import {
+  PRESIGNED_UPLOAD_QUERY,
+  CONFIRM_MEDIA_UPLOAD_MUTATION,
+} from '@/lib/graphql/content.queries';
 import type { UploadedMedia, CourseFormData } from './course-create.types';
 import { AltTextModal } from '@/components/AltTextModal';
 import { RichEditor } from '@/components/editor/RichEditor';
@@ -16,7 +28,13 @@ interface Props {
   onChange: (updates: Partial<CourseFormData>) => void;
 }
 
-type UploadState = 'idle' | 'presigning' | 'uploading' | 'confirming' | 'done' | 'error';
+type UploadState =
+  | 'idle'
+  | 'presigning'
+  | 'uploading'
+  | 'confirming'
+  | 'done'
+  | 'error';
 
 interface FileUploadEntry {
   file: File;
@@ -33,19 +51,29 @@ function fileIcon(mime: string) {
   return <FileText className="h-4 w-4" />;
 }
 
-const ACCEPTED_TYPES = 'video/mp4,video/webm,audio/mpeg,audio/wav,application/pdf,image/jpeg,image/png';
+const ACCEPTED_TYPES =
+  'video/mp4,video/webm,audio/mpeg,audio/wav,application/pdf,image/jpeg,image/png';
 
-export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) {
+export function CourseWizardMediaStep({
+  courseId,
+  mediaList,
+  onChange,
+}: Props) {
   const { t } = useTranslation('courses');
   const inputRef = useRef<HTMLInputElement>(null);
   const [entries, setEntries] = useState<FileUploadEntry[]>([]);
-  const [altTextTarget, setAltTextTarget] = useState<{ mediaId: string; altText: string | null } | null>(null);
+  const [altTextTarget, setAltTextTarget] = useState<{
+    mediaId: string;
+    altText: string | null;
+  } | null>(null);
   const [richDocTitle, setRichDocTitle] = useState('');
   const [richDocContent, setRichDocContent] = useState('');
   const [richDocSaved, setRichDocSaved] = useState(false);
 
   const updateEntry = (index: number, patch: Partial<FileUploadEntry>) => {
-    setEntries((prev) => prev.map((e, i) => (i === index ? { ...e, ...patch } : e)));
+    setEntries((prev) =>
+      prev.map((e, i) => (i === index ? { ...e, ...patch } : e))
+    );
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,14 +96,19 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
     // Step 1: Get presigned URL
     updateEntry(index, { state: 'presigning', progress: 0 });
 
-    const presignResult = await urqlClient.query(PRESIGNED_UPLOAD_QUERY, {
-      fileName: entry.file.name,
-      contentType: entry.file.type,
-      courseId,
-    }).toPromise();
+    const presignResult = await urqlClient
+      .query(PRESIGNED_UPLOAD_QUERY, {
+        fileName: entry.file.name,
+        contentType: entry.file.type,
+        courseId,
+      })
+      .toPromise();
 
     if (presignResult.error || !presignResult.data?.getPresignedUploadUrl) {
-      updateEntry(index, { state: 'error', error: t('wizard.failedUploadUrl') });
+      updateEntry(index, {
+        state: 'error',
+        error: t('wizard.failedUploadUrl'),
+      });
       return;
     }
 
@@ -96,7 +129,10 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
       });
 
       if (!uploadResp.ok) {
-        updateEntry(index, { state: 'error', error: `Upload failed: ${uploadResp.statusText}` });
+        updateEntry(index, {
+          state: 'error',
+          error: `Upload failed: ${uploadResp.statusText}`,
+        });
         return;
       }
     } catch {
@@ -107,11 +143,13 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
     updateEntry(index, { state: 'confirming', progress: 80 });
 
     // Step 3: Confirm upload via mutation
-    const confirmResult = await urqlClient.mutation(CONFIRM_MEDIA_UPLOAD_MUTATION, {
-      fileKey,
-      courseId,
-      title: entry.title,
-    }).toPromise();
+    const confirmResult = await urqlClient
+      .mutation(CONFIRM_MEDIA_UPLOAD_MUTATION, {
+        fileKey,
+        courseId,
+        title: entry.title,
+      })
+      .toPromise();
 
     if (confirmResult.error || !confirmResult.data?.confirmMediaUpload) {
       updateEntry(index, { state: 'error', error: t('wizard.failedConfirm') });
@@ -127,26 +165,46 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
   const removeEntry = (index: number) => {
     const entry = entries[index];
     if (entry?.result) {
-      onChange({ mediaList: mediaList.filter((m) => m.id !== entry.result?.id) });
+      onChange({
+        mediaList: mediaList.filter((m) => m.id !== entry.result?.id),
+      });
     }
     setEntries((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSaveRichDoc = () => { if (!richDocTitle.trim()) return;
-    const richEntry = { id: `rich-${Date.now()}`, courseId, fileKey: '', title: richDocTitle.trim(), contentType: 'RICH_DOCUMENT', status: 'READY' as const, downloadUrl: null, altText: null } as UploadedMedia;
-    onChange({ mediaList: [...mediaList, richEntry] }); setRichDocSaved(true); setRichDocTitle(''); setRichDocContent(''); setTimeout(() => setRichDocSaved(false), 3000);
+  const handleSaveRichDoc = () => {
+    if (!richDocTitle.trim()) return;
+    const richEntry = {
+      id: `rich-${Date.now()}`,
+      courseId,
+      fileKey: '',
+      title: richDocTitle.trim(),
+      contentType: 'RICH_DOCUMENT',
+      status: 'READY' as const,
+      downloadUrl: null,
+      altText: null,
+    } as UploadedMedia;
+    onChange({ mediaList: [...mediaList, richEntry] });
+    setRichDocSaved(true);
+    setRichDocTitle('');
+    setRichDocContent('');
+    setTimeout(() => setRichDocSaved(false), 3000);
   };
   return (
     <div className="space-y-6">
       {/* Existing confirmed media */}
       {mediaList.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium">{t('wizard.uploadedFiles', { count: mediaList.length })}</p>
+          <p className="text-sm font-medium">
+            {t('wizard.uploadedFiles', { count: mediaList.length })}
+          </p>
           {mediaList.map((m) => (
             <Card key={m.id} className="p-3 flex items-center gap-3 text-sm">
               <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
               <span className="flex-1 truncate font-medium">{m.title}</span>
-              <span className="text-muted-foreground text-xs">{m.contentType}</span>
+              <span className="text-muted-foreground text-xs">
+                {m.contentType}
+              </span>
             </Card>
           ))}
         </div>
@@ -159,7 +217,9 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
             <Card key={i} className="p-4 space-y-3">
               <div className="flex items-center gap-3">
                 {fileIcon(entry.file.type)}
-                <span className="flex-1 text-sm truncate">{entry.file.name}</span>
+                <span className="flex-1 text-sm truncate">
+                  {entry.file.name}
+                </span>
                 <button
                   type="button"
                   onClick={() => removeEntry(i)}
@@ -171,7 +231,9 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor={`title-${i}`} className="text-xs">{t('wizard.displayTitle')}</Label>
+                <Label htmlFor={`title-${i}`} className="text-xs">
+                  {t('wizard.displayTitle')}
+                </Label>
                 <Input
                   id={`title-${i}`}
                   value={entry.title}
@@ -187,11 +249,14 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
                   <div className="w-full bg-muted rounded-full h-1.5">
                     <div
                       className="bg-primary h-1.5 rounded-full transition-all duration-300"
-                      style={{ width: `${entry.state === 'done' ? 100 : entry.progress}%` }}
+                      style={{
+                        width: `${entry.state === 'done' ? 100 : entry.progress}%`,
+                      }}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {entry.state === 'presigning' && t('wizard.preparingUpload')}
+                    {entry.state === 'presigning' &&
+                      t('wizard.preparingUpload')}
                     {entry.state === 'uploading' && t('wizard.uploadingFile')}
                     {entry.state === 'confirming' && t('wizard.confirming')}
                     {entry.state === 'done' && t('wizard.uploadComplete')}
@@ -243,15 +308,33 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
           aria-label="Select files to upload"
         />
       </div>
-    
+
       {/* Rich Document section */}
       <div className="mt-6 border-t pt-4 space-y-3">
-        <p className="text-sm font-medium flex items-center gap-2"><PenLine className="h-4 w-4" /> Create Rich Document</p>
-        <input className="w-full text-sm px-3 py-2 border rounded-md bg-background" placeholder="Document title..." value={richDocTitle} onChange={(e) => setRichDocTitle(e.target.value)} />
+        <p className="text-sm font-medium flex items-center gap-2">
+          <PenLine className="h-4 w-4" /> Create Rich Document
+        </p>
+        <input
+          className="w-full text-sm px-3 py-2 border rounded-md bg-background"
+          placeholder="Document title..."
+          value={richDocTitle}
+          onChange={(e) => setRichDocTitle(e.target.value)}
+        />
         <RichEditor content={richDocContent} onChange={setRichDocContent} />
         <div className="flex items-center gap-2 justify-end">
-          {richDocSaved && <span className="text-sm text-green-600 flex items-center gap-1"><CheckCircle2 className="h-4 w-4" /> Added</span>}
-          <button type="button" onClick={handleSaveRichDoc} disabled={!richDocTitle.trim()} className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground disabled:opacity-50">Add Rich Document</button>
+          {richDocSaved && (
+            <span className="text-sm text-green-600 flex items-center gap-1">
+              <CheckCircle2 className="h-4 w-4" /> Added
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleSaveRichDoc}
+            disabled={!richDocTitle.trim()}
+            className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground disabled:opacity-50"
+          >
+            Add Rich Document
+          </button>
         </div>
       </div>
       {/* Alt-text review modal for image uploads (F-023) */}
@@ -271,6 +354,6 @@ export function CourseWizardMediaStep({ courseId, mediaList, onChange }: Props) 
           }}
         />
       )}
-</div>
+    </div>
   );
 }

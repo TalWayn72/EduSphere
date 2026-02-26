@@ -5,7 +5,14 @@
  */
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
-import { createDatabaseConnection, closeAllPools, schema, withTenantContext, eq, and } from '@edusphere/db';
+import {
+  createDatabaseConnection,
+  closeAllPools,
+  schema,
+  withTenantContext,
+  eq,
+  and,
+} from '@edusphere/db';
 import type { Database, TenantContext } from '@edusphere/db';
 
 export interface TokenMetadata {
@@ -48,7 +55,7 @@ export class ScimTokenService implements OnModuleDestroy {
     tenantId: string,
     userId: string,
     description: string,
-    expiresInDays?: number,
+    expiresInDays?: number
   ): Promise<{ token: TokenMetadata; rawToken: string }> {
     const rawToken = randomBytes(32).toString('hex');
     const tokenHash = this.hashToken(rawToken);
@@ -58,9 +65,17 @@ export class ScimTokenService implements OnModuleDestroy {
 
     const ctx: TenantContext = { tenantId, userId, userRole: 'ORG_ADMIN' };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.insert(schema.scimTokens)
-        .values({ tenantId, tokenHash, description, createdByUserId: userId, expiresAt, isActive: true })
-        .returning(),
+      tx
+        .insert(schema.scimTokens)
+        .values({
+          tenantId,
+          tokenHash,
+          description,
+          createdByUserId: userId,
+          expiresAt,
+          isActive: true,
+        })
+        .returning()
     );
 
     const row = rows[0];
@@ -105,29 +120,51 @@ export class ScimTokenService implements OnModuleDestroy {
   }
 
   async revokeToken(tenantId: string, tokenId: string): Promise<boolean> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     await withTenantContext(this.db, ctx, async (tx) =>
-      tx.update(schema.scimTokens)
+      tx
+        .update(schema.scimTokens)
         .set({ isActive: false })
-        .where(and(eq(schema.scimTokens.id, tokenId), eq(schema.scimTokens.tenantId, tenantId))),
+        .where(
+          and(
+            eq(schema.scimTokens.id, tokenId),
+            eq(schema.scimTokens.tenantId, tenantId)
+          )
+        )
     );
     // Invalidate cache entry with this tokenId
     for (const [k, v] of tokenCache) {
-      if (v.tokenId === tokenId) { tokenCache.delete(k); break; }
+      if (v.tokenId === tokenId) {
+        tokenCache.delete(k);
+        break;
+      }
     }
     this.logger.log({ tenantId, tokenId }, 'SCIM token revoked');
     return true;
   }
 
   async listTokens(tenantId: string): Promise<TokenMetadata[]> {
-    const ctx: TenantContext = { tenantId, userId: 'system', userRole: 'ORG_ADMIN' };
+    const ctx: TenantContext = {
+      tenantId,
+      userId: 'system',
+      userRole: 'ORG_ADMIN',
+    };
     const rows = await withTenantContext(this.db, ctx, async (tx) =>
-      tx.select().from(schema.scimTokens).where(eq(schema.scimTokens.tenantId, tenantId)),
+      tx
+        .select()
+        .from(schema.scimTokens)
+        .where(eq(schema.scimTokens.tenantId, tenantId))
     );
     return rows.map((r) => this.toMetadata(r));
   }
 
-  private toMetadata(row: typeof schema.scimTokens.$inferSelect): TokenMetadata {
+  private toMetadata(
+    row: typeof schema.scimTokens.$inferSelect
+  ): TokenMetadata {
     return {
       id: row.id,
       description: row.description,

@@ -16,8 +16,12 @@ export const customRoles = pgTable('custom_roles', {
   permissions: text('permissions').array().notNull().default([]),
   isSystem: boolean('is_system').notNull().default(false),
   createdBy: uuid('created_by').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type CustomRole = typeof customRoles.$inferSelect;
@@ -34,7 +38,9 @@ export const userRoleDelegations = pgTable('user_role_delegations', {
   /** Optional expiry — null means indefinite */
   validUntil: timestamp('valid_until', { withTimezone: true }),
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type UserRoleDelegation = typeof userRoleDelegations.$inferSelect;

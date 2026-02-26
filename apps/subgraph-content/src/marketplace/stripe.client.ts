@@ -11,7 +11,9 @@ export class StripeClient {
   constructor() {
     const key = process.env['STRIPE_SECRET_KEY'];
     if (!key) {
-      this.logger.warn('STRIPE_SECRET_KEY not set — marketplace payments disabled');
+      this.logger.warn(
+        'STRIPE_SECRET_KEY not set — marketplace payments disabled'
+      );
       this.stripe = null;
     } else {
       this.stripe = new Stripe(key, { apiVersion: STRIPE_API_VERSION });
@@ -26,7 +28,7 @@ export class StripeClient {
   async createPaymentIntent(
     amountCents: number,
     currency: string,
-    customerId?: string,
+    customerId?: string
   ): Promise<Stripe.PaymentIntent> {
     return this.client.paymentIntents.create({
       amount: amountCents,
@@ -36,17 +38,17 @@ export class StripeClient {
     });
   }
 
-  async createCustomer(
-    email: string,
-    name: string,
-  ): Promise<Stripe.Customer> {
-    return this.client.customers.create({ email, name }) as Promise<Stripe.Customer>;
+  async createCustomer(email: string, name: string): Promise<Stripe.Customer> {
+    return this.client.customers.create({
+      email,
+      name,
+    }) as Promise<Stripe.Customer>;
   }
 
   async createTransfer(
     amountCents: number,
     stripeAccountId: string,
-    description: string,
+    description: string
   ): Promise<Stripe.Transfer> {
     return this.client.transfers.create({
       amount: amountCents,
@@ -59,7 +61,7 @@ export class StripeClient {
   async constructWebhookEvent(
     payload: string,
     signature: string,
-    secret: string,
+    secret: string
   ): Promise<Stripe.Event> {
     return this.client.webhooks.constructEventAsync(payload, signature, secret);
   }

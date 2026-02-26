@@ -20,8 +20,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { mockCloseAllPools, mockDb } = vi.hoisted(() => {
   const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
   const mockDb = {
-    select: vi.fn().mockReturnValue({ from: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }) }) }),
-    delete: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }) }),
+    select: vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi
+          .fn()
+          .mockReturnValue({ limit: vi.fn().mockResolvedValue([]) }),
+      }),
+    }),
+    delete: vi.fn().mockReturnValue({
+      where: vi
+        .fn()
+        .mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+    }),
     execute: vi.fn().mockResolvedValue([]),
   };
   return { mockCloseAllPools, mockDb };
@@ -76,15 +86,29 @@ describe('EmbeddingService / EmbeddingStoreService — memory safety', () => {
       maxConcurrent = Math.max(maxConcurrent, inFlight);
       await Promise.resolve();
       inFlight--;
-      return { ok: true, json: async () => ({ embedding: new Array(768).fill(0.1) }) };
+      return {
+        ok: true,
+        json: async () => ({ embedding: new Array(768).fill(0.1) }),
+      };
     });
 
     vi.stubGlobal('fetch', mockFetch);
 
     const { svc, store } = makeServices();
-    mockDb.execute.mockResolvedValue([{ id: 'emb-1', segment_id: 'seg-1', embedding: [], created_at: new Date() }]);
+    mockDb.execute.mockResolvedValue([
+      {
+        id: 'emb-1',
+        segment_id: 'seg-1',
+        embedding: [],
+        created_at: new Date(),
+      },
+    ]);
 
-    const segments = Array.from({ length: 45 }, (_, i) => ({ id: `seg-${i}`, text: `text ${i}`, transcriptId: 'tr-1' }));
+    const segments = Array.from({ length: 45 }, (_, i) => ({
+      id: `seg-${i}`,
+      text: `text ${i}`,
+      transcriptId: 'tr-1',
+    }));
     await svc.generateBatchEmbeddings(segments);
 
     expect(maxConcurrent).toBeLessThanOrEqual(20);
@@ -94,7 +118,10 @@ describe('EmbeddingService / EmbeddingStoreService — memory safety', () => {
   // ── Test 3: provider errors during batch are caught, not accumulated ──────
   it('batch does not accumulate unhandled rejections when provider throws', async () => {
     vi.stubEnv('OLLAMA_URL', 'http://localhost:11434');
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: false, status: 503 })
+    );
 
     const { svc, store } = makeServices();
     const segments = [
@@ -110,7 +137,9 @@ describe('EmbeddingService / EmbeddingStoreService — memory safety', () => {
   // ── Test 4: no provider retained when hasProvider() is false ─────────────
   it('semanticSearch uses ILIKE fallback when no provider env is set', async () => {
     // No OLLAMA_URL, no OPENAI_API_KEY → hasProvider() = false
-    const mockIlike = vi.spyOn(EmbeddingStoreService.prototype, 'ilikeFallback').mockResolvedValue([]);
+    const mockIlike = vi
+      .spyOn(EmbeddingStoreService.prototype, 'ilikeFallback')
+      .mockResolvedValue([]);
     const { svc, store } = makeServices();
 
     await svc.semanticSearch('graph theory', 'tenant-1', 5);

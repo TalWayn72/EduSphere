@@ -102,16 +102,17 @@ docker exec <container> bash -c "cat //var/log/postgresql/init.log"
 
 ### Key Technical Decisions
 
-| Decision | Reason |
-|----------|--------|
-| supervisord over systemd | Works in Docker without PID 1 issues |
-| startup.sh for DB init | PostgreSQL needs to be up before migrate/seed, then handed to supervisord |
-| `compose-supergraph` as one-shot program | Waits for all subgraphs (35s), then fetches SDL and composes |
-| `node compose.js` (not tsx) | Gateway dir has compiled JS in node_modules |
-| `IF NOT EXISTS` in migrations | Idempotent — safe to run on already-initialized DB |
-| Raw pg Pool in `executeCypher` | Apache AGE requires multi-statement: LOAD + SET + SELECT — cannot use Drizzle prepared statements |
+| Decision                                 | Reason                                                                                            |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| supervisord over systemd                 | Works in Docker without PID 1 issues                                                              |
+| startup.sh for DB init                   | PostgreSQL needs to be up before migrate/seed, then handed to supervisord                         |
+| `compose-supergraph` as one-shot program | Waits for all subgraphs (35s), then fetches SDL and composes                                      |
+| `node compose.js` (not tsx)              | Gateway dir has compiled JS in node_modules                                                       |
+| `IF NOT EXISTS` in migrations            | Idempotent — safe to run on already-initialized DB                                                |
+| Raw pg Pool in `executeCypher`           | Apache AGE requires multi-statement: LOAD + SET + SELECT — cannot use Drizzle prepared statements |
 
 ---
+
 11. [Performance Tuning](#11-performance-tuning)
 12. [Troubleshooting](#12-troubleshooting)
 
@@ -122,6 +123,7 @@ docker exec <container> bash -c "cat //var/log/postgresql/init.log"
 ### 1.1 Docker Desktop
 
 **Minimum Requirements**:
+
 - **Docker Desktop**: 4.25.0+ (includes Docker Engine 24.0+, Docker Compose v2)
 - **Memory**: 8GB RAM minimum, 16GB recommended
 - **Disk Space**: 20GB free space for images and volumes
@@ -130,6 +132,7 @@ docker exec <container> bash -c "cat //var/log/postgresql/init.log"
 **Installation**:
 
 **Windows**:
+
 ```powershell
 # Download from https://www.docker.com/products/docker-desktop
 # Or install via winget
@@ -137,6 +140,7 @@ winget install Docker.DockerDesktop
 ```
 
 **macOS**:
+
 ```bash
 # Download from https://www.docker.com/products/docker-desktop
 # Or install via Homebrew
@@ -144,6 +148,7 @@ brew install --cask docker
 ```
 
 **Linux**:
+
 ```bash
 # Ubuntu/Debian
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -159,6 +164,7 @@ sudo apt-get install docker-compose-plugin
 **CRITICAL**: WSL2 is **required** for Docker Desktop on Windows. WSL1 is not supported.
 
 **Installation**:
+
 ```powershell
 # Open PowerShell as Administrator
 wsl --install
@@ -174,6 +180,7 @@ wsl --list --verbose
 **Performance Tip**: Place your project files in the WSL2 filesystem (e.g., `/home/username/projects/edusphere`) rather than the Windows filesystem (`/mnt/c/`) for 10-20x faster I/O.
 
 **Docker Desktop WSL2 Integration**:
+
 1. Open Docker Desktop
 2. Settings → Resources → WSL Integration
 3. Enable integration with your WSL2 distribution (e.g., Ubuntu)
@@ -206,6 +213,7 @@ docker run hello-world
 ### 2.1 postgres-age Image (PostgreSQL + AGE + pgvector)
 
 EduSphere requires a custom PostgreSQL image with:
+
 - **Apache AGE 1.5.0**: Graph database extension for Cypher queries
 - **pgvector 0.8.0**: Vector similarity search for embeddings
 - **PostgreSQL 16.x**: Base image
@@ -300,6 +308,7 @@ SELECT * FROM ag_graph WHERE name = 'edusphere_graph';
 ```
 
 **Build Command**:
+
 ```bash
 cd infrastructure/docker/postgres-age
 docker build -t edusphere/postgres-age:1.5.0 .
@@ -311,6 +320,7 @@ docker images | grep postgres-age
 ### 2.2 Image Versioning
 
 Use semantic versioning for custom images:
+
 - `edusphere/postgres-age:1.5.0` — Production-ready
 - `edusphere/postgres-age:1.5.0-dev` — Development builds
 - `edusphere/postgres-age:latest` — Always points to latest stable
@@ -334,7 +344,7 @@ services:
     container_name: edusphere-postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_postgres_password}
@@ -346,7 +356,7 @@ services:
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d edusphere"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d edusphere']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -368,7 +378,7 @@ services:
     container_name: edusphere-keycloak
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
@@ -377,8 +387,8 @@ services:
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-dev_postgres_password}
       KC_HOSTNAME: localhost
-      KC_HTTP_ENABLED: "true"
-      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_ENABLED: 'true'
+      KC_HEALTH_ENABLED: 'true'
     command:
       - start-dev
       - --import-realm
@@ -391,7 +401,11 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      test:
+        [
+          'CMD-SHELL',
+          "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -413,21 +427,25 @@ services:
     container_name: edusphere-nats
     restart: unless-stopped
     ports:
-      - "4222:4222"  # Client connections
-      - "8222:8222"  # HTTP management
-      - "6222:6222"  # Cluster routing
+      - '4222:4222' # Client connections
+      - '8222:8222' # HTTP management
+      - '6222:6222' # Cluster routing
     command:
-      - "--jetstream"
-      - "--store_dir=/data"
-      - "--max_payload=8MB"
-      - "--max_pending=128MB"
-      - "--http_port=8222"
+      - '--jetstream'
+      - '--store_dir=/data'
+      - '--max_payload=8MB'
+      - '--max_pending=128MB'
+      - '--http_port=8222'
     volumes:
       - nats_data:/data
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8222/healthz || exit 1"]
+      test:
+        [
+          'CMD-SHELL',
+          'wget --no-verbose --tries=1 --spider http://localhost:8222/healthz || exit 1',
+        ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -449,19 +467,23 @@ services:
     container_name: edusphere-minio
     restart: unless-stopped
     ports:
-      - "9000:9000"  # S3 API
-      - "9001:9001"  # Web Console
+      - '9000:9000' # S3 API
+      - '9001:9001' # Web Console
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      MINIO_BROWSER: "on"
+      MINIO_BROWSER: 'on'
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      test:
+        [
+          'CMD-SHELL',
+          'curl -f http://localhost:9000/minio/health/live || exit 1',
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -507,17 +529,21 @@ services:
     container_name: edusphere-jaeger
     restart: unless-stopped
     ports:
-      - "16686:16686"  # Jaeger UI
-      - "14268:14268"  # Jaeger Collector HTTP
-      - "14250:14250"  # Jaeger Collector gRPC
-      - "6831:6831/udp"  # Jaeger Agent (Thrift)
+      - '16686:16686' # Jaeger UI
+      - '14268:14268' # Jaeger Collector HTTP
+      - '14250:14250' # Jaeger Collector gRPC
+      - '6831:6831/udp' # Jaeger Agent (Thrift)
     environment:
-      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
-      COLLECTOR_OTLP_ENABLED: "true"
+      COLLECTOR_ZIPKIN_HOST_PORT: ':9411'
+      COLLECTOR_OTLP_ENABLED: 'true'
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:16686/ || exit 1"]
+      test:
+        [
+          'CMD-SHELL',
+          'wget --no-verbose --tries=1 --spider http://localhost:16686/ || exit 1',
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -539,14 +565,18 @@ services:
     container_name: edusphere-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - '6379:6379'
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-dev_redis_password}
     volumes:
       - redis_data:/data
     networks:
       - edusphere-network
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli --auth ${REDIS_PASSWORD:-dev_redis_password} ping | grep PONG"]
+      test:
+        [
+          'CMD-SHELL',
+          'redis-cli --auth ${REDIS_PASSWORD:-dev_redis_password} ping | grep PONG',
+        ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -595,11 +625,13 @@ volumes:
 EduSphere uses a custom bridge network (`edusphere-network`) for service-to-service communication.
 
 **Benefits**:
+
 - Automatic DNS resolution between containers (e.g., `postgres:5432`)
 - Isolation from other Docker networks
 - Custom subnet for predictable IP addressing
 
 **Configuration**:
+
 ```yaml
 networks:
   edusphere-network:
@@ -615,13 +647,14 @@ Services communicate using container names as hostnames:
 
 ```typescript
 // Example: Connecting to PostgreSQL from a subgraph
-const databaseUrl = "postgresql://edusphere_app:dev_password@postgres:5432/edusphere";
+const databaseUrl =
+  'postgresql://edusphere_app:dev_password@postgres:5432/edusphere';
 
 // Example: Connecting to NATS
-const natsUrl = "nats://nats:4222";
+const natsUrl = 'nats://nats:4222';
 
 // Example: Connecting to MinIO
-const minioEndpoint = "minio:9000";
+const minioEndpoint = 'minio:9000';
 ```
 
 **DNS Resolution**: Docker automatically resolves service names to container IPs within the network.
@@ -629,6 +662,7 @@ const minioEndpoint = "minio:9000";
 ### 4.3 Port Mapping
 
 **Host → Container Port Mappings**:
+
 ```
 Host Port    Container Port    Service
 ---------    --------------    -------
@@ -647,6 +681,7 @@ Host Port    Container Port    Service
 ```
 
 **Accessing Services from Host**:
+
 ```bash
 # PostgreSQL
 psql -h localhost -p 5432 -U postgres -d edusphere
@@ -679,18 +714,20 @@ By default, all services are accessible from the host machine but **not** from t
 EduSphere uses **named volumes** for persistent data. Named volumes are managed by Docker and survive container restarts and removals.
 
 **Defined Volumes**:
+
 ```yaml
 volumes:
-  postgres_data:      # PostgreSQL data directory
-  keycloak_data:      # Keycloak configuration and realm data
-  nats_data:          # NATS JetStream message storage
-  minio_data:         # MinIO object storage
-  redis_data:         # Redis persistence
+  postgres_data: # PostgreSQL data directory
+  keycloak_data: # Keycloak configuration and realm data
+  nats_data: # NATS JetStream message storage
+  minio_data: # MinIO object storage
+  redis_data: # Redis persistence
 ```
 
 ### 5.2 Volume Locations
 
 **Linux/macOS**:
+
 ```bash
 # Default volume path
 /var/lib/docker/volumes/<volume-name>/_data
@@ -703,6 +740,7 @@ docker volume inspect postgres_data
 ```
 
 **Windows (WSL2)**:
+
 ```powershell
 # Access WSL2 filesystem
 \\wsl$\docker-desktop-data\data\docker\volumes
@@ -714,6 +752,7 @@ ls /var/lib/docker/volumes/
 ### 5.3 Backup & Restore
 
 **PostgreSQL Backup**:
+
 ```bash
 # Create a backup
 docker exec edusphere-postgres pg_dump -U postgres edusphere > backup_$(date +%Y%m%d).sql
@@ -723,6 +762,7 @@ docker exec -i edusphere-postgres psql -U postgres edusphere < backup_20260217.s
 ```
 
 **MinIO Backup**:
+
 ```bash
 # Sync to local directory
 docker run --rm \
@@ -733,6 +773,7 @@ docker run --rm \
 ```
 
 **Full Volume Backup**:
+
 ```bash
 # Backup a volume to tar.gz
 docker run --rm \
@@ -772,7 +813,7 @@ Health checks ensure services are ready before dependent services start.
 
 ```yaml
 healthcheck:
-  test: ["CMD-SHELL", "pg_isready -U postgres -d edusphere"]
+  test: ['CMD-SHELL', 'pg_isready -U postgres -d edusphere']
   interval: 10s
   timeout: 5s
   retries: 5
@@ -780,6 +821,7 @@ healthcheck:
 ```
 
 **Explanation**:
+
 - `pg_isready`: PostgreSQL utility to check if server is accepting connections
 - `interval: 10s`: Check every 10 seconds
 - `timeout: 5s`: Fail if check takes > 5 seconds
@@ -790,7 +832,11 @@ healthcheck:
 
 ```yaml
 healthcheck:
-  test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+  test:
+    [
+      'CMD-SHELL',
+      "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
+    ]
   interval: 30s
   timeout: 10s
   retries: 5
@@ -798,6 +844,7 @@ healthcheck:
 ```
 
 **Explanation**:
+
 - Checks Keycloak's `/health/ready` endpoint
 - `start_period: 60s`: Keycloak takes ~60s to start
 
@@ -805,7 +852,11 @@ healthcheck:
 
 ```yaml
 healthcheck:
-  test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8222/healthz || exit 1"]
+  test:
+    [
+      'CMD-SHELL',
+      'wget --no-verbose --tries=1 --spider http://localhost:8222/healthz || exit 1',
+    ]
   interval: 10s
   timeout: 5s
   retries: 3
@@ -816,7 +867,8 @@ healthcheck:
 
 ```yaml
 healthcheck:
-  test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+  test:
+    ['CMD-SHELL', 'curl -f http://localhost:9000/minio/health/live || exit 1']
   interval: 30s
   timeout: 10s
   retries: 3
@@ -904,17 +956,20 @@ docker compose --env-file infrastructure/.env.production -f infrastructure/docke
 ### 7.3 Security Best Practices
 
 **DO**:
+
 - Use strong passwords in production
 - Store `.env` files in `.gitignore`
 - Use secret management tools (AWS Secrets Manager, Vault) in production
 - Rotate credentials regularly
 
 **DON'T**:
+
 - Commit `.env` files to version control
 - Use default passwords in production
 - Share credentials via Slack/email
 
 **Example `.env.example`**:
+
 ```bash
 # infrastructure/.env.example
 POSTGRES_PASSWORD=your_postgres_password
@@ -1040,6 +1095,7 @@ docker compose -f infrastructure/docker-compose.yml logs -t postgres
 ### 9.2 Log Levels
 
 **PostgreSQL**:
+
 ```bash
 # Enable query logging (temporary)
 docker exec edusphere-postgres psql -U postgres -c "ALTER SYSTEM SET log_statement = 'all';"
@@ -1050,13 +1106,15 @@ docker exec edusphere-postgres psql -U postgres -c "SELECT * FROM pg_stat_statem
 ```
 
 **Keycloak**:
+
 ```yaml
 # Add to environment in docker-compose.yml
 environment:
-  KC_LOG_LEVEL: DEBUG  # Options: ERROR, WARN, INFO, DEBUG, TRACE
+  KC_LOG_LEVEL: DEBUG # Options: ERROR, WARN, INFO, DEBUG, TRACE
 ```
 
 **NATS**:
+
 ```bash
 # Enable debug logging
 command:
@@ -1105,6 +1163,7 @@ docker run --rm --network infrastructure_edusphere-network \
 For production, integrate with centralized logging:
 
 **Fluentd**:
+
 ```yaml
 logging:
   driver: fluentd
@@ -1114,12 +1173,13 @@ logging:
 ```
 
 **JSON File Driver** (default):
+
 ```yaml
 logging:
   driver: json-file
   options:
-    max-size: "10m"
-    max-file: "3"
+    max-size: '10m'
+    max-file: '3'
 ```
 
 ---
@@ -1131,6 +1191,7 @@ logging:
 **Problem**: Files on Windows filesystem (`/mnt/c/`) have 10-20x slower I/O.
 
 **Solution**: Move project to WSL2 filesystem:
+
 ```bash
 # From WSL2 terminal
 cd ~
@@ -1145,6 +1206,7 @@ cd edusphere
 **Problem**: Windows uses CRLF (`\r\n`), Linux uses LF (`\n`). Shell scripts fail with `\r: command not found`.
 
 **Solution**:
+
 ```bash
 # Configure Git to auto-convert
 git config --global core.autocrlf input
@@ -1157,6 +1219,7 @@ sed -i 's/\r$//' infrastructure/docker/postgres-age/init.sql
 ```
 
 **Prevention**: Add `.gitattributes`:
+
 ```
 # .gitattributes
 * text=auto
@@ -1170,6 +1233,7 @@ sed -i 's/\r$//' infrastructure/docker/postgres-age/init.sql
 **Problem**: Default 2GB RAM is insufficient.
 
 **Solution**:
+
 1. Open Docker Desktop
 2. Settings → Resources → Advanced
 3. Set Memory to at least 8GB
@@ -1177,6 +1241,7 @@ sed -i 's/\r$//' infrastructure/docker/postgres-age/init.sql
 5. Click "Apply & Restart"
 
 **WSL2 Config** (`%USERPROFILE%\.wslconfig`):
+
 ```ini
 [wsl2]
 memory=12GB
@@ -1189,6 +1254,7 @@ swap=4GB
 **Problem**: Port already in use (e.g., 5432, 8080).
 
 **Solution**:
+
 ```powershell
 # Find process using port
 netstat -ano | findstr :5432
@@ -1206,6 +1272,7 @@ ports:
 **Problem**: Cannot write to volumes.
 
 **Solution**:
+
 ```bash
 # From WSL2
 sudo chown -R $USER:$USER ~/edusphere
@@ -1219,6 +1286,7 @@ sudo docker compose up
 **Problem**: Antivirus software (Windows Defender, McAfee) slows down file access.
 
 **Solution**:
+
 1. Add Docker directories to exclusion list:
    - `C:\Program Files\Docker`
    - `C:\ProgramData\Docker`
@@ -1231,6 +1299,7 @@ sudo docker compose up
 **Problem**: VPN interferes with Docker networking.
 
 **Solution**:
+
 ```powershell
 # Restart Docker Desktop after connecting to VPN
 net stop com.docker.service
@@ -1247,6 +1316,7 @@ wsl --shutdown
 ### 11.1 Resource Limits
 
 **Per-Service Limits** (already configured in docker-compose.yml):
+
 ```yaml
 deploy:
   resources:
@@ -1259,6 +1329,7 @@ deploy:
 ```
 
 **Global Limits** (Docker Desktop):
+
 - Memory: 12-16GB for dev environment
 - CPUs: 6-8 cores
 - Swap: 4GB
@@ -1266,6 +1337,7 @@ deploy:
 ### 11.2 PostgreSQL Performance
 
 **Tune postgresql.conf** (add to `init.sql`):
+
 ```sql
 -- PostgreSQL performance tuning for development
 ALTER SYSTEM SET shared_buffers = '2GB';
@@ -1285,6 +1357,7 @@ ALTER SYSTEM SET max_parallel_workers = 4;
 ```
 
 **Connection Pooling** (PgBouncer):
+
 ```yaml
 # Add to docker-compose.yml
 pgbouncer:
@@ -1295,7 +1368,7 @@ pgbouncer:
     MAX_CLIENT_CONN: 1000
     DEFAULT_POOL_SIZE: 25
   ports:
-    - "6432:6432"
+    - '6432:6432'
   networks:
     - edusphere-network
 ```
@@ -1303,6 +1376,7 @@ pgbouncer:
 ### 11.3 MinIO Performance
 
 **Multi-part Upload Optimization**:
+
 ```yaml
 environment:
   MINIO_API_REQUESTS_MAX: 10000
@@ -1312,17 +1386,19 @@ environment:
 ### 11.4 NATS Performance
 
 **Increase Buffer Sizes**:
+
 ```yaml
 command:
-  - "--jetstream"
-  - "--max_payload=8MB"
-  - "--max_pending=128MB"
-  - "--write_deadline=10s"
+  - '--jetstream'
+  - '--max_payload=8MB'
+  - '--max_pending=128MB'
+  - '--write_deadline=10s'
 ```
 
 ### 11.5 Volume Performance (WSL2)
 
 **Use Named Volumes** (not bind mounts) for database data:
+
 ```yaml
 # FAST (named volume)
 volumes:
@@ -1334,6 +1410,7 @@ volumes:
 ```
 
 **Exception**: Use bind mounts for config files (read-only):
+
 ```yaml
 volumes:
   - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
@@ -1342,6 +1419,7 @@ volumes:
 ### 11.6 Image Build Optimization
 
 **Multi-stage Builds**:
+
 ```dockerfile
 # Build stage
 FROM postgres:16-alpine AS builder
@@ -1355,6 +1433,7 @@ COPY --from=builder /usr/local/lib/postgresql /usr/local/lib/postgresql
 ```
 
 **BuildKit**:
+
 ```bash
 # Enable BuildKit for faster builds
 export DOCKER_BUILDKIT=1
@@ -1370,6 +1449,7 @@ docker build -t edusphere/postgres-age:1.5.0 .
 **Problem**: `role "edusphere_app" does not exist`
 
 **Solution**:
+
 ```bash
 # Recreate database with init script
 docker compose -f infrastructure/docker-compose.yml down -v
@@ -1379,6 +1459,7 @@ docker compose -f infrastructure/docker-compose.yml up -d postgres
 **Problem**: `pg_isready` fails
 
 **Solution**:
+
 ```bash
 # Check logs
 docker logs edusphere-postgres
@@ -1393,6 +1474,7 @@ docker exec -it edusphere-postgres psql -U postgres
 **Problem**: Slow query performance
 
 **Solution**:
+
 ```sql
 -- Enable pg_stat_statements
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
@@ -1409,6 +1491,7 @@ LIMIT 10;
 **Problem**: Keycloak stuck at "Starting..."
 
 **Solution**:
+
 ```bash
 # Increase start_period in healthcheck
 # Check logs for errors
@@ -1421,6 +1504,7 @@ docker compose -f infrastructure/docker-compose.yml restart postgres keycloak
 **Problem**: Cannot access admin console
 
 **Solution**:
+
 ```bash
 # Verify port mapping
 docker ps | grep keycloak
@@ -1439,6 +1523,7 @@ curl http://<container-ip>:8080
 **Problem**: `nats: no servers available for connection`
 
 **Solution**:
+
 ```bash
 # Verify NATS is running
 docker logs edusphere-nats
@@ -1452,6 +1537,7 @@ docker run --rm --network infrastructure_edusphere-network \
 **Problem**: JetStream not enabled
 
 **Solution**:
+
 ```bash
 # Verify JetStream is enabled
 docker exec edusphere-nats nats-server --jetstream --version
@@ -1465,6 +1551,7 @@ docker inspect edusphere-nats | jq '.[0].Config.Cmd'
 **Problem**: `Access Denied` when creating bucket
 
 **Solution**:
+
 ```bash
 # Check credentials
 docker logs edusphere-minio
@@ -1480,6 +1567,7 @@ docker exec edusphere-minio mc ls local
 **Problem**: Cannot upload files
 
 **Solution**:
+
 ```bash
 # Check bucket policy
 docker exec edusphere-minio mc anonymous get local/courses
@@ -1493,6 +1581,7 @@ docker exec edusphere-minio mc anonymous set download local/courses
 **Problem**: Services cannot communicate
 
 **Solution**:
+
 ```bash
 # Verify all services are on same network
 docker network inspect infrastructure_edusphere-network
@@ -1506,6 +1595,7 @@ docker compose -f infrastructure/docker-compose.yml up -d
 **Problem**: DNS resolution fails
 
 **Solution**:
+
 ```bash
 # Test DNS
 docker run --rm --network infrastructure_edusphere-network \
@@ -1520,6 +1610,7 @@ docker inspect bridge | jq '.[0].IPAM.Config'
 **Problem**: Data not persisting
 
 **Solution**:
+
 ```bash
 # Verify volume is mounted
 docker inspect edusphere-postgres | jq '.[0].Mounts'
@@ -1534,6 +1625,7 @@ docker volume inspect infrastructure_postgres_data
 **Problem**: Permission denied when accessing volume
 
 **Solution**:
+
 ```bash
 # Fix permissions (Linux/macOS)
 sudo chown -R 999:999 /var/lib/docker/volumes/infrastructure_postgres_data/_data
@@ -1548,6 +1640,7 @@ docker compose -f infrastructure/docker-compose.yml up -d
 **Problem**: `docker-compose: command not found`
 
 **Solution**:
+
 ```bash
 # Use docker compose (v2) instead of docker-compose (v1)
 docker compose version
@@ -1559,6 +1652,7 @@ pip install docker-compose
 **Problem**: Out of disk space
 
 **Solution**:
+
 ```bash
 # Check disk usage
 docker system df
@@ -1576,6 +1670,7 @@ docker container prune # Remove stopped containers
 **Problem**: Docker daemon not responding
 
 **Solution**:
+
 ```bash
 # Restart Docker Desktop (Windows/macOS)
 # Or restart Docker service (Linux)
@@ -1590,6 +1685,7 @@ docker info
 **Problem**: Service marked unhealthy
 
 **Solution**:
+
 ```bash
 # Check health status
 docker inspect edusphere-postgres | jq '.[0].State.Health'
@@ -1606,6 +1702,7 @@ docker exec edusphere-postgres pg_isready -U postgres -d edusphere
 **Problem**: `ERROR [internal] load metadata for docker.io/library/postgres:16-alpine`
 
 **Solution**:
+
 ```bash
 # Pull base image manually
 docker pull postgres:16-alpine
@@ -1617,6 +1714,7 @@ docker build -t edusphere/postgres-age:1.5.0 infrastructure/docker/postgres-age
 **Problem**: Build fails on ARM64 (Apple Silicon)
 
 **Solution**:
+
 ```bash
 # Use buildx for multi-platform builds
 docker buildx create --use
@@ -1631,16 +1729,16 @@ docker buildx build --platform linux/amd64,linux/arm64 \
 
 ### Service URLs (Development)
 
-| Service      | URL                               | Credentials                        |
-|--------------|-----------------------------------|------------------------------------|
-| PostgreSQL   | `postgresql://localhost:5432`     | postgres / dev_postgres_password   |
-| Keycloak     | http://localhost:8080             | admin / admin                      |
-| MinIO Console| http://localhost:9001             | minioadmin / minioadmin            |
-| MinIO S3 API | http://localhost:9000             | minioadmin / minioadmin            |
-| NATS         | `nats://localhost:4222`           | No auth (dev)                      |
-| NATS Monitor | http://localhost:8222             | No auth                            |
-| Jaeger UI    | http://localhost:16686            | No auth                            |
-| Redis        | `redis://localhost:6379`          | Password: dev_redis_password       |
+| Service       | URL                           | Credentials                      |
+| ------------- | ----------------------------- | -------------------------------- |
+| PostgreSQL    | `postgresql://localhost:5432` | postgres / dev_postgres_password |
+| Keycloak      | http://localhost:8080         | admin / admin                    |
+| MinIO Console | http://localhost:9001         | minioadmin / minioadmin          |
+| MinIO S3 API  | http://localhost:9000         | minioadmin / minioadmin          |
+| NATS          | `nats://localhost:4222`       | No auth (dev)                    |
+| NATS Monitor  | http://localhost:8222         | No auth                          |
+| Jaeger UI     | http://localhost:16686        | No auth                          |
+| Redis         | `redis://localhost:6379`      | Password: dev_redis_password     |
 
 ### Common Commands
 
@@ -1688,6 +1786,7 @@ After setting up Docker:
 6. **Performance Baseline**: Run initial load tests
 
 **Related Documentation**:
+
 - [Database Schema](../database/DATABASE_SCHEMA.md)
 - [Development Guidelines](./GUIDELINES.md)
 - [Architecture Overview](../architecture/ARCHITECTURE.md)

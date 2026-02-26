@@ -17,20 +17,18 @@ const store = new Map<string, RateLimitEntry>();
 
 export const MAX_REQUESTS = parseInt(
   process.env['RATE_LIMIT_MAX'] ?? String(RATE_LIMIT_MAX_REQUESTS),
-  10,
+  10
 );
 
 // Clean up stale entries to prevent memory leaks
-let cleanupIntervalHandle: ReturnType<typeof setInterval> | undefined = setInterval(
-  () => {
+let cleanupIntervalHandle: ReturnType<typeof setInterval> | undefined =
+  setInterval(() => {
     const cutoff = Date.now() - RATE_LIMIT_WINDOW_MS;
     for (const [key, entry] of store.entries()) {
       entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
       if (entry.timestamps.length === 0) store.delete(key);
     }
-  },
-  RATE_LIMIT_CLEANUP_INTERVAL_MS,
-);
+  }, RATE_LIMIT_CLEANUP_INTERVAL_MS);
 
 // Allow test teardown without keeping Node.js alive
 if (cleanupIntervalHandle.unref) cleanupIntervalHandle.unref();

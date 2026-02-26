@@ -2,7 +2,13 @@
  * OpenBadgeCard — displays a W3C OpenBadge 3.0 assertion with verify + LinkedIn share (F-025)
  */
 import React from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, Award, CheckCircle } from 'lucide-react';
@@ -37,7 +43,9 @@ function isExpired(expiresAt: string | null | undefined): boolean {
   return new Date(expiresAt) < new Date();
 }
 
-export function OpenBadgeCard({ assertion }: OpenBadgeCardProps): React.ReactElement {
+export function OpenBadgeCard({
+  assertion,
+}: OpenBadgeCardProps): React.ReactElement {
   const expired = isExpired(assertion.expiresAt);
   const invalid = assertion.revoked || expired;
 
@@ -59,7 +67,10 @@ export function OpenBadgeCard({ assertion }: OpenBadgeCardProps): React.ReactEle
     <Card className={`relative ${invalid ? 'opacity-60' : ''}`}>
       <CardHeader className="pb-2">
         <div className="flex items-start gap-3">
-          <Award className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <Award
+            className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-0.5"
+            aria-hidden="true"
+          />
           <div className="flex-1 min-w-0">
             <CardTitle className="text-base leading-tight truncate">
               {assertion.badgeName}
@@ -76,7 +87,9 @@ export function OpenBadgeCard({ assertion }: OpenBadgeCardProps): React.ReactEle
           {assertion.revoked ? (
             <Badge variant="destructive">Revoked</Badge>
           ) : expired ? (
-            <Badge variant="outline" className="text-muted-foreground">Expired</Badge>
+            <Badge variant="outline" className="text-muted-foreground">
+              Expired
+            </Badge>
           ) : (
             <Badge variant="secondary" className="gap-1">
               <CheckCircle className="h-3 w-3" aria-hidden="true" />

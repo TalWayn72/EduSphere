@@ -31,7 +31,9 @@ const MIN_EASE_FACTOR = 1.3;
  */
 export function computeNextReview(card: SM2Card, quality: number): SM2Result {
   if (!Number.isInteger(quality) || quality < 0 || quality > 5) {
-    throw new RangeError(`quality must be an integer 0–5, received: ${quality}`);
+    throw new RangeError(
+      `quality must be an integer 0–5, received: ${quality}`
+    );
   }
 
   let { intervalDays, easeFactor, repetitions } = card;

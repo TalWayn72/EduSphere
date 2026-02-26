@@ -36,7 +36,7 @@ export class CypherService {
     private readonly term: CypherTermService,
     private readonly source: CypherSourceService,
     private readonly topicCluster: CypherTopicClusterService,
-    private readonly learningPath: CypherLearningPathService,
+    private readonly learningPath: CypherLearningPathService
   ) {}
 
   // ── Concept ────────────────────────────────────────────────────────────────
@@ -57,9 +57,14 @@ export class CypherService {
     fromName: string,
     toName: string,
     tenantId: string,
-    strength: number = 0.7,
+    strength: number = 0.7
   ) {
-    return this.concept.linkConceptsByName(fromName, toName, tenantId, strength);
+    return this.concept.linkConceptsByName(
+      fromName,
+      toName,
+      tenantId,
+      strength
+    );
   }
 
   findAllConcepts(tenantId: string, limit: number) {
@@ -73,7 +78,7 @@ export class CypherService {
   updateConcept(
     id: string,
     tenantId: string,
-    updates: Partial<ConceptProperties>,
+    updates: Partial<ConceptProperties>
   ) {
     return this.concept.updateConcept(id, tenantId, updates);
   }
@@ -86,7 +91,7 @@ export class CypherService {
     conceptId: string,
     tenantId: string,
     depth: number = 2,
-    limit: number = 10,
+    limit: number = 10
   ) {
     return this.concept.findRelatedConcepts(conceptId, tenantId, depth, limit);
   }
@@ -95,9 +100,14 @@ export class CypherService {
     fromId: string,
     toId: string,
     relationshipType: string,
-    properties: RelationshipProperties = {},
+    properties: RelationshipProperties = {}
   ) {
-    return this.concept.linkConcepts(fromId, toId, relationshipType, properties);
+    return this.concept.linkConcepts(
+      fromId,
+      toId,
+      relationshipType,
+      properties
+    );
   }
 
   /**
@@ -110,10 +120,14 @@ export class CypherService {
     toId: string,
     relationshipType: string,
     properties: RelationshipProperties,
-    tenantId: string,
+    tenantId: string
   ): Promise<{ from: unknown; to: unknown }> {
     return this.concept.linkConceptsAndFetch(
-      fromId, toId, relationshipType, properties, tenantId,
+      fromId,
+      toId,
+      relationshipType,
+      properties,
+      tenantId
     );
   }
 
@@ -155,7 +169,7 @@ export class CypherService {
     title: string,
     type: string,
     url: string | null,
-    tenantId: string,
+    tenantId: string
   ) {
     return this.source.createSource(title, type, url, tenantId);
   }
@@ -173,7 +187,7 @@ export class CypherService {
   createTopicCluster(
     name: string,
     description: string | null,
-    tenantId: string,
+    tenantId: string
   ) {
     return this.topicCluster.createTopicCluster(name, description, tenantId);
   }
@@ -183,22 +197,30 @@ export class CypherService {
   findShortestLearningPath(
     fromName: string,
     toName: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<LearningPathResult | null> {
-    return this.learningPath.findShortestLearningPath(fromName, toName, tenantId);
+    return this.learningPath.findShortestLearningPath(
+      fromName,
+      toName,
+      tenantId
+    );
   }
 
   collectRelatedConcepts(
     conceptName: string,
     depth: number,
-    tenantId: string,
+    tenantId: string
   ): Promise<ConceptNode[]> {
-    return this.learningPath.collectRelatedConcepts(conceptName, depth, tenantId);
+    return this.learningPath.collectRelatedConcepts(
+      conceptName,
+      depth,
+      tenantId
+    );
   }
 
   findPrerequisiteChain(
     conceptName: string,
-    tenantId: string,
+    tenantId: string
   ): Promise<ConceptNode[]> {
     return this.learningPath.findPrerequisiteChain(conceptName, tenantId);
   }

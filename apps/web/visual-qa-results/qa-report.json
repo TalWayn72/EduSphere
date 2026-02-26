@@ -56,9 +56,7 @@
     "label": "04 — Course List",
     "url": "http://localhost:5174/courses",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\04-courses-list.png",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
+    "consoleErrors": ["Failed to load resource: net::ERR_CONNECTION_REFUSED"],
     "consoleWarnings": [
       "🔧 DEV MODE: Running without Keycloak authentication",
       "🔧 DEV MODE: Running without Keycloak authentication",
@@ -69,9 +67,7 @@
       "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
     ],
     "loadedSuccessfully": true,
-    "notes": [
-      "Found 4 course cards"
-    ]
+    "notes": ["Found 4 course cards"]
   },
   {
     "label": "05 — Content Viewer",
@@ -101,17 +97,13 @@
     ],
     "networkErrors": [],
     "loadedSuccessfully": true,
-    "notes": [
-      "SUCCESS: Annotation created and visible in list"
-    ]
+    "notes": ["SUCCESS: Annotation created and visible in list"]
   },
   {
     "label": "07 — Annotations Page",
     "url": "http://localhost:5174/annotations",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\07-annotations-page.png",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
+    "consoleErrors": ["Failed to load resource: net::ERR_CONNECTION_REFUSED"],
     "consoleWarnings": [
       "🔧 DEV MODE: Running without Keycloak authentication",
       "🔧 DEV MODE: Running without Keycloak authentication",
@@ -154,9 +146,7 @@
     ],
     "networkErrors": [],
     "loadedSuccessfully": true,
-    "notes": [
-      "Found 7 search result cards after querying \"Talmud\""
-    ]
+    "notes": ["Found 7 search result cards after querying \"Talmud\""]
   },
   {
     "label": "10 — AI Agents (Chavruta)",
@@ -171,9 +161,7 @@
     ],
     "networkErrors": [],
     "loadedSuccessfully": true,
-    "notes": [
-      "AI response bubbles visible: 2"
-    ]
+    "notes": ["AI response bubbles visible: 2"]
   },
   {
     "label": "11 — Collaboration Page",
@@ -188,9 +176,7 @@
     ],
     "networkErrors": [],
     "loadedSuccessfully": true,
-    "notes": [
-      "Page heading: \"Collaboration\""
-    ]
+    "notes": ["Page heading: \"Collaboration\""]
   },
   {
     "label": "12 — Profile Page",
