@@ -262,7 +262,7 @@ jobs:
   e2e-tests:
     name: E2E Tests (Playwright — frontend only)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
 
     steps:
       - name: Checkout repository

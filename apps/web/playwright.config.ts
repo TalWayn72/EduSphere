@@ -98,10 +98,11 @@ export default defineConfig({
 
   /**
    * Worker concurrency.
-   * CI: 1 worker to avoid resource contention on shared runners.
+   * CI: 4 workers — GitHub Actions runners have 2 vCPUs; 4 workers with
+   *     fullyParallel allows the Vite dev server to serve concurrently.
    * Local: Playwright default (50% of CPU cores) for parallel speed.
    */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 4 : undefined,
 
   /* Reporter — GitHub annotations in CI, rich HTML report locally */
   reporter: process.env.CI
@@ -153,12 +154,18 @@ export default defineConfig({
 
     /**
      * Extra HTTP headers forwarded to all requests.
-     * Used to identify E2E traffic in logs (e.g. for staging rate-limit bypass).
+     * NOTE: these headers must NOT be sent to Keycloak (CORS preflight rejects unknown headers).
+     * Only send them in production where gateway/CDN is configured to accept them.
+     * Local / staging: disabled to avoid Keycloak CORS failures.
      */
-    extraHTTPHeaders: {
-      'x-e2e-run': 'true',
-      'x-e2e-env': E2E_PROFILE,
-    },
+    ...(E2E_PROFILE === 'production'
+      ? {
+          extraHTTPHeaders: {
+            'x-e2e-run': 'true',
+            'x-e2e-env': E2E_PROFILE,
+          },
+        }
+      : {}),
   },
 
   /**
