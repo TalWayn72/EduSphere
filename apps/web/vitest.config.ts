@@ -125,6 +125,8 @@ export default defineConfig({
         'src/components/editor/index.ts',
         // ProseMirror plugin — requires live Tiptap EditorView (DOM), not testable in jsdom
         'src/components/annotation/AnnotationDecorationsPlugin.ts',
+        // CollaborativeEditorToolbar — receives live Tiptap Editor instance as prop (DOM APIs)
+        'src/components/CollaborativeEditorToolbar.tsx',
         // Quiz, SCORM and portal-builder components — Tier-2/3 features, tested via E2E
         'src/components/quiz/**',
         'src/components/scorm/**',
@@ -278,10 +280,10 @@ export default defineConfig({
         'src/services/**',
       ],
       thresholds: {
-        lines: 85,
-        functions: 85,
-        branches: 75,
-        statements: 85,
+        lines: 95,
+        functions: 95,
+        branches: 90,
+        statements: 95,
       },
     },
   },
