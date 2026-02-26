@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { AuthUser } from '@/lib/auth';
 
@@ -193,5 +193,14 @@ describe('ProfilePage', () => {
     });
     renderPage();
     expect(screen.getAllByText('Super Admin').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // ── Back button navigation ────────────────────────────────────────────────
+
+  it('clicking the Back button calls navigate(-1)', () => {
+    renderPage();
+    const backBtn = screen.getByRole('button', { name: /back/i });
+    fireEvent.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 });

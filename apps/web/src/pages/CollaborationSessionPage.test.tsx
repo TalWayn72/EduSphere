@@ -13,6 +13,10 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
+// Stable mock for the JOIN_DISCUSSION_MUTATION execute function so that
+// we can assert it was called with the correct discussionId argument.
+const mockJoinFn = vi.fn();
+
 vi.mock('urql', async (importOriginal) => {
   const actual = await importOriginal<typeof import('urql')>();
   return {
@@ -21,7 +25,10 @@ vi.mock('urql', async (importOriginal) => {
       { data: undefined, fetching: false, error: undefined },
       vi.fn(),
     ]),
-    useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
+    useMutation: vi.fn(() => [
+      { fetching: false, error: undefined },
+      mockJoinFn,
+    ]),
     useSubscription: vi.fn(() => [
       { data: undefined, fetching: false, error: undefined },
       vi.fn(),
@@ -137,5 +144,38 @@ describe('CollaborationSessionPage', () => {
   it('renders the Chavruta session info bar', () => {
     renderPage('?partner=Alice');
     expect(screen.getByText(/Chavruta with/i)).toBeInTheDocument();
+  });
+
+  // ── Auto-join mutation (line ~59 — useEffect with discussionId guard) ────────
+
+  it('calls JOIN_DISCUSSION_MUTATION on mount when discussionId is present', () => {
+    renderPage('?discussionId=disc-abc-123&partner=Bob');
+    // useEffect fires synchronously after mount in jsdom
+    expect(mockJoinFn).toHaveBeenCalledTimes(1);
+    expect(mockJoinFn).toHaveBeenCalledWith({ discussionId: 'disc-abc-123' });
+  });
+
+  it('does NOT call JOIN_DISCUSSION_MUTATION when discussionId is absent', () => {
+    renderPage('?partner=Bob&topic=Talmud');
+    // No discussionId → useEffect guard (if discussionId) prevents the call
+    expect(mockJoinFn).not.toHaveBeenCalled();
+  });
+
+  it('auto-join fires without any user interaction', () => {
+    renderPage('?discussionId=disc-xyz&partner=Alice');
+    // Mutation called purely from mount-time useEffect — no click needed
+    expect(mockJoinFn).toHaveBeenCalledWith({ discussionId: 'disc-xyz' });
+  });
+
+  it('shows CRDT sync active note with truncated discussionId', () => {
+    renderPage('?discussionId=disc-abc-123');
+    // Footer text contains the first 8 chars of discussionId
+    expect(screen.getByText(/disc-abc/i)).toBeInTheDocument();
+  });
+
+  it('shows CRDT sync inactive note when no discussionId', () => {
+    renderPage('?partner=Bob');
+    // collaboration.json: crdtSyncInactive = "Sync inactive"
+    expect(screen.getByText('Sync inactive')).toBeInTheDocument();
   });
 });

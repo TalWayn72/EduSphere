@@ -327,4 +327,83 @@ describe('CourseList', () => {
     renderCourseList();
     expect(screen.getByText('Courses')).toBeInTheDocument();
   });
+
+  // ── Open button (inside card header) ────────────────────────────────────────
+
+  it('clicking the "Open" ghost button navigates to /courses/:id', () => {
+    renderCourseList(STUDENT_USER);
+    // The "Open" button is opacity-0 by default (group-hover) but always in DOM
+    const openButtons = screen.getAllByRole('button', { name: /^open$/i });
+    expect(openButtons.length).toBe(MOCK_COURSES.length);
+    fireEvent.click(openButtons[0]!);
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+  });
+
+  it('Open button stopPropagation prevents duplicate navigation calls', () => {
+    renderCourseList(STUDENT_USER);
+    const openButtons = screen.getAllByRole('button', { name: /^open$/i });
+    fireEvent.click(openButtons[1]!);
+    // Only one navigation call — stopPropagation prevents the card onClick firing twice
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-2');
+  });
+
+  // ── Instructor Edit button ──────────────────────────────────────────────────
+
+  it('instructor sees one Edit button per course', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    const editBtns = screen.getAllByRole('button', { name: /^edit$/i });
+    expect(editBtns.length).toBe(MOCK_COURSES.length);
+  });
+
+  it('clicking Edit button navigates to /courses/:id', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    const editBtns = screen.getAllByRole('button', { name: /^edit$/i });
+    fireEvent.click(editBtns[0]!);
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+  });
+
+  it('non-instructor does not see Edit button', () => {
+    renderCourseList(STUDENT_USER);
+    expect(
+      screen.queryByRole('button', { name: /^edit$/i })
+    ).not.toBeInTheDocument();
+  });
+
+  // ── Publish / Unpublish toggle (instructor) ──────────────────────────────────
+
+  it('clicking Unpublish toggles course to unpublished state locally', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    // course-1 and course-2 are published — grab first Unpublish and click it
+    const unpublishBtns = screen.getAllByRole('button', {
+      name: /unpublish/i,
+    });
+    fireEvent.click(unpublishBtns[0]!);
+    // After toggling, Publish buttons should increase by 1
+    const publishBtnsAfter = screen.getAllByRole('button', {
+      name: /^publish$/i,
+    });
+    expect(publishBtnsAfter.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('clicking Publish on a draft course toggles it to published locally', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    // course-3 is a draft — click its Publish button
+    const publishBtns = screen.getAllByRole('button', { name: /^publish$/i });
+    fireEvent.click(publishBtns[0]!);
+    // All 3 courses now show Unpublish
+    const unpublishBtnsAfter = screen.getAllByRole('button', {
+      name: /unpublish/i,
+    });
+    expect(unpublishBtnsAfter.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('Unpublish button click does not navigate away', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    const unpublishBtns = screen.getAllByRole('button', {
+      name: /unpublish/i,
+    });
+    fireEvent.click(unpublishBtns[0]!);
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
 });

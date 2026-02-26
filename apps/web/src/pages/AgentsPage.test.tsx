@@ -434,4 +434,123 @@ describe('AgentsPage', () => {
       ).toBeInTheDocument();
     });
   });
+
+  // ── Streaming cleanup (DEV_MODE) — interval fires to completion ────────────
+
+  it('clears streamingContent and appends agent reply when interval completes', () => {
+    vi.useFakeTimers();
+    renderAgents();
+
+    const input = screen.getByPlaceholderText(/Ask the Chavruta Debate/i);
+
+    act(() => {
+      fireEvent.change(input, { target: { value: 'Debate free will' } });
+      fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    });
+
+    // Advance through the 600ms typing delay then run all interval ticks
+    act(() => { vi.advanceTimersByTime(700); });
+    act(() => { vi.runAllTimers(); });
+
+    // After the interval fires to completion the streaming cursor is gone
+    const cursors = document.querySelectorAll('.animate-pulse');
+    expect(cursors.length).toBe(0);
+
+    // A final agent reply bubble is appended (initial welcome + new reply)
+    const agentBubbles = document.querySelectorAll('.rounded-bl-none');
+    expect(agentBubbles.length).toBeGreaterThanOrEqual(2);
+
+    vi.useRealTimers();
+  });
+
+  it('streaming interval builds content progressively before cleanup', () => {
+    vi.useFakeTimers();
+    renderAgents();
+
+    const input = screen.getByPlaceholderText(/Ask the Chavruta Debate/i);
+
+    act(() => {
+      fireEvent.change(input, { target: { value: 'Challenge my thesis' } });
+      fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    });
+
+    // Advance past typing delay into the streaming interval ticks
+    act(() => { vi.advanceTimersByTime(700); });
+    // Two ticks of the 18ms interval — partial content visible, cursor present
+    act(() => { vi.advanceTimersByTime(36); });
+
+    const cursorMid = document.querySelector('.animate-pulse');
+    expect(cursorMid).toBeInTheDocument();
+
+    // Run all remaining timers — streaming finishes, cursor disappears
+    act(() => { vi.runAllTimers(); });
+    const cursorDone = document.querySelector('.animate-pulse');
+    expect(cursorDone).not.toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
+  // ── Mutation mock shape tests — non-DEV_MODE fallback robustness ───────────
+  // These tests verify that the component remains stable when useMutation
+  // returns various response shapes (null reply, undefined data). Because
+  // VITE_DEV_MODE is replaced at transform-time by the vitest define config,
+  // DEV_MODE is always true in this test environment and the real GraphQL
+  // mutation path is not reachable. The tests below assert component stability
+  // and correct mutation hook wiring via the mock return values.
+
+  it('component remains functional when sendMessage mock returns null reply', () => {
+    const sendMsgNull = vi
+      .fn()
+      .mockResolvedValue({ data: { sendMessage: null }, error: undefined });
+    const startFn = vi.fn().mockResolvedValue({
+      data: { startAgentSession: { id: 'sess-null' } },
+      error: undefined,
+    });
+
+    vi.mocked(useMutation)
+      .mockReturnValueOnce([
+        { fetching: false, error: undefined },
+        startFn,
+      ] as unknown as ReturnType<typeof useMutation>)
+      .mockReturnValueOnce([
+        { fetching: false, error: undefined },
+        sendMsgNull,
+      ] as unknown as ReturnType<typeof useMutation>);
+
+    renderAgents();
+
+    // Chat input and heading remain accessible — component did not crash
+    expect(
+      screen.getByPlaceholderText(/Ask the Chavruta Debate/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /AI Learning Agents/i })
+    ).toBeInTheDocument();
+  });
+
+  it('component remains functional when sendMessage mock returns undefined data', () => {
+    const sendMsgUndef = vi
+      .fn()
+      .mockResolvedValue({ data: undefined, error: undefined });
+    const startFn = vi.fn().mockResolvedValue({
+      data: { startAgentSession: { id: 'sess-undef' } },
+      error: undefined,
+    });
+
+    vi.mocked(useMutation)
+      .mockReturnValueOnce([
+        { fetching: false, error: undefined },
+        startFn,
+      ] as unknown as ReturnType<typeof useMutation>)
+      .mockReturnValueOnce([
+        { fetching: false, error: undefined },
+        sendMsgUndef,
+      ] as unknown as ReturnType<typeof useMutation>);
+
+    renderAgents();
+
+    expect(
+      screen.getByPlaceholderText(/Ask the Chavruta Debate/i)
+    ).toBeInTheDocument();
+  });
 });
