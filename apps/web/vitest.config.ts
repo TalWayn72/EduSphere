@@ -33,6 +33,14 @@ export default defineConfig({
   plugins: [react()],
   define: {
     'import.meta.env.VITE_DEV_MODE': '"true"',
+    // Provide fallback values for CI where .env is not committed.
+    // These are test-only defaults — no real server connection is made
+    // because urql/fetch are mocked in every test that needs them.
+    'import.meta.env.VITE_GRAPHQL_URL': '"http://localhost:4000/graphql"',
+    'import.meta.env.VITE_GRAPHQL_WS_URL': '"ws://localhost:4000/graphql"',
+    'import.meta.env.VITE_KEYCLOAK_URL': '"http://localhost:8080"',
+    'import.meta.env.VITE_KEYCLOAK_REALM': '"edusphere"',
+    'import.meta.env.VITE_KEYCLOAK_CLIENT_ID': '"edusphere-web"',
   },
   resolve: {
     alias: {
