@@ -173,6 +173,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-40"
           size="icon"
+          aria-label="Open AI chat"
         >
           <MessageSquare className="h-6 w-6" />
         </Button>
@@ -190,7 +191,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
             <Sparkles className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">{t('chatPanel.title')}</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8">
+          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8" aria-label="Close AI chat">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -254,6 +255,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
               disabled={!inputValue.trim() || isStreaming}
               size="icon"
               className="shrink-0"
+              aria-label="Send message"
             >
               <Send className="h-4 w-4" />
             </Button>
