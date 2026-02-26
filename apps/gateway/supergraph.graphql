@@ -203,8 +203,16 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   tenants(limit: Int = 10, offset: Int = 0) : [Tenant!]! @join__field(graph: CORE) 
   user(id: ID!) : User @join__field(graph: CORE) 
   users(limit: Int = 10, offset: Int = 0) : [User!]! @join__field(graph: CORE) 
-  me: User @join__field(graph: CORE) 
+  me: User @join__field(graph: CORE)
   myStats: UserStats! @join__field(graph: CORE)  @authenticated
+  adminOverview: AdminOverview! @join__field(graph: CORE)  @authenticated
+  adminAnnouncements(limit: Int = 20, offset: Int = 0) : AnnouncementResult! @join__field(graph: CORE)  @authenticated
+  activeAnnouncements: [Announcement!]! @join__field(graph: CORE)  @authenticated
+  adminAuditLog(limit: Int = 50, offset: Int = 0, action: String, userId: ID, since: String, until: String) : AuditLogResult! @join__field(graph: CORE)  @authenticated
+  roles: [Role!]! @join__field(graph: CORE)  @authenticated
+  role(id: ID!) : Role @join__field(graph: CORE)  @authenticated
+  userDelegations(userId: ID!) : [RoleDelegation!]! @join__field(graph: CORE)  @authenticated
+  mySecuritySettings: SecuritySettings! @join__field(graph: CORE)  @authenticated
   embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE) 
   embeddingsByContentItem(contentItemId: ID!) : [Embedding!]! @join__field(graph: KNOWLEDGE) 
   semanticSearch(query: [Float!]!, limit: Int = 10, minSimilarity: Float = 0.7) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
@@ -286,6 +294,16 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   reorderModules(courseId: ID!, moduleIds: [ID!]!) : [Module!]! @join__field(graph: CONTENT)  @authenticated
   createUser(input: CreateUserInput!) : User! @join__field(graph: CORE)  @authenticated
   updateUser(id: ID!, input: UpdateUserInput!) : User! @join__field(graph: CORE)  @authenticated
+  createAnnouncement(input: CreateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
+  updateAnnouncement(id: ID!, input: UpdateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
+  deleteAnnouncement(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  publishAnnouncement(id: ID!) : Announcement! @join__field(graph: CORE)  @authenticated
+  createRole(input: CreateRoleInput!) : Role! @join__field(graph: CORE)  @authenticated
+  updateRole(id: ID!, input: UpdateRoleInput!) : Role! @join__field(graph: CORE)  @authenticated
+  deleteRole(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  delegateRole(userId: ID!, roleId: ID!, validUntil: String) : RoleDelegation! @join__field(graph: CORE)  @authenticated
+  revokeDelegation(delegationId: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  updateSecuritySettings(input: UpdateSecuritySettingsInput!) : SecuritySettings! @join__field(graph: CORE)  @authenticated
   createEmbedding(input: CreateEmbeddingInput!) : Embedding! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbedding(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)  @authenticated
   deleteEmbeddingsByContentItem(contentItemId: ID!) : Int! @join__field(graph: KNOWLEDGE)  @authenticated
@@ -509,6 +527,88 @@ type UserStatus @join__type(graph: CORE)  {
   userId: ID!
   online: Boolean!
   lastSeen: DateTime!
+}
+
+type AdminOverview @join__type(graph: CORE)  {
+  totalUsers: Int! @join__field(graph: CORE)
+  activeUsersThisMonth: Int! @join__field(graph: CORE)
+  totalCourses: Int! @join__field(graph: CORE)
+  completionsThisMonth: Int! @join__field(graph: CORE)
+  atRiskCount: Int! @join__field(graph: CORE)
+  lastScimSync: String @join__field(graph: CORE)
+  lastComplianceReport: String @join__field(graph: CORE)
+  storageUsedMb: Float! @join__field(graph: CORE)
+}
+
+type Announcement @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  title: String! @join__field(graph: CORE)
+  body: String! @join__field(graph: CORE)
+  priority: String! @join__field(graph: CORE)
+  targetAudience: String! @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  publishAt: String @join__field(graph: CORE)
+  expiresAt: String @join__field(graph: CORE)
+  createdBy: ID @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type AnnouncementResult @join__type(graph: CORE)  {
+  announcements: [Announcement!]! @join__field(graph: CORE)
+  total: Int! @join__field(graph: CORE)
+}
+
+type AuditLogEntry @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  tenantId: ID! @join__field(graph: CORE)
+  userId: ID @join__field(graph: CORE)
+  action: String! @join__field(graph: CORE)
+  resourceType: String @join__field(graph: CORE)
+  resourceId: ID @join__field(graph: CORE)
+  status: String! @join__field(graph: CORE)
+  ipAddress: String @join__field(graph: CORE)
+  requestId: String @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+  metadata: String @join__field(graph: CORE)
+}
+
+type AuditLogResult @join__type(graph: CORE)  {
+  entries: [AuditLogEntry!]! @join__field(graph: CORE)
+  total: Int! @join__field(graph: CORE)
+}
+
+type Role @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  tenantId: ID! @join__field(graph: CORE)
+  name: String! @join__field(graph: CORE)
+  description: String! @join__field(graph: CORE)
+  permissions: [String!]! @join__field(graph: CORE)
+  isSystem: Boolean! @join__field(graph: CORE)
+  userCount: Int! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+  updatedAt: String! @join__field(graph: CORE)
+}
+
+type RoleDelegation @join__type(graph: CORE)  {
+  id: ID! @join__field(graph: CORE)
+  userId: ID! @join__field(graph: CORE)
+  roleId: ID! @join__field(graph: CORE)
+  delegatedBy: ID! @join__field(graph: CORE)
+  validUntil: String @join__field(graph: CORE)
+  isActive: Boolean! @join__field(graph: CORE)
+  createdAt: String! @join__field(graph: CORE)
+}
+
+type SecuritySettings @join__type(graph: CORE)  {
+  mfaRequired: Boolean! @join__field(graph: CORE)
+  mfaRequiredForAdmins: Boolean! @join__field(graph: CORE)
+  sessionTimeoutMinutes: Int! @join__field(graph: CORE)
+  maxConcurrentSessions: Int! @join__field(graph: CORE)
+  loginAttemptLockoutThreshold: Int! @join__field(graph: CORE)
+  passwordMinLength: Int! @join__field(graph: CORE)
+  passwordRequireSpecialChars: Boolean! @join__field(graph: CORE)
+  passwordExpiryDays: Int @join__field(graph: CORE)
+  ipAllowlist: [String!]! @join__field(graph: CORE)
 }
 
 type Embedding @join__type(graph: KNOWLEDGE, key: "id")  {
@@ -798,6 +898,49 @@ input UpdateUserInput @join__type(graph: CORE)  {
   firstName: String
   lastName: String
   role: UserRole
+}
+
+input CreateAnnouncementInput @join__type(graph: CORE)  {
+  title: String!
+  body: String!
+  priority: String!
+  targetAudience: String!
+  publishAt: String
+  expiresAt: String
+}
+
+input UpdateAnnouncementInput @join__type(graph: CORE)  {
+  title: String
+  body: String
+  priority: String
+  targetAudience: String
+  isActive: Boolean
+  publishAt: String
+  expiresAt: String
+}
+
+input CreateRoleInput @join__type(graph: CORE)  {
+  name: String!
+  description: String
+  permissions: [String!]!
+}
+
+input UpdateRoleInput @join__type(graph: CORE)  {
+  name: String
+  description: String
+  permissions: [String!]
+}
+
+input UpdateSecuritySettingsInput @join__type(graph: CORE)  {
+  mfaRequired: Boolean
+  mfaRequiredForAdmins: Boolean
+  sessionTimeoutMinutes: Int
+  maxConcurrentSessions: Int
+  loginAttemptLockoutThreshold: Int
+  passwordMinLength: Int
+  passwordRequireSpecialChars: Boolean
+  passwordExpiryDays: Int
+  ipAllowlist: [String!]
 }
 
 input CreateEmbeddingInput @join__type(graph: KNOWLEDGE)  {

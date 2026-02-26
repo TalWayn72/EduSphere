@@ -1,9 +1,88 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 25 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅**
+**תאריך עדכון:** 26 פברואר 2026
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅**
 **בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569 | Backend subgraphs: 1,764+ | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,524 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **ALL E2E PASS** | **813/813 security tests ✅** | **ALL turbo test PASS (38/38 tasks) ✅**
+
+---
+
+## ✅ BUG-SELECT-001 — Radix `<Select.Item value="">` crash at `/admin/users` (26 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (page crash) | **Branch:** `feat/improvements-wave1`
+
+### Problem
+
+`/admin/users` threw `Unexpected Application Error` on load:
+> A `<Select.Item />` must have a value prop that is not an empty string.
+
+Radix UI reserves `value=""` for the placeholder/clear mechanism — using it on a real item causes a render-time throw.
+
+### Root Cause
+
+`UserManagementPage.tsx:149` — "All Roles" filter item had `value=""`:
+```tsx
+<SelectItem value="">All Roles</SelectItem>  // WRONG
+```
+State initializers `roleFilter` and `appliedRole` were also `''`, and the query variable used `appliedRole || undefined` which silently converted `'all'` to `undefined`.
+
+### Solution
+
+1. Replaced `value=""` with sentinel `value="all"` on the SelectItem
+2. Changed `useState('')` → `useState('all')` for `roleFilter` + `appliedRole`
+3. Changed `appliedRole || undefined` → `appliedRole === 'all' ? undefined : appliedRole` in query variables
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/UserManagementPage.tsx` | `value=""` → `value="all"`, state init + query var |
+
+### Tests
+
+`apps/web/src/pages/UserManagementPage.test.tsx` — 12 tests including regression:
+- `role filter Select does not use empty string as SelectItem value`
+- `role filter defaults to "All Roles" option (value="all")`
+
+---
+
+## ✅ BUG-007: Admin Panel — `Cannot query field "adminOverview" on type "Query"` (26 Feb 2026)
+
+Severity: 🔴 Critical (Admin Panel blank) | Status: ✅ Fixed | Scope: apps/gateway
+
+### Problem
+
+`localhost:5173/admin` displayed: *"Failed to load dashboard data: [GraphQL] Cannot query field "adminOverview" on type "Query"."* — the entire Admin Panel was blank.
+
+### Root Cause
+
+`apps/gateway/supergraph.graphql` was composed before the Admin Upgrade (F-101–F-113) was merged. All 5 admin SDL files (`admin.graphql`, `announcements.graphql`, `audit.graphql`, `custom-role.graphql`, `security.graphql`) defined types and queries in `apps/subgraph-core/src/admin/` but were **never included** in the static supergraph SDL that the gateway serves.
+
+| File | Types missing |
+|------|---------------|
+| `admin.graphql` | `AdminOverview`, query `adminOverview` |
+| `announcements.graphql` | `Announcement`, `AnnouncementResult`, queries + mutations |
+| `audit.graphql` | `AuditLogEntry`, `AuditLogResult`, query `adminAuditLog` |
+| `custom-role.graphql` | `Role`, `RoleDelegation`, queries + mutations |
+| `security.graphql` | `SecuritySettings`, query + mutation |
+
+### Solution
+
+Added all missing types, input types, queries and mutations to `apps/gateway/supergraph.graphql` with `@join__type(graph: CORE)` / `@join__field(graph: CORE)` + `@authenticated` directives:
+- 8 object types (AdminOverview, Announcement, AnnouncementResult, AuditLogEntry, AuditLogResult, Role, RoleDelegation, SecuritySettings)
+- 10 queries added to Query type
+- 12 mutations added to Mutation type
+- 5 input types (CreateAnnouncementInput, UpdateAnnouncementInput, CreateRoleInput, UpdateRoleInput, UpdateSecuritySettingsInput)
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `apps/gateway/supergraph.graphql` | +145 lines — all admin types/queries/mutations |
+
+### Regression Test
+
+`apps/gateway/src/test/federation/admin-supergraph.spec.ts` — verifies all admin types present in supergraph SDL.
 
 ---
 

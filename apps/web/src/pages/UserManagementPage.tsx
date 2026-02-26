@@ -64,9 +64,9 @@ export function UserManagementPage() {
   const role = useAuthRole();
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
   const [appliedSearch, setAppliedSearch] = useState('');
-  const [appliedRole, setAppliedRole] = useState('');
+  const [appliedRole, setAppliedRole] = useState('all');
   const [showInvite, setShowInvite] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [editingRole, setEditingRole] = useState<Record<string, string>>({});
@@ -90,7 +90,7 @@ export function UserManagementPage() {
       limit: PAGE_SIZE,
       offset: page * PAGE_SIZE,
       search: appliedSearch || undefined,
-      role: (appliedRole || undefined) as UserRole | undefined,
+      role: (appliedRole === 'all' ? undefined : appliedRole) as UserRole | undefined,
     },
   });
 
@@ -146,7 +146,7 @@ export function UserManagementPage() {
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Roles</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="STUDENT">Student</SelectItem>
               <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
               <SelectItem value="RESEARCHER">Researcher</SelectItem>
