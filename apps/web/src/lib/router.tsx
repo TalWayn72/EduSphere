@@ -13,8 +13,12 @@ const ContentViewer = lazy(() =>
 const QuizContentPage = lazy(() =>
   import('@/pages/QuizContentPage').then((m) => ({ default: m.QuizContentPage }))
 );
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const RichDocumentPage = lazy(() =>
   import('@/pages/RichDocumentPage').then((m) => ({ default: m.RichDocumentPage }))
+);
+const DocumentAnnotationPage = lazy(() =>
+  import('@/pages/DocumentAnnotationPage').then((m) => ({ default: m.DocumentAnnotationPage }))
 );
 const CourseList = lazy(() =>
   import('@/pages/CourseList').then((m) => ({ default: m.CourseList }))
@@ -226,7 +230,7 @@ export const router = createBrowserRouter([
   {
     // Dedicated route for RICH_DOCUMENT content items
     path: '/document/:contentId',
-    element: guarded(<RichDocumentPage />),
+    element: guarded(<DocumentAnnotationPage />),
   },
   {
     path: '/courses',

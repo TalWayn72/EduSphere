@@ -140,3 +140,65 @@
 .ProseMirror .math-node {
   cursor: default;
 }
+
+/* ── Annotation text-range highlights ──────────────────────────────────────── */
+
+.annotation-highlight {
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.annotation-highlight--PERSONAL    { background-color: rgba(250, 204, 21, 0.25); }
+.annotation-highlight--SHARED      { background-color: rgba(59, 130, 246, 0.20); }
+.annotation-highlight--INSTRUCTOR  { background-color: rgba(34, 197, 94, 0.20); }
+.annotation-highlight--AI_GENERATED { background-color: rgba(168, 85, 247, 0.20); }
+
+/* Focused: stronger colour + underline (overrides layer colour) */
+.annotation-highlight--focused {
+  background-color: rgba(249, 115, 22, 0.30) !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(249, 115, 22, 0.70);
+  text-underline-offset: 2px;
+}
+
+/* Dark-mode overrides */
+.dark .annotation-highlight--PERSONAL     { background-color: rgba(250, 204, 21, 0.20); }
+.dark .annotation-highlight--SHARED       { background-color: rgba(59, 130, 246, 0.18); }
+.dark .annotation-highlight--INSTRUCTOR   { background-color: rgba(34, 197, 94, 0.18); }
+.dark .annotation-highlight--AI_GENERATED { background-color: rgba(168, 85, 247, 0.18); }
+.dark .annotation-highlight--focused      { background-color: rgba(249, 115, 22, 0.28) !important; }
+
+/* ── MS-Word Style Annotation Highlights ──────────────────────────────────── */
+/* Applied by ProseMirror DecorationSet plugin in AnnotationDecorationsPlugin  */
+.annotation-highlight {
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 150ms ease, outline 150ms ease;
+}
+
+.annotation-highlight--PERSONAL {
+  background-color: rgba(124, 58, 237, 0.15); /* violet */
+}
+
+.annotation-highlight--SHARED {
+  background-color: rgba(37, 99, 235, 0.15); /* blue */
+}
+
+.annotation-highlight--INSTRUCTOR {
+  background-color: rgba(22, 163, 74, 0.15); /* green */
+}
+
+.annotation-highlight--AI_GENERATED {
+  background-color: rgba(217, 119, 6, 0.15); /* amber */
+}
+
+.annotation-highlight--focused {
+  background-color: rgba(245, 158, 11, 0.35) !important; /* stronger amber */
+  outline: 2px solid rgba(245, 158, 11, 0.6);
+  border-radius: 2px;
+}
+
+.annotation-highlight:hover {
+  filter: brightness(0.92);
+}

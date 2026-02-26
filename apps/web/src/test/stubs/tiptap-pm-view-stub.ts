@@ -5,7 +5,7 @@
 export const Decoration = {
   inline: (_from: number, _to: number, _attrs: Record<string, string>) => ({}),
   node: (_from: number, _to: number, _attrs: Record<string, string>) => ({}),
-  widget: (_pos: number, _toDOM: () => Node) => ({}),
+  widget: (_pos: number, _toDOM: () => globalThis.Node) => ({}),
 };
 export const DecorationSet = {
   create: (_doc: unknown, _decorations: unknown[]) => ({ decorations: _decorations }),
