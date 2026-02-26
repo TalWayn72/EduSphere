@@ -1,7 +1,7 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 26 פברואר 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅**
 **בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,630 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88/88 ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
 
@@ -4309,3 +4309,40 @@ Full SCORM 1.2/2004 import pipeline + SCORM 1.2 API shim for in-platform playbac
 ### Test Results After Fix
 
 - **686/686 tests pass** across 53 test files
+
+---
+
+## ✅ CI-002: Full Test Suite — 4 Remaining Failures (26 February 2026)
+
+| Field | Value |
+|-------|-------|
+| **Status** | ✅ Fixed |
+| **Severity** | 🔴 Critical (blocked CI merge) |
+| **Branch** | `feat/improvements-wave1` |
+| **Commit** | `02a6464` |
+
+### Problems (4 failures in "Full Test Suite" workflow)
+
+| # | Failure | Root Cause |
+|---|---------|------------|
+| 1 | `relation 'discussion_messages' does not exist` | `0004_discussion_tables.sql` created but NOT registered in `_journal.json` — Drizzle ignores unregistered migrations |
+| 2 | `Error: Test timed out in 30000ms` in `subgraph-core/src/metrics/metrics.interceptor.spec.ts` | `MetricsInterceptor.handleGraphql()` calls `this.metricsService.resolverDuration.observe()` inside `tap()`. Mock was missing `resolverDuration`, so `tap()` threw TypeError → Observable never completed |
+| 3 | `ReferenceError: Cannot access 'mockDb' before initialization` in `open-badges.service.memory.spec.ts` | `vi.mock()` factories are hoisted above all `const` declarations; `mockDb` was a module-level `const` referenced inside the mock factory |
+| 4 | `AssertionError: expected undefined to be 'def-1'` in `open-badges.service.spec.ts:97` | `issueBadge()` returns `{ assertion, definition }` (not a flat object); test accessed `result.badgeDefinitionId` instead of `result.assertion.badgeDefinitionId` |
+
+### Solutions
+
+1. **`packages/db/migrations/meta/_journal.json`** — Added `{ idx: 4, tag: "0004_discussion_tables", ... }` entry so Drizzle picks up the migration
+2. **`apps/subgraph-core/src/metrics/metrics.interceptor.spec.ts`** — Added `resolverDuration/rlsDuration/agentDuration/ragDuration: { observe: vi.fn() }` histogram mocks
+3. **`apps/subgraph-core/src/gamification/open-badges.service.memory.spec.ts`** — Rewrote all mock variables (`mockDb`, `mockSelectFrom`, `mockInsertReturning`) to use `vi.hoisted()`
+4. **`apps/subgraph-core/src/gamification/open-badges.service.spec.ts`** — Changed `result.badgeDefinitionId` → `result.assertion.badgeDefinitionId` (and `result.recipientId` → `result.assertion.recipientId`)
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/db/migrations/meta/_journal.json` | Added `0004_discussion_tables` entry at idx 4 |
+| `apps/subgraph-core/src/metrics/metrics.interceptor.spec.ts` | Added 4 histogram mocks to `mockService` |
+| `apps/subgraph-core/src/gamification/open-badges.service.memory.spec.ts` | Rewrote with `vi.hoisted()` |
+| `apps/subgraph-core/src/gamification/open-badges.service.spec.ts` | Fixed `result.assertion.*` access |
+
