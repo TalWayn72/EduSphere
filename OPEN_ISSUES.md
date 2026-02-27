@@ -7,51 +7,42 @@
 
 ---
 
-## 🟡 A11Y-001 — WCAG 2.2 AA Form Label Violations in Tier 2/3 Admin Pages (27 Feb 2026)
+## ✅ A11Y-001 — WCAG 2.2 AA Form Label Violations in Tier 2/3 Admin Pages (27 Feb 2026)
 
-**Status:** 🟡 In Progress (CI excluded) | **Severity:** 🟡 Medium | **Date:** 27 Feb 2026
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Date:** 27 Feb 2026 → Fixed 27 Feb 2026
 **Files:** `apps/web/e2e/accessibility-new-features.spec.ts` (976 lines, ~100 tests)
 
 ### Problem
 
-`accessibility-new-features.spec.ts` — a comprehensive WCAG 2.2 AA test suite covering Tier 2/3
-admin pages — was added as part of the Admin Upgrade (F-101–F-113). All ~100 axe-core tests fail
-because the admin pages have form accessibility violations:
+`accessibility-new-features.spec.ts` — a comprehensive WCAG 2.2 AA test suite covering new
+admin pages — was added as part of the Admin Upgrade. The spec was excluded from CI because
+admin pages had form accessibility violations:
 
-- **Missing `htmlFor` / `aria-labelledby`** on form inputs in settings pages
-- **Checkboxes without associated labels** in compliance/LTI/xAPI settings
-- **`<select>` elements without labels** in language/branding settings
-- **Icon-only buttons without `aria-label`** in some data tables
+- **Missing `htmlFor` / `id`** on form inputs in LTI, SCIM, Compliance settings pages
+- **Icon-only buttons without `aria-label`** in LTI toggle, SCIM revoke, RoleplaySimulator close
 
 ### Root Cause
 
-The Tier 2/3 pages were built with functional correctness as the priority. Visual design uses
-placeholder text and layout context as implicit labels, but screen readers and axe-core require
-explicit programmatic label associations.
+Pages built for functional correctness; visual layout context is not sufficient for screen readers —
+axe-core requires explicit programmatic label associations.
 
-### Affected Pages (estimated ~40 pages)
+### Solution
 
-Language, Branding, LTI, xAPI, BI Export, CPD, Gamification, Notification Templates,
-Portal Builder, Compliance Reports, Assessment Campaign, and more.
+Fixed the following files:
 
-### Temporary Fix
+| File                        | Fix                                                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `LtiSettingsPage.tsx`       | Added `htmlFor={field}` to loop labels + `id={field}` to inputs; added `aria-label` to toggle button |
+| `ScimSettingsPage.tsx`      | Added `htmlFor`/`id` to modal description + expires inputs; added `aria-label` to revoke button      |
+| `ComplianceReportsPage.tsx` | Added `htmlFor="compliance-asof-date"` to label + `id` to date input                                 |
+| `RoleplaySimulator.tsx`     | Added `aria-label="Close roleplay simulator"` to X button                                            |
+| `AIChatPanel.tsx`           | Added `htmlFor`/`id` to link label with SelectTrigger                                                |
 
-`apps/web/playwright.config.ts` → `testIgnore` excludes this spec in CI:
-
-```typescript
-testIgnore: process.env.CI ? ['**/accessibility-new-features.spec.ts'] : [],
-```
-
-### Solution Plan
-
-1. Add `<label htmlFor>` associations to all form inputs in affected pages
-2. Add `aria-label` to icon-only buttons
-3. Add `role="group"` + `aria-labelledby` to checkbox groups
-4. Re-enable `accessibility-new-features.spec.ts` in CI once all tests pass
+Also removed `testIgnore` from `playwright.config.ts` — spec is now fully included in CI.
 
 ### Tests
 
-- `apps/web/e2e/accessibility-new-features.spec.ts` — ~100 tests, currently excluded from CI
+- `apps/web/e2e/accessibility-new-features.spec.ts` — ~100 tests, now included in CI
 - Run locally: `pnpm --filter @edusphere/web test:e2e -- accessibility-new-features`
 
 ---

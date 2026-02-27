@@ -198,6 +198,7 @@ export function ScimSettingsPage() {
                         variant="ghost"
                         size="sm"
                         className="text-destructive"
+                        aria-label={`Revoke token: ${token.description}`}
                         onClick={() => void handleRevoke(token.id)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -294,10 +295,14 @@ export function ScimSettingsPage() {
             ) : (
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium block mb-1">
+                  <label
+                    htmlFor="scim-token-description"
+                    className="text-sm font-medium block mb-1"
+                  >
                     Description
                   </label>
                   <input
+                    id="scim-token-description"
                     className="w-full border rounded-md px-3 py-2 text-sm"
                     placeholder="e.g. Workday Production"
                     value={description}
@@ -305,10 +310,14 @@ export function ScimSettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium block mb-1">
+                  <label
+                    htmlFor="scim-token-expires"
+                    className="text-sm font-medium block mb-1"
+                  >
                     Expires in days (optional)
                   </label>
                   <input
+                    id="scim-token-expires"
                     className="w-full border rounded-md px-3 py-2 text-sm"
                     type="number"
                     min="1"
