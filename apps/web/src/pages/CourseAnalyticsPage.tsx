@@ -102,8 +102,6 @@ export function CourseAnalyticsPage() {
   const role = useAuthRole();
   const [resolving, setResolving] = useState<string | null>(null);
 
-  const paused = !courseId || !ALLOWED_ROLES.has(role ?? '');
-
   const [{ data, fetching, error }] = useQuery<CourseAnalyticsResult>({
     query: COURSE_ANALYTICS_QUERY,
     variables: { courseId },
