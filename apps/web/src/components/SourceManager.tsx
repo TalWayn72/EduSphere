@@ -144,27 +144,37 @@ function AddSourceModal({
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [youtubeTitle, setYoutubeTitle] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const [selectedFileName, setSelectedFileName] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Close modal on Escape key
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !success) onClose();
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  }, [onClose, success]);
+
+  // Auto-close 1.5 s after success is shown
+  useEffect(() => {
+    if (success) {
+      closeTimerRef.current = setTimeout(onClose, 1500);
+    }
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, [success, onClose]);
 
   const addUrl = useMutation({
     mutationFn: IS_DEV_MODE
       ? devMutationFn
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_URL_SOURCE, { input }, authHeaders()),
-    onSuccess: () => {
-      onAdded();
-      onClose();
-    },
+    onSuccess: () => { onAdded(); setSuccess(true); },
     onError: (e) => setError(String(e)),
   });
 
@@ -173,10 +183,7 @@ function AddSourceModal({
       ? devMutationFn
       : (input: { courseId: string; title: string; text: string }) =>
           graphqlClient.request(ADD_TEXT_SOURCE, { input }, authHeaders()),
-    onSuccess: () => {
-      onAdded();
-      onClose();
-    },
+    onSuccess: () => { onAdded(); setSuccess(true); },
     onError: (e) => setError(String(e)),
   });
 
@@ -185,10 +192,7 @@ function AddSourceModal({
       ? devMutationFn
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }, authHeaders()),
-    onSuccess: () => {
-      onAdded();
-      onClose();
-    },
+    onSuccess: () => { onAdded(); setSuccess(true); },
     onError: (e) => setError(String(e)),
   });
 
@@ -202,10 +206,7 @@ function AddSourceModal({
           contentBase64: string;
           mimeType: string;
         }) => graphqlClient.request(ADD_FILE_SOURCE, { input }, authHeaders()),
-    onSuccess: () => {
-      onAdded();
-      onClose();
-    },
+    onSuccess: () => { onAdded(); setSuccess(true); },
     onError: (e) => setError(String(e)),
   });
 
@@ -269,29 +270,42 @@ function AddSourceModal({
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b px-6">
-          {(['url', 'text', 'youtube', 'file'] as AddTab[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors
-                ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-            >
-              {t === 'url'
-                ? '🌐 קישור'
-                : t === 'text'
-                  ? '✏️ טקסט'
-                  : t === 'youtube'
-                    ? '▶️ YouTube'
-                    : '📄 קובץ'}
-            </button>
-          ))}
-        </div>
+        {/* Tabs — hidden when success */}
+        {!success && (
+          <div className="flex border-b px-6">
+            {(['url', 'text', 'youtube', 'file'] as AddTab[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors
+                  ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+              >
+                {t === 'url'
+                  ? '🌐 קישור'
+                  : t === 'text'
+                    ? '✏️ טקסט'
+                    : t === 'youtube'
+                      ? '▶️ YouTube'
+                      : '📄 קובץ'}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Body */}
         <div className="p-6 flex flex-col gap-4">
-          {tab === 'url' && (
+          {/* ── Success state ── */}
+          {success && (
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">✅</span>
+              </div>
+              <p className="font-semibold text-green-700 text-base">המקור הוסף בהצלחה!</p>
+              <p className="text-sm text-gray-500">מעובד ויוצג ברשימה בקרוב...</p>
+            </div>
+          )}
+
+          {!success && tab === 'url' && (
             <>
               <label className="text-xs font-medium text-gray-700">
                 כתובת URL
@@ -315,7 +329,7 @@ function AddSourceModal({
             </>
           )}
 
-          {tab === 'text' && (
+          {!success && tab === 'text' && (
             <>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm"
@@ -332,7 +346,7 @@ function AddSourceModal({
             </>
           )}
 
-          {tab === 'youtube' && (
+          {!success && tab === 'youtube' && (
             <>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -354,59 +368,78 @@ function AddSourceModal({
             </>
           )}
 
-          {tab === 'file' && (
+          {!success && tab === 'file' && (
             <>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 placeholder="כותרת (אופציונלי)"
                 value={fileTitle}
                 onChange={(e) => setFileTitle(e.target.value)}
+                disabled={busy}
               />
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors">
-                <span className="text-3xl mb-1">📂</span>
-                <span className="text-sm text-gray-600">
-                  גרור קובץ לכאן או לחץ לבחירה
-                </span>
-                <span className="text-xs text-gray-400 mt-1">
-                  DOCX, PDF, TXT
-                </span>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept=".docx,.pdf,.txt"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f && !fileTitle) setFileTitle(f.name);
-                  }}
-                />
-              </label>
+
+              {/* Upload zone — spinner while busy, file picker otherwise */}
+              {busy ? (
+                <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50">
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2" />
+                  <span className="text-sm text-blue-700 font-medium">מעלה ומעבד קובץ…</span>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors">
+                  <span className="text-3xl mb-1">{selectedFileName ? '📄' : '📂'}</span>
+                  <span className="text-sm text-gray-600">
+                    {selectedFileName || 'גרור קובץ לכאן או לחץ לבחירה'}
+                  </span>
+                  {!selectedFileName && (
+                    <span className="text-xs text-gray-400 mt-1">DOCX, PDF, TXT</span>
+                  )}
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept=".docx,.pdf,.txt"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        setSelectedFileName(f.name);
+                        if (!fileTitle) setFileTitle(f.name);
+                      }
+                    }}
+                  />
+                </label>
+              )}
             </>
           )}
 
-          {error && (
+          {!success && error && (
             <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">
               {error}
             </p>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex gap-3 justify-end px-6 py-4 border-t">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
-          >
-            ביטול
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={busy}
-            className="px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {busy ? 'מעבד...' : 'הוספת מקור'}
-          </button>
-        </div>
+        {/* Footer — hidden when success */}
+        {!success && (
+          <div className="flex gap-3 justify-end px-6 py-4 border-t">
+            <button
+              onClick={onClose}
+              disabled={busy}
+              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-40"
+            >
+              ביטול
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={busy}
+              className="flex items-center gap-2 px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {busy && (
+                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              )}
+              {busy ? 'שולח...' : 'הוספת מקור'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -460,6 +493,15 @@ function SourceDetailDrawer({
 export function SourceManager({ courseId }: { courseId: string }) {
   const [showAdd, setShowAdd] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [addedBanner, setAddedBanner] = useState<string | null>(null);
+  const addedBannerTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Cleanup banner timer on unmount
+  useEffect(() => {
+    return () => {
+      if (addedBannerTimerRef.current) clearTimeout(addedBannerTimerRef.current);
+    };
+  }, []);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['course-sources', courseId],
@@ -519,6 +561,14 @@ export function SourceManager({ courseId }: { courseId: string }) {
           הוסף מקור
         </button>
       </div>
+
+      {/* Added-source banner */}
+      {addedBanner && (
+        <div className="mx-2 mt-2 flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2 text-sm text-green-700 animate-in slide-in-from-top-2">
+          <span>✅</span>
+          <span>{addedBanner}</span>
+        </div>
+      )}
 
       {/* Source list */}
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
@@ -614,7 +664,9 @@ export function SourceManager({ courseId }: { courseId: string }) {
           onClose={() => setShowAdd(false)}
           onAdded={() => {
             refetch();
-            setShowAdd(false);
+            setAddedBanner('המקור נוסף ומעובד כעת — יוצג כאן בקרוב');
+            if (addedBannerTimerRef.current) clearTimeout(addedBannerTimerRef.current);
+            addedBannerTimerRef.current = setTimeout(() => setAddedBanner(null), 5000);
           }}
         />
       )}
