@@ -50,6 +50,7 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((a, b) => ({ eq: [a, b] })),
   and: vi.fn((...args) => ({ and: args })),
+  inArray: vi.fn((col, vals) => ({ inArray: [col, vals] })),
 }));
 
 import { KnowledgeSourceService } from './knowledge-source.service.js';
@@ -211,13 +212,19 @@ describe('KnowledgeSourceService', () => {
         rawText: 'Hello from test',
       });
 
+      // createAndProcess now returns PENDING immediately; background task does the rest
+      expect(result.status).toBe('PENDING');
+
+      // Flush all pending microtasks so the background processSource completes
+      await new Promise<void>(resolve => setImmediate(resolve));
+
       expect(mockParser.parseText).toHaveBeenCalledWith('Hello from test');
       expect(mockParser.chunkText).toHaveBeenCalled();
       expect(mockEmbeddings.generateEmbedding).toHaveBeenCalledWith(
         'chunk 1',
         expect.stringContaining('ks:')
       );
-      expect(result.status).toBe('READY');
+      expect(mockUpdate).toHaveBeenCalled();
     });
 
     it('marks source as FAILED when parser throws', async () => {
@@ -252,7 +259,14 @@ describe('KnowledgeSourceService', () => {
         rawText: 'fail',
       });
 
-      expect(result.status).toBe('FAILED');
+      // Returns PENDING immediately; background task transitions to FAILED
+      expect(result.status).toBe('PENDING');
+
+      // Flush background processing
+      await new Promise<void>(resolve => setImmediate(resolve));
+
+      // Background task should have called update twice: PROCESSING + FAILED
+      expect(updateCall).toBe(2);
     });
   });
 
@@ -271,6 +285,9 @@ describe('KnowledgeSourceService', () => {
         sourceType: 'URL',
         origin: 'https://example.com/article',
       });
+
+      // Flush background processing
+      await new Promise<void>(resolve => setImmediate(resolve));
 
       expect(mockParser.parseUrl).toHaveBeenCalledWith(
         'https://example.com/article'
@@ -293,6 +310,9 @@ describe('KnowledgeSourceService', () => {
         sourceType: 'FILE_DOCX',
         origin: '/path/to/file.docx',
       });
+
+      // Flush background processing
+      await new Promise<void>(resolve => setImmediate(resolve));
 
       expect(mockParser.parseDocx).toHaveBeenCalledWith('/path/to/file.docx');
     });
@@ -327,8 +347,14 @@ describe('KnowledgeSourceService', () => {
         rawText: 'two chunks text',
       });
 
-      // Only 1 out of 2 chunks embedded successfully — service still marks READY
-      expect(result.status).toBe('READY');
+      // Returns PENDING immediately; background marks READY after partial embedding
+      expect(result.status).toBe('PENDING');
+
+      // Flush background processing
+      await new Promise<void>(resolve => setImmediate(resolve));
+
+      // Background task completed: update was called (PROCESSING + READY)
+      expect(mockUpdate).toHaveBeenCalled();
     });
   });
 

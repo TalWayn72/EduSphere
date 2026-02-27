@@ -237,9 +237,13 @@ describe('KnowledgeSourceService — memory safety', () => {
       rawText: 'will fail',
     });
 
-    // Must reach terminal state — not stuck in PROCESSING
-    expect(['READY', 'FAILED']).toContain(result.status);
-    // Two updates: one for PROCESSING, one for FAILED
+    // createAndProcess returns PENDING immediately; background task handles the rest
+    expect(result.status).toBe('PENDING');
+
+    // Flush background processing so processSource completes
+    await new Promise<void>(resolve => setImmediate(resolve));
+
+    // Must have reached terminal state — two updates: PROCESSING + FAILED
     expect(updateCount).toBeGreaterThanOrEqual(2);
   });
 });

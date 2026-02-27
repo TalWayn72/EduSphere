@@ -19,6 +19,7 @@ import {
   schema,
   eq,
   and,
+  inArray,
   closeAllPools,
 } from '@edusphere/db';
 import type { KnowledgeSource, SourceType } from '@edusphere/db';
@@ -93,9 +94,17 @@ export class KnowledgeSourceService implements OnModuleDestroy {
   // Mutations
   // ---------------------------------------------------------------------------
 
-  /** Create a source record and process it synchronously (for demo/seed) */
+  /** Max processing time before the background task is considered timed out. */
+  private static readonly PROCESS_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+  /**
+   * Insert the source record as PENDING and return immediately.
+   * Processing (parse → chunk → embed) runs in the background so the
+   * GraphQL resolver is not blocked by potentially long embedding loops.
+   * The client polls via refetchInterval (3 s) until status becomes READY/FAILED.
+   */
   async createAndProcess(input: CreateSourceInput): Promise<KnowledgeSource> {
-    // 1. Insert as PENDING
+    // 1. Insert as PENDING — returned to caller immediately
     const [source] = await this.db
       .insert(schema.knowledgeSources)
       .values({
@@ -111,8 +120,33 @@ export class KnowledgeSourceService implements OnModuleDestroy {
 
     if (!source) throw new Error('Failed to create knowledge source');
 
-    // 2. Process inline (could be deferred via NATS in production)
-    return this.processSource(source.id, input);
+    // 2. Fire-and-forget with 5-min timeout (per memory-safety rules)
+    const processTask = this.processSource(source.id, input);
+    const timeoutTask = new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error('Processing timed out after 5 minutes')),
+        KnowledgeSourceService.PROCESS_TIMEOUT_MS
+      )
+    );
+
+    void Promise.race([processTask, timeoutTask]).catch(async (err: unknown) => {
+      this.logger.error(`Source ${source.id} background error: ${err}`);
+      // Only mark FAILED if still PENDING/PROCESSING (processSource may already set FAILED)
+      await this.db
+        .update(schema.knowledgeSources)
+        .set({ status: 'FAILED', error_message: String(err) })
+        .where(
+          and(
+            eq(schema.knowledgeSources.id, source.id),
+            inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING'])
+          )
+        )
+        .catch((dbErr: unknown) =>
+          this.logger.error(`Failed to mark timed-out source as FAILED: ${dbErr}`)
+        );
+    });
+
+    return source; // PENDING — resolver returns immediately
   }
 
   private async processSource(
