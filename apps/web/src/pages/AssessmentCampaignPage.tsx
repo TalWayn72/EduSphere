@@ -89,7 +89,10 @@ export function AssessmentCampaignPage() {
   const [targetUserId, setTargetUserId] = useState('');
   const [dueDate, setDueDate] = useState('');
 
-  const [{ data, fetching }, refetch] = useQuery({ query: MY_CAMPAIGNS_QUERY });
+  const [{ data, fetching }, refetch] = useQuery({
+    query: MY_CAMPAIGNS_QUERY,
+    pause: true,
+  });
   const [{ fetching: creating }, createCampaign] = useMutation(
     CREATE_CAMPAIGN_MUTATION
   );

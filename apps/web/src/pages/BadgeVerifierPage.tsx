@@ -56,7 +56,7 @@ export function BadgeVerifierPage(): React.ReactElement {
       gqlClient.request<VerifyBadgeResponse>(VERIFY_BADGE_QUERY, {
         assertionId,
       }),
-    enabled: Boolean(assertionId),
+    enabled: false,
     staleTime: 30_000,
     retry: 1,
   });

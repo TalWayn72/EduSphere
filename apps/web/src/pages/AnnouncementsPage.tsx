@@ -60,6 +60,7 @@ export function AnnouncementsPage() {
   const [{ data, fetching }, refetch] = useQuery({
     query: ADMIN_ANNOUNCEMENTS_QUERY,
     variables: { limit: 20, offset: 0 },
+    pause: true,
   });
   const [{ fetching: creating }, execCreate] = useMutation(
     CREATE_ANNOUNCEMENT_MUTATION

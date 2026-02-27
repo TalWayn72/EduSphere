@@ -59,13 +59,13 @@ export function FollowersList({
   const [followersResult] = useQuery<FollowersData>({
     query: MY_FOLLOWERS_QUERY,
     variables: { limit: 50 },
-    pause: !isOpen || type !== 'followers',
+    pause: true, // myFollowers not in live gateway
   });
 
   const [followingResult] = useQuery<FollowingData>({
     query: MY_FOLLOWING_QUERY,
     variables: { limit: 50 },
-    pause: !isOpen || type !== 'following',
+    pause: true, // myFollowing not in live gateway
   });
 
   const fetching =

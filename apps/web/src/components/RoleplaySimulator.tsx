@@ -164,6 +164,7 @@ export function RoleplaySimulator({ scenario, onClose }: Props) {
             size="sm"
             onClick={onClose}
             className="text-gray-400 hover:text-white"
+            aria-label="Close roleplay simulator"
           >
             <X className="h-4 w-4" />
           </Button>

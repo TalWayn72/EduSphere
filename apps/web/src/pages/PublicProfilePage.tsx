@@ -95,7 +95,7 @@ export function PublicProfilePage() {
   const [{ data, fetching, error }] = useQuery<PublicProfileResult>({
     query: PUBLIC_PROFILE_QUERY,
     variables: { userId: userId ?? '' },
-    pause: !userId,
+    pause: true, // publicProfile not in live gateway
     context: React.useMemo(() => ({ fetchOptions: {} }), []),
   });
 

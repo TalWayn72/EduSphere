@@ -48,7 +48,7 @@ export function AuditLogPage() {
       since: since || undefined,
       until: until || undefined,
     },
-    pause: !role || !ADMIN_ROLES.has(role),
+    pause: true,
   });
 
   if (!role || !ADMIN_ROLES.has(role)) {

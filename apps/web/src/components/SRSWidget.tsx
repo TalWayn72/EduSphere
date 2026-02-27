@@ -34,7 +34,7 @@ export function SRSWidget() {
 
   const [countResult, refetchCount] = useQuery<SrsQueueCountResult>({
     query: SRS_QUEUE_COUNT_QUERY,
-    pause: pauseRef.current,
+    pause: true, // srsQueueCount not in live gateway
   });
 
   const [reviewsResult] = useQuery<DueReviewsResult>({

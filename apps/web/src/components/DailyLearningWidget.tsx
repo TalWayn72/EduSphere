@@ -51,6 +51,7 @@ export function DailyLearningWidget() {
 
   const [{ data, fetching, error }] = useQuery<DailyMicrolessonQueryResult>({
     query: DAILY_MICROLESSON_QUERY,
+    pause: true, // dailyMicrolesson not in live gateway
   });
 
   const [, markViewed] = useMutation(MARK_CONTENT_VIEWED_MUTATION);

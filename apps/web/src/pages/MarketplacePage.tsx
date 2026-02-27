@@ -62,6 +62,7 @@ export function MarketplacePage() {
   const { data, isLoading, error } = useQuery<ListingsData>({
     queryKey: ['marketplace-listings'],
     queryFn: () => request<ListingsData>(GRAPHQL_URL, COURSE_LISTINGS_QUERY),
+    enabled: false, // courseListings not in live gateway
   });
 
   if (isLoading) {

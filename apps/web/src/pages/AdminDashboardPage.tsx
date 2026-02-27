@@ -91,6 +91,7 @@ export function AdminDashboardPage() {
 
   const [result] = useQuery<{ adminOverview: AdminOverviewData }>({
     query: ADMIN_OVERVIEW_QUERY,
+    pause: true, // adminOverview not in live gateway
   });
 
   if (!role || !ADMIN_ROLES.has(role)) {

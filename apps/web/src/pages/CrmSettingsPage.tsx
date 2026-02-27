@@ -57,10 +57,12 @@ export function CrmSettingsPage() {
     crmConnection: CrmConnectionData | null;
   }>({
     query: CRM_CONNECTION_QUERY,
+    pause: true,
   });
   const [logResult] = useQuery<{ crmSyncLog: CrmSyncEntry[] }>({
     query: CRM_SYNC_LOG_QUERY,
     variables: { limit: 20 },
+    pause: true,
   });
   const [, disconnectCrm] = useMutation(DISCONNECT_CRM_MUTATION);
 

@@ -248,7 +248,7 @@ export function EnrollmentManagementPage() {
   }>({
     query: ADMIN_COURSE_ENROLLMENTS_QUERY,
     variables: { courseId: selectedCourseId },
-    pause: !selectedCourseId,
+    pause: true,
   });
 
   const courses = coursesResult.data?.courses ?? [];

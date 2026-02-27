@@ -81,6 +81,7 @@ export function LanguageSettingsPage() {
 
   const [queryResult] = useQuery<QueryResult>({
     query: TENANT_LANGUAGE_SETTINGS_QUERY,
+    pause: true,
   });
   const [mutResult, updateSettings] = useMutation(
     UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION

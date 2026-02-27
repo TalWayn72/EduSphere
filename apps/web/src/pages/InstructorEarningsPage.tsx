@@ -69,6 +69,7 @@ export function InstructorEarningsPage() {
     {
       queryKey: ['instructor-earnings'],
       queryFn: () => request(GRAPHQL_URL, EARNINGS_QUERY),
+      enabled: false, // instructorEarnings not in live gateway
     }
   );
 

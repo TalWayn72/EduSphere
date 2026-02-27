@@ -11,12 +11,6 @@ export const ME_QUERY = gql`
       tenantId
       createdAt
       updatedAt
-      preferences {
-        locale
-        theme
-        emailNotifications
-        pushNotifications
-      }
     }
   }
 `;

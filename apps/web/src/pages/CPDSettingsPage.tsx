@@ -46,6 +46,7 @@ export function CPDSettingsPage() {
 
   const [{ data, fetching }] = useQuery<{ cpdCreditTypes: CpdCreditType[] }>({
     query: CPD_CREDIT_TYPES_QUERY,
+    pause: true,
   });
 
   const [, createCreditType] = useMutation(CREATE_CPD_CREDIT_TYPE_MUTATION);

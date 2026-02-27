@@ -219,14 +219,21 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
         </div>
 
         <div className="p-4 border-b bg-background">
-          <label className="text-sm font-medium mb-2 block">
+          <label
+            htmlFor="ai-agent-select"
+            className="text-sm font-medium mb-2 block"
+          >
             {t('selectAgent')}
           </label>
           <Select
             value={selectedAgent}
             onValueChange={(v) => setSelectedAgent(v as AgentType)}
           >
-            <SelectTrigger className="w-full" aria-label={t('selectAgent')}>
+            <SelectTrigger
+              id="ai-agent-select"
+              className="w-full"
+              aria-label={t('selectAgent')}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

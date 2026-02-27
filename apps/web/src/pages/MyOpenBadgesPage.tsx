@@ -144,7 +144,7 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function MyOpenBadgesPage() {
-  const [result] = useQuery({ query: MY_OPEN_BADGES_QUERY });
+  const [result] = useQuery({ query: MY_OPEN_BADGES_QUERY, pause: true }); // myOpenBadges not in live gateway
   const { data, fetching, error } = result;
   const badges: OpenBadgeAssertion[] =
     (data as { myOpenBadges?: OpenBadgeAssertion[] } | undefined)
