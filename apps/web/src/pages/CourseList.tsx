@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import {
@@ -141,6 +143,7 @@ export function CourseList() {
   const [{ data: enrollmentsData }, reexecuteEnrollments] =
     useQuery<MyEnrollmentsResult>({
       query: MY_ENROLLMENTS_QUERY,
+      pause: DEV_MODE,
     });
 
   const [, executeEnroll] = useMutation<

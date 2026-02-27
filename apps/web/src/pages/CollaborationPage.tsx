@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -73,6 +75,7 @@ export function CollaborationPage() {
   const [{ data, fetching, error }, reexecute] = useQuery({
     query: MY_DISCUSSIONS_QUERY,
     variables: { limit: 20, offset: 0 },
+    pause: DEV_MODE,
   });
 
   const [createResult, executeCreate] = useMutation(CREATE_DISCUSSION_MUTATION);

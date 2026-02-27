@@ -10,6 +10,8 @@
  */
 import { useQuery } from 'urql';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import {
   mockVideo,
   mockTranscript,
@@ -62,7 +64,7 @@ export function useContentData(contentId: string): ContentData {
   const [result] = useQuery<ContentQueryResult>({
     query: CONTENT_ITEM_QUERY,
     variables: { id: contentId },
-    pause: !contentId,
+    pause: !contentId || DEV_MODE,
   });
 
   const item = result.data?.contentItem;
