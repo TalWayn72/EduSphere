@@ -67,6 +67,18 @@ export const ADD_YOUTUBE_SOURCE = gql`
   }
 `;
 
+export const ADD_FILE_SOURCE = gql`
+  mutation AddFileSource($input: AddFileSourceInput!) {
+    addFileSource(input: $input) {
+      id
+      title
+      sourceType
+      status
+      origin
+    }
+  }
+`;
+
 export const DELETE_KNOWLEDGE_SOURCE = gql`
   mutation DeleteKnowledgeSource($id: ID!) {
     deleteKnowledgeSource(id: $id)

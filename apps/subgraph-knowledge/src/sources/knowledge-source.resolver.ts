@@ -78,6 +78,39 @@ export class KnowledgeSourceResolver {
   }
 
   @Mutation()
+  async addFileSource(
+    @Args('input')
+    input: {
+      courseId: string;
+      title: string;
+      fileName: string;
+      contentBase64: string;
+      mimeType: string;
+    },
+    @Context() ctx: GraphQLContext
+  ) {
+    const { tenantId } = this.auth(ctx);
+    const fileBuffer = Buffer.from(input.contentBase64, 'base64');
+    const lower = input.fileName.toLowerCase();
+    const sourceType =
+      lower.endsWith('.pdf') || input.mimeType === 'application/pdf'
+        ? ('FILE_PDF' as const)
+        : lower.endsWith('.docx') ||
+            input.mimeType.includes('wordprocessingml')
+          ? ('FILE_DOCX' as const)
+          : ('FILE_TXT' as const);
+
+    return this.service.createAndProcess({
+      tenantId,
+      courseId: input.courseId,
+      title: input.title,
+      sourceType,
+      origin: input.fileName,
+      fileBuffer,
+    });
+  }
+
+  @Mutation()
   async deleteKnowledgeSource(
     @Args('id') id: string,
     @Context() ctx: GraphQLContext

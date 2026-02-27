@@ -15,13 +15,13 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { gqlClient as graphqlClient } from '@/lib/graphql';
-import { getToken } from '@/lib/auth';
 import {
   COURSE_KNOWLEDGE_SOURCES,
   KNOWLEDGE_SOURCE_DETAIL,
   ADD_URL_SOURCE,
   ADD_TEXT_SOURCE,
   ADD_YOUTUBE_SOURCE,
+  ADD_FILE_SOURCE,
   DELETE_KNOWLEDGE_SOURCE,
 } from '@/lib/graphql/sources.queries';
 
@@ -185,6 +185,23 @@ function AddSourceModal({
     onError: (e) => setError(String(e)),
   });
 
+  const addFile = useMutation({
+    mutationFn: IS_DEV_MODE
+      ? devMutationFn
+      : (input: {
+          courseId: string;
+          title: string;
+          fileName: string;
+          contentBase64: string;
+          mimeType: string;
+        }) => graphqlClient.request(ADD_FILE_SOURCE, { input }),
+    onSuccess: () => {
+      onAdded();
+      onClose();
+    },
+    onError: (e) => setError(String(e)),
+  });
+
   const handleSubmit = async () => {
     setError('');
     setBusy(true);
@@ -204,19 +221,22 @@ function AddSourceModal({
       } else if (tab === 'file') {
         const file = fileRef.current?.files?.[0];
         if (!file) return setError('נא לבחור קובץ');
-        const fd = new FormData();
-        fd.append('file', file);
-        fd.append('courseId', courseId);
-        fd.append('title', fileTitle || file.name);
-        const token = getToken();
-        const res = await fetch('/api/knowledge-sources/upload', {
-          method: 'POST',
-          headers: token ? { authorization: `Bearer ${token}` } : {},
-          body: fd,
+        const contentBase64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = reader.result as string;
+            resolve(dataUrl.split(',')[1] ?? '');
+          };
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(file);
         });
-        if (!res.ok) throw new Error(await res.text());
-        onAdded();
-        onClose();
+        await addFile.mutateAsync({
+          courseId,
+          title: fileTitle || file.name,
+          fileName: file.name,
+          contentBase64,
+          mimeType: file.type || 'application/octet-stream',
+        });
       }
     } catch (e) {
       setError(String(e));
