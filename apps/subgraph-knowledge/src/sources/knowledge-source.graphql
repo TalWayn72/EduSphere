@@ -56,6 +56,17 @@ input AddYoutubeSourceInput {
   url: String!
 }
 
+input AddFileSourceInput {
+  courseId: ID!
+  title: String!
+  """ Original filename — used to determine SourceType (pdf/docx/txt) """
+  fileName: String!
+  """ Base64-encoded file content """
+  contentBase64: String!
+  """ MIME type hint (e.g. application/pdf) """
+  mimeType: String!
+}
+
 extend type Query {
   courseKnowledgeSources(courseId: ID!): [KnowledgeSource!]!
   knowledgeSource(id: ID!): KnowledgeSource
@@ -78,6 +89,13 @@ extend type Mutation {
   The system fetches the auto-generated transcript and indexes it.
   """
   addYoutubeSource(input: AddYoutubeSourceInput!): KnowledgeSource!
+
+  """
+  Upload a local file (DOCX / PDF / TXT) as a knowledge source.
+  The content is passed as a base64-encoded string so it can travel through
+  the GraphQL gateway without a multipart transport layer.
+  """
+  addFileSource(input: AddFileSourceInput!): KnowledgeSource!
 
   """
   Remove a knowledge source (and its embeddings).
