@@ -1,20 +1,34 @@
 'use client';
 
+/**
+ * resizable.tsx — shadcn/ui wrapper for react-resizable-panels v4.
+ *
+ * v4 uses inline styles (flexDirection) instead of data-panel-group-direction
+ * attributes, so the old CSS data selectors never fire.  We use a React
+ * context to propagate orientation from Group → Separator so the handle
+ * gets the right CSS in both horizontal and vertical groups.
+ */
+import { createContext, useContext } from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+type Orientation = 'horizontal' | 'vertical';
+
+const OrientationCtx = createContext<Orientation>('horizontal');
+
 const ResizablePanelGroup = ({
   className,
+  orientation = 'horizontal',
   ...props
 }: React.ComponentProps<typeof Group>) => (
-  <Group
-    className={cn(
-      'flex h-full w-full data-[panel-group-direction=vertical]:flex-col',
-      className
-    )}
-    {...props}
-  />
+  <OrientationCtx.Provider value={orientation}>
+    <Group
+      className={cn('flex h-full w-full', className)}
+      orientation={orientation}
+      {...props}
+    />
+  </OrientationCtx.Provider>
 );
 
 const ResizablePanel = Panel;
@@ -25,20 +39,38 @@ const ResizableHandle = ({
   ...props
 }: React.ComponentProps<typeof Separator> & {
   withHandle?: boolean;
-}) => (
-  <Separator
-    className={cn(
-      'relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:after:left-0 data-[panel-group-direction=vertical]:after:h-1 data-[panel-group-direction=vertical]:after:w-full data-[panel-group-direction=vertical]:after:-translate-y-1/2 data-[panel-group-direction=vertical]:after:translate-x-0 [&[data-panel-group-direction=vertical]>div]:rotate-90',
-      className
-    )}
-    {...props}
-  >
-    {withHandle && (
-      <div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
-        <GripVertical className="h-2.5 w-2.5" />
-      </div>
-    )}
-  </Separator>
-);
+}) => {
+  const orientation = useContext(OrientationCtx);
+  const isVertical = orientation === 'vertical';
+
+  return (
+    <Separator
+      className={cn(
+        'relative flex items-center justify-center bg-border',
+        'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1',
+        isVertical
+          // horizontal bar spanning full width — between top/bottom panels
+          ? 'h-2 w-full flex-col after:absolute after:inset-x-0 after:top-1/2 after:h-1 after:-translate-y-1/2'
+          // vertical bar spanning full height — between left/right panels
+          : 'w-2 after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2',
+        className
+      )}
+      {...props}
+    >
+      {withHandle && (
+        <div
+          className={cn(
+            'z-10 flex items-center justify-center rounded-sm border bg-border',
+            isVertical ? 'h-3 w-6' : 'h-6 w-3'
+          )}
+        >
+          <GripVertical
+            className={cn('h-3 w-3', isVertical && 'rotate-90')}
+          />
+        </div>
+      )}
+    </Separator>
+  );
+};
 
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle };

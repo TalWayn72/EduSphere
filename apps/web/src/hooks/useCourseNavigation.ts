@@ -7,7 +7,15 @@
  *  2. Fall back to fetching the course via contentItem.course.id if the
  *     GraphQL schema supports it.
  *  3. Degrades gracefully when no course context is available (direct link).
+ *
+ * NOTE — setState-during-render fix:
+ *  urql's useQuery triggers a synchronous state update on the first render when
+ *  the cache already has data (shared with CourseDetailPage).  To prevent the
+ *  "Cannot update CourseDetailPage while rendering ContentViewerBreadcrumb" error
+ *  we gate the query with `mounted` state so it only runs after the component
+ *  has been committed to the DOM (inside useEffect, never during render).
  */
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { COURSE_DETAIL_QUERY } from '@/lib/graphql/content.queries';
@@ -48,11 +56,17 @@ export function useCourseNavigation(contentId: string): CourseNavContext {
   const [searchParams] = useSearchParams();
   const courseIdHint = searchParams.get('courseId');
 
+  // Delay the query until after mount to prevent urql from triggering a
+  // synchronous setState on CourseDetailPage (which shares the same cache entry)
+  // during ContentViewerBreadcrumb's render phase.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [courseResult] = useQuery<CourseDetailResult>({
     query: COURSE_DETAIL_QUERY,
     variables: { id: courseIdHint },
-    pause: !courseIdHint,
-    requestPolicy: 'network-only', // avoid synchronous cache read that triggers setState-during-render
+    pause: !courseIdHint || !mounted,
+    requestPolicy: 'cache-first',
   });
 
   const course = courseResult.data?.course;
@@ -64,7 +78,7 @@ export function useCourseNavigation(contentId: string): CourseNavContext {
       moduleName: null,
       prevItemId: null,
       nextItemId: null,
-      ready: !courseResult.fetching,
+      ready: mounted && !courseResult.fetching,
     };
   }
 

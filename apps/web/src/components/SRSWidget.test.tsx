@@ -9,24 +9,25 @@ import type { UseQueryResponse, UseMutationResponse } from 'urql';
 
 // ─── Module mocks ─────────────────────────────────────────────────────────────
 
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-      vi.fn(),
-    ]),
-    useMutation: vi.fn(() => [
-      { fetching: false, error: undefined },
-      vi.fn().mockResolvedValue({
-        data: { createReviewCard: { id: 'card-1' } },
-        error: undefined,
-      }),
-    ]),
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false, error: undefined },
+    vi.fn().mockResolvedValue({
+      data: { createReviewCard: { id: 'card-1' } },
+      error: undefined,
+    }),
+  ]),
+}));
 
 // Mock SRSReviewSession — complex component, unit-test stub only
 vi.mock('@/components/SRSReviewSession', () => ({

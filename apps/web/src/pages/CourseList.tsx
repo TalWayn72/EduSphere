@@ -32,6 +32,8 @@ import {
   MY_ENROLLMENTS_QUERY,
   ENROLL_COURSE_MUTATION,
   UNENROLL_COURSE_MUTATION,
+  PUBLISH_COURSE_MUTATION,
+  UNPUBLISH_COURSE_MUTATION,
 } from '@/lib/graphql/content.queries';
 import { AiCourseCreatorModal } from '@/components/AiCourseCreatorModal';
 
@@ -156,6 +158,16 @@ export function CourseList() {
     { courseId: string }
   >(UNENROLL_COURSE_MUTATION);
 
+  const [, executePublish] = useMutation<
+    { publishCourse: { id: string; isPublished: boolean } },
+    { id: string }
+  >(PUBLISH_COURSE_MUTATION);
+
+  const [, executeUnpublish] = useMutation<
+    { unpublishCourse: { id: string; isPublished: boolean } },
+    { id: string }
+  >(UNPUBLISH_COURSE_MUTATION);
+
   const [localPublishState, setLocalPublishState] = useState<
     Map<string, boolean>
   >(new Map());
@@ -224,13 +236,24 @@ export function CourseList() {
     }
   };
 
-  const togglePublish = (
+  const togglePublish = async (
     e: React.MouseEvent,
     courseId: string,
     current: boolean
   ) => {
     e.stopPropagation();
+    // Optimistic update
     setLocalPublishState((prev) => new Map(prev).set(courseId, !current));
+    const { error } = current
+      ? await executeUnpublish({ id: courseId })
+      : await executePublish({ id: courseId });
+    if (error) {
+      // Revert on error
+      setLocalPublishState((prev) => new Map(prev).set(courseId, current));
+      showToast(`Failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+    } else {
+      showToast(current ? 'Course unpublished' : 'Course published!');
+    }
   };
 
   const isPublished = (course: CourseItem): boolean =>
@@ -384,7 +407,7 @@ export function CourseList() {
                           className="flex-1 gap-1.5"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/courses/${course.id}`);
+                            navigate(`/courses/${course.id}/edit`);
                           }}
                         >
                           <Pencil className="h-3.5 w-3.5" />

@@ -5,29 +5,30 @@ import type { UseMutationResponse } from 'urql';
 
 // ─── Module mocks (hoisted before component imports) ──────────────────────────
 
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-    useMutation: vi.fn(() => [
-      { fetching: false, error: undefined },
-      vi.fn().mockResolvedValue({
-        data: {
-          exportAuditLog: {
-            presignedUrl: 'https://minio.example.com/audit-export.csv',
-            expiresAt: '2026-02-26T16:00:00Z',
-            recordCount: 1234,
-          },
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false, error: undefined },
+    vi.fn().mockResolvedValue({
+      data: {
+        exportAuditLog: {
+          presignedUrl: 'https://minio.example.com/audit-export.csv',
+          expiresAt: '2026-02-26T16:00:00Z',
+          recordCount: 1234,
         },
-        error: undefined,
-      }),
-    ]),
-  };
-});
+      },
+      error: undefined,
+    }),
+  ]),
+}));
 
 vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => (

@@ -3,24 +3,25 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock urql — keep gql/other exports, override useQuery, useMutation, useSubscription
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-    useMutation: vi.fn(() => [
-      { fetching: false },
-      vi.fn().mockResolvedValue({ error: null }),
-    ]),
-    useSubscription: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { fetching: false },
+    vi.fn().mockResolvedValue({ error: null }),
+  ]),
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+}));
 
 // Mock Layout to avoid nested routing/auth concerns
 vi.mock('@/components/Layout', () => ({

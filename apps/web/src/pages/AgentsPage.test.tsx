@@ -16,21 +16,22 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 // ─── Module mocks (must be hoisted before component imports) ──────────────────
 
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: { agentTemplates: [] }, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-    useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
-    useSubscription: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: { agentTemplates: [] }, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, vi.fn()]),
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+}));
 
 vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => (
