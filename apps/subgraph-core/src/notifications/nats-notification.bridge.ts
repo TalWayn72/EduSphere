@@ -28,7 +28,7 @@ export interface Notification {
   payload: Record<string, unknown> | null;
   readAt: string | null;
   createdAt: string;
-  /** Internal — used for routing; not exposed in GraphQL. */
+  /** Exposed in GraphQL as Notification.userId and used for PubSub routing. */
   userId: string;
 }
 
@@ -64,6 +64,11 @@ const SUBJECT_MAP: Record<
     title: () => 'Review Due',
     body: (raw) =>
       `You have ${String(raw['cardCount'] ?? 'some')} cards ready for review.`,
+  },
+  'EDUSPHERE.notification.announcement': {
+    type: 'ANNOUNCEMENT',
+    title: (raw) => String(raw['title'] ?? 'New Announcement'),
+    body: (raw) => String(raw['body'] ?? ''),
   },
 };
 
@@ -136,6 +141,7 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
     subject: string,
     sub: Subscription
   ): Promise<void> {
+    // eslint-disable-next-line security/detect-object-injection -- subject is always a key from Object.keys(SUBJECT_MAP)
     const mapping = SUBJECT_MAP[subject];
     if (!mapping) return;
 

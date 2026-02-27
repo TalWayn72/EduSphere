@@ -67,7 +67,7 @@ import type { NotificationPubSub } from './notifications.pubsub';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Total number of NATS subjects watched by the bridge. */
-const WATCHED_SUBJECT_COUNT = 4; // badge.issued, course.enrolled, user.followed, srs.review.due
+const WATCHED_SUBJECT_COUNT = 5; // badge.issued, course.enrolled, user.followed, srs.review.due, EDUSPHERE.notification.announcement
 
 /** Access private _subs array via type casting. */
 function getSubs(bridge: NatsNotificationBridge) {

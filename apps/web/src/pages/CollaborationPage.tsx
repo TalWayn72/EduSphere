@@ -70,12 +70,9 @@ export function CollaborationPage() {
     };
   }, []);
 
-  // MY_DISCUSSIONS_QUERY is not in the running gateway supergraph (Docker image predates
-  // the feature). Pause until the image is rebuilt. Tracked in OPEN_ISSUES.md (BUG-DOCKER-001).
   const [{ data, fetching, error }, reexecute] = useQuery({
     query: MY_DISCUSSIONS_QUERY,
     variables: { limit: 20, offset: 0 },
-    pause: true,
   });
 
   const [createResult, executeCreate] = useMutation(CREATE_DISCUSSION_MUTATION);

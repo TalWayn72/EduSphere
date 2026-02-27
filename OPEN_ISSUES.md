@@ -7,6 +7,42 @@
 
 ---
 
+## ✅ ULP-001 — Unified Learning Page Console Fixes (28 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Date:** 28 Feb 2026
+**Branch:** `feat/improvements-wave1`
+
+### Problem
+
+After implementing the UnifiedLearningPage (document + video + AI + annotations in one resizable panel layout), three console issues appeared:
+
+1. **TipTap duplicate 'codeBlock' extension warning** — `StarterKit` includes `CodeBlock` by default; adding `CodeBlockLowlight` separately caused duplicate extension conflict.
+2. **Resizable panel dividers not draggable** — `react-resizable-panels` v4 applies `flexDirection` via **inline styles** (not `data-panel-group-direction` data attributes). The old shadcn/ui `resizable.tsx` CSS selectors (`data-[panel-group-direction=vertical]:flex-col`) never fired. Vertical group `Separator` stayed at `w-px` (1px wide in a column layout → unclickable).
+3. **Enrollment button shows "הירשם" even when user is enrolled** — when gateway is offline, `enrollData` is `undefined` so `isEnrolled` is always `false`.
+
+### Root Causes
+
+| Issue | File | Root Cause |
+|-------|------|------------|
+| TipTap warning | `RichContentViewer.tsx` | `StarterKit` includes `CodeBlock`; `CodeBlockLowlight` is a replacement, not addition |
+| Panels not draggable | `resizable.tsx` | v4 uses inline `flexDirection` style, not `data-panel-group-direction` attribute → CSS selectors never match |
+| Wrong enroll button | `CourseDetailPage.tsx` | `enrollData` is `undefined` when gateway offline → `isEnrolled = false` always |
+
+### Solution
+
+| File | Change |
+|------|--------|
+| `RichContentViewer.tsx` | `StarterKit.configure({ codeBlock: false })` to prevent duplicate |
+| `resizable.tsx` | Replaced CSS data-attribute approach with React Context (`OrientationCtx`) — `ResizablePanelGroup` provides orientation, `ResizableHandle` consumes it and applies correct CSS (`h-2 w-full` for vertical, `w-2` for horizontal). Handle grip icon rotated 90° for vertical. |
+| `CourseDetailPage.tsx` | When `enrollError` is truthy (gateway offline), `isEnrolled = true` to show "בטל הרשמה" on mock course |
+
+### Tests
+
+- ESLint: 0 errors on all 3 files
+- TypeScript: 0 errors (totalErrors: 0)
+
+---
+
 ## ✅ A11Y-001 — WCAG 2.2 AA Form Label Violations in Tier 2/3 Admin Pages (27 Feb 2026)
 
 **Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Date:** 27 Feb 2026 → Fixed 27 Feb 2026

@@ -138,12 +138,9 @@ export function CourseList() {
     variables: { limit: 50, offset: 0 },
   });
 
-  // MY_ENROLLMENTS_QUERY is not in the running gateway supergraph (Docker image predates
-  // the feature). Pause until the image is rebuilt. Tracked in OPEN_ISSUES.md (BUG-DOCKER-001).
   const [{ data: enrollmentsData }, reexecuteEnrollments] =
     useQuery<MyEnrollmentsResult>({
       query: MY_ENROLLMENTS_QUERY,
-      pause: true,
     });
 
   const [, executeEnroll] = useMutation<
