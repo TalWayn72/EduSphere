@@ -77,9 +77,20 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(defaultOpen);
 
-  const navigateToItem = (itemId: string) => {
+  const navigateToItem = (itemId: string, contentType: string) => {
     const params = new URLSearchParams({ courseId });
-    navigate(`/learn/${itemId}?${params.toString()}`);
+    const type = contentType.toUpperCase();
+    if (type === 'QUIZ') {
+      navigate(`/quiz/${itemId}?${params.toString()}`);
+    } else if (
+      type === 'PDF' ||
+      type === 'MARKDOWN' ||
+      type === 'RICH_DOCUMENT'
+    ) {
+      navigate(`/document/${itemId}?${params.toString()}`);
+    } else {
+      navigate(`/learn/${itemId}?${params.toString()}`);
+    }
   };
 
   return (
@@ -119,7 +130,7 @@ function ModuleCard({ mod, defaultOpen, courseId }: ModuleCardProps) {
                   <Button
                     variant="ghost"
                     className="w-full justify-start gap-2 h-9 px-2 text-sm font-normal"
-                    onClick={() => navigateToItem(item.id)}
+                    onClick={() => navigateToItem(item.id, item.contentType)}
                   >
                     <ContentTypeIcon type={item.contentType} />
                     <span className="flex-1 truncate text-left">

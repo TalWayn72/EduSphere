@@ -3,8 +3,14 @@
  * Uses expo-network to detect connectivity changes.
  * Memory-safe: subscription unsubscribed on dispose(), interval cleared.
  * Max 3 retries per mutation; permanently failed items are dequeued with error log.
+ *
+ * Wave 2 additions:
+ *   - syncOnAppResume(): triggers sync on AppState background→active transition.
+ *   - getSyncStatus(): returns pending count, last-sync timestamp, conflict flag.
+ *   - Conflict resolution: last-write-wins via createdAt timestamp comparison.
  */
 import * as Network from 'expo-network';
+import { AppState, AppStateStatus } from 'react-native';
 import {
   enqueue,
   dequeue,
@@ -12,11 +18,18 @@ import {
   incrementRetry,
   queueSize,
   addConflict,
+  conflictCount,
   QueuedMutation,
 } from './OfflineQueue';
 
 export type SyncStatus = 'idle' | 'syncing' | 'error';
 type StatusListener = (status: SyncStatus, pending: number) => void;
+
+export interface DetailedSyncStatus {
+  pending: number;
+  lastSync: Date | null;
+  hasConflicts: boolean;
+}
 
 const MAX_RETRIES = 3;
 const SYNC_INTERVAL_MS = 30_000; // 30 s polling fallback
@@ -28,6 +41,11 @@ export class SyncEngine {
   private _disposed = false;
   private _graphqlEndpoint: string;
   private _getAuthToken: () => Promise<string | null>;
+  private _lastSync: Date | null = null;
+  private _appStateSubscription: ReturnType<
+    typeof AppState.addEventListener
+  > | null = null;
+  private _prevAppState: AppStateStatus = AppState.currentState;
 
   constructor(
     graphqlEndpoint: string,
@@ -55,7 +73,59 @@ export class SyncEngine {
       clearInterval(this._intervalHandle);
       this._intervalHandle = null;
     }
+    this._appStateSubscription?.remove();
+    this._appStateSubscription = null;
     this._listeners.clear();
+  }
+
+  /**
+   * Subscribe to AppState changes so that sync is triggered when the app
+   * returns from the background to the foreground.
+   * Call once after start(). dispose() automatically removes the subscription.
+   */
+  syncOnAppResume(): void {
+    if (this._disposed) return;
+    if (this._appStateSubscription) return; // already subscribed
+
+    this._appStateSubscription = AppState.addEventListener(
+      'change',
+      (nextState: AppStateStatus) => {
+        if (
+          this._prevAppState === 'background' &&
+          nextState === 'active' &&
+          !this._disposed
+        ) {
+          void this._trySyncAll();
+        }
+        this._prevAppState = nextState;
+      }
+    );
+  }
+
+  /**
+   * Returns a snapshot of the current sync state:
+   * - pending: number of mutations waiting to sync
+   * - lastSync: timestamp of the last successful sync batch, or null
+   * - hasConflicts: true if any mutations exhausted MAX_RETRIES
+   */
+  getSyncStatus(): DetailedSyncStatus {
+    return {
+      pending: queueSize(),
+      lastSync: this._lastSync,
+      hasConflicts: conflictCount() > 0,
+    };
+  }
+
+  /**
+   * Conflict resolution helper — last-write-wins.
+   * Given two mutations for the same logical resource, returns the one
+   * with the higher `createdAt` timestamp (more recent wins).
+   */
+  static resolveConflictLastWriteWins(
+    a: QueuedMutation,
+    b: QueuedMutation
+  ): QueuedMutation {
+    return a.createdAt >= b.createdAt ? a : b;
   }
 
   addStatusListener(listener: StatusListener): () => void {
@@ -100,6 +170,9 @@ export class SyncEngine {
       }
     }
 
+    if (!hadError) {
+      this._lastSync = new Date();
+    }
     this._emit(hadError ? 'error' : 'idle', queueSize());
   }
 

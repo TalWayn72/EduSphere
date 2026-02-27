@@ -30,5 +30,21 @@
   "chavrutaAi": "AI Study Partner",
   "dialecticalPartner": "AI-powered dialectical study partner",
   "agentResponding": "Agent is responding...",
-  "askOrDebate": "Ask or debate..."
+  "askOrDebate": "Ask or debate...",
+  "transcriptNoResults": "No results found",
+  "liveSession": {
+    "joinError": "Failed to join session",
+    "joining": "Joining...",
+    "startMeeting": "Start Meeting",
+    "joinSession": "Join Session",
+    "recordingAvailable": "Recording available",
+    "processingRecording": "Processing recording...",
+    "validationError": "Please fill in all required fields",
+    "scheduleTitle": "Schedule Live Session",
+    "meetingName": "Meeting Name",
+    "meetingNamePlaceholder": "e.g. Weekly Q&A",
+    "scheduledAt": "Scheduled Date & Time",
+    "scheduling": "Scheduling...",
+    "scheduleButton": "Schedule Session"
+  }
 }

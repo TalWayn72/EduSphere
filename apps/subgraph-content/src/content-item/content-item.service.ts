@@ -19,6 +19,15 @@ import {
 } from '../microlearning/microlearning.schemas';
 import { BadRequestException } from '@nestjs/common';
 
+export interface CreateContentItemInput {
+  moduleId: string;
+  title: string;
+  contentType: string;
+  body?: string | null;
+  mediaAssetId?: string | null;
+  order?: number | null;
+}
+
 type DbContentItem = typeof schema.contentItems.$inferSelect;
 
 export interface ContentItemMapped {
@@ -138,6 +147,31 @@ export class ContentItemService implements OnModuleDestroy {
       result.get(key)!.push(this.map(row));
     }
     return result;
+  }
+
+  async create(
+    input: CreateContentItemInput,
+    _tenantId: string
+  ): Promise<ContentItemMapped> {
+    const orderIndex = input.order ?? 0;
+    const [row] = await this.db
+      .insert(schema.contentItems)
+      .values({
+        moduleId: input.moduleId,
+        title: input.title,
+        type: input.contentType as (typeof schema.contentItems.$inferInsert)['type'],
+        content: input.body ?? null,
+        fileId: input.mediaAssetId ?? null,
+        orderIndex,
+      })
+      .returning();
+    if (!row) {
+      throw new Error('Failed to create ContentItem');
+    }
+    this.logger.log(
+      `ContentItem created: id=${row.id} module=${input.moduleId}`
+    );
+    return this.map(row);
   }
 
   async findByModule(moduleId: string): Promise<ContentItemMapped[]> {

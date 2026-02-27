@@ -64,7 +64,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     // Raise warning threshold — KaTeX + ContentViewer are intentionally large
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         // ── Manual chunk groups ──────────────────────────────────────────────

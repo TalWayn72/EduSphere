@@ -260,21 +260,51 @@
 **CRITICAL RULE:** Prefer MCP tools over Bash commands whenever available.
 MCP tools return **structured, typed data** — Bash commands return unstructured text that must be parsed.
 
+### MCP Iron Rule — node.exe directly, never .cmd files, never npx
+
+**Root cause #1:** `npx -y` downloads from npm on every session start — corporate proxy/TLS kills it silently.
+**Root cause #2:** `.cmd` files on Windows cause 30s MCP timeout — JSON-RPC handshake cannot complete via batch file stdio.
+**Correct approach:** All MCP servers globally installed via `npm install -g`, invoked with **`node.exe` + full absolute JS path**.
+**Node path:** `C:\Program Files\nodejs\node.exe`
+**Global modules:** `C:\Users\P0039217\AppData\Roaming\npm\node_modules\`
+**settings.json:** `C:\Users\P0039217\.claude\settings.json`
+
+### Installed MCP Servers (11 active)
+
+| Server                   | Command file                     | Package                                | Version   | Status       |
+| ------------------------ | -------------------------------- | -------------------------------------- | --------- | ------------ |
+| `memory`                 | `node.exe` + `server-memory\dist\index.js`          | `@modelcontextprotocol/server-memory`  | 0.6.3 | ✅ Global    |
+| `sequential-thinking`    | `node.exe` + `server-sequential-thinking\dist\index.js` | `@modelcontextprotocol/server-sequential-thinking` | latest | ✅ Global |
+| `eslint`                 | `node.exe` + `@eslint\mcp\src\mcp-cli.js`           | `@eslint/mcp`                          | 0.3.0     | ✅ Global    |
+| `github`                 | `github-mcp-server.exe`          | `github/github-mcp-server` v0.31.0     | 0.31.0    | ✅ Binary    |
+| `tavily`                 | `node.exe` + `tavily-mcp\build\index.js`             | `tavily-mcp`                           | 0.2.17    | ✅ Global    |
+| `postgres`               | `node.exe` + `postgres-mcp-server\build\index.js`   | `@henkey/postgres-mcp-server`          | 1.0.5     | ✅ Global    |
+| `graphql`                | `node.exe` + `mcp-graphql\dist\index.js`             | `mcp-graphql`                          | 2.0.4     | ✅ Global    |
+| `nats`                   | docker exec                      | edusphere-all-in-one container         | -         | ✅ Docker    |
+| `typescript-diagnostics` | `node.exe` + `ts-diagnostics-mcp\dist\index.js`     | `ts-diagnostics-mcp`                   | -         | ✅ Global    |
+| `playwright`             | `node.exe` + `@playwright\mcp\cli.js`               | `@playwright/mcp`                      | 0.0.68    | ✅ Global    |
+| `context7`               | `node.exe` + `context7-mcp\dist\index.js`           | `@upstash/context7-mcp`                | 2.1.2     | ✅ Global    |
+
+> **Note:** `@modelcontextprotocol/server-github` is DEPRECATED (Apr 2025). Replaced by official `github/github-mcp-server` binary.
+> **Note:** `@modelcontextprotocol/server-postgres` is ARCHIVED (May 2025) + has SQL injection vulnerability. Replaced by `@henkey/postgres-mcp-server`.
+> **Note:** If Node.js is upgraded, verify path `C:\Program Files\nodejs\node.exe` still exists.
+
 ### Decision Matrix
 
 | Task                                                | Use This MCP Tool                                                 | Do NOT Use              |
 | --------------------------------------------------- | ----------------------------------------------------------------- | ----------------------- |
-| PostgreSQL query (RLS, schema, pg_policies)         | `mcp__postgres__query`                                            | `psql -c "..."` or Bash |
+| PostgreSQL query (RLS, schema, pg_policies)         | `mcp__postgres__*`                                                | `psql -c "..."` or Bash |
 | Search technical docs / APIs / patterns             | `mcp__tavily__tavily_search`                                      | WebSearch built-in      |
+| Fetch live NestJS/Drizzle/GraphQL docs              | `mcp__context7__*`                                                | Hallucinated APIs       |
 | Lint a file after writing it                        | `mcp__eslint__lint-files`                                         | `pnpm turbo lint`       |
 | Store architectural decision across sessions        | `mcp__memory__create_entities`                                    | Editing CLAUDE.md       |
 | Recall previous decisions / bug root causes         | `mcp__memory__search_nodes`                                       | Asking user to repeat   |
 | GitHub CI status / PR reviews / commit history      | `mcp__github__*`                                                  | `gh run list`           |
 | GraphQL schema inspection / query testing           | `mcp__graphql__introspect-schema` / `mcp__graphql__query-graphql` | `pnpm compose`          |
 | Complex multi-step reasoning / planning             | `mcp__sequential-thinking__sequentialthinking`                    | Inline reasoning only   |
-| E2E browser test after UI change                    | playwright MCP                                                    | `pnpm test:e2e`         |
-| NATS event monitoring / stream inspection           | nats MCP                                                          | `nats sub EDUSPHERE.>`  |
-| Per-file TypeScript errors (faster than full build) | typescript-diagnostics MCP                                        | `pnpm turbo typecheck`  |
+| E2E browser test after UI change                    | `mcp__playwright__*`                                              | `pnpm test:e2e`         |
+| NATS event monitoring / stream inspection           | `mcp__nats__*`                                                    | `nats sub EDUSPHERE.>`  |
+| Per-file TypeScript errors (faster than full build) | `mcp__typescript-diagnostics__*`                                  | `pnpm turbo typecheck`  |
 
 ### postgres — Use For
 
@@ -283,6 +313,7 @@ MCP tools return **structured, typed data** — Bash commands return unstructure
 - Inspect Apache AGE graph: `SELECT * FROM cypher('edusphere_graph', ...) AS (n agtype)`
 - Debug connection pool: `SELECT pid, state, query FROM pg_stat_activity WHERE datname='edusphere'`
 - Verify migration state: `SELECT * FROM drizzle.__drizzle_migrations`
+- Uses `@henkey/postgres-mcp-server` (18 intelligent tools covering schema, RLS, performance)
 
 ### memory — ALWAYS Use
 
@@ -291,13 +322,18 @@ MCP tools return **structured, typed data** — Bash commands return unstructure
 - **After every architectural decision:** Store the decision and rationale
 - **Before starting related tasks:** `mcp__memory__search_nodes` to recall past decisions
 
+### context7 — Use Before Writing Code
+
+- Fetch current NestJS, Drizzle ORM v1, TanStack Query v5, GraphQL Yoga, Expo SDK 54 docs
+- Prevents hallucinated/outdated API usage
+- Use: `mcp__context7__resolve-library-id` then `mcp__context7__get-library-docs`
+
 ### tavily — Use For
 
 - Apache AGE Cypher query syntax and examples
 - LangGraph.js agent patterns and state machine docs
 - pgvector HNSW index configuration
 - NestJS Federation v2 patterns and resolver examples
-- Drizzle ORM v1 migration and RLS helpers
 - `mcp__tavily__tavily_research` for comprehensive multi-source research
 
 ### eslint — Use After Every File Write
@@ -310,9 +346,10 @@ Fix any errors before moving to next file. Do not batch lint at the end.
 
 ### github — Use After Every Push
 
+- Official `github/github-mcp-server` v0.31.0 binary (not deprecated npm package)
 - `mcp__github__list_commits` to verify commit landed
-- `mcp__github__get_pull_request_status` to check CI gates
-- View failed workflow logs via `mcp__github__search_issues`
+- `mcp__github__get_pull_request` to check CI gates
+- `mcp__github__get_file_contents` for PR diff inspection
 
 ### sequential-thinking — Use For
 
@@ -325,9 +362,9 @@ Fix any errors before moving to next file. Do not batch lint at the end.
 
 | Server     | Prerequisite                           | Verify                                          |
 | ---------- | -------------------------------------- | ----------------------------------------------- |
-| `postgres` | `docker-compose up -d postgres`        | `mcp__postgres__query` returns result           |
+| `postgres` | `docker-compose up -d postgres`        | `mcp__postgres__*` returns result               |
 | `graphql`  | `pnpm --filter @edusphere/gateway dev` | `mcp__graphql__introspect-schema` returns types |
-| `nats`     | `docker-compose up -d nats`            | nats MCP returns stream list                    |
+| `nats`     | `docker-compose up -d nats`            | `mcp__nats__*` returns stream list              |
 
 ---
 

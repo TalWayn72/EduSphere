@@ -498,6 +498,101 @@
       "realmRoles": ["default-roles-edusphere"],
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "id": "909e98a3-d6c4-407c-a4ab-59a978820f07",
+      "username": "super.admin@edusphere.dev",
+      "email": "super.admin@edusphere.dev",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Super",
+      "lastName": "Admin",
+      "createdTimestamp": 1771563800000,
+      "totp": false,
+      "credentials": [
+        { "type": "password", "value": "SuperAdmin123!", "temporary": false }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-edusphere", "SUPER_ADMIN"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "daa00e8d-0b90-4990-ab36-e9dccbf855a5",
+      "username": "instructor@example.com",
+      "email": "instructor@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "Instructor",
+      "createdTimestamp": 1771563800001,
+      "totp": false,
+      "credentials": [
+        { "type": "password", "value": "Instructor123!", "temporary": false }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-edusphere", "INSTRUCTOR"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "a5e38677-6147-4e6c-a7f0-97370c4161c6",
+      "username": "org.admin@example.com",
+      "email": "org.admin@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Org",
+      "lastName": "Admin",
+      "createdTimestamp": 1771563800002,
+      "totp": false,
+      "credentials": [
+        { "type": "password", "value": "OrgAdmin123!", "temporary": false }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-edusphere", "ORG_ADMIN"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "092417f4-5c50-4274-b640-f56b2aebdefd",
+      "username": "researcher@example.com",
+      "email": "researcher@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "Researcher",
+      "createdTimestamp": 1771563800003,
+      "totp": false,
+      "credentials": [
+        { "type": "password", "value": "Researcher123!", "temporary": false }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-edusphere", "RESEARCHER"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "5c849df5-a025-4c65-9fa4-d282ced233b4",
+      "username": "student@example.com",
+      "email": "student@example.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "Student",
+      "createdTimestamp": 1771563800004,
+      "totp": false,
+      "credentials": [
+        { "type": "password", "value": "Student123!", "temporary": false }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-edusphere", "STUDENT"],
+      "notBefore": 0,
+      "groups": []
     }
   ],
   "scopeMappings": [

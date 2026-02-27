@@ -146,7 +146,7 @@ export function CollaborationPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-semibold">{t('humanChavruta')}</h3>
+                  <h2 className="font-semibold">{t('humanChavruta')}</h2>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('humanChavrutaDescription')}
@@ -181,7 +181,7 @@ export function CollaborationPage() {
               <div className="space-y-3 border-l pl-6">
                 <div className="flex items-center gap-2">
                   <Bot className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-semibold">{t('aiChavruta')}</h3>
+                  <h2 className="font-semibold">{t('aiChavruta')}</h2>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('aiChavrutaDescription')}
@@ -232,9 +232,9 @@ export function CollaborationPage() {
           <>
             {activeSessions.length > 0 && (
               <div className="space-y-3">
-                <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                   {t('activeSessions')}
-                </h2>
+                </h3>
                 <div className="grid md:grid-cols-2 gap-3">
                   {activeSessions.map((session) => (
                     <Card
@@ -279,9 +279,9 @@ export function CollaborationPage() {
             {/* Recent discussions */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                   {t('recentDiscussions')}
-                </h2>
+                </h3>
                 <Button
                   variant="ghost"
                   size="sm"

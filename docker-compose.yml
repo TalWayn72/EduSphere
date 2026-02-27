@@ -35,6 +35,8 @@ services:
       - keycloak_data:/opt/keycloak/data
       - minio_data:/data/minio
       - ollama_data:/root/.ollama
+      # Persist mcp-nats installation for Claude Code MCP server
+      - nats_mcp_data:/tmp/nats-test
       # Optional: Mount code for development hot-reload
       # - ./apps:/app/apps
       # - ./packages:/app/packages
@@ -77,3 +79,4 @@ volumes:
   keycloak_data:
   minio_data:
   ollama_data:
+  nats_mcp_data:

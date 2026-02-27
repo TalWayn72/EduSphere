@@ -3,7 +3,7 @@
  * Route: /admin/lti
  * Access: ORG_ADMIN, SUPER_ADMIN only
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -86,6 +86,8 @@ export function LtiSettingsPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<RegisterFormState>(EMPTY_FORM);
   const [copied, setCopied] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [{ data, fetching, error }, refetch] = useQuery<{
     ltiPlatforms: LtiPlatform[];
@@ -96,6 +98,12 @@ export function LtiSettingsPage() {
 
   const [, registerPlatform] = useMutation(REGISTER_PLATFORM_MUTATION);
   const [, togglePlatform] = useMutation(TOGGLE_PLATFORM_MUTATION);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    };
+  }, []);
 
   if (!role || !ADMIN_ROLES.has(role)) {
     void navigate('/dashboard');
@@ -108,7 +116,8 @@ export function LtiSettingsPage() {
   const handleCopyUrl = () => {
     void navigator.clipboard.writeText(callbackUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
   };
 
   const handleToggle = async (id: string, current: boolean) => {
@@ -125,15 +134,17 @@ export function LtiSettingsPage() {
   };
 
   const handleTestConnection = async (keySetUrl: string) => {
+    setTestResult(null);
     try {
       const res = await fetch(keySetUrl);
-      alert(
-        res.ok
+      setTestResult({
+        ok: res.ok,
+        message: res.ok
           ? 'JWKS reachable (HTTP ' + res.status + ')'
-          : 'JWKS unreachable: HTTP ' + res.status
-      );
+          : 'JWKS unreachable: HTTP ' + res.status,
+      });
     } catch (err) {
-      alert('Connection failed: ' + String(err));
+      setTestResult({ ok: false, message: 'Connection failed: ' + String(err) });
     }
   };
 
@@ -233,6 +244,17 @@ export function LtiSettingsPage() {
           <div className="flex items-center gap-2 text-destructive">
             <AlertCircle className="h-4 w-4" />
             <span>{error.message}</span>
+          </div>
+        )}
+
+        {testResult !== null && (
+          <div
+            role="status"
+            aria-live="polite"
+            className={testResult.ok ? 'flex items-center gap-2 text-green-600 text-sm' : 'flex items-center gap-2 text-destructive text-sm'}
+          >
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {testResult.message}
           </div>
         )}
 
