@@ -7,7 +7,9 @@ import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  // Disable Express's built-in body-parser (100 KB default limit).
+  // GraphQL Yoga reads the raw request stream directly, so no limit applies.
+  const app = await NestFactory.create(AppModule, { bufferLogs: true, bodyParser: false });
   app.useLogger(app.get(Logger));
 
   // CORS for development

@@ -7,6 +7,44 @@
 
 ---
 
+## ✅ BUG-FILE-001 — Knowledge Source File Upload Broken (27 Feb 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 27 Feb 2026
+**Branch:** `feat/wave2-backend-performance-mobile`
+
+### Problem
+
+Three cascading bugs prevented uploading a Word/PDF file to a course's knowledge sources:
+
+1. **HTTP 404** — `SourceManager.tsx` called `POST /api/knowledge-sources/upload` (a REST endpoint) which does not exist in the GraphQL-only Hive Gateway → 404.
+2. **HTTP 413 Payload Too Large** — After switching to `addFileSource` GraphQL mutation, Express's default 100 KB body-parser limit rejected the base64-encoded payload (~333 KB for a 250 KB file).
+3. **`Cannot return null for non-nullable field KnowledgeSource.sourceType`** — The resolver returned raw Drizzle rows (snake_case: `source_type`) but the GraphQL type expects camelCase (`sourceType`). All source mutations were broken.
+
+### Root Causes
+
+| Bug | File | Root Cause |
+|-----|------|------------|
+| 404 REST | `SourceManager.tsx` | Called `/api/knowledge-sources/upload` — REST endpoint was removed; should use GraphQL |
+| 413 Body | `apps/subgraph-knowledge/src/main.ts` | NestJS default body-parser limit is 100 KB; base64 DOCX files exceed this |
+| null sourceType | `knowledge-source.resolver.ts` | Drizzle returns `source_type` (snake_case) but GraphQL resolves `sourceType` (camelCase) — no mapping |
+
+### Solution
+
+1. **`SourceManager.tsx`**: Replaced `fetch('/api/knowledge-sources/upload')` with `addFileSource` GraphQL mutation using `FileReader.readAsDataURL()` + base64
+2. **`knowledge-source.graphql`**: Added `AddFileSourceInput` + `addFileSource` mutation to SDL
+3. **`knowledge-source.resolver.ts`**: Added `addFileSource` resolver + `toGQL()` mapper for snake_case→camelCase on all mutations
+4. **`main.ts`**: Set `bodyParser: false` in `NestFactory.create()` — GraphQL Yoga reads the raw request stream itself, bypassing Express's 100 KB limit
+5. **`knowledge-source.module.ts`**: Removed `KnowledgeSourceController` (REST, multer required) — no longer needed
+6. **`sources.queries.ts`**: Added `ADD_FILE_SOURCE` GraphQL mutation
+
+### Tests
+
+- `apps/web/src/components/SourceManager.test.tsx` — 8 tests (regression: confirms no REST fetch, uses GraphQL mutation)
+- `integration-test-file-upload.mjs` — E2E: 333 KB base64 payload → real Keycloak JWT → knowledge subgraph → DB insert SUCCESS
+- All 1025 web tests passing
+
+---
+
 ## ✅ ULP-001 — Unified Learning Page Console Fixes (28 Feb 2026)
 
 **Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Date:** 28 Feb 2026
