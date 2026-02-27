@@ -144,7 +144,6 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function MyOpenBadgesPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const [result] = useQuery({ query: MY_OPEN_BADGES_QUERY, pause: true }); // myOpenBadges not in live gateway
   const { data, fetching, error } = result;
   const badges: OpenBadgeAssertion[] =
