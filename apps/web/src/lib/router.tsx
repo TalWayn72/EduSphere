@@ -7,6 +7,12 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 const Dashboard = lazy(() =>
   import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard }))
 );
+// UnifiedLearningPage replaces ContentViewer + DocumentAnnotationPage
+const UnifiedLearningPage = lazy(() =>
+  import('@/pages/UnifiedLearningPage').then((m) => ({ default: m.UnifiedLearningPage }))
+);
+// Keep ContentViewer + DocumentAnnotationPage lazy-loaded so existing imports don't break
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContentViewer = lazy(() =>
   import('@/pages/ContentViewer').then((m) => ({ default: m.ContentViewer }))
 );
@@ -21,6 +27,7 @@ const RichDocumentPage = lazy(() =>
     default: m.RichDocumentPage,
   }))
 );
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DocumentAnnotationPage = lazy(() =>
   import('@/pages/DocumentAnnotationPage').then((m) => ({
     default: m.DocumentAnnotationPage,
@@ -64,6 +71,11 @@ const CourseCreatePage = lazy(() =>
 const CourseDetailPage = lazy(() =>
   import('@/pages/CourseDetailPage').then((m) => ({
     default: m.CourseDetailPage,
+  }))
+);
+const CourseEditPage = lazy(() =>
+  import('@/pages/CourseEditPage').then((m) => ({
+    default: m.CourseEditPage,
   }))
 );
 const CourseAnalyticsPage = lazy(() =>
@@ -134,6 +146,11 @@ const CrmSettingsPage = lazy(() =>
 const MarketplacePage = lazy(() =>
   import('@/pages/MarketplacePage').then((m) => ({
     default: m.MarketplacePage,
+  }))
+);
+const SrsReviewPage = lazy(() =>
+  import('@/pages/SrsReviewPage').then((m) => ({
+    default: m.SrsReviewPage,
   }))
 );
 const InstructorEarningsPage = lazy(() =>
@@ -297,18 +314,28 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    // Unified learning interface for all content types (video, document, etc.)
     path: '/learn/:contentId',
-    element: guarded(<ContentViewer />),
+    element: guarded(<UnifiedLearningPage />),
+  },
+  {
+    // /document/ also renders the unified page (contentType detected inside)
+    path: '/document/:contentId',
+    element: guarded(<UnifiedLearningPage />),
+  },
+  {
+    // SRS review session — SM-2 flashcard review
+    path: '/srs-review',
+    element: guarded(
+      <Suspense fallback={<PageLoader />}>
+        <SrsReviewPage />
+      </Suspense>
+    ),
   },
   {
     // Dedicated route for QUIZ content items
     path: '/quiz/:contentId',
     element: guarded(<QuizContentPage />),
-  },
-  {
-    // Dedicated route for RICH_DOCUMENT content items
-    path: '/document/:contentId',
-    element: guarded(<DocumentAnnotationPage />),
   },
   {
     path: '/courses',
@@ -321,6 +348,10 @@ export const router = createBrowserRouter([
   {
     path: '/courses/:courseId/analytics',
     element: guarded(<CourseAnalyticsPage />),
+  },
+  {
+    path: '/courses/:courseId/edit',
+    element: guarded(<CourseEditPage />),
   },
   {
     path: '/courses/:courseId',
