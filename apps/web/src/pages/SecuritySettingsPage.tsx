@@ -66,7 +66,10 @@ export function SecuritySettingsPage() {
   const [form, setForm] = useState<SecurityFormValues>(DEFAULTS);
   const [saved, setSaved] = useState(false);
 
-  const [{ data, fetching }] = useQuery({ query: SECURITY_SETTINGS_QUERY, pause: true });
+  const [{ data, fetching }] = useQuery({
+    query: SECURITY_SETTINGS_QUERY,
+    pause: true,
+  });
   const [{ fetching: saving }, execUpdate] = useMutation(
     UPDATE_SECURITY_SETTINGS_MUTATION
   );

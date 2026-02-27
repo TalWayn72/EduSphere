@@ -36,3 +36,6 @@ test_output.txt
 apps/web/playwright-report/
 apps/web/test-results/
 apps/web/visual-qa-results/
+
+# Vite dev-server dependency cache — auto-generated, not source code
+apps/web/.vite/
