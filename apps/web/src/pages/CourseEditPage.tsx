@@ -81,6 +81,18 @@ export function CourseEditPage() {
     }
   }, [data?.course]);
 
+  // Role guard — redirect non-editors (must be in useEffect, not render body)
+  useEffect(() => {
+    const course = data?.course;
+    if (!fetching && !error && course) {
+      if (!user || !EDITOR_ROLES.has(user.role)) {
+        navigate(`/courses/${courseId}`, { replace: true });
+      } else if (user.role === 'INSTRUCTOR' && course.instructorId !== user.id) {
+        navigate(`/courses/${courseId}`, { replace: true });
+      }
+    }
+  }, [fetching, error, data?.course, user, courseId, navigate]);
+
   const showToast = (msg: string) => {
     setToast(msg);
     if (toastRef.current) clearTimeout(toastRef.current);
@@ -88,19 +100,6 @@ export function CourseEditPage() {
   };
 
   const course = data?.course;
-
-  // Role guard — redirect non-editors
-  if (!fetching && !error && course) {
-    if (!user || !EDITOR_ROLES.has(user.role)) {
-      navigate(`/courses/${courseId}`, { replace: true });
-      return null;
-    }
-    // INSTRUCTOR can only edit their own courses
-    if (user.role === 'INSTRUCTOR' && course.instructorId !== user.id) {
-      navigate(`/courses/${courseId}`, { replace: true });
-      return null;
-    }
-  }
 
   const handleTogglePublish = async () => {
     const isCurrentlyPublished = published ?? course?.isPublished ?? false;

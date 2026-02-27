@@ -15,6 +15,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { gqlClient as graphqlClient } from '@/lib/graphql';
+import { getToken } from '@/lib/auth';
 import {
   COURSE_KNOWLEDGE_SOURCES,
   KNOWLEDGE_SOURCE_DETAIL,
@@ -26,6 +27,12 @@ import {
 } from '@/lib/graphql/sources.queries';
 
 // ─── DEV_MODE flag ────────────────────────────────────────────────────────────
+
+/** Returns Authorization header for authenticated gqlClient requests. */
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 const IS_DEV_MODE =
   import.meta.env.VITE_DEV_MODE === 'true' ||
@@ -153,7 +160,7 @@ function AddSourceModal({
     mutationFn: IS_DEV_MODE
       ? devMutationFn
       : (input: { courseId: string; title: string; url: string }) =>
-          graphqlClient.request(ADD_URL_SOURCE, { input }),
+          graphqlClient.request(ADD_URL_SOURCE, { input }, authHeaders()),
     onSuccess: () => {
       onAdded();
       onClose();
@@ -165,7 +172,7 @@ function AddSourceModal({
     mutationFn: IS_DEV_MODE
       ? devMutationFn
       : (input: { courseId: string; title: string; text: string }) =>
-          graphqlClient.request(ADD_TEXT_SOURCE, { input }),
+          graphqlClient.request(ADD_TEXT_SOURCE, { input }, authHeaders()),
     onSuccess: () => {
       onAdded();
       onClose();
@@ -177,7 +184,7 @@ function AddSourceModal({
     mutationFn: IS_DEV_MODE
       ? devMutationFn
       : (input: { courseId: string; title: string; url: string }) =>
-          graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }),
+          graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }, authHeaders()),
     onSuccess: () => {
       onAdded();
       onClose();
@@ -194,7 +201,7 @@ function AddSourceModal({
           fileName: string;
           contentBase64: string;
           mimeType: string;
-        }) => graphqlClient.request(ADD_FILE_SOURCE, { input }),
+        }) => graphqlClient.request(ADD_FILE_SOURCE, { input }, authHeaders()),
     onSuccess: () => {
       onAdded();
       onClose();
@@ -423,7 +430,7 @@ function SourceDetailDrawer({
           )
       : () =>
           graphqlClient
-            .request(KNOWLEDGE_SOURCE_DETAIL, { id: sourceId })
+            .request(KNOWLEDGE_SOURCE_DETAIL, { id: sourceId }, authHeaders())
             .then(
               (r: { knowledgeSource: KnowledgeSource }) => r.knowledgeSource
             ),
@@ -460,7 +467,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
       ? devQueryFn
       : () =>
           graphqlClient
-            .request(COURSE_KNOWLEDGE_SOURCES, { courseId })
+            .request(COURSE_KNOWLEDGE_SOURCES, { courseId }, authHeaders())
             .then(
               (r: { courseKnowledgeSources: KnowledgeSource[] }) =>
                 r.courseKnowledgeSources
@@ -479,7 +486,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
   const deleteSource = useMutation({
     mutationFn: IS_DEV_MODE
       ? devMutationFn
-      : (id: string) => graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }),
+      : (id: string) => graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }, authHeaders()),
     onSuccess: () => refetch(),
   });
 
