@@ -77,13 +77,16 @@ export class WebStorageManager {
 
   /**
    * Clears localStorage keys that belong to EduSphere.
+   * Preserves user preference keys (locale, theme) so they survive a cache clear.
    * Returns approximate bytes freed (estimated from string length × 2).
    */
   clearLocalStorage(): number {
+    const PRESERVED_KEYS = new Set(['edusphere_locale']);
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('edusphere_')) keysToRemove.push(key);
+      if (key && key.startsWith('edusphere_') && !PRESERVED_KEYS.has(key))
+        keysToRemove.push(key);
     }
     const bytesFreed = keysToRemove.reduce((sum, k) => {
       const val = localStorage.getItem(k) ?? '';

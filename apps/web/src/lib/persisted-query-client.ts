@@ -12,9 +12,10 @@ import { idbStorage } from './offline-db';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60_000,
+      staleTime: 1_000 * 60 * 5, // 5 min — reduce server round-trips
       gcTime: 24 * 60 * 60_000, // 24h — keep cache alive for offline
       retry: 2,
+      refetchOnWindowFocus: false,
       networkMode: 'offlineFirst',
     },
     mutations: {

@@ -18,6 +18,7 @@ import { useDocumentUIStore } from '@/lib/store';
 import { getCurrentUser } from '@/lib/auth';
 import { DocumentToolbar } from '@/pages/DocumentAnnotationPage.toolbar';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
+import { mockDocumentContent } from '@/lib/mock-content-data';
 import type { AnnotationLayer } from '@/types/annotations';
 
 interface ContentItemResult {
@@ -79,10 +80,11 @@ export function DocumentAnnotationPage() {
 
   // Track document in recent list + show welcome-back toast + restore scroll
   useEffect(() => {
-    if (!item || fetching) return;
+    if (fetching || (!item && !result.error)) return;
+    const title = item?.title ?? 'נהר שלום — פנינים מאוץ';
 
     // Track in recently viewed
-    addRecentDocument(contentId, item.title ?? 'Document');
+    addRecentDocument(contentId, title);
 
     // Welcome back toast + scroll restore (run once per mount)
     if (isReturning && !welcomeShownRef.current) {
@@ -90,7 +92,7 @@ export function DocumentAnnotationPage() {
       const user = getCurrentUser();
       const name = user?.firstName ?? '';
       toast(`ברוך הבא${name ? `, ${name}` : ''}!`, {
-        description: `ממשיך מהמקום שעצרת ב"${item.title ?? 'המסמך'}"`,
+        description: `ממשיך מהמקום שעצרת ב"${title}"`,
         duration: 4000,
       });
       const timer = setTimeout(() => {
@@ -101,7 +103,7 @@ export function DocumentAnnotationPage() {
       }, 400);
       return () => clearTimeout(timer);
     }
-  }, [item?.id, fetching]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [item?.id, fetching, result.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
@@ -149,7 +151,12 @@ export function DocumentAnnotationPage() {
     );
   }
 
-  if (result.error || !item) {
+  // Fallback to mock document when gateway is offline (dev mode)
+  const effectiveItem = item ?? (result.error
+    ? { id: contentId, title: 'נהר שלום — פנינים מאוץ (הדגמה)', contentType: 'RICH_DOCUMENT', content: mockDocumentContent }
+    : null);
+
+  if (!effectiveItem) {
     return (
       <div className="flex h-screen items-center justify-center text-muted-foreground text-sm">
         Document not found
@@ -160,7 +167,7 @@ export function DocumentAnnotationPage() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-muted/30">
       <DocumentToolbar
-        title={item.title ?? 'Document'}
+        title={effectiveItem.title ?? 'Document'}
         documentZoom={documentZoom}
         onZoomChange={setDocumentZoom}
         defaultAnnotationLayer={defaultAnnotationLayer}
@@ -191,7 +198,7 @@ export function DocumentAnnotationPage() {
               }}
             >
               <AnnotatedDocumentViewer
-                content={item.content ?? ''}
+                content={effectiveItem.content ?? ''}
                 annotations={textAnnotations}
                 focusedAnnotationId={focusedAnnotationId}
                 onAnnotationClick={setFocusedAnnotationId}

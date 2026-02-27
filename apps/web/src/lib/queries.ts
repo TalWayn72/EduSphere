@@ -9,6 +9,12 @@ export const ME_QUERY = gql`
       lastName
       role
       tenantId
+      preferences {
+        locale
+        theme
+        emailNotifications
+        pushNotifications
+      }
       createdAt
       updatedAt
     }

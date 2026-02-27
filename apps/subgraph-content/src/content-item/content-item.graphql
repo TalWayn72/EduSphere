@@ -11,7 +11,37 @@ type ContentItem @key(fields: "id") {
   updatedAt: String!
 }
 
+input CreateContentItemInput {
+  moduleId: ID!
+  title: String!
+  contentType: ContentType!
+  body: String
+  mediaAssetId: ID
+  order: Int
+}
+
+enum ContentType {
+  VIDEO
+  PDF
+  MARKDOWN
+  QUIZ
+  ASSIGNMENT
+  LINK
+  AUDIO
+  LIVE_SESSION
+  SCORM
+  RICH_DOCUMENT
+  MICROLESSON
+  SCENARIO
+}
+
 extend type Query {
   contentItem(id: ID!): ContentItem
   contentItemsByModule(moduleId: ID!): [ContentItem!]!
+}
+
+extend type Mutation {
+  createContentItem(input: CreateContentItemInput!): ContentItem!
+    @authenticated
+    @requiresScopes(scopes: ["course:write"])
 }

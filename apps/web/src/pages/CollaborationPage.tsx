@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,12 +72,10 @@ export function CollaborationPage() {
     };
   }, []);
 
-  // MY_DISCUSSIONS_QUERY is not in the running gateway supergraph (Docker image predates
-  // the feature). Pause until the image is rebuilt. Tracked in OPEN_ISSUES.md (BUG-DOCKER-001).
   const [{ data, fetching, error }, reexecute] = useQuery({
     query: MY_DISCUSSIONS_QUERY,
     variables: { limit: 20, offset: 0 },
-    pause: true,
+    pause: DEV_MODE,
   });
 
   const [createResult, executeCreate] = useMutation(CREATE_DISCUSSION_MUTATION);
@@ -146,7 +146,7 @@ export function CollaborationPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-semibold">{t('humanChavruta')}</h3>
+                  <h2 className="font-semibold">{t('humanChavruta')}</h2>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('humanChavrutaDescription')}
@@ -181,7 +181,7 @@ export function CollaborationPage() {
               <div className="space-y-3 border-l pl-6">
                 <div className="flex items-center gap-2">
                   <Bot className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-semibold">{t('aiChavruta')}</h3>
+                  <h2 className="font-semibold">{t('aiChavruta')}</h2>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('aiChavrutaDescription')}
@@ -232,9 +232,9 @@ export function CollaborationPage() {
           <>
             {activeSessions.length > 0 && (
               <div className="space-y-3">
-                <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                   {t('activeSessions')}
-                </h2>
+                </h3>
                 <div className="grid md:grid-cols-2 gap-3">
                   {activeSessions.map((session) => (
                     <Card
@@ -279,9 +279,9 @@ export function CollaborationPage() {
             {/* Recent discussions */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                   {t('recentDiscussions')}
-                </h2>
+                </h3>
                 <Button
                   variant="ghost"
                   size="sm"

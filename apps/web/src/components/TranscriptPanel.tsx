@@ -51,7 +51,7 @@ export function TranscriptPanel({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('transcript.searchPlaceholder')}
+            placeholder={t('searchTranscript')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -104,7 +104,7 @@ export function TranscriptPanel({
         {filteredSegments.length === 0 && (
           <div className="text-center py-8">
             <p className="text-sm text-muted-foreground">
-              {t('transcript.noResults')}
+              {t('transcriptNoResults')}
             </p>
           </div>
         )}

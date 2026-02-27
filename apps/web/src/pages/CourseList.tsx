@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import {
@@ -138,12 +140,10 @@ export function CourseList() {
     variables: { limit: 50, offset: 0 },
   });
 
-  // MY_ENROLLMENTS_QUERY is not in the running gateway supergraph (Docker image predates
-  // the feature). Pause until the image is rebuilt. Tracked in OPEN_ISSUES.md (BUG-DOCKER-001).
   const [{ data: enrollmentsData }, reexecuteEnrollments] =
     useQuery<MyEnrollmentsResult>({
       query: MY_ENROLLMENTS_QUERY,
-      pause: true,
+      pause: DEV_MODE,
     });
 
   const [, executeEnroll] = useMutation<

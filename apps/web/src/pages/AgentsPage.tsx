@@ -524,6 +524,7 @@ export function AgentsPage() {
               className="h-9 w-9 p-0"
               onClick={handleSend}
               disabled={isTyping || !!streamingContent}
+              aria-label={t('sendMessage')}
             >
               <Send className="h-4 w-4" />
             </Button>

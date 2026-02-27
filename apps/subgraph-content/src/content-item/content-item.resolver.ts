@@ -1,6 +1,16 @@
-import { Resolver, Query, Args, ResolveReference } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveReference,
+  Context,
+} from '@nestjs/graphql';
+import { UnauthorizedException } from '@nestjs/common';
 import { ContentItemService } from './content-item.service';
+import type { CreateContentItemInput } from './content-item.service';
 import { ContentItemLoader } from './content-item.loader';
+import type { GraphQLContext } from '../auth/auth.middleware';
 
 @Resolver('ContentItem')
 export class ContentItemResolver {
@@ -17,6 +27,22 @@ export class ContentItemResolver {
   @Query('contentItemsByModule')
   async getContentItemsByModule(@Args('moduleId') moduleId: string) {
     return this.contentItemService.findByModule(moduleId);
+  }
+
+  @Mutation('createContentItem')
+  async createContentItem(
+    @Args('input') input: CreateContentItemInput,
+    @Context() ctx: GraphQLContext
+  ) {
+    const auth = ctx.authContext;
+    if (!auth) {
+      throw new UnauthorizedException('Authentication required');
+    }
+    const tenantId = auth.tenantId;
+    if (!tenantId) {
+      throw new UnauthorizedException('Tenant context missing');
+    }
+    return this.contentItemService.create(input, tenantId);
   }
 
   /**

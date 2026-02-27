@@ -204,10 +204,10 @@ describe('ContentViewer', () => {
 
   it('renders transcript search input', () => {
     renderCV();
-    const input = screen.getByPlaceholderText(
+    const inputs = screen.getAllByPlaceholderText(
       'Search transcript, annotations...'
     );
-    expect(input).toBeDefined();
+    expect(inputs[0]).toBeDefined();
   });
 
   it('shows at least one transcript segment from hook data', () => {
@@ -288,9 +288,9 @@ describe('ContentViewer', () => {
 
   it('search input updates on change', () => {
     renderCV();
-    const searchInput = screen.getByPlaceholderText(
+    const searchInput = screen.getAllByPlaceholderText(
       'Search transcript, annotations...'
-    );
+    )[0]!;
     fireEvent.change(searchInput, { target: { value: 'free will' } });
     expect((searchInput as HTMLInputElement).value).toBe('free will');
   });

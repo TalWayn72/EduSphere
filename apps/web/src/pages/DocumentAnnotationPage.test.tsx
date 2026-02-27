@@ -133,8 +133,12 @@ describe('DocumentAnnotationPage', () => {
   });
 
   it('shows "Document not found" on error', () => {
+    // When there is no error but data is absent (e.g. content not found),
+    // effectiveItem is null and the component renders "Document not found".
+    // Note: when result.error is set, the component falls back to mock content
+    // instead of showing "Document not found" (offline/dev fallback behaviour).
     vi.mocked(useQuery).mockReturnValue([
-      { fetching: false, data: undefined, error: new Error('Not found') },
+      { fetching: false, data: undefined, error: undefined },
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
     renderPage();

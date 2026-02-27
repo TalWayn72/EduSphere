@@ -10,6 +10,8 @@
  */
 import { useQuery } from 'urql';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
+
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import {
   mockVideo,
   mockTranscript,
@@ -59,13 +61,10 @@ export interface ContentData {
 }
 
 export function useContentData(contentId: string): ContentData {
-  // contentItem(id: ID!) is not yet exposed in the supergraph schema.
-  // The query is paused to avoid HTTP 400 validation errors in the console.
-  // The hook falls back to mock data below. Tracked in OPEN_ISSUES.md.
   const [result] = useQuery<ContentQueryResult>({
     query: CONTENT_ITEM_QUERY,
     variables: { id: contentId },
-    pause: true,
+    pause: !contentId || DEV_MODE,
   });
 
   const item = result.data?.contentItem;

@@ -3,7 +3,7 @@
  * Route: /admin/scim
  * Access: ORG_ADMIN, SUPER_ADMIN only (F-019)
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -51,6 +51,7 @@ export function ScimSettingsPage() {
   const [expiresInDays, setExpiresInDays] = useState('');
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [tokensResult, refetchTokens] = useQuery<{ scimTokens: ScimToken[] }>({
     query: SCIM_TOKENS_QUERY,
@@ -64,6 +65,12 @@ export function ScimSettingsPage() {
   const [, generateToken] = useMutation(GENERATE_SCIM_TOKEN_MUTATION);
   const [, revokeToken] = useMutation(REVOKE_SCIM_TOKEN_MUTATION);
 
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    };
+  }, []);
+
   if (!role || !ADMIN_ROLES.has(role)) {
     navigate('/dashboard');
     return null;
@@ -74,7 +81,8 @@ export function ScimSettingsPage() {
   const handleCopyEndpoint = async () => {
     await navigator.clipboard.writeText(scimBaseUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
   };
 
   const handleGenerateToken = async () => {
@@ -262,13 +270,21 @@ export function ScimSettingsPage() {
       {showModal && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          role="dialog"
+          aria-labelledby="scim-modal-title"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && !generatedToken) setShowModal(false);
+          }}
           onClick={(e) => {
             if (e.target === e.currentTarget && !generatedToken)
               setShowModal(false);
           }}
         >
-          <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4">
-            <h2 className="text-lg font-semibold">Generate SCIM Token</h2>
+          <div
+            className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4"
+            aria-modal="true"
+          >
+            <h2 id="scim-modal-title" className="text-lg font-semibold">Generate SCIM Token</h2>
             {generatedToken ? (
               <div className="space-y-3">
                 <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm">
