@@ -54,6 +54,7 @@ export function RoleManagementPage() {
 
   const [rolesResult, reexecuteRoles] = useQuery<{ roles: BackendRole[] }>({
     query: LIST_ROLES_QUERY,
+    pause: true,
   });
 
   const [, createRole] = useMutation(CREATE_ROLE_MUTATION);

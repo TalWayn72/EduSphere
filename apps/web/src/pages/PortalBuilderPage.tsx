@@ -39,7 +39,7 @@ function parseServerBlocks(
 }
 
 export function PortalBuilderPage() {
-  const [{ data }] = useQuery({ query: MY_PORTAL_QUERY });
+  const [{ data }] = useQuery({ query: MY_PORTAL_QUERY, pause: true });
   const [, saveMutation] = useMutation(SAVE_PORTAL_LAYOUT_MUTATION);
   const [, publishMutation] = useMutation(PUBLISH_PORTAL_MUTATION);
   const [, unpublishMutation] = useMutation(UNPUBLISH_PORTAL_MUTATION);

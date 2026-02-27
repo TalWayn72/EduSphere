@@ -65,7 +65,7 @@ export function GamificationSettingsPage() {
 
   const [result, refetch] = useQuery<AdminBadgesResult>({
     query: ADMIN_BADGES_QUERY,
-    pause: !role || !ADMIN_ROLES.has(role),
+    pause: true,
   });
   const [, createBadge] = useMutation(CREATE_BADGE_MUTATION);
   const [, updateBadge] = useMutation(UPDATE_BADGE_MUTATION);

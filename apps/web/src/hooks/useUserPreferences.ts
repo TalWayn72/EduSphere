@@ -37,6 +37,7 @@ export function useUserPreferences(): UseUserPreferencesReturn {
   const [meResult] = useQuery<MeQueryResult>({ query: ME_QUERY });
   const [tenantLangResult] = useQuery<TenantLanguageSettingsResult>({
     query: MY_TENANT_LANGUAGE_SETTINGS_QUERY,
+    pause: true, // myTenantLanguageSettings not in live gateway
   });
   const [{ fetching }, updatePreferences] = useMutation(
     UPDATE_USER_PREFERENCES_MUTATION

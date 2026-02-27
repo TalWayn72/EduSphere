@@ -54,6 +54,7 @@ export function BrandingSettingsPage() {
 
   const [queryResult] = useQuery<BrandingQueryResult>({
     query: TENANT_BRANDING_QUERY,
+    pause: true,
   });
   const [mutResult, updateBranding] = useMutation(
     UPDATE_TENANT_BRANDING_MUTATION

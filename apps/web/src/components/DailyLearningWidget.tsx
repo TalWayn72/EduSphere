@@ -51,6 +51,8 @@ export function DailyLearningWidget() {
 
   const [{ data, fetching, error }] = useQuery<DailyMicrolessonQueryResult>({
     query: DAILY_MICROLESSON_QUERY,
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    pause: true, // dailyMicrolesson not in live gateway
   });
 
   const [, markViewed] = useMutation(MARK_CONTENT_VIEWED_MUTATION);

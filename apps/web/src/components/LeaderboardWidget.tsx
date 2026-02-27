@@ -30,10 +30,12 @@ export function LeaderboardWidget() {
   const [leaderboardResult] = useQuery<LeaderboardResult>({
     query: LEADERBOARD_QUERY,
     variables: { limit: 5 },
+    pause: true, // leaderboard not in live gateway
   });
 
   const [rankResult] = useQuery<MyRankResult>({
     query: MY_RANK_QUERY,
+    pause: true, // myRank not in live gateway
   });
 
   const entries = leaderboardResult.data?.leaderboard ?? [];

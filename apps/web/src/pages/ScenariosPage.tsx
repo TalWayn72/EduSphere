@@ -56,7 +56,7 @@ export function ScenariosPage() {
     null
   );
 
-  const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY });
+  const [result] = useQuery({ query: SCENARIO_TEMPLATES_QUERY, pause: true }); // scenarioTemplates not in live gateway
 
   const scenarios: ScenarioTemplate[] =
     (result.data?.scenarioTemplates as ScenarioTemplate[] | undefined) ?? [];

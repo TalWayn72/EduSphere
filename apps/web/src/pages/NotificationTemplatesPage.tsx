@@ -142,10 +142,12 @@ export function NotificationTemplatesPage() {
         <Card className="w-72 shrink-0">
           <CardContent className="p-2 space-y-0.5">
             {templates.map((t) => (
-              <button
+              <div
                 key={t.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedId(t.id)}
+                onKeyDown={(e) => e.key === 'Enter' && setSelectedId(t.id)}
                 className={`w-full text-left rounded-md px-3 py-2.5 flex items-center gap-2 transition-colors ${
                   t.id === selectedId
                     ? 'bg-primary/10 text-primary'
@@ -186,7 +188,7 @@ export function NotificationTemplatesPage() {
                     className={`w-3.5 h-3.5 ${t.id === selectedId ? 'text-primary' : 'text-muted-foreground'}`}
                   />
                 </div>
-              </button>
+              </div>
             ))}
           </CardContent>
         </Card>

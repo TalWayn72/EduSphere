@@ -39,11 +39,13 @@ export function ProgramsPage(): React.ReactElement {
   const navigate = useNavigate();
   const [programsResult] = useQuery<{ programs: CredentialProgram[] }>({
     query: PROGRAMS_QUERY,
+    pause: true, // programs not in live gateway
   });
   const [enrollmentsResult] = useQuery<{
     myProgramEnrollments: ProgramEnrollment[];
   }>({
     query: MY_PROGRAM_ENROLLMENTS_QUERY,
+    pause: true, // myProgramEnrollments not in live gateway
   });
   const [, enrollMutation] = useMutation(ENROLL_IN_PROGRAM_MUTATION);
 

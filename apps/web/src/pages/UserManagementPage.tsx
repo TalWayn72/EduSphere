@@ -100,6 +100,7 @@ export function UserManagementPage() {
         | UserRole
         | undefined,
     },
+    pause: true, // adminUsers not in live gateway
   });
 
   if (!role || !ADMIN_ROLES.has(role)) return null;

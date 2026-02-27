@@ -58,6 +58,7 @@ export function ComplianceReportsPage() {
 
   const [{ data, fetching, error }] = useQuery({
     query: COMPLIANCE_COURSES_QUERY,
+    pause: true,
   });
   const [{ fetching: generating }, generateReport] = useMutation(
     GENERATE_COMPLIANCE_REPORT_MUTATION

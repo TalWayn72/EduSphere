@@ -57,7 +57,7 @@ export function BiExportSettingsPage() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   const [tokensResult, refetchTokens] = useQuery<{ biApiTokens: BiApiToken[] }>(
-    { query: BI_API_TOKENS_QUERY }
+    { query: BI_API_TOKENS_QUERY, pause: true }
   );
   const [, generateKey] = useMutation<{ generateBIApiKey: string }>(
     GENERATE_BI_API_KEY_MUTATION

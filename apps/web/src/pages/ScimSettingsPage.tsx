@@ -54,10 +54,12 @@ export function ScimSettingsPage() {
 
   const [tokensResult, refetchTokens] = useQuery<{ scimTokens: ScimToken[] }>({
     query: SCIM_TOKENS_QUERY,
+    pause: true,
   });
   const [logResult] = useQuery<{ scimSyncLog: ScimSyncEntry[] }>({
     query: SCIM_SYNC_LOG_QUERY,
     variables: { limit: 50 },
+    pause: true,
   });
   const [, generateToken] = useMutation(GENERATE_SCIM_TOKEN_MUTATION);
   const [, revokeToken] = useMutation(REVOKE_SCIM_TOKEN_MUTATION);

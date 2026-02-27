@@ -36,7 +36,7 @@ function parseBlocks(raw: RawBlock[]): PortalBlock[] {
 
 export function PortalPage() {
   const navigate = useNavigate();
-  const [{ data, fetching, error }] = useQuery({ query: PUBLIC_PORTAL_QUERY });
+  const [{ data, fetching, error }] = useQuery({ query: PUBLIC_PORTAL_QUERY, pause: true });
 
   useEffect(() => {
     // If portal is definitely not published or not found → redirect

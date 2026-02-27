@@ -83,6 +83,7 @@ export function CourseLibraryPage() {
       request(GRAPHQL_URL, LIBRARY_COURSES_QUERY, {
         topic: activeTopic === 'ALL' ? undefined : activeTopic,
       }),
+    enabled: false, // libraryCourses not in live gateway
   });
 
   const { mutate: activate, isPending } = useMutation({

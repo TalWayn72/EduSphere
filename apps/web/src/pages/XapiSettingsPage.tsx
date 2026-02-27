@@ -57,10 +57,12 @@ export function XapiSettingsPage() {
 
   const [tokensResult, refetchTokens] = useQuery<{ xapiTokens: XapiToken[] }>({
     query: XAPI_TOKENS_QUERY,
+    pause: true,
   });
   const [statementsResult] = useQuery<{ xapiStatements: XapiStatement[] }>({
     query: XAPI_STATEMENTS_QUERY,
     variables: { limit: 20 },
+    pause: true,
   });
   const [, generateToken] = useMutation(GENERATE_XAPI_TOKEN_MUTATION);
   const [, revokeToken] = useMutation(REVOKE_XAPI_TOKEN_MUTATION);
