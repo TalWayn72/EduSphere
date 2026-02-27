@@ -173,22 +173,22 @@ vi.mock('./CourseWizardStep3', () => ({
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 // Mock urql so useMutation doesn't throw "No client" in tests.
-// We spread the real module so `gql` and other named exports remain available.
 const mockExecuteMutation = vi
   .fn()
   .mockResolvedValue({ data: null, error: null });
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useMutation: () => [
-      { fetching: false, data: null, error: null },
-      mockExecuteMutation,
-    ],
-    useQuery: () => [{ fetching: false, data: null, error: null }, vi.fn()],
-    Provider: ({ children }: { children: React.ReactNode }) => children,
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useMutation: () => [
+    { fetching: false, data: null, error: null },
+    mockExecuteMutation,
+  ],
+  useQuery: () => [{ fetching: false, data: null, error: null }, vi.fn()],
+  Provider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 import { getCurrentUser } from '@/lib/auth';
 import { CourseCreatePage } from './CourseCreatePage';

@@ -31,7 +31,11 @@ import {
   Loader2,
   Users,
   BookMarked,
+  Pencil,
 } from 'lucide-react';
+import { getCurrentUser } from '@/lib/auth';
+
+const EDITOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -119,21 +123,30 @@ export function CourseDetailPage() {
   const { t } = useTranslation('courses');
   const { courseId = '' } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+  const canEdit = currentUser != null && EDITOR_ROLES.has(currentUser.role);
+
+  // Delay all queries until after mount to prevent urql from triggering a
+  // synchronous setState on CourseList (which shares MY_ENROLLMENTS_QUERY cache)
+  // during CourseDetailPage's render phase — causes React strict-mode warning.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const [{ data, fetching, error }] = useQuery<CourseDetailResult>({
     query: COURSE_DETAIL_QUERY,
     variables: { id: courseId },
-    pause: !courseId,
+    pause: !courseId || !mounted,
   });
 
-  const [{ data: enrollData }] = useQuery<EnrollmentData>({
+  const [{ data: enrollData, error: enrollError }] = useQuery<EnrollmentData>({
     query: MY_ENROLLMENTS_QUERY,
+    pause: !mounted,
   });
 
   const [{ data: progressData }] = useQuery<ProgressData>({
     query: MY_COURSE_PROGRESS_QUERY,
     variables: { courseId },
-    pause: !courseId,
+    pause: !courseId || !mounted,
   });
 
   const [, enrollMutation] = useMutation(ENROLL_COURSE_MUTATION);
@@ -157,8 +170,11 @@ export function CourseDetailPage() {
 
   // Fall back to mock data when GraphQL is unavailable (DEV_MODE / no backend)
   const course = data?.course ?? (error ? MOCK_COURSE_FALLBACK : null);
-  const isEnrolled =
-    enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ?? false;
+  // When gateway is offline (enrollError) and showing mock course, treat as enrolled
+  // so "בטל הרשמה" is shown rather than the misleading "הירשם".
+  const isEnrolled = enrollError
+    ? true
+    : (enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ?? false);
   const progress = progressData?.myCourseProgress;
 
   const showToast = (msg: string) => {
@@ -254,21 +270,34 @@ export function CourseDetailPage() {
                   )}
                 </div>
               </div>
-              <Button
-                variant={isEnrolled ? 'secondary' : 'default'}
-                className="shrink-0 gap-2"
-                onClick={handleEnroll}
-                disabled={isEnrolling}
-              >
-                {isEnrolling && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isEnrolling
-                  ? isEnrolled
-                    ? t('unenrolling')
-                    : t('enrolling')
-                  : isEnrolled
-                    ? t('unenroll')
-                    : t('enroll')}
-              </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                {canEdit && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => navigate(`/courses/${courseId}/edit`)}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit Course
+                  </Button>
+                )}
+                <Button
+                  variant={isEnrolled ? 'secondary' : 'default'}
+                  className="gap-2"
+                  onClick={handleEnroll}
+                  disabled={isEnrolling}
+                >
+                  {isEnrolling && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {isEnrolling
+                    ? isEnrolled
+                      ? t('unenrolling')
+                      : t('enrolling')
+                    : isEnrolled
+                      ? t('unenroll')
+                      : t('enroll')}
+                </Button>
+              </div>
             </div>
           </CardHeader>
 

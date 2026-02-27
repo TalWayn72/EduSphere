@@ -12,28 +12,29 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: { courses: [] }, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-    // useMutation must be mocked to avoid the "No client specified" urql Provider error.
-    // The execute function resolves with { error: null } so that enrollment handlers
-    // can destructure without throwing.
-    useMutation: vi.fn(() => [
-      { fetching: false },
-      vi.fn().mockResolvedValue({ error: null }),
-    ]),
-    // useSubscription must be mocked for AiCourseCreatorModal (rendered inside CourseList).
-    useSubscription: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: { courses: [] }, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  // useMutation must be mocked to avoid the "No client specified" urql Provider error.
+  // The execute function resolves with { error: null } so that enrollment handlers
+  // can destructure without throwing.
+  useMutation: vi.fn(() => [
+    { fetching: false },
+    vi.fn().mockResolvedValue({ error: null }),
+  ]),
+  // useSubscription must be mocked for AiCourseCreatorModal (rendered inside CourseList).
+  useSubscription: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+}));
 
 const mockGetCurrentUser = vi.fn();
 vi.mock('@/lib/auth', () => ({
@@ -356,11 +357,11 @@ describe('CourseList', () => {
     expect(editBtns.length).toBe(MOCK_COURSES.length);
   });
 
-  it('clicking Edit button navigates to /courses/:id', () => {
+  it('clicking Edit button navigates to /courses/:id/edit', () => {
     renderCourseList(INSTRUCTOR_USER);
     const editBtns = screen.getAllByRole('button', { name: /^edit$/i });
     fireEvent.click(editBtns[0]!);
-    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1/edit');
   });
 
   it('non-instructor does not see Edit button', () => {

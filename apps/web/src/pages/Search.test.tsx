@@ -12,16 +12,17 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 // ─── Module mocks (must be hoisted before component imports) ──────────────────
 
 // Mock urql — keep gql/other exports, only override useQuery
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+}));
 
 // Mock Layout to avoid nested routing / auth concerns
 vi.mock('@/components/Layout', () => ({

@@ -5,15 +5,16 @@ import { KnowledgeGraph } from './KnowledgeGraph';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-    ]),
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+  ]),
+}));
 
 vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => (

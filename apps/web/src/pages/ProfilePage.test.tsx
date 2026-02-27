@@ -25,17 +25,18 @@ vi.mock('@/components/Layout', () => ({
 // Mock urql — ProfilePage uses useQuery for ME_QUERY and COURSES_QUERY.
 // useMutation is mocked so that ProfileVisibilityCard (rendered when userId is
 // truthy) does not throw "No client specified" when it calls useMutation().
-vi.mock('urql', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('urql')>();
-  return {
-    ...actual,
-    useQuery: vi.fn(() => [
-      { data: undefined, fetching: false, error: undefined },
-      vi.fn(),
-    ]),
-    useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
-  };
-});
+vi.mock('urql', () => ({
+  gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
+    strings.reduce(
+      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      ''
+    ),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
+}));
 
 import { getCurrentUser } from '@/lib/auth';
 import * as urqlModule from 'urql';
