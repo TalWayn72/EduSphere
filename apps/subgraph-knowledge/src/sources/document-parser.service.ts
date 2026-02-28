@@ -11,7 +11,6 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
-import { basename, resolve } from 'path';
 
 export type ParseResult = {
   text: string;
@@ -25,10 +24,13 @@ export class DocumentParserService {
 
   /** Parse a local DOCX file path or an in-memory Buffer → plaintext */
   async parseDocx(source: string | Buffer): Promise<ParseResult> {
-    const { default: mammoth } = await import('mammoth');
+    // mammoth is CommonJS; ESM dynamic import wraps it as { default: module, ...named }.
+    // Use the same defensive pattern as pdf-parse to handle both import shapes.
+    const mammothModule = await import('mammoth');
+    const mammoth = (mammothModule.default ?? mammothModule) as typeof mammothModule;
     const buffer =
       typeof source === 'string'
-        ? readFileSync(resolve(basename(source)))
+        ? readFileSync(source) // source is always an absolute path when string
         : source;
     const result = await mammoth.extractRawText({ buffer });
 
