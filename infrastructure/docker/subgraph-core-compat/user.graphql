@@ -1,0 +1,76 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+
+# Custom directives — declared locally, not imported from Federation spec
+directive @requiresRole(roles: [UserRole!]!) on FIELD_DEFINITION | OBJECT
+directive @requiresScopes(scopes: [String!]!) on FIELD_DEFINITION | OBJECT
+
+type UserPreferences {
+  locale: String!
+  theme: String!
+  emailNotifications: Boolean!
+  pushNotifications: Boolean!
+  isPublic: Boolean!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  role: UserRole!
+  tenantId: ID!
+  preferences: UserPreferences!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ORG_ADMIN
+  INSTRUCTOR
+  STUDENT
+  RESEARCHER
+}
+
+type UserStats {
+  totalEnrollments: Int!
+  completedCourses: Int!
+  totalAnnotations: Int!
+  averageScore: Float
+}
+
+extend type Query {
+  me: User! @authenticated
+  user(id: ID!): User @authenticated
+  users: [User!]! @authenticated
+  myStats: UserStats! @authenticated
+}
+
+extend type Mutation {
+  createUser(input: CreateUserInput!): User! @authenticated
+  updateUser(id: ID!, input: UpdateUserInput!): User! @authenticated
+  updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
+}
+
+input CreateUserInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  role: UserRole!
+  tenantId: ID!
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  role: UserRole
+}
+
+input UpdateUserPreferencesInput {
+  locale: String
+  theme: String
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+  isPublic: Boolean
+}

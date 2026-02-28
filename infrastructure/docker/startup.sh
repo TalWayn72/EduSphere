@@ -147,31 +147,26 @@ fi
 # committed — avoids requiring a full image rebuild in corporate-proxy environments.
 export PATH="/opt/nodejs/bin:$PATH"
 
-NEEDS_DB_BUILD=false
-NEEDS_CORE_BUILD=false
-
 # packages/db: check for sql.raw() RLS fix (SET LOCAL requires literal values)
+# If missing, rebuild the package — it has no problematic ESM/workspace dependencies.
 if ! grep -q "sql\.raw" /app/packages/db/dist/rls/withTenantContext.js 2>/dev/null; then
     echo "⚠️  packages/db dist is stale (missing sql.raw() RLS fix) — rebuilding..."
-    NEEDS_DB_BUILD=true
-fi
-
-# subgraph-core: check for UserPreferences type (preferences field on User)
-if ! grep -q "UserPreferences" /app/apps/subgraph-core/dist/user/user.graphql 2>/dev/null; then
-    echo "⚠️  subgraph-core dist is stale (missing UserPreferences) — rebuilding..."
-    NEEDS_CORE_BUILD=true
-fi
-
-if [ "$NEEDS_DB_BUILD" = "true" ]; then
-    cd /app && pnpm turbo build --filter='./packages/db' 2>&1 | tail -8 \
+    mkdir -p /var/log/edusphere
+    cd /app && pnpm turbo build --filter='./packages/db' > /var/log/edusphere/db-build.log 2>&1 \
         && echo "✅ packages/db rebuilt" \
-        || echo "❌ packages/db rebuild failed"
+        || echo "⚠️  packages/db rebuild failed — see /var/log/edusphere/db-build.log"
+else
+    echo "✅ packages/db dist is up-to-date"
 fi
 
-if [ "$NEEDS_CORE_BUILD" = "true" ]; then
-    cd /app && pnpm turbo build --filter='./apps/subgraph-core' 2>&1 | tail -8 \
-        && echo "✅ subgraph-core rebuilt" \
-        || echo "❌ subgraph-core rebuild failed"
+# subgraph-core user.graphql: verify UserPreferences type is present.
+# The correct user.graphql (with UserPreferences + preferences: UserPreferences! on User)
+# is provided via docker-compose volume mount from the host source tree.
+# This check is informational only — no rebuild needed when mount is active.
+if grep -q "UserPreferences" /app/apps/subgraph-core/dist/user/user.graphql 2>/dev/null; then
+    echo "✅ subgraph-core user.graphql has UserPreferences"
+else
+    echo "⚠️  subgraph-core user.graphql missing UserPreferences — docker-compose volume mount may not be active"
 fi
 
 # ─── Hand off to supervisord ─────────────────────────────────

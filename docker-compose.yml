@@ -37,7 +37,23 @@ services:
       - ollama_data:/root/.ollama
       # Persist mcp-nats installation for Claude Code MCP server
       - nats_mcp_data:/tmp/nats-test
-      # Optional: Mount code for development hot-reload
+      # ── Permanent fix mounts (survive container restart without image rebuild) ──
+      # Entrypoint: always uses the committed startup.sh from source
+      - ./infrastructure/docker/startup.sh:/startup.sh:ro
+      # Supervisor config: always uses the committed supervisord.conf from source
+      - ./infrastructure/docker/supervisord.conf:/etc/supervisor/conf.d/edusphere.conf:ro
+      # packages/db dist: sql.raw() SET LOCAL fix for RLS enforcement (Bug 1)
+      # Mounts the full dist — safe, pure-JS library with no app.module side effects
+      - ./packages/db/dist:/app/packages/db/dist
+      # subgraph-core: mount only the user module files needed for Bug 2 + 3 fixes.
+      # Full dist mount is intentionally avoided — new app.module.js includes SRS/admin modules
+      # that require workspace packages missing from the Feb-20 image's node_modules layout.
+      # user.graphql patch (UserPreferences type) is handled by startup.sh cp from src.
+      - ./infrastructure/docker/subgraph-core-compat/user.graphql:/app/apps/subgraph-core/dist/user/user.graphql:ro
+      - ./infrastructure/docker/subgraph-core-compat/user.service.js:/app/apps/subgraph-core/dist/user/user.service.js:ro
+      - ./infrastructure/docker/subgraph-core-compat/user-preferences.service.js:/app/apps/subgraph-core/dist/user/user-preferences.service.js:ro
+      - ./infrastructure/docker/subgraph-core-compat/user.module.js:/app/apps/subgraph-core/dist/user/user.module.js:ro
+      # Optional: Mount code for development hot-reload (uncomment to enable)
       # - ./apps:/app/apps
       # - ./packages:/app/packages
     environment:
