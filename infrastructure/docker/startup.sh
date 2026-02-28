@@ -141,6 +141,39 @@ else
     echo "✅ nats already present"
 fi
 
+# ─── Conditional dist rebuild (idempotent, runs only when stale) ──
+# Detects if the compiled dist files predate critical source fixes and rebuilds.
+# This handles the case where the Docker image was built before source fixes were
+# committed — avoids requiring a full image rebuild in corporate-proxy environments.
+export PATH="/opt/nodejs/bin:$PATH"
+
+NEEDS_DB_BUILD=false
+NEEDS_CORE_BUILD=false
+
+# packages/db: check for sql.raw() RLS fix (SET LOCAL requires literal values)
+if ! grep -q "sql\.raw" /app/packages/db/dist/rls/withTenantContext.js 2>/dev/null; then
+    echo "⚠️  packages/db dist is stale (missing sql.raw() RLS fix) — rebuilding..."
+    NEEDS_DB_BUILD=true
+fi
+
+# subgraph-core: check for UserPreferences type (preferences field on User)
+if ! grep -q "UserPreferences" /app/apps/subgraph-core/dist/user/user.graphql 2>/dev/null; then
+    echo "⚠️  subgraph-core dist is stale (missing UserPreferences) — rebuilding..."
+    NEEDS_CORE_BUILD=true
+fi
+
+if [ "$NEEDS_DB_BUILD" = "true" ]; then
+    cd /app && pnpm turbo build --filter='./packages/db' 2>&1 | tail -8 \
+        && echo "✅ packages/db rebuilt" \
+        || echo "❌ packages/db rebuild failed"
+fi
+
+if [ "$NEEDS_CORE_BUILD" = "true" ]; then
+    cd /app && pnpm turbo build --filter='./apps/subgraph-core' 2>&1 | tail -8 \
+        && echo "✅ subgraph-core rebuilt" \
+        || echo "❌ subgraph-core rebuild failed"
+fi
+
 # ─── Hand off to supervisord ─────────────────────────────────
 echo "🎯 Starting all services via Supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/edusphere.conf
