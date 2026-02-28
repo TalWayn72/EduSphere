@@ -1,6 +1,6 @@
 # ═══════════════════════════════════════════════════════════════
 # EduSphere - All-in-One Docker Container
-# PostgreSQL 17 + Apache AGE + pgvector + Redis + Keycloak + NATS + MinIO + Ollama
+# PostgreSQL 18 + Apache AGE 1.7.0 + pgvector 0.8.1 + Redis + Keycloak + NATS + MinIO + Ollama
 # All services managed by supervisord inside a single container
 # Last updated: February 2026
 # ═══════════════════════════════════════════════════════════════
@@ -8,10 +8,10 @@
 FROM ubuntu:22.04
 
 LABEL maintainer="EduSphere Team"
-LABEL description="EduSphere all-in-one: PG17 + AGE + pgvector + Keycloak + NATS + MinIO"
-LABEL postgresql.version="17"
-LABEL apache.age.version="pgdg-package"
-LABEL pgvector.version="pgdg-package"
+LABEL description="EduSphere all-in-one: PG18 + AGE 1.7.0 + pgvector 0.8.1 + Keycloak + NATS + MinIO"
+LABEL postgresql.version="18"
+LABEL apache.age.version="1.7.0"
+LABEL pgvector.version="0.8.1"
 LABEL keycloak.version="26.5.3"
 LABEL nats.version="2.12.4"
 LABEL node.version="22-lts"
@@ -21,9 +21,12 @@ ENV TZ=UTC
 ENV PATH="/opt/nodejs/bin:$PATH"
 
 # ═══════════════════════════════════════════════════════════════
-# STAGE 0: Ensure CA certificates are up to date
-# Required before any HTTPS apt/curl/wget operations
+# STAGE 0: Corporate CA cert + system CA certificates
+# Corporate proxy performs SSL interception — inject root CA FIRST
+# so all subsequent curl/wget/apt HTTPS calls succeed (SI-5 compliant)
 # ═══════════════════════════════════════════════════════════════
+
+COPY infrastructure/docker/corporate-root-ca.pem /usr/local/share/ca-certificates/corporate-root-ca.crt
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates && \
@@ -31,25 +34,45 @@ RUN apt-get update && \
     update-ca-certificates
 
 # ═══════════════════════════════════════════════════════════════
-# STAGE 1: System base + PGDG repo + PostgreSQL 17 + AGE + pgvector
-# AGE and pgvector installed as PGDG packages — no compilation needed
+# STAGE 1: System base + PGDG repo + PostgreSQL 18
+# AGE 1.7.0 and pgvector 0.8.1 compiled from source (PG18 packages
+# not yet available in pgdg apt — source build is the reliable path)
 # ═══════════════════════════════════════════════════════════════
 
 RUN apt-get update && apt-get install -y \
     build-essential curl wget git gnupg lsb-release \
+    flex bison \
     netcat-openbsd supervisor python3 python3-pip \
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
        | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
        > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update && apt-get install -y \
-       postgresql-17 \
-       postgresql-contrib-17 \
-       postgresql-17-age \
-       postgresql-17-pgvector \
+       postgresql-18 \
+       postgresql-contrib-18 \
+       postgresql-server-dev-18 \
        redis-server \
        openjdk-21-jre-headless \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# ═══════════════════════════════════════════════════════════════
+# STAGE 1.5: Compile Apache AGE 1.7.0 + pgvector 0.8.1 from source
+# Both compiled against PG18 dev headers (postgresql-server-dev-18)
+# ═══════════════════════════════════════════════════════════════
+
+RUN cd /tmp && \
+    git clone --branch release/PG18/1.7.0 --depth 1 https://github.com/apache/age.git && \
+    cd age && \
+    make USE_PGXS=1 && \
+    make USE_PGXS=1 install && \
+    cd / && rm -rf /tmp/age
+
+RUN cd /tmp && \
+    git clone --branch v0.8.1 --depth 1 https://github.com/pgvector/pgvector.git && \
+    cd pgvector && \
+    make USE_PGXS=1 && \
+    make USE_PGXS=1 install && \
+    cd / && rm -rf /tmp/pgvector
 
 # ═══════════════════════════════════════════════════════════════
 # STAGE 2: Node.js 22 LTS + pnpm
@@ -108,14 +131,14 @@ RUN cd /opt && \
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # ═══════════════════════════════════════════════════════════════
-# STAGE 7: Configure PostgreSQL 17 — AGE + pgvector + edusphere DB
+# STAGE 7: Configure PostgreSQL 18 — AGE + pgvector + edusphere DB
 # shared_preload_libraries must be set BEFORE starting PostgreSQL
 # ═══════════════════════════════════════════════════════════════
 
-RUN echo "shared_preload_libraries = 'age'" >> /etc/postgresql/17/main/postgresql.conf && \
-    echo "listen_addresses = '*'" >> /etc/postgresql/17/main/postgresql.conf && \
-    echo "port = 5432" >> /etc/postgresql/17/main/postgresql.conf && \
-    echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/17/main/pg_hba.conf
+RUN echo "shared_preload_libraries = 'age'" >> /etc/postgresql/18/main/postgresql.conf && \
+    echo "listen_addresses = '*'" >> /etc/postgresql/18/main/postgresql.conf && \
+    echo "port = 5432" >> /etc/postgresql/18/main/postgresql.conf && \
+    echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/18/main/pg_hba.conf
 
 USER postgres
 

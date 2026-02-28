@@ -859,6 +859,28 @@ DO $$ BEGIN
     BEGIN ALTER TABLE "discussions" ADD CONSTRAINT "discussions_creator_id_users_id_fk" FOREIGN KEY ("creator_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action; EXCEPTION WHEN duplicate_object THEN null; END;
   END IF;
 END $$;--> statement-breakpoint
+CREATE TYPE "public"."session_status" AS ENUM('ACTIVE', 'COMPLETED', 'FAILED', 'CANCELLED');--> statement-breakpoint
+CREATE TYPE "public"."message_role" AS ENUM('USER', 'ASSISTANT', 'SYSTEM', 'TOOL');--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "agent_sessions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"agent_type" varchar(100) NOT NULL,
+	"status" "session_status" DEFAULT 'ACTIVE' NOT NULL,
+	"metadata" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"completed_at" timestamp
+);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "agent_messages" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"session_id" uuid NOT NULL,
+	"role" "message_role" NOT NULL,
+	"content" text NOT NULL,
+	"metadata" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"is_ai_generated" boolean DEFAULT false NOT NULL,
+	"model_used" varchar(100),
+	"human_review_required" boolean DEFAULT false NOT NULL
+);--> statement-breakpoint
 ALTER TABLE "agent_sessions" ADD CONSTRAINT "agent_sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "agent_messages" ADD CONSTRAINT "agent_messages_session_id_agent_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."agent_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "content_translations" ADD CONSTRAINT "content_translations_content_item_id_content_items_id_fk" FOREIGN KEY ("content_item_id") REFERENCES "public"."content_items"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

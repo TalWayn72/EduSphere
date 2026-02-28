@@ -1,7 +1,7 @@
 {
   "name": "@edusphere/langgraph-workflows",
   "version": "1.0.0",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
   "types": "./src/index.ts",
   "scripts": {
     "build": "tsc || true",
@@ -27,8 +27,8 @@
   },
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "types": "./src/index.ts"
     }
   }

@@ -244,3 +244,32 @@ extend type Mutation {
     requiredConcepts: [String!]!
   ): SkillProfile! @authenticated
 }
+
+# ─── F-002: Personalized Auto Learning Path ──────────────────────────────────
+
+"""
+A single node in the personalized learning path (concept + completion status).
+"""
+type AutoPathNode {
+  conceptName: String!
+  isCompleted: Boolean!
+  contentItems: [String!]!
+}
+
+"""
+Personalized learning path toward a target concept, showing per-node completion.
+"""
+type AutoPath {
+  targetConceptName: String!
+  nodes: [AutoPathNode!]!
+  totalSteps: Int!
+  completedSteps: Int!
+}
+
+extend type Query {
+  """
+  Return a personalized learning path toward the named concept.
+  Nodes are ordered from prerequisite to target; isCompleted reflects user progress.
+  """
+  myLearningPath(targetConceptName: String!): AutoPath @authenticated
+}

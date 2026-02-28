@@ -18,7 +18,7 @@ chmod -R 755 /var/log
 echo "📁 Log directories created"
 
 # ─── PostgreSQL constants ─────────────────────────────────────
-PG_VER="17"
+PG_VER="18"
 PG_DATA="/var/lib/postgresql/${PG_VER}/main"
 PG_CTL="/usr/lib/postgresql/${PG_VER}/bin/pg_ctl"
 PG_BIN="/usr/lib/postgresql/${PG_VER}/bin"
@@ -159,15 +159,24 @@ else
     echo "✅ packages/db dist is up-to-date"
 fi
 
-# subgraph-core user.graphql: verify UserPreferences type is present.
-# The correct user.graphql (with UserPreferences + preferences: UserPreferences! on User)
-# is provided via docker-compose volume mount from the host source tree.
-# This check is informational only — no rebuild needed when mount is active.
-if grep -q "UserPreferences" /app/apps/subgraph-core/dist/user/user.graphql 2>/dev/null; then
-    echo "✅ subgraph-core user.graphql has UserPreferences"
-else
-    echo "⚠️  subgraph-core user.graphql missing UserPreferences — docker-compose volume mount may not be active"
-fi
+# subgraph-core SDL fix: copy fixed src/*.graphql files over the dist/*.graphql files.
+# src/ is bind-mounted from host with @requiresRole removed from @link imports (invalid federation import)
+# and directive @requiresRole defined locally. dist/ still has old baked-in SDL files.
+# typePaths: ['./**/*.graphql'] loads both src/ and dist/, so we must fix dist/ too.
+echo "🔧 Syncing subgraph-core SDL files from src to dist..."
+CORE_SRC="/app/apps/subgraph-core/src"
+CORE_DIST="/app/apps/subgraph-core/dist"
+for SDL in tenant/tenant.graphql user/user.graphql gamification/gamification.graphql \
+           admin/admin.graphql admin/announcements.graphql admin/audit.graphql \
+           admin/security.graphql; do
+    src_file="$CORE_SRC/$SDL"
+    dist_file="$CORE_DIST/$SDL"
+    if [ -f "$src_file" ] && [ -f "$dist_file" ]; then
+        cp "$src_file" "$dist_file"
+        echo "  ✅ Synced: $SDL"
+    fi
+done
+echo "✅ subgraph-core SDL sync complete"
 
 # ─── Hand off to supervisord ─────────────────────────────────
 echo "🎯 Starting all services via Supervisor..."

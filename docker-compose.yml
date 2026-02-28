@@ -31,7 +31,7 @@ services:
       - "11434:11434" # Ollama
     volumes:
       # Persist data outside container
-      - postgres_data:/var/lib/postgresql/17/main
+      - postgres_data:/var/lib/postgresql/18/main
       - keycloak_data:/opt/keycloak/data
       - minio_data:/data/minio
       - ollama_data:/root/.ollama
@@ -45,14 +45,21 @@ services:
       # packages/db dist: sql.raw() SET LOCAL fix for RLS enforcement (Bug 1)
       # Mounts the full dist — safe, pure-JS library with no app.module side effects
       - ./packages/db/dist:/app/packages/db/dist
-      # subgraph-core: mount only the user module files needed for Bug 2 + 3 fixes.
-      # Full dist mount is intentionally avoided — new app.module.js includes SRS/admin modules
-      # that require workspace packages missing from the Feb-20 image's node_modules layout.
-      # user.graphql patch (UserPreferences type) is handled by startup.sh cp from src.
-      - ./infrastructure/docker/subgraph-core-compat/user.graphql:/app/apps/subgraph-core/dist/user/user.graphql:ro
-      - ./infrastructure/docker/subgraph-core-compat/user.service.js:/app/apps/subgraph-core/dist/user/user.service.js:ro
-      - ./infrastructure/docker/subgraph-core-compat/user-preferences.service.js:/app/apps/subgraph-core/dist/user/user-preferences.service.js:ro
-      - ./infrastructure/docker/subgraph-core-compat/user.module.js:/app/apps/subgraph-core/dist/user/user.module.js:ro
+      # packages/db migrations: fixes missing CREATE TABLE for agent_sessions/agent_messages
+      # Mount ensures the corrected 0002 migration file is used without image rebuild
+      - ./packages/db/migrations:/app/packages/db/migrations:ro
+      # langgraph-workflows: tutorWorkflow.js missing from image build; package.json main updated to dist/
+      # dist mounted so subgraph-agent loads compiled JS; package.json mounted for correct resolution
+      - ./packages/langgraph-workflows/dist:/app/packages/langgraph-workflows/dist:ro
+      - ./packages/langgraph-workflows/package.json:/app/packages/langgraph-workflows/package.json:ro
+      # subgraph-knowledge: add myLearningPath SDL definition (resolver exists, SDL was missing)
+      - ./apps/subgraph-knowledge/src/graph/graph.graphql:/app/apps/subgraph-knowledge/src/graph/graph.graphql:ro
+      # subgraph-core: mount src/ — fixes @requiresRole removed from @link imports (invalid federation import),
+      # directive @requiresRole defined locally in user.graphql instead
+      - ./apps/subgraph-core/src:/app/apps/subgraph-core/src:ro
+      # subgraph-core-compat mounts REMOVED: PG18 image is freshly built from source,
+      # so baked-in dist already has UserPreferences, PublicProfileService, etc.
+      # Compat files were only needed for the stale Feb-20 image.
       # Optional: Mount code for development hot-reload (uncomment to enable)
       # - ./apps:/app/apps
       # - ./packages:/app/packages

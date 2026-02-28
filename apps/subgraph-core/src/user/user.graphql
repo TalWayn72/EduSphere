@@ -1,5 +1,8 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresRole", "@requiresScopes"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated", "@requiresScopes"])
+
+# Custom authorization directive (not a federation spec directive — defined locally)
+directive @requiresRole(roles: [String!]!) on FIELD_DEFINITION
 
 type UserPreferences {
   locale: String!
