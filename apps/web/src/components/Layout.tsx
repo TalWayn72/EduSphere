@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getCurrentUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/UserMenu';
+import { NotificationBell } from '@/components/NotificationBell';
 import {
   BookOpen,
   Users,
@@ -236,6 +237,8 @@ export function Layout({ children }: LayoutProps) {
                   ⌘K
                 </kbd>
               </Button>
+
+              {user && <NotificationBell />}
 
               {user ? (
                 <UserMenu user={user} />

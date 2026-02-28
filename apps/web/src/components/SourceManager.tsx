@@ -148,7 +148,7 @@ function AddSourceModal({
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Close modal on Escape key
   useEffect(() => {
@@ -494,7 +494,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
   const [showAdd, setShowAdd] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [addedBanner, setAddedBanner] = useState<string | null>(null);
-  const addedBannerTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const addedBannerTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Cleanup banner timer on unmount
   useEffect(() => {
