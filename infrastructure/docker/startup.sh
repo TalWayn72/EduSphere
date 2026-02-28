@@ -111,6 +111,36 @@ fi
 echo "⏹️  Stopping PostgreSQL (supervisord will take over)..."
 su - postgres -c "$PG_CTL -D $PG_DATA stop -m fast" || true
 
+# ─── Hoist pnpm packages required by compiled dist ───────────
+# prom-client is used by packages/db/dist/rls/withTenantContext.js for RLS metrics.
+# nats is used by subgraphs that have NATS JetStream integration.
+# pnpm's hoisting may not place these at the top-level; ensure they are accessible.
+echo "🔗 Ensuring required packages are hoisted..."
+
+if [ ! -d "/app/node_modules/prom-client" ]; then
+    PROM_PATH=$(find /app/node_modules/.pnpm -maxdepth 4 -type d -name "prom-client" 2>/dev/null | head -1)
+    if [ -n "$PROM_PATH" ]; then
+        ln -sf "$PROM_PATH" /app/node_modules/prom-client
+        echo "✅ prom-client symlinked"
+    else
+        echo "⚠️  prom-client not found in pnpm store — subgraphs may fail to start"
+    fi
+else
+    echo "✅ prom-client already present"
+fi
+
+if [ ! -d "/app/node_modules/nats" ]; then
+    NATS_PATH=$(find /app/node_modules/.pnpm -maxdepth 4 -type d -name "nats" 2>/dev/null | head -1)
+    if [ -n "$NATS_PATH" ]; then
+        ln -sf "$NATS_PATH" /app/node_modules/nats
+        echo "✅ nats symlinked"
+    else
+        echo "⚠️  nats not found in pnpm store"
+    fi
+else
+    echo "✅ nats already present"
+fi
+
 # ─── Hand off to supervisord ─────────────────────────────────
 echo "🎯 Starting all services via Supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/edusphere.conf

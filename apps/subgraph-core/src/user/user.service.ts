@@ -205,11 +205,12 @@ export class UserService implements OnModuleDestroy {
     let failed = 0;
     const errors: string[] = [];
     for (let i = 1; i < lines.length; i++) {
-      const rawValues = lines[i]?.split(',').map((v) => v.trim()) ?? [];
-      const row: Record<string, string> = {};
-      headers.forEach((h, idx) => {
-        row[h] = rawValues[idx] ?? '';
-      });
+      // eslint-disable-next-line security/detect-object-injection
+      const rawValues = (lines[i] ?? '').split(',').map((v) => v.trim());
+      const row: Record<string, string> = Object.fromEntries(
+        // eslint-disable-next-line security/detect-object-injection
+        headers.map((h, idx) => [h, rawValues[idx] ?? ''] as [string, string])
+      );
       if (!row['email']) {
         errors.push('Row ' + String(i) + ': missing email');
         failed++;

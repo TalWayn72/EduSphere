@@ -54,7 +54,7 @@ export async function withTenantContext<T>(
       );
 
       // Execute operation with RLS context
-      return operation(tx as any);
+      return operation(tx as unknown as DrizzleDB);
     });
   } finally {
     endTimer();
@@ -70,7 +70,7 @@ export async function withBypassRLS<T>(
 ): Promise<T> {
   return db.transaction(async (tx) => {
     await tx.execute(sql`SET LOCAL row_security = OFF`);
-    const result = await operation(tx as any);
+    const result = await operation(tx as unknown as DrizzleDB);
     await tx.execute(sql`SET LOCAL row_security = ON`);
     return result;
   });
