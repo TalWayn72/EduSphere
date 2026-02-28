@@ -58,10 +58,14 @@ export function CourseEditPage() {
   const [published, setPublished] = useState<boolean | null>(null);
   const toastRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  // 'network-only' prevents urql from reading the cache synchronously during render,
+  // which would trigger setState on the still-unmounting CourseDetailPage and cause
+  // React's "Cannot update component while rendering different component" warning.
   const [{ data, fetching, error }, refetch] = useQuery<CourseDetailResult>({
     query: COURSE_DETAIL_QUERY,
     variables: { id: courseId },
     pause: !courseId,
+    requestPolicy: 'network-only',
   });
 
   const [{ fetching: publishing }, executePublish] = useMutation(PUBLISH_COURSE_MUTATION);

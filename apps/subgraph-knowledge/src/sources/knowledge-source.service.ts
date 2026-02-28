@@ -13,6 +13,7 @@ import {
   Logger,
   NotFoundException,
   OnModuleDestroy,
+  OnModuleInit,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -42,7 +43,7 @@ export type CreateSourceInput = {
 };
 
 @Injectable()
-export class KnowledgeSourceService implements OnModuleDestroy {
+export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(KnowledgeSourceService.name);
   private readonly db = createDatabaseConnection();
 
@@ -50,6 +51,26 @@ export class KnowledgeSourceService implements OnModuleDestroy {
     private readonly parser: DocumentParserService,
     private readonly embeddings: EmbeddingService
   ) {}
+
+  async onModuleInit(): Promise<void> {
+    // On startup, any sources still in PENDING or PROCESSING state are orphaned:
+    // their background tasks were killed when the service last restarted.
+    // Mark them FAILED so users see a clear error and can re-upload.
+    const stale = await this.db
+      .update(schema.knowledgeSources)
+      .set({
+        status: 'FAILED',
+        error_message: 'Processing was interrupted (service restarted)',
+      })
+      .where(inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING']))
+      .returning();
+
+    if (stale.length > 0) {
+      this.logger.warn(
+        `Startup cleanup: marked ${stale.length} stale PENDING/PROCESSING source(s) as FAILED`
+      );
+    }
+  }
 
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();

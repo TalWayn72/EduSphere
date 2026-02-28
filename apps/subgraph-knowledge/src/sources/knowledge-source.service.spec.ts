@@ -380,6 +380,28 @@ describe('KnowledgeSourceService', () => {
     });
   });
 
+  // ── onModuleInit ──────────────────────────────────────────────────────────
+
+  describe('onModuleInit()', () => {
+    it('marks stale PENDING/PROCESSING sources as FAILED on startup', async () => {
+      const failedSource = { ...MOCK_SOURCE, status: 'FAILED' as const };
+      mockUpdate.mockImplementation(buildUpdate(failedSource));
+
+      await service.onModuleInit();
+
+      expect(mockUpdate).toHaveBeenCalled();
+    });
+
+    it('does not throw when no stale sources exist', async () => {
+      const returning = vi.fn().mockResolvedValue([]);
+      const where = vi.fn().mockReturnValue({ returning });
+      const set = vi.fn().mockReturnValue({ where });
+      mockUpdate.mockReturnValue({ set });
+
+      await expect(service.onModuleInit()).resolves.toBeUndefined();
+    });
+  });
+
   // ── onModuleDestroy ────────────────────────────────────────────────────────
 
   describe('onModuleDestroy()', () => {
