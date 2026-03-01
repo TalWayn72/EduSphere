@@ -1,7 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import type { CourseFormData } from './course-create.types';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
