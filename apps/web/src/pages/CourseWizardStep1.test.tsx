@@ -44,7 +44,7 @@ const courseSchema = z.object({
 
 function Step1Wrapper({ defaultValues }: { defaultValues?: Partial<CourseSchemaValues> }) {
   const form = useForm<CourseSchemaValues>({
-    resolver: zodResolver(courseSchema),
+    resolver: zodResolver(courseSchema as never),
     defaultValues: {
       title: '',
       description: '',

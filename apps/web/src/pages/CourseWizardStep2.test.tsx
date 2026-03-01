@@ -1,6 +1,7 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import type { CourseFormData } from './course-create.types';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -35,11 +36,11 @@ const MODULE_B: CourseModule = { id: 'mod-b', title: 'Advanced Topics', descript
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('CourseWizardStep2', () => {
-  let onChange: ReturnType<typeof vi.fn>;
+  let onChange: MockedFunction<(updates: Partial<CourseFormData>) => void>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    onChange = vi.fn();
+    onChange = vi.fn() as MockedFunction<(updates: Partial<CourseFormData>) => void>;
   });
 
   it('shows empty state when no modules exist', () => {
@@ -88,7 +89,7 @@ describe('CourseWizardStep2', () => {
     fireEvent.change(titleInput, { target: { value: 'New Module' } });
     fireEvent.click(screen.getByRole('button', { name: /add module/i }));
     expect(onChange).toHaveBeenCalledOnce();
-    const { modules } = onChange.mock.calls[0][0] as { modules: CourseModule[] };
+    const { modules } = onChange.mock.calls[0]![0]! as { modules: CourseModule[] };
     expect(modules).toHaveLength(2);
     expect(modules[1]?.title).toBe('New Module');
   });
@@ -99,7 +100,7 @@ describe('CourseWizardStep2', () => {
     fireEvent.change(titleInput, { target: { value: 'Keyboard Module' } });
     fireEvent.keyDown(titleInput, { key: 'Enter', code: 'Enter' });
     expect(onChange).toHaveBeenCalledOnce();
-    const { modules } = onChange.mock.calls[0][0] as { modules: CourseModule[] };
+    const { modules } = onChange.mock.calls[0]![0]! as { modules: CourseModule[] };
     expect(modules[0]?.title).toBe('Keyboard Module');
   });
 
@@ -108,7 +109,7 @@ describe('CourseWizardStep2', () => {
     const removeBtns = screen.getAllByRole('button', { name: /remove module/i });
     fireEvent.click(removeBtns[0]!);
     expect(onChange).toHaveBeenCalledOnce();
-    const { modules } = onChange.mock.calls[0][0] as { modules: CourseModule[] };
+    const { modules } = onChange.mock.calls[0]![0]! as { modules: CourseModule[] };
     expect(modules).toHaveLength(1);
     expect(modules[0]?.id).toBe('mod-b');
   });
