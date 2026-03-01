@@ -7,6 +7,32 @@
 
 ---
 
+## ✅ FEAT-LESSON-001 — Lesson Pipeline Builder (01 Mar 2026)
+
+**Status:** ✅ Complete | **Severity:** 🟢 Feature | **Date:** 01 Mar 2026
+**Branch:** `feat/wave13-page-tests`
+
+### Summary
+
+Full end-to-end implementation of the AI-powered Lesson Pipeline Builder for Jewish religious education (THEMATIC + SEQUENTIAL archetypes). 181 new tests across 13 test files. All packages TypeScript-clean.
+
+| Phase | Files | Status |
+|-------|-------|--------|
+| Phase 1A: DB Schema (6 tables) + NATS events | `packages/db/src/schema/lesson.ts`, `events.ts` | ✅ |
+| Phase 1B: GraphQL SDL | `apps/subgraph-content/src/lesson/lesson.graphql` | ✅ |
+| Phase 1C: NestJS module (5 services + resolver) | `apps/subgraph-content/src/lesson/` | ✅ |
+| Phase 2: 8 LangGraph workflows | `packages/langgraph-workflows/src/` | ✅ |
+| Phase 3: 4 pages + components + store + queries | `apps/web/src/pages/`, `components/lesson-pipeline/` | ✅ |
+| Phase 4: 13 test files (181 tests) | All packages | ✅ |
+
+### Key Fixes During Implementation
+- `vi.hoisted()` required for all mock variables used inside `vi.mock()` factory functions (NatsDrain pattern)
+- `mockFn.mockReset()` (not `vi.clearAllMocks()`) needed in `beforeEach` to flush `mockResolvedValueOnce` queues
+- Zod v4: `z.record()` requires 2 args — `z.record(z.string(), z.unknown())`
+- `lessonType` must come from pipeline context, not from `tenantCtx.userRole`
+
+---
+
 ## ✅ BUG-FILE-001 — Knowledge Source File Upload Broken (27 Feb 2026)
 
 **Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 27 Feb 2026

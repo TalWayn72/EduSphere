@@ -1,5 +1,22 @@
 # EduSphere — Agent Memory
 
+## Lesson Pipeline Builder — COMPLETE (01 Mar 2026)
+
+Full AI-powered lesson pipeline: 4 phases, 41 new files, 181 new tests, all TypeScript-clean.
+
+### Critical Vitest Patterns (learned 01 Mar 2026)
+1. **`vi.hoisted()`**: ALL variables referenced inside `vi.mock()` factories MUST be declared via `vi.hoisted(() => ({...}))`. Regular `const` declarations AFTER `vi.mock` cause `ReferenceError: Cannot access 'X' before initialization`.
+2. **`mockFn.mockReset()` not `vi.clearAllMocks()`**: `clearAllMocks()` only clears call history; `mockReset()` also flushes `mockResolvedValueOnce`/`mockRejectedValueOnce` queues. Use in `beforeEach` for tests that use `.once()` chains.
+3. **Zod v4 `z.record()`**: requires 2 args: `z.record(z.string(), z.unknown())`.
+4. **LangGraph mock bypasses Annotation reducers**: Cap/array-size tests in workflow unit tests must account for the mock not applying `reducer` logic.
+
+### Test Counts After Wave 13 (01 Mar 2026)
+- web: **~1,807 passing (133 files)** | subgraph-content: **556** | langgraph-workflows: **154** | nats-client: **183** | db: **380**
+- Total: >5,000 tests
+
+### Packages Must Be Rebuilt After Schema Changes
+- `@edusphere/db` and `@edusphere/nats-client` import from `dist/` — always run `pnpm --filter @edusphere/<pkg> build` after modifying source types.
+
 ## Project Status (Feb 2026)
 
 - Branch: `fix/bug-16-23-g18` → PR #2 open against `master` (https://github.com/TalWayn72/EduSphere/pull/2)

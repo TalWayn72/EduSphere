@@ -36,6 +36,13 @@
       "when": 1772200000000,
       "tag": "0004_discussion_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1772354898484,
+      "tag": "0005_absurd_tyger_tiger",
+      "breakpoints": true
     }
   ]
 }

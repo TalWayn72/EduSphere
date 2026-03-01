@@ -26,6 +26,7 @@ import { AssessmentModule } from './assessment/assessment.module';
 import { MarketplaceModule } from './marketplace/marketplace.module';
 import { OpenBadgeModule } from './open-badges/open-badge.module';
 import { LibraryModule } from './course-library/library.module';
+import { LessonModule } from './lesson/lesson.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { LibraryModule } from './course-library/library.module';
     MarketplaceModule,
     OpenBadgeModule,
     LibraryModule,
+    LessonModule,
   ],
 })
 export class AppModule {}
