@@ -407,4 +407,71 @@ describe('CourseList', () => {
     fireEvent.click(unpublishBtns[0]!);
     expect(mockNavigate).not.toHaveBeenCalled();
   });
+
+  // ── Search ──────────────────────────────────────────────────────────────────
+
+  it('renders search input', () => {
+    renderCourseList();
+    expect(screen.getByRole('textbox', { name: /search courses/i })).toBeInTheDocument();
+  });
+
+  it('filters courses by title when searching', () => {
+    renderCourseList();
+    const input = screen.getByRole('textbox', { name: /search courses/i });
+    // 'Knowledge' only appears in course-3 title; absent from all other titles/descriptions
+    fireEvent.change(input, { target: { value: 'Knowledge' } });
+    expect(screen.getByText('Knowledge Graph Navigation')).toBeInTheDocument();
+    expect(screen.queryByText('Introduction to Talmud Study')).not.toBeInTheDocument();
+    expect(screen.queryByText('Advanced Chavruta Techniques')).not.toBeInTheDocument();
+  });
+
+  it('filters courses by description when searching', () => {
+    renderCourseList();
+    const input = screen.getByRole('textbox', { name: /search courses/i });
+    // 'AI' only appears in course-2 description ('Collaborative Talmud learning with AI')
+    fireEvent.change(input, { target: { value: 'AI' } });
+    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(screen.queryByText('Knowledge Graph Navigation')).not.toBeInTheDocument();
+  });
+
+  it('shows all courses when search is cleared', () => {
+    renderCourseList();
+    const input = screen.getByRole('textbox', { name: /search courses/i });
+    fireEvent.change(input, { target: { value: 'talmud' } });
+    fireEvent.change(input, { target: { value: '' } });
+    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(screen.getByText('Knowledge Graph Navigation')).toBeInTheDocument();
+  });
+
+  // ── Sort ────────────────────────────────────────────────────────────────────
+
+  it('renders sort dropdown', () => {
+    renderCourseList();
+    expect(screen.getByRole('combobox', { name: /sort courses/i })).toBeInTheDocument();
+  });
+
+  it('sorts courses A→Z by title when title sort selected', () => {
+    renderCourseList();
+    const select = screen.getByRole('combobox', { name: /sort courses/i });
+    fireEvent.change(select, { target: { value: 'title' } });
+    const titles = screen
+      .getAllByRole('heading', { level: 3 })
+      .map((h) => h.textContent ?? '');
+    const sorted = [...titles].sort((a, b) => a.localeCompare(b));
+    expect(titles).toEqual(sorted);
+  });
+
+  // ── Tab filter (students only) ───────────────────────────────────────────────
+
+  it('renders All and My Courses tabs for students', () => {
+    renderCourseList(STUDENT_USER);
+    expect(screen.getByRole('tab', { name: /^all$/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /my courses/i })).toBeInTheDocument();
+  });
+
+  it('does not render tab filter for instructors', () => {
+    renderCourseList(INSTRUCTOR_USER);
+    expect(screen.queryByRole('tab', { name: /my courses/i })).not.toBeInTheDocument();
+  });
 });

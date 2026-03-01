@@ -1,4 +1,5 @@
 import { useQuery } from 'urql';
+import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import {
   LEADERBOARD_QUERY,
@@ -30,12 +31,12 @@ export function LeaderboardWidget() {
   const [leaderboardResult] = useQuery<LeaderboardResult>({
     query: LEADERBOARD_QUERY,
     variables: { limit: 5 },
-    pause: true, // leaderboard not in live gateway
+    pause: false,
   });
 
   const [rankResult] = useQuery<MyRankResult>({
     query: MY_RANK_QUERY,
-    pause: true, // myRank not in live gateway
+    pause: false,
   });
 
   const entries = leaderboardResult.data?.leaderboard ?? [];
@@ -88,6 +89,14 @@ export function LeaderboardWidget() {
             Your rank: #{myRank}
           </p>
         )}
+        <div className="pt-2 border-t text-center">
+          <Link
+            to="/leaderboard"
+            className="text-xs text-primary hover:underline"
+          >
+            View full leaderboard →
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );

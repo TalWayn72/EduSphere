@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 
@@ -25,6 +25,7 @@ import {
   AlertTriangle,
   Pencil,
   Sparkles,
+  Search,
 } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { COURSES_QUERY } from '@/lib/queries';
@@ -168,6 +169,10 @@ export function CourseList() {
     { id: string }
   >(UNPUBLISH_COURSE_MUTATION);
 
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<'newest' | 'title' | 'duration'>('newest');
+  const [activeTab, setActiveTab] = useState<'all' | 'enrolled'>('all');
+
   const [localPublishState, setLocalPublishState] = useState<
     Map<string, boolean>
   >(new Map());
@@ -262,7 +267,38 @@ export function CourseList() {
       : course.isPublished;
 
   // On error, fall back to mock courses so the page remains functional
-  const allCourses = error ? MOCK_COURSES_FALLBACK : (data?.courses ?? []);
+  const allCourses = useMemo(
+    () => (error ? MOCK_COURSES_FALLBACK : (data?.courses ?? [])),
+    [error, data]
+  );
+
+  const filteredCourses = useMemo(() => {
+    const enrolledIds = new Set(
+      (enrollmentsData?.myEnrollments ?? [])
+        .filter((e) => e.status === 'ACTIVE')
+        .map((e) => e.courseId)
+    );
+    let list = allCourses;
+    if (!isInstructor && activeTab === 'enrolled') {
+      list = list.filter((c) => enrolledIds.has(c.id));
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) ||
+          c.description?.toLowerCase().includes(q)
+      );
+    }
+    if (sort === 'title') {
+      list = [...list].sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sort === 'duration') {
+      list = [...list].sort(
+        (a, b) => (b.estimatedHours ?? 0) - (a.estimatedHours ?? 0)
+      );
+    }
+    return list;
+  }, [allCourses, enrollmentsData, search, sort, activeTab, isInstructor]);
 
   return (
     <Layout>
@@ -307,6 +343,61 @@ export function CourseList() {
           )}
         </div>
 
+        {/* Search + Tab + Sort row */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search courses..."
+              aria-label="Search courses"
+              className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          {!isInstructor && (
+            <div className="flex rounded-md border overflow-hidden shrink-0" role="tablist" aria-label="Course filter">
+              <button
+                role="tab"
+                aria-selected={activeTab === 'all'}
+                onClick={() => setActiveTab('all')}
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'all'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                All
+              </button>
+              <button
+                role="tab"
+                aria-selected={activeTab === 'enrolled'}
+                onClick={() => setActiveTab('enrolled')}
+                className={`px-3 py-2 text-sm font-medium border-l transition-colors ${
+                  activeTab === 'enrolled'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                My Courses
+              </button>
+            </div>
+          )}
+          <select
+            value={sort}
+            onChange={(e) =>
+              setSort(e.target.value as 'newest' | 'title' | 'duration')
+            }
+            aria-label="Sort courses"
+            className="px-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring shrink-0"
+          >
+            <option value="newest">Newest</option>
+            <option value="title">A → Z</option>
+            <option value="duration">Duration</option>
+          </select>
+        </div>
+
         {fetching && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -315,7 +406,7 @@ export function CourseList() {
         )}
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {allCourses.map((course) => {
+          {filteredCourses.map((course) => {
             const published = isPublished(course);
             const isEnrolled = enrolledCourseIds.has(course.id);
             return (
@@ -442,7 +533,7 @@ export function CourseList() {
           })}
         </div>
 
-        {!fetching && allCourses.length === 0 && (
+        {!fetching && filteredCourses.length === 0 && (
           <Card>
             <CardContent className="pt-6 text-center">
               <Users className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />

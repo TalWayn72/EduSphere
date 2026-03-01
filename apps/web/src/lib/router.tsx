@@ -262,6 +262,11 @@ const NotificationsPage = lazy(() =>
     default: m.NotificationsPage,
   }))
 );
+const LeaderboardPage = lazy(() =>
+  import('@/pages/LeaderboardPage').then((m) => ({
+    default: m.LeaderboardPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -345,6 +350,11 @@ export const router = createBrowserRouter([
         <NotificationsPage />
       </Suspense>
     ),
+  },
+  {
+    // Leaderboard — top 50 users by XP points
+    path: '/leaderboard',
+    element: guarded(<LeaderboardPage />),
   },
   {
     // Dedicated route for QUIZ content items
