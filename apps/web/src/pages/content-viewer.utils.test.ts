@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { formatTime, LAYER_META, SPEED_OPTIONS } from './content-viewer.utils';
+import { render } from '@testing-library/react';
+import React from 'react';
+import { formatTime, highlightText, LAYER_META, SPEED_OPTIONS } from './content-viewer.utils';
 
 describe('formatTime', () => {
   it('formats 0 seconds as 0:00', () => {
@@ -57,6 +59,52 @@ describe('LAYER_META', () => {
 
   it('AI_GENERATED layer has correct label', () => {
     expect(LAYER_META['AI_GENERATED']!.label).toBe('AI');
+  });
+});
+
+// ── highlightText ──────────────────────────────────────────────────────────────
+
+describe('highlightText', () => {
+  it('returns plain text when query is empty', () => {
+    expect(highlightText('Hello world', '')).toBe('Hello world');
+  });
+
+  it('returns plain text when query is whitespace', () => {
+    expect(highlightText('Hello world', '   ')).toBe('Hello world');
+  });
+
+  it('returns plain text when query is 1 character', () => {
+    expect(highlightText('Hello world', 'H')).toBe('Hello world');
+  });
+
+  it('wraps matching text in <mark> element', () => {
+    const result = highlightText('Hello world', 'world');
+    const { getByText } = render(React.createElement(React.Fragment, null, result));
+    expect(getByText('world').tagName).toBe('MARK');
+  });
+
+  it('is case-insensitive for matching', () => {
+    const result = highlightText('Hello World', 'world');
+    const { getByText } = render(React.createElement(React.Fragment, null, result));
+    expect(getByText('World').tagName).toBe('MARK');
+  });
+
+  it('highlights multiple occurrences', () => {
+    const result = highlightText('foo and foo', 'foo');
+    const { getAllByText } = render(React.createElement(React.Fragment, null, result));
+    const marks = getAllByText('foo');
+    expect(marks).toHaveLength(2);
+    marks.forEach((m) => expect(m.tagName).toBe('MARK'));
+  });
+
+  it('renders non-matching text as <span>', () => {
+    const result = highlightText('Hello world', 'world');
+    const { container } = render(React.createElement(React.Fragment, null, result));
+    expect(container.querySelectorAll('span').length).toBeGreaterThan(0);
+  });
+
+  it('escapes special regex characters in query', () => {
+    expect(() => highlightText('price: $5.00', '$5.00')).not.toThrow();
   });
 });
 
