@@ -56,7 +56,7 @@ function BadgeCard({ userBadge }: { userBadge: UserBadgeData }) {
 export function BadgesGrid({ badges: propBadges }: BadgesGridProps) {
   const [result] = useQuery<MyBadgesResult>({
     query: MY_BADGES_QUERY,
-    pause: true, // myBadges not in live gateway
+    pause: false,
   });
 
   const badges = propBadges ?? result.data?.myBadges ?? [];

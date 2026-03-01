@@ -20,6 +20,7 @@ import {
   LayoutDashboard,
   Award,
   Brain,
+  Trophy,
 } from 'lucide-react';
 import { useSrsQueueCount } from '@/hooks/useSrsQueueCount';
 
@@ -125,6 +126,28 @@ export function Layout({ children }: LayoutProps) {
                             {srsCount > 99 ? '99+' : srsCount}
                           </span>
                         )}
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
+                )}
+                {/* Leaderboard — visible to all logged-in users */}
+                {user && (
+                  <NavLink
+                    to="/leaderboard"
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-accent text-accent-foreground'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+                      ].join(' ')
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <Trophy className="h-4 w-4" />
+                        <span>Leaderboard</span>
                         <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
                       </>
                     )}
@@ -323,6 +346,17 @@ export function Layout({ children }: LayoutProps) {
                       {srsCount > 99 ? '99+' : srsCount}
                     </span>
                   )}
+                </Link>
+              )}
+              {/* Leaderboard — mobile */}
+              {user && (
+                <Link
+                  to="/leaderboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
+                  <Trophy className="h-4 w-4" />
+                  <span>Leaderboard</span>
                 </Link>
               )}
               {isAdmin && (

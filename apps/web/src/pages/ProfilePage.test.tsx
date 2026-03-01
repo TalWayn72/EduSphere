@@ -152,7 +152,7 @@ describe('ProfilePage', () => {
     renderPage();
     expect(screen.getByText('Learning Overview')).toBeInTheDocument();
     expect(screen.getByText('Courses Available')).toBeInTheDocument();
-    expect(screen.getByText('Concepts Mastered')).toBeInTheDocument();
+    expect(screen.getByText('XP Points')).toBeInTheDocument();
     expect(screen.getByText('Annotations Created')).toBeInTheDocument();
   });
 
@@ -289,6 +289,44 @@ describe('ProfilePage', () => {
     // ROLE_LABELS['CUSTOM_ROLE'] → undefined → ?? 'CUSTOM_ROLE' (raw role)
     // ROLE_COLORS['CUSTOM_ROLE'] → undefined → ?? 'bg-gray-100 text-gray-700'
     expect(screen.getAllByText('CUSTOM_ROLE').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // ── XP Points stat (MY_TOTAL_POINTS_QUERY) ────────────────────────────────
+
+  it('shows XP points when myTotalPoints data is available', () => {
+    vi.mocked(urqlModule.useQuery)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: { myTotalPoints: 1250 }, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    expect(screen.getByText('1,250')).toBeInTheDocument();
+  });
+
+  it('shows "..." for XP Points while loading', () => {
+    vi.mocked(urqlModule.useQuery)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as never)
+      .mockReturnValueOnce([
+        { data: undefined, fetching: true, error: undefined },
+        vi.fn(),
+      ] as never);
+    renderPage();
+    expect(screen.getByText('...')).toBeInTheDocument();
   });
 
   // ── ProfileVisibilityCard rendered when userId is truthy (line 241) ────────

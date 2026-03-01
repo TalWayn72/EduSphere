@@ -9,7 +9,7 @@ import {
   Shield,
   Key,
   BookOpen,
-  Brain,
+  Trophy,
   MessageSquare,
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
@@ -18,6 +18,7 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getCurrentUser } from '@/lib/auth';
 import { ME_QUERY, COURSES_QUERY } from '@/lib/queries';
+import { MY_TOTAL_POINTS_QUERY } from '@/lib/graphql/gamification.queries';
 import { BadgesGrid } from '@/components/BadgesGrid';
 import { ProfileVisibilityCard } from './ProfileVisibilityCard';
 
@@ -61,6 +62,10 @@ interface CoursesQueryResult {
   courses: { id: string }[];
 }
 
+interface MyTotalPointsResult {
+  myTotalPoints: number;
+}
+
 function getInitials(
   firstName: string,
   lastName: string,
@@ -81,6 +86,7 @@ export function ProfilePage() {
     query: COURSES_QUERY,
     variables: { limit: 100, offset: 0 },
   });
+  const [pointsResult] = useQuery<MyTotalPointsResult>({ query: MY_TOTAL_POINTS_QUERY });
 
   if (!localUser) {
     return <Navigate to="/login" replace />;
@@ -100,13 +106,19 @@ export function ProfilePage() {
   const roleColor = ROLE_COLORS[role] ?? 'bg-gray-100 text-gray-700';
   const coursesCount = coursesResult.data?.courses?.length ?? '—';
 
+  const totalPoints = pointsResult.data?.myTotalPoints;
+
   const stats = [
     {
       icon: BookOpen,
       label: t('profile.stats.coursesAvailable'),
       value: coursesResult.fetching ? '...' : String(coursesCount),
     },
-    { icon: Brain, label: t('profile.stats.conceptsMastered'), value: '—' },
+    {
+      icon: Trophy,
+      label: 'XP Points',
+      value: pointsResult.fetching ? '...' : totalPoints !== undefined ? totalPoints.toLocaleString() : '—',
+    },
     {
       icon: MessageSquare,
       label: t('profile.stats.annotationsCreated'),

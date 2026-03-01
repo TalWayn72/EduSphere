@@ -139,6 +139,28 @@ describe('Layout', () => {
     expect(screen.getByText('My Badges')).toBeInTheDocument();
   });
 
+  // ── Leaderboard nav item ────────────────────────────────────────────────
+
+  it('shows "Leaderboard" nav link for logged-in users', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
+    renderLayout();
+    expect(screen.getByText('Leaderboard')).toBeInTheDocument();
+  });
+
+  it('does NOT show "Leaderboard" nav link when no user is logged in', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(null);
+    renderLayout();
+    expect(screen.queryByText('Leaderboard')).not.toBeInTheDocument();
+  });
+
+  it('shows "Leaderboard" in mobile menu for logged-in user', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    const links = screen.getAllByText('Leaderboard');
+    expect(links.length).toBeGreaterThanOrEqual(2);
+  });
+
   // ── Admin-only compliance nav items ────────────────────────────────────
 
   it('shows "Admin Panel" nav link for ORG_ADMIN', () => {

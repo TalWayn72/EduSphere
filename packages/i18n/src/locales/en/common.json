@@ -44,7 +44,7 @@
     },
     "stats": {
       "coursesAvailable": "Courses Available",
-      "conceptsMastered": "Concepts Mastered",
+      "xpPoints": "XP Points",
       "annotationsCreated": "Annotations Created"
     }
   }
