@@ -31,7 +31,7 @@ describe('ScenarioPlayer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false } as urql.OperationResultState,
+      { fetching: false } as never,
       NOOP_EXECUTE,
     ]);
   });
@@ -92,7 +92,7 @@ describe('ScenarioPlayer', () => {
     });
 
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false } as urql.OperationResultState,
+      { fetching: false } as never,
       vi.fn().mockResolvedValue({
         data: { recordScenarioChoice: nextNode },
         error: undefined,
@@ -155,7 +155,7 @@ describe('ScenarioPlayer', () => {
 
   it('does not navigate when recordChoice returns an error', async () => {
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false } as urql.OperationResultState,
+      { fetching: false } as never,
       vi.fn().mockResolvedValue({
         data: null,
         error: { message: 'GraphQL error' },
