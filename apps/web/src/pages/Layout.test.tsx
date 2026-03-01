@@ -26,6 +26,11 @@ vi.mock('@/hooks/useNotifications', () => ({
   }),
 }));
 
+// Mock useSrsQueueCount so SRS nav badge doesn't need a urql Provider
+vi.mock('@/hooks/useSrsQueueCount', () => ({
+  useSrsQueueCount: () => 0,
+}));
+
 import { getCurrentUser } from '@/lib/auth';
 
 const MOCK_USER: AuthUser = {

@@ -19,7 +19,9 @@ import {
   Link2,
   LayoutDashboard,
   Award,
+  Brain,
 } from 'lucide-react';
+import { useSrsQueueCount } from '@/hooks/useSrsQueueCount';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -64,6 +66,7 @@ export function Layout({ children }: LayoutProps) {
   const isAdmin = user ? ADMIN_ROLES.has(user.role) : false;
   const isComplianceAdmin = user ? COMPLIANCE_ROLES.has(user.role) : false;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const srsCount = useSrsQueueCount(!user);
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,6 +103,33 @@ export function Layout({ children }: LayoutProps) {
                     )}
                   </NavLink>
                 ))}
+                {/* SRS review link — visible to all logged-in users, shows due count badge */}
+                {user && (
+                  <NavLink
+                    to="/srs-review"
+                    className={({ isActive }) =>
+                      [
+                        'flex items-center space-x-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-accent text-accent-foreground'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+                      ].join(' ')
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <Brain className="h-4 w-4" />
+                        <span>SRS</span>
+                        {srsCount > 0 && (
+                          <span className="ml-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                            {srsCount > 99 ? '99+' : srsCount}
+                          </span>
+                        )}
+                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                      </>
+                    )}
+                  </NavLink>
+                )}
                 {/* Admin-only: show course creation entry point */}
                 {isAdmin && (
                   <NavLink
@@ -279,6 +309,22 @@ export function Layout({ children }: LayoutProps) {
                   <span>{label}</span>
                 </Link>
               ))}
+              {/* SRS review — mobile */}
+              {user && (
+                <Link
+                  to="/srs-review"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
+                  <Brain className="h-4 w-4" />
+                  <span>SRS</span>
+                  {srsCount > 0 && (
+                    <span className="ml-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                      {srsCount > 99 ? '99+' : srsCount}
+                    </span>
+                  )}
+                </Link>
+              )}
               {isAdmin && (
                 <Link
                   to="/courses/new"

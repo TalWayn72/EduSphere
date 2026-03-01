@@ -257,6 +257,11 @@ const MyOpenBadgesPage = lazy(() =>
     default: m.MyOpenBadgesPage,
   }))
 );
+const NotificationsPage = lazy(() =>
+  import('@/pages/NotificationsPage').then((m) => ({
+    default: m.NotificationsPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -329,6 +334,15 @@ export const router = createBrowserRouter([
     element: guarded(
       <Suspense fallback={<PageLoader />}>
         <SrsReviewPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Notifications full dashboard — all notifications with filters + date grouping
+    path: '/notifications',
+    element: guarded(
+      <Suspense fallback={<PageLoader />}>
+        <NotificationsPage />
       </Suspense>
     ),
   },
