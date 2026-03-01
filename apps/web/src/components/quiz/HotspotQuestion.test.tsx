@@ -16,10 +16,10 @@ const mockItem: Hotspot = {
 };
 
 describe('HotspotQuestion', () => {
-  let onChange: ReturnType<typeof vi.fn>;
+  let onChange: (value: string[]) => void;
 
   beforeEach(() => {
-    onChange = vi.fn();
+    onChange = vi.fn() as unknown as (value: string[]) => void;
   });
 
   it('renders the question text', () => {
