@@ -107,6 +107,7 @@ describe('QuizPlayer', () => {
     vi.mocked(useGradeQuizModule.useGradeQuiz).mockReturnValue({
       gradeQuiz: vi.fn().mockResolvedValue(null),
       loading: false,
+      error: null,
     });
   });
 
@@ -176,6 +177,7 @@ describe('QuizPlayer', () => {
     vi.mocked(useGradeQuizModule.useGradeQuiz).mockReturnValue({
       gradeQuiz,
       loading: false,
+      error: null,
     });
     render(<QuizPlayer quizContent={MOCK_QUIZ} contentItemId="item-1" />);
     // Navigate to last question
