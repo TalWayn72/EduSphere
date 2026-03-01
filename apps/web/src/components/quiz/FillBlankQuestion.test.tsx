@@ -13,10 +13,10 @@ const makeItem = (overrides?: Partial<FillBlank>): FillBlank => ({
 });
 
 describe('FillBlankQuestion', () => {
-  let onChange: ReturnType<typeof vi.fn>;
+  let onChange: (value: string) => void;
 
   beforeEach(() => {
-    onChange = vi.fn();
+    onChange = vi.fn() as unknown as (value: string) => void;
   });
 
   it('renders inline input when question contains {{blank}}', () => {
