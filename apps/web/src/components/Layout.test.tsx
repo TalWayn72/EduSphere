@@ -44,7 +44,7 @@ vi.mock('@/components/NotificationBell', () => ({
 /* ── SRS queue count hook ── */
 const mockUseSrsQueueCount = vi.fn(() => 0);
 vi.mock('@/hooks/useSrsQueueCount', () => ({
-  useSrsQueueCount: (pause: boolean) => mockUseSrsQueueCount(pause),
+  useSrsQueueCount: () => mockUseSrsQueueCount(),
 }));
 
 /* ── shadcn Button ── */
