@@ -17,6 +17,15 @@ vi.mock('@/components/UserMenu', () => ({
   ),
 }));
 
+// Mock useNotifications so NotificationBell doesn't need a urql Provider
+vi.mock('@/hooks/useNotifications', () => ({
+  useNotifications: () => ({
+    notifications: [],
+    unreadCount: 0,
+    markAsRead: vi.fn(),
+  }),
+}));
+
 import { getCurrentUser } from '@/lib/auth';
 
 const MOCK_USER: AuthUser = {

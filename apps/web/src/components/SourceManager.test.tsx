@@ -58,6 +58,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
+  // @ts-expect-error — React 19 ReactNode includes bigint; @tanstack/react-query types use React 18
   return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
 }
 
