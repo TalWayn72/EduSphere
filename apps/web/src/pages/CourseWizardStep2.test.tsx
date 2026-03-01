@@ -26,7 +26,7 @@ vi.mock('react-i18next', () => ({
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { CourseWizardStep2 } from './CourseWizardStep2';
-import type { CourseModule } from './course-create.types';
+import type { CourseModule, CourseFormData } from './course-create.types';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
