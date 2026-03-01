@@ -14,6 +14,17 @@ vi.mock('urql', () => ({
   useMutation: vi.fn(),
 }));
 
+// Mock Layout to avoid rendering the full nav/header with its own hooks
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+}));
+
+// Mock auth so getCurrentUser() returns a stable dev user
+vi.mock('@/lib/auth', () => ({
+  getCurrentUser: vi.fn(() => ({ id: 'dev-user-1', username: 'developer', role: 'STUDENT' })),
+  isAuthenticated: vi.fn(() => true),
+}));
+
 // Mock useSrsSession so page tests are isolated from hook logic
 vi.mock('@/hooks/useSrsSession');
 
@@ -36,6 +47,7 @@ const defaultSession = {
   currentCard: mockCard,
   totalDue: 3,
   fetching: false,
+  error: undefined,
   submitRating: vi.fn(),
   sessionComplete: false,
   stats: { correct: 0, incorrect: 0 },
@@ -173,5 +185,24 @@ describe('SrsReviewPage', () => {
     renderPage();
     fireEvent.click(screen.getByTestId('flashcard'));
     expect(screen.getByTestId('rating-buttons')).toBeInTheDocument();
+  });
+
+  it('shows error state when query fails', () => {
+    vi.mocked(useSrsSession).mockReturnValue({
+      ...defaultSession,
+      fetching: false,
+      error: new Error('Network error') as ReturnType<typeof Error>,
+      currentCard: null,
+      totalDue: 0,
+    });
+    renderPage();
+    expect(screen.getByTestId('error-state')).toBeInTheDocument();
+    // error.message is rendered verbatim (not translated)
+    expect(screen.getByText('Network error')).toBeInTheDocument();
+  });
+
+  it('wraps content in Layout', () => {
+    renderPage();
+    expect(screen.getByTestId('layout')).toBeInTheDocument();
   });
 });

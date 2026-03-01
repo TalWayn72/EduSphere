@@ -28,6 +28,7 @@ export interface UseSrsSessionReturn {
   currentCard: SrsCard | null;
   totalDue: number;
   fetching: boolean;
+  error: Error | undefined;
   submitRating: (quality: 0 | 1 | 2 | 3 | 4 | 5) => void;
   sessionComplete: boolean;
   stats: SrsSessionStats;
@@ -82,6 +83,7 @@ export function useSrsSession(userId?: string): UseSrsSessionReturn {
     currentCard: sessionCards[currentIndex] ?? null,
     totalDue: sessionCards.length,
     fetching: result.fetching,
+    error: result.error,
     submitRating,
     sessionComplete,
     stats: { correct: correctCount, incorrect: incorrectCount },
