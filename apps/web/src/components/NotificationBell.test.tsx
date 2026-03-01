@@ -13,6 +13,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { NotificationBell } from './NotificationBell';
 import type { AppNotification } from '@/hooks/useNotifications';
@@ -60,12 +61,12 @@ describe('NotificationBell', () => {
   });
 
   it('renders the bell button', () => {
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
   });
 
   it('shows no badge when there are no unread notifications', () => {
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     // badge should not be visible
     const button = screen.getByRole('button', { name: /notifications$/i });
     expect(button).toHaveAttribute('aria-label', 'Notifications');
@@ -74,7 +75,7 @@ describe('NotificationBell', () => {
   it('shows badge count when there are unread notifications', () => {
     mockUnreadCount = 3;
     mockNotifications = [makeNotification(), makeNotification(), makeNotification()];
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /3 unread/i })
@@ -83,26 +84,26 @@ describe('NotificationBell', () => {
 
   it('caps badge at 9+ when unread > 9', () => {
     mockUnreadCount = 15;
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     expect(screen.getByText('9+')).toBeInTheDocument();
   });
 
   it('opens dropdown when bell is clicked', async () => {
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     const bell = screen.getByRole('button', { name: /notifications/i });
     await userEvent.click(bell);
     expect(screen.getByRole('dialog', { name: /notifications panel/i })).toBeInTheDocument();
   });
 
   it('shows empty state when no notifications exist', async () => {
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
     expect(screen.getByText(/no notifications yet/i)).toBeInTheDocument();
   });
 
   it('renders notification items with title and body', async () => {
     mockNotifications = [makeNotification({ title: 'Badge Earned!', body: 'You earned a new badge.' })];
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
     expect(screen.getByText('Badge Earned!')).toBeInTheDocument();
     expect(screen.getByText('You earned a new badge.')).toBeInTheDocument();
@@ -111,7 +112,7 @@ describe('NotificationBell', () => {
   it('calls markAsRead when a notification is clicked', async () => {
     const notif = makeNotification({ id: 'n-1' });
     mockNotifications = [notif];
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
     const notifButton = screen.getByRole('button', { name: /Unread: Test Notification/i });
     await userEvent.click(notifButton);
@@ -121,7 +122,7 @@ describe('NotificationBell', () => {
   it('shows "Mark all read" button only when there are unread notifications', async () => {
     mockUnreadCount = 2;
     mockNotifications = [makeNotification(), makeNotification()];
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
     expect(screen.getByRole('button', { name: /mark all read/i })).toBeInTheDocument();
   });
@@ -133,7 +134,7 @@ describe('NotificationBell', () => {
     mockNotifications = [n1, n2, n3];
     mockUnreadCount = 2;
 
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
     await userEvent.click(screen.getByRole('button', { name: /mark all read/i }));
 
@@ -145,10 +146,12 @@ describe('NotificationBell', () => {
 
   it('closes dropdown when clicking outside', async () => {
     render(
-      <div>
-        <NotificationBell />
-        <div data-testid="outside">Outside</div>
-      </div>
+      <MemoryRouter>
+        <div>
+          <NotificationBell />
+          <div data-testid="outside">Outside</div>
+        </div>
+      </MemoryRouter>
     );
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -162,7 +165,7 @@ describe('NotificationBell', () => {
       makeNotification({ type: 'BADGE_ISSUED', title: 'Badge' }),
       makeNotification({ type: 'SRS_REVIEW_DUE', title: 'SRS Due' }),
     ];
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
     // Emoji icons are rendered as aria-hidden spans
     const container = screen.getByRole('dialog');
@@ -174,9 +177,12 @@ describe('NotificationBell', () => {
     mockNotifications = Array.from({ length: 15 }, (_, i) =>
       makeNotification({ id: `n${i}`, title: `Notification ${i}` })
     );
-    render(<NotificationBell />);
+    render(<MemoryRouter><NotificationBell /></MemoryRouter>);
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }));
-    // Should show "Showing 10 of 15"
-    expect(screen.getByText(/showing 10 of 15/i)).toBeInTheDocument();
+    // "View all" footer link is always shown; only 10 items should be displayed
+    expect(screen.getByRole('link', { name: /view all notifications/i })).toBeInTheDocument();
+    const items = screen.getAllByRole('button', { name: /notification/i });
+    // The bell button itself + up to 10 notification buttons
+    expect(items.length).toBeLessThanOrEqual(11);
   });
 });

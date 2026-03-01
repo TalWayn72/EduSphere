@@ -11,6 +11,7 @@
  * Memory safety: useNotifications pauses the WebSocket subscription on unmount.
  */
 import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -165,13 +166,16 @@ export function NotificationBell() {
             )}
           </div>
 
-          {notifications.length > 10 && (
-            <div className="px-4 py-2 border-t text-center">
-              <p className="text-xs text-muted-foreground">
-                Showing 10 of {notifications.length} notifications
-              </p>
-            </div>
-          )}
+          {/* Footer: "View all" link to full notifications page */}
+          <div className="px-4 py-2 border-t text-center">
+            <Link
+              to="/notifications"
+              className="text-xs text-primary hover:underline"
+              onClick={() => setOpen(false)}
+            >
+              View all notifications →
+            </Link>
+          </div>
         </div>
       )}
     </div>
