@@ -267,6 +267,26 @@ const LeaderboardPage = lazy(() =>
     default: m.LeaderboardPage,
   }))
 );
+const CreateLessonPage = lazy(() =>
+  import('@/pages/CreateLessonPage').then((m) => ({
+    default: m.CreateLessonPage,
+  }))
+);
+const LessonDetailPage = lazy(() =>
+  import('@/pages/LessonDetailPage').then((m) => ({
+    default: m.LessonDetailPage,
+  }))
+);
+const LessonPipelinePage = lazy(() =>
+  import('@/pages/LessonPipelinePage').then((m) => ({
+    default: m.LessonPipelinePage,
+  }))
+);
+const LessonResultsPage = lazy(() =>
+  import('@/pages/LessonResultsPage').then((m) => ({
+    default: m.LessonResultsPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -376,6 +396,23 @@ export const router = createBrowserRouter([
   {
     path: '/courses/:courseId/edit',
     element: guarded(<CourseEditPage />),
+  },
+  {
+    // Create lesson — must come before :courseId to avoid route shadowing
+    path: '/courses/:courseId/lessons/new',
+    element: guarded(<CreateLessonPage />),
+  },
+  {
+    path: '/courses/:courseId/lessons/:lessonId/pipeline',
+    element: guarded(<LessonPipelinePage />),
+  },
+  {
+    path: '/courses/:courseId/lessons/:lessonId/results',
+    element: guarded(<LessonResultsPage />),
+  },
+  {
+    path: '/courses/:courseId/lessons/:lessonId',
+    element: guarded(<LessonDetailPage />),
   },
   {
     path: '/courses/:courseId',

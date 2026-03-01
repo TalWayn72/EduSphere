@@ -21,6 +21,7 @@ import {
   MY_ENROLLMENTS_QUERY,
   MY_COURSE_PROGRESS_QUERY,
 } from '@/lib/graphql/content.queries';
+import { LESSONS_BY_COURSE_QUERY } from '@/lib/graphql/lesson.queries';
 import { CourseModuleList } from './CourseDetailPage.modules';
 import { SourceManager } from '@/components/SourceManager';
 import {
@@ -67,6 +68,18 @@ interface CourseDetailData {
 
 interface CourseDetailResult {
   course: CourseDetailData | null;
+}
+
+interface LessonSummary {
+  id: string;
+  title: string;
+  type: string;
+  status: string;
+  series?: string;
+}
+
+interface LessonsByCourseData {
+  lessonsByCourse: LessonSummary[];
 }
 
 interface EnrollmentData {
@@ -146,6 +159,12 @@ export function CourseDetailPage() {
   const [{ data: progressData }] = useQuery<ProgressData>({
     query: MY_COURSE_PROGRESS_QUERY,
     variables: { courseId },
+    pause: !courseId || !mounted,
+  });
+
+  const [{ data: lessonsData }] = useQuery<LessonsByCourseData>({
+    query: LESSONS_BY_COURSE_QUERY,
+    variables: { courseId, limit: 20 },
     pause: !courseId || !mounted,
   });
 
@@ -327,6 +346,56 @@ export function CourseDetailPage() {
 
         {/* Module list */}
         <CourseModuleList modules={course.modules} courseId={courseId} />
+
+        {/* Lessons section (F-Lesson Pipeline Builder) */}
+        {canEdit && (
+          <div className="border rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-white border-b">
+              <span className="text-sm font-medium flex items-center gap-2">
+                🎓 שיעורים
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate(`/courses/${courseId}/lessons/new`)}
+              >
+                + הוסף שיעור
+              </Button>
+            </div>
+            {lessonsData?.lessonsByCourse?.length ? (
+              <div className="divide-y">
+                {lessonsData.lessonsByCourse.map((lesson) => (
+                  <button
+                    key={lesson.id}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm text-left"
+                    onClick={() =>
+                      navigate(`/courses/${courseId}/lessons/${lesson.id}`)
+                    }
+                  >
+                    <span className="font-medium">{lesson.title}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        lesson.status === 'PUBLISHED'
+                          ? 'bg-blue-100 text-blue-700'
+                          : lesson.status === 'READY'
+                            ? 'bg-green-100 text-green-700'
+                            : lesson.status === 'PROCESSING'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {lesson.status}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="px-4 py-6 text-center text-sm text-gray-400">
+                אין שיעורים עדיין — לחץ "+ הוסף שיעור" כדי להתחיל
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Knowledge Sources — collapsible panel */}
         <div className="border rounded-xl overflow-hidden">

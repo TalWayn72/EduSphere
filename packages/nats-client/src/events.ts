@@ -141,6 +141,35 @@ export interface GatewayPubSubPayload {
   readonly data: Record<string, unknown>;
 }
 
+// ─── Lesson Pipeline Events ───────────────────────────────────────────────────
+
+export type LessonEventType =
+  | 'lesson.created'
+  | 'lesson.asset.uploaded'
+  | 'lesson.pipeline.started'
+  | 'lesson.pipeline.module.completed'
+  | 'lesson.pipeline.completed'
+  | 'lesson.published';
+
+export interface LessonPayload {
+  readonly type: LessonEventType;
+  readonly lessonId: string;
+  readonly courseId: string;
+  readonly tenantId: string;
+  readonly timestamp: string; // ISO 8601
+}
+
+export interface LessonPipelineModuleCompletedPayload {
+  readonly type: 'lesson.pipeline.module.completed';
+  readonly lessonId: string;
+  readonly runId: string;
+  readonly moduleType: string;
+  readonly moduleName: string;
+  readonly status: 'COMPLETED' | 'FAILED';
+  readonly tenantId: string;
+  readonly timestamp: string; // ISO 8601
+}
+
 // ─── Discriminated Union ─────────────────────────────────────────────────────
 
 export type NatsEvent =
@@ -154,7 +183,9 @@ export type NatsEvent =
   | ContentTranslationPayload
   | GatewayPubSubPayload
   | UserFollowedPayload
-  | PollVotePayload;
+  | PollVotePayload
+  | LessonPayload
+  | LessonPipelineModuleCompletedPayload;
 
 // ─── Type Guards ─────────────────────────────────────────────────────────────
 
@@ -309,6 +340,12 @@ export const NatsSubjects = {
   COURSE_ENROLLED: 'EDUSPHERE.course.enrolled',
   BADGE_ISSUED: 'EDUSPHERE.badge.issued',
   BADGE_REVOKED: 'EDUSPHERE.badge.revoked',
+  LESSON_CREATED: 'EDUSPHERE.lesson.created',
+  LESSON_ASSET_UPLOADED: 'EDUSPHERE.lesson.asset.uploaded',
+  LESSON_PIPELINE_STARTED: 'EDUSPHERE.lesson.pipeline.started',
+  LESSON_PIPELINE_MODULE_COMPLETED: 'EDUSPHERE.lesson.pipeline.module.completed',
+  LESSON_PIPELINE_COMPLETED: 'EDUSPHERE.lesson.pipeline.completed',
+  LESSON_PUBLISHED: 'EDUSPHERE.lesson.published',
 } as const;
 
 // ─── Course Enrolled Events (F-031 Instructor Marketplace) ───────────────────
@@ -394,5 +431,38 @@ export function isBadgeRevokedEvent(e: unknown): e is BadgeRevokedPayload {
     typeof obj['assertionId'] === 'string' &&
     typeof obj['tenantId'] === 'string' &&
     typeof obj['reason'] === 'string'
+  );
+}
+
+export function isLessonEvent(e: unknown): e is LessonPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  const LESSON_EVENT_TYPES = new Set([
+    'lesson.created',
+    'lesson.asset.uploaded',
+    'lesson.pipeline.started',
+    'lesson.pipeline.module.completed',
+    'lesson.pipeline.completed',
+    'lesson.published',
+  ]);
+  return (
+    typeof obj['lessonId'] === 'string' &&
+    typeof obj['courseId'] === 'string' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['type'] === 'string' &&
+    LESSON_EVENT_TYPES.has(obj['type'])
+  );
+}
+
+export function isLessonPipelineModuleCompletedEvent(
+  e: unknown
+): e is LessonPipelineModuleCompletedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['lessonId'] === 'string' &&
+    typeof obj['runId'] === 'string' &&
+    typeof obj['moduleType'] === 'string' &&
+    obj['type'] === 'lesson.pipeline.module.completed'
   );
 }

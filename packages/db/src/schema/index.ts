@@ -136,3 +136,6 @@ export * from './custom-roles';
 
 // Knowledge Sources — NotebookLM-style source management
 export * from './knowledge-sources';
+
+// Lesson Pipeline Builder (AI-powered lesson processing)
+export * from './lesson';
