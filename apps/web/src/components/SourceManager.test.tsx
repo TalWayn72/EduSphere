@@ -100,7 +100,7 @@ describe('SourceManager', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('הוסף מקור'));
     });
-    const closeBtn = screen.getByText('✕');
+    const closeBtn = screen.getAllByText('✕').at(-1) as HTMLElement;
     await act(async () => {
       fireEvent.click(closeBtn);
     });
