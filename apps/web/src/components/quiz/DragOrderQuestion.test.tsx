@@ -16,10 +16,13 @@ const mockItem: DragOrder = {
 };
 
 describe('DragOrderQuestion', () => {
-  let onChange: ReturnType<typeof vi.fn>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let onChangeMock: ReturnType<typeof vi.fn<any>>;
+  let onChange: (value: string[]) => void;
 
   beforeEach(() => {
-    onChange = vi.fn();
+    onChangeMock = vi.fn();
+    onChange = onChangeMock as unknown as (value: string[]) => void;
   });
 
   it('renders the question text', () => {
@@ -87,31 +90,31 @@ describe('DragOrderQuestion', () => {
   it('calls onChange with reordered ids on drop', () => {
     render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
     const items = screen.getAllByRole('listitem');
-    fireEvent.dragStart(items[0]);
-    fireEvent.drop(items[2]);
-    expect(onChange).toHaveBeenCalledWith(['b', 'c', 'a', 'd']);
+    fireEvent.dragStart(items[0]!);
+    fireEvent.drop(items[2]!);
+    expect(onChangeMock).toHaveBeenCalledWith(['b', 'c', 'a', 'd']);
   });
 
   it('does not call onChange when disabled and drop fires', () => {
     render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} disabled />);
     const items = screen.getAllByRole('listitem');
-    fireEvent.dragStart(items[0]);
-    fireEvent.drop(items[2]);
-    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.dragStart(items[0]!);
+    fireEvent.drop(items[2]!);
+    expect(onChangeMock).not.toHaveBeenCalled();
   });
 
   it('does not call onChange when dropping on same index', () => {
     render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
     const items = screen.getAllByRole('listitem');
-    fireEvent.dragStart(items[1]);
-    fireEvent.drop(items[1]);
-    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.dragStart(items[1]!);
+    fireEvent.drop(items[1]!);
+    expect(onChangeMock).not.toHaveBeenCalled();
   });
 
   it('allows dragOver without preventing default implicitly', () => {
     render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
     const items = screen.getAllByRole('listitem');
     // dragOver should not throw
-    expect(() => fireEvent.dragOver(items[0])).not.toThrow();
+    expect(() => fireEvent.dragOver(items[0]!)).not.toThrow();
   });
 });

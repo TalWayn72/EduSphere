@@ -3,6 +3,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MatchingQuestion } from './MatchingQuestion';
 import type { Matching } from '@/types/quiz';
 
+interface Pair {
+  leftId: string;
+  rightId: string;
+}
+
 const mockItem: Matching = {
   type: 'MATCHING',
   question: 'Match each country to its capital city',
@@ -24,15 +29,20 @@ const mockItem: Matching = {
 };
 
 describe('MatchingQuestion', () => {
-  let onChange: ReturnType<typeof vi.fn>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let onChangeMock: ReturnType<typeof vi.fn<any>>;
+  let onChange: (value: Pair[]) => void;
 
   beforeEach(() => {
-    onChange = vi.fn();
+    onChangeMock = vi.fn();
+    onChange = onChangeMock as unknown as (value: Pair[]) => void;
   });
 
   it('renders the question text', () => {
     render(<MatchingQuestion item={mockItem} value={[]} onChange={onChange} />);
-    expect(screen.getByText('Match each country to its capital city')).toBeInTheDocument();
+    expect(
+      screen.getByText('Match each country to its capital city')
+    ).toBeInTheDocument();
   });
 
   it('renders instruction hint text', () => {
@@ -82,7 +92,7 @@ describe('MatchingQuestion', () => {
     render(<MatchingQuestion item={mockItem} value={[]} onChange={onChange} />);
     fireEvent.click(screen.getByRole('button', { name: 'France' }));
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }));
-    expect(onChange).toHaveBeenCalledWith([{ leftId: 'fr', rightId: 'par' }]);
+    expect(onChangeMock).toHaveBeenCalledWith([{ leftId: 'fr', rightId: 'par' }]);
   });
 
   it('clears selection after a pair is created', () => {
@@ -116,18 +126,22 @@ describe('MatchingQuestion', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'France' }));
     fireEvent.click(screen.getByRole('button', { name: 'Berlin' }));
-    expect(onChange).toHaveBeenCalledWith([{ leftId: 'fr', rightId: 'ber' }]);
+    expect(onChangeMock).toHaveBeenCalledWith([{ leftId: 'fr', rightId: 'ber' }]);
   });
 
   it('does not call onChange and ignores clicks when disabled', () => {
-    render(<MatchingQuestion item={mockItem} value={[]} onChange={onChange} disabled />);
+    render(
+      <MatchingQuestion item={mockItem} value={[]} onChange={onChange} disabled />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'France' }));
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }));
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onChangeMock).not.toHaveBeenCalled();
   });
 
   it('left buttons are disabled when disabled prop is true', () => {
-    render(<MatchingQuestion item={mockItem} value={[]} onChange={onChange} disabled />);
+    render(
+      <MatchingQuestion item={mockItem} value={[]} onChange={onChange} disabled />
+    );
     expect(screen.getByRole('button', { name: 'France' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Germany' })).toBeDisabled();
   });

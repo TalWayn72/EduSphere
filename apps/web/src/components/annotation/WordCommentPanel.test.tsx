@@ -186,7 +186,7 @@ describe('WordCommentPanel', () => {
       />
     );
     const focusBtns = screen.getAllByRole('button', { name: 'focus' });
-    fireEvent.click(focusBtns[0]);
+    fireEvent.click(focusBtns[0]!);
     expect(onFocusAnnotation).toHaveBeenCalledWith('ann-1');
   });
 });

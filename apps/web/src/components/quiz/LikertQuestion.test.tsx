@@ -11,10 +11,10 @@ const makeItem = (overrides?: Partial<Likert>): Likert => ({
 });
 
 describe('LikertQuestion', () => {
-  let onChange: ReturnType<typeof vi.fn>;
+  let onChange: (value: number) => void;
 
   beforeEach(() => {
-    onChange = vi.fn();
+    onChange = vi.fn() as unknown as (value: number) => void;
   });
 
   it('renders the question text', () => {
