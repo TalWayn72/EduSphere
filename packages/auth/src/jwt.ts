@@ -73,14 +73,14 @@ export class JWTValidator {
       token === 'dev-token-mock-jwt'
     ) {
       return {
-        userId: 'dev-user-1',
-        email: 'dev@edusphere.local',
-        username: 'developer',
-        firstName: 'Dev',
-        lastName: 'User',
+        userId: '00000000-0000-0000-0000-000000000001',
+        email: 'super.admin@edusphere.dev',
+        username: 'super.admin',
+        firstName: 'Super',
+        lastName: 'Admin',
         roles: ['SUPER_ADMIN'],
         scopes: [],
-        tenantId: 'dev-tenant-1',
+        tenantId: '00000000-0000-0000-0000-000000000000',
         isSuperAdmin: true,
       };
     }

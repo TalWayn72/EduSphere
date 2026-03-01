@@ -16,7 +16,7 @@ export function useSrsQueueCount(pause = false): number {
   const [result] = useQuery<SrsQueueCountData>({
     query: SRS_QUEUE_COUNT_QUERY,
     pause,
-    requestPolicy: 'cache-and-network',
+    requestPolicy: 'network-only',
   });
   return result.data?.srsQueueCount ?? 0;
 }

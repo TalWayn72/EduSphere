@@ -101,18 +101,18 @@ describe('Layout', () => {
 
   it('shows SRS review link when user is logged in', () => {
     renderLayout(studentUser);
-    expect(screen.getByText('SRS')).toBeInTheDocument();
+    expect(screen.getByText('srs')).toBeInTheDocument();
   });
 
   it('shows leaderboard link when user is logged in', () => {
     renderLayout(studentUser);
-    expect(screen.getByText('Leaderboard')).toBeInTheDocument();
+    expect(screen.getByText('leaderboard')).toBeInTheDocument();
   });
 
   it('hides SRS and leaderboard links when not logged in', () => {
     renderLayout(null);
-    expect(screen.queryByText('SRS')).not.toBeInTheDocument();
-    expect(screen.queryByText('Leaderboard')).not.toBeInTheDocument();
+    expect(screen.queryByText('srs')).not.toBeInTheDocument();
+    expect(screen.queryByText('leaderboard')).not.toBeInTheDocument();
   });
 
   it('shows SRS badge when srsCount > 0', () => {

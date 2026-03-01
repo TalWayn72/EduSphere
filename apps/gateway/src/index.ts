@@ -150,8 +150,8 @@ const yoga = createYoga({
         process.env.NODE_ENV !== 'production' &&
         token === 'dev-token-mock-jwt'
       ) {
-        resolvedTenantId = 'dev-tenant-1';
-        userId = 'dev-user-1';
+        resolvedTenantId = '00000000-0000-0000-0000-000000000000';
+        userId = '00000000-0000-0000-0000-000000000001';
         role = 'SUPER_ADMIN';
         isAuthenticated = true;
       } else {

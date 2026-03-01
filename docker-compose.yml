@@ -45,6 +45,9 @@ services:
       # packages/db dist: sql.raw() SET LOCAL fix for RLS enforcement (Bug 1)
       # Mounts the full dist — safe, pure-JS library with no app.module side effects
       - ./packages/db/dist:/app/packages/db/dist
+      # packages/auth dist: dev bypass uses real seeded UUIDs so ME_QUERY resolves correctly
+      # (was using 'dev-user-1'/'dev-tenant-1' non-UUID strings that caused PostgreSQL errors)
+      - ./packages/auth/dist:/app/packages/auth/dist:ro
       # packages/db migrations: fixes missing CREATE TABLE for agent_sessions/agent_messages
       # Mount ensures the corrected 0002 migration file is used without image rebuild
       - ./packages/db/migrations:/app/packages/db/migrations:ro
@@ -57,6 +60,9 @@ services:
       # subgraph-core: mount src/ — fixes @requiresRole removed from @link imports (invalid federation import),
       # directive @requiresRole defined locally in user.graphql instead
       - ./apps/subgraph-core/src:/app/apps/subgraph-core/src:ro
+      # subgraph-content: rebuilt dist with MinIO full-URL fix (endpoint: `http://${host}:${port}`)
+      # MINIO_ENDPOINT in supervisord.conf must be just the hostname (e.g. "localhost"), not a full URL.
+      - ./apps/subgraph-content/dist:/app/apps/subgraph-content/dist:ro
       # subgraph-core-compat mounts REMOVED: PG18 image is freshly built from source,
       # so baked-in dist already has UserPreferences, PublicProfileService, etc.
       # Compat files were only needed for the stale Feb-20 image.

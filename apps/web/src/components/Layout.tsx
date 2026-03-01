@@ -120,7 +120,7 @@ export function Layout({ children }: LayoutProps) {
                     {({ isActive }) => (
                       <>
                         <Brain className="h-4 w-4" />
-                        <span>SRS</span>
+                        <span>{t('srs')}</span>
                         {srsCount > 0 && (
                           <span className="ml-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                             {srsCount > 99 ? '99+' : srsCount}
@@ -147,7 +147,7 @@ export function Layout({ children }: LayoutProps) {
                     {({ isActive }) => (
                       <>
                         <Trophy className="h-4 w-4" />
-                        <span>Leaderboard</span>
+                        <span>{t('leaderboard')}</span>
                         <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
                       </>
                     )}
@@ -340,7 +340,7 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 >
                   <Brain className="h-4 w-4" />
-                  <span>SRS</span>
+                  <span>{t('srs')}</span>
                   {srsCount > 0 && (
                     <span className="ml-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                       {srsCount > 99 ? '99+' : srsCount}
@@ -356,7 +356,7 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 >
                   <Trophy className="h-4 w-4" />
-                  <span>Leaderboard</span>
+                  <span>{t('leaderboard')}</span>
                 </Link>
               )}
               {isAdmin && (

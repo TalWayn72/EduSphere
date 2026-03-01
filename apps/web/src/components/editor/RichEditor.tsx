@@ -45,7 +45,7 @@ export function RichEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ codeBlock: false }),
       Image,
       Table.configure({ resizable: true }),
       TableRow,

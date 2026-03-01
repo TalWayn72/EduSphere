@@ -20,9 +20,11 @@ import {
 import { MediaService } from './media.service';
 
 const mockS3Send = vi.fn();
+let capturedS3Config: Record<string, unknown> = {};
 
 vi.mock('@aws-sdk/client-s3', () => ({
-  S3Client: vi.fn().mockImplementation(function S3ClientCtor() {
+  S3Client: vi.fn().mockImplementation(function S3ClientCtor(cfg: Record<string, unknown>) {
+    capturedS3Config = cfg;
     return { send: mockS3Send };
   }),
   PutObjectCommand: vi.fn().mockImplementation(function PutObjectCommandCtor(
@@ -119,10 +121,20 @@ describe('MediaService', () => {
       flush: mockNatsFlush,
       close: mockNatsClose,
     });
-    process.env['MINIO_ENDPOINT'] = 'http://localhost:9000';
+    // MINIO_ENDPOINT must be just the hostname — MediaService constructs the full
+    // URL as `http://${endpoint}:${port}` using minioConfig getters.
+    process.env['MINIO_ENDPOINT'] = 'localhost';
+    process.env['MINIO_PORT'] = '9000';
     process.env['MINIO_BUCKET'] = 'edusphere-media';
     process.env['NATS_URL'] = 'nats://localhost:4222';
     service = new MediaService();
+  });
+
+  it('should initialise S3Client with full http:// URL and forcePathStyle=true', () => {
+    expect(capturedS3Config).toMatchObject({
+      endpoint: 'http://localhost:9000',
+      forcePathStyle: true,
+    });
   });
 
   it('should generate a presigned upload URL with correct fileKey structure', async () => {

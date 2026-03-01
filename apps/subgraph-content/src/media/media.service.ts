@@ -50,7 +50,7 @@ export class MediaService implements OnModuleDestroy {
     this.bucket = minioConfig.bucket;
 
     this.s3 = new S3Client({
-      endpoint: minioConfig.endpoint,
+      endpoint: `http://${minioConfig.endpoint}:${minioConfig.port}`,
       region: minioConfig.region,
       credentials: {
         accessKeyId: minioConfig.accessKey,
@@ -280,7 +280,7 @@ export class MediaService implements OnModuleDestroy {
       jpeg: 'image/jpeg',
       png: 'image/png',
     };
-    return mimeMap[ext] ?? 'application/octet-stream';
+    return mimeMap[ext as keyof typeof mimeMap] ?? 'application/octet-stream';
   }
 
   private detectMediaType(contentType: string): 'VIDEO' | 'AUDIO' | 'DOCUMENT' {
