@@ -98,6 +98,7 @@ jobs:
           pnpm --filter @edusphere/nats-client build
           pnpm --filter @edusphere/auth build
           pnpm --filter @edusphere/metrics build
+          pnpm --filter @edusphere/langgraph-workflows build
 
       - name: Generate database schema
         run: pnpm --filter @edusphere/db generate
@@ -287,6 +288,7 @@ jobs:
           pnpm --filter @edusphere/nats-client build
           pnpm --filter @edusphere/auth build
           pnpm --filter @edusphere/metrics build
+          pnpm --filter @edusphere/langgraph-workflows build
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
