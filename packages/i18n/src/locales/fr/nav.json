@@ -12,5 +12,11 @@
   "aiTutor": "Tuteur IA",
   "profile": "Profil",
   "newCourse": "Nouveau cours",
-  "search": "Rechercher..."
+  "search": "Rechercher...",
+  "leaderboard": "Classement",
+  "srs": "Répétition espacée",
+  "adminPanel": "Panneau d'administration",
+  "lti": "LTI 1.3",
+  "compliance": "Conformité",
+  "scimHris": "SCIM / HRIS"
 }

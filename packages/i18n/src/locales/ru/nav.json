@@ -12,5 +12,11 @@
   "aiTutor": "ИИ-наставник",
   "profile": "Профиль",
   "newCourse": "Новый курс",
-  "search": "Поиск..."
+  "search": "Поиск...",
+  "leaderboard": "Рейтинг",
+  "srs": "Интервальное повторение",
+  "adminPanel": "Панель администратора",
+  "lti": "LTI 1.3",
+  "compliance": "Соответствие",
+  "scimHris": "SCIM / HRIS"
 }

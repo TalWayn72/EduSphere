@@ -30,5 +30,21 @@
   "chavrutaAi": "AI Study Partner",
   "dialecticalPartner": "AI-powered dialectical study partner",
   "agentResponding": "Agent is responding...",
-  "askOrDebate": "Ask or debate..."
+  "askOrDebate": "Ask or debate...",
+  "transcriptNoResults": "Результаты не найдены",
+  "liveSession": {
+    "joinError": "Не удалось подключиться к сессии",
+    "joining": "Подключение...",
+    "startMeeting": "Начать встречу",
+    "joinSession": "Войти в сессию",
+    "recordingAvailable": "Запись доступна",
+    "processingRecording": "Обработка записи...",
+    "validationError": "Пожалуйста, заполните все обязательные поля",
+    "scheduleTitle": "Запланировать прямой эфир",
+    "meetingName": "Название встречи",
+    "meetingNamePlaceholder": "напр. Еженедельные вопросы",
+    "scheduledAt": "Запланированная дата и время",
+    "scheduling": "Планирование...",
+    "scheduleButton": "Запланировать сессию"
+  }
 }

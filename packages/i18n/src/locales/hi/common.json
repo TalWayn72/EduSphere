@@ -45,7 +45,8 @@
     "stats": {
       "coursesAvailable": "उपलब्ध पाठ्यक्रम",
       "conceptsMastered": "महारत हासिल अवधारणाएं",
-      "annotationsCreated": "बनाए गए एनोटेशन"
+      "annotationsCreated": "बनाए गए एनोटेशन",
+      "xpPoints": "XP अंक"
     }
   }
 }

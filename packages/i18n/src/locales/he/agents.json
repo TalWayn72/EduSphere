@@ -35,6 +35,8 @@
   "chatPanel": {
     "title": "עוזר למידה AI",
     "openPanel": "פתח לוח AI",
-    "closePanel": "סגור לוח AI"
+    "closePanel": "סגור לוח AI",
+    "startConversation": "התחל שיחה עם עוזר ה-AI שלך",
+    "inputHint": "שאל שאלה או התחל ויכוח..."
   }
 }

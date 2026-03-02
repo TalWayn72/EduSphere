@@ -45,7 +45,8 @@
     "stats": {
       "coursesAvailable": "Cursos disponibles",
       "conceptsMastered": "Conceptos dominados",
-      "annotationsCreated": "Anotaciones creadas"
+      "annotationsCreated": "Anotaciones creadas",
+      "xpPoints": "Puntos XP"
     }
   }
 }

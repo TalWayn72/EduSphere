@@ -30,5 +30,21 @@
   "chavrutaAi": "AI Study Partner",
   "dialecticalPartner": "AI-powered dialectical study partner",
   "agentResponding": "Agent is responding...",
-  "askOrDebate": "Ask or debate..."
+  "askOrDebate": "Ask or debate...",
+  "transcriptNoResults": "কোনো ফলাফল পাওয়া যায়নি",
+  "liveSession": {
+    "joinError": "সেশনে যোগ দিতে ব্যর্থ",
+    "joining": "যোগ দেওয়া হচ্ছে...",
+    "startMeeting": "মিটিং শুরু করুন",
+    "joinSession": "সেশনে যোগ দিন",
+    "recordingAvailable": "রেকর্ডিং উপলব্ধ",
+    "processingRecording": "রেকর্ডিং প্রক্রিয়াকরণ...",
+    "validationError": "অনুগ্রহ করে সমস্ত প্রয়োজনীয় ক্ষেত্র পূরণ করুন",
+    "scheduleTitle": "লাইভ সেশন নির্ধারণ করুন",
+    "meetingName": "মিটিংয়ের নাম",
+    "meetingNamePlaceholder": "যেমন: সাপ্তাহিক প্রশ্নোত্তর",
+    "scheduledAt": "নির্ধারিত তারিখ ও সময়",
+    "scheduling": "নির্ধারণ করা হচ্ছে...",
+    "scheduleButton": "সেশন নির্ধারণ করুন"
+  }
 }

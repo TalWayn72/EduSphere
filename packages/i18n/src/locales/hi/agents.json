@@ -35,6 +35,8 @@
   "chatPanel": {
     "title": "AI सीखने का सहायक",
     "openPanel": "AI पैनल खोलें",
-    "closePanel": "AI पैनल बंद करें"
+    "closePanel": "AI पैनल बंद करें",
+    "startConversation": "अपने AI सहायक के साथ बातचीत शुरू करें",
+    "inputHint": "कोई प्रश्न पूछें या बहस शुरू करें..."
   }
 }

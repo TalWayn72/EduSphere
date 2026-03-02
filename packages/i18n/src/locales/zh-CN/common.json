@@ -45,7 +45,8 @@
     "stats": {
       "coursesAvailable": "可用课程",
       "conceptsMastered": "已掌握概念",
-      "annotationsCreated": "已创建注释"
+      "annotationsCreated": "已创建注释",
+      "xpPoints": "经验值"
     }
   }
 }

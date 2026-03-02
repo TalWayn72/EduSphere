@@ -35,6 +35,8 @@
   "chatPanel": {
     "title": "Asisten Pembelajaran AI",
     "openPanel": "Buka panel AI",
-    "closePanel": "Tutup panel AI"
+    "closePanel": "Tutup panel AI",
+    "startConversation": "Mulai percakapan dengan asisten AI Anda",
+    "inputHint": "Ajukan pertanyaan atau mulai debat..."
   }
 }

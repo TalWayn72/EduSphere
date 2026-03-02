@@ -35,6 +35,8 @@
   "chatPanel": {
     "title": "AI学习助手",
     "openPanel": "打开AI面板",
-    "closePanel": "关闭AI面板"
+    "closePanel": "关闭AI面板",
+    "startConversation": "与AI助手开始对话",
+    "inputHint": "提问或开始辩论..."
   }
 }

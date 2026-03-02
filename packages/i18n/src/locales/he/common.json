@@ -45,7 +45,8 @@
     "stats": {
       "coursesAvailable": "קורסים זמינים",
       "conceptsMastered": "מושגים שנרכשו",
-      "annotationsCreated": "הערות שנוצרו"
+      "annotationsCreated": "הערות שנוצרו",
+      "xpPoints": "נקודות XP"
     }
   }
 }

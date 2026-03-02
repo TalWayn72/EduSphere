@@ -30,5 +30,21 @@
   "chavrutaAi": "AI Study Partner",
   "dialecticalPartner": "AI-powered dialectical study partner",
   "agentResponding": "Agent is responding...",
-  "askOrDebate": "Ask or debate..."
+  "askOrDebate": "Ask or debate...",
+  "transcriptNoResults": "Tidak ada hasil ditemukan",
+  "liveSession": {
+    "joinError": "Gagal bergabung ke sesi",
+    "joining": "Bergabung...",
+    "startMeeting": "Mulai Rapat",
+    "joinSession": "Bergabung ke Sesi",
+    "recordingAvailable": "Rekaman tersedia",
+    "processingRecording": "Memproses rekaman...",
+    "validationError": "Harap isi semua kolom yang diperlukan",
+    "scheduleTitle": "Jadwalkan Sesi Langsung",
+    "meetingName": "Nama Rapat",
+    "meetingNamePlaceholder": "misalnya: T&J Mingguan",
+    "scheduledAt": "Tanggal & Waktu yang Dijadwalkan",
+    "scheduling": "Menjadwalkan...",
+    "scheduleButton": "Jadwalkan Sesi"
+  }
 }

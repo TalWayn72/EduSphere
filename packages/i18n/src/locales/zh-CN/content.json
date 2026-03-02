@@ -30,5 +30,21 @@
   "chavrutaAi": "AI Study Partner",
   "dialecticalPartner": "AI-powered dialectical study partner",
   "agentResponding": "Agent is responding...",
-  "askOrDebate": "Ask or debate..."
+  "askOrDebate": "Ask or debate...",
+  "transcriptNoResults": "未找到结果",
+  "liveSession": {
+    "joinError": "加入会话失败",
+    "joining": "正在加入...",
+    "startMeeting": "开始会议",
+    "joinSession": "加入会话",
+    "recordingAvailable": "录像可用",
+    "processingRecording": "处理录像中...",
+    "validationError": "请填写所有必填字段",
+    "scheduleTitle": "安排直播课程",
+    "meetingName": "会议名称",
+    "meetingNamePlaceholder": "例如：每周答疑",
+    "scheduledAt": "预定日期和时间",
+    "scheduling": "正在安排...",
+    "scheduleButton": "安排课程"
+  }
 }

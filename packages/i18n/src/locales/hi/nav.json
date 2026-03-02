@@ -12,5 +12,11 @@
   "aiTutor": "AI ट्यूटर",
   "profile": "प्रोफ़ाइल",
   "newCourse": "नया पाठ्यक्रम",
-  "search": "खोजें..."
+  "search": "खोजें...",
+  "leaderboard": "लीडरबोर्ड",
+  "srs": "अंतराल पुनरावृत्ति",
+  "adminPanel": "व्यवस्थापक पैनल",
+  "lti": "LTI 1.3",
+  "compliance": "अनुपालन",
+  "scimHris": "SCIM / HRIS"
 }

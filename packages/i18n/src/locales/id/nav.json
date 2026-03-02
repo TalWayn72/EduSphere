@@ -12,5 +12,11 @@
   "aiTutor": "Tutor AI",
   "profile": "Profil",
   "newCourse": "Kursus baru",
-  "search": "Cari..."
+  "search": "Cari...",
+  "leaderboard": "Papan peringkat",
+  "srs": "Pengulangan berjarak",
+  "adminPanel": "Panel admin",
+  "lti": "LTI 1.3",
+  "compliance": "Kepatuhan",
+  "scimHris": "SCIM / HRIS"
 }

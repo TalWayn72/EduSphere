@@ -12,5 +12,11 @@
   "aiTutor": "AI导师",
   "profile": "个人资料",
   "newCourse": "新课程",
-  "search": "搜索..."
+  "search": "搜索...",
+  "leaderboard": "排行榜",
+  "srs": "间隔重复",
+  "adminPanel": "管理面板",
+  "lti": "LTI 1.3",
+  "compliance": "合规",
+  "scimHris": "SCIM / HRIS"
 }

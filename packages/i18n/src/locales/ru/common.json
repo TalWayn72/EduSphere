@@ -45,7 +45,8 @@
     "stats": {
       "coursesAvailable": "Доступные курсы",
       "conceptsMastered": "Освоенные концепции",
-      "annotationsCreated": "Созданные аннотации"
+      "annotationsCreated": "Созданные аннотации",
+      "xpPoints": "Очки XP"
     }
   }
 }

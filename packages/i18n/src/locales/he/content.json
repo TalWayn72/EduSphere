@@ -30,5 +30,21 @@
   "chavrutaAi": "שותף לימוד AI",
   "dialecticalPartner": "שותף לימוד דיאלקטי מבוסס AI",
   "agentResponding": "הסוכן מגיב...",
-  "askOrDebate": "שאל או התווכח..."
+  "askOrDebate": "שאל או התווכח...",
+  "transcriptNoResults": "לא נמצאו תוצאות",
+  "liveSession": {
+    "joinError": "כניסה לשיחה נכשלה",
+    "joining": "מצטרף...",
+    "startMeeting": "התחל פגישה",
+    "joinSession": "הצטרף לשיחה",
+    "recordingAvailable": "הקלטה זמינה",
+    "processingRecording": "מעבד הקלטה...",
+    "validationError": "אנא מלא את כל השדות הנדרשים",
+    "scheduleTitle": "תזמן שיחה חיה",
+    "meetingName": "שם הפגישה",
+    "meetingNamePlaceholder": "לדוגמה: שאלות ותשובות שבועי",
+    "scheduledAt": "תאריך ושעה מתוזמנים",
+    "scheduling": "מתזמן...",
+    "scheduleButton": "תזמן שיחה"
+  }
 }

@@ -35,6 +35,8 @@
   "chatPanel": {
     "title": "Assistant d'apprentissage IA",
     "openPanel": "Ouvrir le panneau IA",
-    "closePanel": "Fermer le panneau IA"
+    "closePanel": "Fermer le panneau IA",
+    "startConversation": "Commencez une conversation avec votre assistant IA",
+    "inputHint": "Posez une question ou commencez un débat..."
   }
 }

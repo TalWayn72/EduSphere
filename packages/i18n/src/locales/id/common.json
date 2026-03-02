@@ -45,7 +45,8 @@
     "stats": {
       "coursesAvailable": "Kursus tersedia",
       "conceptsMastered": "Konsep yang dikuasai",
-      "annotationsCreated": "Anotasi dibuat"
+      "annotationsCreated": "Anotasi dibuat",
+      "xpPoints": "Poin XP"
     }
   }
 }

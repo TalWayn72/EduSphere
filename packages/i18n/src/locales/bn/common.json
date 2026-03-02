@@ -45,7 +45,8 @@
     "stats": {
       "coursesAvailable": "উপলব্ধ কোর্স",
       "conceptsMastered": "আয়ত্ত করা ধারণা",
-      "annotationsCreated": "তৈরি করা অ্যানোটেশন"
+      "annotationsCreated": "তৈরি করা অ্যানোটেশন",
+      "xpPoints": "XP পয়েন্ট"
     }
   }
 }
