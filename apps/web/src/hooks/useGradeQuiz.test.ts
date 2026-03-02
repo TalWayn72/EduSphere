@@ -77,12 +77,10 @@ describe('useGradeQuiz', () => {
 
   // Test 3 — gradeQuiz sets loading then resolves
   it('sets loading to false after mutation resolves', async () => {
-    const mockExecute = vi
-      .fn()
-      .mockResolvedValue({
-        data: { gradeQuizSubmission: makeQuizResult() },
-        error: undefined,
-      });
+    const mockExecute = vi.fn().mockResolvedValue({
+      data: { gradeQuizSubmission: makeQuizResult() },
+      error: undefined,
+    });
     vi.mocked(urql.useMutation).mockReturnValue([
       {
         fetching: false,

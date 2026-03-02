@@ -184,12 +184,10 @@ describe('LessonPipelinePage', () => {
 
   it('calls savePipeline mutation when Save is clicked with dirty store', async () => {
     mockStore.isDirty = true;
-    const mockSave = vi
-      .fn()
-      .mockResolvedValue({
-        data: { saveLessonPipeline: { id: 'p1' } },
-        error: undefined,
-      });
+    const mockSave = vi.fn().mockResolvedValue({
+      data: { saveLessonPipeline: { id: 'p1' } },
+      error: undefined,
+    });
     vi.mocked(urql.useMutation).mockReturnValue([
       { fetching: false },
       mockSave,

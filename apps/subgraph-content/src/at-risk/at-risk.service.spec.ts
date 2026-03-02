@@ -53,13 +53,11 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 vi.mock('nats', () => ({
-  connect: vi
-    .fn()
-    .mockResolvedValue({
-      close: mockNatsClose,
-      publish: vi.fn(),
-      drain: vi.fn(),
-    }),
+  connect: vi.fn().mockResolvedValue({
+    close: mockNatsClose,
+    publish: vi.fn(),
+    drain: vi.fn(),
+  }),
   StringCodec: vi.fn(() => ({
     encode: vi.fn((s: string) => s),
     decode: vi.fn(),

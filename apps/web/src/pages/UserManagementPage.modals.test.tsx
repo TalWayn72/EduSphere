@@ -96,12 +96,10 @@ describe('InviteUserModal', () => {
   });
 
   it('calls onSuccess and onClose on successful submission', async () => {
-    const createUserFn = vi
-      .fn()
-      .mockResolvedValue({
-        data: { createUser: { id: 'u1' } },
-        error: undefined,
-      });
+    const createUserFn = vi.fn().mockResolvedValue({
+      data: { createUser: { id: 'u1' } },
+      error: undefined,
+    });
     setupMutation(createUserFn);
     renderModal();
 

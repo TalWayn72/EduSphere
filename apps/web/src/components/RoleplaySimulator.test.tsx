@@ -106,11 +106,9 @@ describe('RoleplaySimulator', () => {
     vi.mocked(urql.useMutation)
       .mockReturnValueOnce([
         { fetching: false } as never,
-        vi
-          .fn()
-          .mockResolvedValue({
-            data: { startRoleplaySession: { id: 'sess-1' } },
-          }),
+        vi.fn().mockResolvedValue({
+          data: { startRoleplaySession: { id: 'sess-1' } },
+        }),
       ])
       .mockReturnValue([{ fetching: false } as never, NOOP_EXECUTE]);
 
@@ -142,11 +140,9 @@ describe('RoleplaySimulator', () => {
     vi.mocked(urql.useMutation)
       .mockReturnValueOnce([
         { fetching: false } as never,
-        vi
-          .fn()
-          .mockResolvedValue({
-            data: { startRoleplaySession: { id: 'sess-1' } },
-          }),
+        vi.fn().mockResolvedValue({
+          data: { startRoleplaySession: { id: 'sess-1' } },
+        }),
       ])
       .mockReturnValue([
         { fetching: false } as never,

@@ -124,12 +124,10 @@ describe('useScormSession', () => {
         data: { initScormSession: scormSession },
         error: undefined,
       } as unknown as MutationState,
-      vi
-        .fn()
-        .mockResolvedValue({
-          data: { initScormSession: scormSession },
-          error: undefined,
-        }) as unknown as ReturnType<typeof urql.useMutation>[1],
+      vi.fn().mockResolvedValue({
+        data: { initScormSession: scormSession },
+        error: undefined,
+      }) as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
     const { result } = renderHook(() => useScormSession());
@@ -151,12 +149,10 @@ describe('useScormSession', () => {
         data: undefined,
         error: mutationError,
       } as unknown as MutationState,
-      vi
-        .fn()
-        .mockResolvedValue({
-          data: undefined,
-          error: mutationError,
-        }) as unknown as ReturnType<typeof urql.useMutation>[1],
+      vi.fn().mockResolvedValue({
+        data: undefined,
+        error: mutationError,
+      }) as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
     const { result } = renderHook(() => useScormSession());
