@@ -1,9 +1,54 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 27 פברואר 2026 (updated)
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅**
+**תאריך עדכון:** 02 מרץ 2026
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅** | **Visual QA 53/53 Zero-Error ✅**
 **בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,658 tests** (+17) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5+13 (BUG-026/027) ✅** | **Contract 36+11+4 (BUG-026/027) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
+
+---
+
+## ✅ BUG-028 — DEV_MODE Dashboard shown after Log Off (02 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 02 Mar 2026
+**Commit:** `da83507` fix(auth,urql): DEV_MODE logout persistence + cache key guards
+
+### Problem
+In DEV_MODE (`VITE_DEV_MODE=true`), clicking "Log out" showed the dashboard again on the next page load. Navigating to any protected route after logout still displayed the content.
+
+### Root Cause
+`logout()` sets `devAuthenticated = false` and does `window.location.href = '/login'` (full page reload). On the next cold start, `initKeycloak()` unconditionally set `devAuthenticated = true`, overriding the logout. The module state is re-initialized on every page reload, so the logout was lost.
+
+### Fix
+`window.sessionStorage` used to persist the logout flag across page reloads:
+- `logout()` → `sessionStorage.setItem('edusphere_dev_logged_out', 'true')` before redirect
+- `initKeycloak()` → checks sessionStorage; if flag present, keeps `devAuthenticated = false`
+- `login()` → `sessionStorage.removeItem('edusphere_dev_logged_out')` before redirect
+
+### Tests
+5 new tests in `auth.test.ts` covering the logout-reload regression, login flag-clear, DEV_USER UUID assertions, and `getCurrentUser()` null path.
+
+### Files
+- `apps/web/src/lib/auth.ts`
+- `apps/web/src/lib/auth.test.ts`
+
+---
+
+## ✅ BUG-029 — urql UserPreferences "Invalid key" console warning (02 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium | **Date:** 02 Mar 2026
+**Commit:** `da83507` fix(auth,urql): DEV_MODE logout persistence + cache key guards
+
+### Problem
+Console warning: "Invalid key: The GraphQL query at the field `User:00000000-…-0001.preferences` has a selection set, but no key could be generated for the data at this field."
+
+### Root Cause
+urql's normalized `cacheExchange` requires every type in a response to have an `id`/`_id` field (for cache key generation) or an explicit `keys: { TypeName: () => null }` entry. `UserPreferences` has no `id` field, causing the warning.
+
+### Fix
+`UserPreferences: () => null` added to urql `cacheExchange.keys` config in `urql-client.ts`, instructing urql to embed `UserPreferences` directly in the parent `User` entity without its own cache entry.
+
+### Files
+- `apps/web/src/lib/urql-client.ts`
 
 ---
 
