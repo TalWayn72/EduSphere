@@ -12,6 +12,21 @@ import {
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
+interface CreateAnnotationInput {
+  assetId: string;
+  annotationType: string;
+  layer?: string;
+  content: unknown;
+  spatialData?: unknown;
+  parentId?: string;
+}
+
+interface UpdateAnnotationInput {
+  content?: unknown;
+  spatialData?: unknown;
+  isResolved?: boolean;
+}
+
 @Injectable()
 export class AnnotationService implements OnModuleDestroy {
   private readonly logger = new Logger(AnnotationService.name);
@@ -88,7 +103,7 @@ export class AnnotationService implements OnModuleDestroy {
       );
 
       if (filters.layer) {
-        conditions.push(eq(schema.annotations.layer, filters.layer as any));
+        conditions.push(eq(schema.annotations.layer, filters.layer as string));
         // PERSONAL layer only visible to owner
         if (filters.layer === 'PERSONAL') {
           conditions.push(eq(schema.annotations.user_id, authContext.userId));
@@ -141,7 +156,7 @@ export class AnnotationService implements OnModuleDestroy {
       );
 
       if (layer) {
-        conditions.push(eq(schema.annotations.layer, layer as any));
+        conditions.push(eq(schema.annotations.layer, layer as string));
         // PERSONAL layer only visible to owner
         if (layer === 'PERSONAL') {
           conditions.push(eq(schema.annotations.user_id, authContext.userId));
@@ -196,7 +211,7 @@ export class AnnotationService implements OnModuleDestroy {
     });
   }
 
-  async create(input: any, authContext: AuthContext) {
+  async create(input: CreateAnnotationInput, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');
     }
@@ -229,7 +244,7 @@ export class AnnotationService implements OnModuleDestroy {
     });
   }
 
-  async update(id: string, input: any, authContext: AuthContext) {
+  async update(id: string, input: UpdateAnnotationInput, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');
     }
@@ -265,7 +280,7 @@ export class AnnotationService implements OnModuleDestroy {
         );
       }
 
-      const updateData: any = {};
+      const updateData: Record<string, unknown> = {};
 
       if (input.content !== undefined) {
         updateData.content = input.content;

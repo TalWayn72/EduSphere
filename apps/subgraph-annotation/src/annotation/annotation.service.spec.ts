@@ -288,7 +288,7 @@ describe('AnnotationService', () => {
 
     it('throws Authentication required when no authContext', async () => {
       await expect(
-        service.update('ann-1', {}, undefined as any)
+        service.update('ann-1', {}, undefined as unknown as AuthContext)
       ).rejects.toThrow('Authentication required');
     });
 
@@ -557,7 +557,7 @@ describe('AnnotationService', () => {
             layer: 'PERSONAL',
             content: {},
           },
-          undefined as any
+          undefined as unknown as AuthContext
         )
       ).rejects.toThrow('Authentication required');
     });

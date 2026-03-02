@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnnotationResolver } from './annotation.resolver';
+import { AnnotationService } from './annotation.service';
 import type { AuthContext } from '@edusphere/auth';
 
 const mockAnnotationService = {
@@ -66,7 +67,7 @@ describe('AnnotationResolver', () => {
   let resolver: AnnotationResolver;
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new AnnotationResolver(mockAnnotationService as any);
+    resolver = new AnnotationResolver(mockAnnotationService as unknown as AnnotationService);
   });
 
   describe('health()', () => {
