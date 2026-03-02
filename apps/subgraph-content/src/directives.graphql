@@ -8,5 +8,5 @@ enum UserRole {
 }
 
 directive @requiresRole(roles: [UserRole!]!) on FIELD_DEFINITION
-directive @requiresScopes(scopes: [String!]!) on FIELD_DEFINITION
+directive @requiresScopes(scopes: [[String!]!]!) on FIELD_DEFINITION
 directive @rateLimit(limit: Int!, window: Int!) on FIELD_DEFINITION

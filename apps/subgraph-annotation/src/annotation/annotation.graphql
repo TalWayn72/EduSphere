@@ -58,19 +58,19 @@ type Query {
 type Mutation {
   createAnnotation(input: CreateAnnotationInput!): Annotation!
     @authenticated
-    @requiresScopes(scopes: ["write:annotations"])
+    @requiresScopes(scopes: [["write:annotations"]])
   updateAnnotation(id: ID!, input: UpdateAnnotationInput!): Annotation!
     @authenticated
-    @requiresScopes(scopes: ["write:annotations"])
+    @requiresScopes(scopes: [["write:annotations"]])
   deleteAnnotation(id: ID!): Boolean!
     @authenticated
-    @requiresScopes(scopes: ["write:annotations"])
+    @requiresScopes(scopes: [["write:annotations"]])
   resolveAnnotation(id: ID!): Annotation!
     @authenticated
-    @requiresScopes(scopes: ["write:annotations"])
+    @requiresScopes(scopes: [["write:annotations"]])
   replyToAnnotation(annotationId: ID!, content: String!): Annotation!
     @authenticated
-    @requiresScopes(scopes: ["write:annotations"])
+    @requiresScopes(scopes: [["write:annotations"]])
 }
 
 type Subscription {

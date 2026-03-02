@@ -167,28 +167,28 @@ extend type Query {
 extend type Mutation {
   createLesson(input: CreateLessonInput!): Lesson!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
   updateLesson(id: ID!, input: UpdateLessonInput!): Lesson!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
   deleteLesson(id: ID!): Boolean!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
   addLessonAsset(lessonId: ID!, input: AddLessonAssetInput!): LessonAsset!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
   saveLessonPipeline(lessonId: ID!, input: SaveLessonPipelineInput!): LessonPipeline!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
   startLessonPipelineRun(pipelineId: ID!): LessonPipelineRun!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
   cancelLessonPipelineRun(runId: ID!): LessonPipelineRun!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
   publishLesson(id: ID!): Lesson!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
 }
 
 extend type Subscription {

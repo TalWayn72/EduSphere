@@ -37,8 +37,8 @@ export class OpenBadgeResolver {
 
   // ── Queries ───────────────────────────────────────────────────────────────
 
-  @Query('myBadges')
-  async myBadges(@Context() ctx: GqlCtx): Promise<BadgeAssertionResult[]> {
+  @Query('myOpenBadges')
+  async myOpenBadges(@Context() ctx: GqlCtx): Promise<BadgeAssertionResult[]> {
     const user = requireAuth(ctx);
     return this.badgeService.getUserBadges(user.userId, user.tenantId);
   }

@@ -16,15 +16,20 @@ type OpenBadgeAssertion {
   badgeDefinitionId: ID!
   badgeName: String!
   badgeDescription: String!
+  imageUrl: String
   recipientId: ID!
   issuedAt: String!
   expiresAt: String
   evidenceUrl: String
   revoked: Boolean!
+  revokedAt: String
+  revokedReason: String
   """Public JSON-LD URL (no auth) — shareable"""
   verifyUrl: String!
   """LinkedIn certifications deep-link"""
   shareUrl: String!
+  """W3C VC JSON document (serialized), null when not yet signed"""
+  vcDocument: String
 }
 
 """Result of verifying a badge assertion's Ed25519 proof"""
@@ -36,7 +41,7 @@ type BadgeVerificationResult {
 
 extend type Query {
   """List all non-revoked badges earned by the current user"""
-  myBadges: [OpenBadgeAssertion!]! @authenticated
+  myOpenBadges: [OpenBadgeAssertion!]! @authenticated
 
   """List all badge definitions for the tenant (admin/instructor only)"""
   badgeDefinitions: [OpenBadgeDefinition!]!

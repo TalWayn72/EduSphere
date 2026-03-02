@@ -43,5 +43,5 @@ extend type Query {
 extend type Mutation {
   createContentItem(input: CreateContentItemInput!): ContentItem!
     @authenticated
-    @requiresScopes(scopes: ["course:write"])
+    @requiresScopes(scopes: [["course:write"]])
 }

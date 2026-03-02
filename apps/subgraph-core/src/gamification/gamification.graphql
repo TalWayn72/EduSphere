@@ -69,48 +69,4 @@ extend type Mutation {
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
-  # Open Badges 3.0 — Verifiable Credentials (W3C VC)
-  issueBadge(
-    badgeDefinitionId: ID!
-    recipientId: ID!
-    evidenceUrl: String
-  ): OpenBadgeAssertion! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN, INSTRUCTOR])
-
-  revokeOpenBadge(assertionId: ID!, reason: String!): Boolean!
-    @authenticated
-    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
-}
-
-# ── Open Badges 3.0 ──────────────────────────────────────────────────────────
-
-type OpenBadgeDefinition {
-  id: ID!
-  name: String!
-  description: String!
-  imageUrl: String
-  criteriaUrl: String
-  tags: [String!]!
-  issuerId: String!
-  createdAt: String!
-}
-
-type OpenBadgeAssertion {
-  id: ID!
-  badgeDefinitionId: ID!
-  recipientId: ID!
-  issuedAt: String!
-  expiresAt: String
-  evidenceUrl: String
-  revoked: Boolean!
-  revokedAt: String
-  revokedReason: String
-  # The issuing badge definition
-  definition: OpenBadgeDefinition!
-  # W3C VC JSON document (serialized)
-  vcDocument: String!
-}
-
-extend type Query {
-  myOpenBadges: [OpenBadgeAssertion!]! @authenticated
-  verifyOpenBadge(assertionId: ID!): Boolean! @authenticated
 }

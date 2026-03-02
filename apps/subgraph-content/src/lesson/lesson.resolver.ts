@@ -26,13 +26,6 @@ interface LessonParent {
   courseId?: string;
 }
 
-interface PipelineParent {
-  id: string;
-}
-
-interface RunParent {
-  id: string;
-}
 
 function requireAuth(ctx: GqlContext): TenantContext {
   const auth = ctx.authContext;
@@ -176,15 +169,4 @@ export class LessonResolver {
     return [];
   }
 
-  @ResolveField('currentRun')
-  async getCurrentRun(@Parent() pipeline: PipelineParent) {
-    if (!pipeline?.id) return null;
-    return this.pipelineService.findRunById(pipeline.id);
-  }
-
-  @ResolveField('results')
-  async getResults(@Parent() run: RunParent) {
-    if (!run?.id) return [];
-    return this.pipelineService.findResultsByRunId(run.id);
-  }
 }

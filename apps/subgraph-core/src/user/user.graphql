@@ -101,12 +101,12 @@ type Mutation {
   # Admin-only: creating a user with an arbitrary role requires ORG_ADMIN or SUPER_ADMIN
   createUser(input: CreateUserInput!): User!
     @authenticated
-    @requiresScopes(scopes: ["write:users"])
+    @requiresScopes(scopes: [["write:users"]])
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
   # Role changes require admin privileges; first/last name updates are also guarded
   updateUser(id: ID!, input: UpdateUserInput!): User!
     @authenticated
-    @requiresScopes(scopes: ["write:users"])
+    @requiresScopes(scopes: [["write:users"]])
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
   # Self-service: any authenticated user may update their own preferences
   updateUserPreferences(input: UpdateUserPreferencesInput!): User! @authenticated
@@ -115,17 +115,17 @@ type Mutation {
   # Soft-deactivate a user (admin only)
   deactivateUser(id: ID!): Boolean!
     @authenticated
-    @requiresScopes(scopes: ["write:users"])
+    @requiresScopes(scopes: [["write:users"]])
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
   # Trigger Keycloak password reset email (admin only)
   resetUserPassword(userId: ID!): Boolean!
     @authenticated
-    @requiresScopes(scopes: ["write:users"])
+    @requiresScopes(scopes: [["write:users"]])
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
   # Bulk import users from CSV data (admin only)
   bulkImportUsers(csvData: String!): BulkImportResult!
     @authenticated
-    @requiresScopes(scopes: ["write:users"])
+    @requiresScopes(scopes: [["write:users"]])
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
 }
 
