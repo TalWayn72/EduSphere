@@ -39,11 +39,11 @@ describe('packages/i18n exports', () => {
     }
   });
 
-  it('exports exactly 14 namespaces', () => {
-    expect(NAMESPACES).toHaveLength(14);
+  it('exports exactly 15 namespaces', () => {
+    expect(NAMESPACES).toHaveLength(15);
   });
 
-  it('all locale directories exist with all 14 namespace files', () => {
+  it('all locale directories exist with all 15 namespace files', () => {
     const localesDir = path.join(__dirname, '..', 'locales');
     for (const locale of SUPPORTED_LOCALES) {
       for (const ns of NAMESPACES) {
@@ -89,8 +89,8 @@ describe('DEFAULT_LOCALE', () => {
 });
 
 describe('NAMESPACES', () => {
-  it('contains exactly 14 namespaces', () => {
-    expect(NAMESPACES).toHaveLength(14);
+  it('contains exactly 15 namespaces', () => {
+    expect(NAMESPACES).toHaveLength(15);
   });
 
   it('includes all required namespaces', () => {
