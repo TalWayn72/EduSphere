@@ -57,11 +57,11 @@ describe('useSrsQueueCount', () => {
     );
   });
 
-  it('uses cache-and-network request policy', () => {
+  it('uses network-only request policy', () => {
     mockUseQuery.mockReturnValue([{ data: undefined, fetching: false }]);
     renderHook(() => useSrsQueueCount());
     expect(mockUseQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ requestPolicy: 'cache-and-network' })
+      expect.objectContaining({ requestPolicy: 'network-only' })
     );
   });
 });
