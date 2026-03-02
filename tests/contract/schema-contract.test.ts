@@ -505,6 +505,8 @@ describe('Schema Contract - content-tier3.queries.ts (Microlearning)', () => {
 
 // ---- badges.queries.ts — BUG-026: was missing from contract tests, allowing runtime
 // "Cannot query field 'myOpenBadges' on type 'Query'" to go undetected.
+// Note: OpenBadgeAssertion.definition field was removed from schema (eager-load removed).
+// verifyOpenBadge was removed; use verifyBadge (returns BadgeVerificationResult).
 const MY_OPEN_BADGES_QUERY_DOC = parse(`
   query MyOpenBadges {
     myOpenBadges {
@@ -517,24 +519,17 @@ const MY_OPEN_BADGES_QUERY_DOC = parse(`
       revoked
       revokedAt
       revokedReason
-      definition {
-        id
-        name
-        description
-        imageUrl
-        criteriaUrl
-        tags
-        issuerId
-        createdAt
-      }
       vcDocument
     }
   }
 `);
 
-const VERIFY_OPEN_BADGE_QUERY_DOC = parse(`
-  query VerifyOpenBadge($assertionId: ID!) {
-    verifyOpenBadge(assertionId: $assertionId)
+const VERIFY_BADGE_CONTRACT_QUERY_DOC = parse(`
+  query VerifyBadge($assertionId: ID!) {
+    verifyBadge(assertionId: $assertionId) {
+      valid
+      error
+    }
   }
 `);
 
@@ -544,8 +539,8 @@ describe('Schema Contract - badges.queries.ts (BUG-026 regression)', () => {
     expect(true).toBe(true);
   });
 
-  it('VERIFY_OPEN_BADGE_QUERY is valid against supergraph', () => {
-    assertValid('VERIFY_OPEN_BADGE_QUERY', VERIFY_OPEN_BADGE_QUERY_DOC);
+  it('VERIFY_BADGE_QUERY is valid against supergraph', () => {
+    assertValid('VERIFY_BADGE_QUERY', VERIFY_BADGE_CONTRACT_QUERY_DOC);
     expect(true).toBe(true);
   });
 });
