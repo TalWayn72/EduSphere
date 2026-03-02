@@ -1,9 +1,47 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 02 מרץ 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅** | **Visual QA 53/53 Zero-Error ✅**
 **בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,658 tests** (+17) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5+13 (BUG-026/027) ✅** | **Contract 36+11+4 (BUG-026/027) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
+
+---
+
+## ✅ BUG-036 — Media Upload "כשל בקבלת כותרת להעלאה" — S3 CRC32 + .doc contentType + JWT UUID (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 03 Mar 2026
+
+### Problem
+
+After BUG-035 was fixed, uploading a `.doc` file in the Course Wizard Media step still failed with:
+
+- UI: "כשל בקבלת כותרת להעלאה" (Failed to get upload URL)
+- Server presigned URLs contained `x-amz-checksum-crc32=AAAAAA%3D%3D&x-amz-sdk-checksum-algorithm=CRC32` — MinIO rejects those
+- Windows Chrome returns `file.type = ""` for `.doc`/`.xls` files → query fails with empty contentType
+- urql `cache-first` policy returned stale/null presigned URL on retry
+- `createCourse` FK violation when submitting (instructor_id UUID not in users table)
+
+### Root Causes (4)
+
+1. **AWS SDK v3 ≥ 3.993.0 CRC32 default** — `S3Client` now generates presigned URLs with mandatory CRC32 checksum params (`x-amz-checksum-crc32` + `x-amz-sdk-checksum-algorithm`). MinIO does not support these in presigned PUTs → upload fails.
+2. **Empty `file.type` on Windows** — Chrome on Windows returns empty MIME type for Office formats (`.doc`, `.xls`). Sending empty `contentType` to the presign query failed schema validation.
+3. **urql cache on presigned URLs** — default `cache-first` policy could return a stale/empty cache entry for the presign query (especially on retry after error).
+4. **JWT dev bypass UUID mismatch** — `packages/auth/src/jwt.ts` dev bypass returned `909e98a3-...` (old seed ID); after DB re-seed the real ID is `00000000-0000-0000-0000-000000000001`; FK constraint on `courses.instructor_id` rejected the wrong UUID.
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `apps/subgraph-content/src/media/media.service.ts` | `requestChecksumCalculation: 'WHEN_REQUIRED'` + `responseChecksumValidation: 'WHEN_REQUIRED'` in S3Client — removes CRC32 from presigned URLs |
+| `apps/web/src/pages/CourseWizardMediaStep.tsx` | `const contentType = entry.file.type \|\| 'application/octet-stream'` fallback; `requestPolicy: 'network-only'` on presign query; use resolved `contentType` in PUT headers |
+| `packages/auth/src/jwt.ts` | Restore `userId: '00000000-0000-0000-0000-000000000001'` in dev bypass (matches seeded user) |
+
+### Verification
+
+- `curl` presigned URL: no `x-amz-checksum-crc32` param in URL
+- GraphQL `createCourse` mutation: returns `{ id, title, slug }` with no FK error
+- GraphQL `me` query: returns `id: "00000000-0000-0000-0000-000000000001"`
+- All 2,814 web tests + 71 auth tests pass
 
 ---
 
