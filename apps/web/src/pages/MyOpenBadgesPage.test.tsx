@@ -39,43 +39,37 @@ import { useQuery } from 'urql';
 const MOCK_BADGES = [
   {
     id: 'b1',
+    badgeDefinitionId: 'def1',
+    badgeName: 'Excellence Badge',
+    badgeDescription: 'For excellence',
+    imageUrl: null,
+    recipientId: 'user-1',
     issuedAt: '2024-01-01T00:00:00Z',
     expiresAt: null,
+    evidenceUrl: null,
     revoked: false,
     revokedAt: null,
     revokedReason: null,
-    evidenceUrl: null,
+    verifyUrl: 'https://example.com/verify/b1',
+    shareUrl: 'https://example.com/share/b1',
     vcDocument: '{"@context":["https://www.w3.org/2018/credentials/v1"]}',
-    definition: {
-      id: 'def1',
-      name: 'Excellence Badge',
-      description: 'For excellence',
-      imageUrl: null,
-      criteriaUrl: null,
-      tags: [],
-      issuerId: 'issuer1',
-      createdAt: '2024-01-01T00:00:00Z',
-    },
   },
   {
     id: 'b2',
+    badgeDefinitionId: 'def2',
+    badgeName: 'Participation Badge',
+    badgeDescription: 'For participation',
+    imageUrl: null,
+    recipientId: 'user-1',
     issuedAt: '2024-02-01T00:00:00Z',
     expiresAt: null,
+    evidenceUrl: null,
     revoked: true,
     revokedAt: '2024-03-01T00:00:00Z',
     revokedReason: 'Policy violation',
-    evidenceUrl: null,
+    verifyUrl: 'https://example.com/verify/b2',
+    shareUrl: 'https://example.com/share/b2',
     vcDocument: '{"@context":["https://www.w3.org/2018/credentials/v1"]}',
-    definition: {
-      id: 'def2',
-      name: 'Participation Badge',
-      description: 'For participation',
-      imageUrl: null,
-      criteriaUrl: null,
-      tags: [],
-      issuerId: 'issuer1',
-      createdAt: '2024-01-01T00:00:00Z',
-    },
   },
 ];
 
@@ -293,10 +287,7 @@ describe('MyOpenBadgesPage', () => {
     const badgeWithImage = [
       {
         ...MOCK_BADGES[0]!,
-        definition: {
-          ...MOCK_BADGES[0]!.definition,
-          imageUrl: 'https://example.com/badge.png',
-        },
+        imageUrl: 'https://example.com/badge.png',
       },
     ];
     mockQuery({ data: { myOpenBadges: badgeWithImage } });

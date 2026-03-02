@@ -89,8 +89,11 @@ const STATUS_LABELS: Record<SourceStatus, string> = {
 
 // ─── DEV_MODE mock data ───────────────────────────────────────────────────────
 
-/** Seed sources returned when VITE_DEV_MODE=true (no backend required). */
-const DEV_SOURCES: KnowledgeSource[] = [
+/**
+ * Mutable in-memory store for DEV_MODE sources.
+ * Persists within the session so add/delete operations are reflected immediately.
+ */
+let _devSources: KnowledgeSource[] = [
   {
     id: 'dev-src-1',
     title: 'מבוא לתלמוד',
@@ -112,14 +115,34 @@ const DEV_SOURCES: KnowledgeSource[] = [
   },
 ];
 
-/** Mock query function for DEV_MODE — resolves immediately with seed data. */
+/** Mock query function for DEV_MODE — returns a snapshot of the mutable store. */
 function devQueryFn(): Promise<KnowledgeSource[]> {
-  return Promise.resolve(DEV_SOURCES);
+  return Promise.resolve([..._devSources]);
 }
 
-/** Mock mutation for DEV_MODE — no-op that resolves immediately. */
-function devMutationFn(_: unknown): Promise<void> {
-  return Promise.resolve();
+/** Creates a new mock source and appends it to the dev store. */
+function devAddSource(
+  sourceType: SourceType,
+  title: string,
+  origin?: string,
+): KnowledgeSource {
+  const src: KnowledgeSource = {
+    id: `dev-src-${Date.now()}`,
+    title,
+    sourceType,
+    origin,
+    preview: `תוכן לדוגמה עבור "${title}"`,
+    status: 'READY',
+    chunkCount: Math.floor(Math.random() * 15) + 1,
+    createdAt: new Date().toISOString(),
+  };
+  _devSources = [..._devSources, src];
+  return src;
+}
+
+/** Removes a source from the dev store by id. */
+function devRemoveSource(id: string): void {
+  _devSources = _devSources.filter((s) => s.id !== id);
 }
 
 // ─── Add-source Modal ─────────────────────────────────────────────────────────
@@ -171,7 +194,8 @@ function AddSourceModal({
 
   const addUrl = useMutation({
     mutationFn: IS_DEV_MODE
-      ? devMutationFn
+      ? (input: { courseId: string; title: string; url: string }) =>
+          Promise.resolve(devAddSource('URL', input.title, input.url))
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_URL_SOURCE, { input }, authHeaders()),
     onSuccess: () => { onAdded(); setSuccess(true); },
@@ -180,7 +204,8 @@ function AddSourceModal({
 
   const addText = useMutation({
     mutationFn: IS_DEV_MODE
-      ? devMutationFn
+      ? (input: { courseId: string; title: string; text: string }) =>
+          Promise.resolve(devAddSource('TEXT', input.title))
       : (input: { courseId: string; title: string; text: string }) =>
           graphqlClient.request(ADD_TEXT_SOURCE, { input }, authHeaders()),
     onSuccess: () => { onAdded(); setSuccess(true); },
@@ -189,7 +214,8 @@ function AddSourceModal({
 
   const addYoutube = useMutation({
     mutationFn: IS_DEV_MODE
-      ? devMutationFn
+      ? (input: { courseId: string; title: string; url: string }) =>
+          Promise.resolve(devAddSource('YOUTUBE', input.title, input.url))
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }, authHeaders()),
     onSuccess: () => { onAdded(); setSuccess(true); },
@@ -198,7 +224,8 @@ function AddSourceModal({
 
   const addFile = useMutation({
     mutationFn: IS_DEV_MODE
-      ? devMutationFn
+      ? (input: { courseId: string; title: string; fileName: string; contentBase64: string; mimeType: string }) =>
+          Promise.resolve(devAddSource('FILE_PDF', input.title, input.fileName))
       : (input: {
           courseId: string;
           title: string;
@@ -459,7 +486,7 @@ function SourceDetailDrawer({
     queryFn: IS_DEV_MODE
       ? () =>
           Promise.resolve(
-            DEV_SOURCES.find((s) => s.id === sourceId) ?? DEV_SOURCES[0]
+            _devSources.find((s) => s.id === sourceId) ?? _devSources[0]
           )
       : () =>
           graphqlClient
@@ -527,7 +554,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
 
   const deleteSource = useMutation({
     mutationFn: IS_DEV_MODE
-      ? devMutationFn
+      ? (id: string) => { devRemoveSource(id); return Promise.resolve(); }
       : (id: string) => graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }, authHeaders()),
     onSuccess: () => refetch(),
   });

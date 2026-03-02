@@ -139,15 +139,15 @@ describe('Layout', () => {
 
   it('shows compliance nav items for ORG_ADMIN', () => {
     renderLayout(orgAdminUser);
-    expect(screen.getByText('Admin Panel')).toBeInTheDocument();
-    expect(screen.getByText('LTI 1.3')).toBeInTheDocument();
-    expect(screen.getByText('Compliance')).toBeInTheDocument();
-    expect(screen.getByText('SCIM / HRIS')).toBeInTheDocument();
+    expect(screen.getByText('adminPanel')).toBeInTheDocument();
+    expect(screen.getByText('lti')).toBeInTheDocument();
+    expect(screen.getByText('compliance')).toBeInTheDocument();
+    expect(screen.getByText('scimHris')).toBeInTheDocument();
   });
 
   it('hides compliance items for INSTRUCTOR', () => {
     renderLayout(instructorUser);
-    expect(screen.queryByText('Admin Panel')).not.toBeInTheDocument();
+    expect(screen.queryByText('adminPanel')).not.toBeInTheDocument();
   });
 
   it('shows UserMenu when user is logged in', () => {

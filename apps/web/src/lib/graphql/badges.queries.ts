@@ -5,6 +5,9 @@ export const MY_OPEN_BADGES_QUERY = gql`
     myOpenBadges {
       id
       badgeDefinitionId
+      badgeName
+      badgeDescription
+      imageUrl
       recipientId
       issuedAt
       expiresAt
@@ -12,23 +15,9 @@ export const MY_OPEN_BADGES_QUERY = gql`
       revoked
       revokedAt
       revokedReason
-      definition {
-        id
-        name
-        description
-        imageUrl
-        criteriaUrl
-        tags
-        issuerId
-        createdAt
-      }
+      verifyUrl
+      shareUrl
       vcDocument
     }
-  }
-`;
-
-export const VERIFY_OPEN_BADGE_QUERY = gql`
-  query VerifyOpenBadge($assertionId: ID!) {
-    verifyOpenBadge(assertionId: $assertionId)
   }
 `;

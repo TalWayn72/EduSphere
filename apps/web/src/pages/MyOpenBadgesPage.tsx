@@ -13,20 +13,12 @@ import { Award, Download } from 'lucide-react';
 import { MY_OPEN_BADGES_QUERY } from '@/lib/graphql/badges.queries';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-interface OpenBadgeDefinition {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string | null;
-  criteriaUrl: string | null;
-  tags: string[];
-  issuerId: string;
-  createdAt: string;
-}
-
 export interface OpenBadgeAssertion {
   id: string;
   badgeDefinitionId: string;
+  badgeName: string;
+  badgeDescription: string;
+  imageUrl: string | null;
   recipientId: string;
   issuedAt: string;
   expiresAt: string | null;
@@ -34,8 +26,9 @@ export interface OpenBadgeAssertion {
   revoked: boolean;
   revokedAt: string | null;
   revokedReason: string | null;
-  definition: OpenBadgeDefinition;
-  vcDocument: string;
+  verifyUrl: string;
+  shareUrl: string;
+  vcDocument: string | null;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -79,15 +72,14 @@ function BadgeSkeleton() {
 
 // ── Badge Card ────────────────────────────────────────────────────────────────
 function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
-  const { definition } = assertion;
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
-          {definition.imageUrl ? (
+          {assertion.imageUrl ? (
             <img
-              src={definition.imageUrl}
-              alt={definition.name}
+              src={assertion.imageUrl}
+              alt={assertion.badgeName}
               className="h-12 w-12 rounded-lg object-cover shrink-0 border"
             />
           ) : (
@@ -98,7 +90,7 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle className="text-base leading-tight">
-                {definition.name}
+                {assertion.badgeName}
               </CardTitle>
               {assertion.revoked ? (
                 <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20">
@@ -111,7 +103,7 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
               )}
             </div>
             <CardDescription className="mt-1 line-clamp-2">
-              {definition.description}
+              {assertion.badgeDescription}
             </CardDescription>
           </div>
         </div>
@@ -127,15 +119,17 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
               </p>
             )}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5 shrink-0"
-            onClick={() => downloadVC(assertion.id, assertion.vcDocument)}
-          >
-            <Download className="h-3.5 w-3.5" />
-            Download VC
-          </Button>
+          {assertion.vcDocument && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 shrink-0"
+              onClick={() => downloadVC(assertion.id, assertion.vcDocument!)}
+            >
+              <Download className="h-3.5 w-3.5" />
+              Download VC
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -144,7 +138,7 @@ function BadgeCard({ assertion }: { assertion: OpenBadgeAssertion }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function MyOpenBadgesPage() {
-  const [result] = useQuery({ query: MY_OPEN_BADGES_QUERY, pause: true }); // myOpenBadges not in live gateway
+  const [result] = useQuery({ query: MY_OPEN_BADGES_QUERY });
   const { data, fetching, error } = result;
   const badges: OpenBadgeAssertion[] =
     (data as { myOpenBadges?: OpenBadgeAssertion[] } | undefined)

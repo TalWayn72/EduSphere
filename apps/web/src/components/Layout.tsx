@@ -194,7 +194,7 @@ export function Layout({ children }: LayoutProps) {
                     {({ isActive }) => (
                       <>
                         <LayoutDashboard className="h-4 w-4" />
-                        <span>Admin Panel</span>
+                        <span>{t('adminPanel')}</span>
                         <span className="sr-only">
                           {isActive ? ' (current page)' : ''}
                         </span>
@@ -218,7 +218,7 @@ export function Layout({ children }: LayoutProps) {
                     {({ isActive }) => (
                       <>
                         <Link2 className="h-4 w-4" />
-                        <span>LTI 1.3</span>
+                        <span>{t('lti')}</span>
                         <span className="sr-only">
                           {isActive ? ' (current page)' : ''}
                         </span>
@@ -242,7 +242,7 @@ export function Layout({ children }: LayoutProps) {
                     {({ isActive }) => (
                       <>
                         <ShieldCheck className="h-4 w-4" />
-                        <span>Compliance</span>
+                        <span>{t('compliance')}</span>
                         <span className="sr-only">
                           {isActive ? ' (current page)' : ''}
                         </span>
@@ -265,7 +265,7 @@ export function Layout({ children }: LayoutProps) {
                     {({ isActive }) => (
                       <>
                         <ShieldCheck className="h-4 w-4" />
-                        <span>SCIM / HRIS</span>
+                        <span>{t('scimHris')}</span>
                         <span className="sr-only">
                           {isActive ? ' (current page)' : ''}
                         </span>
@@ -377,7 +377,7 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                 >
                   <LayoutDashboard className="h-4 w-4" />
-                  <span>Admin Panel</span>
+                  <span>{t('adminPanel')}</span>
                 </Link>
               )}
               {isComplianceAdmin && (
@@ -387,7 +387,7 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                 >
                   <Link2 className="h-4 w-4" />
-                  <span>LTI 1.3</span>
+                  <span>{t('lti')}</span>
                 </Link>
               )}
               {isComplianceAdmin && (
@@ -397,7 +397,7 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                 >
                   <ShieldCheck className="h-4 w-4" />
-                  <span>Compliance</span>
+                  <span>{t('compliance')}</span>
                 </Link>
               )}
               {isComplianceAdmin && (
@@ -407,7 +407,7 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                 >
                   <ShieldCheck className="h-4 w-4" />
-                  <span>SCIM / HRIS</span>
+                  <span>{t('scimHris')}</span>
                 </Link>
               )}
               <Button

@@ -14,5 +14,9 @@
   "newCourse": "New Course",
   "search": "Search...",
   "leaderboard": "Leaderboard",
-  "srs": "SRS"
+  "srs": "SRS",
+  "adminPanel": "Admin Panel",
+  "lti": "LTI 1.3",
+  "compliance": "Compliance",
+  "scimHris": "SCIM / HRIS"
 }

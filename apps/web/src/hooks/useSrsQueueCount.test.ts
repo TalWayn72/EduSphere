@@ -48,11 +48,11 @@ describe('useSrsQueueCount', () => {
     expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ pause: false }));
   });
 
-  it('uses network-only request policy', () => {
+  it('uses cache-and-network request policy', () => {
     mockUseQuery.mockReturnValue([{ data: undefined, fetching: false }]);
     renderHook(() => useSrsQueueCount());
     expect(mockUseQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ requestPolicy: 'network-only' })
+      expect.objectContaining({ requestPolicy: 'cache-and-network' })
     );
   });
 });
