@@ -1,13 +1,18 @@
 import Keycloak from 'keycloak-js';
 
-const DEV_MODE =
+// SessionStorage key used to persist explicit dev-mode login across page reloads.
+// initKeycloak() sets devAuthenticated=false on every cold start. Only after the
+// user explicitly calls login() is the flag written, keeping the user authenticated
+// across page reloads within the same browser session (cleared on tab/window close).
+// This prevents incognito / fresh sessions from bypassing the login screen entirely.
+export const DEV_LOGGED_IN_KEY = 'edusphere_dev_logged_in';
+
+/** @deprecated Use DEV_LOGGED_IN_KEY. Kept for backward-compat cleanup in logout(). */
+const _DEV_LOGOUT_KEY_LEGACY = 'edusphere_dev_logged_out';
+
+export const DEV_MODE =
   import.meta.env.VITE_DEV_MODE === 'true' ||
   !import.meta.env.VITE_KEYCLOAK_URL;
-
-// SessionStorage key used to persist explicit dev-mode logout across page reloads.
-// initKeycloak() sets devAuthenticated=true on every cold start, so without this
-// flag a full-page-reload after logout would immediately re-authenticate the user.
-const DEV_LOGOUT_KEY = 'edusphere_dev_logged_out';
 
 const keycloakConfig = {
   url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
@@ -59,12 +64,13 @@ export function initKeycloak(): Promise<boolean> {
   // Development mode - skip Keycloak
   if (DEV_MODE) {
     console.warn('🔧 DEV MODE: Running without Keycloak authentication');
-    // Respect an explicit logout — do NOT auto-authenticate when the user
-    // has previously signed out (sessionStorage survives page reloads but
-    // is cleared when the browser tab/session ends).
-    const wasLoggedOut =
-      window.sessionStorage.getItem(DEV_LOGOUT_KEY) === 'true';
-    devAuthenticated = !wasLoggedOut;
+    // Require an explicit login() call — do NOT auto-authenticate on cold
+    // start. sessionStorage is empty in incognito / fresh sessions, so using
+    // a "logged-in" flag (opt-in) instead of a "logged-out" flag (opt-out)
+    // ensures a login screen is always shown until the user actively signs in.
+    const wasLoggedIn =
+      window.sessionStorage.getItem(DEV_LOGGED_IN_KEY) === 'true';
+    devAuthenticated = wasLoggedIn;
     return Promise.resolve(devAuthenticated);
   }
 
@@ -116,7 +122,7 @@ export function initKeycloak(): Promise<boolean> {
 
 export function login(): void {
   if (DEV_MODE) {
-    window.sessionStorage.removeItem(DEV_LOGOUT_KEY);
+    window.sessionStorage.setItem(DEV_LOGGED_IN_KEY, 'true');
     devAuthenticated = true;
     window.location.href = '/';
     return;
@@ -131,9 +137,11 @@ export function logout(): void {
   if (DEV_MODE) {
     devAuthenticated = false;
     clearTokenRefresh();
-    // Persist the logged-out state before the page reloads so that
-    // initKeycloak() does not re-authenticate on the next cold start.
-    window.sessionStorage.setItem(DEV_LOGOUT_KEY, 'true');
+    // Remove the logged-in flag so the next initKeycloak() (page reload)
+    // starts unauthenticated and shows the login screen again.
+    window.sessionStorage.removeItem(DEV_LOGGED_IN_KEY);
+    // Also purge any legacy "logged-out" key left by older builds.
+    window.sessionStorage.removeItem(_DEV_LOGOUT_KEY_LEGACY);
     window.location.href = '/login';
     return;
   }

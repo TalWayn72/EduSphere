@@ -54,6 +54,22 @@ function stubKeycloakEnv(devMode: string = 'false') {
   vi.stubEnv('VITE_KEYCLOAK_CLIENT_ID', 'edusphere-web');
 }
 
+/** Stub window.location.href writes to prevent jsdom navigation errors. */
+function stubHref() {
+  const hrefSetter = vi.fn();
+  Object.defineProperty(window, 'location', {
+    value: {
+      ...window.location,
+      set href(v: string) {
+        hrefSetter(v);
+      },
+    },
+    writable: true,
+    configurable: true,
+  });
+  return hrefSetter;
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -62,17 +78,18 @@ describe('auth — DEV_MODE', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.unstubAllEnvs();
-    // Prevent a stale DEV_LOGOUT_KEY from a prior test leaking into this one.
+    // Start every test with a clean slate — no stale logged-in/logged-out flags.
     window.sessionStorage.clear();
   });
 
-  it('initKeycloak() succeeds immediately when VITE_DEV_MODE=true', async () => {
+  it('initKeycloak() returns false in DEV_MODE (login screen required)', async () => {
     vi.stubEnv('VITE_DEV_MODE', 'true');
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
 
     const { initKeycloak } = await import('@/lib/auth');
     const result = await initKeycloak();
-    expect(result).toBe(true);
+    // Must NOT auto-authenticate — user must explicitly click "Sign In".
+    expect(result).toBe(false);
   });
 
   it('keycloak singleton is null in DEV_MODE', async () => {
@@ -83,42 +100,52 @@ describe('auth — DEV_MODE', () => {
     expect(keycloak).toBeNull();
   });
 
-  it('isAuthenticated() returns true after initKeycloak() in DEV_MODE', async () => {
+  it('isAuthenticated() is false after initKeycloak() and true after login() in DEV_MODE', async () => {
     vi.stubEnv('VITE_DEV_MODE', 'true');
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+    const hrefSetter = stubHref();
 
-    const { initKeycloak, isAuthenticated } = await import('@/lib/auth');
+    const { initKeycloak, isAuthenticated, login } = await import('@/lib/auth');
+
     await initKeycloak();
-    expect(isAuthenticated()).toBe(true);
+    expect(isAuthenticated()).toBe(false); // no auto-auth
+
+    login();
+    expect(isAuthenticated()).toBe(true); // authenticated after explicit login
+    expect(hrefSetter).toHaveBeenCalledWith('/');
   });
 
   it('DEV_USER contains real seeded UUIDs matching the database seed', async () => {
     vi.stubEnv('VITE_DEV_MODE', 'true');
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+    stubHref();
 
-    const { initKeycloak, getCurrentUser } = await import('@/lib/auth');
+    const { initKeycloak, getCurrentUser, login } = await import('@/lib/auth');
     await initKeycloak();
+    login(); // must log in explicitly before getCurrentUser returns a user
     const user = getCurrentUser();
     expect(user?.id).toBe('00000000-0000-0000-0000-000000000001');
     expect(user?.tenantId).toBe('00000000-0000-0000-0000-000000000000');
     expect(user?.role).toBe('SUPER_ADMIN');
   });
 
-  it('logout() sets sessionStorage flag so next initKeycloak() returns false (page-reload scenario)', async () => {
+  it('logout() removes logged-in flag so next initKeycloak() returns false (page-reload scenario)', async () => {
     vi.stubEnv('VITE_DEV_MODE', 'true');
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+    const hrefSetter = stubHref();
 
-    // Simulate the in-memory logout
-    const { initKeycloak, logout, isAuthenticated } =
-      await import('@/lib/auth');
+    // Simulate being logged in via the sessionStorage flag (avoids href mock complexity)
+    window.sessionStorage.setItem('edusphere_dev_logged_in', 'true');
+
+    const { initKeycloak, logout, isAuthenticated } = await import('@/lib/auth');
     await initKeycloak();
     expect(isAuthenticated()).toBe(true);
 
     logout();
     expect(isAuthenticated()).toBe(false);
-    expect(window.sessionStorage.getItem('edusphere_dev_logged_out')).toBe(
-      'true'
-    );
+    // Flag must be removed (not set to 'true' — the new opt-in pattern)
+    expect(window.sessionStorage.getItem('edusphere_dev_logged_in')).toBeNull();
+    expect(hrefSetter).toHaveBeenCalledWith('/login');
 
     // Simulate a full page reload: re-import the module from scratch
     vi.resetModules();
@@ -127,46 +154,27 @@ describe('auth — DEV_MODE', () => {
       isAuthenticated: isAuthAfterReload,
     } = await import('@/lib/auth');
     await initAfterReload();
-    // Despite initKeycloak() being called again, the sessionStorage flag must
-    // keep the user logged out (the bug this test guards against).
+    // Without the logged-in flag, the user must remain unauthenticated.
     expect(isAuthAfterReload()).toBe(false);
   });
 
-  it('login() clears the sessionStorage logout flag so the user can log back in', async () => {
+  it('login() sets DEV_LOGGED_IN_KEY so the user stays logged in across reloads', async () => {
     vi.stubEnv('VITE_DEV_MODE', 'true');
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
-
-    // Simulate prior logout
-    window.sessionStorage.setItem('edusphere_dev_logged_out', 'true');
-
-    // Stub window.location.href to prevent jsdom navigation errors
-    const hrefSetter = vi.fn();
-    Object.defineProperty(window, 'location', {
-      value: {
-        ...window.location,
-        set href(v: string) {
-          hrefSetter(v);
-        },
-      },
-      writable: true,
-    });
+    const hrefSetter = stubHref();
 
     const { login } = await import('@/lib/auth');
     login();
 
-    expect(
-      window.sessionStorage.getItem('edusphere_dev_logged_out')
-    ).toBeNull();
+    expect(window.sessionStorage.getItem('edusphere_dev_logged_in')).toBe('true');
     expect(hrefSetter).toHaveBeenCalledWith('/');
   });
 
-  it('getCurrentUser() returns null when devAuthenticated is false', async () => {
+  it('getCurrentUser() returns null when devAuthenticated is false (no login called)', async () => {
     vi.stubEnv('VITE_DEV_MODE', 'true');
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
 
-    // Simulate a prior logout persisted in sessionStorage
-    window.sessionStorage.setItem('edusphere_dev_logged_out', 'true');
-
+    // sessionStorage is empty (cleared in beforeEach) — no logged-in flag
     const { initKeycloak, getCurrentUser } = await import('@/lib/auth');
     await initKeycloak();
     expect(getCurrentUser()).toBeNull();

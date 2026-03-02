@@ -18,6 +18,8 @@ const mockLogin = vi.fn();
 vi.mock('@/lib/auth', () => ({
   isAuthenticated: () => mockIsAuthenticated(),
   login: () => mockLogin(),
+  // DEV_MODE=false → render the production Keycloak branch so existing tests pass
+  DEV_MODE: false,
 }));
 
 function renderLogin() {
