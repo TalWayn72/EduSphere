@@ -111,7 +111,9 @@ export class CourseService implements OnModuleDestroy {
       .set({ is_published: isPublished })
       .where(eq(schema.courses.id, id))
       .returning();
-    this.logger.log(`Course ${isPublished ? 'published' : 'unpublished'}: ${id}`);
+    this.logger.log(
+      `Course ${isPublished ? 'published' : 'unpublished'}: ${id}`
+    );
     return this.mapCourse(course as Record<string, unknown>);
   }
 

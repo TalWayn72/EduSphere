@@ -142,14 +142,17 @@ describe('CourseResolver', () => {
       const published = { ...MOCK_COURSE, isPublished: true };
       mockCourseService.setPublished.mockResolvedValue(published);
       const result = await resolver.publishCourse('course-1', AUTH_CTX);
-      expect(mockCourseService.setPublished).toHaveBeenCalledWith('course-1', true);
+      expect(mockCourseService.setPublished).toHaveBeenCalledWith(
+        'course-1',
+        true
+      );
       expect(result).toEqual(published);
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.publishCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(
+        resolver.publishCourse('course-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -158,14 +161,17 @@ describe('CourseResolver', () => {
       const unpublished = { ...MOCK_COURSE, isPublished: false };
       mockCourseService.setPublished.mockResolvedValue(unpublished);
       const result = await resolver.unpublishCourse('course-1', AUTH_CTX);
-      expect(mockCourseService.setPublished).toHaveBeenCalledWith('course-1', false);
+      expect(mockCourseService.setPublished).toHaveBeenCalledWith(
+        'course-1',
+        false
+      );
       expect(result).toEqual(unpublished);
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.unpublishCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(
+        resolver.unpublishCourse('course-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -178,9 +184,9 @@ describe('CourseResolver', () => {
     });
 
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.deleteCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(
+        resolver.deleteCourse('course-1', NO_AUTH_CTX)
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 

@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from './schema';
 import { initializeGraphOntology } from './graph';
@@ -54,12 +55,10 @@ async function seed() {
     // with a random UUID, causing onConflictDoNothing to silently skip the
     // insert — leaving the expected ID missing. We delete any conflicting row
     // first (it has no FK dependents on a fresh seed).
-    await db
-      .delete(users)
-      .where(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sql`email = 'super.admin@edusphere.dev' AND tenant_id = '00000000-0000-0000-0000-000000000000'::uuid AND id != '00000000-0000-0000-0000-000000000001'::uuid` as any
-      );
+    await db.delete(users).where(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sql`email = 'super.admin@edusphere.dev' AND tenant_id = '00000000-0000-0000-0000-000000000000'::uuid AND id != '00000000-0000-0000-0000-000000000001'::uuid` as any
+    );
 
     // Create users
     await db
