@@ -404,6 +404,7 @@ jobs:
 
       - name: Generate SBOM (CycloneDX)
         uses: aquasecurity/trivy-action@0.28.0
+        continue-on-error: true
         with:
           scan-type: fs
           format: cyclonedx
