@@ -8,6 +8,7 @@ import { server } from './server';
 // English string (e.g. t('title') → "AI Learning Agents"), matching what
 // component tests assert against.
 
+import adminEn from '../../../../packages/i18n/src/locales/en/admin.json';
 import agentsEn from '../../../../packages/i18n/src/locales/en/agents.json';
 import annotationsEn from '../../../../packages/i18n/src/locales/en/annotations.json';
 import authEn from '../../../../packages/i18n/src/locales/en/auth.json';
@@ -24,6 +25,7 @@ import settingsEn from '../../../../packages/i18n/src/locales/en/settings.json';
 type TranslationRecord = Record<string, unknown>;
 
 const EN_RESOURCES: Record<string, TranslationRecord> = {
+  admin: adminEn as TranslationRecord,
   agents: agentsEn as TranslationRecord,
   annotations: annotationsEn as TranslationRecord,
   auth: authEn as TranslationRecord,

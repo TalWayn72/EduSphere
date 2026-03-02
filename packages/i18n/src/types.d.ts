@@ -11,6 +11,7 @@ import type enKnowledge from './locales/en/knowledge.json';
 import type enSettings from './locales/en/settings.json';
 import type enErrors from './locales/en/errors.json';
 import type enOffline from './locales/en/offline.json';
+import type enAdmin from './locales/en/admin.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -29,6 +30,7 @@ declare module 'i18next' {
       settings: typeof enSettings;
       errors: typeof enErrors;
       offline: typeof enOffline;
+      admin: typeof enAdmin;
     };
   }
 }

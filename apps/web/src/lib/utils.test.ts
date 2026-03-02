@@ -28,7 +28,8 @@ describe('cn()', () => {
   });
 
   it('excludes falsy conditional classes (false is excluded)', () => {
-    const result = cn('flex', false && 'hidden', 'gap-2');
+    const falsy: boolean = false;
+    const result = cn('flex', falsy && 'hidden', 'gap-2');
     expect(result).not.toContain('hidden');
     expect(result).toContain('flex');
     expect(result).toContain('gap-2');

@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "Ikhtisar",
+      "organization": "Organisasi",
+      "people": "Orang",
+      "learning": "Pembelajaran",
+      "integrations": "Integrasi",
+      "securityCompliance": "Keamanan & Kepatuhan",
+      "settings": "Pengaturan"
+    },
+    "nav": {
+      "dashboard": "Dasbor",
+      "branding": "Merek",
+      "languages": "Bahasa",
+      "portalBuilder": "Pembangun Portal",
+      "announcements": "Pengumuman",
+      "users": "Pengguna",
+      "rolesPermissions": "Peran & Izin",
+      "enrollment": "Pendaftaran",
+      "compliance": "Kepatuhan",
+      "cpd": "CPD / Kredit",
+      "assessments": "Penilaian 360°",
+      "atRiskLearners": "Pelajar Berisiko",
+      "gamification": "Gamifikasi",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "Ekspor BI",
+      "securitySettings": "Pengaturan Keamanan",
+      "auditLog": "Log Audit",
+      "notificationTemplates": "Template Notifikasi"
+    }
+  },
+  "dashboard": {
+    "title": "Dasbor Admin",
+    "description": "Ikhtisar platform dan metrik utama",
+    "adminTools": "Alat Admin",
+    "recentActivity": "Aktivitas Terkini",
+    "activityFeed": "Feed Aktivitas",
+    "noActivity": "Aktivitas admin terkini akan muncul di sini.",
+    "loadError": "Gagal memuat data dasbor",
+    "quickLinks": {
+      "branding": { "label": "Merek", "desc": "Logo, warna, tema" },
+      "users": { "label": "Pengguna", "desc": "Kelola pelajar dan admin" },
+      "compliance": { "label": "Kepatuhan", "desc": "Laporan dan tenggat waktu" },
+      "gamification": { "label": "Gamifikasi", "desc": "Poin, lencana, papan peringkat" },
+      "security": { "label": "Keamanan", "desc": "MFA, SSO, kebijakan sesi" },
+      "auditLog": { "label": "Log Audit", "desc": "Riwayat tindakan admin" }
+    }
+  },
+  "stats": {
+    "totalUsers": "Total Pengguna",
+    "activeThisMonth": "Aktif Bulan Ini",
+    "totalCourses": "Total Kursus",
+    "completions30d": "Selesai (30h)",
+    "atRiskLearners": "Pelajar Berisiko",
+    "storageUsed": "Penyimpanan Terpakai"
+  }
+}

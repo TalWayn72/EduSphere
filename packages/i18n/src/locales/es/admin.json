@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "Resumen",
+      "organization": "Organización",
+      "people": "Personas",
+      "learning": "Aprendizaje",
+      "integrations": "Integraciones",
+      "securityCompliance": "Seguridad y Cumplimiento",
+      "settings": "Configuración"
+    },
+    "nav": {
+      "dashboard": "Panel",
+      "branding": "Marca",
+      "languages": "Idiomas",
+      "portalBuilder": "Constructor de Portal",
+      "announcements": "Anuncios",
+      "users": "Usuarios",
+      "rolesPermissions": "Roles y Permisos",
+      "enrollment": "Inscripción",
+      "compliance": "Cumplimiento",
+      "cpd": "CPD / Créditos",
+      "assessments": "Evaluaciones 360°",
+      "atRiskLearners": "Estudiantes en Riesgo",
+      "gamification": "Gamificación",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "Exportar BI",
+      "securitySettings": "Configuración de Seguridad",
+      "auditLog": "Registro de Auditoría",
+      "notificationTemplates": "Plantillas de Notificación"
+    }
+  },
+  "dashboard": {
+    "title": "Panel de Administración",
+    "description": "Resumen de la plataforma y métricas clave",
+    "adminTools": "Herramientas de Admin",
+    "recentActivity": "Actividad Reciente",
+    "activityFeed": "Feed de Actividad",
+    "noActivity": "La actividad reciente de administración aparecerá aquí.",
+    "loadError": "Error al cargar datos del panel",
+    "quickLinks": {
+      "branding": { "label": "Marca", "desc": "Logos, colores, temas" },
+      "users": { "label": "Usuarios", "desc": "Gestionar estudiantes y admins" },
+      "compliance": { "label": "Cumplimiento", "desc": "Informes y plazos" },
+      "gamification": { "label": "Gamificación", "desc": "Puntos, insignias, clasificaciones" },
+      "security": { "label": "Seguridad", "desc": "MFA, SSO, política de sesión" },
+      "auditLog": { "label": "Registro de Auditoría", "desc": "Historial de acciones admin" }
+    }
+  },
+  "stats": {
+    "totalUsers": "Total de Usuarios",
+    "activeThisMonth": "Activos Este Mes",
+    "totalCourses": "Total de Cursos",
+    "completions30d": "Completados (30d)",
+    "atRiskLearners": "Estudiantes en Riesgo",
+    "storageUsed": "Almacenamiento Usado"
+  }
+}

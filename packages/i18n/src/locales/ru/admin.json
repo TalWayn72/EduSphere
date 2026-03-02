@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "Обзор",
+      "organization": "Организация",
+      "people": "Люди",
+      "learning": "Обучение",
+      "integrations": "Интеграции",
+      "securityCompliance": "Безопасность и Соответствие",
+      "settings": "Настройки"
+    },
+    "nav": {
+      "dashboard": "Панель управления",
+      "branding": "Брендинг",
+      "languages": "Языки",
+      "portalBuilder": "Конструктор портала",
+      "announcements": "Объявления",
+      "users": "Пользователи",
+      "rolesPermissions": "Роли и Разрешения",
+      "enrollment": "Запись",
+      "compliance": "Соответствие",
+      "cpd": "CPD / Кредиты",
+      "assessments": "Оценки 360°",
+      "atRiskLearners": "Учащиеся в группе риска",
+      "gamification": "Геймификация",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "Экспорт BI",
+      "securitySettings": "Настройки безопасности",
+      "auditLog": "Журнал аудита",
+      "notificationTemplates": "Шаблоны уведомлений"
+    }
+  },
+  "dashboard": {
+    "title": "Панель администратора",
+    "description": "Обзор платформы и ключевые показатели",
+    "adminTools": "Инструменты администратора",
+    "recentActivity": "Последняя активность",
+    "activityFeed": "Лента активности",
+    "noActivity": "Последняя активность администратора появится здесь.",
+    "loadError": "Не удалось загрузить данные панели",
+    "quickLinks": {
+      "branding": { "label": "Брендинг", "desc": "Логотипы, цвета, темы" },
+      "users": { "label": "Пользователи", "desc": "Управление учащимися и администраторами" },
+      "compliance": { "label": "Соответствие", "desc": "Отчёты и сроки" },
+      "gamification": { "label": "Геймификация", "desc": "Очки, значки, рейтинги" },
+      "security": { "label": "Безопасность", "desc": "MFA, SSO, политика сессий" },
+      "auditLog": { "label": "Журнал аудита", "desc": "История действий администратора" }
+    }
+  },
+  "stats": {
+    "totalUsers": "Всего пользователей",
+    "activeThisMonth": "Активных в этом месяце",
+    "totalCourses": "Всего курсов",
+    "completions30d": "Завершений (30 дн.)",
+    "atRiskLearners": "Учащихся в риске",
+    "storageUsed": "Использовано хранилища"
+  }
+}

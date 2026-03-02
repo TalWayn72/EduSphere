@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "Visão Geral",
+      "organization": "Organização",
+      "people": "Pessoas",
+      "learning": "Aprendizado",
+      "integrations": "Integrações",
+      "securityCompliance": "Segurança e Conformidade",
+      "settings": "Configurações"
+    },
+    "nav": {
+      "dashboard": "Painel",
+      "branding": "Identidade Visual",
+      "languages": "Idiomas",
+      "portalBuilder": "Construtor de Portal",
+      "announcements": "Comunicados",
+      "users": "Usuários",
+      "rolesPermissions": "Funções e Permissões",
+      "enrollment": "Matrícula",
+      "compliance": "Conformidade",
+      "cpd": "CPD / Créditos",
+      "assessments": "Avaliações 360°",
+      "atRiskLearners": "Alunos em Risco",
+      "gamification": "Gamificação",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "Exportar BI",
+      "securitySettings": "Configurações de Segurança",
+      "auditLog": "Log de Auditoria",
+      "notificationTemplates": "Modelos de Notificação"
+    }
+  },
+  "dashboard": {
+    "title": "Painel Administrativo",
+    "description": "Visão geral da plataforma e métricas principais",
+    "adminTools": "Ferramentas Admin",
+    "recentActivity": "Atividade Recente",
+    "activityFeed": "Feed de Atividade",
+    "noActivity": "A atividade admin recente aparecerá aqui.",
+    "loadError": "Falha ao carregar dados do painel",
+    "quickLinks": {
+      "branding": { "label": "Identidade Visual", "desc": "Logos, cores, temas" },
+      "users": { "label": "Usuários", "desc": "Gerenciar alunos e admins" },
+      "compliance": { "label": "Conformidade", "desc": "Relatórios e prazos" },
+      "gamification": { "label": "Gamificação", "desc": "Pontos, emblemas, classificações" },
+      "security": { "label": "Segurança", "desc": "MFA, SSO, política de sessão" },
+      "auditLog": { "label": "Log de Auditoria", "desc": "Histórico de ações admin" }
+    }
+  },
+  "stats": {
+    "totalUsers": "Total de Usuários",
+    "activeThisMonth": "Ativos este Mês",
+    "totalCourses": "Total de Cursos",
+    "completions30d": "Concluídos (30d)",
+    "atRiskLearners": "Alunos em Risco",
+    "storageUsed": "Armazenamento Usado"
+  }
+}

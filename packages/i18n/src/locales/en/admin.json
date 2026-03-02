@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "Overview",
+      "organization": "Organization",
+      "people": "People",
+      "learning": "Learning",
+      "integrations": "Integrations",
+      "securityCompliance": "Security & Compliance",
+      "settings": "Settings"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "branding": "Branding",
+      "languages": "Languages",
+      "portalBuilder": "Portal Builder",
+      "announcements": "Announcements",
+      "users": "Users",
+      "rolesPermissions": "Roles & Permissions",
+      "enrollment": "Enrollment",
+      "compliance": "Compliance",
+      "cpd": "CPD / Credits",
+      "assessments": "360° Assessments",
+      "atRiskLearners": "At-Risk Learners",
+      "gamification": "Gamification",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "BI Export",
+      "securitySettings": "Security Settings",
+      "auditLog": "Audit Log",
+      "notificationTemplates": "Notification Templates"
+    }
+  },
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "description": "Platform overview and key metrics",
+    "adminTools": "Admin Tools",
+    "recentActivity": "Recent Activity",
+    "activityFeed": "Activity Feed",
+    "noActivity": "Recent admin activity will appear here.",
+    "loadError": "Failed to load dashboard data",
+    "quickLinks": {
+      "branding": { "label": "Branding", "desc": "Logos, colors, themes" },
+      "users": { "label": "Users", "desc": "Manage learners and admins" },
+      "compliance": { "label": "Compliance", "desc": "Reports and deadlines" },
+      "gamification": { "label": "Gamification", "desc": "Points, badges, leaderboards" },
+      "security": { "label": "Security", "desc": "MFA, SSO, session policy" },
+      "auditLog": { "label": "Audit Log", "desc": "Admin action history" }
+    }
+  },
+  "stats": {
+    "totalUsers": "Total Users",
+    "activeThisMonth": "Active This Month",
+    "totalCourses": "Total Courses",
+    "completions30d": "Completions (30d)",
+    "atRiskLearners": "At-Risk Learners",
+    "storageUsed": "Storage Used"
+  }
+}

@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Users,
@@ -15,6 +16,7 @@ import {
 import type { AdminOverviewData } from '@/pages/AdminDashboardPage';
 
 interface StatCard {
+  id: string;
   label: string;
   value: string;
   icon: React.ElementType;
@@ -22,41 +24,49 @@ interface StatCard {
   linkTo?: string;
 }
 
-function buildCards(overview: AdminOverviewData): StatCard[] {
+type TFunction = (key: string) => string;
+
+function buildCards(overview: AdminOverviewData, t: TFunction): StatCard[] {
   return [
     {
-      label: 'Total Users',
+      id: 'totalUsers',
+      label: t('stats.totalUsers'),
       value: overview.totalUsers.toLocaleString(),
       icon: Users,
       colorClass: 'text-blue-600',
     },
     {
-      label: 'Active This Month',
+      id: 'activeThisMonth',
+      label: t('stats.activeThisMonth'),
       value: overview.activeUsersThisMonth.toLocaleString(),
       icon: TrendingUp,
       colorClass: 'text-green-600',
     },
     {
-      label: 'Total Courses',
+      id: 'totalCourses',
+      label: t('stats.totalCourses'),
       value: overview.totalCourses.toLocaleString(),
       icon: BookOpen,
       colorClass: 'text-purple-600',
     },
     {
-      label: 'Completions (30d)',
+      id: 'completions30d',
+      label: t('stats.completions30d'),
       value: overview.completionsThisMonth.toLocaleString(),
       icon: CheckCircle,
       colorClass: 'text-emerald-600',
     },
     {
-      label: 'At-Risk Learners',
+      id: 'atRiskLearners',
+      label: t('stats.atRiskLearners'),
       value: overview.atRiskCount.toLocaleString(),
       icon: AlertTriangle,
       colorClass: 'text-orange-600',
       linkTo: '/admin/at-risk',
     },
     {
-      label: 'Storage Used',
+      id: 'storageUsed',
+      label: t('stats.storageUsed'),
       value: `${overview.storageUsedMb.toFixed(1)} MB`,
       icon: Database,
       colorClass: 'text-gray-600',
@@ -69,7 +79,8 @@ interface AdminStatCardsProps {
 }
 
 export function AdminStatCards({ overview }: AdminStatCardsProps) {
-  const cards = buildCards(overview);
+  const { t } = useTranslation('admin');
+  const cards = buildCards(overview, t);
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -95,11 +106,11 @@ export function AdminStatCards({ overview }: AdminStatCardsProps) {
           </Card>
         );
         return card.linkTo ? (
-          <Link key={card.label} to={card.linkTo}>
+          <Link key={card.id} to={card.linkTo}>
             {inner}
           </Link>
         ) : (
-          <div key={card.label}>{inner}</div>
+          <div key={card.id}>{inner}</div>
         );
       })}
     </div>

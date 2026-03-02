@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "概览",
+      "organization": "组织",
+      "people": "人员",
+      "learning": "学习",
+      "integrations": "集成",
+      "securityCompliance": "安全与合规",
+      "settings": "设置"
+    },
+    "nav": {
+      "dashboard": "控制台",
+      "branding": "品牌",
+      "languages": "语言",
+      "portalBuilder": "门户构建器",
+      "announcements": "公告",
+      "users": "用户",
+      "rolesPermissions": "角色与权限",
+      "enrollment": "注册",
+      "compliance": "合规",
+      "cpd": "CPD / 学分",
+      "assessments": "360°评估",
+      "atRiskLearners": "高风险学员",
+      "gamification": "游戏化",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "BI导出",
+      "securitySettings": "安全设置",
+      "auditLog": "审计日志",
+      "notificationTemplates": "通知模板"
+    }
+  },
+  "dashboard": {
+    "title": "管理控制台",
+    "description": "平台概览与关键指标",
+    "adminTools": "管理工具",
+    "recentActivity": "最近活动",
+    "activityFeed": "活动记录",
+    "noActivity": "最近的管理活动将显示在这里。",
+    "loadError": "加载仪表盘数据失败",
+    "quickLinks": {
+      "branding": { "label": "品牌", "desc": "标志、颜色、主题" },
+      "users": { "label": "用户", "desc": "管理学员和管理员" },
+      "compliance": { "label": "合规", "desc": "报告和截止日期" },
+      "gamification": { "label": "游戏化", "desc": "积分、徽章、排行榜" },
+      "security": { "label": "安全", "desc": "MFA、SSO、会话策略" },
+      "auditLog": { "label": "审计日志", "desc": "管理员操作历史" }
+    }
+  },
+  "stats": {
+    "totalUsers": "总用户数",
+    "activeThisMonth": "本月活跃",
+    "totalCourses": "总课程数",
+    "completions30d": "完成数(30天)",
+    "atRiskLearners": "高风险学员",
+    "storageUsed": "已用存储"
+  }
+}

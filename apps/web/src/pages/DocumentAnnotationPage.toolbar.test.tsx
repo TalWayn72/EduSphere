@@ -72,7 +72,7 @@ describe('DocumentToolbar', () => {
     renderToolbar({ documentZoom: 0.75 });
     const buttons = screen.getAllByRole('button');
     // ZoomOut is the first zoom button
-    const zoomOutBtn = buttons.find((b) => b.querySelector('svg'));
+    void buttons.find((b) => b.querySelector('svg'));
     // The first ghost size button near zoom area should be disabled
     expect(buttons.some((b) => (b as HTMLButtonElement).disabled)).toBe(true);
   });

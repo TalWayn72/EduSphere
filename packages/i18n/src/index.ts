@@ -50,5 +50,6 @@ export const NAMESPACES = [
   'settings',
   'errors',
   'offline',
+  'admin',
 ] as const;
 export type I18nNamespace = (typeof NAMESPACES)[number];

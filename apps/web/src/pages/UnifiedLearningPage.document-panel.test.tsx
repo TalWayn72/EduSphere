@@ -3,7 +3,7 @@
  * Covers: no-document placeholder, LinkViewer (URL content), document viewer mode.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { DocumentPanel } from './UnifiedLearningPage.document-panel';
 import { AnnotationLayer } from '@/types/annotations';
 import type { TextRangeAnnotation } from '@/components/annotation/AnnotationDecorationsPlugin';

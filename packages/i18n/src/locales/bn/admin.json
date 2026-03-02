@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "সংক্ষিপ্ত বিবরণ",
+      "organization": "সংগঠন",
+      "people": "মানুষ",
+      "learning": "শেখা",
+      "integrations": "ইন্টিগ্রেশন",
+      "securityCompliance": "নিরাপত্তা ও সম্মতি",
+      "settings": "সেটিংস"
+    },
+    "nav": {
+      "dashboard": "ড্যাশবোর্ড",
+      "branding": "ব্র্যান্ডিং",
+      "languages": "ভাষা",
+      "portalBuilder": "পোর্টাল বিল্ডার",
+      "announcements": "ঘোষণা",
+      "users": "ব্যবহারকারী",
+      "rolesPermissions": "ভূমিকা ও অনুমতি",
+      "enrollment": "নথিভুক্তি",
+      "compliance": "সম্মতি",
+      "cpd": "CPD / ক্রেডিট",
+      "assessments": "৩৬০° মূল্যায়ন",
+      "atRiskLearners": "ঝুঁকিতে থাকা শিক্ষার্থী",
+      "gamification": "গেমিফিকেশন",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "BI রপ্তানি",
+      "securitySettings": "নিরাপত্তা সেটিংস",
+      "auditLog": "অডিট লগ",
+      "notificationTemplates": "বিজ্ঞপ্তি টেমপ্লেট"
+    }
+  },
+  "dashboard": {
+    "title": "অ্যাডমিন ড্যাশবোর্ড",
+    "description": "প্ল্যাটফর্ম সংক্ষিপ্ত বিবরণ ও মূল মেট্রিক্স",
+    "adminTools": "অ্যাডমিন সরঞ্জাম",
+    "recentActivity": "সাম্প্রতিক কার্যকলাপ",
+    "activityFeed": "কার্যকলাপ ফিড",
+    "noActivity": "সাম্প্রতিক অ্যাডমিন কার্যকলাপ এখানে দেখাবে।",
+    "loadError": "ড্যাশবোর্ড ডেটা লোড করতে ব্যর্থ",
+    "quickLinks": {
+      "branding": { "label": "ব্র্যান্ডিং", "desc": "লোগো, রঙ, থিম" },
+      "users": { "label": "ব্যবহারকারী", "desc": "শিক্ষার্থী ও অ্যাডমিন পরিচালনা" },
+      "compliance": { "label": "সম্মতি", "desc": "রিপোর্ট ও সময়সীমা" },
+      "gamification": { "label": "গেমিফিকেশন", "desc": "পয়েন্ট, ব্যাজ, লিডারবোর্ড" },
+      "security": { "label": "নিরাপত্তা", "desc": "MFA, SSO, সেশন নীতি" },
+      "auditLog": { "label": "অডিট লগ", "desc": "অ্যাডমিন কার্যকলাপের ইতিহাস" }
+    }
+  },
+  "stats": {
+    "totalUsers": "মোট ব্যবহারকারী",
+    "activeThisMonth": "এই মাসে সক্রিয়",
+    "totalCourses": "মোট কোর্স",
+    "completions30d": "সম্পন্ন (৩০ দিন)",
+    "atRiskLearners": "ঝুঁকিতে থাকা শিক্ষার্থী",
+    "storageUsed": "ব্যবহৃত স্টোরেজ"
+  }
+}

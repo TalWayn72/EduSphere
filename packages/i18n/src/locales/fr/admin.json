@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "Aperçu",
+      "organization": "Organisation",
+      "people": "Personnes",
+      "learning": "Apprentissage",
+      "integrations": "Intégrations",
+      "securityCompliance": "Sécurité et Conformité",
+      "settings": "Paramètres"
+    },
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "branding": "Image de marque",
+      "languages": "Langues",
+      "portalBuilder": "Constructeur de portail",
+      "announcements": "Annonces",
+      "users": "Utilisateurs",
+      "rolesPermissions": "Rôles et Autorisations",
+      "enrollment": "Inscription",
+      "compliance": "Conformité",
+      "cpd": "CPD / Crédits",
+      "assessments": "Évaluations 360°",
+      "atRiskLearners": "Apprenants à risque",
+      "gamification": "Gamification",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "Export BI",
+      "securitySettings": "Paramètres de sécurité",
+      "auditLog": "Journal d'audit",
+      "notificationTemplates": "Modèles de notification"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord Admin",
+    "description": "Aperçu de la plateforme et métriques clés",
+    "adminTools": "Outils Admin",
+    "recentActivity": "Activité récente",
+    "activityFeed": "Fil d'activité",
+    "noActivity": "L'activité admin récente apparaîtra ici.",
+    "loadError": "Échec du chargement des données",
+    "quickLinks": {
+      "branding": { "label": "Image de marque", "desc": "Logos, couleurs, thèmes" },
+      "users": { "label": "Utilisateurs", "desc": "Gérer apprenants et admins" },
+      "compliance": { "label": "Conformité", "desc": "Rapports et échéances" },
+      "gamification": { "label": "Gamification", "desc": "Points, badges, classements" },
+      "security": { "label": "Sécurité", "desc": "MFA, SSO, politique de session" },
+      "auditLog": { "label": "Journal d'audit", "desc": "Historique des actions admin" }
+    }
+  },
+  "stats": {
+    "totalUsers": "Total Utilisateurs",
+    "activeThisMonth": "Actifs ce mois",
+    "totalCourses": "Total Cours",
+    "completions30d": "Complétés (30j)",
+    "atRiskLearners": "Apprenants à risque",
+    "storageUsed": "Stockage utilisé"
+  }
+}

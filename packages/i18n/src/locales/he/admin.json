@@ -1,0 +1,61 @@
+{
+  "sidebar": {
+    "groups": {
+      "overview": "סקירה כללית",
+      "organization": "ארגון",
+      "people": "אנשים",
+      "learning": "למידה",
+      "integrations": "אינטגרציות",
+      "securityCompliance": "אבטחה ותאימות",
+      "settings": "הגדרות"
+    },
+    "nav": {
+      "dashboard": "לוח בקרה",
+      "branding": "מיתוג",
+      "languages": "שפות",
+      "portalBuilder": "בונה פורטל",
+      "announcements": "הודעות",
+      "users": "משתמשים",
+      "rolesPermissions": "תפקידים והרשאות",
+      "enrollment": "הרשמה",
+      "compliance": "ציות",
+      "cpd": "CPD / נקודות זכות",
+      "assessments": "הערכות 360°",
+      "atRiskLearners": "לומדים בסיכון",
+      "gamification": "גמיפיקציה",
+      "lti": "LTI 1.3",
+      "scimHris": "SCIM / HRIS",
+      "crmSalesforce": "CRM (Salesforce)",
+      "xapiLrs": "xAPI / LRS",
+      "biExport": "ייצוא BI",
+      "securitySettings": "הגדרות אבטחה",
+      "auditLog": "יומן ביקורת",
+      "notificationTemplates": "תבניות התראות"
+    }
+  },
+  "dashboard": {
+    "title": "לוח ניהול",
+    "description": "סקירת פלטפורמה ומדדים מרכזיים",
+    "adminTools": "כלי ניהול",
+    "recentActivity": "פעילות אחרונה",
+    "activityFeed": "עדכון פעילות",
+    "noActivity": "פעילות ניהולית אחרונה תופיע כאן.",
+    "loadError": "שגיאה בטעינת נתוני לוח הבקרה",
+    "quickLinks": {
+      "branding": { "label": "מיתוג", "desc": "לוגואים, צבעים, ערכות נושא" },
+      "users": { "label": "משתמשים", "desc": "ניהול לומדים ומנהלים" },
+      "compliance": { "label": "ציות", "desc": "דוחות ומועדים" },
+      "gamification": { "label": "גמיפיקציה", "desc": "נקודות, תגים, לוחות דירוג" },
+      "security": { "label": "אבטחה", "desc": "MFA, SSO, מדיניות סשן" },
+      "auditLog": { "label": "יומן ביקורת", "desc": "היסטוריית פעולות מנהל" }
+    }
+  },
+  "stats": {
+    "totalUsers": "סך משתמשים",
+    "activeThisMonth": "פעילים החודש",
+    "totalCourses": "סך קורסים",
+    "completions30d": "השלמות (30 יום)",
+    "atRiskLearners": "לומדים בסיכון",
+    "storageUsed": "אחסון בשימוש"
+  }
+}
