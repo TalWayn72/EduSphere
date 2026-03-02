@@ -19,8 +19,8 @@ export interface PushNotificationToken {
 
 export class NotificationService {
   private token: string | null = null;
-  private notificationListener: any;
-  private responseListener: any;
+  private notificationListener: Notifications.Subscription | null = null;
+  private responseListener: Notifications.Subscription | null = null;
 
   async initialize(): Promise<PushNotificationToken | null> {
     if (!Device.isDevice) {
@@ -87,7 +87,7 @@ export class NotificationService {
   async scheduleLocal(
     title: string,
     body: string,
-    data?: any,
+    data?: Record<string, unknown>,
     trigger?: number
   ) {
     await Notifications.scheduleNotificationAsync({

@@ -1,14 +1,15 @@
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { database } from './database';
-import { ApolloClient } from '@apollo/client';
+import { ApolloClient, type NormalizedCacheObject } from '@apollo/client';
+import type { DocumentNode } from 'graphql';
 
 const BACKGROUND_SYNC_TASK = 'background-sync';
 
 export class BackgroundSyncService {
-  private apolloClient?: ApolloClient<any>;
+  private apolloClient?: ApolloClient<NormalizedCacheObject>;
 
-  configureApolloClient(client: ApolloClient<any>) {
+  configureApolloClient(client: ApolloClient<NormalizedCacheObject>) {
     this.apolloClient = client;
   }
 
@@ -60,8 +61,8 @@ export class BackgroundSyncService {
       try {
         // Execute mutation
         await this.apolloClient.mutate({
-          mutation: mutation.mutation as any,
-          variables: mutation.variables as any,
+          mutation: mutation.mutation as unknown as DocumentNode,
+          variables: mutation.variables as Record<string, unknown>,
         });
 
         // Mark as synced

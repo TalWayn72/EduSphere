@@ -20,6 +20,16 @@ export interface OfflineCourse {
   lessonsCount: number;
 }
 
+export interface CourseData {
+  title: string;
+  description: string;
+  lessons: Array<{
+    id: string;
+    videoUrl?: string;
+    estimatedSizeBytes?: number;
+  }>;
+}
+
 export class DownloadService {
   private downloads = new Map<string, FileSystem.DownloadResumable>();
   private progressCallbacks = new Map<
@@ -29,7 +39,7 @@ export class DownloadService {
 
   async downloadCourse(
     courseId: string,
-    courseData: any,
+    courseData: CourseData,
     onProgress?: (progress: DownloadProgress) => void
   ): Promise<void> {
     if (this.downloads.has(courseId)) {
@@ -170,7 +180,16 @@ export class DownloadService {
   async getOfflineCourses(): Promise<OfflineCourse[]> {
     await database.init();
 
-    const result = await database.pool?.getAllAsync<any>(
+    interface OfflineCourseRow {
+      id: string;
+      title: string;
+      description: string;
+      downloaded_at: number;
+      size: number;
+      lessons_count: number;
+    }
+
+    const result = await database.pool?.getAllAsync<OfflineCourseRow>(
       'SELECT * FROM offline_courses ORDER BY downloaded_at DESC'
     );
 

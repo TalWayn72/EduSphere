@@ -151,7 +151,7 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.progressFill,
-                  { width: `${course.progress}%` as any },
+                  { width: `${course.progress}%` },
                 ]}
               />
             </View>

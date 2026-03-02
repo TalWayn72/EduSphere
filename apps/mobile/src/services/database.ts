@@ -78,7 +78,7 @@ class DatabaseService {
     `);
   }
 
-  async cacheQuery(query: string, variables: any, data: any): Promise<void> {
+  async cacheQuery(query: string, variables: Record<string, unknown>, data: unknown): Promise<void> {
     if (!this.db) return;
 
     const id = this.generateId(query, variables);
@@ -88,7 +88,7 @@ class DatabaseService {
     );
   }
 
-  async getCachedQuery(query: string, variables: any): Promise<any | null> {
+  async getCachedQuery(query: string, variables: Record<string, unknown>): Promise<unknown> {
     if (!this.db) return null;
 
     const id = this.generateId(query, variables);
@@ -100,7 +100,7 @@ class DatabaseService {
     return result ? JSON.parse(result.data) : null;
   }
 
-  async addOfflineMutation(mutation: string, variables: any): Promise<string> {
+  async addOfflineMutation(mutation: string, variables: Record<string, unknown>): Promise<string> {
     if (!this.db) throw new Error('Database not initialized');
 
     const id = Math.random().toString(36).substr(2, 9);
@@ -122,7 +122,7 @@ class DatabaseService {
 
     return results.map((row) => ({
       ...row,
-      variables: JSON.parse(row.variables as any),
+      variables: JSON.parse(row.variables),
     }));
   }
 
@@ -147,7 +147,7 @@ class DatabaseService {
     ]);
   }
 
-  private generateId(query: string, variables: any): string {
+  private generateId(query: string, variables: Record<string, unknown>): string {
     return `${query}-${JSON.stringify(variables)}`;
   }
 }

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 export interface DeepLinkRoute {
   screen: string;
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
 }
 
 export class DeepLinkingService {
@@ -107,7 +107,7 @@ export class DeepLinkingService {
 export const deepLinkingService = new DeepLinkingService();
 
 export function useDeepLinking() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
 
   useEffect(() => {
     // Handle initial URL

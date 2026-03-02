@@ -119,7 +119,7 @@ function StorageSection() {
         <View
           style={[
             styles.barFill,
-            { width: `${barFill * 100}%` as any, backgroundColor: barColor },
+            { width: `${barFill * 100}%`, backgroundColor: barColor },
           ]}
         />
       </View>

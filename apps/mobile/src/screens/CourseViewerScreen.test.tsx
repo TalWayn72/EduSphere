@@ -24,13 +24,17 @@ vi.mock('@react-native-community/netinfo', () => ({
 vi.mock('../navigation', () => ({ default: {} }));
 
 import CourseViewerScreen from './CourseViewerScreen';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation';
+
+type CourseViewerScreenProps = NativeStackScreenProps<RootStackParamList, 'CourseViewer'>;
 
 const MOCK_ROUTE = {
   params: { courseId: 'course-1' },
   key: 'CourseViewer',
   name: 'CourseViewer' as const,
 };
-const MOCK_NAV = {} as any;
+const MOCK_NAV = {} as unknown as CourseViewerScreenProps['navigation'];
 
 const MOCK_COURSE = {
   id: 'course-1',
@@ -60,7 +64,7 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByTestId } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
     );
 
     const titleEl = getByTestId('course-title');
@@ -75,7 +79,7 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByTestId } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
     );
 
     expect(getByTestId('module-list')).toBeTruthy();
@@ -91,7 +95,7 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByType } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
     );
 
     // ActivityIndicator is rendered during loading
@@ -107,7 +111,7 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByTestId } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
     );
 
     expect(getByTestId('offline-indicator')).toBeTruthy();
