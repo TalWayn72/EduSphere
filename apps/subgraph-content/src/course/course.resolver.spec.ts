@@ -59,11 +59,13 @@ describe('CourseResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     resolver = new CourseResolver(
       mockCourseService as any,
       mockEnrollmentService as any,
       mockModuleService as any
     );
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   });
 
   describe('health()', () => {

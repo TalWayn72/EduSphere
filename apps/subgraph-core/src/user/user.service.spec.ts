@@ -229,6 +229,7 @@ describe('UserService', () => {
     });
 
     it('builds display_name from firstName + lastName', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       mockReturning.mockResolvedValue([MOCK_USER]);
       mockValues.mockImplementation((v) => {
@@ -245,6 +246,7 @@ describe('UserService', () => {
     });
 
     it('includes optional role when provided', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       mockReturning.mockResolvedValue([MOCK_USER]);
       mockValues.mockImplementation((v) => {

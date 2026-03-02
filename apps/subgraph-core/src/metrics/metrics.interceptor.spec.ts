@@ -23,6 +23,7 @@ function buildHttpContext(
       getResponse: vi.fn().mockReturnValue(res),
     }),
     getArgByIndex: vi.fn(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
 
@@ -37,6 +38,7 @@ function buildGraphqlContext(
     getType: vi.fn().mockReturnValue('graphql'),
     switchToHttp: vi.fn(),
     getArgByIndex: vi.fn().mockReturnValue(info),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
 
@@ -85,6 +87,7 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
         const next = { handle: vi.fn().mockReturnValue(of({})) };
         interceptor.intercept(ctx, next).subscribe({
           complete: () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const [, route] = (mockService.recordHttpRequest as any).mock
               .calls[0];
             expect(route).toBe('/users/:id');
@@ -160,10 +163,12 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
         const ctx = {
           getType: vi.fn().mockReturnValue('graphql'),
           getArgByIndex: vi.fn().mockReturnValue({}),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
         const next = { handle: vi.fn().mockReturnValue(of({})) };
         interceptor.intercept(ctx, next).subscribe({
           complete: () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const [, opName] = (mockService.recordGraphqlOperation as any).mock
               .calls[0];
             expect(opName).toBe('unknown');

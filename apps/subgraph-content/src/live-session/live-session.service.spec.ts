@@ -114,6 +114,7 @@ describe('LiveSessionService', () => {
       vi.mocked(createBbbClient).mockReturnValue(null);
 
       // Mock DB to return a live session
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = (service as any).db;
       db.limit = vi.fn().mockResolvedValue([
         {
@@ -145,8 +146,10 @@ describe('LiveSessionService', () => {
         .mockReturnValue('https://bbb.example.com/join?pw=mod-pw');
       vi.mocked(createBbbClient).mockReturnValue({
         buildJoinUrl: mockBuildJoinUrl,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = (service as any).db;
       db.limit = vi.fn().mockResolvedValue([
         {
@@ -182,8 +185,10 @@ describe('LiveSessionService', () => {
         .mockReturnValue('https://bbb.example.com/join?pw=att-pw');
       vi.mocked(createBbbClient).mockReturnValue({
         buildJoinUrl: mockBuildJoinUrl,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = (service as any).db;
       db.limit = vi.fn().mockResolvedValue([
         {
@@ -204,6 +209,7 @@ describe('LiveSessionService', () => {
     });
 
     it('throws NotFoundException for non-existent session', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = (service as any).db;
       db.limit = vi.fn().mockResolvedValue([]);
 
@@ -213,6 +219,7 @@ describe('LiveSessionService', () => {
     });
 
     it('throws ForbiddenException for ended sessions', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = (service as any).db;
       db.limit = vi.fn().mockResolvedValue([
         {

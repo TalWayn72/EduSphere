@@ -96,16 +96,16 @@ describe('CypherService', function () {
 
   describe('findConceptById', function () {
     it('returns concept when found', async function () {
-      (executeCypher as any).mockResolvedValue([RAW]);
+      vi.mocked(executeCypher).mockResolvedValue([RAW]);
       var result = await service.findConceptById('c-1', 't-1');
       expect(result).toEqual(RAW);
     });
     it('returns null when not found', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findConceptById('missing', 't-1')).toBeNull();
     });
     it('passes params to executeCypher', async function () {
-      (executeCypher as any).mockResolvedValue([RAW]);
+      vi.mocked(executeCypher).mockResolvedValue([RAW]);
       await service.findConceptById('c-1', 't-1');
       // executeCypher is called with 5 args: db, graphName, query, params, tenantId
       expect(executeCypher).toHaveBeenCalledWith(
@@ -120,18 +120,18 @@ describe('CypherService', function () {
 
   describe('findConceptByName', function () {
     it('returns concept when found', async function () {
-      (executeCypher as any).mockResolvedValue([RAW]);
+      vi.mocked(executeCypher).mockResolvedValue([RAW]);
       expect(await service.findConceptByName('Free Will', 't-1')).toEqual(RAW);
     });
     it('returns null when not found', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findConceptByName('X', 't-1')).toBeNull();
     });
   });
 
   describe('findConceptByNameCaseInsensitive', function () {
     it('finds concept matching case-insensitively', async function () {
-      (executeCypher as any).mockResolvedValue([RAW]);
+      vi.mocked(executeCypher).mockResolvedValue([RAW]);
       const result = await service.findConceptByNameCaseInsensitive(
         'free will',
         't-1'
@@ -139,13 +139,13 @@ describe('CypherService', function () {
       expect(result).toEqual(RAW);
     });
     it('returns null when no match', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(
         await service.findConceptByNameCaseInsensitive('Unknown', 't-1')
       ).toBeNull();
     });
     it('is case-insensitive for mixed case', async function () {
-      (executeCypher as any).mockResolvedValue([RAW]);
+      vi.mocked(executeCypher).mockResolvedValue([RAW]);
       const result = await service.findConceptByNameCaseInsensitive(
         'FREE WILL',
         't-1'
@@ -156,7 +156,7 @@ describe('CypherService', function () {
 
   describe('linkConceptsByName', function () {
     it('calls executeCypher with MERGE RELATED_TO query', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       await service.linkConceptsByName('Metaphysics', 'Ontology', 't-1', 0.7);
       // 5th arg is tenantId passed for RLS set_config inside executeCypher
       expect(executeCypher).toHaveBeenCalledWith(
@@ -173,33 +173,33 @@ describe('CypherService', function () {
       );
     });
     it('uses default strength of 0.7 when not specified', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       await service.linkConceptsByName('A', 'B', 't-1');
-      const params = (executeCypher as any).mock.calls[0][3];
+      const params = vi.mocked(executeCypher).mock.calls[0][3];
       expect(params.strength).toBe(0.7);
     });
   });
 
   describe('findAllConcepts', function () {
     it('returns concepts', async function () {
-      (executeCypher as any).mockResolvedValue([RAW]);
+      vi.mocked(executeCypher).mockResolvedValue([RAW]);
       expect(await service.findAllConcepts('t-1', 20)).toHaveLength(1);
     });
     it('clamps limit to 200', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       await service.findAllConcepts('t-1', 9999);
-      expect((executeCypher as any).mock.calls[0][2]).toContain('LIMIT 200');
+      expect(vi.mocked(executeCypher).mock.calls[0][2]).toContain('LIMIT 200');
     });
     it('clamps limit to 1', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       await service.findAllConcepts('t-1', 0);
-      expect((executeCypher as any).mock.calls[0][2]).toContain('LIMIT 1');
+      expect(vi.mocked(executeCypher).mock.calls[0][2]).toContain('LIMIT 1');
     });
   });
 
   describe('createConcept', function () {
     it('delegates to createConcept helper', async function () {
-      (createConcept as any).mockResolvedValue('new-id');
+      vi.mocked(createConcept).mockResolvedValue('new-id');
       var result = await service.createConcept({
         tenant_id: 't-1',
         name: 'X',
@@ -212,31 +212,31 @@ describe('CypherService', function () {
 
   describe('updateConcept', function () {
     it('updates and returns result', async function () {
-      (executeCypher as any).mockResolvedValue([RAW]);
+      vi.mocked(executeCypher).mockResolvedValue([RAW]);
       expect(
         await service.updateConcept('c-1', 't-1', { name: 'Updated' })
       ).toEqual(RAW);
     });
     it('returns null when not found', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.updateConcept('x', 't-1', { name: 'X' })).toBeNull();
     });
   });
 
   describe('deleteConcept', function () {
     it('returns true on success', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.deleteConcept('c-1', 't-1')).toBe(true);
     });
     it('returns false when throws', async function () {
-      (executeCypher as any).mockRejectedValue(new Error('err'));
+      vi.mocked(executeCypher).mockRejectedValue(new Error('err'));
       expect(await service.deleteConcept('c-1', 't-1')).toBe(false);
     });
   });
 
   describe('findRelatedConcepts', function () {
     it('delegates to helper', async function () {
-      (findRelatedConcepts as any).mockResolvedValue([{ id: 'r-1' }]);
+      vi.mocked(findRelatedConcepts).mockResolvedValue([{ id: 'r-1' }]);
       expect(await service.findRelatedConcepts('c-1', 't-1', 2, 10)).toEqual([
         { id: 'r-1' },
       ]);
@@ -245,7 +245,7 @@ describe('CypherService', function () {
 
   describe('linkConcepts', function () {
     it('delegates to createRelationship', async function () {
-      (createRelationship as any).mockResolvedValue(undefined);
+      vi.mocked(createRelationship).mockResolvedValue(undefined);
       await service.linkConcepts('f-1', 't-1', 'RELATES_TO', { strength: 0.8 });
       expect(createRelationship).toHaveBeenCalledWith(
         expect.anything(),
@@ -258,63 +258,63 @@ describe('CypherService', function () {
   });
   describe('findPersonById', function () {
     it('returns person', async function () {
-      (executeCypher as any).mockResolvedValue([PERSON]);
+      vi.mocked(executeCypher).mockResolvedValue([PERSON]);
       expect(await service.findPersonById('p-1', 't-1')).toEqual(PERSON);
     });
     it('returns null', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findPersonById('x', 't-1')).toBeNull();
     });
   });
   describe('findPersonByName', function () {
     it('returns person', async function () {
-      (executeCypher as any).mockResolvedValue([PERSON]);
+      vi.mocked(executeCypher).mockResolvedValue([PERSON]);
       expect(await service.findPersonByName('Maimonides', 't-1')).toEqual(
         PERSON
       );
     });
     it('returns null', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findPersonByName('X', 't-1')).toBeNull();
     });
   });
   describe('createPerson', function () {
     it('returns created person', async function () {
-      (executeCypher as any).mockResolvedValue([PERSON]);
+      vi.mocked(executeCypher).mockResolvedValue([PERSON]);
       expect(await service.createPerson('Maimonides', 'Bio', 't-1')).toEqual(
         PERSON
       );
     });
     it('passes null bio', async function () {
-      (executeCypher as any).mockResolvedValue([PERSON]);
+      vi.mocked(executeCypher).mockResolvedValue([PERSON]);
       await service.createPerson('Name', null, 't-1');
-      expect((executeCypher as any).mock.calls[0][3].bio).toBeNull();
+      expect(vi.mocked(executeCypher).mock.calls[0][3].bio).toBeNull();
     });
   });
 
   describe('findTermById', function () {
     it('returns term', async function () {
-      (executeCypher as any).mockResolvedValue([TERM]);
+      vi.mocked(executeCypher).mockResolvedValue([TERM]);
       expect(await service.findTermById('term-1', 't-1')).toEqual(TERM);
     });
     it('returns null', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findTermById('x', 't-1')).toBeNull();
     });
   });
   describe('findTermByName', function () {
     it('returns term', async function () {
-      (executeCypher as any).mockResolvedValue([TERM]);
+      vi.mocked(executeCypher).mockResolvedValue([TERM]);
       expect(await service.findTermByName('Torah', 't-1')).toEqual(TERM);
     });
     it('returns null', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findTermByName('X', 't-1')).toBeNull();
     });
   });
   describe('createTerm', function () {
     it('returns created term', async function () {
-      (executeCypher as any).mockResolvedValue([TERM]);
+      vi.mocked(executeCypher).mockResolvedValue([TERM]);
       expect(await service.createTerm('Torah', 'Scriptures', 't-1')).toEqual(
         TERM
       );
@@ -323,63 +323,63 @@ describe('CypherService', function () {
 
   describe('findSourceById', function () {
     it('returns source', async function () {
-      (executeCypher as any).mockResolvedValue([SOURCE]);
+      vi.mocked(executeCypher).mockResolvedValue([SOURCE]);
       expect(await service.findSourceById('src-1', 't-1')).toEqual(SOURCE);
     });
     it('returns null', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findSourceById('x', 't-1')).toBeNull();
     });
   });
   describe('createSource', function () {
     it('returns created source', async function () {
-      (executeCypher as any).mockResolvedValue([SOURCE]);
+      vi.mocked(executeCypher).mockResolvedValue([SOURCE]);
       expect(await service.createSource('Title', 'BOOK', null, 't-1')).toEqual(
         SOURCE
       );
     });
     it('passes null url', async function () {
-      (executeCypher as any).mockResolvedValue([SOURCE]);
+      vi.mocked(executeCypher).mockResolvedValue([SOURCE]);
       await service.createSource('T', 'BOOK', null, 't-1');
-      expect((executeCypher as any).mock.calls[0][3].url).toBeNull();
+      expect(vi.mocked(executeCypher).mock.calls[0][3].url).toBeNull();
     });
   });
 
   describe('findTopicClusterById', function () {
     it('returns cluster', async function () {
-      (executeCypher as any).mockResolvedValue([CLUSTER]);
+      vi.mocked(executeCypher).mockResolvedValue([CLUSTER]);
       expect(await service.findTopicClusterById('cl-1', 't-1')).toEqual(
         CLUSTER
       );
     });
     it('returns null', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findTopicClusterById('x', 't-1')).toBeNull();
     });
   });
   describe('findTopicClustersByCourse', function () {
     it('returns clusters', async function () {
-      (executeCypher as any).mockResolvedValue([CLUSTER]);
+      vi.mocked(executeCypher).mockResolvedValue([CLUSTER]);
       expect(
         await service.findTopicClustersByCourse('course-1', 't-1')
       ).toHaveLength(1);
     });
     it('returns empty array', async function () {
-      (executeCypher as any).mockResolvedValue([]);
+      vi.mocked(executeCypher).mockResolvedValue([]);
       expect(await service.findTopicClustersByCourse('x', 't-1')).toEqual([]);
     });
   });
   describe('createTopicCluster', function () {
     it('returns created cluster', async function () {
-      (executeCypher as any).mockResolvedValue([CLUSTER]);
+      vi.mocked(executeCypher).mockResolvedValue([CLUSTER]);
       expect(await service.createTopicCluster('Cluster', null, 't-1')).toEqual(
         CLUSTER
       );
     });
     it('passes null description', async function () {
-      (executeCypher as any).mockResolvedValue([CLUSTER]);
+      vi.mocked(executeCypher).mockResolvedValue([CLUSTER]);
       await service.createTopicCluster('C', null, 't-1');
-      expect((executeCypher as any).mock.calls[0][3].description).toBeNull();
+      expect(vi.mocked(executeCypher).mock.calls[0][3].description).toBeNull();
     });
   });
 

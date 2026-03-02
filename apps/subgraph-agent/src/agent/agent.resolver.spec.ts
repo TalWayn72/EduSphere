@@ -26,6 +26,7 @@ describe('AgentResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver = new AgentResolver(mockAgentService as any);
   });
 

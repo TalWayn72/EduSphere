@@ -21,6 +21,7 @@ describe('TenantResolver', () => {
       findAll: vi.fn(),
     };
     // Direct instantiation — avoids NestJS module compilation overhead
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver = new TenantResolver(tenantService as any);
   });
 

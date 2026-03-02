@@ -170,6 +170,7 @@ export class GraphResolver {
 
   @Mutation()
   async createConcept(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Args('input') input: any,
     @Context() context: GraphQLContext
   ) {
@@ -187,6 +188,7 @@ export class GraphResolver {
   @Mutation()
   async updateConcept(
     @Args('id') id: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Args('input') input: any,
     @Context() context: GraphQLContext
   ) {
@@ -227,6 +229,7 @@ export class GraphResolver {
 
   @Mutation()
   async createPerson(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Args('input') input: any,
     @Context() context: GraphQLContext
   ) {
@@ -242,6 +245,7 @@ export class GraphResolver {
 
   @Mutation()
   async createTerm(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Args('input') input: any,
     @Context() context: GraphQLContext
   ) {
@@ -257,6 +261,7 @@ export class GraphResolver {
 
   @Mutation()
   async createSource(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Args('input') input: any,
     @Context() context: GraphQLContext
   ) {
@@ -273,6 +278,7 @@ export class GraphResolver {
 
   @Mutation()
   async createTopicCluster(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Args('input') input: any,
     @Context() context: GraphQLContext
   ) {

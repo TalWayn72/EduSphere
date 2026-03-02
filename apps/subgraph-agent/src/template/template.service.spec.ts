@@ -181,6 +181,7 @@ describe('TemplateService', () => {
     });
 
     it('maps tenantId to tenant_id in insert values', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       mockValues.mockImplementation((v) => {
         capturedValues = v;
@@ -198,6 +199,7 @@ describe('TemplateService', () => {
     });
 
     it('sets is_active to true by default on creation', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       mockValues.mockImplementation((v) => {
         capturedValues = v;
@@ -215,6 +217,7 @@ describe('TemplateService', () => {
     });
 
     it('defaults config to empty object when not provided', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       mockValues.mockImplementation((v) => {
         capturedValues = v;
@@ -232,6 +235,7 @@ describe('TemplateService', () => {
     });
 
     it('uses provided config when supplied', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       mockValues.mockImplementation((v) => {
         capturedValues = v;
@@ -262,6 +266,7 @@ describe('TemplateService', () => {
     });
 
     it('includes updated_at timestamp in the update set', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       mockSet.mockImplementation((data) => {
         capturedSet = data;
@@ -275,6 +280,7 @@ describe('TemplateService', () => {
     });
 
     it('updates name when provided', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       mockSet.mockImplementation((data) => {
         capturedSet = data;
@@ -288,6 +294,7 @@ describe('TemplateService', () => {
     });
 
     it('updates isActive when provided', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       mockSet.mockImplementation((data) => {
         capturedSet = data;
@@ -301,6 +308,7 @@ describe('TemplateService', () => {
     });
 
     it('does not set name when name is undefined in input', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       mockSet.mockImplementation((data) => {
         capturedSet = data;
@@ -318,6 +326,7 @@ describe('TemplateService', () => {
 
   describe('delete()', () => {
     it('sets deleted_at to soft-delete the template', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       mockSet.mockImplementation((data) => {
         capturedSet = data;
@@ -352,6 +361,7 @@ describe('TemplateService', () => {
 
   describe('activate()', () => {
     it('sets is_active to true', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       mockSet.mockImplementation((data) => {
         capturedSet = data;
@@ -379,6 +389,7 @@ describe('TemplateService', () => {
 
   describe('deactivate()', () => {
     it('sets is_active to false', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       mockSet.mockImplementation((data) => {
         capturedSet = data;

@@ -93,6 +93,7 @@ describe('AgentSessionService', () => {
     });
     mockUpdate.mockReturnValue({ set: mockSet });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     service = new AgentSessionService(mockNatsService as any);
   });
 

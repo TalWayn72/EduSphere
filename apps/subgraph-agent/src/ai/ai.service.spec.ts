@@ -108,11 +108,13 @@ describe('AIService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     service = new AIService(
       mockLangGraphService as any,
       new AiLanggraphRunnerService(mockLangGraphService as any),
       new AiLegacyRunnerService()
     );
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     mockRunLangGraphDebate.mockResolvedValue(MOCK_LANGGRAPH_RESULT);
     mockRunLangGraphQuiz.mockResolvedValue(MOCK_LANGGRAPH_RESULT);

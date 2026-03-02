@@ -22,6 +22,7 @@ describe('MetricsController', () => {
 
   describe('getMetrics()', () => {
     it('sets Content-Type header to registry contentType', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockRes = { set: vi.fn(), end: vi.fn() } as any;
       await controller.getMetrics(mockRes);
       expect(mockRes.set).toHaveBeenCalledWith(
@@ -31,12 +32,14 @@ describe('MetricsController', () => {
     });
 
     it('calls registry.metrics() to retrieve prometheus data', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockRes = { set: vi.fn(), end: vi.fn() } as any;
       await controller.getMetrics(mockRes);
       expect(mockRegistry.metrics).toHaveBeenCalledOnce();
     });
 
     it('ends response with metrics output', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockRes = { set: vi.fn(), end: vi.fn() } as any;
       const expectedMetrics = 'edusphere_up 1';
       mockRegistry.metrics.mockResolvedValue(expectedMetrics);
@@ -46,6 +49,7 @@ describe('MetricsController', () => {
 
     it('propagates errors from registry.metrics()', async () => {
       mockRegistry.metrics.mockRejectedValue(new Error('Registry error'));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockRes = { set: vi.fn(), end: vi.fn() } as any;
       await expect(controller.getMetrics(mockRes)).rejects.toThrow(
         'Registry error'

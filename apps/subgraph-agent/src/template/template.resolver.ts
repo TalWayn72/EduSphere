@@ -24,11 +24,13 @@ export class TemplateResolver {
   }
 
   @Mutation('createAgentTemplate')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createAgentTemplate(@Args('input') input: any) {
     return this.templateService.create(input);
   }
 
   @Mutation('updateAgentTemplate')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async updateAgentTemplate(@Args('id') id: string, @Args('input') input: any) {
     return this.templateService.update(id, input);
   }

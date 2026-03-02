@@ -21,6 +21,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         userRole: authContext.roles[0] as any,
       },
       async (txDb: Database) => {
@@ -49,6 +50,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         userRole: authContext.roles[0] as any,
       },
       async (txDb: Database) => {
@@ -72,6 +74,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         userRole: authContext.roles[0] as any,
       },
       async (txDb: Database) => {
@@ -99,6 +102,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         userRole: authContext.roles[0] as any,
       },
       async (txDb: Database) => {
@@ -144,6 +148,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         userRole: authContext.roles[0] as any,
       },
       async (txDb: Database) => {

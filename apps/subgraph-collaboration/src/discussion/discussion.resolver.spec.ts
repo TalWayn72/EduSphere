@@ -4,6 +4,7 @@ import {
   DiscussionMessageResolver,
   DiscussionParticipantResolver,
 } from './discussion.resolver';
+import { DiscussionService } from './discussion.service';
 import type { AuthContext } from '@edusphere/auth';
 
 // ── Mock graphql-yoga pubSub ──────────────────────────────────────────────────
@@ -80,7 +81,7 @@ describe('DiscussionResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new DiscussionResolver(mockDiscussionService as any);
+    resolver = new DiscussionResolver(mockDiscussionService as unknown as DiscussionService);
   });
 
   // ─── getDiscussion query ──────────────────────────────────────────────────
@@ -432,7 +433,7 @@ describe('DiscussionMessageResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new DiscussionMessageResolver(mockDiscussionService as any);
+    resolver = new DiscussionMessageResolver(mockDiscussionService as unknown as DiscussionService);
   });
 
   describe('resolveDiscussion()', () => {
@@ -542,7 +543,7 @@ describe('DiscussionParticipantResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new DiscussionParticipantResolver(mockDiscussionService as any);
+    resolver = new DiscussionParticipantResolver(mockDiscussionService as unknown as DiscussionService);
   });
 
   describe('resolveDiscussion()', () => {

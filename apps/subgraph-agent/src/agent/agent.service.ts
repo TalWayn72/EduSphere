@@ -60,6 +60,7 @@ export class AgentService implements OnModuleDestroy {
       .orderBy(desc(schema.agent_executions.started_at));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async startExecution(input: any) {
     const [execution] = await this.db
       .insert(schema.agent_executions)
@@ -129,6 +130,7 @@ export class AgentService implements OnModuleDestroy {
       // Execute with AI service
       const result = await this.aiService.execute(
         agent,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         execution!.input as any
       );
 
@@ -137,6 +139,7 @@ export class AgentService implements OnModuleDestroy {
         .update(schema.agent_executions)
         .set({
           status: 'COMPLETED',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           output: result as any,
           completed_at: new Date(),
         })
@@ -150,6 +153,7 @@ export class AgentService implements OnModuleDestroy {
         .update(schema.agent_executions)
         .set({
           status: 'FAILED',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           output: { error: errorMessage } as any,
           completed_at: new Date(),
         })

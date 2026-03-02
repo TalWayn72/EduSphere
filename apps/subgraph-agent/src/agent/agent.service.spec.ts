@@ -112,6 +112,7 @@ describe('AgentService', () => {
     const mockValues2 = vi.fn().mockReturnValue({ returning: mockReturning2 });
     mockInsert.mockReturnValue({ values: mockValues2 });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     service = new AgentService(mockAIService as any);
   });
 
@@ -250,6 +251,7 @@ describe('AgentService', () => {
     });
 
     it('creates execution with QUEUED status initially', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       const returning = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
       const values = vi.fn().mockImplementation((v) => {
@@ -266,6 +268,7 @@ describe('AgentService', () => {
     });
 
     it('sets agent_id from input.agentId', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       const returning = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
       const values = vi.fn().mockImplementation((v) => {
@@ -282,6 +285,7 @@ describe('AgentService', () => {
     });
 
     it('sets user_id from input.userId', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       const returning = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
       const values = vi.fn().mockImplementation((v) => {
@@ -298,6 +302,7 @@ describe('AgentService', () => {
     });
 
     it('defaults metadata to empty object when not provided', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       const returning = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
       const values = vi.fn().mockImplementation((v) => {
@@ -314,6 +319,7 @@ describe('AgentService', () => {
     });
 
     it('uses provided metadata when supplied', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedValues: any;
       const returning = vi.fn().mockResolvedValue([MOCK_EXECUTION]);
       const values = vi.fn().mockImplementation((v) => {
@@ -348,6 +354,7 @@ describe('AgentService', () => {
 
   describe('cancelExecution()', () => {
     it('updates status to CANCELLED', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       const returning = vi
         .fn()
@@ -363,6 +370,7 @@ describe('AgentService', () => {
     });
 
     it('sets completed_at on cancellation', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let capturedSet: any;
       const returning = vi
         .fn()

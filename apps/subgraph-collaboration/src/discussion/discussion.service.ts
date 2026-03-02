@@ -88,6 +88,7 @@ export class DiscussionService implements OnModuleDestroy {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const values: any = {
         tenant_id: authContext.tenantId || '',
         course_id: input.courseId,
@@ -211,6 +212,7 @@ export class DiscussionService implements OnModuleDestroy {
         }
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const messageValues: any = {
         discussion_id: discussionId,
         user_id: authContext.userId,

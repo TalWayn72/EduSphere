@@ -99,12 +99,14 @@ describe('AgentService fire-and-forget timeout (memory safety)', () => {
     ).catch((err: Error) => {
       timeoutError = err;
       return mockDb
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .update(null as any)
         .set({
           status: 'FAILED',
           output: { error: err.message },
           completed_at: new Date(),
         })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .where(null as any)
         .returning();
     });
@@ -135,12 +137,14 @@ describe('AgentService fire-and-forget timeout (memory safety)', () => {
       'exec-msg-test'
     ).catch((err: Error) => {
       return mockDb
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .update(null as any)
         .set({
           status: 'FAILED',
           output: { error: err.message },
           completed_at: new Date(),
         })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .where(null as any)
         .returning();
     });
@@ -196,6 +200,7 @@ describe('AgentService fire-and-forget timeout (memory safety)', () => {
     mockUpdate
       .mockReturnValueOnce({ set: runningSet })
       .mockReturnValueOnce({ set: failSet });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const service = new AgentService(mockAIService as any);
     await service.startExecution({
       agentId: 'agent-1',

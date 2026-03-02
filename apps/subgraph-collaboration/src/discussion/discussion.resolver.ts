@@ -1,3 +1,4 @@
+import type { IncomingMessage } from 'http';
 import {
   Resolver,
   Query,
@@ -20,8 +21,26 @@ import {
 } from './discussion.schemas';
 
 interface GraphQLContext {
-  req: any;
+  req: IncomingMessage;
   authContext?: AuthContext;
+}
+
+interface DiscussionRow {
+  id: string;
+  course_id: string;
+  creator_id: string;
+}
+
+interface MessageRow {
+  id: string;
+  discussion_id: string;
+  user_id: string;
+  parent_message_id: string | null;
+}
+
+interface ParticipantRow {
+  discussion_id: string;
+  user_id: string;
 }
 
 @Resolver('Discussion')
@@ -154,18 +173,18 @@ export class DiscussionResolver {
 
   // Field resolvers
   @ResolveField('course')
-  resolveCourse(@Parent() discussion: any) {
+  resolveCourse(@Parent() discussion: DiscussionRow) {
     return { __typename: 'Course', id: discussion.course_id };
   }
 
   @ResolveField('creator')
-  resolveCreator(@Parent() discussion: any) {
+  resolveCreator(@Parent() discussion: DiscussionRow) {
     return { __typename: 'User', id: discussion.creator_id };
   }
 
   @ResolveField('messages')
   async resolveMessages(
-    @Parent() discussion: any,
+    @Parent() discussion: DiscussionRow,
     @Args('limit') limit: number = 50,
     @Args('offset') offset: number = 0,
     @Context() context: GraphQLContext
@@ -181,7 +200,7 @@ export class DiscussionResolver {
 
   @ResolveField('participants')
   async resolveParticipants(
-    @Parent() discussion: any,
+    @Parent() discussion: DiscussionRow,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
@@ -193,7 +212,7 @@ export class DiscussionResolver {
 
   @ResolveField('participantCount')
   async resolveParticipantCount(
-    @Parent() discussion: any,
+    @Parent() discussion: DiscussionRow,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
@@ -205,7 +224,7 @@ export class DiscussionResolver {
 
   @ResolveField('messageCount')
   async resolveMessageCount(
-    @Parent() discussion: any,
+    @Parent() discussion: DiscussionRow,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
@@ -224,7 +243,7 @@ export class DiscussionMessageResolver {
 
   @ResolveField('discussion')
   async resolveDiscussion(
-    @Parent() message: any,
+    @Parent() message: MessageRow,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
@@ -235,13 +254,13 @@ export class DiscussionMessageResolver {
   }
 
   @ResolveField('user')
-  resolveUser(@Parent() message: any) {
+  resolveUser(@Parent() message: MessageRow) {
     return { __typename: 'User', id: message.user_id };
   }
 
   @ResolveField('parentMessage')
   async resolveParentMessage(
-    @Parent() message: any,
+    @Parent() message: MessageRow,
     @Context() context: GraphQLContext
   ) {
     if (!message.parent_message_id) return null;
@@ -254,7 +273,7 @@ export class DiscussionMessageResolver {
 
   @ResolveField('replies')
   async resolveReplies(
-    @Parent() message: any,
+    @Parent() message: MessageRow,
     @Args('limit') limit: number = 20,
     @Args('offset') offset: number = 0,
     @Context() context: GraphQLContext
@@ -270,7 +289,7 @@ export class DiscussionMessageResolver {
 
   @ResolveField('replyCount')
   async resolveReplyCount(
-    @Parent() message: any,
+    @Parent() message: MessageRow,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
@@ -286,7 +305,7 @@ export class DiscussionParticipantResolver {
 
   @ResolveField('discussion')
   async resolveDiscussion(
-    @Parent() participant: any,
+    @Parent() participant: ParticipantRow,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new Error('Unauthenticated');
@@ -297,7 +316,7 @@ export class DiscussionParticipantResolver {
   }
 
   @ResolveField('user')
-  resolveUser(@Parent() participant: any) {
+  resolveUser(@Parent() participant: ParticipantRow) {
     return { __typename: 'User', id: participant.user_id };
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NatsConsumer } from './nats.consumer';
 import type { CypherService } from '../graph/cypher.service';

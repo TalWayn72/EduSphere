@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Memory-safety tests for NatsConsumer.
  * Verifies: ensureStream max_age+max_bytes, drain on destroy, message processing.

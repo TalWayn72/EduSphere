@@ -49,12 +49,14 @@ describe('UserResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     resolver = new UserResolver(
       mockUserService as any,
       mockUserStatsService as any,
       mockUserPreferencesService as any,
       mockPublicProfileService as any
     );
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   });
 
   // ─── health ──────────────────────────────────────────────────────────────

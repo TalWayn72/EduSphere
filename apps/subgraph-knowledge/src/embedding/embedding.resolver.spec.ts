@@ -25,6 +25,7 @@ describe('EmbeddingResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver = new EmbeddingResolver(mockEmbeddingService as any);
   });
 

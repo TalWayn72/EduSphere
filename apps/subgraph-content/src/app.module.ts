@@ -1,3 +1,4 @@
+import type { IncomingMessage } from 'http';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { YogaFederationDriver } from '@graphql-yoga/nestjs-federation';
@@ -41,7 +42,7 @@ import { LessonModule } from './lesson/lesson.module';
               }
             : undefined,
         redact: ['req.headers.authorization', 'req.headers.cookie'],
-        customProps: (req: any) => ({
+        customProps: (req: IncomingMessage) => ({
           tenantId: req.headers['x-tenant-id'],
           requestId: req.headers['x-request-id'],
         }),
@@ -51,7 +52,7 @@ import { LessonModule } from './lesson/lesson.module';
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
       typePaths: ['./**/*.graphql'],
-      context: async ({ req }: any) => {
+      context: async ({ req }: { req: IncomingMessage }) => {
         const ctx = { req };
         await authMiddleware.validateRequest(ctx);
         return ctx;
