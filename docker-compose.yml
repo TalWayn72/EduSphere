@@ -63,6 +63,9 @@ services:
       # subgraph-content: rebuilt dist with MinIO full-URL fix (endpoint: `http://${host}:${port}`)
       # MINIO_ENDPOINT in supervisord.conf must be just the hostname (e.g. "localhost"), not a full URL.
       - ./apps/subgraph-content/dist:/app/apps/subgraph-content/dist:ro
+      # gateway supergraph: keeps the federation schema in sync after subgraph additions
+      # without requiring an image rebuild (gateway polls every 10 s via pollingInterval)
+      - ./apps/gateway/supergraph.graphql:/app/apps/gateway/supergraph.graphql:ro
       # subgraph-core-compat mounts REMOVED: PG18 image is freshly built from source,
       # so baked-in dist already has UserPreferences, PublicProfileService, etc.
       # Compat files were only needed for the stale Feb-20 image.
