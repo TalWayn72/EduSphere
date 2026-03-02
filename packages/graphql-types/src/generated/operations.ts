@@ -16,12 +16,61 @@ export type Scalars = {
   JSON: { input: unknown; output: unknown; }
   join__FieldSet: { input: string; output: string; }
   link__Import: { input: string; output: string; }
+  requiresScopes__Scope: { input: string; output: string; }
+};
+
+export type AddFileSourceInput = {
+  /** Base64-encoded file content  */
+  contentBase64: Scalars['String']['input'];
+  courseId: Scalars['ID']['input'];
+  /** Original filename — used to determine SourceType (pdf/docx/txt)  */
+  fileName: Scalars['String']['input'];
+  /** MIME type hint (e.g. application/pdf)  */
+  mimeType: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type AddLessonAssetInput = {
+  assetType: LessonAssetType;
+  fileUrl?: InputMaybe<Scalars['String']['input']>;
+  mediaAssetId?: InputMaybe<Scalars['ID']['input']>;
+  metadata?: InputMaybe<Scalars['JSON']['input']>;
+  sourceUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AddMessageInput = {
   content: Scalars['String']['input'];
   messageType: MessageType;
   parentMessageId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type AddTextSourceInput = {
+  courseId: Scalars['ID']['input'];
+  text: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type AddUrlSourceInput = {
+  courseId: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+};
+
+export type AddYoutubeSourceInput = {
+  courseId: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
+  /** Full YouTube video URL (youtube.com/watch?v=... or youtu.be/...)  */
+  url: Scalars['String']['input'];
+};
+
+export type AdminEnrollmentRecord = {
+  __typename?: 'AdminEnrollmentRecord';
+  completedAt?: Maybe<Scalars['String']['output']>;
+  courseId: Scalars['ID']['output'];
+  enrolledAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  status: Scalars['String']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export type AdminOverview = {
@@ -104,6 +153,16 @@ export type AgentTemplate = {
   templateType: TemplateType;
 };
 
+/**
+ * Spaced-repetition scheduling algorithm to use when creating or reviewing a card.
+ * SM2 uses the classic SuperMemo-2 algorithm (quality 0-5).
+ * FSRS uses the FSRS-4.5 algorithm (quality 1-4).
+ */
+export enum AlgorithmType {
+  Fsrs = 'FSRS',
+  Sm2 = 'SM2'
+}
+
 export type Annotation = {
   __typename?: 'Annotation';
   annotationType: AnnotationType;
@@ -157,6 +216,41 @@ export type AnnouncementResult = {
   total: Scalars['Int']['output'];
 };
 
+export type AssessmentCampaign = {
+  __typename?: 'AssessmentCampaign';
+  criteriaCount: Scalars['Int']['output'];
+  dueDate?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  status: AssessmentStatus;
+  targetUserId: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type AssessmentResult = {
+  __typename?: 'AssessmentResult';
+  aggregatedScores: Array<CriteriaAggregation>;
+  campaignId: Scalars['ID']['output'];
+  generatedAt: Scalars['String']['output'];
+  summary: Scalars['String']['output'];
+};
+
+export enum AssessmentStatus {
+  Active = 'ACTIVE',
+  Completed = 'COMPLETED',
+  Draft = 'DRAFT'
+}
+
+export type AtRiskLearner = {
+  __typename?: 'AtRiskLearner';
+  courseId: Scalars['ID']['output'];
+  daysSinceLastActivity: Scalars['Int']['output'];
+  flaggedAt: Scalars['DateTime']['output'];
+  learnerId: Scalars['ID']['output'];
+  progressPercent: Scalars['Float']['output'];
+  riskFactors: Array<RiskFactor>;
+  riskScore: Scalars['Float']['output'];
+};
+
 export enum AuditExportFormat {
   Csv = 'CSV',
   Json = 'JSON'
@@ -190,6 +284,32 @@ export type AuditLogResult = {
   total: Scalars['Int']['output'];
 };
 
+/** Personalized learning path toward a target concept, showing per-node completion. */
+export type AutoPath = {
+  __typename?: 'AutoPath';
+  completedSteps: Scalars['Int']['output'];
+  nodes: Array<AutoPathNode>;
+  targetConceptName: Scalars['String']['output'];
+  totalSteps: Scalars['Int']['output'];
+};
+
+/** A single node in the personalized learning path (concept + completion status). */
+export type AutoPathNode = {
+  __typename?: 'AutoPathNode';
+  conceptName: Scalars['String']['output'];
+  contentItems: Array<Scalars['String']['output']>;
+  isCompleted: Scalars['Boolean']['output'];
+};
+
+export type BiApiToken = {
+  __typename?: 'BIApiToken';
+  createdAt: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  lastUsedAt?: Maybe<Scalars['String']['output']>;
+};
+
 export type Badge = {
   __typename?: 'Badge';
   category: Scalars['String']['output'];
@@ -202,12 +322,73 @@ export type Badge = {
   pointsReward: Scalars['Int']['output'];
 };
 
+/** Result of verifying a badge assertion's Ed25519 proof */
+export type BadgeVerificationResult = {
+  __typename?: 'BadgeVerificationResult';
+  assertion?: Maybe<OpenBadgeAssertion>;
+  error?: Maybe<Scalars['String']['output']>;
+  valid: Scalars['Boolean']['output'];
+};
+
+export type BreakoutRoom = {
+  __typename?: 'BreakoutRoom';
+  assignedUserIds: Array<Scalars['ID']['output']>;
+  capacity: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  roomName: Scalars['String']['output'];
+  sessionId: Scalars['ID']['output'];
+};
+
 export type BulkImportResult = {
   __typename?: 'BulkImportResult';
   created: Scalars['Int']['output'];
   errors: Array<Scalars['String']['output']>;
   failed: Scalars['Int']['output'];
   updated: Scalars['Int']['output'];
+};
+
+export type Certificate = {
+  __typename?: 'Certificate';
+  courseId: Scalars['ID']['output'];
+  courseName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  issuedAt: Scalars['String']['output'];
+  pdfUrl?: Maybe<Scalars['String']['output']>;
+  verificationCode: Scalars['String']['output'];
+};
+
+export enum CitationMatchStatus {
+  Failed = 'FAILED',
+  Unverified = 'UNVERIFIED',
+  Verified = 'VERIFIED'
+}
+
+export type ComplianceCourse = {
+  __typename?: 'ComplianceCourse';
+  complianceDueDate?: Maybe<Scalars['String']['output']>;
+  estimatedHours?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  isCompliance: Scalars['Boolean']['output'];
+  isPublished: Scalars['Boolean']['output'];
+  slug: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type ComplianceReportResult = {
+  __typename?: 'ComplianceReportResult';
+  csvUrl: Scalars['String']['output'];
+  pdfUrl: Scalars['String']['output'];
+  summary: ComplianceSummary;
+};
+
+export type ComplianceSummary = {
+  __typename?: 'ComplianceSummary';
+  completedCount: Scalars['Int']['output'];
+  completionRate: Scalars['Float']['output'];
+  generatedAt: Scalars['String']['output'];
+  overdueCount: Scalars['Int']['output'];
+  totalEnrollments: Scalars['Int']['output'];
+  totalUsers: Scalars['Int']['output'];
 };
 
 export type Concept = {
@@ -256,6 +437,45 @@ export type ContentItem = {
   updatedAt: Scalars['String']['output'];
 };
 
+export type ContentItemMetric = {
+  __typename?: 'ContentItemMetric';
+  avgTimeSpentSeconds: Scalars['Int']['output'];
+  completionRate: Scalars['Float']['output'];
+  contentItemId: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+  viewCount: Scalars['Int']['output'];
+};
+
+export type ContentTranslation = {
+  __typename?: 'ContentTranslation';
+  contentItemId: Scalars['ID']['output'];
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  locale: Scalars['String']['output'];
+  modelUsed: Scalars['String']['output'];
+  qualityScore?: Maybe<Scalars['Float']['output']>;
+  translatedDescription?: Maybe<Scalars['String']['output']>;
+  translatedSummary?: Maybe<Scalars['String']['output']>;
+  translatedTitle?: Maybe<Scalars['String']['output']>;
+  translatedTranscript?: Maybe<Scalars['String']['output']>;
+  translationStatus: TranslationStatus;
+};
+
+export enum ContentType {
+  Assignment = 'ASSIGNMENT',
+  Audio = 'AUDIO',
+  Link = 'LINK',
+  LiveSession = 'LIVE_SESSION',
+  Markdown = 'MARKDOWN',
+  Microlesson = 'MICROLESSON',
+  Pdf = 'PDF',
+  Quiz = 'QUIZ',
+  RichDocument = 'RICH_DOCUMENT',
+  Scenario = 'SCENARIO',
+  Scorm = 'SCORM',
+  Video = 'VIDEO'
+}
+
 export type Course = {
   __typename?: 'Course';
   createdAt: Scalars['String']['output'];
@@ -273,12 +493,81 @@ export type Course = {
   updatedAt: Scalars['String']['output'];
 };
 
+export type CourseAnalytics = {
+  __typename?: 'CourseAnalytics';
+  activeLearnersLast7Days: Scalars['Int']['output'];
+  avgQuizScore?: Maybe<Scalars['Float']['output']>;
+  completionRate: Scalars['Float']['output'];
+  contentItemMetrics: Array<ContentItemMetric>;
+  courseId: Scalars['ID']['output'];
+  dropOffFunnel: Array<FunnelStep>;
+  enrollmentCount: Scalars['Int']['output'];
+};
+
+export type CourseGenerationResult = {
+  __typename?: 'CourseGenerationResult';
+  courseDescription?: Maybe<Scalars['String']['output']>;
+  courseTitle?: Maybe<Scalars['String']['output']>;
+  draftCourseId?: Maybe<Scalars['ID']['output']>;
+  executionId: Scalars['ID']['output'];
+  modules: Array<GeneratedModule>;
+  status: Scalars['String']['output'];
+};
+
+export type CourseListing = {
+  __typename?: 'CourseListing';
+  courseId: Scalars['ID']['output'];
+  currency: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isPublished: Scalars['Boolean']['output'];
+  priceCents: Scalars['Int']['output'];
+  revenueSplitPercent: Scalars['Int']['output'];
+};
+
 export type CourseProgress = {
   __typename?: 'CourseProgress';
   completedItems: Scalars['Int']['output'];
   courseId: Scalars['ID']['output'];
   percentComplete: Scalars['Float']['output'];
   totalItems: Scalars['Int']['output'];
+};
+
+export type CpdCreditType = {
+  __typename?: 'CpdCreditType';
+  creditHoursPerHour: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  regulatoryBody: Scalars['String']['output'];
+};
+
+export enum CpdExportFormat {
+  Ama = 'AMA',
+  Csv = 'CSV',
+  Nasba = 'NASBA'
+}
+
+export type CpdLogEntry = {
+  __typename?: 'CpdLogEntry';
+  completionDate: Scalars['String']['output'];
+  courseId: Scalars['ID']['output'];
+  creditTypeName: Scalars['String']['output'];
+  earnedHours: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+};
+
+export type CpdReport = {
+  __typename?: 'CpdReport';
+  byType: Array<CpdTypeSummary>;
+  entries: Array<CpdLogEntry>;
+  totalHours: Scalars['Float']['output'];
+};
+
+export type CpdTypeSummary = {
+  __typename?: 'CpdTypeSummary';
+  name: Scalars['String']['output'];
+  regulatoryBody: Scalars['String']['output'];
+  totalHours: Scalars['Float']['output'];
 };
 
 export type CreateAgentTemplateInput = {
@@ -316,10 +605,25 @@ export type CreateBadgeInput = {
   pointsReward: Scalars['Int']['input'];
 };
 
+export type CreateBreakoutRoomInput = {
+  assignedUserIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  capacity: Scalars['Int']['input'];
+  roomName: Scalars['String']['input'];
+};
+
 export type CreateConceptInput = {
   definition: Scalars['String']['input'];
   name: Scalars['String']['input'];
   sourceIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type CreateContentItemInput = {
+  body?: InputMaybe<Scalars['String']['input']>;
+  contentType: ContentType;
+  mediaAssetId?: InputMaybe<Scalars['ID']['input']>;
+  moduleId: Scalars['ID']['input'];
+  order?: InputMaybe<Scalars['Int']['input']>;
+  title: Scalars['String']['input'];
 };
 
 export type CreateCourseInput = {
@@ -344,6 +648,16 @@ export type CreateEmbeddingInput = {
   contentItemId: Scalars['ID']['input'];
   embedding: Array<Scalars['Float']['input']>;
   metadata?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type CreateLessonInput = {
+  courseId: Scalars['ID']['input'];
+  instructorId: Scalars['ID']['input'];
+  lessonDate?: InputMaybe<Scalars['String']['input']>;
+  moduleId?: InputMaybe<Scalars['ID']['input']>;
+  series?: InputMaybe<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
+  type: LessonType;
 };
 
 export type CreateModuleInput = {
@@ -386,6 +700,28 @@ export type CreateUserInput = {
   lastName: Scalars['String']['input'];
   role: UserRole;
   tenantId: Scalars['ID']['input'];
+};
+
+export type CredentialProgram = {
+  __typename?: 'CredentialProgram';
+  badgeEmoji: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  enrollmentCount: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  published: Scalars['Boolean']['output'];
+  requiredCourseIds: Array<Scalars['ID']['output']>;
+  title: Scalars['String']['output'];
+  totalHours: Scalars['Int']['output'];
+};
+
+export type CriteriaAggregation = {
+  __typename?: 'CriteriaAggregation';
+  criteriaId: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
+  managerScore?: Maybe<Scalars['Float']['output']>;
+  overallAvg: Scalars['Float']['output'];
+  peerAvg?: Maybe<Scalars['Float']['output']>;
+  selfScore?: Maybe<Scalars['Float']['output']>;
 };
 
 export type CrmConnection = {
@@ -482,6 +818,14 @@ export enum DiscussionType {
   Forum = 'FORUM'
 }
 
+export type EarningsSummary = {
+  __typename?: 'EarningsSummary';
+  paidOutCents: Scalars['Int']['output'];
+  pendingPayoutCents: Scalars['Int']['output'];
+  purchases: Array<MarketplacePurchase>;
+  totalEarnedCents: Scalars['Int']['output'];
+};
+
 export type Embedding = {
   __typename?: 'Embedding';
   chunkText: Scalars['String']['output'];
@@ -493,6 +837,29 @@ export type Embedding = {
   metadata?: Maybe<Scalars['JSON']['output']>;
 };
 
+export type EvaluationCriterionScore = {
+  __typename?: 'EvaluationCriterionScore';
+  feedback: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  score: Scalars['Float']['output'];
+};
+
+export type FunnelStep = {
+  __typename?: 'FunnelStep';
+  dropOffRate: Scalars['Float']['output'];
+  learnersCompleted: Scalars['Int']['output'];
+  learnersStarted: Scalars['Int']['output'];
+  moduleId: Scalars['ID']['output'];
+  moduleName: Scalars['String']['output'];
+};
+
+export type GenerateCourseInput = {
+  estimatedHours?: InputMaybe<Scalars['Int']['input']>;
+  language?: InputMaybe<Scalars['String']['input']>;
+  prompt: Scalars['String']['input'];
+  targetAudienceLevel?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type GenerateScimTokenInput = {
   description: Scalars['String']['input'];
   expiresInDays?: InputMaybe<Scalars['Int']['input']>;
@@ -502,6 +869,37 @@ export type GenerateScimTokenResult = {
   __typename?: 'GenerateScimTokenResult';
   rawToken: Scalars['String']['output'];
   token: ScimToken;
+};
+
+export type GeneratedModule = {
+  __typename?: 'GeneratedModule';
+  contentItemTitles: Array<Scalars['String']['output']>;
+  description: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+};
+
+/**
+ * KnowledgeSource — an information source attached to a course.
+ * Modelled after NotebookLM: users can attach DOCX, PDF, URLs, YouTube, or raw text.
+ */
+export type KnowledgeSource = {
+  __typename?: 'KnowledgeSource';
+  chunkCount: Scalars['Int']['output'];
+  courseId: Scalars['ID']['output'];
+  createdAt: Scalars['String']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  metadata?: Maybe<Scalars['JSON']['output']>;
+  /** Original file name, URL, or YouTube link  */
+  origin?: Maybe<Scalars['String']['output']>;
+  /** Preview of first 500 chars  */
+  preview?: Maybe<Scalars['String']['output']>;
+  /** Full extracted plaintext (may be large — use with care)  */
+  rawContent?: Maybe<Scalars['String']['output']>;
+  sourceType: SourceType;
+  status: SourceStatus;
+  tenantId: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
 };
 
 export type LeaderboardEntry = {
@@ -524,8 +922,176 @@ export type LearningPath = {
   steps: Scalars['Int']['output'];
 };
 
+export type Lesson = {
+  __typename?: 'Lesson';
+  assets: Array<LessonAsset>;
+  citations: Array<LessonCitation>;
+  courseId: Scalars['ID']['output'];
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  instructorId: Scalars['ID']['output'];
+  lessonDate?: Maybe<Scalars['String']['output']>;
+  moduleId?: Maybe<Scalars['ID']['output']>;
+  pipeline?: Maybe<LessonPipeline>;
+  series?: Maybe<Scalars['String']['output']>;
+  status: LessonStatus;
+  title: Scalars['String']['output'];
+  type: LessonType;
+  updatedAt: Scalars['String']['output'];
+};
+
+export type LessonAsset = {
+  __typename?: 'LessonAsset';
+  assetType: LessonAssetType;
+  fileUrl?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lessonId: Scalars['ID']['output'];
+  mediaAssetId?: Maybe<Scalars['ID']['output']>;
+  metadata?: Maybe<Scalars['JSON']['output']>;
+  sourceUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export enum LessonAssetType {
+  Audio = 'AUDIO',
+  Notes = 'NOTES',
+  Video = 'VIDEO',
+  Whiteboard = 'WHITEBOARD'
+}
+
+export type LessonCitation = {
+  __typename?: 'LessonCitation';
+  bookName: Scalars['String']['output'];
+  column?: Maybe<Scalars['String']['output']>;
+  confidence?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  lessonId: Scalars['ID']['output'];
+  matchStatus: CitationMatchStatus;
+  page?: Maybe<Scalars['String']['output']>;
+  paragraph?: Maybe<Scalars['String']['output']>;
+  part?: Maybe<Scalars['String']['output']>;
+  sourceText: Scalars['String']['output'];
+};
+
+export type LessonPipeline = {
+  __typename?: 'LessonPipeline';
+  config?: Maybe<Scalars['JSON']['output']>;
+  createdAt: Scalars['String']['output'];
+  currentRun?: Maybe<LessonPipelineRun>;
+  id: Scalars['ID']['output'];
+  lessonId: Scalars['ID']['output'];
+  nodes: Scalars['JSON']['output'];
+  status: PipelineStatus;
+  templateName?: Maybe<Scalars['String']['output']>;
+};
+
+export type LessonPipelineResult = {
+  __typename?: 'LessonPipelineResult';
+  createdAt: Scalars['String']['output'];
+  fileUrl?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  moduleName: Scalars['String']['output'];
+  outputData?: Maybe<Scalars['JSON']['output']>;
+  outputType: Scalars['String']['output'];
+  runId: Scalars['ID']['output'];
+};
+
+export type LessonPipelineRun = {
+  __typename?: 'LessonPipelineRun';
+  completedAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  logs?: Maybe<Scalars['JSON']['output']>;
+  pipelineId: Scalars['ID']['output'];
+  results: Array<LessonPipelineResult>;
+  startedAt?: Maybe<Scalars['String']['output']>;
+  status: RunStatus;
+};
+
+export enum LessonStatus {
+  Draft = 'DRAFT',
+  Processing = 'PROCESSING',
+  Published = 'PUBLISHED',
+  Ready = 'READY'
+}
+
+export enum LessonType {
+  Sequential = 'SEQUENTIAL',
+  Thematic = 'THEMATIC'
+}
+
+export type LibraryActivation = {
+  __typename?: 'LibraryActivation';
+  activatedAt: Scalars['String']['output'];
+  /** The course ID created in the tenant's catalog, populated after activation */
+  courseId?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
+  libraryCourseId: Scalars['ID']['output'];
+};
+
+export type LibraryCourse = {
+  __typename?: 'LibraryCourse';
+  description: Scalars['String']['output'];
+  durationMinutes: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  /** True if the current tenant has already activated this course */
+  isActivated: Scalars['Boolean']['output'];
+  licenseType: LibraryLicense;
+  priceCents: Scalars['Int']['output'];
+  title: Scalars['String']['output'];
+  topic: LibraryTopic;
+};
+
+export enum LibraryLicense {
+  Free = 'FREE',
+  Paid = 'PAID'
+}
+
+export enum LibraryTopic {
+  Aml = 'AML',
+  Cybersecurity = 'CYBERSECURITY',
+  Dei = 'DEI',
+  Gdpr = 'GDPR',
+  HarassmentPrevention = 'HARASSMENT_PREVENTION',
+  Hipaa = 'HIPAA',
+  Soc2 = 'SOC2'
+}
+
+export type LiveSession = {
+  __typename?: 'LiveSession';
+  contentItemId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  meetingName: Scalars['String']['output'];
+  recordingUrl?: Maybe<Scalars['String']['output']>;
+  scheduledAt: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
+/** LTI 1.3 registered platform (Canvas, Moodle, Blackboard, etc.) */
+export type LtiPlatform = {
+  __typename?: 'LtiPlatform';
+  authLoginUrl: Scalars['String']['output'];
+  authTokenUrl: Scalars['String']['output'];
+  clientId: Scalars['String']['output'];
+  deploymentId: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  keySetUrl: Scalars['String']['output'];
+  platformName: Scalars['String']['output'];
+  platformUrl: Scalars['String']['output'];
+};
+
+export type MarketplacePurchase = {
+  __typename?: 'MarketplacePurchase';
+  amountCents: Scalars['Int']['output'];
+  courseId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  purchasedAt: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
 export type MediaAsset = {
   __typename?: 'MediaAsset';
+  altText?: Maybe<Scalars['String']['output']>;
+  captionsUrl?: Maybe<Scalars['String']['output']>;
   contentType: Scalars['String']['output'];
   courseId: Scalars['ID']['output'];
   downloadUrl?: Maybe<Scalars['String']['output']>;
@@ -574,6 +1140,32 @@ export type MicrolearningPath = {
   topicClusterId?: Maybe<Scalars['ID']['output']>;
 };
 
+/**
+ * Structured content for a MICROLESSON content item.
+ * Enforced max duration: 420 seconds (7 minutes).
+ */
+export type MicrolessonContent = {
+  __typename?: 'MicrolessonContent';
+  body: Scalars['String']['output'];
+  conceptName: Scalars['String']['output'];
+  durationSeconds: Scalars['Int']['output'];
+  objective: Scalars['String']['output'];
+  quizQuestion?: Maybe<MicrolessonQuizQuestion>;
+};
+
+export type MicrolessonQuizOption = {
+  __typename?: 'MicrolessonQuizOption';
+  isCorrect: Scalars['Boolean']['output'];
+  text: Scalars['String']['output'];
+};
+
+export type MicrolessonQuizQuestion = {
+  __typename?: 'MicrolessonQuizQuestion';
+  explanation?: Maybe<Scalars['String']['output']>;
+  options: Array<MicrolessonQuizOption>;
+  question: Scalars['String']['output'];
+};
+
 export type Module = {
   __typename?: 'Module';
   contentItems: Array<ContentItem>;
@@ -589,29 +1181,79 @@ export type Module = {
 export type Mutation = {
   __typename?: 'Mutation';
   activateAgentTemplate: AgentTemplate;
+  activateAssessmentCampaign: Scalars['Boolean']['output'];
+  activateLibraryCourse: LibraryActivation;
+  activatePoll: SessionPoll;
+  /**
+   * Upload a local file (DOCX / PDF / TXT) as a knowledge source.
+   * The content is passed as a base64-encoded string so it can travel through
+   * the GraphQL gateway without a multipart transport layer.
+   */
+  addFileSource: KnowledgeSource;
+  addLessonAsset: LessonAsset;
   /** Add a message to a discussion */
   addMessage: DiscussionMessage;
+  /** Add raw text as a knowledge source. */
+  addTextSource: KnowledgeSource;
+  /**
+   * Add a URL as a knowledge source.
+   * The system fetches the page, extracts text, chunks it and embeds it.
+   */
+  addUrlSource: KnowledgeSource;
+  /**
+   * Add a YouTube video as a knowledge source.
+   * The system fetches the auto-generated transcript and indexes it.
+   */
+  addYoutubeSource: KnowledgeSource;
+  adminBulkEnroll: Scalars['Int']['output'];
+  adminEnrollUser: AdminEnrollmentRecord;
+  adminUnenrollUser: Scalars['Boolean']['output'];
+  assignCpdCreditsToCourse: Scalars['Boolean']['output'];
   bulkImportUsers: BulkImportResult;
   cancelAgentExecution: AgentExecution;
+  cancelLessonPipelineRun: LessonPipelineRun;
+  closePoll: PollResults;
+  completeAssessmentCampaign: AssessmentResult;
   confirmMediaUpload: MediaAsset;
   createAgentTemplate: AgentTemplate;
   createAnnotation: Annotation;
   createAnnouncement: Announcement;
+  createAssessmentCampaign: AssessmentCampaign;
   createBadge: Badge;
+  /** Create a new badge definition for the tenant */
+  createBadgeDefinition: OpenBadgeDefinition;
+  createBreakoutRooms: Array<BreakoutRoom>;
   createConcept: Concept;
+  createContentItem: ContentItem;
   createCourse: Course;
+  createCourseListing: CourseListing;
+  createCpdCreditType: CpdCreditType;
   /** Create a new discussion */
   createDiscussion: Discussion;
   createEmbedding: Embedding;
+  createLesson: Lesson;
+  createLiveSession: LiveSession;
+  /** Creates a new ordered microlearning path from existing MICROLESSON content items. */
+  createMicrolearningPath: MicrolearningPath;
   createModule: Module;
   createPerson: Person;
+  createPoll: SessionPoll;
+  createProgram: CredentialProgram;
+  /** Create a new spaced-repetition card for the authenticated user. */
   createReviewCard: SrsCard;
   createRole: Role;
+  createScenarioTemplate: ScenarioTemplate;
+  /**
+   * Create a new skill profile defining required concepts for a role/goal.
+   * Only instructors and admins may create profiles.
+   */
+  createSkillProfile: SkillProfile;
   createSource: Source;
   createTerm: Term;
   createTopicCluster: TopicCluster;
   createUser: User;
   deactivateAgentTemplate: AgentTemplate;
+  deactivateLibraryCourse: Scalars['Boolean']['output'];
   deactivateUser: Scalars['Boolean']['output'];
   delegateRole: RoleDelegation;
   deleteAgentTemplate: Scalars['Boolean']['output'];
@@ -622,38 +1264,96 @@ export type Mutation = {
   deleteCourse: Scalars['Boolean']['output'];
   deleteEmbedding: Scalars['Boolean']['output'];
   deleteEmbeddingsByContentItem: Scalars['Int']['output'];
+  /** Remove a knowledge source (and its embeddings). */
+  deleteKnowledgeSource: Scalars['Boolean']['output'];
+  deleteLesson: Scalars['Boolean']['output'];
   deleteModule: Scalars['Boolean']['output'];
   deleteRole: Scalars['Boolean']['output'];
   disconnectCrm: Scalars['Boolean']['output'];
+  endLiveSession: LiveSession;
   endSession: Scalars['Boolean']['output'];
   enrollCourse: UserCourse;
+  enrollInProgram: ProgramEnrollment;
   exportAuditLog: AuditExportResult;
+  exportCourseAsScorm: Scalars['String']['output'];
+  exportCpdReport: Scalars['String']['output'];
+  finishScormSession: Scalars['Boolean']['output'];
   followUser: Scalars['Boolean']['output'];
+  generateBIApiKey: Scalars['String']['output'];
+  generateComplianceReport: ComplianceReportResult;
+  generateCourseFromPrompt: CourseGenerationResult;
   generateEmbedding: Scalars['Boolean']['output'];
   generateScimToken: GenerateScimTokenResult;
+  /** Generate a new xAPI LRS bearer token. Returns the raw token (shown once). */
+  generateXapiToken: Scalars['String']['output'];
+  gradeQuizSubmission: QuizResult;
+  importScormPackage: ScormImportResult;
+  initScormSession: ScormSession;
+  /** Manually issue a badge to a user (admin or instructor action) */
   issueBadge: OpenBadgeAssertion;
   /** Join a discussion as a participant */
   joinDiscussion: Scalars['Boolean']['output'];
+  joinLiveSession: Scalars['String']['output'];
   /** Leave a discussion */
   leaveDiscussion: Scalars['Boolean']['output'];
   linkConcepts: ConceptRelationship;
   markContentViewed: Scalars['Boolean']['output'];
   publishAnnouncement: Announcement;
   publishCourse: Course;
+  publishLesson: Lesson;
+  publishListing: Scalars['Boolean']['output'];
   publishPortal: Scalars['Boolean']['output'];
+  purchaseCourse: PaymentIntentResult;
+  /**
+   * Record a review for a card identified by ID using the given quality rating.
+   * Alias for submitReview with positional card-id argument.
+   */
+  recordReview: SrsCard;
+  /**
+   * Records the authenticated learner's choice within a scenario and returns
+   * the next scenario node. Returns null when the chosen branch has ended.
+   */
+  recordScenarioChoice?: Maybe<ScenarioNode>;
+  /** Register a new LTI 1.3 platform for the current tenant. */
+  registerLtiPlatform: LtiPlatform;
   reorderModules: Array<Module>;
   replyToAnnotation: Annotation;
+  requestContentTranslation: ContentTranslation;
+  requestPayout: Scalars['Boolean']['output'];
   resetUserPassword: Scalars['Boolean']['output'];
   resolveAnnotation: Annotation;
+  resolveAtRiskFlag: Scalars['Boolean']['output'];
+  revokeBIApiKey: Scalars['Boolean']['output'];
+  /** Revoke a previously issued badge (cannot be undone) */
+  revokeBadge: Scalars['Boolean']['output'];
   revokeDelegation: Scalars['Boolean']['output'];
-  revokeOpenBadge: Scalars['Boolean']['output'];
   revokeScimToken: Scalars['Boolean']['output'];
+  /** Revoke an existing xAPI token. */
+  revokeXapiToken: Scalars['Boolean']['output'];
+  saveLessonPipeline: LessonPipeline;
   savePortalLayout: PortalPage;
   scheduleGdprErasure: Scalars['Boolean']['output'];
+  /**
+   * Schedule a concept for spaced-repetition review. Creates a card and
+   * optionally sets an explicit initial due date. Defaults to SM2 algorithm.
+   * Alias surface for createReviewCard with extended options.
+   */
+  scheduleReview: SrsCard;
   sendMessage: AgentMessage;
+  sendRoleplayMessage: Scalars['Boolean']['output'];
   startAgentExecution: AgentExecution;
   startAgentSession: AgentSession;
+  startLessonPipelineRun: LessonPipelineRun;
+  startRoleplaySession: ScenarioSession;
+  submitAssessmentResponse: Scalars['Boolean']['output'];
+  /**
+   * Record a review result using the SM-2 quality scale (0–5) and return
+   * the updated card with its new due date and interval.
+   */
   submitReview: SrsCard;
+  submitTextAssignment: TextSubmission;
+  /** Enable or disable an LTI platform. */
+  toggleLtiPlatform: LtiPlatform;
   unenrollCourse: Scalars['Boolean']['output'];
   unfollowUser: Scalars['Boolean']['output'];
   unpublishCourse: Course;
@@ -664,14 +1364,20 @@ export type Mutation = {
   updateBadge: Badge;
   updateConcept: Concept;
   updateCourse: Course;
+  updateCourseComplianceSettings: ComplianceCourse;
+  updateLesson: Lesson;
+  updateMediaAltText: MediaAsset;
   updateModule: Module;
   updateProfileVisibility: UserPreferences;
+  updateProgram: CredentialProgram;
   updateRole: Role;
+  updateScormSession: Scalars['Boolean']['output'];
   updateSecuritySettings: SecuritySettings;
   updateTenantBranding: TenantBranding;
   updateTenantLanguageSettings: TenantLanguageSettings;
   updateUser: User;
   updateUserPreferences: User;
+  votePoll: Scalars['Boolean']['output'];
 };
 
 
@@ -680,9 +1386,75 @@ export type MutationActivateAgentTemplateArgs = {
 };
 
 
+export type MutationActivateAssessmentCampaignArgs = {
+  campaignId: Scalars['ID']['input'];
+};
+
+
+export type MutationActivateLibraryCourseArgs = {
+  libraryCourseId: Scalars['ID']['input'];
+};
+
+
+export type MutationActivatePollArgs = {
+  pollId: Scalars['ID']['input'];
+};
+
+
+export type MutationAddFileSourceArgs = {
+  input: AddFileSourceInput;
+};
+
+
+export type MutationAddLessonAssetArgs = {
+  input: AddLessonAssetInput;
+  lessonId: Scalars['ID']['input'];
+};
+
+
 export type MutationAddMessageArgs = {
   discussionId: Scalars['ID']['input'];
   input: AddMessageInput;
+};
+
+
+export type MutationAddTextSourceArgs = {
+  input: AddTextSourceInput;
+};
+
+
+export type MutationAddUrlSourceArgs = {
+  input: AddUrlSourceInput;
+};
+
+
+export type MutationAddYoutubeSourceArgs = {
+  input: AddYoutubeSourceInput;
+};
+
+
+export type MutationAdminBulkEnrollArgs = {
+  courseId: Scalars['ID']['input'];
+  userIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationAdminEnrollUserArgs = {
+  courseId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationAdminUnenrollUserArgs = {
+  courseId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationAssignCpdCreditsToCourseArgs = {
+  courseId: Scalars['ID']['input'];
+  creditHours: Scalars['Float']['input'];
+  creditTypeId: Scalars['ID']['input'];
 };
 
 
@@ -693,6 +1465,21 @@ export type MutationBulkImportUsersArgs = {
 
 export type MutationCancelAgentExecutionArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationCancelLessonPipelineRunArgs = {
+  runId: Scalars['ID']['input'];
+};
+
+
+export type MutationClosePollArgs = {
+  pollId: Scalars['ID']['input'];
+};
+
+
+export type MutationCompleteAssessmentCampaignArgs = {
+  campaignId: Scalars['ID']['input'];
 };
 
 
@@ -718,8 +1505,30 @@ export type MutationCreateAnnouncementArgs = {
 };
 
 
+export type MutationCreateAssessmentCampaignArgs = {
+  dueDate?: InputMaybe<Scalars['String']['input']>;
+  targetUserId: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
+};
+
+
 export type MutationCreateBadgeArgs = {
   input: CreateBadgeInput;
+};
+
+
+export type MutationCreateBadgeDefinitionArgs = {
+  criteriaUrl?: InputMaybe<Scalars['String']['input']>;
+  description: Scalars['String']['input'];
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationCreateBreakoutRoomsArgs = {
+  rooms: Array<CreateBreakoutRoomInput>;
+  sessionId: Scalars['ID']['input'];
 };
 
 
@@ -728,8 +1537,28 @@ export type MutationCreateConceptArgs = {
 };
 
 
+export type MutationCreateContentItemArgs = {
+  input: CreateContentItemInput;
+};
+
+
 export type MutationCreateCourseArgs = {
   input: CreateCourseInput;
+};
+
+
+export type MutationCreateCourseListingArgs = {
+  courseId: Scalars['ID']['input'];
+  currency: Scalars['String']['input'];
+  priceCents: Scalars['Int']['input'];
+  revenueSplitPercent?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MutationCreateCpdCreditTypeArgs = {
+  creditHoursPerHour: Scalars['Float']['input'];
+  name: Scalars['String']['input'];
+  regulatoryBody: Scalars['String']['input'];
 };
 
 
@@ -743,6 +1572,25 @@ export type MutationCreateEmbeddingArgs = {
 };
 
 
+export type MutationCreateLessonArgs = {
+  input: CreateLessonInput;
+};
+
+
+export type MutationCreateLiveSessionArgs = {
+  contentItemId: Scalars['ID']['input'];
+  meetingName: Scalars['String']['input'];
+  scheduledAt: Scalars['String']['input'];
+};
+
+
+export type MutationCreateMicrolearningPathArgs = {
+  contentItemIds: Array<Scalars['ID']['input']>;
+  title: Scalars['String']['input'];
+  topicClusterId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
 export type MutationCreateModuleArgs = {
   input: CreateModuleInput;
 };
@@ -753,6 +1601,22 @@ export type MutationCreatePersonArgs = {
 };
 
 
+export type MutationCreatePollArgs = {
+  options: Array<Scalars['String']['input']>;
+  question: Scalars['String']['input'];
+  sessionId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateProgramArgs = {
+  badgeEmoji?: InputMaybe<Scalars['String']['input']>;
+  description: Scalars['String']['input'];
+  requiredCourseIds: Array<Scalars['ID']['input']>;
+  title: Scalars['String']['input'];
+  totalHours?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type MutationCreateReviewCardArgs = {
   conceptName: Scalars['String']['input'];
 };
@@ -760,6 +1624,23 @@ export type MutationCreateReviewCardArgs = {
 
 export type MutationCreateRoleArgs = {
   input: CreateRoleInput;
+};
+
+
+export type MutationCreateScenarioTemplateArgs = {
+  characterPersona: Scalars['String']['input'];
+  difficultyLevel: Scalars['String']['input'];
+  domain: Scalars['String']['input'];
+  maxTurns?: InputMaybe<Scalars['Int']['input']>;
+  sceneDescription: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
+
+export type MutationCreateSkillProfileArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  requiredConcepts: Array<Scalars['String']['input']>;
+  roleName: Scalars['String']['input'];
 };
 
 
@@ -785,6 +1666,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationDeactivateAgentTemplateArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeactivateLibraryCourseArgs = {
+  libraryCourseId: Scalars['ID']['input'];
 };
 
 
@@ -840,6 +1726,16 @@ export type MutationDeleteEmbeddingsByContentItemArgs = {
 };
 
 
+export type MutationDeleteKnowledgeSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteLessonArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteModuleArgs = {
   id: Scalars['ID']['input'];
 };
@@ -847,6 +1743,11 @@ export type MutationDeleteModuleArgs = {
 
 export type MutationDeleteRoleArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationEndLiveSessionArgs = {
+  sessionId: Scalars['ID']['input'];
 };
 
 
@@ -860,15 +1761,52 @@ export type MutationEnrollCourseArgs = {
 };
 
 
+export type MutationEnrollInProgramArgs = {
+  programId: Scalars['ID']['input'];
+};
+
+
 export type MutationExportAuditLogArgs = {
-  format: AuditExportFormat;
+  format?: AuditExportFormat;
   fromDate: Scalars['String']['input'];
   toDate: Scalars['String']['input'];
 };
 
 
+export type MutationExportCourseAsScormArgs = {
+  courseId: Scalars['ID']['input'];
+};
+
+
+export type MutationExportCpdReportArgs = {
+  format: CpdExportFormat;
+};
+
+
+export type MutationFinishScormSessionArgs = {
+  data: Scalars['String']['input'];
+  sessionId: Scalars['ID']['input'];
+};
+
+
 export type MutationFollowUserArgs = {
   userId: Scalars['ID']['input'];
+};
+
+
+export type MutationGenerateBiApiKeyArgs = {
+  description: Scalars['String']['input'];
+};
+
+
+export type MutationGenerateComplianceReportArgs = {
+  asOf?: InputMaybe<Scalars['String']['input']>;
+  courseIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationGenerateCourseFromPromptArgs = {
+  input: GenerateCourseInput;
 };
 
 
@@ -884,15 +1822,42 @@ export type MutationGenerateScimTokenArgs = {
 };
 
 
+export type MutationGenerateXapiTokenArgs = {
+  description: Scalars['String']['input'];
+  lrsEndpoint?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationGradeQuizSubmissionArgs = {
+  answers: Scalars['JSON']['input'];
+  contentItemId: Scalars['ID']['input'];
+};
+
+
+export type MutationImportScormPackageArgs = {
+  fileKey: Scalars['String']['input'];
+};
+
+
+export type MutationInitScormSessionArgs = {
+  contentItemId: Scalars['ID']['input'];
+};
+
+
 export type MutationIssueBadgeArgs = {
   badgeDefinitionId: Scalars['ID']['input'];
   evidenceUrl?: InputMaybe<Scalars['String']['input']>;
-  recipientId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 
 export type MutationJoinDiscussionArgs = {
   discussionId: Scalars['ID']['input'];
+};
+
+
+export type MutationJoinLiveSessionArgs = {
+  sessionId: Scalars['ID']['input'];
 };
 
 
@@ -925,6 +1890,39 @@ export type MutationPublishCourseArgs = {
 };
 
 
+export type MutationPublishLessonArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationPublishListingArgs = {
+  courseId: Scalars['ID']['input'];
+};
+
+
+export type MutationPurchaseCourseArgs = {
+  courseId: Scalars['ID']['input'];
+};
+
+
+export type MutationRecordReviewArgs = {
+  cardId: Scalars['ID']['input'];
+  quality: Scalars['Int']['input'];
+};
+
+
+export type MutationRecordScenarioChoiceArgs = {
+  choiceId: Scalars['String']['input'];
+  fromContentItemId: Scalars['ID']['input'];
+  scenarioRootId: Scalars['ID']['input'];
+};
+
+
+export type MutationRegisterLtiPlatformArgs = {
+  input: RegisterLtiPlatformInput;
+};
+
+
 export type MutationReorderModulesArgs = {
   courseId: Scalars['ID']['input'];
   moduleIds: Array<Scalars['ID']['input']>;
@@ -934,6 +1932,12 @@ export type MutationReorderModulesArgs = {
 export type MutationReplyToAnnotationArgs = {
   annotationId: Scalars['ID']['input'];
   content: Scalars['String']['input'];
+};
+
+
+export type MutationRequestContentTranslationArgs = {
+  contentItemId: Scalars['ID']['input'];
+  targetLocale: Scalars['String']['input'];
 };
 
 
@@ -947,19 +1951,40 @@ export type MutationResolveAnnotationArgs = {
 };
 
 
-export type MutationRevokeDelegationArgs = {
-  delegationId: Scalars['ID']['input'];
+export type MutationResolveAtRiskFlagArgs = {
+  flagId: Scalars['ID']['input'];
 };
 
 
-export type MutationRevokeOpenBadgeArgs = {
+export type MutationRevokeBiApiKeyArgs = {
+  tokenId: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeBadgeArgs = {
   assertionId: Scalars['ID']['input'];
   reason: Scalars['String']['input'];
 };
 
 
+export type MutationRevokeDelegationArgs = {
+  delegationId: Scalars['ID']['input'];
+};
+
+
 export type MutationRevokeScimTokenArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeXapiTokenArgs = {
+  tokenId: Scalars['ID']['input'];
+};
+
+
+export type MutationSaveLessonPipelineArgs = {
+  input: SaveLessonPipelineInput;
+  lessonId: Scalars['ID']['input'];
 };
 
 
@@ -974,8 +1999,21 @@ export type MutationScheduleGdprErasureArgs = {
 };
 
 
+export type MutationScheduleReviewArgs = {
+  algorithm?: InputMaybe<AlgorithmType>;
+  conceptName: Scalars['String']['input'];
+  initialDueDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
 export type MutationSendMessageArgs = {
   content: Scalars['String']['input'];
+  sessionId: Scalars['ID']['input'];
+};
+
+
+export type MutationSendRoleplayMessageArgs = {
+  message: Scalars['String']['input'];
   sessionId: Scalars['ID']['input'];
 };
 
@@ -991,9 +2029,40 @@ export type MutationStartAgentSessionArgs = {
 };
 
 
+export type MutationStartLessonPipelineRunArgs = {
+  pipelineId: Scalars['ID']['input'];
+};
+
+
+export type MutationStartRoleplaySessionArgs = {
+  scenarioId: Scalars['ID']['input'];
+};
+
+
+export type MutationSubmitAssessmentResponseArgs = {
+  campaignId: Scalars['ID']['input'];
+  criteriaScores: Scalars['String']['input'];
+  narrative?: InputMaybe<Scalars['String']['input']>;
+  raterRole: RaterRole;
+};
+
+
 export type MutationSubmitReviewArgs = {
   cardId: Scalars['ID']['input'];
   quality: Scalars['Int']['input'];
+};
+
+
+export type MutationSubmitTextAssignmentArgs = {
+  contentItemId: Scalars['ID']['input'];
+  courseId: Scalars['ID']['input'];
+  textContent: Scalars['String']['input'];
+};
+
+
+export type MutationToggleLtiPlatformArgs = {
+  id: Scalars['ID']['input'];
+  isActive: Scalars['Boolean']['input'];
 };
 
 
@@ -1048,6 +2117,25 @@ export type MutationUpdateCourseArgs = {
 };
 
 
+export type MutationUpdateCourseComplianceSettingsArgs = {
+  complianceDueDate?: InputMaybe<Scalars['String']['input']>;
+  courseId: Scalars['ID']['input'];
+  isCompliance: Scalars['Boolean']['input'];
+};
+
+
+export type MutationUpdateLessonArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateLessonInput;
+};
+
+
+export type MutationUpdateMediaAltTextArgs = {
+  altText: Scalars['String']['input'];
+  mediaId: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateModuleArgs = {
   id: Scalars['ID']['input'];
   input: UpdateModuleInput;
@@ -1059,9 +2147,23 @@ export type MutationUpdateProfileVisibilityArgs = {
 };
 
 
+export type MutationUpdateProgramArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  published?: InputMaybe<Scalars['Boolean']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationUpdateRoleArgs = {
   id: Scalars['ID']['input'];
   input: UpdateRoleInput;
+};
+
+
+export type MutationUpdateScormSessionArgs = {
+  data: Scalars['String']['input'];
+  sessionId: Scalars['ID']['input'];
 };
 
 
@@ -1090,6 +2192,12 @@ export type MutationUpdateUserPreferencesArgs = {
   input: UpdateUserPreferencesInput;
 };
 
+
+export type MutationVotePollArgs = {
+  optionIndex: Scalars['Int']['input'];
+  pollId: Scalars['ID']['input'];
+};
+
 export type Notification = {
   __typename?: 'Notification';
   body: Scalars['String']['output'];
@@ -1099,6 +2207,7 @@ export type Notification = {
   readAt?: Maybe<Scalars['DateTime']['output']>;
   title: Scalars['String']['output'];
   type: NotificationType;
+  userId: Scalars['ID']['output'];
 };
 
 export enum NotificationType {
@@ -1109,24 +2218,32 @@ export enum NotificationType {
   UserFollowed = 'USER_FOLLOWED'
 }
 
+/** OpenBadges 3.0 assertion — one earned credential per user */
 export type OpenBadgeAssertion = {
   __typename?: 'OpenBadgeAssertion';
   badgeDefinitionId: Scalars['ID']['output'];
-  definition: OpenBadgeDefinition;
+  badgeDescription: Scalars['String']['output'];
+  badgeName: Scalars['String']['output'];
   evidenceUrl?: Maybe<Scalars['String']['output']>;
   expiresAt?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
   issuedAt: Scalars['String']['output'];
   recipientId: Scalars['ID']['output'];
   revoked: Scalars['Boolean']['output'];
   revokedAt?: Maybe<Scalars['String']['output']>;
   revokedReason?: Maybe<Scalars['String']['output']>;
-  vcDocument: Scalars['String']['output'];
+  /** LinkedIn certifications deep-link */
+  shareUrl: Scalars['String']['output'];
+  /** W3C VC JSON document (serialized), null when not yet signed */
+  vcDocument?: Maybe<Scalars['String']['output']>;
+  /** Public JSON-LD URL (no auth) — shareable */
+  verifyUrl: Scalars['String']['output'];
 };
 
+/** OpenBadges 3.0 badge definition (issuer-managed, tenant-scoped) */
 export type OpenBadgeDefinition = {
   __typename?: 'OpenBadgeDefinition';
-  createdAt: Scalars['String']['output'];
   criteriaUrl?: Maybe<Scalars['String']['output']>;
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -1134,6 +2251,13 @@ export type OpenBadgeDefinition = {
   issuerId: Scalars['String']['output'];
   name: Scalars['String']['output'];
   tags: Array<Scalars['String']['output']>;
+  version: Scalars['String']['output'];
+};
+
+export type PaymentIntentResult = {
+  __typename?: 'PaymentIntentResult';
+  clientSecret: Scalars['String']['output'];
+  paymentIntentId: Scalars['String']['output'];
 };
 
 export type Person = {
@@ -1144,6 +2268,51 @@ export type Person = {
   name: Scalars['String']['output'];
   tenantId: Scalars['ID']['output'];
   updatedAt: Scalars['String']['output'];
+};
+
+export enum PipelineModuleType {
+  Asr = 'ASR',
+  CitationVerifier = 'CITATION_VERIFIER',
+  ContentCleaning = 'CONTENT_CLEANING',
+  DiagramGenerator = 'DIAGRAM_GENERATOR',
+  Ingestion = 'INGESTION',
+  NerSourceLinking = 'NER_SOURCE_LINKING',
+  PublishShare = 'PUBLISH_SHARE',
+  QaGate = 'QA_GATE',
+  StructuredNotes = 'STRUCTURED_NOTES',
+  Summarization = 'SUMMARIZATION'
+}
+
+export enum PipelineStatus {
+  Completed = 'COMPLETED',
+  Draft = 'DRAFT',
+  Failed = 'FAILED',
+  Ready = 'READY',
+  Running = 'RUNNING'
+}
+
+export type PlagiarismReport = {
+  __typename?: 'PlagiarismReport';
+  checkedAt: Scalars['DateTime']['output'];
+  highestSimilarity: Scalars['Float']['output'];
+  isFlagged: Scalars['Boolean']['output'];
+  similarSubmissions: Array<SimilarSubmission>;
+  submissionId: Scalars['ID']['output'];
+};
+
+export type PollOptionResult = {
+  __typename?: 'PollOptionResult';
+  count: Scalars['Int']['output'];
+  percentage: Scalars['Float']['output'];
+  text: Scalars['String']['output'];
+};
+
+export type PollResults = {
+  __typename?: 'PollResults';
+  options: Array<PollOptionResult>;
+  pollId: Scalars['ID']['output'];
+  question: Scalars['String']['output'];
+  totalVotes: Scalars['Int']['output'];
 };
 
 export type PortalBlock = {
@@ -1168,6 +2337,24 @@ export type PresignedUploadUrl = {
   expiresAt: Scalars['String']['output'];
   fileKey: Scalars['String']['output'];
   uploadUrl: Scalars['String']['output'];
+};
+
+export type ProgramEnrollment = {
+  __typename?: 'ProgramEnrollment';
+  certificateId?: Maybe<Scalars['ID']['output']>;
+  completedAt?: Maybe<Scalars['String']['output']>;
+  enrolledAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  programId: Scalars['ID']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type ProgramProgress = {
+  __typename?: 'ProgramProgress';
+  completedCourseIds: Array<Scalars['ID']['output']>;
+  completedCourses: Scalars['Int']['output'];
+  percentComplete: Scalars['Float']['output'];
+  totalCourses: Scalars['Int']['output'];
 };
 
 export type PublicCourse = {
@@ -1200,6 +2387,7 @@ export type Query = {
   adminAnnouncements: AnnouncementResult;
   adminAuditLog: AuditLogResult;
   adminBadges: Array<Badge>;
+  adminCourseEnrollments: Array<AdminEnrollmentRecord>;
   adminOverview: AdminOverview;
   adminUsers: AdminUsersResult;
   agentExecution?: Maybe<AgentExecution>;
@@ -1213,17 +2401,33 @@ export type Query = {
   annotations: Array<Annotation>;
   annotationsByAsset: Array<Annotation>;
   annotationsByUser: Array<Annotation>;
+  assessmentResult?: Maybe<AssessmentResult>;
+  atRiskLearners: Array<AtRiskLearner>;
+  /** List all badge definitions for the tenant (admin/instructor only) */
+  badgeDefinitions: Array<OpenBadgeDefinition>;
+  biApiTokens: Array<BiApiToken>;
+  breakoutRooms: Array<BreakoutRoom>;
+  campaignsToRespond: Array<AssessmentCampaign>;
+  complianceCourses: Array<ComplianceCourse>;
   concept?: Maybe<Concept>;
   conceptByName?: Maybe<Concept>;
   concepts: Array<Concept>;
   contentItem?: Maybe<ContentItem>;
   contentItemsByModule: Array<ContentItem>;
+  contentTranslation?: Maybe<ContentTranslation>;
   course?: Maybe<Course>;
+  courseAnalytics: CourseAnalytics;
+  courseKnowledgeSources: Array<KnowledgeSource>;
+  courseListings: Array<CourseListing>;
   courses: Array<Course>;
   coursesByInstructor: Array<Course>;
+  cpdCreditTypes: Array<CpdCreditType>;
   crmConnection?: Maybe<CrmConnection>;
   crmSyncLog: Array<CrmSyncLogEntry>;
-  /** Returns the next unviewed MICROLESSON for the authenticated user today. */
+  /**
+   * Returns the next unviewed MICROLESSON for the authenticated user today.
+   * Returns null when no lessons are available.
+   */
   dailyMicrolesson?: Maybe<ContentItem>;
   /** Get a single discussion by ID */
   discussion?: Maybe<Discussion>;
@@ -1231,10 +2435,15 @@ export type Query = {
   discussionMessages: Array<DiscussionMessage>;
   /** Get all discussions for a course */
   discussions: Array<Discussion>;
+  /** Return cards that are due for review now (dueDate <= current time). */
   dueReviews: Array<SrsCard>;
   embedding?: Maybe<Embedding>;
   embeddingsByContentItem: Array<Embedding>;
+  /** Alias for dueReviews — returns cards due for review up to the given limit. */
+  getDueCards: Array<SrsCard>;
   getPresignedUploadUrl: PresignedUploadUrl;
+  instructorEarnings: EarningsSummary;
+  knowledgeSource?: Maybe<KnowledgeSource>;
   leaderboard: Array<LeaderboardEntry>;
   /**
    * Find the shortest learning path between two concepts identified by name.
@@ -1242,6 +2451,13 @@ export type Query = {
    * Uses Apache AGE shortestPath() traversing RELATED_TO and PREREQUISITE_OF edges.
    */
   learningPath?: Maybe<LearningPath>;
+  lesson?: Maybe<Lesson>;
+  lessonPipelineRun?: Maybe<LessonPipelineRun>;
+  lessonsByCourse: Array<Lesson>;
+  libraryCourses: Array<LibraryCourse>;
+  liveSession?: Maybe<LiveSession>;
+  /** List all LTI platforms for the current tenant. ORG_ADMIN only. */
+  ltiPlatforms: Array<LtiPlatform>;
   me?: Maybe<User>;
   /** Lists all microlearning paths for the authenticated user's tenant. */
   microlearningPaths: Array<MicrolearningPath>;
@@ -1249,27 +2465,52 @@ export type Query = {
   modulesByCourse: Array<Module>;
   myAgentSessions: Array<AgentSession>;
   myBadges: Array<UserBadge>;
+  myCampaigns: Array<AssessmentCampaign>;
+  myCertificates: Array<Certificate>;
   myCourseProgress: CourseProgress;
+  myCpdReport: CpdReport;
   /** Get all discussions the current user has participated in */
   myDiscussions: Array<Discussion>;
   myEnrollments: Array<UserCourse>;
   myFollowers: Array<Scalars['ID']['output']>;
   myFollowing: Array<Scalars['ID']['output']>;
+  /**
+   * Return a personalized learning path toward the named concept.
+   * Nodes are ordered from prerequisite to target; isCompleted reflects user progress.
+   */
+  myLearningPath?: Maybe<AutoPath>;
+  myLibraryActivations: Array<LibraryActivation>;
+  /** List all non-revoked badges earned by the current user */
   myOpenBadges: Array<OpenBadgeAssertion>;
   myPortal?: Maybe<PortalPage>;
+  myProgramEnrollments: Array<ProgramEnrollment>;
+  myPurchases: Array<MarketplacePurchase>;
+  myQuizResults: Array<QuizResult>;
   myRank: Scalars['Int']['output'];
+  /**
+   * Returns the ordered list of choices the authenticated user has made
+   * for the given scenario tree (identified by its root content item ID).
+   */
+  myScenarioProgress: Array<ScenarioProgressEntry>;
+  myScenarioSession?: Maybe<ScenarioSession>;
+  myScormSession?: Maybe<ScormSession>;
   mySecuritySettings: SecuritySettings;
   myStats: UserStats;
+  mySubmissions: Array<TextSubmission>;
   myTenantBranding: TenantBranding;
   myTenantLanguageSettings: TenantLanguageSettings;
   myTotalPoints: Scalars['Int']['output'];
   person?: Maybe<Person>;
   personByName?: Maybe<Person>;
+  pollResults: PollResults;
   /**
    * Find the deepest prerequisite chain leading into a named concept.
    * Returns nodes ordered from root prerequisite to the target concept.
    */
   prerequisiteChain: Array<ConceptNode>;
+  program?: Maybe<CredentialProgram>;
+  programProgress: ProgramProgress;
+  programs: Array<CredentialProgram>;
   publicPortal?: Maybe<PortalPage>;
   publicProfile?: Maybe<PublicProfile>;
   relatedConcepts: Array<RelatedConcept>;
@@ -1281,13 +2522,25 @@ export type Query = {
   role?: Maybe<Role>;
   roles: Array<Role>;
   runningExecutions: Array<AgentExecution>;
+  /** Returns the scenario node data for a given SCENARIO-type ContentItem. */
+  scenarioNode?: Maybe<ScenarioNode>;
+  scenarioTemplates: Array<ScenarioTemplate>;
   scimSyncLog: Array<ScimSyncEntry>;
   scimTokens: Array<ScimToken>;
   searchSemantic: Array<SemanticResult>;
   semanticSearch: Array<SimilarityResult>;
   semanticSearchByContentItem: Array<SimilarityResult>;
+  sessionPolls: Array<SessionPoll>;
+  /** Analyze skill gap between the current user's mastery and a named skill profile. */
+  skillGapAnalysis: SkillGapReport;
+  /** List all skill profiles available within the current tenant. */
+  skillProfiles: Array<SkillProfile>;
+  socialFeed: Array<SocialFeedItem>;
+  socialRecommendations: Array<SocialRecommendation>;
   source?: Maybe<Source>;
+  /** Count of cards currently due — used by the Dashboard badge. */
   srsQueueCount: Scalars['Int']['output'];
+  submissionPlagiarismReport?: Maybe<PlagiarismReport>;
   tenant?: Maybe<Tenant>;
   tenants: Array<Tenant>;
   term?: Maybe<Term>;
@@ -1297,7 +2550,16 @@ export type Query = {
   user?: Maybe<User>;
   userDelegations: Array<RoleDelegation>;
   users: Array<User>;
-  verifyOpenBadge: Scalars['Boolean']['output'];
+  /**
+   * Verify a badge assertion by ID — public (no auth required).
+   * Checks signature validity, revocation status and expiry.
+   */
+  verifyBadge: BadgeVerificationResult;
+  verifyCertificate?: Maybe<Certificate>;
+  /** Query recent xAPI statements stored in the self-hosted LRS. */
+  xapiStatements: Array<XapiStatementResult>;
+  /** List all xAPI tokens for this tenant. ORG_ADMIN only. */
+  xapiTokens: Array<XapiToken>;
 };
 
 
@@ -1314,6 +2576,11 @@ export type QueryAdminAuditLogArgs = {
   since?: InputMaybe<Scalars['String']['input']>;
   until?: InputMaybe<Scalars['String']['input']>;
   userId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryAdminCourseEnrollmentsArgs = {
+  courseId: Scalars['ID']['input'];
 };
 
 
@@ -1384,6 +2651,21 @@ export type QueryAnnotationsByUserArgs = {
 };
 
 
+export type QueryAssessmentResultArgs = {
+  campaignId: Scalars['ID']['input'];
+};
+
+
+export type QueryAtRiskLearnersArgs = {
+  courseId: Scalars['ID']['input'];
+};
+
+
+export type QueryBreakoutRoomsArgs = {
+  sessionId: Scalars['ID']['input'];
+};
+
+
 export type QueryConceptArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1409,8 +2691,24 @@ export type QueryContentItemsByModuleArgs = {
 };
 
 
+export type QueryContentTranslationArgs = {
+  contentItemId: Scalars['ID']['input'];
+  locale: Scalars['String']['input'];
+};
+
+
 export type QueryCourseArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryCourseAnalyticsArgs = {
+  courseId: Scalars['ID']['input'];
+};
+
+
+export type QueryCourseKnowledgeSourcesArgs = {
+  courseId: Scalars['ID']['input'];
 };
 
 
@@ -1465,10 +2763,20 @@ export type QueryEmbeddingsByContentItemArgs = {
 };
 
 
+export type QueryGetDueCardsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryGetPresignedUploadUrlArgs = {
   contentType: Scalars['String']['input'];
   courseId: Scalars['ID']['input'];
   fileName: Scalars['String']['input'];
+};
+
+
+export type QueryKnowledgeSourceArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1480,6 +2788,33 @@ export type QueryLeaderboardArgs = {
 export type QueryLearningPathArgs = {
   from: Scalars['String']['input'];
   to: Scalars['String']['input'];
+};
+
+
+export type QueryLessonArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryLessonPipelineRunArgs = {
+  runId: Scalars['ID']['input'];
+};
+
+
+export type QueryLessonsByCourseArgs = {
+  courseId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryLibraryCoursesArgs = {
+  topic?: InputMaybe<LibraryTopic>;
+};
+
+
+export type QueryLiveSessionArgs = {
+  contentItemId: Scalars['ID']['input'];
 };
 
 
@@ -1495,6 +2830,12 @@ export type QueryModulesByCourseArgs = {
 
 export type QueryMyCourseProgressArgs = {
   courseId: Scalars['ID']['input'];
+};
+
+
+export type QueryMyCpdReportArgs = {
+  endDate?: InputMaybe<Scalars['String']['input']>;
+  startDate?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1514,6 +2855,36 @@ export type QueryMyFollowingArgs = {
 };
 
 
+export type QueryMyLearningPathArgs = {
+  targetConceptName: Scalars['String']['input'];
+};
+
+
+export type QueryMyQuizResultsArgs = {
+  contentItemId: Scalars['ID']['input'];
+};
+
+
+export type QueryMyScenarioProgressArgs = {
+  scenarioRootId: Scalars['ID']['input'];
+};
+
+
+export type QueryMyScenarioSessionArgs = {
+  sessionId: Scalars['ID']['input'];
+};
+
+
+export type QueryMyScormSessionArgs = {
+  contentItemId: Scalars['ID']['input'];
+};
+
+
+export type QueryMySubmissionsArgs = {
+  contentItemId: Scalars['ID']['input'];
+};
+
+
 export type QueryPersonArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1524,8 +2895,23 @@ export type QueryPersonByNameArgs = {
 };
 
 
+export type QueryPollResultsArgs = {
+  pollId: Scalars['ID']['input'];
+};
+
+
 export type QueryPrerequisiteChainArgs = {
   conceptName: Scalars['String']['input'];
+};
+
+
+export type QueryProgramArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryProgramProgressArgs = {
+  programId: Scalars['ID']['input'];
 };
 
 
@@ -1557,6 +2943,11 @@ export type QueryRunningExecutionsArgs = {
 };
 
 
+export type QueryScenarioNodeArgs = {
+  contentItemId: Scalars['ID']['input'];
+};
+
+
 export type QueryScimSyncLogArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -1582,8 +2973,33 @@ export type QuerySemanticSearchByContentItemArgs = {
 };
 
 
+export type QuerySessionPollsArgs = {
+  sessionId: Scalars['ID']['input'];
+};
+
+
+export type QuerySkillGapAnalysisArgs = {
+  roleId: Scalars['ID']['input'];
+};
+
+
+export type QuerySocialFeedArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QuerySocialRecommendationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QuerySourceArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QuerySubmissionPlagiarismReportArgs = {
+  submissionId: Scalars['ID']['input'];
 };
 
 
@@ -1634,14 +3050,66 @@ export type QueryUsersArgs = {
 };
 
 
-export type QueryVerifyOpenBadgeArgs = {
+export type QueryVerifyBadgeArgs = {
   assertionId: Scalars['ID']['input'];
+};
+
+
+export type QueryVerifyCertificateArgs = {
+  code: Scalars['String']['input'];
+};
+
+
+export type QueryXapiStatementsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  since?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QuizItemResult = {
+  __typename?: 'QuizItemResult';
+  correct: Scalars['Boolean']['output'];
+  explanation?: Maybe<Scalars['String']['output']>;
+  itemIndex: Scalars['Int']['output'];
+  partialScore?: Maybe<Scalars['Float']['output']>;
+};
+
+export type QuizResult = {
+  __typename?: 'QuizResult';
+  id: Scalars['ID']['output'];
+  itemResults: Array<QuizItemResult>;
+  passed: Scalars['Boolean']['output'];
+  score: Scalars['Float']['output'];
+  submittedAt: Scalars['DateTime']['output'];
+};
+
+export enum RaterRole {
+  DirectReport = 'DIRECT_REPORT',
+  Manager = 'MANAGER',
+  Peer = 'PEER',
+  Self = 'SELF'
+}
+
+/** Input for registering a new LTI 1.3 platform */
+export type RegisterLtiPlatformInput = {
+  authLoginUrl: Scalars['String']['input'];
+  authTokenUrl: Scalars['String']['input'];
+  clientId: Scalars['String']['input'];
+  deploymentId: Scalars['String']['input'];
+  keySetUrl: Scalars['String']['input'];
+  platformName: Scalars['String']['input'];
+  platformUrl: Scalars['String']['input'];
 };
 
 export type RelatedConcept = {
   __typename?: 'RelatedConcept';
   concept: Concept;
   strength: Scalars['Float']['output'];
+};
+
+export type RiskFactor = {
+  __typename?: 'RiskFactor';
+  description: Scalars['String']['output'];
+  key: Scalars['String']['output'];
 };
 
 export type Role = {
@@ -1668,6 +3136,14 @@ export type RoleDelegation = {
   validUntil?: Maybe<Scalars['String']['output']>;
 };
 
+export enum RunStatus {
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Running = 'RUNNING'
+}
+
+/** An SM-2 spaced-repetition review card tracking when a concept is next due. */
 export type SrsCard = {
   __typename?: 'SRSCard';
   conceptName: Scalars['String']['output'];
@@ -1677,6 +3153,79 @@ export type SrsCard = {
   intervalDays: Scalars['Int']['output'];
   lastReviewedAt?: Maybe<Scalars['DateTime']['output']>;
   repetitions: Scalars['Int']['output'];
+};
+
+export type SaveLessonPipelineInput = {
+  config?: InputMaybe<Scalars['JSON']['input']>;
+  nodes: Scalars['JSON']['input'];
+  templateName?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** A single choice option within a scenario node. */
+export type ScenarioChoice = {
+  __typename?: 'ScenarioChoice';
+  id: Scalars['ID']['output'];
+  /**
+   * ID of the next ContentItem to navigate to when this choice is selected.
+   * null means this choice leads to the end of the branch.
+   */
+  nextContentItemId?: Maybe<Scalars['ID']['output']>;
+  text: Scalars['String']['output'];
+};
+
+export type ScenarioEvaluation = {
+  __typename?: 'ScenarioEvaluation';
+  areasForImprovement: Array<Scalars['String']['output']>;
+  criteriaScores: Array<EvaluationCriterionScore>;
+  overallScore: Scalars['Float']['output'];
+  strengths: Array<Scalars['String']['output']>;
+  summary: Scalars['String']['output'];
+};
+
+/** A scenario node parsed from a SCENARIO-type ContentItem. */
+export type ScenarioNode = {
+  __typename?: 'ScenarioNode';
+  choices: Array<ScenarioChoice>;
+  description: Scalars['String']['output'];
+  /**
+   * Only present on terminal nodes (isEndNode = true).
+   * One of: SUCCESS | FAILURE | NEUTRAL
+   */
+  endingType?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isEndNode: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+};
+
+/** A single step in a learner's path through a branching scenario. */
+export type ScenarioProgressEntry = {
+  __typename?: 'ScenarioProgressEntry';
+  choiceId: Scalars['String']['output'];
+  choiceText: Scalars['String']['output'];
+  chosenAt: Scalars['String']['output'];
+  fromContentItemId: Scalars['ID']['output'];
+};
+
+export type ScenarioSession = {
+  __typename?: 'ScenarioSession';
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  evaluation?: Maybe<ScenarioEvaluation>;
+  id: Scalars['ID']['output'];
+  scenarioId: Scalars['ID']['output'];
+  startedAt: Scalars['DateTime']['output'];
+  status: Scalars['String']['output'];
+  turnCount: Scalars['Int']['output'];
+};
+
+export type ScenarioTemplate = {
+  __typename?: 'ScenarioTemplate';
+  difficultyLevel: Scalars['String']['output'];
+  domain: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isBuiltin: Scalars['Boolean']['output'];
+  maxTurns: Scalars['Int']['output'];
+  sceneDescription: Scalars['String']['output'];
+  title: Scalars['String']['output'];
 };
 
 export type ScimSyncEntry = {
@@ -1697,6 +3246,22 @@ export type ScimToken = {
   id: Scalars['ID']['output'];
   isActive: Scalars['Boolean']['output'];
   lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type ScormImportResult = {
+  __typename?: 'ScormImportResult';
+  courseId: Scalars['ID']['output'];
+  itemCount: Scalars['Int']['output'];
+};
+
+export type ScormSession = {
+  __typename?: 'ScormSession';
+  completedAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lessonStatus: Scalars['String']['output'];
+  scoreRaw?: Maybe<Scalars['Float']['output']>;
+  suspendData?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['String']['output'];
 };
 
 export type SecuritySettings = {
@@ -1721,11 +3286,78 @@ export type SemanticResult = {
   text: Scalars['String']['output'];
 };
 
+export type SessionPoll = {
+  __typename?: 'SessionPoll';
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  options: Array<Scalars['String']['output']>;
+  question: Scalars['String']['output'];
+  sessionId: Scalars['ID']['output'];
+};
+
+export type SimilarSubmission = {
+  __typename?: 'SimilarSubmission';
+  similarity: Scalars['Float']['output'];
+  submissionId: Scalars['ID']['output'];
+  submittedAt: Scalars['DateTime']['output'];
+  userId: Scalars['ID']['output'];
+};
+
 export type SimilarityResult = {
   __typename?: 'SimilarityResult';
   distance: Scalars['Float']['output'];
   embedding: Embedding;
   similarity: Scalars['Float']['output'];
+};
+
+/** A single concept gap item: whether it is mastered and what content is recommended. */
+export type SkillGapItem = {
+  __typename?: 'SkillGapItem';
+  conceptName: Scalars['String']['output'];
+  isMastered: Scalars['Boolean']['output'];
+  recommendedContentItems: Array<Scalars['ID']['output']>;
+  recommendedContentTitles: Array<Scalars['String']['output']>;
+  relevanceScore: Scalars['Float']['output'];
+};
+
+/** Full skill gap report comparing a learner's mastery against a role profile. */
+export type SkillGapReport = {
+  __typename?: 'SkillGapReport';
+  completionPercentage: Scalars['Float']['output'];
+  gapCount: Scalars['Int']['output'];
+  gaps: Array<SkillGapItem>;
+  mastered: Scalars['Int']['output'];
+  roleId: Scalars['ID']['output'];
+  roleName: Scalars['String']['output'];
+  totalRequired: Scalars['Int']['output'];
+};
+
+/** A brief view of a skill profile (role/goal definition). */
+export type SkillProfile = {
+  __typename?: 'SkillProfile';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  requiredConceptsCount: Scalars['Int']['output'];
+  roleName: Scalars['String']['output'];
+};
+
+export type SocialFeedItem = {
+  __typename?: 'SocialFeedItem';
+  action: Scalars['String']['output'];
+  contentItemId: Scalars['ID']['output'];
+  contentTitle: Scalars['String']['output'];
+  timestamp: Scalars['String']['output'];
+  userDisplayName: Scalars['String']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type SocialRecommendation = {
+  __typename?: 'SocialRecommendation';
+  contentItemId: Scalars['ID']['output'];
+  contentTitle: Scalars['String']['output'];
+  followersCount: Scalars['Int']['output'];
+  isMutualFollower: Scalars['Boolean']['output'];
+  lastActivity: Scalars['String']['output'];
 };
 
 export type Source = {
@@ -1739,6 +3371,22 @@ export type Source = {
   url?: Maybe<Scalars['String']['output']>;
 };
 
+export enum SourceStatus {
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Processing = 'PROCESSING',
+  Ready = 'READY'
+}
+
+export enum SourceType {
+  FileDocx = 'FILE_DOCX',
+  FilePdf = 'FILE_PDF',
+  FileTxt = 'FILE_TXT',
+  Text = 'TEXT',
+  Url = 'URL',
+  Youtube = 'YOUTUBE'
+}
+
 export type StartAgentExecutionInput = {
   agentId: Scalars['ID']['input'];
   input: Scalars['JSON']['input'];
@@ -1751,11 +3399,12 @@ export type Subscription = {
   /** Subscribe to new annotations on a specific asset in real-time */
   annotationAdded: Annotation;
   executionStatusChanged: AgentExecution;
+  lessonPipelineProgress: LessonPipelineRun;
   /** Subscribe to new messages in a discussion */
   messageAdded: DiscussionMessage;
   messageStream: AgentMessage;
-  /** Real-time notification stream for a user */
   notificationReceived: Notification;
+  pollUpdated: PollResults;
   /** User created event */
   userCreated: User;
   /** Real-time user status updates */
@@ -1775,6 +3424,11 @@ export type SubscriptionExecutionStatusChangedArgs = {
 };
 
 
+export type SubscriptionLessonPipelineProgressArgs = {
+  runId: Scalars['ID']['input'];
+};
+
+
 export type SubscriptionMessageAddedArgs = {
   discussionId: Scalars['ID']['input'];
 };
@@ -1787,6 +3441,11 @@ export type SubscriptionMessageStreamArgs = {
 
 export type SubscriptionNotificationReceivedArgs = {
   userId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionPollUpdatedArgs = {
+  pollId: Scalars['ID']['input'];
 };
 
 
@@ -1814,6 +3473,7 @@ export enum TemplateType {
   QuizAssess = 'QUIZ_ASSESS',
   QuizGenerator = 'QUIZ_GENERATOR',
   ResearchScout = 'RESEARCH_SCOUT',
+  RoleplaySimulator = 'ROLEPLAY_SIMULATOR',
   Summarize = 'SUMMARIZE',
   Tutor = 'TUTOR'
 }
@@ -1869,6 +3529,15 @@ export type Term = {
   updatedAt: Scalars['String']['output'];
 };
 
+export type TextSubmission = {
+  __typename?: 'TextSubmission';
+  contentItemId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  plagiarismReport?: Maybe<PlagiarismReport>;
+  submittedAt: Scalars['DateTime']['output'];
+  wordCount: Scalars['Int']['output'];
+};
+
 export type TopicCluster = {
   __typename?: 'TopicCluster';
   createdAt: Scalars['String']['output'];
@@ -1878,6 +3547,13 @@ export type TopicCluster = {
   tenantId: Scalars['ID']['output'];
   updatedAt: Scalars['String']['output'];
 };
+
+export enum TranslationStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Processing = 'PROCESSING'
+}
 
 export type UpdateAgentTemplateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
@@ -1923,6 +3599,14 @@ export type UpdateCourseInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
   thumbnailUrl?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateLessonInput = {
+  lessonDate?: InputMaybe<Scalars['String']['input']>;
+  series?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<LessonStatus>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<LessonType>;
 };
 
 export type UpdateModuleInput = {
@@ -1990,7 +3674,10 @@ export type User = {
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
   firstName: Scalars['String']['output'];
+  followersCount: Scalars['Int']['output'];
+  followingCount: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
+  isFollowedByMe: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   preferences: UserPreferences;
   role: UserRole;
@@ -2024,6 +3711,7 @@ export type UserPreferences = {
   theme: Scalars['String']['output'];
 };
 
+/** Custom application-level directives (non-federation). */
 export enum UserRole {
   Instructor = 'INSTRUCTOR',
   OrgAdmin = 'ORG_ADMIN',
@@ -2046,6 +3734,27 @@ export type UserStatus = {
   lastSeen: Scalars['DateTime']['output'];
   online: Scalars['Boolean']['output'];
   userId: Scalars['ID']['output'];
+};
+
+export type XapiStatementResult = {
+  __typename?: 'XapiStatementResult';
+  id: Scalars['ID']['output'];
+  objectId: Scalars['String']['output'];
+  storedAt: Scalars['String']['output'];
+  verb: Scalars['String']['output'];
+};
+
+/**
+ * xAPI / LRS integration — F-028 xAPI 1.0.3 Self-Hosted LRS
+ * Provides token management and statement query access for ORG_ADMINs.
+ */
+export type XapiToken = {
+  __typename?: 'XapiToken';
+  createdAt: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  lrsEndpoint?: Maybe<Scalars['String']['output']>;
 };
 
 export enum Join__Graph {
@@ -2175,14 +3884,7 @@ export type ReplyToAnnotationMutation = { __typename?: 'Mutation', replyToAnnota
 export type MyOpenBadgesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyOpenBadgesQuery = { __typename?: 'Query', myOpenBadges: Array<{ __typename?: 'OpenBadgeAssertion', id: string, badgeDefinitionId: string, recipientId: string, issuedAt: string, expiresAt?: string | null, evidenceUrl?: string | null, revoked: boolean, revokedAt?: string | null, revokedReason?: string | null, vcDocument: string, definition: { __typename?: 'OpenBadgeDefinition', id: string, name: string, description: string, imageUrl?: string | null, criteriaUrl?: string | null, tags: Array<string>, issuerId: string, createdAt: string } }> };
-
-export type VerifyOpenBadgeQueryVariables = Exact<{
-  assertionId: Scalars['ID']['input'];
-}>;
-
-
-export type VerifyOpenBadgeQuery = { __typename?: 'Query', verifyOpenBadge: boolean };
+export type MyOpenBadgesQuery = { __typename?: 'Query', myOpenBadges: Array<{ __typename?: 'OpenBadgeAssertion', id: string, badgeDefinitionId: string, badgeName: string, badgeDescription: string, imageUrl?: string | null, recipientId: string, issuedAt: string, expiresAt?: string | null, evidenceUrl?: string | null, revoked: boolean, revokedAt?: string | null, revokedReason?: string | null, verifyUrl: string, shareUrl: string, vcDocument?: string | null }> };
 
 export type DiscussionsQueryVariables = Exact<{
   courseId: Scalars['ID']['input'];
@@ -2331,6 +4033,72 @@ export type MarkContentViewedMutationVariables = Exact<{
 
 export type MarkContentViewedMutation = { __typename?: 'Mutation', markContentViewed: boolean };
 
+export type UpdateCourseMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateCourseInput;
+}>;
+
+
+export type UpdateCourseMutation = { __typename?: 'Mutation', updateCourse: { __typename?: 'Course', id: string, title: string, description?: string | null, thumbnailUrl?: string | null, estimatedHours?: number | null, isPublished: boolean, updatedAt: string } };
+
+export type PublishCourseMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type PublishCourseMutation = { __typename?: 'Mutation', publishCourse: { __typename?: 'Course', id: string, isPublished: boolean, updatedAt: string } };
+
+export type UnpublishCourseMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type UnpublishCourseMutation = { __typename?: 'Mutation', unpublishCourse: { __typename?: 'Course', id: string, isPublished: boolean, updatedAt: string } };
+
+export type DeleteCourseMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteCourseMutation = { __typename?: 'Mutation', deleteCourse: boolean };
+
+export type CreateModuleMutationVariables = Exact<{
+  input: CreateModuleInput;
+}>;
+
+
+export type CreateModuleMutation = { __typename?: 'Mutation', createModule: { __typename?: 'Module', id: string, courseId: string, title: string, description?: string | null, orderIndex: number, createdAt: string } };
+
+export type UpdateModuleMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateModuleInput;
+}>;
+
+
+export type UpdateModuleMutation = { __typename?: 'Mutation', updateModule: { __typename?: 'Module', id: string, title: string, description?: string | null, orderIndex: number } };
+
+export type DeleteModuleMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteModuleMutation = { __typename?: 'Mutation', deleteModule: boolean };
+
+export type ReorderModulesMutationVariables = Exact<{
+  courseId: Scalars['ID']['input'];
+  moduleIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type ReorderModulesMutation = { __typename?: 'Mutation', reorderModules: Array<{ __typename?: 'Module', id: string, orderIndex: number }> };
+
+export type CreateContentItemMutationVariables = Exact<{
+  input: CreateContentItemInput;
+}>;
+
+
+export type CreateContentItemMutation = { __typename?: 'Mutation', createContentItem: { __typename?: 'ContentItem', id: string, moduleId: string, title: string, contentType: string, content?: string | null, orderIndex: number, createdAt: string } };
+
 export type ConceptQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -2401,6 +4169,73 @@ export type PrerequisiteChainQueryVariables = Exact<{
 
 
 export type PrerequisiteChainQuery = { __typename?: 'Query', prerequisiteChain: Array<{ __typename?: 'ConceptNode', id: string, name: string }> };
+
+export type CreateLessonMutationVariables = Exact<{
+  input: CreateLessonInput;
+}>;
+
+
+export type CreateLessonMutation = { __typename?: 'Mutation', createLesson: { __typename?: 'Lesson', id: string, courseId: string, title: string, type: LessonType, status: LessonStatus, createdAt: string } };
+
+export type LessonsByCourseQueryVariables = Exact<{
+  courseId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type LessonsByCourseQuery = { __typename?: 'Query', lessonsByCourse: Array<{ __typename?: 'Lesson', id: string, title: string, type: LessonType, series?: string | null, lessonDate?: string | null, status: LessonStatus, createdAt: string, assets: Array<{ __typename?: 'LessonAsset', id: string, assetType: LessonAssetType, sourceUrl?: string | null, fileUrl?: string | null }> }> };
+
+export type LessonQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type LessonQuery = { __typename?: 'Query', lesson?: { __typename?: 'Lesson', id: string, courseId: string, moduleId?: string | null, title: string, type: LessonType, series?: string | null, lessonDate?: string | null, instructorId: string, status: LessonStatus, createdAt: string, updatedAt: string, assets: Array<{ __typename?: 'LessonAsset', id: string, assetType: LessonAssetType, sourceUrl?: string | null, fileUrl?: string | null, metadata?: unknown | null }>, pipeline?: { __typename?: 'LessonPipeline', id: string, templateName?: string | null, nodes: unknown, config?: unknown | null, status: PipelineStatus, createdAt: string, currentRun?: { __typename?: 'LessonPipelineRun', id: string, status: RunStatus, startedAt?: string | null, completedAt?: string | null, logs?: unknown | null, results: Array<{ __typename?: 'LessonPipelineResult', id: string, moduleName: string, outputType: string, outputData?: unknown | null, fileUrl?: string | null, createdAt: string }> } | null } | null, citations: Array<{ __typename?: 'LessonCitation', id: string, sourceText: string, bookName: string, part?: string | null, page?: string | null, matchStatus: CitationMatchStatus, confidence?: number | null }> } | null };
+
+export type SaveLessonPipelineMutationVariables = Exact<{
+  lessonId: Scalars['ID']['input'];
+  input: SaveLessonPipelineInput;
+}>;
+
+
+export type SaveLessonPipelineMutation = { __typename?: 'Mutation', saveLessonPipeline: { __typename?: 'LessonPipeline', id: string, status: PipelineStatus, nodes: unknown, config?: unknown | null, templateName?: string | null } };
+
+export type StartLessonPipelineRunMutationVariables = Exact<{
+  pipelineId: Scalars['ID']['input'];
+}>;
+
+
+export type StartLessonPipelineRunMutation = { __typename?: 'Mutation', startLessonPipelineRun: { __typename?: 'LessonPipelineRun', id: string, status: RunStatus, startedAt?: string | null } };
+
+export type CancelLessonPipelineRunMutationVariables = Exact<{
+  runId: Scalars['ID']['input'];
+}>;
+
+
+export type CancelLessonPipelineRunMutation = { __typename?: 'Mutation', cancelLessonPipelineRun: { __typename?: 'LessonPipelineRun', id: string, status: RunStatus } };
+
+export type AddLessonAssetMutationVariables = Exact<{
+  lessonId: Scalars['ID']['input'];
+  input: AddLessonAssetInput;
+}>;
+
+
+export type AddLessonAssetMutation = { __typename?: 'Mutation', addLessonAsset: { __typename?: 'LessonAsset', id: string, assetType: LessonAssetType, sourceUrl?: string | null, fileUrl?: string | null } };
+
+export type PublishLessonMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type PublishLessonMutation = { __typename?: 'Mutation', publishLesson: { __typename?: 'Lesson', id: string, status: LessonStatus } };
+
+export type LessonPipelineProgressSubscriptionVariables = Exact<{
+  runId: Scalars['ID']['input'];
+}>;
+
+
+export type LessonPipelineProgressSubscription = { __typename?: 'Subscription', lessonPipelineProgress: { __typename?: 'LessonPipelineRun', id: string, status: RunStatus, completedAt?: string | null, results: Array<{ __typename?: 'LessonPipelineResult', id: string, moduleName: string, outputType: string, outputData?: unknown | null, fileUrl?: string | null }> } };
 
 export type NotificationReceivedSubscriptionVariables = Exact<{
   userId: Scalars['ID']['input'];

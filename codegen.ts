@@ -19,6 +19,7 @@ const SCALAR_CONFIG = {
   // prevents "Unknown scalar" errors during codegen.
   join__FieldSet: 'string',
   link__Import: 'string',
+  requiresScopes__Scope: 'string',
 } as const;
 
 const config: CodegenConfig = {
