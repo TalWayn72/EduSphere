@@ -19,6 +19,8 @@ export const urqlClient = createClient({
     cacheExchange({
       keys: {
         PageInfo: () => null,
+        UserPreferences: () => null,
+        CourseProgress: (data) => (data as { courseId?: string }).courseId ?? null,
       },
     }),
     subscriptionExchange({

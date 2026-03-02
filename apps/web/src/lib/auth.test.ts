@@ -62,6 +62,8 @@ describe('auth — DEV_MODE', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.unstubAllEnvs();
+    // Prevent a stale DEV_LOGOUT_KEY from a prior test leaking into this one.
+    window.sessionStorage.clear();
   });
 
   it('initKeycloak() succeeds immediately when VITE_DEV_MODE=true', async () => {
@@ -88,6 +90,74 @@ describe('auth — DEV_MODE', () => {
     const { initKeycloak, isAuthenticated } = await import('@/lib/auth');
     await initKeycloak();
     expect(isAuthenticated()).toBe(true);
+  });
+
+  it('DEV_USER contains real seeded UUIDs matching the database seed', async () => {
+    vi.stubEnv('VITE_DEV_MODE', 'true');
+    vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+
+    const { initKeycloak, getCurrentUser } = await import('@/lib/auth');
+    await initKeycloak();
+    const user = getCurrentUser();
+    expect(user?.id).toBe('00000000-0000-0000-0000-000000000001');
+    expect(user?.tenantId).toBe('00000000-0000-0000-0000-000000000000');
+    expect(user?.role).toBe('SUPER_ADMIN');
+  });
+
+  it('logout() sets sessionStorage flag so next initKeycloak() returns false (page-reload scenario)', async () => {
+    vi.stubEnv('VITE_DEV_MODE', 'true');
+    vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+
+    // Simulate the in-memory logout
+    const { initKeycloak, logout, isAuthenticated } = await import('@/lib/auth');
+    await initKeycloak();
+    expect(isAuthenticated()).toBe(true);
+
+    logout();
+    expect(isAuthenticated()).toBe(false);
+    expect(window.sessionStorage.getItem('edusphere_dev_logged_out')).toBe('true');
+
+    // Simulate a full page reload: re-import the module from scratch
+    vi.resetModules();
+    const { initKeycloak: initAfterReload, isAuthenticated: isAuthAfterReload } =
+      await import('@/lib/auth');
+    await initAfterReload();
+    // Despite initKeycloak() being called again, the sessionStorage flag must
+    // keep the user logged out (the bug this test guards against).
+    expect(isAuthAfterReload()).toBe(false);
+  });
+
+  it('login() clears the sessionStorage logout flag so the user can log back in', async () => {
+    vi.stubEnv('VITE_DEV_MODE', 'true');
+    vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+
+    // Simulate prior logout
+    window.sessionStorage.setItem('edusphere_dev_logged_out', 'true');
+
+    // Stub window.location.href to prevent jsdom navigation errors
+    const hrefSetter = vi.fn();
+    Object.defineProperty(window, 'location', {
+      value: { ...window.location, set href(v: string) { hrefSetter(v); } },
+      writable: true,
+    });
+
+    const { login } = await import('@/lib/auth');
+    login();
+
+    expect(window.sessionStorage.getItem('edusphere_dev_logged_out')).toBeNull();
+    expect(hrefSetter).toHaveBeenCalledWith('/');
+  });
+
+  it('getCurrentUser() returns null when devAuthenticated is false', async () => {
+    vi.stubEnv('VITE_DEV_MODE', 'true');
+    vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
+
+    // Simulate a prior logout persisted in sessionStorage
+    window.sessionStorage.setItem('edusphere_dev_logged_out', 'true');
+
+    const { initKeycloak, getCurrentUser } = await import('@/lib/auth');
+    await initKeycloak();
+    expect(getCurrentUser()).toBeNull();
   });
 });
 

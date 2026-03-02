@@ -4,6 +4,11 @@ const DEV_MODE =
   import.meta.env.VITE_DEV_MODE === 'true' ||
   !import.meta.env.VITE_KEYCLOAK_URL;
 
+// SessionStorage key used to persist explicit dev-mode logout across page reloads.
+// initKeycloak() sets devAuthenticated=true on every cold start, so without this
+// flag a full-page-reload after logout would immediately re-authenticate the user.
+const DEV_LOGOUT_KEY = 'edusphere_dev_logged_out';
+
 const keycloakConfig = {
   url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
   realm: import.meta.env.VITE_KEYCLOAK_REALM || 'edusphere',
@@ -31,14 +36,14 @@ export interface AuthUser {
   scopes: string[];
 }
 
-// Mock user for development
+// Mock user for development — IDs match the seeded dev user in packages/db seed
 const DEV_USER: AuthUser = {
-  id: 'dev-user-1',
-  username: 'developer',
-  email: 'dev@edusphere.local',
-  firstName: 'Dev',
-  lastName: 'User',
-  tenantId: 'dev-tenant-1',
+  id: '00000000-0000-0000-0000-000000000001',
+  username: 'super.admin',
+  email: 'super.admin@edusphere.dev',
+  firstName: 'Super',
+  lastName: 'Admin',
+  tenantId: '00000000-0000-0000-0000-000000000000',
   role: 'SUPER_ADMIN',
   scopes: ['read', 'write', 'admin'],
 };
@@ -54,8 +59,12 @@ export function initKeycloak(): Promise<boolean> {
   // Development mode - skip Keycloak
   if (DEV_MODE) {
     console.warn('🔧 DEV MODE: Running without Keycloak authentication');
-    devAuthenticated = true;
-    return Promise.resolve(true);
+    // Respect an explicit logout — do NOT auto-authenticate when the user
+    // has previously signed out (sessionStorage survives page reloads but
+    // is cleared when the browser tab/session ends).
+    const wasLoggedOut = window.sessionStorage.getItem(DEV_LOGOUT_KEY) === 'true';
+    devAuthenticated = !wasLoggedOut;
+    return Promise.resolve(devAuthenticated);
   }
 
   // Return the in-flight promise if init is already running.
@@ -106,6 +115,7 @@ export function initKeycloak(): Promise<boolean> {
 
 export function login(): void {
   if (DEV_MODE) {
+    window.sessionStorage.removeItem(DEV_LOGOUT_KEY);
     devAuthenticated = true;
     window.location.href = '/';
     return;
@@ -120,6 +130,9 @@ export function logout(): void {
   if (DEV_MODE) {
     devAuthenticated = false;
     clearTokenRefresh();
+    // Persist the logged-out state before the page reloads so that
+    // initKeycloak() does not re-authenticate on the next cold start.
+    window.sessionStorage.setItem(DEV_LOGOUT_KEY, 'true');
     window.location.href = '/login';
     return;
   }
