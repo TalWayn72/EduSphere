@@ -4868,22 +4868,22 @@ This bypassed all real imports — TipTap/KaTeX was never loaded in tests, makin
 
 ## ✅ CI-003: Full CI Pipeline — 5 Workflow Failures (01 March 2026)
 
-| Field        | Value                                                       |
-| ------------ | ----------------------------------------------------------- |
-| **Status**   | ✅ Fixed                                                    |
-| **Severity** | 🔴 Critical (all CI workflows blocked)                     |
-| **Branch**   | `master`                                                    |
-| **Commits**  | `af86c19`, `3f5bb3a`, `733f76e`, `553b538`, `6b2b0de`      |
+| Field        | Value                                                 |
+| ------------ | ----------------------------------------------------- |
+| **Status**   | ✅ Fixed                                              |
+| **Severity** | 🔴 Critical (all CI workflows blocked)                |
+| **Branch**   | `master`                                              |
+| **Commits**  | `af86c19`, `3f5bb3a`, `733f76e`, `553b538`, `6b2b0de` |
 
 ### Problems (5 distinct failures)
 
-| # | Workflow | Failing Step | Root Cause |
-|---|----------|--------------|------------|
-| 1 | GraphQL Integration Tests (subgraph-content, subgraph-agent) | Run GraphQL tests | `@edusphere/langgraph-workflows` added as dep in `fdffbb0` but `test.yml` graphql-tests job uses `pnpm --filter pkg test` (not turbo), so `^build` dependency resolution never runs → `dist/index.js` missing → Vite ENOENT on module resolution |
-| 2 | All workflows ("Install dependencies") | Install dependencies | `fdffbb0` added `@edusphere/langgraph-workflows: workspace:*` to `apps/subgraph-content/package.json` but did NOT run `pnpm install` to update `pnpm-lock.yaml` → `--frozen-lockfile` fails |
-| 3 | Continuous Integration (codegen-validation job) | Run codegen validation | `requiresScopes__Scope` scalar declared in composed `supergraph.graphql` (indented 2 spaces inside directive block, not at column 0) was missing from `SCALAR_CONFIG` in `codegen.ts` → `pnpm codegen` exits with "Unknown scalar type" |
-| 4 | CD — Deploy to Kubernetes | Upload Trivy SARIF to GitHub Security | GitHub Advanced Security (Code Scanning) not enabled on repo → upload-sarif fails; step lacked `continue-on-error: true` |
-| 5 | Continuous Integration (security-scanning job) | Trivy — scan IaC for misconfigurations | `security-scanning` job lacked `continue-on-error: true` at job level; advisory-only job blocks CI gate despite not being checked by `ci-complete` |
+| #   | Workflow                                                     | Failing Step                           | Root Cause                                                                                                                                                                                                                                       |
+| --- | ------------------------------------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | GraphQL Integration Tests (subgraph-content, subgraph-agent) | Run GraphQL tests                      | `@edusphere/langgraph-workflows` added as dep in `fdffbb0` but `test.yml` graphql-tests job uses `pnpm --filter pkg test` (not turbo), so `^build` dependency resolution never runs → `dist/index.js` missing → Vite ENOENT on module resolution |
+| 2   | All workflows ("Install dependencies")                       | Install dependencies                   | `fdffbb0` added `@edusphere/langgraph-workflows: workspace:*` to `apps/subgraph-content/package.json` but did NOT run `pnpm install` to update `pnpm-lock.yaml` → `--frozen-lockfile` fails                                                      |
+| 3   | Continuous Integration (codegen-validation job)              | Run codegen validation                 | `requiresScopes__Scope` scalar declared in composed `supergraph.graphql` (indented 2 spaces inside directive block, not at column 0) was missing from `SCALAR_CONFIG` in `codegen.ts` → `pnpm codegen` exits with "Unknown scalar type"          |
+| 4   | CD — Deploy to Kubernetes                                    | Upload Trivy SARIF to GitHub Security  | GitHub Advanced Security (Code Scanning) not enabled on repo → upload-sarif fails; step lacked `continue-on-error: true`                                                                                                                         |
+| 5   | Continuous Integration (security-scanning job)               | Trivy — scan IaC for misconfigurations | `security-scanning` job lacked `continue-on-error: true` at job level; advisory-only job blocks CI gate despite not being checked by `ci-complete`                                                                                               |
 
 ### Solutions
 
@@ -4895,26 +4895,26 @@ This bypassed all real imports — TipTap/KaTeX was never loaded in tests, makin
 
 ### Final CI Status (commit `6b2b0de`)
 
-| Workflow | Result |
-|----------|--------|
-| Full Test Suite | ✅ OK |
-| Continuous Integration | ✅ OK |
-| GraphQL Federation Validation | ✅ OK |
-| Docker Image Builds | ✅ OK |
-| CodeQL Security Analysis | ✅ OK |
-| Performance Tests (k6) | ✅ OK |
-| CD — Deploy to Kubernetes | ✅ OK |
-| Secret Scanning | ✅ OK |
-| audit-export | ❌ Infrastructure-only (needs `SOC2_EXPORT_TOKEN` secret — not code-fixable) |
+| Workflow                      | Result                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| Full Test Suite               | ✅ OK                                                                        |
+| Continuous Integration        | ✅ OK                                                                        |
+| GraphQL Federation Validation | ✅ OK                                                                        |
+| Docker Image Builds           | ✅ OK                                                                        |
+| CodeQL Security Analysis      | ✅ OK                                                                        |
+| Performance Tests (k6)        | ✅ OK                                                                        |
+| CD — Deploy to Kubernetes     | ✅ OK                                                                        |
+| Secret Scanning               | ✅ OK                                                                        |
+| audit-export                  | ❌ Infrastructure-only (needs `SOC2_EXPORT_TOKEN` secret — not code-fixable) |
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `.github/workflows/test.yml` | Added `langgraph-workflows build` step to integration-tests + graphql-tests jobs |
-| `pnpm-lock.yaml` | Updated lockfile for `@edusphere/langgraph-workflows` in subgraph-content |
-| `codegen.ts` | Added `requiresScopes__Scope: 'string'` to SCALAR_CONFIG |
-| `packages/graphql-types/src/generated/types.ts` | Regenerated |
-| `packages/graphql-types/src/generated/operations.ts` | Regenerated |
-| `.github/workflows/cd.yml` | Added `continue-on-error: true` to Trivy SARIF upload step |
-| `.github/workflows/ci.yml` | Added `continue-on-error: true` to security-scanning job + IaC scan step |
+| File                                                 | Change                                                                           |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `.github/workflows/test.yml`                         | Added `langgraph-workflows build` step to integration-tests + graphql-tests jobs |
+| `pnpm-lock.yaml`                                     | Updated lockfile for `@edusphere/langgraph-workflows` in subgraph-content        |
+| `codegen.ts`                                         | Added `requiresScopes__Scope: 'string'` to SCALAR_CONFIG                         |
+| `packages/graphql-types/src/generated/types.ts`      | Regenerated                                                                      |
+| `packages/graphql-types/src/generated/operations.ts` | Regenerated                                                                      |
+| `.github/workflows/cd.yml`                           | Added `continue-on-error: true` to Trivy SARIF upload step                       |
+| `.github/workflows/ci.yml`                           | Added `continue-on-error: true` to security-scanning job + IaC scan step         |
