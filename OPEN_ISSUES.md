@@ -30,11 +30,11 @@ After BUG-035 was fixed, uploading a `.doc` file in the Course Wizard Media step
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `apps/subgraph-content/src/media/media.service.ts` | `requestChecksumCalculation: 'WHEN_REQUIRED'` + `responseChecksumValidation: 'WHEN_REQUIRED'` in S3Client — removes CRC32 from presigned URLs |
-| `apps/web/src/pages/CourseWizardMediaStep.tsx` | `const contentType = entry.file.type \|\| 'application/octet-stream'` fallback; `requestPolicy: 'network-only'` on presign query; use resolved `contentType` in PUT headers |
-| `packages/auth/src/jwt.ts` | Restore `userId: '00000000-0000-0000-0000-000000000001'` in dev bypass (matches seeded user) |
+| File                                               | Change                                                                                                                                                                      |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/subgraph-content/src/media/media.service.ts` | `requestChecksumCalculation: 'WHEN_REQUIRED'` + `responseChecksumValidation: 'WHEN_REQUIRED'` in S3Client — removes CRC32 from presigned URLs                               |
+| `apps/web/src/pages/CourseWizardMediaStep.tsx`     | `const contentType = entry.file.type \|\| 'application/octet-stream'` fallback; `requestPolicy: 'network-only'` on presign query; use resolved `contentType` in PUT headers |
+| `packages/auth/src/jwt.ts`                         | Restore `userId: '00000000-0000-0000-0000-000000000001'` in dev bypass (matches seeded user)                                                                                |
 
 ### Verification
 
