@@ -81,6 +81,10 @@ export default defineConfig({
     clearMocks: true,
     testTimeout: 30000,
     hookTimeout: 30000,
+    reporters: [
+      'default',
+      ['junit', { outputFile: './test-results/results.xml', suiteName: 'web' }],
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

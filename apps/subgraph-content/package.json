@@ -21,6 +21,7 @@
     "@edusphere/db": "workspace:*",
     "@edusphere/graphql-shared": "workspace:*",
     "@edusphere/metrics": "workspace:*",
+    "@edusphere/langgraph-workflows": "workspace:*",
     "@edusphere/nats-client": "workspace:*",
     "@edusphere/telemetry": "workspace:*",
     "@graphql-yoga/nestjs-federation": "^3.19.0",
