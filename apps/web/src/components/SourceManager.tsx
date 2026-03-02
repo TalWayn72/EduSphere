@@ -268,7 +268,9 @@ function AddSourceModal({
             : lower.endsWith('.txt')
               ? 'FILE_TXT'
               : 'FILE_PDF';
-          return Promise.resolve(devAddSource(devType, input.title, input.fileName));
+          return Promise.resolve(
+            devAddSource(devType, input.title, input.fileName)
+          );
         }
       : (input: {
           courseId: string;

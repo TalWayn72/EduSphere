@@ -67,7 +67,9 @@ describe('AnnotationResolver', () => {
   let resolver: AnnotationResolver;
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new AnnotationResolver(mockAnnotationService as unknown as AnnotationService);
+    resolver = new AnnotationResolver(
+      mockAnnotationService as unknown as AnnotationService
+    );
   });
 
   describe('health()', () => {

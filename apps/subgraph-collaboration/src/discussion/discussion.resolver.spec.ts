@@ -81,7 +81,9 @@ describe('DiscussionResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new DiscussionResolver(mockDiscussionService as unknown as DiscussionService);
+    resolver = new DiscussionResolver(
+      mockDiscussionService as unknown as DiscussionService
+    );
   });
 
   // ─── getDiscussion query ──────────────────────────────────────────────────
@@ -433,7 +435,9 @@ describe('DiscussionMessageResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new DiscussionMessageResolver(mockDiscussionService as unknown as DiscussionService);
+    resolver = new DiscussionMessageResolver(
+      mockDiscussionService as unknown as DiscussionService
+    );
   });
 
   describe('resolveDiscussion()', () => {
@@ -543,7 +547,9 @@ describe('DiscussionParticipantResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new DiscussionParticipantResolver(mockDiscussionService as unknown as DiscussionService);
+    resolver = new DiscussionParticipantResolver(
+      mockDiscussionService as unknown as DiscussionService
+    );
   });
 
   describe('resolveDiscussion()', () => {

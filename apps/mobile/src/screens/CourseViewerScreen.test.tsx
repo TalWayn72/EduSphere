@@ -27,7 +27,10 @@ import CourseViewerScreen from './CourseViewerScreen';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 
-type CourseViewerScreenProps = NativeStackScreenProps<RootStackParamList, 'CourseViewer'>;
+type CourseViewerScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  'CourseViewer'
+>;
 
 const MOCK_ROUTE = {
   params: { courseId: 'course-1' },
@@ -64,7 +67,10 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByTestId } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
+      <CourseViewerScreen
+        route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
 
     const titleEl = getByTestId('course-title');
@@ -79,7 +85,10 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByTestId } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
+      <CourseViewerScreen
+        route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
 
     expect(getByTestId('module-list')).toBeTruthy();
@@ -95,7 +104,10 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByType } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
+      <CourseViewerScreen
+        route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
 
     // ActivityIndicator is rendered during loading
@@ -111,7 +123,10 @@ describe('CourseViewerScreen', () => {
     });
 
     const { getByTestId } = render(
-      <CourseViewerScreen route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']} navigation={MOCK_NAV} />
+      <CourseViewerScreen
+        route={MOCK_ROUTE as unknown as CourseViewerScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
 
     expect(getByTestId('offline-indicator')).toBeTruthy();

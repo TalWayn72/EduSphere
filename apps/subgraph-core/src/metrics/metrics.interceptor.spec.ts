@@ -163,7 +163,7 @@ describe('MetricsInterceptor (via @edusphere/metrics)', () => {
         const ctx = {
           getType: vi.fn().mockReturnValue('graphql'),
           getArgByIndex: vi.fn().mockReturnValue({}),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
         const next = { handle: vi.fn().mockReturnValue(of({})) };
         interceptor.intercept(ctx, next).subscribe({

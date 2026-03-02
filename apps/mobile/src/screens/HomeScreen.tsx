@@ -149,10 +149,7 @@ export default function HomeScreen() {
           <View style={styles.progressContainer}>
             <View style={styles.progressBar}>
               <View
-                style={[
-                  styles.progressFill,
-                  { width: `${course.progress}%` },
-                ]}
+                style={[styles.progressFill, { width: `${course.progress}%` }]}
               />
             </View>
             <Text style={styles.progressText}>{course.progress}%</Text>

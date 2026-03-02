@@ -137,7 +137,8 @@ describe('auth — DEV_MODE', () => {
     // Simulate being logged in via the sessionStorage flag (avoids href mock complexity)
     window.sessionStorage.setItem('edusphere_dev_logged_in', 'true');
 
-    const { initKeycloak, logout, isAuthenticated } = await import('@/lib/auth');
+    const { initKeycloak, logout, isAuthenticated } =
+      await import('@/lib/auth');
     await initKeycloak();
     expect(isAuthenticated()).toBe(true);
 
@@ -166,7 +167,9 @@ describe('auth — DEV_MODE', () => {
     const { login } = await import('@/lib/auth');
     login();
 
-    expect(window.sessionStorage.getItem('edusphere_dev_logged_in')).toBe('true');
+    expect(window.sessionStorage.getItem('edusphere_dev_logged_in')).toBe(
+      'true'
+    );
     expect(hrefSetter).toHaveBeenCalledWith('/');
   });
 

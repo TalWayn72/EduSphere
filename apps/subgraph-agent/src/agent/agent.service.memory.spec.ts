@@ -98,17 +98,19 @@ describe('AgentService fire-and-forget timeout (memory safety)', () => {
       executionId
     ).catch((err: Error) => {
       timeoutError = err;
-      return mockDb
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update(null as any)
-        .set({
-          status: 'FAILED',
-          output: { error: err.message },
-          completed_at: new Date(),
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .where(null as any)
-        .returning();
+      return (
+        mockDb
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .update(null as any)
+          .set({
+            status: 'FAILED',
+            output: { error: err.message },
+            completed_at: new Date(),
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .where(null as any)
+          .returning()
+      );
     });
     await vi.advanceTimersByTimeAsync(FIVE_MINUTES_MS + 1);
     await guardedExecution;
@@ -136,17 +138,19 @@ describe('AgentService fire-and-forget timeout (memory safety)', () => {
       300_000,
       'exec-msg-test'
     ).catch((err: Error) => {
-      return mockDb
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update(null as any)
-        .set({
-          status: 'FAILED',
-          output: { error: err.message },
-          completed_at: new Date(),
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .where(null as any)
-        .returning();
+      return (
+        mockDb
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .update(null as any)
+          .set({
+            status: 'FAILED',
+            output: { error: err.message },
+            completed_at: new Date(),
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .where(null as any)
+          .returning()
+      );
     });
     await vi.advanceTimersByTimeAsync(300_001);
     await guardedExecution;

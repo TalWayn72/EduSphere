@@ -137,13 +137,17 @@ describe('AgentSessionResolver', () => {
 
     it('includes TUTOR template', async () => {
       const result = await resolver.getAgentTemplates();
-      const tutor = result.find((t: { templateType: string }) => t.templateType === 'TUTOR');
+      const tutor = result.find(
+        (t: { templateType: string }) => t.templateType === 'TUTOR'
+      );
       expect(tutor).toBeDefined();
     });
 
     it('includes QUIZ_GENERATOR template', async () => {
       const result = await resolver.getAgentTemplates();
-      const quiz = result.find((t: { templateType: string }) => t.templateType === 'QUIZ_GENERATOR');
+      const quiz = result.find(
+        (t: { templateType: string }) => t.templateType === 'QUIZ_GENERATOR'
+      );
       expect(quiz).toBeDefined();
     });
 
@@ -158,7 +162,8 @@ describe('AgentSessionResolver', () => {
     it('includes EXPLANATION_GENERATOR template', async () => {
       const result = await resolver.getAgentTemplates();
       const explainer = result.find(
-        (t: { templateType: string }) => t.templateType === 'EXPLANATION_GENERATOR'
+        (t: { templateType: string }) =>
+          t.templateType === 'EXPLANATION_GENERATOR'
       );
       expect(explainer).toBeDefined();
     });

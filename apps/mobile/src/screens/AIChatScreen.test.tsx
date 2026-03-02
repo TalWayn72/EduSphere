@@ -48,14 +48,20 @@ beforeEach(() => {
 describe('AIChatScreen', () => {
   it('renders empty chat state', () => {
     const { getByTestId } = render(
-      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
+      <AIChatScreen
+        route={MOCK_ROUTE as unknown as AIChatScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
     expect(getByTestId('chat-message-list')).toBeTruthy();
   });
 
   it('renders message bubbles after receiving response', async () => {
     const { getByTestId, findByText } = render(
-      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
+      <AIChatScreen
+        route={MOCK_ROUTE as unknown as AIChatScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
 
     const input = getByTestId('chat-input');
@@ -72,7 +78,10 @@ describe('AIChatScreen', () => {
 
   it('send button triggers mutation', async () => {
     const { getByTestId } = render(
-      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
+      <AIChatScreen
+        route={MOCK_ROUTE as unknown as AIChatScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
 
     fireEvent.changeText(getByTestId('chat-input'), 'Test message');
@@ -96,7 +105,10 @@ describe('AIChatScreen', () => {
     mockUseMutation.mockReturnValue([mockMutateFn, { loading: false }]);
 
     const { getByTestId, findByTestId } = render(
-      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
+      <AIChatScreen
+        route={MOCK_ROUTE as unknown as AIChatScreenProps['route']}
+        navigation={MOCK_NAV}
+      />
     );
 
     fireEvent.changeText(getByTestId('chat-input'), 'Hello');

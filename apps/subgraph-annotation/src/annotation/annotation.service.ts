@@ -252,7 +252,11 @@ export class AnnotationService implements OnModuleDestroy {
     });
   }
 
-  async update(id: string, input: UpdateAnnotationInput, authContext: AuthContext) {
+  async update(
+    id: string,
+    input: UpdateAnnotationInput,
+    authContext: AuthContext
+  ) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');
     }

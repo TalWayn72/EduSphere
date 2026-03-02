@@ -146,7 +146,7 @@ describe('LiveSessionService', () => {
         .mockReturnValue('https://bbb.example.com/join?pw=mod-pw');
       vi.mocked(createBbbClient).mockReturnValue({
         buildJoinUrl: mockBuildJoinUrl,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -185,7 +185,7 @@ describe('LiveSessionService', () => {
         .mockReturnValue('https://bbb.example.com/join?pw=att-pw');
       vi.mocked(createBbbClient).mockReturnValue({
         buildJoinUrl: mockBuildJoinUrl,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
