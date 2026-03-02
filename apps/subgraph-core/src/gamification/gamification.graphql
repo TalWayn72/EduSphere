@@ -46,6 +46,35 @@ input UpdateBadgeInput {
   conditionValue: Int
 }
 
+type OpenBadgeDefinition {
+  id: ID!
+  tenantId: ID!
+  name: String!
+  description: String!
+  imageUrl: String
+  criteriaUrl: String
+  tags: [String!]!
+  version: String!
+  issuerId: String!
+  createdAt: String!
+}
+
+type OpenBadge {
+  id: ID!
+  badgeDefinitionId: ID!
+  recipientId: ID!
+  tenantId: ID!
+  issuedAt: String!
+  expiresAt: String
+  evidenceUrl: String
+  proof: JSON!
+  revoked: Boolean!
+  revokedAt: String
+  revokedReason: String
+  definition: OpenBadgeDefinition!
+  vcDocument: String!
+}
+
 extend type Query {
   myBadges: [UserBadge!]! @authenticated
   leaderboard(limit: Int): [LeaderboardEntry!]! @authenticated
@@ -54,6 +83,8 @@ extend type Query {
   adminBadges: [Badge!]!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+  myOpenBadges: [OpenBadge!]! @authenticated
+  verifyOpenBadge(assertionId: ID!): Boolean! @authenticated
 }
 
 extend type Mutation {
@@ -69,4 +100,13 @@ extend type Mutation {
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 
+  issueBadge(
+    badgeDefinitionId: ID!
+    recipientId: ID!
+    evidenceUrl: String
+  ): OpenBadge! @authenticated
+
+  revokeOpenBadge(assertionId: ID!, reason: String!): Boolean!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }

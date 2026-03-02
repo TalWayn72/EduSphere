@@ -89,6 +89,20 @@ PGSQL" 2>/dev/null || echo "⚠️  Graph init will retry on first use"
 
 echo "✅ Database setup complete"
 
+# ─── Keycloak realm file: ensure correct name (edusphere-realm.json) ──────────
+# Keycloak ≥ 24 requires the import file name to match the realm name.
+# The image ships keycloak-realm.json; rename it once to edusphere-realm.json.
+KC_IMPORT_DIR="/opt/keycloak/data/import"
+if [ -f "$KC_IMPORT_DIR/keycloak-realm.json" ] && [ ! -f "$KC_IMPORT_DIR/edusphere-realm.json" ]; then
+    echo "🔑 Renaming keycloak-realm.json → edusphere-realm.json (Keycloak name convention fix)"
+    cp "$KC_IMPORT_DIR/keycloak-realm.json" "$KC_IMPORT_DIR/edusphere-realm.json"
+    rm "$KC_IMPORT_DIR/keycloak-realm.json"
+    echo "✅ Keycloak realm file renamed"
+elif [ -f "$KC_IMPORT_DIR/keycloak-realm.json" ] && [ -f "$KC_IMPORT_DIR/edusphere-realm.json" ]; then
+    rm "$KC_IMPORT_DIR/keycloak-realm.json"
+    echo "✅ Removed duplicate keycloak-realm.json"
+fi
+
 # ─── Run Drizzle migrations (idempotent) ─────────────────────
 echo "🔄 Running database migrations..."
 DB_URL="postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere"
