@@ -100,6 +100,13 @@ let _devSources: KnowledgeSource[] = [
     sourceType: 'URL',
     origin: 'https://example.com/intro-talmud',
     preview: 'מסכת בבא קמא — פרק ראשון: מניין הנזיקין.',
+    rawContent:
+      'מסכת בבא קמא — פרק ראשון: מניין הנזיקין.\n\n' +
+      'ארבעה אבות נזיקין: השור, והבור, והמבעה, וההבער.\n' +
+      'לא הרי השור כהרי המבעה, ולא הרי המבעה כהרי השור.\n' +
+      'לא זה וזה שיש בהן רוח חיים כהרי האש שאין בו רוח חיים.\n' +
+      'ולא זה וזה שדרכן לילך ולהזיק כהרי הבור שאין דרכו לילך ולהזיק.\n' +
+      'הצד השוה שבכולן — שדרכן להזיק ושמירתן עליך.',
     status: 'READY',
     chunkCount: 12,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
@@ -109,6 +116,12 @@ let _devSources: KnowledgeSource[] = [
     title: 'הרמב"ם - משנה תורה',
     sourceType: 'TEXT',
     preview: 'הלכות תשובה — פרק א.',
+    rawContent:
+      'הלכות תשובה — פרק א.\n\n' +
+      'כל המצוות שבתורה, בין עשה בין לא תעשה — אם עבר אדם על אחת מהן, בין בזדון בין בשגגה, ' +
+      'כשיעשה תשובה וישוב מחטאו, חייב להתוודות לפני האל ברוך הוא, שנאמר "איש או אשה כי יעשו" ' +
+      'וגו׳ "והתוודו את חטאתם אשר עשו".\n\n' +
+      'זה וידוי דברים. ווידוי זה מצות עשה.',
     status: 'READY',
     chunkCount: 7,
     createdAt: new Date(Date.now() - 43200000).toISOString(),
@@ -126,12 +139,19 @@ function devAddSource(
   title: string,
   origin?: string
 ): KnowledgeSource {
+  const mockContent =
+    `(תוכן לדוגמה — סביבת פיתוח)\n\n` +
+    `המסמך "${origin ?? title}" הועלה בהצלחה.\n` +
+    `בסביבת ייצור, כאן יוצג התוכן המלא שחולץ מהמסמך לאחר עיבוד אוטומטי.\n\n` +
+    `לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית. ` +
+    `סמי שמי ח עס הedio לי זה להאמין. נולום ארווס מאסט ד'לורד.`;
   const src: KnowledgeSource = {
     id: `dev-src-${Date.now()}`,
     title,
     sourceType,
     origin,
-    preview: `תוכן לדוגמה עבור "${title}"`,
+    preview: mockContent.slice(0, 120),
+    rawContent: mockContent,
     status: 'READY',
     chunkCount: Math.floor(Math.random() * 15) + 1,
     createdAt: new Date().toISOString(),
@@ -241,8 +261,15 @@ function AddSourceModal({
           fileName: string;
           contentBase64: string;
           mimeType: string;
-        }) =>
-          Promise.resolve(devAddSource('FILE_PDF', input.title, input.fileName))
+        }) => {
+          const lower = input.fileName.toLowerCase();
+          const devType: SourceType = lower.endsWith('.docx')
+            ? 'FILE_DOCX'
+            : lower.endsWith('.txt')
+              ? 'FILE_TXT'
+              : 'FILE_PDF';
+          return Promise.resolve(devAddSource(devType, input.title, input.fileName));
+        }
       : (input: {
           courseId: string;
           title: string;
