@@ -60,6 +60,14 @@ export class OpenBadgeResolver {
     return this.badgeService.verifyCredential(assertionId);
   }
 
+  @Query('verifyOpenBadge')
+  async verifyOpenBadge(
+    @Args('assertionId') assertionId: string
+  ): Promise<boolean> {
+    const result = await this.badgeService.verifyCredential(assertionId);
+    return result.valid;
+  }
+
   // ── Mutations ─────────────────────────────────────────────────────────────
 
   @Mutation('createBadgeDefinition')

@@ -262,7 +262,12 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   Verify a badge assertion by ID — public (no auth required).
   Checks signature validity, revocation status and expiry.
   """
-  verifyBadge(assertionId: ID!) : BadgeVerificationResult! @join__field(graph: CONTENT) 
+  verifyBadge(assertionId: ID!) : BadgeVerificationResult! @join__field(graph: CONTENT)
+  """
+  Verify a badge assertion — returns true if valid, false otherwise.
+  Simpler scalar alternative to verifyBadge for quick validity checks.
+  """
+  verifyOpenBadge(assertionId: ID!) : Boolean! @join__field(graph: CONTENT)
   mySubmissions(contentItemId: ID!) : [TextSubmission!]! @join__field(graph: CONTENT)  @authenticated
   submissionPlagiarismReport(submissionId: ID!) : PlagiarismReport @join__field(graph: CONTENT)  @authenticated
   programs: [CredentialProgram!]! @join__field(graph: CONTENT)  @authenticated
@@ -1256,6 +1261,7 @@ type OpenBadgeDefinition @join__type(graph: CONTENT)  {
   tags: [String!]!
   version: String!
   issuerId: String!
+  createdAt: String!
 }
 
 """
@@ -1286,6 +1292,10 @@ type OpenBadgeAssertion @join__type(graph: CONTENT)  {
   W3C VC JSON document (serialized), null when not yet signed
   """
   vcDocument: String
+  """
+  Resolved badge definition (eager-loaded with the assertion)
+  """
+  definition: OpenBadgeDefinition @join__field(graph: CONTENT)
 }
 
 """

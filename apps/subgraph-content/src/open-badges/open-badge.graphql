@@ -8,6 +8,7 @@ type OpenBadgeDefinition {
   tags: [String!]!
   version: String!
   issuerId: String!
+  createdAt: String!
 }
 
 """OpenBadges 3.0 assertion — one earned credential per user"""
@@ -30,6 +31,8 @@ type OpenBadgeAssertion {
   shareUrl: String!
   """W3C VC JSON document (serialized), null when not yet signed"""
   vcDocument: String
+  """Resolved badge definition (eager-loaded with the assertion)"""
+  definition: OpenBadgeDefinition
 }
 
 """Result of verifying a badge assertion's Ed25519 proof"""
@@ -53,6 +56,12 @@ extend type Query {
   Checks signature validity, revocation status and expiry.
   """
   verifyBadge(assertionId: ID!): BadgeVerificationResult!
+
+  """
+  Verify a badge assertion — returns true if valid, false otherwise.
+  Simpler scalar alternative to verifyBadge for quick validity checks.
+  """
+  verifyOpenBadge(assertionId: ID!): Boolean!
 }
 
 extend type Mutation {
