@@ -107,7 +107,11 @@ describe('CourseResolver', () => {
       mockCourseService.create.mockResolvedValue(MOCK_COURSE);
       const input = { title: 'New', instructorId: 'u-1' };
       const result = await resolver.createCourse(input, AUTH_CTX);
-      expect(mockCourseService.create).toHaveBeenCalledWith(input);
+      expect(mockCourseService.create).toHaveBeenCalledWith({
+        ...input,
+        tenantId: 'tenant-1',
+        creatorId: 'user-1',
+      });
       expect(result).toEqual(MOCK_COURSE);
     });
 
