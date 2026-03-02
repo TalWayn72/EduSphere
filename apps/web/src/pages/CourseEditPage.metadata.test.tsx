@@ -1,12 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -31,7 +38,15 @@ const INITIAL_VALUES = {
 };
 
 const SUCCESS_RESULT = {
-  data: { updateCourse: { id: 'c1', title: 'New Title', description: null, thumbnailUrl: null, estimatedHours: null } },
+  data: {
+    updateCourse: {
+      id: 'c1',
+      title: 'New Title',
+      description: null,
+      thumbnailUrl: null,
+      estimatedHours: null,
+    },
+  },
   error: undefined,
 };
 
@@ -43,12 +58,19 @@ describe('CourseEditMetadata', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockExecute.mockResolvedValue(SUCCESS_RESULT);
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockExecute] as never);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockExecute,
+    ] as never);
   });
 
   function renderForm(onSaved = vi.fn()) {
     return render(
-      <CourseEditMetadata courseId="c1" initialValues={INITIAL_VALUES} onSaved={onSaved} />
+      <CourseEditMetadata
+        courseId="c1"
+        initialValues={INITIAL_VALUES}
+        onSaved={onSaved}
+      />
     );
   }
 
@@ -59,7 +81,9 @@ describe('CourseEditMetadata', () => {
 
   it('renders description textarea with the initial value', () => {
     renderForm();
-    expect(screen.getByDisplayValue('Original description')).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Original description')
+    ).toBeInTheDocument();
   });
 
   it('renders thumbnail input with the initial value', () => {
@@ -69,7 +93,9 @@ describe('CourseEditMetadata', () => {
 
   it('Save button is disabled when form has no changes', () => {
     renderForm();
-    expect(screen.getByRole('button', { name: /save changes/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /save changes/i })
+    ).toBeDisabled();
   });
 
   it('Save button is enabled after title is changed', async () => {
@@ -77,7 +103,9 @@ describe('CourseEditMetadata', () => {
     const titleInput = screen.getByDisplayValue('Original Title');
     fireEvent.change(titleInput, { target: { value: 'New Course Title' } });
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /save changes/i })).not.toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: /save changes/i })
+      ).not.toBeDisabled();
     });
   });
 
@@ -120,7 +148,10 @@ describe('CourseEditMetadata', () => {
   it('calls onSaved with error message when mutation fails', async () => {
     mockExecute.mockResolvedValue({
       data: undefined,
-      error: { graphQLErrors: [{ message: 'Unauthorized' }], message: 'Unauthorized' },
+      error: {
+        graphQLErrors: [{ message: 'Unauthorized' }],
+        message: 'Unauthorized',
+      },
     });
     const onSaved = vi.fn();
     renderForm(onSaved);
@@ -134,12 +165,17 @@ describe('CourseEditMetadata', () => {
     });
 
     await waitFor(() => {
-      expect(onSaved).toHaveBeenCalledWith(expect.stringContaining('Unauthorized'));
+      expect(onSaved).toHaveBeenCalledWith(
+        expect.stringContaining('Unauthorized')
+      );
     });
   });
 
   it('shows spinner while mutation is in flight', () => {
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: true }, mockExecute] as never);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: true },
+      mockExecute,
+    ] as never);
     renderForm();
     // Button exists but is disabled during fetch
     const btn = screen.getByRole('button', { name: /save changes/i });

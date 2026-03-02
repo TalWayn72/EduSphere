@@ -24,7 +24,9 @@ describe('SelectionCommentButton', () => {
         onAddComment={vi.fn()}
       />
     );
-    expect(screen.getByRole('button', { name: /add comment/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /add comment/i })
+    ).toBeInTheDocument();
   });
 
   it('positions the wrapper with fixed style at correct top/left', () => {
@@ -100,9 +102,7 @@ describe('SelectionCommentButton', () => {
     );
     expect(container.firstChild).not.toBeNull();
 
-    rerender(
-      <SelectionCommentButton position={null} onAddComment={vi.fn()} />
-    );
+    rerender(<SelectionCommentButton position={null} onAddComment={vi.fn()} />);
     expect(container.firstChild).toBeNull();
   });
 

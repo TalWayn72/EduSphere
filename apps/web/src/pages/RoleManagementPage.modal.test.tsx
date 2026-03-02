@@ -7,7 +7,15 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { RoleFormModal } from './RoleManagementPage.modal';
 
-function setup(open = true, initialRole?: { id?: string; name?: string; description?: string; permissions?: string[] }) {
+function setup(
+  open = true,
+  initialRole?: {
+    id?: string;
+    name?: string;
+    description?: string;
+    permissions?: string[];
+  }
+) {
   const onClose = vi.fn();
   const onSave = vi.fn();
   const utils = render(
@@ -47,7 +55,9 @@ describe('RoleFormModal', () => {
   it('shows Cancel and Save role buttons', () => {
     setup(true);
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /save role/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /save role/i })
+    ).toBeInTheDocument();
   });
 
   it('calls onClose when Cancel is clicked', () => {
@@ -81,7 +91,9 @@ describe('RoleFormModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /save role/i }));
     await waitFor(() => {
       expect(onSave).toHaveBeenCalled();
-      expect(onSave.mock.calls[0]![0]!).toMatchObject({ name: 'Content Manager' });
+      expect(onSave.mock.calls[0]![0]!).toMatchObject({
+        name: 'Content Manager',
+      });
     });
   });
 

@@ -55,7 +55,9 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
     return this.nc;
   }
 
-  private publishModuleEvent(payload: LessonPipelineModuleCompletedPayload): void {
+  private publishModuleEvent(
+    payload: LessonPipelineModuleCompletedPayload
+  ): void {
     this.getNats()
       .then((nc) =>
         nc.publish(
@@ -110,7 +112,11 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
         const startedAt = Date.now();
 
         try {
-          const output = await this.executeModule(node, sharedContext, tenantCtx);
+          const output = await this.executeModule(
+            node,
+            sharedContext,
+            tenantCtx
+          );
           sharedContext = { ...sharedContext, ...output };
 
           await this.db.insert(schema.lesson_pipeline_results).values({
@@ -257,9 +263,14 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
           summary: (context['longSummary'] as string | undefined) ?? '',
           keyPoints: (context['keyPoints'] as string[] | undefined) ?? [],
           entities:
-            (context['entities'] as Array<{ text: string; type: string }> | undefined) ?? [],
+            (context['entities'] as
+              | Array<{ text: string; type: string }>
+              | undefined) ?? [],
         });
-        return { structuredNotes: result, outputMarkdown: result.outputMarkdown };
+        return {
+          structuredNotes: result,
+          outputMarkdown: result.outputMarkdown,
+        };
       }
 
       case 'DIAGRAM_GENERATOR': {
@@ -273,20 +284,29 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
               | 'graph'
               | undefined) ?? 'mindmap',
         });
-        return { diagram: result, mermaidSrc: result.mermaidSrc, svgOutput: result.svgOutput };
+        return {
+          diagram: result,
+          mermaidSrc: result.mermaidSrc,
+          svgOutput: result.svgOutput,
+        };
       }
 
       case 'CITATION_VERIFIER': {
         const wf = createCitationVerifierWorkflow(model, locale);
         const result = await wf.run({
           citations:
-            (context['citations'] as Array<{
-              sourceText: string;
-              bookName: string;
-            }> | undefined) ?? [],
+            (context['citations'] as
+              | Array<{
+                  sourceText: string;
+                  bookName: string;
+                }>
+              | undefined) ?? [],
           strictMode: Boolean(node.config['strictMode'] ?? false),
         });
-        return { citationVerification: result, matchReport: result.matchReport };
+        return {
+          citationVerification: result,
+          matchReport: result.matchReport,
+        };
       }
 
       case 'QA_GATE': {
@@ -302,7 +322,11 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
           content: content || 'No content',
           lessonType: 'THEMATIC',
         });
-        return { qa: result, qaScore: result.overallScore, fixList: result.fixList };
+        return {
+          qa: result,
+          qaScore: result.overallScore,
+          fixList: result.fixList,
+        };
       }
 
       case 'ASR':

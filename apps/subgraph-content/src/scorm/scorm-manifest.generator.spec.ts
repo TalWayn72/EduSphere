@@ -51,7 +51,7 @@ describe('XML escaping (via generateManifest2004 title field)', () => {
     expect(xml).toContain('&quot;');
   });
 
-  it("escapes single-quotes (apostrophe) in course title", () => {
+  it('escapes single-quotes (apostrophe) in course title', () => {
     const course = { id: 'c4', title: "It's Alive", description: null };
     const xml = generateManifest2004(course, [makeItem()]);
     expect(xml).toContain('&apos;');
@@ -71,7 +71,11 @@ describe('XML escaping (via generateManifest2004 title field)', () => {
 // ── generateManifest2004 ──────────────────────────────────────────────────────
 
 describe('generateManifest2004', () => {
-  const course = { id: 'course-abc-123', title: 'Torah Studies 101', description: null };
+  const course = {
+    id: 'course-abc-123',
+    title: 'Torah Studies 101',
+    description: null,
+  };
   const items = [
     makeItem({ id: 'item-001', title: 'Lesson One', type: 'MARKDOWN' }),
     makeItem({ id: 'item-002', title: 'Quiz One', type: 'QUIZ' }),
@@ -164,7 +168,12 @@ describe('injectScormApiShim', () => {
 
 describe('buildVideoHtml', () => {
   it('generates HTML with a <video> tag', () => {
-    const item = makeItem({ id: 'v1', title: 'Lecture 1', type: 'VIDEO', content: null });
+    const item = makeItem({
+      id: 'v1',
+      title: 'Lecture 1',
+      type: 'VIDEO',
+      content: null,
+    });
     const html = buildVideoHtml(item as never);
     expect(html).toContain('<video');
     expect(html).toContain('Lecture 1');
@@ -182,13 +191,23 @@ describe('buildVideoHtml', () => {
   });
 
   it('omits source tag when content url is missing', () => {
-    const item = makeItem({ id: 'v3', title: 'No URL', type: 'VIDEO', content: '{}' });
+    const item = makeItem({
+      id: 'v3',
+      title: 'No URL',
+      type: 'VIDEO',
+      content: '{}',
+    });
     const html = buildVideoHtml(item as never);
     expect(html).not.toContain('<source');
   });
 
   it('is a complete HTML document', () => {
-    const item = makeItem({ id: 'v4', title: 'Full Doc', type: 'VIDEO', content: null });
+    const item = makeItem({
+      id: 'v4',
+      title: 'Full Doc',
+      type: 'VIDEO',
+      content: null,
+    });
     const html = buildVideoHtml(item as never);
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('</html>');
@@ -199,20 +218,35 @@ describe('buildVideoHtml', () => {
 
 describe('buildQuizHtml', () => {
   it('generates HTML containing the item title', () => {
-    const item = makeItem({ id: 'q1', title: 'Chapter Quiz', type: 'QUIZ', content: null });
+    const item = makeItem({
+      id: 'q1',
+      title: 'Chapter Quiz',
+      type: 'QUIZ',
+      content: null,
+    });
     const html = buildQuizHtml(item as never);
     expect(html).toContain('Chapter Quiz');
   });
 
   it('is a complete HTML document', () => {
-    const item = makeItem({ id: 'q2', title: 'Final Exam', type: 'QUIZ', content: null });
+    const item = makeItem({
+      id: 'q2',
+      title: 'Final Exam',
+      type: 'QUIZ',
+      content: null,
+    });
     const html = buildQuizHtml(item as never);
     expect(html).toContain('<!DOCTYPE html>');
     expect(html).toContain('</html>');
   });
 
   it('mentions EduSphere platform', () => {
-    const item = makeItem({ id: 'q3', title: 'Midterm', type: 'QUIZ', content: null });
+    const item = makeItem({
+      id: 'q3',
+      title: 'Midterm',
+      type: 'QUIZ',
+      content: null,
+    });
     const html = buildQuizHtml(item as never);
     expect(html).toContain('EduSphere');
   });

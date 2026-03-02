@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // 32-byte key: Buffer.from('a'.repeat(32)) encoded in base64
 const VALID_KEY = Buffer.from('a'.repeat(32)).toString('base64');
-const SHORT_KEY  = Buffer.from('short').toString('base64'); // not 32 bytes
+const SHORT_KEY = Buffer.from('short').toString('base64'); // not 32 bytes
 
 let originalKey: string | undefined;
 
@@ -59,7 +59,9 @@ describe('CrmEncryptionService', () => {
   // 4. decrypt throws on 2-part format
   it('decrypt throws on a 2-part (invalid) format', () => {
     const svc = new CrmEncryptionService();
-    expect(() => svc.decrypt('aabbcc:ddeeff')).toThrow('Invalid encrypted token format');
+    expect(() => svc.decrypt('aabbcc:ddeeff')).toThrow(
+      'Invalid encrypted token format'
+    );
   });
 
   // 5. decrypt throws when authTag length is wrong
@@ -69,19 +71,25 @@ describe('CrmEncryptionService', () => {
     const badTag = 'aabb'; // only 2 bytes
     const validIv = 'a'.repeat(24); // 12 bytes in hex
     const ciphertext = 'deadbeef';
-    expect(() => svc.decrypt(`${validIv}:${badTag}:${ciphertext}`)).toThrow('Invalid auth tag length');
+    expect(() => svc.decrypt(`${validIv}:${badTag}:${ciphertext}`)).toThrow(
+      'Invalid auth tag length'
+    );
   });
 
   // 6. constructor throws if CRM_ENCRYPTION_KEY is missing
   it('constructor throws when CRM_ENCRYPTION_KEY is not set', () => {
     delete process.env['CRM_ENCRYPTION_KEY'];
-    expect(() => new CrmEncryptionService()).toThrow('CRM_ENCRYPTION_KEY env var is required');
+    expect(() => new CrmEncryptionService()).toThrow(
+      'CRM_ENCRYPTION_KEY env var is required'
+    );
   });
 
   // 7. constructor throws if key is not 32 bytes
   it('constructor throws when key decodes to fewer than 32 bytes', () => {
     process.env['CRM_ENCRYPTION_KEY'] = SHORT_KEY;
-    expect(() => new CrmEncryptionService()).toThrow('CRM_ENCRYPTION_KEY must be 32 bytes');
+    expect(() => new CrmEncryptionService()).toThrow(
+      'CRM_ENCRYPTION_KEY must be 32 bytes'
+    );
   });
 
   // 8. encrypt/decrypt empty string

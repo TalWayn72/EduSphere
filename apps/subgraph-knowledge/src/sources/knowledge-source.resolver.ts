@@ -125,8 +125,7 @@ export class KnowledgeSourceResolver {
     const sourceType =
       lower.endsWith('.pdf') || input.mimeType === 'application/pdf'
         ? ('FILE_PDF' as const)
-        : lower.endsWith('.docx') ||
-            input.mimeType.includes('wordprocessingml')
+        : lower.endsWith('.docx') || input.mimeType.includes('wordprocessingml')
           ? ('FILE_DOCX' as const)
           : ('FILE_TXT' as const);
 

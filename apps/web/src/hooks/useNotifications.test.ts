@@ -98,10 +98,9 @@ describe('useNotifications', () => {
 
     renderHook(() => useNotifications(''));
 
-    const lastCall =
-      vi.mocked(urql.useSubscription).mock.calls[
-        vi.mocked(urql.useSubscription).mock.calls.length - 1
-      ];
+    const lastCall = vi.mocked(urql.useSubscription).mock.calls[
+      vi.mocked(urql.useSubscription).mock.calls.length - 1
+    ];
     expect(lastCall?.[0]).toMatchObject({ pause: true });
   });
 
@@ -136,8 +135,7 @@ describe('useNotifications', () => {
     // because the hook is fully torn down — both are acceptable).
     const callsAfterUnmount = vi.mocked(urql.useSubscription).mock.calls;
     if (callsAfterUnmount.length > 0) {
-      const lastCall =
-        callsAfterUnmount[callsAfterUnmount.length - 1];
+      const lastCall = callsAfterUnmount[callsAfterUnmount.length - 1];
       expect(lastCall?.[0]).toMatchObject({ pause: true });
     }
     // No assertion failure if no further calls — hook was fully torn down.

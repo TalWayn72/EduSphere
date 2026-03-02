@@ -10,14 +10,17 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 const mockUseQuery = vi.fn();
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: (args: unknown) => mockUseQuery(args),
@@ -26,10 +29,34 @@ vi.mock('urql', () => ({
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const MOCK_ENTRIES = [
-  { rank: 1, userId: 'u1', displayName: 'Alice Smith', totalPoints: 5000, badgeCount: 10 },
-  { rank: 2, userId: 'u2', displayName: 'Bob Jones', totalPoints: 4200, badgeCount: 8 },
-  { rank: 3, userId: 'u3', displayName: 'Carol White', totalPoints: 3800, badgeCount: 6 },
-  { rank: 4, userId: 'u4', displayName: 'Dave Brown', totalPoints: 3100, badgeCount: 4 },
+  {
+    rank: 1,
+    userId: 'u1',
+    displayName: 'Alice Smith',
+    totalPoints: 5000,
+    badgeCount: 10,
+  },
+  {
+    rank: 2,
+    userId: 'u2',
+    displayName: 'Bob Jones',
+    totalPoints: 4200,
+    badgeCount: 8,
+  },
+  {
+    rank: 3,
+    userId: 'u3',
+    displayName: 'Carol White',
+    totalPoints: 3800,
+    badgeCount: 6,
+  },
+  {
+    rank: 4,
+    userId: 'u4',
+    displayName: 'Dave Brown',
+    totalPoints: 3100,
+    badgeCount: 4,
+  },
 ];
 
 function renderPage() {
@@ -55,7 +82,9 @@ describe('LeaderboardPage', () => {
 
   it('renders heading', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /leaderboard/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /leaderboard/i })
+    ).toBeInTheDocument();
   });
 
   it('shows user rank badge', () => {
@@ -103,7 +132,9 @@ describe('LeaderboardPage', () => {
   });
 
   it('shows empty state when no entries', () => {
-    mockUseQuery.mockReturnValue([{ data: { leaderboard: [], myRank: undefined }, fetching: false }]);
+    mockUseQuery.mockReturnValue([
+      { data: { leaderboard: [], myRank: undefined }, fetching: false },
+    ]);
     renderPage();
     expect(screen.getByText(/no leaderboard data yet/i)).toBeInTheDocument();
   });

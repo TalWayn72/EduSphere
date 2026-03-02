@@ -20,7 +20,8 @@ export const urqlClient = createClient({
       keys: {
         PageInfo: () => null,
         UserPreferences: () => null,
-        CourseProgress: (data) => (data as { courseId?: string }).courseId ?? null,
+        CourseProgress: (data) =>
+          (data as { courseId?: string }).courseId ?? null,
       },
     }),
     subscriptionExchange({

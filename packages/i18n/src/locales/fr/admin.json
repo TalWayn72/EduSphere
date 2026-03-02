@@ -42,12 +42,27 @@
     "noActivity": "L'activité admin récente apparaîtra ici.",
     "loadError": "Échec du chargement des données",
     "quickLinks": {
-      "branding": { "label": "Image de marque", "desc": "Logos, couleurs, thèmes" },
-      "users": { "label": "Utilisateurs", "desc": "Gérer apprenants et admins" },
+      "branding": {
+        "label": "Image de marque",
+        "desc": "Logos, couleurs, thèmes"
+      },
+      "users": {
+        "label": "Utilisateurs",
+        "desc": "Gérer apprenants et admins"
+      },
       "compliance": { "label": "Conformité", "desc": "Rapports et échéances" },
-      "gamification": { "label": "Gamification", "desc": "Points, badges, classements" },
-      "security": { "label": "Sécurité", "desc": "MFA, SSO, politique de session" },
-      "auditLog": { "label": "Journal d'audit", "desc": "Historique des actions admin" }
+      "gamification": {
+        "label": "Gamification",
+        "desc": "Points, badges, classements"
+      },
+      "security": {
+        "label": "Sécurité",
+        "desc": "MFA, SSO, politique de session"
+      },
+      "auditLog": {
+        "label": "Journal d'audit",
+        "desc": "Historique des actions admin"
+      }
     }
   },
   "stats": {

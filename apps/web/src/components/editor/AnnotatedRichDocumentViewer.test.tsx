@@ -62,13 +62,17 @@ describe('AnnotatedRichDocumentViewer', () => {
 
   it('returns null when editor is not ready', () => {
     vi.mocked(TiptapReact.useEditor).mockReturnValue(null as never);
-    const { container } = render(<AnnotatedRichDocumentViewer {...defaultProps} />);
+    const { container } = render(
+      <AnnotatedRichDocumentViewer {...defaultProps} />
+    );
     expect(container.firstChild).toBeNull();
   });
 
   it('renders viewer wrapper when editor is ready', () => {
     vi.mocked(TiptapReact.useEditor).mockReturnValue(makeEditor());
-    const { container } = render(<AnnotatedRichDocumentViewer {...defaultProps} />);
+    const { container } = render(
+      <AnnotatedRichDocumentViewer {...defaultProps} />
+    );
     expect(container.querySelector('.rich-content-viewer')).toBeInTheDocument();
   });
 
@@ -81,15 +85,17 @@ describe('AnnotatedRichDocumentViewer', () => {
   it('sets editable: false on the editor', () => {
     vi.mocked(TiptapReact.useEditor).mockReturnValue(makeEditor());
     render(<AnnotatedRichDocumentViewer {...defaultProps} />);
-    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!
+    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!;
     expect(call?.editable).toBe(false);
   });
 
   it('applies aria-label and role via editorProps', () => {
     vi.mocked(TiptapReact.useEditor).mockReturnValue(makeEditor());
     render(<AnnotatedRichDocumentViewer {...defaultProps} />);
-    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!
-    const attrs = call?.editorProps?.attributes as Record<string, string> | undefined;
+    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!;
+    const attrs = call?.editorProps?.attributes as
+      | Record<string, string>
+      | undefined;
     expect(attrs?.['aria-label']).toBe('Rich document content');
     expect(attrs?.['role']).toBe('document');
   });
@@ -97,14 +103,16 @@ describe('AnnotatedRichDocumentViewer', () => {
   it('uses empty doc when content is empty string', () => {
     vi.mocked(TiptapReact.useEditor).mockReturnValue(makeEditor());
     render(<AnnotatedRichDocumentViewer {...defaultProps} content="" />);
-    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!
+    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!;
     expect(call?.content).toEqual({ type: 'doc', content: [] });
   });
 
   it('uses empty doc when content is invalid JSON', () => {
     vi.mocked(TiptapReact.useEditor).mockReturnValue(makeEditor());
-    render(<AnnotatedRichDocumentViewer {...defaultProps} content="not json" />);
-    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!
+    render(
+      <AnnotatedRichDocumentViewer {...defaultProps} content="not json" />
+    );
+    const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0]!;
     expect(call?.content).toEqual({ type: 'doc', content: [] });
   });
 

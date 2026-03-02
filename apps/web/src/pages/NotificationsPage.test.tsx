@@ -22,12 +22,16 @@ vi.mock('@/hooks/useNotifications', () => ({
 
 // Layout renders children — stub it to avoid nav complexity
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeNotification(overrides: Partial<AppNotification> = {}): AppNotification {
+function makeNotification(
+  overrides: Partial<AppNotification> = {}
+): AppNotification {
   return {
     id: 'n1',
     type: 'BADGE_ISSUED',
@@ -58,7 +62,9 @@ describe('NotificationsPage', () => {
 
   it('renders heading', () => {
     renderPage();
-    expect(screen.getByRole('heading', { name: /notifications/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /notifications/i })
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no notifications', () => {
@@ -67,14 +73,19 @@ describe('NotificationsPage', () => {
   });
 
   it('renders a notification item', () => {
-    mockNotifications = [makeNotification({ title: 'Test badge', body: 'You did it!' })];
+    mockNotifications = [
+      makeNotification({ title: 'Test badge', body: 'You did it!' }),
+    ];
     renderPage();
     expect(screen.getByText('Test badge')).toBeInTheDocument();
     expect(screen.getByText('You did it!')).toBeInTheDocument();
   });
 
   it('shows unread count badge in header', () => {
-    mockNotifications = [makeNotification({ id: 'n1' }), makeNotification({ id: 'n2' })];
+    mockNotifications = [
+      makeNotification({ id: 'n1' }),
+      makeNotification({ id: 'n2' }),
+    ];
     renderPage();
     // Unread badge in header
     expect(screen.getByText('2')).toBeInTheDocument();
@@ -83,17 +94,26 @@ describe('NotificationsPage', () => {
   it('shows mark-all-read button when there are unread', () => {
     mockNotifications = [makeNotification()];
     renderPage();
-    expect(screen.getByRole('button', { name: /mark all read/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /mark all read/i })
+    ).toBeInTheDocument();
   });
 
   it('hides mark-all-read when all read', () => {
-    mockNotifications = [makeNotification({ readAt: new Date().toISOString() })];
+    mockNotifications = [
+      makeNotification({ readAt: new Date().toISOString() }),
+    ];
     renderPage();
-    expect(screen.queryByRole('button', { name: /mark all read/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /mark all read/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls markAsRead for all unread when mark-all-read clicked', () => {
-    mockNotifications = [makeNotification({ id: 'a' }), makeNotification({ id: 'b' })];
+    mockNotifications = [
+      makeNotification({ id: 'a' }),
+      makeNotification({ id: 'b' }),
+    ];
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /mark all read/i }));
     expect(mockMarkAsRead).toHaveBeenCalledWith('a');
@@ -101,7 +121,9 @@ describe('NotificationsPage', () => {
   });
 
   it('calls markAsRead when notification item clicked', () => {
-    mockNotifications = [makeNotification({ id: 'click-me', title: 'Click me' })];
+    mockNotifications = [
+      makeNotification({ id: 'click-me', title: 'Click me' }),
+    ];
     renderPage();
     fireEvent.click(screen.getByText('Click me').closest('[role="button"]')!);
     expect(mockMarkAsRead).toHaveBeenCalledWith('click-me');
@@ -117,7 +139,11 @@ describe('NotificationsPage', () => {
   it('filters to only unread when Unread tab clicked', () => {
     mockNotifications = [
       makeNotification({ id: 'unread', title: 'Unread One', readAt: null }),
-      makeNotification({ id: 'read', title: 'Read One', readAt: new Date().toISOString() }),
+      makeNotification({
+        id: 'read',
+        title: 'Read One',
+        readAt: new Date().toISOString(),
+      }),
     ];
     renderPage();
     fireEvent.click(screen.getByRole('tab', { name: /unread/i }));
@@ -128,7 +154,11 @@ describe('NotificationsPage', () => {
   it('filters by type when type tab clicked', () => {
     mockNotifications = [
       makeNotification({ id: 'b', title: 'Badge one', type: 'BADGE_ISSUED' }),
-      makeNotification({ id: 'c', title: 'Course one', type: 'COURSE_ENROLLED' }),
+      makeNotification({
+        id: 'c',
+        title: 'Course one',
+        type: 'COURSE_ENROLLED',
+      }),
     ];
     renderPage();
     fireEvent.click(screen.getByRole('tab', { name: /badge/i }));
@@ -143,9 +173,21 @@ describe('NotificationsPage', () => {
     earlier.setDate(earlier.getDate() - 5);
 
     mockNotifications = [
-      makeNotification({ id: '1', title: 'Today item', createdAt: new Date().toISOString() }),
-      makeNotification({ id: '2', title: 'Yesterday item', createdAt: yesterday.toISOString() }),
-      makeNotification({ id: '3', title: 'Earlier item', createdAt: earlier.toISOString() }),
+      makeNotification({
+        id: '1',
+        title: 'Today item',
+        createdAt: new Date().toISOString(),
+      }),
+      makeNotification({
+        id: '2',
+        title: 'Yesterday item',
+        createdAt: yesterday.toISOString(),
+      }),
+      makeNotification({
+        id: '3',
+        title: 'Earlier item',
+        createdAt: earlier.toISOString(),
+      }),
     ];
     renderPage();
     expect(screen.getByText('Today')).toBeInTheDocument();
@@ -157,6 +199,8 @@ describe('NotificationsPage', () => {
     mockNotifications = [makeNotification({ type: 'BADGE_ISSUED' })];
     renderPage();
     fireEvent.click(screen.getByRole('tab', { name: /📢 announce/i }));
-    expect(screen.getByText(/no notifications match this filter/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/no notifications match this filter/i)
+    ).toBeInTheDocument();
   });
 });

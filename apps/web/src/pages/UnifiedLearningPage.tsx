@@ -58,16 +58,11 @@ export function UnifiedLearningPage() {
 
   // Fallback document content when gateway offline
   const documentContent: string =
-    item?.content ??
-    (itemResult.error ? mockDocumentContent : '');
+    item?.content ?? (itemResult.error ? mockDocumentContent : '');
 
   // ── Video / transcript hook (has mock fallback) ──
-  const {
-    videoUrl,
-    hlsManifestUrl,
-    videoTitle,
-    transcript,
-  } = useContentData(contentId);
+  const { videoUrl, hlsManifestUrl, videoTitle, transcript } =
+    useContentData(contentId);
 
   // ── Annotation hooks ──
   const [activeLayers] = useState<AnnotationLayer[]>([
@@ -120,7 +115,10 @@ export function UnifiedLearningPage() {
 
   // Derive video bookmarks from PERSONAL annotations with timestamps
   const bookmarks = annotations
-    .filter((a) => a.layer === AnnotationLayer.PERSONAL && a.contentTimestamp !== undefined)
+    .filter(
+      (a) =>
+        a.layer === AnnotationLayer.PERSONAL && a.contentTimestamp !== undefined
+    )
     .map((a) => ({
       id: a.id,
       timestamp: a.contentTimestamp!,
@@ -146,7 +144,10 @@ export function UnifiedLearningPage() {
         </div>
 
         {/* Main resizable layout */}
-        <ResizablePanelGroup orientation="horizontal" className="flex-1 overflow-hidden border rounded-lg">
+        <ResizablePanelGroup
+          orientation="horizontal"
+          className="flex-1 overflow-hidden border rounded-lg"
+        >
           {/* LEFT — Document */}
           <ResizablePanel defaultSize={55} minSize={25} id="document">
             <DocumentPanel
@@ -155,7 +156,9 @@ export function UnifiedLearningPage() {
               textAnnotations={textAnnotations}
               focusedAnnotationId={focusedAnnotationId}
               onAnnotationClick={setFocusedAnnotationId}
-              onAddTextAnnotation={(args) => { void addTextAnnotation(args); }}
+              onAddTextAnnotation={(args) => {
+                void addTextAnnotation(args);
+              }}
               scrollContainerRef={scrollContainerRef}
               onScroll={handleScroll}
               documentZoom={documentZoom}
@@ -179,9 +182,15 @@ export function UnifiedLearningPage() {
               onTimeUpdate={setCurrentTime}
               onDurationChange={setDuration}
               onSeek={seekTo}
-              onAddAnnotation={(text, layer, time) => { void addAnnotation(text, layer, time); }}
-              onReply={(pid, content, layer) => { void addReply(pid, content, layer, currentTime); }}
-              onOverlayAnnotation={(content, layer, ts) => { void addAnnotation(content, layer, ts); }}
+              onAddAnnotation={(text, layer, time) => {
+                void addAnnotation(text, layer, time);
+              }}
+              onReply={(pid, content, layer) => {
+                void addReply(pid, content, layer, currentTime);
+              }}
+              onOverlayAnnotation={(content, layer, ts) => {
+                void addAnnotation(content, layer, ts);
+              }}
               bookmarks={bookmarks}
               chat={chat}
             />

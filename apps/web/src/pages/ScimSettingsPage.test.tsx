@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -173,9 +174,7 @@ describe('ScimSettingsPage', () => {
   it('opens generate token modal when button is clicked', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /generate token/i }));
-    expect(
-      document.querySelector('[role="dialog"]')
-    ).toBeInTheDocument();
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument();
   });
 
   it('shows "Generate SCIM Token" dialog title after clicking Generate Token', () => {

@@ -44,8 +44,14 @@
     "quickLinks": {
       "branding": { "label": "Merek", "desc": "Logo, warna, tema" },
       "users": { "label": "Pengguna", "desc": "Kelola pelajar dan admin" },
-      "compliance": { "label": "Kepatuhan", "desc": "Laporan dan tenggat waktu" },
-      "gamification": { "label": "Gamifikasi", "desc": "Poin, lencana, papan peringkat" },
+      "compliance": {
+        "label": "Kepatuhan",
+        "desc": "Laporan dan tenggat waktu"
+      },
+      "gamification": {
+        "label": "Gamifikasi",
+        "desc": "Poin, lencana, papan peringkat"
+      },
       "security": { "label": "Keamanan", "desc": "MFA, SSO, kebijakan sesi" },
       "auditLog": { "label": "Log Audit", "desc": "Riwayat tindakan admin" }
     }

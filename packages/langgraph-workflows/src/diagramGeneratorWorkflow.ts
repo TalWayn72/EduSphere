@@ -17,10 +17,22 @@ export type DiagramGeneratorState = z.infer<typeof DiagramGeneratorStateSchema>;
 
 const DiagramGeneratorAnnotation = Annotation.Root({
   keyPoints: Annotation<string[]>({ value: (_, u) => u, default: () => [] }),
-  diagramType: Annotation<DiagramGeneratorState['diagramType']>({ value: (_, u) => u, default: () => 'mindmap' }),
-  mermaidSrc: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  svgOutput: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  validationErrors: Annotation<string[]>({ value: (_, u) => u, default: () => [] }),
+  diagramType: Annotation<DiagramGeneratorState['diagramType']>({
+    value: (_, u) => u,
+    default: () => 'mindmap',
+  }),
+  mermaidSrc: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  svgOutput: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  validationErrors: Annotation<string[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
@@ -54,11 +66,19 @@ export class DiagramGeneratorWorkflow {
     return graph;
   }
 
-  private async buildMermaidSyntaxNode(state: DiagramGeneratorState): Promise<Partial<DiagramGeneratorState>> {
-    const diagramInstructions: Record<DiagramGeneratorState['diagramType'], string> = {
-      flowchart: 'Create a flowchart showing the logical flow between concepts.',
-      mindmap: 'Create a mindmap showing concept relationships radiating from the central theme.',
-      graph: 'Create a graph diagram showing connections between all major concepts.',
+  private async buildMermaidSyntaxNode(
+    state: DiagramGeneratorState
+  ): Promise<Partial<DiagramGeneratorState>> {
+    const diagramInstructions: Record<
+      DiagramGeneratorState['diagramType'],
+      string
+    > = {
+      flowchart:
+        'Create a flowchart showing the logical flow between concepts.',
+      mindmap:
+        'Create a mindmap showing concept relationships radiating from the central theme.',
+      graph:
+        'Create a graph diagram showing connections between all major concepts.',
     };
 
     const systemPrompt = injectLocale(
@@ -80,18 +100,31 @@ IMPORTANT: Mermaid node labels with Hebrew text must be quoted: A["תוכן"]`,
     return { mermaidSrc: object.mermaidSrc };
   }
 
-  private async validateMermaidNode(state: DiagramGeneratorState): Promise<Partial<DiagramGeneratorState>> {
+  private async validateMermaidNode(
+    state: DiagramGeneratorState
+  ): Promise<Partial<DiagramGeneratorState>> {
     if (!state.mermaidSrc) {
-      return { validationErrors: ['No Mermaid source generated'], isComplete: true };
+      return {
+        validationErrors: ['No Mermaid source generated'],
+        isComplete: true,
+      };
     }
 
-    const validStarters = ['flowchart', 'graph', 'mindmap', 'sequenceDiagram', 'classDiagram'];
+    const validStarters = [
+      'flowchart',
+      'graph',
+      'mindmap',
+      'sequenceDiagram',
+      'classDiagram',
+    ];
     const trimmed = state.mermaidSrc.trim();
     const isValid = validStarters.some((s) => trimmed.startsWith(s));
 
     if (!isValid) {
       return {
-        validationErrors: ['Invalid Mermaid syntax: missing diagram type declaration'],
+        validationErrors: [
+          'Invalid Mermaid syntax: missing diagram type declaration',
+        ],
         isComplete: true,
       };
     }
@@ -103,15 +136,21 @@ IMPORTANT: Mermaid node labels with Hebrew text must be quoted: A["תוכן"]`,
     return { svgOutput, isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) { return this.graph.compile(opts); }
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts);
+  }
 
-  async run(initialState: Partial<DiagramGeneratorState>): Promise<DiagramGeneratorState> {
+  async run(
+    initialState: Partial<DiagramGeneratorState>
+  ): Promise<DiagramGeneratorState> {
     const fullState = DiagramGeneratorStateSchema.parse(initialState);
     const result = await this.graph.compile().invoke(fullState);
     return result as DiagramGeneratorState;
   }
 
-  async *stream(initialState: Partial<DiagramGeneratorState>): AsyncGenerator<DiagramGeneratorState, void, unknown> {
+  async *stream(
+    initialState: Partial<DiagramGeneratorState>
+  ): AsyncGenerator<DiagramGeneratorState, void, unknown> {
     const compiledGraph = this.graph.compile();
     const fullState = DiagramGeneratorStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
@@ -120,6 +159,9 @@ IMPORTANT: Mermaid node labels with Hebrew text must be quoted: A["תוכן"]`,
   }
 }
 
-export function createDiagramGeneratorWorkflow(model?: string, locale = 'he'): DiagramGeneratorWorkflow {
+export function createDiagramGeneratorWorkflow(
+  model?: string,
+  locale = 'he'
+): DiagramGeneratorWorkflow {
   return new DiagramGeneratorWorkflow(model, locale);
 }

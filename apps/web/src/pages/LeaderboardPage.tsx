@@ -97,46 +97,46 @@ export function LeaderboardPage() {
 
         {/* Leaderboard list */}
         <div className="space-y-1">
-          {fetching
-            ? Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="h-12 rounded-lg animate-pulse bg-muted" />
-              ))
-            : entries.length === 0
-              ? (
-                <div className="text-center py-20 text-muted-foreground text-sm">
-                  No leaderboard data yet. Complete courses and earn badges to rank up!
+          {fetching ? (
+            Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="h-12 rounded-lg animate-pulse bg-muted" />
+            ))
+          ) : entries.length === 0 ? (
+            <div className="text-center py-20 text-muted-foreground text-sm">
+              No leaderboard data yet. Complete courses and earn badges to rank
+              up!
+            </div>
+          ) : (
+            entries.map((entry) => {
+              const isMe =
+                localUser && entry.displayName.includes(localUser.firstName);
+              return (
+                <div
+                  key={entry.userId}
+                  className={`flex items-center gap-4 px-4 py-3 rounded-lg text-sm ${
+                    isMe
+                      ? 'bg-primary/10 border border-primary/20 font-semibold'
+                      : 'hover:bg-muted/50'
+                  }`}
+                >
+                  <span className="w-8 text-center shrink-0 text-lg">
+                    {MEDAL[entry.rank] ?? (
+                      <span className="text-sm text-muted-foreground font-normal">
+                        #{entry.rank}
+                      </span>
+                    )}
+                  </span>
+                  <span className="flex-1 truncate">{entry.displayName}</span>
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {entry.badgeCount} badge{entry.badgeCount !== 1 ? 's' : ''}
+                  </span>
+                  <span className="font-bold text-primary shrink-0 tabular-nums">
+                    {entry.totalPoints.toLocaleString()} pts
+                  </span>
                 </div>
-              )
-              : entries.map((entry) => {
-                  const isMe =
-                    localUser &&
-                    entry.displayName.includes(localUser.firstName);
-                  return (
-                    <div
-                      key={entry.userId}
-                      className={`flex items-center gap-4 px-4 py-3 rounded-lg text-sm ${
-                        isMe
-                          ? 'bg-primary/10 border border-primary/20 font-semibold'
-                          : 'hover:bg-muted/50'
-                      }`}
-                    >
-                      <span className="w-8 text-center shrink-0 text-lg">
-                        {MEDAL[entry.rank] ?? (
-                          <span className="text-sm text-muted-foreground font-normal">
-                            #{entry.rank}
-                          </span>
-                        )}
-                      </span>
-                      <span className="flex-1 truncate">{entry.displayName}</span>
-                      <span className="text-xs text-muted-foreground shrink-0">
-                        {entry.badgeCount} badge{entry.badgeCount !== 1 ? 's' : ''}
-                      </span>
-                      <span className="font-bold text-primary shrink-0 tabular-nums">
-                        {entry.totalPoints.toLocaleString()} pts
-                      </span>
-                    </div>
-                  );
-                })}
+              );
+            })
+          )}
         </div>
       </div>
     </Layout>

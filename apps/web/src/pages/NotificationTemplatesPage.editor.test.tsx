@@ -115,6 +115,8 @@ describe('NotificationTemplateEditor', () => {
 
   it('shows "Save Changes" text when saved prop is false', () => {
     renderEditor({ saved: false });
-    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /save changes/i })
+    ).toBeInTheDocument();
   });
 });

@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 
 // ── Mocks (hoisted by vitest) ─────────────────────────────────────────────────
 
@@ -19,7 +25,8 @@ vi.mock('@/lib/auth', () => ({ getCurrentUser: vi.fn() }));
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -129,7 +136,9 @@ describe('CourseDetailPage', () => {
 
   it('shows Enroll button when not enrolled', () => {
     render(<CourseDetailPage />);
-    expect(screen.getByRole('button', { name: /^enroll$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^enroll$/i })
+    ).toBeInTheDocument();
   });
 
   it('shows Unenroll button when enrolled', () => {
@@ -137,18 +146,24 @@ describe('CourseDetailPage', () => {
       makeQueryResult({ myEnrollments: [{ courseId: 'course-1' }] })
     );
     render(<CourseDetailPage />);
-    expect(screen.getByRole('button', { name: /^unenroll$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^unenroll$/i })
+    ).toBeInTheDocument();
   });
 
   it('shows Edit Course button for instructor role', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
     render(<CourseDetailPage />);
-    expect(screen.getByRole('button', { name: /edit course/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /edit course/i })
+    ).toBeInTheDocument();
   });
 
   it('does not show Edit Course button for student role', () => {
     render(<CourseDetailPage />);
-    expect(screen.queryByRole('button', { name: /edit course/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /edit course/i })
+    ).not.toBeInTheDocument();
   });
 
   it('navigates to /courses when back button is clicked', () => {
@@ -166,16 +181,22 @@ describe('CourseDetailPage', () => {
 
   it('reveals sources panel when toggle button is clicked', async () => {
     const { container } = render(<CourseDetailPage />);
-    const toggleBtn = container.querySelector('[data-testid="toggle-sources"]') as HTMLElement;
+    const toggleBtn = container.querySelector(
+      '[data-testid="toggle-sources"]'
+    ) as HTMLElement;
     expect(toggleBtn).toBeInTheDocument();
-    expect(container.querySelector('[data-testid="sources-panel"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="sources-panel"]')
+    ).not.toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(toggleBtn);
     });
 
     await waitFor(() => {
-      expect(container.querySelector('[data-testid="sources-panel"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="sources-panel"]')
+      ).toBeInTheDocument();
     });
   });
 
@@ -183,7 +204,11 @@ describe('CourseDetailPage', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQueryResult({
         myEnrollments: [{ courseId: 'course-1' }],
-        myCourseProgress: { totalItems: 10, completedItems: 5, percentComplete: 50 },
+        myCourseProgress: {
+          totalItems: 10,
+          completedItems: 5,
+          percentComplete: 50,
+        },
       })
     );
     render(<CourseDetailPage />);

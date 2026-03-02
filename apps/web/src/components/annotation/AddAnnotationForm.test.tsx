@@ -25,9 +25,7 @@ describe('AddAnnotationForm', () => {
 
   it('renders the textarea with placeholder', () => {
     render(<AddAnnotationForm {...defaultProps} />);
-    expect(
-      screen.getByPlaceholderText(/add a note/i)
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/add a note/i)).toBeInTheDocument();
   });
 
   it('renders Save and Cancel buttons', () => {
@@ -52,7 +50,9 @@ describe('AddAnnotationForm', () => {
 
   it('calls onSave with trimmed text and timestamp when Save is clicked', () => {
     const onSave = vi.fn();
-    render(<AddAnnotationForm {...defaultProps} onSave={onSave} currentTime={90} />);
+    render(
+      <AddAnnotationForm {...defaultProps} onSave={onSave} currentTime={90} />
+    );
     fireEvent.change(
       screen.getByRole('textbox', { name: /annotation text/i }),
       { target: { value: '  Important point  ' } }

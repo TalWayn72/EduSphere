@@ -62,9 +62,7 @@ describe('AnnotationThread', () => {
   it('shows reply input when Reply is clicked', () => {
     render(<AnnotationThread {...defaultProps} />);
     fireEvent.click(screen.getByText('Reply'));
-    expect(
-      screen.getByPlaceholderText(/reply\.\.\./i)
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/reply\.\.\./i)).toBeInTheDocument();
   });
 
   it('shows reply count button when replies exist', () => {

@@ -38,7 +38,9 @@ describe('StartAgentSessionSchema', () => {
   });
 
   it('applies default locale "en" when omitted', () => {
-    const result = StartAgentSessionSchema.safeParse({ templateType: 'EXPLAIN' });
+    const result = StartAgentSessionSchema.safeParse({
+      templateType: 'EXPLAIN',
+    });
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.locale).toBe('en');

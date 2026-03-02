@@ -20,7 +20,8 @@ import { renderHook, act } from '@testing-library/react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -58,8 +59,13 @@ type QueryState = {
   error?: urql.CombinedError;
 };
 
-function setupMocks(queryState: QueryState, submitExecute?: ReturnType<typeof vi.fn>) {
-  const mockSubmit = submitExecute ?? vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+function setupMocks(
+  queryState: QueryState,
+  submitExecute?: ReturnType<typeof vi.fn>
+) {
+  const mockSubmit =
+    submitExecute ??
+    vi.fn().mockResolvedValue({ data: undefined, error: undefined });
 
   vi.mocked(urql.useQuery).mockReturnValue([
     queryState as unknown as ReturnType<typeof urql.useQuery>[0],
@@ -68,7 +74,11 @@ function setupMocks(queryState: QueryState, submitExecute?: ReturnType<typeof vi
   ]);
 
   vi.mocked(urql.useMutation).mockReturnValue([
-    { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+    {
+      fetching: false,
+      data: undefined,
+      error: undefined,
+    } as unknown as ReturnType<typeof urql.useMutation>[0],
     mockSubmit as unknown as ReturnType<typeof urql.useMutation>[1],
   ]);
 
@@ -179,14 +189,25 @@ describe('useSrsSession', () => {
 
   // Test 9 — session stats tracking (correct + incorrect)
   it('tracks both correct and incorrect counts across multiple ratings', () => {
-    const cards = [makeCard('c1'), makeCard('c2'), makeCard('c3'), makeCard('c4')];
+    const cards = [
+      makeCard('c1'),
+      makeCard('c2'),
+      makeCard('c3'),
+      makeCard('c4'),
+    ];
     setupMocks({ data: { dueReviews: cards }, fetching: false });
 
     const { result } = renderHook(() => useSrsSession('user-1'));
 
-    act(() => { result.current.submitRating(5); }); // correct
-    act(() => { result.current.submitRating(0); }); // incorrect
-    act(() => { result.current.submitRating(3); }); // correct
+    act(() => {
+      result.current.submitRating(5);
+    }); // correct
+    act(() => {
+      result.current.submitRating(0);
+    }); // incorrect
+    act(() => {
+      result.current.submitRating(3);
+    }); // correct
 
     expect(result.current.stats.correct).toBe(2);
     expect(result.current.stats.incorrect).toBe(1);
@@ -195,7 +216,10 @@ describe('useSrsSession', () => {
   // Test 10 — submitRating calls mutation with the card's id
   it('calls the submit mutation with the current card id and quality', () => {
     const cards = [makeCard('card-id-123')];
-    const mockSubmit = setupMocks({ data: { dueReviews: cards }, fetching: false });
+    const mockSubmit = setupMocks({
+      data: { dueReviews: cards },
+      fetching: false,
+    });
 
     const { result } = renderHook(() => useSrsSession('user-1'));
 
@@ -203,6 +227,9 @@ describe('useSrsSession', () => {
       result.current.submitRating(4);
     });
 
-    expect(mockSubmit).toHaveBeenCalledWith({ cardId: 'card-id-123', quality: 4 });
+    expect(mockSubmit).toHaveBeenCalledWith({
+      cardId: 'card-id-123',
+      quality: 4,
+    });
   });
 });

@@ -54,25 +54,42 @@ describe('MicrolearningResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new MicrolearningResolver(mockMicrolearningService, mockContentItemService);
+    resolver = new MicrolearningResolver(
+      mockMicrolearningService,
+      mockContentItemService
+    );
   });
 
   // ── requireAuth ────────────────────────────────────────────────────────────
 
   describe('requireAuth (tested via getDailyMicrolesson)', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.getDailyMicrolesson(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getDailyMicrolesson(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockGetDailyLesson).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
-      await expect(resolver.getDailyMicrolesson(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: undefined as unknown as string,
+        tenantId: 't1',
+        roles: [],
+      });
+      await expect(resolver.getDailyMicrolesson(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.getDailyMicrolesson(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.getDailyMicrolesson(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -100,12 +117,20 @@ describe('MicrolearningResolver', () => {
 
     it('passes correct TenantContext to microlearningService.getDailyLesson', async () => {
       mockGetDailyLesson.mockResolvedValueOnce(null);
-      const ctx = makeCtx({ userId: 'u99', tenantId: 't99', roles: ['INSTRUCTOR'] });
+      const ctx = makeCtx({
+        userId: 'u99',
+        tenantId: 't99',
+        roles: ['INSTRUCTOR'],
+      });
 
       await resolver.getDailyMicrolesson(ctx);
 
       expect(mockGetDailyLesson).toHaveBeenCalledWith(
-        expect.objectContaining({ tenantId: 't99', userId: 'u99', userRole: 'INSTRUCTOR' })
+        expect.objectContaining({
+          tenantId: 't99',
+          userId: 'u99',
+          userRole: 'INSTRUCTOR',
+        })
       );
     });
   });
@@ -114,7 +139,9 @@ describe('MicrolearningResolver', () => {
 
   describe('getMicrolearningPaths()', () => {
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.getMicrolearningPaths(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getMicrolearningPaths(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to service.listPaths and returns result', async () => {
@@ -156,7 +183,11 @@ describe('MicrolearningResolver', () => {
 
       expect(result).toEqual(MOCK_PATH);
       expect(mockCreatePath).toHaveBeenCalledWith(
-        { title: 'Intro to ML', contentItemIds: ['item-1', 'item-2'], topicClusterId: 'cluster-1' },
+        {
+          title: 'Intro to ML',
+          contentItemIds: ['item-1', 'item-2'],
+          topicClusterId: 'cluster-1',
+        },
         expect.objectContaining({ tenantId: 'tenant-1', userId: 'user-1' })
       );
     });
@@ -164,7 +195,12 @@ describe('MicrolearningResolver', () => {
     it('passes undefined topicClusterId to service when not provided', async () => {
       mockCreatePath.mockResolvedValueOnce(MOCK_PATH);
 
-      await resolver.createMicrolearningPath('Path', ['i1'], undefined, makeCtx());
+      await resolver.createMicrolearningPath(
+        'Path',
+        ['i1'],
+        undefined,
+        makeCtx()
+      );
 
       const [pathInput] = mockCreatePath.mock.calls[0];
       expect(pathInput.topicClusterId).toBeUndefined();

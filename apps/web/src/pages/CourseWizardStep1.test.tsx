@@ -42,7 +42,11 @@ const courseSchema = z.object({
   thumbnail: z.string(),
 });
 
-function Step1Wrapper({ defaultValues }: { defaultValues?: Partial<CourseSchemaValues> }) {
+function Step1Wrapper({
+  defaultValues,
+}: {
+  defaultValues?: Partial<CourseSchemaValues>;
+}) {
   const form = useForm<CourseSchemaValues>({
     resolver: zodResolver(courseSchema as never),
     defaultValues: {
@@ -124,9 +128,9 @@ describe('CourseWizardStep1', () => {
   it('the default thumbnail emoji button has the primary border class', () => {
     renderStep1({ thumbnail: '📚' });
     // The selected thumbnail button has border-primary class
-    const bookBtn = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.trim() === '📚'
-    );
+    const bookBtn = screen
+      .getAllByRole('button')
+      .find((btn) => btn.textContent?.trim() === '📚');
     expect(bookBtn).toBeDefined();
     expect(bookBtn?.className).toContain('border-primary');
   });

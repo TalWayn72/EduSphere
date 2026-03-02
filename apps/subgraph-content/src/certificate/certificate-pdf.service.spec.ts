@@ -37,14 +37,30 @@ vi.mock('pdfkit', () => ({
         handlers['data']?.forEach((cb) => cb(Buffer.from('PDF-CONTENT')));
         handlers['end']?.forEach((cb) => cb(Buffer.from('')));
       },
-      fontSize: function () { return doc; },
-      font: function () { return doc; },
-      text: function () { return doc; },
-      moveDown: function () { return doc; },
-      fillColor: function () { return doc; },
-      rect: function () { return doc; },
-      fill: function () { return doc; },
-      image: function () { return doc; },
+      fontSize: function () {
+        return doc;
+      },
+      font: function () {
+        return doc;
+      },
+      text: function () {
+        return doc;
+      },
+      moveDown: function () {
+        return doc;
+      },
+      fillColor: function () {
+        return doc;
+      },
+      rect: function () {
+        return doc;
+      },
+      fill: function () {
+        return doc;
+      },
+      image: function () {
+        return doc;
+      },
     };
     return doc;
   }),
@@ -118,7 +134,10 @@ describe('CertificatePdfService', () => {
 
     await service.generateAndUpload(BASE_INPUT);
 
-    const callArg = vi.mocked(PutObjectCommand).mock.calls[0]?.[0] as Record<string, unknown>;
+    const callArg = vi.mocked(PutObjectCommand).mock.calls[0]?.[0] as Record<
+      string,
+      unknown
+    >;
     expect(Buffer.isBuffer(callArg?.['Body'])).toBe(true);
     expect((callArg?.['Body'] as Buffer).length).toBeGreaterThan(0);
   });

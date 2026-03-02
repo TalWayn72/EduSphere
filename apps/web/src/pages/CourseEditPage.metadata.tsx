@@ -44,8 +44,14 @@ interface UpdateCourseResult {
   };
 }
 
-export function CourseEditMetadata({ courseId, initialValues, onSaved }: Props) {
-  const [{ fetching }, executeUpdate] = useMutation<UpdateCourseResult>(UPDATE_COURSE_MUTATION);
+export function CourseEditMetadata({
+  courseId,
+  initialValues,
+  onSaved,
+}: Props) {
+  const [{ fetching }, executeUpdate] = useMutation<UpdateCourseResult>(
+    UPDATE_COURSE_MUTATION
+  );
 
   const {
     register,
@@ -65,13 +71,18 @@ export function CourseEditMetadata({ courseId, initialValues, onSaved }: Props) 
   const onSubmit = async (values: MetadataValues) => {
     const input: Record<string, unknown> = {};
     if (values.title !== initialValues.title) input.title = values.title;
-    if (values.description !== initialValues.description) input.description = values.description ?? '';
-    if (values.thumbnailUrl !== initialValues.thumbnailUrl) input.thumbnailUrl = values.thumbnailUrl ?? '';
-    if (values.estimatedHours !== initialValues.estimatedHours) input.estimatedHours = values.estimatedHours ?? null;
+    if (values.description !== initialValues.description)
+      input.description = values.description ?? '';
+    if (values.thumbnailUrl !== initialValues.thumbnailUrl)
+      input.thumbnailUrl = values.thumbnailUrl ?? '';
+    if (values.estimatedHours !== initialValues.estimatedHours)
+      input.estimatedHours = values.estimatedHours ?? null;
 
     const { error } = await executeUpdate({ id: courseId, input });
     if (error) {
-      onSaved(`Save failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+      onSaved(
+        `Save failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+      );
     } else {
       onSaved('Course info saved!');
     }
@@ -128,7 +139,11 @@ export function CourseEditMetadata({ courseId, initialValues, onSaved }: Props) 
             />
           </div>
 
-          <Button type="submit" disabled={fetching || !isDirty} className="gap-2">
+          <Button
+            type="submit"
+            disabled={fetching || !isDirty}
+            className="gap-2"
+          >
             {fetching ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (

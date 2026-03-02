@@ -102,9 +102,9 @@ describe('AnnouncementsResolver', () => {
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
-      await expect(
-        resolver.createAnnouncement({}, CTX_ANON)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.createAnnouncement({}, CTX_ANON)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 

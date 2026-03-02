@@ -20,18 +20,24 @@ describe('FillBlankQuestion', () => {
   });
 
   it('renders inline input when question contains {{blank}}', () => {
-    render(<FillBlankQuestion item={makeItem()} value="" onChange={onChange} />);
+    render(
+      <FillBlankQuestion item={makeItem()} value="" onChange={onChange} />
+    );
     const input = screen.getByRole('textbox', { name: 'Fill in the blank' });
     expect(input).toBeInTheDocument();
   });
 
   it('renders text before blank token', () => {
-    render(<FillBlankQuestion item={makeItem()} value="" onChange={onChange} />);
+    render(
+      <FillBlankQuestion item={makeItem()} value="" onChange={onChange} />
+    );
     expect(screen.getByText('The capital of France is')).toBeInTheDocument();
   });
 
   it('renders text after blank token', () => {
-    render(<FillBlankQuestion item={makeItem()} value="" onChange={onChange} />);
+    render(
+      <FillBlankQuestion item={makeItem()} value="" onChange={onChange} />
+    );
     expect(screen.getByText('.')).toBeInTheDocument();
   });
 
@@ -44,16 +50,22 @@ describe('FillBlankQuestion', () => {
       />
     );
     expect(screen.getByText('What is the speed of light?')).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: 'Your answer' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: 'Your answer' })
+    ).toBeInTheDocument();
   });
 
   it('shows the current value in the input', () => {
-    render(<FillBlankQuestion item={makeItem()} value="Berlin" onChange={onChange} />);
+    render(
+      <FillBlankQuestion item={makeItem()} value="Berlin" onChange={onChange} />
+    );
     expect(screen.getByDisplayValue('Berlin')).toBeInTheDocument();
   });
 
   it('calls onChange when user types in inline input', () => {
-    render(<FillBlankQuestion item={makeItem()} value="" onChange={onChange} />);
+    render(
+      <FillBlankQuestion item={makeItem()} value="" onChange={onChange} />
+    );
     const input = screen.getByRole('textbox', { name: 'Fill in the blank' });
     fireEvent.change(input, { target: { value: 'Paris' } });
     expect(onChange).toHaveBeenCalledWith('Paris');
@@ -73,7 +85,14 @@ describe('FillBlankQuestion', () => {
   });
 
   it('disables input when disabled prop is true (inline)', () => {
-    render(<FillBlankQuestion item={makeItem()} value="" onChange={onChange} disabled />);
+    render(
+      <FillBlankQuestion
+        item={makeItem()}
+        value=""
+        onChange={onChange}
+        disabled
+      />
+    );
     const input = screen.getByRole('textbox', { name: 'Fill in the blank' });
     expect(input).toBeDisabled();
   });
@@ -100,19 +119,27 @@ describe('FillBlankQuestion', () => {
       />
     );
     expect(
-      screen.getByText('Answers are evaluated using semantic similarity matching.')
+      screen.getByText(
+        'Answers are evaluated using semantic similarity matching.'
+      )
     ).toBeInTheDocument();
   });
 
   it('does not show semantic matching hint when useSemanticMatching is false', () => {
-    render(<FillBlankQuestion item={makeItem()} value="" onChange={onChange} />);
+    render(
+      <FillBlankQuestion item={makeItem()} value="" onChange={onChange} />
+    );
     expect(
-      screen.queryByText('Answers are evaluated using semantic similarity matching.')
+      screen.queryByText(
+        'Answers are evaluated using semantic similarity matching.'
+      )
     ).not.toBeInTheDocument();
   });
 
   it('inline input has placeholder "your answer"', () => {
-    render(<FillBlankQuestion item={makeItem()} value="" onChange={onChange} />);
+    render(
+      <FillBlankQuestion item={makeItem()} value="" onChange={onChange} />
+    );
     const input = screen.getByPlaceholderText('your answer');
     expect(input).toBeInTheDocument();
   });

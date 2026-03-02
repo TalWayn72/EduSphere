@@ -2,7 +2,8 @@
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -30,25 +31,39 @@ import * as urql from 'urql';
 import * as ReactRouterDom from 'react-router-dom';
 import { useCourseNavigation } from './useCourseNavigation';
 
-type UseQueryReturn = [{ data: unknown; fetching: boolean; error: unknown }, () => void];
+type UseQueryReturn = [
+  { data: unknown; fetching: boolean; error: unknown },
+  () => void,
+];
 
-function makeResult(overrides: Partial<{ data: unknown; fetching: boolean; error: unknown }>): UseQueryReturn {
-  return [{ data: undefined, fetching: false, error: undefined, ...overrides }, vi.fn()];
+function makeResult(
+  overrides: Partial<{ data: unknown; fetching: boolean; error: unknown }>
+): UseQueryReturn {
+  return [
+    { data: undefined, fetching: false, error: undefined, ...overrides },
+    vi.fn(),
+  ];
 }
 
 function makeSearchParams(params: Record<string, string>) {
   const sp = new URLSearchParams(params);
-  return [sp, vi.fn()] as unknown as ReturnType<typeof ReactRouterDom.useSearchParams>;
+  return [sp, vi.fn()] as unknown as ReturnType<
+    typeof ReactRouterDom.useSearchParams
+  >;
 }
 
 beforeEach(() => {
   vi.mocked(urql.useQuery).mockReturnValue(makeResult({}));
-  vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({}));
+  vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+    makeSearchParams({})
+  );
 });
 
 describe('useCourseNavigation', () => {
   it('returns nulls when no courseId param is present', async () => {
-    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({}));
+    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+      makeSearchParams({})
+    );
     vi.mocked(urql.useQuery).mockReturnValue(makeResult({ data: {} }));
     const { result } = renderHook(() => useCourseNavigation('item-1'), {
       wrapper: MemoryRouter,
@@ -63,7 +78,9 @@ describe('useCourseNavigation', () => {
   });
 
   it('returns course data when query has a course', async () => {
-    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({ courseId: 'course-1' }));
+    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+      makeSearchParams({ courseId: 'course-1' })
+    );
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {
@@ -76,7 +93,13 @@ describe('useCourseNavigation', () => {
                 title: 'Module One',
                 orderIndex: 0,
                 contentItems: [
-                  { id: 'item-1', title: 'Lesson 1', contentType: 'VIDEO', duration: 60, orderIndex: 0 },
+                  {
+                    id: 'item-1',
+                    title: 'Lesson 1',
+                    contentType: 'VIDEO',
+                    duration: 60,
+                    orderIndex: 0,
+                  },
                 ],
               },
             ],
@@ -93,7 +116,9 @@ describe('useCourseNavigation', () => {
   });
 
   it('correctly computes prevItemId and nextItemId from sorted flat list', async () => {
-    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({ courseId: 'course-2' }));
+    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+      makeSearchParams({ courseId: 'course-2' })
+    );
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {
@@ -106,9 +131,27 @@ describe('useCourseNavigation', () => {
                 title: 'Module A',
                 orderIndex: 0,
                 contentItems: [
-                  { id: 'item-a', title: 'A', contentType: 'VIDEO', duration: null, orderIndex: 0 },
-                  { id: 'item-b', title: 'B', contentType: 'VIDEO', duration: null, orderIndex: 1 },
-                  { id: 'item-c', title: 'C', contentType: 'VIDEO', duration: null, orderIndex: 2 },
+                  {
+                    id: 'item-a',
+                    title: 'A',
+                    contentType: 'VIDEO',
+                    duration: null,
+                    orderIndex: 0,
+                  },
+                  {
+                    id: 'item-b',
+                    title: 'B',
+                    contentType: 'VIDEO',
+                    duration: null,
+                    orderIndex: 1,
+                  },
+                  {
+                    id: 'item-c',
+                    title: 'C',
+                    contentType: 'VIDEO',
+                    duration: null,
+                    orderIndex: 2,
+                  },
                 ],
               },
             ],
@@ -125,7 +168,9 @@ describe('useCourseNavigation', () => {
   });
 
   it('returns correct moduleName for found item', async () => {
-    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({ courseId: 'course-3' }));
+    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+      makeSearchParams({ courseId: 'course-3' })
+    );
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {
@@ -138,7 +183,13 @@ describe('useCourseNavigation', () => {
                 title: 'Special Module',
                 orderIndex: 0,
                 contentItems: [
-                  { id: 'item-x', title: 'X', contentType: 'DOC', duration: null, orderIndex: 0 },
+                  {
+                    id: 'item-x',
+                    title: 'X',
+                    contentType: 'DOC',
+                    duration: null,
+                    orderIndex: 0,
+                  },
                 ],
               },
             ],
@@ -154,7 +205,9 @@ describe('useCourseNavigation', () => {
   });
 
   it('ready=true when course data is present after mount', async () => {
-    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({ courseId: 'course-4' }));
+    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+      makeSearchParams({ courseId: 'course-4' })
+    );
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {
@@ -174,16 +227,22 @@ describe('useCourseNavigation', () => {
   });
 
   it('pauses query when no courseIdHint is present', async () => {
-    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({}));
+    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+      makeSearchParams({})
+    );
     vi.mocked(urql.useQuery).mockReturnValue(makeResult({}));
     renderHook(() => useCourseNavigation('item-1'), { wrapper: MemoryRouter });
     await act(async () => {});
-    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as { pause?: boolean };
+    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as {
+      pause?: boolean;
+    };
     expect(callArgs?.pause).toBe(true);
   });
 
   it('prevItemId is null for first item and nextItemId is null for last', async () => {
-    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(makeSearchParams({ courseId: 'course-5' }));
+    vi.mocked(ReactRouterDom.useSearchParams).mockReturnValue(
+      makeSearchParams({ courseId: 'course-5' })
+    );
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {
@@ -196,8 +255,20 @@ describe('useCourseNavigation', () => {
                 title: 'Mod B',
                 orderIndex: 0,
                 contentItems: [
-                  { id: 'first', title: 'First', contentType: 'VIDEO', duration: null, orderIndex: 0 },
-                  { id: 'last', title: 'Last', contentType: 'VIDEO', duration: null, orderIndex: 1 },
+                  {
+                    id: 'first',
+                    title: 'First',
+                    contentType: 'VIDEO',
+                    duration: null,
+                    orderIndex: 0,
+                  },
+                  {
+                    id: 'last',
+                    title: 'Last',
+                    contentType: 'VIDEO',
+                    duration: null,
+                    orderIndex: 1,
+                  },
                 ],
               },
             ],

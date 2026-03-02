@@ -128,16 +128,12 @@ describe('QuizPlayer', () => {
 
   it('"Previous" button is disabled on the first question', () => {
     render(<QuizPlayer quizContent={MOCK_QUIZ} contentItemId="item-1" />);
-    expect(
-      screen.getByRole('button', { name: /previous/i })
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
   });
 
   it('shows "Next" button (not "Submit Quiz") on first question', () => {
     render(<QuizPlayer quizContent={MOCK_QUIZ} contentItemId="item-1" />);
-    expect(
-      screen.getByRole('button', { name: /next/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /submit quiz/i })
     ).not.toBeInTheDocument();

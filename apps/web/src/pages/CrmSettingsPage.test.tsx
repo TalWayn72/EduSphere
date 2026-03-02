@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -115,9 +116,7 @@ describe('CrmSettingsPage', () => {
 
   it('renders "Salesforce CRM Integration" heading', () => {
     renderPage();
-    expect(
-      screen.getByText('Salesforce CRM Integration')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Salesforce CRM Integration')).toBeInTheDocument();
   });
 
   it('redirects to /dashboard for STUDENT role', () => {
@@ -134,17 +133,13 @@ describe('CrmSettingsPage', () => {
 
   it('allows ORG_ADMIN to view the page', () => {
     renderPage();
-    expect(
-      screen.getByText('Salesforce CRM Integration')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Salesforce CRM Integration')).toBeInTheDocument();
   });
 
   it('allows SUPER_ADMIN to view the page', () => {
     vi.mocked(useAuthRole).mockReturnValue('SUPER_ADMIN');
     renderPage();
-    expect(
-      screen.getByText('Salesforce CRM Integration')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Salesforce CRM Integration')).toBeInTheDocument();
   });
 
   it('renders "Connection Status" card title', () => {
@@ -179,9 +174,7 @@ describe('CrmSettingsPage', () => {
   it('shows "Connected to Salesforce" when connection is active', () => {
     setupUrql(MOCK_CONNECTION);
     renderPage();
-    expect(
-      screen.getByText('Connected to Salesforce')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Connected to Salesforce')).toBeInTheDocument();
   });
 
   it('shows instance URL when connected', () => {
@@ -213,9 +206,7 @@ describe('CrmSettingsPage', () => {
   it('shows "No sync operations yet." when log is empty', () => {
     setupUrql(null, []);
     renderPage();
-    expect(
-      screen.getByText('No sync operations yet.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('No sync operations yet.')).toBeInTheDocument();
   });
 
   it('renders sync log entries when they exist', () => {

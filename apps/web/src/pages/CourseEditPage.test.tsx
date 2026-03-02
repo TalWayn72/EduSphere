@@ -19,7 +19,8 @@ vi.mock('@/lib/auth', () => ({ getCurrentUser: vi.fn() }));
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -80,7 +81,12 @@ const NOOP_MUTATION = [{ fetching: false }, vi.fn()] as never;
 
 function makeQuery(overrides: Record<string, unknown> = {}) {
   return [
-    { data: { course: MOCK_COURSE }, fetching: false, error: undefined, ...overrides },
+    {
+      data: { course: MOCK_COURSE },
+      fetching: false,
+      error: undefined,
+      ...overrides,
+    },
     vi.fn(),
   ] as never;
 }
@@ -112,7 +118,9 @@ describe('CourseEditPage', () => {
   });
 
   it('shows "Course not found" when course is null', () => {
-    vi.mocked(urql.useQuery).mockReturnValue(makeQuery({ data: { course: null } }));
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({ data: { course: null } })
+    );
     render(<CourseEditPage />);
     expect(screen.getByText(/course not found/i)).toBeInTheDocument();
   });
@@ -137,13 +145,17 @@ describe('CourseEditPage', () => {
 
   it('renders "Basic Info" and "Modules & Content" tabs', () => {
     render(<CourseEditPage />);
-    expect(screen.getByRole('tab', { name: /basic info/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /basic info/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /modules/i })).toBeInTheDocument();
   });
 
   it('shows "Publish" button for a draft course', () => {
     render(<CourseEditPage />);
-    expect(screen.getByRole('button', { name: /^publish$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^publish$/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "Unpublish" button for a published course', () => {
@@ -151,7 +163,9 @@ describe('CourseEditPage', () => {
       makeQuery({ data: { course: { ...MOCK_COURSE, isPublished: true } } })
     );
     render(<CourseEditPage />);
-    expect(screen.getByRole('button', { name: /^unpublish$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^unpublish$/i })
+    ).toBeInTheDocument();
   });
 
   it('navigates back to course detail when Back button is clicked', () => {

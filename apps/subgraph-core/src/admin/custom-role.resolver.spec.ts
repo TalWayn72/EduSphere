@@ -59,7 +59,9 @@ describe('CustomRoleResolver', () => {
     it('delegates to service with tenantCtx', async () => {
       customRoleService.listRoles.mockResolvedValue([]);
       await resolver.listRoles(CTX_AUTHED);
-      expect(customRoleService.listRoles).toHaveBeenCalledWith(EXPECTED_TENANT_CTX);
+      expect(customRoleService.listRoles).toHaveBeenCalledWith(
+        EXPECTED_TENANT_CTX
+      );
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
@@ -76,7 +78,8 @@ describe('CustomRoleResolver', () => {
       customRoleService.getRole.mockResolvedValue({ id: 'role-1' });
       await resolver.getRole('role-1', CTX_AUTHED);
       expect(customRoleService.getRole).toHaveBeenCalledWith(
-        'role-1', EXPECTED_TENANT_CTX
+        'role-1',
+        EXPECTED_TENANT_CTX
       );
     });
 
@@ -94,7 +97,8 @@ describe('CustomRoleResolver', () => {
       customRoleService.getUserDelegations.mockResolvedValue([]);
       await resolver.getUserDelegations('user-2', CTX_AUTHED);
       expect(customRoleService.getUserDelegations).toHaveBeenCalledWith(
-        'user-2', EXPECTED_TENANT_CTX
+        'user-2',
+        EXPECTED_TENANT_CTX
       );
     });
   });
@@ -103,11 +107,19 @@ describe('CustomRoleResolver', () => {
 
   describe('createRole()', () => {
     it('delegates to service with input and tenantCtx', async () => {
-      const input = { name: 'Editor', description: 'Can edit', permissions: ['content:write'] };
-      customRoleService.createRole.mockResolvedValue({ id: 'role-2', ...input });
+      const input = {
+        name: 'Editor',
+        description: 'Can edit',
+        permissions: ['content:write'],
+      };
+      customRoleService.createRole.mockResolvedValue({
+        id: 'role-2',
+        ...input,
+      });
       await resolver.createRole(input, CTX_AUTHED);
       expect(customRoleService.createRole).toHaveBeenCalledWith(
-        input, EXPECTED_TENANT_CTX
+        input,
+        EXPECTED_TENANT_CTX
       );
     });
 
@@ -126,7 +138,9 @@ describe('CustomRoleResolver', () => {
       customRoleService.updateRole.mockResolvedValue({ id: 'role-2' });
       await resolver.updateRole('role-2', input, CTX_AUTHED);
       expect(customRoleService.updateRole).toHaveBeenCalledWith(
-        'role-2', input, EXPECTED_TENANT_CTX
+        'role-2',
+        input,
+        EXPECTED_TENANT_CTX
       );
     });
   });
@@ -138,7 +152,8 @@ describe('CustomRoleResolver', () => {
       customRoleService.deleteRole.mockResolvedValue(true);
       await resolver.deleteRole('role-2', CTX_AUTHED);
       expect(customRoleService.deleteRole).toHaveBeenCalledWith(
-        'role-2', EXPECTED_TENANT_CTX
+        'role-2',
+        EXPECTED_TENANT_CTX
       );
     });
   });
@@ -150,7 +165,10 @@ describe('CustomRoleResolver', () => {
       customRoleService.delegateRole.mockResolvedValue({ id: 'del-1' });
       await resolver.delegateRole('user-2', 'role-1', '2027-01-01', CTX_AUTHED);
       expect(customRoleService.delegateRole).toHaveBeenCalledWith(
-        'user-2', 'role-1', '2027-01-01', EXPECTED_TENANT_CTX
+        'user-2',
+        'role-1',
+        '2027-01-01',
+        EXPECTED_TENANT_CTX
       );
     });
 
@@ -158,7 +176,10 @@ describe('CustomRoleResolver', () => {
       customRoleService.delegateRole.mockResolvedValue({ id: 'del-1' });
       await resolver.delegateRole('user-2', 'role-1', undefined, CTX_AUTHED);
       expect(customRoleService.delegateRole).toHaveBeenCalledWith(
-        'user-2', 'role-1', null, EXPECTED_TENANT_CTX
+        'user-2',
+        'role-1',
+        null,
+        EXPECTED_TENANT_CTX
       );
     });
   });
@@ -170,7 +191,8 @@ describe('CustomRoleResolver', () => {
       customRoleService.revokeDelegation.mockResolvedValue(true);
       await resolver.revokeDelegation('del-1', CTX_AUTHED);
       expect(customRoleService.revokeDelegation).toHaveBeenCalledWith(
-        'del-1', EXPECTED_TENANT_CTX
+        'del-1',
+        EXPECTED_TENANT_CTX
       );
     });
 

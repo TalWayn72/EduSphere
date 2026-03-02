@@ -14,7 +14,8 @@ vi.mock('graphql-request', () => ({
   request: vi.fn(),
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
 }));
@@ -149,7 +150,9 @@ describe('CourseLibraryPage', () => {
   it('shows Activate button for non-activated courses', () => {
     setupQueries(MOCK_COURSES);
     renderPage();
-    expect(screen.getByRole('button', { name: /^activate$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^activate$/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "Activated" badge for already-activated courses', () => {
@@ -170,7 +173,9 @@ describe('CourseLibraryPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /^activate$/i }));
     // Course title appears in both the card and the dialog description — accept multiple
-    expect(screen.getAllByText('GDPR Essentials').length).toBeGreaterThanOrEqual(2);
+    expect(
+      screen.getAllByText('GDPR Essentials').length
+    ).toBeGreaterThanOrEqual(2);
   });
 
   it('renders "Confirm Activate" button in dialog', () => {

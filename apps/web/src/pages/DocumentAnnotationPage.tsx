@@ -152,9 +152,16 @@ export function DocumentAnnotationPage() {
   }
 
   // Fallback to mock document when gateway is offline (dev mode)
-  const effectiveItem = item ?? (result.error
-    ? { id: contentId, title: 'נהר שלום — פנינים מאוץ (הדגמה)', contentType: 'RICH_DOCUMENT', content: mockDocumentContent }
-    : null);
+  const effectiveItem =
+    item ??
+    (result.error
+      ? {
+          id: contentId,
+          title: 'נהר שלום — פנינים מאוץ (הדגמה)',
+          contentType: 'RICH_DOCUMENT',
+          content: mockDocumentContent,
+        }
+      : null);
 
   if (!effectiveItem) {
     return (

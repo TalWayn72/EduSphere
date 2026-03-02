@@ -2,14 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Hoisted mocks (must run before vi.mock factories) ─────────────────────────
 
-const { mockCloseAllPools, mockWithTenantContext, mockWithBypassRLS, mockNatsClose } = vi.hoisted(
-  () => ({
-    mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
-    mockWithTenantContext: vi.fn().mockResolvedValue([]),
-    mockWithBypassRLS: vi.fn().mockResolvedValue([]),
-    mockNatsClose: vi.fn().mockResolvedValue(undefined),
-  })
-);
+const {
+  mockCloseAllPools,
+  mockWithTenantContext,
+  mockWithBypassRLS,
+  mockNatsClose,
+} = vi.hoisted(() => ({
+  mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
+  mockWithTenantContext: vi.fn().mockResolvedValue([]),
+  mockWithBypassRLS: vi.fn().mockResolvedValue([]),
+  mockNatsClose: vi.fn().mockResolvedValue(undefined),
+}));
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -31,7 +34,13 @@ vi.mock('@edusphere/db', () => ({
       flaggedAt: {},
       status: {},
     },
-    userProgress: { lastAccessedAt: {}, isCompleted: {}, userId: {}, contentItemId: {}, timeSpent: {} },
+    userProgress: {
+      lastAccessedAt: {},
+      isCompleted: {},
+      userId: {},
+      contentItemId: {},
+      timeSpent: {},
+    },
     quizResults: { passed: {}, userId: {}, contentItemId: {} },
     contentItems: { id: {}, moduleId: {} },
     modules: { id: {}, course_id: {} },
@@ -44,8 +53,17 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 vi.mock('nats', () => ({
-  connect: vi.fn().mockResolvedValue({ close: mockNatsClose, publish: vi.fn(), drain: vi.fn() }),
-  StringCodec: vi.fn(() => ({ encode: vi.fn((s: string) => s), decode: vi.fn() })),
+  connect: vi
+    .fn()
+    .mockResolvedValue({
+      close: mockNatsClose,
+      publish: vi.fn(),
+      drain: vi.fn(),
+    }),
+  StringCodec: vi.fn(() => ({
+    encode: vi.fn((s: string) => s),
+    decode: vi.fn(),
+  })),
 }));
 
 vi.mock('@nestjs/schedule', () => ({
@@ -54,7 +72,9 @@ vi.mock('@nestjs/schedule', () => ({
 }));
 
 vi.mock('./risk-scorer.js', () => ({
-  computeRiskScore: vi.fn().mockReturnValue({ score: 0.5, factors: {}, isAtRisk: false }),
+  computeRiskScore: vi
+    .fn()
+    .mockReturnValue({ score: 0.5, factors: {}, isAtRisk: false }),
 }));
 
 import { AtRiskService } from './at-risk.service.js';
@@ -94,7 +114,9 @@ describe('AtRiskService', () => {
   it('onModuleDestroy closes NATS connection if open', async () => {
     const service = new AtRiskService();
     // Inject an open NATS connection
-    (service as unknown as { nc: { close: () => Promise<void> } }).nc = { close: mockNatsClose };
+    (service as unknown as { nc: { close: () => Promise<void> } }).nc = {
+      close: mockNatsClose,
+    };
     await service.onModuleDestroy();
     expect(mockNatsClose).toHaveBeenCalled();
   });

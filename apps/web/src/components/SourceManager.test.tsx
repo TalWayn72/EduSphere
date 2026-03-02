@@ -147,9 +147,9 @@ describe('SourceManager', () => {
 
   it('file upload uses GraphQL mutation, NOT REST fetch endpoint', async () => {
     // Spy on fetch to ensure it is never called with the REST upload URL
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response('', { status: 404 })
-    );
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response('', { status: 404 }));
 
     // Stub FileReader.readAsDataURL to synchronously call onload with base64
     const originalFileReader = globalThis.FileReader;
@@ -177,8 +177,12 @@ describe('SourceManager', () => {
     });
 
     // Simulate file selection
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const testFile = new File(['%PDF-1.4'], 'test.pdf', { type: 'application/pdf' });
+    const fileInput = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    const testFile = new File(['%PDF-1.4'], 'test.pdf', {
+      type: 'application/pdf',
+    });
     Object.defineProperty(fileInput, 'files', {
       value: [testFile],
       configurable: true,

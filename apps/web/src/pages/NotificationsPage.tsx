@@ -66,11 +66,14 @@ export function NotificationsPage() {
     return n.type === filter;
   });
 
-  const grouped = filtered.reduce<Record<string, AppNotification[]>>((acc, n) => {
-    const g = dateLabel(n.createdAt);
-    (acc[g] ??= []).push(n);
-    return acc;
-  }, {});
+  const grouped = filtered.reduce<Record<string, AppNotification[]>>(
+    (acc, n) => {
+      const g = dateLabel(n.createdAt);
+      (acc[g] ??= []).push(n);
+      return acc;
+    },
+    {}
+  );
 
   function markAllRead() {
     notifications.filter((n) => !n.readAt).forEach((n) => markAsRead(n.id));
@@ -99,7 +102,11 @@ export function NotificationsPage() {
         </div>
 
         {/* Filter tabs */}
-        <div className="flex flex-wrap gap-1.5 mb-6" role="tablist" aria-label="Filter notifications">
+        <div
+          className="flex flex-wrap gap-1.5 mb-6"
+          role="tablist"
+          aria-label="Filter notifications"
+        >
           {FILTERS.map(({ key, label }) => (
             <button
               key={key}
@@ -123,7 +130,9 @@ export function NotificationsPage() {
           <div className="flex flex-col items-center py-20 gap-3 text-muted-foreground">
             <BellOff className="h-10 w-10 opacity-40" />
             <p className="text-sm">
-              {filter === 'ALL' ? 'No notifications yet.' : 'No notifications match this filter.'}
+              {filter === 'ALL'
+                ? 'No notifications yet.'
+                : 'No notifications match this filter.'}
             </p>
           </div>
         ) : (
@@ -150,19 +159,34 @@ export function NotificationsPage() {
                         tabIndex={0}
                         onKeyDown={(e) => e.key === 'Enter' && markAsRead(n.id)}
                       >
-                        <span className="text-xl leading-none mt-0.5" aria-hidden="true">
+                        <span
+                          className="text-xl leading-none mt-0.5"
+                          aria-hidden="true"
+                        >
                           {TYPE_ICON[n.type]}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className={['text-sm', n.readAt ? 'font-medium' : 'font-semibold'].join(' ')}>
+                          <p
+                            className={[
+                              'text-sm',
+                              n.readAt ? 'font-medium' : 'font-semibold',
+                            ].join(' ')}
+                          >
                             {n.title}
                           </p>
-                          <p className="text-xs text-muted-foreground truncate">{n.body}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {n.body}
+                          </p>
                         </div>
                         <div className="flex flex-col items-end gap-1 shrink-0">
-                          <span className="text-xs text-muted-foreground">{timeAgo(n.createdAt)}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {timeAgo(n.createdAt)}
+                          </span>
                           {!n.readAt && (
-                            <span className="h-2 w-2 rounded-full bg-primary" aria-label="Unread" />
+                            <span
+                              className="h-2 w-2 rounded-full bg-primary"
+                              aria-label="Unread"
+                            />
                           )}
                         </div>
                       </li>

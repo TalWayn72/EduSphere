@@ -60,14 +60,22 @@ describe('QuizResolver', () => {
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
+      const ctx = makeCtx({
+        userId: undefined as unknown as string,
+        tenantId: 't1',
+        roles: [],
+      });
       await expect(
         resolver.gradeQuizSubmission('item-1', SAMPLE_ANSWERS, ctx)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
       await expect(
         resolver.gradeQuizSubmission('item-1', SAMPLE_ANSWERS, ctx)
       ).rejects.toThrow(UnauthorizedException);
@@ -76,7 +84,11 @@ describe('QuizResolver', () => {
     it('delegates to service.gradeAndSave with correct args', async () => {
       mockGradeAndSave.mockResolvedValueOnce(MOCK_QUIZ_RESULT);
 
-      const result = await resolver.gradeQuizSubmission('item-1', SAMPLE_ANSWERS, makeCtx());
+      const result = await resolver.gradeQuizSubmission(
+        'item-1',
+        SAMPLE_ANSWERS,
+        makeCtx()
+      );
 
       expect(result).toEqual(MOCK_QUIZ_RESULT);
       expect(mockGradeAndSave).toHaveBeenCalledWith(
@@ -89,7 +101,11 @@ describe('QuizResolver', () => {
 
     it('builds TenantContext with role from first roles entry', async () => {
       mockGradeAndSave.mockResolvedValueOnce(MOCK_QUIZ_RESULT);
-      const ctx = makeCtx({ userId: 'u1', tenantId: 't1', roles: ['INSTRUCTOR'] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: 't1',
+        roles: ['INSTRUCTOR'],
+      });
 
       await resolver.gradeQuizSubmission('item-1', SAMPLE_ANSWERS, ctx);
 
@@ -112,15 +128,21 @@ describe('QuizResolver', () => {
 
   describe('myQuizResults()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(
-        resolver.myQuizResults('item-1', noAuthCtx)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myQuizResults('item-1', noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockGetMyResults).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.myQuizResults('item-1', ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.myQuizResults('item-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to service.getMyResults with userId, tenantCtx, contentItemId', async () => {

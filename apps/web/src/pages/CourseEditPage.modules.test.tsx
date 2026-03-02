@@ -1,12 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -90,23 +97,31 @@ describe('CourseEditModules', () => {
 
   it('shows "Add Module" button when modules are present', () => {
     renderModules();
-    expect(screen.getByRole('button', { name: /add module/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /add module/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "Add Module" button even when modules list is empty', () => {
     renderModules([]);
-    expect(screen.getByRole('button', { name: /add module/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /add module/i })
+    ).toBeInTheDocument();
   });
 
   it('first module has "Move module up" button disabled', () => {
     renderModules();
-    const upButtons = screen.getAllByRole('button', { name: /move module up/i });
+    const upButtons = screen.getAllByRole('button', {
+      name: /move module up/i,
+    });
     expect(upButtons[0]).toBeDisabled();
   });
 
   it('last module has "Move module down" button disabled', () => {
     renderModules();
-    const downButtons = screen.getAllByRole('button', { name: /move module down/i });
+    const downButtons = screen.getAllByRole('button', {
+      name: /move module down/i,
+    });
     expect(downButtons[downButtons.length - 1]).toBeDisabled();
   });
 
@@ -119,7 +134,9 @@ describe('CourseEditModules', () => {
   it('"Create Module" button is disabled when title input is empty', () => {
     renderModules();
     fireEvent.click(screen.getByRole('button', { name: /add module/i }));
-    expect(screen.getByRole('button', { name: /create module/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /create module/i })
+    ).toBeDisabled();
   });
 
   it('"Create Module" button enables when title is entered', () => {
@@ -128,25 +145,36 @@ describe('CourseEditModules', () => {
     fireEvent.change(screen.getByPlaceholderText(/module title/i), {
       target: { value: 'New Module' },
     });
-    expect(screen.getByRole('button', { name: /create module/i })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /create module/i })
+    ).not.toBeDisabled();
   });
 
   it('clicking rename icon puts module into edit mode', () => {
     renderModules();
-    const renameButtons = screen.getAllByRole('button', { name: /rename module/i });
+    const renameButtons = screen.getAllByRole('button', {
+      name: /rename module/i,
+    });
     fireEvent.click(renameButtons[0] as HTMLElement);
     // In edit mode, an input pre-filled with the module title appears
     expect(screen.getByDisplayValue('Unit 1: Foundations')).toBeInTheDocument();
   });
 
   it('calls DELETE_MODULE_MUTATION when delete is confirmed', async () => {
-    const mockDelete = vi.fn().mockResolvedValue({ data: { deleteModule: true }, error: undefined });
+    const mockDelete = vi
+      .fn()
+      .mockResolvedValue({ data: { deleteModule: true }, error: undefined });
     // Use mockReturnValue so ALL useMutation calls return mockDelete across all renders
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockDelete] as never);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockDelete,
+    ] as never);
 
     renderModules();
 
-    const deleteButtons = screen.getAllByRole('button', { name: /delete module/i });
+    const deleteButtons = screen.getAllByRole('button', {
+      name: /delete module/i,
+    });
     await act(async () => {
       fireEvent.click(deleteButtons[0] as HTMLElement);
     });
@@ -159,11 +187,21 @@ describe('CourseEditModules', () => {
 
   it('calls CREATE_MODULE_MUTATION when creating a new module', async () => {
     const mockCreate = vi.fn().mockResolvedValue({
-      data: { createModule: { id: 'mod-new', title: 'New Module', orderIndex: 2, contentItems: [] } },
+      data: {
+        createModule: {
+          id: 'mod-new',
+          title: 'New Module',
+          orderIndex: 2,
+          contentItems: [],
+        },
+      },
       error: undefined,
     });
     // Use mockReturnValue so ALL useMutation calls return mockCreate across all renders
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockCreate] as never);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockCreate,
+    ] as never);
 
     renderModules();
     fireEvent.click(screen.getByRole('button', { name: /add module/i }));
@@ -178,7 +216,10 @@ describe('CourseEditModules', () => {
     await waitFor(() => {
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
-          input: expect.objectContaining({ courseId: 'course-1', title: 'New Module' }),
+          input: expect.objectContaining({
+            courseId: 'course-1',
+            title: 'New Module',
+          }),
         })
       );
     });

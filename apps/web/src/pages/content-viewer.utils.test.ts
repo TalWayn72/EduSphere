@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import React from 'react';
-import { formatTime, highlightText, LAYER_META, SPEED_OPTIONS } from './content-viewer.utils';
+import {
+  formatTime,
+  highlightText,
+  LAYER_META,
+  SPEED_OPTIONS,
+} from './content-viewer.utils';
 
 describe('formatTime', () => {
   it('formats 0 seconds as 0:00', () => {
@@ -79,19 +84,25 @@ describe('highlightText', () => {
 
   it('wraps matching text in <mark> element', () => {
     const result = highlightText('Hello world', 'world');
-    const { getByText } = render(React.createElement(React.Fragment, null, result));
+    const { getByText } = render(
+      React.createElement(React.Fragment, null, result)
+    );
     expect(getByText('world').tagName).toBe('MARK');
   });
 
   it('is case-insensitive for matching', () => {
     const result = highlightText('Hello World', 'world');
-    const { getByText } = render(React.createElement(React.Fragment, null, result));
+    const { getByText } = render(
+      React.createElement(React.Fragment, null, result)
+    );
     expect(getByText('World').tagName).toBe('MARK');
   });
 
   it('highlights multiple occurrences', () => {
     const result = highlightText('foo and foo', 'foo');
-    const { getAllByText } = render(React.createElement(React.Fragment, null, result));
+    const { getAllByText } = render(
+      React.createElement(React.Fragment, null, result)
+    );
     const marks = getAllByText('foo');
     expect(marks).toHaveLength(2);
     marks.forEach((m) => expect(m.tagName).toBe('MARK'));
@@ -99,7 +110,9 @@ describe('highlightText', () => {
 
   it('renders non-matching text as <span>', () => {
     const result = highlightText('Hello world', 'world');
-    const { container } = render(React.createElement(React.Fragment, null, result));
+    const { container } = render(
+      React.createElement(React.Fragment, null, result)
+    );
     expect(container.querySelectorAll('span').length).toBeGreaterThan(0);
   });
 

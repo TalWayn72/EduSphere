@@ -23,7 +23,11 @@ describe('knowledge subgraph constants', () => {
   });
 
   it('all constants are positive integers', () => {
-    for (const val of [DEFAULT_CONCEPT_LIMIT, MAX_CONCEPT_LIMIT, DEFAULT_SEARCH_LIMIT]) {
+    for (const val of [
+      DEFAULT_CONCEPT_LIMIT,
+      MAX_CONCEPT_LIMIT,
+      DEFAULT_SEARCH_LIMIT,
+    ]) {
       expect(Number.isInteger(val)).toBe(true);
       expect(val).toBeGreaterThan(0);
     }

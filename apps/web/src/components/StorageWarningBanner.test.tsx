@@ -84,9 +84,7 @@ describe('StorageWarningBanner', () => {
   it('renders the over-limit warning message when storage is full', () => {
     setupHook({ stats: OVER_LIMIT_STATS });
     render(<StorageWarningBanner />);
-    expect(
-      screen.getByText(/offline storage is full/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/offline storage is full/i)).toBeInTheDocument();
   });
 
   it('renders "Clear Query Cache" button', () => {

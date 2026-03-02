@@ -15,7 +15,11 @@ import { Link } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useNotifications, type AppNotification, type NotificationType } from '@/hooks/useNotifications';
+import {
+  useNotifications,
+  type AppNotification,
+  type NotificationType,
+} from '@/hooks/useNotifications';
 import { getCurrentUser } from '@/lib/auth';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -61,7 +65,12 @@ function NotificationItem({ notification, onRead }: NotificationItemProps) {
         {TYPE_ICON[notification.type] ?? '🔔'}
       </span>
       <div className="flex-1 min-w-0">
-        <p className={cn('text-sm font-medium truncate', isUnread && 'font-semibold')}>
+        <p
+          className={cn(
+            'text-sm font-medium truncate',
+            isUnread && 'font-semibold'
+          )}
+        >
           {notification.title}
         </p>
         <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
@@ -72,7 +81,10 @@ function NotificationItem({ notification, onRead }: NotificationItemProps) {
         </p>
       </div>
       {isUnread && (
-        <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1.5" aria-hidden="true" />
+        <span
+          className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1.5"
+          aria-hidden="true"
+        />
       )}
     </button>
   );
@@ -92,7 +104,10 @@ export function NotificationBell() {
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as HTMLElement)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as HTMLElement)
+      ) {
         setOpen(false);
       }
     };
@@ -110,7 +125,11 @@ export function NotificationBell() {
   const recent = notifications.slice(0, 10);
 
   return (
-    <div ref={containerRef} className="relative" data-testid="notification-bell">
+    <div
+      ref={containerRef}
+      className="relative"
+      data-testid="notification-bell"
+    >
       <Button
         variant="ghost"
         size="icon"
@@ -161,7 +180,11 @@ export function NotificationBell() {
               </div>
             ) : (
               recent.map((n) => (
-                <NotificationItem key={n.id} notification={n} onRead={markAsRead} />
+                <NotificationItem
+                  key={n.id}
+                  notification={n}
+                  onRead={markAsRead}
+                />
               ))
             )}
           </div>

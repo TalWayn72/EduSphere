@@ -50,7 +50,9 @@ describe('RoleDetailPanel', () => {
   it('renders role description', () => {
     setup(SYSTEM_ROLE);
     expect(
-      screen.getByText('Organisation administrator with full tenant management access.')
+      screen.getByText(
+        'Organisation administrator with full tenant management access.'
+      )
     ).toBeInTheDocument();
   });
 
@@ -61,13 +63,19 @@ describe('RoleDetailPanel', () => {
 
   it('always renders Duplicate button', () => {
     setup(SYSTEM_ROLE);
-    expect(screen.getByRole('button', { name: /duplicate/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /duplicate/i })
+    ).toBeInTheDocument();
   });
 
   it('hides Edit and Delete buttons for system roles', () => {
     setup(SYSTEM_ROLE);
-    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /edit/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /delete/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows Edit and Delete buttons for custom roles', () => {

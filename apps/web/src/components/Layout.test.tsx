@@ -7,7 +7,7 @@ import { Layout } from './Layout';
 /* ── urql (required by hooks imported indirectly) ── */
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
   useQuery: vi.fn(() => [{ data: undefined, fetching: false }]),
   useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
 }));
@@ -173,9 +173,9 @@ describe('Layout', () => {
 
   it('search button navigates to /search', () => {
     renderLayout();
-    const searchBtn = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.includes('search')
-    );
+    const searchBtn = screen
+      .getAllByRole('button')
+      .find((btn) => btn.textContent?.includes('search'));
     expect(searchBtn).toBeTruthy();
     fireEvent.click(searchBtn!);
     expect(mockNavigate).toHaveBeenCalledWith('/search');

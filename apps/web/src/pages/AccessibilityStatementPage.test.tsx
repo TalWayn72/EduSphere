@@ -66,7 +66,9 @@ describe('AccessibilityStatementPage', () => {
 
   it('renders the "Return to home" link', () => {
     renderPage();
-    expect(screen.getByRole('link', { name: /return to home/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /return to home/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the accessibility email contact link', () => {
@@ -83,6 +85,8 @@ describe('AccessibilityStatementPage', () => {
 
   it('shows the "Last updated" date', () => {
     renderPage();
-    expect(screen.getByText(/last updated.*february 2026/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/last updated.*february 2026/i)
+    ).toBeInTheDocument();
   });
 });

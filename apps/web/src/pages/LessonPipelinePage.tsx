@@ -110,7 +110,9 @@ export function LessonPipelinePage() {
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const moduleType = e.dataTransfer.getData('moduleType') as PipelineModuleType;
+    const moduleType = e.dataTransfer.getData(
+      'moduleType'
+    ) as PipelineModuleType;
     if (moduleType) addNode(moduleType);
   };
 

@@ -94,7 +94,12 @@ describe('TextSubmissionForm', () => {
   it('calls submit with the textarea value on form submission', async () => {
     const longText =
       'This is a sufficiently long response that has more than ten words total to pass validation';
-    mockSubmit.mockResolvedValue({ id: 'sub-1', contentItemId: 'ci-1', submittedAt: '', wordCount: 15 });
+    mockSubmit.mockResolvedValue({
+      id: 'sub-1',
+      contentItemId: 'ci-1',
+      submittedAt: '',
+      wordCount: 15,
+    });
     render(<TextSubmissionForm {...defaultProps} />);
     fireEvent.change(screen.getByPlaceholderText(/write your assignment/i), {
       target: { value: longText },
@@ -134,9 +139,7 @@ describe('TextSubmissionForm', () => {
       submittedAt: '',
       wordCount: 15,
     });
-    render(
-      <TextSubmissionForm {...defaultProps} onSubmitted={onSubmitted} />
-    );
+    render(<TextSubmissionForm {...defaultProps} onSubmitted={onSubmitted} />);
     fireEvent.change(screen.getByPlaceholderText(/write your assignment/i), {
       target: {
         value:

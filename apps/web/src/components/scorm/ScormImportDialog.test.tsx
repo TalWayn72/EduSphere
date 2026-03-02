@@ -6,7 +6,8 @@ import React from 'react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -23,7 +24,9 @@ const defaultPresigned = vi.fn().mockResolvedValue({
   fileKey: 'scorm/package.zip',
 });
 
-function renderDialog(overrides: Partial<React.ComponentProps<typeof ScormImportDialog>> = {}) {
+function renderDialog(
+  overrides: Partial<React.ComponentProps<typeof ScormImportDialog>> = {}
+) {
   return render(
     <ScormImportDialog
       open={true}
@@ -39,7 +42,13 @@ describe('ScormImportDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        operation: undefined,
+      },
       NOOP_IMPORT,
     ] as unknown as ReturnType<typeof urql.useMutation>);
   });
@@ -82,23 +91,35 @@ describe('ScormImportDialog', () => {
 
   it('shows error state when a non-zip file is selected', async () => {
     renderDialog();
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['content'], 'document.pdf', { type: 'application/pdf' });
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    const file = new File(['content'], 'document.pdf', {
+      type: 'application/pdf',
+    });
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByText(/Please select a \.zip file/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Please select a \.zip file/i)
+      ).toBeInTheDocument();
     });
   });
 
   it('shows Try again button in error state', async () => {
     renderDialog();
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['content'], 'document.pdf', { type: 'application/pdf' });
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    const file = new File(['content'], 'document.pdf', {
+      type: 'application/pdf',
+    });
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /try again/i })
+      ).toBeInTheDocument();
     });
   });
 
@@ -118,8 +139,12 @@ describe('ScormImportDialog', () => {
     );
 
     renderDialog();
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['content'], 'course.zip', { type: 'application/zip' });
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    const file = new File(['content'], 'course.zip', {
+      type: 'application/zip',
+    });
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
@@ -130,6 +155,8 @@ describe('ScormImportDialog', () => {
   it('shows "Import SCORM Package" title when open', () => {
     renderDialog();
     // Verify the dialog title is present and dialog is visible
-    expect(screen.getAllByText('Import SCORM Package').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Import SCORM Package').length).toBeGreaterThan(
+      0
+    );
   });
 });

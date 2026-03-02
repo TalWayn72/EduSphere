@@ -2,12 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 // vi.hoisted ensures these are initialized before vi.mock() hoisting runs
-const { mockCloseAllPools, mockWithTenantContext, mockGrade, mockSafeParse } = vi.hoisted(() => ({
-  mockCloseAllPools: vi.fn(),
-  mockWithTenantContext: vi.fn(),
-  mockGrade: vi.fn(),
-  mockSafeParse: vi.fn(),
-}));
+const { mockCloseAllPools, mockWithTenantContext, mockGrade, mockSafeParse } =
+  vi.hoisted(() => ({
+    mockCloseAllPools: vi.fn(),
+    mockWithTenantContext: vi.fn(),
+    mockGrade: vi.fn(),
+    mockSafeParse: vi.fn(),
+  }));
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
@@ -40,7 +41,11 @@ import { QuizGraderService } from './quiz-grader.service.js';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const TENANT_CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+const TENANT_CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'STUDENT' as const,
+};
 
 const MOCK_QUIZ_CONTENT = {
   items: [
@@ -78,9 +83,15 @@ function makeQuizService(): QuizService {
   return new QuizService(grader);
 }
 
-function setupWithTenantContextForLoad(contentItem: Record<string, unknown> | null): void {
+function setupWithTenantContextForLoad(
+  contentItem: Record<string, unknown> | null
+): void {
   mockWithTenantContext.mockImplementationOnce(
-    async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => Promise<unknown>) => {
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      cb: (tx: unknown) => Promise<unknown>
+    ) => {
       const tx = {
         select: () => ({
           from: () => ({
@@ -95,9 +106,15 @@ function setupWithTenantContextForLoad(contentItem: Record<string, unknown> | nu
   );
 }
 
-function setupWithTenantContextForInsert(savedRow: Record<string, unknown>): void {
+function setupWithTenantContextForInsert(
+  savedRow: Record<string, unknown>
+): void {
   mockWithTenantContext.mockImplementationOnce(
-    async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => Promise<unknown>) => {
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      cb: (tx: unknown) => Promise<unknown>
+    ) => {
       const tx = {
         insert: () => ({
           values: () => ({
@@ -110,9 +127,15 @@ function setupWithTenantContextForInsert(savedRow: Record<string, unknown>): voi
   );
 }
 
-function setupWithTenantContextForSelect(rows: Record<string, unknown>[]): void {
+function setupWithTenantContextForSelect(
+  rows: Record<string, unknown>[]
+): void {
   mockWithTenantContext.mockImplementationOnce(
-    async (_db: unknown, _ctx: unknown, cb: (tx: unknown) => Promise<unknown>) => {
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      cb: (tx: unknown) => Promise<unknown>
+    ) => {
       const tx = {
         select: () => ({
           from: () => ({
@@ -163,7 +186,11 @@ describe('QuizService', () => {
     });
 
     it('throws BadRequestException when content item type is not QUIZ', async () => {
-      setupWithTenantContextForLoad({ id: 'item-1', type: 'VIDEO', content: null });
+      setupWithTenantContextForLoad({
+        id: 'item-1',
+        type: 'VIDEO',
+        content: null,
+      });
 
       await expect(
         service.gradeAndSave('item-1', 'user-1', TENANT_CTX, { 0: ['a'] })
@@ -171,7 +198,11 @@ describe('QuizService', () => {
     });
 
     it('throws BadRequestException when content item has no content', async () => {
-      setupWithTenantContextForLoad({ id: 'item-1', type: 'QUIZ', content: null });
+      setupWithTenantContextForLoad({
+        id: 'item-1',
+        type: 'QUIZ',
+        content: null,
+      });
 
       await expect(
         service.gradeAndSave('item-1', 'user-1', TENANT_CTX, { 0: ['a'] })
@@ -179,7 +210,11 @@ describe('QuizService', () => {
     });
 
     it('throws BadRequestException when content is not valid JSON', async () => {
-      setupWithTenantContextForLoad({ id: 'item-1', type: 'QUIZ', content: '{invalid json' });
+      setupWithTenantContextForLoad({
+        id: 'item-1',
+        type: 'QUIZ',
+        content: '{invalid json',
+      });
 
       await expect(
         service.gradeAndSave('item-1', 'user-1', TENANT_CTX, { 0: ['a'] })
@@ -192,7 +227,10 @@ describe('QuizService', () => {
         type: 'QUIZ',
         content: JSON.stringify({ invalid: 'schema' }),
       });
-      mockSafeParse.mockReturnValueOnce({ success: false, error: { message: 'Invalid quiz' } });
+      mockSafeParse.mockReturnValueOnce({
+        success: false,
+        error: { message: 'Invalid quiz' },
+      });
 
       await expect(
         service.gradeAndSave('item-1', 'user-1', TENANT_CTX, { 0: ['a'] })
@@ -205,11 +243,19 @@ describe('QuizService', () => {
         type: 'QUIZ',
         content: JSON.stringify(MOCK_QUIZ_CONTENT),
       });
-      mockSafeParse.mockReturnValueOnce({ success: true, data: MOCK_QUIZ_CONTENT });
+      mockSafeParse.mockReturnValueOnce({
+        success: true,
+        data: MOCK_QUIZ_CONTENT,
+      });
       mockGrade.mockReturnValueOnce(MOCK_GRADE_RESULT);
       setupWithTenantContextForInsert(MOCK_SAVED_ROW);
 
-      const result = await service.gradeAndSave('item-1', 'user-1', TENANT_CTX, { 0: ['a'] });
+      const result = await service.gradeAndSave(
+        'item-1',
+        'user-1',
+        TENANT_CTX,
+        { 0: ['a'] }
+      );
 
       expect(result).toMatchObject({
         id: 'result-uuid',

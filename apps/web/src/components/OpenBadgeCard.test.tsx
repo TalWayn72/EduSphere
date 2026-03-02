@@ -47,9 +47,7 @@ describe('OpenBadgeCard', () => {
   });
 
   it('shows "Revoked" badge when revoked is true', () => {
-    render(
-      <OpenBadgeCard assertion={{ ...VALID_ASSERTION, revoked: true }} />
-    );
+    render(<OpenBadgeCard assertion={{ ...VALID_ASSERTION, revoked: true }} />);
     expect(screen.getByText('Revoked')).toBeInTheDocument();
   });
 
@@ -92,9 +90,7 @@ describe('OpenBadgeCard', () => {
   });
 
   it('does NOT render "Share to LinkedIn" for revoked assertion', () => {
-    render(
-      <OpenBadgeCard assertion={{ ...VALID_ASSERTION, revoked: true }} />
-    );
+    render(<OpenBadgeCard assertion={{ ...VALID_ASSERTION, revoked: true }} />);
     expect(
       screen.queryByRole('button', { name: /share.*linkedin/i })
     ).not.toBeInTheDocument();
@@ -114,7 +110,10 @@ describe('OpenBadgeCard', () => {
   it('renders "Evidence" button when evidenceUrl is provided', () => {
     render(
       <OpenBadgeCard
-        assertion={{ ...VALID_ASSERTION, evidenceUrl: 'https://evidence.example.com' }}
+        assertion={{
+          ...VALID_ASSERTION,
+          evidenceUrl: 'https://evidence.example.com',
+        }}
       />
     );
     expect(

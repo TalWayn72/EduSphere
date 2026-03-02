@@ -34,9 +34,7 @@ describe('BlockPalette', () => {
     expect(
       screen.getByLabelText('Drag to add Featured Courses')
     ).toBeInTheDocument();
-    expect(
-      screen.getByLabelText('Drag to add CTA Button')
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Drag to add CTA Button')).toBeInTheDocument();
   });
 
   it('calls onDragStart with correct block type on dragstart', () => {

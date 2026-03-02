@@ -58,7 +58,9 @@ describe('SecurityResolver', () => {
 
     it('propagates service errors', async () => {
       svc.getSettings.mockRejectedValue(new Error('DB error'));
-      await expect(resolver.mySecuritySettings(CTX_AUTHED)).rejects.toThrow('DB error');
+      await expect(resolver.mySecuritySettings(CTX_AUTHED)).rejects.toThrow(
+        'DB error'
+      );
     });
   });
 

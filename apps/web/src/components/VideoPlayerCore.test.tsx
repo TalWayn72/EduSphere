@@ -106,7 +106,10 @@ describe('VideoPlayerCore', () => {
     );
     const video = container.querySelector('video')!;
     // Simulate timeupdate — jsdom currentTime defaults to 0
-    Object.defineProperty(video, 'currentTime', { get: () => 42, configurable: true });
+    Object.defineProperty(video, 'currentTime', {
+      get: () => 42,
+      configurable: true,
+    });
     fireEvent(video, new Event('timeupdate'));
     expect(onTimeUpdate).toHaveBeenCalledWith(42);
   });

@@ -43,9 +43,16 @@ const MOCK_BADGES = [
   },
 ];
 
-function makeQueryResponse(overrides: Partial<UseQueryResponse[0]> = {}): UseQueryResponse {
+function makeQueryResponse(
+  overrides: Partial<UseQueryResponse[0]> = {}
+): UseQueryResponse {
   return [
-    { data: { myBadges: MOCK_BADGES }, fetching: false, stale: false, ...overrides },
+    {
+      data: { myBadges: MOCK_BADGES },
+      fetching: false,
+      stale: false,
+      ...overrides,
+    },
     vi.fn(),
   ] as unknown as UseQueryResponse;
 }
@@ -66,13 +73,19 @@ describe('BadgesGrid', () => {
 
   it('renders badge emoji icons', () => {
     render(<BadgesGrid />);
-    expect(screen.getByRole('img', { name: 'First Login' })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Course Completer' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: 'First Login' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: 'Course Completer' })
+    ).toBeInTheDocument();
   });
 
   it('renders badge descriptions', () => {
     render(<BadgesGrid />);
-    expect(screen.getByText('Logged in for the first time')).toBeInTheDocument();
+    expect(
+      screen.getByText('Logged in for the first time')
+    ).toBeInTheDocument();
     expect(screen.getByText('Completed your first course')).toBeInTheDocument();
   });
 
@@ -83,16 +96,16 @@ describe('BadgesGrid', () => {
   });
 
   it('shows loading skeletons when fetching', () => {
-    mockUseQuery.mockReturnValue(makeQueryResponse({ fetching: true, data: undefined }));
+    mockUseQuery.mockReturnValue(
+      makeQueryResponse({ fetching: true, data: undefined })
+    );
     const { container } = render(<BadgesGrid />);
     const skeletons = container.querySelectorAll('.animate-pulse');
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it('shows empty state when no badges earned', () => {
-    mockUseQuery.mockReturnValue(
-      makeQueryResponse({ data: { myBadges: [] } })
-    );
+    mockUseQuery.mockReturnValue(makeQueryResponse({ data: { myBadges: [] } }));
     render(<BadgesGrid />);
     expect(screen.getByText(/no badges earned yet/i)).toBeInTheDocument();
   });
@@ -118,7 +131,9 @@ describe('BadgesGrid', () => {
   });
 
   it('does not show loading state when badges prop is provided', () => {
-    mockUseQuery.mockReturnValue(makeQueryResponse({ fetching: true, data: undefined }));
+    mockUseQuery.mockReturnValue(
+      makeQueryResponse({ fetching: true, data: undefined })
+    );
     const { container } = render(<BadgesGrid badges={[]} />);
     // fetching=true but badges prop provided → no skeletons
     expect(container.querySelectorAll('.animate-pulse').length).toBe(0);

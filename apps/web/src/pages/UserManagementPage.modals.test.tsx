@@ -6,7 +6,7 @@ import React from 'react';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
@@ -18,7 +18,9 @@ import * as urql from 'urql';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
 function setupMutation(overrideFn = NOOP_EXECUTE) {
   vi.mocked(urql.useMutation).mockReturnValue([
@@ -94,7 +96,12 @@ describe('InviteUserModal', () => {
   });
 
   it('calls onSuccess and onClose on successful submission', async () => {
-    const createUserFn = vi.fn().mockResolvedValue({ data: { createUser: { id: 'u1' } }, error: undefined });
+    const createUserFn = vi
+      .fn()
+      .mockResolvedValue({
+        data: { createUser: { id: 'u1' } },
+        error: undefined,
+      });
     setupMutation(createUserFn);
     renderModal();
 
@@ -133,7 +140,9 @@ describe('BulkImportModal', () => {
 
   it('renders CSV instructions', () => {
     renderModal();
-    expect(screen.getByText(/email,firstName,lastName,role/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/email,firstName,lastName,role/)
+    ).toBeInTheDocument();
   });
 
   it('renders Import button disabled when textarea is empty', () => {
@@ -144,7 +153,9 @@ describe('BulkImportModal', () => {
   it('enables Import button when textarea has content', () => {
     renderModal();
     fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'email,firstName,lastName,role\njohn@test.com,John,Doe,STUDENT' },
+      target: {
+        value: 'email,firstName,lastName,role\njohn@test.com,John,Doe,STUDENT',
+      },
     });
     expect(screen.getByRole('button', { name: /import/i })).not.toBeDisabled();
   });
@@ -159,7 +170,9 @@ describe('BulkImportModal', () => {
     renderModal();
 
     fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'email,firstName,lastName,role\njohn@test.com,John,Doe,STUDENT' },
+      target: {
+        value: 'email,firstName,lastName,role\njohn@test.com,John,Doe,STUDENT',
+      },
     });
     fireEvent.click(screen.getByRole('button', { name: /import/i }));
 

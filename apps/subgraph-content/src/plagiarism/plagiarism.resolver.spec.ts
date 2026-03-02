@@ -12,11 +12,15 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 vi.mock('nats', () => ({
-  connect: vi.fn().mockResolvedValue({ close: vi.fn(), drain: vi.fn(), publish: vi.fn() }),
+  connect: vi
+    .fn()
+    .mockResolvedValue({ close: vi.fn(), drain: vi.fn(), publish: vi.fn() }),
   StringCodec: vi.fn(() => ({ encode: (s: string) => s })),
 }));
 
-vi.mock('@edusphere/nats-client', () => ({ buildNatsOptions: vi.fn(() => ({})) }));
+vi.mock('@edusphere/nats-client', () => ({
+  buildNatsOptions: vi.fn(() => ({})),
+}));
 
 import { PlagiarismResolver } from './plagiarism.resolver.js';
 import type { SubmissionService } from './submission.service.js';
@@ -66,7 +70,10 @@ describe('PlagiarismResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new PlagiarismResolver(mockSubmissionService, mockPlagiarismService);
+    resolver = new PlagiarismResolver(
+      mockSubmissionService,
+      mockPlagiarismService
+    );
   });
 
   // ── submitTextAssignment ──────────────────────────────────────────────────
@@ -74,20 +81,33 @@ describe('PlagiarismResolver', () => {
   describe('submitTextAssignment()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
       await expect(
-        resolver.submitTextAssignment('item-1', 'My essay', 'course-1', noAuthCtx)
+        resolver.submitTextAssignment(
+          'item-1',
+          'My essay',
+          'course-1',
+          noAuthCtx
+        )
       ).rejects.toThrow(UnauthorizedException);
       expect(mockSubmitAssignment).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
+      const ctx = makeCtx({
+        userId: undefined as unknown as string,
+        tenantId: 't1',
+        roles: [],
+      });
       await expect(
         resolver.submitTextAssignment('item-1', 'My essay', 'course-1', ctx)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
       await expect(
         resolver.submitTextAssignment('item-1', 'My essay', 'course-1', ctx)
       ).rejects.toThrow(UnauthorizedException);
@@ -119,14 +139,20 @@ describe('PlagiarismResolver', () => {
 
   describe('mySubmissions()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(
-        resolver.mySubmissions('item-1', noAuthCtx)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.mySubmissions('item-1', noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.mySubmissions('item-1', ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.mySubmissions('item-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to submissionService.getMySubmissions with correct args', async () => {
@@ -153,7 +179,11 @@ describe('PlagiarismResolver', () => {
     });
 
     it('throws UnauthorizedException when userId or tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
       await expect(
         resolver.submissionPlagiarismReport('sub-1', ctx)
       ).rejects.toThrow(UnauthorizedException);
@@ -162,7 +192,10 @@ describe('PlagiarismResolver', () => {
     it('delegates to submissionService.getPlagiarismReport with correct args', async () => {
       mockGetPlagiarismReport.mockResolvedValueOnce(MOCK_REPORT);
 
-      const result = await resolver.submissionPlagiarismReport('sub-1', makeCtx());
+      const result = await resolver.submissionPlagiarismReport(
+        'sub-1',
+        makeCtx()
+      );
 
       expect(result).toEqual(MOCK_REPORT);
       expect(mockGetPlagiarismReport).toHaveBeenCalledWith(
@@ -174,7 +207,11 @@ describe('PlagiarismResolver', () => {
 
     it('builds TenantContext using role from roles array', async () => {
       mockGetPlagiarismReport.mockResolvedValueOnce(MOCK_REPORT);
-      const ctx = makeCtx({ userId: 'u1', tenantId: 't1', roles: ['INSTRUCTOR'] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: 't1',
+        roles: ['INSTRUCTOR'],
+      });
 
       await resolver.submissionPlagiarismReport('sub-1', ctx);
 

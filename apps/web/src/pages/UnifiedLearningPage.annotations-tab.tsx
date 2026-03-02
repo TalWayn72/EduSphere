@@ -21,7 +21,12 @@ interface Props {
 }
 
 function SkeletonLine({ className = '' }: { className?: string }) {
-  return <div className={`bg-muted animate-pulse rounded ${className}`} aria-hidden="true" />;
+  return (
+    <div
+      className={`bg-muted animate-pulse rounded ${className}`}
+      aria-hidden="true"
+    />
+  );
 }
 
 export function AnnotationsTab({
@@ -41,7 +46,9 @@ export function AnnotationsTab({
   ]);
   const [showForm, setShowForm] = useState(false);
   const [newText, setNewText] = useState('');
-  const [newLayer, setNewLayer] = useState<AnnotationLayer>(AnnotationLayer.PERSONAL);
+  const [newLayer, setNewLayer] = useState<AnnotationLayer>(
+    AnnotationLayer.PERSONAL
+  );
 
   const toggleLayer = (layer: AnnotationLayer) =>
     setActiveLayers((prev) =>
@@ -55,17 +62,26 @@ export function AnnotationsTab({
     setShowForm(false);
   };
 
-  const visible = annotations.filter((a) => !a.parentId && activeLayers.includes(a.layer));
+  const visible = annotations.filter(
+    (a) => !a.parentId && activeLayers.includes(a.layer)
+  );
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-3 py-2 border-b flex-shrink-0">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs font-semibold">{t('common:annotations')}</span>
-          <Button variant="ghost" size="sm" className="h-6 text-xs px-2"
-            onClick={() => setShowForm((v) => !v)}>
-            <Plus className="h-3 w-3 mr-1" />{t('common:add')}
+          <span className="text-xs font-semibold">
+            {t('common:annotations')}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-xs px-2"
+            onClick={() => setShowForm((v) => !v)}
+          >
+            <Plus className="h-3 w-3 mr-1" />
+            {t('common:add')}
           </Button>
         </div>
         <LayerToggleBar activeLayers={activeLayers} onToggle={toggleLayer} />
@@ -76,18 +92,30 @@ export function AnnotationsTab({
         <div className="px-3 py-2 border-b bg-muted/20 flex-shrink-0 space-y-1.5">
           <div className="flex flex-wrap gap-1">
             {(Object.keys(LAYER_META) as AnnotationLayer[]).map((l) => (
-              <button key={l} onClick={() => setNewLayer(l)}
+              <button
+                key={l}
+                onClick={() => setNewLayer(l)}
                 className={`px-2 py-0.5 rounded text-xs border ${LAYER_META[l]?.bg ?? ''} ${LAYER_META[l]?.color ?? ''}
-                  ${newLayer === l ? 'ring-2 ring-offset-1 ring-primary' : 'opacity-60'}`}>
+                  ${newLayer === l ? 'ring-2 ring-offset-1 ring-primary' : 'opacity-60'}`}
+              >
                 {LAYER_META[l]?.label}
               </button>
             ))}
           </div>
-          <textarea value={newText} onChange={(e) => setNewText(e.target.value)}
+          <textarea
+            value={newText}
+            onChange={(e) => setNewText(e.target.value)}
             placeholder={t('content:annotationPlaceholder')}
-            className="w-full text-xs px-2 py-1.5 border rounded bg-background resize-none" rows={2} />
+            className="w-full text-xs px-2 py-1.5 border rounded bg-background resize-none"
+            rows={2}
+          />
           <div className="flex gap-1 justify-end">
-            <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => setShowForm(false)}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 text-xs"
+              onClick={() => setShowForm(false)}
+            >
               {t('common:cancel')}
             </Button>
             <Button size="sm" className="h-6 text-xs" onClick={handleSave}>
@@ -113,7 +141,12 @@ export function AnnotationsTab({
           </p>
         )}
         {visible.map((ann) => (
-          <AnnotationThread key={ann.id} annotation={ann} onSeek={onSeek} onReply={onReply} />
+          <AnnotationThread
+            key={ann.id}
+            annotation={ann}
+            onSeek={onSeek}
+            onReply={onReply}
+          />
         ))}
       </div>
     </div>

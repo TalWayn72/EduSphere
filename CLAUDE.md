@@ -271,19 +271,19 @@ MCP tools return **structured, typed data** — Bash commands return unstructure
 
 ### Installed MCP Servers (11 active)
 
-| Server                   | Command file                     | Package                                | Version   | Status       |
-| ------------------------ | -------------------------------- | -------------------------------------- | --------- | ------------ |
-| `memory`                 | `node.exe` + `server-memory\dist\index.js`          | `@modelcontextprotocol/server-memory`  | 0.6.3 | ✅ Global    |
-| `sequential-thinking`    | `node.exe` + `server-sequential-thinking\dist\index.js` | `@modelcontextprotocol/server-sequential-thinking` | latest | ✅ Global |
-| `eslint`                 | `node.exe` + `@eslint\mcp\src\mcp-cli.js`           | `@eslint/mcp`                          | 0.3.0     | ✅ Global    |
-| `github`                 | `github-mcp-server.exe`          | `github/github-mcp-server` v0.31.0     | 0.31.0    | ✅ Binary    |
-| `tavily`                 | `node.exe` + `tavily-mcp\build\index.js`             | `tavily-mcp`                           | 0.2.17    | ✅ Global    |
-| `postgres`               | `node.exe` + `postgres-mcp-server\build\index.js`   | `@henkey/postgres-mcp-server`          | 1.0.5     | ✅ Global    |
-| `graphql`                | `node.exe` + `mcp-graphql\dist\index.js`             | `mcp-graphql`                          | 2.0.4     | ✅ Global    |
-| `nats`                   | docker exec                      | edusphere-all-in-one container         | -         | ✅ Docker    |
-| `typescript-diagnostics` | `node.exe` + `ts-diagnostics-mcp\dist\index.js`     | `ts-diagnostics-mcp`                   | -         | ✅ Global    |
-| `playwright`             | `node.exe` + `@playwright\mcp\cli.js`               | `@playwright/mcp`                      | 0.0.68    | ✅ Global    |
-| `context7`               | `node.exe` + `context7-mcp\dist\index.js`           | `@upstash/context7-mcp`                | 2.1.2     | ✅ Global    |
+| Server                   | Command file                                            | Package                                            | Version | Status    |
+| ------------------------ | ------------------------------------------------------- | -------------------------------------------------- | ------- | --------- |
+| `memory`                 | `node.exe` + `server-memory\dist\index.js`              | `@modelcontextprotocol/server-memory`              | 0.6.3   | ✅ Global |
+| `sequential-thinking`    | `node.exe` + `server-sequential-thinking\dist\index.js` | `@modelcontextprotocol/server-sequential-thinking` | latest  | ✅ Global |
+| `eslint`                 | `node.exe` + `@eslint\mcp\src\mcp-cli.js`               | `@eslint/mcp`                                      | 0.3.0   | ✅ Global |
+| `github`                 | `github-mcp-server.exe`                                 | `github/github-mcp-server` v0.31.0                 | 0.31.0  | ✅ Binary |
+| `tavily`                 | `node.exe` + `tavily-mcp\build\index.js`                | `tavily-mcp`                                       | 0.2.17  | ✅ Global |
+| `postgres`               | `node.exe` + `postgres-mcp-server\build\index.js`       | `@henkey/postgres-mcp-server`                      | 1.0.5   | ✅ Global |
+| `graphql`                | `node.exe` + `mcp-graphql\dist\index.js`                | `mcp-graphql`                                      | 2.0.4   | ✅ Global |
+| `nats`                   | docker exec                                             | edusphere-all-in-one container                     | -       | ✅ Docker |
+| `typescript-diagnostics` | `node.exe` + `ts-diagnostics-mcp\dist\index.js`         | `ts-diagnostics-mcp`                               | -       | ✅ Global |
+| `playwright`             | `node.exe` + `@playwright\mcp\cli.js`                   | `@playwright/mcp`                                  | 0.0.68  | ✅ Global |
+| `context7`               | `node.exe` + `context7-mcp\dist\index.js`               | `@upstash/context7-mcp`                            | 2.1.2   | ✅ Global |
 
 > **Note:** `@modelcontextprotocol/server-github` is DEPRECATED (Apr 2025). Replaced by official `github/github-mcp-server` binary.
 > **Note:** `@modelcontextprotocol/server-postgres` is ARCHIVED (May 2025) + has SQL injection vulnerability. Replaced by `@henkey/postgres-mcp-server`.

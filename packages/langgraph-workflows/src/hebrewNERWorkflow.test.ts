@@ -139,7 +139,9 @@ describe('HebrewNERWorkflow', () => {
       mockGenerateObject
         .mockResolvedValueOnce(makeEntityResponse([sampleEntity]) as never)
         .mockResolvedValueOnce(makeEntityResponse([sampleEntity]) as never)
-        .mockResolvedValueOnce(makeEnrichedResponse('[ENTITY:BOOK] עץ חיים') as never);
+        .mockResolvedValueOnce(
+          makeEnrichedResponse('[ENTITY:BOOK] עץ חיים') as never
+        );
 
       const workflow = new HebrewNERWorkflow();
       const result = await workflow.run({ transcript: 'מקור עץ חיים פרק א' });
@@ -189,7 +191,9 @@ describe('HebrewNERWorkflow', () => {
       mockGenerateObject
         .mockResolvedValueOnce(makeEntityResponse([sampleEntity]) as never)
         .mockResolvedValueOnce(makeEntityResponse([sampleEntity]) as never)
-        .mockResolvedValueOnce(makeEnrichedResponse('marked transcript') as never);
+        .mockResolvedValueOnce(
+          makeEnrichedResponse('marked transcript') as never
+        );
 
       const workflow = new HebrewNERWorkflow();
       const result = await workflow.run({ transcript: 'test hebrew text' });
@@ -234,9 +238,9 @@ describe('HebrewNERWorkflow', () => {
       );
 
       const workflow = new HebrewNERWorkflow();
-      await expect(
-        workflow.run({ transcript: 'some text' })
-      ).rejects.toThrow('LLM rate limit');
+      await expect(workflow.run({ transcript: 'some text' })).rejects.toThrow(
+        'LLM rate limit'
+      );
     });
   });
 });

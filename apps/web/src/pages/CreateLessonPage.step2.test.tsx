@@ -7,7 +7,8 @@ import * as urql from 'urql';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -25,7 +26,9 @@ import { CreateLessonStep2 } from './CreateLessonPage.step2';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
 const renderStep2 = (props: {
   lessonId?: string;
@@ -45,7 +48,10 @@ const renderStep2 = (props: {
 describe('CreateLessonStep2', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, NOOP_EXECUTE] as never);
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      NOOP_EXECUTE,
+    ] as never);
   });
 
   it('renders the step heading', () => {
@@ -77,12 +83,16 @@ describe('CreateLessonStep2', () => {
 
   it('does NOT show "הוסף" button when lessonId is empty', () => {
     renderStep2({ lessonId: '' });
-    expect(screen.queryByRole('button', { name: /הוסף/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /הוסף/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows deferred hint text when lessonId is empty', () => {
     renderStep2({ lessonId: '' });
-    expect(screen.getByText(/הקישור יתווסף לאחר יצירת השיעור/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/הקישור יתווסף לאחר יצירת השיעור/i)
+    ).toBeInTheDocument();
   });
 
   it('shows validation error for invalid YouTube URL', async () => {

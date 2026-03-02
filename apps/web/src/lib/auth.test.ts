@@ -109,18 +109,23 @@ describe('auth — DEV_MODE', () => {
     vi.stubEnv('VITE_KEYCLOAK_URL', 'http://localhost:8080');
 
     // Simulate the in-memory logout
-    const { initKeycloak, logout, isAuthenticated } = await import('@/lib/auth');
+    const { initKeycloak, logout, isAuthenticated } =
+      await import('@/lib/auth');
     await initKeycloak();
     expect(isAuthenticated()).toBe(true);
 
     logout();
     expect(isAuthenticated()).toBe(false);
-    expect(window.sessionStorage.getItem('edusphere_dev_logged_out')).toBe('true');
+    expect(window.sessionStorage.getItem('edusphere_dev_logged_out')).toBe(
+      'true'
+    );
 
     // Simulate a full page reload: re-import the module from scratch
     vi.resetModules();
-    const { initKeycloak: initAfterReload, isAuthenticated: isAuthAfterReload } =
-      await import('@/lib/auth');
+    const {
+      initKeycloak: initAfterReload,
+      isAuthenticated: isAuthAfterReload,
+    } = await import('@/lib/auth');
     await initAfterReload();
     // Despite initKeycloak() being called again, the sessionStorage flag must
     // keep the user logged out (the bug this test guards against).
@@ -137,14 +142,21 @@ describe('auth — DEV_MODE', () => {
     // Stub window.location.href to prevent jsdom navigation errors
     const hrefSetter = vi.fn();
     Object.defineProperty(window, 'location', {
-      value: { ...window.location, set href(v: string) { hrefSetter(v); } },
+      value: {
+        ...window.location,
+        set href(v: string) {
+          hrefSetter(v);
+        },
+      },
       writable: true,
     });
 
     const { login } = await import('@/lib/auth');
     login();
 
-    expect(window.sessionStorage.getItem('edusphere_dev_logged_out')).toBeNull();
+    expect(
+      window.sessionStorage.getItem('edusphere_dev_logged_out')
+    ).toBeNull();
     expect(hrefSetter).toHaveBeenCalledWith('/');
   });
 

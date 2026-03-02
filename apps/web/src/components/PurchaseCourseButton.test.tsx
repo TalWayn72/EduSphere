@@ -13,7 +13,8 @@ vi.mock('graphql-request', () => ({
   request: vi.fn(),
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
 }));
@@ -35,7 +36,9 @@ function setupMutation(overrides: Record<string, unknown> = {}) {
   } as never);
 }
 
-function renderButton(props = { courseId: 'course-1', priceCents: 2999, currency: 'USD' }) {
+function renderButton(
+  props = { courseId: 'course-1', priceCents: 2999, currency: 'USD' }
+) {
   return render(
     <MemoryRouter>
       <PurchaseCourseButton {...props} />
@@ -53,12 +56,16 @@ describe('PurchaseCourseButton', () => {
 
   it('displays formatted price for a paid course', () => {
     renderButton({ courseId: 'course-1', priceCents: 2999, currency: 'USD' });
-    expect(screen.getByRole('button', { name: /purchase \$29\.99/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /purchase \$29\.99/i })
+    ).toBeInTheDocument();
   });
 
   it('displays "Enroll Free" for a free course (priceCents=0)', () => {
     renderButton({ courseId: 'course-1', priceCents: 0, currency: 'USD' });
-    expect(screen.getByRole('button', { name: /enroll free/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /enroll free/i })
+    ).toBeInTheDocument();
   });
 
   it('button is enabled by default', () => {

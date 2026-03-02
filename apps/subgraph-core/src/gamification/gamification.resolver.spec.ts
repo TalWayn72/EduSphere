@@ -136,7 +136,10 @@ describe('GamificationResolver', () => {
       badgeService.myTotalPoints.mockResolvedValue(450);
       const result = await resolver.getMyTotalPoints(CTX_AUTHED);
       expect(result).toBe(450);
-      expect(badgeService.myTotalPoints).toHaveBeenCalledWith('user-1', 'tenant-1');
+      expect(badgeService.myTotalPoints).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1'
+      );
     });
   });
 
@@ -191,7 +194,9 @@ describe('GamificationResolver', () => {
     it('delegates to openBadgesService with assertionId', async () => {
       openBadgesService.verifyOpenBadge.mockResolvedValue({ valid: true });
       await resolver.verifyOpenBadge('assert-1', CTX_AUTHED);
-      expect(openBadgesService.verifyOpenBadge).toHaveBeenCalledWith('assert-1');
+      expect(openBadgesService.verifyOpenBadge).toHaveBeenCalledWith(
+        'assert-1'
+      );
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
@@ -208,10 +213,16 @@ describe('GamificationResolver', () => {
       const row = makeOpenBadgeRow();
       openBadgesService.issueBadge.mockResolvedValue(row);
       const result = await resolver.issueBadge(
-        'def-1', 'user-2', undefined, CTX_AUTHED
+        'def-1',
+        'user-2',
+        undefined,
+        CTX_AUTHED
       );
       expect(openBadgesService.issueBadge).toHaveBeenCalledWith(
-        'def-1', 'user-2', 'tenant-1', undefined
+        'def-1',
+        'user-2',
+        'tenant-1',
+        undefined
       );
       expect(result.issuedAt).toBe('2026-01-15T10:00:00.000Z');
     });
@@ -224,7 +235,9 @@ describe('GamificationResolver', () => {
       openBadgesService.revokeOpenBadge.mockResolvedValue({ revoked: true });
       await resolver.revokeOpenBadge('assert-1', 'Violation', CTX_AUTHED);
       expect(openBadgesService.revokeOpenBadge).toHaveBeenCalledWith(
-        'assert-1', 'tenant-1', 'Violation'
+        'assert-1',
+        'tenant-1',
+        'Violation'
       );
     });
   });

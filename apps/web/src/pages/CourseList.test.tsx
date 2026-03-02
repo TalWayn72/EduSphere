@@ -15,7 +15,8 @@ vi.mock('react-router-dom', async () => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(() => [
@@ -412,7 +413,9 @@ describe('CourseList', () => {
 
   it('renders search input', () => {
     renderCourseList();
-    expect(screen.getByRole('textbox', { name: /search courses/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: /search courses/i })
+    ).toBeInTheDocument();
   });
 
   it('filters courses by title when searching', () => {
@@ -421,8 +424,12 @@ describe('CourseList', () => {
     // 'Knowledge' only appears in course-3 title; absent from all other titles/descriptions
     fireEvent.change(input, { target: { value: 'Knowledge' } });
     expect(screen.getByText('Knowledge Graph Navigation')).toBeInTheDocument();
-    expect(screen.queryByText('Introduction to Talmud Study')).not.toBeInTheDocument();
-    expect(screen.queryByText('Advanced Chavruta Techniques')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Introduction to Talmud Study')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Advanced Chavruta Techniques')
+    ).not.toBeInTheDocument();
   });
 
   it('filters courses by description when searching', () => {
@@ -430,8 +437,12 @@ describe('CourseList', () => {
     const input = screen.getByRole('textbox', { name: /search courses/i });
     // 'AI' only appears in course-2 description ('Collaborative Talmud learning with AI')
     fireEvent.change(input, { target: { value: 'AI' } });
-    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
-    expect(screen.queryByText('Knowledge Graph Navigation')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Advanced Chavruta Techniques')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Knowledge Graph Navigation')
+    ).not.toBeInTheDocument();
   });
 
   it('shows all courses when search is cleared', () => {
@@ -439,8 +450,12 @@ describe('CourseList', () => {
     const input = screen.getByRole('textbox', { name: /search courses/i });
     fireEvent.change(input, { target: { value: 'talmud' } });
     fireEvent.change(input, { target: { value: '' } });
-    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
-    expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
+    expect(
+      screen.getByText('Introduction to Talmud Study')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Advanced Chavruta Techniques')
+    ).toBeInTheDocument();
     expect(screen.getByText('Knowledge Graph Navigation')).toBeInTheDocument();
   });
 
@@ -448,7 +463,9 @@ describe('CourseList', () => {
 
   it('renders sort dropdown', () => {
     renderCourseList();
-    expect(screen.getByRole('combobox', { name: /sort courses/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: /sort courses/i })
+    ).toBeInTheDocument();
   });
 
   it('sorts courses A→Z by title when title sort selected', () => {
@@ -467,11 +484,15 @@ describe('CourseList', () => {
   it('renders All and My Courses tabs for students', () => {
     renderCourseList(STUDENT_USER);
     expect(screen.getByRole('tab', { name: /^all$/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /my courses/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: /my courses/i })
+    ).toBeInTheDocument();
   });
 
   it('does not render tab filter for instructors', () => {
     renderCourseList(INSTRUCTOR_USER);
-    expect(screen.queryByRole('tab', { name: /my courses/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('tab', { name: /my courses/i })
+    ).not.toBeInTheDocument();
   });
 });

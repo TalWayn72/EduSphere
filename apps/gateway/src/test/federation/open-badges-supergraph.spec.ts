@@ -34,7 +34,9 @@ describe('supergraph — Open Badges 3.0 types present (BUG-026 regression)', ()
   it.each(['OpenBadgeAssertion', 'OpenBadgeDefinition'])(
     'object type %s is defined with @join__type(graph: CONTENT)',
     (typeName) => {
-      expect(supergraph).toContain(`type ${typeName} @join__type(graph: CONTENT)`);
+      expect(supergraph).toContain(
+        `type ${typeName} @join__type(graph: CONTENT)`
+      );
     }
   );
 
@@ -76,12 +78,7 @@ describe('supergraph — Open Badges 3.0 types present (BUG-026 regression)', ()
     const idx = supergraph.indexOf('type OpenBadgeDefinition');
     expect(idx).toBeGreaterThan(0);
     const block = supergraph.slice(idx, supergraph.indexOf('}', idx) + 1);
-    for (const field of [
-      'id',
-      'name',
-      'description',
-      'issuerId',
-    ]) {
+    for (const field of ['id', 'name', 'description', 'issuerId']) {
       expect(block).toContain(field);
     }
   });

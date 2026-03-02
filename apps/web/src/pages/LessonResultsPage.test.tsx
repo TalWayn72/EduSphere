@@ -16,7 +16,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -73,9 +74,7 @@ const MOCK_LESSON_WITH_RESULTS = {
             outputType: 'QA_GATE',
             outputData: {
               overallScore: 0.85,
-              fixList: [
-                { description: 'תקן ציטוט חסר', severity: 'MEDIUM' },
-              ],
+              fixList: [{ description: 'תקן ציטוט חסר', severity: 'MEDIUM' }],
             },
           },
         ],
@@ -86,7 +85,12 @@ const MOCK_LESSON_WITH_RESULTS = {
 
 function makeQuery(overrides: Record<string, unknown> = {}) {
   return [
-    { data: MOCK_LESSON_WITH_RESULTS, fetching: false, error: undefined, ...overrides },
+    {
+      data: MOCK_LESSON_WITH_RESULTS,
+      fetching: false,
+      error: undefined,
+      ...overrides,
+    },
     vi.fn(),
   ] as never;
 }
@@ -101,7 +105,11 @@ describe('LessonResultsPage', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ fetching: true, data: undefined })
     );
-    const { container } = render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    const { container } = render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(container.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
@@ -109,44 +117,76 @@ describe('LessonResultsPage', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ data: { lesson: null } })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('השיעור לא נמצא')).toBeInTheDocument();
   });
 
   it('renders page heading תוצאות Pipeline', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('תוצאות Pipeline')).toBeInTheDocument();
   });
 
   it('renders lesson title in back button', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/שיעור בעץ חיים/)).toBeInTheDocument();
   });
 
   it('renders summarization section with short summary', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('סיכום קצר לשיעור')).toBeInTheDocument();
   });
 
   it('renders key points list items', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('נקודה א')).toBeInTheDocument();
     expect(screen.getByText('נקודה ב')).toBeInTheDocument();
   });
 
   it('renders QA gate score as percentage (overallScore * 100)', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     // 0.85 * 100 = 85 → displayed as "85%"
     expect(screen.getByText('85%')).toBeInTheDocument();
   });
 
   it('renders QA fix list description', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText('תקן ציטוט חסר')).toBeInTheDocument();
   });
 
   it('renders citation verifier section heading', () => {
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/אימות ציטוטים/)).toBeInTheDocument();
   });
 
@@ -161,8 +201,14 @@ describe('LessonResultsPage', () => {
         },
       })
     );
-    render(<MemoryRouter><LessonResultsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <LessonResultsPage />
+      </MemoryRouter>
+    );
     expect(screen.getByText(/אין תוצאות עדיין/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Pipeline Builder/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Pipeline Builder/ })
+    ).toBeInTheDocument();
   });
 });

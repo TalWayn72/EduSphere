@@ -60,11 +60,7 @@ describe('AnnotationTimeline', () => {
 
   it('renders slider with correct aria attributes', () => {
     render(
-      <AnnotationTimeline
-        {...defaultProps}
-        currentTime={30}
-        duration={120}
-      />
+      <AnnotationTimeline {...defaultProps} currentTime={30} duration={120} />
     );
     const slider = screen.getByRole('slider');
     expect(slider).toHaveAttribute('aria-valuemin', '0');
@@ -74,11 +70,7 @@ describe('AnnotationTimeline', () => {
 
   it('displays current time and duration as formatted labels', () => {
     render(
-      <AnnotationTimeline
-        {...defaultProps}
-        currentTime={90}
-        duration={600}
-      />
+      <AnnotationTimeline {...defaultProps} currentTime={90} duration={600} />
     );
     // 90s = 1:30, 600s = 10:00
     expect(screen.getByText('1:30')).toBeInTheDocument();
@@ -92,7 +84,9 @@ describe('AnnotationTimeline', () => {
     ];
     render(<AnnotationTimeline {...defaultProps} annotations={annotations} />);
     // Each marker has a title attribute with timestamp info
-    expect(document.querySelectorAll('[title]').length).toBeGreaterThanOrEqual(2);
+    expect(document.querySelectorAll('[title]').length).toBeGreaterThanOrEqual(
+      2
+    );
   });
 
   it('calls onSeek with timestamp when clicking an annotation marker', () => {
@@ -155,11 +149,7 @@ describe('AnnotationTimeline', () => {
 
   it('shows 0:00 for zero current time', () => {
     render(
-      <AnnotationTimeline
-        {...defaultProps}
-        currentTime={0}
-        duration={60}
-      />
+      <AnnotationTimeline {...defaultProps} currentTime={0} duration={60} />
     );
     expect(screen.getAllByText('0:00').length).toBeGreaterThanOrEqual(1);
   });

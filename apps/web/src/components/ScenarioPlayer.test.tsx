@@ -6,14 +6,17 @@ import { ScenarioPlayer } from './ScenarioPlayer';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
 const makeNode = (overrides = {}) => ({
   id: 'node-1',
@@ -38,20 +41,14 @@ describe('ScenarioPlayer', () => {
 
   it('renders the initial node title', () => {
     render(
-      <ScenarioPlayer
-        rootContentItemId="root-1"
-        initialNode={makeNode()}
-      />
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
     );
     expect(screen.getAllByText('The Beginning')[0]).toBeInTheDocument();
   });
 
   it('renders the initial node description', () => {
     render(
-      <ScenarioPlayer
-        rootContentItemId="root-1"
-        initialNode={makeNode()}
-      />
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
     );
     expect(
       screen.getByText('You stand at a crossroads. What do you do?')
@@ -60,21 +57,17 @@ describe('ScenarioPlayer', () => {
 
   it('renders all choice buttons', () => {
     render(
-      <ScenarioPlayer
-        rootContentItemId="root-1"
-        initialNode={makeNode()}
-      />
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
     );
     expect(screen.getByRole('button', { name: 'Go left' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Go right' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Go right' })
+    ).toBeInTheDocument();
   });
 
   it('renders breadcrumb with initial node title', () => {
     render(
-      <ScenarioPlayer
-        rootContentItemId="root-1"
-        initialNode={makeNode()}
-      />
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
     );
     const nav = screen.getByRole('navigation', { name: 'Scenario path' });
     expect(nav).toBeInTheDocument();
@@ -100,10 +93,7 @@ describe('ScenarioPlayer', () => {
     ]);
 
     render(
-      <ScenarioPlayer
-        rootContentItemId="root-1"
-        initialNode={makeNode()}
-      />
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Go left' }));
@@ -117,7 +107,11 @@ describe('ScenarioPlayer', () => {
     render(
       <ScenarioPlayer
         rootContentItemId="root-1"
-        initialNode={makeNode({ isEndNode: true, endingType: 'SUCCESS', choices: [] })}
+        initialNode={makeNode({
+          isEndNode: true,
+          endingType: 'SUCCESS',
+          choices: [],
+        })}
       />
     );
     expect(
@@ -129,7 +123,11 @@ describe('ScenarioPlayer', () => {
     render(
       <ScenarioPlayer
         rootContentItemId="root-1"
-        initialNode={makeNode({ isEndNode: true, endingType: 'FAILURE', choices: [] })}
+        initialNode={makeNode({
+          isEndNode: true,
+          endingType: 'FAILURE',
+          choices: [],
+        })}
       />
     );
     expect(
@@ -141,7 +139,11 @@ describe('ScenarioPlayer', () => {
     render(
       <ScenarioPlayer
         rootContentItemId="root-1"
-        initialNode={makeNode({ isEndNode: true, endingType: 'NEUTRAL', choices: [] })}
+        initialNode={makeNode({
+          isEndNode: true,
+          endingType: 'NEUTRAL',
+          choices: [],
+        })}
       />
     );
     const tryAgainBtn = screen.getByRole('button', { name: /Try Again/i });
@@ -163,10 +165,7 @@ describe('ScenarioPlayer', () => {
     ]);
 
     render(
-      <ScenarioPlayer
-        rootContentItemId="root-1"
-        initialNode={makeNode()}
-      />
+      <ScenarioPlayer rootContentItemId="root-1" initialNode={makeNode()} />
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Go left' }));

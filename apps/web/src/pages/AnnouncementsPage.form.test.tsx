@@ -66,7 +66,9 @@ describe('AnnouncementForm', () => {
 
   it('calls onSubmit when create button is clicked with a title', () => {
     const { onSubmit } = setup({ title: 'Test' });
-    fireEvent.click(screen.getByRole('button', { name: /create announcement/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /create announcement/i })
+    );
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
@@ -116,8 +118,6 @@ describe('AnnouncementForm', () => {
       />
     );
     expect(screen.getByText('Creating...')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /creating/i })
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: /creating/i })).toBeDisabled();
   });
 });

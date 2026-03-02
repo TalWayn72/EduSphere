@@ -19,14 +19,18 @@ const {
 } = vi.hoisted(() => {
   const mockReturning = vi.fn();
   const mockLimit = vi.fn().mockResolvedValue([]);
-  const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning, limit: mockLimit });
+  const mockWhere = vi
+    .fn()
+    .mockReturnValue({ returning: mockReturning, limit: mockLimit });
   const mockValues = vi.fn().mockReturnValue({ returning: mockReturning });
   const mockInsert = vi.fn().mockReturnValue({ values: mockValues });
   const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
   const mockSelect = vi.fn().mockReturnValue({ from: mockFrom });
   const mockDrain = vi.fn().mockResolvedValue(undefined);
   const mockPublish = vi.fn();
-  const mockNatsConnect = vi.fn().mockResolvedValue({ drain: mockDrain, publish: mockPublish });
+  const mockNatsConnect = vi
+    .fn()
+    .mockResolvedValue({ drain: mockDrain, publish: mockPublish });
   const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
 
   return {
@@ -85,7 +89,10 @@ describe('LessonAssetService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockNatsConnect.mockResolvedValue({ drain: mockDrain, publish: mockPublish });
+    mockNatsConnect.mockResolvedValue({
+      drain: mockDrain,
+      publish: mockPublish,
+    });
     mockDrain.mockResolvedValue(undefined);
     mockCloseAllPools.mockResolvedValue(undefined);
     // Re-wire the chainable DB mock after clearAllMocks
@@ -203,7 +210,11 @@ describe('LessonAssetService', () => {
     mockReturning.mockResolvedValueOnce([insertedRow]);
     mockLimit.mockResolvedValueOnce([{ course_id: 'course-abc' }]);
 
-    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+    const tenantCtx = {
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      userRole: 'STUDENT' as const,
+    };
 
     const result = await service.addAsset(
       'lesson-1',
@@ -220,7 +231,11 @@ describe('LessonAssetService', () => {
     mockReturning.mockResolvedValueOnce([]);
     mockLimit.mockResolvedValueOnce([]);
 
-    const tenantCtx = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'STUDENT' as const };
+    const tenantCtx = {
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      userRole: 'STUDENT' as const,
+    };
 
     const result = await service.addAsset(
       'lesson-x',

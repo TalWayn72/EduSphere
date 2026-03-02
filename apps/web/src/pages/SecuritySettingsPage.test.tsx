@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -44,7 +45,9 @@ vi.mock('./SecuritySettingsPage.sections', () => ({
   MfaSection: vi.fn(() => <div data-testid="mfa-section" />),
   SessionSection: vi.fn(() => <div data-testid="session-section" />),
   PasswordSection: vi.fn(() => <div data-testid="password-section" />),
-  AccessControlSection: vi.fn(() => <div data-testid="access-control-section" />),
+  AccessControlSection: vi.fn(() => (
+    <div data-testid="access-control-section" />
+  )),
 }));
 
 // ── Imports after mocks ───────────────────────────────────────────────────────
@@ -148,7 +151,9 @@ describe('SecuritySettingsPage', () => {
 
   it('renders "Save Settings" button', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /save settings/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /save settings/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "Settings saved." after successful save', async () => {

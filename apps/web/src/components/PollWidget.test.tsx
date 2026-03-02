@@ -8,7 +8,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -47,7 +47,7 @@ const MOCK_ACTIVE_POLL = {
   isActive: true,
 };
 
-function setupMocks(polls: typeof MOCK_INACTIVE_POLL[] = []) {
+function setupMocks(polls: (typeof MOCK_INACTIVE_POLL)[] = []) {
   vi.mocked(urql.useQuery).mockReturnValue([
     {
       data: { sessionPolls: polls },
@@ -120,7 +120,9 @@ describe('PollWidget', () => {
 
   it('moderator sees "Close Poll" button for active poll', () => {
     setupMocks([MOCK_ACTIVE_POLL]);
-    vi.mocked(urql.useSubscription).mockReturnValue([{ data: undefined }] as never);
+    vi.mocked(urql.useSubscription).mockReturnValue([
+      { data: undefined },
+    ] as never);
     render(<PollWidget sessionId="s1" isModerator={true} />);
     expect(
       screen.getByRole('button', { name: /close poll/i })

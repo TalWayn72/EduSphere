@@ -20,9 +20,17 @@ vi.mock('@edusphere/db', () => ({
     delete: vi.fn(),
   },
   auditLog: {
-    tenantId: {}, userId: {}, action: {}, createdAt: {},
-    resourceType: {}, resourceId: {}, status: {}, ipAddress: {},
-    requestId: {}, metadata: {}, userAgent: {},
+    tenantId: {},
+    userId: {},
+    action: {},
+    createdAt: {},
+    resourceType: {},
+    resourceId: {},
+    status: {},
+    ipAddress: {},
+    requestId: {},
+    metadata: {},
+    userAgent: {},
   },
   count: vi.fn(() => 'COUNT(*)'),
   desc: vi.fn(),
@@ -73,17 +81,31 @@ import { AuditLogService } from './audit-log.service.js';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 type AuditEntry = {
-  id: string; tenantId: string; userId: string | null; action: string;
-  resourceType: string | null; resourceId: string | null; status: string;
-  ipAddress: string | null; requestId: string | null; createdAt: string;
+  id: string;
+  tenantId: string;
+  userId: string | null;
+  action: string;
+  resourceType: string | null;
+  resourceId: string | null;
+  status: string;
+  ipAddress: string | null;
+  requestId: string | null;
+  createdAt: string;
   metadata: string | null;
 };
 
 const makeEntry = (overrides: Partial<AuditEntry> = {}): AuditEntry => ({
-  id: 'entry-1', tenantId: 'tenant-1', userId: 'user-1', action: 'USER_LOGIN',
-  resourceType: null, resourceId: null, status: 'SUCCESS',
-  ipAddress: '127.0.0.1', requestId: 'req-1',
-  createdAt: new Date('2026-01-01T00:00:00Z').toISOString(), metadata: null,
+  id: 'entry-1',
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  action: 'USER_LOGIN',
+  resourceType: null,
+  resourceId: null,
+  status: 'SUCCESS',
+  ipAddress: '127.0.0.1',
+  requestId: 'req-1',
+  createdAt: new Date('2026-01-01T00:00:00Z').toISOString(),
+  metadata: null,
   ...overrides,
 });
 
@@ -95,9 +117,14 @@ function buildSelectMock(rowsBatches: unknown[][]) {
   let callIndex = 0;
   return () => {
     const rows = rowsBatches[callIndex++] ?? [];
-    const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, () => unknown>;
+    const p = Promise.resolve(rows) as Promise<unknown[]> &
+      Record<string, () => unknown>;
     const self = (): typeof p => p;
-    p.from = self; p.where = self; p.orderBy = self; p.limit = self; p.offset = self;
+    p.from = self;
+    p.where = self;
+    p.orderBy = self;
+    p.limit = self;
+    p.offset = self;
     return p;
   };
 }
@@ -147,14 +174,24 @@ describe('AuditLogService', () => {
     const { db } = await import('@edusphere/db');
     const mockSelect = db.select as ReturnType<typeof vi.fn>;
     const dbRow = {
-      id: 'e1', tenantId: 't1', userId: 'u1', action: 'LOGIN',
-      resourceType: null, resourceId: null, status: 'SUCCESS',
-      ipAddress: null, requestId: null,
+      id: 'e1',
+      tenantId: 't1',
+      userId: 'u1',
+      action: 'LOGIN',
+      resourceType: null,
+      resourceId: null,
+      status: 'SUCCESS',
+      ipAddress: null,
+      requestId: null,
       createdAt: new Date('2026-01-01T00:00:00Z'),
-      metadata: null, userAgent: null,
+      metadata: null,
+      userAgent: null,
     };
     mockSelect.mockImplementation(buildSelectMock([[dbRow], [{ total: 1 }]]));
-    const result = await service.getAuditLog('tenant-1', { limit: 10, offset: 0 });
+    const result = await service.getAuditLog('tenant-1', {
+      limit: 10,
+      offset: 0,
+    });
     expect(result.entries).toHaveLength(1);
     expect(result.total).toBe(1);
     expect(result.entries[0]?.action).toBe('LOGIN');
@@ -166,12 +203,24 @@ describe('AuditLogService', () => {
     const mockSelect = db.select as ReturnType<typeof vi.fn>;
     const date = new Date('2026-03-01T12:00:00Z');
     const dbRow = {
-      id: 'e1', tenantId: 't1', userId: null, action: 'EXPORT',
-      resourceType: null, resourceId: null, status: 'SUCCESS',
-      ipAddress: null, requestId: null, createdAt: date, metadata: null, userAgent: null,
+      id: 'e1',
+      tenantId: 't1',
+      userId: null,
+      action: 'EXPORT',
+      resourceType: null,
+      resourceId: null,
+      status: 'SUCCESS',
+      ipAddress: null,
+      requestId: null,
+      createdAt: date,
+      metadata: null,
+      userAgent: null,
     };
     mockSelect.mockImplementation(buildSelectMock([[dbRow], [{ total: 1 }]]));
-    const result = await service.getAuditLog('tenant-1', { limit: 10, offset: 0 });
+    const result = await service.getAuditLog('tenant-1', {
+      limit: 10,
+      offset: 0,
+    });
     expect(result.entries[0]?.createdAt).toBe(date.toISOString());
   });
 
@@ -180,13 +229,27 @@ describe('AuditLogService', () => {
     const { db } = await import('@edusphere/db');
     const mockSelect = db.select as ReturnType<typeof vi.fn>;
     const dbRow = {
-      id: 'e1', tenantId: 't1', userId: 'u1', action: 'LOGIN',
-      resourceType: null, resourceId: null, status: 'SUCCESS',
-      ipAddress: null, requestId: null, createdAt: new Date(), metadata: null, userAgent: null,
+      id: 'e1',
+      tenantId: 't1',
+      userId: 'u1',
+      action: 'LOGIN',
+      resourceType: null,
+      resourceId: null,
+      status: 'SUCCESS',
+      ipAddress: null,
+      requestId: null,
+      createdAt: new Date(),
+      metadata: null,
+      userAgent: null,
     };
     // exportAuditLog calls getAuditLog internally → 2 selects (rows + count)
     mockSelect.mockImplementation(buildSelectMock([[dbRow], [{ total: 1 }]]));
-    const result = await service.exportAuditLog('tenant-1', '2026-01-01', '2026-01-31', 'CSV');
+    const result = await service.exportAuditLog(
+      'tenant-1',
+      '2026-01-01',
+      '2026-01-31',
+      'CSV'
+    );
     expect(result.presignedUrl).toBe('https://minio/audit-export.csv');
     expect(result.recordCount).toBe(1);
   });
@@ -196,7 +259,12 @@ describe('AuditLogService', () => {
     const { db } = await import('@edusphere/db');
     const mockSelect = db.select as ReturnType<typeof vi.fn>;
     mockSelect.mockImplementation(buildSelectMock([[], [{ total: 0 }]]));
-    const result = await service.exportAuditLog('tenant-1', '2026-01-01', '2026-01-31', 'JSON');
+    const result = await service.exportAuditLog(
+      'tenant-1',
+      '2026-01-01',
+      '2026-01-31',
+      'JSON'
+    );
     expect(new Date(result.expiresAt).getTime()).toBeGreaterThan(Date.now());
   });
 });

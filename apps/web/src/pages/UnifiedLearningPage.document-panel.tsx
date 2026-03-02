@@ -27,7 +27,12 @@ interface Props {
   textAnnotations: TextRangeAnnotation[];
   focusedAnnotationId: string | null;
   onAnnotationClick: (id: string) => void;
-  onAddTextAnnotation: (args: { text: string; layer: AnnotationLayer; from: number; to: number }) => void;
+  onAddTextAnnotation: (args: {
+    text: string;
+    layer: AnnotationLayer;
+    from: number;
+    to: number;
+  }) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   onScroll: (e: React.UIEvent<HTMLDivElement>) => void;
   documentZoom: number;
@@ -42,7 +47,9 @@ function LinkViewer({ url }: { url: string }) {
   // Also set a 10 s deadline: browsers that honour X-Frame-Options / CSP
   // frame-ancestors show a blank iframe and never fire onError — this
   // heuristic catches those cases.  onLoad cancels the timer on success.
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
   useEffect(() => {
     setIframeBlocked(false);
     timeoutRef.current = setTimeout(() => setIframeBlocked(true), 10_000);
@@ -62,9 +69,15 @@ function LinkViewer({ url }: { url: string }) {
       {/* Header bar */}
       <div className="flex items-center gap-2 px-3 py-2 border-b flex-shrink-0 bg-muted/20">
         <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
-        <span className="text-xs text-muted-foreground truncate flex-1">{url}</span>
-        <Button size="sm" variant="outline" className="h-7 text-xs shrink-0 gap-1"
-          onClick={openExternal}>
+        <span className="text-xs text-muted-foreground truncate flex-1">
+          {url}
+        </span>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs shrink-0 gap-1"
+          onClick={openExternal}
+        >
           <ExternalLink className="h-3 w-3" />
           פתח בחלון חדש
         </Button>
@@ -116,7 +129,8 @@ export function DocumentPanel({
   defaultAnnotationLayer,
 }: Props) {
   const { t } = useTranslation('content');
-  const [pendingSelection, setPendingSelection] = useState<SelectionState | null>(null);
+  const [pendingSelection, setPendingSelection] =
+    useState<SelectionState | null>(null);
   const [showForm, setShowForm] = useState(false);
   const pendingRef = useRef(pendingSelection);
   pendingRef.current = pendingSelection;
@@ -127,23 +141,30 @@ export function DocumentPanel({
   }, []);
 
   const handleAddCommentClick = useCallback((pos: { x: number; y: number }) => {
-    setPendingSelection((prev) => prev ? { ...prev, x: pos.x, y: pos.y } : null);
+    setPendingSelection((prev) =>
+      prev ? { ...prev, x: pos.x, y: pos.y } : null
+    );
     setShowForm(true);
   }, []);
 
-  const handleFormSubmit = useCallback((text: string, layer: AnnotationLayer) => {
-    const sel = pendingRef.current;
-    if (!sel) return;
-    onAddTextAnnotation({ text, layer, from: sel.from, to: sel.to });
-    setShowForm(false);
-    setPendingSelection(null);
-  }, [onAddTextAnnotation]);
+  const handleFormSubmit = useCallback(
+    (text: string, layer: AnnotationLayer) => {
+      const sel = pendingRef.current;
+      if (!sel) return;
+      onAddTextAnnotation({ text, layer, from: sel.from, to: sel.to });
+      setShowForm(false);
+      setPendingSelection(null);
+    },
+    [onAddTextAnnotation]
+  );
 
   if (!hasDocument) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-3">
         <FileText className="h-12 w-12 opacity-20" />
-        <p className="text-sm">{t('noDocumentForContent', 'אין מסמך לתוכן זה')}</p>
+        <p className="text-sm">
+          {t('noDocumentForContent', 'אין מסמך לתוכן זה')}
+        </p>
       </div>
     );
   }

@@ -10,7 +10,13 @@ export default defineConfig({
     hookTimeout: 30000,
     reporters: [
       'default',
-      ['junit', { outputFile: './test-results/results.xml', suiteName: 'subgraph-content' }],
+      [
+        'junit',
+        {
+          outputFile: './test-results/results.xml',
+          suiteName: 'subgraph-content',
+        },
+      ],
     ],
     coverage: {
       provider: 'v8',

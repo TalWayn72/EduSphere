@@ -8,7 +8,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -62,7 +62,9 @@ beforeEach(() => {
     {} as never,
     mockExportReport as never,
   ]);
-  mockExportReport.mockResolvedValue({ data: { exportCpdReport: '/report.pdf' } });
+  mockExportReport.mockResolvedValue({
+    data: { exportCpdReport: '/report.pdf' },
+  });
 });
 
 describe('CPDReportPage', () => {
@@ -152,9 +154,7 @@ describe('CPDReportPage', () => {
       vi.fn(),
     ] as never);
     render(<CPDReportPage />);
-    expect(
-      screen.getByText(/no cpd credits earned yet/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no cpd credits earned yet/i)).toBeInTheDocument();
   });
 
   it('renders history table rows for each entry', () => {

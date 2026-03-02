@@ -26,7 +26,6 @@ interface LessonParent {
   courseId?: string;
 }
 
-
 function requireAuth(ctx: GqlContext): TenantContext {
   const auth = ctx.authContext;
   if (!auth || !auth.tenantId || !auth.userId) {
@@ -48,10 +47,7 @@ export class LessonResolver {
   ) {}
 
   @Query('lesson')
-  async getLesson(
-    @Args('id') id: string,
-    @Context() ctx: GqlContext
-  ) {
+  async getLesson(@Args('id') id: string, @Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
     return this.lessonService.findById(id, tenantCtx);
   }
@@ -96,10 +92,7 @@ export class LessonResolver {
   }
 
   @Mutation('deleteLesson')
-  async deleteLesson(
-    @Args('id') id: string,
-    @Context() ctx: GqlContext
-  ) {
+  async deleteLesson(@Args('id') id: string, @Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
     return this.lessonService.delete(id, tenantCtx);
   }
@@ -143,10 +136,7 @@ export class LessonResolver {
   }
 
   @Mutation('publishLesson')
-  async publishLesson(
-    @Args('id') id: string,
-    @Context() ctx: GqlContext
-  ) {
+  async publishLesson(@Args('id') id: string, @Context() ctx: GqlContext) {
     const tenantCtx = requireAuth(ctx);
     return this.lessonService.publish(id, tenantCtx);
   }
@@ -168,5 +158,4 @@ export class LessonResolver {
     // Citations populated by CitationVerifierWorkflow via pipeline results
     return [];
   }
-
 }

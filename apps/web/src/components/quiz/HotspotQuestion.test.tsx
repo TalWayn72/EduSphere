@@ -24,12 +24,16 @@ describe('HotspotQuestion', () => {
 
   it('renders the question text', () => {
     render(<HotspotQuestion item={mockItem} value={[]} onChange={onChange} />);
-    expect(screen.getByText('Click on the heart in the diagram')).toBeInTheDocument();
+    expect(
+      screen.getByText('Click on the heart in the diagram')
+    ).toBeInTheDocument();
   });
 
   it('renders the instruction hint', () => {
     render(<HotspotQuestion item={mockItem} value={[]} onChange={onChange} />);
-    expect(screen.getByText('Click on the correct area(s) in the image')).toBeInTheDocument();
+    expect(
+      screen.getByText('Click on the correct area(s) in the image')
+    ).toBeInTheDocument();
   });
 
   it('renders the image with alt text', () => {
@@ -57,7 +61,9 @@ describe('HotspotQuestion', () => {
   });
 
   it('selected hotspots have aria-pressed="true"', () => {
-    render(<HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />);
+    render(
+      <HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />
+    );
     const heartBtn = screen.getByRole('button', { name: 'Heart' });
     expect(heartBtn).toHaveAttribute('aria-pressed', 'true');
   });
@@ -69,25 +75,38 @@ describe('HotspotQuestion', () => {
   });
 
   it('calls onChange with removed id when a selected hotspot is clicked', () => {
-    render(<HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />);
+    render(
+      <HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Heart' }));
     expect(onChange).toHaveBeenCalledWith([]);
   });
 
   it('calls onChange with multiple ids when several hotspots selected', () => {
-    render(<HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />);
+    render(
+      <HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Lung' }));
     expect(onChange).toHaveBeenCalledWith(['heart', 'lung']);
   });
 
   it('does not call onChange when disabled', () => {
-    render(<HotspotQuestion item={mockItem} value={[]} onChange={onChange} disabled />);
+    render(
+      <HotspotQuestion
+        item={mockItem}
+        value={[]}
+        onChange={onChange}
+        disabled
+      />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Heart' }));
     expect(onChange).not.toHaveBeenCalled();
   });
 
   it('shows label text for selected hotspot', () => {
-    render(<HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />);
+    render(
+      <HotspotQuestion item={mockItem} value={['heart']} onChange={onChange} />
+    );
     // The <text> SVG element for the selected label should be in the document
     expect(screen.getByText('Heart')).toBeInTheDocument();
   });

@@ -86,7 +86,10 @@ export function LtiSettingsPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<RegisterFormState>(EMPTY_FORM);
   const [copied, setCopied] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState<{
+    ok: boolean;
+    message: string;
+  } | null>(null);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [{ data, fetching, error }, refetch] = useQuery<{
@@ -144,7 +147,10 @@ export function LtiSettingsPage() {
           : 'JWKS unreachable: HTTP ' + res.status,
       });
     } catch (err) {
-      setTestResult({ ok: false, message: 'Connection failed: ' + String(err) });
+      setTestResult({
+        ok: false,
+        message: 'Connection failed: ' + String(err),
+      });
     }
   };
 
@@ -251,7 +257,11 @@ export function LtiSettingsPage() {
           <div
             role="status"
             aria-live="polite"
-            className={testResult.ok ? 'flex items-center gap-2 text-green-600 text-sm' : 'flex items-center gap-2 text-destructive text-sm'}
+            className={
+              testResult.ok
+                ? 'flex items-center gap-2 text-green-600 text-sm'
+                : 'flex items-center gap-2 text-destructive text-sm'
+            }
           >
             <AlertCircle className="h-4 w-4 shrink-0" />
             {testResult.message}

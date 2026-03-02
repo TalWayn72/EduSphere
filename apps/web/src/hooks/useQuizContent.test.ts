@@ -2,7 +2,8 @@
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -25,21 +26,40 @@ import * as urql from 'urql';
 import { QuizContentSchema } from '../lib/quiz-schema-client';
 import { useQuizContent } from './useQuizContent';
 
-type UseQueryReturn = [{ data: unknown; fetching: boolean; error: unknown }, () => void];
+type UseQueryReturn = [
+  { data: unknown; fetching: boolean; error: unknown },
+  () => void,
+];
 
-function makeResult(overrides: Partial<{ data: unknown; fetching: boolean; error: unknown }>): UseQueryReturn {
-  return [{ data: undefined, fetching: false, error: undefined, ...overrides }, vi.fn()];
+function makeResult(
+  overrides: Partial<{ data: unknown; fetching: boolean; error: unknown }>
+): UseQueryReturn {
+  return [
+    { data: undefined, fetching: false, error: undefined, ...overrides },
+    vi.fn(),
+  ];
 }
 
 beforeEach(() => {
   vi.mocked(urql.useQuery).mockReturnValue(makeResult({}));
-  vi.mocked(QuizContentSchema.safeParse).mockReturnValue({ success: false } as ReturnType<typeof QuizContentSchema.safeParse>);
+  vi.mocked(QuizContentSchema.safeParse).mockReturnValue({
+    success: false,
+  } as ReturnType<typeof QuizContentSchema.safeParse>);
 });
 
 describe('useQuizContent', () => {
   it('isQuiz=false for non-QUIZ contentType', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeResult({ data: { contentItem: { id: 'ci-1', contentType: 'VIDEO', title: 'Vid', content: null } } })
+      makeResult({
+        data: {
+          contentItem: {
+            id: 'ci-1',
+            contentType: 'VIDEO',
+            title: 'Vid',
+            content: null,
+          },
+        },
+      })
     );
     const { result } = renderHook(() => useQuizContent('ci-1'));
     expect(result.current.isQuiz).toBe(false);
@@ -48,7 +68,16 @@ describe('useQuizContent', () => {
 
   it('isQuiz=true for QUIZ contentType', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeResult({ data: { contentItem: { id: 'ci-2', contentType: 'QUIZ', title: 'My Quiz', content: null } } })
+      makeResult({
+        data: {
+          contentItem: {
+            id: 'ci-2',
+            contentType: 'QUIZ',
+            title: 'My Quiz',
+            content: null,
+          },
+        },
+      })
     );
     const { result } = renderHook(() => useQuizContent('ci-2'));
     expect(result.current.isQuiz).toBe(true);
@@ -56,7 +85,16 @@ describe('useQuizContent', () => {
 
   it('quizContent=null when JSON content is invalid', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeResult({ data: { contentItem: { id: 'ci-3', contentType: 'QUIZ', title: 'Bad JSON', content: '{invalid' } } })
+      makeResult({
+        data: {
+          contentItem: {
+            id: 'ci-3',
+            contentType: 'QUIZ',
+            title: 'Bad JSON',
+            content: '{invalid',
+          },
+        },
+      })
     );
     const { result } = renderHook(() => useQuizContent('ci-3'));
     expect(result.current.quizContent).toBeNull();
@@ -97,7 +135,16 @@ describe('useQuizContent', () => {
 
   it('error is null when no error', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeResult({ data: { contentItem: { id: 'ci-6', contentType: 'VIDEO', title: 'T', content: null } } })
+      makeResult({
+        data: {
+          contentItem: {
+            id: 'ci-6',
+            contentType: 'VIDEO',
+            title: 'T',
+            content: null,
+          },
+        },
+      })
     );
     const { result } = renderHook(() => useQuizContent('ci-6'));
     expect(result.current.error).toBeNull();
@@ -113,12 +160,16 @@ describe('useQuizContent', () => {
 
   it('pauses query when contentItemId is empty', () => {
     renderHook(() => useQuizContent(''));
-    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as { pause?: boolean };
+    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as {
+      pause?: boolean;
+    };
     expect(callArgs?.pause).toBe(true);
   });
 
   it('quizContent=null when safeParse returns success=false for valid JSON', () => {
-    vi.mocked(QuizContentSchema.safeParse).mockReturnValue({ success: false } as ReturnType<typeof QuizContentSchema.safeParse>);
+    vi.mocked(QuizContentSchema.safeParse).mockReturnValue({
+      success: false,
+    } as ReturnType<typeof QuizContentSchema.safeParse>);
     vi.mocked(urql.useQuery).mockReturnValue(
       makeResult({
         data: {

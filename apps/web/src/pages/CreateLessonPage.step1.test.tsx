@@ -32,9 +32,7 @@ describe('CreateLessonStep1', () => {
 
   it('renders the title input with correct placeholder', () => {
     renderStep1();
-    expect(
-      screen.getByPlaceholderText(/שיעור עץ חיים/i)
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/שיעור עץ חיים/i)).toBeInTheDocument();
   });
 
   it('renders THEMATIC and SEQUENTIAL radio options', () => {

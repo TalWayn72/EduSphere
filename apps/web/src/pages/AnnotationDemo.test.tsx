@@ -31,7 +31,9 @@ import AnnotationDemo from './AnnotationDemo';
 describe('AnnotationDemo', () => {
   it('renders the page heading', () => {
     render(<AnnotationDemo />);
-    expect(screen.getByRole('heading', { name: /Annotation System Demo/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Annotation System Demo/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the subtitle description', () => {
@@ -53,12 +55,16 @@ describe('AnnotationDemo', () => {
 
   it('renders the lecture title heading', () => {
     render(<AnnotationDemo />);
-    expect(screen.getByText(/Introduction to Logical Reasoning/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Introduction to Logical Reasoning/i)
+    ).toBeInTheDocument();
   });
 
   it('renders the description prose text', () => {
     render(<AnnotationDemo />);
-    expect(screen.getByText(/deductive and inductive arguments/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/deductive and inductive arguments/i)
+    ).toBeInTheDocument();
   });
 
   it('renders AnnotationPanel with correct props', () => {

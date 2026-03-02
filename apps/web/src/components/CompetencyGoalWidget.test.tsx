@@ -8,7 +8,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -29,11 +29,23 @@ vi.mock('@/components/GoalPathPanel', () => ({
   ),
 }));
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
 const MOCK_GOALS = [
-  { id: 'g1', targetConceptName: 'Machine Learning', targetLevel: null, createdAt: '2026-01-01' },
-  { id: 'g2', targetConceptName: 'Graph Theory', targetLevel: 'advanced', createdAt: '2026-01-02' },
+  {
+    id: 'g1',
+    targetConceptName: 'Machine Learning',
+    targetLevel: null,
+    createdAt: '2026-01-01',
+  },
+  {
+    id: 'g2',
+    targetConceptName: 'Graph Theory',
+    targetLevel: 'advanced',
+    createdAt: '2026-01-02',
+  },
 ];
 
 function renderWidget() {
@@ -85,7 +97,9 @@ describe('CompetencyGoalWidget', () => {
 
   it('shows "Explore full Knowledge Graph" link when goals exist', () => {
     renderWidget();
-    const link = screen.getByRole('link', { name: /explore full knowledge graph/i });
+    const link = screen.getByRole('link', {
+      name: /explore full knowledge graph/i,
+    });
     expect(link).toHaveAttribute('href', '/knowledge');
   });
 

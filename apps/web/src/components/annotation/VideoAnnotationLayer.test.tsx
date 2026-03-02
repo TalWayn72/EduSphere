@@ -111,9 +111,7 @@ describe('VideoAnnotationLayer', () => {
 
   it('renders the annotation layer container', () => {
     render(<VideoAnnotationLayer {...defaultProps} />);
-    expect(
-      screen.getByLabelText('Video annotation layer')
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Video annotation layer')).toBeInTheDocument();
   });
 
   it('renders AnnotationTimeline with annotations', () => {
@@ -170,7 +168,9 @@ describe('VideoAnnotationLayer', () => {
       expect(mockAddAnnotation).toHaveBeenCalledWith('my note', 45);
     });
     await waitFor(() => {
-      expect(screen.queryByTestId('add-annotation-form')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('add-annotation-form')
+      ).not.toBeInTheDocument();
     });
   });
 

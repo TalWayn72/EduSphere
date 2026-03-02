@@ -57,14 +57,32 @@ vi.mock('@edusphere/nats-client', () => ({
 }));
 
 vi.mock('@edusphere/langgraph-workflows', () => ({
-  createLessonIngestionWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({}) })),
-  createHebrewNERWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ entities: [], enrichedTranscript: '' }) })),
-  createContentCleaningWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ cleanedText: '' }) })),
-  createSummarizationWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ shortSummary: '', longSummary: '', keyPoints: [] }) })),
-  createStructuredNotesWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ outputMarkdown: '' }) })),
-  createDiagramGeneratorWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ mermaidSrc: '', svgOutput: '' }) })),
-  createCitationVerifierWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ matchReport: '' }) })),
-  createQAWorkflow: vi.fn(() => ({ run: vi.fn().mockResolvedValue({ overallScore: 1, fixList: [] }) })),
+  createLessonIngestionWorkflow: vi.fn(() => ({
+    run: vi.fn().mockResolvedValue({}),
+  })),
+  createHebrewNERWorkflow: vi.fn(() => ({
+    run: vi.fn().mockResolvedValue({ entities: [], enrichedTranscript: '' }),
+  })),
+  createContentCleaningWorkflow: vi.fn(() => ({
+    run: vi.fn().mockResolvedValue({ cleanedText: '' }),
+  })),
+  createSummarizationWorkflow: vi.fn(() => ({
+    run: vi
+      .fn()
+      .mockResolvedValue({ shortSummary: '', longSummary: '', keyPoints: [] }),
+  })),
+  createStructuredNotesWorkflow: vi.fn(() => ({
+    run: vi.fn().mockResolvedValue({ outputMarkdown: '' }),
+  })),
+  createDiagramGeneratorWorkflow: vi.fn(() => ({
+    run: vi.fn().mockResolvedValue({ mermaidSrc: '', svgOutput: '' }),
+  })),
+  createCitationVerifierWorkflow: vi.fn(() => ({
+    run: vi.fn().mockResolvedValue({ matchReport: '' }),
+  })),
+  createQAWorkflow: vi.fn(() => ({
+    run: vi.fn().mockResolvedValue({ overallScore: 1, fixList: [] }),
+  })),
 }));
 
 import { LessonPipelineOrchestratorService } from './lesson-pipeline-orchestrator.service';
@@ -84,10 +102,12 @@ describe('LessonPipelineOrchestratorService — memory safety', () => {
     const abort1 = vi.spyOn(ctrl1, 'abort');
     const abort2 = vi.spyOn(ctrl2, 'abort');
 
-    (service as unknown as { activeControllers: Set<AbortController> })
-      .activeControllers.add(ctrl1);
-    (service as unknown as { activeControllers: Set<AbortController> })
-      .activeControllers.add(ctrl2);
+    (
+      service as unknown as { activeControllers: Set<AbortController> }
+    ).activeControllers.add(ctrl1);
+    (
+      service as unknown as { activeControllers: Set<AbortController> }
+    ).activeControllers.add(ctrl2);
 
     await service.onModuleDestroy();
 
@@ -97,8 +117,9 @@ describe('LessonPipelineOrchestratorService — memory safety', () => {
 
   it('activeControllers Set is empty after onModuleDestroy', async () => {
     const ctrl = new AbortController();
-    (service as unknown as { activeControllers: Set<AbortController> })
-      .activeControllers.add(ctrl);
+    (
+      service as unknown as { activeControllers: Set<AbortController> }
+    ).activeControllers.add(ctrl);
 
     await service.onModuleDestroy();
 
@@ -110,8 +131,9 @@ describe('LessonPipelineOrchestratorService — memory safety', () => {
 
   it('runControllers Map is empty after onModuleDestroy', async () => {
     const ctrl = new AbortController();
-    (service as unknown as { runControllers: Map<string, AbortController> })
-      .runControllers.set('run-test-1', ctrl);
+    (
+      service as unknown as { runControllers: Map<string, AbortController> }
+    ).runControllers.set('run-test-1', ctrl);
 
     await service.onModuleDestroy();
 
@@ -138,16 +160,22 @@ describe('LessonPipelineOrchestratorService — memory safety', () => {
     const ctrl = new AbortController();
     const abortSpy = vi.spyOn(ctrl, 'abort');
 
-    (service as unknown as { activeControllers: Set<AbortController> })
-      .activeControllers.add(ctrl);
-    (service as unknown as { runControllers: Map<string, AbortController> })
-      .runControllers.set('run-cancel-1', ctrl);
+    (
+      service as unknown as { activeControllers: Set<AbortController> }
+    ).activeControllers.add(ctrl);
+    (
+      service as unknown as { runControllers: Map<string, AbortController> }
+    ).runControllers.set('run-cancel-1', ctrl);
 
     service.cancelRun('run-cancel-1');
 
     expect(abortSpy).toHaveBeenCalledOnce();
-    const active = (service as unknown as { activeControllers: Set<AbortController> }).activeControllers;
-    const running = (service as unknown as { runControllers: Map<string, AbortController> }).runControllers;
+    const active = (
+      service as unknown as { activeControllers: Set<AbortController> }
+    ).activeControllers;
+    const running = (
+      service as unknown as { runControllers: Map<string, AbortController> }
+    ).runControllers;
     expect(active.has(ctrl)).toBe(false);
     expect(running.has('run-cancel-1')).toBe(false);
   });

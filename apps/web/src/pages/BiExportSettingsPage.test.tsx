@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -63,10 +64,7 @@ const MOCK_TOKENS = [
 
 const MOCK_EXECUTE = vi.fn().mockResolvedValue({ error: undefined });
 
-function setupUrql(
-  tokens: typeof MOCK_TOKENS | [] = [],
-  fetching = false
-) {
+function setupUrql(tokens: typeof MOCK_TOKENS | [] = [], fetching = false) {
   vi.mocked(urql.useQuery).mockReturnValue([
     {
       data: { biApiTokens: tokens },
@@ -161,9 +159,7 @@ describe('BiExportSettingsPage', () => {
   it('shows "No tokens yet" message when token list is empty', () => {
     setupUrql([]);
     renderPage();
-    expect(
-      screen.getByText(/no tokens yet/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no tokens yet/i)).toBeInTheDocument();
   });
 
   it('shows loading indicator when tokens are fetching', () => {
@@ -188,9 +184,7 @@ describe('BiExportSettingsPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /generate token/i }));
     // The Generate button inside the modal
-    expect(
-      screen.getByRole('button', { name: /^generate$/i })
-    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: /^generate$/i })).toBeDisabled();
   });
 
   it('renders token description when tokens exist', () => {

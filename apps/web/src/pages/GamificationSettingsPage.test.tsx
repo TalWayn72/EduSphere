@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -69,10 +70,7 @@ const MOCK_BADGES = [
 
 const MOCK_EXECUTE = vi.fn().mockResolvedValue({ error: undefined });
 
-function setupUrql(
-  badges: typeof MOCK_BADGES | [] = [],
-  fetching = false
-) {
+function setupUrql(badges: typeof MOCK_BADGES | [] = [], fetching = false) {
   vi.mocked(urql.useQuery).mockReturnValue([
     {
       data: { adminBadges: badges },

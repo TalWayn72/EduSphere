@@ -164,9 +164,9 @@ describe('AutoPathService', () => {
         'STUDENT'
       );
 
-      expect(
-        result!.nodes.every((n) => Array.isArray(n.contentItems))
-      ).toBe(true);
+      expect(result!.nodes.every((n) => Array.isArray(n.contentItems))).toBe(
+        true
+      );
     });
   });
 });

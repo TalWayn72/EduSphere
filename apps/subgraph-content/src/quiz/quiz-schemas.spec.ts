@@ -15,7 +15,14 @@ import {
 
 describe('QuizItemTypeSchema', () => {
   it('accepts all 6 valid enum values', () => {
-    const types = ['MULTIPLE_CHOICE', 'DRAG_ORDER', 'HOTSPOT', 'MATCHING', 'LIKERT', 'FILL_BLANK'];
+    const types = [
+      'MULTIPLE_CHOICE',
+      'DRAG_ORDER',
+      'HOTSPOT',
+      'MATCHING',
+      'LIKERT',
+      'FILL_BLANK',
+    ];
     for (const t of types) {
       expect(QuizItemTypeSchema.parse(t)).toBe(t);
     }
@@ -48,27 +55,42 @@ describe('MultipleChoiceSchema', () => {
   });
 
   it('accepts optional explanation', () => {
-    const result = MultipleChoiceSchema.parse({ ...valid, explanation: 'Because math.' });
+    const result = MultipleChoiceSchema.parse({
+      ...valid,
+      explanation: 'Because math.',
+    });
     expect(result.explanation).toBe('Because math.');
   });
 
   it('rejects fewer than 2 options', () => {
     expect(() =>
-      MultipleChoiceSchema.parse({ ...valid, options: [{ id: 'a', text: 'Only one' }] })
+      MultipleChoiceSchema.parse({
+        ...valid,
+        options: [{ id: 'a', text: 'Only one' }],
+      })
     ).toThrow();
   });
 
   it('rejects more than 8 options', () => {
-    const tooMany = Array.from({ length: 9 }, (_, i) => ({ id: String(i), text: `Opt ${i}` }));
-    expect(() => MultipleChoiceSchema.parse({ ...valid, options: tooMany })).toThrow();
+    const tooMany = Array.from({ length: 9 }, (_, i) => ({
+      id: String(i),
+      text: `Opt ${i}`,
+    }));
+    expect(() =>
+      MultipleChoiceSchema.parse({ ...valid, options: tooMany })
+    ).toThrow();
   });
 
   it('rejects empty correctOptionIds', () => {
-    expect(() => MultipleChoiceSchema.parse({ ...valid, correctOptionIds: [] })).toThrow();
+    expect(() =>
+      MultipleChoiceSchema.parse({ ...valid, correctOptionIds: [] })
+    ).toThrow();
   });
 
   it('rejects empty question', () => {
-    expect(() => MultipleChoiceSchema.parse({ ...valid, question: '' })).toThrow();
+    expect(() =>
+      MultipleChoiceSchema.parse({ ...valid, question: '' })
+    ).toThrow();
   });
 });
 
@@ -99,7 +121,9 @@ describe('DragOrderSchema', () => {
   });
 
   it('rejects correctOrder with fewer than 2 entries', () => {
-    expect(() => DragOrderSchema.parse({ ...valid, correctOrder: ['a'] })).toThrow();
+    expect(() =>
+      DragOrderSchema.parse({ ...valid, correctOrder: ['a'] })
+    ).toThrow();
   });
 });
 
@@ -122,16 +146,22 @@ describe('HotspotSchema', () => {
   });
 
   it('rejects invalid imageUrl', () => {
-    expect(() => HotspotSchema.parse({ ...valid, imageUrl: 'not-a-url' })).toThrow();
+    expect(() =>
+      HotspotSchema.parse({ ...valid, imageUrl: 'not-a-url' })
+    ).toThrow();
   });
 
   it('rejects empty correctHotspotIds', () => {
-    expect(() => HotspotSchema.parse({ ...valid, correctHotspotIds: [] })).toThrow();
+    expect(() =>
+      HotspotSchema.parse({ ...valid, correctHotspotIds: [] })
+    ).toThrow();
   });
 
   it('rejects x/y out of 0-100 range', () => {
     const badHotspot = [{ id: 'h1', x: 150, y: 60, label: 'Out' }];
-    expect(() => HotspotSchema.parse({ ...valid, hotspots: badHotspot })).toThrow();
+    expect(() =>
+      HotspotSchema.parse({ ...valid, hotspots: badHotspot })
+    ).toThrow();
   });
 });
 
@@ -164,13 +194,19 @@ describe('MatchingSchema', () => {
 
   it('rejects fewer than 2 leftItems', () => {
     expect(() =>
-      MatchingSchema.parse({ ...valid, leftItems: [{ id: 'l1', text: 'Solo' }] })
+      MatchingSchema.parse({
+        ...valid,
+        leftItems: [{ id: 'l1', text: 'Solo' }],
+      })
     ).toThrow();
   });
 
   it('rejects fewer than 2 rightItems', () => {
     expect(() =>
-      MatchingSchema.parse({ ...valid, rightItems: [{ id: 'r1', text: 'Solo' }] })
+      MatchingSchema.parse({
+        ...valid,
+        rightItems: [{ id: 'r1', text: 'Solo' }],
+      })
     ).toThrow();
   });
 });
@@ -203,7 +239,10 @@ describe('LikertSchema', () => {
   });
 
   it('accepts optional labels object', () => {
-    const result = LikertSchema.parse({ ...valid, labels: { min: 'Disagree', max: 'Agree' } });
+    const result = LikertSchema.parse({
+      ...valid,
+      labels: { min: 'Disagree', max: 'Agree' },
+    });
     expect(result.labels?.min).toBe('Disagree');
   });
 });
@@ -225,21 +264,34 @@ describe('FillBlankSchema', () => {
   });
 
   it('accepts explicit useSemanticMatching=true', () => {
-    const result = FillBlankSchema.parse({ ...valid, useSemanticMatching: true });
+    const result = FillBlankSchema.parse({
+      ...valid,
+      useSemanticMatching: true,
+    });
     expect(result.useSemanticMatching).toBe(true);
   });
 
   it('accepts similarityThreshold within 0-1', () => {
-    expect(FillBlankSchema.parse({ ...valid, similarityThreshold: 0 }).similarityThreshold).toBe(0);
-    expect(FillBlankSchema.parse({ ...valid, similarityThreshold: 1 }).similarityThreshold).toBe(1);
+    expect(
+      FillBlankSchema.parse({ ...valid, similarityThreshold: 0 })
+        .similarityThreshold
+    ).toBe(0);
+    expect(
+      FillBlankSchema.parse({ ...valid, similarityThreshold: 1 })
+        .similarityThreshold
+    ).toBe(1);
   });
 
   it('rejects similarityThreshold above 1', () => {
-    expect(() => FillBlankSchema.parse({ ...valid, similarityThreshold: 1.1 })).toThrow();
+    expect(() =>
+      FillBlankSchema.parse({ ...valid, similarityThreshold: 1.1 })
+    ).toThrow();
   });
 
   it('rejects empty correctAnswer', () => {
-    expect(() => FillBlankSchema.parse({ ...valid, correctAnswer: '' })).toThrow();
+    expect(() =>
+      FillBlankSchema.parse({ ...valid, correctAnswer: '' })
+    ).toThrow();
   });
 });
 
@@ -250,7 +302,10 @@ describe('QuizItemSchema', () => {
     const item = QuizItemSchema.parse({
       type: 'MULTIPLE_CHOICE',
       question: 'Q?',
-      options: [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }],
+      options: [
+        { id: 'a', text: 'A' },
+        { id: 'b', text: 'B' },
+      ],
       correctOptionIds: ['a'],
     });
     expect(item.type).toBe('MULTIPLE_CHOICE');
@@ -271,7 +326,9 @@ describe('QuizItemSchema', () => {
   });
 
   it('rejects an unknown discriminant', () => {
-    expect(() => QuizItemSchema.parse({ type: 'ESSAY', question: 'Why?' })).toThrow();
+    expect(() =>
+      QuizItemSchema.parse({ type: 'ESSAY', question: 'Why?' })
+    ).toThrow();
   });
 });
 
@@ -281,7 +338,10 @@ describe('QuizContentSchema', () => {
   const mcItem = {
     type: 'MULTIPLE_CHOICE' as const,
     question: 'Q?',
-    options: [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }],
+    options: [
+      { id: 'a', text: 'A' },
+      { id: 'b', text: 'B' },
+    ],
     correctOptionIds: ['a'],
   };
   const likertItem = { type: 'LIKERT' as const, question: 'Rate this' };
@@ -322,7 +382,10 @@ describe('QuizContentSchema', () => {
   });
 
   it('applies explicit passingScore override', () => {
-    const result = QuizContentSchema.parse({ items: [mcItem], passingScore: 80 });
+    const result = QuizContentSchema.parse({
+      items: [mcItem],
+      passingScore: 80,
+    });
     expect(result.passingScore).toBe(80);
   });
 });

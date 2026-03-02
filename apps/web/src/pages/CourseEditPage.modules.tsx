@@ -36,8 +36,16 @@ import {
 } from '@/lib/graphql/content.queries';
 
 const CONTENT_TYPES = [
-  'VIDEO', 'PDF', 'MARKDOWN', 'QUIZ', 'ASSIGNMENT',
-  'LINK', 'AUDIO', 'RICH_DOCUMENT', 'LIVE_SESSION', 'SCORM',
+  'VIDEO',
+  'PDF',
+  'MARKDOWN',
+  'QUIZ',
+  'ASSIGNMENT',
+  'LINK',
+  'AUDIO',
+  'RICH_DOCUMENT',
+  'LIVE_SESSION',
+  'SCORM',
 ] as const;
 
 type ContentType = (typeof CONTENT_TYPES)[number];
@@ -72,15 +80,34 @@ function typeBadgeVariant(type: string): 'default' | 'secondary' | 'outline' {
 }
 
 const TYPE_EMOJI: Record<string, string> = {
-  VIDEO: '🎬', PDF: '📄', MARKDOWN: '📝', QUIZ: '❓',
-  ASSIGNMENT: '✏️', LINK: '🔗', AUDIO: '🎧', RICH_DOCUMENT: '📖',
-  LIVE_SESSION: '📡', SCORM: '📦',
+  VIDEO: '🎬',
+  PDF: '📄',
+  MARKDOWN: '📝',
+  QUIZ: '❓',
+  ASSIGNMENT: '✏️',
+  LINK: '🔗',
+  AUDIO: '🎧',
+  RICH_DOCUMENT: '📖',
+  LIVE_SESSION: '📡',
+  SCORM: '📦',
 };
 
-interface NewModuleForm { title: string; description: string }
-interface NewItemForm { title: string; contentType: ContentType; body: string }
+interface NewModuleForm {
+  title: string;
+  description: string;
+}
+interface NewItemForm {
+  title: string;
+  contentType: ContentType;
+  body: string;
+}
 
-export function CourseEditModules({ courseId, modules: initialModules, onRefetch, onToast }: Props) {
+export function CourseEditModules({
+  courseId,
+  modules: initialModules,
+  onRefetch,
+  onToast,
+}: Props) {
   // Local copy for optimistic reorder
   const [modules, setModules] = useState<ModuleSummary[]>(
     [...initialModules].sort((a, b) => a.orderIndex - b.orderIndex)
@@ -93,10 +120,17 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
   const [editingTitle, setEditingTitle] = useState('');
   // State: which module is showing "Add content item" form
   const [addItemModuleId, setAddItemModuleId] = useState<string | null>(null);
-  const [newItemForm, setNewItemForm] = useState<NewItemForm>({ title: '', contentType: 'MARKDOWN', body: '' });
+  const [newItemForm, setNewItemForm] = useState<NewItemForm>({
+    title: '',
+    contentType: 'MARKDOWN',
+    body: '',
+  });
   // State: add-module form
   const [showAddModule, setShowAddModule] = useState(false);
-  const [newModuleForm, setNewModuleForm] = useState<NewModuleForm>({ title: '', description: '' });
+  const [newModuleForm, setNewModuleForm] = useState<NewModuleForm>({
+    title: '',
+    description: '',
+  });
   // Pending operation tracker (per module id)
   const [pending, setPending] = useState<Set<string>>(new Set());
 
@@ -109,7 +143,11 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
   const setPendingFor = (id: string, on: boolean) => {
     setPending((prev) => {
       const next = new Set(prev);
-      if (on) { next.add(id); } else { next.delete(id); }
+      if (on) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
       return next;
     });
   };
@@ -131,19 +169,28 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
     });
     if (error) {
       setModules(modules); // revert on error
-      onToast(`Reorder failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+      onToast(
+        `Reorder failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+      );
     } else {
       onRefetch();
     }
   };
 
   const handleDeleteModule = async (mod: ModuleSummary) => {
-    if (!window.confirm(`Delete module "${mod.title}"? This will also remove all its content items.`)) return;
+    if (
+      !window.confirm(
+        `Delete module "${mod.title}"? This will also remove all its content items.`
+      )
+    )
+      return;
     setPendingFor(mod.id, true);
     const { error } = await executeDeleteModule({ id: mod.id });
     setPendingFor(mod.id, false);
     if (error) {
-      onToast(`Delete failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+      onToast(
+        `Delete failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+      );
     } else {
       setModules((prev) => prev.filter((m) => m.id !== mod.id));
       onToast(`Module "${mod.title}" deleted`);
@@ -152,14 +199,24 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
 
   const handleSaveModuleTitle = async (mod: ModuleSummary) => {
     const trimmed = editingTitle.trim();
-    if (!trimmed || trimmed === mod.title) { setEditingId(null); return; }
+    if (!trimmed || trimmed === mod.title) {
+      setEditingId(null);
+      return;
+    }
     setPendingFor(mod.id, true);
-    const { error } = await executeUpdateModule({ id: mod.id, input: { title: trimmed } });
+    const { error } = await executeUpdateModule({
+      id: mod.id,
+      input: { title: trimmed },
+    });
     setPendingFor(mod.id, false);
     if (error) {
-      onToast(`Rename failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+      onToast(
+        `Rename failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+      );
     } else {
-      setModules((prev) => prev.map((m) => m.id === mod.id ? { ...m, title: trimmed } : m));
+      setModules((prev) =>
+        prev.map((m) => (m.id === mod.id ? { ...m, title: trimmed } : m))
+      );
       onToast('Module renamed');
     }
     setEditingId(null);
@@ -170,12 +227,22 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
     if (!title) return;
     const orderIndex = modules.length;
     const { data, error } = await executeCreateModule({
-      input: { courseId, title, description: newModuleForm.description || undefined, orderIndex },
+      input: {
+        courseId,
+        title,
+        description: newModuleForm.description || undefined,
+        orderIndex,
+      },
     });
     if (error) {
-      onToast(`Create failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+      onToast(
+        `Create failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+      );
     } else if (data?.createModule) {
-      setModules((prev) => [...prev, { ...data.createModule, contentItems: [] }]);
+      setModules((prev) => [
+        ...prev,
+        { ...data.createModule, contentItems: [] },
+      ]);
       setNewModuleForm({ title: '', description: '' });
       setShowAddModule(false);
       onToast(`Module "${title}" created`);
@@ -203,7 +270,10 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
       setModules((prev) =>
         prev.map((m) =>
           m.id === moduleId
-            ? { ...m, contentItems: [...m.contentItems, data.createContentItem] }
+            ? {
+                ...m,
+                contentItems: [...m.contentItems, data.createContentItem],
+              }
             : m
         )
       );
@@ -262,10 +332,20 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
                       className="h-7 text-sm"
                       autoFocus
                     />
-                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleSaveModuleTitle(mod)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0"
+                      onClick={() => handleSaveModuleTitle(mod)}
+                    >
                       <Check className="h-3.5 w-3.5 text-green-600" />
                     </Button>
-                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setEditingId(null)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0"
+                      onClick={() => setEditingId(null)}
+                    >
                       <X className="h-3.5 w-3.5 text-muted-foreground" />
                     </Button>
                   </div>
@@ -275,9 +355,14 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
                     onClick={() => setExpandedId(isExpanded ? null : mod.id)}
                   >
                     <span className="flex items-center gap-1.5">
-                      <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                      <ChevronRight
+                        className={`h-3.5 w-3.5 shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                      />
                       {mod.title}
-                      <Badge variant="outline" className="ml-1 text-xs font-normal">
+                      <Badge
+                        variant="outline"
+                        className="ml-1 text-xs font-normal"
+                      >
                         {mod.contentItems.length} items
                       </Badge>
                     </span>
@@ -295,7 +380,10 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
                           variant="ghost"
                           size="sm"
                           className="h-7 w-7 p-0"
-                          onClick={() => { setEditingId(mod.id); setEditingTitle(mod.title); }}
+                          onClick={() => {
+                            setEditingId(mod.id);
+                            setEditingTitle(mod.title);
+                          }}
                           aria-label="Rename module"
                         >
                           <Pencil className="h-3.5 w-3.5" />
@@ -320,16 +408,24 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
             {isExpanded && (
               <CardContent className="pt-0 pb-3 px-4 space-y-2">
                 {mod.contentItems.length === 0 ? (
-                  <p className="text-xs text-muted-foreground pl-2">No content items yet.</p>
+                  <p className="text-xs text-muted-foreground pl-2">
+                    No content items yet.
+                  </p>
                 ) : (
                   <ul className="space-y-1.5 pl-2">
                     {[...mod.contentItems]
                       .sort((a, b) => a.orderIndex - b.orderIndex)
                       .map((item) => (
-                        <li key={item.id} className="flex items-center gap-2 text-sm">
+                        <li
+                          key={item.id}
+                          className="flex items-center gap-2 text-sm"
+                        >
                           <span>{TYPE_EMOJI[item.contentType] ?? '📄'}</span>
                           <span className="flex-1 truncate">{item.title}</span>
-                          <Badge variant={typeBadgeVariant(item.contentType)} className="text-xs">
+                          <Badge
+                            variant={typeBadgeVariant(item.contentType)}
+                            className="text-xs"
+                          >
                             {item.contentType}
                           </Badge>
                         </li>
@@ -344,14 +440,24 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
                     <Input
                       placeholder="Title *"
                       value={newItemForm.title}
-                      onChange={(e) => setNewItemForm((f) => ({ ...f, title: e.target.value }))}
+                      onChange={(e) =>
+                        setNewItemForm((f) => ({ ...f, title: e.target.value }))
+                      }
                       className="h-8 text-sm"
                     />
                     <Select
                       value={newItemForm.contentType}
-                      onValueChange={(v) => setNewItemForm((f) => ({ ...f, contentType: v as ContentType }))}
+                      onValueChange={(v) =>
+                        setNewItemForm((f) => ({
+                          ...f,
+                          contentType: v as ContentType,
+                        }))
+                      }
                     >
-                      <SelectTrigger className="h-8 text-sm" aria-label="Content type">
+                      <SelectTrigger
+                        className="h-8 text-sm"
+                        aria-label="Content type"
+                      >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -365,17 +471,30 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
                     <Input
                       placeholder="Body text / URL (optional)"
                       value={newItemForm.body}
-                      onChange={(e) => setNewItemForm((f) => ({ ...f, body: e.target.value }))}
+                      onChange={(e) =>
+                        setNewItemForm((f) => ({ ...f, body: e.target.value }))
+                      }
                       className="h-8 text-sm"
                     />
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => handleAddContentItem(mod.id)} disabled={!newItemForm.title.trim()}>
+                      <Button
+                        size="sm"
+                        onClick={() => handleAddContentItem(mod.id)}
+                        disabled={!newItemForm.title.trim()}
+                      >
                         Add
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => { setAddItemModuleId(null); setNewItemForm({ title: '', contentType: 'MARKDOWN', body: '' }); }}
+                        onClick={() => {
+                          setAddItemModuleId(null);
+                          setNewItemForm({
+                            title: '',
+                            contentType: 'MARKDOWN',
+                            body: '',
+                          });
+                        }}
                       >
                         Cancel
                       </Button>
@@ -406,20 +525,38 @@ export function CourseEditModules({ courseId, modules: initialModules, onRefetch
             <Input
               placeholder="Module title *"
               value={newModuleForm.title}
-              onChange={(e) => setNewModuleForm((f) => ({ ...f, title: e.target.value }))}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleAddModule(); if (e.key === 'Escape') setShowAddModule(false); }}
+              onChange={(e) =>
+                setNewModuleForm((f) => ({ ...f, title: e.target.value }))
+              }
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAddModule();
+                if (e.key === 'Escape') setShowAddModule(false);
+              }}
               autoFocus
             />
             <Input
               placeholder="Description (optional)"
               value={newModuleForm.description}
-              onChange={(e) => setNewModuleForm((f) => ({ ...f, description: e.target.value }))}
+              onChange={(e) =>
+                setNewModuleForm((f) => ({ ...f, description: e.target.value }))
+              }
             />
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleAddModule} disabled={!newModuleForm.title.trim()}>
+              <Button
+                size="sm"
+                onClick={handleAddModule}
+                disabled={!newModuleForm.title.trim()}
+              >
                 Create Module
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => { setShowAddModule(false); setNewModuleForm({ title: '', description: '' }); }}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setShowAddModule(false);
+                  setNewModuleForm({ title: '', description: '' });
+                }}
+              >
                 Cancel
               </Button>
             </div>

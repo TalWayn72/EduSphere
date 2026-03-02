@@ -24,7 +24,11 @@ const makeAnnotation = (overrides: Partial<Annotation>): Annotation => ({
 
 const ANNOTATIONS: Annotation[] = [
   makeAnnotation({ id: 'a1', contentTimestamp: 30 }),
-  makeAnnotation({ id: 'a2', contentTimestamp: 90, layer: AnnotationLayer.SHARED }),
+  makeAnnotation({
+    id: 'a2',
+    contentTimestamp: 90,
+    layer: AnnotationLayer.SHARED,
+  }),
   makeAnnotation({ id: 'a3', contentTimestamp: undefined }), // no timestamp — should be filtered
 ];
 

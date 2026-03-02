@@ -67,28 +67,34 @@ describe('DocumentAnnotationPanel', () => {
 
   it('shows annotation count in header', () => {
     const annotations = [makeAnnotation(), makeAnnotation({ id: 'ann-2' })];
-    render(<DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />);
+    render(
+      <DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />
+    );
     expect(screen.getByText('2 annotations')).toBeInTheDocument();
   });
 
   it('shows singular "annotation" when only one exists', () => {
     const annotations = [makeAnnotation()];
-    render(<DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />);
+    render(
+      <DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />
+    );
     expect(screen.getByText('1 annotation')).toBeInTheDocument();
   });
 
   it('renders annotation content and user name', () => {
     const annotations = [makeAnnotation()];
-    render(<DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />);
+    render(
+      <DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />
+    );
     expect(screen.getByText('This is an insightful note')).toBeInTheDocument();
     expect(screen.getByText('Alice')).toBeInTheDocument();
   });
 
   it('renders text range when textRange is present', () => {
-    const annotations = [
-      makeAnnotation({ textRange: { from: 10, to: 50 } }),
-    ];
-    render(<DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />);
+    const annotations = [makeAnnotation({ textRange: { from: 10, to: 50 } })];
+    render(
+      <DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />
+    );
     expect(screen.getByText('Position: chars 10–50')).toBeInTheDocument();
   });
 
@@ -123,9 +129,14 @@ describe('DocumentAnnotationPanel', () => {
 
   it('renders INSTRUCTOR layer badge with Authority label', () => {
     const annotations = [
-      makeAnnotation({ layer: AnnotationLayer.INSTRUCTOR, userRole: 'instructor' }),
+      makeAnnotation({
+        layer: AnnotationLayer.INSTRUCTOR,
+        userRole: 'instructor',
+      }),
     ];
-    render(<DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />);
+    render(
+      <DocumentAnnotationPanel {...baseProps} allAnnotations={annotations} />
+    );
     expect(screen.getByText(/Authority/)).toBeInTheDocument();
   });
 });

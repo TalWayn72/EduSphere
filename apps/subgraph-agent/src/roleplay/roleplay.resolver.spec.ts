@@ -99,7 +99,11 @@ describe('RoleplayResolver', () => {
 
       const result = await resolver.myScenarioSession('sess-1', makeCtx());
 
-      expect(mockGetSession).toHaveBeenCalledWith('sess-1', 'user-1', 'tenant-1');
+      expect(mockGetSession).toHaveBeenCalledWith(
+        'sess-1',
+        'user-1',
+        'tenant-1'
+      );
       expect(result!.id).toBe('sess-1');
       expect(result!.status).toBe('IN_PROGRESS');
       expect(result!.evaluation).toBeNull();
@@ -118,7 +122,11 @@ describe('RoleplayResolver', () => {
 
       const result = await resolver.startRoleplaySession('s-1', makeCtx());
 
-      expect(mockStartSession).toHaveBeenCalledWith('s-1', 'user-1', 'tenant-1');
+      expect(mockStartSession).toHaveBeenCalledWith(
+        's-1',
+        'user-1',
+        'tenant-1'
+      );
       expect(result.scenarioId).toBe('s-1');
       expect(result.turnCount).toBe(2);
     });

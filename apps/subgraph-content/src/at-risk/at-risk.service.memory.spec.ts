@@ -8,11 +8,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Hoisted mocks (must run before vi.mock factories) ─────────────────────────
 
-const { mockClose, mockCloseAllPools, mockWithTenantContext } = vi.hoisted(() => ({
-  mockClose: vi.fn().mockResolvedValue(undefined),
-  mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
-  mockWithTenantContext: vi.fn().mockResolvedValue([]),
-}));
+const { mockClose, mockCloseAllPools, mockWithTenantContext } = vi.hoisted(
+  () => ({
+    mockClose: vi.fn().mockResolvedValue(undefined),
+    mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
+    mockWithTenantContext: vi.fn().mockResolvedValue([]),
+  })
+);
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -50,7 +52,9 @@ vi.mock('@edusphere/db', () => ({
 }));
 
 vi.mock('./risk-scorer.js', () => ({
-  computeRiskScore: vi.fn().mockReturnValue({ score: 0.5, factors: {}, isAtRisk: false }),
+  computeRiskScore: vi
+    .fn()
+    .mockReturnValue({ score: 0.5, factors: {}, isAtRisk: false }),
 }));
 
 // ── Import after mocks (vi.mock is hoisted, so this is safe) ──────────────────
@@ -59,7 +63,11 @@ import { AtRiskService } from './at-risk.service.js';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const CTX = { tenantId: 'tenant-1', userId: 'user-1', userRole: 'SUPER_ADMIN' as const };
+const CTX = {
+  tenantId: 'tenant-1',
+  userId: 'user-1',
+  userRole: 'SUPER_ADMIN' as const,
+};
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

@@ -94,7 +94,8 @@ describe('LtiResolver', () => {
       name: 'Canvas LMS',
       issuer: 'https://canvas.instructure.com',
       clientId: 'client-abc',
-      authorizationUrl: 'https://canvas.instructure.com/api/lti/authorize_redirect',
+      authorizationUrl:
+        'https://canvas.instructure.com/api/lti/authorize_redirect',
       jwksUrl: 'https://canvas.instructure.com/api/lti/security/jwks',
       tokenUrl: 'https://canvas.instructure.com/login/oauth2/token',
     };

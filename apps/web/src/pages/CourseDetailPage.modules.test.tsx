@@ -41,8 +41,20 @@ const MOCK_MODULES = [
     title: 'Module One',
     orderIndex: 1,
     contentItems: [
-      { id: 'ci-1', title: 'Intro Video', contentType: 'VIDEO', duration: 120, orderIndex: 0 },
-      { id: 'ci-2', title: 'Reading', contentType: 'PDF', duration: null, orderIndex: 1 },
+      {
+        id: 'ci-1',
+        title: 'Intro Video',
+        contentType: 'VIDEO',
+        duration: 120,
+        orderIndex: 0,
+      },
+      {
+        id: 'ci-2',
+        title: 'Reading',
+        contentType: 'PDF',
+        duration: null,
+        orderIndex: 1,
+      },
     ],
   },
   {
@@ -98,14 +110,18 @@ describe('CourseModuleList', () => {
   it('toggles module closed when header is clicked', () => {
     renderList();
     // First module is open; clicking its header should close it
-    const moduleOneHeader = screen.getByText('Module One').closest('[class*="cursor-pointer"]')!;
+    const moduleOneHeader = screen
+      .getByText('Module One')
+      .closest('[class*="cursor-pointer"]')!;
     fireEvent.click(moduleOneHeader);
     expect(screen.queryByText('Intro Video')).not.toBeInTheDocument();
   });
 
   it('opens second (closed) module when its header is clicked', () => {
     renderList();
-    const moduleTwoHeader = screen.getByText('Module Two').closest('[class*="cursor-pointer"]')!;
+    const moduleTwoHeader = screen
+      .getByText('Module Two')
+      .closest('[class*="cursor-pointer"]')!;
     fireEvent.click(moduleTwoHeader);
     expect(screen.getByText('No content items')).toBeInTheDocument();
   });
@@ -113,13 +129,17 @@ describe('CourseModuleList', () => {
   it('navigates to /learn/:id for VIDEO content type', () => {
     renderList();
     fireEvent.click(screen.getByText('Intro Video'));
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/learn/ci-1'));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('/learn/ci-1')
+    );
   });
 
   it('navigates to /document/:id for PDF content type', () => {
     renderList();
     fireEvent.click(screen.getByText('Reading'));
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/document/ci-2'));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('/document/ci-2')
+    );
   });
 
   it('renders duration for content items with duration', () => {
@@ -134,12 +154,20 @@ describe('CourseModuleList', () => {
         title: 'Quiz Module',
         orderIndex: 0,
         contentItems: [
-          { id: 'ci-q', title: 'Final Quiz', contentType: 'QUIZ', duration: null, orderIndex: 0 },
+          {
+            id: 'ci-q',
+            title: 'Final Quiz',
+            contentType: 'QUIZ',
+            duration: null,
+            orderIndex: 0,
+          },
         ],
       },
     ];
     renderList(modulesWithQuiz);
     fireEvent.click(screen.getByText('Final Quiz'));
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/quiz/ci-q'));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('/quiz/ci-q')
+    );
   });
 });

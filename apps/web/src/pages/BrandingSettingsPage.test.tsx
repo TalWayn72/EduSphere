@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -134,7 +135,9 @@ describe('BrandingSettingsPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
     await waitFor(() => {
-      expect(screen.getByText(/branding saved successfully/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/branding saved successfully/i)
+      ).toBeInTheDocument();
     });
   });
 

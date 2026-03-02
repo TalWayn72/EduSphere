@@ -67,11 +67,7 @@ describe('CpdResolver', () => {
     const mockReport = { totalHours: 10, byType: [], entries: [] };
     mockCpdService.getUserCpdReport.mockResolvedValue(mockReport);
 
-    const result = await resolver.myCpdReport(
-      undefined,
-      undefined,
-      makeCtx()
-    );
+    const result = await resolver.myCpdReport(undefined, undefined, makeCtx());
 
     expect(mockCpdService.getUserCpdReport).toHaveBeenCalledWith(
       USER_ID,
@@ -86,12 +82,11 @@ describe('CpdResolver', () => {
 
     await resolver.myCpdReport('2026-01-01', '2026-01-31', makeCtx());
 
-    const [, , dateRange] =
-      mockCpdService.getUserCpdReport.mock.calls[0] as [
-        string,
-        string,
-        { start: Date; end: Date } | undefined,
-      ];
+    const [, , dateRange] = mockCpdService.getUserCpdReport.mock.calls[0] as [
+      string,
+      string,
+      { start: Date; end: Date } | undefined,
+    ];
     expect(dateRange?.start).toBeInstanceOf(Date);
     expect(dateRange?.end).toBeInstanceOf(Date);
     expect(dateRange?.start?.getFullYear()).toBe(2026);

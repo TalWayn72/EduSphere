@@ -60,7 +60,9 @@ export function useCourseNavigation(contentId: string): CourseNavContext {
   // synchronous setState on CourseDetailPage (which shares the same cache entry)
   // during ContentViewerBreadcrumb's render phase.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [courseResult] = useQuery<CourseDetailResult>({
     query: COURSE_DETAIL_QUERY,

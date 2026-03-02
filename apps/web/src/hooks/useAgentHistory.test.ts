@@ -7,10 +7,18 @@ const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
     getItem: vi.fn((key: string) => store[key] ?? null),
-    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
-    removeItem: vi.fn((key: string) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
-    get length() { return Object.keys(store).length; },
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    get length() {
+      return Object.keys(store).length;
+    },
     key: vi.fn((i: number) => Object.keys(store)[i] ?? null),
     _store: store,
   };
@@ -27,7 +35,10 @@ import { useAgentHistory, type AgentHistoryEntry } from './useAgentHistory';
 const STORAGE_KEY = 'edusphere:agent:history:v1';
 const MAX_ENTRIES = 20;
 
-function makeEntry(id: string, overrides: Partial<AgentHistoryEntry> = {}): AgentHistoryEntry {
+function makeEntry(
+  id: string,
+  overrides: Partial<AgentHistoryEntry> = {}
+): AgentHistoryEntry {
   return {
     id,
     contentId: `content-${id}`,
@@ -65,7 +76,9 @@ describe('useAgentHistory', () => {
     const { result } = renderHook(() => useAgentHistory());
     const entry = makeEntry('new-1');
 
-    act(() => { result.current.addSession(entry); });
+    act(() => {
+      result.current.addSession(entry);
+    });
 
     expect(result.current.history[0]).toEqual(entry);
   });
@@ -75,9 +88,15 @@ describe('useAgentHistory', () => {
     const entryB = makeEntry('other');
     const { result } = renderHook(() => useAgentHistory());
 
-    act(() => { result.current.addSession(entryB); });
-    act(() => { result.current.addSession(entryA); });
-    act(() => { result.current.addSession({ ...entryA, messageCount: 5 }); });
+    act(() => {
+      result.current.addSession(entryB);
+    });
+    act(() => {
+      result.current.addSession(entryA);
+    });
+    act(() => {
+      result.current.addSession({ ...entryA, messageCount: 5 });
+    });
 
     expect(result.current.history).toHaveLength(2);
     expect(result.current.history[0].id).toBe('dup');
@@ -100,29 +119,39 @@ describe('useAgentHistory', () => {
     const { result } = renderHook(() => useAgentHistory());
     const entry = makeEntry('persist-me');
 
-    act(() => { result.current.addSession(entry); });
+    act(() => {
+      result.current.addSession(entry);
+    });
 
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
       STORAGE_KEY,
-      JSON.stringify([entry]),
+      JSON.stringify([entry])
     );
   });
 
   it('clearHistory empties in-memory history', () => {
     const { result } = renderHook(() => useAgentHistory());
-    act(() => { result.current.addSession(makeEntry('x')); });
+    act(() => {
+      result.current.addSession(makeEntry('x'));
+    });
     expect(result.current.history).toHaveLength(1);
 
-    act(() => { result.current.clearHistory(); });
+    act(() => {
+      result.current.clearHistory();
+    });
 
     expect(result.current.history).toEqual([]);
   });
 
   it('clearHistory removes the localStorage key', () => {
     const { result } = renderHook(() => useAgentHistory());
-    act(() => { result.current.addSession(makeEntry('y')); });
+    act(() => {
+      result.current.addSession(makeEntry('y'));
+    });
 
-    act(() => { result.current.clearHistory(); });
+    act(() => {
+      result.current.clearHistory();
+    });
 
     expect(localStorageMock.removeItem).toHaveBeenCalledWith(STORAGE_KEY);
   });

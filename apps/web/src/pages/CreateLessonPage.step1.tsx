@@ -36,7 +36,9 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
       <h2 className="text-xl font-semibold mb-4">פרטי שיעור</h2>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">כותרת השיעור *</label>
+          <label className="block text-sm font-medium mb-1">
+            כותרת השיעור *
+          </label>
           <input
             {...register('title')}
             placeholder="לדוג׳: שיעור עץ חיים — שער הנסירה פסקה ג׳"

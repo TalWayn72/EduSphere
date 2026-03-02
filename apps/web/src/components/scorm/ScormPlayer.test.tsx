@@ -6,7 +6,8 @@ import React from 'react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -19,7 +20,9 @@ import * as urql from 'urql';
 const NOOP_UPDATE = vi.fn().mockResolvedValue({ data: null, error: undefined });
 const NOOP_FINISH = vi.fn().mockResolvedValue({ data: null, error: undefined });
 
-function renderPlayer(overrides: Partial<React.ComponentProps<typeof ScormPlayer>> = {}) {
+function renderPlayer(
+  overrides: Partial<React.ComponentProps<typeof ScormPlayer>> = {}
+) {
   return render(
     <ScormPlayer sessionId="session-1" contentItemId="item-1" {...overrides} />
   );
@@ -30,11 +33,23 @@ describe('ScormPlayer', () => {
     vi.clearAllMocks();
     vi.mocked(urql.useMutation)
       .mockReturnValueOnce([
-        { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+        {
+          fetching: false,
+          data: undefined,
+          error: undefined,
+          stale: false,
+          operation: undefined,
+        },
         NOOP_UPDATE,
       ] as unknown as ReturnType<typeof urql.useMutation>)
       .mockReturnValue([
-        { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+        {
+          fetching: false,
+          data: undefined,
+          error: undefined,
+          stale: false,
+          operation: undefined,
+        },
         NOOP_FINISH,
       ] as unknown as ReturnType<typeof urql.useMutation>);
   });
@@ -95,9 +110,17 @@ describe('ScormPlayer', () => {
 
   it('ignores SCORM messages from unknown origins', async () => {
     // updateSession should NOT be called for messages from foreign origins
-    const updateSession = vi.fn().mockResolvedValue({ data: null, error: undefined });
+    const updateSession = vi
+      .fn()
+      .mockResolvedValue({ data: null, error: undefined });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        operation: undefined,
+      },
       updateSession,
     ] as unknown as ReturnType<typeof urql.useMutation>);
 

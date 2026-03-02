@@ -68,8 +68,12 @@ export function CourseEditPage() {
     requestPolicy: 'network-only',
   });
 
-  const [{ fetching: publishing }, executePublish] = useMutation(PUBLISH_COURSE_MUTATION);
-  const [{ fetching: unpublishing }, executeUnpublish] = useMutation(UNPUBLISH_COURSE_MUTATION);
+  const [{ fetching: publishing }, executePublish] = useMutation(
+    PUBLISH_COURSE_MUTATION
+  );
+  const [{ fetching: unpublishing }, executeUnpublish] = useMutation(
+    UNPUBLISH_COURSE_MUTATION
+  );
 
   // Cleanup on unmount
   useEffect(() => {
@@ -91,7 +95,10 @@ export function CourseEditPage() {
     if (!fetching && !error && course) {
       if (!user || !EDITOR_ROLES.has(user.role)) {
         navigate(`/courses/${courseId}`, { replace: true });
-      } else if (user.role === 'INSTRUCTOR' && course.instructorId !== user.id) {
+      } else if (
+        user.role === 'INSTRUCTOR' &&
+        course.instructorId !== user.id
+      ) {
         navigate(`/courses/${courseId}`, { replace: true });
       }
     }
@@ -110,7 +117,9 @@ export function CourseEditPage() {
     if (isCurrentlyPublished) {
       const { error: err } = await executeUnpublish({ id: courseId });
       if (err) {
-        showToast(`Failed to unpublish: ${err.graphQLErrors?.[0]?.message ?? err.message}`);
+        showToast(
+          `Failed to unpublish: ${err.graphQLErrors?.[0]?.message ?? err.message}`
+        );
       } else {
         setPublished(false);
         showToast('Course unpublished — now draft only');
@@ -118,7 +127,9 @@ export function CourseEditPage() {
     } else {
       const { error: err } = await executePublish({ id: courseId });
       if (err) {
-        showToast(`Failed to publish: ${err.graphQLErrors?.[0]?.message ?? err.message}`);
+        showToast(
+          `Failed to publish: ${err.graphQLErrors?.[0]?.message ?? err.message}`
+        );
       } else {
         setPublished(true);
         showToast('Course published successfully!');
@@ -173,7 +184,9 @@ export function CourseEditPage() {
               Back
             </Button>
             <h1 className="text-xl font-semibold truncate">{course.title}</h1>
-            <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${isCurrentlyPublished ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'}`}>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${isCurrentlyPublished ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'}`}
+            >
               {isCurrentlyPublished ? 'Published' : 'Draft'}
             </span>
           </div>

@@ -155,7 +155,9 @@ describe('BrandingMiscCard', () => {
 
   it('checkbox reflects hideEduSphereBranding=false', () => {
     render(<BrandingMiscCard form={BASE_FORM} onChange={vi.fn()} />);
-    const checkbox = screen.getByLabelText('Hide EduSphere Branding') as HTMLInputElement;
+    const checkbox = screen.getByLabelText(
+      'Hide EduSphere Branding'
+    ) as HTMLInputElement;
     expect(checkbox.checked).toBe(false);
   });
 

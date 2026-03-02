@@ -15,7 +15,9 @@ vi.mock('@edusphere/db', () => ({
   })),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   schema: {},
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: () => unknown) => fn()),
+  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: () => unknown) =>
+    fn()
+  ),
   eq: vi.fn(),
   and: vi.fn(),
   desc: vi.fn(),
@@ -90,7 +92,9 @@ describe('CrmResolver', () => {
   // 3. crmConnection returns shaped object when service returns a connection
   it('crmConnection returns mapped object with ISO createdAt when connection exists', async () => {
     mockService.getConnection.mockResolvedValue(CONN);
-    const result = await resolver.crmConnection(makeCtx('tenant-1')) as Record<string, unknown>;
+    const result = (await resolver.crmConnection(
+      makeCtx('tenant-1')
+    )) as Record<string, unknown>;
     expect(result).not.toBeNull();
     expect(result?.['id']).toBe('conn-1');
     expect(result?.['provider']).toBe('SALESFORCE');
@@ -107,7 +111,10 @@ describe('CrmResolver', () => {
   // 5. crmSyncLog maps entries with ISO createdAt
   it('crmSyncLog returns mapped entries with ISO createdAt', async () => {
     mockService.getSyncLog.mockResolvedValue([SYNC_ENTRY]);
-    const result = await resolver.crmSyncLog(makeCtx('tenant-1'), 5) as Record<string, unknown>[];
+    const result = (await resolver.crmSyncLog(
+      makeCtx('tenant-1'),
+      5
+    )) as Record<string, unknown>[];
     expect(result).toHaveLength(1);
     expect(result[0]?.['createdAt']).toBe(SYNC_ENTRY.createdAt.toISOString());
     expect(result[0]?.['operation']).toBe('COMPLETION_SYNC');

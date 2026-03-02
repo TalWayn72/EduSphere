@@ -113,7 +113,9 @@ describe('AnnotationsTab', () => {
   });
 
   it('shows "no annotations" message when list is empty and not fetching', () => {
-    render(<AnnotationsTab {...defaultProps} annotations={[]} fetching={false} />);
+    render(
+      <AnnotationsTab {...defaultProps} annotations={[]} fetching={false} />
+    );
     expect(screen.getByText('content:noAnnotationsVisible')).toBeDefined();
   });
 
@@ -128,8 +130,16 @@ describe('AnnotationsTab', () => {
 
   it('renders annotation threads for visible annotations', () => {
     const anns = [
-      makeAnnotation({ id: 'ann-1', content: 'First note', layer: AnnotationLayer.PERSONAL }),
-      makeAnnotation({ id: 'ann-2', content: 'Second note', layer: AnnotationLayer.SHARED }),
+      makeAnnotation({
+        id: 'ann-1',
+        content: 'First note',
+        layer: AnnotationLayer.PERSONAL,
+      }),
+      makeAnnotation({
+        id: 'ann-2',
+        content: 'Second note',
+        layer: AnnotationLayer.SHARED,
+      }),
     ];
     render(<AnnotationsTab {...defaultProps} annotations={anns} />);
     expect(screen.getByTestId('annotation-thread-ann-1')).toBeDefined();
@@ -138,7 +148,11 @@ describe('AnnotationsTab', () => {
 
   it('does not render reply annotations as top-level threads', () => {
     const parent = makeAnnotation({ id: 'parent', content: 'Parent' });
-    const reply = makeAnnotation({ id: 'reply', content: 'Reply', parentId: 'parent' });
+    const reply = makeAnnotation({
+      id: 'reply',
+      content: 'Reply',
+      parentId: 'parent',
+    });
     render(<AnnotationsTab {...defaultProps} annotations={[parent, reply]} />);
     expect(screen.getByTestId('annotation-thread-parent')).toBeDefined();
     expect(screen.queryByTestId('annotation-thread-reply')).toBeNull();
@@ -148,15 +162,21 @@ describe('AnnotationsTab', () => {
     render(<AnnotationsTab {...defaultProps} />);
     fireEvent.click(screen.getByText('common:add'));
     // The textarea should appear
-    expect(screen.getByPlaceholderText('content:annotationPlaceholder')).toBeDefined();
+    expect(
+      screen.getByPlaceholderText('content:annotationPlaceholder')
+    ).toBeDefined();
   });
 
   it('hides the form after clicking Cancel', () => {
     render(<AnnotationsTab {...defaultProps} />);
     fireEvent.click(screen.getByText('common:add'));
-    expect(screen.getByPlaceholderText('content:annotationPlaceholder')).toBeDefined();
+    expect(
+      screen.getByPlaceholderText('content:annotationPlaceholder')
+    ).toBeDefined();
     fireEvent.click(screen.getByText('common:cancel'));
-    expect(screen.queryByPlaceholderText('content:annotationPlaceholder')).toBeNull();
+    expect(
+      screen.queryByPlaceholderText('content:annotationPlaceholder')
+    ).toBeNull();
   });
 
   it('calls onAddAnnotation with text and current time when form is saved', () => {
@@ -169,7 +189,9 @@ describe('AnnotationsTab', () => {
       />
     );
     fireEvent.click(screen.getByText('common:add'));
-    const textarea = screen.getByPlaceholderText('content:annotationPlaceholder');
+    const textarea = screen.getByPlaceholderText(
+      'content:annotationPlaceholder'
+    );
     fireEvent.change(textarea, { target: { value: 'My annotation' } });
     // Click save (the button containing saveAt key)
     const saveBtn = screen.getByText((t) => t.startsWith('content:saveAt'));
@@ -183,7 +205,9 @@ describe('AnnotationsTab', () => {
 
   it('does not call onAddAnnotation if text is empty', () => {
     const onAddAnnotation = vi.fn();
-    render(<AnnotationsTab {...defaultProps} onAddAnnotation={onAddAnnotation} />);
+    render(
+      <AnnotationsTab {...defaultProps} onAddAnnotation={onAddAnnotation} />
+    );
     fireEvent.click(screen.getByText('common:add'));
     // Don't type anything, just click save
     const saveBtn = screen.getByText((t) => t.startsWith('content:saveAt'));
@@ -194,10 +218,14 @@ describe('AnnotationsTab', () => {
   it('hides form and clears textarea after successful save', () => {
     render(<AnnotationsTab {...defaultProps} />);
     fireEvent.click(screen.getByText('common:add'));
-    const textarea = screen.getByPlaceholderText('content:annotationPlaceholder') as HTMLTextAreaElement;
+    const textarea = screen.getByPlaceholderText(
+      'content:annotationPlaceholder'
+    ) as HTMLTextAreaElement;
     fireEvent.change(textarea, { target: { value: 'Note content' } });
     const saveBtn = screen.getByText((t) => t.startsWith('content:saveAt'));
     fireEvent.click(saveBtn);
-    expect(screen.queryByPlaceholderText('content:annotationPlaceholder')).toBeNull();
+    expect(
+      screen.queryByPlaceholderText('content:annotationPlaceholder')
+    ).toBeNull();
   });
 });

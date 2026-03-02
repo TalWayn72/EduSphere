@@ -8,7 +8,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -29,7 +29,9 @@ vi.mock('@/lib/graphql/content.queries', () => ({
   CREATE_COURSE_MUTATION: 'CREATE_COURSE_MUTATION',
 }));
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
 const defaultProps = {
   open: true,

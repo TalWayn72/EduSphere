@@ -8,8 +8,10 @@ import { AnnotationLayer } from '@/types/annotations';
 /* ── urql ── */
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
-  useQuery: vi.fn(() => [{ data: undefined, fetching: false, error: undefined }]),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
+  useQuery: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+  ]),
   useMutation: vi.fn(() => [{ fetching: false }, vi.fn()]),
 }));
 
@@ -49,7 +51,13 @@ vi.mock('@/components/ContentViewerBreadcrumb', () => ({
 
 /* ── Sub-panels ── */
 vi.mock('@/pages/UnifiedLearningPage.document-panel', () => ({
-  DocumentPanel: ({ content, hasDocument }: { content: string; hasDocument: boolean }) => (
+  DocumentPanel: ({
+    content,
+    hasDocument,
+  }: {
+    content: string;
+    hasDocument: boolean;
+  }) => (
     <div data-testid="document-panel" data-has-doc={String(hasDocument)}>
       {content && <span data-testid="doc-content">{content.slice(0, 20)}</span>}
     </div>
@@ -135,8 +143,14 @@ vi.mock('@/components/NotificationBell', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-    <button onClick={onClick} {...props}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <button onClick={onClick} {...props}>
+      {children}
+    </button>
   ),
 }));
 
@@ -169,7 +183,11 @@ function renderPage(
   ] as never);
 
   return render(
-    <MemoryRouter initialEntries={[`/learn/${contentId}${searchParams ? '?' + searchParams : ''}`]}>
+    <MemoryRouter
+      initialEntries={[
+        `/learn/${contentId}${searchParams ? '?' + searchParams : ''}`,
+      ]}
+    >
       <Routes>
         <Route path="/learn/:contentId" element={<UnifiedLearningPage />} />
       </Routes>
@@ -215,12 +233,16 @@ describe('UnifiedLearningPage', () => {
 
   it('shows video URL from useContentData in tools panel', () => {
     renderPage();
-    expect(screen.getByTestId('video-url')).toHaveTextContent('https://example.com/video.mp4');
+    expect(screen.getByTestId('video-url')).toHaveTextContent(
+      'https://example.com/video.mp4'
+    );
   });
 
   it('uses video title as breadcrumb title when no content item', () => {
     renderPage();
-    expect(screen.getByTestId('breadcrumb-title')).toHaveTextContent('Test Video');
+    expect(screen.getByTestId('breadcrumb-title')).toHaveTextContent(
+      'Test Video'
+    );
   });
 
   it('uses content item title when query returns data', () => {
@@ -234,7 +256,9 @@ describe('UnifiedLearningPage', () => {
         },
       },
     });
-    expect(screen.getByTestId('breadcrumb-title')).toHaveTextContent('Fetched Title');
+    expect(screen.getByTestId('breadcrumb-title')).toHaveTextContent(
+      'Fetched Title'
+    );
   });
 
   it('passes hasDocument=true for document content types', () => {
@@ -248,7 +272,10 @@ describe('UnifiedLearningPage', () => {
         },
       },
     });
-    expect(screen.getByTestId('document-panel')).toHaveAttribute('data-has-doc', 'true');
+    expect(screen.getByTestId('document-panel')).toHaveAttribute(
+      'data-has-doc',
+      'true'
+    );
   });
 
   it('passes hasDocument=false for video content type', () => {
@@ -263,12 +290,17 @@ describe('UnifiedLearningPage', () => {
       },
     });
     // VIDEO type → not in DOC_TYPES → hasDocument = false (no doc content either)
-    expect(screen.getByTestId('document-panel')).toHaveAttribute('data-has-doc', 'false');
+    expect(screen.getByTestId('document-panel')).toHaveAttribute(
+      'data-has-doc',
+      'false'
+    );
   });
 
   it('uses mock content when gateway returns error', () => {
     renderPage('content-1', '', { error: new Error('Gateway error') });
-    expect(screen.getByTestId('doc-content')).toHaveTextContent('Mock document');
+    expect(screen.getByTestId('doc-content')).toHaveTextContent(
+      'Mock document'
+    );
   });
 
   it('passes transcript from useContentData to tools panel', () => {
@@ -277,7 +309,10 @@ describe('UnifiedLearningPage', () => {
   });
 
   it('passes empty transcript when useContentData returns none', () => {
-    mockUseContentData.mockReturnValue({ ...defaultContentData, transcript: [] });
+    mockUseContentData.mockReturnValue({
+      ...defaultContentData,
+      transcript: [],
+    });
     renderPage();
     expect(screen.getByTestId('transcript-count')).toHaveTextContent('0');
   });

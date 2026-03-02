@@ -7,7 +7,8 @@ import { MemoryRouter } from 'react-router-dom';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -94,17 +95,26 @@ describe('ProfileVisibilityCard', () => {
 
   it('shows "Copy link" button when public', () => {
     renderCard(PUBLIC_PREFS);
-    expect(screen.getByRole('button', { name: /copy link/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /copy link/i })
+    ).toBeInTheDocument();
   });
 
   it('does not show "Copy link" button when private', () => {
     renderCard(PRIVATE_PREFS);
-    expect(screen.queryByRole('button', { name: /copy link/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /copy link/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls mutation with isPublic=true when toggling from private', async () => {
-    const mockExecute = vi.fn().mockResolvedValue({ data: null, error: undefined });
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockExecute] as never);
+    const mockExecute = vi
+      .fn()
+      .mockResolvedValue({ data: null, error: undefined });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockExecute,
+    ] as never);
 
     renderCard(PRIVATE_PREFS);
     fireEvent.click(screen.getByRole('switch'));
@@ -115,8 +125,13 @@ describe('ProfileVisibilityCard', () => {
   });
 
   it('calls mutation with isPublic=false when toggling from public', async () => {
-    const mockExecute = vi.fn().mockResolvedValue({ data: null, error: undefined });
-    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockExecute] as never);
+    const mockExecute = vi
+      .fn()
+      .mockResolvedValue({ data: null, error: undefined });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockExecute,
+    ] as never);
 
     renderCard(PUBLIC_PREFS);
     fireEvent.click(screen.getByRole('switch'));

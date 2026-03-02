@@ -30,8 +30,11 @@ function sha256(input: string): string {
 // Helper: mock withTenantContext to invoke the callback with a fake tx
 function mockTxOnce(txImpl: unknown): void {
   mockWithTenantContext.mockImplementationOnce(
-    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
-      fn(txImpl)
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      fn: (tx: unknown) => Promise<unknown>
+    ) => fn(txImpl)
   );
 }
 

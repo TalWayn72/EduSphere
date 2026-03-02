@@ -23,7 +23,9 @@ const mockS3Send = vi.fn();
 let capturedS3Config: Record<string, unknown> = {};
 
 vi.mock('@aws-sdk/client-s3', () => ({
-  S3Client: vi.fn().mockImplementation(function S3ClientCtor(cfg: Record<string, unknown>) {
+  S3Client: vi.fn().mockImplementation(function S3ClientCtor(
+    cfg: Record<string, unknown>
+  ) {
     capturedS3Config = cfg;
     return { send: mockS3Send };
   }),

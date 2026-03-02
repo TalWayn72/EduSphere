@@ -150,22 +150,26 @@ export class KnowledgeSourceService implements OnModuleInit, OnModuleDestroy {
       )
     );
 
-    void Promise.race([processTask, timeoutTask]).catch(async (err: unknown) => {
-      this.logger.error(`Source ${source.id} background error: ${err}`);
-      // Only mark FAILED if still PENDING/PROCESSING (processSource may already set FAILED)
-      await this.db
-        .update(schema.knowledgeSources)
-        .set({ status: 'FAILED', error_message: String(err) })
-        .where(
-          and(
-            eq(schema.knowledgeSources.id, source.id),
-            inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING'])
+    void Promise.race([processTask, timeoutTask]).catch(
+      async (err: unknown) => {
+        this.logger.error(`Source ${source.id} background error: ${err}`);
+        // Only mark FAILED if still PENDING/PROCESSING (processSource may already set FAILED)
+        await this.db
+          .update(schema.knowledgeSources)
+          .set({ status: 'FAILED', error_message: String(err) })
+          .where(
+            and(
+              eq(schema.knowledgeSources.id, source.id),
+              inArray(schema.knowledgeSources.status, ['PENDING', 'PROCESSING'])
+            )
           )
-        )
-        .catch((dbErr: unknown) =>
-          this.logger.error(`Failed to mark timed-out source as FAILED: ${dbErr}`)
-        );
-    });
+          .catch((dbErr: unknown) =>
+            this.logger.error(
+              `Failed to mark timed-out source as FAILED: ${dbErr}`
+            )
+          );
+      }
+    );
 
     return source; // PENDING — resolver returns immediately
   }

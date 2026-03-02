@@ -48,7 +48,11 @@ const FAILED_RESULT: QuizResult = {
   passed: false,
   itemResults: [
     { itemIndex: 0, correct: true },
-    { itemIndex: 1, correct: false, explanation: 'Paris is the capital of France.' },
+    {
+      itemIndex: 1,
+      correct: false,
+      explanation: 'Paris is the capital of France.',
+    },
   ],
   submittedAt: '2026-02-20T11:00:00Z',
 };
@@ -58,42 +62,66 @@ const FAILED_RESULT: QuizResult = {
 describe('QuizResultView', () => {
   it('shows "Congratulations!" when quiz is passed', () => {
     render(
-      <QuizResultView result={PASSED_RESULT} quiz={MOCK_QUIZ} onRetry={vi.fn()} />
+      <QuizResultView
+        result={PASSED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={vi.fn()}
+      />
     );
     expect(screen.getByText('Congratulations!')).toBeInTheDocument();
   });
 
   it('shows "Not quite — keep going!" when quiz is failed', () => {
     render(
-      <QuizResultView result={FAILED_RESULT} quiz={MOCK_QUIZ} onRetry={vi.fn()} />
+      <QuizResultView
+        result={FAILED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={vi.fn()}
+      />
     );
     expect(screen.getByText('Not quite — keep going!')).toBeInTheDocument();
   });
 
   it('renders the score as a percentage', () => {
     render(
-      <QuizResultView result={PASSED_RESULT} quiz={MOCK_QUIZ} onRetry={vi.fn()} />
+      <QuizResultView
+        result={PASSED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={vi.fn()}
+      />
     );
     expect(screen.getByText('85%')).toBeInTheDocument();
   });
 
   it('shows the failing score', () => {
     render(
-      <QuizResultView result={FAILED_RESULT} quiz={MOCK_QUIZ} onRetry={vi.fn()} />
+      <QuizResultView
+        result={FAILED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={vi.fn()}
+      />
     );
     expect(screen.getByText('50%')).toBeInTheDocument();
   });
 
   it('renders the passing score threshold', () => {
     render(
-      <QuizResultView result={PASSED_RESULT} quiz={MOCK_QUIZ} onRetry={vi.fn()} />
+      <QuizResultView
+        result={PASSED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={vi.fn()}
+      />
     );
     expect(screen.getByText('Passing score: 70%')).toBeInTheDocument();
   });
 
   it('renders "Try Again" button', () => {
     render(
-      <QuizResultView result={PASSED_RESULT} quiz={MOCK_QUIZ} onRetry={vi.fn()} />
+      <QuizResultView
+        result={PASSED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={vi.fn()}
+      />
     );
     expect(
       screen.getByRole('button', { name: /try again/i })
@@ -103,7 +131,11 @@ describe('QuizResultView', () => {
   it('calls onRetry when "Try Again" is clicked', () => {
     const onRetry = vi.fn();
     render(
-      <QuizResultView result={PASSED_RESULT} quiz={MOCK_QUIZ} onRetry={onRetry} />
+      <QuizResultView
+        result={PASSED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={onRetry}
+      />
     );
     fireEvent.click(screen.getByRole('button', { name: /try again/i }));
     expect(onRetry).toHaveBeenCalledOnce();
@@ -111,7 +143,11 @@ describe('QuizResultView', () => {
 
   it('does NOT show question review when showExplanations is false', () => {
     render(
-      <QuizResultView result={PASSED_RESULT} quiz={MOCK_QUIZ} onRetry={vi.fn()} />
+      <QuizResultView
+        result={PASSED_RESULT}
+        quiz={MOCK_QUIZ}
+        onRetry={vi.fn()}
+      />
     );
     expect(screen.queryByText('Question Review')).not.toBeInTheDocument();
   });
@@ -138,7 +174,9 @@ describe('QuizResultView', () => {
       />
     );
     expect(screen.getByText('What is 2+2?')).toBeInTheDocument();
-    expect(screen.getByText('What is the capital of France?')).toBeInTheDocument();
+    expect(
+      screen.getByText('What is the capital of France?')
+    ).toBeInTheDocument();
   });
 
   it('shows explanation text for incorrect answers when showExplanations is true', () => {

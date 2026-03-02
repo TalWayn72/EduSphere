@@ -53,7 +53,10 @@ describe('canonicalJson', () => {
   });
 
   it('handles arrays of objects, sorting object keys within each element', () => {
-    const input = [{ z: 1, a: 2 }, { y: 3, b: 4 }];
+    const input = [
+      { z: 1, a: 2 },
+      { y: 3, b: 4 },
+    ];
     const result = canonicalJson(input);
     expect(result).toBe('[{"a":2,"z":1},{"b":4,"y":3}]');
   });
@@ -210,7 +213,11 @@ describe('verifyCredentialSignature', () => {
     const proof = signCredential(credential, kp);
 
     const corruptedProof = { ...proof, proofValue: 'AAAA' + proof.proofValue };
-    const valid = verifyCredentialSignature(credential, corruptedProof, kp.publicKey);
+    const valid = verifyCredentialSignature(
+      credential,
+      corruptedProof,
+      kp.publicKey
+    );
     expect(valid).toBe(false);
   });
 
@@ -222,6 +229,8 @@ describe('verifyCredentialSignature', () => {
       issuanceDate: '2026-01-15T12:00:00Z',
     };
     const proof = signCredential(credential2, kp);
-    expect(verifyCredentialSignature(credential2, proof, kp.publicKey)).toBe(true);
+    expect(verifyCredentialSignature(credential2, proof, kp.publicKey)).toBe(
+      true
+    );
   });
 });

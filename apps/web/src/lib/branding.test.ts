@@ -17,7 +17,9 @@ import {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeBranding(overrides: Partial<TenantBrandingData> = {}): TenantBrandingData {
+function makeBranding(
+  overrides: Partial<TenantBrandingData> = {}
+): TenantBrandingData {
   return { ...DEFAULT_BRANDING, ...overrides };
 }
 
@@ -86,12 +88,18 @@ describe('applyTenantBranding', () => {
 
   it('sets --primary CSS custom property', () => {
     applyTenantBranding(makeBranding({ primaryColor: '#2563eb' }));
-    expect(setPropertySpy).toHaveBeenCalledWith('--primary', expect.any(String));
+    expect(setPropertySpy).toHaveBeenCalledWith(
+      '--primary',
+      expect.any(String)
+    );
   });
 
   it('sets --secondary CSS custom property', () => {
     applyTenantBranding(makeBranding());
-    expect(setPropertySpy).toHaveBeenCalledWith('--secondary', expect.any(String));
+    expect(setPropertySpy).toHaveBeenCalledWith(
+      '--secondary',
+      expect.any(String)
+    );
   });
 
   it('sets --accent CSS custom property', () => {
@@ -101,7 +109,10 @@ describe('applyTenantBranding', () => {
 
   it('sets --background CSS custom property', () => {
     applyTenantBranding(makeBranding());
-    expect(setPropertySpy).toHaveBeenCalledWith('--background', expect.any(String));
+    expect(setPropertySpy).toHaveBeenCalledWith(
+      '--background',
+      expect.any(String)
+    );
   });
 
   it('sets document.title to organizationName', () => {

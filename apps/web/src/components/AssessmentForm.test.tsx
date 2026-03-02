@@ -7,7 +7,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -32,7 +32,10 @@ const defaultProps = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockSubmit.mockResolvedValue({ data: { submitResponse: { id: 'r1' } }, error: undefined });
+  mockSubmit.mockResolvedValue({
+    data: { submitResponse: { id: 'r1' } },
+    error: undefined,
+  });
   vi.mocked(urql.useMutation).mockReturnValue([
     { fetching: false, error: undefined } as never,
     mockSubmit as never,
@@ -52,8 +55,12 @@ describe('AssessmentForm', () => {
 
   it('renders a radiogroup for each criteria', () => {
     render(<AssessmentForm {...defaultProps} />);
-    expect(screen.getByRole('radiogroup', { name: 'Communication' })).toBeInTheDocument();
-    expect(screen.getByRole('radiogroup', { name: 'Teamwork' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('radiogroup', { name: 'Communication' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('radiogroup', { name: 'Teamwork' })
+    ).toBeInTheDocument();
   });
 
   it('renders 5 star radio buttons per criteria', () => {

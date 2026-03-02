@@ -12,7 +12,8 @@ vi.mock('graphql-request', () => ({
   request: vi.fn(),
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
 }));
@@ -66,11 +67,15 @@ describe('MarketplacePage', () => {
 
   it('shows "Course Marketplace" heading', () => {
     render(<MarketplacePage />);
-    expect(screen.getByRole('heading', { name: /course marketplace/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /course marketplace/i })
+    ).toBeInTheDocument();
   });
 
   it('shows loading spinner while fetching', () => {
-    vi.mocked(tanstack.useQuery).mockReturnValue(makeQuery({ isLoading: true }));
+    vi.mocked(tanstack.useQuery).mockReturnValue(
+      makeQuery({ isLoading: true })
+    );
     const { container } = render(<MarketplacePage />);
     expect(container.querySelector('.animate-spin')).toBeInTheDocument();
   });
@@ -100,7 +105,9 @@ describe('MarketplacePage', () => {
 
   it('shows formatted price for paid listings', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
-      makeQuery({ data: { courseListings: [MOCK_LISTINGS[0]], myPurchases: [] } })
+      makeQuery({
+        data: { courseListings: [MOCK_LISTINGS[0]], myPurchases: [] },
+      })
     );
     render(<MarketplacePage />);
     expect(screen.getByText('$29.99')).toBeInTheDocument();
@@ -108,7 +115,9 @@ describe('MarketplacePage', () => {
 
   it('shows "Free" for listings with priceCents=0', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
-      makeQuery({ data: { courseListings: [MOCK_LISTINGS[1]], myPurchases: [] } })
+      makeQuery({
+        data: { courseListings: [MOCK_LISTINGS[1]], myPurchases: [] },
+      })
     );
     render(<MarketplacePage />);
     expect(screen.getByText('Free')).toBeInTheDocument();
@@ -119,7 +128,12 @@ describe('MarketplacePage', () => {
       makeQuery({
         data: {
           courseListings: [MOCK_LISTINGS[0]],
-          myPurchases: [{ courseId: 'aabbccdd-1111-2222-3333-000000000001', status: 'COMPLETE' }],
+          myPurchases: [
+            {
+              courseId: 'aabbccdd-1111-2222-3333-000000000001',
+              status: 'COMPLETE',
+            },
+          ],
         },
       })
     );
@@ -129,7 +143,9 @@ describe('MarketplacePage', () => {
 
   it('shows revenue split percentage', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
-      makeQuery({ data: { courseListings: [MOCK_LISTINGS[0]], myPurchases: [] } })
+      makeQuery({
+        data: { courseListings: [MOCK_LISTINGS[0]], myPurchases: [] },
+      })
     );
     render(<MarketplacePage />);
     expect(screen.getByText(/instructor earns 70%/i)).toBeInTheDocument();

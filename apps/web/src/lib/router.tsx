@@ -9,7 +9,9 @@ const Dashboard = lazy(() =>
 );
 // UnifiedLearningPage replaces ContentViewer + DocumentAnnotationPage
 const UnifiedLearningPage = lazy(() =>
-  import('@/pages/UnifiedLearningPage').then((m) => ({ default: m.UnifiedLearningPage }))
+  import('@/pages/UnifiedLearningPage').then((m) => ({
+    default: m.UnifiedLearningPage,
+  }))
 );
 // Keep ContentViewer + DocumentAnnotationPage lazy-loaded so existing imports don't break
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

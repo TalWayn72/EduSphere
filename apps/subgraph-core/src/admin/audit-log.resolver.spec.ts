@@ -42,7 +42,13 @@ describe('AuditLogResolver', () => {
     it('delegates to service with tenantId and filter params', async () => {
       auditLogService.getAuditLog.mockResolvedValue([]);
       await resolver.getAdminAuditLog(
-        50, 0, 'LOGIN', 'user-2', '2026-01-01', '2026-02-01', CTX_AUTHED
+        50,
+        0,
+        'LOGIN',
+        'user-2',
+        '2026-01-01',
+        '2026-02-01',
+        CTX_AUTHED
       );
       expect(auditLogService.getAuditLog).toHaveBeenCalledWith('tenant-1', {
         limit: 50,
@@ -77,7 +83,15 @@ describe('AuditLogResolver', () => {
 
     it('throws UnauthorizedException when not authenticated', async () => {
       await expect(
-        resolver.getAdminAuditLog(10, 0, undefined, undefined, undefined, undefined, CTX_ANON)
+        resolver.getAdminAuditLog(
+          10,
+          0,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          CTX_ANON
+        )
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -88,10 +102,16 @@ describe('AuditLogResolver', () => {
     it('delegates to service with tenantId, date range, and format', async () => {
       auditLogService.exportAuditLog.mockResolvedValue('url://file.csv');
       await resolver.exportAuditLog(
-        '2026-01-01', '2026-02-01', 'CSV', CTX_AUTHED
+        '2026-01-01',
+        '2026-02-01',
+        'CSV',
+        CTX_AUTHED
       );
       expect(auditLogService.exportAuditLog).toHaveBeenCalledWith(
-        'tenant-1', '2026-01-01', '2026-02-01', 'CSV'
+        'tenant-1',
+        '2026-01-01',
+        '2026-02-01',
+        'CSV'
       );
     });
 
@@ -104,7 +124,10 @@ describe('AuditLogResolver', () => {
         CTX_AUTHED
       );
       expect(auditLogService.exportAuditLog).toHaveBeenCalledWith(
-        'tenant-1', '2026-01-01', '2026-02-01', 'CSV'
+        'tenant-1',
+        '2026-01-01',
+        '2026-02-01',
+        'CSV'
       );
     });
 
@@ -123,7 +146,8 @@ describe('AuditLogResolver', () => {
       const result = await resolver.scheduleGdprErasure('user-99', CTX_AUTHED);
       expect(result).toBe(true);
       expect(auditLogService.scheduleGdprErasure).toHaveBeenCalledWith(
-        'user-99', 'tenant-1'
+        'user-99',
+        'tenant-1'
       );
     });
 

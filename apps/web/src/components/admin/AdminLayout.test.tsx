@@ -51,12 +51,8 @@ describe('AdminLayout', () => {
   });
 
   it('does not render description when title is omitted', () => {
-    render(
-      <AdminLayout description="Some description">content</AdminLayout>
-    );
-    expect(
-      screen.queryByText('Some description')
-    ).not.toBeInTheDocument();
+    render(<AdminLayout description="Some description">content</AdminLayout>);
+    expect(screen.queryByText('Some description')).not.toBeInTheDocument();
   });
 
   it('wraps content in the Layout component', () => {

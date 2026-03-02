@@ -255,7 +255,9 @@ export function CourseList() {
     if (error) {
       // Revert on error
       setLocalPublishState((prev) => new Map(prev).set(courseId, current));
-      showToast(`Failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`);
+      showToast(
+        `Failed: ${error.graphQLErrors?.[0]?.message ?? error.message}`
+      );
     } else {
       showToast(current ? 'Course unpublished' : 'Course published!');
     }
@@ -357,7 +359,11 @@ export function CourseList() {
             />
           </div>
           {!isInstructor && (
-            <div className="flex rounded-md border overflow-hidden shrink-0" role="tablist" aria-label="Course filter">
+            <div
+              className="flex rounded-md border overflow-hidden shrink-0"
+              role="tablist"
+              aria-label="Course filter"
+            >
               <button
                 role="tab"
                 aria-selected={activeTab === 'all'}

@@ -12,14 +12,19 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
 }));
 
-vi.mock('@/components/FollowButton', () => ({ FollowButton: vi.fn(() => null) }));
-vi.mock('@/components/FollowersList', () => ({ FollowersList: vi.fn(() => null) }));
+vi.mock('@/components/FollowButton', () => ({
+  FollowButton: vi.fn(() => null),
+}));
+vi.mock('@/components/FollowersList', () => ({
+  FollowersList: vi.fn(() => null),
+}));
 
 vi.mock('@/lib/graphql/profile.queries', () => ({
   PUBLIC_PROFILE_QUERY: 'PUBLIC_PROFILE_QUERY',
@@ -55,7 +60,12 @@ const MOCK_PROFILE = {
 
 function makeQuery(overrides: Record<string, unknown> = {}) {
   return [
-    { data: { publicProfile: MOCK_PROFILE }, fetching: false, error: undefined, ...overrides },
+    {
+      data: { publicProfile: MOCK_PROFILE },
+      fetching: false,
+      error: undefined,
+      ...overrides,
+    },
     vi.fn(),
   ] as never;
 }
@@ -90,7 +100,9 @@ describe('PublicProfilePage', () => {
       makeQuery({ data: { publicProfile: null } })
     );
     renderPage();
-    expect(screen.getByRole('link', { name: /browse courses/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /browse courses/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "Profile Not Available" on query error', () => {
@@ -143,7 +155,9 @@ describe('PublicProfilePage', () => {
 
   it('does not show completed courses section when list is empty', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeQuery({ data: { publicProfile: { ...MOCK_PROFILE, completedCourses: [] } } })
+      makeQuery({
+        data: { publicProfile: { ...MOCK_PROFILE, completedCourses: [] } },
+      })
     );
     renderPage();
     expect(screen.queryByText('Completed Courses')).not.toBeInTheDocument();

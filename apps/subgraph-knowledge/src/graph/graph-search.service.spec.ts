@@ -61,11 +61,41 @@ describe('GraphSearchService', () => {
       mockCallEmbeddingProvider.mockResolvedValue([0.1, 0.2]);
       // Vector search returns 5 results (fills the limit), so ILIKE won't be called
       mockDbExecute.mockResolvedValue([
-        { id: 'e1', segment_id: 's1', transcript_id: 't1', text: 'hello world', similarity: '0.92' },
-        { id: 'e2', segment_id: 's2', transcript_id: 't1', text: 'hello there', similarity: '0.88' },
-        { id: 'e3', segment_id: 's3', transcript_id: 't1', text: 'hello you', similarity: '0.81' },
-        { id: 'e4', segment_id: 's4', transcript_id: 't1', text: 'hello again', similarity: '0.75' },
-        { id: 'e5', segment_id: 's5', transcript_id: 't1', text: 'hello world 2', similarity: '0.70' },
+        {
+          id: 'e1',
+          segment_id: 's1',
+          transcript_id: 't1',
+          text: 'hello world',
+          similarity: '0.92',
+        },
+        {
+          id: 'e2',
+          segment_id: 's2',
+          transcript_id: 't1',
+          text: 'hello there',
+          similarity: '0.88',
+        },
+        {
+          id: 'e3',
+          segment_id: 's3',
+          transcript_id: 't1',
+          text: 'hello you',
+          similarity: '0.81',
+        },
+        {
+          id: 'e4',
+          segment_id: 's4',
+          transcript_id: 't1',
+          text: 'hello again',
+          similarity: '0.75',
+        },
+        {
+          id: 'e5',
+          segment_id: 's5',
+          transcript_id: 't1',
+          text: 'hello world 2',
+          similarity: '0.70',
+        },
       ]);
       mockFindAllConcepts.mockResolvedValue([]);
 

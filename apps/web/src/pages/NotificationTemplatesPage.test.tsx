@@ -93,7 +93,9 @@ describe('NotificationTemplatesPage', () => {
   it('renders all 6 default template names in the sidebar', () => {
     renderPage();
     // "Welcome Email" appears in both sidebar + editor mock; others appear once each
-    expect(screen.getAllByText('Welcome Email').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Welcome Email').length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getByText('Enrollment Confirmation')).toBeInTheDocument();
     expect(screen.getByText('Completion Certificate')).toBeInTheDocument();
     expect(screen.getByText('Compliance Reminder')).toBeInTheDocument();

@@ -70,18 +70,32 @@ describe('ProgramResolver', () => {
 
   describe('programs()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.programs(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.programs(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockListPrograms).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.programs(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.programs(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
-      await expect(resolver.programs(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: undefined as unknown as string,
+        tenantId: 't1',
+        roles: [],
+      });
+      await expect(resolver.programs(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to service.listPrograms with tenantId and userId', async () => {
@@ -104,7 +118,9 @@ describe('ProgramResolver', () => {
 
   describe('program()', () => {
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.program('prog-1', noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.program('prog-1', noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to service.getProgram with id, tenantId, userId', async () => {
@@ -112,7 +128,11 @@ describe('ProgramResolver', () => {
 
       const result = await resolver.program('prog-1', makeCtx());
 
-      expect(mockGetProgram).toHaveBeenCalledWith('prog-1', 'tenant-1', 'user-1');
+      expect(mockGetProgram).toHaveBeenCalledWith(
+        'prog-1',
+        'tenant-1',
+        'user-1'
+      );
       expect(result).toEqual(MOCK_PROGRAM);
     });
   });
@@ -121,7 +141,9 @@ describe('ProgramResolver', () => {
 
   describe('myProgramEnrollments()', () => {
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.myProgramEnrollments(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myProgramEnrollments(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to service.getUserEnrollments with userId and tenantId', async () => {
@@ -144,7 +166,9 @@ describe('ProgramResolver', () => {
 
   describe('programProgress()', () => {
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.programProgress('prog-1', noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(
+        resolver.programProgress('prog-1', noAuthCtx)
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('delegates to service.getProgramProgress with programId, userId, tenantId', async () => {
@@ -152,7 +176,11 @@ describe('ProgramResolver', () => {
 
       const result = await resolver.programProgress('prog-1', makeCtx());
 
-      expect(mockGetProgramProgress).toHaveBeenCalledWith('prog-1', 'user-1', 'tenant-1');
+      expect(mockGetProgramProgress).toHaveBeenCalledWith(
+        'prog-1',
+        'user-1',
+        'tenant-1'
+      );
       expect(result).toEqual(MOCK_PROGRESS);
     });
   });

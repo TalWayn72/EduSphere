@@ -38,7 +38,9 @@ describe('UpdateUserPreferencesSchema', () => {
   it('accepts all valid theme values', () => {
     for (const theme of ['light', 'dark', 'system'] as const) {
       const result = UpdateUserPreferencesSchema.safeParse({ theme });
-      expect(result.success, `Expected theme '${theme}' to be valid`).toBe(true);
+      expect(result.success, `Expected theme '${theme}' to be valid`).toBe(
+        true
+      );
     }
   });
 
@@ -58,7 +60,16 @@ describe('UpdateUserPreferencesSchema', () => {
 
   it('accepts all known SUPPORTED_LOCALES', () => {
     const locales = [
-      'en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id', 'he',
+      'en',
+      'zh-CN',
+      'hi',
+      'es',
+      'fr',
+      'bn',
+      'pt',
+      'ru',
+      'id',
+      'he',
     ] as const;
     for (const locale of locales) {
       const result = UpdateUserPreferencesSchema.safeParse({ locale });

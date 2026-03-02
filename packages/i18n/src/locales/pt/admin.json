@@ -42,12 +42,24 @@
     "noActivity": "A atividade admin recente aparecerá aqui.",
     "loadError": "Falha ao carregar dados do painel",
     "quickLinks": {
-      "branding": { "label": "Identidade Visual", "desc": "Logos, cores, temas" },
+      "branding": {
+        "label": "Identidade Visual",
+        "desc": "Logos, cores, temas"
+      },
       "users": { "label": "Usuários", "desc": "Gerenciar alunos e admins" },
       "compliance": { "label": "Conformidade", "desc": "Relatórios e prazos" },
-      "gamification": { "label": "Gamificação", "desc": "Pontos, emblemas, classificações" },
-      "security": { "label": "Segurança", "desc": "MFA, SSO, política de sessão" },
-      "auditLog": { "label": "Log de Auditoria", "desc": "Histórico de ações admin" }
+      "gamification": {
+        "label": "Gamificação",
+        "desc": "Pontos, emblemas, classificações"
+      },
+      "security": {
+        "label": "Segurança",
+        "desc": "MFA, SSO, política de sessão"
+      },
+      "auditLog": {
+        "label": "Log de Auditoria",
+        "desc": "Histórico de ações admin"
+      }
     }
   },
   "stats": {

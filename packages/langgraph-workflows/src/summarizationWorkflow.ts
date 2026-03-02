@@ -22,24 +22,40 @@ export type SummarizationState = z.infer<typeof SummarizationStateSchema>;
 
 const SummarizationAnnotation = Annotation.Root({
   text: Annotation<string>(),
-  shortSummary: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  longSummary: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  shortSummary: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  longSummary: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
   keyPoints: Annotation<string[]>({
     reducer: (existing, incoming) => {
       const merged = [...existing, ...incoming];
-      return merged.length > MAX_KEY_POINTS ? merged.slice(merged.length - MAX_KEY_POINTS) : merged;
+      return merged.length > MAX_KEY_POINTS
+        ? merged.slice(merged.length - MAX_KEY_POINTS)
+        : merged;
     },
     default: () => [],
   }),
   discussionQuestions: Annotation<string[]>({
     reducer: (existing, incoming) => {
       const merged = [...existing, ...incoming];
-      return merged.length > MAX_QUESTIONS ? merged.slice(merged.length - MAX_QUESTIONS) : merged;
+      return merged.length > MAX_QUESTIONS
+        ? merged.slice(merged.length - MAX_QUESTIONS)
+        : merged;
     },
     default: () => [],
   }),
-  lessonType: Annotation<SummarizationState['lessonType']>({ value: (_, u) => u, default: () => 'THEMATIC' }),
-  bookLocation: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  lessonType: Annotation<SummarizationState['lessonType']>({
+    value: (_, u) => u,
+    default: () => 'THEMATIC',
+  }),
+  bookLocation: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
@@ -67,7 +83,10 @@ export class SummarizationWorkflow {
     const graph = new StateGraph(SummarizationAnnotation) as any;
     graph.addNode('generateSummaries', this.generateSummariesNode.bind(this));
     graph.addNode('extractKeyPoints', this.extractKeyPointsNode.bind(this));
-    graph.addNode('generateDiscussionQuestions', this.generateDiscussionQuestionsNode.bind(this));
+    graph.addNode(
+      'generateDiscussionQuestions',
+      this.generateDiscussionQuestionsNode.bind(this)
+    );
     graph.addEdge(START, 'generateSummaries');
     graph.addEdge('generateSummaries', 'extractKeyPoints');
     graph.addEdge('extractKeyPoints', 'generateDiscussionQuestions');
@@ -75,7 +94,9 @@ export class SummarizationWorkflow {
     return graph;
   }
 
-  private async generateSummariesNode(state: SummarizationState): Promise<Partial<SummarizationState>> {
+  private async generateSummariesNode(
+    state: SummarizationState
+  ): Promise<Partial<SummarizationState>> {
     const isSequential = state.lessonType === 'SEQUENTIAL';
     const systemPrompt = injectLocale(
       `You are a Hebrew lesson summarizer specializing in Jewish religious texts.
@@ -95,40 +116,59 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
       }),
     });
 
-    return { shortSummary: object.shortSummary, longSummary: object.longSummary };
+    return {
+      shortSummary: object.shortSummary,
+      longSummary: object.longSummary,
+    };
   }
 
-  private async extractKeyPointsNode(state: SummarizationState): Promise<Partial<SummarizationState>> {
+  private async extractKeyPointsNode(
+    state: SummarizationState
+  ): Promise<Partial<SummarizationState>> {
     const { object } = await generateObject({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       model: openai(this.model) as any,
-      system: injectLocale('Extract key conceptual points from the lesson summary as a numbered list in Hebrew.', this.locale),
+      system: injectLocale(
+        'Extract key conceptual points from the lesson summary as a numbered list in Hebrew.',
+        this.locale
+      ),
       prompt: `Extract 5-10 key points from:\n${state.longSummary ?? state.text.slice(0, 3000)}`,
       schema: z.object({ keyPoints: z.array(z.string()).max(MAX_KEY_POINTS) }),
     });
     return { keyPoints: object.keyPoints };
   }
 
-  private async generateDiscussionQuestionsNode(state: SummarizationState): Promise<Partial<SummarizationState>> {
+  private async generateDiscussionQuestionsNode(
+    state: SummarizationState
+  ): Promise<Partial<SummarizationState>> {
     const { object } = await generateObject({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       model: openai(this.model) as any,
-      system: injectLocale('Generate thoughtful discussion questions in Hebrew for a study group based on the lesson content.', this.locale),
+      system: injectLocale(
+        'Generate thoughtful discussion questions in Hebrew for a study group based on the lesson content.',
+        this.locale
+      ),
       prompt: `Generate 3-5 discussion questions for:\nKey points: ${state.keyPoints.slice(0, 10).join('\n')}`,
       schema: z.object({ questions: z.array(z.string()).max(MAX_QUESTIONS) }),
     });
     return { discussionQuestions: object.questions, isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) { return this.graph.compile(opts); }
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts);
+  }
 
-  async run(initialState: Partial<SummarizationState>): Promise<SummarizationState> {
+  async run(
+    initialState: Partial<SummarizationState>
+  ): Promise<SummarizationState> {
     const fullState = SummarizationStateSchema.parse(initialState);
     const result = await this.graph.compile().invoke(fullState);
     return result as SummarizationState;
   }
 
-  async *stream(initialState: Partial<SummarizationState>): AsyncGenerator<SummarizationState, void, unknown> {
+  async *stream(
+    initialState: Partial<SummarizationState>
+  ): AsyncGenerator<SummarizationState, void, unknown> {
     const compiledGraph = this.graph.compile();
     const fullState = SummarizationStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
@@ -137,6 +177,9 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
   }
 }
 
-export function createSummarizationWorkflow(model?: string, locale = 'he'): SummarizationWorkflow {
+export function createSummarizationWorkflow(
+  model?: string,
+  locale = 'he'
+): SummarizationWorkflow {
   return new SummarizationWorkflow(model, locale);
 }

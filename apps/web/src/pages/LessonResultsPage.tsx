@@ -77,9 +77,7 @@ export function LessonResultsPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() =>
-              navigate(`/courses/${courseId}/lessons/${lessonId}`)
-            }
+            onClick={() => navigate(`/courses/${courseId}/lessons/${lessonId}`)}
           >
             ← {lesson.title}
           </Button>
@@ -121,9 +119,7 @@ export function LessonResultsPage() {
                     נקודות מפתח
                   </h3>
                   <ul className="list-disc list-inside text-sm space-y-1">
-                    {(
-                      summarization.outputData['keyPoints'] as string[]
-                    )
+                    {(summarization.outputData['keyPoints'] as string[])
                       .slice(0, 8)
                       .map((p, i) => (
                         <li key={i}>{p}</li>
@@ -178,9 +174,10 @@ export function LessonResultsPage() {
               </div>
               {Boolean(citationVerifier.outputData?.['matchReport']) && (
                 <pre className="text-xs text-gray-600 whitespace-pre-wrap">
-                  {String(
-                    citationVerifier.outputData?.['matchReport']
-                  ).slice(0, 800)}
+                  {String(citationVerifier.outputData?.['matchReport']).slice(
+                    0,
+                    800
+                  )}
                 </pre>
               )}
             </div>

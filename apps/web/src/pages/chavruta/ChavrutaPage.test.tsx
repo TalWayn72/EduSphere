@@ -85,7 +85,9 @@ describe('ChavrutaPage', () => {
 
   it('calls startNewTopic when "New Topic" is clicked', () => {
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /start a new debate topic/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /start a new debate topic/i })
+    );
     expect(mockStartNewTopic).toHaveBeenCalledTimes(1);
   });
 
@@ -95,7 +97,9 @@ describe('ChavrutaPage', () => {
       isLoading: true,
     } as never);
     renderPage();
-    expect(screen.getByRole('button', { name: /start a new debate topic/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /start a new debate topic/i })
+    ).toBeDisabled();
   });
 
   it('shows ConsentPrompt when needsConsent=true', () => {

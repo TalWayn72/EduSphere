@@ -48,8 +48,9 @@ export function CreateLessonPage() {
   >(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [{ fetching }, createLesson] =
-    useMutation<CreateLessonResult>(CREATE_LESSON_MUTATION);
+  const [{ fetching }, createLesson] = useMutation<CreateLessonResult>(
+    CREATE_LESSON_MUTATION
+  );
   const loadTemplate = useLessonPipelineStore((s) => s.loadTemplate);
   const user = getCurrentUser();
 
@@ -76,9 +77,7 @@ export function CreateLessonPage() {
     }
     if (data?.createLesson) {
       if (selectedTemplate) loadTemplate(selectedTemplate);
-      navigate(
-        `/courses/${courseId}/lessons/${data.createLesson.id}/pipeline`
-      );
+      navigate(`/courses/${courseId}/lessons/${data.createLesson.id}/pipeline`);
     }
   };
 

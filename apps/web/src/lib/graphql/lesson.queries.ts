@@ -91,7 +91,10 @@ export const LESSON_QUERY = gql`
 `;
 
 export const SAVE_LESSON_PIPELINE_MUTATION = gql`
-  mutation SaveLessonPipeline($lessonId: ID!, $input: SaveLessonPipelineInput!) {
+  mutation SaveLessonPipeline(
+    $lessonId: ID!
+    $input: SaveLessonPipelineInput!
+  ) {
     saveLessonPipeline(lessonId: $lessonId, input: $input) {
       id
       status

@@ -27,7 +27,8 @@ export class DocumentParserService {
     // mammoth is CommonJS; ESM dynamic import wraps it as { default: module, ...named }.
     // Use the same defensive pattern as pdf-parse to handle both import shapes.
     const mammothModule = await import('mammoth');
-    const mammoth = (mammothModule.default ?? mammothModule) as typeof mammothModule;
+    const mammoth = (mammothModule.default ??
+      mammothModule) as typeof mammothModule;
     const buffer =
       typeof source === 'string'
         ? readFileSync(source) // source is always an absolute path when string

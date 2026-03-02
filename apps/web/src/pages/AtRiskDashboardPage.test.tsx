@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -35,19 +36,27 @@ vi.mock('@/hooks/useAuthRole', () => ({
 }));
 
 vi.mock('@/components/AtRiskLearnersTable', () => ({
-  AtRiskLearnersTable: vi.fn(({ learners, onResolve }: { learners: { learnerId: string; courseId: string }[]; onResolve: (l: string, c: string) => void }) => (
-    <div data-testid="at-risk-table">
-      {learners.map((l) => (
-        <button
-          key={l.learnerId + l.courseId}
-          onClick={() => onResolve(l.learnerId, l.courseId)}
-        >
-          Resolve {l.learnerId}
-        </button>
-      ))}
-      <span data-testid="row-count">{learners.length}</span>
-    </div>
-  )),
+  AtRiskLearnersTable: vi.fn(
+    ({
+      learners,
+      onResolve,
+    }: {
+      learners: { learnerId: string; courseId: string }[];
+      onResolve: (l: string, c: string) => void;
+    }) => (
+      <div data-testid="at-risk-table">
+        {learners.map((l) => (
+          <button
+            key={l.learnerId + l.courseId}
+            onClick={() => onResolve(l.learnerId, l.courseId)}
+          >
+            Resolve {l.learnerId}
+          </button>
+        ))}
+        <span data-testid="row-count">{learners.length}</span>
+      </div>
+    )
+  ),
 }));
 
 vi.mock('./AtRiskDashboardPage.config', () => ({
@@ -149,9 +158,7 @@ describe('AtRiskDashboardPage', () => {
 
   it('renders the RiskThresholdConfig component', () => {
     renderPage();
-    expect(
-      screen.getByTestId('risk-threshold-config')
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('risk-threshold-config')).toBeInTheDocument();
   });
 
   it('renders filter select trigger', () => {

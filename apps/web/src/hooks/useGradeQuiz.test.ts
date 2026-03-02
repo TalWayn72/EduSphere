@@ -18,7 +18,8 @@ import { renderHook, act } from '@testing-library/react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -49,9 +50,15 @@ describe('useGradeQuiz', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default: mutation resolves with no data and no error
-    const mockExecute = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+    const mockExecute = vi
+      .fn()
+      .mockResolvedValue({ data: undefined, error: undefined });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockExecute as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
   });
@@ -70,9 +77,18 @@ describe('useGradeQuiz', () => {
 
   // Test 3 — gradeQuiz sets loading then resolves
   it('sets loading to false after mutation resolves', async () => {
-    const mockExecute = vi.fn().mockResolvedValue({ data: { gradeQuizSubmission: makeQuizResult() }, error: undefined });
+    const mockExecute = vi
+      .fn()
+      .mockResolvedValue({
+        data: { gradeQuizSubmission: makeQuizResult() },
+        error: undefined,
+      });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockExecute as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
@@ -93,7 +109,11 @@ describe('useGradeQuiz', () => {
       error: undefined,
     });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockExecute as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
@@ -110,10 +130,18 @@ describe('useGradeQuiz', () => {
 
   // Test 5 — gradeQuiz returns null and sets error on mutation error
   it('returns null and sets error when the mutation returns an error', async () => {
-    const mutationError = { message: 'Quiz grading failed' } as urql.CombinedError;
-    const mockExecute = vi.fn().mockResolvedValue({ data: undefined, error: mutationError });
+    const mutationError = {
+      message: 'Quiz grading failed',
+    } as urql.CombinedError;
+    const mockExecute = vi
+      .fn()
+      .mockResolvedValue({ data: undefined, error: mutationError });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockExecute as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
@@ -132,7 +160,11 @@ describe('useGradeQuiz', () => {
   it('catches thrown errors and sets error message', async () => {
     const mockExecute = vi.fn().mockRejectedValue(new Error('Network crash'));
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockExecute as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
@@ -150,12 +182,23 @@ describe('useGradeQuiz', () => {
 
   // Test 7 — gradeQuiz resets error on each call
   it('clears the previous error at the start of each new gradeQuiz call', async () => {
-    const mockExecute = vi.fn()
-      .mockResolvedValueOnce({ data: undefined, error: { message: 'First error' } as urql.CombinedError })
-      .mockResolvedValueOnce({ data: { gradeQuizSubmission: makeQuizResult() }, error: undefined });
+    const mockExecute = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: undefined,
+        error: { message: 'First error' } as urql.CombinedError,
+      })
+      .mockResolvedValueOnce({
+        data: { gradeQuizSubmission: makeQuizResult() },
+        error: undefined,
+      });
 
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockExecute as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
@@ -181,7 +224,11 @@ describe('useGradeQuiz', () => {
       error: undefined,
     });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockExecute as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 

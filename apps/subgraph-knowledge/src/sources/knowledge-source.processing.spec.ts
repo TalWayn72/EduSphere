@@ -51,10 +51,7 @@ function makeFakeSource(overrides?: Partial<FakeSource>): FakeSource {
 }
 
 // Drizzle-like chainable mock
-function makeDbMock(opts: {
-  insertRow: FakeSource;
-  updateRows: FakeSource[];
-}) {
+function makeDbMock(opts: { insertRow: FakeSource; updateRows: FakeSource[] }) {
   let updateIdx = 0;
 
   return {
@@ -67,7 +64,10 @@ function makeDbMock(opts: {
       set: vi.fn((setArg: Record<string, unknown>) => ({
         where: vi.fn(() => ({
           returning: vi.fn(async () => {
-            const row = { ...(opts.updateRows[updateIdx++] ?? opts.insertRow), ...setArg };
+            const row = {
+              ...(opts.updateRows[updateIdx++] ?? opts.insertRow),
+              ...setArg,
+            };
             return [row];
           }),
           // For the timeout-guard path that doesn't call .returning()
@@ -87,7 +87,11 @@ vi.mock('@edusphere/db', async () => {
     schema: { knowledgeSources: 'knowledgeSources' },
     eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
     and: vi.fn((...args: unknown[]) => ({ args, op: 'and' })),
-    inArray: vi.fn((col: unknown, vals: unknown[]) => ({ col, vals, op: 'in' })),
+    inArray: vi.fn((col: unknown, vals: unknown[]) => ({
+      col,
+      vals,
+      op: 'in',
+    })),
   };
 });
 
@@ -109,7 +113,8 @@ async function buildService(opts: {
   embeddingError?: boolean;
   parseError?: boolean;
 }) {
-  const { KnowledgeSourceService } = await import('./knowledge-source.service.js');
+  const { KnowledgeSourceService } =
+    await import('./knowledge-source.service.js');
 
   const insertRow = makeFakeSource({ status: 'PENDING' });
   const processingRow = makeFakeSource({ status: 'PROCESSING' });
@@ -193,12 +198,16 @@ describe('KnowledgeSourceService — text-tracing pipeline', () => {
   // ── 2. Text flows into raw_content (the core "עקב" assertion) ──────────────
 
   it('extracted text is stored verbatim in raw_content after processing', async () => {
-    const EXTRACTED = 'בראשית ברא אלהים את השמים ואת הארץ. והארץ היתה תוהו ובוהו.';
+    const EXTRACTED =
+      'בראשית ברא אלהים את השמים ואת הארץ. והארץ היתה תוהו ובוהו.';
     const { svc, db } = await buildService({ extractedText: EXTRACTED });
 
     await svc.createAndProcess({
-      tenantId: 't1', courseId: 'c1', title: 'src',
-      sourceType: 'FILE_DOCX', origin: 'bereishit.docx',
+      tenantId: 't1',
+      courseId: 'c1',
+      title: 'src',
+      sourceType: 'FILE_DOCX',
+      origin: 'bereishit.docx',
       fileBuffer: Buffer.from('docx-buf'),
     });
     await vi.runAllTimersAsync();
@@ -213,11 +222,17 @@ describe('KnowledgeSourceService — text-tracing pipeline', () => {
   // ── 3. Status transitions: PENDING → PROCESSING → READY ────────────────────
 
   it('status transitions through PENDING → PROCESSING → READY', async () => {
-    const { svc, db } = await buildService({ extractedText: 'הלכות תשובה פרק א.' });
+    const { svc, db } = await buildService({
+      extractedText: 'הלכות תשובה פרק א.',
+    });
 
     await svc.createAndProcess({
-      tenantId: 't1', courseId: 'c1', title: 'src',
-      sourceType: 'TEXT', origin: 'manual', rawText: 'הלכות תשובה פרק א.',
+      tenantId: 't1',
+      courseId: 'c1',
+      title: 'src',
+      sourceType: 'TEXT',
+      origin: 'manual',
+      rawText: 'הלכות תשובה פרק א.',
     });
     await vi.runAllTimersAsync();
 
@@ -238,8 +253,12 @@ describe('KnowledgeSourceService — text-tracing pipeline', () => {
     });
 
     await svc.createAndProcess({
-      tenantId: 't1', courseId: 'c1', title: 'src',
-      sourceType: 'TEXT', origin: 'manual', rawText: EXTRACTED,
+      tenantId: 't1',
+      courseId: 'c1',
+      title: 'src',
+      sourceType: 'TEXT',
+      origin: 'manual',
+      rawText: EXTRACTED,
     });
     await vi.runAllTimersAsync();
 
@@ -256,11 +275,17 @@ describe('KnowledgeSourceService — text-tracing pipeline', () => {
   // ── 5. Parse failure → FAILED with error_message ───────────────────────────
 
   it('when DOCX parsing fails, source is marked FAILED with error_message', async () => {
-    const { svc, db } = await buildService({ extractedText: '', parseError: true });
+    const { svc, db } = await buildService({
+      extractedText: '',
+      parseError: true,
+    });
 
     await svc.createAndProcess({
-      tenantId: 't1', courseId: 'c1', title: 'broken',
-      sourceType: 'FILE_DOCX', origin: 'broken.docx',
+      tenantId: 't1',
+      courseId: 'c1',
+      title: 'broken',
+      sourceType: 'FILE_DOCX',
+      origin: 'broken.docx',
       fileBuffer: Buffer.from('not-a-real-docx'),
     });
     await vi.runAllTimersAsync();
@@ -278,7 +303,9 @@ describe('KnowledgeSourceService — text-tracing pipeline', () => {
 
   it('chunk_count reflects the number of chunks that were embedded successfully', async () => {
     const LONG_TEXT = 'א'.repeat(2500);
-    const { svc, db, parser } = await buildService({ extractedText: LONG_TEXT });
+    const { svc, db, parser } = await buildService({
+      extractedText: LONG_TEXT,
+    });
 
     parser.chunkText = vi.fn().mockReturnValue([
       { index: 0, text: 'c0' },
@@ -287,8 +314,12 @@ describe('KnowledgeSourceService — text-tracing pipeline', () => {
     ]);
 
     await svc.createAndProcess({
-      tenantId: 't1', courseId: 'c1', title: 'long',
-      sourceType: 'TEXT', origin: 'manual', rawText: LONG_TEXT,
+      tenantId: 't1',
+      courseId: 'c1',
+      title: 'long',
+      sourceType: 'TEXT',
+      origin: 'manual',
+      rawText: LONG_TEXT,
     });
     await vi.runAllTimersAsync();
 

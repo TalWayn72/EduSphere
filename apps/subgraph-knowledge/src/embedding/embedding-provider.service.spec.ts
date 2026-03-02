@@ -49,12 +49,10 @@ describe('EmbeddingProviderService', () => {
 
     it('calls Ollama API and returns embedding when OLLAMA_URL is set', async () => {
       process.env.OLLAMA_URL = 'http://localhost:11434';
-      const mockFetch = vi
-        .spyOn(global, 'fetch')
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({ embedding: [0.1, 0.2, 0.3] }),
-        } as Response);
+      const mockFetch = vi.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ embedding: [0.1, 0.2, 0.3] }),
+      } as Response);
 
       const result = await service.generateEmbedding('hello world');
 
@@ -79,12 +77,10 @@ describe('EmbeddingProviderService', () => {
 
     it('calls OpenAI API and returns embedding when OPENAI_API_KEY is set', async () => {
       process.env.OPENAI_API_KEY = 'sk-test-key';
-      const mockFetch = vi
-        .spyOn(global, 'fetch')
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({ data: [{ embedding: [0.5, 0.6, 0.7] }] }),
-        } as Response);
+      const mockFetch = vi.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: [{ embedding: [0.5, 0.6, 0.7] }] }),
+      } as Response);
 
       const result = await service.generateEmbedding('hello');
 
@@ -110,12 +106,10 @@ describe('EmbeddingProviderService', () => {
     it('prefers Ollama over OpenAI when both are configured', async () => {
       process.env.OLLAMA_URL = 'http://localhost:11434';
       process.env.OPENAI_API_KEY = 'sk-test';
-      const mockFetch = vi
-        .spyOn(global, 'fetch')
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({ embedding: [1, 2, 3] }),
-        } as Response);
+      const mockFetch = vi.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ embedding: [1, 2, 3] }),
+      } as Response);
 
       await service.generateEmbedding('text');
 
@@ -129,16 +123,16 @@ describe('EmbeddingProviderService', () => {
     it('uses EMBEDDING_MODEL env var for Ollama model name', async () => {
       process.env.OLLAMA_URL = 'http://localhost:11434';
       process.env.EMBEDDING_MODEL = 'custom-model';
-      const mockFetch = vi
-        .spyOn(global, 'fetch')
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({ embedding: [0.1] }),
-        } as Response);
+      const mockFetch = vi.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ embedding: [0.1] }),
+      } as Response);
 
       await service.generateEmbedding('text');
 
-      const callBody = JSON.parse((mockFetch.mock.calls[0]![1] as RequestInit).body as string);
+      const callBody = JSON.parse(
+        (mockFetch.mock.calls[0]![1] as RequestInit).body as string
+      );
       expect(callBody.model).toBe('custom-model');
     });
   });

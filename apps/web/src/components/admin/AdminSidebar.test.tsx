@@ -53,7 +53,9 @@ describe('AdminSidebar', () => {
 
   it('renders the "Dashboard" nav link', () => {
     renderSidebar();
-    expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /dashboard/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the "Branding" nav link', () => {
@@ -82,12 +84,16 @@ describe('AdminSidebar', () => {
 
   it('renders the "Enrollment" nav link', () => {
     renderSidebar();
-    expect(screen.getByRole('link', { name: /enrollment/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /enrollment/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the "Gamification" nav link', () => {
     renderSidebar();
-    expect(screen.getByRole('link', { name: /gamification/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /gamification/i })
+    ).toBeInTheDocument();
   });
 
   it('renders the "LTI 1.3" nav link', () => {

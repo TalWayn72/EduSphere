@@ -18,7 +18,11 @@ interface Props {
   onNext: () => void;
 }
 
-export function CreateLessonStep2({ lessonId, courseId: _courseId, onNext }: Props) {
+export function CreateLessonStep2({
+  lessonId,
+  courseId: _courseId,
+  onNext,
+}: Props) {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoError, setVideoError] = useState('');
   const [, addAsset] = useMutation(ADD_LESSON_ASSET_MUTATION);
@@ -47,7 +51,9 @@ export function CreateLessonStep2({ lessonId, courseId: _courseId, onNext }: Pro
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-1">🎥 קישור YouTube</label>
+          <label className="block text-sm font-medium mb-1">
+            🎥 קישור YouTube
+          </label>
           <div className="flex gap-2">
             <input
               value={videoUrl}
@@ -73,13 +79,17 @@ export function CreateLessonStep2({ lessonId, courseId: _courseId, onNext }: Pro
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">📄 קובץ הערות (PDF)</label>
+          <label className="block text-sm font-medium mb-1">
+            📄 קובץ הערות (PDF)
+          </label>
           <input
             type="file"
             accept=".pdf,.docx,.txt"
             className="w-full border rounded-lg px-3 py-2 text-sm"
           />
-          <p className="text-xs text-gray-400 mt-1">תמיכה בקבצי PDF, Word, TXT</p>
+          <p className="text-xs text-gray-400 mt-1">
+            תמיכה בקבצי PDF, Word, TXT
+          </p>
         </div>
       </div>
 

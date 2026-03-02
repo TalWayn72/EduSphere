@@ -94,10 +94,9 @@ describe('CourseGeneratorResolver', () => {
     it('uses "default" as tenantId when tenantId is null', async () => {
       mockGenerateCourse.mockResolvedValue(sampleResult);
 
-      await resolver.generateCourseFromPrompt(
-        { prompt: 'test' },
-        { authContext: { userId: 'user-1', tenantId: null } } as never
-      );
+      await resolver.generateCourseFromPrompt({ prompt: 'test' }, {
+        authContext: { userId: 'user-1', tenantId: null },
+      } as never);
 
       expect(mockGenerateCourse).toHaveBeenCalledWith(
         expect.anything(),

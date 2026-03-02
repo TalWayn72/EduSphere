@@ -7,7 +7,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -127,7 +127,9 @@ describe('BreakoutRoomPanel', () => {
   });
 
   it('shows mutation error message when createRooms returns an error', async () => {
-    mockCreateRooms.mockResolvedValueOnce({ error: { message: 'Server error' } });
+    mockCreateRooms.mockResolvedValueOnce({
+      error: { message: 'Server error' },
+    });
     render(<BreakoutRoomPanel sessionId="s1" />);
     fireEvent.change(screen.getByPlaceholderText('Room 1 name'), {
       target: { value: 'Beta Group' },

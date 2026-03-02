@@ -42,7 +42,9 @@ const AT_RISK_LEARNER = {
   learnerId: 'learner-1',
   courseId: 'course-1',
   riskScore: 0.85,
-  riskFactors: [{ key: 'inactiveForDays', description: 'No activity for more than 7 days' }],
+  riskFactors: [
+    { key: 'inactiveForDays', description: 'No activity for more than 7 days' },
+  ],
   flaggedAt: '2026-01-10T08:00:00.000Z',
   daysSinceLastActivity: 10,
   progressPercent: 15,
@@ -64,12 +66,19 @@ describe('AtRiskResolver', () => {
     it('returns learners for INSTRUCTOR role', async () => {
       mockGetAtRiskLearners.mockResolvedValueOnce([AT_RISK_LEARNER]);
 
-      const result = await resolver.getAtRiskLearners('course-1', makeCtx(['INSTRUCTOR']));
+      const result = await resolver.getAtRiskLearners(
+        'course-1',
+        makeCtx(['INSTRUCTOR'])
+      );
 
       expect(result).toEqual([AT_RISK_LEARNER]);
       expect(mockGetAtRiskLearners).toHaveBeenCalledWith(
         'course-1',
-        expect.objectContaining({ tenantId: 't1', userId: 'u1', userRole: 'INSTRUCTOR' })
+        expect.objectContaining({
+          tenantId: 't1',
+          userId: 'u1',
+          userRole: 'INSTRUCTOR',
+        })
       );
     });
 

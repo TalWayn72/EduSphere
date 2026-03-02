@@ -45,10 +45,16 @@ describe('BiTokenService', () => {
   it('generateToken returns 64-char hex string', async () => {
     const service = new BiTokenService();
     mockWithTenantContext.mockImplementationOnce(
-      async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (db: unknown) => Promise<unknown>
+      ) =>
         fn({
           insert: () => ({
-            values: () => ({ returning: () => Promise.resolve([{ id: 'tok-1' }]) }),
+            values: () => ({
+              returning: () => Promise.resolve([{ id: 'tok-1' }]),
+            }),
           }),
         })
     );
@@ -64,13 +70,18 @@ describe('BiTokenService', () => {
     let capturedValues: Record<string, unknown> | null = null;
 
     mockWithTenantContext.mockImplementationOnce(
-      async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (db: unknown) => Promise<unknown>
+      ) =>
         fn({
           insert: () => ({
             values: (vals: Record<string, unknown>) => {
               capturedValues = vals;
               return {
-                returning: () => Promise.resolve([{ id: 'tok-1', tenantId: 'tenant-1' }]),
+                returning: () =>
+                  Promise.resolve([{ id: 'tok-1', tenantId: 'tenant-1' }]),
               };
             },
           }),
@@ -81,15 +92,23 @@ describe('BiTokenService', () => {
     const expectedHash = sha256(raw);
 
     expect(capturedValues).not.toBeNull();
-    expect((capturedValues as Record<string, unknown>)['tokenHash']).toBe(expectedHash);
-    expect((capturedValues as Record<string, unknown>)['tokenHash']).not.toBe(raw);
+    expect((capturedValues as Record<string, unknown>)['tokenHash']).toBe(
+      expectedHash
+    );
+    expect((capturedValues as Record<string, unknown>)['tokenHash']).not.toBe(
+      raw
+    );
   });
 
   // Test 4: listTokens calls withTenantContext
   it('listTokens calls withTenantContext with correct tenantId', async () => {
     const service = new BiTokenService();
     mockWithTenantContext.mockImplementationOnce(
-      async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (db: unknown) => Promise<unknown>
+      ) =>
         fn({
           select: () => ({
             from: () => ({ where: () => Promise.resolve([]) }),
@@ -110,7 +129,11 @@ describe('BiTokenService', () => {
   it('revokeToken calls withTenantContext with correct tenantId', async () => {
     const service = new BiTokenService();
     mockWithTenantContext.mockImplementationOnce(
-      async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (db: unknown) => Promise<unknown>
+      ) =>
         fn({
           update: () => ({
             set: () => ({ where: () => Promise.resolve([]) }),
@@ -136,7 +159,11 @@ describe('BiTokenService', () => {
 
     mockWithTenantContext
       .mockImplementationOnce(
-        async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+        async (
+          _db: unknown,
+          _ctx: unknown,
+          fn: (db: unknown) => Promise<unknown>
+        ) =>
           fn({
             insert: () => ({
               values: (vals: Record<string, unknown>) => {
@@ -147,7 +174,11 @@ describe('BiTokenService', () => {
           })
       )
       .mockImplementationOnce(
-        async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+        async (
+          _db: unknown,
+          _ctx: unknown,
+          fn: (db: unknown) => Promise<unknown>
+        ) =>
           fn({
             insert: () => ({
               values: (vals: Record<string, unknown>) => {
@@ -189,7 +220,11 @@ describe('BiTokenService', () => {
     let capturedDesc: string | null = null;
 
     mockWithTenantContext.mockImplementationOnce(
-      async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (db: unknown) => Promise<unknown>
+      ) =>
         fn({
           insert: () => ({
             values: (vals: Record<string, unknown>) => {
@@ -209,7 +244,11 @@ describe('BiTokenService', () => {
   it('revokeToken resolves without error on success', async () => {
     const service = new BiTokenService();
     mockWithTenantContext.mockImplementationOnce(
-      async (_db: unknown, _ctx: unknown, fn: (db: unknown) => Promise<unknown>) =>
+      async (
+        _db: unknown,
+        _ctx: unknown,
+        fn: (db: unknown) => Promise<unknown>
+      ) =>
         fn({
           update: () => ({
             set: () => ({ where: () => Promise.resolve([]) }),
@@ -217,6 +256,8 @@ describe('BiTokenService', () => {
         })
     );
 
-    await expect(service.revokeToken('tok-1', 'tenant-1')).resolves.not.toThrow();
+    await expect(
+      service.revokeToken('tok-1', 'tenant-1')
+    ).resolves.not.toThrow();
   });
 });

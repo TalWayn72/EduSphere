@@ -35,9 +35,7 @@ describe('AgentMessageResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new AgentMessageResolver(
-      new AgentMessageService({} as never)
-    );
+    resolver = new AgentMessageResolver(new AgentMessageService({} as never));
   });
 
   describe('resolveReference()', () => {
@@ -61,7 +59,10 @@ describe('AgentMessageResolver', () => {
     it('throws UnauthorizedException when authContext is missing', async () => {
       const ctx = makeCtx(false);
       await expect(
-        resolver.resolveReference({ __typename: 'AgentMessage', id: 'msg-1' }, ctx)
+        resolver.resolveReference(
+          { __typename: 'AgentMessage', id: 'msg-1' },
+          ctx
+        )
       ).rejects.toThrow(UnauthorizedException);
     });
 

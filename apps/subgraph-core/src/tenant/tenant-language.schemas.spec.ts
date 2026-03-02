@@ -51,7 +51,16 @@ describe('UpdateTenantLanguageSettingsSchema', () => {
 
   it('accepts all known SUPPORTED_LOCALES as defaultLanguage', () => {
     const knownLocales = [
-      'en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id', 'he',
+      'en',
+      'zh-CN',
+      'hi',
+      'es',
+      'fr',
+      'bn',
+      'pt',
+      'ru',
+      'id',
+      'he',
     ] as const;
     for (const locale of knownLocales) {
       const result = UpdateTenantLanguageSettingsSchema.safeParse({

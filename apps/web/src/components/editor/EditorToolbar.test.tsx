@@ -81,7 +81,9 @@ describe('EditorToolbar', () => {
   it('calls editor.chain().focus().toggleBold().run() on Bold click', () => {
     render(<EditorToolbar editor={editor} />);
     fireEvent.click(screen.getByTitle('Bold'));
-    const chain = (editor as unknown as { _chainResult: { run: ReturnType<typeof vi.fn> } })._chainResult;
+    const chain = (
+      editor as unknown as { _chainResult: { run: ReturnType<typeof vi.fn> } }
+    )._chainResult;
     expect(chain.run).toHaveBeenCalled();
   });
 
@@ -97,15 +99,33 @@ describe('EditorToolbar', () => {
   it('inserts table when Insert table button is clicked', () => {
     render(<EditorToolbar editor={editor} />);
     fireEvent.click(screen.getByTitle('Insert table'));
-    const chain = (editor as unknown as { _chainResult: { insertTable: ReturnType<typeof vi.fn>; run: ReturnType<typeof vi.fn> } })._chainResult;
-    expect(chain.insertTable).toHaveBeenCalledWith({ rows: 3, cols: 3, withHeaderRow: true });
+    const chain = (
+      editor as unknown as {
+        _chainResult: {
+          insertTable: ReturnType<typeof vi.fn>;
+          run: ReturnType<typeof vi.fn>;
+        };
+      }
+    )._chainResult;
+    expect(chain.insertTable).toHaveBeenCalledWith({
+      rows: 3,
+      cols: 3,
+      withHeaderRow: true,
+    });
     expect(chain.run).toHaveBeenCalled();
   });
 
   it('inserts math content when math button is clicked', () => {
     render(<EditorToolbar editor={editor} hasMath />);
     fireEvent.click(screen.getByTitle('Insert math (LaTeX)'));
-    const chain = (editor as unknown as { _chainResult: { insertContent: ReturnType<typeof vi.fn>; run: ReturnType<typeof vi.fn> } })._chainResult;
+    const chain = (
+      editor as unknown as {
+        _chainResult: {
+          insertContent: ReturnType<typeof vi.fn>;
+          run: ReturnType<typeof vi.fn>;
+        };
+      }
+    )._chainResult;
     expect(chain.insertContent).toHaveBeenCalledWith('$$...$$');
     expect(chain.run).toHaveBeenCalled();
   });

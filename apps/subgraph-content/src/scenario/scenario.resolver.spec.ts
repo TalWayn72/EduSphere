@@ -65,18 +65,32 @@ describe('ScenarioResolver', () => {
 
   describe('requireAuth (tested via getScenarioNode)', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.getScenarioNode('item-1', noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(
+        resolver.getScenarioNode('item-1', noAuthCtx)
+      ).rejects.toThrow(UnauthorizedException);
       expect(mockGetScenarioNode).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
-      await expect(resolver.getScenarioNode('item-1', ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: undefined as unknown as string,
+        tenantId: 't1',
+        roles: [],
+      });
+      await expect(resolver.getScenarioNode('item-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.getScenarioNode('item-1', ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.getScenarioNode('item-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -97,7 +111,11 @@ describe('ScenarioResolver', () => {
 
     it('builds TenantContext with role from first roles entry', async () => {
       mockGetScenarioNode.mockResolvedValueOnce(MOCK_NODE);
-      const ctx = makeCtx({ userId: 'u1', tenantId: 't1', roles: ['INSTRUCTOR'] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: 't1',
+        roles: ['INSTRUCTOR'],
+      });
 
       await resolver.getScenarioNode('node-1', ctx);
 
@@ -128,7 +146,10 @@ describe('ScenarioResolver', () => {
     it('delegates to service.getScenarioProgress with scenarioRootId and TenantContext', async () => {
       mockGetScenarioProgress.mockResolvedValueOnce(MOCK_PROGRESS);
 
-      const result = await resolver.getMyScenarioProgress('node-root', makeCtx());
+      const result = await resolver.getMyScenarioProgress(
+        'node-root',
+        makeCtx()
+      );
 
       expect(mockGetScenarioProgress).toHaveBeenCalledWith(
         'node-root',

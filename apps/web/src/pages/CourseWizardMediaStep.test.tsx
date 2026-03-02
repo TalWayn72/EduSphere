@@ -28,8 +28,12 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/lib/urql-client', () => ({
   urqlClient: {
-    query: vi.fn(() => ({ toPromise: vi.fn().mockResolvedValue({ data: null, error: null }) })),
-    mutation: vi.fn(() => ({ toPromise: vi.fn().mockResolvedValue({ data: null, error: null }) })),
+    query: vi.fn(() => ({
+      toPromise: vi.fn().mockResolvedValue({ data: null, error: null }),
+    })),
+    mutation: vi.fn(() => ({
+      toPromise: vi.fn().mockResolvedValue({ data: null, error: null }),
+    })),
   },
 }));
 
@@ -123,10 +127,9 @@ describe('CourseWizardMediaStep', () => {
 
   it('"Add Rich Document" button is enabled when title is filled', () => {
     renderStep();
-    fireEvent.change(
-      screen.getByPlaceholderText('Document title...'),
-      { target: { value: 'My Guide' } }
-    );
+    fireEvent.change(screen.getByPlaceholderText('Document title...'), {
+      target: { value: 'My Guide' },
+    });
     expect(
       screen.getByRole('button', { name: /add rich document/i })
     ).not.toBeDisabled();
@@ -136,17 +139,19 @@ describe('CourseWizardMediaStep', () => {
     const onChange = vi.fn();
     renderStep({ onChange });
 
-    fireEvent.change(
-      screen.getByPlaceholderText('Document title...'),
-      { target: { value: 'Study Guide' } }
-    );
+    fireEvent.change(screen.getByPlaceholderText('Document title...'), {
+      target: { value: 'Study Guide' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /add rich document/i }));
 
     await waitFor(() => expect(screen.getByText('Added')).toBeInTheDocument());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         mediaList: expect.arrayContaining([
-          expect.objectContaining({ title: 'Study Guide', contentType: 'RICH_DOCUMENT' }),
+          expect.objectContaining({
+            title: 'Study Guide',
+            contentType: 'RICH_DOCUMENT',
+          }),
         ]),
       })
     );
@@ -165,9 +170,16 @@ describe('CourseWizardMediaStep', () => {
 
   it('adds file entry when a file is selected via the input', () => {
     const { container } = renderStep();
-    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['video content'], 'lecture.mp4', { type: 'video/mp4' });
-    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+    const fileInput = container.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    const file = new File(['video content'], 'lecture.mp4', {
+      type: 'video/mp4',
+    });
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
     fireEvent.change(fileInput);
     expect(screen.getByText('lecture.mp4')).toBeInTheDocument();
   });

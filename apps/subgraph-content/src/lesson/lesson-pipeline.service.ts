@@ -45,7 +45,9 @@ export class LessonPipelineService implements OnModuleDestroy {
 
   private publishEvent(subject: string, payload: LessonPayload): void {
     this.getNats()
-      .then((nc) => nc.publish(subject, this.sc.encode(JSON.stringify(payload))))
+      .then((nc) =>
+        nc.publish(subject, this.sc.encode(JSON.stringify(payload)))
+      )
       .catch((err: unknown) => {
         this.logger.warn(`Failed to publish ${subject}: ${String(err)}`);
       });
@@ -198,7 +200,10 @@ export class LessonPipelineService implements OnModuleDestroy {
     // Fire-and-forget with 5-minute timeout per memory safety rules
     const FIVE_MINUTES = 5 * 60 * 1000;
     const timeoutPromise = new Promise<void>((_, reject) =>
-      setTimeout(() => reject(new Error('Pipeline run timed out')), FIVE_MINUTES)
+      setTimeout(
+        () => reject(new Error('Pipeline run timed out')),
+        FIVE_MINUTES
+      )
     );
     Promise.race([
       this.orchestrator.executeRun(runId, pipelineId, tenantCtx),

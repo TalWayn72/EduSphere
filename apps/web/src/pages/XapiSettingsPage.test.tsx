@@ -7,7 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
@@ -61,14 +61,18 @@ const MOCK_STATEMENTS = [
   },
 ];
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
-function setupMocks(opts: {
-  tokens?: typeof MOCK_TOKENS;
-  statements?: typeof MOCK_STATEMENTS;
-  tokensFetching?: boolean;
-  role?: string | null;
-} = {}) {
+function setupMocks(
+  opts: {
+    tokens?: typeof MOCK_TOKENS;
+    statements?: typeof MOCK_STATEMENTS;
+    tokensFetching?: boolean;
+    role?: string | null;
+  } = {}
+) {
   const {
     tokens,
     statements,
@@ -174,7 +178,9 @@ describe('XapiSettingsPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /generate/i }));
     expect(screen.getByText('Generate xAPI Token')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/rustici scorm cloud/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/rustici scorm cloud/i)
+    ).toBeInTheDocument();
   });
 
   it('modal Cancel button closes the modal', () => {
@@ -189,7 +195,9 @@ describe('XapiSettingsPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /generate/i }));
     // The Generate button inside the modal (second one)
-    const modalGenerateBtn = screen.getAllByRole('button', { name: /generate/i })[1];
+    const modalGenerateBtn = screen.getAllByRole('button', {
+      name: /generate/i,
+    })[1];
     expect(modalGenerateBtn).toBeDisabled();
   });
 
@@ -204,7 +212,9 @@ describe('XapiSettingsPage', () => {
     renderPage();
     // verb.split('/').pop() = 'completed'
     expect(screen.getByText('completed')).toBeInTheDocument();
-    expect(screen.getByText('https://example.com/courses/intro')).toBeInTheDocument();
+    expect(
+      screen.getByText('https://example.com/courses/intro')
+    ).toBeInTheDocument();
   });
 
   it('redirects (renders null) when user role is not admin', () => {

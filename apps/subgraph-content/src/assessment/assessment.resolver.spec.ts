@@ -50,7 +50,12 @@ const CAMPAIGN_ROW = {
   targetUserId: 'target-1',
   status: 'DRAFT',
   dueDate: new Date('2026-06-30T00:00:00.000Z'),
-  rubric: { criteria: [{ id: 'c1', label: 'Communication' }, { id: 'c2', label: 'Teamwork' }] },
+  rubric: {
+    criteria: [
+      { id: 'c1', label: 'Communication' },
+      { id: 'c2', label: 'Teamwork' },
+    ],
+  },
 };
 
 const RESULT_ROW = {
@@ -92,13 +97,23 @@ describe('AssessmentResolver', () => {
     });
 
     it('throws UnauthorizedException when no auth', async () => {
-      await expect(resolver.myCampaigns(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myCampaigns(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockListCampaignsForTarget).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = { authContext: { userId: undefined as unknown as string, tenantId: 't1', roles: ['STUDENT'] } };
-      await expect(resolver.myCampaigns(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = {
+        authContext: {
+          userId: undefined as unknown as string,
+          tenantId: 't1',
+          roles: ['STUDENT'],
+        },
+      };
+      await expect(resolver.myCampaigns(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -155,7 +170,9 @@ describe('AssessmentResolver', () => {
     });
 
     it('throws UnauthorizedException when no auth', async () => {
-      await expect(resolver.campaignsToRespond(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.campaignsToRespond(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -181,8 +198,16 @@ describe('AssessmentResolver', () => {
     });
 
     it('throws UnauthorizedException when tenantId missing', async () => {
-      const ctx = { authContext: { userId: 'u1', tenantId: undefined as unknown as string, roles: ['STUDENT'] } };
-      await expect(resolver.assessmentResult('camp-1', ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = {
+        authContext: {
+          userId: 'u1',
+          tenantId: undefined as unknown as string,
+          roles: ['STUDENT'],
+        },
+      };
+      await expect(resolver.assessmentResult('camp-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -191,7 +216,12 @@ describe('AssessmentResolver', () => {
   describe('createAssessmentCampaign', () => {
     it('throws UnauthorizedException when no auth', async () => {
       await expect(
-        resolver.createAssessmentCampaign('Review', 'target-1', undefined, noAuthCtx)
+        resolver.createAssessmentCampaign(
+          'Review',
+          'target-1',
+          undefined,
+          noAuthCtx
+        )
       ).rejects.toThrow(UnauthorizedException);
       expect(mockCreateCampaign).not.toHaveBeenCalled();
     });
@@ -239,7 +269,13 @@ describe('AssessmentResolver', () => {
 
     it('throws UnauthorizedException when no auth', async () => {
       await expect(
-        resolver.submitAssessmentResponse('camp-1', 'SELF', '{}', undefined, noAuthCtx)
+        resolver.submitAssessmentResponse(
+          'camp-1',
+          'SELF',
+          '{}',
+          undefined,
+          noAuthCtx
+        )
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -250,7 +286,10 @@ describe('AssessmentResolver', () => {
     it('returns aggregated result with ISO generatedAt', async () => {
       mockCompleteCampaign.mockResolvedValueOnce(RESULT_ROW);
 
-      const result = await resolver.completeAssessmentCampaign('camp-1', makeCtx());
+      const result = await resolver.completeAssessmentCampaign(
+        'camp-1',
+        makeCtx()
+      );
 
       expect(result.campaignId).toBe('camp-1');
       expect(result.generatedAt).toBe('2026-01-15T10:00:00.000Z');

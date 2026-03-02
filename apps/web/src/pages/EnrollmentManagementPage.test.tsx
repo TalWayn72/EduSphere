@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -80,10 +81,7 @@ const MOCK_ENROLLMENTS = [
 
 const MOCK_EXECUTE = vi.fn().mockResolvedValue({ error: undefined });
 
-function setupUrql(
-  overrides: Record<string, unknown> = {},
-  fetching = false
-) {
+function setupUrql(overrides: Record<string, unknown> = {}, fetching = false) {
   vi.mocked(urql.useQuery).mockReturnValue([
     {
       data: {
@@ -140,9 +138,7 @@ describe('EnrollmentManagementPage', () => {
   it('returns null for non-admin roles (no course selector rendered)', () => {
     vi.mocked(useAuthRole).mockReturnValue('STUDENT');
     renderPage();
-    expect(
-      screen.queryByText(/select a course/i)
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/select a course/i)).not.toBeInTheDocument();
   });
 
   it('allows ORG_ADMIN to view the page', () => {
@@ -170,9 +166,7 @@ describe('EnrollmentManagementPage', () => {
 
   it('renders the course select dropdown', () => {
     renderPage();
-    expect(
-      screen.getByText(/select a course…/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/select a course…/i)).toBeInTheDocument();
   });
 
   it('shows loading indicator when courses are fetching', () => {

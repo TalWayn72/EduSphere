@@ -65,13 +65,24 @@ describe('BiExportResolver', () => {
 
   describe('requireAdmin (tested via getBiApiTokens)', () => {
     it('throws UnauthorizedException when no auth', async () => {
-      await expect(resolver.getBiApiTokens(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getBiApiTokens(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockListTokens).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = { req: {}, authContext: { userId: undefined as unknown as string, tenantId: 't1', roles: ['ORG_ADMIN'] } };
-      await expect(resolver.getBiApiTokens(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = {
+        req: {},
+        authContext: {
+          userId: undefined as unknown as string,
+          tenantId: 't1',
+          roles: ['ORG_ADMIN'],
+        },
+      };
+      await expect(resolver.getBiApiTokens(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws ForbiddenException for INSTRUCTOR role', async () => {
@@ -89,12 +100,16 @@ describe('BiExportResolver', () => {
 
     it('allows ORG_ADMIN role', async () => {
       mockListTokens.mockResolvedValueOnce([]);
-      await expect(resolver.getBiApiTokens(makeCtx(['ORG_ADMIN']))).resolves.not.toThrow();
+      await expect(
+        resolver.getBiApiTokens(makeCtx(['ORG_ADMIN']))
+      ).resolves.not.toThrow();
     });
 
     it('allows SUPER_ADMIN role', async () => {
       mockListTokens.mockResolvedValueOnce([]);
-      await expect(resolver.getBiApiTokens(makeCtx(['SUPER_ADMIN']))).resolves.not.toThrow();
+      await expect(
+        resolver.getBiApiTokens(makeCtx(['SUPER_ADMIN']))
+      ).resolves.not.toThrow();
     });
   });
 

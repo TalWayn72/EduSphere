@@ -15,18 +15,42 @@ vi.mock('pdfkit', () => ({
         handlers['data']?.forEach((cb) => cb(Buffer.from('PDF')));
         handlers['end']?.forEach((cb) => cb(Buffer.from('')));
       },
-      fontSize: function () { return doc; },
-      font: function () { return doc; },
-      text: function () { return doc; },
-      moveDown: function () { return doc; },
-      fillColor: function () { return doc; },
-      rect: function () { return doc; },
-      fill: function () { return doc; },
-      stroke: function () { return doc; },
-      lineWidth: function () { return doc; },
-      moveTo: function () { return doc; },
-      lineTo: function () { return doc; },
-      addPage: function () { return doc; },
+      fontSize: function () {
+        return doc;
+      },
+      font: function () {
+        return doc;
+      },
+      text: function () {
+        return doc;
+      },
+      moveDown: function () {
+        return doc;
+      },
+      fillColor: function () {
+        return doc;
+      },
+      rect: function () {
+        return doc;
+      },
+      fill: function () {
+        return doc;
+      },
+      stroke: function () {
+        return doc;
+      },
+      lineWidth: function () {
+        return doc;
+      },
+      moveTo: function () {
+        return doc;
+      },
+      lineTo: function () {
+        return doc;
+      },
+      addPage: function () {
+        return doc;
+      },
       // y well below page.height - 80 so addPage is not triggered by default
       y: 100,
       page: { width: 842, height: 595, margins: { left: 40 } },
@@ -60,7 +84,9 @@ const SINGLE_ROW = {
   complianceDueDate: '2026-02-01',
 };
 
-function makeInput(rows: CompliancePdfInput['rows'] = [SINGLE_ROW]): CompliancePdfInput {
+function makeInput(
+  rows: CompliancePdfInput['rows'] = [SINGLE_ROW]
+): CompliancePdfInput {
   return {
     title: 'Q1 Compliance Report',
     tenantName: 'Acme Corp',

@@ -86,7 +86,9 @@ export function ProfilePage() {
     query: COURSES_QUERY,
     variables: { limit: 100, offset: 0 },
   });
-  const [pointsResult] = useQuery<MyTotalPointsResult>({ query: MY_TOTAL_POINTS_QUERY });
+  const [pointsResult] = useQuery<MyTotalPointsResult>({
+    query: MY_TOTAL_POINTS_QUERY,
+  });
 
   if (!localUser) {
     return <Navigate to="/login" replace />;
@@ -117,7 +119,11 @@ export function ProfilePage() {
     {
       icon: Trophy,
       label: 'XP Points',
-      value: pointsResult.fetching ? '...' : totalPoints !== undefined ? totalPoints.toLocaleString() : '—',
+      value: pointsResult.fetching
+        ? '...'
+        : totalPoints !== undefined
+          ? totalPoints.toLocaleString()
+          : '—',
     },
     {
       icon: MessageSquare,

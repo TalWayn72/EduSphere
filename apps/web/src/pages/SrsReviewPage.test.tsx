@@ -7,7 +7,8 @@ import { MemoryRouter } from 'react-router-dom';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -16,12 +17,18 @@ vi.mock('urql', () => ({
 
 // Mock Layout to avoid rendering the full nav/header with its own hooks
 vi.mock('@/components/Layout', () => ({
-  Layout: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
 
 // Mock auth so getCurrentUser() returns a stable dev user
 vi.mock('@/lib/auth', () => ({
-  getCurrentUser: vi.fn(() => ({ id: 'dev-user-1', username: 'developer', role: 'STUDENT' })),
+  getCurrentUser: vi.fn(() => ({
+    id: 'dev-user-1',
+    username: 'developer',
+    role: 'STUDENT',
+  })),
   isAuthenticated: vi.fn(() => true),
 }));
 
@@ -81,7 +88,9 @@ describe('SrsReviewPage', () => {
 
   it('renders card conceptName when a card is present', () => {
     renderPage();
-    expect(screen.getByTestId('concept-name')).toHaveTextContent('Photosynthesis');
+    expect(screen.getByTestId('concept-name')).toHaveTextContent(
+      'Photosynthesis'
+    );
   });
 
   it('does NOT show rating buttons before flipping the card', () => {
@@ -105,7 +114,10 @@ describe('SrsReviewPage', () => {
 
   it('calls submitRating(0) when "Again" is clicked', () => {
     const mockSubmit = vi.fn();
-    vi.mocked(useSrsSession).mockReturnValue({ ...defaultSession, submitRating: mockSubmit });
+    vi.mocked(useSrsSession).mockReturnValue({
+      ...defaultSession,
+      submitRating: mockSubmit,
+    });
     renderPage();
     fireEvent.click(screen.getByTestId('flip-button'));
     fireEvent.click(screen.getByTestId('rate-again'));
@@ -114,7 +126,10 @@ describe('SrsReviewPage', () => {
 
   it('calls submitRating(3) when "Good" is clicked', () => {
     const mockSubmit = vi.fn();
-    vi.mocked(useSrsSession).mockReturnValue({ ...defaultSession, submitRating: mockSubmit });
+    vi.mocked(useSrsSession).mockReturnValue({
+      ...defaultSession,
+      submitRating: mockSubmit,
+    });
     renderPage();
     fireEvent.click(screen.getByTestId('flip-button'));
     fireEvent.click(screen.getByTestId('rate-good'));
@@ -123,7 +138,10 @@ describe('SrsReviewPage', () => {
 
   it('calls submitRating(5) when "Easy" is clicked', () => {
     const mockSubmit = vi.fn();
-    vi.mocked(useSrsSession).mockReturnValue({ ...defaultSession, submitRating: mockSubmit });
+    vi.mocked(useSrsSession).mockReturnValue({
+      ...defaultSession,
+      submitRating: mockSubmit,
+    });
     renderPage();
     fireEvent.click(screen.getByTestId('flip-button'));
     fireEvent.click(screen.getByTestId('rate-easy'));
@@ -169,7 +187,9 @@ describe('SrsReviewPage', () => {
       totalDue: 5,
     });
     renderPage();
-    expect(screen.getByTestId('card-progress')).toHaveTextContent('Card 1 of 5');
+    expect(screen.getByTestId('card-progress')).toHaveTextContent(
+      'Card 1 of 5'
+    );
   });
 
   it('hides flip button and shows rating buttons after flip', () => {

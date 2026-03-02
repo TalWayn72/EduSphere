@@ -57,12 +57,19 @@ describe('AnalyticsResolver', () => {
   it('getCourseAnalytics returns service result for instructor role', async () => {
     mockGetCourseAnalytics.mockResolvedValueOnce(MOCK_ANALYTICS);
 
-    const result = await resolver.getCourseAnalytics('course-1', makeCtx(['INSTRUCTOR']));
+    const result = await resolver.getCourseAnalytics(
+      'course-1',
+      makeCtx(['INSTRUCTOR'])
+    );
 
     expect(result).toEqual(MOCK_ANALYTICS);
     expect(mockGetCourseAnalytics).toHaveBeenCalledWith(
       'course-1',
-      expect.objectContaining({ tenantId: 't1', userId: 'u1', userRole: 'INSTRUCTOR' })
+      expect.objectContaining({
+        tenantId: 't1',
+        userId: 'u1',
+        userRole: 'INSTRUCTOR',
+      })
     );
   });
 
@@ -86,7 +93,10 @@ describe('AnalyticsResolver', () => {
   it('getCourseAnalytics allows ORG_ADMIN', async () => {
     mockGetCourseAnalytics.mockResolvedValueOnce(MOCK_ANALYTICS);
 
-    const result = await resolver.getCourseAnalytics('course-1', makeCtx(['ORG_ADMIN']));
+    const result = await resolver.getCourseAnalytics(
+      'course-1',
+      makeCtx(['ORG_ADMIN'])
+    );
 
     expect(result).toEqual(MOCK_ANALYTICS);
     expect(mockGetCourseAnalytics).toHaveBeenCalledWith(
@@ -99,7 +109,10 @@ describe('AnalyticsResolver', () => {
   it('getCourseAnalytics allows SUPER_ADMIN', async () => {
     mockGetCourseAnalytics.mockResolvedValueOnce(MOCK_ANALYTICS);
 
-    const result = await resolver.getCourseAnalytics('course-1', makeCtx(['SUPER_ADMIN']));
+    const result = await resolver.getCourseAnalytics(
+      'course-1',
+      makeCtx(['SUPER_ADMIN'])
+    );
 
     expect(result).toEqual(MOCK_ANALYTICS);
     expect(mockGetCourseAnalytics).toHaveBeenCalledWith(
@@ -113,15 +126,20 @@ describe('AnalyticsResolver', () => {
     mockGetCourseAnalytics.mockResolvedValueOnce(MOCK_ANALYTICS);
 
     const ctx = {
-      authContext: { userId: 'instructor-99', tenantId: 'tenant-42', roles: ['INSTRUCTOR'] },
+      authContext: {
+        userId: 'instructor-99',
+        tenantId: 'tenant-42',
+        roles: ['INSTRUCTOR'],
+      },
     };
 
     await resolver.getCourseAnalytics('course-abc', ctx);
 
-    expect(mockGetCourseAnalytics).toHaveBeenCalledWith(
-      'course-abc',
-      { tenantId: 'tenant-42', userId: 'instructor-99', userRole: 'INSTRUCTOR' }
-    );
+    expect(mockGetCourseAnalytics).toHaveBeenCalledWith('course-abc', {
+      tenantId: 'tenant-42',
+      userId: 'instructor-99',
+      userRole: 'INSTRUCTOR',
+    });
   });
 
   // Test 7: returns service result with correct courseId
@@ -132,18 +150,25 @@ describe('AnalyticsResolver', () => {
     const result = await resolver.getCourseAnalytics('course-2', makeCtx());
 
     expect(result.courseId).toBe('course-2');
-    expect(mockGetCourseAnalytics).toHaveBeenCalledWith('course-2', expect.any(Object));
+    expect(mockGetCourseAnalytics).toHaveBeenCalledWith(
+      'course-2',
+      expect.any(Object)
+    );
   });
 
   // Test 8: missing tenantId throws UnauthorizedException
   it('missing tenantId throws UnauthorizedException', async () => {
     const ctx = {
-      authContext: { userId: 'u1', tenantId: undefined as unknown as string, roles: ['INSTRUCTOR'] },
+      authContext: {
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: ['INSTRUCTOR'],
+      },
     };
 
-    await expect(
-      resolver.getCourseAnalytics('course-1', ctx)
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(resolver.getCourseAnalytics('course-1', ctx)).rejects.toThrow(
+      UnauthorizedException
+    );
     expect(mockGetCourseAnalytics).not.toHaveBeenCalled();
   });
 });

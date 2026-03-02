@@ -5,7 +5,10 @@ import { render, screen } from '@testing-library/react';
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
-  return { ...actual, useParams: vi.fn(() => ({ assertionId: 'assert-abc123' })) };
+  return {
+    ...actual,
+    useParams: vi.fn(() => ({ assertionId: 'assert-abc123' })),
+  };
 });
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
@@ -39,7 +42,12 @@ const MOCK_ASSERTION = {
   verifyUrl: 'https://example.com/verify/assert-abc123',
 };
 
-const IDLE_RESULT = { data: undefined, isLoading: false, isError: false, error: null };
+const IDLE_RESULT = {
+  data: undefined,
+  isLoading: false,
+  isError: false,
+  error: null,
+};
 
 function makeQuery(overrides: Record<string, unknown> = {}) {
   return { ...IDLE_RESULT, ...overrides } as never;
@@ -55,7 +63,9 @@ describe('BadgeVerifierPage', () => {
 
   it('always shows "Badge Verification" heading', () => {
     render(<BadgeVerifierPage />);
-    expect(screen.getByRole('heading', { name: /badge verification/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /badge verification/i })
+    ).toBeInTheDocument();
   });
 
   it('shows the assertion ID from URL params', () => {
@@ -64,7 +74,9 @@ describe('BadgeVerifierPage', () => {
   });
 
   it('shows loading indicator while verifying', () => {
-    vi.mocked(tanstack.useQuery).mockReturnValue(makeQuery({ isLoading: true }));
+    vi.mocked(tanstack.useQuery).mockReturnValue(
+      makeQuery({ isLoading: true })
+    );
     render(<BadgeVerifierPage />);
     expect(screen.getByText(/verifying credential/i)).toBeInTheDocument();
   });
@@ -72,13 +84,17 @@ describe('BadgeVerifierPage', () => {
   it('shows network error message when query errors', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(makeQuery({ isError: true }));
     render(<BadgeVerifierPage />);
-    expect(screen.getByText(/unable to verify.*network error/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/unable to verify.*network error/i)
+    ).toBeInTheDocument();
   });
 
   it('shows "Valid Credential" badge for a valid result', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
       makeQuery({
-        data: { verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION } },
+        data: {
+          verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION },
+        },
       })
     );
     render(<BadgeVerifierPage />);
@@ -88,18 +104,24 @@ describe('BadgeVerifierPage', () => {
   it('shows badge name and description for valid assertion', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
       makeQuery({
-        data: { verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION } },
+        data: {
+          verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION },
+        },
       })
     );
     render(<BadgeVerifierPage />);
     expect(screen.getByText('First Login')).toBeInTheDocument();
-    expect(screen.getByText('Logged in for the first time')).toBeInTheDocument();
+    expect(
+      screen.getByText('Logged in for the first time')
+    ).toBeInTheDocument();
   });
 
   it('shows "Invalid Credential" for an invalid result', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
       makeQuery({
-        data: { verifyBadge: { valid: false, error: 'Revoked', assertion: null } },
+        data: {
+          verifyBadge: { valid: false, error: 'Revoked', assertion: null },
+        },
       })
     );
     render(<BadgeVerifierPage />);
@@ -119,7 +141,9 @@ describe('BadgeVerifierPage', () => {
   it('shows anonymized recipient ID', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
       makeQuery({
-        data: { verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION } },
+        data: {
+          verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION },
+        },
       })
     );
     render(<BadgeVerifierPage />);
@@ -130,7 +154,9 @@ describe('BadgeVerifierPage', () => {
   it('shows "EduSphere Platform" as issuer', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
       makeQuery({
-        data: { verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION } },
+        data: {
+          verifyBadge: { valid: true, error: null, assertion: MOCK_ASSERTION },
+        },
       })
     );
     render(<BadgeVerifierPage />);

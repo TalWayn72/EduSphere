@@ -62,7 +62,8 @@ export function initKeycloak(): Promise<boolean> {
     // Respect an explicit logout — do NOT auto-authenticate when the user
     // has previously signed out (sessionStorage survives page reloads but
     // is cleared when the browser tab/session ends).
-    const wasLoggedOut = window.sessionStorage.getItem(DEV_LOGOUT_KEY) === 'true';
+    const wasLoggedOut =
+      window.sessionStorage.getItem(DEV_LOGOUT_KEY) === 'true';
     devAuthenticated = !wasLoggedOut;
     return Promise.resolve(devAuthenticated);
   }

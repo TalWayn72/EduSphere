@@ -136,18 +136,13 @@ describe('AnnotatedDocumentViewer', () => {
   });
 
   it('renders without crashing when annotations array is empty', () => {
-    render(
-      <AnnotatedDocumentViewer {...defaultProps} annotations={[]} />
-    );
+    render(<AnnotatedDocumentViewer {...defaultProps} annotations={[]} />);
     expect(screen.getByTestId('rich-content-viewer')).toBeInTheDocument();
   });
 
   it('renders without crashing when focusedAnnotationId is set', () => {
     render(
-      <AnnotatedDocumentViewer
-        {...defaultProps}
-        focusedAnnotationId="ann-1"
-      />
+      <AnnotatedDocumentViewer {...defaultProps} focusedAnnotationId="ann-1" />
     );
     expect(screen.getByTestId('rich-content-viewer')).toBeInTheDocument();
   });
@@ -156,7 +151,11 @@ describe('AnnotatedDocumentViewer', () => {
     render(
       <AnnotatedDocumentViewer
         {...defaultProps}
-        annotations={[makeAnnotation('a1'), makeAnnotation('a2'), makeAnnotation('a3')]}
+        annotations={[
+          makeAnnotation('a1'),
+          makeAnnotation('a2'),
+          makeAnnotation('a3'),
+        ]}
       />
     );
     expect(screen.getByTestId('rich-content-viewer')).toBeInTheDocument();

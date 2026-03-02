@@ -59,7 +59,11 @@ describe('CanvasDropZone', () => {
   it('calls onRemove with correct block id when remove button clicked', () => {
     const onRemove = vi.fn();
     render(
-      <CanvasDropZone {...defaultProps} blocks={MOCK_BLOCKS} onRemove={onRemove} />
+      <CanvasDropZone
+        {...defaultProps}
+        blocks={MOCK_BLOCKS}
+        onRemove={onRemove}
+      />
     );
     fireEvent.click(
       screen.getByRole('button', { name: /remove HeroBanner block/i })
@@ -70,7 +74,9 @@ describe('CanvasDropZone', () => {
   it('calls onDrop when a palette blockType is dropped on empty zone', () => {
     const onDrop = vi.fn();
     render(<CanvasDropZone {...defaultProps} onDrop={onDrop} />);
-    const zone = screen.getByRole('region', { name: /portal canvas drop zone/i });
+    const zone = screen.getByRole('region', {
+      name: /portal canvas drop zone/i,
+    });
     fireEvent.drop(zone, {
       dataTransfer: { getData: vi.fn(() => 'StatWidget') },
     });

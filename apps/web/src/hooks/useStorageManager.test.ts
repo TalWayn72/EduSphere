@@ -83,7 +83,9 @@ describe('useStorageManager', () => {
     mockGetStats.mockResolvedValueOnce(initial).mockResolvedValueOnce(updated);
 
     const { result } = renderHook(() => useStorageManager());
-    await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
 
     await act(async () => {
       await result.current.refresh();
@@ -97,9 +99,13 @@ describe('useStorageManager', () => {
     mockGetStats.mockResolvedValue(makeStats());
 
     const { result } = renderHook(() => useStorageManager());
-    await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
 
-    await act(async () => { result.current.clearLocalStorage(); });
+    await act(async () => {
+      result.current.clearLocalStorage();
+    });
 
     expect(mockClearLocalStorage).toHaveBeenCalledTimes(1);
   });
@@ -107,10 +113,14 @@ describe('useStorageManager', () => {
   it('clearLocalStorage returns the number of bytes freed from the service', async () => {
     mockClearLocalStorage.mockReturnValue(8192);
     const { result } = renderHook(() => useStorageManager());
-    await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
 
     let freed = 0;
-    await act(async () => { freed = result.current.clearLocalStorage(); });
+    await act(async () => {
+      freed = result.current.clearLocalStorage();
+    });
 
     expect(freed).toBe(8192);
   });
@@ -123,7 +133,7 @@ describe('useStorageManager', () => {
     await waitFor(() => {
       expect(setIntervalSpy).toHaveBeenCalledWith(
         expect.any(Function),
-        POLL_INTERVAL_MS,
+        POLL_INTERVAL_MS
       );
     });
   });
@@ -133,7 +143,9 @@ describe('useStorageManager', () => {
     mockGetStats.mockResolvedValue(makeStats());
 
     const { unmount } = renderHook(() => useStorageManager());
-    await waitFor(() => { expect(mockGetStats).toHaveBeenCalled(); });
+    await waitFor(() => {
+      expect(mockGetStats).toHaveBeenCalled();
+    });
 
     unmount();
 
@@ -143,7 +155,9 @@ describe('useStorageManager', () => {
   it('mounted guard prevents setState after unmount', async () => {
     // Deferred promise: resolves after unmount
     let resolveStats!: (v: WebStorageStats) => void;
-    const deferred = new Promise<WebStorageStats>((res) => { resolveStats = res; });
+    const deferred = new Promise<WebStorageStats>((res) => {
+      resolveStats = res;
+    });
     mockGetStats.mockReturnValue(deferred);
 
     const { result, unmount } = renderHook(() => useStorageManager());

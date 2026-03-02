@@ -1,5 +1,12 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  type MockedFunction,
+} from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -15,7 +22,8 @@ vi.mock('react-i18next', () => ({
         'wizard.addModuleDescriptionLabel': 'Description (optional)',
         'wizard.addModuleDescriptionPlaceholder': 'Brief description',
       };
-      if (key === 'wizard.moduleNumber' && opts) return `Module ${opts['n'] as number}`;
+      if (key === 'wizard.moduleNumber' && opts)
+        return `Module ${opts['n'] as number}`;
       return map[key] ?? key;
     },
     i18n: { changeLanguage: vi.fn() },
@@ -29,8 +37,16 @@ import type { CourseModule, CourseFormData } from './course-create.types';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const MODULE_A: CourseModule = { id: 'mod-a', title: 'Introduction', description: 'Intro desc' };
-const MODULE_B: CourseModule = { id: 'mod-b', title: 'Advanced Topics', description: '' };
+const MODULE_A: CourseModule = {
+  id: 'mod-a',
+  title: 'Introduction',
+  description: 'Intro desc',
+};
+const MODULE_B: CourseModule = {
+  id: 'mod-b',
+  title: 'Advanced Topics',
+  description: '',
+};
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -39,7 +55,9 @@ describe('CourseWizardStep2', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    onChange = vi.fn() as MockedFunction<(updates: Partial<CourseFormData>) => void>;
+    onChange = vi.fn() as MockedFunction<
+      (updates: Partial<CourseFormData>) => void
+    >;
   });
 
   it('shows empty state when no modules exist', () => {
@@ -50,13 +68,17 @@ describe('CourseWizardStep2', () => {
   });
 
   it('renders existing module titles', () => {
-    render(<CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />);
+    render(
+      <CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />
+    );
     expect(screen.getByText('Introduction')).toBeInTheDocument();
     expect(screen.getByText('Advanced Topics')).toBeInTheDocument();
   });
 
   it('renders module numbers for each module', () => {
-    render(<CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />);
+    render(
+      <CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />
+    );
     expect(screen.getByText('Module 1')).toBeInTheDocument();
     expect(screen.getByText('Module 2')).toBeInTheDocument();
   });
@@ -88,7 +110,9 @@ describe('CourseWizardStep2', () => {
     fireEvent.change(titleInput, { target: { value: 'New Module' } });
     fireEvent.click(screen.getByRole('button', { name: /add module/i }));
     expect(onChange).toHaveBeenCalledOnce();
-    const { modules } = onChange.mock.calls[0]![0]! as { modules: CourseModule[] };
+    const { modules } = onChange.mock.calls[0]![0]! as {
+      modules: CourseModule[];
+    };
     expect(modules).toHaveLength(2);
     expect(modules[1]?.title).toBe('New Module');
   });
@@ -99,28 +123,40 @@ describe('CourseWizardStep2', () => {
     fireEvent.change(titleInput, { target: { value: 'Keyboard Module' } });
     fireEvent.keyDown(titleInput, { key: 'Enter', code: 'Enter' });
     expect(onChange).toHaveBeenCalledOnce();
-    const { modules } = onChange.mock.calls[0]![0]! as { modules: CourseModule[] };
+    const { modules } = onChange.mock.calls[0]![0]! as {
+      modules: CourseModule[];
+    };
     expect(modules[0]?.title).toBe('Keyboard Module');
   });
 
   it('clicking Remove on a module calls onChange with that module excluded', () => {
-    render(<CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />);
-    const removeBtns = screen.getAllByRole('button', { name: /remove module/i });
+    render(
+      <CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />
+    );
+    const removeBtns = screen.getAllByRole('button', {
+      name: /remove module/i,
+    });
     fireEvent.click(removeBtns[0]!);
     expect(onChange).toHaveBeenCalledOnce();
-    const { modules } = onChange.mock.calls[0]![0]! as { modules: CourseModule[] };
+    const { modules } = onChange.mock.calls[0]![0]! as {
+      modules: CourseModule[];
+    };
     expect(modules).toHaveLength(1);
     expect(modules[0]?.id).toBe('mod-b');
   });
 
   it('Move Up button is disabled for the first module', () => {
-    render(<CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />);
+    render(
+      <CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />
+    );
     const moveUpBtns = screen.getAllByRole('button', { name: /move up/i });
     expect(moveUpBtns[0]).toBeDisabled();
   });
 
   it('Move Down button is disabled for the last module', () => {
-    render(<CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />);
+    render(
+      <CourseWizardStep2 modules={[MODULE_A, MODULE_B]} onChange={onChange} />
+    );
     const moveDownBtns = screen.getAllByRole('button', { name: /move down/i });
     expect(moveDownBtns[moveDownBtns.length - 1]).toBeDisabled();
   });

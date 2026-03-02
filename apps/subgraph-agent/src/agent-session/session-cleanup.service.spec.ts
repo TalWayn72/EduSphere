@@ -105,7 +105,9 @@ describe('SessionCleanupService', () => {
     service.onModuleDestroy();
 
     // After destroy the internal handle must be null so a second destroy is safe
-    expect((service as unknown as Record<string, unknown>).cleanupInterval).toBeNull();
+    expect(
+      (service as unknown as Record<string, unknown>).cleanupInterval
+    ).toBeNull();
   });
 
   // ── Test 5 ──────────────────────────────────────────────────────────────────

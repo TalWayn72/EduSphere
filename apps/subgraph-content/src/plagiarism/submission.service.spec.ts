@@ -73,8 +73,11 @@ const MOCK_SUBMISSION_ROW = {
 // Helper: mock withTenantContext to invoke the callback with a fake tx
 function mockTxOnce(txImpl: unknown): void {
   mockWithTenantContext.mockImplementationOnce(
-    async (_db: unknown, _ctx: unknown, fn: (tx: unknown) => Promise<unknown>) =>
-      fn(txImpl)
+    async (
+      _db: unknown,
+      _ctx: unknown,
+      fn: (tx: unknown) => Promise<unknown>
+    ) => fn(txImpl)
   );
 }
 
@@ -111,7 +114,14 @@ describe('SubmissionService', () => {
       }),
     });
 
-    await service.submitAssignment('ci-1', 'user-1', 'tenant-1', 'course-1', 'Hello World', TENANT_CTX);
+    await service.submitAssignment(
+      'ci-1',
+      'user-1',
+      'tenant-1',
+      'course-1',
+      'Hello World',
+      TENANT_CTX
+    );
 
     expect(mockWithTenantContext).toHaveBeenCalledWith(
       expect.anything(),
@@ -158,7 +168,12 @@ describe('SubmissionService', () => {
     });
 
     const result = await service.submitAssignment(
-      'ci-1', 'user-1', 'tenant-1', 'course-1', 'three word text', TENANT_CTX
+      'ci-1',
+      'user-1',
+      'tenant-1',
+      'course-1',
+      'three word text',
+      TENANT_CTX
     );
 
     expect(result.wordCount).toBe(3);
@@ -174,7 +189,11 @@ describe('SubmissionService', () => {
       }),
     });
 
-    const results = await service.getMySubmissions('ci-1', 'user-1', TENANT_CTX);
+    const results = await service.getMySubmissions(
+      'ci-1',
+      'user-1',
+      TENANT_CTX
+    );
 
     expect(mockWithTenantContext).toHaveBeenCalledWith(
       expect.anything(),
@@ -195,7 +214,11 @@ describe('SubmissionService', () => {
       }),
     });
 
-    const results = await service.getMySubmissions('ci-1', 'user-1', TENANT_CTX);
+    const results = await service.getMySubmissions(
+      'ci-1',
+      'user-1',
+      TENANT_CTX
+    );
 
     expect(results).toEqual([]);
   });

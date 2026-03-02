@@ -33,7 +33,9 @@ vi.mock('@/components/ui/button', () => ({
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeChat(overrides: Partial<UseAgentChatReturn> = {}): UseAgentChatReturn {
+function makeChat(
+  overrides: Partial<UseAgentChatReturn> = {}
+): UseAgentChatReturn {
   return {
     messages: [],
     chatInput: '',
@@ -47,8 +49,16 @@ function makeChat(overrides: Partial<UseAgentChatReturn> = {}): UseAgentChatRetu
   };
 }
 
-const AGENT_MSG: ChatMessage = { id: 'a1', role: 'agent', content: 'Shalom, how can I help?' };
-const USER_MSG: ChatMessage = { id: 'u1', role: 'user', content: 'Explain free will.' };
+const AGENT_MSG: ChatMessage = {
+  id: 'a1',
+  role: 'agent',
+  content: 'Shalom, how can I help?',
+};
+const USER_MSG: ChatMessage = {
+  id: 'u1',
+  role: 'user',
+  content: 'Explain free will.',
+};
 
 // ─── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -88,14 +98,18 @@ describe('AiTab', () => {
   });
 
   it('shows streaming indicator dots when isStreaming is true', () => {
-    const { container } = render(<AiTab chat={makeChat({ isStreaming: true })} />);
+    const { container } = render(
+      <AiTab chat={makeChat({ isStreaming: true })} />
+    );
     // 3 bounce dots rendered as span elements inside the streaming indicator
     const bouncingDots = container.querySelectorAll('.animate-bounce');
     expect(bouncingDots.length).toBe(3);
   });
 
   it('does not show streaming indicator when not streaming', () => {
-    const { container } = render(<AiTab chat={makeChat({ isStreaming: false })} />);
+    const { container } = render(
+      <AiTab chat={makeChat({ isStreaming: false })} />
+    );
     const bouncingDots = container.querySelectorAll('.animate-bounce');
     expect(bouncingDots.length).toBe(0);
   });

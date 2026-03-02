@@ -32,8 +32,11 @@ import { AdminOverviewService } from './admin-overview.service.js';
  *   db.select(...).from(...).where(...).orderBy(...).limit(1) → Promise([rows])
  * We make every chain method return a thenable Promise that also has the chain methods.
  */
-function makeThenableChain(rows: unknown[]): Promise<unknown[]> & Record<string, () => unknown> {
-  const p = Promise.resolve(rows) as Promise<unknown[]> & Record<string, () => unknown>;
+function makeThenableChain(
+  rows: unknown[]
+): Promise<unknown[]> & Record<string, () => unknown> {
+  const p = Promise.resolve(rows) as Promise<unknown[]> &
+    Record<string, () => unknown>;
   // Attach chain methods so .from().where().orderBy().limit() all work
   const self = (): typeof p => p;
   p.from = self;
@@ -73,9 +76,9 @@ describe('AdminOverviewService', () => {
   // 3. Returns totalUsers from DB count result
   it('returns totalUsers from the first DB select result', async () => {
     mockDbSelect
-      .mockReturnValueOnce(makeThenableChain([{ value: 77 }]))  // totalUsers
-      .mockReturnValueOnce(makeThenableChain([{ value: 5 }]))   // activeUsers
-      .mockReturnValueOnce(makeThenableChain([]));               // scim (empty)
+      .mockReturnValueOnce(makeThenableChain([{ value: 77 }])) // totalUsers
+      .mockReturnValueOnce(makeThenableChain([{ value: 5 }])) // activeUsers
+      .mockReturnValueOnce(makeThenableChain([])); // scim (empty)
     const result = await service.getOverview('tenant-1');
     expect(result.totalUsers).toBe(77);
   });

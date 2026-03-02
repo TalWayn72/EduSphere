@@ -78,17 +78,29 @@ describe('AddAnnotationOverlay', () => {
     expect(
       screen.getByRole('button', { name: /add note @/i })
     ).toBeInTheDocument();
-    expect(screen.queryByPlaceholderText(/type your note/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/type your note/i)
+    ).not.toBeInTheDocument();
   });
 
   it('saves via Ctrl+Enter keyboard shortcut', () => {
     const onSave = vi.fn();
-    render(<AddAnnotationOverlay {...defaultProps} onSave={onSave} currentTime={30} />);
+    render(
+      <AddAnnotationOverlay
+        {...defaultProps}
+        onSave={onSave}
+        currentTime={30}
+      />
+    );
     fireEvent.click(screen.getByRole('button', { name: /add note @/i }));
     const textarea = screen.getByPlaceholderText(/type your note/i);
     fireEvent.change(textarea, { target: { value: 'Keyboard note' } });
     fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
-    expect(onSave).toHaveBeenCalledWith('Keyboard note', AnnotationLayer.PERSONAL, 30);
+    expect(onSave).toHaveBeenCalledWith(
+      'Keyboard note',
+      AnnotationLayer.PERSONAL,
+      30
+    );
   });
 
   it('closes form on Escape keydown', () => {
@@ -97,7 +109,9 @@ describe('AddAnnotationOverlay', () => {
     fireEvent.keyDown(screen.getByPlaceholderText(/type your note/i), {
       key: 'Escape',
     });
-    expect(screen.queryByPlaceholderText(/type your note/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/type your note/i)
+    ).not.toBeInTheDocument();
   });
 
   it('renders PERSONAL and SHARED layer selector buttons', () => {

@@ -56,24 +56,27 @@ function normalizeRequiresScopes(sdl) {
   );
   // Fix usage: normalize all scopes values to [[...]] format.
   // Handles bare strings at the outer level, deduplicates identical inner lists.
-  out = out.replace(/@requiresScopes\(scopes:\s*(\[[^\n]+?\])\)/g, (match, scopesVal) => {
-    try {
-      const parsed = JSON.parse(scopesVal);
-      const normalized = parsed.map((item) =>
-        Array.isArray(item) ? item : [item]
-      );
-      const seen = new Set();
-      const deduped = normalized.filter((item) => {
-        const key = JSON.stringify([...item].sort());
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-      return `@requiresScopes(scopes: ${JSON.stringify(deduped)})`;
-    } catch {
-      return match;
+  out = out.replace(
+    /@requiresScopes\(scopes:\s*(\[[^\n]+?\])\)/g,
+    (match, scopesVal) => {
+      try {
+        const parsed = JSON.parse(scopesVal);
+        const normalized = parsed.map((item) =>
+          Array.isArray(item) ? item : [item]
+        );
+        const seen = new Set();
+        const deduped = normalized.filter((item) => {
+          const key = JSON.stringify([...item].sort());
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        return `@requiresScopes(scopes: ${JSON.stringify(deduped)})`;
+      } catch {
+        return match;
+      }
     }
-  });
+  );
   return out;
 }
 
@@ -86,13 +89,19 @@ function normalizeRequiresScopes(sdl) {
  */
 function normalizeCoreSdl(sdl) {
   // Remove OpenBadgeDefinition type block
-  let out = sdl.replace(/"""[^"]*"""\s*type OpenBadgeDefinition\s*\{[^}]*\}/gs, '');
+  let out = sdl.replace(
+    /"""[^"]*"""\s*type OpenBadgeDefinition\s*\{[^}]*\}/gs,
+    ''
+  );
   out = out.replace(/type OpenBadgeDefinition\s*\{[^}]*\}/gs, '');
   // Remove OpenBadgeAssertion type block
   out = out.replace(/"""[^"]*"""\s*type OpenBadgeAssertion\s*\{[^}]*\}/gs, '');
   out = out.replace(/type OpenBadgeAssertion\s*\{[^}]*\}/gs, '');
   // Remove BadgeVerificationResult type block (also owned by content)
-  out = out.replace(/"""[^"]*"""\s*type BadgeVerificationResult\s*\{[^}]*\}/gs, '');
+  out = out.replace(
+    /"""[^"]*"""\s*type BadgeVerificationResult\s*\{[^}]*\}/gs,
+    ''
+  );
   out = out.replace(/type BadgeVerificationResult\s*\{[^}]*\}/gs, '');
   // Remove OpenBadge queries from any extend type Query block
   out = out.replace(/\s*"""[^"]*"""\s*myOpenBadges[^!]*![^\n]*/gs, (m) =>
@@ -107,8 +116,9 @@ function normalizeCoreSdl(sdl) {
   // Remove OpenBadge mutations from any extend type Mutation block
   // issueBadge from core has different signature than content (recipientId vs userId)
   // Remove the entire core issueBadge/revokeOpenBadge lines
-  out = out.replace(/\s*"""[^"]*"""\s*issueBadge\([^)]*\)[^!]*![^\n]*/gs, (m) =>
-    m.includes('issueBadge') ? '' : m
+  out = out.replace(
+    /\s*"""[^"]*"""\s*issueBadge\([^)]*\)[^!]*![^\n]*/gs,
+    (m) => (m.includes('issueBadge') ? '' : m)
   );
   out = out.replace(/\s*issueBadge\([^)]*\)[^\n]*/g, '');
   out = out.replace(/\s*revokeOpenBadge[^\n]*/g, '');

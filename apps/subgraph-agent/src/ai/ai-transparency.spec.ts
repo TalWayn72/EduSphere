@@ -22,7 +22,11 @@ describe('requiresHumanReview()', () => {
 
   it('returns false for TUTOR with no grade impact', () => {
     expect(
-      requiresHumanReview({ agentType: 'TUTOR', impactsGrade: false, isAssessment: false })
+      requiresHumanReview({
+        agentType: 'TUTOR',
+        impactsGrade: false,
+        isAssessment: false,
+      })
     ).toBe(false);
   });
 
@@ -101,7 +105,13 @@ describe('DEFAULT_AI_PREFERENCES', () => {
   });
 
   it('all agent types are enabled by default', () => {
-    const agentTypes: AgentType[] = ['CHAVRUTA', 'QUIZ_MASTER', 'SUMMARIZER', 'DEBATE', 'TUTOR'];
+    const agentTypes: AgentType[] = [
+      'CHAVRUTA',
+      'QUIZ_MASTER',
+      'SUMMARIZER',
+      'DEBATE',
+      'TUTOR',
+    ];
     for (const type of agentTypes) {
       expect(DEFAULT_AI_PREFERENCES.agentTypes[type]).toBe(true);
     }

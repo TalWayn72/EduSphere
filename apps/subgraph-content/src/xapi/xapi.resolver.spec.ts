@@ -34,7 +34,11 @@ const mockStatementService = {
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const AUTH_CTX = { userId: 'user-1', tenantId: 'tenant-1', roles: ['ORG_ADMIN'] };
+const AUTH_CTX = {
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  roles: ['ORG_ADMIN'],
+};
 const makeCtx = (auth = AUTH_CTX) => ({ authContext: auth });
 const noAuthCtx = { authContext: undefined };
 
@@ -50,8 +54,14 @@ const MOCK_TOKEN = {
 
 const MOCK_STATEMENT_ROW = {
   id: 'stmt-1',
-  verb: { id: 'http://adlnet.gov/expapi/verbs/completed', display: { en: 'completed' } },
-  object: { id: 'http://example.com/activities/course-1', objectType: 'Activity' },
+  verb: {
+    id: 'http://adlnet.gov/expapi/verbs/completed',
+    display: { en: 'completed' },
+  },
+  object: {
+    id: 'http://example.com/activities/course-1',
+    objectType: 'Activity',
+  },
   stored: '2026-01-15T08:00:00.000Z',
   actor: { mbox: 'mailto:user@example.com' },
   tenantId: 'tenant-1',
@@ -71,13 +81,21 @@ describe('XapiResolver', () => {
 
   describe('xapiTokens()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.xapiTokens(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.xapiTokens(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockListTokens).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.xapiTokens(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.xapiTokens(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to tokenService.listTokens with tenantId', async () => {
@@ -100,12 +118,20 @@ describe('XapiResolver', () => {
 
   describe('xapiStatements()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.xapiStatements(10, undefined, noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(
+        resolver.xapiStatements(10, undefined, noAuthCtx)
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.xapiStatements(10, undefined, ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.xapiStatements(10, undefined, ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('maps verb.id, object.id, and stored to storedAt in returned shape', async () => {
@@ -127,15 +153,19 @@ describe('XapiResolver', () => {
 
       await resolver.xapiStatements(25, '2026-01-01T00:00:00.000Z', makeCtx());
 
-      expect(mockQueryStatements).toHaveBeenCalledWith(
-        'tenant-1',
-        { limit: 25, since: '2026-01-01T00:00:00.000Z' }
-      );
+      expect(mockQueryStatements).toHaveBeenCalledWith('tenant-1', {
+        limit: 25,
+        since: '2026-01-01T00:00:00.000Z',
+      });
     });
 
     it('returns empty array when no statements match', async () => {
       mockQueryStatements.mockResolvedValueOnce([]);
-      const result = await resolver.xapiStatements(undefined, undefined, makeCtx());
+      const result = await resolver.xapiStatements(
+        undefined,
+        undefined,
+        makeCtx()
+      );
       expect(result).toEqual([]);
     });
 
@@ -155,9 +185,17 @@ describe('XapiResolver', () => {
 
   describe('generateXapiToken()', () => {
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
       await expect(
-        resolver.generateXapiToken('Integration', 'https://lrs.example.com', ctx)
+        resolver.generateXapiToken(
+          'Integration',
+          'https://lrs.example.com',
+          ctx
+        )
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -183,8 +221,14 @@ describe('XapiResolver', () => {
 
   describe('revokeXapiToken()', () => {
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.revokeXapiToken('token-1', ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.revokeXapiToken('token-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to tokenService.revokeToken with tokenId and tenantId', async () => {

@@ -14,7 +14,15 @@ const NotesSectionSchema = z.object({
 const StructuredNotesStateSchema = z.object({
   summary: z.string(),
   keyPoints: z.array(z.string()).default([]),
-  entities: z.array(z.object({ text: z.string(), type: z.string(), canonicalName: z.string().optional() })).default([]),
+  entities: z
+    .array(
+      z.object({
+        text: z.string(),
+        type: z.string(),
+        canonicalName: z.string().optional(),
+      })
+    )
+    .default([]),
   sections: z.array(NotesSectionSchema).default([]),
   outputMarkdown: z.string().optional(),
   outputDocxBase64: z.string().optional(),
@@ -26,10 +34,22 @@ export type StructuredNotesState = z.infer<typeof StructuredNotesStateSchema>;
 const StructuredNotesAnnotation = Annotation.Root({
   summary: Annotation<string>(),
   keyPoints: Annotation<string[]>({ value: (_, u) => u, default: () => [] }),
-  entities: Annotation<StructuredNotesState['entities']>({ value: (_, u) => u, default: () => [] }),
-  sections: Annotation<z.infer<typeof NotesSectionSchema>[]>({ value: (_, u) => u, default: () => [] }),
-  outputMarkdown: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
-  outputDocxBase64: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  entities: Annotation<StructuredNotesState['entities']>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
+  sections: Annotation<z.infer<typeof NotesSectionSchema>[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
+  outputMarkdown: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
+  outputDocxBase64: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
 
@@ -64,7 +84,9 @@ export class StructuredNotesWorkflow {
     return graph;
   }
 
-  private async buildHierarchyNode(state: StructuredNotesState): Promise<Partial<StructuredNotesState>> {
+  private async buildHierarchyNode(
+    state: StructuredNotesState
+  ): Promise<Partial<StructuredNotesState>> {
     const systemPrompt = injectLocale(
       'Build a hierarchical document structure from Hebrew lesson content. Create sections with titles and content in Hebrew.',
       this.locale
@@ -81,10 +103,14 @@ export class StructuredNotesWorkflow {
     return { sections: object.sections };
   }
 
-  private async insertSourceRefsNode(state: StructuredNotesState): Promise<Partial<StructuredNotesState>> {
+  private async insertSourceRefsNode(
+    state: StructuredNotesState
+  ): Promise<Partial<StructuredNotesState>> {
     if (state.entities.length === 0) return {};
 
-    const bookEntities = state.entities.filter((e) => e.type === 'BOOK' || e.type === 'PAGE');
+    const bookEntities = state.entities.filter(
+      (e) => e.type === 'BOOK' || e.type === 'PAGE'
+    );
     if (bookEntities.length === 0) return {};
 
     const enrichedSections = state.sections.map((section) => ({
@@ -97,7 +123,9 @@ export class StructuredNotesWorkflow {
     return { sections: enrichedSections };
   }
 
-  private async formatMarkdownNode(state: StructuredNotesState): Promise<Partial<StructuredNotesState>> {
+  private async formatMarkdownNode(
+    state: StructuredNotesState
+  ): Promise<Partial<StructuredNotesState>> {
     const mdLines: string[] = ['# שיעור — תיעוד מובנה\n'];
 
     for (const section of state.sections) {
@@ -116,15 +144,21 @@ export class StructuredNotesWorkflow {
     return { outputMarkdown, outputDocxBase64, isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) { return this.graph.compile(opts); }
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts);
+  }
 
-  async run(initialState: Partial<StructuredNotesState>): Promise<StructuredNotesState> {
+  async run(
+    initialState: Partial<StructuredNotesState>
+  ): Promise<StructuredNotesState> {
     const fullState = StructuredNotesStateSchema.parse(initialState);
     const result = await this.graph.compile().invoke(fullState);
     return result as StructuredNotesState;
   }
 
-  async *stream(initialState: Partial<StructuredNotesState>): AsyncGenerator<StructuredNotesState, void, unknown> {
+  async *stream(
+    initialState: Partial<StructuredNotesState>
+  ): AsyncGenerator<StructuredNotesState, void, unknown> {
     const compiledGraph = this.graph.compile();
     const fullState = StructuredNotesStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
@@ -133,6 +167,9 @@ export class StructuredNotesWorkflow {
   }
 }
 
-export function createStructuredNotesWorkflow(model?: string, locale = 'he'): StructuredNotesWorkflow {
+export function createStructuredNotesWorkflow(
+  model?: string,
+  locale = 'he'
+): StructuredNotesWorkflow {
   return new StructuredNotesWorkflow(model, locale);
 }

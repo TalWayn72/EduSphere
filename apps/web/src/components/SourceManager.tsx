@@ -124,7 +124,7 @@ function devQueryFn(): Promise<KnowledgeSource[]> {
 function devAddSource(
   sourceType: SourceType,
   title: string,
-  origin?: string,
+  origin?: string
 ): KnowledgeSource {
   const src: KnowledgeSource = {
     id: `dev-src-${Date.now()}`,
@@ -171,7 +171,9 @@ function AddSourceModal({
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Close modal on Escape key
   useEffect(() => {
@@ -198,7 +200,10 @@ function AddSourceModal({
           Promise.resolve(devAddSource('URL', input.title, input.url))
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_URL_SOURCE, { input }, authHeaders()),
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(String(e)),
   });
 
@@ -208,7 +213,10 @@ function AddSourceModal({
           Promise.resolve(devAddSource('TEXT', input.title))
       : (input: { courseId: string; title: string; text: string }) =>
           graphqlClient.request(ADD_TEXT_SOURCE, { input }, authHeaders()),
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(String(e)),
   });
 
@@ -218,13 +226,22 @@ function AddSourceModal({
           Promise.resolve(devAddSource('YOUTUBE', input.title, input.url))
       : (input: { courseId: string; title: string; url: string }) =>
           graphqlClient.request(ADD_YOUTUBE_SOURCE, { input }, authHeaders()),
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(String(e)),
   });
 
   const addFile = useMutation({
     mutationFn: IS_DEV_MODE
-      ? (input: { courseId: string; title: string; fileName: string; contentBase64: string; mimeType: string }) =>
+      ? (input: {
+          courseId: string;
+          title: string;
+          fileName: string;
+          contentBase64: string;
+          mimeType: string;
+        }) =>
           Promise.resolve(devAddSource('FILE_PDF', input.title, input.fileName))
       : (input: {
           courseId: string;
@@ -233,7 +250,10 @@ function AddSourceModal({
           contentBase64: string;
           mimeType: string;
         }) => graphqlClient.request(ADD_FILE_SOURCE, { input }, authHeaders()),
-    onSuccess: () => { onAdded(); setSuccess(true); },
+    onSuccess: () => {
+      onAdded();
+      setSuccess(true);
+    },
     onError: (e) => setError(String(e)),
   });
 
@@ -327,8 +347,12 @@ function AddSourceModal({
               <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
                 <span className="text-3xl">✅</span>
               </div>
-              <p className="font-semibold text-green-700 text-base">המקור הוסף בהצלחה!</p>
-              <p className="text-sm text-gray-500">מעובד ויוצג ברשימה בקרוב...</p>
+              <p className="font-semibold text-green-700 text-base">
+                המקור הוסף בהצלחה!
+              </p>
+              <p className="text-sm text-gray-500">
+                מעובד ויוצג ברשימה בקרוב...
+              </p>
             </div>
           )}
 
@@ -409,16 +433,22 @@ function AddSourceModal({
               {busy ? (
                 <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50">
                   <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2" />
-                  <span className="text-sm text-blue-700 font-medium">מעלה ומעבד קובץ…</span>
+                  <span className="text-sm text-blue-700 font-medium">
+                    מעלה ומעבד קובץ…
+                  </span>
                 </div>
               ) : (
                 <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors">
-                  <span className="text-3xl mb-1">{selectedFileName ? '📄' : '📂'}</span>
+                  <span className="text-3xl mb-1">
+                    {selectedFileName ? '📄' : '📂'}
+                  </span>
                   <span className="text-sm text-gray-600">
                     {selectedFileName || 'גרור קובץ לכאן או לחץ לבחירה'}
                   </span>
                   {!selectedFileName && (
-                    <span className="text-xs text-gray-400 mt-1">DOCX, PDF, TXT</span>
+                    <span className="text-xs text-gray-400 mt-1">
+                      DOCX, PDF, TXT
+                    </span>
                   )}
                   <input
                     ref={fileRef}
@@ -521,12 +551,15 @@ export function SourceManager({ courseId }: { courseId: string }) {
   const [showAdd, setShowAdd] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [addedBanner, setAddedBanner] = useState<string | null>(null);
-  const addedBannerTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const addedBannerTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Cleanup banner timer on unmount
   useEffect(() => {
     return () => {
-      if (addedBannerTimerRef.current) clearTimeout(addedBannerTimerRef.current);
+      if (addedBannerTimerRef.current)
+        clearTimeout(addedBannerTimerRef.current);
     };
   }, []);
 
@@ -554,8 +587,12 @@ export function SourceManager({ courseId }: { courseId: string }) {
 
   const deleteSource = useMutation({
     mutationFn: IS_DEV_MODE
-      ? (id: string) => { devRemoveSource(id); return Promise.resolve(); }
-      : (id: string) => graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }, authHeaders()),
+      ? (id: string) => {
+          devRemoveSource(id);
+          return Promise.resolve();
+        }
+      : (id: string) =>
+          graphqlClient.request(DELETE_KNOWLEDGE_SOURCE, { id }, authHeaders()),
     onSuccess: () => refetch(),
   });
 
@@ -692,8 +729,12 @@ export function SourceManager({ courseId }: { courseId: string }) {
           onAdded={() => {
             refetch();
             setAddedBanner('המקור נוסף ומעובד כעת — יוצג כאן בקרוב');
-            if (addedBannerTimerRef.current) clearTimeout(addedBannerTimerRef.current);
-            addedBannerTimerRef.current = setTimeout(() => setAddedBanner(null), 5000);
+            if (addedBannerTimerRef.current)
+              clearTimeout(addedBannerTimerRef.current);
+            addedBannerTimerRef.current = setTimeout(
+              () => setAddedBanner(null),
+              5000
+            );
           }}
         />
       )}

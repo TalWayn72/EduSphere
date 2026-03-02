@@ -36,7 +36,11 @@ interface Props {
   onSeek: (t: number) => void;
   onAddAnnotation: (text: string, layer: AnnotationLayer, time: number) => void;
   onReply: (parentId: string, content: string, layer: AnnotationLayer) => void;
-  onOverlayAnnotation: (content: string, layer: AnnotationLayer, ts: number) => void;
+  onOverlayAnnotation: (
+    content: string,
+    layer: AnnotationLayer,
+    ts: number
+  ) => void;
   bookmarks: { id: string; timestamp: number; label: string; color: string }[];
   chat: UseAgentChatReturn;
 }
@@ -63,9 +67,21 @@ export function ToolsPanel({
   const [activeTab, setActiveTab] = useState<Tab>('annotations');
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: 'annotations', label: t('common:annotations', 'הערות'), icon: <FileText className="h-3 w-3" /> },
-    { id: 'ai', label: t('chavrutaAi', 'חברותא AI'), icon: <Bot className="h-3 w-3" /> },
-    { id: 'collab', label: t('collaboration', 'שיתוף'), icon: <Users className="h-3 w-3" /> },
+    {
+      id: 'annotations',
+      label: t('common:annotations', 'הערות'),
+      icon: <FileText className="h-3 w-3" />,
+    },
+    {
+      id: 'ai',
+      label: t('chavrutaAi', 'חברותא AI'),
+      icon: <Bot className="h-3 w-3" />,
+    },
+    {
+      id: 'collab',
+      label: t('collaboration', 'שיתוף'),
+      icon: <Users className="h-3 w-3" />,
+    },
   ];
 
   return (
@@ -84,9 +100,16 @@ export function ToolsPanel({
               onDurationChange={onDurationChange}
             />
             <div className="absolute bottom-10 left-0 right-0 pointer-events-none">
-              <VideoProgressMarkers annotations={annotations} duration={duration} onSeek={onSeek} />
+              <VideoProgressMarkers
+                annotations={annotations}
+                duration={duration}
+                onSeek={onSeek}
+              />
             </div>
-            <AddAnnotationOverlay currentTime={currentTime} onSave={onOverlayAnnotation} />
+            <AddAnnotationOverlay
+              currentTime={currentTime}
+              onSave={onOverlayAnnotation}
+            />
           </div>
 
           {/* Transcript */}
@@ -96,7 +119,11 @@ export function ToolsPanel({
               {t('transcript', 'תמלול')}
             </div>
             <div className="flex-1 overflow-hidden">
-              <TranscriptPanel segments={transcript} currentTime={currentTime} onSeek={onSeek} />
+              <TranscriptPanel
+                segments={transcript}
+                currentTime={currentTime}
+                onSeek={onSeek}
+              />
             </div>
           </div>
         </div>
@@ -116,9 +143,11 @@ export function ToolsPanel({
                 aria-selected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-1 px-3 py-2 text-xs font-medium border-b-2 transition-colors flex-1 justify-center
-                  ${activeTab === tab.id
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                  ${
+                    activeTab === tab.id
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 {tab.icon}
                 {tab.label}

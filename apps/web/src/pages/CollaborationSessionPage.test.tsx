@@ -20,17 +20,15 @@ const mockJoinFn = vi.fn();
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + String(values[i] ?? ''),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(() => [
     { data: undefined, fetching: false, error: undefined },
     vi.fn(),
   ]),
-  useMutation: vi.fn(() => [
-    { fetching: false, error: undefined },
-    mockJoinFn,
-  ]),
+  useMutation: vi.fn(() => [{ fetching: false, error: undefined }, mockJoinFn]),
   useSubscription: vi.fn(() => [
     { data: undefined, fetching: false, error: undefined },
     vi.fn(),

@@ -80,17 +80,19 @@ const mockStripeClient = {
 };
 
 // Default purchase row matching the join query return shape
-function makePurchaseRow(overrides: Partial<{
-  purchaseId: string;
-  courseId: string;
-  amountCents: number;
-  status: string;
-  purchasedAt: Date;
-  userId: string;
-  tenantId: string;
-  stripePaymentIntentId: string | null;
-  revenueSplitPercent: number;
-}> = {}) {
+function makePurchaseRow(
+  overrides: Partial<{
+    purchaseId: string;
+    courseId: string;
+    amountCents: number;
+    status: string;
+    purchasedAt: Date;
+    userId: string;
+    tenantId: string;
+    stripePaymentIntentId: string | null;
+    revenueSplitPercent: number;
+  }> = {}
+) {
   return {
     purchaseId: overrides.purchaseId ?? 'purchase-1',
     courseId: overrides.courseId ?? 'course-x',
@@ -104,16 +106,18 @@ function makePurchaseRow(overrides: Partial<{
   };
 }
 
-function makePayoutRow(overrides: Partial<{
-  id: string;
-  instructorId: string;
-  tenantId: string;
-  amountCents: number;
-  status: string;
-  stripeTransferId: string | null;
-  periodStart: Date;
-  periodEnd: Date;
-}> = {}) {
+function makePayoutRow(
+  overrides: Partial<{
+    id: string;
+    instructorId: string;
+    tenantId: string;
+    amountCents: number;
+    status: string;
+    stripeTransferId: string | null;
+    periodStart: Date;
+    periodEnd: Date;
+  }> = {}
+) {
   return {
     id: overrides.id ?? 'payout-1',
     instructorId: overrides.instructorId ?? INSTRUCTOR_ID,
@@ -145,9 +149,9 @@ describe('MarketplaceEarningsService', () => {
 
   // Test 2
   it('has no onModuleDestroy — not needed as it only uses DB from shared pool', () => {
-    expect(
-      typeof (svc as Record<string, unknown>)['onModuleDestroy']
-    ).toBe('undefined');
+    expect(typeof (svc as Record<string, unknown>)['onModuleDestroy']).toBe(
+      'undefined'
+    );
   });
 
   // ── getInstructorEarnings ─────────────────────────────────────────────────
@@ -155,7 +159,7 @@ describe('MarketplaceEarningsService', () => {
   // Test 3
   it('getInstructorEarnings returns zero totals when instructor has no purchases', async () => {
     mockWithTenantContext
-      .mockResolvedValueOnce([])  // purchase rows (empty)
+      .mockResolvedValueOnce([]) // purchase rows (empty)
       .mockResolvedValueOnce([]); // payout rows (empty)
 
     const result = await svc.getInstructorEarnings(INSTRUCTOR_ID, TENANT_ID);
@@ -168,7 +172,10 @@ describe('MarketplaceEarningsService', () => {
   // Test 4
   it('getInstructorEarnings calculates totalEarnedCents using revenueSplitPercent', async () => {
     // 10000 cents * 70% = 7000 cents earned
-    const purchase = makePurchaseRow({ amountCents: 10000, revenueSplitPercent: 70 });
+    const purchase = makePurchaseRow({
+      amountCents: 10000,
+      revenueSplitPercent: 70,
+    });
     mockWithTenantContext
       .mockResolvedValueOnce([purchase])
       .mockResolvedValueOnce([]); // no payouts yet
@@ -179,7 +186,10 @@ describe('MarketplaceEarningsService', () => {
 
   // Test 5
   it('getInstructorEarnings uses default 70% split when revenueSplitPercent is null', async () => {
-    const purchase = makePurchaseRow({ amountCents: 5000, revenueSplitPercent: undefined });
+    const purchase = makePurchaseRow({
+      amountCents: 5000,
+      revenueSplitPercent: undefined,
+    });
     // Override with null revenueSplitPercent
     const rowWithNull = { ...purchase, revenueSplitPercent: null };
     mockWithTenantContext
@@ -193,7 +203,10 @@ describe('MarketplaceEarningsService', () => {
 
   // Test 6
   it('getInstructorEarnings calculates pendingPayoutCents as totalEarned minus paidOut', async () => {
-    const purchase = makePurchaseRow({ amountCents: 20000, revenueSplitPercent: 70 });
+    const purchase = makePurchaseRow({
+      amountCents: 20000,
+      revenueSplitPercent: 70,
+    });
     // totalEarned = 14000 cents
     const paidPayout = makePayoutRow({ amountCents: 7000, status: 'PAID' });
     mockWithTenantContext
@@ -223,8 +236,14 @@ describe('MarketplaceEarningsService', () => {
 
   // Test 8
   it('getInstructorEarnings only counts PAID payouts in paidOutCents', async () => {
-    const purchase = makePurchaseRow({ amountCents: 10000, revenueSplitPercent: 70 });
-    const pendingPayout = makePayoutRow({ amountCents: 5000, status: 'PENDING' });
+    const purchase = makePurchaseRow({
+      amountCents: 10000,
+      revenueSplitPercent: 70,
+    });
+    const pendingPayout = makePayoutRow({
+      amountCents: 5000,
+      status: 'PENDING',
+    });
     const paidPayout = makePayoutRow({ amountCents: 2000, status: 'PAID' });
 
     mockWithTenantContext
@@ -240,9 +259,7 @@ describe('MarketplaceEarningsService', () => {
 
   // Test 9
   it('getInstructorEarnings calls withTenantContext twice (purchases + payouts)', async () => {
-    mockWithTenantContext
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([]);
+    mockWithTenantContext.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     await svc.getInstructorEarnings(INSTRUCTOR_ID, TENANT_ID);
     expect(mockWithTenantContext).toHaveBeenCalledTimes(2);
@@ -250,9 +267,7 @@ describe('MarketplaceEarningsService', () => {
 
   // Test 10
   it('getInstructorEarnings passes INSTRUCTOR role in tenant context', async () => {
-    mockWithTenantContext
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([]);
+    mockWithTenantContext.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     await svc.getInstructorEarnings(INSTRUCTOR_ID, TENANT_ID);
     expect(mockWithTenantContext).toHaveBeenCalledWith(
@@ -273,10 +288,10 @@ describe('MarketplaceEarningsService', () => {
     // Each requestPayout call delegates to getInstructorEarnings (2 withTenantContext calls each)
     // Set up 4 calls: 2 for first requestPayout + 2 for second requestPayout
     mockWithTenantContext
-      .mockResolvedValueOnce([])   // 1st call: purchases (empty)
-      .mockResolvedValueOnce([])   // 1st call: payouts (empty)
-      .mockResolvedValueOnce([])   // 2nd call: purchases (empty)
-      .mockResolvedValueOnce([]);  // 2nd call: payouts (empty)
+      .mockResolvedValueOnce([]) // 1st call: purchases (empty)
+      .mockResolvedValueOnce([]) // 1st call: payouts (empty)
+      .mockResolvedValueOnce([]) // 2nd call: purchases (empty)
+      .mockResolvedValueOnce([]); // 2nd call: payouts (empty)
 
     await expect(
       svc.requestPayout(INSTRUCTOR_ID, TENANT_ID, mockStripeClient as never)
@@ -291,16 +306,27 @@ describe('MarketplaceEarningsService', () => {
     // Set env variable for this test
     process.env[`INSTRUCTOR_STRIPE_ACCOUNT_${INSTRUCTOR_ID}`] = 'acct_test_123';
 
-    const purchase = makePurchaseRow({ amountCents: 10000, revenueSplitPercent: 70 });
+    const purchase = makePurchaseRow({
+      amountCents: 10000,
+      revenueSplitPercent: 70,
+    });
     // totalEarned = 7000, paidOut = 0, pending = 7000
     mockWithTenantContext
-      .mockResolvedValueOnce([purchase])       // purchases (for getInstructorEarnings)
-      .mockResolvedValueOnce([])               // payouts (for getInstructorEarnings)
-      .mockResolvedValueOnce([makePayoutRow({ status: 'PAID', amountCents: 7000 })]); // insert payout
+      .mockResolvedValueOnce([purchase]) // purchases (for getInstructorEarnings)
+      .mockResolvedValueOnce([]) // payouts (for getInstructorEarnings)
+      .mockResolvedValueOnce([
+        makePayoutRow({ status: 'PAID', amountCents: 7000 }),
+      ]); // insert payout
 
-    mockStripeClient.createTransfer.mockResolvedValue({ id: 'tr_new_transfer' });
+    mockStripeClient.createTransfer.mockResolvedValue({
+      id: 'tr_new_transfer',
+    });
 
-    const result = await svc.requestPayout(INSTRUCTOR_ID, TENANT_ID, mockStripeClient as never);
+    const result = await svc.requestPayout(
+      INSTRUCTOR_ID,
+      TENANT_ID,
+      mockStripeClient as never
+    );
     expect(mockStripeClient.createTransfer).toHaveBeenCalledWith(
       7000,
       'acct_test_123',
@@ -317,15 +343,26 @@ describe('MarketplaceEarningsService', () => {
     // Ensure no stripe account env var
     delete process.env[`INSTRUCTOR_STRIPE_ACCOUNT_${INSTRUCTOR_ID}`];
 
-    const purchase = makePurchaseRow({ amountCents: 10000, revenueSplitPercent: 70 });
-    const pendingPayoutRow = makePayoutRow({ status: 'PENDING', stripeTransferId: null, amountCents: 7000 });
+    const purchase = makePurchaseRow({
+      amountCents: 10000,
+      revenueSplitPercent: 70,
+    });
+    const pendingPayoutRow = makePayoutRow({
+      status: 'PENDING',
+      stripeTransferId: null,
+      amountCents: 7000,
+    });
 
     mockWithTenantContext
-      .mockResolvedValueOnce([purchase])     // purchases
-      .mockResolvedValueOnce([])             // payouts (none paid)
+      .mockResolvedValueOnce([purchase]) // purchases
+      .mockResolvedValueOnce([]) // payouts (none paid)
       .mockResolvedValueOnce([pendingPayoutRow]); // insert payout
 
-    const result = await svc.requestPayout(INSTRUCTOR_ID, TENANT_ID, mockStripeClient as never);
+    const result = await svc.requestPayout(
+      INSTRUCTOR_ID,
+      TENANT_ID,
+      mockStripeClient as never
+    );
     expect(mockStripeClient.createTransfer).not.toHaveBeenCalled();
     expect(result.status).toBe('PENDING');
   });
@@ -334,38 +371,56 @@ describe('MarketplaceEarningsService', () => {
   it('requestPayout persists payout with correct amountCents equal to pendingPayoutCents', async () => {
     delete process.env[`INSTRUCTOR_STRIPE_ACCOUNT_${INSTRUCTOR_ID}`];
 
-    const purchase = makePurchaseRow({ amountCents: 5000, revenueSplitPercent: 80 });
+    const purchase = makePurchaseRow({
+      amountCents: 5000,
+      revenueSplitPercent: 80,
+    });
     // totalEarned = 4000, no prior payouts, pending = 4000
     let capturedAmount: number | undefined;
 
     mockWithTenantContext
-      .mockResolvedValueOnce([purchase])   // purchases
-      .mockResolvedValueOnce([])           // payouts
+      .mockResolvedValueOnce([purchase]) // purchases
+      .mockResolvedValueOnce([]) // payouts
       .mockImplementationOnce(
-        (_db: unknown, _ctx: unknown, fn: (tx: {
-          insert: () => {
-            values: (v: Record<string, unknown>) => {
-              returning: () => Array<Record<string, unknown>>;
+        (
+          _db: unknown,
+          _ctx: unknown,
+          fn: (tx: {
+            insert: () => {
+              values: (v: Record<string, unknown>) => {
+                returning: () => Array<Record<string, unknown>>;
+              };
             };
-          };
-        }) => unknown) =>
+          }) => unknown
+        ) =>
           fn({
             insert: () => ({
               values: (v: Record<string, unknown>) => {
                 capturedAmount = v['amountCents'] as number;
                 return {
-                  returning: () => [{
-                    id: 'po-new', instructorId: INSTRUCTOR_ID, tenantId: TENANT_ID,
-                    amountCents: capturedAmount, status: 'PENDING',
-                    stripeTransferId: null, periodStart: new Date(), periodEnd: new Date(),
-                  }],
+                  returning: () => [
+                    {
+                      id: 'po-new',
+                      instructorId: INSTRUCTOR_ID,
+                      tenantId: TENANT_ID,
+                      amountCents: capturedAmount,
+                      status: 'PENDING',
+                      stripeTransferId: null,
+                      periodStart: new Date(),
+                      periodEnd: new Date(),
+                    },
+                  ],
                 };
               },
             }),
           })
       );
 
-    await svc.requestPayout(INSTRUCTOR_ID, TENANT_ID, mockStripeClient as never);
+    await svc.requestPayout(
+      INSTRUCTOR_ID,
+      TENANT_ID,
+      mockStripeClient as never
+    );
     expect(capturedAmount).toBe(4000);
   });
 });

@@ -135,9 +135,14 @@ describe('SummarizationWorkflow', () => {
     it('populates shortSummary and longSummary fields', async () => {
       mockGenerateObject
         .mockResolvedValueOnce(
-          makeSummaryResponse('Short Hebrew summary.', 'Long Hebrew summary text.') as never
+          makeSummaryResponse(
+            'Short Hebrew summary.',
+            'Long Hebrew summary text.'
+          ) as never
         )
-        .mockResolvedValueOnce(makeKeyPointsResponse(['point 1', 'point 2']) as never)
+        .mockResolvedValueOnce(
+          makeKeyPointsResponse(['point 1', 'point 2']) as never
+        )
         .mockResolvedValueOnce(makeQuestionsResponse(['Q1?', 'Q2?']) as never);
 
       const workflow = new SummarizationWorkflow();
@@ -174,7 +179,11 @@ describe('SummarizationWorkflow', () => {
       mockGenerateObject
         .mockResolvedValueOnce(makeSummaryResponse('Short', 'Long') as never)
         .mockResolvedValueOnce(
-          makeKeyPointsResponse(['Kabbalistic concept', 'Tree of Life', 'Sefirot']) as never
+          makeKeyPointsResponse([
+            'Kabbalistic concept',
+            'Tree of Life',
+            'Sefirot',
+          ]) as never
         )
         .mockResolvedValueOnce(makeQuestionsResponse(['Q?']) as never);
 
@@ -213,7 +222,11 @@ describe('SummarizationWorkflow', () => {
         .mockResolvedValueOnce(makeSummaryResponse('Short', 'Long') as never)
         .mockResolvedValueOnce(makeKeyPointsResponse(['point 1']) as never)
         .mockResolvedValueOnce(
-          makeQuestionsResponse(['What is the meaning?', 'How does this apply?', 'Why is it significant?']) as never
+          makeQuestionsResponse([
+            'What is the meaning?',
+            'How does this apply?',
+            'Why is it significant?',
+          ]) as never
         );
 
       const workflow = new SummarizationWorkflow();
@@ -274,7 +287,10 @@ describe('SummarizationWorkflow', () => {
   describe('stream method', () => {
     it('stream() is an async generator', () => {
       const workflow = new SummarizationWorkflow();
-      const gen = workflow.stream({ text: SAMPLE_TEXT, lessonType: 'THEMATIC' });
+      const gen = workflow.stream({
+        text: SAMPLE_TEXT,
+        lessonType: 'THEMATIC',
+      });
       expect(typeof gen[Symbol.asyncIterator]).toBe('function');
     });
 

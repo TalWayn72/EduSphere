@@ -16,7 +16,8 @@ import { renderHook, act } from '@testing-library/react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -29,7 +30,9 @@ import * as urql from 'urql';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeScormSession(overrides: Partial<ScormSessionResult> = {}): ScormSessionResult {
+function makeScormSession(
+  overrides: Partial<ScormSessionResult> = {}
+): ScormSessionResult {
   return {
     id: 'session-1',
     lessonStatus: 'incomplete',
@@ -51,9 +54,15 @@ describe('useScormSession', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default: idle state — no data, not fetching, no error
-    const mockInitSession = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+    const mockInitSession = vi
+      .fn()
+      .mockResolvedValue({ data: undefined, error: undefined });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockInitSession as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
   });
@@ -78,9 +87,15 @@ describe('useScormSession', () => {
 
   // Test 4 — initSession calls the mutation with contentItemId
   it('calls the mutation with the given contentItemId', async () => {
-    const mockInitSession = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+    const mockInitSession = vi
+      .fn()
+      .mockResolvedValue({ data: undefined, error: undefined });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined } as unknown as ReturnType<typeof urql.useMutation>[0],
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+      } as unknown as ReturnType<typeof urql.useMutation>[0],
       mockInitSession as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
@@ -90,12 +105,18 @@ describe('useScormSession', () => {
       await result.current.initSession('scorm-content-42');
     });
 
-    expect(mockInitSession).toHaveBeenCalledWith({ contentItemId: 'scorm-content-42' });
+    expect(mockInitSession).toHaveBeenCalledWith({
+      contentItemId: 'scorm-content-42',
+    });
   });
 
   // Test 5 — session populated from result.data
   it('exposes session data from the mutation result', () => {
-    const scormSession = makeScormSession({ id: 'sess-abc', lessonStatus: 'passed', scoreRaw: 92 });
+    const scormSession = makeScormSession({
+      id: 'sess-abc',
+      lessonStatus: 'passed',
+      scoreRaw: 92,
+    });
 
     vi.mocked(urql.useMutation).mockReturnValue([
       {
@@ -103,7 +124,12 @@ describe('useScormSession', () => {
         data: { initScormSession: scormSession },
         error: undefined,
       } as unknown as MutationState,
-      vi.fn().mockResolvedValue({ data: { initScormSession: scormSession }, error: undefined }) as unknown as ReturnType<typeof urql.useMutation>[1],
+      vi
+        .fn()
+        .mockResolvedValue({
+          data: { initScormSession: scormSession },
+          error: undefined,
+        }) as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
     const { result } = renderHook(() => useScormSession());
@@ -115,7 +141,9 @@ describe('useScormSession', () => {
 
   // Test 6 — error.message surfaced from result.error
   it('surfaces the error message from result.error', () => {
-    const mutationError = { message: 'SCORM session init failed' } as urql.CombinedError;
+    const mutationError = {
+      message: 'SCORM session init failed',
+    } as urql.CombinedError;
 
     vi.mocked(urql.useMutation).mockReturnValue([
       {
@@ -123,7 +151,12 @@ describe('useScormSession', () => {
         data: undefined,
         error: mutationError,
       } as unknown as MutationState,
-      vi.fn().mockResolvedValue({ data: undefined, error: mutationError }) as unknown as ReturnType<typeof urql.useMutation>[1],
+      vi
+        .fn()
+        .mockResolvedValue({
+          data: undefined,
+          error: mutationError,
+        }) as unknown as ReturnType<typeof urql.useMutation>[1],
     ]);
 
     const { result } = renderHook(() => useScormSession());

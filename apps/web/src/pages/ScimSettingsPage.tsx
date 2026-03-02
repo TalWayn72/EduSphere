@@ -284,7 +284,9 @@ export function ScimSettingsPage() {
             className="bg-background rounded-lg p-6 max-w-md w-full mx-4 space-y-4"
             aria-modal="true"
           >
-            <h2 id="scim-modal-title" className="text-lg font-semibold">Generate SCIM Token</h2>
+            <h2 id="scim-modal-title" className="text-lg font-semibold">
+              Generate SCIM Token
+            </h2>
             {generatedToken ? (
               <div className="space-y-3">
                 <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm">

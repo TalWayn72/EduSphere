@@ -7,7 +7,7 @@ import React from 'react';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
@@ -82,7 +82,9 @@ describe('ScormContentViewer', () => {
   it('shows error message and Retry button on error', () => {
     setHook({ error: 'Session initialization failed' });
     renderPage();
-    expect(screen.getByText('Session initialization failed')).toBeInTheDocument();
+    expect(
+      screen.getByText('Session initialization failed')
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
@@ -95,7 +97,12 @@ describe('ScormContentViewer', () => {
 
   it('renders ScormPlayer when session is available and not fetching', () => {
     setHook({
-      session: { id: 'sess-1', lessonStatus: 'incomplete', scoreRaw: null, suspendData: null },
+      session: {
+        id: 'sess-1',
+        lessonStatus: 'incomplete',
+        scoreRaw: null,
+        suspendData: null,
+      },
     });
     renderPage();
     expect(screen.getByTestId('scorm-player')).toBeInTheDocument();
@@ -103,7 +110,12 @@ describe('ScormContentViewer', () => {
 
   it('shows lesson status when session is available', () => {
     setHook({
-      session: { id: 'sess-1', lessonStatus: 'completed', scoreRaw: null, suspendData: null },
+      session: {
+        id: 'sess-1',
+        lessonStatus: 'completed',
+        scoreRaw: null,
+        suspendData: null,
+      },
     });
     renderPage();
     expect(screen.getByText('completed')).toBeInTheDocument();
@@ -111,7 +123,12 @@ describe('ScormContentViewer', () => {
 
   it('shows score when scoreRaw is not null', () => {
     setHook({
-      session: { id: 'sess-1', lessonStatus: 'passed', scoreRaw: 85, suspendData: null },
+      session: {
+        id: 'sess-1',
+        lessonStatus: 'passed',
+        scoreRaw: 85,
+        suspendData: null,
+      },
     });
     renderPage();
     expect(screen.getByText('Score: 85')).toBeInTheDocument();
@@ -119,7 +136,12 @@ describe('ScormContentViewer', () => {
 
   it('does not show score when scoreRaw is null', () => {
     setHook({
-      session: { id: 'sess-1', lessonStatus: 'incomplete', scoreRaw: null, suspendData: null },
+      session: {
+        id: 'sess-1',
+        lessonStatus: 'incomplete',
+        scoreRaw: null,
+        suspendData: null,
+      },
     });
     renderPage();
     expect(screen.queryByText(/Score:/)).not.toBeInTheDocument();
@@ -128,7 +150,12 @@ describe('ScormContentViewer', () => {
   it('does not render ScormPlayer while fetching even if session exists', () => {
     setHook({
       fetching: true,
-      session: { id: 'sess-1', lessonStatus: 'incomplete', scoreRaw: null, suspendData: null },
+      session: {
+        id: 'sess-1',
+        lessonStatus: 'incomplete',
+        scoreRaw: null,
+        suspendData: null,
+      },
     });
     renderPage();
     expect(screen.queryByTestId('scorm-player')).not.toBeInTheDocument();

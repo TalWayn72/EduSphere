@@ -84,9 +84,9 @@ describe('AssessmentAggregatorService', () => {
 
   // Test 2
   it('has no onModuleDestroy method — no resources to clean up', () => {
-    expect(
-      typeof (svc as Record<string, unknown>)['onModuleDestroy']
-    ).toBe('undefined');
+    expect(typeof (svc as Record<string, unknown>)['onModuleDestroy']).toBe(
+      'undefined'
+    );
   });
 
   // ── aggregate — NotFoundException ─────────────────────────────────────────
@@ -95,7 +95,7 @@ describe('AssessmentAggregatorService', () => {
   it('throws NotFoundException when campaign not found', async () => {
     // Each aggregate call consumes one mockResolvedValueOnce — set up two
     mockWithTenantContext
-      .mockResolvedValueOnce([])  // first call: campaign not found
+      .mockResolvedValueOnce([]) // first call: campaign not found
       .mockResolvedValueOnce([]); // second call: also not found
 
     await expect(svc.aggregate(CAMPAIGN_ID, TENANT_ID)).rejects.toThrow(
@@ -124,8 +124,8 @@ describe('AssessmentAggregatorService', () => {
   it('aggregate with empty responses builds summary "No criteria were rated."', async () => {
     mockWithTenantContext
       .mockResolvedValueOnce([mockCampaign]) // campaign fetch
-      .mockResolvedValueOnce([])             // responses fetch (empty)
-      .mockResolvedValueOnce([mockResult]);  // upsert result
+      .mockResolvedValueOnce([]) // responses fetch (empty)
+      .mockResolvedValueOnce([mockResult]); // upsert result
 
     const result = await svc.aggregate(CAMPAIGN_ID, TENANT_ID);
     expect(result.summary).toBe('No criteria were rated.');
@@ -141,7 +141,9 @@ describe('AssessmentAggregatorService', () => {
       campaignId: CAMPAIGN_ID,
       tenantId: TENANT_ID,
       raterRole: 'SELF',
-      criteriaScores: [{ criteriaId: 'comm', label: 'Communication', score: 4 }],
+      criteriaScores: [
+        { criteriaId: 'comm', label: 'Communication', score: 4 },
+      ],
     };
     const expectedResult = {
       ...mockResult,
@@ -181,7 +183,15 @@ describe('AssessmentAggregatorService', () => {
     const expectedResult = {
       ...mockResult,
       aggregatedScores: [
-        { criteriaId: 'lead', label: 'Leadership', selfScore: 5, peerAvg: null, managerScore: null, directReportAvg: null, overallAvg: 5 },
+        {
+          criteriaId: 'lead',
+          label: 'Leadership',
+          selfScore: 5,
+          peerAvg: null,
+          managerScore: null,
+          directReportAvg: null,
+          overallAvg: 5,
+        },
       ],
       summary: 'Overall score: 5/5. Strongest: Leadership (5/5).',
     };
@@ -192,7 +202,9 @@ describe('AssessmentAggregatorService', () => {
       .mockResolvedValueOnce([expectedResult]);
 
     const result = await svc.aggregate(CAMPAIGN_ID, TENANT_ID);
-    const scores = result.aggregatedScores as Array<{ selfScore: number | null }>;
+    const scores = result.aggregatedScores as Array<{
+      selfScore: number | null;
+    }>;
     expect(scores[0]?.selfScore).toBe(5);
   });
 
@@ -286,7 +298,15 @@ describe('AssessmentAggregatorService', () => {
     const expectedResult = {
       ...mockResult,
       aggregatedScores: [
-        { criteriaId: 'c1', label: 'Comm', selfScore: null, peerAvg: 4, managerScore: null, directReportAvg: null, overallAvg: 4 },
+        {
+          criteriaId: 'c1',
+          label: 'Comm',
+          selfScore: null,
+          peerAvg: 4,
+          managerScore: null,
+          directReportAvg: null,
+          overallAvg: 4,
+        },
       ],
     };
 
@@ -319,10 +339,27 @@ describe('AssessmentAggregatorService', () => {
     const expectedResult = {
       ...mockResult,
       aggregatedScores: [
-        { criteriaId: 'c1', label: 'Leadership', selfScore: 5, peerAvg: null, managerScore: null, directReportAvg: null, overallAvg: 5 },
-        { criteriaId: 'c2', label: 'Teamwork', selfScore: 2, peerAvg: null, managerScore: null, directReportAvg: null, overallAvg: 2 },
+        {
+          criteriaId: 'c1',
+          label: 'Leadership',
+          selfScore: 5,
+          peerAvg: null,
+          managerScore: null,
+          directReportAvg: null,
+          overallAvg: 5,
+        },
+        {
+          criteriaId: 'c2',
+          label: 'Teamwork',
+          selfScore: 2,
+          peerAvg: null,
+          managerScore: null,
+          directReportAvg: null,
+          overallAvg: 2,
+        },
       ],
-      summary: 'Overall score: 3.5/5. Strongest: Leadership (5/5). Growth area: Teamwork (2/5).',
+      summary:
+        'Overall score: 3.5/5. Strongest: Leadership (5/5). Growth area: Teamwork (2/5).',
     };
 
     mockWithTenantContext
@@ -349,7 +386,15 @@ describe('AssessmentAggregatorService', () => {
     const expectedResult = {
       ...mockResult,
       aggregatedScores: [
-        { criteriaId: 'c1', label: 'Integrity', selfScore: 4, peerAvg: null, managerScore: null, directReportAvg: null, overallAvg: 4 },
+        {
+          criteriaId: 'c1',
+          label: 'Integrity',
+          selfScore: 4,
+          peerAvg: null,
+          managerScore: null,
+          directReportAvg: null,
+          overallAvg: 4,
+        },
       ],
       summary: 'Overall score: 4/5. Strongest: Integrity (4/5).',
     };
@@ -417,22 +462,39 @@ describe('AssessmentAggregatorService', () => {
     // 3 scores: 1+2+3 = 6, avg = 2 → overallAvg 2.00
     const responses = [
       {
-        id: 'rx1', campaignId: CAMPAIGN_ID, tenantId: TENANT_ID, raterRole: 'PEER',
+        id: 'rx1',
+        campaignId: CAMPAIGN_ID,
+        tenantId: TENANT_ID,
+        raterRole: 'PEER',
         criteriaScores: [{ criteriaId: 'cx', label: 'Focus', score: 1 }],
       },
       {
-        id: 'rx2', campaignId: CAMPAIGN_ID, tenantId: TENANT_ID, raterRole: 'PEER',
+        id: 'rx2',
+        campaignId: CAMPAIGN_ID,
+        tenantId: TENANT_ID,
+        raterRole: 'PEER',
         criteriaScores: [{ criteriaId: 'cx', label: 'Focus', score: 2 }],
       },
       {
-        id: 'rx3', campaignId: CAMPAIGN_ID, tenantId: TENANT_ID, raterRole: 'PEER',
+        id: 'rx3',
+        campaignId: CAMPAIGN_ID,
+        tenantId: TENANT_ID,
+        raterRole: 'PEER',
         criteriaScores: [{ criteriaId: 'cx', label: 'Focus', score: 3 }],
       },
     ];
     const expectedResult = {
       ...mockResult,
       aggregatedScores: [
-        { criteriaId: 'cx', label: 'Focus', selfScore: null, peerAvg: 2, managerScore: null, directReportAvg: null, overallAvg: 2 },
+        {
+          criteriaId: 'cx',
+          label: 'Focus',
+          selfScore: null,
+          peerAvg: 2,
+          managerScore: null,
+          directReportAvg: null,
+          overallAvg: 2,
+        },
       ],
     };
 
@@ -444,7 +506,9 @@ describe('AssessmentAggregatorService', () => {
     const result = await svc.aggregate(CAMPAIGN_ID, TENANT_ID);
     const scores = result.aggregatedScores as Array<{ overallAvg: number }>;
     const avgStr = String(scores[0]?.overallAvg ?? '');
-    const decimalPart = avgStr.includes('.') ? avgStr.split('.')[1] ?? '' : '';
+    const decimalPart = avgStr.includes('.')
+      ? (avgStr.split('.')[1] ?? '')
+      : '';
     expect(decimalPart.length).toBeLessThanOrEqual(2);
   });
 });

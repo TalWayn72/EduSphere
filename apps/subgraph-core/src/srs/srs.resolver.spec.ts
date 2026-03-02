@@ -50,13 +50,21 @@ describe('SrsResolver', () => {
     it('delegates to service with userId, tenantId and limit', async () => {
       srsService.getDueReviews.mockResolvedValue([]);
       await resolver.getDueReviews(10, CTX_AUTHED);
-      expect(srsService.getDueReviews).toHaveBeenCalledWith('user-1', 'tenant-1', 10);
+      expect(srsService.getDueReviews).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        10
+      );
     });
 
     it('defaults limit to 20 when undefined', async () => {
       srsService.getDueReviews.mockResolvedValue([]);
       await resolver.getDueReviews(undefined, CTX_AUTHED);
-      expect(srsService.getDueReviews).toHaveBeenCalledWith('user-1', 'tenant-1', 20);
+      expect(srsService.getDueReviews).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        20
+      );
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
@@ -73,7 +81,10 @@ describe('SrsResolver', () => {
       srsService.getQueueCount.mockResolvedValue(7);
       const result = await resolver.getSrsQueueCount(CTX_AUTHED);
       expect(result).toBe(7);
-      expect(srsService.getQueueCount).toHaveBeenCalledWith('user-1', 'tenant-1');
+      expect(srsService.getQueueCount).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1'
+      );
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
@@ -90,7 +101,10 @@ describe('SrsResolver', () => {
       srsService.submitReview.mockResolvedValue({ nextDue: '2026-03-08' });
       await resolver.submitReview('card-1', 4, CTX_AUTHED);
       expect(srsService.submitReview).toHaveBeenCalledWith(
-        'card-1', 'user-1', 'tenant-1', 4
+        'card-1',
+        'user-1',
+        'tenant-1',
+        4
       );
     });
 
@@ -134,7 +148,9 @@ describe('SrsResolver', () => {
       srsService.createCard.mockResolvedValue({ id: 'card-new' });
       await resolver.createReviewCard('  Photosynthesis  ', CTX_AUTHED);
       expect(srsService.createCard).toHaveBeenCalledWith(
-        'user-1', 'tenant-1', 'Photosynthesis'
+        'user-1',
+        'tenant-1',
+        'Photosynthesis'
       );
     });
 
@@ -157,7 +173,11 @@ describe('SrsResolver', () => {
     it('delegates to service with tenantId, userId and limit', async () => {
       srsService.getDueCards.mockResolvedValue([]);
       await resolver.getDueCards(5, CTX_AUTHED);
-      expect(srsService.getDueCards).toHaveBeenCalledWith('tenant-1', 'user-1', 5);
+      expect(srsService.getDueCards).toHaveBeenCalledWith(
+        'tenant-1',
+        'user-1',
+        5
+      );
     });
   });
 
@@ -166,11 +186,13 @@ describe('SrsResolver', () => {
   describe('scheduleReview()', () => {
     it('delegates to service with all params', async () => {
       srsService.scheduleReview.mockResolvedValue({ id: 'card-1' });
-      await resolver.scheduleReview(
-        'Mitosis', '2026-03-10', 'SM2', CTX_AUTHED
-      );
+      await resolver.scheduleReview('Mitosis', '2026-03-10', 'SM2', CTX_AUTHED);
       expect(srsService.scheduleReview).toHaveBeenCalledWith(
-        'tenant-1', 'user-1', 'Mitosis', '2026-03-10', 'SM2'
+        'tenant-1',
+        'user-1',
+        'Mitosis',
+        '2026-03-10',
+        'SM2'
       );
     });
 
@@ -188,7 +210,10 @@ describe('SrsResolver', () => {
       srsService.recordReview.mockResolvedValue({ nextDue: '2026-04-01' });
       await resolver.recordReview('card-1', 3, CTX_AUTHED);
       expect(srsService.recordReview).toHaveBeenCalledWith(
-        'tenant-1', 'user-1', 'card-1', 3
+        'tenant-1',
+        'user-1',
+        'card-1',
+        3
       );
     });
 

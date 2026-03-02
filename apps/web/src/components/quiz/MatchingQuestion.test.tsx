@@ -92,7 +92,9 @@ describe('MatchingQuestion', () => {
     render(<MatchingQuestion item={mockItem} value={[]} onChange={onChange} />);
     fireEvent.click(screen.getByRole('button', { name: 'France' }));
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }));
-    expect(onChangeMock).toHaveBeenCalledWith([{ leftId: 'fr', rightId: 'par' }]);
+    expect(onChangeMock).toHaveBeenCalledWith([
+      { leftId: 'fr', rightId: 'par' },
+    ]);
   });
 
   it('clears selection after a pair is created', () => {
@@ -126,12 +128,19 @@ describe('MatchingQuestion', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'France' }));
     fireEvent.click(screen.getByRole('button', { name: 'Berlin' }));
-    expect(onChangeMock).toHaveBeenCalledWith([{ leftId: 'fr', rightId: 'ber' }]);
+    expect(onChangeMock).toHaveBeenCalledWith([
+      { leftId: 'fr', rightId: 'ber' },
+    ]);
   });
 
   it('does not call onChange and ignores clicks when disabled', () => {
     render(
-      <MatchingQuestion item={mockItem} value={[]} onChange={onChange} disabled />
+      <MatchingQuestion
+        item={mockItem}
+        value={[]}
+        onChange={onChange}
+        disabled
+      />
     );
     fireEvent.click(screen.getByRole('button', { name: 'France' }));
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }));
@@ -140,7 +149,12 @@ describe('MatchingQuestion', () => {
 
   it('left buttons are disabled when disabled prop is true', () => {
     render(
-      <MatchingQuestion item={mockItem} value={[]} onChange={onChange} disabled />
+      <MatchingQuestion
+        item={mockItem}
+        value={[]}
+        onChange={onChange}
+        disabled
+      />
     );
     expect(screen.getByRole('button', { name: 'France' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Germany' })).toBeDisabled();

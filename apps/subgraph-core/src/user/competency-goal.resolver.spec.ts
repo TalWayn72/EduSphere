@@ -52,7 +52,8 @@ describe('CompetencyGoalResolver', () => {
       const result = await resolver.getMyCompetencyGoals(CTX_AUTHED);
       expect(result).toEqual([MOCK_GOAL]);
       expect(competencyGoalService.getMyGoals).toHaveBeenCalledWith(
-        'user-1', 'tenant-1'
+        'user-1',
+        'tenant-1'
       );
     });
 
@@ -63,9 +64,9 @@ describe('CompetencyGoalResolver', () => {
     });
 
     it('throws UnauthorizedException when not authenticated', async () => {
-      await expect(
-        resolver.getMyCompetencyGoals(CTX_ANON)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getMyCompetencyGoals(CTX_ANON)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -74,9 +75,16 @@ describe('CompetencyGoalResolver', () => {
   describe('addCompetencyGoal()', () => {
     it('delegates to service with userId, tenantId, conceptName and level', async () => {
       competencyGoalService.addGoal.mockResolvedValue(MOCK_GOAL);
-      await resolver.addCompetencyGoal('Photosynthesis', 'ADVANCED', CTX_AUTHED);
+      await resolver.addCompetencyGoal(
+        'Photosynthesis',
+        'ADVANCED',
+        CTX_AUTHED
+      );
       expect(competencyGoalService.addGoal).toHaveBeenCalledWith(
-        'user-1', 'tenant-1', 'Photosynthesis', 'ADVANCED'
+        'user-1',
+        'tenant-1',
+        'Photosynthesis',
+        'ADVANCED'
       );
     });
 
@@ -84,14 +92,19 @@ describe('CompetencyGoalResolver', () => {
       competencyGoalService.addGoal.mockResolvedValue(MOCK_GOAL);
       await resolver.addCompetencyGoal('Mitosis', undefined, CTX_AUTHED);
       expect(competencyGoalService.addGoal).toHaveBeenCalledWith(
-        'user-1', 'tenant-1', 'Mitosis', undefined
+        'user-1',
+        'tenant-1',
+        'Mitosis',
+        undefined
       );
     });
 
     it('returns the created goal', async () => {
       competencyGoalService.addGoal.mockResolvedValue(MOCK_GOAL);
       const result = await resolver.addCompetencyGoal(
-        'Photosynthesis', 'ADVANCED', CTX_AUTHED
+        'Photosynthesis',
+        'ADVANCED',
+        CTX_AUTHED
       );
       expect(result).toEqual(MOCK_GOAL);
     });
@@ -111,7 +124,9 @@ describe('CompetencyGoalResolver', () => {
       const result = await resolver.removeCompetencyGoal('goal-1', CTX_AUTHED);
       expect(result).toBe(true);
       expect(competencyGoalService.removeGoal).toHaveBeenCalledWith(
-        'goal-1', 'user-1', 'tenant-1'
+        'goal-1',
+        'user-1',
+        'tenant-1'
       );
     });
 
@@ -122,7 +137,9 @@ describe('CompetencyGoalResolver', () => {
     });
 
     it('propagates service errors', async () => {
-      competencyGoalService.removeGoal.mockRejectedValue(new Error('Not found'));
+      competencyGoalService.removeGoal.mockRejectedValue(
+        new Error('Not found')
+      );
       await expect(
         resolver.removeCompetencyGoal('goal-999', CTX_AUTHED)
       ).rejects.toThrow('Not found');

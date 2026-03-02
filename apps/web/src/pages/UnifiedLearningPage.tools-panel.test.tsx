@@ -70,7 +70,9 @@ vi.mock('@/pages/UnifiedLearningPage.ai-tab', () => ({
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-function makeChat(overrides: Partial<UseAgentChatReturn> = {}): UseAgentChatReturn {
+function makeChat(
+  overrides: Partial<UseAgentChatReturn> = {}
+): UseAgentChatReturn {
   return {
     messages: [],
     chatInput: '',
@@ -118,7 +120,9 @@ describe('ToolsPanel', () => {
   it('renders the video player with the correct src', () => {
     render(<ToolsPanel {...baseProps} />);
     const player = screen.getByTestId('video-player-core');
-    expect(player.getAttribute('data-src')).toBe('https://example.com/video.mp4');
+    expect(player.getAttribute('data-src')).toBe(
+      'https://example.com/video.mp4'
+    );
   });
 
   it('renders the transcript panel', () => {

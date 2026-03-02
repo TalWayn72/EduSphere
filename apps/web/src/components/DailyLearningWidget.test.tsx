@@ -6,7 +6,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -46,7 +47,10 @@ const MOCK_LESSON_DATA = {
   duration: 240,
 };
 
-function setupQueries(lessonData: typeof MOCK_LESSON_DATA | null = null, overrides: Record<string, unknown> = {}) {
+function setupQueries(
+  lessonData: typeof MOCK_LESSON_DATA | null = null,
+  overrides: Record<string, unknown> = {}
+) {
   vi.mocked(urql.useQuery).mockReturnValue([
     {
       data: { dailyMicrolesson: lessonData },
@@ -72,9 +76,11 @@ describe('DailyLearningWidget', () => {
     expect(screen.getByText('Daily Learning')).toBeInTheDocument();
   });
 
-  it('shows today\'s lesson description when not completed', () => {
+  it("shows today's lesson description when not completed", () => {
     render(<DailyLearningWidget />);
-    expect(screen.getByText(/today's 3-7 minute microlesson/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/today's 3-7 minute microlesson/i)
+    ).toBeInTheDocument();
   });
 
   it('shows loading text while fetching', () => {
@@ -92,7 +98,9 @@ describe('DailyLearningWidget', () => {
   it('shows "No microlessons available yet" when data is null', () => {
     setupQueries(null);
     render(<DailyLearningWidget />);
-    expect(screen.getByText(/no microlessons available yet/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/no microlessons available yet/i)
+    ).toBeInTheDocument();
   });
 
   it('shows lesson concept name and "Start Today\'s Lesson" button when lesson is available', () => {
@@ -107,20 +115,26 @@ describe('DailyLearningWidget', () => {
   it('shows lesson objective below concept name', () => {
     setupQueries(MOCK_LESSON_DATA);
     render(<DailyLearningWidget />);
-    expect(screen.getByText('Learn useState and useEffect')).toBeInTheDocument();
+    expect(
+      screen.getByText('Learn useState and useEffect')
+    ).toBeInTheDocument();
   });
 
   it('renders MicrolessonCard after clicking "Start Today\'s Lesson"', () => {
     setupQueries(MOCK_LESSON_DATA);
     render(<DailyLearningWidget />);
-    fireEvent.click(screen.getByRole('button', { name: /start today's lesson/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /start today's lesson/i })
+    );
     expect(vi.mocked(MicrolessonCard)).toHaveBeenCalled();
   });
 
   it('hides "Start Today\'s Lesson" button after it is clicked', () => {
     setupQueries(MOCK_LESSON_DATA);
     render(<DailyLearningWidget />);
-    fireEvent.click(screen.getByRole('button', { name: /start today's lesson/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /start today's lesson/i })
+    );
     expect(
       screen.queryByRole('button', { name: /start today's lesson/i })
     ).not.toBeInTheDocument();

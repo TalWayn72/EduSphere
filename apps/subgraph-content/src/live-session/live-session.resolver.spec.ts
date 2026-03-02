@@ -23,13 +23,15 @@ const mockLiveSessionService = {
 // Context helpers
 // ---------------------------------------------------------------------------
 
-const makeCtx = (user: {
-  tenant_id?: string;
-  sub?: string;
-  name?: string;
-  preferred_username?: string;
-  role?: string;
-} = {}) => ({
+const makeCtx = (
+  user: {
+    tenant_id?: string;
+    sub?: string;
+    name?: string;
+    preferred_username?: string;
+    role?: string;
+  } = {}
+) => ({
   req: { user },
 });
 
@@ -48,7 +50,9 @@ describe('LiveSessionResolver', () => {
   // ── getLiveSession ────────────────────────────────────────────────────────
 
   it('getLiveSession — passes contentItemId and tenant_id to service', async () => {
-    mockLiveSessionService.getByContentItem.mockResolvedValue({ id: 'session-1' });
+    mockLiveSessionService.getByContentItem.mockResolvedValue({
+      id: 'session-1',
+    });
 
     const result = await resolver.getLiveSession(
       'content-1',
@@ -86,13 +90,8 @@ describe('LiveSessionResolver', () => {
       makeCtx({ tenant_id: 'tenant-abc' })
     );
 
-    const [, tenantId, scheduledAt, meetingName] =
-      mockLiveSessionService.createLiveSession.mock.calls[0] as [
-        string,
-        string,
-        Date,
-        string,
-      ];
+    const [, tenantId, scheduledAt, meetingName] = mockLiveSessionService
+      .createLiveSession.mock.calls[0] as [string, string, Date, string];
 
     expect(tenantId).toBe('tenant-abc');
     expect(scheduledAt).toBeInstanceOf(Date);
@@ -103,41 +102,62 @@ describe('LiveSessionResolver', () => {
   // ── joinLiveSession ───────────────────────────────────────────────────────
 
   it('joinLiveSession — uses name when present', async () => {
-    mockLiveSessionService.getJoinUrl.mockResolvedValue('https://bbb/join?token=abc');
+    mockLiveSessionService.getJoinUrl.mockResolvedValue(
+      'https://bbb/join?token=abc'
+    );
 
     await resolver.joinLiveSession(
       'session-1',
-      makeCtx({ tenant_id: 'tenant-abc', name: 'Alice Smith', role: 'INSTRUCTOR' })
+      makeCtx({
+        tenant_id: 'tenant-abc',
+        name: 'Alice Smith',
+        role: 'INSTRUCTOR',
+      })
     );
 
-    const [, , userName, userRole] =
-      mockLiveSessionService.getJoinUrl.mock.calls[0] as [string, string, string, string];
+    const [, , userName, userRole] = mockLiveSessionService.getJoinUrl.mock
+      .calls[0] as [string, string, string, string];
 
     expect(userName).toBe('Alice Smith');
     expect(userRole).toBe('INSTRUCTOR');
   });
 
   it('joinLiveSession — falls back to preferred_username when name absent', async () => {
-    mockLiveSessionService.getJoinUrl.mockResolvedValue('https://bbb/join?token=xyz');
+    mockLiveSessionService.getJoinUrl.mockResolvedValue(
+      'https://bbb/join?token=xyz'
+    );
 
     await resolver.joinLiveSession(
       'session-1',
       makeCtx({ tenant_id: 'tenant-abc', preferred_username: 'alice42' })
     );
 
-    const [, , userName] =
-      mockLiveSessionService.getJoinUrl.mock.calls[0] as [string, string, string, string];
+    const [, , userName] = mockLiveSessionService.getJoinUrl.mock.calls[0] as [
+      string,
+      string,
+      string,
+      string,
+    ];
 
     expect(userName).toBe('alice42');
   });
 
   it('joinLiveSession — falls back to "Learner" when name and preferred_username absent', async () => {
-    mockLiveSessionService.getJoinUrl.mockResolvedValue('https://bbb/join?token=zzz');
+    mockLiveSessionService.getJoinUrl.mockResolvedValue(
+      'https://bbb/join?token=zzz'
+    );
 
-    await resolver.joinLiveSession('session-1', makeCtx({ tenant_id: 'tenant-abc' }));
+    await resolver.joinLiveSession(
+      'session-1',
+      makeCtx({ tenant_id: 'tenant-abc' })
+    );
 
-    const [, , userName] =
-      mockLiveSessionService.getJoinUrl.mock.calls[0] as [string, string, string, string];
+    const [, , userName] = mockLiveSessionService.getJoinUrl.mock.calls[0] as [
+      string,
+      string,
+      string,
+      string,
+    ];
 
     expect(userName).toBe('Learner');
   });
@@ -150,8 +170,8 @@ describe('LiveSessionResolver', () => {
       makeCtx({ tenant_id: 'tenant-abc', name: 'Bob' })
     );
 
-    const [, , , userRole] =
-      mockLiveSessionService.getJoinUrl.mock.calls[0] as [string, string, string, string];
+    const [, , , userRole] = mockLiveSessionService.getJoinUrl.mock
+      .calls[0] as [string, string, string, string];
 
     expect(userRole).toBe('LEARNER');
   });

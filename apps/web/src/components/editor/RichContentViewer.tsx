@@ -31,8 +31,14 @@ function markdownToHtml(md: string): string {
   let inOl = false;
 
   const closeList = () => {
-    if (inUl) { out.push('</ul>'); inUl = false; }
-    if (inOl) { out.push('</ol>'); inOl = false; }
+    if (inUl) {
+      out.push('</ul>');
+      inUl = false;
+    }
+    if (inOl) {
+      out.push('</ol>');
+      inOl = false;
+    }
   };
 
   const inline = (s: string) =>
@@ -50,18 +56,40 @@ function markdownToHtml(md: string): string {
     const ul = line.match(/^[-*] (.+)/);
     const ol = line.match(/^\d+\. (.+)/);
 
-    if (h1)        { closeList(); out.push(`<h1>${inline(h1[1]!)}</h1>`); }
-    else if (h2)   { closeList(); out.push(`<h2>${inline(h2[1]!)}</h2>`); }
-    else if (h3)   { closeList(); out.push(`<h3>${inline(h3[1]!)}</h3>`); }
-    else if (bq)   { closeList(); out.push(`<blockquote><p>${inline(bq[1]!)}</p></blockquote>`); }
-    else if (line === '---' || line === '***') { closeList(); out.push('<hr/>'); }
-    else if (ul)   {
-      if (inOl) { out.push('</ol>'); inOl = false; }
-      if (!inUl) { out.push('<ul>'); inUl = true; }
+    if (h1) {
+      closeList();
+      out.push(`<h1>${inline(h1[1]!)}</h1>`);
+    } else if (h2) {
+      closeList();
+      out.push(`<h2>${inline(h2[1]!)}</h2>`);
+    } else if (h3) {
+      closeList();
+      out.push(`<h3>${inline(h3[1]!)}</h3>`);
+    } else if (bq) {
+      closeList();
+      out.push(`<blockquote><p>${inline(bq[1]!)}</p></blockquote>`);
+    } else if (line === '---' || line === '***') {
+      closeList();
+      out.push('<hr/>');
+    } else if (ul) {
+      if (inOl) {
+        out.push('</ol>');
+        inOl = false;
+      }
+      if (!inUl) {
+        out.push('<ul>');
+        inUl = true;
+      }
       out.push(`<li>${inline(ul[1]!)}</li>`);
     } else if (ol) {
-      if (inUl) { out.push('</ul>'); inUl = false; }
-      if (!inOl) { out.push('<ol>'); inOl = true; }
+      if (inUl) {
+        out.push('</ul>');
+        inUl = false;
+      }
+      if (!inOl) {
+        out.push('<ol>');
+        inOl = true;
+      }
       out.push(`<li>${inline(ol[1]!)}</li>`);
     } else if (line === '') {
       closeList();

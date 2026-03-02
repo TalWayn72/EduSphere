@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -179,9 +180,7 @@ describe('LtiSettingsPage', () => {
   it('renders platform URL in card', () => {
     setupUrql(MOCK_PLATFORMS);
     renderPage();
-    expect(
-      screen.getByText('https://canvas.example.edu')
-    ).toBeInTheDocument();
+    expect(screen.getByText('https://canvas.example.edu')).toBeInTheDocument();
   });
 
   it('shows Active status for active platforms', () => {

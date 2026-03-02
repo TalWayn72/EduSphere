@@ -25,11 +25,15 @@ describe('isLessonEvent', () => {
   });
 
   it('returns true for lesson.asset.uploaded', () => {
-    expect(isLessonEvent({ ...base, type: 'lesson.asset.uploaded' })).toBe(true);
+    expect(isLessonEvent({ ...base, type: 'lesson.asset.uploaded' })).toBe(
+      true
+    );
   });
 
   it('returns true for lesson.pipeline.started', () => {
-    expect(isLessonEvent({ ...base, type: 'lesson.pipeline.started' })).toBe(true);
+    expect(isLessonEvent({ ...base, type: 'lesson.pipeline.started' })).toBe(
+      true
+    );
   });
 
   it('returns true for lesson.pipeline.module.completed', () => {
@@ -39,9 +43,9 @@ describe('isLessonEvent', () => {
   });
 
   it('returns true for lesson.pipeline.completed', () => {
-    expect(
-      isLessonEvent({ ...base, type: 'lesson.pipeline.completed' })
-    ).toBe(true);
+    expect(isLessonEvent({ ...base, type: 'lesson.pipeline.completed' })).toBe(
+      true
+    );
   });
 
   it('returns true for lesson.published', () => {

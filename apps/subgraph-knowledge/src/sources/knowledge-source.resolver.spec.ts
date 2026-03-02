@@ -69,9 +69,9 @@ describe('KnowledgeSourceResolver', () => {
   describe('auth check', () => {
     it('throws UnauthorizedException when tenantId missing', async () => {
       const ctx = { authContext: {} } as never;
-      await expect(
-        resolver.courseKnowledgeSources('c-1', ctx)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.courseKnowledgeSources('c-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 

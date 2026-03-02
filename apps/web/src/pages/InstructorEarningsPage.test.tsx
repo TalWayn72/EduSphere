@@ -14,7 +14,8 @@ vi.mock('graphql-request', () => ({
   request: vi.fn(),
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
 }));
@@ -27,9 +28,9 @@ import * as tanstack from '@tanstack/react-query';
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
 const MOCK_EARNINGS = {
-  totalEarnedCents: 15000,  // $150.00
+  totalEarnedCents: 15000, // $150.00
   pendingPayoutCents: 5000, // $50.00
-  paidOutCents: 10000,      // $100.00
+  paidOutCents: 10000, // $100.00
   purchases: [
     {
       id: 'p1',
@@ -48,7 +49,10 @@ const MOCK_EARNINGS = {
   ],
 };
 
-function setupQueries(earnings: typeof MOCK_EARNINGS | null = null, isLoading = false) {
+function setupQueries(
+  earnings: typeof MOCK_EARNINGS | null = null,
+  isLoading = false
+) {
   vi.mocked(tanstack.useQuery).mockReturnValue({
     data: earnings ? { instructorEarnings: earnings } : undefined,
     isLoading,
@@ -142,7 +146,9 @@ describe('InstructorEarningsPage', () => {
   it('payout button is disabled when pendingPayoutCents is 0', () => {
     setupQueries({ ...MOCK_EARNINGS, pendingPayoutCents: 0 });
     renderPage();
-    expect(screen.getByRole('button', { name: /request payout/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /request payout/i })
+    ).toBeDisabled();
   });
 
   it('payout button is enabled when pendingPayoutCents > 0', () => {

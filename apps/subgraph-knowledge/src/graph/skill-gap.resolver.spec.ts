@@ -32,7 +32,9 @@ describe('SkillGapResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new SkillGapResolver(new SkillGapService({} as never, {} as never));
+    resolver = new SkillGapResolver(
+      new SkillGapService({} as never, {} as never)
+    );
   });
 
   describe('skillGapAnalysis()', () => {

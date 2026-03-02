@@ -33,10 +33,14 @@ beforeAll(() => {
     writable: true,
     value: vi.fn(),
   });
-  Object.defineProperty(window.HTMLMediaElement.prototype, 'requestFullscreen', {
-    writable: true,
-    value: vi.fn().mockResolvedValue(undefined),
-  });
+  Object.defineProperty(
+    window.HTMLMediaElement.prototype,
+    'requestFullscreen',
+    {
+      writable: true,
+      value: vi.fn().mockResolvedValue(undefined),
+    }
+  );
   Object.defineProperty(document, 'exitFullscreen', {
     writable: true,
     value: vi.fn(),
@@ -46,8 +50,9 @@ beforeAll(() => {
 beforeEach(() => {
   vi.clearAllMocks();
   // Restore isSupported default after clearAllMocks clears mock state
-  (Hls as unknown as { isSupported: ReturnType<typeof vi.fn> }).isSupported
-    .mockReturnValue(true);
+  (
+    Hls as unknown as { isSupported: ReturnType<typeof vi.fn> }
+  ).isSupported.mockReturnValue(true);
   // Do NOT re-set Hls mockImplementation — factory implementation persists
   // and arrow functions used with mockImplementation cannot be called with `new`
 });

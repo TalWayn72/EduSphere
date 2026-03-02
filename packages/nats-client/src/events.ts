@@ -343,7 +343,8 @@ export const NatsSubjects = {
   LESSON_CREATED: 'EDUSPHERE.lesson.created',
   LESSON_ASSET_UPLOADED: 'EDUSPHERE.lesson.asset.uploaded',
   LESSON_PIPELINE_STARTED: 'EDUSPHERE.lesson.pipeline.started',
-  LESSON_PIPELINE_MODULE_COMPLETED: 'EDUSPHERE.lesson.pipeline.module.completed',
+  LESSON_PIPELINE_MODULE_COMPLETED:
+    'EDUSPHERE.lesson.pipeline.module.completed',
   LESSON_PIPELINE_COMPLETED: 'EDUSPHERE.lesson.pipeline.completed',
   LESSON_PUBLISHED: 'EDUSPHERE.lesson.published',
 } as const;

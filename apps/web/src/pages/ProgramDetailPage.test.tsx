@@ -18,7 +18,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -70,7 +71,10 @@ const COMPLETED_ENROLLMENT = [
   },
 ];
 
-function setupQueries(overrides: Record<string, unknown> = {}, fetching = false) {
+function setupQueries(
+  overrides: Record<string, unknown> = {},
+  fetching = false
+) {
   vi.mocked(urql.useQuery).mockReturnValue([
     {
       data: {
@@ -122,7 +126,9 @@ describe('ProgramDetailPage', () => {
 
   it('renders the program description', () => {
     renderPage();
-    expect(screen.getByText('Learn data science from scratch')).toBeInTheDocument();
+    expect(
+      screen.getByText('Learn data science from scratch')
+    ).toBeInTheDocument();
   });
 
   it('renders the badge emoji', () => {

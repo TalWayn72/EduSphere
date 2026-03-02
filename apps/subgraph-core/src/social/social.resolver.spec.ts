@@ -54,7 +54,8 @@ describe('SocialResolver', () => {
       const result = await resolver.followersCount(USER_REF, CTX_AUTHED);
       expect(result).toBe(42);
       expect(socialService.getFollowersCount).toHaveBeenCalledWith(
-        'user-2', 'tenant-1'
+        'user-2',
+        'tenant-1'
       );
     });
 
@@ -62,7 +63,8 @@ describe('SocialResolver', () => {
       socialService.getFollowersCount.mockResolvedValue(5);
       await resolver.followersCount(USER_REF, CTX_ANON);
       expect(socialService.getFollowersCount).toHaveBeenCalledWith(
-        'user-2', 'tenant-1'
+        'user-2',
+        'tenant-1'
       );
     });
   });
@@ -75,7 +77,8 @@ describe('SocialResolver', () => {
       const result = await resolver.followingCount(USER_REF, CTX_AUTHED);
       expect(result).toBe(10);
       expect(socialService.getFollowingCount).toHaveBeenCalledWith(
-        'user-2', 'tenant-1'
+        'user-2',
+        'tenant-1'
       );
     });
   });
@@ -88,7 +91,9 @@ describe('SocialResolver', () => {
       const result = await resolver.isFollowedByMe(USER_REF, CTX_AUTHED);
       expect(result).toBe(true);
       expect(socialService.isFollowing).toHaveBeenCalledWith(
-        'user-1', 'user-2', 'tenant-1'
+        'user-1',
+        'user-2',
+        'tenant-1'
       );
     });
 
@@ -107,7 +112,9 @@ describe('SocialResolver', () => {
       const result = await resolver.myFollowers(20, CTX_AUTHED);
       expect(result).toEqual(['user-3', 'user-4']);
       expect(socialService.getFollowers).toHaveBeenCalledWith(
-        'user-1', 'tenant-1', 20
+        'user-1',
+        'tenant-1',
+        20
       );
     });
 
@@ -126,7 +133,9 @@ describe('SocialResolver', () => {
       const result = await resolver.myFollowing(10, CTX_AUTHED);
       expect(result).toEqual(['user-5']);
       expect(socialService.getFollowing).toHaveBeenCalledWith(
-        'user-1', 'tenant-1', 10
+        'user-1',
+        'tenant-1',
+        10
       );
     });
 
@@ -145,7 +154,9 @@ describe('SocialResolver', () => {
       const result = await resolver.followUser('user-2', CTX_AUTHED);
       expect(result).toBe(true);
       expect(socialService.followUser).toHaveBeenCalledWith(
-        'user-1', 'user-2', 'tenant-1'
+        'user-1',
+        'user-2',
+        'tenant-1'
       );
     });
 
@@ -164,7 +175,9 @@ describe('SocialResolver', () => {
       const result = await resolver.unfollowUser('user-2', CTX_AUTHED);
       expect(result).toBe(true);
       expect(socialService.unfollowUser).toHaveBeenCalledWith(
-        'user-1', 'user-2', 'tenant-1'
+        'user-1',
+        'user-2',
+        'tenant-1'
       );
     });
 

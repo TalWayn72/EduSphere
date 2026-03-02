@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -53,7 +58,9 @@ export class LessonService implements OnModuleDestroy {
 
   private publishEvent(subject: string, payload: LessonPayload): void {
     this.getNats()
-      .then((nc) => nc.publish(subject, this.sc.encode(JSON.stringify(payload))))
+      .then((nc) =>
+        nc.publish(subject, this.sc.encode(JSON.stringify(payload)))
+      )
       .catch((err: unknown) => {
         this.logger.warn(`Failed to publish ${subject}: ${String(err)}`);
       });
@@ -130,7 +137,9 @@ export class LessonService implements OnModuleDestroy {
       .returning();
 
     const lesson = this.mapLesson(row as Record<string, unknown>);
-    this.logger.log(`Lesson created: ${String(row?.['id'])} - "${input.title}"`);
+    this.logger.log(
+      `Lesson created: ${String(row?.['id'])} - "${input.title}"`
+    );
 
     const payload: LessonPayload = {
       type: 'lesson.created',
@@ -150,7 +159,9 @@ export class LessonService implements OnModuleDestroy {
     if (input.type !== undefined) updateData['type'] = input.type;
     if (input.series !== undefined) updateData['series'] = input.series;
     if (input.lessonDate !== undefined)
-      updateData['lesson_date'] = input.lessonDate ? new Date(input.lessonDate) : null;
+      updateData['lesson_date'] = input.lessonDate
+        ? new Date(input.lessonDate)
+        : null;
     if (input.status !== undefined) updateData['status'] = input.status;
 
     const [row] = await this.db

@@ -37,7 +37,10 @@ const ASSET_ICONS: Record<string, string> = {
 };
 
 export function LessonDetailPage() {
-  const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
+  const { courseId, lessonId } = useParams<{
+    courseId: string;
+    lessonId: string;
+  }>();
   const navigate = useNavigate();
 
   const [{ data, fetching, error }] = useQuery<LessonData>({
@@ -73,14 +76,20 @@ export function LessonDetailPage() {
     );
   }
 
-  const statusInfo =
-    STATUS_LABELS[lesson.status] ?? { label: lesson.status, color: 'bg-gray-100 text-gray-600' };
+  const statusInfo = STATUS_LABELS[lesson.status] ?? {
+    label: lesson.status,
+    color: 'bg-gray-100 text-gray-600',
+  };
 
   return (
     <Layout>
       <div className="max-w-3xl mx-auto p-6">
         <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/courses/${courseId}`)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/courses/${courseId}`)}
+          >
             ← חזרה לקורס
           </Button>
         </div>
@@ -88,7 +97,9 @@ export function LessonDetailPage() {
         <div className="bg-white rounded-xl border p-6 mb-4">
           <div className="flex items-start justify-between mb-3">
             <h1 className="text-2xl font-bold">{lesson.title}</h1>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.color}`}>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.color}`}
+            >
               {statusInfo.label}
             </span>
           </div>
@@ -96,7 +107,9 @@ export function LessonDetailPage() {
             <span>סוג: {lesson.type === 'THEMATIC' ? 'הגות' : 'על הסדר'}</span>
             {lesson.series && <span>סדרה: {lesson.series}</span>}
             {lesson.lessonDate && (
-              <span>תאריך: {new Date(lesson.lessonDate).toLocaleDateString('he-IL')}</span>
+              <span>
+                תאריך: {new Date(lesson.lessonDate).toLocaleDateString('he-IL')}
+              </span>
             )}
           </div>
         </div>

@@ -7,7 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
@@ -102,7 +102,9 @@ describe('ScenariosPage', () => {
 
   it('renders the "Create Scenario" button', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /create scenario/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create scenario/i })
+    ).toBeInTheDocument();
   });
 
   it('shows loading skeletons while fetching', () => {
@@ -122,9 +124,7 @@ describe('ScenariosPage', () => {
   it('shows empty state when no scenarios are returned', () => {
     setupQuery({ scenarios: null });
     renderPage();
-    expect(
-      screen.getByText(/no scenarios available yet/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no scenarios available yet/i)).toBeInTheDocument();
   });
 
   it('renders scenario cards from query data', () => {
@@ -162,6 +162,8 @@ describe('ScenariosPage', () => {
   it('renders scene descriptions on cards', () => {
     setupQuery({ scenarios: MOCK_SCENARIOS });
     renderPage();
-    expect(screen.getByText('Practice a cold call sales scenario.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Practice a cold call sales scenario.')
+    ).toBeInTheDocument();
   });
 });

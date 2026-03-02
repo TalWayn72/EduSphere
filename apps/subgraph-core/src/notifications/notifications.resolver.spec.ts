@@ -28,7 +28,9 @@ import { NotificationsResolver } from './notifications.resolver.js';
 function makeCtx(authUserId?: string) {
   return {
     req: {},
-    authContext: authUserId ? { userId: authUserId, tenantId: 'tenant-1', roles: [] } : undefined,
+    authContext: authUserId
+      ? { userId: authUserId, tenantId: 'tenant-1', roles: [] }
+      : undefined,
   };
 }
 
@@ -44,23 +46,26 @@ describe('NotificationsResolver', () => {
 
   // 1. Throws UnauthorizedException when authContext is absent
   it('throws UnauthorizedException when authContext is not present', () => {
-    expect(() => resolver.notificationReceived('user-1', makeCtx(undefined))).toThrow(
-      UnauthorizedException,
-    );
+    expect(() =>
+      resolver.notificationReceived('user-1', makeCtx(undefined))
+    ).toThrow(UnauthorizedException);
   });
 
   // 2. Throws UnauthorizedException when authUserId is absent (null userId)
   it('throws UnauthorizedException when authContext has no userId', () => {
-    const ctx = { req: {}, authContext: { userId: '', tenantId: 't1', roles: [] } };
-    expect(() =>
-      resolver.notificationReceived('user-1', ctx as never),
-    ).toThrow(UnauthorizedException);
+    const ctx = {
+      req: {},
+      authContext: { userId: '', tenantId: 't1', roles: [] },
+    };
+    expect(() => resolver.notificationReceived('user-1', ctx as never)).toThrow(
+      UnauthorizedException
+    );
   });
 
   // 3. Throws UnauthorizedException when authUserId !== requested userId
   it('throws UnauthorizedException when authUserId does not match requested userId', () => {
     expect(() =>
-      resolver.notificationReceived('user-2', makeCtx('user-1')),
+      resolver.notificationReceived('user-2', makeCtx('user-1'))
     ).toThrow(UnauthorizedException);
   });
 

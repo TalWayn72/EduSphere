@@ -61,7 +61,9 @@ describe('AdminStatCards', () => {
   it('shows the total users count', () => {
     renderCards();
     // 1250 → toLocaleString() in en-US is "1,250"
-    expect(screen.getByText(MOCK_OVERVIEW.totalUsers.toLocaleString())).toBeInTheDocument();
+    expect(
+      screen.getByText(MOCK_OVERVIEW.totalUsers.toLocaleString())
+    ).toBeInTheDocument();
   });
 
   it('shows the storage used value formatted as MB', () => {

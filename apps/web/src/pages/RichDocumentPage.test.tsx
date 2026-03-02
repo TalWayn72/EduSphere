@@ -7,7 +7,7 @@ import React from 'react';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
@@ -132,7 +132,9 @@ describe('RichDocumentPage', () => {
   it('shows skeleton loading blocks while fetching', () => {
     setQuery({ fetching: true });
     const { container } = renderPage();
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(
+      0
+    );
   });
 
   it('shows error banner on query error', () => {
@@ -191,7 +193,9 @@ describe('RichDocumentPage', () => {
       },
     });
     renderPage();
-    expect(screen.getByTestId('doc-viewer')).toHaveTextContent('rich content here');
+    expect(screen.getByTestId('doc-viewer')).toHaveTextContent(
+      'rich content here'
+    );
   });
 
   it('renders "No content available" when contentType is not RICH_DOCUMENT', () => {

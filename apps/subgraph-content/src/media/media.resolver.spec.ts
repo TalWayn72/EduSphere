@@ -28,7 +28,9 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
 }));
 
 vi.mock('nats', () => ({
-  connect: vi.fn().mockResolvedValue({ close: vi.fn(), publish: vi.fn(), flush: vi.fn() }),
+  connect: vi
+    .fn()
+    .mockResolvedValue({ close: vi.fn(), publish: vi.fn(), flush: vi.fn() }),
   StringCodec: vi.fn(() => ({ encode: (s: string) => s })),
 }));
 
@@ -51,7 +53,11 @@ const mockService = {
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-const AUTH_CTX = { userId: 'user-1', tenantId: 'tenant-1', roles: ['INSTRUCTOR'] };
+const AUTH_CTX = {
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  roles: ['INSTRUCTOR'],
+};
 const makeCtx = (auth = AUTH_CTX) => ({ authContext: auth });
 const noAuthCtx = { authContext: undefined };
 
@@ -89,13 +95,22 @@ describe('MediaResolver', () => {
   describe('getPresignedUploadUrl()', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
       await expect(
-        resolver.getPresignedUploadUrl('file.mp4', 'video/mp4', 'course-1', noAuthCtx)
+        resolver.getPresignedUploadUrl(
+          'file.mp4',
+          'video/mp4',
+          'course-1',
+          noAuthCtx
+        )
       ).rejects.toThrow(UnauthorizedException);
       expect(mockGetPresignedUploadUrl).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
       await expect(
         resolver.getPresignedUploadUrl('file.mp4', 'video/mp4', 'course-1', ctx)
       ).rejects.toThrow(UnauthorizedException);
@@ -125,7 +140,12 @@ describe('MediaResolver', () => {
       mockGetPresignedUploadUrl.mockResolvedValueOnce(PRESIGNED_RESULT);
       const ctx = makeCtx({ userId: 'u1', tenantId: 'tenant-xyz', roles: [] });
 
-      await resolver.getPresignedUploadUrl('f.pdf', 'application/pdf', 'c2', ctx);
+      await resolver.getPresignedUploadUrl(
+        'f.pdf',
+        'application/pdf',
+        'c2',
+        ctx
+      );
 
       const [, , , tenantArg] = mockGetPresignedUploadUrl.mock.calls[0];
       expect(tenantArg).toBe('tenant-xyz');
@@ -143,14 +163,22 @@ describe('MediaResolver', () => {
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
       await expect(
         resolver.confirmMediaUpload('key', 'course-1', 'Video', ctx)
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
+      const ctx = makeCtx({
+        userId: undefined as unknown as string,
+        tenantId: 't1',
+        roles: [],
+      });
       await expect(
         resolver.confirmMediaUpload('key', 'course-1', 'Video', ctx)
       ).rejects.toThrow(UnauthorizedException);
@@ -181,7 +209,9 @@ describe('MediaResolver', () => {
 
   describe('resolveHlsManifestUrl()', () => {
     it('returns parent.hlsManifestUrl directly when it is not undefined', async () => {
-      const parent = { hlsManifestUrl: 'https://cdn.example.com/manifest.m3u8' };
+      const parent = {
+        hlsManifestUrl: 'https://cdn.example.com/manifest.m3u8',
+      };
       const result = await resolver.resolveHlsManifestUrl(parent);
       expect(result).toBe('https://cdn.example.com/manifest.m3u8');
       expect(mockGetHlsManifestUrl).not.toHaveBeenCalled();
@@ -195,8 +225,13 @@ describe('MediaResolver', () => {
     });
 
     it('calls service.getHlsManifestUrl with hlsManifestKey when hlsManifestUrl is undefined', async () => {
-      mockGetHlsManifestUrl.mockResolvedValueOnce('https://cdn.example.com/hls/master.m3u8');
-      const parent = { hlsManifestUrl: undefined as unknown as null, hlsManifestKey: 'hls/manifest.m3u8' };
+      mockGetHlsManifestUrl.mockResolvedValueOnce(
+        'https://cdn.example.com/hls/master.m3u8'
+      );
+      const parent = {
+        hlsManifestUrl: undefined as unknown as null,
+        hlsManifestKey: 'hls/manifest.m3u8',
+      };
       const result = await resolver.resolveHlsManifestUrl(parent);
       expect(mockGetHlsManifestUrl).toHaveBeenCalledWith('hls/manifest.m3u8');
       expect(result).toBe('https://cdn.example.com/hls/master.m3u8');

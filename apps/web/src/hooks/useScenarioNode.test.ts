@@ -2,7 +2,8 @@
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -19,10 +20,18 @@ import { renderHook } from '@testing-library/react';
 import * as urql from 'urql';
 import { useScenarioNode } from './useScenarioNode';
 
-type UseQueryReturn = [{ data: unknown; fetching: boolean; error: unknown }, () => void];
+type UseQueryReturn = [
+  { data: unknown; fetching: boolean; error: unknown },
+  () => void,
+];
 
-function makeResult(overrides: Partial<{ data: unknown; fetching: boolean; error: unknown }>): UseQueryReturn {
-  return [{ data: undefined, fetching: false, error: undefined, ...overrides }, vi.fn()];
+function makeResult(
+  overrides: Partial<{ data: unknown; fetching: boolean; error: unknown }>
+): UseQueryReturn {
+  return [
+    { data: undefined, fetching: false, error: undefined, ...overrides },
+    vi.fn(),
+  ];
 }
 
 const mockScenarioNode = {
@@ -72,19 +81,25 @@ describe('useScenarioNode', () => {
 
   it('pauses query when enabled=false', () => {
     renderHook(() => useScenarioNode('ci-1', false));
-    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as { pause?: boolean };
+    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as {
+      pause?: boolean;
+    };
     expect(callArgs?.pause).toBe(true);
   });
 
   it('does not pause query when enabled=true', () => {
     renderHook(() => useScenarioNode('ci-1', true));
-    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as { pause?: boolean };
+    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as {
+      pause?: boolean;
+    };
     expect(callArgs?.pause).toBe(false);
   });
 
   it('passes contentItemId as variable to the query', () => {
     renderHook(() => useScenarioNode('my-content-42'));
-    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as { variables?: Record<string, unknown> };
+    const callArgs = vi.mocked(urql.useQuery).mock.calls[0]?.[0] as {
+      variables?: Record<string, unknown>;
+    };
     expect(callArgs?.variables?.contentItemId).toBe('my-content-42');
   });
 

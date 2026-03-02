@@ -9,9 +9,7 @@ import type { PresenceUser } from './CollaborativeEditor';
 
 // ── Mock TipTap Editor ─────────────────────────────────────────────────────
 
-function createMockEditor(
-  activeStates: Record<string, boolean> = {}
-): Editor {
+function createMockEditor(activeStates: Record<string, boolean> = {}): Editor {
   const run = vi.fn();
   const chainResult = {
     focus: vi.fn(() => ({
@@ -200,7 +198,13 @@ describe('CollaborativeEditorToolbar', () => {
 
   it('renders presence avatars with initials and online count', () => {
     const users: PresenceUser[] = [
-      { id: 'u1', name: 'Alice', initials: 'AL', color: '#f00', isTyping: false },
+      {
+        id: 'u1',
+        name: 'Alice',
+        initials: 'AL',
+        color: '#f00',
+        isTyping: false,
+      },
       { id: 'u2', name: 'Bob', initials: 'BO', color: '#0f0', isTyping: true },
     ];
     render(

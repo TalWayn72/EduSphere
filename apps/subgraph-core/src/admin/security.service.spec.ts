@@ -131,7 +131,7 @@ describe('SecurityService', () => {
   // 6. mapRow converts non-array ipAllowlist to empty array
   it('getSettings converts non-array ipAllowlist to empty array', async () => {
     mockDb.select.mockReturnValue(
-      selectChain([{ ...FULL_ROW, ipAllowlist: null }]),
+      selectChain([{ ...FULL_ROW, ipAllowlist: null }])
     );
     const result = await service.getSettings('tenant-1');
     expect(result.ipAllowlist).toEqual([]);
@@ -147,7 +147,9 @@ describe('SecurityService', () => {
         }),
       }),
     });
-    const result = await service.updateSettings('tenant-1', { mfaRequired: false });
+    const result = await service.updateSettings('tenant-1', {
+      mfaRequired: false,
+    });
     expect(result.mfaRequired).toBe(false);
     expect(mockDb.insert).toHaveBeenCalled();
   });

@@ -8,7 +8,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -66,7 +66,10 @@ const defaultProps = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockCreateSession.mockResolvedValue({ data: { createLiveSession: { id: 's1' } }, error: undefined });
+  mockCreateSession.mockResolvedValue({
+    data: { createLiveSession: { id: 's1' } },
+    error: undefined,
+  });
   vi.mocked(urql.useMutation).mockReturnValue([
     { fetching: false } as never,
     mockCreateSession as never,
@@ -91,12 +94,16 @@ describe('ScheduleLiveSessionModal', () => {
 
   it('renders meeting name input', () => {
     render(<ScheduleLiveSessionModal {...defaultProps} />);
-    expect(screen.getByLabelText('liveSession.meetingName')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('liveSession.meetingName')
+    ).toBeInTheDocument();
   });
 
   it('renders scheduled date input', () => {
     render(<ScheduleLiveSessionModal {...defaultProps} />);
-    expect(screen.getByLabelText('liveSession.scheduledAt')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('liveSession.scheduledAt')
+    ).toBeInTheDocument();
   });
 
   it('calls onClose when Cancel button is clicked', () => {
@@ -107,7 +114,9 @@ describe('ScheduleLiveSessionModal', () => {
   });
 
   it('shows validation error when form is submitted empty', async () => {
-    const { container } = render(<ScheduleLiveSessionModal {...defaultProps} />);
+    const { container } = render(
+      <ScheduleLiveSessionModal {...defaultProps} />
+    );
     fireEvent.submit(container.querySelector('form')!);
     await waitFor(() =>
       expect(
@@ -124,7 +133,9 @@ describe('ScheduleLiveSessionModal', () => {
     fireEvent.change(screen.getByLabelText('liveSession.scheduledAt'), {
       target: { value: '2026-06-01T10:00' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /liveSession.scheduleButton/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /liveSession.scheduleButton/i })
+    );
     await waitFor(() =>
       expect(mockCreateSession).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -151,7 +162,9 @@ describe('ScheduleLiveSessionModal', () => {
     fireEvent.change(screen.getByLabelText('liveSession.scheduledAt'), {
       target: { value: '2026-06-01T10:00' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /liveSession.scheduleButton/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /liveSession.scheduleButton/i })
+    );
     await waitFor(() => {
       expect(onCreated).toHaveBeenCalledTimes(1);
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -169,7 +182,9 @@ describe('ScheduleLiveSessionModal', () => {
     fireEvent.change(screen.getByLabelText('liveSession.scheduledAt'), {
       target: { value: '2026-06-01T10:00' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /liveSession.scheduleButton/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /liveSession.scheduleButton/i })
+    );
     await waitFor(() =>
       expect(screen.getByText('Session creation failed')).toBeInTheDocument()
     );

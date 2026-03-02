@@ -40,7 +40,9 @@ export class LessonAssetService implements OnModuleDestroy {
 
   private publishEvent(subject: string, payload: LessonPayload): void {
     this.getNats()
-      .then((nc) => nc.publish(subject, this.sc.encode(JSON.stringify(payload))))
+      .then((nc) =>
+        nc.publish(subject, this.sc.encode(JSON.stringify(payload)))
+      )
       .catch((err: unknown) => {
         this.logger.warn(`Failed to publish ${subject}: ${String(err)}`);
       });
@@ -84,7 +86,9 @@ export class LessonAssetService implements OnModuleDestroy {
       })
       .returning();
 
-    this.logger.log(`Lesson asset added: ${String(row?.['id'])} for lesson ${lessonId}`);
+    this.logger.log(
+      `Lesson asset added: ${String(row?.['id'])} for lesson ${lessonId}`
+    );
 
     // Get courseId for NATS event
     const [lessonRow] = await this.db

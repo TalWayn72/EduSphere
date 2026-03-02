@@ -41,23 +41,33 @@ const CitationVerifierStateSchema = z.object({
 export type CitationVerifierState = z.infer<typeof CitationVerifierStateSchema>;
 
 const CitationVerifierAnnotation = Annotation.Root({
-  citations: Annotation<CitationInput[]>({ value: (_, u) => u, default: () => [] }),
+  citations: Annotation<CitationInput[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
   strictMode: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
   verifiedCitations: Annotation<CitationResult[]>({
     reducer: (existing, incoming) => {
       const merged = [...existing, ...incoming];
-      return merged.length > MAX_CITATIONS ? merged.slice(merged.length - MAX_CITATIONS) : merged;
+      return merged.length > MAX_CITATIONS
+        ? merged.slice(merged.length - MAX_CITATIONS)
+        : merged;
     },
     default: () => [],
   }),
   failedCitations: Annotation<CitationResult[]>({
     reducer: (existing, incoming) => {
       const merged = [...existing, ...incoming];
-      return merged.length > MAX_CITATIONS ? merged.slice(merged.length - MAX_CITATIONS) : merged;
+      return merged.length > MAX_CITATIONS
+        ? merged.slice(merged.length - MAX_CITATIONS)
+        : merged;
     },
     default: () => [],
   }),
-  matchReport: Annotation<string | undefined>({ value: (_, u) => u, default: () => undefined }),
+  matchReport: Annotation<string | undefined>({
+    value: (_, u) => u,
+    default: () => undefined,
+  }),
   overallScore: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
   isComplete: Annotation<boolean>({ value: (_, u) => u, default: () => false }),
 });
@@ -93,12 +103,14 @@ export class CitationVerifierWorkflow {
     return graph;
   }
 
-  private async semanticMatchNode(state: CitationVerifierState): Promise<Partial<CitationVerifierState>> {
+  private async semanticMatchNode(
+    state: CitationVerifierState
+  ): Promise<Partial<CitationVerifierState>> {
     if (state.citations.length === 0) {
       return { verifiedCitations: [], failedCitations: [] };
     }
 
-    const threshold = state.strictMode ? 0.95 : 0.70;
+    const threshold = state.strictMode ? 0.95 : 0.7;
 
     const systemPrompt = injectLocale(
       `You are a Hebrew religious text citation verifier specializing in Kabbalistic and Talmudic literature.
@@ -127,7 +139,10 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
         if (result.confidence >= threshold) {
           verified.push({ ...result, matchStatus: 'VERIFIED' });
         } else {
-          failed.push({ ...result, matchStatus: result.confidence > 0.3 ? 'UNVERIFIED' : 'FAILED' });
+          failed.push({
+            ...result,
+            matchStatus: result.confidence > 0.3 ? 'UNVERIFIED' : 'FAILED',
+          });
         }
       }
     }
@@ -135,7 +150,9 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
     return { verifiedCitations: verified, failedCitations: failed };
   }
 
-  private async generateReportNode(state: CitationVerifierState): Promise<Partial<CitationVerifierState>> {
+  private async generateReportNode(
+    state: CitationVerifierState
+  ): Promise<Partial<CitationVerifierState>> {
     const total = state.verifiedCitations.length + state.failedCitations.length;
     const verifiedCount = state.verifiedCitations.length;
     const overallScore = total > 0 ? verifiedCount / total : 1;
@@ -147,9 +164,12 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
       `**מצב:** ${state.strictMode ? 'מחמיר' : 'מאוזן'}`,
       ``,
       `## ציטוטים שנכשלו (${state.failedCitations.length})`,
-      ...state.failedCitations.slice(0, 20).map((c) =>
-        `- "${c.sourceText.slice(0, 60)}..." — ${c.bookName} — ביטחון: ${Math.round(c.confidence * 100)}%`
-      ),
+      ...state.failedCitations
+        .slice(0, 20)
+        .map(
+          (c) =>
+            `- "${c.sourceText.slice(0, 60)}..." — ${c.bookName} — ביטחון: ${Math.round(c.confidence * 100)}%`
+        ),
     ];
 
     return {
@@ -159,15 +179,21 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
     };
   }
 
-  compile(opts?: { checkpointer?: unknown }) { return this.graph.compile(opts); }
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts);
+  }
 
-  async run(initialState: Partial<CitationVerifierState>): Promise<CitationVerifierState> {
+  async run(
+    initialState: Partial<CitationVerifierState>
+  ): Promise<CitationVerifierState> {
     const fullState = CitationVerifierStateSchema.parse(initialState);
     const result = await this.graph.compile().invoke(fullState);
     return result as CitationVerifierState;
   }
 
-  async *stream(initialState: Partial<CitationVerifierState>): AsyncGenerator<CitationVerifierState, void, unknown> {
+  async *stream(
+    initialState: Partial<CitationVerifierState>
+  ): AsyncGenerator<CitationVerifierState, void, unknown> {
     const compiledGraph = this.graph.compile();
     const fullState = CitationVerifierStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
@@ -176,6 +202,9 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
   }
 }
 
-export function createCitationVerifierWorkflow(model?: string, locale = 'he'): CitationVerifierWorkflow {
+export function createCitationVerifierWorkflow(
+  model?: string,
+  locale = 'he'
+): CitationVerifierWorkflow {
   return new CitationVerifierWorkflow(model, locale);
 }

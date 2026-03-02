@@ -2,10 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { AnalyticsCharts } from './CourseAnalyticsPage.charts';
-import type {
-  ContentItemMetric,
-  FunnelStep,
-} from './CourseAnalyticsPage';
+import type { ContentItemMetric, FunnelStep } from './CourseAnalyticsPage';
 
 // Mock Recharts — ResponsiveContainer uses ResizeObserver which is absent in JSDOM
 vi.mock('recharts', () => ({
@@ -72,9 +69,7 @@ describe('AnalyticsCharts', () => {
     render(
       <AnalyticsCharts contentItemMetrics={[]} dropOffFunnel={MOCK_FUNNEL} />
     );
-    expect(
-      screen.getByText('No content item data yet.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('No content item data yet.')).toBeInTheDocument();
     expect(screen.getByText('Content Engagement')).toBeInTheDocument();
   });
 
@@ -85,9 +80,7 @@ describe('AnalyticsCharts', () => {
         dropOffFunnel={MOCK_FUNNEL}
       />
     );
-    expect(
-      screen.getAllByText('Module Drop-off Funnel')
-    ).toHaveLength(1);
+    expect(screen.getAllByText('Module Drop-off Funnel')).toHaveLength(1);
   });
 
   it('shows "No funnel data yet" when funnel array is empty', () => {
@@ -119,9 +112,7 @@ describe('AnalyticsCharts', () => {
 
   it('shows both empty states when both data sets are empty', () => {
     render(<AnalyticsCharts contentItemMetrics={[]} dropOffFunnel={[]} />);
-    expect(
-      screen.getByText('No content item data yet.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('No content item data yet.')).toBeInTheDocument();
     expect(screen.getByText('No funnel data yet.')).toBeInTheDocument();
   });
 });

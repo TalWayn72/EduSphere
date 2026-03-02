@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -32,7 +33,8 @@ vi.mock('@/hooks/useAuthRole', () => ({
 
 vi.mock('@/lib/graphql/admin-language.queries', () => ({
   TENANT_LANGUAGE_SETTINGS_QUERY: 'TENANT_LANGUAGE_SETTINGS_QUERY',
-  UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION: 'UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION',
+  UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION:
+    'UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION',
 }));
 
 // ── Imports after mocks ───────────────────────────────────────────────────────
@@ -126,7 +128,9 @@ describe('LanguageSettingsPage', () => {
 
   it('renders "Save Changes" button', () => {
     renderPage();
-    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /save changes/i })
+    ).toBeInTheDocument();
   });
 
   it('English is checked by default (initial supported set)', () => {

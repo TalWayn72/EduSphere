@@ -1,12 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import * as urql from 'urql';
 import { RoleplaySimulator } from './RoleplaySimulator';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -21,11 +28,14 @@ const mockScenario = {
   title: 'Medical Ethics Consultation',
   domain: 'Medicine',
   difficultyLevel: 'INTERMEDIATE',
-  sceneDescription: 'You are meeting a patient who needs critical care guidance.',
+  sceneDescription:
+    'You are meeting a patient who needs critical care guidance.',
   maxTurns: 10,
 };
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
 describe('RoleplaySimulator', () => {
   const onClose = vi.fn();
@@ -46,7 +56,9 @@ describe('RoleplaySimulator', () => {
   it('renders the scenario title in the header', async () => {
     render(<RoleplaySimulator scenario={mockScenario} onClose={onClose} />);
     await waitFor(() => {
-      expect(screen.getByText('Medical Ethics Consultation')).toBeInTheDocument();
+      expect(
+        screen.getByText('Medical Ethics Consultation')
+      ).toBeInTheDocument();
     });
   });
 
@@ -96,12 +108,11 @@ describe('RoleplaySimulator', () => {
         { fetching: false } as never,
         vi
           .fn()
-          .mockResolvedValue({ data: { startRoleplaySession: { id: 'sess-1' } } }),
+          .mockResolvedValue({
+            data: { startRoleplaySession: { id: 'sess-1' } },
+          }),
       ])
-      .mockReturnValue([
-        { fetching: false } as never,
-        NOOP_EXECUTE,
-      ]);
+      .mockReturnValue([{ fetching: false } as never, NOOP_EXECUTE]);
 
     await act(async () => {
       render(<RoleplaySimulator scenario={mockScenario} onClose={onClose} />);
@@ -133,7 +144,9 @@ describe('RoleplaySimulator', () => {
         { fetching: false } as never,
         vi
           .fn()
-          .mockResolvedValue({ data: { startRoleplaySession: { id: 'sess-1' } } }),
+          .mockResolvedValue({
+            data: { startRoleplaySession: { id: 'sess-1' } },
+          }),
       ])
       .mockReturnValue([
         { fetching: false } as never,

@@ -7,10 +7,18 @@ const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
     getItem: vi.fn((key: string) => store[key] ?? null),
-    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
-    removeItem: vi.fn((key: string) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
-    get length() { return Object.keys(store).length; },
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    get length() {
+      return Object.keys(store).length;
+    },
     key: vi.fn((i: number) => Object.keys(store)[i] ?? null),
   };
 })();
@@ -43,11 +51,13 @@ describe('useRecentDocuments', () => {
   it('addRecentDocument stores a new entry in localStorage', () => {
     const { result } = renderHook(() => useRecentDocuments());
 
-    act(() => { result.current.addRecentDocument('content-1', 'Introduction to AI'); });
+    act(() => {
+      result.current.addRecentDocument('content-1', 'Introduction to AI');
+    });
 
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
       RECENT_KEY,
-      expect.stringContaining('"contentId":"content-1"'),
+      expect.stringContaining('"contentId":"content-1"')
     );
   });
 
@@ -74,7 +84,9 @@ describe('useRecentDocuments', () => {
 
     const { result } = renderHook(() => useRecentDocuments());
 
-    act(() => { result.current.addRecentDocument('dup', 'New Title'); });
+    act(() => {
+      result.current.addRecentDocument('dup', 'New Title');
+    });
 
     const written = JSON.parse(
       (localStorageMock.setItem.mock.calls[0] as [string, string])[1]
@@ -85,16 +97,21 @@ describe('useRecentDocuments', () => {
   });
 
   it('addRecentDocument caps the list at MAX_RECENT (10)', () => {
-    const many: RecentDocument[] = Array.from({ length: MAX_RECENT }, (_, i) => ({
-      contentId: `c${i}`,
-      title: `Doc ${i}`,
-      lastViewedAt: Date.now() - i * 1000,
-    }));
+    const many: RecentDocument[] = Array.from(
+      { length: MAX_RECENT },
+      (_, i) => ({
+        contentId: `c${i}`,
+        title: `Doc ${i}`,
+        lastViewedAt: Date.now() - i * 1000,
+      })
+    );
     localStorageMock.getItem.mockReturnValue(JSON.stringify(many));
 
     const { result } = renderHook(() => useRecentDocuments());
 
-    act(() => { result.current.addRecentDocument('c-new', 'New Doc'); });
+    act(() => {
+      result.current.addRecentDocument('c-new', 'New Doc');
+    });
 
     const written = JSON.parse(
       (localStorageMock.setItem.mock.calls[0] as [string, string])[1]
@@ -131,7 +148,9 @@ describe('useRecentDocuments', () => {
     const before = Date.now();
     const { result } = renderHook(() => useRecentDocuments());
 
-    act(() => { result.current.addRecentDocument('ts-test', 'Timestamp Test'); });
+    act(() => {
+      result.current.addRecentDocument('ts-test', 'Timestamp Test');
+    });
 
     const written = JSON.parse(
       (localStorageMock.setItem.mock.calls[0] as [string, string])[1]

@@ -111,7 +111,9 @@ export class LessonIngestionWorkflow {
     const errors: string[] = [];
 
     if (!state.videoUrl && !state.audioFileKey) {
-      errors.push('At least one media source (videoUrl or audioFileKey) is required');
+      errors.push(
+        'At least one media source (videoUrl or audioFileKey) is required'
+      );
     }
 
     if (

@@ -52,7 +52,9 @@ describe('RiskThresholdConfig', () => {
 
   it('renders the card title', () => {
     render(<RiskThresholdConfig />);
-    expect(screen.getByText('Risk Threshold Configuration')).toBeInTheDocument();
+    expect(
+      screen.getByText('Risk Threshold Configuration')
+    ).toBeInTheDocument();
   });
 
   it('renders inactive days label and input with default value 7', () => {
@@ -89,7 +91,9 @@ describe('RiskThresholdConfig', () => {
 
   it('renders Save Thresholds button', () => {
     render(<RiskThresholdConfig />);
-    expect(screen.getByRole('button', { name: /Save Thresholds/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Save Thresholds/i })
+    ).toBeInTheDocument();
   });
 
   it('shows Saving… text while saving and calls toast.success after timeout', async () => {
@@ -101,7 +105,9 @@ describe('RiskThresholdConfig', () => {
       vi.advanceTimersByTime(700);
     });
 
-    expect(vi.mocked(toast.success)).toHaveBeenCalledWith('Risk thresholds saved');
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+      'Risk thresholds saved'
+    );
   });
 
   it('re-enables button after save completes', () => {
@@ -112,7 +118,9 @@ describe('RiskThresholdConfig', () => {
       vi.advanceTimersByTime(700);
     });
 
-    expect(screen.getByRole('button', { name: /Save Thresholds/i })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /Save Thresholds/i })
+    ).not.toBeDisabled();
   });
 
   it('slider has correct min/max/step attributes', () => {

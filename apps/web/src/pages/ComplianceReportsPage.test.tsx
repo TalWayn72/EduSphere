@@ -14,7 +14,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -106,9 +107,7 @@ describe('ComplianceReportsPage', () => {
 
   it('renders "Compliance Training Reports" heading', () => {
     renderPage();
-    expect(
-      screen.getByText('Compliance Training Reports')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Compliance Training Reports')).toBeInTheDocument();
   });
 
   it('redirects to /dashboard for STUDENT role', () => {
@@ -125,17 +124,13 @@ describe('ComplianceReportsPage', () => {
 
   it('allows ORG_ADMIN to view the page', () => {
     renderPage();
-    expect(
-      screen.getByText('Compliance Training Reports')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Compliance Training Reports')).toBeInTheDocument();
   });
 
   it('allows SUPER_ADMIN to view the page', () => {
     vi.mocked(useAuthRole).mockReturnValue('SUPER_ADMIN');
     renderPage();
-    expect(
-      screen.getByText('Compliance Training Reports')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Compliance Training Reports')).toBeInTheDocument();
   });
 
   it('renders "Compliance Courses" card header', () => {
@@ -167,8 +162,12 @@ describe('ComplianceReportsPage', () => {
   it('renders course titles when courses exist', () => {
     setupUrql(MOCK_COURSES);
     renderPage();
-    expect(screen.getAllByText('GDPR Essentials').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Data Security 101').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('GDPR Essentials').length
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('Data Security 101').length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('shows "Remove" button for compliance courses and "Add to Compliance" for non-compliance', () => {

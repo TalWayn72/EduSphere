@@ -28,9 +28,7 @@ vi.mock('@/components/annotation/CommentCard', () => ({
     >
       <span>{annotation.content}</span>
       <button onClick={() => onFocus(annotation.id)}>focus</button>
-      {onReply && (
-        <button onClick={() => onReply(annotation.id)}>reply</button>
-      )}
+      {onReply && <button onClick={() => onReply(annotation.id)}>reply</button>}
       {onResolve && (
         <button onClick={() => onResolve(annotation.id)}>resolve</button>
       )}
@@ -116,9 +114,7 @@ describe('WordCommentPanel', () => {
   });
 
   it('Add button is enabled when selectionActive is true', () => {
-    render(
-      <WordCommentPanel {...defaultProps} selectionActive={true} />
-    );
+    render(<WordCommentPanel {...defaultProps} selectionActive={true} />);
     const addBtn = screen.getByRole('button', { name: /add/i });
     expect(addBtn).not.toBeDisabled();
   });
@@ -170,9 +166,7 @@ describe('WordCommentPanel', () => {
   });
 
   it('passes isFocused=true to the focused annotation card', () => {
-    render(
-      <WordCommentPanel {...defaultProps} focusedAnnotationId="ann-1" />
-    );
+    render(<WordCommentPanel {...defaultProps} focusedAnnotationId="ann-1" />);
     const card = screen.getByTestId('comment-card-ann-1');
     expect(card.getAttribute('data-focused')).toBe('true');
   });

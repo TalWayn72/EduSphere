@@ -39,13 +39,23 @@ const mockExportService = {
 
 // ── Context helpers ───────────────────────────────────────────────────────────
 
-const makeCtx = (opts: { userId?: string; tenantId?: string; roles?: string[] } = {}) => ({
+const makeCtx = (
+  opts: { userId?: string; tenantId?: string; roles?: string[] } = {}
+) => ({
   authContext: opts.userId
-    ? { userId: opts.userId, tenantId: opts.tenantId ?? '', roles: opts.roles ?? [] }
+    ? {
+        userId: opts.userId,
+        tenantId: opts.tenantId ?? '',
+        roles: opts.roles ?? [],
+      }
     : null,
 });
 
-const AUTH_CTX = makeCtx({ userId: 'user-1', tenantId: 'tenant-abc', roles: ['INSTRUCTOR'] });
+const AUTH_CTX = makeCtx({
+  userId: 'user-1',
+  tenantId: 'tenant-abc',
+  roles: ['INSTRUCTOR'],
+});
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -66,9 +76,9 @@ describe('ScormResolver', () => {
   it('myScormSession — throws UnauthorizedException when not authenticated', async () => {
     const ctx = makeCtx();
 
-    await expect(
-      resolver.myScormSession('ci-1', ctx as never)
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(resolver.myScormSession('ci-1', ctx as never)).rejects.toThrow(
+      UnauthorizedException
+    );
 
     expect(mockSessionService.findSession).not.toHaveBeenCalled();
   });
@@ -77,9 +87,9 @@ describe('ScormResolver', () => {
   it('myScormSession — throws UnauthorizedException when userId is empty', async () => {
     const ctx = makeCtx({ userId: '', tenantId: 'tenant-1' });
 
-    await expect(
-      resolver.myScormSession('ci-1', ctx as never)
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(resolver.myScormSession('ci-1', ctx as never)).rejects.toThrow(
+      UnauthorizedException
+    );
   });
 
   // Test 3: myScormSession delegates to sessionService.findSession
@@ -89,7 +99,10 @@ describe('ScormResolver', () => {
 
     const result = await resolver.myScormSession('ci-1', AUTH_CTX as never);
 
-    expect(mockSessionService.findSession).toHaveBeenCalledWith('user-1', 'ci-1');
+    expect(mockSessionService.findSession).toHaveBeenCalledWith(
+      'user-1',
+      'ci-1'
+    );
     expect(result).toEqual(session);
   });
 
@@ -100,7 +113,11 @@ describe('ScormResolver', () => {
 
     const result = await resolver.initScormSession('ci-5', AUTH_CTX as never);
 
-    expect(mockSessionService.initSession).toHaveBeenCalledWith('user-1', 'ci-5', 'tenant-abc');
+    expect(mockSessionService.initSession).toHaveBeenCalledWith(
+      'user-1',
+      'ci-5',
+      'tenant-abc'
+    );
     expect(result).toEqual(session);
   });
 
@@ -135,10 +152,14 @@ describe('ScormResolver', () => {
 
   // Test 7: exportCourseAsScorm delegates to exportService.exportCourse and returns URL
   it('exportCourseAsScorm — delegates to exportService.exportCourse with courseId and tenantCtx', async () => {
-    const downloadUrl = 'https://minio/scorm-exports/tenant-abc/course-1-123.zip?X-Amz-Signature=abc';
+    const downloadUrl =
+      'https://minio/scorm-exports/tenant-abc/course-1-123.zip?X-Amz-Signature=abc';
     mockExportService.exportCourse.mockResolvedValue(downloadUrl);
 
-    const result = await resolver.exportCourseAsScorm('course-1', AUTH_CTX as never);
+    const result = await resolver.exportCourseAsScorm(
+      'course-1',
+      AUTH_CTX as never
+    );
 
     expect(mockExportService.exportCourse).toHaveBeenCalledWith(
       'course-1',
@@ -168,7 +189,12 @@ describe('ScormResolver', () => {
   // Test 9: resolver instantiates without error
   it('resolver instantiates without error', () => {
     expect(
-      () => new ScormResolver(mockSessionService as never, mockImportService as never, mockExportService as never)
+      () =>
+        new ScormResolver(
+          mockSessionService as never,
+          mockImportService as never,
+          mockExportService as never
+        )
     ).not.toThrow();
   });
 });

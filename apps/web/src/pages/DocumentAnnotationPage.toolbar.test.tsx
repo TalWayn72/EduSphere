@@ -123,6 +123,8 @@ describe('DocumentToolbar', () => {
     renderToolbar();
     const select = screen.getByTitle('Default comment visibility');
     const options = Array.from(select.querySelectorAll('option'));
-    expect(options.every((o) => o.value !== AnnotationLayer.AI_GENERATED)).toBe(true);
+    expect(options.every((o) => o.value !== AnnotationLayer.AI_GENERATED)).toBe(
+      true
+    );
   });
 });

@@ -95,13 +95,9 @@ describe('AtRiskLearnersTable', () => {
 
   it('renders risk factor descriptions', () => {
     renderTable();
-    expect(
-      screen.getByText('No activity for 14 days')
-    ).toBeInTheDocument();
+    expect(screen.getByText('No activity for 14 days')).toBeInTheDocument();
     expect(screen.getByText('Below 30% completion')).toBeInTheDocument();
-    expect(
-      screen.getByText('Below average session time')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Below average session time')).toBeInTheDocument();
   });
 
   it('calls onResolve with learnerId and courseId when button clicked', () => {
@@ -137,8 +133,7 @@ describe('AtRiskLearnersTable', () => {
   it('renders multiple risk factors per learner', () => {
     renderTable();
     // First learner has 2 risk factors
-    const items = screen
-      .getAllByText(/No activity|Below 30%|Below average/);
+    const items = screen.getAllByText(/No activity|Below 30%|Below average/);
     expect(items.length).toBeGreaterThanOrEqual(3);
   });
 });

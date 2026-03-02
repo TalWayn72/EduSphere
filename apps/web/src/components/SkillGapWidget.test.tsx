@@ -8,7 +8,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -22,11 +22,23 @@ vi.mock('@/lib/graphql/knowledge-tier3.queries', () => ({
   SOCIAL_FEED_QUERY: 'SOCIAL_FEED_QUERY',
 }));
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
 const MOCK_PROFILES = [
-  { id: 'p1', roleName: 'Backend Engineer', description: null, requiredConceptsCount: 10 },
-  { id: 'p2', roleName: 'Data Scientist', description: null, requiredConceptsCount: 8 },
+  {
+    id: 'p1',
+    roleName: 'Backend Engineer',
+    description: null,
+    requiredConceptsCount: 10,
+  },
+  {
+    id: 'p2',
+    roleName: 'Data Scientist',
+    description: null,
+    requiredConceptsCount: 8,
+  },
 ];
 
 const MOCK_REPORT = {
@@ -37,11 +49,27 @@ const MOCK_REPORT = {
   gapCount: 4,
   completionPercentage: 60,
   gaps: [
-    { conceptName: 'Docker', isMastered: false, recommendedContentTitles: ['Docker 101'] },
-    { conceptName: 'Kubernetes', isMastered: false, recommendedContentTitles: [] },
-    { conceptName: 'Redis', isMastered: false, recommendedContentTitles: ['Redis Basics'] },
+    {
+      conceptName: 'Docker',
+      isMastered: false,
+      recommendedContentTitles: ['Docker 101'],
+    },
+    {
+      conceptName: 'Kubernetes',
+      isMastered: false,
+      recommendedContentTitles: [],
+    },
+    {
+      conceptName: 'Redis',
+      isMastered: false,
+      recommendedContentTitles: ['Redis Basics'],
+    },
     { conceptName: 'NATS', isMastered: false, recommendedContentTitles: [] },
-    { conceptName: 'GraphQL', isMastered: false, recommendedContentTitles: ['GQL Intro'] },
+    {
+      conceptName: 'GraphQL',
+      isMastered: false,
+      recommendedContentTitles: ['GQL Intro'],
+    },
     { conceptName: 'REST', isMastered: false, recommendedContentTitles: [] },
   ],
 };
@@ -104,7 +132,9 @@ describe('SkillGapWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: /new profile/i }));
     const inputs = screen.getAllByRole('textbox');
     fireEvent.change(inputs[0]!, { target: { value: 'Frontend Dev' } });
-    fireEvent.change(inputs[1]!, { target: { value: 'React, TypeScript, CSS' } });
+    fireEvent.change(inputs[1]!, {
+      target: { value: 'React, TypeScript, CSS' },
+    });
     fireEvent.click(screen.getByRole('button', { name: /create profile/i }));
     await waitFor(() =>
       expect(NOOP_EXECUTE).toHaveBeenCalledWith({
@@ -137,7 +167,9 @@ describe('SkillGapWidget', () => {
     renderWidget();
     expect(screen.getByText('Backend Engineer')).toBeInTheDocument();
     expect(screen.getByText('6/10 mastered')).toBeInTheDocument();
-    expect(screen.getByText(/60% complete · 4 gaps remaining/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/60% complete · 4 gaps remaining/i)
+    ).toBeInTheDocument();
   });
 
   it('renders gap items (capped at 5)', () => {

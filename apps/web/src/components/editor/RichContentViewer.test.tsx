@@ -89,7 +89,9 @@ describe('RichContentViewer', () => {
     vi.mocked(TiptapReact.useEditor).mockReturnValue(makeEditor());
     render(<RichContentViewer content="" />);
     const call = vi.mocked(TiptapReact.useEditor).mock.calls[0]![0];
-    const attrs = call?.editorProps?.attributes as Record<string, string> | undefined;
+    const attrs = call?.editorProps?.attributes as
+      | Record<string, string>
+      | undefined;
     expect(attrs?.['aria-label']).toBe('Rich document content');
     expect(attrs?.['role']).toBe('document');
   });

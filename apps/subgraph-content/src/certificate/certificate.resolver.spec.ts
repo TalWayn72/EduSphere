@@ -81,15 +81,23 @@ describe('CertificateResolver', () => {
     });
 
     it('throws UnauthorizedException when no auth', async () => {
-      await expect(resolver.getMyCertificates(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getMyCertificates(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockGetMyCertificates).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
       const ctx = {
-        authContext: { userId: 'u1', tenantId: undefined as unknown as string, roles: ['STUDENT'] },
+        authContext: {
+          userId: 'u1',
+          tenantId: undefined as unknown as string,
+          roles: ['STUDENT'],
+        },
       };
-      await expect(resolver.getMyCertificates(ctx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.getMyCertificates(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('passes correct TenantContext with first role as userRole', async () => {

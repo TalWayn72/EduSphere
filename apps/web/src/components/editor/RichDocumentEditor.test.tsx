@@ -6,7 +6,8 @@ import React from 'react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -27,7 +28,7 @@ vi.mock('@/components/editor/RichEditor', () => ({
     <div
       data-testid="rich-editor"
       data-content={content}
-      onClick={() => onChange('{"type":"doc","content":[]}') }
+      onClick={() => onChange('{"type":"doc","content":[]}')}
     />
   ),
 }));
@@ -48,9 +49,13 @@ import { RichDocumentEditor } from './RichDocumentEditor';
 import * as urql from 'urql';
 import { toast } from 'sonner';
 
-const NOOP_EXECUTE = vi.fn().mockResolvedValue({ data: null, error: undefined });
+const NOOP_EXECUTE = vi
+  .fn()
+  .mockResolvedValue({ data: null, error: undefined });
 
-function renderEditor(props: Partial<React.ComponentProps<typeof RichDocumentEditor>> = {}) {
+function renderEditor(
+  props: Partial<React.ComponentProps<typeof RichDocumentEditor>> = {}
+) {
   return render(
     <RichDocumentEditor moduleId="module-1" courseId="course-1" {...props} />
   );
@@ -60,7 +65,13 @@ describe('RichDocumentEditor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        operation: undefined,
+      },
       NOOP_EXECUTE,
     ] as unknown as ReturnType<typeof urql.useMutation>);
   });
@@ -77,26 +88,34 @@ describe('RichDocumentEditor', () => {
 
   it('renders Save Document button', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /save document/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /save document/i })
+    ).toBeInTheDocument();
   });
 
   it('Save button is disabled when title is empty', () => {
     renderEditor();
-    expect(screen.getByRole('button', { name: /save document/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /save document/i })
+    ).toBeDisabled();
   });
 
   it('Save button becomes enabled after title is entered', () => {
     renderEditor();
     const input = screen.getByPlaceholderText(/enter document title/i);
     fireEvent.change(input, { target: { value: 'My Doc' } });
-    expect(screen.getByRole('button', { name: /save document/i })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /save document/i })
+    ).not.toBeDisabled();
   });
 
   it('Save button is disabled (and does not fire) when title is whitespace only', () => {
     renderEditor();
     const input = screen.getByPlaceholderText(/enter document title/i);
     fireEvent.change(input, { target: { value: '   ' } });
-    expect(screen.getByRole('button', { name: /save document/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /save document/i })
+    ).toBeDisabled();
   });
 
   it('calls executeCreate mutation with correct payload on save', async () => {
@@ -105,7 +124,13 @@ describe('RichDocumentEditor', () => {
       error: undefined,
     });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        operation: undefined,
+      },
       executeCreate,
     ] as unknown as ReturnType<typeof urql.useMutation>);
 
@@ -136,7 +161,13 @@ describe('RichDocumentEditor', () => {
       error: undefined,
     });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        operation: undefined,
+      },
       executeCreate,
     ] as unknown as ReturnType<typeof urql.useMutation>);
 
@@ -160,7 +191,13 @@ describe('RichDocumentEditor', () => {
       },
     });
     vi.mocked(urql.useMutation).mockReturnValue([
-      { fetching: false, data: undefined, error: undefined, stale: false, operation: undefined },
+      {
+        fetching: false,
+        data: undefined,
+        error: undefined,
+        stale: false,
+        operation: undefined,
+      },
       executeCreate,
     ] as unknown as ReturnType<typeof urql.useMutation>);
 

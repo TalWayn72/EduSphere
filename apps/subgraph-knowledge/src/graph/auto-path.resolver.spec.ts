@@ -35,7 +35,9 @@ describe('AutoPathResolver', () => {
     it('returns learning path from service', async () => {
       const path = {
         targetConceptName: 'Calculus',
-        nodes: [{ conceptName: 'Algebra', isCompleted: true, contentItems: [] }],
+        nodes: [
+          { conceptName: 'Algebra', isCompleted: true, contentItems: [] },
+        ],
         totalSteps: 1,
         completedSteps: 1,
       };
@@ -61,24 +63,24 @@ describe('AutoPathResolver', () => {
       const ctx = {
         authContext: { userId: null, tenantId: 'tenant-1', roles: ['STUDENT'] },
       };
-      await expect(
-        resolver.myLearningPath('X', ctx as never)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myLearningPath('X', ctx as never)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws UnauthorizedException when tenantId missing', async () => {
       const ctx = {
         authContext: { userId: 'user-1', tenantId: null, roles: ['STUDENT'] },
       };
-      await expect(
-        resolver.myLearningPath('X', ctx as never)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myLearningPath('X', ctx as never)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws UnauthorizedException when authContext missing', async () => {
-      await expect(
-        resolver.myLearningPath('X', {} as never)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myLearningPath('X', {} as never)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 });

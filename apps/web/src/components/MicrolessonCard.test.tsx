@@ -84,9 +84,7 @@ describe('MicrolessonCard', () => {
 
   it('renders progress dots with correct aria-label', () => {
     renderCard({}, { currentIndex: 1, totalCount: 3 });
-    expect(
-      screen.getByLabelText('Lesson 2 of 3')
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Lesson 2 of 3')).toBeInTheDocument();
   });
 
   it('Prev button is disabled at index 0', () => {
@@ -128,7 +126,10 @@ describe('MicrolessonCard', () => {
 
   it('calls onComplete with lesson id when Mark Complete is clicked', () => {
     const onComplete = vi.fn();
-    renderCard({ id: 'lesson-1' }, { currentIndex: 2, totalCount: 3, onComplete });
+    renderCard(
+      { id: 'lesson-1' },
+      { currentIndex: 2, totalCount: 3, onComplete }
+    );
     fireEvent.click(screen.getByRole('button', { name: /mark complete/i }));
     expect(onComplete).toHaveBeenCalledWith('lesson-1');
   });
@@ -139,8 +140,8 @@ describe('MicrolessonCard', () => {
     const svgs = container.querySelectorAll('svg');
     expect(svgs.length).toBeGreaterThan(0);
     // isCompleted adds a green-500 class to the CheckCircle
-    const greenSvg = Array.from(svgs).find(
-      (svg) => svg.getAttribute('class')?.includes('text-green-500')
+    const greenSvg = Array.from(svgs).find((svg) =>
+      svg.getAttribute('class')?.includes('text-green-500')
     );
     expect(greenSvg).toBeDefined();
   });
@@ -153,9 +154,7 @@ describe('MicrolessonCard', () => {
         totalCount={1}
       />
     );
-    expect(
-      screen.getByText(/quick check:/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/quick check:/i)).toBeInTheDocument();
     expect(
       screen.getByText(/which is a valid list comprehension/i)
     ).toBeInTheDocument();
@@ -169,9 +168,7 @@ describe('MicrolessonCard', () => {
         totalCount={1}
       />
     );
-    expect(
-      screen.getByText('[x for x in range(5)]')
-    ).toBeInTheDocument();
+    expect(screen.getByText('[x for x in range(5)]')).toBeInTheDocument();
   });
 
   it('quiz explanation appears after selecting an option', () => {

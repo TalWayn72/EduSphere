@@ -62,7 +62,9 @@ vi.mock('nats', () => ({
 
 vi.mock('@edusphere/nats-client', () => ({
   buildNatsOptions: vi.fn(() => ({})),
-  NatsSubjects: { LESSON_PIPELINE_STARTED: 'EDUSPHERE.lesson.pipeline.started' },
+  NatsSubjects: {
+    LESSON_PIPELINE_STARTED: 'EDUSPHERE.lesson.pipeline.started',
+  },
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -133,7 +135,10 @@ describe('LessonPipelineService', () => {
       // findByLesson returns nothing (no existing pipeline)
       mockLimit.mockResolvedValue([]);
       mockOrderBy.mockReturnValue({ limit: mockLimit });
-      mockWhere.mockReturnValue({ orderBy: mockOrderBy, returning: mockReturning });
+      mockWhere.mockReturnValue({
+        orderBy: mockOrderBy,
+        returning: mockReturning,
+      });
       mockFrom.mockReturnValue({ where: mockWhere });
       mockSelect.mockReturnValue({ from: mockFrom });
       // insert chain
@@ -153,7 +158,9 @@ describe('LessonPipelineService', () => {
 
   describe('cancelRun()', () => {
     it('calls orchestrator.cancelRun with the runId', async () => {
-      mockReturning.mockResolvedValue([{ ...MOCK_RUN_ROW, status: 'CANCELLED' }]);
+      mockReturning.mockResolvedValue([
+        { ...MOCK_RUN_ROW, status: 'CANCELLED' },
+      ]);
       mockWhere.mockReturnValue({ returning: mockReturning });
       mockSet.mockReturnValue({ where: mockWhere });
       mockUpdate.mockReturnValue({ set: mockSet });
@@ -168,7 +175,9 @@ describe('LessonPipelineService', () => {
         captured = v;
         return { where: mockWhere };
       });
-      mockReturning.mockResolvedValue([{ ...MOCK_RUN_ROW, status: 'CANCELLED' }]);
+      mockReturning.mockResolvedValue([
+        { ...MOCK_RUN_ROW, status: 'CANCELLED' },
+      ]);
       mockWhere.mockReturnValue({ returning: mockReturning });
       mockUpdate.mockReturnValue({ set: mockSet });
 
@@ -177,7 +186,9 @@ describe('LessonPipelineService', () => {
     });
 
     it('returns mapped run with CANCELLED status', async () => {
-      mockReturning.mockResolvedValue([{ ...MOCK_RUN_ROW, status: 'CANCELLED' }]);
+      mockReturning.mockResolvedValue([
+        { ...MOCK_RUN_ROW, status: 'CANCELLED' },
+      ]);
       mockWhere.mockReturnValue({ returning: mockReturning });
       mockSet.mockReturnValue({ where: mockWhere });
       mockUpdate.mockReturnValue({ set: mockSet });

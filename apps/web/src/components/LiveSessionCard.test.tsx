@@ -7,7 +7,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -47,7 +47,10 @@ beforeEach(() => {
   mockJoinSession = vi
     .fn()
     .mockResolvedValue({ data: { joinLiveSession: '' }, error: undefined });
-  vi.mocked(urql.useMutation).mockReturnValue([{} as never, mockJoinSession as never]);
+  vi.mocked(urql.useMutation).mockReturnValue([
+    {} as never,
+    mockJoinSession as never,
+  ]);
 });
 
 function renderCard(

@@ -75,7 +75,11 @@ describe('LiveSessionExtensionsResolver', () => {
 
     await resolver.breakoutRooms('session-1', EMPTY_CTX as never);
 
-    expect(mockBreakoutService.listRooms).toHaveBeenCalledWith('session-1', '', '');
+    expect(mockBreakoutService.listRooms).toHaveBeenCalledWith(
+      'session-1',
+      '',
+      ''
+    );
   });
 
   // Test 3: tenantId returns tenant_id from context
@@ -98,15 +102,24 @@ describe('LiveSessionExtensionsResolver', () => {
 
     await resolver.sessionPolls('session-1', ctxNoTenant as never);
 
-    expect(mockPollService.listPolls).toHaveBeenCalledWith('session-1', '', 'user-1');
+    expect(mockPollService.listPolls).toHaveBeenCalledWith(
+      'session-1',
+      '',
+      'user-1'
+    );
   });
 
   // Test 5: breakoutRooms delegates to breakoutService.listRooms
   it('breakoutRooms — delegates to breakoutService.listRooms and returns result', async () => {
-    const rooms = [{ id: 'room-1', roomName: 'Group A', capacity: 5, assignedUserIds: [] }];
+    const rooms = [
+      { id: 'room-1', roomName: 'Group A', capacity: 5, assignedUserIds: [] },
+    ];
     mockBreakoutService.listRooms.mockResolvedValue(rooms);
 
-    const result = await resolver.breakoutRooms('session-99', AUTH_CTX as never);
+    const result = await resolver.breakoutRooms(
+      'session-99',
+      AUTH_CTX as never
+    );
 
     expect(result).toEqual(rooms);
   });
@@ -123,7 +136,11 @@ describe('LiveSessionExtensionsResolver', () => {
 
   // Test 7: createPoll delegates to pollService.createPoll
   it('createPoll — delegates question and options to pollService.createPoll', async () => {
-    const poll = { id: 'poll-new', question: 'Is this useful?', options: ['Yes', 'No'] };
+    const poll = {
+      id: 'poll-new',
+      question: 'Is this useful?',
+      options: ['Yes', 'No'],
+    };
     mockPollService.createPoll.mockResolvedValue(poll);
 
     const result = await resolver.createPoll(
@@ -149,7 +166,12 @@ describe('LiveSessionExtensionsResolver', () => {
 
     const result = await resolver.votePoll('poll-1', 2, AUTH_CTX as never);
 
-    expect(mockPollService.vote).toHaveBeenCalledWith('poll-1', 'user-1', 2, 'tenant-abc');
+    expect(mockPollService.vote).toHaveBeenCalledWith(
+      'poll-1',
+      'user-1',
+      2,
+      'tenant-abc'
+    );
     expect(result).toBe(true);
   });
 

@@ -70,18 +70,32 @@ describe('OpenBadgeResolver', () => {
 
   describe('requireAuth (tested via myOpenBadges)', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.myOpenBadges(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myOpenBadges(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(mockGetUserBadges).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
-      const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
-      await expect(resolver.myOpenBadges(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: undefined as unknown as string,
+        tenantId: 't1',
+        roles: [],
+      });
+      await expect(resolver.myOpenBadges(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
-      const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.myOpenBadges(ctx)).rejects.toThrow(UnauthorizedException);
+      const ctx = makeCtx({
+        userId: 'u1',
+        tenantId: undefined as unknown as string,
+        roles: [],
+      });
+      await expect(resolver.myOpenBadges(ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 
@@ -108,7 +122,9 @@ describe('OpenBadgeResolver', () => {
 
   describe('badgeDefinitions()', () => {
     it('throws UnauthorizedException when unauthenticated', async () => {
-      await expect(resolver.badgeDefinitions(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.badgeDefinitions(noAuthCtx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('delegates to service.getBadgeDefinitions with tenantId', async () => {
@@ -125,7 +141,10 @@ describe('OpenBadgeResolver', () => {
 
   describe('verifyBadge()', () => {
     it('does NOT require authentication — calls service directly', async () => {
-      mockVerifyCredential.mockResolvedValueOnce({ valid: true, assertion: MOCK_ASSERTION });
+      mockVerifyCredential.mockResolvedValueOnce({
+        valid: true,
+        assertion: MOCK_ASSERTION,
+      });
 
       const result = await resolver.verifyBadge('assertion-1');
 
@@ -134,7 +153,10 @@ describe('OpenBadgeResolver', () => {
     });
 
     it('returns valid:false with error when assertion is invalid', async () => {
-      mockVerifyCredential.mockResolvedValueOnce({ valid: false, error: 'Assertion not found' });
+      mockVerifyCredential.mockResolvedValueOnce({
+        valid: false,
+        error: 'Assertion not found',
+      });
 
       const result = await resolver.verifyBadge('bad-assertion-id');
 
@@ -147,7 +169,10 @@ describe('OpenBadgeResolver', () => {
 
   describe('verifyOpenBadge()', () => {
     it('returns true when credential is valid', async () => {
-      mockVerifyCredential.mockResolvedValueOnce({ valid: true, assertion: MOCK_ASSERTION });
+      mockVerifyCredential.mockResolvedValueOnce({
+        valid: true,
+        assertion: MOCK_ASSERTION,
+      });
 
       const result = await resolver.verifyOpenBadge('assertion-1');
 
@@ -156,7 +181,10 @@ describe('OpenBadgeResolver', () => {
     });
 
     it('returns false when credential is invalid', async () => {
-      mockVerifyCredential.mockResolvedValueOnce({ valid: false, error: 'Revoked' });
+      mockVerifyCredential.mockResolvedValueOnce({
+        valid: false,
+        error: 'Revoked',
+      });
 
       const result = await resolver.verifyOpenBadge('bad-id');
 
@@ -198,7 +226,14 @@ describe('OpenBadgeResolver', () => {
   describe('createBadgeDefinition()', () => {
     it('throws UnauthorizedException when unauthenticated', async () => {
       await expect(
-        resolver.createBadgeDefinition('SQL Expert', 'Desc', undefined, undefined, undefined, noAuthCtx)
+        resolver.createBadgeDefinition(
+          'SQL Expert',
+          'Desc',
+          undefined,
+          undefined,
+          undefined,
+          noAuthCtx
+        )
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -240,9 +275,17 @@ describe('OpenBadgeResolver', () => {
     it('calls service.revokeCredential and returns true', async () => {
       mockRevokeCredential.mockResolvedValueOnce(undefined);
 
-      const result = await resolver.revokeBadge('assertion-1', 'Policy violation', makeCtx());
+      const result = await resolver.revokeBadge(
+        'assertion-1',
+        'Policy violation',
+        makeCtx()
+      );
 
-      expect(mockRevokeCredential).toHaveBeenCalledWith('assertion-1', 'Policy violation', 'tenant-1');
+      expect(mockRevokeCredential).toHaveBeenCalledWith(
+        'assertion-1',
+        'Policy violation',
+        'tenant-1'
+      );
       expect(result).toBe(true);
     });
   });

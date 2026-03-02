@@ -93,7 +93,9 @@ describe('AnnotationsPanel', () => {
 
   it('calls onAddAnnotation when Add Note button is clicked', () => {
     const onAddAnnotation = vi.fn();
-    render(<AnnotationsPanel {...defaultProps} onAddAnnotation={onAddAnnotation} />);
+    render(
+      <AnnotationsPanel {...defaultProps} onAddAnnotation={onAddAnnotation} />
+    );
     fireEvent.click(screen.getByRole('button', { name: /add note/i }));
     expect(onAddAnnotation).toHaveBeenCalledTimes(1);
   });

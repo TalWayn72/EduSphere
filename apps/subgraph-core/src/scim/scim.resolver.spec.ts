@@ -41,17 +41,21 @@ import { ScimResolver } from './scim.resolver.js';
 function makeTokenService(overrides: Record<string, unknown> = {}) {
   return {
     listTokens: vi.fn().mockResolvedValue([]),
-    generateToken: vi.fn().mockResolvedValue({ rawToken: 'raw-token', token: {} }),
+    generateToken: vi
+      .fn()
+      .mockResolvedValue({ rawToken: 'raw-token', token: {} }),
     revokeToken: vi.fn().mockResolvedValue(true),
     ...overrides,
   };
 }
 
-function makeCtx(options: {
-  userId?: string;
-  role?: string;
-  tenantId?: string;
-} = {}) {
+function makeCtx(
+  options: {
+    userId?: string;
+    role?: string;
+    tenantId?: string;
+  } = {}
+) {
   const { userId, role, tenantId = 'tenant-1' } = options;
   return {
     req: {},
@@ -89,14 +93,14 @@ describe('ScimResolver', () => {
   // 1. requireAdmin throws UnauthorizedException when no userId
   it('throws UnauthorizedException when authContext is absent', async () => {
     await expect(resolver.getScimTokens(makeCtx())).rejects.toBeInstanceOf(
-      UnauthorizedException,
+      UnauthorizedException
     );
   });
 
   // 2. requireAdmin throws ForbiddenException for non-admin role
   it('throws ForbiddenException when user role is LEARNER (not admin)', async () => {
     await expect(
-      resolver.getScimTokens(makeCtx({ userId: 'u1', role: 'LEARNER' })),
+      resolver.getScimTokens(makeCtx({ userId: 'u1', role: 'LEARNER' }))
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
@@ -125,9 +129,12 @@ describe('ScimResolver', () => {
               }),
             }),
           }),
-        }),
+        })
     );
-    const result = await resolver.getScimSyncLog(undefined, ADMIN_CTX) as Record<string, unknown>[];
+    const result = (await resolver.getScimSyncLog(
+      undefined,
+      ADMIN_CTX
+    )) as Record<string, unknown>[];
     expect(result).toHaveLength(1);
     expect(result[0]?.['operation']).toBe('USER_PROVISION');
     expect(result[0]?.['id']).toBe('scim-log-1');
@@ -139,10 +146,13 @@ describe('ScimResolver', () => {
     mockService.generateToken.mockResolvedValue(mockResult);
     const result = await resolver.generateScimToken(
       { description: 'HR System', expiresInDays: 365 },
-      ADMIN_CTX,
+      ADMIN_CTX
     );
     expect(mockService.generateToken).toHaveBeenCalledWith(
-      'tenant-1', 'admin-1', 'HR System', 365,
+      'tenant-1',
+      'admin-1',
+      'HR System',
+      365
     );
     expect(result).toBe(mockResult);
   });
@@ -150,20 +160,27 @@ describe('ScimResolver', () => {
   // 7. revokeScimToken delegates to tokenService.revokeToken and returns true
   it('revokeScimToken delegates to tokenService and returns true', async () => {
     const result = await resolver.revokeScimToken('token-id-1', ADMIN_CTX);
-    expect(mockService.revokeToken).toHaveBeenCalledWith('tenant-1', 'token-id-1');
+    expect(mockService.revokeToken).toHaveBeenCalledWith(
+      'tenant-1',
+      'token-id-1'
+    );
     expect(result).toBe(true);
   });
 
   // 8. requireAdmin throws ForbiddenException when roles array is empty
   it('throws ForbiddenException when roles array is empty', async () => {
     await expect(
-      resolver.getScimTokens(makeCtx({ userId: 'u1' })), // no role
+      resolver.getScimTokens(makeCtx({ userId: 'u1' })) // no role
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   // 9. getScimTokens passes tenantId from authContext to service
   it('getScimTokens passes the authContext tenantId to tokenService.listTokens', async () => {
-    const ctx = makeCtx({ userId: 'admin-2', role: 'ORG_ADMIN', tenantId: 'my-tenant' });
+    const ctx = makeCtx({
+      userId: 'admin-2',
+      role: 'ORG_ADMIN',
+      tenantId: 'my-tenant',
+    });
     await resolver.getScimTokens(ctx);
     expect(mockService.listTokens).toHaveBeenCalledWith('my-tenant');
   });

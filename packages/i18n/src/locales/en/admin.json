@@ -45,7 +45,10 @@
       "branding": { "label": "Branding", "desc": "Logos, colors, themes" },
       "users": { "label": "Users", "desc": "Manage learners and admins" },
       "compliance": { "label": "Compliance", "desc": "Reports and deadlines" },
-      "gamification": { "label": "Gamification", "desc": "Points, badges, leaderboards" },
+      "gamification": {
+        "label": "Gamification",
+        "desc": "Points, badges, leaderboards"
+      },
       "security": { "label": "Security", "desc": "MFA, SSO, session policy" },
       "auditLog": { "label": "Audit Log", "desc": "Admin action history" }
     }

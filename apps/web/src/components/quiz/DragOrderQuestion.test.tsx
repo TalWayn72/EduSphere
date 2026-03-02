@@ -26,17 +26,27 @@ describe('DragOrderQuestion', () => {
   });
 
   it('renders the question text', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
-    expect(screen.getByText('Order the steps of the scientific method')).toBeInTheDocument();
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    expect(
+      screen.getByText('Order the steps of the scientific method')
+    ).toBeInTheDocument();
   });
 
   it('renders drag hint text', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
-    expect(screen.getByText('Drag items into the correct order')).toBeInTheDocument();
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    expect(
+      screen.getByText('Drag items into the correct order')
+    ).toBeInTheDocument();
   });
 
   it('renders all items in original order when value is empty', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
     expect(screen.getByText('Observe')).toBeInTheDocument();
     expect(screen.getByText('Hypothesize')).toBeInTheDocument();
     expect(screen.getByText('Experiment')).toBeInTheDocument();
@@ -59,7 +69,9 @@ describe('DragOrderQuestion', () => {
   });
 
   it('renders numbered position labels', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
@@ -67,12 +79,18 @@ describe('DragOrderQuestion', () => {
   });
 
   it('list has accessible role and label', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
-    expect(screen.getByRole('list', { name: 'Orderable items' })).toBeInTheDocument();
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
+    expect(
+      screen.getByRole('list', { name: 'Orderable items' })
+    ).toBeInTheDocument();
   });
 
   it('items are draggable when not disabled', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
     const items = screen.getAllByRole('listitem');
     items.forEach((li) => {
       expect(li).toHaveAttribute('draggable', 'true');
@@ -80,7 +98,14 @@ describe('DragOrderQuestion', () => {
   });
 
   it('items are not draggable when disabled', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} disabled />);
+    render(
+      <DragOrderQuestion
+        item={mockItem}
+        value={[]}
+        onChange={onChange}
+        disabled
+      />
+    );
     const items = screen.getAllByRole('listitem');
     items.forEach((li) => {
       expect(li).toHaveAttribute('draggable', 'false');
@@ -88,7 +113,9 @@ describe('DragOrderQuestion', () => {
   });
 
   it('calls onChange with reordered ids on drop', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
     const items = screen.getAllByRole('listitem');
     fireEvent.dragStart(items[0]!);
     fireEvent.drop(items[2]!);
@@ -96,7 +123,14 @@ describe('DragOrderQuestion', () => {
   });
 
   it('does not call onChange when disabled and drop fires', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} disabled />);
+    render(
+      <DragOrderQuestion
+        item={mockItem}
+        value={[]}
+        onChange={onChange}
+        disabled
+      />
+    );
     const items = screen.getAllByRole('listitem');
     fireEvent.dragStart(items[0]!);
     fireEvent.drop(items[2]!);
@@ -104,7 +138,9 @@ describe('DragOrderQuestion', () => {
   });
 
   it('does not call onChange when dropping on same index', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
     const items = screen.getAllByRole('listitem');
     fireEvent.dragStart(items[1]!);
     fireEvent.drop(items[1]!);
@@ -112,7 +148,9 @@ describe('DragOrderQuestion', () => {
   });
 
   it('allows dragOver without preventing default implicitly', () => {
-    render(<DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />);
+    render(
+      <DragOrderQuestion item={mockItem} value={[]} onChange={onChange} />
+    );
     const items = screen.getAllByRole('listitem');
     // dragOver should not throw
     expect(() => fireEvent.dragOver(items[0]!)).not.toThrow();

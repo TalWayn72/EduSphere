@@ -43,11 +43,23 @@
     "loadError": "Error al cargar datos del panel",
     "quickLinks": {
       "branding": { "label": "Marca", "desc": "Logos, colores, temas" },
-      "users": { "label": "Usuarios", "desc": "Gestionar estudiantes y admins" },
+      "users": {
+        "label": "Usuarios",
+        "desc": "Gestionar estudiantes y admins"
+      },
       "compliance": { "label": "Cumplimiento", "desc": "Informes y plazos" },
-      "gamification": { "label": "Gamificación", "desc": "Puntos, insignias, clasificaciones" },
-      "security": { "label": "Seguridad", "desc": "MFA, SSO, política de sesión" },
-      "auditLog": { "label": "Registro de Auditoría", "desc": "Historial de acciones admin" }
+      "gamification": {
+        "label": "Gamificación",
+        "desc": "Puntos, insignias, clasificaciones"
+      },
+      "security": {
+        "label": "Seguridad",
+        "desc": "MFA, SSO, política de sesión"
+      },
+      "auditLog": {
+        "label": "Registro de Auditoría",
+        "desc": "Historial de acciones admin"
+      }
     }
   },
   "stats": {

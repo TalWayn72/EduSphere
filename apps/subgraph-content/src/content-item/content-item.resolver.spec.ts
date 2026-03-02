@@ -68,7 +68,10 @@ describe('ContentItemResolver', () => {
     const ctx = makeCtx();
 
     await expect(
-      resolver.createContentItem({ title: 'Lesson 1', type: 'VIDEO' } as never, ctx as never)
+      resolver.createContentItem(
+        { title: 'Lesson 1', type: 'VIDEO' } as never,
+        ctx as never
+      )
     ).rejects.toThrow(UnauthorizedException);
 
     expect(mockContentItemService.create).not.toHaveBeenCalled();
@@ -81,7 +84,10 @@ describe('ContentItemResolver', () => {
     };
 
     await expect(
-      resolver.createContentItem({ title: 'Lesson 1', type: 'VIDEO' } as never, ctx as never)
+      resolver.createContentItem(
+        { title: 'Lesson 1', type: 'VIDEO' } as never,
+        ctx as never
+      )
     ).rejects.toThrow(UnauthorizedException);
 
     expect(mockContentItemService.create).not.toHaveBeenCalled();
@@ -94,9 +100,15 @@ describe('ContentItemResolver', () => {
     mockContentItemService.create.mockResolvedValue(created);
 
     const ctx = makeCtx({ tenantId: 'tenant-abc', userId: 'user-1' });
-    const result = await resolver.createContentItem(input as never, ctx as never);
+    const result = await resolver.createContentItem(
+      input as never,
+      ctx as never
+    );
 
-    expect(mockContentItemService.create).toHaveBeenCalledWith(input, 'tenant-abc');
+    expect(mockContentItemService.create).toHaveBeenCalledWith(
+      input,
+      'tenant-abc'
+    );
     expect(result).toEqual(created);
   });
 
@@ -106,7 +118,10 @@ describe('ContentItemResolver', () => {
     mockContentItemService.create.mockResolvedValue(returnValue);
 
     const ctx = makeCtx({ tenantId: 'tenant-xyz' });
-    const result = await resolver.createContentItem({ title: 'Test', type: 'QUIZ' } as never, ctx as never);
+    const result = await resolver.createContentItem(
+      { title: 'Test', type: 'QUIZ' } as never,
+      ctx as never
+    );
 
     expect(result).toBe(returnValue);
   });
@@ -116,7 +131,10 @@ describe('ContentItemResolver', () => {
     const item = { id: 'ci-ref-1', title: 'Ref Item' };
     mockByIdLoader.load.mockResolvedValue(item);
 
-    const result = await resolver.resolveReference({ __typename: 'ContentItem', id: 'ci-ref-1' });
+    const result = await resolver.resolveReference({
+      __typename: 'ContentItem',
+      id: 'ci-ref-1',
+    });
 
     expect(mockByIdLoader.load).toHaveBeenCalledWith('ci-ref-1');
     expect(result).toEqual(item);
@@ -126,7 +144,10 @@ describe('ContentItemResolver', () => {
   it('resolveReference — propagates loader result (null case)', async () => {
     mockByIdLoader.load.mockResolvedValue(null);
 
-    const result = await resolver.resolveReference({ __typename: 'ContentItem', id: 'missing-id' });
+    const result = await resolver.resolveReference({
+      __typename: 'ContentItem',
+      id: 'missing-id',
+    });
 
     expect(result).toBeNull();
   });

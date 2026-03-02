@@ -143,7 +143,9 @@ export function CourseDetailPage() {
   // synchronous setState on CourseList (which shares MY_ENROLLMENTS_QUERY cache)
   // during CourseDetailPage's render phase — causes React strict-mode warning.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching, error }] = useQuery<CourseDetailResult>({
     query: COURSE_DETAIL_QUERY,
@@ -193,7 +195,8 @@ export function CourseDetailPage() {
   // so "בטל הרשמה" is shown rather than the misleading "הירשם".
   const isEnrolled = enrollError
     ? true
-    : (enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ?? false);
+    : (enrollData?.myEnrollments?.some((e) => e.courseId === courseId) ??
+      false);
   const progress = progressData?.myCourseProgress;
 
   const showToast = (msg: string) => {

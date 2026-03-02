@@ -126,7 +126,9 @@ export function Layout({ children }: LayoutProps) {
                             {srsCount > 99 ? '99+' : srsCount}
                           </span>
                         )}
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>
@@ -148,7 +150,9 @@ export function Layout({ children }: LayoutProps) {
                       <>
                         <Trophy className="h-4 w-4" />
                         <span>{t('leaderboard')}</span>
-                        <span className="sr-only">{isActive ? ' (current page)' : ''}</span>
+                        <span className="sr-only">
+                          {isActive ? ' (current page)' : ''}
+                        </span>
                       </>
                     )}
                   </NavLink>

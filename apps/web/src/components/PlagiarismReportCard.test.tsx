@@ -94,7 +94,9 @@ describe('PlagiarismReportCard', () => {
         onReview={vi.fn()}
       />
     );
-    expect(screen.queryByRole('button', { name: /review/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /review/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls onReview with submissionId when Review is clicked', () => {

@@ -8,7 +8,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -113,9 +113,7 @@ describe('AssessmentCampaignPage', () => {
 
   it('shows empty state message when no campaigns', () => {
     render(<AssessmentCampaignPage />);
-    expect(
-      screen.getByText(/no campaigns yet/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no campaigns yet/i)).toBeInTheDocument();
   });
 
   it('shows loading indicator when fetching', () => {
@@ -129,7 +127,11 @@ describe('AssessmentCampaignPage', () => {
 
   it('renders campaign rows when data is available', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myCampaigns: MOCK_CAMPAIGNS }, fetching: false, error: undefined },
+      {
+        data: { myCampaigns: MOCK_CAMPAIGNS },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<AssessmentCampaignPage />);
@@ -140,7 +142,11 @@ describe('AssessmentCampaignPage', () => {
 
   it('shows "Activate" button for DRAFT campaigns', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myCampaigns: MOCK_CAMPAIGNS }, fetching: false, error: undefined },
+      {
+        data: { myCampaigns: MOCK_CAMPAIGNS },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<AssessmentCampaignPage />);
@@ -151,7 +157,11 @@ describe('AssessmentCampaignPage', () => {
 
   it('shows "Close & Generate" button for ACTIVE campaigns', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myCampaigns: MOCK_CAMPAIGNS }, fetching: false, error: undefined },
+      {
+        data: { myCampaigns: MOCK_CAMPAIGNS },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<AssessmentCampaignPage />);
@@ -162,7 +172,11 @@ describe('AssessmentCampaignPage', () => {
 
   it('calls activate mutation when Activate button is clicked', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myCampaigns: MOCK_CAMPAIGNS }, fetching: false, error: undefined },
+      {
+        data: { myCampaigns: MOCK_CAMPAIGNS },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<AssessmentCampaignPage />);
@@ -172,7 +186,11 @@ describe('AssessmentCampaignPage', () => {
 
   it('calls complete mutation when "Close & Generate" is clicked', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { myCampaigns: MOCK_CAMPAIGNS }, fetching: false, error: undefined },
+      {
+        data: { myCampaigns: MOCK_CAMPAIGNS },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<AssessmentCampaignPage />);
@@ -182,14 +200,10 @@ describe('AssessmentCampaignPage', () => {
 
   it('renders dialog with form fields', () => {
     render(<AssessmentCampaignPage />);
-    expect(
-      screen.getByText('Create Assessment Campaign')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Create Assessment Campaign')).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText('Q1 Performance Review')
     ).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText('uuid-of-user')
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('uuid-of-user')).toBeInTheDocument();
   });
 });

@@ -23,12 +23,17 @@ describe('scenarioChoiceItemSchema', () => {
 
   it('parses a valid choice item with a UUID nextContentItemId', () => {
     const uuid = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
-    const result = scenarioChoiceItemSchema.parse({ ...valid, nextContentItemId: uuid });
+    const result = scenarioChoiceItemSchema.parse({
+      ...valid,
+      nextContentItemId: uuid,
+    });
     expect(result.nextContentItemId).toBe(uuid);
   });
 
   it('rejects empty id', () => {
-    expect(() => scenarioChoiceItemSchema.parse({ ...valid, id: '' })).toThrow();
+    expect(() =>
+      scenarioChoiceItemSchema.parse({ ...valid, id: '' })
+    ).toThrow();
   });
 
   it('rejects id longer than 100 characters', () => {
@@ -38,7 +43,9 @@ describe('scenarioChoiceItemSchema', () => {
   });
 
   it('rejects empty text', () => {
-    expect(() => scenarioChoiceItemSchema.parse({ ...valid, text: '' })).toThrow();
+    expect(() =>
+      scenarioChoiceItemSchema.parse({ ...valid, text: '' })
+    ).toThrow();
   });
 
   it('rejects text longer than 500 characters', () => {
@@ -49,7 +56,10 @@ describe('scenarioChoiceItemSchema', () => {
 
   it('rejects non-UUID nextContentItemId', () => {
     expect(() =>
-      scenarioChoiceItemSchema.parse({ ...valid, nextContentItemId: 'not-a-uuid' })
+      scenarioChoiceItemSchema.parse({
+        ...valid,
+        nextContentItemId: 'not-a-uuid',
+      })
     ).toThrow();
   });
 });
@@ -79,13 +89,18 @@ describe('scenarioContentSchema', () => {
   });
 
   it('accepts endingType as optional enum', () => {
-    const result = scenarioContentSchema.parse({ ...valid, endingType: 'SUCCESS' });
+    const result = scenarioContentSchema.parse({
+      ...valid,
+      endingType: 'SUCCESS',
+    });
     expect(result.endingType).toBe('SUCCESS');
   });
 
   it('accepts all valid endingType values', () => {
     for (const ending of ['SUCCESS', 'FAILURE', 'NEUTRAL'] as const) {
-      expect(scenarioContentSchema.parse({ ...valid, endingType: ending }).endingType).toBe(ending);
+      expect(
+        scenarioContentSchema.parse({ ...valid, endingType: ending }).endingType
+      ).toBe(ending);
     }
   });
 
@@ -95,11 +110,15 @@ describe('scenarioContentSchema', () => {
       text: `Choice ${i}`,
       nextContentItemId: null,
     }));
-    expect(() => scenarioContentSchema.parse({ ...valid, choices: tooMany })).toThrow();
+    expect(() =>
+      scenarioContentSchema.parse({ ...valid, choices: tooMany })
+    ).toThrow();
   });
 
   it('rejects empty title', () => {
-    expect(() => scenarioContentSchema.parse({ ...valid, title: '' })).toThrow();
+    expect(() =>
+      scenarioContentSchema.parse({ ...valid, title: '' })
+    ).toThrow();
   });
 
   it('rejects title longer than 255 characters', () => {
@@ -109,7 +128,9 @@ describe('scenarioContentSchema', () => {
   });
 
   it('rejects empty description', () => {
-    expect(() => scenarioContentSchema.parse({ ...valid, description: '' })).toThrow();
+    expect(() =>
+      scenarioContentSchema.parse({ ...valid, description: '' })
+    ).toThrow();
   });
 
   it('rejects description longer than 5000 characters', () => {
@@ -146,7 +167,10 @@ describe('recordScenarioChoiceInputSchema', () => {
 
   it('rejects invalid fromContentItemId (non-UUID)', () => {
     expect(() =>
-      recordScenarioChoiceInputSchema.parse({ ...valid, fromContentItemId: 'not-a-uuid' })
+      recordScenarioChoiceInputSchema.parse({
+        ...valid,
+        fromContentItemId: 'not-a-uuid',
+      })
     ).toThrow();
   });
 
@@ -158,7 +182,10 @@ describe('recordScenarioChoiceInputSchema', () => {
 
   it('rejects invalid scenarioRootId (non-UUID)', () => {
     expect(() =>
-      recordScenarioChoiceInputSchema.parse({ ...valid, scenarioRootId: 'bad-id' })
+      recordScenarioChoiceInputSchema.parse({
+        ...valid,
+        scenarioRootId: 'bad-id',
+      })
     ).toThrow();
   });
 });

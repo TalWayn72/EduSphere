@@ -13,7 +13,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -89,7 +90,9 @@ describe('ProgramsPage', () => {
 
   it('shows "Nanodegree Programs" heading', () => {
     render(<ProgramsPage />);
-    expect(screen.getByRole('heading', { name: /nanodegree programs/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /nanodegree programs/i })
+    ).toBeInTheDocument();
   });
 
   it('shows loading spinner while fetching programs', () => {
@@ -142,7 +145,12 @@ describe('ProgramsPage', () => {
   it('shows "Enrolled" badge for enrolled programs', () => {
     setupQueries({
       myProgramEnrollments: [
-        { id: 'enr-1', programId: 'prog-1', completedAt: null, certificateId: null },
+        {
+          id: 'enr-1',
+          programId: 'prog-1',
+          completedAt: null,
+          certificateId: null,
+        },
       ],
     });
     render(<ProgramsPage />);
@@ -152,11 +160,18 @@ describe('ProgramsPage', () => {
   it('shows "Continue" button for in-progress enrolled programs', () => {
     setupQueries({
       myProgramEnrollments: [
-        { id: 'enr-1', programId: 'prog-1', completedAt: null, certificateId: null },
+        {
+          id: 'enr-1',
+          programId: 'prog-1',
+          completedAt: null,
+          certificateId: null,
+        },
       ],
     });
     render(<ProgramsPage />);
-    expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /continue/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "View Certificate" button for completed programs', () => {
@@ -171,7 +186,9 @@ describe('ProgramsPage', () => {
       ],
     });
     render(<ProgramsPage />);
-    expect(screen.getByRole('button', { name: /view certificate/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /view certificate/i })
+    ).toBeInTheDocument();
   });
 
   it('navigates to program detail when Details button is clicked', () => {

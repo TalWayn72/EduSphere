@@ -22,10 +22,16 @@ export interface PipelineNode {
   config: Record<string, unknown>;
 }
 
-export const MODULE_LABELS: Record<PipelineModuleType, { en: string; he: string }> = {
+export const MODULE_LABELS: Record<
+  PipelineModuleType,
+  { en: string; he: string }
+> = {
   INGESTION: { en: 'Ingestion', he: 'איסוף חומרים' },
   ASR: { en: 'Transcription (ASR)', he: 'תמלול' },
-  NER_SOURCE_LINKING: { en: 'NER + Source Linking', he: 'זיהוי ישויות ומקורות' },
+  NER_SOURCE_LINKING: {
+    en: 'NER + Source Linking',
+    he: 'זיהוי ישויות ומקורות',
+  },
   CONTENT_CLEANING: { en: 'Content Cleaning', he: 'ניקוי תוכן' },
   SUMMARIZATION: { en: 'Summarization', he: 'סיכום' },
   STRUCTURED_NOTES: { en: 'Structured Notes', he: 'תיעוד מובנה' },
@@ -85,66 +91,68 @@ interface LessonPipelineState {
   resetDirty: () => void;
 }
 
-export const useLessonPipelineStore = create<LessonPipelineState>()((set, get) => ({
-  nodes: [],
-  isDirty: false,
-  selectedNodeId: null,
+export const useLessonPipelineStore = create<LessonPipelineState>()(
+  (set, get) => ({
+    nodes: [],
+    isDirty: false,
+    selectedNodeId: null,
 
-  setNodes: (nodes) => set({ nodes, isDirty: true }),
+    setNodes: (nodes) => set({ nodes, isDirty: true }),
 
-  addNode: (moduleType) => {
-    const nodes = get().nodes;
-    set({
-      nodes: [...nodes, makeNode(moduleType, nodes.length)],
-      isDirty: true,
-    });
-  },
+    addNode: (moduleType) => {
+      const nodes = get().nodes;
+      set({
+        nodes: [...nodes, makeNode(moduleType, nodes.length)],
+        isDirty: true,
+      });
+    },
 
-  removeNode: (id) => {
-    set({
-      nodes: get()
-        .nodes.filter((n) => n.id !== id)
-        .map((n, i) => ({ ...n, order: i })),
-      isDirty: true,
-    });
-  },
+    removeNode: (id) => {
+      set({
+        nodes: get()
+          .nodes.filter((n) => n.id !== id)
+          .map((n, i) => ({ ...n, order: i })),
+        isDirty: true,
+      });
+    },
 
-  reorderNodes: (fromIdx, toIdx) => {
-    const nodes = [...get().nodes];
-    const [moved] = nodes.splice(fromIdx, 1) as [PipelineNode];
-    nodes.splice(toIdx, 0, moved);
-    set({
-      nodes: nodes.map((n, i) => ({ ...n, order: i })),
-      isDirty: true,
-    });
-  },
+    reorderNodes: (fromIdx, toIdx) => {
+      const nodes = [...get().nodes];
+      const [moved] = nodes.splice(fromIdx, 1) as [PipelineNode];
+      nodes.splice(toIdx, 0, moved);
+      set({
+        nodes: nodes.map((n, i) => ({ ...n, order: i })),
+        isDirty: true,
+      });
+    },
 
-  toggleNode: (id) => {
-    set({
-      nodes: get().nodes.map((n) =>
-        n.id === id ? { ...n, enabled: !n.enabled } : n
-      ),
-      isDirty: true,
-    });
-  },
+    toggleNode: (id) => {
+      set({
+        nodes: get().nodes.map((n) =>
+          n.id === id ? { ...n, enabled: !n.enabled } : n
+        ),
+        isDirty: true,
+      });
+    },
 
-  updateNodeConfig: (id, config) => {
-    set({
-      nodes: get().nodes.map((n) => (n.id === id ? { ...n, config } : n)),
-      isDirty: true,
-    });
-  },
+    updateNodeConfig: (id, config) => {
+      set({
+        nodes: get().nodes.map((n) => (n.id === id ? { ...n, config } : n)),
+        isDirty: true,
+      });
+    },
 
-  loadTemplate: (templateName) => {
-    const modules =
-      templateName === 'THEMATIC' ? THEMATIC_TEMPLATE : SEQUENTIAL_TEMPLATE;
-    set({
-      nodes: modules.map((m, i) => makeNode(m, i)),
-      isDirty: false,
-    });
-  },
+    loadTemplate: (templateName) => {
+      const modules =
+        templateName === 'THEMATIC' ? THEMATIC_TEMPLATE : SEQUENTIAL_TEMPLATE;
+      set({
+        nodes: modules.map((m, i) => makeNode(m, i)),
+        isDirty: false,
+      });
+    },
 
-  setSelectedNode: (id) => set({ selectedNodeId: id }),
+    setSelectedNode: (id) => set({ selectedNodeId: id }),
 
-  resetDirty: () => set({ isDirty: false }),
-}));
+    resetDirty: () => set({ isDirty: false }),
+  })
+);

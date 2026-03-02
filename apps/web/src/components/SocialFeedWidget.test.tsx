@@ -7,7 +7,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useQuery: vi.fn(),
@@ -105,7 +105,11 @@ describe('SocialFeedWidget', () => {
 
   it('shows "completed" action label', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { socialFeed: [MOCK_FEED[0]!] }, fetching: false, error: undefined },
+      {
+        data: { socialFeed: [MOCK_FEED[0]!] },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<SocialFeedWidget />);
@@ -114,7 +118,11 @@ describe('SocialFeedWidget', () => {
 
   it('shows "is making progress on" for progressed action', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { socialFeed: [MOCK_FEED[1]!] }, fetching: false, error: undefined },
+      {
+        data: { socialFeed: [MOCK_FEED[1]!] },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<SocialFeedWidget />);
@@ -123,7 +131,11 @@ describe('SocialFeedWidget', () => {
 
   it('shows "started" for started action', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { socialFeed: [MOCK_FEED[2]!] }, fetching: false, error: undefined },
+      {
+        data: { socialFeed: [MOCK_FEED[2]!] },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<SocialFeedWidget />);
@@ -132,7 +144,11 @@ describe('SocialFeedWidget', () => {
 
   it('shows user initials avatar (first 2 chars uppercased)', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { socialFeed: [MOCK_FEED[0]!] }, fetching: false, error: undefined },
+      {
+        data: { socialFeed: [MOCK_FEED[0]!] },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<SocialFeedWidget />);
@@ -141,7 +157,11 @@ describe('SocialFeedWidget', () => {
 
   it('shows relative time for feed items', () => {
     vi.mocked(urql.useQuery).mockReturnValue([
-      { data: { socialFeed: [MOCK_FEED[0]!] }, fetching: false, error: undefined },
+      {
+        data: { socialFeed: [MOCK_FEED[0]!] },
+        fetching: false,
+        error: undefined,
+      },
       vi.fn(),
     ] as never);
     render(<SocialFeedWidget />);

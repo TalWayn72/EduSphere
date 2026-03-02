@@ -81,7 +81,9 @@ describe('PortalResolver', () => {
       const result = await resolver.myPortal(makeCtx('tenant-1'));
       expect(result?.blocks).toHaveLength(1);
       expect(result?.blocks[0]?.type).toBe('HERO');
-      expect(result?.blocks[0]?.config).toBe(JSON.stringify({ heading: 'Welcome' }));
+      expect(result?.blocks[0]?.config).toBe(
+        JSON.stringify({ heading: 'Welcome' })
+      );
     });
   });
 
@@ -94,10 +96,14 @@ describe('PortalResolver', () => {
     });
 
     it('delegates to getPublishedPortalPage and maps result', async () => {
-      portalService.getPublishedPortalPage.mockResolvedValue(makePage({ published: true }));
+      portalService.getPublishedPortalPage.mockResolvedValue(
+        makePage({ published: true })
+      );
       const result = await resolver.publicPortal(makeCtx('tenant-1'));
       expect(result?.published).toBe(true);
-      expect(portalService.getPublishedPortalPage).toHaveBeenCalledWith('tenant-1');
+      expect(portalService.getPublishedPortalPage).toHaveBeenCalledWith(
+        'tenant-1'
+      );
     });
 
     it('returns null when no published page', async () => {
@@ -119,7 +125,10 @@ describe('PortalResolver', () => {
         makeCtx('tenant-1', 'user-1')
       );
       expect(portalService.createOrUpdatePortal).toHaveBeenCalledWith(
-        'tenant-1', blocks, 'Home Page', 'user-1'
+        'tenant-1',
+        blocks,
+        'Home Page',
+        'user-1'
       );
     });
 
@@ -133,17 +142,24 @@ describe('PortalResolver', () => {
       const blocks: unknown[] = [];
       portalService.createOrUpdatePortal.mockResolvedValue(makePage());
       await resolver.savePortalLayout(
-        'Home', JSON.stringify(blocks), makeCtx('tenant-1')
+        'Home',
+        JSON.stringify(blocks),
+        makeCtx('tenant-1')
       );
       expect(portalService.createOrUpdatePortal).toHaveBeenCalledWith(
-        'tenant-1', blocks, 'Home', 'unknown'
+        'tenant-1',
+        blocks,
+        'Home',
+        'unknown'
       );
     });
 
     it('maps returned page to GQL shape', async () => {
       portalService.createOrUpdatePortal.mockResolvedValue(makePage());
       const result = await resolver.savePortalLayout(
-        'Home', '[]', makeCtx('tenant-1', 'user-1')
+        'Home',
+        '[]',
+        makeCtx('tenant-1', 'user-1')
       );
       expect(result.updatedAt).toBe('2026-01-01T12:00:00.000Z');
     });

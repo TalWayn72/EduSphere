@@ -59,9 +59,7 @@ describe('DebateInterface', () => {
 
   it('shows typing indicator when isLoading is true', () => {
     render(<DebateInterface {...defaultProps} isLoading={true} />);
-    expect(
-      screen.getByText('AI is composing a response')
-    ).toBeInTheDocument();
+    expect(screen.getByText('AI is composing a response')).toBeInTheDocument();
   });
 
   it('submit button is disabled when input is empty', () => {
@@ -102,7 +100,9 @@ describe('DebateInterface', () => {
     fireEvent.change(textarea, { target: { value: 'Keyboard submit test' } });
     fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
     await waitFor(() => {
-      expect(defaultProps.onSubmit).toHaveBeenCalledWith('Keyboard submit test');
+      expect(defaultProps.onSubmit).toHaveBeenCalledWith(
+        'Keyboard submit test'
+      );
     });
   });
 

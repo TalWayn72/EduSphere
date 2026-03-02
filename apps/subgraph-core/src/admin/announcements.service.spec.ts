@@ -126,9 +126,12 @@ describe('AnnouncementsService', () => {
   it('mapRow maps null optional fields to null', async () => {
     const row = makeRow({ publishAt: null, expiresAt: null, createdBy: null });
     mockDb.select
-      .mockReturnValueOnce(selectChain([row]))    // rows
+      .mockReturnValueOnce(selectChain([row])) // rows
       .mockReturnValueOnce(selectChain([{ value: 1 }])); // count
-    const result = await service.getAdminAnnouncements('tenant-1', { limit: 10, offset: 0 });
+    const result = await service.getAdminAnnouncements('tenant-1', {
+      limit: 10,
+      offset: 0,
+    });
     expect(result.announcements[0]?.publishAt).toBeNull();
     expect(result.announcements[0]?.expiresAt).toBeNull();
     expect(result.announcements[0]?.createdBy).toBeNull();
@@ -136,11 +139,17 @@ describe('AnnouncementsService', () => {
 
   // 3. mapRow formats ISO dates for publishAt/expiresAt/createdAt
   it('mapRow formats Date objects as ISO strings', async () => {
-    const row = makeRow({ publishAt: PUB_AT, expiresAt: new Date('2026-03-01T00:00:00Z') });
+    const row = makeRow({
+      publishAt: PUB_AT,
+      expiresAt: new Date('2026-03-01T00:00:00Z'),
+    });
     mockDb.select
       .mockReturnValueOnce(selectChain([row]))
       .mockReturnValueOnce(selectChain([{ value: 1 }]));
-    const result = await service.getAdminAnnouncements('tenant-1', { limit: 10, offset: 0 });
+    const result = await service.getAdminAnnouncements('tenant-1', {
+      limit: 10,
+      offset: 0,
+    });
     const ann = result.announcements[0]!;
     expect(ann.publishAt).toBe(PUB_AT.toISOString());
     expect(ann.createdAt).toBe(NOW.toISOString());
@@ -149,17 +158,27 @@ describe('AnnouncementsService', () => {
   // 4. getAdminAnnouncements delegates to DB and returns shaped result
   it('getAdminAnnouncements returns total and announcements array', async () => {
     mockDb.select
-      .mockReturnValueOnce(selectChain([makeRow(), makeRow({ id: 'ann-2', title: 'Hi' })]))
+      .mockReturnValueOnce(
+        selectChain([makeRow(), makeRow({ id: 'ann-2', title: 'Hi' })])
+      )
       .mockReturnValueOnce(selectChain([{ value: 2 }]));
-    const result = await service.getAdminAnnouncements('tenant-1', { limit: 10, offset: 0 });
+    const result = await service.getAdminAnnouncements('tenant-1', {
+      limit: 10,
+      offset: 0,
+    });
     expect(result.total).toBe(2);
     expect(result.announcements).toHaveLength(2);
   });
 
   // 5. getAdminAnnouncements returns empty result on DB error
   it('getAdminAnnouncements returns empty result on DB error', async () => {
-    mockDb.select.mockImplementation(() => { throw new Error('DB error'); });
-    const result = await service.getAdminAnnouncements('tenant-1', { limit: 10, offset: 0 });
+    mockDb.select.mockImplementation(() => {
+      throw new Error('DB error');
+    });
+    const result = await service.getAdminAnnouncements('tenant-1', {
+      limit: 10,
+      offset: 0,
+    });
     expect(result.announcements).toHaveLength(0);
     expect(result.total).toBe(0);
   });

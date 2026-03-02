@@ -46,7 +46,14 @@ const BASE_RESULT = {
 
 const MOCK_QUIZ_CONTENT = {
   title: 'Test Quiz',
-  questions: [{ id: 'q1', text: 'What is 2+2?', options: ['3', '4', '5'], correctIndex: 1 }],
+  questions: [
+    {
+      id: 'q1',
+      text: 'What is 2+2?',
+      options: ['3', '4', '5'],
+      correctIndex: 1,
+    },
+  ],
 };
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -58,7 +65,10 @@ describe('QuizContentPage', () => {
   });
 
   it('shows loading skeleton while fetching', () => {
-    vi.mocked(useQuizContent).mockReturnValue({ ...BASE_RESULT, fetching: true });
+    vi.mocked(useQuizContent).mockReturnValue({
+      ...BASE_RESULT,
+      fetching: true,
+    });
     const { container } = render(<QuizContentPage />);
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
@@ -69,15 +79,25 @@ describe('QuizContentPage', () => {
   });
 
   it('shows error message when error occurs', () => {
-    vi.mocked(useQuizContent).mockReturnValue({ ...BASE_RESULT, error: 'Network error' });
+    vi.mocked(useQuizContent).mockReturnValue({
+      ...BASE_RESULT,
+      error: 'Network error',
+    });
     render(<QuizContentPage />);
-    expect(screen.getByText(/failed to load quiz.*network error/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/failed to load quiz.*network error/i)
+    ).toBeInTheDocument();
   });
 
   it('shows "not a quiz" message when content type is not QUIZ', () => {
-    vi.mocked(useQuizContent).mockReturnValue({ ...BASE_RESULT, isQuiz: false });
+    vi.mocked(useQuizContent).mockReturnValue({
+      ...BASE_RESULT,
+      isQuiz: false,
+    });
     render(<QuizContentPage />);
-    expect(screen.getByText(/this content item is not a quiz/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/this content item is not a quiz/i)
+    ).toBeInTheDocument();
   });
 
   it('renders QuizPlayer when isQuiz and quizContent are both truthy', () => {
@@ -95,7 +115,11 @@ describe('QuizContentPage', () => {
   });
 
   it('shows "Quiz data is missing" when isQuiz but quizContent is null', () => {
-    vi.mocked(useQuizContent).mockReturnValue({ ...BASE_RESULT, isQuiz: true, quizContent: null });
+    vi.mocked(useQuizContent).mockReturnValue({
+      ...BASE_RESULT,
+      isQuiz: true,
+      quizContent: null,
+    });
     render(<QuizContentPage />);
     expect(screen.getByText(/quiz data is missing/i)).toBeInTheDocument();
   });

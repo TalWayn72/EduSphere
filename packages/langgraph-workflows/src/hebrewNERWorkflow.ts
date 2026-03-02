@@ -182,7 +182,10 @@ Known books: ספר עץ חיים (Etz Chaim), תלמוד בבלי, תלמוד �
 
     const entitySummary = state.entities
       .slice(0, 30)
-      .map((e) => `"${e.text}" → ${e.type}${e.canonicalName ? ` (${e.canonicalName})` : ''}`)
+      .map(
+        (e) =>
+          `"${e.text}" → ${e.type}${e.canonicalName ? ` (${e.canonicalName})` : ''}`
+      )
       .join('\n');
 
     const truncatedTranscript = state.transcript.slice(0, 4000);
@@ -210,9 +213,7 @@ ${truncatedTranscript}`,
     return this.graph.compile(opts);
   }
 
-  async run(
-    initialState: Partial<HebrewNERState>
-  ): Promise<HebrewNERState> {
+  async run(initialState: Partial<HebrewNERState>): Promise<HebrewNERState> {
     const fullState = HebrewNERStateSchema.parse(initialState);
     const result = await this.graph.compile().invoke(fullState);
     return result as HebrewNERState;

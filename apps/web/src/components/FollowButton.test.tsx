@@ -6,7 +6,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
-      (acc: string, str: string, i: number) => acc + str + (String(values[i] ?? '')),
+      (acc: string, str: string, i: number) =>
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -48,45 +49,79 @@ describe('FollowButton', () => {
 
   it('shows "Follow" button when not following', () => {
     render(
-      <FollowButton userId="user-1" initialIsFollowing={false} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={false}
+        followersCount={10}
+      />
     );
-    expect(screen.getByRole('button', { name: /follow user/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /follow user/i })
+    ).toBeInTheDocument();
     expect(screen.getByText('Follow')).toBeInTheDocument();
   });
 
   it('shows "Following" button when already following', () => {
     render(
-      <FollowButton userId="user-1" initialIsFollowing={true} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={true}
+        followersCount={10}
+      />
     );
-    expect(screen.getByRole('button', { name: /unfollow user/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /unfollow user/i })
+    ).toBeInTheDocument();
     expect(screen.getByText('Following')).toBeInTheDocument();
   });
 
   it('displays the initial followers count', () => {
     render(
-      <FollowButton userId="user-1" initialIsFollowing={false} followersCount={42} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={false}
+        followersCount={42}
+      />
     );
     expect(screen.getByText('42')).toBeInTheDocument();
   });
 
   it('aria-label is "Follow user" when not following', () => {
     render(
-      <FollowButton userId="user-1" initialIsFollowing={false} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={false}
+        followersCount={10}
+      />
     );
-    expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Follow user');
+    expect(screen.getByRole('button')).toHaveAttribute(
+      'aria-label',
+      'Follow user'
+    );
   });
 
   it('aria-label is "Unfollow user" when following', () => {
     render(
-      <FollowButton userId="user-1" initialIsFollowing={true} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={true}
+        followersCount={10}
+      />
     );
-    expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Unfollow user');
+    expect(screen.getByRole('button')).toHaveAttribute(
+      'aria-label',
+      'Unfollow user'
+    );
   });
 
   it('calls follow mutation with userId on click when not following', async () => {
     const { followFn } = setupMutations();
     render(
-      <FollowButton userId="user-42" initialIsFollowing={false} followersCount={10} />
+      <FollowButton
+        userId="user-42"
+        initialIsFollowing={false}
+        followersCount={10}
+      />
     );
     fireEvent.click(screen.getByRole('button'));
     await waitFor(() => {
@@ -97,7 +132,11 @@ describe('FollowButton', () => {
   it('calls unfollow mutation with userId on click when following', async () => {
     const { unfollowFn } = setupMutations();
     render(
-      <FollowButton userId="user-42" initialIsFollowing={true} followersCount={10} />
+      <FollowButton
+        userId="user-42"
+        initialIsFollowing={true}
+        followersCount={10}
+      />
     );
     fireEvent.click(screen.getByRole('button'));
     await waitFor(() => {
@@ -108,7 +147,11 @@ describe('FollowButton', () => {
   it('increments followers count after successful follow', async () => {
     setupMutations();
     render(
-      <FollowButton userId="user-1" initialIsFollowing={false} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={false}
+        followersCount={10}
+      />
     );
     expect(screen.getByText('10')).toBeInTheDocument();
 
@@ -122,7 +165,11 @@ describe('FollowButton', () => {
   it('decrements followers count after successful unfollow', async () => {
     setupMutations();
     render(
-      <FollowButton userId="user-1" initialIsFollowing={true} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={true}
+        followersCount={10}
+      />
     );
     expect(screen.getByText('10')).toBeInTheDocument();
 
@@ -138,7 +185,11 @@ describe('FollowButton', () => {
       vi.fn().mockResolvedValue({ error: new Error('Network error') })
     );
     render(
-      <FollowButton userId="user-1" initialIsFollowing={false} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={false}
+        followersCount={10}
+      />
     );
     fireEvent.click(screen.getByRole('button'));
 
@@ -151,7 +202,11 @@ describe('FollowButton', () => {
   it('button is disabled when loading', () => {
     setupMutations(vi.fn(), vi.fn(), true);
     render(
-      <FollowButton userId="user-1" initialIsFollowing={false} followersCount={10} />
+      <FollowButton
+        userId="user-1"
+        initialIsFollowing={false}
+        followersCount={10}
+      />
     );
     expect(screen.getByRole('button')).toBeDisabled();
   });

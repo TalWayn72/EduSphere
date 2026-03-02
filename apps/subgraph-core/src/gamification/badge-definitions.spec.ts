@@ -75,7 +75,9 @@ describe('PLATFORM_BADGES', () => {
     const completion = PLATFORM_BADGES.filter(
       (b): b is BadgeDefinition => b.category === 'COMPLETION'
     );
-    const sorted = [...completion].sort((a, b) => a.conditionValue - b.conditionValue);
+    const sorted = [...completion].sort(
+      (a, b) => a.conditionValue - b.conditionValue
+    );
     expect(completion.map((b) => b.conditionValue)).toEqual(
       sorted.map((b) => b.conditionValue)
     );

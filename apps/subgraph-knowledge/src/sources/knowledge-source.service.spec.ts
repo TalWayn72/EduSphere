@@ -216,7 +216,7 @@ describe('KnowledgeSourceService', () => {
       expect(result.status).toBe('PENDING');
 
       // Flush all pending microtasks so the background processSource completes
-      await new Promise<void>(resolve => setImmediate(resolve));
+      await new Promise<void>((resolve) => setImmediate(resolve));
 
       expect(mockParser.parseText).toHaveBeenCalledWith('Hello from test');
       expect(mockParser.chunkText).toHaveBeenCalled();
@@ -263,7 +263,7 @@ describe('KnowledgeSourceService', () => {
       expect(result.status).toBe('PENDING');
 
       // Flush background processing
-      await new Promise<void>(resolve => setImmediate(resolve));
+      await new Promise<void>((resolve) => setImmediate(resolve));
 
       // Background task should have called update twice: PROCESSING + FAILED
       expect(updateCall).toBe(2);
@@ -287,7 +287,7 @@ describe('KnowledgeSourceService', () => {
       });
 
       // Flush background processing
-      await new Promise<void>(resolve => setImmediate(resolve));
+      await new Promise<void>((resolve) => setImmediate(resolve));
 
       expect(mockParser.parseUrl).toHaveBeenCalledWith(
         'https://example.com/article'
@@ -312,7 +312,7 @@ describe('KnowledgeSourceService', () => {
       });
 
       // Flush background processing
-      await new Promise<void>(resolve => setImmediate(resolve));
+      await new Promise<void>((resolve) => setImmediate(resolve));
 
       expect(mockParser.parseDocx).toHaveBeenCalledWith('/path/to/file.docx');
     });
@@ -351,7 +351,7 @@ describe('KnowledgeSourceService', () => {
       expect(result.status).toBe('PENDING');
 
       // Flush background processing
-      await new Promise<void>(resolve => setImmediate(resolve));
+      await new Promise<void>((resolve) => setImmediate(resolve));
 
       // Background task completed: update was called (PROCESSING + READY)
       expect(mockUpdate).toHaveBeenCalled();

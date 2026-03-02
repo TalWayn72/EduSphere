@@ -7,7 +7,7 @@ vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
       (acc: string, str: string, i: number) =>
-        acc + str + (String(values[i] ?? '')),
+        acc + str + String(values[i] ?? ''),
       ''
     ),
   useMutation: vi.fn(),
@@ -74,7 +74,9 @@ describe('SRSReviewSession', () => {
 
   it('does not show quality buttons before flipping', () => {
     render(<SRSReviewSession {...defaultProps} />);
-    expect(screen.queryByRole('button', { name: /again/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /again/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls submitReview with correct cardId and quality', async () => {
@@ -82,7 +84,10 @@ describe('SRSReviewSession', () => {
     fireEvent.click(screen.getByRole('button', { name: /click to reveal/i }));
     fireEvent.click(screen.getByRole('button', { name: /good/i }));
     await waitFor(() =>
-      expect(mockSubmitReview).toHaveBeenCalledWith({ cardId: 'c1', quality: 4 })
+      expect(mockSubmitReview).toHaveBeenCalledWith({
+        cardId: 'c1',
+        quality: 4,
+      })
     );
   });
 
@@ -90,9 +95,7 @@ describe('SRSReviewSession', () => {
     render(<SRSReviewSession {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /click to reveal/i }));
     fireEvent.click(screen.getByRole('button', { name: /easy/i }));
-    await waitFor(() =>
-      expect(screen.getByText('2 / 3')).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText('2 / 3')).toBeInTheDocument());
   });
 
   it('shows "All caught up!" when cards array is empty', () => {
@@ -113,7 +116,10 @@ describe('SRSReviewSession', () => {
     fireEvent.click(screen.getByRole('button', { name: /click to reveal/i }));
     fireEvent.click(screen.getByRole('button', { name: /again/i }));
     await waitFor(() =>
-      expect(mockSubmitReview).toHaveBeenCalledWith({ cardId: 'c1', quality: 1 })
+      expect(mockSubmitReview).toHaveBeenCalledWith({
+        cardId: 'c1',
+        quality: 1,
+      })
     );
   });
 });

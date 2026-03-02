@@ -44,10 +44,7 @@ describe('SocialRecommendationsResolver', () => {
         },
       ]);
 
-      const result = await resolver.socialRecommendations(
-        undefined,
-        makeCtx()
-      );
+      const result = await resolver.socialRecommendations(undefined, makeCtx());
 
       expect(mockGetRecommendations).toHaveBeenCalledWith(
         'user-1',
@@ -72,10 +69,7 @@ describe('SocialRecommendationsResolver', () => {
       mockGetRecommendations.mockResolvedValue([
         { courseId: 'c-2', lastActivity: date },
       ]);
-      const result = await resolver.socialRecommendations(
-        undefined,
-        makeCtx()
-      );
+      const result = await resolver.socialRecommendations(undefined, makeCtx());
       expect(result[0]!.lastActivity).toBe('2025-06-15T10:30:00.000Z');
     });
 
@@ -105,11 +99,7 @@ describe('SocialRecommendationsResolver', () => {
 
       const result = await resolver.socialFeed(undefined, makeCtx());
 
-      expect(mockGetSocialFeed).toHaveBeenCalledWith(
-        'user-1',
-        'tenant-1',
-        20
-      );
+      expect(mockGetSocialFeed).toHaveBeenCalledWith('user-1', 'tenant-1', 20);
       expect(result[0]!.timestamp).toBe('2024-02-01T00:00:00.000Z');
     });
 

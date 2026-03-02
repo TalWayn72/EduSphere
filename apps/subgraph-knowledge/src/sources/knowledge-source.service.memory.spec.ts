@@ -241,7 +241,7 @@ describe('KnowledgeSourceService — memory safety', () => {
     expect(result.status).toBe('PENDING');
 
     // Flush background processing so processSource completes
-    await new Promise<void>(resolve => setImmediate(resolve));
+    await new Promise<void>((resolve) => setImmediate(resolve));
 
     // Must have reached terminal state — two updates: PROCESSING + FAILED
     expect(updateCount).toBeGreaterThanOrEqual(2);

@@ -6,7 +6,11 @@ import { useLessonPipelineStore } from './lesson-pipeline.store';
 
 beforeEach(() => {
   act(() => {
-    useLessonPipelineStore.setState({ nodes: [], isDirty: false, selectedNodeId: null });
+    useLessonPipelineStore.setState({
+      nodes: [],
+      isDirty: false,
+      selectedNodeId: null,
+    });
   });
 });
 
@@ -125,7 +129,9 @@ describe('useLessonPipelineStore', () => {
     const { nodes } = useLessonPipelineStore.getState();
     const originalEnabled = nodes[0].enabled;
     act(() => useLessonPipelineStore.getState().toggleNode(nodes[0].id));
-    expect(useLessonPipelineStore.getState().nodes[0].enabled).toBe(!originalEnabled);
+    expect(useLessonPipelineStore.getState().nodes[0].enabled).toBe(
+      !originalEnabled
+    );
   });
 
   it('toggleNode sets isDirty true', () => {
@@ -148,14 +154,26 @@ describe('useLessonPipelineStore', () => {
   it('updateNodeConfig merges config onto the target node', () => {
     act(() => useLessonPipelineStore.getState().addNode('INGESTION'));
     const id = useLessonPipelineStore.getState().nodes[0].id;
-    act(() => useLessonPipelineStore.getState().updateNodeConfig(id, { maxRetries: 3 }));
-    expect(useLessonPipelineStore.getState().nodes[0].config).toEqual({ maxRetries: 3 });
+    act(() =>
+      useLessonPipelineStore.getState().updateNodeConfig(id, { maxRetries: 3 })
+    );
+    expect(useLessonPipelineStore.getState().nodes[0].config).toEqual({
+      maxRetries: 3,
+    });
   });
 
   it('setNodes replaces all nodes and sets isDirty true', () => {
     act(() => useLessonPipelineStore.getState().loadTemplate('THEMATIC'));
     const singleNode = [
-      { id: 'n1', moduleType: 'QA_GATE' as const, label: 'QA', labelHe: 'בקרה', enabled: true, order: 0, config: {} },
+      {
+        id: 'n1',
+        moduleType: 'QA_GATE' as const,
+        label: 'QA',
+        labelHe: 'בקרה',
+        enabled: true,
+        order: 0,
+        config: {},
+      },
     ];
     act(() => useLessonPipelineStore.getState().setNodes(singleNode));
     const { nodes, isDirty } = useLessonPipelineStore.getState();

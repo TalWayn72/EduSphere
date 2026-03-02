@@ -87,7 +87,9 @@ describe('AltTextModal', () => {
     // preventing invalid submissions at the UI level.
     renderModal({ ...defaultProps, initialAltText: 'some text' });
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '   ' } });
-    expect(screen.getByRole('button', { name: /save alt-text/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /save alt-text/i })
+    ).toBeDisabled();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
@@ -96,7 +98,9 @@ describe('AltTextModal', () => {
     const onClose = vi.fn();
     renderModal({ ...defaultProps, onSaved, onClose });
     fireEvent.click(screen.getByRole('button', { name: /save alt-text/i }));
-    await waitFor(() => expect(onSaved).toHaveBeenCalledWith('A photo of a sunset'));
+    await waitFor(() =>
+      expect(onSaved).toHaveBeenCalledWith('A photo of a sunset')
+    );
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 

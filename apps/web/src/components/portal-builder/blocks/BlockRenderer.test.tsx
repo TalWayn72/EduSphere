@@ -99,9 +99,7 @@ describe('BlockRenderer', () => {
 
     it('renders custom button text from config', () => {
       render(
-        <BlockRenderer
-          block={makeBlock('CTAButton', { text: 'Enroll Now' })}
-        />
+        <BlockRenderer block={makeBlock('CTAButton', { text: 'Enroll Now' })} />
       );
       expect(screen.getByText('Enroll Now')).toBeInTheDocument();
     });

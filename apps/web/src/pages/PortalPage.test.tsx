@@ -7,7 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
-    strings.reduce((acc, str, i) => acc + str + (String(values[i] ?? '')), ''),
+    strings.reduce((acc, str, i) => acc + str + String(values[i] ?? ''), ''),
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
@@ -43,7 +43,11 @@ function setupQuery(state: {
   data?: unknown;
 }) {
   vi.mocked(urql.useQuery).mockReturnValue([
-    { fetching: state.fetching ?? false, error: state.error ?? undefined, data: state.data },
+    {
+      fetching: state.fetching ?? false,
+      error: state.error ?? undefined,
+      data: state.data,
+    },
     vi.fn(),
     vi.fn(),
   ] as never);
@@ -87,7 +91,9 @@ describe('PortalPage', () => {
       },
     });
     renderPage();
-    expect(screen.getByRole('main', { name: /learning portal/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('main', { name: /learning portal/i })
+    ).toBeInTheDocument();
   });
 
   it('shows empty state message when portal has no blocks', () => {
@@ -131,7 +137,9 @@ describe('PortalPage', () => {
       },
     });
     renderPage();
-    expect(screen.getByRole('region', { name: /hero section/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: /hero section/i })
+    ).toBeInTheDocument();
   });
 
   it('handles malformed block config JSON gracefully', () => {
@@ -139,7 +147,9 @@ describe('PortalPage', () => {
       fetching: false,
       data: {
         publicPortal: {
-          blocks: [{ id: 'b1', type: 'text', order: 1, config: 'INVALID_JSON' }],
+          blocks: [
+            { id: 'b1', type: 'text', order: 1, config: 'INVALID_JSON' },
+          ],
         },
       },
     });

@@ -111,7 +111,9 @@ describe('EmbeddingStoreService', () => {
       mockSelectChain([]);
       mockSelectChain([]);
       mockSelectChain([]);
-      await expect(service.findById('missing')).rejects.toThrow(NotFoundException);
+      await expect(service.findById('missing')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -186,9 +188,9 @@ describe('EmbeddingStoreService', () => {
       mockSelect.mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              { id: 'seg-x', text: 'matching content' },
-            ]),
+            limit: vi
+              .fn()
+              .mockResolvedValue([{ id: 'seg-x', text: 'matching content' }]),
           }),
         }),
       });

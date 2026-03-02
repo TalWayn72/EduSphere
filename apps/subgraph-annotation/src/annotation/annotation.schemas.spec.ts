@@ -56,7 +56,10 @@ describe('CreateAnnotationInputSchema', () => {
   });
 
   it('accepts an explicit layer override', () => {
-    const result = CreateAnnotationInputSchema.parse({ ...valid, layer: 'SHARED' });
+    const result = CreateAnnotationInputSchema.parse({
+      ...valid,
+      layer: 'SHARED',
+    });
     expect(result.layer).toBe('SHARED');
   });
 
@@ -82,7 +85,10 @@ describe('CreateAnnotationInputSchema', () => {
 
   it('rejects invalid annotationType', () => {
     expect(() =>
-      CreateAnnotationInputSchema.parse({ ...valid, annotationType: 'VIDEO_NOTE' })
+      CreateAnnotationInputSchema.parse({
+        ...valid,
+        annotationType: 'VIDEO_NOTE',
+      })
     ).toThrow();
   });
 
@@ -128,7 +134,9 @@ describe('UpdateAnnotationInputSchema', () => {
   });
 
   it('accepts partial update with only content', () => {
-    const result = UpdateAnnotationInputSchema.parse({ content: { text: 'Updated' } });
+    const result = UpdateAnnotationInputSchema.parse({
+      content: { text: 'Updated' },
+    });
     expect(result.content).toEqual({ text: 'Updated' });
     expect(result.isResolved).toBeUndefined();
   });

@@ -7,7 +7,13 @@ import { injectLocale } from './locale-prompt';
 const MAX_FIX_LIST = 100;
 
 const QAFixItemSchema = z.object({
-  category: z.enum(['LINGUISTIC', 'TOPIC_COVERAGE', 'SENSITIVITY', 'CITATION', 'STRUCTURE']),
+  category: z.enum([
+    'LINGUISTIC',
+    'TOPIC_COVERAGE',
+    'SENSITIVITY',
+    'CITATION',
+    'STRUCTURE',
+  ]),
   description: z.string(),
   severity: z.enum(['HIGH', 'MEDIUM', 'LOW']),
   suggestion: z.string().optional(),
@@ -28,14 +34,25 @@ export type QAState = z.infer<typeof QAStateSchema>;
 
 const QAAnnotation = Annotation.Root({
   content: Annotation<string>(),
-  lessonType: Annotation<QAState['lessonType']>({ value: (_, u) => u, default: () => 'THEMATIC' }),
+  lessonType: Annotation<QAState['lessonType']>({
+    value: (_, u) => u,
+    default: () => 'THEMATIC',
+  }),
   linguisticScore: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
-  topicCoverageScore: Annotation<number>({ value: (_, u) => u, default: () => 0 }),
-  sensitivityFlags: Annotation<string[]>({ value: (_, u) => u, default: () => [] }),
+  topicCoverageScore: Annotation<number>({
+    value: (_, u) => u,
+    default: () => 0,
+  }),
+  sensitivityFlags: Annotation<string[]>({
+    value: (_, u) => u,
+    default: () => [],
+  }),
   fixList: Annotation<z.infer<typeof QAFixItemSchema>[]>({
     reducer: (existing, incoming) => {
       const merged = [...existing, ...incoming];
-      return merged.length > MAX_FIX_LIST ? merged.slice(merged.length - MAX_FIX_LIST) : merged;
+      return merged.length > MAX_FIX_LIST
+        ? merged.slice(merged.length - MAX_FIX_LIST)
+        : merged;
     },
     default: () => [],
   }),
@@ -93,7 +110,9 @@ export class QAWorkflow {
     return { linguisticScore: object.score, fixList: object.issues };
   }
 
-  private async checkTopicCoverageNode(state: QAState): Promise<Partial<QAState>> {
+  private async checkTopicCoverageNode(
+    state: QAState
+  ): Promise<Partial<QAState>> {
     const { object } = await generateObject({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       model: openai(this.model) as any,
@@ -132,12 +151,16 @@ Check: main topic addressed, subtopics covered, logical flow, completeness.`,
     const overallScore =
       state.linguisticScore * 0.35 +
       state.topicCoverageScore * 0.45 +
-      (state.sensitivityFlags.length === 0 ? 0.2 : Math.max(0, 0.2 - state.sensitivityFlags.length * 0.05));
+      (state.sensitivityFlags.length === 0
+        ? 0.2
+        : Math.max(0, 0.2 - state.sensitivityFlags.length * 0.05));
 
     return { overallScore: Math.min(1, overallScore), isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) { return this.graph.compile(opts); }
+  compile(opts?: { checkpointer?: unknown }) {
+    return this.graph.compile(opts);
+  }
 
   async run(initialState: Partial<QAState>): Promise<QAState> {
     const fullState = QAStateSchema.parse(initialState);
@@ -145,7 +168,9 @@ Check: main topic addressed, subtopics covered, logical flow, completeness.`,
     return result as QAState;
   }
 
-  async *stream(initialState: Partial<QAState>): AsyncGenerator<QAState, void, unknown> {
+  async *stream(
+    initialState: Partial<QAState>
+  ): AsyncGenerator<QAState, void, unknown> {
     const compiledGraph = this.graph.compile();
     const fullState = QAStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {

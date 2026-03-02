@@ -86,16 +86,10 @@ const mockGenerateObject = vi.mocked(generateObject);
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-function makeVerifyResponse(
-  verified: unknown[],
-  failed: unknown[]
-) {
+function makeVerifyResponse(verified: unknown[], failed: unknown[]) {
   return {
     object: {
-      results: [
-        ...verified.map((r) => r),
-        ...failed.map((r) => r),
-      ],
+      results: [...verified.map((r) => r), ...failed.map((r) => r)],
     },
   };
 }
@@ -160,7 +154,10 @@ describe('CitationVerifierWorkflow', () => {
 
       const workflow = new CitationVerifierWorkflow();
       const result = await workflow.run({
-        citations: [sampleCitation, { ...sampleCitation, sourceText: 'unknown' }],
+        citations: [
+          sampleCitation,
+          { ...sampleCitation, sourceText: 'unknown' },
+        ],
         strictMode: false,
       });
 
@@ -197,8 +194,9 @@ describe('CitationVerifierWorkflow', () => {
       });
 
       // Confidence 0.85 < threshold 0.95 in strict mode → should be in failedCitations
-      expect(result.failedCitations.length + result.verifiedCitations.length)
-        .toBeGreaterThanOrEqual(0);
+      expect(
+        result.failedCitations.length + result.verifiedCitations.length
+      ).toBeGreaterThanOrEqual(0);
     });
 
     it('verifiedCitations array is capped at MAX_CITATIONS (500)', async () => {

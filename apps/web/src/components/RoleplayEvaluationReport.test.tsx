@@ -5,11 +5,22 @@ import { RoleplayEvaluationReport } from './RoleplayEvaluationReport';
 const mockEvaluation = {
   overallScore: 82,
   criteriaScores: [
-    { name: 'Communication', score: 85, feedback: 'Clear and empathetic tone.' },
-    { name: 'Problem Solving', score: 78, feedback: 'Good approach, needs refinement.' },
+    {
+      name: 'Communication',
+      score: 85,
+      feedback: 'Clear and empathetic tone.',
+    },
+    {
+      name: 'Problem Solving',
+      score: 78,
+      feedback: 'Good approach, needs refinement.',
+    },
   ],
   strengths: ['Active listening demonstrated', 'Professional language used'],
-  areasForImprovement: ['More follow-up questions needed', 'Elaborate on diagnosis steps'],
+  areasForImprovement: [
+    'More follow-up questions needed',
+    'Elaborate on diagnosis steps',
+  ],
   summary: 'A strong performance with room to grow in diagnostic questioning.',
 };
 
@@ -97,7 +108,9 @@ describe('RoleplayEvaluationReport', () => {
       />
     );
     expect(screen.getByText('Clear and empathetic tone.')).toBeInTheDocument();
-    expect(screen.getByText('Good approach, needs refinement.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Good approach, needs refinement.')
+    ).toBeInTheDocument();
   });
 
   it('renders strengths section', () => {
@@ -109,7 +122,9 @@ describe('RoleplayEvaluationReport', () => {
         onBack={onBack}
       />
     );
-    expect(screen.getByText('Active listening demonstrated')).toBeInTheDocument();
+    expect(
+      screen.getByText('Active listening demonstrated')
+    ).toBeInTheDocument();
     expect(screen.getByText('Professional language used')).toBeInTheDocument();
   });
 

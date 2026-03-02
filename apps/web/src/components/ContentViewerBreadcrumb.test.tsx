@@ -43,7 +43,9 @@ function setupSearchParams(courseId: string | null = 'course-1') {
   ] as never);
 }
 
-function renderBreadcrumb(props = { contentId: 'content-1', contentTitle: 'Lesson 1' }) {
+function renderBreadcrumb(
+  props = { contentId: 'content-1', contentTitle: 'Lesson 1' }
+) {
   return render(
     <MemoryRouter>
       <ContentViewerBreadcrumb {...props} />
@@ -61,7 +63,10 @@ describe('ContentViewerBreadcrumb', () => {
   });
 
   it('renders nothing when not ready', () => {
-    vi.mocked(useCourseNavigation).mockReturnValue({ ...BASE_NAV, ready: false });
+    vi.mocked(useCourseNavigation).mockReturnValue({
+      ...BASE_NAV,
+      ready: false,
+    });
     const { container } = renderBreadcrumb();
     expect(container.firstChild).toBeNull();
   });
@@ -73,14 +78,19 @@ describe('ContentViewerBreadcrumb', () => {
   });
 
   it('renders nothing when useCourseNavigation returns no courseId', () => {
-    vi.mocked(useCourseNavigation).mockReturnValue({ ...BASE_NAV, courseId: '' });
+    vi.mocked(useCourseNavigation).mockReturnValue({
+      ...BASE_NAV,
+      courseId: '',
+    });
     const { container } = renderBreadcrumb();
     expect(container.firstChild).toBeNull();
   });
 
   it('renders the breadcrumb nav when all conditions are met', () => {
     renderBreadcrumb();
-    expect(screen.getByRole('navigation', { name: /breadcrumb/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: /breadcrumb/i })
+    ).toBeInTheDocument();
   });
 
   it('renders "Courses" as the first breadcrumb segment', () => {
@@ -104,13 +114,19 @@ describe('ContentViewerBreadcrumb', () => {
   });
 
   it('Prev button is disabled when no prevItemId', () => {
-    vi.mocked(useCourseNavigation).mockReturnValue({ ...BASE_NAV, prevItemId: null });
+    vi.mocked(useCourseNavigation).mockReturnValue({
+      ...BASE_NAV,
+      prevItemId: null,
+    });
     renderBreadcrumb();
     expect(screen.getByRole('button', { name: /prev/i })).toBeDisabled();
   });
 
   it('Next button is disabled when no nextItemId', () => {
-    vi.mocked(useCourseNavigation).mockReturnValue({ ...BASE_NAV, nextItemId: null });
+    vi.mocked(useCourseNavigation).mockReturnValue({
+      ...BASE_NAV,
+      nextItemId: null,
+    });
     renderBreadcrumb();
     expect(screen.getByRole('button', { name: /next/i })).toBeDisabled();
   });

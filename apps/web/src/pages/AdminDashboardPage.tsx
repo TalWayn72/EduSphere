@@ -129,7 +129,9 @@ export function AdminDashboardPage() {
 
       {/* Quick Links */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">{t('dashboard.adminTools')}</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          {t('dashboard.adminTools')}
+        </h2>
         <div className="grid grid-cols-2 gap-4">
           {quickLinks.map(({ to, icon: Icon, label, desc }) => (
             <Link key={to} to={to}>
@@ -149,7 +151,9 @@ export function AdminDashboardPage() {
 
       {/* Recent Activity placeholder */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">{t('dashboard.recentActivity')}</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          {t('dashboard.recentActivity')}
+        </h2>
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">

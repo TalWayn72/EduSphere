@@ -31,9 +31,7 @@ const BASE: SecurityFormValues = {
 describe('MfaSection', () => {
   it('renders Multi-Factor Authentication heading', () => {
     render(<MfaSection values={BASE} onChange={vi.fn()} />);
-    expect(
-      screen.getByText('Multi-Factor Authentication')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Multi-Factor Authentication')).toBeInTheDocument();
   });
 
   it('renders both MFA toggle labels', () => {
@@ -44,14 +42,18 @@ describe('MfaSection', () => {
 
   it('toggle for all users reflects checked=false', () => {
     render(<MfaSection values={BASE} onChange={vi.fn()} />);
-    const sw = screen.getByRole('switch', { name: 'Require MFA for all users' });
+    const sw = screen.getByRole('switch', {
+      name: 'Require MFA for all users',
+    });
     expect(sw).toHaveAttribute('aria-checked', 'false');
   });
 
   it('calls onChange with mfaRequired=true when toggle clicked', () => {
     const onChange = vi.fn();
     render(<MfaSection values={BASE} onChange={onChange} />);
-    fireEvent.click(screen.getByRole('switch', { name: 'Require MFA for all users' }));
+    fireEvent.click(
+      screen.getByRole('switch', { name: 'Require MFA for all users' })
+    );
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ mfaRequired: true })
     );
@@ -71,7 +73,9 @@ describe('MfaSection', () => {
   it('calls onChange with mfaRequiredForAdmins=true when admin toggle clicked', () => {
     const onChange = vi.fn();
     render(<MfaSection values={BASE} onChange={onChange} />);
-    fireEvent.click(screen.getByRole('switch', { name: 'Require MFA for admins' }));
+    fireEvent.click(
+      screen.getByRole('switch', { name: 'Require MFA for admins' })
+    );
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ mfaRequiredForAdmins: true })
     );
@@ -90,7 +94,9 @@ describe('SessionSection', () => {
   it('renders timeout select and max concurrent input', () => {
     render(<SessionSection values={BASE} onChange={vi.fn()} />);
     expect(screen.getByLabelText('Session Timeout')).toBeInTheDocument();
-    expect(screen.getByLabelText('Max Concurrent Sessions')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Max Concurrent Sessions')
+    ).toBeInTheDocument();
   });
 
   it('calls onChange with updated maxConcurrentSessions', () => {
@@ -128,7 +134,9 @@ describe('PasswordSection', () => {
   it('renders minimum length and expiry inputs', () => {
     render(<PasswordSection values={BASE} onChange={vi.fn()} />);
     expect(screen.getByLabelText('Minimum Length')).toBeInTheDocument();
-    expect(screen.getByLabelText('Expiry Days (0 = never)')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Expiry Days (0 = never)')
+    ).toBeInTheDocument();
   });
 
   it('calls onChange with updated passwordMinLength', () => {
@@ -155,7 +163,9 @@ describe('PasswordSection', () => {
 
   it('special chars toggle starts unchecked', () => {
     render(<PasswordSection values={BASE} onChange={vi.fn()} />);
-    const sw = screen.getByRole('switch', { name: 'Require special characters' });
+    const sw = screen.getByRole('switch', {
+      name: 'Require special characters',
+    });
     expect(sw).toHaveAttribute('aria-checked', 'false');
   });
 

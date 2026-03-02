@@ -16,7 +16,9 @@ describe('LayerToggleBar', () => {
   it('renders the group with correct aria-label', () => {
     render(<LayerToggleBar {...defaultProps} />);
     expect(
-      screen.getByRole('group', { name: /annotation layer visibility toggles/i })
+      screen.getByRole('group', {
+        name: /annotation layer visibility toggles/i,
+      })
     ).toBeInTheDocument();
   });
 

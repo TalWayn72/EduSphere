@@ -53,7 +53,9 @@ vi.mock('@/components/annotation/CommentForm', () => ({
     defaultLayer: AnnotationLayer;
   }) => (
     <div data-testid="comment-form">
-      <button onClick={() => onSubmit('test note', AnnotationLayer.PERSONAL)}>submit</button>
+      <button onClick={() => onSubmit('test note', AnnotationLayer.PERSONAL)}>
+        submit
+      </button>
       <button onClick={onCancel}>cancel</button>
     </div>
   ),
@@ -84,7 +86,9 @@ const baseProps = {
   focusedAnnotationId: null,
   onAnnotationClick: vi.fn(),
   onAddTextAnnotation: vi.fn(),
-  scrollContainerRef: { current: null } as React.RefObject<HTMLDivElement | null>,
+  scrollContainerRef: {
+    current: null,
+  } as React.RefObject<HTMLDivElement | null>,
   onScroll: vi.fn(),
   documentZoom: 1,
   defaultAnnotationLayer: AnnotationLayer.PERSONAL,
@@ -128,16 +132,12 @@ describe('DocumentPanel', () => {
   });
 
   it('shows URL in the LinkViewer header bar', () => {
-    render(
-      <DocumentPanel {...baseProps} content="https://example.com/page" />
-    );
+    render(<DocumentPanel {...baseProps} content="https://example.com/page" />);
     expect(screen.getByText('https://example.com/page')).toBeDefined();
   });
 
   it('renders open-in-new-window button for link content', () => {
-    render(
-      <DocumentPanel {...baseProps} content="https://example.com" />
-    );
+    render(<DocumentPanel {...baseProps} content="https://example.com" />);
     expect(screen.getByText('פתח בחלון חדש')).toBeDefined();
   });
 

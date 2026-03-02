@@ -21,24 +21,57 @@ const mockGetCurrentUser = vi.mocked(auth.getCurrentUser);
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const ENTRIES = [
-  { rank: 1, userId: 'u1', displayName: 'Alice Cohen', totalPoints: 1500, badgeCount: 5 },
-  { rank: 2, userId: 'u2', displayName: 'Bob Levi', totalPoints: 1200, badgeCount: 4 },
-  { rank: 3, userId: 'u3', displayName: 'Carol Gold', totalPoints: 900, badgeCount: 3 },
-  { rank: 4, userId: 'u4', displayName: 'Dave Green', totalPoints: 700, badgeCount: 2 },
+  {
+    rank: 1,
+    userId: 'u1',
+    displayName: 'Alice Cohen',
+    totalPoints: 1500,
+    badgeCount: 5,
+  },
+  {
+    rank: 2,
+    userId: 'u2',
+    displayName: 'Bob Levi',
+    totalPoints: 1200,
+    badgeCount: 4,
+  },
+  {
+    rank: 3,
+    userId: 'u3',
+    displayName: 'Carol Gold',
+    totalPoints: 900,
+    badgeCount: 3,
+  },
+  {
+    rank: 4,
+    userId: 'u4',
+    displayName: 'Dave Green',
+    totalPoints: 700,
+    badgeCount: 2,
+  },
 ];
 
 function makeLeaderboardResponse(
   overrides: Partial<UseQueryResponse[0]> = {}
 ): UseQueryResponse {
   return [
-    { data: { leaderboard: ENTRIES }, fetching: false, stale: false, ...overrides },
+    {
+      data: { leaderboard: ENTRIES },
+      fetching: false,
+      stale: false,
+      ...overrides,
+    },
     vi.fn(),
   ] as unknown as UseQueryResponse;
 }
 
 function makeRankResponse(rank?: number): UseQueryResponse {
   return [
-    { data: rank !== undefined ? { myRank: rank } : undefined, fetching: false, stale: false },
+    {
+      data: rank !== undefined ? { myRank: rank } : undefined,
+      fetching: false,
+      stale: false,
+    },
     vi.fn(),
   ] as unknown as UseQueryResponse;
 }
@@ -77,12 +110,16 @@ describe('LeaderboardWidget', () => {
       .mockReturnValueOnce(makeRankResponse())
       .mockReturnValue(makeLeaderboardResponse());
     renderWidget();
-    expect(screen.getByRole('heading', { name: /leaderboard/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /leaderboard/i })
+    ).toBeInTheDocument();
   });
 
   it('shows loading skeletons when fetching', () => {
     mockUseQuery
-      .mockReturnValueOnce(makeLeaderboardResponse({ fetching: true, data: undefined }))
+      .mockReturnValueOnce(
+        makeLeaderboardResponse({ fetching: true, data: undefined })
+      )
       .mockReturnValue(makeRankResponse());
     const { container } = renderWidget();
     const skeletons = container.querySelectorAll('.animate-pulse');
@@ -112,31 +149,41 @@ describe('LeaderboardWidget', () => {
   });
 
   it('shows gold medal for rank 1', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     renderWidget();
     expect(screen.getByText('🥇')).toBeInTheDocument();
   });
 
   it('shows silver medal for rank 2', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     renderWidget();
     expect(screen.getByText('🥈')).toBeInTheDocument();
   });
 
   it('shows bronze medal for rank 3', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     renderWidget();
     expect(screen.getByText('🥉')).toBeInTheDocument();
   });
 
   it('shows numeric rank for rank 4+', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     renderWidget();
     expect(screen.getByText('#4')).toBeInTheDocument();
   });
 
   it('highlights the current user row with bg-primary/10', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     const { container } = renderWidget();
     const highlighted = container.querySelector('.bg-primary\\/10');
     expect(highlighted).toBeInTheDocument();
@@ -144,7 +191,9 @@ describe('LeaderboardWidget', () => {
   });
 
   it('does not highlight other users', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     const { container } = renderWidget();
     const highlighted = container.querySelectorAll('.bg-primary\\/10');
     expect(highlighted.length).toBe(1);
@@ -160,13 +209,17 @@ describe('LeaderboardWidget', () => {
   });
 
   it('does not show "Your rank" footer when myRank is undefined', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     renderWidget();
     expect(screen.queryByText(/Your rank/i)).not.toBeInTheDocument();
   });
 
   it('renders badge count and points for each entry', () => {
-    mockUseQuery.mockReturnValueOnce(makeLeaderboardResponse()).mockReturnValue(makeRankResponse());
+    mockUseQuery
+      .mockReturnValueOnce(makeLeaderboardResponse())
+      .mockReturnValue(makeRankResponse());
     renderWidget();
     expect(screen.getByText('5 badges')).toBeInTheDocument();
     expect(screen.getByText(/1,500 pts/i)).toBeInTheDocument();
@@ -185,6 +238,8 @@ describe('LeaderboardWidget', () => {
   it('renders "View full leaderboard" link', () => {
     mockUseQuery.mockReturnValue(makeLeaderboardResponse());
     renderWidget();
-    expect(screen.getByRole('link', { name: /view full leaderboard/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /view full leaderboard/i })
+    ).toBeInTheDocument();
   });
 });

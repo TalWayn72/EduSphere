@@ -13,21 +13,27 @@
 **Commit:** `da83507` fix(auth,urql): DEV_MODE logout persistence + cache key guards
 
 ### Problem
+
 In DEV_MODE (`VITE_DEV_MODE=true`), clicking "Log out" showed the dashboard again on the next page load. Navigating to any protected route after logout still displayed the content.
 
 ### Root Cause
+
 `logout()` sets `devAuthenticated = false` and does `window.location.href = '/login'` (full page reload). On the next cold start, `initKeycloak()` unconditionally set `devAuthenticated = true`, overriding the logout. The module state is re-initialized on every page reload, so the logout was lost.
 
 ### Fix
+
 `window.sessionStorage` used to persist the logout flag across page reloads:
+
 - `logout()` → `sessionStorage.setItem('edusphere_dev_logged_out', 'true')` before redirect
 - `initKeycloak()` → checks sessionStorage; if flag present, keeps `devAuthenticated = false`
 - `login()` → `sessionStorage.removeItem('edusphere_dev_logged_out')` before redirect
 
 ### Tests
+
 5 new tests in `auth.test.ts` covering the logout-reload regression, login flag-clear, DEV_USER UUID assertions, and `getCurrentUser()` null path.
 
 ### Files
+
 - `apps/web/src/lib/auth.ts`
 - `apps/web/src/lib/auth.test.ts`
 
@@ -39,15 +45,19 @@ In DEV_MODE (`VITE_DEV_MODE=true`), clicking "Log out" showed the dashboard agai
 **Commit:** `da83507` fix(auth,urql): DEV_MODE logout persistence + cache key guards
 
 ### Problem
+
 Console warning: "Invalid key: The GraphQL query at the field `User:00000000-…-0001.preferences` has a selection set, but no key could be generated for the data at this field."
 
 ### Root Cause
+
 urql's normalized `cacheExchange` requires every type in a response to have an `id`/`_id` field (for cache key generation) or an explicit `keys: { TypeName: () => null }` entry. `UserPreferences` has no `id` field, causing the warning.
 
 ### Fix
+
 `UserPreferences: () => null` added to urql `cacheExchange.keys` config in `urql-client.ts`, instructing urql to embed `UserPreferences` directly in the parent `User` entity without its own cache entry.
 
 ### Files
+
 - `apps/web/src/lib/urql-client.ts`
 
 ---
@@ -61,16 +71,17 @@ urql's normalized `cacheExchange` requires every type in a response to have an `
 
 Full end-to-end implementation of the AI-powered Lesson Pipeline Builder for Jewish religious education (THEMATIC + SEQUENTIAL archetypes). 181 new tests across 13 test files. All packages TypeScript-clean.
 
-| Phase | Files | Status |
-|-------|-------|--------|
-| Phase 1A: DB Schema (6 tables) + NATS events | `packages/db/src/schema/lesson.ts`, `events.ts` | ✅ |
-| Phase 1B: GraphQL SDL | `apps/subgraph-content/src/lesson/lesson.graphql` | ✅ |
-| Phase 1C: NestJS module (5 services + resolver) | `apps/subgraph-content/src/lesson/` | ✅ |
-| Phase 2: 8 LangGraph workflows | `packages/langgraph-workflows/src/` | ✅ |
-| Phase 3: 4 pages + components + store + queries | `apps/web/src/pages/`, `components/lesson-pipeline/` | ✅ |
-| Phase 4: 13 test files (181 tests) | All packages | ✅ |
+| Phase                                           | Files                                                | Status |
+| ----------------------------------------------- | ---------------------------------------------------- | ------ |
+| Phase 1A: DB Schema (6 tables) + NATS events    | `packages/db/src/schema/lesson.ts`, `events.ts`      | ✅     |
+| Phase 1B: GraphQL SDL                           | `apps/subgraph-content/src/lesson/lesson.graphql`    | ✅     |
+| Phase 1C: NestJS module (5 services + resolver) | `apps/subgraph-content/src/lesson/`                  | ✅     |
+| Phase 2: 8 LangGraph workflows                  | `packages/langgraph-workflows/src/`                  | ✅     |
+| Phase 3: 4 pages + components + store + queries | `apps/web/src/pages/`, `components/lesson-pipeline/` | ✅     |
+| Phase 4: 13 test files (181 tests)              | All packages                                         | ✅     |
 
 ### Key Fixes During Implementation
+
 - `vi.hoisted()` required for all mock variables used inside `vi.mock()` factory functions (NatsDrain pattern)
 - `mockFn.mockReset()` (not `vi.clearAllMocks()`) needed in `beforeEach` to flush `mockResolvedValueOnce` queues
 - Zod v4: `z.record()` requires 2 args — `z.record(z.string(), z.unknown())`
@@ -93,11 +104,11 @@ Three cascading bugs prevented uploading a Word/PDF file to a course's knowledge
 
 ### Root Causes
 
-| Bug | File | Root Cause |
-|-----|------|------------|
-| 404 REST | `SourceManager.tsx` | Called `/api/knowledge-sources/upload` — REST endpoint was removed; should use GraphQL |
-| 413 Body | `apps/subgraph-knowledge/src/main.ts` | NestJS default body-parser limit is 100 KB; base64 DOCX files exceed this |
-| null sourceType | `knowledge-source.resolver.ts` | Drizzle returns `source_type` (snake_case) but GraphQL resolves `sourceType` (camelCase) — no mapping |
+| Bug             | File                                  | Root Cause                                                                                            |
+| --------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 404 REST        | `SourceManager.tsx`                   | Called `/api/knowledge-sources/upload` — REST endpoint was removed; should use GraphQL                |
+| 413 Body        | `apps/subgraph-knowledge/src/main.ts` | NestJS default body-parser limit is 100 KB; base64 DOCX files exceed this                             |
+| null sourceType | `knowledge-source.resolver.ts`        | Drizzle returns `source_type` (snake_case) but GraphQL resolves `sourceType` (camelCase) — no mapping |
 
 ### Solution
 
@@ -131,19 +142,19 @@ After implementing the UnifiedLearningPage (document + video + AI + annotations 
 
 ### Root Causes
 
-| Issue | File | Root Cause |
-|-------|------|------------|
-| TipTap warning | `RichContentViewer.tsx` | `StarterKit` includes `CodeBlock`; `CodeBlockLowlight` is a replacement, not addition |
-| Panels not draggable | `resizable.tsx` | v4 uses inline `flexDirection` style, not `data-panel-group-direction` attribute → CSS selectors never match |
-| Wrong enroll button | `CourseDetailPage.tsx` | `enrollData` is `undefined` when gateway offline → `isEnrolled = false` always |
+| Issue                | File                    | Root Cause                                                                                                   |
+| -------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------ |
+| TipTap warning       | `RichContentViewer.tsx` | `StarterKit` includes `CodeBlock`; `CodeBlockLowlight` is a replacement, not addition                        |
+| Panels not draggable | `resizable.tsx`         | v4 uses inline `flexDirection` style, not `data-panel-group-direction` attribute → CSS selectors never match |
+| Wrong enroll button  | `CourseDetailPage.tsx`  | `enrollData` is `undefined` when gateway offline → `isEnrolled = false` always                               |
 
 ### Solution
 
-| File | Change |
-|------|--------|
-| `RichContentViewer.tsx` | `StarterKit.configure({ codeBlock: false })` to prevent duplicate |
-| `resizable.tsx` | Replaced CSS data-attribute approach with React Context (`OrientationCtx`) — `ResizablePanelGroup` provides orientation, `ResizableHandle` consumes it and applies correct CSS (`h-2 w-full` for vertical, `w-2` for horizontal). Handle grip icon rotated 90° for vertical. |
-| `CourseDetailPage.tsx` | When `enrollError` is truthy (gateway offline), `isEnrolled = true` to show "בטל הרשמה" on mock course |
+| File                    | Change                                                                                                                                                                                                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RichContentViewer.tsx` | `StarterKit.configure({ codeBlock: false })` to prevent duplicate                                                                                                                                                                                                            |
+| `resizable.tsx`         | Replaced CSS data-attribute approach with React Context (`OrientationCtx`) — `ResizablePanelGroup` provides orientation, `ResizableHandle` consumes it and applies correct CSS (`h-2 w-full` for vertical, `w-2` for horizontal). Handle grip icon rotated 90° for vertical. |
+| `CourseDetailPage.tsx`  | When `enrollError` is truthy (gateway offline), `isEnrolled = true` to show "בטל הרשמה" on mock course                                                                                                                                                                       |
 
 ### Tests
 
