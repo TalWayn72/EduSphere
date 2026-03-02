@@ -203,17 +203,25 @@ jobs:
       - name: Check @deprecated directives have reasons (supergraph level)
         run: |
           # Every @deprecated in supergraph must include reason argument.
-          # Uses perl -0777 to read the whole file as one string so that
-          # multi-line @deprecated(\n  reason: "...") is handled correctly
-          # alongside single-line @deprecated(reason: "...").
-          BAD=$(perl -0777 -ne 'print "VIOLATION\n" while /@deprecated\((?!\s*reason:)/sg' \
-            apps/gateway/supergraph.graphql 2>/dev/null || true)
-          if [ -n "$BAD" ]; then
-            echo "ERROR: @deprecated directives without reason:"
-            grep -n "@deprecated" apps/gateway/supergraph.graphql
-            exit 1
-          fi
-          echo "OK: All supergraph-level deprecation reasons present"
+          # Uses Node.js to read the whole file and check for @deprecated(
+          # NOT followed by whitespace+reason:, handling both single-line
+          # @deprecated(reason: "...") and multi-line @deprecated(\n  reason:)
+          # formats produced by Hive composition tools.
+          node -e "
+            const fs = require('fs');
+            const sdl = fs.readFileSync('apps/gateway/supergraph.graphql', 'utf-8');
+            const re = /@deprecated\(/g;
+            let m, bad = 0;
+            while ((m = re.exec(sdl)) !== null) {
+              const after = sdl.slice(m.index + m[0].length);
+              if (!/^[\s]*reason:/.test(after)) { bad++; }
+            }
+            if (bad > 0) {
+              console.error('ERROR: @deprecated directives without reason: ' + bad + ' violation(s)');
+              process.exit(1);
+            }
+            console.log('OK: All supergraph-level deprecation reasons present');
+          "
 
       - name: Run schema structural tests
         run: pnpm --filter @edusphere/gateway test -- tests/schema-lint.test.ts --reporter=verbose

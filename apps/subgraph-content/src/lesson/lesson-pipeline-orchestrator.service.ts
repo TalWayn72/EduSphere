@@ -3,7 +3,6 @@ import {
   createDatabaseConnection,
   schema,
   eq,
-  and,
   closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
@@ -195,7 +194,7 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
   private async executeModule(
     node: PipelineNode,
     context: Record<string, unknown>,
-    tenantCtx: TenantContext
+    _tenantCtx: TenantContext
   ): Promise<Record<string, unknown>> {
     const model = (node.config['model'] as string | undefined) ?? 'gpt-4o';
     const locale = 'he';

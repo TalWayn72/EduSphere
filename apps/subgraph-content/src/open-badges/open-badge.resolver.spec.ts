@@ -68,30 +68,30 @@ describe('OpenBadgeResolver', () => {
 
   // ── requireAuth ────────────────────────────────────────────────────────────
 
-  describe('requireAuth (tested via myBadges)', () => {
+  describe('requireAuth (tested via myOpenBadges)', () => {
     it('throws UnauthorizedException when authContext is absent', async () => {
-      await expect(resolver.myBadges(noAuthCtx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myOpenBadges(noAuthCtx)).rejects.toThrow(UnauthorizedException);
       expect(mockGetUserBadges).not.toHaveBeenCalled();
     });
 
     it('throws UnauthorizedException when userId is missing', async () => {
       const ctx = makeCtx({ userId: undefined as unknown as string, tenantId: 't1', roles: [] });
-      await expect(resolver.myBadges(ctx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myOpenBadges(ctx)).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException when tenantId is missing', async () => {
       const ctx = makeCtx({ userId: 'u1', tenantId: undefined as unknown as string, roles: [] });
-      await expect(resolver.myBadges(ctx)).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.myOpenBadges(ctx)).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  // ── myBadges ──────────────────────────────────────────────────────────────
+  // ── myOpenBadges ──────────────────────────────────────────────────────────
 
-  describe('myBadges()', () => {
+  describe('myOpenBadges()', () => {
     it('delegates to service.getUserBadges with userId and tenantId', async () => {
       mockGetUserBadges.mockResolvedValueOnce([MOCK_ASSERTION]);
 
-      const result = await resolver.myBadges(makeCtx());
+      const result = await resolver.myOpenBadges(makeCtx());
 
       expect(mockGetUserBadges).toHaveBeenCalledWith('user-1', 'tenant-1');
       expect(result).toEqual([MOCK_ASSERTION]);
@@ -99,7 +99,7 @@ describe('OpenBadgeResolver', () => {
 
     it('returns empty array when user has no badges', async () => {
       mockGetUserBadges.mockResolvedValueOnce([]);
-      const result = await resolver.myBadges(makeCtx());
+      const result = await resolver.myOpenBadges(makeCtx());
       expect(result).toEqual([]);
     });
   });
@@ -140,6 +140,27 @@ describe('OpenBadgeResolver', () => {
 
       expect(result.valid).toBe(false);
       expect(result.error).toBe('Assertion not found');
+    });
+  });
+
+  // ── verifyOpenBadge ───────────────────────────────────────────────────────
+
+  describe('verifyOpenBadge()', () => {
+    it('returns true when credential is valid', async () => {
+      mockVerifyCredential.mockResolvedValueOnce({ valid: true, assertion: MOCK_ASSERTION });
+
+      const result = await resolver.verifyOpenBadge('assertion-1');
+
+      expect(mockVerifyCredential).toHaveBeenCalledWith('assertion-1');
+      expect(result).toBe(true);
+    });
+
+    it('returns false when credential is invalid', async () => {
+      mockVerifyCredential.mockResolvedValueOnce({ valid: false, error: 'Revoked' });
+
+      const result = await resolver.verifyOpenBadge('bad-id');
+
+      expect(result).toBe(false);
     });
   });
 

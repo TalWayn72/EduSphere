@@ -114,7 +114,7 @@ export class LessonPipelineService implements OnModuleDestroy {
   async savePipeline(
     lessonId: string,
     input: SaveLessonPipelineInput,
-    tenantCtx: TenantContext
+    _tenantCtx: TenantContext
   ) {
     const existing = await this.findByLesson(lessonId);
     if (existing) {
