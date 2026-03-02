@@ -5,7 +5,7 @@ import NetInfo from '@react-native-community/netinfo';
 
 export const offlineLink = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
-    let subscription: any;
+    let subscription: { unsubscribe: () => void } | undefined;
 
     NetInfo.fetch().then((state) => {
       const isOnline = state.isConnected ?? false;

@@ -28,6 +28,21 @@ const COURSE_DETAIL_QUERY = gql`
   }
 `;
 
+interface ContentItem {
+  id: string;
+  title: string;
+  type: string;
+  orderIndex: number;
+}
+
+interface Module {
+  id: string;
+  title: string;
+  description: string;
+  orderIndex: number;
+  contentItems: ContentItem[];
+}
+
 type Props = NativeStackScreenProps<RootStackParamList, 'CourseDetail'>;
 
 export default function CourseDetailScreen({ route }: Props) {
@@ -66,14 +81,14 @@ export default function CourseDetailScreen({ route }: Props) {
 
       <View style={styles.modulesSection}>
         <Text style={styles.sectionTitle}>📖 {t('modules')}</Text>
-        {course.modules?.map((module: any) => (
+        {course.modules?.map((module: Module) => (
           <View key={module.id} style={styles.moduleCard}>
             <Text style={styles.moduleTitle}>{module.title}</Text>
             <Text style={styles.moduleDescription}>{module.description}</Text>
 
             {module.contentItems?.length > 0 && (
               <View style={styles.contentItems}>
-                {module.contentItems.map((item: any) => (
+                {module.contentItems.map((item: ContentItem) => (
                   <View key={item.id} style={styles.contentItem}>
                     <Text style={styles.contentIcon}>
                       {item.type === 'VIDEO' && '🎥'}

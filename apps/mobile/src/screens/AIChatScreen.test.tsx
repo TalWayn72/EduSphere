@@ -16,13 +16,17 @@ vi.mock('@apollo/client', () => ({
 vi.mock('../navigation', () => ({ default: {} }));
 
 import AIChatScreen from './AIChatScreen';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation';
+
+type AIChatScreenProps = NativeStackScreenProps<RootStackParamList, 'AIChat'>;
 
 const MOCK_ROUTE = {
   params: { sessionId: 'session-abc' },
   key: 'AIChat',
   name: 'AIChat' as const,
 };
-const MOCK_NAV = {} as any;
+const MOCK_NAV = {} as unknown as AIChatScreenProps['navigation'];
 
 const AI_RESPONSE = {
   id: 'msg-ai-1',
@@ -44,14 +48,14 @@ beforeEach(() => {
 describe('AIChatScreen', () => {
   it('renders empty chat state', () => {
     const { getByTestId } = render(
-      <AIChatScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
     );
     expect(getByTestId('chat-message-list')).toBeTruthy();
   });
 
   it('renders message bubbles after receiving response', async () => {
     const { getByTestId, findByText } = render(
-      <AIChatScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
     );
 
     const input = getByTestId('chat-input');
@@ -68,7 +72,7 @@ describe('AIChatScreen', () => {
 
   it('send button triggers mutation', async () => {
     const { getByTestId } = render(
-      <AIChatScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
     );
 
     fireEvent.changeText(getByTestId('chat-input'), 'Test message');
@@ -92,7 +96,7 @@ describe('AIChatScreen', () => {
     mockUseMutation.mockReturnValue([mockMutateFn, { loading: false }]);
 
     const { getByTestId, findByTestId } = render(
-      <AIChatScreen route={MOCK_ROUTE as any} navigation={MOCK_NAV} />
+      <AIChatScreen route={MOCK_ROUTE as unknown as AIChatScreenProps['route']} navigation={MOCK_NAV} />
     );
 
     fireEvent.changeText(getByTestId('chat-input'), 'Hello');

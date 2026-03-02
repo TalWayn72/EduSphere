@@ -38,9 +38,16 @@ const MESSAGE_SUB = gql`
   }
 `;
 
+interface AgentMessage {
+  id: string;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
 export default function AITutorScreen() {
   const { t } = useTranslation('agents');
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<AgentMessage[]>([]);
   const [input, setInput] = useState('');
   const flatListRef = useRef<FlatList>(null);
   const sessionId = 'demo-session'; // TODO: Create session on mount

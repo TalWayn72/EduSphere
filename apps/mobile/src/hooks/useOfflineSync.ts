@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useApolloClient } from '@apollo/client';
+import type { DocumentNode } from 'graphql';
 import NetInfo from '@react-native-community/netinfo';
 import { database } from '../services/database';
 
@@ -43,7 +44,7 @@ export function useOfflineSync() {
         try {
           // Execute the mutation
           await client.mutate({
-            mutation: item.mutation as any,
+            mutation: item.mutation as unknown as DocumentNode,
             variables:
               typeof item.variables === 'string'
                 ? JSON.parse(item.variables)
