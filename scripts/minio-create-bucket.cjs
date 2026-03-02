@@ -30,7 +30,11 @@ function getSignatureKey(key, dateStamp, regionName, serviceName) {
 function makeRequest(method, path, body, contentType) {
   return new Promise((resolve, reject) => {
     const now = new Date();
-    const amzDate = now.toISOString().replace(/[:\-]|\.\d{3}/g, '').slice(0, 15) + 'Z';
+    const amzDate =
+      now
+        .toISOString()
+        .replace(/[:\-]|\.\d{3}/g, '')
+        .slice(0, 15) + 'Z';
     const dateStamp = amzDate.slice(0, 8);
 
     const payloadHash = crypto
@@ -38,12 +42,13 @@ function makeRequest(method, path, body, contentType) {
       .update(body || '')
       .digest('hex');
 
-    const canonicalHeaders = [
-      `content-type:${contentType || 'application/octet-stream'}`,
-      `host:${ENDPOINT}:${PORT}`,
-      `x-amz-content-sha256:${payloadHash}`,
-      `x-amz-date:${amzDate}`,
-    ].join('\n') + '\n';
+    const canonicalHeaders =
+      [
+        `content-type:${contentType || 'application/octet-stream'}`,
+        `host:${ENDPOINT}:${PORT}`,
+        `x-amz-content-sha256:${payloadHash}`,
+        `x-amz-date:${amzDate}`,
+      ].join('\n') + '\n';
 
     const signedHeaders = 'content-type;host;x-amz-content-sha256;x-amz-date';
 
@@ -104,22 +109,39 @@ async function main() {
   console.log(`Creating bucket '${BUCKET}' in MinIO...`);
 
   // Check if bucket exists (HEAD request)
-  const head = await makeRequest('HEAD', `/${BUCKET}`, '', 'application/octet-stream');
+  const head = await makeRequest(
+    'HEAD',
+    `/${BUCKET}`,
+    '',
+    'application/octet-stream'
+  );
   if (head.status === 200) {
     console.log(`Bucket '${BUCKET}' already exists.`);
   } else if (head.status === 404) {
     // Create bucket
-    const create = await makeRequest('PUT', `/${BUCKET}`, '', 'application/octet-stream');
+    const create = await makeRequest(
+      'PUT',
+      `/${BUCKET}`,
+      '',
+      'application/octet-stream'
+    );
     if (create.status === 200) {
       console.log(`Bucket '${BUCKET}' created successfully.`);
     } else {
-      console.error(`Failed to create bucket: HTTP ${create.status}\n${create.body}`);
+      console.error(
+        `Failed to create bucket: HTTP ${create.status}\n${create.body}`
+      );
       process.exit(1);
     }
   } else {
     console.log(`Bucket check returned: HTTP ${head.status}`);
     // Try to create anyway
-    const create = await makeRequest('PUT', `/${BUCKET}`, '', 'application/octet-stream');
+    const create = await makeRequest(
+      'PUT',
+      `/${BUCKET}`,
+      '',
+      'application/octet-stream'
+    );
     console.log(`Create attempt: HTTP ${create.status}\n${create.body}`);
   }
 
@@ -141,7 +163,12 @@ async function main() {
   </CORSRule>
 </CORSConfiguration>`;
 
-  const cors = await makeRequest('PUT', `/${BUCKET}?cors`, corsXml, 'application/xml');
+  const cors = await makeRequest(
+    'PUT',
+    `/${BUCKET}?cors`,
+    corsXml,
+    'application/xml'
+  );
   if (cors.status === 200) {
     console.log('CORS policy set successfully.');
   } else {

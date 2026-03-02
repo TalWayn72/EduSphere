@@ -14,6 +14,7 @@
 ### Problem
 
 Uploading a file in the Course Wizard Media step (`/courses/new` step 3) failed with:
+
 - UI: "Upload failed: Not Found"
 - Console: `404 Not Found` from `localhost:9000/edusphere/...`
 - Console: urql "Invalid key: The GraphQL query at the field `Query.getPresignedUploadUrl` has a selection set, but no key could be generated"
@@ -28,15 +29,15 @@ Uploading a file in the Course Wizard Media step (`/courses/new` step 3) failed 
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `infrastructure/docker/startup.sh` | Added `mkdir -p /data/minio/edusphere` + heredoc to write `minio-create-bucket.cjs` to `/tmp` before supervisord |
-| `infrastructure/docker/supervisord.conf` | Added `[program:minio-init]` one-shot (priority 45, `sleep 8 && node /tmp/minio-create-bucket.cjs`) |
-| `scripts/minio-create-bucket.cjs` | New pure Node.js S3 API client (built-ins only: `http`+`crypto`, AWS Sig V4) — creates bucket + sets CORS policy |
-| `apps/web/src/lib/urql-client.ts` | Added `PresignedUploadUrl: () => null` to `keys` config |
-| `apps/subgraph-content/src/media/media.service.ts` | UUID regex validation for courseId (store null for 'draft'); extended mimeMap with doc/docx/xls/xlsx/ppt/pptx/txt |
-| `apps/web/src/pages/CourseWizardMediaStep.tsx` | Added Office document MIME types + extensions to `ACCEPTED_TYPES` |
-| `docker-compose.yml` | Fixed `MINIO_ENCRYPTION_KEY` default from invalid-base64 `CHANGE_ME_...!` to valid base64 `dGhpcy1pcy1hLTMyLWJ5dGUtZGV2LXNlY3JldC1rZXk=` |
+| File                                               | Change                                                                                                                                   |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `infrastructure/docker/startup.sh`                 | Added `mkdir -p /data/minio/edusphere` + heredoc to write `minio-create-bucket.cjs` to `/tmp` before supervisord                         |
+| `infrastructure/docker/supervisord.conf`           | Added `[program:minio-init]` one-shot (priority 45, `sleep 8 && node /tmp/minio-create-bucket.cjs`)                                      |
+| `scripts/minio-create-bucket.cjs`                  | New pure Node.js S3 API client (built-ins only: `http`+`crypto`, AWS Sig V4) — creates bucket + sets CORS policy                         |
+| `apps/web/src/lib/urql-client.ts`                  | Added `PresignedUploadUrl: () => null` to `keys` config                                                                                  |
+| `apps/subgraph-content/src/media/media.service.ts` | UUID regex validation for courseId (store null for 'draft'); extended mimeMap with doc/docx/xls/xlsx/ppt/pptx/txt                        |
+| `apps/web/src/pages/CourseWizardMediaStep.tsx`     | Added Office document MIME types + extensions to `ACCEPTED_TYPES`                                                                        |
+| `docker-compose.yml`                               | Fixed `MINIO_ENCRYPTION_KEY` default from invalid-base64 `CHANGE_ME_...!` to valid base64 `dGhpcy1pcy1hLTMyLWJ5dGUtZGV2LXNlY3JldC1rZXk=` |
 
 ### Verification
 
