@@ -122,7 +122,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NODE_VERSION=20
-            PNPM_VERSION=9
+            PNPM_VERSION=10
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VCS_REF=${{ github.sha }}
             VERSION=${{ steps.meta.outputs.version }}
