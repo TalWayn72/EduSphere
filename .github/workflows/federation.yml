@@ -202,11 +202,15 @@ jobs:
 
       - name: Check @deprecated directives have reasons (supergraph level)
         run: |
-          # Every @deprecated in supergraph must include reason argument
-          BAD=$(grep -P "@deprecated(?!\(reason:)" apps/gateway/supergraph.graphql 2>/dev/null || true)
+          # Every @deprecated in supergraph must include reason argument.
+          # Uses perl -0777 to read the whole file as one string so that
+          # multi-line @deprecated(\n  reason: "...") is handled correctly
+          # alongside single-line @deprecated(reason: "...").
+          BAD=$(perl -0777 -ne 'print "VIOLATION\n" while /@deprecated\((?!\s*reason:)/sg' \
+            apps/gateway/supergraph.graphql 2>/dev/null || true)
           if [ -n "$BAD" ]; then
             echo "ERROR: @deprecated directives without reason:"
-            echo "$BAD"
+            grep -n "@deprecated" apps/gateway/supergraph.graphql
             exit 1
           fi
           echo "OK: All supergraph-level deprecation reasons present"

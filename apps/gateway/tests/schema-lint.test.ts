@@ -41,8 +41,10 @@ describe('Schema Structural Validation', () => {
   });
 
   it('all @deprecated directives include a reason argument', () => {
+    // \s* handles both single-line @deprecated(reason: "...") and
+    // multi-line @deprecated(\n  reason: "...") produced by composition tools.
     const deprecatedWithReason = (
-      schemaSDL.match(/@deprecated\(reason:/g) ?? []
+      schemaSDL.match(/@deprecated\(\s*reason:/g) ?? []
     ).length;
     const deprecatedTotal = (schemaSDL.match(/@deprecated/g) ?? []).length;
     // Every @deprecated must have a reason
