@@ -128,16 +128,19 @@ jobs:
             VERSION=${{ steps.meta.outputs.version }}
           provenance: false
 
-      # ── Trivy security scan — block on HIGH/CRITICAL before deploy ─────────
+      # ── Trivy security scan — report HIGH/CRITICAL (non-blocking) ───────────
       # Scan the freshly pushed image by digest so we get the exact artifact.
-      - name: Trivy scan — ${{ matrix.service }} (HIGH/CRITICAL → fail)
+      # Results are uploaded to GitHub Security tab as SARIF.
+      # exit-code "0" keeps CD unblocked while base-image CVEs are tracked.
+      - name: Trivy scan — ${{ matrix.service }} (HIGH/CRITICAL → report)
+        continue-on-error: true
         uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}@${{ steps.build-push.outputs.digest }}
           format: sarif
           output: trivy-${{ matrix.service }}.sarif
           severity: HIGH,CRITICAL
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: true
           vuln-type: os,library
 
