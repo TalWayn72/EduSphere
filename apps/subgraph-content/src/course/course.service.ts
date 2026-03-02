@@ -83,8 +83,10 @@ export class CourseService implements OnModuleDestroy {
   }
 
   async create(input: CreateCourseInput) {
-    const slug =
-      input.slug || input.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const rawSlug = (
+      input.slug ?? input.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    ).replace(/^-+|-+$/g, '');
+    const slug = rawSlug || `course-${Date.now().toString(36)}`;
     const instructorId = input.instructorId || input.creatorId || '';
     const [course] = await this.db
       .insert(schema.courses)

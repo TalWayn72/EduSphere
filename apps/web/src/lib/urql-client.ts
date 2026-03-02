@@ -20,6 +20,7 @@ export const urqlClient = createClient({
       keys: {
         PageInfo: () => null,
         UserPreferences: () => null,
+        PresignedUploadUrl: () => null,
         CourseProgress: (data) =>
           (data as { courseId?: string }).courseId ?? null,
       },

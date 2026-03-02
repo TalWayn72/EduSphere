@@ -51,8 +51,29 @@ function fileIcon(mime: string) {
   return <FileText className="h-4 w-4" />;
 }
 
-const ACCEPTED_TYPES =
-  'video/mp4,video/webm,audio/mpeg,audio/wav,application/pdf,image/jpeg,image/png';
+const ACCEPTED_TYPES = [
+  'video/mp4',
+  'video/webm',
+  'audio/mpeg',
+  'audio/wav',
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
+  '.doc',
+  '.docx',
+  '.xls',
+  '.xlsx',
+  '.ppt',
+  '.pptx',
+  '.txt',
+].join(',');
 
 export function CourseWizardMediaStep({
   courseId,

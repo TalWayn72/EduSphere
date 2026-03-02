@@ -80,7 +80,7 @@ services:
       - DATABASE_URL=postgresql://edusphere:edusphere_dev_password@localhost:5432/edusphere?sslmode=prefer
       # G-17: MinIO Server-Side Encryption (SSE-S3 / AES-256)
       # Format: "key-name:base64-32-byte-secret" — use vault-managed secret in production
-      - MINIO_KMS_SECRET_KEY=edusphere-encryption-key:${MINIO_ENCRYPTION_KEY:-CHANGE_ME_REPLACE_WITH_32_CHAR_MIN_KEY!}
+      - MINIO_KMS_SECRET_KEY=edusphere-encryption-key:${MINIO_ENCRYPTION_KEY:-dGhpcy1pcy1hLTMyLWJ5dGUtZGV2LXNlY3JldC1rZXk=}
       # G-16: NATS TLS — set NATS_TLS_CERT/KEY/CA env vars in .env for mTLS in production
       # Dev default: plain-text NATS (no TLS); all three vars must be set for production mTLS
       # CORS

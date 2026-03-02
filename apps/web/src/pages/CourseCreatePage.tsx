@@ -143,8 +143,12 @@ export function CourseCreatePage() {
 
   const handlePublish = async (publish: boolean) => {
     const vals = form.getValues();
-    const slug = vals.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const instructorId = user?.id ?? 'unknown';
+    const rawSlug = vals.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const slug = rawSlug || `course-${Date.now().toString(36)}`;
+    const instructorId = user?.id ?? '';
 
     const { data, error } = await executeMutation({
       input: {

@@ -178,6 +178,70 @@ for SDL in tenant/tenant.graphql user/user.graphql gamification/gamification.gra
 done
 echo "✅ subgraph-core SDL sync complete"
 
+# ─── Initialize MinIO bucket (idempotent) ────────────────────
+# Pre-create bucket directory so MinIO recognizes it on startup.
+echo "🪣 Pre-creating MinIO bucket directory 'edusphere'..."
+mkdir -p /data/minio/edusphere
+echo "✅ MinIO bucket directory created"
+
+# Write the minio-init script to /tmp so supervisord can run it after MinIO starts.
+cat > /tmp/minio-create-bucket.cjs << 'MINIO_INIT_SCRIPT'
+'use strict';
+const http = require('http');
+const crypto = require('crypto');
+const ENDPOINT = 'localhost';
+const PORT = 9000;
+const ACCESS_KEY = 'minioadmin';
+const SECRET_KEY = 'minioadmin';
+const BUCKET = 'edusphere';
+const REGION = 'us-east-1';
+function hmac(key, data) { return crypto.createHmac('sha256', key).update(data).digest(); }
+function getSignatureKey(key, dateStamp, regionName, serviceName) {
+  const kDate = hmac('AWS4' + key, dateStamp);
+  const kRegion = hmac(kDate, regionName);
+  const kService = hmac(kRegion, serviceName);
+  return hmac(kService, 'aws4_request');
+}
+function makeRequest(method, path, body, contentType) {
+  return new Promise((resolve, reject) => {
+    const now = new Date();
+    const amzDate = now.toISOString().replace(/[:\-]|\.\d{3}/g, '').slice(0, 15) + 'Z';
+    const dateStamp = amzDate.slice(0, 8);
+    const payloadHash = crypto.createHash('sha256').update(body || '').digest('hex');
+    const ct = contentType || 'application/octet-stream';
+    const canonicalHeaders = `content-type:${ct}\nhost:${ENDPOINT}:${PORT}\nx-amz-content-sha256:${payloadHash}\nx-amz-date:${amzDate}\n`;
+    const signedHeaders = 'content-type;host;x-amz-content-sha256;x-amz-date';
+    const canonicalRequest = [method, path, '', canonicalHeaders, signedHeaders, payloadHash].join('\n');
+    const credentialScope = `${dateStamp}/${REGION}/s3/aws4_request`;
+    const stringToSign = ['AWS4-HMAC-SHA256', amzDate, credentialScope, crypto.createHash('sha256').update(canonicalRequest).digest('hex')].join('\n');
+    const signingKey = getSignatureKey(SECRET_KEY, dateStamp, REGION, 's3');
+    const signature = crypto.createHmac('sha256', signingKey).update(stringToSign).digest('hex');
+    const authHeader = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+    const bodyBuf = Buffer.from(body || '');
+    const req = http.request({ hostname: ENDPOINT, port: PORT, path, method, headers: { Authorization: authHeader, 'Content-Type': ct, 'Content-Length': bodyBuf.length, 'x-amz-content-sha256': payloadHash, 'x-amz-date': amzDate } }, (res) => {
+      let data = ''; res.on('data', (c) => (data += c)); res.on('end', () => resolve({ status: res.statusCode, body: data }));
+    });
+    req.on('error', reject);
+    if (bodyBuf.length > 0) req.write(bodyBuf);
+    req.end();
+  });
+}
+async function main() {
+  console.log(`Checking MinIO bucket '${BUCKET}'...`);
+  const head = await makeRequest('HEAD', `/${BUCKET}`, '', 'application/octet-stream');
+  if (head.status === 200 || head.status === 403) {
+    console.log(`Bucket '${BUCKET}' exists (HTTP ${head.status}).`);
+  } else {
+    const create = await makeRequest('PUT', `/${BUCKET}`, '', 'application/octet-stream');
+    if (create.status === 200) { console.log(`Bucket '${BUCKET}' created.`); }
+    else { console.error(`Failed to create bucket: HTTP ${create.status}\n${create.body}`); process.exit(1); }
+  }
+  console.log('MinIO init complete.');
+}
+main().catch((err) => { console.error('Error:', err); process.exit(1); });
+MINIO_INIT_SCRIPT
+echo "✅ MinIO init script written to /tmp/minio-create-bucket.cjs"
+
 # ─── Hand off to supervisord ─────────────────────────────────
 echo "🎯 Starting all services via Supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/edusphere.conf

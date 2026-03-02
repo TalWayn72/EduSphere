@@ -83,10 +83,12 @@ export class CourseResolver {
     @Args('input') input: Record<string, unknown>,
     @Context() ctx: GqlContext
   ) {
-    requireAuth(ctx);
-    return this.courseService.create(
-      input as unknown as Parameters<CourseService['create']>[0]
-    );
+    const tenantCtx = requireAuth(ctx);
+    return this.courseService.create({
+      ...(input as unknown as Parameters<CourseService['create']>[0]),
+      tenantId: tenantCtx.tenantId,
+      creatorId: tenantCtx.userId,
+    });
   }
 
   @Mutation('updateCourse')

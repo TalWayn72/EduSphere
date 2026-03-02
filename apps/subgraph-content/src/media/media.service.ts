@@ -127,11 +127,16 @@ export class MediaService implements OnModuleDestroy {
   ): Promise<MediaAssetResult> {
     const contentType = this.extractContentTypeFromKey(fileKey);
 
+    // UUID regex — 'draft' or any non-UUID courseId is stored as null
+    const uuidRe =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const resolvedCourseId = uuidRe.test(courseId) ? courseId : null;
+
     const [asset] = await this.db
       .insert(schema.media_assets)
       .values({
         tenant_id: tenantId,
-        course_id: courseId,
+        course_id: resolvedCourseId,
         title,
         media_type: this.detectMediaType(contentType),
         file_url: fileKey,
@@ -279,6 +284,13 @@ export class MediaService implements OnModuleDestroy {
       jpg: 'image/jpeg',
       jpeg: 'image/jpeg',
       png: 'image/png',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ppt: 'application/vnd.ms-powerpoint',
+      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      txt: 'text/plain',
     };
     return mimeMap[ext as keyof typeof mimeMap] ?? 'application/octet-stream';
   }
