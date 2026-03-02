@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  BookOpen,
   Clock,
   Users,
   Plus,
@@ -469,13 +468,6 @@ export function CourseList() {
                         </span>
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BookOpen className="h-4 w-4 shrink-0" />
-                      <span className="truncate font-mono text-xs">
-                        {course.instructorId}
-                      </span>
-                    </div>
-
                     {!isInstructor && (
                       <Button
                         variant={isEnrolled ? 'secondary' : 'default'}
