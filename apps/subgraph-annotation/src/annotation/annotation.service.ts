@@ -12,12 +12,20 @@ import {
 import type { Database, TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
+type AnnotationLayer = 'PERSONAL' | 'SHARED' | 'INSTRUCTOR' | 'AI_GENERATED';
+type AnnotationType =
+  | 'TEXT'
+  | 'SKETCH'
+  | 'LINK'
+  | 'BOOKMARK'
+  | 'SPATIAL_COMMENT';
+
 interface CreateAnnotationInput {
   assetId: string;
-  annotationType: string;
-  layer?: string;
-  content: unknown;
-  spatialData?: unknown;
+  annotationType: AnnotationType;
+  layer?: AnnotationLayer;
+  content: Record<string, unknown>;
+  spatialData?: Record<string, unknown> | null;
   parentId?: string;
 }
 
@@ -103,7 +111,7 @@ export class AnnotationService implements OnModuleDestroy {
       );
 
       if (filters.layer) {
-        conditions.push(eq(schema.annotations.layer, filters.layer as string));
+        conditions.push(sql`${schema.annotations.layer} = ${filters.layer}`);
         // PERSONAL layer only visible to owner
         if (filters.layer === 'PERSONAL') {
           conditions.push(eq(schema.annotations.user_id, authContext.userId));
@@ -156,7 +164,7 @@ export class AnnotationService implements OnModuleDestroy {
       );
 
       if (layer) {
-        conditions.push(eq(schema.annotations.layer, layer as string));
+        conditions.push(sql`${schema.annotations.layer} = ${layer}`);
         // PERSONAL layer only visible to owner
         if (layer === 'PERSONAL') {
           conditions.push(eq(schema.annotations.user_id, authContext.userId));
@@ -280,7 +288,8 @@ export class AnnotationService implements OnModuleDestroy {
         );
       }
 
-      const updateData: Record<string, unknown> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateData: any = {};
 
       if (input.content !== undefined) {
         updateData.content = input.content;
