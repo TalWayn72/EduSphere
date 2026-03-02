@@ -1,0 +1,19 @@
+{
+  "loading": "加载卡片中...",
+  "errorLoading": "加载复习卡片失败",
+  "backToDashboard": "返回仪表板",
+  "sessionComplete": "本次复习完成！",
+  "correct": "正确",
+  "incorrect": "错误",
+  "noCardsDue": "暂无到期卡片",
+  "noCardsDueHint": "太棒了！稍后再来查看，或浏览课程生成新的复习卡片。",
+  "browseCourses": "浏览课程",
+  "flipCard": "翻转卡片",
+  "interval": "间隔",
+  "easeFactor": "难度",
+  "showAnswer": "显示答案",
+  "rateAgain": "再次",
+  "rateHard": "困难",
+  "rateGood": "良好",
+  "rateEasy": "简单"
+}

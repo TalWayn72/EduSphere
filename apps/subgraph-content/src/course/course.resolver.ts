@@ -87,6 +87,7 @@ export class CourseResolver {
     return this.courseService.create({
       ...(input as unknown as Parameters<CourseService['create']>[0]),
       tenantId: tenantCtx.tenantId,
+      instructorId: tenantCtx.userId,
       creatorId: tenantCtx.userId,
     });
   }
@@ -95,12 +96,31 @@ export class CourseResolver {
   async updateCourse(
     @Args('id') id: string,
     @Args('input') input: Record<string, unknown>,
-    @Context() _ctx: GqlContext
+    @Context() ctx: GqlContext
   ) {
+    requireAuth(ctx);
     return this.courseService.update(
       id,
       input as unknown as Parameters<CourseService['update']>[1]
     );
+  }
+
+  @Mutation('publishCourse')
+  async publishCourse(@Args('id') id: string, @Context() ctx: GqlContext) {
+    requireAuth(ctx);
+    return this.courseService.setPublished(id, true);
+  }
+
+  @Mutation('unpublishCourse')
+  async unpublishCourse(@Args('id') id: string, @Context() ctx: GqlContext) {
+    requireAuth(ctx);
+    return this.courseService.setPublished(id, false);
+  }
+
+  @Mutation('deleteCourse')
+  async deleteCourse(@Args('id') id: string, @Context() ctx: GqlContext) {
+    requireAuth(ctx);
+    return this.courseService.delete(id);
   }
 
   // ── Enrollment ───────────────────────────────────────────────

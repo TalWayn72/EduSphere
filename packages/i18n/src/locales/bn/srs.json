@@ -1,0 +1,19 @@
+{
+  "loading": "কার্ড লোড হচ্ছে...",
+  "errorLoading": "রিভিউ কার্ড লোড করতে ব্যর্থ",
+  "backToDashboard": "ড্যাশবোর্ডে ফিরে যান",
+  "sessionComplete": "সেশন সম্পূর্ণ!",
+  "correct": "সঠিক",
+  "incorrect": "ভুল",
+  "noCardsDue": "কোনো কার্ড বাকি নেই",
+  "noCardsDueHint": "চমৎকার! পরে আবার দেখুন বা নতুন কার্ড তৈরি করতে কোর্স খুঁজুন।",
+  "browseCourses": "কোর্স দেখুন",
+  "flipCard": "কার্ড উল্টান",
+  "interval": "ব্যবধান",
+  "easeFactor": "সহজতা",
+  "showAnswer": "উত্তর দেখান",
+  "rateAgain": "আবার",
+  "rateHard": "কঠিন",
+  "rateGood": "ভালো",
+  "rateEasy": "সহজ"
+}

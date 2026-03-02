@@ -41,7 +41,8 @@ export interface AuthUser {
   scopes: string[];
 }
 
-// Mock user for development — IDs match the seeded dev user in packages/db seed
+// Mock user for development — ID matches the seeded super.admin@edusphere.dev
+// row in the users table (run `pnpm --filter @edusphere/db seed` to provision).
 const DEV_USER: AuthUser = {
   id: '00000000-0000-0000-0000-000000000001',
   username: 'super.admin',

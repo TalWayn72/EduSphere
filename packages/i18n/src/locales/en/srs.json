@@ -1,0 +1,19 @@
+{
+  "loading": "Loading cards...",
+  "errorLoading": "Failed to load review cards",
+  "backToDashboard": "Back to Dashboard",
+  "sessionComplete": "Session Complete!",
+  "correct": "Correct",
+  "incorrect": "Incorrect",
+  "noCardsDue": "No cards due",
+  "noCardsDueHint": "Great job! Check back later or explore courses to generate new review cards.",
+  "browseCourses": "Browse Courses",
+  "flipCard": "Flip card",
+  "interval": "Interval",
+  "easeFactor": "Ease",
+  "showAnswer": "Show Answer",
+  "rateAgain": "Again",
+  "rateHard": "Hard",
+  "rateGood": "Good",
+  "rateEasy": "Easy"
+}

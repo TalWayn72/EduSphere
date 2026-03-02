@@ -1,0 +1,19 @@
+{
+  "loading": "Carregando cartões...",
+  "errorLoading": "Falha ao carregar cartões de revisão",
+  "backToDashboard": "Voltar ao painel",
+  "sessionComplete": "Sessão concluída!",
+  "correct": "Correto",
+  "incorrect": "Incorreto",
+  "noCardsDue": "Sem cartões pendentes",
+  "noCardsDueHint": "Ótimo trabalho! Volte mais tarde ou explore cursos para gerar novos cartões.",
+  "browseCourses": "Explorar cursos",
+  "flipCard": "Virar cartão",
+  "interval": "Intervalo",
+  "easeFactor": "Facilidade",
+  "showAnswer": "Mostrar resposta",
+  "rateAgain": "De novo",
+  "rateHard": "Difícil",
+  "rateGood": "Bom",
+  "rateEasy": "Fácil"
+}

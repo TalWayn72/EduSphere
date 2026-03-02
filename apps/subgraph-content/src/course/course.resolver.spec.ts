@@ -7,6 +7,8 @@ const mockCourseService = {
   findAll: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
+  setPublished: vi.fn(),
+  delete: vi.fn(),
 };
 
 const mockEnrollmentService = {
@@ -107,8 +109,10 @@ describe('CourseResolver', () => {
       mockCourseService.create.mockResolvedValue(MOCK_COURSE);
       const input = { title: 'New', instructorId: 'u-1' };
       const result = await resolver.createCourse(input, AUTH_CTX);
+      // instructorId is overridden from auth context (security: ignore client-supplied value)
       expect(mockCourseService.create).toHaveBeenCalledWith({
-        ...input,
+        title: 'New',
+        instructorId: 'user-1',
         tenantId: 'tenant-1',
         creatorId: 'user-1',
       });
@@ -130,6 +134,53 @@ describe('CourseResolver', () => {
       const result = await resolver.updateCourse('course-1', input, AUTH_CTX);
       expect(mockCourseService.update).toHaveBeenCalledWith('course-1', input);
       expect(result).toEqual(updated);
+    });
+  });
+
+  describe('publishCourse()', () => {
+    it('calls setPublished(id, true) and returns course', async () => {
+      const published = { ...MOCK_COURSE, isPublished: true };
+      mockCourseService.setPublished.mockResolvedValue(published);
+      const result = await resolver.publishCourse('course-1', AUTH_CTX);
+      expect(mockCourseService.setPublished).toHaveBeenCalledWith('course-1', true);
+      expect(result).toEqual(published);
+    });
+
+    it('throws UnauthorizedException when unauthenticated', async () => {
+      await expect(resolver.publishCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(
+        UnauthorizedException
+      );
+    });
+  });
+
+  describe('unpublishCourse()', () => {
+    it('calls setPublished(id, false) and returns course', async () => {
+      const unpublished = { ...MOCK_COURSE, isPublished: false };
+      mockCourseService.setPublished.mockResolvedValue(unpublished);
+      const result = await resolver.unpublishCourse('course-1', AUTH_CTX);
+      expect(mockCourseService.setPublished).toHaveBeenCalledWith('course-1', false);
+      expect(result).toEqual(unpublished);
+    });
+
+    it('throws UnauthorizedException when unauthenticated', async () => {
+      await expect(resolver.unpublishCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(
+        UnauthorizedException
+      );
+    });
+  });
+
+  describe('deleteCourse()', () => {
+    it('calls service.delete and returns true', async () => {
+      mockCourseService.delete.mockResolvedValue(true);
+      const result = await resolver.deleteCourse('course-1', AUTH_CTX);
+      expect(mockCourseService.delete).toHaveBeenCalledWith('course-1');
+      expect(result).toBe(true);
+    });
+
+    it('throws UnauthorizedException when unauthenticated', async () => {
+      await expect(resolver.deleteCourse('course-1', NO_AUTH_CTX)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 

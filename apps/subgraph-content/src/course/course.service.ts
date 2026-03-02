@@ -105,6 +105,26 @@ export class CourseService implements OnModuleDestroy {
     return this.mapCourse(course as Record<string, unknown>);
   }
 
+  async setPublished(id: string, isPublished: boolean) {
+    const [course] = await this.db
+      .update(schema.courses)
+      .set({ is_published: isPublished })
+      .where(eq(schema.courses.id, id))
+      .returning();
+    this.logger.log(`Course ${isPublished ? 'published' : 'unpublished'}: ${id}`);
+    return this.mapCourse(course as Record<string, unknown>);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const [course] = await this.db
+      .update(schema.courses)
+      .set({ deleted_at: new Date() })
+      .where(eq(schema.courses.id, id))
+      .returning();
+    this.logger.log(`Course soft-deleted: ${id}`);
+    return !!course;
+  }
+
   async update(id: string, input: UpdateCourseInput) {
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
     if (input.title !== undefined) updateData['title'] = input.title;

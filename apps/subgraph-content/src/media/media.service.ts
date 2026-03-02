@@ -57,6 +57,10 @@ export class MediaService implements OnModuleDestroy {
         secretAccessKey: minioConfig.secretKey,
       },
       forcePathStyle: true, // Required for MinIO
+      // Disable automatic CRC32 checksum in presigned URLs — MinIO does not
+      // require it and browsers cannot compute/send the correct value.
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
     });
 
     this.logger.log(

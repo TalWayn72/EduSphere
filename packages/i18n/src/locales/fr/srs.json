@@ -1,0 +1,19 @@
+{
+  "loading": "Chargement des cartes...",
+  "errorLoading": "Échec du chargement des cartes de révision",
+  "backToDashboard": "Retour au tableau de bord",
+  "sessionComplete": "Session terminée !",
+  "correct": "Correct",
+  "incorrect": "Incorrect",
+  "noCardsDue": "Aucune carte à réviser",
+  "noCardsDueHint": "Bravo ! Revenez plus tard ou explorez les cours pour créer de nouvelles cartes.",
+  "browseCourses": "Parcourir les cours",
+  "flipCard": "Retourner la carte",
+  "interval": "Intervalle",
+  "easeFactor": "Facilité",
+  "showAnswer": "Afficher la réponse",
+  "rateAgain": "Encore",
+  "rateHard": "Difficile",
+  "rateGood": "Bien",
+  "rateEasy": "Facile"
+}

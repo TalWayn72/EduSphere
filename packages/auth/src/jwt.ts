@@ -73,6 +73,8 @@ export class JWTValidator {
       token === 'dev-token-mock-jwt'
     ) {
       return {
+        // ID matches the seeded super.admin@edusphere.dev row in the users table.
+        // Run `pnpm --filter @edusphere/db seed` to ensure this user exists.
         userId: '00000000-0000-0000-0000-000000000001',
         email: 'super.admin@edusphere.dev',
         username: 'super.admin',

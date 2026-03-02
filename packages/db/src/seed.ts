@@ -49,6 +49,18 @@ async function seed() {
 
     console.log('✅ Created tenant 1:', tenant1?.name);
 
+    // Ensure the dev super-admin user always has the hardcoded UUID.
+    // A previous run or Keycloak bootstrap may have created the same email
+    // with a random UUID, causing onConflictDoNothing to silently skip the
+    // insert — leaving the expected ID missing. We delete any conflicting row
+    // first (it has no FK dependents on a fresh seed).
+    await db
+      .delete(users)
+      .where(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sql`email = 'super.admin@edusphere.dev' AND tenant_id = '00000000-0000-0000-0000-000000000000'::uuid AND id != '00000000-0000-0000-0000-000000000001'::uuid` as any
+      );
+
     // Create users
     await db
       .insert(users)

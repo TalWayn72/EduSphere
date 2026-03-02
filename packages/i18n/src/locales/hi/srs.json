@@ -1,0 +1,19 @@
+{
+  "loading": "कार्ड लोड हो रहे हैं...",
+  "errorLoading": "समीक्षा कार्ड लोड करने में विफल",
+  "backToDashboard": "डैशबोर्ड पर वापस जाएं",
+  "sessionComplete": "सत्र पूर्ण!",
+  "correct": "सही",
+  "incorrect": "गलत",
+  "noCardsDue": "कोई कार्ड बकाया नहीं",
+  "noCardsDueHint": "बहुत बढ़िया! बाद में वापस देखें या नए समीक्षा कार्ड बनाने के लिए पाठ्यक्रम खोजें।",
+  "browseCourses": "पाठ्यक्रम देखें",
+  "flipCard": "कार्ड पलटें",
+  "interval": "अंतराल",
+  "easeFactor": "सहजता",
+  "showAnswer": "उत्तर दिखाएं",
+  "rateAgain": "फिर से",
+  "rateHard": "कठिन",
+  "rateGood": "अच्छा",
+  "rateEasy": "आसान"
+}

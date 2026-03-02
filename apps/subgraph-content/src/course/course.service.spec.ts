@@ -17,6 +17,7 @@ const mockDb = { select: mockSelect, insert: mockInsert, update: mockUpdate };
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => mockDb),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
   withReadReplica: vi.fn((fn: (db: typeof mockDb) => unknown) => fn(mockDb)),
   schema: {
     courses: {
@@ -281,6 +282,82 @@ describe('CourseService', () => {
     it('calls .returning()', async () => {
       await service.update('course-1', { title: 'T', description: 'D' });
       expect(mockReturning).toHaveBeenCalled();
+    });
+  });
+
+  describe('setPublished()', () => {
+    beforeEach(() => {
+      mockReturning.mockResolvedValue([MOCK_COURSE]);
+      mockWhere.mockReturnValue({ returning: mockReturning });
+      mockSet.mockReturnValue({ where: mockWhere });
+      mockUpdate.mockReturnValue({ set: mockSet });
+    });
+
+    it('sets is_published to true', async () => {
+      let cap: Record<string, unknown> = {};
+      mockSet.mockImplementation((v: Record<string, unknown>) => {
+        cap = v;
+        return { where: mockWhere };
+      });
+      await service.setPublished('course-1', true);
+      expect(cap['is_published']).toBe(true);
+    });
+
+    it('sets is_published to false', async () => {
+      let cap: Record<string, unknown> = {};
+      mockSet.mockImplementation((v: Record<string, unknown>) => {
+        cap = v;
+        return { where: mockWhere };
+      });
+      await service.setPublished('course-1', false);
+      expect(cap['is_published']).toBe(false);
+    });
+
+    it('uses eq() with the provided id', async () => {
+      const { eq } = await import('@edusphere/db');
+      await service.setPublished('course-42', true);
+      expect(eq).toHaveBeenCalledWith(expect.anything(), 'course-42');
+    });
+
+    it('returns mapped course', async () => {
+      const result = await service.setPublished('course-1', true);
+      expect(result).toEqual(MOCK_COURSE);
+    });
+  });
+
+  describe('delete()', () => {
+    beforeEach(() => {
+      mockReturning.mockResolvedValue([MOCK_COURSE]);
+      mockWhere.mockReturnValue({ returning: mockReturning });
+      mockSet.mockReturnValue({ where: mockWhere });
+      mockUpdate.mockReturnValue({ set: mockSet });
+    });
+
+    it('sets deleted_at to a Date (soft delete)', async () => {
+      let cap: Record<string, unknown> = {};
+      mockSet.mockImplementation((v: Record<string, unknown>) => {
+        cap = v;
+        return { where: mockWhere };
+      });
+      await service.delete('course-1');
+      expect(cap['deleted_at']).toBeInstanceOf(Date);
+    });
+
+    it('uses eq() with the provided id', async () => {
+      const { eq } = await import('@edusphere/db');
+      await service.delete('course-99');
+      expect(eq).toHaveBeenCalledWith(expect.anything(), 'course-99');
+    });
+
+    it('returns true when course was found and soft-deleted', async () => {
+      const result = await service.delete('course-1');
+      expect(result).toBe(true);
+    });
+
+    it('returns false when no course matched', async () => {
+      mockReturning.mockResolvedValue([]);
+      const result = await service.delete('nonexistent');
+      expect(result).toBe(false);
     });
   });
 });

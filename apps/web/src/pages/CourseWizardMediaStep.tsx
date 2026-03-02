@@ -117,12 +117,21 @@ export function CourseWizardMediaStep({
     // Step 1: Get presigned URL
     updateEntry(index, { state: 'presigning', progress: 0 });
 
+    // Use network-only to always get a fresh presigned URL (bypass cache).
+    // Also fall back to 'application/octet-stream' when file.type is empty
+    // (common for .doc/.xls on Windows where the MIME type may not be registered).
+    const contentType = entry.file.type || 'application/octet-stream';
+
     const presignResult = await urqlClient
-      .query(PRESIGNED_UPLOAD_QUERY, {
-        fileName: entry.file.name,
-        contentType: entry.file.type,
-        courseId,
-      })
+      .query(
+        PRESIGNED_UPLOAD_QUERY,
+        {
+          fileName: entry.file.name,
+          contentType,
+          courseId,
+        },
+        { requestPolicy: 'network-only' }
+      )
       .toPromise();
 
     if (presignResult.error || !presignResult.data?.getPresignedUploadUrl) {
@@ -146,7 +155,7 @@ export function CourseWizardMediaStep({
       const uploadResp = await fetch(uploadUrl, {
         method: 'PUT',
         body: entry.file,
-        headers: { 'Content-Type': entry.file.type },
+        headers: { 'Content-Type': contentType },
       });
 
       if (!uploadResp.ok) {

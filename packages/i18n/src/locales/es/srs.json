@@ -1,0 +1,19 @@
+{
+  "loading": "Cargando tarjetas...",
+  "errorLoading": "Error al cargar las tarjetas de repaso",
+  "backToDashboard": "Volver al panel",
+  "sessionComplete": "¡Sesión completada!",
+  "correct": "Correcto",
+  "incorrect": "Incorrecto",
+  "noCardsDue": "Sin tarjetas pendientes",
+  "noCardsDueHint": "¡Excelente! Vuelve más tarde o explora cursos para generar nuevas tarjetas.",
+  "browseCourses": "Explorar cursos",
+  "flipCard": "Voltear tarjeta",
+  "interval": "Intervalo",
+  "easeFactor": "Facilidad",
+  "showAnswer": "Mostrar respuesta",
+  "rateAgain": "De nuevo",
+  "rateHard": "Difícil",
+  "rateGood": "Bien",
+  "rateEasy": "Fácil"
+}

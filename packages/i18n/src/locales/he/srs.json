@@ -1,0 +1,19 @@
+{
+  "loading": "טוען כרטיסים...",
+  "errorLoading": "שגיאה בטעינת כרטיסי החזרה",
+  "backToDashboard": "חזרה ללוח הבקרה",
+  "sessionComplete": "הסשן הושלם!",
+  "correct": "נכון",
+  "incorrect": "שגוי",
+  "noCardsDue": "אין כרטיסים לחזרה",
+  "noCardsDueHint": "כל הכבוד! בדוק שוב מאוחר יותר או עיין בקורסים ליצירת כרטיסי חזרה חדשים.",
+  "browseCourses": "עיין בקורסים",
+  "flipCard": "הפוך כרטיס",
+  "interval": "מרווח",
+  "easeFactor": "קלות",
+  "showAnswer": "הצג תשובה",
+  "rateAgain": "שוב",
+  "rateHard": "קשה",
+  "rateGood": "טוב",
+  "rateEasy": "קל"
+}

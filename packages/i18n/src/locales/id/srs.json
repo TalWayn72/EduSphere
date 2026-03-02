@@ -1,0 +1,19 @@
+{
+  "loading": "Memuat kartu...",
+  "errorLoading": "Gagal memuat kartu ulasan",
+  "backToDashboard": "Kembali ke dasbor",
+  "sessionComplete": "Sesi Selesai!",
+  "correct": "Benar",
+  "incorrect": "Salah",
+  "noCardsDue": "Tidak ada kartu yang jatuh tempo",
+  "noCardsDueHint": "Kerja bagus! Periksa lagi nanti atau jelajahi kursus untuk membuat kartu ulasan baru.",
+  "browseCourses": "Jelajahi Kursus",
+  "flipCard": "Balik kartu",
+  "interval": "Interval",
+  "easeFactor": "Kemudahan",
+  "showAnswer": "Tampilkan Jawaban",
+  "rateAgain": "Lagi",
+  "rateHard": "Sulit",
+  "rateGood": "Bagus",
+  "rateEasy": "Mudah"
+}
