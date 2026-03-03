@@ -4,7 +4,7 @@ import {
   subscriptionExchange,
   errorExchange,
 } from 'urql';
-import type { CombinedError } from 'urql';
+import type { CombinedError, Operation } from 'urql';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { createClient as createWsClient } from 'graphql-ws';
 import { getToken, logout, isAuthenticated } from './auth';
@@ -38,7 +38,22 @@ function hasAuthError(error: CombinedError): boolean {
 }
 
 const authErrorExchange = errorExchange({
-  onError(error: CombinedError) {
+  // onError receives the operation as the second argument (urql errorExchange API).
+  // Subscription auth failures (e.g. notificationReceived when the WebSocket
+  // connectionParams token is not forwarded by the gateway) must NOT trigger a
+  // global logout — the user's HTTP session is still valid and queries work.
+  // Subscriptions degrade gracefully: real-time updates pause, the page stays.
+  // Only query/mutation auth failures indicate a genuinely expired session.
+  onError(error: CombinedError, operation: Operation) {
+    if (operation.kind === 'subscription') {
+      if (hasAuthError(error)) {
+        console.warn(
+          '[Auth] Subscription auth error — degrading gracefully (real-time updates paused).',
+          error.message
+        );
+      }
+      return;
+    }
     if (
       hasAuthError(error) &&
       isAuthenticated() &&

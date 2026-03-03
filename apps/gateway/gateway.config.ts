@@ -158,10 +158,21 @@ export const gatewayConfig = defineConfig({
     // hive-gateway CLI does not forward the Authorization header to upstream
     // subgraphs by default. Each subgraph independently validates the JWT, so
     // it must receive the original Bearer token from the client request.
+    //
+    // Two auth paths:
+    //   HTTP (query/mutation): token in Authorization request header
+    //   WebSocket (subscription): token in graphql-ws connectionParams
+    //     → `context.connectionParams.authorization` (set by urql-client.ts)
     {
       onFetch({ options, setOptions, context }) {
-        const gqlCtx = context as { request?: Request } | null | undefined;
-        const auth = gqlCtx?.request?.headers?.get('authorization');
+        const gqlCtx = context as {
+          request?: Request;
+          connectionParams?: Record<string, string>;
+        } | null | undefined;
+        const auth =
+          gqlCtx?.request?.headers?.get('authorization') ??
+          gqlCtx?.connectionParams?.['authorization'] ??
+          null;
         if (!auth) return;
         const prev = options.headers as Record<string, string> | undefined;
         setOptions({

@@ -53,11 +53,15 @@ function hasAuthError(error: MockCombinedError): boolean {
   );
 }
 
+// operationKind mirrors the `operation.kind` check in authErrorExchange.onError.
+// Subscriptions degrade gracefully — they must NEVER trigger logout/redirect.
 function shouldRedirectOnError(
   error: MockCombinedError,
   authenticated: boolean,
-  pathname: string
+  pathname: string,
+  operationKind = 'query'
 ): boolean {
+  if (operationKind === 'subscription') return false;
   return (
     hasAuthError(error) &&
     authenticated &&
@@ -173,5 +177,29 @@ describe('urql auth error exchange — redirect logic', () => {
 
   it('does NOT redirect when on /login/callback sub-path', () => {
     expect(shouldRedirectOnError(unauthorizedError, true, '/login/callback')).toBe(false);
+  });
+
+  // ── Subscription auth errors — graceful degradation (not logout) ──────────
+  // If the WebSocket connectionParams token is not forwarded by the gateway,
+  // the subscription resolver throws UnauthorizedException.  This must NOT
+  // call logout() — the user's HTTP session is still valid; real-time updates
+  // simply pause.  See: urql-client.ts authErrorExchange.onError.
+
+  it('does NOT redirect for subscription auth error (graceful degradation)', () => {
+    expect(
+      shouldRedirectOnError(unauthorizedError, true, '/courses/mock-1', 'subscription')
+    ).toBe(false);
+  });
+
+  it('does NOT redirect for subscription auth error even when on non-login page', () => {
+    expect(
+      shouldRedirectOnError(unauthorizedError, true, '/settings', 'subscription')
+    ).toBe(false);
+  });
+
+  it('still redirects for query auth error (normal logout path)', () => {
+    expect(
+      shouldRedirectOnError(unauthorizedError, true, '/courses/mock-1', 'query')
+    ).toBe(true);
   });
 });

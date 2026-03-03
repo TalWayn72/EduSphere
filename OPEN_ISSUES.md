@@ -1,9 +1,98 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 03 מרץ 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅**
+**תאריך עדכון:** 03 מרץ 2026 (Session 5 final)
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅** | **Visual QA 53/53 Zero-Error ✅** | **BUG-037 SourceManager Unauthorized ✅**
 **בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,671 tests** (+13) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5+13 (BUG-026/027) ✅** | **Contract 36+11+4 (BUG-026/027) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅** | **BUG-037 +13 new tests ✅**
+
+---
+
+## ✅ BUG-040 — Video/Document Annotations Disappear After Save (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 03 Mar 2026
+
+### Problem
+
+After saving an annotation (video note or document highlight), the annotation disappeared immediately:
+
+1. **Video annotations**: After calling `createAnnotation` mutation, the annotation appeared briefly then vanished when the component re-rendered. The `useOptimistic` + `useTransition` (React 19) pattern reverted optimistic state when the transition ended without the server state having updated in urql's document cache.
+2. **Document annotations**: `useDocumentAnnotations.addTextAnnotation` called the mutation but never triggered a refetch — urql document cache did not auto-invalidate after mutations.
+3. **Non-UUID contentIds** (`"content-1"` slug format): The UUID validation guard in `useAnnotations` paused the query, but the mock fallback data was only shown on `hasError` — not on `!validAssetId`. So in dev/mock mode with non-UUID IDs, the annotation list was always empty.
+
+### Root Cause
+
+| Hook | Root Cause |
+|------|-----------|
+| `useAnnotations.ts` | `useOptimistic` revertible state + missing mock fallback for `!validAssetId` |
+| `useVideoAnnotations.ts` | Same `useOptimistic` pattern + no `executeQuery` after mutation success |
+| `useDocumentAnnotations.ts` | No refetch call after mutation, no error logging |
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `apps/web/src/hooks/useAnnotations.ts` | Complete rewrite: replaced `useOptimistic`+`useTransition` with persistent `useState<Annotation[]>` (`localAnnotations`). Mock fallback shown when `!validAssetId`. After mutation success: remove placeholder + `executeQuery({ requestPolicy: 'network-only' })`. After failure: remove placeholder + `console.error`. |
+| `apps/web/src/hooks/useVideoAnnotations.ts` | Complete rewrite: same persistent `localAnnotations` pattern. `[queryResult, executeQuery]` captures executeQuery for post-mutation refetch. Memory-safe subscription with `subscriptionPaused` cleanup state. |
+| `apps/web/src/hooks/useDocumentAnnotations.ts` | Added `refetch` destructured from `useAnnotations`. `addTextAnnotation` calls `refetch()` after success. Logs `console.error` on failure. |
+
+### Tests Added
+
+| File | Tests |
+|------|-------|
+| `apps/web/src/hooks/useAnnotations.test.ts` | Non-UUID shows mock fallback; mutation failure removes annotation; refetch after success; offline mode persistence; refetch function exposed |
+| `apps/web/src/hooks/useVideoAnnotations.test.ts` | NEW: placeholder added immediately; removed on failure; no refetch on failure |
+| `apps/web/src/hooks/useDocumentAnnotations.test.ts` | Added `refetch: vi.fn()` to all 7 mock return sites |
+
+### Verification
+
+- Full web test suite: **2,856/2,856 tests, 228/228 files** ✅
+- Visual: `/learn/content-1` → Add Note → Save → annotation "בדיקת תיקון BUG-016: annotation זה אמור להישאר לאחר שמירה" persists in right panel at "Annotation by You at 0:00" ✅
+- Commits: `bb87818` (useAnnotations + useDocumentAnnotations), `8cfce89` (useVideoAnnotations + DEV_MODE mock fixes)
+
+---
+
+## ✅ BUG-039 — React 19 Concurrent-Mode "Cannot update a component while rendering" + Subscription Graceful Degradation (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (recurring across sessions) | **Date:** 03 Mar 2026
+
+### Problem
+
+After navigation to any page (settings, dashboard, etc.), the React console showed:
+> "Cannot update a component (`Layout`) while rendering a different component (`Layout`)"
+
+Root causes (3 distinct issues):
+
+1. **React 19 concurrent fiber collision**: `useSrsQueueCount` in `Layout.tsx` fired a urql query synchronously on first render. `@urql/exchange-graphcache` (graphcache) deduplicates cached results synchronously, dispatching a `setState` call into Layout's old concurrent fiber while React was rendering the new route's Layout fiber in the work-in-progress tree. React 19's strict concurrent renderer caught this as an illegal cross-fiber state update.
+
+2. **Subscription auth error triggered global logout**: `authErrorExchange.onError` did not distinguish between `query`/`mutation` and `subscription` operations. When `useNotifications` fired a WebSocket subscription on mount, the gateway's `onFetch` plugin extracted auth from `request.headers` which is null for WebSocket connections (WS auth is in `connectionParams`). Subgraph-core threw `UnauthorizedException`. The error exchange caught it and called `logout()`, redirecting the entire app to `/login` — even though the user's HTTP session was perfectly valid.
+
+3. **Gateway onFetch plugin missing WebSocket auth path**: The `onFetch` plugin only read `context.request.headers.get('authorization')`, which is `null` for WebSocket subscription operations. The client does send the token in `connectionParams.authorization` (set by `urql-client.ts` wsClient), but the gateway never forwarded it to subgraphs.
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `apps/web/src/hooks/useSrsQueueCount.ts` | Added `mounted` defer pattern: `useState(false)` + `useEffect(() => setMounted(true), [])` + `pause: !mounted \|\| pause` — prevents graphcache from synchronously dispatching setState during render. Same fix documented in `useCourseNavigation.ts`. |
+| `apps/web/src/lib/urql-client.ts` | `authErrorExchange.onError` now receives `operation: Operation` (second arg). Added `if (operation.kind === 'subscription') return` — subscription auth errors log a warning but never trigger logout. |
+| `apps/gateway/gateway.config.ts` | `onFetch` plugin now reads `context.connectionParams?.['authorization']` as fallback when HTTP header is null — fixes WebSocket subscription auth forwarding to subgraphs. |
+
+### Tests Added (11 new tests)
+
+| File | Tests |
+|------|-------|
+| `apps/web/src/hooks/useSrsQueueCount.test.ts` | 8 tests (full rewrite): concurrent-mode pause=true before mount, pause=false after mount, network-only policy, error logging, graceful 0 return |
+| `apps/web/src/lib/urql-client.test.ts` | +3 tests: subscription auth error → no redirect, subscription on non-login page → no redirect, query auth error → still redirects |
+
+### Root Cause Chain (why this kept recurring)
+
+The "Cannot update a component while rendering" error appeared every session because `useSrsQueueCount` was never deferred. Each session applied a different downstream fix (BUG-030 fixed `SRSWidget` directly, BUG-038 fixed `authErrorExchange`) without addressing the root cause: graphcache synchronously pushing updates during concurrent render. The mounted defer pattern is the canonical fix for this class of React 19 + urql graphcache issue.
+
+### Verification
+
+- Full web test suite: **2,861/2,861 tests, 228/228 files** ✅
+- Visual: `/settings` — 0 console errors, Layout renders correctly ✅
+- Visual: `/dashboard` — 0 console errors, all widgets load ✅
+- Gateway restarted with connectionParams auth fix deployed ✅
 
 ---
 
