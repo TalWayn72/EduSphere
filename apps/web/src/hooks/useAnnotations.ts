@@ -2,10 +2,14 @@
  * useAnnotations — loads, normalises, and manages annotation state.
  *
  * - Maps GraphQL response fields to the internal Annotation type
- * - Uses React 19 useOptimistic for immediate UI feedback on add/reply
- * - Uses useTransition to keep the UI responsive during mutations
+ * - Uses a persistent localAnnotations state for immediate UI feedback on add/reply
+ *   (replaces the old useOptimistic+useTransition approach which caused notes to
+ *   disappear after the transition ended when urql did not auto-refetch)
+ * - After every successful mutation, forces a refetch so the server list is fresh
+ * - Falls back to mock data when the query errors OR when contentId is not a UUID
+ *   (offline / demo-mode, e.g. slug "content-1")
+ * - On mutation failure, removes the locally-added annotation and logs the error
  * - Wires ANNOTATION_ADDED_SUBSCRIPTION for real-time incoming annotations
- * - Falls back to mock data when the query errors
  *
  * Schema notes:
  *   content: JSON scalar — may be a plain string or { text: string }.
@@ -13,7 +17,7 @@
  *   Replies are modelled as sibling annotations with parentId set.
  *   Multi-layer filtering is applied client-side (API supports single layer).
  */
-import { useOptimistic, useTransition, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useSubscription } from 'urql';
 import { Annotation, AnnotationLayer } from '@/types/annotations';
 import {
@@ -49,12 +53,6 @@ type GqlAnnotationInput =
   | GqlAnnotation
   | AnnotationAddedSubscription['annotationAdded'];
 
-// ── Optimistic action types ─────────────────────────────────────────────────
-
-type OptimisticAction =
-  | { type: 'add'; annotation: Annotation }
-  | { type: 'reply'; annotation: Annotation };
-
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Extract plain text from a JSON content scalar. */
@@ -83,8 +81,6 @@ function normaliseAnnotation(
   const text = extractContentText(gql.content);
   const timestampStart = extractTimestamp(gql.spatialData);
 
-  // Cast the generated AnnotationLayer to the local enum: both are string enums
-  // with identical runtime values ('PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED').
   const localLayer = gql.layer as unknown as AnnotationLayer;
 
   return {
@@ -105,19 +101,8 @@ function normaliseAnnotation(
     parentId: ('parentId' in gql ? gql.parentId : undefined) ?? undefined,
     createdAt: gql.createdAt,
     updatedAt: gql.updatedAt,
-    replies: [], // siblings with matching parentId are threaded client-side
+    replies: [],
   };
-}
-
-function buildOptimisticList(
-  state: Annotation[],
-  action: OptimisticAction
-): Annotation[] {
-  if (action.type === 'add') {
-    return [action.annotation, ...state];
-  }
-  // reply: append to end (subscription will deduplicate on next query)
-  return [...state, action.annotation];
 }
 
 // ── UUID validation ─────────────────────────────────────────────────────────
@@ -136,6 +121,8 @@ export interface UseAnnotationsReturn {
   fetching: boolean;
   isPending: boolean;
   error: string | null;
+  /** Force a fresh network fetch of the annotations list. */
+  refetch: () => void;
   addAnnotation: (
     content: string,
     layer: AnnotationLayer,
@@ -158,7 +145,10 @@ export function useAnnotations(
   const validAssetId = !!contentId && isUUID(contentId);
 
   // Fetch all annotations for this asset; multi-layer filtering is client-side.
-  const [result] = useQuery<AnnotationsQuery, AnnotationsQueryVariables>({
+  const [result, executeQuery] = useQuery<
+    AnnotationsQuery,
+    AnnotationsQueryVariables
+  >({
     query: ANNOTATIONS_QUERY,
     variables: { assetId: contentId },
     pause: !validAssetId,
@@ -178,51 +168,71 @@ export function useAnnotations(
   const [, createAnnotation] = useMutation(CREATE_ANNOTATION_MUTATION);
   const [, replyToAnnotation] = useMutation(REPLY_TO_ANNOTATION_MUTATION);
 
+  // Tracks whether a save mutation is in-flight.
+  const [isPending, setIsPending] = useState(false);
+
+  // Local annotations: optimistic adds that persist across re-renders until
+  // the server confirms them (or they fail). This replaces useOptimistic which
+  // reverted state once the transition ended if urql hadn't refetched yet.
+  const [localAnnotations, setLocalAnnotations] = useState<Annotation[]>([]);
+
   const hasError = !!result.error && !result.data;
 
-  const serverAnnotations: Annotation[] = hasError
-    ? filterAnnotationsByLayers(getThreadedAnnotations(), activeLayers)
-    : (result.data?.annotations ?? []).map((a) =>
-        normaliseAnnotation(a, contentId)
-      );
+  // Server annotations — fall back to mock data when:
+  //   a) contentId is not a UUID (offline / demo mode), OR
+  //   b) the query returned an error
+  const serverAnnotations: Annotation[] =
+    !validAssetId || hasError
+      ? getThreadedAnnotations()
+      : (result.data?.annotations ?? []).map((a) =>
+          normaliseAnnotation(a, contentId)
+        );
 
-  // useOptimistic: base state is server list; reducer applies add/reply actions.
-  const [optimisticAnnotations, dispatchOptimistic] = useOptimistic<
-    Annotation[],
-    OptimisticAction
-  >(serverAnnotations, buildOptimisticList);
+  // Remove local annotations whose IDs are now present in the server list
+  // (they've been confirmed and the refetch returned them).
+  const serverIds = new Set(serverAnnotations.map((a) => a.id));
+  useEffect(() => {
+    setLocalAnnotations((prev) => prev.filter((a) => !serverIds.has(a.id)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.data?.annotations]);
 
-  const [isPending, startTransition] = useTransition();
-
+  // Wire subscription: merge incoming annotations into local list.
   useEffect(() => {
     const incoming = subscriptionResult.data?.annotationAdded;
     if (!incoming) return;
 
-    const alreadyInServer = serverAnnotations.some((a) => a.id === incoming.id);
-    if (alreadyInServer) return;
-
-    dispatchOptimistic({
-      type: 'add',
-      annotation: normaliseAnnotation(incoming, contentId),
+    const newAnn = normaliseAnnotation(incoming, contentId);
+    setLocalAnnotations((prev) => {
+      if (prev.some((a) => a.id === newAnn.id) || serverIds.has(newAnn.id))
+        return prev;
+      return [newAnn, ...prev];
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subscriptionResult.data, contentId]);
 
-  // Deduplicate optimistic list vs server list
-  const serverIds = new Set(serverAnnotations.map((a) => a.id));
+  // Merge local + server, deduplicating by ID (local-first so optimistic items
+  // are at the top, superseded once the server list includes them).
+  const merged = [
+    ...localAnnotations.filter((a) => !serverIds.has(a.id)),
+    ...serverAnnotations,
+  ];
+
   const visibleAnnotations = filterAnnotationsByLayers(
-    optimisticAnnotations.filter((a, idx, arr) => {
-      if (!a.id.startsWith('local-')) return true;
-      const isSuperseded = serverIds.has(a.id);
-      return !isSuperseded && arr.findIndex((x) => x.id === a.id) === idx;
-    }),
+    merged.filter((a, idx, arr) => arr.findIndex((x) => x.id === a.id) === idx),
     activeLayers
   );
 
+  const refetch = useCallback(() => {
+    if (validAssetId) {
+      executeQuery({ requestPolicy: 'network-only' });
+    }
+  }, [validAssetId, executeQuery]);
+
   const addAnnotation = useCallback(
     (content: string, layer: AnnotationLayer, timestamp: number) => {
+      const tempId = `local-${Date.now()}`;
       const tempAnnotation: Annotation = {
-        id: `local-${Date.now()}`,
+        id: tempId,
         content,
         layer,
         userId: 'current-user',
@@ -230,26 +240,46 @@ export function useAnnotations(
         userRole: 'student',
         timestamp: formatTime(timestamp),
         contentId,
-        contentTimestamp: timestamp,
+        contentTimestamp: timestamp || undefined,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         replies: [],
       };
 
-      startTransition(async () => {
-        dispatchOptimistic({ type: 'add', annotation: tempAnnotation });
-        await createAnnotation({
-          input: {
-            assetId: contentId,
-            annotationType: 'TEXT',
-            content,
-            layer,
-            spatialData: timestamp > 0 ? { timestampStart: timestamp } : null,
-          },
-        });
+      // Add immediately — persists until server confirmation or failure.
+      setLocalAnnotations((prev) => [tempAnnotation, ...prev]);
+
+      if (!validAssetId) {
+        // Offline / demo mode: keep in local state only, no backend mutation.
+        return;
+      }
+
+      setIsPending(true);
+      void createAnnotation({
+        input: {
+          assetId: contentId,
+          annotationType: 'TEXT',
+          content,
+          layer,
+          spatialData: timestamp > 0 ? { timestampStart: timestamp } : null,
+        },
+      }).then((response) => {
+        setIsPending(false);
+        if (response.error) {
+          // Remove failed annotation and log so developers can diagnose.
+          console.error(
+            '[useAnnotations] Failed to save annotation:',
+            response.error.message
+          );
+          setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
+        } else {
+          // Remove the local placeholder; the refetch will deliver the real one.
+          setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
+          executeQuery({ requestPolicy: 'network-only' });
+        }
       });
     },
-    [contentId, createAnnotation, dispatchOptimistic]
+    [contentId, validAssetId, createAnnotation, executeQuery]
   );
 
   const addReply = useCallback(
@@ -259,8 +289,9 @@ export function useAnnotations(
       layer: AnnotationLayer,
       timestamp: number
     ) => {
+      const tempId = `local-reply-${Date.now()}`;
       const tempReply: Annotation = {
-        id: `local-reply-${Date.now()}`,
+        id: tempId,
         content,
         layer,
         userId: 'current-user',
@@ -274,12 +305,26 @@ export function useAnnotations(
         replies: [],
       };
 
-      startTransition(async () => {
-        dispatchOptimistic({ type: 'reply', annotation: tempReply });
-        await replyToAnnotation({ annotationId: parentId, content });
-      });
+      setLocalAnnotations((prev) => [...prev, tempReply]);
+
+      if (!validAssetId) return;
+
+      void replyToAnnotation({ annotationId: parentId, content }).then(
+        (response) => {
+          if (response.error) {
+            console.error(
+              '[useAnnotations] Failed to save reply:',
+              response.error.message
+            );
+            setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
+          } else {
+            setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
+            executeQuery({ requestPolicy: 'network-only' });
+          }
+        }
+      );
     },
-    [contentId, replyToAnnotation, dispatchOptimistic]
+    [contentId, validAssetId, replyToAnnotation, executeQuery]
   );
 
   return {
@@ -289,6 +334,7 @@ export function useAnnotations(
     error: hasError
       ? (result.error?.message ?? 'Failed to load annotations')
       : null,
+    refetch,
     addAnnotation,
     addReply,
   };

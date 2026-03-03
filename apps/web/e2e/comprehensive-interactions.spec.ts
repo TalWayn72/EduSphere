@@ -16,6 +16,7 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
+import { login } from './auth.helpers';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -75,6 +76,11 @@ async function assertPageLoaded(page: Page): Promise<void> {
     'Page must have a visible heading or navigation'
   ).toBe(true);
 }
+
+// BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 // ── Test Suite: Top Navigation ────────────────────────────────────────────────
 

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Navigation Audit — Comprehensive top-navigation tab coverage
@@ -74,6 +75,12 @@ async function assertNoCrash(
     timeout: 3_000,
   });
 }
+
+// ─── Auth (required since BUG-028: DEV_MODE no longer auto-authenticates) ─────
+
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 // ─── Suite 1: Nav tab routing ─────────────────────────────────────────────────
 

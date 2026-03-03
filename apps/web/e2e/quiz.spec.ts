@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Quiz E2E tests — QuizContentPage + QuizPlayer components.
@@ -46,6 +47,11 @@ async function waitForQuizPageReady(
     return 'error';
   return 'loading';
 }
+
+// BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 // ── Suite 1: Page load and basic rendering ────────────────────────────────────
 

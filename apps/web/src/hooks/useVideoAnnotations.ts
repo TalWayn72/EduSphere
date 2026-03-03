@@ -5,6 +5,9 @@
  * - Queries annotationsByAsset filtered to VIDEO annotation type
  * - Real-time via ANNOTATION_ADDED_SUBSCRIPTION (paused on unmount — memory safe)
  * - Exposes addAnnotation, updateAnnotation, deleteAnnotation helpers
+ * - Optimistically adds new annotations to local state immediately; on mutation
+ *   success triggers a refetch and removes the placeholder; on failure removes
+ *   the placeholder and logs the error so annotations do not disappear silently.
  */
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useSubscription } from 'urql';
@@ -75,6 +78,23 @@ function extractText(content: unknown): string {
   return String(content ?? '');
 }
 
+function rawToVideoAnnotation(
+  a: Record<string, unknown>
+): VideoAnnotation {
+  return {
+    id: String(a['id'] ?? ''),
+    assetId: String(a['assetId'] ?? ''),
+    userId: String(a['userId'] ?? ''),
+    layer: (a['layer'] as AnnotationLayer) ?? AnnotationLayer.PERSONAL,
+    text: extractText(a['content']),
+    timestamp: extractSpatialTimestamp(a['spatialData']),
+    endTimestamp: extractSpatialEndTimestamp(a['spatialData']),
+    color: LAYER_COLOR_MAP[String(a['layer'] ?? '')] ?? '#6b7280',
+    createdAt: String(a['createdAt'] ?? ''),
+    updatedAt: String(a['updatedAt'] ?? ''),
+  };
+}
+
 // ── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useVideoAnnotations(
@@ -90,7 +110,7 @@ export function useVideoAnnotations(
     };
   }, []);
 
-  const [queryResult] = useQuery({
+  const [queryResult, executeQuery] = useQuery({
     query: ANNOTATIONS_BY_ASSET_QUERY,
     variables: { assetId: videoId },
     pause: !videoId,
@@ -106,48 +126,44 @@ export function useVideoAnnotations(
   const [, execUpdate] = useMutation(UPDATE_ANNOTATION_MUTATION);
   const [, execDelete] = useMutation(DELETE_ANNOTATION_MUTATION);
 
-  // Merge server annotations with incoming subscription events
-  const rawAnnotations: unknown[] = queryResult.data?.annotationsByAsset ?? [];
-  const incomingAnnotation = subscriptionResult.data?.annotationAdded;
+  // Local annotations: optimistic adds that persist until server confirms.
+  const [localAnnotations, setLocalAnnotations] = useState<VideoAnnotation[]>(
+    []
+  );
 
-  const annotations: VideoAnnotation[] = (() => {
-    const base = (rawAnnotations as Record<string, unknown>[]).map((a) => ({
-      id: String(a['id'] ?? ''),
-      assetId: String(a['assetId'] ?? ''),
-      userId: String(a['userId'] ?? ''),
-      layer: (a['layer'] as AnnotationLayer) ?? AnnotationLayer.PERSONAL,
-      text: extractText(a['content']),
-      timestamp: extractSpatialTimestamp(a['spatialData']),
-      endTimestamp: extractSpatialEndTimestamp(a['spatialData']),
-      color: LAYER_COLOR_MAP[String(a['layer'] ?? '')] ?? '#6b7280',
-      createdAt: String(a['createdAt'] ?? ''),
-      updatedAt: String(a['updatedAt'] ?? ''),
-    }));
+  const serverAnnotations: VideoAnnotation[] = (
+    (queryResult.data?.annotationsByAsset ?? []) as Record<string, unknown>[]
+  ).map(rawToVideoAnnotation);
 
-    if (incomingAnnotation) {
-      const incoming = incomingAnnotation as Record<string, unknown>;
-      const alreadyPresent = base.some(
-        (a) => a.id === String(incoming['id'] ?? '')
-      );
-      if (!alreadyPresent) {
-        base.push({
-          id: String(incoming['id'] ?? ''),
-          assetId: String(incoming['assetId'] ?? ''),
-          userId: String(incoming['userId'] ?? ''),
-          layer:
-            (incoming['layer'] as AnnotationLayer) ?? AnnotationLayer.PERSONAL,
-          text: extractText(incoming['content']),
-          timestamp: extractSpatialTimestamp(incoming['spatialData']),
-          endTimestamp: extractSpatialEndTimestamp(incoming['spatialData']),
-          color: LAYER_COLOR_MAP[String(incoming['layer'] ?? '')] ?? '#6b7280',
-          createdAt: String(incoming['createdAt'] ?? ''),
-          updatedAt: String(incoming['updatedAt'] ?? ''),
-        });
-      }
-    }
+  // Clean up local annotations that are now confirmed server-side.
+  const serverIds = new Set(serverAnnotations.map((a) => a.id));
+  useEffect(() => {
+    setLocalAnnotations((prev) => prev.filter((a) => !serverIds.has(a.id)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryResult.data?.annotationsByAsset]);
 
-    return base.sort((a, b) => a.timestamp - b.timestamp);
-  })();
+  // Merge incoming subscription event into local list.
+  useEffect(() => {
+    const incoming = subscriptionResult.data
+      ?.annotationAdded as Record<string, unknown> | undefined;
+    if (!incoming) return;
+    const newAnn = rawToVideoAnnotation(incoming);
+    setLocalAnnotations((prev) => {
+      if (prev.some((a) => a.id === newAnn.id) || serverIds.has(newAnn.id))
+        return prev;
+      return [...prev, newAnn];
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subscriptionResult.data]);
+
+  // Merge server + local, deduplicate, sort by timestamp.
+  const merged = [
+    ...serverAnnotations,
+    ...localAnnotations.filter((a) => !serverIds.has(a.id)),
+  ];
+  const annotations = merged
+    .filter((a, idx, arr) => arr.findIndex((x) => x.id === a.id) === idx)
+    .sort((a, b) => a.timestamp - b.timestamp);
 
   const addAnnotation = useCallback(
     async (
@@ -155,7 +171,23 @@ export function useVideoAnnotations(
       timestamp: number,
       layer: AnnotationLayer = AnnotationLayer.PERSONAL
     ) => {
-      await execCreate({
+      const tempId = `local-video-${Date.now()}`;
+      const tempAnn: VideoAnnotation = {
+        id: tempId,
+        assetId: videoId,
+        userId: 'current-user',
+        layer,
+        text,
+        timestamp,
+        color: LAYER_COLOR_MAP[layer] ?? '#6b7280',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Add immediately so the marker appears on the timeline right away.
+      setLocalAnnotations((prev) => [...prev, tempAnn]);
+
+      const response = await execCreate({
         input: {
           assetId: videoId,
           annotationType: 'TEXT',
@@ -164,22 +196,51 @@ export function useVideoAnnotations(
           spatialData: { timestampStart: timestamp },
         },
       });
+
+      if (response.error) {
+        console.error(
+          '[useVideoAnnotations] Failed to save annotation:',
+          response.error.message
+        );
+        setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
+      } else {
+        // Remove placeholder; refetch will deliver the canonical version.
+        setLocalAnnotations((prev) => prev.filter((a) => a.id !== tempId));
+        executeQuery({ requestPolicy: 'network-only' });
+      }
     },
-    [videoId, execCreate]
+    [videoId, execCreate, executeQuery]
   );
 
   const updateAnnotation = useCallback(
     async (id: string, text: string) => {
-      await execUpdate({ id, input: { content: text } });
+      const response = await execUpdate({ id, input: { content: text } });
+      if (response.error) {
+        console.error(
+          '[useVideoAnnotations] Failed to update annotation:',
+          response.error.message
+        );
+        return;
+      }
+      executeQuery({ requestPolicy: 'network-only' });
     },
-    [execUpdate]
+    [execUpdate, executeQuery]
   );
 
   const deleteAnnotation = useCallback(
     async (id: string) => {
-      await execDelete({ id });
+      const response = await execDelete({ id });
+      if (response.error) {
+        console.error(
+          '[useVideoAnnotations] Failed to delete annotation:',
+          response.error.message
+        );
+        return;
+      }
+      setLocalAnnotations((prev) => prev.filter((a) => a.id !== id));
+      executeQuery({ requestPolicy: 'network-only' });
     },
-    [execDelete]
+    [execDelete, executeQuery]
   );
 
   return {

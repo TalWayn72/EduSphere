@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
+import { login } from './auth.helpers';
 
 /**
  * Authentication E2E tests.
@@ -44,6 +45,11 @@ test.describe('Auth — Login page UI', () => {
 });
 
 test.describe('Auth — DEV_MODE auto-login behaviour', () => {
+  // BUG-028: DEV_MODE no longer auto-authenticates on cold start — explicit login required.
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('root "/" redirects to /learn/content-1 (DEV_MODE auto-auth)', async ({
     page,
   }) => {

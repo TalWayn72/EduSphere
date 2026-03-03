@@ -160,9 +160,12 @@ async function snap(page: Page, label: string): Promise<string> {
 
 async function loginViaKeycloak(page: Page): Promise<void> {
   if (process.env.VITE_DEV_MODE !== 'false') {
-    // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
-    await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    // DEV_MODE: click the dev-login button so sessionStorage key is set
+    await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
+    const devBtn = page.locator('[data-testid="dev-login-btn"]');
+    await devBtn.waitFor({ timeout: 10_000 });
+    await devBtn.click();
+    await page.waitForURL(/\/learn\//, { timeout: 15_000 });
     return;
   }
 

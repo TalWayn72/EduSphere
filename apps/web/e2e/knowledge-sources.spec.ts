@@ -23,6 +23,7 @@
 
 import { test, expect } from '@playwright/test';
 import { BASE_URL, IS_DEV_MODE, RUN_WRITE_TESTS } from './env';
+import { login } from './auth.helpers';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -39,6 +40,7 @@ const PROCESSING_TIMEOUT = 30_000;
 
 test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
   test.beforeEach(async ({ page }) => {
+    await login(page);
     await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1_000); // let React settle
   });

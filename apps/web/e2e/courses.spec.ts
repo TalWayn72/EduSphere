@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { CoursePage } from './pages/CoursePage';
+import { login } from './auth.helpers';
 
 /**
  * Courses E2E tests — CourseList + ContentViewer flows.
@@ -12,6 +13,11 @@ import { CoursePage } from './pages/CoursePage';
  *     because the video element renders regardless of network status)
  *   - No backend GraphQL required
  */
+
+// BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 test.describe('Course List — page load and content', () => {
   test('course list page loads and shows the Courses heading', async ({

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Scenarios E2E tests — ScenariosPage + RoleplaySimulator.
@@ -36,6 +37,11 @@ async function hasScenariosLoaded(
   const count = await cards.count();
   return count > 0;
 }
+
+// BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 // ── Suite 1: Page load and header ─────────────────────────────────────────────
 

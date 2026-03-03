@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * i18n E2E tests — internationalization feature (/settings).
@@ -16,6 +17,11 @@ import { test, expect } from '@playwright/test';
  *
  * Requires: pnpm dev (port 5173, default baseURL in playwright.config.ts)
  */
+
+// BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 // ── Group 1: Settings page navigation ────────────────────────────────────────
 

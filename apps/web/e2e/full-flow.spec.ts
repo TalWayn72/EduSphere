@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Full Learning Loop E2E test — end-to-end scenario covering the complete
@@ -21,6 +22,11 @@ import { test, expect } from '@playwright/test';
  *
  * Timeouts: generous (10s per navigation step) to handle slow CI environments.
  */
+
+// BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 test('complete learning loop — student session from login to logout', async ({
   page,

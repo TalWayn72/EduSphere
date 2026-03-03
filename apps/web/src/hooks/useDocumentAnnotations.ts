@@ -88,7 +88,7 @@ export function useDocumentAnnotations(
   contentId: string
 ): UseDocumentAnnotationsReturn {
   // Delegate query + subscription to useAnnotations — one urql subscription only.
-  const { annotations, fetching, error } = useAnnotations(
+  const { annotations, fetching, error, refetch } = useAnnotations(
     contentId,
     ALL_LAYERS
   );
@@ -123,7 +123,7 @@ export function useDocumentAnnotations(
 
   const addTextAnnotation = useCallback(
     async (input: DocumentAnnotationInput): Promise<void> => {
-      await createAnnotation({
+      const response = await createAnnotation({
         input: {
           assetId: contentId,
           annotationType: 'TEXT',
@@ -132,8 +132,17 @@ export function useDocumentAnnotations(
           spatialData: { from: input.from, to: input.to },
         },
       });
+      if (response.error) {
+        console.error(
+          '[useDocumentAnnotations] Failed to save text annotation:',
+          response.error.message
+        );
+        return;
+      }
+      // Refetch so the new annotation appears in the document.
+      refetch();
     },
-    [contentId, createAnnotation]
+    [contentId, createAnnotation, refetch]
   );
 
   return {

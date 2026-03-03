@@ -2,19 +2,23 @@
  * useAnnotations hook tests
  *
  * Verifies:
- *  1. Returns server annotations mapped through normaliseAnnotation
- *  2. addAnnotation immediately adds an optimistic entry (id starts with "local-")
- *  3. addReply immediately adds an optimistic reply entry
- *  4. Falls back to mock data when the query errors
- *  5. isPending reflects transition state
+ *  1. Returns server annotations mapped through normaliseAnnotation (UUID path)
+ *  2. Non-UUID contentId: shows mock fallback (offline/demo mode), no error banner
+ *  3. addAnnotation immediately adds a local entry (id starts with "local-")
+ *  4. addAnnotation removes local entry on mutation failure
+ *  5. addAnnotation keeps local entry until refetch confirms it
+ *  6. addReply immediately adds a local reply entry
+ *  7. Falls back to mock data when the query errors
+ *  8. isPending reflects mutation in-flight state
+ *  9. Offline mode (non-UUID): addAnnotation persists locally without mutation
+ * 10. refetch is exposed and callable
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { AnnotationLayer } from '@/types/annotations';
 import type { AnnotationsQuery } from '@edusphere/graphql-types';
 
 // ── urql mock ────────────────────────────────────────────────────────────────
-// We fully mock urql so no real network calls are made.
 
 const mockCreateAnnotation = vi
   .fn()
@@ -22,6 +26,7 @@ const mockCreateAnnotation = vi
 const mockReplyToAnnotation = vi
   .fn()
   .mockResolvedValue({ data: null, error: null });
+const mockExecuteQuery = vi.fn();
 
 vi.mock('urql', () => ({
   useQuery: vi.fn(),
@@ -35,7 +40,6 @@ vi.mock('@/lib/graphql/annotation.queries', () => ({
   REPLY_TO_ANNOTATION_MUTATION: 'REPLY_TO_ANNOTATION_MUTATION',
 }));
 
-// CREATE_ANNOTATION_MUTATION and ANNOTATION_ADDED_SUBSCRIPTION moved to mutations file.
 vi.mock('@/lib/graphql/annotation.mutations', () => ({
   CREATE_ANNOTATION_MUTATION: 'CREATE_ANNOTATION_MUTATION',
   ANNOTATION_ADDED_SUBSCRIPTION: 'ANNOTATION_ADDED_SUBSCRIPTION',
@@ -50,8 +54,25 @@ vi.mock('@/pages/content-viewer.utils', () => ({
 }));
 
 // ── mock-annotations mock ─────────────────────────────────────────────────────
+const MOCK_ANNOTATIONS = [
+  {
+    id: 'mock-ann-1',
+    content: 'Mock annotation',
+    layer: AnnotationLayer.PERSONAL,
+    userId: 'mock-user',
+    userName: 'Mock User',
+    userRole: 'student' as const,
+    timestamp: '0s',
+    contentId: 'content-1',
+    contentTimestamp: 0,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    replies: [],
+  },
+];
+
 vi.mock('@/lib/mock-annotations', () => ({
-  getThreadedAnnotations: () => [],
+  getThreadedAnnotations: () => MOCK_ANNOTATIONS,
   filterAnnotationsByLayers: <T>(items: T[], _layers: unknown[]) => items,
 }));
 
@@ -61,8 +82,6 @@ import * as urql from 'urql';
 
 // ── Helper to configure urql mock state ──────────────────────────────────────
 
-// SERVER_ANNOTATION matches the actual Annotation type from annotation.graphql.
-// content is a JSON scalar (string here); spatialData holds timestamp info.
 const SERVER_ANNOTATION = {
   id: 'ann-server-1',
   layer: AnnotationLayer.PERSONAL,
@@ -91,10 +110,9 @@ function setupUrqlMocks(options: UrqlMockOptions = {}) {
 
   vi.mocked(urql.useQuery).mockReturnValue([
     { data: queryData, fetching: queryFetching, error: queryError },
-    vi.fn(),
+    mockExecuteQuery,
   ] as ReturnType<typeof urql.useQuery>);
 
-  // Map mutation document strings to their respective mock functions.
   vi.mocked(urql.useMutation).mockImplementation((mutation) => {
     if (mutation === 'CREATE_ANNOTATION_MUTATION') {
       return [{ fetching: false }, mockCreateAnnotation] as ReturnType<
@@ -120,6 +138,8 @@ const VALID_UUID = '909e98a3-d6c4-407c-a4ab-59a978820f07';
 describe('useAnnotations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCreateAnnotation.mockResolvedValue({ data: null, error: null });
+    mockReplyToAnnotation.mockResolvedValue({ data: null, error: null });
   });
 
   it('returns normalised server annotations when contentId is a valid UUID', () => {
@@ -130,31 +150,32 @@ describe('useAnnotations', () => {
 
     expect(result.current.annotations).toHaveLength(1);
     expect(result.current.annotations[0]?.id).toBe('ann-server-1');
-    // userName is 'User' — displayName is not fetched (User stub only has id in annotation subgraph)
     expect(result.current.annotations[0]?.userName).toBe('User');
-    // timestamp extracted from spatialData.timestampStart via extractTimestamp()
     expect(result.current.annotations[0]?.timestamp).toBe('10s');
     expect(result.current.fetching).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
-  it('pauses the query and returns no error when contentId is not a UUID (e.g. slug)', () => {
-    // When the query is paused, urql returns no data and no error.
+  it('shows mock fallback when contentId is not a UUID (offline/demo mode)', () => {
     setupUrqlMocks({ queryData: null, queryError: null });
 
     const { result } = renderHook(() =>
       useAnnotations('content-1', [AnnotationLayer.PERSONAL])
     );
 
-    // useQuery should be called with pause:true — verify via mock call args.
+    // useQuery should be called with pause:true for non-UUID contentIds.
     const queryCall = vi.mocked(urql.useQuery).mock.calls[0];
     expect(queryCall?.[0]).toMatchObject({ pause: true });
 
-    // No error banner should be shown.
+    // Mock fallback should be shown — not an empty list.
+    expect(result.current.annotations).toHaveLength(MOCK_ANNOTATIONS.length);
+    expect(result.current.annotations[0]?.id).toBe('mock-ann-1');
+
+    // No error banner (offline mode is not an error).
     expect(result.current.error).toBeNull();
   });
 
-  it('adds an optimistic annotation immediately when addAnnotation is called', () => {
+  it('adds a local annotation immediately when addAnnotation is called', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
       useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
@@ -168,13 +189,11 @@ describe('useAnnotations', () => {
       );
     });
 
-    // The optimistic entry should appear immediately
     const ids = result.current.annotations.map((a) => a.id);
-    const hasOptimistic = ids.some((id) => id.startsWith('local-'));
-    expect(hasOptimistic).toBe(true);
+    expect(ids.some((id) => id.startsWith('local-'))).toBe(true);
   });
 
-  it('optimistic annotation has the correct content and layer', () => {
+  it('local annotation has correct content, layer, and user', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
       useAnnotations(VALID_UUID, [AnnotationLayer.SHARED])
@@ -184,16 +203,112 @@ describe('useAnnotations', () => {
       result.current.addAnnotation('Shared thought', AnnotationLayer.SHARED, 5);
     });
 
-    const optimistic = result.current.annotations.find((a) =>
+    const local = result.current.annotations.find((a) =>
       a.id.startsWith('local-')
     );
-    expect(optimistic?.content).toBe('Shared thought');
-    expect(optimistic?.layer).toBe(AnnotationLayer.SHARED);
-    expect(optimistic?.userName).toBe('You');
-    expect(optimistic?.contentTimestamp).toBe(5);
+    expect(local?.content).toBe('Shared thought');
+    expect(local?.layer).toBe(AnnotationLayer.SHARED);
+    expect(local?.userName).toBe('You');
+    expect(local?.contentTimestamp).toBe(5);
   });
 
-  it('adds an optimistic reply when addReply is called', () => {
+  it('removes local annotation when mutation fails', async () => {
+    mockCreateAnnotation.mockResolvedValue({
+      data: null,
+      error: { message: 'Server error' },
+    });
+    setupUrqlMocks();
+
+    const { result } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+
+    act(() => {
+      result.current.addAnnotation('Will fail', AnnotationLayer.PERSONAL, 0);
+    });
+
+    // Local annotation appears immediately.
+    expect(
+      result.current.annotations.some((a) => a.id.startsWith('local-'))
+    ).toBe(true);
+
+    // After mutation resolves (failure), local annotation is removed.
+    await waitFor(() => {
+      expect(
+        result.current.annotations.some((a) => a.id.startsWith('local-'))
+      ).toBe(false);
+    });
+  });
+
+  it('triggers refetch after successful mutation', async () => {
+    mockCreateAnnotation.mockResolvedValue({ data: {}, error: null });
+    setupUrqlMocks();
+
+    const { result } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+
+    act(() => {
+      result.current.addAnnotation('Note to save', AnnotationLayer.PERSONAL, 0);
+    });
+
+    await waitFor(() => {
+      expect(mockExecuteQuery).toHaveBeenCalledWith({
+        requestPolicy: 'network-only',
+      });
+    });
+  });
+
+  it('adds a local annotation in offline mode (non-UUID) without calling mutation', () => {
+    setupUrqlMocks({ queryData: null, queryError: null });
+
+    const { result } = renderHook(() =>
+      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+    );
+
+    act(() => {
+      result.current.addAnnotation(
+        'Offline note',
+        AnnotationLayer.PERSONAL,
+        0
+      );
+    });
+
+    // Mutation should NOT have been called.
+    expect(mockCreateAnnotation).not.toHaveBeenCalled();
+
+    // The annotation should appear in the list.
+    expect(
+      result.current.annotations.some(
+        (a) => a.id.startsWith('local-') && a.content === 'Offline note'
+      )
+    ).toBe(true);
+  });
+
+  it('offline mode annotation persists (not reverted)', () => {
+    setupUrqlMocks({ queryData: null, queryError: null });
+
+    const { result } = renderHook(() =>
+      useAnnotations('content-1', [AnnotationLayer.PERSONAL])
+    );
+
+    act(() => {
+      result.current.addAnnotation(
+        'Persistent offline note',
+        AnnotationLayer.PERSONAL,
+        0
+      );
+    });
+
+    // The local annotation must still be visible (not reverted by any mechanism).
+    expect(
+      result.current.annotations.some(
+        (a) => a.content === 'Persistent offline note'
+      )
+    ).toBe(true);
+  });
+
+  it('adds a local reply when addReply is called', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
       useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
@@ -212,7 +327,7 @@ describe('useAnnotations', () => {
     expect(replyIds.some((id) => id.startsWith('local-reply-'))).toBe(true);
   });
 
-  it('sets parentId on optimistic reply', () => {
+  it('sets parentId on local reply', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
       useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
@@ -244,19 +359,34 @@ describe('useAnnotations', () => {
       useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
-    // filterAnnotationsByLayers returns input unchanged (mocked above)
     expect(result.current.error).toBe('Network error');
-    // Falls back to getThreadedAnnotations() which returns []
-    expect(result.current.annotations).toEqual([]);
+    // Mock fallback returns MOCK_ANNOTATIONS (mocked getThreadedAnnotations).
+    expect(result.current.annotations).toHaveLength(MOCK_ANNOTATIONS.length);
   });
 
-  it('exposes isPending from useTransition', () => {
+  it('exposes isPending as false when no mutation is in-flight', () => {
     setupUrqlMocks();
     const { result } = renderHook(() =>
       useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
     );
 
-    // Before any transition: isPending is false
     expect(result.current.isPending).toBe(false);
+  });
+
+  it('exposes a refetch function', () => {
+    setupUrqlMocks();
+    const { result } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+
+    expect(typeof result.current.refetch).toBe('function');
+
+    act(() => {
+      result.current.refetch();
+    });
+
+    expect(mockExecuteQuery).toHaveBeenCalledWith({
+      requestPolicy: 'network-only',
+    });
   });
 });

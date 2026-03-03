@@ -30,6 +30,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { login } from './auth.helpers';
 
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'visual-qa-results');
@@ -71,6 +72,10 @@ test.beforeAll(() => {
 // ── Suite 1: DEV_MODE rendering ───────────────────────────────────────────────
 
 test.describe('Dashboard — DEV_MODE (mock data)', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('page loads with "Dashboard" heading', async ({ page }) => {
     await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({

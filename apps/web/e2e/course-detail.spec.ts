@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * CourseDetailPage E2E tests — /courses/:courseId
@@ -39,6 +40,12 @@ const SQL_PATTERNS = [
 
 const MOCK_COURSE_ID = 'mock-course-1';
 const MOCK_COURSE_TITLE = 'Introduction to Talmud Study';
+
+// ─── Auth (required since BUG-028: DEV_MODE no longer auto-authenticates) ─────
+
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 // ── Suite 1: Page load and basic structure ─────────────────────────────────────
 

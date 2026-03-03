@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Dashboard Widgets E2E tests — Batch 1.
@@ -29,6 +30,11 @@ async function gotoDashboard(page: import('@playwright/test').Page) {
   // Wait for React to finish rendering and mock queries to settle
   await page.waitForTimeout(2_500);
 }
+
+// BUG-028: DEV_MODE no longer auto-authenticates — explicit login required.
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 // ── Suite 1: Dashboard shell ──────────────────────────────────────────────────
 

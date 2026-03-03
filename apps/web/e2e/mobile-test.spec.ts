@@ -13,9 +13,12 @@ test.beforeAll(() => {
 
 async function login(page: any) {
   if (process.env.VITE_DEV_MODE !== 'false') {
-    // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
-    await page.goto(`${BASE}/`);
-    await page.waitForLoadState('networkidle');
+    // DEV_MODE: click the dev-login button so sessionStorage key is set
+    await page.goto(`${BASE}/login`);
+    const devBtn = page.locator('[data-testid="dev-login-btn"]');
+    await devBtn.waitFor({ timeout: 10_000 });
+    await devBtn.click();
+    await page.waitForURL(/\/learn\//, { timeout: 15_000 });
     return;
   }
   await page.goto(`${BASE}/login`);

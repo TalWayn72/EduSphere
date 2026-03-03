@@ -26,6 +26,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { login } from './auth.helpers';
 
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'visual-qa-results');
@@ -53,6 +54,10 @@ test.beforeAll(() => {
 // ── Suite 1: DEV_MODE mock-data rendering ─────────────────────────────────────
 
 test.describe('Knowledge Graph — DEV_MODE (mock data)', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('page loads with "Knowledge Graph" heading', async ({ page }) => {
     await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
     await expect(

@@ -111,6 +111,7 @@ describe('useDocumentAnnotations', () => {
       fetching: false,
       isPending: false,
       error: null,
+      refetch: vi.fn(),
     });
     vi.mocked(useUIStore).mockReturnValue(makeUIStore());
   });
@@ -220,6 +221,7 @@ describe('useDocumentAnnotations', () => {
       fetching: true,
       isPending: false,
       error: null,
+      refetch: vi.fn(),
     });
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
     expect(result.current.fetching).toBe(true);
@@ -233,6 +235,7 @@ describe('useDocumentAnnotations', () => {
       fetching: false,
       isPending: false,
       error: 'Network error',
+      refetch: vi.fn(),
     });
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
     expect(result.current.error).toBe('Network error');
@@ -253,6 +256,7 @@ describe('useDocumentAnnotations', () => {
       fetching: false,
       isPending: false,
       error: null,
+      refetch: vi.fn(),
     });
 
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
@@ -280,6 +284,7 @@ describe('useDocumentAnnotations', () => {
       fetching: false,
       isPending: false,
       error: null,
+      refetch: vi.fn(),
     });
 
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
@@ -301,6 +306,7 @@ describe('useDocumentAnnotations', () => {
       fetching: false,
       isPending: false,
       error: null,
+      refetch: vi.fn(),
     });
 
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));
@@ -322,6 +328,7 @@ describe('useDocumentAnnotations', () => {
       fetching: false,
       isPending: false,
       error: null,
+      refetch: vi.fn(),
     });
 
     const { result } = renderHook(() => useDocumentAnnotations('doc-1'));

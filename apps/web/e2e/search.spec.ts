@@ -58,9 +58,7 @@ async function loginViaKeycloak(page: Page): Promise<void> {
 test.describe('Search — page load and empty state', () => {
   test.beforeEach(async ({ page }) => {
     if (process.env.VITE_DEV_MODE !== 'false') {
-      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await loginInDevMode(page);
     } else {
       await loginViaKeycloak(page);
     }
@@ -100,9 +98,7 @@ test.describe('Search — page load and empty state', () => {
 test.describe('Search — keyboard shortcut', () => {
   test.beforeEach(async ({ page }) => {
     if (process.env.VITE_DEV_MODE !== 'false') {
-      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await loginInDevMode(page);
     } else {
       await loginViaKeycloak(page);
     }
@@ -152,9 +148,7 @@ test.describe('Search — keyboard shortcut', () => {
 test.describe('Search — results behaviour', () => {
   test.beforeEach(async ({ page }) => {
     if (process.env.VITE_DEV_MODE !== 'false') {
-      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await loginInDevMode(page);
     } else {
       await loginViaKeycloak(page);
     }
