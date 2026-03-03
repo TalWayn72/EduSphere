@@ -64,6 +64,7 @@ export function LessonPipelinePage() {
     resetDirty,
   } = useLessonPipelineStore();
   const [runStatus, setRunStatus] = useState<string | null>(null);
+  const [pipelineError, setPipelineError] = useState<string | null>(null);
 
   const [{ data, error: lessonError }] = useQuery<LessonQueryData>({
     query: LESSON_QUERY,
@@ -95,7 +96,20 @@ export function LessonPipelinePage() {
 
   const handleSave = async () => {
     if (!lessonId) return;
-    await savePipeline({ lessonId, input: { nodes, config: {} } });
+    setPipelineError(null);
+    const { error: saveError } = await savePipeline({
+      lessonId,
+      input: { nodes, config: {} },
+    });
+    if (saveError) {
+      const msg =
+        saveError.graphQLErrors?.[0]?.message ??
+        saveError.networkError?.message ??
+        saveError.message;
+      console.error('[LessonPipelinePage] savePipeline failed:', msg, saveError);
+      setPipelineError(msg);
+      return;
+    }
     resetDirty();
   };
 
@@ -103,10 +117,21 @@ export function LessonPipelinePage() {
     const pipeline = data?.lesson?.pipeline;
     if (!pipeline?.id) {
       await handleSave();
+      if (pipelineError) return;
     }
     const pipelineId = data?.lesson?.pipeline?.id;
     if (!pipelineId) return;
-    const { data: runData } = await startRun({ pipelineId });
+    setPipelineError(null);
+    const { data: runData, error: runError } = await startRun({ pipelineId });
+    if (runError) {
+      const msg =
+        runError.graphQLErrors?.[0]?.message ??
+        runError.networkError?.message ??
+        runError.message;
+      console.error('[LessonPipelinePage] startRun failed:', msg, runError);
+      setPipelineError(msg);
+      return;
+    }
     if (runData?.startLessonPipelineRun) {
       setRunStatus('RUNNING');
     }
@@ -157,6 +182,16 @@ export function LessonPipelinePage() {
             </Button>
           </div>
         </div>
+
+        {pipelineError && (
+          <div
+            className="px-6 py-2 bg-red-50 border-b border-red-200 text-red-700 text-sm"
+            data-testid="pipeline-error"
+            role="alert"
+          >
+            {pipelineError}
+          </div>
+        )}
 
         <div className="flex flex-1 overflow-hidden">
           {/* Module Palette */}

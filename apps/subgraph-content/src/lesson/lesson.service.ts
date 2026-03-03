@@ -3,6 +3,7 @@ import {
   Logger,
   OnModuleDestroy,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -35,6 +36,9 @@ export interface UpdateLessonInput {
   lessonDate?: string;
   status?: 'DRAFT' | 'PROCESSING' | 'READY' | 'PUBLISHED';
 }
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class LessonService implements OnModuleDestroy {
@@ -121,25 +125,43 @@ export class LessonService implements OnModuleDestroy {
   }
 
   async create(input: CreateLessonInput, tenantCtx: TenantContext) {
-    const [row] = await this.db
-      .insert(schema.lessons)
-      .values({
-        tenant_id: tenantCtx.tenantId,
-        course_id: input.courseId,
-        module_id: input.moduleId ?? null,
-        title: input.title,
-        type: input.type,
-        series: input.series ?? null,
-        lesson_date: input.lessonDate ? new Date(input.lessonDate) : null,
-        instructor_id: input.instructorId,
-        status: 'DRAFT',
-      })
-      .returning();
+    if (!UUID_REGEX.test(input.courseId)) {
+      this.logger.warn(
+        `createLesson rejected: courseId "${input.courseId}" is not a valid UUID`
+      );
+      throw new BadRequestException(
+        `Invalid courseId "${input.courseId}". The course must exist in the database.`
+      );
+    }
 
-    const lesson = this.mapLesson(row as Record<string, unknown>);
-    this.logger.log(
-      `Lesson created: ${String(row?.['id'])} - "${input.title}"`
-    );
+    let row: Record<string, unknown> | undefined;
+    try {
+      [row] = (await this.db
+        .insert(schema.lessons)
+        .values({
+          tenant_id: tenantCtx.tenantId,
+          course_id: input.courseId,
+          module_id: input.moduleId ?? null,
+          title: input.title,
+          type: input.type,
+          series: input.series ?? null,
+          lesson_date: input.lessonDate ? new Date(input.lessonDate) : null,
+          instructor_id: input.instructorId,
+          status: 'DRAFT',
+        })
+        .returning()) as [Record<string, unknown>];
+    } catch (err) {
+      this.logger.error(
+        `Failed to create lesson for course "${input.courseId}" ` +
+          `(tenant: ${tenantCtx.tenantId}): ${String(err)}`
+      );
+      throw new BadRequestException(
+        'Failed to create lesson. Ensure the course exists and you have access to it.'
+      );
+    }
+
+    const lesson = this.mapLesson(row);
+    this.logger.log(`Lesson created: ${String(row?.['id'])} - "${input.title}"`);
 
     const payload: LessonPayload = {
       type: 'lesson.created',
@@ -164,57 +186,72 @@ export class LessonService implements OnModuleDestroy {
         : null;
     if (input.status !== undefined) updateData['status'] = input.status;
 
-    const [row] = await this.db
-      .update(schema.lessons)
-      .set(updateData)
-      .where(
-        and(
-          eq(schema.lessons.id, id),
-          eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+    try {
+      const [row] = await this.db
+        .update(schema.lessons)
+        .set(updateData)
+        .where(
+          and(
+            eq(schema.lessons.id, id),
+            eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+          )
         )
-      )
-      .returning();
-    return this.mapLesson(row as Record<string, unknown>);
+        .returning();
+      return this.mapLesson(row as Record<string, unknown>);
+    } catch (err) {
+      this.logger.error(`Failed to update lesson "${id}": ${String(err)}`);
+      throw new BadRequestException('Failed to update lesson.');
+    }
   }
 
   async delete(id: string, tenantCtx: TenantContext): Promise<boolean> {
-    await this.db
-      .update(schema.lessons)
-      .set({ deleted_at: new Date() })
-      .where(
-        and(
-          eq(schema.lessons.id, id),
-          eq(schema.lessons.tenant_id, tenantCtx.tenantId)
-        )
-      );
-    return true;
+    try {
+      await this.db
+        .update(schema.lessons)
+        .set({ deleted_at: new Date() })
+        .where(
+          and(
+            eq(schema.lessons.id, id),
+            eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+          )
+        );
+      return true;
+    } catch (err) {
+      this.logger.error(`Failed to delete lesson "${id}": ${String(err)}`);
+      throw new BadRequestException('Failed to delete lesson.');
+    }
   }
 
   async publish(id: string, tenantCtx: TenantContext) {
     const lesson = await this.findById(id, tenantCtx);
     if (!lesson) throw new NotFoundException(`Lesson ${id} not found`);
 
-    const [row] = await this.db
-      .update(schema.lessons)
-      .set({ status: 'PUBLISHED' })
-      .where(
-        and(
-          eq(schema.lessons.id, id),
-          eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+    try {
+      const [row] = await this.db
+        .update(schema.lessons)
+        .set({ status: 'PUBLISHED' })
+        .where(
+          and(
+            eq(schema.lessons.id, id),
+            eq(schema.lessons.tenant_id, tenantCtx.tenantId)
+          )
         )
-      )
-      .returning();
+        .returning();
 
-    const published = this.mapLesson(row as Record<string, unknown>);
-    const payload: LessonPayload = {
-      type: 'lesson.published',
-      lessonId: id,
-      courseId: String(lesson.courseId),
-      tenantId: tenantCtx.tenantId,
-      timestamp: new Date().toISOString(),
-    };
-    this.publishEvent(NatsSubjects.LESSON_PUBLISHED, payload);
+      const published = this.mapLesson(row as Record<string, unknown>);
+      const payload: LessonPayload = {
+        type: 'lesson.published',
+        lessonId: id,
+        courseId: String(lesson.courseId),
+        tenantId: tenantCtx.tenantId,
+        timestamp: new Date().toISOString(),
+      };
+      this.publishEvent(NatsSubjects.LESSON_PUBLISHED, payload);
 
-    return published;
+      return published;
+    } catch (err) {
+      this.logger.error(`Failed to publish lesson "${id}": ${String(err)}`);
+      throw new BadRequestException('Failed to publish lesson.');
+    }
   }
 }

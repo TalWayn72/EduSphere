@@ -225,10 +225,28 @@ export function CourseDetailPage() {
   const handleEnroll = () => {
     startEnrollTransition(async () => {
       if (isEnrolled) {
-        await unenrollMutation({ courseId });
+        const { error: unenrollErr } = await unenrollMutation({ courseId });
+        if (unenrollErr) {
+          const msg =
+            unenrollErr.graphQLErrors?.[0]?.message ??
+            unenrollErr.message ??
+            'Failed to unenroll';
+          console.error('[CourseDetailPage] unenroll failed:', msg, unenrollErr);
+          showToast(msg);
+          return;
+        }
         showToast(t('unenroll'));
       } else {
-        await enrollMutation({ courseId });
+        const { error: enrollErr } = await enrollMutation({ courseId });
+        if (enrollErr) {
+          const msg =
+            enrollErr.graphQLErrors?.[0]?.message ??
+            enrollErr.message ??
+            'Failed to enroll';
+          console.error('[CourseDetailPage] enroll failed:', msg, enrollErr);
+          showToast(msg);
+          return;
+        }
         showToast(t('enrolled'));
       }
     });

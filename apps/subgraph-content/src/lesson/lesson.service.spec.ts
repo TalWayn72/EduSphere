@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 
 // ─── DB chain mocks ───────────────────────────────────────────────────────────
@@ -116,6 +116,8 @@ describe('LessonService', () => {
   });
 
   describe('create()', () => {
+    const VALID_COURSE_ID = 'c1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6';
+
     beforeEach(() => {
       mockReturning.mockResolvedValue([MOCK_ROW]);
       mockValues.mockReturnValue({ returning: mockReturning });
@@ -124,7 +126,7 @@ describe('LessonService', () => {
 
     it('returns the newly created lesson', async () => {
       const input = {
-        courseId: 'c-1',
+        courseId: VALID_COURSE_ID,
         title: 'Introduction',
         type: 'THEMATIC' as const,
         instructorId: 'u-1',
@@ -140,7 +142,12 @@ describe('LessonService', () => {
         return { returning: mockReturning };
       });
       await service.create(
-        { courseId: 'c-1', title: 'T', type: 'THEMATIC', instructorId: 'u-1' },
+        {
+          courseId: VALID_COURSE_ID,
+          title: 'T',
+          type: 'THEMATIC',
+          instructorId: 'u-1',
+        },
         TENANT_CTX
       );
       expect(captured['status']).toBe('DRAFT');
@@ -148,10 +155,83 @@ describe('LessonService', () => {
 
     it('calls returning() after insert', async () => {
       await service.create(
-        { courseId: 'c-1', title: 'T', type: 'THEMATIC', instructorId: 'u-1' },
+        {
+          courseId: VALID_COURSE_ID,
+          title: 'T',
+          type: 'THEMATIC',
+          instructorId: 'u-1',
+        },
         TENANT_CTX
       );
       expect(mockReturning).toHaveBeenCalled();
+    });
+
+    // BUG-044: courseId must be a valid UUID — mock IDs like "mock-course-1"
+    // caused FK constraint violations that bubbled as "Unexpected error".
+    it('throws BadRequestException for non-UUID courseId (BUG-044)', async () => {
+      await expect(
+        service.create(
+          {
+            courseId: 'mock-course-1',
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: 'u-1',
+          },
+          TENANT_CTX
+        )
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('error message for invalid courseId is descriptive (not "Unexpected error")', async () => {
+      await expect(
+        service.create(
+          {
+            courseId: 'not-a-uuid',
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: 'u-1',
+          },
+          TENANT_CTX
+        )
+      ).rejects.toMatchObject({
+        message: expect.stringContaining('Invalid courseId'),
+      });
+    });
+
+    it('throws BadRequestException when DB insert fails', async () => {
+      mockReturning.mockRejectedValue(
+        new Error('insert violates foreign key constraint')
+      );
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: 'u-1',
+          },
+          TENANT_CTX
+        )
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('DB error message is user-friendly (not raw SQL error)', async () => {
+      mockReturning.mockRejectedValue(
+        new Error('insert violates foreign key constraint "lessons_course_id_fkey"')
+      );
+      await expect(
+        service.create(
+          {
+            courseId: VALID_COURSE_ID,
+            title: 'T',
+            type: 'THEMATIC',
+            instructorId: 'u-1',
+          },
+          TENANT_CTX
+        )
+      ).rejects.toMatchObject({
+        message: expect.stringContaining('Failed to create lesson'),
+      });
     });
   });
 

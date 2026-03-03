@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -118,57 +123,86 @@ export class LessonPipelineService implements OnModuleDestroy {
     input: SaveLessonPipelineInput,
     _tenantCtx: TenantContext
   ) {
-    const existing = await this.findByLesson(lessonId);
-    if (existing) {
+    try {
+      const existing = await this.findByLesson(lessonId);
+      if (existing) {
+        const [row] = await this.db
+          .update(schema.lesson_pipelines)
+          .set({
+            template_name: input.templateName ?? null,
+            nodes: input.nodes,
+            config: input.config ?? {},
+            status: 'DRAFT',
+          })
+          .where(eq(schema.lesson_pipelines.id, String(existing.id)))
+          .returning();
+        return this.mapPipeline(row as Record<string, unknown>);
+      }
+
       const [row] = await this.db
-        .update(schema.lesson_pipelines)
-        .set({
+        .insert(schema.lesson_pipelines)
+        .values({
+          lesson_id: lessonId,
           template_name: input.templateName ?? null,
           nodes: input.nodes,
           config: input.config ?? {},
           status: 'DRAFT',
         })
-        .where(eq(schema.lesson_pipelines.id, String(existing.id)))
         .returning();
+      this.logger.log(`Pipeline saved for lesson ${lessonId}`);
       return this.mapPipeline(row as Record<string, unknown>);
+    } catch (err) {
+      this.logger.error(
+        `Failed to save pipeline for lesson "${lessonId}": ${String(err)}`
+      );
+      throw new BadRequestException(
+        'Failed to save pipeline. Ensure the lesson exists.'
+      );
     }
-
-    const [row] = await this.db
-      .insert(schema.lesson_pipelines)
-      .values({
-        lesson_id: lessonId,
-        template_name: input.templateName ?? null,
-        nodes: input.nodes,
-        config: input.config ?? {},
-        status: 'DRAFT',
-      })
-      .returning();
-    this.logger.log(`Pipeline saved for lesson ${lessonId}`);
-    return this.mapPipeline(row as Record<string, unknown>);
   }
 
   async startRun(pipelineId: string, tenantCtx: TenantContext) {
     // Prevent duplicate concurrent runs
-    const [existing] = await this.db
-      .select()
-      .from(schema.lesson_pipeline_runs)
-      .where(
-        and(
-          eq(schema.lesson_pipeline_runs.pipeline_id, pipelineId),
-          eq(schema.lesson_pipeline_runs.status, 'RUNNING')
+    let existing: Record<string, unknown> | undefined;
+    try {
+      [existing] = await this.db
+        .select()
+        .from(schema.lesson_pipeline_runs)
+        .where(
+          and(
+            eq(schema.lesson_pipeline_runs.pipeline_id, pipelineId),
+            eq(schema.lesson_pipeline_runs.status, 'RUNNING')
+          )
         )
-      )
-      .limit(1);
-    if (existing) return this.mapRun(existing as Record<string, unknown>);
+        .limit(1) as [Record<string, unknown>];
+    } catch (err) {
+      this.logger.error(
+        `Failed to check existing runs for pipeline "${pipelineId}": ${String(err)}`
+      );
+      throw new BadRequestException(
+        'Failed to start pipeline run. Ensure the pipeline exists.'
+      );
+    }
+    if (existing) return this.mapRun(existing);
 
-    const [row] = await this.db
-      .insert(schema.lesson_pipeline_runs)
-      .values({
-        pipeline_id: pipelineId,
-        started_at: new Date(),
-        status: 'RUNNING',
-      })
-      .returning();
+    let row: Record<string, unknown>;
+    try {
+      [row] = await this.db
+        .insert(schema.lesson_pipeline_runs)
+        .values({
+          pipeline_id: pipelineId,
+          started_at: new Date(),
+          status: 'RUNNING',
+        })
+        .returning() as [Record<string, unknown>];
+    } catch (err) {
+      this.logger.error(
+        `Failed to create run for pipeline "${pipelineId}": ${String(err)}`
+      );
+      throw new BadRequestException(
+        'Failed to start pipeline run. Ensure the pipeline exists.'
+      );
+    }
 
     const run = this.mapRun(row as Record<string, unknown>);
     const runId = String(row?.['id']);

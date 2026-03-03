@@ -703,27 +703,35 @@ Execute one round per logical grouping of similar issues. **A round is NOT done 
 - **Round N**: Continue rounds until the Discovery List is empty and grep returns zero matches for the bug pattern
 - Each round must NOT introduce new TypeScript errors (`pnpm turbo typecheck`)
 
+**Required tests per round (for UI bugs):**
+- Unit test asserting the CORRECT behavior is now present
+- Unit test asserting the BAD behavior is GONE (regression guard — explicitly test the bad string/state is absent)
+- **Playwright E2E test** with `page.route()` interception or mock to reproduce the bug scenario + `expect(element).not.toContainText(badString)` assertion
+- Screenshot assertion (`expect(page).toHaveScreenshot(...)`) for visual regressions
+
 ### Phase 3 — Verification
 
 6. **Full test suite** - `pnpm turbo test -- --coverage` must pass 100%
-7. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino error/warn)
-8. **Visual check** - Open browser, reproduce the original scenario, confirm zero console errors and correct UI behavior
+7. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino/console.error with structured prefix)
+8. **Visual check (MANDATORY for UI bugs)** - Open browser, reproduce the original scenario (e.g., block the GraphQL endpoint with DevTools → Network → Block Request URL), confirm the correct fallback UI is shown without raw technical strings. Take a screenshot and compare.
 9. **Health check** - `./scripts/health-check.sh` passes
 10. **Pattern clean** - grep for the bug pattern returns zero matches outside of test files
+11. **E2E visual regression test** - A Playwright test that simulates the failure condition and asserts BOTH that the error UI is shown AND that raw technical strings (urql error messages, stack traces) are NOT visible to users
 
 ### Phase 4 — Documentation
 
-11. **Document** in `OPEN_ISSUES.md`:
+12. **Document** in `OPEN_ISSUES.md`:
     - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
     - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
     - Files affected (including ALL rounds), problem, root cause chain, solution per round, tests added
-    - **Anti-recurrence note**: what prevents this from happening again
+    - **Anti-recurrence note**: what prevents this from happening again (the regression test file:line that would catch it)
 
 **IRON RULES (never violate):**
 - Never fix a bug without reading the logs first. No logs = part of the bug.
 - Never declare a bug fixed until the entire Discovery List is empty.
 - Never close a bug without a regression test that would catch it if it returns.
 - Never leave logging gaps — the bug must be observable in logs if it recurs.
+- **UI bugs must have a Playwright E2E test that simulates the failure and asserts the UI is clean.** A bug that shows ugly technical errors to users is NOT fixed until a Playwright test guards against the ugly message reappearing.
 - Only report completion when ALL rounds are done, all tests pass, and grep shows zero recurrence patterns.
 
 ## Parallel Execution (Agents)

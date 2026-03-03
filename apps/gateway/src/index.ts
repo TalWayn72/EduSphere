@@ -161,7 +161,23 @@ const yoga = createYoga({
           });
           resolvedTenantId = (payload['tenant_id'] as string) ?? null;
           userId = payload.sub ?? null;
-          role = (payload['role'] as string) ?? null;
+          // Support both a top-level "role" claim (custom mapper) and the
+          // standard Keycloak realm_access.roles array (default).
+          const APP_ROLES = new Set([
+            'SUPER_ADMIN',
+            'ORG_ADMIN',
+            'INSTRUCTOR',
+            'STUDENT',
+            'RESEARCHER',
+          ]);
+          role =
+            (payload['role'] as string) ??
+            (
+              (
+                (payload['realm_access'] as Record<string, unknown>)
+                  ?.['roles'] as string[]
+              )?.find((r) => APP_ROLES.has(r)) ?? null
+            );
           isAuthenticated = true;
         } catch (error) {
           logger.warn(

@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -71,15 +76,20 @@ export class CourseService implements OnModuleDestroy {
   }
 
   async findAll(limit: number, offset: number) {
-    const rows = await withReadReplica((db) =>
-      db
-        .select()
-        .from(schema.courses)
-        .orderBy(desc(schema.courses.created_at))
-        .limit(limit)
-        .offset(offset)
-    );
-    return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
+    try {
+      const rows = await withReadReplica((db) =>
+        db
+          .select()
+          .from(schema.courses)
+          .orderBy(desc(schema.courses.created_at))
+          .limit(limit)
+          .offset(offset)
+      );
+      return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
+    } catch (err) {
+      this.logger.error(`Failed to fetch courses: ${String(err)}`);
+      throw new BadRequestException('Failed to fetch courses. Please try again.');
+    }
   }
 
   async create(input: CreateCourseInput) {
@@ -88,43 +98,64 @@ export class CourseService implements OnModuleDestroy {
     ).replace(/^-+|-+$/g, '');
     const slug = rawSlug || `course-${Date.now().toString(36)}`;
     const instructorId = input.instructorId || input.creatorId || '';
-    const [course] = await this.db
-      .insert(schema.courses)
-      .values({
-        tenant_id: input.tenantId ?? '',
-        title: input.title,
-        slug,
-        description: input.description,
-        instructor_id: instructorId,
-        is_published: input.isPublished || false,
-        thumbnail_url: input.thumbnailUrl,
-        estimated_hours: input.estimatedHours,
-      })
-      .returning();
-    this.logger.log(`Course created: ${course?.id} - "${input.title}"`);
-    return this.mapCourse(course as Record<string, unknown>);
+    try {
+      const [course] = await this.db
+        .insert(schema.courses)
+        .values({
+          tenant_id: input.tenantId ?? '',
+          title: input.title,
+          slug,
+          description: input.description,
+          instructor_id: instructorId,
+          is_published: input.isPublished || false,
+          thumbnail_url: input.thumbnailUrl,
+          estimated_hours: input.estimatedHours,
+        })
+        .returning();
+      this.logger.log(`Course created: ${course?.id} - "${input.title}"`);
+      return this.mapCourse(course as Record<string, unknown>);
+    } catch (err) {
+      this.logger.error(
+        `Failed to create course "${input.title}": ${String(err)}`
+      );
+      throw new BadRequestException('Failed to create course.');
+    }
   }
 
   async setPublished(id: string, isPublished: boolean) {
-    const [course] = await this.db
-      .update(schema.courses)
-      .set({ is_published: isPublished })
-      .where(eq(schema.courses.id, id))
-      .returning();
-    this.logger.log(
-      `Course ${isPublished ? 'published' : 'unpublished'}: ${id}`
-    );
-    return this.mapCourse(course as Record<string, unknown>);
+    try {
+      const [course] = await this.db
+        .update(schema.courses)
+        .set({ is_published: isPublished })
+        .where(eq(schema.courses.id, id))
+        .returning();
+      this.logger.log(
+        `Course ${isPublished ? 'published' : 'unpublished'}: ${id}`
+      );
+      return this.mapCourse(course as Record<string, unknown>);
+    } catch (err) {
+      this.logger.error(
+        `Failed to ${isPublished ? 'publish' : 'unpublish'} course "${id}": ${String(err)}`
+      );
+      throw new BadRequestException(
+        `Failed to ${isPublished ? 'publish' : 'unpublish'} course.`
+      );
+    }
   }
 
   async delete(id: string): Promise<boolean> {
-    const [course] = await this.db
-      .update(schema.courses)
-      .set({ deleted_at: new Date() })
-      .where(eq(schema.courses.id, id))
-      .returning();
-    this.logger.log(`Course soft-deleted: ${id}`);
-    return !!course;
+    try {
+      const [course] = await this.db
+        .update(schema.courses)
+        .set({ deleted_at: new Date() })
+        .where(eq(schema.courses.id, id))
+        .returning();
+      this.logger.log(`Course soft-deleted: ${id}`);
+      return !!course;
+    } catch (err) {
+      this.logger.error(`Failed to delete course "${id}": ${String(err)}`);
+      throw new BadRequestException('Failed to delete course.');
+    }
   }
 
   async update(id: string, input: UpdateCourseInput) {
@@ -138,11 +169,16 @@ export class CourseService implements OnModuleDestroy {
     if (input.estimatedHours !== undefined)
       updateData['estimatedHours'] = input.estimatedHours;
 
-    const [course] = await this.db
-      .update(schema.courses)
-      .set(updateData)
-      .where(eq(schema.courses.id, id))
-      .returning();
-    return this.mapCourse(course as Record<string, unknown>);
+    try {
+      const [course] = await this.db
+        .update(schema.courses)
+        .set(updateData)
+        .where(eq(schema.courses.id, id))
+        .returning();
+      return this.mapCourse(course as Record<string, unknown>);
+    } catch (err) {
+      this.logger.error(`Failed to update course "${id}": ${String(err)}`);
+      throw new BadRequestException('Failed to update course.');
+    }
   }
 }

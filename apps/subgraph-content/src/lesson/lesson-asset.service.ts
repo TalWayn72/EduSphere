@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
@@ -74,17 +79,27 @@ export class LessonAssetService implements OnModuleDestroy {
     input: AddLessonAssetInput,
     tenantCtx: TenantContext
   ) {
-    const [row] = await this.db
-      .insert(schema.lesson_assets)
-      .values({
-        lesson_id: lessonId,
-        asset_type: input.assetType,
-        source_url: input.sourceUrl ?? null,
-        file_url: input.fileUrl ?? null,
-        media_asset_id: input.mediaAssetId ?? null,
-        metadata: input.metadata ?? {},
-      })
-      .returning();
+    let row: Record<string, unknown> | undefined;
+    try {
+      [row] = (await this.db
+        .insert(schema.lesson_assets)
+        .values({
+          lesson_id: lessonId,
+          asset_type: input.assetType,
+          source_url: input.sourceUrl ?? null,
+          file_url: input.fileUrl ?? null,
+          media_asset_id: input.mediaAssetId ?? null,
+          metadata: input.metadata ?? {},
+        })
+        .returning()) as [Record<string, unknown>];
+    } catch (err) {
+      this.logger.error(
+        `Failed to add asset to lesson "${lessonId}": ${String(err)}`
+      );
+      throw new BadRequestException(
+        'Failed to add asset. Ensure the lesson exists.'
+      );
+    }
 
     this.logger.log(
       `Lesson asset added: ${String(row?.['id'])} for lesson ${lessonId}`

@@ -72,7 +72,11 @@ export function CreateLessonPage() {
       },
     });
     if (mutError) {
-      setError(mutError.graphQLErrors?.[0]?.message ?? mutError.message);
+      const gqlMsg = mutError.graphQLErrors?.[0]?.message;
+      const networkMsg = mutError.networkError?.message;
+      const msg = gqlMsg ?? networkMsg ?? mutError.message;
+      console.error('[CreateLessonPage] createLesson failed:', msg, mutError);
+      setError(msg);
       return;
     }
     if (data?.createLesson) {
@@ -158,7 +162,15 @@ export function CreateLessonPage() {
                 </p>
               </div>
             </div>
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            {error && (
+              <p
+                className="text-red-500 text-sm mb-4"
+                data-testid="create-lesson-error"
+                role="alert"
+              >
+                {error}
+              </p>
+            )}
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setStep(2)}>
                 חזרה
