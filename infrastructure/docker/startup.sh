@@ -91,16 +91,22 @@ echo "✅ Database setup complete"
 
 # ─── Keycloak realm file: ensure correct name (edusphere-realm.json) ──────────
 # Keycloak ≥ 24 requires the import file name to match the realm name.
-# The image ships keycloak-realm.json; rename it once to edusphere-realm.json.
+# edusphere-realm.json is bind-mounted from infrastructure/docker/keycloak-realm.json.
+# That bind mount has the correct user IDs (00000000-...001-5) matching DB seed.
+# If the volume-initialized keycloak-realm.json also exists, remove it to avoid
+# Keycloak seeing two realm files and potentially importing the wrong one.
 KC_IMPORT_DIR="/opt/keycloak/data/import"
-if [ -f "$KC_IMPORT_DIR/keycloak-realm.json" ] && [ ! -f "$KC_IMPORT_DIR/edusphere-realm.json" ]; then
+mkdir -p "$KC_IMPORT_DIR"
+if [ -f "$KC_IMPORT_DIR/keycloak-realm.json" ] && [ -f "$KC_IMPORT_DIR/edusphere-realm.json" ]; then
+    rm "$KC_IMPORT_DIR/keycloak-realm.json"
+    echo "✅ Removed stale keycloak-realm.json (edusphere-realm.json bind-mount is authoritative)"
+elif [ -f "$KC_IMPORT_DIR/keycloak-realm.json" ] && [ ! -f "$KC_IMPORT_DIR/edusphere-realm.json" ]; then
     echo "🔑 Renaming keycloak-realm.json → edusphere-realm.json (Keycloak name convention fix)"
     cp "$KC_IMPORT_DIR/keycloak-realm.json" "$KC_IMPORT_DIR/edusphere-realm.json"
     rm "$KC_IMPORT_DIR/keycloak-realm.json"
     echo "✅ Keycloak realm file renamed"
-elif [ -f "$KC_IMPORT_DIR/keycloak-realm.json" ] && [ -f "$KC_IMPORT_DIR/edusphere-realm.json" ]; then
-    rm "$KC_IMPORT_DIR/keycloak-realm.json"
-    echo "✅ Removed duplicate keycloak-realm.json"
+elif [ -f "$KC_IMPORT_DIR/edusphere-realm.json" ]; then
+    echo "✅ edusphere-realm.json present (bind-mounted)"
 fi
 
 # ─── Run Drizzle migrations (idempotent) ─────────────────────
@@ -153,6 +159,17 @@ if [ ! -d "/app/node_modules/nats" ]; then
     fi
 else
     echo "✅ nats already present"
+fi
+
+# @edusphere/langgraph-workflows: pnpm workspace symlink not created by install
+# (langgraph-workflows is not directly in app's node_modules top-level).
+# Needed by subgraph-agent to load compiled tutorWorkflow.js.
+if [ ! -L "/app/node_modules/@edusphere/langgraph-workflows" ] && [ ! -d "/app/node_modules/@edusphere/langgraph-workflows" ]; then
+    mkdir -p /app/node_modules/@edusphere
+    ln -sf /app/packages/langgraph-workflows /app/node_modules/@edusphere/langgraph-workflows
+    echo "✅ @edusphere/langgraph-workflows symlinked"
+else
+    echo "✅ @edusphere/langgraph-workflows already present"
 fi
 
 # ─── Conditional dist rebuild (idempotent, runs only when stale) ──

@@ -500,7 +500,7 @@
       "groups": []
     },
     {
-      "id": "909e98a3-d6c4-407c-a4ab-59a978820f07",
+      "id": "00000000-0000-0000-0000-000000000001",
       "username": "super.admin@edusphere.dev",
       "email": "super.admin@edusphere.dev",
       "emailVerified": true,
@@ -509,6 +509,7 @@
       "lastName": "Admin",
       "createdTimestamp": 1771563800000,
       "totp": false,
+      "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000000"] },
       "credentials": [
         { "type": "password", "value": "SuperAdmin123!", "temporary": false }
       ],
@@ -519,7 +520,7 @@
       "groups": []
     },
     {
-      "id": "daa00e8d-0b90-4990-ab36-e9dccbf855a5",
+      "id": "00000000-0000-0000-0000-000000000002",
       "username": "instructor@example.com",
       "email": "instructor@example.com",
       "emailVerified": true,
@@ -528,6 +529,7 @@
       "lastName": "Instructor",
       "createdTimestamp": 1771563800001,
       "totp": false,
+      "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000000"] },
       "credentials": [
         { "type": "password", "value": "Instructor123!", "temporary": false }
       ],
@@ -538,7 +540,7 @@
       "groups": []
     },
     {
-      "id": "a5e38677-6147-4e6c-a7f0-97370c4161c6",
+      "id": "00000000-0000-0000-0000-000000000003",
       "username": "org.admin@example.com",
       "email": "org.admin@example.com",
       "emailVerified": true,
@@ -547,6 +549,7 @@
       "lastName": "Admin",
       "createdTimestamp": 1771563800002,
       "totp": false,
+      "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000000"] },
       "credentials": [
         { "type": "password", "value": "OrgAdmin123!", "temporary": false }
       ],
@@ -557,7 +560,7 @@
       "groups": []
     },
     {
-      "id": "092417f4-5c50-4274-b640-f56b2aebdefd",
+      "id": "00000000-0000-0000-0000-000000000004",
       "username": "researcher@example.com",
       "email": "researcher@example.com",
       "emailVerified": true,
@@ -566,6 +569,7 @@
       "lastName": "Researcher",
       "createdTimestamp": 1771563800003,
       "totp": false,
+      "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000000"] },
       "credentials": [
         { "type": "password", "value": "Researcher123!", "temporary": false }
       ],
@@ -576,7 +580,7 @@
       "groups": []
     },
     {
-      "id": "5c849df5-a025-4c65-9fa4-d282ced233b4",
+      "id": "00000000-0000-0000-0000-000000000005",
       "username": "student@example.com",
       "email": "student@example.com",
       "emailVerified": true,
@@ -585,6 +589,7 @@
       "lastName": "Student",
       "createdTimestamp": 1771563800004,
       "totp": false,
+      "attributes": { "tenant_id": ["00000000-0000-0000-0000-000000000000"] },
       "credentials": [
         { "type": "password", "value": "Student123!", "temporary": false }
       ],

@@ -63,6 +63,7 @@ async function seed() {
     await db
       .insert(users)
       .values([
+        // ── Dev/CI super-admin (Keycloak ID 00000000-...0001) ───────────────
         {
           id: '00000000-0000-0000-0000-000000000001',
           tenant_id:
@@ -71,6 +72,41 @@ async function seed() {
           display_name: 'Super Admin',
           role: 'SUPER_ADMIN',
         },
+        // ── Keycloak demo users — IDs MUST match Keycloak realm user IDs ────
+        // Keycloak sub == DB users.id so `me { ... }` resolves after login.
+        {
+          id: '00000000-0000-0000-0000-000000000002',
+          tenant_id:
+            defaultTenant?.id || '00000000-0000-0000-0000-000000000000',
+          email: 'instructor@example.com',
+          display_name: 'Demo Instructor',
+          role: 'INSTRUCTOR',
+        },
+        {
+          id: '00000000-0000-0000-0000-000000000003',
+          tenant_id:
+            defaultTenant?.id || '00000000-0000-0000-0000-000000000000',
+          email: 'org.admin@example.com',
+          display_name: 'Demo Org Admin',
+          role: 'ORG_ADMIN',
+        },
+        {
+          id: '00000000-0000-0000-0000-000000000004',
+          tenant_id:
+            defaultTenant?.id || '00000000-0000-0000-0000-000000000000',
+          email: 'researcher@example.com',
+          display_name: 'Demo Researcher',
+          role: 'RESEARCHER',
+        },
+        {
+          id: '00000000-0000-0000-0000-000000000005',
+          tenant_id:
+            defaultTenant?.id || '00000000-0000-0000-0000-000000000000',
+          email: 'student@example.com',
+          display_name: 'Demo Student',
+          role: 'STUDENT',
+        },
+        // ── University A demo users (legacy test data) ───────────────────────
         {
           id: '11111111-1111-1111-1111-111111111101',
           tenant_id: tenant1?.id || '11111111-1111-1111-1111-111111111111',
@@ -102,7 +138,7 @@ async function seed() {
       ])
       .onConflictDoNothing();
 
-    console.log('✅ Created 5 demo users');
+    console.log('✅ Created 9 demo users (5 Keycloak + 4 University A legacy)');
 
     // Create sample course
     const [course1] = await db

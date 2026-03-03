@@ -16,7 +16,8 @@ export const UserRole = z.enum([
 export type UserRole = z.infer<typeof UserRole>;
 
 export const JWTClaimsSchema = z.object({
-  sub: z.string().uuid(),
+  // sub is a Keycloak user UUID — allow nil-patterned UUIDs (00000000-...) used in dev seeds
+  sub: z.string().min(36).max(36),
   email: z.string().email(),
   preferred_username: z.string(),
   given_name: z.string().optional(),

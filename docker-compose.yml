@@ -66,6 +66,14 @@ services:
       # gateway supergraph: keeps the federation schema in sync after subgraph additions
       # without requiring an image rebuild (gateway polls every 10 s via pollingInterval)
       - ./apps/gateway/supergraph.graphql:/app/apps/gateway/supergraph.graphql:ro
+      # keycloak realm: ensures Keycloak always imports the current realm JSON on a fresh
+      # keycloak_data volume. User IDs MUST match DB seed IDs (00000000-...001-5) so that
+      # JWT sub == DB users.id and `me { ... }` resolves correctly after every login.
+      # startup.sh detects this file already exists and skips renaming keycloak-realm.json.
+      - ./infrastructure/docker/keycloak-realm.json:/opt/keycloak/data/import/edusphere-realm.json:ro
+      # scripts: always use committed scripts — critical for keycloak-seed-passwords
+      # which runs reset-keycloak-passwords.cjs (UUID fix + role assignment + passwords).
+      - ./scripts:/app/scripts:ro
       # subgraph-core-compat mounts REMOVED: PG18 image is freshly built from source,
       # so baked-in dist already has UserPreferences, PublicProfileService, etc.
       # Compat files were only needed for the stale Feb-20 image.
