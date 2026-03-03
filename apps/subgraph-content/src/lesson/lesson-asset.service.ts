@@ -91,7 +91,7 @@ export class LessonAssetService implements OnModuleDestroy {
           media_asset_id: input.mediaAssetId ?? null,
           metadata: input.metadata ?? {},
         })
-        .returning()) as [Record<string, unknown>];
+        .returning()) as unknown as [Record<string, unknown>];
     } catch (err) {
       this.logger.error(
         `Failed to add asset to lesson "${lessonId}": ${String(err)}`

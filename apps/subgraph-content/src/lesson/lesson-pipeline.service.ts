@@ -174,7 +174,7 @@ export class LessonPipelineService implements OnModuleDestroy {
             eq(schema.lesson_pipeline_runs.status, 'RUNNING')
           )
         )
-        .limit(1) as [Record<string, unknown>];
+        .limit(1) as unknown as [Record<string, unknown>];
     } catch (err) {
       this.logger.error(
         `Failed to check existing runs for pipeline "${pipelineId}": ${String(err)}`
@@ -194,7 +194,7 @@ export class LessonPipelineService implements OnModuleDestroy {
           started_at: new Date(),
           status: 'RUNNING',
         })
-        .returning() as [Record<string, unknown>];
+        .returning() as unknown as [Record<string, unknown>];
     } catch (err) {
       this.logger.error(
         `Failed to create run for pipeline "${pipelineId}": ${String(err)}`

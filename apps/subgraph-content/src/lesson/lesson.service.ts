@@ -149,7 +149,7 @@ export class LessonService implements OnModuleDestroy {
           instructor_id: input.instructorId,
           status: 'DRAFT',
         })
-        .returning()) as [Record<string, unknown>];
+        .returning()) as unknown as [Record<string, unknown>];
     } catch (err) {
       this.logger.error(
         `Failed to create lesson for course "${input.courseId}" ` +
