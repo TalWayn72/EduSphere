@@ -5,7 +5,7 @@
  * Captures console errors, network errors, screenshots for each page.
  *
  * Usage (against the running dev server on 5173):
- *   E2E_ENV=staging E2E_BASE_URL=http://localhost:5173 \
+ *   E2E_ENV=staging E2E_BASE_URL=http://localhost:5175 \
  *   VITE_DEV_MODE=false \
  *   pnpm --filter @edusphere/web exec playwright test e2e/visual-qa-full.spec.ts \
  *   --workers=1 --project=chromium --reporter=list
@@ -17,7 +17,7 @@ import path from 'path';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5173';
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 
 // Known seed data IDs (from nahar-shalom-course.ts + DB query)
 const SEED = {
@@ -193,7 +193,7 @@ async function login(
 
   if (page.url().includes('8080') || page.url().includes('auth')) {
     await keycloakLogin(page, user.email, user.password);
-    await page.waitForURL(/localhost:5173/, { timeout: 25000 }).catch(() => {});
+    await page.waitForURL(/localhost:5175/, { timeout: 25000 }).catch(() => {});
     await page.waitForTimeout(2000);
   }
 
@@ -208,7 +208,7 @@ async function login(
       if (page.url().includes('8080')) {
         await keycloakLogin(page, user.email, user.password);
         await page
-          .waitForURL(/localhost:5173/, { timeout: 25000 })
+          .waitForURL(/localhost:5175/, { timeout: 25000 })
           .catch(() => {});
         await page.waitForTimeout(2000);
       }

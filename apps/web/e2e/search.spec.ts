@@ -18,7 +18,7 @@ import { SearchPage } from './pages/SearchPage';
 
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 // Matches whichever port the app is running on (5173 default, 5175 when E2E_BASE_URL overrides)
-const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5173').replace(
+const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5175').replace(
   /^https?:\/\//,
   ''
 );

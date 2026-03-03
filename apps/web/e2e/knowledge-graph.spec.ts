@@ -18,7 +18,7 @@
  *   pnpm --filter @edusphere/web exec playwright test e2e/knowledge-graph.spec.ts
  *
  * Run (live backend regression check):
- *   VITE_DEV_MODE=false E2E_BASE_URL=http://localhost:5173 \
+ *   VITE_DEV_MODE=false E2E_BASE_URL=http://localhost:5175 \
  *   pnpm --filter @edusphere/web exec playwright test e2e/knowledge-graph.spec.ts \
  *   --project=chromium --reporter=list
  */
