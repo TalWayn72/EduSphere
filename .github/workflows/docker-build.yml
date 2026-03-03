@@ -134,6 +134,7 @@ jobs:
 
       - name: Generate SBOM (Software Bill of Materials)
         if: github.event_name != 'pull_request'
+        continue-on-error: true
         uses: anchore/sbom-action@v0
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.meta.outputs.version }}

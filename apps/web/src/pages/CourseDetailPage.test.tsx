@@ -93,7 +93,12 @@ const MOCK_COURSE = {
 const NOOP_MUTATION = [{ fetching: false }, vi.fn()] as never;
 
 const MOCK_LESSONS = [
-  { id: 'lesson-1', title: 'שיעור מבוא', type: 'THEMATIC', status: 'PUBLISHED' },
+  {
+    id: 'lesson-1',
+    title: 'שיעור מבוא',
+    type: 'THEMATIC',
+    status: 'PUBLISHED',
+  },
   { id: 'lesson-2', title: 'שיעור מתקדם', type: 'SEQUENTIAL', status: 'READY' },
 ];
 
@@ -241,19 +246,25 @@ describe('CourseDetailPage', () => {
   it('hides "+ הוסף שיעור" button from student', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
     render(<CourseDetailPage />);
-    expect(screen.queryByRole('button', { name: /הוסף שיעור/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /הוסף שיעור/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows "+ הוסף שיעור" button to instructor', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
     render(<CourseDetailPage />);
-    expect(screen.getByRole('button', { name: /הוסף שיעור/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /הוסף שיעור/i })
+    ).toBeInTheDocument();
   });
 
   it('navigates to lesson detail when lesson row is clicked', () => {
     render(<CourseDetailPage />);
     fireEvent.click(screen.getByText('שיעור מבוא'));
-    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1/lessons/lesson-1');
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/courses/course-1/lessons/lesson-1'
+    );
   });
 
   it('shows status badge per lesson', () => {

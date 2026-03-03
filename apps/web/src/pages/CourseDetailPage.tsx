@@ -97,8 +97,18 @@ interface ProgressData {
 // ── Mock fallback (shown when GraphQL is unavailable / DEV_MODE) ──────────────
 
 const MOCK_LESSONS_FALLBACK: LessonSummary[] = [
-  { id: 'lesson-demo-1', title: 'שיעור 1 — מבוא למשנה', type: 'THEMATIC', status: 'PUBLISHED' },
-  { id: 'lesson-demo-2', title: 'שיעור 2 — מבנה הגמרא', type: 'SEQUENTIAL', status: 'READY' },
+  {
+    id: 'lesson-demo-1',
+    title: 'שיעור 1 — מבוא למשנה',
+    type: 'THEMATIC',
+    status: 'PUBLISHED',
+  },
+  {
+    id: 'lesson-demo-2',
+    title: 'שיעור 2 — מבנה הגמרא',
+    type: 'SEQUENTIAL',
+    status: 'READY',
+  },
 ];
 
 const MOCK_COURSE_FALLBACK: CourseDetailData = {
@@ -197,8 +207,7 @@ export function CourseDetailPage() {
   // Fall back to mock data when GraphQL is unavailable (DEV_MODE / no backend)
   const course = data?.course ?? (error ? MOCK_COURSE_FALLBACK : null);
   const lessons: LessonSummary[] =
-    lessonsData?.lessonsByCourse ??
-    (error ? MOCK_LESSONS_FALLBACK : []);
+    lessonsData?.lessonsByCourse ?? (error ? MOCK_LESSONS_FALLBACK : []);
   // When gateway is offline (enrollError) and showing mock course, treat as enrolled
   // so "בטל הרשמה" is shown rather than the misleading "הירשם".
   const isEnrolled = enrollError
