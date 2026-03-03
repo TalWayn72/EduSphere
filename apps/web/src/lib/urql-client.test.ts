@@ -40,8 +40,16 @@ interface MockCombinedError {
 
 // ── hasAuthError logic (extracted from urql-client.ts for unit testing) ───────
 
-const AUTH_ERROR_MESSAGES = ['unauthorized', 'authentication required', 'unauthenticated'];
-const AUTH_ERROR_CODES = new Set(['UNAUTHENTICATED', 'UNAUTHORIZED', 'FORBIDDEN']);
+const AUTH_ERROR_MESSAGES = [
+  'unauthorized',
+  'authentication required',
+  'unauthenticated',
+];
+const AUTH_ERROR_CODES = new Set([
+  'UNAUTHENTICATED',
+  'UNAUTHORIZED',
+  'FORBIDDEN',
+]);
 
 function hasAuthError(error: MockCombinedError): boolean {
   return (
@@ -62,11 +70,7 @@ function shouldRedirectOnError(
   operationKind = 'query'
 ): boolean {
   if (operationKind === 'subscription') return false;
-  return (
-    hasAuthError(error) &&
-    authenticated &&
-    !pathname.startsWith('/login')
-  );
+  return hasAuthError(error) && authenticated && !pathname.startsWith('/login');
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -111,7 +115,9 @@ describe('urql auth error exchange — hasAuthError', () => {
   it('returns true for UNAUTHENTICATED extension code', () => {
     const error: MockCombinedError = {
       message: '[GraphQL] Error',
-      graphQLErrors: [{ message: 'Error', extensions: { code: 'UNAUTHENTICATED' } }],
+      graphQLErrors: [
+        { message: 'Error', extensions: { code: 'UNAUTHENTICATED' } },
+      ],
     };
     expect(hasAuthError(error)).toBe(true);
   });
@@ -119,7 +125,9 @@ describe('urql auth error exchange — hasAuthError', () => {
   it('returns true for FORBIDDEN extension code', () => {
     const error: MockCombinedError = {
       message: '[GraphQL] Forbidden',
-      graphQLErrors: [{ message: 'Forbidden', extensions: { code: 'FORBIDDEN' } }],
+      graphQLErrors: [
+        { message: 'Forbidden', extensions: { code: 'FORBIDDEN' } },
+      ],
     };
     expect(hasAuthError(error)).toBe(true);
   });
@@ -143,7 +151,9 @@ describe('urql auth error exchange — hasAuthError', () => {
   it('returns false for NOT_FOUND error', () => {
     const error: MockCombinedError = {
       message: '[GraphQL] Not found',
-      graphQLErrors: [{ message: 'Not found', extensions: { code: 'NOT_FOUND' } }],
+      graphQLErrors: [
+        { message: 'Not found', extensions: { code: 'NOT_FOUND' } },
+      ],
     };
     expect(hasAuthError(error)).toBe(false);
   });
@@ -160,23 +170,33 @@ describe('urql auth error exchange — redirect logic', () => {
   };
 
   it('redirects when authenticated + auth error + not on login page', () => {
-    expect(shouldRedirectOnError(unauthorizedError, true, '/courses/mock-1')).toBe(true);
+    expect(
+      shouldRedirectOnError(unauthorizedError, true, '/courses/mock-1')
+    ).toBe(true);
   });
 
   it('does NOT redirect when NOT authenticated (user not logged in)', () => {
-    expect(shouldRedirectOnError(unauthorizedError, false, '/courses/mock-1')).toBe(false);
+    expect(
+      shouldRedirectOnError(unauthorizedError, false, '/courses/mock-1')
+    ).toBe(false);
   });
 
   it('does NOT redirect when already on /login page (prevents redirect loop)', () => {
-    expect(shouldRedirectOnError(unauthorizedError, true, '/login')).toBe(false);
+    expect(shouldRedirectOnError(unauthorizedError, true, '/login')).toBe(
+      false
+    );
   });
 
   it('does NOT redirect for non-auth errors', () => {
-    expect(shouldRedirectOnError(networkError, true, '/courses/mock-1')).toBe(false);
+    expect(shouldRedirectOnError(networkError, true, '/courses/mock-1')).toBe(
+      false
+    );
   });
 
   it('does NOT redirect when on /login/callback sub-path', () => {
-    expect(shouldRedirectOnError(unauthorizedError, true, '/login/callback')).toBe(false);
+    expect(
+      shouldRedirectOnError(unauthorizedError, true, '/login/callback')
+    ).toBe(false);
   });
 
   // ── Subscription auth errors — graceful degradation (not logout) ──────────
@@ -187,13 +207,23 @@ describe('urql auth error exchange — redirect logic', () => {
 
   it('does NOT redirect for subscription auth error (graceful degradation)', () => {
     expect(
-      shouldRedirectOnError(unauthorizedError, true, '/courses/mock-1', 'subscription')
+      shouldRedirectOnError(
+        unauthorizedError,
+        true,
+        '/courses/mock-1',
+        'subscription'
+      )
     ).toBe(false);
   });
 
   it('does NOT redirect for subscription auth error even when on non-login page', () => {
     expect(
-      shouldRedirectOnError(unauthorizedError, true, '/settings', 'subscription')
+      shouldRedirectOnError(
+        unauthorizedError,
+        true,
+        '/settings',
+        'subscription'
+      )
     ).toBe(false);
   });
 

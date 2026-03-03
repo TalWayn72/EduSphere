@@ -21,27 +21,27 @@ After saving an annotation (video note or document highlight), the annotation di
 
 ### Root Cause
 
-| Hook | Root Cause |
-|------|-----------|
-| `useAnnotations.ts` | `useOptimistic` revertible state + missing mock fallback for `!validAssetId` |
-| `useVideoAnnotations.ts` | Same `useOptimistic` pattern + no `executeQuery` after mutation success |
-| `useDocumentAnnotations.ts` | No refetch call after mutation, no error logging |
+| Hook                        | Root Cause                                                                   |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| `useAnnotations.ts`         | `useOptimistic` revertible state + missing mock fallback for `!validAssetId` |
+| `useVideoAnnotations.ts`    | Same `useOptimistic` pattern + no `executeQuery` after mutation success      |
+| `useDocumentAnnotations.ts` | No refetch call after mutation, no error logging                             |
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `apps/web/src/hooks/useAnnotations.ts` | Complete rewrite: replaced `useOptimistic`+`useTransition` with persistent `useState<Annotation[]>` (`localAnnotations`). Mock fallback shown when `!validAssetId`. After mutation success: remove placeholder + `executeQuery({ requestPolicy: 'network-only' })`. After failure: remove placeholder + `console.error`. |
-| `apps/web/src/hooks/useVideoAnnotations.ts` | Complete rewrite: same persistent `localAnnotations` pattern. `[queryResult, executeQuery]` captures executeQuery for post-mutation refetch. Memory-safe subscription with `subscriptionPaused` cleanup state. |
-| `apps/web/src/hooks/useDocumentAnnotations.ts` | Added `refetch` destructured from `useAnnotations`. `addTextAnnotation` calls `refetch()` after success. Logs `console.error` on failure. |
+| File                                           | Change                                                                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `apps/web/src/hooks/useAnnotations.ts`         | Complete rewrite: replaced `useOptimistic`+`useTransition` with persistent `useState<Annotation[]>` (`localAnnotations`). Mock fallback shown when `!validAssetId`. After mutation success: remove placeholder + `executeQuery({ requestPolicy: 'network-only' })`. After failure: remove placeholder + `console.error`. |
+| `apps/web/src/hooks/useVideoAnnotations.ts`    | Complete rewrite: same persistent `localAnnotations` pattern. `[queryResult, executeQuery]` captures executeQuery for post-mutation refetch. Memory-safe subscription with `subscriptionPaused` cleanup state.                                                                                                           |
+| `apps/web/src/hooks/useDocumentAnnotations.ts` | Added `refetch` destructured from `useAnnotations`. `addTextAnnotation` calls `refetch()` after success. Logs `console.error` on failure.                                                                                                                                                                                |
 
 ### Tests Added
 
-| File | Tests |
-|------|-------|
-| `apps/web/src/hooks/useAnnotations.test.ts` | Non-UUID shows mock fallback; mutation failure removes annotation; refetch after success; offline mode persistence; refetch function exposed |
-| `apps/web/src/hooks/useVideoAnnotations.test.ts` | NEW: placeholder added immediately; removed on failure; no refetch on failure |
-| `apps/web/src/hooks/useDocumentAnnotations.test.ts` | Added `refetch: vi.fn()` to all 7 mock return sites |
+| File                                                | Tests                                                                                                                                        |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/hooks/useAnnotations.test.ts`         | Non-UUID shows mock fallback; mutation failure removes annotation; refetch after success; offline mode persistence; refetch function exposed |
+| `apps/web/src/hooks/useVideoAnnotations.test.ts`    | NEW: placeholder added immediately; removed on failure; no refetch on failure                                                                |
+| `apps/web/src/hooks/useDocumentAnnotations.test.ts` | Added `refetch: vi.fn()` to all 7 mock return sites                                                                                          |
 
 ### Verification
 
@@ -58,6 +58,7 @@ After saving an annotation (video note or document highlight), the annotation di
 ### Problem
 
 After navigation to any page (settings, dashboard, etc.), the React console showed:
+
 > "Cannot update a component (`Layout`) while rendering a different component (`Layout`)"
 
 Root causes (3 distinct issues):
@@ -70,18 +71,18 @@ Root causes (3 distinct issues):
 
 ### Fix
 
-| File | Change |
-|------|--------|
+| File                                     | Change                                                                                                                                                                                                                                                  |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `apps/web/src/hooks/useSrsQueueCount.ts` | Added `mounted` defer pattern: `useState(false)` + `useEffect(() => setMounted(true), [])` + `pause: !mounted \|\| pause` — prevents graphcache from synchronously dispatching setState during render. Same fix documented in `useCourseNavigation.ts`. |
-| `apps/web/src/lib/urql-client.ts` | `authErrorExchange.onError` now receives `operation: Operation` (second arg). Added `if (operation.kind === 'subscription') return` — subscription auth errors log a warning but never trigger logout. |
-| `apps/gateway/gateway.config.ts` | `onFetch` plugin now reads `context.connectionParams?.['authorization']` as fallback when HTTP header is null — fixes WebSocket subscription auth forwarding to subgraphs. |
+| `apps/web/src/lib/urql-client.ts`        | `authErrorExchange.onError` now receives `operation: Operation` (second arg). Added `if (operation.kind === 'subscription') return` — subscription auth errors log a warning but never trigger logout.                                                  |
+| `apps/gateway/gateway.config.ts`         | `onFetch` plugin now reads `context.connectionParams?.['authorization']` as fallback when HTTP header is null — fixes WebSocket subscription auth forwarding to subgraphs.                                                                              |
 
 ### Tests Added (11 new tests)
 
-| File | Tests |
-|------|-------|
+| File                                          | Tests                                                                                                                                           |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `apps/web/src/hooks/useSrsQueueCount.test.ts` | 8 tests (full rewrite): concurrent-mode pause=true before mount, pause=false after mount, network-only policy, error logging, graceful 0 return |
-| `apps/web/src/lib/urql-client.test.ts` | +3 tests: subscription auth error → no redirect, subscription on non-login page → no redirect, query auth error → still redirects |
+| `apps/web/src/lib/urql-client.test.ts`        | +3 tests: subscription auth error → no redirect, subscription on non-login page → no redirect, query auth error → still redirects               |
 
 ### Root Cause Chain (why this kept recurring)
 

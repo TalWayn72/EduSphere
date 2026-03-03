@@ -14,15 +14,9 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 
 // ── Mock urql ────────────────────────────────────────────────────────────────
 
-const mockExecCreate = vi
-  .fn()
-  .mockResolvedValue({ data: {}, error: null });
-const mockExecUpdate = vi
-  .fn()
-  .mockResolvedValue({ data: {}, error: null });
-const mockExecDelete = vi
-  .fn()
-  .mockResolvedValue({ data: {}, error: null });
+const mockExecCreate = vi.fn().mockResolvedValue({ data: {}, error: null });
+const mockExecUpdate = vi.fn().mockResolvedValue({ data: {}, error: null });
+const mockExecDelete = vi.fn().mockResolvedValue({ data: {}, error: null });
 const mockExecuteQuery = vi.fn();
 
 vi.mock('urql', () => ({
@@ -121,9 +115,7 @@ describe('useVideoAnnotations — annotation persistence', () => {
     // Placeholder should be removed, no refetch.
     await waitFor(() => {
       expect(
-        result.current.annotations.some((a) =>
-          a.id.startsWith('local-video-')
-        )
+        result.current.annotations.some((a) => a.id.startsWith('local-video-'))
       ).toBe(false);
     });
     expect(mockExecuteQuery).not.toHaveBeenCalledWith({

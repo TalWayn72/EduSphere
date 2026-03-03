@@ -121,3 +121,22 @@ apps/web/C*Users*AppData*
 ci_runs.json
 job_logs.txt
 run_jobs.json
+
+# CI debugging artifacts (session-specific logs and data snapshots)
+scripts/ci_log_*.txt
+scripts/ci_*.json
+UsersP0039217.claudeprojectsEduSpherescripts*.txt
+
+# Visual QA screenshots (committed separately in chore/qa commits)
+# Uncomment below to ignore screenshots from tracked status:
+# scan-*.png
+# step*.png
+
+# Playwright MCP session artifacts
+.playwright-mcp/
+
+# Test result artifacts
+apps/*/test-results/
+
+# Temporary test files
+test-upload.txt

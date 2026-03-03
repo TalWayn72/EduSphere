@@ -165,10 +165,13 @@ export const gatewayConfig = defineConfig({
     //     → `context.connectionParams.authorization` (set by urql-client.ts)
     {
       onFetch({ options, setOptions, context }) {
-        const gqlCtx = context as {
-          request?: Request;
-          connectionParams?: Record<string, string>;
-        } | null | undefined;
+        const gqlCtx = context as
+          | {
+              request?: Request;
+              connectionParams?: Record<string, string>;
+            }
+          | null
+          | undefined;
         const auth =
           gqlCtx?.request?.headers?.get('authorization') ??
           gqlCtx?.connectionParams?.['authorization'] ??

@@ -227,7 +227,10 @@ describe('LessonDetailPage', () => {
 
   it('shows session-expired UI for "Unauthorized" error', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
-      makeQuery({ error: { message: '[GraphQL] Unauthorized' }, data: undefined })
+      makeQuery({
+        error: { message: '[GraphQL] Unauthorized' },
+        data: undefined,
+      })
     );
     render(
       <MemoryRouter>

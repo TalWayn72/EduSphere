@@ -77,9 +77,7 @@ export function LessonDetailPage() {
         <Layout>
           <div className="p-6 space-y-3">
             <p className="text-amber-700 font-medium">הסשן פג תוקף</p>
-            <p className="text-sm text-gray-600">
-              יש להתחבר מחדש כדי להמשיך.
-            </p>
+            <p className="text-sm text-gray-600">יש להתחבר מחדש כדי להמשיך.</p>
             <Button onClick={() => login()}>התחבר מחדש</Button>
           </div>
         </Layout>
