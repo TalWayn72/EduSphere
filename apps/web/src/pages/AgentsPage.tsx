@@ -19,8 +19,7 @@ import {
   MESSAGE_STREAM_SUBSCRIPTION,
   AGENT_TEMPLATES_QUERY,
 } from '@/lib/graphql/agent.queries';
-
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+import { DEV_MODE } from '@/lib/auth';
 
 // ─── Agent modes ──────────────────────────────────────────────────────────────
 const AGENT_MODES = [

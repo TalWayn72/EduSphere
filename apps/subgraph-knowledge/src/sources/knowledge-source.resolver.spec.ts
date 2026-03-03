@@ -73,6 +73,47 @@ describe('KnowledgeSourceResolver', () => {
         UnauthorizedException
       );
     });
+
+    it('throws UnauthorizedException when authContext is completely absent', async () => {
+      const ctx = {} as never;
+      await expect(resolver.courseKnowledgeSources('c-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
+    });
+
+    it('throws UnauthorizedException for addFileSource when tenantId is missing', async () => {
+      const ctx = { authContext: {} } as never;
+      await expect(
+        resolver.addFileSource(
+          {
+            courseId: 'c-1',
+            title: 'nahar-shalom.docx',
+            fileName: 'nahar-shalom.docx',
+            contentBase64: 'JVBERi0=',
+            mimeType:
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          },
+          ctx
+        )
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('throws UnauthorizedException for addUrlSource when authContext is absent', async () => {
+      const ctx = {} as never;
+      await expect(
+        resolver.addUrlSource(
+          { courseId: 'c-1', title: 'Test', url: 'https://test.com' },
+          ctx
+        )
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('throws UnauthorizedException for deleteKnowledgeSource when tenantId missing', async () => {
+      const ctx = { authContext: {} } as never;
+      await expect(
+        resolver.deleteKnowledgeSource('ks-1', ctx)
+      ).rejects.toThrow(UnauthorizedException);
+    });
   });
 
   describe('courseKnowledgeSources()', () => {

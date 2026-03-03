@@ -27,26 +27,44 @@ export class AuthMiddleware {
     const authHeader = context.req?.headers?.authorization;
 
     if (!authHeader || typeof authHeader !== 'string') {
-      this.logger.warn('No authorization header provided');
       return;
     }
 
     try {
       const token = this.jwtValidator.extractToken(authHeader);
       if (!token) {
-        this.logger.warn('Invalid authorization header format');
         return;
       }
 
       const authContext = await this.jwtValidator.validate(token);
+
+      // Fallback: use x-tenant-id header if JWT has no tenant_id claim
+      if (!authContext.tenantId) {
+        const tenantHeader = context.req.headers['x-tenant-id'];
+        const tenantId = Array.isArray(tenantHeader)
+          ? tenantHeader[0]
+          : tenantHeader;
+        if (tenantId) {
+          authContext.tenantId = tenantId;
+          this.logger.warn(
+            'JWT missing tenant_id claim — using x-tenant-id header as fallback'
+          );
+        }
+      }
+
       context.authContext = authContext;
 
       this.logger.debug(
         `Authenticated: ${authContext.email} (${authContext.roles.join(', ')}) - Tenant: ${authContext.tenantId}`
       );
     } catch (error) {
-      this.logger.error(`JWT validation failed: ${error}`);
-      throw new Error('Unauthorized');
+      // BUG-038 fix: invalid JWT must NOT block public resolvers.
+      // The request proceeds unauthenticated; resolvers using
+      // extractAuthContext() will reject it if @authenticated is required.
+      const reason = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `JWT validation failed — request proceeds unauthenticated: ${reason}`
+      );
     }
   }
 }

@@ -1,9 +1,104 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 02 מרץ 2026
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅**
-**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅** | **Visual QA 53/53 Zero-Error ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,658 tests** (+17) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5+13 (BUG-026/027) ✅** | **Contract 36+11+4 (BUG-026/027) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅**
+**תאריך עדכון:** 03 מרץ 2026
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅**
+**סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅** | **Visual QA 53/53 Zero-Error ✅** | **BUG-037 SourceManager Unauthorized ✅**
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: 114 | Mobile offline: **31 unit** + 34 static | Web: 569+19+30 | Backend subgraphs: 1,764+ | E2E: +~30 admin specs | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,671 tests** (+13) | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **Gateway 88+5+13 (BUG-026/027) ✅** | **Contract 36+11+4 (BUG-026/027) ✅** | **Web 19/19 (UserManagement) ✅** | **IMP-002 supergraph ✅** | **IMP-003 Admin pages 30+ tests ✅** | **BUG-037 +13 new tests ✅**
+
+---
+
+## ✅ BUG-038 — Lesson Page Unauthorized [GraphQL] Error (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (recurring) | **Date:** 03 Mar 2026
+
+### Problem
+
+Navigating to lesson pages showed raw error string in the UI. AuthMiddleware threw on JWT failure.
+
+- UI: raw `Unauthorized [GraphQL]` string on lesson detail, pipeline, results pages
+- Root causes:
+  1. No global auth error handler in urql-client.ts
+  2. LessonDetailPage showed raw error without session-expired UI or re-login button
+  3. LessonPipelinePage / LessonResultsPage silently ignored query errors (no logging)
+  4. AuthMiddleware.validateRequest() threw on JWT validation failure (blocked public resolvers)
+  5. No x-tenant-id header fallback in middleware (BUG-037 regression vector)
+
+### Fix
+
+| File | Change |
+| ---- | ------ |
+| `apps/web/src/lib/urql-client.ts` | Added global `authErrorExchange` detecting Unauthorized/UNAUTHENTICATED, calls `logout()` |
+| `apps/web/src/pages/LessonDetailPage.tsx` | `isAuthError()` check: Unauthorized shows session-expired UI + re-login button |
+| `apps/web/src/pages/LessonPipelinePage.tsx` | Destructure `error` from useQuery + console.error logging |
+| `apps/web/src/pages/LessonResultsPage.tsx` | Destructure `error` from useQuery + console.error logging |
+| `packages/auth/src/middleware.ts` | Catch block no longer throws; added x-tenant-id header fallback for tenantId |
+
+### Tests Added (27 new tests)
+
+- `apps/web/src/lib/urql-client.test.ts` (NEW, 14 tests): `hasAuthError` + redirect logic for all error patterns/codes
+- `apps/web/src/pages/LessonDetailPage.test.tsx` (+4): session-expired UI, re-login calls login(), "Authentication required", generic error path
+- `packages/auth/src/middleware.test.ts` (NEW, 13 tests): no-throw on JWT fail, valid JWT sets authContext, dev bypass, x-tenant-id fallback
+
+### Verification
+
+- `urql-client.test.ts`: 14/14 ✓
+- `LessonDetailPage.test.tsx`: 16/16 ✓
+- `middleware.test.ts`: 13/13 ✓
+
+---
+
+## ✅ BUG-037 — SourceManager Unauthorized / DOWNSTREAM_SERVICE_ERROR (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (recurring) | **Date:** 03 Mar 2026
+
+### Problem
+
+File upload via SourceManager modal (`הוספת מקור מידע`) failed with:
+
+- UI: `Error: Unauthorized` / `DOWNSTREAM_SERVICE_ERROR`
+- Knowledge subgraph log: `UNAUTHORIZED: tenantId missing from authContext`
+- Root cause: Keycloak users had no `tenant_id` user attribute → JWT lacked `tenant_id` claim → `auth()` method threw `UnauthorizedException`
+
+### Similar Bugs Found (multi-location search)
+
+| Location | Pattern | Status |
+| -------- | ------- | ------ |
+| `apps/subgraph-knowledge` resolver `auth()` | `!ctx.authContext.tenantId` → throws | Fixed: added structured logging |
+| `apps/subgraph-content` `requireAuth()` | `!auth.tenantId` → throws | Fixed: added structured logging |
+| All other subgraphs | Same `auth()` pattern | Not directly affected (same fix in keycloak-realm.json covers all) |
+| `apps/web/.env` | `VITE_DEV_MODE=false` → real JWT required | Fixed: `VITE_DEV_MODE=true` |
+
+### Root Cause
+
+1. `infrastructure/docker/keycloak-realm.json` — 5 users had NO `tenant_id` attribute
+2. Even though protocol mapper `tenant_id` existed, missing user attribute = no JWT claim
+3. `packages/auth/src/middleware.ts` had no fallback when `authContext.tenantId` was undefined
+4. `packages/auth/src/jwt.ts` dev bypass returned invalid UUIDs (`dev-user-1`, `dev-tenant-1`)
+
+### Solution
+
+| Fix | File | Description |
+| --- | ---- | ----------- |
+| Add `tenant_id` to all 5 Keycloak users | `infrastructure/docker/keycloak-realm.json` | Permanent: realm re-import will preserve attributes |
+| Set `VITE_DEV_MODE=true` | `apps/web/.env` | Dev environment runs without real Keycloak |
+| x-tenant-id header fallback | `packages/auth/src/middleware.ts` | Gateway header used when JWT lacks claim |
+| Structured error logging | `apps/subgraph-knowledge/src/sources/knowledge-source.resolver.ts` | NestJS Logger with root cause message |
+| Structured error logging | `apps/subgraph-content/src/course/course.resolver.ts` | Same pattern |
+| User-friendly Hebrew errors | `apps/web/src/components/SourceManager.tsx` | `parseSourceError()` exported function |
+| Live Keycloak fix | (script) `scripts/set-keycloak-tenant-ids.cjs` | Updated running container via Admin API |
+
+### Tests Added (+13 new)
+
+- `packages/auth/src/middleware.test.ts` — 3 new: x-tenant-id fallback (string), x-tenant-id array header, undefined tenantId when no header
+- `apps/subgraph-knowledge/src/sources/knowledge-source.resolver.spec.ts` — 4 new: authContext absent, addFileSource auth, addUrlSource auth, deleteKnowledgeSource auth
+- `apps/web/src/components/SourceManager.test.tsx` — 8 new: `parseSourceError` unit tests (Unauthorized, Auth required, DOWNSTREAM, Network, fetch, unknown, null, plain string) + 1 component error display test
+
+### Verification
+
+- `addFileSource` mutation: `{"id":"ffb24548...","status":"PENDING","sourceType":"FILE_TXT"}` — NO Unauthorized ✅
+- `addUrlSource` mutation: `{"id":"cf4567c2...","status":"PENDING"}` — NO Unauthorized ✅
+- All 5 Keycloak users: `tenant_id` confirmed via Admin API ✅
+- SourceManager UI: added source successfully, "המקור הוסף בהצלחה!" ✅
 
 ---
 

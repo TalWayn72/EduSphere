@@ -19,8 +19,7 @@ import { SEARCH_SEMANTIC_QUERY } from '@/lib/graphql/knowledge.queries';
 import { mockTranscript } from '@/lib/mock-content-data';
 import { getThreadedAnnotations } from '@/lib/mock-annotations';
 import { mockGraphData } from '@/lib/mock-graph-data';
-
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+import { DEV_MODE } from '@/lib/auth';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ResultType = 'transcript' | 'annotation' | 'concept' | 'course';

@@ -165,6 +165,24 @@ function devRemoveSource(id: string): void {
   _devSources = _devSources.filter((s) => s.id !== id);
 }
 
+// ─── Error parser (exported for unit testing) ─────────────────────────────────
+
+/** Extracts a user-friendly Hebrew message from a GraphQL or network error. */
+export function parseSourceError(e: unknown): string {
+  if (!e) return 'שגיאה לא ידועה';
+  const msg = String(e);
+  if (msg.includes('Unauthorized') || msg.includes('Auth required')) {
+    return 'שגיאת הרשאה — נא להתחבר מחדש ולנסות שוב. אם הבעיה נמשכת, פנה למנהל המערכת.';
+  }
+  if (msg.includes('DOWNSTREAM_SERVICE_ERROR')) {
+    return 'שגיאה בשירות הפנימי — ייתכן שהשרת אינו זמין. נסה שוב בעוד מספר שניות.';
+  }
+  if (msg.includes('Network') || msg.includes('fetch')) {
+    return 'שגיאת רשת — בדוק שהשרת פועל ונסה שוב.';
+  }
+  return IS_DEV_MODE ? msg : 'שגיאה בהוספת המקור. נסה שוב.';
+}
+
 // ─── Add-source Modal ─────────────────────────────────────────────────────────
 
 type AddTab = 'url' | 'text' | 'file' | 'youtube';
@@ -224,7 +242,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(String(e)),
+    onError: (e) => setError(parseSourceError(e)),
   });
 
   const addText = useMutation({
@@ -237,7 +255,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(String(e)),
+    onError: (e) => setError(parseSourceError(e)),
   });
 
   const addYoutube = useMutation({
@@ -250,7 +268,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(String(e)),
+    onError: (e) => setError(parseSourceError(e)),
   });
 
   const addFile = useMutation({
@@ -283,7 +301,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(String(e)),
+    onError: (e) => setError(parseSourceError(e)),
   });
 
   const handleSubmit = async () => {
@@ -323,7 +341,7 @@ function AddSourceModal({
         });
       }
     } catch (e) {
-      setError(String(e));
+      setError(parseSourceError(e));
     } finally {
       setBusy(false);
     }

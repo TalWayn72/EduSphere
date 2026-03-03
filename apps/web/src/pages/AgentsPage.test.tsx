@@ -43,11 +43,17 @@ vi.mock('@/components/Layout', () => ({
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(() => null),
   logout: vi.fn(),
+  // DEV_MODE must be true so the component takes the mock/streaming path
+  // (DEV_MODE=false would invoke the real GraphQL mutation path instead).
+  // After BUG-038 fix, DEV_MODE is imported from auth.ts rather than
+  // inlined from import.meta.env — this mock value replaces the vitest
+  // define fallback that used to handle it at transform time.
+  DEV_MODE: true,
 }));
 
 // ─── Imports ──────────────────────────────────────────────────────────────────
 import { AgentsPage } from './AgentsPage';
-import { useMutation, useSubscription } from 'urql';
+import { useMutation, useSubscription, useQuery } from 'urql';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -502,13 +508,36 @@ describe('AgentsPage', () => {
     vi.useRealTimers();
   });
 
+  // ── Template error banner — guarded by DEV_MODE ────────────────────────────
+  // BUG-038 regression: auth middleware previously threw on invalid JWT,
+  // blocking even public resolvers like agentTemplates.  Error banner is shown
+  // only when DEV_MODE=false AND the query returns an error.  In DEV_MODE=true
+  // (the test default, see vi.mock('@/lib/auth') above) the banner is hidden so
+  // the user is not alarmed by a non-critical check.
+
+  it('does NOT show template error banner when query errors but DEV_MODE is true', () => {
+    vi.mocked(useQuery).mockReturnValueOnce([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('[GraphQL] Unauthorized') as never,
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof useQuery>);
+
+    renderAgents();
+
+    // Error banner must be suppressed in DEV_MODE=true
+    expect(
+      screen.queryByText(/Could not load agent templates/i)
+    ).not.toBeInTheDocument();
+  });
+
   // ── Mutation mock shape tests — non-DEV_MODE fallback robustness ───────────
   // These tests verify that the component remains stable when useMutation
-  // returns various response shapes (null reply, undefined data). Because
-  // VITE_DEV_MODE is replaced at transform-time by the vitest define config,
-  // DEV_MODE is always true in this test environment and the real GraphQL
-  // mutation path is not reachable. The tests below assert component stability
-  // and correct mutation hook wiring via the mock return values.
+  // returns various response shapes (null reply, undefined data).
+  // DEV_MODE=true (from vi.mock('@/lib/auth') above) keeps the streaming path
+  // active so the real GraphQL mutation path is not reached here.
 
   it('component remains functional when sendMessage mock returns null reply', () => {
     const sendMsgNull = vi

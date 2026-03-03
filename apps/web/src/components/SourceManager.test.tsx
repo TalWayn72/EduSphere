@@ -50,7 +50,7 @@ vi.mock('@/lib/graphql/sources.queries', () => ({
   DELETE_KNOWLEDGE_SOURCE: 'DELETE_KNOWLEDGE_SOURCE',
 }));
 
-import { SourceManager } from './SourceManager';
+import { SourceManager, parseSourceError } from './SourceManager';
 
 // ── QueryClient wrapper ───────────────────────────────────────────────────────
 
@@ -61,6 +61,65 @@ function wrapper({ children }: { children: React.ReactNode }) {
   // @ts-expect-error — React 19 ReactNode includes bigint; @tanstack/react-query types use React 18
   return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
 }
+
+// ── parseSourceError unit tests ───────────────────────────────────────────────
+
+describe('parseSourceError()', () => {
+  it('returns Hebrew Unauthorized message for "Unauthorized" error', () => {
+    const result = parseSourceError(new Error('Unauthorized: Auth required'));
+    expect(result).toBe(
+      'שגיאת הרשאה — נא להתחבר מחדש ולנסות שוב. אם הבעיה נמשכת, פנה למנהל המערכת.'
+    );
+  });
+
+  it('returns Hebrew Unauthorized message for "Auth required" error', () => {
+    const result = parseSourceError(new Error('Auth required'));
+    expect(result).toBe(
+      'שגיאת הרשאה — נא להתחבר מחדש ולנסות שוב. אם הבעיה נמשכת, פנה למנהל המערכת.'
+    );
+  });
+
+  it('returns Hebrew downstream message for DOWNSTREAM_SERVICE_ERROR', () => {
+    const result = parseSourceError(
+      new Error('GraphQL Error: DOWNSTREAM_SERVICE_ERROR')
+    );
+    expect(result).toBe(
+      'שגיאה בשירות הפנימי — ייתכן שהשרת אינו זמין. נסה שוב בעוד מספר שניות.'
+    );
+  });
+
+  it('returns Hebrew network message for Network errors', () => {
+    const result = parseSourceError(new Error('Network error occurred'));
+    expect(result).toBe('שגיאת רשת — בדוק שהשרת פועל ונסה שוב.');
+  });
+
+  it('returns Hebrew network message for fetch errors', () => {
+    const result = parseSourceError(new Error('Failed to fetch'));
+    expect(result).toBe('שגיאת רשת — בדוק שהשרת פועל ונסה שוב.');
+  });
+
+  it('returns raw message for unknown errors (IS_DEV_MODE=true in test env)', () => {
+    const result = parseSourceError(new Error('Some unexpected internal error'));
+    expect(result).toBe('Error: Some unexpected internal error');
+  });
+
+  it('returns שגיאה לא ידועה for falsy input', () => {
+    expect(parseSourceError(null)).toBe('שגיאה לא ידועה');
+    expect(parseSourceError(undefined)).toBe('שגיאה לא ידועה');
+    expect(parseSourceError('')).toBe('שגיאה לא ידועה');
+  });
+
+  it('handles plain string errors correctly', () => {
+    expect(parseSourceError('Unauthorized')).toBe(
+      'שגיאת הרשאה — נא להתחבר מחדש ולנסות שוב. אם הבעיה נמשכת, פנה למנהל המערכת.'
+    );
+    expect(parseSourceError('Network timeout')).toBe(
+      'שגיאת רשת — בדוק שהשרת פועל ונסה שוב.'
+    );
+  });
+});
+
+// ── SourceManager component tests ─────────────────────────────────────────────
 
 describe('SourceManager', () => {
   beforeEach(() => {
