@@ -77,4 +77,26 @@ describe('ActivityHeatmap', () => {
     expect(screen.getByText('0 total study sessions')).toBeInTheDocument();
     expect(screen.getByText(/0 study days/)).toBeInTheDocument();
   });
+
+  // ── BUG-043 regression: empty data must NOT throw "Invalid time value" ────────
+  // Root cause: new Date(data[0]?.date ?? '') creates Invalid Date when data=[]
+  // causing getDay() to return NaN, and formatHeatmapDate('') to throw.
+  it('regression BUG-043: renders without crashing when data is empty array', () => {
+    // Before fix: new Date('').getDay() returns NaN, formatHeatmapDate('') throws.
+    // After fix: guard returns startDayOfWeek=0 and formatHeatmapDate('')=''.
+    expect(() => render(<ActivityHeatmap data={[]} />)).not.toThrow();
+  });
+
+  it('regression BUG-043: renders 0 study days summary with empty data', () => {
+    render(<ActivityHeatmap data={[]} />);
+    expect(screen.getByText(/0 study days/)).toBeInTheDocument();
+    expect(screen.getByText('0 total study sessions')).toBeInTheDocument();
+  });
+
+  it('regression BUG-043: does not render tooltip cells when data is empty', () => {
+    const { container } = render(<ActivityHeatmap data={[]} />);
+    // No data → no heatmap cells with a non-empty title attribute
+    const tiledCells = container.querySelectorAll('[title]:not([title=""])');
+    expect(tiledCells.length).toBe(0);
+  });
 });

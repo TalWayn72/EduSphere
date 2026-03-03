@@ -96,17 +96,26 @@ const MOCK_COURSES_FALLBACK: CourseItem[] = [
   },
 ];
 
-function OfflineBanner({
-  message,
-  cachedLabel,
-}: {
-  message: string;
-  cachedLabel: string;
-}) {
+function OfflineBanner({ onRetry }: { onRetry: () => void }) {
+  const { t } = useTranslation('courses');
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md">
-      <AlertTriangle className="h-3 w-3 flex-shrink-0" />
-      {message} — {cachedLabel}
+    <div
+      role="alert"
+      aria-live="polite"
+      data-testid="offline-banner"
+      className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md"
+    >
+      <div className="flex items-center gap-2">
+        <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+        <span>{t('networkUnavailable')}</span>
+      </div>
+      <button
+        onClick={onRetry}
+        className="underline hover:no-underline text-orange-900 font-medium shrink-0"
+        data-testid="offline-banner-retry"
+      >
+        {t('retry')}
+      </button>
     </div>
   );
 }
@@ -135,10 +144,16 @@ export function CourseList() {
   const user = getCurrentUser();
   const isInstructor = user ? INSTRUCTOR_ROLES.has(user.role) : false;
 
-  const [{ data, fetching, error }] = useQuery<CoursesQueryResult>({
-    query: COURSES_QUERY,
-    variables: { limit: 50, offset: 0 },
-  });
+  const [{ data, fetching, error }, reexecuteCourses] =
+    useQuery<CoursesQueryResult>({
+      query: COURSES_QUERY,
+      variables: { limit: 50, offset: 0 },
+    });
+
+  // Log network errors for debugging (visible in devtools console)
+  if (error) {
+    console.error('[CourseList] GraphQL network error:', error.message);
+  }
 
   const [{ data: enrollmentsData }, reexecuteEnrollments] =
     useQuery<MyEnrollmentsResult>({
@@ -311,8 +326,7 @@ export function CourseList() {
       <div className="space-y-6">
         {error && (
           <OfflineBanner
-            message={`[Network] Failed to fetch — ${error.message}`}
-            cachedLabel={t('showingCachedData')}
+            onRetry={() => reexecuteCourses({ requestPolicy: 'network-only' })}
           />
         )}
 

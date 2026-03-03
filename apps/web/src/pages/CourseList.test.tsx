@@ -165,15 +165,16 @@ describe('CourseList', () => {
 
   it('shows offline banner and mock fallback courses when query fails', () => {
     vi.mocked(useQuery).mockReturnValueOnce([
-      { data: undefined, fetching: false, error: new Error('Network error') },
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('[GraphQL] Unexpected error [Network]'),
+      },
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
     renderCourseList();
-    // Non-blocking warning banner is shown
-    expect(
-      screen.getByText(/\[Network\] Failed to fetch/i)
-    ).toBeInTheDocument();
-    expect(screen.getByText(/showing cached data/i)).toBeInTheDocument();
+    // Clean offline banner is shown (not raw urql error strings)
+    expect(screen.getByTestId('offline-banner')).toBeInTheDocument();
     // Page still renders with mock fallback courses — not a blank error page
     expect(
       screen.getByText('Introduction to Talmud Study')
@@ -182,6 +183,86 @@ describe('CourseList', () => {
       screen.getByText('Advanced Chavruta Techniques')
     ).toBeInTheDocument();
     expect(screen.getByText('Courses')).toBeInTheDocument();
+  });
+
+  // ── Offline/Network error state (BUG-039 regression guards) ─────────────────
+
+  it('offline banner shows human-readable message, NOT raw urql error strings', () => {
+    vi.mocked(useQuery).mockReturnValueOnce([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('[GraphQL] Unexpected error [Network]'),
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof useQuery>);
+    renderCourseList();
+    const banner = screen.getByTestId('offline-banner');
+    // Human-readable message present
+    expect(banner).toHaveTextContent(/Server unavailable/i);
+    // Raw urql error strings NEVER exposed to user (regression guard for BUG-039)
+    expect(banner.textContent).not.toContain('[GraphQL]');
+    expect(banner.textContent).not.toContain('[Network]');
+    expect(banner.textContent).not.toContain('Unexpected error');
+  });
+
+  it('offline banner has retry button', () => {
+    vi.mocked(useQuery).mockReturnValueOnce([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('[GraphQL] Unexpected error [Network]'),
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof useQuery>);
+    renderCourseList();
+    expect(screen.getByTestId('offline-banner-retry')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /retry/i })
+    ).toBeInTheDocument();
+  });
+
+  it('retry button calls reexecute with network-only policy', () => {
+    const mockReexecute = vi.fn();
+    vi.mocked(useQuery).mockReturnValueOnce([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('[GraphQL] Unexpected error [Network]'),
+      },
+      mockReexecute,
+    ] as unknown as ReturnType<typeof useQuery>);
+    renderCourseList();
+    fireEvent.click(screen.getByTestId('offline-banner-retry'));
+    expect(mockReexecute).toHaveBeenCalledWith({
+      requestPolicy: 'network-only',
+    });
+  });
+
+  it('does not show offline banner when query succeeds', () => {
+    // beforeEach sets up success state — no error
+    renderCourseList();
+    expect(screen.queryByTestId('offline-banner')).not.toBeInTheDocument();
+  });
+
+  it('logs network error to console.error when query fails', () => {
+    const consoleSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    vi.mocked(useQuery).mockReturnValueOnce([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('[GraphQL] Unexpected error [Network]'),
+      },
+      vi.fn(),
+    ] as unknown as ReturnType<typeof useQuery>);
+    renderCourseList();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      '[CourseList] GraphQL network error:',
+      '[GraphQL] Unexpected error [Network]'
+    );
+    consoleSpy.mockRestore();
   });
 
   it('shows Enroll buttons for students', () => {

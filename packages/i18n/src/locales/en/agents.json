@@ -2,6 +2,7 @@
   "title": "AI Learning Agents",
   "subtitle": "Choose an agent mode to enhance your learning",
   "devMode": "Dev Mode — mock responses",
+  "templatesUnavailable": "Agent templates unavailable — using offline mode",
   "selectAgent": "Select Agent:",
   "reset": "Reset",
   "sendMessage": "Send message",

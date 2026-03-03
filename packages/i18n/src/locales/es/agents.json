@@ -2,6 +2,7 @@
   "title": "Agentes de aprendizaje IA",
   "subtitle": "Elige un modo de agente para mejorar tu aprendizaje",
   "devMode": "Modo desarrollo — respuestas simuladas",
+  "templatesUnavailable": "Plantillas de agentes no disponibles — usando modo sin conexión",
   "selectAgent": "Seleccionar agente:",
   "reset": "Restablecer",
   "sendMessage": "Enviar mensaje",

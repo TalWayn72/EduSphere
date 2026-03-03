@@ -15,9 +15,13 @@ export function getHeatmapColor(count: number): string {
 
 /**
  * Format an ISO date string as "Mon DD" (e.g. "Jan 15").
+ * Returns empty string for missing or invalid date strings.
  */
 export function formatHeatmapDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
   });

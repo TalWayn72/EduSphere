@@ -29,6 +29,9 @@
   "edges": "Edges",
   "loadingGraph": "Loading graph...",
   "loadError": "Failed to load graph",
+  "networkUnavailable": "Сервер недоступен — отображаются резервные данные",
+  "retry": "Повторить",
+  "pathError": "Не удалось найти учебный путь",
   "refreshGraph": "Refresh graph",
   "refresh": "Refresh"
 }

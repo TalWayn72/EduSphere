@@ -17,6 +17,10 @@ vi.mock('urql', () => ({
   ]),
 }));
 
+// Mock DEV_MODE=false so production error-handling paths are exercised.
+// Individual tests that need DEV_MODE=true can override useQuery to return no error.
+vi.mock('@/lib/auth', () => ({ DEV_MODE: false }));
+
 vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="layout">{children}</div>
@@ -277,5 +281,100 @@ describe('KnowledgeGraph', () => {
     renderKG();
     // Mock graph has nodes — at least the default selected "Free Will" label must appear
     expect(screen.getAllByText('Free Will').length).toBeGreaterThan(0);
+  });
+});
+
+// ─── BUG-043 regression: error banner must NEVER show raw GraphQL/network error strings ──────
+// Problem: conceptsResult.error.message was interpolated directly into the UI, showing raw
+// strings like "Invalid time value [GraphQL]" or "[Network] Failed to fetch" to users.
+// Fix: replaced raw interpolation with i18n key (networkUnavailable) + retry button.
+describe('KnowledgeGraph — BUG-043 regression: clean error banner (no raw error strings)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('shows graph-error-banner testid when concepts query fails', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: 'Invalid time value [GraphQL]' },
+      },
+    ]);
+    renderKG();
+    const banner = screen.getByTestId('graph-error-banner');
+    expect(banner).toBeDefined();
+  });
+
+  it('regression BUG-043: banner does NOT contain raw "[GraphQL]" text', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: 'Invalid time value [GraphQL]' },
+      },
+    ]);
+    renderKG();
+    const banner = screen.getByTestId('graph-error-banner');
+    expect(banner.textContent).not.toContain('[GraphQL]');
+  });
+
+  it('regression BUG-043: banner does NOT contain raw "[Network]" text', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: '[Network] Failed to fetch' },
+      },
+    ]);
+    renderKG();
+    const banner = screen.getByTestId('graph-error-banner');
+    expect(banner.textContent).not.toContain('[Network]');
+  });
+
+  it('regression BUG-043: banner does NOT expose raw "Invalid time value"', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: 'Invalid time value [GraphQL]' },
+      },
+    ]);
+    renderKG();
+    // The raw date-parsing error must never be shown to users
+    const raw = screen.queryByText(/Invalid time value/i);
+    expect(raw).toBeNull();
+  });
+
+  it('regression BUG-043: retry button is visible in the error banner', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: 'Invalid time value [GraphQL]' },
+      },
+    ]);
+    renderKG();
+    const retryBtn = screen.getByTestId('graph-error-retry');
+    expect(retryBtn).toBeDefined();
+  });
+
+  it('regression BUG-043: error banner has role="alert" for accessibility', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: '[GraphQL] Some error' },
+      },
+    ]);
+    renderKG();
+    const alerts = screen.getAllByRole('alert');
+    expect(alerts.length).toBeGreaterThan(0);
   });
 });

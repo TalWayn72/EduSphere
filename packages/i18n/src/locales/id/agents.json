@@ -2,6 +2,7 @@
   "title": "Agen Pembelajaran AI",
   "subtitle": "Pilih mode agen untuk meningkatkan pembelajaran Anda",
   "devMode": "Mode dev — respons tiruan",
+  "templatesUnavailable": "Template agen tidak tersedia — menggunakan mode offline",
   "selectAgent": "Pilih Agen:",
   "reset": "Atur ulang",
   "sendMessage": "Kirim pesan",

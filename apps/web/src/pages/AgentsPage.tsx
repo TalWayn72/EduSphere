@@ -383,6 +383,13 @@ export function AgentsPage() {
   const messages = sessions[activeMode];
   const hasTemplatesError = !DEV_MODE && templatesResult.error;
 
+  if (hasTemplatesError) {
+    console.error(
+      '[AgentsPage] Failed to load agent templates:',
+      templatesResult.error?.message
+    );
+  }
+
   return (
     <Layout>
       <div className="space-y-4">
@@ -397,8 +404,12 @@ export function AgentsPage() {
             )}
           </p>
           {hasTemplatesError && (
-            <p className="text-xs text-destructive mt-1">
-              Could not load agent templates: {templatesResult.error?.message}
+            <p
+              role="alert"
+              data-testid="agents-templates-error"
+              className="text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded px-2 py-1 mt-1"
+            >
+              {t('templatesUnavailable')}
             </p>
           )}
         </div>

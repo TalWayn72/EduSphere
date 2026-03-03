@@ -264,6 +264,19 @@ export function KnowledgeGraph() {
     prevConceptCount.current = current;
   }, [conceptsResult.data, conceptsResult.fetching]);
 
+  // Log GraphQL errors so they are observable in devtools / CI logs
+  useEffect(() => {
+    if (conceptsResult.error) {
+      console.error('[KnowledgeGraph] Concepts query error:', conceptsResult.error.message);
+    }
+  }, [conceptsResult.error]);
+
+  useEffect(() => {
+    if (learningPathResult.error) {
+      console.error('[KnowledgeGraph] Learning path query error:', learningPathResult.error.message);
+    }
+  }, [learningPathResult.error]);
+
   const handleRefresh = useCallback(() => {
     setRefreshKey((k) => k + 1);
   }, []);
@@ -383,8 +396,20 @@ export function KnowledgeGraph() {
           </div>
         )}
         {!DEV_MODE && conceptsResult.error && (
-          <div className="text-xs text-destructive">
-            {t('loadError')}: {conceptsResult.error.message}
+          <div
+            role="alert"
+            aria-live="polite"
+            data-testid="graph-error-banner"
+            className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded px-3 py-2"
+          >
+            <span data-testid="graph-error-message">{t('networkUnavailable')}</span>
+            <button
+              onClick={handleRefresh}
+              data-testid="graph-error-retry"
+              className="underline hover:no-underline font-medium"
+            >
+              {t('retry')}
+            </button>
           </div>
         )}
         {toast && (
@@ -745,8 +770,12 @@ export function KnowledgeGraph() {
                 )}
 
                 {!DEV_MODE && learningPathResult.error && (
-                  <p className="text-xs text-destructive">
-                    {learningPathResult.error.message}
+                  <p
+                    role="alert"
+                    data-testid="path-error-banner"
+                    className="text-xs text-destructive"
+                  >
+                    {t('pathError')}
                   </p>
                 )}
 

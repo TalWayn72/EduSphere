@@ -12,7 +12,7 @@ import {
   Clock,
   Loader2,
   CheckCircle,
-  AlertCircle,
+  AlertTriangle,
   BookOpen,
   Plus,
 } from 'lucide-react';
@@ -52,7 +52,7 @@ function formatRelativeTime(iso: string): string {
 }
 
 export function CollaborationPage() {
-  const { t } = useTranslation('collaboration');
+  const { t } = useTranslation(['collaboration', 'common']);
   const navigate = useNavigate();
   const [matchState, setMatchState] = useState<MatchState>('idle');
   const [matchMode, setMatchMode] = useState<'human' | 'ai'>('human');
@@ -83,6 +83,10 @@ export function CollaborationPage() {
   // being added to the schema. Treat as empty list until Docker image is rebuilt.
   const isSchemaValidationError =
     error?.message?.includes('Cannot query field');
+
+  if (error && !isSchemaValidationError) {
+    console.error('[CollaborationPage] GraphQL network error:', error.message);
+  }
   const discussions: BackendDiscussion[] =
     (data as { myDiscussions?: BackendDiscussion[] } | undefined)
       ?.myDiscussions ?? [];
@@ -215,9 +219,23 @@ export function CollaborationPage() {
 
         {/* Error state — hide schema-validation errors (field not yet in deployed subgraph) */}
         {error && !isSchemaValidationError && (
-          <div className="flex items-center gap-2 p-3 rounded-md border border-destructive/30 bg-destructive/10 text-destructive text-sm">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            {t('loadError')}: {error.message}
+          <div
+            role="alert"
+            aria-live="polite"
+            data-testid="collab-offline-banner"
+            className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded-md"
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+              <span>{t('loadError')}</span>
+            </div>
+            <button
+              onClick={() => reexecute({ requestPolicy: 'network-only' })}
+              className="underline hover:no-underline text-orange-900 font-medium shrink-0"
+              data-testid="collab-offline-banner-retry"
+            >
+              {t('common:retry')}
+            </button>
           </div>
         )}
 

@@ -1,9 +1,183 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 03 מרץ 2026 (Session 6 — CQI-003 complete)
-**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅**
+**תאריך עדכון:** 03 מרץ 2026 (Session 10 — BUG-044 "Unexpected error" on lesson creation + wide pattern fix across 4 services + 2 frontend pages)
+**מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (10 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅** | **Visual QA 53/53 Zero-Error ✅** | **BUG-037 SourceManager Unauthorized ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **2,861** | Backend subgraphs: **1,866** (agent:563+collab:161+core:575+knowledge:443+annotation:124) | E2E: +~30 admin specs | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,881 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **CQI-003 zero no-explicit-any ✅**
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **2,881** (+12 BUG-043) | Backend subgraphs: **1,877** (+11 BUG-044: content:1,011→+4 new lesson tests, pipeline:+4, asset:+1, course:+2) | E2E: +~30 admin specs + 8 BUG-044 | Gateway: 88+federation+13(SCIM) | i18n: ~247 | Tier 3 new: ~180+ | סה"כ: **>4,905 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | **CQI-003 zero no-explicit-any ✅** | **BUG-043 graph error banner + Invalid Date ✅** | **BUG-044 lesson creation UUID validation + try/catch ✅**
+
+---
+
+## ✅ BUG-044 — "Unexpected error" on lesson creation with invalid courseId (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (UX/data integrity) | **Date:** 03 Mar 2026
+
+### Problem
+
+Navigating to `/courses/mock-course-1/lessons/new` and completing the 3-step wizard displayed a generic **"Unexpected error"** message with no context. Console showed:
+```
+[CourseList] GraphQL network error: [GraphQL] Unexpected error.
+```
+
+### Root Cause Chain (Wide Pattern Search — Phase 1 Discovery)
+
+| File | Issue |
+|------|-------|
+| `lesson.service.ts create()` | No UUID validation for `courseId` → FK violation on DB insert → unhandled exception → "Unexpected error" |
+| `course.service.ts findAll()` | No try/catch → any DB error propagates as "Unexpected error" → CourseList falls back to MOCK_COURSES_FALLBACK → user navigates to `mock-course-1` |
+| `lesson-asset.service.ts addAsset()` | No try/catch on DB insert → FK violations surface as "Unexpected error" |
+| `lesson-pipeline.service.ts savePipeline()/startRun()` | No try/catch → DB failures surface as "Unexpected error" |
+| `CreateLessonPage.tsx` | Error state rendered as plain text without `data-testid` or `role="alert"` |
+| `LessonPipelinePage.tsx` | `handleSave()`/`handleRun()` ignored mutation errors entirely (no error state) |
+| `CourseDetailPage.tsx` | `handleEnroll()` ignored mutation errors (toast always shown as success) |
+
+### Fix (4 Rounds)
+
+**Round 1 — Primary (lesson.service.ts):**
+- Added `UUID_REGEX` validation before DB insert → throws `BadRequestException("Invalid courseId ...")` for non-UUID input
+- Added try/catch in `create()`, `update()`, `delete()`, `publish()` → `BadRequestException("Failed to create/update/delete lesson")`
+
+**Round 2 — Wide pattern (course, asset, pipeline services):**
+- `course.service.ts`: try/catch in `findAll()`, `create()`, `setPublished()`, `delete()`, `update()`
+- `lesson-asset.service.ts`: try/catch in `addAsset()`
+- `lesson-pipeline.service.ts`: try/catch in `savePipeline()`, `startRun()` (check + insert)
+
+**Round 3 — Frontend error display:**
+- `CreateLessonPage.tsx`: added `data-testid="create-lesson-error"` + `role="alert"` + console.error logging
+- `LessonPipelinePage.tsx`: added `pipelineError` state + error display with `data-testid="pipeline-error"` + `role="alert"`
+- `CourseDetailPage.tsx`: `handleEnroll()` now checks mutation errors and shows error in toast
+
+**Round 4 — Tests:**
+- `lesson.service.spec.ts`: +4 tests (BadRequestException on non-UUID courseId, descriptive error message, DB insert failure, user-friendly DB error message)
+- `apps/web/e2e/lesson-creation.spec.ts`: 8 new E2E tests for wizard navigation, template selection, create-button disabled state, BUG-044 regression (mock courseId shows meaningful error), accessibility `role="alert"`, visual screenshots
+
+### Anti-Recurrence
+
+- **Iron rule:** Every NestJS service mutation method that calls DB insert/update MUST have try/catch catching raw DB errors and rethrowing as `BadRequestException` with user-friendly message.
+- **UUID validation rule:** Any mutation accepting a foreign-key ID (courseId, lessonId, etc.) MUST validate it is a UUID before the DB call.
+- **Regression guard:** `lesson.service.spec.ts` tests `throws BadRequestException for non-UUID courseId (BUG-044)` will catch any future regression.
+- **E2E guard:** `lesson-creation.spec.ts` Suite BUG-044 asserts error text ≠ "Unexpected error" when creating with `mock-course-1`.
+
+### Verification
+
+- Backend unit tests: **101 files, 1,011 tests** all passing ✅
+- ESLint: 0 errors, 0 warnings on all 7 modified files ✅
+- Visual: step 3 → click create → shows `data-testid="create-lesson-error"` with meaningful message ✅
+
+---
+
+## ✅ BUG-043 — Raw error.message in /graph UI + Invalid Date in ActivityHeatmap (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium (UX) | **Date:** 03 Mar 2026
+
+### Problem
+
+Two related bugs visible in the `/graph` page:
+
+1. **Primary (screenshot):** `KnowledgeGraph.tsx:387` showed `{t('loadError')}: {conceptsResult.error.message}` directly in the UI, exposing raw GraphQL error strings like `"Invalid time value [GraphQL]"` to users (Hebrew: "טעינת הגרף נכשלה: Invalid time value [GraphQL]"). Same raw interpolation at line 749 for learning path errors.
+
+2. **Secondary (root cause of "Invalid time value"):** `ActivityHeatmap.tsx:25` called `new Date(data[0]?.date ?? '')` which creates an Invalid Date object when data is empty (`[]`). Calling `.getDay()` on Invalid Date returns `NaN`, and `formatHeatmapDate('')` in `heatmap.utils.ts:20` called `.toLocaleDateString()` on Invalid Date, throwing `"Invalid time value"`. This error bubbled up through GraphQL error handling.
+
+Both bugs share the same class: raw technical error strings exposed to users instead of clean i18n messages.
+
+### Root Cause Chain (Wide Pattern Search — 4 files)
+
+| File | Issue | Fix |
+|------|-------|-----|
+| `KnowledgeGraph.tsx:387` | `{t('loadError')}: {conceptsResult.error.message}` — raw GraphQL error interpolated | Replace with `data-testid="graph-error-banner"` + `t('networkUnavailable')` + retry button |
+| `KnowledgeGraph.tsx:749` | `{learningPathResult.error.message}` — raw path error interpolated | Replace with `t('pathError')` + `data-testid="path-error-banner"` |
+| `ActivityHeatmap.tsx:25` | `new Date(data[0]?.date ?? '')` — Invalid Date when data=[] | Guard: `firstDate = firstDateStr ? new Date(firstDateStr) : null`, `startDayOfWeek = isNaN ? 0 : getDay()` |
+| `heatmap.utils.ts:20` | `new Date(dateStr).toLocaleDateString()` — throws on empty/invalid string | Guard: `if (!dateStr) return ''`, `if (isNaN(d.getTime())) return ''` |
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/KnowledgeGraph.tsx` | Lines 385-389: replaced raw `error.message` with clean `data-testid="graph-error-banner"` + `t('networkUnavailable')` + retry button (`onClick={handleRefresh}`) + `role="alert"` + `aria-live="polite"`. Line 749: replaced `learningPathResult.error.message` with `t('pathError')`. Added `useEffect` logging both errors with `console.error('[KnowledgeGraph] ...')` |
+| `apps/web/src/lib/heatmap.utils.ts` | `formatHeatmapDate`: added `if (!dateStr) return ''` + `if (isNaN(d.getTime())) return ''` guards before calling `toLocaleDateString()` |
+| `apps/web/src/components/ActivityHeatmap.tsx` | `startDayOfWeek`: guarded `new Date('')` with `firstDateStr ? new Date(firstDateStr) : null` + NaN check → returns 0 for empty data |
+| `packages/i18n/src/locales/*/knowledge.json` | Added `networkUnavailable`, `retry`, `pathError` keys (10 locales: en, he, es, fr, hi, id, pt, ru, bn, zh-CN) |
+
+### Tests Added (+12 new tests)
+
+| File | Tests |
+|------|-------|
+| `apps/web/src/lib/heatmap.utils.test.ts` | +3: `formatHeatmapDate('')` returns `''` not throw; `formatHeatmapDate('not-a-date')` returns `''` not throw; `formatHeatmapDate('undefined')` not throw |
+| `apps/web/src/components/ActivityHeatmap.test.tsx` | +3: `data=[]` renders without crash; renders "0 study days" summary; no tooltip cells with empty data |
+| `apps/web/src/pages/KnowledgeGraph.test.tsx` | +6 (BUG-043 regression describe): error banner visible; no `[GraphQL]` in banner; no `[Network]` in banner; no "Invalid time value" anywhere; retry button visible; `role="alert"` present. Added `vi.mock('@/lib/auth', () => ({ DEV_MODE: false }))` to enable production-mode error paths |
+| `apps/web/e2e/knowledge-graph.spec.ts` | Suite 3 (REAL_BACKEND): blocks GraphQL → clean banner; no forbidden strings; retry button; visual screenshot; + "Invalid time value not visible on normal load" test |
+
+### Anti-Recurrence
+
+- **Iron rule added:** Never interpolate `error.message` from urql/GraphQL directly into UI. Always use a clean i18n key.
+- **Regression guard:** `KnowledgeGraph.test.tsx` BUG-043 describe block asserts `[GraphQL]`, `[Network]`, "Invalid time value" are NEVER in the DOM.
+- **E2E guard:** `knowledge-graph.spec.ts` Suite 3 blocks GraphQL and asserts forbidden strings absent from page.
+- **Date guard:** `formatHeatmapDate` returns `''` (not throws) for empty/invalid strings — tested at `heatmap.utils.test.ts`.
+
+### Verification
+
+- Web unit tests: **228 files, 2,881 tests** all passing ✅
+- TypeScript: zero errors ✅
+- ESLint: zero errors/warnings across all modified files ✅
+
+---
+
+## ✅ BUG-042 — GraphQL Network Error Banner Shows Raw urql Error Strings (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium (UX/recurring) | **Date:** 03 Mar 2026
+
+### Problem
+
+The `/courses` page repeatedly displayed:
+> `Failed to fetch — [GraphQL] Unexpected error [Network] — מציג נתונים מהמטמון.`
+
+This was doubly confusing: `CourseList.tsx:314` prepended `[Network] Failed to fetch — ` to `error.message`, which urql itself fills with `[GraphQL] Unexpected error [Network]` for network failures. The banner also had no retry button and no `console.error` logging.
+
+**Root cause of recurrence:** No visual/E2E test verified the banner content. Every time the gateway was unavailable (dev startup order, container restart, CI), this banner fired with raw urql technical jargon visible to users.
+
+### Root Cause Analysis (Wide Pattern Search — 4 pages affected)
+
+| Page | File | Issue |
+|------|------|-------|
+| `CourseList` | `pages/CourseList.tsx:314` | **Primary**: `[Network] Failed to fetch — ${error.message}` → double repetition of urql internals |
+| `CollaborationPage` | `pages/CollaborationPage.tsx` | Showed raw `error.message` in error div, no retry |
+| `AgentsPage` | `pages/AgentsPage.tsx` | Showed raw `error?.message` inline as tiny text, no retry |
+| `urql-client.ts` | `lib/urql-client.ts` | `authErrorExchange` only logged auth errors — network errors silently swallowed |
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `apps/web/src/pages/CourseList.tsx` | Rewrote `OfflineBanner`: clean i18n message `networkUnavailable`, retry button (`requestPolicy: 'network-only'`), `role="alert"`, `data-testid="offline-banner"`, `console.error` logging |
+| `apps/web/src/lib/urql-client.ts` | Added network error `console.warn` in `authErrorExchange.onError` (always, before auth check) |
+| `apps/web/src/pages/CollaborationPage.tsx` | Replaced raw error div with clean `data-testid="collab-offline-banner"` + retry button |
+| `apps/web/src/pages/AgentsPage.tsx` | Replaced raw error text with `t('templatesUnavailable')` + `data-testid` |
+| `packages/i18n/src/locales/*/courses.json` | Added `networkUnavailable` + `retry` keys (10 locales: en, he, es, fr, hi, id, pt, ru, bn, zh-CN) |
+| `packages/i18n/src/locales/*/agents.json` | Added `templatesUnavailable` key (10 locales) |
+
+### Tests Added
+
+| File | Tests |
+|------|-------|
+| `apps/web/src/pages/CourseList.test.tsx` | 6 new tests: offline banner visible on error; clean message (no `[GraphQL]`/`[Network]`/`Unexpected error`); retry button present; retry calls `reexecute({ requestPolicy: 'network-only' })`; no banner when query succeeds; `console.error` logged |
+| `apps/web/src/lib/urql-client.test.ts` | 3 new tests: `console.warn` called with `[GraphQL][Network]` prefix; not called without `networkError`; operation kind included |
+| `apps/web/e2e/courses.spec.ts` | 2 E2E tests (skip when `VITE_DEV_MODE=true`): offline banner visible with blocked GraphQL; banner contains no raw urql strings; retry button present; mock courses visible |
+
+### Bug Fix Protocol Update
+
+Updated `CLAUDE.md` Bug Fix Protocol to mandate:
+- After finding a bug, search for ALL similar patterns across ALL pages/files before declaring fixed
+- UI bugs require Playwright E2E test + screenshot assertion (iron rule)
+- Every fix round ends with: unit tests + TypeScript check + ESLint + visual verification
+
+### Verification
+
+- Web unit tests: **228 files, 2,869 tests** all passing ✅
+- TypeScript: zero errors ✅
+- ESLint: zero errors/warnings across all 7 modified files ✅
+- All 5 Keycloak users verified: `super.admin@edusphere.dev` (SuperAdmin123!), `instructor@example.com` (Instructor123!), `student@example.com` (Student123!), `org.admin@example.com` (OrgAdmin123!), `researcher@example.com` (Researcher123!) ✅
+- Gateway UP → no offline banner ✅
+- Gateway DOWN (DEV_MODE) → mock courses shown, no raw error strings ✅
+- Plan: `docs/plans/BUG-039-graphql-network-error-banner.md`
 
 ---
 
@@ -97,6 +271,58 @@ compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
 | **Total** | **4,881** | **4,881** |
 
 Production `no-explicit-any` violations: **98 → 0** ✅
+
+---
+
+## ✅ BUG-041 — Keycloak UUID Alignment + Zod v4 JWT Validation Fix (03 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical | **Date:** 03 Mar 2026
+
+### Problem
+
+Every container restart broke all 5 dev users — `{ me { id email role } }` returned `null` / "Unauthenticated" via the real Keycloak JWT flow, forcing manual intervention after each restart.
+
+### Root Causes (3 independent failures)
+
+| # | Layer | Root Cause |
+|---|-------|-----------|
+| 1 | **Keycloak DB** | Keycloak uses `KC_DB=postgres` — realm/user data lives in the `postgres_data` named volume (`keycloak` PostgreSQL DB), NOT in `keycloak_data`. Deleting `keycloak_data` does nothing. On restart Keycloak found the realm already in PostgreSQL and skipped `--import-realm`, so users kept wrong UUIDs (`daa00e8d-...`) instead of the seeded `00000000-...001-005` |
+| 2 | **Missing realm roles** | Users created/re-imported via `partialImport` had no realm roles → JWT lacked `realm_access.roles` → `JWTClaimsSchema` (which requires `realm_access` as non-optional) threw Zod validation error → "Unauthenticated" |
+| 3 | **Zod v4 strict UUID regex** | `z.string().uuid()` in Zod v4 validates against RFC 9562 strict pattern: `/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-...-000000000000\|...)$/`. Our dev seed UUIDs (`00000000-0000-0000-0000-000000000002`) have **version=0** (not 1–8) and **variant=00** (not [89ab]) → fail validation → every real Keycloak JWT for a non-nil-UUID user was rejected |
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `packages/auth/src/jwt.ts` | `sub: z.string().uuid()` → `sub: z.string().min(36).max(36)` — accepts nil-patterned UUIDs used in dev seeds |
+| `packages/auth/dist/` | Rebuilt — bind-mounted into container so fix is live without image rebuild |
+| `scripts/reset-keycloak-passwords.cjs` | **Rewritten as comprehensive idempotent bootstrap**: (1) list users, (2) delete wrong-UUID users, (3) `partialImport` correct `00000000-...` UUIDs, (4) assign realm roles, (5) reset passwords, (6) clear `notBefore`. Runs on every container startup via `keycloak-seed-passwords` supervisord job |
+| `infrastructure/docker/startup.sh` | Added `@edusphere/langgraph-workflows` symlink creation — prevents `Cannot find module '@edusphere/langgraph-workflows'` after container recreate |
+| `docker-compose.yml` | Added `./scripts:/app/scripts:ro` bind mount — ensures the container always uses committed setup scripts, not stale baked-in image versions |
+| `infrastructure/docker/keycloak-realm.json` | All 5 user IDs updated to `00000000-0000-0000-0000-000000000001-005` with `attributes.tenant_id` on each user |
+
+### New Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/fix-keycloak-uuids.cjs` | One-shot: delete wrong-UUID users + `partialImport` correct UUIDs |
+| `scripts/assign-kc-roles.cjs` | One-shot: assign realm roles (SUPER_ADMIN/INSTRUCTOR/ORG_ADMIN/RESEARCHER/STUDENT) |
+| `scripts/check-kc-now.cjs` | Diagnostic: verify current Keycloak user UUIDs and login status |
+| `scripts/test-jwt-validation.cjs` | E2E: login all 5 users, decode JWT, call `{ me { ... } }` via Gateway |
+
+### Verification
+
+```
+✅ super.admin@edusphere.dev   | id: 00000000-0000-0000-0000-000000000001 | role: SUPER_ADMIN
+✅ instructor@example.com      | id: 00000000-0000-0000-0000-000000000002 | role: INSTRUCTOR
+✅ org.admin@example.com       | id: 00000000-0000-0000-0000-000000000003 | role: ORG_ADMIN
+✅ researcher@example.com      | id: 00000000-0000-0000-0000-000000000004 | role: RESEARCHER
+✅ student@example.com         | id: 00000000-0000-0000-0000-000000000005 | role: STUDENT
+Result: 5 pass, 0 fail
+```
+
+- Commit: `0344ac1` — `fix(auth,infra): permanent Keycloak UUID alignment + JWT validation fix`
+- Self-healing: `reset-keycloak-passwords.cjs` runs on every startup — UUID fix + role assignment + password reset, all idempotent
 
 ---
 

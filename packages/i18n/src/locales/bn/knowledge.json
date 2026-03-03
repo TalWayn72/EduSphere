@@ -29,6 +29,9 @@
   "edges": "Edges",
   "loadingGraph": "Loading graph...",
   "loadError": "Failed to load graph",
+  "networkUnavailable": "সার্ভার অনুপলব্ধ — ব্যাকআপ ডেটা দেখানো হচ্ছে",
+  "retry": "পুনরায় চেষ্টা করুন",
+  "pathError": "শেখার পথ খুঁজে পাওয়া ব্যর্থ হয়েছে",
   "refreshGraph": "Refresh graph",
   "refresh": "Refresh"
 }

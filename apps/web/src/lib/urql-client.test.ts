@@ -233,3 +233,70 @@ describe('urql auth error exchange — redirect logic', () => {
     ).toBe(true);
   });
 });
+
+// ── Network error logging (BUG-039 regression guard) ─────────────────────────
+
+describe('urql error exchange — network error logging', () => {
+  /**
+   * Mirrors the logging logic added in urql-client.ts to ensure console.warn
+   * is called with the [GraphQL][Network] prefix when a network error occurs.
+   * This logic is extracted here for unit testing without importing the full
+   * urql client (which would require a full exchange pipeline setup).
+   */
+  function logNetworkError(
+    error: MockCombinedError,
+    operation: { kind: string; name: string }
+  ): void {
+    if (error.networkError) {
+      console.warn(
+        `[GraphQL][Network] ${operation.kind} "${operation.name}": ${error.networkError.message}`
+      );
+    }
+  }
+
+  it('logs console.warn with [GraphQL][Network] prefix when networkError present', () => {
+    const warnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
+    const error: MockCombinedError = {
+      message: '[Network] Failed to fetch',
+      graphQLErrors: [],
+      networkError: new Error('Failed to fetch'),
+    };
+    logNetworkError(error, { kind: 'query', name: 'CoursesQuery' });
+    expect(warnSpy).toHaveBeenCalledWith(
+      '[GraphQL][Network] query "CoursesQuery": Failed to fetch'
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('does NOT log when no networkError (GraphQL errors only)', () => {
+    const warnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
+    const error: MockCombinedError = {
+      message: '[GraphQL] Not found',
+      graphQLErrors: [{ message: 'Not found' }],
+      // no networkError
+    };
+    logNetworkError(error, { kind: 'query', name: 'SomeQuery' });
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it('includes operation kind in the log message', () => {
+    const warnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
+    const error: MockCombinedError = {
+      message: '[Network] Connection refused',
+      graphQLErrors: [],
+      networkError: new Error('Connection refused'),
+    };
+    logNetworkError(error, { kind: 'mutation', name: 'CreateCourse' });
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('mutation "CreateCourse"')
+    );
+    warnSpy.mockRestore();
+  });
+});

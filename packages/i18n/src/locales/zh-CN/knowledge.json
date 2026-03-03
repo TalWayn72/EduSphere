@@ -29,6 +29,9 @@
   "edges": "Edges",
   "loadingGraph": "Loading graph...",
   "loadError": "Failed to load graph",
+  "networkUnavailable": "服务器不可用 — 显示备份数据",
+  "retry": "重试",
+  "pathError": "无法找到学习路径",
   "refreshGraph": "Refresh graph",
   "refresh": "Refresh"
 }

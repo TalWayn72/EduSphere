@@ -29,6 +29,9 @@
   "edges": "Edges",
   "loadingGraph": "Loading graph...",
   "loadError": "Failed to load graph",
+  "networkUnavailable": "सर्वर अनुपलब्ध — बैकअप डेटा दिखाया जा रहा है",
+  "retry": "पुनः प्रयास करें",
+  "pathError": "लर्निंग पाथ खोजने में विफल",
   "refreshGraph": "Refresh graph",
   "refresh": "Refresh"
 }

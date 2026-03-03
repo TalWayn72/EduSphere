@@ -270,3 +270,154 @@ test.describe('Knowledge Graph — Live backend (AGE 1.7.0 + PG-17 regression gu
     expect(fs.existsSync(file), `Screenshot missing: ${file}`).toBe(true);
   });
 });
+
+// ── Suite 3: BUG-043 — clean error banner, no raw GraphQL/date strings ────────
+//
+// Regression guard: when the GraphQL gateway is unavailable (or returns errors),
+// the /graph page MUST show a clean i18n message instead of raw technical strings
+// like "Invalid time value [GraphQL]" or "[Network] Failed to fetch".
+//
+// Run: VITE_DEV_MODE=false E2E_BASE_URL=http://localhost:5175 \
+//   pnpm --filter @edusphere/web exec playwright test e2e/knowledge-graph.spec.ts \
+//   --project=chromium --reporter=list --grep="BUG-043"
+
+const REAL_BACKEND = process.env.VITE_DEV_MODE === 'false';
+
+/**
+ * Raw technical strings that must NEVER appear in the UI.
+ * These indicate raw error.message interpolation leaking to users.
+ */
+const FORBIDDEN_UI_STRINGS = [
+  '[GraphQL]',
+  '[Network]',
+  'Invalid time value',
+  'Failed to fetch',
+  'Unexpected error',
+  'network error',
+];
+
+test.describe('Knowledge Graph — BUG-043: clean error banner (no raw error strings)', () => {
+  test.skip(
+    !REAL_BACKEND,
+    'Set VITE_DEV_MODE=false to run live-backend regression tests'
+  );
+
+  /**
+   * PRIMARY BUG-043 REGRESSION TEST.
+   *
+   * Blocks the GraphQL endpoint and verifies:
+   * 1. A clean offline banner appears (data-testid="graph-error-banner")
+   * 2. No raw technical strings are exposed in the banner or page
+   * 3. A retry button is present
+   * 4. Visual screenshot is saved for manual inspection
+   */
+  test('shows clean error banner with no raw technical strings when GraphQL is blocked', async ({
+    page,
+  }) => {
+    const consoleErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+
+    await login(page);
+
+    // Block the GraphQL endpoint to simulate gateway down
+    await page.route('**/graphql', (route) => route.abort('failed'));
+
+    await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    // 1. Clean error banner must appear
+    const banner = page.getByTestId('graph-error-banner');
+    await expect(banner).toBeVisible({ timeout: 10_000 });
+
+    // 2. REGRESSION GUARD: None of the forbidden raw strings must appear in the banner
+    const bannerText = await banner.textContent();
+    for (const forbidden of FORBIDDEN_UI_STRINGS) {
+      expect(
+        bannerText,
+        `Banner must not contain raw technical string: "${forbidden}"`
+      ).not.toContain(forbidden);
+    }
+
+    // 3. REGRESSION GUARD: forbidden strings must not appear ANYWHERE on the page
+    for (const forbidden of FORBIDDEN_UI_STRINGS) {
+      const el = page.getByText(forbidden, { exact: false });
+      await expect(
+        el,
+        `Page must not contain raw technical string: "${forbidden}"`
+      ).not.toBeVisible({ timeout: 2_000 });
+    }
+
+    // 4. Retry button must be present
+    const retryBtn = page.getByTestId('graph-error-retry');
+    await expect(retryBtn).toBeVisible();
+
+    // 5. Visual regression screenshot
+    const file = path.join(SCREENSHOTS_DIR, 'knowledge-graph-error-banner.png');
+    await page.screenshot({ path: file, fullPage: true });
+    expect(fs.existsSync(file), `Screenshot missing: ${file}`).toBe(true);
+
+    // Attach console errors to test output for debugging
+    if (consoleErrors.length > 0) {
+      console.warn('[BUG-043] Console errors captured:', consoleErrors);
+    }
+  });
+
+  test('retry button re-issues the concepts query', async ({ page }) => {
+    await login(page);
+
+    let blockGraphQL = true;
+    await page.route('**/graphql', (route) => {
+      if (blockGraphQL) route.abort('failed');
+      else route.continue();
+    });
+
+    await page.goto(`${BASE}/graph`, { waitUntil: 'domcontentloaded' });
+    const banner = page.getByTestId('graph-error-banner');
+    await expect(banner).toBeVisible({ timeout: 10_000 });
+
+    // Unblock GraphQL and retry
+    blockGraphQL = false;
+    const retryBtn = page.getByTestId('graph-error-retry');
+    await retryBtn.click();
+
+    // After retry the banner may disappear (or reload) — either way no raw strings
+    await page.waitForTimeout(3_000);
+    for (const forbidden of FORBIDDEN_UI_STRINGS) {
+      const el = page.getByText(forbidden, { exact: false });
+      await expect(el).not.toBeVisible({ timeout: 2_000 });
+    }
+  });
+
+  /**
+   * VISUAL REGRESSION: verifies no "Invalid time value" on normal page load.
+   * This catches date-formatting bugs from ActivityHeatmap / heatmap.utils.
+   */
+  test('no "Invalid time value" error on normal /graph load', async ({
+    page,
+  }) => {
+    await login(page);
+    await page.goto(`${BASE}/graph`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20_000,
+    });
+    await page.waitForTimeout(5_000);
+
+    await expect(
+      page.getByText('Invalid time value', { exact: false })
+    ).not.toBeVisible({ timeout: 2_000 });
+
+    // Also check the specific error shown in the bug report
+    await expect(
+      page.getByText('[GraphQL]', { exact: false })
+    ).not.toBeVisible({ timeout: 2_000 });
+
+    const file = path.join(
+      SCREENSHOTS_DIR,
+      'knowledge-graph-normal-load-regression.png'
+    );
+    await page.screenshot({ path: file, fullPage: true });
+    expect(fs.existsSync(file)).toBe(true);
+  });
+});

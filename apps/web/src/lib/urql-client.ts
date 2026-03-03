@@ -45,6 +45,19 @@ const authErrorExchange = errorExchange({
   // Subscriptions degrade gracefully: real-time updates pause, the page stays.
   // Only query/mutation auth failures indicate a genuinely expired session.
   onError(error: CombinedError, operation: Operation) {
+    // Always log network errors for debugging (visible in devtools / CI logs)
+    if (error.networkError) {
+      const opName =
+        (
+          operation.query.definitions[0] as {
+            name?: { value?: string };
+          }
+        )?.name?.value ?? 'unknown';
+      console.warn(
+        `[GraphQL][Network] ${operation.kind} "${opName}": ${error.networkError.message}`
+      );
+    }
+
     if (operation.kind === 'subscription') {
       if (hasAuthError(error)) {
         console.warn(

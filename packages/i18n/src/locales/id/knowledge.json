@@ -29,6 +29,9 @@
   "edges": "Edges",
   "loadingGraph": "Loading graph...",
   "loadError": "Failed to load graph",
+  "networkUnavailable": "Server tidak tersedia — menampilkan data cadangan",
+  "retry": "Coba lagi",
+  "pathError": "Gagal menemukan jalur pembelajaran",
   "refreshGraph": "Refresh graph",
   "refresh": "Refresh"
 }

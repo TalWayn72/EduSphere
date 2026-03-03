@@ -87,6 +87,8 @@
   "loadingCourse": "Loading course…",
   "failedToLoad": "Failed to load course: {{message}}",
   "showingCachedData": "showing cached data.",
+  "networkUnavailable": "服务器不可用 — 显示备用数据",
+  "retry": "重试",
   "exploreCollection": "Explore our collection of courses and start your learning journey",
   "hoursEstimated": "{{hours}}h estimated",
   "percentComplete": "{{percent}}% complete",

@@ -29,6 +29,9 @@
   "edges": "Edges",
   "loadingGraph": "Loading graph...",
   "loadError": "Failed to load graph",
+  "networkUnavailable": "Server unavailable — showing backup data",
+  "retry": "Retry",
+  "pathError": "Failed to find learning path",
   "refreshGraph": "Refresh graph",
   "refresh": "Refresh"
 }

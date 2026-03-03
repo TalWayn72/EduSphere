@@ -87,6 +87,8 @@
   "loadingCourse": "Loading course…",
   "failedToLoad": "Failed to load course: {{message}}",
   "showingCachedData": "showing cached data.",
+  "networkUnavailable": "Servidor indisponível — exibindo dados de backup",
+  "retry": "Tentar novamente",
   "exploreCollection": "Explore our collection of courses and start your learning journey",
   "hoursEstimated": "{{hours}}h estimated",
   "percentComplete": "{{percent}}% complete",

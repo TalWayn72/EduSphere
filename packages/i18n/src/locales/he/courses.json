@@ -33,6 +33,8 @@
   "loadingCourse": "טוען קורס…",
   "failedToLoad": "טעינת הקורס נכשלה: {{message}}",
   "showingCachedData": "מציג נתונים מהמטמון.",
+  "networkUnavailable": "שרת לא נגיש — מציג נתוני גיבוי",
+  "retry": "נסה שוב",
   "exploreCollection": "גלה את אוסף הקורסים שלנו והתחל את מסע הלמידה שלך",
   "hoursEstimated": "{{hours}} שעות משוערות",
   "percentComplete": "{{percent}}% הושלם",

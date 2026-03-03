@@ -2,6 +2,7 @@
   "title": "Agents d'apprentissage IA",
   "subtitle": "Choisissez un mode d'agent pour améliorer votre apprentissage",
   "devMode": "Mode dev — réponses simulées",
+  "templatesUnavailable": "Modèles d'agents indisponibles — utilisation du mode hors ligne",
   "selectAgent": "Sélectionner un agent :",
   "reset": "Réinitialiser",
   "sendMessage": "Envoyer le message",

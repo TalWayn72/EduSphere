@@ -33,6 +33,8 @@
   "loadingCourse": "Loading course…",
   "failedToLoad": "Failed to load course: {{message}}",
   "showingCachedData": "showing cached data.",
+  "networkUnavailable": "Server unavailable — showing backup data",
+  "retry": "Retry",
   "exploreCollection": "Explore our collection of courses and start your learning journey",
   "hoursEstimated": "{{hours}}h estimated",
   "percentComplete": "{{percent}}% complete",

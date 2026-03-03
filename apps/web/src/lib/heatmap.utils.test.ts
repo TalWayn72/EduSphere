@@ -57,6 +57,23 @@ describe('formatHeatmapDate', () => {
   it('returns a non-empty string', () => {
     expect(formatHeatmapDate('2024-06-01').length).toBeGreaterThan(0);
   });
+
+  // ── BUG-043 regression: Invalid Date must NOT throw "Invalid time value" ──
+  it('regression BUG-043: returns empty string for empty string input (no throw)', () => {
+    // new Date('').toLocaleDateString() throws "Invalid time value" in some browsers.
+    // Fix: guard with isNaN check before calling toLocaleDateString.
+    expect(() => formatHeatmapDate('')).not.toThrow();
+    expect(formatHeatmapDate('')).toBe('');
+  });
+
+  it('regression BUG-043: returns empty string for invalid date string (no throw)', () => {
+    expect(() => formatHeatmapDate('not-a-date')).not.toThrow();
+    expect(formatHeatmapDate('not-a-date')).toBe('');
+  });
+
+  it('regression BUG-043: returns empty string for null-like placeholder string', () => {
+    expect(() => formatHeatmapDate('undefined')).not.toThrow();
+  });
 });
 
 describe('calcHeatmapStats', () => {
