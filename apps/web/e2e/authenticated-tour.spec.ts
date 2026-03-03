@@ -7,7 +7,7 @@ test.beforeAll(() => {
   mkdirSync(SCREENSHOTS, { recursive: true });
 });
 
-const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
+const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 
 async function loginAsSuperAdmin(page: any) {
   if (process.env.VITE_DEV_MODE !== 'false') {
@@ -65,7 +65,7 @@ test('SA-01 Content Viewer (Default landing)', async ({ page }) => {
 
 test('SA-02 Dashboard', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/dashboard');
+  await page.goto('http://localhost:5175/dashboard');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(3000);
   await page.screenshot({
@@ -79,7 +79,7 @@ test('SA-02 Dashboard', async ({ page }) => {
 
 test('SA-03 Courses List', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/courses');
+  await page.goto('http://localhost:5175/courses');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
   await page.screenshot({
@@ -93,7 +93,7 @@ test('SA-03 Courses List', async ({ page }) => {
 
 test('SA-04 Course Create (Admin feature)', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/courses/new');
+  await page.goto('http://localhost:5175/courses/new');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
   await page.screenshot({
@@ -107,7 +107,7 @@ test('SA-04 Course Create (Admin feature)', async ({ page }) => {
 
 test('SA-05 Knowledge Graph', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/graph');
+  await page.goto('http://localhost:5175/graph');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(4000);
   await page.screenshot({
@@ -121,7 +121,7 @@ test('SA-05 Knowledge Graph', async ({ page }) => {
 
 test('SA-06 Annotations', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/annotations');
+  await page.goto('http://localhost:5175/annotations');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
   await page.screenshot({
@@ -135,7 +135,7 @@ test('SA-06 Annotations', async ({ page }) => {
 
 test('SA-07 Agents', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/agents');
+  await page.goto('http://localhost:5175/agents');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
   await page.screenshot({
@@ -149,7 +149,7 @@ test('SA-07 Agents', async ({ page }) => {
 
 test('SA-08 Collaboration', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/collaboration');
+  await page.goto('http://localhost:5175/collaboration');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
   await page.screenshot({
@@ -163,7 +163,7 @@ test('SA-08 Collaboration', async ({ page }) => {
 
 test('SA-09 Search', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/search');
+  await page.goto('http://localhost:5175/search');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
   await page.screenshot({
@@ -177,7 +177,7 @@ test('SA-09 Search', async ({ page }) => {
 
 test('SA-10 Profile', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/profile');
+  await page.goto('http://localhost:5175/profile');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
   await page.screenshot({
@@ -191,7 +191,7 @@ test('SA-10 Profile', async ({ page }) => {
 
 test('SA-11 User Menu - Check admin options', async ({ page }) => {
   await loginAsSuperAdmin(page);
-  await page.goto('http://localhost:5174/dashboard');
+  await page.goto('http://localhost:5175/dashboard');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
 

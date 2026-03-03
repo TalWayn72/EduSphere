@@ -31,7 +31,7 @@ const __dirname = path.dirname(__filename);
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
-const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
+const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 const INSTRUCTOR = {
   email: 'instructor@example.com',
   password: 'Instructor123!',

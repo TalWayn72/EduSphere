@@ -6,7 +6,7 @@
 import { test, expect, Page } from '@playwright/test';
 import path from 'path';
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const DIR = path.join(process.cwd(), 'ui-audit-results');
 

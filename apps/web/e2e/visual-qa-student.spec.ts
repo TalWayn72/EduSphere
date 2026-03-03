@@ -18,7 +18,7 @@ import path from 'path';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 

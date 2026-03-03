@@ -6,7 +6,7 @@
  *
  * ─── Environment Profiles ────────────────────────────────────────────────────
  *
- * local      (default) — VITE_DEV_MODE=true, no Keycloak, port 5174
+ * local      (default) — VITE_DEV_MODE=true, no Keycloak, port 5175
  * staging              — VITE_DEV_MODE=false, real Keycloak, configured URLs
  * production           — VITE_DEV_MODE=false, real Keycloak, production URLs
  *
@@ -33,7 +33,7 @@
  * ─── Environment Variables Reference ─────────────────────────────────────────
  *
  * E2E_ENV                   — "local" | "staging" | "production" (default: "local")
- * E2E_BASE_URL              — Web app URL (default: http://localhost:5174)
+ * E2E_BASE_URL              — Web app URL (default: http://localhost:5175)
  * E2E_KEYCLOAK_URL          — Keycloak server URL (default: http://localhost:8080)
  * E2E_GRAPHQL_URL           — GraphQL gateway URL (default: http://localhost:4000/graphql)
  * VITE_DEV_MODE             — "true" | "false" (default: "true")
@@ -59,7 +59,7 @@ export const E2E_PROFILE: E2EProfile =
 
 /** Web application base URL — all page.goto('/path') calls are relative to this */
 export const BASE_URL: string =
-  process.env.E2E_BASE_URL ?? 'http://localhost:5174';
+  process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 
 /** Keycloak OIDC server base URL */
 export const KEYCLOAK_URL: string =

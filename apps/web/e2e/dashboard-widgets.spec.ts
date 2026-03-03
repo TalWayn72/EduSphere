@@ -20,7 +20,7 @@ import { test, expect } from '@playwright/test';
  * Visual snapshots: apps/web/e2e/snapshots/
  */
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

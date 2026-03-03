@@ -96,6 +96,11 @@ interface ProgressData {
 
 // ── Mock fallback (shown when GraphQL is unavailable / DEV_MODE) ──────────────
 
+const MOCK_LESSONS_FALLBACK: LessonSummary[] = [
+  { id: 'lesson-demo-1', title: 'שיעור 1 — מבוא למשנה', type: 'THEMATIC', status: 'PUBLISHED' },
+  { id: 'lesson-demo-2', title: 'שיעור 2 — מבנה הגמרא', type: 'SEQUENTIAL', status: 'READY' },
+];
+
 const MOCK_COURSE_FALLBACK: CourseDetailData = {
   id: 'cc000000-0000-0000-0000-000000000002',
   title: 'Introduction to Talmud Study',
@@ -191,6 +196,9 @@ export function CourseDetailPage() {
 
   // Fall back to mock data when GraphQL is unavailable (DEV_MODE / no backend)
   const course = data?.course ?? (error ? MOCK_COURSE_FALLBACK : null);
+  const lessons: LessonSummary[] =
+    lessonsData?.lessonsByCourse ??
+    (error ? MOCK_LESSONS_FALLBACK : []);
   // When gateway is offline (enrollError) and showing mock course, treat as enrolled
   // so "בטל הרשמה" is shown rather than the misleading "הירשם".
   const isEnrolled = enrollError
@@ -350,13 +358,13 @@ export function CourseDetailPage() {
         {/* Module list */}
         <CourseModuleList modules={course.modules} courseId={courseId} />
 
-        {/* Lessons section (F-Lesson Pipeline Builder) */}
-        {canEdit && (
-          <div className="border rounded-xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 bg-white border-b">
-              <span className="text-sm font-medium flex items-center gap-2">
-                🎓 שיעורים
-              </span>
+        {/* Lessons section — visible to all users; add button only for editors */}
+        <div className="border rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 bg-white border-b">
+            <span className="text-sm font-medium flex items-center gap-2">
+              🎓 שיעורים
+            </span>
+            {canEdit && (
               <Button
                 size="sm"
                 variant="outline"
@@ -364,41 +372,43 @@ export function CourseDetailPage() {
               >
                 + הוסף שיעור
               </Button>
-            </div>
-            {lessonsData?.lessonsByCourse?.length ? (
-              <div className="divide-y">
-                {lessonsData.lessonsByCourse.map((lesson) => (
-                  <button
-                    key={lesson.id}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm text-left"
-                    onClick={() =>
-                      navigate(`/courses/${courseId}/lessons/${lesson.id}`)
-                    }
-                  >
-                    <span className="font-medium">{lesson.title}</span>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        lesson.status === 'PUBLISHED'
-                          ? 'bg-blue-100 text-blue-700'
-                          : lesson.status === 'READY'
-                            ? 'bg-green-100 text-green-700'
-                            : lesson.status === 'PROCESSING'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {lesson.status}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="px-4 py-6 text-center text-sm text-gray-400">
-                אין שיעורים עדיין — לחץ "+ הוסף שיעור" כדי להתחיל
-              </div>
             )}
           </div>
-        )}
+          {lessons.length > 0 ? (
+            <div className="divide-y">
+              {lessons.map((lesson) => (
+                <button
+                  key={lesson.id}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm text-left"
+                  onClick={() =>
+                    navigate(`/courses/${courseId}/lessons/${lesson.id}`)
+                  }
+                >
+                  <span className="font-medium">{lesson.title}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      lesson.status === 'PUBLISHED'
+                        ? 'bg-blue-100 text-blue-700'
+                        : lesson.status === 'READY'
+                          ? 'bg-green-100 text-green-700'
+                          : lesson.status === 'PROCESSING'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {lesson.status}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="px-4 py-6 text-center text-sm text-gray-400">
+              {canEdit
+                ? 'אין שיעורים עדיין — לחץ "+ הוסף שיעור" כדי להתחיל'
+                : 'אין שיעורים זמינים עדיין'}
+            </div>
+          )}
+        </div>
 
         {/* Knowledge Sources — collapsible panel */}
         <div className="border rounded-xl overflow-hidden">

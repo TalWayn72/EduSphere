@@ -20,7 +20,7 @@ import { test, expect, type Page } from '@playwright/test';
 
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 // Host extracted from BASE_URL — used in waitForURL pattern after Keycloak redirect
-const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5174').replace(
+const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5175').replace(
   /^https?:\/\//,
   ''
 );

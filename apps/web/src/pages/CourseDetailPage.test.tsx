@@ -54,6 +54,10 @@ vi.mock('@/lib/graphql/content.queries', () => ({
   UNENROLL_COURSE_MUTATION: 'UNENROLL_COURSE_MUTATION',
 }));
 
+vi.mock('@/lib/graphql/lesson.queries', () => ({
+  LESSONS_BY_COURSE_QUERY: 'LESSONS_BY_COURSE_QUERY',
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { CourseDetailPage } from './CourseDetailPage';
@@ -88,7 +92,12 @@ const MOCK_COURSE = {
 
 const NOOP_MUTATION = [{ fetching: false }, vi.fn()] as never;
 
-// Single data object satisfies all three useQuery calls
+const MOCK_LESSONS = [
+  { id: 'lesson-1', title: 'שיעור מבוא', type: 'THEMATIC', status: 'PUBLISHED' },
+  { id: 'lesson-2', title: 'שיעור מתקדם', type: 'SEQUENTIAL', status: 'READY' },
+];
+
+// Single data object satisfies all useQuery calls
 function makeQueryResult(overrides: Record<string, unknown> = {}) {
   return [
     {
@@ -96,6 +105,7 @@ function makeQueryResult(overrides: Record<string, unknown> = {}) {
         course: MOCK_COURSE,
         myEnrollments: [],
         myCourseProgress: null,
+        lessonsByCourse: MOCK_LESSONS,
         ...overrides,
       },
       fetching: false,
@@ -213,5 +223,51 @@ describe('CourseDetailPage', () => {
     );
     render(<CourseDetailPage />);
     expect(screen.getByText('50%')).toBeInTheDocument();
+  });
+
+  it('shows lessons section for student (not gated by canEdit)', () => {
+    vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
+    render(<CourseDetailPage />);
+    expect(screen.getByText('🎓 שיעורים')).toBeInTheDocument();
+  });
+
+  it('shows lesson titles for student', () => {
+    vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
+    render(<CourseDetailPage />);
+    expect(screen.getByText('שיעור מבוא')).toBeInTheDocument();
+    expect(screen.getByText('שיעור מתקדם')).toBeInTheDocument();
+  });
+
+  it('hides "+ הוסף שיעור" button from student', () => {
+    vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
+    render(<CourseDetailPage />);
+    expect(screen.queryByRole('button', { name: /הוסף שיעור/i })).not.toBeInTheDocument();
+  });
+
+  it('shows "+ הוסף שיעור" button to instructor', () => {
+    vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+    render(<CourseDetailPage />);
+    expect(screen.getByRole('button', { name: /הוסף שיעור/i })).toBeInTheDocument();
+  });
+
+  it('navigates to lesson detail when lesson row is clicked', () => {
+    render(<CourseDetailPage />);
+    fireEvent.click(screen.getByText('שיעור מבוא'));
+    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1/lessons/lesson-1');
+  });
+
+  it('shows status badge per lesson', () => {
+    render(<CourseDetailPage />);
+    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    expect(screen.getByText('READY')).toBeInTheDocument();
+  });
+
+  it('shows empty state message for student when no lessons', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQueryResult({ lessonsByCourse: [] })
+    );
+    vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
+    render(<CourseDetailPage />);
+    expect(screen.getByText(/אין שיעורים זמינים/i)).toBeInTheDocument();
   });
 });

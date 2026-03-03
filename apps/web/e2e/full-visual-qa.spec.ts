@@ -16,7 +16,7 @@ import path from 'path';
 
 // Default to 5174 — the dedicated Playwright test server port (5173 = dev server).
 // Override with E2E_BASE_URL env var when running against staging/production.
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5174';
+const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 
 const USERS = {
