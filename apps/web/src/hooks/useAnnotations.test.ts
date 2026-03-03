@@ -267,11 +267,7 @@ describe('useAnnotations', () => {
     );
 
     act(() => {
-      result.current.addAnnotation(
-        'Offline note',
-        AnnotationLayer.PERSONAL,
-        0
-      );
+      result.current.addAnnotation('Offline note', AnnotationLayer.PERSONAL, 0);
     });
 
     // Mutation should NOT have been called.

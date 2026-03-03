@@ -78,9 +78,7 @@ function extractText(content: unknown): string {
   return String(content ?? '');
 }
 
-function rawToVideoAnnotation(
-  a: Record<string, unknown>
-): VideoAnnotation {
+function rawToVideoAnnotation(a: Record<string, unknown>): VideoAnnotation {
   return {
     id: String(a['id'] ?? ''),
     assetId: String(a['assetId'] ?? ''),
@@ -144,8 +142,9 @@ export function useVideoAnnotations(
 
   // Merge incoming subscription event into local list.
   useEffect(() => {
-    const incoming = subscriptionResult.data
-      ?.annotationAdded as Record<string, unknown> | undefined;
+    const incoming = subscriptionResult.data?.annotationAdded as
+      | Record<string, unknown>
+      | undefined;
     if (!incoming) return;
     const newAnn = rawToVideoAnnotation(incoming);
     setLocalAnnotations((prev) => {

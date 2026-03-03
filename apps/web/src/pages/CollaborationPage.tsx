@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
-
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import { useTranslation } from 'react-i18next';
+import { DEV_MODE } from '@/lib/auth';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

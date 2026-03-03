@@ -40,7 +40,9 @@ function makeContext(authHeader?: string): GraphQLContext {
   return {
     req: {
       headers: authHeader ? { authorization: authHeader } : {},
-    } as IncomingMessage & { headers: Record<string, string | string[] | undefined> },
+    } as IncomingMessage & {
+      headers: Record<string, string | string[] | undefined>;
+    },
   };
 }
 

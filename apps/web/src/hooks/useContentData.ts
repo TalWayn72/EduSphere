@@ -10,8 +10,7 @@
  */
 import { useQuery } from 'urql';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
-
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+import { DEV_MODE } from '@/lib/auth';
 import {
   mockVideo,
   mockTranscript,

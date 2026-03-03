@@ -110,9 +110,9 @@ describe('KnowledgeSourceResolver', () => {
 
     it('throws UnauthorizedException for deleteKnowledgeSource when tenantId missing', async () => {
       const ctx = { authContext: {} } as never;
-      await expect(
-        resolver.deleteKnowledgeSource('ks-1', ctx)
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(resolver.deleteKnowledgeSource('ks-1', ctx)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
   });
 

@@ -40,6 +40,8 @@ vi.mock('urql', () => ({
 const mockGetCurrentUser = vi.fn();
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: () => mockGetCurrentUser(),
+  // DEV_MODE must be exported — CourseList imports it from @/lib/auth after BUG-038 fix.
+  DEV_MODE: false,
 }));
 
 vi.mock('@/components/Layout', () => ({

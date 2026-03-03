@@ -30,8 +30,7 @@ import {
   GitBranch,
   Network,
 } from 'lucide-react';
-
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+import { DEV_MODE } from '@/lib/auth';
 
 // ─── Mock learning path used when DEV_MODE is true ───────────────────────────
 const MOCK_LEARNING_PATH: ApiLearningPath = {

@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
-
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import {
@@ -26,7 +24,7 @@ import {
   Sparkles,
   Search,
 } from 'lucide-react';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, DEV_MODE } from '@/lib/auth';
 import { COURSES_QUERY } from '@/lib/queries';
 import {
   MY_ENROLLMENTS_QUERY,

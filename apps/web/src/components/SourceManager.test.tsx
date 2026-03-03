@@ -99,7 +99,9 @@ describe('parseSourceError()', () => {
   });
 
   it('returns raw message for unknown errors (IS_DEV_MODE=true in test env)', () => {
-    const result = parseSourceError(new Error('Some unexpected internal error'));
+    const result = parseSourceError(
+      new Error('Some unexpected internal error')
+    );
     expect(result).toBe('Error: Some unexpected internal error');
   });
 

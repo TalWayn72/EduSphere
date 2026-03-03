@@ -33,9 +33,17 @@ vi.mock('@/components/Layout', () => ({
 }));
 
 // Mock auth so getCurrentUser doesn't try Keycloak
+// DEV_MODE must be included — Search.tsx imports it. vitest.config.ts bakes
+// 'import.meta.env.VITE_DEV_MODE' = '"true"' at compile time via `define`,
+// so DEV_MODE is always true in the test environment. vi.stubEnv cannot
+// change compile-time defines; override with vi.doMock for specific tests.
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(() => null),
   logout: vi.fn(),
+  login: vi.fn(),
+  isAuthenticated: vi.fn(() => false),
+  getToken: vi.fn(() => null),
+  DEV_MODE: true,
 }));
 
 // ─── Imports ──────────────────────────────────────────────────────────────────
@@ -313,14 +321,23 @@ describe('SearchPage', () => {
 
   describe('offline fallback (GraphQL error path)', () => {
     beforeEach(() => {
-      // Stub VITE_DEV_MODE to "false" so the component uses the real-API path
-      vi.stubEnv('VITE_DEV_MODE', 'false');
-      // Reset the module registry so Search.tsx re-evaluates DEV_MODE
+      // Reset the module registry so Search.tsx re-imports @/lib/auth fresh.
       vi.resetModules();
+      // Override @/lib/auth with DEV_MODE=false so the component uses the
+      // real-API path.  vi.stubEnv cannot change compile-time defines (vitest
+      // vitest.config.ts bakes VITE_DEV_MODE="true" at transform time), so we
+      // use vi.doMock with an explicit false value instead.
+      vi.doMock('@/lib/auth', () => ({
+        getCurrentUser: vi.fn(() => null),
+        logout: vi.fn(),
+        login: vi.fn(),
+        isAuthenticated: vi.fn(() => false),
+        getToken: vi.fn(() => null),
+        DEV_MODE: false,
+      }));
     });
 
     afterEach(() => {
-      vi.unstubAllEnvs();
       vi.resetModules();
     });
 

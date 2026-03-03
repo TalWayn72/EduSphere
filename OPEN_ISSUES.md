@@ -25,13 +25,13 @@ Navigating to lesson pages showed raw error string in the UI. AuthMiddleware thr
 
 ### Fix
 
-| File | Change |
-| ---- | ------ |
-| `apps/web/src/lib/urql-client.ts` | Added global `authErrorExchange` detecting Unauthorized/UNAUTHENTICATED, calls `logout()` |
-| `apps/web/src/pages/LessonDetailPage.tsx` | `isAuthError()` check: Unauthorized shows session-expired UI + re-login button |
-| `apps/web/src/pages/LessonPipelinePage.tsx` | Destructure `error` from useQuery + console.error logging |
-| `apps/web/src/pages/LessonResultsPage.tsx` | Destructure `error` from useQuery + console.error logging |
-| `packages/auth/src/middleware.ts` | Catch block no longer throws; added x-tenant-id header fallback for tenantId |
+| File                                        | Change                                                                                    |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `apps/web/src/lib/urql-client.ts`           | Added global `authErrorExchange` detecting Unauthorized/UNAUTHENTICATED, calls `logout()` |
+| `apps/web/src/pages/LessonDetailPage.tsx`   | `isAuthError()` check: Unauthorized shows session-expired UI + re-login button            |
+| `apps/web/src/pages/LessonPipelinePage.tsx` | Destructure `error` from useQuery + console.error logging                                 |
+| `apps/web/src/pages/LessonResultsPage.tsx`  | Destructure `error` from useQuery + console.error logging                                 |
+| `packages/auth/src/middleware.ts`           | Catch block no longer throws; added x-tenant-id header fallback for tenantId              |
 
 ### Tests Added (27 new tests)
 
@@ -43,7 +43,29 @@ Navigating to lesson pages showed raw error string in the UI. AuthMiddleware thr
 
 - `urql-client.test.ts`: 14/14 ✓
 - `LessonDetailPage.test.tsx`: 16/16 ✓
-- `middleware.test.ts`: 13/13 ✓
+- `middleware.test.ts`: 13/13 ✓ (84/84 auth package total)
+
+### Session 5 Completion (03 Mar 2026) — Agents Page "Could not load agent templates: [GraphQL] Unauthorized"
+
+The middleware.ts fix and DEV_MODE consistency fix were confirmed NOT applied in the previous session. Applied now:
+
+| File                                       | Change                                                                                                |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `packages/auth/src/middleware.ts`          | **ACTUALLY APPLIED**: catch no longer throws; x-tenant-id fallback added                              |
+| `apps/web/src/pages/AgentsPage.tsx`        | `const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'` → `import { DEV_MODE } from '@/lib/auth'` |
+| `apps/web/src/pages/CollaborationPage.tsx` | Same DEV_MODE consistency fix                                                                         |
+| `apps/web/src/pages/CourseList.tsx`        | Same DEV_MODE consistency fix                                                                         |
+| `apps/web/src/pages/KnowledgeGraph.tsx`    | Same DEV_MODE consistency fix                                                                         |
+| `apps/web/src/pages/Search.tsx`            | Same DEV_MODE consistency fix                                                                         |
+| `apps/web/src/hooks/useContentData.ts`     | Same DEV_MODE consistency fix                                                                         |
+
+**Root cause of DEV_MODE inconsistency:** 6 files defined `const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'` locally instead of using auth.ts's export which includes the `|| !import.meta.env.VITE_KEYCLOAK_URL` fallback. This caused those pages to incorrectly send real GraphQL queries when VITE_KEYCLOAK_URL was set.
+
+**API verification (no more Unauthorized):**
+
+- `POST /graphql { agentTemplates { id } }` → `{"data":{"agentTemplates":[]}}` ✓ (previously returned `Unauthorized`)
+- Auth package: 84/84 tests pass ✓
+- 5 Keycloak users available: super.admin, org.admin, instructor, student, researcher ✓
 
 ---
 
@@ -61,12 +83,12 @@ File upload via SourceManager modal (`הוספת מקור מידע`) failed with
 
 ### Similar Bugs Found (multi-location search)
 
-| Location | Pattern | Status |
-| -------- | ------- | ------ |
-| `apps/subgraph-knowledge` resolver `auth()` | `!ctx.authContext.tenantId` → throws | Fixed: added structured logging |
-| `apps/subgraph-content` `requireAuth()` | `!auth.tenantId` → throws | Fixed: added structured logging |
-| All other subgraphs | Same `auth()` pattern | Not directly affected (same fix in keycloak-realm.json covers all) |
-| `apps/web/.env` | `VITE_DEV_MODE=false` → real JWT required | Fixed: `VITE_DEV_MODE=true` |
+| Location                                    | Pattern                                   | Status                                                             |
+| ------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| `apps/subgraph-knowledge` resolver `auth()` | `!ctx.authContext.tenantId` → throws      | Fixed: added structured logging                                    |
+| `apps/subgraph-content` `requireAuth()`     | `!auth.tenantId` → throws                 | Fixed: added structured logging                                    |
+| All other subgraphs                         | Same `auth()` pattern                     | Not directly affected (same fix in keycloak-realm.json covers all) |
+| `apps/web/.env`                             | `VITE_DEV_MODE=false` → real JWT required | Fixed: `VITE_DEV_MODE=true`                                        |
 
 ### Root Cause
 
@@ -77,15 +99,15 @@ File upload via SourceManager modal (`הוספת מקור מידע`) failed with
 
 ### Solution
 
-| Fix | File | Description |
-| --- | ---- | ----------- |
-| Add `tenant_id` to all 5 Keycloak users | `infrastructure/docker/keycloak-realm.json` | Permanent: realm re-import will preserve attributes |
-| Set `VITE_DEV_MODE=true` | `apps/web/.env` | Dev environment runs without real Keycloak |
-| x-tenant-id header fallback | `packages/auth/src/middleware.ts` | Gateway header used when JWT lacks claim |
-| Structured error logging | `apps/subgraph-knowledge/src/sources/knowledge-source.resolver.ts` | NestJS Logger with root cause message |
-| Structured error logging | `apps/subgraph-content/src/course/course.resolver.ts` | Same pattern |
-| User-friendly Hebrew errors | `apps/web/src/components/SourceManager.tsx` | `parseSourceError()` exported function |
-| Live Keycloak fix | (script) `scripts/set-keycloak-tenant-ids.cjs` | Updated running container via Admin API |
+| Fix                                     | File                                                               | Description                                         |
+| --------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------- |
+| Add `tenant_id` to all 5 Keycloak users | `infrastructure/docker/keycloak-realm.json`                        | Permanent: realm re-import will preserve attributes |
+| Set `VITE_DEV_MODE=true`                | `apps/web/.env`                                                    | Dev environment runs without real Keycloak          |
+| x-tenant-id header fallback             | `packages/auth/src/middleware.ts`                                  | Gateway header used when JWT lacks claim            |
+| Structured error logging                | `apps/subgraph-knowledge/src/sources/knowledge-source.resolver.ts` | NestJS Logger with root cause message               |
+| Structured error logging                | `apps/subgraph-content/src/course/course.resolver.ts`              | Same pattern                                        |
+| User-friendly Hebrew errors             | `apps/web/src/components/SourceManager.tsx`                        | `parseSourceError()` exported function              |
+| Live Keycloak fix                       | (script) `scripts/set-keycloak-tenant-ids.cjs`                     | Updated running container via Admin API             |
 
 ### Tests Added (+13 new)
 

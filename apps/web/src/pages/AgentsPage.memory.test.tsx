@@ -47,6 +47,9 @@ vi.mock('@/components/Layout', () => ({
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(() => null),
   logout: vi.fn(),
+  // DEV_MODE must be true so AgentsPage takes the mock/streaming path.
+  // After BUG-038 fix, DEV_MODE is imported from auth.ts rather than defined locally.
+  DEV_MODE: true,
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────
