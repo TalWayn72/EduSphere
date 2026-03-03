@@ -65,11 +65,15 @@ export function LessonPipelinePage() {
   } = useLessonPipelineStore();
   const [runStatus, setRunStatus] = useState<string | null>(null);
 
-  const [{ data }] = useQuery<LessonQueryData>({
+  const [{ data, error: lessonError }] = useQuery<LessonQueryData>({
     query: LESSON_QUERY,
     variables: { id: lessonId },
     pause: !lessonId,
   });
+
+  if (lessonError) {
+    console.error('[LessonPipelinePage] Query error:', lessonError.message);
+  }
   const [{ fetching: saving }, savePipeline] = useMutation(
     SAVE_LESSON_PIPELINE_MUTATION
   );

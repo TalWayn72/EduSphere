@@ -38,11 +38,15 @@ export function LessonResultsPage() {
   }>();
   const navigate = useNavigate();
 
-  const [{ data, fetching }] = useQuery<LessonQueryData>({
+  const [{ data, fetching, error }] = useQuery<LessonQueryData>({
     query: LESSON_QUERY,
     variables: { id: lessonId },
     pause: !lessonId,
   });
+
+  if (error) {
+    console.error('[LessonResultsPage] Query error:', error.message);
+  }
 
   if (fetching) {
     return (

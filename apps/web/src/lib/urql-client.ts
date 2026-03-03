@@ -1,7 +1,60 @@
-import { createClient, fetchExchange, subscriptionExchange } from 'urql';
+import {
+  createClient,
+  fetchExchange,
+  subscriptionExchange,
+  errorExchange,
+} from 'urql';
+import type { CombinedError } from 'urql';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { createClient as createWsClient } from 'graphql-ws';
-import { getToken } from './auth';
+import { getToken, logout, isAuthenticated } from './auth';
+
+// ─── Auth error detection ─────────────────────────────────────────────────────
+// Intercepts Unauthorized / Unauthenticated GraphQL errors globally and calls
+// logout() → redirects to /login.  Prevents raw "[GraphQL] Unauthorized"
+// strings from surfacing in individual component error states.
+
+const AUTH_ERROR_MESSAGES = [
+  'unauthorized',
+  'authentication required',
+  'unauthenticated',
+];
+const AUTH_ERROR_CODES = new Set([
+  'UNAUTHENTICATED',
+  'UNAUTHORIZED',
+  'FORBIDDEN',
+]);
+
+function hasAuthError(error: CombinedError): boolean {
+  return (
+    error.graphQLErrors?.some(
+      (e) =>
+        AUTH_ERROR_MESSAGES.some((m) => e.message?.toLowerCase().includes(m)) ||
+        AUTH_ERROR_CODES.has(
+          String((e.extensions as Record<string, unknown>)?.code ?? '')
+        )
+    ) ?? false
+  );
+}
+
+const authErrorExchange = errorExchange({
+  onError(error: CombinedError) {
+    if (
+      hasAuthError(error) &&
+      isAuthenticated() &&
+      typeof window !== 'undefined' &&
+      !window.location.pathname.startsWith('/login')
+    ) {
+      console.error(
+        '[Auth] GraphQL Unauthorized — session expired, redirecting to login.',
+        error.message
+      );
+      logout();
+    }
+  },
+});
+
+// ─── WebSocket client ─────────────────────────────────────────────────────────
 
 const wsClient = createWsClient({
   url:
@@ -25,6 +78,7 @@ export const urqlClient = createClient({
           (data as { courseId?: string }).courseId ?? null,
       },
     }),
+    authErrorExchange,
     subscriptionExchange({
       forwardSubscription(request) {
         const input = { ...request, query: request.query ?? '' };
@@ -47,6 +101,7 @@ export const urqlClient = createClient({
     };
   },
 });
+
 export function disposeWsClient(): void {
   wsClient.dispose();
 }

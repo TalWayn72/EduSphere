@@ -3,6 +3,18 @@ import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { LESSON_QUERY } from '@/lib/graphql/lesson.queries';
+import { login } from '@/lib/auth';
+
+const AUTH_ERROR_PATTERNS = [
+  'unauthorized',
+  'authentication required',
+  'unauthenticated',
+];
+
+function isAuthError(message: string): boolean {
+  const lower = message.toLowerCase();
+  return AUTH_ERROR_PATTERNS.some((p) => lower.includes(p));
+}
 
 interface LessonData {
   lesson: {
@@ -60,6 +72,19 @@ export function LessonDetailPage() {
   }
 
   if (error) {
+    if (isAuthError(error.message)) {
+      return (
+        <Layout>
+          <div className="p-6 space-y-3">
+            <p className="text-amber-700 font-medium">הסשן פג תוקף</p>
+            <p className="text-sm text-gray-600">
+              יש להתחבר מחדש כדי להמשיך.
+            </p>
+            <Button onClick={() => login()}>התחבר מחדש</Button>
+          </div>
+        </Layout>
+      );
+    }
     return (
       <Layout>
         <div className="p-6 text-red-600">שגיאה: {error.message}</div>

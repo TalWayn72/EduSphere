@@ -681,14 +681,16 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 1. **Read logs first** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console
 2. **If no logs exist** - Add logging as part of the fix (Pino logger)
 3. **Reproduce** - Write a failing test that reproduces the bug
-4. **Fix** - Implement the fix
-5. **Verify** - Run tests + health check + E2E smoke test
-6. **Document** in `OPEN_ISSUES.md`:
+4. **Search for similar issues** - After identifying the root cause, grep/search the entire codebase for the same pattern in other pages, components, and files with slight variations. Fix all similar issues in the same round — don't leave the same class of bug elsewhere.
+5. **Fix in rounds** - Fix the root cause + all similar issues. Each round ends with: full test suite pass + visual browser verification (if UI).
+6. **Verify** - Run tests + health check + E2E smoke test
+7. **Document** in `OPEN_ISSUES.md`:
    - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
    - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
    - Files, problem, root cause, solution, tests
 
 **Iron rule:** Never fix a bug without reading the logs first. No logs = part of the bug.
+**Iron rule:** After finding a bug, always search for the same pattern elsewhere before declaring it fixed.
 
 ## Parallel Execution (Agents)
 

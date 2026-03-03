@@ -33,6 +33,15 @@ vi.mock('@/lib/graphql/lesson.queries', () => ({
   LESSON_QUERY: 'LESSON_QUERY',
 }));
 
+const { mockLogin } = vi.hoisted(() => ({
+  mockLogin: vi.fn(),
+}));
+
+vi.mock('@/lib/auth', () => ({
+  login: mockLogin,
+  DEV_MODE: false,
+}));
+
 import { LessonDetailPage } from './LessonDetailPage';
 import * as urql from 'urql';
 
@@ -212,5 +221,66 @@ describe('LessonDetailPage', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /חזרה לקורס/ }));
     expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+  });
+
+  // ── Auth error handling ─────────────────────────────────────────────────────
+
+  it('shows session-expired UI for "Unauthorized" error', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({ error: { message: '[GraphQL] Unauthorized' }, data: undefined })
+    );
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/הסשן פג תוקף/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /התחבר מחדש/ })
+    ).toBeInTheDocument();
+  });
+
+  it('clicking the re-login button calls login()', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({ error: { message: 'Unauthorized' }, data: undefined })
+    );
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByRole('button', { name: /התחבר מחדש/ }));
+    expect(mockLogin).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows session-expired UI for "Authentication required" error', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({
+        error: { message: 'Authentication required' },
+        data: undefined,
+      })
+    );
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/הסשן פג תוקף/)).toBeInTheDocument();
+  });
+
+  it('shows generic שגיאה (not session-expired) for non-auth errors', () => {
+    vi.mocked(urql.useQuery).mockReturnValue(
+      makeQuery({
+        error: { message: 'Internal Server Error' },
+        data: undefined,
+      })
+    );
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/שגיאה/)).toBeInTheDocument();
+    expect(screen.queryByText(/הסשן פג תוקף/)).not.toBeInTheDocument();
   });
 });
