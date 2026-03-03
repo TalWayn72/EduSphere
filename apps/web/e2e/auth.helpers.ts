@@ -28,14 +28,31 @@ import {
 // ─── DEV_MODE login (no Keycloak required) ───────────────────────────────────
 
 /**
- * Navigate to the app root in DEV_MODE.
- * The app auto-authenticates as the SUPER_ADMIN mock user.
+ * Authenticate in DEV_MODE by clicking the "Sign In (Dev Mode)" button.
+ *
+ * After the BUG-028 fix, DEV_MODE no longer auto-authenticates on cold start.
+ * initKeycloak() now requires sessionStorage('edusphere_dev_logged_in', 'true')
+ * to be set before it marks devAuthenticated=true. The login button calls
+ * auth.login() which sets the key and does window.location.href='/' — this
+ * function performs that exact user interaction so subsequent page.goto() calls
+ * in the same test will find the app in an authenticated state.
+ *
  * Fast — no Keycloak round-trip needed.
  */
 export async function loginInDevMode(page: Page): Promise<void> {
-  await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
-  // Allow the auth init + React hydration to complete
-  await page.waitForLoadState('networkidle');
+  await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
+  // Click "Sign In (Dev Mode)" → calls auth.login() which:
+  //   1. sessionStorage.setItem('edusphere_dev_logged_in', 'true')
+  //   2. devAuthenticated = true
+  //   3. window.location.href = '/' (full page reload)
+  const devBtn = page.locator('[data-testid="dev-login-btn"]');
+  await devBtn.waitFor({ timeout: 10_000 });
+  await devBtn.click();
+  // Wait for the redirect chain: / → /learn/content-1 (authenticated home route)
+  await page.waitForURL(/\/learn\//, { timeout: 15_000 }).catch(async () => {
+    // Fallback: if the root redirects elsewhere, just wait for settle
+    await page.waitForLoadState('networkidle');
+  });
 }
 
 // ─── Keycloak OIDC login ─────────────────────────────────────────────────────

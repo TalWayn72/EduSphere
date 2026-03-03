@@ -36,7 +36,7 @@
 
 import { test, expect, request } from '@playwright/test';
 import { E2E } from './env';
-import { attachNetworkMonitor } from './auth.helpers';
+import { login, attachNetworkMonitor } from './auth.helpers';
 
 // ─── 1. Service connectivity ──────────────────────────────────────────────────
 
@@ -101,6 +101,10 @@ test.describe('Health Check — Service Connectivity', () => {
 // ─── 2. App bootstrap ─────────────────────────────────────────────────────────
 
 test.describe('Health Check — App Bootstrap', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('app title is "EduSphere"', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
@@ -158,6 +162,10 @@ test.describe('Health Check — App Bootstrap', () => {
 // ─── 3. Critical page reachability ───────────────────────────────────────────
 
 test.describe('Health Check — Critical Pages Load', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   const CRITICAL_PAGES = [
     { path: '/dashboard', name: 'Dashboard' },
     { path: '/courses', name: 'Courses' },
@@ -192,6 +200,10 @@ test.describe('Health Check — Critical Pages Load', () => {
 // ─── 4. Network error budget ──────────────────────────────────────────────────
 
 test.describe('Health Check — Zero Network Errors on Load', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('dashboard page produces no localhost network errors', async ({
     page,
   }) => {

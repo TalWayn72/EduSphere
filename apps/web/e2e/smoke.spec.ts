@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from './pages/LoginPage';
+import { login } from './auth.helpers';
 import { CoursePage } from './pages/CoursePage';
 import { SearchPage } from './pages/SearchPage';
 
@@ -14,6 +14,10 @@ import { SearchPage } from './pages/SearchPage';
  */
 
 test.describe('Smoke Tests — Critical Page Loads', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('root "/" redirects to content viewer', async ({ page }) => {
     await page.goto('/');
     await page.waitForURL(/\/learn\//, { timeout: 10_000 });
@@ -23,7 +27,7 @@ test.describe('Smoke Tests — Critical Page Loads', () => {
   test('login page redirects authenticated users to dashboard in DEV_MODE', async ({
     page,
   }) => {
-    // In DEV_MODE (VITE_DEV_MODE=true) the app auto-authenticates every visitor.
+    // beforeEach has already authenticated (sessionStorage flag set + devAuthenticated=true).
     // Login.tsx's useEffect detects isAuthenticated()=true and navigates to /dashboard.
     // This test verifies that redirect chain works end-to-end.
     await page.goto('/login');
@@ -89,6 +93,10 @@ test.describe('Smoke Tests — Critical Page Loads', () => {
 });
 
 test.describe('Smoke Tests — Navigation', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('sidebar nav links are present on dashboard', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
