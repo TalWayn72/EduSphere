@@ -58,8 +58,7 @@ export function CourseEditMetadata({
     handleSubmit,
     formState: { errors, isDirty },
   } = useForm<MetadataValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(metadataSchema as any),
+    resolver: zodResolver(metadataSchema as unknown as Parameters<typeof zodResolver>[0]),
     defaultValues: {
       title: initialValues.title,
       description: initialValues.description,

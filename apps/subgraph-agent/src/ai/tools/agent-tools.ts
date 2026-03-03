@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { tool } from 'ai';
 
 // ── Result shapes ─────────────────────────────────────────────────────────────
 
@@ -21,18 +22,17 @@ export interface ContentItemResult {
 // the service can inject DB-bound logic without coupling the schema definitions
 // to any infrastructure dependency.
 //
-// Note: We return plain tool-shaped objects rather than calling tool() from
-// 'ai' because the AI SDK v5 overloads conflict with our dynamic execute
-// closures. The runtime shape is identical.
+// Uses tool() from 'ai' to produce a properly-typed Tool that satisfies
+// the AI SDK v5 ToolSet constraint (requires inputSchema internally).
 
 export function buildSearchKnowledgeGraphTool(
   execute: (query: string, limit: number) => Promise<KnowledgeSearchResult[]>
 ) {
-  return {
+  return tool({
     description:
       'Search the knowledge graph for concepts and transcript segments related to a query. ' +
       'Use this when the user asks about a topic to find relevant knowledge and context.',
-    parameters: z.object({
+    inputSchema: z.object({
       query: z
         .string()
         .describe('The search query to find relevant concepts or content'),
@@ -44,30 +44,27 @@ export function buildSearchKnowledgeGraphTool(
         .default(5)
         .describe('Maximum number of results to return'),
     }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    execute: async (params: any) =>
-      execute(params.query as string, params.limit as number),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+    execute: async (input: { query: string; limit: number }) =>
+      execute(input.query, input.limit),
+  });
 }
 
 export function buildFetchCourseContentTool(
   execute: (contentItemId: string) => Promise<ContentItemResult | null>
 ) {
-  return {
+  return tool({
     description:
       'Fetch the title, type, and text content of a specific content item by its ID. ' +
       'Use this to retrieve context about what the user is currently studying.',
-    parameters: z.object({
+    inputSchema: z.object({
       contentItemId: z
         .string()
         .uuid()
         .describe('The UUID of the content item to fetch'),
     }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    execute: async (params: any) => execute(params.contentItemId as string),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+    execute: async (input: { contentItemId: string }) =>
+      execute(input.contentItemId),
+  });
 }
 
 // ── Parameter schemas (re-exported for testing) ───────────────────────────────

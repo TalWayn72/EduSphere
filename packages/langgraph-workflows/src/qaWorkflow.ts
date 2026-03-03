@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -68,23 +68,18 @@ const QAAnnotation = Annotation.Root({
 export class QAWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4o', locale: string = 'he') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(QAAnnotation) as any;
-    graph.addNode('checkLinguistic', this.checkLinguisticNode.bind(this));
-    graph.addNode('checkTopicCoverage', this.checkTopicCoverageNode.bind(this));
-    graph.addNode('scanSensitivity', this.scanSensitivityNode.bind(this));
-    graph.addNode('computeScore', this.computeScoreNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(QAAnnotation)
+      .addNode('checkLinguistic', this.checkLinguisticNode.bind(this))
+      .addNode('checkTopicCoverage', this.checkTopicCoverageNode.bind(this))
+      .addNode('scanSensitivity', this.scanSensitivityNode.bind(this))
+      .addNode('computeScore', this.computeScoreNode.bind(this));
     graph.addEdge(START, 'checkLinguistic');
     graph.addEdge('checkLinguistic', 'checkTopicCoverage');
     graph.addEdge('checkTopicCoverage', 'scanSensitivity');
@@ -95,8 +90,7 @@ export class QAWorkflow {
 
   private async checkLinguisticNode(state: QAState): Promise<Partial<QAState>> {
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: injectLocale(
         'Evaluate the linguistic quality of Hebrew lesson content: clarity, grammar, Hebrew language use, academic tone.',
         this.locale
@@ -114,8 +108,7 @@ export class QAWorkflow {
     state: QAState
   ): Promise<Partial<QAState>> {
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: injectLocale(
         `Evaluate topic coverage for a ${state.lessonType === 'SEQUENTIAL' ? 'sequential book study' : 'thematic'} Hebrew lesson.
 Check: main topic addressed, subtopics covered, logical flow, completeness.`,
@@ -132,8 +125,7 @@ Check: main topic addressed, subtopics covered, logical flow, completeness.`,
 
   private async scanSensitivityNode(state: QAState): Promise<Partial<QAState>> {
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: injectLocale(
         'Scan Hebrew religious lesson content for sensitivity issues: controversial interpretations, potentially offensive content, halachic disputes that need clarification.',
         this.locale
@@ -158,20 +150,20 @@ Check: main topic addressed, subtopics covered, logical flow, completeness.`,
     return { overallScore: Math.min(1, overallScore), isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(initialState: Partial<QAState>): Promise<QAState> {
     const fullState = QAStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as QAState;
   }
 
   async *stream(
     initialState: Partial<QAState>
   ): AsyncGenerator<QAState, void, unknown> {
-    const compiledGraph = this.graph.compile();
+    const compiledGraph = this.createGraph().compile();
     const fullState = QAStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
       yield state as unknown as QAState;

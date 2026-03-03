@@ -12,6 +12,15 @@
  * Each adapter accepts an optional `checkpointer` parameter.  When provided
  * (the normal NestJS injection path) it is used directly.  When omitted a
  * fresh MemorySaver is created as a backward-compatible fallback for tests.
+ *
+ * Checkpointer casting strategy:
+ *  pnpm resolves two copies of @langchain/langgraph-checkpoint (one for
+ *  @langchain/langgraph, one for @langchain/langgraph-checkpoint-postgres).
+ *  Their BaseCheckpointSaver types are structurally incompatible at the
+ *  TypeScript level even though they are identical at runtime.  We bridge
+ *  this by casting the compile-opts object as a whole through `unknown` to
+ *  the exact opts type that each workflow's `.compile()` method accepts —
+ *  no explicit `any` required.
  */
 
 import { MemorySaver } from '@langchain/langgraph';
@@ -43,7 +52,10 @@ export async function runLangGraphDebate(
 ): Promise<AIResult> {
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createDebateWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer: cp });
+  type DebateCompileOpts = Parameters<typeof workflow.compile>[0];
+  const compiled = workflow.compile(
+    { checkpointer: cp } as unknown as DebateCompileOpts
+  );
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -77,7 +89,10 @@ export async function runLangGraphQuiz(
 ): Promise<AIResult> {
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createQuizWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer: cp });
+  type QuizCompileOpts = Parameters<typeof workflow.compile>[0];
+  const compiled = workflow.compile(
+    { checkpointer: cp } as unknown as QuizCompileOpts
+  );
 
   const state = {
     topic: (context['topic'] as string) ?? message,
@@ -116,7 +131,10 @@ export async function runLangGraphTutor(
 ): Promise<AIResult> {
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createTutorWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer: cp });
+  type TutorCompileOpts = Parameters<typeof workflow.compile>[0];
+  const compiled = workflow.compile(
+    { checkpointer: cp } as unknown as TutorCompileOpts
+  );
 
   const state = {
     question: message,
@@ -154,7 +172,10 @@ export async function runLangGraphAssessment(
 ): Promise<AIResult> {
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createAssessmentWorkflow(undefined, locale);
-  const compiled = workflow.compile({ checkpointer: cp });
+  type AssessmentCompileOpts = Parameters<typeof workflow.compile>[0];
+  const compiled = workflow.compile(
+    { checkpointer: cp } as unknown as AssessmentCompileOpts
+  );
 
   const submission = {
     questionId: 'q1',

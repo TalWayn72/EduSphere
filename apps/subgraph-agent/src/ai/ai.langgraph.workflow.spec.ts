@@ -162,8 +162,8 @@ describe('ai.langgraph.ts: checkpointer injection and MemorySaver fallback', () 
   });
 
   it('calls workflow.compile() with the checkpointer', () => {
-    // Must pass { checkpointer: cp } to compile()
-    expect(src).toContain('{ checkpointer: cp }');
+    // Must pass checkpointer: cp to compile() (possibly with a type cast)
+    expect(src).toMatch(/workflow\.compile\(\{[^}]*checkpointer:\s*cp/);
   });
 
   it('derives thread_id from the threadId argument', () => {

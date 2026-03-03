@@ -1,6 +1,20 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { TemplateService } from './template.service';
 
+interface CreateAgentTemplateInput {
+  tenantId: string;
+  creatorId: string;
+  name: string;
+  template: string;
+  config?: Record<string, unknown>;
+}
+
+interface UpdateAgentTemplateInput {
+  name?: string;
+  config?: Record<string, unknown>;
+  isActive?: boolean;
+}
+
 @Resolver('AgentTemplate')
 export class TemplateResolver {
   constructor(private readonly templateService: TemplateService) {}
@@ -24,14 +38,12 @@ export class TemplateResolver {
   }
 
   @Mutation('createAgentTemplate')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async createAgentTemplate(@Args('input') input: any) {
+  async createAgentTemplate(@Args('input') input: CreateAgentTemplateInput) {
     return this.templateService.create(input);
   }
 
   @Mutation('updateAgentTemplate')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async updateAgentTemplate(@Args('id') id: string, @Args('input') input: any) {
+  async updateAgentTemplate(@Args('id') id: string, @Args('input') input: UpdateAgentTemplateInput) {
     return this.templateService.update(id, input);
   }
 

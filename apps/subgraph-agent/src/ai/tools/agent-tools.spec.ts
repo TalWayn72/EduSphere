@@ -95,7 +95,7 @@ describe('buildSearchKnowledgeGraphTool', () => {
     const execute =
       vi.fn<(q: string, l: number) => Promise<KnowledgeSearchResult[]>>();
     const t = buildSearchKnowledgeGraphTool(execute);
-    expect(t.parameters).toBeDefined();
+    expect(t.inputSchema).toBeDefined();
   });
 
   it('calls the provided execute function with query and limit', async () => {
@@ -170,7 +170,7 @@ describe('buildFetchCourseContentTool', () => {
   it('returns a tool object with a parameters schema', () => {
     const execute = vi.fn<(id: string) => Promise<ContentItemResult | null>>();
     const t = buildFetchCourseContentTool(execute);
-    expect(t.parameters).toBeDefined();
+    expect(t.inputSchema).toBeDefined();
   });
 
   it('calls the execute function with contentItemId', async () => {

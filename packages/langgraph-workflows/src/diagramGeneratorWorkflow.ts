@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -45,21 +45,16 @@ const DiagramGeneratorAnnotation = Annotation.Root({
 export class DiagramGeneratorWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4o', locale: string = 'he') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(DiagramGeneratorAnnotation) as any;
-    graph.addNode('buildMermaidSyntax', this.buildMermaidSyntaxNode.bind(this));
-    graph.addNode('validateMermaid', this.validateMermaidNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(DiagramGeneratorAnnotation)
+      .addNode('buildMermaidSyntax', this.buildMermaidSyntaxNode.bind(this))
+      .addNode('validateMermaid', this.validateMermaidNode.bind(this));
     graph.addEdge(START, 'buildMermaidSyntax');
     graph.addEdge('buildMermaidSyntax', 'validateMermaid');
     graph.addEdge('validateMermaid', END);
@@ -90,8 +85,7 @@ IMPORTANT: Mermaid node labels with Hebrew text must be quoted: A["תוכן"]`,
     );
 
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: systemPrompt,
       prompt: `Generate a ${state.diagramType} Mermaid diagram for these key lesson points:\n${state.keyPoints.slice(0, 15).join('\n')}`,
       schema: z.object({ mermaidSrc: z.string() }),
@@ -136,22 +130,22 @@ IMPORTANT: Mermaid node labels with Hebrew text must be quoted: A["תוכן"]`,
     return { svgOutput, isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(
     initialState: Partial<DiagramGeneratorState>
   ): Promise<DiagramGeneratorState> {
     const fullState = DiagramGeneratorStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as DiagramGeneratorState;
   }
 
   async *stream(
     initialState: Partial<DiagramGeneratorState>
   ): AsyncGenerator<DiagramGeneratorState, void, unknown> {
-    const compiledGraph = this.graph.compile();
+    const compiledGraph = this.createGraph().compile();
     const fullState = DiagramGeneratorStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
       yield state as unknown as DiagramGeneratorState;

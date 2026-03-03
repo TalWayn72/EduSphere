@@ -73,7 +73,7 @@ export async function executeCypher<T = any>(
   params?: Record<string, unknown>,
   tenantId?: string
 ): Promise<T[]> {
-  const pool = (db as any).$client as Pool;
+  const pool = (db as unknown as { $client: Pool }).$client;
   const client = await pool.connect();
   try {
     await client.query("LOAD 'age'");

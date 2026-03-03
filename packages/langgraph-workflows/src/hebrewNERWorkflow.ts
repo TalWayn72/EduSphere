@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -74,23 +74,17 @@ const HebrewNERAnnotation = Annotation.Root({
 export class HebrewNERWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4o', locale: string = 'he') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(HebrewNERAnnotation) as any;
-
-    graph.addNode('extractEntities', this.extractEntitiesNode.bind(this));
-    graph.addNode('linkSources', this.linkSourcesNode.bind(this));
-    graph.addNode('enrichTranscript', this.enrichTranscriptNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(HebrewNERAnnotation)
+      .addNode('extractEntities', this.extractEntitiesNode.bind(this))
+      .addNode('linkSources', this.linkSourcesNode.bind(this))
+      .addNode('enrichTranscript', this.enrichTranscriptNode.bind(this));
 
     graph.addEdge(START, 'extractEntities');
     graph.addEdge('extractEntities', 'linkSources');
@@ -129,8 +123,7 @@ Return a JSON array of entities with text, type, canonicalName, bookName, locati
     for (const chunk of chunks.slice(0, 10)) {
       // Process max 10 chunks to avoid token overflow
       const { object } = await generateObject({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        model: openai(this.model) as any,
+        model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
         system: systemPrompt,
         prompt: `Extract all Hebrew religious entities from this transcript chunk:\n\n${chunk}`,
         schema: z.object({
@@ -156,8 +149,7 @@ Known books: ספר עץ חיים (Etz Chaim), תלמוד בבלי, תלמוד �
     );
 
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: systemPrompt,
       prompt: `Enrich these entities with canonical locations:\n${JSON.stringify(state.entities.slice(0, 50), null, 2)}`,
       schema: z.object({
@@ -191,8 +183,7 @@ Known books: ספר עץ חיים (Etz Chaim), תלמוד בבלי, תלמוד �
     const truncatedTranscript = state.transcript.slice(0, 4000);
 
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: systemPrompt,
       prompt: `Mark the following entities in the transcript with [ENTITY:type] tags:
 Entities found:
@@ -209,20 +200,20 @@ ${truncatedTranscript}`,
     };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(initialState: Partial<HebrewNERState>): Promise<HebrewNERState> {
     const fullState = HebrewNERStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as HebrewNERState;
   }
 
   async *stream(
     initialState: Partial<HebrewNERState>
   ): AsyncGenerator<HebrewNERState, void, unknown> {
-    const compiledGraph = this.graph.compile();
+    const compiledGraph = this.createGraph().compile();
     const fullState = HebrewNERStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
       yield state as unknown as HebrewNERState;

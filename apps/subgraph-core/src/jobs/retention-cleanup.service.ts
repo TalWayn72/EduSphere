@@ -82,19 +82,37 @@ export class RetentionCleanupService {
     cutoff: Date,
     mode: 'HARD_DELETE' | 'ANONYMIZE'
   ): Promise<{ deletedCount: number; mode: string }> {
-    // Map entity type keys to the actual Drizzle table objects (typed as any to avoid
-    // complex Drizzle generic constraints that vary between table definitions)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tableMap: Record<string, any> = {
-      AGENT_MESSAGES: agentMessages,
-      AGENT_SESSIONS: agentSessions,
-      USER_PROGRESS: userProgress,
-      ANNOTATIONS: annotations,
+    // Per-table cutoff column mapping (columns differ across tables)
+    type CleanupTable =
+      | typeof agentMessages
+      | typeof agentSessions
+      | typeof userProgress
+      | typeof annotations;
+    type CutoffEntry = {
+      table: CleanupTable;
+      cutoffCol: (t: CleanupTable) => Parameters<typeof lt>[0];
+    };
+    const tableMap: Record<string, CutoffEntry> = {
+      AGENT_MESSAGES: {
+        table: agentMessages,
+        cutoffCol: (t) => (t as typeof agentMessages).createdAt,
+      },
+      AGENT_SESSIONS: {
+        table: agentSessions,
+        cutoffCol: (t) => (t as typeof agentSessions).createdAt,
+      },
+      USER_PROGRESS: {
+        table: userProgress,
+        cutoffCol: (t) => (t as typeof userProgress).lastAccessedAt,
+      },
+      ANNOTATIONS: {
+        table: annotations,
+        cutoffCol: (t) => (t as typeof annotations).created_at,
+      },
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const table: any = tableMap[entityType];
-    if (!table) {
+    const entry = tableMap[entityType];
+    if (!entry) {
       this.logger.warn(
         { entityType },
         'No table mapped for entity type — skipping'
@@ -104,8 +122,8 @@ export class RetentionCleanupService {
 
     if (mode === 'HARD_DELETE') {
       const deletedRows = await db
-        .delete(table)
-        .where(lt(table.createdAt, cutoff))
+        .delete(entry.table)
+        .where(lt(entry.cutoffCol(entry.table), cutoff))
         .returning();
       return { deletedCount: (deletedRows as unknown[]).length, mode };
     }

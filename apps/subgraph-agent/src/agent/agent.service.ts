@@ -9,6 +9,13 @@ import {
 } from '@edusphere/db';
 import { AIService } from '../ai/ai.service';
 
+interface StartExecutionInput {
+  agentId: string;
+  userId: string;
+  input: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
+
 @Injectable()
 export class AgentService implements OnModuleDestroy {
   private readonly logger = new Logger(AgentService.name);
@@ -60,8 +67,7 @@ export class AgentService implements OnModuleDestroy {
       .orderBy(desc(schema.agent_executions.started_at));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async startExecution(input: any) {
+  async startExecution(input: StartExecutionInput) {
     const [execution] = await this.db
       .insert(schema.agent_executions)
       .values({
@@ -130,8 +136,7 @@ export class AgentService implements OnModuleDestroy {
       // Execute with AI service
       const result = await this.aiService.execute(
         agent,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        execution!.input as any
+        execution!.input as Record<string, unknown>
       );
 
       // Update with result
@@ -139,8 +144,7 @@ export class AgentService implements OnModuleDestroy {
         .update(schema.agent_executions)
         .set({
           status: 'COMPLETED',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          output: result as any,
+          output: result as unknown as Record<string, unknown>,
           completed_at: new Date(),
         })
         .where(eq(schema.agent_executions.id, executionId));
@@ -153,8 +157,7 @@ export class AgentService implements OnModuleDestroy {
         .update(schema.agent_executions)
         .set({
           status: 'FAILED',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          output: { error: errorMessage } as any,
+          output: { error: errorMessage } as Record<string, unknown>,
           completed_at: new Date(),
         })
         .where(eq(schema.agent_executions.id, executionId));

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateObject } from 'ai';
+import { generateObject, type LanguageModel } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createOllama } from 'ollama-ai-provider';
 import { z } from 'zod';
@@ -53,8 +53,7 @@ export class ConceptExtractor {
       const truncatedText = text.slice(0, 8000); // Stay within token budget
 
       const { object } = await generateObject({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        model: model as any,
+        model: model as LanguageModel,
         schema: ExtractedConceptSchema,
         system: SYSTEM_PROMPT,
         prompt: `Course ID: ${courseId}\n\nTranscript:\n${truncatedText}`,

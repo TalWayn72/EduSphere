@@ -104,7 +104,7 @@ export class WhisperClient {
       );
 
       const formData = new FormData();
-      const blob = new Blob([createReadStream(filePath) as any]);
+      const blob = new Blob([createReadStream(filePath) as unknown as BlobPart]);
       formData.append('audio_file', blob, 'audio');
       formData.append('language', language);
       formData.append('output', 'json');

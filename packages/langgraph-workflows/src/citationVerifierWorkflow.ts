@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -82,21 +82,16 @@ const CitationVerifierAnnotation = Annotation.Root({
 export class CitationVerifierWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4o', locale: string = 'he') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(CitationVerifierAnnotation) as any;
-    graph.addNode('semanticMatch', this.semanticMatchNode.bind(this));
-    graph.addNode('generateReport', this.generateReportNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(CitationVerifierAnnotation)
+      .addNode('semanticMatch', this.semanticMatchNode.bind(this))
+      .addNode('generateReport', this.generateReportNode.bind(this));
     graph.addEdge(START, 'semanticMatch');
     graph.addEdge('semanticMatch', 'generateReport');
     graph.addEdge('generateReport', END);
@@ -128,8 +123,7 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
       const batch = state.citations.slice(i, i + batchSize);
 
       const { object } = await generateObject({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        model: openai(this.model) as any,
+        model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
         system: systemPrompt,
         prompt: `Verify these Hebrew citations:\n${JSON.stringify(batch, null, 2)}`,
         schema: z.object({ results: z.array(CitationResultSchema) }),
@@ -179,22 +173,22 @@ Strict mode: ${state.strictMode}. Minimum confidence threshold: ${threshold}.`,
     };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(
     initialState: Partial<CitationVerifierState>
   ): Promise<CitationVerifierState> {
     const fullState = CitationVerifierStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as CitationVerifierState;
   }
 
   async *stream(
     initialState: Partial<CitationVerifierState>
   ): AsyncGenerator<CitationVerifierState, void, unknown> {
-    const compiledGraph = this.graph.compile();
+    const compiledGraph = this.createGraph().compile();
     const fullState = CitationVerifierStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
       yield state as unknown as CitationVerifierState;

@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -48,22 +48,16 @@ const QuizStateAnnotation = Annotation.Root({
 export class QuizGeneratorWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(QuizStateAnnotation) as any;
-
-    graph.addNode('generate', this.generateNode.bind(this));
-    graph.addNode('validate', this.validateNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(QuizStateAnnotation)
+      .addNode('generate', this.generateNode.bind(this))
+      .addNode('validate', this.validateNode.bind(this));
 
     graph.addEdge(START, 'generate');
     graph.addEdge('generate', 'validate');
@@ -77,8 +71,7 @@ export class QuizGeneratorWorkflow {
 
     for (let i = 0; i < state.numQuestions; i++) {
       const { object } = await generateObject({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        model: openai(this.model) as any,
+        model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
         system: injectLocale(
           'You are an expert educational quiz generator.',
           this.locale
@@ -109,13 +102,13 @@ Requirements:
     return { isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(initialState: Partial<QuizState>): Promise<QuizState> {
     const fullState = QuizStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as QuizState;
   }
 }

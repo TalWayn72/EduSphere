@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -77,25 +77,19 @@ const TutorStateAnnotation = Annotation.Root({
 export class AdaptiveTutorWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(TutorStateAnnotation) as any;
-
-    // Define nodes
-    graph.addNode('assess', this.assessNode.bind(this));
-    graph.addNode('explain', this.explainNode.bind(this));
-    graph.addNode('verify', this.verifyNode.bind(this));
-    graph.addNode('followup', this.followupNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(TutorStateAnnotation)
+      // Define nodes
+      .addNode('assess', this.assessNode.bind(this))
+      .addNode('explain', this.explainNode.bind(this))
+      .addNode('verify', this.verifyNode.bind(this))
+      .addNode('followup', this.followupNode.bind(this));
 
     // Define edges
     graph.addEdge(START, 'assess');
@@ -110,8 +104,7 @@ export class AdaptiveTutorWorkflow {
   private async assessNode(state: TutorState): Promise<Partial<TutorState>> {
     // Assess the complexity of the question
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       prompt: `Analyze this student question and determine their likely understanding level:
 Question: "${state.question}"
 
@@ -147,8 +140,7 @@ Provide a clear, educational explanation.`;
     const systemPrompt = injectLocale(basePrompt, this.locale);
 
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       system: systemPrompt,
       prompt: `Question: ${state.question}
 
@@ -168,8 +160,7 @@ Provide a comprehensive yet accessible explanation.`,
   private async verifyNode(state: TutorState): Promise<Partial<TutorState>> {
     // Generate comprehension check question
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       prompt: `Based on this explanation:
 "${state.explanation}"
 
@@ -185,8 +176,7 @@ Generate ONE thoughtful comprehension check question that tests understanding wi
   private async followupNode(state: TutorState): Promise<Partial<TutorState>> {
     // Generate follow-up suggestions
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       prompt: `Given this question and explanation:
 Question: "${state.question}"
 Explanation: "${state.explanation}"
@@ -206,20 +196,20 @@ Suggest 3 related topics the student might want to explore next. Return as a num
     };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(initialState: Partial<TutorState>): Promise<TutorState> {
     const fullState = TutorStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as TutorState;
   }
 
   async *stream(
     initialState: Partial<TutorState>
   ): AsyncGenerator<TutorState, void, unknown> {
-    const compiledGraph = this.graph.compile();
+    const compiledGraph = this.createGraph().compile();
     const fullState = TutorStateSchema.parse(initialState);
 
     for await (const state of await compiledGraph.stream(fullState)) {

@@ -45,7 +45,9 @@ export class AgentResolver {
 
   @Mutation('startAgentExecution')
   async startAgentExecution(@Args('input') input: unknown) {
-    const execution = await this.agentService.startExecution(input);
+    const execution = await this.agentService.startExecution(
+      input as { agentId: string; userId: string; input: Record<string, unknown>; metadata?: Record<string, unknown> }
+    );
     pubSub.publish(`executionStatus_${(execution as ExecutionPayload).id}`, {
       executionStatusChanged: execution as ExecutionPayload,
     });

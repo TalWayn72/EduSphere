@@ -33,10 +33,12 @@ vi.mock('@langchain/langgraph', () => {
       const edges: Array<[string, string]> = [];
 
       this.addNode = vi.fn(function (
+        this: unknown,
         name: string,
         fn: (state: unknown) => Promise<unknown>
       ) {
         nodes[name] = fn;
+        return this;
       });
       this.setEntryPoint = vi.fn(function (name: string) {
         entryPoint = name;

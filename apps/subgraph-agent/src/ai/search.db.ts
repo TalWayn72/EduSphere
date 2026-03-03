@@ -88,8 +88,9 @@ export async function searchKnowledgeGraph(
     try {
       const vectorString = `[${queryVector.join(',')}]`;
       // Raw SQL required: Drizzle v1 has no native <=> operator support.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- raw execute returns unknown row type
-      const rows = (await (db as any).execute(sql`
+      // Double-cast via unknown to bridge Drizzle's QueryResult return type.
+      type RawExecute = { execute: (sql: unknown) => Promise<{ rows: unknown[] }> };
+      const execResult = await (db as unknown as RawExecute).execute(sql`
         SELECT
           ts.id          AS segment_id,
           ts.text        AS text,
@@ -101,7 +102,8 @@ export async function searchKnowledgeGraph(
         WHERE ma.tenant_id = ${tenantId}
         ORDER BY ce.embedding <=> ${vectorString}::vector ASC
         LIMIT ${limit}
-      `)) as Array<{ segment_id: string; text: string; similarity: string }>;
+      `);
+      const rows = execResult.rows as Array<{ segment_id: string; text: string; similarity: string }>;
 
       for (const row of rows) {
         seen.add(row.segment_id);

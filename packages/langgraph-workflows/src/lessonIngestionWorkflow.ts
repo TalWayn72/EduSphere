@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -79,23 +79,17 @@ const LessonIngestionAnnotation = Annotation.Root({
 export class LessonIngestionWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4o', locale: string = 'he') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(LessonIngestionAnnotation) as any;
-
-    graph.addNode('validateInputs', this.validateInputsNode.bind(this));
-    graph.addNode('fetchYouTubeMeta', this.fetchYouTubeMetaNode.bind(this));
-    graph.addNode('bundleAssets', this.bundleAssetsNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(LessonIngestionAnnotation)
+      .addNode('validateInputs', this.validateInputsNode.bind(this))
+      .addNode('fetchYouTubeMeta', this.fetchYouTubeMetaNode.bind(this))
+      .addNode('bundleAssets', this.bundleAssetsNode.bind(this));
 
     graph.addEdge(START, 'validateInputs');
     graph.addEdge('validateInputs', 'fetchYouTubeMeta');
@@ -140,8 +134,7 @@ export class LessonIngestionWorkflow {
     );
 
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       system: systemPrompt,
       prompt: `Extract metadata from YouTube URL: ${state.videoUrl}
 Return JSON with: { "title": "...", "estimatedDurationMinutes": 0 }`,
@@ -187,22 +180,22 @@ Return JSON with: { "title": "...", "estimatedDurationMinutes": 0 }`,
     return { bundle, isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(
     initialState: Partial<LessonIngestionState>
   ): Promise<LessonIngestionState> {
     const fullState = LessonIngestionStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as LessonIngestionState;
   }
 
   async *stream(
     initialState: Partial<LessonIngestionState>
   ): AsyncGenerator<LessonIngestionState, void, unknown> {
-    const compiledGraph = this.graph.compile();
+    const compiledGraph = this.createGraph().compile();
     const fullState = LessonIngestionStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
       yield state as unknown as LessonIngestionState;

@@ -6,6 +6,34 @@ import type { GraphQLContext } from '../auth/auth.middleware';
 
 const tracer = trace.getTracer('subgraph-knowledge');
 
+interface CreateConceptInput {
+  name: string;
+  definition: string;
+  sourceIds?: string[];
+}
+interface UpdateConceptInput {
+  name?: string;
+  definition?: string;
+  sourceIds?: string[];
+}
+interface CreatePersonInput {
+  name: string;
+  bio?: string;
+}
+interface CreateTermInput {
+  name: string;
+  definition: string;
+}
+interface CreateSourceInput {
+  title: string;
+  type: string;
+  url?: string;
+}
+interface CreateTopicClusterInput {
+  name: string;
+  description?: string;
+}
+
 @Resolver()
 export class GraphResolver {
   private readonly logger = new Logger(GraphResolver.name);
@@ -170,8 +198,7 @@ export class GraphResolver {
 
   @Mutation()
   async createConcept(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Args('input') input: any,
+    @Args('input') input: CreateConceptInput,
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
@@ -188,8 +215,7 @@ export class GraphResolver {
   @Mutation()
   async updateConcept(
     @Args('id') id: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Args('input') input: any,
+    @Args('input') input: UpdateConceptInput,
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
@@ -229,8 +255,7 @@ export class GraphResolver {
 
   @Mutation()
   async createPerson(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Args('input') input: any,
+    @Args('input') input: CreatePersonInput,
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
@@ -245,8 +270,7 @@ export class GraphResolver {
 
   @Mutation()
   async createTerm(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Args('input') input: any,
+    @Args('input') input: CreateTermInput,
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
@@ -261,8 +285,7 @@ export class GraphResolver {
 
   @Mutation()
   async createSource(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Args('input') input: any,
+    @Args('input') input: CreateSourceInput,
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);
@@ -278,8 +301,7 @@ export class GraphResolver {
 
   @Mutation()
   async createTopicCluster(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Args('input') input: any,
+    @Args('input') input: CreateTopicClusterInput,
     @Context() context: GraphQLContext
   ) {
     const { tenantId, userId, role } = this.getAuthContext(context);

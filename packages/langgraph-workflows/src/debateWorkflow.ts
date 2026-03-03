@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -58,23 +58,17 @@ const DebateStateAnnotation = Annotation.Root({
 export class ChavrutaDebateWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(DebateStateAnnotation) as any;
-
-    graph.addNode('argue', this.argueNode.bind(this));
-    graph.addNode('counter', this.counterNode.bind(this));
-    graph.addNode('synthesize', this.synthesizeNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(DebateStateAnnotation)
+      .addNode('argue', this.argueNode.bind(this))
+      .addNode('counter', this.counterNode.bind(this))
+      .addNode('synthesize', this.synthesizeNode.bind(this));
 
     graph.addEdge(START, 'argue');
     graph.addConditionalEdges('argue', (state: DebateState) => {
@@ -90,8 +84,7 @@ export class ChavrutaDebateWorkflow {
 
   private async argueNode(state: DebateState): Promise<Partial<DebateState>> {
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       system: injectLocale(
         'You are a skilled debate participant.',
         this.locale
@@ -120,8 +113,7 @@ Provide a strong, logical argument for your position. Use evidence and reasoning
     if (!lastArgument) return {};
 
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       system: injectLocale(
         'You are a skilled debate participant.',
         this.locale
@@ -156,8 +148,7 @@ Provide a strong counter-argument that addresses their points while advancing yo
       .join('\n\n');
 
     const { text } = await generateText({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       system: injectLocale('You are a philosophical teacher.', this.locale),
       prompt: `Synthesize the following debate:
 
@@ -178,13 +169,13 @@ Provide:
     };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(initialState: Partial<DebateState>): Promise<DebateState> {
     const fullState = DebateStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as DebateState;
   }
 }

@@ -6,8 +6,8 @@
 import 'react';
 
 declare module 'react' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
-  interface Component<_P = {}, _S = {}, _SS = any> {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface Component<_P = {}, _S = {}, _SS = unknown> {
     refs: Record<string, React.ReactInstance>;
   }
 }

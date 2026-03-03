@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -68,25 +68,20 @@ const SummarizationAnnotation = Annotation.Root({
 export class SummarizationWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4o', locale: string = 'he') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(SummarizationAnnotation) as any;
-    graph.addNode('generateSummaries', this.generateSummariesNode.bind(this));
-    graph.addNode('extractKeyPoints', this.extractKeyPointsNode.bind(this));
-    graph.addNode(
-      'generateDiscussionQuestions',
-      this.generateDiscussionQuestionsNode.bind(this)
-    );
+  private createGraph() {
+    const graph = new StateGraph(SummarizationAnnotation)
+      .addNode('generateSummaries', this.generateSummariesNode.bind(this))
+      .addNode('extractKeyPoints', this.extractKeyPointsNode.bind(this))
+      .addNode(
+        'generateDiscussionQuestions',
+        this.generateDiscussionQuestionsNode.bind(this)
+      );
     graph.addEdge(START, 'generateSummaries');
     graph.addEdge('generateSummaries', 'extractKeyPoints');
     graph.addEdge('extractKeyPoints', 'generateDiscussionQuestions');
@@ -106,8 +101,7 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
     );
 
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: systemPrompt,
       prompt: `Summarize this Hebrew lesson transcript:\n\n${state.text.slice(0, 8000)}`,
       schema: z.object({
@@ -126,8 +120,7 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
     state: SummarizationState
   ): Promise<Partial<SummarizationState>> {
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: injectLocale(
         'Extract key conceptual points from the lesson summary as a numbered list in Hebrew.',
         this.locale
@@ -142,8 +135,7 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
     state: SummarizationState
   ): Promise<Partial<SummarizationState>> {
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateObject>[0]['model'],
       system: injectLocale(
         'Generate thoughtful discussion questions in Hebrew for a study group based on the lesson content.',
         this.locale
@@ -154,22 +146,22 @@ Write in clear, academic Hebrew. Short summary: 120-180 words. Long summary: 400
     return { discussionQuestions: object.questions, isComplete: true };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(
     initialState: Partial<SummarizationState>
   ): Promise<SummarizationState> {
     const fullState = SummarizationStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as SummarizationState;
   }
 
   async *stream(
     initialState: Partial<SummarizationState>
   ): AsyncGenerator<SummarizationState, void, unknown> {
-    const compiledGraph = this.graph.compile();
+    const compiledGraph = this.createGraph().compile();
     const fullState = SummarizationStateSchema.parse(initialState);
     for await (const state of await compiledGraph.stream(fullState)) {
       yield state as unknown as SummarizationState;

@@ -24,8 +24,7 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
     setValue,
     formState: { errors },
   } = useForm<LessonFormData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(Step1Schema as any),
+    resolver: zodResolver(Step1Schema as unknown as Parameters<typeof zodResolver>[0]),
     defaultValues: initialData,
   });
 

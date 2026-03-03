@@ -95,18 +95,20 @@ describe('searchKnowledgeGraph', () => {
     });
 
     // pgvector raw execute result
-    dbExecuteImpl = vi.fn().mockResolvedValue([
-      {
-        segment_id: 'seg-1',
-        text: 'photosynthesis occurs in chloroplasts',
-        similarity: '0.92',
-      },
-      {
-        segment_id: 'seg-2',
-        text: 'light reactions in thylakoid',
-        similarity: '0.85',
-      },
-    ]);
+    dbExecuteImpl = vi.fn().mockResolvedValue({
+      rows: [
+        {
+          segment_id: 'seg-1',
+          text: 'photosynthesis occurs in chloroplasts',
+          similarity: '0.92',
+        },
+        {
+          segment_id: 'seg-2',
+          text: 'light reactions in thylakoid',
+          similarity: '0.85',
+        },
+      ],
+    });
 
     // ILIKE fallback (remaining=0 so should not be called, but set up anyway)
     const { tx } = buildSelectChain([]);
@@ -176,18 +178,20 @@ describe('searchKnowledgeGraph', () => {
     });
 
     // Vector returns seg-1 and seg-2
-    dbExecuteImpl = vi.fn().mockResolvedValue([
-      {
-        segment_id: 'seg-1',
-        text: 'mitochondria powerhouse',
-        similarity: '0.9',
-      },
-      {
-        segment_id: 'seg-2',
-        text: 'cell membrane structure',
-        similarity: '0.8',
-      },
-    ]);
+    dbExecuteImpl = vi.fn().mockResolvedValue({
+      rows: [
+        {
+          segment_id: 'seg-1',
+          text: 'mitochondria powerhouse',
+          similarity: '0.9',
+        },
+        {
+          segment_id: 'seg-2',
+          text: 'cell membrane structure',
+          similarity: '0.8',
+        },
+      ],
+    });
 
     // ILIKE returns seg-1 (duplicate) and seg-3 (new)
     const { tx } = buildSelectChain([
@@ -214,13 +218,13 @@ describe('searchKnowledgeGraph', () => {
       json: async () => ({ embedding: Array(768).fill(0.1) }),
     });
 
-    dbExecuteImpl = vi.fn().mockResolvedValue(
-      Array.from({ length: 10 }, (_, i) => ({
+    dbExecuteImpl = vi.fn().mockResolvedValue({
+      rows: Array.from({ length: 10 }, (_, i) => ({
         segment_id: `seg-${i}`,
         text: `content ${i}`,
         similarity: String(0.9 - i * 0.05),
-      }))
-    );
+      })),
+    });
 
     const { tx } = buildSelectChain([]);
     withTenantContextImpl = async (_db, _ctx, op) => op(tx);

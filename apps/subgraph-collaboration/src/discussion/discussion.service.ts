@@ -88,8 +88,7 @@ export class DiscussionService implements OnModuleDestroy {
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const values: any = {
+      const values: Record<string, unknown> = {
         tenant_id: authContext.tenantId || '',
         course_id: input.courseId,
         title: input.title,
@@ -103,7 +102,7 @@ export class DiscussionService implements OnModuleDestroy {
 
       const [discussion] = await tx
         .insert(schema.discussions)
-        .values(values)
+        .values(values as never)
         .returning();
 
       // Auto-join creator as participant
@@ -212,8 +211,7 @@ export class DiscussionService implements OnModuleDestroy {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const messageValues: any = {
+      const messageValues: Record<string, unknown> = {
         discussion_id: discussionId,
         user_id: authContext.userId,
         content: input.content,
@@ -226,7 +224,7 @@ export class DiscussionService implements OnModuleDestroy {
 
       const [message] = await tx
         .insert(schema.discussion_messages)
-        .values(messageValues)
+        .values(messageValues as never)
         .returning();
 
       this.logger.log(

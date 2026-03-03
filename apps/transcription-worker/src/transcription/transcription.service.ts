@@ -82,7 +82,7 @@ export class TranscriptionService {
       };
       await this.natsService.publish(
         'transcription.completed',
-        completedEvent as any
+        completedEvent as unknown as Record<string, unknown>
       );
       this.logger.log(
         `Transcription completed: assetId=${assetId} transcriptId=${transcriptId}`
@@ -143,7 +143,7 @@ export class TranscriptionService {
       };
       await this.natsService.publish(
         'transcription.failed',
-        failedEvent as any
+        failedEvent as unknown as Record<string, unknown>
       );
     } finally {
       // Step 7: Clean up temp file

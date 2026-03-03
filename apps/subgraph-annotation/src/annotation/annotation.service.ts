@@ -292,8 +292,7 @@ export class AnnotationService implements OnModuleDestroy {
         );
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updateData: any = {};
+      const updateData: Record<string, unknown> = {};
 
       if (input.content !== undefined) {
         updateData.content = input.content;

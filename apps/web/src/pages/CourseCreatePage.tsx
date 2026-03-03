@@ -102,8 +102,7 @@ export function CourseCreatePage() {
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
 
   const form = useForm<CourseSchemaValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(courseSchema as any),
+    resolver: zodResolver(courseSchema as unknown as Parameters<typeof zodResolver>[0]),
     defaultValues: {
       title: '',
       description: '',

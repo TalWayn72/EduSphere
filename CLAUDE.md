@@ -678,19 +678,53 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 ## Bug Fix Protocol
 
-1. **Read logs first** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console
-2. **If no logs exist** - Add logging as part of the fix (Pino logger)
-3. **Reproduce** - Write a failing test that reproduces the bug
-4. **Search for similar issues** - After identifying the root cause, grep/search the entire codebase for the same pattern in other pages, components, and files with slight variations. Fix all similar issues in the same round — don't leave the same class of bug elsewhere.
-5. **Fix in rounds** - Fix the root cause + all similar issues. Each round ends with: full test suite pass + visual browser verification (if UI).
-6. **Verify** - Run tests + health check + E2E smoke test
-7. **Document** in `OPEN_ISSUES.md`:
-   - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
-   - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
-   - Files, problem, root cause, solution, tests
+### Phase 1 — Discovery
 
-**Iron rule:** Never fix a bug without reading the logs first. No logs = part of the bug.
-**Iron rule:** After finding a bug, always search for the same pattern elsewhere before declaring it fixed.
+1. **Read logs first** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console
+2. **If no logs exist** - Add Pino logging (`this.logger.error(...)`) as part of the fix so the bug becomes observable
+3. **Reproduce** - Write a failing test that reproduces the bug before touching any fix code
+4. **Identify root cause** - Trace the full call chain; document the exact line(s) that cause the failure
+5. **Wide pattern search (MANDATORY)** - After identifying the root cause pattern, grep/search the ENTIRE codebase for:
+   - The same pattern (exact match)
+   - Slight variations (e.g., same logic with different variable names, same hook with different parameters, same component structure in other pages)
+   - Related patterns that share the same class of bug (e.g., if bug is "no cleanup on unmount", search ALL `setInterval`/`setTimeout` usages)
+   - Build a **Discovery List** of every affected file before writing a single fix
+
+### Phase 2 — Fix Rounds
+
+Execute one round per logical grouping of similar issues. **A round is NOT done until:**
+- `pnpm turbo test` passes 100% for affected packages
+- Visual browser verification passes (if UI change)
+- New regression tests are written and green
+
+**Round structure:**
+- **Round 1**: Fix the original bug + add missing logging
+- **Round 2**: Fix all similar issues found in the wide pattern search (other pages/components with variations)
+- **Round N**: Continue rounds until the Discovery List is empty and grep returns zero matches for the bug pattern
+- Each round must NOT introduce new TypeScript errors (`pnpm turbo typecheck`)
+
+### Phase 3 — Verification
+
+6. **Full test suite** - `pnpm turbo test -- --coverage` must pass 100%
+7. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino error/warn)
+8. **Visual check** - Open browser, reproduce the original scenario, confirm zero console errors and correct UI behavior
+9. **Health check** - `./scripts/health-check.sh` passes
+10. **Pattern clean** - grep for the bug pattern returns zero matches outside of test files
+
+### Phase 4 — Documentation
+
+11. **Document** in `OPEN_ISSUES.md`:
+    - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
+    - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
+    - Files affected (including ALL rounds), problem, root cause chain, solution per round, tests added
+    - **Anti-recurrence note**: what prevents this from happening again
+
+**IRON RULES (never violate):**
+- Never fix a bug without reading the logs first. No logs = part of the bug.
+- Never declare a bug fixed until the entire Discovery List is empty.
+- Never close a bug without a regression test that would catch it if it returns.
+- Never leave logging gaps — the bug must be observable in logs if it recurs.
+- Only report completion when ALL rounds are done, all tests pass, and grep shows zero recurrence patterns.
 
 ## Parallel Execution (Agents)
 

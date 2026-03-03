@@ -1,4 +1,4 @@
-import { StateGraph, END, START, Annotation } from '@langchain/langgraph';
+import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
 import { generateText, generateObject } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
@@ -55,22 +55,16 @@ const AssessmentStateAnnotation = Annotation.Root({
 export class AssessmentWorkflow {
   private model: string;
   private locale: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private graph: any;
 
   constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
     this.model = model;
     this.locale = locale;
-    this.graph = this.buildGraph();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private buildGraph(): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graph = new StateGraph(AssessmentStateAnnotation) as any;
-
-    graph.addNode('evaluate', this.evaluateNode.bind(this));
-    graph.addNode('synthesize', this.synthesizeNode.bind(this));
+  private createGraph() {
+    const graph = new StateGraph(AssessmentStateAnnotation)
+      .addNode('evaluate', this.evaluateNode.bind(this))
+      .addNode('synthesize', this.synthesizeNode.bind(this));
 
     graph.addEdge(START, 'evaluate');
     graph.addEdge('evaluate', 'synthesize');
@@ -86,8 +80,7 @@ export class AssessmentWorkflow {
 
     for (const submission of state.submissions) {
       const { text } = await generateText({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        model: openai(this.model) as any,
+        model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
         system: injectLocale(
           'You are an expert educational assessor providing fair and constructive feedback.',
           this.locale
@@ -130,8 +123,7 @@ Feedback: [detailed feedback]`,
       .join('\n\n');
 
     const { object } = await generateObject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model: openai(this.model) as any,
+      model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       system: injectLocale(
         'You are an expert educational assessor providing fair and constructive feedback.',
         this.locale
@@ -154,13 +146,13 @@ Synthesize an overall assessment with:
     };
   }
 
-  compile(opts?: { checkpointer?: unknown }) {
-    return this.graph.compile(opts);
+  compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
+    return this.createGraph().compile(opts);
   }
 
   async run(initialState: Partial<AssessmentState>): Promise<AssessmentState> {
     const fullState = AssessmentStateSchema.parse(initialState);
-    const result = await this.graph.compile().invoke(fullState);
+    const result = await this.compile().invoke(fullState);
     return result as AssessmentState;
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { db, withTenantContext, type Database } from '@edusphere/db';
+import { db, withTenantContext, type Database, type TenantContext } from '@edusphere/db';
 import { agentSessions, NewAgentSession } from '@edusphere/db';
 import { eq, and, desc } from 'drizzle-orm';
 import type { AuthContext } from '@edusphere/auth';
@@ -21,8 +21,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        userRole: authContext.roles[0] as any,
+        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         const [session] = await txDb
@@ -50,8 +49,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        userRole: authContext.roles[0] as any,
+        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         return txDb
@@ -74,8 +72,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        userRole: authContext.roles[0] as any,
+        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         return txDb
@@ -102,8 +99,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        userRole: authContext.roles[0] as any,
+        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         const [session] = await txDb
@@ -148,8 +144,7 @@ export class AgentSessionService {
       {
         tenantId: authContext.tenantId,
         userId: authContext.userId,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        userRole: authContext.roles[0] as any,
+        userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'],
       },
       async (txDb: Database) => {
         const [updated] = await txDb
