@@ -1,7 +1,7 @@
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { Pool } from 'pg';
 
-export type DrizzleDB = NodePgDatabase<any>;
+export type DrizzleDB = NodePgDatabase<Record<string, unknown>>;
 
 /**
  * Convert a JS value to a safe Cypher literal string.
@@ -66,7 +66,7 @@ export function substituteParams(
  * Once the stack is upgraded to AGE ≥1.9 (which supports PG 17) the fallback
  * branch will never be reached and can be removed.
  */
-export async function executeCypher<T = any>(
+export async function executeCypher<T = Record<string, unknown>>(
   db: DrizzleDB,
   graphName: string,
   query: string,
@@ -165,7 +165,7 @@ export async function addEdge(
 /**
  * Query graph nodes with parameterized filters.
  */
-export async function queryNodes<T = any>(
+export async function queryNodes<T = Record<string, unknown>>(
   db: DrizzleDB,
   graphName: string,
   label: string,
@@ -188,7 +188,7 @@ export async function queryNodes<T = any>(
  * Traverse graph relationships using a parameterized start node ID.
  * maxDepth is a non-user-controlled integer used in the range literal.
  */
-export async function traverse<T = any>(
+export async function traverse<T = Record<string, unknown>>(
   db: DrizzleDB,
   graphName: string,
   startNodeId: string,

@@ -53,9 +53,7 @@ export async function runLangGraphDebate(
   const cp = checkpointer ?? new MemorySaver();
   const workflow = createDebateWorkflow(undefined, locale);
   type DebateCompileOpts = Parameters<typeof workflow.compile>[0];
-  const compiled = workflow.compile(
-    { checkpointer: cp } as unknown as DebateCompileOpts
-  );
+  const compiled = workflow.compile({ checkpointer: cp } as unknown as DebateCompileOpts);
 
   const state = {
     topic: (context['topic'] as string) ?? message,
