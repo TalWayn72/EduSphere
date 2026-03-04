@@ -92,6 +92,8 @@ export class NatsService implements OnModuleInit, OnModuleDestroy {
           await jsm.streams.add({
             name: stream.name,
             subjects: stream.subjects,
+            max_age: 7 * 24 * 3600 * 1_000_000_000, // 7 days in nanoseconds
+            max_bytes: 100 * 1024 * 1024, // 100 MB
           });
           this.logger.log(`Created NATS stream: ${stream.name}`);
         }

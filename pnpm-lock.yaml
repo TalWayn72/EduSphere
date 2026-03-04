@@ -259,8 +259,14 @@ importers:
       '@graphql-yoga/nestjs-federation':
         specifier: ^3.19.0
         version: 3.19.0(@nestjs/common@11.1.14(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/graphql@12.2.2(@apollo/subgraph@2.13.0(graphql@16.12.0))(@nestjs/common@11.1.14(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.14)(graphql@16.12.0)(reflect-metadata@0.2.2))(encoding@0.1.13)(graphql-yoga@5.18.0(graphql@16.12.0))(graphql@16.12.0)
+      '@langchain/community':
+        specifier: ^1.1.16
+        version: 1.1.16(5bde875ad74dfffbdd95705faa509448)
+      '@langchain/core':
+        specifier: ^0.3.80
+        version: 0.3.80(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.212.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.5.1(@opentelemetry/api@1.9.0))(openai@6.22.0(ws@8.19.0)(zod@4.3.6))
       '@langchain/langgraph':
-        specifier: ^0.2.28
+        specifier: ^0.2.74
         version: 0.2.74(@langchain/core@0.3.80(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.212.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.5.1(@opentelemetry/api@1.9.0))(openai@6.22.0(ws@8.19.0)(zod@4.3.6)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod-to-json-schema@3.25.1(zod@4.3.6))
       '@langchain/langgraph-checkpoint-postgres':
         specifier: ^1.0.1
@@ -337,7 +343,7 @@ importers:
         version: link:../../packages/tsconfig
       '@nestjs/cli':
         specifier: ^11.0.16
-        version: 11.0.16(@types/node@22.19.11)(esbuild@0.19.12)
+        version: 11.0.16(@types/node@22.19.11)
       '@nestjs/schematics':
         specifier: ^11.0.3
         version: 11.0.9(chokidar@4.0.3)(typescript@5.9.3)
@@ -1137,8 +1143,8 @@ importers:
         specifier: ^2.15.0
         version: 2.15.3(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29)
       '@hookform/resolvers':
-        specifier: ^3.10.0
-        version: 3.10.0(react-hook-form@7.71.1(react@19.2.4))
+        specifier: ^5.2.2
+        version: 5.2.2(react-hook-form@7.71.1(react@19.2.4))
       '@radix-ui/react-avatar':
         specifier: ^1.1.2
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1241,6 +1247,9 @@ importers:
       '@urql/exchange-graphcache':
         specifier: ^7.2.4
         version: 7.2.4(@urql/core@5.2.0(graphql@16.12.0))(graphql@16.12.0)
+      '@urql/exchange-persisted':
+        specifier: ^4.3.1
+        version: 4.3.1(@urql/core@5.2.0(graphql@16.12.0))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1323,8 +1332,8 @@ importers:
         specifier: ^13.6.27
         version: 13.6.29
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.3.6
+        version: 4.3.6
       zustand:
         specifier: ^5.0.0
         version: 5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
@@ -4953,10 +4962,10 @@ packages:
       y-protocols: ^1.0.6
       yjs: ^13.6.8
 
-  '@hookform/resolvers@3.10.0':
-    resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
+  '@hookform/resolvers@5.2.2':
+    resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
     peerDependencies:
-      react-hook-form: ^7.0.0
+      react-hook-form: ^7.55.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -9022,6 +9031,11 @@ packages:
 
   '@urql/exchange-graphcache@7.2.4':
     resolution: {integrity: sha512-kiKbT0ZrtyQmmgNLYR0qkZAJjWHQOtrd+6Dt9JMtm3L/A8r3D6ptcJn668BADP6J+vkxcfNFtdI+0OdmBBkRgw==}
+    peerDependencies:
+      '@urql/core': ^5.0.0
+
+  '@urql/exchange-persisted@4.3.1':
+    resolution: {integrity: sha512-VRGYFNW0gaT7+VCR/1rCMWEP9gvnDnlAolKisysLYkv8Zeysbqx+Omw4IgIRCLjI6oHWPkH8zOhFbqA3GRQ9HQ==}
     peerDependencies:
       '@urql/core': ^5.0.0
 
@@ -21229,8 +21243,9 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@hookform/resolvers@3.10.0(react-hook-form@7.71.1(react@19.2.4))':
+  '@hookform/resolvers@5.2.2(react-hook-form@7.71.1(react@19.2.4))':
     dependencies:
+      '@standard-schema/utils': 0.3.0
       react-hook-form: 7.71.1(react@19.2.4)
 
   '@humanfs/core@0.19.1': {}
@@ -21953,32 +21968,6 @@ snapshots:
       tsconfig-paths-webpack-plugin: 4.2.0
       typescript: 5.9.3
       webpack: 5.104.1
-      webpack-node-externals: 3.0.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - esbuild
-      - uglify-js
-      - webpack-cli
-
-  '@nestjs/cli@11.0.16(@types/node@22.19.11)(esbuild@0.19.12)':
-    dependencies:
-      '@angular-devkit/core': 19.2.19(chokidar@4.0.3)
-      '@angular-devkit/schematics': 19.2.19(chokidar@4.0.3)
-      '@angular-devkit/schematics-cli': 19.2.19(@types/node@22.19.11)(chokidar@4.0.3)
-      '@inquirer/prompts': 7.10.1(@types/node@22.19.11)
-      '@nestjs/schematics': 11.0.9(chokidar@4.0.3)(typescript@5.9.3)
-      ansis: 4.2.0
-      chokidar: 4.0.3
-      cli-table3: 0.6.5
-      commander: 4.1.1
-      fork-ts-checker-webpack-plugin: 9.1.0(typescript@5.9.3)(webpack@5.104.1(esbuild@0.19.12))
-      glob: 13.0.0
-      node-emoji: 1.11.0
-      ora: 5.4.1
-      tsconfig-paths: 4.2.0
-      tsconfig-paths-webpack-plugin: 4.2.0
-      typescript: 5.9.3
-      webpack: 5.104.1(esbuild@0.19.12)
       webpack-node-externals: 3.0.0
     transitivePeerDependencies:
       - '@types/node'
@@ -26034,6 +26023,11 @@ snapshots:
     transitivePeerDependencies:
       - graphql
 
+  '@urql/exchange-persisted@4.3.1(@urql/core@5.2.0(graphql@16.12.0))':
+    dependencies:
+      '@urql/core': 5.2.0(graphql@16.12.0)
+      wonka: 6.3.5
+
   '@urql/exchange-retry@1.3.2(@urql/core@5.2.0(graphql@16.12.0))':
     dependencies:
       '@urql/core': 5.2.0(graphql@16.12.0)
@@ -28201,8 +28195,8 @@ snapshots:
       '@babel/parser': 7.29.0
       eslint: 10.0.0(jiti@2.6.1)
       hermes-parser: 0.25.1
-      zod: 3.25.76
-      zod-validation-error: 4.0.2(zod@3.25.76)
+      zod: 4.3.6
+      zod-validation-error: 4.0.2(zod@4.3.6)
     transitivePeerDependencies:
       - supports-color
 
@@ -29019,23 +29013,6 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-  fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.104.1(esbuild@0.19.12)):
-    dependencies:
-      '@babel/code-frame': 7.29.0
-      chalk: 4.1.2
-      chokidar: 4.0.3
-      cosmiconfig: 8.3.6(typescript@5.9.3)
-      deepmerge: 4.3.1
-      fs-extra: 10.1.0
-      memfs: 3.5.3
-      minimatch: 3.1.2
-      node-abort-controller: 3.1.1
-      schema-utils: 3.3.0
-      semver: 7.7.4
-      tapable: 2.3.0
-      typescript: 5.9.3
-      webpack: 5.104.1(esbuild@0.19.12)
-
   fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.104.1):
     dependencies:
       '@babel/code-frame': 7.29.0
@@ -29599,7 +29576,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.3
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.13.5)
+      retry-axios: 2.6.0(axios@1.13.5(debug@4.4.3))
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -33054,7 +33031,7 @@ snapshots:
 
   restructure@3.0.2: {}
 
-  retry-axios@2.6.0(axios@1.13.5):
+  retry-axios@2.6.0(axios@1.13.5(debug@4.4.3)):
     dependencies:
       axios: 1.13.5(debug@4.4.3)
 
@@ -33807,17 +33784,6 @@ snapshots:
     dependencies:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.3.0
-
-  terser-webpack-plugin@5.3.16(esbuild@0.19.12)(webpack@5.104.1(esbuild@0.19.12)):
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      jest-worker: 27.5.1
-      schema-utils: 4.3.3
-      serialize-javascript: 6.0.2
-      terser: 5.46.0
-      webpack: 5.104.1(esbuild@0.19.12)
-    optionalDependencies:
-      esbuild: 0.19.12
 
   terser-webpack-plugin@5.3.16(webpack@5.104.1):
     dependencies:
@@ -34781,38 +34747,6 @@ snapshots:
       - esbuild
       - uglify-js
 
-  webpack@5.104.1(esbuild@0.19.12):
-    dependencies:
-      '@types/eslint-scope': 3.7.7
-      '@types/estree': 1.0.8
-      '@types/json-schema': 7.0.15
-      '@webassemblyjs/ast': 1.14.1
-      '@webassemblyjs/wasm-edit': 1.14.1
-      '@webassemblyjs/wasm-parser': 1.14.1
-      acorn: 8.15.0
-      acorn-import-phases: 1.0.4(acorn@8.15.0)
-      browserslist: 4.28.1
-      chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.19.0
-      es-module-lexer: 2.0.0
-      eslint-scope: 5.1.1
-      events: 3.3.0
-      glob-to-regexp: 0.4.1
-      graceful-fs: 4.2.11
-      json-parse-even-better-errors: 2.3.1
-      loader-runner: 4.3.1
-      mime-types: 2.1.35
-      neo-async: 2.6.2
-      schema-utils: 4.3.3
-      tapable: 2.3.0
-      terser-webpack-plugin: 5.3.16(esbuild@0.19.12)(webpack@5.104.1(esbuild@0.19.12))
-      watchpack: 2.5.1
-      webpack-sources: 3.3.4
-    transitivePeerDependencies:
-      - '@swc/core'
-      - esbuild
-      - uglify-js
-
   whatwg-encoding@3.1.1:
     dependencies:
       iconv-lite: 0.6.3
@@ -35165,9 +35099,9 @@ snapshots:
     dependencies:
       zod: 4.3.6
 
-  zod-validation-error@4.0.2(zod@3.25.76):
+  zod-validation-error@4.0.2(zod@4.3.6):
     dependencies:
-      zod: 3.25.76
+      zod: 4.3.6
 
   zod@3.24.1: {}
 

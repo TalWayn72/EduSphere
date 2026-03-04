@@ -217,8 +217,9 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   libraryCourses(topic: LibraryTopic) : [LibraryCourse!]! @join__field(graph: CONTENT)  @authenticated
   myLibraryActivations: [LibraryActivation!]! @join__field(graph: CONTENT)  @authenticated
   course(id: ID!) : Course @join__field(graph: CONTENT) 
-  courses(limit: Int = 20, offset: Int = 0) : [Course!]! @join__field(graph: CONTENT) 
-  coursesByInstructor(instructorId: ID!, limit: Int = 20) : [Course!]! @join__field(graph: CONTENT) 
+  courses(limit: Int = 20, offset: Int = 0) : [Course!]! @join__field(graph: CONTENT)
+  coursesByInstructor(instructorId: ID!, limit: Int = 20) : [Course!]! @join__field(graph: CONTENT)
+  searchCourses(query: String!, limit: Int) : [Course!]! @join__field(graph: CONTENT)  @authenticated
   myEnrollments: [UserCourse!]! @join__field(graph: CONTENT)  @authenticated
   myCourseProgress(courseId: ID!) : CourseProgress! @join__field(graph: CONTENT)  @authenticated
   adminCourseEnrollments(courseId: ID!) : [AdminEnrollmentRecord!]! @join__field(graph: CONTENT)  @authenticated

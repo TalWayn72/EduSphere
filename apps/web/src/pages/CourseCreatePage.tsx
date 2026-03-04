@@ -102,7 +102,7 @@ export function CourseCreatePage() {
   const [wizardData, setWizardData] = useState<CourseFormData>(DEFAULT_FORM);
 
   const form = useForm<CourseSchemaValues>({
-    resolver: zodResolver(courseSchema as unknown as Parameters<typeof zodResolver>[0]),
+    resolver: zodResolver(courseSchema),
     defaultValues: {
       title: '',
       description: '',

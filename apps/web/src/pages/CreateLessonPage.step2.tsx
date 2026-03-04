@@ -30,7 +30,7 @@ export function CreateLessonStep2({
   const handleAddVideo = async () => {
     const parsed = youtubeUrlSchema.safeParse(videoUrl);
     if (!parsed.success) {
-      setVideoError(parsed.error.errors[0]?.message ?? 'כתובת לא תקינה');
+      setVideoError(parsed.error.issues[0]?.message ?? 'כתובת לא תקינה');
       return;
     }
     setVideoError('');

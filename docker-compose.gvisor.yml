@@ -1,0 +1,10 @@
+# gVisor Runtime Override for EduSphere
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.gvisor.yml up
+#
+# Prerequisites: gVisor (runsc) must be installed on the host.
+# See docs/security/gvisor-setup.md for installation instructions.
+# Only the agent subgraph uses gVisor isolation — NOT databases or message brokers.
+
+services:
+  subgraph-agent:
+    runtime: runsc

@@ -58,7 +58,7 @@ export function CourseEditMetadata({
     handleSubmit,
     formState: { errors, isDirty },
   } = useForm<MetadataValues>({
-    resolver: zodResolver(metadataSchema as unknown as Parameters<typeof zodResolver>[0]),
+    resolver: zodResolver(metadataSchema),
     defaultValues: {
       title: initialValues.title,
       description: initialValues.description,

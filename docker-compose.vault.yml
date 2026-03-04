@@ -1,0 +1,26 @@
+# HashiCorp Vault - Optional Production Secret Management
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.vault.yml up -d
+# See docs/security/vault-setup.md for configuration.
+#
+# NOTE: For local development, .env files are used instead.
+# This override is for production-like environments.
+
+services:
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: edusphere-vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "dev-root-token"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    mem_limit: 256m
+    mem_reservation: 128m
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
