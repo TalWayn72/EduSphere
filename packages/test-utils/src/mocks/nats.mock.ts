@@ -3,7 +3,10 @@ import { vi } from 'vitest';
 export interface MockNatsClient {
   publish: ReturnType<typeof vi.fn>;
   subscribe: ReturnType<typeof vi.fn>;
+  drain: ReturnType<typeof vi.fn>;
   close: ReturnType<typeof vi.fn>;
+  jetstream: ReturnType<typeof vi.fn>;
+  jetstreamManager: ReturnType<typeof vi.fn>;
 }
 
 export interface MockKVStore {
@@ -21,8 +24,16 @@ export interface MockNatsKVClient {
 export function createMockNatsClient(): MockNatsClient {
   return {
     publish: vi.fn().mockResolvedValue(undefined),
-    subscribe: vi.fn().mockResolvedValue({ unsubscribe: vi.fn() }),
+    subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
+    drain: vi.fn().mockResolvedValue(undefined),
     close: vi.fn().mockResolvedValue(undefined),
+    jetstream: vi.fn().mockReturnValue({
+      publish: vi.fn().mockResolvedValue({ seq: 1 }),
+    }),
+    jetstreamManager: vi.fn().mockResolvedValue({
+      streams: { add: vi.fn(), find: vi.fn() },
+      consumers: { add: vi.fn() },
+    }),
   };
 }
 

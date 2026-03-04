@@ -18,7 +18,15 @@ type AnnotationType =
   | 'SKETCH'
   | 'LINK'
   | 'BOOKMARK'
-  | 'SPATIAL_COMMENT';
+  | 'SPATIAL_COMMENT'
+  | 'INLINE_COMMENT'
+  | 'SUGGESTION';
+
+interface TextRange {
+  start: number;
+  end: number;
+  rangeType?: string;
+}
 
 interface CreateAnnotationInput {
   assetId: string;
@@ -26,6 +34,7 @@ interface CreateAnnotationInput {
   layer?: AnnotationLayer;
   content: Record<string, unknown>;
   spatialData?: Record<string, unknown> | null;
+  textRange?: TextRange | null;
   parentId?: string;
 }
 
@@ -236,6 +245,9 @@ export class AnnotationService implements OnModuleDestroy {
           layer: input.layer || 'PERSONAL',
           content: input.content,
           spatial_data: input.spatialData || null,
+          text_start: input.textRange?.start ?? null,
+          text_end: input.textRange?.end ?? null,
+          range_type: input.textRange?.rangeType ?? null,
           parent_id: input.parentId || null,
           is_resolved: false,
         })

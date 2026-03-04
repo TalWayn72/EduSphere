@@ -1,15 +1,14 @@
 /**
- * GraphConceptService — business-logic layer for Concept graph operations.
+ * GraphConceptService — business-logic layer for Concept CRUD graph operations.
  * Wraps CypherConceptService calls inside withTenantContext (RLS enforcement).
+ *
+ * Relation operations (findRelatedConcepts, linkConcepts) live in
+ * GraphConceptLinkService.
  */
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { db, withTenantContext } from '@edusphere/db';
 import { CypherConceptService } from './cypher-concept.service';
-import {
-  toUserRole,
-  type GraphConceptNode,
-  type RelatedConceptRow,
-} from './graph-types';
+import { toUserRole, type GraphConceptNode } from './graph-types';
 import { DEFAULT_CONCEPT_LIMIT } from '../constants';
 
 @Injectable()
@@ -18,7 +17,7 @@ export class GraphConceptService {
 
   constructor(private readonly cypher: CypherConceptService) {}
 
-  private mapConcept(node: GraphConceptNode) {
+  mapConcept(node: GraphConceptNode) {
     return {
       id: node.id,
       tenantId: node.tenant_id,
@@ -141,80 +140,6 @@ export class GraphConceptService {
       db,
       { tenantId, userId, userRole: toUserRole(role) },
       async () => this.cypher.deleteConcept(id, tenantId)
-    );
-  }
-
-  async findRelatedConcepts(
-    conceptId: string,
-    depth: number,
-    limit: number,
-    tenantId: string,
-    userId: string,
-    role: string
-  ) {
-    return withTenantContext(
-      db,
-      { tenantId, userId, userRole: toUserRole(role) },
-      async () => {
-        const related = await this.cypher.findRelatedConcepts(
-          conceptId,
-          tenantId,
-          depth,
-          limit
-        );
-        return (related as RelatedConceptRow[]).map((r) => ({
-          concept: this.mapConcept(r),
-          strength: r.strength ?? 1.0,
-        }));
-      }
-    );
-  }
-
-  /**
-   * linkConcepts — creates a typed relationship between two Concept nodes.
-   *
-   * N+1 fix: previously called cypher.linkConcepts (MERGE) then two separate
-   * cypher.findConceptById (MATCH) queries — 3 round-trips in total.
-   * Now calls cypher.linkConceptsAndFetch which performs the MERGE and
-   * returns both nodes in a single Cypher query — 1 round-trip.
-   */
-  async linkConcepts(
-    fromId: string,
-    toId: string,
-    relationshipType: string,
-    strength: number | null,
-    description: string | null,
-    tenantId: string,
-    userId: string,
-    role: string
-  ) {
-    return withTenantContext(
-      db,
-      { tenantId, userId, userRole: toUserRole(role) },
-      async () => {
-        const { from, to } = await this.cypher.linkConceptsAndFetch(
-          fromId,
-          toId,
-          relationshipType,
-          {
-            strength: strength ?? undefined,
-            description: description ?? undefined,
-          },
-          tenantId
-        );
-        this.logger.debug(
-          { fromId, toId, relationshipType, tenantId },
-          'linkConcepts: relationship created/updated in single round-trip'
-        );
-        return {
-          fromConcept: from ? this.mapConcept(from as GraphConceptNode) : null,
-          toConcept: to ? this.mapConcept(to as GraphConceptNode) : null,
-          relationshipType,
-          strength,
-          inferred: false,
-          description,
-        };
-      }
     );
   }
 }

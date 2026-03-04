@@ -23,6 +23,7 @@ vi.mock('@edusphere/db', () => ({
   },
   tenants: { id: 'id', settings: 'settings' },
   eq: vi.fn((col, val) => ({ col, val })),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 const ALL_10 = ['en', 'zh-CN', 'hi', 'es', 'fr', 'bn', 'pt', 'ru', 'id', 'he'];

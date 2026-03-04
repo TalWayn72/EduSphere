@@ -12,6 +12,7 @@ vi.mock('@edusphere/db', () => ({
   db: { select: () => ({ from: mockFrom }) },
   tenants: { id: 'id', settings: 'settings' },
   eq: vi.fn(),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('TenantLanguageService — memory safety', () => {

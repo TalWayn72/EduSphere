@@ -2,13 +2,14 @@
  * MarketplaceEarningsService — earnings calculation and payout processing
  * Split from MarketplaceService to keep files under 150 lines.
  */
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
   eq,
   and,
   withTenantContext,
+  closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { sql } from 'drizzle-orm';
@@ -20,9 +21,14 @@ import type {
 } from './marketplace.types.js';
 
 @Injectable()
-export class MarketplaceEarningsService {
+export class MarketplaceEarningsService implements OnModuleDestroy {
   private readonly logger = new Logger(MarketplaceEarningsService.name);
   private readonly db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[MarketplaceEarningsService] onModuleDestroy: DB pools closed');
+  }
 
   async getInstructorEarnings(
     instructorId: string,

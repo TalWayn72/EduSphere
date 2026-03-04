@@ -2,7 +2,7 @@
  * AtRiskDashboardPage.config.tsx — Risk threshold configuration card.
  * Used by AtRiskDashboardPage.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,11 +14,22 @@ export function RiskThresholdConfig() {
   const [inactiveDays, setInactiveDays] = useState(7);
   const [completionThreshold, setCompletionThreshold] = useState(30);
   const [saving, setSaving] = useState(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        console.error('[RiskThresholdConfig] cleanup: save timer cleared on unmount');
+      }
+    };
+  }, []);
 
   function handleSave() {
     setSaving(true);
     // TODO: persist via mutation once admin config API is implemented
-    setTimeout(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
       setSaving(false);
       toast.success('Risk thresholds saved');
     }, 600);

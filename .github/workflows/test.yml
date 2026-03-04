@@ -27,9 +27,9 @@ jobs:
 
     # Service containers for testing
     services:
-      # PostgreSQL 16 with pgvector pre-installed
+      # PostgreSQL 18 with Apache AGE + pgvector (custom CI image)
       postgres:
-        image: pgvector/pgvector:pg16
+        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -81,12 +81,14 @@ jobs:
           done
           echo "NATS JetStream started"
 
-      # Enable pgvector extension (pre-installed in pgvector/pgvector:pg16 image)
+      # Enable AGE and pgvector extensions (both pre-installed in postgres-age:pg18 image)
       - name: Enable PostgreSQL extensions
         run: |
           PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
+            -c "CREATE EXTENSION IF NOT EXISTS age;" \
             -c "CREATE EXTENSION IF NOT EXISTS vector;" \
-            -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"
+            -c "LOAD 'age';" \
+            -c "SELECT extname, extversion FROM pg_extension WHERE extname IN ('age', 'vector');"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -102,19 +104,16 @@ jobs:
 
       - name: Generate database schema
         run: pnpm --filter @edusphere/db generate
-        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
-        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Seed test data
         run: pnpm --filter @edusphere/db seed
-        continue-on-error: true # Seed depends on AGE migration; skip if migration skipped
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
           NODE_ENV: test
@@ -147,7 +146,7 @@ jobs:
 
     services:
       postgres:
-        image: pgvector/pgvector:pg16
+        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -175,17 +174,18 @@ jobs:
           node-version: 20.x
           cache: "pnpm"
 
-      - name: Enable pgvector extension
+      - name: Enable PostgreSQL extensions
         run: |
           PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
-            -c "CREATE EXTENSION IF NOT EXISTS vector;"
+            -c "CREATE EXTENSION IF NOT EXISTS age;" \
+            -c "CREATE EXTENSION IF NOT EXISTS vector;" \
+            -c "LOAD 'age';"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
-        continue-on-error: true # Apache AGE not in pgvector CI image; RLS tests use mocks
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
@@ -211,7 +211,7 @@ jobs:
 
     services:
       postgres:
-        image: pgvector/pgvector:pg16
+        image: ghcr.io/${{ github.repository_owner }}/postgres-age:pg18
         env:
           POSTGRES_USER: edusphere_test
           POSTGRES_PASSWORD: test_password
@@ -273,10 +273,12 @@ jobs:
           done
           echo "NATS JetStream started"
 
-      - name: Enable pgvector extension
+      - name: Enable PostgreSQL extensions
         run: |
           PGPASSWORD=test_password psql -h localhost -U edusphere_test -d edusphere_test \
-            -c "CREATE EXTENSION IF NOT EXISTS vector;"
+            -c "CREATE EXTENSION IF NOT EXISTS age;" \
+            -c "CREATE EXTENSION IF NOT EXISTS vector;" \
+            -c "LOAD 'age';"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -292,13 +294,11 @@ jobs:
 
       - name: Run database migrations
         run: pnpm --filter @edusphere/db migrate
-        continue-on-error: true # Apache AGE not available in pgvector CI image
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
 
       - name: Seed test data
         run: pnpm --filter @edusphere/db seed
-        continue-on-error: true # Seed depends on AGE migration; skip if migration skipped
         env:
           DATABASE_URL: postgresql://edusphere_test:test_password@localhost:5432/edusphere_test
           NODE_ENV: test

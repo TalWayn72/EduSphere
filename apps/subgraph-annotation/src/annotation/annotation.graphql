@@ -7,6 +7,8 @@ enum AnnotationType {
   LINK
   BOOKMARK
   SPATIAL_COMMENT
+  INLINE_COMMENT
+  SUGGESTION
 }
 
 enum AnnotationLayer {
@@ -14,6 +16,13 @@ enum AnnotationLayer {
   SHARED
   INSTRUCTOR
   AI_GENERATED
+}
+
+"""Character range within a text document — used for INLINE_COMMENT and SUGGESTION types"""
+type TextRange {
+  start: Int!
+  end: Int!
+  rangeType: String
 }
 
 type Annotation @key(fields: "id") {
@@ -26,6 +35,8 @@ type Annotation @key(fields: "id") {
   layer: AnnotationLayer!
   content: JSON!
   spatialData: JSON
+  """Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)"""
+  textRange: TextRange
   parentId: ID
   parent: Annotation
   isResolved: Boolean!
@@ -78,12 +89,21 @@ type Subscription {
   annotationAdded(assetId: ID!): Annotation!
 }
 
+"""Input for text range — required for INLINE_COMMENT and SUGGESTION annotation types"""
+input TextRangeInput {
+  start: Int!
+  end: Int!
+  rangeType: String
+}
+
 input CreateAnnotationInput {
   assetId: ID!
   annotationType: AnnotationType!
   layer: AnnotationLayer = PERSONAL
   content: JSON!
   spatialData: JSON
+  """Text range for inline annotations (INLINE_COMMENT, SUGGESTION types)"""
+  textRange: TextRangeInput
   parentId: ID
 }
 

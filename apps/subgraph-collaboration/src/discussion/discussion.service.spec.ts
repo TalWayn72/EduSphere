@@ -91,6 +91,7 @@ vi.mock('@edusphere/db', () => ({
   desc: vi.fn((col) => ({ col, order: 'desc' })),
   sql: vi.fn(() => ({ raw: true })),
   withTenantContext: vi.fn(async (_db, _ctx, callback) => callback(mockTx)),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { withTenantContext } from '@edusphere/db';

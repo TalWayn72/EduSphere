@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { db, users, scimSyncLog } from '@edusphere/db';
+import { db, users, scimSyncLog, closeAllPools } from '@edusphere/db';
 import { count, gte, eq, desc } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 
@@ -29,8 +29,9 @@ const SAFE_DEFAULTS: AdminOverviewData = {
 export class AdminOverviewService implements OnModuleDestroy {
   private readonly logger = new Logger(AdminOverviewService.name);
 
-  onModuleDestroy(): void {
-    // No resources to clean up
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[AdminOverviewService] onModuleDestroy: DB pools closed');
   }
 
   async getOverview(tenantId: string): Promise<AdminOverviewData> {

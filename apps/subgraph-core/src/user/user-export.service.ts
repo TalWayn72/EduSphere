@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import {
   createDatabaseConnection,
@@ -14,7 +14,7 @@ import type { Database } from '@edusphere/db';
  * Caller may serialize, zip, and deliver the result to the user.
  */
 @Injectable()
-export class UserExportService {
+export class UserExportService implements OnModuleDestroy {
   private readonly logger = new Logger(UserExportService.name);
   private readonly db: Database;
 

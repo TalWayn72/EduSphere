@@ -7,15 +7,16 @@ import { BadRequestException } from '@nestjs/common';
 
 // ── Hoisted mocks ─────────────────────────────────────────────────────────────
 
-const { mockWithTenantContext } = vi.hoisted(() => ({
+const { mockWithTenantContext, mockCloseAllPools } = vi.hoisted(() => ({
   mockWithTenantContext: vi.fn(),
+  mockCloseAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 // ── Module mocks ──────────────────────────────────────────────────────────────
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
-  closeAllPools: vi.fn().mockResolvedValue(undefined),
+  closeAllPools: mockCloseAllPools,
   withTenantContext: mockWithTenantContext,
   schema: {
     purchases: {
@@ -148,10 +149,9 @@ describe('MarketplaceEarningsService', () => {
   });
 
   // Test 2
-  it('has no onModuleDestroy — not needed as it only uses DB from shared pool', () => {
-    expect(typeof (svc as Record<string, unknown>)['onModuleDestroy']).toBe(
-      'undefined'
-    );
+  it('onModuleDestroy calls closeAllPools', async () => {
+    await svc.onModuleDestroy();
+    expect(mockCloseAllPools).toHaveBeenCalledOnce();
   });
 
   // ── getInstructorEarnings ─────────────────────────────────────────────────

@@ -73,6 +73,14 @@ jobs:
           TEST_JWT: ${{ secrets.PERF_TEST_JWT }}
           TEST_TEMPLATE_ID: ${{ vars.PERF_TEST_TEMPLATE_ID }}
 
+      - name: Run lesson pipeline load scenario
+        run: k6 run --no-color tests/performance/scenarios/10-lesson-pipeline-load.k6.js
+        env:
+          GATEWAY_URL: ${{ vars.PERF_TEST_BASE_URL || 'http://localhost:4000' }}/graphql
+          K6_PROFILE: ${{ github.event.inputs.profile || 'load' }}
+          TEST_JWT: ${{ secrets.PERF_TEST_JWT }}
+          TEST_LESSON_IDS: ${{ vars.PERF_TEST_LESSON_IDS }}
+
       - name: Upload k6 results
         uses: actions/upload-artifact@v4
         if: always()

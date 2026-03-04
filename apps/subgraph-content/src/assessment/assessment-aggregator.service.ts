@@ -5,13 +5,14 @@
  * the result in assessment_results.
  * Max 150 lines — no AI/LLM calls.
  */
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
   eq,
   and,
   withTenantContext,
+  closeAllPools,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 
@@ -61,9 +62,14 @@ function buildSummary(criteria: AggregatedCriteria[]): string {
 }
 
 @Injectable()
-export class AssessmentAggregatorService {
+export class AssessmentAggregatorService implements OnModuleDestroy {
   private readonly logger = new Logger(AssessmentAggregatorService.name);
   private readonly db = createDatabaseConnection();
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[AssessmentAggregatorService] onModuleDestroy: DB pools closed');
+  }
 
   async aggregate(
     campaignId: string,

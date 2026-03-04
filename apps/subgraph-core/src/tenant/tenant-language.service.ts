@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { db, tenants } from '@edusphere/db';
+import { db, tenants, closeAllPools } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 import type { UpdateTenantLanguageSettingsInput } from './tenant-language.schemas';
 
@@ -55,8 +55,10 @@ export class TenantLanguageService implements OnModuleDestroy {
   >();
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
     this.cache.clear();
+    await closeAllPools();
+    this.logger.log('[TenantLanguageService] onModuleDestroy: cache cleared, DB pools closed');
   }
 
   private setCached(

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { lt } from 'drizzle-orm';
 import {
   db,
@@ -7,6 +7,7 @@ import {
   agentSessions,
   userProgress,
   annotations,
+  closeAllPools,
 } from '@edusphere/db';
 
 /**
@@ -18,8 +19,13 @@ import {
  * For now, exposed as a callable method for testing and manual runs.
  */
 @Injectable()
-export class RetentionCleanupService {
+export class RetentionCleanupService implements OnModuleDestroy {
   private readonly logger = new Logger(RetentionCleanupService.name);
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[RetentionCleanupService] onModuleDestroy: DB pools closed');
+  }
 
   /**
    * Run retention cleanup for all enabled policies.

@@ -159,4 +159,14 @@ describe('ScormImportDialog', () => {
       0
     );
   });
+
+  it('clears redirect timer on unmount (no memory leak)', () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderDialog();
+    unmount();
+    // clearTimeout is always called in the cleanup useEffect
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

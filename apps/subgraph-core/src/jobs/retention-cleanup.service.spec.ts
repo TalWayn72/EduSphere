@@ -17,6 +17,7 @@ vi.mock('@edusphere/db', () => ({
   agentSessions: { createdAt: 'created_at' },
   userProgress: { createdAt: 'created_at' },
   annotations: { createdAt: 'created_at' },
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('RetentionCleanupService', () => {

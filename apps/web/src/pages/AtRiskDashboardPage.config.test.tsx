@@ -130,4 +130,13 @@ describe('RiskThresholdConfig', () => {
     expect(slider).toHaveAttribute('max', '80');
     expect(slider).toHaveAttribute('step', '5');
   });
+
+  it('clears save timer on unmount (no memory leak)', () => {
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = render(<RiskThresholdConfig />);
+    fireEvent.click(screen.getByRole('button', { name: /Save Thresholds/i }));
+    // Timer is now running — unmount before it fires
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+  });
 });

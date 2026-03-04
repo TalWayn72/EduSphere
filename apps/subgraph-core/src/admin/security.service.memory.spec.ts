@@ -11,6 +11,7 @@ vi.mock('@edusphere/db', () => ({
     $inferSelect: {} as Record<string, unknown>,
   },
   eq: vi.fn(),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { SecurityService } from './security.service.js';

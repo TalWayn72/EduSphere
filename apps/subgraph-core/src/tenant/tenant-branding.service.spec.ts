@@ -56,6 +56,7 @@ vi.mock('@edusphere/db', () => ({
     hideEduSphereBranding: 'hideEduSphereBranding',
   },
   eq: vi.fn((col, val) => ({ col, val })),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { TenantBrandingService } from './tenant-branding.service.js';

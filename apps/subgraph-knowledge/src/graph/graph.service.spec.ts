@@ -3,8 +3,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { GraphService } from './graph.service';
 import { GraphConceptService } from './graph-concept.service';
+import { GraphConceptLinkService } from './graph-concept-link.service';
 import { GraphSearchService } from './graph-search.service';
 import { GraphPersonTermService } from './graph-person-term.service';
+import { GraphSourceClusterService } from './graph-source-cluster.service';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -88,13 +90,16 @@ describe('GraphService', () => {
     });
     service = new GraphService(
       new GraphConceptService(mockCypherService as any),
+      new GraphConceptLinkService(mockCypherService as any),
       new GraphSearchService(
         mockCypherService as any,
         mockEmbeddingService as any
       ),
       new GraphPersonTermService(
         mockCypherService as any,
-        mockCypherService as any,
+        mockCypherService as any
+      ),
+      new GraphSourceClusterService(
         mockCypherService as any,
         mockCypherService as any,
         mockCypherService as any

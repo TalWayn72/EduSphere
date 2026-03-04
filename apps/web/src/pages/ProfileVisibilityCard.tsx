@@ -32,6 +32,16 @@ export function ProfileVisibilityCard({
   const [, executeMutation] = useMutation<VisibilityResult>(
     UPDATE_PROFILE_VISIBILITY_MUTATION
   );
+  const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  React.useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+        console.error('[ProfileVisibilityCard] cleanup: copy timer cleared on unmount');
+      }
+    };
+  }, []);
 
   const toggle = React.useCallback(async () => {
     await executeMutation({ isPublic: !isPublic });
@@ -41,8 +51,8 @@ export function ProfileVisibilityCard({
     const url = `${window.location.origin}/u/${userId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
-      const timer = setTimeout(() => setCopied(false), 2000);
-      return () => clearTimeout(timer);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
     });
   }, [userId]);
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Upload,
@@ -90,6 +90,16 @@ export function CourseWizardMediaStep({
   const [richDocTitle, setRichDocTitle] = useState('');
   const [richDocContent, setRichDocContent] = useState('');
   const [richDocSaved, setRichDocSaved] = useState(false);
+  const richDocSavedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (richDocSavedTimerRef.current) {
+        clearTimeout(richDocSavedTimerRef.current);
+        console.error('[CourseWizardMediaStep] cleanup: richDocSaved timer cleared on unmount');
+      }
+    };
+  }, []);
 
   const updateEntry = (index: number, patch: Partial<FileUploadEntry>) => {
     setEntries((prev) =>
@@ -218,7 +228,8 @@ export function CourseWizardMediaStep({
     setRichDocSaved(true);
     setRichDocTitle('');
     setRichDocContent('');
-    setTimeout(() => setRichDocSaved(false), 3000);
+    if (richDocSavedTimerRef.current) clearTimeout(richDocSavedTimerRef.current);
+    richDocSavedTimerRef.current = setTimeout(() => setRichDocSaved(false), 3000);
   };
   return (
     <div className="space-y-6">

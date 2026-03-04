@@ -146,4 +146,14 @@ describe('NotificationTemplatesPage', () => {
     expect(screen.getByText('welcome')).toBeInTheDocument();
     expect(screen.getByText('enrollment_confirmation')).toBeInTheDocument();
   });
+
+  it('clears savedId timer on unmount (no memory leak)', () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage();
+    // Cleanup useEffect always calls clearTimeout(savedTimerRef.current) on unmount
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

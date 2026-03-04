@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -145,5 +145,21 @@ describe('ProfileVisibilityCard', () => {
     renderCard(null);
     expect(screen.getByText('Your profile is private')).toBeInTheDocument();
     expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'false');
+  });
+
+  it('clears copy timer on unmount (no memory leak)', async () => {
+    vi.useFakeTimers();
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    // Render with public profile so the "Copy link" button is visible
+    const { unmount } = renderCard(PUBLIC_PREFS);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /copy link/i }));
+    });
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

@@ -4,7 +4,9 @@ import {
   Mutation,
   Subscription,
   Args,
+  ResolveField,
   ResolveReference,
+  Parent,
   Context,
 } from '@nestjs/graphql';
 import { Logger } from '@nestjs/common';
@@ -202,6 +204,20 @@ export class AnnotationResolver {
   })
   subscribeToAnnotationAdded(@Args('assetId') assetId: string) {
     return pubSub.subscribe(`annotationAdded_${assetId}`);
+  }
+
+  @ResolveField('textRange')
+  resolveTextRange(
+    @Parent() annotation: { text_start?: number | null; text_end?: number | null; range_type?: string | null }
+  ) {
+    if (annotation.text_start == null || annotation.text_end == null) {
+      return null;
+    }
+    return {
+      start: annotation.text_start,
+      end: annotation.text_end,
+      rangeType: annotation.range_type ?? 'character',
+    };
   }
 
   @ResolveReference()

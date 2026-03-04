@@ -157,4 +157,15 @@ describe('BrandingSettingsPage', () => {
       expect(MOCK_SAVE).toHaveBeenCalledOnce();
     });
   });
+
+  it('clears saved timer on unmount (no memory leak)', async () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await Promise.resolve(); // flush microtasks so mutation resolves
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

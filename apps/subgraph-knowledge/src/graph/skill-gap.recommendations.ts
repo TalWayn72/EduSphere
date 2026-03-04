@@ -19,6 +19,13 @@ export class SkillGapRecommendations {
     gapConcepts: string[],
     tenantId: string
   ): Promise<SkillGapItem[]> {
+    // TODO: Replace with DataLoader in next sprint
+    // N+1 query detected: semanticSearch is called once per gapConcept (N vector DB queries).
+    // A batched EmbeddingDataLoader should accept all concept strings and issue a single
+    // pgvector kNN query with UNION or ranked-by-concept grouping.
+    this.logger.warn(
+      '[SkillGapRecommendations] N+1 query detected - use DataLoader for production scale'
+    );
     return Promise.all(
       gapConcepts.map(async (conceptName) => {
         let recommendedContentItems: string[] = [];

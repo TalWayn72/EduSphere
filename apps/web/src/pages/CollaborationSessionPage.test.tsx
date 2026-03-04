@@ -177,4 +177,14 @@ describe('CollaborationSessionPage', () => {
     // collaboration.json: crdtSyncInactive = "Sync inactive"
     expect(screen.getByText('Sync inactive')).toBeInTheDocument();
   });
+
+  it('clears saved timer on unmount (no memory leak)', () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage('?partner=Bob');
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

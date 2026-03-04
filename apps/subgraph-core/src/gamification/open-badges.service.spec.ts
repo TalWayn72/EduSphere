@@ -45,6 +45,7 @@ vi.mock('@edusphere/db', () => {
     },
     eq: vi.fn((a, b) => ({ field: a, value: b })),
     and: vi.fn((...args) => args),
+    closeAllPools: vi.fn().mockResolvedValue(undefined),
   };
 });
 

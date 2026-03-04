@@ -30,6 +30,7 @@ vi.mock('@edusphere/db', () => ({
   db: { select: mockSelect },
   tenantBranding: { tenantId: 'tenantId' },
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val })),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { TenantBrandingService } from './tenant-branding.service.js';

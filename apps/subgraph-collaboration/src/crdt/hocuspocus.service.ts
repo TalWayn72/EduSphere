@@ -13,10 +13,12 @@ import {
   type onStoreDocumentPayload,
 } from '@hocuspocus/server';
 import { JWTValidator, type AuthContext } from '@edusphere/auth';
+import { keycloakConfig } from '@edusphere/config';
 import {
   createDatabaseConnection,
   schema,
   eq,
+  closeAllPools,
   type Database,
 } from '@edusphere/db';
 import * as Y from 'yjs';
@@ -34,10 +36,11 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
 
   constructor() {
     this.db = createDatabaseConnection();
-    const keycloakUrl = process.env.KEYCLOAK_URL ?? 'http://localhost:8080';
-    const realm = process.env.KEYCLOAK_REALM ?? 'edusphere';
-    const clientId = process.env.KEYCLOAK_CLIENT_ID ?? 'edusphere-backend';
-    this.jwtValidator = new JWTValidator(keycloakUrl, realm, clientId);
+    this.jwtValidator = new JWTValidator(
+      keycloakConfig.url,
+      keycloakConfig.realm,
+      keycloakConfig.clientId
+    );
   }
 
   onModuleInit(): void {
@@ -107,12 +110,14 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
       });
   }
 
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
     if (this.server) {
-      this.server.destroy().catch((err: unknown) => {
+      await this.server.destroy().catch((err: unknown) => {
         this.logger.warn('Error destroying Hocuspocus server', err);
       });
     }
+    await closeAllPools();
+    this.logger.log('[HocuspocusService] onModuleDestroy: server destroyed, DB pools closed');
   }
 
   private async loadDocument(data: onLoadDocumentPayload): Promise<Y.Doc> {

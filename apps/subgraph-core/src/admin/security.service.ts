@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { db, securitySettings } from '@edusphere/db';
+import { db, securitySettings, closeAllPools } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 
 export interface SecuritySettingsData {
@@ -52,8 +52,9 @@ const DEFAULTS: SecuritySettingsData = {
 export class SecurityService implements OnModuleDestroy {
   private readonly logger = new Logger(SecurityService.name);
 
-  onModuleDestroy(): void {
-    // No resources to clean up
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[SecurityService] onModuleDestroy: DB pools closed');
   }
 
   async getSettings(tenantId: string): Promise<SecuritySettingsData> {

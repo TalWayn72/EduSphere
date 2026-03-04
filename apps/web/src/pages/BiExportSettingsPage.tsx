@@ -3,7 +3,7 @@
  * Route: /admin/bi-export
  * Access: ORG_ADMIN, SUPER_ADMIN only (F-029)
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -55,6 +55,7 @@ export function BiExportSettingsPage() {
   const [description, setDescription] = useState('');
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [tokensResult, refetchTokens] = useQuery<{ biApiTokens: BiApiToken[] }>(
     { query: BI_API_TOKENS_QUERY, pause: true }
@@ -64,6 +65,15 @@ export function BiExportSettingsPage() {
   );
   const [, revokeKey] = useMutation(REVOKE_BI_API_KEY_MUTATION);
 
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+        console.error('[BiExportSettingsPage] cleanup: copy timer cleared on unmount');
+      }
+    };
+  }, []);
+
   if (!role || !ADMIN_ROLES.has(role)) {
     navigate('/dashboard');
     return null;
@@ -72,7 +82,8 @@ export function BiExportSettingsPage() {
   const handleCopy = async (url: string) => {
     await navigator.clipboard.writeText(url);
     setCopiedUrl(url);
-    setTimeout(() => setCopiedUrl(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedUrl(null), 2000);
   };
 
   const handleGenerate = async () => {

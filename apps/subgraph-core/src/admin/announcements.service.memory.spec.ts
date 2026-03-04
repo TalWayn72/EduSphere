@@ -17,6 +17,7 @@ vi.mock('@edusphere/db', () => ({
   isNull: vi.fn(),
   or: vi.fn(),
   sql: vi.fn(),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { AnnouncementsService } from './announcements.service.js';

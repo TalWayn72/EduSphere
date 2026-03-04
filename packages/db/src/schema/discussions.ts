@@ -10,7 +10,7 @@ import { sql } from 'drizzle-orm';
 import { contentItems } from './contentItems';
 import { users } from './users';
 
-export const discussions: any = pgTable('discussions', {
+export const discussions = pgTable('discussions', {
   id: uuid('id').primaryKey().defaultRandom(),
   contentItemId: uuid('content_item_id').references(() => contentItems.id, {
     onDelete: 'cascade',

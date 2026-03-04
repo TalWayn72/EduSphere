@@ -1,20 +1,25 @@
 /**
- * CypherService — thin facade over 6 domain-specific Cypher service classes.
+ * CypherService — thin facade over 7 domain-specific Cypher service classes.
  *
- * This file is intentionally small: it only delegates to the domain services
- * (CypherConceptService, CypherPersonService, CypherTermService,
- * CypherSourceService, CypherTopicClusterService, CypherLearningPathService).
+ * Delegates to:
+ *   CypherConceptService        — Concept CRUD (find/create/update/delete)
+ *   CypherConceptRelationService — Concept edge queries (link, findRelated)
+ *   CypherPersonService         — Person vertex queries
+ *   CypherTermService           — Term vertex queries
+ *   CypherSourceService         — Source vertex queries
+ *   CypherTopicClusterService   — TopicCluster vertex queries
+ *   CypherLearningPathService   — Shortest-path / prerequisite chains
  *
- * ALL consumers (GraphService, NatsConsumer, etc.) continue to inject and call
- * CypherService without any changes — the facade preserves every original method
- * signature exactly.
+ * ALL consumers continue to inject and call CypherService without changes —
+ * the facade preserves every original method signature exactly.
  *
- * SECURITY: No user-supplied values are interpolated here; security is enforced
- * in each domain service via AGE parameterized queries.
+ * SECURITY: No user-supplied values are interpolated here; each domain service
+ * enforces security via AGE parameterized queries.
  */
 import { Injectable } from '@nestjs/common';
 import type { ConceptProperties, RelationshipProperties } from '@edusphere/db';
 import { CypherConceptService } from './cypher-concept.service';
+import { CypherConceptRelationService } from './cypher-concept-relation.service';
 import { CypherPersonService } from './cypher-person.service';
 import { CypherTermService } from './cypher-term.service';
 import { CypherSourceService } from './cypher-source.service';
@@ -25,13 +30,14 @@ import {
   type LearningPathResult,
 } from './cypher-learning-path.service';
 
-// Re-export the shared types so existing imports from './cypher.service' continue to work.
+// Re-export shared types so existing imports from './cypher.service' continue to work.
 export type { ConceptNode, LearningPathResult };
 
 @Injectable()
 export class CypherService {
   constructor(
     private readonly concept: CypherConceptService,
+    private readonly conceptRelation: CypherConceptRelationService,
     private readonly person: CypherPersonService,
     private readonly term: CypherTermService,
     private readonly source: CypherSourceService,
@@ -39,7 +45,7 @@ export class CypherService {
     private readonly learningPath: CypherLearningPathService
   ) {}
 
-  // ── Concept ────────────────────────────────────────────────────────────────
+  // ── Concept CRUD ────────────────────────────────────────────────────────────
 
   findConceptById(id: string, tenantId: string) {
     return this.concept.findConceptById(id, tenantId);
@@ -51,20 +57,6 @@ export class CypherService {
 
   findConceptByNameCaseInsensitive(name: string, tenantId: string) {
     return this.concept.findConceptByNameCaseInsensitive(name, tenantId);
-  }
-
-  linkConceptsByName(
-    fromName: string,
-    toName: string,
-    tenantId: string,
-    strength: number = 0.7
-  ) {
-    return this.concept.linkConceptsByName(
-      fromName,
-      toName,
-      tenantId,
-      strength
-    );
   }
 
   findAllConcepts(tenantId: string, limit: number) {
@@ -87,13 +79,34 @@ export class CypherService {
     return this.concept.deleteConcept(id, tenantId);
   }
 
+  // ── Concept Relations ───────────────────────────────────────────────────────
+
+  linkConceptsByName(
+    fromName: string,
+    toName: string,
+    tenantId: string,
+    strength: number = 0.7
+  ) {
+    return this.conceptRelation.linkConceptsByName(
+      fromName,
+      toName,
+      tenantId,
+      strength
+    );
+  }
+
   findRelatedConcepts(
     conceptId: string,
     tenantId: string,
     depth: number = 2,
     limit: number = 10
   ) {
-    return this.concept.findRelatedConcepts(conceptId, tenantId, depth, limit);
+    return this.conceptRelation.findRelatedConcepts(
+      conceptId,
+      tenantId,
+      depth,
+      limit
+    );
   }
 
   linkConcepts(
@@ -102,7 +115,7 @@ export class CypherService {
     relationshipType: string,
     properties: RelationshipProperties = {}
   ) {
-    return this.concept.linkConcepts(
+    return this.conceptRelation.linkConcepts(
       fromId,
       toId,
       relationshipType,
@@ -110,11 +123,6 @@ export class CypherService {
     );
   }
 
-  /**
-   * linkConceptsAndFetch — creates the relationship AND returns both endpoint
-   * nodes in a single Cypher round-trip.  Exposed via this facade so that
-   * GraphService can call it without knowing the concrete concept service.
-   */
   linkConceptsAndFetch(
     fromId: string,
     toId: string,
@@ -122,7 +130,7 @@ export class CypherService {
     properties: RelationshipProperties,
     tenantId: string
   ): Promise<{ from: unknown; to: unknown }> {
-    return this.concept.linkConceptsAndFetch(
+    return this.conceptRelation.linkConceptsAndFetch(
       fromId,
       toId,
       relationshipType,

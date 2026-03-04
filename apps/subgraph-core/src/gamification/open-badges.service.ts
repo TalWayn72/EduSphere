@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import { createHmac } from 'crypto';
 import {
   db,
@@ -6,6 +6,7 @@ import {
   openBadgeAssertions,
   eq,
   and,
+  closeAllPools,
 } from '@edusphere/db';
 
 const HMAC_KEY =
@@ -17,8 +18,13 @@ const OB3_CONTEXTS = [
 ] as const;
 
 @Injectable()
-export class OpenBadgesService {
+export class OpenBadgesService implements OnModuleDestroy {
   private readonly logger = new Logger(OpenBadgesService.name);
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[OpenBadgesService] onModuleDestroy: DB pools closed');
+  }
 
   private buildCredential(
     assertionId: string,

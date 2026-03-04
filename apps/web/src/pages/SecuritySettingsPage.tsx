@@ -2,7 +2,7 @@
  * SecuritySettingsPage — MFA, session, password policy, and IP restrictions.
  * Route: /admin/security
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -65,6 +65,16 @@ export function SecuritySettingsPage() {
   const role = useAuthRole();
   const [form, setForm] = useState<SecurityFormValues>(DEFAULTS);
   const [saved, setSaved] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) {
+        clearTimeout(savedTimerRef.current);
+        console.error('[SecuritySettingsPage] cleanup: saved timer cleared on unmount');
+      }
+    };
+  }, []);
 
   const [{ data, fetching }] = useQuery({
     query: SECURITY_SETTINGS_QUERY,
@@ -105,7 +115,8 @@ export function SecuritySettingsPage() {
       },
     });
     setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
   };
 
   const props = { values: form, onChange: setForm };

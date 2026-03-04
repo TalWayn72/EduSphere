@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -199,5 +199,22 @@ describe('BiExportSettingsPage', () => {
     renderPage();
     expect(screen.getByText('Active')).toBeInTheDocument();
     expect(screen.getByText('Revoked')).toBeInTheDocument();
+  });
+
+  it('clears copy timer on unmount (no memory leak)', async () => {
+    vi.useFakeTimers();
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage();
+    // Trigger a copy — handleCopy is async (awaits clipboard), so flush promises
+    const copyButtons = screen.getAllByRole('button', { name: /copy/i });
+    await act(async () => {
+      fireEvent.click(copyButtons[0]!);
+    });
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

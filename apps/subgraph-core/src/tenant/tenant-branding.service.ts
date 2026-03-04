@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { db, tenantBranding } from '@edusphere/db';
+import { db, tenantBranding, closeAllPools } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 
 export interface TenantBrandingData {
@@ -43,8 +43,10 @@ export class TenantBrandingService implements OnModuleDestroy {
   >();
   private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
     this.cache.clear();
+    await closeAllPools();
+    this.logger.log('[TenantBrandingService] onModuleDestroy: cache cleared, DB pools closed');
   }
 
   private setCached(

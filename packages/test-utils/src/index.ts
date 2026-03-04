@@ -2,6 +2,8 @@
 export {
   TENANT_A,
   TENANT_B,
+  TEST_TENANT_ID,
+  TEST_USER_ID,
   createTenantContext,
   createAuthContext,
 } from './factories/tenant.factory.js';

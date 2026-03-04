@@ -4,16 +4,33 @@ import {
   AnnotationLayer,
   CreateAnnotationInputSchema,
   UpdateAnnotationInputSchema,
+  TextRangeInputSchema,
 } from './annotation.schemas.js';
 
 // ── AnnotationType enum ───────────────────────────────────────────────────────
 
 describe('AnnotationType', () => {
-  it('accepts all 5 valid annotation types', () => {
-    const types = ['TEXT', 'SKETCH', 'LINK', 'BOOKMARK', 'SPATIAL_COMMENT'];
+  it('accepts all 7 valid annotation types', () => {
+    const types = [
+      'TEXT',
+      'SKETCH',
+      'LINK',
+      'BOOKMARK',
+      'SPATIAL_COMMENT',
+      'INLINE_COMMENT',
+      'SUGGESTION',
+    ];
     for (const t of types) {
       expect(AnnotationType.parse(t)).toBe(t);
     }
+  });
+
+  it('accepts INLINE_COMMENT type', () => {
+    expect(AnnotationType.parse('INLINE_COMMENT')).toBe('INLINE_COMMENT');
+  });
+
+  it('accepts SUGGESTION type', () => {
+    expect(AnnotationType.parse('SUGGESTION')).toBe('SUGGESTION');
   });
 
   it('rejects an unknown annotation type', () => {
@@ -120,6 +137,71 @@ describe('CreateAnnotationInputSchema', () => {
       content: { strokes: [] },
     });
     expect(result.annotationType).toBe('SKETCH');
+  });
+
+  it('accepts INLINE_COMMENT type with textRange', () => {
+    const result = CreateAnnotationInputSchema.parse({
+      ...valid,
+      annotationType: 'INLINE_COMMENT',
+      textRange: { start: 10, end: 25 },
+    });
+    expect(result.annotationType).toBe('INLINE_COMMENT');
+    expect(result.textRange?.start).toBe(10);
+    expect(result.textRange?.end).toBe(25);
+    expect(result.textRange?.rangeType).toBe('character');
+  });
+
+  it('accepts SUGGESTION type with textRange and custom rangeType', () => {
+    const result = CreateAnnotationInputSchema.parse({
+      ...valid,
+      annotationType: 'SUGGESTION',
+      textRange: { start: 0, end: 50, rangeType: 'word' },
+    });
+    expect(result.annotationType).toBe('SUGGESTION');
+    expect(result.textRange?.rangeType).toBe('word');
+  });
+
+  it('accepts omitted textRange (optional)', () => {
+    const result = CreateAnnotationInputSchema.parse(valid);
+    expect(result.textRange).toBeUndefined();
+  });
+
+  it('rejects textRange with negative start offset', () => {
+    expect(() =>
+      CreateAnnotationInputSchema.parse({
+        ...valid,
+        annotationType: 'INLINE_COMMENT',
+        textRange: { start: -1, end: 10 },
+      })
+    ).toThrow();
+  });
+});
+
+// ── TextRangeInputSchema ──────────────────────────────────────────────────────
+
+describe('TextRangeInputSchema', () => {
+  it('parses valid range with default rangeType', () => {
+    const result = TextRangeInputSchema.parse({ start: 5, end: 20 });
+    expect(result.start).toBe(5);
+    expect(result.end).toBe(20);
+    expect(result.rangeType).toBe('character');
+  });
+
+  it('accepts explicit rangeType', () => {
+    const result = TextRangeInputSchema.parse({ start: 0, end: 100, rangeType: 'word' });
+    expect(result.rangeType).toBe('word');
+  });
+
+  it('rejects non-integer start', () => {
+    expect(() => TextRangeInputSchema.parse({ start: 1.5, end: 10 })).toThrow();
+  });
+
+  it('rejects negative start offset', () => {
+    expect(() => TextRangeInputSchema.parse({ start: -1, end: 10 })).toThrow();
+  });
+
+  it('rejects missing end', () => {
+    expect(() => TextRangeInputSchema.parse({ start: 0 })).toThrow();
   });
 });
 

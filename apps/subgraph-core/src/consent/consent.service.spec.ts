@@ -32,6 +32,7 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((col, val) => ({ col, val })),
   and: vi.fn((...args) => args),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { ConsentService } from './consent.service.js';

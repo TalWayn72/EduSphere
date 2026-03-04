@@ -4,7 +4,7 @@
  * Shows a textarea, live word count, submit button.
  * After a successful submit, displays a "plagiarism check in progress" notice.
  */
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -26,16 +26,6 @@ export function TextSubmissionForm({
 }: TextSubmissionFormProps) {
   const [text, setText] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    const id = timeoutRef.current;
-    return () => {
-      if (id !== null) {
-        clearTimeout(id);
-      }
-    };
-  }, []);
 
   const { submit, loading, error } = useSubmitAssignment(
     contentItemId,

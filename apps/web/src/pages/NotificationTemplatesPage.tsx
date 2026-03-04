@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -93,12 +93,20 @@ export function NotificationTemplatesPage() {
   const [templates, setTemplates] = useState<NotificationTemplate[]>(DEFAULTS);
   const [selectedId, setSelectedId] = useState<string>(DEFAULTS[0]!.id);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (!role || !ADMIN_ROLES.has(role)) {
       void navigate('/dashboard');
     }
   }, [role, navigate]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(savedTimerRef.current);
+      console.error('[NotificationTemplatesPage] cleanup: saved timer cleared on unmount');
+    };
+  }, []);
 
   if (!role || !ADMIN_ROLES.has(role)) return null;
 
@@ -119,7 +127,8 @@ export function NotificationTemplatesPage() {
       )
     );
     setSavedId(id);
-    setTimeout(() => setSavedId(null), 2000);
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setSavedId(null), 2000);
   };
 
   const handleReset = (id: string) => {

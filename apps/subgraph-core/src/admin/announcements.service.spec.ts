@@ -38,6 +38,7 @@ vi.mock('@edusphere/db', () => ({
   desc: vi.fn(),
   isNull: vi.fn(),
   or: vi.fn(),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────

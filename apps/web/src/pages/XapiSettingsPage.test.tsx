@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -222,5 +222,21 @@ describe('XapiSettingsPage', () => {
     const { container } = renderPage();
     // Page renders null and calls navigate('/dashboard')
     expect(container.querySelector('h1')).not.toBeInTheDocument();
+  });
+
+  it('clears copy timer on unmount (no memory leak)', async () => {
+    vi.useFakeTimers();
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage();
+    // handleCopy is async (awaits clipboard), so flush promises before unmount
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /copy/i }));
+    });
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

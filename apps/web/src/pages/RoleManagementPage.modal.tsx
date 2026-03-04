@@ -59,9 +59,7 @@ export function RoleFormModal({ open, initialRole, onClose, onSave }: Props) {
     setValue,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(
-      schema as unknown as Parameters<typeof zodResolver>[0]
-    ),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: initialRole?.name ?? '',
       description: initialRole?.description ?? '',

@@ -17,6 +17,7 @@ import { openai } from '@ai-sdk/openai';
 import { createOllama } from 'ollama-ai-provider';
 import { z } from 'zod';
 import type { LanguageModel } from 'ai';
+import { ollamaConfig } from '@edusphere/config';
 
 // ── Zod schema for the AI-generated course outline ────────────────────────────
 
@@ -58,7 +59,7 @@ function buildModel(): LanguageModel {
     return openai('gpt-4o-mini') as unknown as LanguageModel;
   }
   const ollama = createOllama({
-    baseURL: `${process.env.OLLAMA_URL ?? 'http://localhost:11434'}/api`,
+    baseURL: `${ollamaConfig.url}/api`,
   });
   return ollama(
     process.env.OLLAMA_MODEL ?? 'llama3.2'

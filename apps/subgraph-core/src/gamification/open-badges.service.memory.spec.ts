@@ -88,6 +88,7 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: 'eq' })),
   and: vi.fn((...args: unknown[]) => ({ args, op: 'and' })),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 // ── Import service AFTER mocks ────────────────────────────────────────────────
@@ -160,21 +161,25 @@ describe('OpenBadgesService — memory safety', () => {
     });
   });
 
-  // ── 3. No OnModuleDestroy (correct by design) ─────────────────────────────
+  // ── 3. OnModuleDestroy calls closeAllPools ────────────────────────────────
 
-  describe('no OnModuleDestroy (intentional — singleton db needs no per-service teardown)', () => {
-    it('does NOT have an onModuleDestroy method', () => {
+  describe('OnModuleDestroy — DB pool cleanup', () => {
+    it('has an onModuleDestroy method', () => {
       const service = new OpenBadgesService();
-      expect(
-        typeof (service as unknown as Record<string, unknown>)[
-          'onModuleDestroy'
-        ]
-      ).toBe('undefined');
+      expect(typeof service.onModuleDestroy).toBe('function');
     });
 
-    it('does NOT implement the OnModuleDestroy interface symbol', () => {
+    it('onModuleDestroy() calls closeAllPools()', async () => {
+      const { closeAllPools } = await import('@edusphere/db');
       const service = new OpenBadgesService();
-      expect('onModuleDestroy' in service).toBe(false);
+      await service.onModuleDestroy();
+      expect(closeAllPools).toHaveBeenCalledOnce();
+    });
+
+    it('onModuleDestroy() is idempotent — safe to call multiple times', async () => {
+      const service = new OpenBadgesService();
+      await expect(service.onModuleDestroy()).resolves.toBeUndefined();
+      await expect(service.onModuleDestroy()).resolves.toBeUndefined();
     });
   });
 

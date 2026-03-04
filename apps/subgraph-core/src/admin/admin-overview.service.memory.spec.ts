@@ -14,6 +14,7 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn(),
   desc: vi.fn(),
   sql: vi.fn(),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { AdminOverviewService } from './admin-overview.service.js';

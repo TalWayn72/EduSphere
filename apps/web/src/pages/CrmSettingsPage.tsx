@@ -3,7 +3,7 @@
  * Route: /admin/crm
  * Access: ORG_ADMIN, SUPER_ADMIN only (F-033)
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -52,6 +52,16 @@ export function CrmSettingsPage() {
   const navigate = useNavigate();
   const role = useAuthRole();
   const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+        console.error('[CrmSettingsPage] cleanup: copy timer cleared on unmount');
+      }
+    };
+  }, []);
 
   const [connResult, refetchConn] = useQuery<{
     crmConnection: CrmConnectionData | null;
@@ -87,7 +97,8 @@ export function CrmSettingsPage() {
   const handleCopyWebhook = async () => {
     await navigator.clipboard.writeText(webhookUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
   };
 
   return (

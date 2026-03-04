@@ -1,19 +1,15 @@
 /**
  * SocialRecommendationsService — F-036 Social Content Recommendations.
- * Uses collaborative filtering on the social follow graph (pure Drizzle, no AGE needed).
+ * Uses collaborative filtering on the social follow graph.
+ *
+ * Low-level data access (follows, progress, activity queries) lives in
+ * SocialRecommendationsDataService.
  */
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import {
-  db,
-  sql,
-  withTenantContext,
-  userFollows,
-  userProgress,
-  closeAllPools,
-  eq,
-  and,
-} from '@edusphere/db';
+import { closeAllPools } from '@edusphere/db';
 import { toUserRole } from './graph-types';
+import { SocialRecommendationsDataService } from './social-recommendations-data.service';
+import { aggregateActivity } from './social-recommendations-aggregate';
 
 export interface SocialRecommendation {
   contentItemId: string;
@@ -35,11 +31,12 @@ export interface SocialFeedItem {
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-const MUTUAL_WEIGHT_MULTIPLIER = 2;
 
 @Injectable()
 export class SocialRecommendationsService implements OnModuleDestroy {
   private readonly logger = new Logger(SocialRecommendationsService.name);
+
+  constructor(private readonly data: SocialRecommendationsDataService) {}
 
   async getRecommendations(
     userId: string,
@@ -48,10 +45,14 @@ export class SocialRecommendationsService implements OnModuleDestroy {
   ): Promise<SocialRecommendation[]> {
     const ctx = { tenantId, userId, userRole: toUserRole('STUDENT') };
 
-    const followedIds = await this.getFollowedUserIds(userId, tenantId, ctx);
+    const followedIds = await this.data.getFollowedUserIds(
+      userId,
+      tenantId,
+      ctx
+    );
     if (followedIds.length === 0) return [];
 
-    const mutualIds = await this.getMutualFollowerIds(
+    const mutualIds = await this.data.getMutualFollowerIds(
       userId,
       tenantId,
       followedIds,
@@ -59,21 +60,16 @@ export class SocialRecommendationsService implements OnModuleDestroy {
     );
     const mutualSet = new Set(mutualIds);
 
-    const completedIds = await this.getCompletedContentIds(
-      userId,
-      tenantId,
-      ctx
-    );
+    const completedIds = await this.data.getCompletedContentIds(userId, ctx);
 
     const cutoff = new Date(Date.now() - THIRTY_DAYS_MS);
-    const activityRows = await this.getFollowedActivity(
+    const activityRows = await this.data.getFollowedActivity(
       followedIds,
-      tenantId,
       cutoff,
       ctx
     );
 
-    const aggregated = this.aggregateActivity(
+    const aggregated = aggregateActivity(
       activityRows,
       completedIds,
       mutualSet
@@ -96,40 +92,20 @@ export class SocialRecommendationsService implements OnModuleDestroy {
     limit = 20
   ): Promise<SocialFeedItem[]> {
     const ctx = { tenantId, userId, userRole: toUserRole('STUDENT') };
-    const followedIds = await this.getFollowedUserIds(userId, tenantId, ctx);
+    const followedIds = await this.data.getFollowedUserIds(
+      userId,
+      tenantId,
+      ctx
+    );
     if (followedIds.length === 0) return [];
 
     const cutoff = new Date(Date.now() - SEVEN_DAYS_MS);
-    type FeedRow = {
-      user_id: string;
-      display_name: string;
-      content_item_id: string;
-      content_title: string;
-      is_completed: boolean;
-      progress: number;
-      last_accessed_at: Date;
-    };
-
-    const rows = await withTenantContext(db, ctx, async (tx) => {
-      const result = await tx.execute(sql`
-        SELECT
-          up.user_id,
-          COALESCE(u.display_name, u.email, up.user_id::text) AS display_name,
-          up.content_item_id,
-          ci.title AS content_title,
-          up.is_completed,
-          up.progress,
-          up.last_accessed_at
-        FROM user_progress up
-        JOIN content_items ci ON ci.id = up.content_item_id
-        LEFT JOIN users u ON u.id = up.user_id
-        WHERE up.user_id = ANY(${followedIds}::uuid[])
-          AND up.last_accessed_at >= ${cutoff}
-        ORDER BY up.last_accessed_at DESC
-        LIMIT ${limit}
-      `);
-      return (result.rows ?? result) as FeedRow[];
-    });
+    const rows = await this.data.getSocialFeedRows(
+      followedIds,
+      cutoff,
+      limit,
+      ctx
+    );
 
     return rows.map((r) => ({
       userId: r.user_id,
@@ -151,138 +127,4 @@ export class SocialRecommendationsService implements OnModuleDestroy {
     );
   }
 
-  private async getFollowedUserIds(
-    userId: string,
-    tenantId: string,
-    ctx: Parameters<typeof withTenantContext>[1]
-  ): Promise<string[]> {
-    const follows = await withTenantContext(db, ctx, async (tx) =>
-      tx
-        .select({ followingId: userFollows.followingId })
-        .from(userFollows)
-        .where(
-          and(
-            eq(userFollows.followerId, userId),
-            eq(userFollows.tenantId, tenantId)
-          )
-        )
-    );
-    return follows.map((f) => f.followingId);
-  }
-
-  private async getMutualFollowerIds(
-    userId: string,
-    tenantId: string,
-    followedIds: string[],
-    ctx: Parameters<typeof withTenantContext>[1]
-  ): Promise<string[]> {
-    const myFollowers = await withTenantContext(db, ctx, async (tx) =>
-      tx
-        .select({ followerId: userFollows.followerId })
-        .from(userFollows)
-        .where(
-          and(
-            eq(userFollows.followingId, userId),
-            eq(userFollows.tenantId, tenantId)
-          )
-        )
-    );
-    const followerSet = new Set(myFollowers.map((f) => f.followerId));
-    return followedIds.filter((id) => followerSet.has(id));
-  }
-
-  private async getCompletedContentIds(
-    userId: string,
-    tenantId: string,
-    ctx: Parameters<typeof withTenantContext>[1]
-  ): Promise<Set<string>> {
-    const rows = await withTenantContext(db, ctx, async (tx) =>
-      tx
-        .select({ contentItemId: userProgress.contentItemId })
-        .from(userProgress)
-        .where(
-          and(
-            eq(userProgress.userId, userId),
-            eq(userProgress.isCompleted, true)
-          )
-        )
-    );
-    return new Set(rows.map((r) => r.contentItemId));
-  }
-
-  private async getFollowedActivity(
-    followedIds: string[],
-    _tenantId: string,
-    cutoff: Date,
-    ctx: Parameters<typeof withTenantContext>[1]
-  ): Promise<
-    {
-      contentItemId: string;
-      contentTitle: string;
-      userId: string;
-      lastAccessedAt: Date;
-      isCompleted: boolean;
-    }[]
-  > {
-    type ActivityRow = {
-      content_item_id: string;
-      content_title: string;
-      user_id: string;
-      last_accessed_at: Date;
-      is_completed: boolean;
-    };
-    const rows = await withTenantContext(db, ctx, async (tx) => {
-      const result = await tx.execute(sql`
-        SELECT up.content_item_id, ci.title AS content_title, up.user_id, up.last_accessed_at, up.is_completed
-        FROM user_progress up
-        JOIN content_items ci ON ci.id = up.content_item_id
-        WHERE up.user_id = ANY(${followedIds}::uuid[])
-          AND up.last_accessed_at >= ${cutoff}
-          AND up.is_completed = FALSE
-      `);
-      return (result.rows ?? result) as ActivityRow[];
-    });
-    return rows.map((r) => ({
-      contentItemId: r.content_item_id,
-      contentTitle: r.content_title,
-      userId: r.user_id,
-      lastAccessedAt: new Date(r.last_accessed_at),
-      isCompleted: r.is_completed,
-    }));
-  }
-
-  private aggregateActivity(
-    rows: {
-      contentItemId: string;
-      contentTitle: string;
-      userId: string;
-      lastAccessedAt: Date;
-    }[],
-    completedIds: Set<string>,
-    mutualSet: Set<string>
-  ): SocialRecommendation[] {
-    const map = new Map<string, SocialRecommendation>();
-    for (const row of rows) {
-      if (completedIds.has(row.contentItemId)) continue;
-      const existing = map.get(row.contentItemId);
-      const isMutual = mutualSet.has(row.userId);
-      if (!existing) {
-        map.set(row.contentItemId, {
-          contentItemId: row.contentItemId,
-          contentTitle: row.contentTitle,
-          followersCount: 1,
-          isMutualFollower: isMutual,
-          lastActivity: row.lastAccessedAt,
-          weight: isMutual ? MUTUAL_WEIGHT_MULTIPLIER : 1,
-        });
-      } else {
-        existing.followersCount += 1;
-        existing.weight += isMutual ? MUTUAL_WEIGHT_MULTIPLIER : 1;
-        if (isMutual) existing.isMutualFollower = true;
-        if (row.lastAccessedAt > existing.lastActivity)
-          existing.lastActivity = row.lastAccessedAt;
-      }
-    }
-    return Array.from(map.values());
-  }
 }

@@ -47,6 +47,7 @@ vi.mock('@edusphere/db', () => ({
     { placeholder: vi.fn() }
   ),
   withTenantContext: vi.fn(async (_db, _ctx, callback) => callback(mockTx)),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { withTenantContext } from '@edusphere/db';
@@ -560,6 +561,61 @@ describe('AnnotationService', () => {
           undefined as unknown as AuthContext
         )
       ).rejects.toThrow('Authentication required');
+    });
+
+    it('create() with INLINE_COMMENT and textRange passes text_start/text_end to insert', async () => {
+      mockReturning.mockResolvedValue([{
+        ...MOCK_ANNOTATION,
+        annotation_type: 'INLINE_COMMENT',
+        text_start: 10,
+        text_end: 40,
+        range_type: 'character',
+      }]);
+      const result = await service.create(
+        {
+          assetId: 'asset-1',
+          annotationType: 'INLINE_COMMENT',
+          layer: 'SHARED',
+          content: { text: 'This needs clarification' },
+          textRange: { start: 10, end: 40, rangeType: 'character' },
+        },
+        MOCK_AUTH
+      );
+      expect(result).toBeDefined();
+      // Verify insert was called (values() was invoked)
+      expect(mockValues).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text_start: 10,
+          text_end: 40,
+          range_type: 'character',
+        })
+      );
+    });
+
+    it('create() with SUGGESTION and no textRange sets text_start/text_end to null', async () => {
+      mockReturning.mockResolvedValue([{
+        ...MOCK_ANNOTATION,
+        annotation_type: 'SUGGESTION',
+        text_start: null,
+        text_end: null,
+        range_type: null,
+      }]);
+      await service.create(
+        {
+          assetId: 'asset-1',
+          annotationType: 'SUGGESTION',
+          layer: 'SHARED',
+          content: { text: 'Suggestion without range' },
+        },
+        MOCK_AUTH
+      );
+      expect(mockValues).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text_start: null,
+          text_end: null,
+          range_type: null,
+        })
+      );
     });
 
     it('update() accepts no-op updates (empty input)', async () => {

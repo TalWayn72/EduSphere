@@ -3,7 +3,7 @@
  * Route: /admin/xapi
  * Access: ORG_ADMIN, SUPER_ADMIN only (F-028)
  */
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -54,6 +54,16 @@ export function XapiSettingsPage() {
   const [lrsEndpoint, setLrsEndpoint] = useState('');
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+        console.error('[XapiSettingsPage] cleanup: copy timer cleared on unmount');
+      }
+    };
+  }, []);
 
   const [tokensResult, refetchTokens] = useQuery<{ xapiTokens: XapiToken[] }>({
     query: XAPI_TOKENS_QUERY,
@@ -76,7 +86,8 @@ export function XapiSettingsPage() {
   const handleCopy = async () => {
     await navigator.clipboard.writeText(lrsBaseUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
   };
   const handleGenerateToken = async () => {
     if (!description.trim()) return;

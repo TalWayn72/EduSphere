@@ -7,7 +7,7 @@
  * 3. importScormPackage mutation is called with the fileKey
  * 4. On success, callback is invoked with the new courseId
  */
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useMutation } from 'urql';
 import { Button } from '@/components/ui/button';
 import {
@@ -50,10 +50,20 @@ export function ScormImportDialog({
   const [errorMsg, setErrorMsg] = useState('');
   const [progress, setProgress] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [, importPackage] = useMutation<
     { importScormPackage: { courseId: string; itemCount: number } },
     { fileKey: string }
   >(IMPORT_SCORM);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+        console.error('[ScormImportDialog] cleanup: redirect timer cleared on unmount');
+      }
+    };
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,7 +109,8 @@ export function ScormImportDialog({
       const courseId = result.data?.importScormPackage.courseId ?? '';
       setProgress(100);
       setState('done');
-      setTimeout(() => onSuccess(courseId), 800);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = setTimeout(() => onSuccess(courseId), 800);
     } catch (err) {
       setErrorMsg(String(err));
       setState('error');

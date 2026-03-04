@@ -171,4 +171,15 @@ describe('SecuritySettingsPage', () => {
       expect(MOCK_EXECUTE).toHaveBeenCalledOnce();
     });
   });
+
+  it('clears saved timer on unmount (no memory leak)', async () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /save settings/i }));
+    await Promise.resolve();
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

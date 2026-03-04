@@ -35,6 +35,7 @@ vi.mock('@edusphere/db', () => ({
     { placeholder: vi.fn() }
   ),
   withTenantContext: vi.fn(async (_db, _ctx, cb) => cb({})),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
 
 const MOCK_AUTH: AuthContext = {
@@ -335,6 +336,105 @@ describe('AnnotationResolver', () => {
         MOCK_AUTH
       );
       expect(result).toEqual(MOCK_ANNOTATION);
+    });
+  });
+
+  describe('resolveTextRange()', () => {
+    it('returns null when text_start is null', () => {
+      const annotation = {
+        ...MOCK_ANNOTATION,
+        text_start: null,
+        text_end: null,
+        range_type: null,
+      };
+      expect(resolver.resolveTextRange(annotation)).toBeNull();
+    });
+
+    it('returns null when text_end is null', () => {
+      const annotation = {
+        ...MOCK_ANNOTATION,
+        text_start: 10,
+        text_end: null,
+        range_type: 'character',
+      };
+      expect(resolver.resolveTextRange(annotation)).toBeNull();
+    });
+
+    it('returns TextRange object when both text_start and text_end are set', () => {
+      const annotation = {
+        ...MOCK_ANNOTATION,
+        text_start: 5,
+        text_end: 30,
+        range_type: 'character',
+      };
+      expect(resolver.resolveTextRange(annotation)).toEqual({
+        start: 5,
+        end: 30,
+        rangeType: 'character',
+      });
+    });
+
+    it('returns rangeType as "character" when range_type is null', () => {
+      const annotation = {
+        ...MOCK_ANNOTATION,
+        text_start: 0,
+        text_end: 100,
+        range_type: null,
+      };
+      const result = resolver.resolveTextRange(annotation);
+      expect(result?.rangeType).toBe('character');
+    });
+
+    it('returns custom rangeType (e.g. "word") when set', () => {
+      const annotation = {
+        ...MOCK_ANNOTATION,
+        text_start: 0,
+        text_end: 50,
+        range_type: 'word',
+      };
+      const result = resolver.resolveTextRange(annotation);
+      expect(result?.rangeType).toBe('word');
+    });
+  });
+
+  describe('createAnnotation() with INLINE_COMMENT and textRange', () => {
+    const inlineInput = {
+      assetId: '11111111-1111-4111-a111-111111111111',
+      annotationType: 'INLINE_COMMENT',
+      layer: 'SHARED',
+      content: { text: 'This needs clarification' },
+      textRange: { start: 10, end: 40 },
+    };
+
+    it('passes textRange to service.create for INLINE_COMMENT type', async () => {
+      const mockResult = { ...MOCK_ANNOTATION, annotation_type: 'INLINE_COMMENT', text_start: 10, text_end: 40 };
+      mockAnnotationService.create.mockResolvedValue(mockResult);
+      await resolver.createAnnotation(inlineInput, ctxWith(MOCK_AUTH));
+      expect(mockAnnotationService.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          annotationType: 'INLINE_COMMENT',
+          textRange: expect.objectContaining({ start: 10, end: 40 }),
+        }),
+        MOCK_AUTH
+      );
+    });
+
+    it('passes textRange to service.create for SUGGESTION type', async () => {
+      const suggestionInput = {
+        ...inlineInput,
+        annotationType: 'SUGGESTION',
+        textRange: { start: 0, end: 20, rangeType: 'word' },
+      };
+      const mockResult = { ...MOCK_ANNOTATION, annotation_type: 'SUGGESTION' };
+      mockAnnotationService.create.mockResolvedValue(mockResult);
+      await resolver.createAnnotation(suggestionInput, ctxWith(MOCK_AUTH));
+      expect(mockAnnotationService.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          annotationType: 'SUGGESTION',
+          textRange: expect.objectContaining({ start: 0, end: 20, rangeType: 'word' }),
+        }),
+        MOCK_AUTH
+      );
     });
   });
 });

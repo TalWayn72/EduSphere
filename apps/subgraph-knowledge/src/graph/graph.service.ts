@@ -1,28 +1,33 @@
 /**
- * GraphService — thin facade that delegates to the three focused sub-services.
+ * GraphService — thin facade that delegates to focused sub-services.
  *
- * Concept operations   → GraphConceptService
- * Search / embeddings  → GraphSearchService
- * Person / Term / etc. → GraphPersonTermService
+ * Concept CRUD         → GraphConceptService
+ * Concept Relations    → GraphConceptLinkService
+ * Search / Embeddings  → GraphSearchService
+ * Person / Term        → GraphPersonTermService
+ * Source / Cluster     → GraphSourceClusterService  (also handles learning paths)
  *
- * graph.resolver.ts calls this facade and is completely unaware of the split.
- * No `role as any` casts — all role coercion is handled inside each sub-service
- * via `toUserRole()` from graph-types.ts.
+ * graph.resolver.ts calls this facade without knowledge of the split.
+ * No `role as any` casts — all role coercion is in each sub-service via toUserRole().
  */
 import { Injectable } from '@nestjs/common';
 import { GraphConceptService } from './graph-concept.service';
+import { GraphConceptLinkService } from './graph-concept-link.service';
 import { GraphSearchService } from './graph-search.service';
 import { GraphPersonTermService } from './graph-person-term.service';
+import { GraphSourceClusterService } from './graph-source-cluster.service';
 
 @Injectable()
 export class GraphService {
   constructor(
     private readonly concept: GraphConceptService,
+    private readonly conceptLink: GraphConceptLinkService,
     private readonly search: GraphSearchService,
-    private readonly personTerm: GraphPersonTermService
+    private readonly personTerm: GraphPersonTermService,
+    private readonly sourceCluster: GraphSourceClusterService
   ) {}
 
-  // ── Concept ──────────────────────────────────────────────────────────────
+  // ── Concept CRUD ──────────────────────────────────────────────────────────
   findConceptById(id: string, tenantId: string, userId: string, role: string) {
     return this.concept.findConceptById(id, tenantId, userId, role);
   }
@@ -82,6 +87,7 @@ export class GraphService {
     return this.concept.deleteConcept(id, tenantId, userId, role);
   }
 
+  // ── Concept Relations ─────────────────────────────────────────────────────
   findRelatedConcepts(
     conceptId: string,
     depth: number,
@@ -90,7 +96,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.concept.findRelatedConcepts(
+    return this.conceptLink.findRelatedConcepts(
       conceptId,
       depth,
       limit,
@@ -110,7 +116,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.concept.linkConcepts(
+    return this.conceptLink.linkConcepts(
       fromId,
       toId,
       relationshipType,
@@ -196,7 +202,7 @@ export class GraphService {
 
   // ── Source ───────────────────────────────────────────────────────────────
   findSourceById(id: string, tenantId: string, userId: string, role: string) {
-    return this.personTerm.findSourceById(id, tenantId, userId, role);
+    return this.sourceCluster.findSourceById(id, tenantId, userId, role);
   }
 
   createSource(
@@ -207,7 +213,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.personTerm.createSource(
+    return this.sourceCluster.createSource(
       title,
       type,
       url,
@@ -224,7 +230,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.personTerm.findTopicClusterById(id, tenantId, userId, role);
+    return this.sourceCluster.findTopicClusterById(id, tenantId, userId, role);
   }
 
   findTopicClustersByCourse(
@@ -233,7 +239,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.personTerm.findTopicClustersByCourse(
+    return this.sourceCluster.findTopicClustersByCourse(
       courseId,
       tenantId,
       userId,
@@ -248,7 +254,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.personTerm.createTopicCluster(
+    return this.sourceCluster.createTopicCluster(
       name,
       description,
       tenantId,
@@ -265,7 +271,13 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.personTerm.getLearningPath(from, to, tenantId, userId, role);
+    return this.sourceCluster.getLearningPath(
+      from,
+      to,
+      tenantId,
+      userId,
+      role
+    );
   }
 
   getRelatedConceptsByName(
@@ -275,7 +287,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.personTerm.getRelatedConceptsByName(
+    return this.sourceCluster.getRelatedConceptsByName(
       conceptName,
       depth,
       tenantId,
@@ -290,7 +302,7 @@ export class GraphService {
     userId: string,
     role: string
   ) {
-    return this.personTerm.getPrerequisiteChain(
+    return this.sourceCluster.getPrerequisiteChain(
       conceptName,
       tenantId,
       userId,

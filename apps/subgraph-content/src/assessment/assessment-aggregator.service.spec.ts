@@ -83,10 +83,9 @@ describe('AssessmentAggregatorService', () => {
   });
 
   // Test 2
-  it('has no onModuleDestroy method — no resources to clean up', () => {
-    expect(typeof (svc as Record<string, unknown>)['onModuleDestroy']).toBe(
-      'undefined'
-    );
+  it('onModuleDestroy calls closeAllPools', async () => {
+    await svc.onModuleDestroy();
+    expect(mockCloseAllPools).toHaveBeenCalledOnce();
   });
 
   // ── aggregate — NotFoundException ─────────────────────────────────────────

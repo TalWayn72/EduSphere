@@ -1,20 +1,20 @@
 /**
  * GraphSearchService — semanticSearch (HybridRAG) and generateEmbedding operations.
  * Wraps pgvector cosine search + ILIKE fallback + concept text search.
+ *
+ * Pure text helpers (computeTextSimilarity, scoreConceptsByText) live in
+ * graph-search-helpers.ts.
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { db, withTenantContext, transcript_segments, sql } from '@edusphere/db';
 import { CypherConceptService } from './cypher-concept.service';
 import { EmbeddingService } from '../embedding/embedding.service';
 import { toUserRole, type GraphConceptNode } from './graph-types';
-
-interface SemanticResult {
-  id: string;
-  text: string;
-  similarity: number;
-  entityType: string;
-  entityId: string;
-}
+import {
+  type SemanticResult,
+  computeTextSimilarity,
+  scoreConceptsByText,
+} from './graph-search-helpers';
 
 @Injectable()
 export class GraphSearchService {
@@ -97,7 +97,7 @@ export class GraphSearchService {
             .map((seg) => ({
               id: seg.id,
               text: seg.text,
-              similarity: this.computeTextSimilarity(seg.text, query),
+              similarity: computeTextSimilarity(seg.text, query),
               entityType: 'transcript_segment',
               entityId: seg.transcript_id,
             }));
@@ -146,17 +146,6 @@ export class GraphSearchService {
     );
   }
 
-  private computeTextSimilarity(text: string, query: string): number {
-    const haystack = text.toLowerCase();
-    const needle = query.toLowerCase();
-    if (haystack === needle) return 1.0;
-    if (haystack.includes(needle)) return 0.85;
-    const queryWords = needle.split(/\s+/).filter(Boolean);
-    if (queryWords.length === 0) return 0.5;
-    const matchCount = queryWords.filter((w) => haystack.includes(w)).length;
-    return 0.5 + 0.35 * (matchCount / queryWords.length);
-  }
-
   private async searchConceptsByText(
     query: string,
     tenantId: string,
@@ -164,24 +153,7 @@ export class GraphSearchService {
   ): Promise<SemanticResult[]> {
     try {
       const concepts = await this.cypher.findAllConcepts(tenantId, limit * 3);
-      const q = query.toLowerCase();
-      return (concepts as GraphConceptNode[])
-        .filter(
-          (c) =>
-            c.name?.toLowerCase().includes(q) ||
-            c.definition?.toLowerCase().includes(q)
-        )
-        .slice(0, limit)
-        .map((c) => ({
-          id: c.id,
-          text: c.definition ?? c.name,
-          similarity: this.computeTextSimilarity(
-            `${c.name} ${c.definition ?? ''}`,
-            query
-          ),
-          entityType: 'concept',
-          entityId: c.id,
-        }));
+      return scoreConceptsByText(concepts as GraphConceptNode[], query, limit);
     } catch (err) {
       this.logger.warn({ err }, 'Concept search failed during semanticSearch');
       return [];

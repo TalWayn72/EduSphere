@@ -183,4 +183,18 @@ describe('CourseWizardMediaStep', () => {
     fireEvent.change(fileInput);
     expect(screen.getByText('lecture.mp4')).toBeInTheDocument();
   });
+
+  it('clears richDocSaved timer on unmount (no memory leak)', () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderStep();
+    // Type a title to enable the "Add Rich Document" button
+    const titleInput = screen.getByPlaceholderText(/document title/i);
+    fireEvent.change(titleInput, { target: { value: 'Test Doc' } });
+    // Click "Add Rich Document" — this sets the richDocSavedTimerRef
+    fireEvent.click(screen.getByRole('button', { name: /add rich document/i }));
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

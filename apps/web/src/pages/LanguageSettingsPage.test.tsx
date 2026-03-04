@@ -186,4 +186,15 @@ describe('LanguageSettingsPage', () => {
       expect(screen.getByText('Server error')).toBeInTheDocument();
     });
   });
+
+  it('clears saved timer on unmount (no memory leak)', async () => {
+    vi.useFakeTimers();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await Promise.resolve();
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

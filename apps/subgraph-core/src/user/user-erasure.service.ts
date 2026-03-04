@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { eq, inArray } from 'drizzle-orm';
 import {
   createDatabaseConnection,
@@ -15,7 +15,7 @@ import type { Database } from '@edusphere/db';
  * Writes an append-only audit log entry after erasure.
  */
 @Injectable()
-export class UserErasureService {
+export class UserErasureService implements OnModuleDestroy {
   private readonly logger = new Logger(UserErasureService.name);
   private readonly db: Database;
 

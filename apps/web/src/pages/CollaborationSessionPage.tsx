@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useSubscription } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +43,16 @@ export function CollaborationSessionPage() {
     topic ? `${t('chavruta')}: ${topic}` : t('sharedStudyNotes')
   );
   const [saved, setSaved] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) {
+        clearTimeout(savedTimerRef.current);
+        console.error('[CollaborationSessionPage] cleanup: saved timer cleared on unmount');
+      }
+    };
+  }, []);
 
   // Fetch discussion + auto-join if we have a discussionId
   const [{ data: discussionData }] = useQuery({
@@ -86,7 +96,8 @@ export function CollaborationSessionPage() {
 
   const handleSave = () => {
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setSaved(false), 2000);
   };
 
   const SAMPLE_CONTENT = `<h1>${docTitle}</h1>

@@ -17,14 +17,6 @@ const mockPersonCreate = vi.fn();
 const mockTermFindById = vi.fn();
 const mockTermFindByName = vi.fn();
 const mockTermCreate = vi.fn();
-const mockSourceFindById = vi.fn();
-const mockSourceCreate = vi.fn();
-const mockTopicFindById = vi.fn();
-const mockTopicFindByCourse = vi.fn();
-const mockTopicCreate = vi.fn();
-const mockLearningPathFind = vi.fn();
-const mockCollectRelated = vi.fn();
-const mockPrerequisiteChain = vi.fn();
 
 vi.mock('./cypher-person.service', () => ({
   CypherPersonService: class {
@@ -40,33 +32,13 @@ vi.mock('./cypher-term.service', () => ({
     createTerm = mockTermCreate;
   },
 }));
-vi.mock('./cypher-source.service', () => ({
-  CypherSourceService: class {
-    findSourceById = mockSourceFindById;
-    createSource = mockSourceCreate;
-  },
-}));
-vi.mock('./cypher-topic-cluster.service', () => ({
-  CypherTopicClusterService: class {
-    findTopicClusterById = mockTopicFindById;
-    findTopicClustersByCourse = mockTopicFindByCourse;
-    createTopicCluster = mockTopicCreate;
-  },
-}));
-vi.mock('./cypher-learning-path.service', () => ({
-  CypherLearningPathService: class {
-    findShortestLearningPath = mockLearningPathFind;
-    collectRelatedConcepts = mockCollectRelated;
-    findPrerequisiteChain = mockPrerequisiteChain;
-  },
-}));
 
 import { GraphPersonTermService } from './graph-person-term.service.js';
 import { CypherPersonService } from './cypher-person.service.js';
 import { CypherTermService } from './cypher-term.service.js';
-import { CypherSourceService } from './cypher-source.service.js';
-import { CypherTopicClusterService } from './cypher-topic-cluster.service.js';
-import { CypherLearningPathService } from './cypher-learning-path.service.js';
+
+// Source, TopicCluster, and LearningPath operations are tested in
+// graph-source-cluster.service.spec.ts
 
 describe('GraphPersonTermService', () => {
   let service: GraphPersonTermService;
@@ -75,10 +47,7 @@ describe('GraphPersonTermService', () => {
     vi.clearAllMocks();
     service = new GraphPersonTermService(
       new CypherPersonService({} as never),
-      new CypherTermService({} as never),
-      new CypherSourceService({} as never),
-      new CypherTopicClusterService({} as never),
-      new CypherLearningPathService({} as never)
+      new CypherTermService({} as never)
     );
   });
 
@@ -141,64 +110,6 @@ describe('GraphPersonTermService', () => {
         'tenant-1'
       );
       expect(result).toEqual({ id: 't-2' });
-    });
-  });
-
-  describe('createSource()', () => {
-    it('delegates to source.createSource', async () => {
-      mockSourceCreate.mockResolvedValue({ id: 's-1' });
-      await service.createSource(
-        'MDN',
-        'URL',
-        'https://mdn.io',
-        'tenant-1',
-        'user-1',
-        'INSTRUCTOR'
-      );
-      expect(mockSourceCreate).toHaveBeenCalledWith(
-        'MDN',
-        'URL',
-        'https://mdn.io',
-        'tenant-1'
-      );
-    });
-  });
-
-  describe('getLearningPath()', () => {
-    it('delegates to learningPath.findShortestLearningPath', async () => {
-      mockLearningPathFind.mockResolvedValue({
-        concepts: [{ name: 'A' }, { name: 'B' }],
-        steps: 1,
-      });
-      const result = await service.getLearningPath(
-        'A',
-        'B',
-        'tenant-1',
-        'user-1',
-        'STUDENT'
-      );
-      expect(mockLearningPathFind).toHaveBeenCalledWith('A', 'B', 'tenant-1');
-      expect(result).toBeDefined();
-    });
-  });
-
-  describe('getPrerequisiteChain()', () => {
-    it('delegates to learningPath.findPrerequisiteChain', async () => {
-      mockPrerequisiteChain.mockResolvedValue([
-        { name: 'Algebra' },
-        { name: 'Calculus' },
-      ]);
-      const result = await service.getPrerequisiteChain(
-        'Calculus',
-        'tenant-1',
-        'user-1',
-        'STUDENT'
-      );
-      expect(mockPrerequisiteChain).toHaveBeenCalledWith(
-        'Calculus',
-        'tenant-1'
-      );
-      expect(result).toHaveLength(2);
     });
   });
 });

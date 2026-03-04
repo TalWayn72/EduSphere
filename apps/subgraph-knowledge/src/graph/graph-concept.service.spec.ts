@@ -18,9 +18,6 @@ const mockFindAllConcepts = vi.fn();
 const mockCreateConcept = vi.fn();
 const mockUpdateConcept = vi.fn();
 const mockDeleteConcept = vi.fn();
-const mockFindRelatedConcepts = vi.fn();
-const mockLinkConceptsAndFetch = vi.fn();
-
 vi.mock('./cypher-concept.service', () => ({
   CypherConceptService: class {
     findConceptById = mockFindConceptById;
@@ -29,8 +26,6 @@ vi.mock('./cypher-concept.service', () => ({
     createConcept = mockCreateConcept;
     updateConcept = mockUpdateConcept;
     deleteConcept = mockDeleteConcept;
-    findRelatedConcepts = mockFindRelatedConcepts;
-    linkConceptsAndFetch = mockLinkConceptsAndFetch;
   },
 }));
 
@@ -129,26 +124,6 @@ describe('GraphConceptService', () => {
     });
   });
 
-  describe('linkConcepts()', () => {
-    it('returns relationship object with fromConcept and toConcept', async () => {
-      mockLinkConceptsAndFetch.mockResolvedValue({
-        from: sampleNode,
-        to: { ...sampleNode, id: 'concept-2', name: 'Redux' },
-      });
-      const result = await service.linkConcepts(
-        'concept-1',
-        'concept-2',
-        'PREREQUISITE',
-        0.9,
-        'React before Redux',
-        'tenant-1',
-        'user-1',
-        'INSTRUCTOR'
-      );
-      expect(result.relationshipType).toBe('PREREQUISITE');
-      expect(result.fromConcept?.name).toBe('React');
-      expect(result.toConcept?.name).toBe('Redux');
-      expect(result.strength).toBe(0.9);
-    });
-  });
+  // linkConcepts and findRelatedConcepts live in GraphConceptLinkService.
+  // See graph-concept-link.service.spec.ts for those tests.
 });

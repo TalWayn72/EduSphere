@@ -3,7 +3,7 @@
  * Route: /admin/languages
  * Access: ORG_ADMIN, SUPER_ADMIN only
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -78,6 +78,7 @@ export function LanguageSettingsPage() {
   const [supported, setSupported] = useState<Set<string>>(new Set(['en']));
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [queryResult] = useQuery<QueryResult>({
     query: TENANT_LANGUAGE_SETTINGS_QUERY,
@@ -94,6 +95,15 @@ export function LanguageSettingsPage() {
       setSupported(new Set(s.supportedLanguages));
     }
   }, [queryResult.data]);
+
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) {
+        clearTimeout(savedTimerRef.current);
+        console.error('[LanguageSettingsPage] cleanup: saved timer cleared on unmount');
+      }
+    };
+  }, []);
 
   if (!role || !ADMIN_ROLES.has(role)) {
     navigate('/dashboard');
@@ -131,7 +141,8 @@ export function LanguageSettingsPage() {
       setSaveError(result.error.message);
     } else {
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
     }
   };
 

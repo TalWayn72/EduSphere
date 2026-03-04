@@ -4,7 +4,9 @@ import {
   uuid,
   jsonb,
   boolean,
+  integer,
   index,
+  type AnyPgColumn,
 } from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
@@ -23,7 +25,15 @@ export const annotations = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     annotation_type: text('annotation_type', {
-      enum: ['TEXT', 'SKETCH', 'LINK', 'BOOKMARK', 'SPATIAL_COMMENT'],
+      enum: [
+        'TEXT',
+        'SKETCH',
+        'LINK',
+        'BOOKMARK',
+        'SPATIAL_COMMENT',
+        'INLINE_COMMENT',
+        'SUGGESTION',
+      ],
     }).notNull(),
     layer: text('layer', {
       enum: ['PERSONAL', 'SHARED', 'INSTRUCTOR', 'AI_GENERATED'],
@@ -32,9 +42,14 @@ export const annotations = pgTable(
       .default('PERSONAL'),
     content: jsonb('content').notNull(),
     spatial_data: jsonb('spatial_data'),
-    parent_id: uuid('parent_id').references((): any => annotations.id, {
-      onDelete: 'cascade',
-    }),
+    // Text range for inline annotations (INLINE_COMMENT, SUGGESTION) — added in migration 0008
+    text_start: integer('text_start'),
+    text_end: integer('text_end'),
+    range_type: text('range_type').default('character'),
+    parent_id: uuid('parent_id').references(
+      (): AnyPgColumn => annotations.id,
+      { onDelete: 'cascade' }
+    ),
     is_resolved: boolean('is_resolved').notNull().default(false),
     ...timestamps,
     ...softDelete,
@@ -43,6 +58,7 @@ export const annotations = pgTable(
     index('idx_annotations_tenant').on(t.tenant_id),
     index('idx_annotations_tenant_user').on(t.tenant_id, t.user_id),
     index('idx_annotations_tenant_date').on(t.tenant_id, t.created_at),
+    index('idx_annotations_text_range').on(t.asset_id, t.text_start, t.text_end),
   ]
 );
 

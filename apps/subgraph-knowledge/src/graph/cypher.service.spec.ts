@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CypherService } from './cypher.service';
 import { CypherConceptService } from './cypher-concept.service';
+import { CypherConceptRelationService } from './cypher-concept-relation.service';
 import { CypherPersonService } from './cypher-person.service';
 import { CypherTermService } from './cypher-term.service';
 import { CypherSourceService } from './cypher-source.service';
@@ -86,6 +87,7 @@ describe('CypherService', function () {
     });
     service = new CypherService(
       new CypherConceptService(),
+      new CypherConceptRelationService(),
       new CypherPersonService(),
       new CypherTermService(),
       new CypherSourceService(),

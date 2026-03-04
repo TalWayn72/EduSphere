@@ -1,5 +1,8 @@
 /**
- * Unit tests for CypherConceptService.
+ * Unit tests for CypherConceptService — Concept CRUD operations only.
+ * Relation operations (findRelatedConcepts, linkConcepts, linkConceptsAndFetch) are
+ * tested in cypher-concept-relation.service.spec.ts.
+ *
  * Direct class instantiation — no NestJS TestingModule.
  * All @edusphere/db helpers are mocked at the module level.
  */
@@ -8,15 +11,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // ─── Hoisted mocks — must appear before the vi.mock() factory ─────────────────
 const mockExecuteCypher = vi.fn();
 const mockCreateConcept = vi.fn();
-const mockFindRelatedConcepts = vi.fn();
-const mockCreateRelationship = vi.fn();
 
 vi.mock('@edusphere/db', () => ({
   db: {},
   executeCypher: (...args: unknown[]) => mockExecuteCypher(...args),
   createConcept: (...args: unknown[]) => mockCreateConcept(...args),
-  findRelatedConcepts: (...args: unknown[]) => mockFindRelatedConcepts(...args),
-  createRelationship: (...args: unknown[]) => mockCreateRelationship(...args),
 }));
 
 vi.mock('@edusphere/config', () => ({
@@ -117,38 +116,6 @@ describe('CypherConceptService', () => {
   });
 
   // ── Test 6 ──────────────────────────────────────────────────────────────────
-  it('findRelatedConcepts delegates to findRelatedConcepts helper', async () => {
-    const related = [{ id: 'c-2', name: 'Logic' }];
-    mockFindRelatedConcepts.mockResolvedValue(related);
-
-    const result = await service.findRelatedConcepts('c-1', TENANT, 2, 10);
-
-    expect(mockFindRelatedConcepts).toHaveBeenCalledWith(
-      expect.anything(),
-      'c-1',
-      TENANT,
-      2,
-      10
-    );
-    expect(result).toEqual(related);
-  });
-
-  // ── Test 7 ──────────────────────────────────────────────────────────────────
-  it('linkConcepts delegates to createRelationship helper', async () => {
-    mockCreateRelationship.mockResolvedValue(undefined);
-
-    await service.linkConcepts('f-1', 't-1', 'RELATED_TO', { strength: 0.9 });
-
-    expect(mockCreateRelationship).toHaveBeenCalledWith(
-      expect.anything(),
-      'f-1',
-      't-1',
-      'RELATED_TO',
-      { strength: 0.9 }
-    );
-  });
-
-  // ── Test 8 ──────────────────────────────────────────────────────────────────
   it('service instantiates without error', () => {
     expect(() => new CypherConceptService()).not.toThrow();
   });

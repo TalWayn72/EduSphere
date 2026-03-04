@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { db, announcements } from '@edusphere/db';
+import { db, announcements, closeAllPools } from '@edusphere/db';
 import { count, eq, and, lte, gte, desc, isNull, or } from 'drizzle-orm';
 
 export interface AnnouncementData {
@@ -61,8 +61,9 @@ function mapRow(row: typeof announcements.$inferSelect): AnnouncementData {
 export class AnnouncementsService implements OnModuleDestroy {
   private readonly logger = new Logger(AnnouncementsService.name);
 
-  onModuleDestroy(): void {
-    // No resources to clean up
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[AnnouncementsService] onModuleDestroy: DB pools closed');
   }
 
   async getAdminAnnouncements(

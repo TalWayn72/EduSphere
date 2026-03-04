@@ -3,7 +3,7 @@
  * Route: /admin/branding
  * Access: ORG_ADMIN, SUPER_ADMIN only
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -51,6 +51,7 @@ export function BrandingSettingsPage() {
   const [form, setForm] = useState<BrandingFormState>(DEFAULT_FORM);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [queryResult] = useQuery<BrandingQueryResult>({
     query: TENANT_BRANDING_QUERY,
@@ -65,6 +66,15 @@ export function BrandingSettingsPage() {
       setForm({ ...DEFAULT_FORM, ...queryResult.data.myTenantBranding });
     }
   }, [queryResult.data]);
+
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) {
+        clearTimeout(savedTimerRef.current);
+        console.error('[BrandingSettingsPage] cleanup: saved timer cleared on unmount');
+      }
+    };
+  }, []);
 
   if (!role || !ADMIN_ROLES.has(role)) {
     navigate('/dashboard');
@@ -87,7 +97,8 @@ export function BrandingSettingsPage() {
       setSaveError(result.error.message);
     } else {
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
     }
   };
 

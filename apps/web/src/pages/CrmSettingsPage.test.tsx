@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -215,5 +215,21 @@ describe('CrmSettingsPage', () => {
     expect(screen.getByText('SUCCESS')).toBeInTheDocument();
     expect(screen.getByText('FAILED')).toBeInTheDocument();
     expect(screen.getByText('Duplicate value')).toBeInTheDocument();
+  });
+
+  it('clears copy timer on unmount (no memory leak)', async () => {
+    vi.useFakeTimers();
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { unmount } = renderPage();
+    // handleCopyWebhook is async (awaits clipboard), so flush promises before unmount
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /copy/i }));
+    });
+    unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

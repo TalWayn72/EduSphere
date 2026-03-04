@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { and, eq, createDatabaseConnection, schema } from '@edusphere/db';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { and, eq, createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import type { Database } from '@edusphere/db';
 
 export type ConsentType =
@@ -11,12 +11,17 @@ export type ConsentType =
   | 'RESEARCH';
 
 @Injectable()
-export class ConsentService {
+export class ConsentService implements OnModuleDestroy {
   private readonly logger = new Logger(ConsentService.name);
   private readonly db: Database;
 
   constructor() {
     this.db = createDatabaseConnection();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await closeAllPools();
+    this.logger.log('[ConsentService] onModuleDestroy: DB pools closed');
   }
 
   async hasConsent(userId: string, consentType: ConsentType): Promise<boolean> {
