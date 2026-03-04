@@ -9,6 +9,7 @@ import { initI18n, applyDocumentDirection } from '@/lib/i18n';
 import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
 import { StorageWarningBanner } from '@/components/StorageWarningBanner';
+import { GlobalLocaleSync } from '@/components/GlobalLocaleSync';
 import { registerServiceWorker } from '@/pwa';
 
 // ── App ──────────────────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UrqlProvider value={urqlClient}>
+        <GlobalLocaleSync />
         <StorageWarningBanner />
         <Toaster />
         <RouterProvider router={router} />

@@ -1,7 +1,23 @@
 // Vitest global test setup
 import '@testing-library/jest-dom';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+import { ZodError } from 'zod';
 import { server } from './server';
+
+// ── Zod v4 → @hookform/resolvers v3.x compatibility shim ────────────────────
+// @hookform/resolvers v3.x checks `ZodError.errors` (Zod v3 property name).
+// Zod v4 renamed it to `.issues`. Without this shim the resolver re-throws the
+// ZodError as an unhandled rejection instead of populating form.errors.
+// Adding a `.errors` getter that aliases `.issues` makes the resolver work correctly.
+if (!Object.getOwnPropertyDescriptor(ZodError.prototype, 'errors')) {
+  Object.defineProperty(ZodError.prototype, 'errors', {
+    get(this: ZodError) {
+      return this.issues;
+    },
+    enumerable: false,
+    configurable: true,
+  });
+}
 
 // ── react-i18next mock ──────────────────────────────────────────────────────
 // Load real English translation JSON files so t('key') returns the actual
@@ -140,6 +156,7 @@ vi.mock('react-i18next', () => ({
       changeLanguage: vi.fn().mockResolvedValue(undefined),
       language: 'en',
       isInitialized: true,
+      dir: vi.fn().mockReturnValue('ltr'),
     },
     ready: true,
   }),

@@ -7,7 +7,6 @@ import type { LessonFormData } from './CreateLessonPage';
 const Step1Schema = z.object({
   title: z.string().min(3, 'כותרת חייבת להכיל לפחות 3 תווים'),
   type: z.enum(['THEMATIC', 'SEQUENTIAL']),
-  series: z.string().optional().default(''),
   lessonDate: z.string().optional().default(''),
 });
 
@@ -23,9 +22,9 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<LessonFormData>({
-    resolver: zodResolver(Step1Schema as unknown as Parameters<typeof zodResolver>[0]),
-    defaultValues: initialData,
+  } = useForm({
+    resolver: zodResolver(Step1Schema),
+    defaultValues: initialData as z.input<typeof Step1Schema>,
   });
 
   const selectedType = watch('type');
@@ -61,20 +60,11 @@ export function CreateLessonStep1({ initialData, onSubmit }: Props) {
                   className="w-4 h-4"
                 />
                 <span className="text-sm">
-                  {t === 'THEMATIC' ? 'הגות (נושאי)' : 'על הסדר'}
+                  {t === 'THEMATIC' ? 'כללי (נושאי)' : 'על הסדר'}
                 </span>
               </label>
             ))}
           </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">סדרת שיעורים</label>
-          <input
-            {...register('series')}
-            placeholder="לדוג׳: ספר עץ חיים — שנת תשפ״ה"
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
         </div>
 
         <div>

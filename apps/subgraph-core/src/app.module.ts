@@ -14,6 +14,7 @@ import { CrmModule } from './crm/crm.module.js';
 import { PortalModule } from './portal/portal.module.js';
 import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { SavedSearchModule } from './search/saved-search.module.js';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     PortalModule,
     AdminModule,
     NotificationsModule,
+    SavedSearchModule,
   ],
 })
 export class AppModule {}

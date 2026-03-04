@@ -1,5 +1,48 @@
 # EduSphere — Agent Memory
 
+## Session 19 COMPLETE: BUG-054 — React setState-during-render on lesson creation (04 Mar 2026)
+
+### master HEAD: `b1125d3` | BUG-054 code fix complete (uncommitted — pending deployment verification)
+
+**BUG-054 DONE** — React "Cannot update a component while rendering" on lesson creation fixed
+- Root cause: LessonDetailPage/LessonPipelinePage/LessonResultsPage are sibling routes sharing `LESSON_QUERY`. Without mount guard, urql cache dispatches state updates during sibling render → React 19 violation
+- Fix: `useState(false)` + `useEffect(() => { setMounted(true); }, [])` + `pause: !mounted` on `useQuery` in all 3 lesson pages
+- Also fixed: `CreateLessonPage.tsx` silent failure (`!user → return`) → now shows auth error
+- Also fixed: `@hookform/resolvers` v3.x + Zod v4 incompatibility (resolver checked `.errors` which v4 renamed to `.issues`)
+- **3009/3009 web tests** | **TypeScript: 0 errors** | **231/231 test files**
+
+### BUG-054 Key Pattern — Mounted guard for sibling routes:
+```typescript
+// WRONG: useQuery fires immediately → urql notifies outgoing sibling during incoming render
+const [result] = useQuery({ query: LESSON_QUERY, variables: { lessonId } });
+// RIGHT: defer until component committed to DOM
+const [mounted, setMounted] = useState(false);
+useEffect(() => { setMounted(true); }, []);
+const [result] = useQuery({ query: LESSON_QUERY, variables: { lessonId }, pause: !mounted || !lessonId });
+if (!mounted || result.fetching) return <div className="animate-spin" />;
+```
+
+### BUG-054 Key Pattern — Zod v4 + @hookform/resolvers v3.x shim:
+```typescript
+// @hookform/resolvers v3.x checks ZodError.errors (Zod v3) but Zod v4 uses .issues
+// Add to apps/web/src/test/setup.ts:
+import { ZodError } from 'zod';
+if (!Object.getOwnPropertyDescriptor(ZodError.prototype, 'errors')) {
+  Object.defineProperty(ZodError.prototype, 'errors', {
+    get(this: ZodError) { return this.issues; },
+    enumerable: false, configurable: true,
+  });
+}
+// Root cause: resolver does Array.isArray(r.errors) → false in Zod v4 → throws ZodError
+// as unhandled rejection instead of populating form.errors
+```
+
+### BUG-054 Bug ID Note:
+- BUG-049 in OPEN_ISSUES.md = WebSocket subscription auth (not this bug!)
+- This React setState-during-render lesson fix = BUG-054
+
+---
+
 ## Lesson Pipeline Builder — COMPLETE (01 Mar 2026)
 
 Full AI-powered lesson pipeline: 4 phases, 41 new files, 181 new tests, all TypeScript-clean.

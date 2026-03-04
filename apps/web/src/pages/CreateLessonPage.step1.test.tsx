@@ -11,7 +11,6 @@ import type { LessonFormData } from './CreateLessonPage';
 const DEFAULT_INITIAL: LessonFormData = {
   title: '',
   type: 'THEMATIC',
-  series: '',
   lessonDate: '',
 };
 
@@ -37,13 +36,14 @@ describe('CreateLessonStep1', () => {
 
   it('renders THEMATIC and SEQUENTIAL radio options', () => {
     renderStep1();
-    expect(screen.getByText('הגות (נושאי)')).toBeInTheDocument();
+    expect(screen.getByText('כללי (נושאי)')).toBeInTheDocument();
     expect(screen.getByText('על הסדר')).toBeInTheDocument();
   });
 
-  it('renders series input field', () => {
+  it('"סדרת שיעורים" field is not visible (removed)', () => {
     renderStep1();
-    expect(screen.getByPlaceholderText(/ספר עץ חיים/i)).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText(/ספר עץ חיים/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('סדרת שיעורים')).not.toBeInTheDocument();
   });
 
   it('renders lesson date input (type=date)', () => {
@@ -101,7 +101,6 @@ describe('CreateLessonStep1', () => {
     const initial: LessonFormData = {
       title: 'קיים',
       type: 'SEQUENTIAL',
-      series: 'סדרה',
       lessonDate: '2026-03-01',
     };
     renderStep1(vi.fn(), initial);

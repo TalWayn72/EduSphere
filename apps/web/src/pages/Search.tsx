@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useQuery } from 'urql';
+import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,8 +14,18 @@ import {
   Clock,
   ChevronRight,
   Loader2,
+  Bookmark,
+  BookmarkCheck,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { SEARCH_SEMANTIC_QUERY } from '@/lib/graphql/knowledge.queries';
+import {
+  SAVED_SEARCHES_QUERY,
+  CREATE_SAVED_SEARCH_MUTATION,
+  DELETE_SAVED_SEARCH_MUTATION,
+} from '@/lib/graphql/search.queries';
+import { SEARCH_COURSES_QUERY } from '@/lib/graphql/content.queries';
 import { mockTranscript } from '@/lib/mock-content-data';
 import { getThreadedAnnotations } from '@/lib/mock-annotations';
 import { mockGraphData } from '@/lib/mock-graph-data';
@@ -23,6 +33,14 @@ import { DEV_MODE } from '@/lib/auth';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ResultType = 'transcript' | 'annotation' | 'concept' | 'course';
+
+interface SavedSearch {
+  id: string;
+  name: string;
+  query: string;
+  filters: string | null;
+  createdAt: string;
+}
 
 interface SearchResult {
   id: string;
@@ -197,11 +215,35 @@ export function SearchPage() {
     undefined
   );
 
+  // Saved searches state
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const [{ data: savedSearchesData }, refetchSavedSearches] = useQuery({
+    query: SAVED_SEARCHES_QUERY,
+    pause: !mounted,
+    requestPolicy: 'network-only',
+  });
+
+  const [, createSavedSearchMutation] = useMutation(CREATE_SAVED_SEARCH_MUTATION);
+  const [, deleteSavedSearchMutation] = useMutation(DELETE_SAVED_SEARCH_MUTATION);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [savedSearchName, setSavedSearchName] = useState('');
+  const [savingSearch, setSavingSearch] = useState(false);
+  const [showSavedPanel, setShowSavedPanel] = useState(false);
+
   // GraphQL semantic search (real mode)
   const [searchResult] = useQuery({
     query: SEARCH_SEMANTIC_QUERY,
     variables: { query, limit: 20 },
     pause: DEV_MODE || query.length < 2,
+  });
+
+  // Real course search — always active (not gated by DEV_MODE)
+  const [courseSearchResult] = useQuery({
+    query: SEARCH_COURSES_QUERY,
+    variables: { query, limit: 20 },
+    pause: query.length < 2,
   });
 
   // Debounce input
@@ -226,6 +268,13 @@ export function SearchPage() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Log course search errors
+  useEffect(() => {
+    if (courseSearchResult.error) {
+      console.error('[Search] Course search failed:', courseSearchResult.error.message);
+    }
+  }, [courseSearchResult.error]);
 
   // Map SemanticResult → SearchResult
   const realResults: SearchResult[] = (
@@ -255,14 +304,36 @@ export function SearchPage() {
   const isOfflineFallback =
     !DEV_MODE && !!searchResult.error && query.length >= 2;
 
-  // Build results: dev mode → mock, real mode with error → offline mock fallback, real mode ok → real
-  const results: SearchResult[] = DEV_MODE
-    ? mockSearch(query)
+  // Real course results (from DB) — always shown, never mocked
+  const courseResults: SearchResult[] = (
+    (courseSearchResult.data?.searchCourses ?? []) as Array<{
+      id: string;
+      title: string;
+      description: string | null;
+      slug: string;
+      isPublished: boolean;
+      estimatedHours: number | null;
+      thumbnailUrl: string | null;
+    }>
+  ).map((c) => ({
+    id: `course-${c.id}`,
+    type: 'course' as const,
+    title: c.title,
+    snippet: c.description ?? `Course: ${c.title}`,
+    meta: c.estimatedHours ? `${c.estimatedHours}h` : undefined,
+    href: `/courses/${c.id}`,
+  }));
+
+  // Non-course results: semantic (real) or mock (fallback/dev)
+  const nonCourseResults: SearchResult[] = DEV_MODE
+    ? mockSearch(query).filter((r) => r.type !== 'course')
     : isOfflineFallback
-      ? mockSearch(query)
+      ? mockSearch(query).filter((r) => r.type !== 'course')
       : realResults;
 
-  const loading = (!DEV_MODE && searchResult.fetching) || isSearching;
+  const results: SearchResult[] = [...courseResults, ...nonCourseResults];
+
+  const loading = (!DEV_MODE && searchResult.fetching) || courseSearchResult.fetching || isSearching;
 
   // Group by type
   const grouped = results.reduce<Partial<Record<ResultType, SearchResult[]>>>(
@@ -280,25 +351,78 @@ export function SearchPage() {
     'concept',
   ];
 
+  // Saved search handlers
+  const handleSaveSearch = async () => {
+    if (!savedSearchName.trim() || !query.trim()) return;
+    setSavingSearch(true);
+    try {
+      await createSavedSearchMutation({
+        input: { name: savedSearchName.trim(), query },
+      });
+      setSavedSearchName('');
+      setShowSaveModal(false);
+      refetchSavedSearches({ requestPolicy: 'network-only' });
+    } catch (err) {
+      console.error('[Search] Failed to save search:', err);
+    } finally {
+      setSavingSearch(false);
+    }
+  };
+
+  const handleDeleteSavedSearch = async (id: string) => {
+    await deleteSavedSearchMutation({ id });
+    refetchSavedSearches({ requestPolicy: 'network-only' });
+  };
+
+  const handleLoadSavedSearch = (saved: SavedSearch) => {
+    setSearchParams({ q: saved.query });
+    setShowSavedPanel(false);
+  };
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Search input */}
-        <div className="relative">
-          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <input
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') navigate(-1);
-            }}
-            placeholder={t('searchFullPlaceholder')}
-            className="w-full pl-12 pr-4 py-3 text-lg border-2 border-primary/30 rounded-xl bg-background focus:outline-none focus:border-primary transition-colors shadow-sm"
-          />
-          {loading && (
-            <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <input
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') navigate(-1);
+              }}
+              placeholder={t('searchFullPlaceholder')}
+              className="w-full pl-12 pr-4 py-3 text-lg border-2 border-primary/30 rounded-xl bg-background focus:outline-none focus:border-primary transition-colors shadow-sm"
+            />
+            {loading && (
+              <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+          </div>
+          {/* Saved search buttons */}
+          {query.length >= 2 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9"
+              title={t('saveSearch', 'Save Search')}
+              data-testid="save-search-btn"
+              onClick={() => { setSavedSearchName(query); setShowSaveModal(true); }}
+            >
+              <Bookmark className="h-4 w-4" />
+            </Button>
           )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            title={t('savedSearches', 'Saved Searches')}
+            data-testid="saved-searches-toggle"
+            onClick={() => setShowSavedPanel((prev) => !prev)}
+          >
+            <BookmarkCheck className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Offline fallback banner — shown instead of hard error, results still appear below */}
@@ -438,6 +562,93 @@ export function SearchPage() {
           </p>
         )}
       </div>
+
+      {/* Save Search Modal */}
+      {showSaveModal && (
+        <div
+          className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+          data-testid="save-search-modal"
+          onClick={(e) => e.target === e.currentTarget && setShowSaveModal(false)}
+        >
+          <div className="bg-background rounded-lg shadow-xl p-6 w-full max-w-sm mx-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">{t('saveSearch', 'Save Search')}</h3>
+              <Button variant="ghost" size="icon" onClick={() => setShowSaveModal(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <input
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              placeholder={t('savedSearchNamePlaceholder', 'Name this search...')}
+              value={savedSearchName}
+              onChange={(e) => setSavedSearchName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && void handleSaveSearch()}
+              data-testid="save-search-name-input"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowSaveModal(false)}>
+                {t('cancel', 'Cancel')}
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => void handleSaveSearch()}
+                disabled={savingSearch || !savedSearchName.trim()}
+                data-testid="save-search-confirm-btn"
+              >
+                {savingSearch ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                {t('save', 'Save')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Saved Searches Sidebar Panel */}
+      {showSavedPanel && (
+        <div
+          className="fixed right-0 top-0 h-full w-72 bg-background border-l shadow-xl z-40 flex flex-col"
+          data-testid="saved-searches-panel"
+        >
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="font-semibold text-sm">{t('savedSearches', 'Saved Searches')}</h3>
+            <Button variant="ghost" size="icon" onClick={() => setShowSavedPanel(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            {((savedSearchesData as { savedSearches?: SavedSearch[] })?.savedSearches ?? []).length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                {t('noSavedSearches', 'No saved searches yet')}
+              </p>
+            ) : (
+              ((savedSearchesData as { savedSearches?: SavedSearch[] })?.savedSearches ?? []).map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center gap-2 p-2 rounded-md hover:bg-muted cursor-pointer"
+                  data-testid="saved-search-item"
+                >
+                  <button
+                    className="flex-1 text-left text-sm truncate"
+                    onClick={() => handleLoadSavedSearch(s)}
+                  >
+                    {s.name}
+                  </button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 shrink-0"
+                    onClick={() => void handleDeleteSavedSearch(s.id)}
+                    data-testid="delete-saved-search-btn"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

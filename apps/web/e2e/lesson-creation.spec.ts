@@ -16,7 +16,7 @@
  *   4. Visual screenshot captures the error state
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { login } from './auth.helpers';
 import { BASE_URL } from './env';
 
@@ -221,6 +221,363 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
 
     await page.screenshot({
       path: 'test-results/screenshots/lesson-creation-step3.png',
+    });
+  });
+});
+
+// ── BUG-049 Regression: React "Cannot update a component while rendering" ──────
+//
+// Root cause: LessonDetailPage, LessonPipelinePage and LessonResultsPage all
+// subscribe to LESSON_QUERY via urql. When navigating between them, the
+// outgoing page's urql subscription was notified during the incoming page's
+// render phase, causing React's setState-during-render error.
+//
+// Fix: mounted guard — `pause: !mounted` defers the query until after the
+// component is committed to the DOM, preventing the race condition.
+
+const MOCK_LESSON_BUG049 = {
+  id: 'lesson-bug049',
+  title: 'שיעור בדיקת BUG-049',
+  type: 'SEQUENTIAL',
+  series: null,
+  lessonDate: '2024-03-01T00:00:00.000Z',
+  status: 'READY',
+  assets: [],
+  pipeline: {
+    id: 'pipeline-bug049',
+    status: 'COMPLETED',
+    nodes: [],
+    currentRun: {
+      id: 'run-bug049',
+      status: 'COMPLETED',
+      startedAt: null,
+      completedAt: null,
+      results: [],
+    },
+  },
+};
+
+const COURSE_ID_BUG049 = 'course-bug049';
+const LESSON_ID_BUG049 = 'lesson-bug049';
+const LESSON_DETAIL_URL = `${BASE_URL}/courses/${COURSE_ID_BUG049}/lessons/${LESSON_ID_BUG049}`;
+const LESSON_RESULTS_URL = `${BASE_URL}/courses/${COURSE_ID_BUG049}/lessons/${LESSON_ID_BUG049}/results`;
+
+/** Route all GraphQL calls to return a mock lesson response. */
+async function routeLessonQuery(page: Page): Promise<void> {
+  await page.route('**/graphql', async (route) => {
+    const body = (route.request().postDataJSON() ?? {}) as Record<string, unknown>;
+    const query = String(body.query ?? '');
+    if (query.includes('lesson(') || query.includes('lesson {') || query.includes('lesson\n')) {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({ data: { lesson: MOCK_LESSON_BUG049 } }),
+      });
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+test.describe('BUG-049 — mounted guard prevents React setState-during-render', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('BUG-049: LessonDetailPage renders lesson title without React error', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+        reactErrors.push(msg.text());
+      }
+    });
+
+    await routeLessonQuery(page);
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+    // Iron rule: React must NOT emit setState-during-render warning
+    expect(reactErrors).toHaveLength(0);
+  });
+
+  test('BUG-049: LessonResultsPage renders empty state without React error', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+        reactErrors.push(msg.text());
+      }
+    });
+
+    await routeLessonQuery(page);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+    expect(reactErrors).toHaveLength(0);
+  });
+
+  test('BUG-049: navigating LessonDetailPage → LessonResultsPage does NOT emit React render error', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        const text = msg.text();
+        if (text.includes('Cannot update a component') || text.includes('while rendering a different component')) {
+          reactErrors.push(text);
+        }
+      }
+    });
+
+    await routeLessonQuery(page);
+    // Navigate to detail page first (the sibling that may be slow to unmount)
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('domcontentloaded');
+    // Immediately navigate to results page — reproduces the BUG-049 race condition
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+
+    // KEY ASSERTION: zero React setState-during-render errors
+    expect(reactErrors).toHaveLength(0);
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 8_000 });
+  });
+
+  test('BUG-049: rapid consecutive navigation does not produce React "Cannot update" errors', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && msg.text().includes('Cannot update')) {
+        reactErrors.push(msg.text());
+      }
+    });
+
+    await routeLessonQuery(page);
+    // Stress test: rapidly navigate between all sibling lesson sub-pages
+    await page.goto(LESSON_DETAIL_URL);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('networkidle');
+
+    expect(reactErrors).toHaveLength(0);
+  });
+
+  test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({ page }) => {
+    await routeLessonQuery(page);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+
+    const bodyText = await page.textContent('body');
+    expect(bodyText).not.toContain('Cannot update a component');
+    expect(bodyText).not.toContain('[object Object]');
+    expect(bodyText).not.toContain('while rendering a different component');
+  });
+
+  test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({ page }) => {
+    await routeLessonQuery(page);
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+
+    await page.screenshot({
+      path: 'test-results/screenshots/bug-049-lesson-detail-clean.png',
+    });
+  });
+
+  test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({ page }) => {
+    await routeLessonQuery(page);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+
+    await page.screenshot({
+      path: 'test-results/screenshots/bug-049-lesson-results-empty-clean.png',
+    });
+  });
+});
+
+// ── BUG-049 Regression: React "Cannot update a component while rendering" ──────
+//
+// Root cause: LessonDetailPage, LessonPipelinePage and LessonResultsPage all
+// subscribe to LESSON_QUERY via urql. When navigating between them, the
+// outgoing page's urql subscription was notified during the incoming page's
+// render phase, causing React's setState-during-render error.
+//
+// Fix: mounted guard — `pause: !mounted` defers the query until after the
+// component is committed to the DOM, preventing the race condition.
+//
+// These tests verify the fix holds via:
+//   1. Console error interception (no "Cannot update a component" error)
+//   2. Visual screenshots showing clean UI (no error overlay)
+//   3. Stress test with rapid consecutive navigation
+
+const MOCK_LESSON_BUG049 = {
+  id: 'lesson-bug049',
+  title: 'שיעור בדיקת BUG-049',
+  type: 'SEQUENTIAL',
+  series: null,
+  lessonDate: '2024-03-01T00:00:00.000Z',
+  status: 'READY',
+  assets: [],
+  pipeline: {
+    id: 'pipeline-bug049',
+    status: 'COMPLETED',
+    nodes: [],
+    currentRun: {
+      id: 'run-bug049',
+      status: 'COMPLETED',
+      startedAt: null,
+      completedAt: null,
+      results: [],
+    },
+  },
+};
+
+const COURSE_ID_BUG049 = 'course-bug049';
+const LESSON_ID_BUG049 = 'lesson-bug049';
+const LESSON_DETAIL_URL = `${BASE_URL}/courses/${COURSE_ID_BUG049}/lessons/${LESSON_ID_BUG049}`;
+const LESSON_RESULTS_URL = `${BASE_URL}/courses/${COURSE_ID_BUG049}/lessons/${LESSON_ID_BUG049}/results`;
+
+/** Route all GraphQL calls to return a mock lesson response. */
+async function routeLessonQuery(page: Page): Promise<void> {
+  await page.route('**/graphql', async (route) => {
+    const body = (route.request().postDataJSON() ?? {}) as Record<string, unknown>;
+    const query = String(body.query ?? '');
+    if (query.includes('lesson(') || query.includes('lesson {') || query.includes('lesson\n')) {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({ data: { lesson: MOCK_LESSON_BUG049 } }),
+      });
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+test.describe('BUG-049 — mounted guard prevents React setState-during-render', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('BUG-049: LessonDetailPage renders lesson title without React error', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+        reactErrors.push(msg.text());
+      }
+    });
+
+    await routeLessonQuery(page);
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+    // Iron rule: React must NOT emit setState-during-render warning
+    expect(reactErrors).toHaveLength(0);
+  });
+
+  test('BUG-049: LessonResultsPage renders empty state without React error', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && msg.text().includes('Cannot update a component')) {
+        reactErrors.push(msg.text());
+      }
+    });
+
+    await routeLessonQuery(page);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+    expect(reactErrors).toHaveLength(0);
+  });
+
+  test('BUG-049: navigating LessonDetailPage → LessonResultsPage does NOT emit React render error', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        const text = msg.text();
+        if (text.includes('Cannot update a component') || text.includes('while rendering a different component')) {
+          reactErrors.push(text);
+        }
+      }
+    });
+
+    await routeLessonQuery(page);
+    // Navigate to detail page first (the sibling that may be slow to unmount)
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('domcontentloaded');
+    // Immediately navigate to results page — reproduces the BUG-049 race condition
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+
+    // KEY ASSERTION: zero React setState-during-render errors
+    expect(reactErrors).toHaveLength(0);
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 8_000 });
+  });
+
+  test('BUG-049: rapid consecutive navigation does not produce React "Cannot update" errors', async ({ page }) => {
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && msg.text().includes('Cannot update')) {
+        reactErrors.push(msg.text());
+      }
+    });
+
+    await routeLessonQuery(page);
+    // Stress test: rapidly navigate between all sibling lesson sub-pages
+    await page.goto(LESSON_DETAIL_URL);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('networkidle');
+
+    expect(reactErrors).toHaveLength(0);
+  });
+
+  test('BUG-049: LessonResultsPage body does NOT contain raw React error strings', async ({ page }) => {
+    await routeLessonQuery(page);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+
+    const bodyText = await page.textContent('body');
+    expect(bodyText).not.toContain('Cannot update a component');
+    expect(bodyText).not.toContain('[object Object]');
+    expect(bodyText).not.toContain('while rendering a different component');
+  });
+
+  test('BUG-049: CreateLessonPage shows auth error when user session is null', async ({ page }) => {
+    // Simulate a page where auth returns null (session expired) by manipulating sessionStorage
+    await page.addInitScript(() => {
+      // Clear dev auth so getCurrentUser returns null
+      sessionStorage.removeItem('edusphere_dev_logged_in');
+    });
+
+    await routeLessonQuery(page);
+    await page.goto(`${BASE_URL}/courses/course-1/lessons/new`);
+    await page.waitForLoadState('networkidle');
+
+    // Even unauthenticated, the wizard page should load (auth check is at mutation time)
+    // The "יצירת שיעור חדש" heading or a redirect should be visible
+    const isOnWizard = await page.getByText('יצירת שיעור חדש').isVisible().catch(() => false);
+    const isRedirected = page.url().includes('/login') || page.url().includes('/learn');
+    expect(isOnWizard || isRedirected).toBe(true);
+  });
+
+  test('visual — BUG-049 LessonDetailPage screenshot (clean, no error overlay)', async ({ page }) => {
+    await routeLessonQuery(page);
+    await page.goto(LESSON_DETAIL_URL);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('שיעור בדיקת BUG-049')).toBeVisible({ timeout: 10_000 });
+
+    await page.screenshot({
+      path: 'test-results/screenshots/bug-049-lesson-detail-clean.png',
+    });
+  });
+
+  test('visual — BUG-049 LessonResultsPage screenshot (empty state, no error overlay)', async ({ page }) => {
+    await routeLessonQuery(page);
+    await page.goto(LESSON_RESULTS_URL);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(/אין תוצאות עדיין/)).toBeVisible({ timeout: 10_000 });
+
+    await page.screenshot({
+      path: 'test-results/screenshots/bug-049-lesson-results-empty-clean.png',
     });
   });
 });

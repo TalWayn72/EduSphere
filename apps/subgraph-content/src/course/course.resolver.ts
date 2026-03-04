@@ -78,6 +78,16 @@ export class CourseResolver {
     return this.courseService.findAll(limit, offset);
   }
 
+  @Query('searchCourses')
+  async searchCourses(
+    @Args('query') query: string,
+    @Args('limit') limit: number,
+    @Context() ctx: GqlContext
+  ) {
+    requireAuth(ctx);
+    return this.courseService.search(query, limit);
+  }
+
   @Mutation('createCourse')
   async createCourse(
     @Args('input') input: Record<string, unknown>,
@@ -121,6 +131,19 @@ export class CourseResolver {
   async deleteCourse(@Args('id') id: string, @Context() ctx: GqlContext) {
     requireAuth(ctx);
     return this.courseService.delete(id);
+  }
+
+  @Mutation('forkCourse')
+  async forkCourse(
+    @Args('courseId') courseId: string,
+    @Context() ctx: GqlContext
+  ) {
+    const tenantCtx = requireAuth(ctx);
+    return this.courseService.forkCourse(
+      courseId,
+      tenantCtx.userId,
+      tenantCtx.tenantId
+    );
   }
 
   // ── Enrollment ───────────────────────────────────────────────

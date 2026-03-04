@@ -281,3 +281,28 @@ export const CREATE_CONTENT_ITEM_MUTATION = gql`
     }
   }
 `;
+
+export const FORK_COURSE_MUTATION = gql`
+  mutation ForkCourse($courseId: ID!) {
+    forkCourse(courseId: $courseId) {
+      id
+      title
+      slug
+      forkedFromId
+    }
+  }
+`;
+
+export const SEARCH_COURSES_QUERY = gql`
+  query SearchCourses($query: String!, $limit: Int) {
+    searchCourses(query: $query, limit: $limit) {
+      id
+      title
+      description
+      slug
+      isPublished
+      estimatedHours
+      thumbnailUrl
+    }
+  }
+`;

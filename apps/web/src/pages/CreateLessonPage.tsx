@@ -20,7 +20,6 @@ import { CreateLessonStep2 } from './CreateLessonPage.step2';
 export interface LessonFormData {
   title: string;
   type: 'THEMATIC' | 'SEQUENTIAL';
-  series: string;
   lessonDate: string;
 }
 
@@ -40,8 +39,7 @@ export function CreateLessonPage() {
   const [formData, setFormData] = useState<LessonFormData>({
     title: '',
     type: 'THEMATIC',
-    series: '',
-    lessonDate: '',
+    lessonDate: new Date().toISOString().split('T')[0] ?? '',
   });
   const [selectedTemplate, setSelectedTemplate] = useState<
     'THEMATIC' | 'SEQUENTIAL' | null
@@ -60,13 +58,16 @@ export function CreateLessonPage() {
   };
 
   const handleCreateLesson = async () => {
-    if (!courseId || !user) return;
+    if (!courseId || !user) {
+      setError('שגיאת אימות: יש להתחבר מחדש כדי ליצור שיעור');
+      console.error('[CreateLessonPage] createLesson blocked: missing courseId or user', { courseId, hasUser: Boolean(user) });
+      return;
+    }
     const { data, error: mutError } = await createLesson({
       input: {
         courseId,
         title: formData.title,
         type: formData.type,
-        series: formData.series || undefined,
         lessonDate: formData.lessonDate || undefined,
         instructorId: user.id,
       },
@@ -137,7 +138,7 @@ export function CreateLessonPage() {
                 }`}
                 onClick={() => setSelectedTemplate('THEMATIC')}
               >
-                <h3 className="font-semibold text-lg mb-1">🎯 שיעור הגות</h3>
+                <h3 className="font-semibold text-lg mb-1">🎯 שיעור כללי</h3>
                 <p className="text-sm text-gray-600">
                   נושא נקבע ע&quot;י המרצה — 8 שלבי עיבוד
                 </p>

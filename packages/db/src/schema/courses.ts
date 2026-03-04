@@ -25,6 +25,7 @@ export const courses = pgTable('courses', {
     .references(() => users.id),
   isPublished: boolean('is_published').notNull().default(false),
   estimatedHours: integer('estimated_hours'),
+  forkedFromId: uuid('forked_from_id'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
@@ -42,6 +43,7 @@ CREATE INDEX idx_courses_tenant ON courses(tenant_id);
 CREATE INDEX idx_courses_instructor ON courses(instructor_id);
 CREATE INDEX idx_courses_published ON courses(is_published);
 CREATE UNIQUE INDEX idx_courses_tenant_slug ON courses(tenant_id, slug);
+CREATE INDEX idx_courses_forked_from ON courses(forked_from_id);
 `;
 
 export type Course = typeof courses.$inferSelect;

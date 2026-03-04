@@ -87,6 +87,31 @@ describe('LessonDetailPage', () => {
     vi.mocked(urql.useQuery).mockReturnValue(makeQuery());
   });
 
+  // ── BUG-049 regression: mounted guard prevents setState-during-render ────────
+  it('BUG-049: renders without React "Cannot update a component while rendering" error', () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((msg: unknown) => {
+      if (typeof msg === 'string' && msg.includes('Cannot update a component')) {
+        throw new Error(`React render violation: ${msg}`);
+      }
+    });
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    consoleErrorSpy.mockRestore();
+  });
+
+  // ── BUG-049 regression: content visible after effects flush ──────────────────
+  it('BUG-049: shows lesson title after mounted guard resolves', () => {
+    render(
+      <MemoryRouter>
+        <LessonDetailPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('שיעור ראשון בעץ חיים')).toBeInTheDocument();
+  });
+
   it('shows loading spinner while fetching', () => {
     vi.mocked(urql.useQuery).mockReturnValue(
       makeQuery({ fetching: true, data: undefined })

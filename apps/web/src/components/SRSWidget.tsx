@@ -1,6 +1,15 @@
 /**
  * SRSWidget — Dashboard card showing the spaced-repetition review queue.
  * Displays count of due cards and an inline review session when started.
+ *
+ * React 19 concurrent-mode safety: both useQuery calls are deferred until
+ * after the first render (mounted guard). Without this guard, urql's
+ * graphcache synchronously dispatches state updates across component
+ * boundaries during rendering, causing React's "Cannot update a component
+ * while rendering a different component" error. Both SRSWidget and Layout
+ * (via useSrsQueueCount) subscribe to SRS_QUEUE_COUNT_QUERY — the mounted
+ * guard prevents mutual setState-during-render errors between them.
+ * Same fix pattern: useCourseNavigation.ts, useSrsQueueCount.ts.
  */
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from 'urql';
@@ -31,32 +40,40 @@ type WidgetMode = 'idle' | 'reviewing';
 export function SRSWidget() {
   const [mode, setMode] = useState<WidgetMode>('idle');
   const pauseRef = useRef(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      pauseRef.current = true;
+    };
+  }, []);
 
   const [countResult, refetchCount] = useQuery<SrsQueueCountResult>({
     query: SRS_QUEUE_COUNT_QUERY,
-    pause: false,
+    pause: !mounted,
   });
 
   const [reviewsResult] = useQuery<DueReviewsResult>({
     query: DUE_REVIEWS_QUERY,
     variables: { limit: 50 },
-    pause: mode !== 'reviewing',
+    pause: !mounted || mode !== 'reviewing',
   });
 
   const [, createCard] = useMutation<CreateCardResult>(
     CREATE_REVIEW_CARD_MUTATION
   );
 
-  // Pause subscription on unmount to avoid dangling requests
-  useEffect(() => {
-    return () => {
-      pauseRef.current = true;
-    };
-  }, []);
+  if (countResult.error) {
+    console.error(
+      '[SRSWidget] GraphQL error fetching queue count:',
+      countResult.error.message
+    );
+  }
 
   const queueCount = countResult.data?.srsQueueCount ?? 0;
   const cards = reviewsResult.data?.dueReviews ?? [];
-  const loading = countResult.fetching;
+  const loading = !mounted || countResult.fetching;
 
   const handleStartReview = () => {
     setMode('reviewing');

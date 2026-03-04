@@ -146,6 +146,7 @@
 | Every `setTimeout` inside a component MUST be stored in `useRef` and cleared in `useEffect` cleanup | Same pattern                                                                              |
 | NEVER `return () => cleanup()` inside `useCallback` — the return value is **discarded** by React    | Use `useEffect` for cleanup instead                                                       |
 | GraphQL subscriptions (`useSubscription`) MUST use `pause: true` flag tied to component mount state | `const [paused, setPaused] = useState(false); useEffect(() => () => setPaused(true), [])` |
+| `useQuery` in React Router sibling routes sharing a query (e.g. Lesson Detail/Pipeline/Results) MUST use mounted guard to prevent urql cache dispatch during sibling render | `const [mounted, setMounted] = useState(false); useEffect(() => { setMounted(true); }, []); useQuery({ pause: !mounted })` |
 | Module-level WebSocket clients MUST be disposed on `window.beforeunload`                            | `window.addEventListener('beforeunload', () => client.dispose())`                         |
 
 ### Infrastructure Rules
@@ -678,41 +679,106 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 ## Bug Fix Protocol
 
-### Phase 1 — Discovery
+### Phase 1 — Discovery (MANDATORY — do not skip any step)
 
 1. **Read logs first** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console
 2. **If no logs exist** - Add Pino logging (`this.logger.error(...)`) as part of the fix so the bug becomes observable
 3. **Reproduce** - Write a failing test that reproduces the bug before touching any fix code
 4. **Identify root cause** - Trace the full call chain; document the exact line(s) that cause the failure
-5. **Wide pattern search (MANDATORY)** - After identifying the root cause pattern, grep/search the ENTIRE codebase for:
-   - The same pattern (exact match)
-   - Slight variations (e.g., same logic with different variable names, same hook with different parameters, same component structure in other pages)
-   - Related patterns that share the same class of bug (e.g., if bug is "no cleanup on unmount", search ALL `setInterval`/`setTimeout` usages)
-   - Build a **Discovery List** of every affected file before writing a single fix
+5. **Wide pattern search — DISCOVERY WAVES (MANDATORY, never skip):**
 
-### Phase 2 — Fix Rounds
+   After identifying the root cause pattern, execute **3 search waves** before writing a single line of fix code:
 
-Execute one round per logical grouping of similar issues. **A round is NOT done until:**
-- `pnpm turbo test` passes 100% for affected packages
-- Visual browser verification passes (if UI change)
-- New regression tests are written and green
+   **Wave 1 — Exact match:** Grep for the exact code pattern (string, function name, API call, class structure) across the entire codebase.
+
+   **Wave 2 — MANDATORY SIMILARITY SEARCH (NEVER SKIP — "שוני מסויים"):**
+   After finding the root cause pattern, STOP and execute ALL of the following before writing any fix code:
+
+   MANDATORY CHECKLIST (mark each ✓ as you complete it):
+   □ Every file in `apps/web/src/pages/` — checked for same anti-pattern
+   □ Every file in `apps/web/src/hooks/` — checked for same anti-pattern
+   □ Every file in `apps/web/src/components/` — checked for same anti-pattern
+   □ Every screen in `apps/mobile/src/` — checked for same anti-pattern
+   □ Every service in ALL 6 backend subgraphs — checked if bug is server-side
+   □ All resolver files across all subgraphs — checked for same pattern
+   □ Mobile equivalent of affected web component — explicitly checked
+
+   This includes ALL variation types:
+   - Same hook/function with **different variable names**
+   - Same pattern with **different prop signatures**
+   - Same anti-pattern in **parallel/sibling pages**
+   - Same bug in **mobile screens**
+   - Same logic in **different subgraphs** if cross-cutting
+
+   Build a numbered **DISCOVERY LIST** before writing a single line of fix code.
+   Wave 2 is NOT complete until every checkbox above is ✓.
+
+   **Wave 3 — Class of bug:** Search for all usages of the same API or pattern class. Examples:
+   - If bug is "no cleanup on unmount" → grep ALL `setInterval`/`setTimeout`/`useSubscription` usages
+   - If bug is "raw error.message in UI" → grep ALL places where `.message` or `error.message` is rendered
+   - If bug is "stale urql cache" → grep ALL `useQuery`/`useFragment` reads after mutations
+   - If bug is "missing try/catch" → grep ALL async service methods
+
+   **Build a Discovery List** — a numbered list of every affected file + the exact issue in that file. This list MUST be documented before any fix code is written. The bug is NOT finished until EVERY item on the Discovery List is fixed.
+
+### Phase 2 — Fix Rounds (one round per Wave group)
+
+Execute one fix round per logical grouping of similar issues. **A round is NEVER done until ALL of the following pass:**
+- `pnpm turbo test` passes 100% for ALL affected packages (not just the one you changed)
+- Visual browser verification passes (if UI change) — open DevTools, reproduce the original failure scenario, confirm clean UI
+- New regression tests are green (at least one unit test + one E2E test per round)
+- Zero new TypeScript errors (`pnpm turbo typecheck`)
+- Pino/console.error logging is in place so the bug would be visible in logs if it recurred
 
 **Round structure:**
 - **Round 1**: Fix the original bug + add missing logging
-- **Round 2**: Fix all similar issues found in the wide pattern search (other pages/components with variations)
-- **Round N**: Continue rounds until the Discovery List is empty and grep returns zero matches for the bug pattern
-- Each round must NOT introduce new TypeScript errors (`pnpm turbo typecheck`)
+- **Round 2**: Fix all similar issues found in Wave 2 (other pages/components with variations)
+- **Round 3**: Fix all class-of-bug issues found in Wave 3 (if different from Round 2 items)
+- **Round N**: Continue until the Discovery List is 100% empty and grep returns zero matches for the bug pattern outside of test files
 
-**Required tests per round (for UI bugs):**
+**Round Completion Gate (MANDATORY after EVERY fix round):**
+A round is NOT done until ALL of the following pass:
+1. `pnpm turbo test` passes 100% for ALL affected packages (not just the one you changed)
+2. `pnpm turbo typecheck` — zero TypeScript errors
+3. Visual browser verification — open DevTools, reproduce failure, confirm clean UI
+4. New regression test: asserts the BAD string/state is GONE (not just the fix is present)
+5. Console.error/Pino log added so bug is observable if it recurs in production
+6. `./scripts/health-check.sh` — all services PASS
+7. All 5 test users can authenticate successfully:
+   | User | Role | Password |
+   |------|------|----------|
+   | superadmin@example.com | SUPER_ADMIN | SuperAdmin123! |
+   | instructor@example.com | INSTRUCTOR | Instructor123! |
+   | orgadmin@example.com | ORG_ADMIN | OrgAdmin123! |
+   | researcher@example.com | RESEARCHER | Researcher123! |
+   | student@example.com | STUDENT | Student123! |
+
+**Required output per round (non-negotiable):**
 - Unit test asserting the CORRECT behavior is now present
-- Unit test asserting the BAD behavior is GONE (regression guard — explicitly test the bad string/state is absent)
+- Unit test asserting the BAD behavior is GONE (regression guard — explicitly test that the bad string/state is absent)
 - **Playwright E2E test** with `page.route()` interception or mock to reproduce the bug scenario + `expect(element).not.toContainText(badString)` assertion
 - Screenshot assertion (`expect(page).toHaveScreenshot(...)`) for visual regressions
+- Console.error/Pino log call so the bug is observable if it recurs in production
+
+**Deployment verification (required at end of EVERY round):**
+After all unit + E2E tests pass, run the local deployment health check and verify all 5 users:
+```bash
+./scripts/health-check.sh   # All services must pass
+```
+| User | Role | Password |
+|------|------|----------|
+| superadmin@example.com | SUPER_ADMIN | SuperAdmin123! |
+| instructor@example.com | INSTRUCTOR | Instructor123! |
+| orgadmin@example.com | ORG_ADMIN | OrgAdmin123! |
+| researcher@example.com | RESEARCHER | Researcher123! |
+| student@example.com | STUDENT | Student123! |
+
+A round is **not complete** until health-check passes AND all 5 users can authenticate.
 
 ### Phase 3 — Verification
 
 6. **Full test suite** - `pnpm turbo test -- --coverage` must pass 100%
-7. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino/console.error with structured prefix)
+7. **Logging verification** - Confirm that if the bug were to recur, it would appear in logs (Pino/console.error with structured prefix `[ServiceName]` or `[ComponentName]`)
 8. **Visual check (MANDATORY for UI bugs)** - Open browser, reproduce the original scenario (e.g., block the GraphQL endpoint with DevTools → Network → Block Request URL), confirm the correct fallback UI is shown without raw technical strings. Take a screenshot and compare.
 9. **Health check** - `./scripts/health-check.sh` passes
 10. **Pattern clean** - grep for the bug pattern returns zero matches outside of test files
@@ -723,16 +789,21 @@ Execute one round per logical grouping of similar issues. **A round is NOT done 
 12. **Document** in `OPEN_ISSUES.md`:
     - Status: 🔴 Open → 🟡 In Progress → ✅ Fixed
     - Severity: 🔴 Critical / 🟡 Medium / 🟢 Low
-    - Files affected (including ALL rounds), problem, root cause chain, solution per round, tests added
+    - Files affected per round (all 3 waves), problem, root cause chain, solution per round, tests added
     - **Anti-recurrence note**: what prevents this from happening again (the regression test file:line that would catch it)
+    - **Discovery List**: the complete list of affected files found in each wave
 
 **IRON RULES (never violate):**
 - Never fix a bug without reading the logs first. No logs = part of the bug.
-- Never declare a bug fixed until the entire Discovery List is empty.
+- Never declare a bug fixed until the entire Discovery List is empty (all 3 waves exhausted).
 - Never close a bug without a regression test that would catch it if it returns.
-- Never leave logging gaps — the bug must be observable in logs if it recurs.
+- Never leave logging gaps — the bug must be observable in logs if it recurs (Pino error + structured context).
 - **UI bugs must have a Playwright E2E test that simulates the failure and asserts the UI is clean.** A bug that shows ugly technical errors to users is NOT fixed until a Playwright test guards against the ugly message reappearing.
-- Only report completion when ALL rounds are done, all tests pass, and grep shows zero recurrence patterns.
+- **Never report completion after fixing only the original file.** Always complete all 3 discovery waves and all fix rounds first.
+- Only report completion when ALL rounds are done, all tests pass, grep shows zero recurrence patterns, and OPEN_ISSUES.md is updated.
+- **Every Pino/console.error logging MUST include structured context:** `[ServiceName]` or `[ComponentName]` prefix + `tenantId` + `userId` where applicable. A bug that cannot be observed in logs is NOT fixed.
+- **Never report completion after fixing only the file that was reported.** Always complete all 3 discovery waves first.
+- **Round Completion Gate is mandatory after EVERY round** — never skip health-check.sh or 5-user verification.
 
 ## Parallel Execution (Agents)
 

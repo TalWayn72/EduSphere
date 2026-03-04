@@ -1,7 +1,7 @@
 # EduSphere Product Requirements Document (PRD)
 
-**Version:** 1.0
-**Last Updated:** February 22, 2026
+**Version:** 2.0
+**Last Updated:** March 4, 2026
 **Document Owner:** Product Management
 **Status:** Active
 
@@ -13,6 +13,25 @@
 2. [Product Vision & Mission](#2-product-vision--mission)
 3. [Target Users & Personas](#3-target-users--personas)
 4. [Core Features](#4-core-features)
+   - 4.1 Content Management
+   - 4.2 Annotation System
+   - 4.3 Collaboration
+   - 4.4 AI Agents
+   - 4.5 Knowledge Graph
+   - 4.6 Multi-Language Support
+   - 4.7 Search & Discovery
+   - 4.8 Gamification & Engagement *(new)*
+   - 4.9 Standards & Integrations *(new)*
+   - 4.10 Professional Development *(new)*
+   - 4.11 Enterprise Administration *(new)*
+   - 4.12 Monetization & Marketplace *(new)*
+   - 4.13 White-Label & Customization *(new)*
+   - 4.14 Learning Pathways & Programs *(new)*
+   - 4.15 Spaced Repetition System *(new)*
+   - 4.16 Extended Content Types *(new)*
+   - 4.17 Assessment & Academic Integrity *(new)*
+   - 4.18 Social & Community *(new)*
+   - 4.19 Live Sessions *(new)*
 5. [User Stories](#5-user-stories)
 6. [Technical Requirements](#6-technical-requirements)
 7. [Success Metrics & KPIs](#7-success-metrics--kpis)
@@ -30,11 +49,15 @@ EduSphere is a next-generation educational platform that leverages knowledge gra
 **Key Differentiators:**
 
 - **Knowledge Graph-Native Learning**: Every concept, annotation, and piece of content is connected in a semantic graph, enabling discovery of relationships, contradictions, and prerequisites
-- **AI-Powered Learning Companions**: Multiple AI agent templates (Chavruta debate partner, quiz master, research scout) adapt to individual learning styles
+- **AI-Powered Learning Companions**: Multiple AI agent templates (Chavruta debate partner, quiz master, research scout, explainer, course generator, roleplay) adapt to individual learning styles
 - **HybridRAG Architecture**: Combines vector semantic search with graph traversal for contextually rich AI responses
 - **Multi-Layer Annotation System**: Personal, shared, instructor, and AI-generated annotation layers support collaborative learning
 - **Real-Time Collaboration**: CRDT-based collaborative editing with presence awareness
 - **Enterprise-Grade Multi-Tenancy**: Built from the ground up for 100,000+ concurrent users with tenant isolation
+- **Full LMS Ecosystem**: SCORM 1.2, LTI 1.3, xAPI, SCIM 2.0, OpenBadges 3.0 — enterprise-grade interoperability standards
+- **Gamification & Engagement**: XP system, custom badges, leaderboards, and spaced repetition (SM-2) to drive learning motivation
+- **Marketplace & Monetization**: Built-in instructor earnings model, course marketplace, and CPD tracking
+- **White-Label Ready**: Portal builder, custom branding, and tenant domain management for institutional deployments
 
 ### 1.2 Business Context
 
@@ -317,12 +340,13 @@ Annotations are not flat comments but structured, layered contributions:
 
 | Feature                 | Description                                                                              | User Roles            | Priority |
 | ----------------------- | ---------------------------------------------------------------------------------------- | --------------------- | -------- |
-| **Course Creation**     | Create courses with title, description, structured syllabus (JSON tree), version control | Instructor, Org Admin | P0       |
-| **Module Organization** | Organize courses into modules with drag-and-drop reordering                              | Instructor            | P0       |
-| **Course Publishing**   | Toggle course visibility (draft vs. published for students)                              | Instructor            | P0       |
-| **Course Forking**      | Clone a course while maintaining lineage link to original                                | Instructor            | P1       |
-| **Versioning**          | Monotonically increasing version numbers with change tracking                            | Instructor            | P1       |
-| **Tags & Metadata**     | Categorize courses with searchable tags and custom metadata                              | Instructor, Org Admin | P1       |
+| **Course Creation**      | Create courses with title, description, structured syllabus (JSON tree), version control | Instructor, Org Admin | P0       |
+| **Inline Title Editing** | Edit course title in-place from the course detail page (Enter to save, Escape to cancel) | Instructor            | P1       |
+| **Module Organization**  | Organize courses into modules with drag-and-drop reordering                              | Instructor            | P0       |
+| **Course Publishing**    | Toggle course visibility (draft vs. published for students)                              | Instructor            | P0       |
+| **Course Forking**       | Clone a course while maintaining lineage link to original                                | Instructor            | P1       |
+| **Versioning**           | Monotonically increasing version numbers with change tracking                            | Instructor            | P1       |
+| **Tags & Metadata**      | Categorize courses with searchable tags and custom metadata                              | Instructor, Org Admin | P1       |
 
 #### 4.1.2 Media Asset Management
 
@@ -346,6 +370,21 @@ Annotations are not flat comments but structured, layered contributions:
 | **Language Detection**        | Automatic ISO 639-1 language code detection                                   | System     | P1       |
 | **Speaker Diarization**       | Tag segments with speaker identifiers                                         | System     | P1       |
 | **Embedding Generation**      | Auto-generate pgvector embeddings (768-dim nomic-embed-text) for each segment | System     | P0       |
+
+#### 4.1.4 Lesson Creation Wizard
+
+A 3-step wizard guides instructors through creating a new lesson and attaching it to an AI processing pipeline.
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Step 1 — Lesson Details** | Title (min 3 chars), lesson type, and date; date auto-fills with today | Instructor | P0 |
+| **Lesson Type: כללי (THEMATIC)** | General thematic lesson — not tied to a sequential text; 8-stage pipeline | Instructor | P0 |
+| **Lesson Type: על הסדר (SEQUENTIAL)** | Sequential text study (e.g. Etz Chaim) — 9 stages + citation validation | Instructor | P0 |
+| **Step 2 — Assets** | Upload or link audio/video/PDF files as lesson source material | Instructor | P0 |
+| **Step 3 — Pipeline Template** | Choose pre-configured pipeline template matching the lesson type | Instructor | P0 |
+| **Auto-fill Date** | Lesson date defaults to today; instructor can override | Instructor | P1 |
+
+> **Note:** The "סדרת שיעורים" (lesson series) field was removed — a lesson's series context is inherited from its parent course.
 
 ---
 
@@ -442,6 +481,21 @@ Annotations are not flat comments but structured, layered contributions:
 | **Rate Limiting**       | Per-tenant execution quotas enforced at gateway         | P0       |
 | **Timeout Enforcement** | Execution killed after plan-specific timeout (30s–300s) | P0       |
 | **Memory Limits**       | Plan-specific memory caps (256MB–2GB)                   | P1       |
+
+#### 4.4.4 AI Pipeline Configuration
+
+Per-node configuration panel for the lesson processing pipeline, accessible from the Pipeline Builder UI.
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Per-Node Config Panel** | Slide-in settings panel per pipeline node; changes reflected immediately in pipeline state | Instructor | P0 |
+| **Content Language** | Language selector for INGESTION node; defaults to user's current UI language; persisted in `localStorage` across sessions | Instructor | P1 |
+| **File Upload from Device** | Upload audio/video/PDF/DOCX directly from local device as pipeline source (in addition to selecting from lesson assets) | Instructor | P1 |
+| **Quality Threshold** | Slider (0–100%) for QA_GATE node minimum passing score; includes ⓘ tooltip with plain-language explanation | Instructor | P1 |
+| **Strict Citation Mode** | Toggle for SEQUENTIAL pipelines to reject AI output containing unverified citations | Instructor | P1 |
+| **Summarization Style** | Choose Academic / Friendly / Brief output style for SUMMARIZATION node | Instructor | P1 |
+| **Diagram Type** | Choose Mindmap / Flowchart / Graph-of-relations for DIAGRAM node | Instructor | P2 |
+| **ASR Language** | Override transcription language for ASR node | Instructor | P1 |
 
 ---
 
@@ -559,9 +613,410 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 ---
 
+### 4.8 Gamification & Engagement
+
+**Status:** ✅ Implemented
+
+EduSphere includes a full gamification layer to drive intrinsic motivation through extrinsic rewards.
+
+#### 4.8.1 XP & Points System
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **XP Earning** | Points awarded for completing lessons, annotations, quizzes, collaboration | All authenticated | P1 |
+| **XP Configuration** | Org Admin configures XP rules per activity type | Org Admin | P1 |
+| **XP Leaderboard** | Top 50 users by XP per tenant | All authenticated | P1 |
+| **XP History** | Per-user XP audit trail with activity breakdown | All authenticated | P2 |
+
+#### 4.8.2 Badge System
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Custom Badge Definitions** | Org Admin creates badges with name, icon, criteria | Org Admin | P1 |
+| **Automatic Badge Awards** | System triggers badge award on criteria fulfillment | System | P1 |
+| **Badge Gallery** | User's earned badges displayed on profile | All authenticated | P1 |
+| **OpenBadges 3.0 Export** | Badges issued as verifiable credentials (see §4.9.4) | All authenticated | P1 |
+
+#### 4.8.3 Spaced Repetition (SRS)
+
+| Feature | Description | Technology | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **SM-2 Algorithm** | SuperMemo 2 spaced repetition scheduling | Custom implementation | P1 |
+| **Flashcard Review** | Daily review queue based on SM-2 schedule | SrsReviewPage | P1 |
+| **Deck Management** | Create custom flashcard decks from course content | Student | P1 |
+| **Review Analytics** | Track retention rates and review history | Student | P2 |
+
+---
+
+### 4.9 Standards & Integrations
+
+**Status:** ✅ Implemented
+
+EduSphere supports all major eLearning interoperability standards to enable enterprise adoption.
+
+#### 4.9.1 LTI 1.3 (Learning Tools Interoperability)
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **LTI Platform Registration** | Register EduSphere as LTI 1.3 platform | Org Admin | P1 |
+| **Deep Link Launch** | LTI deep-link content selection flow | System | P1 |
+| **Grade Passback** | AGS (Assignment and Grade Services) passback | System | P2 |
+| **Course Roster Sync** | NRPS (Names and Roles Provisioning Services) | System | P2 |
+
+#### 4.9.2 SCORM Support
+
+| Feature | Description | Standard | Priority |
+| ------- | ----------- | -------- | -------- |
+| **SCORM 1.2 Ingestion** | Upload and parse SCORM 1.2 packages | SCORM 1.2 | P1 |
+| **CMI Data Tracking** | Track cmi.core.lesson_status, score, time | SCORM 1.2 | P1 |
+| **SCORM Player** | In-browser SCORM content viewer | ScormContentViewer | P1 |
+| **Completion Reporting** | Sync SCORM completion to course progress | System | P1 |
+
+#### 4.9.3 xAPI (Experience API / Tin Can)
+
+| Feature | Description | Standard | Priority |
+| ------- | ----------- | -------- | -------- |
+| **Statement Generation** | Generate xAPI statements for learning events | xAPI 1.0.3 | P2 |
+| **LRS Integration** | Send statements to external Learning Record Store | xAPI 1.0.3 | P2 |
+| **Statement Templates** | Configurable statement templates per activity | Org Admin | P2 |
+
+#### 4.9.4 OpenBadges 3.0
+
+| Feature | Description | Standard | Priority |
+| ------- | ----------- | -------- | -------- |
+| **Badge Definition** | Create badge classes with criteria and evidence | OpenBadges 3.0 | P1 |
+| **Badge Assertion** | Issue verifiable badge assertions to learners | OpenBadges 3.0 | P1 |
+| **Public Verification** | Shareable verification URL (no auth required) | BadgeVerifierPage | P1 |
+| **Badge Revocation** | Revoke issued assertions with reason | Org Admin | P2 |
+| **Wallet Export** | Export badges to IMS Global Wallet | Student | P2 |
+
+#### 4.9.5 SCIM 2.0 (System for Cross-domain Identity Management)
+
+| Feature | Description | Standard | Priority |
+| ------- | ----------- | -------- | -------- |
+| **User Provisioning** | Auto-create/update/deactivate users from IdP | SCIM 2.0 | P1 |
+| **Group Sync** | Sync organizational groups from IdP | SCIM 2.0 | P2 |
+| **SCIM Endpoints** | Standard `/Users`, `/Groups` REST endpoints | SCIM 2.0 | P1 |
+
+---
+
+### 4.10 Professional Development
+
+**Status:** ✅ Implemented
+
+#### 4.10.1 CPD / CEU Tracking
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **CPD Hours Tracking** | Log Continuing Professional Development hours per course | Student | P1 |
+| **CPD Categories** | Categorize CPD activities (formal, informal, self-directed) | Org Admin | P1 |
+| **CPD Report** | Generate CPD hours report per user or org | Student, Org Admin | P1 |
+| **CPD Certificate** | Auto-generate CPD completion certificates | System | P2 |
+
+#### 4.10.2 Completion Certificates
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Auto-Issue on Completion** | Certificate issued when course completion threshold met | System | P0 |
+| **Custom Templates** | Org-branded certificate templates | Org Admin | P1 |
+| **Verification URL** | Shareable certificate verification link | All authenticated | P1 |
+
+---
+
+### 4.11 Enterprise Administration
+
+**Status:** ✅ Implemented
+
+#### 4.11.1 At-Risk Learner Detection
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Risk Score Calculation** | Composite risk score from activity, progress, quiz performance | System | P1 |
+| **Risk Dashboard** | Admin view of at-risk learners with intervention recommendations | Org Admin, Instructor | P1 |
+| **Alert Triggers** | Configurable thresholds for risk notifications | Org Admin | P2 |
+| **Intervention Tracking** | Log interventions and outcomes | Instructor | P2 |
+
+#### 4.11.2 Announcements
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Org-Wide Announcements** | Broadcast messages to all tenant users | Org Admin | P1 |
+| **Course Announcements** | Instructor announcements to course enrollees | Instructor | P1 |
+| **Announcement Expiry** | Set expiration date for announcements | Org Admin | P1 |
+| **Notification Delivery** | Deliver via in-app, email (configurable) | System | P1 |
+
+#### 4.11.3 Enrollment Management
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Bulk Enrollment** | Enroll multiple users in batch (CSV upload) | Org Admin | P1 |
+| **Enrollment Rules** | Auto-enroll by role/group | Org Admin | P2 |
+| **Waitlist Management** | Manage capacity-limited course waitlists | Org Admin | P2 |
+| **Enrollment Reporting** | Enrollment status and completion reports | Org Admin | P1 |
+
+#### 4.11.4 Custom RBAC
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Custom Role Creation** | Define roles with granular permission matrix | Org Admin | P1 |
+| **Role Assignment** | Assign custom roles to users | Org Admin | P1 |
+| **Permission Matrix** | Granular per-resource, per-operation permissions | Org Admin | P1 |
+
+#### 4.11.5 Compliance Reporting
+
+| Feature | Description | Standard | Priority |
+| ------- | ----------- | -------- | -------- |
+| **GDPR Report** | Data processing activities, consent status, erasure requests | GDPR | P0 |
+| **FERPA Report** | Student record access audit trail | FERPA | P0 |
+| **COPPA Report** | Minor user data handling compliance | COPPA | P1 |
+| **Data Export** | Full user data export (Article 20 portability) | GDPR | P0 |
+
+#### 4.11.6 BI Data Export
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **BI Access Tokens** | Scoped API tokens for data warehouse integration | Org Admin | P2 |
+| **Export Schemas** | Documented schemas for Looker/Tableau/Power BI | System | P2 |
+| **Incremental Sync** | Delta export for efficient pipeline updates | System | P2 |
+
+#### 4.11.7 Notification Templates
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Email Templates** | Customizable email notification templates | Org Admin | P1 |
+| **Template Variables** | Dynamic variables (user name, course title, etc.) | Org Admin | P1 |
+| **Preview & Test** | Preview rendered template and send test email | Org Admin | P1 |
+
+#### 4.11.8 Audit Logs
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **User Audit Log** | WHO, WHAT, WHEN, WHERE for all user actions | Org Admin | P0 |
+| **Admin Audit Log** | Admin-specific actions (role changes, settings) | Super Admin | P0 |
+| **Export Audit Log** | Export audit trail to CSV | Org Admin | P1 |
+| **Retention** | 7-year audit log retention | System | P0 |
+
+---
+
+### 4.12 Monetization & Marketplace
+
+**Status:** ✅ Implemented
+
+#### 4.12.1 Course Marketplace
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Course Listing** | Instructors list courses for purchase | Instructor | P2 |
+| **Course Purchase** | Students purchase or enroll in paid courses | Student | P2 |
+| **Pricing Tiers** | Free, one-time, subscription pricing models | Instructor | P2 |
+| **Coupon Codes** | Discount codes for courses | Org Admin | P3 |
+
+#### 4.12.2 Instructor Earnings
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Revenue Tracking** | Per-instructor revenue dashboard | Instructor | P2 |
+| **Payout Settings** | Payment method and schedule configuration | Instructor | P2 |
+| **Revenue Sharing** | Configurable platform/instructor revenue split | Org Admin | P2 |
+
+---
+
+### 4.13 White-Label & Customization
+
+**Status:** ✅ Implemented
+
+#### 4.13.1 Tenant Branding
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Custom Logo** | Upload tenant logo for all UI surfaces | Org Admin | P1 |
+| **Color Scheme** | Custom primary/secondary/accent colors | Org Admin | P1 |
+| **Custom Domain** | Map custom subdomain (e.g., learn.university.edu) | Org Admin | P1 |
+| **Favicon & Page Title** | Branded browser tab | Org Admin | P2 |
+| **Email Branding** | Custom sender name and logo in emails | Org Admin | P1 |
+
+#### 4.13.2 Portal Builder
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Drag-Drop Layout** | Build custom portal homepage layouts | Org Admin | P2 |
+| **Component Library** | Pre-built portal components (hero, featured courses, etc.) | Org Admin | P2 |
+| **Public Portal** | Unauthenticated public landing page | All (public) | P2 |
+
+---
+
+### 4.14 Learning Pathways & Programs
+
+**Status:** ✅ Implemented
+
+#### 4.14.1 Programs (Multi-Course Bundles)
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Program Definition** | Bundle multiple courses into a structured program | Org Admin | P1 |
+| **Sequential Enrollment** | Enforce prerequisite course completion order | System | P1 |
+| **Program Progress** | Aggregate progress across all program courses | Student | P1 |
+| **Program Certificate** | Certificate on program completion | System | P1 |
+
+#### 4.14.2 Auto-Generated Learning Paths
+
+| Feature | Description | Technology | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Prerequisite Chains** | Auto-generate path from knowledge graph PREREQUISITE_OF edges | Apache AGE | P1 |
+| **Skill Gap Analysis** | Identify missing concepts vs. target skill profile | Skill Gap Resolver | P1 |
+| **Adaptive Path** | Adjust path dynamically based on quiz performance | AI + Graph | P2 |
+
+---
+
+### 4.15 Spaced Repetition System (SRS)
+
+**Status:** ✅ Implemented — See §4.8.3 for full details.
+
+The SM-2 spaced repetition algorithm is integrated into the platform as a dedicated feature:
+
+| Feature | Description | Priority |
+| ------- | ----------- | -------- |
+| **Daily Review Queue** | SM-2 scheduled card review (due today) | P1 |
+| **Card Creation** | Auto-generate flashcards from transcript segments and quiz questions | P1 |
+| **Interval Tracking** | Track ease factor, interval, repetitions per card | P1 |
+| **Cross-Course Cards** | Cards span multiple courses in a program | P2 |
+
+---
+
+### 4.16 Extended Content Types
+
+**Status:** ✅ Implemented
+
+Beyond video, EduSphere supports multiple content formats:
+
+| Type | Description | Page | Priority |
+| ---- | ----------- | ---- | -------- |
+| **Rich Document** | Interactive rich text with embedded media | RichDocumentPage | P1 |
+| **SCORM Package** | SCORM 1.2 interactive eLearning modules | ScormContentViewer | P1 |
+| **Quiz Content** | Standalone quiz pages with scoring | QuizContentPage | P0 |
+| **Document Annotation** | Annotatable PDF viewer with highlights | DocumentAnnotationPage | P1 |
+| **Microlearning** | Short-form flashcards and knowledge snippets | microlearning resolver | P2 |
+| **AI Scenario** | Branched scenario-based learning module | ScenariosPage | P1 |
+
+#### 4.16.1 Document Annotation (PDF)
+
+| Feature | Description | Priority |
+| ------- | ----------- | -------- |
+| **PDF Rendering** | In-browser PDF display | P1 |
+| **Text Highlights** | Select text to annotate | P1 |
+| **Margin Comments** | Add comments in document margins | P1 |
+| **Annotation Layers** | Same 4-layer system as video annotations | P1 |
+| **Annotation Toolbar** | Drawing tools, text, bookmark | P1 |
+
+#### 4.16.2 Course Library (Reusable Templates)
+
+| Feature | Description | Priority |
+| ------- | ----------- | -------- |
+| **Course Template Library** | Browse and import pre-built course templates | P2 |
+| **Publish to Library** | Share own course as reusable template | P2 |
+| **Template Versioning** | Track template versions and updates | P3 |
+
+---
+
+### 4.17 Assessment & Academic Integrity
+
+**Status:** ✅ Implemented
+
+#### 4.17.1 Assessment Campaigns
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Campaign Creation** | Schedule bulk assessments across a cohort | Org Admin, Instructor | P1 |
+| **Campaign Calendar** | View all upcoming assessment campaigns | All authenticated | P1 |
+| **Auto-Grading** | Auto-grade objective questions with configurable rubrics | System | P1 |
+| **Results Dashboard** | Campaign results aggregated with analytics | Org Admin | P1 |
+
+#### 4.17.2 Plagiarism Detection
+
+| Feature | Description | Technology | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Submission Scanning** | Scan assignment submissions for plagiarism | AI + similarity | P2 |
+| **Similarity Score** | Percentage similarity with source report | System | P2 |
+| **Instructor Review** | Instructor reviews flagged submissions | Instructor | P2 |
+
+---
+
+### 4.18 Social & Community
+
+**Status:** ✅ Implemented
+
+#### 4.18.1 User Profiles
+
+| Feature | Description | Priority |
+| ------- | ----------- | -------- |
+| **Public Profile Page** | Shareable user profile at `/u/:userId` | P2 |
+| **Learning Stats** | Courses completed, badges, XP on public profile | P2 |
+| **Profile Visibility Control** | Toggle public/private per data field | P2 |
+
+#### 4.18.2 Social Graph
+
+| Feature | Description | Priority |
+| ------- | ----------- | -------- |
+| **User Following** | Follow other learners/instructors | P2 |
+| **Activity Feed** | See followed users' learning activity | P2 |
+| **Peer Recommendations** | AI-driven peer matching for collaborative learning | P2 |
+
+#### 4.18.3 Discussion Forums
+
+| Feature | Description | Priority |
+| ------- | ----------- | -------- |
+| **Course Forums** | Threaded discussion forums per course | P1 |
+| **Post & Reply** | Create threads and replies | P1 |
+| **Moderation** | Instructor/admin moderation tools (pin, delete, lock) | P1 |
+| **Rich Text** | Markdown formatting in discussion posts | P1 |
+
+---
+
+### 4.19 Live Sessions
+
+**Status:** ✅ Implemented
+
+#### 4.19.1 Synchronous Learning
+
+| Feature | Description | User Roles | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Live Session Scheduling** | Schedule live virtual class sessions | Instructor | P1 |
+| **Session Chat** | Real-time chat during live session | All authenticated | P1 |
+| **Live Q&A** | Structured Q&A with upvoting | Student | P1 |
+| **Polling** | Real-time polls during sessions | Instructor | P2 |
+| **Session Recording Link** | Link to external recording (Zoom/Teams) | Instructor | P2 |
+| **Attendance Tracking** | Log participant attendance | System | P1 |
+
+---
+
+### 4.20 AI Course Generation
+
+**Status:** ✅ Implemented
+
+| Feature | Description | Technology | Priority |
+| ------- | ----------- | ---------- | -------- |
+| **Outline Generation** | Generate course outline from topic description | LLM + LangGraph | P2 |
+| **Content Population** | Auto-generate module descriptions and learning objectives | LLM | P2 |
+| **Quiz Generation** | Generate quiz questions from content | LLM | P2 |
+| **Review & Edit** | Instructor reviews and modifies AI-generated content | Instructor | P2 |
+
+---
+
+### 4.21 CRM Integration
+
+**Status:** ✅ Implemented
+
+| Feature | Description | Systems | Priority |
+| ------- | ----------- | ------- | -------- |
+| **CRM Connection** | Connect to Salesforce, HubSpot | CrmSettingsPage | P3 |
+| **Lead Sync** | Sync course enrollments as CRM leads | System | P3 |
+| **Activity Push** | Push learning activity to CRM contact records | System | P3 |
+
+---
+
 ## 5. User Stories
 
-### 5.1 Content Management (8 stories)
+### 5.1 Content Management (11 stories)
 
 **CM-01**: As an **Instructor**, I want to **create a new course with a structured syllabus** so that **students can navigate the learning objectives**.
 
@@ -578,6 +1033,12 @@ EduSphere is fully internationalized with support for 9 languages across all use
 **CM-07**: As an **Org Admin**, I want to **view all courses in my tenant** so that **I can monitor content creation activity**.
 
 **CM-08**: As an **Instructor**, I want to **reorder modules within a course** so that **the learning sequence matches my syllabus**.
+
+**CM-09**: As an **Instructor**, I want to **edit a course title inline on the course detail page** so that **I can quickly fix course names without navigating to a separate edit screen**.
+
+**CM-10**: As an **Instructor**, I want the **lesson creation wizard to auto-fill today's date** so that **I don't have to manually enter the lesson date for new lessons**.
+
+**CM-11**: As an **Instructor**, I want to **choose between "כללי" (thematic) and "על הסדר" (sequential) lesson types** so that **the AI pipeline is optimized for my teaching style**.
 
 ---
 
@@ -615,7 +1076,7 @@ EduSphere is fully internationalized with support for 9 languages across all use
 
 ---
 
-### 5.4 AI Agents (6 stories)
+### 5.4 AI Agents (8 stories)
 
 **AI-01**: As a **Student**, I want to **chat with a Chavruta agent that debates both sides of an argument** so that **I develop critical thinking skills**.
 
@@ -628,6 +1089,10 @@ EduSphere is fully internationalized with support for 9 languages across all use
 **AI-05**: As a **Researcher**, I want to **use a Research Scout agent to find contradictions across 10 sources** so that **I save hours of manual reading**.
 
 **AI-06**: As a **Student**, I want to **cancel a long-running AI execution** so that **I don't waste my daily quota**.
+
+**AI-07**: As an **Instructor**, I want to **upload a file directly from my device as a pipeline source** so that **I can process local recordings without first uploading them to a lesson asset**.
+
+**AI-08**: As an **Instructor**, I want the **pipeline to remember my last-used content language** so that **I don't have to re-select it every time I configure a new pipeline run**.
 
 ---
 
@@ -678,6 +1143,90 @@ EduSphere is fully internationalized with support for 9 languages across all use
 **AD-04**: As an **Org Admin**, I want to **deactivate users who graduate or leave** so that **we don't exceed our license limits**.
 
 **AD-05**: As an **Org Admin**, I want to **monitor platform usage via Grafana dashboards** so that **I can identify bottlenecks before users complain**.
+
+---
+
+### 5.9 Gamification & SRS (6 stories)
+
+**GAM-01**: As a **Student**, I want to **earn XP points for completing lessons and creating annotations** so that **I have a visible measure of my learning progress**.
+
+**GAM-02**: As a **Student**, I want to **see my position on the class leaderboard** so that **I'm motivated to engage more deeply with the material**.
+
+**GAM-03**: As an **Org Admin**, I want to **define custom badges for institutional achievements** so that **we can recognize specific competencies relevant to our program**.
+
+**GAM-04**: As a **Student**, I want to **earn a verified OpenBadge credential for completing a course** so that **I can share it on LinkedIn**.
+
+**GAM-05**: As a **Student**, I want to **review flashcards on my daily SRS schedule** so that **I retain material through spaced repetition rather than cramming**.
+
+**GAM-06**: As an **Instructor**, I want to **see which students are using the SRS system** so that **I can identify those who are most engaged**.
+
+---
+
+### 5.10 Standards & Integrations (5 stories)
+
+**STD-01**: As an **Org Admin**, I want to **configure EduSphere as an LTI 1.3 platform** so that **instructors can embed it in our existing Moodle/Canvas environment**.
+
+**STD-02**: As an **Instructor**, I want to **upload a SCORM package** so that **I can reuse existing eLearning modules without recreating them**.
+
+**STD-03**: As an **Org Admin**, I want to **configure SCIM provisioning from our IdP** so that **user accounts are automatically created and deactivated without manual IT work**.
+
+**STD-04**: As a **Student**, I want to **see all my earned OpenBadge credentials in one place** so that **I can manage and share my digital credentials**.
+
+**STD-05**: As an **Org Admin**, I want to **send xAPI statements to our external LRS** so that **all learning activity is recorded in our central data lake**.
+
+---
+
+### 5.11 Enterprise Administration (7 stories)
+
+**ENT-01**: As an **Org Admin**, I want to **create custom roles with granular permissions** so that **department heads can manage their own users without full admin access**.
+
+**ENT-02**: As an **Org Admin**, I want to **see a list of at-risk learners with risk scores** so that **I can prioritize outreach to students who need support**.
+
+**ENT-03**: As an **Org Admin**, I want to **send org-wide announcements** so that **all users are informed about policy changes and upcoming events**.
+
+**ENT-04**: As an **Org Admin**, I want to **bulk-enroll a CSV list of users** so that **onboarding 500 students at semester start doesn't take all day**.
+
+**ENT-05**: As an **Org Admin**, I want to **generate a GDPR compliance report** so that **I can respond to a data subject access request within the 30-day deadline**.
+
+**ENT-06**: As an **Org Admin**, I want to **export learning data to our BI platform** so that **our analytics team can build institutional dashboards**.
+
+**ENT-07**: As an **Instructor**, I want to **schedule an assessment campaign for my entire cohort** so that **all students are tested on the same material in the same time window**.
+
+---
+
+### 5.12 Professional Development (3 stories)
+
+**CPD-01**: As a **Student**, I want to **see how many CPD hours I've earned this year** so that **I can track progress toward my professional recertification requirement**.
+
+**CPD-02**: As an **Org Admin**, I want to **generate a CPD hours report for all staff** so that **I can submit the required annual compliance documentation**.
+
+**CPD-03**: As a **Student**, I want to **download a CPD certificate for a completed course** so that **I can submit it to my professional body**.
+
+---
+
+### 5.13 Content & Live Learning (6 stories)
+
+**CONT-01**: As an **Instructor**, I want to **annotate a PDF document with layer-based comments** so that **students can see my guidance while reading the text**.
+
+**CONT-02**: As a **Student**, I want to **complete a SCORM module and have my score recorded** so that **the instructor can see my progress**.
+
+**CONT-03**: As an **Instructor**, I want to **create a rich document with embedded videos and quizzes** so that **students have an interactive reading experience**.
+
+**CONT-04**: As an **Instructor**, I want to **schedule a live Q&A session** so that **students can ask questions in real time**.
+
+**CONT-05**: As a **Student**, I want to **browse a library of course templates** so that **I can import a pre-built course and customize it**.
+
+**CONT-06**: As an **Instructor**, I want to **create a scenario-based learning module** so that **students practice decision-making in realistic situations**.
+
+---
+
+### 5.14 Social & Community (3 stories)
+
+**SOC-01**: As a **Student**, I want to **have a public profile page** so that **I can showcase my completed courses and badges to potential employers**.
+
+**SOC-02**: As a **Student**, I want to **participate in the course discussion forum** so that **I can ask questions and share insights with classmates without disrupting the live session**.
+
+**SOC-03**: As an **Instructor**, I want to **moderate discussion forum posts** so that **off-topic or inappropriate content is removed quickly**.
 
 ---
 
@@ -856,6 +1405,33 @@ EduSphere is fully internationalized with support for 9 languages across all use
 | **Search Zero-Result Rate**         | High = poor content discoverability     | < 5%                         |
 | **Collaboration Invite Acceptance** | High = viral growth                     | > 70%                        |
 
+### 7.6 Gamification & Engagement Metrics *(new v2.0)*
+
+| Metric | Target | Measurement |
+| ------ | ------ | ----------- |
+| **Daily SRS Reviews** | > 40% of active users complete daily review queue | SRS analytics |
+| **Badge Earn Rate** | Avg. 2 badges earned per user per month | Database query |
+| **OpenBadge Shares** | > 25% of issued badges shared externally | Badge assertion events |
+| **Leaderboard Views** | > 60% of active users view leaderboard weekly | Analytics events |
+
+### 7.7 Integration & Standards Metrics *(new v2.0)*
+
+| Metric | Target | Measurement |
+| ------ | ------ | ----------- |
+| **LTI Adoption** | > 30% of enterprise tenants use LTI integration | Tenant config |
+| **SCORM Completion Rate** | > 80% SCORM completion = valid tracking | CMI data |
+| **xAPI Statement Volume** | > 1,000 statements/user/month (active tenants) | LRS analytics |
+| **SCIM Provisioning Errors** | < 0.1% provisioning failures | SCIM logs |
+
+### 7.8 Enterprise Administration Metrics *(new v2.0)*
+
+| Metric | Target | Measurement |
+| ------ | ------ | ----------- |
+| **At-Risk Intervention Rate** | > 70% of flagged at-risk students contacted within 48h | Intervention log |
+| **CPD Hours per User** | Avg. 10 CPD hours/month (professional users) | CPD tracker |
+| **Compliance Report SLA** | GDPR requests fulfilled within 30 days | Support tickets |
+| **Enrollment Campaign Success** | Bulk enrollment < 5 min for 1,000 users | Enrollment logs |
+
 ---
 
 ## 8. Roadmap Alignment
@@ -887,7 +1463,24 @@ EduSphere's 8-phase implementation roadmap (detailed in IMPLEMENTATION_ROADMAP.m
 | **P1 (Early Adopter)** | Phases 6-7     | Production-ready with web UI, security, scalability                                 |
 | **P2 (Advanced)**      | Phase 8        | Mobile support, advanced transcription, specialized collaboration features          |
 
-### 8.3 Deferred Features (Post-Launch)
+### 8.3 Implemented Phases Beyond Original Roadmap *(new v2.0)*
+
+The platform has been extended with phases beyond the original 8-phase roadmap:
+
+| Phase | Key Deliverables | PRD Sections |
+| ----- | ---------------- | ------------ |
+| **Phase 9: Gamification** | XP system, badges, leaderboards, SRS (SM-2) | §4.8, §4.15 |
+| **Phase 10: Standards** | LTI 1.3, SCORM 1.2, xAPI, SCIM 2.0, OpenBadges 3.0 | §4.9 |
+| **Phase 11: Enterprise Admin** | At-risk dashboard, announcements, enrollment mgmt, RBAC, compliance reports, BI export, notification templates | §4.11 |
+| **Phase 12: Marketplace** | Course marketplace, instructor earnings | §4.12 |
+| **Phase 13: White-Label** | Portal builder, tenant branding, custom domains | §4.13 |
+| **Phase 14: Programs** | Multi-course programs, learning paths, skill gap analysis | §4.14 |
+| **Phase 15: Extended Content** | Rich docs, document annotation (PDF), SCORM viewer, microlearning, AI scenarios, course library | §4.16 |
+| **Phase 16: Assessment** | Assessment campaigns, plagiarism detection | §4.17 |
+| **Phase 17: Social & Live** | Discussion forums, public profiles, social graph, live sessions with chat/Q&A | §4.18, §4.19 |
+| **Phase 18: AI Course Gen** | AI-driven course outline and content generation, roleplay scenarios | §4.20 |
+
+### 8.4 Deferred Features (Post-Launch)
 
 The following features are identified in user stories but deferred to post-launch iterations:
 
@@ -895,6 +1488,10 @@ The following features are identified in user stories but deferred to post-launc
 - **Graph Export as GraphML** (KG-06): Research-focused, niche use case
 - **Session History UI** (CO-03): Admin analytics, not critical for MVP
 - **Custom Agent JSON Editor** (AI-06): Advanced feature requiring robust validation
+- **Payment Gateway Integration**: Marketplace earnings tracked; payment disbursement requires Stripe integration (Phase 9+)
+- **WebRTC Virtual Classroom**: Full video/audio multi-party rooms deferred post-launch
+- **Adaptive Learning Engine**: Dynamic course path adjustment based on real-time performance is foundational; full adaptivity deferred
+- **Session Recording (native)**: In-platform recording deferred; external recording links supported
 
 ---
 
@@ -998,14 +1595,17 @@ The following features are identified in user stories but deferred to post-launc
 
 The following features are **explicitly out of scope** for the initial release:
 
-- **Video Conferencing**: Not building Zoom/Teams competitor; users can link external meeting URLs
-- **Gradebook**: Not replicating traditional LMS grading features; focus is on knowledge exploration, not assessment
+- **Video Conferencing**: Not building Zoom/Teams competitor; users can link external meeting URLs and schedule live sessions (see §4.19)
+- **Built-in Gradebook**: Traditional LMS gradebook with letter grades is deferred; focus is on knowledge exploration and quiz-based mastery tracking
 - **Mobile App Offline Transcoding**: Transcoding happens server-side only (Phase 8 mobile app is for consumption)
-- **Built-in Payment Processing**: Billing integration deferred to Phase 9 (post-launch)
-- **Content Authoring Tools**: No built-in video editor or PDF annotator; users upload pre-created content
-- **Social Features**: No user profiles, followers, likes, etc. (collaborative learning ≠ social networking)
-- **Gamification**: No badges, leaderboards, or points systems (focus on intrinsic learning motivation)
-- **LTI Integration**: Learning Tools Interoperability deferred to Phase 9 (requested by enterprise customers)
+- **Built-in Payment Processing**: Stripe/payment gateway integration deferred to Phase 9; marketplace (§4.12) tracks earnings but payment disbursement is manual
+- **Built-in Video Editor**: No in-browser video editor; users upload pre-created content. PDF annotation IS supported (§4.16.1)
+- **Session Recording (native)**: Live session recording capture is deferred; instructors can link external recordings (Zoom/Teams)
+- **WebRTC (advanced)**: Full-featured virtual classroom with multi-party video/audio is deferred; basic live sessions (§4.19) are supported
+- **A/B Testing Framework**: Systematic course variant testing deferred to post-launch
+- **Proctored Exams**: Exam lockdown/proctoring is deferred; assessment campaigns (§4.17) are not proctored
+
+> **Note (v2.0):** Gamification, LTI, Social Features, PDF Annotation, and OpenBadges were originally listed as out of scope but have been **fully implemented** as part of the expanded platform scope. These are now documented in §4.8, §4.9, §4.18, §4.16, and §4.9.4 respectively.
 
 ---
 
@@ -1037,8 +1637,39 @@ The following features are **explicitly out of scope** for the initial release:
 1. **IMPLEMENTATION_ROADMAP.md** — 8-phase build plan with acceptance criteria
 2. **API_CONTRACTS_GRAPHQL_FEDERATION.md** — Complete GraphQL schema definitions
 3. **docs/database/DATABASE_SCHEMA.md** — PostgreSQL tables, RLS policies, Apache AGE ontology
-4. **EduSphere_Claude.pdf** — Architecture guide and technology decisions
-5. **EduSphere_DB.pdf** — Database design deep-dive
+4. **docs/architecture/ARCHITECTURE.md** — Architecture guide and technology decisions
+5. **docs/product/PRODUCT_GAP_ANALYSIS.md** — Sprint-by-sprint gap analysis
+6. **docs/project/IMPLEMENTATION_STATUS.md** — Current implementation status
+7. **docs/ai/AI_ML_PIPELINE.md** — AI agent pipeline and RAG architecture
+8. **docs/compliance/** — GDPR, FERPA, WCAG, HECVAT compliance documents
+9. **docs/deployment/KUBERNETES_DEPLOYMENT.md** — Production deployment guide
+10. **OPEN_ISSUES.md** — Active bugs, features, and technical debt
+
+## Appendix C: Feature Implementation Map *(new v2.0)*
+
+| PRD Section | Primary Files | Subgraph |
+| ----------- | ------------- | -------- |
+| §4.1 Content Management | `apps/web/src/pages/CourseCreatePage.tsx`, `apps/subgraph-content/src/course/` | content |
+| §4.2 Annotation System | `apps/web/src/pages/AnnotationsPage.tsx`, `apps/subgraph-annotation/` | annotation |
+| §4.3 Collaboration | `apps/web/src/pages/CollaborationSessionPage.tsx`, `apps/subgraph-collaboration/` | collaboration |
+| §4.4 AI Agents | `apps/web/src/pages/AgentsPage.tsx`, `apps/subgraph-agent/` | agent |
+| §4.5 Knowledge Graph | `apps/web/src/pages/KnowledgeGraphPage.tsx`, `apps/subgraph-knowledge/` | knowledge |
+| §4.6 i18n | `packages/i18n/`, `apps/web/src/lib/i18n.ts` | all |
+| §4.7 Search | `apps/web/src/pages/SearchPage.tsx`, `apps/subgraph-knowledge/src/embedding/` | knowledge |
+| §4.8 Gamification | `apps/web/src/pages/GamificationSettingsPage.tsx`, `apps/web/src/pages/LeaderboardPage.tsx` | core |
+| §4.9 Standards | `apps/web/src/pages/LtiLaunchPage.tsx`, `apps/web/src/pages/XapiSettingsPage.tsx`, `apps/subgraph-content/src/lti/`, `apps/subgraph-content/src/scorm/`, `apps/subgraph-content/src/open-badge/` | content, core |
+| §4.10 CPD | `apps/web/src/pages/CPDSettingsPage.tsx`, `apps/subgraph-content/src/cpd/` | content |
+| §4.11 Enterprise Admin | `apps/web/src/pages/AtRiskDashboardPage.tsx`, `apps/web/src/pages/AnnouncementsPage.tsx`, `apps/web/src/pages/EnrollmentManagementPage.tsx`, `apps/web/src/pages/ComplianceReportsPage.tsx` | core, content |
+| §4.12 Marketplace | `apps/web/src/pages/MarketplacePage.tsx`, `apps/web/src/pages/InstructorEarningsPage.tsx` | content |
+| §4.13 White-Label | `apps/web/src/pages/BrandingSettingsPage.tsx`, `apps/web/src/pages/PortalBuilderPage.tsx` | core |
+| §4.14 Programs | `apps/web/src/pages/ProgramsPage.tsx`, `apps/subgraph-content/src/program/` | content |
+| §4.15 SRS | `apps/web/src/pages/SrsReviewPage.tsx`, `apps/subgraph-core/src/srs/` | core |
+| §4.16 Extended Content | `apps/web/src/pages/DocumentAnnotationPage.tsx`, `apps/web/src/pages/ScormContentViewer.tsx`, `apps/web/src/pages/RichDocumentPage.tsx` | content |
+| §4.17 Assessment | `apps/web/src/pages/AssessmentCampaignPage.tsx`, `apps/subgraph-content/src/assessment/` | content |
+| §4.18 Social | `apps/web/src/pages/PublicProfilePage.tsx`, `apps/subgraph-core/src/social/` | core, collaboration |
+| §4.19 Live Sessions | `apps/subgraph-content/src/live-session/` | content |
+| §4.20 AI Course Gen | `apps/subgraph-content/src/course-generator/` | content |
+| §4.21 CRM | `apps/web/src/pages/CrmSettingsPage.tsx`, `apps/subgraph-core/src/crm/` | core |
 
 ---
 
@@ -1047,6 +1678,7 @@ The following features are **explicitly out of scope** for the initial release:
 | Version | Date       | Author             | Changes                                                 |
 | ------- | ---------- | ------------------ | ------------------------------------------------------- |
 | 1.0     | 2026-02-17 | Product Management | Initial PRD creation based on roadmap and API contracts |
+| 2.0     | 2026-03-04 | Product Management | Major update: added §4.8–§4.21 (13 new feature areas — Gamification, Standards/LTI/SCORM/xAPI/SCIM/OpenBadges, CPD, Enterprise Admin, Marketplace, White-Label, Programs, SRS, Extended Content Types, Assessment Campaigns, Social/Community, Live Sessions, AI Course Generation, CRM); added user story sections §5.9–§5.14 (30 new user stories); updated §9.5 Exclusions to reflect moved-in-scope features; updated key differentiators in §1.1; updated Table of Contents. Total scope: 7 original feature areas → 21 feature areas; 38 original user stories → 68 user stories. |
 
 ---
 

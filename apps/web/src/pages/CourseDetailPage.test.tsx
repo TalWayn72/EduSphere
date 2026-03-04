@@ -17,6 +17,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
     ...actual,
     useParams: vi.fn(() => ({ courseId: 'course-1' })),
     useNavigate: vi.fn(() => mockNavigate),
+    useBlocker: vi.fn(() => ({ state: 'unblocked' as const, proceed: vi.fn(), reset: vi.fn() })),
   };
 });
 
@@ -52,6 +53,8 @@ vi.mock('@/lib/graphql/content.queries', () => ({
   MY_COURSE_PROGRESS_QUERY: 'MY_COURSE_PROGRESS_QUERY',
   ENROLL_COURSE_MUTATION: 'ENROLL_COURSE_MUTATION',
   UNENROLL_COURSE_MUTATION: 'UNENROLL_COURSE_MUTATION',
+  FORK_COURSE_MUTATION: 'FORK_COURSE_MUTATION',
+  UPDATE_COURSE_MUTATION: 'UPDATE_COURSE_MUTATION',
 }));
 
 vi.mock('@/lib/graphql/lesson.queries', () => ({
@@ -63,6 +66,7 @@ vi.mock('@/lib/graphql/lesson.queries', () => ({
 import { CourseDetailPage } from './CourseDetailPage';
 import * as auth from '@/lib/auth';
 import * as urql from 'urql';
+import * as RRD from 'react-router-dom';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -90,7 +94,10 @@ const MOCK_COURSE = {
   modules: [],
 };
 
-const NOOP_MUTATION = [{ fetching: false }, vi.fn()] as never;
+const NOOP_MUTATION = [
+  { fetching: false },
+  vi.fn().mockResolvedValue({ data: undefined, error: undefined }),
+] as never;
 
 const MOCK_LESSONS = [
   {
@@ -128,6 +135,11 @@ describe('CourseDetailPage', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
     vi.mocked(urql.useQuery).mockReturnValue(makeQueryResult());
     vi.mocked(urql.useMutation).mockReturnValue(NOOP_MUTATION);
+    vi.mocked(RRD.useBlocker).mockReturnValue({
+      state: 'unblocked',
+      proceed: vi.fn(),
+      reset: vi.fn(),
+    } as never);
   });
 
   it('shows loading spinner while fetching', () => {
@@ -187,11 +199,12 @@ describe('CourseDetailPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/courses');
   });
 
-  it('navigates to edit page when Edit Course button is clicked', () => {
+  it('clicking "Edit Course" enters inline edit mode (does not navigate)', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
     render(<CourseDetailPage />);
     fireEvent.click(screen.getByRole('button', { name: /edit course/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1/edit');
+    expect(mockNavigate).not.toHaveBeenCalledWith('/courses/course-1/edit');
+    expect(screen.getByTestId('course-title-input')).toBeInTheDocument();
   });
 
   it('reveals sources panel when toggle button is clicked', async () => {
@@ -280,5 +293,238 @@ describe('CourseDetailPage', () => {
     vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
     render(<CourseDetailPage />);
     expect(screen.getByText(/אין שיעורים זמינים/i)).toBeInTheDocument();
+  });
+
+  describe('Inline title editing', () => {
+    it('shows "Edit Course" button for instructor users', () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      render(<CourseDetailPage />);
+      expect(screen.getByTestId('edit-course-btn')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /edit course/i })).toBeInTheDocument();
+    });
+
+    it('clicking "Edit Course" enters edit mode and shows title input', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('edit-course-btn'));
+      });
+      expect(screen.getByTestId('course-title-input')).toBeInTheDocument();
+      expect((screen.getByTestId('course-title-input') as HTMLInputElement).value).toBe('Test Course');
+    });
+
+    it('shows "שמור שינויים" button in edit mode (not "Edit Course")', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('edit-course-btn'));
+      });
+      expect(screen.getByTestId('save-course-btn')).toBeInTheDocument();
+      expect(screen.getByText('שמור שינויים')).toBeInTheDocument();
+    });
+
+    it('"Edit Course" button hidden in edit mode (regression guard)', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('edit-course-btn'));
+      });
+      expect(screen.queryByTestId('edit-course-btn')).not.toBeInTheDocument();
+    });
+
+    it('clicking ביטול exits edit mode without saving', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      const updateFn = vi.fn().mockResolvedValue({ data: undefined, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'UPDATE_COURSE_MUTATION') return [{ fetching: false }, updateFn] as never;
+        return NOOP_MUTATION;
+      });
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('edit-course-btn'));
+      });
+      expect(screen.getByTestId('course-title-input')).toBeInTheDocument();
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('cancel-edit-btn'));
+      });
+      expect(screen.queryByTestId('course-title-input')).not.toBeInTheDocument();
+      expect(updateFn).not.toHaveBeenCalled();
+    });
+
+    it('typing in title input and pressing Enter calls UPDATE_COURSE_MUTATION', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      const updateFn = vi.fn().mockResolvedValue({ data: { updateCourse: { id: 'course-1', title: 'New Title' } }, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'UPDATE_COURSE_MUTATION') return [{ fetching: false }, updateFn] as never;
+        return NOOP_MUTATION;
+      });
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('edit-course-btn'));
+      });
+      const input = screen.getByTestId('course-title-input') as HTMLInputElement;
+      await act(async () => {
+        fireEvent.change(input, { target: { value: 'New Title' } });
+        fireEvent.keyDown(input, { key: 'Enter' });
+      });
+      await waitFor(() => {
+        expect(updateFn).toHaveBeenCalledWith({ id: 'course-1', input: { title: 'New Title' } });
+      });
+    });
+
+    it('save error shows toast', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      const updateFn = vi.fn().mockResolvedValue({
+        data: null,
+        error: {
+          graphQLErrors: [{ message: 'Permission denied' }],
+          message: '[GraphQL] Permission denied',
+        },
+      });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'UPDATE_COURSE_MUTATION') return [{ fetching: false }, updateFn] as never;
+        return NOOP_MUTATION;
+      });
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('edit-course-btn'));
+      });
+      const input = screen.getByTestId('course-title-input') as HTMLInputElement;
+      await act(async () => {
+        fireEvent.change(input, { target: { value: 'Updated Title' } });
+        fireEvent.click(screen.getByTestId('save-course-btn'));
+      });
+      await waitFor(() => {
+        expect(screen.getByText('שגיאה בשמירת שם הקורס')).toBeInTheDocument();
+      });
+      // edit mode stays open on error (user can retry)
+      expect(screen.getByTestId('course-title-input')).toBeInTheDocument();
+    });
+  });
+
+  // ── BUG FIX: unsaved changes guard while in inline title-edit mode ─────────
+  // Regression guard: dialog MUST appear when user tries to navigate away
+  // while editMode=true (title being edited). Anti-recurrence test below.
+
+  describe('unsaved changes navigation guard (inline edit mode)', () => {
+    it('unsaved-changes-dialog is NOT shown when blocker is unblocked', () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      vi.mocked(RRD.useBlocker).mockReturnValue({
+        state: 'unblocked',
+        proceed: vi.fn(),
+        reset: vi.fn(),
+      } as never);
+      render(<CourseDetailPage />);
+      expect(screen.queryByTestId('unsaved-changes-dialog')).not.toBeInTheDocument();
+    });
+
+    it('unsaved-changes-dialog IS shown when navigation is blocked (editMode=true)', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      vi.mocked(RRD.useBlocker).mockReturnValue({
+        state: 'blocked',
+        proceed: vi.fn(),
+        reset: vi.fn(),
+      } as never);
+      render(<CourseDetailPage />);
+      // Dialog should appear regardless of whether editMode was entered
+      expect(screen.getByTestId('unsaved-changes-dialog')).toBeInTheDocument();
+    });
+
+    it('clicking "Leave anyway" calls blocker.proceed', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      const mockProceed = vi.fn();
+      vi.mocked(RRD.useBlocker).mockReturnValue({
+        state: 'blocked',
+        proceed: mockProceed,
+        reset: vi.fn(),
+      } as never);
+      render(<CourseDetailPage />);
+      fireEvent.click(screen.getByTestId('unsaved-leave-btn'));
+      expect(mockProceed).toHaveBeenCalledTimes(1);
+    });
+
+    it('clicking "Stay on page" calls blocker.reset', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      const mockReset = vi.fn();
+      vi.mocked(RRD.useBlocker).mockReturnValue({
+        state: 'blocked',
+        proceed: vi.fn(),
+        reset: mockReset,
+      } as never);
+      render(<CourseDetailPage />);
+      fireEvent.click(screen.getByTestId('unsaved-stay-btn'));
+      expect(mockReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('useBlocker is called with editMode state (false by default)', () => {
+      render(<CourseDetailPage />);
+      // On initial render editMode=false so blocker should receive false
+      expect(vi.mocked(RRD.useBlocker)).toHaveBeenCalledWith(false);
+    });
+
+    it('useBlocker is called with true after entering edit mode', async () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('edit-course-btn'));
+      });
+      // After entering editMode, useBlocker should have been called with true
+      const calls = vi.mocked(RRD.useBlocker).mock.calls;
+      const hasCalledWithTrue = calls.some(([condition]) => condition === true);
+      expect(hasCalledWithTrue).toBe(true);
+    });
+  });
+
+  describe('Fork Course', () => {
+    it('shows Fork Course button for INSTRUCTOR role', () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+      render(<CourseDetailPage />);
+      expect(
+        screen.getByTestId('fork-course-btn')
+      ).toBeInTheDocument();
+    });
+
+    it('hides Fork Course button for STUDENT role', () => {
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_STUDENT as never);
+      render(<CourseDetailPage />);
+      expect(
+        screen.queryByTestId('fork-course-btn')
+      ).not.toBeInTheDocument();
+    });
+
+    it('shows fork error banner without raw error on mutation failure', async () => {
+      const forkMutationFn = vi.fn().mockResolvedValue({
+        data: null,
+        error: {
+          graphQLErrors: [{ message: 'Course fork failed' }],
+          message: '[GraphQL] Course fork failed [Network]',
+        },
+      });
+      vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);
+
+      // Match by document string — the content.queries mock returns 'FORK_COURSE_MUTATION'
+      // as the string value, so we can identify it regardless of render count.
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'FORK_COURSE_MUTATION') {
+          return [{ fetching: false }, forkMutationFn] as never;
+        }
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('fork-course-btn'));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('fork-error-banner')).toBeInTheDocument();
+      });
+
+      // Assert no raw GraphQL/network error strings are exposed to the user
+      expect(screen.queryByText(/\[GraphQL\]/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/\[Network\]/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Unexpected error/i)).not.toBeInTheDocument();
+    });
   });
 });

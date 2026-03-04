@@ -29,9 +29,11 @@
   "edges": "Edges",
   "loadingGraph": "Loading graph...",
   "loadError": "Failed to load graph",
+  "refreshGraph": "Refresh graph",
+  "refresh": "Refresh",
+  "graphTitle": "Knowledge Graph",
+  "graphPageBreadcrumb": "Knowledge Graph",
   "networkUnavailable": "Server unavailable — showing backup data",
   "retry": "Retry",
-  "pathError": "Failed to find learning path",
-  "refreshGraph": "Refresh graph",
-  "refresh": "Refresh"
+  "pathError": "Failed to find learning path"
 }

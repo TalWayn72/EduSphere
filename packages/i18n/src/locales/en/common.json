@@ -23,6 +23,12 @@
   "create": "Create",
   "submit": "Submit",
   "noResults": "No results found",
+  "saveSearch": "Save Search",
+  "savedSearches": "Saved Searches",
+  "deleteSavedSearch": "Delete",
+  "savedSearchSuccess": "Search saved!",
+  "noSavedSearches": "No saved searches yet",
+  "savedSearchNamePlaceholder": "Name this search...",
   "viewAll": "View all",
   "learnMore": "Learn more",
   "optional": "Optional",
@@ -32,6 +38,12 @@
   "graph": "Graph",
   "accountInformation": "Account Information",
   "errorLoadingUser": "Error loading user data",
+  "unsavedChanges": {
+    "title": "Unsaved Changes",
+    "message": "You have unsaved changes that will be lost if you leave this page.",
+    "leave": "Leave anyway",
+    "stay": "Stay on page"
+  },
   "profilePage": {
     "accountDetails": "Account Details",
     "permissions": "Permissions",

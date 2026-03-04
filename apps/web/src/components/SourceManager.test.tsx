@@ -7,6 +7,10 @@
  * Critical regression test: file upload must NOT call the REST endpoint
  * `POST /api/knowledge-sources/upload` — it must use the GraphQL mutation
  * `addFileSource` via graphqlClient.request() instead.
+ *
+ * BUG-045 regression tests: verify i18n strings are dynamic (not hardcoded
+ * Hebrew), `dir` attribute responds to i18n.dir(), and getSourceErrorKey()
+ * returns i18n keys (not raw Hebrew).
  */
 import React from 'react';
 import {
@@ -50,7 +54,7 @@ vi.mock('@/lib/graphql/sources.queries', () => ({
   DELETE_KNOWLEDGE_SOURCE: 'DELETE_KNOWLEDGE_SOURCE',
 }));
 
-import { SourceManager, parseSourceError } from './SourceManager';
+import { SourceManager, parseSourceError, getSourceErrorKey } from './SourceManager';
 
 // ── QueryClient wrapper ───────────────────────────────────────────────────────
 
@@ -62,7 +66,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
   return <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
 }
 
-// ── parseSourceError unit tests ───────────────────────────────────────────────
+// ── parseSourceError unit tests (deprecated helper — kept for backward compat) ─
 
 describe('parseSourceError()', () => {
   it('returns Hebrew Unauthorized message for "Unauthorized" error', () => {
@@ -121,6 +125,50 @@ describe('parseSourceError()', () => {
   });
 });
 
+// ── BUG-045 REGRESSION: getSourceErrorKey() returns i18n keys, not raw Hebrew ─
+
+describe('getSourceErrorKey() — BUG-045 regression', () => {
+  it('returns sources.errorUnauthorized for Unauthorized errors', () => {
+    expect(getSourceErrorKey(new Error('Unauthorized'))).toBe('sources.errorUnauthorized');
+    expect(getSourceErrorKey(new Error('Auth required'))).toBe('sources.errorUnauthorized');
+  });
+
+  it('returns sources.errorDownstream for DOWNSTREAM_SERVICE_ERROR', () => {
+    expect(getSourceErrorKey(new Error('DOWNSTREAM_SERVICE_ERROR'))).toBe('sources.errorDownstream');
+  });
+
+  it('returns sources.errorNetwork for Network/fetch errors', () => {
+    expect(getSourceErrorKey(new Error('Network error'))).toBe('sources.errorNetwork');
+    expect(getSourceErrorKey(new Error('Failed to fetch'))).toBe('sources.errorNetwork');
+  });
+
+  it('returns sources.errorGeneric for unknown errors', () => {
+    expect(getSourceErrorKey(new Error('Something unexpected'))).toBe('sources.errorGeneric');
+  });
+
+  it('returns sources.errorUnknown for falsy input', () => {
+    expect(getSourceErrorKey(null)).toBe('sources.errorUnknown');
+    expect(getSourceErrorKey(undefined)).toBe('sources.errorUnknown');
+    expect(getSourceErrorKey('')).toBe('sources.errorUnknown');
+  });
+
+  it('does NOT return any Hebrew strings — only i18n key paths', () => {
+    const errors = [
+      new Error('Unauthorized'),
+      new Error('DOWNSTREAM_SERVICE_ERROR'),
+      new Error('Network error'),
+      new Error('Unknown'),
+      null,
+    ];
+    for (const err of errors) {
+      const key = getSourceErrorKey(err);
+      // Must be a dot-notation key, not a Hebrew string
+      expect(key).toMatch(/^sources\.\w+$/);
+      expect(key).not.toMatch(/[\u0590-\u05FF]/); // no Hebrew unicode
+    }
+  });
+});
+
 // ── SourceManager component tests ─────────────────────────────────────────────
 
 describe('SourceManager', () => {
@@ -132,76 +180,126 @@ describe('SourceManager', () => {
     vi.restoreAllMocks();
   });
 
+  // ── BUG-045 REGRESSION: UI strings must be i18n-driven, not hardcoded Hebrew ─
+
+  it('BUG-045: renders header with English i18n string, not hardcoded Hebrew', async () => {
+    render(<SourceManager courseId="course-1" />, { wrapper });
+    // English from content.json sources.title — NOT hardcoded Hebrew "מקורות מידע"
+    expect(screen.getByText('Knowledge Sources')).toBeInTheDocument();
+    expect(screen.queryByText('מקורות מידע')).not.toBeInTheDocument();
+  });
+
+  it('BUG-045: main panel dir attribute is from i18n.dir(), not hardcoded rtl', () => {
+    const { container } = render(<SourceManager courseId="course-1" />, { wrapper });
+    // The outer panel div must have dir="ltr" (from mock i18n.dir() → 'ltr')
+    const panel = container.querySelector('[dir]');
+    expect(panel).not.toBeNull();
+    expect(panel?.getAttribute('dir')).toBe('ltr');
+    // Must NOT be hardcoded 'rtl'
+    expect(panel?.getAttribute('dir')).not.toBe('rtl');
+  });
+
+  it('BUG-045: add-source modal dir attribute is from i18n.dir(), not hardcoded rtl', async () => {
+    render(<SourceManager courseId="course-1" />, { wrapper });
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add source'));
+    });
+    // The modal inner div must have dir="ltr"
+    const modal = document.querySelector('.fixed .rounded-2xl[dir]');
+    expect(modal).not.toBeNull();
+    expect(modal?.getAttribute('dir')).toBe('ltr');
+    expect(modal?.getAttribute('dir')).not.toBe('rtl');
+  });
+
+  it('BUG-045: tab labels use i18n keys, not hardcoded Hebrew', async () => {
+    render(<SourceManager courseId="course-1" />, { wrapper });
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add source'));
+    });
+    // English tab labels from content.json sources.tabXxx
+    expect(screen.getByText('🌐 Link')).toBeInTheDocument();
+    expect(screen.getByText('✏️ Text')).toBeInTheDocument();
+    expect(screen.getByText('▶️ YouTube')).toBeInTheDocument();
+    expect(screen.getByText('📄 File')).toBeInTheDocument();
+    // Must NOT contain hardcoded Hebrew tab labels
+    expect(screen.queryByText('🌐 קישור')).not.toBeInTheDocument();
+    expect(screen.queryByText('✏️ טקסט')).not.toBeInTheDocument();
+    expect(screen.queryByText('📄 קובץ')).not.toBeInTheDocument();
+  });
+
+  // ── Core functionality tests (updated to English i18n strings) ─────────────
+
   it('renders the panel header and source list', async () => {
     render(<SourceManager courseId="course-1" />, { wrapper });
-    expect(screen.getByText('מקורות מידע')).toBeInTheDocument();
+    expect(screen.getByText('Knowledge Sources')).toBeInTheDocument();
     // In DEV_MODE the mock sources are loaded
     await waitFor(() => {
-      expect(screen.getByText('2 מקורות')).toBeInTheDocument();
+      expect(screen.getByText('2 sources')).toBeInTheDocument();
     });
   });
 
-  it('shows empty state when sources list is empty in DEV_MODE', () => {
-    // This test uses default DEV_MODE which returns DEV_SOURCES, so just verify header
+  it('shows add button when panel loads', () => {
     render(<SourceManager courseId="course-empty" />, { wrapper });
-    expect(screen.getByText('הוסף מקור')).toBeInTheDocument();
+    expect(screen.getByText('Add source')).toBeInTheDocument();
   });
 
-  it('opens the add-source modal when "הוסף מקור" is clicked', async () => {
+  it('opens the add-source modal when "Add source" is clicked', async () => {
     render(<SourceManager courseId="course-1" />, { wrapper });
-    const addBtn = screen.getByText('הוסף מקור');
+    const addBtn = screen.getByText('Add source');
     await act(async () => {
       fireEvent.click(addBtn);
     });
-    expect(screen.getByText('הוספת מקור מידע')).toBeInTheDocument();
+    expect(screen.getByText('Add Knowledge Source')).toBeInTheDocument();
   });
 
   it('closes the modal when ✕ is clicked', async () => {
     render(<SourceManager courseId="course-1" />, { wrapper });
     await act(async () => {
-      fireEvent.click(screen.getByText('הוסף מקור'));
+      fireEvent.click(screen.getByText('Add source'));
     });
     const closeBtn = screen.getAllByText('✕').at(-1) as HTMLElement;
     await act(async () => {
       fireEvent.click(closeBtn);
     });
-    expect(screen.queryByText('הוספת מקור מידע')).not.toBeInTheDocument();
+    expect(screen.queryByText('Add Knowledge Source')).not.toBeInTheDocument();
   });
 
   it('shows all four tabs in the add-source modal', async () => {
     render(<SourceManager courseId="course-1" />, { wrapper });
     await act(async () => {
-      fireEvent.click(screen.getByText('הוסף מקור'));
+      fireEvent.click(screen.getByText('Add source'));
     });
-    expect(screen.getByText('🌐 קישור')).toBeInTheDocument();
-    expect(screen.getByText('✏️ טקסט')).toBeInTheDocument();
+    expect(screen.getByText('🌐 Link')).toBeInTheDocument();
+    expect(screen.getByText('✏️ Text')).toBeInTheDocument();
     expect(screen.getByText('▶️ YouTube')).toBeInTheDocument();
-    expect(screen.getByText('📄 קובץ')).toBeInTheDocument();
+    expect(screen.getByText('📄 File')).toBeInTheDocument();
   });
 
-  it('file tab: shows file upload UI when "📄 קובץ" tab is clicked', async () => {
+  it('file tab: shows file upload UI when "📄 File" tab is clicked', async () => {
     render(<SourceManager courseId="course-1" />, { wrapper });
     await act(async () => {
-      fireEvent.click(screen.getByText('הוסף מקור'));
+      fireEvent.click(screen.getByText('Add source'));
     });
     await act(async () => {
-      fireEvent.click(screen.getByText('📄 קובץ'));
+      fireEvent.click(screen.getByText('📄 File'));
     });
-    expect(screen.getByText('DOCX, PDF, TXT')).toBeInTheDocument();
+    expect(screen.getByText('DOCX, PDF or TXT, up to 25 MB')).toBeInTheDocument();
   });
 
   it('file tab: shows error when submitting without a file', async () => {
     render(<SourceManager courseId="course-1" />, { wrapper });
     await act(async () => {
-      fireEvent.click(screen.getByText('הוסף מקור'));
+      fireEvent.click(screen.getByText('Add source'));
     });
     await act(async () => {
-      fireEvent.click(screen.getByText('📄 קובץ'));
+      fireEvent.click(screen.getByText('📄 File'));
     });
+    // Submit button is the last "Add source" button when modal is open
+    const submitBtn = screen.getAllByText('Add source').at(-1) as HTMLElement;
     await act(async () => {
-      fireEvent.click(screen.getByText('הוספת מקור'));
+      fireEvent.click(submitBtn);
     });
-    expect(screen.getByText('נא לבחור קובץ')).toBeInTheDocument();
+    expect(screen.getByText('Please select a file')).toBeInTheDocument();
   });
 
   // ── BUG REGRESSION: file upload must NOT call REST endpoint ──────────────────
@@ -231,10 +329,10 @@ describe('SourceManager', () => {
 
     render(<SourceManager courseId="course-1" />, { wrapper });
     await act(async () => {
-      fireEvent.click(screen.getByText('הוסף מקור'));
+      fireEvent.click(screen.getByText('Add source'));
     });
     await act(async () => {
-      fireEvent.click(screen.getByText('📄 קובץ'));
+      fireEvent.click(screen.getByText('📄 File'));
     });
 
     // Simulate file selection
@@ -252,9 +350,10 @@ describe('SourceManager', () => {
       fireEvent.change(fileInput);
     });
 
-    // Submit
+    // Submit — last "Add source" button is the modal submit
+    const submitBtn = screen.getAllByText('Add source').at(-1) as HTMLElement;
     await act(async () => {
-      fireEvent.click(screen.getByText('הוספת מקור'));
+      fireEvent.click(submitBtn);
     });
 
     // Wait for async FileReader + mutation

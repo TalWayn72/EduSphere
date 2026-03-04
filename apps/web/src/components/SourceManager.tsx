@@ -14,6 +14,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { gqlClient as graphqlClient } from '@/lib/graphql';
 import { getToken } from '@/lib/auth';
 import {
@@ -80,11 +81,12 @@ const STATUS_COLORS: Record<SourceStatus, string> = {
   FAILED: 'text-red-500',
 };
 
-const STATUS_LABELS: Record<SourceStatus, string> = {
-  PENDING: 'ממתין...',
-  PROCESSING: 'מעבד...',
-  READY: 'מוכן',
-  FAILED: 'שגיאה',
+// i18n keys for each status — resolved at render time via t()
+const STATUS_I18N_KEYS: Record<SourceStatus, string> = {
+  PENDING: 'sources.statusPending',
+  PROCESSING: 'sources.statusProcessing',
+  READY: 'sources.statusReady',
+  FAILED: 'sources.statusFailed',
 };
 
 // ─── DEV_MODE mock data ───────────────────────────────────────────────────────
@@ -167,7 +169,26 @@ function devRemoveSource(id: string): void {
 
 // ─── Error parser (exported for unit testing) ─────────────────────────────────
 
-/** Extracts a user-friendly Hebrew message from a GraphQL or network error. */
+/**
+ * Extracts an i18n key for a GraphQL or network error from SourceManager.
+ * Call with t('sources.<key>') using the 'content' namespace in the component.
+ */
+export function getSourceErrorKey(e: unknown): string {
+  if (!e) return 'sources.errorUnknown';
+  const msg = String(e);
+  if (msg.includes('Unauthorized') || msg.includes('Auth required')) {
+    return 'sources.errorUnauthorized';
+  }
+  if (msg.includes('DOWNSTREAM_SERVICE_ERROR')) {
+    return 'sources.errorDownstream';
+  }
+  if (msg.includes('Network') || msg.includes('fetch')) {
+    return 'sources.errorNetwork';
+  }
+  return 'sources.errorGeneric';
+}
+
+/** @deprecated Use getSourceErrorKey() + t() instead. Kept for unit tests. */
 export function parseSourceError(e: unknown): string {
   if (!e) return 'שגיאה לא ידועה';
   const msg = String(e);
@@ -187,6 +208,15 @@ export function parseSourceError(e: unknown): string {
 
 type AddTab = 'url' | 'text' | 'file' | 'youtube';
 
+const TAB_KEYS: AddTab[] = ['url', 'text', 'youtube', 'file'];
+
+const TAB_LABEL_KEYS: Record<AddTab, string> = {
+  url: 'sources.tabUrl',
+  text: 'sources.tabText',
+  youtube: 'sources.tabYoutube',
+  file: 'sources.tabFile',
+};
+
 function AddSourceModal({
   courseId,
   onClose,
@@ -196,6 +226,8 @@ function AddSourceModal({
   onClose: () => void;
   onAdded: () => void;
 }) {
+  const { t, i18n } = useTranslation('content');
+  const dir = i18n.dir();
   const [tab, setTab] = useState<AddTab>('url');
   const [url, setUrl] = useState('');
   const [urlTitle, setUrlTitle] = useState('');
@@ -242,7 +274,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(parseSourceError(e)),
+    onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 
   const addText = useMutation({
@@ -255,7 +287,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(parseSourceError(e)),
+    onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 
   const addYoutube = useMutation({
@@ -268,7 +300,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(parseSourceError(e)),
+    onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 
   const addFile = useMutation({
@@ -301,7 +333,7 @@ function AddSourceModal({
       onAdded();
       setSuccess(true);
     },
-    onError: (e) => setError(parseSourceError(e)),
+    onError: (e) => setError(t(getSourceErrorKey(e))),
   });
 
   const handleSubmit = async () => {
@@ -309,20 +341,20 @@ function AddSourceModal({
     setBusy(true);
     try {
       if (tab === 'url') {
-        if (!url) return setError('נא להזין URL');
+        if (!url) return setError(t('sources.urlRequired'));
         const title = urlTitle || new URL(url).hostname;
         await addUrl.mutateAsync({ courseId, title, url });
       } else if (tab === 'text') {
-        if (!text.trim()) return setError('נא להזין טקסט');
+        if (!text.trim()) return setError(t('sources.textRequired'));
         const title = textTitle || text.slice(0, 50) + '...';
         await addText.mutateAsync({ courseId, title, text });
       } else if (tab === 'youtube') {
-        if (!youtubeUrl.trim()) return setError('נא להזין קישור YouTube');
+        if (!youtubeUrl.trim()) return setError(t('sources.youtubeRequired'));
         const title = youtubeTitle || youtubeUrl;
         await addYoutube.mutateAsync({ courseId, title, url: youtubeUrl });
       } else if (tab === 'file') {
         const file = fileRef.current?.files?.[0];
-        if (!file) return setError('נא לבחור קובץ');
+        if (!file) return setError(t('sources.fileRequired'));
         const contentBase64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => {
@@ -341,7 +373,7 @@ function AddSourceModal({
         });
       }
     } catch (e) {
-      setError(parseSourceError(e));
+      setError(t(getSourceErrorKey(e)));
     } finally {
       setBusy(false);
     }
@@ -351,11 +383,11 @@ function AddSourceModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div
         className="w-[520px] rounded-2xl bg-white shadow-2xl flex flex-col"
-        dir="rtl"
+        dir={dir}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">הוספת מקור מידע</h2>
+          <h2 className="text-lg font-semibold">{t('sources.addSourceTitle')}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-700 text-xl"
@@ -367,20 +399,14 @@ function AddSourceModal({
         {/* Tabs — hidden when success */}
         {!success && (
           <div className="flex border-b px-6">
-            {(['url', 'text', 'youtube', 'file'] as AddTab[]).map((t) => (
+            {TAB_KEYS.map((tabKey) => (
               <button
-                key={t}
-                onClick={() => setTab(t)}
+                key={tabKey}
+                onClick={() => setTab(tabKey)}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors
-                  ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  ${tab === tabKey ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
               >
-                {t === 'url'
-                  ? '🌐 קישור'
-                  : t === 'text'
-                    ? '✏️ טקסט'
-                    : t === 'youtube'
-                      ? '▶️ YouTube'
-                      : '📄 קובץ'}
+                {t(TAB_LABEL_KEYS[tabKey])}
               </button>
             ))}
           </div>
@@ -395,10 +421,10 @@ function AddSourceModal({
                 <span className="text-3xl">✅</span>
               </div>
               <p className="font-semibold text-green-700 text-base">
-                המקור הוסף בהצלחה!
+                {t('sources.addedSuccess')}
               </p>
               <p className="text-sm text-gray-500">
-                מעובד ויוצג ברשימה בקרוב...
+                {t('sources.addedProcessing')}
               </p>
             </div>
           )}
@@ -406,24 +432,22 @@ function AddSourceModal({
           {!success && tab === 'url' && (
             <>
               <label className="text-xs font-medium text-gray-700">
-                כתובת URL
+                {t('sources.urlLabel')}
               </label>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="https://..."
+                placeholder={t('sources.urlPlaceholder')}
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 dir="ltr"
               />
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="כותרת (אופציונלי)"
+                placeholder={t('sources.titleOptional')}
                 value={urlTitle}
                 onChange={(e) => setUrlTitle(e.target.value)}
               />
-              <p className="text-xs text-gray-500">
-                המערכת תאסוף את תוכן העמוד, תחלק לחלקים ותצור embeddings.
-              </p>
+              <p className="text-xs text-gray-500">{t('sources.urlHint')}</p>
             </>
           )}
 
@@ -431,13 +455,13 @@ function AddSourceModal({
             <>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm"
-                placeholder="כותרת למקור"
+                placeholder={t('sources.titleOptional')}
                 value={textTitle}
                 onChange={(e) => setTextTitle(e.target.value)}
               />
               <textarea
                 className="w-full border rounded-lg px-3 py-2 text-sm h-40 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="הדבק כאן טקסט חופשי — מאמר, קטע ספר, הערות..."
+                placeholder={t('sources.textPlaceholder')}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
@@ -448,21 +472,18 @@ function AddSourceModal({
             <>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="https://youtube.com/watch?v=..."
+                placeholder={t('sources.youtubePlaceholder')}
                 value={youtubeUrl}
                 onChange={(e) => setYoutubeUrl(e.target.value)}
                 dir="ltr"
               />
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm"
-                placeholder="כותרת (אופציונלי)"
+                placeholder={t('sources.titleOptional')}
                 value={youtubeTitle}
                 onChange={(e) => setYoutubeTitle(e.target.value)}
               />
-              <p className="text-xs text-gray-500">
-                המערכת תוריד את תמלול הווידאו ותיצור ממנו embeddings לחיפוש
-                סמנטי.
-              </p>
+              <p className="text-xs text-gray-500">{t('sources.youtubeHint')}</p>
             </>
           )}
 
@@ -470,7 +491,7 @@ function AddSourceModal({
             <>
               <input
                 className="w-full border rounded-lg px-3 py-2 text-sm"
-                placeholder="כותרת (אופציונלי)"
+                placeholder={t('sources.titleOptional')}
                 value={fileTitle}
                 onChange={(e) => setFileTitle(e.target.value)}
                 disabled={busy}
@@ -481,7 +502,7 @@ function AddSourceModal({
                 <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50">
                   <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2" />
                   <span className="text-sm text-blue-700 font-medium">
-                    מעלה ומעבד קובץ…
+                    {t('sources.uploading')}
                   </span>
                 </div>
               ) : (
@@ -490,11 +511,13 @@ function AddSourceModal({
                     {selectedFileName ? '📄' : '📂'}
                   </span>
                   <span className="text-sm text-gray-600">
-                    {selectedFileName || 'גרור קובץ לכאן או לחץ לבחירה'}
+                    {selectedFileName
+                      ? t('sources.fileChanged', { name: selectedFileName })
+                      : t('sources.dropOrClick')}
                   </span>
                   {!selectedFileName && (
                     <span className="text-xs text-gray-400 mt-1">
-                      DOCX, PDF, TXT
+                      {t('sources.fileHint')}
                     </span>
                   )}
                   <input
@@ -530,7 +553,7 @@ function AddSourceModal({
               disabled={busy}
               className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-40"
             >
-              ביטול
+              {t('sources.cancel')}
             </button>
             <button
               onClick={handleSubmit}
@@ -540,7 +563,7 @@ function AddSourceModal({
               {busy && (
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               )}
-              {busy ? 'שולח...' : 'הוספת מקור'}
+              {busy ? t('sources.submitAdding') : t('sources.submit')}
             </button>
           </div>
         )}
@@ -558,6 +581,9 @@ function SourceDetailDrawer({
   sourceId: string;
   onClose: () => void;
 }) {
+  const { t, i18n } = useTranslation('content');
+  const dir = i18n.dir();
+
   const { data, isLoading } = useQuery({
     queryKey: ['knowledge-source', sourceId],
     queryFn: IS_DEV_MODE
@@ -573,20 +599,32 @@ function SourceDetailDrawer({
             ),
   });
 
+  const formattedDate = data?.createdAt
+    ? (() => {
+        const d = new Date(data.createdAt);
+        return isNaN(d.getTime()) ? '' : d.toLocaleDateString(i18n.language);
+      })()
+    : '';
+
   return (
-    <div className="absolute inset-0 z-10 bg-white flex flex-col" dir="rtl">
+    <div className="absolute inset-0 z-10 bg-white flex flex-col" dir={dir}>
       <div className="flex items-center gap-2 px-4 py-3 border-b">
         <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
-          ← חזרה
+          {t('sources.back')}
         </button>
         <span className="font-medium truncate">{data?.title ?? '...'}</span>
       </div>
       <div className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
-        {isLoading ? 'טוען...' : (data?.rawContent ?? 'אין תוכן זמין.')}
+        {isLoading
+          ? t('sources.loading')
+          : (data?.rawContent ?? t('sources.noContent'))}
       </div>
       <div className="px-4 py-2 border-t text-xs text-gray-400">
         {data &&
-          `${data.chunkCount} קטעים • נוצר ${new Date(data.createdAt).toLocaleDateString('he-IL')}`}
+          t('sources.chunkFooter', {
+            count: data.chunkCount,
+            date: formattedDate,
+          })}
       </div>
     </div>
   );
@@ -595,6 +633,8 @@ function SourceDetailDrawer({
 // ─── Main SourceManager Panel ─────────────────────────────────────────────────
 
 export function SourceManager({ courseId }: { courseId: string }) {
+  const { t, i18n } = useTranslation('content');
+  const dir = i18n.dir();
   const [showAdd, setShowAdd] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [addedBanner, setAddedBanner] = useState<string | null>(null);
@@ -646,22 +686,26 @@ export function SourceManager({ courseId }: { courseId: string }) {
   const handleDelete = useCallback(
     (e: React.MouseEvent, id: string) => {
       e.stopPropagation();
-      if (confirm('להסיר מקור זה?')) deleteSource.mutate(id);
+      if (window.confirm(t('sources.deleteConfirm'))) deleteSource.mutate(id);
     },
-    [deleteSource]
+    [deleteSource, t]
   );
 
   return (
     <div
       className="relative flex flex-col h-full bg-gray-50 border-r"
-      dir="rtl"
+      dir={dir}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-white">
         <div>
-          <h3 className="font-semibold text-sm text-gray-800">מקורות מידע</h3>
+          <h3 className="font-semibold text-sm text-gray-800">
+            {t('sources.title')}
+          </h3>
           <p className="text-xs text-gray-500">
-            {data ? `${data.length} מקורות` : '...'}
+            {data
+              ? t('sources.count', { count: data.length })
+              : t('sources.loading')}
           </p>
         </div>
         <button
@@ -669,7 +713,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
           className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <span className="text-base leading-none">+</span>
-          הוסף מקור
+          {t('sources.addSource')}
         </button>
       </div>
 
@@ -685,7 +729,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
         {isLoading && (
           <div className="text-center text-sm text-gray-400 mt-8">
-            טוען מקורות...
+            {t('sources.loadingSources')}
           </div>
         )}
 
@@ -693,10 +737,10 @@ export function SourceManager({ courseId }: { courseId: string }) {
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <span className="text-5xl mb-3">📚</span>
             <p className="text-sm font-medium text-gray-700">
-              אין מקורות עדיין
+              {t('sources.noSourcesYet')}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              הוסף קישורים, מסמכים או טקסט — המערכת תנתח ותאנדקס אותם
+              {t('sources.noSourcesHint')}
             </p>
           </div>
         )}
@@ -728,11 +772,11 @@ export function SourceManager({ courseId }: { courseId: string }) {
                 <span
                   className={`text-xs font-medium ${STATUS_COLORS[source.status]}`}
                 >
-                  {STATUS_LABELS[source.status]}
+                  {t(STATUS_I18N_KEYS[source.status])}
                 </span>
                 {source.status === 'READY' && (
                   <span className="text-xs text-gray-400">
-                    · {source.chunkCount} קטעים
+                    · {t('sources.chunks', { count: source.chunkCount })}
                   </span>
                 )}
                 {source.status === 'FAILED' && source.errorMessage && (
@@ -745,7 +789,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
             <button
               onClick={(e) => handleDelete(e, source.id)}
               className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all text-lg leading-none mt-0.5 shrink-0"
-              title="הסר מקור"
+              title={t('sources.deleteTitle')}
             >
               ✕
             </button>
@@ -756,7 +800,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
       {/* Info footer */}
       <div className="px-4 py-3 border-t bg-white">
         <p className="text-xs text-gray-400 text-center leading-relaxed">
-          המערכת מנתחת את המקורות ומאנדקסת אותם לחיפוש סמנטי ו-AI
+          {t('sources.footerInfo')}
         </p>
       </div>
 
@@ -775,7 +819,7 @@ export function SourceManager({ courseId }: { courseId: string }) {
           onClose={() => setShowAdd(false)}
           onAdded={() => {
             refetch();
-            setAddedBanner('המקור נוסף ומעובד כעת — יוצג כאן בקרוב');
+            setAddedBanner(t('sources.addedBanner'));
             if (addedBannerTimerRef.current)
               clearTimeout(addedBannerTimerRef.current);
             addedBannerTimerRef.current = setTimeout(

@@ -3,7 +3,7 @@
  * Target coverage: lines 56-67 (queue count / loading), 71-72 (handleAddDemo), 111 (Add Review Card button)
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { UseQueryResponse, UseMutationResponse } from 'urql';
 
@@ -64,12 +64,17 @@ function mockCountQuery(overrides: {
   fetching?: boolean;
   error?: unknown;
 }) {
-  // useQuery is called twice (count + reviews), return different values based on call count
+  // SRSWidget calls useQuery twice per render (count + reviews).
+  // With the mounted guard (BUG-049 fix), the component renders twice:
+  // Render 1 (mounted=false, both queries paused) and Render 2 (mounted=true,
+  // count query active). Total useQuery calls across 2 renders = 4.
+  // Odd-numbered calls (1, 3, 5…) = SRS_QUEUE_COUNT_QUERY.
+  // Even-numbered calls (2, 4, 6…) = DUE_REVIEWS_QUERY.
   let callCount = 0;
   vi.mocked(useQuery).mockImplementation(() => {
     callCount++;
-    if (callCount === 1) {
-      // First call: SRS_QUEUE_COUNT_QUERY
+    if (callCount % 2 === 1) {
+      // Odd calls: SRS_QUEUE_COUNT_QUERY (first call per render cycle)
       return [
         {
           data: overrides.data,
@@ -82,7 +87,7 @@ function mockCountQuery(overrides: {
         vi.fn(),
       ] as unknown as UseQueryResponse;
     }
-    // Second call: DUE_REVIEWS_QUERY
+    // Even calls: DUE_REVIEWS_QUERY (second call per render cycle)
     return [
       {
         data: { dueReviews: [] },
@@ -278,5 +283,109 @@ describe('SRSWidget', () => {
     const { unmount } = renderWidget();
     // Simply verify unmounting does not throw
     expect(() => unmount()).not.toThrow();
+  });
+
+  // ── BUG-049 regression: mounted guard (React 19 concurrent-mode safety) ───
+  // Root cause: SRSWidget and Layout (via useSrsQueueCount) both subscribe to
+  // SRS_QUEUE_COUNT_QUERY. Without pause:!mounted, urql graphcache dispatches
+  // state updates across fibers during render, causing "Cannot update a
+  // component while rendering a different component" errors.
+
+  it('BUG-049: passes pause=true to BOTH useQuery calls before mount (prevents setState-during-render)', () => {
+    const pauseValues: boolean[] = [];
+    vi.mocked(useQuery).mockImplementation((opts) => {
+      pauseValues.push((opts as { pause?: boolean }).pause ?? false);
+      return [
+        { data: undefined, fetching: false, error: undefined, stale: false, operation: undefined },
+        vi.fn(),
+        vi.fn(),
+      ] as unknown as UseQueryResponse;
+    });
+
+    renderWidget();
+
+    // Before effects run (mounted=false): BOTH queries must be paused.
+    // This is the guard that prevents setState-during-render in Layout.
+    expect(pauseValues[0]).toBe(true); // SRS_QUEUE_COUNT_QUERY
+    expect(pauseValues[1]).toBe(true); // DUE_REVIEWS_QUERY
+  });
+
+  it('BUG-049: unpauses countQuery after mount (useEffect sets mounted=true)', async () => {
+    const pauseValues: boolean[] = [];
+    vi.mocked(useQuery).mockImplementation((opts) => {
+      pauseValues.push((opts as { pause?: boolean }).pause ?? false);
+      return [
+        { data: undefined, fetching: false, error: undefined, stale: false, operation: undefined },
+        vi.fn(),
+        vi.fn(),
+      ] as unknown as UseQueryResponse;
+    });
+
+    renderWidget();
+    await act(async () => {}); // flush setMounted(true) useEffect
+
+    // After mount: SRS_QUEUE_COUNT_QUERY (first call in re-render) must be unpaused.
+    // pauseValues[2] = 3rd call = first useQuery in the post-mount re-render.
+    expect(pauseValues[2]).toBe(false); // SRS_QUEUE_COUNT_QUERY after mount
+  });
+
+  it('BUG-049: does NOT expose raw GraphQL error strings to user', () => {
+    vi.mocked(useQuery).mockImplementation(() => {
+      return [
+        {
+          data: undefined,
+          fetching: false,
+          error: { message: '[GraphQL] Internal server error — connection refused' },
+          stale: false,
+          operation: undefined,
+        },
+        vi.fn(),
+        vi.fn(),
+      ] as unknown as UseQueryResponse;
+    });
+
+    renderWidget();
+
+    // Raw technical error strings must NOT be visible to the user (regression guard)
+    expect(screen.queryByText(/\[GraphQL\]/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Internal server error/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/connection refused/)).not.toBeInTheDocument();
+  });
+
+  it('BUG-049: logs console.error when countResult has a GraphQL error', () => {
+    const consoleSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    let callCount = 0;
+    vi.mocked(useQuery).mockImplementation(() => {
+      callCount++;
+      if (callCount % 2 === 1) {
+        // Odd = SRS_QUEUE_COUNT_QUERY (across all render cycles)
+        return [
+          {
+            data: undefined,
+            fetching: false,
+            error: { message: 'SRS network error — fetch failed' },
+            stale: false,
+            operation: undefined,
+          },
+          vi.fn(),
+          vi.fn(),
+        ] as unknown as UseQueryResponse;
+      }
+      return [
+        { data: { dueReviews: [] }, fetching: false, error: undefined, stale: false, operation: undefined },
+        vi.fn(),
+        vi.fn(),
+      ] as unknown as UseQueryResponse;
+    });
+
+    renderWidget();
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      '[SRSWidget] GraphQL error fetching queue count:',
+      'SRS network error — fetch failed'
+    );
+    consoleSpy.mockRestore();
   });
 });

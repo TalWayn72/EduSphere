@@ -32,6 +32,8 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((col, val) => ({ col, val })),
   desc: vi.fn((col) => ({ col, direction: 'desc' })),
+  ilike: vi.fn((col, pattern) => ({ col, pattern, op: 'ilike' })),
+  or: vi.fn((...args) => ({ args, op: 'or' })),
 }));
 
 const MOCK_COURSE = {
@@ -46,6 +48,7 @@ const MOCK_COURSE = {
   slug: '',
   thumbnailUrl: null,
   estimatedHours: null,
+  forkedFromId: null,
 };
 
 describe('CourseService', () => {
@@ -358,6 +361,141 @@ describe('CourseService', () => {
       mockReturning.mockResolvedValue([]);
       const result = await service.delete('nonexistent');
       expect(result).toBe(false);
+    });
+  });
+
+  describe('search()', () => {
+    beforeEach(() => {
+      mockLimit.mockResolvedValue([MOCK_COURSE]);
+      mockOrderBy.mockReturnValue({ limit: mockLimit });
+      mockWhere.mockReturnValue({ orderBy: mockOrderBy });
+      mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
+      mockSelect.mockReturnValue({ from: mockFrom });
+    });
+
+    it('returns courses matching title', async () => {
+      mockLimit.mockResolvedValue([MOCK_COURSE]);
+      const result = await service.search('Test', 10);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
+    });
+
+    it('returns courses matching description', async () => {
+      const descMatch = { ...MOCK_COURSE, description: 'Advanced topic' };
+      mockLimit.mockResolvedValue([descMatch]);
+      const result = await service.search('Advanced', 10);
+      expect(result).toHaveLength(1);
+    });
+
+    it('returns empty array for query shorter than 2 characters', async () => {
+      const result = await service.search('a', 10);
+      expect(result).toEqual([]);
+      // withReadReplica should NOT be called for short queries
+      const { withReadReplica } = await import('@edusphere/db');
+      expect(withReadReplica).not.toHaveBeenCalled();
+    });
+
+    it('returns empty array for empty string query', async () => {
+      const result = await service.search('', 10);
+      expect(result).toEqual([]);
+    });
+
+    it('logs error and throws BadRequestException on DB failure', async () => {
+      mockLimit.mockRejectedValue(new Error('DB connection lost'));
+      await expect(service.search('hello', 10)).rejects.toThrow(
+        'Failed to search courses. Please try again.'
+      );
+    });
+
+    it('calls ilike() on title and description columns', async () => {
+      const { ilike } = await import('@edusphere/db');
+      mockLimit.mockResolvedValue([]);
+      await service.search('test query', 10);
+      expect(ilike).toHaveBeenCalledTimes(2);
+    });
+
+    it('calls or() to combine title and description conditions', async () => {
+      const { or } = await import('@edusphere/db');
+      mockLimit.mockResolvedValue([]);
+      await service.search('test query', 10);
+      expect(or).toHaveBeenCalled();
+    });
+
+    it('applies the given limit', async () => {
+      mockLimit.mockResolvedValue([]);
+      await service.search('test', 5);
+      expect(mockLimit).toHaveBeenCalledWith(5);
+    });
+  });
+
+  describe('forkCourse()', () => {
+    beforeEach(() => {
+      mockReturning.mockResolvedValue([MOCK_COURSE]);
+      mockValues.mockReturnValue({ returning: mockReturning });
+      mockInsert.mockReturnValue({ values: mockValues });
+      // Default findById chain (used by forkCourse internally)
+      mockLimit.mockResolvedValue([MOCK_COURSE]);
+      mockWhere.mockReturnValue({ limit: mockLimit });
+      mockFrom.mockReturnValue({ where: mockWhere, orderBy: mockOrderBy });
+      mockSelect.mockReturnValue({ from: mockFrom });
+    });
+
+    it('creates a forked course with forkedFromId', async () => {
+      const forkRow = { ...MOCK_COURSE, id: 'fork-id', forked_from_id: 'course-1' };
+      mockReturning.mockResolvedValue([forkRow]);
+      const result = await service.forkCourse('course-1', 'user-1', 'tenant-1');
+      expect(result?.forkedFromId).toBe('course-1');
+    });
+
+    it('throws NotFoundException when source course not found', async () => {
+      mockLimit.mockResolvedValue([]);
+      await expect(
+        service.forkCourse('bad-id', 'user-1', 'tenant-1')
+      ).rejects.toThrow('not found');
+    });
+
+    it('sets forked course status to DRAFT (is_published = false)', async () => {
+      let insertedValues: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => {
+        insertedValues = v;
+        return { returning: mockReturning };
+      });
+      mockReturning.mockResolvedValue([{ ...MOCK_COURSE, id: 'fork-id' }]);
+      await service.forkCourse('course-1', 'user-1', 'tenant-1');
+      expect(insertedValues['is_published']).toBe(false);
+    });
+
+    it('sets forked_from_id to the original courseId', async () => {
+      let insertedValues: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => {
+        insertedValues = v;
+        return { returning: mockReturning };
+      });
+      mockReturning.mockResolvedValue([{ ...MOCK_COURSE, id: 'fork-id' }]);
+      await service.forkCourse('course-1', 'user-1', 'tenant-1');
+      expect(insertedValues['forked_from_id']).toBe('course-1');
+    });
+
+    it('appends (Fork) to the original title', async () => {
+      let insertedValues: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => {
+        insertedValues = v;
+        return { returning: mockReturning };
+      });
+      mockReturning.mockResolvedValue([{ ...MOCK_COURSE, id: 'fork-id' }]);
+      await service.forkCourse('course-1', 'user-1', 'tenant-1');
+      expect(String(insertedValues['title'])).toContain('(Fork)');
+    });
+
+    it('assigns the new owner as instructor_id', async () => {
+      let insertedValues: Record<string, unknown> = {};
+      mockValues.mockImplementation((v: Record<string, unknown>) => {
+        insertedValues = v;
+        return { returning: mockReturning };
+      });
+      mockReturning.mockResolvedValue([{ ...MOCK_COURSE, id: 'fork-id' }]);
+      await service.forkCourse('course-1', 'user-99', 'tenant-1');
+      expect(insertedValues['instructor_id']).toBe('user-99');
     });
   });
 });

@@ -23,6 +23,12 @@
   "create": "צור",
   "submit": "שלח",
   "noResults": "לא נמצאו תוצאות",
+  "saveSearch": "שמור חיפוש",
+  "savedSearches": "חיפושים שמורים",
+  "deleteSavedSearch": "מחק",
+  "savedSearchSuccess": "החיפוש נשמר!",
+  "noSavedSearches": "אין חיפושים שמורים עדיין",
+  "savedSearchNamePlaceholder": "שם לחיפוש...",
   "viewAll": "הצג הכל",
   "learnMore": "למד עוד",
   "optional": "אופציונלי",
@@ -32,6 +38,12 @@
   "graph": "גרף",
   "accountInformation": "פרטי חשבון",
   "errorLoadingUser": "שגיאה בטעינת נתוני המשתמש",
+  "unsavedChanges": {
+    "title": "שינויים שלא נשמרו",
+    "message": "יש לך שינויים שלא נשמרו. אם תעזוב עכשיו, השינויים יאבדו.",
+    "leave": "עזוב בכל זאת",
+    "stay": "הישאר בדף"
+  },
   "profilePage": {
     "accountDetails": "פרטי חשבון",
     "permissions": "הרשאות",

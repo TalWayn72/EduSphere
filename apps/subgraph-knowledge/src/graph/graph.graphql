@@ -122,6 +122,12 @@ extend type Mutation {
   createTopicCluster(input: CreateTopicClusterInput!): TopicCluster! @authenticated
 
   generateEmbedding(text: String!, entityType: String!, entityId: ID!): Boolean! @authenticated
+
+  """
+  Run k-means++ clustering on all concepts for a given course (default k=5).
+  Returns the resulting TopicCluster nodes. Requires INSTRUCTOR or higher role.
+  """
+  clusterTopics(courseId: ID!, k: Int): [TopicCluster!]! @authenticated
 }
 
 input CreateConceptInput {

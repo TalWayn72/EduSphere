@@ -289,6 +289,7 @@ const LessonResultsPage = lazy(() =>
     default: m.LessonResultsPage,
   }))
 );
+const KnowledgeGraphPage = lazy(() => import('@/pages/KnowledgeGraphPage'));
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -481,6 +482,15 @@ export const router = createBrowserRouter([
   {
     path: '/graph',
     element: guarded(<KnowledgeGraph />),
+  },
+  {
+    // Standalone knowledge graph page — optional course filter via :courseId
+    path: '/knowledge-graph',
+    element: guarded(<KnowledgeGraphPage />),
+  },
+  {
+    path: '/knowledge-graph/:courseId',
+    element: guarded(<KnowledgeGraphPage />),
   },
   {
     path: '/agents',

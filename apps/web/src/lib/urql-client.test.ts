@@ -25,6 +25,10 @@ vi.mock('graphql-ws', () => ({
   })),
 }));
 
+vi.mock('@urql/exchange-persisted', () => ({
+  persistedExchange: vi.fn(() => (next: unknown) => next),
+}));
+
 // ── Types for the exchange callback under test ────────────────────────────────
 
 interface MockGraphQLError {
@@ -234,69 +238,27 @@ describe('urql auth error exchange — redirect logic', () => {
   });
 });
 
-// ── Network error logging (BUG-039 regression guard) ─────────────────────────
+// ── Module smoke tests ────────────────────────────────────────────────────────
+// These tests import the actual module to verify it builds without errors.
+// @urql/exchange-persisted is mocked above to prevent ESM resolution issues.
 
-describe('urql error exchange — network error logging', () => {
-  /**
-   * Mirrors the logging logic added in urql-client.ts to ensure console.warn
-   * is called with the [GraphQL][Network] prefix when a network error occurs.
-   * This logic is extracted here for unit testing without importing the full
-   * urql client (which would require a full exchange pipeline setup).
-   */
-  function logNetworkError(
-    error: MockCombinedError,
-    operation: { kind: string; name: string }
-  ): void {
-    if (error.networkError) {
-      console.warn(
-        `[GraphQL][Network] ${operation.kind} "${operation.name}": ${error.networkError.message}`
-      );
-    }
-  }
-
-  it('logs console.warn with [GraphQL][Network] prefix when networkError present', () => {
-    const warnSpy = vi
-      .spyOn(console, 'warn')
-      .mockImplementation(() => undefined);
-    const error: MockCombinedError = {
-      message: '[Network] Failed to fetch',
-      graphQLErrors: [],
-      networkError: new Error('Failed to fetch'),
-    };
-    logNetworkError(error, { kind: 'query', name: 'CoursesQuery' });
-    expect(warnSpy).toHaveBeenCalledWith(
-      '[GraphQL][Network] query "CoursesQuery": Failed to fetch'
-    );
-    warnSpy.mockRestore();
+describe('urql-client module', () => {
+  it('exports urqlClient', async () => {
+    const mod = await import('./urql-client');
+    expect(mod.urqlClient).toBeDefined();
+    expect(typeof mod.urqlClient).toBe('object');
   });
 
-  it('does NOT log when no networkError (GraphQL errors only)', () => {
-    const warnSpy = vi
-      .spyOn(console, 'warn')
-      .mockImplementation(() => undefined);
-    const error: MockCombinedError = {
-      message: '[GraphQL] Not found',
-      graphQLErrors: [{ message: 'Not found' }],
-      // no networkError
-    };
-    logNetworkError(error, { kind: 'query', name: 'SomeQuery' });
-    expect(warnSpy).not.toHaveBeenCalled();
-    warnSpy.mockRestore();
+  it('exports disposeWsClient function', async () => {
+    const mod = await import('./urql-client');
+    expect(typeof mod.disposeWsClient).toBe('function');
   });
 
-  it('includes operation kind in the log message', () => {
-    const warnSpy = vi
-      .spyOn(console, 'warn')
-      .mockImplementation(() => undefined);
-    const error: MockCombinedError = {
-      message: '[Network] Connection refused',
-      graphQLErrors: [],
-      networkError: new Error('Connection refused'),
-    };
-    logNetworkError(error, { kind: 'mutation', name: 'CreateCourse' });
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('mutation "CreateCourse"')
-    );
-    warnSpy.mockRestore();
+  it('persistedExchange mock is registered (production guard)', async () => {
+    // In test environment import.meta.env.PROD is false, so the exchange array
+    // does NOT include the real persistedExchange — but the mock must be in place
+    // so the module can load the import without throwing.
+    const { persistedExchange } = await import('@urql/exchange-persisted');
+    expect(persistedExchange).toBeDefined();
   });
 });

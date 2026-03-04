@@ -9,6 +9,7 @@ export {
   not,
   desc,
   asc,
+  ilike,
   inArray,
   lte,
   gte,

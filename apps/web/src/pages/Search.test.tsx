@@ -11,7 +11,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 // ─── Module mocks (must be hoisted before component imports) ──────────────────
 
-// Mock urql — keep gql/other exports, only override useQuery
+// Mock urql — keep gql/other exports, only override useQuery and useMutation
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>
     strings.reduce(
@@ -22,6 +22,10 @@ vi.mock('urql', () => ({
   useQuery: vi.fn(() => [
     { data: undefined, fetching: false, error: undefined },
     vi.fn(),
+  ]),
+  useMutation: vi.fn(() => [
+    { data: undefined, fetching: false, error: undefined },
+    vi.fn().mockResolvedValue({ data: null, error: null }),
   ]),
 }));
 
@@ -48,7 +52,7 @@ vi.mock('@/lib/auth', () => ({
 
 // ─── Imports ──────────────────────────────────────────────────────────────────
 import { SearchPage } from './Search';
-import { useQuery } from 'urql';
+import { useQuery, useMutation } from 'urql';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -74,6 +78,10 @@ describe('SearchPage', () => {
       { data: undefined, fetching: false, error: undefined },
       vi.fn(),
     ] as unknown as ReturnType<typeof useQuery>);
+    vi.mocked(useMutation).mockReturnValue([
+      { data: undefined, fetching: false, error: undefined },
+      vi.fn().mockResolvedValue({ data: null, error: null }),
+    ] as unknown as ReturnType<typeof useMutation>);
   });
 
   afterEach(() => {
@@ -197,6 +205,37 @@ describe('SearchPage', () => {
   });
 
   it('renders grouped section heading "Courses" when course results exist', async () => {
+    // Override useQuery so that searchCourses returns a real course result.
+    vi.mocked(useQuery).mockImplementation((opts) => {
+      const queryStr = String((opts as { query?: unknown })?.query ?? '');
+      if (queryStr.includes('searchCourses')) {
+        return [
+          {
+            data: {
+              searchCourses: [
+                {
+                  id: 'c-talmud',
+                  title: 'Talmud Study Course',
+                  description: 'Study Talmud',
+                  slug: 'talmud-study',
+                  isPublished: true,
+                  estimatedHours: 5,
+                  thumbnailUrl: null,
+                },
+              ],
+            },
+            fetching: false,
+            error: undefined,
+          },
+          vi.fn(),
+        ] as unknown as ReturnType<typeof useQuery>;
+      }
+      return [
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>;
+    });
+
     renderSearch();
 
     await userEvent.type(
@@ -692,6 +731,476 @@ describe('SearchPage', () => {
       expect(cards.length).toBeGreaterThan(0);
       // Card click navigates to /learn/content-15 — must not throw
       expect(() => fireEvent.click(cards[0]!)).not.toThrow();
+    });
+  });
+
+  // ── Saved Searches ──────────────────────────────────────────────────────────
+  describe('Saved Searches', () => {
+    it('shows Save button when query has 2+ characters', async () => {
+      renderSearch();
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'test');
+      await waitFor(
+        () => expect(screen.getByTestId('save-search-btn')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('does not show Save button when query is shorter than 2 characters', () => {
+      renderSearch();
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      fireEvent.change(input, { target: { value: 't' } });
+      expect(screen.queryByTestId('save-search-btn')).not.toBeInTheDocument();
+    });
+
+    it('opens save modal when Save button is clicked', async () => {
+      renderSearch();
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'test query');
+      await waitFor(
+        () => expect(screen.getByTestId('save-search-btn')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+      await userEvent.click(screen.getByTestId('save-search-btn'));
+      expect(screen.getByTestId('save-search-modal')).toBeInTheDocument();
+    });
+
+    it('closes save modal when Cancel is clicked', async () => {
+      renderSearch();
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'test query');
+      await waitFor(
+        () => expect(screen.getByTestId('save-search-btn')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+      await userEvent.click(screen.getByTestId('save-search-btn'));
+      expect(screen.getByTestId('save-search-modal')).toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
+      expect(screen.queryByTestId('save-search-modal')).not.toBeInTheDocument();
+    });
+
+    it('saved searches toggle button is always rendered', () => {
+      renderSearch();
+      expect(screen.getByTestId('saved-searches-toggle')).toBeInTheDocument();
+    });
+
+    it('toggles saved searches panel when toggle button is clicked', async () => {
+      renderSearch();
+      const toggleBtn = screen.getByTestId('saved-searches-toggle');
+      await userEvent.click(toggleBtn);
+      expect(screen.getByTestId('saved-searches-panel')).toBeInTheDocument();
+    });
+
+    it('closes saved searches panel when toggle button is clicked again', async () => {
+      renderSearch();
+      const toggleBtn = screen.getByTestId('saved-searches-toggle');
+      await userEvent.click(toggleBtn);
+      expect(screen.getByTestId('saved-searches-panel')).toBeInTheDocument();
+      await userEvent.click(toggleBtn);
+      expect(screen.queryByTestId('saved-searches-panel')).not.toBeInTheDocument();
+    });
+
+    it('closes saved searches panel when close (X) button is clicked', async () => {
+      renderSearch();
+      await userEvent.click(screen.getByTestId('saved-searches-toggle'));
+      expect(screen.getByTestId('saved-searches-panel')).toBeInTheDocument();
+      // The X button inside the panel closes it
+      const panel = screen.getByTestId('saved-searches-panel');
+      // Find the button with X icon inside the panel header
+      const panelButtons = panel.querySelectorAll('button');
+      // Last button in header area closes the panel (has X icon)
+      const closePanelBtn = Array.from(panelButtons).find((btn) =>
+        btn.closest('.border-b') !== null
+      ) as HTMLElement | undefined;
+      if (closePanelBtn) {
+        await userEvent.click(closePanelBtn);
+        expect(screen.queryByTestId('saved-searches-panel')).not.toBeInTheDocument();
+      }
+    });
+
+    it('shows "No saved searches yet" when savedSearches data is empty', async () => {
+      vi.mocked(useQuery).mockReturnValue([
+        { data: { savedSearches: [] }, fetching: false, error: undefined },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      renderSearch();
+      await userEvent.click(screen.getByTestId('saved-searches-toggle'));
+
+      await waitFor(
+        () =>
+          expect(
+            screen.getByText(/no saved searches yet/i)
+          ).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('shows "No saved searches yet" when savedSearches data is undefined', async () => {
+      // useQuery returns no data (undefined)
+      vi.mocked(useQuery).mockReturnValue([
+        { data: undefined, fetching: false, error: undefined },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      renderSearch();
+      await userEvent.click(screen.getByTestId('saved-searches-toggle'));
+
+      await waitFor(
+        () =>
+          expect(
+            screen.getByText(/no saved searches yet/i)
+          ).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('renders saved search items when savedSearches data is populated', async () => {
+      vi.mocked(useQuery).mockReturnValue([
+        {
+          data: {
+            savedSearches: [
+              {
+                id: 'ss-1',
+                name: 'My Talmud Search',
+                query: 'talmud',
+                filters: null,
+                createdAt: '2026-01-01T00:00:00Z',
+              },
+              {
+                id: 'ss-2',
+                name: 'Chavruta Search',
+                query: 'chavruta',
+                filters: null,
+                createdAt: '2026-01-02T00:00:00Z',
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      renderSearch();
+      await userEvent.click(screen.getByTestId('saved-searches-toggle'));
+
+      await waitFor(
+        () =>
+          expect(screen.getAllByTestId('saved-search-item')).toHaveLength(2),
+        { timeout: 2000 }
+      );
+
+      expect(screen.getByText('My Talmud Search')).toBeInTheDocument();
+      expect(screen.getByText('Chavruta Search')).toBeInTheDocument();
+    });
+
+    it('renders delete buttons for each saved search item', async () => {
+      vi.mocked(useQuery).mockReturnValue([
+        {
+          data: {
+            savedSearches: [
+              {
+                id: 'ss-1',
+                name: 'My Talmud Search',
+                query: 'talmud',
+                filters: null,
+                createdAt: '2026-01-01T00:00:00Z',
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      renderSearch();
+      await userEvent.click(screen.getByTestId('saved-searches-toggle'));
+
+      await waitFor(
+        () =>
+          expect(
+            screen.getByTestId('delete-saved-search-btn')
+          ).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('calls deleteSavedSearch mutation when delete button is clicked', async () => {
+      const mockMutationFn = vi.fn().mockResolvedValue({ data: null, error: null });
+      vi.mocked(useMutation).mockReturnValue([
+        { data: undefined, fetching: false, error: undefined },
+        mockMutationFn,
+      ] as unknown as ReturnType<typeof useMutation>);
+
+      const reexecuteQuery = vi.fn();
+      vi.mocked(useQuery).mockReturnValue([
+        {
+          data: {
+            savedSearches: [
+              {
+                id: 'ss-delete-1',
+                name: 'Search to Delete',
+                query: 'delete me',
+                filters: null,
+                createdAt: '2026-01-01T00:00:00Z',
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        reexecuteQuery,
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      renderSearch();
+      await userEvent.click(screen.getByTestId('saved-searches-toggle'));
+
+      await waitFor(
+        () =>
+          expect(
+            screen.getByTestId('delete-saved-search-btn')
+          ).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+
+      await userEvent.click(screen.getByTestId('delete-saved-search-btn'));
+
+      await waitFor(
+        () => expect(mockMutationFn).toHaveBeenCalledWith({ id: 'ss-delete-1' }),
+        { timeout: 2000 }
+      );
+    });
+
+    it('confirm button is disabled when save name input is empty', async () => {
+      renderSearch();
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'test query');
+      await waitFor(
+        () => expect(screen.getByTestId('save-search-btn')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+      await userEvent.click(screen.getByTestId('save-search-btn'));
+      // Clear the pre-populated name
+      const nameInput = screen.getByTestId('save-search-name-input');
+      await userEvent.clear(nameInput);
+      const confirmBtn = screen.getByTestId('save-search-confirm-btn');
+      expect(confirmBtn).toBeDisabled();
+    });
+
+    it('confirm button is enabled when save name input has text', async () => {
+      renderSearch();
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'test query');
+      await waitFor(
+        () => expect(screen.getByTestId('save-search-btn')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+      await userEvent.click(screen.getByTestId('save-search-btn'));
+      const nameInput = screen.getByTestId('save-search-name-input');
+      expect(nameInput).toHaveValue('test query'); // pre-populated with query
+      const confirmBtn = screen.getByTestId('save-search-confirm-btn');
+      expect(confirmBtn).not.toBeDisabled();
+    });
+
+    it('calls createSavedSearch mutation when confirm button is clicked', async () => {
+      const mockCreateFn = vi.fn().mockResolvedValue({ data: { createSavedSearch: { id: 'new-ss' } }, error: null });
+      vi.mocked(useMutation).mockReturnValue([
+        { data: undefined, fetching: false, error: undefined },
+        mockCreateFn,
+      ] as unknown as ReturnType<typeof useMutation>);
+
+      renderSearch();
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'talmud');
+
+      await waitFor(
+        () => expect(screen.getByTestId('save-search-btn')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+      await userEvent.click(screen.getByTestId('save-search-btn'));
+
+      const nameInput = screen.getByTestId('save-search-name-input');
+      await userEvent.clear(nameInput);
+      await userEvent.type(nameInput, 'My Talmud Search');
+
+      await userEvent.click(screen.getByTestId('save-search-confirm-btn'));
+
+      await waitFor(
+        () =>
+          expect(mockCreateFn).toHaveBeenCalledWith({
+            input: { name: 'My Talmud Search', query: 'talmud' },
+          }),
+        { timeout: 2000 }
+      );
+    });
+  });
+
+  // ── BUG-050 Regression: Real course search (searchCourses) ────────────────
+  // These tests guard against the regression where course search was never
+  // executed and courses from the DB were never shown in search results.
+  describe('BUG-053: Real course search from DB', () => {
+    const REAL_COURSE = {
+      id: 'real-course-id-abc123',
+      title: 'Test Fix Course',
+      description: 'A real course from the database',
+      slug: 'test-fix-course',
+      isPublished: true,
+      estimatedHours: 3,
+      thumbnailUrl: null,
+    };
+
+    beforeEach(() => {
+      // useQuery receives { query, variables, pause } options object.
+      // opts.query is the gql string (returned by the gql mock above).
+      vi.mocked(useQuery).mockImplementation((opts) => {
+        const queryStr = String(
+          (opts as { query?: unknown })?.query ?? ''
+        );
+        if (queryStr.includes('searchCourses')) {
+          return [
+            {
+              data: { searchCourses: [REAL_COURSE] },
+              fetching: false,
+              error: undefined,
+            },
+            vi.fn(),
+          ] as unknown as ReturnType<typeof useQuery>;
+        }
+        return [
+          { data: undefined, fetching: false, error: undefined },
+          vi.fn(),
+        ] as unknown as ReturnType<typeof useQuery>;
+      });
+    });
+
+    it('shows real course result from DB even when DEV_MODE=true', async () => {
+      // DEV_MODE is always true in test env (vitest.config define).
+      // The course search query must NOT be gated by DEV_MODE.
+      // Note: Highlight component splits matching text into <mark>/<span> nodes,
+      // so document.body.textContent is used for reliable full-title matching.
+      renderSearch();
+      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Test');
+
+      await waitFor(
+        () => expect(document.body.textContent).toContain('Test Fix Course'),
+        { timeout: 2000 }
+      );
+    });
+
+    it('renders the "Courses" section heading when searchCourses returns data', async () => {
+      renderSearch();
+      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Te');
+
+      await waitFor(
+        () => expect(screen.getByText('Courses')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+    });
+
+    it('course result card links to /courses/:id (not /courses)', async () => {
+      renderSearch();
+      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Test');
+
+      // Highlight splits text into <mark>/<span> nodes; use textContent check.
+      await waitFor(
+        () => expect(document.body.textContent).toContain('Test Fix Course'),
+        { timeout: 2000 }
+      );
+
+      // The result card is the clickable element — verify it navigates correctly
+      // (via react-router MemoryRouter navigate — just verify it doesn't throw)
+      const cards = document.querySelectorAll('[class*="cursor-pointer"]');
+      expect(cards.length).toBeGreaterThan(0);
+      expect(() => fireEvent.click(cards[0]!)).not.toThrow();
+    });
+
+    it('course results appear BEFORE transcript/annotation results', async () => {
+      // Guard: courseResults are prepended to nonCourseResults in the merged array.
+      // Use DEV_MODE mock search which returns transcript results for 'talmud'.
+      // Mock implementation returns courses via searchCourses and transcript via
+      // mockSearch (which runs for DEV_MODE non-course results).
+      renderSearch();
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses/i),
+        'Test'
+      );
+
+      await waitFor(
+        () => {
+          const sections = document.querySelectorAll('h3');
+          // The first section heading must be "Courses" (case insensitive)
+          const sectionTexts = Array.from(sections).map((s) =>
+            s.textContent?.toLowerCase() ?? ''
+          );
+          const courseIdx = sectionTexts.findIndex((t) => t.includes('course'));
+          const transcriptIdx = sectionTexts.findIndex((t) =>
+            t.includes('transcript')
+          );
+          // Courses must appear before transcripts (or transcripts absent)
+          expect(courseIdx).toBeGreaterThanOrEqual(0);
+          if (transcriptIdx >= 0) {
+            expect(courseIdx).toBeLessThan(transcriptIdx);
+          }
+        },
+        { timeout: 2000 }
+      );
+    });
+
+    it('logs console.error when course search query fails', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      vi.mocked(useQuery).mockImplementation((opts) => {
+        const queryStr = String(
+          (opts as { query?: unknown })?.query ?? ''
+        );
+        if (queryStr.includes('searchCourses')) {
+          return [
+            {
+              data: undefined,
+              fetching: false,
+              error: new Error('Network error on course search') as ReturnType<
+                typeof useQuery
+              >[0]['error'],
+            },
+            vi.fn(),
+          ] as unknown as ReturnType<typeof useQuery>;
+        }
+        return [
+          { data: undefined, fetching: false, error: undefined },
+          vi.fn(),
+        ] as unknown as ReturnType<typeof useQuery>;
+      });
+
+      renderSearch('/search?q=TestCourse');
+
+      await waitFor(
+        () =>
+          expect(consoleSpy).toHaveBeenCalledWith(
+            '[Search] Course search failed:',
+            'Network error on course search'
+          ),
+        { timeout: 2000 }
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('does NOT show mock courses (hardcoded) when searchCourses returns real data', async () => {
+      // Guard: mock courses (Introduction to Talmud, Advanced Chavruta, etc.)
+      // must NOT appear when real DB results are returned.
+      // Highlight splits matching text into <mark>/<span> nodes; use textContent.
+      renderSearch();
+      await userEvent.type(screen.getByPlaceholderText(/search courses/i), 'Te');
+
+      await waitFor(
+        () => expect(document.body.textContent).toContain('Test Fix Course'),
+        { timeout: 2000 }
+      );
+
+      // Hardcoded mock course title must NOT be visible
+      expect(document.body.textContent).not.toContain('Introduction to Talmud Study');
     });
   });
 });

@@ -1,0 +1,27 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+
+type SavedSearch {
+  id: ID!
+  userId: ID!
+  tenantId: ID!
+  name: String!
+  query: String!
+  filters: String
+  createdAt: String!
+}
+
+input CreateSavedSearchInput {
+  name: String!
+  query: String!
+  filters: String
+}
+
+extend type Query {
+  savedSearches: [SavedSearch!]! @authenticated
+}
+
+extend type Mutation {
+  createSavedSearch(input: CreateSavedSearchInput!): SavedSearch! @authenticated
+  deleteSavedSearch(id: ID!): Boolean! @authenticated
+}

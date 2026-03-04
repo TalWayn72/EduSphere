@@ -102,6 +102,16 @@ export class LessonPipelineService implements OnModuleDestroy {
     return this.mapRun(row as Record<string, unknown>);
   }
 
+  async findCurrentRunByPipeline(pipelineId: string) {
+    const [row] = await this.db
+      .select()
+      .from(schema.lesson_pipeline_runs)
+      .where(eq(schema.lesson_pipeline_runs.pipeline_id, pipelineId))
+      .orderBy(desc(schema.lesson_pipeline_runs.started_at))
+      .limit(1);
+    return this.mapRun(row as Record<string, unknown>);
+  }
+
   async findResultsByRunId(runId: string) {
     const rows = await this.db
       .select()

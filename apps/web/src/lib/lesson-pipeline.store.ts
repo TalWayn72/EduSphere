@@ -86,7 +86,8 @@ interface LessonPipelineState {
   reorderNodes: (fromIdx: number, toIdx: number) => void;
   toggleNode: (id: string) => void;
   updateNodeConfig: (id: string, config: Record<string, unknown>) => void;
-  loadTemplate: (templateName: 'THEMATIC' | 'SEQUENTIAL') => void;
+  clearNodes: () => void;
+  loadTemplate: (templateName: 'THEMATIC' | 'SEQUENTIAL' | 'CUSTOM') => void;
   setSelectedNode: (id: string | null) => void;
   resetDirty: () => void;
 }
@@ -142,7 +143,15 @@ export const useLessonPipelineStore = create<LessonPipelineState>()(
       });
     },
 
+    clearNodes: () => {
+      set({ nodes: [], isDirty: false, selectedNodeId: null });
+    },
+
     loadTemplate: (templateName) => {
+      if (templateName === 'CUSTOM') {
+        set({ nodes: [], isDirty: false, selectedNodeId: null });
+        return;
+      }
       const modules =
         templateName === 'THEMATIC' ? THEMATIC_TEMPLATE : SEQUENTIAL_TEMPLATE;
       set({

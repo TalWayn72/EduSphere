@@ -43,6 +43,13 @@
       "when": 1772354898484,
       "tag": "0005_absurd_tyger_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1772606833374,
+      "tag": "0006_damp_gateway",
+      "breakpoints": true
     }
   ]
 }

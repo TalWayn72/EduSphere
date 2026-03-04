@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException, Logger } from '@nestjs/common';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
 import { GraphService } from './graph.service';
+import { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
 import type { GraphQLContext } from '../auth/auth.middleware';
 
 const tracer = trace.getTracer('subgraph-knowledge');
@@ -38,7 +39,10 @@ interface CreateTopicClusterInput {
 export class GraphResolver {
   private readonly logger = new Logger(GraphResolver.name);
 
-  constructor(private readonly graphService: GraphService) {}
+  constructor(
+    private readonly graphService: GraphService,
+    private readonly kMeansService: TopicClusterKMeansService
+  ) {}
 
   private getAuthContext(context: GraphQLContext) {
     if (
@@ -375,5 +379,16 @@ export class GraphResolver {
       userId,
       role
     );
+  }
+
+  @Mutation()
+  async clusterTopics(
+    @Args('courseId') courseId: string,
+    @Args('k') k: number,
+    @Context() context: GraphQLContext
+  ) {
+    const { tenantId } = this.getAuthContext(context);
+    this.logger.log({ courseId, k }, '[GraphResolver] clusterTopics mutation');
+    return this.kMeansService.clusterConceptsByCourse(courseId, k ?? 5, tenantId);
   }
 }

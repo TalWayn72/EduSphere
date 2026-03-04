@@ -6,6 +6,7 @@ import {
 } from 'urql';
 import type { CombinedError, Operation } from 'urql';
 import { cacheExchange } from '@urql/exchange-graphcache';
+import { persistedExchange } from '@urql/exchange-persisted';
 import { createClient as createWsClient } from 'graphql-ws';
 import { getToken, logout, isAuthenticated } from './auth';
 
@@ -45,19 +46,6 @@ const authErrorExchange = errorExchange({
   // Subscriptions degrade gracefully: real-time updates pause, the page stays.
   // Only query/mutation auth failures indicate a genuinely expired session.
   onError(error: CombinedError, operation: Operation) {
-    // Always log network errors for debugging (visible in devtools / CI logs)
-    if (error.networkError) {
-      const opName =
-        (
-          operation.query.definitions[0] as {
-            name?: { value?: string };
-          }
-        )?.name?.value ?? 'unknown';
-      console.warn(
-        `[GraphQL][Network] ${operation.kind} "${opName}": ${error.networkError.message}`
-      );
-    }
-
     if (operation.kind === 'subscription') {
       if (hasAuthError(error)) {
         console.warn(
@@ -94,6 +82,19 @@ const wsClient = createWsClient({
   },
 });
 
+// ─── Persisted queries exchange (production only) ─────────────────────────────
+// In production, requests are sent as GET with a SHA-256 hash instead of the
+// full query string, reducing payload size and enabling CDN caching.
+// Disabled in development so queries remain human-readable in DevTools.
+const maybePersistedExchange = import.meta.env.PROD
+  ? [
+      persistedExchange({
+        preferGetForPersistedQueries: true,
+        enableForMutation: false,
+      }),
+    ]
+  : [];
+
 export const urqlClient = createClient({
   url: import.meta.env.VITE_GRAPHQL_URL,
   exchanges: [
@@ -118,6 +119,7 @@ export const urqlClient = createClient({
         };
       },
     }),
+    ...maybePersistedExchange,
     fetchExchange,
   ],
   fetchOptions: () => {

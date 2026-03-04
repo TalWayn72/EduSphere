@@ -11,6 +11,7 @@ import { CypherTermService } from './cypher-term.service';
 import { CypherSourceService } from './cypher-source.service';
 import { CypherTopicClusterService } from './cypher-topic-cluster.service';
 import { CypherLearningPathService } from './cypher-learning-path.service';
+import { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
 import { EmbeddingModule } from '../embedding/embedding.module';
 import { AutoPathResolver } from './auto-path.resolver';
 import { AutoPathService } from './auto-path.service';
@@ -30,6 +31,8 @@ import { SocialRecommendationsResolver } from './social-recommendations.resolver
     CypherSourceService,
     CypherTopicClusterService,
     CypherLearningPathService,
+    // ── K-means topic clustering (depends on CypherTopicClusterService)
+    TopicClusterKMeansService,
     // ── Layer 2: CypherService facade (depends on all 6 domain Cypher services above)
     CypherService,
     // ── Layer 3: Application sub-services (depend on domain Cypher services)

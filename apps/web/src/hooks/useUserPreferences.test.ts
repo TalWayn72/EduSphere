@@ -94,10 +94,16 @@ describe('useUserPreferences', () => {
 
   // ── locale source ─────────────────────────────────────────────────────
 
-  it('returns DB locale when ME_QUERY resolves with preferences', () => {
+  // BUG-045 regression: locale is i18n.language (the ACTIVE language), not the raw DB value.
+  // The DB locale is applied via useEffect → i18n.changeLanguage(), so the hook's
+  // locale field reflects what the user actually sees — not a stale DB snapshot.
+  it('BUG-045: locale returns i18n.language (active language), not DB locale directly', () => {
     setupMocks({ dbLocale: 'fr', i18nLanguage: 'en' });
     const { result } = renderHook(() => useUserPreferences());
-    expect(result.current.locale).toBe('fr');
+    // i18n.language is 'en' (from mock) — locale reflects the active i18n state
+    expect(result.current.locale).toBe('en');
+    // The effect calls changeLanguage('fr') asynchronously, but the locale
+    // field always mirrors i18n.language, not the raw DB value.
   });
 
   it('falls back to i18n.language when ME_QUERY has no data', () => {
@@ -180,6 +186,48 @@ describe('useUserPreferences', () => {
     void changeLanguage; // referenced to avoid unused-var lint
   });
 
+  // ── BUG-045: setLocale error handling ────────────────────────────────
+
+  it('BUG-045: setLocale reverts localStorage and throws when DB mutation fails', async () => {
+    setupMocks({ dbLocale: 'en', i18nLanguage: 'en' });
+
+    // Override mutation to return a GraphQL error (use static import — same module instance)
+    const fakeError = { message: 'Network error', graphQLErrors: [], networkError: null };
+    mockUpdatePreferences.mockResolvedValue({ error: fakeError });
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      mockUpdatePreferences,
+    ] as ReturnType<typeof urql.useMutation>);
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { result } = renderHook(() => useUserPreferences());
+
+    // Catch the thrown error INSIDE act() so act() resolves normally and
+    // all queued state/effect updates are fully flushed before assertions.
+    let thrownError: unknown;
+    await act(async () => {
+      try {
+        await result.current.setLocale('es');
+      } catch (e) {
+        thrownError = e;
+      }
+    });
+
+    // setLocale must have thrown
+    expect(thrownError).toBeDefined();
+
+    // Revert: localStorage must NOT be 'es' after failure (reverted to prev 'en')
+    expect(localStorage.getItem('edusphere_locale')).not.toBe('es');
+
+    // Error must be logged — console.error is called with 2 args
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[useUserPreferences]'),
+      expect.stringContaining('Network error')
+    );
+
+    consoleErrorSpy.mockRestore();
+  });
+
   // ── sync effect ───────────────────────────────────────────────────────
 
   it('syncs localStorage when DB locale differs from i18n.language on mount', () => {
@@ -219,24 +267,18 @@ describe('useUserPreferences', () => {
   it('auto-switches to tenant default locale when current locale is not in availableLocales', async () => {
     // Reset all mock implementations to clear any queued mockReturnValueOnce values
     vi.resetAllMocks();
-    // User's DB locale is 'de', but tenant only allows ['en', 'fr']
-    // → hook must auto-switch to tenant default 'en'
-    const changeLanguage = vi.fn().mockResolvedValue(undefined);
+    // Global mock has i18n.language = 'en'. Tenant DOES NOT support 'en'
+    // (only ['fr', 'de']) → hook must auto-switch to tenant default 'fr'.
+    // (vi.doMock cannot override already-imported module; use data-driven approach instead.)
 
-    vi.doMock('react-i18next', () => ({
-      useTranslation: () => ({
-        i18n: { language: 'de', changeLanguage },
-      }),
-    }));
-
-    // First useQuery call → ME_QUERY (locale: 'de')
+    // First useQuery call → ME_QUERY (locale: 'en' = same as i18n.language → sync effect skips)
     const meResult = [
       {
         data: {
           me: {
             id: 'u-1',
             preferences: {
-              locale: 'de',
+              locale: 'en',
               theme: 'light',
               emailNotifications: true,
               pushNotifications: false,
@@ -250,12 +292,13 @@ describe('useUserPreferences', () => {
     ] as ReturnType<typeof urql.useQuery>;
 
     // Second useQuery call → MY_TENANT_LANGUAGE_SETTINGS_QUERY
+    // 'en' is NOT in supportedLanguages → auto-fallback to defaultLanguage 'fr'
     const tenantResult = [
       {
         data: {
           myTenantLanguageSettings: {
-            supportedLanguages: ['en', 'fr'],
-            defaultLanguage: 'en',
+            supportedLanguages: ['fr', 'de'],
+            defaultLanguage: 'fr',
           },
         },
         fetching: false,
@@ -287,32 +330,72 @@ describe('useUserPreferences', () => {
 
     // The auto-fallback effect must have called updatePreferences with the tenant default
     expect(mockUpdatePreferences).toHaveBeenCalledWith({
-      input: { locale: 'en' },
+      input: { locale: 'fr' },
     });
 
     // localStorage should be updated to the tenant default
-    expect(localStorage.getItem('edusphere_locale')).toBe('en');
+    expect(localStorage.getItem('edusphere_locale')).toBe('fr');
+  });
+
+  // ── BUG-049 regression: mounted guard (React 19 concurrent-mode safety) ───
+  // Without pause:!mounted on ME_QUERY, urql graphcache may synchronously
+  // dispatch a state update into parent fibers (Layout, GlobalLocaleSync)
+  // during the initial render, causing "Cannot update a component while
+  // rendering a different component" React errors.
+
+  it('BUG-049: passes pause=true to ME_QUERY before mount (concurrent-mode safety)', () => {
+    // Must reset (not just clear) to discard any leftover mockReturnValueOnce queue
+    // from the auto-switches test — vi.clearAllMocks() in beforeEach does NOT clear
+    // specificMockImpls, causing leftover queued values to bypass mockImplementation.
+    vi.resetAllMocks();
+    vi.mocked(urql.useMutation).mockReturnValue([
+      { fetching: false },
+      vi.fn().mockResolvedValue({ data: { updateUserPreferences: { id: 'u-1' } }, error: undefined }),
+    ] as ReturnType<typeof urql.useMutation>);
+
+    const pauseValues: boolean[] = [];
+    vi.mocked(urql.useQuery).mockImplementation((opts) => {
+      pauseValues.push((opts as { pause?: boolean }).pause ?? false);
+      return makeQueryResult(null);
+    });
+
+    renderHook(() => useUserPreferences());
+
+    // Before effects run (mounted=false): ME_QUERY must be paused.
+    // useQuery is called twice per render: [0]=ME_QUERY, [1]=tenantLang (always paused).
+    expect(pauseValues[0]).toBe(true); // ME_QUERY must be paused before mount
+    expect(pauseValues[1]).toBe(true); // tenantLang is always paused (not in live gateway)
+  });
+
+  it('BUG-049: unpauses ME_QUERY after mount (setMounted=true fires in useEffect)', async () => {
+    const pauseValues: boolean[] = [];
+    vi.mocked(urql.useQuery).mockImplementation((opts) => {
+      pauseValues.push((opts as { pause?: boolean }).pause ?? false);
+      return makeQueryResult(null);
+    });
+
+    renderHook(() => useUserPreferences());
+    await act(async () => {}); // flush setMounted(true) useEffect
+
+    // After mount re-render: pauseValues[2] = 3rd call = ME_QUERY in the re-render.
+    // It must now be false (unpaused) so the query can fetch user preferences.
+    expect(pauseValues[2]).toBe(false); // ME_QUERY unpaused after mount
   });
 
   it('does NOT auto-switch when current locale is in availableLocales', async () => {
     // Reset all mock implementations to clear any queued mockReturnValueOnce values
     vi.resetAllMocks();
-    // User's locale is 'fr', tenant allows ['en', 'fr'] — no fallback needed
-    const changeLanguage = vi.fn().mockResolvedValue(undefined);
+    // Global mock has i18n.language = 'en'. Tenant supports ['en', 'fr']
+    // → 'en' IS in the allowed list → no auto-fallback should fire.
 
-    vi.doMock('react-i18next', () => ({
-      useTranslation: () => ({
-        i18n: { language: 'fr', changeLanguage },
-      }),
-    }));
-
+    // ME_QUERY: locale 'en' = same as i18n.language → sync effect skips
     const meResult = [
       {
         data: {
           me: {
             id: 'u-1',
             preferences: {
-              locale: 'fr',
+              locale: 'en',
               theme: 'light',
               emailNotifications: true,
               pushNotifications: false,
@@ -325,12 +408,13 @@ describe('useUserPreferences', () => {
       vi.fn(),
     ] as ReturnType<typeof urql.useQuery>;
 
+    // Tenant SUPPORTS 'en' → condition !availableLocales.includes('en') = false → no fallback
     const tenantResult = [
       {
         data: {
           myTenantLanguageSettings: {
             supportedLanguages: ['en', 'fr'],
-            defaultLanguage: 'en',
+            defaultLanguage: 'fr',
           },
         },
         fetching: false,
@@ -357,7 +441,7 @@ describe('useUserPreferences', () => {
       renderHook(() => useUserPreferences());
     });
 
-    // No auto-fallback mutation should fire (locale 'fr' is in allowed list)
+    // No auto-fallback mutation should fire ('en' is in allowed list)
     expect(mockUpdatePreferences).not.toHaveBeenCalled();
   });
 });

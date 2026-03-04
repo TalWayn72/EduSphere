@@ -33,6 +33,8 @@ export const courses = pgTable('courses', {
   // F-016: Compliance Training Report Export
   is_compliance: boolean('is_compliance').notNull().default(false),
   compliance_due_date: timestamp('compliance_due_date', { withTimezone: true }),
+  // A1: Course Forking — tracks source course (added in migration 0006)
+  forked_from_id: uuid('forked_from_id'),
   ...timestamps,
   ...softDelete,
 });

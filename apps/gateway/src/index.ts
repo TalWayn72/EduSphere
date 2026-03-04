@@ -75,6 +75,38 @@ const gateway = createGateway({
     },
   },
   additionalResolvers: [],
+  // BUG-049: Forward Authorization header from the Yoga context to every
+  // subgraph HTTP fetch. Hive Gateway does not automatically propagate
+  // Authorization headers. For HTTP requests the header comes from
+  // context.headers.authorization (set by the Yoga context function below).
+  // For WebSocket subscriptions the header originates from connectionParams
+  // (extracted below) and placed into context.headers.authorization so that
+  // this single plugin handles both transports uniformly.
+  plugins: () => [
+    {
+      onFetch({
+        options,
+        setOptions,
+        context,
+      }: {
+        options: RequestInit;
+        setOptions: (opts: RequestInit) => void;
+        context: unknown;
+      }) {
+        const ctx = context as
+          | { headers?: { authorization?: string | null } }
+          | null
+          | undefined;
+        const auth = ctx?.headers?.authorization;
+        if (!auth) return;
+        const prev = options.headers as Record<string, string> | undefined;
+        setOptions({
+          ...options,
+          headers: { ...(prev ?? {}), authorization: auth },
+        });
+      },
+    },
+  ],
 });
 
 // ── G-09: Rate limiting helper ────────────────────────────────────────────────
@@ -116,7 +148,27 @@ const yoga = createYoga({
   },
   logging: logger,
   // G-09: Rate limiting applied in context (runs before resolvers)
-  context: async ({ request }) => {
+  context: async (initialContext) => {
+    const { request } = initialContext as { request: Request };
+
+    // BUG-049 fix: WebSocket subscriptions (graphql-ws protocol) send the JWT
+    // in connectionParams: { authorization: 'Bearer <token>' }, NOT in HTTP
+    // headers (which belong to the TCP upgrade handshake, not the GQL session).
+    //
+    // In graphql-yoga + graphql-ws, the client's connection_init payload is
+    // available at the ROOT level of the initial context as `connectionParams`.
+    // It is NOT inside `extra` — `extra` contains { socket, request } metadata.
+    //
+    // Without this fallback, subscriptions always fail authentication because
+    // request.headers.get('authorization') returns null for WS upgrade requests.
+    const wsConnectionParams = (
+      initialContext as { connectionParams?: Record<string, unknown> }
+    ).connectionParams;
+    const wsAuthHeader =
+      typeof wsConnectionParams?.['authorization'] === 'string'
+        ? (wsConnectionParams['authorization'] as string)
+        : undefined;
+
     // Prefer tenant-scoped key; fall back to IP for unauthenticated requests
     const tenantId =
       (request.headers.get('x-tenant-id') as string | null) ??
@@ -135,7 +187,9 @@ const yoga = createYoga({
       });
     }
 
-    const authHeader = request.headers.get('authorization');
+    // Use HTTP header first; fall back to WebSocket connectionParams for subscriptions.
+    const authHeader =
+      request.headers.get('authorization') ?? wsAuthHeader ?? null;
     let resolvedTenantId: string | null = null;
     let userId: string | null = null;
     let role: string | null = null;
@@ -179,6 +233,12 @@ const yoga = createYoga({
               )?.find((r) => APP_ROLES.has(r)) ?? null
             );
           isAuthenticated = true;
+          if (wsAuthHeader && !request.headers.get('authorization')) {
+            logger.debug(
+              { userId },
+              'Gateway: authenticated subscription via WebSocket connectionParams'
+            );
+          }
         } catch (error) {
           logger.warn(
             { err: error },

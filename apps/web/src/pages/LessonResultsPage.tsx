@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -38,17 +39,26 @@ export function LessonResultsPage() {
   }>();
   const navigate = useNavigate();
 
+  // Defer query until after initial render to prevent urql cache from calling
+  // setState on a concurrently-unmounting sibling (LessonDetailPage) which
+  // causes React's "Cannot update a component while rendering" warning.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [{ data, fetching, error }] = useQuery<LessonQueryData>({
     query: LESSON_QUERY,
     variables: { id: lessonId },
-    pause: !lessonId,
+    pause: !mounted || !lessonId,
   });
 
-  if (error) {
-    console.error('[LessonResultsPage] Query error:', error.message);
-  }
+  // Log query errors to Pino-compatible console.error (must be in useEffect, not render body)
+  useEffect(() => {
+    if (error) {
+      console.error('[LessonResultsPage] Query error:', error.message);
+    }
+  }, [error]);
 
-  if (fetching) {
+  if (!mounted || fetching) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">

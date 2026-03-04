@@ -29,9 +29,11 @@
   "edges": "קשתות",
   "loadingGraph": "טוען גרף...",
   "loadError": "טעינת הגרף נכשלה",
-  "networkUnavailable": "השרת אינו זמין — מציג נתוני גיבוי",
-  "retry": "נסה שוב",
-  "pathError": "מציאת מסלול הלמידה נכשלה",
   "refreshGraph": "רענן גרף",
-  "refresh": "רענן"
+  "refresh": "רענן",
+  "graphTitle": "גרף ידע",
+  "graphPageBreadcrumb": "גרף ידע",
+  "networkUnavailable": "שרת לא נגיש — מציג נתוני גיבוי",
+  "retry": "נסה שוב",
+  "pathError": "לא ניתן למצוא מסלול למידה"
 }

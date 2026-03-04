@@ -377,4 +377,42 @@ describe('KnowledgeGraph — BUG-043 regression: clean error banner (no raw erro
     const alerts = screen.getAllByRole('alert');
     expect(alerts.length).toBeGreaterThan(0);
   });
+
+  // ─── BUG-049 regression: raw i18n keys must NOT appear in the error banner ────
+  // Problem: 'networkUnavailable', 'retry', 'pathError' keys were missing from
+  // packages/i18n/src/locales/en/knowledge.json and he/knowledge.json.
+  // When the concepts query errored, t('networkUnavailable') returned the raw key
+  // string "networkUnavailable" instead of "Server unavailable — showing backup data".
+  it('regression BUG-049: banner shows translated text, NOT the raw key "networkUnavailable"', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: '[Network] Failed to fetch' },
+      },
+    ]);
+    renderKG();
+    const banner = screen.getByTestId('graph-error-banner');
+    // Must show the real English translation, not the raw key
+    expect(banner.textContent).toContain('Server unavailable');
+    expect(banner.textContent).not.toBe('networkUnavailableretry');
+    expect(banner.textContent).not.toContain('networkUnavailable');
+  });
+
+  it('regression BUG-049: retry button shows translated text, NOT raw key "retry"', async () => {
+    const { useQuery } = await import('urql');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: '[Network] Failed to fetch' },
+      },
+    ]);
+    renderKG();
+    const retryBtn = screen.getByTestId('graph-error-retry');
+    // The button text must be "Retry", not the raw key "retry"
+    expect(retryBtn.textContent?.trim()).toBe('Retry');
+    expect(retryBtn.textContent).not.toBe('retry');
+  });
 });

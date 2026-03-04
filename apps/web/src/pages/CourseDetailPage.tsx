@@ -7,6 +7,8 @@
  */
 import { useTransition, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
+import { UnsavedChangesDialog } from '@/components/UnsavedChangesDialog';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
 import { Layout } from '@/components/Layout';
@@ -16,6 +18,8 @@ import { COURSE_DETAIL_QUERY } from '@/lib/graphql/content.queries';
 import {
   ENROLL_COURSE_MUTATION,
   UNENROLL_COURSE_MUTATION,
+  FORK_COURSE_MUTATION,
+  UPDATE_COURSE_MUTATION,
 } from '@/lib/graphql/content.queries';
 import {
   MY_ENROLLMENTS_QUERY,
@@ -33,6 +37,7 @@ import {
   Users,
   BookMarked,
   Pencil,
+  GitFork,
 } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -187,6 +192,12 @@ export function CourseDetailPage() {
 
   const [, enrollMutation] = useMutation(ENROLL_COURSE_MUTATION);
   const [, unenrollMutation] = useMutation(UNENROLL_COURSE_MUTATION);
+  const [{ fetching: isForkingCourse }, forkCourseMutation] = useMutation(FORK_COURSE_MUTATION);
+  const [{ fetching: isSavingTitle }, updateCourseMutation] = useMutation(UPDATE_COURSE_MUTATION);
+  const [forkError, setForkError] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const blocker = useUnsavedChangesGuard(editMode, 'CourseDetailPage');
 
   // useTransition keeps the UI interactive (non-blocking) during the
   // enroll/unenroll mutation.  isEnrolling replaces the old useState flag.
@@ -252,6 +263,39 @@ export function CourseDetailPage() {
     });
   };
 
+  const handleForkCourse = async () => {
+    setForkError(null);
+    const { data: forkData, error: forkErr } = await forkCourseMutation({ courseId });
+    if (forkErr) {
+      const msg = forkErr.graphQLErrors?.[0]?.message ?? t('forkError', 'Failed to fork course');
+      console.error('[CourseDetailPage] fork course failed:', msg, forkErr);
+      setForkError(msg);
+      return;
+    }
+    const forkedId = forkData?.forkCourse?.id as string | undefined;
+    if (forkedId) {
+      showToast(t('forkCourseSuccess', 'Course forked successfully!'));
+      navigate(`/courses/${forkedId}/edit`);
+    }
+  };
+
+  const handleSaveTitle = async () => {
+    if (!course) return;
+    const trimmed = editTitle.trim();
+    if (!trimmed || trimmed === course.title) {
+      setEditMode(false);
+      return;
+    }
+    const { error: err } = await updateCourseMutation({ id: courseId, input: { title: trimmed } });
+    if (err) {
+      console.error('[CourseDetailPage] updateCourse failed:', err.graphQLErrors?.[0]?.message ?? err.message, err);
+      showToast('שגיאה בשמירת שם הקורס');
+      return;
+    }
+    setEditMode(false);
+    showToast('שם הקורס עודכן בהצלחה');
+  };
+
   if (fetching || !course) {
     return (
       <Layout>
@@ -270,6 +314,11 @@ export function CourseDetailPage() {
 
   return (
     <Layout>
+      <UnsavedChangesDialog
+        open={blocker.state === 'blocked'}
+        onLeave={() => blocker.proceed?.()}
+        onStay={() => blocker.reset?.()}
+      />
       {toast && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 rounded-lg shadow-lg text-sm animate-in slide-in-from-bottom-2">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
@@ -289,15 +338,46 @@ export function CourseDetailPage() {
           {t('backToCourses')}
         </Button>
 
+        {forkError && (
+          <div
+            role="alert"
+            aria-live="polite"
+            data-testid="fork-error-banner"
+            className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-sm text-destructive"
+          >
+            <span>{t('forkError', 'Failed to fork course')}</span>
+            <button
+              className="ml-auto text-xs underline"
+              onClick={() => setForkError(null)}
+            >
+              {t('dismiss', 'Dismiss')}
+            </button>
+          </div>
+        )}
+
         {/* Course header card */}
         <Card>
           <CardHeader>
             <div className="flex items-start gap-4">
               <span className="text-5xl">{course.thumbnailUrl ?? '📚'}</span>
               <div className="flex-1 min-w-0">
-                <CardTitle className="text-2xl leading-snug mb-2">
-                  {course.title}
-                </CardTitle>
+                {editMode ? (
+                  <input
+                    data-testid="course-title-input"
+                    className="text-2xl font-bold border-b-2 border-blue-400 outline-none w-full bg-transparent leading-snug mb-2"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') void handleSaveTitle();
+                      if (e.key === 'Escape') setEditMode(false);
+                    }}
+                    autoFocus
+                  />
+                ) : (
+                  <CardTitle className="text-2xl leading-snug mb-2">
+                    {course.title}
+                  </CardTitle>
+                )}
                 {course.description && (
                   <p className="text-muted-foreground text-sm">
                     {course.description}
@@ -328,15 +408,55 @@ export function CourseDetailPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                {canEdit && !editMode && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    data-testid="edit-course-btn"
+                    onClick={() => { setEditTitle(course.title); setEditMode(true); }}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit Course
+                  </Button>
+                )}
+                {canEdit && editMode && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditMode(false)}
+                      data-testid="cancel-edit-btn"
+                    >
+                      ביטול
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="gap-2"
+                      data-testid="save-course-btn"
+                      onClick={() => void handleSaveTitle()}
+                      disabled={isSavingTitle}
+                    >
+                      {isSavingTitle && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                      שמור שינויים
+                    </Button>
+                  </>
+                )}
                 {canEdit && (
                   <Button
                     variant="outline"
                     size="sm"
                     className="gap-2"
-                    onClick={() => navigate(`/courses/${courseId}/edit`)}
+                    data-testid="fork-course-btn"
+                    onClick={() => void handleForkCourse()}
+                    disabled={isForkingCourse}
                   >
-                    <Pencil className="h-3.5 w-3.5" />
-                    Edit Course
+                    {isForkingCourse ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <GitFork className="h-3.5 w-3.5" />
+                    )}
+                    {t('forkCourse', 'Fork Course')}
                   </Button>
                 )}
                 <Button

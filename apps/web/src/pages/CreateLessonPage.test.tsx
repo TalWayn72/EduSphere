@@ -96,7 +96,7 @@ describe('CreateLessonPage', () => {
         <CreateLessonPage />
       </MemoryRouter>
     );
-    expect(screen.getByText('הגות (נושאי)')).toBeInTheDocument();
+    expect(screen.getByText('כללי (נושאי)')).toBeInTheDocument();
     expect(screen.getByText('על הסדר')).toBeInTheDocument();
   });
 
@@ -174,7 +174,7 @@ describe('CreateLessonPage', () => {
     await waitFor(() => screen.getByText('הוספת חומרים'));
     fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
     await waitFor(() => {
-      expect(screen.getByText(/שיעור הגות/i)).toBeInTheDocument();
+      expect(screen.getByText(/שיעור כללי/i)).toBeInTheDocument();
       expect(screen.getByText(/ספר עץ חיים/i)).toBeInTheDocument();
     });
   });
@@ -226,7 +226,7 @@ describe('CreateLessonPage', () => {
     await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
     fireEvent.click(
       screen
-        .getByText(/שיעור הגות/i)
+        .getByText(/שיעור כללי/i)
         .closest('[class*="border"]') as HTMLElement
     );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
@@ -264,7 +264,7 @@ describe('CreateLessonPage', () => {
     await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
     fireEvent.click(
       screen
-        .getByText(/שיעור הגות/i)
+        .getByText(/שיעור כללי/i)
         .closest('[class*="border"]') as HTMLElement
     );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
@@ -299,7 +299,7 @@ describe('CreateLessonPage', () => {
     await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
     fireEvent.click(
       screen
-        .getByText(/שיעור הגות/i)
+        .getByText(/שיעור כללי/i)
         .closest('[class*="border"]') as HTMLElement
     );
     fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
@@ -314,5 +314,97 @@ describe('CreateLessonPage', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /חזרה/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/courses/course-1');
+  });
+
+  // ── BUG-049 regression: silent failure when user is null must show error ─────
+  it('BUG-049: shows auth error when user is null instead of silently failing', async () => {
+    vi.mocked(auth.getCurrentUser).mockReturnValue(null as never);
+    render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), { target: { value: 'שיעור בדיקה' } });
+    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    await waitFor(() => screen.getByText('הוספת חומרים'));
+    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
+    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    fireEvent.click(screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    await waitFor(() => {
+      const errorEl = screen.getByRole('alert');
+      expect(errorEl).toBeInTheDocument();
+      expect(errorEl.textContent).toMatch(/שגיאת אימות/);
+    });
+  });
+
+  it('BUG-049: createLesson mutation NOT called when user is null (no silent return)', async () => {
+    vi.mocked(auth.getCurrentUser).mockReturnValue(null as never);
+    const mockExecute = vi.fn();
+    vi.mocked(urql.useMutation).mockReturnValue([{ fetching: false }, mockExecute] as never);
+    render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), { target: { value: 'שיעור' } });
+    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    await waitFor(() => screen.getByText('הוספת חומרים'));
+    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
+    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    fireEvent.click(screen.getByText(/שיעור כללי/i).closest('[class*="border"]') as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: /צור שיעור/i }));
+    await waitFor(() => screen.getByRole('alert'));
+    expect(mockExecute).not.toHaveBeenCalled();
+  });
+
+  it('lesson date input exists with name="lessonDate"', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    // The date input exists — RHF manages value internally (not via HTML defaultValue)
+    const dateInput = container.querySelector<HTMLInputElement>(
+      'input[type="date"][name="lessonDate"]'
+    );
+    expect(dateInput).not.toBeNull();
+  });
+
+  it('"סדרת שיעורים" series field is NOT in step 1 (field was removed from form)', () => {
+    render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    // Series field was removed from CreateLessonPage.step1.tsx — only title, type, lessonDate remain
+    expect(screen.queryByText('סדרת שיעורים')).not.toBeInTheDocument();
+  });
+
+  it('type label shows "כללי (נושאי)" for THEMATIC and "על הסדר" for SEQUENTIAL', () => {
+    render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('כללי (נושאי)')).toBeInTheDocument();
+    expect(screen.getByText('על הסדר')).toBeInTheDocument();
+  });
+
+  it('template step 3 shows "שיעור כללי" card (THEMATIC) and "ספר עץ חיים" card (SEQUENTIAL)', async () => {
+    render(
+      <MemoryRouter>
+        <CreateLessonPage />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByPlaceholderText(/שיעור עץ חיים/i), {
+      target: { value: 'שיעור בדיקה' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /המשך לחומרים/i }));
+    await waitFor(() => screen.getByText('הוספת חומרים'));
+    fireEvent.click(screen.getByRole('button', { name: /דלג/i }));
+    await waitFor(() => screen.getByText('בחר תבנית Pipeline'));
+    expect(screen.getByText(/שיעור כללי/i)).toBeInTheDocument();
+    expect(screen.getByText(/ספר עץ חיים/i)).toBeInTheDocument();
   });
 });

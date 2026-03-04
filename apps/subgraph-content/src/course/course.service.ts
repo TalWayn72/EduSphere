@@ -3,12 +3,15 @@ import {
   Logger,
   OnModuleDestroy,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
   schema,
   eq,
   desc,
+  ilike,
+  or,
   closeAllPools,
   withReadReplica,
 } from '@edusphere/db';
@@ -62,6 +65,8 @@ export class CourseService implements OnModuleDestroy {
         course['estimated_hours'] !== undefined
           ? course['estimated_hours']
           : course['estimatedHours'] || null,
+      forkedFromId:
+        course['forked_from_id'] || course['forkedFromId'] || null,
       // content.ts schema uses snake_case timestamps via the ...timestamps helper
       createdAt: course['created_at'] || course['createdAt'] || null,
       updatedAt: course['updated_at'] || course['updatedAt'] || null,
@@ -89,6 +94,35 @@ export class CourseService implements OnModuleDestroy {
     } catch (err) {
       this.logger.error(`Failed to fetch courses: ${String(err)}`);
       throw new BadRequestException('Failed to fetch courses. Please try again.');
+    }
+  }
+
+  async search(query: string, limit: number = 20) {
+    if (!query || query.trim().length < 2) return [];
+    const pattern = `%${query.trim()}%`;
+    try {
+      const rows = await withReadReplica((db) =>
+        db
+          .select()
+          .from(schema.courses)
+          .where(
+            or(
+              ilike(schema.courses.title, pattern),
+              ilike(schema.courses.description, pattern)
+            )
+          )
+          .orderBy(desc(schema.courses.created_at))
+          .limit(limit)
+      );
+      this.logger.log(
+        `[CourseService] searchCourses("${query}") returned ${rows.length} results`
+      );
+      return rows.map((c) => this.mapCourse(c as Record<string, unknown>));
+    } catch (err) {
+      this.logger.error(
+        `[CourseService] searchCourses("${query}") failed: ${String(err)}`
+      );
+      throw new BadRequestException('Failed to search courses. Please try again.');
     }
   }
 
@@ -179,6 +213,41 @@ export class CourseService implements OnModuleDestroy {
     } catch (err) {
       this.logger.error(`Failed to update course "${id}": ${String(err)}`);
       throw new BadRequestException('Failed to update course.');
+    }
+  }
+
+  async forkCourse(courseId: string, newOwnerId: string, tenantId: string) {
+    const original = await this.findById(courseId);
+    if (!original) {
+      throw new NotFoundException(`Course ${courseId} not found`);
+    }
+    // Access raw properties via index since mapCourse spreads Record<string, unknown>
+    const src = original as Record<string, unknown>;
+    const newSlug = `${String(src['slug'] ?? '')}-fork-${Date.now().toString(36)}`;
+    try {
+      const [forked] = await this.db
+        .insert(schema.courses)
+        .values({
+          tenant_id: tenantId,
+          title: `${String(src['title'] ?? '')} (Fork)`,
+          slug: newSlug,
+          description: src['description'] as string | undefined,
+          instructor_id: newOwnerId,
+          is_published: false,
+          thumbnail_url: src['thumbnailUrl'] as string | null | undefined,
+          estimated_hours: src['estimatedHours'] as number | null | undefined,
+          forked_from_id: courseId,
+        })
+        .returning();
+      this.logger.log(
+        `[CourseService] Course forked: ${courseId} → ${String(forked?.id)} by user ${newOwnerId}`
+      );
+      return this.mapCourse(forked as Record<string, unknown>);
+    } catch (err) {
+      this.logger.error(
+        `[CourseService] Failed to fork course "${courseId}": ${String(err)}`
+      );
+      throw new BadRequestException('Failed to fork course.');
     }
   }
 }

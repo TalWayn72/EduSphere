@@ -100,9 +100,22 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
         .sort((a, b) => a.order - b.order);
 
       const lessonId = String(pipelineRow.lesson_id);
+
+      // Fetch lesson assets so INGESTION module can locate source content
+      const lessonAssets = await this.db
+        .select()
+        .from(schema.lesson_assets)
+        .where(eq(schema.lesson_assets.lesson_id, lessonId));
+      const videoAsset = lessonAssets.find((a) => a.asset_type === 'VIDEO');
+      const audioAsset = lessonAssets.find((a) => a.asset_type === 'AUDIO');
+      const notesAsset = lessonAssets.find((a) => a.asset_type === 'NOTES');
+
       let sharedContext: Record<string, unknown> = {
         lessonId,
         tenantId: tenantCtx.tenantId,
+        videoUrl: videoAsset?.source_url ?? videoAsset?.file_url ?? undefined,
+        audioFileKey: audioAsset?.file_url ?? undefined,
+        notesFileKey: notesAsset?.file_url ?? undefined,
       };
 
       for (const node of nodes) {
@@ -208,8 +221,10 @@ export class LessonPipelineOrchestratorService implements OnModuleDestroy {
     switch (node.moduleType) {
       case 'INGESTION': {
         const wf = createLessonIngestionWorkflow(model, locale);
+        // node.config['sourceUrl'] overrides the lesson asset URL
+        const configUrl = node.config['sourceUrl'] as string | undefined;
         const result = await wf.run({
-          videoUrl: context['videoUrl'] as string | undefined,
+          videoUrl: configUrl ?? (context['videoUrl'] as string | undefined),
           audioFileKey: context['audioFileKey'] as string | undefined,
           notesFileKey: context['notesFileKey'] as string | undefined,
         });

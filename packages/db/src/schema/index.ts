@@ -139,3 +139,6 @@ export * from './knowledge-sources';
 
 // Lesson Pipeline Builder (AI-powered lesson processing)
 export * from './lesson';
+
+// Saved Searches (Track A2 — user-scoped search persistence)
+export * from './saved-searches';

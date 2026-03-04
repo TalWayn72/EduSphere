@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -55,13 +56,17 @@ export function LessonDetailPage() {
   }>();
   const navigate = useNavigate();
 
+  // Defer query to prevent urql cache race with concurrently-unmounting siblings
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [{ data, fetching, error }] = useQuery<LessonData>({
     query: LESSON_QUERY,
     variables: { id: lessonId },
-    pause: !lessonId,
+    pause: !mounted || !lessonId,
   });
 
-  if (fetching) {
+  if (!mounted || fetching) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">

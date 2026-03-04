@@ -63,8 +63,13 @@ export async function initI18n(initialLocale?: string): Promise<void> {
       lng: initialLocale,
       interpolation: { escapeValue: false }, // React XSS-escapes by default
       detection: {
+        // Detection order for first-time visitors (no localStorage key yet).
+        // localStorage is checked first so it takes priority over browser language.
         order: ['localStorage', 'navigator', 'htmlTag'],
-        caches: ['localStorage'],
+        // IMPORTANT: Do NOT cache to localStorage here. We manage the
+        // 'edusphere_locale' key explicitly in setLocale() and GlobalLocaleSync.
+        // Allowing LanguageDetector to write would race-condition our explicit writes.
+        caches: [],
         lookupLocalStorage: 'edusphere_locale',
       },
       load: 'currentOnly', // Prevent loading 'en' when 'en-US' is detected

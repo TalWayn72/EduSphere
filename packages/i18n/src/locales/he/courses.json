@@ -102,5 +102,9 @@
     "failedUploadUrl": "כשל בקבלת כתובת להעלאה",
     "networkError": "שגיאת רשת בזמן ההעלאה",
     "failedConfirm": "אישור ההעלאה נכשל"
-  }
+  },
+  "forkCourse": "שכפל קורס",
+  "forkCourseSuccess": "הקורס שוכפל בהצלחה!",
+  "forkError": "שגיאה בשכפול הקורס. נסה שוב.",
+  "forkedFrom": "שוכפל מ"
 }
