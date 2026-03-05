@@ -991,6 +991,44 @@ pnpm audit --audit-level=high
 ═══════════════════════════════════════════════════
 ```
 
+## Session Completion Gate (IRON RULE — NEVER VIOLATE)
+
+**MANDATORY:** Claude may NEVER declare a session, feature, or task "complete" without producing and verifying the following table in full. Every row must show ✅ before completion is announced.
+
+> **Trigger phrase:** When the user asks "הצג Session Completion Report" — produce this table immediately with real results.
+
+| # | Check | Command | Required Result |
+|---|-------|---------|----------------|
+| 1 | Unit Tests | `pnpm turbo test` | 100% pass, 0 failures |
+| 2 | TypeScript | `pnpm turbo typecheck` | 0 errors |
+| 3 | Lint | `pnpm turbo lint` | 0 warnings/errors |
+| 4 | Security Tests | `pnpm test:security` | 0 failures |
+| 5 | E2E Playwright | `pnpm --filter @edusphere/web test:e2e` | all pass |
+| 6 | Health Check | `./scripts/health-check.sh` | all services UP |
+| 7 | 5-User Auth | Keycloak login × 5 roles | all login OK |
+| 8 | GitHub CI | `gh run list --limit 3` | all green |
+| 9 | Git Push | `git log --oneline -1` | commit pushed |
+| 10 | OPEN_ISSUES.md | updated with E2E files listed | status ✅ |
+
+### Iron Rules for Completion
+
+- **NEVER** say "complete" or "done" without running every check above
+- **NEVER** mark OPEN_ISSUES.md ✅ without listing the actual E2E spec files written
+- **EVERY** new feature/fix requires a Playwright E2E spec — unit tests alone are NOT sufficient
+- **EVERY** visual UI change requires `toHaveScreenshot()` visual regression test
+- **Agent work is not done** until the Orchestrator has reviewed all agent outputs and confirmed the table above
+- If any row fails: fix → re-run ALL downstream checks — never partial sign-off
+
+### Parallel Agents — Completion Protocol
+
+When running parallel agents:
+1. Wait for ALL agents to complete before declaring session done
+2. Review each agent's output for errors, gaps, or missed tests
+3. Spawn fix agents for any gaps found
+4. Only after all agents report clean — run the Completion Gate table
+
+---
+
 ## Documentation Sync
 
 | File                                  | When to Update                          | What to Sync                                    |

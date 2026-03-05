@@ -123,10 +123,12 @@ describe('G-10: Query Depth and Complexity', () => {
     expect(c).toMatch(/complex/i);
   });
 
-  it('gateway registers depthLimitRule in validationRules', () => {
+  it('gateway registers depthLimitRule via addValidationRule plugin', () => {
+    // Since Session 22 the gateway uses createGatewayRuntime + onValidate plugin
+    // instead of createYoga + validationRules array.
     const idx = read('apps/gateway/src/index.ts');
     expect(idx).toContain('depthLimitRule');
-    expect(idx).toContain('validationRules');
+    expect(idx).toContain('addValidationRule');
   });
 
   it('gateway registers complexityLimitRule in validationRules', () => {

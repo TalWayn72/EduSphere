@@ -98,17 +98,20 @@ describe('Gateway: Query Hardening Rules Applied (apps/gateway/src/index.ts)', (
     expect(content).toContain('query-complexity');
   });
 
-  it('gateway defines validationRules array', () => {
-    expect(content).toContain('validationRules');
+  it('gateway registers depth limit via onValidate plugin', () => {
+    // Since Session 22 the gateway uses createGatewayRuntime + plugin-based validation
+    // instead of createYoga + validationRules array.
+    expect(content).toContain('onValidate');
+    expect(content).toContain('addValidationRule');
   });
 
-  it('gateway passes validationRules to yoga', () => {
-    expect(content).toContain('createYoga');
-    expect(content).toContain('validationRules');
+  it('gateway passes rules via createGatewayRuntime plugins', () => {
+    expect(content).toContain('createGatewayRuntime');
+    expect(content).toContain('plugins');
   });
 
-  it('gateway applies depthLimitRule() in validationRules', () => {
-    expect(content).toMatch(/validationRules\s*=\s*\[depthLimitRule\(\)/);
+  it('gateway applies depthLimitRule() via addValidationRule', () => {
+    expect(content).toMatch(/addValidationRule\(depthLimitRule\(\)\)/);
   });
 
   it('gateway applies complexityLimitRule() in validationRules', () => {

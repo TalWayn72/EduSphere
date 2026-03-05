@@ -41,6 +41,7 @@ function useCanvasDrawing(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
   const pathsRef = useRef<SketchPath[]>([]);
   const currentPathRef = useRef<{ x: number; y: number }[]>([]);
 
+  // eslint-disable-next-line no-undef
   const getPos = (e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) => {
     const rect = canvas.getBoundingClientRect();
     const client = 'touches' in e ? e.touches[0]! : e;
@@ -73,6 +74,7 @@ function useCanvasDrawing(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
     }
   }, []);
 
+  // eslint-disable-next-line no-undef
   const startDraw = useCallback((e: MouseEvent | TouchEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -81,6 +83,7 @@ function useCanvasDrawing(canvasRef: React.RefObject<HTMLCanvasElement | null>) 
     currentPathRef.current = [getPos(e, canvas)];
   }, [canvasRef]);
 
+  // eslint-disable-next-line no-undef
   const continueDraw = useCallback((e: MouseEvent | TouchEvent) => {
     if (!drawingRef.current) return;
     const canvas = canvasRef.current;

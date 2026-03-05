@@ -36,6 +36,8 @@
 |------|-------|
 | `VideoSketchOverlay.test.tsx` | 13 new (G2: toggle, draw flow, save with/without paths, saving indicator, SVG display, ±3s window, active-mode hides SVG, toolbar) |
 | `AgentStudioPage.test.tsx` | 19 new (G5: render, palette 6 types, canvas, properties, name edit, save/deploy disabled when empty, drop adds node, select+properties, delete, connect, edge SVG, stats) |
+| `apps/web/e2e/agent-studio.spec.ts` | NEW E2E — 10 scenarios: page structure (palette/canvas/properties), all 6 node types, empty-state, disabled buttons, node drop interactions, Save mutation mock, visual regression (empty + with-node screenshots) |
+| `apps/web/e2e/video-sketch-overlay.spec.ts` | NEW E2E — 13 scenarios: inactive state (toggle visible, toolbar hidden, canvas absent), active state (canvas + toolbar appear, SVG hidden, draw mouse events, cancel returns to inactive), Save flow (button states, "Saving…" transition), visual regression (inactive + active screenshots) |
 
 ### Files Changed
 | File | Change |
@@ -51,11 +53,15 @@
 | `apps/web/src/pages/AgentStudioPage.test.tsx` | NEW — 19 tests |
 | `apps/web/src/lib/graphql/agent.queries.ts` | +CREATE_AGENT_WORKFLOW_MUTATION |
 | `apps/web/src/lib/router.tsx` | +/agents/studio route + AgentStudioPage lazy import |
+| `apps/web/e2e/agent-studio.spec.ts` | NEW — Playwright E2E for AgentStudioPage (10 scenarios + visual regression) |
+| `apps/web/e2e/video-sketch-overlay.spec.ts` | NEW — Playwright E2E for VideoSketchOverlay (13 scenarios + visual regression) |
 
 ### Anti-Recurrence
 - Canvas event listeners removed in `useEffect` cleanup (memory-safe per CLAUDE.md rules)
 - `data-testid="sketch-svg-overlay"` on overlay SVG to avoid false-positive queries on Lucide icon SVGs
 - `onSketchSave` optional prop — if not provided, `VideoSketchOverlay` not rendered (no dead UI)
+- `apps/web/e2e/agent-studio.spec.ts` — guards that palette has all 6 node types, Save is disabled when canvas empty, and no raw error strings appear after interactions
+- `apps/web/e2e/video-sketch-overlay.spec.ts` — guards that toggle reappears after Cancel, SVG overlay is hidden during active draw mode, and no `[GraphQL]`/`Unexpected error` strings reach the user after any sketch interaction
 
 ---
 
