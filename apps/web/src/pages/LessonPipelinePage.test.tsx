@@ -277,8 +277,7 @@ describe('LessonPipelinePage', () => {
     const upBtns = screen.getAllByLabelText('הזז למעלה');
     expect(upBtns.length).toBeGreaterThanOrEqual(2);
     // Second node (idx=1) has enabled up button (first node's up is disabled)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    fireEvent.click(upBtns[1]!);
+    fireEvent.click(upBtns[1] as HTMLElement);
     expect(mockStore.reorderNodes).toHaveBeenCalledWith(1, 0);
   });
 

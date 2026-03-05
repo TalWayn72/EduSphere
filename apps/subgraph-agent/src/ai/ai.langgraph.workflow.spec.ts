@@ -519,7 +519,8 @@ describe('runLangGraphTutor()', () => {
       await import('@edusphere/langgraph-workflows');
     mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'ok' });
     await runLangGraphTutor('t', 'q', {}, 'he');
-    expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'he');
+    // Third argument (tools) may be undefined when not provided
+    expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'he', undefined);
   });
 });
 
@@ -622,7 +623,109 @@ describe('runLangGraphAssessment()', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 8. LangGraph service file structure checks (complementary to memory spec)
+// 8. runLangGraphTutor — tool calling wiring
+// ---------------------------------------------------------------------------
+
+describe('runLangGraphTutor() — tool calling', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('accepts a tools argument without throwing', async () => {
+    mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'ok' });
+    const mockTools = {
+      searchKnowledgeGraph: { description: 'search', execute: vi.fn() },
+      fetchCourseContent: { description: 'fetch', execute: vi.fn() },
+    };
+    await expect(
+      runLangGraphTutor('thread-tools', 'question', {}, 'en', undefined, mockTools as never)
+    ).resolves.toBeDefined();
+  });
+
+  it('passes tools to createTutorWorkflow factory', async () => {
+    const { createTutorWorkflow } = await import('@edusphere/langgraph-workflows');
+    mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'Tools answer' });
+    const mockTools = { searchKnowledgeGraph: { description: 'search', execute: vi.fn() } };
+    await runLangGraphTutor('thread-t-tools', 'question', {}, 'en', undefined, mockTools as never);
+    expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'en', mockTools);
+  });
+
+  it('works without tools (tools=undefined) for backward compatibility', async () => {
+    const { createTutorWorkflow } = await import('@edusphere/langgraph-workflows');
+    mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'No tools answer' });
+    await runLangGraphTutor('thread-no-tools', 'question', {});
+    expect(createTutorWorkflow).toHaveBeenCalledWith(undefined, 'en', undefined);
+  });
+
+  it('returns explanation from state when tools are provided', async () => {
+    mockCompiledInvoke.mockResolvedValueOnce({ explanation: 'Tool-assisted explanation' });
+    const mockTools = { searchKnowledgeGraph: { description: 's', execute: vi.fn() } };
+    const result = await runLangGraphTutor(
+      'thread-tool-result',
+      'What is photosynthesis?',
+      {},
+      'en',
+      undefined,
+      mockTools as never
+    );
+    expect(result.text).toBe('Tool-assisted explanation');
+  });
+
+  it('falls back to message text when explanation absent (with tools)', async () => {
+    mockCompiledInvoke.mockResolvedValueOnce({ isComplete: true });
+    const mockTools = { fetchCourseContent: { description: 'f', execute: vi.fn() } };
+    const result = await runLangGraphTutor(
+      'thread-fallback-tools',
+      'Fallback with tools',
+      {},
+      'en',
+      undefined,
+      mockTools as never
+    );
+    expect(result.text).toBe('Fallback with tools');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. AiLanggraphRunnerService — tool wiring source analysis
+// ---------------------------------------------------------------------------
+
+describe('ai-langgraph-runner.service.ts: tool wiring for TUTOR/EXPLANATION_GENERATOR', () => {
+  const src = readSrc('ai-langgraph-runner.service.ts');
+
+  it('imports buildSearchKnowledgeGraphTool from tools/agent-tools', () => {
+    expect(src).toContain('buildSearchKnowledgeGraphTool');
+  });
+
+  it('imports buildFetchCourseContentTool from tools/agent-tools', () => {
+    expect(src).toContain('buildFetchCourseContentTool');
+  });
+
+  it('imports searchKnowledgeGraph from ai.service.db', () => {
+    expect(src).toContain('searchKnowledgeGraph');
+  });
+
+  it('imports fetchContentItem from ai.service.db', () => {
+    expect(src).toContain('fetchContentItem');
+  });
+
+  it('defines buildTutorTools method', () => {
+    expect(src).toMatch(/buildTutorTools\s*\(/);
+  });
+
+  it('passes tools to runLangGraphTutor call', () => {
+    // Verify the tutor dispatch branch passes tools as the 6th argument
+    expect(src).toContain('runLangGraphTutor');
+    expect(src).toContain('tools');
+  });
+
+  it('extracts tenantId from context for tool closures', () => {
+    expect(src).toContain("context['tenantId']");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. LangGraph service file structure checks (complementary to memory spec)
 // ---------------------------------------------------------------------------
 
 describe('langgraph.service.ts: structural requirements', () => {

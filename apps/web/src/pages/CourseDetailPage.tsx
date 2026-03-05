@@ -5,7 +5,7 @@
  * Uses React 19 useTransition for the enroll/unenroll action so the UI
  * stays responsive while the mutation is in flight.
  */
-import { useTransition, useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { UnsavedChangesDialog } from '@/components/UnsavedChangesDialog';
@@ -40,6 +40,7 @@ import {
   GitFork,
 } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
+import { useOptimisticEnrollment } from '@/hooks/useOptimisticEnrollment';
 
 const EDITOR_ROLES = new Set(['SUPER_ADMIN', 'ORG_ADMIN', 'INSTRUCTOR']);
 
@@ -199,9 +200,6 @@ export function CourseDetailPage() {
   const [editTitle, setEditTitle] = useState('');
   const blocker = useUnsavedChangesGuard(editMode, 'CourseDetailPage');
 
-  // useTransition keeps the UI interactive (non-blocking) during the
-  // enroll/unenroll mutation.  isEnrolling replaces the old useState flag.
-  const [isEnrolling, startEnrollTransition] = useTransition();
   const [toast, setToast] = useState<string | null>(null);
   const [showSources, setShowSources] = useState(false);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -233,35 +231,23 @@ export function CourseDetailPage() {
     toastTimeoutRef.current = setTimeout(() => setToast(null), 3000);
   };
 
-  const handleEnroll = () => {
-    startEnrollTransition(async () => {
-      if (isEnrolled) {
-        const { error: unenrollErr } = await unenrollMutation({ courseId });
-        if (unenrollErr) {
-          const msg =
-            unenrollErr.graphQLErrors?.[0]?.message ??
-            unenrollErr.message ??
-            'Failed to unenroll';
-          console.error('[CourseDetailPage] unenroll failed:', msg, unenrollErr);
-          showToast(msg);
-          return;
-        }
-        showToast(t('unenroll'));
-      } else {
-        const { error: enrollErr } = await enrollMutation({ courseId });
-        if (enrollErr) {
-          const msg =
-            enrollErr.graphQLErrors?.[0]?.message ??
-            enrollErr.message ??
-            'Failed to enroll';
-          console.error('[CourseDetailPage] enroll failed:', msg, enrollErr);
-          showToast(msg);
-          return;
-        }
-        showToast(t('enrolled'));
-      }
+  const { optimisticEnrolled, handleEnroll, isEnrolling } =
+    useOptimisticEnrollment({
+      courseId,
+      isEnrolled,
+      enrollMutation: (vars) => enrollMutation(vars),
+      unenrollMutation: (vars) => unenrollMutation(vars),
+      onSuccess: showToast,
+      onError: (msg, raw) => {
+        const action = isEnrolled ? 'unenroll' : 'enroll';
+        console.error(`[CourseDetailPage] ${action} failed:`, msg, raw);
+        showToast(msg);
+      },
+      enrollSuccessMessage: t('enrolled'),
+      unenrollSuccessMessage: t('unenroll'),
+      enrollFailMessage: 'Failed to enroll',
+      unenrollFailMessage: 'Failed to unenroll',
     });
-  };
 
   const handleForkCourse = async () => {
     setForkError(null);
@@ -460,17 +446,18 @@ export function CourseDetailPage() {
                   </Button>
                 )}
                 <Button
-                  variant={isEnrolled ? 'secondary' : 'default'}
+                  variant={optimisticEnrolled ? 'secondary' : 'default'}
                   className="gap-2"
                   onClick={handleEnroll}
                   disabled={isEnrolling}
+                  data-testid="enroll-btn"
                 >
                   {isEnrolling && <Loader2 className="h-4 w-4 animate-spin" />}
                   {isEnrolling
-                    ? isEnrolled
+                    ? optimisticEnrolled
                       ? t('unenrolling')
                       : t('enrolling')
-                    : isEnrolled
+                    : optimisticEnrolled
                       ? t('unenroll')
                       : t('enroll')}
                 </Button>

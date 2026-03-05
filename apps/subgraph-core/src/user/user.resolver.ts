@@ -79,6 +79,16 @@ export class UserResolver {
     );
   }
 
+  @Query('listUsers')
+  async listUsers(
+    @Args('input') input: { page?: number; limit?: number; search?: string; role?: string } | undefined,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
+    return this.userService.listUsers(input ?? {}, context.authContext);
+  }
+
   @Mutation('createUser')
   async createUser(
     @Args('input') input: unknown,
@@ -152,6 +162,17 @@ export class UserResolver {
     if (!context.authContext)
       throw new UnauthorizedException('Unauthenticated');
     return this.userService.resetUserPassword(userId, context.authContext);
+  }
+
+  @Mutation('suspendUser')
+  async suspendUser(
+    @Args('userId') userId: string,
+    @Args('suspended') suspended: boolean,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext)
+      throw new UnauthorizedException('Unauthenticated');
+    return this.userService.suspendUser(userId, suspended, context.authContext);
   }
 
   @Mutation('bulkImportUsers')

@@ -80,9 +80,14 @@ export function LanguageSettingsPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [queryResult] = useQuery<QueryResult>({
     query: TENANT_LANGUAGE_SETTINGS_QUERY,
-    pause: true,
+    pause: !mounted,
   });
   const [mutResult, updateSettings] = useMutation(
     UPDATE_TENANT_LANGUAGE_SETTINGS_MUTATION

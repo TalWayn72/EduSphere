@@ -12,8 +12,22 @@ type AdminOverview {
   storageUsedMb: Float!
 }
 
+# AdminDashboardStats is an alias for AdminOverview exposed for Phase 1 wiring.
+type AdminDashboardStats {
+  totalUsers: Int!
+  activeUsers: Int!
+  totalCourses: Int!
+  publishedCourses: Int!
+  totalAnnotations: Int!
+  storageUsedMb: Float!
+}
+
 type Query {
   adminOverview: AdminOverview!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  adminDashboardStats: AdminDashboardStats!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }

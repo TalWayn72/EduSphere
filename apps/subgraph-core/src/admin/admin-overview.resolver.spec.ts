@@ -35,11 +35,24 @@ const OVERVIEW_DATA = {
   storageUsedMb: 0,
 };
 
+const DASHBOARD_STATS_DATA = {
+  totalUsers: 42,
+  activeUsers: 10,
+  totalCourses: 5,
+  publishedCourses: 3,
+  totalAnnotations: 100,
+  storageUsedMb: 0,
+};
+
 function makeService(
-  overrides: Partial<{ getOverview: () => Promise<unknown> }> = {}
+  overrides: Partial<{
+    getOverview: () => Promise<unknown>;
+    getDashboardStats: () => Promise<unknown>;
+  }> = {}
 ) {
   return {
     getOverview: vi.fn().mockResolvedValue(OVERVIEW_DATA),
+    getDashboardStats: vi.fn().mockResolvedValue(DASHBOARD_STATS_DATA),
     ...overrides,
   };
 }
@@ -96,5 +109,31 @@ describe('AdminOverviewResolver', () => {
     expect(result.totalUsers).toBe(42);
     expect(result.lastScimSync).toBe('2026-02-01T00:00:00.000Z');
     expect(result.storageUsedMb).toBe(0);
+  });
+
+  // ─── adminDashboardStats (Phase 1) ───────────────────────────────────────
+
+  it('adminDashboardStats throws UnauthorizedException when authContext absent', async () => {
+    await expect(
+      resolver.adminDashboardStats(makeContext(undefined))
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
+  it('adminDashboardStats calls service.getDashboardStats with tenantId', async () => {
+    const ctx = makeContext({ tenantId: 'tenant-abc', userId: 'u1', roles: [] });
+    await resolver.adminDashboardStats(ctx);
+    expect(mockService.getDashboardStats).toHaveBeenCalledWith('tenant-abc');
+  });
+
+  it('adminDashboardStats returns result from service', async () => {
+    const ctx = makeContext({ tenantId: 'tenant-1', userId: 'u1', roles: [] });
+    const result = await resolver.adminDashboardStats(ctx);
+    expect(result).toBe(DASHBOARD_STATS_DATA);
+  });
+
+  it('adminDashboardStats passes empty string when tenantId missing', async () => {
+    const ctx = makeContext({ userId: 'u1', roles: [] });
+    await resolver.adminDashboardStats(ctx);
+    expect(mockService.getDashboardStats).toHaveBeenCalledWith('');
   });
 });

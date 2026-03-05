@@ -137,4 +137,40 @@ describe('AdminOverviewService', () => {
       storageUsedMb: 0,
     });
   });
+
+  // ─── getDashboardStats (Phase 1) ────────────────────────────────────────
+
+  it('getDashboardStats returns totalUsers from DB count', async () => {
+    mockDbSelect
+      .mockReturnValueOnce(makeThenableChain([{ value: 55 }])) // total
+      .mockReturnValueOnce(makeThenableChain([{ value: 12 }])); // active
+    const result = await service.getDashboardStats('tenant-1');
+    expect(result.totalUsers).toBe(55);
+    expect(result.activeUsers).toBe(12);
+  });
+
+  it('getDashboardStats returns zero-defaults on DB error', async () => {
+    mockDbSelect.mockImplementation(() => { throw new Error('DB down'); });
+    const result = await service.getDashboardStats('tenant-err');
+    expect(result).toMatchObject({
+      totalUsers: 0,
+      activeUsers: 0,
+      totalCourses: 0,
+      publishedCourses: 0,
+      totalAnnotations: 0,
+      storageUsedMb: 0,
+    });
+  });
+
+  it('getDashboardStats has correct shape', async () => {
+    mockDbSelect
+      .mockReturnValueOnce(makeThenableChain([{ value: 3 }]))
+      .mockReturnValueOnce(makeThenableChain([{ value: 1 }]));
+    const result = await service.getDashboardStats('tenant-shape');
+    expect(result).toHaveProperty('totalUsers');
+    expect(result).toHaveProperty('activeUsers');
+    expect(result).toHaveProperty('publishedCourses');
+    expect(result).toHaveProperty('totalAnnotations');
+    expect(result).toHaveProperty('storageUsedMb');
+  });
 });

@@ -187,6 +187,63 @@ describe('LanguageSettingsPage', () => {
     });
   });
 
+  it('fires real GraphQL query after mount (not permanently paused)', async () => {
+    renderPage();
+    // After render + mount effect, useQuery must have been called with pause: false
+    const calls = vi.mocked(urql.useQuery).mock.calls;
+    // At least one call should have pause: false (fired after mount)
+    const unpaused = calls.some((args) => {
+      const opts = args[0] as { pause?: boolean };
+      return opts.pause === false;
+    });
+    expect(unpaused).toBe(true);
+  });
+
+  it('never uses pause: true permanently (regression guard against stale wiring)', () => {
+    renderPage();
+    const calls = vi.mocked(urql.useQuery).mock.calls;
+    // Verify the query doc used is the real admin-language one (not empty/undefined)
+    calls.forEach((args) => {
+      const opts = args[0] as { query?: string; pause?: boolean };
+      if (opts.query !== undefined) {
+        expect(opts.query).toBeTruthy();
+      }
+    });
+    // The page should NOT have a call that is both pause:true AND after the first render cycle
+    // All post-mount calls must have pause:false
+    const allPermanentlyPaused = calls.every((args) => {
+      const opts = args[0] as { pause?: boolean };
+      return opts.pause === true;
+    });
+    expect(allPermanentlyPaused).toBe(false);
+  });
+
+  it('populates form with data returned from real query', async () => {
+    vi.mocked(urql.useQuery).mockReturnValue([
+      {
+        data: {
+          myTenantLanguageSettings: {
+            defaultLanguage: 'he',
+            supportedLanguages: ['en', 'he'],
+          },
+        },
+        fetching: false,
+        error: undefined,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    await waitFor(() => {
+      // The default language select should now show Hebrew
+      const select = screen.getByRole('combobox') as HTMLSelectElement;
+      expect(select.value).toBe('he');
+    });
+    // Hebrew checkbox should be checked (it's in supportedLanguages)
+    const checkboxes = screen.getAllByRole('checkbox');
+    // Hebrew is index 1 in AVAILABLE_LOCALES
+    expect(checkboxes[1]).toBeChecked();
+  });
+
   it('clears saved timer on unmount (no memory leak)', async () => {
     vi.useFakeTimers();
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');

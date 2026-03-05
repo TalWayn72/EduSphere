@@ -78,6 +78,33 @@ type AdminUsersResult {
   total: Int!
 }
 
+# Phase 2: Cursor-based UserConnection (Relay spec)
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  nodes: [User!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input ListUsersInput {
+  page: Int
+  limit: Int
+  search: String
+  role: String
+}
+
 type Query {
   _health: String! @shareable
   user(id: ID!): User
@@ -88,13 +115,18 @@ type Query {
   me: User
   myStats: UserStats! @authenticated
   publicProfile(userId: ID!): PublicProfile
-  # Admin: get all users with filters
+  # Admin: get all users with filters (offset-based)
   adminUsers(
     limit: Int = 50
     offset: Int = 0
     search: String
     role: UserRole
   ): AdminUsersResult! @authenticated @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+
+  # Phase 2: cursor-based user list (Relay spec)
+  listUsers(input: ListUsersInput): UserConnection!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 type Mutation {
@@ -114,6 +146,11 @@ type Mutation {
   updateProfileVisibility(isPublic: Boolean!): UserPreferences! @authenticated
   # Soft-deactivate a user (admin only)
   deactivateUser(id: ID!): Boolean!
+    @authenticated
+    @requiresScopes(scopes: [["write:users"]])
+    @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])
+  # Phase 2: suspend / unsuspend a user (admin only)
+  suspendUser(userId: ID!, suspended: Boolean!): User!
     @authenticated
     @requiresScopes(scopes: [["write:users"]])
     @requiresRole(roles: [SUPER_ADMIN, ORG_ADMIN])

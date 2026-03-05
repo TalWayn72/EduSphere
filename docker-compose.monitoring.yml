@@ -114,6 +114,8 @@ services:
       - DATA_SOURCE_NAME=postgresql://edusphere:edusphere_dev_password@host.docker.internal:5432/edusphere?sslmode=disable
     ports:
       - "9187:9187"
+    mem_limit: 128m
+    mem_reservation: 64m
     networks:
       - monitoring
     restart: unless-stopped
@@ -126,6 +128,8 @@ services:
       - REDIS_ADDR=host.docker.internal:6379
     ports:
       - "9121:9121"
+    mem_limit: 128m
+    mem_reservation: 64m
     networks:
       - monitoring
     restart: unless-stopped
@@ -138,6 +142,8 @@ services:
     container_name: edusphere-node-exporter
     ports:
       - "9100:9100"
+    mem_limit: 128m
+    mem_reservation: 64m
     networks:
       - monitoring
     restart: unless-stopped
@@ -154,6 +160,8 @@ services:
       - /dev/disk/:/dev/disk:ro
     ports:
       - "8081:8080"
+    mem_limit: 256m
+    mem_reservation: 128m
     networks:
       - monitoring
     restart: unless-stopped

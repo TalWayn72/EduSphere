@@ -46,17 +46,8 @@ input UpdateBadgeInput {
   conditionValue: Int
 }
 
-type OpenBadgeDefinition {
+type OpenBadgeDefinition @key(fields: "id") {
   id: ID!
-  tenantId: ID!
-  name: String!
-  description: String!
-  imageUrl: String
-  criteriaUrl: String
-  tags: [String!]!
-  version: String!
-  issuerId: String!
-  createdAt: String!
 }
 
 type OpenBadge {

@@ -14,6 +14,15 @@ export interface AdminOverviewData {
   storageUsedMb: number;
 }
 
+export interface AdminDashboardStatsData {
+  totalUsers: number;
+  activeUsers: number;
+  totalCourses: number;
+  publishedCourses: number;
+  totalAnnotations: number;
+  storageUsedMb: number;
+}
+
 const SAFE_DEFAULTS: AdminOverviewData = {
   totalUsers: 0,
   activeUsersThisMonth: 0,
@@ -32,6 +41,39 @@ export class AdminOverviewService implements OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     await closeAllPools();
     this.logger.log('[AdminOverviewService] onModuleDestroy: DB pools closed');
+  }
+
+  async getDashboardStats(tenantId: string): Promise<AdminDashboardStatsData> {
+    try {
+      const [totalUsersResult, activeUsersResult] = await Promise.all([
+        db
+          .select({ value: count() })
+          .from(users)
+          .where(eq(users.tenant_id, tenantId)),
+        db
+          .select({ value: count() })
+          .from(users)
+          .where(gte(users.updated_at, sql`NOW() - INTERVAL '30 days'`)),
+      ]);
+      return {
+        totalUsers: totalUsersResult[0]?.value ?? 0,
+        activeUsers: activeUsersResult[0]?.value ?? 0,
+        totalCourses: 0,
+        publishedCourses: 0,
+        totalAnnotations: 0,
+        storageUsedMb: 0,
+      };
+    } catch (err) {
+      this.logger.error({ tenantId, err }, '[AdminOverviewService] getDashboardStats failed');
+      return {
+        totalUsers: 0,
+        activeUsers: 0,
+        totalCourses: 0,
+        publishedCourses: 0,
+        totalAnnotations: 0,
+        storageUsedMb: 0,
+      };
+    }
   }
 
   async getOverview(tenantId: string): Promise<AdminOverviewData> {

@@ -21,4 +21,14 @@ export class AdminOverviewResolver {
       context.authContext.tenantId || ''
     );
   }
+
+  @Query('adminDashboardStats')
+  async adminDashboardStats(@Context() context: GraphQLContext) {
+    if (!context.authContext) {
+      throw new UnauthorizedException('Unauthenticated');
+    }
+    return this.adminOverviewService.getDashboardStats(
+      context.authContext.tenantId || ''
+    );
+  }
 }

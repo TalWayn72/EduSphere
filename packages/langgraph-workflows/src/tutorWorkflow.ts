@@ -1,8 +1,15 @@
 import { StateGraph, END, START, Annotation, type BaseCheckpointSaver } from '@langchain/langgraph';
-import { generateText } from 'ai';
+import { generateText, stepCountIs } from 'ai';
+import type { Tool } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { injectLocale } from './locale-prompt';
+
+// ── Tool set type ─────────────────────────────────────────────────────────────
+
+export type TutorToolSet = Record<string, Tool>;
+
+const MAX_TUTOR_TOOL_STEPS = 5;
 
 const MAX_HISTORY_MESSAGES = 20;
 
@@ -77,10 +84,16 @@ const TutorStateAnnotation = Annotation.Root({
 export class AdaptiveTutorWorkflow {
   private model: string;
   private locale: string;
+  private tools?: TutorToolSet;
 
-  constructor(model: string = 'gpt-4-turbo', locale: string = 'en') {
+  constructor(
+    model: string = 'gpt-4-turbo',
+    locale: string = 'en',
+    tools?: TutorToolSet
+  ) {
     this.model = model;
     this.locale = locale;
+    this.tools = tools;
   }
 
   private createGraph() {
@@ -135,17 +148,25 @@ Respond with ONLY one word: beginner, intermediate, or advanced`,
 
     const basePrompt = `You are an expert tutor. ${levelGuidance[state.studentLevel]}.
 ${state.context ? `Use this context: ${state.context}` : ''}
+${this.tools ? 'You have tools available: use search_knowledge to look up relevant concepts, and fetch_course to retrieve course content.' : ''}
 
 Provide a clear, educational explanation.`;
     const systemPrompt = injectLocale(basePrompt, this.locale);
 
-    const { text } = await generateText({
+    const generateOpts: Parameters<typeof generateText>[0] = {
       model: openai(this.model) as unknown as Parameters<typeof generateText>[0]['model'],
       system: systemPrompt,
       prompt: `Question: ${state.question}
 
 Provide a comprehensive yet accessible explanation.`,
-    });
+    };
+
+    if (this.tools) {
+      generateOpts.tools = this.tools;
+      generateOpts.stopWhen = stepCountIs(MAX_TUTOR_TOOL_STEPS);
+    }
+
+    const { text } = await generateText(generateOpts);
 
     return {
       explanation: text,
@@ -220,7 +241,8 @@ Suggest 3 related topics the student might want to explore next. Return as a num
 
 export function createTutorWorkflow(
   model?: string,
-  locale: string = 'en'
+  locale: string = 'en',
+  tools?: TutorToolSet
 ): AdaptiveTutorWorkflow {
-  return new AdaptiveTutorWorkflow(model, locale);
+  return new AdaptiveTutorWorkflow(model, locale, tools);
 }

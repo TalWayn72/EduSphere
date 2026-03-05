@@ -240,6 +240,68 @@ export class UserService implements OnModuleDestroy {
     return { created, updated, failed, errors };
   }
 
+  async listUsers(
+    opts: { page?: number; limit?: number; search?: string; role?: string },
+    authContext: AuthContext
+  ): Promise<{
+    edges: { cursor: string; node: NonNullable<MappedUser> }[];
+    nodes: NonNullable<MappedUser>[];
+    pageInfo: {
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+      endCursor: string | null;
+    };
+    totalCount: number;
+  }> {
+    const limit = opts.limit ?? 20;
+    const page = opts.page ?? 0;
+    const offset = page * limit;
+    const result = await this.adminUsers(
+      { limit: limit + 1, offset, search: opts.search, role: opts.role },
+      authContext
+    );
+    const hasNextPage = result.users.length > limit;
+    const pageUsers = hasNextPage ? result.users.slice(0, limit) : result.users;
+    const edges = pageUsers.map((node, i) => ({
+      cursor: Buffer.from(String(offset + i)).toString('base64'),
+      node,
+    }));
+    return {
+      edges,
+      nodes: pageUsers,
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage: offset > 0,
+        startCursor: edges[0]?.cursor ?? null,
+        endCursor: edges[edges.length - 1]?.cursor ?? null,
+      },
+      totalCount: result.total,
+    };
+  }
+
+  async suspendUser(
+    userId: string,
+    suspended: boolean,
+    authContext: AuthContext
+  ): Promise<NonNullable<MappedUser>> {
+    const tenantCtx = this.toTenantContext(authContext);
+    return withTenantContext(this.db, tenantCtx, async (tx) => {
+      // Suspended users get their deleted_at toggled; null = active, now = suspended
+      const [user] = await tx
+        .update(schema.users)
+        .set({ deleted_at: suspended ? new Date() : null, updated_at: new Date() })
+        .where(eq(schema.users.id, userId))
+        .returning();
+      if (!user) throw new Error('User not found');
+      this.logger.log(
+        { userId, suspended, tenantId: tenantCtx.tenantId },
+        '[UserService] suspendUser applied'
+      );
+      return this.mapUser(user) as NonNullable<MappedUser>;
+    });
+  }
+
   async adminUsers(
     opts: { limit: number; offset: number; search?: string; role?: string },
     authContext: AuthContext

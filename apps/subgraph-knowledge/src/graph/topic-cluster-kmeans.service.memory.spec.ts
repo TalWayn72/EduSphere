@@ -13,11 +13,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Hoist NATS mock ───────────────────────────────────────────────────────────
 
-const { mockDrain, mockPublish, mockConnect } = vi.hoisted(() => {
+const { mockDrain, _mockPublish, mockConnect } = vi.hoisted(() => {
   const mockDrain = vi.fn().mockResolvedValue(undefined);
-  const mockPublish = vi.fn();
-  const mockConnect = vi.fn().mockResolvedValue({ drain: mockDrain, publish: mockPublish });
-  return { mockDrain, mockPublish, mockConnect };
+  const _mockPublish = vi.fn();
+  const mockConnect = vi.fn().mockResolvedValue({ drain: mockDrain, publish: _mockPublish });
+  return { mockDrain, _mockPublish, mockConnect };
 });
 
 vi.mock('nats', () => ({

@@ -9,26 +9,33 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", ".eslintrc*", "eslint.config*"],
+      "outputs": [],
+      "cache": true
     },
     "typecheck": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", "tsconfig*.json"],
+      "outputs": [],
+      "cache": true
     },
     "test": {
       "dependsOn": ["^build"],
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", "**/*.spec.ts", "**/*.test.ts"],
       "outputs": ["coverage/**"],
-      "cache": false
+      "cache": true
     },
     "test:memory": {
-      "cache": false,
-      "dependsOn": ["build"]
+      "dependsOn": ["^build"],
+      "cache": false
     },
     "test:rls": {
+      "dependsOn": ["^build"],
       "cache": false,
       "env": ["DATABASE_URL"]
     },
     "test:security": {
+      "dependsOn": ["^build"],
       "cache": false
     },
     "test:integration": {

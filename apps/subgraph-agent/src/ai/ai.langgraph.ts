@@ -30,6 +30,7 @@ import {
   createQuizWorkflow,
   createTutorWorkflow,
   createAssessmentWorkflow,
+  type TutorToolSet,
 } from '@edusphere/langgraph-workflows';
 import type { AIResult } from './ai.service';
 
@@ -125,10 +126,11 @@ export async function runLangGraphTutor(
   message: string,
   context: Record<string, unknown>,
   locale: string = 'en',
-  checkpointer?: Checkpointer
+  checkpointer?: Checkpointer,
+  tools?: TutorToolSet
 ): Promise<AIResult> {
   const cp = checkpointer ?? new MemorySaver();
-  const workflow = createTutorWorkflow(undefined, locale);
+  const workflow = createTutorWorkflow(undefined, locale, tools);
   type TutorCompileOpts = Parameters<typeof workflow.compile>[0];
   const compiled = workflow.compile(
     { checkpointer: cp } as unknown as TutorCompileOpts

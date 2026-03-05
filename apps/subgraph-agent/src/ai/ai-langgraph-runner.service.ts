@@ -5,6 +5,11 @@ import {
   runLangGraphTutor,
 } from './ai.langgraph.js';
 import { LangGraphService } from './langgraph.service.js';
+import {
+  buildSearchKnowledgeGraphTool,
+  buildFetchCourseContentTool,
+} from './tools/agent-tools.js';
+import { searchKnowledgeGraph, fetchContentItem } from './ai.service.db.js';
 import type { AIResult } from './ai.service.js';
 
 // ── Templates routed through LangGraph ───────────────────────────────────────
@@ -26,6 +31,18 @@ export class AiLanggraphRunnerService {
   /** Returns true for template types that are executed by LangGraph. */
   isLangGraphTemplate(templateType: string): boolean {
     return LANGGRAPH_TEMPLATES.has(templateType);
+  }
+
+  /** Builds the tool set injected into TUTOR / EXPLANATION_GENERATOR workflows. */
+  buildTutorTools(tenantId: string) {
+    return {
+      searchKnowledgeGraph: buildSearchKnowledgeGraphTool((query, limit) =>
+        searchKnowledgeGraph(query, tenantId, limit)
+      ),
+      fetchCourseContent: buildFetchCourseContentTool((contentItemId) =>
+        fetchContentItem(contentItemId, tenantId)
+      ),
+    };
   }
 
   /**
@@ -66,12 +83,15 @@ export class AiLanggraphRunnerService {
 
     if (templateType === 'TUTOR' || templateType === 'EXPLANATION_GENERATOR') {
       this.logger.debug(`LangGraph: tutor session=${sessionId}`);
+      const tenantId = (context['tenantId'] as string | undefined) ?? '';
+      const tools = this.buildTutorTools(tenantId);
       return runLangGraphTutor(
         sessionId,
         message,
         context,
         locale,
-        checkpointer
+        checkpointer,
+        tools
       );
     }
 

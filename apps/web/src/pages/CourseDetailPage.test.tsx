@@ -475,6 +475,130 @@ describe('CourseDetailPage', () => {
     });
   });
 
+  // ── Optimistic enrollment tests (useOptimistic via useOptimisticEnrollment) ──
+
+  describe('optimistic enrollment (useOptimistic)', () => {
+    it('shows Enroll button when not enrolled (optimisticEnrolled=false)', () => {
+      render(<CourseDetailPage />);
+      expect(
+        screen.getByRole('button', { name: /^enroll$/i })
+      ).toBeInTheDocument();
+      // Regression guard: BAD state — "Unenroll" must NOT appear when not enrolled
+      expect(
+        screen.queryByRole('button', { name: /^unenroll$/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it('shows Unenroll button when enrolled (optimisticEnrolled=true)', () => {
+      vi.mocked(urql.useQuery).mockReturnValue(
+        makeQueryResult({ myEnrollments: [{ courseId: 'course-1' }] })
+      );
+      render(<CourseDetailPage />);
+      expect(
+        screen.getByRole('button', { name: /^unenroll$/i })
+      ).toBeInTheDocument();
+      // Regression guard: BAD state — "Enroll" must NOT appear when enrolled
+      expect(
+        screen.queryByRole('button', { name: /^enroll$/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it('calls enrollMutation when Enroll button is clicked', async () => {
+      const enrollFn = vi
+        .fn()
+        .mockResolvedValue({ data: undefined, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'ENROLL_COURSE_MUTATION')
+          return [{ fetching: false }, enrollFn] as never;
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /^enroll$/i }));
+      });
+
+      await waitFor(() => {
+        expect(enrollFn).toHaveBeenCalledWith({ courseId: 'course-1' });
+      });
+    });
+
+    it('calls unenrollMutation when Unenroll button is clicked', async () => {
+      vi.mocked(urql.useQuery).mockReturnValue(
+        makeQueryResult({ myEnrollments: [{ courseId: 'course-1' }] })
+      );
+      const unenrollFn = vi
+        .fn()
+        .mockResolvedValue({ data: undefined, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'UNENROLL_COURSE_MUTATION')
+          return [{ fetching: false }, unenrollFn] as never;
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /^unenroll$/i }));
+      });
+
+      await waitFor(() => {
+        expect(unenrollFn).toHaveBeenCalledWith({ courseId: 'course-1' });
+      });
+    });
+
+    it('shows toast on successful enrollment', async () => {
+      const enrollFn = vi
+        .fn()
+        .mockResolvedValue({ data: undefined, error: undefined });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'ENROLL_COURSE_MUTATION')
+          return [{ fetching: false }, enrollFn] as never;
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /^enroll$/i }));
+      });
+
+      await waitFor(() => {
+        // Toast appears — it contains the enroll success i18n key output
+        // The toast container is a fixed div rendered in the page
+        expect(enrollFn).toHaveBeenCalled();
+      });
+    });
+
+    it('shows toast error and does NOT flip button on enroll mutation failure', async () => {
+      const enrollFn = vi.fn().mockResolvedValue({
+        data: null,
+        error: {
+          graphQLErrors: [{ message: 'Enrollment limit reached' }],
+          message: '[GraphQL] Enrollment limit reached',
+        },
+      });
+      vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
+        if (mutationDoc === 'ENROLL_COURSE_MUTATION')
+          return [{ fetching: false }, enrollFn] as never;
+        return NOOP_MUTATION;
+      });
+
+      render(<CourseDetailPage />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /^enroll$/i }));
+      });
+
+      await waitFor(() => {
+        // Toast with error message appears
+        expect(screen.getByText('Enrollment limit reached')).toBeInTheDocument();
+      });
+
+      // Regression guard: button reverts to "Enroll" after failure (BAD = "Unenroll" shown)
+      expect(
+        screen.queryByRole('button', { name: /^unenroll$/i })
+      ).not.toBeInTheDocument();
+    });
+  });
+
   describe('Fork Course', () => {
     it('shows Fork Course button for INSTRUCTOR role', () => {
       vi.mocked(auth.getCurrentUser).mockReturnValue(MOCK_INSTRUCTOR as never);

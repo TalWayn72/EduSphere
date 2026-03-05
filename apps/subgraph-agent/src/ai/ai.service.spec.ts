@@ -506,12 +506,14 @@ describe('AIService', () => {
         'TUTOR',
         CTX
       );
+      // Sixth argument is a tools object (searchKnowledgeGraph + fetchCourseContent)
       expect(mockRunLangGraphTutor).toHaveBeenCalledWith(
         SESSION_ID,
         MESSAGE,
         CTX,
         'en',
-        MOCK_CHECKPOINTER
+        MOCK_CHECKPOINTER,
+        expect.any(Object)
       );
       expect(result.text).toBe(MOCK_LANGGRAPH_RESULT.text);
     });
@@ -523,12 +525,14 @@ describe('AIService', () => {
         'EXPLANATION_GENERATOR',
         CTX
       );
+      // Sixth argument is a tools object (searchKnowledgeGraph + fetchCourseContent)
       expect(mockRunLangGraphTutor).toHaveBeenCalledWith(
         SESSION_ID,
         MESSAGE,
         CTX,
         'en',
-        MOCK_CHECKPOINTER
+        MOCK_CHECKPOINTER,
+        expect.any(Object)
       );
     });
 

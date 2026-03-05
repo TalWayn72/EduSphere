@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useOptimistic, useTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { toast } from 'sonner';
@@ -155,7 +155,7 @@ export function AnnotationsPage() {
   const user = getCurrentUser();
   const [sortBy, setSortBy] = useState<'time' | 'layer'>('time');
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, startDeleteTransition] = useTransition();
   // BUG-06 fix: controlled tab state so layer summary cards can drive the Tabs
   const [activeTab, setActiveTab] = useState<string>('all');
 
@@ -175,8 +175,17 @@ export function AnnotationsPage() {
     ? `${user.firstName} ${user.lastName}`.trim() || user.username
     : 'Unknown';
 
-  const annotations: Annotation[] = backendAnnotations.map((a) =>
+  const serverAnnotations: Annotation[] = backendAnnotations.map((a) =>
     toAnnotation(a, displayName)
+  );
+
+  // useOptimistic: remove deleted annotations from the visible list immediately
+  // when the user confirms deletion — before the mutation round-trip completes.
+  // React 19 automatically reverts to serverAnnotations if the mutation fails.
+  const [annotations, removeOptimisticAnnotation] = useOptimistic(
+    serverAnnotations,
+    (state: Annotation[], deletedId: string) =>
+      state.filter((a) => a.id !== deletedId)
   );
 
   const counts = getAnnotationCountByLayer(annotations);
@@ -200,13 +209,30 @@ export function AnnotationsPage() {
     setPendingDeleteId(id);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = () => {
     if (!pendingDeleteId) return;
-    setIsDeleting(true);
-    await executeDelete({ id: pendingDeleteId });
-    setIsDeleting(false);
+    const idToDelete = pendingDeleteId;
     setPendingDeleteId(null);
-    toast.success(t('annotationDeleted'));
+
+    // useOptimistic updates MUST be called inside startTransition (or an action).
+    startDeleteTransition(async () => {
+      // Immediately remove from visible list — React 19 reverts if mutation fails.
+      removeOptimisticAnnotation(idToDelete);
+
+      const { error: deleteErr } = await executeDelete({ id: idToDelete });
+      if (deleteErr) {
+        console.error(
+          '[AnnotationsPage] delete annotation failed:',
+          deleteErr.message,
+          deleteErr
+        );
+        // urql will refetch and restore the annotation on next query update;
+        // the optimistic removal is automatically reverted by React 19.
+        toast.error(t('deleteError', 'Failed to delete annotation'));
+        return;
+      }
+      toast.success(t('annotationDeleted'));
+    });
   };
 
   if (fetching) {

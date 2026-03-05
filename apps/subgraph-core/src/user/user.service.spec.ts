@@ -309,4 +309,91 @@ describe('UserService', () => {
       );
     });
   });
+
+  // ─── suspendUser (Phase 2) ──────────────────────────────────────────────
+
+  describe('suspendUser()', () => {
+    it('calls withTenantContext when suspending', async () => {
+      const updated = { ...MOCK_USER };
+      mockReturning.mockResolvedValue([updated]);
+      mockWhere.mockReturnValue({ returning: mockReturning });
+      mockSet.mockReturnValue({ where: mockWhere });
+      mockUpdate.mockReturnValue({ set: mockSet });
+
+      await service.suspendUser('user-1', true, ADMIN_AUTH);
+      expect(withTenantContext).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({ tenantId: 'tenant-1' }),
+        expect.any(Function)
+      );
+    });
+
+    it('throws when user not found', async () => {
+      mockReturning.mockResolvedValue([]);
+      mockWhere.mockReturnValue({ returning: mockReturning });
+      mockSet.mockReturnValue({ where: mockWhere });
+      mockUpdate.mockReturnValue({ set: mockSet });
+
+      await expect(
+        service.suspendUser('nonexistent', true, ADMIN_AUTH)
+      ).rejects.toThrow('User not found');
+    });
+
+    it('returns mapped user after suspend', async () => {
+      const updated = { ...MOCK_USER };
+      mockReturning.mockResolvedValue([updated]);
+      mockWhere.mockReturnValue({ returning: mockReturning });
+      mockSet.mockReturnValue({ where: mockWhere });
+      mockUpdate.mockReturnValue({ set: mockSet });
+
+      const result = await service.suspendUser('user-1', false, ADMIN_AUTH);
+      expect(result).toBeTruthy();
+    });
+  });
+
+  // ─── listUsers (Phase 2) ────────────────────────────────────────────────
+
+  describe('listUsers()', () => {
+    it('returns a UserConnection shape', async () => {
+      // adminUsers returns { users: [MOCK_USER], total: 1 }
+      // listUsers delegates to adminUsers — spy directly
+      // Simplified: just spy on adminUsers and mock it
+      const adminUsersSpy = vi.spyOn(service, 'adminUsers').mockResolvedValue({
+        users: [MOCK_USER as never],
+        total: 1,
+      });
+
+      const result = await service.listUsers({}, ADMIN_AUTH);
+      expect(result).toHaveProperty('edges');
+      expect(result).toHaveProperty('nodes');
+      expect(result).toHaveProperty('pageInfo');
+      expect(result).toHaveProperty('totalCount');
+      expect(result.totalCount).toBe(1);
+      adminUsersSpy.mockRestore();
+    });
+
+    it('sets hasNextPage true when more results exist', async () => {
+      const manyUsers = Array.from({ length: 21 }, (_, i) => ({ ...MOCK_USER, id: `u-${String(i)}` }));
+      const adminUsersSpy = vi.spyOn(service, 'adminUsers').mockResolvedValue({
+        users: manyUsers as never[],
+        total: 21,
+      });
+
+      const result = await service.listUsers({ limit: 20 }, ADMIN_AUTH);
+      expect(result.pageInfo.hasNextPage).toBe(true);
+      expect(result.nodes.length).toBe(20);
+      adminUsersSpy.mockRestore();
+    });
+
+    it('pageInfo.hasPreviousPage true when page > 0', async () => {
+      const adminUsersSpy = vi.spyOn(service, 'adminUsers').mockResolvedValue({
+        users: [MOCK_USER as never],
+        total: 10,
+      });
+
+      const result = await service.listUsers({ page: 1, limit: 5 }, ADMIN_AUTH);
+      expect(result.pageInfo.hasPreviousPage).toBe(true);
+      adminUsersSpy.mockRestore();
+    });
+  });
 });

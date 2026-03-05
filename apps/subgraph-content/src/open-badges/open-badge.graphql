@@ -1,5 +1,5 @@
 """OpenBadges 3.0 badge definition (issuer-managed, tenant-scoped)"""
-type OpenBadgeDefinition {
+type OpenBadgeDefinition @key(fields: "id") {
   id: ID!
   name: String!
   description: String!

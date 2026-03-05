@@ -20,7 +20,7 @@ export function useUnsavedChangesGuard(isDirty: boolean, componentName: string) 
   // Block browser tab close / page refresh while dirty
   useEffect(() => {
     if (!isDirty) return;
-    const handler = (e: BeforeUnloadEvent) => {
+    const handler = (e: globalThis.BeforeUnloadEvent) => {
       e.preventDefault();
     };
     window.addEventListener('beforeunload', handler);

@@ -8,6 +8,12 @@ const mockUserService = {
   findAll: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
+  adminUsers: vi.fn(),
+  listUsers: vi.fn(),
+  suspendUser: vi.fn(),
+  deactivateUser: vi.fn(),
+  resetUserPassword: vi.fn(),
+  bulkImportUsers: vi.fn(),
 };
 
 // Mock UserStatsService
@@ -259,6 +265,87 @@ describe('UserResolver', () => {
       await expect(
         resolver.updateUserPreferences({ theme: 'neon' }, ctx)
       ).rejects.toThrow();
+    });
+  });
+
+  // ─── listUsers (Phase 2) ─────────────────────────────────────────────────
+
+  describe('listUsers()', () => {
+    const MOCK_CONNECTION = {
+      edges: [],
+      nodes: [],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      },
+      totalCount: 0,
+    };
+
+    it('throws UnauthorizedException when not authenticated', async () => {
+      const ctx = { req: {} };
+      await expect(
+        resolver.listUsers(undefined, ctx)
+      ).rejects.toBeInstanceOf(Error);
+    });
+
+    it('delegates to userService.listUsers with empty opts when input undefined', async () => {
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      (mockUserService.listUsers as any).mockResolvedValue(MOCK_CONNECTION);
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      const ctx = { req: {}, authContext: MOCK_AUTH };
+      const result = await resolver.listUsers(undefined, ctx);
+      expect(mockUserService.listUsers).toHaveBeenCalledWith({}, MOCK_AUTH);
+      expect(result).toBe(MOCK_CONNECTION);
+    });
+
+    it('passes input through to userService.listUsers', async () => {
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      (mockUserService.listUsers as any).mockResolvedValue(MOCK_CONNECTION);
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      const ctx = { req: {}, authContext: MOCK_AUTH };
+      const input = { page: 1, limit: 10, search: 'alice' };
+      await resolver.listUsers(input, ctx);
+      expect(mockUserService.listUsers).toHaveBeenCalledWith(input, MOCK_AUTH);
+    });
+  });
+
+  // ─── suspendUser (Phase 2) ───────────────────────────────────────────────
+
+  describe('suspendUser()', () => {
+    it('throws UnauthorizedException when not authenticated', async () => {
+      const ctx = { req: {} };
+      await expect(
+        resolver.suspendUser('user-1', true, ctx)
+      ).rejects.toBeInstanceOf(Error);
+    });
+
+    it('calls userService.suspendUser with correct args when suspending', async () => {
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      (mockUserService.suspendUser as any).mockResolvedValue(MOCK_USER);
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      const ctx = { req: {}, authContext: MOCK_AUTH };
+      const result = await resolver.suspendUser('user-42', true, ctx);
+      expect(mockUserService.suspendUser).toHaveBeenCalledWith(
+        'user-42',
+        true,
+        MOCK_AUTH
+      );
+      expect(result).toBe(MOCK_USER);
+    });
+
+    it('calls userService.suspendUser with suspended=false when unsuspending', async () => {
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      (mockUserService.suspendUser as any).mockResolvedValue(MOCK_USER);
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+      const ctx = { req: {}, authContext: MOCK_AUTH };
+      await resolver.suspendUser('user-42', false, ctx);
+      expect(mockUserService.suspendUser).toHaveBeenCalledWith(
+        'user-42',
+        false,
+        MOCK_AUTH
+      );
     });
   });
 });
