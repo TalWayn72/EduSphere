@@ -145,3 +145,6 @@ export * from './saved-searches';
 
 // Notification templates (F-112 Email/Notification Templates)
 export * from './notification-templates';
+
+// Tenant themes (multi-tenant theme customization — FEAT-THEME)
+export * from './tenant-themes';

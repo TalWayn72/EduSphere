@@ -747,11 +747,11 @@ A round is NOT done until ALL of the following pass:
 7. All 5 test users can authenticate successfully:
    | User | Role | Password |
    |------|------|----------|
-   | superadmin@example.com | SUPER_ADMIN | SuperAdmin123! |
-   | instructor@example.com | INSTRUCTOR | Instructor123! |
-   | orgadmin@example.com | ORG_ADMIN | OrgAdmin123! |
-   | researcher@example.com | RESEARCHER | Researcher123! |
-   | student@example.com | STUDENT | Student123! |
+   | super.admin@edusphere.dev | SUPER_ADMIN | Test2024 |
+   | instructor@example.com | INSTRUCTOR | Test2024 |
+   | org.admin@example.com | ORG_ADMIN | Test2024 |
+   | researcher@example.com | RESEARCHER | Test2024 |
+   | student@example.com | STUDENT | Test2024 |
 
 **Required output per round (non-negotiable):**
 - Unit test asserting the CORRECT behavior is now present
@@ -767,11 +767,11 @@ After all unit + E2E tests pass, run the local deployment health check and verif
 ```
 | User | Role | Password |
 |------|------|----------|
-| superadmin@example.com | SUPER_ADMIN | SuperAdmin123! |
-| instructor@example.com | INSTRUCTOR | Instructor123! |
-| orgadmin@example.com | ORG_ADMIN | OrgAdmin123! |
-| researcher@example.com | RESEARCHER | Researcher123! |
-| student@example.com | STUDENT | Student123! |
+| super.admin@edusphere.dev | SUPER_ADMIN | Test2024 |
+| instructor@example.com | INSTRUCTOR | Test2024 |
+| org.admin@example.com | ORG_ADMIN | Test2024 |
+| researcher@example.com | RESEARCHER | Test2024 |
+| student@example.com | STUDENT | Test2024 |
 
 A round is **not complete** until health-check passes AND all 5 users can authenticate.
 

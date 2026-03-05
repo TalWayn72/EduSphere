@@ -10,6 +10,7 @@ import { router } from '@/lib/router';
 import { Toaster } from '@/components/ui/sonner';
 import { StorageWarningBanner } from '@/components/StorageWarningBanner';
 import { GlobalLocaleSync } from '@/components/GlobalLocaleSync';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { registerServiceWorker } from '@/pwa';
 
 // ── App ──────────────────────────────────────────────────────────────────────
@@ -54,14 +55,16 @@ function App() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <UrqlProvider value={urqlClient}>
-        <GlobalLocaleSync />
-        <StorageWarningBanner />
-        <Toaster />
-        <RouterProvider router={router} />
-      </UrqlProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <UrqlProvider value={urqlClient}>
+          <GlobalLocaleSync />
+          <StorageWarningBanner />
+          <Toaster />
+          <RouterProvider router={router} />
+        </UrqlProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

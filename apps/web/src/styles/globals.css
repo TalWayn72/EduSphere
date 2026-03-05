@@ -35,72 +35,153 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Mastery states */
+  --color-mastery-none: hsl(var(--mastery-none));
+  --color-mastery-attempted: hsl(var(--mastery-attempted));
+  --color-mastery-familiar: hsl(var(--mastery-familiar));
+  --color-mastery-proficient: hsl(var(--mastery-proficient));
+  --color-mastery-mastered: hsl(var(--mastery-mastered));
+
+  /* Semantic */
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --color-info: hsl(var(--info));
+  --color-streak-fire: hsl(var(--streak-fire));
+  --color-primary-hover: hsl(var(--primary-hover));
+  --color-primary-subtle: hsl(var(--primary-subtle));
+  --color-card-hover: hsl(var(--card-hover));
+
+  /* Shadows as custom properties */
+  --shadow-card: var(--shadow-card);
+  --shadow-elevated: var(--shadow-elevated);
+  --shadow-modal: var(--shadow-modal);
 }
 
 @layer base {
   :root {
+    /* Primary — Indigo (distinct from all competitors) */
+    --primary: 239 84% 67%;              /* #6366F1 indigo-500 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 238 84% 60%;        /* #4F46E5 indigo-600 */
+    --primary-subtle: 239 84% 95%;       /* indigo-50 */
+
+    /* Accent — Purple */
+    --accent: 262 83% 65%;               /* #8B5CF6 violet-500 */
+    --accent-foreground: 0 0% 100%;
+
+    /* Surfaces */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --foreground: 222 47% 11%;           /* slate-900 */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
+    --card-hover: 239 84% 98%;           /* indigo-50/60 on hover */
 
+    /* Neutrals */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 239 84% 67%;
+
+    /* Semantic */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
+    --secondary: 239 84% 97%;
+    --secondary-foreground: 238 84% 40%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    /* Mastery states (Khan Academy 5-state system) */
+    --mastery-none: 220 13% 91%;         /* gray — Not Started */
+    --mastery-attempted: 38 92% 60%;     /* amber — Attempted */
+    --mastery-familiar: 199 89% 55%;     /* sky — Familiar */
+    --mastery-proficient: 142 72% 45%;   /* green — Proficient */
+    --mastery-mastered: 239 84% 67%;     /* indigo — Mastered */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Streak / Gamification */
+    --streak-fire: 24 95% 55%;           /* orange */
+    --streak-cold: 215 16% 65%;          /* slate */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Success / Warning / Info */
+    --success: 142 72% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 45%;
+    --info-foreground: 0 0% 100%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Typography scale */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Radius */
+    --radius: 0.75rem;                   /* more modern, rounded */
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    /* Shadows */
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
+    --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
-    --radius: 0.5rem;
+    /* Animation */
+    --duration-fast: 150ms;
+    --duration-base: 250ms;
+    --duration-slow: 400ms;
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
 
     /* WCAG 2.2 SC 2.4.12 scroll-padding-top variable */
     --header-height: 60px;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --primary: 239 84% 72%;              /* slightly lighter indigo for dark */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 239 84% 80%;
+    --primary-subtle: 239 30% 15%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --accent: 262 83% 72%;
+    --accent-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --background: 222 47% 6%;            /* very dark slate, NOT pure black */
+    --foreground: 210 40% 96%;
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 96%;
+    --card-hover: 239 30% 13%;
 
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 20% 65%;
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 239 84% 72%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 96%;
+    --secondary: 239 30% 16%;
+    --secondary-foreground: 239 84% 80%;
+    --destructive: 0 63% 40%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    /* Mastery — slightly brighter for dark mode readability */
+    --mastery-none: 220 13% 30%;
+    --mastery-attempted: 38 92% 55%;
+    --mastery-familiar: 199 89% 50%;
+    --mastery-proficient: 142 72% 42%;
+    --mastery-mastered: 239 84% 72%;
+
+    --streak-fire: 24 95% 60%;
+    --streak-cold: 215 16% 45%;
+
+    --success: 142 72% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 45%;
+    --info-foreground: 0 0% 100%;
+
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+    --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+    --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.5);
   }
 }
 
@@ -110,6 +191,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   /* WCAG 2.2 SC 2.4.12 — Focus Not Obscured (Minimum)
@@ -120,14 +202,14 @@
   }
 
   /* WCAG 2.2 SC 2.4.11 — Focus Appearance
-     3 px solid #2563eb (blue-600) gives 4.5:1 contrast on white and
+     3 px solid #4F46E5 (indigo-600) gives 4.5:1 contrast on white and
      >= 3:1 on the light-grey background. outline-offset: 2px positions
      the ring outside the element boundary.
      !important is required to prevent Tailwind utility classes such as
      focus-visible:outline-none and bare outline-none from overriding the
      accessible outline on keyboard-focused elements.                       */
   *:focus-visible {
-    outline: 3px solid #2563eb !important;
+    outline: 3px solid #4F46E5 !important;
     outline-offset: 2px !important;
     border-radius: 2px;
   }
@@ -160,6 +242,37 @@
     min-height: unset;
     min-width: unset;
   }
+}
+
+@layer utilities {
+  /* Mastery badge utilities */
+  .mastery-none      { background-color: hsl(var(--mastery-none)); color: hsl(var(--foreground)); }
+  .mastery-attempted { background-color: hsl(var(--mastery-attempted)); color: white; }
+  .mastery-familiar  { background-color: hsl(var(--mastery-familiar)); color: white; }
+  .mastery-proficient{ background-color: hsl(var(--mastery-proficient)); color: white; }
+  .mastery-mastered  { background-color: hsl(var(--mastery-mastered)); color: white; }
+
+  /* Smooth transitions */
+  .transition-theme {
+    transition: background-color var(--duration-base) var(--ease-out),
+                color var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
+  }
+
+  /* Card hover effect */
+  .card-interactive {
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
+  }
+  .card-interactive:hover {
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-1px);
+  }
+
+  /* Streak badge */
+  .streak-active { color: hsl(var(--streak-fire)); }
+  .streak-cold   { color: hsl(var(--streak-cold)); }
 }
 
 /* ── RTL Support — applied when dir="rtl" is set on <html> ──────────────── */

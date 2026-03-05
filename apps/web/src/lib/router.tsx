@@ -293,6 +293,9 @@ const LessonResultsPage = lazy(() =>
   }))
 );
 const KnowledgeGraphPage = lazy(() => import('@/pages/KnowledgeGraphPage'));
+const LandingPage = lazy(() =>
+  import('@/pages/LandingPage').then((m) => ({ default: m.LandingPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -328,6 +331,15 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={<PageLoader />}>
         <LtiLaunchPage />
+      </Suspense>
+    ),
+  },
+  {
+    // Public marketing landing page — no auth required
+    path: '/landing',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <LandingPage />
       </Suspense>
     ),
   },
