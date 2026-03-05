@@ -2,9 +2,9 @@
  * ToolsPanel — right panel of UnifiedLearningPage.
  * Vertical ResizableGroup: top = Video + Transcript, bottom = Tabs (Annotations | AI | Collab).
  */
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, FileText, Bot, Users } from 'lucide-react';
+import { BookOpen, FileText, Bot, Network } from 'lucide-react';
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -14,13 +14,19 @@ import { VideoPlayerCore } from '@/components/VideoPlayerCore';
 import { TranscriptPanel } from '@/components/TranscriptPanel';
 import { VideoProgressMarkers } from '@/components/VideoProgressMarkers';
 import { AddAnnotationOverlay } from '@/components/AddAnnotationOverlay';
+import { ContextPanel } from '@/components/ContextPanel';
 import type { TranscriptSegment } from '@/lib/mock-content-data';
 import type { Annotation, AnnotationLayer } from '@/types/annotations';
 import type { UseAgentChatReturn } from '@/hooks/useAgentChat';
 import { AnnotationsTab } from '@/pages/UnifiedLearningPage.annotations-tab';
 import { AiTab } from '@/pages/UnifiedLearningPage.ai-tab';
+import {
+  VideoSketchOverlay,
+  type SketchPath,
+  type ExistingSketch,
+} from '@/components/VideoSketchOverlay';
 
-type Tab = 'annotations' | 'ai' | 'collab';
+type Tab = 'annotations' | 'ai' | 'context';
 
 interface Props {
   videoUrl: string;
@@ -43,6 +49,8 @@ interface Props {
   ) => void;
   bookmarks: { id: string; timestamp: number; label: string; color: string }[];
   chat: UseAgentChatReturn;
+  onSketchSave?: (paths: SketchPath[], timestamp: number) => Promise<void>;
+  existingSketches?: ExistingSketch[];
 }
 
 export function ToolsPanel({
@@ -62,9 +70,22 @@ export function ToolsPanel({
   onOverlayAnnotation,
   bookmarks,
   chat,
+  onSketchSave,
+  existingSketches = [],
 }: Props) {
   const { t } = useTranslation('content');
   const [activeTab, setActiveTab] = useState<Tab>('annotations');
+
+  // Find the transcript segment active at currentTime for the Context panel.
+  const activeSegment = useMemo((): TranscriptSegment | null => {
+    const sorted = [...transcript].sort((a, b) => a.startTime - b.startTime);
+    let found: TranscriptSegment | null = null;
+    for (const seg of sorted) {
+      if (seg.startTime <= currentTime) found = seg;
+      else break;
+    }
+    return found;
+  }, [transcript, currentTime]);
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     {
@@ -78,9 +99,9 @@ export function ToolsPanel({
       icon: <Bot className="h-3 w-3" />,
     },
     {
-      id: 'collab',
-      label: t('collaboration', 'שיתוף'),
-      icon: <Users className="h-3 w-3" />,
+      id: 'context',
+      label: t('context', 'Context'),
+      icon: <Network className="h-3 w-3" />,
     },
   ];
 
@@ -110,6 +131,13 @@ export function ToolsPanel({
               currentTime={currentTime}
               onSave={onOverlayAnnotation}
             />
+            {onSketchSave && (
+              <VideoSketchOverlay
+                currentTime={currentTime}
+                onSave={onSketchSave}
+                existingSketches={existingSketches}
+              />
+            )}
           </div>
 
           {/* Transcript */}
@@ -168,13 +196,8 @@ export function ToolsPanel({
               />
             )}
             {activeTab === 'ai' && <AiTab chat={chat} />}
-            {activeTab === 'collab' && (
-              <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2 p-4">
-                <Users className="h-8 w-8 opacity-20" />
-                <p className="text-xs text-center">
-                  {t('collaborationComingSoon', 'לימוד משותף — בקרוב')}
-                </p>
-              </div>
+            {activeTab === 'context' && (
+              <ContextPanel activeSegment={activeSegment} onSeek={onSeek} />
             )}
           </div>
         </div>

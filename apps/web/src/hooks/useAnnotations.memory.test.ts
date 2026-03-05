@@ -21,6 +21,7 @@ vi.mock('urql', () => ({
 vi.mock('@/lib/graphql/annotation.queries', () => ({
   ANNOTATIONS_QUERY: 'ANNOTATIONS_QUERY',
   REPLY_TO_ANNOTATION_MUTATION: 'REPLY_TO_ANNOTATION_MUTATION',
+  PROMOTE_ANNOTATION_MUTATION: 'PROMOTE_ANNOTATION_MUTATION',
 }));
 
 vi.mock('@/lib/graphql/annotation.mutations', () => ({
@@ -29,6 +30,10 @@ vi.mock('@/lib/graphql/annotation.mutations', () => ({
   UPDATE_ANNOTATION_MUTATION: 'UPDATE_ANNOTATION_MUTATION',
   DELETE_ANNOTATION_MUTATION: 'DELETE_ANNOTATION_MUTATION',
   ANNOTATIONS_BY_ASSET_QUERY: 'ANNOTATIONS_BY_ASSET_QUERY',
+}));
+
+vi.mock('@/lib/graphql/srs.queries', () => ({
+  CREATE_REVIEW_CARD_MUTATION: 'CREATE_REVIEW_CARD_MUTATION',
 }));
 
 vi.mock('@/pages/content-viewer.utils', () => ({

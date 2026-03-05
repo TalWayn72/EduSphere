@@ -39,6 +39,8 @@ vi.mock('@/types/annotations', () => ({
   },
 }));
 
+vi.mock('@/components/VideoSketchOverlay', () => ({}));
+
 import { useVideoAnnotations } from './useVideoAnnotations.js';
 import * as urql from 'urql';
 

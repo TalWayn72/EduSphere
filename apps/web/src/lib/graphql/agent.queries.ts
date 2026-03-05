@@ -91,6 +91,20 @@ export const MESSAGE_STREAM_SUBSCRIPTION = gql`
   }
 `;
 
+/**
+ * G5 — Agent Studio: save a visually-composed workflow definition.
+ * Schema: createAgentWorkflow(input: CreateAgentWorkflowInput!): AgentWorkflow!
+ */
+export const CREATE_AGENT_WORKFLOW_MUTATION = gql`
+  mutation CreateAgentWorkflow($input: CreateAgentWorkflowInput!) {
+    createAgentWorkflow(input: $input) {
+      id
+      name
+      createdAt
+    }
+  }
+`;
+
 // NOTE: generateCourseFromPrompt and executionStatus subscriptions have been
 // moved to agent-course-gen.queries.ts, which is excluded from codegen until
 // the supergraph is recomposed with the full subgraph-agent SDL.

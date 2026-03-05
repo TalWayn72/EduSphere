@@ -82,6 +82,13 @@ type Mutation {
   replyToAnnotation(annotationId: ID!, content: String!): Annotation!
     @authenticated
     @requiresScopes(scopes: [["write:annotations"]])
+  """
+  Promote an annotation from PERSONAL or SHARED layer to INSTRUCTOR layer,
+  making it visible to all students. Requires INSTRUCTOR, ORG_ADMIN or SUPER_ADMIN role.
+  """
+  promoteAnnotation(id: ID!): Annotation!
+    @authenticated
+    @requiresScopes(scopes: [["write:annotations"]])
 }
 
 type Subscription {

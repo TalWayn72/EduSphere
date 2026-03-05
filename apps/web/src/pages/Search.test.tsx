@@ -1037,6 +1037,191 @@ describe('SearchPage', () => {
     });
   });
 
+  // ── G6: Deep Linking — transcript results with startTime ─────────────────
+  describe('G6: Deep linking for transcript segments with startTime', () => {
+    it('generates ?t= timestamp URL for transcript result with startTime', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-dl-1',
+                text: 'Lecture on pilpul at the third minute',
+                similarity: 0.88,
+                entityType: 'transcript_segment',
+                entityId: 'content-deep-1',
+                startTime: 182.5,
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      const { container } = render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const input = screen.getByPlaceholderText(/search courses, transcripts/i);
+      await userEvent.type(input, 'pi');
+
+      await waitFor(
+        () => expect(screen.getByText('Transcripts')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+
+      // Card must navigate to /learn/content-deep-1?t=182 (floor of 182.5)
+      const cards = container.querySelectorAll('[class*="cursor-pointer"]');
+      expect(cards.length).toBeGreaterThan(0);
+      expect(() => fireEvent.click(cards[0]!)).not.toThrow();
+    });
+
+    it('shows formatted time as meta for transcript segment with startTime', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-dl-2',
+                text: 'Transcript excerpt with known timestamp',
+                similarity: 0.75,
+                entityType: 'transcript_segment',
+                entityId: 'content-ts-42',
+                startTime: 125,
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses, transcripts/i),
+        'tr'
+      );
+
+      // Meta should be formatted time (2:05) instead of similarity %
+      await waitFor(
+        () => expect(document.body.textContent).toContain('2:05'),
+        { timeout: 2000 }
+      );
+    });
+
+    it('shows similarity % as meta for concept result (no startTime)', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-concept-1',
+                text: 'Kal vachomer — a fortiori inference',
+                similarity: 0.9,
+                entityType: 'concept',
+                entityId: 'concept-kv',
+                startTime: null,
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses, transcripts/i),
+        'ka'
+      );
+
+      // Meta should be "90% match" (not a time)
+      await waitFor(
+        () => expect(document.body.textContent).toContain('90% match'),
+        { timeout: 2000 }
+      );
+    });
+
+    it('generates /learn/:entityId URL without ?t= when startTime is null', async () => {
+      const { useQuery: mockedUseQuery } = await import('urql');
+      vi.mocked(mockedUseQuery).mockReturnValue([
+        {
+          data: {
+            searchSemantic: [
+              {
+                id: 'sem-dl-3',
+                text: 'Transcript without timestamp',
+                similarity: 0.6,
+                entityType: 'transcript_segment',
+                entityId: 'content-no-ts',
+                startTime: null,
+              },
+            ],
+          },
+          fetching: false,
+          error: undefined,
+        },
+        vi.fn(),
+      ] as unknown as ReturnType<typeof useQuery>);
+
+      const { SearchPage: SearchPageReal } = await import('./Search');
+
+      const { container } = render(
+        <MemoryRouter initialEntries={['/search']}>
+          <Routes>
+            <Route path="*" element={<SearchPageReal />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await userEvent.type(
+        screen.getByPlaceholderText(/search courses, transcripts/i),
+        'tr'
+      );
+
+      await waitFor(
+        () => expect(screen.getByText('Transcripts')).toBeInTheDocument(),
+        { timeout: 2000 }
+      );
+
+      // Card click must not throw — navigates to /learn/content-no-ts
+      const cards = container.querySelectorAll('[class*="cursor-pointer"]');
+      expect(cards.length).toBeGreaterThan(0);
+      expect(() => fireEvent.click(cards[0]!)).not.toThrow();
+    });
+  });
+
   // ── BUG-050 Regression: Real course search (searchCourses) ────────────────
   // These tests guard against the regression where course search was never
   // executed and courses from the DB were never shown in search results.

@@ -22,6 +22,8 @@ export interface WordCommentPanelProps {
   onAddComment: () => void;
   onReply?: (id: string) => void;
   onResolve?: (id: string) => void;
+  onFlashcard?: (annotationId: string, content: string) => Promise<boolean>;
+  onPromote?: (annotationId: string) => Promise<boolean>;
   selectionActive: boolean;
 }
 
@@ -52,6 +54,8 @@ export function WordCommentPanel({
   onAddComment,
   onReply,
   onResolve,
+  onFlashcard,
+  onPromote,
   selectionActive,
 }: WordCommentPanelProps) {
   const [activeFilter, setActiveFilter] = useState<LayerFilter>('ALL');
@@ -149,6 +153,8 @@ export function WordCommentPanel({
                 onFocus={handleFocus}
                 onReply={onReply}
                 onResolve={onResolve}
+                onFlashcard={onFlashcard}
+                onPromote={onPromote}
               />
             </div>
           ))

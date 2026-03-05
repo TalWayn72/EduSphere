@@ -9,6 +9,7 @@ vi.mock('lucide-react', () => ({
   Check: () => <span data-testid="icon-check" />,
   ChevronDown: () => <span data-testid="icon-down" />,
   ChevronUp: () => <span data-testid="icon-up" />,
+  Zap: () => <span data-testid="icon-zap" />,
 }));
 
 vi.mock('@/components/ui/button', () => ({
@@ -291,5 +292,58 @@ describe('CommentCard', () => {
       />
     );
     expect(screen.queryByText(/Reply/)).not.toBeInTheDocument();
+  });
+
+  it('shows Flashcard button when onFlashcard is provided', () => {
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+        onFlashcard={vi.fn().mockResolvedValue(true)}
+      />
+    );
+    expect(screen.getByRole('button', { name: /flashcard/i })).toBeInTheDocument();
+  });
+
+  it('does not show Flashcard button when onFlashcard is not provided', () => {
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+      />
+    );
+    expect(screen.queryByText(/Flashcard/)).not.toBeInTheDocument();
+  });
+
+  it('calls onFlashcard and shows Saved! after click', async () => {
+    const onFlashcard = vi.fn().mockResolvedValue(true);
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+        onFlashcard={onFlashcard}
+      />
+    );
+    const btn = screen.getByRole('button', { name: /flashcard/i });
+    fireEvent.click(btn);
+    expect(onFlashcard).toHaveBeenCalledWith('ann-1', 'This is a test comment');
+    await screen.findByText('Saved!');
+    expect(screen.queryByText(/^Flashcard$/)).not.toBeInTheDocument();
+  });
+
+  it('does not show Flashcard button at depth=1', () => {
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+        onFlashcard={vi.fn().mockResolvedValue(true)}
+        depth={1}
+      />
+    );
+    expect(screen.queryByText(/Flashcard/)).not.toBeInTheDocument();
   });
 });

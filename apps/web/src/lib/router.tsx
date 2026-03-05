@@ -44,6 +44,9 @@ const KnowledgeGraph = lazy(() =>
 const AgentsPage = lazy(() =>
   import('@/pages/AgentsPage').then((m) => ({ default: m.AgentsPage }))
 );
+const AgentStudioPage = lazy(() =>
+  import('@/pages/AgentStudioPage').then((m) => ({ default: m.AgentStudioPage }))
+);
 const AnnotationsPage = lazy(() =>
   import('@/pages/AnnotationsPage').then((m) => ({
     default: m.AnnotationsPage,
@@ -495,6 +498,10 @@ export const router = createBrowserRouter([
   {
     path: '/agents',
     element: guarded(<AgentsPage />),
+  },
+  {
+    path: '/agents/studio',
+    element: guarded(<AgentStudioPage />),
   },
   {
     path: '/my-badges',

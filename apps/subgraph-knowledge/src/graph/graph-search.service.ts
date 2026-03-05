@@ -52,9 +52,10 @@ export class GraphSearchService {
             transcript_id: string;
             text: string;
             similarity: string;
+            start_time: string;
           };
           const rows = (await db.execute<Row>(sql`
-          SELECT ce.id, ce.segment_id, ts.transcript_id, ts.text,
+          SELECT ce.id, ce.segment_id, ts.transcript_id, ts.text, ts.start_time,
             1 - (ce.embedding <=> ${vectorString}::vector) AS similarity
           FROM content_embeddings ce
           JOIN transcript_segments ts ON ts.id = ce.segment_id
@@ -67,6 +68,7 @@ export class GraphSearchService {
             similarity: parseFloat(r.similarity),
             entityType: 'transcript_segment',
             entityId: r.transcript_id,
+            startTime: r.start_time != null ? parseFloat(r.start_time) : null,
           }));
           this.logger.debug(
             { hits: vectorResults.length },
@@ -87,6 +89,7 @@ export class GraphSearchService {
               id: transcript_segments.id,
               text: transcript_segments.text,
               transcript_id: transcript_segments.transcript_id,
+              start_time: transcript_segments.start_time,
             })
             .from(transcript_segments)
             .where(sql`${transcript_segments.text} ILIKE ${searchTerm}`)
@@ -100,6 +103,7 @@ export class GraphSearchService {
               similarity: computeTextSimilarity(seg.text, query),
               entityType: 'transcript_segment',
               entityId: seg.transcript_id,
+              startTime: seg.start_time != null ? parseFloat(seg.start_time) : null,
             }));
         }
 

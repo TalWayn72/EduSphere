@@ -3,7 +3,7 @@
  * Shows author, layer badge, comment text with expand/collapse, and threaded replies.
  */
 import { useState } from 'react';
-import { MessageSquare, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { MessageSquare, Check, ChevronDown, ChevronUp, Zap, ArrowUpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +18,8 @@ export interface CommentCardProps {
   onFocus: (id: string) => void;
   onReply?: (id: string) => void;
   onResolve?: (id: string) => void;
+  onFlashcard?: (annotationId: string, content: string) => Promise<boolean>;
+  onPromote?: (annotationId: string) => Promise<boolean>;
   depth?: number; // 0 = root, 1 = reply
 }
 
@@ -55,10 +57,16 @@ export function CommentCard({
   onFocus,
   onReply,
   onResolve,
+  onFlashcard,
+  onPromote,
   depth = 0,
 }: CommentCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [repliesOpen, setRepliesOpen] = useState(false);
+  const [flashcardSaved, setFlashcardSaved] = useState(false);
+  const [promoted, setPromoted] = useState(
+    annotation.layer === AnnotationLayer.INSTRUCTOR
+  );
 
   const layerConfig = ANNOTATION_LAYER_CONFIGS[annotation.layer];
   const replies = annotation.replies ?? [];
@@ -132,6 +140,42 @@ export function CommentCard({
           >
             <MessageSquare className="h-3 w-3 mr-0.5" /> Reply
           </Button>
+        )}
+        {onFlashcard && depth === 0 && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-1.5 text-[10px] text-amber-600 hover:text-amber-700"
+            aria-label="Save as flashcard"
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (flashcardSaved) return;
+              const ok = await onFlashcard(annotation.id, annotation.content);
+              if (ok) setFlashcardSaved(true);
+            }}
+          >
+            <Zap className="h-3 w-3 mr-0.5" />
+            {flashcardSaved ? 'Saved!' : 'Flashcard'}
+          </Button>
+        )}
+        {onPromote && depth === 0 && !promoted && annotation.layer !== AnnotationLayer.INSTRUCTOR && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-1.5 text-[10px] text-indigo-600 hover:text-indigo-700"
+            aria-label="Promote to instructor layer"
+            onClick={async (e) => {
+              e.stopPropagation();
+              const ok = await onPromote(annotation.id);
+              if (ok) setPromoted(true);
+            }}
+          >
+            <ArrowUpCircle className="h-3 w-3 mr-0.5" />
+            {promoted ? 'Promoted!' : 'Promote'}
+          </Button>
+        )}
+        {promoted && annotation.layer !== AnnotationLayer.INSTRUCTOR && (
+          <span className="text-[10px] text-indigo-500 px-1">Promoted!</span>
         )}
         {onResolve && (
           <Button

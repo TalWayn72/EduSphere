@@ -60,6 +60,8 @@ export function DocumentAnnotationPage() {
     focusedAnnotationId,
     setFocusedAnnotationId,
     addTextAnnotation,
+    createFlashcard,
+    promoteAnnotation,
     fetching: annotationsFetching,
   } = useDocumentAnnotations(contentId);
 
@@ -225,6 +227,8 @@ export function DocumentAnnotationPage() {
             onAddComment={() => {
               if (pendingSelection) handleAddCommentClick(pendingSelection);
             }}
+            onFlashcard={createFlashcard}
+            onPromote={promoteAnnotation}
             selectionActive={!!pendingSelection && !showForm}
           />
         </ResizablePanel>

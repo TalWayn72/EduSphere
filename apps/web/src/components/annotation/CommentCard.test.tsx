@@ -266,6 +266,73 @@ describe('CommentCard — resolve button', () => {
   });
 });
 
+describe('CommentCard — flashcard button', () => {
+  it('renders Flashcard button when onFlashcard is provided at depth=0', () => {
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+        onFlashcard={vi.fn().mockResolvedValue(true)}
+      />
+    );
+    expect(screen.getByText(/Flashcard/i)).toBeTruthy();
+  });
+
+  it('does not render Flashcard button when onFlashcard is absent', () => {
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+      />
+    );
+    expect(screen.queryByText(/Flashcard/i)).toBeNull();
+  });
+
+  it('does not render Flashcard button at depth=1', () => {
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+        onFlashcard={vi.fn().mockResolvedValue(true)}
+        depth={1}
+      />
+    );
+    expect(screen.queryByText(/Flashcard/i)).toBeNull();
+  });
+
+  it('calls onFlashcard with annotationId and content on click', () => {
+    const onFlashcard = vi.fn().mockResolvedValue(true);
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+        onFlashcard={onFlashcard}
+      />
+    );
+    fireEvent.click(screen.getByText(/Flashcard/i));
+    expect(onFlashcard).toHaveBeenCalledWith('ann-1', SHORT_TEXT);
+  });
+
+  it('shows Saved! text after successful flashcard creation', async () => {
+    const onFlashcard = vi.fn().mockResolvedValue(true);
+    render(
+      <CommentCard
+        annotation={baseAnnotation}
+        isFocused={false}
+        onFocus={vi.fn()}
+        onFlashcard={onFlashcard}
+      />
+    );
+    fireEvent.click(screen.getByText(/Flashcard/i));
+    expect(await screen.findByText('Saved!')).toBeTruthy();
+    expect(screen.queryByText(/^Flashcard$/)).toBeNull();
+  });
+});
+
 describe('CommentCard — layer badge', () => {
   it('renders INSTRUCTOR layer badge', () => {
     render(

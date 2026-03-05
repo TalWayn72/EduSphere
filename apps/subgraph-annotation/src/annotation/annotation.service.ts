@@ -339,6 +339,51 @@ export class AnnotationService implements OnModuleDestroy {
     return this.update(id, { isResolved: true }, authContext);
   }
 
+  async promote(id: string, authContext: AuthContext) {
+    if (!authContext || !authContext.tenantId) {
+      throw new Error('Authentication required');
+    }
+
+    const userRole = authContext.roles[0] || 'STUDENT';
+    const canPromote = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'].includes(userRole);
+    if (!canPromote) {
+      throw new Error('Unauthorized: only instructors can promote annotations');
+    }
+
+    const tenantCtx = this.toTenantContext(authContext);
+    return withTenantContext(this.db, tenantCtx, async (tx) => {
+      const [existing] = await tx
+        .select()
+        .from(schema.annotations)
+        .where(
+          and(
+            eq(schema.annotations.id, id),
+            sql`${schema.annotations.deleted_at} IS NULL`
+          )
+        )
+        .limit(1);
+
+      if (!existing) {
+        throw new Error('Annotation not found');
+      }
+
+      const [promoted] = await tx
+        .update(schema.annotations)
+        .set({ layer: 'INSTRUCTOR' })
+        .where(eq(schema.annotations.id, id))
+        .returning();
+
+      if (!promoted) {
+        throw new Error('Failed to promote annotation');
+      }
+
+      this.logger.log(
+        `Annotation promoted to INSTRUCTOR: ${id} by user ${authContext.userId}`
+      );
+      return promoted;
+    });
+  }
+
   async replyTo(parentId: string, content: string, authContext: AuthContext) {
     if (!authContext || !authContext.tenantId) {
       throw new Error('Authentication required');

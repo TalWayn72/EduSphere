@@ -59,3 +59,13 @@ export const REPLY_TO_ANNOTATION_MUTATION = gql`
     }
   }
 `;
+
+export const PROMOTE_ANNOTATION_MUTATION = gql`
+  mutation PromoteAnnotation($id: ID!) {
+    promoteAnnotation(id: $id) {
+      id
+      layer
+      updatedAt
+    }
+  }
+`;

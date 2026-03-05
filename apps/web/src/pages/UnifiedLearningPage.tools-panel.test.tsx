@@ -68,6 +68,14 @@ vi.mock('@/pages/UnifiedLearningPage.ai-tab', () => ({
   AiTab: () => <div data-testid="ai-tab">ai-tab</div>,
 }));
 
+vi.mock('@/components/ContextPanel', () => ({
+  ContextPanel: () => <div data-testid="context-panel">context-panel</div>,
+}));
+
+vi.mock('@/components/VideoSketchOverlay', () => ({
+  VideoSketchOverlay: () => <div data-testid="video-sketch-overlay" />,
+}));
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 function makeChat(
@@ -159,13 +167,13 @@ describe('ToolsPanel', () => {
     expect(screen.queryByTestId('annotations-tab')).toBeNull();
   });
 
-  it('shows collaboration coming-soon message when collab tab is clicked', () => {
+  it('shows context panel when context tab is clicked', () => {
     render(<ToolsPanel {...baseProps} />);
     const tabList = screen.getByRole('tablist');
     const tabs = tabList.querySelectorAll('[role="tab"]');
-    // Third tab is collab
+    // Third tab is now context (was collab)
     fireEvent.click(tabs[2]!);
-    expect(screen.getByText('לימוד משותף — בקרוב')).toBeDefined();
+    expect(screen.getByTestId('context-panel')).toBeDefined();
     expect(screen.queryByTestId('annotations-tab')).toBeNull();
     expect(screen.queryByTestId('ai-tab')).toBeNull();
   });

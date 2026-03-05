@@ -17,6 +17,7 @@ vi.mock('@edusphere/db', () => ({
     id: 'id',
     text: 'text',
     transcript_id: 'transcript_id',
+    start_time: 'start_time',
   },
   sql: vi.fn((_strings: TemplateStringsArray, ..._values: unknown[]) => ({})),
 }));
@@ -67,6 +68,7 @@ describe('GraphSearchService', () => {
           transcript_id: 't1',
           text: 'hello world',
           similarity: '0.92',
+          start_time: '42.5',
         },
         {
           id: 'e2',
@@ -74,6 +76,7 @@ describe('GraphSearchService', () => {
           transcript_id: 't1',
           text: 'hello there',
           similarity: '0.88',
+          start_time: '60.0',
         },
         {
           id: 'e3',
@@ -81,6 +84,7 @@ describe('GraphSearchService', () => {
           transcript_id: 't1',
           text: 'hello you',
           similarity: '0.81',
+          start_time: '90.0',
         },
         {
           id: 'e4',
@@ -88,6 +92,7 @@ describe('GraphSearchService', () => {
           transcript_id: 't1',
           text: 'hello again',
           similarity: '0.75',
+          start_time: '120.0',
         },
         {
           id: 'e5',
@@ -95,6 +100,7 @@ describe('GraphSearchService', () => {
           transcript_id: 't1',
           text: 'hello world 2',
           similarity: '0.70',
+          start_time: '150.0',
         },
       ]);
       mockFindAllConcepts.mockResolvedValue([]);
@@ -121,6 +127,7 @@ describe('GraphSearchService', () => {
                 id: 'seg-1',
                 text: 'matching content',
                 transcript_id: 't1',
+                start_time: '30.0',
               },
             ]),
           }),
@@ -169,6 +176,71 @@ describe('GraphSearchService', () => {
 
       const conceptResult = results.find((r) => r.entityType === 'concept');
       expect(conceptResult).toBeDefined();
+    });
+
+    it('includes startTime in vector transcript_segment results', async () => {
+      mockCallEmbeddingProvider.mockResolvedValue([0.1, 0.2]);
+      mockDbExecute.mockResolvedValue([
+        {
+          id: 'e1',
+          segment_id: 's1',
+          transcript_id: 't1',
+          text: 'deep link content',
+          similarity: '0.92',
+          start_time: '42.5',
+        },
+      ]);
+      // Vector returns 1 result; limit=5 → remaining=4 → ILIKE fallback runs
+      mockDbSelect.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+      mockFindAllConcepts.mockResolvedValue([]);
+
+      const results = await service.semanticSearch(
+        'deep link',
+        5,
+        'tenant-1',
+        'user-1',
+        'STUDENT'
+      );
+
+      expect(results[0]?.startTime).toBe(42.5);
+    });
+
+    it('sets startTime to null for concept results', async () => {
+      mockCallEmbeddingProvider.mockRejectedValue(new Error('no provider'));
+      mockDbSelect.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+      mockFindAllConcepts.mockResolvedValue([
+        {
+          id: 'c1',
+          name: 'deep link',
+          definition: 'Navigation to a specific resource',
+          tenant_id: 'tenant-1',
+          created_at: '2024-01-01',
+          updated_at: '2024-01-01',
+        },
+      ]);
+
+      const results = await service.semanticSearch(
+        'deep link',
+        5,
+        'tenant-1',
+        'user-1',
+        'STUDENT'
+      );
+
+      const concept = results.find((r) => r.entityType === 'concept');
+      expect(concept?.startTime).toBeNull();
     });
 
     it('returns empty array when all sources fail', async () => {

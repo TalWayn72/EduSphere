@@ -1,9 +1,134 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 05 מרץ 2026 (Session 22 — FEAT-055: LessonResultsPage all 10 pipeline outputs + E2E 28/28 ✅, __typename graphcache fix ✅, CORS preflight mock ✅, E2E port 5175→5176 ✅; Gateway v2.5, Admin Phase 7 (Notification Templates), CODE_QUALITY T2/T4/T6/T8/T9/T11, E2E BUG-039/048/053 regression specs, OpenBadges CORE→CONTENT migration, pnpm audit 8 high vulns → 0 high)
+**תאריך עדכון:** 05 מרץ 2026 (Session 24 cont. — PRD Gap Closure G2+G5: VideoSketchOverlay canvas annotations, AgentStudioPage no-code workflow builder; web 3127/3127 ✅ (235 files), knowledge 509/509 ✅)
 **מצב פרויקט:** ✅ Phases 9-17 + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Knowledge Graph Bugs Fixed ✅** | **Dashboard schema Fixed ✅** | **E2E Infrastructure Overhauled ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **Test Suite 100% Green ✅** | **Offline Storage Quota ✅** | **Admin Panel E2E ✅** | **HIVE-001 CI gate ✅** | **SCIM UX + Contract Tests ✅** | **Visual QA 53/53 Zero-Error ✅** | **BUG-037 SourceManager Unauthorized ✅** | **Pipeline Builder BUG-045 ✅** | **Custom Pipeline Builder FEAT-046 ✅** | **Language Persistence BUG-047 ✅** | **GAP-CLOSURE A1-A5+B1-B3+C ✅** | **BUG-048 Fork Course Drizzle schema fix ✅** | **FEAT-049 Course/Lesson UX Improvements ✅** | **BUG-049 WebSocket subscription auth fix ✅** | **BUG-051 Unsaved changes navigation guard ✅** | **BUG-052 React concurrent-mode SRSWidget ✅** | **BUG-053 Real course search ✅** | **Memory Safety all 20+ services ✅** | **Word-Style Annotations backend ✅** | **Tenant Language Management ✅** | **CI AGE postgres-age:pg18 ✅**
-**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,065** (231 files) | Backend subgraphs: **2,287** (core 640 + content 1041 + annotation 144 + collab 161 + agent 599 + knowledge 507) | Memory safety specs: **+16 new** (6 core/content + 4 knowledge + agent existing) | E2E: +~30 admin specs + 8 BUG-044 + pipeline E2E + 6 CUSTOM mode E2E + 7 BUG-054 E2E + **28 FEAT-055 lesson-results E2E** | Gateway: **138** (+21 BUG-049 subscription-auth) | i18n: ~247 | Tier 3 new: ~180+ | K-means K-nearest: **22 new** | סה"כ: **>5,500 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+**בדיקות:** Security: **813 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,127** (235 files) | Backend subgraphs: **2,296** (core 640 + content 1041 + annotation 144 + collab 161 + agent 599 + knowledge 509) | Memory safety specs: **+16 new** | E2E: +~30 admin specs + 8 BUG-044 + pipeline E2E + 6 CUSTOM mode E2E + 7 BUG-054 E2E + **28 FEAT-055 lesson-results E2E** | Gateway: **138** | i18n: ~247 | Tier 3 new: ~180+ | K-means K-nearest: **22 new** | סה"כ: **>5,562 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+
+---
+
+## ✅ FEAT-057 — PRD Gap Closure G2+G5 (Session 24 cont. — 05 Mar 2026)
+
+**Status:** ✅ Done | **Severity:** 🟡 Medium (PRD feature gaps) | **Date:** 05 Mar 2026
+
+### Features Implemented
+
+#### G2 — Canvas/Spatial Annotations (Video Sketch Overlay)
+- NEW `VideoSketchOverlay.tsx` — HTML5 Canvas freehand sketch overlay rendered as `absolute inset-0` over video container
+- `useCanvasDrawing` internal hook: mouse/touch events → normalized (0-1) path coordinates, memory-safe event listener cleanup
+- Sketch toggle button → activates canvas with Save/Clear/Cancel toolbar; Save persists `SketchPath[]` + video timestamp
+- SVG overlay displays existing sketches within ±3s of `currentTime` (visibility window)
+- `useVideoAnnotations.ts` gains `addSketchAnnotation(paths, timestamp)` → `CREATE_ANNOTATION_MUTATION` with `annotationType: 'SKETCH'` and `spatialData: { paths, timestampStart }`
+- `UnifiedLearningPage.tools-panel.tsx` accepts optional `onSketchSave` + `existingSketches` props and renders `VideoSketchOverlay` inside video container
+
+#### G5 — Agent Studio (No-Code Drag & Drop Workflow Builder)
+- NEW `AgentStudioPage.tsx` at route `/agents/studio` — visual LangGraph-style agent composer
+- Left palette: 6 draggable node types (Start, Assess, Explain, Quiz, Debate, End) with color-coded icons
+- Center canvas: HTML5 DnD drop zone, renders positioned nodes + SVG bezier edge connections with arrow markers
+- Click-to-connect: first click selects source node + shows orange pulse + "Click target node" indicator; second click creates edge
+- Right properties panel: editable label input, connection count, delete button
+- Top bar: workflow name input, Save + Deploy buttons (disabled when canvas empty)
+- `CREATE_AGENT_WORKFLOW_MUTATION` added to `agent.queries.ts`
+- Route registered in `router.tsx` at `/agents/studio`
+
+### Tests Added
+| File | Tests |
+|------|-------|
+| `VideoSketchOverlay.test.tsx` | 13 new (G2: toggle, draw flow, save with/without paths, saving indicator, SVG display, ±3s window, active-mode hides SVG, toolbar) |
+| `AgentStudioPage.test.tsx` | 19 new (G5: render, palette 6 types, canvas, properties, name edit, save/deploy disabled when empty, drop adds node, select+properties, delete, connect, edge SVG, stats) |
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `apps/web/src/components/VideoSketchOverlay.tsx` | NEW — canvas sketch overlay + SVG display |
+| `apps/web/src/components/VideoSketchOverlay.test.tsx` | NEW — 13 tests |
+| `apps/web/src/hooks/useVideoAnnotations.ts` | +addSketchAnnotation, +SketchPath import |
+| `apps/web/src/hooks/useVideoAnnotations.test.ts` | +VideoSketchOverlay mock |
+| `apps/web/src/hooks/useVideoAnnotations.memory.test.ts` | +VideoSketchOverlay mock |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.tsx` | +onSketchSave + existingSketches props + VideoSketchOverlay |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.test.tsx` | +VideoSketchOverlay mock |
+| `apps/web/src/pages/AgentStudioPage.tsx` | NEW — G5 no-code agent builder |
+| `apps/web/src/pages/AgentStudioPage.test.tsx` | NEW — 19 tests |
+| `apps/web/src/lib/graphql/agent.queries.ts` | +CREATE_AGENT_WORKFLOW_MUTATION |
+| `apps/web/src/lib/router.tsx` | +/agents/studio route + AgentStudioPage lazy import |
+
+### Anti-Recurrence
+- Canvas event listeners removed in `useEffect` cleanup (memory-safe per CLAUDE.md rules)
+- `data-testid="sketch-svg-overlay"` on overlay SVG to avoid false-positive queries on Lucide icon SVGs
+- `onSketchSave` optional prop — if not provided, `VideoSketchOverlay` not rendered (no dead UI)
+
+---
+
+## ✅ FEAT-056 — PRD Gap Closure G1+G3+G6+G8 (Session 24 — 05 Mar 2026)
+
+**Status:** ✅ Done | **Severity:** 🟡 Medium (PRD feature gaps) | **Date:** 05 Mar 2026
+
+### Features Implemented
+
+#### G8 — Auto-Flashcards (Annotation → SRS)
+- `CommentCard` gains **Flashcard** button (Zap icon, amber) — calls `onFlashcard(annotationId, content)`
+- `useAnnotations` adds `createFlashcard()` callback using existing `createReviewCard` SRS mutation (content truncated to 200 chars)
+- `useDocumentAnnotations` exposes `createFlashcard`; wired through `DocumentAnnotationPage` + `RichDocumentPage`
+- State: `flashcardSaved` tracks one-time save, shows "Saved!" feedback
+
+#### G6 — Deep Linking (Search → Video Timestamp)
+- `SemanticResult` backend type gains `startTime: Float` in GraphQL SDL + `graph-search-helpers.ts`
+- pgvector SQL selects `ts.start_time`; ILIKE fallback selects `start_time` from `transcript_segments`
+- `Search.tsx`: transcript results generate `/learn/:entityId?t=<seconds>` href + show formatted time (e.g., `2:05`) as meta instead of similarity %
+- Concept results: `startTime: null`, meta stays `XX% match`
+
+#### G1 — Context Panel (HybridRAG sidebar)
+- NEW `ContextPanel.tsx` — debounced (600ms) HybridRAG sidebar using `searchSemantic`
+- Active transcript segment text → semantic query → shows Related Concepts (amber) + Related Segments (green) with jump-to-timestamp buttons
+- Replaced "Collaboration coming soon" 3rd tab in `UnifiedLearningPage.tools-panel.tsx` with Context tab
+- `activeSegment` computed via `useMemo` from transcript + currentTime
+
+#### G3 — Annotation Promote (INSTRUCTOR layer)
+- Backend: `promoteAnnotation(id: ID!): Annotation!` mutation in SDL + `AnnotationService.promote()` + resolver (requires INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN role)
+- Frontend: `PROMOTE_ANNOTATION_MUTATION` in `annotation.queries.ts`
+- `useAnnotations` adds `promoteAnnotation()` callback; `useDocumentAnnotations` exposes it
+- `CommentCard` gains **Promote** button (ArrowUpCircle, indigo) — hidden for INSTRUCTOR-layer annotations and depth>0
+- Wired through `WordCommentPanel` → `DocumentAnnotationPage` + `RichDocumentPage`
+
+### Tests Added
+| File | Tests |
+|------|-------|
+| `ContextPanel.test.tsx` | 15 new (G1: debounce, concepts, segments, jump-to, empty states) |
+| `Search.test.tsx` | +4 (G6: deep-link URL, formatted time meta, concept % meta, null startTime) |
+| `useAnnotations.test.ts` | +3 (G8: createFlashcard) + PROMOTE_ANNOTATION_MUTATION mock fix |
+| `graph-search.service.spec.ts` | +2 (G6: startTime in vector results, null for concepts) |
+
+### Anti-Recurrence
+- ContextPanel timer uses `return () => clearTimeout(t)` in useEffect cleanup (memory safe)
+- All new mutations mocked in both `useAnnotations.test.ts` AND `useAnnotations.memory.test.ts`
+- Vector search tests with fewer results than limit must set up `mockDbSelect` for ILIKE fallback
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `apps/web/src/components/annotation/CommentCard.tsx` | +Flashcard + Promote buttons |
+| `apps/web/src/components/annotation/WordCommentPanel.tsx` | +onFlashcard, onPromote props |
+| `apps/web/src/hooks/useAnnotations.ts` | +createFlashcard, promoteAnnotation |
+| `apps/web/src/hooks/useDocumentAnnotations.ts` | +promoteAnnotation exposed |
+| `apps/web/src/pages/DocumentAnnotationPage.tsx` | +promoteAnnotation wired |
+| `apps/web/src/pages/RichDocumentPage.tsx` | +promoteAnnotation wired |
+| `apps/web/src/lib/graphql/annotation.queries.ts` | +PROMOTE_ANNOTATION_MUTATION |
+| `apps/subgraph-annotation/src/annotation/annotation.graphql` | +promoteAnnotation mutation |
+| `apps/subgraph-annotation/src/annotation/annotation.service.ts` | +promote() method |
+| `apps/subgraph-annotation/src/annotation/annotation.resolver.ts` | +promoteAnnotation resolver |
+| `apps/subgraph-knowledge/src/graph/graph.graphql` | +startTime: Float on SemanticResult |
+| `apps/subgraph-knowledge/src/graph/graph-search-helpers.ts` | +startTime field |
+| `apps/subgraph-knowledge/src/graph/graph-search.service.ts` | +start_time in SQL queries |
+| `apps/web/src/lib/graphql/knowledge.queries.ts` | +startTime in SEARCH_SEMANTIC_QUERY |
+| `apps/web/src/pages/Search.tsx` | Deep-link URLs + formatted time meta |
+| `apps/web/src/components/ContextPanel.tsx` | NEW — HybridRAG context panel |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.tsx` | Collab→Context tab |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.test.tsx` | Updated collab→context test + ContextPanel mock |
+| `apps/web/src/hooks/useAnnotations.test.ts` | +PROMOTE_ANNOTATION_MUTATION mock |
+| `apps/web/src/hooks/useAnnotations.memory.test.ts` | +PROMOTE_ANNOTATION_MUTATION mock |
+| `apps/web/src/components/ContextPanel.test.tsx` | NEW — 15 tests |
+| `apps/web/src/pages/Search.test.tsx` | +4 G6 deep-link tests |
+| `apps/subgraph-knowledge/src/graph/graph-search.service.spec.ts` | +mockDbSelect for ILIKE fallback |
 
 ---
 

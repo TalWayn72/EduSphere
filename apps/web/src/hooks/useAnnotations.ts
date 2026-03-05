@@ -23,11 +23,13 @@ import { Annotation, AnnotationLayer } from '@/types/annotations';
 import {
   ANNOTATIONS_QUERY,
   REPLY_TO_ANNOTATION_MUTATION,
+  PROMOTE_ANNOTATION_MUTATION,
 } from '@/lib/graphql/annotation.queries';
 import {
   CREATE_ANNOTATION_MUTATION,
   ANNOTATION_ADDED_SUBSCRIPTION,
 } from '@/lib/graphql/annotation.mutations';
+import { CREATE_REVIEW_CARD_MUTATION } from '@/lib/graphql/srs.queries';
 import {
   getThreadedAnnotations,
   filterAnnotationsByLayers,
@@ -134,6 +136,10 @@ export interface UseAnnotationsReturn {
     layer: AnnotationLayer,
     timestamp: number
   ) => void;
+  /** Create an SRS flashcard from an annotation's text content. */
+  createFlashcard: (annotationId: string, content: string) => Promise<boolean>;
+  /** Promote annotation to INSTRUCTOR layer (instructor role required). */
+  promoteAnnotation: (annotationId: string) => Promise<boolean>;
 }
 
 export function useAnnotations(
@@ -167,6 +173,8 @@ export function useAnnotations(
 
   const [, createAnnotation] = useMutation(CREATE_ANNOTATION_MUTATION);
   const [, replyToAnnotation] = useMutation(REPLY_TO_ANNOTATION_MUTATION);
+  const [, createReviewCard] = useMutation(CREATE_REVIEW_CARD_MUTATION);
+  const [, promoteAnnotationMutation] = useMutation(PROMOTE_ANNOTATION_MUTATION);
 
   // Tracks whether a save mutation is in-flight.
   const [isPending, setIsPending] = useState(false);
@@ -327,6 +335,39 @@ export function useAnnotations(
     [contentId, validAssetId, replyToAnnotation, executeQuery]
   );
 
+  const createFlashcard = useCallback(
+    async (annotationId: string, content: string): Promise<boolean> => {
+      const conceptName = content.slice(0, 200).trim();
+      if (!conceptName) return false;
+      const response = await createReviewCard({ conceptName });
+      if (response.error) {
+        console.error(
+          `[useAnnotations] Failed to create flashcard for annotation ${annotationId}:`,
+          response.error.message
+        );
+        return false;
+      }
+      return true;
+    },
+    [createReviewCard]
+  );
+
+  const promoteAnnotation = useCallback(
+    async (annotationId: string): Promise<boolean> => {
+      const response = await promoteAnnotationMutation({ id: annotationId });
+      if (response.error) {
+        console.error(
+          `[useAnnotations] Failed to promote annotation ${annotationId}:`,
+          response.error.message
+        );
+        return false;
+      }
+      executeQuery({ requestPolicy: 'network-only' });
+      return true;
+    },
+    [promoteAnnotationMutation, executeQuery]
+  );
+
   return {
     annotations: visibleAnnotations,
     fetching: result.fetching,
@@ -337,5 +378,7 @@ export function useAnnotations(
     refetch,
     addAnnotation,
     addReply,
+    createFlashcard,
+    promoteAnnotation,
   };
 }

@@ -284,10 +284,13 @@ export function SearchPage() {
       similarity: number;
       entityType: string;
       entityId: string;
+      startTime: number | null;
     }>
   ).map((r) => {
     const isConceptType = r.entityType === 'concept';
     const type: ResultType = isConceptType ? 'concept' : 'transcript';
+    const timestampParam =
+      !isConceptType && r.startTime != null ? `?t=${Math.floor(r.startTime)}` : '';
     return {
       id: r.id,
       type,
@@ -295,8 +298,11 @@ export function SearchPage() {
         ? (r.text.split('\n')[0]?.slice(0, 80) ?? r.entityType)
         : query,
       snippet: r.text,
-      meta: `${Math.round(r.similarity * 100)}% match`,
-      href: isConceptType ? '/graph' : `/learn/${r.entityId}`,
+      meta: !isConceptType && r.startTime != null
+        ? formatTime(r.startTime)
+        : `${Math.round(r.similarity * 100)}% match`,
+      timestamp: r.startTime ?? undefined,
+      href: isConceptType ? '/graph' : `/learn/${r.entityId}${timestampParam}`,
     };
   });
 

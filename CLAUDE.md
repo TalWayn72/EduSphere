@@ -861,6 +861,80 @@ Task: Implement Core + Content Subgraphs
 | Repeated OOM       | Continue reducing until 1 agent          |
 | Single agent + OOM | `NODE_OPTIONS=--max-old-space-size=8192` |
 
+## Enterprise Execution Protocol (Mandatory)
+
+> **This section defines HOW Claude operates on every task. These are development workflow rules, not EduSphere app features.**
+> Full reference: `C:\Users\P0039217\.claude\projects\c--Users-P0039217--claude-projects-EduSphere\memory\enterprise-execution.md`
+
+### A. Autonomous Mode (Iron Rules)
+
+- No confirmation requests, no execution pauses, no clarifying questions unless logically impossible
+- **Logically impossible** = conflicting requirements / unavailable credentials / legal-security violation / undefined external resource
+- When ambiguity is resolvable → make best engineering assumption and proceed
+- CORRECT: Detect what needs to be done → execute → report results
+
+### B. Enterprise Division Structure (11 Divisions)
+
+Each task is decomposed and routed to the relevant division(s). Each division must internally approve before passing control.
+
+| # | Division | Responsibility |
+|---|----------|----------------|
+| 1 | **Orchestrator** | Sole external communicator. Coordinates all divisions, tracks % completion, enforces quality gates, reports progress every 3 min |
+| 2 | **Product & Requirements** | PRD delta, functional/non-functional reqs, risk matrix, acceptance criteria |
+| 3 | **Software Architecture** | System impact, scalability, service boundaries, domain modeling, performance budgets |
+| 4 | **UX/UI Design** | User flows, WCAG accessibility, design system compliance, mobile/desktop parity |
+| 5 | **Frontend Engineering** | Component architecture, state management, rendering performance, responsive behavior |
+| 6 | **Backend Engineering** | Business logic, API consistency, validation rules, error resilience |
+| 7 | **Database & Data Eng.** | Schema changes, query optimization, migrations, rollback strategy |
+| 8 | **Security & Compliance** | Threat modeling, vulnerability scan, auth validation, GDPR/privacy (SI-1 through SI-10) |
+| 9 | **QA & Validation** | Unit + Integration + E2E + Load + Playwright visual regression. 100% pass required. No partial approval. |
+| 10 | **Documentation** | Update all affected docs (README, API, runbooks, release notes) after QA approval |
+| 11 | **DevOps & Release** | CI/CD validation, build, staging, prod readiness, rollback plan, post-deploy monitoring |
+
+### C. Mandatory Execution Order (No Exceptions)
+
+1. Product & Requirements
+2. Architecture Review
+3. UX/UI Review
+4. Development — FE + BE + DB **(parallelize these three)**
+5. Security Audit
+6. QA Full Validation
+7. Documentation Update
+8. DevOps Release Validation
+9. Production Update
+10. Post-Release Validation
+
+**If any stage fails:** fix → re-run all downstream stages from that point onward.
+
+### D. Agent Orchestration
+
+- All division work performed by specialized sub-agents via the `Agent` tool
+- Maximize parallel spawning — FE + BE + DB always run concurrently (step 4)
+- Progress reported every 3 minutes: `[Progress: XX%] Active: <Division>`
+
+### E. Completion Gate (All required before declaring done)
+
+- `pnpm turbo test` — 100% pass rate
+- `pnpm turbo typecheck` — 0 TypeScript errors
+- `pnpm turbo lint` — 0 lint errors
+- All Playwright E2E tests pass
+- `./scripts/health-check.sh` — all services healthy
+
+### F. Final Output Format (after 100% completion only)
+
+```
+✅ Change fully implemented.
+✅ Architecture validated.
+✅ UX/UI approved.
+✅ Security cleared.
+✅ QA fully passed.
+✅ Documentation fully updated.
+✅ Production deployed safely.
+✅ Post-release validation successful.
+```
+
+---
+
 ## Phase Execution Protocol
 
 **CRITICAL:** This project follows IMPLEMENTATION_ROADMAP.md strictly.

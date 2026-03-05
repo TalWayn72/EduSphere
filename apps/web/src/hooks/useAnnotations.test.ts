@@ -26,6 +26,9 @@ const mockCreateAnnotation = vi
 const mockReplyToAnnotation = vi
   .fn()
   .mockResolvedValue({ data: null, error: null });
+const mockCreateReviewCard = vi
+  .fn()
+  .mockResolvedValue({ data: { createReviewCard: { id: 'card-1', conceptName: 'test' } }, error: null });
 const mockExecuteQuery = vi.fn();
 
 vi.mock('urql', () => ({
@@ -38,6 +41,7 @@ vi.mock('urql', () => ({
 vi.mock('@/lib/graphql/annotation.queries', () => ({
   ANNOTATIONS_QUERY: 'ANNOTATIONS_QUERY',
   REPLY_TO_ANNOTATION_MUTATION: 'REPLY_TO_ANNOTATION_MUTATION',
+  PROMOTE_ANNOTATION_MUTATION: 'PROMOTE_ANNOTATION_MUTATION',
 }));
 
 vi.mock('@/lib/graphql/annotation.mutations', () => ({
@@ -46,6 +50,10 @@ vi.mock('@/lib/graphql/annotation.mutations', () => ({
   UPDATE_ANNOTATION_MUTATION: 'UPDATE_ANNOTATION_MUTATION',
   DELETE_ANNOTATION_MUTATION: 'DELETE_ANNOTATION_MUTATION',
   ANNOTATIONS_BY_ASSET_QUERY: 'ANNOTATIONS_BY_ASSET_QUERY',
+}));
+
+vi.mock('@/lib/graphql/srs.queries', () => ({
+  CREATE_REVIEW_CARD_MUTATION: 'CREATE_REVIEW_CARD_MUTATION',
 }));
 
 // ── content-viewer utils mock ─────────────────────────────────────────────────
@@ -119,6 +127,11 @@ function setupUrqlMocks(options: UrqlMockOptions = {}) {
         typeof urql.useMutation
       >;
     }
+    if (mutation === 'CREATE_REVIEW_CARD_MUTATION') {
+      return [{ fetching: false }, mockCreateReviewCard] as ReturnType<
+        typeof urql.useMutation
+      >;
+    }
     return [{ fetching: false }, mockReplyToAnnotation] as ReturnType<
       typeof urql.useMutation
     >;
@@ -140,6 +153,10 @@ describe('useAnnotations', () => {
     vi.clearAllMocks();
     mockCreateAnnotation.mockResolvedValue({ data: null, error: null });
     mockReplyToAnnotation.mockResolvedValue({ data: null, error: null });
+    mockCreateReviewCard.mockResolvedValue({
+      data: { createReviewCard: { id: 'card-1', conceptName: 'test' } },
+      error: null,
+    });
   });
 
   it('returns normalised server annotations when contentId is a valid UUID', () => {
@@ -383,6 +400,64 @@ describe('useAnnotations', () => {
 
     expect(mockExecuteQuery).toHaveBeenCalledWith({
       requestPolicy: 'network-only',
+    });
+  });
+
+  it('createFlashcard calls createReviewCard with annotation content', async () => {
+    setupUrqlMocks();
+    const { result } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+
+    let ok = false;
+    await act(async () => {
+      ok = await result.current.createFlashcard('ann-1', 'Some annotation text');
+    });
+
+    expect(ok).toBe(true);
+    expect(mockCreateReviewCard).toHaveBeenCalledWith({
+      conceptName: 'Some annotation text',
+    });
+  });
+
+  it('createFlashcard returns false and logs error when mutation fails', async () => {
+    setupUrqlMocks();
+    mockCreateReviewCard.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'SRS mutation failed' },
+    });
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { result } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+
+    let ok = true;
+    await act(async () => {
+      ok = await result.current.createFlashcard('ann-1', 'Some content');
+    });
+
+    expect(ok).toBe(false);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[useAnnotations]'),
+      expect.any(String)
+    );
+    consoleSpy.mockRestore();
+  });
+
+  it('createFlashcard truncates content to 200 chars', async () => {
+    setupUrqlMocks();
+    const longContent = 'x'.repeat(300);
+    const { result } = renderHook(() =>
+      useAnnotations(VALID_UUID, [AnnotationLayer.PERSONAL])
+    );
+
+    await act(async () => {
+      await result.current.createFlashcard('ann-1', longContent);
+    });
+
+    expect(mockCreateReviewCard).toHaveBeenCalledWith({
+      conceptName: 'x'.repeat(200),
     });
   });
 });

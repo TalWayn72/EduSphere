@@ -58,6 +58,8 @@ export function RichDocumentPage() {
     focusedAnnotationId,
     setFocusedAnnotationId,
     addTextAnnotation,
+    createFlashcard,
+    promoteAnnotation,
     fetching: annotationsFetching,
     error: annotationsError,
   } = useDocumentAnnotations(contentId);
@@ -189,6 +191,8 @@ export function RichDocumentPage() {
                 focusedAnnotationId={focusedAnnotationId}
                 onFocusAnnotation={setFocusedAnnotationId}
                 onAddComment={handleOpenCommentForm}
+                onFlashcard={createFlashcard}
+                onPromote={promoteAnnotation}
                 selectionActive={!!selectionPosition && !pendingForm}
               />
             </ResizablePanel>

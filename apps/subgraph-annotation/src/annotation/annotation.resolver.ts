@@ -194,6 +194,17 @@ export class AnnotationResolver {
     );
   }
 
+  @Mutation('promoteAnnotation')
+  async promoteAnnotation(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext) {
+      throw new Error('Unauthenticated');
+    }
+    return this.annotationService.promote(id, context.authContext);
+  }
+
   @Subscription('annotationAdded', {
     filter: (
       payload: { annotationAdded: { asset_id?: string } },

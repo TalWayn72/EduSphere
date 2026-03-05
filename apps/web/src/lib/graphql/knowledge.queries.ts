@@ -93,6 +93,7 @@ export const SEARCH_SEMANTIC_QUERY = gql`
       similarity
       entityType
       entityId
+      startTime
     }
   }
 `;

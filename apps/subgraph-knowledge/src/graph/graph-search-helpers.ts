@@ -10,6 +10,8 @@ export interface SemanticResult {
   similarity: number;
   entityType: string;
   entityId: string;
+  /** Timestamp in seconds for transcript_segment results; null for concepts. */
+  startTime: number | null;
 }
 
 /**
@@ -50,5 +52,6 @@ export function scoreConceptsByText(
       similarity: computeTextSimilarity(`${c.name} ${c.definition ?? ''}`, query),
       entityType: 'concept',
       entityId: c.id,
+      startTime: null,
     }));
 }

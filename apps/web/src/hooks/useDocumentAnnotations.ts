@@ -80,6 +80,8 @@ export interface UseDocumentAnnotationsReturn {
   focusedAnnotationId: string | null;
   setFocusedAnnotationId: (id: string | null) => void;
   addTextAnnotation: (input: DocumentAnnotationInput) => Promise<void>;
+  createFlashcard: (annotationId: string, content: string) => Promise<boolean>;
+  promoteAnnotation: (annotationId: string) => Promise<boolean>;
   fetching: boolean;
   error: string | null;
 }
@@ -88,10 +90,8 @@ export function useDocumentAnnotations(
   contentId: string
 ): UseDocumentAnnotationsReturn {
   // Delegate query + subscription to useAnnotations — one urql subscription only.
-  const { annotations, fetching, error, refetch } = useAnnotations(
-    contentId,
-    ALL_LAYERS
-  );
+  const { annotations, fetching, error, refetch, createFlashcard, promoteAnnotation } =
+    useAnnotations(contentId, ALL_LAYERS);
 
   const { focusedAnnotationId, setFocusedAnnotationId } = useUIStore();
 
@@ -151,6 +151,8 @@ export function useDocumentAnnotations(
     focusedAnnotationId,
     setFocusedAnnotationId,
     addTextAnnotation,
+    createFlashcard,
+    promoteAnnotation,
     fetching,
     error,
   };

@@ -19,6 +19,7 @@ import {
   ANNOTATION_ADDED_SUBSCRIPTION,
 } from '@/lib/graphql/annotation.mutations';
 import { AnnotationLayer } from '@/types/annotations';
+import type { SketchPath } from '@/components/VideoSketchOverlay';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -43,6 +44,10 @@ export interface UseVideoAnnotationsReturn {
     text: string,
     timestamp: number,
     layer?: AnnotationLayer
+  ) => Promise<void>;
+  addSketchAnnotation: (
+    paths: SketchPath[],
+    timestamp: number
   ) => Promise<void>;
   updateAnnotation: (id: string, text: string) => Promise<void>;
   deleteAnnotation: (id: string) => Promise<void>;
@@ -211,6 +216,29 @@ export function useVideoAnnotations(
     [videoId, execCreate, executeQuery]
   );
 
+  const addSketchAnnotation = useCallback(
+    async (paths: SketchPath[], timestamp: number) => {
+      const response = await execCreate({
+        input: {
+          assetId: videoId,
+          annotationType: 'SKETCH',
+          content: '',
+          layer: AnnotationLayer.PERSONAL,
+          spatialData: { paths, timestampStart: timestamp },
+        },
+      });
+      if (response.error) {
+        console.error(
+          '[useVideoAnnotations] Failed to save sketch annotation:',
+          response.error.message
+        );
+        return;
+      }
+      executeQuery({ requestPolicy: 'network-only' });
+    },
+    [videoId, execCreate, executeQuery]
+  );
+
   const updateAnnotation = useCallback(
     async (id: string, text: string) => {
       const response = await execUpdate({ id, input: { content: text } });
@@ -247,6 +275,7 @@ export function useVideoAnnotations(
     isLoading: queryResult.fetching,
     error: queryResult.error?.message ?? null,
     addAnnotation,
+    addSketchAnnotation,
     updateAnnotation,
     deleteAnnotation,
   };
