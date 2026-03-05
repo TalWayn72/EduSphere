@@ -1,5 +1,6 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import type { AuthUser } from '@/lib/auth';
@@ -10,14 +11,19 @@ vi.mock('@/lib/auth', () => ({
   logout: vi.fn(),
 }));
 
-// Mock UserMenu to avoid dropdown complexity in unit tests
+// Mock UserMenu
 vi.mock('@/components/UserMenu', () => ({
   UserMenu: ({ user }: { user: AuthUser }) => (
     <div data-testid="user-menu">{user.firstName}</div>
   ),
 }));
 
-// Mock useNotifications so NotificationBell doesn't need a urql Provider
+// Mock NotificationBell
+vi.mock('@/components/NotificationBell', () => ({
+  NotificationBell: () => <div data-testid="notification-bell" />,
+}));
+
+// Mock useNotifications
 vi.mock('@/hooks/useNotifications', () => ({
   useNotifications: () => ({
     notifications: [],
@@ -26,9 +32,29 @@ vi.mock('@/hooks/useNotifications', () => ({
   }),
 }));
 
-// Mock useSrsQueueCount so SRS nav badge doesn't need a urql Provider
+// Mock useSrsQueueCount
 vi.mock('@/hooks/useSrsQueueCount', () => ({
   useSrsQueueCount: () => 0,
+}));
+
+// Mock i18n
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: { changeLanguage: vi.fn() },
+  }),
+}));
+
+// Mock react-router-dom navigate
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('react-router-dom')>()),
+  useNavigate: vi.fn(() => mockNavigate),
+}));
+
+// Mock AppSidebar (nav items now belong to AppSidebar.test.tsx)
+vi.mock('@/components/AppSidebar', () => ({
+  AppSidebar: () => <nav data-testid="app-sidebar" aria-label="Main navigation" />,
 }));
 
 import { getCurrentUser } from '@/lib/auth';
@@ -44,8 +70,6 @@ const MOCK_USER: AuthUser = {
   scopes: ['read'],
 };
 
-const ADMIN_USER: AuthUser = { ...MOCK_USER, role: 'INSTRUCTOR' };
-
 const renderLayout = (children = <div>content</div>) =>
   render(
     <MemoryRouter>
@@ -55,28 +79,18 @@ const renderLayout = (children = <div>content</div>) =>
 
 describe('Layout', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.mocked(getCurrentUser).mockReturnValue(null);
   });
 
-  it('renders EduSphere logo link', () => {
+  it('renders the AppSidebar', () => {
     renderLayout();
-    expect(screen.getByText('EduSphere')).toBeInTheDocument();
+    expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
   });
 
-  it('renders all primary nav items', () => {
-    renderLayout();
-    expect(screen.getByText('Learn')).toBeInTheDocument();
-    expect(screen.getByText('Courses')).toBeInTheDocument();
-    expect(screen.getByText('Graph')).toBeInTheDocument();
-    expect(screen.getByText('Annotations')).toBeInTheDocument();
-    expect(screen.getByText('Agents')).toBeInTheDocument();
-    expect(screen.getByText('Chavruta')).toBeInTheDocument();
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-  });
-
-  it('renders Search button', () => {
-    renderLayout();
-    expect(screen.getByText('Search...')).toBeInTheDocument();
+  it('renders children in main content area', () => {
+    renderLayout(<div>My Test Content</div>);
+    expect(screen.getByText('My Test Content')).toBeInTheDocument();
   });
 
   it('renders Sign in button when no user is logged in', () => {
@@ -92,39 +106,10 @@ describe('Layout', () => {
     expect(screen.getByText('Test')).toBeInTheDocument();
   });
 
-  it('does NOT show "New Course" link for STUDENT role', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
+  it('does not show UserMenu when not logged in', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(null);
     renderLayout();
-    expect(screen.queryByText('New Course')).not.toBeInTheDocument();
-  });
-
-  it('shows "New Course" link for INSTRUCTOR role', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(ADMIN_USER);
-    renderLayout();
-    expect(screen.getByText('New Course')).toBeInTheDocument();
-  });
-
-  it('shows "New Course" link for ORG_ADMIN role', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'ORG_ADMIN',
-    });
-    renderLayout();
-    expect(screen.getByText('New Course')).toBeInTheDocument();
-  });
-
-  it('shows "New Course" link for SUPER_ADMIN role', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'SUPER_ADMIN',
-    });
-    renderLayout();
-    expect(screen.getByText('New Course')).toBeInTheDocument();
-  });
-
-  it('renders children in main content area', () => {
-    renderLayout(<div>My Test Content</div>);
-    expect(screen.getByText('My Test Content')).toBeInTheDocument();
+    expect(screen.queryByTestId('user-menu')).not.toBeInTheDocument();
   });
 
   it('renders keyboard shortcut hint ⌘K in Search button', () => {
@@ -132,163 +117,10 @@ describe('Layout', () => {
     expect(screen.getByText('⌘K')).toBeInTheDocument();
   });
 
-  // ── My Badges nav item ──────────────────────────────────────────────────
-
-  it('renders My Badges nav link for all users', () => {
-    renderLayout();
-    expect(screen.getByText('My Badges')).toBeInTheDocument();
-  });
-
-  // ── Leaderboard nav item ────────────────────────────────────────────────
-
-  it('shows "Leaderboard" nav link for logged-in users', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
-    renderLayout();
-    expect(screen.getByText('Leaderboard')).toBeInTheDocument();
-  });
-
-  it('does NOT show "Leaderboard" nav link when no user is logged in', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(null);
-    renderLayout();
-    expect(screen.queryByText('Leaderboard')).not.toBeInTheDocument();
-  });
-
-  it('shows "Leaderboard" in mobile menu for logged-in user', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    const links = screen.getAllByText('Leaderboard');
-    expect(links.length).toBeGreaterThanOrEqual(2);
-  });
-
-  // ── Admin-only compliance nav items ────────────────────────────────────
-
-  it('shows "Admin Panel" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'ORG_ADMIN',
-    });
-    renderLayout();
-    expect(screen.getByText('Admin Panel')).toBeInTheDocument();
-  });
-
-  it('shows "LTI 1.3" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'ORG_ADMIN',
-    });
-    renderLayout();
-    expect(screen.getByText('LTI 1.3')).toBeInTheDocument();
-  });
-
-  it('shows "Compliance" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'ORG_ADMIN',
-    });
-    renderLayout();
-    expect(screen.getByText('Compliance')).toBeInTheDocument();
-  });
-
-  it('shows "SCIM / HRIS" nav link for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'ORG_ADMIN',
-    });
-    renderLayout();
-    expect(screen.getByText('SCIM / HRIS')).toBeInTheDocument();
-  });
-
-  it('shows compliance nav items for SUPER_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'SUPER_ADMIN',
-    });
-    renderLayout();
-    expect(screen.getByText('Admin Panel')).toBeInTheDocument();
-    expect(screen.getByText('LTI 1.3')).toBeInTheDocument();
-    expect(screen.getByText('Compliance')).toBeInTheDocument();
-  });
-
-  it('does NOT show admin compliance nav items for STUDENT', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
-    renderLayout();
-    expect(screen.queryByText('Admin Panel')).not.toBeInTheDocument();
-    expect(screen.queryByText('LTI 1.3')).not.toBeInTheDocument();
-    expect(screen.queryByText('Compliance')).not.toBeInTheDocument();
-  });
-
-  it('does NOT show admin compliance nav items for INSTRUCTOR', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(ADMIN_USER);
-    renderLayout();
-    expect(screen.queryByText('Admin Panel')).not.toBeInTheDocument();
-    expect(screen.queryByText('LTI 1.3')).not.toBeInTheDocument();
-  });
-
-  // ── Mobile hamburger menu ───────────────────────────────────────────────
-
-  it('renders mobile menu button with "Open menu" label when closed', () => {
-    renderLayout();
-    expect(
-      screen.getByRole('button', { name: 'Open menu' })
-    ).toBeInTheDocument();
-  });
-
-  it('opens mobile nav panel when hamburger button is clicked', () => {
-    renderLayout();
-    const hamburger = screen.getByRole('button', { name: 'Open menu' });
-    fireEvent.click(hamburger);
-    // After click, aria-label toggles to "Close menu"
-    expect(
-      screen.getByRole('button', { name: 'Close menu' })
-    ).toBeInTheDocument();
-  });
-
-  it('shows nav links in mobile menu after opening', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    // Mobile nav shows duplicated nav links — at least 2 "Courses" links now
-    const coursesLinks = screen.getAllByText('Courses');
-    expect(coursesLinks.length).toBeGreaterThanOrEqual(2);
-  });
-
-  it('shows "New Course" in mobile menu for INSTRUCTOR', () => {
-    vi.mocked(getCurrentUser).mockReturnValue(ADMIN_USER);
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    const newCourseLinks = screen.getAllByText('New Course');
-    expect(newCourseLinks.length).toBeGreaterThanOrEqual(2);
-  });
-
-  it('shows admin panel links in mobile menu for ORG_ADMIN', () => {
-    vi.mocked(getCurrentUser).mockReturnValue({
-      ...MOCK_USER,
-      role: 'ORG_ADMIN',
-    });
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    // Admin Panel appears twice (desktop + mobile)
-    const adminPanelLinks = screen.getAllByText('Admin Panel');
-    expect(adminPanelLinks.length).toBeGreaterThanOrEqual(2);
-  });
-
-  it('shows Search button in mobile menu after opening', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    // Mobile menu has its own Search button
-    const searchButtons = screen.getAllByText('Search...');
-    expect(searchButtons.length).toBeGreaterThanOrEqual(1);
-  });
-
-  // ── Keyboard shortcut ───────────────────────────────────────────────────
-
-  it('registers Ctrl+K keyboard event listener on mount', () => {
+  it('registers keydown event listener on mount', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
     renderLayout();
-    expect(addEventListenerSpy).toHaveBeenCalledWith(
-      'keydown',
-      expect.any(Function)
-    );
+    expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
     vi.restoreAllMocks();
   });
 
@@ -296,10 +128,19 @@ describe('Layout', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
     const { unmount } = renderLayout();
     unmount();
-    expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'keydown',
-      expect.any(Function)
-    );
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
     vi.restoreAllMocks();
+  });
+
+  it('shows NotificationBell when user is logged in', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(MOCK_USER);
+    renderLayout();
+    expect(screen.getByTestId('notification-bell')).toBeInTheDocument();
+  });
+
+  it('hides NotificationBell when not logged in', () => {
+    vi.mocked(getCurrentUser).mockReturnValue(null);
+    renderLayout();
+    expect(screen.queryByTestId('notification-bell')).not.toBeInTheDocument();
   });
 });

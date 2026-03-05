@@ -91,6 +91,7 @@ export default [
         FocusEvent: 'readonly',
         InputEvent: 'readonly',
         SubmitEvent: 'readonly',
+        MediaQueryListEvent: 'readonly',
       },
     },
     plugins: {

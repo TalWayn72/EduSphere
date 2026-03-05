@@ -11,6 +11,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { StorageWarningBanner } from '@/components/StorageWarningBanner';
 import { GlobalLocaleSync } from '@/components/GlobalLocaleSync';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { SkipLinks } from '@/components/a11y/SkipLinks';
 import { registerServiceWorker } from '@/pwa';
 
 // ── App ──────────────────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ function App() {
 
   return (
     <ThemeProvider>
+      <SkipLinks />
       <QueryClientProvider client={queryClient}>
         <UrqlProvider value={urqlClient}>
           <GlobalLocaleSync />

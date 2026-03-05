@@ -252,6 +252,14 @@
   .mastery-proficient{ background-color: hsl(var(--mastery-proficient)); color: white; }
   .mastery-mastered  { background-color: hsl(var(--mastery-mastered)); color: white; }
 
+  /* WCAG 2.4.1 — prefers-reduced-motion utility class
+     Applied to <html> when motionPreference !== 'full' (see applyUserPreferences). */
+  .reduce-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
   /* Smooth transitions */
   .transition-theme {
     transition: background-color var(--duration-base) var(--ease-out),

@@ -114,7 +114,7 @@ export function SettingsPage() {
               ) : (
                 <>
                   <div className="space-y-1">
-                    <Progress value={usagePercent} className={barColor} />
+                    <Progress value={usagePercent} indicatorClassName={barColor} />
                     <div className="flex justify-between text-xs text-muted-foreground tabular-nums">
                       <span>
                         {formatBytes(stats?.eduSphereUsedBytes ?? 0)}{' '}

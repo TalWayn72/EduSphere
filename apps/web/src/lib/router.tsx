@@ -293,6 +293,11 @@ const LessonResultsPage = lazy(() =>
   }))
 );
 const KnowledgeGraphPage = lazy(() => import('@/pages/KnowledgeGraphPage'));
+const ThemeSettingsPage = lazy(() =>
+  import('@/pages/ThemeSettingsPage').then((m) => ({
+    default: m.ThemeSettingsPage,
+  }))
+);
 const LandingPage = lazy(() =>
   import('@/pages/LandingPage').then((m) => ({ default: m.LandingPage }))
 );
@@ -542,6 +547,10 @@ export const router = createBrowserRouter([
   {
     path: '/settings',
     element: guarded(<SettingsPage />),
+  },
+  {
+    path: '/settings/theme',
+    element: guarded(<ThemeSettingsPage />),
   },
   {
     path: '/annotations-demo',
