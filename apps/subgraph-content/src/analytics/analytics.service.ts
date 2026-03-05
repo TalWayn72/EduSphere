@@ -157,45 +157,82 @@ export class AnalyticsService implements OnModuleDestroy {
     });
   }
 
+  /**
+   * getDropOffFunnel — N+1 fix.
+   *
+   * BEFORE: 1 query for modules + 2 queries per module (started + completed) = 2M+1 queries.
+   * AFTER:  3 queries total regardless of module count:
+   *   1. Fetch all modules for the course (ordered).
+   *   2. GROUP BY moduleId to count started learners for all modules at once.
+   *   3. GROUP BY moduleId to count completed learners for all modules at once.
+   */
   private async getDropOffFunnel(
     courseId: string,
     ctx: TenantContext
   ): Promise<FunnelStep[]> {
     return withTenantContext(this.db, ctx, async (tx) => {
+      // Query 1 — fetch all modules ordered
       const modRows = await tx
         .select({ id: schema.modules.id, title: schema.modules.title })
         .from(schema.modules)
         .where(eq(schema.modules.course_id, courseId))
         .orderBy(schema.modules.order_index);
 
-      const steps: FunnelStep[] = [];
-      for (const mod of modRows) {
-        const [startedRow] = await tx
-          .select({ n: count() })
-          .from(schema.userProgress)
-          .innerJoin(
-            schema.contentItems,
-            eq(schema.userProgress.contentItemId, schema.contentItems.id)
-          )
-          .where(eq(schema.contentItems.moduleId, mod.id));
+      if (modRows.length === 0) return [];
 
-        const [completedRow] = await tx
-          .select({ n: count() })
-          .from(schema.userProgress)
-          .innerJoin(
-            schema.contentItems,
-            eq(schema.userProgress.contentItemId, schema.contentItems.id)
-          )
-          .where(
-            and(
-              eq(schema.contentItems.moduleId, mod.id),
-              eq(schema.userProgress.isCompleted, true)
-            )
-          );
+      // Query 2 — count started learners grouped by moduleId (single round-trip)
+      const startedRows = await tx
+        .select({
+          moduleId: schema.contentItems.moduleId,
+          n: count(),
+        })
+        .from(schema.userProgress)
+        .innerJoin(
+          schema.contentItems,
+          eq(schema.userProgress.contentItemId, schema.contentItems.id)
+        )
+        .innerJoin(
+          schema.modules,
+          eq(schema.contentItems.moduleId, schema.modules.id)
+        )
+        .where(eq(schema.modules.course_id, courseId))
+        .groupBy(schema.contentItems.moduleId);
 
-        const started = Number(startedRow?.n ?? 0);
-        const completed = Number(completedRow?.n ?? 0);
-        steps.push({
+      // Query 3 — count completed learners grouped by moduleId (single round-trip)
+      const completedRows = await tx
+        .select({
+          moduleId: schema.contentItems.moduleId,
+          n: count(),
+        })
+        .from(schema.userProgress)
+        .innerJoin(
+          schema.contentItems,
+          eq(schema.userProgress.contentItemId, schema.contentItems.id)
+        )
+        .innerJoin(
+          schema.modules,
+          eq(schema.contentItems.moduleId, schema.modules.id)
+        )
+        .where(
+          and(
+            eq(schema.modules.course_id, courseId),
+            eq(schema.userProgress.isCompleted, true)
+          )
+        )
+        .groupBy(schema.contentItems.moduleId);
+
+      // Build lookup maps — O(1) per module lookup
+      const startedMap = new Map(
+        startedRows.map((r) => [r.moduleId, Number(r.n)])
+      );
+      const completedMap = new Map(
+        completedRows.map((r) => [r.moduleId, Number(r.n)])
+      );
+
+      return modRows.map((mod) => {
+        const started = startedMap.get(mod.id) ?? 0;
+        const completed = completedMap.get(mod.id) ?? 0;
+        return {
           moduleId: mod.id,
           moduleName: mod.title,
           learnersStarted: started,
@@ -204,9 +241,8 @@ export class AnalyticsService implements OnModuleDestroy {
             started > 0
               ? Math.round(((started - completed) / started) * 1000) / 10
               : 0,
-        });
-      }
-      return steps;
+        };
+      });
     });
   }
 }

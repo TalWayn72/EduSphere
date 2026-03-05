@@ -95,11 +95,12 @@
 
   
 enum join__Graph {
-  AGENT @join__graph(name: "agent", url: "http://localhost:4005/graphql") 
-  ANNOTATION @join__graph(name: "annotation", url: "http://localhost:4003/graphql") 
-  COLLABORATION @join__graph(name: "collaboration", url: "http://localhost:4004/graphql") 
-  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql") 
-  KNOWLEDGE @join__graph(name: "knowledge", url: "http://localhost:4006/graphql") 
+  AGENT @join__graph(name: "agent", url: "http://localhost:4005/graphql")
+  ANNOTATION @join__graph(name: "annotation", url: "http://localhost:4003/graphql")
+  COLLABORATION @join__graph(name: "collaboration", url: "http://localhost:4004/graphql")
+  CONTENT @join__graph(name: "content", url: "http://localhost:4002/graphql")
+  CORE @join__graph(name: "core", url: "http://localhost:4001/graphql")
+  KNOWLEDGE @join__graph(name: "knowledge", url: "http://localhost:4006/graphql")
 }
 
 scalar JSON @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE) 
@@ -149,7 +150,7 @@ type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATI
   id: ID!
 }
 
-type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
+type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
   agentSession(id: ID!) : AgentSession @join__field(graph: AGENT) 
   myAgentSessions: [AgentSession!]! @join__field(graph: AGENT) 
   agentTemplates: [AgentTemplate!]! @join__field(graph: AGENT) 
@@ -212,6 +213,9 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   myRank: Int! @join__field(graph: CORE)  @authenticated
   myTotalPoints: Int! @join__field(graph: CORE)  @authenticated
   adminBadges: [Badge!]! @join__field(graph: CORE)  @authenticated
+  myOpenBadges: [OpenBadgeAssertion!]! @join__field(graph: CONTENT)  @authenticated
+  badgeDefinitions: [OpenBadgeDefinition!]! @join__field(graph: CONTENT)  @authenticated
+  verifyBadge(assertionId: ID!) : BadgeVerificationResult! @join__field(graph: CONTENT)
   myPortal: PortalPage @join__field(graph: CORE)  @authenticated
   publicPortal: PortalPage @join__field(graph: CORE) 
   scimTokens: [ScimToken!]! @join__field(graph: CORE)  @authenticated
@@ -248,6 +252,8 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   adminDashboardStats: AdminDashboardStats! @join__field(graph: CORE)  @authenticated
   savedSearches: [SavedSearch!]! @join__field(graph: CORE)  @authenticated
   listUsers(input: ListUsersInput) : UserConnection! @join__field(graph: CORE)  @authenticated
+  adminNotificationTemplates: [NotificationTemplate!]! @join__field(graph: CORE)  @authenticated
+  adminCourseEnrollments(courseId: ID!) : [AdminEnrollmentRecord!]! @join__field(graph: CONTENT)  @authenticated
   embedding(id: ID!) : Embedding @join__field(graph: KNOWLEDGE) 
   embeddingsByContentItem(contentItemId: ID!) : [Embedding!]! @join__field(graph: KNOWLEDGE) 
   semanticSearch(query: [Float!]!, limit: Int = 10, minSimilarity: Float = 0.7) : [SimilarityResult!]! @join__field(graph: KNOWLEDGE) 
@@ -299,7 +305,7 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   knowledgeSource(id: ID!) : KnowledgeSource @join__field(graph: KNOWLEDGE) 
 }
 
-type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
+type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
   startAgentSession(templateType: TemplateType!, context: JSON!) : AgentSession! @join__field(graph: AGENT)  @authenticated
   sendMessage(sessionId: ID!, content: String!) : AgentMessage! @join__field(graph: AGENT)  @authenticated
   endSession(sessionId: ID!) : Boolean! @join__field(graph: AGENT)  @authenticated
@@ -358,6 +364,14 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   createBadge(input: CreateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
   updateBadge(id: ID!, input: UpdateBadgeInput!) : Badge! @join__field(graph: CORE)  @authenticated
   deleteBadge(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
+  issueBadge(userId: ID!, badgeDefinitionId: ID!, evidenceUrl: String) : OpenBadgeAssertion! @join__field(graph: CONTENT)  @authenticated
+  revokeBadge(assertionId: ID!, reason: String!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  createBadgeDefinition(name: String!, description: String!, imageUrl: String, criteriaUrl: String, tags: [String!]) : OpenBadgeDefinition! @join__field(graph: CONTENT)  @authenticated
+  updateNotificationTemplate(id: ID!, input: UpdateNotificationTemplateInput!) : NotificationTemplate! @join__field(graph: CORE)  @authenticated
+  resetNotificationTemplate(id: ID!) : NotificationTemplate! @join__field(graph: CORE)  @authenticated
+  adminEnrollUser(courseId: ID!, userId: ID!) : AdminEnrollmentRecord! @join__field(graph: CONTENT)  @authenticated
+  adminUnenrollUser(courseId: ID!, userId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  adminBulkEnroll(courseId: ID!, userIds: [ID!]!) : Int! @join__field(graph: CONTENT)  @authenticated
   savePortalLayout(title: String!, blocksJson: String!) : PortalPage! @join__field(graph: CORE)  @authenticated
   publishPortal: Boolean! @join__field(graph: CORE)  @authenticated
   unpublishPortal: Boolean! @join__field(graph: CORE)  @authenticated
@@ -674,6 +688,26 @@ type AuditExportResult @join__type(graph: CORE)  {
   recordCount: Int!
 }
 
+type NotificationTemplate @join__type(graph: CORE)  {
+  id: ID!
+  key: String!
+  name: String!
+  subject: String!
+  bodyHtml: String!
+  variables: [String!]!
+  isActive: Boolean!
+  updatedAt: String!
+}
+
+type AdminEnrollmentRecord @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  userId: ID!
+  status: String!
+  enrolledAt: String!
+  completedAt: String
+}
+
 type Role @join__type(graph: CORE)  {
   id: ID!
   tenantId: ID!
@@ -750,7 +784,7 @@ type LeaderboardEntry @join__type(graph: CORE)  {
   badgeCount: Int!
 }
 
-type OpenBadgeDefinition @join__type(graph: CORE, key: "id")  {
+type OpenBadgeDefinition @join__type(graph: CONTENT)  @join__type(graph: CORE, key: "id", resolvable: false)  {
   id: ID!
   tenantId: ID!
   name: String!
@@ -763,20 +797,29 @@ type OpenBadgeDefinition @join__type(graph: CORE, key: "id")  {
   createdAt: String!
 }
 
-type OpenBadge @join__type(graph: CORE)  {
+type OpenBadgeAssertion @join__type(graph: CONTENT)  {
   id: ID!
   badgeDefinitionId: ID!
+  badgeName: String!
+  badgeDescription: String!
+  imageUrl: String
   recipientId: ID!
-  tenantId: ID!
   issuedAt: String!
   expiresAt: String
   evidenceUrl: String
-  proof: JSON!
   revoked: Boolean!
   revokedAt: String
   revokedReason: String
-  definition: OpenBadgeDefinition!
-  vcDocument: String!
+  verifyUrl: String!
+  shareUrl: String!
+  vcDocument: String
+  definition: OpenBadgeDefinition
+}
+
+type BadgeVerificationResult @join__type(graph: CONTENT)  {
+  valid: Boolean!
+  error: String
+  assertion: OpenBadgeAssertion
 }
 
 type Notification @join__type(graph: CORE)  {
@@ -1414,6 +1457,12 @@ input UpdateBadgeInput @join__type(graph: CORE)  {
   pointsReward: Int
   conditionType: String
   conditionValue: Int
+}
+
+input UpdateNotificationTemplateInput @join__type(graph: CORE)  {
+  subject: String
+  bodyHtml: String
+  isActive: Boolean
 }
 
 input GenerateScimTokenInput @join__type(graph: CORE)  {

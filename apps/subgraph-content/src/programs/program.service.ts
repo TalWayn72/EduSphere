@@ -2,237 +2,46 @@
  * ProgramService — F-026 Stackable Credentials / Nanodegrees
  *
  * Responsibilities:
- *  1. Subscribe to EDUSPHERE.course.completed NATS events
- *  2. Check whether all required courses for enrolled programs are done
- *  3. If yes → mark program as completed + trigger nanodegree certificate
- *  4. Expose CRUD + progress query methods for resolvers
+ *  1. Expose CRUD + progress query methods for resolvers
+ *  2. NATS event handling for completion is in ProgramEventsHandler
  */
 import {
   Injectable,
   Logger,
   NotFoundException,
   ConflictException,
-  OnModuleInit,
-  OnModuleDestroy,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
-  closeAllPools,
   schema,
   eq,
   and,
   withTenantContext,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
-import {
-  connect,
-  StringCodec,
-  type NatsConnection,
-  type Subscription,
-} from 'nats';
-import {
-  buildNatsOptions,
-  isCourseCompletedEvent,
-} from '@edusphere/nats-client';
-import type { CourseCompletedPayload } from '@edusphere/nats-client';
-import { CertificateService } from '../certificate/certificate.service.js';
 
-// ─── Result types ─────────────────────────────────────────────────────────────
+export type {
+  ProgramProgress,
+  ProgramResult,
+  EnrollmentResult,
+  CreateProgramInput,
+  UpdateProgramInput,
+} from './program.types.js';
 
-export interface ProgramProgress {
-  totalCourses: number;
-  completedCourses: number;
-  completedCourseIds: string[];
-  percentComplete: number;
-}
-
-export interface ProgramResult {
-  id: string;
-  title: string;
-  description: string;
-  badgeEmoji: string;
-  requiredCourseIds: string[];
-  totalHours: number;
-  published: boolean;
-  enrollmentCount: number;
-}
-
-export interface EnrollmentResult {
-  id: string;
-  programId: string;
-  userId: string;
-  enrolledAt: string;
-  completedAt: string | null;
-  certificateId: string | null;
-}
-
-export interface CreateProgramInput {
-  title: string;
-  description: string;
-  requiredCourseIds: string[];
-  badgeEmoji?: string;
-  totalHours?: number;
-}
-
-export interface UpdateProgramInput {
-  title?: string;
-  description?: string;
-  published?: boolean;
-}
-
-const COURSE_COMPLETED_SUBJECT = 'EDUSPHERE.course.completed';
+import type {
+  ProgramProgress,
+  ProgramResult,
+  EnrollmentResult,
+  CreateProgramInput,
+  UpdateProgramInput,
+} from './program.types.js';
 
 // ─── Service ──────────────────────────────────────────────────────────────────
 
 @Injectable()
-export class ProgramService implements OnModuleInit, OnModuleDestroy {
+export class ProgramService {
   private readonly logger = new Logger(ProgramService.name);
   private readonly db = createDatabaseConnection();
-  private readonly sc = StringCodec();
-  private nc: NatsConnection | null = null;
-  private sub: Subscription | null = null;
-
-  constructor(private readonly certificateService: CertificateService) {}
-
-  async onModuleInit(): Promise<void> {
-    await this.connectAndSubscribe();
-  }
-
-  async onModuleDestroy(): Promise<void> {
-    this.sub?.unsubscribe();
-    this.sub = null;
-    if (this.nc) {
-      await this.nc.drain().catch(() => undefined);
-      this.nc = null;
-    }
-    await closeAllPools();
-    this.logger.log('ProgramService destroyed — connections closed');
-  }
-
-  // ─── NATS subscription ────────────────────────────────────────────────────
-
-  private async connectAndSubscribe(): Promise<void> {
-    try {
-      this.nc = await connect(buildNatsOptions());
-      this.sub = this.nc.subscribe(COURSE_COMPLETED_SUBJECT);
-      this.logger.log(
-        `ProgramService: subscribed to ${COURSE_COMPLETED_SUBJECT}`
-      );
-      void this.processMessages();
-    } catch (err) {
-      this.logger.error(`ProgramService: NATS connect failed: ${String(err)}`);
-    }
-  }
-
-  private async processMessages(): Promise<void> {
-    if (!this.sub) return;
-    for await (const msg of this.sub) {
-      try {
-        const raw = JSON.parse(this.sc.decode(msg.data)) as unknown;
-        if (isCourseCompletedEvent(raw)) {
-          await this.handleCourseCompleted(raw);
-        }
-      } catch (err) {
-        this.logger.warn(
-          { err },
-          'ProgramService: failed to process course.completed message'
-        );
-      }
-    }
-  }
-
-  private async handleCourseCompleted(
-    payload: CourseCompletedPayload
-  ): Promise<void> {
-    const { userId, tenantId } = payload;
-    const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
-
-    const enrollments = await withTenantContext(this.db, ctx, async (tx) =>
-      tx
-        .select()
-        .from(schema.programEnrollments)
-        .where(
-          and(
-            eq(schema.programEnrollments.userId, userId),
-            eq(schema.programEnrollments.tenantId, tenantId)
-          )
-        )
-    );
-
-    const incomplete = enrollments.filter((e) => !e.completedAt);
-    await Promise.all(
-      incomplete.map((e) =>
-        this.checkProgramCompletion(userId, e.programId, tenantId)
-      )
-    );
-  }
-
-  // ─── Completion check ─────────────────────────────────────────────────────
-
-  private async checkProgramCompletion(
-    userId: string,
-    programId: string,
-    tenantId: string
-  ): Promise<void> {
-    const ctx: TenantContext = { tenantId, userId, userRole: 'STUDENT' };
-
-    const [program] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx
-        .select()
-        .from(schema.credentialPrograms)
-        .where(eq(schema.credentialPrograms.id, programId))
-        .limit(1)
-    );
-
-    if (!program) return;
-
-    const progress = await this.getProgramProgress(programId, userId, tenantId);
-    if (progress.percentComplete < 100) return;
-
-    const [enrollment] = await withTenantContext(this.db, ctx, async (tx) =>
-      tx
-        .update(schema.programEnrollments)
-        .set({ completedAt: new Date() })
-        .where(
-          and(
-            eq(schema.programEnrollments.userId, userId),
-            eq(schema.programEnrollments.programId, programId)
-          )
-        )
-        .returning()
-    );
-
-    if (!enrollment) return;
-
-    try {
-      const cert = await this.certificateService.generateCertificate({
-        userId,
-        tenantId,
-        courseId: programId,
-        learnerName: userId,
-        courseName: `${program.badgeEmoji} ${program.title} Nanodegree`,
-      });
-
-      await withTenantContext(this.db, ctx, async (tx) =>
-        tx
-          .update(schema.programEnrollments)
-          .set({ certificateId: cert.id })
-          .where(eq(schema.programEnrollments.id, enrollment.id))
-      );
-
-      this.logger.log(
-        { userId, programId, tenantId, certId: cert.id },
-        'ProgramService: nanodegree certificate issued'
-      );
-    } catch (err) {
-      this.logger.error(
-        { err, userId, programId },
-        'ProgramService: cert generation failed'
-      );
-    }
-  }
-
-  // ─── Public API ───────────────────────────────────────────────────────────
 
   async listPrograms(
     tenantId: string,
@@ -304,7 +113,7 @@ export class ProgramService implements OnModuleInit, OnModuleDestroy {
           title: input.title,
           description: input.description,
           requiredCourseIds: input.requiredCourseIds,
-          badgeEmoji: input.badgeEmoji ?? '🎓',
+          badgeEmoji: input.badgeEmoji ?? '\uD83C\uDF93',
           totalHours: input.totalHours ?? 0,
         })
         .returning()

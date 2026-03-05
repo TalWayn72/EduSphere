@@ -142,3 +142,6 @@ export * from './lesson';
 
 // Saved Searches (Track A2 — user-scoped search persistence)
 export * from './saved-searches';
+
+// Notification templates (F-112 Email/Notification Templates)
+export * from './notification-templates';

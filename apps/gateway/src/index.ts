@@ -2,8 +2,7 @@
 import { initTelemetry } from '@edusphere/telemetry';
 initTelemetry('gateway');
 
-import { createGateway } from '@graphql-hive/gateway';
-import { createYoga } from 'graphql-yoga';
+import { createGatewayRuntime } from '@graphql-hive/gateway';
 import { createServer } from 'http';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import pino from 'pino';
@@ -34,47 +33,44 @@ const JWKS = createRemoteJWKSet(new URL(JWKS_URL));
 // ── NATS pub/sub (distributed subscriptions across replicas) ─────────────────
 const pubSub = await createNatsPubSub(logger);
 
-const gateway = createGateway({
-  supergraph: {
-    type: 'config',
-    config: {
-      subgraphs: [
+// ── G-09: Rate limiting helper ────────────────────────────────────────────────
+
+function rateLimitedResponse(resetAt: number): Response {
+  const retryAfterSec = Math.ceil((resetAt - Date.now()) / 1000);
+  return new Response(
+    JSON.stringify({
+      errors: [
         {
-          name: 'core',
-          url: process.env.SUBGRAPH_CORE_URL || 'http://localhost:4001/graphql',
-        },
-        {
-          name: 'content',
-          url:
-            process.env.SUBGRAPH_CONTENT_URL || 'http://localhost:4002/graphql',
-        },
-        {
-          name: 'annotation',
-          url:
-            process.env.SUBGRAPH_ANNOTATION_URL ||
-            'http://localhost:4003/graphql',
-        },
-        {
-          name: 'collaboration',
-          url:
-            process.env.SUBGRAPH_COLLABORATION_URL ||
-            'http://localhost:4004/graphql',
-        },
-        {
-          name: 'agent',
-          url:
-            process.env.SUBGRAPH_AGENT_URL || 'http://localhost:4005/graphql',
-        },
-        {
-          name: 'knowledge',
-          url:
-            process.env.SUBGRAPH_KNOWLEDGE_URL ||
-            'http://localhost:4006/graphql',
+          message: 'Rate limit exceeded. Please retry later.',
+          extensions: { code: 'RATE_LIMIT_EXCEEDED', retryAfter: resetAt },
         },
       ],
-    },
-  },
+    }),
+    {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': String(retryAfterSec),
+      },
+    }
+  );
+}
+
+const gateway = createGatewayRuntime({
+  // Load the composed supergraph SDL (run `pnpm compose` to regenerate).
+  // Subgraph URLs come from environment variables and are set in the SDL via
+  // @join__graph directives.  At runtime the gateway resolves each subgraph
+  // URL from the env vars below so the SDL itself only needs to be valid SDL.
+  supergraph: new URL('../../supergraph.graphql', import.meta.url).pathname,
   additionalResolvers: [],
+  cors: {
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+      : [], // NEVER wildcard in production — fail closed
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+  },
+  logging: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
   // BUG-049: Forward Authorization header from the Yoga context to every
   // subgraph HTTP fetch. Hive Gateway does not automatically propagate
   // Authorization headers. For HTTP requests the header comes from
@@ -83,6 +79,125 @@ const gateway = createGateway({
   // (extracted below) and placed into context.headers.authorization so that
   // this single plugin handles both transports uniformly.
   plugins: () => [
+    // G-10: query depth + complexity validation
+    {
+      onValidate({ addValidationRule }: { addValidationRule: (rule: unknown) => void }) {
+        addValidationRule(depthLimitRule());
+        addValidationRule(complexityLimitRule());
+      },
+    },
+    // G-09 + BUG-049: JWT auth context + header forwarding
+    {
+      async onContextBuilding({ context, extendContext }: {
+        context: Record<string, unknown>;
+        extendContext: (ext: Record<string, unknown>) => void;
+      }) {
+        const request = context['request'] as Request | undefined;
+        if (!request) return;
+
+        // BUG-049 fix: WebSocket subscriptions (graphql-ws protocol) send the JWT
+        // in connectionParams: { authorization: 'Bearer <token>' }, NOT in HTTP
+        // headers (which belong to the TCP upgrade handshake, not the GQL session).
+        const wsConnectionParams = context['connectionParams'] as Record<string, unknown> | undefined;
+        const wsAuthHeader =
+          typeof wsConnectionParams?.['authorization'] === 'string'
+            ? wsConnectionParams['authorization']
+            : undefined;
+
+        // Prefer tenant-scoped key; fall back to IP for unauthenticated requests
+        const tenantId =
+          request.headers.get('x-tenant-id') ??
+          request.headers.get('x-forwarded-for') ??
+          'unknown';
+
+        const rateCheck = checkRateLimit(tenantId);
+        if (!rateCheck.allowed) {
+          logger.warn(
+            { tenantId, resetAt: rateCheck.resetAt },
+            'G-09: rate limit exceeded (context)'
+          );
+          throw Object.assign(new Error('Rate limit exceeded'), {
+            _rateLimitResponse: rateLimitedResponse(rateCheck.resetAt),
+          });
+        }
+
+        // Use HTTP header first; fall back to WebSocket connectionParams for subscriptions.
+        const authHeader =
+          request.headers.get('authorization') ?? wsAuthHeader ?? null;
+        let resolvedTenantId: string | null = null;
+        let userId: string | null = null;
+        let role: string | null = null;
+        let isAuthenticated = false;
+
+        if (authHeader?.startsWith('Bearer ')) {
+          const token = authHeader.slice(7);
+
+          // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
+          // non-production environments. NEVER active when NODE_ENV=production.
+          if (
+            process.env.NODE_ENV !== 'production' &&
+            token === 'dev-token-mock-jwt'
+          ) {
+            resolvedTenantId = '00000000-0000-0000-0000-000000000000';
+            userId = '00000000-0000-0000-0000-000000000001';
+            role = 'SUPER_ADMIN';
+            isAuthenticated = true;
+          } else {
+            try {
+              const { payload } = await jwtVerify(token, JWKS, {
+                issuer: KEYCLOAK_ISSUER,
+              });
+              resolvedTenantId = (payload['tenant_id'] as string) ?? null;
+              userId = payload.sub ?? null;
+              // Support both a top-level "role" claim (custom mapper) and the
+              // standard Keycloak realm_access.roles array (default).
+              const APP_ROLES = new Set([
+                'SUPER_ADMIN',
+                'ORG_ADMIN',
+                'INSTRUCTOR',
+                'STUDENT',
+                'RESEARCHER',
+              ]);
+              role =
+                (payload['role'] as string) ??
+                (
+                  (
+                    (payload['realm_access'] as Record<string, unknown>)
+                      ?.['roles'] as string[]
+                  )?.find((r) => APP_ROLES.has(r)) ?? null
+                );
+              isAuthenticated = true;
+              if (wsAuthHeader && !request.headers.get('authorization')) {
+                logger.debug(
+                  { userId },
+                  'Gateway: authenticated subscription via WebSocket connectionParams'
+                );
+              }
+            } catch (error) {
+              logger.warn(
+                { err: error },
+                'JWT verification failed — request proceeds unauthenticated'
+              );
+            }
+          }
+        }
+
+        extendContext({
+          isAuthenticated,
+          userId,
+          tenantId: resolvedTenantId,
+          role,
+          pubSub,
+          headers: {
+            authorization: authHeader,
+            'x-tenant-id': resolvedTenantId,
+            'x-user-id': userId,
+            'x-user-role': role,
+          },
+        });
+      },
+    },
+    // BUG-049: Forward Authorization header to every subgraph fetch
     {
       onFetch({
         options,
@@ -107,161 +222,6 @@ const gateway = createGateway({
       },
     },
   ],
-});
-
-// ── G-09: Rate limiting helper ────────────────────────────────────────────────
-
-function rateLimitedResponse(resetAt: number): Response {
-  const retryAfterSec = Math.ceil((resetAt - Date.now()) / 1000);
-  return new Response(
-    JSON.stringify({
-      errors: [
-        {
-          message: 'Rate limit exceeded. Please retry later.',
-          extensions: { code: 'RATE_LIMIT_EXCEEDED', retryAfter: resetAt },
-        },
-      ],
-    }),
-    {
-      status: 429,
-      headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': String(retryAfterSec),
-      },
-    }
-  );
-}
-
-// ── G-10: Collect validation rules ───────────────────────────────────────────
-const validationRules = [depthLimitRule(), complexityLimitRule()];
-
-const yoga = createYoga({
-  gateway,
-  // G-10: reject deeply-nested / high-complexity queries before execution
-  validationRules,
-  cors: {
-    origin: process.env.CORS_ORIGIN
-      ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
-      : [], // NEVER wildcard in production — fail closed
-    credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS'],
-  },
-  logging: logger,
-  // G-09: Rate limiting applied in context (runs before resolvers)
-  context: async (initialContext) => {
-    const { request } = initialContext as { request: Request };
-
-    // BUG-049 fix: WebSocket subscriptions (graphql-ws protocol) send the JWT
-    // in connectionParams: { authorization: 'Bearer <token>' }, NOT in HTTP
-    // headers (which belong to the TCP upgrade handshake, not the GQL session).
-    //
-    // In graphql-yoga + graphql-ws, the client's connection_init payload is
-    // available at the ROOT level of the initial context as `connectionParams`.
-    // It is NOT inside `extra` — `extra` contains { socket, request } metadata.
-    //
-    // Without this fallback, subscriptions always fail authentication because
-    // request.headers.get('authorization') returns null for WS upgrade requests.
-    const wsConnectionParams = (
-      initialContext as { connectionParams?: Record<string, unknown> }
-    ).connectionParams;
-    const wsAuthHeader =
-      typeof wsConnectionParams?.['authorization'] === 'string'
-        ? (wsConnectionParams['authorization'] as string)
-        : undefined;
-
-    // Prefer tenant-scoped key; fall back to IP for unauthenticated requests
-    const tenantId =
-      (request.headers.get('x-tenant-id') as string | null) ??
-      (request.headers.get('x-forwarded-for') as string | null) ??
-      'unknown';
-
-    const rateCheck = checkRateLimit(tenantId);
-    if (!rateCheck.allowed) {
-      logger.warn(
-        { tenantId, resetAt: rateCheck.resetAt },
-        'G-09: rate limit exceeded'
-      );
-      // Yoga supports returning a Response from context to short-circuit
-      throw Object.assign(new Error('Rate limit exceeded'), {
-        _rateLimitResponse: rateLimitedResponse(rateCheck.resetAt),
-      });
-    }
-
-    // Use HTTP header first; fall back to WebSocket connectionParams for subscriptions.
-    const authHeader =
-      request.headers.get('authorization') ?? wsAuthHeader ?? null;
-    let resolvedTenantId: string | null = null;
-    let userId: string | null = null;
-    let role: string | null = null;
-    let isAuthenticated = false;
-
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.slice(7);
-
-      // Dev bypass for E2E tests (BUG-23): accept the well-known dev token in
-      // non-production environments. NEVER active when NODE_ENV=production.
-      if (
-        process.env.NODE_ENV !== 'production' &&
-        token === 'dev-token-mock-jwt'
-      ) {
-        resolvedTenantId = '00000000-0000-0000-0000-000000000000';
-        userId = '00000000-0000-0000-0000-000000000001';
-        role = 'SUPER_ADMIN';
-        isAuthenticated = true;
-      } else {
-        try {
-          const { payload } = await jwtVerify(token, JWKS, {
-            issuer: KEYCLOAK_ISSUER,
-          });
-          resolvedTenantId = (payload['tenant_id'] as string) ?? null;
-          userId = payload.sub ?? null;
-          // Support both a top-level "role" claim (custom mapper) and the
-          // standard Keycloak realm_access.roles array (default).
-          const APP_ROLES = new Set([
-            'SUPER_ADMIN',
-            'ORG_ADMIN',
-            'INSTRUCTOR',
-            'STUDENT',
-            'RESEARCHER',
-          ]);
-          role =
-            (payload['role'] as string) ??
-            (
-              (
-                (payload['realm_access'] as Record<string, unknown>)
-                  ?.['roles'] as string[]
-              )?.find((r) => APP_ROLES.has(r)) ?? null
-            );
-          isAuthenticated = true;
-          if (wsAuthHeader && !request.headers.get('authorization')) {
-            logger.debug(
-              { userId },
-              'Gateway: authenticated subscription via WebSocket connectionParams'
-            );
-          }
-        } catch (error) {
-          logger.warn(
-            { err: error },
-            'JWT verification failed — request proceeds unauthenticated'
-          );
-        }
-      }
-    }
-
-    return {
-      isAuthenticated,
-      userId,
-      tenantId: resolvedTenantId,
-      role,
-      pubSub,
-      headers: {
-        authorization: authHeader,
-        'x-tenant-id': resolvedTenantId,
-        'x-user-id': userId,
-        'x-user-role': role,
-      },
-    };
-  },
 });
 
 // ── HTTP server with G-09 pre-flight rate-limit enforcement ──────────────────
@@ -306,8 +266,8 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  // Forward to Yoga handler
-  yoga.handle(req as unknown as Request, res as unknown as Response);
+  // Forward to gateway handler
+  gateway.handle(req as unknown as Request, res as unknown as Response);
 });
 
 server.listen(port, () => {

@@ -11,6 +11,7 @@ import {
   integer,
   real,
   pgPolicy,
+  index,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -48,6 +49,9 @@ export const spacedRepetitionCards = pgTable(
         user_id::text = current_setting('app.current_user_id', TRUE)
       `,
     }),
+    // Performance indexes for SRS queue queries: fetch due cards by user+tenant
+    index('idx_srs_cards_user_tenant').on(table.userId, table.tenantId),
+    index('idx_srs_cards_due_date').on(table.userId, table.dueDate),
   ]
 ).enableRLS();
 

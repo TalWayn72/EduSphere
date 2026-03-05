@@ -1,0 +1,38 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+
+type NotificationTemplate {
+  id: ID!
+  key: String!
+  name: String!
+  subject: String!
+  bodyHtml: String!
+  variables: [String!]!
+  isActive: Boolean!
+  updatedAt: String!
+}
+
+input UpdateNotificationTemplateInput {
+  subject: String
+  bodyHtml: String
+  isActive: Boolean
+}
+
+extend type Query {
+  adminNotificationTemplates: [NotificationTemplate!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  updateNotificationTemplate(
+    id: ID!
+    input: UpdateNotificationTemplateInput!
+  ): NotificationTemplate!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+
+  resetNotificationTemplate(id: ID!): NotificationTemplate!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

@@ -9,6 +9,8 @@ import { SecurityResolver } from './security.resolver';
 import { SecurityService } from './security.service';
 import { CustomRoleResolver } from './custom-role.resolver';
 import { CustomRoleService } from './custom-role.service';
+import { NotificationTemplatesResolver } from './notification-templates.resolver';
+import { NotificationTemplatesService } from './notification-templates.service';
 
 @Module({
   providers: [
@@ -22,6 +24,8 @@ import { CustomRoleService } from './custom-role.service';
     SecurityService,
     CustomRoleResolver,
     CustomRoleService,
+    NotificationTemplatesResolver,
+    NotificationTemplatesService,
   ],
   exports: [AdminOverviewService],
 })

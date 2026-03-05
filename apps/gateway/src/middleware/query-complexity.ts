@@ -9,7 +9,7 @@ export const MAX_COMPLEXITY = parseInt(
 // ── Internal tree-walk helpers ────────────────────────────────────────────────
 
 type SelectableNode = {
-  selectionSet?: { selections: SelectableNode[] };
+  selectionSet?: { selections: readonly SelectableNode[] };
   name?: { value?: string };
 };
 

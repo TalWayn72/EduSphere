@@ -1,21 +1,14 @@
 /**
  * Unit tests for ProgramService (F-026 Stackable Credentials / Nanodegrees)
  *
- * 8 tests:
+ * 5 tests covering CRUD + progress (NATS event tests are in program-events.handler.spec.ts):
  *  1. listPrograms returns only published programs for tenant
  *  2. createProgram stores program with requiredCourseIds array
  *  3. enrollInProgram creates enrollment record
  *  4. enrollInProgram is idempotent (duplicate enroll returns existing)
  *  5. getProgramProgress calculates percentComplete correctly
- *  6. NATS consumer detects full completion (all courses done)
- *  7. NATS consumer does NOT trigger completion if partial
- *  8. checkProgramCompletion calls certificate service on full completion
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {
-  NotFoundException as _NotFoundException,
-  ConflictException as _ConflictException,
-} from '@nestjs/common';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Mocks (must be before any import of mocked module) ──────────────────────
 
@@ -58,48 +51,10 @@ vi.mock('@edusphere/db', () => {
   };
 });
 
-vi.mock('@edusphere/nats-client', () => ({
-  buildNatsOptions: vi.fn(() => ({ servers: 'nats://localhost:4222' })),
-  isCourseCompletedEvent: vi.fn((e: unknown) => {
-    if (!e || typeof e !== 'object') return false;
-    const obj = e as Record<string, unknown>;
-    return (
-      typeof obj['courseId'] === 'string' && typeof obj['userId'] === 'string'
-    );
-  }),
-}));
-
-vi.mock('nats', () => ({
-  connect: vi.fn().mockResolvedValue({
-    subscribe: vi.fn().mockReturnValue({
-      unsubscribe: vi.fn(),
-      [Symbol.asyncIterator]: vi.fn().mockReturnValue({
-        next: vi.fn().mockResolvedValue({ done: true }),
-      }),
-    }),
-    drain: vi.fn().mockResolvedValue(undefined),
-  }),
-  StringCodec: vi.fn(() => ({
-    encode: (s: string) => Buffer.from(s),
-    decode: (b: Uint8Array) => Buffer.from(b).toString(),
-  })),
-}));
-
-vi.mock('../certificate/certificate.service.js', () => ({
-  CertificateService: vi
-    .fn()
-    .mockImplementation(function CertificateServiceCtor() {
-      return {
-        generateCertificate: vi.fn().mockResolvedValue({ id: 'cert-uuid-1' }),
-      };
-    }),
-}));
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 import { ProgramService } from './program.service';
-import { withTenantContext, schema as _schema } from '@edusphere/db';
-import { CertificateService } from '../certificate/certificate.service.js';
+import { withTenantContext } from '@edusphere/db';
 
 function buildPublishedProgram(
   overrides: Partial<Record<string, unknown>> = {}
@@ -109,7 +64,7 @@ function buildPublishedProgram(
     tenantId: 'tenant-1',
     title: 'Full-Stack Nanodegree',
     description: 'Master full-stack development',
-    badgeEmoji: '🎓',
+    badgeEmoji: '\uD83C\uDF93',
     requiredCourseIds: ['course-1', 'course-2'],
     totalHours: 40,
     published: true,
@@ -136,17 +91,10 @@ function buildEnrollment(overrides: Partial<Record<string, unknown>> = {}) {
 
 describe('ProgramService', () => {
   let service: ProgramService;
-  let certService: CertificateService;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
-    certService = new (vi.mocked(CertificateService))();
-    service = new ProgramService(certService);
-    await new Promise((r) => setTimeout(r, 10));
-  });
-
-  afterEach(async () => {
-    await service.onModuleDestroy();
+    service = new ProgramService();
   });
 
   // ─── 1. listPrograms ───────────────────────────────────────────────────────
@@ -219,7 +167,7 @@ describe('ProgramService', () => {
     const program = buildPublishedProgram();
 
     vi.mocked(withTenantContext)
-      // existing check → empty
+      // existing check -> empty
       .mockImplementationOnce(async (_, __, fn) =>
         fn({
           select: vi.fn().mockReturnValue({
@@ -269,7 +217,6 @@ describe('ProgramService', () => {
   it('enrollInProgram is idempotent — returns existing enrollment', async () => {
     const enrollment = buildEnrollment();
 
-    // First call: existing enrollment found → return it without inserting
     vi.mocked(withTenantContext).mockImplementationOnce(async (_, __, fn) =>
       fn({
         select: vi.fn().mockReturnValue({
@@ -312,7 +259,7 @@ describe('ProgramService', () => {
           }),
         } as never)
       )
-      // userCourses query → 2 of 4 done
+      // userCourses query -> 2 of 4 done
       .mockImplementationOnce(async (_, __, fn) =>
         fn({
           select: vi.fn().mockReturnValue({
@@ -335,214 +282,6 @@ describe('ProgramService', () => {
     expect(progress.percentComplete).toBe(50);
     expect(progress.completedCourseIds).toEqual(
       expect.arrayContaining(['c1', 'c3'])
-    );
-  });
-
-  // ─── 6. NATS consumer detects full completion ──────────────────────────────
-
-  it('NATS consumer detects full completion and marks enrollment done', async () => {
-    const getProgramProgressSpy = vi
-      .spyOn(service, 'getProgramProgress')
-      .mockResolvedValue({
-        totalCourses: 2,
-        completedCourses: 2,
-        completedCourseIds: ['course-1', 'course-2'],
-        percentComplete: 100,
-      });
-
-    const program = buildPublishedProgram();
-    const enrollment = buildEnrollment();
-
-    vi.mocked(withTenantContext)
-      // getUserEnrollments inside handleCourseCompleted
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockResolvedValue([enrollment]),
-            }),
-          }),
-        } as never)
-      )
-      // program fetch in checkProgramCompletion
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                limit: vi.fn().mockResolvedValue([program]),
-              }),
-            }),
-          }),
-        } as never)
-      )
-      // update completedAt
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          update: vi.fn().mockReturnValue({
-            set: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                returning: vi
-                  .fn()
-                  .mockResolvedValue([
-                    { ...enrollment, completedAt: new Date() },
-                  ]),
-              }),
-            }),
-          }),
-        } as never)
-      )
-      // update certificateId
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          update: vi.fn().mockReturnValue({
-            set: vi
-              .fn()
-              .mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
-          }),
-        } as never)
-      );
-
-    await (
-      service as unknown as {
-        handleCourseCompleted: (p: unknown) => Promise<void>;
-      }
-    ).handleCourseCompleted({
-      courseId: 'course-2',
-      userId: 'user-1',
-      tenantId: 'tenant-1',
-      completionDate: new Date().toISOString(),
-    });
-
-    expect(getProgramProgressSpy).toHaveBeenCalledWith(
-      'prog-1',
-      'user-1',
-      'tenant-1'
-    );
-  });
-
-  // ─── 7. NATS consumer does NOT trigger if partial ──────────────────────────
-
-  it('NATS consumer does NOT trigger completion if progress is partial', async () => {
-    const getProgramProgressSpy = vi
-      .spyOn(service, 'getProgramProgress')
-      .mockResolvedValue({
-        totalCourses: 2,
-        completedCourses: 1,
-        completedCourseIds: ['course-1'],
-        percentComplete: 50,
-      });
-
-    const enrollment = buildEnrollment();
-    const program = buildPublishedProgram();
-
-    vi.mocked(withTenantContext)
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockResolvedValue([enrollment]),
-            }),
-          }),
-        } as never)
-      )
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                limit: vi.fn().mockResolvedValue([program]),
-              }),
-            }),
-          }),
-        } as never)
-      );
-
-    await (
-      service as unknown as {
-        handleCourseCompleted: (p: unknown) => Promise<void>;
-      }
-    ).handleCourseCompleted({
-      courseId: 'course-1',
-      userId: 'user-1',
-      tenantId: 'tenant-1',
-      completionDate: new Date().toISOString(),
-    });
-
-    expect(getProgramProgressSpy).toHaveBeenCalled();
-    // cert service should NOT be called since percentComplete < 100
-    expect(certService.generateCertificate).not.toHaveBeenCalled();
-  });
-
-  // ─── 8. checkProgramCompletion calls certificate service ──────────────────
-
-  it('checkProgramCompletion calls certificateService on full completion', async () => {
-    const program = buildPublishedProgram();
-    const enrollment = buildEnrollment();
-
-    vi.spyOn(service, 'getProgramProgress').mockResolvedValue({
-      totalCourses: 2,
-      completedCourses: 2,
-      completedCourseIds: ['course-1', 'course-2'],
-      percentComplete: 100,
-    });
-
-    vi.mocked(withTenantContext)
-      // program fetch
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                limit: vi.fn().mockResolvedValue([program]),
-              }),
-            }),
-          }),
-        } as never)
-      )
-      // update completedAt
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          update: vi.fn().mockReturnValue({
-            set: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                returning: vi
-                  .fn()
-                  .mockResolvedValue([
-                    { ...enrollment, completedAt: new Date() },
-                  ]),
-              }),
-            }),
-          }),
-        } as never)
-      )
-      // update certificateId
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          update: vi.fn().mockReturnValue({
-            set: vi
-              .fn()
-              .mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
-          }),
-        } as never)
-      );
-
-    await (
-      service as unknown as {
-        checkProgramCompletion: (
-          u: string,
-          p: string,
-          t: string
-        ) => Promise<void>;
-      }
-    ).checkProgramCompletion('user-1', 'prog-1', 'tenant-1');
-
-    expect(certService.generateCertificate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: 'user-1',
-        tenantId: 'tenant-1',
-        courseId: 'prog-1',
-      })
     );
   });
 });

@@ -10,24 +10,32 @@ import {
   integer,
   jsonb,
   pgPolicy,
+  index,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 // ── Badge definitions (platform-wide: tenant_id nullable) ─────────────────────
-export const badges = pgTable('badges', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  name: text('name').notNull().unique(),
-  description: text('description').notNull(),
-  iconEmoji: text('icon_emoji').notNull(),
-  category: text('category').notNull(), // STREAK | COMPLETION | ENGAGEMENT | SOCIAL
-  pointsReward: integer('points_reward').notNull().default(0),
-  conditionType: text('condition_type').notNull(),
-  conditionValue: integer('condition_value').notNull(),
-  tenantId: uuid('tenant_id'), // null = platform-wide
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const badges = pgTable(
+  'badges',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: text('name').notNull().unique(),
+    description: text('description').notNull(),
+    iconEmoji: text('icon_emoji').notNull(),
+    category: text('category').notNull(), // STREAK | COMPLETION | ENGAGEMENT | SOCIAL
+    pointsReward: integer('points_reward').notNull().default(0),
+    conditionType: text('condition_type').notNull(),
+    conditionValue: integer('condition_value').notNull(),
+    tenantId: uuid('tenant_id'), // null = platform-wide
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('idx_badges_tenant').on(t.tenantId),
+    index('idx_badges_category').on(t.category),
+  ]
+);
 
 export type Badge = typeof badges.$inferSelect;
 export type NewBadge = typeof badges.$inferInsert;
@@ -55,6 +63,8 @@ export const userBadges = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
+    index('idx_user_badges_user_tenant').on(table.userId, table.tenantId),
+    index('idx_user_badges_badge').on(table.badgeId),
   ]
 ).enableRLS();
 
@@ -106,6 +116,8 @@ export const pointEvents = pgTable(
       `,
       withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
     }),
+    index('idx_point_events_user_tenant').on(table.userId, table.tenantId),
+    index('idx_point_events_created').on(table.userId, table.createdAt),
   ]
 ).enableRLS();
 

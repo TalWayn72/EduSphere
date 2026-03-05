@@ -36,7 +36,25 @@ vi.mock('./NotificationTemplatesPage.editor', () => ({
 }));
 
 vi.mock('@/lib/graphql/admin-notifications.queries', () => ({
-  // NotificationTemplate type is used only as type import — no runtime value needed
+  ADMIN_NOTIFICATION_TEMPLATES_QUERY: 'ADMIN_NOTIFICATION_TEMPLATES_QUERY',
+  UPDATE_NOTIFICATION_TEMPLATE_MUTATION: 'UPDATE_NOTIFICATION_TEMPLATE_MUTATION',
+  RESET_NOTIFICATION_TEMPLATE_MUTATION: 'RESET_NOTIFICATION_TEMPLATE_MUTATION',
+}));
+
+const MOCK_TEMPLATES = [
+  { id: '1', key: 'welcome', name: 'Welcome Email', subject: 'Welcome!', bodyHtml: '<p>Hi</p>', variables: [], isActive: true, updatedAt: '2026-01-01T00:00:00Z' },
+  { id: '2', key: 'enrollment_confirmation', name: 'Enrollment Confirmation', subject: 'Enrolled!', bodyHtml: '<p>Enrolled</p>', variables: [], isActive: true, updatedAt: '2026-01-01T00:00:00Z' },
+  { id: '3', key: 'completion_certificate', name: 'Completion Certificate', subject: 'Complete!', bodyHtml: '<p>Done</p>', variables: [], isActive: true, updatedAt: '2026-01-01T00:00:00Z' },
+  { id: '4', key: 'compliance_reminder', name: 'Compliance Reminder', subject: 'Reminder', bodyHtml: '<p>Reminder</p>', variables: [], isActive: true, updatedAt: '2026-01-01T00:00:00Z' },
+  { id: '5', key: 'password_reset', name: 'Password Reset', subject: 'Reset', bodyHtml: '<p>Reset</p>', variables: [], isActive: true, updatedAt: '2026-01-01T00:00:00Z' },
+  { id: '6', key: 'at_risk_intervention', name: 'At-Risk Intervention', subject: 'Alert', bodyHtml: '<p>Alert</p>', variables: [], isActive: false, updatedAt: '2026-01-01T00:00:00Z' },
+];
+
+const NOOP_MUTATION = [{ fetching: false, data: undefined, error: undefined }, vi.fn().mockResolvedValue({ data: undefined, error: undefined })] as never;
+
+vi.mock('urql', () => ({
+  useQuery: vi.fn(() => [{ data: { adminNotificationTemplates: MOCK_TEMPLATES }, fetching: false, error: undefined }]),
+  useMutation: vi.fn(() => NOOP_MUTATION),
 }));
 
 // ── Imports after mocks ───────────────────────────────────────────────────────

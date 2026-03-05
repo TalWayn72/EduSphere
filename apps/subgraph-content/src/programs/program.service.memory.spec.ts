@@ -1,5 +1,5 @@
 /**
- * Memory safety tests for ProgramService (F-026)
+ * Memory safety tests for ProgramEventsHandler (F-026)
  *
  * Verifies that OnModuleDestroy:
  *  1. Calls closeAllPools and drains NATS
@@ -75,14 +75,14 @@ vi.mock('../certificate/certificate.service.js', () => ({
 
 // ─── Import after mocks ────────────────────────────────────────────────────────
 
-import { ProgramService } from './program.service';
+import { ProgramEventsHandler } from './program-events.handler';
 import { closeAllPools } from '@edusphere/db';
 import { CertificateService } from '../certificate/certificate.service.js';
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe('ProgramService — memory safety', () => {
-  let service: ProgramService;
+describe('ProgramEventsHandler — memory safety', () => {
+  let handler: ProgramEventsHandler;
   let certService: CertificateService;
 
   beforeEach(async () => {
@@ -91,15 +91,15 @@ describe('ProgramService — memory safety', () => {
     mockDrain.mockReset().mockResolvedValue(undefined);
 
     certService = new (vi.mocked(CertificateService))();
-    service = new ProgramService(certService);
+    handler = new ProgramEventsHandler(certService);
     // Explicitly call lifecycle hook (NestJS doesn't call it in direct instantiation)
-    await service.onModuleInit();
+    await handler.onModuleInit();
   });
 
   // ─── 1. onModuleDestroy calls closeAllPools and drains NATS ───────────────
 
   it('onModuleDestroy calls closeAllPools and drains NATS connection', async () => {
-    await service.onModuleDestroy();
+    await handler.onModuleDestroy();
 
     expect(closeAllPools).toHaveBeenCalledOnce();
     expect(mockDrain).toHaveBeenCalledOnce();
@@ -108,27 +108,17 @@ describe('ProgramService — memory safety', () => {
   // ─── 2. NATS subscription loop exits cleanly ──────────────────────────────
 
   it('NATS subscription loop exits cleanly on unsubscribe', async () => {
-    // Call destroy which triggers unsubscribe
-    await service.onModuleDestroy();
+    await handler.onModuleDestroy();
 
     expect(mockUnsubscribe).toHaveBeenCalledOnce();
     // nc should be nulled out after destroy
-    expect((service as unknown as { nc: unknown }).nc).toBeNull();
-    expect((service as unknown as { sub: unknown }).sub).toBeNull();
+    expect((handler as unknown as { nc: unknown }).nc).toBeNull();
+    expect((handler as unknown as { sub: unknown }).sub).toBeNull();
   });
 
   // ─── 3. Concurrent course completions resolve correctly ───────────────────
 
   it('concurrent course completions resolve without collision', async () => {
-    const getProgramProgressSpy = vi
-      .spyOn(service, 'getProgramProgress')
-      .mockResolvedValue({
-        totalCourses: 3,
-        completedCourses: 2,
-        completedCourseIds: ['c1', 'c2'],
-        percentComplete: 67,
-      });
-
     const enrollment = {
       id: 'enroll-1',
       userId: 'user-1',
@@ -140,73 +130,53 @@ describe('ProgramService — memory safety', () => {
       id: 'prog-1',
       tenantId: 'tenant-1',
       requiredCourseIds: ['c1', 'c2', 'c3'],
+      badgeEmoji: '\uD83C\uDF93',
+      title: 'Test Program',
     };
 
     const { withTenantContext } = await import('@edusphere/db');
-    vi.mocked(withTenantContext)
-      // h1: getUserEnrollments
-      .mockImplementationOnce(async (_, __, fn) =>
+
+    // Use a general mock that supports concurrent calls regardless of ordering.
+    // The where() result must support both .limit() (program fetch) and
+    // direct resolution (enrollments / userCourses).
+    const makeWhereResult = (directResult: unknown[]) => {
+      const obj = Object.assign(Promise.resolve(directResult), {
+        limit: vi.fn().mockResolvedValue([program]),
+      });
+      return obj;
+    };
+
+    vi.mocked(withTenantContext).mockImplementation(
+      async (_, __, fn: (db: unknown) => unknown) =>
         fn({
           select: vi.fn().mockReturnValue({
             from: vi.fn().mockReturnValue({
-              where: vi.fn().mockResolvedValue([enrollment]),
+              where: vi
+                .fn()
+                .mockReturnValueOnce(makeWhereResult([enrollment]))
+                .mockReturnValue(makeWhereResult([{ courseId: 'c1' }, { courseId: 'c2' }])),
             }),
           }),
         } as never)
-      )
-      // h2: getUserEnrollments
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockResolvedValue([enrollment]),
-            }),
-          }),
-        } as never)
-      )
-      // h1: checkProgramCompletion → program fetch
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                limit: vi.fn().mockResolvedValue([program]),
-              }),
-            }),
-          }),
-        } as never)
-      )
-      // h2: checkProgramCompletion → program fetch
-      .mockImplementationOnce(async (_, __, fn) =>
-        fn({
-          select: vi.fn().mockReturnValue({
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                limit: vi.fn().mockResolvedValue([program]),
-              }),
-            }),
-          }),
-        } as never)
-      );
+    );
 
     // Fire two completions concurrently for the same program
     const payload = {
-      courseId: 'c3',
+      courseId: 'c2',
       userId: 'user-1',
       tenantId: 'tenant-1',
       completionDate: new Date().toISOString(),
     };
 
-    const handler = (
-      service as unknown as {
+    const handleFn = (
+      handler as unknown as {
         handleCourseCompleted: (p: unknown) => Promise<void>;
       }
-    ).handleCourseCompleted.bind(service);
+    ).handleCourseCompleted.bind(handler);
 
-    await Promise.all([handler(payload), handler(payload)]);
+    await Promise.all([handleFn(payload), handleFn(payload)]);
 
-    // Progress was evaluated; cert was NOT issued since percentComplete < 100
-    expect(getProgramProgressSpy).toHaveBeenCalled();
+    // cert was NOT issued since only 2 of 3 courses done
     expect(certService.generateCertificate).not.toHaveBeenCalled();
   });
 });

@@ -8,36 +8,46 @@ import {
   numeric,
   unique,
   timestamp,
+  index,
 } from 'drizzle-orm/pg-core';
 import { pk, tenantId, timestamps, softDelete } from './_shared';
 import { tenants } from './tenants';
 import { users } from './core';
 
 // Courses
-export const courses = pgTable('courses', {
-  id: pk(),
-  tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
-  title: text('title').notNull(),
-  slug: text('slug').notNull().default(''),
-  description: text('description'),
-  thumbnail_url: text('thumbnail_url'),
-  creator_id: uuid('creator_id').references(() => users.id, {
-    onDelete: 'set null',
-  }),
-  instructor_id: uuid('instructor_id').references(() => users.id),
-  is_published: boolean('is_published').notNull().default(false),
-  is_public: boolean('is_public').notNull().default(false),
-  estimated_hours: integer('estimated_hours'),
-  prerequisites: jsonb('prerequisites').notNull().default([]),
-  tags: jsonb('tags').notNull().default([]),
-  // F-016: Compliance Training Report Export
-  is_compliance: boolean('is_compliance').notNull().default(false),
-  compliance_due_date: timestamp('compliance_due_date', { withTimezone: true }),
-  // A1: Course Forking — tracks source course (added in migration 0006)
-  forked_from_id: uuid('forked_from_id'),
-  ...timestamps,
-  ...softDelete,
-});
+export const courses = pgTable(
+  'courses',
+  {
+    id: pk(),
+    tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    slug: text('slug').notNull().default(''),
+    description: text('description'),
+    thumbnail_url: text('thumbnail_url'),
+    creator_id: uuid('creator_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    instructor_id: uuid('instructor_id').references(() => users.id),
+    is_published: boolean('is_published').notNull().default(false),
+    is_public: boolean('is_public').notNull().default(false),
+    estimated_hours: integer('estimated_hours'),
+    prerequisites: jsonb('prerequisites').notNull().default([]),
+    tags: jsonb('tags').notNull().default([]),
+    // F-016: Compliance Training Report Export
+    is_compliance: boolean('is_compliance').notNull().default(false),
+    compliance_due_date: timestamp('compliance_due_date', { withTimezone: true }),
+    // A1: Course Forking — tracks source course (added in migration 0006)
+    forked_from_id: uuid('forked_from_id'),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => [
+    index('idx_courses_tenant').on(t.tenant_id),
+    index('idx_courses_tenant_published').on(t.tenant_id, t.is_published),
+    index('idx_courses_tenant_instructor').on(t.tenant_id, t.instructor_id),
+    index('idx_courses_forked_from').on(t.forked_from_id),
+  ]
+);
 
 // Modules
 export const modules = pgTable(
@@ -59,38 +69,46 @@ export const modules = pgTable(
 );
 
 // Media Assets
-export const media_assets = pgTable('media_assets', {
-  id: pk(),
-  tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
-  course_id: uuid('course_id').references(() => courses.id, {
-    onDelete: 'cascade',
-  }),
-  module_id: uuid('module_id').references(() => modules.id, {
-    onDelete: 'cascade',
-  }),
-  title: text('title').notNull(),
-  media_type: text('media_type', {
-    enum: ['VIDEO', 'AUDIO', 'DOCUMENT'],
-  }).notNull(),
-  file_url: text('file_url').notNull(),
-  /** MinIO object key for the HLS master manifest (.m3u8). Null until HLS transcode completes. */
-  hls_manifest_key: text('hls_manifest_key'),
-  /**
-   * AI-generated alt-text description for image assets (F-023).
-   * Populated asynchronously after upload via NATS + AltTextGeneratorService.
-   * Instructors can review and edit via updateMediaAltText mutation.
-   */
-  alt_text: text('alt_text'),
-  duration: integer('duration'),
-  transcription_status: text('transcription_status', {
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'],
-  })
-    .notNull()
-    .default('PENDING'),
-  metadata: jsonb('metadata').notNull().default({}),
-  ...timestamps,
-  ...softDelete,
-});
+export const media_assets = pgTable(
+  'media_assets',
+  {
+    id: pk(),
+    tenant_id: tenantId().references(() => tenants.id, { onDelete: 'cascade' }),
+    course_id: uuid('course_id').references(() => courses.id, {
+      onDelete: 'cascade',
+    }),
+    module_id: uuid('module_id').references(() => modules.id, {
+      onDelete: 'cascade',
+    }),
+    title: text('title').notNull(),
+    media_type: text('media_type', {
+      enum: ['VIDEO', 'AUDIO', 'DOCUMENT'],
+    }).notNull(),
+    file_url: text('file_url').notNull(),
+    /** MinIO object key for the HLS master manifest (.m3u8). Null until HLS transcode completes. */
+    hls_manifest_key: text('hls_manifest_key'),
+    /**
+     * AI-generated alt-text description for image assets (F-023).
+     * Populated asynchronously after upload via NATS + AltTextGeneratorService.
+     * Instructors can review and edit via updateMediaAltText mutation.
+     */
+    alt_text: text('alt_text'),
+    duration: integer('duration'),
+    transcription_status: text('transcription_status', {
+      enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'],
+    })
+      .notNull()
+      .default('PENDING'),
+    metadata: jsonb('metadata').notNull().default({}),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => [
+    index('idx_media_assets_tenant').on(t.tenant_id),
+    index('idx_media_assets_course').on(t.course_id),
+    index('idx_media_assets_transcription_status').on(t.transcription_status),
+  ]
+);
 
 // Transcripts
 export const transcripts = pgTable(
@@ -110,17 +128,24 @@ export const transcripts = pgTable(
 );
 
 // Transcript Segments
-export const transcript_segments = pgTable('transcript_segments', {
-  id: pk(),
-  transcript_id: uuid('transcript_id')
-    .notNull()
-    .references(() => transcripts.id, { onDelete: 'cascade' }),
-  start_time: numeric('start_time', { precision: 10, scale: 3 }).notNull(),
-  end_time: numeric('end_time', { precision: 10, scale: 3 }).notNull(),
-  text: text('text').notNull(),
-  speaker: text('speaker'),
-  ...timestamps,
-});
+export const transcript_segments = pgTable(
+  'transcript_segments',
+  {
+    id: pk(),
+    transcript_id: uuid('transcript_id')
+      .notNull()
+      .references(() => transcripts.id, { onDelete: 'cascade' }),
+    start_time: numeric('start_time', { precision: 10, scale: 3 }).notNull(),
+    end_time: numeric('end_time', { precision: 10, scale: 3 }).notNull(),
+    text: text('text').notNull(),
+    speaker: text('speaker'),
+    ...timestamps,
+  },
+  (t) => [
+    index('idx_transcript_segments_transcript').on(t.transcript_id),
+    index('idx_transcript_segments_time').on(t.transcript_id, t.start_time),
+  ]
+);
 
 export type Course = typeof courses.$inferSelect;
 export type NewCourse = typeof courses.$inferInsert;
