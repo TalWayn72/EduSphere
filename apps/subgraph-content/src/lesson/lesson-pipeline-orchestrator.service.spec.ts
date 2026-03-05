@@ -80,13 +80,13 @@ describe('LessonPipelineOrchestratorService', () => {
     const abortSpy = vi.spyOn(ctrl, 'abort');
     // @ts-expect-error — accessing private field for testing
     service['runControllers'].set('run-1', ctrl);
-    // @ts-expect-error
+    // @ts-expect-error — accessing private field for testing
     service['activeControllers'].add(ctrl);
     service.cancelRun('run-1');
     expect(abortSpy).toHaveBeenCalled();
-    // @ts-expect-error
+    // @ts-expect-error — accessing private field for testing
     expect(service['runControllers'].has('run-1')).toBe(false);
-    // @ts-expect-error
+    // @ts-expect-error — accessing private field for testing
     expect(service['activeControllers'].has(ctrl)).toBe(false);
   });
 
@@ -101,9 +101,9 @@ describe('LessonPipelineOrchestratorService', () => {
     const ctrl2 = new AbortController();
     const abort1 = vi.spyOn(ctrl1, 'abort');
     const abort2 = vi.spyOn(ctrl2, 'abort');
-    // @ts-expect-error
+    // @ts-expect-error — accessing private field for testing
     service['activeControllers'].add(ctrl1);
-    // @ts-expect-error
+    // @ts-expect-error — accessing private field for testing
     service['activeControllers'].add(ctrl2);
     await service.onModuleDestroy();
     expect(abort1).toHaveBeenCalled();
@@ -112,7 +112,7 @@ describe('LessonPipelineOrchestratorService', () => {
 
   it('drains NATS connection on destroy if connected', async () => {
     const mockNc = { drain: vi.fn().mockResolvedValue(undefined), publish: vi.fn() };
-    // @ts-expect-error
+    // @ts-expect-error — accessing private field for testing
     service['nc'] = mockNc;
     await service.onModuleDestroy();
     expect(mockNc.drain).toHaveBeenCalled();
