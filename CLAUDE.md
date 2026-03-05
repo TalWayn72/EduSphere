@@ -991,6 +991,44 @@ pnpm audit --audit-level=high
 ═══════════════════════════════════════════════════
 ```
 
+## Autonomous Execution Rules (IRON RULES)
+
+### 1. Phase Completion Announcement (MANDATORY)
+After EVERY phase or major milestone completes, Claude MUST proactively announce:
+```
+═══════════════════════════════════════════════════
+✅ PHASE [X] COMPLETE — [Phase Name]
+═══════════════════════════════════════════════════
+תוצרים: [list what was built]
+בדיקות: [test counts]
+📋 הבא בתור (Phase [X+1]):
+  • [next item 1]
+  • [next item 2]
+  • [next item 3]
+▶ ממשיך אוטומטית ב-[X] שניות אלא אם כן תעצור אותי.
+═══════════════════════════════════════════════════
+```
+Then proceed autonomously without waiting for user approval.
+
+### 2. No Inter-Phase Pauses
+- NEVER ask "האם להמשיך לשלב הבא?" between phases
+- NEVER wait for user confirmation between phases
+- Proceed directly from phase to phase
+- Only stop for: logical contradiction, security violation, missing credentials
+
+### 3. Maximum Parallelism
+- Always spawn the MAXIMUM number of parallel agents the task allows
+- Frontend + Backend + DB agents ALWAYS run in parallel
+- Never run sequentially what can run in parallel
+- Hardware limit: up to 5 parallel agents at once
+
+### 4. Protocol Compliance
+- Run Session Completion Gate after EVERY phase (not just at session end)
+- Every new feature = E2E Playwright spec (no exceptions)
+- Every UI change = visual regression screenshot
+
+---
+
 ## Session Completion Gate (IRON RULE — NEVER VIOLATE)
 
 **MANDATORY:** Claude may NEVER declare a session, feature, or task "complete" without producing and verifying the following table in full. Every row must show ✅ before completion is announced.
