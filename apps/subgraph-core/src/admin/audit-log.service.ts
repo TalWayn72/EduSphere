@@ -8,7 +8,7 @@ import {
   DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { minioConfig } from '@edusphere/config';
+import { minioConfig, TIME } from '@edusphere/config';
 import { count, desc, gte, lte, and, eq, like, type SQL } from 'drizzle-orm';
 
 export interface AuditLogEntryData {
@@ -210,7 +210,7 @@ export class AuditLogService implements OnModuleDestroy {
     // Delete audit log entries for user (GDPR Art.17 right to erasure).
     // Entries older than 30 days are permanently deleted; newer entries are
     // anonymised (userId set to null, IP/userAgent cleared).
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(Date.now() - TIME.THIRTY_DAYS_MS);
 
     // Anonymise recent entries (keep audit trail but remove PII)
     await db

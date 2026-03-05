@@ -190,9 +190,10 @@ export function createMetricsMiddleware(metricsService: MetricsService) {
   };
 }
 
-// NestJS-specific exports (module factory, controller, interceptor)
+// NestJS-specific exports (module factory, controller, interceptor, logger)
 export { createMetricsModule } from './nestjs.module-factory.js';
 export { MetricsController } from './nestjs.controller.js';
 export { MetricsInterceptor } from './nestjs.interceptor.js';
+export { createSubgraphLoggerModule } from './nestjs.logger.js';
 
 export { Registry, Counter, Histogram, Gauge };

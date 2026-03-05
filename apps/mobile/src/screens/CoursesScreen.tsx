@@ -62,9 +62,10 @@ export default function CoursesScreen() {
     if (error) {
       database
         .getCachedQuery(COURSES_QUERY_STR, {})
-        .then((cached: { courses?: Course[] } | null) => {
-          if (cached?.courses) {
-            setCachedCourses(cached.courses);
+        .then((cached: unknown) => {
+          const data = cached as { courses?: Course[] } | null;
+          if (data?.courses) {
+            setCachedCourses(data.courses);
             setIsShowingCache(true);
           }
         })

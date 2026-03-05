@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { YogaFederationDriver } from '@graphql-yoga/nestjs-federation';
-import { LoggerModule } from 'nestjs-pino';
+import { createSubgraphLoggerModule } from '@edusphere/metrics';
 import { UserModule } from './user/user.module';
 import { TenantModule } from './tenant/tenant.module';
 import { SrsModule } from './srs/srs.module';
@@ -18,26 +18,7 @@ import { SavedSearchModule } from './search/saved-search.module.js';
 
 @Module({
   imports: [
-    LoggerModule.forRoot({
-      pinoHttp: {
-        level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-        transport:
-          process.env.NODE_ENV !== 'production'
-            ? {
-                target: 'pino-pretty',
-                options: { singleLine: true, colorize: true },
-              }
-            : undefined,
-        redact: ['req.headers.authorization', 'req.headers.cookie'],
-        customProps: (req: unknown) => {
-          const r = req as { headers?: Record<string, string> };
-          return {
-            tenantId: r.headers?.['x-tenant-id'],
-            requestId: r.headers?.['x-request-id'],
-          };
-        },
-      },
-    }),
+    createSubgraphLoggerModule(),
     MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,

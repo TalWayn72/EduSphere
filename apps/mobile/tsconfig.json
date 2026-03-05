@@ -6,12 +6,14 @@
     "noEmit": true,
     "rootDir": ".",
     "outDir": "./dist",
+    "moduleResolution": "Bundler",
     "types": ["react-native"]
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "exclude": [
     "node_modules",
     "dist",
+    "src/__mocks__/**",
     "**/__tests__/**",
     "**/*.spec.ts",
     "**/*.test.ts",

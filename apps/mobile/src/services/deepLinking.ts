@@ -1,6 +1,6 @@
 import * as Linking from 'expo-linking';
 import { useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
 
 export interface DeepLinkRoute {
   screen: string;
@@ -107,7 +107,7 @@ export class DeepLinkingService {
 export const deepLinkingService = new DeepLinkingService();
 
 export function useDeepLinking() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   useEffect(() => {
     // Handle initial URL

@@ -24,7 +24,7 @@ export default defineConfig({
     // is not installed — exclude until the package is added as a dev dependency
     exclude: ['src/hooks/__tests__/useOfflineAnnotations.test.tsx'],
     passWithNoTests: true,
-    restoreAllMocks: true,
+    restoreMocks: true,
     clearMocks: true,
     testTimeout: 15000,
   },

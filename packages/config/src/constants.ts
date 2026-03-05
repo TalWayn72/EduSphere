@@ -4,6 +4,18 @@ export const RATE_LIMIT = {
   MAX_REQUESTS_AUTHENTICATED: 500,
 } as const;
 
+/** Common time-unit constants (milliseconds) */
+export const TIME = {
+  /** One day in milliseconds (86 400 000). Used for day-diff calculations and retention cutoffs. */
+  DAY_MS: 86_400_000,
+  /** Seven days in milliseconds. Used for activity-window cutoffs. */
+  SEVEN_DAYS_MS: 7 * 24 * 60 * 60 * 1000,
+  /** Thirty days in milliseconds. Used for retention and recommendation cutoffs. */
+  THIRTY_DAYS_MS: 30 * 24 * 60 * 60 * 1000,
+  /** Standard short LRS/external-service forward timeout (5 s). */
+  LRS_FORWARD_TIMEOUT_MS: 5_000,
+} as const;
+
 export const SESSION = {
   AGE_SECONDS: 86_400,
   REFRESH_INTERVAL_MS: 5 * 60 * 1000,

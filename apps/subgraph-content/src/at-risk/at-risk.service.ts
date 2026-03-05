@@ -17,6 +17,7 @@ import {
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
 import { connect, StringCodec, type NatsConnection } from 'nats';
+import { TIME } from '@edusphere/config';
 import { computeRiskScore } from './risk-scorer.js';
 import type { LearnerMetrics } from './risk-scorer.js';
 import type { AtRiskLearner } from './at-risk.types.js';
@@ -146,7 +147,7 @@ export class AtRiskService implements OnModuleDestroy {
     ctx: TenantContext
   ): Promise<LearnerMetrics> {
     const now = Date.now();
-    const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now - TIME.SEVEN_DAYS_MS);
     const [progressRows, quizRows] = await Promise.all([
       withTenantContext(this.db, ctx, async (tx) =>
         tx
@@ -198,11 +199,11 @@ export class AtRiskService implements OnModuleDestroy {
       null
     );
     const daysSinceLastActivity = latestActivity
-      ? Math.floor((now - latestActivity.getTime()) / 86400000)
+      ? Math.floor((now - latestActivity.getTime()) / TIME.DAY_MS)
       : 999;
     const estimatedDays = (enrollment.estimatedHours ?? 0) * 3;
     const elapsedDays = Math.floor(
-      (now - enrollment.enrolledAt.getTime()) / 86400000
+      (now - enrollment.enrolledAt.getTime()) / TIME.DAY_MS
     );
     const courseDaysRemaining = Math.max(0, estimatedDays - elapsedDays);
     const failedQuizzes = quizRows.filter((q) => !q.passed).length;

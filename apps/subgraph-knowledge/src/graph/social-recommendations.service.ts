@@ -7,6 +7,7 @@
  */
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { closeAllPools } from '@edusphere/db';
+import { TIME } from '@edusphere/config';
 import { toUserRole } from './graph-types';
 import { SocialRecommendationsDataService } from './social-recommendations-data.service';
 import { aggregateActivity } from './social-recommendations-aggregate';
@@ -29,8 +30,6 @@ export interface SocialFeedItem {
   timestamp: Date;
 }
 
-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class SocialRecommendationsService implements OnModuleDestroy {
@@ -62,7 +61,7 @@ export class SocialRecommendationsService implements OnModuleDestroy {
 
     const completedIds = await this.data.getCompletedContentIds(userId, ctx);
 
-    const cutoff = new Date(Date.now() - THIRTY_DAYS_MS);
+    const cutoff = new Date(Date.now() - TIME.THIRTY_DAYS_MS);
     const activityRows = await this.data.getFollowedActivity(
       followedIds,
       cutoff,
@@ -99,7 +98,7 @@ export class SocialRecommendationsService implements OnModuleDestroy {
     );
     if (followedIds.length === 0) return [];
 
-    const cutoff = new Date(Date.now() - SEVEN_DAYS_MS);
+    const cutoff = new Date(Date.now() - TIME.SEVEN_DAYS_MS);
     const rows = await this.data.getSocialFeedRows(
       followedIds,
       cutoff,

@@ -57,6 +57,7 @@ export function usePrefetchNextLesson() {
 
       // Check storage quota — require space for the lesson plus MIN_FREE_BYTES buffer
       const nextLesson = courseData.lessons[nextLessonIndex];
+      if (!nextLesson) return; // guard against out-of-bounds access
       const needed = nextLesson.estimatedSizeBytes ?? 0;
       const ok = await storageManager.isStorageAvailable(
         needed + MIN_FREE_BYTES

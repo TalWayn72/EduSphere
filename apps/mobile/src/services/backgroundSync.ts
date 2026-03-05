@@ -62,7 +62,7 @@ export class BackgroundSyncService {
         // Execute mutation
         await this.apolloClient.mutate({
           mutation: mutation.mutation as unknown as DocumentNode,
-          variables: mutation.variables as Record<string, unknown>,
+          variables: mutation.variables as unknown as Record<string, unknown>,
         });
 
         // Mark as synced
