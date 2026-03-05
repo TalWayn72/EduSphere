@@ -59,7 +59,7 @@ export const E2E_PROFILE: E2EProfile =
 
 /** Web application base URL — all page.goto('/path') calls are relative to this */
 export const BASE_URL: string =
-  process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+  process.env.E2E_BASE_URL ?? 'http://localhost:5176';
 
 /** Keycloak OIDC server base URL */
 export const KEYCLOAK_URL: string =

@@ -68,7 +68,7 @@ const BASE_URL = (() => {
         'Example: E2E_BASE_URL=https://staging.edusphere.io'
     );
   }
-  return 'http://localhost:5175';
+  return 'http://localhost:5176';
 })();
 
 // Whether a Vite dev server should be started automatically.
@@ -218,9 +218,9 @@ export default defineConfig({
    */
   webServer: USE_LOCAL_SERVER
     ? {
-        command: 'pnpm dev --port 5175',
-        url: 'http://localhost:5175',
-        reuseExistingServer: false,
+        command: 'pnpm dev --port 5176',
+        url: 'http://localhost:5176',
+        reuseExistingServer: !process.env.CI,
         env: {
           // Forward all VITE_* variables plus E2E-specific overrides
           VITE_DEV_MODE: process.env.VITE_DEV_MODE ?? 'true',

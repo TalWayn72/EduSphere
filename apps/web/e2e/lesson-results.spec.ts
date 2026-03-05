@@ -15,7 +15,7 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
-import { BASE_URL, RUN_WRITE_TESTS } from './env';
+import { BASE_URL, GRAPHQL_URL, RUN_WRITE_TESTS } from './env';
 
 /**
  * DEV_MODE auth helper — sets sessionStorage before page loads so the app
@@ -37,7 +37,11 @@ const RESULTS_URL = `${BASE_URL}/courses/${COURSE_ID}/lessons/${LESSON_ID}/resul
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
+// @urql/exchange-graphcache requires __typename on every object to normalize responses.
+// Without __typename the cache returns undefined for all entities.
+
 const LESSON_BASE = {
+  __typename: 'Lesson',
   id: LESSON_ID,
   courseId: COURSE_ID,
   moduleId: null,
@@ -53,6 +57,7 @@ const LESSON_BASE = {
 };
 
 const VIDEO_ASSET = {
+  __typename: 'LessonAsset',
   id: 'asset-1',
   assetType: 'VIDEO',
   sourceUrl: 'https://www.youtube.com/watch?v=purim-lesson-2024',
@@ -62,11 +67,13 @@ const VIDEO_ASSET = {
 
 const FULL_RESULTS = [
   {
+    __typename: 'PipelineResult',
     id: 'r-ingestion', moduleName: 'INGESTION', outputType: 'INGESTION',
     outputData: { sourceUrl: 'https://www.youtube.com/watch?v=purim-lesson-2024', assetType: 'VIDEO' },
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-asr', moduleName: 'ASR', outputType: 'ASR',
     outputData: {
       transcript: 'ברוכים הבאים לשיעור על פורים. היום נלמד על מגילת אסתר ועל מצוות היום הגדול. ייחודו של פורים הוא ששמחתו גדולה מכל שאר המועדות. חז"ל אמרו: "מי שלא שמח בפורים לא קיים מצוות שמחה". הגמרא בתענית מספרת על רבא ועל שמחת פורים.',
@@ -76,11 +83,13 @@ const FULL_RESULTS = [
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-cleaning', moduleName: 'CONTENT_CLEANING', outputType: 'CONTENT_CLEANING',
     outputData: { cleanedText: 'ברוכים הבאים לשיעור על פורים היום נלמד על מגילת אסתר ועל מצוות היום הגדול' },
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-ner', moduleName: 'NER_SOURCE_LINKING', outputType: 'NER_SOURCE_LINKING',
     outputData: {
       entities: [{ text: 'פורים', type: 'CONCEPT' }, { text: 'מגילת אסתר', type: 'SOURCE' }, { text: 'רבא', type: 'PERSON' }],
@@ -89,6 +98,7 @@ const FULL_RESULTS = [
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-summarize', moduleName: 'SUMMARIZATION', outputType: 'SUMMARIZATION',
     outputData: {
       shortSummary: 'שיעור מרתק על ייחודו של פורים ומצוות השמחה בו.',
@@ -97,16 +107,19 @@ const FULL_RESULTS = [
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-notes', moduleName: 'STRUCTURED_NOTES', outputType: 'STRUCTURED_NOTES',
     outputData: { outputMarkdown: '## פורים\n### מצוות\n- שמחה\n- מגילה\n- משלוח מנות\n- מתנות לאביונים' },
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-diagram', moduleName: 'DIAGRAM_GENERATOR', outputType: 'DIAGRAM_GENERATOR',
     outputData: { mermaidSrc: 'graph LR\n  A[פורים] --> B[מגילת אסתר]\n  A --> C[שמחה]' },
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-citations', moduleName: 'CITATION_VERIFIER', outputType: 'CITATION_VERIFIER',
     outputData: {
       verifiedCitations: [{ sourceText: 'מגילת אסתר' }, { sourceText: 'תלמוד בבלי, תענית' }],
@@ -116,11 +129,13 @@ const FULL_RESULTS = [
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-qa', moduleName: 'QA_GATE', outputType: 'QA_GATE',
     outputData: { overallScore: 0.92, fixList: [] },
     fileUrl: null, createdAt: new Date().toISOString(),
   },
   {
+    __typename: 'PipelineResult',
     id: 'r-publish', moduleName: 'PUBLISH_SHARE', outputType: 'PUBLISH_SHARE',
     outputData: { publishReady: true, publishedUrl: 'https://cdn.example.com/purim-lesson' },
     fileUrl: null, createdAt: new Date().toISOString(),
@@ -128,6 +143,7 @@ const FULL_RESULTS = [
 ];
 
 const PIPELINE_COMPLETED = {
+  __typename: 'LessonPipeline',
   id: 'pipeline-1',
   templateName: 'THEMATIC',
   nodes: [],
@@ -135,6 +151,7 @@ const PIPELINE_COMPLETED = {
   status: 'COMPLETED',
   createdAt: '2025-01-01T00:00:00Z',
   currentRun: {
+    __typename: 'PipelineRun',
     id: 'run-1',
     status: 'COMPLETED',
     startedAt: '2025-03-01T09:00:00Z',
@@ -159,14 +176,57 @@ const PIPELINE_RUNNING = {
 
 type ScenarioKey = 'empty' | 'running' | 'completed';
 
-async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed') {
-  await page.route('**/graphql', async (route) => {
-    const body = route.request().postDataJSON() as { query?: string; operationName?: string };
-    const q = body?.query ?? '';
-    const op = body?.operationName ?? '';
+const CORS_HEADERS = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': 'content-type, authorization',
+};
 
-    // Lesson query
-    if (q.includes('lesson(id:') || q.includes('query Lesson') || op === 'Lesson') {
+async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed') {
+  // Use explicit URL (not glob) to reliably intercept cross-origin urql requests
+  await page.route(GRAPHQL_URL, async (route) => {
+    // Handle CORS preflight — the app (port 5175) fetches from the GraphQL API
+    // (port 4000) which is a different origin. Without proper CORS headers on
+    // the OPTIONS preflight response, the browser blocks the subsequent POST.
+    if (route.request().method() === 'OPTIONS') {
+      return route.fulfill({ status: 204, headers: CORS_HEADERS, body: '' });
+    }
+
+    // Use postData() for robust body reading — postDataJSON() can return null
+    // when urql sends the query but the Content-Type differs in headless Chrome.
+    const rawBody = route.request().postData() ?? '';
+    let op = '';
+    let q = rawBody;
+    try {
+      const parsed = JSON.parse(rawBody) as { query?: string; operationName?: string };
+      op = parsed?.operationName ?? '';
+      q = parsed?.query ?? rawBody;
+    } catch {
+      // keep op='' and q=rawBody for string-based matching below
+    }
+
+    // addLessonAsset mutation (check BEFORE lesson query to avoid substring match)
+    if (q.includes('addLessonAsset') || op === 'AddLessonAsset') {
+      return route.fulfill({
+        status: 200,
+        headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          data: { addLessonAsset: { id: 'asset-new', assetType: 'VIDEO', sourceUrl: 'https://youtube.com/test', fileUrl: null } },
+        }),
+      });
+    }
+
+    // Lesson query — op, query string, or fallback to any non-mutation POST
+    const isLessonQuery =
+      op === 'Lesson' ||
+      q.includes('query Lesson') ||
+      q.includes('lesson(id:') ||
+      // fallback: any GraphQL POST that isn't a named mutation
+      (route.request().method() === 'POST' &&
+       !op.startsWith('Add') && !op.startsWith('Save') && !op.startsWith('Start') &&
+       !op.startsWith('Cancel') && !op.startsWith('Publish'));
+
+    if (isLessonQuery) {
       const pipeline =
         scenario === 'empty'     ? null :
         scenario === 'running'   ? PIPELINE_RUNNING :
@@ -174,7 +234,7 @@ async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed'
 
       return route.fulfill({
         status: 200,
-        contentType: 'application/json',
+        headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
         body: JSON.stringify({
           data: {
             lesson: { ...LESSON_BASE, assets: [VIDEO_ASSET], pipeline },
@@ -183,19 +243,12 @@ async function setupResultsMocks(page: Page, scenario: ScenarioKey = 'completed'
       });
     }
 
-    // addLessonAsset mutation
-    if (q.includes('addLessonAsset') || op === 'AddLessonAsset') {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: { addLessonAsset: { id: 'asset-new', assetType: 'VIDEO', sourceUrl: 'https://youtube.com/test', fileUrl: null } },
-        }),
-      });
-    }
-
-    // Subscriptions / other
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: {} }) });
+    // Subscriptions / other — return empty data with CORS headers
+    await route.fulfill({
+      status: 200,
+      headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
+      body: JSON.stringify({ data: {} }),
+    });
   });
 }
 
