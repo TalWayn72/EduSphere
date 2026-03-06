@@ -35,7 +35,9 @@ export const courses = pgTable(
     tags: jsonb('tags').notNull().default([]),
     // F-016: Compliance Training Report Export
     is_compliance: boolean('is_compliance').notNull().default(false),
-    compliance_due_date: timestamp('compliance_due_date', { withTimezone: true }),
+    compliance_due_date: timestamp('compliance_due_date', {
+      withTimezone: true,
+    }),
     // A1: Course Forking — tracks source course (added in migration 0006)
     forked_from_id: uuid('forked_from_id'),
     ...timestamps,
@@ -120,6 +122,8 @@ export const transcripts = pgTable(
       .references(() => media_assets.id, { onDelete: 'cascade' }),
     language: text('language').notNull().default('en'),
     full_text: text('full_text').notNull(),
+    /** MinIO key of the WebVTT subtitle file. Null until VTT generation completes. */
+    vtt_key: text('vtt_key'),
     ...timestamps,
   },
   (table) => ({

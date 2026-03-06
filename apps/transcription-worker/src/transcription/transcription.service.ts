@@ -13,6 +13,7 @@ import { NatsService } from '../nats/nats.service';
 import { ConceptExtractor } from '../knowledge/concept-extractor';
 import { GraphBuilder } from '../knowledge/graph-builder';
 import { HlsService } from '../hls/hls.service';
+import { TranslationService } from '../translation/translation.service';
 
 /**
  * Core transcription orchestrator.
@@ -24,6 +25,10 @@ import { HlsService } from '../hls/hls.service';
  *   4. Update media_assets.transcription_status
  *   5. Publish transcription.completed / transcription.failed to NATS
  *   6. Clean up temp file
+ *   7. Request embeddings (non-blocking)
+ *   8. Extract concepts (non-blocking)
+ *   9. HLS transcode (non-blocking)
+ *   10. AI subtitle translation for configured target languages (non-blocking)
  */
 @Injectable()
 export class TranscriptionService {
@@ -36,7 +41,8 @@ export class TranscriptionService {
     private readonly natsService: NatsService,
     private readonly conceptExtractor: ConceptExtractor,
     private readonly graphBuilder: GraphBuilder,
-    private readonly hlsService: HlsService
+    private readonly hlsService: HlsService,
+    private readonly translationService: TranslationService
   ) {}
 
   async transcribeFile(event: MediaUploadedEvent): Promise<void> {
@@ -104,7 +110,23 @@ export class TranscriptionService {
         );
       }
 
-      // Step 8: Extract concepts and publish to knowledge graph pipeline
+      // Step 8: AI subtitle translation (non-blocking — disabled when TRANSLATION_TARGETS is empty)
+      this.translationService
+        .translateTranscript(
+          transcriptId,
+          assetId,
+          courseId,
+          tenantId,
+          result.language ?? 'en'
+        )
+        .catch((err) =>
+          this.logger.error(
+            { err, assetId },
+            'Subtitle translation error (non-fatal)'
+          )
+        );
+
+      // Step 9: Extract concepts and publish to knowledge graph pipeline
       // Non-blocking: errors here must not fail the transcription job.
       this.extractAndPublishConcepts(result.text, courseId, tenantId).catch(
         (err) =>

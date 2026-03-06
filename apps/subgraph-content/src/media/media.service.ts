@@ -13,7 +13,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import { connect, StringCodec } from 'nats';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNotNull } from 'drizzle-orm';
 import { createDatabaseConnection, schema, closeAllPools } from '@edusphere/db';
 import { minioConfig } from '@edusphere/config';
 
@@ -244,6 +244,55 @@ export class MediaService implements OnModuleDestroy {
       );
       return null;
     }
+  }
+
+  /**
+   * Returns available translated subtitle tracks for a media asset.
+   * Only returns tracks where vtt_key is set (VTT file has been generated).
+   */
+  async getSubtitleTracks(
+    assetId: string
+  ): Promise<{ language: string; label: string; src: string }[]> {
+    const LANG_LABELS: Record<string, string> = {
+      en: 'English',
+      he: 'Hebrew',
+      ar: 'Arabic',
+      fr: 'French',
+      de: 'German',
+      es: 'Spanish',
+      ru: 'Russian',
+    };
+
+    const transcripts = await this.db
+      .select({
+        language: schema.transcripts.language,
+        vttKey: schema.transcripts.vtt_key,
+      })
+      .from(schema.transcripts)
+      .where(
+        and(
+          eq(schema.transcripts.asset_id, assetId),
+          isNotNull(schema.transcripts.vtt_key)
+        )
+      );
+
+    const tracks: { language: string; label: string; src: string }[] = [];
+    for (const t of transcripts) {
+      if (!t.vttKey) continue;
+      try {
+        const src = await this.getPresignedDownloadUrl(t.vttKey);
+        tracks.push({
+          language: t.language,
+          label: LANG_LABELS[t.language] ?? t.language.toUpperCase(),
+          src,
+        });
+      } catch {
+        this.logger.warn(
+          `Could not generate VTT URL for assetId=${assetId} lang=${t.language}`
+        );
+      }
+    }
+    return tracks;
   }
 
   private async publishMediaUploaded(payload: {

@@ -4,6 +4,18 @@ type PresignedUploadUrl {
   expiresAt: String!
 }
 
+"""
+An available subtitle track for a media asset.
+"""
+type SubtitleTrack {
+  """ BCP-47 language code, e.g. "he", "fr", "de". """
+  language: String!
+  """ Human-readable label for display in the player UI. """
+  label: String!
+  """ Presigned URL of the WebVTT subtitle file (valid for 15 minutes). """
+  src: String!
+}
+
 type MediaAsset {
   id: ID!
   courseId: ID!
@@ -20,6 +32,11 @@ type MediaAsset {
   hlsManifestUrl: String
   captionsUrl: String
   altText: String
+  """
+  Available subtitle tracks for this media asset.
+  Populated after AI subtitle translation completes for one or more target languages.
+  """
+  subtitleTracks: [SubtitleTrack!]!
 }
 
 enum MediaStatus {

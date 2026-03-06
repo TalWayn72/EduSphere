@@ -1,6 +1,6 @@
 #!/bin/sh
 # Root artifact check — block files that must never live in the project root
-staged_violations=$(git diff --cached --name-only | grep -E "^[^/]+\.(png|txt)$" | grep -v "^README\|^CLAUDE\|^OPEN_ISSUES\|^IMPLEMENTATION\|^API_CONTRACTS\|^CHANGELOG")
+staged_violations=$(git diff --cached --name-only | grep -E "^[^/]+\.(png|txt)$" | grep -v "^README\|^CLAUDE\|^OPEN_ISSUES\|^IMPLEMENTATION\|^API_CONTRACTS\|^CHANGELOG" || true)
 if [ -n "$staged_violations" ]; then
   echo "Pre-commit blocked: artifacts in project root"
   echo "$staged_violations"

@@ -1,9 +1,47 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 06 מרץ 2026 (Session 28 Phase 31 ✅ COMPLETE; web ~3544/3544 (276+ files), security 819/819 ✅, TypeScript 0 errors 26/26)
+**תאריך עדכון:** 06 מרץ 2026 (Session 28 Phase 32 ✅ COMPLETE; web ~3553/3553 (279+ files), security 819/819 ✅, TypeScript 0 errors 26/26)
 **מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 🔄 IN PROGRESS** + **BUG-054 Progress Bar ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings)
 **בדיקות:** Security: **819 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,453** (263 files, +138 Session 26) | Backend subgraphs: **2,296** (core 640 + content 1041 + annotation 144 + collab 161 + agent 599 + knowledge 509) | Gateway: **138** | i18n: ~247 | סה"כ: **>5,916 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+
+---
+
+## Phase 32 — Real-time AI Subtitle Translation (Session 28)
+
+**Status:** ✅ Complete
+**Date:** March 2026
+**PRD Gap closed:** §3.4 (G-2) — Real-time AI subtitle translation for multilingual organizations
+
+### Deliverables
+
+| Deliverable                                                                                 | Status | Files                                                                  |
+| ------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------- |
+| DB migration 0013: `transcripts.vtt_key TEXT` column                                        | ✅     | `packages/db/src/migrations/0013_transcript_vtt_key.sql`               |
+| Drizzle schema update — `vtt_key` on `transcripts` table                                    | ✅     | `packages/db/src/schema/content.ts`                                    |
+| `TranslationService` — LibreTranslate HTTP client, VTT gen, MinIO upload, NATS event        | ✅     | `apps/transcription-worker/src/translation/translation.service.ts`     |
+| `TranslationModule` — NestJS module wiring                                                  | ✅     | `apps/transcription-worker/src/translation/translation.module.ts`      |
+| `translation.types.ts` — `TranslationCompletedEvent` interface                              | ✅     | `apps/transcription-worker/src/translation/translation.types.ts`       |
+| `TranscriptionService` updated — Step 8 fires `translateTranscript` non-blocking            | ✅     | `apps/transcription-worker/src/transcription/transcription.service.ts` |
+| `TranscriptionModule` updated — imports `TranslationModule`                                 | ✅     | `apps/transcription-worker/src/transcription/transcription.module.ts`  |
+| GraphQL SDL — `SubtitleTrack` type + `subtitleTracks: [SubtitleTrack!]!` on `MediaAsset`    | ✅     | `apps/subgraph-content/src/media/media.graphql`                        |
+| `MediaService.getSubtitleTracks()` — queries DB + generates presigned VTT URLs              | ✅     | `apps/subgraph-content/src/media/media.service.ts`                     |
+| `MediaResolver.resolveSubtitleTracks()` — `@ResolveField` with graceful fallback            | ✅     | `apps/subgraph-content/src/media/media.resolver.ts`                    |
+| `VideoSubtitleSelector.tsx` — CC button, language dropdown, Off option, ARIA                | ✅     | `apps/web/src/components/VideoSubtitleSelector.tsx`                    |
+| `VideoPlayer.tsx` updated — `subtitleTracks` prop, `<track>` elements, selector integration | ✅     | `apps/web/src/components/VideoPlayer.tsx`                              |
+
+### Tests Added (Phase 32)
+
+| File                                   | Tests         | Coverage                                                                                           |
+| -------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| `translation.service.spec.ts` (NEW)    | 11            | onModuleDestroy, translateTranscript (4), translateText degradation (3), generateVtt (1)           |
+| `VideoPlayer.subtitles.test.tsx` (NEW) | 9             | No CC when empty, CC shows when tracks present, track elements, aria-selected, activate/deactivate |
+| `subtitle-tracks.spec.ts` (E2E — NEW)  | 10 + 3 visual | CC visibility, menu open, language list, active selection, Off option, raw string guard            |
+
+**New files:** `translation.service.ts`, `translation.module.ts`, `translation.types.ts`, `translation.service.spec.ts`, `VideoSubtitleSelector.tsx`, `VideoPlayer.subtitles.test.tsx`, `e2e/subtitle-tracks.spec.ts`
+**Visual regression screenshots:** `subtitle-selector-closed.png`, `subtitle-selector-open.png`, `subtitle-lang-selected.png`
+**Anti-recurrence:** `VideoPlayer.subtitles.test.tsx:35` — asserts CC button absent when `subtitleTracks=[]`, and `translation.service.spec.ts:62` — asserts `closeAllPools()` called on destroy.
+**Env vars:** `TRANSLATION_TARGETS` (comma-separated BCP-47 codes — empty = disabled), `LIBRE_TRANSLATE_URL` (LibreTranslate base URL)
 
 ---
 
@@ -15,26 +53,26 @@
 
 ### Deliverables
 
-| Deliverable | Status | Files |
-|-------------|--------|-------|
-| `useSketchCanvas.ts` hook with freehand, eraser, rect, arrow, ellipse, text tools | ✅ | `src/components/useSketchCanvas.ts` |
-| `VideoSketchToolbar.tsx` with 6 tool buttons + color picker swatch | ✅ | `src/components/VideoSketchToolbar.tsx` |
-| `VideoSketchOverlay.tsx` refactored — thin coordinator using new hook + toolbar | ✅ | `src/components/VideoSketchOverlay.tsx` |
-| Eraser (`destination-out` composite operation) | ✅ | `useSketchCanvas.ts` — renderPath eraser branch |
-| Rectangle tool (`strokeRect`) | ✅ | `useSketchCanvas.ts` — renderPath rect branch |
-| Arrow tool (line + arrowhead via `drawArrow`) | ✅ | `useSketchCanvas.ts` — renderPath arrow branch |
-| Ellipse tool (`ctx.ellipse`) | ✅ | `useSketchCanvas.ts` — renderPath ellipse branch |
-| Text tool (click → positioned `<input>` → `fillText` on Enter) | ✅ | `VideoSketchOverlay.tsx` — `textInput` state + `addTextPath` |
-| Color picker (`<input type="color">`) — default `#ef4444` | ✅ | `VideoSketchToolbar.tsx` — color swatch + input |
-| Cancel resets tool + color to defaults | ✅ | `VideoSketchOverlay.tsx` — `handleCancel` |
+| Deliverable                                                                       | Status | Files                                                        |
+| --------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------ |
+| `useSketchCanvas.ts` hook with freehand, eraser, rect, arrow, ellipse, text tools | ✅     | `src/components/useSketchCanvas.ts`                          |
+| `VideoSketchToolbar.tsx` with 6 tool buttons + color picker swatch                | ✅     | `src/components/VideoSketchToolbar.tsx`                      |
+| `VideoSketchOverlay.tsx` refactored — thin coordinator using new hook + toolbar   | ✅     | `src/components/VideoSketchOverlay.tsx`                      |
+| Eraser (`destination-out` composite operation)                                    | ✅     | `useSketchCanvas.ts` — renderPath eraser branch              |
+| Rectangle tool (`strokeRect`)                                                     | ✅     | `useSketchCanvas.ts` — renderPath rect branch                |
+| Arrow tool (line + arrowhead via `drawArrow`)                                     | ✅     | `useSketchCanvas.ts` — renderPath arrow branch               |
+| Ellipse tool (`ctx.ellipse`)                                                      | ✅     | `useSketchCanvas.ts` — renderPath ellipse branch             |
+| Text tool (click → positioned `<input>` → `fillText` on Enter)                    | ✅     | `VideoSketchOverlay.tsx` — `textInput` state + `addTextPath` |
+| Color picker (`<input type="color">`) — default `#ef4444`                         | ✅     | `VideoSketchToolbar.tsx` — color swatch + input              |
+| Cancel resets tool + color to defaults                                            | ✅     | `VideoSketchOverlay.tsx` — `handleCancel`                    |
 
 ### Tests Added (Phase 31)
 
-| File | Tests | Coverage |
-|------|-------|----------|
-| `VideoSketchOverlay.tools.test.tsx` (NEW) | 21 | Tool selector (8), color picker (5), text tool (5), eraser integration (1), cancel reset (1) |
-| `VideoSketchOverlay.test.tsx` (existing — all pass) | 13 | Toggle, canvas, save, cancel, SVG display — all still passing |
-| `video-sketch.spec.ts` (E2E — NEW) | 20 | Tool selector, color picker, text tool, cancel/save, 4 visual regression shots |
+| File                                                | Tests | Coverage                                                                                     |
+| --------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------- |
+| `VideoSketchOverlay.tools.test.tsx` (NEW)           | 21    | Tool selector (8), color picker (5), text tool (5), eraser integration (1), cancel reset (1) |
+| `VideoSketchOverlay.test.tsx` (existing — all pass) | 13    | Toggle, canvas, save, cancel, SVG display — all still passing                                |
+| `video-sketch.spec.ts` (E2E — NEW)                  | 20    | Tool selector, color picker, text tool, cancel/save, 4 visual regression shots               |
 
 **New files:** `useSketchCanvas.ts`, `VideoSketchToolbar.tsx`, `VideoSketchOverlay.tools.test.tsx`, `e2e/video-sketch.spec.ts`
 **Visual regression screenshots:** `sketch-toolbar-freehand.png`, `sketch-toolbar-eraser.png`, `sketch-toolbar-rect.png`, `sketch-toggle-inactive.png`
@@ -50,27 +88,27 @@
 
 ### Deliverables
 
-| Deliverable | Status | Files |
-|-------------|--------|-------|
-| Personal wiki view in KnowledgeGraph (`viewMode: 'personal'`) | ✅ | `KnowledgeGraph.tsx` — viewMode toggle (Global/My Wiki tabs) |
-| PersonalGraphView component (SVG, 6 mock annotation nodes, course legend) | ✅ | `PersonalGraphView.tsx` |
-| Mock personal graph data | ✅ | `src/lib/mock-personal-graph.ts` |
-| Propose to Official button on PERSONAL annotations | ✅ | `AnnotationItem.tsx` — `onPropose` prop, `canPropose` guard |
-| AnnotationMergeRequestModal (textarea, char count, submit/cancel) | ✅ | `AnnotationMergeRequestModal.tsx` |
-| AnnotationPanel merge request flow (proposingId state, submitted badges) | ✅ | `AnnotationPanel.tsx` |
-| InstructorMergeQueuePage (approve/reject, diff view, resolved section) | ✅ | `InstructorMergeQueuePage.tsx` |
-| Route `/instructor/merge-queue` | ✅ | `router.tsx` |
+| Deliverable                                                               | Status | Files                                                        |
+| ------------------------------------------------------------------------- | ------ | ------------------------------------------------------------ |
+| Personal wiki view in KnowledgeGraph (`viewMode: 'personal'`)             | ✅     | `KnowledgeGraph.tsx` — viewMode toggle (Global/My Wiki tabs) |
+| PersonalGraphView component (SVG, 6 mock annotation nodes, course legend) | ✅     | `PersonalGraphView.tsx`                                      |
+| Mock personal graph data                                                  | ✅     | `src/lib/mock-personal-graph.ts`                             |
+| Propose to Official button on PERSONAL annotations                        | ✅     | `AnnotationItem.tsx` — `onPropose` prop, `canPropose` guard  |
+| AnnotationMergeRequestModal (textarea, char count, submit/cancel)         | ✅     | `AnnotationMergeRequestModal.tsx`                            |
+| AnnotationPanel merge request flow (proposingId state, submitted badges)  | ✅     | `AnnotationPanel.tsx`                                        |
+| InstructorMergeQueuePage (approve/reject, diff view, resolved section)    | ✅     | `InstructorMergeQueuePage.tsx`                               |
+| Route `/instructor/merge-queue`                                           | ✅     | `router.tsx`                                                 |
 
 ### Tests Added (Phase 30)
 
-| File | Tests | Coverage |
-|------|-------|----------|
-| `PersonalGraphView.test.tsx` | 9 | Node rendering, click selection, detail panel, deselect, course legend, timestamps |
-| `AnnotationMergeRequestModal.test.tsx` | 7 | Empty submit guard, onSubmit, onCancel, aria attributes, char count |
-| `InstructorMergeQueuePage.test.tsx` | 10 | Pending count, approve/reject, empty state, no raw errors |
-| `AnnotationItem.propose.test.tsx` | 7 | PERSONAL only, own-user only, aria-label, onPropose callback |
-| `KnowledgeGraph.personal.test.tsx` | 8 | Tab switching, personal view rendering, search hidden in personal mode |
-| `annotation-merge-request.spec.ts` (E2E) | 15 | Personal tabs, node click, KG visual regression (2 shots), merge queue, approve/reject, visual regression (2 shots) |
+| File                                     | Tests | Coverage                                                                                                            |
+| ---------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------- |
+| `PersonalGraphView.test.tsx`             | 9     | Node rendering, click selection, detail panel, deselect, course legend, timestamps                                  |
+| `AnnotationMergeRequestModal.test.tsx`   | 7     | Empty submit guard, onSubmit, onCancel, aria attributes, char count                                                 |
+| `InstructorMergeQueuePage.test.tsx`      | 10    | Pending count, approve/reject, empty state, no raw errors                                                           |
+| `AnnotationItem.propose.test.tsx`        | 7     | PERSONAL only, own-user only, aria-label, onPropose callback                                                        |
+| `KnowledgeGraph.personal.test.tsx`       | 8     | Tab switching, personal view rendering, search hidden in personal mode                                              |
+| `annotation-merge-request.spec.ts` (E2E) | 15    | Personal tabs, node click, KG visual regression (2 shots), merge queue, approve/reject, visual regression (2 shots) |
 
 **New E2E specs:** `apps/web/e2e/annotation-merge-request.spec.ts`
 **Visual regression screenshots:** `kg-global-view.png`, `kg-personal-wiki.png`, `instructor-merge-queue.png`, `instructor-merge-queue-after-approve.png`
@@ -86,16 +124,17 @@
 
 ### Deliverables
 
-| ID | Feature | Status | Tests |
-|----|---------|--------|-------|
-| T1 | `@stripe/stripe-js` + `@stripe/react-stripe-js` installed in web app | ✅ | — |
-| T2 | `CheckoutPage` — Stripe Elements form, clientSecret from URL, success redirect | ✅ | 8 unit |
-| T3 | `PurchaseCourseButton` — passes `secret+session+course` via URL; removed console.error | ✅ | — |
-| T4 | `/checkout` route added to `router.tsx` | ✅ | route test |
-| T5 | Security: clientSecret never in localStorage, never in DOM text, user-safe error messages | ✅ | security test |
-| T6 | `checkout-flow.spec.ts` — 8 E2E + 2 visual regression screenshots | ✅ | 8 E2E |
+| ID  | Feature                                                                                   | Status | Tests         |
+| --- | ----------------------------------------------------------------------------------------- | ------ | ------------- |
+| T1  | `@stripe/stripe-js` + `@stripe/react-stripe-js` installed in web app                      | ✅     | —             |
+| T2  | `CheckoutPage` — Stripe Elements form, clientSecret from URL, success redirect            | ✅     | 8 unit        |
+| T3  | `PurchaseCourseButton` — passes `secret+session+course` via URL; removed console.error    | ✅     | —             |
+| T4  | `/checkout` route added to `router.tsx`                                                   | ✅     | route test    |
+| T5  | Security: clientSecret never in localStorage, never in DOM text, user-safe error messages | ✅     | security test |
+| T6  | `checkout-flow.spec.ts` — 8 E2E + 2 visual regression screenshots                         | ✅     | 8 E2E         |
 
 ### Security Notes (P-3)
+
 - `clientSecret` lives in URL search params (in-memory), never localStorage
 - User-facing errors: card decline messages shown; raw JS errors never exposed
 - Graceful fallback when `VITE_STRIPE_PUBLISHABLE_KEY` not set
@@ -111,35 +150,38 @@
 
 ### Deliverables
 
-| ID | Feature | Status | Tests |
-|----|---------|--------|-------|
-| T1-CRITICAL | migration 0012: custom SQL runner in migrate.ts (idempotent, `custom_migrations` table) | ✅ | file-content unit test |
-| T1-CRITICAL | Husky v10 — pre-commit hook already v10 compatible (verified) | ✅ | — |
-| T1-CRITICAL | ServiceWorker registration: pwa.ts onNeedRefresh+onOfflineReady+onRegistered; vite.config.ts theme_color #6366F1 | ✅ | existing SW tests |
-| T2-SI3 | SI-3 fix: `encryptField/decryptField/deriveTenantKey` exported from `@edusphere/db` | ✅ | — |
-| T2-SI3 | SI-3 fix: `createLiveSession` encrypts passwords before DB write; `getJoinUrl` decrypts before BBB | ✅ | 10 unit + 6 memory spec |
-| T2-SI3 | SI-3 regression tests: assert plaintext never written, `decryptField` called on join | ✅ | 2 SI-3 regression tests |
-| T2 | `useLiveSessionActions` hook — start/end/join/cancel mutations with toast error handling | ✅ | LiveSessionsPage.test.tsx |
-| T2 | `LiveSessionsPage` wired to mutations via useLiveSessionActions | ✅ | 72 unit (LiveSessionsPage.test.tsx) |
-| T2 | `live-session.queries.ts` — all 4 mutations defined (START/END/JOIN/CANCEL) | ✅ | — |
-| T3 | `useOfflineQueue` — `online` event calls `flush(onFlush)` when callback provided | ✅ | 18 unit (useOfflineQueue.test.ts) |
-| T4 | SkillTree backend: `user_skill_mastery` real data query — already complete (Phase 27) | ✅ | skill-tree.service.ts verified |
-| T5 | ARIA: level filter group `role="group" aria-label`, sort select `aria-label`, `aria-pressed` on active button | ✅ | 5 ARIA tests in CoursesDiscoveryPage.test.tsx |
-| T6 | CoursesDiscovery: Category + Level + Sort filters implemented | ✅ | 24 unit (CoursesDiscoveryPage.test.tsx) |
+| ID          | Feature                                                                                                          | Status | Tests                                         |
+| ----------- | ---------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------- |
+| T1-CRITICAL | migration 0012: custom SQL runner in migrate.ts (idempotent, `custom_migrations` table)                          | ✅     | file-content unit test                        |
+| T1-CRITICAL | Husky v10 — pre-commit hook already v10 compatible (verified)                                                    | ✅     | —                                             |
+| T1-CRITICAL | ServiceWorker registration: pwa.ts onNeedRefresh+onOfflineReady+onRegistered; vite.config.ts theme_color #6366F1 | ✅     | existing SW tests                             |
+| T2-SI3      | SI-3 fix: `encryptField/decryptField/deriveTenantKey` exported from `@edusphere/db`                              | ✅     | —                                             |
+| T2-SI3      | SI-3 fix: `createLiveSession` encrypts passwords before DB write; `getJoinUrl` decrypts before BBB               | ✅     | 10 unit + 6 memory spec                       |
+| T2-SI3      | SI-3 regression tests: assert plaintext never written, `decryptField` called on join                             | ✅     | 2 SI-3 regression tests                       |
+| T2          | `useLiveSessionActions` hook — start/end/join/cancel mutations with toast error handling                         | ✅     | LiveSessionsPage.test.tsx                     |
+| T2          | `LiveSessionsPage` wired to mutations via useLiveSessionActions                                                  | ✅     | 72 unit (LiveSessionsPage.test.tsx)           |
+| T2          | `live-session.queries.ts` — all 4 mutations defined (START/END/JOIN/CANCEL)                                      | ✅     | —                                             |
+| T3          | `useOfflineQueue` — `online` event calls `flush(onFlush)` when callback provided                                 | ✅     | 18 unit (useOfflineQueue.test.ts)             |
+| T4          | SkillTree backend: `user_skill_mastery` real data query — already complete (Phase 27)                            | ✅     | skill-tree.service.ts verified                |
+| T5          | ARIA: level filter group `role="group" aria-label`, sort select `aria-label`, `aria-pressed` on active button    | ✅     | 5 ARIA tests in CoursesDiscoveryPage.test.tsx |
+| T6          | CoursesDiscovery: Category + Level + Sort filters implemented                                                    | ✅     | 24 unit (CoursesDiscoveryPage.test.tsx)       |
 
 ### E2E Specs (new in Phase 28)
+
 - `apps/web/e2e/offline-sync.spec.ts` — offline queue + online flush scenarios
 - `apps/web/e2e/live-sessions-mutations.spec.ts` — start/end/join/cancel mutation flows
 - `apps/web/e2e/course-discovery-filters.spec.ts` — category, level, sort filter E2E
 - `apps/web/e2e/aria-phase28.spec.ts` — ARIA role + aria-pressed + aria-label assertions
 
 ### Security Fixes (Phase 28 SI-3 Critical)
+
 - **SI-3 CRITICAL**: `live-session.service.ts` now calls `encryptField()` before every DB write of passwords
 - **SI-3 CRITICAL**: `getJoinUrl()` calls `decryptField()` before passing password to BBB client
 - **SI-3**: `@edusphere/db` exports `encryptField/decryptField/encryptFieldNullable/decryptFieldNullable/deriveTenantKey`
 - Regression tests: 2 dedicated SI-3 tests in `live-session.service.spec.ts` guard against regressions
 
 ### Test Counts (Phase 28 additions)
+
 - subgraph-content live-session: **+10 unit + 6 memory** (SI-3 tests included)
 - web CoursesDiscoveryPage: **+24 unit** (level, sort, ARIA)
 - web LiveSessionsPage: **+72 unit** (mutation wiring)
@@ -157,33 +199,37 @@
 
 ### Deliverables
 
-| ID | Feature | Status | Tests |
-|----|---------|--------|-------|
-| T1.1 | Route fix: /explore, /discover, /courses/discover | ✅ | 3 unit + 11 E2E |
-| T1.2 | Live Sessions (FE + BE + NATS) | ✅ | 21 unit + ~20 E2E + 12 visual |
-| T2.2 | Offline Web (ServiceWorker + IndexedDB + OfflineBanner) | ✅ | 32 unit + 5 E2E + 12 visual |
-| T2.3 | KnowledgeGraph courseId context + AdminActivityFeed | ✅ | 21 unit + 11 E2E + 13 visual |
-| BUG-054 | Progress bar indicatorClassName fix | ✅ | 20 unit + 8 E2E + 1 visual |
+| ID      | Feature                                                 | Status | Tests                         |
+| ------- | ------------------------------------------------------- | ------ | ----------------------------- |
+| T1.1    | Route fix: /explore, /discover, /courses/discover       | ✅     | 3 unit + 11 E2E               |
+| T1.2    | Live Sessions (FE + BE + NATS)                          | ✅     | 21 unit + ~20 E2E + 12 visual |
+| T2.2    | Offline Web (ServiceWorker + IndexedDB + OfflineBanner) | ✅     | 32 unit + 5 E2E + 12 visual   |
+| T2.3    | KnowledgeGraph courseId context + AdminActivityFeed     | ✅     | 21 unit + 11 E2E + 13 visual  |
+| BUG-054 | Progress bar indicatorClassName fix                     | ✅     | 20 unit + 8 E2E + 1 visual    |
 
 ### Security Fixes (Phase 27 Security Audit)
+
 - HIGH: SI-3 live_sessions attendeePasswordEnc/moderatorPasswordEnc (plaintext → encrypted columns)
 - MEDIUM: Raw GraphQL error message exposed in LiveSessionsPage DOM (→ generic user message)
 - LOW: console.warn removed from useOfflineStatus + useOfflineQueue
 
 ### Test Coverage
+
 - Total: 175 tests (109 unit + 66 E2E)
 - Visual regression: 44 screenshots
 - PenTests: PENTEST-001..023 (auth bypass, IDOR, XSS, injection)
 - TypeScript: 0 errors across 26 packages
 
 ### Plans & Docs
+
 - QA plan: docs/plans/phase-27-qa-test-plan.md
 - Deployment plan: docs/plans/phase-27-deployment-plan.md
 - Security audit: docs/plans/phase-27-security-audit.md
 
 ### Anti-recurrence
+
 - Progress bar fix: progress.test.tsx REGRESSION BUG-054 tests guard against re-introduction
-- Password encryption: columns named *Enc to force service-layer awareness
+- Password encryption: columns named \*Enc to force service-layer awareness
 
 ---
 
@@ -192,17 +238,22 @@
 **Status:** ✅ Fixed | **Severity:** 🟡 Medium (UI visual bug) | **Date:** 06 Mar 2026
 
 ### Problem
+
 The Offline Storage progress bar on `/settings` appeared completely filled (solid blue) even when storage usage was 0% (e.g. 1016 B out of 897.8 MB). The bar looked broken — full bar + "(0%)" text.
 
 ### Root Cause Chain
+
 `SettingsPage.tsx:117`:
+
 ```tsx
 <Progress value={usagePercent} className={barColor} />
 // barColor = 'bg-primary' | 'bg-yellow-500' | 'bg-destructive'
 ```
+
 The `className` prop is forwarded to the **container div** (outer wrapper). Applying `bg-primary` to the container overrode the existing `bg-primary/20` (20% opacity background), making the entire container solid blue — visually indistinguishable from a full bar — regardless of `value`. The indicator div was correctly translated off-screen via `translateX(-100%)` but was invisible since the container background was now solid.
 
 ### Discovery List (3 Waves)
+
 **Wave 1 (exact match):** Only `SettingsPage.tsx:117` passes a `bg-color` class to `<Progress className>`. All other usages (`AssessmentResultReport`, `PollWidget`, `SkillGapWidget`, `ProgramDetailPage`, `ProgramsPage`) pass only layout classes (`h-2`, `h-3`, `flex-1`) — unaffected.
 
 **Wave 2 (similar files):** All pages/hooks/components checked — no other component makes this mistake.
@@ -210,17 +261,20 @@ The `className` prop is forwarded to the **container div** (outer wrapper). Appl
 **Wave 3 (class of bug):** No other `bg-` color is passed to `<Progress className>` anywhere in the codebase.
 
 ### Fix (Round 1)
+
 1. **`apps/web/src/components/ui/progress.tsx`** — Added `indicatorClassName?: string` prop that applies to the inner indicator div only.
 2. **`apps/web/src/pages/SettingsPage.tsx:117`** — Changed `className={barColor}` → `indicatorClassName={barColor}`.
 
 ### Tests Added
-| File | Tests | Type |
-|------|-------|------|
-| `apps/web/src/components/ui/progress.test.tsx` | 9 new — indicatorClassName vs className isolation, translateX at 0/50/100%, BUG-054 regression | Unit |
-| `apps/web/src/pages/SettingsPage.test.tsx` | +8 new — storage card hidden/loading/visible, REGRESSION: translateX(-100%) at 0%, container has no barColor, 50% progress, clearLocalStorage | Unit |
-| `apps/web/e2e/settings-storage.spec.ts` | NEW — 7 scenarios: bar visible, translateX near -100% at ~0% usage, container lacks bg-primary, aria-valuenow=0, usage text, 85% state, visual screenshot regression | Playwright E2E |
+
+| File                                           | Tests                                                                                                                                                                | Type           |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `apps/web/src/components/ui/progress.test.tsx` | 9 new — indicatorClassName vs className isolation, translateX at 0/50/100%, BUG-054 regression                                                                       | Unit           |
+| `apps/web/src/pages/SettingsPage.test.tsx`     | +8 new — storage card hidden/loading/visible, REGRESSION: translateX(-100%) at 0%, container has no barColor, 50% progress, clearLocalStorage                        | Unit           |
+| `apps/web/e2e/settings-storage.spec.ts`        | NEW — 7 scenarios: bar visible, translateX near -100% at ~0% usage, container lacks bg-primary, aria-valuenow=0, usage text, 85% state, visual screenshot regression | Playwright E2E |
 
 ### Anti-Recurrence
+
 - `progress.test.tsx:REGRESSION BUG-054` explicitly asserts that `className` on container NEVER carries `bg-primary/bg-destructive/bg-yellow-500`
 - `SettingsPage.test.tsx:REGRESSION BUG-054` asserts `translateX(-100%)` at 0% usage and clean container classes
 - `e2e/settings-storage.spec.ts` asserts correct DOM transform + missing solid container class via live browser check
@@ -234,6 +288,7 @@ The `className` prop is forwarded to the **container div** (outer wrapper). Appl
 ### Features Implemented
 
 #### G2 — Canvas/Spatial Annotations (Video Sketch Overlay)
+
 - NEW `VideoSketchOverlay.tsx` — HTML5 Canvas freehand sketch overlay rendered as `absolute inset-0` over video container
 - `useCanvasDrawing` internal hook: mouse/touch events → normalized (0-1) path coordinates, memory-safe event listener cleanup
 - Sketch toggle button → activates canvas with Save/Clear/Cancel toolbar; Save persists `SketchPath[]` + video timestamp
@@ -242,6 +297,7 @@ The `className` prop is forwarded to the **container div** (outer wrapper). Appl
 - `UnifiedLearningPage.tools-panel.tsx` accepts optional `onSketchSave` + `existingSketches` props and renders `VideoSketchOverlay` inside video container
 
 #### G5 — Agent Studio (No-Code Drag & Drop Workflow Builder)
+
 - NEW `AgentStudioPage.tsx` at route `/agents/studio` — visual LangGraph-style agent composer
 - Left palette: 6 draggable node types (Start, Assess, Explain, Quiz, Debate, End) with color-coded icons
 - Center canvas: HTML5 DnD drop zone, renders positioned nodes + SVG bezier edge connections with arrow markers
@@ -252,31 +308,34 @@ The `className` prop is forwarded to the **container div** (outer wrapper). Appl
 - Route registered in `router.tsx` at `/agents/studio`
 
 ### Tests Added
-| File | Tests |
-|------|-------|
-| `VideoSketchOverlay.test.tsx` | 13 new (G2: toggle, draw flow, save with/without paths, saving indicator, SVG display, ±3s window, active-mode hides SVG, toolbar) |
-| `AgentStudioPage.test.tsx` | 19 new (G5: render, palette 6 types, canvas, properties, name edit, save/deploy disabled when empty, drop adds node, select+properties, delete, connect, edge SVG, stats) |
-| `apps/web/e2e/agent-studio.spec.ts` | NEW E2E — 10 scenarios: page structure (palette/canvas/properties), all 6 node types, empty-state, disabled buttons, node drop interactions, Save mutation mock, visual regression (empty + with-node screenshots) |
+
+| File                                        | Tests                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VideoSketchOverlay.test.tsx`               | 13 new (G2: toggle, draw flow, save with/without paths, saving indicator, SVG display, ±3s window, active-mode hides SVG, toolbar)                                                                                                                                                            |
+| `AgentStudioPage.test.tsx`                  | 19 new (G5: render, palette 6 types, canvas, properties, name edit, save/deploy disabled when empty, drop adds node, select+properties, delete, connect, edge SVG, stats)                                                                                                                     |
+| `apps/web/e2e/agent-studio.spec.ts`         | NEW E2E — 10 scenarios: page structure (palette/canvas/properties), all 6 node types, empty-state, disabled buttons, node drop interactions, Save mutation mock, visual regression (empty + with-node screenshots)                                                                            |
 | `apps/web/e2e/video-sketch-overlay.spec.ts` | NEW E2E — 13 scenarios: inactive state (toggle visible, toolbar hidden, canvas absent), active state (canvas + toolbar appear, SVG hidden, draw mouse events, cancel returns to inactive), Save flow (button states, "Saving…" transition), visual regression (inactive + active screenshots) |
 
 ### Files Changed
-| File | Change |
-|------|--------|
-| `apps/web/src/components/VideoSketchOverlay.tsx` | NEW — canvas sketch overlay + SVG display |
-| `apps/web/src/components/VideoSketchOverlay.test.tsx` | NEW — 13 tests |
-| `apps/web/src/hooks/useVideoAnnotations.ts` | +addSketchAnnotation, +SketchPath import |
-| `apps/web/src/hooks/useVideoAnnotations.test.ts` | +VideoSketchOverlay mock |
-| `apps/web/src/hooks/useVideoAnnotations.memory.test.ts` | +VideoSketchOverlay mock |
-| `apps/web/src/pages/UnifiedLearningPage.tools-panel.tsx` | +onSketchSave + existingSketches props + VideoSketchOverlay |
-| `apps/web/src/pages/UnifiedLearningPage.tools-panel.test.tsx` | +VideoSketchOverlay mock |
-| `apps/web/src/pages/AgentStudioPage.tsx` | NEW — G5 no-code agent builder |
-| `apps/web/src/pages/AgentStudioPage.test.tsx` | NEW — 19 tests |
-| `apps/web/src/lib/graphql/agent.queries.ts` | +CREATE_AGENT_WORKFLOW_MUTATION |
-| `apps/web/src/lib/router.tsx` | +/agents/studio route + AgentStudioPage lazy import |
-| `apps/web/e2e/agent-studio.spec.ts` | NEW — Playwright E2E for AgentStudioPage (10 scenarios + visual regression) |
-| `apps/web/e2e/video-sketch-overlay.spec.ts` | NEW — Playwright E2E for VideoSketchOverlay (13 scenarios + visual regression) |
+
+| File                                                          | Change                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `apps/web/src/components/VideoSketchOverlay.tsx`              | NEW — canvas sketch overlay + SVG display                                      |
+| `apps/web/src/components/VideoSketchOverlay.test.tsx`         | NEW — 13 tests                                                                 |
+| `apps/web/src/hooks/useVideoAnnotations.ts`                   | +addSketchAnnotation, +SketchPath import                                       |
+| `apps/web/src/hooks/useVideoAnnotations.test.ts`              | +VideoSketchOverlay mock                                                       |
+| `apps/web/src/hooks/useVideoAnnotations.memory.test.ts`       | +VideoSketchOverlay mock                                                       |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.tsx`      | +onSketchSave + existingSketches props + VideoSketchOverlay                    |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.test.tsx` | +VideoSketchOverlay mock                                                       |
+| `apps/web/src/pages/AgentStudioPage.tsx`                      | NEW — G5 no-code agent builder                                                 |
+| `apps/web/src/pages/AgentStudioPage.test.tsx`                 | NEW — 19 tests                                                                 |
+| `apps/web/src/lib/graphql/agent.queries.ts`                   | +CREATE_AGENT_WORKFLOW_MUTATION                                                |
+| `apps/web/src/lib/router.tsx`                                 | +/agents/studio route + AgentStudioPage lazy import                            |
+| `apps/web/e2e/agent-studio.spec.ts`                           | NEW — Playwright E2E for AgentStudioPage (10 scenarios + visual regression)    |
+| `apps/web/e2e/video-sketch-overlay.spec.ts`                   | NEW — Playwright E2E for VideoSketchOverlay (13 scenarios + visual regression) |
 
 ### Anti-Recurrence
+
 - Canvas event listeners removed in `useEffect` cleanup (memory-safe per CLAUDE.md rules)
 - `data-testid="sketch-svg-overlay"` on overlay SVG to avoid false-positive queries on Lucide icon SVGs
 - `onSketchSave` optional prop — if not provided, `VideoSketchOverlay` not rendered (no dead UI)
@@ -292,24 +351,28 @@ The `className` prop is forwarded to the **container div** (outer wrapper). Appl
 ### Features Implemented
 
 #### G8 — Auto-Flashcards (Annotation → SRS)
+
 - `CommentCard` gains **Flashcard** button (Zap icon, amber) — calls `onFlashcard(annotationId, content)`
 - `useAnnotations` adds `createFlashcard()` callback using existing `createReviewCard` SRS mutation (content truncated to 200 chars)
 - `useDocumentAnnotations` exposes `createFlashcard`; wired through `DocumentAnnotationPage` + `RichDocumentPage`
 - State: `flashcardSaved` tracks one-time save, shows "Saved!" feedback
 
 #### G6 — Deep Linking (Search → Video Timestamp)
+
 - `SemanticResult` backend type gains `startTime: Float` in GraphQL SDL + `graph-search-helpers.ts`
 - pgvector SQL selects `ts.start_time`; ILIKE fallback selects `start_time` from `transcript_segments`
 - `Search.tsx`: transcript results generate `/learn/:entityId?t=<seconds>` href + show formatted time (e.g., `2:05`) as meta instead of similarity %
 - Concept results: `startTime: null`, meta stays `XX% match`
 
 #### G1 — Context Panel (HybridRAG sidebar)
+
 - NEW `ContextPanel.tsx` — debounced (600ms) HybridRAG sidebar using `searchSemantic`
 - Active transcript segment text → semantic query → shows Related Concepts (amber) + Related Segments (green) with jump-to-timestamp buttons
 - Replaced "Collaboration coming soon" 3rd tab in `UnifiedLearningPage.tools-panel.tsx` with Context tab
 - `activeSegment` computed via `useMemo` from transcript + currentTime
 
 #### G3 — Annotation Promote (INSTRUCTOR layer)
+
 - Backend: `promoteAnnotation(id: ID!): Annotation!` mutation in SDL + `AnnotationService.promote()` + resolver (requires INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN role)
 - Frontend: `PROMOTE_ANNOTATION_MUTATION` in `annotation.queries.ts`
 - `useAnnotations` adds `promoteAnnotation()` callback; `useDocumentAnnotations` exposes it
@@ -317,44 +380,47 @@ The `className` prop is forwarded to the **container div** (outer wrapper). Appl
 - Wired through `WordCommentPanel` → `DocumentAnnotationPage` + `RichDocumentPage`
 
 ### Tests Added
-| File | Tests |
-|------|-------|
-| `ContextPanel.test.tsx` | 15 new (G1: debounce, concepts, segments, jump-to, empty states) |
-| `Search.test.tsx` | +4 (G6: deep-link URL, formatted time meta, concept % meta, null startTime) |
-| `useAnnotations.test.ts` | +3 (G8: createFlashcard) + PROMOTE_ANNOTATION_MUTATION mock fix |
-| `graph-search.service.spec.ts` | +2 (G6: startTime in vector results, null for concepts) |
+
+| File                           | Tests                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------- |
+| `ContextPanel.test.tsx`        | 15 new (G1: debounce, concepts, segments, jump-to, empty states)            |
+| `Search.test.tsx`              | +4 (G6: deep-link URL, formatted time meta, concept % meta, null startTime) |
+| `useAnnotations.test.ts`       | +3 (G8: createFlashcard) + PROMOTE_ANNOTATION_MUTATION mock fix             |
+| `graph-search.service.spec.ts` | +2 (G6: startTime in vector results, null for concepts)                     |
 
 ### Anti-Recurrence
+
 - ContextPanel timer uses `return () => clearTimeout(t)` in useEffect cleanup (memory safe)
 - All new mutations mocked in both `useAnnotations.test.ts` AND `useAnnotations.memory.test.ts`
 - Vector search tests with fewer results than limit must set up `mockDbSelect` for ILIKE fallback
 
 ### Files Changed
-| File | Change |
-|------|--------|
-| `apps/web/src/components/annotation/CommentCard.tsx` | +Flashcard + Promote buttons |
-| `apps/web/src/components/annotation/WordCommentPanel.tsx` | +onFlashcard, onPromote props |
-| `apps/web/src/hooks/useAnnotations.ts` | +createFlashcard, promoteAnnotation |
-| `apps/web/src/hooks/useDocumentAnnotations.ts` | +promoteAnnotation exposed |
-| `apps/web/src/pages/DocumentAnnotationPage.tsx` | +promoteAnnotation wired |
-| `apps/web/src/pages/RichDocumentPage.tsx` | +promoteAnnotation wired |
-| `apps/web/src/lib/graphql/annotation.queries.ts` | +PROMOTE_ANNOTATION_MUTATION |
-| `apps/subgraph-annotation/src/annotation/annotation.graphql` | +promoteAnnotation mutation |
-| `apps/subgraph-annotation/src/annotation/annotation.service.ts` | +promote() method |
-| `apps/subgraph-annotation/src/annotation/annotation.resolver.ts` | +promoteAnnotation resolver |
-| `apps/subgraph-knowledge/src/graph/graph.graphql` | +startTime: Float on SemanticResult |
-| `apps/subgraph-knowledge/src/graph/graph-search-helpers.ts` | +startTime field |
-| `apps/subgraph-knowledge/src/graph/graph-search.service.ts` | +start_time in SQL queries |
-| `apps/web/src/lib/graphql/knowledge.queries.ts` | +startTime in SEARCH_SEMANTIC_QUERY |
-| `apps/web/src/pages/Search.tsx` | Deep-link URLs + formatted time meta |
-| `apps/web/src/components/ContextPanel.tsx` | NEW — HybridRAG context panel |
-| `apps/web/src/pages/UnifiedLearningPage.tools-panel.tsx` | Collab→Context tab |
-| `apps/web/src/pages/UnifiedLearningPage.tools-panel.test.tsx` | Updated collab→context test + ContextPanel mock |
-| `apps/web/src/hooks/useAnnotations.test.ts` | +PROMOTE_ANNOTATION_MUTATION mock |
-| `apps/web/src/hooks/useAnnotations.memory.test.ts` | +PROMOTE_ANNOTATION_MUTATION mock |
-| `apps/web/src/components/ContextPanel.test.tsx` | NEW — 15 tests |
-| `apps/web/src/pages/Search.test.tsx` | +4 G6 deep-link tests |
-| `apps/subgraph-knowledge/src/graph/graph-search.service.spec.ts` | +mockDbSelect for ILIKE fallback |
+
+| File                                                             | Change                                          |
+| ---------------------------------------------------------------- | ----------------------------------------------- |
+| `apps/web/src/components/annotation/CommentCard.tsx`             | +Flashcard + Promote buttons                    |
+| `apps/web/src/components/annotation/WordCommentPanel.tsx`        | +onFlashcard, onPromote props                   |
+| `apps/web/src/hooks/useAnnotations.ts`                           | +createFlashcard, promoteAnnotation             |
+| `apps/web/src/hooks/useDocumentAnnotations.ts`                   | +promoteAnnotation exposed                      |
+| `apps/web/src/pages/DocumentAnnotationPage.tsx`                  | +promoteAnnotation wired                        |
+| `apps/web/src/pages/RichDocumentPage.tsx`                        | +promoteAnnotation wired                        |
+| `apps/web/src/lib/graphql/annotation.queries.ts`                 | +PROMOTE_ANNOTATION_MUTATION                    |
+| `apps/subgraph-annotation/src/annotation/annotation.graphql`     | +promoteAnnotation mutation                     |
+| `apps/subgraph-annotation/src/annotation/annotation.service.ts`  | +promote() method                               |
+| `apps/subgraph-annotation/src/annotation/annotation.resolver.ts` | +promoteAnnotation resolver                     |
+| `apps/subgraph-knowledge/src/graph/graph.graphql`                | +startTime: Float on SemanticResult             |
+| `apps/subgraph-knowledge/src/graph/graph-search-helpers.ts`      | +startTime field                                |
+| `apps/subgraph-knowledge/src/graph/graph-search.service.ts`      | +start_time in SQL queries                      |
+| `apps/web/src/lib/graphql/knowledge.queries.ts`                  | +startTime in SEARCH_SEMANTIC_QUERY             |
+| `apps/web/src/pages/Search.tsx`                                  | Deep-link URLs + formatted time meta            |
+| `apps/web/src/components/ContextPanel.tsx`                       | NEW — HybridRAG context panel                   |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.tsx`         | Collab→Context tab                              |
+| `apps/web/src/pages/UnifiedLearningPage.tools-panel.test.tsx`    | Updated collab→context test + ContextPanel mock |
+| `apps/web/src/hooks/useAnnotations.test.ts`                      | +PROMOTE_ANNOTATION_MUTATION mock               |
+| `apps/web/src/hooks/useAnnotations.memory.test.ts`               | +PROMOTE_ANNOTATION_MUTATION mock               |
+| `apps/web/src/components/ContextPanel.test.tsx`                  | NEW — 15 tests                                  |
+| `apps/web/src/pages/Search.test.tsx`                             | +4 G6 deep-link tests                           |
+| `apps/subgraph-knowledge/src/graph/graph-search.service.spec.ts` | +mockDbSelect for ILIKE fallback                |
 
 ---
 
@@ -363,35 +429,41 @@ The `className` prop is forwarded to the **container div** (outer wrapper). Appl
 **Status:** ✅ Done | **Severity:** 🟡 Medium (feature completeness) | **Date:** 05 Mar 2026
 
 ### Problem
+
 LessonResultsPage only showed a basic status card. The full pipeline output (10 modules: INGESTION, ASR, CONTENT_CLEANING, NER_SOURCE_LINKING, SUMMARIZATION, STRUCTURED_NOTES, DIAGRAM_GENERATOR, CITATION_VERIFIER, QA_GATE, PUBLISH_SHARE) was not displayed. E2E tests (28 tests) were failing because `@urql/exchange-graphcache` requires `__typename` in all GraphQL response objects for entity normalization — without it, cache normalization fails silently and `lesson` resolves as `undefined`.
 
 ### Root Cause Chain
+
 1. **`@urql/exchange-graphcache`** normalizes entities by `__typename` + `id`. Mock data in E2E tests was missing `__typename` on `Lesson`, `LessonAsset`, `LessonPipeline`, `PipelineRun`, and `PipelineResult` objects → cache returned `undefined` → page showed "השיעור לא נמצא" (lesson not found).
 2. **CORS preflight**: App on port 5176, GraphQL on port 4000 → browser sends OPTIONS preflight before POST. Mock handler didn't handle OPTIONS → preflight failed → no POST sent.
 3. **Port zombie**: Windows port 5175 occupied by zombie process after `taskkill` → changed E2E port to 5176.
 4. **`postDataJSON()` fragility**: Can return `null` in headless Chrome; replaced with `postData()` + manual `JSON.parse`.
 
 ### Fix
+
 - **`LessonResultsPage.tsx`**: Complete rewrite showing all 10 pipeline sections with `data-testid` attributes, `mounted` guard (`pause: !mounted`), `AddVideoPanel` component, `ExpandableText` for long transcripts, `ResultCard` wrapper.
 - **`lesson-results.spec.ts`**: 28 E2E tests covering all 10 module output sections. Added `__typename` to ALL mock data objects, CORS preflight (OPTIONS → 204) handling, explicit `GRAPHQL_URL` routing (not glob), `postData()` body parsing.
 - **`playwright.config.ts`**: Changed port 5175→5176; `reuseExistingServer: !process.env.CI`.
 - **`e2e/env.ts`**: BASE_URL default updated to port 5176.
 
 ### Anti-Recurrence
+
 - `e2e/lesson-results.spec.ts` guards all 10 module sections with `data-testid` assertions.
 - Key pattern: always add `__typename` to ALL graphql mock objects in E2E tests that use graphcache.
 - Key pattern: always handle OPTIONS preflight in `page.route()` mocks for cross-origin GraphQL.
 
 ### Tests Added
+
 - 28 new E2E tests in `apps/web/e2e/lesson-results.spec.ts` (all passing ✅)
 
 ### Files Changed
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/LessonResultsPage.tsx` | Complete rewrite: all 10 pipeline sections |
-| `apps/web/e2e/lesson-results.spec.ts` | 28 E2E tests: __typename fix, CORS, port 5176 |
-| `apps/web/playwright.config.ts` | Port 5175→5176, reuseExistingServer: !CI |
-| `apps/web/e2e/env.ts` | BASE_URL default port 5176 |
+
+| File                                       | Change                                          |
+| ------------------------------------------ | ----------------------------------------------- |
+| `apps/web/src/pages/LessonResultsPage.tsx` | Complete rewrite: all 10 pipeline sections      |
+| `apps/web/e2e/lesson-results.spec.ts`      | 28 E2E tests: \_\_typename fix, CORS, port 5176 |
+| `apps/web/playwright.config.ts`            | Port 5175→5176, reuseExistingServer: !CI        |
+| `apps/web/e2e/env.ts`                      | BASE_URL default port 5176                      |
 
 ---
 
@@ -421,9 +493,11 @@ Additionally, a secondary bug: `@hookform/resolvers` v3.x + Zod v4 incompatibili
 ### 3-Wave Discovery
 
 **Wave 1 — Exact match (LessonResultsPage — original crash site):**
+
 - `apps/web/src/pages/LessonResultsPage.tsx` — `useQuery(LESSON_QUERY)` fired immediately on mount, before component was committed to DOM → cache subscription during sibling render ❌
 
 **Wave 2 — Other pages/components with same urql subscription pattern:**
+
 - `apps/web/src/pages/LessonDetailPage.tsx` — same `useQuery(LESSON_QUERY)` without mount guard ❌ + auth error handling missing
 - `apps/web/src/pages/LessonPipelinePage.tsx` — same pattern, `console.error` in render body ❌
 - `apps/web/src/pages/CreateLessonPage.tsx` — silent return on `!user` instead of showing error ❌
@@ -431,23 +505,27 @@ Additionally, a secondary bug: `@hookform/resolvers` v3.x + Zod v4 incompatibili
 - `apps/web/src/pages/CreateLessonPage.step1.tsx` — same ZodError resolver incompatibility ❌
 
 **Wave 3 — Class of bug (all useQuery without mount guards across lesson routes):**
+
 - Grep `useQuery.*LESSON_QUERY` — found 3 pages (all lesson siblings) ✅ all fixed
 - Grep `zodResolver` — found 2 component files using broken resolver ✅ both fixed via Zod v4 shim
 
 ### Fix
 
 **Round 1 — Mounted guard pattern (4 files):**
+
 - `LessonResultsPage.tsx` — `useState(false)` + `useEffect(() => setMounted(true), [])` + `pause: !mounted || !lessonId`; loading guard returns spinner until mounted; `console.error` moved to `useEffect`
 - `LessonDetailPage.tsx` — Same mounted guard + auth error detection via `isAuthError()` helper
 - `LessonPipelinePage.tsx` — Same mounted guard; `console.error` moved to `useEffect`
 - `CreateLessonPage.tsx` — Changed silent `return` to `setError('שגיאת אימות: יש להתחבר מחדש...')` + `console.error`
 
 **Round 2 — Zod v4 compatibility shim (1 file):**
+
 - `apps/web/src/test/setup.ts` — Added `ZodError.prototype.errors` getter aliasing `.issues` so `@hookform/resolvers` v3.x check `Array.isArray(r.errors)` returns `true` in Zod v4 → resolver correctly populates `form.errors` instead of re-throwing
 
 ### Tests Added
 
 **Unit regression tests:**
+
 - `LessonDetailPage.test.tsx` — 2 BUG-054 tests: mounted guard prevents "Cannot update" error; lesson title visible after mount
 - `LessonResultsPage.test.tsx` — 3 BUG-054 tests: mounted guard; empty state; no raw React error strings
 - `CreateLessonPage.test.tsx` — 2 BUG-054 tests: auth error shown when user=null; mutation NOT called on null user
@@ -455,6 +533,7 @@ Additionally, a secondary bug: `@hookform/resolvers` v3.x + Zod v4 incompatibili
 - `CourseCreatePage.test.tsx` + `CreateLessonPage.test.tsx` — validation error tests now pass (Zod v4 shim)
 
 **E2E Playwright tests (`apps/web/e2e/lesson-creation.spec.ts`):**
+
 - 7 new BUG-054 E2E tests in `test.describe('BUG-054 — mounted guard prevents React setState-during-render', ...)`:
   1. LessonDetailPage renders without React error
   2. LessonResultsPage renders empty state without React error
@@ -472,6 +551,7 @@ Additionally, a secondary bug: `@hookform/resolvers` v3.x + Zod v4 incompatibili
 ### Anti-Recurrence
 
 **Regression guards:**
+
 - `LessonDetailPage.test.tsx:91` — `BUG-054: renders without React "Cannot update a component" error`
 - `LessonResultsPage.test.tsx` — BUG-054 mounted guard tests
 - `CreateLessonPage.test.tsx:320` — `BUG-054: shows auth error when user is null`
@@ -491,8 +571,11 @@ if (!mounted || result.fetching) return <div className="animate-spin" />;
 // CORRECT: Zod v4 + @hookform/resolvers v3.x shim in test/setup.ts
 if (!Object.getOwnPropertyDescriptor(ZodError.prototype, 'errors')) {
   Object.defineProperty(ZodError.prototype, 'errors', {
-    get(this: ZodError) { return this.issues; },
-    enumerable: false, configurable: true,
+    get(this: ZodError) {
+      return this.issues;
+    },
+    enumerable: false,
+    configurable: true,
   });
 }
 ```
@@ -501,7 +584,10 @@ if (!Object.getOwnPropertyDescriptor(ZodError.prototype, 'errors')) {
 // CORRECT: Show error instead of silently returning on missing user
 if (!courseId || !user) {
   setError('שגיאת אימות: יש להתחבר מחדש כדי ליצור שיעור');
-  console.error('[CreateLessonPage] createLesson blocked:', { courseId, hasUser: Boolean(user) });
+  console.error('[CreateLessonPage] createLesson blocked:', {
+    courseId,
+    hasUser: Boolean(user),
+  });
   return;
 }
 ```
@@ -529,31 +615,37 @@ The search page at `/search?q=<course-name>` returned "לא נמצאו תוצא�
 ### 3-Wave Discovery
 
 **Wave 1 (exact match — Search.tsx):**
+
 - `apps/web/src/pages/Search.tsx` — entire course search block used `MOCK_COURSES` hardcoded array ❌ → replaced with real `useQuery(SEARCH_COURSES_QUERY)` ✅
 
 **Wave 2 (other pages — similar mock-data pattern):**
+
 - `apps/web/src/pages/CourseList.tsx` — `pause: DEV_MODE` only for `MY_ENROLLMENTS_QUERY` (intentional, not courses) ✅
 - `apps/web/src/pages/KnowledgeGraph.tsx` — `pause: DEV_MODE` for graph queries (intentional dev mocks) ✅
 - No other pages had missing real-DB queries for critical search features ✅
 
 **Wave 3 (class of bug — queries gated by DEV_MODE that should query real DB):**
+
 - Grep for `pause: DEV_MODE` across all pages: only `CourseList` enrollment query + `KnowledgeGraph` graph path (both intentional)
 - No other un-mocked search queries found ✅
 
 ### Fix
 
 **Round 1 — Backend (Content Subgraph):**
+
 - `apps/subgraph-content/src/course/course.graphql` — Added `searchCourses(query: String!, limit: Int): [Course!]! @authenticated`
 - `apps/subgraph-content/src/course/course.service.ts` — Added `search()` method using Drizzle `ilike` + `or` on `title`/`description` with try/catch + Pino logging
 - `apps/subgraph-content/src/course/course.resolver.ts` — Added `@Query('searchCourses')` resolver with `requireAuth(ctx)` guard
 - `packages/db/src/index.ts` — Added `ilike` to re-exports
 
 **Round 2 — Frontend (Search.tsx):**
+
 - `apps/web/src/lib/graphql/content.queries.ts` — Added `SEARCH_COURSES_QUERY`
 - `apps/web/src/pages/Search.tsx` — Added `const [courseSearchResult] = useQuery({ query: SEARCH_COURSES_QUERY, pause: query.length < 2 })` (NOT gated by DEV_MODE). Course results rendered first (highest priority). `nonCourseResults` now filters `type !== 'course'` from mockSearch.
 - Added `useEffect` logging: `console.error('[Search] Course search failed:', error.message)` for observability.
 
 **Round 3 — Tests:**
+
 - `apps/subgraph-content/src/course/course.service.spec.ts` — +8 tests for `search()` method
 - `apps/web/src/pages/Search.test.tsx` — +6 BUG-053 regression tests in `describe('BUG-053: Real course search from DB', ...)`
   - `renders grouped section heading "Courses" when course results exist`
@@ -575,12 +667,14 @@ The search page at `/search?q=<course-name>` returned "לא נמצאו תוצא�
 **Regression guard:** `apps/web/src/pages/Search.test.tsx:1047` — `shows real course result from DB even when DEV_MODE=true` will fail if course search is ever gated by DEV_MODE again.
 
 **Key pattern — Highlight component text splitting:**
+
 ```typescript
 // WRONG: getByText('Test Fix Course') — fails when Highlight splits into <mark>Test</mark><span> Fix Course</span>
 // RIGHT: expect(document.body.textContent).toContain('Test Fix Course')
 ```
 
 **Key pattern — useQuery mock with document string:**
+
 ```typescript
 vi.mocked(useQuery).mockImplementation((opts) => {
   const queryStr = String((opts as { query?: unknown })?.query ?? '');
@@ -598,6 +692,7 @@ vi.mocked(useQuery).mockImplementation((opts) => {
 ### Problem
 
 The browser console showed React invariant violations on every visit to the dashboard:
+
 ```
 Cannot update a component (`Layout`) while rendering a different component (`SRSWidget`)
   at SRSWidget.tsx:35
@@ -605,6 +700,7 @@ Cannot update a component (`Layout`) while rendering a different component (`SRS
 Cannot update a component (`SRSWidget`) while rendering a different component (`Layout`)
   at useSrsQueueCount.ts:27
 ```
+
 Both errors fired on the same render cycle. `SRSWidget` and `Layout` (via `useSrsQueueCount`) both subscribe to `SRS_QUEUE_COUNT_QUERY`. Without a mount guard, urql's graphcache synchronously dispatches state updates across component boundaries during rendering, violating React 19's concurrent-mode constraint.
 
 ### Root Cause Chain
@@ -617,53 +713,60 @@ Both errors fired on the same render cycle. `SRSWidget` and `Layout` (via `useSr
 ### 3-Wave Discovery
 
 **Wave 1 (exact match — useQuery without mounted guard):**
+
 - `SRSWidget.tsx` — `useQuery(SRS_QUEUE_COUNT_QUERY)` no mount guard ❌ → **Fixed**
 - `SRSWidget.tsx` — `useQuery(DUE_REVIEWS_QUERY)` no mount guard ❌ → **Fixed**
 - `useSrsQueueCount.ts` — already had `pause: !mounted` guard ✅
 
 **Wave 2 (same pattern — other hooks/components):**
+
 - `useUserPreferences.ts` — `useQuery(ME_QUERY)` no mount guard ❌ → **Fixed (preemptive)**
 - `useCourseNavigation.ts` — already had `pause: !mounted` guard ✅
 - All other `useQuery` calls are inside hooks that already have the guard ✅
 
 **Wave 3 (class of bug — concurrent-mode setState-during-render):**
+
 - BUG-039 fixed `useSrsQueueCount` and `Layout` in a previous session
 - BUG-049 regression revealed `SRSWidget` was missed (it directly subscribes to the same query without the guard that `useSrsQueueCount` has)
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `apps/web/src/components/SRSWidget.tsx` | Added `mounted` guard: `useState(false)` + `useEffect(() => setMounted(true))` + `pause: !mounted` on both `useQuery` calls; merged cleanup into single `useEffect`; added `loading = !mounted || countResult.fetching`; added `console.error('[SRSWidget] GraphQL error fetching queue count:', ...)` |
-| `apps/web/src/hooks/useUserPreferences.ts` | Added `mounted` guard: `useState(false)` + `useEffect(() => setMounted(true))` + `pause: !mounted` on `ME_QUERY` useQuery call |
+| File                                       | Change                                                                                                                                                                                         |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/SRSWidget.tsx`    | Added `mounted` guard: `useState(false)` + `useEffect(() => setMounted(true))` + `pause: !mounted` on both `useQuery` calls; merged cleanup into single `useEffect`; added `loading = !mounted |     | countResult.fetching`; added `console.error('[SRSWidget] GraphQL error fetching queue count:', ...)` |
+| `apps/web/src/hooks/useUserPreferences.ts` | Added `mounted` guard: `useState(false)` + `useEffect(() => setMounted(true))` + `pause: !mounted` on `ME_QUERY` useQuery call                                                                 |
 
 ```tsx
 // SRSWidget.tsx — BEFORE (broken):
 const [countResult, refetchCount] = useQuery<SrsQueueCountResult>({
-  query: SRS_QUEUE_COUNT_QUERY,  // no pause → fires during render → setState-during-render
+  query: SRS_QUEUE_COUNT_QUERY, // no pause → fires during render → setState-during-render
 });
 
 // AFTER (fixed):
 const [mounted, setMounted] = useState(false);
 useEffect(() => {
   setMounted(true);
-  return () => { pauseRef.current = true; };
+  return () => {
+    pauseRef.current = true;
+  };
 }, []);
 const [countResult, refetchCount] = useQuery<SrsQueueCountResult>({
   query: SRS_QUEUE_COUNT_QUERY,
-  pause: !mounted,  // deferred until after first render — prevents cross-fiber setState
+  pause: !mounted, // deferred until after first render — prevents cross-fiber setState
 });
 ```
 
 ### Tests Added
 
 `apps/web/src/components/SRSWidget.test.tsx` — 4 new BUG-052 regression tests:
+
 - `BUG-049: passes pause=true to BOTH useQuery calls before mount` — asserts `pauseValues[0]` and `pauseValues[1]` are `true` on initial render
 - `BUG-049: unpauses countQuery after mount` — asserts `pauseValues[2]` is `false` after `act()` flushes `setMounted(true)`
 - `BUG-049: does NOT expose raw GraphQL error strings to user` — asserts `[GraphQL]`, `Internal server error`, `connection refused` are NOT in the DOM
 - `BUG-049: logs console.error when countResult has a GraphQL error` — asserts `console.error('[SRSWidget] GraphQL error fetching queue count:', ...)` is called
 
 `apps/web/src/hooks/useUserPreferences.test.ts` — 2 new BUG-052 regression tests:
+
 - `BUG-049: passes pause=true to ME_QUERY before mount` — asserts `pauseValues[0]` = true (with `vi.resetAllMocks()` to clear leftover `mockReturnValueOnce` queue from prior test)
 - `BUG-049: unpauses ME_QUERY after mount` — asserts `pauseValues[2]` = false after `act()` flushes `setMounted(true)`
 
@@ -698,6 +801,7 @@ Grep for `useBlocker`, `useBeforeUnload`, `beforeunload`, `Prompt`, `isDirty` gu
 
 **Wave 2 (all pages with forms — "שוני מסויים"):**
 Priority targets:
+
 1. `LessonPipelinePage.tsx` — Zustand `isDirty` exists, no guard ← primary bug
 2. `CourseDetailPage.tsx` — `editMode` state exists, no guard ← direct co-occurrence
 3. `CourseEditPage.metadata.tsx` — React Hook Form `isDirty`, no guard
@@ -709,16 +813,19 @@ All 19 form pages lack guards; Round 1 fixes the 2 highest-impact pages.
 ### Fix (Round 1)
 
 **New files:**
+
 - `apps/web/src/hooks/useUnsavedChangesGuard.ts` — hook wrapping React Router v7 `useBlocker` + `window.beforeunload`; logs `console.error('[ComponentName]...')` when navigation is blocked
 - `apps/web/src/components/UnsavedChangesDialog.tsx` — modal dialog with "Leave anyway" / "Stay on page" buttons; uses `unsavedChanges.*` i18n keys from `common` namespace
 
 **Modified files:**
+
 - `apps/web/src/pages/LessonPipelinePage.tsx` — `useUnsavedChangesGuard(isDirty, 'LessonPipelinePage')` + `<UnsavedChangesDialog>`
 - `apps/web/src/pages/CourseDetailPage.tsx` — `useUnsavedChangesGuard(editMode, 'CourseDetailPage')` + `<UnsavedChangesDialog>`
 - `packages/i18n/src/locales/en/common.json` — `unsavedChanges.{title,message,leave,stay}` keys
 - `packages/i18n/src/locales/he/common.json` — Hebrew translations
 
 **Tests added (+21):**
+
 - `apps/web/src/hooks/useUnsavedChangesGuard.test.ts` — 9 unit tests
 - `apps/web/src/pages/LessonPipelinePage.test.tsx` — +6 navigation guard regression tests (37 total)
 - `apps/web/src/pages/CourseDetailPage.test.tsx` — +6 navigation guard regression tests (34 total)
@@ -743,6 +850,7 @@ All 19 form pages lack guards; Round 1 fixes the 2 highest-impact pages.
 All GraphQL subscriptions (e.g., `notificationsReceived`) failed with `[GraphQL] Authentication required` in the browser console on every page that uses `useNotifications()`. The `urql-client.ts` `authErrorExchange` caught these errors and degraded gracefully (logged a warning at line 51, did not logout), but real-time notifications were silently broken for all authenticated users.
 
 **Console evidence:**
+
 ```
 [Auth] Subscription auth error — degrading gracefully (real-time updates paused).
 [GraphQL] Authentication required for notifications subscription
@@ -763,11 +871,13 @@ Even if the gateway context function correctly resolved the auth header, Hive Ga
 ### 3-Wave Discovery
 
 **Wave 1 (exact match — gateway context function):**
+
 - `apps/gateway/src/index.ts` — `extra?.connectionParams` → wrong path ❌ → changed to root-level `connectionParams` ✅
 - `apps/gateway/gateway.config.ts` — already correct (root-level `connectionParams`) ✅ (CLI path only)
 
 **Wave 2 (other subscription resolvers with auth gaps):**
 6 subscription resolvers found across all subgraphs:
+
 1. `notifications.resolver.ts` — throws `UnauthorizedException` (visible bug) ← the trigger
 2. `live-session-extensions.resolver.ts` — no auth check (security gap, noted as BUG-050)
 3. `annotation.resolver.ts` — no auth check (security gap)
@@ -778,18 +888,20 @@ Even if the gateway context function correctly resolved the auth header, Hive Ga
 The resolvers without auth checks work because they don't call services that enforce auth. They are documented as BUG-050 for follow-up hardening.
 
 **Wave 3 (class of bug — auth header forwarding in gateway):**
+
 - `apps/gateway/src/index.ts` — `createGateway` call had no `plugins` option → no `onFetch` → auth never forwarded to any subgraph ❌ → added `onFetch` plugin ✅
 - `apps/gateway/gateway.config.ts` — already has `onFetch` plugin ✅ (CLI path)
 
 ### Fix (Round 1 — core auth fix)
 
-| File | Change |
-|------|--------|
-| `apps/gateway/src/index.ts` | **Fix 1:** Changed `extra?.connectionParams` → root-level `connectionParams` access |
-| `apps/gateway/src/index.ts` | **Fix 2:** Added `onFetch` plugin to `createGateway` to forward `context.headers.authorization` to all subgraph fetches |
-| `apps/gateway/tests/subscription-auth.test.ts` (NEW) | 21 regression tests for both fixes |
+| File                                                 | Change                                                                                                                  |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `apps/gateway/src/index.ts`                          | **Fix 1:** Changed `extra?.connectionParams` → root-level `connectionParams` access                                     |
+| `apps/gateway/src/index.ts`                          | **Fix 2:** Added `onFetch` plugin to `createGateway` to forward `context.headers.authorization` to all subgraph fetches |
+| `apps/gateway/tests/subscription-auth.test.ts` (NEW) | 21 regression tests for both fixes                                                                                      |
 
 **Fix 1 — connectionParams path:**
+
 ```typescript
 // BEFORE (WRONG — extra.connectionParams is always undefined):
 const wsConnectionParams = (
@@ -803,6 +915,7 @@ const wsConnectionParams = (
 ```
 
 **Fix 2 — onFetch plugin:**
+
 ```typescript
 const gateway = createGateway({
   supergraph: { ... },
@@ -858,24 +971,27 @@ The same keys (`networkUnavailable`, `retry`) existed in `courses.json` (correct
 ### 3-Wave Discovery
 
 **Wave 1 (exact match):**
+
 - `KnowledgeGraph.tsx:405` — `t('networkUnavailable')` ❌ missing from `knowledge.json`
 - `KnowledgeGraph.tsx:411` — `t('retry')` ❌ missing from `knowledge.json`
 - `KnowledgeGraph.tsx:778` — `t('pathError')` ❌ missing from `knowledge.json`
 
 **Wave 2 (other pages/variations):**
+
 - `CourseList.tsx:110,117` — `t('networkUnavailable')`, `t('retry')` from `courses` namespace ✅ correct (keys exist in `courses.json`)
 - No other page uses `useTranslation('knowledge')` — KnowledgeGraph.tsx is the only consumer
 
 **Wave 3 (class of bug — missing i18n keys):**
+
 - All other namespaces cross-checked. Only `knowledge.json` was missing these 3 keys.
 
 ### Fix (Round 1)
 
-| File | Change |
-|------|--------|
+| File                                          | Change                                                   |
+| --------------------------------------------- | -------------------------------------------------------- |
 | `packages/i18n/src/locales/en/knowledge.json` | Added 3 keys: `networkUnavailable`, `retry`, `pathError` |
-| `packages/i18n/src/locales/he/knowledge.json` | Added 3 Hebrew translations for the same keys |
-| `apps/web/src/pages/KnowledgeGraph.test.tsx` | +2 BUG-050 regression tests |
+| `packages/i18n/src/locales/he/knowledge.json` | Added 3 Hebrew translations for the same keys            |
+| `apps/web/src/pages/KnowledgeGraph.test.tsx`  | +2 BUG-050 regression tests                              |
 
 ### Tests Added
 
@@ -897,17 +1013,17 @@ The same keys (`networkUnavailable`, `retry`) existed in `courses.json` (correct
 
 ### Changes Implemented
 
-| # | Feature | Files Changed |
-|---|---------|---------------|
-| 1 | Inline course title editing — "Edit Course" → "שמור שינויים" | `CourseDetailPage.tsx` |
-| 2 | Rename "הגות" → "כללי" everywhere | `CreateLessonPage.tsx`, `step1.tsx`, test files |
-| 3 | Remove "סדרת שיעורים" field from lesson creation | `CreateLessonPage.tsx`, `step1.tsx`, `step1.test.tsx` |
-| 4 | Auto-fill lesson date with today's date | `CreateLessonPage.tsx` |
-| 5 | Rename "שיעור הגות" → "שיעור כללי" in step 3 | `CreateLessonPage.tsx` |
-| 6 | File upload from local device in PipelineConfigPanel | `PipelineConfigPanel.tsx` |
-| 7 | Default content language = user locale; remembered in localStorage | `PipelineConfigPanel.tsx` |
-| 8 | "ⓘ" info tooltip for quality threshold | `PipelineConfigPanel.tsx`, `content.json` ×2 |
-| 9 | CLAUDE.md bug fix protocol: deployment verification after each round | `CLAUDE.md` |
+| #   | Feature                                                              | Files Changed                                         |
+| --- | -------------------------------------------------------------------- | ----------------------------------------------------- |
+| 1   | Inline course title editing — "Edit Course" → "שמור שינויים"         | `CourseDetailPage.tsx`                                |
+| 2   | Rename "הגות" → "כללי" everywhere                                    | `CreateLessonPage.tsx`, `step1.tsx`, test files       |
+| 3   | Remove "סדרת שיעורים" field from lesson creation                     | `CreateLessonPage.tsx`, `step1.tsx`, `step1.test.tsx` |
+| 4   | Auto-fill lesson date with today's date                              | `CreateLessonPage.tsx`                                |
+| 5   | Rename "שיעור הגות" → "שיעור כללי" in step 3                         | `CreateLessonPage.tsx`                                |
+| 6   | File upload from local device in PipelineConfigPanel                 | `PipelineConfigPanel.tsx`                             |
+| 7   | Default content language = user locale; remembered in localStorage   | `PipelineConfigPanel.tsx`                             |
+| 8   | "ⓘ" info tooltip for quality threshold                               | `PipelineConfigPanel.tsx`, `content.json` ×2          |
+| 9   | CLAUDE.md bug fix protocol: deployment verification after each round | `CLAUDE.md`                                           |
 
 ### Tests Added
 
@@ -946,9 +1062,9 @@ The same keys (`networkUnavailable`, `retry`) existed in `courses.json` (correct
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `packages/db/src/schema/content.ts` | Added `forked_from_id: uuid('forked_from_id')` to `courses` table |
+| File                                                 | Change                                                                                                                                       |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/db/src/schema/content.ts`                  | Added `forked_from_id: uuid('forked_from_id')` to `courses` table                                                                            |
 | `apps/subgraph-content/src/course/course.service.ts` | Removed `as unknown as Parameters<typeof this.db.insert>[0]` cast; used `src = original as Record<string, unknown>` for safe property access |
 
 ### Tests
@@ -984,19 +1100,20 @@ All 10 gaps closed in Session 14.
 
 **Root cause:** `forkCourse` method and `FORK_COURSE_MUTATION` completely missing.
 
-| File | Change |
-|------|--------|
-| `packages/db/src/schema/courses.ts` | Added `forkedFromId` column; DB column applied via SQL ALTER TABLE |
-| `apps/subgraph-content/src/course/course.graphql` | Added `forkCourse` mutation + `forkedFromId` field |
-| `apps/subgraph-content/src/course/course.service.ts` | Added `forkCourse()` method with NotFoundException, logger |
-| `apps/subgraph-content/src/course/course.resolver.ts` | Added `@Mutation('forkCourse')` |
-| `apps/subgraph-content/src/course/course.service.spec.ts` | Added 6 fork unit tests; fixed MOCK_COURSE fixture |
-| `apps/web/src/lib/graphql/content.queries.ts` | Added `FORK_COURSE_MUTATION` |
-| `apps/web/src/pages/CourseDetailPage.tsx` | Added Fork button (instructor only), error banner, handler |
-| `packages/i18n/src/locales/{en,he}/courses.json` | Added `forkCourse`, `forkCourseSuccess`, `forkError`, `forkedFrom` |
-| `apps/web/src/pages/CourseDetailPage.test.tsx` | Added 3 fork tests; fixed NOOP_MUTATION + document-string matching |
+| File                                                      | Change                                                             |
+| --------------------------------------------------------- | ------------------------------------------------------------------ |
+| `packages/db/src/schema/courses.ts`                       | Added `forkedFromId` column; DB column applied via SQL ALTER TABLE |
+| `apps/subgraph-content/src/course/course.graphql`         | Added `forkCourse` mutation + `forkedFromId` field                 |
+| `apps/subgraph-content/src/course/course.service.ts`      | Added `forkCourse()` method with NotFoundException, logger         |
+| `apps/subgraph-content/src/course/course.resolver.ts`     | Added `@Mutation('forkCourse')`                                    |
+| `apps/subgraph-content/src/course/course.service.spec.ts` | Added 6 fork unit tests; fixed MOCK_COURSE fixture                 |
+| `apps/web/src/lib/graphql/content.queries.ts`             | Added `FORK_COURSE_MUTATION`                                       |
+| `apps/web/src/pages/CourseDetailPage.tsx`                 | Added Fork button (instructor only), error banner, handler         |
+| `packages/i18n/src/locales/{en,he}/courses.json`          | Added `forkCourse`, `forkCourseSuccess`, `forkError`, `forkedFrom` |
+| `apps/web/src/pages/CourseDetailPage.test.tsx`            | Added 3 fork tests; fixed NOOP_MUTATION + document-string matching |
 
 **Key fix — fork test mutation mocking:**
+
 ```typescript
 // DON'T: fragile call-count-based switching
 // DO: match by mutation document string
@@ -1014,71 +1131,71 @@ vi.mocked(urql.useMutation).mockImplementation((mutationDoc) => {
 
 **Root cause:** No `SavedSearch` DB table, no backend service/resolver, no frontend save UI.
 
-| File | Change |
-|------|--------|
-| `packages/db/src/schema/saved-searches.ts` | NEW — `saved_searches` table with RLS |
-| `packages/db/src/schema/index.ts` | Added `saved-searches` export |
-| `packages/db/migrations/0006_damp_gateway.sql` | Migration applies `saved_searches` table |
-| `apps/subgraph-core/src/search/saved-search.service.ts` | NEW — `SavedSearchService` with create/list/delete |
-| `apps/subgraph-core/src/search/saved-search.resolver.ts` | NEW — GraphQL resolver |
-| `apps/subgraph-core/src/search/saved-search.graphql` | NEW — SDL types + mutations |
-| `apps/subgraph-core/src/search/saved-search.module.ts` | NEW — NestJS module |
-| `apps/subgraph-core/src/app.module.ts` | Added `SavedSearchModule` import |
-| `apps/web/src/lib/graphql/search.queries.ts` | NEW — GraphQL operations |
-| `apps/web/src/pages/Search.tsx` | Added Save button, modal, saved searches panel |
-| `packages/i18n/src/locales/{en,he}/common.json` | Added 6 saved search i18n keys |
-| `apps/web/src/pages/Search.test.tsx` | Added 16 saved search unit tests |
+| File                                                     | Change                                             |
+| -------------------------------------------------------- | -------------------------------------------------- |
+| `packages/db/src/schema/saved-searches.ts`               | NEW — `saved_searches` table with RLS              |
+| `packages/db/src/schema/index.ts`                        | Added `saved-searches` export                      |
+| `packages/db/migrations/0006_damp_gateway.sql`           | Migration applies `saved_searches` table           |
+| `apps/subgraph-core/src/search/saved-search.service.ts`  | NEW — `SavedSearchService` with create/list/delete |
+| `apps/subgraph-core/src/search/saved-search.resolver.ts` | NEW — GraphQL resolver                             |
+| `apps/subgraph-core/src/search/saved-search.graphql`     | NEW — SDL types + mutations                        |
+| `apps/subgraph-core/src/search/saved-search.module.ts`   | NEW — NestJS module                                |
+| `apps/subgraph-core/src/app.module.ts`                   | Added `SavedSearchModule` import                   |
+| `apps/web/src/lib/graphql/search.queries.ts`             | NEW — GraphQL operations                           |
+| `apps/web/src/pages/Search.tsx`                          | Added Save button, modal, saved searches panel     |
+| `packages/i18n/src/locales/{en,he}/common.json`          | Added 6 saved search i18n keys                     |
+| `apps/web/src/pages/Search.test.tsx`                     | Added 16 saved search unit tests                   |
 
 ### Track A3 — KnowledgeGraphPage Standalone Route
 
 **Root cause:** `KnowledgeGraphPage` component missing; no route in `App.tsx`.
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/KnowledgeGraphPage.tsx` | NEW — thin wrapper + optional courseId param |
-| `apps/web/src/lib/router.tsx` | Added `/knowledge-graph` and `/knowledge-graph/:courseId` routes |
-| `packages/i18n/src/locales/{en,he}/knowledge.json` | Added `graphTitle`, `graphPageBreadcrumb` |
+| File                                               | Change                                                           |
+| -------------------------------------------------- | ---------------------------------------------------------------- |
+| `apps/web/src/pages/KnowledgeGraphPage.tsx`        | NEW — thin wrapper + optional courseId param                     |
+| `apps/web/src/lib/router.tsx`                      | Added `/knowledge-graph` and `/knowledge-graph/:courseId` routes |
+| `packages/i18n/src/locales/{en,he}/knowledge.json` | Added `graphTitle`, `graphPageBreadcrumb`                        |
 
 ### Track A4 — K-means Topic Clustering
 
 **Root cause:** `CypherTopicClusterService` exists but no clustering algorithm.
 
-| File | Change |
-|------|--------|
-| `apps/subgraph-knowledge/src/graph/topic-cluster-kmeans.service.ts` | NEW — pure TypeScript k-means++ with cosine similarity |
-| `apps/subgraph-knowledge/src/graph/topic-cluster-kmeans.service.spec.ts` | NEW — 22 unit tests |
-| `apps/subgraph-knowledge/src/graph/graph.module.ts` | Added `TopicClusterKMeansService` provider |
-| `apps/subgraph-knowledge/src/graph/graph.graphql` | Added `clusterTopics(courseId, k)` mutation |
-| `apps/subgraph-knowledge/src/graph/graph.resolver.ts` | Added `clusterTopics` mutation resolver; injected service |
+| File                                                                     | Change                                                    |
+| ------------------------------------------------------------------------ | --------------------------------------------------------- |
+| `apps/subgraph-knowledge/src/graph/topic-cluster-kmeans.service.ts`      | NEW — pure TypeScript k-means++ with cosine similarity    |
+| `apps/subgraph-knowledge/src/graph/topic-cluster-kmeans.service.spec.ts` | NEW — 22 unit tests                                       |
+| `apps/subgraph-knowledge/src/graph/graph.module.ts`                      | Added `TopicClusterKMeansService` provider                |
+| `apps/subgraph-knowledge/src/graph/graph.graphql`                        | Added `clusterTopics(courseId, k)` mutation               |
+| `apps/subgraph-knowledge/src/graph/graph.resolver.ts`                    | Added `clusterTopics` mutation resolver; injected service |
 
 ### Track A5 — Persisted Queries Client Wiring
 
 **Root cause:** `@urql/exchange-persisted` missing; production builds would reject arbitrary documents.
 
-| File | Change |
-|------|--------|
-| `apps/web/src/lib/urql-client.ts` | Added `persistedExchange` (production-only, before fetchExchange) |
-| `apps/web/package.json` | Added `@urql/exchange-persisted: ^4.0.0` |
-| `apps/web/src/lib/urql-client.test.ts` | Added 3 smoke tests |
+| File                                   | Change                                                            |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| `apps/web/src/lib/urql-client.ts`      | Added `persistedExchange` (production-only, before fetchExchange) |
+| `apps/web/package.json`                | Added `@urql/exchange-persisted: ^4.0.0`                          |
+| `apps/web/src/lib/urql-client.test.ts` | Added 3 smoke tests                                               |
 
 ### Track B1 — gVisor Agent Sandbox
 
-| File | Change |
-|------|--------|
-| `docker-compose.gvisor.yml` | NEW — override: `subgraph-agent: runtime: runsc` |
+| File                            | Change                                                        |
+| ------------------------------- | ------------------------------------------------------------- |
+| `docker-compose.gvisor.yml`     | NEW — override: `subgraph-agent: runtime: runsc`              |
 | `docs/security/gvisor-setup.md` | NEW — full runbook (install, daemon config, K8s RuntimeClass) |
 
 ### Track B2 — Column-Level Encryption (TDE)
 
-| File | Change |
-|------|--------|
+| File                                     | Change                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------- |
 | `docs/security/tde-column-encryption.md` | NEW — runbook: encrypted fields, key management, migration strategy |
 
 ### Track B3 — Vault Infrastructure
 
-| File | Change |
-|------|--------|
-| `docker-compose.vault.yml` | NEW — HashiCorp Vault 1.17 service with mem_limit |
+| File                           | Change                                                    |
+| ------------------------------ | --------------------------------------------------------- |
+| `docker-compose.vault.yml`     | NEW — HashiCorp Vault 1.17 service with mem_limit         |
 | `docs/security/vault-setup.md` | NEW — runbook: secret paths, NestJS integration, rotation |
 
 ### TypeScript Fix (GlobalLocaleSync.test.tsx)
@@ -1106,23 +1223,25 @@ strings and `dir="rtl"` attributes — broken for non-Hebrew locales.
 
 ### Root Cause Chain (Wide Pattern — 3 Rounds)
 
-| File | Root Cause |
-|------|------------|
-| `i18n.ts` | `caches: ['localStorage']` caused write-race: localStorage written BEFORE i18next was ready → stale locale on next page load |
-| `useUserPreferences.ts` | Returned DB locale directly, not `i18n.language` (active language) — showed stale value |
-| `App.tsx` | No global DB→i18next sync — only SettingsPage called `useUserPreferences` |
-| `SourceManager.tsx` | Hardcoded `dir="rtl"`, `'he-IL'` locale, Hebrew labels, `STATUS_LABELS` removed but still referenced; tab variable `t` shadowed useTranslation `t` |
-| `PipelineConfigPanel.tsx` | `?? 'he'` hardcoded defaults for ASR language and content locale; all UI labels hardcoded Hebrew |
+| File                      | Root Cause                                                                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `i18n.ts`                 | `caches: ['localStorage']` caused write-race: localStorage written BEFORE i18next was ready → stale locale on next page load                       |
+| `useUserPreferences.ts`   | Returned DB locale directly, not `i18n.language` (active language) — showed stale value                                                            |
+| `App.tsx`                 | No global DB→i18next sync — only SettingsPage called `useUserPreferences`                                                                          |
+| `SourceManager.tsx`       | Hardcoded `dir="rtl"`, `'he-IL'` locale, Hebrew labels, `STATUS_LABELS` removed but still referenced; tab variable `t` shadowed useTranslation `t` |
+| `PipelineConfigPanel.tsx` | `?? 'he'` hardcoded defaults for ASR language and content locale; all UI labels hardcoded Hebrew                                                   |
 
 ### Fix (3 Rounds)
 
 **Round 1 — Core i18n plumbing**
+
 - `i18n.ts`: `caches: []` (no localStorage write during init — prevents race); `initI18n()` reads localStorage before init
 - `useUserPreferences.ts`: `currentLocale = i18n.language` (active language, not raw DB value); mutex on `setLocale` localStorage update; error revert (reverts localStorage + changeLanguage on DB mutation failure); throws on failure for toast display
 - NEW `GlobalLocaleSync.tsx`: side-effect-only component rendered in `App.tsx` — syncs DB locale to i18next on every page (fresh session: no localStorage → apply DB locale)
 - `App.tsx`: `<GlobalLocaleSync />` inside UrqlProvider
 
 **Round 2 — SourceManager.tsx hardcoded Hebrew**
+
 - Removed `STATUS_LABELS` (Hebrew); added `STATUS_I18N_KEYS` mapping to i18n keys
 - Added `TAB_KEYS` + `TAB_LABEL_KEYS` for tab rendering — removed variable shadowing
 - All `dir="rtl"` → `dir={i18n.dir()}` (dynamic RTL/LTR)
@@ -1133,6 +1252,7 @@ strings and `dir="rtl"` attributes — broken for non-Hebrew locales.
 - Added `dir: vi.fn().mockReturnValue('ltr')` to setup.ts global mock
 
 **Round 3 — PipelineConfigPanel.tsx hardcoded Hebrew**
+
 - `?? 'he'` defaults → `?? DEFAULT_LOCALE` (from `@edusphere/i18n`)
 - All UI labels (enable module, close settings, ASR language, summary style, etc.) → `t('pipeline.xxx')`
 - Added `ASR_LANGUAGES` const using `LOCALE_LABELS` for native language names
@@ -1148,21 +1268,21 @@ strings and `dir="rtl"` attributes — broken for non-Hebrew locales.
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/lib/i18n.ts` | `caches: []`, `initI18n()` reads localStorage |
-| `apps/web/src/hooks/useUserPreferences.ts` | `i18n.language` as locale; error revert; throws |
-| `apps/web/src/components/GlobalLocaleSync.tsx` | NEW — global DB→i18next sync component |
-| `apps/web/src/App.tsx` | Added `<GlobalLocaleSync />` |
-| `apps/web/src/components/SourceManager.tsx` | All hardcoded Hebrew removed; dynamic dir |
-| `apps/web/src/components/pipeline/PipelineConfigPanel.tsx` | `?? 'he'` → `DEFAULT_LOCALE`; all labels i18n |
-| `packages/i18n/src/locales/en/content.json` | +32 new keys (sources + pipeline sections) |
-| `packages/i18n/src/locales/he/content.json` | +32 matching Hebrew translations |
-| `apps/web/src/test/setup.ts` | `dir: vi.fn().mockReturnValue('ltr')` in i18n mock |
-| `apps/web/src/components/GlobalLocaleSync.test.tsx` | NEW — 6 regression tests |
-| `apps/web/src/components/pipeline/PipelineConfigPanel.test.tsx` | NEW — 7 regression tests |
-| `apps/web/src/hooks/useUserPreferences.test.ts` | +5 new BUG-047 tests |
-| `apps/web/src/components/SourceManager.test.tsx` | Updated for i18n key assertions |
+| File                                                            | Change                                             |
+| --------------------------------------------------------------- | -------------------------------------------------- |
+| `apps/web/src/lib/i18n.ts`                                      | `caches: []`, `initI18n()` reads localStorage      |
+| `apps/web/src/hooks/useUserPreferences.ts`                      | `i18n.language` as locale; error revert; throws    |
+| `apps/web/src/components/GlobalLocaleSync.tsx`                  | NEW — global DB→i18next sync component             |
+| `apps/web/src/App.tsx`                                          | Added `<GlobalLocaleSync />`                       |
+| `apps/web/src/components/SourceManager.tsx`                     | All hardcoded Hebrew removed; dynamic dir          |
+| `apps/web/src/components/pipeline/PipelineConfigPanel.tsx`      | `?? 'he'` → `DEFAULT_LOCALE`; all labels i18n      |
+| `packages/i18n/src/locales/en/content.json`                     | +32 new keys (sources + pipeline sections)         |
+| `packages/i18n/src/locales/he/content.json`                     | +32 matching Hebrew translations                   |
+| `apps/web/src/test/setup.ts`                                    | `dir: vi.fn().mockReturnValue('ltr')` in i18n mock |
+| `apps/web/src/components/GlobalLocaleSync.test.tsx`             | NEW — 6 regression tests                           |
+| `apps/web/src/components/pipeline/PipelineConfigPanel.test.tsx` | NEW — 7 regression tests                           |
+| `apps/web/src/hooks/useUserPreferences.test.ts`                 | +5 new BUG-047 tests                               |
+| `apps/web/src/components/SourceManager.test.tsx`                | Updated for i18n key assertions                    |
 
 ### Verification
 
@@ -1180,6 +1300,7 @@ strings and `dir="rtl"` attributes — broken for non-Hebrew locales.
 ### Feature
 
 Added a **"🔧 בנה ידנית (מאפס)"** ("Build from Scratch") option to the Pipeline Builder template picker. When selected:
+
 - Canvas is cleared (all nodes removed)
 - A distinct **"מצב בנייה חופשית"** message appears in the center with a 🔧 icon
 - Guidance: "גרור מודולים מהחלונית השמאלית לכאן" + "בנה Pipeline מותאם אישית ללא תבנית מוכנה"
@@ -1188,16 +1309,17 @@ Added a **"🔧 בנה ידנית (מאפס)"** ("Build from Scratch") option to
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/web/src/lib/lesson-pipeline.store.ts` | Added `clearNodes()` action; extended `loadTemplate` to accept `'CUSTOM'` |
-| `apps/web/src/pages/LessonPipelinePage.tsx` | Added CUSTOM option to `<select>`; added `customMode` state; updated empty canvas to show custom message |
-| `apps/web/src/pages/LessonPipelinePage.test.tsx` | +5 new tests for CUSTOM option visibility, clearNodes call, custom message, old message absence, back-to-template |
-| `apps/web/e2e/lesson-pipeline.spec.ts` | +6 new E2E tests for CUSTOM mode: option exists, canvas clears, custom message, drag-drop, back-to-template, no raw errors, screenshot |
+| File                                             | Change                                                                                                                                 |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/lib/lesson-pipeline.store.ts`      | Added `clearNodes()` action; extended `loadTemplate` to accept `'CUSTOM'`                                                              |
+| `apps/web/src/pages/LessonPipelinePage.tsx`      | Added CUSTOM option to `<select>`; added `customMode` state; updated empty canvas to show custom message                               |
+| `apps/web/src/pages/LessonPipelinePage.test.tsx` | +5 new tests for CUSTOM option visibility, clearNodes call, custom message, old message absence, back-to-template                      |
+| `apps/web/e2e/lesson-pipeline.spec.ts`           | +6 new E2E tests for CUSTOM mode: option exists, canvas clears, custom message, drag-drop, back-to-template, no raw errors, screenshot |
 
 ### Tests Added (+11 total)
 
 **Unit (5):**
+
 - template picker has a CUSTOM option
 - selecting CUSTOM calls clearNodes
 - CUSTOM mode shows "מצב בנייה חופשית" on empty canvas
@@ -1205,6 +1327,7 @@ Added a **"🔧 בנה ידנית (מאפס)"** ("Build from Scratch") option to
 - selecting THEMATIC after CUSTOM restores template behavior
 
 **E2E (6):**
+
 - template picker has CUSTOM option (selector check)
 - selecting CUSTOM clears canvas (8 → 0 nodes) + shows custom mode message
 - CUSTOM mode: drag module from palette (DataTransfer dispatch approach for headless)
@@ -1214,15 +1337,15 @@ Added a **"🔧 בנה ידנית (מאפס)"** ("Build from Scratch") option to
 
 ### Visual Verification (Playwright MCP live test)
 
-| Test | Result |
-|------|--------|
-| CUSTOM option in picker | ✅ option[value="CUSTOM"] found |
-| Selecting CUSTOM: nodes cleared | ✅ 8 → 0 nodes |
-| "מצב בנייה חופשית" message | ✅ visible |
-| "גרור מודולים מהחלונית השמאלית" | ✅ visible |
-| Default message hidden | ✅ not visible |
-| Drag-drop adds module | ✅ SUMMARIZATION added via DataTransfer event |
-| No error banners | ✅ 0 errors in console |
+| Test                            | Result                                        |
+| ------------------------------- | --------------------------------------------- |
+| CUSTOM option in picker         | ✅ option[value="CUSTOM"] found               |
+| Selecting CUSTOM: nodes cleared | ✅ 8 → 0 nodes                                |
+| "מצב בנייה חופשית" message      | ✅ visible                                    |
+| "גרור מודולים מהחלונית השמאלית" | ✅ visible                                    |
+| Default message hidden          | ✅ not visible                                |
+| Drag-drop adds module           | ✅ SUMMARIZATION added via DataTransfer event |
+| No error banners                | ✅ 0 errors in console                        |
 
 ### Also Updated This Session
 
@@ -1251,32 +1374,36 @@ Added a **"🔧 בנה ידנית (מאפס)"** ("Build from Scratch") option to
 
 ### Root Cause Chain (Wide Pattern — Phase 1 Discovery)
 
-| File | Issue |
-|------|-------|
-| `LessonPipelinePage.tsx` | `handleRun` read stale React state + stale urql cache after `await savePipeline()` → never got `pipelineId` → silently returned |
-| `LessonPipelinePage.tsx` | `selectedNodeId` tracked in store but no conditional render for `PipelineConfigPanel` → clicking nodes had no effect |
-| `LessonPipelinePage.tsx` | No `PipelineRunStatus` component rendered → completed run results invisible |
-| `LessonPipelinePage.tsx` | Template picker `<select>` missing from toolbar → `loadTemplate()` unreachable from UI |
-| `lesson-pipeline.resolver.ts` (missing) | No `@ResolveField('currentRun')` on `LessonPipeline` → `currentRun` always null in GraphQL response |
-| `lesson-pipeline.resolver.ts` (missing) | No `@ResolveField('results')` on `LessonPipelineRun` → run had empty results array |
+| File                                      | Issue                                                                                                                            |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `LessonPipelinePage.tsx`                  | `handleRun` read stale React state + stale urql cache after `await savePipeline()` → never got `pipelineId` → silently returned  |
+| `LessonPipelinePage.tsx`                  | `selectedNodeId` tracked in store but no conditional render for `PipelineConfigPanel` → clicking nodes had no effect             |
+| `LessonPipelinePage.tsx`                  | No `PipelineRunStatus` component rendered → completed run results invisible                                                      |
+| `LessonPipelinePage.tsx`                  | Template picker `<select>` missing from toolbar → `loadTemplate()` unreachable from UI                                           |
+| `lesson-pipeline.resolver.ts` (missing)   | No `@ResolveField('currentRun')` on `LessonPipeline` → `currentRun` always null in GraphQL response                              |
+| `lesson-pipeline.resolver.ts` (missing)   | No `@ResolveField('results')` on `LessonPipelineRun` → run had empty results array                                               |
 | `lesson-pipeline-orchestrator.service.ts` | `sharedContext` only had `{ lessonId, tenantId }` — no video/audio/notes URLs fetched from DB → INGESTION had nothing to process |
 
 ### Fix (4 Rounds)
 
 **Round 1 — Backend: field resolvers**
+
 - NEW `lesson-pipeline.resolver.ts`: `LessonPipelineFieldResolver` (`@ResolveField('currentRun')`) + `LessonPipelineRunFieldResolver` (`@ResolveField('results')`)
 - Added `findCurrentRunByPipeline(pipelineId)` to `lesson-pipeline.service.ts`
 - `lesson.module.ts`: registered both new resolvers in providers array
 
 **Round 2 — Backend: INGESTION asset context**
+
 - `lesson-pipeline-orchestrator.service.ts`: fetch `lesson_assets` from DB before module loop; populate `sharedContext` with `videoUrl`, `audioFileKey`, `notesFileKey`
 - INGESTION module uses `node.config['sourceUrl']` override if set, else falls back to lesson assets
 
 **Round 3 — Frontend: config panel + run status**
+
 - NEW `PipelineConfigPanel.tsx` (175 lines): right-side panel with enable/disable toggle + module-specific config (INGESTION: asset picker + URL + locale; ASR: language; SUMMARIZATION: style; DIAGRAM_GENERATOR: diagramType; CITATION_VERIFIER: strictMode; QA_GATE: threshold slider)
 - NEW `PipelineRunStatus.tsx` (130 lines): bottom panel showing status badge (RUNNING/COMPLETED/FAILED/CANCELLED), module result pills, key outputs (summary, QA score, transcript preview, notes)
 
 **Round 4 — Frontend: page rewrite + template picker**
+
 - `LessonPipelinePage.tsx` complete rewrite: 3-column layout (palette | canvas | config panel), template picker `<select>` in toolbar, fixed `handleRun` race (uses mutation response directly for `pipelineId`, not stale urql cache), polling useEffect for RUNNING state, `PipelineConfigPanel` conditional render, `PipelineRunStatus` at page bottom, ↑↓ reorder buttons on each node card
 - `LessonPipelinePage.test.tsx`: +12 new tests (template picker, config panel toggle, run status, empty-nodes guard, handleRun saves-then-starts regression, move buttons, asset passing)
 - NEW `apps/web/e2e/lesson-pipeline.spec.ts`: full E2E with GraphQL `page.route()` mocking — drag/configure/save/run/results flow
@@ -1297,17 +1424,17 @@ Added a **"🔧 בנה ידנית (מאפס)"** ("Build from Scratch") option to
 
 ### Files Changed
 
-| File | Change |
-|------|--------|
-| `apps/subgraph-content/src/lesson/lesson-pipeline.service.ts` | Added `findCurrentRunByPipeline()` + `findResultsByRunId()` |
-| `apps/subgraph-content/src/lesson/lesson-pipeline.resolver.ts` | NEW — `LessonPipelineFieldResolver` + `LessonPipelineRunFieldResolver` |
-| `apps/subgraph-content/src/lesson/lesson.module.ts` | Added new resolvers to providers |
+| File                                                                       | Change                                                                 |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `apps/subgraph-content/src/lesson/lesson-pipeline.service.ts`              | Added `findCurrentRunByPipeline()` + `findResultsByRunId()`            |
+| `apps/subgraph-content/src/lesson/lesson-pipeline.resolver.ts`             | NEW — `LessonPipelineFieldResolver` + `LessonPipelineRunFieldResolver` |
+| `apps/subgraph-content/src/lesson/lesson.module.ts`                        | Added new resolvers to providers                                       |
 | `apps/subgraph-content/src/lesson/lesson-pipeline-orchestrator.service.ts` | Fetch lesson assets; populate sharedContext; INGESTION config override |
-| `apps/web/src/components/pipeline/PipelineConfigPanel.tsx` | NEW — per-node config panel |
-| `apps/web/src/components/pipeline/PipelineRunStatus.tsx` | NEW — run results panel |
-| `apps/web/src/pages/LessonPipelinePage.tsx` | Complete rewrite — 3-col layout, race fix, template picker, results |
-| `apps/web/src/pages/LessonPipelinePage.test.tsx` | +12 new tests |
-| `apps/web/e2e/lesson-pipeline.spec.ts` | NEW — full E2E pipeline flow |
+| `apps/web/src/components/pipeline/PipelineConfigPanel.tsx`                 | NEW — per-node config panel                                            |
+| `apps/web/src/components/pipeline/PipelineRunStatus.tsx`                   | NEW — run results panel                                                |
+| `apps/web/src/pages/LessonPipelinePage.tsx`                                | Complete rewrite — 3-col layout, race fix, template picker, results    |
+| `apps/web/src/pages/LessonPipelinePage.test.tsx`                           | +12 new tests                                                          |
+| `apps/web/e2e/lesson-pipeline.spec.ts`                                     | NEW — full E2E pipeline flow                                           |
 
 ---
 
@@ -1318,39 +1445,44 @@ Added a **"🔧 בנה ידנית (מאפס)"** ("Build from Scratch") option to
 ### Problem
 
 Navigating to `/courses/mock-course-1/lessons/new` and completing the 3-step wizard displayed a generic **"Unexpected error"** message with no context. Console showed:
+
 ```
 [CourseList] GraphQL network error: [GraphQL] Unexpected error.
 ```
 
 ### Root Cause Chain (Wide Pattern Search — Phase 1 Discovery)
 
-| File | Issue |
-|------|-------|
-| `lesson.service.ts create()` | No UUID validation for `courseId` → FK violation on DB insert → unhandled exception → "Unexpected error" |
-| `course.service.ts findAll()` | No try/catch → any DB error propagates as "Unexpected error" → CourseList falls back to MOCK_COURSES_FALLBACK → user navigates to `mock-course-1` |
-| `lesson-asset.service.ts addAsset()` | No try/catch on DB insert → FK violations surface as "Unexpected error" |
-| `lesson-pipeline.service.ts savePipeline()/startRun()` | No try/catch → DB failures surface as "Unexpected error" |
-| `CreateLessonPage.tsx` | Error state rendered as plain text without `data-testid` or `role="alert"` |
-| `LessonPipelinePage.tsx` | `handleSave()`/`handleRun()` ignored mutation errors entirely (no error state) |
-| `CourseDetailPage.tsx` | `handleEnroll()` ignored mutation errors (toast always shown as success) |
+| File                                                   | Issue                                                                                                                                             |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lesson.service.ts create()`                           | No UUID validation for `courseId` → FK violation on DB insert → unhandled exception → "Unexpected error"                                          |
+| `course.service.ts findAll()`                          | No try/catch → any DB error propagates as "Unexpected error" → CourseList falls back to MOCK_COURSES_FALLBACK → user navigates to `mock-course-1` |
+| `lesson-asset.service.ts addAsset()`                   | No try/catch on DB insert → FK violations surface as "Unexpected error"                                                                           |
+| `lesson-pipeline.service.ts savePipeline()/startRun()` | No try/catch → DB failures surface as "Unexpected error"                                                                                          |
+| `CreateLessonPage.tsx`                                 | Error state rendered as plain text without `data-testid` or `role="alert"`                                                                        |
+| `LessonPipelinePage.tsx`                               | `handleSave()`/`handleRun()` ignored mutation errors entirely (no error state)                                                                    |
+| `CourseDetailPage.tsx`                                 | `handleEnroll()` ignored mutation errors (toast always shown as success)                                                                          |
 
 ### Fix (4 Rounds)
 
 **Round 1 — Primary (lesson.service.ts):**
+
 - Added `UUID_REGEX` validation before DB insert → throws `BadRequestException("Invalid courseId ...")` for non-UUID input
 - Added try/catch in `create()`, `update()`, `delete()`, `publish()` → `BadRequestException("Failed to create/update/delete lesson")`
 
 **Round 2 — Wide pattern (course, asset, pipeline services):**
+
 - `course.service.ts`: try/catch in `findAll()`, `create()`, `setPublished()`, `delete()`, `update()`
 - `lesson-asset.service.ts`: try/catch in `addAsset()`
 - `lesson-pipeline.service.ts`: try/catch in `savePipeline()`, `startRun()` (check + insert)
 
 **Round 3 — Frontend error display:**
+
 - `CreateLessonPage.tsx`: added `data-testid="create-lesson-error"` + `role="alert"` + console.error logging
 - `LessonPipelinePage.tsx`: added `pipelineError` state + error display with `data-testid="pipeline-error"` + `role="alert"`
 - `CourseDetailPage.tsx`: `handleEnroll()` now checks mutation errors and shows error in toast
 
 **Round 4 — Tests:**
+
 - `lesson.service.spec.ts`: +4 tests (BadRequestException on non-UUID courseId, descriptive error message, DB insert failure, user-friendly DB error message)
 - `apps/web/e2e/lesson-creation.spec.ts`: 8 new E2E tests for wizard navigation, template selection, create-button disabled state, BUG-044 regression (mock courseId shows meaningful error), accessibility `role="alert"`, visual screenshots
 
@@ -1385,30 +1517,30 @@ Both bugs share the same class: raw technical error strings exposed to users ins
 
 ### Root Cause Chain (Wide Pattern Search — 4 files)
 
-| File | Issue | Fix |
-|------|-------|-----|
-| `KnowledgeGraph.tsx:387` | `{t('loadError')}: {conceptsResult.error.message}` — raw GraphQL error interpolated | Replace with `data-testid="graph-error-banner"` + `t('networkUnavailable')` + retry button |
-| `KnowledgeGraph.tsx:749` | `{learningPathResult.error.message}` — raw path error interpolated | Replace with `t('pathError')` + `data-testid="path-error-banner"` |
-| `ActivityHeatmap.tsx:25` | `new Date(data[0]?.date ?? '')` — Invalid Date when data=[] | Guard: `firstDate = firstDateStr ? new Date(firstDateStr) : null`, `startDayOfWeek = isNaN ? 0 : getDay()` |
-| `heatmap.utils.ts:20` | `new Date(dateStr).toLocaleDateString()` — throws on empty/invalid string | Guard: `if (!dateStr) return ''`, `if (isNaN(d.getTime())) return ''` |
+| File                     | Issue                                                                               | Fix                                                                                                        |
+| ------------------------ | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `KnowledgeGraph.tsx:387` | `{t('loadError')}: {conceptsResult.error.message}` — raw GraphQL error interpolated | Replace with `data-testid="graph-error-banner"` + `t('networkUnavailable')` + retry button                 |
+| `KnowledgeGraph.tsx:749` | `{learningPathResult.error.message}` — raw path error interpolated                  | Replace with `t('pathError')` + `data-testid="path-error-banner"`                                          |
+| `ActivityHeatmap.tsx:25` | `new Date(data[0]?.date ?? '')` — Invalid Date when data=[]                         | Guard: `firstDate = firstDateStr ? new Date(firstDateStr) : null`, `startDayOfWeek = isNaN ? 0 : getDay()` |
+| `heatmap.utils.ts:20`    | `new Date(dateStr).toLocaleDateString()` — throws on empty/invalid string           | Guard: `if (!dateStr) return ''`, `if (isNaN(d.getTime())) return ''`                                      |
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/KnowledgeGraph.tsx` | Lines 385-389: replaced raw `error.message` with clean `data-testid="graph-error-banner"` + `t('networkUnavailable')` + retry button (`onClick={handleRefresh}`) + `role="alert"` + `aria-live="polite"`. Line 749: replaced `learningPathResult.error.message` with `t('pathError')`. Added `useEffect` logging both errors with `console.error('[KnowledgeGraph] ...')` |
-| `apps/web/src/lib/heatmap.utils.ts` | `formatHeatmapDate`: added `if (!dateStr) return ''` + `if (isNaN(d.getTime())) return ''` guards before calling `toLocaleDateString()` |
-| `apps/web/src/components/ActivityHeatmap.tsx` | `startDayOfWeek`: guarded `new Date('')` with `firstDateStr ? new Date(firstDateStr) : null` + NaN check → returns 0 for empty data |
-| `packages/i18n/src/locales/*/knowledge.json` | Added `networkUnavailable`, `retry`, `pathError` keys (10 locales: en, he, es, fr, hi, id, pt, ru, bn, zh-CN) |
+| File                                          | Change                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/pages/KnowledgeGraph.tsx`       | Lines 385-389: replaced raw `error.message` with clean `data-testid="graph-error-banner"` + `t('networkUnavailable')` + retry button (`onClick={handleRefresh}`) + `role="alert"` + `aria-live="polite"`. Line 749: replaced `learningPathResult.error.message` with `t('pathError')`. Added `useEffect` logging both errors with `console.error('[KnowledgeGraph] ...')` |
+| `apps/web/src/lib/heatmap.utils.ts`           | `formatHeatmapDate`: added `if (!dateStr) return ''` + `if (isNaN(d.getTime())) return ''` guards before calling `toLocaleDateString()`                                                                                                                                                                                                                                   |
+| `apps/web/src/components/ActivityHeatmap.tsx` | `startDayOfWeek`: guarded `new Date('')` with `firstDateStr ? new Date(firstDateStr) : null` + NaN check → returns 0 for empty data                                                                                                                                                                                                                                       |
+| `packages/i18n/src/locales/*/knowledge.json`  | Added `networkUnavailable`, `retry`, `pathError` keys (10 locales: en, he, es, fr, hi, id, pt, ru, bn, zh-CN)                                                                                                                                                                                                                                                             |
 
 ### Tests Added (+12 new tests)
 
-| File | Tests |
-|------|-------|
-| `apps/web/src/lib/heatmap.utils.test.ts` | +3: `formatHeatmapDate('')` returns `''` not throw; `formatHeatmapDate('not-a-date')` returns `''` not throw; `formatHeatmapDate('undefined')` not throw |
-| `apps/web/src/components/ActivityHeatmap.test.tsx` | +3: `data=[]` renders without crash; renders "0 study days" summary; no tooltip cells with empty data |
-| `apps/web/src/pages/KnowledgeGraph.test.tsx` | +6 (BUG-043 regression describe): error banner visible; no `[GraphQL]` in banner; no `[Network]` in banner; no "Invalid time value" anywhere; retry button visible; `role="alert"` present. Added `vi.mock('@/lib/auth', () => ({ DEV_MODE: false }))` to enable production-mode error paths |
-| `apps/web/e2e/knowledge-graph.spec.ts` | Suite 3 (REAL_BACKEND): blocks GraphQL → clean banner; no forbidden strings; retry button; visual screenshot; + "Invalid time value not visible on normal load" test |
+| File                                               | Tests                                                                                                                                                                                                                                                                                        |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/lib/heatmap.utils.test.ts`           | +3: `formatHeatmapDate('')` returns `''` not throw; `formatHeatmapDate('not-a-date')` returns `''` not throw; `formatHeatmapDate('undefined')` not throw                                                                                                                                     |
+| `apps/web/src/components/ActivityHeatmap.test.tsx` | +3: `data=[]` renders without crash; renders "0 study days" summary; no tooltip cells with empty data                                                                                                                                                                                        |
+| `apps/web/src/pages/KnowledgeGraph.test.tsx`       | +6 (BUG-043 regression describe): error banner visible; no `[GraphQL]` in banner; no `[Network]` in banner; no "Invalid time value" anywhere; retry button visible; `role="alert"` present. Added `vi.mock('@/lib/auth', () => ({ DEV_MODE: false }))` to enable production-mode error paths |
+| `apps/web/e2e/knowledge-graph.spec.ts`             | Suite 3 (REAL_BACKEND): blocks GraphQL → clean banner; no forbidden strings; retry button; visual screenshot; + "Invalid time value not visible on normal load" test                                                                                                                         |
 
 ### Anti-Recurrence
 
@@ -1432,6 +1564,7 @@ Both bugs share the same class: raw technical error strings exposed to users ins
 ### Problem
 
 The `/courses` page repeatedly displayed:
+
 > `Failed to fetch — [GraphQL] Unexpected error [Network] — מציג נתונים מהמטמון.`
 
 This was doubly confusing: `CourseList.tsx:314` prepended `[Network] Failed to fetch — ` to `error.message`, which urql itself fills with `[GraphQL] Unexpected error [Network]` for network failures. The banner also had no retry button and no `console.error` logging.
@@ -1440,35 +1573,36 @@ This was doubly confusing: `CourseList.tsx:314` prepended `[Network] Failed to f
 
 ### Root Cause Analysis (Wide Pattern Search — 4 pages affected)
 
-| Page | File | Issue |
-|------|------|-------|
-| `CourseList` | `pages/CourseList.tsx:314` | **Primary**: `[Network] Failed to fetch — ${error.message}` → double repetition of urql internals |
-| `CollaborationPage` | `pages/CollaborationPage.tsx` | Showed raw `error.message` in error div, no retry |
-| `AgentsPage` | `pages/AgentsPage.tsx` | Showed raw `error?.message` inline as tiny text, no retry |
-| `urql-client.ts` | `lib/urql-client.ts` | `authErrorExchange` only logged auth errors — network errors silently swallowed |
+| Page                | File                          | Issue                                                                                             |
+| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| `CourseList`        | `pages/CourseList.tsx:314`    | **Primary**: `[Network] Failed to fetch — ${error.message}` → double repetition of urql internals |
+| `CollaborationPage` | `pages/CollaborationPage.tsx` | Showed raw `error.message` in error div, no retry                                                 |
+| `AgentsPage`        | `pages/AgentsPage.tsx`        | Showed raw `error?.message` inline as tiny text, no retry                                         |
+| `urql-client.ts`    | `lib/urql-client.ts`          | `authErrorExchange` only logged auth errors — network errors silently swallowed                   |
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `apps/web/src/pages/CourseList.tsx` | Rewrote `OfflineBanner`: clean i18n message `networkUnavailable`, retry button (`requestPolicy: 'network-only'`), `role="alert"`, `data-testid="offline-banner"`, `console.error` logging |
-| `apps/web/src/lib/urql-client.ts` | Added network error `console.warn` in `authErrorExchange.onError` (always, before auth check) |
-| `apps/web/src/pages/CollaborationPage.tsx` | Replaced raw error div with clean `data-testid="collab-offline-banner"` + retry button |
-| `apps/web/src/pages/AgentsPage.tsx` | Replaced raw error text with `t('templatesUnavailable')` + `data-testid` |
-| `packages/i18n/src/locales/*/courses.json` | Added `networkUnavailable` + `retry` keys (10 locales: en, he, es, fr, hi, id, pt, ru, bn, zh-CN) |
-| `packages/i18n/src/locales/*/agents.json` | Added `templatesUnavailable` key (10 locales) |
+| File                                       | Change                                                                                                                                                                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/pages/CourseList.tsx`        | Rewrote `OfflineBanner`: clean i18n message `networkUnavailable`, retry button (`requestPolicy: 'network-only'`), `role="alert"`, `data-testid="offline-banner"`, `console.error` logging |
+| `apps/web/src/lib/urql-client.ts`          | Added network error `console.warn` in `authErrorExchange.onError` (always, before auth check)                                                                                             |
+| `apps/web/src/pages/CollaborationPage.tsx` | Replaced raw error div with clean `data-testid="collab-offline-banner"` + retry button                                                                                                    |
+| `apps/web/src/pages/AgentsPage.tsx`        | Replaced raw error text with `t('templatesUnavailable')` + `data-testid`                                                                                                                  |
+| `packages/i18n/src/locales/*/courses.json` | Added `networkUnavailable` + `retry` keys (10 locales: en, he, es, fr, hi, id, pt, ru, bn, zh-CN)                                                                                         |
+| `packages/i18n/src/locales/*/agents.json`  | Added `templatesUnavailable` key (10 locales)                                                                                                                                             |
 
 ### Tests Added
 
-| File | Tests |
-|------|-------|
+| File                                     | Tests                                                                                                                                                                                                                                                |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `apps/web/src/pages/CourseList.test.tsx` | 6 new tests: offline banner visible on error; clean message (no `[GraphQL]`/`[Network]`/`Unexpected error`); retry button present; retry calls `reexecute({ requestPolicy: 'network-only' })`; no banner when query succeeds; `console.error` logged |
-| `apps/web/src/lib/urql-client.test.ts` | 3 new tests: `console.warn` called with `[GraphQL][Network]` prefix; not called without `networkError`; operation kind included |
-| `apps/web/e2e/courses.spec.ts` | 2 E2E tests (skip when `VITE_DEV_MODE=true`): offline banner visible with blocked GraphQL; banner contains no raw urql strings; retry button present; mock courses visible |
+| `apps/web/src/lib/urql-client.test.ts`   | 3 new tests: `console.warn` called with `[GraphQL][Network]` prefix; not called without `networkError`; operation kind included                                                                                                                      |
+| `apps/web/e2e/courses.spec.ts`           | 2 E2E tests (skip when `VITE_DEV_MODE=true`): offline banner visible with blocked GraphQL; banner contains no raw urql strings; retry button present; mock courses visible                                                                           |
 
 ### Bug Fix Protocol Update
 
 Updated `CLAUDE.md` Bug Fix Protocol to mandate:
+
 - After finding a bug, search for ALL similar patterns across ALL pages/files before declaring fixed
 - UI bugs require Playwright E2E test + screenshot assertion (iron rule)
 - Every fix round ends with: unit tests + TypeScript check + ESLint + visual verification
@@ -1495,30 +1629,39 @@ Updated `CLAUDE.md` Bug Fix Protocol to mandate:
 
 ### Root Cause Analysis (Wide Pattern Search — 6 patterns found)
 
-| Pattern | Occurrences | Root Cause |
-|---------|-------------|------------|
-| **A** — `authContext.roles[0] as any` | 9 (agent-message×4, agent-session×5) | `TenantContext['userRole']` type existed but was unused in service files |
-| **B** — `@Args('input') input: any` in resolvers | 8 (template×2, graph×6) | Schema-first resolvers typed loosely at initial implementation |
-| **C** — LangGraph `private graph: any` / `buildGraph(): any` | 12 workflow files | StateGraph generic param not inferred when graph stored as field |
-| **D** — `openai(this.model) as any` | 12 workflow files | `@ai-sdk/openai` v1 returns `LanguageModelV3`; `ai@5` expects `LanguageModelV1|V2` |
-| **E** — Drizzle / misc backend casts | 6 files | `Record<string,unknown>` not assignable to Drizzle generated types |
-| **F** — Frontend `zodResolver(schema as any)` | 3 web pages | Zod v3 in `apps/web` vs `@hookform/resolvers` v3+ expecting Zod v4 internal types |
+| Pattern                                                      | Occurrences                          | Root Cause                                                                        |
+| ------------------------------------------------------------ | ------------------------------------ | --------------------------------------------------------------------------------- | --- |
+| **A** — `authContext.roles[0] as any`                        | 9 (agent-message×4, agent-session×5) | `TenantContext['userRole']` type existed but was unused in service files          |
+| **B** — `@Args('input') input: any` in resolvers             | 8 (template×2, graph×6)              | Schema-first resolvers typed loosely at initial implementation                    |
+| **C** — LangGraph `private graph: any` / `buildGraph(): any` | 12 workflow files                    | StateGraph generic param not inferred when graph stored as field                  |
+| **D** — `openai(this.model) as any`                          | 12 workflow files                    | `@ai-sdk/openai` v1 returns `LanguageModelV3`; `ai@5` expects `LanguageModelV1    | V2` |
+| **E** — Drizzle / misc backend casts                         | 6 files                              | `Record<string,unknown>` not assignable to Drizzle generated types                |
+| **F** — Frontend `zodResolver(schema as any)`                | 3 web pages                          | Zod v3 in `apps/web` vs `@hookform/resolvers` v3+ expecting Zod v4 internal types |
 
 ### Fix Per Pattern
 
 **Pattern A:**
+
 ```typescript
 // Before: userRole: authContext.roles[0] as any
 import type { TenantContext } from '@edusphere/db';
-userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole']
+userRole: (authContext.roles[0] ?? 'STUDENT') as TenantContext['userRole'];
 ```
 
 **Pattern B:** Defined typed interfaces matching actual service signatures:
+
 ```typescript
-interface CreateAgentTemplateInput { tenantId: string; creatorId: string; name: string; template: string; config?: Record<string, unknown>; }
+interface CreateAgentTemplateInput {
+  tenantId: string;
+  creatorId: string;
+  name: string;
+  template: string;
+  config?: Record<string, unknown>;
+}
 ```
 
 **Pattern C — Major LangGraph structural refactor (12 files):**
+
 ```typescript
 // Before: stored graph as field; returned any
 private graph: any;
@@ -1546,12 +1689,12 @@ compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
 
 ### Test Updates Required
 
-| File | Reason |
-|------|--------|
-| 7 LangGraph test files | `addNode: vi.fn()` → `addNode: vi.fn(function(){ return this; })` (fluent chain mock) |
-| `ai.service.db.spec.ts` | 3 mocks updated from plain array to `{ rows: [...] }` structure |
-| `agent-tools.spec.ts` | `.parameters` → `.inputSchema` (Vercel AI SDK v5 rename) |
-| `ai.langgraph.workflow.spec.ts` | Static string → regex for compile() assertion |
+| File                            | Reason                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------- |
+| 7 LangGraph test files          | `addNode: vi.fn()` → `addNode: vi.fn(function(){ return this; })` (fluent chain mock) |
+| `ai.service.db.spec.ts`         | 3 mocks updated from plain array to `{ rows: [...] }` structure                       |
+| `agent-tools.spec.ts`           | `.parameters` → `.inputSchema` (Vercel AI SDK v5 rename)                              |
+| `ai.langgraph.workflow.spec.ts` | Static string → regex for compile() assertion                                         |
 
 ### Anti-Recurrence
 
@@ -1563,16 +1706,16 @@ compile(opts?: { checkpointer?: boolean | BaseCheckpointSaver }) {
 
 ### Results
 
-| Package | Tests Before | Tests After |
-|---------|-------------|-------------|
-| `@edusphere/langgraph-workflows` | 154 ✅ | 154 ✅ |
-| `@edusphere/subgraph-agent` | 563 ✅ | 563 ✅ |
-| `@edusphere/subgraph-collaboration` | 161 ✅ | 161 ✅ |
-| `@edusphere/subgraph-core` | 575 ✅ | 575 ✅ |
-| `@edusphere/subgraph-knowledge` | 443 ✅ | 443 ✅ |
-| `@edusphere/subgraph-annotation` | 124 ✅ | 124 ✅ |
-| `@edusphere/web` | 2,861 ✅ | 2,861 ✅ |
-| **Total** | **4,881** | **4,881** |
+| Package                             | Tests Before | Tests After |
+| ----------------------------------- | ------------ | ----------- |
+| `@edusphere/langgraph-workflows`    | 154 ✅       | 154 ✅      |
+| `@edusphere/subgraph-agent`         | 563 ✅       | 563 ✅      |
+| `@edusphere/subgraph-collaboration` | 161 ✅       | 161 ✅      |
+| `@edusphere/subgraph-core`          | 575 ✅       | 575 ✅      |
+| `@edusphere/subgraph-knowledge`     | 443 ✅       | 443 ✅      |
+| `@edusphere/subgraph-annotation`    | 124 ✅       | 124 ✅      |
+| `@edusphere/web`                    | 2,861 ✅     | 2,861 ✅    |
+| **Total**                           | **4,881**    | **4,881**   |
 
 Production `no-explicit-any` violations: **98 → 0** ✅
 
@@ -1588,31 +1731,31 @@ Every container restart broke all 5 dev users — `{ me { id email role } }` ret
 
 ### Root Causes (3 independent failures)
 
-| # | Layer | Root Cause |
-|---|-------|-----------|
-| 1 | **Keycloak DB** | Keycloak uses `KC_DB=postgres` — realm/user data lives in the `postgres_data` named volume (`keycloak` PostgreSQL DB), NOT in `keycloak_data`. Deleting `keycloak_data` does nothing. On restart Keycloak found the realm already in PostgreSQL and skipped `--import-realm`, so users kept wrong UUIDs (`daa00e8d-...`) instead of the seeded `00000000-...001-005` |
-| 2 | **Missing realm roles** | Users created/re-imported via `partialImport` had no realm roles → JWT lacked `realm_access.roles` → `JWTClaimsSchema` (which requires `realm_access` as non-optional) threw Zod validation error → "Unauthenticated" |
-| 3 | **Zod v4 strict UUID regex** | `z.string().uuid()` in Zod v4 validates against RFC 9562 strict pattern: `/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-...-000000000000\|...)$/`. Our dev seed UUIDs (`00000000-0000-0000-0000-000000000002`) have **version=0** (not 1–8) and **variant=00** (not [89ab]) → fail validation → every real Keycloak JWT for a non-nil-UUID user was rejected |
+| #   | Layer                        | Root Cause                                                                                                                                                                                                                                                                                                                                                                                                           |
+| --- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Keycloak DB**              | Keycloak uses `KC_DB=postgres` — realm/user data lives in the `postgres_data` named volume (`keycloak` PostgreSQL DB), NOT in `keycloak_data`. Deleting `keycloak_data` does nothing. On restart Keycloak found the realm already in PostgreSQL and skipped `--import-realm`, so users kept wrong UUIDs (`daa00e8d-...`) instead of the seeded `00000000-...001-005`                                                 |
+| 2   | **Missing realm roles**      | Users created/re-imported via `partialImport` had no realm roles → JWT lacked `realm_access.roles` → `JWTClaimsSchema` (which requires `realm_access` as non-optional) threw Zod validation error → "Unauthenticated"                                                                                                                                                                                                |
+| 3   | **Zod v4 strict UUID regex** | `z.string().uuid()` in Zod v4 validates against RFC 9562 strict pattern: `/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-...-000000000000\|...)$/`. Our dev seed UUIDs (`00000000-0000-0000-0000-000000000002`) have **version=0** (not 1–8) and **variant=00** (not [89ab]) → fail validation → every real Keycloak JWT for a non-nil-UUID user was rejected |
 
 ### Fix
 
-| File | Change |
-|------|--------|
-| `packages/auth/src/jwt.ts` | `sub: z.string().uuid()` → `sub: z.string().min(36).max(36)` — accepts nil-patterned UUIDs used in dev seeds |
-| `packages/auth/dist/` | Rebuilt — bind-mounted into container so fix is live without image rebuild |
-| `scripts/reset-keycloak-passwords.cjs` | **Rewritten as comprehensive idempotent bootstrap**: (1) list users, (2) delete wrong-UUID users, (3) `partialImport` correct `00000000-...` UUIDs, (4) assign realm roles, (5) reset passwords, (6) clear `notBefore`. Runs on every container startup via `keycloak-seed-passwords` supervisord job |
-| `infrastructure/docker/startup.sh` | Added `@edusphere/langgraph-workflows` symlink creation — prevents `Cannot find module '@edusphere/langgraph-workflows'` after container recreate |
-| `docker-compose.yml` | Added `./scripts:/app/scripts:ro` bind mount — ensures the container always uses committed setup scripts, not stale baked-in image versions |
-| `infrastructure/docker/keycloak-realm.json` | All 5 user IDs updated to `00000000-0000-0000-0000-000000000001-005` with `attributes.tenant_id` on each user |
+| File                                        | Change                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/auth/src/jwt.ts`                  | `sub: z.string().uuid()` → `sub: z.string().min(36).max(36)` — accepts nil-patterned UUIDs used in dev seeds                                                                                                                                                                                          |
+| `packages/auth/dist/`                       | Rebuilt — bind-mounted into container so fix is live without image rebuild                                                                                                                                                                                                                            |
+| `scripts/reset-keycloak-passwords.cjs`      | **Rewritten as comprehensive idempotent bootstrap**: (1) list users, (2) delete wrong-UUID users, (3) `partialImport` correct `00000000-...` UUIDs, (4) assign realm roles, (5) reset passwords, (6) clear `notBefore`. Runs on every container startup via `keycloak-seed-passwords` supervisord job |
+| `infrastructure/docker/startup.sh`          | Added `@edusphere/langgraph-workflows` symlink creation — prevents `Cannot find module '@edusphere/langgraph-workflows'` after container recreate                                                                                                                                                     |
+| `docker-compose.yml`                        | Added `./scripts:/app/scripts:ro` bind mount — ensures the container always uses committed setup scripts, not stale baked-in image versions                                                                                                                                                           |
+| `infrastructure/docker/keycloak-realm.json` | All 5 user IDs updated to `00000000-0000-0000-0000-000000000001-005` with `attributes.tenant_id` on each user                                                                                                                                                                                         |
 
 ### New Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `scripts/fix-keycloak-uuids.cjs` | One-shot: delete wrong-UUID users + `partialImport` correct UUIDs |
-| `scripts/assign-kc-roles.cjs` | One-shot: assign realm roles (SUPER_ADMIN/INSTRUCTOR/ORG_ADMIN/RESEARCHER/STUDENT) |
-| `scripts/check-kc-now.cjs` | Diagnostic: verify current Keycloak user UUIDs and login status |
-| `scripts/test-jwt-validation.cjs` | E2E: login all 5 users, decode JWT, call `{ me { ... } }` via Gateway |
+| Script                            | Purpose                                                                            |
+| --------------------------------- | ---------------------------------------------------------------------------------- |
+| `scripts/fix-keycloak-uuids.cjs`  | One-shot: delete wrong-UUID users + `partialImport` correct UUIDs                  |
+| `scripts/assign-kc-roles.cjs`     | One-shot: assign realm roles (SUPER_ADMIN/INSTRUCTOR/ORG_ADMIN/RESEARCHER/STUDENT) |
+| `scripts/check-kc-now.cjs`        | Diagnostic: verify current Keycloak user UUIDs and login status                    |
+| `scripts/test-jwt-validation.cjs` | E2E: login all 5 users, decode JWT, call `{ me { ... } }` via Gateway              |
 
 ### Verification
 
@@ -6836,64 +6979,66 @@ This bypassed all real imports — TipTap/KaTeX was never loaded in tests, makin
 
 ### Option A — Router Wiring + Real Data
 
-| Item | Status |
-|------|--------|
-| DashboardPage wired at /dashboard (Session 25 new UI) | ✅ |
-| CoursesDiscoveryPage wired at /discover | ✅ |
-| /dashboard/legacy preserved for backward compat | ✅ |
-| MY_ENROLLMENTS_QUERY wired in DashboardPage + mock fallback | ✅ |
-| CoursesDiscovery onClick: /learn/:id → /courses/:id (UX BLOCKING fixed) | ✅ |
-| SmartRoot: / → LandingPage (unauthenticated) or /dashboard (authenticated) | ✅ |
-| SmartRoot.test.tsx — 9 unit tests | ✅ |
-| TODO: streak/XP/activity mocks → real resolvers (needs supergraph fields) | ⚠️ |
+| Item                                                                       | Status |
+| -------------------------------------------------------------------------- | ------ |
+| DashboardPage wired at /dashboard (Session 25 new UI)                      | ✅     |
+| CoursesDiscoveryPage wired at /discover                                    | ✅     |
+| /dashboard/legacy preserved for backward compat                            | ✅     |
+| MY_ENROLLMENTS_QUERY wired in DashboardPage + mock fallback                | ✅     |
+| CoursesDiscovery onClick: /learn/:id → /courses/:id (UX BLOCKING fixed)    | ✅     |
+| SmartRoot: / → LandingPage (unauthenticated) or /dashboard (authenticated) | ✅     |
+| SmartRoot.test.tsx — 9 unit tests                                          | ✅     |
+| TODO: streak/XP/activity mocks → real resolvers (needs supergraph fields)  | ⚠️     |
 
 ### Option B — Learning Loop / KnowledgeSkillTree
 
-| Item | Status |
-|------|--------|
-| Migration 0011: user_skill_mastery table + RLS (SI-1 confirmed) | ✅ |
-| Drizzle schema: packages/db/src/schema/user-skill-mastery.ts | ✅ |
-| GET_SKILL_TREE_QUERY + UPDATE_MASTERY_MUTATION in knowledge.queries.ts | ✅ |
-| SkillTree SDL: skillTree + updateMasteryLevel in subgraph-knowledge | ✅ |
-| PENDING: pnpm --filter @edusphere/gateway compose (supergraph recompose) | ⚠️ |
-| PENDING: pnpm codegen (generate TS types for new schema) | ⚠️ |
+| Item                                                                     | Status |
+| ------------------------------------------------------------------------ | ------ |
+| Migration 0011: user_skill_mastery table + RLS (SI-1 confirmed)          | ✅     |
+| Drizzle schema: packages/db/src/schema/user-skill-mastery.ts             | ✅     |
+| GET_SKILL_TREE_QUERY + UPDATE_MASTERY_MUTATION in knowledge.queries.ts   | ✅     |
+| SkillTree SDL: skillTree + updateMasteryLevel in subgraph-knowledge      | ✅     |
+| PENDING: pnpm --filter @edusphere/gateway compose (supergraph recompose) | ⚠️     |
+| PENDING: pnpm codegen (generate TS types for new schema)                 | ⚠️     |
 
 ### Option C — Mobile Security
 
-| Item | Status |
-|------|--------|
-| AITutorScreen: real createAgentSession mutation (no demo-session) | ✅ |
-| AITutorScreen: AI consent gate AsyncStorage (SI-10) | ✅ |
-| AITutorScreen: tenantId:"tenant-1" removed from SEND_MESSAGE mutation (SI-9) | ✅ |
-| HomeScreen: MY_STATS_QUERY + resolveStats() with mock fallback | ✅ |
-| ai-consent.ts + stats-utils.ts pure logic modules | ✅ |
-| AITutorScreen.test.ts — 14 pure logic tests | ✅ |
-| HomeScreen.test.tsx — +7 resolveStats tests + regression guard | ✅ |
-| Mobile total: 138 tests pass | ✅ |
+| Item                                                                         | Status |
+| ---------------------------------------------------------------------------- | ------ |
+| AITutorScreen: real createAgentSession mutation (no demo-session)            | ✅     |
+| AITutorScreen: AI consent gate AsyncStorage (SI-10)                          | ✅     |
+| AITutorScreen: tenantId:"tenant-1" removed from SEND_MESSAGE mutation (SI-9) | ✅     |
+| HomeScreen: MY_STATS_QUERY + resolveStats() with mock fallback               | ✅     |
+| ai-consent.ts + stats-utils.ts pure logic modules                            | ✅     |
+| AITutorScreen.test.ts — 14 pure logic tests                                  | ✅     |
+| HomeScreen.test.tsx — +7 resolveStats tests + regression guard               | ✅     |
+| Mobile total: 138 tests pass                                                 | ✅     |
 
 ### Security Audit
 
-| Item | Status |
-|------|--------|
-| SI-1..SI-10: all 10 invariants PASS | ✅ |
-| apps/web/e2e/auth-flow-security.spec.ts — 17 pen-test scenarios | ✅ |
-| apps/web/e2e/skill-tree-security.spec.ts — 6 pen-test scenarios | ✅ |
-| docs/security/session-26-security-audit.md | ✅ |
+| Item                                                            | Status |
+| --------------------------------------------------------------- | ------ |
+| SI-1..SI-10: all 10 invariants PASS                             | ✅     |
+| apps/web/e2e/auth-flow-security.spec.ts — 17 pen-test scenarios | ✅     |
+| apps/web/e2e/skill-tree-security.spec.ts — 6 pen-test scenarios | ✅     |
+| docs/security/session-26-security-audit.md                      | ✅     |
 
 ### Known Issues
 
-| Issue | Severity |
-|-------|---------|
-| CoursesScreen.test.tsx: 2 pre-existing sqlite dynamic import timeouts (unrelated to Session 26) | 🟡 |
-| supergraph.graphql needs recompose before skillTree/updateMasteryLevel are routable | 🟡 |
+| Issue                                                                                           | Severity |
+| ----------------------------------------------------------------------------------------------- | -------- |
+| CoursesScreen.test.tsx: 2 pre-existing sqlite dynamic import timeouts (unrelated to Session 26) | 🟡       |
+| supergraph.graphql needs recompose before skillTree/updateMasteryLevel are routable             | 🟡       |
 
 ### Protocol Update
+
 - enterprise-execution.md: added Proactive Parallelism iron rule
 - MEMORY.md: Launch Arch+UX WITH Stage 1; Security+QA WITH Stage 4
 
 **Anti-recurrence:** enterprise-execution.md updated with mandatory cross-stage parallel launch schedule.
 
 **Files created/modified:**
+
 - apps/web/src/lib/router.tsx
 - apps/web/src/pages/DashboardPage.tsx
 - apps/web/src/pages/CoursesDiscoveryPage.tsx

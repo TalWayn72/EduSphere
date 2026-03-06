@@ -111,4 +111,23 @@ export class MediaResolver {
     if (parent.hlsManifestUrl !== undefined) return parent.hlsManifestUrl;
     return this.mediaService.getHlsManifestUrl(parent.hlsManifestKey ?? null);
   }
+
+  /**
+   * Field resolver: returns available translated subtitle tracks.
+   * Empty array when no translations have completed yet.
+   */
+  @ResolveField('subtitleTracks')
+  async resolveSubtitleTracks(
+    @Parent() parent: { id: string }
+  ): Promise<{ language: string; label: string; src: string }[]> {
+    try {
+      return await this.mediaService.getSubtitleTracks(parent.id);
+    } catch (err) {
+      this.logger.warn(
+        `resolveSubtitleTracks failed for assetId=${parent.id}`,
+        err
+      );
+      return [];
+    }
+  }
 }

@@ -4,6 +4,10 @@ import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Bookmark } from '@/lib/mock-content-data';
+import {
+  VideoSubtitleSelector,
+  type SubtitleTrack,
+} from './VideoSubtitleSelector';
 
 interface VideoPlayerProps {
   /** Direct URL for the original video file (fallback when HLS is unavailable). */
@@ -18,6 +22,8 @@ interface VideoPlayerProps {
   bookmarks?: Bookmark[];
   onTimeUpdate?: (currentTime: number) => void;
   seekTo?: number;
+  /** Available subtitle tracks (populated after AI translation completes). */
+  subtitleTracks?: SubtitleTrack[];
 }
 
 export function VideoPlayer({
@@ -26,6 +32,7 @@ export function VideoPlayer({
   bookmarks = [],
   onTimeUpdate,
   seekTo,
+  subtitleTracks = [],
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -35,6 +42,7 @@ export function VideoPlayer({
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [activeSubtitle, setActiveSubtitle] = useState<string | null>(null);
 
   // ── HLS initialisation ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -76,6 +84,18 @@ export function VideoPlayer({
       videoRef.current.currentTime = seekTo;
     }
   }, [seekTo]);
+
+  // ── Subtitle track selection ─────────────────────────────────────────────────
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    for (let i = 0; i < video.textTracks.length; i++) {
+      const track = video.textTracks[i];
+      if (track) {
+        track.mode = track.language === activeSubtitle ? 'showing' : 'hidden';
+      }
+    }
+  }, [activeSubtitle]);
 
   // ── Playback controls ───────────────────────────────────────────────────────
   const togglePlayPause = () => {
@@ -157,7 +177,17 @@ export function VideoPlayer({
         onLoadedMetadata={handleLoadedMetadata}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-      />
+      >
+        {subtitleTracks.map((track) => (
+          <track
+            key={track.language}
+            kind="subtitles"
+            src={track.src}
+            srcLang={track.language}
+            label={track.label}
+          />
+        ))}
+      </video>
 
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="relative mb-2">
@@ -224,6 +254,14 @@ export function VideoPlayer({
                 className="cursor-pointer"
               />
             </div>
+
+            {subtitleTracks.length > 0 && (
+              <VideoSubtitleSelector
+                tracks={subtitleTracks}
+                activeLanguage={activeSubtitle}
+                onChange={setActiveSubtitle}
+              />
+            )}
 
             <Button
               variant="ghost"
