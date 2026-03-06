@@ -1,7 +1,7 @@
 # EduSphere Documentation Index
 
 > Single-source navigation for all 120+ project documents.
-> Last updated: March 2026 (Session 26)
+> Last updated: March 2026 (Session 27)
 
 ---
 
@@ -94,6 +94,7 @@
 | [GITHUB_SETUP.md](development/GITHUB_SETUP.md) | GitHub Actions, CI/CD setup |
 | [CICD_FIX_PLAN.md](development/CICD_FIX_PLAN.md) | CI/CD pipeline fix and improvement plan |
 | [CODE_QUALITY_IMPROVEMENT_PLAN.md](development/CODE_QUALITY_IMPROVEMENT_PLAN.md) | Code quality improvement plan |
+| [DESIGN_SYSTEM.md](development/DESIGN_SYSTEM.md) | Indigo Design System tokens, ThemeProvider, MasteryBadge, AppSidebar |
 
 ---
 
@@ -123,6 +124,22 @@
 > - `plans/bugs/` — Bug fix documents (BUG-NNN-*)
 > - `plans/features/` — Feature implementation specs
 > - `plans/archive/` — Completed sprint plans (historical)
+
+### docs/plans/archive/ — Completed Plan History
+
+| File | Purpose |
+|------|---------|
+| GAP_CLOSURE_PLAN.md | Gap analysis closure plan (archived) |
+| MASTER_COMPLETION_PLAN.md | Master project completion plan (archived) |
+| MCP_COMPLETION_VALIDATION_PLAN.md | MCP validation plan (archived) |
+| PHASE_27_DEPLOYMENT_PLAN.md | Phase 27 deployment plan (archived) |
+| REMAINING_WORK_PLAN.md | Remaining work backlog (archived) |
+| SPRINT4_TECH_PLAN.md | Sprint 4 technical plan (archived) |
+| PHASE_2_SETUP_LOG.md | Phase 2 setup log |
+| PHASE_3_PROGRESS_LOG.md | Phase 3 progress log |
+| PHASE_3_4_COMPLETION_REPORT.md | Phase 3-4 completion report |
+| PHASE_IMPLEMENTATION_LOG.md | Phase implementation log |
+| ACCESSIBILITY_AND_THEMING_IMPLEMENTATION_SPEC.md | Session 25 implementation spec (implemented) |
 
 ---
 
@@ -167,6 +184,8 @@
 | [IMPLEMENTATION_STATUS.md](project/IMPLEMENTATION_STATUS.md) | Phase-by-phase implementation status |
 | [SESSION_SUMMARY.md](project/SESSION_SUMMARY.md) | Development session summaries |
 | [SPRINT_ACTION_PLAN.md](project/SPRINT_ACTION_PLAN.md) | Current sprint action plan |
+| [DOC_MANAGER_AUDIT_SESSION27.md](project/DOC_MANAGER_AUDIT_SESSION27.md) | Documentation Manager audit report — Session 27 gap analysis |
+| [DOC_QA_REPORT_SESSION27.md](project/DOC_QA_REPORT_SESSION27.md) | Documentation QA quality scorecard — Session 27 |
 
 ---
 
@@ -233,7 +252,7 @@
 | [TDE_COLUMN_ENCRYPTION.md](security/TDE_COLUMN_ENCRYPTION.md) | Transparent data encryption setup |
 | [VAULT_SETUP.md](security/VAULT_SETUP.md) | HashiCorp Vault secrets management setup |
 | [MEMORY_SAFETY_PLAN.md](security/MEMORY_SAFETY_PLAN.md) | Memory safety rules and OOM prevention |
-| [phase-27-security-audit.md](security/phase-27-security-audit.md) | Phase 27 security audit plan |
+| [PHASE_27_SECURITY_AUDIT.md](security/PHASE_27_SECURITY_AUDIT.md) | Phase 27 security audit plan |
 
 ---
 

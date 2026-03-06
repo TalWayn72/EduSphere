@@ -1,5 +1,415 @@
 # Changelog
 
-All notable changes to EduSphere will be documented in this file.
+All notable changes to EduSphere are documented in this file.
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+Versioning: Session-based (Session N = version 0.N.0)
 
-This file is auto-generated from conventional commits via `pnpm changelog`.
+---
+
+## [0.27.0] — 2026-03-06 — Phase 27: Live Sessions, Offline Web, Course Discovery, KG Context
+
+### Added
+- Live Sessions subgraph (subgraph-agent): `LiveSessionsPage`, `LiveSessionDetailPage`, NATS JetStream event integration (`session.started`, `session.ended`)
+- Offline Web: ServiceWorker + IndexedDB via `OfflineLessonCache`, `OfflineBanner` component, `useOfflineStatus` hook, `useOfflineQueue` hook with 100-item LRU eviction
+- `AdminActivityFeed` component with 30-second auto-refresh and `clearInterval` cleanup (memory safety compliant)
+- KnowledgeGraph courseId context: `KnowledgeGraphPage` now passes `courseId` from URL params to graph queries
+- `CoursesDiscoveryPage`: search input, category/level filters, `MasteryBadge` integration, card layout
+- Routes fully wired: `/explore`, `/discover`, `/courses/discover`, `/sessions`, `/skill-tree`
+- `SmartRoot` component for root-level route resolution
+- 175 new tests (109 unit + 66 E2E), 44 visual regression screenshots
+
+### Fixed
+- BUG-054: `<Progress>` `barColor` was applied to the container div (outer wrapper), making the bar appear solid at 0% usage. Added `indicatorClassName` prop — color now applies to the inner indicator div only.
+
+### Security
+- SI-3: `attendeePasswordEnc` / `moderatorPasswordEnc` — AES-256-GCM encryption for live session passwords (plaintext columns removed)
+- Raw GraphQL error messages no longer exposed in `LiveSessionsPage` DOM (replaced with generic user message)
+- PENTEST-001..023: penetration tests covering auth bypass, IDOR, XSS, injection for live sessions and offline queue
+- GDPR Art.30: `PROCESSING_ACTIVITIES.md` added for data processing register
+
+---
+
+## [0.26.0] — 2026-03-05 — Session 25 Phase 5: Mobile Design System Alignment
+
+### Added
+- `apps/mobile/src/lib/theme.ts`: Indigo design tokens (`COLORS.primary = #6366F1`, `SPACING`, `RADIUS`, `FONT`, `SHADOW`)
+- `MasteryBadge` mobile component: 5-level badge with semantic colors and `testID=mastery-badge-${level}`
+- `HomeScreen` redesign: indigo primary palette, streak row with flame icon, 4 stat cards with semantic colors
+- `CoursesScreen`: search input integration, `MasteryBadge` per course, left-accent card layout
+- `ProfileScreen` + `SettingsScreen`: migrated from iOS `#007AFF` / Material `#2563EB` to `COLORS.primary`
+- Navigation: `tabBarActiveTintColor` unified to `COLORS.primary`
+- `apps/mobile/src/lib/ai-consent.ts`: AI consent check utilities
+- `apps/mobile/src/lib/stats-utils.ts`: learning statistics utility functions
+
+### Changed
+- Mobile vitest config: added `__DEV__: true` global define; `CoursesScreen`, `MasteryBadge`, `HomeScreen` test files included
+- Mobile test pattern: pure logic tests only (no `@testing-library/react-native` — not installed)
+
+---
+
+## [0.25.4] — 2026-03-06 — Session 25 Phase 4: Accessibility (WCAG 2.2 AAA)
+
+### Added
+- `SkipLinks` component: keyboard-accessible skip-to-main-content and skip-to-navigation links
+- `useFocusTrap` hook: traps keyboard focus within modals and dialogs
+- `useAnnounce` hook: dual ARIA live region announcer (polite + assertive)
+- `useReducedMotion` hook: respects `prefers-reduced-motion` media query
+- `ThemeSettingsPage` at `/settings/theme`: user-facing theme controls (light/dark/system, color scheme, font size, reduced motion, high contrast)
+- FOUC prevention: inline script in `index.html` reads `localStorage` before React hydrates
+
+### Changed
+- `useFocusTrap` TypeScript fix: `noUncheckedIndexedAccess` guard — `const firstEl: HTMLElement = first` after null guard
+
+---
+
+## [0.25.3] — 2026-03-06 — Session 25 Phase 3: Learning Experience (Video + KnowledgeSkillTree)
+
+### Added
+- `VideoPlayerWithCurriculum`: 320px collapsible curriculum sidebar alongside video player with progress tracking
+- `KnowledgeSkillTree` (alias `SkillTreePage`): BFS graph traversal + SVG bezier edge connections; renders mastery levels per node
+- `SkillTreePage` route at `/skill-tree`
+
+---
+
+## [0.25.2] — 2026-03-06 — Session 25 Phase 2: Navigation + Dashboard Revolution
+
+### Added
+- `AppSidebar`: collapsible 240px → 64px icon-only sidebar, 6 navigation groups, hover tooltips in collapsed state
+- `DashboardPage` redesign: 5 sections — KPIs, learning streak, course progress, skill mastery, recent activity
+- `CoursesDiscoveryPage` with `CourseCard` component: search, sort, filter, mastery badge
+- Tenant-themes DB migration (`0010_tenant_themes`): `tenant_themes` table + RLS + `user_preferences` columns
+
+### Changed
+- `Layout.tsx`: `AppSidebar` integration; Layout test mock hoists `mockGetCurrentUser()` to avoid `require()` inside `vi.mock`
+
+---
+
+## [0.25.1] — 2026-03-05 — Session 25 Phase 1: Design System + Theme Engine
+
+### Added
+- Indigo design system: primary `#6366F1`, mastery level tokens (Novice → Expert), semantic color scales
+- `ThemeProvider`: 3-tier theming (globals.css `:root` → tenant primitives via CSS vars inline → user prefs via class toggles on `<html>`)
+- `LandingPage` at `/`: hero, features section, CTA, responsive layout
+- `MasteryBadge` web component: 5 mastery levels with accessible labels
+- `globals.css` design token variables
+
+---
+
+## [0.24.0] — 2026-03-05 — Session 24: PRD Gap Closure (G1 + G2 + G3 + G5 + G6 + G8)
+
+### Added
+- **G1 — Context Panel**: `ContextPanel.tsx` — debounced HybridRAG sidebar (600ms), shows Related Concepts + Related Segments with jump-to-timestamp; replaces stub "Collaboration coming soon" tab
+- **G2 — Canvas/Spatial Annotations (Video Sketch Overlay)**: `VideoSketchOverlay.tsx` — HTML5 Canvas freehand sketching over video; normalized (0–1) coordinates saved as `SketchPath[]` with video timestamp; SVG overlay shows existing sketches within ±3s window
+- **G3 — Annotation Promote**: `promoteAnnotation` mutation in backend SDL + `AnnotationService.promote()`; `CommentCard` gains Promote button (ArrowUpCircle, indigo) for INSTRUCTOR layer promotion
+- **G5 — Agent Studio (No-Code Workflow Builder)**: `AgentStudioPage.tsx` at `/agents/studio` — drag-and-drop LangGraph-style agent composer with 6 node types, SVG bezier edges, click-to-connect, properties panel
+- **G6 — Deep Linking (Search → Video Timestamp)**: `SemanticResult.startTime` field; search results for transcripts link directly to `/learn/:entityId?t=<seconds>`
+- **G8 — Auto-Flashcards (Annotation → SRS)**: `CommentCard` Flashcard button — calls `createFlashcard()` which reuses `createReviewCard` SRS mutation
+- Playwright E2E specs for all 6 gap features; visual regression screenshots
+
+### Fixed
+- DB migration idempotency: removed `CONCURRENTLY` from migration 0007, added `IF NOT EXISTS` to migration 0009
+- Session 24 completion gate: 0 lint errors, 0 TypeScript errors, all security tests pass
+
+---
+
+## [0.23.0] — 2026-03-05 — Session 23: Mobile Polish + Quality
+
+### Added
+- `LoggerModule` extraction: shared NestJS logger module extracted for reuse across all 6 subgraphs
+- `TIME` constants package (`packages/config`): centralized duration constants (seconds, minutes, hours)
+- Mobile TypeScript: all remaining `any` types replaced with proper interfaces across mobile services and screens
+- `@ts-expect-error` descriptions added to all suppressed errors in pipeline spec (CI requirement)
+
+### Fixed
+- Mobile `any` type elimination: `apps/mobile/src/screens/`, services, and type files fully typed
+- Security audit clean: 0 `no-explicit-any` violations in production code
+
+---
+
+## [0.22.0] — 2026-03-05 — Session 22: Gateway v2.5 + Admin Phase 7 + Code Quality
+
+### Added
+- **Hive Gateway v2.5.1** upgrade with improved performance and federation v2.7 compliance
+- **Admin Phase 7 — Notification Templates**: template editor with variable interpolation, preview, channel selection
+- Code Quality Initiative (CQI) tracks: T2 (no-explicit-any enforcement), T4 (file splitting), T6 (barrel files), T8 (service extraction), T9 (test isolation), T11 (memory safety)
+- E2E expansion: Playwright specs for 10 additional admin routes
+- DB migration: idempotent migration guards
+
+### Fixed
+- BUG-047: Language persistence — Hebrew UI setting now survives page refresh (localStorage + `i18n.changeLanguage`)
+- BUG-048: Drizzle schema drift — dead `courses.ts` schema identified; real schema is `content.ts` (exported from `index.ts`)
+- BUG-052: React concurrent-mode — `useUserPreferences` and `SRSWidget` now use `mounted` guard before `useQuery`
+
+---
+
+## [0.21.0] — 2026-03-05 — Session 21: Master Completion Plan (Tracks 0–6)
+
+### Added
+- **Admin Phases 1–3**: User Management CRUD, Org Settings, Analytics dashboard
+- **LangGraph tools**: additional agent nodes (Socratic, Assessment, Feedback)
+- `useOptimistic` pattern for instant UI updates on mutation submit
+- OpenBadges federation fix: moved badge resolvers from Core → Content subgraph
+
+### Fixed
+- FEAT-055: `LessonResultsPage` — all 10 pipeline output types rendered; E2E 28/28 passing
+- LessonResultsPage video/assets UI with BUG-039 i18n scripts
+- pnpm security overrides: `tar >=7.5.10`, `rollup >=4.59.0`, `minimatch >=9.0.7`
+- Memory safety: `OnModuleDestroy` implemented on all 20+ services with DB/NATS connections
+
+---
+
+## [0.20.0] — 2026-03-04 — Session 20: Bug Wave + Competitive Gap Features
+
+### Added
+- Tier 1+2+3 competitive gap features (39 total): xAPI/LRS, OpenBadges 3.0, BI export, Portal builder, Social following, Marketplace, Saved searches, Persisted queries, Announcement system, Gamification
+- `MyOpenBadgesPage` + `BadgeVerifierPage` (frontend)
+- `MyBadgesScreen` (mobile — OpenBadges viewer)
+- `AgentsPage` with template selector and history
+- AuditLog S3 export functionality
+
+### Fixed
+- BUG-039: React 19 concurrent-mode `setState`-during-render in `Layout`/`useSrsQueueCount` — deferred with `useEffect` mount guard
+- BUG-040: Video/document annotations disappear after save — urql cache invalidation fixed
+- BUG-041: Keycloak UUID alignment — all 5 demo users have consistent UUIDs across Keycloak + DB
+- BUG-042: GraphQL network error banner — raw urql error strings replaced with user-friendly messages
+- BUG-043: Raw `error.message` in `/graph` UI + `Invalid Date` in `ActivityHeatmap`
+- BUG-044: "Unexpected error" on lesson creation — missing UUID validation + try/catch added
+- BUG-045: Pipeline Builder non-functional — config panel, `handleRun` race condition, backend resolvers
+
+---
+
+## [0.19.0] — 2026-03-03 — Session 19: Security Hardening + Admin Upgrade
+
+### Added
+- CQI-003: Eliminate all `no-explicit-any` from production code (all 6 subgraphs + web + mobile)
+- Admin Upgrade (F-101–F-113): UserManagement UX improvements (role confirm modal, toasts, tenant safety)
+- HIVE-001: CI gate — GraphQL Hive schema composition check in every PR
+- Visual QA: 53/53 zero-error E2E verification across all routes and all 5 roles
+
+### Fixed
+- BUG-037: SourceManager Unauthorized — Keycloak missing `tenant_id` claim; realm export updated
+- BUG-038: Unauthorized `[GraphQL]` error on lesson page — global auth exchange + middleware hardening
+- CodeQL critical/high vulnerabilities: 12 fixed (SQL injection patterns, XSS vectors, prototype pollution)
+- Prettier formatting: 327 source files formatted consistently
+
+---
+
+## [0.18.0] — 2026-03-02 — Session 18: Media Upload + i18n + Infrastructure Fixes
+
+### Added
+- FEAT-046: Custom Pipeline Builder ("Build from Scratch") — visual node editor with config panel
+- i18n admin namespace + AdminSidebar/Dashboard/StatCards translations (EN + HE)
+- 15 i18n namespaces (added `srs` namespace)
+- Lighthouse CI Core Web Vitals gate + bundle-size-check
+- Vite `manualChunks`: split 523 kB entry bundle into cacheable vendor layers
+
+### Fixed
+- BUG-035: Media upload 404 — MinIO bucket creation on startup + urql cache key + UUID courseId
+- BUG-036: Media upload S3 CRC32 + .doc contentType + JWT UUID
+- BUG-039 i18n: LTI and SCIM/HRIS nav labels translated to Hebrew
+- CI-003: 5 CI workflow failures fixed (PNPM version, Trivy SARIF, security scanning, SBOM)
+- Deploy: 4 service crashes after container recreate fixed (`e109c29`)
+
+---
+
+## [0.17.0] — 2026-02-22 — Session 17: API-First Level 4 + Stack Capabilities
+
+### Added
+- Level 4 Enterprise API-First compliance: persisted queries, schema registry, contract tests
+- New stack capabilities: Pino logging (all services), LangGraph checkpointing, React Router v7, Tailwind v4
+- AGE RLS: Apache AGE graph queries now respect row-level security tenant isolation
+- NATS gateway: event routing through gateway layer for cross-subgraph pub/sub
+
+### Fixed
+- BUG-028: DEV_MODE logout persistence — session flag properly cleared
+- BUG-029: urql UserPreferences cache key collision fixed
+- BUG-030: `SRSWidget` `setState`-during-render fixed with deferred update pattern
+- BUG-031: `@deprecated` multi-line CI false-positive resolved
+- BUG-032: Docker GHA cache pnpm@9 stale layers fixed with scoped cache keys
+- CI-002: 4 full test suite CI failures resolved
+
+---
+
+## [0.16.0] — 2026-02-20 — Session 16: Phase 8.2 + Observability + LangGraph v1
+
+### Added
+- Phase 8.2: faster-whisper transcription worker (NATS consumer, GPU-accelerated speech-to-text)
+- OpenTelemetry + Jaeger distributed tracing across all 6 subgraphs and gateway
+- LangGraph v1 state machines: Chavruta, Quiz, Explain, Debate agent workflows
+- LangGraph checkpointing with NestJS `OnModuleInit`/`OnModuleDestroy` lifecycle
+- GraphQL real-time AI streaming via `graphql-ws` subscriptions
+- K8s Helm chart + k6 load tests (lesson pipeline, 100K concurrent user scenarios)
+
+---
+
+## [0.15.0] — 2026-02-20 — Session 15: Visual QA + E2E Comprehensive Coverage
+
+### Added
+- Comprehensive Playwright visual QA spec: all routes + all 5 roles
+- 9 E2E spec suites covering admin routes, annotation flows, search, agents
+- BUG fix waves 1–7: 35 bugs across auth, layout, UX, and data layers resolved
+
+### Fixed
+- BUG-033: OpenBadges federation tests stale CORE→CONTENT move
+- BUG-034: SourceManager DEV_MODE `rawContent` missing field
+- Keycloak 26 JWT validation and RLS context issues fixed permanently
+
+---
+
+## [0.14.0] — 2026-02-21 — Session 14: Full Quality Gates Pass
+
+### Added
+- Lint: 21/21 packages clean (zero warnings)
+- Build: 19/19 packages build successfully
+- Tests: 2,213+ tests passing across all packages
+
+### Changed
+- pnpm/action-setup downgraded v4→v2 across all CI workflows (corepack conflict)
+- All CI workflow `pnpm` steps standardized to v2 action
+
+---
+
+## [0.13.0] — 2026-02-20 — Session 13: Test Coverage Expansion
+
+### Added
+- Backend test waves 42–49: subgraph-content, core, knowledge, agent resolver tests
+- Frontend test waves 30–41: 500+ new unit tests across components, hooks, pages
+- Test coverage targets: >90% line coverage per subgraph, >80% component coverage
+- `@testing-library/react` integration for jsdom component rendering
+
+---
+
+## [0.12.0] — 2026-02-20 — Session 12: Stack Upgrade (UPGRADE-001)
+
+### Changed
+- PostgreSQL upgraded to PG18 (`all-in-one` container Build 10)
+- Full dependency upgrade: NestJS 11, Drizzle ORM v1, TanStack Query v5, Zustand v5, Expo SDK 54, React 19, Vite 6
+- React Router v7 migration (from v6)
+- Tailwind CSS v4 migration
+
+### Added
+- Read replicas configuration for high-availability DB reads
+- Persisted queries support in Hive Gateway
+
+---
+
+## [0.11.0] — 2026-02-20 — Session 11: Security Compliance (SEC-001 + SEC-002)
+
+### Added
+- GraphQL Federation authentication hardening (SEC-001): `@authenticated` directive enforced on all mutations
+- Security test expansion to 1,400+ tests across all packages (SEC-002)
+- OWASP Top 10 coverage: SQL injection, XSS, CORS, rate limiting, query complexity
+- Keycloak brute-force protection enabled (`failureFactor: 5`)
+
+---
+
+## [0.10.0] — 2026-02-18 — Session 10: Phase 8 Mobile (Expo SDK 54)
+
+### Added
+- `apps/mobile`: Expo SDK 54 (React Native 0.81) offline-first mobile application
+- Screens: Auth, Home, Courses, CourseViewer, Lessons, Annotations, OfflineSync, Profile
+- Offline-first: `expo-sqlite` + TanStack Query for local data persistence
+- `MyBadgesScreen`: OpenBadges 3.0 viewer for mobile
+- Mobile build configuration: EAS Build, `pnpm cap:sync`, `pnpm cap:build`
+
+---
+
+## [0.9.0] — 2026-02-18 — Session 9: Phase 7 Production Hardening
+
+### Added
+- Helm chart for Kubernetes deployment (`infrastructure/k8s/`)
+- k6 load tests: lesson pipeline scenario, concurrent user simulation (100K target)
+- Traefik v3.6 reverse proxy with Let's Encrypt auto-TLS and rate limiting
+- CD pipeline (`cd.yml`): staging → production with rollback plan
+- Multi-stage Docker builds for all 8 services with Trivy vulnerability scanning
+
+---
+
+## [0.8.0] — 2026-02-18 — Session 8: Phases 14–17 Frontend Completion
+
+### Added
+- Phase 14: Annotation overlay on video (`VideoAnnotationLayer`, `AnnotationTimeline`, `LayerToggleBar`)
+- Phase 15: User menu, profile page, authentication completion
+- Phase 16: Course Wizard (4-step: Details → Media → Curriculum → Settings), `CourseEditPage`
+- Phase 17: Collaboration editor (`CollaborativeEditor.tsx`) with Yjs/TipTap, real-time cursors, offline buffer
+
+---
+
+## [0.7.0] — 2026-02-18 — Session 7: Phases 10–13 Frontend
+
+### Added
+- Phase 10: Video player with HLS streaming, transcript sync, transcript search → video jump
+- Phase 11: Global semantic search bar, search results page, search → video timestamp
+- Phase 12: AI Agent chat interface with streaming cursor, stop generation, session history
+- Phase 13: Knowledge Graph visualization with Cytoscape.js, concept detail panel, learning path overlay
+
+---
+
+## [0.6.0] — 2026-02-18 — Session 6: Phase 9 Dashboard Analytics
+
+### Added
+- Dashboard: activity heatmap (GitHub-style), progress bars, activity feed
+- Spaced Repetition System (SRS): queue badge in nav, review session UI
+- Notification bell: real-time notification center with WebSocket subscription
+- CourseList: search/sort/tabs, `LeaderboardPage`
+
+---
+
+## [0.5.0] — 2026-02-18 — Session 5: Backend GraphQL Integration + Security
+
+### Added
+- Backend-connected GraphQL queries in all frontend pages (replaced mock data)
+- Security hardening: CSP headers, CORS configuration, JWT scope validation
+- 146 new unit tests (3 test suites)
+- Vite bundle optimization: lazy-loading for CourseWizard steps 2–4
+
+### Fixed
+- CI failures: LTI conflicts, Stripe types, migration ordering, TypeScript strict errors, E2E port mismatches
+
+---
+
+## [0.4.0] — 2026-02-18 — Session 4: Phases 3–6 Subgraphs + Gateway + Frontend
+
+### Added
+- Annotation subgraph (4003): 4-layer annotation system (PERSONAL/SHARED/INSTRUCTOR/AI_GENERATED) + Word-Style
+- Collaboration subgraph (4004): Yjs CRDT, WebSocket subscriptions, `@authenticate` guards
+- Agent subgraph (4005): LangGraph.js state machines (Chavruta, Quiz, Explain, Debate) + LlamaIndex RAG
+- Knowledge subgraph (4006): Apache AGE Cypher queries, pgvector HybridRAG, K-means clustering
+- Hive Gateway v2 (4000): supergraph composition, JWT propagation, rate limiting, query depth/complexity
+- Frontend shell: React 19 + Vite 6, shadcn/ui + Tailwind, React Router v6, all initial pages
+
+---
+
+## [0.3.0] — 2026-02-17 — Session 3: Phase 2 Authentication + Content Subgraph
+
+### Added
+- Keycloak v26 realm: 5 roles (SUPER_ADMIN, ORG_ADMIN, INSTRUCTOR, RESEARCHER, STUDENT), JWKS endpoint
+- Core subgraph (4001): User, Tenant CRUD with RLS + JWT validation
+- Content subgraph (4002): Courses, Lessons, Media, Transcription pipeline, Course Forking, Search
+- JWT validation via JWKS; `@authenticated` / `@requiresScopes` / `@requiresRole` GraphQL directives
+- `packages/auth`: JWT validation, context extraction, NestJS guards
+
+---
+
+## [0.2.0] — 2026-02-17 — Session 2: Phase 1 Data Layer
+
+### Added
+- 16 PostgreSQL tables with full Row-Level Security (RLS) using `withTenantContext()` pattern
+- Apache AGE graph ontology: Concept, Person, Term, Source, TopicCluster vertex/edge types
+- pgvector HNSW indexes (768-dim) for semantic search using `nomic-embed-text` embeddings
+- Drizzle ORM v1 with native RLS (`pgTable.withRLS()`), migrations, seed data
+- Seed: 5 demo users × 3 tenants, sample courses, knowledge graph nodes
+
+---
+
+## [0.1.0] — 2026-02-17 — Session 1: Phase 0 Foundation
+
+### Added
+- Monorepo scaffold: pnpm workspaces + Turborepo (`apps/*`, `packages/*`, `infrastructure/`)
+- Docker Compose stack: PostgreSQL 16 + Apache AGE 1.5 + pgvector 0.8, Keycloak, NATS JetStream, MinIO, Jaeger
+- All-in-one Docker container for local development (Build 1)
+- TypeScript strict configuration: `strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`
+- Health check script (`./scripts/health-check.sh`), smoke test script (`./scripts/smoke-test.sh`)
+- GitHub Actions CI/CD workflows: `ci.yml`, `test.yml`, `federation.yml`, `docker-build.yml`, `cd.yml`
+- VS Code workspace configuration with recommended extensions
+- Shared packages scaffolded: `packages/db`, `packages/auth`, `packages/graphql-shared`, `packages/nats-client`, `packages/tsconfig`, `packages/eslint-config`

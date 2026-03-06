@@ -1129,7 +1129,30 @@ Every code change MUST pass ALL of these checks before commit:
 
 ---
 
+---
+
+## Phase 27 — Live Sessions & Offline Security Checks
+
+### Live Sessions
+- [ ] `attendeePasswordEnc` uses AES-256-GCM encryption (SI-3 compliant)
+- [ ] `moderatorPasswordEnc` uses AES-256-GCM encryption (SI-3 compliant)
+- [ ] Live session RLS: tenant isolation on `live_sessions` table
+- [ ] `joinLiveSession` mutation validates password before joining
+- [ ] NATS JetStream live session events use TLS + auth (SI-7)
+
+### Offline Web
+- [ ] IndexedDB offline cache: only stores tenant-scoped data
+- [ ] Offline queue: mutations replayed with valid JWT on reconnect
+- [ ] ServiceWorker scope: does not cache authentication tokens
+- [ ] `useOfflineQueue` max-size: 100-item LRU (memory safety)
+
+### SkillTree
+- [ ] `user_skill_mastery` table has RLS: user + tenant isolation
+- [ ] SkillTree queries filtered by tenantId in resolver
+
+---
+
 **Document Version**: 1.0.0
-**Last Updated**: 2026-02-17
+**Last Updated**: 2026-03-06
 **Maintained By**: EduSphere Security Team
 **Review Cycle**: Monthly

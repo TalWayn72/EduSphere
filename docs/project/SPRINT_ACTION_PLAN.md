@@ -1,268 +1,105 @@
-# תוכנית פעולה מסודרת - EduSphere
+# EduSphere — Sprint Action Plan
 
-**תאריך:** 2026-02-17 20:01
-**בסיס:** PRD + Gap Analysis + Implementation Roadmap
-
-═══════════════════════════════════════════════════
-
-## 📋 סיכום מצב נוכחי
-
-═══════════════════════════════════════════════════
-
-### ✅ הושלם (Phases 0-2):
-
-- Foundation: Docker + Monorepo + Health Checks
-- Data Layer: 16 tables + RLS + Apache AGE + pgvector
-- Auth: Keycloak + JWT + packages/auth
-- Subgraph-Core: Users + Tenants (Port 4001)
-- Subgraph-Content: Courses (חלקי, Port 4002)
-
-### 🔴 חסר (קריטי):
-
-- Gateway (Port 4000) - **חוסם הכל**
-- Frontend (Port 5173)
-- 4 subgraphs נוספים
-
-═══════════════════════════════════════════════════
-
-## 🎯 תוכנית פעולה - 3 רבדים
-
-═══════════════════════════════════════════════════
-
-### רובד א': קריטי - ההשקה הבסיסית (זמן: 4-5 שעות)
-
-**מטרה:** מערכת עובדת end-to-end עם login + רשימת קורסים
-
-#### משימה 1: Gateway (עדיפות 1 - חוסם!) ⚡
-
-**זמן משוער:** 1.5-2 שעות
-**תיאור:** יצירת GraphQL Federation Gateway עם Hive Gateway v2.7
-
-**שלבי ביצוע:**
-1.1. יצירת apps/gateway/
-
-- package.json עם @graphql-hive/gateway
-- src/index.ts - Gateway server (port 4000)
-- Supergraph configuration (6 subgraphs)
-
-  1.2. JWT Propagation
-
-- קריאת Authorization header
-- חילוץ tenant_id מ-JWT
-- העברת x-tenant-id ל-subgraphs
-
-  1.3. CORS + Health Check
-
-- CORS middleware לפיתוח
-- /health endpoint
-- /\_readiness endpoint
-
-  1.4. Build + Test
-
-- pnpm build
-- בדיקת composition
-- GraphQL Playground
-
-**Acceptance:**
-
-- http://localhost:4000/graphql פעיל
-- Query `{ __typename }` עובד
-- Introspection מראה כל הsubgraphs
+**Updated:** 2026-03-06 | **Current Phase:** 27 Complete | **Next Phase:** 28
 
 ---
 
-#### משימה 2: Frontend - Authentication (עדיפות 2)
+## Current Sprint Status
 
-**זמן משוער:** 2-2.5 שעות
-**תיאור:** React app עם login + routing בסיסי
-
-**שלבי ביצוע:**
-2.1. Setup Vite + React 19
-
-- apps/web/package.json
-- vite.config.ts עם path aliases
-- tsconfig.json
-
-  2.2. GraphQL Client (urql)
-
-- src/lib/graphql-client.ts
-- Auth exchange (JWT מ-localStorage)
-- Error handling
-
-  2.3. Authentication Flow
-
-- src/pages/Login.tsx
-- src/pages/Dashboard.tsx
-- src/contexts/AuthContext.tsx
-- Login → JWT → Redirect
-
-  2.4. Router Setup
-
-- React Router v6
-- Protected routes
-- /login, /dashboard, /courses
-
-**Acceptance:**
-
-- http://localhost:5173 פעיל
-- Login עובד עם Keycloak
-- Dashboard מציג user.email
-- Protected routes מפנים ל-login
+All Phase 27 deliverables are complete. The team is now planning Phase 28.
 
 ---
 
-#### משימה 3: השלמת Content Subgraph (עדיפות 3)
+## Phase 28 — Upcoming Sprint
 
-**זמן משוער:** 1 שעה
-**תיאור:** הוספת auth middleware + media assets
+### Sprint Goal
 
-**שלבי ביצוע:**
-3.1. Auth Middleware
+Deliver PWA capabilities, performance optimization, mobile feature parity, and advanced analytics.
 
-- העתקה מ-subgraph-core
-- src/auth/auth.middleware.ts
-- Integration ב-app.module.ts
+### Sprint Backlog
 
-  3.2. Media Module (אופציונלי)
+| Priority | Task | Owner | Effort |
+|----------|------|-------|--------|
+| P1 | PWA: manifest + service worker install prompt | FE | M |
+| P1 | Lighthouse score >= 90 (code splitting, lazy loading) | FE | L |
+| P1 | Mobile: Live Sessions screen (Expo) | Mobile | L |
+| P2 | Mobile: Offline support (expo-sqlite sync) | Mobile | L |
+| P2 | Mobile: SkillTree screen (Expo + BFS graph) | Mobile | M |
+| P2 | Analytics Dashboard (learning velocity, completion rates) | FE+BE | L |
+| P3 | AI recommendations from UserSkillMastery (graph traversal) | AI | L |
+| P3 | Push notifications (Keycloak events via NATS to mobile) | BE+Mobile | M |
 
-- src/media/media.graphql
-- src/media/media.service.ts
-- src/media/media.resolver.ts
+### Definition of Done (Phase 28)
 
-  3.3. RLS Integration
+- [ ] PWA installable on Chrome/Safari/Firefox
+- [ ] Lighthouse Performance >= 90 on Dashboard + Courses pages
+- [ ] Mobile app covers Live Sessions, Offline, SkillTree
+- [ ] Analytics dashboard: 10+ metrics per tenant
+- [ ] AI recommendations in sidebar (based on mastery graph)
+- [ ] All new features: unit + E2E + mobile tests
+- [ ] `pnpm turbo test` — 100% pass
+- [ ] `pnpm turbo typecheck` — 0 errors
 
-- withTenantContext בכל הqueries
-- AuthContext מה-context
+---
 
-**Acceptance:**
+## Technical Debt Backlog
 
-- Query עם JWT עובד
-- RLS מונע cross-tenant access
-- Build successful
+| Item | Priority | Notes |
+|------|----------|-------|
+| git LFS history migration for PDF/DOCX | P2 | Requires user approval (rewrites history) |
+| OPEN_ISSUES.md header cleanup | P3 | 1,200+ char header line — convert to structured table |
+| migration 0012: live_sessions Enc column rename | P1 | SI-3 compliance — plaintext column names removed |
+| Husky v10 deprecation fix | P1 | pre-commit hook uses deprecated Husky v9 API |
+| ServiceWorker registration polish (main.tsx/pwa.ts) | P2 | Background sync TTL + queue flush on reconnect |
 
-═══════════════════════════════════════════════════
+---
 
-### רובד ב': תכונות ליבה (זמן: 8-10 שעות)
+## Phase 27 — Completed (reference)
 
-**מטרה:** Annotation + Knowledge Graph + Collaboration
+| ID | Deliverable | Tests |
+|----|-------------|-------|
+| T1.1 | Route fix: /explore, /discover, /courses/discover | 3 unit + 11 E2E |
+| T1.2 | Live Sessions (FE + BE + NATS) | 21 unit + ~20 E2E + 12 visual |
+| T2.2 | Offline Web (ServiceWorker + IndexedDB + OfflineBanner) | 32 unit + 5 E2E + 12 visual |
+| T2.3 | KnowledgeGraph courseId context + AdminActivityFeed | 21 unit + 11 E2E + 13 visual |
+| BUG-054 | Progress bar indicatorClassName fix | 20 unit + 8 E2E + 1 visual |
+| Security | PENTEST-001..023 (auth, IDOR, XSS, injection) | 23 pen-tests pass |
 
-#### משימה 4: Annotation Subgraph (עדיפות 4)
+---
 
-**זמן:** 3-4 שעות
+## Health Checks (all passing as of 2026-03-06)
 
-- 4 שכבות: PERSONAL, SHARED, INSTRUCTOR, AI_GENERATED
-- Types: TEXT, SKETCH, LINK, BOOKMARK
-- Threaded replies
-- Real-time updates
+| Service | Port | Status |
+|---------|------|--------|
+| PostgreSQL (5432) | 5432 | Pass |
+| Keycloak (8080) | 8080 | Pass |
+| NATS JetStream | 4222 | Pass |
+| MinIO | 9000 | Pass |
+| Jaeger | 16686 | Pass |
+| Gateway | 4000 | Pass |
+| subgraph-core | 4001 | Pass |
+| subgraph-content | 4002 | Pass |
+| subgraph-annotation | 4003 | Pass |
+| subgraph-collaboration | 4004 | Pass |
+| subgraph-agent | 4005 | Pass |
+| subgraph-knowledge | 4006 | Pass |
+| Frontend | 5173 | Pass |
 
-#### משימה 5: Knowledge Subgraph (עדיפות 5)
+---
 
-**זמן:** 3-4 שעות
+## Test Users (Keycloak)
 
-- Apache AGE graph queries
-- HybridRAG (semantic + graph)
-- Learning path generation
-- Contradiction detection
+| User | Role | Notes |
+|------|------|-------|
+| super.admin@edusphere.dev | SUPER_ADMIN | Cross-tenant access |
+| org.admin@example.com | ORG_ADMIN | Tenant admin |
+| instructor@example.com | INSTRUCTOR | Course management |
+| researcher@example.com | RESEARCHER | Knowledge graph access |
+| student@example.com | STUDENT | Learner access |
 
-#### משימה 6: Agent Subgraph (עדיפות 6)
+Passwords: see `scripts/reset-keycloak-passwords.cjs` (single source of truth).
 
-**זמן:** 2-3 שעות
+---
 
-- LangGraph.js workflows
-- Chavruta debate agent
-- Quiz generation agent
-- Explain agent
-
-═══════════════════════════════════════════════════
-
-### רובד ג': שיפורים וקנה מידה (זמן: 6-8 שעות)
-
-**מטרה:** Production-ready + Testing
-
-#### משימה 7: Collaboration Subgraph (עדיפות 7)
-
-**זמן:** 2-3 שעות
-
-- Yjs CRDT
-- WebSocket subscriptions
-- Conflict resolution
-
-#### משימה 8: Frontend Features (עדיפות 8)
-
-**זמן:** 3-4 שעות
-
-- Course listing + details
-- Annotation UI
-- Collaboration editor
-- AI chat interface
-
-#### משימה 9: Testing & CI/CD (עדיפות 9)
-
-**זמן:** 2-3 שעות
-
-- Integration tests
-- E2E tests (Playwright)
-- GitHub Actions
-- Docker build
-
-═══════════════════════════════════════════════════
-
-## 🚀 המלצה לסשן הבא
-
-═══════════════════════════════════════════════════
-
-### אסטרטגיה: 3 Agents במקביל על רובד א'
-
-**Agent-1:** Gateway (1.5h)
-
-- יצירת מלאה של apps/gateway
-- Supergraph composition
-- JWT propagation
-
-**Agent-2:** Frontend Auth (2h)
-
-- React + Vite setup
-- urql client
-- Login flow
-
-**Agent-3:** Complete Content (1h)
-
-- Auth middleware
-- RLS fixes
-- Build verification
-
-**זמן כולל עם parallelization:** ~2 שעות במקום 4.5
-
-**לאחר מכן:**
-
-- Build all packages
-- Test end-to-end flow
-- Commit + Push
-- Deploy לסביבת dev
-
-═══════════════════════════════════════════════════
-
-## 📊 KPIs להצלחה
-
-═══════════════════════════════════════════════════
-
-### רובד א' (MVP):
-
-- ✅ Gateway serving GraphQL on :4000
-- ✅ Frontend serving on :5173
-- ✅ Login flow working
-- ✅ Query `{ me { email } }` returns data
-- ✅ RLS preventing cross-tenant access
-
-### רובד ב' (Core):
-
-- ✅ Annotation system functional
-- ✅ Knowledge graph queries working
-- ✅ AI agent responding to prompts
-
-### רובד ג' (Production):
-
-- ✅ All tests passing (>80% coverage)
-- ✅ Docker build successful
-- ✅ Performance: <100ms p95 latency
-- ✅ Can handle 1000 concurrent users
+*See [IMPLEMENTATION_ROADMAP.md](../../IMPLEMENTATION_ROADMAP.md) for full phase history.*
+*See [OPEN_ISSUES.md](../../OPEN_ISSUES.md) for bug tracking.*

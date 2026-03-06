@@ -13,7 +13,7 @@ A next-generation knowledge graph educational platform built for scale. Powered 
 
 ## Quick Start
 
-**Prerequisites:** Node.js 20+, pnpm 9+, Docker Desktop
+**Prerequisites:** Node.js 20+, pnpm 10+, Docker Desktop
 
 ```bash
 # Clone repository
@@ -59,15 +59,15 @@ pnpm dev
 
 ### Demo User Accounts
 
-All demo users have password: **Demo123!**
+| Email | Role | Password |
+|-------|------|----------|
+| super.admin@edusphere.dev | SUPER_ADMIN | SuperAdmin123! |
+| instructor@example.com | INSTRUCTOR | Instructor123! |
+| org.admin@example.com | ORG_ADMIN | OrgAdmin123! |
+| researcher@example.com | RESEARCHER | Researcher123! |
+| student@example.com | STUDENT | Student123! |
 
-| Role        | Email                    | Name            |
-| ----------- | ------------------------ | --------------- |
-| Super Admin | admin@edusphere.dev      | Admin User      |
-| Org Admin   | orgadmin@edusphere.dev   | Org Admin       |
-| Instructor  | instructor@edusphere.dev | Instructor User |
-| Student     | student@edusphere.dev    | Student User    |
-| Researcher  | researcher@edusphere.dev | Researcher User |
+> **Note:** To reset passwords, run: `node scripts/reset-keycloak-passwords.cjs`
 
 ### Service Health Check
 
@@ -176,7 +176,7 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 
 | Layer                | Technology                  | Version                 | License    | Why                                                                  |
 | -------------------- | --------------------------- | ----------------------- | ---------- | -------------------------------------------------------------------- |
-| **Monorepo**         | pnpm workspaces + Turborepo | pnpm 9.x + Turbo latest | MIT        | 60-80% disk savings, 3-5x faster than npm, parallel builds           |
+| **Monorepo**         | pnpm workspaces + Turborepo | pnpm 10.x + Turbo latest | MIT        | 60-80% disk savings, 3-5x faster than npm, parallel builds           |
 | **Gateway**          | Hive Gateway v2             | v2.x                    | MIT        | Federation v2.7, 2x faster than competitors, MIT-licensed (not ELv2) |
 | **Subgraph Runtime** | GraphQL Yoga + NestJS       | Yoga 5.x + NestJS 11.x  | MIT        | `YogaFederationDriver`, enterprise DI, guards, interceptors          |
 | **Database**         | PostgreSQL 16+              | 16.x                    | PostgreSQL | RLS, extensions (AGE, pgvector), ACID, mature ecosystem              |
@@ -223,6 +223,17 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 ---
 
 ## Features
+
+### Recently Added (Sessions 25-27)
+
+- **Design System** — Indigo #6366F1 design tokens, ThemeProvider (3-tier tenant/user theming), dark mode
+- **Live Sessions** — Real-time instructor-led sessions with NATS JetStream, join/leave, moderator controls
+- **Offline Web** — ServiceWorker + IndexedDB cache, offline banner, mutation queue with auto-replay
+- **Skill Tree** — Visual skill progression graph (BFS traversal, SVG bezier curves, mastery levels 1-5)
+- **Course Discovery** — Search + filter with MasteryBadge indicators
+- **WCAG 2.2 AAA** — Full accessibility: skip links, focus trap, screen reader announcements, reduced motion
+- **i18n** — Hebrew + English (react-i18next, complete locale files)
+- **Knowledge Graph** — Course-contextual knowledge graph with pgvector semantic search + Apache AGE traversal
 
 ### Core Platform
 
@@ -317,8 +328,12 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 9**      | Dashboard Analytics -- Heatmap, progress bars, activity feed                           | 2-3 days   | ✅ Complete |
 | **Phases 10-14** | Frontend Core UX -- Video player, search, AI chat, knowledge graph, annotation overlay | 12-20 days | ✅ Complete |
 | **Phases 15-17** | Frontend UX polish -- User menu, course wizard, Tiptap collaboration editor            | 5-8 days   | ✅ Complete |
+| **Phases 18-24** | i18n, Admin Dashboard, AI Tutor, Offline Mode, Knowledge Graph enhancements            | 10-15 days | ✅ Complete |
+| **Phase 25**     | UI/UX Revolution -- Design System, ThemeProvider, AppSidebar, WCAG 2.2 AAA             | 3-5 days   | ✅ Complete |
+| **Phase 26**     | Skill Tree, Course Discovery, Mobile Design System alignment                            | 2-3 days   | ✅ Complete |
+| **Phase 27**     | Live Sessions, Offline Web, AdminActivityFeed, Knowledge Graph course context           | 3-4 days   | ✅ Complete |
 
-**Current Status:** ALL 17 phases complete ✅ — Backend + Frontend fully built. GraphQL integration active (KnowledgeGraph + AgentsPage + ContentViewer + Dashboard wired to real API with DEV_MODE fallback). Next: Phase 7 Production Hardening (K8s) + Phase 8 Mobile (Expo). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** ALL 27 phases complete ✅ — Backend + Frontend + Mobile fully built. GraphQL federation active across all 6 subgraphs. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -418,8 +433,8 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **146 tests / 12 suites passing**               |
-| **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ **37 tests / 3 suites passing** (subgraph-core) |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **5,762+ tests passing**                        |
+| **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (subgraph-core + subgraph-knowledge)    |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |
 | **RLS Validation**      | Vitest                  | `packages/db/src/rls/*.test.ts`              | ⏳ Planned Phase 7                                 |
@@ -528,7 +543,7 @@ MINIO_BUCKET=edusphere
 # Keycloak
 KEYCLOAK_URL=http://localhost:8080
 KEYCLOAK_REALM=edusphere
-KEYCLOAK_CLIENT_ID=edusphere-app
+KEYCLOAK_CLIENT_ID=edusphere-web
 KEYCLOAK_CLIENT_SECRET=<secret>
 
 # AI/ML

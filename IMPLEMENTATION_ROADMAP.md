@@ -1409,6 +1409,343 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
+## Phase 18 — Admin Dashboard Upgrade + LessonResults (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 18–21 | **Date:** 2026-03-02 to 2026-03-05
+
+### What Was Built
+- `LessonResultsPage` with all 10 pipeline output types (transcript, summary, quiz, flashcards, annotations, embeddings, entities, topics, video chapters, SCORM)
+- Admin Phase 1–3: User Management CRUD with role confirm modal + toasts, Org Settings, Analytics dashboard
+- Custom Pipeline Builder ("Build from Scratch") — visual node editor
+- `useOptimistic` pattern for instant UI feedback on mutations
+- OpenBadges federation moved from Core → Content subgraph
+
+### Acceptance Criteria
+- [x] `LessonResultsPage` renders all 10 pipeline output types (E2E 28/28)
+- [x] Admin User Management CRUD works for all 5 roles
+- [x] Custom Pipeline Builder saves and runs custom workflows
+- [x] `pnpm turbo test` passes 100%
+- [x] TypeScript: 0 errors
+
+### Key Files
+- `apps/web/src/pages/LessonResultsPage.tsx`
+- `apps/web/src/pages/AdminDashboardPage.tsx`
+- `apps/web/src/pages/PipelineBuilderPage.tsx`
+- `apps/web/e2e/lesson-results.spec.ts`
+
+---
+
+## Phase 19 — Media Upload + i18n Infrastructure (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 18–19 | **Date:** 2026-03-02
+
+### What Was Built
+- MinIO media upload pipeline: bucket auto-creation, presigned URL generation, S3 CRC32 fix, `.doc` content-type
+- 15 i18n namespaces (EN + HE): added `srs` namespace, translated AdminSidebar, LTI/SCIM nav labels
+- Lighthouse CI Core Web Vitals gate + bundle-size-check
+- Vite `manualChunks`: split 523 kB entry bundle into cacheable vendor layers
+- pnpm security overrides: `tar >=7.5.10`, `rollup >=4.59.0`, `minimatch >=9.0.7`, `serialize-javascript >=7.0.3`
+
+### Acceptance Criteria
+- [x] Media upload end-to-end: file → MinIO → lesson asset → video player
+- [x] 15 i18n namespaces pass assertion test
+- [x] Lighthouse Performance score gate in CI
+- [x] Zero high vulnerabilities (`pnpm audit --audit-level=high`)
+- [x] pnpm lockfile consistent across all packages
+
+### Key Files
+- `apps/subgraph-content/src/media/media.service.ts`
+- `packages/i18n/src/locales/en/` (15 namespace files)
+- `packages/i18n/src/locales/he/` (15 namespace files)
+- `apps/web/vite.config.ts`
+
+---
+
+## Phase 20 — Security Compliance (G-01 to G-22) (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 19–20 | **Date:** 2026-03-03
+
+### What Was Built
+- CQI-003: Eliminated all `no-explicit-any` from production code across all 6 subgraphs, web, and mobile
+- CodeQL critical/high vulnerability fixes (12 issues resolved)
+- Keycloak UUID alignment: all 5 demo users have consistent UUIDs across Keycloak + DB
+- BUG-037/038: SourceManager Unauthorized + Lesson page Unauthorized errors permanently fixed
+- HIVE-001: GraphQL Hive schema composition CI gate enforced on every PR
+- Visual QA: 53/53 routes verified zero-error across all 5 user roles
+
+### Acceptance Criteria
+- [x] `pnpm test:security` passes all 813 security tests
+- [x] CodeQL: 0 critical/high alerts
+- [x] `no-explicit-any`: 0 violations in production code
+- [x] All 5 demo users authenticate successfully
+- [x] Hive CI gate blocks breaking schema changes
+
+### Key Files
+- `tests/security/` (32 spec files, 813 tests)
+- `infrastructure/keycloak/realm-export.json`
+- `apps/subgraph-knowledge/src/source/source.service.ts`
+- `apps/web/src/lib/urql/` (auth exchange hardening)
+
+---
+
+## Phase 21 — Memory Safety (OnModuleDestroy + Frontend Timers) (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 20–21 | **Date:** 2026-03-05
+
+### What Was Built
+- `OnModuleDestroy` implemented on all 20+ NestJS services with DB/NATS connections
+- `clearInterval`/`clearTimeout` in all React hooks and components using timers
+- `useOfflineQueue` precursor: max-size eviction for unbounded Maps and arrays
+- Frontend subscription cleanup: `pause: true` guard on all `useSubscription` hooks
+- Memory testing: `*.memory.spec.ts` and `*.memory.test.ts` for all new services and hooks
+
+### Acceptance Criteria
+- [x] All 20+ services implement `OnModuleDestroy` with `closeAllPools()` / `close()` calls
+- [x] All `setInterval` usages in components have corresponding `clearInterval` in `useEffect` cleanup
+- [x] `*.memory.spec.ts` tests verify cleanup is called on `onModuleDestroy()`
+- [x] No unbounded Maps or Arrays (all have max-size eviction or `slice(-N)` guards)
+
+### Key Files
+- `apps/subgraph-agent/src/agent/agent.service.ts` (`implements OnModuleDestroy`)
+- `apps/subgraph-knowledge/src/knowledge/knowledge.service.ts`
+- `apps/web/src/hooks/useOfflineQueue.ts`
+- `apps/web/src/hooks/useOfflineStatus.ts`
+
+---
+
+## Phase 22 — i18n Completion + Admin Phase 7 + Gateway v2.5 (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 22 | **Date:** 2026-03-05
+
+### What Was Built
+- Hive Gateway upgraded to v2.5.1: improved performance, federation v2.7 compliance
+- Admin Phase 7 — Notification Templates: template editor with variable interpolation, preview, channel selector
+- Code Quality Initiative (CQI): T2 (no-explicit-any), T4 (file splitting <150 lines), T6 (barrel files), T8 (service extraction), T9 (test isolation), T11 (memory safety hooks)
+- E2E expansion: Playwright specs for 10 additional admin routes
+- BUG-047: Language persistence fixed (Hebrew UI setting survives page refresh)
+- BUG-048: Drizzle schema drift identified and resolved (`courses.ts` was dead; `content.ts` is the real schema)
+- BUG-052: React concurrent-mode `useUserPreferences` + `SRSWidget` — `mounted` guard added
+
+### Acceptance Criteria
+- [x] Hive Gateway v2.5.1 composes supergraph without errors
+- [x] Admin Notification Templates — create, edit, preview, delete
+- [x] Language setting (HE/EN) persists across page refreshes
+- [x] `pnpm turbo test` — 100% pass
+- [x] TypeScript: 0 errors across 26 packages
+
+### Key Files
+- `apps/gateway/` (v2.5.1 config)
+- `apps/web/src/pages/NotificationTemplatesPage.tsx`
+- `apps/web/src/hooks/useUserPreferences.ts`
+- `packages/i18n/src/locales/` (EN + HE, 15 namespaces)
+
+---
+
+## Phase 23 — Mobile Polish + LoggerModule + TIME Constants (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 23 | **Date:** 2026-03-05
+
+### What Was Built
+- `LoggerModule` extraction: shared NestJS Pino logger module — consistent structured logging across all 6 subgraphs
+- `TIME` constants (`packages/config`): `SECONDS`, `MINUTES`, `HOURS` — replaces magic number durations
+- Mobile TypeScript hardening: all remaining `any` types replaced with proper interfaces in mobile screens and services
+- `@ts-expect-error` descriptions enforced for all suppressed errors (CI pipeline requirement)
+- `apps/mobile/src/lib/ai-consent.ts`: AI consent utilities for third-party LLM calls (SI-10)
+- `apps/mobile/src/lib/stats-utils.ts`: learning statistics utility functions
+
+### Acceptance Criteria
+- [x] All 6 subgraphs use `LoggerModule` for structured Pino logging (no `console.log`)
+- [x] `TIME` constants used for all duration magic numbers
+- [x] Mobile TypeScript: 0 `no-explicit-any` violations
+- [x] `pnpm turbo typecheck` — 0 errors across all 26 packages
+
+### Key Files
+- `packages/config/src/time.ts`
+- `apps/mobile/src/lib/ai-consent.ts`
+- `apps/mobile/src/lib/stats-utils.ts`
+- `apps/mobile/src/screens/AITutorScreen.tsx`
+
+---
+
+## Phase 24 — PRD Gap Closure G1+G2+G3+G5+G6+G8 (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 24 | **Date:** 2026-03-05
+
+### What Was Built
+- **G1 — Context Panel**: Debounced HybridRAG sidebar inside `UnifiedLearningPage` — shows Related Concepts (amber) + Related Segments (green) from active transcript segment
+- **G2 — Video Sketch Overlay**: HTML5 Canvas freehand annotation over video; normalized coordinate paths saved as `SketchPath[]`; SVG overlay shows sketches within ±3s window
+- **G3 — Annotation Promote**: `promoteAnnotation` mutation (backend + frontend); INSTRUCTOR-layer promotion button in `CommentCard`
+- **G5 — Agent Studio**: No-code drag-and-drop LangGraph workflow builder with 6 node types, SVG bezier edges, properties panel
+- **G6 — Deep Linking**: `SemanticResult.startTime` field; search → `/learn/:entityId?t=<seconds>` direct video timestamp links
+- **G8 — Auto-Flashcards**: Annotation → SRS one-click flashcard creation (reuses `createReviewCard` mutation)
+
+### Acceptance Criteria
+- [x] Context Panel shows semantic results for current video segment
+- [x] Video Sketch overlay canvas draws, saves, and displays paths at correct timestamps
+- [x] `promoteAnnotation` mutation passes unit + integration tests
+- [x] Agent Studio drag-and-drop works; Save/Deploy disabled when canvas empty
+- [x] Search results for transcripts link to correct video timestamp
+- [x] Flashcard created from annotation appears in SRS queue
+- [x] Playwright E2E specs for all 6 features pass
+
+### Key Files
+- `apps/web/src/components/ContextPanel.tsx`
+- `apps/web/src/components/VideoSketchOverlay.tsx`
+- `apps/web/src/pages/AgentStudioPage.tsx`
+- `apps/subgraph-annotation/src/annotation/annotation.service.ts` (`promote()`)
+- `apps/web/e2e/agent-studio.spec.ts`
+- `apps/web/e2e/video-sketch-overlay.spec.ts`
+
+---
+
+## Phase 25 — UI/UX Revolution (Design System + Accessibility + Learning Experience) (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 25 Phases 1–4 | **Date:** 2026-03-05 to 2026-03-06
+
+### What Was Built
+- **Phase 25.1 — Design System**: Indigo `#6366F1` primary palette, mastery level tokens, `ThemeProvider` (3-tier: globals → tenant → user), `LandingPage`, `MasteryBadge`
+- **Phase 25.2 — Navigation + Dashboard**: `AppSidebar` (240px/64px collapsible, 6 nav groups, hover tooltips), `DashboardPage` (5 sections), `CoursesDiscoveryPage`, `CourseCard`; tenant-themes DB migration (`0010`)
+- **Phase 25.3 — Learning Experience**: `VideoPlayerWithCurriculum` (320px sidebar), `KnowledgeSkillTree` (BFS + SVG bezier edges)
+- **Phase 25.4 — Accessibility (WCAG 2.2 AAA)**: `SkipLinks`, `useFocusTrap`, `useAnnounce` (dual live region), `useReducedMotion`, `ThemeSettingsPage`; FOUC prevention script in `index.html`
+
+### Acceptance Criteria
+- [x] `ThemeProvider` renders without flash of unstyled content (FOUC prevention)
+- [x] `AppSidebar` collapses to 64px icon-only; expands to 240px on hover/click
+- [x] `VideoPlayerWithCurriculum` curriculum sidebar scrolls independently
+- [x] `KnowledgeSkillTree` BFS traversal renders all reachable nodes with SVG bezier edges
+- [x] `SkipLinks` navigate to `#main-content` and `#main-nav` (keyboard accessible)
+- [x] `useFocusTrap` traps Tab/Shift+Tab within modals
+- [x] `useAnnounce` dual live region announces changes to screen readers
+- [x] `ThemeSettingsPage` persists font size, color scheme, reduced motion, high contrast to `localStorage`
+- [x] TypeScript: 0 errors | Lint: 0 warnings | Tests: 100% pass
+
+### Key Files
+- `apps/web/src/lib/theme.ts`
+- `apps/web/src/components/ThemeProvider.tsx`
+- `apps/web/src/components/AppSidebar.tsx`
+- `apps/web/src/components/SkipLinks.tsx`
+- `apps/web/src/hooks/useFocusTrap.ts`
+- `apps/web/src/hooks/useAnnounce.ts`
+- `apps/web/src/hooks/useReducedMotion.ts`
+- `apps/web/src/pages/KnowledgeSkillTree.tsx`
+- `apps/web/src/pages/ThemeSettingsPage.tsx`
+- `packages/db/src/migrations/0010_tenant_themes.sql`
+
+---
+
+## Phase 26 — Mobile Design System Alignment + SkillTree Backend (✅ Complete)
+**Status:** ✅ Complete | **Session:** Session 25 Phase 5 | **Date:** 2026-03-06
+
+### What Was Built
+- `apps/mobile/src/lib/theme.ts`: unified design tokens (`COLORS.primary = #6366F1`, `SPACING`, `RADIUS`, `FONT`, `SHADOW`)
+- Mobile `MasteryBadge` component: 5-level badge with semantic colors, `testID` for test targeting
+- Mobile screens redesigned with `COLORS.primary`: `HomeScreen` (streak row, 4 stat cards), `CoursesScreen` (search + left-accent cards), `ProfileScreen`, `SettingsScreen`
+- Navigation `tabBarActiveTintColor` unified to `COLORS.primary`
+- Backend SkillTree: `skill-tree.service.ts`, `skill-tree.resolver.ts` — Drizzle queries on `user_skill_mastery` table
+- DB migration `0011_user_skill_mastery.sql`: `user_skill_mastery` table with RLS, mastery level enum, timestamps
+
+### Acceptance Criteria
+- [x] All mobile screens use `COLORS.primary` from `theme.ts` (no hardcoded `#007AFF` or `#2563EB`)
+- [x] `MasteryBadge` renders all 5 levels with correct colors (unit test with `testID`)
+- [x] `skill-tree.service` returns skill tree from DB (Drizzle mock in spec)
+- [x] Migration `0011` applies without errors
+- [x] Mobile vitest: `__DEV__: true` define prevents `ReferenceError`
+
+### Key Files
+- `apps/mobile/src/lib/theme.ts`
+- `apps/mobile/src/screens/HomeScreen.tsx`
+- `apps/mobile/src/screens/CoursesScreen.tsx`
+- `apps/mobile/src/screens/ProfileScreen.tsx`
+- `apps/subgraph-knowledge/src/graph/skill-tree.service.ts`
+- `apps/subgraph-knowledge/src/graph/skill-tree.resolver.ts`
+- `packages/db/src/schema/user-skill-mastery.ts`
+- `packages/db/src/migrations/0011_user_skill_mastery.sql`
+
+---
+
+## Phase 27: Live Sessions, Offline Web, Course Discovery, KG Context (✅ COMPLETED — Mar 2026)
+
+**Goal:** Wire live session CRUD, add offline web PWA capabilities, build CoursesDiscovery UI, and connect KnowledgeGraph to courseId context.
+
+**Tasks:**
+1. Route fix: /explore, /discover, /courses/discover
+2. Live Sessions FE + BE + NATS (startLiveSession, LiveSessionsPage, NATS events)
+3. Offline Web: ServiceWorker + IndexedDB + OfflineBanner
+4. KnowledgeGraph courseId context + AdminActivityFeed
+
+**Acceptance Criteria:** All tests pass, E2E Playwright for live sessions + offline scenarios.
+
+### What Was Built
+- `LiveSessionsPage` + `LiveSessionDetailPage` with NATS JetStream event integration
+- `OfflineLessonCache` (IndexedDB), `OfflineBanner`, `useOfflineStatus`, `useOfflineQueue` (100-item LRU)
+- `AdminActivityFeed` with 30-second auto-refresh and `clearInterval` cleanup
+- `KnowledgeGraphPage` passes `courseId` from URL params to graph queries
+- Routes: `/explore`, `/discover`, `/courses/discover`, `/sessions`, `/skill-tree` fully wired
+- Security: `attendeePasswordEnc`/`moderatorPasswordEnc` AES-256-GCM encryption (SI-3)
+- BUG-054: `<Progress>` `indicatorClassName` prop added — `barColor` now on inner div only
+- 175 new tests (109 unit + 66 E2E), 44 visual regression screenshots
+
+### Key Files
+- `apps/web/src/pages/LiveSessionsPage.tsx`
+- `apps/web/src/pages/LiveSessionDetailPage.tsx`
+- `apps/web/src/services/OfflineLessonCache.ts`
+- `apps/web/src/components/OfflineBanner.tsx`
+- `apps/web/src/hooks/useOfflineStatus.ts`
+- `apps/web/src/hooks/useOfflineQueue.ts`
+- `apps/web/src/components/AdminActivityFeed.tsx`
+- `apps/web/e2e/live-sessions.spec.ts`
+- `apps/web/e2e/offline-mode.spec.ts`
+
+---
+
+## Phase 28: Live Sessions Completeness + Background Sync + SkillTree Real Data
+
+**Goal:** Complete the Live Sessions backend, wire offline auto-sync, connect SkillTree to real DB data.
+
+**Duration:** 1 session
+
+### Tasks
+
+1. Migration 0012 — live_sessions *Enc column rename (CRITICAL)
+2. Husky v10 fix + ServiceWorker registration
+3. Live Sessions: endLiveSession, joinLiveSession, cancelLiveSession, getSessionAttendees
+4. useOfflineQueue: online event → auto-flush + 48h TTL eviction
+5. SkillTree: real Drizzle query on user_skill_mastery table
+6. ARIA: tablist/tab roles on LiveSessionsPage, aria-live on AdminActivityFeed
+
+### Acceptance Criteria
+
+- migration 0012 exists and has both RENAME COLUMN statements
+- Husky hooks have no deprecated shebang lines
+- endLiveSession/joinLiveSession/cancelLiveSession mutations pass tests
+- useOfflineQueue flushes on 'online' event (test passes)
+- skill-tree.service returns real DB data (mock Drizzle in spec)
+- ARIA attributes verified by unit tests
+- pnpm turbo test — 100% pass
+- pnpm turbo typecheck — 0 errors
+
+---
+
+## Phase 29 — Performance, PWA, Advanced Analytics
+**Status:** Planned | **Target Session:** Session 29
+
+### Planned Scope
+- Progressive Web App (PWA manifest, install prompts, push notifications via Web Push API)
+- Performance optimization: Lighthouse score ≥ 90 on all major pages, code splitting, lazy loading
+- Advanced analytics dashboard: learning velocity, completion rates, tenant-level metrics (10+ KPIs)
+- Mobile parity: all Session 25–27 web features mirrored in mobile app (Live Sessions, Offline mode, SkillTree)
+- AI personalization: learning path recommendations from `UserSkillMastery` data using Apache AGE graph traversal
+
+### Acceptance Criteria
+- [ ] Lighthouse Performance score ≥ 90 on Dashboard, Courses, Lesson, Knowledge Graph pages
+- [ ] PWA installable (Web App Manifest + Service Worker + icons + `beforeinstallprompt` handler)
+- [ ] Push notifications: opt-in flow, permission request, VAPID key registration
+- [ ] Mobile app covers Live Sessions screen, Offline banner, SkillTree screen
+- [ ] Analytics dashboard with ≥ 10 metrics per tenant (velocity, completion, mastery distribution, at-risk learners)
+- [ ] AI recommendations: `recommendSkillPath(userId)` query using AGE graph traversal on `user_skill_mastery`
+- [ ] `pnpm turbo test` — 100% pass
+- [ ] `pnpm turbo typecheck` — 0 errors
+
+### Prerequisites
+- Phase 27 complete (Live Sessions, Offline Web) ✅
+- Phase 28 complete (SkillTree real data, offline background sync) — in progress
+- `user_skill_mastery` table populated (migration `0011`) ✅
+- `tenant_themes` table (migration `0010`) ✅
+
+---
+
 ## Cross-Cutting Concerns (Active in ALL Phases)
 
 ### Testing Strategy

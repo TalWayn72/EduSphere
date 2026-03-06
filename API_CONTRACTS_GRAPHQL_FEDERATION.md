@@ -2768,6 +2768,38 @@ type AgentExecutionEdge {
 
 ---
 
+## 11.X Live Sessions (subgraph-agent — port 4005)
+
+**Owns:** `LiveSession`, `SessionAttendee`
+**Port:** 4005
+**Database tables:** `live_sessions`, `session_attendees`
+
+### 11.X.1 Mutations
+
+| Mutation | Auth | Role | Input | Returns |
+|----------|------|------|-------|---------|
+| `startLiveSession(input: StartLiveSessionInput!)` | @authenticated | INSTRUCTOR | title, scheduledAt, attendeePasswordEnc? | LiveSession! |
+| `endLiveSession(sessionId: ID!)` | @authenticated | INSTRUCTOR | sessionId | LiveSession! |
+| `joinLiveSession(sessionId: ID!)` | @authenticated | any | sessionId | JoinSessionResult! |
+| `cancelLiveSession(sessionId: ID!)` | @authenticated | INSTRUCTOR | sessionId | LiveSession! |
+
+### 11.X.2 Queries
+
+| Query | Auth | Role | Returns |
+|-------|------|------|---------|
+| `liveSessions(status: LiveSessionStatus, first: Int, after: String)` | @authenticated | any | LiveSessionConnection! |
+| `liveSession(id: ID!)` | @authenticated | any | LiveSession |
+| `sessionAttendees(sessionId: ID!, first: Int, after: String)` | @authenticated | INSTRUCTOR | SessionAttendeeConnection! |
+
+### 11.X.3 Types
+
+- `LiveSession`: id, title, status (SCHEDULED|LIVE|ENDED|CANCELLED), scheduledAt, startedAt, endedAt, createdBy, attendeePasswordEnc, moderatorPasswordEnc, tenantId
+- `JoinSessionResult`: session, roomUrl, token
+- `LiveSessionStatus` enum: SCHEDULED, LIVE, ENDED, CANCELLED
+- `StartLiveSessionInput`: title (String!), scheduledAt (DateTime!), attendeePasswordEnc (String)
+
+---
+
 ## 12. Subgraph: Knowledge (Graph, Embeddings, Semantic Search)
 
 **Owns:** `Concept`, `Person`, `Term`, `Source`, `TopicCluster`, `KnowledgeRelation`, `SemanticSearchResult`
@@ -4986,3 +5018,218 @@ This table maps every technology choice to its usage in the GraphQL API layer:
 | `REFERS_TO` edge        | `KnowledgeRelation`     | General reference between entities          |
 | `DERIVED_FROM` edge     | `KnowledgeRelation`     | Concept derivation chain                    |
 | `BELONGS_TO` edge       | _(via `topicCluster`)_  | Concept-to-cluster membership               |
+
+---
+
+## Section 21 — Phase 25-27 Types (Sessions 25-27)
+
+### 21.1 SkillTree (subgraph-knowledge, Phase 26)
+
+#### Types
+
+```graphql
+type SkillTreeNode {
+  id: ID!
+  label: String!
+  type: String!
+  masteryLevel: MasteryLevel!
+  connections: [ID!]!
+}
+
+type SkillTreeEdge {
+  source: ID!
+  target: ID!
+}
+
+type SkillTree {
+  nodes: [SkillTreeNode!]!
+  edges: [SkillTreeEdge!]!
+}
+
+enum MasteryLevel {
+  NONE        # No exposure yet
+  ATTEMPTED   # Tried but not yet familiar
+  FAMILIAR    # Basic understanding
+  PROFICIENT  # Can apply the skill
+  MASTERED    # Expert-level command
+}
+```
+
+#### Queries
+
+```graphql
+type Query {
+  skillTree(courseId: ID!): SkillTree!  @authenticated
+}
+```
+
+#### Mutations
+
+```graphql
+type Mutation {
+  updateMasteryLevel(
+    nodeId: ID!
+    level: MasteryLevel!
+  ): SkillTreeNode!  @authenticated
+}
+```
+
+> **Implementation note:** MasteryLevel values in the actual subgraph implementation are `NONE | ATTEMPTED | FAMILIAR | PROFICIENT | MASTERED` (5 levels). The `user_skill_mastery` table (migration 0011) stores per-user mastery per skill node with `tenant_id` RLS isolation.
+
+---
+
+### 21.2 Live Sessions (subgraph-agent, Phase 27)
+
+#### Types
+
+```graphql
+type LiveSession {
+  id: ID!
+  contentItemId: ID!
+  tenantId: ID!
+  bbbMeetingId: String!
+  meetingName: String!
+  scheduledAt: DateTime!
+  startedAt: DateTime
+  endedAt: DateTime
+  recordingUrl: String
+  attendeePasswordEnc: String!   # AES-256-GCM encrypted (SI-3)
+  moderatorPasswordEnc: String!  # AES-256-GCM encrypted (SI-3)
+  status: LiveSessionStatus!
+  createdAt: DateTime!
+}
+
+enum LiveSessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  RECORDING
+  CANCELLED
+}
+
+type LiveSessionConnection {
+  edges: [LiveSessionEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type LiveSessionEdge {
+  node: LiveSession!
+  cursor: String!
+}
+```
+
+#### Queries
+
+```graphql
+type Query {
+  liveSessions(
+    status: LiveSessionStatus
+    first: Int
+    after: String
+  ): LiveSessionConnection!  @authenticated
+
+  liveSession(id: ID!): LiveSession  @authenticated
+}
+```
+
+#### Mutations
+
+```graphql
+type Mutation {
+  createLiveSession(input: CreateLiveSessionInput!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
+
+  startLiveSession(id: ID!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
+
+  endLiveSession(id: ID!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
+
+  joinLiveSession(id: ID!, password: String!): LiveSession!
+    @authenticated
+
+  cancelLiveSession(id: ID!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
+}
+
+input CreateLiveSessionInput {
+  meetingName: String!
+  scheduledAt: DateTime!
+  contentItemId: ID!
+  attendeePassword: String!    # Stored encrypted as attendeePasswordEnc
+  moderatorPassword: String!   # Stored encrypted as moderatorPasswordEnc
+}
+```
+
+#### Subscriptions
+
+```graphql
+type Subscription {
+  liveSessionUpdated(sessionId: ID!): LiveSession!  @authenticated
+  liveSessionAttendeeJoined(sessionId: ID!): LiveSessionAttendee!  @authenticated
+}
+```
+
+#### NATS Events
+
+| Event | Subject | Payload |
+|-------|---------|---------|
+| Session created | `edusphere.session.created` | `{ sessionId, tenantId, instructorId }` |
+| Session started | `edusphere.session.started` | `{ sessionId, tenantId, startedAt }` |
+| Attendee joined | `edusphere.session.attendee.joined` | `{ sessionId, userId, tenantId }` |
+| Session ended | `edusphere.session.ended` | `{ sessionId, tenantId, endedAt }` |
+
+---
+
+### 21.3 Knowledge Graph — CourseId Context (Phase 27)
+
+The `knowledgeGraph` query now accepts an optional `courseId` parameter to filter the graph to nodes related to a specific course:
+
+```graphql
+type Query {
+  # Updated signature (courseId added in Phase 27)
+  knowledgeGraph(
+    query: String
+    courseId: ID           # NEW: filter graph to course context
+    limit: Int
+    depth: Int
+  ): KnowledgeGraphResult!  @authenticated
+}
+```
+
+---
+
+### 21.4 AdminActivityFeed (Phase 27)
+
+```graphql
+type AdminActivity {
+  id: ID!
+  type: String!
+  actor: User!
+  target: String
+  metadata: JSON
+  createdAt: DateTime!
+  tenantId: ID!
+}
+
+type Query {
+  adminActivityFeed(
+    first: Int
+    after: String
+    types: [String!]
+  ): AdminActivityConnection!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}
+```
+
+---
+
+*All types above follow the Relay Cursor Connection spec (PageInfo, edges, nodes).*
+*All mutations require `@authenticated`. Sensitive mutations additionally require `@requiresScopes`.*
+*PII fields (passwords) stored AES-256-GCM encrypted per Security Invariant SI-3.*

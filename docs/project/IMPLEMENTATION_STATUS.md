@@ -145,3 +145,157 @@ TypeScript: **0 errors** across all 26 packages.
 | subgraph-knowledge | 4006 | Complete |
 | Frontend web | 5173 | Complete |
 | Mobile (Expo) | - | Complete |
+
+---
+
+## Session History
+
+### Session 23 (2026-02-xx)
+
+**Focus:** Mobile TypeScript fixes, Code quality, LoggerModule extraction
+
+**Key Changes:**
+- Mobile app TypeScript strict-mode errors resolved (Expo SDK 54 compatibility)
+- LoggerModule extracted as reusable NestJS global module (shared across all subgraphs)
+- TIME constants package created (`packages/config`) for shared duration literals
+
+**Files Changed:** Mobile TypeScript error fixes, `packages/config/src/time.ts`, LoggerModule in `packages/shared/logger/`
+
+**Tests Added:** ~50 (mobile unit tests, logger service tests)
+
+**Bugs Resolved:** TypeScript strict mode compatibility issues on React Native 0.81 / Expo SDK 54
+
+---
+
+### Session 24 (2026-02-xx)
+
+**Focus:** PRD Gap Closure G1-G8 (canvas annotations, video sketch, AI Tutor, knowledge sources, adaptive quiz, study streaks)
+
+**Key Changes:**
+- Annotation subgraph: canvas/sketch annotation support added
+- VideoPlayerWithCurriculum: base implementation with sidebar
+- AITutorScreen: enhanced with EU AI Act compliance and consent management (SI-10)
+- Knowledge source citations: linked to graph nodes in HybridRAG responses
+- `AITutorScreen.test.ts` added (Session 24 mobile test baseline)
+- EU AI Act transparency tests and consent management tests added
+
+**Files Changed:** `apps/subgraph-annotation/` (canvas layer), `apps/mobile/src/screens/AITutorScreen.tsx`, `apps/web/src/components/VideoPlayerWithCurriculum.tsx`
+
+**Tests Added:** ~500 (passing total exceeded 5,000 for first time)
+
+**Milestone:** Total test count crossed 5,000+ passing tests
+
+---
+
+### Session 25 (2026-03-05 — commit d85242c)
+
+**Focus:** UI/UX Revolution — Design System + Accessibility + Mobile alignment (5 phases)
+
+**Phase 1 — Design System:**
+- Indigo design tokens: `COLORS.primary = #6366F1`, `SPACING`, `RADIUS`, `FONT`, `SHADOW`
+- ThemeProvider (3-tier: globals.css `:root` → tenant CSS vars → user pref class toggles on `html`)
+- LandingPage rewrite with gradient hero and feature sections
+- MasteryBadge component (5 mastery levels, semantic colors)
+- DB migration `0010_tenant_themes` (tenant_themes table + RLS + user_preferences columns)
+
+**Phase 2 — Navigation + Dashboard:**
+- AppSidebar: collapsible 240px/64px with 6 nav groups
+- DashboardPage: 5 sections (hero streak, stats grid, recent activity, upcoming, quick actions)
+- CoursesDiscoveryPage with search + MasteryBadge integration + CourseCard component
+
+**Phase 3 — Learning + Knowledge:**
+- VideoPlayerWithCurriculum: 320px curriculum sidebar with lesson list
+- KnowledgeSkillTree: BFS traversal + SVG bezier edge rendering
+
+**Phase 4 — WCAG 2.2 AAA Accessibility:**
+- SkipLinks, useFocusTrap, useAnnounce (dual live-region), useReducedMotion
+- ThemeSettingsPage (font size, contrast, motion preferences)
+
+**Phase 5 — Mobile Design System Alignment:**
+- `theme.ts` with Indigo tokens shared across all screens
+- HomeScreen, CoursesScreen, ProfileScreen, SettingsScreen: all migrated to `COLORS.primary`
+- Navigation `tabBarActiveTintColor` → `COLORS.primary`
+- MasteryBadge mobile component (`testID=mastery-badge-${level}`)
+
+**New Files:**
+- `apps/subgraph-knowledge/src/graph/skill-tree.resolver.ts`
+- `apps/subgraph-knowledge/src/graph/skill-tree.service.ts`
+- `apps/subgraph-knowledge/src/graph/skill-tree.resolver.spec.ts`
+- `apps/subgraph-knowledge/src/graph/skill-tree.service.spec.ts`
+- DB migration `0011_user_skill_mastery.sql`
+
+**Tests Added:** ~1,200 (frontend components, mobile screens, skill-tree backend)
+
+**Test Totals After Session 25:**
+| Scope | Count |
+|-------|-------|
+| Web frontend | 3,315 |
+| Mobile | 119 |
+| subgraph-knowledge | 509 (includes skill tree) |
+
+---
+
+### Session 26 (2026-03-05)
+
+**Focus:** Documentation Infrastructure + Phase 27 Security Audit preparation
+
+**Key Changes:**
+- `docs/INDEX.md` created as documentation root index
+- `.github/workflows/ci.yml`: root-cleanliness job added (enforces no stray files at repo root)
+- `.husky/pre-commit` hook: doc lint check
+- `scripts/lint-docs.sh`: validates doc structure
+- `.gitattributes`: Git LFS configured for PNG/screenshot files
+- 55 PNGs moved to `docs/screenshots/`, 4 CI logs moved to `docs/logs/`
+- `docs/plans/` reorganised into 3 sub-folders: `bugs/`, `features/`, `archive/`
+- GDPR duplicates merged: SUBPROCESSORS and MODEL_CARDS deduplicated
+- `docs/plans/phase-27-security-audit.md`: PENTEST-001..041 security audit plan (58 tests)
+
+**Tests Added:** ~50 (security pentest scaffolding tests)
+
+---
+
+### Session 27 (2026-03-06 — commit c0e4810)
+
+**Focus:** Live Sessions, Offline Web, Course Discovery, Knowledge Graph course context, BUG-054
+
+**New Features:**
+- **Live Sessions** (`/sessions`): List + Detail pages backed by new agent subgraph module
+- **Offline Web**: OfflineBanner, useOfflineStatus, useOfflineQueue (100-item LRU cap), OfflineLessonCache (IndexedDB), SmartRoot
+- **Course Discovery**: `/explore`, `/discover`, `/courses/discover` routes; CourseCard + Highlight component (BUG-053 fix)
+- **Knowledge Graph course context**: `/knowledge-graph?courseId=...` deep-link support
+- **AdminActivityFeed** component for admin dashboard
+
+**New Files:**
+- `apps/subgraph-agent/src/live-sessions/` (live-sessions NestJS module)
+- `apps/web/src/pages/LiveSessionsPage.tsx` + `LiveSessionsPage.test.tsx`
+- `apps/web/src/pages/LiveSessionDetailPage.tsx` + `LiveSessionDetailPage.test.tsx`
+- `apps/web/src/services/OfflineLessonCache.ts` + `OfflineLessonCache.test.ts`
+- `apps/web/src/hooks/useOfflineStatus.ts` + `useOfflineStatus.test.ts`
+- `apps/web/src/hooks/useOfflineQueue.ts` + `useOfflineQueue.test.ts`
+- `apps/web/src/components/OfflineBanner.tsx` + `OfflineBanner.test.tsx`
+- `apps/web/src/components/AdminActivityFeed.tsx` + `AdminActivityFeed.test.tsx`
+- `apps/web/src/components/SmartRoot.tsx` + `SmartRoot.test.tsx`
+- `apps/web/e2e/live-sessions.spec.ts`
+- `apps/web/e2e/offline-mode.spec.ts`
+- `apps/web/e2e/knowledge-graph-course-context.spec.ts`
+- `packages/db/src/schema/live-sessions.ts`
+- `packages/db/src/migrations/0011_user_skill_mastery.sql`
+
+**Database:**
+- `live_sessions` table with SI-3 compliant encrypted fields (`attendeePasswordEnc`, `moderatorPasswordEnc`)
+
+**Routes Added:** `/explore`, `/discover`, `/courses/discover`, `/sessions`, `/sessions/:id`, `/skill-tree`
+
+**Tests Added:** ~300 (live sessions, offline hooks/services, new components, 3 new E2E specs)
+
+**Total Tests After Session 27:** 5,762+
+
+**Updated Totals:**
+| Scope | Tests |
+|-------|-------|
+| Web frontend | 3,315 |
+| subgraph-agent | 599 (includes live-sessions module) |
+| subgraph-knowledge | 509 (includes skill tree) |
+| Security | 816 |
+| Mobile | 119 |
+| **Grand Total** | **5,762+** |

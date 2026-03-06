@@ -1572,4 +1572,17 @@ When adding new E2E tests:
 4. Update this documentation
 5. Ensure tests pass in all browsers
 6. Add appropriate test tags (@smoke, @regression, etc.)
+
+---
+
+## Spec File Registry (Sessions 25-27)
+
+| Spec File | Feature Area | Session Added |
+|-----------|-------------|---------------|
+| `apps/web/e2e/course-discovery.spec.ts` | Course Discovery search + filter | 25 |
+| `apps/web/e2e/landing-page.spec.ts` | Landing page (visual regression) | 25 |
+| `apps/web/e2e/lesson-results.spec.ts` | Lesson pipeline completion | 26 |
+| `apps/web/e2e/live-sessions.spec.ts` | Live Sessions join/leave | 27 |
+| `apps/web/e2e/offline-mode.spec.ts` | ServiceWorker + OfflineBanner | 27 |
+| `apps/web/e2e/knowledge-graph-course-context.spec.ts` | KG courseId context | 27 |
 7. Document any new fixtures or utilities
