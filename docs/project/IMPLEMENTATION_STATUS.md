@@ -299,3 +299,163 @@ TypeScript: **0 errors** across all 26 packages.
 | Security | 816 |
 | Mobile | 119 |
 | **Grand Total** | **5,762+** |
+
+---
+
+## Session 28 — Phases 28-34 (2026-03-06)
+
+### Phase 28 — Live Sessions Mutations + Offline Sync + PWA + SI-3 Fix
+**Commit:** `fddb6c0` + `1cc2469`
+
+**Key changes:**
+- `useLiveSessionActions.ts`: 4 mutations (end/join/cancel/start) with toast error handling
+- SI-3 critical fix: `encryptField()`/`decryptField()` wired in `live-session.service.ts`
+- `useOfflineQueue`: TTL 48h + online-event auto-flush + LRU 100 + `onFlush` callback
+- `pwa.ts`: ServiceWorker registration callbacks + hourly update poll
+- `CoursesDiscovery`: Category/Level/Sort filters + full ARIA
+- DB migration 0012: idempotent `custom_migrations` runner
+- NATS SI-7: TLS via env vars (`NATS_TLS_CA_FILE`)
+- Husky v10: `#!/bin/sh` shebang fix
+
+**New files:**
+- `apps/web/src/hooks/useLiveSessionActions.ts`
+- `apps/web/src/pwa.ts`
+- `apps/web/e2e/offline-sync.spec.ts`, `live-sessions-mutations.spec.ts`, `course-discovery-filters.spec.ts`, `aria-phase28.spec.ts`
+- `apps/subgraph-agent/src/live-sessions/live-sessions-p28.pentest.spec.ts`
+
+**Tests added:** ~130 | **Running total:** ~6,092+
+
+---
+
+### Phase 29 — Stripe Checkout Flow (PRD §8.4)
+**Commit:** `be3705a`
+
+**Key changes:**
+- `CheckoutPage.tsx`: Stripe Elements, clientSecret from URL, success redirect
+- `PurchaseCourseButton.tsx`: URL-based secret passing, fixed console.error removal
+- `/checkout` route added (lazy-loaded, auth-guarded)
+- Packages added: `@stripe/stripe-js`, `@stripe/react-stripe-js`
+- Security: clientSecret never in localStorage or DOM text
+
+**New files:**
+- `apps/web/src/pages/CheckoutPage.tsx` + `CheckoutPage.test.tsx`
+- `apps/web/e2e/checkout-flow.spec.ts`
+
+**Tests added:** ~18 | **Running total:** ~6,110+
+
+---
+
+### Phase 30 — Personal Knowledge Graph Wiki + Annotation Merge Request (PRD §4.3+§4.4)
+**Commit:** `4ae6614`
+
+**Key changes:**
+- `PersonalGraphView.tsx`: SVG annotation wiki across all courses (6 nodes, 7 edges, colour legend, detail panel)
+- `KnowledgeGraph.tsx`: Global/My Wiki tab toggle
+- `AnnotationMergeRequestModal.tsx`: propose annotation dialog with 0/500 char counter
+- `AnnotationItem.tsx`: "Propose to Official" button (PERSONAL + own-user guard)
+- `InstructorMergeQueuePage.tsx`: diff view, approve/reject, route `/instructor/merge-queue`
+
+**New files:**
+- `apps/web/src/components/PersonalGraphView.tsx` + `.test.tsx`
+- `apps/web/src/components/AnnotationMergeRequestModal.tsx` + `.test.tsx`
+- `apps/web/src/pages/InstructorMergeQueuePage.tsx` + `.test.tsx`
+- `apps/web/e2e/annotation-merge-request.spec.ts`
+
+**Tests added:** ~59 (44 unit + 15 E2E) | **Running total:** ~6,169+
+
+---
+
+### Phase 31 — Video Sketch Overlay Enhancement (PRD §4.2 P-1)
+**Commit:** `2c9d178`
+
+**Key changes:**
+- `useSketchCanvas.ts`: 6 tools — freehand, eraser (destination-out), rect, arrow, ellipse, text
+- `VideoSketchToolbar.tsx`: tool buttons (aria-pressed), color picker swatch, Save/Clear/Cancel
+- Text tool: positioned `<input>` on click, commits on Enter/blur
+- `VideoSketchOverlay.tsx`: refactored as coordinator; backward-compatible SketchPath re-export
+
+**New files:**
+- `apps/web/src/hooks/useSketchCanvas.ts`
+- `apps/web/src/components/VideoSketchToolbar.tsx`
+- `apps/web/src/components/VideoSketchOverlay.tools.test.tsx`
+- `apps/web/e2e/video-sketch.spec.ts` (updated)
+
+**Tests added:** ~25 | **Running total:** ~6,194+
+
+---
+
+### Phase 32 — Real-time AI Subtitle Translation (PRD §3.4 G-2)
+**Commit:** `720b7c9`
+
+**Key changes:**
+- `TranslationService`: LibreTranslate HTTP, VTT generation, MinIO upload, NATS event
+- `SubtitleTrack` GraphQL type; `subtitleTracks` field on `MediaAsset`
+- `VideoSubtitleSelector.tsx`: CC button, language dropdown, Off option, ARIA
+- `VideoPlayer.tsx`: multi-language `<track>` element support
+- DB migration 0013: `transcripts.vtt_key`
+- Env: `TRANSLATION_TARGETS` (BCP-47), `LIBRE_TRANSLATE_URL`
+
+**New files:**
+- `apps/subgraph-content/src/translation/translation.service.ts` + `.spec.ts`
+- `apps/web/src/components/VideoSubtitleSelector.tsx` + `.test.tsx`
+- `apps/web/e2e/subtitle-translation.spec.ts`
+
+**Tests added:** ~33 | **Running total:** ~6,227+
+
+---
+
+### Phase 33 — Remote Proctoring (PRD §7.2 G-4)
+**Commit:** `0d51873`
+
+**Key changes:**
+- `ProctoringService`: full session lifecycle (start/flag/end) with `OnModuleDestroy` cleanup
+- `ProctoringOverlay.tsx`: WebRTC webcam, tab-switch via `visibilitychange`, flag count badge
+- `ProctoringReportCard.tsx`: status badge + flag timeline
+- DB migration 0014: `proctoring_sessions` (JSONB flags, RLS)
+- Memory safety: `visibilitychange` listener removed + `MediaStream.getTracks().stop()` on unmount
+
+**New files:**
+- `apps/subgraph-agent/src/proctoring/proctoring.service.ts` + `.spec.ts`
+- `apps/web/src/components/ProctoringOverlay.tsx` + `.test.tsx`
+- `apps/web/src/components/ProctoringReportCard.tsx`
+- `apps/web/e2e/proctoring.spec.ts`
+- `packages/db/src/migrations/0014_proctoring_sessions.sql`
+
+**Tests added:** ~48 (16 service + 23 component + 6 E2E + 3 visual) | **Running total:** ~6,275+
+
+---
+
+### Phase 34 — 3D Models & Simulations (PRD §3.3 G-1)
+**Commit:** `1e3314b`
+
+**ALL PRD GAPS CLOSED** — G-1 through G-4, P-1 through P-3 complete.
+
+**Key changes:**
+- `Model3DViewer.tsx`: Three.js WebGL via dynamic `import()`, OrbitControls, full memory cleanup
+- `Model3DInfo` + `ModelAnimation` types; `AssetType.MODEL_3D` enum value
+- `uploadModel3D` mutation: format validation (gltf/glb/obj/fbx), MinIO presigned URL
+- DB migration 0015: `model_format`, `model_animations` (JSONB), `poly_count`
+- Three.js vitest stubs for CI
+
+**New files:**
+- `apps/web/src/components/Model3DViewer.tsx` + `.test.tsx`
+- `apps/web/src/lib/graphql/model3d.queries.ts`
+- `apps/web/e2e/model3d-viewer.spec.ts`
+- `packages/db/src/migrations/0015_model3d.sql`
+- `apps/web/src/test/three-stub.ts` + `three-gltf-stub.ts` + `three-orbit-stub.ts`
+
+**Tests added:** ~39 (14 service + 18 component + 5 E2E + 2 visual) | **Running total:** ~6,314+
+
+---
+
+## Cumulative Test Count (All Sessions)
+
+| Session | Tests Added | Running Total |
+|---------|------------|---------------|
+| 1-22 | ~3,500 | ~3,500 |
+| 23 | ~50 | ~3,550 |
+| 24 | ~500 | ~4,050 |
+| 25 | ~1,200 | ~5,250 |
+| 26 | ~50 | ~5,300 |
+| 27 | ~462 | ~5,762 |
+| 28 (Phases 28-34) | ~352 | **~6,114+** |

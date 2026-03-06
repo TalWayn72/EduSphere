@@ -224,6 +224,17 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 
 ## Features
 
+### Recently Added (Session 28 — Phases 28-34)
+
+- **ALL PRD GAPS CLOSED** — G-1, G-2, G-3, G-4, P-1, P-2, P-3 all complete
+- **Stripe Checkout** — Stripe Elements checkout flow, secure clientSecret handling
+- **Personal Knowledge Graph** — Annotation wiki across courses with SVG graph
+- **Annotation Merge Request** — Students propose annotations to official knowledge base
+- **Video Sketch Tools** — 6 drawing tools (freehand, eraser, rect, arrow, ellipse, text)
+- **AI Subtitle Translation** — Real-time subtitle generation via LibreTranslate (VTT/WebVTT)
+- **Remote Proctoring** — WebRTC webcam, tab-switch detection, flag timeline
+- **3D Models & Simulations** — Three.js WebGL viewer with OrbitControls, gltf/glb/obj/fbx
+
 ### Recently Added (Sessions 25-27)
 
 - **Design System** — Indigo #6366F1 design tokens, ThemeProvider (3-tier tenant/user theming), dark mode
@@ -332,8 +343,15 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 25**     | UI/UX Revolution -- Design System, ThemeProvider, AppSidebar, WCAG 2.2 AAA             | 3-5 days   | ✅ Complete |
 | **Phase 26**     | Skill Tree, Course Discovery, Mobile Design System alignment                            | 2-3 days   | ✅ Complete |
 | **Phase 27**     | Live Sessions, Offline Web, AdminActivityFeed, Knowledge Graph course context           | 3-4 days   | ✅ Complete |
+| **Phase 28**     | Live Sessions mutations, Offline sync, PWA, SI-3 fix                                   | 2-3 days   | ✅ Complete |
+| **Phase 29**     | Stripe checkout flow                                                                    | 1-2 days   | ✅ Complete |
+| **Phase 30**     | Personal KG wiki + Annotation merge request                                             | 2-3 days   | ✅ Complete |
+| **Phase 31**     | Video sketch 6 tools                                                                    | 1-2 days   | ✅ Complete |
+| **Phase 32**     | AI subtitle translation                                                                 | 2-3 days   | ✅ Complete |
+| **Phase 33**     | Remote proctoring                                                                       | 2-3 days   | ✅ Complete |
+| **Phase 34**     | 3D Models & Simulations                                                                 | 2-3 days   | ✅ Complete |
 
-**Current Status:** ALL 27 phases complete ✅ — Backend + Frontend + Mobile fully built. GraphQL federation active across all 6 subgraphs. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** ALL 34 phases complete ✅ — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -433,7 +451,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **5,762+ tests passing**                        |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **6,125+ tests passing**                        |
 | **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (subgraph-core + subgraph-knowledge)    |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |

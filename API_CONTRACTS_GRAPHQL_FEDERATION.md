@@ -5232,4 +5232,272 @@ type Query {
 
 *All types above follow the Relay Cursor Connection spec (PageInfo, edges, nodes).*
 *All mutations require `@authenticated`. Sensitive mutations additionally require `@requiresScopes`.*
+
+---
+
+## Section 22 — Phase 28-34 Types (Sessions 28)
+
+> **Milestone:** All PRD gaps closed with Phase 34. Sections 22.1–22.6 document every new type introduced in Phases 28–34.
+
+---
+
+### 22.1 Live Session Mutations — Phase 28
+
+The following mutations were added to the `LiveSession` type defined in Section 21.2:
+
+```graphql
+type Mutation {
+  # Phase 28 additions (endLiveSession, joinLiveSession, cancelLiveSession added)
+  endLiveSession(id: ID!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
+
+  joinLiveSession(id: ID!, password: String!): LiveSession!
+    @authenticated
+
+  cancelLiveSession(id: ID!): LiveSession!
+    @authenticated
+    @requiresScopes(scopes: ["session:write"])
+}
+
+# LiveSessionStatus enum updated — CANCELLED added in Phase 28
+enum LiveSessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED   # Added Phase 28
+}
+```
+
+**Hook:** `useLiveSessionActions` — wraps all 4 mutations with toast error handling.
+
+---
+
+### 22.2 Stripe Checkout — Phase 29 (subgraph-core)
+
+```graphql
+type CheckoutSession {
+  id: ID!
+  clientSecret: String!
+  courseId: ID!
+  userId: ID!
+  amount: Int!          # In cents
+  currency: String!
+  status: CheckoutStatus!
+  createdAt: DateTime!
+}
+
+enum CheckoutStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+type Mutation {
+  createCheckoutSession(
+    courseId: ID!
+    returnUrl: String!
+  ): CheckoutSession!
+    @authenticated
+}
+```
+
+**Security:** `clientSecret` is never stored in `localStorage` and never rendered as visible DOM text. The Stripe Elements component receives it via URL param only.
+
+**Frontend route:** `/checkout?secret={clientSecret}&session={sessionId}&courseId={courseId}`
+
+---
+
+### 22.3 Annotation Merge Request — Phase 30 (subgraph-annotation)
+
+```graphql
+type AnnotationMergeRequest {
+  id: ID!
+  sourceAnnotationId: ID!
+  proposedBy: User!
+  justification: String!     # Max 500 chars
+  status: MergeRequestStatus!
+  reviewedBy: User
+  reviewedAt: DateTime
+  tenantId: ID!
+  createdAt: DateTime!
+}
+
+enum MergeRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+type Mutation {
+  proposeMergeRequest(
+    annotationId: ID!
+    justification: String!
+  ): AnnotationMergeRequest!
+    @authenticated
+
+  reviewMergeRequest(
+    id: ID!
+    decision: MergeRequestStatus!
+    reviewNote: String
+  ): AnnotationMergeRequest!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+}
+
+type Query {
+  pendingMergeRequests: [AnnotationMergeRequest!]!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+}
+```
+
+**Frontend:** `AnnotationMergeRequestModal.tsx` (0/500 char counter), `InstructorMergeQueuePage.tsx` at `/instructor/merge-queue`.
+
+---
+
+### 22.4 AI Subtitle Translation — Phase 32 (subgraph-content)
+
+```graphql
+type SubtitleTrack {
+  language: String!       # BCP-47 code (e.g. "en", "he", "fr")
+  label: String!          # Display name (e.g. "English", "Hebrew")
+  vttUrl: String!         # Presigned MinIO URL to .vtt file
+}
+
+# Added to MediaAsset type (Phase 32)
+type MediaAsset {
+  # ... existing fields ...
+  subtitleTracks: [SubtitleTrack!]!   # Empty array if translation disabled
+}
+```
+
+**Configuration:**
+- `TRANSLATION_TARGETS`: comma-separated BCP-47 codes (empty = disabled)
+- `LIBRE_TRANSLATE_URL`: LibreTranslate instance URL
+- Translation runs non-blocking after transcription completes (Step 8 of pipeline)
+
+**DB:** `transcripts.vtt_key` column (migration 0013) stores MinIO object key for VTT file.
+
+---
+
+### 22.5 Remote Proctoring — Phase 33 (subgraph-agent)
+
+```graphql
+type ProctoringSession {
+  id: ID!
+  assessmentId: ID!
+  userId: ID!
+  status: ProctoringStatus!
+  flags: [ProctoringFlag!]!
+  recordingKey: String         # MinIO key for session recording
+  startedAt: DateTime!
+  endedAt: DateTime
+  tenantId: ID!
+}
+
+type ProctoringFlag {
+  type: ProctoringFlagType!
+  timestamp: DateTime!
+  metadata: JSON
+}
+
+enum ProctoringFlagType {
+  TAB_SWITCH
+  WINDOW_BLUR
+  MULTIPLE_FACES
+  NO_FACE
+  AUDIO_DETECTED
+  COPY_PASTE
+}
+
+enum ProctoringStatus {
+  ACTIVE
+  COMPLETED
+  FLAGGED
+}
+
+type Mutation {
+  startProctoringSession(assessmentId: ID!): ProctoringSession!
+    @authenticated
+
+  flagProctoringEvent(
+    sessionId: ID!
+    type: ProctoringFlagType!
+    metadata: JSON
+  ): ProctoringFlag!
+    @authenticated
+
+  endProctoringSession(sessionId: ID!): ProctoringSession!
+    @authenticated
+}
+
+type Query {
+  proctoringSession(id: ID!): ProctoringSession  @authenticated
+  proctoringReport(assessmentId: ID!): [ProctoringSession!]!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+}
+```
+
+**DB:** `proctoring_sessions` table with `flags: jsonb`, RLS tenant isolation (migration 0014).
+**Memory safety:** `visibilitychange` listener + `MediaStream.getTracks().stop()` in `useEffect` cleanup.
+
+---
+
+### 22.6 3D Models & Simulations — Phase 34 (subgraph-content)
+
+```graphql
+type Model3DInfo {
+  format: String!             # gltf | glb | obj | fbx
+  polyCount: Int
+  animations: [ModelAnimation!]!
+  viewerUrl: String!          # Presigned MinIO URL
+}
+
+type ModelAnimation {
+  name: String!
+  duration: Float!            # Seconds
+}
+
+# AssetType enum updated — MODEL_3D added in Phase 34
+enum AssetType {
+  VIDEO
+  AUDIO
+  DOCUMENT
+  IMAGE
+  MODEL_3D    # Added Phase 34
+}
+
+# Added to MediaAsset type (Phase 34)
+type MediaAsset {
+  # ... existing fields ...
+  model3d: Model3DInfo        # Null unless assetType = MODEL_3D
+}
+
+type Mutation {
+  uploadModel3D(
+    input: UploadModel3DInput!
+  ): MediaAssetUploadResponse!
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
+}
+
+input UploadModel3DInput {
+  filename: String!           # Must end in .gltf/.glb/.obj/.fbx
+  contentItemId: ID!
+  mimeType: String
+}
+```
+
+**Frontend:** `Model3DViewer.tsx` uses Three.js (dynamic `import()`) with OrbitControls. Full memory safety: `renderer.dispose()`, geometry/material/texture cleanup, `cancelAnimationFrame()`, `ResizeObserver.disconnect()`.
+**DB:** migration 0015 adds `model_format`, `model_animations` (JSONB), `poly_count` to `media_assets`.
+**CI:** Three.js vitest stubs (`three-stub`, `three-gltf-stub`, `three-orbit-stub`) prevent WebGL errors in test environment.
+
+---
+
+*Sections 22.1–22.6 reflect commit range `3229051..1e3314b` (2026-03-06).*
+*All types follow Relay Cursor Connection spec where applicable.*
+*All mutations require `@authenticated`. Sensitive mutations additionally use `@requiresScopes` or `@requiresRole`.*
 *PII fields (passwords) stored AES-256-GCM encrypted per Security Invariant SI-3.*

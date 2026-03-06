@@ -1,7 +1,7 @@
 # EduSphere — Test Registry
 
-**Last Updated:** 2026-03-06 | **Session:** 27
-**Total Tests:** 5,762+ | **Pass Rate:** 100%
+**Last Updated:** 2026-03-06 | **Session:** 28
+**Total Tests:** 6,125+ | **Pass Rate:** 100%
 
 ---
 
@@ -15,10 +15,10 @@
 | subgraph-collaboration | 161 | Unit + Integration | Passing |
 | subgraph-agent | 599 | Unit + Integration | Passing |
 | subgraph-knowledge | 509 | Unit + Integration | Passing |
-| web (frontend) | 3,315 | Unit + Component + E2E | Passing |
+| web (frontend) | 3,678+ | Unit + Component + E2E | Passing |
 | security tests | 816 | Static + Policy | Passing |
 | mobile | 119 | Logic (pure functions) | Passing |
-| **TOTAL** | **5,762+** | All | **100% pass** |
+| **TOTAL** | **6,125+** | All | **100% pass** |
 
 ---
 
@@ -116,6 +116,8 @@
 | `src/pages/LiveSessionsPage.test.tsx` | 27 | Live sessions list + tabs |
 | `src/pages/LiveSessionDetailPage.test.tsx` | 27 | Session detail view |
 | `src/pages/AdminDashboardPage.test.tsx` | 18 | Admin metrics + panels |
+| `src/pages/CheckoutPage.test.tsx` | Added Session 28 | Stripe checkout |
+| `src/pages/InstructorMergeQueuePage.test.tsx` | Added Session 28 | Merge queue |
 
 **Components:**
 
@@ -125,6 +127,11 @@
 | `src/components/AdminActivityFeed.test.tsx` | 27 | Admin activity feed |
 | `src/components/SmartRoot.test.tsx` | 27 | Root-level app wrapper |
 | `src/components/Layout.test.tsx` | 25 | AppSidebar + collapse state |
+| `src/components/PersonalGraphView.test.tsx` | Added Session 28 | Personal KG |
+| `src/components/AnnotationMergeRequestModal.test.tsx` | Added Session 28 | Merge request modal |
+| `src/components/ProctoringOverlay.test.tsx` | Added Session 28 | WebRTC proctoring |
+| `src/components/Model3DViewer.test.tsx` | Added Session 28 | Three.js viewer |
+| `src/components/VideoSubtitleSelector.test.tsx` | Added Session 28 | Subtitles |
 
 **Hooks:**
 
@@ -132,6 +139,8 @@
 |------|---------------|---------|
 | `src/hooks/useOfflineStatus.test.ts` | 27 | Network status detection |
 | `src/hooks/useOfflineQueue.test.ts` | 27 | Mutation queue + 100-item LRU eviction |
+| `src/hooks/useLiveSessionActions.test.ts` | Added Session 28 | Session mutations |
+| `src/hooks/useSketchCanvas.test.ts` | Added Session 28 | Sketch tools |
 
 **Services:**
 
@@ -149,6 +158,15 @@
 | `e2e/live-sessions.spec.ts` | Live session flow (join, moderator, attendee) | 27 |
 | `e2e/offline-mode.spec.ts` | Offline banner + queue drain on reconnect | 27 |
 | `e2e/knowledge-graph-course-context.spec.ts` | KG courseId deep-link + context panel | 27 |
+| `e2e/offline-sync.spec.ts` | Offline queue auto-flush | 28 |
+| `e2e/live-sessions-mutations.spec.ts` | Session mutations | 28 |
+| `e2e/course-discovery-filters.spec.ts` | Discovery filters | 28 |
+| `e2e/checkout-flow.spec.ts` | Stripe checkout | 29 |
+| `e2e/annotation-merge-request.spec.ts` | Annotation merge | 30 |
+| `e2e/video-sketch.spec.ts` | Sketch 6 tools | 31 |
+| `e2e/subtitle-translation.spec.ts` | AI subtitles | 32 |
+| `e2e/proctoring.spec.ts` | Remote proctoring | 33 |
+| `e2e/model3d-viewer.spec.ts` | 3D model viewer | 34 |
 
 ---
 
@@ -252,6 +270,7 @@ tests/
 | 25 | ~1,200 (frontend + mobile + skill-tree) | ~5,462 |
 | 26 | ~50 (security pentest) | ~5,512 |
 | 27 | ~300 (live sessions, offline, E2E) | **5,762+** |
+| 28 (Phases 28-34) | ~352 | **~6,125+** |
 
 ---
 

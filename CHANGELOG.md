@@ -29,6 +29,120 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.34.0] — 2026-03-06 — Phase 34: 3D Models & Simulations (PRD §3.3 G-1)
+
+🎉 **ALL PRD GAPS CLOSED** — G-1, G-2, G-3, G-4, P-1, P-2, P-3 all complete.
+
+### Added
+- `Model3DViewer.tsx`: Three.js WebGL viewer with OrbitControls, loading/error states, full memory safety
+- `Model3DInfo` + `ModelAnimation` GraphQL types; `AssetType.MODEL_3D` enum value
+- `uploadModel3D` mutation with format validation (gltf/glb/obj/fbx) + MinIO presigned URL
+- DB migration 0015: `model_format`, `model_animations` (JSONB), `poly_count` on `media_assets`
+- Three.js vitest stubs (three-stub, three-gltf-stub, three-orbit-stub)
+
+### Tests
+- 14 service tests + 18 component tests + 5 E2E + 2 visual regression
+
+---
+
+## [0.33.0] — 2026-03-06 — Phase 33: Remote Proctoring (PRD §7.2 G-4)
+
+### Added
+- `ProctoringOverlay.tsx`: WebRTC webcam preview, tab-switch detection, flag count badge
+- `ProctoringReportCard.tsx`: status badge + flag timeline
+- `ProctoringSession`, `ProctoringFlag`, `ProctoringFlagType` enum (GraphQL + DB)
+- Mutations: `startProctoringSession`, `flagProctoringEvent`, `endProctoringSession`
+- Queries: `proctoringSession`, `proctoringReport`
+- DB migration 0014: `proctoring_sessions` table with JSONB flags + RLS tenant isolation
+- Memory safety: `visibilitychange` listener removed + `MediaStream.getTracks().stop()` on unmount
+
+### Tests
+- 16 service tests + 23 component tests + 6 E2E + 3 visual regression
+
+---
+
+## [0.32.0] — 2026-03-06 — Phase 32: Real-time AI Subtitle Translation (PRD §3.4 G-2)
+
+### Added
+- `TranslationService`: LibreTranslate HTTP client, VTT generation, MinIO upload, NATS event
+- `SubtitleTrack` GraphQL type; `subtitleTracks` field on `MediaAsset`
+- `VideoSubtitleSelector`: CC button, language dropdown, Off option, ARIA attributes
+- `VideoPlayer`: multi-language subtitle track support with `<track>` elements
+- DB migration 0013: `transcripts.vtt_key` column for VTT file storage in MinIO
+- Env: `TRANSLATION_TARGETS` (comma-separated BCP-47), `LIBRE_TRANSLATE_URL`
+- `.husky/pre-commit`: added `|| true` to fix grep no-match exit code crash
+
+### Tests
+- 11 unit (TranslationService) + 9 unit (VideoPlayer subtitles) + 10 E2E + 3 visual regression
+
+---
+
+## [0.31.0] — 2026-03-06 — Phase 31: Video Sketch Overlay Enhancement (PRD §4.2 P-1)
+
+### Added
+- `useSketchCanvas.ts`: drawing hook with 6 tools — freehand, eraser, rect, arrow, ellipse, text
+- `VideoSketchToolbar.tsx`: 6 tool buttons (aria-pressed), color picker, Save/Clear/Cancel
+- Text tool: positioned `<input>` on canvas click, commits on Enter/blur
+- Color picker: full swatch support per tool
+- Shape preview during mousemove via `shapeEndRef` pattern
+
+### Tests
+- 21 new unit tests + 4 visual regression screenshots (freehand, eraser, rect, toolbar-inactive)
+
+---
+
+## [0.30.0] — 2026-03-06 — Phase 30: Personal Knowledge Graph Wiki + Annotation Merge Request (PRD §4.3+§4.4)
+
+### Added
+- `PersonalGraphView.tsx`: SVG wiki of personal annotations across all courses (6 nodes, 7 edges, colour legend)
+- `KnowledgeGraph.tsx`: Global / My Wiki tab toggle (`viewMode: 'global' | 'personal'`)
+- `AnnotationMergeRequestModal.tsx`: propose annotation to official knowledge base, 500-char counter
+- `AnnotationItem.tsx`: "Propose to Official" button (PERSONAL layer + own-user only)
+- `InstructorMergeQueuePage.tsx`: approval queue with diff view, approve/reject; route `/instructor/merge-queue`
+
+### Tests
+- 44 unit tests + 15 E2E + 4 visual regression (kg-global, kg-personal-wiki, merge-queue ×2)
+
+---
+
+## [0.29.0] — 2026-03-06 — Phase 29: Stripe Checkout Flow (PRD §8.4)
+
+### Added
+- `CheckoutPage.tsx`: Stripe Elements with `clientSecret` from URL params, success redirect
+- `PurchaseCourseButton`: passes `secret+session+course` via URL; `/checkout` route (lazy-loaded)
+- Packages: `@stripe/stripe-js`, `@stripe/react-stripe-js`
+- Security: `clientSecret` never in `localStorage`, never in DOM text, user-safe error messages
+
+### Tests
+- 8 unit tests + 8 E2E + 2 visual regression screenshots (checkout-flow.spec.ts)
+
+---
+
+## [0.28.0] — 2026-03-06 — Phase 28: Live Sessions Mutations, Offline Sync, PWA, SI-3 Fix
+
+### Added
+- Live Session mutations: `endLiveSession`, `joinLiveSession`, `cancelLiveSession`, `startLiveSession`
+- `useLiveSessionActions` hook: all 4 mutations with toast error handling
+- `CANCELLED` status added to `LiveSessionStatus` enum
+- SI-3 security fix: `encryptField()`/`decryptField()` wired in `live-session.service.ts` (plaintext never written to DB)
+- `useOfflineQueue`: online-event flush + 48h TTL + 100-item LRU
+- Background sync: `pwa.ts` with `onNeedRefresh`/`onOfflineReady`/`onRegistered` callbacks; hourly SW poll
+- PWA: `vite.config.ts` theme_color `#6366F1` (Indigo design system)
+- `CoursesDiscovery`: Category + Level + Sort filters; `aria-pressed`, `aria-label`, `role="group"`
+- DB migration 0012: idempotent `custom_migrations` table runner for migrations 0010-0012
+- NATS SI-7 fix: `getNatsConnection()` uses env-var TLS (`NATS_TLS_CA_FILE`)
+- Husky v10: `#!/bin/sh` (removed deprecated `husky.sh` sourcing)
+
+### Security
+- SI-3 regression tests: assert plaintext never written to DB
+- SI-7: NATS TLS configuration via environment variables
+- `live-sessions-p28.pentest.spec.ts`: SQL/XSS injection guards
+
+### Tests
+- 72 LiveSessionsPage unit + 24 CoursesDiscovery unit + 18 useOfflineQueue unit + 10 live-session SI-3 + 6 memory safety + 4 E2E specs
+
+---
+
 ## [0.26.0] — 2026-03-05 — Session 25 Phase 5: Mobile Design System Alignment
 
 ### Added

@@ -1690,59 +1690,209 @@ pnpm --filter @edusphere/mobile expo build  # exits 0
 
 ---
 
-## Phase 28: Live Sessions Completeness + Background Sync + SkillTree Real Data
+## Phase 28 — Live Sessions Mutations + Offline Sync + PWA + SI-3 Fix
+**Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commits:** `fddb6c0`, `1cc2469`, `a94a5d6`
 
-**Goal:** Complete the Live Sessions backend, wire offline auto-sync, connect SkillTree to real DB data.
-
-**Duration:** 1 session
-
-### Tasks
-
-1. Migration 0012 — live_sessions *Enc column rename (CRITICAL)
-2. Husky v10 fix + ServiceWorker registration
-3. Live Sessions: endLiveSession, joinLiveSession, cancelLiveSession, getSessionAttendees
-4. useOfflineQueue: online event → auto-flush + 48h TTL eviction
-5. SkillTree: real Drizzle query on user_skill_mastery table
-6. ARIA: tablist/tab roles on LiveSessionsPage, aria-live on AdminActivityFeed
+### What Was Built
+- Live Session mutations: end/join/cancel/start fully implemented with `useLiveSessionActions` hook
+- SI-3 security fix: `encryptField()`/`decryptField()` in `live-session.service.ts` (plaintext never stored)
+- `useOfflineQueue`: online-event flush + 48h TTL + 100-item LRU + onFlush callback
+- PWA: `pwa.ts` service worker callbacks, hourly update poll, `vite.config.ts` Indigo theme_color
+- `CoursesDiscovery` filters: Category + Level + Sort + ARIA (`aria-pressed`, `role="group"`)
+- DB migration 0012: idempotent custom_migrations runner
+- NATS SI-7 fix: TLS via environment variables
+- Husky v10 pre-commit hook fix
 
 ### Acceptance Criteria
+- [x] All 4 Live Session mutations working with role-based guards
+- [x] SI-3: no plaintext passwords ever written to DB
+- [x] Offline queue flushes automatically on reconnect
+- [x] PWA installable with Indigo theme
+- [x] `pnpm turbo test` 100% pass
 
-- migration 0012 exists and has both RENAME COLUMN statements
-- Husky hooks have no deprecated shebang lines
-- endLiveSession/joinLiveSession/cancelLiveSession mutations pass tests
-- useOfflineQueue flushes on 'online' event (test passes)
-- skill-tree.service returns real DB data (mock Drizzle in spec)
-- ARIA attributes verified by unit tests
-- pnpm turbo test — 100% pass
-- pnpm turbo typecheck — 0 errors
+### Key Files
+- `apps/subgraph-agent/src/live-sessions/live-sessions.service.ts`
+- `apps/web/src/hooks/useLiveSessionActions.ts`
+- `apps/web/src/hooks/useOfflineQueue.ts`
+- `apps/web/src/pwa.ts`
+- `packages/db/src/migrations/0012_live_sessions_enc_rename.sql`
 
 ---
 
-## Phase 29 — Performance, PWA, Advanced Analytics
-**Status:** Planned | **Target Session:** Session 29
+## Phase 29 — Stripe Checkout Flow (PRD §8.4)
+**Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `be3705a`
 
-### Planned Scope
-- Progressive Web App (PWA manifest, install prompts, push notifications via Web Push API)
-- Performance optimization: Lighthouse score ≥ 90 on all major pages, code splitting, lazy loading
-- Advanced analytics dashboard: learning velocity, completion rates, tenant-level metrics (10+ KPIs)
-- Mobile parity: all Session 25–27 web features mirrored in mobile app (Live Sessions, Offline mode, SkillTree)
-- AI personalization: learning path recommendations from `UserSkillMastery` data using Apache AGE graph traversal
+### What Was Built
+- `CheckoutPage.tsx`: Stripe Elements with `clientSecret` from URL, success redirect, graceful fallbacks
+- `PurchaseCourseButton`: URL-based secret passing, `/checkout` route (lazy-loaded, guarded)
+- Packages: `@stripe/stripe-js`, `@stripe/react-stripe-js`
+- Security: `clientSecret` never stored in `localStorage` or exposed in DOM
 
 ### Acceptance Criteria
-- [ ] Lighthouse Performance score ≥ 90 on Dashboard, Courses, Lesson, Knowledge Graph pages
-- [ ] PWA installable (Web App Manifest + Service Worker + icons + `beforeinstallprompt` handler)
-- [ ] Push notifications: opt-in flow, permission request, VAPID key registration
-- [ ] Mobile app covers Live Sessions screen, Offline banner, SkillTree screen
-- [ ] Analytics dashboard with ≥ 10 metrics per tenant (velocity, completion, mastery distribution, at-risk learners)
-- [ ] AI recommendations: `recommendSkillPath(userId)` query using AGE graph traversal on `user_skill_mastery`
-- [ ] `pnpm turbo test` — 100% pass
-- [ ] `pnpm turbo typecheck` — 0 errors
+- [x] Stripe checkout page renders with Elements
+- [x] Success redirect after payment
+- [x] `clientSecret` never in localStorage or DOM text
+- [x] 8 unit + 8 E2E tests pass
+
+### Key Files
+- `apps/web/src/pages/CheckoutPage.tsx`
+- `apps/web/src/components/PurchaseCourseButton.tsx`
+- `apps/web/e2e/checkout-flow.spec.ts`
+
+---
+
+## Phase 30 — Personal Knowledge Graph Wiki + Annotation Merge Request (PRD §4.3+§4.4)
+**Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `4ae6614`
+
+### What Was Built
+- `PersonalGraphView.tsx`: SVG wiki of personal annotations across all courses (6 nodes, 7 edges, course colour legend, detail panel)
+- `KnowledgeGraph.tsx`: Global / My Wiki tab toggle with `viewMode: 'global' | 'personal'`
+- `AnnotationMergeRequestModal.tsx`: propose annotation to official knowledge base (0/500 char counter)
+- `AnnotationItem.tsx`: "Propose to Official" button (PERSONAL layer + own-user guard)
+- `InstructorMergeQueuePage.tsx`: diff view, approve/reject, resolved section; route `/instructor/merge-queue`
+
+### Acceptance Criteria
+- [x] Personal graph shows annotations linked across courses
+- [x] Tab toggle between global and personal views
+- [x] Annotation merge request modal with char counter
+- [x] Instructor merge queue with approve/reject
+- [x] 44 unit + 15 E2E tests pass
+
+### Key Files
+- `apps/web/src/components/PersonalGraphView.tsx`
+- `apps/web/src/components/AnnotationMergeRequestModal.tsx`
+- `apps/web/src/pages/InstructorMergeQueuePage.tsx`
+- `apps/web/e2e/annotation-merge-request.spec.ts`
+
+---
+
+## Phase 31 — Video Sketch Overlay Enhancement (PRD §4.2 P-1)
+**Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `2c9d178`
+
+### What Was Built
+- `useSketchCanvas.ts`: 6 drawing tools — freehand, eraser (destination-out), rect, arrow, ellipse, text
+- `VideoSketchToolbar.tsx`: tool buttons with `aria-pressed`, color picker swatch, Save/Clear/Cancel
+- Text tool: positioned `<input>` on canvas click, commits on Enter/blur
+- Shape preview during mousemove via `shapeEndRef` pattern
+- Backward-compatible `SketchPath` re-export preserved
+
+### Acceptance Criteria
+- [x] All 6 tools functional with canvas rendering
+- [x] Color picker changes tool color
+- [x] Text tool creates canvas text
+- [x] Eraser uses `destination-out` composite operation
+- [x] 34 total sketch tests pass (21 new + 13 existing)
+
+### Key Files
+- `apps/web/src/hooks/useSketchCanvas.ts`
+- `apps/web/src/components/VideoSketchToolbar.tsx`
+- `apps/web/src/components/VideoSketchOverlay.tsx`
+- `apps/web/e2e/video-sketch.spec.ts`
+
+---
+
+## Phase 32 — Real-time AI Subtitle Translation (PRD §3.4 G-2)
+**Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `720b7c9`
+
+### What Was Built
+- `TranslationService`: LibreTranslate HTTP client, VTT generation, MinIO upload, NATS event
+- `SubtitleTrack` GraphQL type; `subtitleTracks` field on `MediaAsset`
+- `VideoSubtitleSelector`: CC button, language dropdown, Off option, ARIA attributes
+- `VideoPlayer`: multi-language `<track>` element support
+- DB migration 0013: `transcripts.vtt_key` column
+- Env vars: `TRANSLATION_TARGETS`, `LIBRE_TRANSLATE_URL`
+
+### Acceptance Criteria
+- [x] Translation runs after transcription (non-blocking)
+- [x] VTT files stored in MinIO with presigned URLs
+- [x] Video player shows CC button + language selector
+- [x] Empty `TRANSLATION_TARGETS` disables translation
+- [x] 11 + 9 unit + 10 E2E + 3 visual tests pass
+
+### Key Files
+- `apps/subgraph-content/src/translation/translation.service.ts`
+- `apps/web/src/components/VideoSubtitleSelector.tsx`
+- `packages/db/src/migrations/0013_transcripts_vtt_key.sql`
+
+---
+
+## Phase 33 — Remote Proctoring (PRD §7.2 G-4)
+**Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `0d51873`
+
+### What Was Built
+- `ProctoringOverlay.tsx`: WebRTC webcam preview, tab-switch detection via `visibilitychange`, flag badge
+- `ProctoringReportCard.tsx`: status badge + flag timeline list
+- `ProctoringSession`, `ProctoringFlag`, `ProctoringFlagType` enum (GraphQL + DB)
+- Mutations: `startProctoringSession`, `flagProctoringEvent`, `endProctoringSession`
+- Queries: `proctoringSession`, `proctoringReport`
+- DB migration 0014: `proctoring_sessions` table with JSONB flags, RLS tenant isolation
+- Memory safety: `visibilitychange` listener removed + `MediaStream.getTracks().stop()` on unmount
+
+### Acceptance Criteria
+- [x] Webcam preview starts on session start
+- [x] Tab-switch triggers flag automatically
+- [x] Session lifecycle (start → flag → end) fully testable
+- [x] RLS: tenants cannot access each other's sessions
+- [x] 16 service + 23 component + 6 E2E + 3 visual tests pass
+
+### Key Files
+- `apps/subgraph-agent/src/proctoring/proctoring.service.ts`
+- `apps/web/src/components/ProctoringOverlay.tsx`
+- `packages/db/src/migrations/0014_proctoring_sessions.sql`
+- `apps/web/e2e/proctoring.spec.ts`
+
+---
+
+## Phase 34 — 3D Models & Simulations (PRD §3.3 G-1)
+**Status:** ✅ Complete | **Session:** Session 28 | **Date:** 2026-03-06 | **Commit:** `1e3314b`
+
+This phase closes the last remaining PRD gap — ALL G and P items are now complete.
+
+### What Was Built
+- `Model3DViewer.tsx`: Three.js WebGL viewer via dynamic `import()`, OrbitControls, loading/error/unavailable states
+- Full memory safety: `renderer.dispose()`, geometry/material/texture dispose, `OrbitControls.dispose()`, `cancelAnimationFrame()`, `ResizeObserver.disconnect()` in `useEffect` cleanup
+- `Model3DInfo` type, `ModelAnimation` type, `AssetType.MODEL_3D` enum value
+- `uploadModel3D` mutation: validates format (gltf/glb/obj/fbx), MinIO presigned PUT URL
+- DB migration 0015: `model_format`, `model_animations` (JSONB), `poly_count` on `media_assets`
+- Three.js vitest stubs for CI (three-stub, three-gltf-stub, three-orbit-stub)
+- Package: `three` added to web dependencies
+
+### Acceptance Criteria
+- [x] 3D model renders in WebGL with orbit controls
+- [x] Upload validates format (gltf/glb/obj/fbx only)
+- [x] Memory fully cleaned up on component unmount (4 memory-safety tests)
+- [x] CI passes with Three.js stubs (no WebGL in test environment)
+- [x] 14 service + 18 component + 5 E2E + 2 visual tests pass
+
+### Key Files
+- `apps/web/src/components/Model3DViewer.tsx`
+- `apps/subgraph-content/src/media/media.service.ts` (uploadModel3D)
+- `packages/db/src/migrations/0015_model3d.sql`
+- `apps/web/e2e/model3d-viewer.spec.ts`
+
+---
+
+## Phase 35 — Performance, Analytics & Mobile Parity (Planned)
+**Status:** 🔵 Planned | **Target Session:** Session 29
+
+### Planned Scope
+- **Performance:** Lighthouse score >= 90 on all major pages (code splitting, lazy loading, image optimization)
+- **PWA:** Install prompt, push notifications (Keycloak events -> NATS -> mobile)
+- **Mobile parity:** Live Sessions + SkillTree + Offline + 3D viewer on Expo SDK 54
+- **Analytics dashboard:** Learning velocity, completion rates, mastery progression per tenant
+- **AI recommendations:** Personalized learning paths from `UserSkillMastery` graph traversal
+
+### Acceptance Criteria
+- [ ] Lighthouse Performance >= 90 on Dashboard + Courses + Lesson pages
+- [ ] PWA installable on Chrome, Safari, Firefox
+- [ ] Mobile app: Live Sessions screen, SkillTree screen, Offline sync
+- [ ] Analytics: 10+ metrics per tenant with time-range filters
+- [ ] AI recommendations: skill gap identification + suggested next courses
 
 ### Prerequisites
-- Phase 27 complete (Live Sessions, Offline Web) ✅
-- Phase 28 complete (SkillTree real data, offline background sync) — in progress
-- `user_skill_mastery` table populated (migration `0011`) ✅
-- `tenant_themes` table (migration `0010`) ✅
+- All PRD gaps closed (Phases 28-34) ✅
+- UserSkillMastery data model (migration 0011) ✅
+- Offline queue + ServiceWorker (Phase 28) ✅
 
 ---
 
