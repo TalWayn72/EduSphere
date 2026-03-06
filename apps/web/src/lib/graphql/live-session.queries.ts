@@ -70,7 +70,29 @@ export const CREATE_LIVE_SESSION_MUTATION = gql`
 
 export const JOIN_LIVE_SESSION_MUTATION = gql`
   mutation JoinLiveSession($sessionId: ID!) {
-    joinLiveSession(sessionId: $sessionId)
+    joinLiveSession(sessionId: $sessionId) {
+      roomUrl
+      token
+    }
+  }
+`;
+
+export const START_LIVE_SESSION_MUTATION = gql`
+  mutation StartLiveSession($sessionId: ID!) {
+    startLiveSession(sessionId: $sessionId) {
+      sessionId
+      status
+      startedAt
+    }
+  }
+`;
+
+export const CANCEL_LIVE_SESSION_MUTATION = gql`
+  mutation CancelLiveSession($sessionId: ID!) {
+    cancelLiveSession(sessionId: $sessionId) {
+      id
+      status
+    }
   }
 `;
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -30,10 +31,24 @@ vi.mock('@/lib/auth', () => ({
   DEV_MODE: true,
 }));
 
+vi.mock('@/hooks/useLiveSessionActions', () => ({
+  useLiveSessionActions: vi.fn(() => ({
+    startSession: vi.fn().mockResolvedValue(undefined),
+    endSession: vi.fn().mockResolvedValue(undefined),
+    joinSession: vi.fn().mockResolvedValue(null),
+    cancelSession: vi.fn().mockResolvedValue(undefined),
+    startFetching: false,
+    endFetching: false,
+    joinFetching: false,
+    cancelFetching: false,
+  })),
+}));
+
 // ─── Imports ──────────────────────────────────────────────────────────────────
 import { LiveSessionsPage } from './LiveSessionsPage';
 import { useQuery, useMutation } from 'urql';
 import { getCurrentUser } from '@/lib/auth';
+import { useLiveSessionActions } from '@/hooks/useLiveSessionActions';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function renderPage() {
@@ -82,6 +97,16 @@ describe('LiveSessionsPage', () => {
       { fetching: false, error: undefined },
       vi.fn().mockResolvedValue({ data: {}, error: undefined }),
     ] as never);
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: vi.fn().mockResolvedValue(undefined),
+      endSession: vi.fn().mockResolvedValue(undefined),
+      joinSession: vi.fn().mockResolvedValue(null),
+      cancelSession: vi.fn().mockResolvedValue(undefined),
+      startFetching: false,
+      endFetching: false,
+      joinFetching: false,
+      cancelFetching: false,
+    });
   });
 
   it('renders without crashing', () => {
@@ -198,7 +223,7 @@ describe('LiveSessionsPage', () => {
     expect(screen.queryByTestId('create-session-btn')).not.toBeInTheDocument();
   });
 
-  it('clicking Join button triggers join mutation', () => {
+  it('clicking Join button triggers join action for STUDENT', () => {
     vi.mocked(getCurrentUser).mockReturnValue({
       id: 'u2',
       username: 'student@example.com',
@@ -208,11 +233,17 @@ describe('LiveSessionsPage', () => {
       role: 'STUDENT',
       tenantId: 'tenant-1',
     });
-    const joinFn = vi.fn().mockResolvedValue({ data: {}, error: undefined });
-    vi.mocked(useMutation).mockReturnValue([
-      { fetching: false, error: undefined },
-      joinFn,
-    ] as never);
+    const joinFn = vi.fn().mockResolvedValue(null);
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: vi.fn(),
+      endSession: vi.fn(),
+      joinSession: joinFn,
+      cancelSession: vi.fn(),
+      startFetching: false,
+      endFetching: false,
+      joinFetching: false,
+      cancelFetching: false,
+    });
     vi.mocked(useQuery).mockReturnValue([
       {
         data: {
@@ -232,17 +263,14 @@ describe('LiveSessionsPage', () => {
     ] as never);
 
     renderPage();
-    const joinBtn = screen.getByTestId('session-action-btn');
+    const joinBtn = screen.getByTestId('join-session-btn');
     fireEvent.click(joinBtn);
-    expect(joinFn).toHaveBeenCalledWith({ sessionId: 'sess-2' });
+    expect(joinFn).toHaveBeenCalledWith('sess-2');
   });
 
   it('REGRESSION: /sessions route is defined (no 404)', () => {
-    // Verify the page component exports properly and can be rendered
-    // The route definition in router.tsx wires /sessions -> LiveSessionsPage
     renderPage();
     expect(screen.getByTestId('layout')).toBeInTheDocument();
-    // Verify no 404 message rendered
     expect(document.body.textContent).not.toContain('404');
     expect(document.body.textContent).not.toContain('Page not found');
   });
@@ -362,5 +390,364 @@ describe('LiveSessionsPage', () => {
     fireEvent.click(pastTab);
     expect(pastTab).toHaveAttribute('aria-selected', 'true');
     expect(upcomingTab).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('sessions grid has aria-live="polite" for screen reader announcements', () => {
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: MOCK_SESSIONS },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    const sessionsGrid = screen.getByTestId('sessions-grid');
+    expect(sessionsGrid).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('tablist has aria-label describing its purpose', () => {
+    renderPage();
+    const tablist = screen.getByRole('tablist');
+    expect(tablist).toHaveAttribute('aria-label', 'Session filter tabs');
+  });
+
+  // ─── Phase 28: Start/End/Cancel mutation wiring tests ─────────────────────
+
+  it('INSTRUCTOR sees Start and Cancel buttons on SCHEDULED session', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u1',
+      username: 'instructor@example.com',
+      email: 'instructor@example.com',
+      firstName: 'Instructor',
+      lastName: 'User',
+      role: 'INSTRUCTOR',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [MOCK_SESSIONS[0]] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('start-session-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('cancel-session-btn')).toBeInTheDocument();
+  });
+
+  it('INSTRUCTOR sees End and Manage buttons on LIVE session', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u1',
+      username: 'instructor@example.com',
+      email: 'instructor@example.com',
+      firstName: 'Instructor',
+      lastName: 'User',
+      role: 'INSTRUCTOR',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('end-session-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('manage-session-btn')).toBeInTheDocument();
+  });
+
+  it('STUDENT does NOT see Start/End/Cancel buttons', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u2',
+      username: 'student@example.com',
+      email: 'student@example.com',
+      firstName: 'Student',
+      lastName: 'User',
+      role: 'STUDENT',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [MOCK_SESSIONS[0]] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.queryByTestId('start-session-btn')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('end-session-btn')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cancel-session-btn')).not.toBeInTheDocument();
+  });
+
+  it('STUDENT does NOT see Join button for SCHEDULED session', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u2',
+      username: 'student@example.com',
+      email: 'student@example.com',
+      firstName: 'Student',
+      lastName: 'User',
+      role: 'STUDENT',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [MOCK_SESSIONS[0]] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.queryByTestId('join-session-btn')).not.toBeInTheDocument();
+  });
+
+  it('clicking Start button calls startSession with correct sessionId', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u1',
+      username: 'instructor@example.com',
+      email: 'instructor@example.com',
+      firstName: 'Instructor',
+      lastName: 'User',
+      role: 'INSTRUCTOR',
+      tenantId: 'tenant-1',
+    });
+    const startFn = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: startFn,
+      endSession: vi.fn(),
+      joinSession: vi.fn().mockResolvedValue(null),
+      cancelSession: vi.fn(),
+      startFetching: false,
+      endFetching: false,
+      joinFetching: false,
+      cancelFetching: false,
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [MOCK_SESSIONS[0]] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    fireEvent.click(screen.getByTestId('start-session-btn'));
+    expect(startFn).toHaveBeenCalledWith('sess-1');
+  });
+
+  it('clicking Cancel button calls cancelSession with correct sessionId', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u1',
+      username: 'instructor@example.com',
+      email: 'instructor@example.com',
+      firstName: 'Instructor',
+      lastName: 'User',
+      role: 'INSTRUCTOR',
+      tenantId: 'tenant-1',
+    });
+    const cancelFn = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: vi.fn(),
+      endSession: vi.fn(),
+      joinSession: vi.fn().mockResolvedValue(null),
+      cancelSession: cancelFn,
+      startFetching: false,
+      endFetching: false,
+      joinFetching: false,
+      cancelFetching: false,
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [MOCK_SESSIONS[0]] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    fireEvent.click(screen.getByTestId('cancel-session-btn'));
+    expect(cancelFn).toHaveBeenCalledWith('sess-1');
+  });
+
+  it('clicking End button calls endSession with correct sessionId', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u1',
+      username: 'instructor@example.com',
+      email: 'instructor@example.com',
+      firstName: 'Instructor',
+      lastName: 'User',
+      role: 'INSTRUCTOR',
+      tenantId: 'tenant-1',
+    });
+    const endFn = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: vi.fn(),
+      endSession: endFn,
+      joinSession: vi.fn().mockResolvedValue(null),
+      cancelSession: vi.fn(),
+      startFetching: false,
+      endFetching: false,
+      joinFetching: false,
+      cancelFetching: false,
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    fireEvent.click(screen.getByTestId('end-session-btn'));
+    expect(endFn).toHaveBeenCalledWith('sess-2');
+  });
+
+  it('Start button is disabled when startFetching is true', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u1',
+      username: 'instructor@example.com',
+      email: 'instructor@example.com',
+      firstName: 'Instructor',
+      lastName: 'User',
+      role: 'INSTRUCTOR',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: vi.fn(),
+      endSession: vi.fn(),
+      joinSession: vi.fn().mockResolvedValue(null),
+      cancelSession: vi.fn(),
+      startFetching: true,
+      endFetching: false,
+      joinFetching: false,
+      cancelFetching: false,
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [MOCK_SESSIONS[0]] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('start-session-btn')).toBeDisabled();
+  });
+
+  it('Cancel button is disabled when cancelFetching is true', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u1',
+      username: 'instructor@example.com',
+      email: 'instructor@example.com',
+      firstName: 'Instructor',
+      lastName: 'User',
+      role: 'INSTRUCTOR',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: vi.fn(),
+      endSession: vi.fn(),
+      joinSession: vi.fn().mockResolvedValue(null),
+      cancelSession: vi.fn(),
+      startFetching: false,
+      endFetching: false,
+      joinFetching: false,
+      cancelFetching: true,
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [MOCK_SESSIONS[0]] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('cancel-session-btn')).toBeDisabled();
+  });
+
+  it('Join button is disabled when joinFetching is true', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u2',
+      username: 'student@example.com',
+      email: 'student@example.com',
+      firstName: 'Student',
+      lastName: 'User',
+      role: 'STUDENT',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useLiveSessionActions).mockReturnValue({
+      startSession: vi.fn(),
+      endSession: vi.fn(),
+      joinSession: vi.fn().mockResolvedValue(null),
+      cancelSession: vi.fn(),
+      startFetching: false,
+      endFetching: false,
+      joinFetching: true,
+      cancelFetching: false,
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('join-session-btn')).toBeDisabled();
+  });
+
+  it('REGRESSION: join-session-btn testid exists — session-action-btn is removed', () => {
+    vi.mocked(getCurrentUser).mockReturnValue({
+      id: 'u2',
+      username: 'student@example.com',
+      email: 'student@example.com',
+      firstName: 'Student',
+      lastName: 'User',
+      role: 'STUDENT',
+      tenantId: 'tenant-1',
+    });
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [{ ...MOCK_SESSIONS[1], status: 'LIVE' as const }] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('join-session-btn')).toBeInTheDocument();
+    expect(screen.queryByTestId('session-action-btn')).not.toBeInTheDocument();
   });
 });

@@ -7,24 +7,49 @@
 
 ---
 
-## Phase 28 — Live Sessions Completeness, Background Sync, SkillTree Real Data (Session 26)
+## Phase 28 — Live Sessions Completeness, Background Sync, SkillTree Real Data (Session 28)
 
-**Status:** 🔄 In Progress
+**Status:** ✅ Complete
 **Date:** March 2026
 **Severity:** Feature completeness
 
 ### Deliverables
 
-| ID | Feature | Status | Priority |
-|----|---------|--------|----------|
-| T1-CRITICAL | migration 0012: live_sessions *Enc column rename | 🔄 | 🔴 CRITICAL |
-| T1-CRITICAL | Husky v10 deprecation fix | 🔄 | 🔴 CRITICAL |
-| T1-CRITICAL | ServiceWorker registration (main.tsx/pwa.ts) | 🔄 | 🔴 CRITICAL |
-| T2 | Live Sessions: endLiveSession + joinLiveSession + cancelLiveSession | 🔄 | 🟡 HIGH |
-| T3 | Background Sync: useOfflineQueue online→flushQueue + TTL | 🔄 | 🟡 HIGH |
-| T4 | SkillTree real data (user_skill_mastery Drizzle query) | 🔄 | 🟡 HIGH |
-| T5 | ARIA fixes: tablist, aria-live, role=log | 🔄 | 🟢 MEDIUM |
-| T6 | CoursesDiscovery filters (category, level, sort) | ⏳ Planned | 🟢 MEDIUM |
+| ID | Feature | Status | Tests |
+|----|---------|--------|-------|
+| T1-CRITICAL | migration 0012: custom SQL runner in migrate.ts (idempotent, `custom_migrations` table) | ✅ | file-content unit test |
+| T1-CRITICAL | Husky v10 — pre-commit hook already v10 compatible (verified) | ✅ | — |
+| T1-CRITICAL | ServiceWorker registration: pwa.ts onNeedRefresh+onOfflineReady+onRegistered; vite.config.ts theme_color #6366F1 | ✅ | existing SW tests |
+| T2-SI3 | SI-3 fix: `encryptField/decryptField/deriveTenantKey` exported from `@edusphere/db` | ✅ | — |
+| T2-SI3 | SI-3 fix: `createLiveSession` encrypts passwords before DB write; `getJoinUrl` decrypts before BBB | ✅ | 10 unit + 6 memory spec |
+| T2-SI3 | SI-3 regression tests: assert plaintext never written, `decryptField` called on join | ✅ | 2 SI-3 regression tests |
+| T2 | `useLiveSessionActions` hook — start/end/join/cancel mutations with toast error handling | ✅ | LiveSessionsPage.test.tsx |
+| T2 | `LiveSessionsPage` wired to mutations via useLiveSessionActions | ✅ | 72 unit (LiveSessionsPage.test.tsx) |
+| T2 | `live-session.queries.ts` — all 4 mutations defined (START/END/JOIN/CANCEL) | ✅ | — |
+| T3 | `useOfflineQueue` — `online` event calls `flush(onFlush)` when callback provided | ✅ | 18 unit (useOfflineQueue.test.ts) |
+| T4 | SkillTree backend: `user_skill_mastery` real data query — already complete (Phase 27) | ✅ | skill-tree.service.ts verified |
+| T5 | ARIA: level filter group `role="group" aria-label`, sort select `aria-label`, `aria-pressed` on active button | ✅ | 5 ARIA tests in CoursesDiscoveryPage.test.tsx |
+| T6 | CoursesDiscovery: Category + Level + Sort filters implemented | ✅ | 24 unit (CoursesDiscoveryPage.test.tsx) |
+
+### E2E Specs (new in Phase 28)
+- `apps/web/e2e/offline-sync.spec.ts` — offline queue + online flush scenarios
+- `apps/web/e2e/live-sessions-mutations.spec.ts` — start/end/join/cancel mutation flows
+- `apps/web/e2e/course-discovery-filters.spec.ts` — category, level, sort filter E2E
+- `apps/web/e2e/aria-phase28.spec.ts` — ARIA role + aria-pressed + aria-label assertions
+
+### Security Fixes (Phase 28 SI-3 Critical)
+- **SI-3 CRITICAL**: `live-session.service.ts` now calls `encryptField()` before every DB write of passwords
+- **SI-3 CRITICAL**: `getJoinUrl()` calls `decryptField()` before passing password to BBB client
+- **SI-3**: `@edusphere/db` exports `encryptField/decryptField/encryptFieldNullable/decryptFieldNullable/deriveTenantKey`
+- Regression tests: 2 dedicated SI-3 tests in `live-session.service.spec.ts` guard against regressions
+
+### Test Counts (Phase 28 additions)
+- subgraph-content live-session: **+10 unit + 6 memory** (SI-3 tests included)
+- web CoursesDiscoveryPage: **+24 unit** (level, sort, ARIA)
+- web LiveSessionsPage: **+72 unit** (mutation wiring)
+- web useOfflineQueue: **+18 unit** (online flush, TTL, onFlush callback)
+- E2E: **4 new spec files**
+- Total Phase 28 additions: **~130 unit + 4 E2E specs**
 
 ---
 

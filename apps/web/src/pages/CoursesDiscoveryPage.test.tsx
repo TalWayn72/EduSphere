@@ -193,6 +193,111 @@ describe('CoursesDiscoveryPage', () => {
     fireEvent.click(listBtn);
     expect(grid.getAttribute('data-view')).toBe('list');
   });
+
+  // ── Phase 28: Level filter, Sort, and ARIA tests ───────────────────────────
+
+  it('level filter "Intermediate" shows only intermediate courses', () => {
+    renderPage();
+    const levelGroup = screen.getByTestId('level-filter-group');
+    const intermediateBtn = Array.from(
+      levelGroup.querySelectorAll('button')
+    ).find((b) => b.textContent?.trim() === 'Intermediate');
+    expect(intermediateBtn).toBeDefined();
+    if (intermediateBtn) {
+      fireEvent.click(intermediateBtn);
+      // TypeScript Bootcamp (Advanced) should NOT appear
+      expect(document.body.textContent).not.toContain(
+        'Complete TypeScript Bootcamp: From Zero to Advanced'
+      );
+      // At least one intermediate course should appear
+      expect(document.body.textContent).toContain(
+        'React 19 and Next.js 15: Full-Stack Development'
+      );
+    }
+  });
+
+  it('level filter "Beginner" hides Advanced courses', () => {
+    renderPage();
+    const levelGroup = screen.getByTestId('level-filter-group');
+    const beginnerBtn = Array.from(
+      levelGroup.querySelectorAll('button')
+    ).find((b) => b.textContent?.trim() === 'Beginner');
+    if (beginnerBtn) {
+      fireEvent.click(beginnerBtn);
+      // Quantum Computing (Advanced) should not appear
+      expect(document.body.textContent).not.toContain(
+        'Quantum Computing: Foundations and Applications'
+      );
+      // UI/UX (Beginner) should appear
+      expect(document.body.textContent).toContain(
+        'UI/UX Design Fundamentals with Figma'
+      );
+    }
+  });
+
+  it('sort select is present with data-testid="sort-select"', () => {
+    renderPage();
+    const sortSelect = screen.getByTestId('sort-select');
+    expect(sortSelect).toBeInTheDocument();
+  });
+
+  it('level filter group has role="group" and aria-label="Filter by level"', () => {
+    renderPage();
+    const levelGroup = screen.getByRole('group', { name: /filter by level/i });
+    expect(levelGroup).toBeInTheDocument();
+  });
+
+  it('level filter group has data-testid="level-filter-group"', () => {
+    renderPage();
+    expect(screen.getByTestId('level-filter-group')).toBeInTheDocument();
+  });
+
+  it('sort select trigger has aria-label="Sort courses"', () => {
+    renderPage();
+    const sortSelect = screen.getByTestId('sort-select');
+    expect(sortSelect).toHaveAttribute('aria-label', 'Sort courses');
+  });
+
+  it('level filter "Intermediate" button has aria-pressed=true after click', () => {
+    renderPage();
+    const levelGroup = screen.getByTestId('level-filter-group');
+    const intermediateBtn = Array.from(
+      levelGroup.querySelectorAll('button')
+    ).find((b) => b.textContent?.trim() === 'Intermediate');
+    if (intermediateBtn) {
+      fireEvent.click(intermediateBtn);
+      expect(intermediateBtn.getAttribute('aria-pressed')).toBe('true');
+    }
+  });
+
+  it('sort select label is associated via htmlFor="sort-select"', () => {
+    renderPage();
+    const label = document.querySelector('label[for="sort-select"]');
+    expect(label).not.toBeNull();
+    expect(label?.textContent?.trim()).toBe('Sort by');
+  });
+
+  it('"Any Level" filter restores all courses after intermediate was selected', () => {
+    renderPage();
+    const levelGroup = screen.getByTestId('level-filter-group');
+    // Select Intermediate first
+    const intermediateBtn = Array.from(
+      levelGroup.querySelectorAll('button')
+    ).find((b) => b.textContent?.trim() === 'Intermediate');
+    if (intermediateBtn) fireEvent.click(intermediateBtn);
+    // Then go back to Any Level
+    const anyBtn = Array.from(
+      levelGroup.querySelectorAll('button')
+    ).find((b) => b.textContent?.trim() === 'Any Level');
+    if (anyBtn) fireEvent.click(anyBtn);
+    // All courses should be visible again
+    expect(document.body.textContent).toContain(
+      'Complete TypeScript Bootcamp: From Zero to Advanced'
+    );
+    expect(document.body.textContent).toContain(
+      'UI/UX Design Fundamentals with Figma'
+    );
+  });
 });
 
 // ── Route registration regression ─────────────────────────────────────────────

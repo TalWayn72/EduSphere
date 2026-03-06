@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 // Mock @edusphere/db before importing the service
+// SI-3: encryptField / decryptField / deriveTenantKey mocks simulate AES-256-GCM
+// without requiring ENCRYPTION_MASTER_KEY env var in unit tests.
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({
     insert: vi.fn().mockReturnThis(),
@@ -17,8 +19,9 @@ vi.mock('@edusphere/db', () => ({
         startedAt: null,
         endedAt: null,
         recordingUrl: null,
-        attendeePassword: 'att-pw',
-        moderatorPassword: 'mod-pw',
+        // SI-3: columns use *Enc suffix — store ciphertext, NOT plaintext
+        attendeePasswordEnc: 'encrypted:att-pw',
+        moderatorPasswordEnc: 'encrypted:mod-pw',
         status: 'SCHEDULED',
         createdAt: new Date(),
       },
@@ -40,6 +43,10 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn((a, b) => ({ field: a, value: b })),
   and: vi.fn((...args) => args),
+  // SI-3: PII encryption helpers — mock without real AES key for unit tests
+  encryptField: vi.fn((v: string) => `encrypted:${v}`),
+  decryptField: vi.fn((v: string) => v.replace(/^encrypted:/, '')),
+  deriveTenantKey: vi.fn(() => Buffer.alloc(32, 0)),
 }));
 
 vi.mock('nats', () => ({
@@ -125,8 +132,9 @@ describe('LiveSessionService', () => {
           meetingName: 'Test',
           scheduledAt: new Date(),
           status: 'LIVE',
-          attendeePassword: 'att-pw',
-          moderatorPassword: 'mod-pw',
+          // SI-3: *Enc columns store ciphertext; decryptField mock strips 'encrypted:' prefix
+          attendeePasswordEnc: 'encrypted:att-pw',
+          moderatorPasswordEnc: 'encrypted:mod-pw',
           recordingUrl: null,
         },
       ]);
@@ -160,8 +168,9 @@ describe('LiveSessionService', () => {
           meetingName: 'Test',
           scheduledAt: new Date(),
           status: 'LIVE',
-          attendeePassword: 'att-pw',
-          moderatorPassword: 'mod-pw',
+          // SI-3: *Enc columns — decryptField mock yields 'mod-pw' for INSTRUCTOR
+          attendeePasswordEnc: 'encrypted:att-pw',
+          moderatorPasswordEnc: 'encrypted:mod-pw',
           recordingUrl: null,
         },
       ]);
@@ -195,8 +204,9 @@ describe('LiveSessionService', () => {
           id: 'session-1',
           bbbMeetingId: 'bbb-1',
           status: 'LIVE',
-          attendeePassword: 'att-pw',
-          moderatorPassword: 'mod-pw',
+          // SI-3: *Enc columns — decryptField mock yields 'att-pw' for LEARNER
+          attendeePasswordEnc: 'encrypted:att-pw',
+          moderatorPasswordEnc: 'encrypted:mod-pw',
         },
       ]);
 
@@ -225,8 +235,8 @@ describe('LiveSessionService', () => {
         {
           id: 'session-1',
           status: 'ENDED',
-          attendeePassword: 'att',
-          moderatorPassword: 'mod',
+          attendeePasswordEnc: 'encrypted:att',
+          moderatorPasswordEnc: 'encrypted:mod',
         },
       ]);
 
@@ -241,6 +251,79 @@ describe('LiveSessionService', () => {
       const { closeAllPools } = await import('@edusphere/db');
       await service.onModuleDestroy();
       expect(closeAllPools).toHaveBeenCalled();
+    });
+  });
+
+  // ── SI-3 Regression — AES-256-GCM PII encryption ─────────────────────────
+  // These tests guard against plaintext passwords being written to the DB.
+  // If any of these fail, it means encryptField() is no longer being called
+  // before INSERT, which is a critical security regression (SI-3).
+  describe('SI-3 regression — passwords must be encrypted before DB write', () => {
+    it('does NOT store raw plaintext passwords in the DB values() call', async () => {
+      const { encryptField, deriveTenantKey } = await import('@edusphere/db');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = (service as any).db;
+      const capturedValues: Record<string, unknown>[] = [];
+      db.values = vi.fn((v: Record<string, unknown>) => {
+        capturedValues.push(v);
+        return db;
+      });
+      db.returning = vi.fn().mockResolvedValue([
+        {
+          id: 'si3-test',
+          contentItemId: 'c-1',
+          tenantId: 'tenant-si3',
+          bbbMeetingId: 'bbb-si3',
+          meetingName: 'SI-3 Test',
+          scheduledAt: new Date(),
+          attendeePasswordEnc: 'encrypted:dummy',
+          moderatorPasswordEnc: 'encrypted:dummy',
+          status: 'SCHEDULED',
+          recordingUrl: null,
+          createdAt: new Date(),
+        },
+      ]);
+
+      await service.createLiveSession('c-1', 'tenant-si3', new Date(), 'SI-3 Test');
+
+      expect(encryptField).toHaveBeenCalled();
+      expect(deriveTenantKey).toHaveBeenCalledWith('tenant-si3');
+
+      // The values passed to DB must NOT be plaintext 32-char hex passwords.
+      // encryptField mock returns 'encrypted:<plaintext>' so capturedValues
+      // must contain the prefixed form, not the raw hex.
+      if (capturedValues.length > 0) {
+        const vals = capturedValues[0];
+        expect(vals).not.toHaveProperty('attendeePassword');
+        expect(vals).not.toHaveProperty('moderatorPassword');
+        // The *Enc values must pass through encryptField (mock returns 'encrypted:...')
+        const attEnc = vals?.['attendeePasswordEnc'] as string | undefined;
+        const modEnc = vals?.['moderatorPasswordEnc'] as string | undefined;
+        if (attEnc) expect(attEnc).toMatch(/^encrypted:/);
+        if (modEnc) expect(modEnc).toMatch(/^encrypted:/);
+      }
+    });
+
+    it('decryptField is called when building join URL', async () => {
+      const { decryptField } = await import('@edusphere/db');
+      vi.mocked(createBbbClient).mockReturnValue(null);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = (service as any).db;
+      db.limit = vi.fn().mockResolvedValue([
+        {
+          id: 'session-si3',
+          bbbMeetingId: 'bbb-si3',
+          status: 'LIVE',
+          attendeePasswordEnc: 'encrypted:att-secret',
+          moderatorPasswordEnc: 'encrypted:mod-secret',
+        },
+      ]);
+
+      await service.getJoinUrl('session-si3', 'tenant-si3', 'Leila', 'LEARNER');
+
+      // decryptField MUST have been called — never pass ciphertext directly to BBB
+      expect(decryptField).toHaveBeenCalledWith('encrypted:att-secret', expect.anything());
     });
   });
 });

@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useOfflineQueue } from './useOfflineQueue';
+import type { QueuedItem } from './useOfflineQueue';
 
 const STORAGE_KEY = 'edusphere_offline_queue';
 const TTL_MS = 48 * 60 * 60 * 1000; // 48 hours
@@ -288,5 +289,105 @@ describe('useOfflineQueue', () => {
 
     addSpy.mockRestore();
     removeSpy.mockRestore();
+  });
+
+  // ─── Phase 28: onFlush callback option ────────────────────────────────────
+  it('calls onFlush handler for each queued item when online event fires', async () => {
+    const onFlush = vi.fn().mockResolvedValue(undefined);
+    const { result } = renderHook(() => useOfflineQueue({ onFlush }));
+
+    act(() => {
+      result.current.enqueue({ id: 'item-a', operationName: 'OpA', variables: { x: 1 } });
+      result.current.enqueue({ id: 'item-b', operationName: 'OpB', variables: { x: 2 } });
+    });
+    expect(result.current.pendingCount).toBe(2);
+
+    // Fire the online event — should invoke onFlush for each item
+    await act(async () => {
+      window.dispatchEvent(new Event('online'));
+      await Promise.resolve();
+    });
+
+    expect(onFlush).toHaveBeenCalledTimes(2);
+    expect(onFlush).toHaveBeenCalledWith(expect.objectContaining({ id: 'item-a' }));
+    expect(onFlush).toHaveBeenCalledWith(expect.objectContaining({ id: 'item-b' }));
+    // Queue is cleared after flush
+    expect(result.current.pendingCount).toBe(0);
+  });
+
+  it('does NOT call onFlush for items with expired TTL (>48h old)', async () => {
+    const onFlush = vi.fn().mockResolvedValue(undefined);
+
+    // Pre-populate storage with one expired and one fresh item
+    const expiredItem = {
+      id: 'expired-item',
+      operationName: 'ExpiredOp',
+      variables: {},
+      createdAt: Date.now() - (TTL_MS + 5000), // 48h + 5s ago
+    };
+    const freshItem = {
+      id: 'fresh-item',
+      operationName: 'FreshOp',
+      variables: {},
+      createdAt: Date.now(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([expiredItem, freshItem]));
+
+    const { result } = renderHook(() => useOfflineQueue({ onFlush }));
+
+    await act(async () => {
+      window.dispatchEvent(new Event('online'));
+      await Promise.resolve();
+    });
+
+    // Only fresh item should be processed
+    expect(onFlush).toHaveBeenCalledTimes(1);
+    expect(onFlush).toHaveBeenCalledWith(expect.objectContaining({ id: 'fresh-item' }));
+    expect(onFlush).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'expired-item' }));
+    expect(result.current.pendingCount).toBe(0);
+  });
+
+  it('falls back to no-op cleanup (no onFlush call) when no callback provided', async () => {
+    // Without onFlush option — existing behavior: queue is cleared, no handler called
+    const { result } = renderHook(() => useOfflineQueue());
+
+    act(() => {
+      result.current.enqueue({ id: 'item-x', operationName: 'OpX', variables: {} });
+    });
+    expect(result.current.pendingCount).toBe(1);
+
+    await act(async () => {
+      window.dispatchEvent(new Event('online'));
+      await Promise.resolve();
+    });
+
+    // Queue cleared without any handler
+    expect(result.current.pendingCount).toBe(0);
+    expect(result.current.queue).toHaveLength(0);
+  });
+
+  it('onFlush ref update does NOT re-register the online event listener', () => {
+    const addSpy = vi.spyOn(window, 'addEventListener');
+
+    const onFlushV1 = vi.fn().mockResolvedValue(undefined);
+    const onFlushV2 = vi.fn().mockResolvedValue(undefined);
+
+    const { rerender } = renderHook(
+      (props: { onFlush: (item: QueuedItem) => Promise<void> }) =>
+        useOfflineQueue({ onFlush: props.onFlush }),
+      { initialProps: { onFlush: onFlushV1 } }
+    );
+
+    // Count online listeners registered so far
+    const onlineCallsBefore = addSpy.mock.calls.filter(([event]) => event === 'online').length;
+
+    // Rerender with a new callback reference
+    rerender({ onFlush: onFlushV2 });
+
+    // No new online listener should have been registered
+    const onlineCallsAfter = addSpy.mock.calls.filter(([event]) => event === 'online').length;
+    expect(onlineCallsAfter).toBe(onlineCallsBefore);
+
+    addSpy.mockRestore();
   });
 });

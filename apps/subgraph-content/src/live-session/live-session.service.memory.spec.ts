@@ -22,8 +22,9 @@ vi.mock('@edusphere/db', () => ({
         meetingName: 'Test',
         scheduledAt: new Date(),
         status: 'SCHEDULED',
-        attendeePassword: 'ap',
-        moderatorPassword: 'mp',
+        // SI-3: *Enc suffix — ciphertext columns (not plaintext)
+        attendeePasswordEnc: 'encrypted:ap',
+        moderatorPasswordEnc: 'encrypted:mp',
         recordingUrl: null,
         createdAt: new Date(),
       },
@@ -45,6 +46,10 @@ vi.mock('@edusphere/db', () => ({
   },
   eq: vi.fn(),
   and: vi.fn(),
+  // SI-3: encryption helpers — simple pass-through stubs for memory tests
+  encryptField: vi.fn((v: string) => `encrypted:${v}`),
+  decryptField: vi.fn((v: string) => v.replace(/^encrypted:/, '')),
+  deriveTenantKey: vi.fn(() => Buffer.alloc(32, 0)),
 }));
 
 vi.mock('nats', () => ({

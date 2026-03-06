@@ -28,7 +28,7 @@ export default defineConfig({
         name: 'EduSphere',
         short_name: 'EduSphere',
         description: 'AI-powered knowledge graph learning platform',
-        theme_color: '#2563EB',
+        theme_color: '#6366F1',
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',

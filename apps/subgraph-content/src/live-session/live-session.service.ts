@@ -18,6 +18,9 @@ import {
   schema,
   eq,
   and,
+  encryptField,
+  decryptField,
+  deriveTenantKey,
 } from '@edusphere/db';
 import { createBbbClient, BBB_DEMO_JOIN_URL } from './bbb.client';
 
@@ -112,6 +115,11 @@ export class LiveSessionService implements OnModuleDestroy {
     const attendeePassword = this.generatePassword();
     const moderatorPassword = this.generatePassword();
 
+    // SI-3: Encrypt passwords with tenant-derived AES-256-GCM key before INSERT.
+    const tenantKey = deriveTenantKey(tenantId);
+    const attendeePasswordEnc = encryptField(attendeePassword, tenantKey);
+    const moderatorPasswordEnc = encryptField(moderatorPassword, tenantKey);
+
     const [session] = await this.db
       .insert(schema.liveSessions)
       .values({
@@ -120,8 +128,8 @@ export class LiveSessionService implements OnModuleDestroy {
         bbbMeetingId,
         meetingName,
         scheduledAt,
-        attendeePasswordEnc: attendeePassword,
-        moderatorPasswordEnc: moderatorPassword,
+        attendeePasswordEnc,
+        moderatorPasswordEnc,
         status: 'SCHEDULED',
       })
       .returning();
@@ -198,9 +206,12 @@ export class LiveSessionService implements OnModuleDestroy {
     }
 
     const isModerator = MODERATOR_ROLES.includes(userRole);
-    const password = isModerator
+    // SI-3: Decrypt the stored ciphertext before passing to the BBB client.
+    const tenantKey = deriveTenantKey(tenantId);
+    const encryptedPassword = isModerator
       ? typedSession.moderatorPasswordEnc
       : typedSession.attendeePasswordEnc;
+    const password = decryptField(encryptedPassword, tenantKey);
 
     await this.publishNatsEvent(NATS_PARTICIPANT_JOINED, {
       sessionId,

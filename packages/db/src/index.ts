@@ -99,3 +99,12 @@ export {
   createReadConnection,
   createWriteConnection,
 } from './helpers/readReplica.js';
+
+// Export PII encryption helpers (SI-3: AES-256-GCM field encryption)
+export {
+  encryptField,
+  decryptField,
+  encryptFieldNullable,
+  decryptFieldNullable,
+  deriveTenantKey,
+} from './helpers/encryption.js';

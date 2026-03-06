@@ -11,15 +11,18 @@ import {
   Radio,
   CheckCircle2,
   Loader2,
+  StopCircle,
+  XCircle,
+  PlayCircle,
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getCurrentUser } from '@/lib/auth';
+import { useLiveSessionActions } from '@/hooks/useLiveSessionActions';
 import {
   LIST_LIVE_SESSIONS_QUERY,
   CREATE_LIVE_SESSION_MUTATION,
-  JOIN_LIVE_SESSION_MUTATION,
 } from '@/lib/graphql/live-session.queries';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -87,16 +90,29 @@ function SessionCard({
   session,
   isInstructor,
   onJoin,
+  onStart,
+  onEnd,
+  onCancel,
   onOpen,
+  joinFetching,
+  startFetching,
+  endFetching,
+  cancelFetching,
 }: {
   session: LiveSession;
   isInstructor: boolean;
   onJoin: (id: string) => void;
+  onStart: (id: string) => void;
+  onEnd: (id: string) => void;
+  onCancel: (id: string) => void;
   onOpen: (id: string) => void;
+  joinFetching: boolean;
+  startFetching: boolean;
+  endFetching: boolean;
+  cancelFetching: boolean;
 }) {
   const isLive = session.status === 'LIVE';
   const isScheduled = session.status === 'SCHEDULED';
-  const canAct = isLive || isScheduled;
 
   return (
     <Card
@@ -134,25 +150,73 @@ function SessionCard({
           )}
         </div>
 
-        {canAct && (
+        {/* INSTRUCTOR actions */}
+        {isInstructor && isScheduled && (
+          <div className="flex gap-2 mt-1">
+            <Button
+              size="sm"
+              variant="default"
+              className="flex-1"
+              data-testid="start-session-btn"
+              disabled={startFetching}
+              onClick={(e) => { e.stopPropagation(); onStart(session.id); }}
+            >
+              {startFetching
+                ? <Loader2 className="h-3 w-3 animate-spin" />
+                : <><PlayCircle className="h-3 w-3 mr-1" />Start</>}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              data-testid="cancel-session-btn"
+              disabled={cancelFetching}
+              onClick={(e) => { e.stopPropagation(); onCancel(session.id); }}
+            >
+              {cancelFetching
+                ? <Loader2 className="h-3 w-3 animate-spin" />
+                : <><XCircle className="h-3 w-3 mr-1" />Cancel</>}
+            </Button>
+          </div>
+        )}
+        {isInstructor && isLive && (
+          <div className="flex gap-2 mt-1">
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              data-testid="manage-session-btn"
+              onClick={(e) => { e.stopPropagation(); onOpen(session.id); }}
+            >
+              Manage
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="flex-1"
+              data-testid="end-session-btn"
+              disabled={endFetching}
+              onClick={(e) => { e.stopPropagation(); onEnd(session.id); }}
+            >
+              {endFetching
+                ? <Loader2 className="h-3 w-3 animate-spin" />
+                : <><StopCircle className="h-3 w-3 mr-1" />End</>}
+            </Button>
+          </div>
+        )}
+
+        {/* STUDENT actions — only join when LIVE */}
+        {!isInstructor && isLive && (
           <Button
             size="sm"
-            variant={isLive ? 'default' : 'outline'}
+            variant="default"
             className="w-full mt-1"
-            data-testid="session-action-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (isInstructor) {
-                onOpen(session.id);
-              } else {
-                onJoin(session.id);
-              }
-            }}
+            data-testid="join-session-btn"
+            disabled={joinFetching}
+            onClick={(e) => { e.stopPropagation(); onJoin(session.id); }}
           >
-            {isInstructor
-              ? isLive
-                ? 'Manage'
-                : 'Start Session'
+            {joinFetching
+              ? <Loader2 className="h-3 w-3 animate-spin" />
               : 'Join'}
           </Button>
         )}
@@ -280,9 +344,18 @@ export function LiveSessionsPage() {
     pause: !mounted,
   });
 
-  // Mutations
+  // Mutations — create (inline) + session actions via hook
   const [createResult, executeCreate] = useMutation(CREATE_LIVE_SESSION_MUTATION);
-  const [, executeJoin] = useMutation(JOIN_LIVE_SESSION_MUTATION);
+  const {
+    startSession,
+    endSession,
+    joinSession,
+    cancelSession,
+    startFetching,
+    endFetching,
+    joinFetching,
+    cancelFetching,
+  } = useLiveSessionActions();
 
   const sessions: LiveSession[] =
     (sessionsResult.data?.liveSessions as LiveSession[] | undefined) ?? [];
@@ -303,8 +376,21 @@ export function LiveSessionsPage() {
   };
 
   const handleJoin = async (sessionId: string) => {
-    await executeJoin({ sessionId });
+    await joinSession(sessionId);
     navigate(`/sessions/${sessionId}`);
+  };
+
+  const handleStart = async (sessionId: string) => {
+    await startSession(sessionId);
+    navigate(`/sessions/${sessionId}`);
+  };
+
+  const handleEnd = async (sessionId: string) => {
+    await endSession(sessionId);
+  };
+
+  const handleCancel = async (sessionId: string) => {
+    await cancelSession(sessionId);
   };
 
   const handleOpen = (sessionId: string) => {
@@ -410,6 +496,8 @@ export function LiveSessionsPage() {
           <div
             className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
             data-testid="sessions-grid"
+            aria-live="polite"
+            aria-label="Session list"
           >
             {filteredSessions.map((s) => (
               <SessionCard
@@ -417,7 +505,14 @@ export function LiveSessionsPage() {
                 session={s}
                 isInstructor={isInstructor}
                 onJoin={handleJoin}
+                onStart={handleStart}
+                onEnd={handleEnd}
+                onCancel={handleCancel}
                 onOpen={handleOpen}
+                joinFetching={joinFetching}
+                startFetching={startFetching}
+                endFetching={endFetching}
+                cancelFetching={cancelFetching}
               />
             ))}
           </div>

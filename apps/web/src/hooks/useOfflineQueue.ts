@@ -7,7 +7,7 @@
  *
  * Storage key: "edusphere_offline_queue"
  */
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 export interface QueuedItem {
   id: string;
@@ -46,8 +46,19 @@ export interface OfflineQueue {
   pendingCount: number;
 }
 
-export function useOfflineQueue(): OfflineQueue {
+export interface UseOfflineQueueOptions {
+  onFlush?: (item: QueuedItem) => Promise<void>;
+}
+
+export function useOfflineQueue(options?: UseOfflineQueueOptions): OfflineQueue {
   const [queue, setQueue] = useState<QueuedItem[]>(() => readQueue());
+
+  // Store callback in a ref so the online event listener is not re-registered
+  // when the callback reference changes (CLAUDE.md: useRef for callback stability)
+  const onFlushRef = useRef(options?.onFlush);
+  useEffect(() => {
+    onFlushRef.current = options?.onFlush;
+  }, [options?.onFlush]);
 
   // Sync state when localStorage changes in another tab
   useEffect(() => {
@@ -94,12 +105,6 @@ export function useOfflineQueue(): OfflineQueue {
     setQueue([]);
   }, [evictExpired]);
 
-  // Online event: auto-flush pending queue when connectivity is restored
-  useEffect(() => {
-    window.addEventListener('online', flushQueue);
-    return () => window.removeEventListener('online', flushQueue);
-  }, [flushQueue]);
-
   const flush = useCallback(
     async (handler: (item: QueuedItem) => Promise<void>) => {
       const current = evictExpired(readQueue());
@@ -115,6 +120,22 @@ export function useOfflineQueue(): OfflineQueue {
     },
     [evictExpired]
   );
+
+  // Online event: auto-flush pending queue when connectivity is restored.
+  // If a consumer provides onFlush, call flush(onFlush) so queued mutations
+  // are re-executed; otherwise fall back to the no-op flushQueue cleanup.
+  // Memory safety: ONE listener registered; removed on unmount (CLAUDE.md).
+  useEffect(() => {
+    const handleOnline = async () => {
+      if (onFlushRef.current) {
+        await flush(onFlushRef.current);
+      } else {
+        await flushQueue();
+      }
+    };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [flush, flushQueue]);
 
   const clear = useCallback(() => {
     writeQueue([]);

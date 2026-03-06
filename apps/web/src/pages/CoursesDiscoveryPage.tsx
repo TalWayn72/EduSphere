@@ -2,6 +2,13 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { LayoutGrid, List } from 'lucide-react';
 import { CourseCard, type CourseCardProps } from '@/components/CourseCard';
 // TODO: replace with real query — import { useQuery } from 'urql';
@@ -9,7 +16,11 @@ import { CourseCard, type CourseCardProps } from '@/components/CourseCard';
 
 // ── DEV_MODE mock data ────────────────────────────────────────────────────────
 
-const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
+type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced';
+
+type MockCourse = Omit<CourseCardProps, 'onClick'> & { level: CourseLevel };
+
+const MOCK_COURSES: MockCourse[] = [
   {
     id: 'c-1',
     title: 'Complete TypeScript Bootcamp: From Zero to Advanced',
@@ -21,6 +32,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     progress: 65,
     mastery: 'proficient',
     featured: true,
+    level: 'Advanced',
   },
   {
     id: 'c-2',
@@ -33,6 +45,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     progress: 30,
     mastery: 'familiar',
     featured: false,
+    level: 'Beginner',
   },
   {
     id: 'c-3',
@@ -44,6 +57,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     enrolled: false,
     mastery: 'none',
     featured: true,
+    level: 'Intermediate',
   },
   {
     id: 'c-4',
@@ -55,6 +69,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     enrolled: false,
     mastery: 'none',
     featured: false,
+    level: 'Advanced',
   },
   {
     id: 'c-5',
@@ -67,6 +82,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     progress: 10,
     mastery: 'attempted',
     featured: false,
+    level: 'Beginner',
   },
   {
     id: 'c-6',
@@ -78,6 +94,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     enrolled: false,
     mastery: 'none',
     featured: false,
+    level: 'Beginner',
   },
   {
     id: 'c-7',
@@ -90,6 +107,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     progress: 100,
     mastery: 'mastered',
     featured: false,
+    level: 'Intermediate',
   },
   {
     id: 'c-8',
@@ -101,6 +119,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     enrolled: false,
     mastery: 'none',
     featured: false,
+    level: 'Intermediate',
   },
   {
     id: 'c-9',
@@ -112,6 +131,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     enrolled: false,
     mastery: 'none',
     featured: true,
+    level: 'Intermediate',
   },
   {
     id: 'c-10',
@@ -123,6 +143,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     enrolled: false,
     mastery: 'none',
     featured: false,
+    level: 'Beginner',
   },
   {
     id: 'c-11',
@@ -134,6 +155,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     enrolled: false,
     mastery: 'none',
     featured: false,
+    level: 'Beginner',
   },
   {
     id: 'c-12',
@@ -146,6 +168,7 @@ const MOCK_COURSES: Omit<CourseCardProps, 'onClick'>[] = [
     progress: 45,
     mastery: 'familiar',
     featured: false,
+    level: 'Intermediate',
   },
 ];
 
@@ -162,6 +185,14 @@ const CATEGORY_FILTERS = [
 ];
 
 const LEVEL_FILTERS = ['Any Level', 'Beginner', 'Intermediate', 'Advanced'];
+
+const SORT_OPTIONS = [
+  { value: 'popular', label: 'Most Popular' },
+  { value: 'newest', label: 'Newest' },
+  { value: 'rating', label: 'Highest Rated' },
+] as const;
+
+type SortOption = (typeof SORT_OPTIONS)[number]['value'];
 
 const DURATION_FILTERS = ['Any Duration', '< 1h', '1-5h', '5h+'];
 
@@ -234,6 +265,7 @@ export function CoursesDiscoveryPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedLevel, setSelectedLevel] = useState('Any Level');
+  const [selectedSort, setSelectedSort] = useState<SortOption>('popular');
   const [selectedDuration, setSelectedDuration] = useState('Any Duration');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -261,7 +293,7 @@ export function CoursesDiscoveryPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    let results = MOCK_COURSES;
+    let results = [...MOCK_COURSES];
 
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.toLowerCase();
@@ -277,6 +309,10 @@ export function CoursesDiscoveryPage() {
       results = results.filter((c) => c.category === selectedCategory);
     }
 
+    if (selectedLevel !== 'Any Level') {
+      results = results.filter((c) => c.level === selectedLevel);
+    }
+
     if (selectedDuration !== 'Any Duration') {
       results = results.filter((c) => {
         if (selectedDuration === '< 1h') return c.estimatedHours < 1;
@@ -287,8 +323,18 @@ export function CoursesDiscoveryPage() {
       });
     }
 
+    // Sort results
+    if (selectedSort === 'popular') {
+      results.sort((a, b) => b.lessonCount - a.lessonCount);
+    } else if (selectedSort === 'newest') {
+      // Newest = reverse insertion order (higher id index = newer)
+      results.reverse();
+    } else if (selectedSort === 'rating') {
+      results.sort((a, b) => (b.progress ?? 0) - (a.progress ?? 0));
+    }
+
     return results;
-  }, [debouncedSearch, selectedCategory, selectedDuration]);
+  }, [debouncedSearch, selectedCategory, selectedLevel, selectedDuration, selectedSort]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -392,7 +438,12 @@ export function CoursesDiscoveryPage() {
           <div className="w-px bg-border shrink-0 mx-1" aria-hidden="true" />
 
           {/* Level pills */}
-          <div className="flex gap-1.5 shrink-0">
+          <div
+            role="group"
+            aria-label="Filter by level"
+            className="flex gap-1.5 shrink-0"
+            data-testid="level-filter-group"
+          >
             {LEVEL_FILTERS.map((lvl) => (
               <button
                 key={lvl}
@@ -430,6 +481,38 @@ export function CoursesDiscoveryPage() {
                 {dur}
               </button>
             ))}
+          </div>
+
+          <div className="w-px bg-border shrink-0 mx-1" aria-hidden="true" />
+
+          {/* Sort select */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <label
+              htmlFor="sort-select"
+              className="text-xs text-muted-foreground whitespace-nowrap"
+            >
+              Sort by
+            </label>
+            <Select
+              value={selectedSort}
+              onValueChange={(v) => setSelectedSort(v as SortOption)}
+            >
+              <SelectTrigger
+                id="sort-select"
+                className="h-7 text-xs min-w-[130px]"
+                aria-label="Sort courses"
+                data-testid="sort-select"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
