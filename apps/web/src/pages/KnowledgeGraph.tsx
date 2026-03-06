@@ -29,8 +29,10 @@ import {
   RefreshCw,
   GitBranch,
   Network,
+  User,
 } from 'lucide-react';
 import { DEV_MODE } from '@/lib/auth';
+import { PersonalGraphView } from './PersonalGraphView';
 
 // ─── Mock learning path used when DEV_MODE is true ───────────────────────────
 const MOCK_LEARNING_PATH: ApiLearningPath = {
@@ -118,9 +120,12 @@ export interface KnowledgeGraphProps {
   courseId?: string;
 }
 
+type ViewMode = 'global' | 'personal';
+
 export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
   const { t } = useTranslation('knowledge');
   const navigate = useNavigate();
+  const [viewMode, setViewMode] = useState<ViewMode>('global');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
@@ -424,8 +429,53 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
           </div>
         )}
 
-        {/* Header */}
-        <div className="flex items-center justify-between">
+        {/* View mode toggle */}
+        <div className="flex gap-2" role="tablist" aria-label="Knowledge graph view">
+          <button
+            role="tab"
+            aria-selected={viewMode === 'global'}
+            onClick={() => setViewMode('global')}
+            data-testid="kg-tab-global"
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+              ${viewMode === 'global'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+          >
+            <Network className="h-3 w-3" />
+            {courseId ? t('courseContext') : t('title')}
+          </button>
+          <button
+            role="tab"
+            aria-selected={viewMode === 'personal'}
+            onClick={() => setViewMode('personal')}
+            data-testid="kg-tab-personal"
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors
+              ${viewMode === 'personal'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+          >
+            <User className="h-3 w-3" />
+            My Wiki
+          </button>
+        </div>
+
+        {/* Personal graph view */}
+        {viewMode === 'personal' && (
+          <div>
+            <div className="mb-2">
+              <h1 className="text-2xl font-bold">Personal Knowledge Wiki</h1>
+              <p className="text-sm text-muted-foreground">
+                Your annotations across all courses, connected by shared concepts.
+              </p>
+            </div>
+            <PersonalGraphView
+              onViewCourse={(cId) => void navigate(`/courses/${cId}`)}
+            />
+          </div>
+        )}
+
+        {/* Header (global / course view only) */}
+        {viewMode === 'global' && <div className="flex items-center justify-between">
           <div>
             {courseId ? (
               <>
@@ -475,8 +525,10 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
               </Button>
             )}
           </div>
-        </div>
+        </div>}
 
+        {viewMode === 'global' && (
+        <>
         {/* Search */}
         <div className="relative w-64">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -891,6 +943,8 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
             </Card>
           </div>
         </div>
+        </>
+        )}
       </div>
     </Layout>
   );

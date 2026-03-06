@@ -15,6 +15,7 @@ interface AnnotationItemProps {
   onReply: (parentId: string, content: string, layer: AnnotationLayer) => void;
   onEdit: (annotationId: string, content: string) => void;
   onDelete: (annotationId: string) => void;
+  onPropose?: (annotationId: string) => void;
 }
 
 export function AnnotationItem({
@@ -25,6 +26,7 @@ export function AnnotationItem({
   onReply,
   onEdit,
   onDelete,
+  onPropose,
 }: AnnotationItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -34,6 +36,10 @@ export function AnnotationItem({
   const canEdit = config.canEdit(annotation, currentUserId);
   const canDelete = config.canDelete(annotation, currentUserId);
   const isOwn = annotation.userId === currentUserId;
+  const canPropose =
+    onPropose !== undefined &&
+    annotation.layer === AnnotationLayer.PERSONAL &&
+    isOwn;
 
   const handleReplySubmit = (content: string, layer: AnnotationLayer) => {
     onReply(annotation.id, content, layer);
@@ -148,9 +154,9 @@ export function AnnotationItem({
           </p>
         )}
 
-        {/* Reply button */}
+        {/* Reply + Propose buttons */}
         {!isEditing && depth < 3 && (
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button
               variant="ghost"
               size="sm"
@@ -159,6 +165,18 @@ export function AnnotationItem({
             >
               {isReplying ? 'Cancel' : 'Reply'}
             </Button>
+            {canPropose && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onPropose!(annotation.id)}
+                className="h-7 text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                data-testid={`propose-btn-${annotation.id}`}
+                aria-label="Propose to official content"
+              >
+                Propose to Official
+              </Button>
+            )}
             {annotation.replies && annotation.replies.length > 0 && (
               <span className="text-xs text-gray-500 self-center">
                 {annotation.replies.length}{' '}

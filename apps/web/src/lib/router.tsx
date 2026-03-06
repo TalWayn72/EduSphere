@@ -328,6 +328,11 @@ const SkillTreePage = lazy(() =>
 const CheckoutPage = lazy(() =>
   import('@/pages/CheckoutPage').then((m) => ({ default: m.CheckoutPage }))
 );
+const InstructorMergeQueuePage = lazy(() =>
+  import('@/pages/InstructorMergeQueuePage').then((m) => ({
+    default: m.InstructorMergeQueuePage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -533,6 +538,11 @@ export const router = createBrowserRouter([
     // Stripe checkout — reached from PurchaseCourseButton via ?secret=&session=&course=
     path: '/checkout',
     element: guarded(<CheckoutPage />),
+  },
+  {
+    // Instructor annotation merge queue — PRD §4.3
+    path: '/instructor/merge-queue',
+    element: guarded(<InstructorMergeQueuePage />),
   },
   {
     path: '/library',

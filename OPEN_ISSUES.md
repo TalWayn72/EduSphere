@@ -1,9 +1,45 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 06 מרץ 2026 (Session 26 Phase 28 — IN PROGRESS; web 3453/3453 ✅ (263 files), security 819/819 ✅, TypeScript 0 errors 26/26)
+**תאריך עדכון:** 06 מרץ 2026 (Session 28 Phase 30 ✅ COMPLETE; web ~3510/3510 (270+ files), security 819/819 ✅, TypeScript 0 errors 26/26)
 **מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 🔄 IN PROGRESS** + **BUG-054 Progress Bar ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings)
 **בדיקות:** Security: **819 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,453** (263 files, +138 Session 26) | Backend subgraphs: **2,296** (core 640 + content 1041 + annotation 144 + collab 161 + agent 599 + knowledge 509) | Gateway: **138** | i18n: ~247 | סה"כ: **>5,916 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+
+---
+
+## Phase 30 — Personal Knowledge Graph & Annotation Merge Request (Session 28)
+
+**Status:** ✅ Complete
+**Date:** March 2026
+**PRD Gaps closed:** §4.4 (P-2) — Personal Knowledge Graph wiki | §4.3 (G-3) — Annotation Merge Request
+
+### Deliverables
+
+| Deliverable | Status | Files |
+|-------------|--------|-------|
+| Personal wiki view in KnowledgeGraph (`viewMode: 'personal'`) | ✅ | `KnowledgeGraph.tsx` — viewMode toggle (Global/My Wiki tabs) |
+| PersonalGraphView component (SVG, 6 mock annotation nodes, course legend) | ✅ | `PersonalGraphView.tsx` |
+| Mock personal graph data | ✅ | `src/lib/mock-personal-graph.ts` |
+| Propose to Official button on PERSONAL annotations | ✅ | `AnnotationItem.tsx` — `onPropose` prop, `canPropose` guard |
+| AnnotationMergeRequestModal (textarea, char count, submit/cancel) | ✅ | `AnnotationMergeRequestModal.tsx` |
+| AnnotationPanel merge request flow (proposingId state, submitted badges) | ✅ | `AnnotationPanel.tsx` |
+| InstructorMergeQueuePage (approve/reject, diff view, resolved section) | ✅ | `InstructorMergeQueuePage.tsx` |
+| Route `/instructor/merge-queue` | ✅ | `router.tsx` |
+
+### Tests Added (Phase 30)
+
+| File | Tests | Coverage |
+|------|-------|----------|
+| `PersonalGraphView.test.tsx` | 9 | Node rendering, click selection, detail panel, deselect, course legend, timestamps |
+| `AnnotationMergeRequestModal.test.tsx` | 7 | Empty submit guard, onSubmit, onCancel, aria attributes, char count |
+| `InstructorMergeQueuePage.test.tsx` | 10 | Pending count, approve/reject, empty state, no raw errors |
+| `AnnotationItem.propose.test.tsx` | 7 | PERSONAL only, own-user only, aria-label, onPropose callback |
+| `KnowledgeGraph.personal.test.tsx` | 8 | Tab switching, personal view rendering, search hidden in personal mode |
+| `annotation-merge-request.spec.ts` (E2E) | 15 | Personal tabs, node click, KG visual regression (2 shots), merge queue, approve/reject, visual regression (2 shots) |
+
+**New E2E specs:** `apps/web/e2e/annotation-merge-request.spec.ts`
+**Visual regression screenshots:** `kg-global-view.png`, `kg-personal-wiki.png`, `instructor-merge-queue.png`, `instructor-merge-queue-after-approve.png`
+**Anti-recurrence:** `AnnotationItem.propose.test.tsx:43` guards that Propose button only appears for PERSONAL+own-user annotations
 
 ---
 

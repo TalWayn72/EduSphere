@@ -11,6 +11,7 @@ import {
 } from '@/lib/mock-annotations';
 import { AnnotationItem } from './AnnotationItem';
 import { AnnotationForm } from './AnnotationForm';
+import { AnnotationMergeRequestModal } from './AnnotationMergeRequestModal';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -39,6 +40,8 @@ export function AnnotationPanel({
   ]);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [sortBy, setSortBy] = useState<'timestamp' | 'recent'>('timestamp');
+  const [proposingId, setProposingId] = useState<string | null>(null);
+  const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
 
   // Filter annotations by enabled layers
   const filteredAnnotations = useMemo(() => {
@@ -145,6 +148,19 @@ export function AnnotationPanel({
     );
   };
 
+  // Submit merge request
+  const handleMergeRequestSubmit = (description: string) => {
+    if (!proposingId) return;
+    // In production this would call a GraphQL mutation.
+    // For now we mark it as submitted locally.
+    console.info('[AnnotationPanel] Merge request submitted:', {
+      annotationId: proposingId,
+      description,
+    });
+    setSubmittedIds((prev) => new Set([...prev, proposingId]));
+    setProposingId(null);
+  };
+
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header */}
@@ -216,6 +232,17 @@ export function AnnotationPanel({
         </div>
       )}
 
+      {/* Merge Request Modal */}
+      {proposingId && (
+        <AnnotationMergeRequestModal
+          annotationContent={
+            annotations.find((a) => a.id === proposingId)?.content ?? ''
+          }
+          onSubmit={handleMergeRequestSubmit}
+          onCancel={() => setProposingId(null)}
+        />
+      )}
+
       {/* Annotations List */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {sortedAnnotations.length === 0 ? (
@@ -225,15 +252,29 @@ export function AnnotationPanel({
           </div>
         ) : (
           sortedAnnotations.map((annotation) => (
-            <AnnotationItem
-              key={annotation.id}
-              annotation={annotation}
-              currentUserId={currentUserId}
-              currentUserRole={currentUserRole}
-              onReply={handleReply}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <div key={annotation.id}>
+              {submittedIds.has(annotation.id) && (
+                <p
+                  className="text-xs text-indigo-600 mb-1 ml-1"
+                  data-testid={`merge-submitted-${annotation.id}`}
+                >
+                  Proposal submitted — pending instructor review.
+                </p>
+              )}
+              <AnnotationItem
+                annotation={annotation}
+                currentUserId={currentUserId}
+                currentUserRole={currentUserRole}
+                onReply={handleReply}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onPropose={
+                  submittedIds.has(annotation.id)
+                    ? undefined
+                    : (id) => setProposingId(id)
+                }
+              />
+            </div>
           ))
         )}
       </div>
