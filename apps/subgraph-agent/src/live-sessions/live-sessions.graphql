@@ -4,10 +4,40 @@ extend type LiveSession @key(fields: "id") {
 
 extend type Mutation {
   startLiveSession(sessionId: ID!): StartLiveSessionResult! @authenticated
+  endLiveSession(sessionId: ID!): LiveSession! @authenticated @requiresRole(roles: [INSTRUCTOR])
+  joinLiveSession(sessionId: ID!): JoinSessionResult! @authenticated
+  cancelLiveSession(sessionId: ID!): LiveSession! @authenticated @requiresRole(roles: [INSTRUCTOR])
+}
+
+extend type Query {
+  sessionAttendees(sessionId: ID!, first: Int, after: String): SessionAttendeeConnection! @authenticated @requiresRole(roles: [INSTRUCTOR])
 }
 
 type StartLiveSessionResult {
   sessionId: ID!
   status: String!
   startedAt: String!
+}
+
+type JoinSessionResult {
+  session: LiveSession!
+  roomUrl: String
+  token: String
+}
+
+type SessionAttendeeConnection {
+  edges: [SessionAttendeeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type SessionAttendeeEdge {
+  node: SessionAttendee!
+  cursor: String!
+}
+
+type SessionAttendee {
+  userId: ID!
+  joinedAt: DateTime!
+  role: String!
 }

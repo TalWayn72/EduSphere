@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Mutation, Query, Args, Context } from '@nestjs/graphql';
 import { Logger, UnauthorizedException } from '@nestjs/common';
 import { LiveSessionsService } from './live-sessions.service';
 import type { AuthContext } from '@edusphere/auth';
@@ -28,6 +28,77 @@ export class LiveSessionsResolver {
       tenantId,
       userId,
       userRole
+    );
+  }
+
+  @Mutation('endLiveSession')
+  async endLiveSession(
+    @Args('sessionId') sessionId: string,
+    @Context() context: unknown
+  ) {
+    const authContext = this.extractAuthContext(context);
+    const tenantId = authContext.tenantId ?? '';
+    const userId = authContext.userId;
+
+    this.logger.debug(
+      `[LiveSessionsResolver] endLiveSession sessionId=${sessionId} userId=${userId}`
+    );
+
+    return this.liveSessionsService.endLiveSession(sessionId, userId, tenantId);
+  }
+
+  @Mutation('joinLiveSession')
+  async joinLiveSession(
+    @Args('sessionId') sessionId: string,
+    @Context() context: unknown
+  ) {
+    const authContext = this.extractAuthContext(context);
+    const tenantId = authContext.tenantId ?? '';
+    const userId = authContext.userId;
+
+    this.logger.debug(
+      `[LiveSessionsResolver] joinLiveSession sessionId=${sessionId} userId=${userId}`
+    );
+
+    return this.liveSessionsService.joinLiveSession(sessionId, userId, tenantId);
+  }
+
+  @Mutation('cancelLiveSession')
+  async cancelLiveSession(
+    @Args('sessionId') sessionId: string,
+    @Context() context: unknown
+  ) {
+    const authContext = this.extractAuthContext(context);
+    const tenantId = authContext.tenantId ?? '';
+    const userId = authContext.userId;
+
+    this.logger.debug(
+      `[LiveSessionsResolver] cancelLiveSession sessionId=${sessionId} userId=${userId}`
+    );
+
+    return this.liveSessionsService.cancelLiveSession(sessionId, userId, tenantId);
+  }
+
+  @Query('sessionAttendees')
+  async sessionAttendees(
+    @Args('sessionId') sessionId: string,
+    @Args('first') first: number | undefined,
+    @Args('after') after: string | undefined,
+    @Context() context: unknown
+  ) {
+    const authContext = this.extractAuthContext(context);
+    const tenantId = authContext.tenantId ?? '';
+    const userId = authContext.userId;
+
+    this.logger.debug(
+      `[LiveSessionsResolver] sessionAttendees sessionId=${sessionId} userId=${userId}`
+    );
+
+    return this.liveSessionsService.getSessionAttendees(
+      sessionId,
+      userId,
+      tenantId,
+      { first, after }
     );
   }
 

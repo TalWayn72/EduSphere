@@ -263,4 +263,104 @@ describe('LiveSessionsPage', () => {
     fireEvent.click(pastTab);
     expect(pastTab).toHaveAttribute('aria-selected', 'true');
   });
+
+  // ─── ARIA attribute tests ──────────────────────────────────────────────────
+
+  it('tab container has role="tablist"', () => {
+    renderPage();
+    const tablist = document.querySelector('[role="tablist"]');
+    expect(tablist).not.toBeNull();
+  });
+
+  it('tab buttons have role="tab"', () => {
+    renderPage();
+    const tabs = document.querySelectorAll('[role="tab"]');
+    expect(tabs.length).toBe(2);
+  });
+
+  it('active tab has tabIndex=0 and inactive tab has tabIndex=-1', () => {
+    renderPage();
+    const upcomingTab = screen.getByTestId('tab-upcoming');
+    const pastTab = screen.getByTestId('tab-past');
+    // Upcoming is active by default
+    expect(upcomingTab).toHaveAttribute('tabindex', '0');
+    expect(pastTab).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('clicking Past tab gives it tabIndex=0 and removes focus from Upcoming', () => {
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    const pastTab = screen.getByTestId('tab-past');
+    const upcomingTab = screen.getByTestId('tab-upcoming');
+    fireEvent.click(pastTab);
+    expect(pastTab).toHaveAttribute('tabindex', '0');
+    expect(upcomingTab).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('tabs have aria-controls pointing to their panel', () => {
+    renderPage();
+    const upcomingTab = screen.getByTestId('tab-upcoming');
+    const pastTab = screen.getByTestId('tab-past');
+    expect(upcomingTab).toHaveAttribute('aria-controls', 'tab-panel-upcoming');
+    expect(pastTab).toHaveAttribute('aria-controls', 'tab-panel-past');
+  });
+
+  // ─── Phase 28: ARIA role validation tests ─────────────────────────────────
+
+  it('tabs have correct ARIA roles — getByRole tablist and getAllByRole tab', () => {
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+
+    // tablist exists
+    const tablist = screen.getByRole('tablist');
+    expect(tablist).toBeInTheDocument();
+
+    // At least 2 tab elements with role=tab
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('active tab has aria-selected=true after click', () => {
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { liveSessions: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+    renderPage();
+
+    const upcomingTab = screen.getByTestId('tab-upcoming');
+    const pastTab = screen.getByTestId('tab-past');
+
+    // Initially Upcoming is selected
+    expect(upcomingTab).toHaveAttribute('aria-selected', 'true');
+    expect(pastTab).toHaveAttribute('aria-selected', 'false');
+
+    // Click Past tab — aria-selected must transfer
+    fireEvent.click(pastTab);
+    expect(pastTab).toHaveAttribute('aria-selected', 'true');
+    expect(upcomingTab).toHaveAttribute('aria-selected', 'false');
+  });
 });

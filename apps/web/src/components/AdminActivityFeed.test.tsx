@@ -174,4 +174,46 @@ describe('AdminActivityFeed', () => {
     renderFeed({ refreshIntervalMs: 0 });
     expect(setIntervalSpy).not.toHaveBeenCalled();
   });
+
+  // ─── ARIA attribute tests ──────────────────────────────────────────────────
+
+  it('feed container has role="log"', () => {
+    renderFeed();
+    const feed = screen.getByTestId('admin-activity-feed');
+    expect(feed).toHaveAttribute('role', 'log');
+  });
+
+  it('feed container has aria-live="polite"', () => {
+    renderFeed();
+    const feed = screen.getByTestId('admin-activity-feed');
+    expect(feed).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('feed container has aria-atomic="false"', () => {
+    renderFeed();
+    const feed = screen.getByTestId('admin-activity-feed');
+    expect(feed).toHaveAttribute('aria-atomic', 'false');
+  });
+
+  it('feed container has aria-label="Activity Feed"', () => {
+    renderFeed();
+    const feed = screen.getByTestId('admin-activity-feed');
+    expect(feed).toHaveAttribute('aria-label', 'Activity Feed');
+  });
+
+  // ─── Phase 28: aria-live and role=log on feed container ───────────────────
+
+  it('feed container has aria-live=polite (Phase 28 explicit assertion)', () => {
+    renderFeed({ items: SAMPLE_ITEMS });
+    // Verify the outer feed container announces updates to screen readers
+    const feed = screen.getByTestId('admin-activity-feed');
+    expect(feed).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('feed container has role=log (Phase 28 explicit assertion)', () => {
+    renderFeed({ items: SAMPLE_ITEMS });
+    // role=log is the correct semantic role for activity/audit feeds
+    const feed = screen.getByTestId('admin-activity-feed');
+    expect(feed).toHaveAttribute('role', 'log');
+  });
 });

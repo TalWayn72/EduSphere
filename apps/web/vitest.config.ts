@@ -81,6 +81,12 @@ export default defineConfig({
     clearMocks: true,
     testTimeout: 30000,
     hookTimeout: 30000,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        execArgv: ['--max-old-space-size=512'],
+      },
+    },
     reporters: [
       'default',
       ['junit', { outputFile: './test-results/results.xml', suiteName: 'web' }],

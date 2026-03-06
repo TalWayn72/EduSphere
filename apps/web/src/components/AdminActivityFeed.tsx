@@ -178,7 +178,13 @@ export function AdminActivityFeed({
   const items = externalItems ?? MOCK_ACTIVITIES;
 
   return (
-    <Card data-testid="admin-activity-feed">
+    <Card
+      data-testid="admin-activity-feed"
+      role="log"
+      aria-live="polite"
+      aria-atomic="false"
+      aria-label="Activity Feed"
+    >
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
         <CardTitle className="text-sm font-medium flex items-center gap-1.5">
           <Activity className="h-4 w-4 text-primary" />

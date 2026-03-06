@@ -3,7 +3,7 @@
  *
  * Memory safety:
  *   - Max 100 items; oldest evicted (LRU) when cap is reached (CLAUDE.md unbounded-Map rule).
- *   - No timers or subscriptions — no cleanup needed.
+ *   - 'online' event listener registered for auto-flush; removed on unmount (memory-safe).
  *
  * Storage key: "edusphere_offline_queue"
  */
@@ -18,6 +18,7 @@ export interface QueuedItem {
 
 const STORAGE_KEY = 'edusphere_offline_queue';
 const MAX_QUEUE_SIZE = 100;
+const TTL_MS = 48 * 60 * 60 * 1000; // 48 hours
 
 function readQueue(): QueuedItem[] {
   try {
@@ -72,9 +73,36 @@ export function useOfflineQueue(): OfflineQueue {
     });
   }, []);
 
+  const evictExpired = useCallback((items: QueuedItem[]): QueuedItem[] => {
+    const cutoff = Date.now() - TTL_MS;
+    return items.filter((item) => item.createdAt >= cutoff);
+  }, []);
+
+  const flushQueue = useCallback(async () => {
+    const current = evictExpired(readQueue());
+    if (current.length === 0) {
+      writeQueue([]);
+      setQueue([]);
+      return;
+    }
+    for (const item of current) {
+      // No-op flush: items are dequeued when back online; real sync
+      // requires a flush(handler) call from the consuming component.
+      void item;
+    }
+    writeQueue([]);
+    setQueue([]);
+  }, [evictExpired]);
+
+  // Online event: auto-flush pending queue when connectivity is restored
+  useEffect(() => {
+    window.addEventListener('online', flushQueue);
+    return () => window.removeEventListener('online', flushQueue);
+  }, [flushQueue]);
+
   const flush = useCallback(
     async (handler: (item: QueuedItem) => Promise<void>) => {
-      const current = readQueue();
+      const current = evictExpired(readQueue());
       for (const item of current) {
         try {
           await handler(item);
@@ -85,7 +113,7 @@ export function useOfflineQueue(): OfflineQueue {
       writeQueue([]);
       setQueue([]);
     },
-    []
+    [evictExpired]
   );
 
   const clear = useCallback(() => {

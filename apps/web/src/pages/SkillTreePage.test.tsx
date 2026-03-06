@@ -128,7 +128,7 @@ describe('SkillTreePage', () => {
       },
       vi.fn(),
     ] as never);
-    renderPage('course-123');
+    renderPage('00000000-0000-0000-0000-000000000001');
     expect(screen.getByTestId('skill-node-node-1')).toBeInTheDocument();
     expect(screen.getByTestId('skill-node-node-2')).toBeInTheDocument();
     // Should NOT show sample notice
@@ -157,7 +157,7 @@ describe('SkillTreePage', () => {
       },
       vi.fn(),
     ] as never);
-    renderPage('course-123');
+    renderPage('00000000-0000-0000-0000-000000000001');
     fireEvent.click(screen.getByTestId('skill-node-node-1'));
     expect(screen.getByTestId('skill-tree-node-actions')).toBeInTheDocument();
     expect(screen.getByTestId('advance-mastery-btn')).toBeInTheDocument();
@@ -190,7 +190,7 @@ describe('SkillTreePage', () => {
       },
       vi.fn(),
     ] as never);
-    renderPage('course-123');
+    renderPage('00000000-0000-0000-0000-000000000001');
     fireEvent.click(screen.getByTestId('skill-node-node-1'));
     fireEvent.click(screen.getByTestId('advance-mastery-btn'));
     expect(mockUpdate).toHaveBeenCalledWith({
@@ -221,7 +221,7 @@ describe('SkillTreePage', () => {
       },
       vi.fn(),
     ] as never);
-    renderPage('course-123');
+    renderPage('00000000-0000-0000-0000-000000000001');
     fireEvent.click(screen.getByTestId('skill-node-node-1'));
     expect(screen.getByTestId('advance-mastery-btn')).toBeDisabled();
   });

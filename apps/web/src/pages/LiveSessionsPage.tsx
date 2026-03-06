@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
 import { useTranslation } from 'react-i18next';
@@ -263,6 +263,13 @@ export function LiveSessionsPage() {
 
   const [activeTab, setActiveTab] = useState<Tab>('upcoming');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Mount guard — prevents urql graphcache dispatch during sibling render (CLAUDE.md pattern)
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // GraphQL — list sessions
   const statusFilter =
@@ -270,6 +277,7 @@ export function LiveSessionsPage() {
   const [sessionsResult] = useQuery({
     query: LIST_LIVE_SESSIONS_QUERY,
     variables: { status: statusFilter, limit: 20, offset: 0 },
+    pause: !mounted,
   });
 
   // Mutations
@@ -331,12 +339,14 @@ export function LiveSessionsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b" role="tablist">
+        <div className="flex gap-1 border-b" role="tablist" aria-label="Session filter tabs">
           {(['upcoming', 'past'] as Tab[]).map((tab) => (
             <button
               key={tab}
               role="tab"
               aria-selected={activeTab === tab}
+              aria-controls={`tab-panel-${tab}`}
+              tabIndex={activeTab === tab ? 0 : -1}
               data-testid={`tab-${tab}`}
               onClick={() => setActiveTab(tab)}
               className={[

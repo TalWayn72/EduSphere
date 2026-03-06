@@ -95,6 +95,16 @@ function masteryToProgress(level: MasteryLevel): number {
   return map[level] ?? 0;
 }
 
+// ─── UUID validation helper ────────────────────────────────────────────────
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidCourseId(id: string): boolean {
+  // 'all' is the global/unfiltered sentinel — always valid
+  return id === 'all' || UUID_REGEX.test(id);
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export function SkillTreePage() {
@@ -106,6 +116,8 @@ export function SkillTreePage() {
     Map<string, MasteryLevel>
   >(new Map());
 
+  const validId = isValidCourseId(courseId);
+
   // Mounted guard — prevents urql graphcache dispatch during sibling render
   useEffect(() => {
     setMounted(true);
@@ -114,7 +126,8 @@ export function SkillTreePage() {
   const [skillTreeResult] = useQuery<ApiSkillTree>({
     query: GET_SKILL_TREE_QUERY,
     variables: { courseId },
-    pause: !mounted,
+    // Pause when not mounted OR when courseId is invalid (no point querying)
+    pause: !mounted || !validId,
   });
 
   const [updateResult, updateMastery] = useMutation(UPDATE_MASTERY_LEVEL_MUTATION);
@@ -169,6 +182,24 @@ export function SkillTreePage() {
   };
 
   const isSampleData = !hasData;
+
+  // UUID validation — render invalid state after all hooks have been called
+  if (!validId) {
+    return (
+      <Layout>
+        <div
+          className="flex flex-col items-center justify-center min-h-[300px] gap-3"
+          data-testid="skill-tree-invalid-id"
+          role="alert"
+        >
+          <p className="text-lg font-semibold text-destructive">Invalid course ID</p>
+          <p className="text-sm text-muted-foreground">
+            The course ID &quot;{courseId}&quot; is not a valid identifier.
+          </p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

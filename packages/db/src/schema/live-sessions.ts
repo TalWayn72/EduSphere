@@ -7,6 +7,7 @@ export const liveSessionStatusEnum = pgEnum('live_session_status', [
   'LIVE',
   'ENDED',
   'RECORDING',
+  'CANCELLED',
 ]);
 
 export const liveSessions = pgTable('live_sessions', {
