@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  TextInput,
 } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 import { database } from '../services/database';
+import { MasteryBadge } from '../components/MasteryBadge';
+import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../lib/theme';
 
 const COURSES_QUERY = gql`
   query Courses {
@@ -46,10 +49,10 @@ export default function CoursesScreen() {
   const { t } = useTranslation('courses');
   const [cachedCourses, setCachedCourses] = useState<Course[]>([]);
   const [isShowingCache, setIsShowingCache] = useState(false);
+  const [search, setSearch] = useState('');
 
   const { data, loading, error } = useQuery(COURSES_QUERY);
 
-  // Cache successful results to SQLite
   useEffect(() => {
     if (data?.courses) {
       database.cacheQuery(COURSES_QUERY_STR, {}, data).catch(() => {});
@@ -57,15 +60,14 @@ export default function CoursesScreen() {
     }
   }, [data]);
 
-  // Load from cache when there's an error
   useEffect(() => {
     if (error) {
       database
         .getCachedQuery(COURSES_QUERY_STR, {})
         .then((cached: unknown) => {
-          const data = cached as { courses?: Course[] } | null;
-          if (data?.courses) {
-            setCachedCourses(data.courses);
+          const result = cached as { courses?: Course[] } | null;
+          if (result?.courses) {
+            setCachedCourses(result.courses);
             setIsShowingCache(true);
           }
         })
@@ -73,17 +75,23 @@ export default function CoursesScreen() {
     }
   }, [error]);
 
-  const courses: Course[] = data?.courses ?? cachedCourses;
+  const allCourses: Course[] = data?.courses ?? cachedCourses;
 
-  if (loading && courses.length === 0) {
+  const courses = search.trim()
+    ? allCourses.filter((c) =>
+        c.title.toLowerCase().includes(search.trim().toLowerCase()),
+      )
+    : allCourses;
+
+  if (loading && allCourses.length === 0) {
     return (
       <View style={styles.center}>
-        <Text>{t('loadingCourses')}</Text>
+        <Text testID="courses-loading">{t('loadingCourses')}</Text>
       </View>
     );
   }
 
-  if (error && courses.length === 0) {
+  if (error && allCourses.length === 0) {
     return (
       <View style={styles.center}>
         <Text style={styles.error}>
@@ -97,32 +105,54 @@ export default function CoursesScreen() {
   return (
     <View style={styles.container}>
       {isShowingCache && (
-        <View style={styles.offlineBanner}>
+        <View style={styles.offlineBanner} testID="offline-banner">
           <Text style={styles.offlineBannerText}>{t('showingCachedData')}</Text>
         </View>
       )}
+      <View style={styles.searchRow}>
+        <TextInput
+          testID="courses-search-input"
+          style={styles.searchInput}
+          placeholder={t('searchPlaceholder', { defaultValue: 'Search courses…' })}
+          placeholderTextColor={COLORS.textMuted}
+          value={search}
+          onChangeText={setSearch}
+          returnKeyType="search"
+          clearButtonMode="while-editing"
+        />
+      </View>
       <FlatList
+        testID="courses-list"
         data={courses}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
+            testID={`course-item-${item.id}`}
             style={styles.courseCard}
             onPress={() =>
               navigation.navigate('CourseDetail', { courseId: item.id })
             }
           >
-            <View style={styles.courseHeader}>
-              <Text style={styles.courseTitle}>{item.title}</Text>
-              {!item.isPublished && (
-                <Text style={styles.draftBadge}>{t('draft')}</Text>
-              )}
+            <View style={styles.cardLeftBorder} />
+            <View style={styles.cardContent}>
+              <View style={styles.courseHeader}>
+                <Text style={styles.courseTitle} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                {!item.isPublished && (
+                  <Text style={styles.draftBadge}>{t('draft')}</Text>
+                )}
+              </View>
+              <Text style={styles.courseDescription} numberOfLines={2}>
+                {item.description}
+              </Text>
+              <View style={styles.courseFooter}>
+                <Text style={styles.courseDate}>
+                  {new Date(item.createdAt).toLocaleDateString()}
+                </Text>
+                <MasteryBadge level="none" size="sm" showLabel />
+              </View>
             </View>
-            <Text style={styles.courseDescription} numberOfLines={2}>
-              {item.description}
-            </Text>
-            <Text style={styles.courseDate}>
-              {new Date(item.createdAt).toLocaleDateString()}
-            </Text>
           </TouchableOpacity>
         )}
         contentContainerStyle={styles.listContent}
@@ -139,70 +169,96 @@ export default function CoursesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.bg,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: SPACING.xl,
   },
   offlineBanner: {
     backgroundColor: '#FF9500',
-    padding: 10,
+    padding: SPACING.sm,
     alignItems: 'center',
   },
   offlineBannerText: {
     color: 'white',
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: FONT.sm,
+    fontWeight: FONT.medium,
+  },
+  searchRow: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.bgCard,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  searchInput: {
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    fontSize: FONT.md,
+    color: COLORS.textPrimary,
   },
   listContent: {
-    padding: 16,
+    padding: SPACING.lg,
   },
   courseCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.md,
+    flexDirection: 'row',
+    overflow: 'hidden',
+    ...SHADOW.md,
+  },
+  cardLeftBorder: {
+    width: 4,
+    backgroundColor: COLORS.primary,
+  },
+  cardContent: {
+    flex: 1,
+    padding: SPACING.lg,
   },
   courseHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: SPACING.xs,
   },
   courseTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: FONT.lg,
+    fontWeight: FONT.semibold,
+    color: COLORS.textPrimary,
     flex: 1,
   },
   draftBadge: {
-    fontSize: 12,
-    color: '#999',
-    marginLeft: 8,
+    fontSize: FONT.xs,
+    color: COLORS.textMuted,
+    marginLeft: SPACING.sm,
   },
   courseDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    fontSize: FONT.md,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.sm,
+  },
+  courseFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   courseDate: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: FONT.sm,
+    color: COLORS.textMuted,
   },
   error: {
-    color: 'red',
-    marginBottom: 8,
+    color: COLORS.error,
+    marginBottom: SPACING.sm,
   },
   hint: {
-    color: '#999',
-    fontSize: 14,
+    color: COLORS.textMuted,
+    fontSize: FONT.md,
     textAlign: 'center',
   },
 });

@@ -9,6 +9,10 @@ export default defineConfig({
       'react-native': path.resolve(__dirname, 'src/__mocks__/react-native.ts'),
     },
   },
+  define: {
+    // React Native global — always true in test (enables DEV_MODE mock data)
+    __DEV__: true,
+  },
   test: {
     globals: true,
     environment: 'node',
@@ -19,6 +23,10 @@ export default defineConfig({
       'src/notifications/__tests__/**/*.test.ts',
       'src/auth/__tests__/**/*.test.ts',
       'src/screens/MyBadgesScreen.test.tsx',
+      'src/screens/HomeScreen.test.tsx',
+      'src/screens/CoursesScreen.test.tsx',
+      'src/components/MasteryBadge.test.tsx',
+      'src/lib/theme.test.ts',
     ],
     // useOfflineAnnotations.test.tsx imports @testing-library/react-hooks which
     // is not installed — exclude until the package is added as a dev dependency

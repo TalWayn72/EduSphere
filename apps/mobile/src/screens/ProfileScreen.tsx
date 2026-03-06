@@ -9,6 +9,7 @@ import {
 import { useQuery, gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { COLORS, SPACING, RADIUS, FONT } from '../lib/theme';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 
@@ -128,22 +129,22 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.bg,
   },
   header: {
-    backgroundColor: 'white',
-    padding: 24,
+    backgroundColor: COLORS.bgCard,
+    padding: SPACING.xxl,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: SPACING.lg,
   },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#007AFF',
+    backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   avatarText: {
     fontSize: 32,
@@ -151,63 +152,63 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   loadingText: {
-    fontSize: 16,
-    color: '#999',
+    fontSize: FONT.base,
+    color: COLORS.textMuted,
   },
   name: {
-    fontSize: 24,
+    fontSize: FONT.xxl,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   email: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: FONT.base,
+    color: COLORS.textSecondary,
     marginBottom: 4,
   },
   role: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: FONT.md,
+    color: COLORS.textMuted,
     textTransform: 'capitalize',
   },
   section: {
-    backgroundColor: 'white',
-    marginBottom: 16,
+    backgroundColor: COLORS.bgCard,
+    marginBottom: SPACING.lg,
   },
   sectionTitle: {
-    fontSize: 13,
-    color: '#999',
+    fontSize: FONT.sm,
+    color: COLORS.textMuted,
     textTransform: 'uppercase',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.sm,
   },
   menuItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.border,
   },
   menuItemText: {
-    fontSize: 16,
+    fontSize: FONT.base,
   },
   menuItemChevron: {
     fontSize: 24,
-    color: '#ccc',
+    color: COLORS.textMuted,
   },
   logoutButton: {
     borderBottomWidth: 0,
   },
   logoutText: {
-    fontSize: 16,
+    fontSize: FONT.base,
     color: '#FF3B30',
     fontWeight: '600',
   },
   version: {
     textAlign: 'center',
-    color: '#999',
-    fontSize: 12,
-    padding: 20,
+    color: COLORS.textMuted,
+    fontSize: FONT.sm,
+    padding: SPACING.xl,
   },
 });

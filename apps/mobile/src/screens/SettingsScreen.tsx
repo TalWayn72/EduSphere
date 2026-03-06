@@ -17,6 +17,7 @@ import {
   LOCALE_LABELS,
   type SupportedLocale,
 } from '@edusphere/i18n';
+import { COLORS, SPACING, RADIUS, FONT } from '../lib/theme';
 import { saveMobileLocale } from '../lib/i18n';
 import { useStorageManager } from '../hooks/useStorageManager';
 import { useWifiOnlySetting } from '../hooks/useWifiOnlySetting';
@@ -82,17 +83,17 @@ function StorageSection() {
   if (isLoading || !stats) {
     return (
       <View style={styles.loadingRow}>
-        <ActivityIndicator size="small" color="#2563EB" />
+        <ActivityIndicator size="small" color={COLORS.primary} />
       </View>
     );
   }
 
   const barFill = Math.min(stats.usageRatio, 1);
   const barColor = stats.isOverLimit
-    ? '#DC2626'
+    ? COLORS.error
     : stats.isApproachingLimit
-      ? '#D97706'
-      : '#2563EB';
+      ? COLORS.warning
+      : COLORS.primary;
 
   return (
     <View style={styles.storageSection}>
@@ -140,7 +141,7 @@ function StorageSection() {
         disabled={clearing !== null}
       >
         {clearing === 'cache' ? (
-          <ActivityIndicator size="small" color="#2563EB" />
+          <ActivityIndicator size="small" color={COLORS.primary} />
         ) : null}
         <Text style={styles.actionButtonText}>{t('storage.clearCache')}</Text>
       </TouchableOpacity>
@@ -151,7 +152,7 @@ function StorageSection() {
         disabled={clearing !== null}
       >
         {clearing === 'downloads' ? (
-          <ActivityIndicator size="small" color="#DC2626" />
+          <ActivityIndicator size="small" color={COLORS.error} />
         ) : null}
         <Text style={[styles.actionButtonText, styles.actionButtonTextDanger]}>
           {t('storage.clearDownloads')}
@@ -217,7 +218,7 @@ function DownloadedCoursesSection() {
       </Text>
       {isLoading ? (
         <View style={styles.loadingRow}>
-          <ActivityIndicator size="small" color="#2563EB" />
+          <ActivityIndicator size="small" color={COLORS.primary} />
         </View>
       ) : courses.length === 0 ? (
         <Text style={styles.emptyText}>{t('downloads.noCourses')}</Text>
@@ -325,119 +326,119 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: COLORS.bgCard },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: FONT.xl,
     fontWeight: '600',
-    paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xl,
     paddingBottom: 4,
   },
   sectionTitleSpaced: {
-    marginTop: 12,
+    marginTop: SPACING.md,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: COLORS.border,
   },
   sectionDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    fontSize: FONT.md,
+    color: COLORS.textSecondary,
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.md,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.lg,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: COLORS.border,
   },
-  itemSelected: { backgroundColor: '#EFF6FF' },
-  flag: { fontSize: 24, marginRight: 12 },
+  itemSelected: { backgroundColor: COLORS.primaryLight },
+  flag: { fontSize: 24, marginRight: SPACING.md },
   textContainer: { flex: 1 },
-  nativeLabel: { fontSize: 16, color: '#111827' },
-  selectedText: { color: '#2563EB', fontWeight: '600' },
-  englishLabel: { fontSize: 12, color: '#6B7280', marginTop: 1 },
-  checkmark: { fontSize: 18, color: '#2563EB', fontWeight: 'bold' },
-  loadingRow: { padding: 20, alignItems: 'center' },
-  storageSection: { paddingHorizontal: 16, paddingBottom: 32 },
+  nativeLabel: { fontSize: FONT.base, color: COLORS.textPrimary },
+  selectedText: { color: COLORS.primary, fontWeight: '600' },
+  englishLabel: { fontSize: FONT.sm, color: COLORS.textSecondary, marginTop: 1 },
+  checkmark: { fontSize: 18, color: COLORS.primary, fontWeight: 'bold' },
+  loadingRow: { padding: SPACING.xl, alignItems: 'center' },
+  storageSection: { paddingHorizontal: SPACING.lg, paddingBottom: 32 },
   warningBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FEF2F2',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
   },
   warningBannerYellow: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFBEB',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
   },
-  warningIcon: { fontSize: 18, marginRight: 8 },
-  warningText: { flex: 1, fontSize: 13, color: '#DC2626' },
+  warningIcon: { fontSize: 18, marginRight: SPACING.sm },
+  warningText: { flex: 1, fontSize: 13, color: COLORS.error },
   warningTextYellow: { flex: 1, fontSize: 13, color: '#92400E' },
   barBackground: {
     height: 8,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: COLORS.border,
     borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   barFill: { height: '100%', borderRadius: 4 },
-  usageLabel: { fontSize: 14, color: '#374151', fontVariant: ['tabular-nums'] },
-  usageSubLabel: { fontSize: 12, color: '#9CA3AF', marginBottom: 16 },
+  usageLabel: { fontSize: FONT.md, color: COLORS.textPrimary, fontVariant: ['tabular-nums'] },
+  usageSubLabel: { fontSize: FONT.sm, color: COLORS.textMuted, marginBottom: SPACING.lg },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACING.md,
     marginBottom: 10,
   },
   actionButtonDanger: { borderColor: '#FCA5A5' },
-  actionButtonText: { fontSize: 14, color: '#374151', fontWeight: '500' },
-  actionButtonTextDanger: { color: '#DC2626' },
-  wifiSection: { paddingBottom: 8 },
+  actionButtonText: { fontSize: FONT.md, color: COLORS.textPrimary, fontWeight: '500' },
+  actionButtonTextDanger: { color: COLORS.error },
+  wifiSection: { paddingBottom: SPACING.sm },
   switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: COLORS.border,
   },
-  switchLabel: { fontSize: 15, color: '#111827', flex: 1 },
+  switchLabel: { fontSize: 15, color: COLORS.textPrimary, flex: 1 },
   emptyText: {
-    fontSize: 14,
-    color: '#9CA3AF',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    fontSize: FONT.md,
+    color: COLORS.textMuted,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
   },
   courseRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: COLORS.border,
   },
-  courseInfo: { flex: 1, marginRight: 12 },
-  courseTitle: { fontSize: 15, color: '#111827', fontWeight: '500' },
-  courseMeta: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  courseInfo: { flex: 1, marginRight: SPACING.md },
+  courseTitle: { fontSize: 15, color: COLORS.textPrimary, fontWeight: '500' },
+  courseMeta: { fontSize: FONT.sm, color: COLORS.textSecondary, marginTop: 2 },
   deleteBtn: {
     borderWidth: 1,
     borderColor: '#FCA5A5',
-    borderRadius: 6,
-    paddingHorizontal: 12,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.md,
     paddingVertical: 6,
   },
-  deleteBtnText: { fontSize: 13, color: '#DC2626', fontWeight: '500' },
+  deleteBtnText: { fontSize: 13, color: COLORS.error, fontWeight: '500' },
 });

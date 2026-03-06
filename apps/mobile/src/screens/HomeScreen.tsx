@@ -18,6 +18,7 @@ import {
   MOCK_STATS,
   MOCK_RECENT_COURSES,
 } from '../lib/mock-mobile-data';
+import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../lib/theme';
 
 const HOME_QUERY = gql`
   query HomeData {
@@ -83,18 +84,28 @@ export default function HomeScreen() {
       );
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <View>
+      <View style={styles.header} testID="home-header">
+        <View style={styles.headerLeft}>
           <Text style={styles.greeting}>
             {t('dashboard:welcomeBack', { name: user?.firstName ?? 'Student' })}
           </Text>
           {loading && !DEV_MODE ? (
-            <ActivityIndicator size="small" color="#007AFF" />
+            <ActivityIndicator size="small" color={COLORS.primary} />
           ) : (
             <Text style={styles.userName}>
               {user?.firstName ?? 'Student'} {user?.lastName ?? ''}
             </Text>
           )}
+          <View style={styles.streakRow}>
+            <Text style={styles.streakFlame}>🔥</Text>
+            <Text
+              style={styles.streakCount}
+              testID="streak-value"
+            >
+              {stats.learningStreak}
+            </Text>
+            <Text style={styles.streakLabel}> day streak</Text>
+          </View>
         </View>
         {DEV_MODE && (
           <View style={styles.devBadge}>
@@ -103,59 +114,61 @@ export default function HomeScreen() {
         )}
       </View>
       <Text style={styles.sectionTitle}>{t('dashboard:yourProgress')}</Text>
-      <View style={styles.statsGrid}>
+      <View style={styles.statsGrid} testID="stats-grid">
         <StatCard
           label={t('dashboard:stats.activeCourses')}
           value={stats.activeCourses}
-          color="#007AFF"
+          color={COLORS.primary}
         />
         <StatCard
           label={t('dashboard:stats.learningStreak')}
           value={stats.learningStreak}
           unit={t('dashboard:stats.days')}
-          color="#FF9500"
+          color={COLORS.warning}
         />
         <StatCard
           label={t('dashboard:stats.studyTime')}
           value={Math.round(stats.studyTimeMinutes / 60)}
           unit="hrs"
-          color="#34C759"
+          color={COLORS.success}
         />
         <StatCard
           label={t('dashboard:stats.concepts')}
           value={stats.conceptsMastered}
-          color="#AF52DE"
+          color={COLORS.accent}
         />
       </View>
       <Text style={styles.sectionTitle}>{t('dashboard:continueLearning')}</Text>
-      {recentCourses.map((course) => (
-        <TouchableOpacity
-          key={course.id}
-          style={styles.courseCard}
-          onPress={() =>
-            navigation.navigate('CourseDetail', { courseId: course.id })
-          }
-        >
-          <View style={styles.courseInfo}>
-            <Text style={styles.courseTitle} numberOfLines={1}>
-              {course.title}
-            </Text>
-            <Text style={styles.courseAccessed}>
-              {formatRelativeTime(
-                course.lastAccessed ?? course.lastAccessedAt ?? ''
-              )}
-            </Text>
-          </View>
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[styles.progressFill, { width: `${course.progress}%` }]}
-              />
+      <View testID="continue-learning-list">
+        {recentCourses.map((course) => (
+          <TouchableOpacity
+            key={course.id}
+            style={styles.courseCard}
+            onPress={() =>
+              navigation.navigate('CourseDetail', { courseId: course.id })
+            }
+          >
+            <View style={styles.courseInfo}>
+              <Text style={styles.courseTitle} numberOfLines={1}>
+                {course.title}
+              </Text>
+              <Text style={styles.courseAccessed}>
+                {formatRelativeTime(
+                  course.lastAccessed ?? course.lastAccessedAt ?? ''
+                )}
+              </Text>
             </View>
-            <Text style={styles.progressText}>{course.progress}%</Text>
-          </View>
-        </TouchableOpacity>
-      ))}
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View
+                  style={[styles.progressFill, { width: `${course.progress}%` }]}
+                />
+              </View>
+              <Text style={styles.progressText}>{course.progress}%</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
     </ScrollView>
   );
 }
@@ -171,81 +184,90 @@ function formatRelativeTime(isoString: string): string {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  content: { padding: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { padding: SPACING.lg },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 24,
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
+    marginBottom: SPACING.xxl,
+    backgroundColor: COLORS.bgCard,
+    padding: SPACING.xl,
+    borderRadius: RADIUS.lg,
+    ...SHADOW.md,
   },
-  greeting: { fontSize: 14, color: '#666' },
-  userName: { fontSize: 24, fontWeight: 'bold', color: '#1a1a1a' },
+  headerLeft: { flex: 1 },
+  greeting: { fontSize: FONT.sm, color: COLORS.textSecondary },
+  userName: { fontSize: FONT.xxl, fontWeight: FONT.bold, color: COLORS.textPrimary },
+  streakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.sm,
+  },
+  streakFlame: { fontSize: FONT.lg },
+  streakCount: {
+    fontSize: FONT.base,
+    fontWeight: FONT.semibold,
+    color: COLORS.warning,
+    marginLeft: 4,
+  },
+  streakLabel: { fontSize: FONT.sm, color: COLORS.textSecondary },
   devBadge: {
-    backgroundColor: '#FF9500',
-    borderRadius: 4,
-    paddingHorizontal: 8,
+    backgroundColor: COLORS.warning,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
   },
-  devBadgeText: { color: 'white', fontSize: 11, fontWeight: '700' },
+  devBadgeText: { color: 'white', fontSize: FONT.xs, fontWeight: FONT.bold },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 12,
-    marginTop: 8,
+    fontSize: FONT.lg,
+    fontWeight: FONT.semibold,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.sm,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
+    gap: SPACING.md,
+    marginBottom: SPACING.xxl,
   },
   statCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
     width: '47%',
     borderTopWidth: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    ...SHADOW.sm,
   },
-  statValue: { fontSize: 28, fontWeight: 'bold', marginBottom: 4 },
-  statUnit: { fontSize: 14, fontWeight: 'normal' },
-  statLabel: { fontSize: 13, color: '#666' },
+  statValue: { fontSize: 28, fontWeight: FONT.bold, marginBottom: 4 },
+  statUnit: { fontSize: FONT.md, fontWeight: FONT.regular },
+  statLabel: { fontSize: 13, color: COLORS.textSecondary },
   courseCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: COLORS.bgCard,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    marginBottom: SPACING.sm,
+    borderLeftWidth: 3,
+    borderLeftColor: COLORS.primary,
+    ...SHADOW.sm,
   },
   courseInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: SPACING.sm,
   },
-  courseTitle: { fontSize: 15, fontWeight: '600', flex: 1, marginRight: 8 },
-  courseAccessed: { fontSize: 12, color: '#999' },
-  progressContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  courseTitle: { fontSize: FONT.base, fontWeight: FONT.semibold, flex: 1, marginRight: SPACING.sm },
+  courseAccessed: { fontSize: FONT.sm, color: COLORS.textMuted },
+  progressContainer: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   progressBar: {
     flex: 1,
     height: 6,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: COLORS.border,
     borderRadius: 3,
     overflow: 'hidden',
   },
-  progressFill: { height: '100%', backgroundColor: '#007AFF', borderRadius: 3 },
-  progressText: { fontSize: 12, color: '#666', width: 35, textAlign: 'right' },
+  progressFill: { height: '100%', backgroundColor: COLORS.primary, borderRadius: 3 },
+  progressText: { fontSize: FONT.sm, color: COLORS.textSecondary, width: 35, textAlign: 'right' },
 });

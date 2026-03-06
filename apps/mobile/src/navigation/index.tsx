@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { COLORS } from '../lib/theme';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -65,7 +66,7 @@ function MainTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
+        tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: 'gray',
       })}
     >
