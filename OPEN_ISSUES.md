@@ -7,6 +7,31 @@
 
 ---
 
+## Phase 29 — Payment & Marketplace Completion (Session 28)
+
+**Status:** ✅ Complete
+**Date:** March 2026
+**PRD Gap closed:** §8.4 (P-3) — Stripe checkout flow
+
+### Deliverables
+
+| ID | Feature | Status | Tests |
+|----|---------|--------|-------|
+| T1 | `@stripe/stripe-js` + `@stripe/react-stripe-js` installed in web app | ✅ | — |
+| T2 | `CheckoutPage` — Stripe Elements form, clientSecret from URL, success redirect | ✅ | 8 unit |
+| T3 | `PurchaseCourseButton` — passes `secret+session+course` via URL; removed console.error | ✅ | — |
+| T4 | `/checkout` route added to `router.tsx` | ✅ | route test |
+| T5 | Security: clientSecret never in localStorage, never in DOM text, user-safe error messages | ✅ | security test |
+| T6 | `checkout-flow.spec.ts` — 8 E2E + 2 visual regression screenshots | ✅ | 8 E2E |
+
+### Security Notes (P-3)
+- `clientSecret` lives in URL search params (in-memory), never localStorage
+- User-facing errors: card decline messages shown; raw JS errors never exposed
+- Graceful fallback when `VITE_STRIPE_PUBLISHABLE_KEY` not set
+- Backend `StripeClient` already warns + disables when `STRIPE_SECRET_KEY` absent
+
+---
+
 ## Phase 28 — Live Sessions Completeness, Background Sync, SkillTree Real Data (Session 28)
 
 **Status:** ✅ Complete

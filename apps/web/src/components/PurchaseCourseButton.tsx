@@ -52,16 +52,18 @@ export function PurchaseCourseButton({
         courseId,
       }),
     onSuccess: (data) => {
-      const { paymentIntentId } = data.purchaseCourse;
-      // Redirect to checkout page where Stripe.js renders the payment form.
-      // The clientSecret is passed via URL search params so the checkout page
-      // can initialize Stripe Elements without an additional API call.
-      void navigate(`/checkout?session=${paymentIntentId}`);
+      const { clientSecret, paymentIntentId } = data.purchaseCourse;
+      // Pass clientSecret via URL so CheckoutPage can init Stripe Elements
+      // without an extra API call. secret is NOT stored in localStorage.
+      const params = new URLSearchParams({
+        secret: clientSecret,
+        session: paymentIntentId,
+        course: courseId,
+      });
+      void navigate(`/checkout?${params.toString()}`);
     },
-    onError: (err) => {
-      // Error is surfaced to the user via the button's disabled/error state.
-      // In production, connect to a toast system here.
-      console.error('Purchase failed:', err.message);
+    onError: () => {
+      // Error surfaced via button disabled/error state — no raw message to user
     },
   });
 

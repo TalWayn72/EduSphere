@@ -325,6 +325,9 @@ const LiveSessionDetailPage = lazy(() =>
 const SkillTreePage = lazy(() =>
   import('@/pages/SkillTreePage').then((m) => ({ default: m.SkillTreePage }))
 );
+const CheckoutPage = lazy(() =>
+  import('@/pages/CheckoutPage').then((m) => ({ default: m.CheckoutPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -525,6 +528,11 @@ export const router = createBrowserRouter([
   {
     path: '/marketplace',
     element: guarded(<MarketplacePage />),
+  },
+  {
+    // Stripe checkout — reached from PurchaseCourseButton via ?secret=&session=&course=
+    path: '/checkout',
+    element: guarded(<CheckoutPage />),
   },
   {
     path: '/library',
