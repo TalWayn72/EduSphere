@@ -857,11 +857,13 @@ Task: Implement Core + Content Subgraphs
 
 ### Agent Tracking Table (required when running parallel)
 
-| Agent               | Task                          | Status     |
-| ------------------- | ----------------------------- | ---------- |
-| Agent-1 (Architect) | Building docker-compose.yml   | 🟡 Running |
-| Agent-2 (Schema)    | Generating Drizzle migrations | ⏳ Waiting |
-| Agent-3 (Testing)   | Writing health-check tests    | ✅ Done    |
+**Format:** `Agent-N` = per-task sequence index (temporary). `Division` = one of the 11 Enterprise Divisions (mandatory). `Mission` = specific deliverable for this run (mandatory).
+
+| ID      | Division          | Mission                       | Status     |
+| ------- | ----------------- | ----------------------------- | ---------- |
+| Agent-1 | Architecture      | Building docker-compose.yml   | 🟡 Running |
+| Agent-2 | Database & Data   | Generating Drizzle migrations | ⏳ Waiting |
+| Agent-3 | QA & Validation   | Writing health-check tests    | ✅ Done    |
 
 ### OOM Protection
 
@@ -986,8 +988,8 @@ pnpm audit --audit-level=high
 📊 PROGRESS REPORT — Phase X.Y — [timestamp]
 ═══════════════════════════════════════════════════
 🔵 Active Agents:
-   Agent-1 [Schema]: Generating Drizzle migrations — 80% complete
-   Agent-2 [Testing]: Writing RLS validation tests — running
+   Agent-1 [Database & Data | Migrations]: Generating Drizzle migrations — 80% complete
+   Agent-2 [QA & Validation | RLS Tests]: Writing RLS validation tests — running
 
 ✅ Completed this cycle:
    - All 16 tables created with RLS enabled
