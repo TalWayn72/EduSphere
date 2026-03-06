@@ -130,4 +130,79 @@ export class MediaResolver {
       return [];
     }
   }
+
+  /**
+   * Mutation: initiates a 3D model upload. Returns a presigned PUT URL valid
+   * for 15 minutes along with the new asset ID and storage key.
+   */
+  @Mutation('uploadModel3D')
+  async uploadModel3D(
+    @Args('courseId') courseId: string,
+    @Args('lessonId') lessonId: string,
+    @Args('filename') filename: string,
+    @Args('format') format: string,
+    @Args('contentLength') contentLength: number,
+    @Context() ctx: GraphQLContext
+  ) {
+    const auth = ctx.authContext;
+    if (!auth) throw new UnauthorizedException('Authentication required');
+    const tenantId = auth.tenantId;
+    const userId = auth.userId;
+    if (!tenantId || !userId) {
+      throw new UnauthorizedException('Tenant or user context missing');
+    }
+    this.logger.log(
+      `uploadModel3D: tenant=${tenantId} course=${courseId} format=${format} file=${filename}`
+    );
+    return this.mediaService.createModel3DUpload(
+      courseId,
+      lessonId,
+      filename,
+      format,
+      contentLength,
+      tenantId,
+      userId
+    );
+  }
+
+  /**
+   * Field resolver: maps 3D model DB fields to the Model3DInfo GraphQL type.
+   * Returns null for non-MODEL_3D assets.
+   */
+  @ResolveField('model3d')
+  resolveModel3d(
+    @Parent()
+    parent: {
+      media_type?: string;
+      model_format?: string | null;
+      model_animations?: unknown;
+      poly_count?: number | null;
+    }
+  ): {
+    format: string;
+    polyCount: number | null;
+    animations: { name: string; duration: number }[];
+  } | null {
+    if (parent.media_type !== 'MODEL_3D' || !parent.model_format) {
+      return null;
+    }
+
+    const rawAnimations = parent.model_animations;
+    const animations: { name: string; duration: number }[] = Array.isArray(
+      rawAnimations
+    )
+      ? (rawAnimations as { name: string; duration: number }[]).filter(
+          (a) =>
+            a &&
+            typeof a.name === 'string' &&
+            typeof a.duration === 'number'
+        )
+      : [];
+
+    return {
+      format: parent.model_format,
+      polyCount: parent.poly_count ?? null,
+      animations,
+    };
+  }
 }

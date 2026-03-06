@@ -84,7 +84,7 @@ export const media_assets = pgTable(
     }),
     title: text('title').notNull(),
     media_type: text('media_type', {
-      enum: ['VIDEO', 'AUDIO', 'DOCUMENT'],
+      enum: ['VIDEO', 'AUDIO', 'DOCUMENT', 'MODEL_3D'],
     }).notNull(),
     file_url: text('file_url').notNull(),
     /** MinIO object key for the HLS master manifest (.m3u8). Null until HLS transcode completes. */
@@ -102,6 +102,12 @@ export const media_assets = pgTable(
       .notNull()
       .default('PENDING'),
     metadata: jsonb('metadata').notNull().default({}),
+    /** 3D model format: 'gltf' | 'glb' | 'obj' | 'fbx'. Null for non-MODEL_3D assets. */
+    model_format: text('model_format'),
+    /** Animation clips for 3D models: [{name, duration}]. */
+    model_animations: jsonb('model_animations').default([]),
+    /** Triangle count for LOD hints (3D models only). */
+    poly_count: integer('poly_count'),
     ...timestamps,
     ...softDelete,
   },

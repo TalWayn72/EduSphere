@@ -5,6 +5,35 @@ type PresignedUploadUrl {
 }
 
 """
+Upload receipt returned by uploadModel3D mutation.
+"""
+type MediaAssetUpload {
+  assetId: ID!
+  uploadUrl: String!
+  key: String!
+}
+
+"""
+3D model metadata — populated only when assetType is MODEL_3D.
+"""
+type Model3DInfo {
+  """ Format identifier: gltf | glb | obj | fbx """
+  format: String!
+  """ Triangle count used for LOD hints. Null until poly_count is set. """
+  polyCount: Int
+  """ Animation clips embedded in the 3D file. """
+  animations: [ModelAnimation!]!
+}
+
+"""
+A single animation clip embedded in a 3D model file.
+"""
+type ModelAnimation {
+  name: String!
+  duration: Float!
+}
+
+"""
 An available subtitle track for a media asset.
 """
 type SubtitleTrack {
@@ -37,6 +66,10 @@ type MediaAsset {
   Populated after AI subtitle translation completes for one or more target languages.
   """
   subtitleTracks: [SubtitleTrack!]!
+  """
+  3D model metadata. Non-null only when this asset is a MODEL_3D asset.
+  """
+  model3d: Model3DInfo
 }
 
 enum MediaStatus {
@@ -44,6 +77,17 @@ enum MediaStatus {
   PROCESSING
   READY
   ERROR
+}
+
+"""
+Type of media asset stored in the system.
+"""
+enum AssetType {
+  VIDEO
+  AUDIO
+  IMAGE
+  DOCUMENT
+  MODEL_3D
 }
 
 extend type Query {
@@ -62,4 +106,16 @@ extend type Mutation {
   ): MediaAsset! @authenticated
 
   updateMediaAltText(mediaId: ID!, altText: String!): MediaAsset! @authenticated
+
+  """
+  Initiates a 3D model upload. Returns a presigned PUT URL valid for 15 minutes.
+  Supported formats: gltf, glb, obj, fbx.
+  """
+  uploadModel3D(
+    courseId: ID!
+    lessonId: ID!
+    filename: String!
+    format: String!
+    contentLength: Int!
+  ): MediaAssetUpload! @authenticated @requiresScopes(scopes: ["content:write"])
 }

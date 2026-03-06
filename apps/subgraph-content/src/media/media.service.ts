@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  BadRequestException,
   OnModuleDestroy,
   NotFoundException,
 } from '@nestjs/common';
@@ -36,7 +37,19 @@ interface MediaAssetResult {
   hlsManifestUrl: string | null;
   captionsUrl: string | null;
   altText: string | null;
+  model_format?: string | null;
+  model_animations?: unknown;
+  poly_count?: number | null;
 }
+
+interface Model3DUploadResult {
+  assetId: string;
+  uploadUrl: string;
+  key: string;
+}
+
+const VALID_MODEL_FORMATS = ['gltf', 'glb', 'obj', 'fbx'] as const;
+type ModelFormat = (typeof VALID_MODEL_FORMATS)[number];
 
 @Injectable()
 export class MediaService implements OnModuleDestroy {
@@ -295,6 +308,85 @@ export class MediaService implements OnModuleDestroy {
     return tracks;
   }
 
+  /**
+   * Creates a presigned MinIO PUT URL for a 3D model file and inserts a
+   * `media_assets` row with `media_type = 'MODEL_3D'`.
+   *
+   * Supported formats: gltf | glb | obj | fbx.
+   * Returns the new asset ID, presigned upload URL, and storage key.
+   */
+  async createModel3DUpload(
+    courseId: string,
+    lessonId: string,
+    filename: string,
+    format: string,
+    contentLength: number,
+    tenantId: string,
+    userId: string
+  ): Promise<Model3DUploadResult> {
+    const normalizedFormat = format.toLowerCase() as ModelFormat;
+    if (!VALID_MODEL_FORMATS.includes(normalizedFormat)) {
+      throw new BadRequestException(
+        `Unsupported 3D model format "${format}". Allowed: ${VALID_MODEL_FORMATS.join(', ')}`
+      );
+    }
+
+    const fileId = randomUUID();
+    const sanitizedName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const key = `${tenantId}/${courseId}/${fileId}-${sanitizedName}`;
+    const contentType = this.contentTypeForModelFormat(normalizedFormat);
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+      ContentType: contentType,
+      ContentLength: contentLength,
+    });
+
+    let uploadUrl: string;
+    try {
+      uploadUrl = await getSignedUrl(this.s3, command, {
+        expiresIn: PRESIGNED_URL_EXPIRY_SECONDS,
+      });
+    } catch (err) {
+      this.logger.error(
+        `createModel3DUpload: failed to generate presigned URL for key=${key}`,
+        err
+      );
+      throw new InternalServerErrorException(
+        'Failed to generate 3D model upload URL'
+      );
+    }
+
+    const uuidRe =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const resolvedCourseId = uuidRe.test(courseId) ? courseId : null;
+    const resolvedModuleId = uuidRe.test(lessonId) ? lessonId : null;
+
+    const [asset] = await this.db
+      .insert(schema.media_assets)
+      .values({
+        tenant_id: tenantId,
+        course_id: resolvedCourseId,
+        module_id: resolvedModuleId,
+        title: sanitizedName,
+        media_type: 'MODEL_3D',
+        file_url: key,
+        transcription_status: 'PENDING',
+        model_format: normalizedFormat,
+        model_animations: [],
+        metadata: { uploadedById: userId, contentType },
+      })
+      .returning();
+
+    const assetId = asset?.id ?? '';
+    this.logger.log(
+      `createModel3DUpload: assetId=${assetId} format=${normalizedFormat} course=${courseId} tenant=${tenantId}`
+    );
+
+    return { assetId, uploadUrl, key };
+  }
+
   private async publishMediaUploaded(payload: {
     assetId: string;
     fileKey: string;
@@ -348,9 +440,27 @@ export class MediaService implements OnModuleDestroy {
     return mimeMap[ext as keyof typeof mimeMap] ?? 'application/octet-stream';
   }
 
-  private detectMediaType(contentType: string): 'VIDEO' | 'AUDIO' | 'DOCUMENT' {
+  private detectMediaType(
+    contentType: string
+  ): 'VIDEO' | 'AUDIO' | 'DOCUMENT' | 'MODEL_3D' {
     if (contentType.startsWith('video/')) return 'VIDEO';
     if (contentType.startsWith('audio/')) return 'AUDIO';
+    if (
+      contentType === 'model/gltf+json' ||
+      contentType === 'model/gltf-binary' ||
+      contentType === 'model/obj' ||
+      contentType === 'application/octet-stream-fbx'
+    )
+      return 'MODEL_3D';
     return 'DOCUMENT';
+  }
+
+  private contentTypeForModelFormat(format: ModelFormat): string {
+    switch (format) {
+      case 'gltf': return 'model/gltf+json';
+      case 'glb':  return 'model/gltf-binary';
+      case 'obj':  return 'model/obj';
+      case 'fbx':  return 'application/octet-stream';
+    }
   }
 }

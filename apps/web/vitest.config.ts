@@ -8,6 +8,11 @@ import path from 'path';
 // the aliases let Vitest resolve the module path without throwing
 // "Failed to resolve import".
 const tiptapStub = path.resolve(__dirname, './src/test/stubs/tiptap-stub.ts');
+// Three.js stubs — package is not installed; stubs allow Vite import-analysis
+// to resolve the paths; vi.mock() replaces the exports at test runtime.
+const threeStub = path.resolve(__dirname, './src/test/stubs/three-stub.ts');
+const threeGltfStub = path.resolve(__dirname, './src/test/stubs/three-gltf-stub.ts');
+const threeOrbitStub = path.resolve(__dirname, './src/test/stubs/three-orbit-stub.ts');
 // Each @tiptap/pm/* package and @tiptap/core needs its own distinct stub file.
 // Vitest uses the resolved file path as the module-cache key, so if multiple
 // packages alias to the same file, vi.mock() calls overwrite each other
@@ -35,41 +40,47 @@ export default defineConfig({
     'import.meta.env.VITE_DEV_MODE': '"true"',
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, './src') },
       // Tiptap extension stubs — packages exist in pnpm virtual store but
       // are not symlinked into apps/web/node_modules. vi.mock() intercepts
       // these in tests; the alias just provides a resolvable path.
-      '@tiptap/extension-code-block-lowlight': tiptapStub,
-      '@tiptap/extension-collaboration': tiptapStub,
-      '@tiptap/extension-collaboration-cursor': tiptapStub,
-      '@tiptap/extension-mathematics': tiptapStub,
-      '@tiptap/extension-mention': tiptapStub,
-      '@tiptap/extension-placeholder': tiptapStub,
-      '@tiptap/extension-table': tiptapStub,
-      '@tiptap/extension-table-row': tiptapStub,
-      '@tiptap/extension-table-cell': tiptapStub,
-      '@tiptap/extension-table-header': tiptapStub,
-      '@tiptap/extension-task-list': tiptapStub,
-      '@tiptap/extension-task-item': tiptapStub,
-      '@tiptap/extension-image': tiptapStub,
-      '@tiptap/react': tiptapStub,
-      '@tiptap/starter-kit': tiptapStub,
-      lowlight: tiptapStub,
-      '@hocuspocus/provider': tiptapStub,
+      { find: '@tiptap/extension-code-block-lowlight', replacement: tiptapStub },
+      { find: '@tiptap/extension-collaboration', replacement: tiptapStub },
+      { find: '@tiptap/extension-collaboration-cursor', replacement: tiptapStub },
+      { find: '@tiptap/extension-mathematics', replacement: tiptapStub },
+      { find: '@tiptap/extension-mention', replacement: tiptapStub },
+      { find: '@tiptap/extension-placeholder', replacement: tiptapStub },
+      { find: '@tiptap/extension-table', replacement: tiptapStub },
+      { find: '@tiptap/extension-table-row', replacement: tiptapStub },
+      { find: '@tiptap/extension-table-cell', replacement: tiptapStub },
+      { find: '@tiptap/extension-table-header', replacement: tiptapStub },
+      { find: '@tiptap/extension-task-list', replacement: tiptapStub },
+      { find: '@tiptap/extension-task-item', replacement: tiptapStub },
+      { find: '@tiptap/extension-image', replacement: tiptapStub },
+      { find: '@tiptap/react', replacement: tiptapStub },
+      { find: '@tiptap/starter-kit', replacement: tiptapStub },
+      { find: 'lowlight', replacement: tiptapStub },
+      { find: '@hocuspocus/provider', replacement: tiptapStub },
       // CSS imports from katex — not needed in jsdom tests
-      'katex/dist/katex.min.css': tiptapStub,
+      { find: 'katex/dist/katex.min.css', replacement: tiptapStub },
       // Each ProseMirror / Tiptap-core package gets a dedicated stub file so that
       // Vitest assigns each a separate module-cache slot.  If multiple packages
       // alias to the same file, vi.mock() calls for each share one slot and
       // overwrite each other (last writer wins).
-      '@tiptap/core': tiptapCoreStub,
-      '@tiptap/pm/state': tiptapPmStateStub,
-      '@tiptap/pm/view': tiptapPmViewStub,
-      '@tiptap/pm/model': tiptapPmModelStub,
+      { find: '@tiptap/core', replacement: tiptapCoreStub },
+      { find: '@tiptap/pm/state', replacement: tiptapPmStateStub },
+      { find: '@tiptap/pm/view', replacement: tiptapPmViewStub },
+      { find: '@tiptap/pm/model', replacement: tiptapPmModelStub },
       // react-resizable-panels — not testable in jsdom, stub for UI component tests
-      'react-resizable-panels': tiptapStub,
-    },
+      { find: 'react-resizable-panels', replacement: tiptapStub },
+      // Three.js — not installed; stubs allow Vite import-analysis to pass.
+      // Subpath entries use regex `find` and MUST be listed before the root 'three'
+      // entry, otherwise 'three' prefix-matches subpaths first.
+      { find: /^three\/examples\/jsm\/loaders\/GLTFLoader\.js$/, replacement: threeGltfStub },
+      { find: /^three\/examples\/jsm\/controls\/OrbitControls\.js$/, replacement: threeOrbitStub },
+      { find: /^three$/, replacement: threeStub },
+    ],
   },
   test: {
     globals: true,
@@ -110,6 +121,8 @@ export default defineConfig({
         // Video/media components require HTMLVideoElement not available in jsdom
         'src/components/VideoPlayer.tsx',
         'src/components/VideoPlayerCore.tsx',
+        // Model3DViewer — WebGL renderer not available in jsdom; logic tested via unit tests
+        'src/components/Model3DViewer.tsx',
         'src/components/VideoProgressMarkers.tsx',
         'src/components/TranscriptPanel.tsx',
         // Storybook story files — not production logic
