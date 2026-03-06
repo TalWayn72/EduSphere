@@ -1,9 +1,11 @@
 /**
  * AssessmentForm — F-030: 360° Multi-Rater Assessments
  * Rater submits feedback on all rubric criteria using star ratings (1-5).
+ * Phase 33: supports optional proctoringEnabled mode (PRD §7.2 G-4).
  */
 import React, { useState } from 'react';
 import { useMutation } from 'urql';
+import { ProctoringOverlay } from '@/components/ProctoringOverlay';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +22,10 @@ interface Props {
   raterRole: 'SELF' | 'PEER' | 'MANAGER' | 'DIRECT_REPORT';
   criteria: Criteria[];
   onSubmitted?: () => void;
+  /** When true, renders ProctoringOverlay for non-instructor/admin users */
+  proctoringEnabled?: boolean;
+  /** assessmentId required when proctoringEnabled=true */
+  assessmentId?: string;
 }
 
 interface StarRatingProps {
@@ -64,6 +70,8 @@ export function AssessmentForm({
   raterRole,
   criteria,
   onSubmitted,
+  proctoringEnabled = false,
+  assessmentId,
 }: Props) {
   const [scores, setScores] = useState<Record<string, number>>({});
   const [narrative, setNarrative] = useState('');
@@ -97,6 +105,9 @@ export function AssessmentForm({
     }
   }
 
+  const showProctoring =
+    proctoringEnabled && assessmentId && raterRole !== 'MANAGER' && raterRole !== 'SELF';
+
   if (submitted) {
     return (
       <Card>
@@ -110,7 +121,13 @@ export function AssessmentForm({
   }
 
   return (
-    <Card>
+    <>
+      {showProctoring && (
+        <div data-testid="proctoring-mode-indicator">
+          <ProctoringOverlay assessmentId={assessmentId} />
+        </div>
+      )}
+      <Card>
       <CardHeader>
         <CardTitle>Submit Your Feedback</CardTitle>
         <p className="text-sm text-muted-foreground">
@@ -148,6 +165,7 @@ export function AssessmentForm({
           Submit Feedback
         </Button>
       </CardContent>
-    </Card>
+      </Card>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import { AgentModule } from './agent/agent.module';
 import { RoleplayModule } from './roleplay/roleplay.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { LiveSessionsModule } from './live-sessions/live-sessions.module';
+import { ProctoringModule } from './proctoring/proctoring.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
@@ -33,6 +34,7 @@ import { authMiddleware } from './auth/auth.middleware';
     AgentModule,
     RoleplayModule,
     LiveSessionsModule,
+    ProctoringModule,
   ],
 })
 export class AppModule {}

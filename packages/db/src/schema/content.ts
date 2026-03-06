@@ -161,3 +161,27 @@ export type Transcript = typeof transcripts.$inferSelect;
 export type NewTranscript = typeof transcripts.$inferInsert;
 export type TranscriptSegment = typeof transcript_segments.$inferSelect;
 export type NewTranscriptSegment = typeof transcript_segments.$inferInsert;
+
+// Proctoring Sessions (PRD §7.2 G-4 — Remote Proctoring)
+export const proctoring_sessions = pgTable(
+  'proctoring_sessions',
+  {
+    id: pk(),
+    tenant_id: tenantId(),
+    assessment_id: uuid('assessment_id').notNull(),
+    user_id: uuid('user_id').notNull(),
+    status: text('status').notNull().default('PENDING'),
+    started_at: timestamp('started_at', { withTimezone: true }),
+    ended_at: timestamp('ended_at', { withTimezone: true }),
+    flags: jsonb('flags').default([]),
+    recording_key: text('recording_key'),
+    ...timestamps,
+  },
+  (t) => [
+    index('idx_proctoring_sessions_assessment').on(t.assessment_id),
+    index('idx_proctoring_sessions_tenant').on(t.tenant_id),
+  ]
+);
+
+export type ProctoringSession = typeof proctoring_sessions.$inferSelect;
+export type NewProctoringSession = typeof proctoring_sessions.$inferInsert;

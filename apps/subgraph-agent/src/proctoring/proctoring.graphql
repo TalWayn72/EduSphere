@@ -1,0 +1,49 @@
+"""
+A flag event captured during a proctored assessment session.
+"""
+type ProctoringFlag {
+  type: ProctoringFlagType!
+  timestamp: String!
+  detail: String
+}
+
+enum ProctoringFlagType {
+  TAB_SWITCH
+  FACE_NOT_DETECTED
+  MULTIPLE_FACES
+  GAZE_AWAY
+  COPY_PASTE
+}
+
+type ProctoringSession {
+  id: ID!
+  assessmentId: ID!
+  userId: ID!
+  status: ProctoringSessionStatus!
+  startedAt: String
+  endedAt: String
+  flags: [ProctoringFlag!]!
+  flagCount: Int!
+}
+
+enum ProctoringSessionStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  FLAGGED
+}
+
+extend type Mutation {
+  startProctoringSession(assessmentId: ID!): ProctoringSession! @authenticated
+  flagProctoringEvent(
+    sessionId: ID!
+    type: ProctoringFlagType!
+    detail: String
+  ): ProctoringSession! @authenticated
+  endProctoringSession(sessionId: ID!): ProctoringSession! @authenticated
+}
+
+extend type Query {
+  proctoringSession(sessionId: ID!): ProctoringSession @authenticated
+  proctoringReport(assessmentId: ID!): [ProctoringSession!]! @authenticated
+}
