@@ -171,3 +171,162 @@ describe('DashboardPage', () => {
     expect(body).not.toMatch(/\[object/);
   });
 });
+
+// ── Real data integration tests ───────────────────────────────────────────────
+
+describe('DashboardPage — real data integration', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('shows enrolled count from real query data when query succeeds', async () => {
+    // Mock a successful enrollments response with 2 enrollments
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: {
+          myEnrollments: [
+            { id: 'e-1', status: 'IN_PROGRESS' },
+            { id: 'e-2', status: 'COMPLETED' },
+          ],
+        },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+
+    renderDashboard();
+    // With 2 enrollments (not the mock default of 3), count should be 2
+    expect(screen.getByText(/2 in progress/i)).toBeInTheDocument();
+  });
+
+  it('shows completed count derived from real enrollment data', async () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: {
+          myEnrollments: [
+            { id: 'e-1', status: 'COMPLETED' },
+            { id: 'e-2', status: 'COMPLETED' },
+            { id: 'e-3', status: 'IN_PROGRESS' },
+          ],
+        },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+
+    renderDashboard();
+    // 2 COMPLETED out of 3 total; the count widget shows "2 completed"
+    expect(screen.getByText(/2 completed/i)).toBeInTheDocument();
+  });
+
+  it('falls back to MOCK_IN_PROGRESS length (3) when query errors', async () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: new Error('Network error'),
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+
+    renderDashboard();
+    // MOCK_IN_PROGRESS has 3 items — fallback "3 in progress" shown
+    expect(screen.getByText(/3 in progress/i)).toBeInTheDocument();
+    // Mock courses are still shown (fallback)
+    expect(screen.getByText('Introduction to Talmud Study')).toBeInTheDocument();
+  });
+
+  it('shows loading state without crashing during fetch', async () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: undefined,
+        fetching: true,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+
+    renderDashboard();
+    // Component should NOT crash during loading
+    expect(screen.getByTestId('layout')).toBeInTheDocument();
+    // Mock data is still displayed (component doesn't show skeleton — uses mock fallback)
+    expect(screen.getByTestId('continue-learning-section')).toBeInTheDocument();
+  });
+
+  it('handles empty enrollments array without crashing', async () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { myEnrollments: [] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+
+    renderDashboard();
+    // 0 enrollments → "0 in progress", 0 completed
+    expect(screen.getByText(/0 in progress/i)).toBeInTheDocument();
+    expect(screen.getByText(/0 completed/i)).toBeInTheDocument();
+    // No crash
+    expect(screen.getByTestId('layout')).toBeInTheDocument();
+  });
+
+  it('does not show mock card titles when real data overrides counts', async () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: { myEnrollments: [{ id: 'e-99', status: 'IN_PROGRESS' }] },
+        fetching: false,
+        error: undefined,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+
+    renderDashboard();
+    // The count stat uses real data (1 enrolled)
+    expect(screen.getByText(/1 in progress/i)).toBeInTheDocument();
+    // NOTE: course cards themselves still use MOCK_IN_PROGRESS until
+    // the myEnrollments resolver returns courseTitle + progress fields.
+    // This is intentional per the TODO comment in DashboardPage.tsx.
+    expect(screen.getByTestId('continue-learning-section')).toBeInTheDocument();
+  });
+
+  it('page does not display raw GraphQL error messages to user', async () => {
+    const { useQuery } = await import('urql');
+    vi.mocked(useQuery).mockReturnValue([
+      {
+        data: undefined,
+        fetching: false,
+        error: { message: 'Cannot query field "preferences" on type "User"' } as Error,
+        stale: false,
+        hasNext: false,
+      },
+      vi.fn(),
+    ] as never);
+
+    renderDashboard();
+    const body = document.body.textContent ?? '';
+    // Raw GraphQL schema errors must NOT be shown to users
+    expect(body).not.toContain('Cannot query field');
+    expect(body).not.toContain('on type "User"');
+  });
+});

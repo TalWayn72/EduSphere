@@ -3,6 +3,15 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AdminDashboardPage } from './AdminDashboardPage';
 
+// Mock AdminActivityFeed so the dashboard test stays isolated
+vi.mock('@/components/AdminActivityFeed', () => ({
+  AdminActivityFeed: ({ loading }: { loading?: boolean }) => (
+    <div data-testid="admin-activity-feed-mock">
+      {loading ? 'loading...' : 'Recent admin activity will appear here.'}
+    </div>
+  ),
+}));
+
 // Mock urql
 vi.mock('urql', () => ({
   gql: (strings: TemplateStringsArray, ...values: unknown[]) =>

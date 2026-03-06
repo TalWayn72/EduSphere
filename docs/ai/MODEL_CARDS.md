@@ -1,7 +1,7 @@
 # EduSphere AI Model Cards
 
 <!-- EU AI Act Art.53 — GPAI Model Documentation Requirements -->
-<!-- Last Updated: 2026-02-22 -->
+<!-- Last Updated: 2026-02-24 -->
 
 ## Overview
 
@@ -28,7 +28,7 @@ transparency information about the AI models used, as required by the EU AI Act 
 - **Purpose:** Generates questions and evaluates student answers
 - **Model (Development):** `ollama/llama3.2`
 - **Model (Production):** `openai/gpt-4o` (higher accuracy for evaluation)
-- **High-Risk Classification:** ⚠️ HIGH-RISK when quiz impacts course grade
+- **High-Risk Classification:** HIGH-RISK when quiz impacts course grade
 - **Human Oversight:** REQUIRED for grade-impacting assessments (instructor review within 24h)
 - **Known Limitations:** May not detect all forms of correct reasoning in free-text answers
 
@@ -53,7 +53,7 @@ transparency information about the AI models used, as required by the EU AI Act 
 - **Purpose:** Personalized learning path recommendations
 - **Model (Development):** `ollama/llama3.2`
 - **Model (Production):** `openai/gpt-4o`
-- **High-Risk Classification:** ⚠️ MEDIUM-RISK when recommendations affect course enrollment
+- **High-Risk Classification:** MEDIUM-RISK when recommendations affect course enrollment
 - **Human Oversight:** Instructor approval required for enrollment recommendations
 
 ---
@@ -69,8 +69,15 @@ transparency information about the AI models used, as required by the EU AI Act 
 
 ## Opt-Out
 
-Users can opt out of AI features at any time via Settings → Privacy → AI Preferences.
+Users can opt-out of AI features at any time via Settings → Privacy → AI Preferences.
 Specific agent types can be disabled independently.
+Opt-out requests are processed within 72 hours and are covered by GDPR Art.21 (right to object).
+
+## Human Oversight
+
+All high-risk AI decisions (grade-impacting quizzes, enrollment recommendations) require
+human oversight by instructors before taking effect. Users can appeal AI decisions at any time
+by contacting their instructor or the platform administrators.
 
 ## Contact
 

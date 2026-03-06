@@ -1,85 +1,85 @@
-# EduSphere AI Model Cards
-
-<!-- EU AI Act Art.53 — GPAI Model Documentation Requirements -->
-<!-- Last Updated: 2026-02-24 -->
+# AI Model Cards — EU AI Act Art.53 Compliance
 
 ## Overview
 
-EduSphere uses AI agents powered by large language models (LLMs). This document provides
-transparency information about the AI models used, as required by the EU AI Act (Art.50, Art.53).
+This document provides model cards for all AI agents and models used by EduSphere,
+in accordance with EU AI Act Art.50 and Art.53 transparency requirements.
 
 ---
 
-## Agent Types
+## 1. Chavruta Debate Agent
 
-### CHAVRUTA Agent
-
-- **Purpose:** Socratic dialogue — asks questions to guide student understanding
-- **Model (Development):** `ollama/llama3.2` (local, air-gapped)
-- **Model (Production):** `openai/gpt-4o-mini` or `anthropic/claude-haiku-4-5`
-- **High-Risk Classification:** Not high-risk (advisory/tutoring, no grade impact)
-- **Data Retention:** Conversation history purged after 90 days
-- **Human Oversight:** Not required unless student flags response
-- **Known Limitations:** May produce factually incorrect information; instructors should review flagged responses
-- **Bias Considerations:** LLM training data may underrepresent non-English educational contexts
-
-### QUIZ_MASTER Agent
-
-- **Purpose:** Generates questions and evaluates student answers
-- **Model (Development):** `ollama/llama3.2`
-- **Model (Production):** `openai/gpt-4o` (higher accuracy for evaluation)
-- **High-Risk Classification:** ⚠️ HIGH-RISK when quiz impacts course grade
-- **Human Oversight:** REQUIRED for grade-impacting assessments (instructor review within 24h)
-- **Known Limitations:** May not detect all forms of correct reasoning in free-text answers
-
-### SUMMARIZER Agent
-
-- **Purpose:** Generates summaries of course content and discussions
-- **Model (Development):** `ollama/llama3.2`
-- **Model (Production):** `openai/gpt-4o-mini`
-- **High-Risk Classification:** Not high-risk
-- **Human Oversight:** Not required
-
-### DEBATE Agent
-
-- **Purpose:** Presents multiple perspectives on a topic for critical thinking
-- **Model (Development):** `ollama/llama3.2`
-- **Model (Production):** `anthropic/claude-sonnet-4-6`
-- **High-Risk Classification:** Not high-risk
-- **Known Limitations:** Perspectives generated may not represent all viewpoints fairly
-
-### TUTOR Agent
-
-- **Purpose:** Personalized learning path recommendations
-- **Model (Development):** `ollama/llama3.2`
-- **Model (Production):** `openai/gpt-4o`
-- **High-Risk Classification:** ⚠️ MEDIUM-RISK when recommendations affect course enrollment
-- **Human Oversight:** Instructor approval required for enrollment recommendations
+| Field | Value |
+|-------|-------|
+| **Agent Type** | Conversational AI Agent (LangGraph.js state machine) |
+| **Purpose** | Socratic debate facilitation for educational content |
+| **Risk Classification** | High-Risk (educational AI system per EU AI Act Annex III) |
+| **Human Oversight** | Instructor can pause/terminate any agent session; all outputs logged |
+| **Underlying Models** | Ollama (dev): llama3.2 / OpenAI gpt-4o (prod) / Anthropic claude-3-5-sonnet (prod) |
+| **Data Retention** | Agent session logs: 90 days (configurable per tenant); embeddings: lifetime of course |
+| **Opt-Out** | Users may opt out of AI-assisted sessions at any time; instructors can disable per course |
 
 ---
 
-## Data Processing
+## 2. HybridRAG Knowledge Graph Agent
 
-| Data Type         | Sent to External LLM?        | Retention |
-| ----------------- | ---------------------------- | --------- |
-| Student questions | Yes (with consent)           | 90 days   |
-| Student answers   | Yes (with consent)           | 90 days   |
-| PII (email, name) | No — scrubbed before sending | N/A       |
-| IP addresses      | No                           | N/A       |
+| Field | Value |
+|-------|-------|
+| **Agent Type** | Retrieval-Augmented Generation Agent |
+| **Purpose** | Semantic search over course content using pgvector + Apache AGE |
+| **Risk Classification** | High-Risk (educational recommendation system) |
+| **Human Oversight** | All retrieved context is auditable; instructors can flag incorrect answers |
+| **Underlying Models** | nomic-embed-text (dev) / text-embedding-3-small (prod) |
+| **Data Retention** | Embeddings retained for course lifetime; query logs: 30 days |
+| **Opt-Out** | Students may opt out of personalized recommendations |
 
-## Opt-Out
+---
 
-Users can opt-out of AI features at any time via Settings → Privacy → AI Preferences.
-Specific agent types can be disabled independently.
-Opt-out requests are processed within 72 hours and are covered by GDPR Art.21 (right to object).
+## 3. Assessment & Quiz Agent
 
-## Human Oversight
+| Field | Value |
+|-------|-------|
+| **Agent Type** | Automated assessment agent |
+| **Purpose** | Generate and grade quiz questions based on learning objectives |
+| **Risk Classification** | High-Risk (automated scoring with educational consequence) |
+| **Human Oversight** | All automated grades are reviewable and overridable by instructors |
+| **Underlying Models** | OpenAI gpt-4o / Anthropic claude-3-5-sonnet (prod, consent-gated) |
+| **Data Retention** | Assessment results: retained per GDPR data retention policy (3 years academic) |
+| **Opt-Out** | Students may request human grading review for any automated assessment |
 
-All high-risk AI decisions (grade-impacting quizzes, enrollment recommendations) require
-human oversight by instructors before taking effect. Users can appeal AI decisions at any time
-by contacting their instructor or the platform administrators.
+---
 
-## Contact
+## EU AI Act Compliance Statement
 
-For questions about AI use: privacy@edusphere.io
-For EU AI Act inquiries: dpo@edusphere.io
+- **Art.50 Transparency:** Users are informed when interacting with an AI agent via visible UI indicator.
+- **Art.53 Documentation:** This MODEL_CARDS.md constitutes the technical documentation per Art.53(1).
+- **High-Risk Classification:** EduSphere AI systems that produce educational assessments fall under Annex III category 5 (education and vocational training).
+- **Human Oversight:** Per Art.14, all high-risk AI outputs include instructor override capability.
+- **GDPR Alignment:** Opt-Out mechanisms comply with GDPR Art.21 (right to object to automated processing).
+- **Third-Party LLM Consent:** External model calls (OpenAI, Anthropic) require `THIRD_PARTY_LLM` consent flag per SI-10.
+
+---
+
+## Data Retention Summary
+
+| Data Type | Retention Period | Basis |
+|-----------|-----------------|-------|
+| Agent conversation logs | 90 days | Operational necessity |
+| Embeddings (course content) | Course lifetime | Educational contract |
+| Assessment results | 3 years | Academic records obligation |
+| Query logs | 30 days | Security monitoring |
+
+---
+
+## Opt-Out Procedures
+
+Users may opt out of AI features by:
+1. Navigating to Account Settings > AI Preferences
+2. Toggling "AI-Assisted Learning" to off
+3. Requesting human grading via the assessment review form
+
+Instructors may disable AI features at the course level via Course Settings > AI Configuration.
+
+---
+
+*Last Updated: March 2026 | Maintained by: EduSphere Security Team*

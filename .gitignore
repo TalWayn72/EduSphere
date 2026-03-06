@@ -113,6 +113,10 @@ coverage_result*.txt
 nul
 apps/web/nul
 
+# Root artifact enforcement (PNGs, TXTs in root are blocked by CI root-cleanliness job
+# and by the .husky/pre-commit hook — not ignored here so violations are visible in git status)
+# Correct locations: PNGs -> docs/screenshots/ | logs -> docs/logs/
+
 # Windows temp path artifacts (created by Windows path confusion)
 "apps/web/C:*"
 apps/web/C:*
@@ -134,6 +138,9 @@ UsersP0039217.claudeprojectsEduSpherescripts*.txt
 
 # Playwright MCP session artifacts
 .playwright-mcp/
+
+# Claude Code agent worktrees (ephemeral sub-agents, not project code)
+.claude/worktrees/
 
 # Test result artifacts
 apps/*/test-results/

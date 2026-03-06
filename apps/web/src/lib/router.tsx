@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Login } from '@/pages/Login';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { SmartRoot } from '@/components/SmartRoot';
 
 // ── Lazy loaded: heavy feature pages ─────────────────────────────────────────
 const Dashboard = lazy(() =>
@@ -301,6 +302,29 @@ const ThemeSettingsPage = lazy(() =>
 const LandingPage = lazy(() =>
   import('@/pages/LandingPage').then((m) => ({ default: m.LandingPage }))
 );
+const CoursesDiscoveryPage = lazy(() =>
+  import('@/pages/CoursesDiscoveryPage').then((m) => ({
+    default: m.CoursesDiscoveryPage,
+  }))
+);
+const DashboardPage = lazy(() =>
+  import('@/pages/DashboardPage').then((m) => ({
+    default: m.DashboardPage,
+  }))
+);
+const LiveSessionsPage = lazy(() =>
+  import('@/pages/LiveSessionsPage').then((m) => ({
+    default: m.LiveSessionsPage,
+  }))
+);
+const LiveSessionDetailPage = lazy(() =>
+  import('@/pages/LiveSessionDetailPage').then((m) => ({
+    default: m.LiveSessionDetailPage,
+  }))
+);
+const SkillTreePage = lazy(() =>
+  import('@/pages/SkillTreePage').then((m) => ({ default: m.SkillTreePage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -405,6 +429,21 @@ export const router = createBrowserRouter([
     element: guarded(<QuizContentPage />),
   },
   {
+    // Course discovery / explore page — linked from AppSidebar "Discover" item
+    path: '/explore',
+    element: guarded(<CoursesDiscoveryPage />),
+  },
+  {
+    // Primary discovery route — canonical URL
+    path: '/discover',
+    element: guarded(<CoursesDiscoveryPage />),
+  },
+  {
+    // Alias: /courses/discover → same page (used by E2E specs)
+    path: '/courses/discover',
+    element: guarded(<CoursesDiscoveryPage />),
+  },
+  {
     path: '/courses',
     element: guarded(<CourseList />),
   },
@@ -496,8 +535,14 @@ export const router = createBrowserRouter([
     element: guarded(<InstructorEarningsPage />),
   },
   {
-    path: '/dashboard',
+    // Legacy dashboard — kept for backward compatibility
+    path: '/dashboard/legacy',
     element: guarded(<Dashboard />),
+  },
+  {
+    // New Session 25 dashboard — primary learner home
+    path: '/dashboard',
+    element: guarded(<DashboardPage />),
   },
   {
     path: '/graph',
@@ -511,6 +556,25 @@ export const router = createBrowserRouter([
   {
     path: '/knowledge-graph/:courseId',
     element: guarded(<KnowledgeGraphPage />),
+  },
+  {
+    // Visual skill tree — course-specific or global ('all')
+    path: '/skill-tree',
+    element: guarded(<SkillTreePage />),
+  },
+  {
+    path: '/skill-tree/:courseId',
+    element: guarded(<SkillTreePage />),
+  },
+  {
+    // Live Sessions list
+    path: '/sessions',
+    element: guarded(<LiveSessionsPage />),
+  },
+  {
+    // Live Session detail / join
+    path: '/sessions/:sessionId',
+    element: guarded(<LiveSessionDetailPage />),
   },
   {
     path: '/agents',
@@ -599,7 +663,7 @@ export const router = createBrowserRouter([
   { path: '/admin/cpd', element: guarded(<CpdSettingsPage />) },
   {
     path: '/',
-    element: <Navigate to="/learn/content-1" replace />,
+    element: <SmartRoot />,
   },
   {
     path: '/u/:userId',
@@ -611,6 +675,6 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <Navigate to="/learn/content-1" replace />,
+    element: <Navigate to="/dashboard" replace />,
   },
 ]);

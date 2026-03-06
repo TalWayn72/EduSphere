@@ -22,6 +22,9 @@ import {
 import { createBbbClient, BBB_DEMO_JOIN_URL } from './bbb.client';
 
 const NATS_SUBJECT = 'EDUSPHERE.live.session.ended';
+const NATS_SESSION_CREATED = 'EDUSPHERE.sessions.created';
+const NATS_SESSION_ENDED = 'EDUSPHERE.sessions.ended';
+const NATS_PARTICIPANT_JOINED = 'EDUSPHERE.sessions.participant.joined';
 
 const MODERATOR_ROLES = ['INSTRUCTOR', 'ADMIN', 'ORG_ADMIN', 'SUPER_ADMIN'];
 
@@ -44,8 +47,8 @@ interface DbLiveSession {
   startedAt?: Date | null;
   endedAt?: Date | null;
   recordingUrl?: string | null;
-  attendeePassword: string;
-  moderatorPassword: string;
+  attendeePasswordEnc: string;
+  moderatorPasswordEnc: string;
   status: string;
   createdAt: Date;
 }
@@ -86,6 +89,19 @@ export class LiveSessionService implements OnModuleDestroy {
     return randomBytes(16).toString('hex');
   }
 
+  private async publishNatsEvent(subject: string, payload: object): Promise<void> {
+    try {
+      if (!this.natsConn) {
+        const url = process.env.NATS_URL ?? 'nats://localhost:4222';
+        this.natsConn = await connect({ servers: url });
+      }
+      this.natsConn.publish(subject, this.sc.encode(JSON.stringify(payload)));
+      this.logger.debug(`[LiveSessionService] Published ${subject}`);
+    } catch (err) {
+      this.logger.warn(`[LiveSessionService] NATS publish failed (non-fatal): ${err}`);
+    }
+  }
+
   async createLiveSession(
     contentItemId: string,
     tenantId: string,
@@ -104,13 +120,19 @@ export class LiveSessionService implements OnModuleDestroy {
         bbbMeetingId,
         meetingName,
         scheduledAt,
-        attendeePassword,
-        moderatorPassword,
+        attendeePasswordEnc: attendeePassword,
+        moderatorPasswordEnc: moderatorPassword,
         status: 'SCHEDULED',
       })
       .returning();
 
     if (!session) throw new Error('Failed to insert live session');
+
+    await this.publishNatsEvent(NATS_SESSION_CREATED, {
+      sessionId: session.id,
+      tenantId,
+      scheduledAt: scheduledAt.toISOString(),
+    });
 
     const bbb = createBbbClient();
     if (bbb) {
@@ -177,8 +199,14 @@ export class LiveSessionService implements OnModuleDestroy {
 
     const isModerator = MODERATOR_ROLES.includes(userRole);
     const password = isModerator
-      ? typedSession.moderatorPassword
-      : typedSession.attendeePassword;
+      ? typedSession.moderatorPasswordEnc
+      : typedSession.attendeePasswordEnc;
+
+    await this.publishNatsEvent(NATS_PARTICIPANT_JOINED, {
+      sessionId,
+      tenantId,
+      userId: userName,
+    });
 
     const bbb = createBbbClient();
     if (!bbb) {
@@ -208,8 +236,29 @@ export class LiveSessionService implements OnModuleDestroy {
 
     if (!updated)
       throw new NotFoundException(`LiveSession ${sessionId} not found`);
-    this.logger.log(`Session ended: ${sessionId}`);
-    return this.map(updated as DbLiveSession);
+
+    const typedUpdated = updated as DbLiveSession;
+    const endedAt = typedUpdated.endedAt ?? new Date();
+    const durationSeconds = typedUpdated.startedAt
+      ? Math.round((endedAt.getTime() - typedUpdated.startedAt.getTime()) / 1000)
+      : null;
+
+    this.logger.log(`[LiveSessionService] Session ended: ${sessionId}`);
+
+    await this.publishNatsEvent(NATS_SESSION_ENDED, {
+      sessionId,
+      tenantId,
+      endedAt: endedAt.toISOString(),
+      durationSeconds,
+    });
+
+    // Also signal legacy NATS subject for recording pipeline
+    this.natsConn?.publish(
+      NATS_SUBJECT,
+      this.sc.encode(JSON.stringify({ sessionId, tenantId }))
+    );
+
+    return this.map(typedUpdated);
   }
 
   async processRecording(sessionId: string, tenantId: string): Promise<void> {

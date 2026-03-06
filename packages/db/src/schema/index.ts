@@ -148,3 +148,6 @@ export * from './notification-templates';
 
 // Tenant themes (multi-tenant theme customization — FEAT-THEME)
 export * from './tenant-themes';
+
+// User skill mastery (KnowledgeSkillTree mastery tracking — Session 26)
+export * from './user-skill-mastery';

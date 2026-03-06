@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Root artifact check — block files that must never live in the project root
+staged_violations=$(git diff --cached --name-only | grep -E "^[^/]+\.(png|txt)$" | grep -v "^README\|^CLAUDE\|^OPEN_ISSUES\|^IMPLEMENTATION\|^API_CONTRACTS\|^CHANGELOG")
+if [ -n "$staged_violations" ]; then
+  echo "Pre-commit blocked: artifacts in project root"
+  echo "$staged_violations"
+  echo "Move PNGs -> docs/screenshots/ | logs -> docs/logs/"
+  exit 1
+fi

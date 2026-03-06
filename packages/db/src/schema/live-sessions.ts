@@ -21,8 +21,11 @@ export const liveSessions = pgTable('live_sessions', {
   startedAt: timestamp('started_at'),
   endedAt: timestamp('ended_at'),
   recordingUrl: text('recording_url'),
-  attendeePassword: text('attendee_password').notNull(),
-  moderatorPassword: text('moderator_password').notNull(),
+  // SI-3: These fields MUST be stored encrypted. Service layer MUST call
+  // encryptField(value, tenantKey) before INSERT and decryptField() on SELECT.
+  // Column stores AES-256-GCM ciphertext (base64-encoded), NOT plaintext.
+  attendeePasswordEnc: text('attendee_password_enc').notNull(),
+  moderatorPasswordEnc: text('moderator_password_enc').notNull(),
   status: liveSessionStatusEnum('status').notNull().default('SCHEDULED'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });

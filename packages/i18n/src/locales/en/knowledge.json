@@ -35,5 +35,8 @@
   "graphPageBreadcrumb": "Knowledge Graph",
   "networkUnavailable": "Server unavailable — showing backup data",
   "retry": "Retry",
-  "pathError": "Failed to find learning path"
+  "pathError": "Failed to find learning path",
+  "courseContext": "Course Knowledge Graph",
+  "allKnowledge": "All Knowledge",
+  "filteredBy": "Filtered by: {{course}}"
 }

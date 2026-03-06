@@ -7,7 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'urql';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { AdminActivityFeed } from '@/components/AdminActivityFeed';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { AdminStatCards } from '@/components/admin/AdminStatCards';
 import {
@@ -149,23 +150,12 @@ export function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity placeholder */}
+      {/* Recent Activity */}
       <div className="mt-8">
         <h2 className="text-lg font-semibold mb-4">
           {t('dashboard.recentActivity')}
         </h2>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.activityFeed')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {t('dashboard.noActivity')}
-            </p>
-          </CardContent>
-        </Card>
+        <AdminActivityFeed loading={fetching} />
       </div>
     </AdminLayout>
   );

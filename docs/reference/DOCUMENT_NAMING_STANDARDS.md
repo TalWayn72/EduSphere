@@ -1,6 +1,6 @@
 # Document Naming Standards — EduSphere
 
-## Standard Established: February 2026
+## Standard Established: February 2026 | Last Updated: March 2026
 
 All documentation files in this project follow `SCREAMING_SNAKE_CASE` naming convention.
 
@@ -38,6 +38,37 @@ All documentation files in this project follow `SCREAMING_SNAKE_CASE` naming con
 | Legal Templates      | `[DOCUMENT_TYPE]_TEMPLATE.md`     | `DATA_PROCESSING_AGREEMENT_TEMPLATE.md` |
 | Execution Logs       | `[PHASE]_[TYPE]_LOG.md`           | `PHASE_3_PROGRESS_LOG.md`               |
 
+## Folder Structure (Mandatory)
+
+| Artifact Type | Location |
+|---------------|----------|
+| Active implementation plans | `docs/plans/` |
+| Bug fix documents | `docs/plans/bugs/` — named `BUG-NNN-description.md` |
+| Feature plans | `docs/plans/features/` |
+| Completed/old sprint plans | `docs/plans/archive/` |
+| Security & compliance docs | `docs/security/` |
+| Architecture decisions | `docs/architecture/` |
+| **Screenshots (PNG)** | `docs/screenshots/` — **NEVER in project root** |
+| CI/build log files | `docs/logs/` |
+| Reference docs (naming, MCP, tech audit) | `docs/reference/` |
+| Testing plans and checklists | `docs/testing/` |
+| Product plans (admin, i18n, tiers) | `docs/product/` |
+| Deployment & ops guides | `docs/deployment/` |
+| Developer guides | `docs/development/` |
+| API reference | `docs/api/` |
+| AI/ML documentation | `docs/ai/` |
+| Legal documents | `docs/legal/` |
+| Policies | `docs/policies/` |
+| Project status & logs | `docs/project/` |
+| Performance & test reports | `docs/reports/` |
+| Research & analysis | `docs/research/` |
+| Compliance certifications | `docs/compliance/` |
+| Database schema docs | `docs/database/` |
+
+**Iron Rule:** No PNG, TXT, or non-config file may exist in the project root.
+Only these files belong in root: `README.md`, `CLAUDE.md`, `OPEN_ISSUES.md`, `IMPLEMENTATION_ROADMAP.md`,
+`API_CONTRACTS_GRAPHQL_FEDERATION.md`, `CHANGELOG.md`, and project config files (`package.json`, `tsconfig*.json`, `turbo.json`, `pnpm-*.yaml`, `docker-compose*.yml`, `renovate.json`).
+
 ## Enforcement
 
 New files violating this standard will be renamed during code review.
@@ -46,5 +77,5 @@ their content must be migrated to `docs/plans/` with a proper name before or imm
 
 ## Applied In
 
-This standard was applied in February 2026, renaming 21 files and updating cross-references in 21 files.
-See git history on branch `docs/normalize-file-naming` for the complete change set.
+- **February 2026:** First application — renamed 21 files, updated 21 cross-references
+- **March 2026:** Second application — moved 60 files (55 PNGs → docs/screenshots/, 29 plan docs redistributed, 4 naming violations fixed, 2 duplicates removed)

@@ -35,5 +35,8 @@
   "graphPageBreadcrumb": "גרף ידע",
   "networkUnavailable": "שרת לא נגיש — מציג נתוני גיבוי",
   "retry": "נסה שוב",
-  "pathError": "לא ניתן למצוא מסלול למידה"
+  "pathError": "לא ניתן למצוא מסלול למידה",
+  "courseContext": "גרף ידע של הקורס",
+  "allKnowledge": "כל הידע",
+  "filteredBy": "מסונן לפי: {{course}}"
 }

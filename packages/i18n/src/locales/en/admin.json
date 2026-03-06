@@ -53,6 +53,11 @@
       "auditLog": { "label": "Audit Log", "desc": "Admin action history" }
     }
   },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
+  },
   "stats": {
     "totalUsers": "Total Users",
     "activeThisMonth": "Active This Month",

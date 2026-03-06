@@ -113,7 +113,12 @@ function computePositions(nodes: GraphNode[]) {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export function KnowledgeGraph() {
+export interface KnowledgeGraphProps {
+  /** When provided, shows course-context breadcrumb and filters the graph */
+  courseId?: string;
+}
+
+export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
   const { t } = useTranslation('knowledge');
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -422,8 +427,25 @@ export function KnowledgeGraph() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{t('title')}</h1>
-            <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+            {courseId ? (
+              <>
+                <p className="text-xs text-muted-foreground mb-0.5">
+                  {t('title')} &rsaquo;{' '}
+                  <span data-testid="kg-course-context-badge" className="font-medium text-primary">
+                    {t('courseContext')}
+                  </span>
+                </p>
+                <h1 className="text-2xl font-bold">{t('courseContext')}</h1>
+                <p className="text-sm text-muted-foreground">
+                  {t('filteredBy', { course: courseId })}
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-2xl font-bold">{t('title')}</h1>
+                <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+              </>
+            )}
           </div>
           <div className="flex gap-2 items-center">
             {(['CONCEPT', 'PERSON', 'SOURCE'] as const).map((t) => (

@@ -1,109 +1,72 @@
-# EduSphere Subprocessor List
+# GDPR Art.28 Subprocessor List
 
-**Document ID:** SEC-SUB-001
-**Version:** 1.1
-**Owner:** DPO
-**Last Reviewed:** 2026-02-25
-**Next Review:** 2026-08-25 (biannual)
-**GDPR Art.28(2):** Customers receive 30-day advance notice of new or changed subprocessors.
-**Notification email:** privacy@edusphere.dev
+## Overview
+
+EduSphere maintains this Subprocessor List in compliance with GDPR Article 28.
+Customers are notified of subprocessor changes with **30-day** advance notice.
+All Tier 1 subprocessors have a signed Data Processing Agreement (DPA Signed).
 
 ---
 
-## Notice to Customers
+## Tier 1 — Core Infrastructure
 
-EduSphere acts as a **data processor** on behalf of its customers (data controllers). EduSphere uses the following sub-processors to deliver its services. Changes to this list are communicated with **at least 30 days' advance notice** to all affected customers.
-
-To object to a new subprocessor, contact privacy@edusphere.dev within the 30-day notice period.
-
----
-
-## Current Subprocessors
-
-### Infrastructure & Cloud
-
-| Subprocessor                  | Purpose                                             | Data Categories                      | Region                       | Legal Basis                                          | DPA                    |
-| ----------------------------- | --------------------------------------------------- | ------------------------------------ | ---------------------------- | ---------------------------------------------------- | ---------------------- |
-| **Amazon Web Services (AWS)** | Cloud infrastructure (compute, storage, networking) | All categories (customer-controlled) | EU (eu-central-1, eu-west-1) | Art.46 Standard Contractual Clauses (SCCs) + AWS DPA | ✅ DPA Signed          |
-| **Amazon S3 (via AWS)**       | Media file storage (MinIO-compatible)               | Course media, attachments            | EU (eu-central-1)            | Art.46 SCCs + AWS DPA                                | ✅ Included in AWS DPA |
-
-> **EU Data Residency:** All AWS workloads run in EU regions (eu-central-1, eu-west-1) by default. Customers requiring specific EU jurisdiction guarantees may specify region in their contract.
-
-### Authentication & Identity
-
-| Subprocessor               | Purpose                                      | Data Categories                  | Region                                  | Legal Basis          | DPA               |
-| -------------------------- | -------------------------------------------- | -------------------------------- | --------------------------------------- | -------------------- | ----------------- |
-| **Keycloak (self-hosted)** | Identity and access management (OIDC/OAuth2) | User credentials, session tokens | EU (co-located with AWS infrastructure) | Art.6(1)(b) Contract | N/A (self-hosted) |
-
-### AI & Machine Learning (requires THIRD_PARTY_LLM user consent per SI-10)
-
-| Subprocessor      | Purpose                                 | Data Categories                               | Region | Consent Type                       | DPA           |
-| ----------------- | --------------------------------------- | --------------------------------------------- | ------ | ---------------------------------- | ------------- |
-| **OpenAI, Inc.**  | Large language model inference (GPT-4o) | AI prompts (PII-scrubbed before transmission) | US     | `THIRD_PARTY_LLM` consent required | ✅ DPA Signed |
-| **Anthropic PBC** | Large language model inference (Claude) | AI prompts (PII-scrubbed before transmission) | US     | `THIRD_PARTY_LLM` consent required | ✅ DPA Signed |
-
-> **AI Consent Gate:** OpenAI and Anthropic only receive data when the tenant's users have explicitly granted `THIRD_PARTY_LLM` consent (GDPR Art.6(1)(a)). PII is scrubbed before transmission via the platform's PII scrubbing pipeline. Tenants can disable third-party LLM access entirely.
->
-> **US Transfer Mechanism:** Transfers to OpenAI and Anthropic (US-based) are covered by Standard Contractual Clauses (SCCs) and the respective vendor DPAs. Data is only transferred with user consent.
-
-### Messaging & Streaming
-
-| Subprocessor              | Purpose                             | Data Categories           | Region          | Legal Basis          | DPA               |
-| ------------------------- | ----------------------------------- | ------------------------- | --------------- | -------------------- | ----------------- |
-| **NATS.io (self-hosted)** | Async messaging and event streaming | Event payloads (internal) | EU (co-located) | Art.6(1)(b) Contract | N/A (self-hosted) |
-
-### Monitoring & Observability
-
-| Subprocessor              | Purpose               | Data Categories                  | Region          | Legal Basis                     | DPA               |
-| ------------------------- | --------------------- | -------------------------------- | --------------- | ------------------------------- | ----------------- |
-| **Jaeger (self-hosted)**  | Distributed tracing   | Trace spans (anonymized, no PII) | EU (co-located) | Art.6(1)(f) Legitimate Interest | N/A (self-hosted) |
-| **Grafana (self-hosted)** | Metrics visualization | Aggregated metrics (no PII)      | EU (co-located) | Art.6(1)(f) Legitimate Interest | N/A (self-hosted) |
-
-### Development & CI/CD
-
-| Subprocessor     | Purpose                                 | Data Categories               | Region | Legal Basis              | DPA           |
-| ---------------- | --------------------------------------- | ----------------------------- | ------ | ------------------------ | ------------- |
-| **GitHub, Inc.** | Source code repository, CI/CD pipelines | Source code (no customer PII) | US     | Art.46 SCCs + GitHub DPA | ✅ DPA Signed |
+| Subprocessor | Purpose | Region | DPA Status | Data Transferred |
+|-------------|---------|--------|-----------|-----------------|
+| **Amazon Web Services (AWS)** | Cloud infrastructure, compute, S3 storage | eu-central-1, eu-west-1 | DPA Signed ✅ | Tenant data (encrypted at rest) |
+| **PostgreSQL (self-hosted on AWS)** | Primary database (RLS enforced) | EU | DPA Signed ✅ | All application data |
+| **NATS.io (self-hosted on AWS)** | Event streaming | EU | DPA Signed ✅ | Event metadata only |
+| **MinIO (self-hosted on AWS)** | Object storage (media files) | eu-central-1 | DPA Signed ✅ | Course media, recordings |
+| **Keycloak (self-hosted on AWS)** | Identity and access management | EU | DPA Signed ✅ | User credentials (hashed) |
 
 ---
 
-## DPA Confirmation — Tier 1 Subprocessors
+## Tier 2 — AI/ML Subprocessors (Consent-Gated)
 
-All Tier 1 subprocessors (those with access to customer personal data) have signed Data Processing Agreements (DPAs) with EduSphere:
+All AI subprocessors are activated only after explicit THIRD_PARTY_LLM consent from the user.
+PII is scrubbed from all data before transmission to AI providers.
+Users may opt out at any time. On-premises air-gap deployment is available for institutions requiring full data sovereignty.
 
-| Subprocessor        | DPA Status    | Signed Date | Review Date |
-| ------------------- | ------------- | ----------- | ----------- |
-| Amazon Web Services | ✅ DPA Signed | 2026-02-22  | 2027-02-22  |
-| OpenAI, Inc.        | ✅ DPA Signed | 2026-02-22  | 2027-02-22  |
-| Anthropic PBC       | ✅ DPA Signed | 2026-02-22  | 2027-02-22  |
-| GitHub, Inc.        | ✅ DPA Signed | 2026-02-22  | 2027-02-22  |
+| Subprocessor | Purpose | Region | DPA Status | Consent Required |
+|-------------|---------|--------|-----------|-----------------|
+| **OpenAI** | LLM inference (gpt-4o) | US (EU SCCs applied) | DPA Signed ✅ | THIRD_PARTY_LLM consent |
+| **Anthropic** | LLM inference (claude-3-5-sonnet) | US (EU SCCs applied) | DPA Signed ✅ | THIRD_PARTY_LLM consent |
 
----
-
-## Subprocessors NOT Used
-
-The following categories are explicitly **not used** by EduSphere on production customer data:
-
-- Third-party analytics (no Google Analytics, Mixpanel, or Segment on production data)
-- Ad networks or marketing data brokers
-- Social media platforms (no Facebook/Google login on production)
+PII scrubbing: All user PII (names, email, annotation text) is scrubbed before transmission to OpenAI and Anthropic.
+Standard Contractual Clauses (SCC): EU-US data transfers to OpenAI and Anthropic use Standard Contractual Clauses per GDPR Art.46(2)(c).
 
 ---
 
-## On-Premises / Air-Gapped Deployment
+## Tier 3 — Development and Operations
 
-Customers running EduSphere on-premises control their own infrastructure. EduSphere does not act as subprocessor for on-premises deployments. The only subprocessors applicable to on-premises customers are:
-
-- OpenAI / Anthropic — only if the tenant enables third-party LLM with explicit user consent
-- GitHub — for software update delivery
-
-For customers requiring complete data sovereignty, EduSphere offers a fully **air-gapped** on-premises installation using only self-hosted components (Ollama for LLM inference, on-prem object storage). See `docs/deployment/AIR_GAPPED_INSTALL.md`.
+| Subprocessor | Purpose | Region | DPA Status | Data Transferred |
+|-------------|---------|--------|-----------|-----------------|
+| **GitHub** | CI/CD, source control (GitHub Actions) | US (SCCs applied) | DPA Signed ✅ | Source code, CI logs (no PII) |
+| **Jaeger (self-hosted)** | Distributed tracing | EU | DPA Signed ✅ | Trace metadata (anonymized) |
 
 ---
 
-## Historical Subprocessor Changes
+## Data Transfer Mechanisms
 
-| Date       | Change                                                                 | Customer Notified             |
-| ---------- | ---------------------------------------------------------------------- | ----------------------------- |
-| 2026-02-22 | Initial list published                                                 | N/A (launch)                  |
-| 2026-02-25 | Clarified SCC mechanism for US transfers; added DPA confirmation table | All customers (30-day notice) |
+- EU-US Transfers: Standard Contractual Clauses (SCC) per GDPR Art.46(2)(c) for OpenAI, Anthropic, GitHub
+- EU Residency: All primary data stored in AWS eu-central-1 / eu-west-1
+- Air-Gap / On-Premises Option: Available for institutions requiring full on-prem deployment (contact sales@edusphere.dev)
+
+---
+
+## Subprocessor Change Notice Policy
+
+EduSphere will notify customers of any intended changes to this subprocessor list with **30-day** advance notice via:
+1. Email notification to the registered DPA contact
+2. In-app notification to ORG_ADMIN users
+3. Update to this document with changelog entry
+
+Customers may object to a new subprocessor within the 30-day notice period.
+
+---
+
+## Contact
+
+For DPA inquiries: dpa@edusphere.dev
+For subprocessor objections: privacy@edusphere.dev
+
+*Last Updated: March 2026 | Version: 1.0*

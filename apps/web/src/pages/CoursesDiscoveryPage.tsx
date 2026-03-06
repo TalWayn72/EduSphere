@@ -1,8 +1,11 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { LayoutGrid, List } from 'lucide-react';
 import { CourseCard, type CourseCardProps } from '@/components/CourseCard';
+// TODO: replace with real query — import { useQuery } from 'urql';
+// TODO: import { COURSES_QUERY } from '@/lib/queries';
 
 // ── DEV_MODE mock data ────────────────────────────────────────────────────────
 
@@ -226,6 +229,7 @@ function EmptyState({ query }: { query: string }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export function CoursesDiscoveryPage() {
+  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -446,6 +450,7 @@ export function CoursesDiscoveryPage() {
                 : 'flex flex-col gap-4'
           }
           data-testid="courses-grid"
+          data-view={viewMode}
           aria-label="Course listing"
         >
           {isLoading
@@ -464,7 +469,7 @@ export function CoursesDiscoveryPage() {
                     key={course.id}
                     {...course}
                     onClick={() => {
-                      // navigation would go here in production
+                      navigate(`/courses/${course.id}`);
                     }}
                   />
                 ))}

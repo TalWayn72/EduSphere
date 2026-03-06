@@ -1,133 +1,114 @@
-# Records of Processing Activities (RoPA)
+# Record of Processing Activities (GDPR Art.30)
 
-**Document ID:** SEC-RPA-001
-**Version:** 1.1
-**Owner:** DPO (Data Protection Officer)
-**Last Reviewed:** 2026-02-25
-**Next Review:** 2027-02-25
-**Legal Basis:** GDPR Art.30
-**Contact:** dpo@edusphere.dev
+**Controller:** EduSphere Platform
+**Version:** 1.0
+**Review Schedule:** Annual review by DPO
+**Last Reviewed:** March 2026
 
 ---
 
-## Overview
+## RPA-001: User Account Management
 
-EduSphere maintains this Record of Processing Activities (RoPA) as required by **GDPR Art.30**. EduSphere acts as **Data Controller** for its own operations and as **Data Processor** on behalf of customer organizations.
-
----
-
-## A. EduSphere as Data Controller
-
-### RPA-001: User Account Management
-
-| Field                       | Value                                                              |
-| --------------------------- | ------------------------------------------------------------------ |
-| **Activity ID**             | RPA-001                                                            |
-| **Purpose**                 | Create and manage User Account records for platform access         |
-| **Legal Basis**             | Art.6(1)(b) - Contract (performance of service agreement)          |
-| **Data Categories**         | Name, email address, role, tenant association, account preferences |
-| **Data Subjects**           | Platform users (students, instructors, administrators)             |
-| **Recipients**              | EduSphere internal systems; Keycloak (self-hosted)                 |
-| **Third-Country Transfers** | None                                                               |
-| **Retention**               | Active account lifetime + 90 days post-deletion request            |
-| **Security Measures**       | AES-256-GCM encryption, RLS tenant isolation, MFA for admin roles  |
-| **Sub-processor**           | AWS (EU infrastructure)                                            |
-
-### RPA-002: Security Audit Logging and Security Monitoring
-
-| Field                       | Value                                                                                                |
-| --------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Activity ID**             | RPA-002                                                                                              |
-| **Purpose**                 | Detect security incidents; security monitor platform; audit log all access (GDPR Art.32, SOC2 CC7.2) |
-| **Legal Basis**             | Art.6(1)(f) - Legitimate Interest (security monitoring)                                              |
-| **Data Categories**         | IP addresses, user IDs, action timestamps, API endpoint accessed                                     |
-| **Data Subjects**           | All platform users                                                                                   |
-| **Third-Country Transfers** | None (self-hosted EU)                                                                                |
-| **Retention**               | 7 years (SOC2 audit log requirement)                                                                 |
-| **Security Measures**       | Encrypted storage, role-based access (security team only)                                            |
-| **Sub-processor**           | AWS (infrastructure)                                                                                 |
+**Purpose:** Management of user accounts, authentication, and profile information
+**Legal Basis:** Contract (Art. 6(1)(b)) — necessary for platform service delivery
+**Data Categories:** Name, email, role, preferences, authentication credentials
+**Retention Period:** Account data retained for duration of active subscription + 90 days after termination
+**Subprocessors:** Keycloak (identity provider, self-hosted)
+**Transfers:** No transfers outside EEA
+**Data Controller Role:** Controller
 
 ---
 
-## B. EduSphere as Data Processor (on behalf of customer organizations)
+## RPA-002: Security Audit Logging
 
-### RPA-004: Educational Content Delivery
-
-| Field                       | Value                                                                       |
-| --------------------------- | --------------------------------------------------------------------------- |
-| **Activity ID**             | RPA-004                                                                     |
-| **Purpose**                 | Deliver course content to enrolled students on behalf of customer           |
-| **Legal Basis**             | Art.6(1)(b) - Customer DPA (Data Processor on Data Controller instructions) |
-| **Data Categories**         | User enrollment, course progress, completion certificates                   |
-| **Data Controller**         | Customer organization (tenant)                                              |
-| **Third-Country Transfers** | None (EU infrastructure: eu-central-1, eu-west-1)                           |
-| **Retention**               | Per customer retention policy; GDPR Art.5(1)(e) compliant                   |
-| **Security Measures**       | Per-tenant RLS, AES-256-GCM encryption, audit logging                       |
-| **Sub-processor**           | AWS (EU infrastructure)                                                     |
-
-### RPA-005: AI-Powered Learning - AI_PROCESSING (Consent-Gated)
-
-| Field                       | Value                                                                                        |
-| --------------------------- | -------------------------------------------------------------------------------------------- |
-| **Activity ID**             | RPA-005                                                                                      |
-| **Purpose**                 | Personalized AI tutoring, quiz generation, knowledge graph navigation via AI Consent gate    |
-| **Legal Basis**             | Art.6(1)(a) - User consent (AI_PROCESSING + THIRD_PARTY_LLM consent flags)                   |
-| **Data Categories**         | Learning context, questions, AI responses; PII-scrubbed before external LLM call             |
-| **Data Subjects**           | Users who granted AI processing consent                                                      |
-| **Data Controller**         | Customer organization (tenant) + user (for consent)                                          |
-| **Recipients**              | EduSphere Agent subgraph; OpenAI (if THIRD_PARTY_LLM consent); Anthropic (if consent)        |
-| **Third-Country Transfers** | US consent transfer via Standard Contractual Clauses (SCC) - only with explicit user consent |
-| **Retention**               | Agent messages: 90 days default (tenant-configurable)                                        |
-| **Security Measures**       | Consent gate (LLM guard SI-10), PII scrubber before external calls, AES-256-GCM              |
-| **Sub-processor**           | AWS; OpenAI (with consent + SCC); Anthropic (with consent + SCC)                             |
-
-### RPA-006: Personal Annotations
-
-| Field                       | Value                                                             |
-| --------------------------- | ----------------------------------------------------------------- |
-| **Activity ID**             | RPA-006                                                           |
-| **Purpose**                 | Store student Annotation notes and highlights on course content   |
-| **Legal Basis**             | Art.6(1)(b) - Contract (core platform feature)                    |
-| **Data Categories**         | Annotation text (personal - student own words), content reference |
-| **Data Subjects**           | Students who create annotations                                   |
-| **Data Controller**         | Customer organization (tenant)                                    |
-| **Recipients**              | EduSphere Annotation subgraph; instructors (RLS-enforced access)  |
-| **Third-Country Transfers** | None                                                              |
-| **Retention**               | Account lifetime + 90 days; erasable on Art.17 request            |
-| **Security Measures**       | AES-256-GCM per-tenant encryption, owner-only RLS by default      |
-| **Sub-processor**           | AWS (EU infrastructure)                                           |
+**Purpose:** Security monitoring, audit trail for compliance, incident investigation
+**Legal Basis:** Legal obligation (Art. 6(1)(c)) — required for GDPR accountability
+**Data Categories:** User ID, IP address, action performed, timestamp, resource accessed
+**Retention Period:** 2 years per security policy
+**Subprocessors:** None (self-hosted PostgreSQL)
+**Transfers:** No transfers outside EEA
+**Data Controller Role:** Controller
 
 ---
 
-## C. Controller vs Processor Role Summary
+## RPA-003: Educational Content Delivery
 
-| Activity                        | EduSphere Role  | Data Controller                        |
-| ------------------------------- | --------------- | -------------------------------------- |
-| RPA-001 User Account Management | Data Controller | EduSphere                              |
-| RPA-002 Security Audit Logging  | Data Controller | EduSphere                              |
-| RPA-004 Content Delivery        | Data Processor  | Customer organization (tenant)         |
-| RPA-005 AI-Powered Learning     | Data Processor  | Customer organization + user (consent) |
-| RPA-006 Personal Annotations    | Data Processor  | Customer organization (tenant)         |
-
----
-
-## D. Sub-processor Index
-
-| Sub-processor                 | Activities                   | Transfer Mechanism                                |
-| ----------------------------- | ---------------------------- | ------------------------------------------------- |
-| AWS (eu-central-1, eu-west-1) | RPA-001 to RPA-006           | EU data residency (no transfer needed)            |
-| OpenAI, Inc. (US)             | RPA-005 only (consent-gated) | Standard Contractual Clauses (SCC) + user consent |
-| Anthropic PBC (US)            | RPA-005 only (consent-gated) | SCC + user consent                                |
-| GitHub, Inc. (US)             | CI/CD only (no customer PII) | SCC                                               |
+**Purpose:** Delivery of course content, lessons, assessments to enrolled learners
+**Legal Basis:** Contract (Art. 6(1)(b)) — core platform service
+**Data Categories:** Course enrollment, progress, completion status, assessment scores
+**Retention Period:** Duration of enrollment + 5 years for certificate records
+**Subprocessors:** MinIO (self-hosted object storage)
+**Transfers:** No transfers outside EEA
+**Data Controller Role:** Controller
 
 ---
 
-## E. Review Schedule
+## RPA-004: Learning Analytics
 
-| Activity                | Frequency      | Owner       | DPO Sign-off |
-| ----------------------- | -------------- | ----------- | ------------ |
-| Full RoPA review        | Annual         | DPO         | Required     |
-| New processing activity | Before go-live | DPO + Legal | Required     |
-| Subprocessor change     | On change      | DPO         | Required     |
+**Purpose:** Analytics on learner progress, engagement metrics, at-risk learner identification
+**Legal Basis:** Legitimate interest (Art. 6(1)(f)) — improving educational outcomes
+**Data Categories:** Progress events, time-on-task, completion rates, quiz attempts
+**Retention Period:** Aggregated analytics retained indefinitely; individual event logs 1 year
+**Subprocessors:** None
+**Transfers:** No transfers outside EEA
+**Data Controller Role:** Controller
 
-**Next scheduled DPO review:** 2027-02-25
+---
+
+## RPA-005: AI Processing with Consent Gate
+
+**Purpose:** AI-powered tutoring, content generation, knowledge graph construction
+**Legal Basis:** Consent (Art. 6(1)(a)) — explicit consent required before AI processing
+**Consent Mechanism:** `THIRD_PARTY_LLM` consent flag checked before every LLM call (SI-10)
+**Data Categories:** User queries, annotations, learning content (anonymized where possible)
+**Retention Period:** Processing logs 90 days; models not trained on individual user data
+**Subprocessors:**
+  - Ollama (self-hosted, development) — no data transfer
+  - OpenAI (production, US) — Standard Contractual Clauses (SCCs) in place, Data Processing Agreement signed
+  - Anthropic (production, US) — Standard Contractual Clauses (SCCs) in place, Data Processing Agreement signed
+**Transfers:** US transfer with SCCs for AI providers (OpenAI, Anthropic) per Art. 46(2)(c)
+**Data Controller Role:** Controller (Data Processor relationship with OpenAI/Anthropic)
+
+---
+
+## RPA-006: Personal Annotations
+
+**Purpose:** Storage and retrieval of user-created annotations on educational content
+**Legal Basis:** Contract (Art. 6(1)(b)) — user-initiated feature
+**Data Categories:** Annotation text (may contain personal reflections), document reference, timestamp
+**Special Category:** May incidentally contain health/belief data — encryption required (AES-256-GCM)
+**Retention Period:** Retained until user deletes or account termination + 30 days
+**Subprocessors:** None (PostgreSQL self-hosted, encryption at application layer)
+**Transfers:** No transfers outside EEA
+**Data Controller Role:** Controller
+
+---
+
+## RPA-007: Tenant Organization Management
+
+**Purpose:** Management of tenant organizations, admin users, billing, and feature configuration
+**Legal Basis:** Contract (Art. 6(1)(b)) — B2B service agreement
+**Data Categories:** Organization name, admin contact details, subscription tier, feature flags
+**Retention Period:** Duration of contract + 7 years for financial records
+**Subprocessors:** None
+**Transfers:** No transfers outside EEA
+**Data Controller Role:** Controller
+
+---
+
+## Subprocessor Register
+
+| Subprocessor | Purpose | Location | Transfer Mechanism | DPA Status |
+|---|---|---|---|---|
+| Keycloak | Identity & Authentication | Self-hosted EEA | N/A | N/A |
+| PostgreSQL | Primary Database | Self-hosted EEA | N/A | N/A |
+| MinIO | Object Storage | Self-hosted EEA | N/A | N/A |
+| OpenAI | AI Processing (prod, with consent) | US | SCCs Art. 46(2)(c) | Signed |
+| Anthropic | AI Processing (prod, with consent) | US | SCCs Art. 46(2)(c) | Signed |
+
+---
+
+## Review Schedule
+
+This document is reviewed annually by the Data Protection Officer (DPO).
+Next review: March 2027.

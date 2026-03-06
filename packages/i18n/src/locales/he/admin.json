@@ -53,6 +53,11 @@
       "auditLog": { "label": "יומן ביקורת", "desc": "היסטוריית פעולות מנהל" }
     }
   },
+  "activityFeed": {
+    "title": "פעילות אחרונה",
+    "noActivity": "אין פעילות אחרונה",
+    "viewAll": "הצג הכל"
+  },
   "stats": {
     "totalUsers": "סך משתמשים",
     "activeThisMonth": "פעילים החודש",

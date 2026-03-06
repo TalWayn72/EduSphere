@@ -1,0 +1,13 @@
+extend type LiveSession @key(fields: "id") {
+  id: ID! @external
+}
+
+extend type Mutation {
+  startLiveSession(sessionId: ID!): StartLiveSessionResult! @authenticated
+}
+
+type StartLiveSessionResult {
+  sessionId: ID!
+  status: String!
+  startedAt: String!
+}

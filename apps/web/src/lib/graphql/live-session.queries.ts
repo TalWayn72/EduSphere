@@ -1,5 +1,22 @@
 import { gql } from 'urql';
 
+export const LIST_LIVE_SESSIONS_QUERY = gql`
+  query ListLiveSessions($status: String, $limit: Int, $offset: Int) {
+    liveSessions(status: $status, limit: $limit, offset: $offset) {
+      id
+      contentItemId
+      meetingName
+      scheduledAt
+      status
+      recordingUrl
+      participantCount
+      maxParticipants
+      instructorId
+      courseId
+    }
+  }
+`;
+
 export const LIVE_SESSION_QUERY = gql`
   query LiveSession($contentItemId: ID!) {
     liveSession(contentItemId: $contentItemId) {
@@ -9,6 +26,23 @@ export const LIVE_SESSION_QUERY = gql`
       scheduledAt
       status
       recordingUrl
+    }
+  }
+`;
+
+export const GET_LIVE_SESSION_QUERY = gql`
+  query GetLiveSession($sessionId: ID!) {
+    liveSessionById(sessionId: $sessionId) {
+      id
+      contentItemId
+      meetingName
+      scheduledAt
+      status
+      recordingUrl
+      participantCount
+      maxParticipants
+      instructorId
+      courseId
     }
   }
 `;

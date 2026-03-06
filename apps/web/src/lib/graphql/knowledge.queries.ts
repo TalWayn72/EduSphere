@@ -146,3 +146,42 @@ export const PREREQUISITE_CHAIN_QUERY = gql`
 // NOTE: Tier-3 knowledge queries (skill gap analysis, social feed/recommendations)
 // have been moved to knowledge-tier3.queries.ts, which is excluded from codegen
 // until the supergraph is recomposed with the full subgraph-knowledge SDL.
+
+// ─── Skill Tree (KnowledgeSkillTree UI integration) ──────────────────────────
+
+/**
+ * Fetch the visual skill tree for a course.
+ * Maps to: skillTree(courseId: ID!): SkillTree!
+ * Returns nodes with mastery levels + edges for the BFS layout engine.
+ */
+export const GET_SKILL_TREE_QUERY = gql`
+  query GetSkillTree($courseId: ID!) {
+    skillTree(courseId: $courseId) {
+      nodes {
+        id
+        label
+        type
+        masteryLevel
+        connections
+      }
+      edges {
+        source
+        target
+      }
+    }
+  }
+`;
+
+/**
+ * Update the mastery level for a skill tree node (concept) for the current user.
+ * Maps to: updateMasteryLevel(nodeId: ID!, level: MasteryLevel!): SkillTreeNode!
+ */
+export const UPDATE_MASTERY_LEVEL_MUTATION = gql`
+  mutation UpdateMasteryLevel($nodeId: ID!, $level: MasteryLevel!) {
+    updateMasteryLevel(nodeId: $nodeId, level: $level) {
+      id
+      label
+      masteryLevel
+    }
+  }
+`;

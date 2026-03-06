@@ -48,5 +48,17 @@
   "newPost": "פוסט חדש",
   "reply": "השב",
   "sessionEnded": "הסשן הסתיים",
-  "connecting": "מתחבר..."
+  "connecting": "מתחבר...",
+  "sessionsTitle": "סשנים חיים",
+  "sessionsUpcoming": "קרובים",
+  "sessionsPast": "עבר",
+  "sessionsJoin": "הצטרף",
+  "sessionsStart": "התחל סשן",
+  "sessionsEnd": "סיים סשן",
+  "sessionsCreate": "צור סשן",
+  "sessionsLiveNow": "חי עכשיו",
+  "sessionsStartsIn": "מתחיל ב-{{time}}",
+  "sessionsNoSessions": "אין סשנים מתוזמנים",
+  "sessionsParticipants": "{{count}} משתתפים",
+  "sessionsChat": "צ'אט חי"
 }

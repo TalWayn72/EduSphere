@@ -17,13 +17,11 @@ function GraphLoader() {
 // :courseId param so the same component can be reached at both
 //   /knowledge-graph
 //   /knowledge-graph/:courseId
-// The courseId is forwarded to KnowledgeGraph once it accepts the prop
-// (currently the component ignores it and shows the global graph).
+// The courseId is forwarded to KnowledgeGraph which shows course-filtered
+// view when present, or the global "All Knowledge" graph when absent.
 function KnowledgeGraphPageContent() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { courseId: _courseId } = useParams<{ courseId?: string }>();
-  // KnowledgeGraph is a full page component with its own Layout.
-  return <KnowledgeGraph />;
+  const { courseId } = useParams<{ courseId?: string }>();
+  return <KnowledgeGraph courseId={courseId} />;
 }
 
 // ─── Default export — lazy-loadable entry point ───────────────────────────────

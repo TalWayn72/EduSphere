@@ -281,3 +281,61 @@ extend type Query {
   """
   myLearningPath(targetConceptName: String!): AutoPath @authenticated
 }
+
+# ─── Skill Tree (KnowledgeSkillTree UI integration) ───────────────────────────
+
+"""
+Mastery level enum for skill tree nodes.
+Mirrors the frontend MasteryLevel type for full-stack consistency.
+"""
+enum MasteryLevel {
+  NONE
+  ATTEMPTED
+  FAMILIAR
+  PROFICIENT
+  MASTERED
+}
+
+"""
+A single node in the visual skill tree.
+Derived from Concept vertices in the Apache AGE graph, enriched with mastery data.
+"""
+type SkillTreeNode {
+  id: ID!
+  label: String!
+  type: String!
+  masteryLevel: MasteryLevel!
+  connections: [ID!]!
+}
+
+"""
+An edge in the skill tree connecting two nodes.
+"""
+type SkillTreeEdge {
+  source: ID!
+  target: ID!
+}
+
+"""
+Complete skill tree for a course — nodes + edges.
+"""
+type SkillTree {
+  nodes: [SkillTreeNode!]!
+  edges: [SkillTreeEdge!]!
+}
+
+extend type Query {
+  """
+  Fetch the skill tree for a course (derived from concept graph relationships).
+  Returns nodes enriched with the current user's mastery level.
+  """
+  skillTree(courseId: ID!): SkillTree! @authenticated
+}
+
+extend type Mutation {
+  """
+  Update the mastery level for a skill tree node (concept) for the current user.
+  Stored in the user_skill_mastery table (created by migration 0011).
+  """
+  updateMasteryLevel(nodeId: ID!, level: MasteryLevel!): SkillTreeNode! @authenticated
+}

@@ -19,6 +19,7 @@ import {
   MOCK_RECENT_COURSES,
 } from '../lib/mock-mobile-data';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../lib/theme';
+import { resolveStats } from '../lib/stats-utils';
 
 const HOME_QUERY = gql`
   query HomeData {
@@ -36,6 +37,20 @@ const HOME_QUERY = gql`
           lastAccessedAt
         }
       }
+    }
+  }
+`;
+
+/**
+ * MY_STATS_QUERY — fetches real learning stats (SI-9 fix: replaces always-MOCK_STATS usage).
+ * Schema: myStats: UserStats! @authenticated (subgraph-core user.graphql)
+ */
+const MY_STATS_QUERY = gql`
+  query MyStats {
+    myStats {
+      coursesEnrolled
+      conceptsMastered
+      totalLearningMinutes
     }
   }
 `;
@@ -73,10 +88,19 @@ export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { t } = useTranslation(['dashboard', 'common']);
   const { data, loading } = useQuery(HOME_QUERY, { skip: DEV_MODE });
+  const { data: statsData, loading: statsLoading } = useQuery(MY_STATS_QUERY, {
+    skip: DEV_MODE,
+  });
   const user = DEV_MODE
     ? MOCK_USER
     : (data?.me as typeof MOCK_USER | undefined);
-  const stats = MOCK_STATS;
+  const stats = DEV_MODE
+    ? MOCK_STATS
+    : resolveStats(
+        statsLoading,
+        statsData?.myStats as { coursesEnrolled?: number; conceptsMastered?: number; totalLearningMinutes?: number } | undefined,
+        MOCK_STATS
+      );
   const recentCourses: CourseItem[] = DEV_MODE
     ? MOCK_RECENT_COURSES
     : ((data?.myCourses?.edges ?? []) as Array<{ node: CourseItem }>).map(

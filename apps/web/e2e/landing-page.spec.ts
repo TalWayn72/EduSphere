@@ -174,9 +174,88 @@ test.describe('Landing Page — Phase 1 (responsive & navigation)', () => {
   });
 });
 
-// ─── Suite 4: Visual regression ───────────────────────────────────────────────
+// ─── Suite 4: SmartRoot — route "/" behaviour ─────────────────────────────────
 
-test.describe('Landing Page — Phase 1 @visual', () => {
+test.describe('SmartRoot — "/" route behaviour', () => {
+  /**
+   * In DEV_MODE the app auto-authenticates — visiting "/" triggers SmartRoot
+   * which calls isAuthenticated() → true → Navigate to /dashboard.
+   * In non-DEV_MODE (VITE_DEV_MODE=false) visiting "/" shows the LandingPage.
+   *
+   * These tests cover the behaviour observable from the browser in each mode.
+   */
+
+  test('unauthenticated visit to "/" shows landing page (non-DEV_MODE)', async ({
+    page,
+  }) => {
+    test.skip(
+      process.env.VITE_DEV_MODE !== 'false',
+      'SmartRoot shows LandingPage at "/" only in non-DEV_MODE'
+    );
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    // SmartRoot → isAuthenticated()=false → renders LandingPage
+    await expect(
+      page.locator('[data-testid="hero-section"]')
+    ).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('"Log In" button on landing page at "/" navigates to /login', async ({
+    page,
+  }) => {
+    test.skip(
+      process.env.VITE_DEV_MODE !== 'false',
+      'SmartRoot shows LandingPage at "/" only in non-DEV_MODE'
+    );
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    const loginLink = page.getByRole('link', { name: /Log In/i }).first();
+    await loginLink.waitFor({ timeout: 10_000 });
+    await loginLink.click();
+    await page.waitForURL(/\/login/, { timeout: 10_000 });
+    expect(page.url()).toContain('/login');
+  });
+
+  test('authenticated user visiting "/" goes to /dashboard in DEV_MODE', async ({
+    page,
+  }) => {
+    // In DEV_MODE auto-auth is active — SmartRoot detects isAuthenticated()=true
+    // and renders <Navigate to="/dashboard" replace /> without showing LandingPage.
+    test.skip(
+      process.env.VITE_DEV_MODE === 'false',
+      'DEV_MODE auto-auth required for this test'
+    );
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    // SmartRoot redirects to /dashboard (or /learn/content-1 via a nested route)
+    await page.waitForURL(/\/(dashboard|learn)/, { timeout: 10_000 });
+    expect(page.url()).not.toContain('/landing');
+    // Landing page hero section should NOT be visible
+    await expect(
+      page.locator('[data-testid="hero-section"]')
+    ).not.toBeVisible({ timeout: 3_000 });
+  });
+
+  test('LandingPage at /landing is accessible without auth in all modes', async ({
+    page,
+  }) => {
+    // /landing is a direct public route (not mediated by SmartRoot)
+    await page.goto(`${BASE_URL}/landing`, { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.locator('[data-testid="hero-section"]')
+    ).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('no raw technical strings at "/" in any auth mode', async ({ page }) => {
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    // Allow redirect to complete before asserting
+    await page.waitForLoadState('domcontentloaded');
+    const body = await page.textContent('body');
+    expect(body).not.toContain('[object Object]');
+    expect(body).not.toContain('Cannot query field');
+  });
+});
+
+// ─── Suite 5: Visual regression ───────────────────────────────────────────────
+
+test.describe('Landing Page — @visual', () => {
   test.use({ reducedMotion: 'reduce' });
 
   test('visual regression — landing page desktop', async ({ page }) => {

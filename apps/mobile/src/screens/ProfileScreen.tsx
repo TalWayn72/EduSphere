@@ -9,7 +9,7 @@ import {
 import { useQuery, gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { COLORS, SPACING, RADIUS, FONT } from '../lib/theme';
+import { COLORS, SPACING, FONT } from '../lib/theme';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 

@@ -37,6 +37,7 @@ import errorsEn from '../../../../packages/i18n/src/locales/en/errors.json';
 import knowledgeEn from '../../../../packages/i18n/src/locales/en/knowledge.json';
 import navEn from '../../../../packages/i18n/src/locales/en/nav.json';
 import settingsEn from '../../../../packages/i18n/src/locales/en/settings.json';
+import offlineEn from '../../../../packages/i18n/src/locales/en/offline.json';
 
 type TranslationRecord = Record<string, unknown>;
 
@@ -53,6 +54,7 @@ const EN_RESOURCES: Record<string, TranslationRecord> = {
   errors: errorsEn as TranslationRecord,
   knowledge: knowledgeEn as TranslationRecord,
   nav: navEn as TranslationRecord,
+  offline: offlineEn as TranslationRecord,
   settings: settingsEn as TranslationRecord,
 };
 

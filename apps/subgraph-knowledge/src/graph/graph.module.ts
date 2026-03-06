@@ -25,6 +25,8 @@ import { SkillGapRecommendations } from './skill-gap.recommendations';
 import { SocialRecommendationsService } from './social-recommendations.service';
 import { SocialRecommendationsDataService } from './social-recommendations-data.service';
 import { SocialRecommendationsResolver } from './social-recommendations.resolver';
+import { SkillTreeService } from './skill-tree.service';
+import { SkillTreeResolver } from './skill-tree.resolver';
 
 @Module({
   imports: [EmbeddingModule],
@@ -60,6 +62,8 @@ import { SocialRecommendationsResolver } from './social-recommendations.resolver
     SocialRecommendationsDataService,
     SocialRecommendationsService,
     SocialRecommendationsResolver,
+    SkillTreeService,
+    SkillTreeResolver,
   ],
   exports: [GraphService, CypherService],
 })

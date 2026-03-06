@@ -19,6 +19,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Root cleanliness check — fail fast if artifacts are committed to project root
+  root-cleanliness:
+    name: Root Cleanliness Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for artifacts in project root
+        run: |
+          # Find artifacts in root only (not subdirectories)
+          violations=$(find . -maxdepth 1 -type f \( -name "*.png" -o -name "*.txt" -o -name "nul" -o -name ".tmp-*" \) 2>/dev/null)
+          if [ -n "$violations" ]; then
+            echo "ERROR: Artifacts found in project root:"
+            echo "$violations"
+            echo "Move PNGs to docs/screenshots/, logs to docs/logs/"
+            exit 1
+          fi
+          echo "Root cleanliness check passed"
+
   # Lint job - ESLint + Prettier validation
   lint:
     name: Lint (ESLint + Prettier)
@@ -476,6 +498,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       [
+        root-cleanliness,
         lint,
         typecheck,
         unit-tests,
@@ -494,7 +517,8 @@ jobs:
         run: |
           # HIVE-001: schema-check is always "success" even when HIVE_TOKEN is absent
           # because the conditional step reports skip (not failure) and the job succeeds.
-          if [[ "${{ needs.lint.result }}" != "success" || \
+          if [[ "${{ needs.root-cleanliness.result }}" != "success" || \
+                "${{ needs.lint.result }}" != "success" || \
                 "${{ needs.typecheck.result }}" != "success" || \
                 "${{ needs.unit-tests.result }}" != "success" || \
                 "${{ needs.security-scan.result }}" != "success" || \

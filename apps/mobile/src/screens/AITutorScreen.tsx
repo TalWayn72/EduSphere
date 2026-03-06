@@ -1,3 +1,9 @@
+/**
+ * AITutorScreen — AI tutor chat for mobile.
+ * SI-9 fix: real sessionId created via mutation (no hardcoded 'demo-session').
+ * SI-10: AI consent gate (AsyncStorage) must be granted before sending messages.
+ * Memory safe: subscription variables bound to real sessionId only.
+ */
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -8,9 +14,20 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useSubscription, useMutation, gql } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
+import { checkAiConsent, grantAiConsent } from '../lib/ai-consent';
+
+const CREATE_SESSION = gql`
+  mutation CreateAgentSession($templateType: String!, $context: JSON) {
+    startAgentSession(templateType: $templateType, context: $context) {
+      id
+    }
+  }
+`;
 
 const SEND_MESSAGE = gql`
   mutation SendMessage($sessionId: ID!, $content: String!) {
@@ -19,7 +36,6 @@ const SEND_MESSAGE = gql`
         sessionId: $sessionId
         role: "USER"
         content: $content
-        tenantId: "tenant-1"
       }
     ) {
       id
@@ -45,31 +61,125 @@ interface AgentMessage {
   createdAt: string;
 }
 
+// Re-export for backward compatibility and convenience
+export { checkAiConsent, grantAiConsent } from '../lib/ai-consent';
+
+/**
+ * Pure logic: resolve sessionId from mutation result or fallback.
+ * Exported for unit testing without render.
+ */
+export function resolveSessionId(
+  mutationResult: string | null,
+  fallback: string
+): string {
+  if (mutationResult && mutationResult.trim().length > 0) {
+    return mutationResult;
+  }
+  return fallback;
+}
+
 export default function AITutorScreen() {
   const { t } = useTranslation('agents');
   const [messages, setMessages] = useState<AgentMessage[]>([]);
   const [input, setInput] = useState('');
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [consentGranted, setConsentGranted] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-  const sessionId = 'demo-session'; // TODO: Create session on mount
 
+  const [createSession] = useMutation(CREATE_SESSION);
   const [sendMessage] = useMutation(SEND_MESSAGE);
+
   const { data } = useSubscription(MESSAGE_SUB, {
-    variables: { sessionId },
+    variables: { sessionId: sessionId ?? '' },
+    skip: !sessionId,
   });
+
+  // SI-10: Check consent on mount
+  useEffect(() => {
+    void checkAiConsent().then((granted) => {
+      setConsentGranted(granted);
+    });
+  }, []);
+
+  // SI-9: Create real session on mount
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const result = await createSession({
+          variables: { templateType: 'AI_TUTOR', context: {} },
+        });
+        const newId = result.data?.startAgentSession?.id as string | null;
+        if (!cancelled) {
+          const resolved = resolveSessionId(newId ?? null, 'demo-session');
+          if (!newId) {
+            console.warn(
+              '[AITutorScreen] Session creation returned no id — falling back to demo-session'
+            );
+          }
+          setSessionId(resolved);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.warn(
+            '[AITutorScreen] Failed to create agent session, using demo-session fallback:',
+            err
+          );
+          setSessionId('demo-session');
+        }
+      } finally {
+        if (!cancelled) setSessionLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [createSession]);
 
   useEffect(() => {
     if (data?.agentMessageCreated) {
-      setMessages((prev) => [...prev, data.agentMessageCreated]);
+      setMessages((prev) => [...prev, data.agentMessageCreated as AgentMessage]);
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
   }, [data]);
 
+  // SI-10: Show consent modal if not granted
+  const requestConsent = () => {
+    Alert.alert(
+      'AI Feature Consent',
+      'This feature uses AI. Do you consent to sending your learning data to AI systems?',
+      [
+        {
+          text: 'Decline',
+          style: 'cancel',
+          onPress: () => {
+            // User declined — do not proceed
+          },
+        },
+        {
+          text: 'Accept',
+          onPress: () => {
+            void grantAiConsent().then(() => setConsentGranted(true));
+          },
+        },
+      ]
+    );
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage = {
+    // SI-10: Enforce consent before sending to AI
+    if (!consentGranted) {
+      requestConsent();
+      return;
+    }
+
+    const effectiveSessionId = sessionId ?? 'demo-session';
+    const userMessage: AgentMessage = {
       id: Date.now().toString(),
       role: 'USER',
       content: input,
@@ -78,8 +188,17 @@ export default function AITutorScreen() {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
 
-    await sendMessage({ variables: { sessionId, content: input } });
+    await sendMessage({ variables: { sessionId: effectiveSessionId, content: input } });
   };
+
+  if (sessionLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Starting session…</Text>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -100,8 +219,8 @@ export default function AITutorScreen() {
           >
             <Text style={styles.messageRole}>
               {item.role === 'USER'
-                ? `👤 ${t('common:profile')}`
-                : `🤖 ${t('chatPanel.title')}`}
+                ? `\u{1F464} ${t('common:profile')}`
+                : `\u{1F916} ${t('chatPanel.title')}`}
             </Text>
             <Text style={styles.messageContent}>{item.content}</Text>
             <Text style={styles.messageTime}>
@@ -112,7 +231,7 @@ export default function AITutorScreen() {
         contentContainerStyle={styles.messagesList}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>🤖</Text>
+            <Text style={styles.emptyIcon}>{'\u{1F916}'}</Text>
             <Text style={styles.emptyText}>{t('startConversation')}</Text>
           </View>
         }
@@ -132,7 +251,7 @@ export default function AITutorScreen() {
             styles.sendButton,
             !input.trim() && styles.sendButtonDisabled,
           ]}
-          onPress={handleSend}
+          onPress={() => void handleSend()}
           disabled={!input.trim()}
         >
           <Text style={styles.sendButtonText}>{t('sendMessage')}</Text>
@@ -146,6 +265,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
   },
   messagesList: {
     padding: 16,

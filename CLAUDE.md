@@ -25,12 +25,22 @@
 >
 > **Correct locations within the project:**
 >
-> - Plans & implementation specs → `docs/plans/`
+> - Active implementation plans → `docs/plans/`
+> - Bug fix documents → `docs/plans/bugs/` (naming: `BUG-NNN-description.md`)
+> - Feature plans → `docs/plans/features/`
+> - Completed/old sprint plans → `docs/plans/archive/`
 > - Security & compliance docs → `docs/security/`
 > - Architecture decisions → `docs/architecture/`
 > - ISMS & ISO documents → `docs/isms/`
 > - API contracts → `API_CONTRACTS_GRAPHQL_FEDERATION.md` (root)
+> - **Screenshots (PNG files) → `docs/screenshots/` — NEVER in project root**
+> - CI/build logs → `docs/logs/`
+> - Reference docs (naming standards, MCP setup, tech audit) → `docs/reference/`
+> - Testing plans → `docs/testing/`
+> - Product plans (admin, i18n, tiers) → `docs/product/`
 > - All others → `docs/<relevant-subfolder>/`
+>
+> **Screenshot Rule (IRON RULE):** Playwright screenshots, browser scans, verification PNGs — ALL go to `docs/screenshots/`. Never leave PNGs in the project root.
 >
 > **Enforcement:** When plan mode writes a plan file, immediately move it to the project before any other work. Check with `ls docs/plans/` that the file is in the correct location.
 

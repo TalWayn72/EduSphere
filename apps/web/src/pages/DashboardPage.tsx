@@ -1,3 +1,5 @@
+import { useQuery } from 'urql';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Flame, BookOpen, CheckCircle, Zap, Clock, ChevronRight } from 'lucide-react';
 import { getCurrentUser, DEV_MODE } from '@/lib/auth';
@@ -9,6 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { MY_ENROLLMENTS_QUERY } from '@/lib/graphql/content.queries';
+// TODO: replace MOCK_STREAK, MOCK_XP, MOCK_ACTIVITY with real queries once
+//       myStats and activityFeed resolvers are in the deployed supergraph.
 
 // ── Mock data ──────────────────────────────────────────────────────────────────
 
@@ -157,6 +162,33 @@ export function DashboardPage() {
   const user = getCurrentUser();
   const displayName = user?.firstName ?? (DEV_MODE ? 'Learner' : 'Learner');
 
+  // Mounted guard: prevents urql cache dispatch during sibling render (BUG-052 pattern)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  // Real query: enrollments — falls back to MOCK_IN_PROGRESS when loading or errored
+  const [enrollmentsResult] = useQuery({
+    query: MY_ENROLLMENTS_QUERY,
+    pause: !mounted,
+  });
+
+  // Derive counts from real data; fall back to mock lengths if query hasn't resolved
+  const enrolledCount =
+    enrollmentsResult.data?.myEnrollments?.length ?? MOCK_IN_PROGRESS.length;
+  const completedCount =
+    enrollmentsResult.data?.myEnrollments?.filter(
+      (e: { status: string }) => e.status === 'COMPLETED'
+    ).length ?? MOCK_COMPLETED;
+  // TODO: replace MOCK_IN_PROGRESS with real in-progress enrollments once the
+  //       myEnrollments resolver returns courseTitle + progress fields.
+  const inProgressCourses = MOCK_IN_PROGRESS;
+  const recommendedCourses = MOCK_RECOMMENDED;
+  // TODO: replace MOCK_STREAK and MOCK_XP with real myStats query once resolver is live.
+  const streak = MOCK_STREAK;
+  const xp = MOCK_XP;
+  // TODO: replace MOCK_ACTIVITY with real activityFeed query once resolver is live.
+  const activity = MOCK_ACTIVITY;
+
   return (
     <Layout>
       <div className="space-y-8 max-w-screen-xl mx-auto">
@@ -184,28 +216,28 @@ export function DashboardPage() {
               >
                 <Flame className="h-5 w-5 streak-active" aria-hidden />
                 <span className="text-sm font-semibold text-foreground">
-                  {MOCK_STREAK} day streak
+                  {streak} day streak
                 </span>
               </div>
 
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
                 <BookOpen className="h-4 w-4 text-primary" aria-hidden />
                 <span className="text-sm font-medium text-foreground">
-                  {MOCK_IN_PROGRESS.length} in progress
+                  {enrolledCount} in progress
                 </span>
               </div>
 
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
                 <CheckCircle className="h-4 w-4 text-success" aria-hidden />
                 <span className="text-sm font-medium text-foreground">
-                  {MOCK_COMPLETED} completed
+                  {completedCount} completed
                 </span>
               </div>
 
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
                 <Zap className="h-4 w-4 text-accent" aria-hidden />
                 <span className="text-sm font-medium text-foreground">
-                  {MOCK_XP.toLocaleString()} XP
+                  {xp.toLocaleString()} XP
                 </span>
               </div>
             </div>
@@ -236,7 +268,7 @@ export function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
-                  {MOCK_IN_PROGRESS.map((course) => (
+                  {inProgressCourses.map((course) => (
                     <CourseCard key={course.id} course={course} />
                   ))}
                 </div>
@@ -285,7 +317,7 @@ export function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <ol className="space-y-3" aria-label="Recent learning activities">
-                  {MOCK_ACTIVITY.map((item) => (
+                  {activity.map((item) => (
                     <li key={item.id} className="flex items-start gap-3">
                       <ActivityIcon type={item.icon} />
                       <div className="flex-1 min-w-0">
@@ -315,7 +347,7 @@ export function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {MOCK_RECOMMENDED.map((course) => (
+                {recommendedCourses.map((course) => (
                   <Link
                     key={course.id}
                     to={`/courses/${course.id}`}

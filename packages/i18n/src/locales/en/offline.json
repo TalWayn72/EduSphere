@@ -1,4 +1,9 @@
 {
+  "banner": "No internet connection — learning in offline mode",
+  "pendingSync": "{{count}} changes pending sync",
+  "download": "Download for Offline",
+  "downloaded": "Downloaded",
+  "downloading": "Downloading...",
   "conflicts": {
     "title": "{{count}} failed sync operations",
     "subtitle": "These changes could not be saved. Dismiss to clear.",

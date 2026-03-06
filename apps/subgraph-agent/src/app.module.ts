@@ -9,6 +9,7 @@ import { TemplateModule } from './template/template.module';
 import { AgentModule } from './agent/agent.module';
 import { RoleplayModule } from './roleplay/roleplay.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { LiveSessionsModule } from './live-sessions/live-sessions.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
@@ -31,6 +32,7 @@ import { authMiddleware } from './auth/auth.middleware';
     TemplateModule,
     AgentModule,
     RoleplayModule,
+    LiveSessionsModule,
   ],
 })
 export class AppModule {}

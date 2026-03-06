@@ -25,6 +25,7 @@ export default defineConfig({
       'src/screens/MyBadgesScreen.test.tsx',
       'src/screens/HomeScreen.test.tsx',
       'src/screens/CoursesScreen.test.tsx',
+      'src/screens/AITutorScreen.test.ts',
       'src/components/MasteryBadge.test.tsx',
       'src/lib/theme.test.ts',
     ],
