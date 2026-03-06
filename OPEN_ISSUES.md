@@ -1,9 +1,44 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 06 מרץ 2026 (Session 28 Phase 30 ✅ COMPLETE; web ~3510/3510 (270+ files), security 819/819 ✅, TypeScript 0 errors 26/26)
+**תאריך עדכון:** 06 מרץ 2026 (Session 28 Phase 31 ✅ COMPLETE; web ~3544/3544 (276+ files), security 819/819 ✅, TypeScript 0 errors 26/26)
 **מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 🔄 IN PROGRESS** + **BUG-054 Progress Bar ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings)
 **בדיקות:** Security: **819 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,453** (263 files, +138 Session 26) | Backend subgraphs: **2,296** (core 640 + content 1041 + annotation 144 + collab 161 + agent 599 + knowledge 509) | Gateway: **138** | i18n: ~247 | סה"כ: **>5,916 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+
+---
+
+## Phase 31 — Video Sketch Overlay Enhancement (Session 28)
+
+**Status:** ✅ Complete
+**Date:** March 2026
+**PRD Gap closed:** §4.2 (P-1) — Video Sketch Overlay (shapes, eraser, color picker, text)
+
+### Deliverables
+
+| Deliverable | Status | Files |
+|-------------|--------|-------|
+| `useSketchCanvas.ts` hook with freehand, eraser, rect, arrow, ellipse, text tools | ✅ | `src/components/useSketchCanvas.ts` |
+| `VideoSketchToolbar.tsx` with 6 tool buttons + color picker swatch | ✅ | `src/components/VideoSketchToolbar.tsx` |
+| `VideoSketchOverlay.tsx` refactored — thin coordinator using new hook + toolbar | ✅ | `src/components/VideoSketchOverlay.tsx` |
+| Eraser (`destination-out` composite operation) | ✅ | `useSketchCanvas.ts` — renderPath eraser branch |
+| Rectangle tool (`strokeRect`) | ✅ | `useSketchCanvas.ts` — renderPath rect branch |
+| Arrow tool (line + arrowhead via `drawArrow`) | ✅ | `useSketchCanvas.ts` — renderPath arrow branch |
+| Ellipse tool (`ctx.ellipse`) | ✅ | `useSketchCanvas.ts` — renderPath ellipse branch |
+| Text tool (click → positioned `<input>` → `fillText` on Enter) | ✅ | `VideoSketchOverlay.tsx` — `textInput` state + `addTextPath` |
+| Color picker (`<input type="color">`) — default `#ef4444` | ✅ | `VideoSketchToolbar.tsx` — color swatch + input |
+| Cancel resets tool + color to defaults | ✅ | `VideoSketchOverlay.tsx` — `handleCancel` |
+
+### Tests Added (Phase 31)
+
+| File | Tests | Coverage |
+|------|-------|----------|
+| `VideoSketchOverlay.tools.test.tsx` (NEW) | 21 | Tool selector (8), color picker (5), text tool (5), eraser integration (1), cancel reset (1) |
+| `VideoSketchOverlay.test.tsx` (existing — all pass) | 13 | Toggle, canvas, save, cancel, SVG display — all still passing |
+| `video-sketch.spec.ts` (E2E — NEW) | 20 | Tool selector, color picker, text tool, cancel/save, 4 visual regression shots |
+
+**New files:** `useSketchCanvas.ts`, `VideoSketchToolbar.tsx`, `VideoSketchOverlay.tools.test.tsx`, `e2e/video-sketch.spec.ts`
+**Visual regression screenshots:** `sketch-toolbar-freehand.png`, `sketch-toolbar-eraser.png`, `sketch-toolbar-rect.png`, `sketch-toggle-inactive.png`
+**Anti-recurrence:** `VideoSketchOverlay.tools.test.tsx` guards that all 6 tool buttons render with correct `aria-pressed` states, color picker defaults to `#ef4444`, and cancel resets tool/color.
 
 ---
 

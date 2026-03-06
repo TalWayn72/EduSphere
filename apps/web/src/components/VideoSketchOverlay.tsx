@@ -1,132 +1,51 @@
 /**
- * VideoSketchOverlay — HTML5 canvas freehand sketch overlay for video annotations (G2).
+ * VideoSketchOverlay — HTML5 canvas sketch overlay for video (PRD §4.2).
+ * Tools: freehand, eraser, rect, arrow, ellipse, text + color picker.
  *
  * Renders as `absolute inset-0` over a video container.
- * - "Sketch" toggle button activates drawing mode (video should be paused externally).
- * - Mouse/touch events capture freehand paths.
- * - Saves normalized paths (0-1 coords) + timestamp via onSave.
- * - Displays existing sketch annotations as SVG overlays at ±3s of current time.
- *
- * Memory safety: canvas event listeners removed on unmount.
+ * Memory safety: canvas event listeners removed on unmount via useEffect cleanup.
  */
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { Pencil, X, Check, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSketchCanvas, type DrawingTool } from './useSketchCanvas';
+import { VideoSketchToolbar } from './VideoSketchToolbar';
 
-export interface SketchPath {
-  points: { x: number; y: number }[];
-  color: string;
-  width: number;
-}
+// Re-export types for consumers (tests import from this file)
+export type { SketchPath } from './useSketchCanvas';
 
 export interface ExistingSketch {
   id: string;
-  paths: SketchPath[];
+  paths: import('./useSketchCanvas').SketchPath[];
   timestamp: number;
 }
 
 interface Props {
   currentTime: number;
-  onSave: (paths: SketchPath[], timestamp: number) => Promise<void>;
+  onSave: (paths: import('./useSketchCanvas').SketchPath[], timestamp: number) => Promise<void>;
   existingSketches?: ExistingSketch[];
 }
 
-const STROKE_COLOR = '#ef4444';
-const STROKE_WIDTH = 3;
-const VISIBILITY_WINDOW = 3; // seconds
-
-function useCanvasDrawing(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
-  const drawingRef = useRef(false);
-  const pathsRef = useRef<SketchPath[]>([]);
-  const currentPathRef = useRef<{ x: number; y: number }[]>([]);
-
-  // eslint-disable-next-line no-undef
-  const getPos = (e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) => {
-    const rect = canvas.getBoundingClientRect();
-    const client = 'touches' in e ? e.touches[0]! : e;
-    return {
-      x: (client.clientX - rect.left) / rect.width,
-      y: (client.clientY - rect.top) / rect.height,
-    };
-  };
-
-  const redraw = useCallback((canvas: HTMLCanvasElement) => {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const allPaths = [...pathsRef.current];
-    if (currentPathRef.current.length > 1) {
-      allPaths.push({ points: currentPathRef.current, color: STROKE_COLOR, width: STROKE_WIDTH });
-    }
-    for (const path of allPaths) {
-      if (path.points.length < 2) continue;
-      ctx.beginPath();
-      ctx.strokeStyle = path.color;
-      ctx.lineWidth = path.width;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.moveTo(path.points[0]!.x * canvas.width, path.points[0]!.y * canvas.height);
-      for (let i = 1; i < path.points.length; i++) {
-        ctx.lineTo(path.points[i]!.x * canvas.width, path.points[i]!.y * canvas.height);
-      }
-      ctx.stroke();
-    }
-  }, []);
-
-  // eslint-disable-next-line no-undef
-  const startDraw = useCallback((e: MouseEvent | TouchEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    e.preventDefault();
-    drawingRef.current = true;
-    currentPathRef.current = [getPos(e, canvas)];
-  }, [canvasRef]);
-
-  // eslint-disable-next-line no-undef
-  const continueDraw = useCallback((e: MouseEvent | TouchEvent) => {
-    if (!drawingRef.current) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    e.preventDefault();
-    currentPathRef.current.push(getPos(e, canvas));
-    redraw(canvas);
-  }, [canvasRef, redraw]);
-
-  const endDraw = useCallback(() => {
-    if (!drawingRef.current) return;
-    drawingRef.current = false;
-    if (currentPathRef.current.length > 1) {
-      pathsRef.current.push({ points: currentPathRef.current, color: STROKE_COLOR, width: STROKE_WIDTH });
-    }
-    currentPathRef.current = [];
-  }, []);
-
-  const clearPaths = useCallback(() => {
-    pathsRef.current = [];
-    currentPathRef.current = [];
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx?.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }, [canvasRef]);
-
-  const getPaths = () => pathsRef.current;
-
-  return { startDraw, continueDraw, endDraw, clearPaths, getPaths, redraw };
-}
+const VISIBILITY_WINDOW = 3;
+const DEFAULT_COLOR = '#ef4444';
+const DEFAULT_WIDTH = 3;
 
 export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] }: Props) {
   const [active, setActive] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [tool, setTool] = useState<DrawingTool>('freehand');
+  const [color, setColor] = useState(DEFAULT_COLOR);
+  const [textInput, setTextInput] = useState<{ x: number; y: number } | null>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { startDraw, continueDraw, endDraw, clearPaths, getPaths } = useCanvasDrawing(canvasRef);
 
-  // Attach canvas listeners when active
+  const { startDraw, continueDraw, endDraw, clearPaths, getPaths, addTextPath } =
+    useSketchCanvas({ canvasRef, tool, color, strokeWidth: DEFAULT_WIDTH });
+
+  // Attach native canvas event listeners (skipped for text tool — handled via onClick)
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !active) return;
+    if (!canvas || !active || tool === 'text') return;
     canvas.addEventListener('mousedown', startDraw);
     canvas.addEventListener('mousemove', continueDraw);
     canvas.addEventListener('mouseup', endDraw);
@@ -143,7 +62,26 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
       canvas.removeEventListener('touchmove', continueDraw);
       canvas.removeEventListener('touchend', endDraw);
     };
-  }, [active, startDraw, continueDraw, endDraw]);
+  }, [active, tool, startDraw, continueDraw, endDraw]);
+
+  // Text tool: click on canvas → show positioned <input>
+  const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (tool !== 'text') return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    setTextInput({ x, y });
+    setTimeout(() => textInputRef.current?.focus(), 0);
+  }, [tool]);
+
+  const commitText = useCallback((text: string) => {
+    if (text.trim() && textInput) {
+      addTextPath(text.trim(), textInput.x, textInput.y);
+    }
+    setTextInput(null);
+  }, [textInput, addTextPath]);
 
   const handleSave = async () => {
     const paths = getPaths();
@@ -160,17 +98,19 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
 
   const handleCancel = () => {
     clearPaths();
+    setTextInput(null);
     setActive(false);
+    setTool('freehand');
+    setColor(DEFAULT_COLOR);
   };
 
-  // Visible sketches: existing ones within VISIBILITY_WINDOW of current time
   const visibleSketches = existingSketches.filter(
     (s) => Math.abs(s.timestamp - currentTime) <= VISIBILITY_WINDOW
   );
 
   return (
     <>
-      {/* SVG overlay for displaying existing sketches */}
+      {/* SVG overlay for existing sketches (inactive mode only) */}
       {!active && visibleSketches.length > 0 && (
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none"
@@ -198,17 +138,35 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
         </svg>
       )}
 
-      {/* Drawing canvas (active mode only) */}
+      {/* Drawing canvas + text input (active mode) */}
       {active && (
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full cursor-crosshair"
-          style={{ touchAction: 'none' }}
-          aria-label="Sketch canvas — draw with mouse or touch"
-        />
+        <div className="absolute inset-0">
+          <canvas
+            ref={canvasRef}
+            className={cn(
+              'absolute inset-0 w-full h-full',
+              tool === 'text' ? 'cursor-text' : 'cursor-crosshair'
+            )}
+            style={{ touchAction: 'none' }}
+            aria-label="Sketch canvas — draw with mouse or touch"
+            onClick={handleCanvasClick}
+          />
+          {textInput && (
+            <input
+              ref={textInputRef}
+              type="text"
+              className="absolute bg-transparent border-b border-white text-white outline-none text-sm min-w-[4rem]"
+              style={{ left: `${textInput.x * 100}%`, top: `${textInput.y * 100}%` }}
+              onKeyDown={(e) => { if (e.key === 'Enter') commitText(e.currentTarget.value); }}
+              onBlur={(e) => commitText(e.currentTarget.value)}
+              data-testid="sketch-text-input"
+              aria-label="Type text annotation"
+            />
+          )}
+        </div>
       )}
 
-      {/* Toggle / action buttons */}
+      {/* Toggle button (inactive) / Toolbar (active) */}
       {!active ? (
         <button
           className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 hover:bg-black/80 text-white rounded px-2 py-1 text-[11px] font-medium transition-colors"
@@ -220,40 +178,16 @@ export function VideoSketchOverlay({ currentTime, onSave, existingSketches = [] 
           Sketch
         </button>
       ) : (
-        <div className="absolute top-2 right-2 flex items-center gap-1.5" data-testid="sketch-toolbar">
-          <Button
-            size="sm"
-            variant="ghost"
-            className={cn('h-7 px-2 text-[11px] bg-black/60 text-white hover:bg-black/80', saving && 'opacity-50')}
-            onClick={() => clearPaths()}
-            disabled={saving}
-            aria-label="Clear sketch"
-          >
-            <Trash2 className="h-3 w-3 mr-1" />
-            Clear
-          </Button>
-          <Button
-            size="sm"
-            className="h-7 px-2 text-[11px] bg-green-600 hover:bg-green-700 text-white"
-            onClick={handleSave}
-            disabled={saving}
-            aria-label="Save sketch annotation"
-            data-testid="sketch-save-btn"
-          >
-            <Check className="h-3 w-3 mr-1" />
-            {saving ? 'Saving…' : 'Save'}
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-7 px-2 text-[11px] bg-black/60 text-white hover:bg-black/80"
-            onClick={handleCancel}
-            aria-label="Cancel sketch"
-            data-testid="sketch-cancel-btn"
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </div>
+        <VideoSketchToolbar
+          tool={tool}
+          color={color}
+          saving={saving}
+          onToolChange={setTool}
+          onColorChange={setColor}
+          onClear={clearPaths}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
       )}
     </>
   );
