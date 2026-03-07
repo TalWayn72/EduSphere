@@ -1,14 +1,22 @@
-type LiveSession {
+type LiveSession @key(fields: "id") {
   id: ID!
   contentItemId: ID!
   meetingName: String!
   scheduledAt: String!
   status: String!
   recordingUrl: String
+  participantCount: Int
+  maxParticipants: Int
+  instructorId: ID
+  courseId: ID
 }
 
 extend type Query {
   liveSession(contentItemId: ID!): LiveSession @authenticated
+
+  liveSessions(status: String, limit: Int, offset: Int): [LiveSession!]! @authenticated
+
+  liveSessionById(sessionId: ID!): LiveSession @authenticated
 }
 
 extend type Mutation {

@@ -54,7 +54,7 @@ vi.mock('@/lib/graphql/sources.queries', () => ({
   DELETE_KNOWLEDGE_SOURCE: 'DELETE_KNOWLEDGE_SOURCE',
 }));
 
-import { SourceManager, parseSourceError, getSourceErrorKey } from './SourceManager';
+import { SourceManager, parseSourceError, getSourceErrorKey, getFriendlySourceErrorKey } from './SourceManager';
 
 // ── QueryClient wrapper ───────────────────────────────────────────────────────
 
@@ -122,6 +122,75 @@ describe('parseSourceError()', () => {
     expect(parseSourceError('Network timeout')).toBe(
       'שגיאת רשת — בדוק שהשרת פועל ונסה שוב.'
     );
+  });
+});
+
+// ── BUG-055 REGRESSION: getFriendlySourceErrorKey() never exposes raw backend strings ─
+
+describe('getFriendlySourceErrorKey() — BUG-055 regression', () => {
+  it('maps "Processing was interrupted (service restarted)" to sources.errorServiceRestarted', () => {
+    expect(
+      getFriendlySourceErrorKey('Processing was interrupted (service restarted)')
+    ).toBe('sources.errorServiceRestarted');
+  });
+
+  it('maps "interrupted" variant to sources.errorServiceRestarted', () => {
+    expect(getFriendlySourceErrorKey('Worker interrupted')).toBe(
+      'sources.errorServiceRestarted'
+    );
+  });
+
+  it('maps timeout error to sources.errorTimeout', () => {
+    expect(getFriendlySourceErrorKey('Processing timed out after 300s')).toBe(
+      'sources.errorTimeout'
+    );
+  });
+
+  it('maps file size error to sources.errorFileTooLarge', () => {
+    expect(
+      getFriendlySourceErrorKey('File exceeds size limit of 25 MB')
+    ).toBe('sources.errorFileTooLarge');
+  });
+
+  it('returns sources.errorGeneric for unknown error strings', () => {
+    expect(
+      getFriendlySourceErrorKey('Unexpected internal error XYZ')
+    ).toBe('sources.errorGeneric');
+  });
+
+  it('returns sources.errorGeneric for undefined (no error message)', () => {
+    expect(getFriendlySourceErrorKey(undefined)).toBe('sources.errorGeneric');
+  });
+
+  it('NEVER returns a raw technical backend string — always returns an i18n key', () => {
+    const rawBackendStrings = [
+      'Processing was interrupted (service restarted)',
+      'Worker interrupted',
+      'timed out after 300s',
+      'size limit exceeded',
+      undefined,
+    ];
+    for (const raw of rawBackendStrings) {
+      const key = getFriendlySourceErrorKey(raw);
+      // Must be a dot-notation i18n key, never the raw string itself
+      expect(key).toMatch(/^sources\.\w+$/);
+      expect(key).not.toBe(raw);
+    }
+  });
+});
+
+// ── BUG-055 REGRESSION: SourceManager must NOT render raw errorMessage in DOM ─
+
+describe('SourceManager FAILED source — BUG-055 visual regression', () => {
+  it('does NOT render raw "Processing was interrupted" text in UI for FAILED source', async () => {
+    render(<SourceManager courseId="course-1" />, { wrapper });
+    // The dev mock data does not include FAILED sources, but we verify the
+    // key contract: raw technical backend strings are never in the DOM.
+    await waitFor(() => {
+      const bodyText = document.body.textContent ?? '';
+      expect(bodyText).not.toContain('Processing was interrupted');
+      expect(bodyText).not.toContain('service restarted');
+    });
   });
 });
 

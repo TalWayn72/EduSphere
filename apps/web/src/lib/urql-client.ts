@@ -38,6 +38,11 @@ function hasAuthError(error: CombinedError): boolean {
   );
 }
 
+// Rate-limit subscription auth warnings: log at most once per subscription
+// operation name per page session. Without this, urql reconnect loops cause
+// the same warning to appear 5+ times in the browser console.
+const _warnedSubscriptionOps = new Set<string>();
+
 const authErrorExchange = errorExchange({
   // onError receives the operation as the second argument (urql errorExchange API).
   // Subscription auth failures (e.g. notificationReceived when the WebSocket
@@ -48,10 +53,17 @@ const authErrorExchange = errorExchange({
   onError(error: CombinedError, operation: Operation) {
     if (operation.kind === 'subscription') {
       if (hasAuthError(error)) {
-        console.warn(
-          '[Auth] Subscription auth error — degrading gracefully (real-time updates paused).',
-          error.message
-        );
+        const opDef = operation.query.definitions.find(
+          (d) => d.kind === 'OperationDefinition'
+        ) as { name?: { value: string } } | undefined;
+        const opName = opDef?.name?.value ?? 'unknown';
+        if (!_warnedSubscriptionOps.has(opName)) {
+          _warnedSubscriptionOps.add(opName);
+          console.warn(
+            '[Auth] Subscription auth error — degrading gracefully (real-time updates paused).',
+            error.message
+          );
+        }
       }
       return;
     }

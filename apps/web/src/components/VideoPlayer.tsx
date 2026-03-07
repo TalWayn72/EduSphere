@@ -258,7 +258,7 @@ export function VideoPlayer({
             {subtitleTracks.length > 0 && (
               <VideoSubtitleSelector
                 tracks={subtitleTracks}
-                activeLanguage={activeSubtitle}
+                active={activeSubtitle}
                 onChange={setActiveSubtitle}
               />
             )}

@@ -188,6 +188,27 @@ export function getSourceErrorKey(e: unknown): string {
   return 'sources.errorGeneric';
 }
 
+/**
+ * Maps a FAILED knowledge source's backend errorMessage to a safe i18n key.
+ * Prevents raw technical strings (e.g. "Processing was interrupted (service restarted)")
+ * from being displayed verbatim to end users.
+ * Exported for unit testing.
+ */
+export function getFriendlySourceErrorKey(errorMessage?: string): string {
+  if (!errorMessage) return 'sources.errorGeneric';
+  const m = errorMessage.toLowerCase();
+  if (m.includes('interrupted') || m.includes('service restarted')) {
+    return 'sources.errorServiceRestarted';
+  }
+  if (m.includes('timeout') || m.includes('timed out')) {
+    return 'sources.errorTimeout';
+  }
+  if (m.includes('too large') || m.includes('size limit')) {
+    return 'sources.errorFileTooLarge';
+  }
+  return 'sources.errorGeneric';
+}
+
 /** @deprecated Use getSourceErrorKey() + t() instead. Kept for unit tests. */
 export function parseSourceError(e: unknown): string {
   if (!e) return 'שגיאה לא ידועה';
@@ -779,9 +800,9 @@ export function SourceManager({ courseId }: { courseId: string }) {
                     · {t('sources.chunks', { count: source.chunkCount })}
                   </span>
                 )}
-                {source.status === 'FAILED' && source.errorMessage && (
+                {source.status === 'FAILED' && (
                   <span className="text-xs text-red-400 truncate">
-                    — {source.errorMessage}
+                    — {t(getFriendlySourceErrorKey(source.errorMessage))}
                   </span>
                 )}
               </div>

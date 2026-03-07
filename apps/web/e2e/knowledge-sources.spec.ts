@@ -277,6 +277,9 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
     });
   });
 
+  // ── BUG-055 regression: raw errorMessage must never appear in UI ─────────────
+  // This test skipped in live-backend mode (requires mock GraphQL response).
+  // Covered by the dedicated DEV_MODE suite below.
   test('can delete a source', async ({ page }) => {
     // Add a source first
     await page.getByRole('button', { name: /הוסף מקור/i }).click();
@@ -306,5 +309,133 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
     ).not.toBeVisible({
       timeout: UI_TIMEOUT,
     });
+  });
+});
+
+// ─── Suite 3: BUG-055 regression — raw errorMessage never shown in UI ─────────
+//
+// Intercepts the GraphQL courseKnowledgeSources query and returns a FAILED
+// source whose errorMessage is the raw backend string used in production.
+// Asserts that the raw string is never rendered; only a user-friendly
+// i18n message appears.
+
+test.describe('Knowledge Sources — BUG-055 (raw errorMessage must not reach UI)', () => {
+  const RAW_BACKEND_ERROR = 'Processing was interrupted (service restarted)';
+
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+
+    // Intercept GraphQL requests and inject a FAILED source with raw errorMessage
+    await page.route('**/graphql', async (route) => {
+      const request = route.request();
+      const body = request.postDataJSON() as { query?: string } | null;
+      if (body?.query?.includes('courseKnowledgeSources')) {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              courseKnowledgeSources: [
+                {
+                  id: 'failed-src-1',
+                  title: 'ספר נהר שלום — הרש"ש (טקסט מלא)',
+                  sourceType: 'FILE_DOCX',
+                  origin: 'nahar-shalom.docx',
+                  preview: null,
+                  status: 'FAILED',
+                  chunkCount: 0,
+                  errorMessage: RAW_BACKEND_ERROR,
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            },
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    // Open sources panel
+    await page.getByTestId('toggle-sources').click();
+    await expect(page.getByTestId('sources-panel')).toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
+  });
+
+  test('BUG-055: raw backend errorMessage is NOT visible in the UI', async ({
+    page,
+  }) => {
+    await expect(page.getByText(RAW_BACKEND_ERROR)).not.toBeVisible({
+      timeout: UI_TIMEOUT,
+    });
+  });
+
+  test('BUG-055: raw "service restarted" technical string is NOT in page text', async ({
+    page,
+  }) => {
+    const bodyText = await page.evaluate(() => document.body.textContent ?? '');
+    expect(bodyText).not.toContain('service restarted');
+    expect(bodyText).not.toContain('Processing was interrupted');
+  });
+
+  test('BUG-055: FAILED source shows user-friendly error (not raw string)', async ({
+    page,
+  }) => {
+    // The source should be visible with FAILED status indicator
+    await expect(
+      page.getByText(/שגיאה|Error|interrupted|failed/i).first()
+    ).toBeVisible({ timeout: UI_TIMEOUT });
+    // But the raw technical string must be absent
+    const bodyText = await page.evaluate(() => document.body.textContent ?? '');
+    expect(bodyText).not.toContain('service restarted');
+  });
+
+  test('BUG-055: visual regression — sources panel with FAILED source', async ({
+    page,
+  }) => {
+    await expect(page.getByTestId('sources-panel')).toHaveScreenshot(
+      'sources-panel-failed-source.png'
+    );
+  });
+});
+
+// ─── Suite 4: BUG-056 regression — subscription auth warning fires at most once ─
+//
+// Navigates to a course page and monitors console.warn calls.
+// The urql subscription auth warning must fire at most ONCE per subscription
+// operation name, not 5+ times due to reconnect loops.
+
+test.describe('Knowledge Sources — BUG-056 (subscription auth warning rate-limit)', () => {
+  test('BUG-056: subscription auth console.warn fires at most once', async ({
+    page,
+  }) => {
+    const authWarnings: string[] = [];
+
+    page.on('console', (msg) => {
+      if (
+        msg.type() === 'warning' &&
+        msg.text().includes('Subscription auth error')
+      ) {
+        authWarnings.push(msg.text());
+      }
+    });
+
+    await login(page);
+    await page.goto(COURSE_URL, { waitUntil: 'domcontentloaded' });
+    // Wait long enough for any reconnect loops to manifest
+    await page.waitForTimeout(3_000);
+
+    // Rate limiter must prevent the same warning from appearing more than once
+    // per subscription operation name
+    const uniqueWarnings = new Set(authWarnings);
+    for (const warning of uniqueWarnings) {
+      const count = authWarnings.filter((w) => w === warning).length;
+      expect(
+        count,
+        `Subscription auth warning "${warning}" fired ${count} times — expected ≤ 1`
+      ).toBeLessThanOrEqual(1);
+    }
   });
 });

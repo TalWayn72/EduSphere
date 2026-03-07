@@ -150,6 +150,48 @@ type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATI
   id: ID!
 }
 
+type LiveSession @join__type(graph: AGENT, key: "id")  @join__type(graph: CONTENT, key: "id")  {
+  id: ID! @join__field(graph: CONTENT)
+  contentItemId: ID! @join__field(graph: CONTENT)
+  meetingName: String! @join__field(graph: CONTENT)
+  scheduledAt: String! @join__field(graph: CONTENT)
+  status: String! @join__field(graph: CONTENT)
+  recordingUrl: String @join__field(graph: CONTENT)
+  participantCount: Int @join__field(graph: CONTENT)
+  maxParticipants: Int @join__field(graph: CONTENT)
+  instructorId: ID @join__field(graph: CONTENT)
+  courseId: ID @join__field(graph: CONTENT)
+}
+
+type JoinSessionResult @join__type(graph: AGENT)  {
+  session: LiveSession! @join__field(graph: AGENT)
+  roomUrl: String @join__field(graph: AGENT)
+  token: String @join__field(graph: AGENT)
+}
+
+type StartLiveSessionResult @join__type(graph: AGENT)  {
+  sessionId: ID! @join__field(graph: AGENT)
+  status: String! @join__field(graph: AGENT)
+  startedAt: String! @join__field(graph: AGENT)
+}
+
+type SessionAttendee @join__type(graph: AGENT)  {
+  userId: ID! @join__field(graph: AGENT)
+  joinedAt: DateTime! @join__field(graph: AGENT)
+  role: String! @join__field(graph: AGENT)
+}
+
+type SessionAttendeeEdge @join__type(graph: AGENT)  {
+  node: SessionAttendee! @join__field(graph: AGENT)
+  cursor: String! @join__field(graph: AGENT)
+}
+
+type SessionAttendeeConnection @join__type(graph: AGENT)  {
+  edges: [SessionAttendeeEdge!]! @join__field(graph: AGENT)
+  pageInfo: PageInfo! @join__field(graph: AGENT)
+  totalCount: Int! @join__field(graph: AGENT)
+}
+
 type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
   agentSession(id: ID!) : AgentSession @join__field(graph: AGENT) 
   myAgentSessions: [AgentSession!]! @join__field(graph: AGENT) 
@@ -302,7 +344,11 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   socialRecommendations(limit: Int) : [SocialRecommendation!]! @join__field(graph: KNOWLEDGE)  @authenticated
   socialFeed(limit: Int) : [SocialFeedItem!]! @join__field(graph: KNOWLEDGE)  @authenticated
   courseKnowledgeSources(courseId: ID!) : [KnowledgeSource!]! @join__field(graph: KNOWLEDGE) 
-  knowledgeSource(id: ID!) : KnowledgeSource @join__field(graph: KNOWLEDGE) 
+  knowledgeSource(id: ID!) : KnowledgeSource @join__field(graph: KNOWLEDGE)
+  liveSession(contentItemId: ID!) : LiveSession @join__field(graph: CONTENT)  @authenticated
+  liveSessions(status: String, limit: Int, offset: Int) : [LiveSession!]! @join__field(graph: CONTENT)  @authenticated
+  liveSessionById(sessionId: ID!) : LiveSession @join__field(graph: CONTENT)  @authenticated
+  sessionAttendees(sessionId: ID!, first: Int, after: String) : SessionAttendeeConnection! @join__field(graph: AGENT)  @authenticated
 }
 
 type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
@@ -462,7 +508,12 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   """
   Remove a knowledge source (and its embeddings).
   """
-  deleteKnowledgeSource(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE) 
+  deleteKnowledgeSource(id: ID!) : Boolean! @join__field(graph: KNOWLEDGE)
+  createLiveSession(contentItemId: ID!, scheduledAt: String!, meetingName: String!) : LiveSession! @join__field(graph: CONTENT)  @authenticated
+  joinLiveSession(sessionId: ID!) : JoinSessionResult! @join__field(graph: AGENT)  @authenticated
+  startLiveSession(sessionId: ID!) : StartLiveSessionResult! @join__field(graph: AGENT)  @authenticated
+  endLiveSession(sessionId: ID!) : LiveSession! @join__field(graph: CONTENT)  @authenticated
+  cancelLiveSession(sessionId: ID!) : LiveSession! @join__field(graph: AGENT)  @authenticated
 }
 
 type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE)  {

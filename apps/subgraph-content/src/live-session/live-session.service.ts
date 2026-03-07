@@ -38,6 +38,10 @@ export interface LiveSessionResult {
   scheduledAt: string;
   status: string;
   recordingUrl: string | null;
+  participantCount: number | null;
+  maxParticipants: number | null;
+  instructorId: string | null;
+  courseId: string | null;
 }
 
 interface DbLiveSession {
@@ -85,6 +89,10 @@ export class LiveSessionService implements OnModuleDestroy {
       scheduledAt: row.scheduledAt.toISOString(),
       status: row.status,
       recordingUrl: row.recordingUrl ?? null,
+      participantCount: null,
+      maxParticipants: null,
+      instructorId: null,
+      courseId: null,
     };
   }
 
@@ -304,6 +312,48 @@ export class LiveSessionService implements OnModuleDestroy {
         .where(eq(schema.liveSessions.id, sessionId));
       this.logger.log(`Recording saved for session=${sessionId}`);
     }
+  }
+
+  async listSessions(
+    tenantId: string,
+    status?: string,
+    limit = 20,
+    offset = 0
+  ): Promise<LiveSessionResult[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.liveSessions)
+      .where(
+        status
+          ? and(
+              eq(schema.liveSessions.tenantId, tenantId),
+              eq(schema.liveSessions.status, status as 'SCHEDULED' | 'LIVE' | 'ENDED' | 'RECORDING' | 'CANCELLED')
+            )
+          : eq(schema.liveSessions.tenantId, tenantId)
+      )
+      .orderBy(schema.liveSessions.scheduledAt)
+      .limit(limit)
+      .offset(offset);
+
+    return (rows as DbLiveSession[]).map((r) => this.map(r));
+  }
+
+  async getById(
+    sessionId: string,
+    tenantId: string
+  ): Promise<LiveSessionResult | null> {
+    const [row] = await this.db
+      .select()
+      .from(schema.liveSessions)
+      .where(
+        and(
+          eq(schema.liveSessions.id, sessionId),
+          eq(schema.liveSessions.tenantId, tenantId)
+        )
+      )
+      .limit(1);
+
+    return row ? this.map(row as DbLiveSession) : null;
   }
 
   private async subscribeToSessionEnded(): Promise<void> {

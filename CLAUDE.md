@@ -748,6 +748,7 @@ Execute one fix round per logical grouping of similar issues. **A round is NEVER
 
 **Round Completion Gate (MANDATORY after EVERY fix round):**
 A round is NOT done until ALL of the following pass:
+0. Docker infrastructure UP — `docker ps` shows postgres, keycloak, nats, minio, jaeger healthy. If not: `docker-compose up -d` first. **Never skip — E2E + visual tests fail silently without Docker.**
 1. `pnpm turbo test` passes 100% for ALL affected packages (not just the one you changed)
 2. `pnpm turbo typecheck` — zero TypeScript errors
 3. Visual browser verification — open DevTools, reproduce failure, confirm clean UI
@@ -1049,6 +1050,7 @@ Then proceed autonomously without waiting for user approval.
 
 | # | Check | Command | Required Result |
 |---|-------|---------|----------------|
+| 0 | Docker Up | `docker ps \| grep -c healthy` | ≥5 containers healthy |
 | 1 | Unit Tests | `pnpm turbo test` | 100% pass, 0 failures |
 | 2 | TypeScript | `pnpm turbo typecheck` | 0 errors |
 | 3 | Lint | `pnpm turbo lint` | 0 warnings/errors |
