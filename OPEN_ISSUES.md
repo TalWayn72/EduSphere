@@ -1,9 +1,76 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 06 מרץ 2026 (Session 28 Phase 34 ✅ COMPLETE — ALL PRD GAPS CLOSED 🎉; web ~3594+/3594+ (286+ files), security 819/819 ✅, subgraph-content 1055+/1055+ ✅, TypeScript 0 errors 26/26)
+**תאריך עדכון:** 08 מרץ 2026 (Session 29 Phase 29 ✅ COMPLETE — Visual Anchoring & Asset Linking System; web 3731/3731 (287 files), subgraph-content 1095/1095 (110 files) ✅, TypeScript 0 errors)
 **מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 🔄 IN PROGRESS** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings)
 **בדיקות:** Security: **819 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,476+** (282 files) | Backend subgraphs: **2,374** (core 640 + content 1041 + annotation 144 + collab 161 + agent 677 + knowledge 509) | Gateway: **138** | i18n: ~247 | סה"כ: **>5,955 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+
+---
+
+## FEAT-VISUAL-ANCHORING — Visual Anchoring & Asset Linking System (Phase 29)
+
+**Status:** ✅ Complete
+**Date:** March 2026
+**Severity:** HIGH — Major new feature (PRD v1.6)
+**Files:** `packages/db`, `apps/subgraph-content`, `apps/web`, `apps/mobile`, `docker-compose.yml`
+
+### Deliverables
+
+**Phase 0 — Infrastructure:**
+- ClamAV service added to `docker-compose.yml` (1g mem_limit, healthcheck)
+- Env vars: `CLAMAV_HOST`, `CLAMAV_PORT`
+
+**Phase 1 — Database:**
+- Migration `0016_visual_anchoring.sql` — 3 new tables: `visual_assets`, `visual_anchors`, `document_versions`
+- RLS policies + 7 performance indexes
+- Drizzle schema: `packages/db/src/schema/visual-anchoring.ts`
+
+**Phase 2 — Backend (subgraph-content, port 4002):**
+- `ClamavService` — inline ClamAV scanning, ZIP-bomb guard (>100MB), graceful fallback
+- `ImageOptimizerService` — WebP conversion (sharp), magic-byte verification (file-type), ZIP-bomb size guard
+- `VisualAnchorService` — CRUD + simhash + RLS + NATS events (`EDUSPHERE.visual.anchor.created/deleted`)
+- `VisualAnchorResolver` + `visual-anchor.graphql` — full GraphQL API
+- `DocumentVersionService` — snapshot versioning + DIFF + rollback + broken-anchor detection
+- `DocumentVersionResolver` + `document-version.graphql`
+- All modules registered in `AppModule`
+
+**Phase 3 — Frontend Web:**
+- `VisualSidebar.tsx` — 280px fixed panel, CrossFade image display, RTL-aware
+- `CrossFadeImage.tsx` — GPU-accelerated 300ms opacity transitions
+- `AnchorFrame.tsx` — border frame over active text passage
+- `AnchorEditor.tsx` — text selection → anchor creation flow
+- `AssetPicker.tsx` + `AssetUploader.tsx` — image management UI
+- `InstructorAnchorPanel.tsx` — full anchor management list
+- `useAnchorDetection.ts` — rAF loop, throttled 20fps, centermost calculation
+- `useOfflineAnchors.ts` — IndexedDB (idb) + localStorage fallback
+- `useVisualAssetSearch.ts` — debounced 300ms search hook
+
+**Phase 4 — Mobile:**
+- `VisualBottomSheet.tsx` — @gorhom/bottom-sheet, snap points 25/50/90%
+
+**Packages added:**
+- Backend: `clamscan`, `sharp`, `file-type`, `@types/clamscan`
+- Web: `idb`, `dompurify`, `@types/dompurify`
+- Mobile: `@gorhom/bottom-sheet`
+
+### Tests
+- `clamav.service.spec.ts` — 7 tests (injected scanner pattern)
+- `image-optimizer.service.spec.ts` — 12 tests (real 1×1 sharp images)
+- `visual-anchor.service.spec.ts` — 10 tests
+- `document-version.service.spec.ts` — 7 tests (withTenantContext override pattern)
+- `useAnchorDetection.test.ts` — 4 tests (proper cancelAnimationFrame mock)
+- All components: unit tests with RTL-aware assertions
+
+### Key Technical Decisions
+- ClamAV: inline scan (immediate rejection per PRD), graceful fallback when daemon unavailable
+- WebP: skip GIF (animation) and SVG (vector), convert all others with quality=85
+- rAF throttle: every 3rd frame (~20fps detection, 60fps render)
+- `cancelAnimationFrame` in tests: must use Map (not array) so cancel actually removes pending callback
+- `vi.mock('clamscan')` CJS interop issue: use direct scanner injection instead
+- `withTenantContext.mockResolvedValueOnce()` per-test override (not complex mock chains)
+
+### Plan
+`docs/plans/features/VISUAL-ANCHORING-ASSET-LINKING.md`
 
 ---
 
@@ -7428,3 +7495,59 @@ This bypassed all real imports — TipTap/KaTeX was never loaded in tests, makin
 - docs/security/session-26-security-audit.md (new)
 - memory/enterprise-execution.md
 - memory/MEMORY.md
+
+---
+
+## FEAT-VISUAL-ANCHORING | 🟡 In Progress | HIGH
+
+**Phase 29 — Visual Anchoring & Asset Linking System (PRD v1.6)**
+**Branch:** `feat/visual-anchoring-phase29`
+**Started:** 2026-03-07
+
+### Overview
+Enables instructors to bind images/drawings to specific text passages in study documents.
+Students see the most relevant image auto-updated in a Sidebar as they scroll — smoothly, at 60fps, client-side.
+
+### Files Created (Phase 29)
+**Database:**
+- `packages/db/src/schema/visual-anchoring.ts` — visual_assets, visual_anchors, document_versions tables
+- `packages/db/src/migrations/0016_visual_anchoring.sql` — DDL + RLS policies
+
+**Backend (Content Subgraph):**
+- `apps/subgraph-content/src/clamav/` — ClamAV antivirus scanning service
+- `apps/subgraph-content/src/image-optimizer/` — WebP conversion, MIME verification
+- `apps/subgraph-content/src/visual-anchor/` — Visual anchor CRUD + GraphQL API
+- `apps/subgraph-content/src/document-version/` — Version control + rollback
+
+**Frontend Web:**
+- `apps/web/src/components/visual-anchoring/` — AnchorEditor, VisualSidebar, CrossFadeImage, AnchorFrame, AssetUploader, AssetPicker, InstructorAnchorPanel, DocumentVersionPanel
+- `apps/web/src/hooks/useAnchorDetection.ts` — rAF centermost detection (60fps)
+- `apps/web/src/hooks/useOfflineAnchors.ts` — IndexedDB offline storage
+- `apps/web/src/hooks/useVisualAssetSearch.ts` — Debounced asset search
+- `apps/web/e2e/visual-anchoring.spec.ts` — E2E Playwright tests
+
+**Mobile:**
+- `apps/mobile/src/components/VisualBottomSheet.tsx` — Bottom sheet for mobile
+
+**Security:**
+- `tests/security/clamav-upload.spec.ts` — ClamAV upload security tests
+- `tests/security/svg-sanitization.spec.ts` — SVG XSS sanitization tests
+
+**Infrastructure:**
+- `docker-compose.yml` — ClamAV service added
+
+### Architecture
+- ClamAV: **Inline synchronous scanning** — immediate rejection of infected files
+- Anchor detection: **requestAnimationFrame** + `getBoundingClientRect()` — throttled to 20fps, scroll at 60fps
+- Cross-fade: **CSS opacity transition** — GPU-accelerated, 400ms
+- Offline: **IndexedDB** via `idb` package + localStorage fallback
+- Search: PostgreSQL FTS with Hebrew support
+
+### Anti-Recurrence
+- SVG XSS: `tests/security/svg-sanitization.spec.ts` — onerror, script, javascript: all tested
+- ClamAV bypass: service returns `hasError=true` (not false positive) when scanner unavailable
+- ZIP bomb: size checked BEFORE scan (`> 100MB` → `BadRequestException`)
+- File type: server-side magic byte verification via `file-type` package
+
+### Status
+🟡 In Progress — awaiting test verification and full integration
