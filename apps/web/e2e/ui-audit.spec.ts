@@ -5,8 +5,7 @@
  */
 import { test, expect, Page } from '@playwright/test';
 import path from 'path';
-
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL } from './env';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const DIR = path.join(process.cwd(), 'ui-audit-results');
 
@@ -50,7 +49,7 @@ async function snap(page: Page, label: string): Promise<string> {
 }
 
 async function loginKeycloak(page: Page) {
-  await page.goto(`${BASE}/login`);
+  await page.goto(`${BASE_URL}/login`);
   await page.waitForLoadState('domcontentloaded');
 
   const signInBtn = page.getByRole('button', {
@@ -93,7 +92,7 @@ test('01 — Login page renders', async ({ page }) => {
   };
   collectErrors(page, entry);
 
-  await page.goto(`${BASE}/login`);
+  await page.goto(`${BASE_URL}/login`);
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(1000);
 

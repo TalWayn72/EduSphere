@@ -392,65 +392,7 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
   });
 });
 
-// ── BUG-049 Regression: React "Cannot update a component while rendering" ──────
-//
-// Root cause: LessonDetailPage, LessonPipelinePage and LessonResultsPage all
-// subscribe to LESSON_QUERY via urql. When navigating between them, the
-// outgoing page's urql subscription was notified during the incoming page's
-// render phase, causing React's setState-during-render error.
-//
-// Fix: mounted guard — `pause: !mounted` defers the query until after the
-// component is committed to the DOM, preventing the race condition.
-//
-// These tests verify the fix holds via:
-//   1. Console error interception (no "Cannot update a component" error)
-//   2. Visual screenshots showing clean UI (no error overlay)
-//   3. Stress test with rapid consecutive navigation
-
-const MOCK_LESSON_BUG049 = {
-  id: 'lesson-bug049',
-  title: 'שיעור בדיקת BUG-049',
-  type: 'SEQUENTIAL',
-  series: null,
-  lessonDate: '2024-03-01T00:00:00.000Z',
-  status: 'READY',
-  assets: [],
-  pipeline: {
-    id: 'pipeline-bug049',
-    status: 'COMPLETED',
-    nodes: [],
-    currentRun: {
-      id: 'run-bug049',
-      status: 'COMPLETED',
-      startedAt: null,
-      completedAt: null,
-      results: [],
-    },
-  },
-};
-
-const COURSE_ID_BUG049 = 'course-bug049';
-const LESSON_ID_BUG049 = 'lesson-bug049';
-const LESSON_DETAIL_URL = `${BASE_URL}/courses/${COURSE_ID_BUG049}/lessons/${LESSON_ID_BUG049}`;
-const LESSON_RESULTS_URL = `${BASE_URL}/courses/${COURSE_ID_BUG049}/lessons/${LESSON_ID_BUG049}/results`;
-
-/** Route all GraphQL calls to return a mock lesson response. */
-async function routeLessonQuery(page: Page): Promise<void> {
-  await page.route('**/graphql', async (route) => {
-    const body = (route.request().postDataJSON() ?? {}) as Record<string, unknown>;
-    const query = String(body.query ?? '');
-    if (query.includes('lesson(') || query.includes('lesson {') || query.includes('lesson\n')) {
-      await route.fulfill({
-        contentType: 'application/json',
-        body: JSON.stringify({ data: { lesson: MOCK_LESSON_BUG049 } }),
-      });
-    } else {
-      await route.continue();
-    }
-  });
-}
-
-test.describe('BUG-049 — mounted guard prevents React setState-during-render', () => {
+test.describe('BUG-049 — mounted guard prevents React setState-during-render (extended)', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
   });

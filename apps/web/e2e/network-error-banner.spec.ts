@@ -16,7 +16,7 @@
  *   5. Dismissing / retrying the banner works correctly
  *   6. Visual screenshot asserts the banner renders cleanly
  *
- * Uses page.route('**/graphql', route => route.abort()) to simulate offline.
+ * Uses page.route() with pattern **\/graphql to abort() all GraphQL requests, simulating offline.
  * No live backend required.
  *
  * Run:

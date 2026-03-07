@@ -27,8 +27,9 @@ import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import { login } from './auth.helpers';
+import { BASE_URL } from './env';
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+const BASE = BASE_URL;
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 
 /**

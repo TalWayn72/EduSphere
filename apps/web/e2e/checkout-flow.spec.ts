@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const BASE_URL = process.env['PLAYWRIGHT_BASE_URL'] ?? 'http://localhost:5173';
+import { BASE_URL } from './env';
 
 // ── Stripe mock helper ────────────────────────────────────────────────────────
 // All GraphQL mutations are intercepted via page.route to avoid real API calls.

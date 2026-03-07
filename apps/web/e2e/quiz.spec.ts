@@ -20,7 +20,9 @@ import { login } from './auth.helpers';
  * Visual snapshots are stored in: apps/web/e2e/snapshots/
  */
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL } from './env';
+
+const BASE = BASE_URL;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -37,7 +39,7 @@ async function waitForQuizPageReady(
   });
   await page.waitForTimeout(2_000);
 
-  if (await page.locator('.bg-primary.h-1\\.5.rounded-full').isVisible())
+  if (await page.locator('[data-testid="quiz-progress-fill"]').isVisible())
     return 'player';
   if ((await page.getByText('This content item is not a quiz').count()) > 0)
     return 'not-quiz';
@@ -115,7 +117,7 @@ test.describe('Quiz — Page load', () => {
     }
 
     // Progress bar fill element — always present even at 0%
-    const progressFill = page.locator('.bg-primary.h-1\\.5.rounded-full');
+    const progressFill = page.locator('[data-testid="quiz-progress-fill"]');
     await expect(progressFill.first()).toBeAttached({ timeout: 8_000 });
   });
 });

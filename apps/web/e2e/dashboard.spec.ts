@@ -31,8 +31,7 @@ import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import { login } from './auth.helpers';
-
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL } from './env';
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 
 /**
@@ -77,14 +76,14 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
   });
 
   test('page loads with "Dashboard" heading', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
       timeout: 10_000,
     });
   });
 
   test('stats cards are visible', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     // Primary stats row: Courses Enrolled, Study Time, Concepts Mastered
     await expect(page.getByText('Courses Enrolled')).toBeVisible({
       timeout: 8_000,
@@ -96,7 +95,7 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
   });
 
   test('Instructor Tools section is visible', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await expect(page.getByText('Instructor Tools')).toBeVisible({
       timeout: 8_000,
     });
@@ -116,7 +115,7 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
   test('no "preferences" schema error visible — regression guard', async ({
     page,
   }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2_000); // let React + GraphQL settle
 
     // Specific schema mismatch: preferences field missing from gateway supergraph
@@ -139,14 +138,14 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
   test('no crash overlay ("Something went wrong") visible', async ({
     page,
   }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await expect(page.getByText(/something went wrong/i)).not.toBeVisible({
       timeout: 5_000,
     });
   });
 
   test('visual snapshot — dashboard DEV_MODE render', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(800);
 
     const file = path.join(SCREENSHOTS_DIR, 'dashboard-dev-mode.png');
@@ -188,7 +187,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
 
-    await page.goto(`${BASE}/dashboard`, {
+    await page.goto(`${BASE_URL}/dashboard`, {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
@@ -217,7 +216,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
   test('user display name is shown in header from real API', async ({
     page,
   }) => {
-    await page.goto(`${BASE}/dashboard`, {
+    await page.goto(`${BASE_URL}/dashboard`, {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
@@ -233,7 +232,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
   });
 
   test('stats cards show numeric values from real API', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, {
+    await page.goto(`${BASE_URL}/dashboard`, {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });
@@ -248,7 +247,7 @@ test.describe('Dashboard — Live backend (schema regression guard)', () => {
   });
 
   test('visual snapshot — dashboard live backend render', async ({ page }) => {
-    await page.goto(`${BASE}/dashboard`, {
+    await page.goto(`${BASE_URL}/dashboard`, {
       waitUntil: 'domcontentloaded',
       timeout: 20_000,
     });

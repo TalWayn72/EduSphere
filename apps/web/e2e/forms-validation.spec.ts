@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginInDevMode } from './auth.helpers';
 
 /**
  * Forms Validation E2E tests — every form in the application.
@@ -22,8 +23,7 @@ import { test, expect } from '@playwright/test';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 async function loginDevMode(page: import('@playwright/test').Page) {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
+  await loginInDevMode(page);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

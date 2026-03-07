@@ -24,6 +24,7 @@ import {
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import { BASE_URL } from './env';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,7 +32,6 @@ const __dirname = path.dirname(__filename);
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
-const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
 const INSTRUCTOR = {
   email: 'instructor@example.com',
   password: 'Instructor123!',

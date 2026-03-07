@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { SearchPage } from './pages/SearchPage';
+import { BASE_URL } from './env';
 
 /**
  * Search E2E tests — /search route and Ctrl+K / Cmd+K keyboard shortcut.
@@ -18,10 +19,7 @@ import { SearchPage } from './pages/SearchPage';
 
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 // Matches whichever port the app is running on (5173 default, 5175 when E2E_BASE_URL overrides)
-const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5175').replace(
-  /^https?:\/\//,
-  ''
-);
+const APP_HOST = BASE_URL.replace(/^https?:\/\//, '');
 
 /**
  * Perform a full Keycloak OIDC login as the given user and wait until the app

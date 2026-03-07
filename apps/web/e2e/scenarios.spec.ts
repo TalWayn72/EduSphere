@@ -17,7 +17,9 @@ import { login } from './auth.helpers';
  * Visual snapshots: apps/web/e2e/snapshots/
  */
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL } from './env';
+
+const BASE = BASE_URL;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

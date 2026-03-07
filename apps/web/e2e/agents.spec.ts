@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { BASE_URL } from './env';
 
 /**
  * Agents E2E tests — AgentsPage (/agents).
@@ -20,10 +21,7 @@ import { test, expect, type Page } from '@playwright/test';
 
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 // Host extracted from BASE_URL — used in waitForURL pattern after Keycloak redirect
-const APP_HOST = (process.env.E2E_BASE_URL ?? 'http://localhost:5175').replace(
-  /^https?:\/\//,
-  ''
-);
+const APP_HOST = BASE_URL.replace(/^https?:\/\//, '');
 
 /**
  * Perform a full Keycloak OIDC login as the given user and wait until the app

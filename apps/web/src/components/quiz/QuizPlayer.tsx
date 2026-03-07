@@ -132,9 +132,10 @@ export function QuizPlayer({ quizContent, contentItemId }: Props) {
             {Math.round(((currentIdx + 1) / total) * 100)}%
           </span>
         </div>
-        <div className="w-full bg-muted rounded-full h-1.5">
+        <div className="w-full bg-muted rounded-full h-1.5" data-testid="quiz-progress">
           <div
             className="bg-primary h-1.5 rounded-full transition-all"
+            data-testid="quiz-progress-fill"
             style={{ width: `${((currentIdx + 1) / total) * 100}%` }}
           />
         </div>

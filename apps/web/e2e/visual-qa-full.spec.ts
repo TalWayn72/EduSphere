@@ -14,10 +14,7 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-
-// ── Config ──────────────────────────────────────────────────────────────────
-
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL as BASE } from './env';
 
 // Known seed data IDs (from nahar-shalom-course.ts + DB query)
 const SEED = {
@@ -193,7 +190,7 @@ async function login(
 
   if (page.url().includes('8080') || page.url().includes('auth')) {
     await keycloakLogin(page, user.email, user.password);
-    await page.waitForURL(/localhost:5175/, { timeout: 25000 }).catch(() => {});
+    await page.waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 25000 }).catch(() => {});
     await page.waitForTimeout(2000);
   }
 
@@ -208,7 +205,7 @@ async function login(
       if (page.url().includes('8080')) {
         await keycloakLogin(page, user.email, user.password);
         await page
-          .waitForURL(/localhost:5175/, { timeout: 25000 })
+          .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 25000 })
           .catch(() => {});
         await page.waitForTimeout(2000);
       }
@@ -329,7 +326,7 @@ test('10 — Auth: Instructor Keycloak login', async ({ page }) => {
   r.headings = await headings(page);
   r.screenshot = await snap(page, '10-instructor-login');
 
-  const loggedIn = !r.url.includes('/login') && r.url.includes('5173');
+  const loggedIn = !r.url.includes('/login') && r.url.includes(BASE.replace(/https?:\/\//, '').split('/')[0]);
   r.notes.push(`Logged in: ${loggedIn} | URL: ${r.url}`);
   r.ok = loggedIn;
 });

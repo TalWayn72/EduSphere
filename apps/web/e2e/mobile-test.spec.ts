@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
-
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL } from './env';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const SHOTS = 'test-results/mobile-screenshots';
 
@@ -14,14 +13,14 @@ test.beforeAll(() => {
 async function login(page: any) {
   if (process.env.VITE_DEV_MODE !== 'false') {
     // DEV_MODE: click the dev-login button so sessionStorage key is set
-    await page.goto(`${BASE}/login`);
+    await page.goto(`${BASE_URL}/login`);
     const devBtn = page.locator('[data-testid="dev-login-btn"]');
     await devBtn.waitFor({ timeout: 10_000 });
     await devBtn.click();
     await page.waitForURL(/\/learn\//, { timeout: 15_000 });
     return;
   }
-  await page.goto(`${BASE}/login`);
+  await page.goto(`${BASE_URL}/login`);
   await page
     .waitForFunction(() => !document.body.innerText.includes('Initializing'), {
       timeout: 15000,
@@ -35,14 +34,14 @@ async function login(page: any) {
   await page.fill('#password', STUDENT.password);
   await page.click('#kc-login');
   await page.waitForURL(
-    new RegExp(BASE.replace(/^https?:\/\//, '').replace('.', '\\.')),
+    new RegExp(BASE_URL.replace(/^https?:\/\//, '').replace('.', '\\.')),
     { timeout: 20000 }
   );
 }
 
 test('M-01 mobile hamburger menu visible', async ({ page }) => {
   await login(page);
-  await page.goto(`${BASE}/dashboard`);
+  await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('networkidle');
   await page.screenshot({
     path: `${SHOTS}/m01-dashboard.png`,
@@ -56,7 +55,7 @@ test('M-01 mobile hamburger menu visible', async ({ page }) => {
 
 test('M-02 mobile hamburger opens nav', async ({ page }) => {
   await login(page);
-  await page.goto(`${BASE}/dashboard`);
+  await page.goto(`${BASE_URL}/dashboard`);
   await page.waitForLoadState('networkidle');
   const hamburger = page
     .locator('button[aria-label*="menu"], button[aria-label*="Menu"]')
@@ -77,7 +76,7 @@ test('M-02 mobile hamburger opens nav', async ({ page }) => {
 
 test('M-03 mobile courses page', async ({ page }) => {
   await login(page);
-  await page.goto(`${BASE}/courses`);
+  await page.goto(`${BASE_URL}/courses`);
   await page.waitForLoadState('networkidle');
   await page.screenshot({ path: `${SHOTS}/m03-courses.png`, fullPage: true });
   const h1 = await page
@@ -90,7 +89,7 @@ test('M-03 mobile courses page', async ({ page }) => {
 
 test('M-04 mobile agents page', async ({ page }) => {
   await login(page);
-  await page.goto(`${BASE}/agents`);
+  await page.goto(`${BASE_URL}/agents`);
   await page.waitForLoadState('networkidle');
   await page.screenshot({ path: `${SHOTS}/m04-agents.png`, fullPage: true });
   const h1 = await page

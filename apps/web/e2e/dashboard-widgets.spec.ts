@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { login } from './auth.helpers';
+import { BASE_URL } from './env';
 
 /**
  * Dashboard Widgets E2E tests — Batch 1.
@@ -21,12 +22,10 @@ import { login } from './auth.helpers';
  * Visual snapshots: apps/web/e2e/snapshots/
  */
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function gotoDashboard(page: import('@playwright/test').Page) {
-  await page.goto(`${BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
   // Wait for React to finish rendering and mock queries to settle
   await page.waitForTimeout(2_500);
 }
@@ -449,7 +448,7 @@ test.describe('Dashboard Widgets — BadgesGrid', () => {
    * by verifying it does not crash when rendered in the app.
    */
   async function gotoBadgesPage(page: import('@playwright/test').Page) {
-    await page.goto(`${BASE}/profile`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2_500);
   }
 
@@ -555,7 +554,7 @@ test.describe('Dashboard Widgets — AtRiskLearnersTable', () => {
   const MOCK_COURSE_ID = 'course-1';
 
   async function gotoAnalyticsPage(page: import('@playwright/test').Page) {
-    await page.goto(`${BASE}/courses/${MOCK_COURSE_ID}/analytics`, {
+    await page.goto(`${BASE_URL}/courses/${MOCK_COURSE_ID}/analytics`, {
       waitUntil: 'domcontentloaded',
     });
     await page.waitForTimeout(2_500);
@@ -786,7 +785,7 @@ test.describe('Dashboard Widgets — Visual regression @visual', () => {
 
   test('visual: BadgesGrid on profile page', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto(`${BASE}/profile`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}/profile`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2_000);
 
     await expect(page).toHaveScreenshot('badges-grid-profile.png', {

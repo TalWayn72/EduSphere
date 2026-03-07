@@ -16,8 +16,9 @@
 
 import { test, expect } from '@playwright/test';
 import { login } from './auth.helpers';
+import { BASE_URL } from './env';
 
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+const BASE = BASE_URL;
 const MOCK_COURSE_ID = 'course-abc-123';
 
 // ── Suite 1: Global route (regression — must not break after T2.3) ─────────────

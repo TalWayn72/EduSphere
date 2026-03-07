@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginInDevMode } from './auth.helpers';
 
 /**
  * Comboboxes, Selects, Tabs, and Dropdowns E2E tests.
@@ -33,8 +34,7 @@ import { test, expect } from '@playwright/test';
 // ─── Auth helper ─────────────────────────────────────────────────────────────
 
 async function loginDevMode(page: import('@playwright/test').Page) {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
+  await loginInDevMode(page);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

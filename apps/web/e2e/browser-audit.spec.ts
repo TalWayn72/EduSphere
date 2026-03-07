@@ -1,5 +1,6 @@
 import { test } from '@playwright/test';
 import { mkdirSync } from 'fs';
+import { BASE_URL } from './env';
 
 const SCREENSHOTS = 'test-results/screenshots';
 
@@ -21,7 +22,7 @@ async function waitForAppReady(page: any, timeout = 15000) {
 }
 
 test('01 - Homepage loads and redirects correctly', async ({ page }) => {
-  await page.goto('http://localhost:5175/');
+  await page.goto('${BASE_URL}/');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/01-homepage.png`,
@@ -34,7 +35,7 @@ test('01 - Homepage loads and redirects correctly', async ({ page }) => {
 });
 
 test('02 - Login page', async ({ page }) => {
-  await page.goto('http://localhost:5175/login');
+  await page.goto('${BASE_URL}/login');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/02-login.png`,
@@ -46,7 +47,7 @@ test('02 - Login page', async ({ page }) => {
 });
 
 test('03 - Dashboard page', async ({ page }) => {
-  await page.goto('http://localhost:5175/dashboard');
+  await page.goto('${BASE_URL}/dashboard');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/03-dashboard.png`,
@@ -58,7 +59,7 @@ test('03 - Dashboard page', async ({ page }) => {
 });
 
 test('04 - Courses page', async ({ page }) => {
-  await page.goto('http://localhost:5175/courses');
+  await page.goto('${BASE_URL}/courses');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/04-courses.png`,
@@ -70,7 +71,7 @@ test('04 - Courses page', async ({ page }) => {
 });
 
 test('05 - Content Viewer page', async ({ page }) => {
-  await page.goto('http://localhost:5175/learn/content-1');
+  await page.goto('${BASE_URL}/learn/content-1');
   await waitForAppReady(page, 20000);
   await page.screenshot({
     path: `${SCREENSHOTS}/05-content-viewer.png`,
@@ -82,7 +83,7 @@ test('05 - Content Viewer page', async ({ page }) => {
 });
 
 test('06 - Knowledge Graph page', async ({ page }) => {
-  await page.goto('http://localhost:5175/graph');
+  await page.goto('${BASE_URL}/graph');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/06-knowledge-graph.png`,
@@ -94,7 +95,7 @@ test('06 - Knowledge Graph page', async ({ page }) => {
 });
 
 test('07 - Agents page', async ({ page }) => {
-  await page.goto('http://localhost:5175/agents');
+  await page.goto('${BASE_URL}/agents');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/07-agents.png`,
@@ -106,7 +107,7 @@ test('07 - Agents page', async ({ page }) => {
 });
 
 test('08 - Annotations page', async ({ page }) => {
-  await page.goto('http://localhost:5175/annotations');
+  await page.goto('${BASE_URL}/annotations');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/08-annotations.png`,
@@ -118,7 +119,7 @@ test('08 - Annotations page', async ({ page }) => {
 });
 
 test('09 - Collaboration page', async ({ page }) => {
-  await page.goto('http://localhost:5175/collaboration');
+  await page.goto('${BASE_URL}/collaboration');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/09-collaboration.png`,
@@ -130,7 +131,7 @@ test('09 - Collaboration page', async ({ page }) => {
 });
 
 test('10 - Search page', async ({ page }) => {
-  await page.goto('http://localhost:5175/search');
+  await page.goto('${BASE_URL}/search');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/10-search.png`,
@@ -142,7 +143,7 @@ test('10 - Search page', async ({ page }) => {
 });
 
 test('11 - Profile page', async ({ page }) => {
-  await page.goto('http://localhost:5175/profile');
+  await page.goto('${BASE_URL}/profile');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/11-profile.png`,
@@ -154,7 +155,7 @@ test('11 - Profile page', async ({ page }) => {
 });
 
 test('12 - Courses New page', async ({ page }) => {
-  await page.goto('http://localhost:5175/courses/new');
+  await page.goto('${BASE_URL}/courses/new');
   await waitForAppReady(page);
   await page.screenshot({
     path: `${SCREENSHOTS}/12-course-create.png`,
@@ -166,7 +167,7 @@ test('12 - Courses New page', async ({ page }) => {
 });
 
 test('13 - Keycloak login flow as super admin', async ({ page }) => {
-  await page.goto('http://localhost:5175/');
+  await page.goto('${BASE_URL}/');
   await waitForAppReady(page, 8000);
 
   const currentUrl = page.url();

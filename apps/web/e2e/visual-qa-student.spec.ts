@@ -15,10 +15,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-
-// ── Config ────────────────────────────────────────────────────────────────────
-
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL as BASE } from './env';
 const STUDENT = { email: 'student@example.com', password: 'Student123!' };
 const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 

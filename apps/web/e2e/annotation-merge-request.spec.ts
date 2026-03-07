@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const BASE_URL = process.env['PLAYWRIGHT_BASE_URL'] ?? 'http://localhost:5173';
+import { BASE_URL } from './env';
 
 // ── Personal Knowledge Graph tests ───────────────────────────────────────────
 test.describe('KnowledgeGraph — Personal Wiki View', () => {

@@ -1,5 +1,6 @@
 import { test } from '@playwright/test';
 import { mkdirSync } from 'fs';
+import { BASE_URL } from './env';
 
 const SCREENSHOTS = 'test-results/screenshots';
 
@@ -22,7 +23,7 @@ async function waitForAppReady(page: any, timeout = 15000) {
 
 test('Super Admin Full Login Flow', async ({ page }) => {
   // Step 1: Go to login page
-  await page.goto('http://localhost:5175/login');
+  await page.goto(`${BASE_URL}/login`);
   await waitForAppReady(page);
   console.log('Step 1 - Login page URL:', page.url());
   await page.screenshot({

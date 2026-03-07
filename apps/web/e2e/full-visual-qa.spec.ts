@@ -13,10 +13,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-
-// Default to 5174 — the dedicated Playwright test server port (5173 = dev server).
-// Override with E2E_BASE_URL env var when running against staging/production.
-const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:5175';
+import { BASE_URL as BASE } from './env';
 const RESULTS_DIR = path.join(process.cwd(), 'visual-qa-results');
 
 const USERS = {
@@ -229,7 +226,7 @@ async function doLogin(
   await keycloakLogin(page, email, password);
 
   // Wait for redirect back to app
-  await page.waitForURL(/localhost:5175/, { timeout: 20000 }).catch(() => {});
+  await page.waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(2000);
 
   // If still on login page, try once more (session may have been stale)
@@ -243,7 +240,7 @@ async function doLogin(
       await page.waitForTimeout(2000);
       await keycloakLogin(page, email, password);
       await page
-        .waitForURL(/localhost:5175/, { timeout: 20000 })
+        .waitForURL(new RegExp(BASE.replace(/https?:\/\//, '') + '/'), { timeout: 20000 })
         .catch(() => {});
       await page.waitForTimeout(2000);
     }
@@ -364,7 +361,7 @@ test('S1.02 — Student login via Keycloak', async ({ page }) => {
   entry.screenshot = await snap(page, 'S1.02-student-after-login');
 
   const isOnApp =
-    page.url().includes('localhost:5175') && !page.url().includes('/login');
+    page.url().includes(BASE.replace(/https?:\/\//, '').split('/')[0]) && !page.url().includes('/login');
   const isOnLogin = page.url().includes('/login');
 
   if (isOnApp) {
