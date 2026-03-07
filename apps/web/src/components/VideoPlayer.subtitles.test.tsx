@@ -14,18 +14,18 @@ vi.mock('./VideoSubtitleSelector', () => ({
   VideoSubtitleSelector: vi.fn(
     ({
       tracks,
-      activeLanguage,
+      active,
       onChange,
     }: {
       tracks: { language: string; label: string; src: string }[];
-      activeLanguage: string | null;
+      active: string | null;
       onChange: (lang: string | null) => void;
     }) => (
       <div data-testid="subtitle-selector">
         <button
           data-testid="subtitle-selector-btn"
           onClick={() =>
-            onChange(activeLanguage ? null : (tracks[0]?.language ?? null))
+            onChange(active ? null : (tracks[0]?.language ?? null))
           }
         >
           CC ({tracks.length})
@@ -34,7 +34,7 @@ vi.mock('./VideoSubtitleSelector', () => ({
           <button
             key={t.language}
             data-testid={`subtitle-lang-${t.language}`}
-            aria-selected={t.language === activeLanguage}
+            aria-selected={t.language === active}
             onClick={() => onChange(t.language)}
           >
             {t.label}

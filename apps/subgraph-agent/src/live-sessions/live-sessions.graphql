@@ -41,3 +41,10 @@ type SessionAttendee {
   joinedAt: DateTime!
   role: String!
 }
+
+type PageInfo @shareable {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}

@@ -153,7 +153,7 @@ export function AnnotationPanel({
     if (!proposingId) return;
     // In production this would call a GraphQL mutation.
     // For now we mark it as submitted locally.
-    console.info('[AnnotationPanel] Merge request submitted:', {
+    console.warn('[AnnotationPanel] Merge request submitted:', {
       annotationId: proposingId,
       description,
     });

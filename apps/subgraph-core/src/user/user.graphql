@@ -84,7 +84,7 @@ type UserEdge {
   node: User!
 }
 
-type PageInfo {
+type PageInfo @shareable {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
   startCursor: String

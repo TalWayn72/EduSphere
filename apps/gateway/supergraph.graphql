@@ -1050,7 +1050,7 @@ type UserEdge @join__type(graph: CORE)  {
   node: User!
 }
 
-type PageInfo @join__type(graph: CORE)  {
+type PageInfo @join__type(graph: AGENT)  @join__type(graph: CORE)  {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
   startCursor: String

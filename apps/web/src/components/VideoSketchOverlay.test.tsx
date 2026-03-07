@@ -104,13 +104,11 @@ describe('VideoSketchOverlay', () => {
       lineTo: vi.fn(),
       stroke: vi.fn(),
     };
-    /* eslint-disable no-undef */
     vi.spyOn(canvas, 'getContext').mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
       left: 0, top: 0, width: 100, height: 100,
       right: 100, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
     } as DOMRect);
-    /* eslint-enable no-undef */
 
     fireEvent.mouseDown(canvas, { clientX: 10, clientY: 10 });
     fireEvent.mouseMove(canvas, { clientX: 20, clientY: 20 });
@@ -155,13 +153,11 @@ describe('VideoSketchOverlay', () => {
       clearRect: vi.fn(), beginPath: vi.fn(), strokeStyle: '', lineWidth: 0,
       lineCap: '', lineJoin: '', moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(),
     };
-    /* eslint-disable no-undef */
     vi.spyOn(canvas, 'getContext').mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
     vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
       left: 0, top: 0, width: 100, height: 100,
       right: 100, bottom: 100, x: 0, y: 0, toJSON: () => ({}),
     } as DOMRect);
-    /* eslint-enable no-undef */
 
     fireEvent.mouseDown(canvas, { clientX: 5, clientY: 5 });
     fireEvent.mouseMove(canvas, { clientX: 15, clientY: 15 });

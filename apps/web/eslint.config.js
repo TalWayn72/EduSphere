@@ -92,6 +92,11 @@ export default [
         InputEvent: 'readonly',
         SubmitEvent: 'readonly',
         MediaQueryListEvent: 'readonly',
+        DOMRect: 'readonly',
+        DOMRectReadOnly: 'readonly',
+        CanvasRenderingContext2D: 'readonly',
+        CanvasGradient: 'readonly',
+        CanvasPattern: 'readonly',
       },
     },
     plugins: {
