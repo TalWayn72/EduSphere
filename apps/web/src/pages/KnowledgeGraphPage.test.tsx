@@ -86,7 +86,8 @@ describe('KnowledgeGraphPage', () => {
 
   it('without courseId: renders global Knowledge Graph heading', () => {
     renderWithRoute('/knowledge-graph');
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    // Use getByRole to avoid ambiguity — 'Knowledge Graph' appears in both heading and nav items
+    expect(screen.getByRole('heading', { name: /knowledge graph/i })).toBeDefined();
   });
 
   it('without courseId: does NOT show course-context badge', () => {

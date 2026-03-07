@@ -1,6 +1,7 @@
 {
   "learn": "למד",
   "courses": "קורסים",
+  "myCourses": "הקורסים שלי",
   "graph": "גרף",
   "annotations": "הערות",
   "agents": "סוכנים",
@@ -8,6 +9,9 @@
   "chavruta": "חברותא",
   "dashboard": "לוח בקרה",
   "home": "בית",
+  "discover": "גלה",
+  "knowledgeGraph": "גרף ידע",
+  "liveSessions": "שיעורים חיים",
   "discussions": "דיונים",
   "aiTutor": "מורה AI",
   "profile": "פרופיל",
@@ -18,5 +22,13 @@
   "adminPanel": "לוח ניהול",
   "lti": "שילוב LTI 1.3",
   "compliance": "ציות",
-  "scimHris": "סנכרון HRIS"
+  "scimHris": "סנכרון HRIS",
+  "settings": "הגדרות",
+  "lightMode": "מצב בהיר",
+  "darkMode": "מצב כהה",
+  "collapse": "כווץ",
+  "expandSidebar": "הרחב סרגל ניווט",
+  "collapseSidebar": "כווץ סרגל ניווט",
+  "switchToLight": "עבור למצב בהיר",
+  "switchToDark": "עבור למצב כהה"
 }

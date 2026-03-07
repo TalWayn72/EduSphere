@@ -60,11 +60,11 @@ describe('AppSidebar', () => {
   it('renders all main nav items', () => {
     renderAt();
     expect(screen.getByTestId('nav-item-home')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-item-my-courses')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-myCourses')).toBeInTheDocument();
     expect(screen.getByTestId('nav-item-discover')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-item-knowledge-graph')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-item-ai-tutor')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-item-live-sessions')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-knowledgeGraph')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-aiTutor')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-item-liveSessions')).toBeInTheDocument();
   });
 
   it('renders Settings nav item in bottom section', () => {
@@ -137,6 +137,23 @@ describe('AppSidebar', () => {
     renderAt('/dashboard');
     const homeLink = screen.getByTestId('nav-item-home');
     expect(homeLink.className).toMatch(/text-primary/);
+  });
+
+  it('renders nav labels in English via i18n', () => {
+    renderAt();
+    // Labels now come from useTranslation('nav') — verify English strings are shown
+    expect(screen.getByTestId('nav-item-home')).toHaveTextContent('Home');
+    expect(screen.getByTestId('nav-item-myCourses')).toHaveTextContent('My Courses');
+    expect(screen.getByTestId('nav-item-discover')).toHaveTextContent('Discover');
+    expect(screen.getByTestId('nav-item-knowledgeGraph')).toHaveTextContent('Knowledge Graph');
+    expect(screen.getByTestId('nav-item-aiTutor')).toHaveTextContent('AI Tutor');
+    expect(screen.getByTestId('nav-item-liveSessions')).toHaveTextContent('Live Sessions');
+  });
+
+  it('renders Settings label via i18n', () => {
+    renderAt();
+    const settingsLink = screen.getByTestId('nav-item-settings');
+    expect(settingsLink).toHaveTextContent('Settings');
   });
 
   it('shows theme toggle for dark mode when resolvedMode is dark', () => {

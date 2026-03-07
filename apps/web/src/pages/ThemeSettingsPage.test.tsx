@@ -32,6 +32,16 @@ vi.mock('@/contexts/ThemeContext', () => ({
   })),
 }));
 
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
+}));
+
+vi.mock('@/components/AppSidebar', () => ({
+  AppSidebar: () => <aside data-testid="app-sidebar" />,
+}));
+
 // ── Import after mocks ─────────────────────────────────────────────────────────
 
 import { ThemeSettingsPage } from './ThemeSettingsPage';

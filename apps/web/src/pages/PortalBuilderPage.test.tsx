@@ -39,6 +39,10 @@ vi.mock('@/lib/graphql/portal.queries', () => ({
   UNPUBLISH_PORTAL_MUTATION: 'UNPUBLISH_PORTAL_MUTATION',
 }));
 
+vi.mock('@/components/AppSidebar', () => ({
+  AppSidebar: () => <aside data-testid="app-sidebar" />,
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { PortalBuilderPage } from './PortalBuilderPage';

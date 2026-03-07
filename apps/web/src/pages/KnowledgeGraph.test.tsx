@@ -80,7 +80,7 @@ describe('KnowledgeGraph', () => {
 
   it('renders "Knowledge Graph" heading', () => {
     renderKG();
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Knowledge Graph' })).toBeDefined();
   });
 
   it('renders the subtitle about exploring concepts', () => {
@@ -188,34 +188,34 @@ describe('KnowledgeGraph', () => {
   it('clicking zoom in button does not crash', () => {
     renderKG();
     fireEvent.click(screen.getByTitle('Zoom in'));
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('clicking zoom out button does not crash', () => {
     renderKG();
     fireEvent.click(screen.getByTitle('Zoom out'));
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('clicking reset view button resets zoom and pan', () => {
     renderKG();
     fireEvent.click(screen.getByTitle('Zoom in'));
     fireEvent.click(screen.getByTitle('Reset view'));
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('clicking CONCEPT filter button does not crash', () => {
     renderKG();
     const conceptBtn = screen.getByRole('button', { name: /CONCEPT/i });
     fireEvent.click(conceptBtn);
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('clicking PERSON filter button does not crash', () => {
     renderKG();
     const personBtn = screen.getByRole('button', { name: /PERSON/i });
     fireEvent.click(personBtn);
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('clicking a filter twice clears the filter', () => {
@@ -223,7 +223,7 @@ describe('KnowledgeGraph', () => {
     const conceptBtn = screen.getByRole('button', { name: /CONCEPT/i });
     fireEvent.click(conceptBtn);
     fireEvent.click(conceptBtn);
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('SVG supports wheel event without crashing', () => {
@@ -232,7 +232,7 @@ describe('KnowledgeGraph', () => {
     if (svg) {
       fireEvent.wheel(svg, { deltaY: 100 });
     }
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('SVG supports mouseDown event without crashing', () => {
@@ -243,7 +243,7 @@ describe('KnowledgeGraph', () => {
       fireEvent.mouseMove(svg, { clientX: 110, clientY: 110 });
       fireEvent.mouseUp(svg);
     }
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('navigates to content viewer when node-related button is clicked', () => {
@@ -254,7 +254,7 @@ describe('KnowledgeGraph', () => {
       fireEvent.click(learnBtn);
       expect(mockNavigate).toHaveBeenCalled();
     }
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   it('Refresh button is hidden in DEV_MODE (vitest sets VITE_DEV_MODE=true)', () => {
@@ -266,7 +266,7 @@ describe('KnowledgeGraph', () => {
 
   it('component renders without crash regardless of DEV_MODE', () => {
     renderKG();
-    expect(screen.getByText('Knowledge Graph')).toBeDefined();
+    expect(screen.getAllByText('Knowledge Graph').length).toBeGreaterThan(0);
   });
 
   // ─── Regression: graph must not vanish when API returns empty array ───────────

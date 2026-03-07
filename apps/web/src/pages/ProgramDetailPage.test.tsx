@@ -33,6 +33,10 @@ vi.mock('@/lib/graphql/programs.queries', () => ({
   ENROLL_IN_PROGRAM_MUTATION: 'ENROLL_IN_PROGRAM_MUTATION',
 }));
 
+vi.mock('@/components/AppSidebar', () => ({
+  AppSidebar: () => <aside data-testid="app-sidebar" />,
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { ProgramDetailPage } from './ProgramDetailPage';

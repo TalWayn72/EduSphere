@@ -1,9 +1,132 @@
 # תקלות פתוחות - EduSphere
 
 **תאריך עדכון:** 06 מרץ 2026 (Session 28 Phase 34 ✅ COMPLETE — ALL PRD GAPS CLOSED 🎉; web ~3594+/3594+ (286+ files), security 819/819 ✅, subgraph-content 1055+/1055+ ✅, TypeScript 0 errors 26/26)
-**מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 🔄 IN PROGRESS** + **BUG-054 Progress Bar ✅** + **Phase 33 Remote Proctoring ✅** + + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
+**מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 🔄 IN PROGRESS** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings)
 **בדיקות:** Security: **819 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,476+** (282 files) | Backend subgraphs: **2,374** (core 640 + content 1041 + annotation 144 + collab 161 + agent 677 + knowledge 509) | Gateway: **138** | i18n: ~247 | סה"כ: **>5,955 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+
+---
+
+## BUG-055 — AppSidebar missing on protected routes (missing Layout wrapper)
+
+**Status:** ✅ Fixed
+**Date:** March 2026
+**Severity:** 🔴 Critical (navigation completely broken — user cannot go to any other page)
+**Discovered by:** Manual visual inspection of `/explore` route
+
+### Problem
+
+AppSidebar (the main navigation sidebar) was not rendered on multiple protected routes. Users visiting those pages had no way to navigate to other sections of the app. The original report was `/explore` (CoursesDiscoveryPage).
+
+### Root Cause
+
+Pages rendered through the React Router use a `guarded()` wrapper that provides `ProtectedRoute + Suspense` — but **not** `Layout`. Each page component is responsible for importing and wrapping its content with `<Layout>`.
+
+`DashboardPage` was the reference implementation — it imports and uses `<Layout>`. But **8 protected pages** never received the `<Layout>` wrapper during development.
+
+### Discovery List (3 Waves)
+
+**Wave 1 — Exact match:**
+- `CoursesDiscoveryPage.tsx` — original reported route `/explore`
+
+**Wave 2 — All pages scan (MANDATORY):**
+All 70 page files in `apps/web/src/pages/` scanned via grep for `import.*Layout`:
+
+| # | File | Route | Status |
+|---|------|-------|--------|
+| 1 | `CoursesDiscoveryPage.tsx` | `/explore`, `/discover`, `/courses/discover` | 🔴 FIXED |
+| 2 | `CourseLibraryPage.tsx` | `/library` | 🔴 FIXED |
+| 3 | `InstructorEarningsPage.tsx` | `/instructor/earnings` | 🔴 FIXED |
+| 4 | `MarketplacePage.tsx` | `/marketplace` | 🔴 FIXED |
+| 5 | `ProgramsPage.tsx` | `/programs` | 🔴 FIXED |
+| 6 | `ProgramDetailPage.tsx` | `/programs/:id` | 🔴 FIXED |
+| 7 | `ThemeSettingsPage.tsx` | `/settings/theme` | 🔴 FIXED |
+| 8 | `PortalBuilderPage.tsx` | `/admin/portal` | 🔴 FIXED (AdminLayout) |
+
+**Wave 3 — Class of bug (all pages without Layout wrapper):**
+Intentionally no-Layout pages (correct): `LandingPage`, `Login`, `AccessibilityStatementPage`, `BadgeVerifierPage`, `LtiLaunchPage`, `PublicProfilePage`, `PortalPage` — these are public/marketing pages with no auth requirement.
+
+### Fix
+
+For each affected page:
+1. Added `import { Layout } from '@/components/Layout';`
+2. Wrapped the main JSX return with `<Layout>...</Layout>`
+3. For pages with `<div className="min-h-screen bg-background">` as outer wrapper — replaced that div with `<Layout>` (Layout already provides min-h-screen)
+4. Fixed early-return loading/error states in `ProgramsPage` and `ProgramDetailPage` to also use `<Layout>` (sidebar should be visible during loading)
+5. `PortalBuilderPage` uses `<AdminLayout>` (which internally uses Layout) — consistent with all other `/admin/*` pages
+
+### E2E Regression Guard
+
+New file: `apps/web/e2e/sidebar-nav.spec.ts`
+
+4 test suites:
+1. **Sidebar visible on all protected routes** — 7 routes × (toBeAttached + toBeVisible)
+2. **Visual regression screenshots** — `sidebar-on-{slug}.png` per route
+3. **Not hidden by attribute** — aria-hidden and hidden attribute checks
+4. **/explore regression guard** — dedicated named suite for the original bug
+
+**Anti-recurrence:** `sidebar-nav.spec.ts` will catch any future page that renders without Layout — it explicitly checks `[data-testid="app-sidebar"]` is attached AND visible.
+
+### Test Infrastructure Fix
+
+After adding Layout to the 8 pages, their unit tests required mock updates:
+- All 8 page test files: added `vi.mock('@/components/AppSidebar', ...)` + `vi.mock('@/components/Layout', ...)`
+- `KnowledgeGraphPage.test.tsx`: pre-existing `getByText` ambiguity (multiple elements) fixed → `getByRole('heading', ...)`
+- Pattern going forward: every page test that wraps content in Layout MUST mock both Layout and AppSidebar
+
+### Why E2E tests didn't catch this before
+
+Zero existing E2E tests checked for sidebar presence. Tests only checked `header`, `nav` links, and `main` content — none verified `aside[data-testid="app-sidebar"]`.
+
+---
+
+## BUG-056 — Hebrew RTL: AppSidebar + DashboardPage hardcoded English labels (Session 28 Hotfix)
+
+**Status:** ✅ Fixed
+**Date:** March 2026
+**Severity:** 🔴 Critical (visual regression — Hebrew locale applied but UI remains English with reversed punctuation)
+**PRD Link:** i18n Phase A+B — BUG-047 follow-up gap
+
+### Problem
+Despite Hebrew locale being set and `dir="rtl"` applied to the document, the sidebar navigation and dashboard content displayed hardcoded English strings. English text in RTL context caused reversed punctuation ("!Welcome back" instead of "Welcome back!").
+
+### Root Causes (5 identified)
+
+| # | Root Cause | File | Impact |
+|---|-----------|------|--------|
+| RC-1 | `AppSidebar` NAV_ITEMS used hardcoded English strings, no `useTranslation` | `AppSidebar.tsx:28-35` | All nav labels in English |
+| RC-2 | `DashboardPage` all UI labels hardcoded English, no `useTranslation` | `DashboardPage.tsx:205,259,288` | Welcome msg, section titles hardcoded |
+| RC-3 | Mock data (course titles, activity) hardcoded English, no `dir="ltr"` | `DashboardPage.tsx:40-95` | BiDi reversal of punctuation |
+| RC-4 | Unicode BiDi — English text in `dir="rtl"` without isolation | `DashboardPage.tsx:126` | "!Welcome back" punctuation flip |
+| RC-5 | FOUC: `index.html` FOUC script didn't set `dir`/`lang` before React | `index.html:9-20` | Flash of LTR before RTL applied |
+
+### Why this was a regression from BUG-047
+BUG-047 fixed locale **persistence and sync** (localStorage, DB, GlobalLocaleSync). It applied `dir="rtl"` correctly. However, it did NOT connect AppSidebar and DashboardPage to the i18n system. Hebrew translation files existed but were never consumed.
+
+### Fix
+
+| File | Change |
+|------|--------|
+| `apps/web/src/components/AppSidebar.tsx` | Added `useTranslation('nav')`, NAV_ITEMS now use `labelKey` + `t(labelKey)` |
+| `apps/web/src/pages/DashboardPage.tsx` | Added `useTranslation('dashboard')` + `useTranslation('common')`, all UI strings use `t()`, mock data elements get `dir="ltr"` to prevent BiDi reversal |
+| `apps/web/index.html` | FOUC script now reads `edusphere_locale` and sets `dir` + `lang` before React hydrates |
+| `packages/i18n/src/locales/en/nav.json` | Added: `myCourses`, `discover`, `knowledgeGraph`, `liveSessions`, `settings`, `lightMode`, `darkMode`, `collapse`, `expandSidebar`, `collapseSidebar`, `switchToLight`, `switchToDark` |
+| `packages/i18n/src/locales/he/nav.json` | Same keys in Hebrew |
+| `packages/i18n/src/locales/en/dashboard.json` | Added: `subtitle`, `dayStreak`, `inProgress`, `completed`, `xpPoints`, `masteryOverview`, `progress`, `recommendedForYou` |
+| `packages/i18n/src/locales/he/dashboard.json` | Same keys in Hebrew |
+| `apps/web/src/components/AppSidebar.test.tsx` | Updated `data-testid` assertions to new `nav-item-${labelKey}` pattern, added i18n label tests |
+| `apps/web/src/pages/DashboardPage.test.tsx` | Updated "see all" → "view all" (matches `tCommon('viewAll')`) |
+| `apps/web/src/components/AppSidebar.bug056.test.tsx` | **NEW** — 5 regression tests: labelKey testids, i18n label content, OLD testid absence guard |
+
+### Tests Added
+
+| File | Tests | Purpose |
+|------|-------|---------|
+| `AppSidebar.bug056.test.tsx` | 5 | Guard against regression: i18n labels present, old hardcoded testids absent |
+| `AppSidebar.test.tsx` | +2 new tests | i18n nav labels, Settings label via i18n |
+| `DashboardPage.test.tsx` | 1 updated | "see all" → "view all" |
+
+**Anti-recurrence:** `AppSidebar.bug056.test.tsx:42-51` asserts OLD hardcoded testids (`nav-item-my-courses`, `nav-item-knowledge-graph`) do NOT exist — any regression would fail immediately.
 
 ---
 
@@ -300,6 +423,182 @@
 
 - Progress bar fix: progress.test.tsx REGRESSION BUG-054 tests guard against re-introduction
 - Password encryption: columns named \*Enc to force service-layer awareness
+
+---
+
+## ✅ BUG-055 — Raw backend `errorMessage` string rendered in SourceManager UI (Session 29 — 06 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟡 Medium (UX — raw technical string shown to users) | **Date:** 06 Mar 2026
+
+### Problem
+
+The SourceManager component (`/courses/:courseId`) rendered the raw backend `errorMessage` field directly in the DOM when a knowledge source had `status: 'FAILED'`. Users saw technical strings such as `"Processing was interrupted (service restarted)"` instead of a user-friendly localized message.
+
+Visual evidence: screenshot showed `"Processing was interrupted (service restarted) — שגיאה"` for a DOCX source in the course detail page sources panel.
+
+### Root Cause Chain
+
+`SourceManager.tsx:782-786` (before fix):
+```tsx
+{source.status === 'FAILED' && source.errorMessage && (
+  <span className="text-xs text-red-400 truncate">
+    — {source.errorMessage}  {/* ← raw backend string, no sanitization */}
+  </span>
+)}
+```
+
+The backend (`knowledge-source.service.ts:63`) sets `error_message = 'Processing was interrupted (service restarted)'` for stale PENDING/PROCESSING sources on service restart. This internal technical message was forwarded verbatim to the React UI.
+
+### Discovery List (3 waves)
+
+**Wave 1 — Exact match:**
+1. `apps/web/src/components/SourceManager.tsx:784` — raw `{source.errorMessage}` in UI ← PRIMARY
+
+**Wave 2 — Similarity search (same `errorMessage` pattern in other pages):**
+2. `apps/web/src/pages/CrmSettingsPage.tsx:241` — `{entry.errorMessage}` (admin-only sync log — acceptable)
+3. `apps/web/src/pages/ScimSettingsPage.tsx:257` — `{entry.errorMessage}` (admin-only sync log — acceptable)
+
+**Wave 3 — Class-of-bug (raw backend error strings in UI):**
+- CrmSettingsPage and ScimSettingsPage are admin-only pages where raw error details are expected by admins. No fix needed.
+
+### Fix
+
+**Round 1 — SourceManager.tsx:**
+- Added `getFriendlySourceErrorKey(errorMessage?: string): string` helper that maps known backend error patterns to i18n keys:
+  - `"interrupted"` / `"service restarted"` → `sources.errorServiceRestarted`
+  - `"timeout"` / `"timed out"` → `sources.errorTimeout`
+  - `"too large"` / `"size limit"` → `sources.errorFileTooLarge`
+  - Unknown → `sources.errorGeneric`
+- Changed render: `{t(getFriendlySourceErrorKey(source.errorMessage))}` — i18n key always resolved, never raw string
+- Now shows error description for ALL FAILED sources (not only when `errorMessage` is set)
+
+**i18n additions:**
+- `packages/i18n/src/locales/en/content.json` — added `errorServiceRestarted`, `errorTimeout`, `errorFileTooLarge`
+- `packages/i18n/src/locales/he/content.json` — Hebrew translations for same keys
+
+### Tests Added
+
+| Type | File | Assertion |
+|------|------|-----------|
+| Unit | `SourceManager.test.tsx` | `getFriendlySourceErrorKey('Processing was interrupted...')` → `sources.errorServiceRestarted` |
+| Unit | `SourceManager.test.tsx` | Raw string NOT in DOM when FAILED source rendered |
+| E2E | `knowledge-sources.spec.ts` (Suite 3) | `page.route()` injects FAILED source; asserts `Processing was interrupted` NOT visible |
+| E2E | `knowledge-sources.spec.ts` (Suite 3) | `document.body.textContent` does not contain `service restarted` |
+| Visual | `knowledge-sources.spec.ts` (Suite 3) | `toHaveScreenshot('sources-panel-failed-source.png')` |
+
+### Anti-recurrence
+
+- `getFriendlySourceErrorKey()` is exported and unit-tested — any new backend error string must be mapped through this function
+- E2E Suite 3 in `knowledge-sources.spec.ts` intercepts GraphQL with the exact backend string and asserts it is absent from the DOM
+- If the bug recurs: look for `source.errorMessage` in SourceManager.tsx render path
+
+---
+
+## ✅ BUG-056 — Subscription auth `console.warn` fires 5+ times per page load (Session 29 — 06 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🟢 Low (console noise, not user-facing) | **Date:** 06 Mar 2026
+
+### Problem
+
+The urql `authErrorExchange` in `urql-client.ts:51` called `console.warn('[Auth] Subscription auth error...')` on every subscription auth failure. Due to the urql WebSocket reconnect loop, this warning appeared **5 times** per page load in the browser DevTools console, making it hard to diagnose real errors.
+
+Visual evidence: screenshot showed the warning appearing 5 times in the DevTools console for the course detail page at `localhost:5173/courses/cc000000-0000-0000-0000-000000000002`.
+
+### Root Cause Chain
+
+1. `urql-client.ts` subscribes to `notificationReceived` via WebSocket
+2. The WebSocket connection sends the JWT in `connectionParams`, but if the token is not forwarded by the Gateway subscription resolver, the backend returns `Authentication required`
+3. `authErrorExchange.onError` catches this, correctly does NOT call `logout()`, but calls `console.warn` unconditionally
+4. urql retries the subscription → same error → same `console.warn` → 5 iterations
+
+No rate limiting existed → 5 identical warnings per load.
+
+### Fix
+
+`apps/web/src/lib/urql-client.ts`:
+- Added module-level `const _warnedSubscriptionOps = new Set<string>()` — tracks operation names already warned
+- In `onError`: extract `opName` from `operation.query.definitions` — skip the `console.warn` if `opName` already in the set
+- Only the first occurrence per subscription operation name per page session is logged
+
+### Tests Added
+
+| Type | File | Assertion |
+|------|------|-----------|
+| E2E | `knowledge-sources.spec.ts` (Suite 4) | Monitors `console.warn` for subscription auth messages — count per unique warning ≤ 1 |
+
+### Anti-recurrence
+
+- `_warnedSubscriptionOps` Set prevents duplicate warnings even if the reconnect loop runs indefinitely
+- E2E Suite 4 in `knowledge-sources.spec.ts` navigates to the course page and asserts each unique subscription auth warning appears ≤ 1 time
+
+---
+
+## ✅ BUG-057 — `liveSessions` query returns 400 Bad Request — field missing from supergraph (Session 29 — 06 Mar 2026)
+
+**Status:** ✅ Fixed | **Severity:** 🔴 Critical (main page broken — all users) | **Date:** 06 Mar 2026
+
+### Problem
+
+Navigating to `/sessions` showed "Failed to load sessions" with `POST /graphql 400 (Bad Request)` in the browser console. The page was completely non-functional for all users.
+
+Additionally, two `[Auth] Subscription auth error` warnings appeared in the console — though these were a pre-existing degradation-only issue (subscription to notifications, not the main query failure).
+
+### Root Cause Chain
+
+**Primary (400 Bad Request):**
+1. `apps/web/src/pages/LiveSessionsPage.tsx` queries `liveSessions(status, limit, offset)` via urql
+2. `apps/web/src/lib/graphql/live-session.queries.ts` defines `LIST_LIVE_SESSIONS_QUERY` with `liveSessions(...)` + fields `participantCount/maxParticipants/instructorId/courseId`
+3. `apps/gateway/supergraph.graphql` had **zero entries** for `LiveSession` type — the gateway never knew about this query
+4. **Root cause:** The `liveSessions` (plural, list) query was never added to the content subgraph SDL. The `liveSession` (singular, by contentItemId) existed but not the list variant. Even the singular query was missing from the supergraph because the supergraph was never recomposed after live sessions were added.
+
+**Secondary (E2E test never caught it):**
+5. `apps/web/e2e/live-sessions.spec.ts:472` — test only checked `bodyText.length > 10` — "Failed to load sessions" passes that check easily
+6. No visual regression test explicitly asserted `[data-testid="sessions-error"]` NOT visible
+7. The visual screenshot test (`toHaveScreenshot`) was also not protecting us — no baseline existed for the `/sessions` list page
+
+### Discovery List (3 Waves)
+
+**Wave 1 — Exact match:**
+1. `apps/subgraph-content/src/live-session/live-session.graphql` — missing `liveSessions` query + missing fields (`participantCount`, `maxParticipants`, `instructorId`, `courseId`) + missing `@key(fields: "id")`
+2. `apps/subgraph-content/src/live-session/live-session.resolver.ts` — missing `@Query('liveSessions')` + `@Query('liveSessionById')` resolvers
+3. `apps/subgraph-content/src/live-session/live-session.service.ts` — missing `listSessions()` + `getById()` methods + missing fields in `LiveSessionResult` interface + `map()` method
+4. `apps/gateway/supergraph.graphql` — `LiveSession` type, all live session queries/mutations, `JoinSessionResult`, `StartLiveSessionResult`, `SessionAttendee*` types all absent
+
+**Wave 2 — Similar pattern (E2E gaps):**
+5. `apps/web/e2e/live-sessions.spec.ts` — visual test has no `@authenticated` mock + no negative assertion on `sessions-error`
+6. `apps/web/src/pages/LiveSessionsPage.test.tsx` — no tests for `sessions-error` state, no BUG-055 regression guard
+
+**Wave 3 — Class of bug (supergraph never updated):**
+7. Pattern: SDL added to subgraph → supergraph not recomposed → gateway serves 400 forever
+8. Same pattern was the root cause of BUG-007 (Admin Panel) and BUG-026 (myOpenBadges)
+
+### Fix Rounds
+
+**Round 1 — Backend SDL + service + resolver:**
+- `apps/subgraph-content/src/live-session/live-session.graphql` — added `@key(fields: "id")`, `liveSessions` query, `liveSessionById` query, new optional fields
+- `apps/subgraph-content/src/live-session/live-session.service.ts` — added `listSessions()`, `getById()`, updated `LiveSessionResult` + `map()`
+- `apps/subgraph-content/src/live-session/live-session.resolver.ts` — added `listSessions` and `getLiveSessionById` handlers with Pino logging
+
+**Round 2 — Supergraph manual update:**
+- `apps/gateway/supergraph.graphql` — added `LiveSession` type, `JoinSessionResult`, `StartLiveSessionResult`, `SessionAttendee*` types; added `liveSession/liveSessions/liveSessionById/sessionAttendees` to Query; added `createLiveSession/joinLiveSession/startLiveSession/endLiveSession/cancelLiveSession` to Mutation
+
+**Round 3 — Test coverage:**
+- `apps/web/e2e/live-sessions.spec.ts` — added `mockLiveSessionsSuccess()` helper; added `sessions page does NOT show error state (BUG-057)` regression guard; added `sessions page shows clean error UI` test; updated visual test to use mock + assert no error visible
+- `apps/web/src/pages/LiveSessionsPage.test.tsx` — added 2 regression tests: `REGRESSION BUG-057: shows sessions-error when GraphQL returns error` and `REGRESSION BUG-057: does NOT show sessions-error when GraphQL succeeds`
+
+### Tests Added
+
+| File | Tests | Type |
+|------|-------|------|
+| `apps/web/src/pages/LiveSessionsPage.test.tsx` | 2 regression guards (BUG-057) | Unit |
+| `apps/web/e2e/live-sessions.spec.ts` | `mockLiveSessionsSuccess` helper + 2 new tests + updated visual | E2E |
+
+### Anti-recurrence
+
+- `LiveSessionsPage.test.tsx:REGRESSION BUG-057` — asserts `sessions-error` NOT visible when query succeeds
+- `live-sessions.spec.ts:sessions page does NOT show error state (BUG-057)` — E2E with mocked GraphQL asserts no error state
+- Visual test now uses `mockLiveSessionsSuccess()` so baseline captures correct empty state
+- Pattern rule: **any new SDL file added to a subgraph requires a companion supergraph.graphql manual update until compose is automated**
 
 ---
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Layout } from '@/components/Layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,7 +92,8 @@ export function InstructorEarningsPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <Layout>
+      <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Instructor Earnings</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -187,6 +189,7 @@ export function InstructorEarningsPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </Layout>
   );
 }

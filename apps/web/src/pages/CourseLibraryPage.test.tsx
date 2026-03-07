@@ -25,6 +25,16 @@ vi.mock('@/lib/graphql/library.queries', () => ({
   ACTIVATE_LIBRARY_COURSE_MUTATION: 'ACTIVATE_LIBRARY_COURSE_MUTATION',
 }));
 
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
+}));
+
+vi.mock('@/components/AppSidebar', () => ({
+  AppSidebar: () => <aside data-testid="app-sidebar" />,
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { CourseLibraryPage } from './CourseLibraryPage';

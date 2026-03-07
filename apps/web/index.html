@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EduSphere - Knowledge Graph Educational Platform</title>
     <script>
-      // Prevent Flash of Unstyled Content — apply theme before React hydrates
+      // Prevent Flash of Unstyled Content — apply theme + locale direction before React hydrates
       (function() {
         try {
           var prefs = JSON.parse(localStorage.getItem('edusphere-user-prefs') || '{}');
@@ -16,6 +16,14 @@
             : mode;
           document.documentElement.classList.toggle('dark', resolved === 'dark');
           document.documentElement.setAttribute('data-theme', resolved);
+        } catch(e) {}
+        try {
+          var locale = localStorage.getItem('edusphere_locale');
+          if (locale) {
+            var rtlLocales = ['he', 'ar'];
+            document.documentElement.setAttribute('dir', rtlLocales.indexOf(locale) !== -1 ? 'rtl' : 'ltr');
+            document.documentElement.setAttribute('lang', locale);
+          }
         } catch(e) {}
       })();
     </script>

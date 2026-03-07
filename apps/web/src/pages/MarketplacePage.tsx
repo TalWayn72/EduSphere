@@ -1,4 +1,5 @@
 import React from 'react';
+import { Layout } from '@/components/Layout';
 import { useQuery } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
 import {
@@ -90,7 +91,8 @@ export function MarketplacePage() {
   const listings = data?.courseListings ?? [];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <Layout>
+      <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-2">Course Marketplace</h1>
       <p className="text-muted-foreground mb-6">
         Browse and purchase courses from expert instructors.
@@ -144,6 +146,7 @@ export function MarketplacePage() {
           })}
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   );
 }

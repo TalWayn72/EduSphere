@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from 'urql';
+import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,14 +78,20 @@ export function ProgramDetailPage(): React.ReactElement {
 
   if (programResult.fetching) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </Layout>
     );
   }
 
   if (!program) {
-    return <div className="p-6 text-destructive">Program not found.</div>;
+    return (
+      <Layout>
+        <div className="p-6 text-destructive">Program not found.</div>
+      </Layout>
+    );
   }
 
   const completedSet = new Set(progress?.completedCourseIds ?? []);
@@ -93,6 +100,7 @@ export function ProgramDetailPage(): React.ReactElement {
   const pct = progress?.percentComplete ?? 0;
 
   return (
+    <Layout>
     <div className="container mx-auto py-8 px-4 max-w-3xl">
       <Button
         variant="ghost"
@@ -204,5 +212,6 @@ export function ProgramDetailPage(): React.ReactElement {
         )}
       </div>
     </div>
+    </Layout>
   );
 }

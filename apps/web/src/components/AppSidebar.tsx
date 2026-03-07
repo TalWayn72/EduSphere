@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   BookOpen,
@@ -22,16 +23,16 @@ const SIDEBAR_KEY = 'edusphere-sidebar-collapsed';
 interface NavItem {
   to: string;
   icon: React.ElementType;
-  label: string;
+  labelKey: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Home' },
-  { to: '/courses', icon: BookOpen, label: 'My Courses' },
-  { to: '/explore', icon: Compass, label: 'Discover' },
-  { to: '/knowledge-graph', icon: Network, label: 'Knowledge Graph' },
-  { to: '/agents', icon: Bot, label: 'AI Tutor' },
-  { to: '/sessions', icon: Video, label: 'Live Sessions' },
+  { to: '/dashboard', icon: LayoutDashboard, labelKey: 'home' },
+  { to: '/courses', icon: BookOpen, labelKey: 'myCourses' },
+  { to: '/explore', icon: Compass, labelKey: 'discover' },
+  { to: '/knowledge-graph', icon: Network, labelKey: 'knowledgeGraph' },
+  { to: '/agents', icon: Bot, labelKey: 'aiTutor' },
+  { to: '/sessions', icon: Video, labelKey: 'liveSessions' },
 ];
 
 function getInitials(firstName?: string, lastName?: string, username?: string): string {
@@ -41,6 +42,7 @@ function getInitials(firstName?: string, lastName?: string, username?: string): 
 }
 
 export function AppSidebar() {
+  const { t } = useTranslation('nav');
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     try {
       return localStorage.getItem(SIDEBAR_KEY) === 'true';
@@ -93,14 +95,15 @@ export function AppSidebar() {
 
       {/* Main nav */}
       <nav id="main-nav" className="flex-1 overflow-y-auto py-2" aria-label="Main navigation">
-        {NAV_ITEMS.map(({ to, icon: Icon, label }) => {
+        {NAV_ITEMS.map(({ to, icon: Icon, labelKey }) => {
+          const label = t(labelKey);
           const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
           return (
             <NavLink
               key={to}
               to={to}
               title={collapsed ? label : undefined}
-              data-testid={`nav-item-${label.toLowerCase().replace(/\s+/g, '-')}`}
+              data-testid={`nav-item-${labelKey}`}
               className={[
                 'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
                 'transition-colors hover:bg-muted/60',
@@ -124,7 +127,7 @@ export function AppSidebar() {
         {/* Settings */}
         <NavLink
           to="/settings"
-          title={collapsed ? 'Settings' : undefined}
+          title={collapsed ? t('settings') : undefined}
           data-testid="nav-item-settings"
           className={({ isActive }) =>
             [
@@ -137,16 +140,16 @@ export function AppSidebar() {
           }
         >
           <Settings className="h-4 w-4 shrink-0" aria-hidden />
-          {!collapsed && <span>Settings</span>}
+          {!collapsed && <span>{t('settings')}</span>}
         </NavLink>
 
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
-          title={resolvedMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
           data-testid="theme-toggle"
           className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/60 transition-colors border-l-2 border-transparent"
-          aria-label={resolvedMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={resolvedMode === 'dark' ? t('switchToLight') : t('switchToDark')}
         >
           {resolvedMode === 'dark' ? (
             <Sun className="h-4 w-4 shrink-0" aria-hidden />
@@ -154,7 +157,7 @@ export function AppSidebar() {
             <Moon className="h-4 w-4 shrink-0" aria-hidden />
           )}
           {!collapsed && (
-            <span>{resolvedMode === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            <span>{resolvedMode === 'dark' ? t('lightMode') : t('darkMode')}</span>
           )}
         </button>
 
@@ -183,7 +186,7 @@ export function AppSidebar() {
         <button
           onClick={toggleCollapsed}
           data-testid="sidebar-collapse-toggle"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
           className="flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted/60 transition-colors border-l-2 border-transparent"
         >
           {collapsed ? (
@@ -191,7 +194,7 @@ export function AppSidebar() {
           ) : (
             <>
               <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
-              <span>Collapse</span>
+              <span>{t('collapse')}</span>
             </>
           )}
         </button>

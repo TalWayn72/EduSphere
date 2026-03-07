@@ -20,6 +20,16 @@ vi.mock('graphql-request', () => ({
     ),
 }));
 
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
+}));
+
+vi.mock('@/components/AppSidebar', () => ({
+  AppSidebar: () => <aside data-testid="app-sidebar" />,
+}));
+
 // ── Imports after mocks ───────────────────────────────────────────────────────
 
 import { InstructorEarningsPage } from './InstructorEarningsPage';

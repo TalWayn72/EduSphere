@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Layout } from '@/components/Layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { request } from 'graphql-request';
 import {
@@ -116,7 +117,8 @@ export function CourseLibraryPage() {
   const courses = data?.libraryCourses ?? [];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <Layout>
+      <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-1">Compliance Course Library</h1>
       <p className="text-muted-foreground mb-6">
         Activate pre-built compliance courses to add them to your catalog
@@ -213,6 +215,7 @@ export function CourseLibraryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </Layout>
   );
 }

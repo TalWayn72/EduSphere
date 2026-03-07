@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { Layout } from '@/components/Layout';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -340,7 +341,7 @@ export function CoursesDiscoveryPage() {
   const hasMore = visibleCount < filtered.length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -572,6 +573,6 @@ export function CoursesDiscoveryPage() {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 }

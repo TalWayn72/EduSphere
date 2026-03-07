@@ -1,6 +1,7 @@
 import { useQuery } from 'urql';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Flame, BookOpen, CheckCircle, Zap, Clock, ChevronRight } from 'lucide-react';
 import { getCurrentUser, DEV_MODE } from '@/lib/auth';
 import { Layout } from '@/components/Layout';
@@ -121,14 +122,16 @@ function ActivityIcon({ type }: { type: string }) {
 
 interface CourseCardProps {
   course: MockCourse;
+  progressLabel: string;
 }
 
-function CourseCard({ course }: CourseCardProps) {
+function CourseCard({ course, progressLabel }: CourseCardProps) {
   return (
     <Link
       to={`/courses/${course.id}`}
       className="block rounded-xl border border-border bg-card p-4 hover:bg-card-hover transition-colors card-interactive shrink-0 w-64"
       aria-label={`Continue ${course.title}`}
+      dir="ltr"
     >
       <div className="flex items-start justify-between gap-2 mb-3">
         <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden />
@@ -138,7 +141,7 @@ function CourseCard({ course }: CourseCardProps) {
       <p className="text-xs text-muted-foreground mb-3">{course.instructor}</p>
       <div className="space-y-1">
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Progress</span>
+          <span>{progressLabel}</span>
           <span>{course.progress}%</span>
         </div>
         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -159,6 +162,8 @@ function CourseCard({ course }: CourseCardProps) {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function DashboardPage() {
+  const { t } = useTranslation('dashboard');
+  const { t: tCommon } = useTranslation('common');
   const user = getCurrentUser();
   const displayName = user?.firstName ?? (DEV_MODE ? 'Learner' : 'Learner');
 
@@ -202,9 +207,9 @@ export function DashboardPage() {
                 className="text-3xl font-bold tracking-tight"
                 data-testid="welcome-heading"
               >
-                Welcome back, {displayName}! 👋
+                {t('welcomeBack', { name: displayName })} 👋
               </h1>
-              <p className="text-muted-foreground mt-1">Here is what is happening in your learning journey.</p>
+              <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
             </div>
 
             {/* Streak + Quick stats */}
@@ -216,28 +221,28 @@ export function DashboardPage() {
               >
                 <Flame className="h-5 w-5 streak-active" aria-hidden />
                 <span className="text-sm font-semibold text-foreground">
-                  {streak} day streak
+                  {t('dayStreak', { count: streak })}
                 </span>
               </div>
 
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
                 <BookOpen className="h-4 w-4 text-primary" aria-hidden />
                 <span className="text-sm font-medium text-foreground">
-                  {enrolledCount} in progress
+                  {t('inProgress', { count: enrolledCount })}
                 </span>
               </div>
 
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
                 <CheckCircle className="h-4 w-4 text-success" aria-hidden />
                 <span className="text-sm font-medium text-foreground">
-                  {completedCount} completed
+                  {t('completed', { count: completedCount })}
                 </span>
               </div>
 
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
                 <Zap className="h-4 w-4 text-accent" aria-hidden />
                 <span className="text-sm font-medium text-foreground">
-                  {xp.toLocaleString()} XP
+                  {t('xpPoints', { count: xp })}
                 </span>
               </div>
             </div>
@@ -256,20 +261,20 @@ export function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-3">
                 <CardTitle id="continue-learning-heading" className="text-base">
-                  Continue Learning
+                  {t('continueLearning')}
                 </CardTitle>
                 <Link
                   to="/courses"
                   className="text-xs text-primary hover:underline flex items-center gap-1"
                 >
-                  See All
+                  {tCommon('viewAll')}
                   <ChevronRight className="h-3 w-3" aria-hidden />
                 </Link>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
                   {inProgressCourses.map((course) => (
-                    <CourseCard key={course.id} course={course} />
+                    <CourseCard key={course.id} course={course} progressLabel={t('progress')} />
                   ))}
                 </div>
               </CardContent>
@@ -285,12 +290,12 @@ export function DashboardPage() {
             <Card className="h-full">
               <CardHeader className="pb-3">
                 <CardTitle id="mastery-heading" className="text-base">
-                  Mastery Overview
+                  {t('masteryOverview')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {MOCK_MASTERY.map(({ topic, level }) => (
-                  <div key={topic} className="flex items-center justify-between gap-2">
+                  <div key={topic} className="flex items-center justify-between gap-2" dir="ltr">
                     <span className="text-sm text-foreground truncate">{topic}</span>
                     <MasteryBadge level={level} size="sm" />
                   </div>
@@ -312,13 +317,13 @@ export function DashboardPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle id="recent-activity-heading" className="text-base">
-                  Recent Activity
+                  {t('recentActivity')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ol className="space-y-3" aria-label="Recent learning activities">
                   {activity.map((item) => (
-                    <li key={item.id} className="flex items-start gap-3">
+                    <li key={item.id} className="flex items-start gap-3" dir="ltr">
                       <ActivityIcon type={item.icon} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-foreground leading-tight">{item.action}</p>
@@ -343,7 +348,7 @@ export function DashboardPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle id="recommendations-heading" className="text-base">
-                  Recommended for You
+                  {t('recommendedForYou')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -353,6 +358,7 @@ export function DashboardPage() {
                     to={`/courses/${course.id}`}
                     className="flex items-start gap-3 rounded-lg p-3 border border-border hover:bg-card-hover transition-colors"
                     aria-label={`Explore ${course.title}`}
+                    dir="ltr"
                   >
                     <BookOpen className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden />
                     <div className="min-w-0">

@@ -118,9 +118,9 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Advanced Chavruta Techniques')).toBeInTheDocument();
   });
 
-  it('renders See All link in continue learning section', () => {
+  it('renders View all link in continue learning section', () => {
     renderDashboard();
-    expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /view all/i })).toBeInTheDocument();
   });
 
   it('renders mastery overview section', () => {

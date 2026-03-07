@@ -750,4 +750,27 @@ describe('LiveSessionsPage', () => {
     expect(screen.getByTestId('join-session-btn')).toBeInTheDocument();
     expect(screen.queryByTestId('session-action-btn')).not.toBeInTheDocument();
   });
+
+  // ─── REGRESSION BUG-057: liveSessions 400 Bad Request (not in supergraph) ──
+
+  it('REGRESSION BUG-057: shows sessions-error when GraphQL returns error', () => {
+    const mockError = { message: '[GraphQL] liveSessions query failed', graphQLErrors: [], networkError: null };
+    vi.mocked(useQuery).mockReturnValue([
+      { data: undefined, fetching: false, error: mockError as never, stale: false, hasNext: false },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.getByTestId('sessions-error')).toBeInTheDocument();
+    expect(document.body.textContent).toContain('Failed to load sessions');
+  });
+
+  it('REGRESSION BUG-057: does NOT show sessions-error when GraphQL succeeds', () => {
+    vi.mocked(useQuery).mockReturnValue([
+      { data: { liveSessions: [] }, fetching: false, error: undefined, stale: false, hasNext: false },
+      vi.fn(),
+    ] as never);
+    renderPage();
+    expect(screen.queryByTestId('sessions-error')).not.toBeInTheDocument();
+    expect(document.body.textContent).not.toContain('Failed to load sessions');
+  });
 });

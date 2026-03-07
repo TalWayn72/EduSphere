@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Layout } from '@/components/Layout';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Sun, Moon, Monitor } from 'lucide-react';
@@ -72,6 +73,7 @@ export function ThemeSettingsPage() {
   const isHighContrast = userPreferences.contrastMode === 'high';
 
   return (
+    <Layout>
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-10">
       <h1 className="text-2xl font-bold text-foreground">Theme &amp; Appearance Settings</h1>
 
@@ -268,6 +270,7 @@ export function ThemeSettingsPage() {
         </Button>
       </section>
     </div>
+    </Layout>
   );
 }
 

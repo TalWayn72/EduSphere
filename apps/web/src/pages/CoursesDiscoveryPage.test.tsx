@@ -2,6 +2,11 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+
+vi.mock('@/components/AppSidebar', () => ({
+  AppSidebar: () => <aside data-testid="app-sidebar" />,
+}));
+
 import { CoursesDiscoveryPage } from './CoursesDiscoveryPage';
 // Import router to verify /explore and /courses/discover route registrations
 import { router } from '@/lib/router';

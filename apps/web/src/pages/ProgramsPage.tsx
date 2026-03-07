@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery, useMutation } from 'urql';
 import { useNavigate } from 'react-router-dom';
+import { Layout } from '@/components/Layout';
 import {
   Card,
   CardContent,
@@ -60,21 +61,26 @@ export function ProgramsPage(): React.ReactElement {
 
   if (programsResult.fetching) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </Layout>
     );
   }
 
   if (programsResult.error) {
     return (
-      <div className="p-6 text-destructive">
-        Failed to load programs: {programsResult.error.message}
-      </div>
+      <Layout>
+        <div className="p-6 text-destructive">
+          Failed to load programs: {programsResult.error.message}
+        </div>
+      </Layout>
     );
   }
 
   return (
+    <Layout>
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Nanodegree Programs</h1>
@@ -165,5 +171,6 @@ export function ProgramsPage(): React.ReactElement {
         </div>
       )}
     </div>
+    </Layout>
   );
 }
