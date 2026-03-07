@@ -25,7 +25,9 @@ import { BASE_URL } from './env';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function gotoDashboard(page: import('@playwright/test').Page) {
-  await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
+  // Phase 27: /dashboard now serves the new DashboardPage.
+  // Widget tests (DailyLearning, SkillGap, Leaderboard) remain at /dashboard/legacy.
+  await page.goto(`${BASE_URL}/dashboard/legacy`, { waitUntil: 'domcontentloaded' });
   // Wait for React to finish rendering and mock queries to settle
   await page.waitForTimeout(2_500);
 }

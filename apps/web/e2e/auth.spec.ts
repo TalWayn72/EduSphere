@@ -64,7 +64,9 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
     // ProtectedRoute passes in DEV_MODE because isAuthenticated() returns true
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+    // Dashboard renders personalised welcome heading (data-testid="welcome-heading")
+    // rather than a generic "Dashboard" title
+    await expect(page.getByTestId('welcome-heading')).toBeVisible({
       timeout: 10_000,
     });
   });
@@ -72,16 +74,16 @@ test.describe('Auth — DEV_MODE auto-login behaviour', () => {
   test('authenticated user sees their display name in the header', async ({
     page,
   }) => {
-    // Mock DEV_USER: { firstName: 'Dev', lastName: 'User', username: 'developer' }
+    // DEV_USER: { firstName: 'Super', lastName: 'Admin', username: 'super.admin' }
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
 
     // UserMenu renders firstName (or username) in the trigger button
     const header = page.locator('header');
-    // The avatar fallback shows "DU" (Dev User initials)
-    // The lg: text shows "Dev" (firstName)
+    // The avatar fallback shows "SA" (Super Admin initials)
+    // The lg: text shows "Super" (firstName)
     // Either is acceptable as proof the user is recognized
-    const userIdentifier = header.getByText(/Dev|DU|developer/i).first();
+    const userIdentifier = header.getByText(/Super|SA|super\.admin/i).first();
     await expect(userIdentifier).toBeVisible({ timeout: 8_000 });
   });
 

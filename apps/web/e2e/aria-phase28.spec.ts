@@ -16,7 +16,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { login } from './auth.helpers';
+import { login, loginInDevMode } from './auth.helpers';
 import { BASE_URL } from './env';
 
 // ─── Suite 1: LiveSessionsPage ARIA ───────────────────────────────────────────
@@ -336,12 +336,18 @@ test.describe('ARIA Phase 28 — CoursesDiscovery Level Filter', () => {
 // ─── Suite 4: OfflineBanner ARIA ─────────────────────────────────────────────
 
 test.describe('ARIA Phase 28 — OfflineBanner', () => {
+  test.beforeEach(async ({ page }) => {
+    // OfflineBanner is in the authenticated Layout — login required
+    await loginInDevMode(page);
+    await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle');
+  });
+
   test('OfflineBanner has role="status" when visible', async ({
     page,
     context,
   }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    // start on dashboard (already navigated in beforeEach)
 
     await context.setOffline(true);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
@@ -358,9 +364,6 @@ test.describe('ARIA Phase 28 — OfflineBanner', () => {
     page,
     context,
   }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
     await context.setOffline(true);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
 
@@ -373,9 +376,6 @@ test.describe('ARIA Phase 28 — OfflineBanner', () => {
   });
 
   test('OfflineBanner has aria-atomic="true"', async ({ page, context }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
     await context.setOffline(true);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
 
@@ -391,9 +391,6 @@ test.describe('ARIA Phase 28 — OfflineBanner', () => {
     page,
     context,
   }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
     await context.setOffline(true);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
 

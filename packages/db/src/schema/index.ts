@@ -151,3 +151,6 @@ export * from './tenant-themes';
 
 // User skill mastery (KnowledgeSkillTree mastery tracking — Session 26)
 export * from './user-skill-mastery';
+
+// Visual Anchoring & Asset Linking (Phase 29 — PRD v1.6)
+export * from './visual-anchoring';

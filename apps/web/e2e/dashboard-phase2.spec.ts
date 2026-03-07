@@ -72,10 +72,10 @@ test.describe('Dashboard — Phase 2 redesign (widget presence)', () => {
   });
 
   test('renders the page heading', async ({ page }) => {
-    // The dashboard heading remains across redesign phases
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' })
-    ).toBeVisible({ timeout: 10_000 });
+    // Phase 27: personalised welcome heading replaces generic "Dashboard" title
+    await expect(page.getByTestId('welcome-heading')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });
 
@@ -96,20 +96,20 @@ test.describe('Dashboard — Phase 2 App Sidebar', () => {
   });
 
   test('sidebar collapse toggle is present', async ({ page }) => {
-    // Phase 2: Collapse button must carry data-testid="sidebar-collapse-btn"
+    // Phase 2: Collapse button must carry data-testid="sidebar-collapse-toggle"
     await expect(
-      page.locator('[data-testid="sidebar-collapse-btn"]')
+      page.locator('[data-testid="sidebar-collapse-toggle"]')
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test('sidebar collapse toggle applies collapsed class', async ({ page }) => {
-    const toggle = page.locator('[data-testid="sidebar-collapse-btn"]');
+    const toggle = page.locator('[data-testid="sidebar-collapse-toggle"]');
     await toggle.waitFor({ timeout: 10_000 });
     await toggle.click();
 
-    // Phase 2 spec: sidebar should receive a "collapsed" CSS class when toggled
+    // Sidebar collapsed state: renders w-16 (narrow) instead of w-60 (wide)
     const sidebar = page.locator('[data-testid="app-sidebar"]');
-    await expect(sidebar).toHaveClass(/collapsed/, { timeout: 5_000 });
+    await expect(sidebar).toHaveClass(/w-16/, { timeout: 5_000 });
   });
 });
 

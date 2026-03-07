@@ -122,6 +122,13 @@ export default defineConfig({
     baseURL: BASE_URL,
 
     /**
+     * Force English locale so navigator.language = 'en-US' in all tests.
+     * Without this, the i18next LanguageDetector falls back to the OS locale
+     * (Hebrew on this machine) and renders Hebrew UI, breaking all English assertions.
+     */
+    locale: 'en-US',
+
+    /**
      * Traces: collect on first retry so failures include a timeline.
      * Inspect with: npx playwright show-trace trace.zip
      */
