@@ -44,6 +44,7 @@
     "typescript": "^5.9.3"
   },
   "pnpm": {
+    "onlyBuiltDependencies": ["sharp"],
     "overrides": {
       "tar": ">=7.5.10",
       "fast-xml-parser": ">=5.3.6",
