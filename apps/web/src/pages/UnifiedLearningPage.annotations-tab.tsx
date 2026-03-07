@@ -94,6 +94,7 @@ export function AnnotationsTab({
             {(Object.keys(LAYER_META) as AnnotationLayer[]).map((l) => (
               <button
                 key={l}
+                data-context="form"
                 onClick={() => setNewLayer(l)}
                 className={`px-2 py-0.5 rounded text-xs border ${LAYER_META[l]?.bg ?? ''} ${LAYER_META[l]?.color ?? ''}
                   ${newLayer === l ? 'ring-2 ring-offset-1 ring-primary' : 'opacity-60'}`}

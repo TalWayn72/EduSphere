@@ -845,12 +845,12 @@ test.describe('Annotation creation form — /learn/content-1', () => {
     const addBtn = page.getByRole('button', { name: /^Add$/i });
     await addBtn.click();
 
-    // Each layer is rendered as a <button> in the inline form — use .last() to select
-    // the inline form button (LayerToggleBar buttons appear first in the DOM)
+    // Each layer is rendered as a <button data-context="form"> in the inline form
+    // This is distinct from LayerToggleBar buttons which have aria-label attributes
     const sharedBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Shared$/ })
-      .last();
+      .first();
     await expect(sharedBtn).toBeVisible({ timeout: 3_000 });
     await sharedBtn.click();
 

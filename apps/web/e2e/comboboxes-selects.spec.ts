@@ -865,11 +865,11 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
     page,
   }) => {
     // Default layer is AnnotationLayer.PERSONAL
-    // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
+    // Use data-context="form" to target inline form buttons (not LayerToggleBar)
     const personalBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Personal$/ })
-      .last();
+      .first();
     await expect(personalBtn).toBeVisible({ timeout: 5_000 });
     await expect(personalBtn).toHaveClass(/ring-2/, { timeout: 2_000 });
   });
@@ -877,15 +877,15 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   test('clicking SHARED layer selects it and deselects PERSONAL', async ({
     page,
   }) => {
-    // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
+    // Use data-context="form" to target inline form buttons (not LayerToggleBar)
     const personalBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Personal$/ })
-      .last();
+      .first();
     const sharedBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Shared$/ })
-      .last();
+      .first();
 
     await sharedBtn.click();
 
@@ -896,36 +896,39 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   });
 
   test('clicking INSTRUCTOR layer selects it', async ({ page }) => {
-    // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
+    // Use data-context="form" to target inline form buttons (not LayerToggleBar)
     const instructorBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Instructor$/ })
-      .last();
+      .first();
     await instructorBtn.click();
     await expect(instructorBtn).toHaveClass(/ring-2/, { timeout: 2_000 });
   });
 
   test('clicking AI layer selects it', async ({ page }) => {
-    // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
-    const aiBtn = page.locator('button').filter({ hasText: /^AI$/ }).last();
+    // Use data-context="form" to target inline form buttons (not LayerToggleBar)
+    const aiBtn = page
+      .locator('button[data-context="form"]')
+      .filter({ hasText: /^AI$/ })
+      .first();
     await aiBtn.click();
     await expect(aiBtn).toHaveClass(/ring-2/, { timeout: 2_000 });
   });
 
   test('only one layer can be selected at a time', async ({ page }) => {
-    // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
+    // Use data-context="form" to target inline form buttons (not LayerToggleBar)
     const personalBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Personal$/ })
-      .last();
+      .first();
     const sharedBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Shared$/ })
-      .last();
+      .first();
     const instructorBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Instructor$/ })
-      .last();
+      .first();
 
     await sharedBtn.click();
     await expect(sharedBtn).toHaveClass(/ring-2/, { timeout: 2_000 });
@@ -937,11 +940,11 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
     page,
   }) => {
     // Select SHARED layer, fill text, and save
-    // Use .last() — inline form buttons appear after LayerToggleBar buttons in DOM
+    // Use data-context="form" to target inline form buttons (not LayerToggleBar)
     const sharedBtn = page
-      .locator('button')
+      .locator('button[data-context="form"]')
       .filter({ hasText: /^Shared$/ })
-      .last();
+      .first();
     await sharedBtn.click();
 
     const textarea = page

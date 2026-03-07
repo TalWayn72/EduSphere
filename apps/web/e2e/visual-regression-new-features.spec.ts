@@ -67,12 +67,26 @@ function dynamicMasks(page: Page) {
 /**
  * Navigate to a route and wait for the page to settle.
  * In DEV_MODE all routes are accessible without authentication.
+ *
+ * Waits for: network idle → no loading spinners → first meaningful element rendered.
+ * This prevents screenshot races where networkidle fires before React has painted content.
  */
 async function goTo(page: Page, path: string) {
   await page.goto(path);
   await page.waitForLoadState('networkidle');
   // Suppress animated spinners before snapping
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  // Wait for React to finish rendering: the app root must have at least one child
+  // and any loading skeletons / spinners should have resolved
+  await page
+    .locator('main, [role="main"], #root > div, .min-h-screen')
+    .first()
+    .waitFor({ state: 'visible', timeout: 10_000 })
+    .catch(() => {
+      // Fallback: page may not have a <main> — continue anyway
+    });
+  // Extra settle tick to let CSS transitions complete
+  await page.waitForTimeout(150);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -188,6 +202,12 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     page,
   }) => {
     await goTo(page, '/scenarios');
+    // Wait for either scenario cards or the empty-state to be fully rendered
+    await page
+      .locator('h3.font-semibold, text=No scenarios available yet, .animate-pulse')
+      .first()
+      .waitFor({ state: 'visible', timeout: 8_000 })
+      .catch(() => {});
     await expect(page).toHaveScreenshot('scenarios-grid.png', {
       ...STABLE_OPTS,
       mask: dynamicMasks(page),
@@ -249,6 +269,12 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await goTo(page, '/scenarios');
+    // Wait for content to be fully painted
+    await page
+      .locator('h3.font-semibold, text=No scenarios available yet, h1')
+      .first()
+      .waitFor({ state: 'visible', timeout: 8_000 })
+      .catch(() => {});
     await expect(page).toHaveScreenshot('scenarios-full-page-desktop.png', {
       fullPage: true,
       ...STABLE_OPTS,
@@ -260,13 +286,25 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     page,
   }) => {
     await goTo(page, '/scenarios');
+    // Wait for cards to appear before trying to click
+    await page
+      .locator('h3.font-semibold, text=No scenarios available yet')
+      .first()
+      .waitFor({ state: 'visible', timeout: 8_000 })
+      .catch(() => {});
     // Click the first scenario card to enter the roleplay simulator
     const firstCard = page.locator('[class*="cursor-pointer"]').first();
     const cardVisible = await firstCard.isVisible().catch(() => false);
     if (cardVisible) {
       await firstCard.click();
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000); // allow simulator to initialize
+      // Wait for the simulator overlay to appear and stabilise
+      await page
+        .locator('.fixed.inset-0')
+        .first()
+        .waitFor({ state: 'visible', timeout: 8_000 })
+        .catch(() => {});
+      await page.waitForTimeout(500);
     }
     await expect(page).toHaveScreenshot('roleplay-simulator-chat.png', {
       ...LOOSE_OPTS,
@@ -281,11 +319,21 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     page,
   }) => {
     await goTo(page, '/scenarios');
+    await page
+      .locator('h3.font-semibold, text=No scenarios available yet')
+      .first()
+      .waitFor({ state: 'visible', timeout: 8_000 })
+      .catch(() => {});
     const firstCard = page.locator('[class*="cursor-pointer"]').first();
     const cardVisible = await firstCard.isVisible().catch(() => false);
     if (cardVisible) {
       await firstCard.click();
-      await page.waitForTimeout(1000);
+      await page
+        .locator('.fixed.inset-0')
+        .first()
+        .waitFor({ state: 'visible', timeout: 8_000 })
+        .catch(() => {});
+      await page.waitForTimeout(300);
     }
     const header = page.locator('.bg-gray-900').first();
     const headerVisible = await header.isVisible().catch(() => false);
@@ -309,11 +357,21 @@ test.describe('Visual Regression — Scenarios & Roleplay @visual-new', () => {
     page,
   }) => {
     await goTo(page, '/scenarios');
+    await page
+      .locator('h3.font-semibold, text=No scenarios available yet')
+      .first()
+      .waitFor({ state: 'visible', timeout: 8_000 })
+      .catch(() => {});
     const firstCard = page.locator('[class*="cursor-pointer"]').first();
     const cardVisible = await firstCard.isVisible().catch(() => false);
     if (cardVisible) {
       await firstCard.click();
-      await page.waitForTimeout(1000);
+      await page
+        .locator('.fixed.inset-0')
+        .first()
+        .waitFor({ state: 'visible', timeout: 8_000 })
+        .catch(() => {});
+      await page.waitForTimeout(300);
     }
     const inputArea = page.locator('.bg-gray-900').last();
     const inputVisible = await inputArea.isVisible().catch(() => false);
@@ -421,6 +479,12 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
     page,
   }) => {
     await goTo(page, '/dashboard');
+    // Wait for the dashboard stats grid to be rendered before snapping
+    await page
+      .locator('.grid, h1, [data-testid]')
+      .first()
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {});
     await expect(page).toHaveScreenshot('dashboard-full-page.png', {
       fullPage: true,
       ...LOOSE_OPTS,
@@ -428,6 +492,8 @@ test.describe('Visual Regression — Dashboard Widgets @visual-new', () => {
         ...dynamicMasks(page),
         page.locator('[data-testid="activity-heatmap"]'),
         page.locator('canvas'),
+        // Mask any score/points counters that may change between runs
+        page.locator('[data-testid*="score"], [data-testid*="count"], [data-testid*="points"]'),
       ],
     });
   });
@@ -961,6 +1027,11 @@ test.describe('Visual Regression — Mobile Views @visual-new', () => {
 
   test('scenarios page — mobile grid renders correctly', async ({ page }) => {
     await goTo(page, '/scenarios');
+    await page
+      .locator('h3.font-semibold, text=No scenarios available yet, h1')
+      .first()
+      .waitFor({ state: 'visible', timeout: 8_000 })
+      .catch(() => {});
     await expect(page).toHaveScreenshot('mobile-scenarios-grid.png', {
       fullPage: true,
       ...STABLE_OPTS,
@@ -1030,6 +1101,11 @@ test.describe('Visual Regression — RTL Layout (Hebrew) @visual-new', () => {
   test('scenarios page — RTL layout renders correctly', async ({ page }) => {
     await applyRTL(page);
     await goTo(page, '/scenarios?lang=he');
+    await page
+      .locator('h3.font-semibold, text=No scenarios available yet, h1')
+      .first()
+      .waitFor({ state: 'visible', timeout: 8_000 })
+      .catch(() => {});
     await expect(page).toHaveScreenshot('rtl-scenarios.png', {
       fullPage: true,
       ...STABLE_OPTS,
