@@ -1,0 +1,32 @@
+# EduSphere GPU Override — Development (separate containers)
+#
+# Requires NVIDIA Container Toolkit on the Docker host.
+#
+# Usage:
+#   docker-compose -f docker-compose.dev.yml -f docker-compose.gpu.dev.yml --profile ai up -d
+#
+# Layers on top of docker-compose.dev.yml to add GPU support for whisper-server
+# and configures Ollama (if running separately) for GPU inference.
+
+services:
+  whisper-server:
+    build:
+      context: apps/whisper-server
+      dockerfile: Dockerfile
+      target: cuda
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    mem_limit: 8g
+    mem_reservation: 4g
+    environment:
+      GPU_AVAILABLE: "true"
+      GPU_VENDOR: nvidia
+      WHISPER_DEVICE: cuda
+      WHISPER_COMPUTE_TYPE: float16
+      WHISPER_MODEL_SIZE: large-v3

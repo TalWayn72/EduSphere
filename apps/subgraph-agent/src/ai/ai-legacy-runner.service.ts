@@ -21,6 +21,7 @@ import { searchKnowledgeGraph, fetchContentItem } from './ai.service.db.js';
 import { injectLocale } from './locale-prompt.js';
 import { createOllama } from 'ollama-ai-provider';
 import type { AIResult } from './ai.service.js';
+import { gpuConfig } from '@edusphere/config';
 
 const MAX_TOOL_STEPS = 5;
 
@@ -64,6 +65,12 @@ function getAgentConfig(agent: AgentDefinition): AgentConfig {
 @Injectable()
 export class AiLegacyRunnerService {
   private readonly logger = new Logger(AiLegacyRunnerService.name);
+
+  constructor() {
+    this.logger.log(
+      JSON.stringify({ hardware: gpuConfig.summary, msg: 'AI runner initialized' })
+    );
+  }
 
   getModel(): LanguageModel {
     if (process.env.OLLAMA_URL) {

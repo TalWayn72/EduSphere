@@ -133,6 +133,37 @@ else
   fi
 fi
 
+# ─── GPU Health (optional — always passes if no GPU present) ────────────────
+echo ""
+echo "=== GPU Health ==="
+if command -v nvidia-smi &>/dev/null && nvidia-smi &>/dev/null 2>&1; then
+  echo "GPU hardware: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1)"
+  nvidia-smi --query-gpu=memory.used,memory.free,utilization.gpu,temperature.gpu \
+    --format=csv,noheader 2>/dev/null | head -1 | awk -F',' \
+    '{printf "  VRAM used/free: %s / %s | Util: %s | Temp: %s\n", $1, $2, $3, $4}'
+  echo "GPU: PASS"
+elif command -v rocm-smi &>/dev/null && rocm-smi &>/dev/null 2>&1; then
+  echo "AMD GPU (ROCm) detected"
+  echo "GPU: PASS"
+else
+  echo "GPU: INFO — No discrete GPU detected, CPU mode active"
+fi
+
+# Verify Ollama reports processor type (GPU or CPU)
+OLLAMA_PS=$(curl -sf http://localhost:11434/api/ps 2>/dev/null || echo "")
+if [ -n "$OLLAMA_PS" ]; then
+  echo "Ollama processor: $(echo "$OLLAMA_PS" | grep -o '"processor":"[^"]*"' | head -1 || echo 'unknown')"
+fi
+
+# Verify whisper-server health (if running)
+WHISPER_HEALTH=$(curl -sf http://localhost:3200/health 2>/dev/null || echo "")
+if [ -n "$WHISPER_HEALTH" ]; then
+  WHISPER_DEVICE=$(echo "$WHISPER_HEALTH" | grep -o '"device":"[^"]*"' | head -1 || echo '')
+  echo "Whisper server: running | $WHISPER_DEVICE"
+else
+  echo "Whisper server: INFO — not running (start with --profile ai)"
+fi
+
 echo ""
 echo "=========================="
 if [ $FAILED -eq 0 ]; then

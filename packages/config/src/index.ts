@@ -1,3 +1,4 @@
+export { gpuConfig } from './gpu.js';
 export { keycloakConfig } from './keycloak.js';
 export { minioConfig } from './minio.js';
 export { ollamaConfig } from './ollama.js';

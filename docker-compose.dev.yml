@@ -562,6 +562,37 @@ services:
     profiles:
       - monitoring
 
+  # ═══════════════════════════════════════════════════════════════
+  # Whisper Server — Hardware-adaptive speech transcription (Port 3200)
+  # CPU mode by default. GPU: docker-compose --profile ai up whisper-server
+  # with WHISPER_DEVICE=cuda WHISPER_COMPUTE_TYPE=float16
+  # ═══════════════════════════════════════════════════════════════
+  whisper-server:
+    build:
+      context: apps/whisper-server
+      dockerfile: Dockerfile
+      target: cpu-base
+    container_name: edusphere-whisper-server
+    ports:
+      - "3200:3200"
+    environment:
+      WHISPER_DEVICE: ${WHISPER_DEVICE:-cpu}
+      WHISPER_COMPUTE_TYPE: ${WHISPER_COMPUTE_TYPE:-int8}
+      WHISPER_MODEL_SIZE: ${WHISPER_MODEL_SIZE:-base}
+      WHISPER_CPU_THREADS: ${WHISPER_CPU_THREADS:-4}
+    mem_limit: 4g
+    mem_reservation: 1g
+    profiles:
+      - ai
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3200/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    networks:
+      - edusphere
+
 networks:
   edusphere:
     driver: bridge

@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { ollamaConfig } from '@edusphere/config';
+import { ollamaConfig, gpuConfig } from '@edusphere/config';
 
 /**
  * Thin HTTP client for Ollama / OpenAI embeddings.
@@ -61,7 +61,7 @@ async function embedWithOllama(
     throw new Error('Ollama returned empty embedding vector');
   }
 
-  logger.debug(`Ollama embed: model=${model} dim=${json.embedding.length}`);
+  logger.debug(`Ollama embed: model=${model} dim=${json.embedding.length} hardware=${gpuConfig.summary}`);
   return json.embedding;
 }
 

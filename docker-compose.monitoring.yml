@@ -167,6 +167,22 @@ services:
     restart: unless-stopped
     privileged: true
 
+  # NVIDIA GPU Exporter - GPU metrics (activate with --profile gpu-monitoring)
+  nvidia-gpu-exporter:
+    image: utkuozdemir/nvidia_gpu_exporter:1.2.1
+    runtime: nvidia
+    restart: unless-stopped
+    ports:
+      - "9835:9835"
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+    mem_limit: 64m
+    mem_reservation: 32m
+    profiles:
+      - gpu-monitoring
+    networks:
+      - monitoring
+
 networks:
   monitoring:
     driver: bridge

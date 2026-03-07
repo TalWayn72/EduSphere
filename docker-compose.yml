@@ -1,3 +1,12 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# EduSphere All-in-One Container (CPU mode — default, always works)
+#
+# GPU ACCELERATION (NVIDIA):
+#   docker-compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
+#   Requires: NVIDIA Container Toolkit on host
+#
+# See: docker-compose.gpu.yml, scripts/detect-gpu.sh
+# ─────────────────────────────────────────────────────────────────────────────
 version: "3.9"
 
 services:

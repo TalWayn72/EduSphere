@@ -1,0 +1,102 @@
+# =============================================================================
+# EduSphere — GPU Helm Values Override
+#
+# Adds NVIDIA GPU scheduling to subgraph-agent and whisper-server.
+# Apply alongside the base (and optionally environment) values:
+#
+#   helm upgrade edusphere ./infrastructure/k8s/helm/edusphere \
+#     --values infrastructure/k8s/helm/edusphere/values.yaml \
+#     --values infrastructure/k8s/helm/edusphere/values.gpu.yaml
+#
+#   # With a specific environment:
+#   helm upgrade edusphere ./infrastructure/k8s/helm/edusphere \
+#     --values infrastructure/k8s/helm/edusphere/values.yaml \
+#     --values infrastructure/k8s/helm/edusphere/values.production.yaml \
+#     --values infrastructure/k8s/helm/edusphere/values.gpu.yaml
+#
+# Prerequisites on cluster:
+#   1. NVIDIA device plugin deployed:
+#      kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.15.0/deployments/static/nvidia-device-plugin.yml
+#   2. GPU nodes labeled:
+#      kubectl label nodes <gpu-node> accelerator=nvidia-gpu
+#   3. GPU nodes tainted:
+#      kubectl taint nodes <gpu-node> nvidia.com/gpu=present:NoSchedule
+# =============================================================================
+
+subgraphs:
+
+  # ── Subgraph Agent (AI inference — highest GPU priority) ──────────────────
+  # Overrides resources from values.yaml (cpu: 2000m / memory: 4Gi) and adds
+  # GPU request + node affinity so pods land exclusively on GPU nodes.
+  agent:
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "2Gi"
+        nvidia.com/gpu: "1"
+      limits:
+        cpu: "4000m"
+        memory: "8Gi"
+        nvidia.com/gpu: "1"
+    nodeSelector:
+      accelerator: nvidia-gpu
+    tolerations:
+      - key: "nvidia.com/gpu"
+        operator: "Exists"
+        effect: "NoSchedule"
+    env:
+      GPU_AVAILABLE: "true"
+      GPU_VENDOR: "nvidia"
+      # OLLAMA_NUM_GPU: leave empty to let Ollama auto-detect all available GPUs.
+      # Set to a positive integer (e.g. "1") to pin a specific count.
+      OLLAMA_NUM_GPU: ""
+
+  # ── Subgraph Knowledge (embeddings — shares GPU node, no dedicated GPU) ───
+  # Does not request a GPU slice; co-schedules on GPU nodes so that embedding
+  # calls routed to the local Ollama sidecar benefit from the GPU without
+  # reserving the full nvidia.com/gpu resource.
+  knowledge:
+    nodeSelector:
+      accelerator: nvidia-gpu
+    tolerations:
+      - key: "nvidia.com/gpu"
+        operator: "Exists"
+        effect: "NoSchedule"
+    env:
+      GPU_AVAILABLE: "true"
+      GPU_VENDOR: "nvidia"
+
+# ── Whisper Server (speech transcription — GPU accelerated) ─────────────────
+# New top-level section — not present in values.yaml base.
+# The Helm chart must check `.Values.whisperServer.enabled` to conditionally
+# render the Deployment, Service, and optional HPA for this workload.
+whisperServer:
+  enabled: true
+  image:
+    registry: ghcr.io
+    repository: edusphere-org/edusphere-whisper-server
+    tag: cuda          # Use the CUDA-enabled image variant
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  port: 3200
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "2Gi"
+      nvidia.com/gpu: "1"
+    limits:
+      cpu: "2000m"
+      memory: "8Gi"
+      nvidia.com/gpu: "1"
+  nodeSelector:
+    accelerator: nvidia-gpu
+  tolerations:
+    - key: "nvidia.com/gpu"
+      operator: "Exists"
+      effect: "NoSchedule"
+  env:
+    GPU_AVAILABLE: "true"
+    GPU_VENDOR: "nvidia"
+    WHISPER_DEVICE: "cuda"
+    WHISPER_COMPUTE_TYPE: "float16"
+    WHISPER_MODEL_SIZE: "large-v3"

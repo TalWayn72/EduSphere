@@ -1,3 +1,5 @@
+import { gpuConfig } from './gpu.js';
+
 export const ollamaConfig = {
   get url() {
     return process.env.OLLAMA_URL ?? 'http://localhost:11434';
@@ -7,5 +9,8 @@ export const ollamaConfig = {
   },
   get embeddingDimension() {
     return parseInt(process.env.EMBEDDING_DIM ?? '768', 10);
+  },
+  get numGpu(): string | undefined {
+    return gpuConfig.ollamaNumGpu;
   },
 };
