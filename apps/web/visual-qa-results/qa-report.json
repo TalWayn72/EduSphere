@@ -26,6 +26,7 @@
       "Failed to load resource: net::ERR_EMPTY_RESPONSE",
       "Failed to load resource: net::ERR_EMPTY_RESPONSE",
       "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
       "WebSocket connection to 'ws://localhost:4000/graphql' failed: Connection closed before receiving a handshake response"
     ],
     "consoleWarnings": [
@@ -35,6 +36,7 @@
       "🔧 DEV MODE: Running without Keycloak authentication"
     ],
     "networkErrors": [
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
       "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
       "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
       "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
