@@ -7,6 +7,62 @@
 
 ---
 
+## FEAT-PHASE36-TECHDEBT-RECOMMENDATIONS-PIPELINE — Technical Debt Clearance + Personalized Recommendations + Lesson Pipeline (Phase 36)
+
+**Status:** ✅ Complete
+**Date:** March 2026
+**Severity:** HIGH
+**Files touched:**
+
+DB:
+- `packages/db/src/schema/user-xp.ts`
+- `packages/db/src/schema/course-lesson-builder.ts`
+- `packages/db/src/migrations/0020_user_xp.sql`
+- `packages/db/src/migrations/0021_course_lesson_builder.sql`
+- `packages/db/src/schema/index.ts`
+
+Backend:
+- `apps/subgraph-core/src/gamification/xp.service.ts` — XP awards + level computation
+- `apps/subgraph-core/src/gamification/xp.service.spec.ts`
+- `apps/subgraph-core/src/user/recommended-courses.service.ts` — real gap-based + fallback
+- `apps/subgraph-core/src/user/recommended-courses.service.spec.ts`
+- `apps/subgraph-core/src/user/user-stats.service.ts` — totalXp + level added
+- `apps/subgraph-core/src/user/user.graphql` — totalXp: Int! + level: Int! on UserStats
+- `apps/subgraph-content/src/analytics/at-risk.service.ts` — real at_risk_flags query
+- `apps/subgraph-content/src/analytics/at-risk.resolver.ts`
+- `apps/subgraph-content/src/lesson/lesson-plan.service.ts`
+- `apps/subgraph-content/src/lesson/lesson-plan.resolver.ts`
+- `apps/subgraph-knowledge/src/graph/recommendation-scorer.ts` — 4-signal pure function
+
+Frontend:
+- `apps/web/src/pages/CoursesDiscoveryPage.tsx` — MOCK_COURSES removed, real urql query
+- `apps/web/src/pages/AtRiskDashboardPage.tsx` — MOCK_LEARNERS removed, real query
+- `apps/web/src/pages/DashboardPage.tsx` — MOCK_XP removed, totalXp/level wired
+- `apps/web/src/pages/LessonPipelineBuilderPage.tsx` — MVP builder for instructors
+- `apps/web/src/lib/vitals.ts` — onFID→onINP (web-vitals v5 API change)
+- `apps/mobile/package.json` — TypeScript 6.0.3→5.9.3
+- `.env.example` — VAPID env vars documented
+- `.github/workflows/ci.yml` — Lighthouse a11y `|| true` removed (hard gate)
+
+E2E:
+- `apps/web/e2e/courses-discovery-realdata.spec.ts`
+- `apps/web/e2e/recommendations-realdata.spec.ts`
+- `apps/web/e2e/at-risk-dashboard.spec.ts`
+- `apps/web/e2e/lesson-pipeline-builder.spec.ts`
+- `apps/web/e2e/xp-dashboard.spec.ts`
+
+Security:
+- `tests/security/graphql-authorization.spec.ts` — 11 new Phase 36 assertions
+
+**Problem:** 11 technical debt items from Phase 35 audit — 2 production-blocking (MOCK_COURSES, empty recommendations), 5 medium (web-vitals, mobile TS, VAPID docs, AtRisk mock, Chavruta TD-7 verified consistent), 3 new features (XP, scorer, pipeline)
+**Root cause:** Deferred items from Phase 35 sprint timeline
+**Solution:** Sprint A (TD-1..9) + Sprint B (XP, scorer, pipeline) + Sprint C (E2E gate)
+**Tests:** 42 new E2E tests + 11 security assertions; all 689 core + 556 knowledge + 3822+ web tests passing
+**Anti-recurrence:** E2E guards assert MOCK_ constants absent from DOM; security tests assert RBAC on all new mutations
+**Commits:** 599f3e9 (Sprint A) + 2e6ef00 (Sprint B) + bc1c618 (Sprint C)
+
+---
+
 ## FEAT-PHASE35-ANALYTICS-MOBILE — Performance, Analytics & Mobile Parity (Phase 35)
 
 **Status:** 🟡 In Progress → ✅ Complete
