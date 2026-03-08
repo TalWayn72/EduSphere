@@ -19,13 +19,16 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { loginInDevMode } from './auth.helpers';
 
 // ── Shared fixture ─────────────────────────────────────────────────────────────
 
 test.describe('Offline Sync — Online Flush', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to app shell; wait for service worker to install if present
-    await page.goto('/');
+    // Login required — OfflineBanner is in the authenticated Layout
+    await loginInDevMode(page);
+    // Navigate to dashboard so the Layout (with OfflineBanner) is mounted
+    await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
   });
 

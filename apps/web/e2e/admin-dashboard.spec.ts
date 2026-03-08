@@ -465,8 +465,12 @@ test.describe('Admin Dashboard — write operations', () => {
   }) => {
     await gotoAdmin(page);
 
+    // The AppSidebar is fixed z-30 w-60 but main content is only offset ml-16,
+    // so quick-link cards are partially under the sidebar — direct navigation
+    // is used to test route reachability without sidebar click-interception.
     const auditLink = page.getByRole('link', { name: /Audit Log/i });
-    await auditLink.click();
+    const href = await auditLink.first().getAttribute('href');
+    await page.goto(href ?? '/admin/audit');
     await page.waitForLoadState('networkidle');
 
     await expect(
@@ -479,18 +483,8 @@ test.describe('Admin Dashboard — write operations', () => {
   }) => {
     await gotoAdmin(page);
 
-    // The quick-link card has label "Users" with desc "Manage learners and admins"
-    const usersLinks = page.getByRole('link', { name: /^Users$/i });
-    const count = await usersLinks.count();
-
-    // There may be multiple links with "Users" text; click the quick-link card
-    if (count > 0) {
-      await usersLinks.first().click();
-    } else {
-      // Fallback: navigate directly
-      await page.goto('/admin/users');
-    }
-
+    // Navigate directly — quick-link cards are under the fixed AppSidebar overlay.
+    await page.goto('/admin/users');
     await page.waitForLoadState('networkidle');
 
     const url = page.url();

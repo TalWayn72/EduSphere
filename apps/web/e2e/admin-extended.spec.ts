@@ -174,8 +174,9 @@ test.describe('Admin Roles — /admin/roles', () => {
     const body = (await page.locator('body').textContent()) ?? '';
     const spinnerCount = await page.locator('.animate-spin').count();
 
+    // RoleManagementPage uses "New Custom Role" button text
     const hasCreateUI =
-      /Create Role|Add Role|New Role/i.test(body) || spinnerCount > 0;
+      /Create Role|Add Role|New Role|New Custom Role/i.test(body) || spinnerCount > 0;
 
     expect(hasCreateUI).toBe(true);
   });

@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { BASE_URL } from './env';
+import { loginInDevMode } from './auth.helpers';
 
 // ── Personal Knowledge Graph tests ───────────────────────────────────────────
 test.describe('KnowledgeGraph — Personal Wiki View', () => {
   test.beforeEach(async ({ page }) => {
+    await loginInDevMode(page);
     await page.goto(`${BASE_URL}/knowledge-graph`, { waitUntil: 'networkidle' });
   });
 
@@ -90,6 +92,7 @@ test.describe('KnowledgeGraph — Personal Wiki View', () => {
 // ── Instructor Merge Queue tests ──────────────────────────────────────────────
 test.describe('InstructorMergeQueuePage', () => {
   test.beforeEach(async ({ page }) => {
+    await loginInDevMode(page);
     await page.goto(`${BASE_URL}/instructor/merge-queue`, {
       waitUntil: 'networkidle',
     });
@@ -153,6 +156,7 @@ test.describe('InstructorMergeQueuePage', () => {
 // ── Annotation Panel — Propose flow ──────────────────────────────────────────
 test.describe('AnnotationPanel — Propose to Official', () => {
   test.beforeEach(async ({ page }) => {
+    await loginInDevMode(page);
     // Annotations panel is accessible via /learn/:lessonId (UnifiedLearningPage)
     // or /annotations. Use the annotations page for simplicity.
     await page.goto(`${BASE_URL}/annotations`, { waitUntil: 'networkidle' });

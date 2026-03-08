@@ -75,28 +75,27 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
     await login(page);
   });
 
-  test('page loads with "Dashboard" heading', async ({ page }) => {
+  test('page loads with welcome heading', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+    // Phase 27 redesign: personalised welcome heading (not generic "Dashboard" title)
+    await expect(page.getByTestId('welcome-heading')).toBeVisible({
       timeout: 10_000,
     });
   });
 
   test('stats cards are visible', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    // Primary stats row: Courses Enrolled, Study Time, Concepts Mastered
-    await expect(page.getByText('Courses Enrolled')).toBeVisible({
+    // Phase 27 UI redesign: stat cards replaced by continue-learning + mastery sections
+    await expect(page.getByTestId('continue-learning-section')).toBeVisible({
       timeout: 8_000,
     });
-    await expect(page.getByText('Study Time')).toBeVisible();
-    await expect(page.getByText('Concepts Mastered')).toBeVisible();
-    // Secondary stats row: Active Courses, Annotations, Study Groups
-    await expect(page.getByText('Active Courses')).toBeVisible();
+    await expect(page.getByTestId('mastery-overview')).toBeVisible();
   });
 
   test('Instructor Tools section is visible', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Instructor Tools')).toBeVisible({
+    // Phase 27: Instructor Tools replaced by recent-activity section
+    await expect(page.getByTestId('recent-activity')).toBeVisible({
       timeout: 8_000,
     });
   });

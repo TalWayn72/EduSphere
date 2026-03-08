@@ -1,0 +1,114 @@
+type VisualAsset {
+  id: ID!
+  courseId: ID!
+  filename: String!
+  mimeType: String!
+  sizeBytes: Int!
+  storageUrl: String!
+  webpUrl: String
+  scanStatus: ScanStatus!
+  metadata: VisualAssetMetadata!
+  createdAt: String!
+}
+
+type VisualAssetMetadata {
+  width: Int
+  height: Int
+  altText: String
+}
+
+enum ScanStatus {
+  PENDING
+  SCANNING
+  CLEAN
+  INFECTED
+  ERROR
+}
+
+type VisualAnchor {
+  id: ID!
+  mediaAssetId: ID!
+  anchorText: String!
+  pageNumber: Int
+  posX: Float
+  posY: Float
+  posW: Float
+  posH: Float
+  pageEnd: Int
+  posXEnd: Float
+  posYEnd: Float
+  visualAssetId: ID
+  visualAsset: VisualAsset
+  documentOrder: Int!
+  isBroken: Boolean!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type SyncResult {
+  synced: Int!
+  broken: Int!
+}
+
+input CreateVisualAnchorInput {
+  mediaAssetId: ID!
+  courseId: ID!
+  anchorText: String!
+  pageNumber: Int
+  posX: Float
+  posY: Float
+  posW: Float
+  posH: Float
+  pageEnd: Int
+  posXEnd: Float
+  posYEnd: Float
+  documentOrder: Int!
+}
+
+input UpdateVisualAnchorInput {
+  anchorText: String
+  pageNumber: Int
+  posX: Float
+  posY: Float
+  posW: Float
+  posH: Float
+  pageEnd: Int
+  posXEnd: Float
+  posYEnd: Float
+  documentOrder: Int
+}
+
+extend type Query {
+  getVisualAssets(courseId: ID!): [VisualAsset!]! @authenticated
+  getVisualAnchors(mediaAssetId: ID!): [VisualAnchor!]! @authenticated
+}
+
+extend type Mutation {
+  confirmVisualAssetUpload(
+    fileKey: String!
+    courseId: ID!
+    originalName: String!
+    declaredMimeType: String!
+    declaredSize: Int!
+  ): VisualAsset! @authenticated @requiresScopes(scopes: ["content:write"])
+
+  createVisualAnchor(input: CreateVisualAnchorInput!): VisualAnchor!
+    @authenticated @requiresScopes(scopes: ["content:write"])
+
+  updateVisualAnchor(id: ID!, input: UpdateVisualAnchorInput!): VisualAnchor!
+    @authenticated @requiresScopes(scopes: ["content:write"])
+
+  deleteVisualAnchor(id: ID!): Boolean!
+    @authenticated @requiresScopes(scopes: ["content:write"])
+
+  assignAssetToAnchor(anchorId: ID!, visualAssetId: ID!): VisualAnchor!
+    @authenticated @requiresScopes(scopes: ["content:write"])
+
+  syncAnchors(mediaAssetId: ID!): SyncResult!
+    @authenticated @requiresScopes(scopes: ["content:write"])
+}
+
+extend type Subscription {
+  anchorDeleted(mediaAssetId: ID!): ID! @authenticated
+  anchorCreated(mediaAssetId: ID!): VisualAnchor! @authenticated
+}

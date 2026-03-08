@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { BASE_URL } from './env';
+import { loginInDevMode } from './auth.helpers';
 
 /**
  * Agents E2E tests — AgentsPage (/agents).
@@ -62,9 +63,8 @@ test.describe('Agents — page load and template selector', () => {
   test.describe.configure({ mode: 'serial' });
   test.beforeEach(async ({ page }) => {
     if (process.env.VITE_DEV_MODE !== 'false') {
-      // DEV_MODE: auto-authenticated — navigate to home to trigger auth init
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      // DEV_MODE: must explicitly set auth key (goto('/') alone does NOT authenticate)
+      await loginInDevMode(page);
     } else {
       await loginViaKeycloak(page);
     }

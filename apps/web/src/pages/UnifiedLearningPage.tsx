@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/resizable';
 import { ContentViewerBreadcrumb } from '@/components/ContentViewerBreadcrumb';
 import { useContentData } from '@/hooks/useContentData';
+import { useSubtitleTracks } from '@/hooks/useSubtitleTracks';
 import { useAnnotations } from '@/hooks/useAnnotations';
 import { useAgentChat } from '@/hooks/useAgentChat';
 import { useDocumentAnnotations } from '@/hooks/useDocumentAnnotations';
@@ -30,6 +31,10 @@ import { mockDocumentContent } from '@/lib/mock-content-data';
 import { AnnotationLayer } from '@/types/annotations';
 import { DocumentPanel } from '@/pages/UnifiedLearningPage.document-panel';
 import { ToolsPanel } from '@/pages/UnifiedLearningPage.tools-panel';
+import VisualSidebar from '@/components/visual-anchoring/VisualSidebar';
+import { useAnchorDetection } from '@/hooks/useAnchorDetection';
+import { GET_VISUAL_ANCHORS } from '@/components/visual-anchoring/visual-anchor.graphql';
+import type { VisualAnchor } from '@/components/visual-anchoring/visual-anchor.types';
 
 const DOC_TYPES = new Set(['MARKDOWN', 'PDF', 'RICH_DOCUMENT']);
 
@@ -40,6 +45,10 @@ interface ContentItemResult {
     contentType: string;
     content: string | null;
   } | null;
+}
+
+interface VisualAnchorsResult {
+  getVisualAnchors: VisualAnchor[];
 }
 
 export function UnifiedLearningPage() {
@@ -63,6 +72,9 @@ export function UnifiedLearningPage() {
   // ── Video / transcript hook (has mock fallback) ──
   const { videoUrl, hlsManifestUrl, videoTitle, transcript } =
     useContentData(contentId);
+
+  // ── Subtitle tracks (empty array when query not available) ──
+  const subtitleTracks = useSubtitleTracks(contentId);
 
   // ── Annotation hooks ──
   const [activeLayers] = useState<AnnotationLayer[]>([
@@ -92,6 +104,19 @@ export function UnifiedLearningPage() {
   // ── Document scroll memory ──
   const { saveScrollPosition } = useDocumentScrollMemory(contentId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // ── Visual anchors ──
+  const [anchorsResult] = useQuery<VisualAnchorsResult>({
+    query: GET_VISUAL_ANCHORS,
+    variables: { mediaAssetId: contentId },
+    pause: !contentId,
+  });
+  const visualAnchors: VisualAnchor[] = anchorsResult.data?.getVisualAnchors ?? [];
+  const anchorPositions = visualAnchors.map((a) => ({
+    id: a.id,
+    documentOrder: a.documentOrder,
+  }));
+  const { activeAnchorId } = useAnchorDetection(anchorPositions, scrollContainerRef);
 
   // ── Document zoom ──
   const { documentZoom, defaultAnnotationLayer } = useDocumentUIStore();
@@ -143,7 +168,12 @@ export function UnifiedLearningPage() {
           <ContentViewerBreadcrumb contentId={contentId} contentTitle={title} />
         </div>
 
-        {/* Main resizable layout */}
+        {/* Main resizable layout with visual sidebar */}
+        <div className="flex flex-1 overflow-hidden">
+          <VisualSidebar
+            anchors={visualAnchors}
+            activeAnchorId={activeAnchorId}
+          />
         <ResizablePanelGroup
           orientation="horizontal"
           className="flex-1 overflow-hidden border rounded-lg"
@@ -193,9 +223,11 @@ export function UnifiedLearningPage() {
               }}
               bookmarks={bookmarks}
               chat={chat}
+              subtitleTracks={subtitleTracks}
             />
           </ResizablePanel>
         </ResizablePanelGroup>
+        </div>
       </div>
     </Layout>
   );

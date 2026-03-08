@@ -1,0 +1,26 @@
+type DocumentVersion {
+  id: ID!
+  mediaAssetId: ID!
+  versionNumber: Int!
+  createdBy: ID
+  anchorCount: Int!
+  brokenAnchorCount: Int!
+  diffSummary: String
+  aiSuggestions: JSON
+  createdAt: String!
+}
+
+scalar JSON
+
+extend type Query {
+  getDocumentVersions(mediaAssetId: ID!): [DocumentVersion!]!
+    @authenticated @requiresScopes(scopes: ["content:read"])
+}
+
+extend type Mutation {
+  createDocumentVersion(mediaAssetId: ID!, summary: String): DocumentVersion!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  rollbackToVersion(versionId: ID!): Boolean!
+    @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}

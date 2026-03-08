@@ -28,6 +28,8 @@ import { MarketplaceModule } from './marketplace/marketplace.module';
 import { OpenBadgeModule } from './open-badges/open-badge.module';
 import { LibraryModule } from './course-library/library.module';
 import { LessonModule } from './lesson/lesson.module';
+import { VisualAnchorModule } from './visual-anchor/visual-anchor.module';
+import { DocumentVersionModule } from './document-version/document-version.module';
 
 @Module({
   imports: [
@@ -67,6 +69,8 @@ import { LessonModule } from './lesson/lesson.module';
     OpenBadgeModule,
     LibraryModule,
     LessonModule,
+    VisualAnchorModule,
+    DocumentVersionModule,
   ],
 })
 export class AppModule {}
