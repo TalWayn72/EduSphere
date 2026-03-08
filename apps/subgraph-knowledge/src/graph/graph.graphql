@@ -204,6 +204,7 @@ type SkillGapItem {
   recommendedContentItems: [ID!]!
   recommendedContentTitles: [String!]!
   relevanceScore: Float!
+  explanationText: String!
 }
 
 """
@@ -251,6 +252,39 @@ extend type Mutation {
     description: String
     requiredConcepts: [String!]!
   ): SkillProfile! @authenticated
+}
+
+# ─── F-007: Adaptive Learning Path ───────────────────────────────────────────
+
+"""
+A single item in the adaptive learning path, ranked by mastery gap and time budget.
+"""
+type AdaptivePathItem {
+  contentItemId: ID!
+  title: String!
+  estimatedMinutes: Int!
+  reason: String!
+  priorityScore: Float!
+}
+
+"""
+Adaptive learning path for a course, personalized to the user's mastery gaps.
+Items are sorted descending by priorityScore: gap items first, mastered items last.
+"""
+type AdaptiveLearningPath {
+  courseId: ID!
+  timeBudgetMinutes: Int!
+  items: [AdaptivePathItem!]!
+  masteryGapCount: Int!
+}
+
+extend type Query {
+  """
+  Return a time-budget-aware adaptive learning path for the given course.
+  Unmastered content ranks highest; items that fit within timeBudgetMinutes
+  receive a +0.2 priority bonus. Requires authentication.
+  """
+  adaptiveLearningPath(courseId: ID!, timeBudgetMinutes: Int = 30): AdaptiveLearningPath! @authenticated
 }
 
 # ─── F-002: Personalized Auto Learning Path ──────────────────────────────────
@@ -338,4 +372,19 @@ extend type Mutation {
   Stored in the user_skill_mastery table (created by migration 0011).
   """
   updateMasteryLevel(nodeId: ID!, level: MasteryLevel!): SkillTreeNode! @authenticated
+}
+
+# ─── Phase 35: Top mastery topics (for Dashboard) ──────────────────────────
+
+type UserMasteryTopic {
+  topicName: String!
+  level: MasteryLevel!
+}
+
+extend type Query {
+  """
+  Return the current user's top mastered topics (for Dashboard mastery widget).
+  Uses existing user_skill_mastery table.
+  """
+  myTopMasteryTopics(limit: Int = 5): [UserMasteryTopic!]! @authenticated
 }

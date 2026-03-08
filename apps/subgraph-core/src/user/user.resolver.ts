@@ -4,6 +4,8 @@ import { UserService } from './user.service';
 import { UserStatsService } from './user-stats.service';
 import { UserPreferencesService } from './user-preferences.service';
 import { PublicProfileService } from './public-profile.service';
+import { ActivityFeedService } from './activity-feed.service';
+import { InProgressCoursesService } from './in-progress-courses.service';
 import { UpdateUserPreferencesSchema } from './user.schemas';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -18,7 +20,9 @@ export class UserResolver {
     private readonly userService: UserService,
     private readonly userStatsService: UserStatsService,
     private readonly userPreferencesService: UserPreferencesService,
-    private readonly publicProfileService: PublicProfileService
+    private readonly publicProfileService: PublicProfileService,
+    private readonly activityFeedService: ActivityFeedService,
+    private readonly inProgressCoursesService: InProgressCoursesService
   ) {}
 
   @Query('_health')
@@ -183,5 +187,41 @@ export class UserResolver {
     if (!context.authContext)
       throw new UnauthorizedException('Unauthenticated');
     return this.userService.bulkImportUsers(csvData, context.authContext);
+  }
+
+  @Query('myInProgressCourses')
+  async getMyInProgressCourses(
+    @Args('limit') limit: number,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    return this.inProgressCoursesService.getInProgressCourses(
+      context.authContext.userId,
+      context.authContext.tenantId || '',
+      limit ?? 5
+    );
+  }
+
+  @Query('myRecommendedCourses')
+  async getMyRecommendedCourses(
+    @Args('limit') _limit: number,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    // TODO(sprint-C): integrate with knowledge subgraph for personalized recommendations
+    return [];
+  }
+
+  @Query('myActivityFeed')
+  async getMyActivityFeed(
+    @Args('limit') limit: number,
+    @Context() context: GraphQLContext
+  ) {
+    if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
+    return this.activityFeedService.getActivityFeed(
+      context.authContext.userId,
+      context.authContext.tenantId || '',
+      limit ?? 10
+    );
   }
 }

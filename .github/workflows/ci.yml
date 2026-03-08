@@ -509,6 +509,7 @@ jobs:
         e2e-tests,
         codegen-validation,
         schema-check,
+        lighthouse-ci,
       ]
     if: always()
 

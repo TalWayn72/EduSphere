@@ -1,10 +1,13 @@
 /**
  * SkillGapRecommendations — resolves content recommendations for each gap concept.
  * Extracted from SkillGapService to respect the 150-line guideline.
+ *
+ * N+1 fix: uses EmbeddingDataLoader.batchLoad() — all concepts are embedded in
+ * parallel, then vector-searched in parallel, replacing N sequential DB queries.
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { db, sql } from '@edusphere/db';
-import { EmbeddingService } from '../embedding/embedding.service';
+import { EmbeddingDataLoader } from '../embedding/embedding.dataloader';
 import type { SkillGapItem } from './skill-gap.service';
 
 const RECS_PER_CONCEPT = 3;
@@ -13,42 +16,44 @@ const RECS_PER_CONCEPT = 3;
 export class SkillGapRecommendations {
   private readonly logger = new Logger(SkillGapRecommendations.name);
 
-  constructor(private readonly embeddingService: EmbeddingService) {}
+  constructor(private readonly embeddingDataLoader: EmbeddingDataLoader) {}
 
   async buildGapItems(
     gapConcepts: string[],
     tenantId: string
   ): Promise<SkillGapItem[]> {
-    // TODO: Replace with DataLoader in next sprint
-    // N+1 query detected: semanticSearch is called once per gapConcept (N vector DB queries).
-    // A batched EmbeddingDataLoader should accept all concept strings and issue a single
-    // pgvector kNN query with UNION or ranked-by-concept grouping.
-    this.logger.warn(
-      '[SkillGapRecommendations] N+1 query detected - use DataLoader for production scale'
+    if (gapConcepts.length === 0) return [];
+
+    // Single batched call — all concepts embedded + searched in parallel
+    const resultMap = await this.embeddingDataLoader.batchLoad(
+      gapConcepts,
+      RECS_PER_CONCEPT
     );
+
     return Promise.all(
       gapConcepts.map(async (conceptName) => {
+        const results = resultMap.get(conceptName) ?? [];
+
         let recommendedContentItems: string[] = [];
         let recommendedContentTitles: string[] = [];
         let relevanceScore = 0;
 
-        try {
-          const results = await this.embeddingService.semanticSearch(
-            conceptName,
-            tenantId,
-            RECS_PER_CONCEPT
-          );
+        if (results.length > 0) {
           recommendedContentItems = results.map((r) => r.refId);
           relevanceScore = results[0]?.similarity ?? 0;
-          recommendedContentTitles = await this.resolveContentTitles(
-            results.map((r) => r.refId)
-          );
-        } catch (err) {
-          this.logger.warn(
-            { conceptName, err: String(err) },
-            'Recommendation lookup failed'
-          );
+          try {
+            recommendedContentTitles = await this.resolveContentTitles(
+              results.map((r) => r.refId)
+            );
+          } catch (err) {
+            this.logger.warn(
+              { conceptName, err: String(err) },
+              '[SkillGapRecommendations] resolveContentTitles failed'
+            );
+          }
         }
+
+        const explanationText = `Recommended because you have ${gapConcepts.length} unmastered skill gaps in this topic area`;
 
         return {
           conceptName,
@@ -56,6 +61,7 @@ export class SkillGapRecommendations {
           recommendedContentItems,
           recommendedContentTitles,
           relevanceScore,
+          explanationText,
         };
       })
     );
@@ -74,7 +80,10 @@ export class SkillGapRecommendations {
       `)) as unknown as TitleRow[];
       return (rows as TitleRow[]).map((r) => r.title).filter(Boolean);
     } catch (err) {
-      this.logger.warn({ err: String(err) }, 'resolveContentTitles failed');
+      this.logger.warn(
+        { err: String(err) },
+        '[SkillGapRecommendations] resolveContentTitles failed'
+      );
       return [];
     }
   }

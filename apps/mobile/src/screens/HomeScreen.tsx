@@ -20,6 +20,18 @@ import {
 } from '../lib/mock-mobile-data';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../lib/theme';
 import { resolveStats } from '../lib/stats-utils';
+import { WeeklyActivityBar } from '../components/WeeklyActivityBar';
+import type { DayData } from '../components/WeeklyActivityBar';
+
+const MOCK_WEEKLY_ACTIVITY: DayData[] = [
+  { label: 'Sun', count: 2 },
+  { label: 'Mon', count: 4 },
+  { label: 'Tue', count: 5 },
+  { label: 'Wed', count: 3 },
+  { label: 'Thu', count: 1 },
+  { label: 'Fri', count: 4 },
+  { label: 'Sat', count: 2 },
+];
 
 const HOME_QUERY = gql`
   query HomeData {
@@ -162,6 +174,8 @@ export default function HomeScreen() {
           color={COLORS.accent}
         />
       </View>
+      <Text style={styles.sectionTitle}>Weekly Activity</Text>
+      <WeeklyActivityBar data={MOCK_WEEKLY_ACTIVITY} maxCount={5} />
       <Text style={styles.sectionTitle}>{t('dashboard:continueLearning')}</Text>
       <View testID="continue-learning-list">
         {recentCourses.map((course) => (

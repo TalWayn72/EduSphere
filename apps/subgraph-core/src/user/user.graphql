@@ -38,6 +38,8 @@ type UserStats {
   conceptsMastered: Int!
   totalLearningMinutes: Int!
   weeklyActivity: [DayActivity!]!
+  currentStreak: Int!
+  longestStreak: Int!
 }
 
 type DayActivity {
@@ -188,3 +190,42 @@ input UpdateUserPreferencesInput {
 }
 
 scalar DateTime
+
+# ─── Phase 35: Dashboard Feed & Recommendations ──────────────────────────────
+
+type InProgressCourse {
+  id: ID!
+  courseId: ID!
+  title: String!
+  progress: Int!
+  lastAccessedAt: String
+  instructorName: String
+}
+
+type RecommendedCourse {
+  courseId: ID!
+  title: String!
+  instructorName: String
+  reason: String!
+}
+
+enum ActivityEventType {
+  LESSON_COMPLETED
+  QUIZ_PASSED
+  AI_SESSION
+  ANNOTATION_ADDED
+  COURSE_ENROLLED
+}
+
+type ActivityFeedItem {
+  id: ID!
+  eventType: ActivityEventType!
+  description: String!
+  occurredAt: String!
+}
+
+extend type Query {
+  myInProgressCourses(limit: Int = 5): [InProgressCourse!]! @authenticated
+  myRecommendedCourses(limit: Int = 5): [RecommendedCourse!]! @authenticated
+  myActivityFeed(limit: Int = 10): [ActivityFeedItem!]! @authenticated
+}

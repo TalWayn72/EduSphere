@@ -7,6 +7,71 @@
 
 ---
 
+## FEAT-PHASE35-ANALYTICS-MOBILE — Performance, Analytics & Mobile Parity (Phase 35)
+
+**Status:** 🟡 In Progress → ✅ Complete
+**Date:** March 2026
+**Severity:** HIGH
+**Files touched:**
+
+DB:
+- `packages/db/src/schema/tenant-analytics-snapshots.ts`
+- `packages/db/src/schema/push-notification-tokens.ts`
+- `packages/db/src/schema/user-learning-velocity.ts`
+- `packages/db/src/migrations/0017_tenant_analytics_snapshot.sql`
+- `packages/db/src/migrations/0018_push_notification_tokens.sql`
+- `packages/db/src/migrations/0019_user_learning_velocity.sql`
+- `packages/db/src/schema/schema-phase35.test.ts` (42 tests)
+
+N+1 Fix:
+- `apps/subgraph-knowledge/src/embedding/embedding.dataloader.ts`
+- `apps/subgraph-knowledge/src/graph/skill-gap.recommendations.ts`
+- `apps/subgraph-knowledge/src/graph/adaptive-path.service.ts`
+- `apps/subgraph-knowledge/src/graph/adaptive-path.resolver.ts`
+
+SDL:
+- `apps/subgraph-core/src/user/user.graphql`
+- `apps/subgraph-content/src/analytics/analytics.graphql`
+- `apps/subgraph-core/src/notifications/notifications.graphql`
+- `apps/subgraph-knowledge/src/graph/graph.graphql`
+
+Backend:
+- `apps/subgraph-core/src/user/activity-feed.service.ts`
+- `apps/subgraph-core/src/user/in-progress-courses.service.ts`
+- `apps/subgraph-core/src/notifications/push-token.service.ts`
+- `apps/subgraph-content/src/analytics/tenant-analytics.service.ts`
+
+Frontend:
+- `apps/web/src/lib/graphql/dashboard.queries.ts`
+- `apps/web/src/pages/DashboardPage.tsx` (5 MOCK constants replaced)
+- `apps/web/src/pages/TenantAnalyticsPage.tsx`
+- `apps/web/src/hooks/usePushNotifications.ts`
+- `apps/web/src/lib/vitals.ts`
+- `apps/web/src/components/ui/OptimizedImage.tsx`
+
+Mobile:
+- `apps/mobile/src/screens/LiveSessionsScreen.tsx`
+- `apps/mobile/src/screens/SkillTreeScreen.tsx`
+- `apps/mobile/src/screens/ModelViewerScreen.tsx`
+- `apps/mobile/src/components/WeeklyActivityBar.tsx`
+
+E2E:
+- `apps/web/e2e/dashboard-realdata.spec.ts`
+- `apps/web/e2e/tenant-analytics.spec.ts`
+- `apps/web/e2e/push-notifications.spec.ts`
+- `apps/web/e2e/adaptive-recommendations.spec.ts`
+
+Security:
+- `tests/security/push-notifications-security.spec.ts`
+
+**Problem:** 6 production gaps — mock data in DashboardPage, no tenant analytics, no Lighthouse CI, no push notifications, mobile parity gaps, N+1 in skill-gap.recommendations.ts (documented TODO in code)
+**Root cause:** Phase 35 scope — intentional deferred items from Phase 34
+**Solution:** Complete Phase 35 implementation across 9 sub-phases
+**Tests:** 650+ passing (unit) + 4 new E2E specs + security tests
+**Anti-recurrence:** E2E spec `dashboard-realdata.spec.ts` asserts no "Dr. Cohen" / "MOCK_" strings in DOM
+
+---
+
 ## FEAT-VISUAL-ANCHORING — Visual Anchoring & Asset Linking System (Phase 29)
 
 **Status:** ✅ Complete

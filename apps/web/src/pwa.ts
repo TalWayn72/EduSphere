@@ -8,7 +8,22 @@
  */
 import { registerSW } from 'virtual:pwa-register';
 
+/**
+ * Listen for messages relayed from the service worker
+ * (e.g. PUSH_RECEIVED events forwarded to the main thread).
+ */
+function registerSwMessageListener(): void {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
+    if ((event.data as { type?: string } | undefined)?.type === 'PUSH_RECEIVED') {
+      // Reserved for future use: update badge counts or refresh notification list
+    }
+  });
+}
+
 export function registerServiceWorker(): void {
+  registerSwMessageListener();
+
   if (import.meta.env.PROD) {
     registerSW({
       immediate: true,

@@ -12,13 +12,18 @@ import {
 } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import type { NotificationPubSub } from './notifications.pubsub';
+import type { PushDispatchService } from './push-dispatch.service';
 
 export type NotificationType =
   | 'BADGE_ISSUED'
   | 'COURSE_ENROLLED'
   | 'USER_FOLLOWED'
   | 'SRS_REVIEW_DUE'
-  | 'ANNOUNCEMENT';
+  | 'ANNOUNCEMENT'
+  | 'LESSON_AVAILABLE'
+  | 'SESSION_STARTING'
+  | 'STREAK_REMINDER'
+  | 'AT_RISK_ALERT';
 
 export interface Notification {
   id: string;
@@ -70,6 +75,30 @@ const SUBJECT_MAP: Record<
     title: (raw) => String(raw['title'] ?? 'New Announcement'),
     body: (raw) => String(raw['body'] ?? ''),
   },
+  'EDUSPHERE.lesson.available': {
+    type: 'LESSON_AVAILABLE',
+    title: () => 'New Lesson Available',
+    body: (raw) =>
+      `A new lesson is ready: ${String(raw['lessonTitle'] ?? 'Untitled Lesson')}.`,
+  },
+  'EDUSPHERE.session.starting': {
+    type: 'SESSION_STARTING',
+    title: () => 'Live Session Starting Soon',
+    body: (raw) =>
+      `Your session "${String(raw['sessionTitle'] ?? 'Untitled Session')}" starts in ${String(raw['minutesUntilStart'] ?? '5')} minutes.`,
+  },
+  'EDUSPHERE.streak.reminder': {
+    type: 'STREAK_REMINDER',
+    title: () => 'Keep Your Streak Going!',
+    body: (raw) =>
+      `You have a ${String(raw['streakDays'] ?? '0')}-day streak — don't break it today.`,
+  },
+  'EDUSPHERE.at.risk.alert': {
+    type: 'AT_RISK_ALERT',
+    title: () => 'Learning Progress Alert',
+    body: (raw) =>
+      `Your progress in "${String(raw['courseName'] ?? 'a course')}" needs attention.`,
+  },
 };
 
 /**
@@ -90,7 +119,10 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
   /** Tracks every NATS Subscription so they can all be closed on destroy. */
   private readonly _subs: Subscription[] = [];
 
-  constructor(private readonly pubSub: NotificationPubSub) {}
+  constructor(
+    private readonly pubSub: NotificationPubSub,
+    private readonly pushDispatch: PushDispatchService
+  ) {}
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -174,6 +206,25 @@ export class NatsNotificationBridge implements OnModuleInit, OnModuleDestroy {
         this.pubSub.publish(`notificationReceived.${userId}`, {
           notificationReceived: notification,
         });
+
+        // Fire-and-forget push dispatch — never blocks WebSocket pipeline.
+        const tenantId = String(raw['tenantId'] ?? '');
+        if (tenantId) {
+          void this.pushDispatch
+            .dispatchToUser(
+              userId,
+              tenantId,
+              notification.title,
+              notification.body,
+              notification.payload ?? undefined
+            )
+            .catch((err: unknown) => {
+              this.logger.error(
+                `[NatsNotificationBridge] Push dispatch error — userId=${userId}`,
+                err
+              );
+            });
+        }
 
         this.logger.debug(
           `Published notification ${notification.type} for user ${userId}`

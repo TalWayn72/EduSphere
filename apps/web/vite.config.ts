@@ -10,19 +10,14 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      workbox: {
+      // injectManifest lets us use a custom SW (src/sw.ts) that adds push
+      // event handlers while still leveraging Workbox precaching.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https?:\/\/localhost:4000\/graphql/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'graphql-cache',
-              expiration: { maxEntries: 100, maxAgeSeconds: 7 * 24 * 60 * 60 },
-              networkTimeoutSeconds: 5,
-            },
-          },
-        ],
+        injectionPoint: 'self.__WB_MANIFEST',
       },
       manifest: {
         name: 'EduSphere',

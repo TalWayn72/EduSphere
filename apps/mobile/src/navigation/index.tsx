@@ -18,6 +18,9 @@ import KnowledgeGraphScreen from '../screens/KnowledgeGraphScreen';
 import MyBadgesScreen from '../screens/MyBadgesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import { LiveSessionsScreen } from '../screens/LiveSessionsScreen';
+import { SkillTreeScreen } from '../screens/SkillTreeScreen';
+import { ModelViewerScreen } from '../screens/ModelViewerScreen';
 
 export type RootStackParamList = {
   Main: undefined;
@@ -25,6 +28,9 @@ export type RootStackParamList = {
   CourseViewer: { courseId: string };
   AIChat: { sessionId: string };
   Settings: undefined;
+  LiveSessions: undefined;
+  SkillTree: { courseId: string };
+  ModelViewer: { modelUrl?: string; modelTitle?: string };
 };
 
 export type MainTabParamList = {
@@ -140,6 +146,21 @@ export default function Navigation() {
           options={{
             title: t('common:settings', { defaultValue: 'Settings' }),
           }}
+        />
+        <Stack.Screen
+          name="LiveSessions"
+          component={LiveSessionsScreen}
+          options={{ title: 'Live Sessions' }}
+        />
+        <Stack.Screen
+          name="SkillTree"
+          component={SkillTreeScreen}
+          options={{ title: 'Skill Tree' }}
+        />
+        <Stack.Screen
+          name="ModelViewer"
+          component={ModelViewerScreen}
+          options={{ title: '3D Model' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

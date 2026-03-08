@@ -199,3 +199,164 @@ describe('G-15: aggregate -- least privilege principle across all schemas', () =
     expect(d).toContain('AuthScope');
   });
 });
+
+// ─── Phase 35: Push Notifications ─────────────────────────────────────────────
+
+describe('G-15: notifications.graphql (Phase 35) -- push token mutations have @authenticated', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-core/src/notifications/notifications.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('registerPushToken mutation is present', () => {
+    expect(schema).toContain('registerPushToken');
+  });
+
+  it('registerPushToken has @authenticated directive', () => {
+    const start = schema.indexOf('registerPushToken');
+    // Slice enough to capture the directive on the same or next line
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('unregisterPushToken mutation is present', () => {
+    expect(schema).toContain('unregisterPushToken');
+  });
+
+  it('unregisterPushToken has @authenticated directive', () => {
+    const start = schema.indexOf('unregisterPushToken');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('PushPlatform enum declares WEB, IOS, ANDROID values', () => {
+    expect(schema).toContain('WEB');
+    expect(schema).toContain('IOS');
+    expect(schema).toContain('ANDROID');
+  });
+
+  it('registerPushToken does NOT have @requiresRole (self-service mutation)', () => {
+    const start = schema.indexOf('registerPushToken');
+    const end = schema.indexOf('unregisterPushToken', start);
+    const b = schema.slice(start, end > start ? end : start + 300);
+    // Push token registration is user-self-service — no elevated role required
+    expect(b).not.toContain('@requiresRole');
+  });
+});
+
+// ─── Phase 35: Tenant Analytics ───────────────────────────────────────────────
+
+describe('G-15: analytics.graphql (Phase 35) -- tenant analytics mutations have @authenticated', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-content/src/analytics/analytics.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('exportTenantAnalytics mutation is present', () => {
+    expect(schema).toContain('exportTenantAnalytics');
+  });
+
+  it('exportTenantAnalytics has @authenticated directive', () => {
+    const start = schema.indexOf('exportTenantAnalytics');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('tenantAnalytics query has @authenticated', () => {
+    const start = schema.indexOf('tenantAnalytics');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('learnerVelocity query has @authenticated', () => {
+    const start = schema.indexOf('learnerVelocity');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('cohortRetention query has @authenticated', () => {
+    const start = schema.indexOf('cohortRetention');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('AnalyticsPeriod enum declares SEVEN_DAYS, THIRTY_DAYS, NINETY_DAYS', () => {
+    expect(schema).toContain('SEVEN_DAYS');
+    expect(schema).toContain('THIRTY_DAYS');
+    expect(schema).toContain('NINETY_DAYS');
+  });
+
+  it('ExportFormat enum declares CSV and EXCEL', () => {
+    expect(schema).toContain('CSV');
+    expect(schema).toContain('EXCEL');
+  });
+});
+
+// ─── Phase 35: Admin Overview authorization ────────────────────────────────────
+
+describe('G-15: admin.graphql (Phase 35) -- admin queries require ORG_ADMIN or SUPER_ADMIN', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-core/src/admin/admin.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('adminOverview query requires @requiresRole', () => {
+    const start = schema.indexOf('adminOverview');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresRole');
+  });
+
+  it('adminOverview restricts to ORG_ADMIN and SUPER_ADMIN', () => {
+    const start = schema.indexOf('adminOverview');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('ORG_ADMIN');
+    expect(b).toContain('SUPER_ADMIN');
+  });
+
+  it('adminDashboardStats query requires @requiresRole', () => {
+    const start = schema.indexOf('adminDashboardStats');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresRole');
+  });
+
+  it('adminOverview has @authenticated as baseline guard', () => {
+    const start = schema.indexOf('adminOverview');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+});
+
+// ─── Phase 35: adaptiveLearningPath ───────────────────────────────────────────
+
+describe('G-15: graph.graphql (Phase 35) -- adaptiveLearningPath requires @authenticated', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-knowledge/src/graph/graph.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('adaptiveLearningPath field is present in schema', () => {
+    expect(schema).toContain('adaptiveLearningPath');
+  });
+
+  it('adaptiveLearningPath has @authenticated directive', () => {
+    const start = schema.indexOf('adaptiveLearningPath');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+});

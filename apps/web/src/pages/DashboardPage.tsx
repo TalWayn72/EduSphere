@@ -13,6 +13,13 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { MY_ENROLLMENTS_QUERY } from '@/lib/graphql/content.queries';
+import {
+  MY_IN_PROGRESS_COURSES_QUERY,
+  MY_RECOMMENDED_COURSES_QUERY,
+  MY_ACTIVITY_FEED_QUERY,
+  MY_STATS_WITH_STREAK_QUERY,
+  MY_TOP_MASTERY_TOPICS_QUERY,
+} from '@/lib/graphql/dashboard.queries';
 // TODO: replace MOCK_STREAK, MOCK_XP, MOCK_ACTIVITY with real queries once
 //       myStats and activityFeed resolvers are in the deployed supergraph.
 
@@ -177,6 +184,36 @@ export function DashboardPage() {
     pause: !mounted,
   });
 
+  // Real queries — paused in DEV_MODE (no gateway) and until mounted (memory safety)
+  const [inProgressResult] = useQuery({
+    query: MY_IN_PROGRESS_COURSES_QUERY,
+    variables: { limit: 5 },
+    pause: !mounted || DEV_MODE,
+  });
+
+  const [recommendedResult] = useQuery({
+    query: MY_RECOMMENDED_COURSES_QUERY,
+    variables: { limit: 5 },
+    pause: !mounted || DEV_MODE,
+  });
+
+  const [activityResult] = useQuery({
+    query: MY_ACTIVITY_FEED_QUERY,
+    variables: { limit: 10 },
+    pause: !mounted || DEV_MODE,
+  });
+
+  const [statsResult] = useQuery({
+    query: MY_STATS_WITH_STREAK_QUERY,
+    pause: !mounted || DEV_MODE,
+  });
+
+  const [masteryResult] = useQuery({
+    query: MY_TOP_MASTERY_TOPICS_QUERY,
+    variables: { limit: 5 },
+    pause: !mounted || DEV_MODE,
+  });
+
   // Derive counts from real data; fall back to mock lengths if query hasn't resolved
   const enrolledCount =
     enrollmentsResult.data?.myEnrollments?.length ?? MOCK_IN_PROGRESS.length;
@@ -184,15 +221,55 @@ export function DashboardPage() {
     enrollmentsResult.data?.myEnrollments?.filter(
       (e: { status: string }) => e.status === 'COMPLETED'
     ).length ?? MOCK_COMPLETED;
-  // TODO: replace MOCK_IN_PROGRESS with real in-progress enrollments once the
-  //       myEnrollments resolver returns courseTitle + progress fields.
-  const inProgressCourses = MOCK_IN_PROGRESS;
-  const recommendedCourses = MOCK_RECOMMENDED;
-  // TODO: replace MOCK_STREAK and MOCK_XP with real myStats query once resolver is live.
-  const streak = MOCK_STREAK;
+
+  // Derive display data — real data when available, mock fallback otherwise
+  const inProgressCourses: MockCourse[] = inProgressResult.data?.myInProgressCourses
+    ? inProgressResult.data.myInProgressCourses.map(
+        (c: { id: string; courseId: string; title: string; progress: number; lastAccessedAt: string | null; instructorName: string }) => ({
+          id: c.id,
+          title: c.title,
+          progress: c.progress,
+          lastStudied: c.lastAccessedAt ?? 'Unknown',
+          instructor: c.instructorName,
+        })
+      )
+    : MOCK_IN_PROGRESS;
+
+  const recommendedCourses: MockCourse[] = recommendedResult.data?.myRecommendedCourses
+    ? recommendedResult.data.myRecommendedCourses.map(
+        (c: { courseId: string; title: string; instructorName: string; reason: string }) => ({
+          id: c.courseId,
+          title: c.title,
+          progress: 0,
+          lastStudied: 'Not started',
+          instructor: c.instructorName,
+        })
+      )
+    : MOCK_RECOMMENDED;
+
+  const activity: MockActivity[] = activityResult.data?.myActivityFeed
+    ? activityResult.data.myActivityFeed.map(
+        (a: { id: string; eventType: string; description: string; occurredAt: string }) => ({
+          id: a.id,
+          icon: a.eventType,
+          action: a.description,
+          timeAgo: a.occurredAt,
+        })
+      )
+    : MOCK_ACTIVITY;
+
+  const streak = statsResult.data?.myStats?.currentStreak ?? MOCK_STREAK;
+  // XP system deferred to Phase 36 — keep mock until then
   const xp = MOCK_XP;
-  // TODO: replace MOCK_ACTIVITY with real activityFeed query once resolver is live.
-  const activity = MOCK_ACTIVITY;
+
+  const masteryTopics: MockMasteryItem[] = masteryResult.data?.myTopMasteryTopics
+    ? masteryResult.data.myTopMasteryTopics.map(
+        (t: { topicName: string; level: MockMasteryItem['level'] }) => ({
+          topic: t.topicName,
+          level: t.level,
+        })
+      )
+    : MOCK_MASTERY;
 
   return (
     <Layout>
@@ -294,7 +371,7 @@ export function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {MOCK_MASTERY.map(({ topic, level }) => (
+                {masteryTopics.map(({ topic, level }) => (
                   <div key={topic} className="flex items-center justify-between gap-2" dir="ltr">
                     <span className="text-sm text-foreground truncate">{topic}</span>
                     <MasteryBadge level={level} size="sm" />

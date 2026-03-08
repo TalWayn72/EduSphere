@@ -8,32 +8,31 @@ vi.mock('@edusphere/db', () => ({
   sql: vi.fn((_strings: TemplateStringsArray, ..._values: unknown[]) => ({})),
 }));
 
-// ─── EmbeddingService mock ────────────────────────────────────────────────────
-const mockSemanticSearch = vi.fn();
+// ─── EmbeddingDataLoader mock ─────────────────────────────────────────────────
+const mockBatchLoad = vi.fn();
 
-vi.mock('../embedding/embedding.service', () => ({
-  EmbeddingService: class {
-    semanticSearch = mockSemanticSearch;
+vi.mock('../embedding/embedding.dataloader', () => ({
+  EmbeddingDataLoader: class {
+    batchLoad = mockBatchLoad;
   },
 }));
 
 import { SkillGapRecommendations } from './skill-gap.recommendations.js';
-import { EmbeddingService } from '../embedding/embedding.service.js';
+import { EmbeddingDataLoader } from '../embedding/embedding.dataloader.js';
 
 describe('SkillGapRecommendations', () => {
   let service: SkillGapRecommendations;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new SkillGapRecommendations(new EmbeddingService());
+    service = new SkillGapRecommendations(new EmbeddingDataLoader({} as never));
   });
 
   describe('buildGapItems()', () => {
     it('returns one gap item per concept with content recommendations', async () => {
-      mockSemanticSearch.mockResolvedValue([
-        { refId: 'seg-1', similarity: 0.92 },
-        { refId: 'seg-2', similarity: 0.85 },
-      ]);
+      mockBatchLoad.mockResolvedValue(
+        new Map([['React', [{ refId: 'seg-1', similarity: 0.92 }, { refId: 'seg-2', similarity: 0.85 }]]])
+      );
       mockDbExecute.mockResolvedValue([{ title: 'Intro to React' }]);
 
       const items = await service.buildGapItems(['React'], 'tenant-1');
@@ -46,9 +45,9 @@ describe('SkillGapRecommendations', () => {
     });
 
     it('uses the first result similarity as relevanceScore', async () => {
-      mockSemanticSearch.mockResolvedValue([
-        { refId: 'seg-a', similarity: 0.77 },
-      ]);
+      mockBatchLoad.mockResolvedValue(
+        new Map([['TypeScript', [{ refId: 'seg-a', similarity: 0.77 }]]])
+      );
       mockDbExecute.mockResolvedValue([]);
 
       const items = await service.buildGapItems(['TypeScript'], 'tenant-1');
@@ -56,7 +55,7 @@ describe('SkillGapRecommendations', () => {
     });
 
     it('returns relevanceScore 0 when no semantic results', async () => {
-      mockSemanticSearch.mockResolvedValue([]);
+      mockBatchLoad.mockResolvedValue(new Map([['Graphs', []]]));
       mockDbExecute.mockResolvedValue([]);
 
       const items = await service.buildGapItems(['Graphs'], 'tenant-1');
@@ -65,9 +64,9 @@ describe('SkillGapRecommendations', () => {
     });
 
     it('returns empty recommendedContentTitles when db.execute returns empty', async () => {
-      mockSemanticSearch.mockResolvedValue([
-        { refId: 'seg-1', similarity: 0.8 },
-      ]);
+      mockBatchLoad.mockResolvedValue(
+        new Map([['Algebra', [{ refId: 'seg-1', similarity: 0.8 }]]])
+      );
       mockDbExecute.mockResolvedValue([]);
 
       const items = await service.buildGapItems(['Algebra'], 'tenant-1');
@@ -75,9 +74,13 @@ describe('SkillGapRecommendations', () => {
     });
 
     it('handles multiple concepts in parallel', async () => {
-      mockSemanticSearch.mockResolvedValue([
-        { refId: 'seg-1', similarity: 0.9 },
-      ]);
+      mockBatchLoad.mockResolvedValue(
+        new Map([
+          ['Math', [{ refId: 'seg-1', similarity: 0.9 }]],
+          ['Physics', [{ refId: 'seg-2', similarity: 0.8 }]],
+          ['Chemistry', [{ refId: 'seg-3', similarity: 0.7 }]],
+        ])
+      );
       mockDbExecute.mockResolvedValue([{ title: 'Course A' }]);
 
       const items = await service.buildGapItems(
@@ -96,18 +99,42 @@ describe('SkillGapRecommendations', () => {
     it('returns empty array for empty gapConcepts', async () => {
       const items = await service.buildGapItems([], 'tenant-1');
       expect(items).toEqual([]);
+      expect(mockBatchLoad).not.toHaveBeenCalled();
     });
 
     it('marks all items as isMastered = false', async () => {
-      mockSemanticSearch.mockResolvedValue([]);
+      mockBatchLoad.mockResolvedValue(
+        new Map([['A', []], ['B', []]])
+      );
       mockDbExecute.mockResolvedValue([]);
 
       const items = await service.buildGapItems(['A', 'B'], 'tenant-1');
       expect(items.every((i) => i.isMastered === false)).toBe(true);
     });
 
-    it('handles semanticSearch failure gracefully with empty recommendations', async () => {
-      mockSemanticSearch.mockRejectedValue(new Error('provider error'));
+    it('includes explanationText on every item', async () => {
+      mockBatchLoad.mockResolvedValue(
+        new Map([['React', [{ refId: 'seg-1', similarity: 0.9 }]]])
+      );
+      mockDbExecute.mockResolvedValue([]);
+
+      const items = await service.buildGapItems(['React'], 'tenant-1');
+      expect(items[0]!.explanationText).toContain('unmastered skill gaps');
+    });
+
+    it('calls batchLoad once for all concepts (N+1 fix)', async () => {
+      mockBatchLoad.mockResolvedValue(
+        new Map([['A', []], ['B', []], ['C', []]])
+      );
+      mockDbExecute.mockResolvedValue([]);
+
+      await service.buildGapItems(['A', 'B', 'C'], 'tenant-1');
+      expect(mockBatchLoad).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles missing map entry gracefully', async () => {
+      // DataLoader returns partial map (missing 'FailConcept')
+      mockBatchLoad.mockResolvedValue(new Map());
 
       const items = await service.buildGapItems(['FailConcept'], 'tenant-1');
       expect(items).toHaveLength(1);

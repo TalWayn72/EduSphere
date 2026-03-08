@@ -20,6 +20,7 @@ export interface SkillGapItem {
   recommendedContentItems: string[];
   recommendedContentTitles: string[];
   relevanceScore: number;
+  explanationText: string;
 }
 
 export interface SkillGapReport {

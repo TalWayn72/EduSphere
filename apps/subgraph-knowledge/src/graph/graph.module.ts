@@ -17,8 +17,11 @@ import { CypherLearningPathService } from './cypher-learning-path.service';
 import { TopicClusterKMeansService } from './topic-cluster-kmeans.service';
 import { KMeansDataService } from './kmeans-data.service';
 import { EmbeddingModule } from '../embedding/embedding.module';
+import { EmbeddingDataLoader } from '../embedding/embedding.dataloader';
 import { AutoPathResolver } from './auto-path.resolver';
 import { AutoPathService } from './auto-path.service';
+import { AdaptivePathResolver } from './adaptive-path.resolver';
+import { AdaptivePathService } from './adaptive-path.service';
 import { SkillGapResolver } from './skill-gap.resolver';
 import { SkillGapService } from './skill-gap.service';
 import { SkillGapRecommendations } from './skill-gap.recommendations';
@@ -56,8 +59,11 @@ import { SkillTreeResolver } from './skill-tree.resolver';
     GraphResolver,
     AutoPathResolver,
     AutoPathService,
+    AdaptivePathResolver,
+    AdaptivePathService,
     SkillGapResolver,
     SkillGapService,
+    EmbeddingDataLoader,
     SkillGapRecommendations,
     SocialRecommendationsDataService,
     SocialRecommendationsService,

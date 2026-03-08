@@ -22,3 +22,5 @@ export * from './roleplay.queries';
 export * from './crm.queries';
 export * from './library.queries';
 export * from './notifications.subscriptions';
+export * from './dashboard.queries';
+export * from './tenant-analytics.queries';

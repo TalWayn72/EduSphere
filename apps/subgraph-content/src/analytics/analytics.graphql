@@ -27,3 +27,69 @@ type CourseAnalytics {
 extend type Query {
   courseAnalytics(courseId: ID!): CourseAnalytics! @authenticated
 }
+
+# ─── Phase 35: Tenant Analytics & Reporting ───────────────────────────────────
+
+enum AnalyticsPeriod {
+  SEVEN_DAYS
+  THIRTY_DAYS
+  NINETY_DAYS
+}
+
+enum ExportFormat {
+  CSV
+  EXCEL
+}
+
+type TrendPoint {
+  date: String!
+  value: Float!
+}
+
+type CourseCompletionMetric {
+  courseId: ID!
+  courseTitle: String!
+  enrollmentCount: Int!
+  completionRate: Float!
+  avgTimeToCompleteHours: Float
+}
+
+type TenantAnalytics {
+  activeLearnersTrend: [TrendPoint!]!
+  completionRateTrend: [TrendPoint!]!
+  totalEnrollments: Int!
+  avgLearningVelocity: Float!
+  topCourses: [CourseCompletionMetric!]!
+}
+
+type LearnerVelocityRow {
+  userId: ID!
+  displayName: String!
+  lessonsPerWeek: Float!
+  weeklyTrend: [TrendPoint!]!
+}
+
+type CohortMetrics {
+  cohortWeek: String!
+  enrolled: Int!
+  activeAt7Days: Int!
+  activeAt30Days: Int!
+  completionRate30Days: Float!
+}
+
+extend type Query {
+  tenantAnalytics(period: AnalyticsPeriod!): TenantAnalytics!
+    @authenticated
+
+  learnerVelocity(period: AnalyticsPeriod!, limit: Int = 20): [LearnerVelocityRow!]!
+    @authenticated
+
+  cohortRetention(weeksBack: Int = 12): [CohortMetrics!]!
+    @authenticated
+}
+
+extend type Mutation {
+  exportTenantAnalytics(period: AnalyticsPeriod!, format: ExportFormat!): String!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

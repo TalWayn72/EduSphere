@@ -17,8 +17,36 @@ enum NotificationType {
   USER_FOLLOWED
   SRS_REVIEW_DUE
   ANNOUNCEMENT
+  LESSON_AVAILABLE
+  SESSION_STARTING
+  STREAK_REMINDER
+  AT_RISK_ALERT
 }
 
 extend type Subscription {
   notificationReceived(userId: ID!): Notification! @authenticated
+}
+
+# ─── Phase 35: Push Token Registration ───────────────────────────────────────
+
+enum PushPlatform {
+  WEB
+  IOS
+  ANDROID
+}
+
+type PushRegistration {
+  id: ID!
+  platform: PushPlatform!
+  createdAt: String!
+}
+
+extend type Mutation {
+  registerPushToken(
+    platform: PushPlatform!
+    expoPushToken: String
+    webPushSubscription: String
+  ): PushRegistration! @authenticated
+
+  unregisterPushToken(platform: PushPlatform!): Boolean! @authenticated
 }

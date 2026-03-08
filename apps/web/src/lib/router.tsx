@@ -341,6 +341,11 @@ const InstructorMergeQueuePage = lazy(() =>
 const Model3DPage = lazy(() =>
   import('@/pages/Model3DPage').then((m) => ({ default: m.Model3DPage }))
 );
+const TenantAnalyticsPage = lazy(() =>
+  import('@/pages/TenantAnalyticsPage').then((m) => ({
+    default: m.TenantAnalyticsPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -696,6 +701,7 @@ export const router = createBrowserRouter([
   },
   { path: '/admin/bi-export', element: guarded(<BiExportSettingsPage />) },
   { path: '/admin/cpd', element: guarded(<CpdSettingsPage />) },
+  { path: '/admin/analytics', element: guarded(<TenantAnalyticsPage />) },
   {
     path: '/',
     element: <SmartRoot />,

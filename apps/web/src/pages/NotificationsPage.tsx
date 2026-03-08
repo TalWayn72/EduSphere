@@ -8,6 +8,7 @@ import {
   type AppNotification,
   type NotificationType,
 } from '@/hooks/useNotifications';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -57,6 +58,7 @@ export function NotificationsPage() {
   const user = getCurrentUser();
   const { notifications, markAsRead } = useNotifications(user?.id ?? '');
   const [filter, setFilter] = useState<FilterKey>('ALL');
+  const { isEnabled: pushEnabled, isLoading: pushLoading, enable: enablePush, disable: disablePush } = usePushNotifications();
 
   const unreadCount = notifications.filter((n) => !n.readAt).length;
 
@@ -99,6 +101,27 @@ export function NotificationsPage() {
               Mark all read
             </Button>
           )}
+        </div>
+
+        {/* Push Notifications toggle */}
+        <div className="mb-6 p-4 rounded-lg border border-border bg-muted/30">
+          <h3 className="text-sm font-semibold mb-1">Push Notifications</h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Receive instant notifications about your learning progress.
+          </p>
+          <Button
+            variant={pushEnabled ? 'destructive' : 'default'}
+            size="sm"
+            onClick={pushEnabled ? disablePush : enablePush}
+            disabled={pushLoading}
+            data-testid="push-toggle"
+          >
+            {pushLoading
+              ? 'Updating…'
+              : pushEnabled
+                ? 'Disable Push Notifications'
+                : 'Enable Push Notifications'}
+          </Button>
         </div>
 
         {/* Filter tabs */}

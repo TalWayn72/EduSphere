@@ -63,11 +63,18 @@ vi.mock('@edusphere/nats-client', () => ({
 
 import { NatsNotificationBridge } from './nats-notification.bridge';
 import type { NotificationPubSub } from './notifications.pubsub';
+import type { PushDispatchService } from './push-dispatch.service';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/** Total number of NATS subjects watched by the bridge. */
-const WATCHED_SUBJECT_COUNT = 5; // badge.issued, course.enrolled, user.followed, srs.review.due, EDUSPHERE.notification.announcement
+/**
+ * Total number of NATS subjects watched by the bridge.
+ * Original 5: badge.issued, course.enrolled, user.followed, srs.review.due,
+ *             EDUSPHERE.notification.announcement
+ * Phase 35 additions (+4): EDUSPHERE.lesson.available, EDUSPHERE.session.starting,
+ *             EDUSPHERE.streak.reminder, EDUSPHERE.at.risk.alert
+ */
+const WATCHED_SUBJECT_COUNT = 9;
 
 /** Access private _subs array via type casting. */
 function getSubs(bridge: NatsNotificationBridge) {
@@ -81,6 +88,13 @@ function makeMockPubSub(): NotificationPubSub {
   } as unknown as NotificationPubSub;
 }
 
+function makeMockPushDispatch(): PushDispatchService {
+  return {
+    dispatchToUser: vi.fn().mockResolvedValue(undefined),
+    onModuleDestroy: vi.fn().mockResolvedValue(undefined),
+  } as unknown as PushDispatchService;
+}
+
 // ── Suite ─────────────────────────────────────────────────────────────────────
 
 describe('NatsNotificationBridge — memory leak / subscription tracking', () => {
@@ -91,7 +105,7 @@ describe('NatsNotificationBridge — memory leak / subscription tracking', () =>
     vi.clearAllMocks();
     mockUnsubscribeFns = [];
     mockPubSub = makeMockPubSub();
-    bridge = new NatsNotificationBridge(mockPubSub);
+    bridge = new NatsNotificationBridge(mockPubSub, makeMockPushDispatch());
   });
 
   afterEach(async () => {
@@ -162,7 +176,7 @@ describe('NatsNotificationBridge — memory leak / subscription tracking', () =>
     });
 
     it('does NOT call drain when NATS never connected (no onModuleInit)', async () => {
-      const fresh = new NatsNotificationBridge(makeMockPubSub());
+      const fresh = new NatsNotificationBridge(makeMockPubSub(), makeMockPushDispatch());
       await fresh.onModuleDestroy();
       // mockDrain is only defined after connect() runs; it should not have been called.
       if (mockDrain) {

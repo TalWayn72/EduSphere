@@ -22,6 +22,7 @@ vi.mock('./notifications.pubsub.js', () => ({
 // ── Import after mocks ────────────────────────────────────────────────────────
 
 import { NotificationsResolver } from './notifications.resolver.js';
+import type { PushTokenService } from './push-token.service.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -34,6 +35,13 @@ function makeCtx(authUserId?: string) {
   };
 }
 
+const mockPushTokenService = {
+  registerToken: vi.fn(),
+  unregisterToken: vi.fn(),
+  getTokensForUser: vi.fn(),
+  getTokensByUserIds: vi.fn(),
+} as unknown as PushTokenService;
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('NotificationsResolver', () => {
@@ -41,7 +49,7 @@ describe('NotificationsResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new NotificationsResolver();
+    resolver = new NotificationsResolver(mockPushTokenService);
   });
 
   // 1. Throws UnauthorizedException when authContext is absent

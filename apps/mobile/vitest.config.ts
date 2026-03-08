@@ -26,8 +26,12 @@ export default defineConfig({
       'src/screens/HomeScreen.test.tsx',
       'src/screens/CoursesScreen.test.tsx',
       'src/screens/AITutorScreen.test.ts',
+      'src/screens/LiveSessionsScreen.test.tsx',
+      'src/screens/SkillTreeScreen.test.tsx',
+      'src/screens/ModelViewerScreen.test.tsx',
       'src/components/MasteryBadge.test.tsx',
       'src/components/VisualBottomSheet.test.tsx',
+      'src/components/WeeklyActivityBar.test.tsx',
       'src/lib/theme.test.ts',
     ],
     // useOfflineAnnotations.test.tsx imports @testing-library/react-hooks which
