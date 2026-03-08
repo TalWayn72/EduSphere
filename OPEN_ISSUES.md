@@ -1,9 +1,9 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 08 מרץ 2026 (Session 29 Phase 29 ✅ COMPLETE — Visual Anchoring & Asset Linking System; web 3731/3731 (287 files), subgraph-content 1095/1095 (110 files) ✅, TypeScript 0 errors)
+**תאריך עדכון:** 08 מרץ 2026 (Session 29 Phase 29 ✅ COMPLETE — Visual Anchoring & Asset Linking System G-1..G-12 all resolved; web 3750/3750, subgraph-content 1096/1096, security 865, total 5711 tests, 0 failures, TypeScript 0 errors; commit ca16f57)
 **מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings)
-**בדיקות:** Security: **819 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,731** (287 files) | Backend subgraphs: **2,428+** (core 640 + content 1095 + annotation 144 + collab 161 + agent 677 + knowledge 509) | Gateway: **138** | i18n: ~247 | Pentest visual-anchoring: **36** | סה"כ: **>5,655 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+**בדיקות:** Security: **865 tests** (32 spec files) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile offline: **31 unit** + 34 static | Web: **3,750** (287 files) | Backend subgraphs: **2,429+** (core 640 + content 1096 + annotation 144 + collab 161 + agent 677 + knowledge 509) | Gateway: **138** | i18n: ~247 | Pentest visual-anchoring: **36** | סה"כ: **5,711 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
 
 ---
 
@@ -14,7 +14,8 @@
 **Completed:** 2026-03-08
 **Severity:** HIGH — Major new feature (PRD v1.6)
 **Files:** `packages/db`, `apps/subgraph-content`, `apps/web`, `apps/mobile`, `docker-compose.yml`
-**Tests:** 73 new test files, 5655+ total tests (web 3731/3731 — 287 files, subgraph-content 1095/1095 — 110 files)
+**Tests:** 73 new test files, 5711 total tests (web 3750/3750 — subgraph-content 1096/1096 — security 865 — 0 failures)
+**Commit:** `ca16f57` (2026-03-08) — all 12 gaps (G-1 through G-12) resolved
 **Security:** `docs/plans/features/PHASE29-SECURITY-AUDIT.md` — CONDITIONAL (4 fixes applied: ClamAV fallback hardening, ZIP-bomb guard, magic-byte verification, RLS on all 3 new tables)
 **Pentest:** `tests/security/visual-anchoring.pentest.spec.ts` — 36 tests (XSS via altText/textPassage, IDOR anchor cross-tenant, malware upload bypass, oversized ZIP-bomb, SVG injection)
 
@@ -75,6 +76,29 @@
 
 ### Plan
 `docs/plans/features/VISUAL-ANCHORING-ASSET-LINKING.md`
+
+### Gap Resolution Log (G-1 through G-12) — all resolved in commit `ca16f57` (2026-03-08)
+
+| # | Gap | Description | Resolution | Status |
+|---|-----|-------------|------------|--------|
+| G-1 | ClamavModule registration | `ClamavModule` not registered in `AppModule` | Registered in earlier commit — `ClamavModule` added to `AppModule` imports | ✅ Resolved |
+| G-2 | Interactive SVG | SVG assets not interactive; no XSS-safe rendering | `useInteractiveSvg.ts` + DOMPurify sanitization added to `VisualSidebar.tsx` | ✅ Resolved |
+| G-3 | GIF last-frame pause | Animated GIFs kept looping; no pause-at-last-frame support | `useCrossFadeGif.ts` — canvas-based last-frame extraction, pauses on crossfade end | ✅ Resolved |
+| G-4 | Hebrew FTS dictionary | Full-text search used `english` dictionary; Hebrew text not indexed | SQL migration adds `hebrew` FTS configuration + `pg_catalog.simple` fallback for `visual_assets` | ✅ Resolved |
+| G-5 | `searchVisualAssets` query | GraphQL query missing from SDL and resolver | `searchVisualAssets` added to `visual-anchor.graphql` SDL + `VisualAnchorResolver` | ✅ Resolved |
+| G-6 | E2E instructor spec | No E2E coverage for instructor anchor-creation flow | `apps/web/e2e/visual-anchoring-instructor.spec.ts` — 5 E2E tests (create/edit/delete anchors, asset upload) | ✅ Resolved |
+| G-7 | Visual regression spec | No visual regression snapshots for anchoring UI | `apps/web/e2e/visual-anchoring-visual.spec.ts` — 7 `toHaveScreenshot()` visual regression tests | ✅ Resolved |
+| G-8 | `AssetPicker` unit tests | `AssetPicker.tsx` had no unit test coverage | `apps/web/src/components/__tests__/AssetPicker.test.tsx` — 13 unit tests | ✅ Resolved |
+| G-9 | `VisualBottomSheet` unit tests | Mobile `VisualBottomSheet.tsx` had no unit test coverage | `apps/mobile/src/components/__tests__/VisualBottomSheet.test.tsx` — 26 unit tests | ✅ Resolved |
+| G-10 | `ResumeBanner` integration | `ResumeBanner.tsx` existed but was not wired into `UnifiedLearningPage` | `ResumeBanner` imported and rendered in `UnifiedLearningPage.tsx` above content area | ✅ Resolved |
+| G-11 | `anchorDomMap` scroll perf | `anchorDomMap` rebuilt on every scroll event (O(n) per frame) | Refactored to rebuild only on anchor-list changes (`useEffect` dep array), not per-scroll | ✅ Resolved |
+| G-12 | `RichDocumentPage` integration | Visual anchoring not wired into `RichDocumentPage` | `RichDocumentPageAnchors.tsx` wrapper integrates `VisualSidebar` + `AnchorEditor` into `RichDocumentPage` | ✅ Resolved |
+
+**Final test counts (post G-1..G-12 fixes):**
+- Web: **3750** tests (was 3731 before G-6/G-7/G-8 additions)
+- subgraph-content: **1096** tests (was 1095)
+- Security: **865** tests
+- Total: **5711** tests — 0 failures
 
 ---
 
