@@ -360,3 +360,134 @@ describe('G-15: graph.graphql (Phase 35) -- adaptiveLearningPath requires @authe
     expect(b).toContain('@authenticated');
   });
 });
+
+// ─── Phase 36: Lesson Pipeline Builder authorization ──────────────────────────
+
+describe('G-15: lesson.graphql (Phase 36) -- Pipeline Builder mutations require INSTRUCTOR role', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-content/src/lesson/lesson.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('createLessonPlan mutation is present', () => {
+    expect(schema).toContain('createLessonPlan');
+  });
+
+  it('createLessonPlan requires @authenticated directive', () => {
+    const start = schema.indexOf('createLessonPlan(input:');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('createLessonPlan requires @requiresRole with INSTRUCTOR', () => {
+    const start = schema.indexOf('createLessonPlan(input:');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('INSTRUCTOR');
+  });
+
+  it('createLessonPlan also allows ORG_ADMIN and SUPER_ADMIN', () => {
+    const start = schema.indexOf('createLessonPlan(input:');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('ORG_ADMIN');
+    expect(b).toContain('SUPER_ADMIN');
+  });
+
+  it('publishLessonPlan mutation is present', () => {
+    expect(schema).toContain('publishLessonPlan');
+  });
+
+  it('publishLessonPlan requires @authenticated directive', () => {
+    const start = schema.indexOf('publishLessonPlan(id:');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('publishLessonPlan requires @requiresRole with INSTRUCTOR', () => {
+    const start = schema.indexOf('publishLessonPlan(id:');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('INSTRUCTOR');
+  });
+
+  it('myCourseLessonPlans query requires @requiresRole with INSTRUCTOR', () => {
+    const start = schema.indexOf('myCourseLessonPlans');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('INSTRUCTOR');
+  });
+
+  it('STUDENT is NOT listed in createLessonPlan roles (student-as-unauthorized guard)', () => {
+    const start = schema.indexOf('createLessonPlan(input:');
+    // Slice between createLessonPlan and addLessonStep to avoid cross-contamination
+    const end = schema.indexOf('addLessonStep', start);
+    const b = schema.slice(start, end > start ? end : start + 300);
+    // STUDENT role must NOT appear in the allowed roles list for this mutation
+    expect(b).not.toContain('STUDENT');
+  });
+
+  it('STUDENT is NOT listed in publishLessonPlan roles', () => {
+    const start = schema.indexOf('publishLessonPlan(id:');
+    const b = schema.slice(start, start + 300);
+    expect(b).not.toContain('STUDENT');
+  });
+});
+
+// ─── Phase 36: At-Risk Learners authorization ─────────────────────────────────
+
+describe('G-15: analytics.graphql (Phase 36) -- listAtRiskLearners requires ORG_ADMIN', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-content/src/analytics/analytics.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('listAtRiskLearners query is present', () => {
+    expect(schema).toContain('listAtRiskLearners');
+  });
+
+  it('listAtRiskLearners has @authenticated directive', () => {
+    const start = schema.indexOf('listAtRiskLearners');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('listAtRiskLearners has @requiresRole directive', () => {
+    const start = schema.indexOf('listAtRiskLearners');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@requiresRole');
+  });
+
+  it('listAtRiskLearners restricts to ORG_ADMIN', () => {
+    const start = schema.indexOf('listAtRiskLearners');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('ORG_ADMIN');
+  });
+
+  it('listAtRiskLearners also allows SUPER_ADMIN', () => {
+    const start = schema.indexOf('listAtRiskLearners');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('SUPER_ADMIN');
+  });
+
+  it('STUDENT is NOT listed in listAtRiskLearners roles', () => {
+    const start = schema.indexOf('listAtRiskLearners');
+    // Slice to next field definition to avoid false positives
+    const b = schema.slice(start, start + 200);
+    expect(b).not.toContain('STUDENT');
+  });
+
+  it('INSTRUCTOR is NOT listed in listAtRiskLearners roles (admin-only guard)', () => {
+    const start = schema.indexOf('listAtRiskLearners');
+    const b = schema.slice(start, start + 200);
+    // listAtRiskLearners is admin-only, instructors should not be in the allow-list
+    expect(b).not.toContain('INSTRUCTOR');
+  });
+});
