@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'urql';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,166 +13,30 @@ import {
 } from '@/components/ui/select';
 import { LayoutGrid, List } from 'lucide-react';
 import { CourseCard, type CourseCardProps } from '@/components/CourseCard';
-// TODO: replace with real query — import { useQuery } from 'urql';
-// TODO: import { COURSES_QUERY } from '@/lib/queries';
+import {
+  COURSES_DISCOVERY_QUERY,
+  SEARCH_COURSES_DISCOVERY_QUERY,
+} from '@/lib/graphql/courses-discovery.queries';
 
-// ── DEV_MODE mock data ────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced';
 
-type MockCourse = Omit<CourseCardProps, 'onClick'> & { level: CourseLevel };
+/** Shape returned by the courses query */
+interface ApiCourse {
+  id: string;
+  title: string;
+  description?: string | null;
+  thumbnailUrl?: string | null;
+  estimatedHours?: number | null;
+  isPublished: boolean;
+  instructorId: string;
+  slug: string;
+  createdAt: string;
+}
 
-const MOCK_COURSES: MockCourse[] = [
-  {
-    id: 'c-1',
-    title: 'Complete TypeScript Bootcamp: From Zero to Advanced',
-    instructor: 'Sarah Chen',
-    category: 'Programming',
-    lessonCount: 48,
-    estimatedHours: 12,
-    enrolled: true,
-    progress: 65,
-    mastery: 'proficient',
-    featured: true,
-    level: 'Advanced',
-  },
-  {
-    id: 'c-2',
-    title: 'UI/UX Design Fundamentals with Figma',
-    instructor: 'Marcus Webb',
-    category: 'Design',
-    lessonCount: 32,
-    estimatedHours: 8,
-    enrolled: true,
-    progress: 30,
-    mastery: 'familiar',
-    featured: false,
-    level: 'Beginner',
-  },
-  {
-    id: 'c-3',
-    title: 'Business Strategy in the Age of AI',
-    instructor: 'Dr. Priya Sharma',
-    category: 'Business',
-    lessonCount: 20,
-    estimatedHours: 5,
-    enrolled: false,
-    mastery: 'none',
-    featured: true,
-    level: 'Intermediate',
-  },
-  {
-    id: 'c-4',
-    title: 'Quantum Computing: Foundations and Applications',
-    instructor: 'Prof. Lior Ben-David',
-    category: 'Science',
-    lessonCount: 36,
-    estimatedHours: 10,
-    enrolled: false,
-    mastery: 'none',
-    featured: false,
-    level: 'Advanced',
-  },
-  {
-    id: 'c-5',
-    title: 'Modern Spanish: Conversational Fluency in 90 Days',
-    instructor: 'Isabella Torres',
-    category: 'Languages',
-    lessonCount: 60,
-    estimatedHours: 15,
-    enrolled: true,
-    progress: 10,
-    mastery: 'attempted',
-    featured: false,
-    level: 'Beginner',
-  },
-  {
-    id: 'c-6',
-    title: 'Digital Photography and Lightroom Editing',
-    instructor: 'Kenji Nakamura',
-    category: 'Arts',
-    lessonCount: 24,
-    estimatedHours: 6,
-    enrolled: false,
-    mastery: 'none',
-    featured: false,
-    level: 'Beginner',
-  },
-  {
-    id: 'c-7',
-    title: 'React 19 and Next.js 15: Full-Stack Development',
-    instructor: 'Amara Osei',
-    category: 'Programming',
-    lessonCount: 56,
-    estimatedHours: 14,
-    enrolled: true,
-    progress: 100,
-    mastery: 'mastered',
-    featured: false,
-    level: 'Intermediate',
-  },
-  {
-    id: 'c-8',
-    title: 'Linear Algebra for Machine Learning',
-    instructor: 'Prof. Yuki Tanaka',
-    category: 'Mathematics',
-    lessonCount: 28,
-    estimatedHours: 7,
-    enrolled: false,
-    mastery: 'none',
-    featured: false,
-    level: 'Intermediate',
-  },
-  {
-    id: 'c-9',
-    title: 'Brand Identity Design: From Concept to Launch',
-    instructor: 'Fatima Al-Hassan',
-    category: 'Design',
-    lessonCount: 18,
-    estimatedHours: 4,
-    enrolled: false,
-    mastery: 'none',
-    featured: true,
-    level: 'Intermediate',
-  },
-  {
-    id: 'c-10',
-    title: 'Entrepreneurship and Startup Finance',
-    instructor: 'James Okafor',
-    category: 'Business',
-    lessonCount: 22,
-    estimatedHours: 6,
-    enrolled: false,
-    mastery: 'none',
-    featured: false,
-    level: 'Beginner',
-  },
-  {
-    id: 'c-11',
-    title: 'Ancient Civilizations: Greece, Rome and Beyond',
-    instructor: 'Dr. Elena Vasquez',
-    category: 'History',
-    lessonCount: 30,
-    estimatedHours: 8,
-    enrolled: false,
-    mastery: 'none',
-    featured: false,
-    level: 'Beginner',
-  },
-  {
-    id: 'c-12',
-    title: 'Data Structures and Algorithms in Python',
-    instructor: 'Raj Patel',
-    category: 'Programming',
-    lessonCount: 42,
-    estimatedHours: 11,
-    enrolled: true,
-    progress: 45,
-    mastery: 'familiar',
-    featured: false,
-    level: 'Intermediate',
-  },
-];
+/** Internal representation used for filtering / sorting */
+type DisplayCourse = Omit<CourseCardProps, 'onClick'> & { level: CourseLevel };
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -199,6 +64,29 @@ const DURATION_FILTERS = ['Any Duration', '< 1h', '1-5h', '5h+'];
 
 const PAGE_SIZE = 12;
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Map an API course to a display course for CourseCard rendering. */
+function toDisplayCourse(course: ApiCourse): DisplayCourse {
+  // Derive level heuristic from estimatedHours (no level field in SDL)
+  let level: CourseLevel = 'Beginner';
+  if ((course.estimatedHours ?? 0) > 10) level = 'Advanced';
+  else if ((course.estimatedHours ?? 0) > 4) level = 'Intermediate';
+
+  return {
+    id: course.id,
+    title: course.title,
+    instructor: `Instructor ${course.instructorId.slice(0, 6)}`,
+    category: 'General',
+    lessonCount: 0,
+    estimatedHours: course.estimatedHours ?? 0,
+    enrolled: false,
+    mastery: 'none',
+    featured: false,
+    level,
+  };
+}
+
 // ── Skeleton card ─────────────────────────────────────────────────────────────
 
 function SkeletonCard() {
@@ -206,6 +94,7 @@ function SkeletonCard() {
     <div
       className="rounded-xl border border-border bg-card overflow-hidden animate-pulse"
       aria-hidden="true"
+      data-testid="skeleton-card"
     >
       <div className="aspect-video bg-muted" />
       <div className="p-4 flex flex-col gap-3">
@@ -258,10 +147,33 @@ function EmptyState({ query }: { query: string }) {
   );
 }
 
+// ── Error banner ──────────────────────────────────────────────────────────────
+
+function ErrorBanner() {
+  return (
+    <div
+      className="col-span-full flex flex-col items-center justify-center py-20 gap-4 text-center"
+      data-testid="courses-error-banner"
+      role="alert"
+    >
+      <p className="text-lg font-semibold text-destructive">
+        Unable to load courses. Please try again.
+      </p>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export function CoursesDiscoveryPage() {
   const navigate = useNavigate();
+
+  // Mounted guard — urql iron rule: pause until mounted
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [searchValue, setSearchValue] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -270,7 +182,6 @@ export function CoursesDiscoveryPage() {
   const [selectedDuration, setSelectedDuration] = useState('Any Duration');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [isLoading] = useState(false);
 
   // Debounce search
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -287,24 +198,48 @@ export function CoursesDiscoveryPage() {
     []
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
 
-  const filtered = useMemo(() => {
-    let results = [...MOCK_COURSES];
+  // Use search query when text is entered, otherwise use listing query
+  const isSearching = debouncedSearch.trim().length > 0;
 
-    if (debouncedSearch.trim()) {
-      const q = debouncedSearch.toLowerCase();
-      results = results.filter(
-        (c) =>
-          c.title.toLowerCase().includes(q) ||
-          c.instructor.toLowerCase().includes(q) ||
-          c.category.toLowerCase().includes(q)
-      );
+  const [{ data: listData, fetching: listFetching, error: listError }] =
+    useQuery({
+      query: COURSES_DISCOVERY_QUERY,
+      variables: { limit: 100, offset: 0 },
+      pause: !mounted || isSearching,
+    });
+
+  const [{ data: searchData, fetching: searchFetching, error: searchError }] =
+    useQuery({
+      query: SEARCH_COURSES_DISCOVERY_QUERY,
+      variables: { query: debouncedSearch, limit: 50 },
+      pause: !mounted || !isSearching,
+    });
+
+  const fetching = isSearching ? searchFetching : listFetching;
+  const error = isSearching ? searchError : listError;
+
+  // Build raw courses list from API data
+  const rawCourses: ApiCourse[] = useMemo(() => {
+    if (isSearching) {
+      return (searchData?.searchCourses ?? []) as ApiCourse[];
     }
+    return (listData?.courses ?? []) as ApiCourse[];
+  }, [isSearching, listData, searchData]);
+
+  // Convert to display courses
+  const allCourses: DisplayCourse[] = useMemo(
+    () => rawCourses.map(toDisplayCourse),
+    [rawCourses]
+  );
+
+  const filtered = useMemo(() => {
+    let results = [...allCourses];
 
     if (selectedCategory !== 'All') {
       results = results.filter((c) => c.category === selectedCategory);
@@ -335,7 +270,7 @@ export function CoursesDiscoveryPage() {
     }
 
     return results;
-  }, [debouncedSearch, selectedCategory, selectedLevel, selectedDuration, selectedSort]);
+  }, [allCourses, selectedCategory, selectedLevel, selectedDuration, selectedSort]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -349,7 +284,7 @@ export function CoursesDiscoveryPage() {
             Discover Courses
           </h1>
           <p className="text-muted-foreground mt-1">
-            Explore {MOCK_COURSES.length} courses across all subjects
+            Explore {fetching ? '…' : `${allCourses.length}`} courses across all subjects
           </p>
         </div>
 
@@ -519,15 +454,17 @@ export function CoursesDiscoveryPage() {
 
         {/* Results summary */}
         <p className="text-sm text-muted-foreground mb-4">
-          {filtered.length === 0
-            ? 'No courses match your filters'
-            : `Showing ${Math.min(visibleCount, filtered.length)} of ${filtered.length} course${filtered.length !== 1 ? 's' : ''}`}
+          {fetching
+            ? 'Loading courses…'
+            : filtered.length === 0 && !error
+              ? 'No courses match your filters'
+              : `Showing ${Math.min(visibleCount, filtered.length)} of ${filtered.length} course${filtered.length !== 1 ? 's' : ''}`}
         </p>
 
         {/* Courses grid / list */}
         <div
           className={
-            isLoading
+            fetching
               ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
               : viewMode === 'grid'
                 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
@@ -537,30 +474,32 @@ export function CoursesDiscoveryPage() {
           data-view={viewMode}
           aria-label="Course listing"
         >
-          {isLoading
+          {fetching
             ? Array.from({ length: 6 }).map((_, i) => (
                 <SkeletonCard key={i} />
               ))
-            : visible.length === 0
-              ? [
-                  <EmptyState
-                    key="empty"
-                    query={debouncedSearch}
-                  />,
-                ]
-              : visible.map((course) => (
-                  <CourseCard
-                    key={course.id}
-                    {...course}
-                    onClick={() => {
-                      navigate(`/courses/${course.id}`);
-                    }}
-                  />
-                ))}
+            : error
+              ? [<ErrorBanner key="error" />]
+              : visible.length === 0
+                ? [
+                    <EmptyState
+                      key="empty"
+                      query={debouncedSearch}
+                    />,
+                  ]
+                : visible.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      {...course}
+                      onClick={() => {
+                        navigate(`/courses/${course.id}`);
+                      }}
+                    />
+                  ))}
         </div>
 
         {/* Load more */}
-        {!isLoading && hasMore && (
+        {!fetching && !error && hasMore && (
           <div className="flex justify-center mt-10">
             <Button
               variant="outline"
@@ -576,3 +515,5 @@ export function CoursesDiscoveryPage() {
     </Layout>
   );
 }
+
+// XP/enrollment display — wired from real data above

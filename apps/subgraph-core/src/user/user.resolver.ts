@@ -6,6 +6,7 @@ import { UserPreferencesService } from './user-preferences.service';
 import { PublicProfileService } from './public-profile.service';
 import { ActivityFeedService } from './activity-feed.service';
 import { InProgressCoursesService } from './in-progress-courses.service';
+import { RecommendedCoursesService } from './recommended-courses.service';
 import { UpdateUserPreferencesSchema } from './user.schemas';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -22,7 +23,8 @@ export class UserResolver {
     private readonly userPreferencesService: UserPreferencesService,
     private readonly publicProfileService: PublicProfileService,
     private readonly activityFeedService: ActivityFeedService,
-    private readonly inProgressCoursesService: InProgressCoursesService
+    private readonly inProgressCoursesService: InProgressCoursesService,
+    private readonly recommendedCoursesService: RecommendedCoursesService
   ) {}
 
   @Query('_health')
@@ -204,12 +206,15 @@ export class UserResolver {
 
   @Query('myRecommendedCourses')
   async getMyRecommendedCourses(
-    @Args('limit') _limit: number,
+    @Args('limit') limit: number,
     @Context() context: GraphQLContext
   ) {
     if (!context.authContext) throw new UnauthorizedException('Unauthenticated');
-    // TODO(sprint-C): integrate with knowledge subgraph for personalized recommendations
-    return [];
+    return this.recommendedCoursesService.getRecommendedCourses(
+      context.authContext.userId,
+      context.authContext.tenantId || '',
+      limit ?? 5
+    );
   }
 
   @Query('myActivityFeed')

@@ -1,23 +1,35 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('web-vitals', () => ({
+  onCLS: vi.fn((cb) => cb({ name: 'CLS', value: 0.05 })),
+  onFID: vi.fn((cb) => cb({ name: 'FID', value: 10 })),
+  onLCP: vi.fn((cb) => cb({ name: 'LCP', value: 2000 })),
+  onFCP: vi.fn((cb) => cb({ name: 'FCP', value: 1000 })),
+  onTTFB: vi.fn((cb) => cb({ name: 'TTFB', value: 300 })),
+}));
 
 describe('reportWebVitals', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
+  let sendBeaconMock: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    sendBeaconMock = vi.fn();
+    vi.stubGlobal('navigator', { sendBeacon: sendBeaconMock });
+    vi.stubEnv('VITE_VITALS_ENDPOINT', 'http://localhost:4001/vitals');
   });
 
-  it('is a callable function', async () => {
+  it('sends CLS metric via sendBeacon', async () => {
     const { reportWebVitals } = await import('./vitals');
-    expect(typeof reportWebVitals).toBe('function');
-    expect(() => reportWebVitals()).not.toThrow();
+    reportWebVitals();
+    expect(sendBeaconMock).toHaveBeenCalledWith(
+      'http://localhost:4001/vitals',
+      expect.stringContaining('CLS'),
+    );
   });
 
-  it('does not throw when navigator.sendBeacon is available', async () => {
-    Object.defineProperty(navigator, 'sendBeacon', {
-      value: vi.fn().mockReturnValue(true),
-      writable: true,
-      configurable: true,
-    });
+  it('does nothing when VITE_VITALS_ENDPOINT is not set', async () => {
+    vi.stubEnv('VITE_VITALS_ENDPOINT', '');
     const { reportWebVitals } = await import('./vitals');
-    expect(() => reportWebVitals()).not.toThrow();
+    reportWebVitals();
+    expect(sendBeaconMock).not.toHaveBeenCalled();
   });
 });

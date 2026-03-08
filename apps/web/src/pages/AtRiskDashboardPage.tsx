@@ -1,11 +1,11 @@
 /**
  * AtRiskDashboardPage - Admin at-risk learner monitoring dashboard.
  * Route: /admin/at-risk
- * Uses mock data; admin-level aggregated query is tracked in OPEN_ISSUES.
+ * Phase 36: replaced mock data with real listAtRiskLearners GraphQL query.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from 'urql';
+import { useMutation, useQuery } from 'urql';
 import { gql } from 'urql';
 import {
   AlertTriangle,
@@ -31,6 +31,7 @@ import {
   type AtRiskLearnerRow,
 } from '@/components/AtRiskLearnersTable';
 import { RiskThresholdConfig } from './AtRiskDashboardPage.config';
+import { LIST_AT_RISK_LEARNERS_QUERY } from '@/lib/graphql/at-risk.queries';
 
 const ADMIN_ROLES = new Set(['ORG_ADMIN', 'SUPER_ADMIN']);
 
@@ -39,75 +40,6 @@ const RESOLVE_AT_RISK = gql`
     resolveAtRiskFlag(flagId: $flagId)
   }
 `;
-
-const MOCK_LEARNERS: AtRiskLearnerRow[] = [
-  {
-    learnerId: 'usr-aaa1',
-    courseId: 'crs-001',
-    riskScore: 0.87,
-    daysSinceLastActivity: 14,
-    progressPercent: 12,
-    flaggedAt: '2026-02-18T10:00:00Z',
-    riskFactors: [
-      { key: 'inactivity', description: 'No activity for 14 days' },
-      { key: 'low_progress', description: 'Below 30% completion' },
-    ],
-  },
-  {
-    learnerId: 'usr-bbb2',
-    courseId: 'crs-002',
-    riskScore: 0.74,
-    daysSinceLastActivity: 10,
-    progressPercent: 22,
-    flaggedAt: '2026-02-20T08:30:00Z',
-    riskFactors: [
-      { key: 'inactivity', description: 'No activity for 10 days' },
-    ],
-  },
-  {
-    learnerId: 'usr-ccc3',
-    courseId: 'crs-001',
-    riskScore: 0.63,
-    daysSinceLastActivity: 8,
-    progressPercent: 28,
-    flaggedAt: '2026-02-21T09:15:00Z',
-    riskFactors: [{ key: 'low_progress', description: 'Below 30% completion' }],
-  },
-  {
-    learnerId: 'usr-ddd4',
-    courseId: 'crs-003',
-    riskScore: 0.55,
-    daysSinceLastActivity: 7,
-    progressPercent: 31,
-    flaggedAt: '2026-02-22T11:00:00Z',
-    riskFactors: [
-      { key: 'quiz_failures', description: 'Failed last 2 quizzes' },
-    ],
-  },
-  {
-    learnerId: 'usr-eee5',
-    courseId: 'crs-002',
-    riskScore: 0.42,
-    daysSinceLastActivity: 5,
-    progressPercent: 45,
-    flaggedAt: '2026-02-23T14:00:00Z',
-    riskFactors: [
-      { key: 'low_engagement', description: 'Below average session time' },
-    ],
-  },
-  {
-    learnerId: 'usr-fff6',
-    courseId: 'crs-004',
-    riskScore: 0.91,
-    daysSinceLastActivity: 21,
-    progressPercent: 5,
-    flaggedAt: '2026-02-15T07:00:00Z',
-    riskFactors: [
-      { key: 'inactivity', description: 'No activity for 21 days' },
-      { key: 'low_progress', description: 'Below 30% completion' },
-    ],
-  },
-];
 
 type RiskFilter = 'all' | 'high' | 'medium' | 'low';
 type SortKey = 'risk' | 'inactive' | 'progress';
@@ -162,14 +94,63 @@ function exportCsv(rows: AtRiskLearnerRow[]) {
   URL.revokeObjectURL(url);
 }
 
+/** Map real GraphQL AtRiskLearner to the table's AtRiskLearnerRow shape */
+function toTableRow(r: {
+  userId: string;
+  displayName: string;
+  courseId: string;
+  courseTitle: string;
+  daysSinceActive: number;
+  progressPct: number;
+}): AtRiskLearnerRow {
+  const riskScore = Math.max(0, Math.min(1, (100 - r.progressPct) / 100));
+  const riskFactors: AtRiskLearnerRow['riskFactors'] = [];
+  if (r.daysSinceActive >= 7) {
+    riskFactors.push({
+      key: 'inactivity',
+      description: `No activity for ${r.daysSinceActive} days`,
+    });
+  }
+  if (r.progressPct < 30) {
+    riskFactors.push({
+      key: 'low_progress',
+      description: 'Below 30% completion',
+    });
+  }
+  return {
+    learnerId: r.userId,
+    courseId: r.courseId,
+    riskScore,
+    daysSinceLastActivity: r.daysSinceActive,
+    progressPercent: r.progressPct,
+    flaggedAt: new Date().toISOString(),
+    riskFactors,
+  };
+}
+
 export function AtRiskDashboardPage() {
   const navigate = useNavigate();
   const role = useAuthRole();
   const [, resolveFlag] = useMutation(RESOLVE_AT_RISK);
-  const [learners, setLearners] = useState<AtRiskLearnerRow[]>(MOCK_LEARNERS);
   const [resolving, setResolving] = useState<string | null>(null);
   const [filter, setFilter] = useState<RiskFilter>('all');
   const [sort, setSort] = useState<SortKey>('risk');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const [{ data, fetching, error }] = useQuery({
+    query: LIST_AT_RISK_LEARNERS_QUERY,
+    variables: { threshold: 30 },
+    pause: !mounted,
+  });
+
+  const learners: AtRiskLearnerRow[] = useMemo(
+    () => (data?.listAtRiskLearners ?? []).map(toTableRow),
+    [data]
+  );
 
   const visible = useMemo(
     () => applySort(applyFilter(learners, filter), sort),
@@ -200,11 +181,6 @@ export function AtRiskDashboardPage() {
     const key = learnerId + courseId;
     setResolving(key);
     await resolveFlag({ flagId: key });
-    setLearners((prev) =>
-      prev.filter(
-        (r) => !(r.learnerId === learnerId && r.courseId === courseId)
-      )
-    );
     setResolving(null);
     toast.success('Learner flag resolved');
   }
@@ -213,25 +189,25 @@ export function AtRiskDashboardPage() {
     {
       icon: AlertTriangle,
       label: 'Total At-Risk',
-      value: stats.total,
+      value: fetching ? '…' : stats.total,
       color: 'text-orange-500',
     },
     {
       icon: TrendingDown,
       label: 'High Risk (>70%)',
-      value: stats.high,
+      value: fetching ? '…' : stats.high,
       color: 'text-red-500',
     },
     {
       icon: Clock,
       label: 'Avg Days Inactive',
-      value: stats.avgInactive + 'd',
+      value: fetching ? '…' : stats.avgInactive + 'd',
       color: 'text-yellow-500',
     },
     {
       icon: BookOpen,
       label: 'Courses Affected',
-      value: stats.courses,
+      value: fetching ? '…' : stats.courses,
       color: 'text-blue-500',
     },
   ] as const;
@@ -257,6 +233,15 @@ export function AtRiskDashboardPage() {
             </Card>
           ))}
         </div>
+
+        {error && (
+          <div
+            role="alert"
+            className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            Unable to load at-risk learners. Please try again.
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-3">
           <Select
@@ -298,11 +283,20 @@ export function AtRiskDashboardPage() {
 
         <Card>
           <CardContent className="pt-4">
-            <AtRiskLearnersTable
-              learners={visible}
-              onResolve={handleResolve}
-              resolving={resolving}
-            />
+            {!fetching && !error && learners.length === 0 ? (
+              <p
+                data-testid="empty-state"
+                className="text-sm text-muted-foreground py-4 text-center"
+              >
+                No at-risk learners detected. Great work!
+              </p>
+            ) : (
+              <AtRiskLearnersTable
+                learners={visible}
+                onResolve={handleResolve}
+                resolving={resolving}
+              />
+            )}
           </CardContent>
         </Card>
 

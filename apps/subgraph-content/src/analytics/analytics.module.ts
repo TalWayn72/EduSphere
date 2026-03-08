@@ -5,6 +5,8 @@ import { TenantAnalyticsService } from './tenant-analytics.service.js';
 import { TenantAnalyticsExportService } from './tenant-analytics-export.service.js';
 import { TenantAnalyticsResolver } from './tenant-analytics.resolver.js';
 import { AnalyticsSnapshotJob } from './analytics-snapshot.job.js';
+import { AtRiskService } from './at-risk.service.js';
+import { AtRiskResolver } from './at-risk.resolver.js';
 
 @Module({
   providers: [
@@ -14,7 +16,9 @@ import { AnalyticsSnapshotJob } from './analytics-snapshot.job.js';
     TenantAnalyticsExportService,
     TenantAnalyticsResolver,
     AnalyticsSnapshotJob,
+    AtRiskService,
+    AtRiskResolver,
   ],
-  exports: [AnalyticsService, TenantAnalyticsService],
+  exports: [AnalyticsService, TenantAnalyticsService, AtRiskService],
 })
 export class AnalyticsModule {}

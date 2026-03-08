@@ -93,3 +93,20 @@ extend type Mutation {
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
+
+# ─── Phase 36: At-Risk Learner Query ──────────────────────────────────────────
+
+type AtRiskLearner {
+  userId: ID!
+  displayName: String!
+  courseId: ID!
+  courseTitle: String!
+  daysSinceActive: Int!
+  progressPct: Int!
+}
+
+extend type Query {
+  listAtRiskLearners(threshold: Int): [AtRiskLearner!]!
+    @authenticated
+    @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
+}

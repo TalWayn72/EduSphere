@@ -488,7 +488,7 @@ jobs:
       - name: Run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.13.x
-          lhci autorun --config=.lighthouserc.json --collect.startServerCommand="pnpm --filter @edusphere/web preview" --collect.startServerReadyPattern="Local" || true
+          lhci autorun --config=.lighthouserc.json --collect.startServerCommand="pnpm --filter @edusphere/web preview" --collect.startServerReadyPattern="Local"
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

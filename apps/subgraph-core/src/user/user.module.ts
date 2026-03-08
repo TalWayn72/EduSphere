@@ -6,6 +6,7 @@ import { UserPreferencesService } from './user-preferences.service';
 import { PublicProfileService } from './public-profile.service';
 import { ActivityFeedService } from './activity-feed.service';
 import { InProgressCoursesService } from './in-progress-courses.service';
+import { RecommendedCoursesService } from './recommended-courses.service';
 
 @Module({
   providers: [
@@ -16,6 +17,7 @@ import { InProgressCoursesService } from './in-progress-courses.service';
     PublicProfileService,
     ActivityFeedService,
     InProgressCoursesService,
+    RecommendedCoursesService,
   ],
   exports: [
     UserService,
@@ -24,6 +26,7 @@ import { InProgressCoursesService } from './in-progress-courses.service';
     PublicProfileService,
     ActivityFeedService,
     InProgressCoursesService,
+    RecommendedCoursesService,
   ],
 })
 export class UserModule {}
