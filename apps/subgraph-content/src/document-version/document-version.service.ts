@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -167,6 +168,13 @@ export class DocumentVersionService implements OnModuleDestroy {
   }
 
   async rollbackToVersion(versionId: string, authCtx: TenantContext): Promise<boolean> {
+    const allowedRoles: TenantContext['userRole'][] = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'];
+    if (!allowedRoles.includes(authCtx.userRole)) {
+      this.logger.warn(
+        `[DocumentVersionService] rollbackToVersion denied: userId=${authCtx.userId} role=${authCtx.userRole}`
+      );
+      throw new ForbiddenException('Only instructors and admins can roll back document versions');
+    }
     // 1. Load the target version
     const [versionRow] = await withTenantContext(this.db, authCtx, (tx) =>
       tx

@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -6,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { connect, StringCodec } from 'nats';
+import { buildNatsOptions } from '@edusphere/nats-client';
 import {
   S3Client,
   GetObjectCommand,
@@ -221,6 +224,41 @@ export class VisualAnchorService implements OnModuleDestroy {
   }
 
   async assignAsset(anchorId: string, visualAssetId: string, authCtx: TenantContext): Promise<VisualAnchorRow> {
+    // Load anchor to get its media_asset_id for course-id derivation
+    const [anchor] = await withTenantContext(this.db, authCtx, (tx) =>
+      tx
+        .select()
+        .from(schema.visualAnchors)
+        .where(and(eq(schema.visualAnchors.id, anchorId), isNull(schema.visualAnchors.deleted_at)))
+    );
+    if (!anchor) throw new NotFoundException(`Visual anchor ${anchorId} not found`);
+
+    // Load the media_asset to get its course_id
+    const [mediaAsset] = await withTenantContext(this.db, authCtx, (tx) =>
+      tx
+        .select({ course_id: schema.media_assets.course_id })
+        .from(schema.media_assets)
+        .where(eq(schema.media_assets.id, anchor.media_asset_id))
+    );
+    if (!mediaAsset) throw new NotFoundException(`Media asset ${anchor.media_asset_id} not found`);
+
+    // Load visual asset to verify same-course ownership
+    const [asset] = await withTenantContext(this.db, authCtx, (tx) =>
+      tx
+        .select({ course_id: schema.visualAssets.course_id })
+        .from(schema.visualAssets)
+        .where(and(eq(schema.visualAssets.id, visualAssetId), isNull(schema.visualAssets.deleted_at)))
+    );
+    if (!asset) throw new NotFoundException(`Visual asset ${visualAssetId} not found`);
+
+    // Cross-course assignment guard (SI-9)
+    if (asset.course_id !== mediaAsset.course_id) {
+      this.logger.warn(
+        `[VisualAnchorService] Cross-course assignment blocked: anchorId=${anchorId} assetId=${visualAssetId} tenantId=${authCtx.tenantId}`
+      );
+      throw new BadRequestException('Asset and anchor must belong to the same course');
+    }
+
     const [updated] = await withTenantContext(this.db, authCtx, (tx) =>
       tx
         .update(schema.visualAnchors)
@@ -233,6 +271,11 @@ export class VisualAnchorService implements OnModuleDestroy {
   }
 
   async syncAnchors(mediaAssetId: string, authCtx: TenantContext): Promise<SyncResult> {
+    const allowedRoles: TenantContext['userRole'][] = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'];
+    if (!allowedRoles.includes(authCtx.userRole)) {
+      this.logger.warn(`[VisualAnchorService] syncAnchors denied: userId=${authCtx.userId} role=${authCtx.userRole}`);
+      throw new ForbiddenException('Only instructors and admins can sync anchors');
+    }
     const anchors = await this.findAllByMediaAsset(mediaAssetId, authCtx);
     let broken = 0;
     let synced = 0;
@@ -284,10 +327,9 @@ export class VisualAnchorService implements OnModuleDestroy {
   // ── Private helpers ────────────────────────────────────────────────────────
 
   private async publishNats(subject: string, payload: object): Promise<void> {
-    const natsUrl = process.env['NATS_URL'] ?? 'nats://localhost:4222';
     let nc;
     try {
-      nc = await connect({ servers: natsUrl });
+      nc = await connect(buildNatsOptions());
       nc.publish(subject, this.sc.encode(JSON.stringify(payload)));
       await nc.flush();
     } catch (err) {

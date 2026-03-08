@@ -17,7 +17,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import type { DrizzleDB, TenantContext } from '@edusphere/db';
-import { schema } from '@edusphere/db';
+import { schema, withTenantContext } from '@edusphere/db';
 import type { ClamavService } from '../clamav/clamav.service';
 import type { ImageOptimizerService } from '../image-optimizer/image-optimizer.service';
 
@@ -154,24 +154,26 @@ export async function runVisualAssetUploadPipeline(opts: {
       ).catch(() => null)
     : null;
 
-  // 13. Insert into visual_assets
-  const [asset] = await db
-    .insert(schema.visualAssets)
-    .values({
-      tenant_id: authCtx.tenantId,
-      course_id: courseId,
-      uploader_id: authCtx.userId,
-      filename: productionKey,
-      original_name: originalName,
-      mime_type: declaredMimeType,
-      size_bytes: buffer.length,
-      storage_key: productionKey,
-      webp_key: webpKey,
-      scan_status: scanResult.hasError ? 'ERROR' : 'CLEAN',
-      scan_verdict: null,
-      metadata: { width, height, altText: null },
-    })
-    .returning();
+  // 13. Insert into visual_assets (wrapped in withTenantContext for SI-9 compliance)
+  const [asset] = await withTenantContext(db, authCtx, (tx) =>
+    tx
+      .insert(schema.visualAssets)
+      .values({
+        tenant_id: authCtx.tenantId,
+        course_id: courseId,
+        uploader_id: authCtx.userId,
+        filename: productionKey,
+        original_name: originalName,
+        mime_type: declaredMimeType,
+        size_bytes: buffer.length,
+        storage_key: productionKey,
+        webp_key: webpKey,
+        scan_status: scanResult.hasError ? 'ERROR' : 'CLEAN',
+        scan_verdict: null,
+        metadata: { width, height, altText: null },
+      })
+      .returning()
+  );
 
   if (!asset) {
     throw new InternalServerErrorException('Failed to save visual asset record.');

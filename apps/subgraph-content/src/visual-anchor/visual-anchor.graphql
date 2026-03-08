@@ -105,7 +105,7 @@ extend type Mutation {
     @authenticated @requiresScopes(scopes: ["content:write"])
 
   syncAnchors(mediaAssetId: ID!): SyncResult!
-    @authenticated @requiresScopes(scopes: ["content:write"])
+    @authenticated @requiresScopes(scopes: ["content:write"]) @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
 }
 
 extend type Subscription {

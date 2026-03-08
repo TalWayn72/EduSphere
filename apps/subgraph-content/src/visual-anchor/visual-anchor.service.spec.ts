@@ -1,9 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Readable } from 'stream';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
-const mockReturning = vi.fn();
+// vi.hoisted ensures these are available when vi.mock factory runs (hoisted to top)
+const { mockReturning, mockWtc } = vi.hoisted(() => {
+  const mockReturning = vi.fn();
+  const mockWtc = vi.fn();
+  return { mockReturning, mockWtc };
+});
+
 const mockSet = vi.fn(() => ({ where: vi.fn(() => ({ returning: mockReturning })) }));
 const mockWhere = vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue([]), returning: mockReturning }));
 const mockValues = vi.fn(() => ({ returning: mockReturning }));
@@ -12,19 +19,14 @@ const mockInsert = vi.fn(() => ({ values: mockValues }));
 const mockUpdate = vi.fn(() => ({ set: mockSet }));
 const mockSelect = vi.fn(() => ({ from: mockFrom }));
 
-const mockTxFn = vi.fn().mockImplementation(
-  (fn: (tx: unknown) => Promise<unknown>) => fn({ insert: mockInsert, update: mockUpdate, select: mockSelect })
-);
-
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  withTenantContext: vi.fn((_db: unknown, _ctx: unknown, fn: unknown) =>
-    (fn as (tx: unknown) => Promise<unknown>)({ insert: mockInsert, update: mockUpdate, select: mockSelect })
-  ),
+  withTenantContext: mockWtc,
   schema: {
     visualAnchors: { id: 'id', media_asset_id: 'media_asset_id', deleted_at: 'deleted_at', document_order: 'document_order' },
     visualAssets: { id: 'id', course_id: 'course_id', deleted_at: 'deleted_at' },
+    media_assets: { id: 'id', course_id: 'course_id' },
   },
   eq: vi.fn((a, b) => ({ eq: [a, b] })),
   and: vi.fn((...args) => ({ and: args })),
@@ -104,8 +106,11 @@ describe('VisualAnchorService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockReturning.mockReset(); // clear any leftover mockResolvedValueOnce queue
-    // Re-apply mock chain after reset (implementations are preserved by clearAllMocks)
+    mockReturning.mockReset(); // clear leftover mockResolvedValueOnce queue
+    mockWtc.mockReset();       // clear wtc queue, then restore default passthrough
+    mockWtc.mockImplementation((_db: unknown, _ctx: unknown, fn: unknown) =>
+      (fn as (tx: unknown) => Promise<unknown>)({ insert: mockInsert, update: mockUpdate, select: mockSelect })
+    );
     service = new VisualAnchorService(
       mockClamav as never,
       mockImageOptimizer as never
@@ -169,9 +174,23 @@ describe('VisualAnchorService', () => {
   });
 
   // ── assignAsset ───────────────────────────────────────────────────────────────
+  // assignAsset makes 4 withTenantContext calls:
+  //   1. select anchor  2. select media_asset  3. select visual_asset  4. update+returning
+  // Calls 1-3 return arrays directly (select without orderBy), so we use mockWtc.mockResolvedValueOnce.
+  // Call 4 goes through mockUpdate → mockSet → mockWhere → mockReturning.
 
   it('assigns visual asset to anchor', async () => {
+    const MEDIA_ASSET_ROW = { course_id: 'course-1' };
+    const VISUAL_ASSET_ROW = { course_id: 'course-1' };
     const withAsset = { ...ANCHOR_ROW, visual_asset_id: 'asset-uuid-1' };
+    mockWtc
+      .mockResolvedValueOnce([ANCHOR_ROW])       // 1. select anchor
+      .mockResolvedValueOnce([MEDIA_ASSET_ROW])  // 2. select media_asset
+      .mockResolvedValueOnce([VISUAL_ASSET_ROW]); // 3. select visual_asset
+    // 4. update+returning uses the passthrough implementation → mockReturning
+    mockWtc.mockImplementationOnce((_db: unknown, _ctx: unknown, fn: unknown) =>
+      (fn as (tx: unknown) => Promise<unknown>)({ insert: mockInsert, update: mockUpdate, select: mockSelect })
+    );
     mockReturning.mockResolvedValueOnce([withAsset]);
 
     const result = await service.assignAsset('anchor-uuid-1', 'asset-uuid-1', TENANT_CTX);
@@ -179,8 +198,19 @@ describe('VisualAnchorService', () => {
   });
 
   it('throws NotFoundException when anchor not found on assign', async () => {
-    mockReturning.mockResolvedValueOnce([]);
+    mockWtc.mockResolvedValueOnce([]); // 1. select anchor returns empty
     await expect(service.assignAsset('missing', 'asset-1', TENANT_CTX)).rejects.toThrow(NotFoundException);
+  });
+
+  it('throws BadRequestException on cross-course assignment', async () => {
+    const MEDIA_ASSET_ROW = { course_id: 'course-A' };
+    const VISUAL_ASSET_ROW = { course_id: 'course-B' }; // different course → cross-course block
+    mockWtc
+      .mockResolvedValueOnce([ANCHOR_ROW])       // 1. select anchor
+      .mockResolvedValueOnce([MEDIA_ASSET_ROW])  // 2. select media_asset
+      .mockResolvedValueOnce([VISUAL_ASSET_ROW]); // 3. select visual_asset (different course)
+
+    await expect(service.assignAsset('anchor-uuid-1', 'asset-uuid-1', TENANT_CTX)).rejects.toThrow(BadRequestException);
   });
 
   // ── confirmVisualAssetUpload — INFECTED path ──────────────────────────────────
@@ -193,7 +223,7 @@ describe('VisualAnchorService', () => {
     });
 
     // Override S3 send to return a stream for GetObject
-    const readable = require('stream').Readable.from(Buffer.from('eicar'));
+    const readable = Readable.from(Buffer.from('eicar'));
     const s3 = (service as unknown as { s3: { send: ReturnType<typeof vi.fn> } }).s3;
     s3.send = vi.fn().mockResolvedValue({ Body: readable });
 
