@@ -6,6 +6,38 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.38.0] — 2026-03-08 — Phase 38: Certificate Download, Marketplace, QuizBuilder, SRS Mobile (commit a2ffe4f)
+
+### Added
+- `certificate-download.service.ts` — S3Client presigned URL (15-min TTL) with ownership check before signing
+- `certificateDownloadUrl` GraphQL query: SDL type definition, resolver, and supergraph federation entry
+- `marketplace.service.ts` — Drizzle 3-table JOIN with parameterized filters for course marketplace browsing
+- `CertificatesPage.tsx` — urql query with mounted guard; raw `pdfUrl` is never rendered into the DOM (SI-9 compliant)
+- `QuizBuilderPage.tsx` + `QuizBuilderForm.tsx` + `QuizQuestion.tsx` — instructor-facing quiz creation flow
+- `MarketplacePage.tsx` — real `title`/`instructorName` fields from JOIN query + debounced filter bar
+- `InstructorEarningsPage.tsx` — converted `enabled: false` pattern to mounted guard for memory safety
+- `AppSidebar.tsx` — Certificates, SRS Review, and Quiz Builder navigation items added
+- `SrsReviewScreen.tsx` + `CertificatesScreen.tsx` — Expo SDK 54 mobile screens
+- `srs.logic.ts` + `certificates.logic.ts` — pure business logic modules with 32 unit tests
+- i18n: `certificates`, `srsReview`, `quizBuilder`, `gamification` namespaces synced to all 10 locales
+
+### Fixed
+- `DashboardPage`: `bannerTimerRef` cleanup on unmount (memory safety — `clearTimeout` in `useEffect` return)
+- `webPush` / service-worker ESLint `no-undef` errors resolved
+
+### Tests
+- Web: **3,881 tests** across 302 files (net +131 tests vs Phase 37)
+- Security: **967 assertions** including +19 new `graphql-authorization` checks
+- Mobile: **19 tests** (pure logic — `srs.logic.spec.ts` + `certificates.logic.spec.ts`)
+- E2E: 4 new Playwright specs — `certificates.spec.ts`, `marketplace-data.spec.ts`, `quiz-builder.spec.ts`, `srs-review.spec.ts`
+
+### Security
+- SI-9 compliant throughout: `tenantId` sourced from JWT context only, never from GraphQL arguments
+- Raw `pdfUrl` never injected into DOM — returned only via secure presigned URL with 15-min TTL
+- +19 `graphql-authorization` security test assertions covering new queries/mutations
+
+---
+
 ## [0.27.0] — 2026-03-06 — Phase 27: Live Sessions, Offline Web, Course Discovery, KG Context
 
 ### Added
