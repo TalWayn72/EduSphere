@@ -40,6 +40,13 @@ import {
  * Fast — no Keycloak round-trip needed.
  */
 export async function loginInDevMode(page: Page): Promise<void> {
+  // Inject English locale into localStorage BEFORE any app scripts run.
+  // GlobalLocaleSync queries the DB for the user's preferred locale and overrides
+  // i18next when localStorage is empty. The seeded super.admin has locale='he',
+  // so without this guard every test sees Hebrew UI, breaking English assertions.
+  await page.addInitScript(() => {
+    localStorage.setItem('edusphere_locale', 'en');
+  });
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' });
   // Click "Sign In (Dev Mode)" → calls auth.login() which:
   //   1. sessionStorage.setItem('edusphere_dev_logged_in', 'true')

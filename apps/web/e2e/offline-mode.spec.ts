@@ -8,11 +8,12 @@
  * Does NOT require a real backend — navigates to the app shell.
  */
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 test.describe('Offline mode', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    // Wait for app shell to settle
+    await login(page);
+    await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
   });
 

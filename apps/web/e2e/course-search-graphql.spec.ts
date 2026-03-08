@@ -302,7 +302,6 @@ test.describe('Course Search via GraphQL searchCourses', () => {
 
 test.describe('Course Search — Visual regression', () => {
   test('search results screenshot — course cards render cleanly', async ({ page }) => {
-    await login(page);
     await mockGraphQLSearch(page, MOCK_SEARCH_COURSES);
     await page.goto(`${BASE_URL}/search`);
     await page.waitForLoadState('networkidle');

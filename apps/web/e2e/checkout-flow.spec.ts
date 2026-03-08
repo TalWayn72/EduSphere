@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { BASE_URL } from './env';
+import { login } from './auth.helpers';
 
 // ── Stripe mock helper ────────────────────────────────────────────────────────
 // All GraphQL mutations are intercepted via page.route to avoid real API calls.
@@ -7,6 +8,7 @@ import { BASE_URL } from './env';
 
 test.describe('CheckoutPage', () => {
   test.beforeEach(async ({ page }) => {
+    await login(page);
     // Mock the purchaseCourse GraphQL mutation
     await page.route('**/graphql', async (route) => {
       const body = route.request().postDataJSON() as { operationName?: string };
@@ -90,6 +92,10 @@ test.describe('CheckoutPage', () => {
 });
 
 test.describe('PurchaseCourseButton → /checkout navigation', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('navigates to /checkout with secret + session + course params after purchase mutation', async ({
     page,
   }) => {

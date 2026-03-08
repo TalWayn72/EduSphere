@@ -29,24 +29,22 @@ test.describe('Smoke Tests — Critical Page Loads', () => {
   }) => {
     // beforeEach has already authenticated (sessionStorage flag set + devAuthenticated=true).
     // Login.tsx's useEffect detects isAuthenticated()=true and navigates to /dashboard.
-    // This test verifies that redirect chain works end-to-end.
+    // DashboardPage renders welcome-heading (not "Dashboard" h1).
     await page.goto('/login');
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+    await expect(page.getByTestId('welcome-heading')).toBeVisible({
       timeout: 10_000,
     });
   });
 
   test('dashboard page loads with stats cards', async ({ page }) => {
     await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible({
+    // DashboardPage renders welcome-heading (not "Dashboard" h1)
+    await expect(page.getByTestId('welcome-heading')).toBeVisible({
       timeout: 10_000,
     });
-    // Primary stats row — labels from dashboard i18n (stats.* keys)
-    await expect(page.getByText('Courses Enrolled')).toBeVisible();
-    await expect(page.getByText('Study Time')).toBeVisible();
-    await expect(page.getByText('Concepts Mastered')).toBeVisible();
-    // Secondary stats row
-    await expect(page.getByText('Active Courses')).toBeVisible();
+    // DashboardPage section headings from i18n
+    await expect(page.getByText('Continue Learning')).toBeVisible();
+    await expect(page.getByText('Mastery Overview')).toBeVisible();
   });
 
   test('annotations page loads with layer tabs', async ({ page }) => {
@@ -101,15 +99,16 @@ test.describe('Smoke Tests — Navigation', () => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
 
-    const nav = page.locator('nav');
-    await expect(nav.getByRole('link', { name: /Annotations/i })).toBeVisible();
-    await expect(nav.getByRole('link', { name: /Dashboard/i })).toBeVisible();
-    await expect(nav.getByRole('link', { name: /Courses/i })).toBeVisible();
+    // AppSidebar nav items: Home, My Courses, Knowledge Graph, AI Tutor, Live Sessions
+    const nav = page.locator('nav#main-nav');
+    await expect(nav.getByRole('link', { name: /Home/i })).toBeVisible();
+    await expect(nav.getByRole('link', { name: /My Courses/i })).toBeVisible();
   });
 
-  test('EduSphere logo link is visible in header', async ({ page }) => {
+  test('EduSphere brand is visible in sidebar', async ({ page }) => {
     await page.goto('/dashboard');
-    await expect(page.getByRole('link', { name: /EduSphere/i })).toBeVisible({
+    // Sidebar brand is a span element (not a link)
+    await expect(page.getByTestId('sidebar-brand-name')).toBeVisible({
       timeout: 8_000,
     });
   });

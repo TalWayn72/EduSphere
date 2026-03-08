@@ -19,11 +19,17 @@ import { login } from './auth.helpers';
 /** Clear all auth state: sessionStorage, localStorage, cookies. */
 async function clearAuthState(page: Page): Promise<void> {
   await page.context().clearCookies();
-  await page.evaluate(() => {
-    // eslint-disable-next-line no-undef
-    sessionStorage.clear();
-    localStorage.clear();
-  });
+  // page.evaluate throws SecurityError on about:blank (fresh page has null origin).
+  // A fresh page has no storage anyway, so catching and ignoring is safe.
+  try {
+    await page.evaluate(() => {
+      // eslint-disable-next-line no-undef
+      sessionStorage.clear();
+      localStorage.clear();
+    });
+  } catch {
+    // Fresh page (about:blank) — storage is already empty, nothing to clear.
+  }
 }
 
 // ── Test suite ────────────────────────────────────────────────────────────────

@@ -1,13 +1,14 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Phase 34 — 3D Models & Simulations E2E tests (PRD §3.3 G-1).
  *
- * Tests Model3DViewer integration in the lesson content view.
+ * Tests Model3DViewer integration at /model3d/:assetId.
  * Mocks GraphQL and Three.js dynamic imports as needed.
  */
 
-const LESSON_URL = '/courses/course-1/lessons/lesson-1';
+const LESSON_URL = '/model3d/asset-3d-1';
 
 const MOCK_MODEL_ASSET = {
   data: {
@@ -49,6 +50,10 @@ function interceptGraphQL(page: import('@playwright/test').Page) {
 }
 
 test.describe('3D Model Viewer — Phase 34', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('Model3DViewer canvas element is rendered', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(LESSON_URL);

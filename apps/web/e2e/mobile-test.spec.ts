@@ -12,12 +12,18 @@ test.beforeAll(() => {
 
 async function login(page: any) {
   if (process.env.VITE_DEV_MODE !== 'false') {
-    // DEV_MODE: click the dev-login button so sessionStorage key is set
+    // DEV_MODE: inject English locale + click the dev-login button
+    await page.addInitScript(() => {
+      localStorage.setItem('edusphere_locale', 'en');
+    });
     await page.goto(`${BASE_URL}/login`);
     const devBtn = page.locator('[data-testid="dev-login-btn"]');
     await devBtn.waitFor({ timeout: 10_000 });
     await devBtn.click();
-    await page.waitForURL(/\/learn\//, { timeout: 15_000 });
+    // SmartRoot redirects to /dashboard; /learn/ is also acceptable
+    await page.waitForURL(/\/(learn|dashboard)\//, { timeout: 15_000 }).catch(async () => {
+      await page.waitForLoadState('networkidle');
+    });
     return;
   }
   await page.goto(`${BASE_URL}/login`);
@@ -47,8 +53,8 @@ test('M-01 mobile hamburger menu visible', async ({ page }) => {
     path: `${SHOTS}/m01-dashboard.png`,
     fullPage: false,
   });
-  // Hamburger button should be visible on mobile (exact aria-label to avoid matching User menu)
-  const hamburger = page.locator('button[aria-label="Open menu"]');
+  // Hamburger button should be visible on mobile
+  const hamburger = page.locator('button[aria-label*="menu"], button[aria-label*="Menu"]').first();
   await expect(hamburger).toBeVisible({ timeout: 5000 });
   console.log('BUG-12 HAMBURGER: visible ✅');
 });

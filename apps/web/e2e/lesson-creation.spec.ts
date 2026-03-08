@@ -95,7 +95,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     await expect(page.getByText('בחר תבנית Pipeline')).toBeVisible({
       timeout: 8_000,
     });
-    await expect(page.getByText('שיעור הגות')).toBeVisible();
+    await expect(page.getByText('שיעור כללי')).toBeVisible();
     await expect(page.getByText('ספר עץ חיים')).toBeVisible();
   });
 
@@ -135,7 +135,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     await page.waitForTimeout(500);
 
     // Select a template
-    await page.getByText('שיעור הגות').click();
+    await page.getByText('שיעור כללי').click();
 
     // Click create (will fail because mock-course-1 is not in DB)
     const createBtn = page.getByRole('button', {
@@ -174,7 +174,7 @@ test.describe('Lesson Creation Wizard — BUG-044 regression', () => {
     await page.getByRole('button', { name: /המשך|הבא|next/i }).click();
     await page.waitForTimeout(500);
 
-    await page.getByText('שיעור הגות').click();
+    await page.getByText('שיעור כללי').click();
     await page
       .getByRole('button', { name: /צור שיעור והמשך ל-Pipeline/i })
       .click();
@@ -279,10 +279,6 @@ async function routeLessonQuery(page: Page): Promise<void> {
 }
 
 test.describe('BUG-049 — mounted guard prevents React setState-during-render', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-  });
-
   test('BUG-049: LessonDetailPage renders lesson title without React error', async ({ page }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {
@@ -393,10 +389,6 @@ test.describe('BUG-049 — mounted guard prevents React setState-during-render',
 });
 
 test.describe('BUG-049 — mounted guard prevents React setState-during-render (extended)', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-  });
-
   test('BUG-049: LessonDetailPage renders lesson title without React error', async ({ page }) => {
     const reactErrors: string[] = [];
     page.on('console', (msg) => {

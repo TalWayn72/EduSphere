@@ -83,29 +83,29 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
     });
   });
 
-  test('sources panel shows "הוסף מקור" button when expanded', async ({
+  test('sources panel shows "Add source" button when expanded', async ({
     page,
   }) => {
     await page.getByTestId('toggle-sources').click();
-    await expect(page.getByRole('button', { name: /הוסף מקור/i })).toBeVisible({
+    await expect(page.getByRole('button', { name: /Add source|Add Source/i })).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
 
-  test('"הוסף מקור" button opens the Add Source modal', async ({ page }) => {
+  test('"Add source" button opens the Add Source modal', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // Modal should appear with tab selector
-    await expect(page.getByText(/כתובת URL|URL/i).first()).toBeVisible({
+    await expect(page.getByText(/URL|Link|Add Knowledge Source/i).first()).toBeVisible({
       timeout: UI_TIMEOUT,
     });
   });
 
   test('Add Source modal has URL tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     await expect(
-      page.getByRole('button', { name: /URL|קישור/i }).first()
+      page.getByRole('button', { name: /URL|Link/i }).first()
     ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
@@ -113,9 +113,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
 
   test('Add Source modal has Text tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     await expect(
-      page.getByRole('button', { name: /טקסט|text/i }).first()
+      page.getByRole('button', { name: /text/i }).first()
     ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
@@ -123,9 +123,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
 
   test('Add Source modal has File tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     await expect(
-      page.getByRole('button', { name: /קובץ|file/i }).first()
+      page.getByRole('button', { name: /file/i }).first()
     ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
@@ -133,9 +133,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
 
   test('Add Source modal has YouTube tab', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     await expect(
-      page.getByRole('button', { name: /YouTube|יוטיוב/i }).first()
+      page.getByRole('button', { name: /YouTube/i }).first()
     ).toBeVisible({
       timeout: UI_TIMEOUT,
     });
@@ -143,9 +143,9 @@ test.describe('Knowledge Sources — DEV_MODE (UI structure)', () => {
 
   test('pressing Escape closes the Add Source modal', async ({ page }) => {
     await page.getByTestId('toggle-sources').click();
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // Wait for modal to appear
-    await expect(page.getByText(/כתובת URL|URL/i).first()).toBeVisible({
+    await expect(page.getByText(/URL|Link|Add Knowledge Source/i).first()).toBeVisible({
       timeout: UI_TIMEOUT,
     });
     await page.keyboard.press('Escape');
@@ -181,7 +181,7 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   });
 
   test('can add a URL source and it appears in the list', async ({ page }) => {
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // URL tab is default — fill in the form
     await page
       .getByPlaceholder(/https?:\/\//i)
@@ -202,7 +202,7 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   test('new URL source starts in PENDING or PROCESSING status', async ({
     page,
   }) => {
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     await page
       .getByPlaceholder(/https?:\/\//i)
       .fill('https://example.com/e2e-test');
@@ -219,7 +219,7 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   test('URL source eventually reaches READY or FAILED status', async ({
     page,
   }) => {
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     await page
       .getByPlaceholder(/https?:\/\//i)
       .fill('https://example.com/e2e-ready');
@@ -235,10 +235,10 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   });
 
   test('can add raw text source', async ({ page }) => {
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // Click Text tab
     await page
-      .getByRole('button', { name: /טקסט|text/i })
+      .getByRole('button', { name: /text/i })
       .first()
       .click();
     await page
@@ -257,10 +257,10 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   });
 
   test('can add a YouTube source', async ({ page }) => {
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     // Click YouTube tab
     await page
-      .getByRole('button', { name: /YouTube|יוטיוב/i })
+      .getByRole('button', { name: /YouTube/i })
       .first()
       .click();
     await page
@@ -282,7 +282,7 @@ test.describe('Knowledge Sources — Live backend (full mutation flow)', () => {
   // Covered by the dedicated DEV_MODE suite below.
   test('can delete a source', async ({ page }) => {
     // Add a source first
-    await page.getByRole('button', { name: /הוסף מקור/i }).click();
+    await page.getByRole('button', { name: /Add source|Add Source/i }).click();
     await page
       .getByPlaceholder(/https?:\/\//i)
       .fill('https://example.com/to-delete');

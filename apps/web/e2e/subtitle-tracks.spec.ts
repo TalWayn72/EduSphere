@@ -1,16 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Phase 32 — Real-time AI Subtitle Translation E2E tests.
  *
  * Tests the VideoSubtitleSelector integration in the lesson player.
- * Route: /courses/:courseId/lessons/:lessonId
+ * Route: /learn/:contentId (UnifiedLearningPage with VideoPlayerCore)
  *
- * These tests mock the GraphQL `mediaAsset` query to return subtitle tracks,
+ * These tests mock the GraphQL `GetSubtitleTracks` query to return subtitle tracks,
  * simulating the state AFTER AI translation has completed for a media asset.
  */
 
-const LESSON_URL = '/courses/course-1/lessons/lesson-1';
+const LESSON_URL = '/learn/content-1';
 
 const MOCK_SUBTITLE_TRACKS = [
   {
@@ -29,39 +30,29 @@ const MOCK_SUBTITLE_TRACKS = [
 
 const MOCK_MEDIA_WITH_SUBTITLES = {
   data: {
-    lesson: {
-      id: 'lesson-1',
-      title: 'Test Lesson',
+    contentItem: {
       mediaAsset: {
-        id: 'asset-1',
-        downloadUrl: 'https://example.com/video.mp4',
-        hlsManifestUrl: null,
         subtitleTracks: MOCK_SUBTITLE_TRACKS,
-        __typename: 'MediaAsset',
       },
-      __typename: 'Lesson',
     },
   },
 };
 
 const MOCK_MEDIA_WITHOUT_SUBTITLES = {
   data: {
-    lesson: {
-      id: 'lesson-1',
-      title: 'Test Lesson',
+    contentItem: {
       mediaAsset: {
-        id: 'asset-1',
-        downloadUrl: 'https://example.com/video.mp4',
-        hlsManifestUrl: null,
         subtitleTracks: [],
-        __typename: 'MediaAsset',
       },
-      __typename: 'Lesson',
     },
   },
 };
 
 test.describe('Subtitle Tracks — Phase 32', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('no CC button when media has no subtitle tracks', async ({ page }) => {
     await page.route('**/graphql', (route) => {
       const body = route.request().postDataJSON() as { query: string };
@@ -221,7 +212,7 @@ test.describe('Subtitle Tracks — Phase 32', () => {
       .catch(() => {});
     await page.locator('[data-testid="subtitle-selector-btn"]').click();
 
-    await expect(page.locator('[data-testid="subtitle-off"]')).toBeVisible();
+    await expect(page.locator('[data-testid="subtitle-lang-off"]')).toBeVisible();
   });
 
   test('raw technical strings are NOT shown to users', async ({ page }) => {

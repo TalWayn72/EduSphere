@@ -144,6 +144,11 @@ const AssessmentCampaignPage = lazy(() =>
     default: m.AssessmentCampaignPage,
   }))
 );
+const AssessmentPage = lazy(() =>
+  import('@/pages/AssessmentPage').then((m) => ({
+    default: m.AssessmentPage,
+  }))
+);
 const CrmSettingsPage = lazy(() =>
   import('@/pages/CrmSettingsPage').then((m) => ({
     default: m.CrmSettingsPage,
@@ -333,6 +338,9 @@ const InstructorMergeQueuePage = lazy(() =>
     default: m.InstructorMergeQueuePage,
   }))
 );
+const Model3DPage = lazy(() =>
+  import('@/pages/Model3DPage').then((m) => ({ default: m.Model3DPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -509,6 +517,10 @@ export const router = createBrowserRouter([
     element: guarded(<AssessmentCampaignPage />),
   },
   {
+    path: '/assessment/:assessmentId',
+    element: guarded(<AssessmentPage />),
+  },
+  {
     path: '/admin/crm',
     element: guarded(<CrmSettingsPage />),
   },
@@ -543,6 +555,11 @@ export const router = createBrowserRouter([
     // Instructor annotation merge queue — PRD §4.3
     path: '/instructor/merge-queue',
     element: guarded(<InstructorMergeQueuePage />),
+  },
+  {
+    // 3D model viewer — PRD §3.3 G-1
+    path: '/model3d/:assetId',
+    element: guarded(<Model3DPage />),
   },
   {
     path: '/library',

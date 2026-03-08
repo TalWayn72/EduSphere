@@ -1,13 +1,15 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 /**
  * Phase 33 — Remote Proctoring E2E tests (PRD §7.2 G-4).
  *
  * Tests the ProctoringOverlay integration in AssessmentForm.
+ * Route: /assessment/:assessmentId (AssessmentPage with proctoringEnabled=true)
  * Mocks GraphQL mutations to simulate proctoring lifecycle.
  */
 
-const ASSESSMENT_URL = '/courses/course-1/lessons/lesson-1/assessment';
+const ASSESSMENT_URL = '/assessment/asmnt-e2e-1';
 
 const MOCK_START_RESPONSE = {
   data: {
@@ -64,6 +66,10 @@ function interceptGraphQL(page: import('@playwright/test').Page) {
 }
 
 test.describe('Remote Proctoring — Phase 33', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('proctoring start button visible when proctoring enabled', async ({ page }) => {
     await interceptGraphQL(page);
     await page.goto(ASSESSMENT_URL);

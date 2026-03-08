@@ -20,10 +20,16 @@
 
 import { test, expect, type Page } from '@playwright/test';
 import { BASE_URL } from './env';
+import { login } from './auth.helpers';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const HOME_URL = `${BASE_URL}/`;
+const HOME_URL = `${BASE_URL}/dashboard`;
+
+// Authenticate before each test so Layout.tsx (with OfflineBanner) is rendered
+test.beforeEach(async ({ page }) => {
+  await login(page);
+});
 
 /** Navigate to home, wait for app shell to settle */
 async function gotoHome(page: Page): Promise<void> {

@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { SearchPage } from './pages/SearchPage';
 import { BASE_URL } from './env';
+import { loginInDevMode } from './auth.helpers';
 
 /**
  * Search E2E tests — /search route and Ctrl+K / Cmd+K keyboard shortcut.

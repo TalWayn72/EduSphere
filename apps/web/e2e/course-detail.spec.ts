@@ -341,8 +341,8 @@ test.describe('CourseDetailPage — content type icons', () => {
     await page.goto(`/courses/${MOCK_COURSE_ID}`);
     await page.waitForLoadState('load');
 
-    // "Foundations Quiz" is QUIZ — Lucide v0.4+ renders HelpCircle as lucide-circle-help
-    await expect(page.locator('svg.lucide-circle-help').first()).toBeVisible({
+    // "Foundations Quiz" is QUIZ — HelpCircle component renders as lucide-help-circle
+    await expect(page.locator('svg.lucide-help-circle').first()).toBeVisible({
       timeout: 8_000,
     });
   });

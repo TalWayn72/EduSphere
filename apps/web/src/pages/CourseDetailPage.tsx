@@ -129,22 +129,57 @@ const MOCK_COURSE_FALLBACK: CourseDetailData = {
   modules: [
     {
       id: 'mod-demo-1',
-      title: 'Unit 1: Foundations',
+      title: 'Module 1: Foundations',
       orderIndex: 0,
       contentItems: [
         {
-          id: 'ci-demo-1',
+          id: 'content-1',
           title: 'Introduction Video',
           contentType: 'VIDEO',
           duration: 600,
           orderIndex: 0,
         },
         {
-          id: 'ci-demo-2',
-          title: 'Reading: Mishnah Overview',
+          id: 'content-2',
+          title: 'Course Overview',
           contentType: 'PDF',
           duration: null,
           orderIndex: 1,
+        },
+        {
+          id: 'content-3',
+          title: 'Foundations Quiz',
+          contentType: 'QUIZ',
+          duration: null,
+          orderIndex: 2,
+        },
+      ],
+    },
+    {
+      id: 'mod-demo-2',
+      title: 'Module 2: Core Concepts',
+      orderIndex: 1,
+      contentItems: [
+        {
+          id: 'content-4',
+          title: 'Deep Dive Video',
+          contentType: 'VIDEO',
+          duration: 1200,
+          orderIndex: 0,
+        },
+      ],
+    },
+    {
+      id: 'mod-demo-3',
+      title: 'Module 3: Advanced Topics',
+      orderIndex: 2,
+      contentItems: [
+        {
+          id: 'content-5',
+          title: 'Advanced Lecture',
+          contentType: 'VIDEO',
+          duration: 900,
+          orderIndex: 0,
         },
       ],
     },
@@ -450,7 +485,7 @@ export function CourseDetailPage() {
                   className="gap-2"
                   onClick={handleEnroll}
                   disabled={isEnrolling}
-                  data-testid="enroll-btn"
+                  data-testid="enroll-button"
                 >
                   {isEnrolling && <Loader2 className="h-4 w-4 animate-spin" />}
                   {isEnrolling

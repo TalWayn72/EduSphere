@@ -61,7 +61,7 @@ export class CoursePage {
       .locator('..')
       .locator('..');
     this.transcriptSegments = page.locator(
-      '.flex.gap-3.p-2.rounded-md.cursor-pointer'
+      '.p-3.rounded-lg.cursor-pointer'
     );
     this.annotationsPanel = page
       .locator('text=Annotations')

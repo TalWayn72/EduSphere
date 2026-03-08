@@ -36,6 +36,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { Bookmark } from '@/lib/mock-content-data';
+import {
+  VideoSubtitleSelector,
+  type SubtitleTrack,
+} from './VideoSubtitleSelector';
 
 interface VideoPlayerCoreProps {
   /** Direct URL for the original video file (fallback when HLS unavailable). */
@@ -54,6 +58,8 @@ interface VideoPlayerCoreProps {
   onTimeUpdate?: (currentTime: number) => void;
   /** Called once when video metadata is loaded (total duration). */
   onDurationChange?: (duration: number) => void;
+  /** Available subtitle tracks (populated after AI translation completes). */
+  subtitleTracks?: SubtitleTrack[];
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
@@ -72,6 +78,7 @@ export function VideoPlayerCore({
   seekTo,
   onTimeUpdate,
   onDurationChange,
+  subtitleTracks = [],
 }: VideoPlayerCoreProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -86,6 +93,7 @@ export function VideoPlayerCore({
   const [speed, setSpeed] = useState<SpeedOption>(1);
   const [levels, setLevels] = useState<Level[]>([]);
   const [currentLevel, setCurrentLevel] = useState<number>(-1); // -1 = Auto
+  const [activeSubtitle, setActiveSubtitle] = useState<string | null>(null);
 
   // ── HLS initialisation ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -427,6 +435,15 @@ export function VideoPlayerCore({
             >
               <PictureInPicture2 className="h-4 w-4" />
             </Button>
+          )}
+
+          {/* Subtitle selector */}
+          {subtitleTracks.length > 0 && (
+            <VideoSubtitleSelector
+              tracks={subtitleTracks}
+              active={activeSubtitle}
+              onChange={setActiveSubtitle}
+            />
           )}
 
           {/* Fullscreen */}

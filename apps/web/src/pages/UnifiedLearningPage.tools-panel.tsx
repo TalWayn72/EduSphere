@@ -11,6 +11,7 @@ import {
   ResizableHandle,
 } from '@/components/ui/resizable';
 import { VideoPlayerCore } from '@/components/VideoPlayerCore';
+import type { SubtitleTrack } from '@/components/VideoSubtitleSelector';
 import { TranscriptPanel } from '@/components/TranscriptPanel';
 import { VideoProgressMarkers } from '@/components/VideoProgressMarkers';
 import { AddAnnotationOverlay } from '@/components/AddAnnotationOverlay';
@@ -51,6 +52,7 @@ interface Props {
   chat: UseAgentChatReturn;
   onSketchSave?: (paths: SketchPath[], timestamp: number) => Promise<void>;
   existingSketches?: ExistingSketch[];
+  subtitleTracks?: SubtitleTrack[];
 }
 
 export function ToolsPanel({
@@ -72,6 +74,7 @@ export function ToolsPanel({
   chat,
   onSketchSave,
   existingSketches = [],
+  subtitleTracks = [],
 }: Props) {
   const { t } = useTranslation('content');
   const [activeTab, setActiveTab] = useState<Tab>('annotations');
@@ -119,6 +122,7 @@ export function ToolsPanel({
               seekTo={seekTarget}
               onTimeUpdate={onTimeUpdate}
               onDurationChange={onDurationChange}
+              subtitleTracks={subtitleTracks}
             />
             <div className="absolute bottom-10 left-0 right-0 pointer-events-none">
               <VideoProgressMarkers

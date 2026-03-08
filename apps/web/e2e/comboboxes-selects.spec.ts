@@ -38,132 +38,111 @@ async function loginDevMode(page: import('@playwright/test').Page) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 1. CONTENT VIEWER — Knowledge Graph/Search Tabs  (/learn/content-1)
+// 1. CONTENT VIEWER — Annotations | AI Study Partner | Context Tabs  (/learn/content-1)
+//
+// NOTE: /learn/:contentId is handled by UnifiedLearningPage (not the old ContentViewer).
+// The right panel (ToolsPanel) shows three custom role="tab" buttons:
+//   "Annotations" | "AI Study Partner" | "Context"
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Content Viewer — Graph | Search tabs', () => {
+test.describe('Content Viewer — Annotations | AI | Context tabs', () => {
   test.beforeEach(async ({ page }) => {
     await loginDevMode(page);
     await page.goto('/learn/content-1');
     await page.waitForLoadState('networkidle');
-    await page.locator('video').waitFor({ state: 'visible', timeout: 10_000 });
+    // Wait for the tablist containing the three panel tabs
+    await page.getByRole('tablist').waitFor({ state: 'visible', timeout: 10_000 });
   });
 
-  test('Graph tab is visible in the knowledge panel', async ({ page }) => {
-    // The mini panel at the bottom of the middle column contains Tabs
-    // TabsTrigger for "graph" renders with the Network icon + "Graph" text
-    await expect(page.getByRole('tab', { name: /graph/i })).toBeVisible({
-      timeout: 8_000,
-    });
-  });
-
-  test('Search tab is visible in the knowledge panel', async ({ page }) => {
-    await expect(page.getByRole('tab', { name: /search/i })).toBeVisible({
-      timeout: 8_000,
-    });
-  });
-
-  test('Graph tab is active by default and shows concept nodes', async ({
-    page,
-  }) => {
-    // TabsContent[value="graph"] renders 4 knowledge-graph mini cards
-    // The graph tab is defaultValue="graph" — should be selected on load
-    const graphTab = page.getByRole('tab', { name: /graph/i }).first();
-    await expect(graphTab).toHaveAttribute('data-state', 'active', {
-      timeout: 8_000,
-    });
-
-    // Graph panel shows the first 4 mock graph nodes
-    // mockGraphData.nodes[0] label is "Kal Vachomer" or similar — check for any node text
-    const graphPanel = page.getByRole('tabpanel').first();
-    await expect(graphPanel).toBeVisible({ timeout: 5_000 });
-  });
-
-  test('clicking Search tab activates the Search panel', async ({ page }) => {
-    const searchTab = page.getByRole('tab', { name: /search/i }).first();
-    await searchTab.click();
-
-    await expect(searchTab).toHaveAttribute('data-state', 'active', {
-      timeout: 3_000,
-    });
-
-    // The search panel contains a text input for transcript search
-    const searchInput = page
-      .locator('input[placeholder*="search"]')
-      .or(page.locator('input[placeholder*="Search"]'))
-      .last();
-    await expect(searchInput).toBeVisible({ timeout: 3_000 });
-  });
-
-  test('switching from Graph to Search does not crash the page', async ({
-    page,
-  }) => {
-    const graphTab = page.getByRole('tab', { name: /graph/i }).first();
-    const searchTab = page.getByRole('tab', { name: /search/i }).first();
-
-    // Switch back and forth
-    await searchTab.click();
-    await expect(searchTab).toHaveAttribute('data-state', 'active', {
-      timeout: 3_000,
-    });
-    await graphTab.click();
-    await expect(graphTab).toHaveAttribute('data-state', 'active', {
-      timeout: 3_000,
-    });
-
-    // Video player must still be present
-    await expect(page.locator('video')).toBeVisible({ timeout: 3_000 });
-  });
-
-  test('Search tab panel: typing in transcript search input shows results or hint', async ({
-    page,
-  }) => {
-    const searchTab = page.getByRole('tab', { name: /search/i }).first();
-    await searchTab.click();
-
-    // Last input on page is the mini transcript search (distinct from main input)
-    const searchInput = page
-      .locator('input[placeholder*="search"]')
-      .or(page.locator('input[placeholder*="Search"]'))
-      .last();
-    await searchInput.fill('kal');
-    await page.waitForTimeout(300);
-
-    // Either results appear or the hint text is shown
-    const hasResults = await page
-      .locator('[class*="rounded"][class*="border"][class*="bg-muted"]')
-      .count();
-    expect(hasResults >= 0).toBe(true); // Non-crashing assertion
-  });
-
-  test('Graph tab panel: "Explore Full Graph" button is visible', async ({
-    page,
-  }) => {
-    const graphTab = page.getByRole('tab', { name: /graph/i }).first();
-    await graphTab.click();
-
+  test('Annotations tab is visible in the tools panel', async ({ page }) => {
     await expect(
-      page.getByRole('button', { name: /explore full graph/i })
-    ).toBeVisible({ timeout: 5_000 });
+      page.getByRole('tab', { name: /annotations/i }).first()
+    ).toBeVisible({ timeout: 8_000 });
   });
 
-  test('Graph tab panel: clicking Explore Full Graph button does not crash the page', async ({
+  test('AI Study Partner tab is visible', async ({ page }) => {
+    await expect(
+      page.getByRole('tab', { name: /AI Study Partner|AI|chavruta/i }).first()
+    ).toBeVisible({ timeout: 8_000 });
+  });
+
+  test('Context tab is visible', async ({ page }) => {
+    await expect(
+      page.getByRole('tab', { name: /context/i }).first()
+    ).toBeVisible({ timeout: 8_000 });
+  });
+
+  test('Annotations tab is selected by default', async ({ page }) => {
+    const annotationsTab = page
+      .getByRole('tab', { name: /annotations/i })
+      .first();
+    await expect(annotationsTab).toHaveAttribute('aria-selected', 'true', {
+      timeout: 8_000,
+    });
+  });
+
+  test('clicking AI Study Partner tab activates it', async ({ page }) => {
+    const aiTab = page
+      .getByRole('tab', { name: /AI Study Partner|AI|chavruta/i })
+      .first();
+    await aiTab.click();
+
+    await expect(aiTab).toHaveAttribute('aria-selected', 'true', {
+      timeout: 3_000,
+    });
+  });
+
+  test('switching from Annotations to AI Study Partner does not crash the page', async ({
     page,
   }) => {
-    const graphTab = page.getByRole('tab', { name: /graph/i }).first();
-    await graphTab.click();
+    const annotationsTab = page
+      .getByRole('tab', { name: /annotations/i })
+      .first();
+    const aiTab = page
+      .getByRole('tab', { name: /AI Study Partner|AI|chavruta/i })
+      .first();
 
-    const exploreBtn = page.getByRole('button', {
-      name: /explore full graph/i,
+    await aiTab.click();
+    await expect(aiTab).toHaveAttribute('aria-selected', 'true', {
+      timeout: 3_000,
     });
-    await expect(exploreBtn).toBeVisible({ timeout: 5_000 });
-    await exploreBtn.click();
-    await page.waitForTimeout(500);
+    await annotationsTab.click();
+    await expect(annotationsTab).toHaveAttribute('aria-selected', 'true', {
+      timeout: 3_000,
+    });
 
-    // Button is a ghost button with no navigation — page remains on /learn
+    // Video player must still be attached
+    await expect(page.locator('video')).toBeAttached({ timeout: 3_000 });
+  });
+
+  test('AI Study Partner tab: chat interface has a message input', async ({
+    page,
+  }) => {
+    const aiTab = page
+      .getByRole('tab', { name: /AI Study Partner|AI|chavruta/i })
+      .first();
+    await aiTab.click();
+
+    // Chat interface shows a textarea or textbox for sending messages
+    const chatInput = page
+      .locator('textarea')
+      .or(page.locator('input[type="text"][placeholder*="message"]'))
+      .last();
+    await expect(chatInput).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('clicking Context tab activates it and does not crash', async ({
+    page,
+  }) => {
+    const contextTab = page.getByRole('tab', { name: /context/i }).first();
+    await contextTab.click();
+
+    await expect(contextTab).toHaveAttribute('aria-selected', 'true', {
+      timeout: 3_000,
+    });
+
+    // Page stays on /learn after switching tabs
     expect(page.url()).toContain('/learn');
-    // Video player still present after click
-    await expect(page.locator('video')).toBeVisible({ timeout: 3_000 });
   });
 });
 
@@ -852,13 +831,16 @@ test.describe('Content Viewer — inline annotation layer selector', () => {
   test('layer buttons are rendered inside the annotation form', async ({
     page,
   }) => {
-    // Layer buttons use text labels from LAYER_META: Personal, Shared, Instructor, AI
-    const layerSection = page.locator('div.px-4.py-3.border-b').first();
-    await expect(layerSection.getByText('Personal')).toBeVisible({
-      timeout: 5_000,
-    });
-    await expect(layerSection.getByText('Shared')).toBeVisible();
-    await expect(layerSection.getByText('Instructor')).toBeVisible();
+    // Layer buttons use data-context="form" attribute and text labels from LAYER_META
+    await expect(
+      page.locator('button[data-context="form"]').filter({ hasText: 'Personal' })
+    ).toBeVisible({ timeout: 5_000 });
+    await expect(
+      page.locator('button[data-context="form"]').filter({ hasText: 'Shared' })
+    ).toBeVisible();
+    await expect(
+      page.locator('button[data-context="form"]').filter({ hasText: 'Instructor' })
+    ).toBeVisible();
   });
 
   test('PERSONAL layer is selected by default (ring-2 class)', async ({

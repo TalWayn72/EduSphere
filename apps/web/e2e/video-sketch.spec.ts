@@ -3,11 +3,14 @@
  * Tests the enhanced sketch overlay: color picker, tool selector, eraser, shapes, text, visual regression.
  */
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
-const LESSON_URL = '/courses/course-1/lessons/lesson-1';
+// VideoSketchOverlay lives inside UnifiedLearningPage at /learn/:contentId
+const LESSON_URL = '/learn/content-1';
 
 test.describe('Video Sketch Overlay — tool selector', () => {
   test.beforeEach(async ({ page }) => {
+    await login(page);
     await page.goto(LESSON_URL);
     await page.waitForLoadState('domcontentloaded');
     // Activate sketch mode if toggle button is present
@@ -124,6 +127,10 @@ test.describe('Video Sketch Overlay — cancel and save', () => {
 });
 
 test.describe('Video Sketch Overlay — visual regression', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('sketch toolbar with default freehand tool', async ({ page }) => {
     await page.goto(LESSON_URL);
     await page.waitForLoadState('domcontentloaded');

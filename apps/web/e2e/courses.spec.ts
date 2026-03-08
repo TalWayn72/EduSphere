@@ -223,7 +223,7 @@ test.describe('Content Viewer — video player', () => {
     await expect(video).toBeVisible({ timeout: 8_000 });
 
     // Get the third transcript segment (index 2) — it has a non-zero startTime
-    const segments = page.locator('.flex.gap-3.p-2.rounded-md.cursor-pointer');
+    const segments = page.locator('.p-3.rounded-lg.cursor-pointer');
     await expect(segments.nth(2)).toBeVisible({ timeout: 5_000 });
 
     // Read the timestamp shown on that segment

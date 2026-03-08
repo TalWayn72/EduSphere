@@ -20,11 +20,17 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
+import { login } from './auth.helpers';
 
 // ── Global: disable animations for stable snapshots ──────────────────────────
 
 test.use({
   reducedMotion: 'reduce',
+});
+
+// All routes are guarded — authenticate before each test
+test.beforeEach(async ({ page }) => {
+  await login(page);
 });
 
 // ── Screenshot tolerances ─────────────────────────────────────────────────────
@@ -788,7 +794,7 @@ test.describe('Visual Regression — Admin Pages @visual-new', () => {
       mask: [
         ...dynamicMasks(page),
         // Mask the callback URL which contains the current hostname
-        page.locator('text=/localhost|https:\/\//').locator('..'),
+        page.locator('text=/localhost|https:\\/\\//').locator('..'),
       ],
     });
   });
