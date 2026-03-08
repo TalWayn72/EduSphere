@@ -122,6 +122,7 @@ describe('scoreCoursesForUser', () => {
     };
     const results = scoreCoursesForUser(baseCandidates, signals);
     for (let i = 0; i < results.length - 1; i++) {
+      // eslint-disable-next-line security/detect-object-injection
       expect(results[i].score).toBeGreaterThanOrEqual(results[i + 1].score);
     }
   });

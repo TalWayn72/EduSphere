@@ -20,7 +20,7 @@ export class SkillGapRecommendations {
 
   async buildGapItems(
     gapConcepts: string[],
-    tenantId: string
+    _tenantId: string
   ): Promise<SkillGapItem[]> {
     if (gapConcepts.length === 0) return [];
 

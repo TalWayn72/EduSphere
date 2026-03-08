@@ -146,8 +146,27 @@ type User @join__type(graph: AGENT, key: "id")  @join__type(graph: ANNOTATION, k
   updatedAt: DateTime! @join__field(graph: CORE) 
 }
 
-type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
-  id: ID!
+type Module @join__type(graph: CONTENT, key: "id")  {
+  id: ID! @join__field(graph: CONTENT)
+  courseId: ID! @join__field(graph: CONTENT)
+  title: String! @join__field(graph: CONTENT)
+  orderIndex: Int! @join__field(graph: CONTENT)
+  contentItems: [ContentItem!]! @join__field(graph: CONTENT)
+}
+
+type Course @join__type(graph: AGENT, key: "id")  @join__type(graph: COLLABORATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID! @join__field(graph: CONTENT)
+  tenantId: ID! @join__field(graph: CONTENT)
+  title: String! @join__field(graph: CONTENT)
+  slug: String! @join__field(graph: CONTENT)
+  description: String @join__field(graph: CONTENT)
+  thumbnailUrl: String @join__field(graph: CONTENT)
+  instructorId: ID! @join__field(graph: CONTENT)
+  isPublished: Boolean! @join__field(graph: CONTENT)
+  estimatedHours: Int @join__field(graph: CONTENT)
+  modules: [Module!]! @join__field(graph: CONTENT)
+  createdAt: String! @join__field(graph: CONTENT)
+  updatedAt: String! @join__field(graph: CONTENT)
 }
 
 type LiveSession @join__type(graph: AGENT, key: "id")  @join__type(graph: CONTENT, key: "id")  {
@@ -349,6 +368,16 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   liveSessions(status: String, limit: Int, offset: Int) : [LiveSession!]! @join__field(graph: CONTENT)  @authenticated
   liveSessionById(sessionId: ID!) : LiveSession @join__field(graph: CONTENT)  @authenticated
   sessionAttendees(sessionId: ID!, first: Int, after: String) : SessionAttendeeConnection! @join__field(graph: AGENT)  @authenticated
+  contentItem(id: ID!) : ContentItem @join__field(graph: CONTENT)
+  course(id: ID!) : Course @join__field(graph: CONTENT)
+  courses(limit: Int = 20, offset: Int = 0) : [Course!]! @join__field(graph: CONTENT)
+  getPresignedUploadUrl(fileName: String!, contentType: String!, courseId: ID!) : PresignedUploadUrl! @join__field(graph: CONTENT)  @authenticated
+  myEnrollments: [UserCourse!]! @join__field(graph: CONTENT)  @authenticated
+  myCourseProgress(courseId: ID!) : CourseProgress! @join__field(graph: CONTENT)  @authenticated
+  dailyMicrolesson: ContentItem @join__field(graph: CONTENT)  @authenticated
+  listAtRiskLearners(threshold: Int) : [AtRiskLearner!]! @join__field(graph: CONTENT)  @authenticated
+  lessonPipeline(id: ID!) : CourseLessonPlan @join__field(graph: CONTENT)  @authenticated
+  myCoursePipelines(courseId: ID!) : [CourseLessonPlan!]! @join__field(graph: CONTENT)  @authenticated
 }
 
 type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
@@ -514,6 +543,15 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   startLiveSession(sessionId: ID!) : StartLiveSessionResult! @join__field(graph: AGENT)  @authenticated
   endLiveSession(sessionId: ID!) : LiveSession! @join__field(graph: CONTENT)  @authenticated
   cancelLiveSession(sessionId: ID!) : LiveSession! @join__field(graph: AGENT)  @authenticated
+  createCourse(input: CreateCourseInput!) : Course! @join__field(graph: CONTENT)  @authenticated
+  enrollCourse(courseId: ID!) : UserCourse! @join__field(graph: CONTENT)  @authenticated
+  unenrollCourse(courseId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  markContentViewed(contentItemId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  confirmMediaUpload(fileKey: String!, courseId: ID!, title: String!) : MediaAsset! @join__field(graph: CONTENT)  @authenticated
+  createLessonPlan(input: CreateLessonPlanInput!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
+  addLessonStep(input: AddLessonStepInput!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
+  reorderLessonSteps(planId: ID!, stepIds: [ID!]!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
+  publishLessonPlan(id: ID!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
 }
 
 type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE)  {
@@ -630,8 +668,17 @@ type Annotation @join__type(graph: ANNOTATION, key: "id")  {
   updatedAt: DateTime!
 }
 
-type ContentItem @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
-  id: ID!
+type ContentItem @join__type(graph: ANNOTATION, key: "id")  @join__type(graph: CONTENT, key: "id")  @join__type(graph: KNOWLEDGE, key: "id")  {
+  id: ID! @join__field(graph: CONTENT)
+  moduleId: ID! @join__field(graph: CONTENT)
+  title: String! @join__field(graph: CONTENT)
+  contentType: String! @join__field(graph: CONTENT)
+  content: String @join__field(graph: CONTENT)
+  fileId: ID @join__field(graph: CONTENT)
+  duration: Int @join__field(graph: CONTENT)
+  orderIndex: Int! @join__field(graph: CONTENT)
+  createdAt: String! @join__field(graph: CONTENT)
+  updatedAt: String! @join__field(graph: CONTENT)
 }
 
 """
@@ -980,6 +1027,8 @@ type UserStats @join__type(graph: CORE)  {
   conceptsMastered: Int!
   totalLearningMinutes: Int!
   weeklyActivity: [DayActivity!]!
+  totalXp: Int!
+  level: Int!
 }
 
 type DayActivity @join__type(graph: CORE)  {
@@ -1642,16 +1691,108 @@ input AddFileSourceInput @join__type(graph: KNOWLEDGE)  {
   courseId: ID!
   title: String!
   """
-   Original filename — used to determine SourceType (pdf/docx/txt) 
+   Original filename — used to determine SourceType (pdf/docx/txt)
   """
   fileName: String!
   """
-   Base64-encoded file content 
+   Base64-encoded file content
   """
   contentBase64: String!
   """
-   MIME type hint (e.g. application/pdf) 
+   MIME type hint (e.g. application/pdf)
   """
   mimeType: String!
 }
-    
+
+type UserCourse @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  userId: ID!
+  status: String!
+  enrolledAt: String!
+  completedAt: String
+}
+
+type CourseProgress @join__type(graph: CONTENT)  {
+  courseId: ID!
+  totalItems: Int!
+  completedItems: Int!
+  percentComplete: Float!
+}
+
+input CreateCourseInput @join__type(graph: CONTENT)  {
+  title: String!
+  description: String
+  thumbnailUrl: String
+  estimatedHours: Int
+}
+
+type PresignedUploadUrl @join__type(graph: CONTENT)  {
+  uploadUrl: String!
+  fileKey: String!
+  expiresAt: String!
+}
+
+type MediaAsset @join__type(graph: CONTENT)  {
+  id: ID!
+  courseId: ID!
+  fileKey: String!
+  title: String!
+  contentType: String!
+  status: String!
+  downloadUrl: String
+  hlsManifestUrl: String
+}
+
+type AtRiskLearner @join__type(graph: CONTENT)  {
+  userId: ID!
+  displayName: String!
+  courseId: ID!
+  courseTitle: String!
+  daysSinceActive: Int!
+  progressPct: Float!
+}
+
+enum LessonPlanStatus @join__type(graph: CONTENT)  {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LessonStepType @join__type(graph: CONTENT)  {
+  VIDEO
+  QUIZ
+  DISCUSSION
+  AI_CHAT
+  SUMMARY
+}
+
+type CourseLessonStep @join__type(graph: CONTENT)  {
+  id: ID!
+  planId: ID!
+  stepType: LessonStepType!
+  stepOrder: Int!
+  config: JSON!
+  createdAt: String!
+}
+
+type CourseLessonPlan @join__type(graph: CONTENT, key: "id")  {
+  id: ID!
+  courseId: ID!
+  title: String!
+  status: LessonPlanStatus!
+  steps: [CourseLessonStep!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+input CreateLessonPlanInput @join__type(graph: CONTENT)  {
+  courseId: ID!
+  title: String!
+}
+
+input AddLessonStepInput @join__type(graph: CONTENT)  {
+  planId: ID!
+  stepType: LessonStepType!
+  config: JSON!
+}
