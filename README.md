@@ -224,6 +224,10 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 
 ## Features
 
+### Recently Added (Session 29 — Phase 29: Visual Anchoring)
+
+- **Visual Anchoring & Asset Linking** — ClamAV-scanned image uploads (WebP-optimised via sharp), text-passage anchors with position tracking, document versioning + rollback, simhash-based anchor sync, `anchorDeleted` real-time subscription, NATS events (`EDUSPHERE.visual.anchor.created/deleted`), offline IndexedDB cache, mobile VisualBottomSheet
+
 ### Recently Added (Session 28 — Phases 28-34)
 
 - **ALL PRD GAPS CLOSED** — G-1, G-2, G-3, G-4, P-1, P-2, P-3 all complete
@@ -344,7 +348,7 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 26**     | Skill Tree, Course Discovery, Mobile Design System alignment                            | 2-3 days   | ✅ Complete |
 | **Phase 27**     | Live Sessions, Offline Web, AdminActivityFeed, Knowledge Graph course context           | 3-4 days   | ✅ Complete |
 | **Phase 28**     | Live Sessions mutations, Offline sync, PWA, SI-3 fix                                   | 2-3 days   | ✅ Complete |
-| **Phase 29**     | Stripe checkout flow                                                                    | 1-2 days   | ✅ Complete |
+| **Phase 29**     | Stripe checkout flow + Visual Anchoring & Asset Linking System                          | 1-2 days   | ✅ Complete |
 | **Phase 30**     | Personal KG wiki + Annotation merge request                                             | 2-3 days   | ✅ Complete |
 | **Phase 31**     | Video sketch 6 tools                                                                    | 1-2 days   | ✅ Complete |
 | **Phase 32**     | AI subtitle translation                                                                 | 2-3 days   | ✅ Complete |
@@ -451,7 +455,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **6,125+ tests passing**                        |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **5,655+ tests passing** (web 3731, subgraph-content 1095, security 819, other)  |
 | **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (subgraph-core + subgraph-knowledge)    |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |

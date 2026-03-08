@@ -5501,3 +5501,205 @@ input UploadModel3DInput {
 *All types follow Relay Cursor Connection spec where applicable.*
 *All mutations require `@authenticated`. Sensitive mutations additionally use `@requiresScopes` or `@requiresRole`.*
 *PII fields (passwords) stored AES-256-GCM encrypted per Security Invariant SI-3.*
+
+---
+
+## Section 23 — Phase 29: Visual Anchoring & Asset Linking System
+
+> **Milestone:** Phase 29 (2026-03-08) — Visual Anchoring & Asset Linking System (PRD v1.6).
+> All types below live on the **Content subgraph (port 4002)**. ClamAV antivirus scanning is enforced for every uploaded asset before anchoring is allowed.
+
+---
+
+### 23.1 New Types
+
+```graphql
+# Scan status for uploaded visual assets (ClamAV inline scan)
+enum ScanStatus {
+  PENDING    # Upload received, scan not yet started
+  SCANNING   # ClamAV scan in progress
+  CLEAN      # Scan passed — asset usable
+  INFECTED   # Malware detected — asset rejected
+  ERROR      # Scanner unavailable (graceful fallback path)
+}
+
+# Metadata for image dimensions and accessibility
+type VisualAssetMetadata {
+  width:   Int!
+  height:  Int!
+  altText: String
+}
+
+# An uploaded image associated with a course, stored in MinIO (WebP-optimised)
+type VisualAsset {
+  id:          ID!
+  courseId:    ID!
+  tenantId:    ID!
+  filename:    String!
+  mimeType:    String!
+  sizeBytes:   Int!
+  url:         String!          # Presigned MinIO URL
+  scanStatus:  ScanStatus!
+  metadata:    VisualAssetMetadata
+  createdAt:   DateTime!
+  updatedAt:   DateTime!
+}
+
+# A text anchor within a document that may be linked to a VisualAsset
+type VisualAnchor {
+  id:           ID!
+  assetId:      ID!
+  tenantId:     ID!
+  textPassage:  String!         # The selected text this anchor is bound to
+  position:     Int!            # Character offset in the document
+  visualAsset:  VisualAsset     # Null until an image is assigned
+  createdAt:    DateTime!
+  updatedAt:    DateTime!
+}
+
+# A point-in-time snapshot of all anchors for a given asset
+type DocumentVersion {
+  id:          ID!
+  assetId:     ID!
+  tenantId:    ID!
+  summary:     String
+  anchorsJson: String!          # JSON snapshot of VisualAnchor[] at version time
+  createdAt:   DateTime!
+}
+
+# Result of a syncAnchors operation (detects broken anchors via simhash diff)
+type SyncResult {
+  assetId:        ID!
+  synced:         Int!          # Number of anchors successfully re-matched
+  broken:         Int!          # Anchors whose text passage no longer exists
+  brokenAnchorIds: [ID!]!
+}
+
+# Input types
+input CreateVisualAnchorInput {
+  assetId:      ID!
+  textPassage:  String!
+  position:     Int!
+  visualAssetId: ID             # Optional — assign image at creation time
+}
+
+input UpdateVisualAnchorInput {
+  textPassage:  String
+  position:     Int
+  visualAssetId: ID
+}
+```
+
+---
+
+### 23.2 Queries
+
+```graphql
+type Query {
+  # List all visual assets for a course (owner or tenant member)
+  getVisualAssets(courseId: ID!): [VisualAsset!]!
+    @authenticated
+    @requiresScopes(scopes: ["content:read"])
+
+  # List all anchors attached to a specific asset
+  getVisualAnchors(assetId: ID!): [VisualAnchor!]!
+    @authenticated
+    @requiresScopes(scopes: ["content:read"])
+
+  # List document version snapshots for a given asset
+  getDocumentVersions(assetId: ID!): [DocumentVersion!]!
+    @authenticated
+    @requiresScopes(scopes: ["content:read"])
+
+  # Full-text search across visual assets for a course
+  searchVisualAssets(courseId: ID!, query: String!): [VisualAsset!]!
+    @authenticated
+}
+```
+
+---
+
+### 23.3 Mutations
+
+```graphql
+type Mutation {
+  # Confirm a presigned upload completed — triggers ClamAV scan + WebP optimisation
+  confirmVisualAssetUpload(
+    assetId: ID!
+  ): VisualAsset!
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
+
+  # Create a new text anchor within a document
+  createVisualAnchor(input: CreateVisualAnchorInput!): VisualAnchor!
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
+
+  # Update an existing anchor's text passage, position, or linked image
+  updateVisualAnchor(id: ID!, input: UpdateVisualAnchorInput!): VisualAnchor!
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
+
+  # Delete a visual anchor (emits EDUSPHERE.visual.anchor.deleted NATS event)
+  deleteVisualAnchor(id: ID!): ID!
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
+
+  # Assign or re-assign a VisualAsset to an existing anchor
+  assignAssetToAnchor(anchorId: ID!, visualAssetId: ID!): VisualAnchor!
+    @authenticated
+    @requiresScopes(scopes: ["content:write"])
+
+  # Re-match all anchors to current document text using simhash diffing
+  syncAnchors(assetId: ID!): SyncResult!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  # Create a named snapshot of current anchor state for an asset
+  createDocumentVersion(assetId: ID!, summary: String): DocumentVersion!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+
+  # Roll back all anchors to the state captured in a previous DocumentVersion
+  rollbackToVersion(versionId: ID!): SyncResult!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+```
+
+---
+
+### 23.4 Subscriptions
+
+```graphql
+type Subscription {
+  # Real-time notification when an anchor is deleted — use to remove stale UI state
+  anchorDeleted(assetId: ID!): ID!
+    @authenticated
+}
+```
+
+---
+
+### 23.5 NATS Events
+
+| Subject                              | Payload                                          | Publisher             |
+| ------------------------------------ | ------------------------------------------------ | --------------------- |
+| `EDUSPHERE.visual.anchor.deleted`    | `{ anchorId, assetId, tenantId }`                | subgraph-content      |
+| `EDUSPHERE.visual.anchor.created`    | `{ anchorId, assetId, tenantId }`                | subgraph-content      |
+
+Both subjects use the existing `EDUSPHERE` NATS stream. Stream retention rules (max_age + max_bytes) apply per the Memory Safety infrastructure rules.
+
+---
+
+### 23.6 Security Notes
+
+- **ClamAV**: every `confirmVisualAssetUpload` call runs an inline ClamAV scan. Assets with `ScanStatus.INFECTED` or `ScanStatus.SCANNING` cannot be referenced by anchors. ZIP-bomb guard: files >100 MB are rejected before scanning.
+- **WebP optimisation**: `ImageOptimizerService` verifies magic bytes with `file-type` before converting via `sharp`. GIF (animation) and SVG (vector) are passed through unchanged.
+- **RLS**: all four tables (`visual_assets`, `visual_anchors`, `document_versions`) have tenant-scoped RLS policies. Every query uses `withTenantContext()`.
+- **`rollbackToVersion`**: restricted to INSTRUCTOR+ role to prevent students from overwriting shared anchor state.
+
+---
+
+*Section 23 reflects commit range for Phase 29 Visual Anchoring (2026-03-08).*
+*All mutations require `@authenticated`. Scope and role guards as specified per resolver above.*
