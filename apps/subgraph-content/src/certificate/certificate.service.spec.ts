@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CertificateService } from './certificate.service';
-import { CertificatePdfService } from './certificate-pdf.service';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
+
+// ── Hoisted mock helpers ──────────────────────────────────────────────────────
+const mockS3Destroy = vi.hoisted(() => vi.fn());
+const mockS3Send = vi.hoisted(() => vi.fn().mockResolvedValue({}));
+const mockGetSignedUrl = vi.hoisted(() =>
+  vi.fn().mockResolvedValue('https://minio.example.com/presigned-url?expires=900')
+);
 
 // ── DB mock ──────────────────────────────────────────────────────────────────
 const mockInsert = vi.fn();
@@ -23,6 +29,7 @@ vi.mock('@edusphere/db', () => ({
     },
   },
   eq: vi.fn((col, val) => ({ col, val })),
+  and: vi.fn((...args) => ({ and: args })),
   withTenantContext: vi.fn((_db, _ctx, fn) => fn(mockDb)),
   closeAllPools: vi.fn().mockResolvedValue(undefined),
 }));
@@ -39,6 +46,42 @@ vi.mock('nats', () => ({
   }),
   StringCodec: vi.fn(() => ({ encode: vi.fn(), decode: vi.fn() })),
 }));
+
+// ── S3 / presigner mock ───────────────────────────────────────────────────────
+vi.mock('@aws-sdk/client-s3', () => {
+  // Use regular constructor functions (not arrow) so `new` works correctly
+  function S3Client(this: { send: typeof mockS3Send; destroy: typeof mockS3Destroy }) {
+    this.send = mockS3Send;
+    this.destroy = mockS3Destroy;
+  }
+  function GetObjectCommand(
+    this: { _type: string; params: unknown },
+    params: unknown
+  ) {
+    this._type = 'GetObjectCommand';
+    this.params = params;
+  }
+  return { S3Client, GetObjectCommand };
+});
+
+vi.mock('@aws-sdk/s3-request-presigner', () => ({
+  getSignedUrl: mockGetSignedUrl,
+}));
+
+vi.mock('@edusphere/config', () => ({
+  minioConfig: {
+    endpoint: 'localhost',
+    port: 9000,
+    region: 'us-east-1',
+    accessKey: 'minioadmin',
+    secretKey: 'minioadmin',
+    bucket: 'edusphere',
+  },
+}));
+
+import { CertificateService } from './certificate.service';
+import { CertificatePdfService } from './certificate-pdf.service';
+import { CertificateDownloadService } from './certificate-download.service';
 
 const NOW = new Date('2026-02-24T00:00:00.000Z');
 const MOCK_CERT = {
@@ -142,6 +185,64 @@ describe('CertificateService', () => {
 
       const result = await service.verifyCertificate('nonexistent-code');
       expect(result).toBeNull();
+    });
+  });
+});
+
+describe('CertificateDownloadService', () => {
+  let downloadService: CertificateDownloadService;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    downloadService = new CertificateDownloadService();
+  });
+
+  describe('getCertificateDownloadUrl', () => {
+    it('returns a presigned URL when certificate belongs to the requesting user', async () => {
+      const certWithPdf = { ...MOCK_CERT, pdf_url: 'tenant-1/certificates/user-1/cert.pdf' };
+      const limit = vi.fn().mockResolvedValue([certWithPdf]);
+      const where = vi.fn().mockReturnValue({ limit });
+      const from = vi.fn().mockReturnValue({ where });
+      mockSelect.mockReturnValue({ from });
+
+      const url = await downloadService.getCertificateDownloadUrl(
+        'cert-1',
+        'user-1',
+        'tenant-1'
+      );
+
+      expect(url).toContain('https://minio.example.com/presigned-url');
+      expect(url).toContain('expires=900');
+    });
+
+    it('throws NotFoundException when certificate is not found or belongs to a different user', async () => {
+      const limit = vi.fn().mockResolvedValue([]);
+      const where = vi.fn().mockReturnValue({ limit });
+      const from = vi.fn().mockReturnValue({ where });
+      mockSelect.mockReturnValue({ from });
+
+      await expect(
+        downloadService.getCertificateDownloadUrl('cert-1', 'other-user', 'tenant-1')
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws BadRequestException when certificate pdf_url is null', async () => {
+      const certNoPdf = { ...MOCK_CERT, pdf_url: null };
+      const limit = vi.fn().mockResolvedValue([certNoPdf]);
+      const where = vi.fn().mockReturnValue({ limit });
+      const from = vi.fn().mockReturnValue({ where });
+      mockSelect.mockReturnValue({ from });
+
+      await expect(
+        downloadService.getCertificateDownloadUrl('cert-1', 'user-1', 'tenant-1')
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('onModuleDestroy', () => {
+    it('calls s3.destroy() to clean up the S3 client', async () => {
+      await downloadService.onModuleDestroy();
+      expect(mockS3Destroy).toHaveBeenCalledOnce();
     });
   });
 });

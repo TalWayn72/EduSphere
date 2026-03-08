@@ -1,10 +1,38 @@
 type CourseListing {
   id: ID!
   courseId: ID!
+  title: String!
+  description: String
+  instructorName: String!
+  thumbnailUrl: String
+  price: Float
+  currency: String
+  tags: [String!]!
+  enrollmentCount: Int!
+  rating: Float
+  totalLessons: Int!
   priceCents: Int!
-  currency: String!
   isPublished: Boolean!
   revenueSplitPercent: Int!
+}
+
+type CourseListingEdge {
+  node: CourseListing!
+  cursor: String!
+}
+
+type CourseListingConnection {
+  edges: [CourseListingEdge!]!
+  nodes: [CourseListing!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input CourseListingFiltersInput {
+  tags: [String!]
+  priceMax: Float
+  instructorName: String
+  search: String
 }
 
 type MarketplacePurchase {
@@ -28,7 +56,12 @@ type PaymentIntentResult {
 }
 
 extend type Query {
-  courseListings: [CourseListing!]! @authenticated
+  courseListings(
+    tenantId: ID!
+    limit: Int
+    offset: Int
+    filters: CourseListingFiltersInput
+  ): CourseListingConnection! @authenticated
   myPurchases: [MarketplacePurchase!]! @authenticated
   instructorEarnings: EarningsSummary! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
 }

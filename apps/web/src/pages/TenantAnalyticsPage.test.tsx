@@ -92,7 +92,8 @@ const MOCK_ANALYTICS = {
   },
 };
 
-const MOCK_COHORT = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _MOCK_COHORT = {
   cohortRetention: [
     {
       cohortWeek: '2026-W01',
@@ -104,7 +105,8 @@ const MOCK_COHORT = {
   ],
 };
 
-function renderPage() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _renderPage() {
   const { TenantAnalyticsPage } = vi.importActual<
     typeof import('./TenantAnalyticsPage')
   >('./TenantAnalyticsPage') as { TenantAnalyticsPage: React.ComponentType };

@@ -16,11 +16,14 @@ import {
   ChevronRight,
   Trophy,
   BarChart2,
+  Award,
+  FileQuestion,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getCurrentUser } from '@/lib/auth';
 
 const MANAGER_SIDEBAR_ROLES = new Set(['MANAGER', 'ORG_ADMIN', 'SUPER_ADMIN']);
+const QUIZ_BUILDER_ROLES = new Set(['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN']);
 
 const SIDEBAR_KEY = 'edusphere-sidebar-collapsed';
 
@@ -38,6 +41,8 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/agents', icon: Bot, labelKey: 'aiTutor' },
   { to: '/sessions', icon: Video, labelKey: 'liveSessions' },
   { to: '/gamification', icon: Trophy, labelKey: 'gamification' },
+  { to: '/certificates', icon: Award, labelKey: 'certificates' },
+  { to: '/srs-review', icon: Brain, labelKey: 'srsReview' },
 ];
 
 function getInitials(firstName?: string, lastName?: string, username?: string): string {
@@ -139,6 +144,25 @@ export function AppSidebar() {
           >
             <BarChart2 className="h-4 w-4 shrink-0" aria-hidden />
             {!collapsed && <span className="truncate">Manager Dashboard</span>}
+          </NavLink>
+        )}
+
+        {/* Quiz Builder — visible to INSTRUCTOR / ORG_ADMIN / SUPER_ADMIN */}
+        {user?.role && QUIZ_BUILDER_ROLES.has(user.role) && (
+          <NavLink
+            to="/quiz-builder"
+            title={collapsed ? t('quizBuilder') : undefined}
+            data-testid="nav-item-quizBuilder"
+            className={[
+              'flex items-center gap-3 rounded-lg mx-2 px-3 py-2 text-sm font-medium',
+              'transition-colors hover:bg-muted/60',
+              location.pathname === '/quiz-builder'
+                ? 'bg-primary/10 text-primary font-semibold border-l-2 border-primary'
+                : 'text-muted-foreground border-l-2 border-transparent',
+            ].join(' ')}
+          >
+            <FileQuestion className="h-4 w-4 shrink-0" aria-hidden />
+            {!collapsed && <span className="truncate">{t('quizBuilder')}</span>}
           </NavLink>
         )}
       </nav>

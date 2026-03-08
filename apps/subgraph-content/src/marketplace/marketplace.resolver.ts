@@ -3,6 +3,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import type { AuthContext } from '@edusphere/auth';
 import type { TenantContext } from '@edusphere/db';
 import { MarketplaceService } from './marketplace.service.js';
+import type { CourseListingFiltersInput } from './marketplace.types.js';
 
 interface GqlContext {
   authContext?: AuthContext;
@@ -20,35 +21,41 @@ function requireAuth(ctx: GqlContext): TenantContext {
   };
 }
 
-function formatListing(l: {
-  id: string;
-  courseId: string;
-  priceCents: number;
-  currency: string;
-  isPublished: boolean;
-  revenueSplitPercent: number;
-}) {
-  return {
-    id: l.id,
-    courseId: l.courseId,
-    priceCents: l.priceCents,
-    currency: l.currency,
-    isPublished: l.isPublished,
-    revenueSplitPercent: l.revenueSplitPercent,
-  };
-}
-
 @Resolver()
 export class MarketplaceResolver {
   constructor(private readonly marketplaceService: MarketplaceService) {}
 
   @Query('courseListings')
-  async getCourseListings(@Context() ctx: GqlContext) {
+  async getCourseListings(
+    @Args('limit') limit: number | undefined,
+    @Args('offset') offset: number | undefined,
+    @Args('filters') filters: CourseListingFiltersInput | undefined,
+    @Context() ctx: GqlContext
+  ) {
     const tenantCtx = requireAuth(ctx);
+    // tenantId sourced from JWT context (SI-9) — NOT from GraphQL args
     const listings = await this.marketplaceService.getListings(
-      tenantCtx.tenantId
+      tenantCtx.tenantId,
+      tenantCtx.userId,
+      tenantCtx.userRole,
+      limit,
+      offset,
+      filters
     );
-    return listings.map(formatListing);
+    return {
+      nodes: listings,
+      edges: listings.map((node, i) => ({
+        node,
+        cursor: Buffer.from(String(i)).toString('base64'),
+      })),
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      },
+      totalCount: listings.length,
+    };
   }
 
   @Query('myPurchases')
@@ -104,7 +111,23 @@ export class MarketplaceResolver {
       revenueSplitPercent ?? 70,
       tenantCtx.tenantId
     );
-    return formatListing(listing);
+    return {
+      id: listing.id,
+      courseId: listing.courseId,
+      priceCents: listing.priceCents,
+      currency: listing.currency,
+      isPublished: listing.isPublished,
+      revenueSplitPercent: listing.revenueSplitPercent,
+      title: '',
+      description: null,
+      instructorName: '',
+      thumbnailUrl: null,
+      price: listing.priceCents / 100,
+      tags: [],
+      enrollmentCount: 0,
+      rating: null,
+      totalLessons: 0,
+    };
   }
 
   @Mutation('publishListing')

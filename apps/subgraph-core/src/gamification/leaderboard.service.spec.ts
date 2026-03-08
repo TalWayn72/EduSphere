@@ -10,7 +10,7 @@ vi.mock('@edusphere/db', () => ({
 import { LeaderboardService } from './leaderboard.service.js';
 import { withTenantContext, closeAllPools } from '@edusphere/db';
 
-const MOCK_ROWS = [
+const _MOCK_ROWS = [
   { user_id: 'u1', display_name: 'Alice', total_xp: 500, level: 3 },
   { user_id: 'u2', display_name: 'Bob', total_xp: 300, level: 2 },
 ];

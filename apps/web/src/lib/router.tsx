@@ -283,6 +283,11 @@ const CreateLessonPage = lazy(() =>
     default: m.CreateLessonPage,
   }))
 );
+const QuizBuilderPage = lazy(() =>
+  import('@/pages/QuizBuilderPage').then((m) => ({
+    default: m.QuizBuilderPage,
+  }))
+);
 const LessonDetailPage = lazy(() =>
   import('@/pages/LessonDetailPage').then((m) => ({
     default: m.LessonDetailPage,
@@ -363,6 +368,11 @@ const ManagerDashboardPage = lazy(() =>
 );
 const OnboardingPage = lazy(() =>
   import('@/pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage }))
+);
+const CertificatesPage = lazy(() =>
+  import('@/pages/CertificatesPage').then((m) => ({
+    default: m.CertificatesPage,
+  }))
 );
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
@@ -502,6 +512,11 @@ export const router = createBrowserRouter([
     // Lesson Pipeline Builder — WYSIWYG authoring (Phase 36)
     path: '/courses/:courseId/pipeline/builder',
     element: guarded(<LessonPipelineBuilderPage />),
+  },
+  {
+    // Quiz Builder — instructor creates a quiz for a module
+    path: '/courses/:courseId/modules/:moduleId/quiz/new',
+    element: guarded(<QuizBuilderPage />),
   },
   {
     // Create lesson — must come before :courseId to avoid route shadowing
@@ -738,6 +753,11 @@ export const router = createBrowserRouter([
     // Onboarding wizard — shown to new users on first login
     path: '/onboarding',
     element: guarded(<OnboardingPage />),
+  },
+  {
+    // Certificates — earned course completion certificates
+    path: '/certificates',
+    element: guarded(<CertificatesPage />),
   },
   {
     path: '/',

@@ -42,7 +42,19 @@ vi.mock('@edusphere/db', () => ({
       tenantId: 'tenantId',
       stripeCustomerId: 'stripeCustomerId',
     },
-    courses: { id: 'id', instructor_id: 'instructor_id' },
+    courses: {
+      id: 'id',
+      instructor_id: 'instructor_id',
+      title: 'title',
+      description: 'description',
+      thumbnail_url: 'thumbnail_url',
+    },
+    users: {
+      id: 'id',
+      first_name: 'first_name',
+      last_name: 'last_name',
+      display_name: 'display_name',
+    },
     instructorPayouts: {
       id: 'id',
       instructorId: 'instructorId',
@@ -52,7 +64,9 @@ vi.mock('@edusphere/db', () => ({
     },
   },
   eq: vi.fn(),
-  and: vi.fn(),
+  and: vi.fn((...args: unknown[]) => args),
+  ilike: vi.fn(),
+  lte: vi.fn(),
   withTenantContext: mockWithTenantContext,
 }));
 
@@ -349,5 +363,100 @@ describe('MarketplaceService', () => {
     expect(result).toHaveLength(1);
     expect(result[0]?.userId).toBe(USER_ID);
     expect(result[0]?.tenantId).toBe(TENANT_ID);
+  });
+
+  it('11. getListings returns listing with title field populated from courses JOIN', async () => {
+    const fakeRow = {
+      id: 'listing-1',
+      courseId: COURSE_ID,
+      priceCents: 1999,
+      currency: 'USD',
+      isPublished: true,
+      revenueSplitPercent: 70,
+      title: 'GraphQL Mastery',
+      description: 'Learn GraphQL',
+      thumbnailUrl: 'https://example.com/thumb.jpg',
+      instructorName: 'Jane Doe',
+      enrollmentCount: 5,
+    };
+    mockWithTenantContext.mockResolvedValueOnce([fakeRow]);
+
+    const svc = await getService();
+    const result = await svc.getListings(TENANT_ID, USER_ID, 'STUDENT');
+    expect(result).toHaveLength(1);
+    expect(result[0]?.title).toBe('GraphQL Mastery');
+    expect(result[0]?.price).toBeCloseTo(19.99, 2);
+  });
+
+  it('12. getListings returns listing with instructorName from users JOIN', async () => {
+    const fakeRow = {
+      id: 'listing-2',
+      courseId: COURSE_ID,
+      priceCents: 4999,
+      currency: 'USD',
+      isPublished: true,
+      revenueSplitPercent: 70,
+      title: 'NestJS Deep Dive',
+      description: null,
+      thumbnailUrl: null,
+      instructorName: 'Alice Smith',
+      enrollmentCount: 12,
+    };
+    mockWithTenantContext.mockResolvedValueOnce([fakeRow]);
+
+    const svc = await getService();
+    const result = await svc.getListings(TENANT_ID, USER_ID, 'STUDENT');
+    expect(result[0]?.instructorName).toBe('Alice Smith');
+    // tags/rating/totalLessons are placeholder values until tables exist
+    expect(result[0]?.tags).toEqual([]);
+    expect(result[0]?.rating).toBeNull();
+    expect(result[0]?.totalLessons).toBe(0);
+  });
+
+  it('13. getListings with filters.search passes ilike filter (mock returns filtered result)', async () => {
+    const { ilike: mockIlike } = await import('@edusphere/db');
+    const fakeRow = {
+      id: 'listing-3',
+      courseId: COURSE_ID,
+      priceCents: 999,
+      currency: 'USD',
+      isPublished: true,
+      revenueSplitPercent: 70,
+      title: 'TypeScript Basics',
+      description: null,
+      thumbnailUrl: null,
+      instructorName: 'Bob Jones',
+      enrollmentCount: 3,
+    };
+    mockWithTenantContext.mockResolvedValueOnce([fakeRow]);
+
+    const svc = await getService();
+    const result = await svc.getListings(TENANT_ID, USER_ID, 'STUDENT', 20, 0, {
+      search: 'TypeScript',
+    });
+
+    // ilike was called with search term wrapped in wildcards
+    expect(mockIlike).toHaveBeenCalledWith(
+      expect.anything(),
+      '%TypeScript%'
+    );
+    expect(result).toHaveLength(1);
+    expect(result[0]?.title).toBe('TypeScript Basics');
+  });
+
+  it('14. getListings with filters.priceMax applies lte filter in cents', async () => {
+    const { lte: mockLte } = await import('@edusphere/db');
+    mockWithTenantContext.mockResolvedValueOnce([]);
+
+    const svc = await getService();
+    await svc.getListings(TENANT_ID, USER_ID, 'STUDENT', 20, 0, {
+      priceMax: 9.99,
+    });
+
+    // priceMax=9.99 → priceCents lte 999
+    expect(mockLte).toHaveBeenCalledWith(
+      expect.anything(),
+      999
+    );
   });
 });

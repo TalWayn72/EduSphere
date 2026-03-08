@@ -39,21 +39,36 @@ import * as tanstack from '@tanstack/react-query';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
-// courseId.slice(0, 8) is used in the card title: 'Course aabbccdd...'
 const MOCK_LISTINGS = [
   {
     id: 'lst-1',
     courseId: 'aabbccdd-1111-2222-3333-000000000001',
+    title: 'React Fundamentals',
+    description: 'Learn React',
+    instructorName: 'John Doe',
+    thumbnailUrl: null,
+    price: 29.99,
     priceCents: 2999,
     currency: 'USD',
+    tags: ['react', 'frontend'],
+    enrollmentCount: 120,
+    rating: 4.5,
     isPublished: true,
     revenueSplitPercent: 70,
   },
   {
     id: 'lst-2',
     courseId: 'eeff0011-1111-2222-3333-000000000002',
+    title: 'Advanced TypeScript',
+    description: 'Deep dive into TypeScript',
+    instructorName: 'Jane Smith',
+    thumbnailUrl: null,
+    price: 0,
     priceCents: 0,
     currency: 'USD',
+    tags: ['typescript'],
+    enrollmentCount: 80,
+    rating: 4.8,
     isPublished: true,
     revenueSplitPercent: 50,
   },
@@ -103,14 +118,30 @@ describe('MarketplacePage', () => {
     expect(screen.getByText(/no courses available yet/i)).toBeInTheDocument();
   });
 
-  it('renders listing cards when data is provided', () => {
+  it('renders real course title', () => {
     vi.mocked(tanstack.useQuery).mockReturnValue(
       makeQuery({ data: { courseListings: MOCK_LISTINGS, myPurchases: [] } })
     );
     render(<MarketplacePage />);
-    // Component renders: `Course ${courseId.slice(0, 8)}...`
-    expect(screen.getByText('Course aabbccdd...')).toBeInTheDocument();
-    expect(screen.getByText('Course eeff0011...')).toBeInTheDocument();
+    expect(screen.getByText('React Fundamentals')).toBeInTheDocument();
+    expect(screen.getByText('Advanced TypeScript')).toBeInTheDocument();
+  });
+
+  it('renders instructor name', () => {
+    vi.mocked(tanstack.useQuery).mockReturnValue(
+      makeQuery({ data: { courseListings: MOCK_LISTINGS, myPurchases: [] } })
+    );
+    render(<MarketplacePage />);
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+  });
+
+  it('does NOT render raw UUID fragments as course titles', () => {
+    vi.mocked(tanstack.useQuery).mockReturnValue(
+      makeQuery({ data: { courseListings: MOCK_LISTINGS, myPurchases: [] } })
+    );
+    render(<MarketplacePage />);
+    expect(document.body.textContent).not.toMatch(/Course [0-9a-f]{8}/);
   });
 
   it('shows formatted price for paid listings', () => {
@@ -130,7 +161,12 @@ describe('MarketplacePage', () => {
       })
     );
     render(<MarketplacePage />);
-    expect(screen.getByText('Free')).toBeInTheDocument();
+    // Both the price span and the select option render "Free" — use getAllByText
+    const freeElements = screen.getAllByText('Free');
+    expect(freeElements.length).toBeGreaterThanOrEqual(1);
+    // At least one should be the price span (not an option element)
+    const priceSpan = freeElements.find((el) => el.tagName === 'SPAN');
+    expect(priceSpan).toBeInTheDocument();
   });
 
   it('shows "Purchased" badge for purchased courses', () => {
@@ -159,5 +195,15 @@ describe('MarketplacePage', () => {
     );
     render(<MarketplacePage />);
     expect(screen.getByText(/instructor earns 70%/i)).toBeInTheDocument();
+  });
+
+  it('renders search input and price filter select', () => {
+    render(<MarketplacePage />);
+    expect(
+      screen.getByPlaceholderText(/search courses/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox')
+    ).toBeInTheDocument();
   });
 });

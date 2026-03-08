@@ -55,6 +55,15 @@ const LISTING = {
   currency: 'USD',
   isPublished: true,
   revenueSplitPercent: 70,
+  title: 'Test Course',
+  description: null,
+  instructorName: 'Alice Smith',
+  thumbnailUrl: null,
+  price: 49.99,
+  tags: [],
+  enrollmentCount: 0,
+  rating: null,
+  totalLessons: 0,
 };
 
 const PURCHASE = {
@@ -80,42 +89,58 @@ describe('MarketplaceResolver', () => {
   // ── requireAuth ────────────────────────────────────────────────────────────
 
   it('getCourseListings — throws UnauthorizedException when authContext absent', async () => {
-    await expect(resolver.getCourseListings(makeCtx(null))).rejects.toThrow(
-      UnauthorizedException
-    );
+    await expect(
+      resolver.getCourseListings(undefined, undefined, undefined, makeCtx(null))
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('getCourseListings — throws UnauthorizedException when tenantId missing', async () => {
     const ctx = { authContext: { ...AUTH_CTX, tenantId: '' } };
-    await expect(resolver.getCourseListings(ctx as never)).rejects.toThrow(
-      UnauthorizedException
-    );
+    await expect(
+      resolver.getCourseListings(undefined, undefined, undefined, ctx as never)
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   // ── getCourseListings ──────────────────────────────────────────────────────
 
-  it('getCourseListings — calls service with tenantId and maps listing fields', async () => {
+  it('getCourseListings — calls service with tenantId from JWT (SI-9) and returns connection', async () => {
     mockMarketplaceService.getListings.mockResolvedValue([LISTING]);
 
-    const result = await resolver.getCourseListings(makeCtx());
+    const result = await resolver.getCourseListings(
+      undefined,
+      undefined,
+      undefined,
+      makeCtx()
+    );
 
-    expect(mockMarketplaceService.getListings).toHaveBeenCalledWith(TENANT_ID);
-    expect(result[0]).toEqual({
-      id: 'listing-1',
-      courseId: 'course-1',
-      priceCents: 4999,
-      currency: 'USD',
-      isPublished: true,
-      revenueSplitPercent: 70,
-    });
+    // tenantId comes from JWT context, not from args
+    expect(mockMarketplaceService.getListings).toHaveBeenCalledWith(
+      TENANT_ID,
+      USER_ID,
+      'INSTRUCTOR',
+      undefined,
+      undefined,
+      undefined
+    );
+    expect(result.nodes).toHaveLength(1);
+    expect(result.edges).toHaveLength(1);
+    expect(result.nodes[0]?.id).toBe('listing-1');
+    expect(result.nodes[0]?.title).toBe('Test Course');
   });
 
-  it('getCourseListings — returns empty array when no listings exist', async () => {
+  it('getCourseListings — returns connection with empty edges when no listings exist', async () => {
     mockMarketplaceService.getListings.mockResolvedValue([]);
 
-    const result = await resolver.getCourseListings(makeCtx());
+    const result = await resolver.getCourseListings(
+      undefined,
+      undefined,
+      undefined,
+      makeCtx()
+    );
 
-    expect(result).toEqual([]);
+    expect(result.nodes).toEqual([]);
+    expect(result.edges).toEqual([]);
+    expect(result.totalCount).toBe(0);
   });
 
   // ── getMyPurchases ────────────────────────────────────────────────────────
@@ -156,7 +181,14 @@ describe('MarketplaceResolver', () => {
   // ── createCourseListing ───────────────────────────────────────────────────
 
   it('createCourseListing — passes args to service and formats listing', async () => {
-    mockMarketplaceService.createListing.mockResolvedValue(LISTING);
+    mockMarketplaceService.createListing.mockResolvedValue({
+      id: 'listing-1',
+      courseId: 'course-1',
+      priceCents: 4999,
+      currency: 'USD',
+      isPublished: false,
+      revenueSplitPercent: 70,
+    });
 
     const result = await resolver.createCourseListing(
       'course-1',

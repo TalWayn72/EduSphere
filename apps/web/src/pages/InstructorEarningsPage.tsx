@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
@@ -65,12 +65,14 @@ function statusVariant(
 
 export function InstructorEarningsPage() {
   const queryClient = useQueryClient();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const { data, isLoading } = useQuery<{ instructorEarnings: EarningsSummary }>(
     {
       queryKey: ['instructor-earnings'],
       queryFn: () => request(GRAPHQL_URL, EARNINGS_QUERY),
-      enabled: false, // instructorEarnings not in live gateway
+      enabled: mounted,
     }
   );
 

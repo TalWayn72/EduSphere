@@ -195,8 +195,9 @@ export function DashboardPage() {
 
   // Cleanup banner timer on unmount
   useEffect(() => {
+    const timer = bannerTimerRef.current;
     return () => {
-      if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+      if (timer) clearTimeout(timer);
     };
   }, []);
 

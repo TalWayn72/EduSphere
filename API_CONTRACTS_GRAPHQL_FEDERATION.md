@@ -5781,3 +5781,70 @@ level: Int!     # computed: max(1, floor(sqrt(totalXp/100))+1)
 - Level 2: 100–399 XP
 - Level 5: 1600–2499 XP
 - Level 10: 8100–9999 XP
+
+---
+
+## Section 25 — Phase 37+38: Gamification, Manager Dashboard, Onboarding, Certificates (March 2026)
+
+### Phase 37 — New Types Added
+
+#### GamificationStats (subgraph-core)
+- `currentStreak: Int!`, `longestStreak: Int!`, `activeChallenges: [UserChallenge!]!`, `leaderboardRank: Int`, `leaderboard: [LeaderboardEntry!]!`
+- Query: `myGamificationStats: GamificationStats! @authenticated`
+
+#### UserChallenge
+- `challengeId: ID!`, `title: String!`, `description: String!`, `targetValue: Int!`, `currentValue: Int!`, `xpReward: Int!`, `completed: Boolean!`, `endDate: DateTime!`
+
+#### LeaderboardEntry
+- `rank: Int!`, `userId: ID!`, `displayName: String!` (no email — GDPR), `totalXp: Int!`, `level: Int!`
+- Query: `tenantLeaderboard(limit: Int): [LeaderboardEntry!]! @authenticated`
+
+#### TeamOverview (Manager Dashboard, subgraph-core)
+- `memberCount: Int!`, `avgCompletionPct: Float!`, `avgXpThisWeek: Float!`, `atRiskCount: Int!`, `topCourseTitle: String`
+- Query: `myTeamOverview: TeamOverview! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])`
+
+#### TeamMemberProgress
+- `userId: ID!`, `displayName: String!`, `coursesEnrolled: Int!`, `avgCompletionPct: Float!`, `totalXp: Int!`, `level: Int!`, `lastActiveAt: DateTime`, `isAtRisk: Boolean!`
+- Query: `myTeamMemberProgress: [TeamMemberProgress!]! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])`
+- Mutations: `addTeamMember(memberId: ID!): Boolean!`, `removeTeamMember(memberId: ID!): Boolean!`
+
+#### OnboardingState (subgraph-core)
+- `userId: ID!`, `currentStep: Int!`, `totalSteps: Int!`, `completed: Boolean!`, `skipped: Boolean!`, `role: String!`, `data: JSON`
+- Query: `myOnboardingState: OnboardingState @authenticated`
+- Mutations: `updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState! @authenticated`, `completeOnboarding: OnboardingState! @authenticated`, `skipOnboarding: OnboardingState! @authenticated`
+
+### Phase 38 — Certificate Download URL
+
+#### New Query: certificateDownloadUrl(certId: ID!): String! @authenticated
+- Returns a 15-minute presigned MinIO URL for secure PDF certificate download
+- Security: server validates `cert.user_id = jwt.userId` — users cannot download other users' certificates
+- Error: `NotFoundException` if cert not found or belongs to different user
+- Error: `BadRequestException('PDF not yet generated')` if `pdfUrl` is null
+
+### Phase 38 — Updated: CourseListing type
+Previous `CourseListing` returned only DB columns (`priceCents`, `currency`, `isPublished`, `revenueSplitPercent`).
+
+Updated `CourseListing` now returns joined data:
+- `id: ID!`, `courseId: ID!`
+- `title: String!` — from `courses.title` JOIN
+- `description: String` — from `courses.description` JOIN
+- `instructorName: String!` — COALESCE(firstName || ' ' || lastName, username) from `users` JOIN
+- `thumbnailUrl: String` — from `courses.thumbnailUrl` JOIN
+- `price: Float` — priceCents / 100
+- `currency: String` — from course_listings
+- `tags: [String!]!` — returns `[]` (course_tags table pending Phase 39)
+- `enrollmentCount: Int!` — COUNT from purchases WHERE status='COMPLETE'
+- `rating: Float` — returns `null` (rating system pending Phase 39)
+- `totalLessons: Int!` — returns `0` (aggregation pending Phase 39)
+- `priceCents: Int!`, `isPublished: Boolean!`, `revenueSplitPercent: Int!`
+
+### Phase 38 — New Input: CourseListingFiltersInput
+```graphql
+input CourseListingFiltersInput {
+  tags: [String!]       # reserved for Phase 39
+  priceMax: Float       # applied as lte(priceCents, priceMax * 100)
+  instructorName: String # applied as ilike on COALESCE(firstName || lastName, username)
+  search: String        # applied as ilike on courses.title
+}
+```
+All filters are optional. Drizzle parameterized queries (never raw SQL). Tenant isolation enforced via withTenantContext (SI-9).

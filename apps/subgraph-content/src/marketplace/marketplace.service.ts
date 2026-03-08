@@ -16,6 +16,8 @@ import {
   schema,
   eq,
   and,
+  ilike,
+  lte,
   withTenantContext,
 } from '@edusphere/db';
 import type { TenantContext } from '@edusphere/db';
@@ -28,7 +30,8 @@ import { MarketplaceEarningsService } from './marketplace.earnings.service.js';
 import type {
   PurchaseResult,
   EarningsSummary,
-  CourseListing,
+  CourseListingResult,
+  CourseListingFiltersInput,
   Purchase,
   InstructorPayout,
 } from './marketplace.types.js';
@@ -69,7 +72,7 @@ export class MarketplaceService implements OnModuleDestroy {
     currency: string,
     revenueSplitPercent: number,
     tenantId: string
-  ): Promise<CourseListing> {
+  ): Promise<typeof schema.courseListings.$inferSelect> {
     const ctx: TenantContext = {
       tenantId,
       userId: 'system',
@@ -294,23 +297,92 @@ export class MarketplaceService implements OnModuleDestroy {
     }
   }
 
-  async getListings(tenantId: string): Promise<CourseListing[]> {
+  async getListings(
+    tenantId: string,
+    userId: string,
+    userRole: string,
+    limit = 20,
+    offset = 0,
+    filters?: CourseListingFiltersInput
+  ): Promise<CourseListingResult[]> {
     const ctx: TenantContext = {
       tenantId,
-      userId: 'system',
-      userRole: 'SUPER_ADMIN',
+      userId,
+      userRole: userRole as TenantContext['userRole'],
     };
-    return withTenantContext(this.db, ctx, async (tx) =>
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const safeOffset = Math.max(0, offset);
+
+    // Build instructor name expression for filtering
+    const instructorNameExpr = sql<string>`COALESCE(
+      NULLIF(TRIM(${schema.users.first_name} || ' ' || ${schema.users.last_name}), ''),
+      ${schema.users.display_name}
+    )`;
+
+    // Enrollment count subquery (purchases with status=COMPLETE for this course)
+    const enrollmentCountExpr = sql<number>`(
+      SELECT COUNT(*)::int
+      FROM purchases p
+      WHERE p.course_id = ${schema.courses.id}
+        AND p.status = 'COMPLETE'
+    )`;
+
+    const conditions = [
+      eq(schema.courseListings.tenantId, tenantId),
+      eq(schema.courseListings.isPublished, true),
+    ];
+
+    if (filters?.search) {
+      conditions.push(ilike(schema.courses.title, `%${filters.search}%`));
+    }
+    if (filters?.priceMax !== undefined && filters.priceMax !== null) {
+      conditions.push(
+        lte(schema.courseListings.priceCents, Math.round(filters.priceMax * 100))
+      );
+    }
+    if (filters?.instructorName) {
+      conditions.push(ilike(instructorNameExpr, `%${filters.instructorName}%`));
+    }
+
+    const rows = await withTenantContext(this.db, ctx, async (tx) =>
       tx
-        .select()
+        .select({
+          id: schema.courseListings.id,
+          courseId: schema.courseListings.courseId,
+          priceCents: schema.courseListings.priceCents,
+          currency: schema.courseListings.currency,
+          isPublished: schema.courseListings.isPublished,
+          revenueSplitPercent: schema.courseListings.revenueSplitPercent,
+          title: schema.courses.title,
+          description: schema.courses.description,
+          thumbnailUrl: schema.courses.thumbnail_url,
+          instructorName: instructorNameExpr,
+          enrollmentCount: enrollmentCountExpr,
+        })
         .from(schema.courseListings)
-        .where(
-          and(
-            eq(schema.courseListings.tenantId, tenantId),
-            eq(schema.courseListings.isPublished, true)
-          )
+        .innerJoin(
+          schema.courses,
+          eq(schema.courseListings.courseId, schema.courses.id)
         )
+        .innerJoin(
+          schema.users,
+          eq(schema.courses.instructor_id, schema.users.id)
+        )
+        .where(and(...conditions))
+        .limit(safeLimit)
+        .offset(safeOffset)
     );
+
+    return rows.map((row) => ({
+      ...row,
+      price: row.priceCents / 100,
+      // tags: [] — no course_tags join table yet; courses.tags jsonb not mapped here
+      tags: [],
+      // rating: null — not stored in DB yet
+      rating: null,
+      // totalLessons: 0 — lessons count not joined yet
+      totalLessons: 0,
+    }));
   }
 
   async getUserPurchases(

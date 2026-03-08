@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * webPush.ts — Web Push API helpers.
  *

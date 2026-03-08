@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * sw.ts — Custom Service Worker (EduSphere PWA)
  *

@@ -30,5 +30,9 @@
   "expandSidebar": "Expand sidebar",
   "collapseSidebar": "Collapse sidebar",
   "switchToLight": "Switch to light mode",
-  "switchToDark": "Switch to dark mode"
+  "switchToDark": "Switch to dark mode",
+  "gamification": "Gamification",
+  "certificates": "Certificates",
+  "srsReview": "SRS Review",
+  "quizBuilder": "Quiz Builder"
 }

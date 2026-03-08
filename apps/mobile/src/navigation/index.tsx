@@ -23,6 +23,8 @@ import { SkillTreeScreen } from '../screens/SkillTreeScreen';
 import { ModelViewerScreen } from '../screens/ModelViewerScreen';
 import GamificationScreen from '../screens/GamificationScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
+import SrsReviewScreen from '../screens/SrsReviewScreen';
+import CertificatesScreen from '../screens/CertificatesScreen';
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -34,6 +36,8 @@ export type RootStackParamList = {
   LiveSessions: undefined;
   SkillTree: { courseId: string };
   ModelViewer: { modelUrl?: string; modelTitle?: string };
+  SrsReview: undefined;
+  Certificates: undefined;
 };
 
 export type MainTabParamList = {
@@ -177,6 +181,16 @@ export default function Navigation() {
           name="ModelViewer"
           component={ModelViewerScreen}
           options={{ title: '3D Model' }}
+        />
+        <Stack.Screen
+          name="SrsReview"
+          component={SrsReviewScreen}
+          options={{ title: 'SRS Review' }}
+        />
+        <Stack.Screen
+          name="Certificates"
+          component={CertificatesScreen}
+          options={{ title: 'Certificates' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

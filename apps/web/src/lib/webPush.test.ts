@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * webPush.test.ts — Unit tests for Web Push API helpers.
  *

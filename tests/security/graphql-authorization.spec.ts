@@ -606,3 +606,129 @@ describe('G-15: onboarding.graphql (Phase 37) -- onboarding mutations require @a
     expect(b).toContain('@authenticated');
   });
 });
+
+// ─── Phase 38: Certificate Download authorization ─────────────────────────────
+
+describe('G-15: certificate.graphql (Phase 38) -- certificateDownloadUrl requires @authenticated', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-content/src/certificate/certificate.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('myCertificates query is present', () => {
+    expect(schema).toContain('myCertificates');
+  });
+
+  it('myCertificates has @authenticated directive', () => {
+    const start = schema.indexOf('myCertificates');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('certificateDownloadUrl query is present', () => {
+    expect(schema).toContain('certificateDownloadUrl');
+  });
+
+  it('certificateDownloadUrl has @authenticated directive', () => {
+    const start = schema.indexOf('certificateDownloadUrl');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('certificateDownloadUrl requires certId argument', () => {
+    const start = schema.indexOf('certificateDownloadUrl');
+    const b = schema.slice(start, start + 200);
+    expect(b).toMatch(/certificateDownloadUrl\s*\(\s*certId\s*:/);
+  });
+
+  it('certificateDownloadUrl is NOT accessible without auth (no unauthenticated access)', () => {
+    const start = schema.indexOf('certificateDownloadUrl');
+    const b = schema.slice(start, start + 200);
+    // Must have @authenticated — no anonymous access to presigned URLs
+    expect(b).toContain('@authenticated');
+  });
+
+  it('verifyCertificate query is present for public certificate validation', () => {
+    expect(schema).toContain('verifyCertificate');
+  });
+});
+
+// ─── Phase 38: CourseListing Marketplace authorization ────────────────────────
+
+describe('G-15: marketplace.graphql (Phase 38) -- courseListings and mutations have correct auth', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-content/src/marketplace/marketplace.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('courseListings query is present', () => {
+    expect(schema).toContain('courseListings');
+  });
+
+  it('courseListings query has @authenticated directive', () => {
+    const start = schema.indexOf('courseListings');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('myPurchases query has @authenticated directive', () => {
+    const start = schema.indexOf('myPurchases');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('instructorEarnings query is restricted to INSTRUCTOR or ORG_ADMIN role', () => {
+    const start = schema.indexOf('instructorEarnings');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('INSTRUCTOR');
+  });
+
+  it('createCourseListing mutation requires INSTRUCTOR or ORG_ADMIN role', () => {
+    const start = schema.indexOf('createCourseListing');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('INSTRUCTOR');
+  });
+
+  it('createCourseListing mutation requires @authenticated', () => {
+    const start = schema.indexOf('createCourseListing');
+    const b = schema.slice(start, start + 300);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('STUDENT is NOT listed in createCourseListing roles', () => {
+    const start = schema.indexOf('createCourseListing');
+    const end = schema.indexOf('publishListing', start);
+    const b = schema.slice(start, end > start ? end : start + 300);
+    expect(b).not.toContain('STUDENT');
+  });
+
+  it('publishListing mutation requires INSTRUCTOR or ORG_ADMIN role', () => {
+    const start = schema.indexOf('publishListing');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('INSTRUCTOR');
+  });
+
+  it('purchaseCourse mutation requires @authenticated (self-service)', () => {
+    const start = schema.indexOf('purchaseCourse');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('purchaseCourse does NOT require elevated role (any authenticated user can purchase)', () => {
+    const start = schema.indexOf('purchaseCourse');
+    const end = schema.indexOf('requestPayout', start);
+    const b = schema.slice(start, end > start ? end : start + 200);
+    expect(b).not.toContain('@requiresRole');
+  });
+});

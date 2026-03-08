@@ -378,6 +378,10 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   listAtRiskLearners(threshold: Int) : [AtRiskLearner!]! @join__field(graph: CONTENT)  @authenticated
   lessonPipeline(id: ID!) : CourseLessonPlan @join__field(graph: CONTENT)  @authenticated
   myCoursePipelines(courseId: ID!) : [CourseLessonPlan!]! @join__field(graph: CONTENT)  @authenticated
+  certificateDownloadUrl(certId: ID!) : String! @join__field(graph: CONTENT)  @authenticated
+  courseListings(tenantId: ID!, limit: Int, offset: Int, filters: CourseListingFiltersInput): CourseListingConnection! @join__field(graph: CONTENT) @authenticated
+  myPurchases: [MarketplacePurchase!]! @join__field(graph: CONTENT) @authenticated
+  instructorEarnings: EarningsSummary! @join__field(graph: CONTENT) @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
   myTeamOverview: TeamOverview! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
   myTeamMemberProgress: [TeamMemberProgress!]! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
   myOnboardingState: OnboardingState @join__field(graph: CORE) @authenticated
@@ -555,7 +559,10 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   addLessonStep(input: AddLessonStepInput!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
   reorderLessonSteps(planId: ID!, stepIds: [ID!]!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
   publishLessonPlan(id: ID!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
-  courseListings(tenantId: ID!, limit: Int, offset: Int, filters: CourseListingFiltersInput): CourseListingConnection! @join__field(graph: CONTENT) @authenticated
+  createCourseListing(courseId: ID!, priceCents: Int!, currency: String!, revenueSplitPercent: Int): CourseListing! @join__field(graph: CONTENT) @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+  publishListing(courseId: ID!): Boolean! @join__field(graph: CONTENT) @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
+  purchaseCourse(courseId: ID!): PaymentIntentResult! @join__field(graph: CONTENT) @authenticated
+  requestPayout: Boolean! @join__field(graph: CONTENT) @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN])
   addTeamMember(memberId: ID!): Boolean! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
   removeTeamMember(memberId: ID!): Boolean! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
   updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState! @join__field(graph: CORE) @authenticated
@@ -1810,6 +1817,7 @@ type CourseListingConnection
   @join__type(graph: CONTENT)
 {
   edges: [CourseListingEdge!]!
+  nodes: [CourseListing!]!
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -1825,6 +1833,7 @@ type CourseListing
   @join__type(graph: CONTENT)
 {
   id: ID!
+  courseId: ID!
   title: String!
   description: String
   instructorName: String!
@@ -1835,6 +1844,9 @@ type CourseListing
   enrollmentCount: Int!
   rating: Float
   totalLessons: Int!
+  priceCents: Int!
+  isPublished: Boolean!
+  revenueSplitPercent: Int!
 }
 
 input CourseListingFiltersInput @join__type(graph: CONTENT) {
@@ -1842,6 +1854,32 @@ input CourseListingFiltersInput @join__type(graph: CONTENT) {
   priceMax: Float
   instructorName: String
   search: String
+}
+
+type MarketplacePurchase
+  @join__type(graph: CONTENT)
+{
+  id: ID!
+  courseId: ID!
+  amountCents: Int!
+  status: String!
+  purchasedAt: String!
+}
+
+type EarningsSummary
+  @join__type(graph: CONTENT)
+{
+  totalEarnedCents: Int!
+  pendingPayoutCents: Int!
+  paidOutCents: Int!
+  purchases: [MarketplacePurchase!]!
+}
+
+type PaymentIntentResult
+  @join__type(graph: CONTENT)
+{
+  clientSecret: String!
+  paymentIntentId: String!
 }
 
 type TeamOverview

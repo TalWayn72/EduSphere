@@ -10,4 +10,5 @@ type Certificate {
 extend type Query {
   myCertificates: [Certificate!]! @authenticated
   verifyCertificate(code: String!): Certificate
+  certificateDownloadUrl(certId: ID!): String! @authenticated
 }

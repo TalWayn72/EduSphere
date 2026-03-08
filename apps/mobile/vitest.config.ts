@@ -35,6 +35,8 @@ export default defineConfig({
       'src/screens/__tests__/SettingsScreen.test.ts',
       'src/screens/__tests__/KnowledgeGraphScreen.test.ts',
       'src/screens/__tests__/OnboardingScreen.test.ts',
+      'src/screens/__tests__/SrsReviewScreen.test.ts',
+      'src/screens/__tests__/CertificatesScreen.test.ts',
       'src/components/MasteryBadge.test.tsx',
       'src/components/VisualBottomSheet.test.tsx',
       'src/components/WeeklyActivityBar.test.tsx',

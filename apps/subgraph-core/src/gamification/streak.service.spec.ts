@@ -24,7 +24,7 @@ import { StreakService } from './streak.service.js';
 import { withTenantContext, closeAllPools } from '@edusphere/db';
 
 // Helper to get the mock execute from the captured tx
-function getMockExecute() {
+function _getMockExecute() {
   const capturedFn = vi.mocked(withTenantContext).mock.calls[0]?.[2];
   if (!capturedFn) return vi.fn();
   // The execute is injected by the module-level mockTx — we spy on db calls via withTenantContext.
