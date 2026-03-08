@@ -23,33 +23,72 @@ const mockCloseAllPools = vi.mocked(closeAllPools);
 const USER_ID = '00000000-0000-0000-0000-000000000001';
 const TENANT_ID = '00000000-0000-0000-0000-000000000002';
 
-const gapRows = [
+// New service issues 4 parallel queries via Promise.all:
+//   [0] mastery rows  — { concept_id, mastery_level, concept_name }
+//   [1] velocity row  — { lessons_completed }
+//   [2] enrolled rows — { course_id }
+//   [3] candidate rows — { course_id, course_title, instructor_name, tags, enrollment_count, added_at }
+
+const masteryRows = [
+  { concept_id: 'abc', mastery_level: 'NONE', concept_name: 'graphql' },
+  { concept_id: 'def', mastery_level: 'ATTEMPTED', concept_name: 'react' },
+];
+
+const velocityRow = [{ lessons_completed: 4 }];
+const enrolledRows: { course_id: string }[] = [];
+
+const candidateRows = [
   {
     course_id: 'c1',
-    course_title: 'Advanced Algebra',
-    instructor_name: 'Prof. Lee',
-    concept_name: 'linear equations',
+    course_title: 'GraphQL Course',
+    instructor_name: 'Alice',
+    tags: 'graphql,api',
+    enrollment_count: 100,
+    added_at: new Date('2020-01-01').toISOString(),
   },
   {
     course_id: 'c2',
-    course_title: 'Calculus Basics',
-    instructor_name: null,
-    concept_name: 'derivatives',
+    course_title: 'React Course',
+    instructor_name: 'Bob',
+    tags: 'react,hooks',
+    enrollment_count: 50,
+    added_at: new Date('2020-01-01').toISOString(),
   },
-];
-
-const trendingRows = [
   {
     course_id: 'c3',
     course_title: 'Data Science 101',
-    instructor_name: 'Dr. Brown',
-  },
-  {
-    course_id: 'c4',
-    course_title: 'Machine Learning',
-    instructor_name: null,
+    instructor_name: 'Carol',
+    tags: 'python,data',
+    enrollment_count: 200,
+    added_at: new Date('2020-01-01').toISOString(),
   },
 ];
+
+/** Helper: set up mockWithTenantContext to return the 4 parallel query results */
+function mockParallelQueries(
+  mastery = masteryRows,
+  velocity = velocityRow,
+  enrolled = enrolledRows,
+  candidates = candidateRows,
+): void {
+  mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
+    let callIdx = 0;
+    const responses = [
+      { rows: mastery },
+      { rows: velocity },
+      { rows: enrolled },
+      { rows: candidates },
+    ];
+    const mockTx = {
+      execute: vi.fn().mockImplementation(() => {
+        const res = responses[callIdx] ?? { rows: [] };
+        callIdx++;
+        return Promise.resolve(res);
+      }),
+    };
+    return fn(mockTx as never);
+  });
+}
 
 describe('RecommendedCoursesService', () => {
   let service: RecommendedCoursesService;
@@ -59,78 +98,76 @@ describe('RecommendedCoursesService', () => {
     service = new RecommendedCoursesService();
   });
 
-  it('returns gap-based recommendations when skill mastery data exists', async () => {
-    // First execute call returns gap rows (non-empty)
-    mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
-      const mockTx = {
-        execute: vi.fn().mockResolvedValue({ rows: gapRows }),
-      };
-      return fn(mockTx as never);
-    });
+  it('returns gap-based recommendations ranked by score', async () => {
+    mockParallelQueries();
 
     const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
 
-    expect(result).toHaveLength(2);
-    expect(result[0]?.courseId).toBe('c1');
-    expect(result[0]?.title).toBe('Advanced Algebra');
-    expect(result[0]?.instructorName).toBe('Prof. Lee');
-    expect(result[0]?.reason).toBe('Based on your gap in linear equations');
-    expect(result[1]?.reason).toBe('Based on your gap in derivatives');
-    expect(result[1]?.instructorName).toBeNull();
-  });
-
-  it('falls back to trending courses when no skill mastery data (never returns [])', async () => {
-    // First execute returns empty (no gap data), second returns trending rows
-    mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
-      let callCount = 0;
-      const mockTx = {
-        execute: vi.fn().mockImplementation(() => {
-          callCount++;
-          if (callCount === 1) return Promise.resolve({ rows: [] });
-          return Promise.resolve({ rows: trendingRows });
-        }),
-      };
-      return fn(mockTx as never);
-    });
-
-    const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
-
-    expect(result).toHaveLength(2);
-    expect(result[0]?.courseId).toBe('c3');
-    expect(result[0]?.title).toBe('Data Science 101');
-    expect(result[0]?.instructorName).toBe('Dr. Brown');
-    expect(result[0]?.reason).toBe('Trending in your organization');
-    expect(result[1]?.reason).toBe('Trending in your organization');
-    // Confirm it is NEVER empty when trending rows exist
     expect(result.length).toBeGreaterThan(0);
+    // c1 matches 'graphql' gap, c2 matches 'react' gap — both should be in results
+    const ids = result.map((r) => r.courseId);
+    expect(ids).toContain('c1');
+    expect(ids).toContain('c2');
   });
 
-  it('reason contains fallback concept name when concept_name is null', async () => {
-    const rowsWithNullConcept = [
-      {
-        course_id: 'c5',
-        course_title: 'Statistics',
-        instructor_name: 'Prof. Jones',
-        concept_name: null,
-      },
-    ];
-
-    mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
-      const mockTx = {
-        execute: vi.fn().mockResolvedValue({ rows: rowsWithNullConcept }),
-      };
-      return fn(mockTx as never);
-    });
+  it('gap-matched courses have gap-based reason', async () => {
+    mockParallelQueries();
 
     const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
-    expect(result[0]?.reason).toBe('Based on your gap in this topic');
+    const c1 = result.find((r) => r.courseId === 'c1');
+    expect(c1?.reason).toContain('graphql');
   });
 
-  it('calls withTenantContext with correct tenantId and userId', async () => {
-    mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
-      const mockTx = { execute: vi.fn().mockResolvedValue({ rows: gapRows }) };
-      return fn(mockTx as never);
-    });
+  it('falls back to trending reason when no skill mastery data exists', async () => {
+    mockParallelQueries(
+      [], // no mastery rows → no gaps
+      velocityRow,
+      enrolledRows,
+      candidateRows,
+    );
+
+    const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
+    expect(result.length).toBeGreaterThan(0);
+    // All reasons should be trending (no gap match, c3 has most enrollments)
+    const topResult = result[0];
+    expect(topResult?.reason).toMatch(/trending|new/i);
+  });
+
+  it('excludes already-enrolled courses', async () => {
+    mockParallelQueries(
+      masteryRows,
+      velocityRow,
+      [{ course_id: 'c1' }, { course_id: 'c2' }], // enrolled in c1 + c2
+      candidateRows,
+    );
+
+    const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
+    const ids = result.map((r) => r.courseId);
+    expect(ids).not.toContain('c1');
+    expect(ids).not.toContain('c2');
+    expect(ids).toContain('c3');
+  });
+
+  it('uses fallback title when course_title is null', async () => {
+    const candidatesWithNull = [
+      { ...candidateRows[0]!, course_title: null },
+    ];
+    mockParallelQueries(masteryRows, velocityRow, enrolledRows, candidatesWithNull);
+
+    const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
+    expect(result[0]?.title).toBe('Untitled Course');
+  });
+
+  it('limits results to safeLimit (max 20)', async () => {
+    // Request limit=100 — service clamps to 20 and only returns what candidates give
+    mockParallelQueries();
+
+    const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 100);
+    expect(result.length).toBeLessThanOrEqual(20);
+  });
+
+  it('calls withTenantContext with correct tenantId, userId, and role', async () => {
+    mockParallelQueries();
 
     await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
 
@@ -146,37 +183,10 @@ describe('RecommendedCoursesService', () => {
     expect(mockCloseAllPools).toHaveBeenCalledOnce();
   });
 
-  it('uses fallback title when course_title is null', async () => {
-    const rowsWithNullTitle = [
-      {
-        course_id: 'c6',
-        course_title: null,
-        instructor_name: null,
-        concept_name: 'fractions',
-      },
-    ];
-
-    mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
-      const mockTx = {
-        execute: vi.fn().mockResolvedValue({ rows: rowsWithNullTitle }),
-      };
-      return fn(mockTx as never);
-    });
+  it('returns empty array when candidate list is empty', async () => {
+    mockParallelQueries(masteryRows, velocityRow, enrolledRows, []);
 
     const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 5);
-    expect(result[0]?.title).toBe('Untitled Course');
-  });
-
-  it('limits results to safeLimit (max 20)', async () => {
-    // Request limit=100 — should be clamped to 20 in the SQL query
-    mockWithTenantContext.mockImplementation(async (_db, _ctx, fn) => {
-      const mockTx = { execute: vi.fn().mockResolvedValue({ rows: gapRows }) };
-      return fn(mockTx as never);
-    });
-
-    // The SQL uses safeLimit = Math.min(limit, 20). We can't check the SQL directly
-    // but we verify the service itself returns without throwing for large limit values.
-    const result = await service.getRecommendedCourses(USER_ID, TENANT_ID, 100);
-    expect(result).toHaveLength(2);
+    expect(result).toEqual([]);
   });
 });

@@ -99,11 +99,28 @@ describe('DashboardPage', () => {
     expect(matches.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders total XP quick stat', () => {
+  it('renders total XP quick stat widget', () => {
     renderDashboard();
-    // Use getAllByText because "XP" appears in both the quick stat and the activity feed text (case-insensitive)
+    expect(screen.getByTestId('xp-widget')).toBeInTheDocument();
+    // Use getAllByText because "XP" may appear in multiple places
     const matches = screen.getAllByText(/XP/i);
     expect(matches.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders level badge in XP widget', () => {
+    renderDashboard();
+    const levelBadge = screen.getByTestId('xp-level-badge');
+    expect(levelBadge).toBeInTheDocument();
+    // DEV_MODE=true + no real stats → level defaults to 1
+    expect(levelBadge).toHaveTextContent('Lv. 1');
+  });
+
+  it('does not use hardcoded MOCK_XP value of 2340', () => {
+    renderDashboard();
+    // After Phase 36, XP comes from real query (or 0 fallback) — never hardcoded 2340
+    const body = document.body.textContent ?? '';
+    expect(body).not.toContain('2,340');
+    expect(body).not.toContain('2340');
   });
 
   it('renders continue learning section', () => {

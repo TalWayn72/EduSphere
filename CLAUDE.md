@@ -689,12 +689,49 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 ## Bug Fix Protocol
 
+### Interactive Debugger — `dap` CLI (MANDATORY tool for all debugging)
+
+**NEVER use `console.log` / `this.logger.debug` for debugging runtime state. Use the `dap` interactive debugger instead.**
+
+The `debugging-code` skill + `dap` CLI are globally installed. `dap` wraps the Debug Adapter Protocol and lets you pause execution, inspect live variables, step through code, and evaluate expressions — without restarting the process.
+
+**Supported languages:** Python · Go · Node.js/TypeScript · Rust/C/C++ (backend auto-detected from file extension)
+
+**Quick reference:**
+```bash
+# Stop at a specific line and inspect
+dap debug apps/subgraph-core/src/main.ts --break user.service.ts:55
+
+# Evaluate a live expression at the stopped line
+dap eval "this.tenantId"
+dap eval "result"
+
+# Navigate
+dap step          # step over
+dap step in       # step into a function
+dap continue      # jump to next breakpoint
+dap output        # drain stdout/stderr since last stop
+
+# End session
+dap stop
+```
+
+**Debugging mindset (mandatory):**
+1. Form a hypothesis: "I believe X fails because Y"
+2. Set breakpoint *where the problem begins*, not where it manifests
+3. Stop → read locals + call stack → confirm or disprove hypothesis
+4. Repeat until root cause confirmed
+
+**When `dap` is unavailable** (e.g. remote container, CI): fall back to structured Pino logging with `tenantId`+`userId` context — never raw `console.log`.
+
+---
+
 ### Phase 1 — Discovery (MANDATORY — do not skip any step)
 
 1. **Read logs first** - Subgraph logs, Gateway logs, PostgreSQL logs, NATS logs, Frontend console
 2. **If no logs exist** - Add Pino logging (`this.logger.error(...)`) as part of the fix so the bug becomes observable
 3. **Reproduce** - Write a failing test that reproduces the bug before touching any fix code
-4. **Identify root cause** - Trace the full call chain; document the exact line(s) that cause the failure
+4. **Identify root cause** - Use `dap` to set a breakpoint at the suspected location, inspect live state, and trace the full call chain; document the exact line(s) that cause the failure
 5. **Wide pattern search — DISCOVERY WAVES (MANDATORY, never skip):**
 
    After identifying the root cause pattern, execute **3 search waves** before writing a single line of fix code:

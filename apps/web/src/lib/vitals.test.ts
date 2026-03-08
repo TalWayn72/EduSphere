@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('web-vitals', () => ({
   onCLS: vi.fn((cb) => cb({ name: 'CLS', value: 0.05 })),
-  onFID: vi.fn((cb) => cb({ name: 'FID', value: 10 })),
+  onINP: vi.fn((cb) => cb({ name: 'INP', value: 10 })),
   onLCP: vi.fn((cb) => cb({ name: 'LCP', value: 2000 })),
   onFCP: vi.fn((cb) => cb({ name: 'FCP', value: 1000 })),
   onTTFB: vi.fn((cb) => cb({ name: 'TTFB', value: 300 })),

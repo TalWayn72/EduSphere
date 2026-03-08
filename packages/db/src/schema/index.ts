@@ -159,3 +159,9 @@ export * from './visual-anchoring';
 export * from './tenant-analytics-snapshots';
 export * from './push-notification-tokens';
 export * from './user-learning-velocity';
+
+// Phase 36: XP / Gamification Foundation
+export * from './user-xp';
+
+// Phase 36: Course Lesson Builder (WYSIWYG authoring — VIDEO/QUIZ/DISCUSSION/AI_CHAT/SUMMARY steps)
+export * from './course-lesson-builder';

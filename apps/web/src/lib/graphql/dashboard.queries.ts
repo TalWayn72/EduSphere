@@ -43,6 +43,8 @@ export const MY_STATS_WITH_STREAK_QUERY = gql`
       totalLearningMinutes
       currentStreak
       longestStreak
+      totalXp
+      level
     }
   }
 `;

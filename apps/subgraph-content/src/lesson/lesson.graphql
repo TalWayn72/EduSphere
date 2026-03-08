@@ -194,3 +194,68 @@ extend type Mutation {
 extend type Subscription {
   lessonPipelineProgress(runId: ID!): LessonPipelineRun! @authenticated
 }
+
+# ─── Course Lesson Builder (WYSIWYG authoring — Phase 36) ─────────────────────
+
+enum CourseLessonPlanStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LessonStepType {
+  VIDEO
+  QUIZ
+  DISCUSSION
+  AI_CHAT
+  SUMMARY
+}
+
+type CourseLessonPlan {
+  id: ID!
+  courseId: ID!
+  title: String!
+  status: CourseLessonPlanStatus!
+  steps: [CourseLessonStep!]!
+  createdAt: String!
+}
+
+type CourseLessonStep {
+  id: ID!
+  stepType: LessonStepType!
+  stepOrder: Int!
+  config: JSON!
+}
+
+input CreateLessonPlanInput {
+  courseId: ID!
+  title: String!
+}
+
+input AddLessonStepInput {
+  planId: ID!
+  stepType: LessonStepType!
+  config: JSON
+}
+
+extend type Query {
+  courseLessonPlan(id: ID!): CourseLessonPlan @authenticated
+  myCourseLessonPlans(courseId: ID!): [CourseLessonPlan!]!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  createLessonPlan(input: CreateLessonPlanInput!): CourseLessonPlan!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  addLessonStep(input: AddLessonStepInput!): CourseLessonPlan!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  reorderLessonSteps(planId: ID!, stepIds: [ID!]!): CourseLessonPlan!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  publishLessonPlan(id: ID!): CourseLessonPlan!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}

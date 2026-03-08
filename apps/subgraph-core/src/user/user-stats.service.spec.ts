@@ -69,12 +69,13 @@ function isoDate(daysAgo: number): string {
 describe('UserStatsService', () => {
   let service: UserStatsService;
 
-  /** Sets up what mockExecute resolves with for the three raw-SQL calls. */
+  /** Sets up what mockExecute resolves with for the four raw-SQL calls. */
   function setupExecuteMocks(
     enrolledCount: number,
     completedCount: number,
     totalSeconds: number,
-    activityRows: { date: string; count: number }[]
+    activityRows: { date: string; count: number }[],
+    xpRow: { total_xp: number; level: number } | undefined = undefined
   ) {
     mockExecute
       .mockResolvedValueOnce({ rows: [{ count: enrolledCount }] }) // countEnrolled
@@ -82,7 +83,8 @@ describe('UserStatsService', () => {
         // sumLearningMinutes
         rows: [{ completed: completedCount, total_seconds: totalSeconds }],
       })
-      .mockResolvedValueOnce({ rows: activityRows }); // fetchWeeklyActivity
+      .mockResolvedValueOnce({ rows: activityRows }) // fetchWeeklyActivity
+      .mockResolvedValueOnce({ rows: xpRow ? [xpRow] : [] }); // fetchUserXP
   }
 
   /** Sets up what the select chain resolves with for countAnnotations. */
@@ -102,11 +104,17 @@ describe('UserStatsService', () => {
   // ── Test 1 ──────────────────────────────────────────────────────────────────
   it('should aggregate all stats correctly from sub-queries', async () => {
     setupAnnotationsMock(7);
-    setupExecuteMocks(3, 12, 7200, [
-      { date: isoDate(2), count: 4 },
-      { date: isoDate(1), count: 2 },
-      { date: isoDate(0), count: 5 },
-    ]);
+    setupExecuteMocks(
+      3,
+      12,
+      7200,
+      [
+        { date: isoDate(2), count: 4 },
+        { date: isoDate(1), count: 2 },
+        { date: isoDate(0), count: 5 },
+      ],
+      { total_xp: 250, level: 2 }
+    );
 
     const stats = await service.getMyStats('user-1', 'tenant-1');
 
@@ -115,6 +123,8 @@ describe('UserStatsService', () => {
     expect(stats.conceptsMastered).toBe(12);
     expect(stats.totalLearningMinutes).toBe(120); // 7200 s / 60
     expect(stats.weeklyActivity).toHaveLength(3);
+    expect(stats.totalXp).toBe(250);
+    expect(stats.level).toBe(2);
   });
 
   // ── Test 2 ──────────────────────────────────────────────────────────────────
@@ -131,6 +141,9 @@ describe('UserStatsService', () => {
     expect(stats.weeklyActivity).toHaveLength(0);
     expect(stats.currentStreak).toBe(0);
     expect(stats.longestStreak).toBe(0);
+    // New user with no XP record defaults to 0 XP and level 1
+    expect(stats.totalXp).toBe(0);
+    expect(stats.level).toBe(1);
   });
 
   // ── Test 3 ──────────────────────────────────────────────────────────────────

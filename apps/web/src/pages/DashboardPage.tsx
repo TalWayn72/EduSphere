@@ -20,7 +20,7 @@ import {
   MY_STATS_WITH_STREAK_QUERY,
   MY_TOP_MASTERY_TOPICS_QUERY,
 } from '@/lib/graphql/dashboard.queries';
-// TODO: replace MOCK_STREAK, MOCK_XP, MOCK_ACTIVITY with real queries once
+// TODO: replace MOCK_STREAK, MOCK_ACTIVITY with real queries once
 //       myStats and activityFeed resolvers are in the deployed supergraph.
 
 // ── Mock data ──────────────────────────────────────────────────────────────────
@@ -103,7 +103,6 @@ const MOCK_MASTERY: MockMasteryItem[] = [
 ];
 
 const MOCK_STREAK = 7;
-const MOCK_XP = 2_340;
 const MOCK_COMPLETED = 4;
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
@@ -259,8 +258,8 @@ export function DashboardPage() {
     : MOCK_ACTIVITY;
 
   const streak = statsResult.data?.myStats?.currentStreak ?? MOCK_STREAK;
-  // XP system deferred to Phase 36 — keep mock until then
-  const xp = MOCK_XP;
+  const xp = statsResult.data?.myStats?.totalXp ?? 0;
+  const level = statsResult.data?.myStats?.level ?? 1;
 
   const masteryTopics: MockMasteryItem[] = masteryResult.data?.myTopMasteryTopics
     ? masteryResult.data.myTopMasteryTopics.map(
@@ -316,10 +315,20 @@ export function DashboardPage() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5">
+              <div
+                className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5"
+                data-testid="xp-widget"
+              >
                 <Zap className="h-4 w-4 text-accent" aria-hidden />
                 <span className="text-sm font-medium text-foreground">
                   {t('xpPoints', { count: xp })}
+                </span>
+                <span
+                  className="ml-1 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent"
+                  data-testid="xp-level-badge"
+                  aria-label={`Level ${level}`}
+                >
+                  {`Lv. ${level}`}
                 </span>
               </div>
             </div>

@@ -40,6 +40,8 @@ type UserStats {
   weeklyActivity: [DayActivity!]!
   currentStreak: Int!
   longestStreak: Int!
+  totalXp: Int!
+  level: Int!
 }
 
 type DayActivity {

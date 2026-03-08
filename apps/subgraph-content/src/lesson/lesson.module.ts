@@ -8,6 +8,8 @@ import {
   LessonPipelineFieldResolver,
   LessonPipelineRunFieldResolver,
 } from './lesson-pipeline.resolver';
+import { LessonPlanService } from './lesson-plan.service';
+import { LessonPlanResolver } from './lesson-plan.resolver';
 
 @Module({
   providers: [
@@ -18,7 +20,10 @@ import {
     LessonAssetService,
     LessonPipelineService,
     LessonPipelineOrchestratorService,
+    // Phase 36: WYSIWYG Course Lesson Builder
+    LessonPlanService,
+    LessonPlanResolver,
   ],
-  exports: [LessonService, LessonAssetService, LessonPipelineService],
+  exports: [LessonService, LessonAssetService, LessonPipelineService, LessonPlanService],
 })
 export class LessonModule {}

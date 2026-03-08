@@ -1,5 +1,5 @@
 import type { Metric } from 'web-vitals';
-import { onCLS, onFID, onLCP, onFCP, onTTFB } from 'web-vitals';
+import { onCLS, onINP, onLCP, onFCP, onTTFB } from 'web-vitals';
 
 export function reportWebVitals(): void {
   const endpoint = import.meta.env.VITE_VITALS_ENDPOINT as string | undefined;
@@ -10,7 +10,7 @@ export function reportWebVitals(): void {
   };
 
   onCLS(send);
-  onFID(send);
+  onINP(send); // INP replaces FID in web-vitals v4+ (Core Web Vital)
   onLCP(send);
   onFCP(send);
   onTTFB(send);

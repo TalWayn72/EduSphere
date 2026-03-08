@@ -23,6 +23,8 @@ export interface UserStats {
   weeklyActivity: DayActivity[];
   currentStreak: number;
   longestStreak: number;
+  totalXp: number;
+  level: number;
 }
 
 @Injectable()
@@ -46,11 +48,12 @@ export class UserStatsService implements OnModuleDestroy {
     };
 
     return withTenantContext(this.db, ctx, async (tx) => {
-      const [enrolled, annotated, progress, activity] = await Promise.all([
+      const [enrolled, annotated, progress, activity, xp] = await Promise.all([
         this.countEnrolled(tx, userId),
         this.countAnnotations(tx, userId, tenantId),
         this.sumLearningMinutes(tx, userId),
         this.fetchWeeklyActivity(tx, userId, tenantId),
+        this.fetchUserXP(tx, userId),
       ]);
 
       const { currentStreak, longestStreak } = this.computeStreaks(activity);
@@ -68,6 +71,8 @@ export class UserStatsService implements OnModuleDestroy {
         weeklyActivity: activity,
         currentStreak,
         longestStreak,
+        totalXp: xp.totalXp,
+        level: xp.level,
       };
     });
   }
@@ -165,6 +170,27 @@ export class UserStatsService implements OnModuleDestroy {
     return {
       completed: Number(row?.completed ?? 0),
       minutes: Math.round(Number(row?.total_seconds ?? 0) / 60),
+    };
+  }
+
+  private async fetchUserXP(
+    tx: Database,
+    userId: string
+  ): Promise<{ totalXp: number; level: number }> {
+    const rows = await tx.execute(
+      sql`
+        SELECT total_xp, level
+        FROM user_xp_totals
+        WHERE user_id = ${userId}::uuid
+        LIMIT 1
+      `
+    );
+    const row = rows.rows[0] as
+      | { total_xp: number; level: number }
+      | undefined;
+    return {
+      totalXp: Number(row?.total_xp ?? 0),
+      level: Number(row?.level ?? 1),
     };
   }
 

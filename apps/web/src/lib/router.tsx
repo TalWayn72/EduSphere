@@ -346,6 +346,11 @@ const TenantAnalyticsPage = lazy(() =>
     default: m.TenantAnalyticsPage,
   }))
 );
+const LessonPipelineBuilderPage = lazy(() =>
+  import('@/pages/LessonPipelineBuilderPage').then((m) => ({
+    default: m.LessonPipelineBuilderPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -479,6 +484,11 @@ export const router = createBrowserRouter([
   {
     path: '/courses/:courseId/edit',
     element: guarded(<CourseEditPage />),
+  },
+  {
+    // Lesson Pipeline Builder — WYSIWYG authoring (Phase 36)
+    path: '/courses/:courseId/pipeline/builder',
+    element: guarded(<LessonPipelineBuilderPage />),
   },
   {
     // Create lesson — must come before :courseId to avoid route shadowing
