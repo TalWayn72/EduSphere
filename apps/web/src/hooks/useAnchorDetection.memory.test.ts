@@ -30,9 +30,9 @@ describe('useAnchorDetection — memory safety', () => {
     expect(cancelSpy).toHaveBeenCalled();
   });
 
-  it('removes scroll listener on unmount', () => {
+  it('does NOT attach a scroll listener (G-11: domMap built on anchor change, not on scroll)', () => {
     const div = document.createElement('div');
-    const removeSpy = vi.spyOn(div, 'removeEventListener');
+    const addSpy = vi.spyOn(div, 'addEventListener');
     const containerRef = { current: div };
 
     const { unmount } = renderHook(() =>
@@ -41,7 +41,9 @@ describe('useAnchorDetection — memory safety', () => {
 
     unmount();
 
-    expect(removeSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
+    // No scroll listener should ever be attached (G-11 performance fix)
+    const scrollCalls = addSpy.mock.calls.filter(([type]) => type === 'scroll');
+    expect(scrollCalls).toHaveLength(0);
   });
 
   it('does not crash when anchors array is empty (no rAF started)', () => {

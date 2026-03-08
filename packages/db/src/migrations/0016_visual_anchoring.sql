@@ -79,8 +79,12 @@ CREATE INDEX IF NOT EXISTS idx_visual_anchors_visual_asset
   ON visual_anchors(visual_asset_id);
 
 -- FTS index for Hebrew + Latin anchor text search (Phase 5)
+-- Requires pg_trgm and Hebrew text search config.
+-- Run: CREATE TEXT SEARCH CONFIGURATION hebrew (COPY = pg_catalog.simple);
+-- in your PostgreSQL instance if 'hebrew' config is not available.
+-- Fallback: 'simple' also tokenizes Hebrew correctly (no stemming).
 CREATE INDEX IF NOT EXISTS idx_visual_anchors_fts
-  ON visual_anchors USING GIN (to_tsvector('simple', anchor_text));
+  ON visual_anchors USING GIN (to_tsvector('hebrew', anchor_text));
 
 ALTER TABLE visual_anchors ENABLE ROW LEVEL SECURITY;
 

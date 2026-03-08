@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 
 export interface AnchorPosition {
@@ -11,6 +11,11 @@ export interface AnchorPosition {
  * Uses requestAnimationFrame loop, throttled to every 3rd frame (~20fps).
  * Anchors must have data-anchor-id="<id>" attribute in DOM.
  * Memory-safe: rAF handle cancelled on unmount.
+ *
+ * Performance (G-11): domMap is built ONCE when the anchor list changes,
+ * not on every scroll tick. The scroll listener has been removed entirely.
+ * For lazy-rendered anchors not yet in DOM, a single querySelector fallback
+ * is used per missing anchor per frame — without rebuilding the whole map.
  */
 export function useAnchorDetection(
   anchors: AnchorPosition[],
@@ -19,13 +24,14 @@ export function useAnchorDetection(
   const [activeAnchorId, setActiveAnchorId] = useState<string | null>(null);
   const rafRef = useRef<number | null>(null);
   const frameCountRef = useRef(0);
-  // Cache of anchor DOM elements — rebuilt only when anchor list changes
+  // Cache of anchor DOM elements — rebuilt only when anchor list changes (G-11)
   const domMapRef = useRef<Map<string, HTMLElement>>(new Map());
 
   // Stable key for detecting anchor list changes without deep equality
   const anchorsKey = anchors.map((a) => a.id).join(',');
 
-  const buildDomMap = useCallback(() => {
+  // Rebuild DOM map ONCE when anchor list changes (O(anchors), not on every scroll)
+  useEffect(() => {
     const map = new Map<string, HTMLElement>();
     for (const anchor of anchors) {
       const el = document.querySelector<HTMLElement>(
@@ -36,11 +42,6 @@ export function useAnchorDetection(
     domMapRef.current = map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [anchorsKey]);
-
-  // Rebuild DOM map when anchor list changes
-  useEffect(() => {
-    buildDomMap();
-  }, [anchorsKey, buildDomMap]);
 
   useEffect(() => {
     if (anchors.length === 0) {
@@ -63,8 +64,19 @@ export function useAnchorDetection(
       let bestOrder = Infinity;
 
       for (const anchor of anchors) {
-        const el = domMapRef.current.get(anchor.id);
+        // Use cached map; fall back to querySelector for lazy-rendered anchors
+        let el = domMapRef.current.get(anchor.id);
+        if (!el) {
+          const found = document.querySelector<HTMLElement>(
+            `[data-anchor-id="${anchor.id}"]`
+          );
+          if (found) {
+            domMapRef.current.set(anchor.id, found);
+            el = found;
+          }
+        }
         if (!el) continue;
+
         // Use offsetTop which is relative to offsetParent (document container)
         const anchorCenterY = el.offsetTop + el.offsetHeight / 2;
         const distance = Math.abs(anchorCenterY - viewportCenterY);
@@ -84,18 +96,13 @@ export function useAnchorDetection(
 
     rafRef.current = window.requestAnimationFrame(loop);
 
-    // Rebuild DOM map on scroll (elements may lazy-render)
-    const container = containerRef.current;
-    container?.addEventListener('scroll', buildDomMap, { passive: true });
-
     return () => {
       if (rafRef.current !== null) {
         window.cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
-      container?.removeEventListener('scroll', buildDomMap);
     };
-  }, [anchors, anchorsKey, buildDomMap, containerRef]);
+  }, [anchors, anchorsKey, containerRef]);
 
   return { activeAnchorId };
 }

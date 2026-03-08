@@ -143,6 +143,35 @@ describe('useAnchorDetection', () => {
     expect(globalThis.cancelAnimationFrame).toHaveBeenCalled();
   });
 
+  it('does NOT rebuild domMap on scroll — uses cached map', () => {
+    const container = makeContainer(0, 600);
+    document.body.appendChild(container);
+
+    const el1 = makeAnchorEl(100, 20);
+    el1.setAttribute('data-anchor-id', 'c1');
+    container.appendChild(el1);
+
+    const containerRef = { current: container };
+    const anchors: AnchorPosition[] = [{ id: 'c1', documentOrder: 0 }];
+
+    const querySpy = vi.spyOn(document, 'querySelector');
+
+    renderHook(() => useAnchorDetection(anchors, containerRef));
+
+    // Record how many querySelector calls were made during mount (map build)
+    const callsAfterMount = querySpy.mock.calls.length;
+
+    // Simulate a scroll event — this must NOT trigger more querySelector calls
+    // to rebuild the whole map (only the lazy-fallback path is allowed, but
+    // since c1 is already in the map, zero additional calls should occur per frame)
+    container.dispatchEvent(new Event('scroll'));
+
+    expect(querySpy.mock.calls.length).toBe(callsAfterMount);
+
+    vi.restoreAllMocks();
+    document.body.removeChild(container);
+  });
+
   it('rebuilds DOM map when anchor list changes', () => {
     const container = makeContainer(0, 600);
     document.body.appendChild(container);

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useCrossFadeGif } from './useCrossFadeGif';
+import { useInteractiveSvg } from './useInteractiveSvg';
 
 interface ImageLayer {
   src: string;
@@ -13,13 +15,17 @@ interface CrossFadeImageProps {
   className?: string;
   /** Fade duration in ms (default: 400) */
   fadeDuration?: number;
+  /** Render SVG inline (sanitized) for interactivity — only applies when mimeType === 'image/svg+xml' */
+  interactiveSvg?: boolean;
 }
 
 /**
  * Cross-fade image component.
  * Two layered img elements swap opacity via CSS transition.
  * GPU-accelerated → guaranteed 60fps.
- * Memory-safe: setTimeout handle cleared on unmount.
+ * Memory-safe: all setTimeout/fetch handles cleared on unmount.
+ * G-2: interactiveSvg renders sanitized SVG inline via DOMPurify.
+ * G-3: outgoing GIF src swapped to transparent pixel after fade.
  */
 export default function CrossFadeImage({
   src,
@@ -27,14 +33,19 @@ export default function CrossFadeImage({
   mimeType = 'image/png',
   className = '',
   fadeDuration = 400,
+  interactiveSvg = false,
 }: CrossFadeImageProps) {
-  // Two layers: "current" (visible) and "next" (fading in)
   const [current, setCurrent] = useState<ImageLayer | null>(null);
   const [next, setNext] = useState<ImageLayer | null>(null);
   const [showNext, setShowNext] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentImgRef = useRef<HTMLImageElement | null>(null);
 
-  // Cleanup timer on unmount
+  const isSvgInteractive = mimeType === 'image/svg+xml' && interactiveSvg;
+  const { sanitizedSvg } = useInteractiveSvg(src, isSvgInteractive);
+  const { scheduleGifPause } = useCrossFadeGif(current?.src ?? null, current?.mimeType ?? '');
+
+  // Cleanup fade timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -54,73 +65,76 @@ export default function CrossFadeImage({
     const newLayer: ImageLayer = { src, alt, mimeType };
 
     if (!current) {
-      // First image: no fade needed
       setCurrent(newLayer);
       return;
     }
 
-    if (current.src === src) return; // No change
+    if (current.src === src) return;
 
-    // Clear any in-flight transition timer
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
 
-    // Start cross-fade: set next image, trigger opacity transition
     setNext(newLayer);
     setShowNext(false);
 
-    // Small delay to allow DOM paint before starting transition
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => setShowNext(true));
     });
 
-    // After transition: swap current ← next, clear next layer
     timerRef.current = setTimeout(() => {
+      // G-3: pause outgoing GIF before swapping layers
+      scheduleGifPause(currentImgRef.current);
       setCurrent(newLayer);
       setNext(null);
       setShowNext(false);
       timerRef.current = null;
-    }, fadeDuration + 50); // slight buffer over CSS transition
+    }, fadeDuration + 50);
   }, [src, alt, mimeType]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!current && !next) {
-    return null;
+  if (!current && !next) return null;
+
+  // G-2: interactive SVG rendering path
+  if (isSvgInteractive && sanitizedSvg !== null) {
+    return (
+      <div
+        className={`relative overflow-hidden ${className}`}
+        data-testid="cross-fade-image"
+        dangerouslySetInnerHTML={{ __html: sanitizedSvg }}
+        aria-label={alt || undefined}
+        role="img"
+      />
+    );
   }
+
+  const visibleAlt = next ? (next.alt || undefined) : (current?.alt || undefined);
 
   return (
     <div
       className={`relative overflow-hidden ${className}`}
       data-testid="cross-fade-image"
       role="img"
-      aria-label={next ? (next.alt || undefined) : (current?.alt || undefined)}
+      aria-label={visibleAlt}
     >
-      {/* Current image (fades out when next is shown) — aria-hidden when being replaced */}
       {current && (
         <img
+          ref={currentImgRef}
           src={current.src}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-contain"
-          style={{
-            opacity: showNext ? 0 : 1,
-            transition: `opacity ${fadeDuration}ms ease-in-out`,
-          }}
+          style={{ opacity: showNext ? 0 : 1, transition: `opacity ${fadeDuration}ms ease-in-out` }}
           data-testid="cross-fade-current"
         />
       )}
-      {/* Next image (fades in) — aria-hidden while invisible, presented via container role */}
       {next && (
         <img
           src={next.src}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-contain"
-          style={{
-            opacity: showNext ? 1 : 0,
-            transition: `opacity ${fadeDuration}ms ease-in-out`,
-          }}
+          style={{ opacity: showNext ? 1 : 0, transition: `opacity ${fadeDuration}ms ease-in-out` }}
           data-testid="cross-fade-next"
         />
       )}

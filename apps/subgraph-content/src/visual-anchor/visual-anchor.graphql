@@ -78,9 +78,18 @@ input UpdateVisualAnchorInput {
   documentOrder: Int
 }
 
+type VisualAssetSearchResult {
+  asset: VisualAsset!
+  anchorText: String
+  thumbnailUrl: String
+}
+
 extend type Query {
   getVisualAssets(courseId: ID!): [VisualAsset!]! @authenticated
   getVisualAnchors(mediaAssetId: ID!): [VisualAnchor!]! @authenticated
+  searchVisualAssets(courseId: ID!, query: String!): [VisualAssetSearchResult!]!
+    @authenticated
+    @requiresScopes(scopes: ["content:read"])
 }
 
 extend type Mutation {

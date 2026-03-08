@@ -35,6 +35,7 @@ import VisualSidebar from '@/components/visual-anchoring/VisualSidebar';
 import { useAnchorDetection } from '@/hooks/useAnchorDetection';
 import { GET_VISUAL_ANCHORS } from '@/components/visual-anchoring/visual-anchor.graphql';
 import type { VisualAnchor } from '@/components/visual-anchoring/visual-anchor.types';
+import { ResumeBanner } from '@/pages/ResumeBanner';
 
 const DOC_TYPES = new Set(['MARKDOWN', 'PDF', 'RICH_DOCUMENT']);
 
@@ -102,8 +103,15 @@ export function UnifiedLearningPage() {
   const chat = useAgentChat(contentId);
 
   // ── Document scroll memory ──
-  const { saveScrollPosition } = useDocumentScrollMemory(contentId);
+  const { saveScrollPosition, isReturning, savedScrollY } = useDocumentScrollMemory(contentId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // ── Resume banner (G-10) ──
+  const [showResumeBanner, setShowResumeBanner] = useState(isReturning);
+
+  const scrollToSaved = useCallback(() => {
+    scrollContainerRef.current?.scrollTo({ top: savedScrollY, behavior: 'smooth' });
+  }, [savedScrollY]);
 
   // ── Visual anchors ──
   const [anchorsResult] = useQuery<VisualAnchorsResult>({
@@ -117,6 +125,7 @@ export function UnifiedLearningPage() {
     documentOrder: a.documentOrder,
   }));
   const { activeAnchorId } = useAnchorDetection(anchorPositions, scrollContainerRef);
+  const activeAnchor = visualAnchors.find((a) => a.id === activeAnchorId);
 
   // ── Document zoom ──
   const { documentZoom, defaultAnnotationLayer } = useDocumentUIStore();
@@ -162,6 +171,13 @@ export function UnifiedLearningPage() {
 
   return (
     <Layout>
+      {showResumeBanner && activeAnchorId && (
+        <ResumeBanner
+          activeAnchor={activeAnchor}
+          onResume={() => { scrollToSaved(); setShowResumeBanner(false); }}
+          onDismiss={() => setShowResumeBanner(false)}
+        />
+      )}
       <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
         {/* Breadcrumb */}
         <div className="flex-shrink-0 px-1">

@@ -54,6 +54,16 @@ export class VisualAnchorResolver {
     return this.service.findAllByMediaAsset(mediaAssetId, authCtx);
   }
 
+  @Query('searchVisualAssets')
+  async searchVisualAssets(
+    @Args('courseId') courseId: string,
+    @Args('query') query: string,
+    @Context() ctx: GqlContext
+  ) {
+    const authCtx = requireAuth(ctx);
+    return this.service.searchVisualAssets(courseId, query, authCtx);
+  }
+
   // ── Mutations ──────────────────────────────────────────────────────────────
 
   @Mutation('confirmVisualAssetUpload')

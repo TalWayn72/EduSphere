@@ -66,6 +66,12 @@ export interface SyncResult {
   broken: number;
 }
 
+export interface VisualAssetSearchResult {
+  asset: VisualAssetRow & { courseId: string; createdAt: string };
+  anchorText: string | null;
+  thumbnailUrl: string | null;
+}
+
 @Injectable()
 export class VisualAnchorService implements OnModuleDestroy {
   private readonly logger = new Logger(VisualAnchorService.name);
@@ -127,6 +133,53 @@ export class VisualAnchorService implements OnModuleDestroy {
         )
     );
     return Promise.all(rows.map((r) => this.mapAsset(r)));
+  }
+
+  async searchVisualAssets(courseId: string, query: string, authCtx: TenantContext): Promise<VisualAssetSearchResult[]> {
+    const rows = await withTenantContext(this.db, authCtx, (tx) =>
+      tx
+        .select({
+          id: schema.visualAssets.id,
+          filename: schema.visualAssets.filename,
+          original_name: schema.visualAssets.original_name,
+          storage_key: schema.visualAssets.storage_key,
+          mime_type: schema.visualAssets.mime_type,
+          size_bytes: schema.visualAssets.size_bytes,
+          webp_key: schema.visualAssets.webp_key,
+          metadata: schema.visualAssets.metadata,
+          created_at: schema.visualAssets.created_at,
+          scan_status: schema.visualAssets.scan_status,
+        })
+        .from(schema.visualAssets)
+        .where(
+          and(
+            eq(schema.visualAssets.course_id, courseId),
+            isNull(schema.visualAssets.deleted_at),
+            eq(schema.visualAssets.scan_status, 'CLEAN' as const),
+          )
+        )
+        .limit(20)
+    );
+
+    const q = query.toLowerCase();
+    const matched = rows.filter((r) => r.original_name.toLowerCase().includes(q));
+
+    return matched.map((r) => ({
+      asset: {
+        id: r.id,
+        courseId,
+        filename: r.original_name,
+        mimeType: r.mime_type,
+        sizeBytes: Number(r.size_bytes),
+        storageUrl: '',
+        webpUrl: null,
+        scanStatus: r.scan_status,
+        metadata: r.metadata as Record<string, unknown>,
+        createdAt: r.created_at.toISOString(),
+      },
+      anchorText: null,
+      thumbnailUrl: null,
+    }));
   }
 
   // ── Mutations ──────────────────────────────────────────────────────────────
