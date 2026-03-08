@@ -27,13 +27,5 @@ CREATE POLICY tenant_themes_admin_write ON tenant_themes
   );
 
 -- user_theme_preferences: per-user overrides (theme mode, font size, etc.)
-ALTER TABLE user_preferences
-  ADD COLUMN IF NOT EXISTS theme_mode VARCHAR(10) NOT NULL DEFAULT 'system'
-    CHECK (theme_mode IN ('light', 'dark', 'system')),
-  ADD COLUMN IF NOT EXISTS font_size VARCHAR(10) NOT NULL DEFAULT 'md'
-    CHECK (font_size IN ('sm', 'md', 'lg', 'xl')),
-  ADD COLUMN IF NOT EXISTS reading_mode BOOLEAN NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS motion_preference VARCHAR(10) NOT NULL DEFAULT 'full'
-    CHECK (motion_preference IN ('full', 'reduced', 'none')),
-  ADD COLUMN IF NOT EXISTS contrast_mode VARCHAR(10) NOT NULL DEFAULT 'normal'
-    CHECK (contrast_mode IN ('normal', 'high'));
+-- NOTE: Stored in users.preferences JSONB column — no separate table needed.
+-- Keys: theme_mode, font_size, reading_mode, motion_preference, contrast_mode

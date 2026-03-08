@@ -14,17 +14,25 @@ CREATE TABLE IF NOT EXISTS user_skill_mastery (
 -- RLS
 ALTER TABLE user_skill_mastery ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS user_skill_mastery_tenant_isolation
-  ON user_skill_mastery
-  FOR ALL
-  USING (
-    tenant_id = current_setting('app.current_tenant', TRUE)::uuid
-    AND user_id = current_setting('app.current_user_id', TRUE)::uuid
-  )
-  WITH CHECK (
-    tenant_id = current_setting('app.current_tenant', TRUE)::uuid
-    AND user_id = current_setting('app.current_user_id', TRUE)::uuid
-  );
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'user_skill_mastery'
+    AND policyname = 'user_skill_mastery_tenant_isolation'
+  ) THEN
+    CREATE POLICY user_skill_mastery_tenant_isolation
+      ON user_skill_mastery
+      FOR ALL
+      USING (
+        tenant_id = current_setting('app.current_tenant', TRUE)::uuid
+        AND user_id = current_setting('app.current_user_id', TRUE)::uuid
+      )
+      WITH CHECK (
+        tenant_id = current_setting('app.current_tenant', TRUE)::uuid
+        AND user_id = current_setting('app.current_user_id', TRUE)::uuid
+      );
+  END IF;
+END $$;
 
 -- Index for fast lookup by user+tenant
 CREATE INDEX IF NOT EXISTS idx_user_skill_mastery_user_tenant
