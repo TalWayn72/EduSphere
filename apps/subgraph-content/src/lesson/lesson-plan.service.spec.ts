@@ -5,9 +5,9 @@ import { LessonPlanService } from './lesson-plan.service';
 
 const mockReturning = vi.fn();
 const mockWhere = vi.fn();
-const mockLimit = vi.fn();
-const mockOrderBy = vi.fn();
-const mockFrom = vi.fn();
+const _mockLimit = vi.fn();
+const _mockOrderBy = vi.fn();
+const _mockFrom = vi.fn();
 const mockSelect = vi.fn();
 const mockValues = vi.fn();
 const mockInsert = vi.fn();
