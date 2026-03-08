@@ -12,11 +12,10 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/hooks/usePushNotifications', () => ({
   usePushNotifications: () => ({
-    isSupported: false,
-    isSubscribed: false,
+    isEnabled: false,
     isLoading: false,
-    subscribe: vi.fn(),
-    unsubscribe: vi.fn(),
+    enable: vi.fn(),
+    disable: vi.fn(),
   }),
 }));
 
@@ -73,7 +72,7 @@ describe('NotificationsPage', () => {
   it('renders heading', () => {
     renderPage();
     expect(
-      screen.getByRole('heading', { name: /notifications/i })
+      screen.getByRole('heading', { name: /^notifications$/i, level: 1 })
     ).toBeInTheDocument();
   });
 
