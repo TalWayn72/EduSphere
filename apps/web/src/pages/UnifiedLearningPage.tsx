@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/resizable';
 import { ContentViewerBreadcrumb } from '@/components/ContentViewerBreadcrumb';
 import { useContentData } from '@/hooks/useContentData';
+import { useSubtitleTracks } from '@/hooks/useSubtitleTracks';
 import { useAnnotations } from '@/hooks/useAnnotations';
 import { useAgentChat } from '@/hooks/useAgentChat';
 import { useDocumentAnnotations } from '@/hooks/useDocumentAnnotations';
@@ -71,6 +72,9 @@ export function UnifiedLearningPage() {
   // ── Video / transcript hook (has mock fallback) ──
   const { videoUrl, hlsManifestUrl, videoTitle, transcript } =
     useContentData(contentId);
+
+  // ── Subtitle tracks (empty array when query not available) ──
+  const subtitleTracks = useSubtitleTracks(contentId);
 
   // ── Annotation hooks ──
   const [activeLayers] = useState<AnnotationLayer[]>([
@@ -219,6 +223,7 @@ export function UnifiedLearningPage() {
               }}
               bookmarks={bookmarks}
               chat={chat}
+              subtitleTracks={subtitleTracks}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

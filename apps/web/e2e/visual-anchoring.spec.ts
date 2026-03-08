@@ -1,13 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth.helpers';
 
 test.describe('Visual Anchoring — Instructor Flow', () => {
   test.beforeEach(async ({ page }) => {
-    // Login as instructor
-    await page.goto('/');
-    await page.fill('[data-testid="email-input"]', 'instructor@example.com');
-    await page.fill('[data-testid="password-input"]', 'Instructor123!');
-    await page.click('[data-testid="login-button"]');
-    await page.waitForURL('**/dashboard');
+    await login(page);
   });
 
   test('instructor can create a visual anchor', async ({ page }) => {
@@ -64,12 +60,7 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
   });
 
   test('student sees visual sidebar update on scroll', async ({ page }) => {
-    // Login as student
-    await page.goto('/');
-    await page.fill('[data-testid="email-input"]', 'student@example.com');
-    await page.fill('[data-testid="password-input"]', 'Student123!');
-    await page.click('[data-testid="login-button"]');
-    await page.waitForURL('**/dashboard');
+    // beforeEach already logged in
 
     // Mock GraphQL: return anchors with assigned images
     await page.route('**/graphql', async (route) => {
@@ -133,6 +124,10 @@ test.describe('Visual Anchoring — Instructor Flow', () => {
 });
 
 test.describe('Visual Anchoring — Visual Regression', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
   test('sidebar with image matches snapshot', async ({ page }) => {
     await page.route('**/graphql', async (route) => {
       const body = route.request().postDataJSON() as { operationName?: string } | null;
