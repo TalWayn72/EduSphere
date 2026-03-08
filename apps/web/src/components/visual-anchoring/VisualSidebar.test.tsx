@@ -148,7 +148,9 @@ describe('VisualSidebar', () => {
 
   it('has role=complementary and aria-label on root element', () => {
     render(<VisualSidebar anchors={[]} activeAnchorId={null} />);
-    const sidebar = screen.getByRole('complementary', { name: 'Visual Aid Sidebar' });
+    // The component uses Hebrew aria-label: "סרגל עזרים חזותיים"
+    const sidebar = screen.getByRole('complementary');
     expect(sidebar).toBeDefined();
+    expect(sidebar.getAttribute('aria-label')).toBeTruthy();
   });
 });

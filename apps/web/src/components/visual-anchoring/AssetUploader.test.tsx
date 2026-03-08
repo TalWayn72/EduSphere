@@ -77,8 +77,19 @@ function renderUploader(onUploaded = vi.fn()) {
 }
 
 function dropFile(container: HTMLElement, file: File) {
-  const zone = container.querySelector('[data-testid="asset-uploader"] > div');
-  if (!zone) throw new Error('Drop zone not found');
+  // Prefer fireEvent.change on the hidden file input — more reliable than drop events in jsdom.
+  // The input has data-testid="asset-file-input".
+  const input = container.querySelector('[data-testid="asset-file-input"]') as HTMLInputElement | null;
+  if (input) {
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    fireEvent.change(input);
+    return;
+  }
+  // Fallback: drag zone has role="button"
+  const wrapper = container.querySelector('[data-testid="asset-uploader"]');
+  if (!wrapper) throw new Error('asset-uploader wrapper not found');
+  const zone = wrapper.querySelector('[role="button"]');
+  if (!zone) throw new Error('Drop zone (role=button) not found inside asset-uploader');
   fireEvent.drop(zone, { dataTransfer: { files: [file] } });
 }
 
@@ -107,7 +118,12 @@ describe('AssetUploader', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/15 MB/)).toBeInTheDocument();
+      // Error message appears in both sr-only announce div and visible error div — use getAllByText
+      const matches = screen.getAllByText(/15 MB/);
+      expect(matches.length).toBeGreaterThanOrEqual(1);
+      // Visible error: the paragraph with id="uploader-error-msg"
+      const visibleError = container.querySelector('#uploader-error-msg');
+      expect(visibleError).not.toBeNull();
     });
 
     expect(mockQueryFn).not.toHaveBeenCalled();
@@ -170,7 +186,9 @@ describe('AssetUploader', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/Upload failed/)).toBeInTheDocument();
+      // Error message appears in both sr-only error-announce div and visible #uploader-error-msg
+      const allMatches = screen.getAllByText(/Upload failed/);
+      expect(allMatches.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByTestId('icon-alert-circle')).toBeInTheDocument();
     });
 
@@ -195,7 +213,9 @@ describe('AssetUploader', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('icon-shield')).toBeInTheDocument();
-      expect(screen.getByText(/flagged by security scan/i)).toBeInTheDocument();
+      // Message appears in assertive-announce div and visible #uploader-infected-msg
+      const allMatches = screen.getAllByText(/flagged by security scan/i);
+      expect(allMatches.length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -234,7 +254,9 @@ describe('AssetUploader', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/Could not initiate upload/)).toBeInTheDocument();
+      // Message appears in sr-only error-announce div and visible #uploader-error-msg
+      const allMatches = screen.getAllByText(/Could not initiate upload/);
+      expect(allMatches.length).toBeGreaterThanOrEqual(1);
     });
   });
 });

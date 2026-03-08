@@ -24,11 +24,15 @@ describe('CrossFadeImage', () => {
 
   it('renders a single image (no fade wrapper) on first src provided', () => {
     render(<CrossFadeImage src="https://example.com/img1.png" alt="Image 1" />);
-    expect(screen.getByTestId('cross-fade-image')).toBeDefined();
-    // Current layer should be present
+    const wrapper = screen.getByTestId('cross-fade-image');
+    expect(wrapper).toBeDefined();
+    // Current layer should be present with correct src
     const current = screen.getByTestId('cross-fade-current');
     expect(current.getAttribute('src')).toBe('https://example.com/img1.png');
-    expect(current.getAttribute('alt')).toBe('Image 1');
+    // Component uses aria-hidden pattern on img elements (alt text on container div via aria-label)
+    expect(current.getAttribute('aria-hidden')).toBe('true');
+    // Container carries the accessible label
+    expect(wrapper.getAttribute('aria-label')).toBe('Image 1');
     // No next layer on first render
     expect(screen.queryByTestId('cross-fade-next')).toBeNull();
   });
