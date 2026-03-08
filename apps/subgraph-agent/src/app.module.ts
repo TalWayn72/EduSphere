@@ -19,7 +19,7 @@ import { authMiddleware } from './auth/auth.middleware';
     MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
-      typePaths: ['./**/*.graphql'],
+      typePaths: ['./dist/**/*.graphql'],
       context: async ({ req }: { req: IncomingMessage }) => {
         const ctx = { req };
         await authMiddleware.validateRequest(ctx);

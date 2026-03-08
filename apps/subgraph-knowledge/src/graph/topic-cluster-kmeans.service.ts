@@ -16,7 +16,7 @@ import {
   db,
   executeCypher,
 } from '@edusphere/db';
-import type { CypherTopicClusterService } from './cypher-topic-cluster.service';
+import { CypherTopicClusterService } from './cypher-topic-cluster.service';
 import { connect, StringCodec, type NatsConnection } from 'nats';
 import { buildNatsOptions } from '@edusphere/nats-client';
 import { graphConfig } from '@edusphere/config';

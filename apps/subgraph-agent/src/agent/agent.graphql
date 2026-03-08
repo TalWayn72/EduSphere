@@ -1,5 +1,7 @@
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external", "@shareable", "@authenticated"])
+
+directive @requiresRole(roles: [String!]!) on FIELD_DEFINITION
 
 enum AgentExecutionStatus {
   QUEUED

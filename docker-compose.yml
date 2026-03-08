@@ -64,6 +64,10 @@ services:
       # dist mounted so subgraph-agent loads compiled JS; package.json mounted for correct resolution
       - ./packages/langgraph-workflows/dist:/app/packages/langgraph-workflows/dist:ro
       - ./packages/langgraph-workflows/package.json:/app/packages/langgraph-workflows/package.json:ro
+      # subgraph-knowledge: dist mounted — fixes import type → runtime DI bug (TopicClusterKMeansService)
+      - ./apps/subgraph-knowledge/dist:/app/apps/subgraph-knowledge/dist:ro
+      # subgraph-agent: dist mounted — fixes typePaths './**' picking up node_modules schematics template
+      - ./apps/subgraph-agent/dist:/app/apps/subgraph-agent/dist:ro
       # subgraph-knowledge: add myLearningPath SDL definition (resolver exists, SDL was missing)
       - ./apps/subgraph-knowledge/src/graph/graph.graphql:/app/apps/subgraph-knowledge/src/graph/graph.graphql:ro
       # subgraph-core: mount src/ — fixes @requiresRole removed from @link imports (invalid federation import),
