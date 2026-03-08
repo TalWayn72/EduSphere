@@ -166,7 +166,9 @@ async function buildService(opts: {
 
 describe('KnowledgeSourceService — text-tracing pipeline', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    // Only fake setTimeout/clearTimeout — leave Promise/queueMicrotask untouched
+    // to avoid blocking async resolution inside createAndProcess
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
   });
 
   afterEach(async () => {

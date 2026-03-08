@@ -10,6 +10,16 @@ vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(() => ({ id: 'user-1', firstName: 'Test' })),
 }));
 
+vi.mock('@/hooks/usePushNotifications', () => ({
+  usePushNotifications: () => ({
+    isSupported: false,
+    isSubscribed: false,
+    isLoading: false,
+    subscribe: vi.fn(),
+    unsubscribe: vi.fn(),
+  }),
+}));
+
 const mockMarkAsRead = vi.fn();
 let mockNotifications: AppNotification[] = [];
 

@@ -31,10 +31,48 @@ vi.mock('@edusphere/nats-client', () => ({
   buildNatsOptions: vi.fn().mockReturnValue({ servers: 'nats://localhost:4222' }),
 }));
 
-vi.mock('./kmeans-math.js', () => ({
-  runKMeans: vi.fn().mockReturnValue([
-    { label: 'Cluster A', conceptIds: ['c1', 'c2'] },
+// ── Mock @edusphere/db to avoid real DB connections ───────────────────────────
+
+const DEFAULT_EMBEDDING_ROWS = [
+  { concept_id: 'c1', embedding: [0.1, 0.2, 0.3] },
+  { concept_id: 'c2', embedding: [0.4, 0.5, 0.6] },
+];
+
+// Track what the mockLocalDb.select chain returns so tests can override
+let embeddingRowsToReturn: typeof DEFAULT_EMBEDDING_ROWS = DEFAULT_EMBEDDING_ROWS;
+
+const mockLocalDb = {
+  select: vi.fn(() => ({
+    from: vi.fn(() =>
+      Object.assign(
+        Promise.resolve(embeddingRowsToReturn),
+        {
+          catch: (fn: (e: unknown) => unknown) =>
+            Promise.resolve(embeddingRowsToReturn).catch(fn),
+        }
+      )
+    ),
+  })),
+};
+
+vi.mock('@edusphere/db', () => ({
+  createDatabaseConnection: vi.fn(() => mockLocalDb),
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
+  schema: {
+    concept_embeddings: {
+      concept_id: 'concept_id',
+      embedding: 'embedding',
+    },
+  },
+  db: {},
+  executeCypher: vi.fn().mockResolvedValue([
+    { id: 'c1', name: 'Alpha' },
+    { id: 'c2', name: 'Beta' },
   ]),
+}));
+
+vi.mock('@edusphere/config', () => ({
+  graphConfig: { graphName: 'edusphere_graph' },
 }));
 
 // ── Mocked dependencies ───────────────────────────────────────────────────────
@@ -45,38 +83,33 @@ function makeCypherTopicClusterService() {
   };
 }
 
-function makeKMeansDataService() {
-  return {
-    fetchEmbeddingRows: vi.fn().mockResolvedValue([
-      { concept_id: 'c1', embedding: [0.1, 0.2, 0.3] },
-      { concept_id: 'c2', embedding: [0.4, 0.5, 0.6] },
-    ]),
-    filterConceptsByCourse: vi.fn().mockResolvedValue(['c1', 'c2']),
-    resolveConceptNames: vi.fn().mockResolvedValue(new Map([['c1', 'Alpha'], ['c2', 'Beta']])),
-    buildConceptsWithEmbeddings: vi.fn().mockReturnValue([
-      { id: 'c1', name: 'Alpha', embedding: [0.1, 0.2, 0.3] },
-      { id: 'c2', name: 'Beta', embedding: [0.4, 0.5, 0.6] },
-    ]),
-  };
-}
-
 import { TopicClusterKMeansService } from './topic-cluster-kmeans.service.js';
 import type { CypherTopicClusterService } from './cypher-topic-cluster.service.js';
-import type { KMeansDataService } from './kmeans-data.service.js';
 
 function makeService(
   cypher?: ReturnType<typeof makeCypherTopicClusterService>,
-  data?: ReturnType<typeof makeKMeansDataService>
 ): TopicClusterKMeansService {
   return new TopicClusterKMeansService(
     (cypher ?? makeCypherTopicClusterService()) as unknown as CypherTopicClusterService,
-    (data ?? makeKMeansDataService()) as unknown as KMeansDataService
   );
 }
 
 describe('TopicClusterKMeansService — memory safety', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    embeddingRowsToReturn = DEFAULT_EMBEDDING_ROWS;
+    // Re-wire the select mock after clearAllMocks
+    mockLocalDb.select.mockImplementation(() => ({
+      from: vi.fn(() =>
+        Object.assign(
+          Promise.resolve(embeddingRowsToReturn),
+          {
+            catch: (fn: (e: unknown) => unknown) =>
+              Promise.resolve(embeddingRowsToReturn).catch(fn),
+          }
+        )
+      ),
+    }));
   });
 
   // ── Test 1: onModuleDestroy drains NATS when connection was established ───
@@ -114,7 +147,8 @@ describe('TopicClusterKMeansService — memory safety', () => {
     const cypher = makeCypherTopicClusterService();
     const svc = makeService(cypher);
 
-    const result = await svc.clusterConceptsByCourse('course-1', 2, 'tenant-1');
+    // Use k=1 so we get exactly 1 cluster from 2 concepts
+    const result = await svc.clusterConceptsByCourse('course-1', 1, 'tenant-1');
 
     // Cluster creation should succeed even when NATS publish fails
     expect(result).toHaveLength(1);
