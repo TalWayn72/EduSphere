@@ -1,7 +1,7 @@
 [
   {
     "label": "01 — Login Page",
-    "url": "http://localhost:5174/dashboard",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\01-login-page.png",
     "consoleErrors": [],
     "consoleWarnings": [
@@ -11,31 +11,15 @@
     "networkErrors": [],
     "loadedSuccessfully": false,
     "notes": [
-      "MISSING: \"Welcome to EduSphere\" heading not visible",
-      "MISSING: \"Sign In with Keycloak\" button not visible",
-      "MISSING: Description text not visible"
+      "MISSING: \"Sign In with Keycloak\" button not visible"
     ]
   },
   {
     "label": "02 — Keycloak Auth Flow",
-    "url": "http://localhost:5174/learn/content-1",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\02-post-keycloak-login.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": []
-  },
-  {
-    "label": "03 — Dashboard",
-    "url": "http://localhost:5174/dashboard",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\03-dashboard.png",
+    "url": "",
+    "screenshot": "",
     "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+      "Failed to load resource: the server responded with a status of 400 (Bad Request)"
     ],
     "consoleWarnings": [
       "🔧 DEV MODE: Running without Keycloak authentication",
@@ -44,225 +28,9 @@
       "🔧 DEV MODE: Running without Keycloak authentication"
     ],
     "networkErrors": [
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
-    "loadedSuccessfully": true,
-    "notes": [
-      "ERROR CARD VISIBLE: Error loading user data: [Network] Failed to fetch"
-    ]
-  },
-  {
-    "label": "04 — Course List",
-    "url": "http://localhost:5174/courses",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\04-courses-list.png",
-    "consoleErrors": ["Failed to load resource: net::ERR_CONNECTION_REFUSED"],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
-    "loadedSuccessfully": true,
-    "notes": ["Found 4 course cards"]
-  },
-  {
-    "label": "05 — Content Viewer",
-    "url": "http://localhost:5174/learn/content-1",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\05-content-viewer.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": []
-  },
-  {
-    "label": "06 — Create Annotation",
-    "url": "http://localhost:5174/learn/content-1",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\06-annotation-result.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": ["SUCCESS: Annotation created and visible in list"]
-  },
-  {
-    "label": "07 — Annotations Page",
-    "url": "http://localhost:5174/annotations",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\07-annotations-page.png",
-    "consoleErrors": ["Failed to load resource: net::ERR_CONNECTION_REFUSED"],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
-    "loadedSuccessfully": true,
-    "notes": []
-  },
-  {
-    "label": "08 — Knowledge Graph",
-    "url": "http://localhost:5174/graph",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\08-knowledge-graph.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": [
-      "INFO: No canvas/svg graph element visible — may be text-based fallback or loading"
-    ]
-  },
-  {
-    "label": "09 — Search Page",
-    "url": "http://localhost:5174/search",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\09-search-results.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": ["Found 7 search result cards after querying \"Talmud\""]
-  },
-  {
-    "label": "10 — AI Agents (Chavruta)",
-    "url": "http://localhost:5174/agents",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\10-agents-ai-response.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": ["AI response bubbles visible: 2"]
-  },
-  {
-    "label": "11 — Collaboration Page",
-    "url": "http://localhost:5174/collaboration",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\11-collaboration.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": ["Page heading: \"Collaboration\""]
-  },
-  {
-    "label": "12 — Profile Page",
-    "url": "http://localhost:5174/profile",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\12-profile.png",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
-    "loadedSuccessfully": true,
-    "notes": [
-      "INFO: Student email not visible on profile page (may require GraphQL me query)"
-    ]
-  },
-  {
-    "label": "13 — UserMenu / Logout",
-    "url": "http://localhost:5174/dashboard",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\13-after-logout.png",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
+      "HTTP 400 — http://localhost:4000/graphql"
     ],
     "loadedSuccessfully": false,
-    "notes": [
-      "After logout URL: http://localhost:5174/dashboard",
-      "BUG: After logout, user is still on http://localhost:5174/dashboard instead of /login or Keycloak"
-    ]
-  },
-  {
-    "label": "14 — Navigation Sidebar",
-    "url": "http://localhost:5174/dashboard",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\14-sidebar-navigation.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": [
-      "FOUND nav link: \"Dashboard\"",
-      "FOUND nav link: \"Courses\"",
-      "FOUND nav link: \"Annotations\"",
-      "FOUND nav link: \"Agents\"",
-      "FOUND nav link: \"Graph\""
-    ]
-  },
-  {
-    "label": "15 — Unknown Route / 404",
-    "url": "http://localhost:5174/learn/content-1",
-    "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\15-unknown-route.png",
-    "consoleErrors": [],
-    "consoleWarnings": [
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication",
-      "🔧 DEV MODE: Running without Keycloak authentication"
-    ],
-    "networkErrors": [],
-    "loadedSuccessfully": true,
-    "notes": [
-      "INFO: Unknown route redirected to http://localhost:5174/learn/content-1 — fallback route working"
-    ]
+    "notes": []
   }
 ]

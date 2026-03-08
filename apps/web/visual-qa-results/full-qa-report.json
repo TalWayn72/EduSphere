@@ -1,401 +1,260 @@
 [
   {
     "label": "S1.01 — Login Page",
-    "url": "http://localhost:5174/dashboard",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_01-login-page.png",
     "headings": [
-      "AI Learning Assistant",
-      "Dashboard",
-      "Instructor Tools\nSUPER ADMIN",
-      "Courses Enrolled",
-      "Study Time"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n06:30 PM\n\nWhat's the relationship between free will and div",
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
     "consoleErrors": [],
     "networkErrors": [],
     "notes": [
-      "MISSING: \"Welcome to EduSphere\" heading",
-      "MISSING: \"Sign In with Keycloak\" button",
-      "Full body text: EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n06:30 PM\n\nWhat's the relationship between free will and div"
+      "MISSING: \"Sign In with Keycloak\" button"
     ],
     "loadedOk": false
   },
   {
     "label": "S1.02 — Student Keycloak Login",
-    "url": "http://localhost:5174/dashboard",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_02-student-after-login.png",
     "headings": [
-      "AI Learning Assistant",
-      "Dashboard",
-      "Instructor Tools\nSUPER ADMIN",
-      "Courses Enrolled",
-      "Study Time"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n06:30 PM\n\nWhat's the relationship between free will and div",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "FAILURE: Still on login page — Keycloak auth failed or redirect broken"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
-    "notes": ["On Keycloak page: http://localhost:5174/dashboard"],
     "loadedOk": false
   },
   {
     "label": "S1.03 — Student Dashboard",
-    "url": "http://localhost:5174/dashboard",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_03-student-dashboard.png",
     "headings": [
-      "AI Learning Assistant",
-      "Dashboard",
-      "Instructor Tools\nSUPER ADMIN",
-      "Courses Enrolled",
-      "Study Time"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n06:31 PM\n\nWhat's the relationship between free will and div",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Stat card \"Study Time\": VISIBLE",
-      "Stat card \"Concepts Mastered\": VISIBLE",
-      "Stat card \"Active Courses\": VISIBLE",
-      "Stat card \"Annotations\": VISIBLE",
-      "Navigation sidebar: VISIBLE",
-      "ERROR CARD: Error loading user data: [Network] Failed to fetch"
+      "Stat card \"Study Time\": MISSING",
+      "Stat card \"Concepts Mastered\": MISSING",
+      "Stat card \"Active Courses\": MISSING",
+      "Stat card \"Annotations\": MISSING",
+      "Navigation sidebar: MISSING",
+      "MISSING: Dashboard heading not found"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S1.04 — Student Courses",
-    "url": "http://localhost:5174/courses",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_04-student-courses.png",
     "headings": [
-      "Courses",
-      "Introduction to Talmud Study",
-      "Advanced Chavruta Techniques",
-      "Knowledge Graph Navigation",
-      "Jewish Philosophy: Rambam & Ramban"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\n(current page)\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\n[Network] Failed to fetch — [Network] Failed to fetch — showing cached data.\nCourses\n\nExplore our collection of courses and start your learning journey\n\nNew Course\n📚\nOpen\nIntroduction t",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Course cards visible: 1",
+      "Enroll button visible: false",
+      "MISSING: Courses heading"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
-    "notes": ["Course cards visible: 4", "Enroll button visible: false"],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S1.05 — Content Viewer",
-    "url": "http://localhost:5174/learn/content-1",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_05-content-viewer.png",
-    "headings": [],
-    "bodySnippet": "EduSphere\nLearn\n(current page)\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nAdd Note @ 0:00\n0:00 / 9:56\n1×\nTranscript\nIntroduction to Talmudic Reasoning\n0:00\nWelcome to this introduction to Talmudic reasoning. Today, we will explore the fundamental principles of",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "headings": [
+      "Welcome to EduSphere"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Video player: VISIBLE",
-      "Transcript panel: VISIBLE",
-      "Annotations panel: VISIBLE"
+      "Video player: MISSING",
+      "Transcript panel: MISSING",
+      "Annotations panel: MISSING"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S1.06 — AI Agents",
-    "url": "http://localhost:5174/agents",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_06-agents.png",
-    "headings": ["AI Learning Agents"],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\n(current page)\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Agents\n\nChoose an agent mode to enhance your learningDev Mode — mock responses\n\nChavruta Debate\n\nDialectical partner — challenges your arguments using Talmudic reasoning\n\nQui",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "headings": [
+      "Welcome to EduSphere"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Agent mode \"Chavruta Debate\": VISIBLE",
-      "Agent mode \"Quiz Master\": VISIBLE",
-      "Agent mode \"Summarizer\": VISIBLE",
-      "Agent mode \"Research Scout\": VISIBLE",
-      "Agent mode \"Explainer\": VISIBLE",
-      "Chat input: VISIBLE"
+      "Agent mode \"Chavruta Debate\": MISSING",
+      "Agent mode \"Quiz Master\": MISSING",
+      "Agent mode \"Summarizer\": MISSING",
+      "Agent mode \"Research Scout\": MISSING",
+      "Agent mode \"Explainer\": MISSING",
+      "Chat input: MISSING",
+      "MISSING: AI Learning Agents heading"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S1.07 — Knowledge Graph",
-    "url": "http://localhost:5174/graph",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_07-knowledge-graph.png",
-    "headings": ["Knowledge Graph"],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\n(current page)\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nKnowledge Graph\n\nExplore concepts, people, and sources in the knowledge graph\n\n💡 CONCEPT\n👤 PERSON\n📚 SOURCE\nRambam\nAristotle\nFree Will\nDeterminism\nEthics\nMetaphysics\nGuide for the Perp",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "headings": [
+      "Welcome to EduSphere"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
       "Canvas element: MISSING",
       "SVG element: VISIBLE",
-      "Final URL: http://localhost:5174/graph"
+      "Final URL: http://localhost:5176/login"
     ],
     "loadedOk": true
   },
   {
     "label": "S1.08 — Collaboration",
-    "url": "http://localhost:5174/collaboration",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_08-collaboration.png",
     "headings": [
-      "Collaboration",
-      "Human Chavruta",
-      "AI Chavruta",
-      "RECENT DISCUSSIONS"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\n(current page)\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nCollaboration\n\nStudy together in real-time with peers and AI\n\nHuman Chavruta\n\nStudy with a peer in real-time collaborative sessions\n\nFind a Chavruta Partner\nAI Chavruta\n\nStudy with an AI",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "Header/nav visible: false"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
-    "notes": ["Header/nav visible: true"],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S1.09 — Search (Talmud)",
-    "url": "http://localhost:5174/search?q=Talmud",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_09b-search-talmud-results.png",
-    "headings": ["COURSES", "TRANSCRIPTS", "CONCEPTS"],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\n\n7 results for \"Talmud\"\n\nCOURSES\n(2)\n\nIntroduction to Talmud Study\n\nFundamentals of Talmudic reasoning and argumentation\n\nAdvanced Chavruta Techniques\n\nCollaborative Talmud learning with AI assistance\n",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "headings": [
+      "Welcome to EduSphere"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "notes": [
+      "MISSING: Search input not found",
+      "Search results for \"Talmud\": 1 cards"
     ],
-    "notes": ["Search results for \"Talmud\": 7 cards"],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S1.10 — Student Profile",
-    "url": "http://localhost:5174/profile",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_10-student-profile.png",
     "headings": [
-      "Profile",
-      "Dev User",
-      "PROFILE.ACCOUNTDETAILS",
-      "PROFILE.PERMISSIONS",
-      "PROFILE.LEARNINGOVERVIEW"
+      "Bienvenido a EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nBack\nProfile\nDU\nDev User\n\n@developer\n\nSuper Admin\nPROFILE.ACCOUNTDETAILS\nprofile.fields.username\ndeveloper\nprofile.fields.email\ndev@edusphere.local\nprofile.fields.role\nSuper Admin\nprofile.fields.tenant",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenido a EduSphere\n\nPlataforma educativa de grafos de conocimiento\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Header/nav: VISIBLE",
-      "Profile heading: VISIBLE",
+      "Header/nav: MISSING",
+      "Profile heading: MISSING",
       "Student email visible: NO"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S1.11 — UserMenu & Logout",
-    "url": "http://localhost:5174/dashboard",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_11b-after-logout.png",
     "headings": [
-      "AI Learning Assistant",
-      "Dashboard",
-      "Instructor Tools\nSUPER ADMIN",
-      "Courses Enrolled",
-      "Study Time"
+      "Bienvenue sur EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n06:35 PM\n\nWhat's the relationship between free will and div",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenue sur EduSphere\n\nPlateforme éducative en graphes de connaissances\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Dropdown menu: VISIBLE",
-      "Menu items: Profile, Settings, Log out",
-      "After logout URL: http://localhost:5174/dashboard",
-      "Redirected to login: false"
+      "Header buttons: []",
+      "MISSING: UserMenu button not found"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S2.01 — Instructor Dashboard",
-    "url": "http://localhost:5174/dashboard",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S2_01-instructor-dashboard.png",
     "headings": [
-      "AI Learning Assistant",
-      "Dashboard",
-      "Instructor Tools\nSUPER ADMIN",
-      "Courses Enrolled",
-      "Study Time"
+      "Bienvenue sur EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n06:35 PM\n\nWhat's the relationship between free will and div",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenue sur EduSphere\n\nPlateforme éducative en graphes de connaissances\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Dashboard heading: VISIBLE",
+      "Dashboard heading: MISSING",
       "Create Course button (instructor feature): NOT VISIBLE",
       "Manage button: NOT VISIBLE",
-      "Instructor role shown: true"
+      "Instructor role shown: false"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S2.02 — Instructor Courses",
-    "url": "http://localhost:5174/courses",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S2_02-instructor-courses.png",
     "headings": [
-      "Courses",
-      "Introduction to Talmud Study",
-      "Advanced Chavruta Techniques",
-      "Knowledge Graph Navigation",
-      "Jewish Philosophy: Rambam & Ramban"
+      "ברוכים הבאים ל-EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\n(current page)\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\n[Network] Failed to fetch — [Network] Failed to fetch — showing cached data.\nCourses\n\nExplore our collection of courses and start your learning journey\n\nNew Course\n📚\nOpen\nIntroduction t",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nברוכים הבאים ל-EduSphere\n\nפלטפורמת לימוד גרף ידע\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Courses heading: VISIBLE",
-      "Create/New Course button: VISIBLE (instructor feature)",
-      "Edit button on course: VISIBLE (instructor feature)"
+      "Courses heading: MISSING",
+      "Create/New Course button: NOT VISIBLE",
+      "Edit button on course: NOT VISIBLE"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S3.01 — Super Admin Dashboard",
-    "url": "http://localhost:5174/dashboard",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S3_01-admin-dashboard.png",
     "headings": [
-      "AI Learning Assistant",
-      "Dashboard",
-      "Instructor Tools\nSUPER ADMIN",
-      "Courses Enrolled",
-      "Study Time"
+      "ברוכים הבאים ל-EduSphere"
     ],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\nAgents\nChavruta\nDashboard\n(current page)\nNew Course\nSearch...\n⌘K\nDU\nDev\nAI Learning Assistant\nSelect Agent:\n🗣️\nChavruta\nDebate Partner - Challenges your thinking through dialectical questioning\nYou\n06:36 PM\n\nWhat's the relationship between free will and div",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
-    ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nברוכים הבאים ל-EduSphere\n\nפלטפורמת לימוד גרף ידע\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "Dashboard heading: VISIBLE",
+      "Dashboard heading: MISSING",
       "Admin-specific content: VISIBLE",
-      "Nav items: Learn, Courses, Graph, Annotations, Agents, Chavruta, Dashboard\n(current page), New Course",
+      "Nav items: ",
       "Admin nav link: NOT VISIBLE"
     ],
-    "loadedOk": true
+    "loadedOk": false
   },
   {
     "label": "S3.02 — Super Admin Route Check",
-    "url": "http://localhost:5174/annotations",
+    "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S3_02-admin-routes.png",
-    "headings": ["Annotations"],
-    "bodySnippet": "EduSphere\nLearn\nCourses\nGraph\nAnnotations\n(current page)\nAgents\nChavruta\nDashboard\nNew Course\nSearch...\n⌘K\nDU\nDev\nFailed to load annotations\nAnnotations\n\n0 notes\n\nSort:\nBy time\nBy layer\n\n🔒\n\n0\n\nPersonal\n\n👥\n\n0\n\nShared\n\n🎓\n\n0\n\nInstructor\n\n🤖\n\n0\n\nAI\n\nAll (0)\n🔒 Personal (0)\n👥 Shared (0)\n🎓 Instructor",
-    "consoleErrors": [
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
-      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    "headings": [
+      "Bienvenido a EduSphere"
     ],
-    "networkErrors": [
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_ABORTED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_ABORTED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_ABORTED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_ABORTED)",
-      "FAILED: http://localhost:4000/graphql (net::ERR_CONNECTION_REFUSED)"
-    ],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenido a EduSphere\n\nPlataforma educativa de grafos de conocimiento\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [],
+    "networkErrors": [],
     "notes": [
-      "/dashboard: finalURL=http://localhost:5174/dashboard crashed=false",
-      "/courses: finalURL=http://localhost:5174/courses crashed=false",
-      "/agents: finalURL=http://localhost:5174/agents crashed=false",
-      "/search: finalURL=http://localhost:5174/search crashed=false",
-      "/profile: finalURL=http://localhost:5174/profile crashed=false",
-      "/annotations: finalURL=http://localhost:5174/annotations crashed=false"
+      "/dashboard: finalURL=http://localhost:5176/login crashed=false",
+      "/courses: finalURL=http://localhost:5176/login crashed=false",
+      "/agents: finalURL=http://localhost:5176/login crashed=false",
+      "/search: finalURL=http://localhost:5176/login crashed=false",
+      "/profile: finalURL=http://localhost:5176/login crashed=false",
+      "/annotations: finalURL=http://localhost:5176/login crashed=false"
     ],
     "loadedOk": true
   }
