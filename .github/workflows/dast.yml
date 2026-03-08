@@ -1,0 +1,105 @@
+name: DAST — OWASP ZAP Baseline Scan
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'   # Weekly Sunday 02:00 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/gateway/**'
+      - 'apps/subgraph-*/**'
+
+jobs:
+  zap-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: ankane/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: edusphere_test
+        ports:
+          - '5432:5432'
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      nats:
+        image: nats:2.10-alpine
+        ports:
+          - '4222:4222'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: '10'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run database migrations
+        run: pnpm --filter @edusphere/db migrate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/edusphere_test
+
+      - name: Start subgraphs in background
+        run: |
+          pnpm turbo dev --filter='@edusphere/subgraph-core' &
+          pnpm turbo dev --filter='@edusphere/subgraph-content' &
+          sleep 25
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/edusphere_test
+          NATS_URL: nats://localhost:4222
+          NODE_ENV: test
+
+      - name: Start gateway in background
+        run: |
+          pnpm --filter @edusphere/gateway dev &
+          sleep 15
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/edusphere_test
+          NATS_URL: nats://localhost:4222
+          SUBGRAPH_CORE_URL: http://localhost:4001/graphql
+          SUBGRAPH_CONTENT_URL: http://localhost:4002/graphql
+          SUBGRAPH_ANNOTATION_URL: http://localhost:4003/graphql
+          SUBGRAPH_COLLABORATION_URL: http://localhost:4004/graphql
+          SUBGRAPH_AGENT_URL: http://localhost:4005/graphql
+          SUBGRAPH_KNOWLEDGE_URL: http://localhost:4006/graphql
+
+      - name: Verify gateway is responding
+        run: |
+          curl --retry 10 --retry-delay 3 --retry-connrefused \
+            -X POST http://localhost:4000/graphql \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ __typename }"}' \
+            -f -s -o /dev/null
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:4000/graphql'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          fail_action: true
+          allow_issue_writing: false
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-report-${{ github.run_number }}
+          path: |
+            report_html.html
+            report_json.json
+          retention-days: 30

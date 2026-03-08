@@ -3,12 +3,16 @@
     "label": "01 — Login Page",
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\01-login-page.png",
-    "consoleErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
     "consoleWarnings": [
       "🔧 DEV MODE: Running without Keycloak authentication",
       "🔧 DEV MODE: Running without Keycloak authentication"
     ],
-    "networkErrors": [],
+    "networkErrors": [
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "loadedSuccessfully": false,
     "notes": [
       "MISSING: \"Sign In with Keycloak\" button not visible"
@@ -19,7 +23,10 @@
     "url": "",
     "screenshot": "",
     "consoleErrors": [
-      "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "WebSocket connection to 'ws://localhost:4000/graphql' failed: Connection closed before receiving a handshake response"
     ],
     "consoleWarnings": [
       "🔧 DEV MODE: Running without Keycloak authentication",
@@ -28,7 +35,9 @@
       "🔧 DEV MODE: Running without Keycloak authentication"
     ],
     "networkErrors": [
-      "HTTP 400 — http://localhost:4000/graphql"
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED REQUEST — http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
     ],
     "loadedSuccessfully": false,
     "notes": []

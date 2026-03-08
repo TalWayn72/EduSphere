@@ -59,6 +59,9 @@ export * from './live-sessions';
 // Gamification tables (F-011 Badges, Points, Leaderboards)
 export * from './gamification';
 
+// Streaks + Challenges tables (Phase 37)
+export * from './streaks-challenges';
+
 // SCORM tables (F-017)
 export * from './scorm';
 
@@ -165,3 +168,9 @@ export * from './user-xp';
 
 // Phase 36: Course Lesson Builder (WYSIWYG authoring — VIDEO/QUIZ/DISCUSSION/AI_CHAT/SUMMARY steps)
 export * from './course-lesson-builder';
+
+// Phase 37: Team Members — Manager Dashboard
+export * from './team-members';
+
+// Phase 37: Onboarding State
+export * from './onboarding';

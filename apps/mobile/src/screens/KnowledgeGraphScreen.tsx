@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useQuery, gql } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import { DEV_MODE, MOCK_GRAPH_NODES } from '../lib/mock-mobile-data';
 
 const KNOWLEDGE_GRAPH_QUERY = gql`
   query MobileKnowledgeGraph($contentId: ID!) {
@@ -62,12 +61,9 @@ export default function KnowledgeGraphScreen() {
 
   const { data } = useQuery(KNOWLEDGE_GRAPH_QUERY, {
     variables: { contentId: 'content-1' },
-    skip: DEV_MODE,
   });
 
-  const nodes: GraphNode[] = DEV_MODE
-    ? MOCK_GRAPH_NODES
-    : (data?.conceptsForContent?.nodes ?? []);
+  const nodes: GraphNode[] = data?.conceptsForContent?.nodes ?? [];
 
   const filteredNodes = nodes.filter((n) => {
     const matchesSearch =
@@ -116,7 +112,6 @@ export default function KnowledgeGraphScreen() {
       <View style={styles.statsBar}>
         <Text style={styles.statsText}>
           {filteredNodes.length} of {nodes.length} {t('concepts')}
-          {DEV_MODE && ' (mock)'}
         </Text>
       </View>
       <FlatList

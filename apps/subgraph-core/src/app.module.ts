@@ -15,6 +15,8 @@ import { PortalModule } from './portal/portal.module.js';
 import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SavedSearchModule } from './search/saved-search.module.js';
+import { ManagerModule } from './manager/manager.module';
+import { OnboardingModule } from './onboarding/onboarding.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { SavedSearchModule } from './search/saved-search.module.js';
     AdminModule,
     NotificationsModule,
     SavedSearchModule,
+    ManagerModule,
+    OnboardingModule,
   ],
 })
 export class AppModule {}

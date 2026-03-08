@@ -66,6 +66,32 @@ type OpenBadge {
   vcDocument: String!
 }
 
+type GamificationStats {
+  currentStreak: Int!
+  longestStreak: Int!
+  activeChallenges: [UserChallenge!]!
+  leaderboard: [XpLeaderboardEntry!]!
+}
+
+type UserChallenge {
+  challengeId: ID!
+  title: String!
+  description: String!
+  targetValue: Int!
+  currentValue: Int!
+  xpReward: Int!
+  completed: Boolean!
+  endDate: DateTime!
+}
+
+type XpLeaderboardEntry {
+  rank: Int!
+  userId: ID!
+  displayName: String!
+  totalXp: Int!
+  level: Int!
+}
+
 extend type Query {
   myBadges: [UserBadge!]! @authenticated
   leaderboard(limit: Int): [LeaderboardEntry!]! @authenticated
@@ -76,6 +102,8 @@ extend type Query {
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   myOpenBadges: [OpenBadge!]! @authenticated
   verifyOpenBadge(assertionId: ID!): Boolean! @authenticated
+  myGamificationStats: GamificationStats! @authenticated
+  tenantLeaderboard(limit: Int): [XpLeaderboardEntry!]! @authenticated
 }
 
 extend type Mutation {

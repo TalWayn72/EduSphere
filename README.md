@@ -354,8 +354,11 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 32**     | AI subtitle translation                                                                 | 2-3 days   | ✅ Complete |
 | **Phase 33**     | Remote proctoring                                                                       | 2-3 days   | ✅ Complete |
 | **Phase 34**     | 3D Models & Simulations                                                                 | 2-3 days   | ✅ Complete |
+| **Phase 35**     | i18n sync, at-risk analytics, XP foundation, scoring algorithm, pipeline builder        | 3-4 days   | ✅ Complete |
+| **Phase 36**     | AtRisk Analytics, Lesson Pipeline Builder, XP Gamification (commit 09b8690)             | 2-3 days   | ✅ Complete |
+| **Phase 37**     | Recommendation scoring, skill-gap improvements, supergraph sync                         | 1-2 days   | 🟡 In Progress |
 
-**Current Status:** ALL 34 phases complete ✅ — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** ALL 36 phases complete ✅ — Phase 37 in progress. Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -455,7 +458,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **5,655+ tests passing** (web 3731, subgraph-content 1095, security 819, other)  |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **3,174+ tests passing** (core ~664, knowledge ~544, DB ~428, mobile ~218, i18n ~304, security ~928, contract ~88)  |
 | **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (subgraph-core + subgraph-knowledge)    |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |
@@ -464,7 +467,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 | **Federation Tests**    | Vitest                  | `apps/gateway/src/test/federation/*.spec.ts` | ⏳ Planned Phase 7                                 |
 | **Load Tests**          | k6                      | `infrastructure/k6/*.js`                     | ⏳ Planned Phase 7                                 |
 
-**Frontend Unit Test Suites (146 tests, all green):**
+**Test Suites (selected highlights, all green):**
 
 - `Layout.test.tsx` — nav items, logo, UserMenu, role-based links (11 tests) 🆕
 - `Dashboard.test.tsx` — stats cards, loading/error states, AIChatPanel (15 tests) 🆕

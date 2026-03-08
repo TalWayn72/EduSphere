@@ -1,0 +1,24 @@
+type OnboardingState {
+  userId: ID!
+  currentStep: Int!
+  totalSteps: Int!
+  completed: Boolean!
+  skipped: Boolean!
+  role: String!
+  data: JSON
+}
+
+input UpdateOnboardingStepInput {
+  step: Int!
+  data: JSON
+}
+
+extend type Query {
+  myOnboardingState: OnboardingState @authenticated
+}
+
+extend type Mutation {
+  updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState! @authenticated
+  completeOnboarding: OnboardingState! @authenticated
+  skipOnboarding: OnboardingState! @authenticated
+}

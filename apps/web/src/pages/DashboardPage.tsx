@@ -1,6 +1,8 @@
 import { useQuery } from 'urql';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { MY_ONBOARDING_STATE_QUERY } from '@/lib/graphql/onboarding.queries';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Flame, BookOpen, CheckCircle, Zap, Clock, ChevronRight } from 'lucide-react';
 import { getCurrentUser, DEV_MODE } from '@/lib/auth';
@@ -177,6 +179,27 @@ export function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
+  // Onboarding banner state
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
+  const bannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [{ data: onboardingData }] = useQuery({
+    query: MY_ONBOARDING_STATE_QUERY,
+    pause: !mounted,
+  });
+
+  const showOnboardingBanner = !onboardingDismissed
+    && !!onboardingData?.myOnboardingState
+    && !onboardingData.myOnboardingState.completed
+    && !onboardingData.myOnboardingState.skipped;
+
+  // Cleanup banner timer on unmount
+  useEffect(() => {
+    return () => {
+      if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+    };
+  }, []);
+
   // Real query: enrollments — falls back to MOCK_IN_PROGRESS when loading or errored
   const [enrollmentsResult] = useQuery({
     query: MY_ENROLLMENTS_QUERY,
@@ -273,6 +296,35 @@ export function DashboardPage() {
   return (
     <Layout>
       <div className="space-y-8 max-w-screen-xl mx-auto">
+
+        {/* Onboarding banner */}
+        {showOnboardingBanner && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex items-center justify-between rounded-lg border border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-950/30 px-4 py-3"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-lg" aria-hidden>📚</span>
+              <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                Complete your profile setup to get personalized recommendations
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link to="/onboarding">
+                <Button size="sm" variant="default" className="text-xs">Continue Setup</Button>
+              </Link>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-xs text-muted-foreground"
+                onClick={() => setOnboardingDismissed(true)}
+              >
+                Dismiss
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Section 1 — Welcome Hero */}
         <section aria-labelledby="welcome-heading">

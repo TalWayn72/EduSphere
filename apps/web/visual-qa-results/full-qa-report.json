@@ -7,8 +7,12 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "MISSING: \"Sign In with Keycloak\" button"
     ],
@@ -22,8 +26,12 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "FAILURE: Still on login page — Keycloak auth failed or redirect broken"
     ],
@@ -37,8 +45,14 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Stat card \"Study Time\": MISSING",
       "Stat card \"Concepts Mastered\": MISSING",
@@ -57,8 +71,14 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Course cards visible: 1",
       "Enroll button visible: false",
@@ -74,8 +94,14 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Video player: MISSING",
       "Transcript panel: MISSING",
@@ -91,8 +117,14 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Agent mode \"Chavruta Debate\": MISSING",
       "Agent mode \"Quiz Master\": MISSING",
@@ -112,8 +144,16 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Canvas element: MISSING",
       "SVG element: VISIBLE",
@@ -129,8 +169,14 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Header/nav visible: false"
     ],
@@ -144,8 +190,14 @@
       "Welcome to EduSphere"
     ],
     "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "MISSING: Search input not found",
       "Search results for \"Talmud\": 1 cards"
@@ -157,11 +209,17 @@
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_10-student-profile.png",
     "headings": [
-      "Bienvenido a EduSphere"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenido a EduSphere\n\nPlataforma educativa de grafos de conocimiento\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Header/nav: MISSING",
       "Profile heading: MISSING",
@@ -174,11 +232,17 @@
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S1_11b-after-logout.png",
     "headings": [
-      "Bienvenue sur EduSphere"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenue sur EduSphere\n\nPlateforme éducative en graphes de connaissances\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Header buttons: []",
       "MISSING: UserMenu button not found"
@@ -190,11 +254,17 @@
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S2_01-instructor-dashboard.png",
     "headings": [
-      "Bienvenue sur EduSphere"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenue sur EduSphere\n\nPlateforme éducative en graphes de connaissances\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Dashboard heading: MISSING",
       "Create Course button (instructor feature): NOT VISIBLE",
@@ -208,11 +278,17 @@
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S2_02-instructor-courses.png",
     "headings": [
-      "ברוכים הבאים ל-EduSphere"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "Skip to main content\nSkip to navigation\nברוכים הבאים ל-EduSphere\n\nפלטפורמת לימוד גרף ידע\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Courses heading: MISSING",
       "Create/New Course button: NOT VISIBLE",
@@ -225,11 +301,17 @@
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S3_01-admin-dashboard.png",
     "headings": [
-      "ברוכים הבאים ל-EduSphere"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "Skip to main content\nSkip to navigation\nברוכים הבאים ל-EduSphere\n\nפלטפורמת לימוד גרף ידע\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "Dashboard heading: MISSING",
       "Admin-specific content: VISIBLE",
@@ -243,11 +325,27 @@
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\S3_02-admin-routes.png",
     "headings": [
-      "Bienvenido a EduSphere"
+      "Welcome to EduSphere"
     ],
-    "bodySnippet": "Skip to main content\nSkip to navigation\nBienvenido a EduSphere\n\nPlataforma educativa de grafos de conocimiento\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
-    "consoleErrors": [],
-    "networkErrors": [],
+    "bodySnippet": "Skip to main content\nSkip to navigation\nWelcome to EduSphere\n\nKnowledge Graph Educational Platform\n\nDev Mode — Keycloak bypassed. Signing in as super.admin@edusphere.dev (SUPER_ADMIN).\nSign In (Dev Mode)",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_EMPTY_RESPONSE"
+    ],
+    "networkErrors": [
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)",
+      "FAILED: http://localhost:4000/graphql (net::ERR_EMPTY_RESPONSE)"
+    ],
     "notes": [
       "/dashboard: finalURL=http://localhost:5176/login crashed=false",
       "/courses: finalURL=http://localhost:5176/login crashed=false",

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { useQuery } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
@@ -60,10 +60,13 @@ function formatPrice(cents: number, currency: string): string {
 }
 
 export function MarketplacePage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const { data, isLoading, error } = useQuery<ListingsData>({
     queryKey: ['marketplace-listings'],
     queryFn: () => request<ListingsData>(GRAPHQL_URL, COURSE_LISTINGS_QUERY),
-    enabled: false, // courseListings not in live gateway
+    enabled: mounted,
   });
 
   if (isLoading) {

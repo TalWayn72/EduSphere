@@ -491,3 +491,118 @@ describe('G-15: analytics.graphql (Phase 36) -- listAtRiskLearners requires ORG_
     expect(b).not.toContain('INSTRUCTOR');
   });
 });
+
+// ─── Phase 37: Manager Dashboard authorization ────────────────────────────────
+
+describe('G-15: manager.graphql (Phase 37) -- myTeamOverview requires MANAGER/ORG_ADMIN/SUPER_ADMIN', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-core/src/manager/manager.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('myTeamOverview query is present', () => {
+    expect(schema).toContain('myTeamOverview');
+  });
+
+  it('myTeamOverview requires @authenticated directive', () => {
+    const start = schema.indexOf('myTeamOverview');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('myTeamOverview requires @requiresRole directive', () => {
+    const start = schema.indexOf('myTeamOverview');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@requiresRole');
+  });
+
+  it('myTeamOverview restricts to MANAGER, ORG_ADMIN, SUPER_ADMIN', () => {
+    const start = schema.indexOf('myTeamOverview');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('ORG_ADMIN');
+    expect(b).toContain('SUPER_ADMIN');
+  });
+
+  it('STUDENT is NOT listed in myTeamOverview roles', () => {
+    const start = schema.indexOf('myTeamOverview');
+    const end = schema.indexOf('myTeamMemberProgress', start);
+    const b = schema.slice(start, end > start ? end : start + 200);
+    expect(b).not.toContain('STUDENT');
+  });
+
+  it('addTeamMember mutation is present', () => {
+    expect(schema).toContain('addTeamMember');
+  });
+
+  it('addTeamMember requires @authenticated directive', () => {
+    const start = schema.indexOf('addTeamMember');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('addTeamMember requires @requiresRole with ORG_ADMIN or SUPER_ADMIN', () => {
+    const start = schema.indexOf('addTeamMember');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@requiresRole');
+    expect(b).toContain('ORG_ADMIN');
+  });
+
+  it('STUDENT is NOT listed in addTeamMember roles', () => {
+    const start = schema.indexOf('addTeamMember');
+    const end = schema.indexOf('removeTeamMember', start);
+    const b = schema.slice(start, end > start ? end : start + 200);
+    expect(b).not.toContain('STUDENT');
+  });
+});
+
+// ─── Phase 37: Onboarding authorization ──────────────────────────────────────
+
+describe('G-15: onboarding.graphql (Phase 37) -- onboarding mutations require @authenticated', () => {
+  let schema: string;
+  beforeAll(() => {
+    schema = read('apps/subgraph-core/src/onboarding/onboarding.graphql');
+  });
+
+  it('schema file exists and is non-empty', () => {
+    expect(schema.length).toBeGreaterThan(0);
+  });
+
+  it('skipOnboarding mutation is present', () => {
+    expect(schema).toContain('skipOnboarding');
+  });
+
+  it('skipOnboarding requires @authenticated directive', () => {
+    const start = schema.indexOf('skipOnboarding');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('skipOnboarding is self-service: does NOT require @requiresRole', () => {
+    const start = schema.indexOf('skipOnboarding');
+    const b = schema.slice(start, start + 200);
+    // Onboarding skip is self-service — no elevated role required
+    expect(b).not.toContain('@requiresRole');
+  });
+
+  it('updateOnboardingStep requires @authenticated directive', () => {
+    const start = schema.indexOf('updateOnboardingStep');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('completeOnboarding requires @authenticated directive', () => {
+    const start = schema.indexOf('completeOnboarding');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+
+  it('myOnboardingState query requires @authenticated', () => {
+    const start = schema.indexOf('myOnboardingState');
+    const b = schema.slice(start, start + 200);
+    expect(b).toContain('@authenticated');
+  });
+});

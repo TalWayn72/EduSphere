@@ -1,0 +1,28 @@
+type TeamOverview {
+  memberCount: Int!
+  avgCompletionPct: Float!
+  avgXpThisWeek: Float!
+  atRiskCount: Int!
+  topCourseTitle: String
+}
+
+type TeamMemberProgress {
+  userId: ID!
+  displayName: String!
+  coursesEnrolled: Int!
+  avgCompletionPct: Float!
+  totalXp: Int!
+  level: Int!
+  lastActiveAt: DateTime
+  isAtRisk: Boolean!
+}
+
+extend type Query {
+  myTeamOverview: TeamOverview! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  myTeamMemberProgress: [TeamMemberProgress!]! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+}
+
+extend type Mutation {
+  addTeamMember(memberId: ID!): Boolean! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  removeTeamMember(memberId: ID!): Boolean! @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+}

@@ -5,10 +5,6 @@
       "origin": "http://localhost:5176",
       "localStorage": [
         {
-          "name": "edusphere_locale",
-          "value": "es"
-        },
-        {
           "name": "edusphere-user-prefs",
           "value": "{\"mode\":\"system\",\"fontSize\":\"md\",\"readingMode\":false,\"motionPreference\":\"full\",\"contrastMode\":\"normal\"}"
         }

@@ -1,0 +1,4 @@
+10021	IGNORE	(X-Content-Type-Options Header Missing) — configured at nginx/gateway level
+10038	IGNORE	(Content Security Policy Header Not Set) — managed by nginx in production
+10027	IGNORE	(Information Disclosure - Suspicious Comments) — dev comments, not production
+10035	IGNORE	(Strict-Transport-Security Header Not Set) — HTTP-only in local CI test environment

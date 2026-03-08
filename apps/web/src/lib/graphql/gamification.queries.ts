@@ -47,3 +47,41 @@ export const MY_TOTAL_POINTS_QUERY = gql`
     myTotalPoints
   }
 `;
+
+export const MY_GAMIFICATION_STATS_QUERY = gql`
+  query MyGamificationStats {
+    myGamificationStats {
+      currentStreak
+      longestStreak
+      activeChallenges {
+        challengeId
+        title
+        description
+        targetValue
+        currentValue
+        xpReward
+        completed
+        endDate
+      }
+      leaderboard {
+        rank
+        userId
+        displayName
+        totalXp
+        level
+      }
+    }
+  }
+`;
+
+export const TENANT_LEADERBOARD_QUERY = gql`
+  query TenantLeaderboard($limit: Int) {
+    tenantLeaderboard(limit: $limit) {
+      rank
+      userId
+      displayName
+      totalXp
+      level
+    }
+  }
+`;

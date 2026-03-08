@@ -2,6 +2,9 @@ import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException } from '@nestjs/common';
 import { BadgeService } from './badge.service.js';
 import { OpenBadgesService } from './open-badges.service.js';
+import { StreakService } from './streak.service.js';
+import { ChallengesService } from './challenges.service.js';
+import { LeaderboardService } from './leaderboard.service.js';
 import type { AuthContext } from '@edusphere/auth';
 
 interface GraphQLContext {
@@ -13,7 +16,10 @@ interface GraphQLContext {
 export class GamificationResolver {
   constructor(
     private readonly badgeService: BadgeService,
-    private readonly openBadgesService: OpenBadgesService
+    private readonly openBadgesService: OpenBadgesService,
+    private readonly streakService: StreakService,
+    private readonly challengesService: ChallengesService,
+    private readonly leaderboardService: LeaderboardService
   ) {}
 
   private requireAuth(ctx: GraphQLContext) {
@@ -150,5 +156,41 @@ export class GamificationResolver {
       tenantId,
       reason
     );
+  }
+
+  // ── Streaks + Challenges + XP Leaderboard ────────────────────────────────
+
+  @Query('myGamificationStats')
+  async getMyGamificationStats(@Context() ctx: GraphQLContext) {
+    const { userId, tenantId } = this.requireAuth(ctx);
+    const [streak, challenges, leaderboard] = await Promise.all([
+      this.streakService.getStreak(userId, tenantId),
+      this.challengesService.getUserChallenges(userId, tenantId),
+      this.leaderboardService.getLeaderboard(tenantId, 10),
+    ]);
+    return {
+      currentStreak: streak.currentStreak,
+      longestStreak: streak.longestStreak,
+      activeChallenges: challenges.map((c) => ({
+        challengeId: c.id,
+        title: c.title,
+        description: c.description,
+        targetValue: c.targetValue,
+        currentValue: c.currentValue,
+        xpReward: c.xpReward,
+        completed: c.completed,
+        endDate: c.endDate,
+      })),
+      leaderboard,
+    };
+  }
+
+  @Query('tenantLeaderboard')
+  async getTenantLeaderboard(
+    @Args('limit') limit: number | undefined,
+    @Context() ctx: GraphQLContext
+  ) {
+    const { tenantId } = this.requireAuth(ctx);
+    return this.leaderboardService.getLeaderboard(tenantId, limit ?? 10);
   }
 }

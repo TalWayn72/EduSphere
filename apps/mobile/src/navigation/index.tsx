@@ -21,8 +21,11 @@ import SettingsScreen from '../screens/SettingsScreen';
 import { LiveSessionsScreen } from '../screens/LiveSessionsScreen';
 import { SkillTreeScreen } from '../screens/SkillTreeScreen';
 import { ModelViewerScreen } from '../screens/ModelViewerScreen';
+import GamificationScreen from '../screens/GamificationScreen';
+import { OnboardingScreen } from '../screens/OnboardingScreen';
 
 export type RootStackParamList = {
+  Onboarding: undefined;
   Main: undefined;
   CourseDetail: { courseId: string };
   CourseViewer: { courseId: string };
@@ -39,6 +42,7 @@ export type MainTabParamList = {
   Discussions: undefined;
   AITutor: undefined;
   KnowledgeGraph: undefined;
+  Gamification: undefined;
   Badges: undefined;
   Profile: undefined;
 };
@@ -64,6 +68,8 @@ function MainTabs() {
             iconName = focused ? 'bulb' : 'bulb-outline';
           } else if (route.name === 'KnowledgeGraph') {
             iconName = focused ? 'git-network' : 'git-network-outline';
+          } else if (route.name === 'Gamification') {
+            iconName = focused ? 'trophy' : 'trophy-outline';
           } else if (route.name === 'Badges') {
             iconName = focused ? 'ribbon' : 'ribbon-outline';
           } else {
@@ -102,6 +108,11 @@ function MainTabs() {
         options={{ title: t('graph') }}
       />
       <Tab.Screen
+        name="Gamification"
+        component={GamificationScreen}
+        options={{ title: 'Gamification' }}
+      />
+      <Tab.Screen
         name="Badges"
         component={MyBadgesScreen}
         options={{ title: t('badges', { defaultValue: 'Badges' }) }}
@@ -120,6 +131,11 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Main"
           component={MainTabs}

@@ -5703,3 +5703,81 @@ Both subjects use the existing `EDUSPHERE` NATS stream. Stream retention rules (
 
 *Section 23 reflects commit range for Phase 29 Visual Anchoring (2026-03-08).*
 *All mutations require `@authenticated`. Scope and role guards as specified per resolver above.*
+
+---
+
+## Section 24 — Phase 36: AtRisk Analytics, Lesson Pipeline, XP Gamification (March 2026)
+
+### New Query: listAtRiskLearners
+Returns learners with course progress below threshold AND no activity in the last 14 days.
+- **Auth:** `@authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])`
+- **Returns:** `[AtRiskLearner!]!`
+
+### New Queries: lessonPipeline / myCoursePipelines
+- `lessonPipeline(id: ID!): CourseLessonPlan` — fetch single pipeline by ID. Auth: `@authenticated`
+- `myCoursePipelines(courseId: ID!): [CourseLessonPlan!]!` — all pipelines for a course. Auth: `@authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])`
+
+### New Mutations: Lesson Pipeline Builder
+- `createLessonPipeline(input: CreateLessonPlanInput!): CourseLessonPlan!`
+- `addLessonStep(input: AddLessonStepInput!): CourseLessonPlan!`
+- `reorderLessonSteps(pipelineId: ID!, stepIds: [ID!]!): CourseLessonPlan!`
+- `publishLessonPipeline(id: ID!): CourseLessonPlan!`
+- All mutations: `@authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])`
+
+### New Types (Phase 36)
+
+#### AtRiskLearner
+```graphql
+type AtRiskLearner {
+  userId: ID!
+  displayName: String!       # GDPR: no raw email
+  courseId: ID!
+  courseTitle: String!
+  daysSinceActive: Int!
+  progressPct: Float!
+}
+```
+
+#### CourseLessonPlan
+```graphql
+type CourseLessonPlan {
+  id: ID!
+  courseId: ID!
+  title: String!
+  status: LessonPlanStatus!  # DRAFT | PUBLISHED | ARCHIVED
+  steps: [CourseLessonStep!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CourseLessonStep {
+  id: ID!
+  stepType: LessonStepType!  # VIDEO | QUIZ | DISCUSSION | AI_CHAT | SUMMARY
+  stepOrder: Int!
+  config: JSON!
+}
+
+enum LessonPlanStatus { DRAFT PUBLISHED ARCHIVED }
+enum LessonStepType { VIDEO QUIZ DISCUSSION AI_CHAT SUMMARY }
+```
+
+### UserStats XP Extensions (Phase 36)
+`UserStats` type now includes two additional fields:
+```graphql
+totalXp: Int!   # cumulative XP earned by user
+level: Int!     # computed: max(1, floor(sqrt(totalXp/100))+1)
+```
+
+**XP Award Table:**
+| Event | XP |
+|-------|----|
+| LESSON_COMPLETED | 10 |
+| QUIZ_PASSED | 25 |
+| STREAK_BONUS | 5 |
+| COURSE_COMPLETED | 100 |
+
+**Level Formula:** `level = max(1, floor(sqrt(totalXp / 100)) + 1)`
+- Level 1: 0–99 XP
+- Level 2: 100–399 XP
+- Level 5: 1600–2499 XP
+- Level 10: 8100–9999 XP

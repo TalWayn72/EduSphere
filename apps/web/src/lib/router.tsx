@@ -351,6 +351,19 @@ const LessonPipelineBuilderPage = lazy(() =>
     default: m.LessonPipelineBuilderPage,
   }))
 );
+const GamificationPage = lazy(() =>
+  import('@/pages/GamificationPage').then((m) => ({
+    default: m.GamificationPage,
+  }))
+);
+const ManagerDashboardPage = lazy(() =>
+  import('@/pages/ManagerDashboardPage').then((m) => ({
+    default: m.ManagerDashboardPage,
+  }))
+);
+const OnboardingPage = lazy(() =>
+  import('@/pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -635,6 +648,10 @@ export const router = createBrowserRouter([
     element: guarded(<AgentStudioPage />),
   },
   {
+    path: '/gamification',
+    element: guarded(<GamificationPage />),
+  },
+  {
     path: '/my-badges',
     element: guarded(<MyOpenBadgesPage />),
   },
@@ -712,6 +729,16 @@ export const router = createBrowserRouter([
   { path: '/admin/bi-export', element: guarded(<BiExportSettingsPage />) },
   { path: '/admin/cpd', element: guarded(<CpdSettingsPage />) },
   { path: '/admin/analytics', element: guarded(<TenantAnalyticsPage />) },
+  {
+    // Manager Dashboard — MANAGER / ORG_ADMIN / SUPER_ADMIN only
+    path: '/manager',
+    element: guarded(<ManagerDashboardPage />),
+  },
+  {
+    // Onboarding wizard — shown to new users on first login
+    path: '/onboarding',
+    element: guarded(<OnboardingPage />),
+  },
   {
     path: '/',
     element: <SmartRoot />,

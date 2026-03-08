@@ -378,6 +378,9 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   listAtRiskLearners(threshold: Int) : [AtRiskLearner!]! @join__field(graph: CONTENT)  @authenticated
   lessonPipeline(id: ID!) : CourseLessonPlan @join__field(graph: CONTENT)  @authenticated
   myCoursePipelines(courseId: ID!) : [CourseLessonPlan!]! @join__field(graph: CONTENT)  @authenticated
+  myTeamOverview: TeamOverview! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  myTeamMemberProgress: [TeamMemberProgress!]! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  myOnboardingState: OnboardingState @join__field(graph: CORE) @authenticated
 }
 
 type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)  {
@@ -552,6 +555,12 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   addLessonStep(input: AddLessonStepInput!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
   reorderLessonSteps(planId: ID!, stepIds: [ID!]!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
   publishLessonPlan(id: ID!) : CourseLessonPlan! @join__field(graph: CONTENT)  @authenticated
+  courseListings(tenantId: ID!, limit: Int, offset: Int, filters: CourseListingFiltersInput): CourseListingConnection! @join__field(graph: CONTENT) @authenticated
+  addTeamMember(memberId: ID!): Boolean! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  removeTeamMember(memberId: ID!): Boolean! @join__field(graph: CORE) @authenticated @requiresRole(roles: [MANAGER, ORG_ADMIN, SUPER_ADMIN])
+  updateOnboardingStep(input: UpdateOnboardingStepInput!): OnboardingState! @join__field(graph: CORE) @authenticated
+  completeOnboarding: OnboardingState! @join__field(graph: CORE) @authenticated
+  skipOnboarding: OnboardingState! @join__field(graph: CORE) @authenticated
 }
 
 type Subscription @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE)  {
@@ -1795,4 +1804,82 @@ input AddLessonStepInput @join__type(graph: CONTENT)  {
   planId: ID!
   stepType: LessonStepType!
   config: JSON!
+}
+
+type CourseListingConnection
+  @join__type(graph: CONTENT)
+{
+  edges: [CourseListingEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CourseListingEdge
+  @join__type(graph: CONTENT)
+{
+  node: CourseListing!
+  cursor: String!
+}
+
+type CourseListing
+  @join__type(graph: CONTENT)
+{
+  id: ID!
+  title: String!
+  description: String
+  instructorName: String!
+  thumbnailUrl: String
+  price: Float
+  currency: String
+  tags: [String!]!
+  enrollmentCount: Int!
+  rating: Float
+  totalLessons: Int!
+}
+
+input CourseListingFiltersInput @join__type(graph: CONTENT) {
+  tags: [String!]
+  priceMax: Float
+  instructorName: String
+  search: String
+}
+
+type TeamOverview
+  @join__type(graph: CORE)
+{
+  memberCount: Int!
+  avgCompletionPct: Float!
+  avgXpThisWeek: Float!
+  atRiskCount: Int!
+  topCourseTitle: String
+}
+
+type TeamMemberProgress
+  @join__type(graph: CORE)
+{
+  userId: ID!
+  displayName: String!
+  coursesEnrolled: Int!
+  avgCompletionPct: Float!
+  totalXp: Int!
+  level: Int!
+  lastActiveAt: DateTime
+  isAtRisk: Boolean!
+}
+
+type OnboardingState
+  @join__type(graph: CORE)
+{
+  userId: ID!
+  currentStep: Int!
+  totalSteps: Int!
+  completed: Boolean!
+  skipped: Boolean!
+  role: String!
+  data: JSON
+}
+
+input UpdateOnboardingStepInput {
+  step: Int!
+  data: JSON
 }
