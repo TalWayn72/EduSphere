@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
@@ -13,10 +13,12 @@ import { SelectionCommentButton } from '@/components/annotation/SelectionComment
 import { CommentForm } from '@/components/annotation/CommentForm';
 import { useDocumentAnnotations } from '@/hooks/useDocumentAnnotations';
 import { useDocumentUIStore } from '@/lib/store';
+import { useAuthRole } from '@/hooks/useAuthRole';
 import { DocumentToolbar } from '@/pages/DocumentAnnotationPage.toolbar';
 import { CONTENT_ITEM_QUERY } from '@/lib/graphql/content.queries';
 import { AlertCircle } from 'lucide-react';
 import type { AnnotationLayer } from '@/types/annotations';
+import { RichDocumentPageAnchors } from '@/pages/RichDocumentPageAnchors';
 
 interface ContentItemResult {
   contentItem: {
@@ -45,6 +47,9 @@ function SkeletonBlock() {
 
 export function RichDocumentPage() {
   const { contentId = '' } = useParams<{ contentId: string }>();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const role = useAuthRole();
+  const isInstructor = role === 'INSTRUCTOR' || role === 'ORG_ADMIN' || role === 'SUPER_ADMIN';
 
   const [result] = useQuery<ContentItemResult>({
     query: CONTENT_ITEM_QUERY,
@@ -144,59 +149,68 @@ export function RichDocumentPage() {
         )}
 
         {item && (
-          <ResizablePanelGroup
-            orientation="horizontal"
-            className="flex-1 min-h-0"
+          <RichDocumentPageAnchors
+            assetId={contentId}
+            isInstructor={isInstructor}
+            scrollContainerRef={scrollContainerRef}
           >
-            {/* Document panel */}
-            <ResizablePanel
-              defaultSize={100 - annotationPanelWidth}
-              minSize={40}
+            <ResizablePanelGroup
+              orientation="horizontal"
+              className="flex-1 min-h-0"
             >
-              <div className="h-full overflow-y-auto px-6 py-4">
-                {item.contentType === 'RICH_DOCUMENT' && item.content ? (
-                  <div
-                    style={{
-                      transform: `scale(${documentZoom})`,
-                      transformOrigin: 'top left',
-                      width: `${Math.round((1 / documentZoom) * 100)}%`,
-                    }}
-                  >
-                    <AnnotatedDocumentViewer
-                      content={item.content}
-                      annotations={textAnnotations}
-                      focusedAnnotationId={focusedAnnotationId}
-                      onAnnotationClick={setFocusedAnnotationId}
-                      onSelectionChange={handleSelectionChange}
-                    />
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">
-                    No content available.
-                  </p>
-                )}
-              </div>
-            </ResizablePanel>
+              {/* Document panel */}
+              <ResizablePanel
+                defaultSize={100 - annotationPanelWidth}
+                minSize={40}
+              >
+                <div
+                  ref={scrollContainerRef}
+                  className="h-full overflow-y-auto px-6 py-4"
+                >
+                  {item.contentType === 'RICH_DOCUMENT' && item.content ? (
+                    <div
+                      style={{
+                        transform: `scale(${documentZoom})`,
+                        transformOrigin: 'top left',
+                        width: `${Math.round((1 / documentZoom) * 100)}%`,
+                      }}
+                    >
+                      <AnnotatedDocumentViewer
+                        content={item.content}
+                        annotations={textAnnotations}
+                        focusedAnnotationId={focusedAnnotationId}
+                        onAnnotationClick={setFocusedAnnotationId}
+                        onSelectionChange={handleSelectionChange}
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">
+                      No content available.
+                    </p>
+                  )}
+                </div>
+              </ResizablePanel>
 
-            <ResizableHandle withHandle />
+              <ResizableHandle withHandle />
 
-            {/* Comment panel */}
-            <ResizablePanel
-              defaultSize={annotationPanelWidth}
-              minSize={20}
-              maxSize={50}
-            >
-              <WordCommentPanel
-                annotations={allAnnotations}
-                focusedAnnotationId={focusedAnnotationId}
-                onFocusAnnotation={setFocusedAnnotationId}
-                onAddComment={handleOpenCommentForm}
-                onFlashcard={createFlashcard}
-                onPromote={promoteAnnotation}
-                selectionActive={!!selectionPosition && !pendingForm}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
+              {/* Comment panel */}
+              <ResizablePanel
+                defaultSize={annotationPanelWidth}
+                minSize={20}
+                maxSize={50}
+              >
+                <WordCommentPanel
+                  annotations={allAnnotations}
+                  focusedAnnotationId={focusedAnnotationId}
+                  onFocusAnnotation={setFocusedAnnotationId}
+                  onAddComment={handleOpenCommentForm}
+                  onFlashcard={createFlashcard}
+                  onPromote={promoteAnnotation}
+                  selectionActive={!!selectionPosition && !pendingForm}
+                />
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </RichDocumentPageAnchors>
         )}
       </div>
 

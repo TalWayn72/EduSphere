@@ -148,13 +148,57 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
     setErrorMessage(null);
   }, []);
 
+  // Derive accessible status message
+  const politeStatusMessage =
+    status === 'uploading'
+      ? 'מעלה קובץ…'
+      : status === 'scanning'
+        ? 'סורק אבטחה…'
+        : status === 'success'
+          ? 'התמונה הועלתה ומוכנה לשימוש.'
+          : '';
+
+  const assertiveStatusMessage =
+    status === 'infected' ? (errorMessage ?? 'הקובץ נדחה על ידי סריקת אבטחה.') : '';
+
+  const errorStatusMessage =
+    status === 'error' ? (errorMessage ?? 'שגיאה בהעלאה.') : '';
+
   return (
     <div data-testid="asset-uploader" className="w-full">
+      {/* Polite announcements: upload/scan progress + success */}
+      <div
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="uploader-polite-announce"
+      >
+        {politeStatusMessage}
+      </div>
+      {/* Assertive announcement: security infection (critical) */}
+      <div
+        className="sr-only"
+        aria-live="assertive"
+        aria-atomic="true"
+        data-testid="uploader-assertive-announce"
+      >
+        {assertiveStatusMessage}
+      </div>
+      {/* Error announcement */}
+      <div
+        className="sr-only"
+        aria-live="assertive"
+        aria-atomic="true"
+        data-testid="uploader-error-announce"
+      >
+        {errorStatusMessage}
+      </div>
+
       {status === 'idle' && (
         <div
           role="button"
           tabIndex={0}
-          aria-label="Upload image"
+          aria-label="העלה תמונה — גרור לכאן או לחץ לבחירה"
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -168,7 +212,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
               : 'border-muted-foreground/30 text-muted-foreground hover:border-primary/50 hover:text-foreground',
           ].join(' ')}
         >
-          <Upload className="h-8 w-8" />
+          <Upload className="h-8 w-8" aria-hidden="true" />
           <p className="text-sm font-medium">Drop an image here or click to browse</p>
           <p className="text-xs">PNG, JPG, GIF, SVG, TIFF, BMP, WebP — max 15 MB</p>
           <input
@@ -176,6 +220,7 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
             type="file"
             accept={ACCEPTED_TYPES}
             className="sr-only"
+            aria-label="בחר קובץ תמונה להעלאה"
             onChange={handleInputChange}
             data-testid="asset-file-input"
           />
@@ -183,8 +228,12 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       )}
 
       {(status === 'uploading' || status === 'scanning') && (
-        <div className="flex flex-col items-center gap-3 rounded-lg border bg-muted/40 p-6 text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div
+          className="flex flex-col items-center gap-3 rounded-lg border bg-muted/40 p-6 text-center"
+          role="status"
+          aria-label={status === 'uploading' ? 'מעלה קובץ…' : 'סורק אבטחה…'}
+        >
+          <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
           <p className="text-sm font-medium">
             {status === 'uploading' ? 'Uploading…' : 'Scanning for security…'}
           </p>
@@ -192,8 +241,11 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       )}
 
       {status === 'success' && (
-        <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950">
-          <CheckCircle className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+        <div
+          className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950"
+          role="status"
+        >
+          <CheckCircle className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" aria-hidden="true" />
           <p className="text-sm text-green-700 dark:text-green-300">
             Image uploaded and ready to use.
           </p>
@@ -204,9 +256,13 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       )}
 
       {status === 'infected' && (
-        <div className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4">
-          <ShieldAlert className="h-5 w-5 shrink-0 text-destructive" />
-          <p className="text-sm text-destructive">{errorMessage}</p>
+        <div
+          className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4"
+          role="alert"
+          aria-describedby="uploader-infected-msg"
+        >
+          <ShieldAlert className="h-5 w-5 shrink-0 text-destructive" aria-hidden="true" />
+          <p id="uploader-infected-msg" className="text-sm text-destructive">{errorMessage}</p>
           <Button variant="ghost" size="sm" className="ml-auto" onClick={handleReset}>
             Try another file
           </Button>
@@ -214,9 +270,13 @@ export default function AssetUploader({ courseId, onUploaded }: AssetUploaderPro
       )}
 
       {status === 'error' && (
-        <div className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4">
-          <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
-          <p className="text-sm text-destructive">{errorMessage}</p>
+        <div
+          className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4"
+          role="alert"
+          aria-describedby="uploader-error-msg"
+        >
+          <AlertCircle className="h-5 w-5 shrink-0 text-destructive" aria-hidden="true" />
+          <p id="uploader-error-msg" className="text-sm text-destructive">{errorMessage}</p>
           <Button variant="ghost" size="sm" className="ml-auto" onClick={handleReset}>
             Try again
           </Button>

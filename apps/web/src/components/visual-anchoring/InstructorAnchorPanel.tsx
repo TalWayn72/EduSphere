@@ -2,7 +2,7 @@
  * InstructorAnchorPanel — right sidebar listing all visual anchors
  * for the instructor to review, manage, and delete.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useMutation } from 'urql';
 import { Trash2, Eye, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -59,8 +59,9 @@ function AnchorRow({ anchor, onDelete }: AnchorRowProps) {
               variant="outline"
               className="gap-1 text-[10px] text-orange-600 border-orange-400"
               data-testid={`broken-badge-${anchor.id}`}
+              aria-label="עוגן שבור — הקישור לתמונה אינו תקין"
             >
-              <AlertTriangle className="h-2.5 w-2.5" />
+              <AlertTriangle className="h-2.5 w-2.5" aria-hidden="true" />
               Broken
             </Badge>
           )}
@@ -87,12 +88,16 @@ export default function InstructorAnchorPanel({
   onPreviewAsStudent,
 }: InstructorAnchorPanelProps) {
   const [, deleteAnchor] = useMutation(DELETE_VISUAL_ANCHOR);
+  const [deleteAnnouncement, setDeleteAnnouncement] = useState('');
 
   const handleDelete = useCallback(
     async (anchorId: string) => {
       const result = await deleteAnchor({ id: anchorId });
       if (!result.error) {
         onAnchorDeleted(anchorId);
+        setDeleteAnnouncement('עוגן נמחק בהצלחה');
+      } else {
+        setDeleteAnnouncement('שגיאה במחיקת עוגן. אנא נסה שוב.');
       }
     },
     [deleteAnchor, onAnchorDeleted],
@@ -104,8 +109,18 @@ export default function InstructorAnchorPanel({
     <aside
       className="flex flex-col h-full"
       data-testid="instructor-anchor-panel"
-      aria-label="Visual anchors panel"
+      role="complementary"
+      aria-label="לוח עוגנים חזותיים"
     >
+      {/* Screen reader live region for delete/action results */}
+      <div
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="anchor-panel-announcement"
+      >
+        {deleteAnnouncement}
+      </div>
       <div className="flex items-center justify-between border-b px-3 py-2">
         <h2 className="text-sm font-semibold">Visual Anchors ({anchors.length})</h2>
         <Button
@@ -114,8 +129,9 @@ export default function InstructorAnchorPanel({
           onClick={onPreviewAsStudent}
           data-testid="preview-as-student-btn"
           className="gap-1 text-xs"
+          aria-label="תצוגה מקדימה כסטודנט"
         >
-          <Eye className="h-3.5 w-3.5" />
+          <Eye className="h-3.5 w-3.5" aria-hidden="true" />
           Preview as Student
         </Button>
       </div>

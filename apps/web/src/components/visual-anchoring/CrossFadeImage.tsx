@@ -93,12 +93,15 @@ export default function CrossFadeImage({
     <div
       className={`relative overflow-hidden ${className}`}
       data-testid="cross-fade-image"
+      role="img"
+      aria-label={next ? (next.alt || undefined) : (current?.alt || undefined)}
     >
-      {/* Current image (fades out when next is shown) */}
+      {/* Current image (fades out when next is shown) — aria-hidden when being replaced */}
       {current && (
         <img
           src={current.src}
-          alt={current.alt}
+          alt=""
+          aria-hidden="true"
           className="absolute inset-0 w-full h-full object-contain"
           style={{
             opacity: showNext ? 0 : 1,
@@ -107,11 +110,12 @@ export default function CrossFadeImage({
           data-testid="cross-fade-current"
         />
       )}
-      {/* Next image (fades in) */}
+      {/* Next image (fades in) — aria-hidden while invisible, presented via container role */}
       {next && (
         <img
           src={next.src}
-          alt={next.alt}
+          alt=""
+          aria-hidden="true"
           className="absolute inset-0 w-full h-full object-contain"
           style={{
             opacity: showNext ? 1 : 0,

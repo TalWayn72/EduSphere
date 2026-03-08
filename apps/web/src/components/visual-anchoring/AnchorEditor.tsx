@@ -37,7 +37,8 @@ export default function AnchorEditor({
   const [toolbarPos, setToolbarPos] = useState<{ x: number; y: number } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
-  const [, createAnchor] = useMutation(CREATE_VISUAL_ANCHOR);
+  const [anchorCreatedAnnouncement, setAnchorCreatedAnnouncement] = useState('');
+  const [{ fetching: isCreating }, createAnchor] = useMutation(CREATE_VISUAL_ANCHOR);
 
   const handleMouseUp = useCallback(() => {
     const sel = window.getSelection();
@@ -104,11 +105,14 @@ export default function AnchorEditor({
     });
     if (result.data?.createVisualAnchor) {
       onAnchorCreated(result.data.createVisualAnchor as VisualAnchor);
+      setAnchorCreatedAnnouncement('עוגן חזותי נוצר בהצלחה');
       setIsModalOpen(false);
       setSelection(null);
       setToolbarPos(null);
       setSelectedAssetId(null);
       window.getSelection()?.removeAllRanges();
+    } else if (result.error) {
+      setAnchorCreatedAnnouncement('שגיאה ביצירת עוגן חזותי. אנא נסה שוב.');
     }
   }, [
     selection,
@@ -122,6 +126,16 @@ export default function AnchorEditor({
 
   return (
     <div ref={containerRef} className="relative" data-testid="anchor-editor">
+      {/* Screen-reader live region for anchor creation results */}
+      <div
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="anchor-editor-announcement"
+      >
+        {anchorCreatedAnnouncement}
+      </div>
+
       {children}
 
       {toolbarPos && (
@@ -133,6 +147,8 @@ export default function AnchorEditor({
             size="sm"
             variant="default"
             onClick={handleOpenModal}
+            aria-haspopup="dialog"
+            aria-label="צור עוגן חזותי לטקסט המסומן"
             data-testid="create-anchor-btn"
           >
             + Create Anchor
@@ -165,11 +181,17 @@ export default function AnchorEditor({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseModal}>
+            <Button variant="outline" onClick={handleCloseModal} aria-label="בטל יצירת עוגן">
               Cancel
             </Button>
-            <Button onClick={handleCreateAnchor} data-testid="confirm-anchor-btn">
-              Create Anchor
+            <Button
+              onClick={handleCreateAnchor}
+              disabled={isCreating}
+              aria-disabled={isCreating}
+              aria-label={isCreating ? 'יוצר עוגן…' : 'אשר יצירת עוגן חזותי'}
+              data-testid="confirm-anchor-btn"
+            >
+              {isCreating ? 'Creating…' : 'Create Anchor'}
             </Button>
           </DialogFooter>
         </DialogContent>

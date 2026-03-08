@@ -58,7 +58,12 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
 
   if (fetching) {
     return (
-      <div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
+      <div
+        className="flex items-center justify-center py-8 text-muted-foreground text-sm"
+        role="status"
+        aria-live="polite"
+        aria-label="טוען תמונות…"
+      >
         Loading images…
       </div>
     );
@@ -68,12 +73,13 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
     <div data-testid="asset-picker" className="space-y-3">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <Input
             placeholder="Search images…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-8 text-sm"
+            aria-label="חפש תמונות"
             data-testid="asset-search-input"
           />
         </div>
@@ -81,6 +87,8 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
           variant="outline"
           size="sm"
           onClick={() => setShowUploader((v) => !v)}
+          aria-label={showUploader ? 'הסתר העלאת תמונה' : 'העלה תמונה חדשה'}
+          aria-expanded={showUploader}
           data-testid="toggle-uploader-btn"
         >
           Upload new
@@ -93,7 +101,7 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
 
       {!showUploader && filteredAssets.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-8 text-center">
-          <ImageOff className="h-8 w-8 text-muted-foreground/50" />
+          <ImageOff className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
           <p className="text-sm text-muted-foreground">
             {allAssets.length === 0
               ? 'No images uploaded yet.'
@@ -116,7 +124,7 @@ export default function AssetPicker({ courseId, selectedAssetId, onSelect }: Ass
         <div
           className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto rounded-md"
           role="listbox"
-          aria-label="Available images"
+          aria-label="תמונות זמינות"
         >
           {filteredAssets.map((asset) => {
             const isSelected = selectedAssetId === asset.id;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 interface AnchorFrameProps {
   activeAnchorId: string | null;
@@ -25,6 +25,16 @@ export default function AnchorFrame({
   onFrameClick,
 }: AnchorFrameProps) {
   const [frameRect, setFrameRect] = useState<FrameRect | null>(null);
+  const announceRef = useRef<HTMLDivElement>(null);
+
+  // Announce active anchor change to screen readers
+  useEffect(() => {
+    if (announceRef.current) {
+      announceRef.current.textContent = activeAnchorId
+        ? `עוגן פעיל השתנה`
+        : '';
+    }
+  }, [activeAnchorId]);
 
   const updateFrame = useCallback(() => {
     if (!activeAnchorId || !containerRef.current) {
@@ -60,29 +70,45 @@ export default function AnchorFrame({
     };
   }, [activeAnchorId, updateFrame, containerRef]);
 
-  if (!frameRect || !activeAnchorId) return null;
+  if (!frameRect || !activeAnchorId) return (
+    <div
+      ref={announceRef}
+      className="sr-only"
+      aria-live="polite"
+      aria-atomic="true"
+    />
+  );
 
   return (
-    <div
-      className="absolute pointer-events-auto cursor-pointer rounded"
-      style={{
-        top: frameRect.top - 2,
-        left: frameRect.left - 2,
-        width: frameRect.width + 4,
-        height: frameRect.height + 4,
-        border: '1.5px solid hsl(var(--primary) / 0.6)',
-        transition: 'top 150ms ease, left 150ms ease, width 150ms ease, height 150ms ease',
-        zIndex: 10,
-        background: 'hsl(var(--primary) / 0.05)',
-      }}
-      onClick={() => activeAnchorId && onFrameClick?.(activeAnchorId)}
-      data-testid="anchor-frame"
-      aria-label="Active anchor frame — click to focus visual aid"
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onFrameClick?.(activeAnchorId);
-      }}
-    />
+    <>
+      {/* Screen reader live region for anchor change announcements */}
+      <div
+        ref={announceRef}
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+      />
+      <div
+        className="absolute pointer-events-auto cursor-pointer rounded"
+        style={{
+          top: frameRect.top - 2,
+          left: frameRect.left - 2,
+          width: frameRect.width + 4,
+          height: frameRect.height + 4,
+          border: '1.5px solid hsl(var(--primary) / 0.6)',
+          transition: 'top 150ms ease, left 150ms ease, width 150ms ease, height 150ms ease',
+          zIndex: 10,
+          background: 'hsl(var(--primary) / 0.05)',
+        }}
+        onClick={() => activeAnchorId && onFrameClick?.(activeAnchorId)}
+        data-testid="anchor-frame"
+        aria-label="מסגרת עוגן פעיל — לחץ להצגת עזר חזותי"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') onFrameClick?.(activeAnchorId);
+        }}
+      />
+    </>
   );
 }

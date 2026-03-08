@@ -29,8 +29,10 @@ export default function VisualSidebar({
 
   // Announce image change to screen readers
   useEffect(() => {
-    if (announceRef.current && activeAsset) {
-      announceRef.current.textContent = `Visual aid updated: ${activeAsset.filename}`;
+    if (announceRef.current) {
+      announceRef.current.textContent = activeAsset
+        ? `עזר חזותי עודכן: ${activeAsset.metadata.altText ?? activeAsset.filename}`
+        : '';
     }
   }, [activeAsset]);
 
@@ -40,7 +42,7 @@ export default function VisualSidebar({
     <aside
       className={`hidden md:flex flex-col w-[280px] shrink-0 bg-card border-border ${borderClass} ${className}`}
       role="complementary"
-      aria-label="Visual Aid Sidebar"
+      aria-label="סרגל עזרים חזותיים"
       data-testid="visual-sidebar"
     >
       {/* Screen reader live region */}
