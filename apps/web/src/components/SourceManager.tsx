@@ -411,7 +411,7 @@ function AddSourceModal({
           <h2 className="text-lg font-semibold">{t('sources.addSourceTitle')}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 text-xl"
+            className="text-gray-400 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground text-xl"
           >
             ✕
           </button>
@@ -425,7 +425,7 @@ function AddSourceModal({
                 key={tabKey}
                 onClick={() => setTab(tabKey)}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors
-                  ${tab === tabKey ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  ${tab === tabKey ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground'}`}
               >
                 {t(TAB_LABEL_KEYS[tabKey])}
               </button>
@@ -640,7 +640,7 @@ function SourceDetailDrawer({
           ? t('sources.loading')
           : (data?.rawContent ?? t('sources.noContent'))}
       </div>
-      <div className="px-4 py-2 border-t text-xs text-gray-400">
+      <div className="px-4 py-2 border-t text-xs text-gray-400 dark:text-muted-foreground">
         {data &&
           t('sources.chunkFooter', {
             count: data.chunkCount,

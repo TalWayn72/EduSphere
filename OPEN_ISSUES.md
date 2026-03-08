@@ -7502,3 +7502,46 @@ This bypassed all real imports — TipTap/KaTeX was never loaded in tests, makin
 
 ---
 
+## BUG-059 | 🟡 In Progress (partially fixed) | HIGH
+**Dark mode color contrast — invisible/low-contrast text (WCAG 2.1 AA violation)**
+
+**Date:** 2026-03-08
+**Severity:** HIGH — Invisible text in dark mode is a critical accessibility failure
+**Division:** UX/UI Design (Division 4)
+
+**Problem:**
+Multiple components used hardcoded Tailwind `text-gray-*` and `bg-white` classes without `dark:` variants. When the `.dark` class was applied to `<html>`, these components rendered dark text on a dark background (effectively invisible) or light backgrounds that clashed with the dark theme.
+
+**Root cause:**
+Components bypassed the design token system (`text-foreground`, `text-muted-foreground`, `bg-card`) and used raw gray Tailwind classes. The CSS variables in `globals.css` are correctly defined — the problem was exclusively at the component layer.
+
+**Partial fix in Phase 29 (2026-03-08):**
+23 critical issues fixed across 5 files:
+- `apps/web/src/components/AnnotationItem.tsx` — 5 fixes (bg-white→dark:bg-card, text-gray-* → dark:text-foreground/muted-foreground, bg-gray-100→dark:bg-muted, border-gray-200→dark:border-border)
+- `apps/web/src/components/AnnotationPanel.tsx` — 3 fixes
+- `apps/web/src/components/DocumentAnnotationPanel.tsx` — 5 fixes
+- `apps/web/src/components/SourceManager.tsx` — 3 fixes (close button, tabs, footer)
+- `apps/web/src/pages/LandingPage.tsx` — 16 fixes (nav, stats bar, features, how-it-works, testimonials, pricing sections)
+
+**Remaining issues (next sprint backlog — ~40 instances in 14 files):**
+- `apps/web/src/pages/LessonPipelinePage.tsx` — 8 instances
+- `apps/web/src/pages/LessonResultsPage.tsx` — 10 instances
+- `apps/web/src/pages/CreateLessonPage.tsx` + `.step2.tsx` — 6 instances
+- `apps/web/src/components/AnnotationForm.tsx` — 2 instances
+- `apps/web/src/components/PlagiarismReportCard.tsx` — 3 instances
+- `apps/web/src/pages/CPDSettingsPage.tsx` — 2 instances
+- `apps/web/src/pages/ScenariosPage.tsx` — 1 instance
+- `apps/web/src/pages/CourseDetailPage.tsx` — 2 instances
+- `apps/web/src/pages/LessonDetailPage.tsx` — 2 instances
+- `apps/web/src/components/pipeline/PipelineConfigPanel.tsx` — 4 instances
+- `apps/web/src/components/pipeline/PipelineRunStatus.tsx` — 1 instance
+- `apps/web/src/components/TextSubmissionForm.tsx` — 1 instance
+- `apps/web/src/components/Model3DViewer.tsx` — 1 instance
+- `apps/web/src/components/ScenarioPlayer.tsx` — 1 instance
+
+**Full audit report:** `docs/security/PHASE29-DARK-MODE-CONTRAST-AUDIT.md`
+
+**Anti-recurrence:** Pattern: always use `text-foreground`, `text-muted-foreground`, `bg-card`, `bg-background`, `border-border` Tailwind tokens (which map to CSS variables) instead of raw `text-gray-*` / `bg-white` classes. If raw gray classes are needed, always pair them with `dark:` overrides.
+
+---
+

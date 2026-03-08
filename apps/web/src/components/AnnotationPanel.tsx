@@ -192,7 +192,7 @@ export function AnnotationPanel({
                   >
                     <span>{config.icon}</span>
                     <span className={config.color}>{config.label}</span>
-                    <span className="text-gray-400">({count})</span>
+                    <span className="text-gray-400 dark:text-muted-foreground">({count})</span>
                   </Label>
                 </div>
               );
@@ -246,7 +246,7 @@ export function AnnotationPanel({
       {/* Annotations List */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {sortedAnnotations.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-muted-foreground">
             <p className="text-sm">No annotations yet</p>
             <p className="text-xs mt-1">Be the first to add an annotation!</p>
           </div>
@@ -280,7 +280,7 @@ export function AnnotationPanel({
       </div>
 
       {/* Footer Stats */}
-      <div className="p-3 bg-white border-t text-xs text-gray-500 flex justify-between">
+      <div className="p-3 bg-white dark:bg-card border-t text-xs text-gray-500 dark:text-muted-foreground flex justify-between">
         <span>
           {sortedAnnotations.length} of {annotations.length} annotations visible
         </span>

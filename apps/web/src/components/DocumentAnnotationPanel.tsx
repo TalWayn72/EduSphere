@@ -74,10 +74,10 @@ export function DocumentAnnotationPanel({
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
-      <div className="p-4 bg-white border-b">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-background">
+      <div className="p-4 bg-white dark:bg-card border-b">
         <h2 className="text-lg font-semibold">Text Annotations</h2>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">
           {allAnnotations.length} annotation
           {allAnnotations.length !== 1 ? 's' : ''}
         </p>
@@ -85,7 +85,7 @@ export function DocumentAnnotationPanel({
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {allAnnotations.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-muted-foreground">
             <p className="text-sm">No text annotations yet.</p>
             <p className="text-xs mt-1">
               Select text in the document to annotate.
@@ -121,11 +121,11 @@ export function DocumentAnnotationPanel({
                       {annotation.userName}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap line-clamp-4">
+                  <p className="text-sm text-gray-700 dark:text-foreground whitespace-pre-wrap line-clamp-4">
                     {annotation.content}
                   </p>
                   {range != null && (
-                    <p className="text-xs text-gray-400 font-mono">
+                    <p className="text-xs text-gray-400 dark:text-muted-foreground font-mono">
                       Position: chars {range.from}–{range.to}
                     </p>
                   )}

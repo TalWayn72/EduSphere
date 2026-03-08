@@ -23,14 +23,14 @@ function LandingNav() {
   return (
     <nav
       data-testid="landing-nav"
-      className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm"
+      className="sticky top-0 z-50 bg-white/95 dark:bg-card/95 backdrop-blur border-b border-gray-100 dark:border-border shadow-sm"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         <div className="flex items-center gap-2">
           <Brain className="h-7 w-7 text-indigo-600" aria-hidden="true" />
-          <span className="text-xl font-bold text-gray-900">EduSphere</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-foreground">EduSphere</span>
         </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600 dark:text-muted-foreground">
           <a href="#features" className="hover:text-indigo-600 transition-colors">Features</a>
           <a href="#pricing" className="hover:text-indigo-600 transition-colors">Pricing</a>
           <a href="#" className="hover:text-indigo-600 transition-colors">Blog</a>
@@ -45,7 +45,7 @@ function LandingNav() {
           </Button>
         </div>
         <button
-          className="md:hidden p-2 rounded-md text-gray-600 hover:text-indigo-600"
+          className="md:hidden p-2 rounded-md text-gray-600 dark:text-muted-foreground hover:text-indigo-600"
           onClick={() => setMenuOpen((o) => !o)}
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen}
@@ -54,11 +54,11 @@ function LandingNav() {
         </button>
       </div>
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 flex flex-col gap-4 text-sm font-medium">
-          <a href="#features" onClick={() => setMenuOpen(false)} className="text-gray-700 hover:text-indigo-600">Features</a>
-          <a href="#pricing" onClick={() => setMenuOpen(false)} className="text-gray-700 hover:text-indigo-600">Pricing</a>
-          <a href="#" className="text-gray-700 hover:text-indigo-600">Blog</a>
-          <a href="#" className="text-gray-700 hover:text-indigo-600">Docs</a>
+        <div className="md:hidden bg-white dark:bg-card border-t border-gray-100 dark:border-border px-4 py-4 flex flex-col gap-4 text-sm font-medium">
+          <a href="#features" onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-foreground hover:text-indigo-600">Features</a>
+          <a href="#pricing" onClick={() => setMenuOpen(false)} className="text-gray-700 dark:text-foreground hover:text-indigo-600">Pricing</a>
+          <a href="#" className="text-gray-700 dark:text-foreground hover:text-indigo-600">Blog</a>
+          <a href="#" className="text-gray-700 dark:text-foreground hover:text-indigo-600">Docs</a>
           <div className="flex gap-3 pt-2">
             <Button variant="outline" size="sm" asChild className="flex-1">
               <Link to="/login">Log In</Link>
@@ -118,12 +118,12 @@ const STATS = [
 
 function StatsBar() {
   return (
-    <section data-testid="stats-bar" className="bg-white border-b border-gray-100">
+    <section data-testid="stats-bar" className="bg-white dark:bg-card border-b border-gray-100 dark:border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
         {STATS.map((s) => (
           <div key={s.label}>
             <div className="text-3xl sm:text-4xl font-extrabold text-indigo-600">{s.value}</div>
-            <div className="mt-1 text-sm text-gray-500 font-medium">{s.label}</div>
+            <div className="mt-1 text-sm text-gray-500 dark:text-muted-foreground font-medium">{s.label}</div>
           </div>
         ))}
       </div>
@@ -143,11 +143,11 @@ const FEATURES = [
 
 function FeaturesSection() {
   return (
-    <section id="features" data-testid="features-section" className="bg-gray-50 py-20">
+    <section id="features" data-testid="features-section" className="bg-gray-50 dark:bg-background py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Why EduSphere?</h2>
-          <p className="mt-3 text-lg text-gray-500 max-w-xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-foreground">Why EduSphere?</h2>
+          <p className="mt-3 text-lg text-gray-500 dark:text-muted-foreground max-w-xl mx-auto">
             Everything you need to build, deliver, and scale world-class learning experiences.
           </p>
         </div>
@@ -159,9 +159,9 @@ function FeaturesSection() {
                   <div className="p-2 rounded-lg bg-indigo-50">
                     <Icon className="h-5 w-5 text-indigo-600" aria-hidden="true" />
                   </div>
-                  <h3 className="font-semibold text-gray-900">{title}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-foreground">{title}</h3>
                 </div>
-                <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground leading-relaxed">{desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -180,11 +180,11 @@ const STEPS = [
 
 function HowItWorksSection() {
   return (
-    <section data-testid="how-it-works-section" className="bg-white py-20">
+    <section data-testid="how-it-works-section" className="bg-white dark:bg-card py-20">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">How It Works</h2>
-          <p className="mt-3 text-lg text-gray-500">Three simple steps to transform your learning.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-foreground">How It Works</h2>
+          <p className="mt-3 text-lg text-gray-500 dark:text-muted-foreground">Three simple steps to transform your learning.</p>
         </div>
         <div className="flex flex-col lg:flex-row gap-8">
           {STEPS.map((step, i) => (
@@ -195,8 +195,8 @@ function HowItWorksSection() {
               <div className="w-16 h-16 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xl font-extrabold mb-4 z-10 relative">
                 {step.num}
               </div>
-              <h3 className="font-semibold text-gray-900 text-lg mb-2">{step.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed max-w-xs">{step.desc}</p>
+              <h3 className="font-semibold text-gray-900 dark:text-foreground text-lg mb-2">{step.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground leading-relaxed max-w-xs">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -217,20 +217,20 @@ function TestimonialsSection() {
     <section data-testid="testimonials-section" className="bg-indigo-50 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Loved by Learners & Organizations</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-foreground">Loved by Learners & Organizations</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t) => (
             <Card key={t.name} className="bg-white">
               <CardContent className="pt-6">
-                <p className="text-gray-600 leading-relaxed text-sm mb-5 italic">"{t.quote}"</p>
+                <p className="text-gray-600 dark:text-muted-foreground leading-relaxed text-sm mb-5 italic">"{t.quote}"</p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
                     {t.name.split(' ').map((n) => n[0]).join('')}
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900 text-sm">{t.name}</div>
-                    <div className="text-xs text-gray-500">{t.role}</div>
+                    <div className="font-semibold text-gray-900 dark:text-foreground text-sm">{t.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-muted-foreground">{t.role}</div>
                   </div>
                 </div>
               </CardContent>
@@ -278,11 +278,11 @@ const PLANS = [
 
 function PricingSection() {
   return (
-    <section id="pricing" data-testid="pricing-section" className="bg-white py-20">
+    <section id="pricing" data-testid="pricing-section" className="bg-white dark:bg-background py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Simple, Transparent Pricing</h2>
-          <p className="mt-3 text-lg text-gray-500">Start free, scale as you grow.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-foreground">Simple, Transparent Pricing</h2>
+          <p className="mt-3 text-lg text-gray-500 dark:text-muted-foreground">Start free, scale as you grow.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {PLANS.map((plan) => (
@@ -291,7 +291,7 @@ function PricingSection() {
               className={`rounded-xl border p-8 flex flex-col relative ${
                 plan.highlight
                   ? 'border-indigo-500 shadow-xl ring-2 ring-indigo-500'
-                  : 'border-gray-200'
+                  : 'border-gray-200 dark:border-border'
               }`}
             >
               {plan.popular && (
@@ -300,16 +300,16 @@ function PricingSection() {
                 </div>
               )}
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">{plan.desc}</p>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-foreground">{plan.name}</h3>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground mt-1">{plan.desc}</p>
                 <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
-                  {plan.period && <span className="text-gray-500">{plan.period}</span>}
+                  <span className="text-4xl font-extrabold text-gray-900 dark:text-foreground">{plan.price}</span>
+                  {plan.period && <span className="text-gray-500 dark:text-muted-foreground">{plan.period}</span>}
                 </div>
               </div>
               <ul className="space-y-3 mb-8 flex-1">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
+                  <li key={f} className="flex items-start gap-2 text-sm text-gray-600 dark:text-muted-foreground">
                     <Check className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     {f}
                   </li>
