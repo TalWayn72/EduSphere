@@ -2,18 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AtRiskService } from './at-risk.service.js';
 
 // ── Mock @edusphere/db ─────────────────────────────────────────────────────────
-
-const mockSelect = vi.fn();
-const mockFrom = vi.fn();
-const mockInnerJoin = vi.fn();
-const mockWhere = vi.fn();
-const mockCloseAllPools = vi.fn().mockResolvedValue(undefined);
-const mockWithTenantContext = vi.fn();
+// NOTE: vi.mock is hoisted — factory must NOT reference outer const/let variables.
+// Access mocks via vi.mocked() after import instead.
 
 vi.mock('@edusphere/db', () => ({
   createDatabaseConnection: vi.fn(() => ({})),
-  closeAllPools: mockCloseAllPools,
-  withTenantContext: mockWithTenantContext,
+  closeAllPools: vi.fn().mockResolvedValue(undefined),
+  withTenantContext: vi.fn(),
   schema: {
     atRiskFlags: {
       learnerId: 'learner_id',
@@ -40,6 +35,14 @@ vi.mock('@edusphere/db', () => ({
   and: (...args: unknown[]) => args,
   eq: (a: unknown, b: unknown) => ({ a, b }),
 }));
+
+// ── Module-level mock references (populated after import) ──────────────────────
+import * as db from '@edusphere/db';
+
+const mockSelect = vi.fn();
+const mockFrom = vi.fn();
+const mockInnerJoin = vi.fn();
+const mockWhere = vi.fn();
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -74,7 +77,7 @@ describe('AtRiskService', () => {
     service = new AtRiskService();
 
     // Default: delegate operation to the callback
-    mockWithTenantContext.mockImplementation(
+    vi.mocked(db.withTenantContext).mockImplementation(
       (_db: unknown, _ctx: unknown, operation: (db: unknown) => Promise<unknown>) => {
         const chainMock = {
           select: mockSelect.mockReturnThis(),
@@ -145,7 +148,7 @@ describe('AtRiskService', () => {
 
       await service.getAtRiskLearners(TENANT_ID, USER_ID, 30);
 
-      expect(mockWithTenantContext).toHaveBeenCalledWith(
+      expect(vi.mocked(db.withTenantContext)).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
           tenantId: TENANT_ID,
@@ -160,7 +163,7 @@ describe('AtRiskService', () => {
   describe('onModuleDestroy', () => {
     it('calls closeAllPools on module destroy', async () => {
       await service.onModuleDestroy();
-      expect(mockCloseAllPools).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(db.closeAllPools)).toHaveBeenCalledTimes(1);
     });
   });
 });
