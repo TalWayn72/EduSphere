@@ -4,5 +4,10 @@
     "subtitle": "Perubahan ini tidak dapat disimpan. Tutup untuk menghapus.",
     "dismissAll": "Tutup Semua",
     "dismiss": "Tutup"
-  }
+  },
+  "banner": "No internet connection — learning in offline mode",
+  "pendingSync": "{{count}} changes pending sync",
+  "download": "Download for Offline",
+  "downloaded": "Downloaded",
+  "downloading": "Downloading..."
 }

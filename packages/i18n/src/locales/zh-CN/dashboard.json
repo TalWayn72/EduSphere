@@ -46,5 +46,13 @@
       "conceptsMastered": "已掌握概念",
       "annotationsCreated": "已创建注释"
     }
-  }
+  },
+  "subtitle": "Here is what is happening in your learning journey.",
+  "recommendedForYou": "Recommended for You",
+  "dayStreak": "{{count}} day streak",
+  "inProgress": "{{count}} in progress",
+  "completed": "{{count}} completed",
+  "xpPoints": "{{count}} XP",
+  "masteryOverview": "Mastery Overview",
+  "progress": "Progress"
 }

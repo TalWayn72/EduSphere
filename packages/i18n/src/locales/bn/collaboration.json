@@ -48,5 +48,17 @@
   "documentTitlePlaceholder": "Document title...",
   "editorPlaceholder": "Start typing your notes here...",
   "crdtSyncActive": "Sync active ({{key}})",
-  "crdtSyncInactive": "Sync inactive"
+  "crdtSyncInactive": "Sync inactive",
+  "sessionsTitle": "Live Sessions",
+  "sessionsUpcoming": "Upcoming",
+  "sessionsPast": "Past",
+  "sessionsJoin": "Join",
+  "sessionsStart": "Start Session",
+  "sessionsEnd": "End Session",
+  "sessionsCreate": "Create Session",
+  "sessionsLiveNow": "Live Now",
+  "sessionsStartsIn": "Starts in {{time}}",
+  "sessionsNoSessions": "No sessions scheduled",
+  "sessionsParticipants": "{{count}} participants",
+  "sessionsChat": "Live Chat"
 }

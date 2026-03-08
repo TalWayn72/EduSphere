@@ -46,8 +46,14 @@
         "label": "Identidade Visual",
         "desc": "Logos, cores, temas"
       },
-      "users": { "label": "Usuários", "desc": "Gerenciar alunos e admins" },
-      "compliance": { "label": "Conformidade", "desc": "Relatórios e prazos" },
+      "users": {
+        "label": "Usuários",
+        "desc": "Gerenciar alunos e admins"
+      },
+      "compliance": {
+        "label": "Conformidade",
+        "desc": "Relatórios e prazos"
+      },
       "gamification": {
         "label": "Gamificação",
         "desc": "Pontos, emblemas, classificações"
@@ -69,5 +75,10 @@
     "completions30d": "Concluídos (30d)",
     "atRiskLearners": "Alunos em Risco",
     "storageUsed": "Armazenamento Usado"
+  },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
   }
 }

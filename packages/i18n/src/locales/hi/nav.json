@@ -18,5 +18,17 @@
   "adminPanel": "व्यवस्थापक पैनल",
   "lti": "LTI 1.3",
   "compliance": "अनुपालन",
-  "scimHris": "SCIM / HRIS"
+  "scimHris": "SCIM / HRIS",
+  "myCourses": "My Courses",
+  "discover": "Discover",
+  "knowledgeGraph": "Knowledge Graph",
+  "liveSessions": "Live Sessions",
+  "settings": "Settings",
+  "lightMode": "Light Mode",
+  "darkMode": "Dark Mode",
+  "collapse": "Collapse",
+  "expandSidebar": "Expand sidebar",
+  "collapseSidebar": "Collapse sidebar",
+  "switchToLight": "Switch to light mode",
+  "switchToDark": "Switch to dark mode"
 }

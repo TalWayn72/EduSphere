@@ -102,5 +102,9 @@
     "BEGINNER": "Beginner",
     "INTERMEDIATE": "Intermediate",
     "ADVANCED": "Advanced"
-  }
+  },
+  "forkCourse": "Fork Course",
+  "forkCourseSuccess": "Course forked successfully!",
+  "forkError": "Failed to fork course. Please try again.",
+  "forkedFrom": "Forked from"
 }

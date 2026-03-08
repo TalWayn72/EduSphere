@@ -50,7 +50,10 @@
         "label": "Utilisateurs",
         "desc": "Gérer apprenants et admins"
       },
-      "compliance": { "label": "Conformité", "desc": "Rapports et échéances" },
+      "compliance": {
+        "label": "Conformité",
+        "desc": "Rapports et échéances"
+      },
       "gamification": {
         "label": "Gamification",
         "desc": "Points, badges, classements"
@@ -72,5 +75,10 @@
     "completions30d": "Complétés (30j)",
     "atRiskLearners": "Apprenants à risque",
     "storageUsed": "Stockage utilisé"
+  },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
   }
 }

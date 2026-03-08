@@ -46,5 +46,13 @@
       "conceptsMastered": "महारत हासिल अवधारणाएं",
       "annotationsCreated": "बनाए गए एनोटेशन"
     }
-  }
+  },
+  "subtitle": "Here is what is happening in your learning journey.",
+  "recommendedForYou": "Recommended for You",
+  "dayStreak": "{{count}} day streak",
+  "inProgress": "{{count}} in progress",
+  "completed": "{{count}} completed",
+  "xpPoints": "{{count}} XP",
+  "masteryOverview": "Mastery Overview",
+  "progress": "Progress"
 }

@@ -33,5 +33,10 @@
   "retry": "पुनः प्रयास करें",
   "pathError": "लर्निंग पाथ खोजने में विफल",
   "refreshGraph": "Refresh graph",
-  "refresh": "Refresh"
+  "refresh": "Refresh",
+  "graphTitle": "Knowledge Graph",
+  "graphPageBreadcrumb": "Knowledge Graph",
+  "courseContext": "Course Knowledge Graph",
+  "allKnowledge": "All Knowledge",
+  "filteredBy": "Filtered by: {{course}}"
 }

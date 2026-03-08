@@ -4,5 +4,10 @@
     "subtitle": "这些更改无法保存。关闭以清除。",
     "dismissAll": "全部关闭",
     "dismiss": "关闭"
-  }
+  },
+  "banner": "No internet connection — learning in offline mode",
+  "pendingSync": "{{count}} changes pending sync",
+  "download": "Download for Offline",
+  "downloaded": "Downloaded",
+  "downloading": "Downloading..."
 }

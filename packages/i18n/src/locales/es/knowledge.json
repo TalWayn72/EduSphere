@@ -33,5 +33,10 @@
   "retry": "Reintentar",
   "pathError": "Error al encontrar la ruta de aprendizaje",
   "refreshGraph": "Refresh graph",
-  "refresh": "Refresh"
+  "refresh": "Refresh",
+  "graphTitle": "Knowledge Graph",
+  "graphPageBreadcrumb": "Knowledge Graph",
+  "courseContext": "Course Knowledge Graph",
+  "allKnowledge": "All Knowledge",
+  "filteredBy": "Filtered by: {{course}}"
 }

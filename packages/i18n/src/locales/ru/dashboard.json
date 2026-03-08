@@ -46,5 +46,13 @@
       "conceptsMastered": "Освоенные концепции",
       "annotationsCreated": "Созданные аннотации"
     }
-  }
+  },
+  "subtitle": "Here is what is happening in your learning journey.",
+  "recommendedForYou": "Recommended for You",
+  "dayStreak": "{{count}} day streak",
+  "inProgress": "{{count}} in progress",
+  "completed": "{{count}} completed",
+  "xpPoints": "{{count}} XP",
+  "masteryOverview": "Mastery Overview",
+  "progress": "Progress"
 }

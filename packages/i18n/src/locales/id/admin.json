@@ -42,8 +42,14 @@
     "noActivity": "Aktivitas admin terkini akan muncul di sini.",
     "loadError": "Gagal memuat data dasbor",
     "quickLinks": {
-      "branding": { "label": "Merek", "desc": "Logo, warna, tema" },
-      "users": { "label": "Pengguna", "desc": "Kelola pelajar dan admin" },
+      "branding": {
+        "label": "Merek",
+        "desc": "Logo, warna, tema"
+      },
+      "users": {
+        "label": "Pengguna",
+        "desc": "Kelola pelajar dan admin"
+      },
       "compliance": {
         "label": "Kepatuhan",
         "desc": "Laporan dan tenggat waktu"
@@ -52,8 +58,14 @@
         "label": "Gamifikasi",
         "desc": "Poin, lencana, papan peringkat"
       },
-      "security": { "label": "Keamanan", "desc": "MFA, SSO, kebijakan sesi" },
-      "auditLog": { "label": "Log Audit", "desc": "Riwayat tindakan admin" }
+      "security": {
+        "label": "Keamanan",
+        "desc": "MFA, SSO, kebijakan sesi"
+      },
+      "auditLog": {
+        "label": "Log Audit",
+        "desc": "Riwayat tindakan admin"
+      }
     }
   },
   "stats": {
@@ -63,5 +75,10 @@
     "completions30d": "Selesai (30h)",
     "atRiskLearners": "Pelajar Berisiko",
     "storageUsed": "Penyimpanan Terpakai"
+  },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
   }
 }

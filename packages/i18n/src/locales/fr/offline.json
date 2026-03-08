@@ -4,5 +4,10 @@
     "subtitle": "Ces modifications n'ont pas pu être enregistrées. Ignorez pour effacer.",
     "dismissAll": "Tout ignorer",
     "dismiss": "Ignorer"
-  }
+  },
+  "banner": "No internet connection — learning in offline mode",
+  "pendingSync": "{{count}} changes pending sync",
+  "download": "Download for Offline",
+  "downloaded": "Downloaded",
+  "downloading": "Downloading..."
 }

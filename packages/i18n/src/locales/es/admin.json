@@ -42,12 +42,18 @@
     "noActivity": "La actividad reciente de administración aparecerá aquí.",
     "loadError": "Error al cargar datos del panel",
     "quickLinks": {
-      "branding": { "label": "Marca", "desc": "Logos, colores, temas" },
+      "branding": {
+        "label": "Marca",
+        "desc": "Logos, colores, temas"
+      },
       "users": {
         "label": "Usuarios",
         "desc": "Gestionar estudiantes y admins"
       },
-      "compliance": { "label": "Cumplimiento", "desc": "Informes y plazos" },
+      "compliance": {
+        "label": "Cumplimiento",
+        "desc": "Informes y plazos"
+      },
       "gamification": {
         "label": "Gamificación",
         "desc": "Puntos, insignias, clasificaciones"
@@ -69,5 +75,10 @@
     "completions30d": "Completados (30d)",
     "atRiskLearners": "Estudiantes en Riesgo",
     "storageUsed": "Almacenamiento Usado"
+  },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
   }
 }

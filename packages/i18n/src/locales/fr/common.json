@@ -48,5 +48,17 @@
       "annotationsCreated": "Annotations créées",
       "xpPoints": "Points XP"
     }
+  },
+  "saveSearch": "Save Search",
+  "savedSearches": "Saved Searches",
+  "deleteSavedSearch": "Delete",
+  "savedSearchSuccess": "Search saved!",
+  "noSavedSearches": "No saved searches yet",
+  "savedSearchNamePlaceholder": "Name this search...",
+  "unsavedChanges": {
+    "title": "Unsaved Changes",
+    "message": "You have unsaved changes that will be lost if you leave this page.",
+    "leave": "Leave anyway",
+    "stay": "Stay on page"
   }
 }

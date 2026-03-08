@@ -42,12 +42,18 @@
     "noActivity": "Последняя активность администратора появится здесь.",
     "loadError": "Не удалось загрузить данные панели",
     "quickLinks": {
-      "branding": { "label": "Брендинг", "desc": "Логотипы, цвета, темы" },
+      "branding": {
+        "label": "Брендинг",
+        "desc": "Логотипы, цвета, темы"
+      },
       "users": {
         "label": "Пользователи",
         "desc": "Управление учащимися и администраторами"
       },
-      "compliance": { "label": "Соответствие", "desc": "Отчёты и сроки" },
+      "compliance": {
+        "label": "Соответствие",
+        "desc": "Отчёты и сроки"
+      },
       "gamification": {
         "label": "Геймификация",
         "desc": "Очки, значки, рейтинги"
@@ -69,5 +75,10 @@
     "completions30d": "Завершений (30 дн.)",
     "atRiskLearners": "Учащихся в риске",
     "storageUsed": "Использовано хранилища"
+  },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
   }
 }

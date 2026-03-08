@@ -42,15 +42,30 @@
     "noActivity": "हालिया व्यवस्थापक गतिविधि यहाँ दिखेगी।",
     "loadError": "डैशबोर्ड डेटा लोड करने में विफल",
     "quickLinks": {
-      "branding": { "label": "ब्रांडिंग", "desc": "लोगो, रंग, थीम" },
+      "branding": {
+        "label": "ब्रांडिंग",
+        "desc": "लोगो, रंग, थीम"
+      },
       "users": {
         "label": "उपयोगकर्ता",
         "desc": "शिक्षार्थी और व्यवस्थापक प्रबंधन"
       },
-      "compliance": { "label": "अनुपालन", "desc": "रिपोर्ट और समयसीमाएँ" },
-      "gamification": { "label": "गेमिफिकेशन", "desc": "अंक, बैज, लीडरबोर्ड" },
-      "security": { "label": "सुरक्षा", "desc": "MFA, SSO, सत्र नीति" },
-      "auditLog": { "label": "ऑडिट लॉग", "desc": "व्यवस्थापक क्रिया इतिहास" }
+      "compliance": {
+        "label": "अनुपालन",
+        "desc": "रिपोर्ट और समयसीमाएँ"
+      },
+      "gamification": {
+        "label": "गेमिफिकेशन",
+        "desc": "अंक, बैज, लीडरबोर्ड"
+      },
+      "security": {
+        "label": "सुरक्षा",
+        "desc": "MFA, SSO, सत्र नीति"
+      },
+      "auditLog": {
+        "label": "ऑडिट लॉग",
+        "desc": "व्यवस्थापक क्रिया इतिहास"
+      }
     }
   },
   "stats": {
@@ -60,5 +75,10 @@
     "completions30d": "पूर्ण (30 दिन)",
     "atRiskLearners": "जोखिम वाले शिक्षार्थी",
     "storageUsed": "उपयोग किया गया संग्रहण"
+  },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
   }
 }

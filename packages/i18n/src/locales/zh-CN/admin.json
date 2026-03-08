@@ -42,12 +42,30 @@
     "noActivity": "最近的管理活动将显示在这里。",
     "loadError": "加载仪表盘数据失败",
     "quickLinks": {
-      "branding": { "label": "品牌", "desc": "标志、颜色、主题" },
-      "users": { "label": "用户", "desc": "管理学员和管理员" },
-      "compliance": { "label": "合规", "desc": "报告和截止日期" },
-      "gamification": { "label": "游戏化", "desc": "积分、徽章、排行榜" },
-      "security": { "label": "安全", "desc": "MFA、SSO、会话策略" },
-      "auditLog": { "label": "审计日志", "desc": "管理员操作历史" }
+      "branding": {
+        "label": "品牌",
+        "desc": "标志、颜色、主题"
+      },
+      "users": {
+        "label": "用户",
+        "desc": "管理学员和管理员"
+      },
+      "compliance": {
+        "label": "合规",
+        "desc": "报告和截止日期"
+      },
+      "gamification": {
+        "label": "游戏化",
+        "desc": "积分、徽章、排行榜"
+      },
+      "security": {
+        "label": "安全",
+        "desc": "MFA、SSO、会话策略"
+      },
+      "auditLog": {
+        "label": "审计日志",
+        "desc": "管理员操作历史"
+      }
     }
   },
   "stats": {
@@ -57,5 +75,10 @@
     "completions30d": "完成数(30天)",
     "atRiskLearners": "高风险学员",
     "storageUsed": "已用存储"
+  },
+  "activityFeed": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View all"
   }
 }
