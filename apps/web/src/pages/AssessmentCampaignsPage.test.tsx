@@ -4,6 +4,10 @@ import { MemoryRouter } from 'react-router-dom';
 import * as urql from 'urql';
 import { AssessmentCampaignsPage } from './AssessmentCampaignsPage';
 
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
 vi.mock('urql', async () => ({
   ...(await vi.importActual('urql')),
   useQuery: vi.fn(),

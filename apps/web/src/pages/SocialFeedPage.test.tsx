@@ -4,6 +4,10 @@ import { MemoryRouter } from 'react-router-dom';
 import * as urql from 'urql';
 import { SocialFeedPage } from './SocialFeedPage';
 
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
 vi.mock('urql', async () => ({
   ...await vi.importActual('urql'),
   useQuery: vi.fn(),
@@ -27,30 +31,27 @@ describe('SocialFeedPage', () => {
     expect(screen.getByText(/Follow learners/i)).toBeInTheDocument();
   });
 
-  it('renders feed items when data available', () => {
-    vi.mocked(urql.useQuery).mockImplementation((doc) => {
-      if (String(doc).includes('SocialFeed')) {
-        return [{
-          data: {
-            socialFeed: [{
-              id: '1',
-              actorId: 'u1',
-              actorDisplayName: 'Alice',
-              verb: 'COMPLETED',
-              objectType: 'course',
-              objectId: 'c1',
-              objectTitle: 'React Fundamentals',
-              createdAt: new Date().toISOString(),
-            }],
-          },
-          fetching: false,
-          error: undefined,
-        }, vi.fn()] as never;
-      }
-      return NOOP_QUERY;
-    });
+  it('renders feed items when data available', async () => {
+    vi.mocked(urql.useQuery).mockReturnValue([{
+      data: {
+        socialFeed: [{
+          id: '1',
+          actorId: 'u1',
+          actorDisplayName: 'Alice',
+          verb: 'COMPLETED',
+          objectType: 'course',
+          objectId: 'c1',
+          objectTitle: 'React Fundamentals',
+          createdAt: new Date().toISOString(),
+        }],
+        socialRecommendations: [],
+      },
+      fetching: false,
+      error: undefined,
+    }, vi.fn()] as never);
     render(<MemoryRouter><SocialFeedPage /></MemoryRouter>);
-    expect(screen.getByText('Alice')).toBeInTheDocument();
+    // mounted guard: feed items render after useEffect fires (setMounted(true))
+    expect(await screen.findByText('Alice')).toBeInTheDocument();
   });
 
   it('shows recommendations section heading', () => {

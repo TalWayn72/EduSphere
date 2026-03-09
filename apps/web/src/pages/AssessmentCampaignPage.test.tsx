@@ -57,13 +57,14 @@ beforeEach(() => {
     { data: undefined, fetching: false, error: undefined },
     vi.fn(),
   ] as never);
-  vi.mocked(urql.useMutation)
-    .mockReturnValueOnce([
-      { fetching: false } as never,
-      mockCreateCampaign as never,
-    ])
-    .mockReturnValueOnce([{} as never, mockActivate as never])
-    .mockReturnValueOnce([{} as never, mockComplete as never]);
+  // Use mockImplementation (not mockReturnValueOnce) so re-renders don't exhaust the queue
+  vi.mocked(urql.useMutation).mockImplementation((mutation: unknown) => {
+    const key = String(mutation);
+    if (key.includes('CREATE')) return [{ fetching: false }, mockCreateCampaign] as never;
+    if (key.includes('ACTIVATE')) return [{}, mockActivate] as never;
+    if (key.includes('COMPLETE')) return [{}, mockComplete] as never;
+    return [{ fetching: false }, vi.fn()] as never;
+  });
   mockCreateCampaign.mockResolvedValue({ error: undefined });
   mockActivate.mockResolvedValue({ error: undefined });
   mockComplete.mockResolvedValue({ error: undefined });
