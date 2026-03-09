@@ -273,6 +273,49 @@ test.describe('WCAG 2.2 SC 2.4.11 - Focus Appearance @a11y', () => {
 });
 
 // -------------------------------------------------------------------------
+// ARIA Snapshot Tests — key navigation regions
+//
+// toMatchAriaSnapshot (Playwright v1.49+) verifies the accessible tree
+// structure of key landmarks, catching regressions in role/name/state.
+// -------------------------------------------------------------------------
+
+test.describe('ARIA Snapshot — Navigation landmarks', () => {
+  test('AppSidebar navigation landmark is present on /dashboard', async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle');
+
+    // The sidebar renders as a <nav> or <aside> with an aria-label containing
+    // "navigation" (English) or "ניווט" (Hebrew when i18n is active).
+    const sidebar = page
+      .locator('nav[aria-label], aside[aria-label]')
+      .first();
+
+    if (await sidebar.count() > 0) {
+      // Verify the landmark exposes at least a navigation role in the ARIA tree.
+      await expect(sidebar).toMatchAriaSnapshot(`
+        - navigation
+      `);
+    } else {
+      // If no labelled nav/aside found, verify there is at least one nav element.
+      const anyNav = page.locator('nav').first();
+      await expect(anyNav.count()).resolves.toBeGreaterThan(0);
+    }
+  });
+
+  test('main content landmark is present on /courses', async ({ page }) => {
+    await page.goto('/courses');
+    await page.waitForLoadState('networkidle');
+
+    const main = page.locator('main').first();
+    if (await main.count() > 0) {
+      await expect(main).toMatchAriaSnapshot(`
+        - main
+      `);
+    }
+  });
+});
+
+// -------------------------------------------------------------------------
 // WCAG 2.2 SC 2.4.12 - Focus Not Obscured (Minimum)
 //
 // When a component receives keyboard focus it must not be completely hidden

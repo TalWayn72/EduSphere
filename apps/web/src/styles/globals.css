@@ -207,11 +207,15 @@
      the ring outside the element boundary.
      !important is required to prevent Tailwind utility classes such as
      focus-visible:outline-none and bare outline-none from overriding the
-     accessible outline on keyboard-focused elements.                       */
+     accessible outline on keyboard-focused elements.
+     scroll-margin-top matches --header-height so the sticky topbar (60px)
+     never fully obscures a keyboard-focused element when it is scrolled
+     into view (SC 2.4.11 + SC 2.4.12 reinforcement).                      */
   *:focus-visible {
     outline: 3px solid #4F46E5 !important;
     outline-offset: 2px !important;
     border-radius: 2px;
+    scroll-margin-top: var(--header-height, 60px);
   }
 
   /* Suppress the UA outline for mouse/touch users; keyboard users still
@@ -298,6 +302,29 @@
 [dir="rtl"] input,
 [dir="rtl"] textarea {
   text-align: right;
+}
+
+/* ── LandingPage — CTA shimmer effect ──────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.cta-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-shimmer {
+    animation: none;
+  }
 }
 
 /* ── CollaborativeEditor — mention chip ─────────────────────────────────── */

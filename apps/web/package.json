@@ -101,6 +101,7 @@
   "devDependencies": {
     "@argos-ci/playwright": "^6.4.2",
     "@axe-core/playwright": "^4.10.1",
+    "@axe-core/react": "^4.11.1",
     "@edusphere/eslint-config": "workspace:*",
     "@edusphere/tsconfig": "workspace:*",
     "@eslint/js": "^10.0.1",

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Brain,
@@ -14,8 +14,18 @@ import {
   Linkedin,
   Check,
 } from 'lucide-react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { MotionCard } from '@/components/landing/MotionCard';
+import { AnimatedCounter } from '@/components/landing/AnimatedCounter';
+import { TestimonialsCarousel } from '@/components/landing/TestimonialsCarousel';
+import { VideoSection } from '@/components/landing/VideoSection';
+import { useReducedMotion } from '@/providers/ReducedMotionProvider';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // ── LandingNav ────────────────────────────────────────────────────────────────
 function LandingNav() {
@@ -75,11 +85,47 @@ function LandingNav() {
 
 // ── HeroSection ───────────────────────────────────────────────────────────────
 function HeroSection() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion || !heroRef.current) return;
+      gsap.fromTo(
+        heroRef.current.querySelectorAll('.hero-animate'),
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: 'power3.out',
+        },
+      );
+    },
+    { scope: heroRef, dependencies: [prefersReducedMotion] },
+  );
+
   return (
     <section
       data-testid="hero-section"
       className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 text-white"
     >
+      {/* Pre-rendered Remotion background video — preload=none avoids blocking LCP */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover -z-10"
+        src="/hero-bg.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="none"
+        poster="/hero-bg-poster.webp"
+        aria-hidden="true"
+      />
+      {/* Overlay for text readability */}
+      <div className="absolute inset-0 bg-black/30 -z-10" aria-hidden="true" />
+
       {/* Animated background orbs — CSS-only, prefers-reduced-motion aware */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="motion-safe:animate-pulse absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
@@ -88,14 +134,15 @@ function HeroSection() {
         <div className="motion-safe:animate-bounce absolute top-1/2 right-1/3 w-3 h-3 rounded-full bg-white/15" style={{ animationDuration: '4s' }} />
         <div className="motion-safe:animate-bounce absolute bottom-1/4 left-1/2 w-2 h-2 rounded-full bg-white/25" style={{ animationDuration: '2.5s' }} />
       </div>
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+
+      <div ref={heroRef} className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center">
+        <h1 className="hero-animate text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
           The AI-Powered Learning Platform<br className="hidden sm:block" /> Built for the Future
         </h1>
-        <p className="text-lg sm:text-xl text-indigo-100 mb-10 max-w-2xl mx-auto leading-relaxed">
+        <p className="hero-animate text-lg sm:text-xl text-indigo-100 mb-10 max-w-2xl mx-auto leading-relaxed">
           Personalized learning paths, knowledge graphs, and intelligent tutoring — all in one platform.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="hero-animate flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50 font-semibold shadow-lg" asChild>
             <Link to="/login">Get Started Free</Link>
           </Button>
@@ -110,10 +157,10 @@ function HeroSection() {
 
 // ── StatsBar ──────────────────────────────────────────────────────────────────
 const STATS = [
-  { value: '10,000+', label: 'Courses' },
-  { value: '500K+', label: 'Learners' },
-  { value: '98%', label: 'Completion Rate' },
-  { value: '50+', label: 'Languages' },
+  { target: 10000, suffix: '+', label: 'Courses' },
+  { target: 500000, suffix: '+', label: 'Learners' },
+  { target: 98, suffix: '%', label: 'Completion Rate' },
+  { target: 50, suffix: '+', label: 'Languages' },
 ];
 
 function StatsBar() {
@@ -122,7 +169,9 @@ function StatsBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
         {STATS.map((s) => (
           <div key={s.label}>
-            <div className="text-3xl sm:text-4xl font-extrabold text-indigo-600">{s.value}</div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-indigo-600">
+              <AnimatedCounter target={s.target} suffix={s.suffix} />
+            </div>
             <div className="mt-1 text-sm text-gray-500 dark:text-muted-foreground font-medium">{s.label}</div>
           </div>
         ))}
@@ -152,18 +201,20 @@ function FeaturesSection() {
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map(({ Icon, title, desc }) => (
-            <Card key={title} className="hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 rounded-lg bg-indigo-50">
-                    <Icon className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+          {FEATURES.map(({ Icon, title, desc }, i) => (
+            <MotionCard key={title} delay={i * 0.1}>
+              <Card className="hover:shadow-md transition-shadow h-full">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 rounded-lg bg-indigo-50">
+                      <Icon className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 dark:text-foreground">{title}</h3>
                   </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-foreground">{title}</h3>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground leading-relaxed">{desc}</p>
-              </CardContent>
-            </Card>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground leading-relaxed">{desc}</p>
+                </CardContent>
+              </Card>
+            </MotionCard>
           ))}
         </div>
       </div>
@@ -333,8 +384,9 @@ function PricingSection() {
 // ── CTABanner ─────────────────────────────────────────────────────────────────
 function CTABanner() {
   return (
-    <section data-testid="cta-banner" className="bg-indigo-700 py-20 text-white text-center">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section data-testid="cta-banner" className="relative overflow-hidden bg-indigo-700 py-20 text-white text-center">
+      <div className="cta-shimmer absolute inset-0 pointer-events-none" aria-hidden="true" />
+      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Ready to Transform Your Learning?</h2>
         <p className="text-indigo-200 text-lg mb-8">
           Join 500,000+ learners already building expertise on EduSphere.
@@ -406,9 +458,11 @@ export function LandingPage() {
         <HeroSection />
         <StatsBar />
         <FeaturesSection />
+        <VideoSection />
         <HowItWorksSection />
         <TestimonialsSection />
         <PricingSection />
+        <TestimonialsCarousel />
         <CTABanner />
       </main>
       <LandingFooter />

@@ -8,6 +8,10 @@ import path from 'path';
 // the aliases let Vitest resolve the module path without throwing
 // "Failed to resolve import".
 const tiptapStub = path.resolve(__dirname, './src/test/stubs/tiptap-stub.ts');
+// GSAP stubs — GSAP uses browser APIs (requestAnimationFrame, etc.) not available in jsdom.
+// The stubs replace all GSAP calls with no-ops so component tests can run without crashing.
+const gsapStub = path.resolve(__dirname, './src/test/stubs/gsap-stub.ts');
+const gsapReactStub = path.resolve(__dirname, './src/test/stubs/gsap-react-stub.ts');
 // Three.js stubs — package is not installed; stubs allow Vite import-analysis
 // to resolve the paths; vi.mock() replaces the exports at test runtime.
 const threeStub = path.resolve(__dirname, './src/test/stubs/three-stub.ts');
@@ -80,6 +84,10 @@ export default defineConfig({
       { find: /^three\/examples\/jsm\/loaders\/GLTFLoader\.js$/, replacement: threeGltfStub },
       { find: /^three\/examples\/jsm\/controls\/OrbitControls\.js$/, replacement: threeOrbitStub },
       { find: /^three$/, replacement: threeStub },
+      // GSAP — uses browser APIs not available in jsdom; stub all GSAP imports.
+      { find: /^gsap\/ScrollTrigger$/, replacement: gsapStub },
+      { find: /^gsap$/, replacement: gsapStub },
+      { find: /^@gsap\/react$/, replacement: gsapReactStub },
     ],
   },
   test: {
