@@ -36,7 +36,7 @@ interface LessonData {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: 'טיוטה', color: 'bg-gray-100 text-gray-700' },
+  DRAFT: { label: 'טיוטה', color: 'bg-muted text-foreground' },
   PROCESSING: { label: 'בעיבוד...', color: 'bg-yellow-100 text-yellow-700' },
   READY: { label: 'מוכן', color: 'bg-green-100 text-green-700' },
   PUBLISHED: { label: 'פורסם', color: 'bg-blue-100 text-blue-700' },
@@ -82,7 +82,7 @@ export function LessonDetailPage() {
         <Layout>
           <div className="p-6 space-y-3">
             <p className="text-amber-700 font-medium">הסשן פג תוקף</p>
-            <p className="text-sm text-gray-600">יש להתחבר מחדש כדי להמשיך.</p>
+            <p className="text-sm text-muted-foreground">יש להתחבר מחדש כדי להמשיך.</p>
             <Button onClick={() => login()}>התחבר מחדש</Button>
           </div>
         </Layout>
@@ -99,14 +99,14 @@ export function LessonDetailPage() {
   if (!lesson) {
     return (
       <Layout>
-        <div className="p-6 text-gray-500">השיעור לא נמצא</div>
+        <div className="p-6 text-muted-foreground">השיעור לא נמצא</div>
       </Layout>
     );
   }
 
   const statusInfo = STATUS_LABELS[lesson.status] ?? {
     label: lesson.status,
-    color: 'bg-gray-100 text-gray-600',
+    color: 'bg-muted text-muted-foreground',
   };
 
   return (
@@ -122,7 +122,7 @@ export function LessonDetailPage() {
           </Button>
         </div>
 
-        <div className="bg-white rounded-xl border p-6 mb-4">
+        <div className="bg-card rounded-xl border p-6 mb-4">
           <div className="flex items-start justify-between mb-3">
             <h1 className="text-2xl font-bold">{lesson.title}</h1>
             <span
@@ -131,7 +131,7 @@ export function LessonDetailPage() {
               {statusInfo.label}
             </span>
           </div>
-          <div className="flex gap-4 text-sm text-gray-500">
+          <div className="flex gap-4 text-sm text-muted-foreground">
             <span>סוג: {lesson.type === 'THEMATIC' ? 'הגות' : 'על הסדר'}</span>
             {lesson.series && <span>סדרה: {lesson.series}</span>}
             {lesson.lessonDate && (
@@ -143,7 +143,7 @@ export function LessonDetailPage() {
         </div>
 
         {lesson.assets.length > 0 && (
-          <div className="bg-white rounded-xl border p-4 mb-4">
+          <div className="bg-card rounded-xl border p-4 mb-4">
             <h2 className="text-base font-semibold mb-3">חומרים</h2>
             <div className="space-y-2">
               {lesson.assets.map((asset) => (

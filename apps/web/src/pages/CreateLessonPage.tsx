@@ -105,7 +105,7 @@ export function CreateLessonPage() {
             <div
               key={s}
               className={`flex-1 h-2 rounded-full ${
-                s <= step ? 'bg-blue-600' : 'bg-gray-200'
+                s <= step ? 'bg-blue-600' : 'bg-muted'
               }`}
             />
           ))}
@@ -134,15 +134,15 @@ export function CreateLessonPage() {
                 className={`border-2 rounded-xl p-4 cursor-pointer transition-colors ${
                   selectedTemplate === 'THEMATIC'
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300'
+                    : 'border-border hover:border-blue-300'
                 }`}
                 onClick={() => setSelectedTemplate('THEMATIC')}
               >
                 <h3 className="font-semibold text-lg mb-1">🎯 שיעור כללי</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   נושא נקבע ע&quot;י המרצה — 8 שלבי עיבוד
                 </p>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                   מתאים ל: הרב ישראל אביחי
                 </p>
               </div>
@@ -150,15 +150,15 @@ export function CreateLessonPage() {
                 className={`border-2 rounded-xl p-4 cursor-pointer transition-colors ${
                   selectedTemplate === 'SEQUENTIAL'
                     ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-purple-300'
+                    : 'border-border hover:border-purple-300'
                 }`}
                 onClick={() => setSelectedTemplate('SEQUENTIAL')}
               >
                 <h3 className="font-semibold text-lg mb-1">📖 ספר עץ חיים</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   לימוד על הסדר — 9 שלבים + אימות ציטוטים
                 </p>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                   מתאים ל: הרב יוסף טובול
                 </p>
               </div>

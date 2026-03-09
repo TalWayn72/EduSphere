@@ -7,6 +7,20 @@
 
 ---
 
+## FEAT-PHASE44-SKILLS | ✅ Fixed | HIGH
+**Phase 44 — Skills-Based Learning Paths**
+**Date:** 2026-03-09
+**Status:** ✅ Complete — committed 17c18bf (2026-03-09)
+**Deliverables:** skills/skill_prerequisites/skill_paths/learner_skill_progress tables + RLS + migration 0026, SkillService + SkillGapService + SkillResolver in subgraph-agent, SkillPathPage + SkillGapDashboard + SkillPathCard in web frontend, 21 RLS tests + 9 unit tests + 7 security tests
+**Anti-recurrence:** skills-rls.test.ts uses getTableName() from drizzle-orm (not table._.name)
+
+## FEAT-PHASE43-SCORM-ANALYTICS | ✅ Fixed | HIGH
+**Phase 43 — SCORM 2004 + cmi5 + Analytics + Expo SDK 55**
+**Date:** 2026-03-09
+**Status:** ✅ Complete — committed 17c18bf (2026-03-09)
+**Deliverables:** Scorm2004Player + cmi5-launcher.service, InstructorAnalyticsDashboard + MyProgressPage + DropOffFunnelChart + AtRiskLearnersPanel, AiUsageService, microlearning resolvers, Expo SDK 55 mobile upgrade
+**Anti-recurrence:** Scorm2004Player TypeScript casts use `as unknown as Record<string, unknown>` (double-cast pattern for non-overlapping types)
+
 ## FEAT-PHASE42-WHITE-LABEL-RUNTIME | ✅ Fixed | HIGH
 
 Phase 42 — White-Label Runtime per Tenant
@@ -7867,10 +7881,10 @@ Commit: `ae622ce`
 
 ---
 
-## FEAT-PHASE41-XAPI-DRIVE-MOBILE | 🟡 In Progress | HIGH
+## FEAT-PHASE41-XAPI-DRIVE-MOBILE | ✅ Fixed | HIGH
 **Phase 41 — xAPI NATS Bridge + Google Drive Import + Mobile Offline Queue**
 
-**Status:** 🟡 In Progress — Wave 1 complete (A1+A2+B1+C1), Wave 2 in progress
+**Status:** ✅ Complete — committed ae129f0 (2026-03-09)
 
 **Deliverables (Phase 41 Sprint A — xAPI Pipeline):**
 - `apps/subgraph-content/src/xapi/xapi-verb-mappings.ts` — xAPI 1.0.3 verb table + NATS→xAPI mapper

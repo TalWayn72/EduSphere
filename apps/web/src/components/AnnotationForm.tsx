@@ -61,7 +61,7 @@ export function AnnotationForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 p-4 bg-gray-50 rounded-lg border"
+      className="space-y-4 p-4 bg-muted rounded-lg border"
     >
       <div>
         <Label htmlFor="content" className="text-sm font-medium">
@@ -108,7 +108,7 @@ export function AnnotationForm({
                 })}
               </SelectContent>
             </Select>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {ANNOTATION_LAYER_CONFIGS[selectedLayer].description}
             </p>
           </div>
@@ -125,7 +125,7 @@ export function AnnotationForm({
               placeholder="mm:ss or hh:mm:ss"
               className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Format: 05:23 or 1:05:23
             </p>
           </div>

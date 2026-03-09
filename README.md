@@ -365,7 +365,7 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 43**     | SCORM 2004 Player, cmi5 AU Launcher, InstructorAnalyticsDashboard, MyProgressPage, Microlearning resolvers, AI Usage service, Expo SDK 55 upgrade | 3 days   | ✅ Complete    |
 | **Phase 44**     | Skills-Based Learning Paths DB schema (skills, skill_prerequisites, skill_paths, learner_skill_progress) + migration 0026 with RLS (SI-1 compliant) | 1 day    | ✅ Complete    |
 
-**Current Status:** Phases 1-44 complete ✅ — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. 4,072+ tests passing across 308 test files (web) + 1,132 (subgraph-content) + 980 (security). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** Phases 1-44 complete ✅ — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. 4,004+ tests passing across 316 test files (web) + 1,132 (subgraph-content) + 980+ (security). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 
@@ -465,7 +465,7 @@ k6 run infrastructure/load-testing/k6/scenarios/smoke.js \
 
 | Category                | Framework               | Location                                     | Status                                             |
 | ----------------------- | ----------------------- | -------------------------------------------- | -------------------------------------------------- |
-| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **4,027+ tests passing** (307 test files — core ~664, knowledge ~544, DB ~428, mobile ~218, i18n ~304, security ~970, contract ~88, Phase 39-44 additions)  |
+| **Frontend Unit Tests** | Vitest + jsdom + RTL    | `apps/web/src/**/*.test.{ts,tsx}`            | ✅ **4,004+ tests passing** (316 test files — core ~664, knowledge ~544, DB ~428, mobile ~218, i18n ~304, security ~970, contract ~88, Phase 39-44 additions)  |
 | **Backend Unit Tests**  | Vitest                  | `apps/*/src/**/*.spec.ts`                    | ✅ Passing (subgraph-core + subgraph-knowledge)    |
 | **Frontend E2E**        | Playwright              | `apps/web/e2e/*.spec.ts`                     | ⏳ Specs ready — needs dev server                  |
 | **Integration Tests**   | Vitest + Testcontainers | `apps/*/src/test/integration/*.spec.ts`      | ⏳ Planned Phase 7                                 |

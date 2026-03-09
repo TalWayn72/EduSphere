@@ -34,7 +34,7 @@ function SimilarityBar({ value }: { value: number }) {
     pct >= 85 ? 'bg-red-500' : pct >= 60 ? 'bg-yellow-400' : 'bg-green-400';
   return (
     <div className="flex items-center gap-2">
-      <div className="h-2 w-24 rounded bg-gray-200">
+      <div className="h-2 w-24 rounded bg-muted">
         <div className={`h-2 rounded ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <span className="text-xs tabular-nums">{pct}%</span>
@@ -63,24 +63,24 @@ export function PlagiarismReportCard({
 
       <CardContent className="space-y-4">
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-gray-500">Highest match:</span>
+          <span className="text-muted-foreground">Highest match:</span>
           <SimilarityBar value={highestSimilarity} />
         </div>
 
         {similarSubmissions.length > 0 && (
           <div>
-            <p className="mb-2 text-sm font-medium text-gray-700">
+            <p className="mb-2 text-sm font-medium text-foreground">
               Similar Submissions
             </p>
             <ul className="space-y-2">
               {similarSubmissions.map((s) => (
                 <li
                   key={s.submissionId}
-                  className="flex items-center justify-between rounded border bg-gray-50 px-3 py-2 text-sm"
+                  className="flex items-center justify-between rounded border bg-muted px-3 py-2 text-sm"
                 >
                   <div className="space-y-0.5">
                     <SimilarityBar value={s.similarity} />
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-muted-foreground">
                       Submitted {new Date(s.submittedAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -98,7 +98,7 @@ export function PlagiarismReportCard({
           </div>
         )}
 
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted-foreground">
           Checked at {new Date(checkedAt).toLocaleString()}
         </p>
       </CardContent>

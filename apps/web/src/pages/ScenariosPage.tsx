@@ -116,10 +116,10 @@ export function ScenariosPage() {
               <Briefcase className="h-5 w-5" />
             );
             const iconClass =
-              DOMAIN_COLORS[scenario.domain] ?? 'text-gray-500 bg-gray-50';
+              DOMAIN_COLORS[scenario.domain] ?? 'text-muted-foreground bg-muted';
             const badgeClass =
               DIFFICULTY_BADGES[scenario.difficultyLevel] ??
-              'bg-gray-100 text-gray-700';
+              'bg-muted text-foreground';
             return (
               <Card
                 key={scenario.id}

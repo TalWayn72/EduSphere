@@ -529,7 +529,7 @@ export function CourseDetailPage() {
 
         {/* Lessons section — visible to all users; add button only for editors */}
         <div className="border rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 bg-white border-b">
+          <div className="flex items-center justify-between px-4 py-3 bg-card border-b">
             <span className="text-sm font-medium flex items-center gap-2">
               🎓 שיעורים
             </span>
@@ -548,7 +548,7 @@ export function CourseDetailPage() {
               {lessons.map((lesson) => (
                 <button
                   key={lesson.id}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm text-left"
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted text-sm text-left"
                   onClick={() =>
                     navigate(`/courses/${courseId}/lessons/${lesson.id}`)
                   }
@@ -562,7 +562,7 @@ export function CourseDetailPage() {
                           ? 'bg-green-100 text-green-700'
                           : lesson.status === 'PROCESSING'
                             ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-gray-100 text-gray-600'
+                            : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {lesson.status}
@@ -571,7 +571,7 @@ export function CourseDetailPage() {
               ))}
             </div>
           ) : (
-            <div className="px-4 py-6 text-center text-sm text-gray-400">
+            <div className="px-4 py-6 text-center text-sm text-muted-foreground">
               {canEdit
                 ? 'אין שיעורים עדיין — לחץ "+ הוסף שיעור" כדי להתחיל'
                 : 'אין שיעורים זמינים עדיין'}
@@ -582,7 +582,7 @@ export function CourseDetailPage() {
         {/* Knowledge Sources — collapsible panel */}
         <div className="border rounded-xl overflow-hidden">
           <button
-            className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 transition-colors text-sm font-medium"
+            className="w-full flex items-center justify-between px-4 py-3 bg-card hover:bg-muted transition-colors text-sm font-medium"
             onClick={() => setShowSources((v) => !v)}
             aria-expanded={showSources}
             data-testid="toggle-sources"
@@ -591,7 +591,7 @@ export function CourseDetailPage() {
               <BookMarked className="h-4 w-4 text-blue-600" />
               מקורות מידע
             </span>
-            <span className="text-gray-400">{showSources ? '▲' : '▼'}</span>
+            <span className="text-muted-foreground">{showSources ? '▲' : '▼'}</span>
           </button>
           {showSources && (
             <div className="h-96" data-testid="sources-panel">

@@ -146,14 +146,14 @@ export function LessonPipelinePage() {
       />
       <div className="flex flex-col h-[calc(100vh-4rem)]">
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-6 py-3 border-b bg-white shrink-0">
+        <div className="flex items-center justify-between px-6 py-3 border-b bg-card shrink-0">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(`/courses/${courseId}/lessons/${lessonId}`)}>
               ← {data?.lesson?.title ?? 'שיעור'}
             </Button>
-            <span className="text-sm text-gray-400">Pipeline Builder</span>
+            <span className="text-sm text-muted-foreground">Pipeline Builder</span>
             <select
-              className="text-xs border rounded px-2 py-1 bg-white"
+              className="text-xs border rounded px-2 py-1 bg-card"
               defaultValue=""
               onChange={(e) => {
                 const val = e.target.value as 'THEMATIC' | 'SEQUENTIAL' | 'CUSTOM' | '';
@@ -192,14 +192,14 @@ export function LessonPipelinePage() {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Module Palette */}
-          <div className="w-56 border-r bg-gray-50 overflow-y-auto p-3 shrink-0">
-            <p className="text-xs font-semibold text-gray-500 uppercase mb-3">מודולים</p>
+          <div className="w-56 border-r bg-muted overflow-y-auto p-3 shrink-0">
+            <p className="text-xs font-semibold text-muted-foreground uppercase mb-3">מודולים</p>
             {ALL_MODULES.map((m) => (
               <div key={m} draggable onDragStart={(e) => e.dataTransfer.setData('moduleType', m)}
-                className="bg-white border rounded-lg p-2 mb-2 cursor-grab text-xs hover:border-blue-400 hover:shadow-sm active:cursor-grabbing"
+                className="bg-card border rounded-lg p-2 mb-2 cursor-grab text-xs hover:border-blue-400 hover:shadow-sm active:cursor-grabbing"
               >
                 <div className="font-medium">{MODULE_LABELS[m].he}</div>
-                <div className="text-gray-400">{MODULE_LABELS[m].en}</div>
+                <div className="text-muted-foreground">{MODULE_LABELS[m].en}</div>
               </div>
             ))}
           </div>
@@ -208,7 +208,7 @@ export function LessonPipelinePage() {
           <div className="flex-1 p-4 overflow-y-auto" onDragOver={(e) => e.preventDefault()} onDrop={handleDrop}>
             {nodes.length === 0 ? (
               <div
-                className="flex flex-col items-center justify-center h-full text-gray-400 border-2 border-dashed rounded-xl"
+                className="flex flex-col items-center justify-center h-full text-muted-foreground border-2 border-dashed rounded-xl"
                 data-testid="empty-canvas"
               >
                 {customMode ? (
@@ -216,7 +216,7 @@ export function LessonPipelinePage() {
                     <p className="text-4xl mb-3">🔧</p>
                     <p className="text-lg font-medium text-blue-600">מצב בנייה חופשית</p>
                     <p className="text-sm mt-1">גרור מודולים מהחלונית השמאלית לכאן</p>
-                    <p className="text-xs text-gray-400 mt-2">בנה Pipeline מותאם אישית ללא תבנית מוכנה</p>
+                    <p className="text-xs text-muted-foreground mt-2">בנה Pipeline מותאם אישית ללא תבנית מוכנה</p>
                   </>
                 ) : (
                   <>
@@ -261,7 +261,7 @@ interface NodeCardProps { node: PipelineNode; idx: number; total: number; isSele
 function PipelineNodeCard({ node, idx, total, isSelected, onSelect, onRemove, onMoveUp, onMoveDown }: NodeCardProps) {
   return (
     <div
-      className={`border-2 rounded-xl p-3 cursor-pointer transition-all ${isSelected ? 'border-blue-500 bg-blue-50' : node.enabled ? 'border-gray-200 bg-white hover:border-blue-300' : 'border-gray-100 bg-gray-50 opacity-50'}`}
+      className={`border-2 rounded-xl p-3 cursor-pointer transition-all ${isSelected ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : node.enabled ? 'border-border bg-card hover:border-blue-300' : 'border-border bg-muted opacity-50'}`}
       onClick={onSelect}
       data-testid={`pipeline-node-${node.moduleType}`}
     >
@@ -270,16 +270,16 @@ function PipelineNodeCard({ node, idx, total, isSelected, onSelect, onRemove, on
           <span className="bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">{idx + 1}</span>
           <div>
             <div className="text-sm font-medium">{node.labelHe}</div>
-            <div className="text-xs text-gray-400">{node.label}</div>
+            <div className="text-xs text-muted-foreground">{node.label}</div>
           </div>
         </div>
         <div className="flex items-center gap-1">
           <button onClick={(e) => { e.stopPropagation(); onMoveUp(); }} disabled={idx === 0}
-            className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600 disabled:opacity-30 text-xs" aria-label="הזז למעלה">↑</button>
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs" aria-label="הזז למעלה">↑</button>
           <button onClick={(e) => { e.stopPropagation(); onMoveDown(); }} disabled={idx === total - 1}
-            className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600 disabled:opacity-30 text-xs" aria-label="הזז למטה">↓</button>
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs" aria-label="הזז למטה">↓</button>
           <button onClick={(e) => { e.stopPropagation(); onRemove(); }}
-            className="h-6 w-6 p-0 text-gray-400 hover:text-red-500 text-xs" aria-label="הסר מודול">✕</button>
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500 text-xs" aria-label="הסר מודול">✕</button>
         </div>
       </div>
     </div>

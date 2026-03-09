@@ -6,6 +6,60 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.44.0] — 2026-03-09
+
+### Added
+- **Skills-Based Learning Paths** — full DB schema (4 tables: skills, skill_prerequisites, skill_paths, learner_skill_progress) with Drizzle ORM + migration 0026
+- RLS policies on skill_paths (tenant isolation) and learner_skill_progress (per-user isolation, SI-1 compliant with app.current_user_id)
+- `apps/subgraph-agent/src/skills/` — SkillService, SkillGapService, SkillResolver, SDL with 5 queries + 2 mutations
+- `apps/web/src/pages/SkillPathPage.tsx` — `/skills` route, grid layout with mounted guard, loading/empty/error states
+- `apps/web/src/pages/SkillGapDashboard.tsx` — `/skills/gap/:pathId` route, two-column mastered/gap view
+- `apps/web/src/components/skills/SkillPathCard.tsx` — card with progress bar, expand/collapse, gap analysis CTA
+- `apps/web/src/lib/graphql/skills.queries.ts` — SKILLS_QUERY, SKILL_PATHS_QUERY, MY_SKILL_PROGRESS_QUERY, SKILL_GAP_ANALYSIS_QUERY, UPDATE_SKILL_PROGRESS_MUTATION
+- AppSidebar — added "Skill Paths" nav item (Target icon, /skills route)
+- Router — added /skills and /skills/gap/:pathId lazy routes
+
+### Security
+- learner_skill_progress RLS uses app.current_user_id (SI-1 compliant, not app.current_user)
+- skill_paths RLS restricts writes to INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN roles
+
+### Tests
+- 21 RLS validation tests (packages/db/src/rls/skills-rls.test.ts)
+- 4 SkillPathPage unit tests (hardened with act() + waitFor timeout:5000)
+- 5 SkillGapDashboard unit tests
+- 7 security tests (tests/security/api-security.spec.ts — Phase 44 block)
+- Seed data: 20 sample skills + 10 prerequisite edges
+
+---
+
+## [0.43.0] — 2026-03-09
+
+### Added
+- **Expo SDK 55 Migration** — apps/mobile upgraded to Expo ~55.0.0 + RN 0.83.0, expo-video ~2.0.0 replaces expo-av, react-native-reanimated ^4.0.0 (New Architecture), edgeToEdgeEnabled: true for Android 16+
+- **SCORM 2004 Player** — apps/web/src/lib/scorm/scorm2004-data-model.ts (CMI data model, ISO 8601 duration utils), apps/web/src/components/scorm/Scorm2004Player.tsx (iframe player with postMessage SCORM 2004 API)
+- **cmi5 AU Launcher** — apps/web/src/components/scorm/Cmi5Player.tsx + apps/subgraph-content/src/scorm/cmi5-launcher.service.ts (9 required ADL verbs, MoveOn criteria, launch URL builder)
+- **InstructorAnalyticsDashboard** — /instructor/analytics route, 4 stat cards, 4 tabs (Overview, Learner Engagement, At-Risk Learners, AI Usage), role-gated to INSTRUCTOR+
+- **MyProgressPage** — /my-progress route, student self-analytics (streak, challenges, leaderboard rank)
+- **AI Usage Analytics** — AiUsageService querying xapi_statements for AI tutor usage metrics, aiUsageStats GraphQL query
+- **Microlearning resolvers** — dailyMicrolesson, microlearningPaths, createMicrolearningPath in subgraph-content
+- **DropOffFunnelChart** — Recharts bar chart with color-coded drop-off rates (red/amber/green thresholds)
+- **AtRiskLearnersPanel** — table component with risk scores, days since active, progress %, risk factor badges
+
+### Security
+- SCORM 2004 suspend_data has no length cap (unlike SCORM 1.2's 4096-byte limit)
+- cmi5 launch URL includes all required ADL security parameters (actor, endpoint, authToken, activityId, registration)
+- 5 security tests for Phase 43 SCORM/analytics RBAC (tests/security/api-security.spec.ts)
+
+### Tests
+- 9 mobile migration tests (apps/mobile/src/screens/__tests__/VideoMigration.test.ts)
+- 20 SCORM 2004 data model tests (scorm2004-data-model.test.ts)
+- 14 cmi5 launcher service tests (cmi5-launcher.service.spec.ts)
+- 12 InstructorAnalyticsDashboard tests + 7 DropOffFunnelChart tests
+- 9 MyProgressPage tests
+- 6 AiUsageService tests
+
+---
+
 ## [0.42.0] — 2026-03-09
 
 ### Added

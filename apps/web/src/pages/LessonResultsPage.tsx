@@ -67,7 +67,7 @@ function ResultCard({ icon, title, children, testId }: {
   icon: string; title: string; children: React.ReactNode; testId: string;
 }) {
   return (
-    <div className="bg-white border rounded-xl p-4" data-testid={testId}>
+    <div className="bg-card border rounded-xl p-4" data-testid={testId}>
       <h2 className="text-base font-semibold mb-3">{icon} {title}</h2>
       {children}
     </div>
@@ -79,7 +79,7 @@ function ExpandableText({ text, limit = 600, testId }: { text: string; limit?: n
   const truncated = text.length > limit && !expanded;
   return (
     <div>
-      <pre className="text-xs whitespace-pre-wrap font-sans leading-relaxed text-gray-700" data-testid={testId}>
+      <pre className="text-xs whitespace-pre-wrap font-sans leading-relaxed text-foreground" data-testid={testId}>
         {truncated ? text.slice(0, limit) + '...' : text}
       </pre>
       {text.length > limit && (
@@ -182,7 +182,7 @@ export function LessonResultsPage() {
   if (!lesson) {
     return (
       <Layout>
-        <div className="p-6 text-gray-500">השיעור לא נמצא</div>
+        <div className="p-6 text-muted-foreground">השיעור לא נמצא</div>
       </Layout>
     );
   }
@@ -268,9 +268,9 @@ export function LessonResultsPage() {
             {runStatus === 'COMPLETED' && <span className="text-green-600 font-medium">✅ הושלם</span>}
             {runStatus === 'RUNNING'   && <span className="text-blue-600 font-medium">⏳ מריץ...</span>}
             {runStatus === 'FAILED'    && <span className="text-red-600 font-medium">❌ נכשל</span>}
-            {runStatus === 'CANCELLED' && <span className="text-gray-500 font-medium">⛔ בוטל</span>}
+            {runStatus === 'CANCELLED' && <span className="text-muted-foreground font-medium">⛔ בוטל</span>}
             {completedAt && (
-              <span className="text-gray-400 text-xs">
+              <span className="text-muted-foreground text-xs">
                 {new Date(completedAt).toLocaleString('he-IL')}
               </span>
             )}
@@ -287,7 +287,7 @@ export function LessonResultsPage() {
         {/* Empty state */}
         {!hasResults && (
           <div>
-            <div className="text-center py-10 text-gray-400" data-testid="empty-results">
+            <div className="text-center py-10 text-muted-foreground" data-testid="empty-results">
               <p className="text-4xl mb-3">⏳</p>
               <p className="text-base">אין תוצאות עדיין. הפעל את ה-Pipeline תחילה.</p>
               <Button
@@ -321,10 +321,10 @@ export function LessonResultsPage() {
                     </a>
                   </p>
                 ) : (
-                  <p className="text-sm text-gray-500">קובץ הועלה מקומית</p>
+                  <p className="text-sm text-muted-foreground">קובץ הועלה מקומית</p>
                 )}
                 {getString(ingestion.outputData, 'assetType') && (
-                  <span className="text-xs text-gray-400 mt-1 block">
+                  <span className="text-xs text-muted-foreground mt-1 block">
                     סוג: {getString(ingestion.outputData, 'assetType')}
                   </span>
                 )}
@@ -334,7 +334,7 @@ export function LessonResultsPage() {
             {/* ASR — Transcription */}
             {asr && (
               <ResultCard icon="🎙" title="תמלול (ASR)" testId="result-asr">
-                <div className="flex items-center gap-3 mb-2 text-xs text-gray-500">
+                <div className="flex items-center gap-3 mb-2 text-xs text-muted-foreground">
                   {asrLanguage && (
                     <span data-testid="asr-language">שפה: {asrLanguage}</span>
                   )}
@@ -347,7 +347,7 @@ export function LessonResultsPage() {
                 {transcript ? (
                   <ExpandableText text={transcript} limit={800} testId="asr-transcript" />
                 ) : (
-                  <p className="text-sm text-gray-400">התמלול בעיבוד...</p>
+                  <p className="text-sm text-muted-foreground">התמלול בעיבוד...</p>
                 )}
               </ResultCard>
             )}
@@ -364,23 +364,23 @@ export function LessonResultsPage() {
               <ResultCard icon="🔗" title="זיהוי מקורות וישויות" testId="result-ner">
                 {entities && (
                   <div className="mb-3">
-                    <h3 className="text-xs font-semibold text-gray-500 mb-1 uppercase">ישויות שזוהו</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground mb-1 uppercase">ישויות שזוהו</h3>
                     <div className="flex flex-wrap gap-1">
                       {entities.slice(0, 20).map((e, i) => (
                         <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200" data-testid={`entity-${i}`}>
                           {e.text}
-                          {e.type && <span className="text-gray-400 ml-1">({e.type})</span>}
+                          {e.type && <span className="text-muted-foreground ml-1">({e.type})</span>}
                         </span>
                       ))}
                       {entities.length > 20 && (
-                        <span className="text-xs text-gray-400">+{entities.length - 20} נוספות</span>
+                        <span className="text-xs text-muted-foreground">+{entities.length - 20} נוספות</span>
                       )}
                     </div>
                   </div>
                 )}
                 {linkedSources && (
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 mb-1 uppercase">מקורות מקושרים</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground mb-1 uppercase">מקורות מקושרים</h3>
                     <ul className="text-sm space-y-1">
                       {linkedSources.slice(0, 10).map((s, i) => (
                         <li key={i}>
@@ -402,13 +402,13 @@ export function LessonResultsPage() {
               <ResultCard icon="📋" title="סיכום" testId="result-summarization">
                 {shortSummary && (
                   <div className="mb-3">
-                    <h3 className="text-xs font-semibold text-gray-500 mb-1 uppercase">סיכום קצר</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground mb-1 uppercase">סיכום קצר</h3>
                     <p className="text-sm leading-relaxed" data-testid="summary-short">{shortSummary}</p>
                   </div>
                 )}
                 {keyPoints && (
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 mb-1 uppercase">נקודות מפתח</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground mb-1 uppercase">נקודות מפתח</h3>
                     <ul className="list-disc list-inside text-sm space-y-1" data-testid="summary-keypoints">
                       {keyPoints.slice(0, 8).map((p, i) => <li key={i}>{p}</li>)}
                     </ul>
@@ -427,7 +427,7 @@ export function LessonResultsPage() {
             {/* Diagram */}
             {diagram && mermaidSrc && (
               <ResultCard icon="📊" title="תרשים מושגים" testId="result-diagram">
-                <pre className="text-xs bg-gray-50 rounded p-3 overflow-auto" data-testid="diagram-mermaid">{mermaidSrc}</pre>
+                <pre className="text-xs bg-muted rounded p-3 overflow-auto" data-testid="diagram-mermaid">{mermaidSrc}</pre>
               </ResultCard>
             )}
 
@@ -443,7 +443,7 @@ export function LessonResultsPage() {
                   </span>
                 </div>
                 {matchReport && (
-                  <pre className="text-xs text-gray-600 whitespace-pre-wrap" data-testid="citations-report">
+                  <pre className="text-xs text-muted-foreground whitespace-pre-wrap" data-testid="citations-report">
                     {matchReport.slice(0, 800)}
                   </pre>
                 )}
@@ -457,7 +457,7 @@ export function LessonResultsPage() {
                   <div className="text-3xl font-bold text-blue-600" data-testid="qa-score">
                     {Math.round(Number(qaScore ?? 0) * (Number(qaScore ?? 0) <= 1 ? 100 : 1))}%
                   </div>
-                  <span className="text-sm text-gray-500">ציון כללי</span>
+                  <span className="text-sm text-muted-foreground">ציון כללי</span>
                 </div>
                 {fixList && fixList.length > 0 && (
                   <div>
@@ -465,7 +465,7 @@ export function LessonResultsPage() {
                     <ul className="text-xs space-y-1" data-testid="qa-fix-list">
                       {fixList.slice(0, 5).map((fix, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <span className={fix.severity === 'HIGH' ? 'text-red-500' : fix.severity === 'MEDIUM' ? 'text-yellow-500' : 'text-gray-400'}>●</span>
+                          <span className={fix.severity === 'HIGH' ? 'text-red-500' : fix.severity === 'MEDIUM' ? 'text-yellow-500' : 'text-muted-foreground'}>●</span>
                           <span>{fix.description}</span>
                         </li>
                       ))}

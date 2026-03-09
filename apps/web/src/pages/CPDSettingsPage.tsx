@@ -267,7 +267,7 @@ export function CPDSettingsPage() {
                       </td>
                       <td className="p-2">
                         <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${ct.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}
+                          className={`text-xs px-2 py-0.5 rounded-full ${ct.isActive ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}
                         >
                           {ct.isActive ? 'Active' : 'Inactive'}
                         </span>
