@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AnalyticsResolver } from './analytics.resolver.js';
 import { AnalyticsService } from './analytics.service.js';
+import { AiUsageService } from './ai-usage.service.js';
 import { TenantAnalyticsService } from './tenant-analytics.service.js';
 import { TenantAnalyticsExportService } from './tenant-analytics-export.service.js';
 import { TenantAnalyticsResolver } from './tenant-analytics.resolver.js';
@@ -12,6 +13,7 @@ import { AtRiskResolver } from './at-risk.resolver.js';
   providers: [
     AnalyticsResolver,
     AnalyticsService,
+    AiUsageService,
     TenantAnalyticsService,
     TenantAnalyticsExportService,
     TenantAnalyticsResolver,
@@ -19,6 +21,6 @@ import { AtRiskResolver } from './at-risk.resolver.js';
     AtRiskService,
     AtRiskResolver,
   ],
-  exports: [AnalyticsService, TenantAnalyticsService, AtRiskService],
+  exports: [AnalyticsService, AiUsageService, TenantAnalyticsService, AtRiskService],
 })
 export class AnalyticsModule {}

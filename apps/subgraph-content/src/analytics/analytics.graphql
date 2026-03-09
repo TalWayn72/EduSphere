@@ -108,3 +108,19 @@ extend type Query {
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
+
+# ─── Phase 43: AI Usage Analytics ────────────────────────────────────────────
+
+type AiUsageStats {
+  totalRequests: Int!
+  uniqueLearnersUsed: Int!
+  estimatedTokensUsed: Int!
+  topCourseId: ID
+  topCourseRequests: Int!
+}
+
+extend type Query {
+  aiUsageStats: AiUsageStats!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}

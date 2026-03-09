@@ -8,6 +8,16 @@ vi.mock('@edusphere/db', () => ({
   eq: vi.fn(),
   and: vi.fn(),
   withTenantContext: vi.fn(),
+  count: vi.fn(),
+  sql: Object.assign(
+    (strings: TemplateStringsArray, ...values: unknown[]) =>
+      strings.reduce(
+        (acc: string, str: string, i: number) =>
+          acc + str + String(values[i] ?? ''),
+        ''
+      ),
+    { join: vi.fn() }
+  ),
 }));
 
 vi.mock('@edusphere/auth', () => ({
@@ -16,6 +26,7 @@ vi.mock('@edusphere/auth', () => ({
 
 import { AnalyticsResolver } from './analytics.resolver.js';
 import type { AnalyticsService } from './analytics.service.js';
+import type { AiUsageService } from './ai-usage.service.js';
 
 // ── Mock service ──────────────────────────────────────────────────────────────
 
@@ -24,6 +35,10 @@ const mockGetCourseAnalytics = vi.fn();
 const mockService = {
   getCourseAnalytics: mockGetCourseAnalytics,
 } as unknown as AnalyticsService;
+
+const mockAiUsageService = {
+  getAiUsageStatsByTenantCtx: vi.fn(),
+} as unknown as AiUsageService;
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -50,7 +65,7 @@ describe('AnalyticsResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new AnalyticsResolver(mockService);
+    resolver = new AnalyticsResolver(mockService, mockAiUsageService);
   });
 
   // Test 1: returns service result for INSTRUCTOR role

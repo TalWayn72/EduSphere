@@ -18,6 +18,7 @@ import {
   BarChart2,
   Award,
   FileQuestion,
+  Target,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useBranding } from '@/contexts/BrandingContext';
@@ -44,6 +45,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/gamification', icon: Trophy, labelKey: 'gamification' },
   { to: '/certificates', icon: Award, labelKey: 'certificates' },
   { to: '/srs-review', icon: Brain, labelKey: 'srsReview' },
+  { to: '/skills', icon: Target, labelKey: 'skillPaths' },
 ];
 
 function getInitials(firstName?: string, lastName?: string, username?: string): string {

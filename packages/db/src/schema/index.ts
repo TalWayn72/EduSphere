@@ -174,3 +174,6 @@ export * from './team-members';
 
 // Phase 37: Onboarding State
 export * from './onboarding';
+
+// Phase 44: Skills-Based Learning Paths
+export * from './skills';

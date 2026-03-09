@@ -1,0 +1,67 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable", "@authenticated"])
+
+type Skill {
+  id: ID!
+  slug: String!
+  name: String!
+  description: String
+  category: String!
+  level: Int!
+  parentSkillId: ID
+  prerequisites: [Skill!]!
+}
+
+type SkillPath {
+  id: ID!
+  title: String!
+  description: String
+  targetRole: String
+  skillIds: [ID!]!
+  estimatedHours: Int
+  isPublished: Boolean!
+}
+
+enum MasteryLevel {
+  NONE
+  ATTEMPTED
+  FAMILIAR
+  PROFICIENT
+  MASTERED
+}
+
+type LearnerSkillProgress {
+  skillId: ID!
+  masteryLevel: MasteryLevel!
+  evidenceCount: Int!
+  lastActivityAt: String
+}
+
+type SkillGapAnalysis {
+  targetPathId: ID!
+  totalSkills: Int!
+  masteredSkills: Int!
+  gapSkills: [Skill!]!
+  completionPct: Float!
+}
+
+type Query {
+  skills(category: String, limit: Int, offset: Int): [Skill!]! @authenticated
+  skill(id: ID!): Skill @authenticated
+  skillPaths(limit: Int, offset: Int): [SkillPath!]! @authenticated
+  mySkillProgress: [LearnerSkillProgress!]! @authenticated
+  skillGapAnalysis(pathId: ID!): SkillGapAnalysis! @authenticated
+}
+
+type Mutation {
+  createSkillPath(input: CreateSkillPathInput!): SkillPath! @authenticated
+  updateMySkillProgress(skillId: ID!, masteryLevel: MasteryLevel!): LearnerSkillProgress! @authenticated
+}
+
+input CreateSkillPathInput {
+  title: String!
+  description: String
+  targetRole: String
+  skillIds: [ID!]!
+  estimatedHours: Int
+}

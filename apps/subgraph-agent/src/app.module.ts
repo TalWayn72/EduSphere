@@ -11,6 +11,7 @@ import { RoleplayModule } from './roleplay/roleplay.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { LiveSessionsModule } from './live-sessions/live-sessions.module';
 import { ProctoringModule } from './proctoring/proctoring.module';
+import { SkillModule } from './skills/skill.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
@@ -35,6 +36,7 @@ import { authMiddleware } from './auth/auth.middleware';
     RoleplayModule,
     LiveSessionsModule,
     ProctoringModule,
+    SkillModule,
   ],
 })
 export class AppModule {}

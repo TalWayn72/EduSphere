@@ -1,6 +1,7 @@
 import { Resolver, Query, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service.js';
+import { AiUsageService } from './ai-usage.service.js';
 import type { TenantContext } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -30,7 +31,10 @@ function requireInstructor(ctx: GqlContext): TenantContext {
 
 @Resolver()
 export class AnalyticsResolver {
-  constructor(private readonly analyticsService: AnalyticsService) {}
+  constructor(
+    private readonly analyticsService: AnalyticsService,
+    private readonly aiUsageService: AiUsageService
+  ) {}
 
   @Query('courseAnalytics')
   async getCourseAnalytics(
@@ -39,5 +43,11 @@ export class AnalyticsResolver {
   ) {
     const tenantCtx = requireInstructor(ctx);
     return this.analyticsService.getCourseAnalytics(courseId, tenantCtx);
+  }
+
+  @Query('aiUsageStats')
+  async getAiUsageStats(@Context() ctx: GqlContext) {
+    const tenantCtx = requireInstructor(ctx);
+    return this.aiUsageService.getAiUsageStatsByTenantCtx(tenantCtx);
   }
 }

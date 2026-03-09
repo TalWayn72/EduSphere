@@ -1,3 +1,9 @@
+enum ScormVersion {
+  SCORM_12
+  SCORM_2004
+  CMI5
+}
+
 type ScormSession {
   id: ID!
   lessonStatus: String!
@@ -10,6 +16,7 @@ type ScormSession {
 type ScormImportResult {
   courseId: ID!
   itemCount: Int!
+  version: ScormVersion
 }
 
 extend type Query {

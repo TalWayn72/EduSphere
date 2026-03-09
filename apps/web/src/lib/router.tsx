@@ -384,6 +384,20 @@ const OAuthCallbackPage = lazy(() =>
     default: m.OAuthCallbackPage,
   }))
 );
+const InstructorAnalyticsDashboard = lazy(() =>
+  import('@/pages/InstructorAnalyticsDashboard').then((m) => ({
+    default: m.InstructorAnalyticsDashboard,
+  }))
+);
+const MyProgressPage = lazy(() =>
+  import('@/pages/MyProgressPage').then((m) => ({ default: m.MyProgressPage }))
+);
+const SkillPathPage = lazy(() =>
+  import('@/pages/SkillPathPage').then((m) => ({ default: m.SkillPathPage }))
+);
+const SkillGapDashboard = lazy(() =>
+  import('@/pages/SkillGapDashboard').then((m) => ({ default: m.SkillGapDashboard }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -605,6 +619,11 @@ export const router = createBrowserRouter([
     element: guarded(<CheckoutPage />),
   },
   {
+    // Instructor Analytics Dashboard — aggregate analytics across all courses
+    path: '/instructor/analytics',
+    element: guarded(<InstructorAnalyticsDashboard />),
+  },
+  {
     // Instructor annotation merge queue — PRD §4.3
     path: '/instructor/merge-queue',
     element: guarded(<InstructorMergeQueuePage />),
@@ -679,6 +698,21 @@ export const router = createBrowserRouter([
   {
     path: '/my-badges',
     element: guarded(<MyOpenBadgesPage />),
+  },
+  {
+    // Student self-analytics page — shows streak, challenges, leaderboard position
+    path: '/my-progress',
+    element: guarded(<MyProgressPage />),
+  },
+  {
+    // Skills-based learning paths — grid of all published skill paths
+    path: '/skills',
+    element: guarded(<SkillPathPage />),
+  },
+  {
+    // Skill gap analysis — detailed view for a specific path
+    path: '/skills/gap/:pathId',
+    element: guarded(<SkillGapDashboard />),
   },
   {
     path: '/annotations',

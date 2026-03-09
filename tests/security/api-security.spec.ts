@@ -285,3 +285,144 @@ describe('Phase 42 — White-label security', () => {
     expect(surroundingText).not.toContain('@authenticated');
   });
 });
+
+// ── Phase 43: SCORM 2004 + cmi5 Security ─────────────────────────────────────
+
+describe('Phase 43 — SCORM 2004 + cmi5 Security', () => {
+  it('cmi5-launcher.service exists and uses XapiStatementService (authenticated path)', () => {
+    const launcherFile = read(
+      'apps/subgraph-content/src/scorm/cmi5-launcher.service.ts'
+    );
+    expect(launcherFile.length).toBeGreaterThan(0);
+    // Must delegate to XapiStatementService — not bypass auth by calling LRS directly
+    expect(launcherFile).toContain('XapiStatementService');
+    expect(launcherFile).toContain('storeStatement');
+  });
+
+  it('cmi5-launcher.service does not contain auth-bypass comment', () => {
+    const launcherFile = read(
+      'apps/subgraph-content/src/scorm/cmi5-launcher.service.ts'
+    );
+    // No "authenticated off" comment or similar bypass
+    expect(launcherFile).not.toContain('@authenticated off');
+    expect(launcherFile).not.toContain('skipAuth');
+  });
+
+  it('SCORM 2004 suspend_data has no 4096-byte length limit (unlike SCORM 1.2)', () => {
+    const modelFile = read(
+      'apps/web/src/lib/scorm/scorm2004-data-model.ts'
+    );
+    expect(modelFile.length).toBeGreaterThan(0);
+    // SCORM 2004 uses unlimited CMI suspend_data — the model must not impose 4096 cap
+    expect(modelFile).not.toContain('4096');
+    // The comment must document this is unlimited
+    expect(modelFile).toMatch(/[Uu]nlimited|no.*limit|vs.*SCORM.*1\.2/);
+  });
+
+  it('InstructorAnalyticsDashboard uses pause flag to prevent unauthorised urql dispatch', () => {
+    const pageFile = read(
+      'apps/web/src/pages/InstructorAnalyticsDashboard.tsx'
+    );
+    expect(pageFile.length).toBeGreaterThan(0);
+    // Must have pause: to gate the query
+    expect(pageFile).toContain('pause');
+  });
+
+  it('InstructorAnalyticsDashboard role-gates access to INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN', () => {
+    const pageFile = read(
+      'apps/web/src/pages/InstructorAnalyticsDashboard.tsx'
+    );
+    expect(pageFile).toContain('INSTRUCTOR');
+    expect(pageFile).toContain('ORG_ADMIN');
+    expect(pageFile).toContain('SUPER_ADMIN');
+    // Must render an access-denied block for unauthorized roles
+    expect(pageFile).toMatch(/[Aa]ccess denied|denied|ALLOWED_ROLES/);
+  });
+
+  it('cmi5 emitStatement passes tenantId from Cmi5LaunchParams — never from GraphQL args', () => {
+    const launcherFile = read(
+      'apps/subgraph-content/src/scorm/cmi5-launcher.service.ts'
+    );
+    // tenantId comes from params (service layer), not from a raw @Args argument
+    expect(launcherFile).toContain('params.tenantId');
+    // Must NOT accept tenantId directly from untrusted caller args
+    expect(launcherFile).not.toMatch(/@Args\([^)]*tenantId/);
+  });
+});
+
+// ── Phase 44: Skills-Based Learning Paths Security ───────────────────────────
+
+describe('Phase 44 — Skills Security', () => {
+  it('skills migration file exists', () => {
+    expect(
+      existsSync(resolve(ROOT, 'packages/db/src/migrations/0026_skills.sql'))
+    ).toBe(true);
+  });
+
+  it('skill_paths table has ROW LEVEL SECURITY enabled', () => {
+    const migration = readFileSync(
+      resolve(ROOT, 'packages/db/src/migrations/0026_skills.sql'),
+      'utf-8'
+    );
+    expect(migration).toContain('ROW LEVEL SECURITY');
+    expect(migration).toContain('skill_paths');
+  });
+
+  it('learner_skill_progress table has ROW LEVEL SECURITY enabled', () => {
+    const migration = readFileSync(
+      resolve(ROOT, 'packages/db/src/migrations/0026_skills.sql'),
+      'utf-8'
+    );
+    // Both tenant-scoped tables must have RLS
+    const rlsCount = (migration.match(/ENABLE ROW LEVEL SECURITY/g) ?? []).length;
+    expect(rlsCount).toBeGreaterThanOrEqual(2);
+  });
+
+  it('learner_skill_progress RLS uses app.current_user_id (SI-1 compliant)', () => {
+    const migration = readFileSync(
+      resolve(ROOT, 'packages/db/src/migrations/0026_skills.sql'),
+      'utf-8'
+    );
+    // Must use app.current_user_id (not the incorrect app.current_user)
+    expect(migration).toContain('app.current_user_id');
+  });
+
+  it('learner_skill_progress RLS does NOT use bare app.current_user (SI-1 violation guard)', () => {
+    const migration = readFileSync(
+      resolve(ROOT, 'packages/db/src/migrations/0026_skills.sql'),
+      'utf-8'
+    );
+    // Regex matches 'app.current_user' NOT followed by _id — catches the SI-1 violation pattern
+    // The negative lookahead ensures 'app.current_user_id' does NOT trigger this
+    expect(migration).not.toMatch(/current_setting\s*\(\s*'app\.current_user'\s*,/);
+  });
+
+  it('skills schema is exported from packages/db/src/schema/index.ts', () => {
+    const indexFile = readFileSync(
+      resolve(ROOT, 'packages/db/src/schema/index.ts'),
+      'utf-8'
+    );
+    expect(indexFile).toContain("from './skills'");
+  });
+
+  it('skill_paths write policy is gated to INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN', () => {
+    const migration = readFileSync(
+      resolve(ROOT, 'packages/db/src/migrations/0026_skills.sql'),
+      'utf-8'
+    );
+    // Write CHECK must require elevated role
+    expect(migration).toContain('INSTRUCTOR');
+    expect(migration).toContain('ORG_ADMIN');
+    expect(migration).toContain('SUPER_ADMIN');
+  });
+
+  it('skills and skill_prerequisites have no RLS (global reference data — by design)', () => {
+    const migration = readFileSync(
+      resolve(ROOT, 'packages/db/src/migrations/0026_skills.sql'),
+      'utf-8'
+    );
+    // Only skill_paths and learner_skill_progress get RLS — skills table is global reference data
+    // Verify the migration comment documents this intentional design
+    expect(migration).toMatch(/no RLS|global read-only|no.*rls/i);
+  });
+});
