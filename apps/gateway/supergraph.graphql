@@ -103,7 +103,7 @@ enum join__Graph {
   KNOWLEDGE @join__graph(name: "knowledge", url: "http://localhost:4006/graphql")
 }
 
-scalar JSON @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE) 
+scalar JSON @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: CONTENT)  @join__type(graph: CORE)  @join__type(graph: KNOWLEDGE)
 
 scalar DateTime @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__type(graph: COLLABORATION)  @join__type(graph: CORE) 
 

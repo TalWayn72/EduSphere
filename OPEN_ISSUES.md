@@ -46,6 +46,15 @@ Session: 32 (2026-03-08) — All 10 items resolved across Sprint A (backend), Sp
 - UUID truncation in marketplace: `marketplace-data.spec.ts:68` — `expect(body).not.toMatch(/Course [0-9a-f]{8}/)` guards against regression to UUID display
 - certificateDownloadUrl always requires @authenticated: `graphql-authorization.spec.ts` G-15 phase 38 block
 
+### Known Open Gaps (deferred to Phase 39+):
+
+| ID | Gap | Status |
+|----|-----|--------|
+| P38-OG1 | `CourseListing.tags` always returns `[]` — no `course_tags` table yet | ⏳ Phase 39+ |
+| P38-OG2 | `CourseListing.rating` always returns `null` — rating system not yet built | ⏳ Phase 39+ |
+| P38-OG3 | `CourseListing.totalLessons` always returns `0` — aggregation pending | ⏳ Phase 39+ |
+| P38-OG4 | `instructorName` filter uses COALESCE — may miss users with no firstName | ⏳ Phase 39+ |
+
 ---
 
 ## FEAT-PHASE37-GAMIFICATION-MANAGER-ONBOARDING | ✅ Complete | HIGH

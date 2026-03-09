@@ -5,7 +5,13 @@ import { render, screen } from '@testing-library/react';
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@tanstack/react-query')>();
-  return { ...actual, useQuery: vi.fn() };
+  return {
+    ...actual,
+    useQuery: vi.fn(),
+    useQueryClient: vi.fn(() => ({
+      prefetchQuery: vi.fn().mockResolvedValue(undefined),
+    })),
+  };
 });
 
 vi.mock('graphql-request', () => ({

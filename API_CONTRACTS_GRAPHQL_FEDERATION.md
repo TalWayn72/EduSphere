@@ -5848,3 +5848,12 @@ input CourseListingFiltersInput {
 }
 ```
 All filters are optional. Drizzle parameterized queries (never raw SQL). Tenant isolation enforced via withTenantContext (SI-9).
+
+### Known Gaps / Future Work (Phase 39+)
+
+| Gap | Tracked In | Priority |
+|-----|-----------|----------|
+| `tags` field always returns `[]` | OPEN_ISSUES P38-OG1 | Phase 39+ |
+| `rating` field always returns `null` | OPEN_ISSUES P38-OG2 | Phase 39+ |
+| `totalLessons` field always returns `0` | OPEN_ISSUES P38-OG3 | Phase 39+ |
+| `instructorName` filter on COALESCE | OPEN_ISSUES P38-OG4 | Phase 39+ |

@@ -755,6 +755,11 @@ export const router = createBrowserRouter([
     element: guarded(<OnboardingPage />),
   },
   {
+    // Quiz Builder — top-level entry point for instructors (sidebar link)
+    path: '/quiz-builder',
+    element: guarded(<QuizBuilderPage />),
+  },
+  {
     // Certificates — earned course completion certificates
     path: '/certificates',
     element: guarded(<CertificatesPage />),

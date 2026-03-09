@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Layout } from '@/components/Layout';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { request, gql } from 'graphql-request';
 import {
   Card,
@@ -80,7 +80,18 @@ function formatPrice(cents: number, currency: string): string {
   }).format(cents / 100);
 }
 
+const COURSE_DETAIL_QUERY = gql`
+  query CourseDetail($courseId: ID!) {
+    course(id: $courseId) {
+      id
+      title
+      description
+    }
+  }
+`;
+
 export function MarketplacePage() {
+  const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [priceFilter, setPriceFilter] = useState<'any' | 'free' | 'under25' | 'under50'>('any');
@@ -88,6 +99,18 @@ export function MarketplacePage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
+
+  const prefetchCourse = useCallback(
+    (courseId: string) => {
+      void queryClient.prefetchQuery({
+        queryKey: ['course-detail', courseId],
+        queryFn: () =>
+          request(GRAPHQL_URL, COURSE_DETAIL_QUERY, { courseId }),
+        staleTime: 5 * 60 * 1000, // 5 minutes — don't re-fetch if already warm
+      });
+    },
+    [queryClient],
+  );
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -174,7 +197,11 @@ export function MarketplacePage() {
             {listings.map((listing) => {
               const isPurchased = purchasedCourseIds.has(listing.courseId);
               return (
-                <Card key={listing.id} className="flex flex-col">
+                <Card
+                  key={listing.id}
+                  className="flex flex-col"
+                  onMouseEnter={() => prefetchCourse(listing.courseId)}
+                >
                   {listing.thumbnailUrl && (
                     <img
                       src={listing.thumbnailUrl}

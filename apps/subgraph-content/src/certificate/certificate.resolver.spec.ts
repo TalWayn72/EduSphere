@@ -20,23 +20,33 @@ vi.mock('@edusphere/config', () => ({
   },
 }));
 vi.mock('@aws-sdk/client-s3', () => ({
-  S3Client: vi.fn(() => ({ send: vi.fn() })),
+  S3Client: vi.fn(() => ({ send: vi.fn(), destroy: vi.fn() })),
   PutObjectCommand: vi.fn(),
+  GetObjectCommand: vi.fn(),
+}));
+vi.mock('@aws-sdk/s3-request-presigner', () => ({
+  getSignedUrl: vi.fn().mockResolvedValue('https://minio.example.com/bucket/cert.pdf?signed=1'),
 }));
 vi.mock('@edusphere/auth', () => ({}));
 
 import { CertificateResolver } from './certificate.resolver.js';
 import type { CertificateService } from './certificate.service.js';
+import { CertificateDownloadService } from './certificate-download.service.js';
 
-// ── Mock service ──────────────────────────────────────────────────────────────
+// ── Mock services ──────────────────────────────────────────────────────────────
 
 const mockGetMyCertificates = vi.fn();
 const mockVerifyCertificate = vi.fn();
+const mockGetCertificateDownloadUrl = vi.fn();
 
 const mockCertificateService = {
   getMyCertificates: mockGetMyCertificates,
   verifyCertificate: mockVerifyCertificate,
 } as unknown as CertificateService;
+
+const mockCertificateDownloadService = {
+  getCertificateDownloadUrl: mockGetCertificateDownloadUrl,
+} as unknown as CertificateDownloadService;
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -63,7 +73,7 @@ describe('CertificateResolver', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    resolver = new CertificateResolver(mockCertificateService);
+    resolver = new CertificateResolver(mockCertificateService, mockCertificateDownloadService);
   });
 
   // ── getMyCertificates ─────────────────────────────────────────────────────────
@@ -142,6 +152,29 @@ describe('CertificateResolver', () => {
       const result = await resolver.verifyCertificate('UNKNOWN-CODE');
 
       expect(result).toBeNull();
+    });
+  });
+
+  // ── certificateDownloadUrl ────────────────────────────────────────────────────
+
+  describe('certificateDownloadUrl', () => {
+    it('delegates to CertificateDownloadService using JWT userId (not a client-supplied arg)', async () => {
+      const presignedUrl = 'https://minio.example.com/bucket/cert.pdf?signed=1';
+      mockGetCertificateDownloadUrl.mockResolvedValueOnce(presignedUrl);
+
+      const ctx = makeCtx(['STUDENT']);
+      const result = await resolver.getCertificateDownloadUrl(ctx, 'cert-1');
+
+      expect(result).toBe(presignedUrl);
+      // Must use userId from JWT context (ctx.authContext.userId = 'u1'), not a client arg
+      expect(mockGetCertificateDownloadUrl).toHaveBeenCalledWith('cert-1', 'u1', 't1');
+    });
+
+    it('throws UnauthorizedException when no auth context is present', async () => {
+      await expect(
+        resolver.getCertificateDownloadUrl(noAuthCtx, 'cert-1')
+      ).rejects.toThrow(UnauthorizedException);
+      expect(mockGetCertificateDownloadUrl).not.toHaveBeenCalled();
     });
   });
 });
