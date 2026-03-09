@@ -17,6 +17,20 @@ export const TENANT_BRANDING_QUERY = gql`
       termsOfServiceUrl
       supportEmail
       hideEduSphereBranding
+      customCss
+    }
+  }
+`;
+
+export const PUBLIC_BRANDING_QUERY = gql`
+  query PublicBranding($slug: String!) {
+    publicBranding(slug: $slug) {
+      primaryColor
+      accentColor
+      logoUrl
+      faviconUrl
+      organizationName
+      tagline
     }
   }
 `;

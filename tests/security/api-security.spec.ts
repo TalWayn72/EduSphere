@@ -242,3 +242,46 @@ describe('Phase 41: xAPI NATS Bridge Security', () => {
     expect(queueSrc).toMatch(/500/); // 500-row cap
   });
 });
+
+// ── Phase 42: White-label security ───────────────────────────────────────────
+
+describe('Phase 42 — White-label security', () => {
+  it('publicBranding query does not expose customCss field', () => {
+    // The PUBLIC_BRANDING_QUERY in branding.queries.ts must not include customCss
+    const queryFile = readFileSync(
+      resolve(__dirname, '../../apps/web/src/lib/graphql/branding.queries.ts'),
+      'utf8'
+    );
+    // Find the PUBLIC_BRANDING_QUERY block
+    const publicQueryStart = queryFile.indexOf('PUBLIC_BRANDING_QUERY');
+    const publicQueryEnd = queryFile.indexOf('`;', publicQueryStart);
+    const publicQueryBlock = queryFile.slice(publicQueryStart, publicQueryEnd);
+    expect(publicQueryBlock).not.toContain('customCss');
+    expect(publicQueryBlock).not.toContain('hideEduSphereBranding');
+  });
+
+  it('customCss injection uses textContent not innerHTML', () => {
+    const hookFile = readFileSync(
+      resolve(__dirname, '../../apps/web/src/hooks/useTenantBranding.ts'),
+      'utf8'
+    );
+    // Must use textContent for XSS safety — innerHTML assignment would execute injected scripts
+    expect(hookFile).toContain('textContent');
+    // Check no innerHTML assignment (comments mentioning innerHTML are fine)
+    expect(hookFile).not.toMatch(/\.innerHTML\s*=/);
+  });
+
+  it('publicBranding resolver has no @authenticated directive', () => {
+    const graphqlFile = readFileSync(
+      resolve(__dirname, '../../apps/subgraph-core/src/tenant/tenant.graphql'),
+      'utf8'
+    );
+    // Find the publicBranding query field line
+    const lines = graphqlFile.split('\n');
+    const publicBrandingLine = lines.findIndex((l) => l.includes('publicBranding(slug'));
+    expect(publicBrandingLine, 'publicBranding field must exist in tenant.graphql').toBeGreaterThan(-1);
+    // Neither the field line nor the immediately following line may carry @authenticated
+    const surroundingText = lines.slice(publicBrandingLine, publicBrandingLine + 2).join('\n');
+    expect(surroundingText).not.toContain('@authenticated');
+  });
+});

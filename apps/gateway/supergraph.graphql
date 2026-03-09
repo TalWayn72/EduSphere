@@ -361,6 +361,7 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   tenants(limit: Int = 10, offset: Int = 0) : [Tenant!]! @join__field(graph: CORE) 
   myTenantLanguageSettings: TenantLanguageSettings! @join__field(graph: CORE)  @authenticated
   myTenantBranding: TenantBranding! @join__field(graph: CORE)  @authenticated
+  publicBranding(slug: String!) : PublicTenantBranding @join__field(graph: CORE)
   user(id: ID!) : User @join__field(graph: CORE) 
   users(
     limit: Int = 10
@@ -2096,6 +2097,15 @@ type Tenant @join__type(graph: CORE, key: "id")  {
 type TenantLanguageSettings @join__type(graph: CORE)  {
   supportedLanguages: [String!]!
   defaultLanguage: String!
+}
+
+type PublicTenantBranding @join__type(graph: CORE)  {
+  primaryColor: String!
+  accentColor: String!
+  logoUrl: String!
+  faviconUrl: String!
+  organizationName: String!
+  tagline: String
 }
 
 type TenantBranding @join__type(graph: CORE)  {

@@ -1,9 +1,32 @@
 # תקלות פתוחות - EduSphere
 
-**תאריך עדכון:** 08 מרץ 2026 (Session 32 Phase 38 ✅ COMPLETE — Assessment Engine / Certificate Download / Marketplace Data / Quiz Builder / SRS UI)
+**תאריך עדכון:** 09 מרץ 2026 (Session 33 Phase 42 ✅ COMPLETE — White-Label Runtime per Tenant)
 **מצב פרויקט:** ✅ Phases 9-17 + **Phase 27 ✅** + **Phase 28 ✅** + **Phase 29 Visual Anchoring ✅** + **BUG-054 Progress Bar ✅** + **BUG-057 liveSessions 400 supergraph gap ✅** + **Phase 33 Remote Proctoring ✅** + **Phase 35 ✅** + **Phase 36 ✅** + **Phase 37 ✅** + **Phase 38 ✅** + Phase 7 + Phase 8 + UPGRADE-001 + **Phase 8.2** + **Observability** + **LangGraph v1** + **AGE RLS** + **NATS Gateway** + **Pino Logging** + **LangGraph Checkpoint** + **Router v7** + **Tailwind v4** + **i18n Phase A+B** + **G-01→G-22 Security Compliance** + **Wave 1+2 (Scale+Compliance+UI+Tests)** + **MCP-001 Claude Capabilities** + **DEP-001 Dependency Upgrades** + **BUG-001 SET LOCAL Fix** + **BUG-002 AGE Learning Paths Fix** + **BUG-003 Dashboard preferences schema** + **E2E-001 E2E Infrastructure Overhaul** + **Tier 1 (12 features) ✅** + **Tier 2 (12 features) ✅** + **Tier 3 (15 features) ✅** — **ALL 39 Competitive Gap Features DONE! 🎉** + **Admin Upgrade (F-101–F-113) ✅ COMPLETE** + **CQI-001 Code Quality ✅** + **F-108 Enrollment Management ✅** + **F-113 Sub-Admin Delegation ✅** + **OFFLINE-001 Storage Quota ✅** + **BUG-SELECT-001 Radix Select.Item empty value ✅** + **BUG-007 Admin Panel supergraph ✅** + **IMP-001 UserManagement UX ✅** + **IMP-002 supergraph SDL types ✅** + **IMP-003 Admin page tests ✅** + **HIVE-001 CI gate ✅** + **TS-001 db/globalRegistry ✅** + **CI-002 Full Test Suite 4 failures ✅** + **BUG-026 myOpenBadges contract gap ✅** + **BUG-027 SCIM modal + contract gap ✅** + **VQA-001 Visual QA 53/53 zero-error ✅** + **BUG-028 DEV_MODE logout ✅** + **BUG-029 urql UserPreferences key ✅** + **BUG-030 SRSWidget setState-during-render ✅** + **BUG-031 @deprecated multi-line CI false-positive ✅** + **BUG-032 Docker GHA cache pnpm@9 stale layers ✅** + **BUG-033 Open Badges federation tests stale CORE→CONTENT ✅** + **CI-003 Full CI pipeline 5 workflow failures ✅** + **BUG-034 SourceManager DEV_MODE rawContent missing ✅** + **BUG-035 Media Upload 404 — MinIO bucket + urql key + UUID ✅** + **BUG-036 Media Upload S3 CRC32 + .doc contentType + JWT UUID ✅** + **BUG-037 SourceManager Unauthorized — Keycloak missing tenant_id ✅** + **BUG-038 Lesson page Unauthorized [GraphQL] — global auth exchange + middleware hardening ✅** + **BUG-039 React 19 concurrent-mode setState-during-render (Layout/useSrsQueueCount) + subscription graceful degradation ✅** + **BUG-040 Video/Document Annotations disappear after save ✅** + **CQI-003 Eliminate all no-explicit-any ✅** + **BUG-041 Keycloak UUID alignment + Zod v4 JWT validation fix ✅** + **BUG-042 GraphQL network error banner — raw urql strings shown to users ✅** + **BUG-043 raw error.message in /graph + Invalid Date in heatmap ✅** + **BUG-044 "Unexpected error" on lesson creation — missing UUID validation + try/catch ✅** + **BUG-045 Pipeline Builder non-functional — config panel, handleRun race, backend resolvers ✅** + **FEAT-046 Custom Pipeline Builder (Build from Scratch) ✅** + **BUG-047 Language persistence — UI stays English despite Hebrew setting ✅** + **BUG-050 Knowledge Graph raw i18n key names in error banner ✅** + **BUG-053 Search never queries real courses from DB ✅** + **BUG-052 React concurrent-mode SRSWidget+useUserPreferences ✅** + **MCP-MASTER Track 0-6 ✅** (Memory Safety 20+ services, Code Quality file splits, Dependency unification, CI AGE hardening, FEAT-TenantLanguage, FEAT-WordAnnotations backend, k6 lesson-pipeline scenario) + **FEAT-055 LessonResultsPage all pipeline outputs + E2E 28/28 ✅**
 **סטטוס כללי:** Backend ✅ | Frontend ✅ | Security ✅ | K8s/Helm ✅ | Subscriptions ✅ | Mobile ✅ | Docker ✅ | Stack Upgrades ✅ | Transcription ✅ | LangGraph v1+Checkpoint ✅ | AGE RLS ✅ | NATS Gateway ✅ | **Read Replicas ✅** | **Persisted Queries ✅** | **CD Pipeline ✅** | **k6 Load Tests ✅** | **Video Annotation UI ✅** | **Chavruta UI ✅** | **Mobile Offline Sync ✅** | **AGE/NATS/LangGraph Tests ✅** | **GDPR Compliance Docs ✅** | SOC2 Type II Ready ✅ | **MCP Tools (11 servers) ✅** | **Tier 1+2+3 Competitive Gap (39 features) ✅** | **Admin Upgrade (F-101–F-113) ✅ COMPLETE** | **BUG-047 Language Persistence ✅** | **BUG-052 SRSWidget concurrent-mode ✅** | **BUG-053 Real course search ✅** | **Memory Safety 20+ services ✅** | **UI/UX Revolution Phase 1+2+3+4 ✅** (Design System, AppSidebar, Dashboard, CourseCards, VideoPlayer, KnowledgeSkillTree, WCAG 2.2 AAA, ThemeSettings) | **Phase 37 Gamification + Manager + Onboarding + Production Hardening ✅** | **Phase 38 Assessment Engine + Certificates + Marketplace + QuizBuilder + SRS ✅**
-**בדיקות:** Security: **967 tests** (36 spec files, +19 Phase 38) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile: **256 tests** (21 files) | Web: **3,881** (302 files, +21 Phase 38) | Backend subgraphs: **2,500+** (core 719 + content 1096 + annotation 144 + collab 161 + agent 677 + knowledge 509) | Gateway contract: **142** | i18n: **304** | Pentest visual-anchoring: **36** | סה"כ: **~6,120 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+**בדיקות:** Security: **970 tests** (37 spec files, +3 Phase 42) | AGE Graph: 52 | NATS Schema: 56 | LangGraph: **154** | Mobile: **256 tests** (21 files) | Web: **3,889** (303 files, +8 Phase 42) | Backend subgraphs: **2,500+** (core 719 + content 1096 + annotation 144 + collab 161 + agent 677 + knowledge 509) | Gateway contract: **142** | i18n: **304** | Pentest visual-anchoring: **36** | E2E: +6 Phase 42 | סה"כ: **~6,140 tests** | Security ESLint: ✅ | CodeQL: ✅ | Playwright E2E: ✅ | TypeScript: **0 errors** (26/26 packages)
+
+---
+
+## FEAT-PHASE42-WHITE-LABEL-RUNTIME | ✅ Fixed | HIGH
+
+Phase 42 — White-Label Runtime per Tenant
+Session: 33 (2026-03-09) — All items resolved.
+
+Files:
+- `apps/web/src/hooks/useTenantBranding.ts`
+- `apps/web/src/contexts/BrandingContext.tsx`
+- `apps/web/src/hooks/usePublicBranding.ts`
+- `apps/web/src/components/AppSidebar.tsx`
+- `apps/web/src/pages/LoginPage.tsx`
+- `apps/subgraph-core/src/tenant/tenant.graphql`
+- `apps/subgraph-core/src/tenant/tenant-branding.service.ts`
+- `apps/subgraph-core/src/tenant/tenant.resolver.ts`
+- `apps/gateway/supergraph.graphql`
+
+E2E: `apps/web/e2e/white-label.spec.ts`
+Security: `tests/security/api-security.spec.ts` (3 new Phase 42 tests)
+
+Anti-recurrence: `customCss` uses `el.textContent` (not `el.innerHTML`) — guarded by `api-security.spec.ts`; `publicBranding` query returns only 6 safe public fields (no `customCss` or `hideEduSphereBranding`).
 
 ---
 

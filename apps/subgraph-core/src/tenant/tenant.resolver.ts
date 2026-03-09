@@ -57,6 +57,12 @@ export class TenantResolver {
     );
   }
 
+  @Query('publicBranding')
+  async publicBranding(@Args('slug') slug: string) {
+    if (!slug?.trim()) return null;
+    return this.tenantBrandingService.getPublicBranding(slug);
+  }
+
   @Query('myTenantBranding')
   async getMyTenantBranding(@Context() context: GraphQLContext) {
     if (!context.authContext) {

@@ -11,10 +11,13 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { BookOpen, ShieldAlert } from 'lucide-react';
+import { usePublicBranding } from '@/hooks/usePublicBranding';
 
 export function Login() {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
+  const slug = new URLSearchParams(window.location.search).get('tenant');
+  const { branding } = usePublicBranding(slug);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -31,12 +34,26 @@ export function Login() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-4 bg-primary/10 rounded-full">
-              <BookOpen className="h-12 w-12 text-primary" />
-            </div>
+            {branding?.logoUrl ? (
+              <img
+                src={branding.logoUrl}
+                alt={branding.organizationName}
+                className="h-16 object-contain"
+              />
+            ) : (
+              <div className="p-4 bg-primary/10 rounded-full">
+                <BookOpen className="h-12 w-12 text-primary" />
+              </div>
+            )}
           </div>
-          <CardTitle className="text-3xl">{t('welcome')}</CardTitle>
-          <CardDescription>{t('subtitle')}</CardDescription>
+          <CardTitle className="text-3xl">
+            {branding ? branding.organizationName : t('welcome')}
+          </CardTitle>
+          {branding?.tagline ? (
+            <CardDescription>{branding.tagline}</CardDescription>
+          ) : (
+            <CardDescription>{t('subtitle')}</CardDescription>
+          )}
         </CardHeader>
         <CardContent>
           {DEV_MODE ? (

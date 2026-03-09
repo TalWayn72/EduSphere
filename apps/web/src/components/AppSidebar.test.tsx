@@ -35,8 +35,27 @@ vi.mock('@/contexts/ThemeContext', () => ({
   })),
 }));
 
+vi.mock('@/contexts/BrandingContext', () => ({
+  useBranding: vi.fn(() => ({
+    branding: {
+      logoUrl: '/defaults/logo.svg',
+      logoMarkUrl: null,
+      faviconUrl: '/defaults/favicon.ico',
+      primaryColor: '#2563eb',
+      secondaryColor: '#64748b',
+      accentColor: '#f59e0b',
+      backgroundColor: '#ffffff',
+      fontFamily: 'Inter',
+      organizationName: 'EduSphere',
+      hideEduSphereBranding: false,
+    },
+    fetching: false,
+  })),
+}));
+
 import { AppSidebar } from './AppSidebar';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useBranding } from '@/contexts/BrandingContext';
 
 // Helper — render sidebar at given route
 const renderAt = (path = '/dashboard') =>
@@ -154,6 +173,54 @@ describe('AppSidebar', () => {
     renderAt();
     const settingsLink = screen.getByTestId('nav-item-settings');
     expect(settingsLink).toHaveTextContent('Settings');
+  });
+
+  it('renders custom organizationName from branding context', () => {
+    vi.mocked(useBranding).mockReturnValueOnce({
+      branding: {
+        logoUrl: '/acme/logo.svg',
+        logoMarkUrl: '/acme/logomark.svg',
+        faviconUrl: '/acme/favicon.ico',
+        primaryColor: '#ff0000',
+        secondaryColor: '#00ff00',
+        accentColor: '#0000ff',
+        backgroundColor: '#ffffff',
+        fontFamily: 'Inter',
+        organizationName: 'Acme Corp',
+        hideEduSphereBranding: false,
+      },
+      fetching: false,
+    });
+    renderAt();
+    expect(screen.getByTestId('sidebar-brand-name')).toHaveTextContent('Acme Corp');
+    // Default 'EduSphere' must not appear in the brand name slot
+    expect(screen.getByTestId('sidebar-brand-name')).not.toHaveTextContent('EduSphere');
+  });
+
+  it('hides "Powered by EduSphere" when hideEduSphereBranding is true', () => {
+    vi.mocked(useBranding).mockReturnValueOnce({
+      branding: {
+        logoUrl: '/acme/logo.svg',
+        logoMarkUrl: null,
+        faviconUrl: '/acme/favicon.ico',
+        primaryColor: '#ff0000',
+        secondaryColor: '#00ff00',
+        accentColor: '#0000ff',
+        backgroundColor: '#ffffff',
+        fontFamily: 'Inter',
+        organizationName: 'Acme Corp',
+        hideEduSphereBranding: true,
+      },
+      fetching: false,
+    });
+    renderAt();
+    expect(screen.queryByTestId('powered-by-edusphere')).not.toBeInTheDocument();
+  });
+
+  it('shows "Powered by EduSphere" when hideEduSphereBranding is false', () => {
+    renderAt();
+    expect(screen.getByTestId('powered-by-edusphere')).toBeInTheDocument();
+    expect(screen.getByTestId('powered-by-edusphere')).toHaveTextContent('Powered by EduSphere');
   });
 
   it('shows theme toggle for dark mode when resolvedMode is dark', () => {

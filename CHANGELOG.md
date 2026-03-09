@@ -6,6 +6,28 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.42.0] — 2026-03-09
+
+### Added
+- **White-Label Runtime** — tenants can now customize the UI at runtime via `myTenantBranding` GraphQL query
+- `useTenantBranding` hook — applies CSS variables + optional `customCss` (injected via `textContent`, XSS-safe)
+- `BrandingContext` + `BrandingProvider` — all authenticated pages receive live branding
+- `AppSidebar` dynamic branding — shows tenant logo, org name, conditional "Powered by EduSphere" footer
+- `publicBranding(slug)` GraphQL query (unauthenticated) — Login page customization per tenant
+- `usePublicBranding` hook — Login page reads `?tenant=` slug and applies public branding
+
+### Security
+- `customCss` injection uses `el.textContent` not `el.innerHTML` (XSS prevention)
+- `publicBranding` query returns only 6 safe public fields — no `customCss` or `hideEduSphereBranding`
+- E2E security test: verifies public query does not expose sensitive branding fields
+
+### Tests
+- 8 new unit tests (useTenantBranding, BrandingContext, usePublicBranding, tenant-branding-public service)
+- 6 new E2E tests (white-label.spec.ts)
+- 3 new security tests (api-security.spec.ts)
+
+---
+
 ## [0.41.0] — 2026-03-09
 
 ### Added

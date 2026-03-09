@@ -61,11 +61,21 @@ input UpdateTenantBrandingInput {
   hideEduSphereBranding: Boolean
 }
 
+type PublicTenantBranding {
+  primaryColor: String!
+  accentColor: String!
+  logoUrl: String!
+  faviconUrl: String!
+  organizationName: String!
+  tagline: String
+}
+
 type Query {
   tenant(id: ID!): Tenant
   tenants(limit: Int = 10, offset: Int = 0): [Tenant!]!
   myTenantLanguageSettings: TenantLanguageSettings! @authenticated
   myTenantBranding: TenantBranding! @authenticated
+  publicBranding(slug: String!): PublicTenantBranding
 }
 
 type Mutation {

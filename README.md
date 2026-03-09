@@ -360,9 +360,10 @@ For detailed architecture diagrams: [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_R
 | **Phase 38**     | Certificate download URL, CourseListing JOIN fix, MarketplacePage filters, QuizBuilder, mobile SRS + Certificates | 2-3 days   | ✅ Complete    |
 | **Phase 39**     | Motion Design (Framer Motion + GSAP + Remotion), WCAG 2.2 AA, Argos CI visual regression, Semgrep SAST, CycloneDX SBOM, Storybook 8 | 4 days   | ✅ Complete    |
 | **Phase 40**     | Smart Content Import (YouTube playlist, website crawl, folder/ZIP upload), AI Ingestion Pipeline (OCR 3-tier, handwriting TrOCR, Moondream captions, HEIC, PPTX→PDF) | 4 days   | ✅ Complete    |
-| **Phase 41**     | xAPI NATS Bridge (6 verbs), Google Drive OAuth import, Mobile xAPI offline queue (expo-sqlite, 500-row cap) | 3 days   | 🟡 In Progress    |
+| **Phase 41**     | xAPI NATS Bridge (6 verbs), Google Drive OAuth import, Mobile xAPI offline queue (expo-sqlite, 500-row cap) | 3 days   | ✅ Complete    |
+| **Phase 42**     | White-Label Runtime per Tenant (useTenantBranding, BrandingContext, publicBranding query, AppSidebar dynamic logo, Login page per-tenant branding) | 2 days   | ✅ Complete    |
 
-**Current Status:** Phases 1-40 complete ✅ — Phase 41 🟡 In Progress — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. 3,940+ tests passing across 305 test files (web) + 1,132 (subgraph-content) + 970 (security). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
+**Current Status:** Phases 1-42 complete ✅ — Backend + Frontend + Mobile fully built. ALL PRD gaps closed (G-1 through G-4, P-1 through P-3). GraphQL federation active across all 6 subgraphs. 3,950+ tests passing across 306 test files (web) + 1,132 (subgraph-content) + 973 (security). See [OPEN_ISSUES.md](OPEN_ISSUES.md) for live tracking.
 
 See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for detailed phase breakdown and acceptance criteria.
 

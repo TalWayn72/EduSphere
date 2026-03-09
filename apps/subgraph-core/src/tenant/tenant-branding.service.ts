@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { db, tenantBranding, closeAllPools } from '@edusphere/db';
+import { db, tenantBranding, tenants, closeAllPools } from '@edusphere/db';
 import { eq } from 'drizzle-orm';
 
 export interface TenantBrandingData {
@@ -97,6 +97,35 @@ export class TenantBrandingService implements OnModuleDestroy {
       expiresAt: Date.now() + this.CACHE_TTL_MS,
     });
     return data;
+  }
+
+  async getPublicBranding(slug: string): Promise<{
+    primaryColor: string;
+    accentColor: string;
+    logoUrl: string;
+    faviconUrl: string;
+    organizationName: string;
+    tagline: string | null;
+  } | null> {
+    try {
+      const rows = await db
+        .select({
+          primaryColor: tenantBranding.primaryColor,
+          accentColor: tenantBranding.accentColor,
+          logoUrl: tenantBranding.logoUrl,
+          faviconUrl: tenantBranding.faviconUrl,
+          organizationName: tenantBranding.organizationName,
+          tagline: tenantBranding.tagline,
+        })
+        .from(tenantBranding)
+        .innerJoin(tenants, eq(tenants.id, tenantBranding.tenantId))
+        .where(eq(tenants.slug, slug))
+        .limit(1);
+      return rows[0] ?? null;
+    } catch (err) {
+      this.logger.warn({ slug, err }, '[TenantBrandingService] getPublicBranding failed');
+      return null;
+    }
   }
 
   async updateBranding(

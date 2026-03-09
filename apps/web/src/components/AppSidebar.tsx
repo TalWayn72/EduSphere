@@ -20,6 +20,7 @@ import {
   FileQuestion,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useBranding } from '@/contexts/BrandingContext';
 import { getCurrentUser } from '@/lib/auth';
 
 const MANAGER_SIDEBAR_ROLES = new Set(['MANAGER', 'ORG_ADMIN', 'SUPER_ADMIN']);
@@ -53,6 +54,7 @@ function getInitials(firstName?: string, lastName?: string, username?: string): 
 
 export function AppSidebar() {
   const { t } = useTranslation('nav');
+  const { branding } = useBranding();
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     try {
       return localStorage.getItem(SIDEBAR_KEY) === 'true';
@@ -91,14 +93,16 @@ export function AppSidebar() {
     >
       {/* Logo area */}
       <div className="flex items-center gap-3 px-4 py-5 shrink-0">
-        <Brain
-          className="h-7 w-7 text-primary shrink-0"
+        <img
+          src={collapsed ? (branding.logoMarkUrl ?? branding.logoUrl) : branding.logoUrl}
+          alt={branding.organizationName}
+          className="h-7 w-7 shrink-0 object-contain"
           data-testid="sidebar-logo-icon"
           aria-hidden
         />
         {!collapsed && (
           <span className="text-lg font-bold text-foreground truncate" data-testid="sidebar-brand-name">
-            EduSphere
+            {branding.organizationName}
           </span>
         )}
       </div>
@@ -227,6 +231,13 @@ export function AppSidebar() {
                 {user.firstName || user.username}
               </span>
             )}
+          </div>
+        )}
+
+        {/* Powered-by footer — hidden when white-label branding suppresses it */}
+        {!branding.hideEduSphereBranding && !collapsed && (
+          <div className="mx-2 px-3 py-1" data-testid="powered-by-edusphere">
+            <span className="text-xs text-muted-foreground/60">Powered by EduSphere</span>
           </div>
         )}
 
