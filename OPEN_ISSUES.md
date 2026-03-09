@@ -7785,3 +7785,59 @@ Components bypassed the design token system (`text-foreground`, `text-muted-fore
 
 ---
 
+
+---
+
+## FEAT-PHASE39-MOTION-WCAG-QA-SECURITY | ✅ Fixed | HIGH
+**Phase 39 — Motion Design, WCAG 2.2, QA Tooling, Security Hardening v2**
+Commit: `683fe22` (Wave 3 final), preceded by `9fbd1c0` (Wave 2) and `909da67` (Wave 1)
+
+**Delivered:**
+- Framer Motion v11 + GSAP + Lenis: hero GSAP stagger, whileInView cards, smooth scroll
+- Remotion compositions: HeroBackground (300f@30fps) + StatsCounter (spring physics)
+- ReducedMotionProvider: `useReducedMotion()` guards all animations (WCAG 2.3.3)
+- WCAG 2.2: 9 new criteria — SC 2.4.11 (focus not obscured via scroll-margin-top), SC 3.2.6 (help link), SC 2.4.13 (focus ring), SC 2.5.3 (target size), SC 3.3.7 (redundant entry N/A)
+- axe color-contrast rule re-enabled (was suppressed)
+- Cross-browser: Firefox + WebKit + Mobile Chromium enabled in playwright.config.ts
+- Argos CI: `.github/workflows/visual-regression.yml` + `@argos-ci/playwright`
+- Semgrep SAST: `.github/workflows/semgrep.yml` + 8 custom EduSphere rules
+- CycloneDX SBOM: `scripts/generate-sbom.sh`
+- Storybook 8: MotionCard + AnimatedCounter + TestimonialsCarousel + CertificateCard stories
+- E2E: `landing-page.spec.ts` (10 suites) + `motion-animations.spec.ts` (NEW)
+
+**Open item (SC 2.5.7):** `DragOrderQuestion` + `CanvasDropZone` lack keyboard arrow-key alternatives — tracked separately.
+
+---
+
+## FEAT-PHASE40-SMART-CONTENT-IMPORT | ✅ Fixed | HIGH
+**Phase 40 — Smart Content Import + AI Ingestion Pipeline**
+Commit: `ae622ce`
+
+**Sprint A — Backend:**
+- `content-import.service.ts`: importFromYoutube + importFromWebsite + cancelImport
+- `youtube.client.ts`: YouTube Data API v3, paginated, quota-aware (BadRequestException on 403)
+- `firecrawl.client.ts`: Firecrawl API site crawl + LLM lesson extraction
+- `content-import.graphql`: importFromYoutube/importFromWebsite mutations + ImportJob type
+- Migration 0025: content_imports + content_import_logs + RLS isolation policies
+- Security: ctx.tenantId/ctx.userId always from JWT (SI-9 compliant)
+
+**Sprint B — Frontend:**
+- `ContentImportPage.tsx`: role-gated wizard (INSTRUCTOR/ORG_ADMIN/SUPER_ADMIN)
+- `ImportSourceSelector.tsx`: YouTube / Website / Folder source picker (aria-pressed)
+- `FolderUploadZone.tsx`: webkitdirectory, numeric sort, iOS Safari fallback, size warning
+- `ImportProgressPanel.tsx`: aria-live="polite" progress display
+- `useContentImport.ts`: TanStack Query mutations
+- Route: `/courses/:courseId/import`
+
+**Sprint D — AI Pipeline:**
+- `content-ingestion-pipeline.service.ts`: magic-byte file router + ZIP bomb guard (5GB) + path traversal rejection
+- `tesseract-ocr.service.ts`: Tesseract.js v5, 2-worker scheduler, `onModuleDestroy` cleanup
+- `image-understanding.service.ts`: Moondream 2 via Ollama (caption + handwriting detection)
+- `content-ingestion.graphql`: ingestContent mutation + ContentIngestionResult + OcrMethod enum
+- Docker services: ocr-microservice (PaddleOCR v4, port 8001), handwriting-microservice (TrOCR, port 8002), libreoffice-service (PPTX→PDF, port 8003)
+- docker-compose.yml: 3 new services with mem_limit
+
+**E2E:** `apps/web/e2e/content-import.spec.ts` (role gate, wizard, YouTube mock, visual baseline)
+**Tests:** 11 unit tests (ContentImportPage + FolderUploadZone) + 6 backend service tests + 3 pipeline tests
+
+**Deferred:** NATS real-time progress events, LessonPreviewTable editable grid (Phase 40 Phase 2)
