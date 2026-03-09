@@ -86,9 +86,7 @@ extend type Query {
 
   cohortRetention(weeksBack: Int = 12): [CohortMetrics!]!
     @authenticated
-}
 
-extend type Mutation {
   exportTenantAnalytics(period: AnalyticsPeriod!, format: ExportFormat!): String!
     @authenticated
     @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])

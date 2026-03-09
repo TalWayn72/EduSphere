@@ -45,33 +45,6 @@ export class LiveSessionResolver {
     );
   }
 
-  @Mutation('joinLiveSession')
-  async joinLiveSession(
-    @Args('sessionId') sessionId: string,
-    @Context() ctx: GraphQLContext
-  ): Promise<string> {
-    const tenantId = ctx.req.user?.tenant_id ?? '';
-    const userName =
-      ctx.req.user?.name ?? ctx.req.user?.preferred_username ?? 'Learner';
-    const userRole = ctx.req.user?.role ?? 'LEARNER';
-
-    return this.liveSessionService.getJoinUrl(
-      sessionId,
-      tenantId,
-      userName,
-      userRole
-    );
-  }
-
-  @Mutation('endLiveSession')
-  async endLiveSession(
-    @Args('sessionId') sessionId: string,
-    @Context() ctx: GraphQLContext
-  ) {
-    const tenantId = ctx.req.user?.tenant_id ?? '';
-    return this.liveSessionService.endSession(sessionId, tenantId);
-  }
-
   @Query('liveSessions')
   async listSessions(
     @Args('status') status: string | undefined,

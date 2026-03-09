@@ -1,3 +1,10 @@
+type PageInfo @shareable {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
 type CourseListing {
   id: ID!
   courseId: ID!
