@@ -161,26 +161,30 @@ describe('Phase 40: Content Import Security', () => {
     }
   });
 
-  it('importFromYoutube resolver uses ctx.tenantId not arg tenantId', () => {
+  it('importFromYoutube resolver uses JWT context (authContext) not arg tenantId', () => {
+    // EduSphere pattern: ctx.authContext.tenantId (via GraphQLContext type)
+    // The resolver MUST extract tenantId from JWT context, never from @Args
     const resolverPath = resolve(
       ROOT,
       'apps/subgraph-content/src/content-import/content-import.resolver.ts'
     );
     if (!existsSync(resolverPath)) return; // file not yet created — skip
     const resolverFile = readFileSync(resolverPath, 'utf8');
-    // Must use ctx.tenantId
-    expect(resolverFile).toContain('ctx.tenantId');
-    // Must NOT accept tenantId as an @Args argument
+    // Must use authContext (JWT-derived) for tenant isolation — SI-9
+    expect(resolverFile).toMatch(/auth(?:Context)?\.tenantId|ctx\.authContext/);
+    // Must NOT accept tenantId as an @Args argument (would allow tenant spoofing)
     expect(resolverFile).not.toMatch(/@Args\([^)]*tenantId/);
   });
 
-  it('importFromWebsite resolver uses ctx.userId not arg userId', () => {
+  it('importFromWebsite resolver uses JWT context (authContext) for userId', () => {
+    // EduSphere pattern: ctx.authContext.userId (via GraphQLContext type)
     const resolverPath = resolve(
       ROOT,
       'apps/subgraph-content/src/content-import/content-import.resolver.ts'
     );
     if (!existsSync(resolverPath)) return; // file not yet created — skip
     const resolverFile = readFileSync(resolverPath, 'utf8');
-    expect(resolverFile).toContain('ctx.userId');
+    // Must use authContext (JWT-derived) for userId — never from GraphQL args
+    expect(resolverFile).toMatch(/auth(?:Context)?\.userId|ctx\.authContext/);
   });
 });
