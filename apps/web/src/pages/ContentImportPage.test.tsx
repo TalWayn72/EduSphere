@@ -26,10 +26,9 @@ vi.mock('@/components/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock('@/providers/AuthProvider', () => ({
-  useAuthContext: vi.fn(() => ({
-    user: { role: 'INSTRUCTOR', id: 'u-1' },
-  })),
+// ContentImportPage uses useAuthRole (not AuthProvider)
+vi.mock('@/hooks/useAuthRole', () => ({
+  useAuthRole: vi.fn(() => 'INSTRUCTOR'),
 }));
 
 vi.mock('@/components/content-import/ImportSourceSelector', () => ({
@@ -80,6 +79,12 @@ function renderWithRouter(courseId = 'course-123') {
 describe('ContentImportPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset useAuthRole to INSTRUCTOR for most tests
+    const { useAuthRole } = vi.mocked(
+      { useAuthRole: vi.fn(() => 'INSTRUCTOR') },
+      true
+    );
+    void useAuthRole;
   });
 
   it('renders "Import Content" heading', () => {
@@ -98,10 +103,9 @@ describe('ContentImportPage', () => {
     expect(screen.getByPlaceholderText(/youtube.com\/playlist/i)).toBeInTheDocument();
   });
 
-  it('redirects to /dashboard when user is STUDENT', () => {
-    const { useAuthContext } = vi.mocked(await import('@/providers/AuthProvider') as never) as { useAuthContext: ReturnType<typeof vi.fn> };
-    useAuthContext.mockReturnValueOnce({ user: { role: 'STUDENT', id: 'u-2' } });
-    // No heading if redirected
+  it('redirects to /dashboard when user role is STUDENT', async () => {
+    const { useAuthRole } = await import('@/hooks/useAuthRole');
+    vi.mocked(useAuthRole).mockReturnValueOnce('STUDENT');
     const { container } = renderWithRouter();
     // Should redirect — heading not present
     expect(container.textContent).not.toContain('Import Content');
@@ -129,7 +133,8 @@ describe('ContentImportPage', () => {
 
   it('shows error message when import fails', async () => {
     const { useContentImport } = await import('@/hooks/useContentImport');
-    vi.mocked(useContentImport).mockReturnValueOnce({
+    // Use mockReturnValue (not Once) so the error persists across re-renders triggered by click
+    vi.mocked(useContentImport).mockReturnValue({
       importFromYoutube: vi.fn(),
       importFromWebsite: vi.fn(),
       cancelImport: vi.fn(),

@@ -79,7 +79,7 @@ describe('FolderUploadZone', () => {
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     const bigFile = Object.assign(
       new File([''], 'big.mp4', { type: 'video/mp4' }),
-      { webkitRelativePath: 'big.mp4', size: 600 * 1024 * 1024 }
+      { webkitRelativePath: 'big.mp4' }
     );
     Object.defineProperty(bigFile, 'size', { value: 600 * 1024 * 1024 });
 

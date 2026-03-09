@@ -86,7 +86,7 @@ describe('AccessibilityStatementPage', () => {
   it('shows the "Last updated" date', () => {
     renderPage();
     expect(
-      screen.getByText(/last updated.*february 2026/i)
+      screen.getByText(/last updated.*march 2026/i)
     ).toBeInTheDocument();
   });
 });
