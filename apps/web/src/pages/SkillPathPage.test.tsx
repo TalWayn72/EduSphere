@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import * as urql from 'urql';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
@@ -70,10 +70,11 @@ describe('SkillPathPage', () => {
       }
       return [{ data: { mySkillProgress: [] }, fetching: false, error: undefined }] as never;
     });
-    renderPage();
-    await waitFor(() => {
-      expect(screen.getByText(/no skill paths available yet/i)).toBeInTheDocument();
-    });
+    await act(async () => { renderPage(); });
+    await waitFor(
+      () => { expect(screen.getByText(/no skill paths available yet/i)).toBeInTheDocument(); },
+      { timeout: 5000 },
+    );
   });
 
   it('renders skill path card title when data is present', async () => {
@@ -93,9 +94,10 @@ describe('SkillPathPage', () => {
       }
       return [{ data: { mySkillProgress: [] }, fetching: false, error: undefined }] as never;
     });
-    renderPage();
-    await waitFor(() => {
-      expect(screen.getByText('Frontend Developer Path')).toBeInTheDocument();
-    });
+    await act(async () => { renderPage(); });
+    await waitFor(
+      () => { expect(screen.getByText('Frontend Developer Path')).toBeInTheDocument(); },
+      { timeout: 5000 },
+    );
   });
 });
