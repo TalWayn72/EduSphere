@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
+import { Layout } from '@/components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -70,6 +71,7 @@ export function GamificationPage() {
   }
 
   return (
+    <Layout>
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-3">
         <Trophy className="h-8 w-8 text-yellow-500" aria-hidden="true" />
@@ -225,5 +227,6 @@ export function GamificationPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </Layout>
   );
 }

@@ -51,6 +51,10 @@ vi.mock('@/lib/graphql/gamification.queries', () => ({
   MY_GAMIFICATION_STATS_QUERY: 'MY_GAMIFICATION_STATS_QUERY',
 }));
 
+vi.mock('@/components/Layout', () => ({
+  Layout: ({ children }: { children: React.ReactNode }) => React.createElement('div', {}, children),
+}));
+
 vi.mock('lucide-react', () => ({
   Trophy: () => React.createElement('span', { 'data-testid': 'trophy-icon' }, 'Trophy'),
   Flame: () => React.createElement('span', { 'data-testid': 'flame-icon' }, 'Flame'),

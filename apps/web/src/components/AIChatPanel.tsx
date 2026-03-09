@@ -95,7 +95,7 @@ export function AIChatPanel({ className }: AIChatPanelProps) {
           id: (msg as { id: string }).id,
           role: 'agent' as const,
           content: (msg as { content: string }).content,
-          timestamp: new Date((msg as { createdAt: string }).createdAt),
+          timestamp: (msg as { createdAt?: string }).createdAt ? new Date((msg as { createdAt: string }).createdAt) : new Date(),
           isStreaming: false,
         },
       ];

@@ -340,10 +340,18 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
     [learningPath]
   );
 
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setScale((s) => Math.min(3, Math.max(0.3, s * delta)));
+  // Attach wheel listener as non-passive so preventDefault() works (browsers
+  // default wheel/touch listeners to passive:true which blocks preventDefault)
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      setScale((s) => Math.min(3, Math.max(0.3, s * delta)));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
   const handleMouseDown = useCallback(
@@ -579,7 +587,6 @@ export function KnowledgeGraph({ courseId }: KnowledgeGraphProps = {}) {
                 viewBox={`0 0 ${SVG_W} ${SVG_H}`}
                 className="w-full cursor-grab active:cursor-grabbing select-none"
                 style={{ maxHeight: '420px' }}
-                onWheel={handleWheel}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
