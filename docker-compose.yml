@@ -150,6 +150,68 @@ services:
       start_period: 180s
     restart: unless-stopped
 
+  # ═══════════════════════════════════════════════════════════════
+  # PaddleOCR v4 — Tier 2 OCR microservice (Phase 40 Sprint D)
+  # Called when Tesseract.js confidence < 70%
+  # ═══════════════════════════════════════════════════════════════
+  paddle-ocr:
+    build:
+      context: ./services/ocr-microservice
+      dockerfile: Dockerfile
+    container_name: edusphere-paddle-ocr
+    ports:
+      - "8001:8001"
+    environment:
+      - USE_GPU=false
+    mem_limit: 3g
+    mem_reservation: 2g
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ═══════════════════════════════════════════════════════════════
+  # TrOCR — Tier 3 handwriting OCR microservice (Phase 40 Sprint D)
+  # Called when Moondream 2 detects handwriting in an image
+  # Model: microsoft/trocr-large-handwritten (MIT license)
+  # ═══════════════════════════════════════════════════════════════
+  handwriting-ocr:
+    build:
+      context: ./services/handwriting-microservice
+      dockerfile: Dockerfile
+    container_name: edusphere-handwriting-ocr
+    ports:
+      - "8002:8002"
+    mem_limit: 4g
+    mem_reservation: 3g
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ═══════════════════════════════════════════════════════════════
+  # LibreOffice headless — PPTX/DOCX → PDF converter (Phase 40 Sprint D)
+  # ═══════════════════════════════════════════════════════════════
+  libreoffice-converter:
+    build:
+      context: ./services/libreoffice-service
+      dockerfile: Dockerfile
+    container_name: edusphere-libreoffice
+    ports:
+      - "8003:8003"
+    mem_limit: 1g
+    mem_reservation: 512m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   postgres_data:
   keycloak_data:

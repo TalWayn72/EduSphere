@@ -147,3 +147,8 @@ apps/*/test-results/
 
 # Temporary test files
 test-upload.txt
+
+# Health monitor maintenance flag
+.maintenance-mode
+# Health monitor logs (local only)
+docs/logs/health-monitor.log

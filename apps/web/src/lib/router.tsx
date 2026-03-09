@@ -374,6 +374,11 @@ const CertificatesPage = lazy(() =>
     default: m.CertificatesPage,
   }))
 );
+const ContentImportPage = lazy(() =>
+  import('@/pages/ContentImportPage').then((m) => ({
+    default: m.ContentImportPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -763,6 +768,11 @@ export const router = createBrowserRouter([
     // Certificates — earned course completion certificates
     path: '/certificates',
     element: guarded(<CertificatesPage />),
+  },
+  {
+    // Content Import — bulk import lessons from YouTube/website/folder
+    path: '/courses/:courseId/import',
+    element: guarded(<ContentImportPage />),
   },
   {
     path: '/',

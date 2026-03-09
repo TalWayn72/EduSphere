@@ -1,0 +1,38 @@
+"""
+Content Ingestion — Phase 40 Sprint D.
+Accepts a file upload (base64 via Upload scalar) and runs the full OCR pipeline:
+  Tier 1: Tesseract.js (embedded)
+  Tier 2: PaddleOCR (port 8001) when Tesseract confidence < 70%
+  Tier 3: TrOCR (port 8002) when Moondream detects handwriting
+"""
+
+scalar Upload
+
+extend type Mutation {
+  ingestContent(file: Upload!, courseId: ID!): ContentIngestionResult!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+}
+
+type ContentIngestionResult {
+  contentItemId: ID!
+  extractedText: String!
+  aiCaption: String
+  isHandwritten: Boolean!
+  ocrMethod: OcrMethod!
+  ocrConfidence: Float!
+  topics: [String!]!
+  thumbnailUrl: String
+  estimatedDuration: Int!
+  pageCount: Int
+  warnings: [String!]!
+}
+
+enum OcrMethod {
+  EMBEDDED_TEXT
+  TESSERACT
+  PADDLE
+  TROCR
+  MOONDREAM
+  NONE
+}

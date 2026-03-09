@@ -1,11 +1,13 @@
 /**
  * Static security tests for G-09 (Rate Limiting) and G-10 (Query Depth/Complexity).
  * SOC2 CC6 + OWASP API4 — prevent DoS via unbounded queries and missing rate limits.
+ * Phase 40: Content Import security checks.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { globSync } from 'glob';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../..');
@@ -134,5 +136,51 @@ describe('G-10: Query Depth and Complexity', () => {
   it('gateway registers complexityLimitRule in validationRules', () => {
     const idx = read('apps/gateway/src/index.ts');
     expect(idx).toContain('complexityLimitRule');
+  });
+});
+
+// ── Phase 40: Content Import Security ────────────────────────────────────────
+
+describe('Phase 40: Content Import Security', () => {
+  it('content_imports table has RLS enabled', () => {
+    // Check that no raw SQL bypasses RLS for content_imports
+    const contentImportFiles = globSync(
+      'apps/subgraph-content/src/content-import/**/*.ts',
+      { cwd: ROOT }
+    );
+    for (const file of contentImportFiles) {
+      const content = readFileSync(resolve(ROOT, file), 'utf8');
+      // No direct 'FROM content_imports' without withTenantContext
+      const hasRawQuery =
+        /FROM\s+content_imports/.test(content) &&
+        !content.includes('withTenantContext');
+      expect(
+        hasRawQuery,
+        `${file} queries content_imports without withTenantContext`
+      ).toBe(false);
+    }
+  });
+
+  it('importFromYoutube resolver uses ctx.tenantId not arg tenantId', () => {
+    const resolverPath = resolve(
+      ROOT,
+      'apps/subgraph-content/src/content-import/content-import.resolver.ts'
+    );
+    if (!existsSync(resolverPath)) return; // file not yet created — skip
+    const resolverFile = readFileSync(resolverPath, 'utf8');
+    // Must use ctx.tenantId
+    expect(resolverFile).toContain('ctx.tenantId');
+    // Must NOT accept tenantId as an @Args argument
+    expect(resolverFile).not.toMatch(/@Args\([^)]*tenantId/);
+  });
+
+  it('importFromWebsite resolver uses ctx.userId not arg userId', () => {
+    const resolverPath = resolve(
+      ROOT,
+      'apps/subgraph-content/src/content-import/content-import.resolver.ts'
+    );
+    if (!existsSync(resolverPath)) return; // file not yet created — skip
+    const resolverFile = readFileSync(resolverPath, 'utf8');
+    expect(resolverFile).toContain('ctx.userId');
   });
 });

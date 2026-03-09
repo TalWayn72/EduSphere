@@ -30,6 +30,7 @@ import { LibraryModule } from './course-library/library.module';
 import { LessonModule } from './lesson/lesson.module';
 import { VisualAnchorModule } from './visual-anchor/visual-anchor.module';
 import { DocumentVersionModule } from './document-version/document-version.module';
+import { ContentImportModule } from './content-import/content-import.module';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { DocumentVersionModule } from './document-version/document-version.modul
     MetricsModule,
     GraphQLModule.forRoot({
       driver: YogaFederationDriver,
-      typePaths: ['./**/*.graphql'],
+      typePaths: ['./dist/**/*.graphql'],
       context: async ({ req }: { req: IncomingMessage }) => {
         const ctx = { req };
         await authMiddleware.validateRequest(ctx);
@@ -71,6 +72,7 @@ import { DocumentVersionModule } from './document-version/document-version.modul
     LessonModule,
     VisualAnchorModule,
     DocumentVersionModule,
+    ContentImportModule,
   ],
 })
 export class AppModule {}
