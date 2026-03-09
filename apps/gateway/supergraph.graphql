@@ -313,6 +313,7 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   Query recent xAPI statements stored in the self-hosted LRS.
   """
   xapiStatements(limit: Int, since: String) : [XapiStatementResult!]! @join__field(graph: CONTENT)  @authenticated
+  xapiStatementCount(since: String) : Int! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   adminOverview: AdminOverview! @join__field(graph: CORE)  @authenticated
   adminDashboardStats: AdminDashboardStats! @join__field(graph: CORE)  @authenticated
   adminAnnouncements(limit: Int = 20, offset: Int = 0) : AnnouncementResult! @join__field(graph: CORE)  @authenticated
@@ -645,6 +646,7 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Revoke an existing xAPI token.
   """
   revokeXapiToken(tokenId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
+  clearXapiStatements(olderThanDays: Int!) : Int! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [SUPER_ADMIN])
   createAnnouncement(input: CreateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
   updateAnnouncement(id: ID!, input: UpdateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
   deleteAnnouncement(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated

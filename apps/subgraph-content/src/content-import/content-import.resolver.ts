@@ -23,6 +23,13 @@ interface WebsiteImportInput {
   moduleId: string;
 }
 
+interface DriveImportInput {
+  folderId: string;
+  courseId: string;
+  moduleId: string;
+  accessToken: string;
+}
+
 function toImportJob(result: ImportJobResult): ImportJob {
   return {
     id: result.jobId,
@@ -68,6 +75,28 @@ export class ContentImportResolver {
       auth.userId
     );
     return toImportJob(result);
+  }
+
+  @Mutation('importFromDrive')
+  async importFromDrive(
+    @Args('input') input: DriveImportInput,
+    @Context() ctx: GraphQLContext
+  ): Promise<ImportJob> {
+    const auth = ctx.authContext;
+    if (!auth?.userId || !auth?.tenantId) {
+      throw new UnauthorizedException('Authentication required');
+    }
+    const result = await this.contentImportService.importFromDrive(
+      input,
+      auth.tenantId,
+      auth.userId
+    );
+    return {
+      id: result.id,
+      status: result.status,
+      lessonCount: result.lessonCount,
+      estimatedMinutes: result.estimatedMinutes ?? 5,
+    };
   }
 
   @Mutation('cancelImport')

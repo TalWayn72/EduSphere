@@ -5857,3 +5857,47 @@ All filters are optional. Drizzle parameterized queries (never raw SQL). Tenant 
 | `rating` field always returns `null` | OPEN_ISSUES P38-OG2 | Phase 39+ |
 | `totalLessons` field always returns `0` | OPEN_ISSUES P38-OG3 | Phase 39+ |
 | `instructorName` filter on COALESCE | OPEN_ISSUES P38-OG4 | Phase 39+ |
+
+---
+
+## Section 29 — Phase 41: xAPI NATS Bridge + Google Drive Import
+
+### New GraphQL Fields (subgraph-content → gateway)
+
+#### Queries
+| Field | Return Type | Auth | Description |
+|-------|-------------|------|-------------|
+| `xapiStatementCount(since: String)` | `Int!` | ORG_ADMIN / SUPER_ADMIN | Count xAPI statements, optionally filtered by date |
+
+#### Mutations
+| Field | Return Type | Auth | Description |
+|-------|-------------|------|-------------|
+| `importFromDrive(input: DriveImportInput!)` | `ImportJob!` | INSTRUCTOR+ | Import files from a Google Drive folder |
+| `clearXapiStatements(olderThanDays: Int!)` | `Int!` | SUPER_ADMIN | Delete statements older than N days, returns deleted count |
+
+#### Input Types
+```graphql
+input DriveImportInput {
+  folderId:    String!   # Drive folder ID or full URL
+  courseId:    ID!
+  moduleId:    ID!
+  accessToken: String!   # Short-lived OAuth token, never stored
+}
+```
+
+### NATS→xAPI Verb Mappings
+
+| NATS Subject | xAPI Verb | ADL URI |
+|---|---|---|
+| `EDUSPHERE.course.completed` | completed | `http://adlnet.gov/expapi/verbs/completed` |
+| `EDUSPHERE.course.enrolled` | registered | `http://adlnet.gov/expapi/verbs/registered` |
+| `EDUSPHERE.sessions.ended` | attended | `http://adlnet.gov/expapi/verbs/attended` |
+| `EDUSPHERE.sessions.participant.joined` | launched | `http://adlnet.gov/expapi/verbs/launched` |
+| `EDUSPHERE.submission.created` | attempted | `http://adlnet.gov/expapi/verbs/attempted` |
+| `EDUSPHERE.poll.voted` | responded | `http://adlnet.gov/expapi/verbs/responded` |
+
+### Mobile Offline Queue Architecture
+- `XapiOfflineQueue` uses `expo-sqlite` (`openDatabaseSync`) — no network dependency
+- Max 500 rows enforced via `evictOldStatements()` after every `enqueueStatement()`
+- `useXapiTracking` hook exposes `track(verb, activityId, name)` + `flush()` (called explicitly)
+- Flush POSTs to `/xapi/statements` REST endpoint with Bearer token

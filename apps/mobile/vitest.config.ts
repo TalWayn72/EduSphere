@@ -18,6 +18,7 @@ export default defineConfig({
     environment: 'node',
     include: [
       'src/sync/__tests__/**/*.test.ts',
+      'src/services/__tests__/**/*.test.ts',
       'src/hooks/__tests__/**/*.test.ts',
       'src/hooks/__tests__/**/*.test.tsx',
       'src/notifications/__tests__/**/*.test.ts',

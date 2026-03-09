@@ -1,6 +1,9 @@
 extend type Mutation {
   importFromYoutube(input: YoutubeImportInput!): ImportJob! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
   importFromWebsite(input: WebsiteImportInput!): ImportJob! @authenticated @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
+  importFromDrive(input: DriveImportInput!): ImportJob!
+    @authenticated
+    @requiresRole(roles: [INSTRUCTOR, ORG_ADMIN, SUPER_ADMIN])
   cancelImport(jobId: ID!): Boolean! @authenticated
 }
 
@@ -29,4 +32,11 @@ input WebsiteImportInput {
   siteUrl: String!
   courseId: ID!
   moduleId: ID!
+}
+
+input DriveImportInput {
+  folderId:    String!
+  courseId:    ID!
+  moduleId:    ID!
+  accessToken: String!
 }

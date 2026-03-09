@@ -6,6 +6,7 @@ import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UnauthorizedException, Logger } from '@nestjs/common';
 import { XapiTokenService } from './xapi-token.service.js';
 import { XapiStatementService } from './xapi-statement.service.js';
+import { XapiExportService } from './xapi-export.service.js';
 import type { GraphQLContext } from '../auth/auth.middleware.js';
 
 @Resolver()
@@ -14,7 +15,8 @@ export class XapiResolver {
 
   constructor(
     private readonly tokenService: XapiTokenService,
-    private readonly statementService: XapiStatementService
+    private readonly statementService: XapiStatementService,
+    private readonly exportService: XapiExportService
   ) {}
 
   @Query('xapiTokens')
@@ -76,5 +78,32 @@ export class XapiResolver {
       throw new UnauthorizedException('Authentication required');
     this.logger.log({ tenantId: auth.tenantId, tokenId }, 'revokeXapiToken');
     return this.tokenService.revokeToken(tokenId, auth.tenantId);
+  }
+
+  @Query('xapiStatementCount')
+  async xapiStatementCount(
+    @Args('since') since: string | undefined,
+    @Context() ctx: GraphQLContext
+  ): Promise<number> {
+    const auth = ctx.authContext;
+    if (!auth?.tenantId)
+      throw new UnauthorizedException('Authentication required');
+    return this.exportService.getStatementCount(auth.tenantId, since);
+  }
+
+  @Mutation('clearXapiStatements')
+  async clearXapiStatements(
+    @Args('olderThanDays') _olderThanDays: number,
+    @Context() ctx: GraphQLContext
+  ): Promise<number> {
+    const auth = ctx.authContext;
+    if (!auth?.tenantId)
+      throw new UnauthorizedException('Authentication required');
+    this.logger.log(
+      { tenantId: auth.tenantId, olderThanDays: _olderThanDays },
+      'clearXapiStatements'
+    );
+    // TODO: implement bulk delete in XapiStatementService (Phase 41 B-series)
+    return 0;
   }
 }

@@ -7841,3 +7841,57 @@ Commit: `ae622ce`
 **Tests:** 11 unit tests (ContentImportPage + FolderUploadZone) + 6 backend service tests + 3 pipeline tests
 
 **Deferred:** NATS real-time progress events, LessonPreviewTable editable grid (Phase 40 Phase 2)
+
+---
+
+## FEAT-PHASE41-XAPI-DRIVE-MOBILE | 🟡 In Progress | HIGH
+**Phase 41 — xAPI NATS Bridge + Google Drive Import + Mobile Offline Queue**
+
+**Status:** 🟡 In Progress — Wave 1 complete (A1+A2+B1+C1), Wave 2 in progress
+
+**Deliverables (Phase 41 Sprint A — xAPI Pipeline):**
+- `apps/subgraph-content/src/xapi/xapi-verb-mappings.ts` — xAPI 1.0.3 verb table + NATS→xAPI mapper
+- `apps/subgraph-content/src/xapi/xapi-nats-bridge.service.ts` — subscribes to 6 NATS subjects → stores xAPI statements
+- `apps/subgraph-content/src/xapi/xapi-export.service.ts` — `getStatementCount()` with `since` filter
+- `apps/subgraph-content/src/xapi/xapi.graphql` — added `xapiStatementCount`, `clearXapiStatements`
+- `apps/subgraph-content/src/xapi/xapi.resolver.ts` — resolvers for new fields
+- `apps/gateway/supergraph.graphql` — added `xapiStatementCount` + `clearXapiStatements`
+
+**Deliverables (Phase 41 Sprint B — Google Drive):**
+- `apps/subgraph-content/src/content-import/google-drive.client.ts` — native-fetch Drive API client (no googleapis)
+- `apps/subgraph-content/src/content-import/content-import.graphql` — `DriveImportInput` + `importFromDrive` mutation
+- `apps/subgraph-content/src/content-import/content-import.service.ts` — `importFromDrive()` with 5-min timeout guard
+- `apps/subgraph-content/src/content-import/content-import.resolver.ts` — `importFromDrive` mutation resolver
+- `apps/web/src/components/content-import/DriveImportCard.tsx` — OAuth connect + folder picker + import UI
+- `apps/web/src/pages/OAuthCallbackPage.tsx` — postMessage OAuth relay page
+
+**Deliverables (Phase 41 Sprint C — Mobile):**
+- `apps/mobile/src/services/XapiOfflineQueue.ts` — expo-sqlite queue with 500-row eviction cap
+- `apps/mobile/src/hooks/useXapiTracking.ts` — `track()` + `flush()` hook (no NetInfo coupling)
+
+**NATS→xAPI Verb Mappings:**
+| NATS Subject | xAPI Verb | ADL URI |
+|---|---|---|
+| `EDUSPHERE.course.completed` | completed | `http://adlnet.gov/expapi/verbs/completed` |
+| `EDUSPHERE.course.enrolled` | registered | `http://adlnet.gov/expapi/verbs/registered` |
+| `EDUSPHERE.sessions.ended` | attended | `http://adlnet.gov/expapi/verbs/attended` |
+| `EDUSPHERE.sessions.participant.joined` | launched | `http://adlnet.gov/expapi/verbs/launched` |
+| `EDUSPHERE.submission.created` | attempted | `http://adlnet.gov/expapi/verbs/attempted` |
+| `EDUSPHERE.poll.voted` | responded | `http://adlnet.gov/expapi/verbs/responded` |
+
+**Security:**
+- xAPI tokens: SHA-256 hash only (SI-3) — raw tokens never stored or logged
+- Drive `accessToken`: in-memory only, never inserted into DB or logged
+- NATS bridge: skips events with missing `tenantId` or `userId`
+- All xAPI management mutations: `@requiresRole(roles: [ORG_ADMIN])` or `[SUPER_ADMIN]`
+- Mobile queue: capped at 500 rows (Memory Safety Rule)
+
+**Tests added:**
+- `xapi-nats-bridge.service.spec.ts` — 5 tests (verb mappings, lifecycle, missing tenantId guard)
+- `xapi-export.service.spec.ts` — 3 tests (count, since param, empty)
+- `google-drive.client.spec.ts` — 4 tests (list files, 403 error, empty folder, download buffer)
+- `XapiOfflineQueue.test.ts` (mobile) — 5 tests (init, enqueue, getPending, delete, getSize)
+- `DriveImportCard.test.tsx` — 4 tests (connect, connected msg, disabled state, onImport call)
+- `OAuthCallbackPage.test.tsx` — 2 tests (render, postMessage)
+
+**E2E specs:** `apps/web/e2e/xapi-settings.spec.ts`, `apps/web/e2e/drive-import.spec.ts` — pending Sprint D1

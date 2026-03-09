@@ -188,3 +188,57 @@ describe('Phase 40: Content Import Security', () => {
     expect(resolverFile).toMatch(/auth(?:Context)?\.userId|ctx\.authContext/);
   });
 });
+
+// ── Phase 41: xAPI NATS Bridge Security ──────────────────────────────────────
+
+describe('Phase 41: xAPI NATS Bridge Security', () => {
+  it('xAPI NATS bridge skips events with missing tenantId — guard in source code', () => {
+    const bridgeSrc = read(
+      'apps/subgraph-content/src/xapi/xapi-nats-bridge.service.ts'
+    );
+    // Must check for tenantId or userId before calling storeStatement
+    expect(bridgeSrc).toMatch(/tenantId.*userId|userId.*tenantId|!tenantId|!userId/);
+  });
+
+  it('xAPI tokens use SHA-256 hash — never raw token stored', () => {
+    const tokenSrc = read(
+      'apps/subgraph-content/src/xapi/xapi-token.service.ts'
+    );
+    expect(tokenSrc).toContain("createHash('sha256')");
+    // tokenHash (the hash column) is inserted — never the raw token value
+    expect(tokenSrc).not.toMatch(/\.values\(\s*\{[^}]*rawToken/);
+  });
+
+  it('Google Drive accessToken not stored in DB — service does not insert it', () => {
+    const importSrc = read(
+      'apps/subgraph-content/src/content-import/content-import.service.ts'
+    );
+    // accessToken must not appear in any Drizzle insert context
+    expect(importSrc).not.toMatch(/drizzle.*accessToken|db\.insert.*accessToken/i);
+  });
+
+  it('importFromDrive resolver takes tenantId from JWT context, not args', () => {
+    const resolverSrc = read(
+      'apps/subgraph-content/src/content-import/content-import.resolver.ts'
+    );
+    // Must use ctx.authContext (tenantId from JWT), not accept tenantId from args
+    expect(resolverSrc).toMatch(/ctx\.authContext|authContext\.tenantId/);
+    expect(resolverSrc).not.toMatch(/@Args\([^)]*tenantId|args\.tenantId|input\.tenantId/);
+  });
+
+  it('xapiStatementCount query requires elevated role in SDL', () => {
+    const sdl = read(
+      'apps/subgraph-content/src/xapi/xapi.graphql'
+    );
+    expect(sdl).toMatch(/xapiStatementCount[\s\S]*?@requiresRole/);
+  });
+
+  it('mobile xAPI queue has eviction cap — no unbounded growth', () => {
+    const queueSrc = read(
+      'apps/mobile/src/services/XapiOfflineQueue.ts'
+    );
+    // Must have a max-row eviction function
+    expect(queueSrc).toContain('evictOldStatements');
+    expect(queueSrc).toMatch(/500/); // 500-row cap
+  });
+});

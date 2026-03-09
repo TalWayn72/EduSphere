@@ -1,11 +1,12 @@
-import { Youtube, Globe, FolderOpen } from 'lucide-react';
+import { Youtube, Globe, FolderOpen, HardDrive } from 'lucide-react';
 
-type ImportSource = 'youtube' | 'website' | 'folder' | null;
+type ImportSource = 'youtube' | 'website' | 'folder' | 'drive' | null;
 
 interface Props {
   selected: ImportSource;
   onSelect: (source: ImportSource) => void;
 }
+
 
 const SOURCES = [
   {
@@ -25,6 +26,12 @@ const SOURCES = [
     icon: FolderOpen,
     label: 'Upload Folder / ZIP',
     description: 'Upload a local folder or ZIP archive — supports MP4, PDF, PPTX, DOCX, images.',
+  },
+  {
+    id: 'drive' as const,
+    icon: HardDrive,
+    label: 'Google Drive',
+    description: 'Import files directly from a Google Drive folder via OAuth 2.0.',
   },
 ] as const;
 

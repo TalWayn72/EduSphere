@@ -6,6 +6,29 @@ Versioning: Session-based (Session N = version 0.N.0)
 
 ---
 
+## [0.41.0] — 2026-03-09
+
+### Added
+- **xAPI NATS Bridge** — `XapiNatsBridgeService` subscribes to 6 NATS learning events and auto-generates xAPI 1.0.3 statements (completed, registered, attended, launched, attempted, responded)
+- **xAPI verb mappings** — pure `natsToXapiStatement()` mapper with full ADL-compliant verb table
+- **xAPI export** — `xapiStatementCount` query + `clearXapiStatements` mutation (SUPER_ADMIN only)
+- **Google Drive import** — native-fetch `GoogleDriveClient` + `importFromDrive` GraphQL mutation + `DriveImportCard` React component with OAuth flow
+- **OAuthCallbackPage** — `/oauth/google/callback` route relays authorization code via `postMessage`
+- **Mobile xAPI offline queue** — `XapiOfflineQueue` (expo-sqlite) with 500-row eviction cap + `useXapiTracking` hook
+
+### Changed
+- `content-import.graphql` — added `DriveImportInput` type + `importFromDrive` mutation
+- `xapi.graphql` — added `xapiStatementCount` + `clearXapiStatements` fields
+- `xapi.module.ts` — registered `XapiNatsBridgeService` + `XapiExportService`
+- `supergraph.graphql` — added new xAPI and Drive import fields
+
+### Security
+- Drive `accessToken` is never stored in DB or logs — used in-flight only
+- NATS bridge skips any event missing `tenantId` or `userId`
+- All xAPI admin mutations require `ORG_ADMIN` or `SUPER_ADMIN` role
+
+---
+
 ## [0.38.0] — 2026-03-08 — Phase 38: Certificate Download, Marketplace, QuizBuilder, SRS Mobile (commit a2ffe4f)
 
 ### Added

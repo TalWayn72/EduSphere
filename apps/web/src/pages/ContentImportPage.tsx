@@ -4,10 +4,11 @@ import { Layout } from '@/components/Layout';
 import { useAuthRole } from '@/hooks/useAuthRole';
 import { ImportSourceSelector } from '@/components/content-import/ImportSourceSelector';
 import { FolderUploadZone } from '@/components/content-import/FolderUploadZone';
+import { DriveImportCard } from '@/components/content-import/DriveImportCard';
 import { ImportProgressPanel } from '@/components/content-import/ImportProgressPanel';
 import { useContentImport } from '@/hooks/useContentImport';
 
-type ImportSource = 'youtube' | 'website' | 'folder' | null;
+type ImportSource = 'youtube' | 'website' | 'folder' | 'drive' | null;
 
 export function ContentImportPage() {
   const { courseId } = useParams<{ courseId: string }>();
@@ -17,7 +18,7 @@ export function ContentImportPage() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
 
-  const { importFromYoutube, importFromWebsite, importJob, isImporting, error } =
+  const { importFromYoutube, importFromWebsite, importFromDrive, importJob, isImporting, error } =
     useContentImport(courseId ?? '');
 
   // Role gate: only instructors and admins
@@ -90,13 +91,22 @@ export function ContentImportPage() {
               <FolderUploadZone courseId={courseId ?? ''} />
             )}
 
+            {selectedSource === 'drive' && (
+              <DriveImportCard
+                courseId={courseId ?? ''}
+                moduleId=""
+                onImport={(folderId, accessToken) => void importFromDrive(folderId, accessToken)}
+                isImporting={isImporting}
+              />
+            )}
+
             {error && (
               <p className="text-sm text-destructive" role="alert">
                 {error}
               </p>
             )}
 
-            {selectedSource && selectedSource !== 'folder' && (
+            {selectedSource && selectedSource !== 'folder' && selectedSource !== 'drive' && (
               <button
                 type="submit"
                 disabled={isImporting}

@@ -27,6 +27,17 @@ const IMPORT_WEBSITE_MUTATION = gql`
   }
 `;
 
+const IMPORT_FROM_DRIVE_MUTATION = gql`
+  mutation ImportFromDrive($input: DriveImportInput!) {
+    importFromDrive(input: $input) {
+      id
+      status
+      lessonCount
+      estimatedMinutes
+    }
+  }
+`;
+
 const CANCEL_IMPORT_MUTATION = gql`
   mutation CancelImport($jobId: ID!) {
     cancelImport(jobId: $jobId)
@@ -42,6 +53,7 @@ interface ImportJob {
 
 interface ImportYoutubeResult { importFromYoutube: ImportJob }
 interface ImportWebsiteResult { importFromWebsite: ImportJob }
+interface ImportFromDriveResult { importFromDrive: ImportJob }
 
 export function useContentImport(courseId: string) {
   const [importJob, setImportJob] = useState<ImportJob | null>(null);
@@ -65,6 +77,15 @@ export function useContentImport(courseId: string) {
     onError: (err: Error) => setError(err.message),
   });
 
+  const driveMutation = useMutation({
+    mutationFn: ({ folderId, accessToken }: { folderId: string; accessToken: string }) =>
+      request<ImportFromDriveResult>(GRAPHQL_URL, IMPORT_FROM_DRIVE_MUTATION, {
+        input: { folderId, accessToken, courseId, moduleId: '' },
+      }),
+    onSuccess: (data) => setImportJob(data.importFromDrive),
+    onError: (err: Error) => setError(err.message),
+  });
+
   const cancelMutation = useMutation({
     mutationFn: (jobId: string) =>
       request(GRAPHQL_URL, CANCEL_IMPORT_MUTATION, { jobId }),
@@ -73,9 +94,11 @@ export function useContentImport(courseId: string) {
   return {
     importFromYoutube: (playlistUrl: string) => youtubeMutation.mutateAsync(playlistUrl),
     importFromWebsite: (siteUrl: string) => websiteMutation.mutateAsync(siteUrl),
+    importFromDrive: (folderId: string, accessToken: string) =>
+      driveMutation.mutateAsync({ folderId, accessToken }),
     cancelImport: (jobId: string) => cancelMutation.mutateAsync(jobId),
     importJob,
-    isImporting: youtubeMutation.isPending || websiteMutation.isPending,
+    isImporting: youtubeMutation.isPending || websiteMutation.isPending || driveMutation.isPending,
     error,
   };
 }

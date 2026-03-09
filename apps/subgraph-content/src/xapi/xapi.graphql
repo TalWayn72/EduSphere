@@ -24,6 +24,9 @@ extend type Query {
 
   """Query recent xAPI statements stored in the self-hosted LRS."""
   xapiStatements(limit: Int, since: String): [XapiStatementResult!]! @authenticated @requiresRole(roles: [ORG_ADMIN])
+
+  """Return total count of xAPI statements for this tenant (optionally filtered by since)."""
+  xapiStatementCount(since: String): Int! @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
 }
 
 extend type Mutation {
@@ -32,4 +35,7 @@ extend type Mutation {
 
   """Revoke an existing xAPI token."""
   revokeXapiToken(tokenId: ID!): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+
+  """Delete all xAPI statements older than the given number of days. SUPER_ADMIN only."""
+  clearXapiStatements(olderThanDays: Int!): Int! @authenticated @requiresRole(roles: [SUPER_ADMIN])
 }

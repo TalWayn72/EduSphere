@@ -379,6 +379,11 @@ const ContentImportPage = lazy(() =>
     default: m.ContentImportPage,
   }))
 );
+const OAuthCallbackPage = lazy(() =>
+  import('@/pages/OAuthCallbackPage').then((m) => ({
+    default: m.OAuthCallbackPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -770,9 +775,18 @@ export const router = createBrowserRouter([
     element: guarded(<CertificatesPage />),
   },
   {
-    // Content Import — bulk import lessons from YouTube/website/folder
+    // Content Import — bulk import lessons from YouTube/website/folder/Google Drive
     path: '/courses/:courseId/import',
     element: guarded(<ContentImportPage />),
+  },
+  {
+    // Google OAuth 2.0 callback — public route, postMessage to opener
+    path: '/oauth/google/callback',
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <OAuthCallbackPage />
+      </Suspense>
+    ),
   },
   {
     path: '/',
