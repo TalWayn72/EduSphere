@@ -1,0 +1,55 @@
+extend type Query {
+  myReviewAssignments: [PeerReviewAssignment!]! @authenticated
+  mySubmissions: [PeerReviewSubmission!]! @authenticated
+  peerReviewRubric(contentItemId: ID!): PeerReviewRubric @authenticated
+}
+
+extend type Mutation {
+  createPeerReviewRubric(input: CreateRubricInput!): PeerReviewRubric! @authenticated
+  submitForPeerReview(contentItemId: ID!, submissionText: String!): [PeerReviewAssignment!]! @authenticated
+  submitPeerReview(assignmentId: ID!, criteriaScores: String!, feedback: String): Boolean! @authenticated
+}
+
+type PeerReviewAssignment {
+  id: ID!
+  contentItemId: ID!
+  contentItemTitle: String!
+  submitterId: ID!
+  submitterDisplayName: String
+  status: PeerReviewStatus!
+  submissionText: String
+  feedback: String
+  score: Int
+  createdAt: DateTime!
+}
+
+type PeerReviewSubmission {
+  id: ID!
+  contentItemId: ID!
+  contentItemTitle: String!
+  status: PeerReviewStatus!
+  score: Int
+  feedback: String
+  createdAt: DateTime!
+}
+
+type PeerReviewRubric {
+  id: ID!
+  contentItemId: ID!
+  criteria: String!
+  minReviewers: Int!
+  isAnonymous: Boolean!
+}
+
+enum PeerReviewStatus {
+  PENDING
+  SUBMITTED
+  RATED
+}
+
+input CreateRubricInput {
+  contentItemId: ID!
+  criteria: String!
+  minReviewers: Int
+  isAnonymous: Boolean
+}

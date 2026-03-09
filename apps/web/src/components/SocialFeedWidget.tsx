@@ -2,6 +2,7 @@
  * SocialFeedWidget — "Following Activity" dashboard widget (F-036).
  * Shows recent learning activity of users the current learner follows.
  */
+import { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
 import { Users } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -60,9 +61,16 @@ function FeedItemRow({ item }: { item: SocialFeedItem }) {
 }
 
 export function SocialFeedWidget() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [{ data, fetching }] = useQuery<{ socialFeed: SocialFeedItem[] }>({
     query: SOCIAL_FEED_QUERY,
     variables: { limit: MAX_FEED_ITEMS },
+    pause: !mounted,
   });
 
   const feed = data?.socialFeed ?? [];

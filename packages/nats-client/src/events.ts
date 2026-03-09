@@ -185,7 +185,11 @@ export type NatsEvent =
   | UserFollowedPayload
   | PollVotePayload
   | LessonPayload
-  | LessonPipelineModuleCompletedPayload;
+  | LessonPipelineModuleCompletedPayload
+  | SocialFeedItemPayload
+  | PeerReviewAssignedPayload
+  | PeerReviewCompletedPayload
+  | DiscussionReplyPayload;
 
 // ─── Type Guards ─────────────────────────────────────────────────────────────
 
@@ -347,6 +351,11 @@ export const NatsSubjects = {
     'EDUSPHERE.lesson.pipeline.module.completed',
   LESSON_PIPELINE_COMPLETED: 'EDUSPHERE.lesson.pipeline.completed',
   LESSON_PUBLISHED: 'EDUSPHERE.lesson.published',
+  // Phase 45 — Social Learning
+  PEER_REVIEW_ASSIGNED: 'EDUSPHERE.peer.review.assigned',
+  PEER_REVIEW_COMPLETED: 'EDUSPHERE.peer.review.completed',
+  DISCUSSION_REPLY: 'EDUSPHERE.discussion.reply',
+  SOCIAL_ACTIVITY_DIGEST: 'EDUSPHERE.social.activity.digest',
 } as const;
 
 // ─── Course Enrolled Events (F-031 Instructor Marketplace) ───────────────────
@@ -465,5 +474,85 @@ export function isLessonPipelineModuleCompletedEvent(
     typeof obj['runId'] === 'string' &&
     typeof obj['moduleType'] === 'string' &&
     obj['type'] === 'lesson.pipeline.module.completed'
+  );
+}
+
+// ─── Social Learning Events (Phase 45) ───────────────────────────────────────
+
+export interface SocialFeedItemPayload {
+  readonly actorId: string;
+  readonly tenantId: string;
+  readonly verb: 'COMPLETED' | 'ENROLLED' | 'ACHIEVED_BADGE' | 'DISCUSSED' | 'STARTED_LEARNING';
+  readonly objectType: string;
+  readonly objectId: string;
+  readonly objectTitle: string;
+  readonly timestamp: string;
+}
+
+export interface PeerReviewAssignedPayload {
+  readonly assignmentId: string;
+  readonly reviewerId: string;
+  readonly submitterId: string;
+  readonly contentItemTitle: string;
+  readonly tenantId: string;
+  readonly timestamp: string;
+}
+
+export interface PeerReviewCompletedPayload {
+  readonly assignmentId: string;
+  readonly submitterId: string;
+  readonly contentItemTitle: string;
+  readonly tenantId: string;
+  readonly reviewCount: number;
+  readonly timestamp: string;
+}
+
+export interface DiscussionReplyPayload {
+  readonly discussionId: string;
+  readonly messageId: string;
+  readonly authorId: string;
+  readonly recipientId: string;
+  readonly discussionTitle: string;
+  readonly tenantId: string;
+  readonly timestamp: string;
+}
+
+export function isSocialFeedItemEvent(e: unknown): e is SocialFeedItemPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['actorId'] === 'string' &&
+    typeof obj['tenantId'] === 'string' &&
+    typeof obj['objectId'] === 'string'
+  );
+}
+
+export function isPeerReviewAssignedEvent(e: unknown): e is PeerReviewAssignedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['assignmentId'] === 'string' &&
+    typeof obj['reviewerId'] === 'string' &&
+    typeof obj['submitterId'] === 'string'
+  );
+}
+
+export function isPeerReviewCompletedEvent(e: unknown): e is PeerReviewCompletedPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['assignmentId'] === 'string' &&
+    typeof obj['submitterId'] === 'string' &&
+    typeof obj['reviewCount'] === 'number'
+  );
+}
+
+export function isDiscussionReplyEvent(e: unknown): e is DiscussionReplyPayload {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['discussionId'] === 'string' &&
+    typeof obj['messageId'] === 'string' &&
+    typeof obj['recipientId'] === 'string'
   );
 }

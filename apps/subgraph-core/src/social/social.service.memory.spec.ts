@@ -6,9 +6,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { drainMock, mockNatsConn, mockTx } = vi.hoisted(() => {
   const drainMock = vi.fn().mockResolvedValue(undefined);
+  // Async iterator that immediately ends (simulates a closed subscription)
+  const emptyAsyncIterator = {
+    [Symbol.asyncIterator]() {
+      return { next: async () => ({ value: undefined, done: true }) };
+    },
+    unsubscribe: vi.fn(),
+  };
   const mockNatsConn = {
     publish: vi.fn(),
     drain: drainMock,
+    subscribe: vi.fn().mockReturnValue(emptyAsyncIterator),
   };
   const mockTx = {
     delete: vi.fn().mockReturnValue({

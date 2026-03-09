@@ -313,7 +313,6 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   Query recent xAPI statements stored in the self-hosted LRS.
   """
   xapiStatements(limit: Int, since: String) : [XapiStatementResult!]! @join__field(graph: CONTENT)  @authenticated
-  xapiStatementCount(since: String) : Int! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [ORG_ADMIN, SUPER_ADMIN])
   adminOverview: AdminOverview! @join__field(graph: CORE)  @authenticated
   adminDashboardStats: AdminDashboardStats! @join__field(graph: CORE)  @authenticated
   adminAnnouncements(limit: Int = 20, offset: Int = 0) : AnnouncementResult! @join__field(graph: CORE)  @authenticated
@@ -345,6 +344,7 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   savedSearches: [SavedSearch!]! @join__field(graph: CORE)  @authenticated
   myFollowers(limit: Int) : [ID!]! @join__field(graph: CORE)  @authenticated
   myFollowing(limit: Int) : [ID!]! @join__field(graph: CORE)  @authenticated
+  searchUsers(query: String!, limit: Int) : [PublicProfile!]! @join__field(graph: CORE)  @authenticated
   """
   Return cards that are due for review now (dueDate <= current time).
   """
@@ -361,7 +361,6 @@ type Query @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__typ
   tenants(limit: Int = 10, offset: Int = 0) : [Tenant!]! @join__field(graph: CORE) 
   myTenantLanguageSettings: TenantLanguageSettings! @join__field(graph: CORE)  @authenticated
   myTenantBranding: TenantBranding! @join__field(graph: CORE)  @authenticated
-  publicBranding(slug: String!) : PublicTenantBranding @join__field(graph: CORE)
   user(id: ID!) : User @join__field(graph: CORE) 
   users(
     limit: Int = 10
@@ -499,6 +498,10 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Leave a discussion
   """
   leaveDiscussion(discussionId: ID!) : Boolean! @join__field(graph: COLLABORATION)  @authenticated
+  """
+  Like or unlike a message
+  """
+  likeMessage(messageId: ID!) : Boolean! @join__field(graph: COLLABORATION)  @authenticated
   createAssessmentCampaign(title: String!, targetUserId: ID!, dueDate: String) : AssessmentCampaign! @join__field(graph: CONTENT)  @authenticated
   activateAssessmentCampaign(campaignId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
   submitAssessmentResponse(
@@ -647,7 +650,6 @@ type Mutation @join__type(graph: AGENT)  @join__type(graph: ANNOTATION)  @join__
   Revoke an existing xAPI token.
   """
   revokeXapiToken(tokenId: ID!) : Boolean! @join__field(graph: CONTENT)  @authenticated
-  clearXapiStatements(olderThanDays: Int!) : Int! @join__field(graph: CONTENT)  @authenticated @requiresRole(roles: [SUPER_ADMIN])
   createAnnouncement(input: CreateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
   updateAnnouncement(id: ID!, input: UpdateAnnouncementInput!) : Announcement! @join__field(graph: CORE)  @authenticated
   deleteAnnouncement(id: ID!) : Boolean! @join__field(graph: CORE)  @authenticated
@@ -1014,6 +1016,8 @@ type DiscussionMessage @join__type(graph: COLLABORATION, key: "id")  {
   parentMessage: DiscussionMessage
   replies(limit: Int = 20, offset: Int = 0) : [DiscussionMessage!]!
   replyCount: Int!
+  likesCount: Int! @join__field(graph: COLLABORATION)
+  isLikedByMe: Boolean! @join__field(graph: COLLABORATION)
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -2099,15 +2103,6 @@ type TenantLanguageSettings @join__type(graph: CORE)  {
   defaultLanguage: String!
 }
 
-type PublicTenantBranding @join__type(graph: CORE)  {
-  primaryColor: String!
-  accentColor: String!
-  logoUrl: String!
-  faviconUrl: String!
-  organizationName: String!
-  tagline: String
-}
-
 type TenantBranding @join__type(graph: CORE)  {
   logoUrl: String!
   logoMarkUrl: String
@@ -2429,9 +2424,18 @@ type SocialRecommendation @join__type(graph: KNOWLEDGE)  {
   lastActivity: String!
 }
 
+enum SocialVerb @join__type(graph: KNOWLEDGE)  {
+  COMPLETED @join__enumValue(graph: KNOWLEDGE)
+  ENROLLED @join__enumValue(graph: KNOWLEDGE)
+  ACHIEVED_BADGE @join__enumValue(graph: KNOWLEDGE)
+  DISCUSSED @join__enumValue(graph: KNOWLEDGE)
+  STARTED_LEARNING @join__enumValue(graph: KNOWLEDGE)
+}
+
 type SocialFeedItem @join__type(graph: KNOWLEDGE)  {
   userId: ID!
   userDisplayName: String!
+  verb: SocialVerb @join__field(graph: KNOWLEDGE)
   action: String!
   contentItemId: ID!
   contentTitle: String!

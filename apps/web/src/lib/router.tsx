@@ -398,6 +398,45 @@ const SkillPathPage = lazy(() =>
 const SkillGapDashboard = lazy(() =>
   import('@/pages/SkillGapDashboard').then((m) => ({ default: m.SkillGapDashboard }))
 );
+const DiscussionsPage = lazy(() =>
+  import('@/pages/DiscussionsPage').then((m) => ({ default: m.DiscussionsPage }))
+);
+const DiscussionDetailPage = lazy(() =>
+  import('@/pages/DiscussionDetailPage').then((m) => ({
+    default: m.DiscussionDetailPage,
+  }))
+);
+const SocialFeedPage = lazy(() =>
+  import('@/pages/SocialFeedPage').then((m) => ({ default: m.SocialFeedPage }))
+);
+const UserSearchPage = lazy(() =>
+  import('@/pages/UserSearchPage').then((m) => ({
+    default: m.UserSearchPage,
+  }))
+);
+const PeerReviewPage = lazy(() =>
+  import('@/pages/PeerReviewPage').then((m) => ({ default: m.PeerReviewPage }))
+);
+const ReviewAssignmentPage = lazy(() =>
+  import('@/pages/ReviewAssignmentPage').then((m) => ({
+    default: m.ReviewAssignmentPage,
+  }))
+);
+const AssessmentCampaignsPage = lazy(() =>
+  import('@/pages/AssessmentCampaignsPage').then((m) => ({
+    default: m.AssessmentCampaignsPage,
+  }))
+);
+const AssessmentResponsePage = lazy(() =>
+  import('@/pages/AssessmentResponsePage').then((m) => ({
+    default: m.AssessmentResponsePage,
+  }))
+);
+const AssessmentResultPage = lazy(() =>
+  import('@/pages/AssessmentResultPage').then((m) => ({
+    default: m.AssessmentResultPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -584,6 +623,21 @@ export const router = createBrowserRouter([
     element: guarded(<AssessmentCampaignPage />),
   },
   {
+    // 360° Assessment learner view — list of campaigns targeting me + campaigns to respond
+    path: '/assessments',
+    element: guarded(<AssessmentCampaignsPage />),
+  },
+  {
+    // Submit a 360° assessment response
+    path: '/assessments/:id/respond',
+    element: guarded(<AssessmentResponsePage />),
+  },
+  {
+    // View aggregated results for a 360° campaign
+    path: '/assessments/:id/results',
+    element: guarded(<AssessmentResultPage />),
+  },
+  {
     path: '/assessment/:assessmentId',
     element: guarded(<AssessmentPage />),
   },
@@ -715,6 +769,11 @@ export const router = createBrowserRouter([
     element: guarded(<SkillGapDashboard />),
   },
   {
+    // Social learning feed — following activity + recommendations
+    path: '/social',
+    element: guarded(<SocialFeedPage />),
+  },
+  {
     path: '/annotations',
     element: guarded(<AnnotationsPage />),
   },
@@ -821,6 +880,32 @@ export const router = createBrowserRouter([
         <OAuthCallbackPage />
       </Suspense>
     ),
+  },
+  {
+    path: '/discussions',
+    element: guarded(<DiscussionsPage />),
+  },
+  {
+    path: '/discussions/:id',
+    element: guarded(<DiscussionDetailPage />),
+  },
+  {
+    path: '/peer-review',
+    element: guarded(<PeerReviewPage />),
+  },
+  {
+    path: '/peer-review/:id',
+    element: guarded(<ReviewAssignmentPage />),
+  },
+  {
+    // Social Feed — activity stream from followed users
+    path: '/social-feed',
+    element: guarded(<SocialFeedPage />),
+  },
+  {
+    // People search — find and follow other learners
+    path: '/people',
+    element: guarded(<UserSearchPage />),
   },
   {
     path: '/',

@@ -112,4 +112,35 @@ export class SocialResolver {
       tenantId
     );
   }
+
+  @Query('socialFeed')
+  async socialFeed(
+    @Args('limit') limit: number | undefined,
+    @Context() ctx: GqlContext
+  ) {
+    if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
+    const tenantId = ctx.authContext.tenantId ?? '';
+    return this.socialService.getSocialFeed(ctx.authContext.userId, tenantId, limit);
+  }
+
+  @Query('socialRecommendations')
+  async socialRecommendations(
+    @Args('limit') limit: number | undefined,
+    @Context() ctx: GqlContext
+  ) {
+    if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
+    const tenantId = ctx.authContext.tenantId ?? '';
+    return this.socialService.getSocialRecommendations(ctx.authContext.userId, tenantId, limit);
+  }
+
+  @Query('searchUsers')
+  async searchUsers(
+    @Args('query') query: string,
+    @Args('limit') limit: number | undefined,
+    @Context() ctx: GqlContext
+  ) {
+    if (!ctx.authContext) throw new UnauthorizedException('Unauthenticated');
+    const tenantId = ctx.authContext.tenantId ?? '';
+    return this.socialService.searchUsers(query, tenantId, limit);
+  }
 }

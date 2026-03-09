@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
   OnModuleDestroy,
 } from '@nestjs/common';
 import {
@@ -192,6 +193,14 @@ export class DiscussionService implements OnModuleDestroy {
     input: AddMessageInput,
     authContext: AuthContext
   ) {
+    // SEC-3: maxLength 2000 — enforce content length limit
+    if (input.content.length > 2000) {
+      throw new BadRequestException('Message content exceeds 2000 character limit');
+    }
+    // SEC-3: Sanitize — strip all HTML tags to prevent stored XSS
+    const sanitizedContent = input.content.replace(/<[^>]*>/g, '').trim();
+    const sanitizedInput = { ...input, content: sanitizedContent };
+
     const tenantCtx = this.toTenantContext(authContext);
 
     return withTenantContext(this.db, tenantCtx, async (tx) => {
@@ -214,8 +223,8 @@ export class DiscussionService implements OnModuleDestroy {
       const messageValues: Record<string, unknown> = {
         discussion_id: discussionId,
         user_id: authContext.userId,
-        content: input.content,
-        message_type: input.messageType,
+        content: sanitizedInput.content,
+        message_type: sanitizedInput.messageType,
       };
 
       if (input.parentMessageId) {

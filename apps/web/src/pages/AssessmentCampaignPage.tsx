@@ -3,7 +3,7 @@
  * Route: /admin/assessments
  * Admin dashboard to manage campaigns: create, activate, complete.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery } from 'urql';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -88,10 +88,15 @@ export function AssessmentCampaignPage() {
   const [title, setTitle] = useState('');
   const [targetUserId, setTargetUserId] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching }, refetch] = useQuery({
     query: MY_CAMPAIGNS_QUERY,
-    pause: true,
+    pause: !mounted,
   });
   const [{ fetching: creating }, createCampaign] = useMutation(
     CREATE_CAMPAIGN_MUTATION

@@ -25,7 +25,16 @@ export type NotificationType =
   | 'COURSE_ENROLLED'
   | 'USER_FOLLOWED'
   | 'SRS_REVIEW_DUE'
-  | 'ANNOUNCEMENT';
+  | 'ANNOUNCEMENT'
+  | 'LESSON_AVAILABLE'
+  | 'SESSION_STARTING'
+  | 'STREAK_REMINDER'
+  | 'AT_RISK_ALERT'
+  // Phase 45 — Social Learning
+  | 'PEER_REVIEW_ASSIGNED'
+  | 'PEER_REVIEW_RECEIVED'
+  | 'DISCUSSION_REPLY'
+  | 'PEER_FOLLOWED_ACTIVITY';
 
 export interface AppNotification {
   id: string;

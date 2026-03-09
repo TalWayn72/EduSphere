@@ -5,6 +5,7 @@ import {
   DiscussionParticipantResolver,
 } from './discussion.resolver';
 import { DiscussionService } from './discussion.service';
+import { DiscussionInsightsService } from './discussion-insights.service';
 
 @Module({
   providers: [
@@ -12,7 +13,8 @@ import { DiscussionService } from './discussion.service';
     DiscussionMessageResolver,
     DiscussionParticipantResolver,
     DiscussionService,
+    DiscussionInsightsService,
   ],
-  exports: [DiscussionService],
+  exports: [DiscussionService, DiscussionInsightsService],
 })
 export class DiscussionModule {}

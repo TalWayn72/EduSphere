@@ -73,8 +73,10 @@ import type { PushDispatchService } from './push-dispatch.service';
  *             EDUSPHERE.notification.announcement
  * Phase 35 additions (+4): EDUSPHERE.lesson.available, EDUSPHERE.session.starting,
  *             EDUSPHERE.streak.reminder, EDUSPHERE.at.risk.alert
+ * Phase 45 additions (+4): EDUSPHERE.peer.review.assigned, EDUSPHERE.peer.review.completed,
+ *             EDUSPHERE.discussion.reply, EDUSPHERE.social.activity.digest
  */
-const WATCHED_SUBJECT_COUNT = 9;
+const WATCHED_SUBJECT_COUNT = 13;
 
 /** Access private _subs array via type casting. */
 function getSubs(bridge: NatsNotificationBridge) {

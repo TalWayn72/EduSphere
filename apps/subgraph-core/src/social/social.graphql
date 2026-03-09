@@ -7,6 +7,7 @@ extend type User @key(fields: "id") {
 extend type Query {
   myFollowers(limit: Int): [ID!]! @authenticated
   myFollowing(limit: Int): [ID!]! @authenticated
+  searchUsers(query: String!, limit: Int): [PublicProfile!]! @authenticated
 }
 
 extend type Mutation {

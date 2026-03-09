@@ -31,6 +31,7 @@ import { LessonModule } from './lesson/lesson.module';
 import { VisualAnchorModule } from './visual-anchor/visual-anchor.module';
 import { DocumentVersionModule } from './document-version/document-version.module';
 import { ContentImportModule } from './content-import/content-import.module';
+import { PeerReviewModule } from './peer-review/peer-review.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { ContentImportModule } from './content-import/content-import.module';
     VisualAnchorModule,
     DocumentVersionModule,
     ContentImportModule,
+    PeerReviewModule,
   ],
 })
 export class AppModule {}

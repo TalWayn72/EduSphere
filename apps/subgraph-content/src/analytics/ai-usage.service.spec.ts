@@ -46,7 +46,7 @@ const mockGroupBy = vi.fn();
 const mockOrderBy = vi.fn();
 const mockLimit = vi.fn();
 
-function buildChain(finalValue: unknown) {
+function _buildChain(finalValue: unknown) {
   const chain = {
     select: mockSelect,
     from: mockFrom,

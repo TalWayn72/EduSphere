@@ -6,6 +6,7 @@ import {
   pgTable,
   uuid,
   timestamp,
+  text,
   uniqueIndex,
   index,
   pgPolicy,
@@ -43,3 +44,30 @@ export const userFollows = pgTable(
 
 export type UserFollow = typeof userFollows.$inferSelect;
 export type NewUserFollow = typeof userFollows.$inferInsert;
+
+export const socialFeedItems = pgTable(
+  'social_feed_items',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    tenantId: uuid('tenant_id').notNull(),
+    actorId: uuid('actor_id').notNull(),
+    verb: text('verb').notNull(), // COMPLETED | ENROLLED | ACHIEVED_BADGE | DISCUSSED | STARTED_LEARNING
+    objectType: text('object_type').notNull(),
+    objectId: uuid('object_id').notNull(),
+    objectTitle: text('object_title').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('idx_social_feed_actor').on(t.actorId, t.tenantId),
+    index('idx_social_feed_created').on(t.createdAt),
+    pgPolicy('social_feed_tenant_isolation', {
+      using: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+      withCheck: sql`tenant_id::text = current_setting('app.current_tenant', TRUE)`,
+    }),
+  ]
+).enableRLS();
+
+export type SocialFeedItem = typeof socialFeedItems.$inferSelect;
+export type NewSocialFeedItem = typeof socialFeedItems.$inferInsert;

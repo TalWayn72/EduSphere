@@ -6,7 +6,9 @@
  *  - Dropdown list of the 10 most recent notifications
  *  - Click a notification → mark as read
  *  - "Mark all as read" button
- *  - Type icons: 🏅 badge, 📚 course, 👤 follow, 🗂️ SRS, 📢 announcement
+ *  - Type icons: 🏅 badge, 📚 course, 👤 follow, 🗂️ SRS, 📢 announcement,
+ *                📋 peer review assigned, ⭐ peer review received,
+ *                💬 discussion reply, 📡 following activity
  *
  * Memory safety: useNotifications pauses the WebSocket subscription on unmount.
  */
@@ -30,6 +32,15 @@ const TYPE_ICON: Record<NotificationType, string> = {
   USER_FOLLOWED: '👤',
   SRS_REVIEW_DUE: '🗂️',
   ANNOUNCEMENT: '📢',
+  LESSON_AVAILABLE: '📖',
+  SESSION_STARTING: '🎙️',
+  STREAK_REMINDER: '🔥',
+  AT_RISK_ALERT: '⚠️',
+  // Phase 45 — Social Learning
+  PEER_REVIEW_ASSIGNED: '📋',
+  PEER_REVIEW_RECEIVED: '⭐',
+  DISCUSSION_REPLY: '💬',
+  PEER_FOLLOWED_ACTIVITY: '📡',
 };
 
 function timeAgo(iso: string): string {

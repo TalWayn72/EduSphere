@@ -177,3 +177,6 @@ export * from './onboarding';
 
 // Phase 44: Skills-Based Learning Paths
 export * from './skills';
+
+// Phase 45: Social Learning — Peer Review + Discussion Likes
+export * from './peer-review';

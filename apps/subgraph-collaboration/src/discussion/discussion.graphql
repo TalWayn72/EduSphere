@@ -47,6 +47,8 @@ type DiscussionMessage @key(fields: "id") {
   parentMessage: DiscussionMessage
   replies(limit: Int = 20, offset: Int = 0): [DiscussionMessage!]!
   replyCount: Int!
+  likesCount: Int!
+  isLikedByMe: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -96,6 +98,9 @@ extend type Mutation {
 
   """Leave a discussion"""
   leaveDiscussion(discussionId: ID!): Boolean! @authenticated
+
+  """Like or unlike a message"""
+  likeMessage(messageId: ID!): Boolean! @authenticated
 }
 
 type Subscription {
@@ -117,3 +122,16 @@ input AddMessageInput {
 }
 
 scalar DateTime
+
+"""AI-generated summary of a discussion thread"""
+type DiscussionSummary {
+  summary: String!
+  keyTopics: [String!]!
+  suggestedFollowUp: String
+  generatedAt: DateTime!
+}
+
+extend type Mutation {
+  """Generate an AI-powered summary for a discussion thread"""
+  generateDiscussionSummary(discussionId: ID!): DiscussionSummary! @authenticated
+}

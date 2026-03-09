@@ -7,6 +7,17 @@ export const MY_CAMPAIGNS_QUERY = `
   }}
 `;
 
+export const CAMPAIGNS_TO_RESPOND_QUERY = `
+  query CampaignsToRespond {
+    campaignsToRespond {
+      id
+      title
+      status
+      dueDate
+    }
+  }
+`;
+
 export const CREATE_CAMPAIGN_MUTATION = `
   mutation CreateAssessmentCampaign($title: String!, $targetUserId: ID!, $dueDate: String) {
     createAssessmentCampaign(title: $title, targetUserId: $targetUserId, dueDate: $dueDate) {

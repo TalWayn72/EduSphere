@@ -18,6 +18,15 @@ const TYPE_ICON: Record<NotificationType, string> = {
   USER_FOLLOWED: '👤',
   SRS_REVIEW_DUE: '🗂️',
   ANNOUNCEMENT: '📢',
+  LESSON_AVAILABLE: '📖',
+  SESSION_STARTING: '🎙️',
+  STREAK_REMINDER: '🔥',
+  AT_RISK_ALERT: '⚠️',
+  // Phase 45 — Social Learning
+  PEER_REVIEW_ASSIGNED: '📋',
+  PEER_REVIEW_RECEIVED: '⭐',
+  DISCUSSION_REPLY: '💬',
+  PEER_FOLLOWED_ACTIVITY: '📡',
 };
 
 type FilterKey = 'ALL' | 'UNREAD' | NotificationType;

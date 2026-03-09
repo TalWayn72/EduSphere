@@ -19,6 +19,11 @@ import {
   Award,
   FileQuestion,
   Target,
+  MessageSquare,
+  Users,
+  Search,
+  Star,
+  ClipboardList,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useBranding } from '@/contexts/BrandingContext';
@@ -46,6 +51,11 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/certificates', icon: Award, labelKey: 'certificates' },
   { to: '/srs-review', icon: Brain, labelKey: 'srsReview' },
   { to: '/skills', icon: Target, labelKey: 'skillPaths' },
+  { to: '/discussions', icon: MessageSquare, labelKey: 'discussions' },
+  { to: '/social', icon: Users, labelKey: 'socialFeed' },
+  { to: '/people', icon: Search, labelKey: 'findPeople' },
+  { to: '/peer-review', icon: Star, labelKey: 'peerReview' },
+  { to: '/assessments', icon: ClipboardList, labelKey: 'assessments' },
 ];
 
 function getInitials(firstName?: string, lastName?: string, username?: string): string {

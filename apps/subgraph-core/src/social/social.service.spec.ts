@@ -25,6 +25,21 @@ vi.mock('@edusphere/db', () => ({
       followingId: 'following_id',
       tenantId: 'tenant_id',
     },
+    socialFeedItems: {
+      id: 'id',
+      tenantId: 'tenant_id',
+      actorId: 'actor_id',
+      verb: 'verb',
+      objectType: 'object_type',
+      objectId: 'object_id',
+      objectTitle: 'object_title',
+      createdAt: 'created_at',
+    },
+    users: {
+      id: 'id',
+      tenant_id: 'tenant_id',
+      display_name: 'display_name',
+    },
   },
   withTenantContext: vi.fn(
     async (_d: unknown, _c: unknown, fn: (t: unknown) => unknown) => fn(mockTx)
@@ -32,6 +47,10 @@ vi.mock('@edusphere/db', () => ({
   closeAllPools: vi.fn().mockResolvedValue(undefined),
   eq: vi.fn((a: unknown, b: unknown) => ({ eq: [a, b] })),
   and: vi.fn((...a: unknown[]) => ({ and: a })),
+  desc: vi.fn((a: unknown) => ({ desc: a })),
+  inArray: vi.fn((a: unknown, b: unknown) => ({ inArray: [a, b] })),
+  ilike: vi.fn((a: unknown, b: unknown) => ({ ilike: [a, b] })),
+  sql: Object.assign(vi.fn((a: unknown) => ({ sql: a })), { raw: vi.fn((a: unknown) => ({ sqlRaw: a })) }),
 }));
 
 vi.mock('nats', () => ({ connect: vi.fn().mockResolvedValue(mockNatsConn) }));
@@ -182,5 +201,56 @@ describe('SocialService', () => {
     expect(result).toContain('u3');
     expect(result).not.toContain('u1');
     expect(result).not.toContain('u4');
+  });
+
+  describe('getSocialFeed', () => {
+    it('returns empty array when user follows nobody', async () => {
+      vi.spyOn(service, 'getFollowing').mockResolvedValue([]);
+      const result = await service.getSocialFeed('user-1', 'tenant-1', 20);
+      expect(result).toEqual([]);
+    });
+
+    it('returns feed items from followed users ordered by createdAt desc', async () => {
+      vi.spyOn(service, 'getFollowing').mockResolvedValue(['user-2', 'user-3']);
+      mockTx.select.mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            orderBy: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([]),
+            }),
+          }),
+        }),
+      });
+      await service.getSocialFeed('user-1', 'tenant-1', 20);
+      expect(service.getFollowing).toHaveBeenCalledWith('user-1', 'tenant-1', 100);
+    });
+
+    it('respects the limit parameter', async () => {
+      vi.spyOn(service, 'getFollowing').mockResolvedValue(['user-2']);
+      mockTx.select.mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            orderBy: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([]),
+            }),
+          }),
+        }),
+      });
+      await service.getSocialFeed('user-1', 'tenant-1', 5);
+      expect(service.getFollowing).toHaveBeenCalledWith('user-1', 'tenant-1', 100);
+    });
+  });
+
+  describe('searchUsers', () => {
+    it('returns empty array for queries shorter than 3 characters', async () => {
+      const result = await service.searchUsers('ab', 'tenant-1', 20);
+      expect(result).toEqual([]);
+    });
+
+    it('returns empty array for a 2-char query without touching the DB', async () => {
+      const result = await service.searchUsers('xy', 'tenant-1', 20);
+      expect(result).toEqual([]);
+      expect(mockTx.select).not.toHaveBeenCalled();
+    });
   });
 });

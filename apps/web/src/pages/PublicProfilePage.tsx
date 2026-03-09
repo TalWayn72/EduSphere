@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'urql';
 import {
@@ -91,11 +91,16 @@ export function PublicProfilePage() {
   const { copied, copy } = useCopyLink(userId ?? '');
   const [followListOpen, setFollowListOpen] =
     React.useState<FollowListType>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [{ data, fetching, error }] = useQuery<PublicProfileResult>({
     query: PUBLIC_PROFILE_QUERY,
     variables: { userId: userId ?? '' },
-    pause: true, // publicProfile not in live gateway
+    pause: !mounted,
     context: React.useMemo(() => ({ fetchOptions: {} }), []),
   });
 

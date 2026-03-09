@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'urql';
 import {
   Dialog,
@@ -55,17 +55,22 @@ export function FollowersList({
   onClose,
 }: FollowersListProps) {
   const title = type === 'followers' ? 'Followers' : 'Following';
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [followersResult] = useQuery<FollowersData>({
     query: MY_FOLLOWERS_QUERY,
     variables: { limit: 50 },
-    pause: true, // myFollowers not in live gateway
+    pause: !mounted,
   });
 
   const [followingResult] = useQuery<FollowingData>({
     query: MY_FOLLOWING_QUERY,
     variables: { limit: 50 },
-    pause: true, // myFollowing not in live gateway
+    pause: !mounted,
   });
 
   const fetching =

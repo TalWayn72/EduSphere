@@ -6,9 +6,18 @@ type SocialRecommendation {
   lastActivity: String!
 }
 
+enum SocialVerb {
+  COMPLETED
+  ENROLLED
+  ACHIEVED_BADGE
+  DISCUSSED
+  STARTED_LEARNING
+}
+
 type SocialFeedItem {
   userId: ID!
   userDisplayName: String!
+  verb: SocialVerb
   action: String!
   contentItemId: ID!
   contentTitle: String!

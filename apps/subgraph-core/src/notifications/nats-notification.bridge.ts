@@ -23,7 +23,12 @@ export type NotificationType =
   | 'LESSON_AVAILABLE'
   | 'SESSION_STARTING'
   | 'STREAK_REMINDER'
-  | 'AT_RISK_ALERT';
+  | 'AT_RISK_ALERT'
+  // Phase 45 — Social Learning
+  | 'PEER_REVIEW_ASSIGNED'
+  | 'PEER_REVIEW_RECEIVED'
+  | 'DISCUSSION_REPLY'
+  | 'PEER_FOLLOWED_ACTIVITY';
 
 export interface Notification {
   id: string;
@@ -98,6 +103,31 @@ const SUBJECT_MAP: Record<
     title: () => 'Learning Progress Alert',
     body: (raw) =>
       `Your progress in "${String(raw['courseName'] ?? 'a course')}" needs attention.`,
+  },
+  // Phase 45 — Social Learning notification subjects
+  'EDUSPHERE.peer.review.assigned': {
+    type: 'PEER_REVIEW_ASSIGNED',
+    title: () => 'Peer Review Assigned',
+    body: (raw) =>
+      `You have been assigned to review "${String(raw['contentItemTitle'] ?? 'a submission')}".`,
+  },
+  'EDUSPHERE.peer.review.completed': {
+    type: 'PEER_REVIEW_RECEIVED',
+    title: () => 'Peer Review Received',
+    body: (raw) =>
+      `Your submission "${String(raw['contentItemTitle'] ?? 'your work')}" has received a peer review.`,
+  },
+  'EDUSPHERE.discussion.reply': {
+    type: 'DISCUSSION_REPLY',
+    title: () => 'New Reply in Discussion',
+    body: (raw) =>
+      `Someone replied in "${String(raw['discussionTitle'] ?? 'a discussion')}".`,
+  },
+  'EDUSPHERE.social.activity.digest': {
+    type: 'PEER_FOLLOWED_ACTIVITY',
+    title: () => 'Following Activity',
+    body: (raw) =>
+      `${String(raw['actorName'] ?? 'Someone you follow')} has new activity on EduSphere.`,
   },
 };
 

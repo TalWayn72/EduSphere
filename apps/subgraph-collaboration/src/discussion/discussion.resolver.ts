@@ -12,6 +12,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { createPubSub } from 'graphql-yoga';
 import { DiscussionService } from './discussion.service';
+import { DiscussionInsightsService } from './discussion-insights.service';
 import type { AuthContext } from '@edusphere/auth';
 import {
   createDiscussionInputSchema,
@@ -48,7 +49,10 @@ export class DiscussionResolver {
   private readonly logger = new Logger(DiscussionResolver.name);
   private pubSub: ReturnType<typeof createPubSub>;
 
-  constructor(private readonly discussionService: DiscussionService) {
+  constructor(
+    private readonly discussionService: DiscussionService,
+    private readonly discussionInsightsService: DiscussionInsightsService,
+  ) {
     this.pubSub = createPubSub();
   }
 
@@ -163,6 +167,38 @@ export class DiscussionResolver {
     return this.discussionService.leaveDiscussion(
       discussionId,
       context.authContext
+    );
+  }
+
+  @Mutation('generateDiscussionSummary')
+  async generateDiscussionSummary(
+    @Args('discussionId') discussionId: string,
+    @Context() context: GraphQLContext,
+  ) {
+    if (!context.authContext) throw new Error('Unauthenticated');
+
+    // Fetch the discussion to get title
+    const discussion = await this.discussionService.findDiscussionById(
+      discussionId,
+      context.authContext,
+    );
+
+    // Fetch last 50 messages
+    const messages = await this.discussionService.findMessagesByDiscussion(
+      discussionId,
+      50,
+      0,
+      context.authContext,
+    );
+
+    const messageDtos = messages.map((m: { content: string; user_id: string }) => ({
+      content: m.content,
+      userId: m.user_id,
+    }));
+
+    return this.discussionInsightsService.summarizeThread(
+      messageDtos,
+      (discussion as { title: string }).title,
     );
   }
 
