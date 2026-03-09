@@ -196,7 +196,6 @@ export default defineConfig({
         ...(process.env.CI ? {} : { channel: 'chrome' }),
       },
     },
-    /* Uncomment to test additional browsers in CI:
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
@@ -209,7 +208,6 @@ export default defineConfig({
       name: 'mobile-chrome',
       use: { ...devices['Pixel 5'] },
     },
-    */
   ],
 
   /**

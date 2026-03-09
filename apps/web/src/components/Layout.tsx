@@ -52,6 +52,15 @@ export function Layout({ children }: LayoutProps) {
             </kbd>
           </Button>
 
+          {/* WCAG 2.2 SC 3.2.6 — Persistent help mechanism */}
+          <a
+            href="/accessibility"
+            className="hidden md:inline-flex items-center justify-center text-sm text-muted-foreground hover:text-foreground min-h-6 min-w-6 px-2 rounded"
+            aria-label="Help and accessibility information"
+          >
+            ?
+          </a>
+
           {user && <NotificationBell />}
 
           {user ? (

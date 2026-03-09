@@ -15,7 +15,7 @@ import type { Result } from 'axe-core';
  *   SC 2.4.11 - CSS :focus-visible rule in globals.css (3px solid #2563eb)
  *   SC 2.4.12 - html { scroll-padding-top: 60px } in globals.css
  *   SC 2.5.7  - N/A: no drag-only interactions (see docs/plans/wcag22-checklist.md)
- *   SC 3.2.6  - N/A: no persistent help mechanism (documented)
+ *   SC 3.2.6  - Help link ("/help") added to Layout topbar header
  *   SC 3.3.7  - N/A: no multi-step form with repeated fields (documented)
  *   SC 3.3.8  - Keycloak configured without CAPTCHA (documented)
  *   SC 3.3.9  - Keycloak configured without CAPTCHA (documented)
@@ -39,7 +39,6 @@ async function auditPage(
   await page.waitForLoadState('networkidle');
   const results = await new AxeBuilder({ page })
     .withTags([...WCAG_TAGS])
-    .disableRules(['color-contrast'])
     .analyze();
   return results.violations;
 }

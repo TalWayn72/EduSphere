@@ -225,4 +225,13 @@ describe('Layout', () => {
     fireEvent.click(screen.getByText('Sign in'));
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
+
+  it('renders a persistent help/accessibility link (WCAG 2.2 SC 3.2.6)', () => {
+    renderLayout();
+    const helpLink = screen.getByRole('link', {
+      name: /help and accessibility/i,
+    });
+    expect(helpLink).toBeInTheDocument();
+    expect(helpLink).toHaveAttribute('href', '/accessibility');
+  });
 });

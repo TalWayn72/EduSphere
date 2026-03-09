@@ -5,6 +5,7 @@
  * names from GraphQL, and that UUID truncation artifacts are absent from DOM.
  */
 import { test, expect } from '@playwright/test';
+import { argosScreenshot } from '@argos-ci/playwright';
 import { login, loginViaKeycloak } from './auth.helpers';
 import { BASE_URL, IS_DEV_MODE, TEST_USERS } from './env';
 
@@ -66,6 +67,7 @@ test.describe('MarketplacePage — DEV_MODE guard', () => {
 
   test('displays real course title, not UUID truncation', async ({ page }) => {
     await expect(page.getByText('React Fundamentals')).toBeVisible();
+    await argosScreenshot(page, 'marketplace-course-listings');
   });
 
   test('displays instructor name', async ({ page }) => {
@@ -128,6 +130,7 @@ test.describe('MarketplacePage — Live backend', () => {
     await expect(page).toHaveScreenshot('marketplace-real-data.png', {
       maxDiffPixels: 200,
     });
+    await argosScreenshot(page, 'marketplace-real-data-live');
   });
 
   test('filter controls are accessible', async ({ page }) => {

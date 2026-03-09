@@ -26,7 +26,4 @@ extend type Mutation {
     meetingName: String!
   ): LiveSession! @authenticated
 
-  joinLiveSession(sessionId: ID!): String! @authenticated
-
-  endLiveSession(sessionId: ID!): LiveSession! @authenticated
 }

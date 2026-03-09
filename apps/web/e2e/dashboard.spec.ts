@@ -28,6 +28,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { argosScreenshot } from '@argos-ci/playwright';
 import fs from 'fs';
 import path from 'path';
 import { login } from './auth.helpers';
@@ -81,6 +82,7 @@ test.describe('Dashboard — DEV_MODE (mock data)', () => {
     await expect(page.getByTestId('welcome-heading')).toBeVisible({
       timeout: 10_000,
     });
+    await argosScreenshot(page, 'dashboard-welcome-heading');
   });
 
   test('stats cards are visible', async ({ page }) => {

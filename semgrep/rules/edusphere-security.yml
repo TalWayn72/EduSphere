@@ -1,0 +1,91 @@
+rules:
+  - id: edusphere-console-log
+    pattern: console.log(...)
+    message: |
+      console.log() in production code. Use Pino logger instead:
+        this.logger.log(...) or this.logger.info(...)
+      console.log does not include structured context (tenantId, userId, requestId).
+    languages: [typescript]
+    severity: WARNING
+    paths:
+      include:
+        - 'apps/*/src/**/*.ts'
+        - 'packages/*/src/**/*.ts'
+      exclude:
+        - '**/*.spec.ts'
+        - '**/*.test.ts'
+        - '**/*.test.tsx'
+        - '**/test/**'
+        - '**/scripts/**'
+
+  - id: edusphere-raw-sql
+    patterns:
+      - pattern: $DB.execute(`...`)
+      - pattern-not-inside: |
+          // @ts-expect-error AGE Cypher
+          ...
+    message: |
+      Raw SQL execution outside of approved AGE Cypher helpers.
+      Use Drizzle ORM for all queries. Only Apache AGE Cypher queries
+      are allowed as raw SQL (must be wrapped in graph helper functions).
+    languages: [typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: 'CWE-89: SQL Injection'
+      confidence: MEDIUM
+
+  - id: edusphere-missing-auth-directive
+    patterns:
+      - pattern: |
+          @Resolver()
+          class $CLASS {
+            @Query(...)
+            $METHOD(...) { ... }
+          }
+      - pattern-not: |
+          @UseGuards(...)
+          $METHOD(...)
+    message: |
+      GraphQL resolver method missing @UseGuards() authentication guard.
+      All resolvers require authentication via @UseGuards(AuthGuard) or similar.
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      confidence: LOW
+
+  - id: edusphere-pii-plaintext
+    patterns:
+      - pattern: |
+          $DB.insert($TABLE).values({ ..., $PII_FIELD: $VALUE, ... })
+      - pattern-where:
+          - metavariable-regex:
+              metavariable: $PII_FIELD
+              regex: '(email|password|firstName|lastName|phone|address)'
+          - metavariable-regex:
+              metavariable: $VALUE
+              regex: '^(?!encryptField\().*'
+    message: |
+      PII field written in plaintext. Use encryptField() before storing:
+        encryptField(value, tenantEncryptionKey)
+      Security Invariant SI-3: All PII must be encrypted at rest.
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: 'CWE-312: Cleartext Storage of Sensitive Information'
+      confidence: LOW
+
+  - id: edusphere-cors-wildcard
+    pattern: origin: '*'
+    message: |
+      CORS wildcard origin in production. Use specific origins:
+        origin: process.env.CORS_ORIGIN?.split(',') ?? []
+      Security Invariant SI-2: CORS must fail-closed.
+    languages: [typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: 'CWE-346: Origin Validation Error'
+      confidence: HIGH

@@ -4,6 +4,7 @@
     "url": "http://localhost:5176/login",
     "screenshot": "C:\\Users\\P0039217\\.claude\\projects\\EduSphere\\apps\\web\\visual-qa-results\\01-login-page.png",
     "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
       "Failed to load resource: net::ERR_EMPTY_RESPONSE"
     ],
     "consoleWarnings": [
@@ -23,7 +24,9 @@
     "url": "",
     "screenshot": "",
     "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
       "Failed to load resource: net::ERR_EMPTY_RESPONSE",
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
       "Failed to load resource: net::ERR_EMPTY_RESPONSE",
       "Failed to load resource: net::ERR_EMPTY_RESPONSE",
       "Failed to load resource: net::ERR_EMPTY_RESPONSE",

@@ -35,14 +35,13 @@ const WCAG_TAGS = [
 
 /**
  * Run axe-core scan on the current page and return violations.
- * Disables color-contrast rule (handled separately in design tokens audit).
+ * Runs the full WCAG 2.1 + 2.2 AA rule set including color-contrast (SC 1.4.3).
  */
 async function auditPage(page: Page, url: string) {
   await page.goto(url);
   await page.waitForLoadState('networkidle');
   const results = await new AxeBuilder({ page })
     .withTags([...WCAG_TAGS])
-    .disableRules(['color-contrast'])
     .analyze();
   return results.violations;
 }
@@ -240,7 +239,6 @@ test.describe('Accessibility — Quiz Player @a11y-new', () => {
     }
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,
@@ -340,7 +338,6 @@ test.describe('Accessibility — Scenarios Page @a11y-new', () => {
     }
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,
@@ -396,7 +393,6 @@ test.describe('Accessibility — Rich Document Viewer @a11y-new', () => {
     // If error state renders without an alert role, axe will catch it
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,
@@ -450,7 +446,6 @@ test.describe('Accessibility — LTI Settings Page @a11y-new', () => {
     // Audit with form visible
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,
@@ -490,7 +485,6 @@ test.describe('Accessibility — SCIM Settings Page @a11y-new', () => {
     }
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,
@@ -548,7 +542,6 @@ test.describe('Accessibility — Compliance Reports Page @a11y-new', () => {
     await page.waitForLoadState('networkidle');
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,
@@ -677,7 +670,6 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
       const violations = await new AxeBuilder({ page })
         .include('.card:has-text("Leaderboard")')
         .withTags([...WCAG_TAGS])
-        .disableRules(['color-contrast'])
         .analyze();
       expect(
         violations.violations,
@@ -697,7 +689,6 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
       const violations = await new AxeBuilder({ page })
         .include('.card:has-text("Daily Learning")')
         .withTags([...WCAG_TAGS])
-        .disableRules(['color-contrast'])
         .analyze();
       expect(
         violations.violations,
@@ -711,7 +702,6 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
     await page.waitForLoadState('networkidle');
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,
@@ -735,7 +725,6 @@ test.describe('Accessibility — Dashboard New Widgets @a11y-new', () => {
         const violations = await new AxeBuilder({ page })
           .include('[role="dialog"]')
           .withTags([...WCAG_TAGS])
-          .disableRules(['color-contrast'])
           .analyze();
         expect(
           violations.violations,
@@ -808,7 +797,6 @@ test.describe('Accessibility — Course Analytics Page @a11y-new', () => {
     // Run full axe audit
     const violations = await new AxeBuilder({ page })
       .withTags([...WCAG_TAGS])
-      .disableRules(['color-contrast'])
       .analyze();
     expect(
       violations.violations,

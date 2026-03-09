@@ -1,0 +1,45 @@
+rules:
+  - id: edusphere-rls-bypass
+    patterns:
+      - pattern: $DB.select(...)
+      - pattern-not: withTenantContext(...)
+      - pattern-not-inside: withTenantContext(...)
+    message: |
+      Database SELECT outside withTenantContext() bypasses Row Level Security.
+      All tenant-scoped queries MUST be wrapped in withTenantContext().
+      Security Invariant SI-9: Never query without tenant context.
+    languages: [typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      technology: [drizzle-orm, postgresql]
+      cwe: 'CWE-284: Improper Access Control'
+      confidence: MEDIUM
+
+  - id: edusphere-rls-variable-name
+    pattern: current_setting('app.current_user', ...)
+    message: |
+      Wrong RLS session variable name. Use 'app.current_user_id' not 'app.current_user'.
+      Security Invariant SI-1: RLS policy must use exact variable name 'app.current_user_id'.
+    languages: [typescript, sql]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: 'CWE-284: Improper Access Control'
+      confidence: HIGH
+
+  - id: edusphere-cross-tenant
+    pattern: |
+      $DB.$METHOD(..., $TENANT_ID, ...)
+    pattern-where:
+      - metavariable-regex:
+          metavariable: $TENANT_ID
+          regex: 'args\.'
+    message: |
+      Possible cross-tenant data access: tenantId sourced from GraphQL args.
+      Use ctx.tenantId from JWT context (SI-9), never from resolver arguments.
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      confidence: LOW

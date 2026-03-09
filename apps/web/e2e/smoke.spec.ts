@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { argosScreenshot } from '@argos-ci/playwright';
 import { login } from './auth.helpers';
 import { CoursePage } from './pages/CoursePage';
 import { SearchPage } from './pages/SearchPage';
@@ -45,6 +46,7 @@ test.describe('Smoke Tests — Critical Page Loads', () => {
     // DashboardPage section headings from i18n
     await expect(page.getByText('Continue Learning')).toBeVisible();
     await expect(page.getByText('Mastery Overview')).toBeVisible();
+    await argosScreenshot(page, 'smoke-dashboard');
   });
 
   test('annotations page loads with layer tabs', async ({ page }) => {

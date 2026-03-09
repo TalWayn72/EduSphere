@@ -20,6 +20,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { argosScreenshot } from '@argos-ci/playwright';
 import { BASE_URL } from './env';
 
 // ─── Suite 1: Core sections ───────────────────────────────────────────────────
@@ -267,6 +268,7 @@ test.describe('Landing Page — @visual', () => {
       maxDiffPixels: 200,
       animations: 'disabled',
     });
+    await argosScreenshot(page, 'landing-page-desktop');
   });
 
   test('visual regression — landing page mobile', async ({ page }) => {
@@ -279,5 +281,6 @@ test.describe('Landing Page — @visual', () => {
       maxDiffPixels: 200,
       animations: 'disabled',
     });
+    await argosScreenshot(page, 'landing-page-mobile');
   });
 });

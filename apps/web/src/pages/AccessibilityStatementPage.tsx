@@ -111,7 +111,7 @@ export function AccessibilityStatementPage() {
           platform.
         </p>
         <p className="text-sm text-muted-foreground">
-          Last updated: February 2026
+          Last updated: March 2026
         </p>
       </div>
 
@@ -137,7 +137,10 @@ export function AccessibilityStatementPage() {
           </p>
           <p>
             Our platform also targets compliance with{' '}
-            <strong>Section 508</strong> and <strong>EN 301 549</strong>. A full
+            <strong>Section 508</strong>,{' '}
+            <strong>EN 301 549</strong>, and the{' '}
+            <strong>European Accessibility Act (EAA)</strong> — enforced June
+            2025 for digital products and services in EU member states. A full
             machine-readable conformance report is available in our{' '}
             <a href="/docs/VPAT_v2.5.pdf" className="underline text-primary">
               VPAT 2.5 (PDF)
@@ -243,7 +246,7 @@ export function AccessibilityStatementPage() {
             accessibility testing is performed with axe-core on every CI run.
           </p>
           <p>
-            This statement was prepared in February 2026 based on
+            This statement was prepared in March 2026 based on
             self-evaluation and automated testing. We commit to reviewing and
             updating this statement at least annually.
           </p>

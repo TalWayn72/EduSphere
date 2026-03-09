@@ -1,0 +1,75 @@
+name: Semgrep SAST
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main]
+  schedule:
+    # Run weekly on Sundays at 02:00 UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  semgrep:
+    name: Semgrep scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+      security-events: write  # For SARIF upload
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep — Community ruleset
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/javascript
+            p/typescript
+            p/nodejs
+            p/owasp-top-ten
+            semgrep/rules/edusphere-rls.yml
+            semgrep/rules/edusphere-security.yml
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Run custom EduSphere rules only (no token required)
+        if: always()
+        run: |
+          pip install semgrep --quiet
+          semgrep \
+            --config semgrep/rules/edusphere-rls.yml \
+            --config semgrep/rules/edusphere-security.yml \
+            --error \
+            --json \
+            --output semgrep-results.json \
+            apps/ packages/ || true
+          echo "Semgrep findings:"
+          cat semgrep-results.json | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          results = data.get('results', [])
+          if results:
+              for r in results:
+                  print(f'  [{r[\"check_id\"]}] {r[\"path\"]}:{r[\"start\"][\"line\"]} — {r[\"extra\"][\"message\"]}')
+              sys.exit(1)
+          else:
+              print('  No findings — all custom rules pass')
+          "
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.json
+        continue-on-error: true
+
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 30

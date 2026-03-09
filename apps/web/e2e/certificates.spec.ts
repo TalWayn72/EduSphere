@@ -5,6 +5,7 @@
  * and that raw MinIO key paths are never exposed to the user DOM.
  */
 import { test, expect } from '@playwright/test';
+import { argosScreenshot } from '@argos-ci/playwright';
 import { login, loginViaKeycloak } from './auth.helpers';
 import { BASE_URL, IS_DEV_MODE, TEST_USERS } from './env';
 
@@ -61,6 +62,7 @@ test.describe('CertificatesPage — DEV_MODE guard', () => {
     await expect(
       page.getByRole('heading', { name: /certificates/i })
     ).toBeVisible();
+    await argosScreenshot(page, 'certificates-heading-visible');
   });
 
   test('displays certificate card with course name', async ({ page }) => {
@@ -121,6 +123,7 @@ test.describe('CertificatesPage — Live backend', () => {
     await expect(page).toHaveScreenshot('certificates-page.png', {
       maxDiffPixels: 200,
     });
+    await argosScreenshot(page, 'certificates-page-live');
   });
 
   test('certificate list or empty state is visible', async ({ page }) => {
