@@ -15,6 +15,10 @@ vi.mock('react-router-dom', async () => {
 
 const mockIsAuthenticated = vi.fn().mockReturnValue(false);
 const mockLogin = vi.fn();
+vi.mock('@/hooks/usePublicBranding', () => ({
+  usePublicBranding: () => ({ branding: null, fetching: false }),
+}));
+
 vi.mock('@/lib/auth', () => ({
   isAuthenticated: () => mockIsAuthenticated(),
   login: () => mockLogin(),

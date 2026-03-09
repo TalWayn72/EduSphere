@@ -34,8 +34,9 @@ describe('usePublicBranding', () => {
   });
 
   it('pauses query when slug is null', () => {
-    usePublicBranding(null);
-    const [, opts] = (vi.mocked(urql.useQuery) as ReturnType<typeof vi.fn>).mock.calls[0];
+    renderHook(() => usePublicBranding(null));
+    // useQuery is called with a single options object (not two args)
+    const [opts] = (vi.mocked(urql.useQuery) as ReturnType<typeof vi.fn>).mock.calls[0] as [{ pause: boolean }];
     expect(opts?.pause).toBe(true);
   });
 
