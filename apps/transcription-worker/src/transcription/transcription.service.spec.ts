@@ -72,6 +72,10 @@ describe('TranscriptionService', () => {
       .mockResolvedValue('https://minio/hls/master.m3u8'),
   };
 
+  const mockTranslation = {
+    translateTranscript: vi.fn().mockResolvedValue(undefined),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     service = new TranscriptionService(
@@ -80,7 +84,8 @@ describe('TranscriptionService', () => {
       mockNats as any,
       mockConceptExtractor as any,
       mockGraphBuilder as any,
-      mockHls as any
+      mockHls as any,
+      mockTranslation as any
     );
   });
 

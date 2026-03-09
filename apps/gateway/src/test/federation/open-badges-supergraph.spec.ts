@@ -34,8 +34,9 @@ describe('supergraph — Open Badges 3.0 types present (BUG-026 regression)', ()
   it.each(['OpenBadgeAssertion', 'OpenBadgeDefinition'])(
     'object type %s is defined with @join__type(graph: CONTENT)',
     (typeName) => {
-      expect(supergraph).toContain(
-        `type ${typeName} @join__type(graph: CONTENT)`
+      // Use prefix match — definition may include optional key: "id" parameter
+      expect(supergraph).toMatch(
+        new RegExp(`type ${typeName} @join__type\\(graph: CONTENT`)
       );
     }
   );

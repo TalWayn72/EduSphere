@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { useAuthContext } from '@/providers/AuthProvider';
+import { useAuthRole } from '@/hooks/useAuthRole';
 import { ImportSourceSelector } from '@/components/content-import/ImportSourceSelector';
 import { FolderUploadZone } from '@/components/content-import/FolderUploadZone';
 import { ImportProgressPanel } from '@/components/content-import/ImportProgressPanel';
@@ -12,7 +12,7 @@ type ImportSource = 'youtube' | 'website' | 'folder' | null;
 export function ContentImportPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const role = useAuthRole();
   const [selectedSource, setSelectedSource] = useState<ImportSource>(null);
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -22,7 +22,7 @@ export function ContentImportPage() {
 
   // Role gate: only instructors and admins
   const allowedRoles = ['INSTRUCTOR', 'ORG_ADMIN', 'SUPER_ADMIN'];
-  if (user && !allowedRoles.includes(user.role)) {
+  if (role && !allowedRoles.includes(role)) {
     navigate('/dashboard', { replace: true });
     return null;
   }

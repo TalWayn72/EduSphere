@@ -103,7 +103,6 @@ export function FolderUploadZone({ courseId: _courseId, onFilesSelected }: Props
         <input
           ref={inputRef}
           type="file"
-          // eslint-disable-next-line react/no-unknown-property
           {...{ webkitdirectory: '' }}
           multiple
           onChange={handleChange}

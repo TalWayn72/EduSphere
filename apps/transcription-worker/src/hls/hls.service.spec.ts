@@ -410,13 +410,17 @@ describe('TranscriptionService — HLS non-blocking behaviour', () => {
       getManifestPresignedUrl: vi.fn(),
     };
 
+    const mockTranslation = {
+      translateTranscript: vi.fn().mockResolvedValue(undefined),
+    };
     const service = new TranscriptionService(
       mockWhisper as any,
       mockMinio as any,
       mockNats as any,
       mockConceptExtractor as any,
       mockGraphBuilder as any,
-      mockHls as any
+      mockHls as any,
+      mockTranslation as any
     );
 
     await service.transcribeFile({
