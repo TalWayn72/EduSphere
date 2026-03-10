@@ -17,9 +17,16 @@ type PeerMatchRequest {
   createdAt: String!
 }
 
+type MentorPathMatch {
+  mentorId: ID!
+  pathOverlapScore: Float!
+  sharedConcepts: [String!]!
+}
+
 extend type Query {
   peerMatches(courseId: String): [PeerMatch!]! @authenticated
   myPeerMatchRequests: [PeerMatchRequest!]! @authenticated
+  mentorsByPathTopology(courseId: ID!): [MentorPathMatch!]! @authenticated
 }
 
 extend type Mutation {

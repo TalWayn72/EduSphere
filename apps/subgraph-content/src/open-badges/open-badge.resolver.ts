@@ -8,6 +8,8 @@ import type {
   BadgeAssertionResult,
   CreateBadgeDefinitionInput,
 } from './open-badge.types.js';
+import type { KnowledgePathCoverageResult } from '../certificate/graph-credential.service.js';
+import { GraphGroundedCredentialService } from '../certificate/graph-credential.service.js';
 import type { schema } from '@edusphere/db';
 import type { AuthContext } from '@edusphere/auth';
 
@@ -33,7 +35,10 @@ function requireAuth(ctx: GqlCtx): {
 
 @Resolver()
 export class OpenBadgeResolver {
-  constructor(private readonly badgeService: OpenBadgeService) {}
+  constructor(
+    private readonly badgeService: OpenBadgeService,
+    private readonly graphCredentialService: GraphGroundedCredentialService,
+  ) {}
 
   // ── Queries ───────────────────────────────────────────────────────────────
 
@@ -119,5 +124,37 @@ export class OpenBadgeResolver {
       user.tenantId
     );
     return true;
+  }
+
+  @Query('knowledgePathCoverage')
+  async knowledgePathCoverage(
+    @Args('courseId') courseId: string,
+    @Args('requiredConceptIds') requiredConceptIds: string[],
+    @Context() ctx: GqlCtx,
+  ): Promise<KnowledgePathCoverageResult> {
+    const user = requireAuth(ctx);
+    return this.graphCredentialService.verifyKnowledgePathCoverage(
+      user.userId,
+      user.tenantId,
+      courseId,
+      requiredConceptIds,
+    );
+  }
+
+  @Mutation('issueGraphGroundedBadge')
+  async issueGraphGroundedBadge(
+    @Args('courseId') courseId: string,
+    @Args('definitionId') definitionId: string,
+    @Args('requiredConceptIds') requiredConceptIds: string[],
+    @Context() ctx: GqlCtx,
+  ): Promise<BadgeAssertionResult> {
+    const user = requireAuth(ctx);
+    return this.badgeService.issueGraphGroundedBadge(
+      user.userId,
+      user.tenantId,
+      courseId,
+      definitionId,
+      requiredConceptIds,
+    );
   }
 }

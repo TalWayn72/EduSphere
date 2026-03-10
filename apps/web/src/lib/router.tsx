@@ -452,6 +452,16 @@ const PeerMatchingPage = lazy(() =>
     default: m.PeerMatchingPage,
   }))
 );
+const ChavrutaPartnerPage = lazy(() =>
+  import('@/pages/chavruta/ChavrutaPartnerPage').then((m) => ({
+    default: m.ChavrutaPartnerPage,
+  }))
+);
+const MentorDiscoveryPage = lazy(() =>
+  import('@/pages/mentor/MentorDiscoveryPage').then((m) => ({
+    default: m.MentorDiscoveryPage,
+  }))
+);
 
 // ── Loading fallback ──────────────────────────────────────────────────────────
 function PageLoader() {
@@ -936,6 +946,16 @@ export const router = createBrowserRouter([
     // Peer Matching — AI-powered learner matching
     path: '/peer-matching',
     element: guarded(<PeerMatchingPage />),
+  },
+  {
+    // Chavruta Partner Finder — find a human debate partner
+    path: '/chavruta/partner',
+    element: guarded(<ChavrutaPartnerPage />),
+  },
+  {
+    // Mentor Discovery — find a mentor by knowledge path topology
+    path: '/mentor/discover/:courseId?',
+    element: guarded(<MentorDiscoveryPage />),
   },
   {
     path: '/',

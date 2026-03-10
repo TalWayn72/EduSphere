@@ -1,27 +1,56 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-const mockWithTenantContext = vi.fn(async (_db, _ctx, fn: (tx: unknown) => unknown) => fn(mockTx));
-const mockReturning = vi.fn();
-const mockTx = {
-  select: vi.fn(),
-  insert: vi.fn(() => ({ values: vi.fn(() => ({ returning: mockReturning })) })),
-  update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(() => ({ returning: mockReturning })) })) })),
+// ── Hoisted mocks (vi.hoisted prevents TDZ issues) ───────────────────────────
+const mockReturning = vi.hoisted(() => vi.fn());
+const mockTx = vi.hoisted(() => ({
+  select: vi.fn(() => ({
+    from: vi.fn(() => ({
+      where: vi.fn(() => ({
+        limit: vi.fn().mockResolvedValue([]),
+      })),
+    })),
+  })),
+  insert: vi.fn(() => ({
+    values: vi.fn(() => ({
+      returning: mockReturning,
+    })),
+  })),
+  update: vi.fn(() => ({
+    set: vi.fn(() => ({
+      where: vi.fn(() => ({
+        returning: mockReturning,
+      })),
+    })),
+  })),
   execute: vi.fn(),
-};
+}));
+
+const mockWithTenantContext = vi.hoisted(() =>
+  vi.fn(async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
+    fn(mockTx)
+  )
+);
+
+const mockExecuteCypher = vi.hoisted(() => vi.fn().mockResolvedValue([]));
 
 vi.mock('@edusphere/db', () => ({
   db: {},
   withTenantContext: mockWithTenantContext,
   closeAllPools: vi.fn().mockResolvedValue(undefined),
-  executeCypher: vi.fn().mockResolvedValue([]),
+  executeCypher: mockExecuteCypher,
   peerMatchRequests: {
-    id: 'id', tenantId: 'tenant_id', requesterId: 'requester_id',
-    matchedUserId: 'matched_user_id', status: 'status',
+    id: 'id',
+    tenantId: 'tenant_id',
+    requesterId: 'requester_id',
+    matchedUserId: 'matched_user_id',
+    status: 'status',
   },
-  eq: vi.fn((col, _val) => col),
-  and: vi.fn((...args) => args),
-  sql: vi.fn(),
+  userCourses: { userId: 'user_id', courseId: 'course_id' },
+  eq: vi.fn((col: unknown) => col),
+  and: vi.fn((...args: unknown[]) => args),
+  ne: vi.fn((col: unknown) => col),
+  sql: Object.assign(vi.fn(), { raw: vi.fn() }),
 }));
 
 vi.mock('@edusphere/config', () => ({
@@ -41,6 +70,18 @@ describe('PeerMatchingService', () => {
   beforeEach(() => {
     service = new PeerMatchingService();
     vi.clearAllMocks();
+    mockExecuteCypher.mockResolvedValue([]);
+    mockWithTenantContext.mockImplementation(
+      async (_db: unknown, _ctx: unknown, fn: (tx: typeof mockTx) => unknown) =>
+        fn(mockTx)
+    );
+    mockTx.select.mockReturnValue({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+    });
   });
 
   it('onModuleDestroy — calls closeAllPools', async () => {
@@ -50,11 +91,7 @@ describe('PeerMatchingService', () => {
   });
 
   it('findPeerMatches — returns array (may be empty fallback)', async () => {
-    // AGE returns empty → fallback
     mockTx.execute.mockResolvedValueOnce({ rows: [] });
-    mockWithTenantContext.mockImplementationOnce(async (_db, _ctx, fn: (tx: unknown) => unknown) =>
-      fn(mockTx)
-    );
     const result = await service.findPeerMatches(TENANT, REQUESTER);
     expect(Array.isArray(result)).toBe(true);
   });
@@ -67,8 +104,11 @@ describe('PeerMatchingService', () => {
 
   it('requestPeerMatch — creates record with correct tenant and requester', async () => {
     const newRequest = {
-      id: REQUEST_ID, tenantId: TENANT, requesterId: REQUESTER,
-      matchedUserId: MATCHED, status: 'PENDING',
+      id: REQUEST_ID,
+      tenantId: TENANT,
+      requesterId: REQUESTER,
+      matchedUserId: MATCHED,
+      status: 'PENDING',
     };
     mockReturning.mockResolvedValueOnce([newRequest]);
 
@@ -76,13 +116,30 @@ describe('PeerMatchingService', () => {
     expect(result).toMatchObject({ tenantId: TENANT, requesterId: REQUESTER, status: 'PENDING' });
   });
 
+  it('respondToPeerMatch — throws NotFoundException when request not found', async () => {
+    mockTx.select.mockReturnValueOnce({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+    });
+    await expect(
+      service.respondToPeerMatch(TENANT, REQUESTER, REQUEST_ID, true)
+    ).rejects.toThrow(NotFoundException);
+  });
+
   it('respondToPeerMatch — IDOR: rejects if not the matchedUserId', async () => {
     const request = { id: REQUEST_ID, requesterId: REQUESTER, matchedUserId: MATCHED };
     mockTx.select.mockReturnValueOnce({
-      from: vi.fn(() => ({ where: vi.fn(() => ({ limit: vi.fn().mockResolvedValue([request]) })) })),
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn().mockResolvedValue([request]),
+        })),
+      })),
     });
 
-    // USER is the requester, not the matched user — should be rejected
+    // REQUESTER tries to respond, but matchedUserId is MATCHED — should be rejected
     await expect(service.respondToPeerMatch(TENANT, REQUESTER, REQUEST_ID, true)).rejects.toThrow(
       BadRequestException
     );
@@ -91,10 +148,14 @@ describe('PeerMatchingService', () => {
   it('respondToPeerMatch — updates status to ACCEPTED when matchedUserId responds', async () => {
     const request = { id: REQUEST_ID, requesterId: REQUESTER, matchedUserId: MATCHED };
     const updated = { ...request, status: 'ACCEPTED' };
-    mockReturning.mockResolvedValueOnce([updated]);
     mockTx.select.mockReturnValueOnce({
-      from: vi.fn(() => ({ where: vi.fn(() => ({ limit: vi.fn().mockResolvedValue([request]) })) })),
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn().mockResolvedValue([request]),
+        })),
+      })),
     });
+    mockReturning.mockResolvedValueOnce([updated]);
 
     const result = await service.respondToPeerMatch(TENANT, MATCHED, REQUEST_ID, true);
     expect(result.status).toBe('ACCEPTED');

@@ -183,3 +183,6 @@ export * from './peer-review';
 
 // Phase 46: Group Challenges + KG Peer Matching
 export * from './group-challenges';
+
+// Phase 47: Knowledge Graph Credentials + Chavruta Partner Sessions
+export * from './knowledge-credentials';

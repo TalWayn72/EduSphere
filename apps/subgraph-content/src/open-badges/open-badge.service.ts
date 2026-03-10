@@ -10,6 +10,7 @@ import {
   OnModuleDestroy,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   createDatabaseConnection,
@@ -27,6 +28,8 @@ import {
   signCredential,
   verifyCredentialSignature,
 } from './open-badge.crypto.js';
+import { GraphGroundedCredentialService } from '../certificate/graph-credential.service.js';
+import type { KnowledgePathCoverageResult } from '../certificate/graph-credential.service.js';
 import { buildLinkedInShareUrl } from './open-badge.types.js';
 import type {
   Ed25519KeyPair,
@@ -55,6 +58,10 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
   keyPair!: Ed25519KeyPair; // loaded once on init; internal for testability
   private nats: NatsConnection | null = null;
   private readonly subs: Subscription[] = [];
+
+  constructor(
+    private readonly graphCredentialService: GraphGroundedCredentialService,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     this.keyPair = loadKeyPair();
@@ -296,6 +303,57 @@ export class OpenBadgeService implements OnModuleInit, OnModuleDestroy {
         .from(schema.openBadgeDefinitions)
         .where(eq(schema.openBadgeDefinitions.tenantId, tenantId))
     );
+  }
+
+  /**
+   * GAP-8: Issue a badge only after verifying knowledge graph path coverage.
+   * Throws BadRequestException if coverage is below the mastery threshold.
+   */
+  async issueGraphGroundedBadge(
+    userId: string,
+    tenantId: string,
+    courseId: string,
+    badgeDefinitionId: string,
+    requiredConceptIds: string[],
+  ): Promise<BadgeAssertionResult> {
+    const coverage =
+      await this.graphCredentialService.verifyKnowledgePathCoverage(
+        userId,
+        tenantId,
+        courseId,
+        requiredConceptIds,
+      );
+
+    if (!coverage.covered) {
+      this.logger.warn(
+        `[OpenBadgeService] Graph coverage insufficient userId=${userId} score=${coverage.coverageScore}`,
+        { tenantId, userId, courseId, coverageScore: coverage.coverageScore },
+      );
+      throw new BadRequestException(
+        `Knowledge graph coverage insufficient: ${Math.round(coverage.coverageScore * 100)}% (required ≥70%). ` +
+          `Missing concepts: ${coverage.missingConcepts.join(', ')}`,
+      );
+    }
+
+    const assertion = await this.issueCredential({
+      userId,
+      tenantId,
+      badgeDefinitionId,
+    });
+
+    await this.graphCredentialService.recordGraphCredential(
+      userId,
+      tenantId,
+      assertion.id,
+      coverage,
+    );
+
+    this.logger.log(
+      `[OpenBadgeService] Graph-grounded badge issued assertionId=${assertion.id}`,
+      { tenantId, userId, courseId, coverageScore: coverage.coverageScore },
+    );
+
+    return assertion;
   }
 
   async getAssertionById(

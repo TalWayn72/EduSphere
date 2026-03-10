@@ -35,6 +35,15 @@ type OpenBadgeAssertion {
   definition: OpenBadgeDefinition
 }
 
+"""Knowledge graph topology coverage for a credential requirement"""
+type KnowledgePathCoverage {
+  covered: Boolean!
+  coverageScore: Float!
+  conceptIds: [ID!]!
+  pathDepth: Int!
+  missingConcepts: [ID!]!
+}
+
 """Result of verifying a badge assertion's Ed25519 proof"""
 type BadgeVerificationResult {
   valid: Boolean!
@@ -62,6 +71,14 @@ extend type Query {
   Simpler scalar alternative to verifyBadge for quick validity checks.
   """
   verifyOpenBadge(assertionId: ID!): Boolean!
+
+  """
+  Check knowledge graph topology coverage for a course before badge issuance.
+  """
+  knowledgePathCoverage(
+    courseId: ID!
+    requiredConceptIds: [ID!]!
+  ): KnowledgePathCoverage! @authenticated
 }
 
 extend type Mutation {
@@ -86,4 +103,14 @@ extend type Mutation {
     assertionId: ID!
     reason: String!
   ): Boolean! @authenticated @requiresRole(roles: [ORG_ADMIN])
+
+  """
+  Issue a badge gated on knowledge graph topology coverage (GAP-8).
+  Throws if coverage < 70% mastery threshold.
+  """
+  issueGraphGroundedBadge(
+    courseId: ID!
+    definitionId: ID!
+    requiredConceptIds: [ID!]!
+  ): OpenBadgeAssertion! @authenticated
 }

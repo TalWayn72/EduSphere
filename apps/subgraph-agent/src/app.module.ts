@@ -12,6 +12,7 @@ import { MetricsModule } from './metrics/metrics.module';
 import { LiveSessionsModule } from './live-sessions/live-sessions.module';
 import { ProctoringModule } from './proctoring/proctoring.module';
 import { SkillModule } from './skills/skill.module';
+import { ChavrutaPartnerModule } from './chavruta-partner/chavruta-partner.module';
 import { authMiddleware } from './auth/auth.middleware';
 
 @Module({
@@ -37,6 +38,7 @@ import { authMiddleware } from './auth/auth.middleware';
     LiveSessionsModule,
     ProctoringModule,
     SkillModule,
+    ChavrutaPartnerModule,
   ],
 })
 export class AppModule {}

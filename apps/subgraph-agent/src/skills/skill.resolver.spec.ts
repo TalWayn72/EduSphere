@@ -1,39 +1,39 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UnauthorizedException } from '@nestjs/common';
 
-// ── Mock SkillService ────────────────────────────────────────────────────────
+// ── Hoisted mocks (vi.hoisted prevents TDZ when vi.mock factories reference these) ──
+const mockListSkills = vi.hoisted(() => vi.fn().mockResolvedValue([]));
+const mockGetSkill = vi.hoisted(() => vi.fn().mockResolvedValue(null));
+const mockListSkillPaths = vi.hoisted(() => vi.fn().mockResolvedValue([]));
+const mockGetMySkillProgress = vi.hoisted(() => vi.fn().mockResolvedValue([]));
+const mockCreateSkillPath = vi.hoisted(() => vi.fn().mockResolvedValue({ id: 'path-1' }));
+const mockUpdateMySkillProgress = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ skillId: 'skill-1', masteryLevel: 'PROFICIENT' })
+);
+const mockGetSkillPrerequisites = vi.hoisted(() => vi.fn().mockResolvedValue([]));
+const mockGetSkillGapAnalysis = vi.hoisted(() => vi.fn().mockResolvedValue(null));
 
-const mockListSkills = vi.fn().mockResolvedValue([]);
-const mockGetSkill = vi.fn().mockResolvedValue(null);
-const mockListSkillPaths = vi.fn().mockResolvedValue([]);
-const mockGetMySkillProgress = vi.fn().mockResolvedValue([]);
-const mockCreateSkillPath = vi.fn().mockResolvedValue({ id: 'path-1' });
-const mockUpdateMySkillProgress = vi
-  .fn()
-  .mockResolvedValue({ skillId: 'skill-1', masteryLevel: 'PROFICIENT' });
-const mockGetSkillPrerequisites = vi.fn().mockResolvedValue([]);
+// ── Module mocks ──────────────────────────────────────────────────────────────
 
-vi.mock('./skill.service', () => ({
-  SkillService: vi.fn().mockImplementation(() => ({
-    listSkills: mockListSkills,
-    getSkill: mockGetSkill,
-    listSkillPaths: mockListSkillPaths,
-    getMySkillProgress: mockGetMySkillProgress,
-    createSkillPath: mockCreateSkillPath,
-    updateMySkillProgress: mockUpdateMySkillProgress,
-    getSkillPrerequisites: mockGetSkillPrerequisites,
-  })),
-}));
+vi.mock('./skill.service', () => {
+  class SkillService {
+    listSkills = mockListSkills;
+    getSkill = mockGetSkill;
+    listSkillPaths = mockListSkillPaths;
+    getMySkillProgress = mockGetMySkillProgress;
+    createSkillPath = mockCreateSkillPath;
+    updateMySkillProgress = mockUpdateMySkillProgress;
+    getSkillPrerequisites = mockGetSkillPrerequisites;
+  }
+  return { SkillService };
+});
 
-// ── Mock SkillGapService ──────────────────────────────────────────────────────
-
-const mockGetSkillGapAnalysis = vi.fn().mockResolvedValue(null);
-
-vi.mock('./skill-gap.service', () => ({
-  SkillGapService: vi.fn().mockImplementation(() => ({
-    getSkillGapAnalysis: mockGetSkillGapAnalysis,
-  })),
-}));
+vi.mock('./skill-gap.service', () => {
+  class SkillGapService {
+    getSkillGapAnalysis = mockGetSkillGapAnalysis;
+  }
+  return { SkillGapService };
+});
 
 // ── Import after mocks ────────────────────────────────────────────────────────
 

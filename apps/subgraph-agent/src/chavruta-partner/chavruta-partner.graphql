@@ -1,0 +1,41 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@authenticated"])
+
+type ChavrutaPartnerMatch {
+  partnerId: ID!
+  partnerName: String!
+  courseId: ID!
+  topic: String!
+  matchReason: String!
+  compatibilityScore: Float!
+}
+
+type ChavrutaPartnerSession {
+  id: ID!
+  initiatorId: ID!
+  partnerId: ID!
+  courseId: ID!
+  topic: String!
+  status: String!
+  initiatedAt: String!
+}
+
+input FindChavrutaPartnerInput {
+  courseId: ID!
+  preferredTopic: String
+}
+
+input CreateChavrutaPartnerSessionInput {
+  partnerId: ID!
+  courseId: ID!
+  topic: String!
+}
+
+extend type Query {
+  chavrutaPartnerMatches(input: FindChavrutaPartnerInput!): [ChavrutaPartnerMatch!]! @authenticated
+  myChavrutaPartnerSessions: [ChavrutaPartnerSession!]! @authenticated
+}
+
+extend type Mutation {
+  createChavrutaPartnerSession(input: CreateChavrutaPartnerSessionInput!): ChavrutaPartnerSession! @authenticated
+}

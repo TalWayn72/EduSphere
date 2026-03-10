@@ -9,6 +9,8 @@ import { KnowledgeSourceModule } from './sources/knowledge-source.module';
 import { NatsConsumerModule } from './nats/nats.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { authMiddleware } from './auth/auth.middleware';
+import { CohortInsightsModule } from './cohort-insights/cohort-insights.module';
+import { PeerMatchingModule } from './peer-matching/peer-matching.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { authMiddleware } from './auth/auth.middleware';
     GraphModule,
     KnowledgeSourceModule,
     NatsConsumerModule,
+    CohortInsightsModule,
+    PeerMatchingModule,
   ],
 })
 export class AppModule {}

@@ -11,11 +11,19 @@ import {
   closeAllPools,
   executeCypher,
   peerMatchRequests,
+  userCourses,
   eq,
   and,
+  ne,
   sql,
 } from '@edusphere/db';
 import type { TenantContext, NewPeerMatchRequest } from '@edusphere/db';
+
+export interface MentorPathMatchDto {
+  mentorId: string;
+  pathOverlapScore: number;
+  sharedConcepts: string[];
+}
 import { graphConfig } from '@edusphere/config';
 
 const GRAPH_NAME = graphConfig.graphName;
@@ -166,5 +174,72 @@ export class PeerMatchingService implements OnModuleDestroy {
           )
         )
     );
+  }
+
+  /**
+   * GAP-6: Find mentors who traversed the same learning path.
+   * Uses Apache AGE Cypher to match on shared STUDIED concept nodes,
+   * falling back to SQL enrollment overlap if AGE is unavailable.
+   */
+  async findMentorsByPathTopology(
+    userId: string,
+    tenantId: string,
+    courseId: string
+  ): Promise<MentorPathMatchDto[]> {
+    try {
+      const cypherQuery = `
+        MATCH (me:Person {userId: $userId})-[:STUDIED]->(c:Concept)
+        MATCH (mentor:Person)-[:STUDIED]->(c)
+        WHERE mentor.userId <> $userId
+          AND mentor.tenantId = $tenantId
+        WITH mentor, COUNT(c) AS sharedCount, COLLECT(c.name) AS sharedConcepts
+        WHERE sharedCount >= 3
+        RETURN mentor.userId AS mentorId, sharedCount, sharedConcepts
+        ORDER BY sharedCount DESC
+        LIMIT 5
+      `;
+      const rows = await executeCypher<{
+        mentorId: string;
+        sharedCount: number;
+        sharedConcepts: string[];
+      }>(db, GRAPH_NAME, cypherQuery, { userId, tenantId }, tenantId);
+
+      if (rows.length > 0) {
+        return rows.map((r) => ({
+          mentorId: String(r.mentorId).replace(/"/g, ''),
+          pathOverlapScore: Math.min(1, Number(r.sharedCount) / 10),
+          sharedConcepts: Array.isArray(r.sharedConcepts) ? r.sharedConcepts : [],
+        }));
+      }
+    } catch (err) {
+      this.logger.warn(
+        { err, userId, tenantId, courseId },
+        '[PeerMatchingService] AGE mentorsByPath query failed, using SQL fallback'
+      );
+    }
+
+    // SQL fallback: enrolled peers in the same course
+    return withTenantContext(db, this.ctx(tenantId, userId), async (tx) => {
+      const mentors = await tx
+        .select({ mentorId: userCourses.userId })
+        .from(userCourses)
+        .where(
+          and(
+            sql`EXISTS (
+              SELECT 1 FROM courses c
+              WHERE c.id = ${userCourses.courseId}
+                AND c.tenant_id::text = ${tenantId}
+                AND c.id::text = ${courseId}
+            )`,
+            ne(userCourses.userId, userId)
+          )
+        )
+        .limit(5);
+      return mentors.map((m) => ({
+        mentorId: m.mentorId,
+        pathOverlapScore: 0.5,
+        sharedConcepts: [],
+      }));
+    });
   }
 }
