@@ -197,34 +197,40 @@ describe('SEC-7: Profile enumeration protection', () => {
 // ── Cross-feature: RLS tenant isolation on new tables ────────────────────────
 
 describe('Cross-feature: RLS tenant isolation on new tables', () => {
-  const schema = read('packages/db/src/schema/peer-review.ts');
+  // peer-review.ts has rubrics/assignments/discussion_likes
+  // social.ts (canonical) has social_feed_items — combined for full coverage check
+  const peerReviewSchema = read('packages/db/src/schema/peer-review.ts');
+  const socialSchema = read('packages/db/src/schema/social.ts');
+  const allSchemas = peerReviewSchema + '\n' + socialSchema;
 
   it('peer_review_rubrics has pgPolicy with tenant_id check', () => {
-    expect(schema).toMatch(
+    expect(peerReviewSchema).toMatch(
       /peer_rubrics_tenant_isolation|peer_review_rubrics.*tenant/i
     );
   });
 
   it('peer_review_assignments has pgPolicy with tenant_id check', () => {
-    expect(schema).toMatch(
+    expect(peerReviewSchema).toMatch(
       /peer_assignments_rls|peer_review_assignments.*tenant/i
     );
   });
 
   it('social_feed_items has pgPolicy with tenant_id check', () => {
-    expect(schema).toMatch(
+    // social_feed_items is defined in social.ts (canonical location, not peer-review.ts)
+    expect(socialSchema).toMatch(
       /social_feed_tenant_isolation|social_feed_items.*tenant/i
     );
   });
 
   it('discussion_message_likes has pgPolicy with tenant_id check', () => {
-    expect(schema).toMatch(
+    expect(peerReviewSchema).toMatch(
       /discussion_likes_tenant_isolation|discussion_message_likes.*tenant/i
     );
   });
 
   it('all 4 new tables call enableRLS()', () => {
-    expect(schema.match(/\.enableRLS\(\)/g)?.length ?? 0).toBeGreaterThanOrEqual(4);
+    // 3 in peer-review.ts (rubrics, assignments, discussion_likes) + 1 in social.ts (social_feed_items)
+    expect(allSchemas.match(/\.enableRLS\(\)/g)?.length ?? 0).toBeGreaterThanOrEqual(4);
   });
 });
 
